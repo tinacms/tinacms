@@ -38,7 +38,7 @@ export default defineClientPlugin({
       const field = asObjectFieldSchema(node);
       return digestDocument(value, field.fields, context);
     },
-    validateChildren: (value: TinaDocument, node, address, registry) => {
+    validateChildren: (value: TinaDocument, node, address, registry, scope) => {
       const field = asObjectFieldSchema(node);
       const object = isPlainObject(value) ? value : {};
       const errors: Record<string, string[]> = {};
@@ -51,7 +51,8 @@ export default defineClientPlugin({
             descriptor,
             object[subfield.name],
             `${address}.${subfield.name}`,
-            registry
+            registry,
+            { ...scope, siblings: object }
           )
         );
       }

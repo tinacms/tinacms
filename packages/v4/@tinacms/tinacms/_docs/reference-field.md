@@ -35,7 +35,7 @@ const collection = {
     t.reference({
       name: 'author',
       label: 'Author',
-      required: true,
+      validators: [required()],
       collections: ['author'],
     }),
   ],
@@ -47,6 +47,12 @@ const collection = {
 | Key | Type | Effect |
 |---|---|---|
 | `collections` | `string[]` (required) | the names of the collections an author can choose a document from |
+
+> `required`, `min`, `max` and `pattern` are no longer config keys. They are
+> validators that a core plugin registers, and a collection attaches them with
+> `validators`. Refer to
+> [Validation in two layers](./field-plugins.md#validation-in-two-layers).
+
 
 `collections` holds collection **names**, not paths and not labels. A field can
 name more than one collection. The field then shows the documents of every one
@@ -98,7 +104,6 @@ resolves.
 
 | Config | Rule | Message |
 |---|---|---|
-| `required` | the value is absent or empty | `<label> is required` |
 | (none) | an absent or empty value passes | |
 
 An optional field wraps the string in `z.preprocess`, so `''` and `null` become

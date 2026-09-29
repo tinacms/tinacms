@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from '@tinacms/ui/components/select';
 import { useRef } from 'react';
+import { hasValidator } from '../../../core/schema/types';
 import {
   useFieldActivation,
   useFieldAddress,
@@ -30,7 +31,8 @@ export function SelectField() {
     value: option.value,
     label: option.label ?? option.value,
   }));
-  const items = field.required ? optionItems : [noneItem, ...optionItems];
+  const isRequired = hasValidator(field, 'required');
+  const items = isRequired ? optionItems : [noneItem, ...optionItems];
 
   return (
     <FieldWrapper errors={errors}>
@@ -45,7 +47,7 @@ export function SelectField() {
           <SelectValue placeholder='Select...' />
         </SelectTrigger>
         <SelectContent>
-          {field.required ? null : (
+          {isRequired ? null : (
             <SelectItem value={noneItem.value}>{noneItem.label}</SelectItem>
           )}
           {field.options.map((option) => (

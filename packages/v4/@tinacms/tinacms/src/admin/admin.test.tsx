@@ -8,8 +8,11 @@ import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
 import { useFormId } from '../editor/hooks';
+import { draftKey, readDraft } from '../form/drafts';
 import { useFormStore } from '../form/form-store';
+import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 import { useAdminRoute } from './use-admin-route';
 
@@ -94,7 +97,12 @@ const screenPlugin = definePlugin({
 });
 
 const config = asResolvedConfig({
-  plugins: [contentPlugin, screenPlugin, stringFieldPlugin],
+  plugins: [
+    contentPlugin,
+    screenPlugin,
+    stringFieldPlugin,
+    coreValidatorsPlugin,
+  ],
   schema: {
     collections: [
       {
@@ -102,7 +110,14 @@ const config = asResolvedConfig({
         label: 'Posts',
         path: 'content/posts',
         format: 'mdx',
-        fields: [{ name: 'title', label: 'Title', type: 'string' }],
+        fields: [
+          {
+            name: 'title',
+            label: 'Title',
+            type: 'string',
+            validators: [required()],
+          },
+        ],
       },
       {
         name: 'page',
@@ -194,6 +209,31 @@ describe('TinaAdmin', () => {
       expect(screen.getByRole('status')).toHaveTextContent('Saved')
     );
     expect(input).toHaveValue('Hello!');
+  });
+
+  it('disables Save while the document has a validation error', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    const input = await screen.findByLabelText('Title');
+
+    await user.clear(input);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Title is required'
+    );
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+
+    await user.type(input, 'Hello again');
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
+        'aria-disabled',
+        'false'
+      )
+    );
   });
 
   it('opens the document a deep link names', async () => {
@@ -535,5 +575,54 @@ describe('TinaAdmin form continuity', () => {
     await screen.findByLabelText('Title');
 
     expect(screen.getByRole('list', { name: 'Posts documents' })).toBe(before);
+  });
+});
+
+describe('TinaAdmin stale drafts', () => {
+  const storeStaleDraft = () =>
+    localStorage.setItem(
+      draftKey('content/posts/hello.mdx'),
+      JSON.stringify({
+        version: 1,
+        values: { title: 'Mine' },
+        baseline: { title: 'Old' },
+      })
+    );
+
+  const openHello = async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    return user;
+  };
+
+  it('asks to resume or discard before the form can be edited', async () => {
+    storeStaleDraft();
+    const user = await openHello();
+    const dialog = await screen.findByRole('alertdialog', {
+      name: 'Resume your unsaved edits?',
+    });
+
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Resume edits' })
+    );
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
+      'Mine'
+    );
+  });
+
+  it('discards the stale draft from the dialog', async () => {
+    storeStaleDraft();
+    const user = await openHello();
+    const dialog = await screen.findByRole('alertdialog');
+
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Discard draft' })
+    );
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(screen.getByLabelText('Title')).toHaveValue('Hello');
+    expect(readDraft('content/posts/hello.mdx')).toBeUndefined();
   });
 });

@@ -23,6 +23,9 @@ import {
 } from '../../../editor';
 import { formStatus, toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
+import { max, min, required } from '../../../plugins/fields';
+import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
+import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
 import numberFieldPlugin from '../number/number-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
@@ -31,7 +34,12 @@ import { asArrayFieldSchema } from './array-field.schema';
 
 const NO_COLLECTIONS = { collections: [] };
 const DOCUMENT_PATH = 'content/posts/featured.mdx';
-const PLUGINS = [arrayFieldPlugin, stringFieldPlugin, numberFieldPlugin];
+const PLUGINS = [
+  arrayFieldPlugin,
+  stringFieldPlugin,
+  numberFieldPlugin,
+  coreValidatorsPlugin,
+];
 
 const valueOf = (name: string) =>
   useFormStore.getState().forms[toFormId(DOCUMENT_PATH)]?.values[
@@ -49,16 +57,16 @@ const collection: CollectionSchema = {
     t.array({
       name: 'authors',
       label: 'Authors',
-      required: true,
+      validators: [required()],
       fields: [
-        t.string({ name: 'name', label: 'Name', required: true }),
+        t.string({ name: 'name', label: 'Name', validators: [required()] }),
         t.number({ name: 'age', label: 'Age' }),
       ],
     }),
     t.array({
       name: 'tags',
       label: 'Tags',
-      max: 2,
+      validators: [max(2)],
       fields: [t.string({ name: 'value', label: 'Value' })],
     }),
     t.array({
@@ -68,7 +76,9 @@ const collection: CollectionSchema = {
         t.array({
           name: 'members',
           label: 'Members',
-          fields: [t.string({ name: 'name', label: 'Name', required: true })],
+          fields: [
+            t.string({ name: 'name', label: 'Name', validators: [required()] }),
+          ],
         }),
       ],
     }),
@@ -246,14 +256,14 @@ describe('ArrayField validation', () => {
   it('requires at least one item', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('array');
-    expect(validateField(authorsNode, descriptor, [{ name: 'Ivan' }])).toEqual(
-      []
-    );
-    expect(validateField(authorsNode, descriptor, [])).toEqual([
-      'Authors needs at least 1 item',
+    expect(
+      validateFieldWithCore(authorsNode, descriptor, [{ name: 'Ivan' }])
+    ).toEqual([]);
+    expect(validateFieldWithCore(authorsNode, descriptor, [])).toEqual([
+      'Authors is required',
     ]);
-    expect(validateField(authorsNode, descriptor, undefined)).toEqual([
-      'Authors needs at least 1 item',
+    expect(validateFieldWithCore(authorsNode, descriptor, undefined)).toEqual([
+      'Authors is required',
     ]);
   });
 
@@ -263,29 +273,33 @@ describe('ArrayField validation', () => {
     const node = t.array({
       name: 'authors',
       label: 'Authors',
-      required: true,
-      min: 0,
+      validators: [required(), min(0)],
       fields: [t.string({ name: 'name' })],
     });
-    expect(validateField(node, descriptor, [])).toEqual([
-      'Authors needs at least 1 item',
+    expect(validateFieldWithCore(node, descriptor, [])).toEqual([
+      'Authors is required',
     ]);
-    expect(validateField(node, descriptor, [{ name: 'Ivan' }])).toEqual([]);
+    expect(validateFieldWithCore(node, descriptor, [{ name: 'Ivan' }])).toEqual(
+      []
+    );
   });
 
   it('rejects more items than max', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('array');
     expect(
-      validateField(tagsNode, descriptor, [{ value: 'a' }, { value: 'b' }])
+      validateFieldWithCore(tagsNode, descriptor, [
+        { value: 'a' },
+        { value: 'b' },
+      ])
     ).toEqual([]);
     expect(
-      validateField(tagsNode, descriptor, [
+      validateFieldWithCore(tagsNode, descriptor, [
         { value: 'a' },
         { value: 'b' },
         { value: 'c' },
       ])
-    ).toEqual(['Tags allows at most 2 items']);
+    ).toEqual(['Tags must be at most 2 items']);
   });
 
   it("validates each item field and keys messages by the item's nested address", async () => {
@@ -295,7 +309,8 @@ describe('ArrayField validation', () => {
       [{ name: '', age: 30 }, { name: 'Brook' }],
       authorsNode,
       'authors',
-      registry
+      registry,
+      { validators: coreValidatorRegistry }
     );
     expect(errors).toEqual({ 'authors.0.name': ['Name is required'] });
   });
@@ -317,7 +332,8 @@ describe('ArrayField validation', () => {
       [{ members: [{ name: '' }] }],
       groupsNode,
       'groups',
-      registry
+      registry,
+      { validators: coreValidatorRegistry }
     );
     expect(errors).toEqual({ 'groups.0.members.0.name': ['Name is required'] });
   });
@@ -395,3 +411,14 @@ describe('ArrayField metadata wrapping', () => {
     expect(descriptor?.defaultValue).toBeUndefined();
   });
 });
+
+const validateFieldWithCore: typeof validateField = (
+  node,
+  descriptor,
+  value,
+  options
+) =>
+  validateField(node, descriptor, value, {
+    validators: coreValidatorRegistry,
+    ...options,
+  });

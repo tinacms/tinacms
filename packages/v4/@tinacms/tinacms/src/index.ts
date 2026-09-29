@@ -25,14 +25,30 @@ export {
   definePlugin,
   type PluginManifest,
 } from './core/plugin';
+export {
+  defineHook,
+  defineHooksPlugin,
+  type HookDefinition,
+  type RegisteredHook,
+} from './core/form/hooks';
 export type {
   CollectionFormat,
   CollectionSchema,
   FieldSchema,
+  HookRef,
   TinaDocument,
+  ValidatorRef,
 } from './core/schema/types';
 export { localContentPlugin } from './plugins/content/local/local-content.plugin';
-export { corePlugins, t } from './plugins/fields';
+export {
+  corePlugins,
+  max,
+  min,
+  pattern,
+  required,
+  t,
+  v,
+} from './plugins/fields';
 export type {
   BooleanFieldSchema,
   DatetimeFieldSchema,

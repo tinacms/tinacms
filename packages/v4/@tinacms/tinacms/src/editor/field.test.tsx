@@ -5,6 +5,7 @@ import { asResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { Field } from './field';
 import { FormProvider, TinaProvider } from './index';
 
@@ -46,7 +47,7 @@ const renderField = (address: string, schema: CollectionSchema = collection) =>
     <CaptureError>
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [stringFieldPlugin],
+          plugins: [stringFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >
@@ -77,7 +78,7 @@ describe('Field outside its providers', () => {
       <CaptureError>
         <TinaProvider
           config={asResolvedConfig({
-            plugins: [stringFieldPlugin],
+            plugins: [stringFieldPlugin, coreValidatorsPlugin],
             schema: NO_COLLECTIONS,
           })}
         >
@@ -116,7 +117,7 @@ describe('Field with a registered plugin', () => {
     render(
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [stringFieldPlugin],
+          plugins: [stringFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >

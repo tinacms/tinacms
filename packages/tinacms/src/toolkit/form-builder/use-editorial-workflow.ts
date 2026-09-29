@@ -1,22 +1,28 @@
-import * as React from 'react';
-import { ERR_BRANCH_CONFLICT, ERR_BRANCH_EXISTS } from '@tinacms/schema-tools';
+import { Form } from '@toolkit/forms';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
-import { useCMS } from '../react-core';
-import {
-  EDITORIAL_WORKFLOW_ERROR,
-  EDITORIAL_WORKFLOW_STATUS,
-  EditorialWorkflowErrorDetails,
-} from './editorial-workflow-constants';
+import * as React from 'react';
 import {
   CREATE_DOCUMENT_GQL,
   DELETE_DOCUMENT_GQL,
   UPDATE_DOCUMENT_GQL,
 } from '../../admin/api';
-import { Form } from '@toolkit/forms';
+import { useCMS } from '../react-core';
+import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
 import {
-  checkTargetBranchExists,
-  getEditorialWorkflowPrTitle,
+  type EditorialWorkflowErrorCopy,
   TARGET_BRANCH_EXISTS_ERROR,
+  checkTargetBranchExists,
+  collectionLabelResolver,
+  getEditorialWorkflowError,
+  getEditorialWorkflowPrTitle,
+  messageText,
+  plainMessage,
+} from './editorial-workflow-utils';
+
+export {
+  collectionLabelResolver,
+  getEditorialWorkflowError,
+  plainMessage,
 } from './editorial-workflow-utils';
 
 const pathRelativeToCollection = (
@@ -76,7 +82,7 @@ export interface ExecuteWorkflowOptions {
 
 export interface UseEditorialWorkflowResult {
   isExecuting: boolean;
-  errorMessage: string;
+  error?: EditorialWorkflowErrorCopy;
   currentStep: number;
   elapsedTime: number;
   /** Resolves with the outcome; on failure `error` holds the message. */
@@ -87,46 +93,15 @@ export interface UseEditorialWorkflowResult {
   reset: () => void;
 }
 
-export const getEditorialWorkflowErrorMessage = (e: unknown): string => {
-  let errMessage =
-    'Branch operation failed. Talking to GitHub was unsuccessful, please try again. If the problem persists please contact support at https://tina.io/support 🦙';
-
-  const err = e as EditorialWorkflowErrorDetails;
-
-  if (err.errorCode) {
-    switch (err.errorCode) {
-      case EDITORIAL_WORKFLOW_ERROR.BRANCH_EXISTS:
-        errMessage = 'A branch with this name already exists';
-        break;
-      case EDITORIAL_WORKFLOW_ERROR.BRANCH_HIERARCHY_CONFLICT:
-        errMessage =
-          err.message || 'Branch name conflicts with an existing branch';
-        break;
-      case EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED:
-        errMessage = err.message || 'Invalid branch name';
-        break;
-      default:
-        errMessage = err.message || errMessage;
-        break;
-    }
-  } else if (err.message) {
-    if (err.message.toLowerCase().includes(ERR_BRANCH_EXISTS)) {
-      errMessage = 'A branch with this name already exists';
-    } else if (err.message.toLowerCase().includes(ERR_BRANCH_CONFLICT)) {
-      errMessage = err.message;
-    }
-  }
-
-  return errMessage;
-};
-
 export function useEditorialWorkflow(): UseEditorialWorkflowResult {
   const cms = useCMS();
   const tinaApi = cms.api.tina;
   const { setCurrentBranch } = useBranchData();
 
   const [isExecuting, setIsExecuting] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState('');
+  const [error, setError] = React.useState<
+    EditorialWorkflowErrorCopy | undefined
+  >(undefined);
   const [currentStep, setCurrentStep] = React.useState(0);
   const [elapsedTime, setElapsedTime] = React.useState(0);
 
@@ -145,7 +120,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
   }, [isExecuting, currentStep]);
 
   const reset = () => {
-    setErrorMessage('');
+    setError(undefined);
     setIsExecuting(false);
     setCurrentStep(0);
   };
@@ -176,7 +151,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       if (signal?.aborted) return { success: false };
 
       if (targetBranchExists) {
-        setErrorMessage(TARGET_BRANCH_EXISTS_ERROR);
+        setError({ messageParts: plainMessage(TARGET_BRANCH_EXISTS_ERROR) });
         setIsExecuting(false);
         setCurrentStep(0);
         return { success: false, error: TARGET_BRANCH_EXISTS_ERROR };
@@ -270,19 +245,22 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       return { success: true };
     } catch (e: unknown) {
       console.error(e);
-      const errMessage = getEditorialWorkflowErrorMessage(e);
+      const copy = getEditorialWorkflowError(
+        e,
+        collectionLabelResolver(cms.api.tina.schema)
+      );
 
-      setErrorMessage(errMessage);
+      setError(copy);
       setIsExecuting(false);
       setCurrentStep(0);
 
-      return { success: false, error: errMessage };
+      return { success: false, error: messageText(copy.messageParts) };
     }
   };
 
   return {
     isExecuting,
-    errorMessage,
+    error,
     currentStep,
     elapsedTime,
     executeWorkflow,

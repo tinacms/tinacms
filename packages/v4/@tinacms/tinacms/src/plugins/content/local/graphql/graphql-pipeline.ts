@@ -7,9 +7,10 @@ import {
   resolve,
 } from '@tinacms/graphql';
 import { SqliteLevel } from 'sqlite-level';
-import type {
-  CollectionSchema,
-  FieldSchema,
+import {
+  type CollectionSchema,
+  type FieldSchema,
+  hasValidator,
 } from '../../../../core/schema/types';
 import { collectionFormats } from '../adapters/format-adapters';
 
@@ -32,7 +33,7 @@ const toV3Field = (field: FieldSchema) => ({
   type: field.type,
   name: field.name,
   label: field.label,
-  required: field.required,
+  required: hasValidator(field, 'required'),
   isBody: field.isBody,
   ...(field.templates ? { templates: field.templates } : {}),
   ...(field.collections ? { collections: field.collections } : {}),

@@ -4,7 +4,7 @@
 
 */
 
-import type { RichTextType } from '@tinacms/schema-tools';
+import type { RichTextField } from '@tinacms/schema-tools';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { gfmFromMarkdown } from 'mdast-util-gfm';
 import { gfm } from 'micromark-extension-gfm';
@@ -71,7 +71,7 @@ import {
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form value with no additional work.
  */
-export const markdownToAst = (value: string, field: RichTextType) => {
+export const markdownToAst = (value: string, field: RichTextField) => {
   const patterns: Pattern[] = [];
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
@@ -160,7 +160,7 @@ const toLineFeeds = (value: string): string => value.replace(/\r\n/g, '\n');
 
 export const parseMDX = (
   value: string,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (s: string) => string
 ): Plate.RootElement => {
   if (!value) {

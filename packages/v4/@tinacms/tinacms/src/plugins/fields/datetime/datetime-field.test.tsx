@@ -18,6 +18,9 @@ import {
   useFieldValue,
 } from '../../../editor';
 import { t } from '../../../index';
+import { required } from '../../../plugins/fields';
+import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
+import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
 import datetimeFieldPlugin from './datetime-field.plugin';
 
@@ -36,7 +39,7 @@ const publishedNode = collection.fields[0];
 const requiredNode = t.datetime({
   name: 'published',
   label: 'Published',
-  required: true,
+  validators: [required()],
 });
 
 const resolveRegistry = (): Promise<FieldRegistry> =>
@@ -46,7 +49,7 @@ const renderPublished = (document?: TinaDocument) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [datetimeFieldPlugin],
+        plugins: [datetimeFieldPlugin, coreValidatorsPlugin],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -175,25 +178,31 @@ describe('DatetimeField validation', () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('datetime');
     expect(
-      validateField(publishedNode, descriptor, '2024-05-01T09:30')
+      validateFieldWithCore(publishedNode, descriptor, '2024-05-01T09:30')
     ).toEqual([]);
-    expect(validateField(publishedNode, descriptor, '2024-05-01')).toEqual([]);
+    expect(
+      validateFieldWithCore(publishedNode, descriptor, '2024-05-01')
+    ).toEqual([]);
   });
 
   it('accepts a Date instance, the shape a YAML frontmatter date arrives in', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('datetime');
     expect(
-      validateField(publishedNode, descriptor, new Date('2024-05-01T09:30:00Z'))
+      validateFieldWithCore(
+        publishedNode,
+        descriptor,
+        new Date('2024-05-01T09:30:00Z')
+      )
     ).toEqual([]);
   });
 
   it('rejects a string that is not a date', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('datetime');
-    expect(validateField(publishedNode, descriptor, 'not-a-date')).not.toEqual(
-      []
-    );
+    expect(
+      validateFieldWithCore(publishedNode, descriptor, 'not-a-date')
+    ).not.toEqual([]);
   });
 
   it('rejects a date shape the input cannot show, even when Date.parse takes it', async () => {
@@ -201,7 +210,9 @@ describe('DatetimeField validation', () => {
     const descriptor = registry.get('datetime');
     for (const value of ['May 1, 2024', '2024/05/01', '2024-05-01 09:30']) {
       expect(Number.isNaN(Date.parse(value))).toBe(false);
-      expect(validateField(publishedNode, descriptor, value)).not.toEqual([]);
+      expect(
+        validateFieldWithCore(publishedNode, descriptor, value)
+      ).not.toEqual([]);
     }
   });
 
@@ -209,31 +220,39 @@ describe('DatetimeField validation', () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('datetime');
     expect(
-      validateField(publishedNode, descriptor, '2024-05-01T09:30:00+10:00')
+      validateFieldWithCore(
+        publishedNode,
+        descriptor,
+        '2024-05-01T09:30:00+10:00'
+      )
     ).toEqual([]);
   });
 
   it('rejects a month that the calendar does not have', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('datetime');
-    expect(validateField(publishedNode, descriptor, '2024-13-01')).not.toEqual(
-      []
-    );
+    expect(
+      validateFieldWithCore(publishedNode, descriptor, '2024-13-01')
+    ).not.toEqual([]);
   });
 
   it('accepts an absent value as optional', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('datetime');
-    expect(validateField(publishedNode, descriptor, undefined)).toEqual([]);
-    expect(validateField(publishedNode, descriptor, null)).toEqual([]);
-    expect(validateField(publishedNode, descriptor, '')).toEqual([]);
+    expect(validateFieldWithCore(publishedNode, descriptor, undefined)).toEqual(
+      []
+    );
+    expect(validateFieldWithCore(publishedNode, descriptor, null)).toEqual([]);
+    expect(validateFieldWithCore(publishedNode, descriptor, '')).toEqual([]);
   });
 
   it('rejects an absent value when the field is required', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('datetime');
-    expect(validateField(requiredNode, descriptor, undefined)).not.toEqual([]);
-    expect(validateField(requiredNode, descriptor, '')).not.toEqual([]);
+    expect(
+      validateFieldWithCore(requiredNode, descriptor, undefined)
+    ).not.toEqual([]);
+    expect(validateFieldWithCore(requiredNode, descriptor, '')).not.toEqual([]);
   });
 });
 
@@ -268,3 +287,14 @@ describe('DatetimeField ingest and digest', () => {
     expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
   });
 });
+
+const validateFieldWithCore: typeof validateField = (
+  node,
+  descriptor,
+  value,
+  options
+) =>
+  validateField(node, descriptor, value, {
+    validators: coreValidatorRegistry,
+    ...options,
+  });

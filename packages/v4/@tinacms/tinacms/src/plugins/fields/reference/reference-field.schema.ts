@@ -17,17 +17,10 @@ export const reference = (
 
 const labelOf = (node: ReferenceFieldSchema): string => node.label ?? node.name;
 
-export const referenceSchema = (node: FieldSchema): ZodType => {
-  const field = node as ReferenceFieldSchema;
-  const schema = z.string();
-  if (field.required) {
-    return z.preprocess(
-      (value) => value ?? '',
-      schema.min(1, `${labelOf(field)} is required`)
-    );
-  }
-  return z.preprocess(
+// The shape of the value only: the path of another document. `required` is a
+// validator the collection attaches.
+export const referenceSchema = (_node: FieldSchema): ZodType =>
+  z.preprocess(
     (value) => (value === '' || value == null ? undefined : value),
-    schema.optional()
+    z.string().optional()
   );
-};

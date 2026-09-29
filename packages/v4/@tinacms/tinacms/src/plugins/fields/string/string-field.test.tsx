@@ -14,6 +14,9 @@ import type {
 import { validateField } from '../../../core/validation';
 import { FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
+import { max, min, pattern, required } from '../../../plugins/fields';
+import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
+import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
 import stringFieldPlugin from './string-field.plugin';
 
@@ -23,7 +26,13 @@ const collection: CollectionSchema = {
   name: 'post',
   label: 'Posts',
   format: 'mdx',
-  fields: [t.string({ name: 'title', label: 'Title', required: true, min: 3 })],
+  fields: [
+    t.string({
+      name: 'title',
+      label: 'Title',
+      validators: [required(), min(3)],
+    }),
+  ],
 };
 
 const titleNode = collection.fields[0];
@@ -35,7 +44,7 @@ const renderTitle = (document?: TinaDocument) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [stringFieldPlugin],
+        plugins: [stringFieldPlugin, coreValidatorsPlugin],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -85,9 +94,9 @@ describe('StringField validation', () => {
   it('passes the shared validation path with a valid value', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('string');
-    expect(validateField(titleNode, descriptor, 'abc')).toEqual([]);
-    expect(validateField(titleNode, descriptor, '')).toEqual([
-      'Title must be at least 3 characters',
+    expect(validateFieldWithCore(titleNode, descriptor, 'abc')).toEqual([]);
+    expect(validateFieldWithCore(titleNode, descriptor, '')).toEqual([
+      'Title is required',
     ]);
   });
 
@@ -98,7 +107,7 @@ describe('StringField validation', () => {
       validate: (value: string) =>
         value === 'banned' ? 'Value is not allowed' : null,
     };
-    expect(validateField(titleNode, descriptor, 'banned')).toContain(
+    expect(validateFieldWithCore(titleNode, descriptor, 'banned')).toContain(
       'Value is not allowed'
     );
   });
@@ -109,19 +118,25 @@ const errorsFor = async (
   value: unknown
 ): Promise<string[]> => {
   const registry = await resolveRegistry();
-  return validateField(t.string(config), registry.get('string'), value);
+  return validateFieldWithCore(t.string(config), registry.get('string'), value);
 };
 
 describe('StringField schema length bounds', () => {
   it('reports a value that is longer than the maximum', async () => {
     expect(
-      await errorsFor({ name: 'title', label: 'Title', max: 5 }, 'abcdef')
+      await errorsFor(
+        { name: 'title', label: 'Title', validators: [max(5)] },
+        'abcdef'
+      )
     ).toEqual(['Title must be at most 5 characters']);
   });
 
   it('accepts a value that sits on the maximum', async () => {
     expect(
-      await errorsFor({ name: 'title', label: 'Title', max: 5 }, 'abcde')
+      await errorsFor(
+        { name: 'title', label: 'Title', validators: [max(5)] },
+        'abcde'
+      )
     ).toEqual([]);
   });
 });
@@ -130,7 +145,7 @@ describe('StringField schema pattern', () => {
   it('accepts a value that matches the pattern', async () => {
     expect(
       await errorsFor(
-        { name: 'slug', label: 'Slug', pattern: '^[a-z-]+$' },
+        { name: 'slug', label: 'Slug', validators: [pattern('^[a-z-]+$')] },
         'a-slug'
       )
     ).toEqual([]);
@@ -139,7 +154,7 @@ describe('StringField schema pattern', () => {
   it('rejects a value that does not match the pattern', async () => {
     expect(
       await errorsFor(
-        { name: 'slug', label: 'Slug', pattern: '^[a-z-]+$' },
+        { name: 'slug', label: 'Slug', validators: [pattern('^[a-z-]+$')] },
         'Not A Slug'
       )
     ).toEqual(['Slug is invalid']);
@@ -149,7 +164,10 @@ describe('StringField schema pattern', () => {
   // leaves the field without the rule, and never stops the editor working.
   it('ignores a pattern that is not a valid expression', async () => {
     expect(
-      await errorsFor({ name: 'slug', label: 'Slug', pattern: '[' }, 'anything')
+      await errorsFor(
+        { name: 'slug', label: 'Slug', validators: [pattern('[')] },
+        'anything'
+      )
     ).toEqual([]);
   });
 });
@@ -157,43 +175,54 @@ describe('StringField schema pattern', () => {
 describe('StringField schema required', () => {
   it('reports an empty required field', async () => {
     expect(
-      await errorsFor({ name: 'title', label: 'Title', required: true }, '')
+      await errorsFor(
+        { name: 'title', label: 'Title', validators: [required()] },
+        ''
+      )
     ).toEqual(['Title is required']);
   });
 
   it('reports a missing required field', async () => {
     expect(
       await errorsFor(
-        { name: 'title', label: 'Title', required: true },
+        { name: 'title', label: 'Title', validators: [required()] },
         undefined
       )
     ).toEqual(['Title is required']);
   });
 
-  // A minimum of one or more already rejects an empty value. A second rule
-  // would report the same field twice.
-  it('reports only the minimum message when the field has a minimum', async () => {
+  // `min` measures content, so it passes an empty value and lets `required`
+  // report it. A field with both rules reports one message, not two.
+  it('reports only the required message when the field is empty', async () => {
     expect(
       await errorsFor(
-        { name: 'title', label: 'Title', required: true, min: 3 },
+        {
+          name: 'title',
+          label: 'Title',
+          validators: [required(), min(3)],
+        },
         ''
       )
-    ).toEqual(['Title must be at least 3 characters']);
+    ).toEqual(['Title is required']);
   });
 
   it('reports the required message when the minimum is zero', async () => {
     expect(
       await errorsFor(
-        { name: 'title', label: 'Title', required: true, min: 0 },
+        {
+          name: 'title',
+          label: 'Title',
+          validators: [required(), min(0)],
+        },
         ''
       )
     ).toEqual(['Title is required']);
   });
 
   it('names a field without a label by its name', async () => {
-    expect(await errorsFor({ name: 'slug', required: true }, '')).toEqual([
-      'slug is required',
-    ]);
+    expect(
+      await errorsFor({ name: 'slug', validators: [required()] }, '')
+    ).toEqual(['slug is required']);
   });
 });
 
@@ -211,7 +240,10 @@ describe('StringField schema optional', () => {
   // An empty optional field becomes undefined, so a length rule never sees it.
   it('skips the length rules of an empty optional field', async () => {
     expect(
-      await errorsFor({ name: 'title', label: 'Title', min: 3 }, '')
+      await errorsFor(
+        { name: 'title', label: 'Title', validators: [min(3)] },
+        ''
+      )
     ).toEqual([]);
   });
 });
@@ -252,3 +284,14 @@ describe('StringField metadata wrapping', () => {
     expect(descriptor?.defaultValue).toBe('');
   });
 });
+
+const validateFieldWithCore: typeof validateField = (
+  node,
+  descriptor,
+  value,
+  options
+) =>
+  validateField(node, descriptor, value, {
+    validators: coreValidatorRegistry,
+    ...options,
+  });

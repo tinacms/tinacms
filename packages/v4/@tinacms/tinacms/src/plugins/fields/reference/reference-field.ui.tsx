@@ -9,6 +9,7 @@ import {
 } from '@tinacms/ui/components/combobox';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { useRef } from 'react';
+import { hasValidator } from '../../../core/schema/types';
 import {
   CONTENT_STALE_TIME,
   contentKeys,
@@ -99,7 +100,7 @@ export function ReferenceField() {
           ref={inputRef}
           id={address}
           disabled={unusable}
-          showClear={!field.required}
+          showClear={!hasValidator(field, 'required')}
           placeholder={placeholderFor(lookup)}
         />
         <ComboboxContent>

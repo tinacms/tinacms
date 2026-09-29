@@ -310,6 +310,18 @@ export type MediaCategory = keyof typeof MEDIA_CATEGORIES;
 
 export type MediaAccept = MediaExtension | MediaCategory;
 
+export const MEDIA_CATEGORY_NAMES = [
+  'image',
+  'video',
+  'audio',
+  'document',
+] as const satisfies readonly MediaCategory[];
+
+export const MEDIA_ACCEPT_VALUES = [
+  ...MEDIA_CATEGORY_NAMES,
+  ...MEDIA_EXTENSIONS,
+] as const;
+
 /**
  * Extensions naming the same format. Declaring one accepts the other, so
  * `accept: 'jpeg'` does not reject `photo.jpg`.
