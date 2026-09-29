@@ -10,5 +10,7 @@ export const c = () => (
     {flag && (<span>parenthesized</span>)}
     {flag && <>fragment</>}
     {items.length > 0 && ((<b>nested</b>))}
+    {items.length && (flag ? <i>ternary</i> : null)}
+    {items.length && [<i key="a">array</i>]}
   </div>
 )

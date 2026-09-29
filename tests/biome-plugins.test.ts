@@ -46,7 +46,7 @@ describe('biome GritQL plugins', () => {
   it('flags forbidden error narrowing and conditional JSX', () => {
     const bad = pluginDiagnostics(diagnostics, 'bad.tsx')
     expect(bad.filter((d) => NARROWING.test(d.message))).toHaveLength(2)
-    expect(bad.filter((d) => CONDITIONAL_JSX.test(d.message))).toHaveLength(4)
+    expect(bad.filter((d) => CONDITIONAL_JSX.test(d.message))).toHaveLength(6)
   })
 
   it('stays quiet on the allowed forms', () => {

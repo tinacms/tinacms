@@ -25,5 +25,8 @@ export const view = () => (
     {flag ? <span>element</span> : null}
     {flag ? <>fragment</> : null}
     {flag && items.join(',')}
+    {flag && (items.length ? 1 : 2)}
+    {flag && [1, 2]}
+    {flag && items.length ? <i>ternary</i> : null}
   </div>
 )
