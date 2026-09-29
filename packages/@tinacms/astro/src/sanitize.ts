@@ -62,3 +62,24 @@ export function sanitizeImageSrc(src: unknown): string {
   }
   return '';
 }
+
+// Mirrors `isSafeCssColor` in @tinacms/mdx (src/sanitize-css-color.ts); this
+// package keeps a copy so it doesn't depend on @tinacms/mdx.
+const SAFE_CSS_COLOR_PATTERNS = [
+  /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i,
+  /^[a-z]+$/i,
+  /^(?:rgba?|hsla?|oklch|oklab)\([0-9.,%/ a-z-]*\)$/i,
+  /^var\(--[a-z0-9_-]+\)$/i,
+];
+
+/**
+ * Returns a CMS-supplied colour when it's a plain CSS colour (hex, named,
+ * rgb()/hsl()/oklch()/oklab() or var(--name)), else `undefined`, so a
+ * colour can't smuggle extra declarations into a `style` attribute.
+ */
+export function sanitizeCssColor(value: unknown): string | undefined {
+  return typeof value === 'string' &&
+    SAFE_CSS_COLOR_PATTERNS.some((pattern) => pattern.test(value))
+    ? value
+    : undefined;
+}

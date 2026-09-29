@@ -1,5 +1,9 @@
-import type { HeadingLevel, ToolbarOverrideType } from '@tinacms/schema-tools';
-export type { HeadingLevel, ToolbarOverrideType };
+import type {
+  HeadingLevel,
+  RichTextColorOption,
+  ToolbarOverrideType,
+} from '@tinacms/schema-tools';
+export type { HeadingLevel, RichTextColorOption, ToolbarOverrideType };
 
 export const STANDARD_ICON_WIDTH = 36;
 export const HEADING_ICON_WITH_TEXT = 130;
@@ -15,4 +19,6 @@ export type ToolbarOverrides = {
   toolbar?: ToolbarOverrideType[];
   showFloatingToolbar?: boolean;
   headingLevels?: HeadingLevel[];
+  textColors?: RichTextColorOption[];
+  highlightColors?: RichTextColorOption[];
 };

@@ -12,6 +12,7 @@ import { Components } from '../../plugins/ui/components';
 import { ToolbarProvider } from '../../toolbar/toolbar-provider';
 import { HeadingsMenu } from '../headings-dropdown';
 import { CodeBlockToolbarButton } from './code-block-toolbar-button';
+import { HorizontalRuleToolbarButton } from './hr-toolbar-button';
 import {
   ArrowDownIcon,
   BoldIcon,
@@ -29,7 +30,6 @@ import {
   UnderlineIcon,
   UnorderedListIcon,
 } from './icons';
-import { HorizontalRuleToolbarButton } from './hr-toolbar-button';
 import { ImageToolbarButton } from './image-toolbar-button';
 import { ListToolbarButton } from './indent-list-toolbar-button';
 import { LinkToolbarButton } from './link-toolbar-button';
@@ -39,6 +39,7 @@ import {
   HighlightToolbarButton,
   ItalicToolbarButton,
   StrikethroughToolbarButton,
+  TextColorToolbarButton,
 } from './mark-toolbar-button';
 import { MermaidToolbarButton } from './mermaid-toolbar-button';
 import OverflowMenu from './overflow-menu';
@@ -103,6 +104,7 @@ const ICON_ONLY_BUTTONS: ReadonlyArray<[string, React.ReactElement]> = [
   ['Strikethrough', <StrikethroughToolbarButton key='strikethrough' />],
   ['Code (⌘+E)', <CodeToolbarButton key='code' />],
   ['Highlight color', <HighlightToolbarButton key='highlight' />],
+  ['Text color', <TextColorToolbarButton key='text-color' />],
   ['Code Block', <CodeBlockToolbarButton key='code-block' />],
   ['Mermaid', <MermaidToolbarButton key='mermaid' />],
   ['Table', <TableDropdownMenu key='table' />],
@@ -118,7 +120,7 @@ const ICON_ONLY_BUTTONS: ReadonlyArray<[string, React.ReactElement]> = [
 
 describe('the name a screen reader reads for an icon-only toolbar button', () => {
   it('holds every icon-only button of the toolbar', () => {
-    expect(ICON_ONLY_BUTTONS).toHaveLength(16);
+    expect(ICON_ONLY_BUTTONS).toHaveLength(17);
   });
 
   it.each(ICON_ONLY_BUTTONS)('reads "%s"', (name, button) => {
