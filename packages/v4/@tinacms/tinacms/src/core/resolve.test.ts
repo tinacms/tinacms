@@ -7,7 +7,9 @@ const plugin = (
   spec: {
     provides?: Capability[];
     dependsOn?: Capability[];
-    overrides?: { capability: Exclude<Capability, 'field' | 'validator'> }[];
+    overrides?: {
+      capability: Exclude<Capability, 'field' | 'validator' | 'hooks'>;
+    }[];
   } = {}
 ) => definePlugin({ name, ...spec });
 
@@ -64,6 +66,41 @@ describe('validateCapabilityGraph', () => {
           provides: ['validator'],
           validators: ['after'],
           overrides: [{ capability: 'validator', key: 'after' }],
+        }),
+      ])
+    ).not.toThrow();
+  });
+
+  it('rejects two plugins that register the same form hook name', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        definePlugin({
+          name: 'a',
+          provides: ['hooks'],
+          hooks: ['x'],
+        }),
+        definePlugin({
+          name: 'b',
+          provides: ['hooks'],
+          hooks: ['x'],
+        }),
+      ])
+    ).toThrow(/both register the form hook "x"/);
+  });
+
+  it('lets an override replace a form hook name', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        definePlugin({
+          name: 'a',
+          provides: ['hooks'],
+          hooks: ['x'],
+        }),
+        definePlugin({
+          name: 'b',
+          provides: ['hooks'],
+          hooks: ['x'],
+          overrides: [{ capability: 'hooks', key: 'x' }],
         }),
       ])
     ).not.toThrow();

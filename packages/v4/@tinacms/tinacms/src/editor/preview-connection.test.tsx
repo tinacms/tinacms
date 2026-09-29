@@ -370,6 +370,8 @@ describe('usePreviewConnection', () => {
           onSave: null,
           seedKey: path,
           discardEdits: () => {},
+          hooks: [],
+          staleDraft: null,
         }}
       >
         {children}

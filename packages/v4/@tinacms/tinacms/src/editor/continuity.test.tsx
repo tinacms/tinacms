@@ -10,6 +10,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
+import { readDraft } from '../form/drafts';
 import {
   type FormId,
   type FormStore,
@@ -23,6 +24,7 @@ import { t } from '../index';
 import { max, min, required } from '../plugins/fields';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { LabelledFields } from '../test/labelled-fields';
+import { simulateReload } from '../test/simulate-reload';
 
 const errorsOf = (forms: FormStore['forms'], formId: FormId) => {
   const scope = forms[formId];
@@ -38,6 +40,7 @@ import {
   useFormSave,
   useFormSeedKey,
   useFormStatus,
+  useStaleDraft,
 } from './index';
 
 const NO_COLLECTIONS = { collections: [] };
@@ -80,6 +83,21 @@ function DiscardProbe() {
   );
 }
 
+function StaleDraftProbe() {
+  const stale = useStaleDraft();
+  if (!stale) return null;
+  return (
+    <>
+      <button type='button' onClick={stale.resume}>
+        resume
+      </button>
+      <button type='button' onClick={stale.discard}>
+        dismiss
+      </button>
+    </>
+  );
+}
+
 function SeedKeyProbe() {
   return <span data-testid='seed'>{useFormSeedKey()}</span>;
 }
@@ -103,6 +121,7 @@ const host = (path: string, document: TinaDocument, onSave?: SaveHandler) => (
       <SaveProbe />
       <DiscardProbe />
       <SeedKeyProbe />
+      <StaleDraftProbe />
     </FormProvider>
   </TinaProvider>
 );
@@ -533,5 +552,73 @@ describe('useFormErrors', () => {
       useFormStore.getState().setFieldErrors(formId, {});
     });
     expect(result.current).toEqual({});
+  });
+});
+
+describe('form drafts across a reload', () => {
+  const typeAndReload = async () => {
+    const { unmount } = render(host(pathA, { title: 'Hello' }));
+    await userEvent.type(await screen.findByLabelText('Title'), '!');
+    unmount();
+    act(simulateReload);
+  };
+
+  it('restores unsaved edits, still dirty', async () => {
+    await typeAndReload();
+    render(host(pathA, { title: 'Hello' }));
+    expect(await screen.findByLabelText('Title')).toHaveValue('Hello!');
+    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+    expect(screen.queryByText('resume')).toBeNull();
+  });
+
+  it('opens a stale draft on the file and offers to resume it', async () => {
+    await typeAndReload();
+    let stored: TinaDocument = { title: 'Changed' };
+    const onSave: SaveHandler = (document) => {
+      stored = document;
+    };
+    render(host(pathA, stored, onSave));
+    expect(await screen.findByLabelText('Title')).toHaveValue('Changed');
+    expect(screen.getByTestId('status')).toHaveTextContent('pristine');
+
+    await userEvent.click(screen.getByText('resume'));
+    expect(screen.getByLabelText('Title')).toHaveValue('Hello!');
+    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+    expect(screen.queryByText('resume')).toBeNull();
+
+    await userEvent.click(screen.getByText('save'));
+    await waitFor(() => expect(stored).toEqual({ title: 'Hello!' }));
+  });
+
+  it('dismisses a stale draft and deletes it', async () => {
+    await typeAndReload();
+    render(host(pathA, { title: 'Changed' }));
+    await userEvent.click(await screen.findByText('dismiss'));
+    expect(screen.queryByText('resume')).toBeNull();
+    expect(screen.getByLabelText('Title')).toHaveValue('Changed');
+    expect(readDraft(toFormId(pathA))).toBeUndefined();
+  });
+
+  it('hides the stale draft prompt once the editor starts typing', async () => {
+    await typeAndReload();
+    render(host(pathA, { title: 'Changed' }));
+    await screen.findByText('resume');
+    await userEvent.type(screen.getByLabelText('Title'), '?');
+    expect(screen.queryByText('resume')).toBeNull();
+    await userEvent.type(screen.getByLabelText('Title'), '{Backspace}');
+    expect(screen.queryByText('resume')).toBeNull();
+  });
+
+  it('deletes a resumed draft that no longer changes anything', async () => {
+    await typeAndReload();
+    const { unmount } = render(host(pathA, { title: 'Hello!' }));
+    await userEvent.click(await screen.findByText('resume'));
+    expect(screen.getByTestId('status')).not.toHaveTextContent('dirty');
+    expect(readDraft(toFormId(pathA))).toBeUndefined();
+    unmount();
+
+    render(host(pathA, { title: 'Hello!' }));
+    await screen.findByLabelText('Title');
+    expect(screen.queryByText('resume')).toBeNull();
   });
 });

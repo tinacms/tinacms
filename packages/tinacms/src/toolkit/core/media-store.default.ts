@@ -448,9 +448,12 @@ export class TinaMediaStore implements MediaStore {
   }
 
   private dispatchMediaWorkflowError(err: unknown): void {
+    // `error` carries the code and file the CMS needs to write its own copy;
+    // `message` stays for subscribers that predate it.
     this.cms.events.dispatch({
       type: 'media:workflow:error',
       message: err instanceof Error ? err.message : String(err),
+      error: err,
     });
   }
 

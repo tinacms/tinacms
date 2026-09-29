@@ -1464,6 +1464,40 @@ describe('TinaMediaStore — protected-branch interception', () => {
     );
   });
 
+  it('carries the raw error so the CMS can write its own indexing copy', async () => {
+    const indexingFailure = Object.assign(
+      new Error('Failed to complete workflow: Unable to seed content/a.mdx'),
+      { errorCode: 'INDEXING_FAILED', file: 'content/a.mdx' }
+    );
+    const waitForEditorialWorkflowStatus = vi
+      .fn()
+      .mockRejectedValue(indexingFailure);
+
+    const { store, fetchWithToken, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      waitForEditorialWorkflowStatus,
+    });
+
+    const onWorkflowError = vi.fn();
+    events.subscribe('media:workflow:error', onWorkflowError);
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { requestId: 'r-del' })
+    );
+
+    const deletePromise = store.delete({
+      directory: 'images',
+      filename: 'a.png',
+    } as Media);
+    await vi.advanceTimersByTimeAsync(1100);
+    await expect(deletePromise).resolves.toBeUndefined();
+
+    expect(onWorkflowError).toHaveBeenCalledWith(
+      expect.objectContaining({ error: indexingFailure })
+    );
+  });
+
   it('allows a new media operation after a workflow failure (retry)', async () => {
     const waitForEditorialWorkflowStatus = vi
       .fn()

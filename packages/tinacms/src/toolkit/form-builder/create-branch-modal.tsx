@@ -25,8 +25,14 @@ import {
   ModalHeader,
   PopupModal,
 } from '../react-modals';
+import { EditorialWorkflowErrorBox } from './editorial-workflow-error-box';
 import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
-import { checkBranchGuard } from './editorial-workflow-utils';
+import {
+  type EditorialWorkflowErrorCopy,
+  type EditorialWorkflowErrorLink,
+  type EditorialWorkflowMessagePart,
+  checkBranchGuard,
+} from './editorial-workflow-utils';
 import {
   SAVE_CHOICE_KEY,
   type SaveChoice,
@@ -63,7 +69,7 @@ export const CreateBranchModal = ({
 
   const {
     isExecuting,
-    errorMessage,
+    error,
     currentStep,
     elapsedTime,
     executeWorkflow,
@@ -159,7 +165,7 @@ export const CreateBranchModal = ({
         abortBranchGuard();
         close();
       }}
-      errorMessage={errorMessage}
+      error={error}
       disabled={normalizedBranchName === '' || isBranchGuardChecking}
       onBranchNameChange={(value) => {
         abortBranchGuard();
@@ -233,7 +239,7 @@ export const CreateBranchPromptModal = ({
   branchName,
   close,
   disabled,
-  errorMessage,
+  error,
   onBranchNameChange,
   onCreateBranch,
   onSaveToProtectedBranch,
@@ -244,7 +250,7 @@ export const CreateBranchPromptModal = ({
   branchName: string;
   close: () => void;
   disabled?: boolean;
-  errorMessage?: string;
+  error?: EditorialWorkflowErrorCopy;
   onBranchNameChange: (value: string) => void;
   onCreateBranch: (isDraft: boolean) => void;
   onSaveToProtectedBranch: () => void;
@@ -307,14 +313,7 @@ export const CreateBranchPromptModal = ({
         </ModalHeader>
         <ModalBody padded={true}>
           <div className='max-w-sm'>
-            {errorMessage && (
-              <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
-                <CircleAlert className='w-5 h-auto text-red-400 flex-shrink-0' />
-                <span className='text-sm'>
-                  <b>Error:</b> {errorMessage}
-                </span>
-              </div>
-            )}
+            {error && <EditorialWorkflowErrorBox error={error} />}
             <p className='text-lg text-gray-700 font-bold mb-2'>
               First, let's create a copy
             </p>

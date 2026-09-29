@@ -1,5 +1,15 @@
 # tinacms
 
+## 3.14.1
+
+### Patch Changes
+
+- [#7613](https://github.com/tinacms/tinacms/pull/7613) [`ff3088e`](https://github.com/tinacms/tinacms/commit/ff3088e9aae28dea93bd8b9c8cad8f8a33d3a78d) Thanks [@kulesy](https://github.com/kulesy)! - Send the same TinaCloud token from every CMS request. Editorial workflow requests preferred the access token while content requests preferred the ID token, and TinaCloud reads the editor's email from the ID token, so "Save to new branch" failed with "Failed to complete workflow. Please try again." and left an empty branch behind. Both paths now share one helper that prefers the ID token and falls back to the access token, which is what versions before 3.12.1 sent. Ordinary saves are unchanged.
+
+- [#7553](https://github.com/tinacms/tinacms/pull/7553) [`288244e`](https://github.com/tinacms/tinacms/commit/288244efb544f4ad0712002c8609a5dc6f1d83db) Thanks [@harley-j](https://github.com/harley-j)! - Publish a browser-specific Tina client bundle so client components build without resolving Node.js builtins, while server builds retain the filesystem response cache.
+
+- [#7478](https://github.com/tinacms/tinacms/pull/7478) [`b5ad014`](https://github.com/tinacms/tinacms/commit/b5ad014f1ec6c3009b8396315608f1a82efd31c1) Thanks [@Roshan931](https://github.com/Roshan931)! - Associate the toggle field's label with its checkbox. The input now falls back to the form field name for its `id`, so clicking the label toggles the value and screen readers announce the field name.
+
 ## 3.14.0
 
 ### Minor Changes

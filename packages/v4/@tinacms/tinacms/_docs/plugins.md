@@ -43,12 +43,13 @@ replace a built-in field at a key that is already in use. Refer to
 
 ## Capabilities
 
-`Capability` has these values: `'field'`, `'validator'`, `'content'`, `'auth'`,
-`'media'`, and `'search'`. `field` and `validator` are keyed capabilities. Many
-field plugins can operate at the same time, one plugin for each schema `type`
-such as `string` or `image`. Many validator plugins can operate at the same
-time, and one plugin can register many validators; the key is the validator's
-name.
+`Capability` has these values: `'field'`, `'validator'`, `'hooks'`, `'content'`,
+`'auth'`, `'media'`, and `'search'`. `field`, `validator` and `hooks` are keyed
+capabilities. Many field plugins can operate at the same time, one plugin for
+each schema `type` such as `string` or `image`. Many validator plugins can
+operate at the same time, and one plugin can register many validators; the key
+is the validator's name. Many hook plugins can operate at the same time, and
+one plugin can register many hooks; the key is the hook's name.
 
 ## Validator plugins
 
@@ -102,6 +103,133 @@ Declare `overrides: [{ capability: 'validator', key: 'after' }]` to replace a
 name on purpose.
 Refer to [Validation in two layers](./field-plugins.md#validation-in-two-layers)
 for the context a rule receives and the order the layers run in.
+
+## Form hook plugins
+
+A form hook plugin registers named hooks that a collection attaches to its
+forms. The manifest lists the names in `hooks`, so `compileSchema` can check
+a collection without loading client code. The client segment holds one
+factory for each name. A factory takes the `args` the collection wrote and
+returns the hooks to run. Every hook is optional.
+
+```ts
+// tina/hooks.ts
+import { defineHook, defineHooksPlugin } from '@tinacms/tinacms';
+
+export const requireStarsToPublish = defineHook(
+  'requireStarsToPublish',
+  () => ({
+    beforeSave: (document) => {
+      if (document.status === 'published' && !document.stars) {
+        throw new Error('Rate the post before you publish it');
+      }
+      return document;
+    },
+  })
+);
+
+export const logSave = defineHook('logSave', (prefix: string) => ({
+  afterSave: (_document, { path }) => {
+    console.info(`${prefix} ${path}`);
+  },
+}));
+
+export const hooksPlugin = defineHooksPlugin('example:hooks', [
+  requireStarsToPublish,
+  logSave,
+]);
+
+// tina/config.ts
+import { hooksPlugin, logSave, requireStarsToPublish } from './hooks';
+
+export default defineConfig({
+  plugins: [localContentPlugin(), hooksPlugin],
+  schema: { collections: [postCollection] },
+});
+
+export const postCollection = {
+  name: 'post',
+  hooks: [requireStarsToPublish(), logSave('saved')],
+  fields: [...],
+};
+```
+
+`defineHook` names a hook and types its arguments. The helper it returns
+builds the `HookRef` a collection lists. `defineHooksPlugin` builds the
+manifest and the client segment from a list of hooks. It loads the hook
+bodies with the manifest, so a hook that imports browser-only code uses the
+long form.
+
+### The long form
+
+```ts
+// tina/hooks.ts
+import { type HookRef, definePlugin } from '@tinacms/tinacms';
+import { type JsonValue, defineClientPlugin } from '@tinacms/tinacms/client';
+
+export const requireStarsToPublish = (): HookRef => ({ name: 'requireStarsToPublish' });
+export const logSave = (prefix: string): HookRef => ({ name: 'logSave', args: [prefix] });
+
+export const hooksPlugin = definePlugin({
+  name: 'example:hooks',
+  provides: ['hooks'],
+  hooks: ['requireStarsToPublish', 'logSave'],
+  client: async () => ({
+    default: defineClientPlugin({
+      hooks: {
+        requireStarsToPublish: () => ({
+          beforeSave: (document) => {
+            if (document.status === 'published' && !document.stars) {
+              throw new Error('Rate the post before you publish it');
+            }
+            return document;
+          },
+        }),
+        logSave: (prefix: JsonValue) => ({
+          afterSave: (_document, { path }) => console.info(`${String(prefix)} ${path}`),
+        }),
+      },
+    }),
+  }),
+});
+```
+
+The long form keeps the client segment behind `() => import(...)`, the same
+as a field plugin.
+
+| Hook | Runs | Receives | Returns |
+|---|---|---|---|
+| `beforeSave` | after validation passes, before `onSave` | the digested document | the document to save, or a Promise of it |
+| `afterSave` | after `onSave` resolves and the form is clean | the saved document | `void` or a Promise |
+| `onChange` | on every field value change | `{ address, value }` of the changed field; `value` is the form value, not the stored one | `void`, synchronously |
+
+Every hook also receives a scope: `{ formId, path, collection }`.
+
+These hooks run in the browser. A `beforeSave` throw stops the save in the
+form only. A direct call to the content API does not run it. Enforcement
+belongs in the server segment (ADR-014 §3), which v4 does not supply yet.
+
+A collection runs the hooks it lists, in the order it lists them. A
+collection with no `hooks` runs no hooks. `config.plugins` order and
+`dependsOn` do not change hook order.
+
+The form does not show a change that a `beforeSave` hook makes. The form
+keeps the values the editor typed until the host loads the saved document
+again. A key that the collection does not declare does not go through
+`serialize`.
+
+`beforeSave` hooks form a pipeline. Each one receives the document the
+previous one returned. A hook that throws stops the save. `onSave` does not
+run. The form stays dirty. A throw from `afterSave` reaches the caller of
+`useFormSave` as an `AfterSaveHookError`. The save has already landed. A
+throw from `onChange` goes to the console. The next hook still runs.
+TinaCMS does not await an `onChange` hook.
+
+Names are global, so a third-party plugin gives them a prefix
+(`acme.logSave`). Declare `overrides: [{ capability: 'hooks', key }]` to
+replace a name on purpose. Refer to
+[ADR-025](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/025-form-hook-registration.md)
+for the decision.
 
 ## More data
 
