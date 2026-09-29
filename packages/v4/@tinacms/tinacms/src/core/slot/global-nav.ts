@@ -25,6 +25,7 @@ const validateEntry = (
 };
 
 // TODO(ADR-013 §5): gate entries on `requires: { permission }` once ADR-008 lands.
+//turns every plugin's slots.globalNav entries into the one sorted list
 export const createGlobalNav = (
   resolved: ResolvedSegment[],
   plugins: PluginManifest[],
