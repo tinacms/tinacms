@@ -107,6 +107,9 @@ const generateCollectionString = (args: ConfigTemplateArgs) => {
   return `[\n${collections.map((c) => `  ${indent(c, 2)},`).join('\n')}\n]`;
 };
 
+const escapeSingleQuoted = (value: string) =>
+  value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
 export const generateConfig = (args: ConfigTemplateArgs) => {
   const isUsingTinaCloud =
     !args.selfHosted || args.config.authProvider?.name === 'tina-cloud';
@@ -168,7 +171,7 @@ export default defineConfig({
 ${options.map((line) => `  ${line}`).join('\n')}
   build: {
     outputFolder: 'admin',
-    publicFolder: '${args.publicFolder}',
+    publicFolder: '${escapeSingleQuoted(args.publicFolder)}',
   },
   // Uncomment to allow cross-origin requests from non-localhost origins
   // during local development (e.g. GitHub Codespaces, Gitpod, Docker).
@@ -179,7 +182,7 @@ ${options.map((line) => `  ${line}`).join('\n')}
   media: {
     tina: {
       mediaRoot: '',
-      publicFolder: '${args.publicFolder}',
+      publicFolder: '${escapeSingleQuoted(args.publicFolder)}',
     },
   },
   // See docs on content modeling for more info on how to setup new content models: https://tina.io/docs/r/content-modelling-collections/

@@ -48,6 +48,15 @@ const configFor = (config: Config, selfHosted: boolean) =>
   });
 
 describe('generateConfig', () => {
+  it('escapes quotes and backslashes in the public folder name', () => {
+    const output = configFor(
+      makeConfig('next', { publicFolder: "team's\\public" }),
+      false
+    );
+    expect(output).toContain("publicFolder: 'team\\'s\\\\public',");
+    expect(output).not.toContain("publicFolder: 'team's");
+  });
+
   it('writes the TinaCloud config for a Next.js site', () => {
     expectGolden(
       'config-next-tinacloud.ts',
