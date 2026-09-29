@@ -321,6 +321,82 @@ This example makes a color field:
 
 Do no more steps. You do not change the registry.
 
+## Adapt a v3 field
+
+A v3 custom field is a component that gets `input`, `meta` and `field` as
+props. A v4 field component has no props. A small adapter reads the v4 hooks
+and gives the v3 component the props it expects. Thus the v3 component runs
+without a rewrite.
+
+```tsx
+import type { ComponentType } from 'react';
+import type { FieldSchema } from '@tinacms/tinacms';
+import {
+  useFieldAddress, useFieldErrors, useFieldSchema, useFieldValue,
+} from '@tinacms/tinacms/react';
+
+interface V3FieldProps<T> {
+  input: { name: string; value: T; onChange: (value: T) => void };
+  meta: { error?: string };
+  field: FieldSchema;
+}
+
+export function fromV3Field<T>(V3Component: ComponentType<V3FieldProps<T>>) {
+  return function V3FieldAdapter() {
+    const address = useFieldAddress();
+    const [value, setValue] = useFieldValue<T>(address);
+    const errors = useFieldErrors(address);
+    const field = useFieldSchema();
+
+    return (
+      <div>
+        <V3Component
+          input={{ name: address, value, onChange: setValue }}
+          meta={{ error: errors[0] }}
+          field={field}
+        />
+        {errors.map((e) => <span key={e} role='alert'>{e}</span>)}
+      </div>
+    );
+  };
+}
+```
+
+Give the adapted component to the descriptor. The manifest is the same as for
+any field plugin (step 1):
+
+```tsx
+import { defineClientPlugin } from '@tinacms/tinacms/client';
+import { MyV3ColorPicker } from './my-v3-color-picker';
+
+export default defineClientPlugin({
+  field: {
+    Component: fromV3Field(MyV3ColorPicker),
+    defaultValue: '#000000',
+    metadata: { layout: 'inline' },
+  },
+});
+```
+
+What the adapter supplies:
+
+| v3 prop | v4 source |
+|---|---|
+| `input.name` | `useFieldAddress()` |
+| `input.value`, `input.onChange` | `useFieldValue(address)` |
+| `meta.error` | The first message from `useFieldErrors(address)` |
+| `field` | `useFieldSchema()` |
+
+Limits:
+
+- Remove `wrapFieldsWithMeta` from the v3 component. `<Field>` renders the
+  label, and the adapter renders the errors.
+- The adapter does not supply `form` or `tinaForm`. Those props are the v3
+  Final Form API, and v4 has no equivalent. A component that uses them needs a
+  rewrite as a v4 field (refer to [Write a new field plugin](#write-a-new-field-plugin)).
+- The adapter does not supply `input.onBlur`, `input.onFocus` or the other
+  `meta` flags. Remove those calls from the v3 component.
+
 ## Addresses
 
 `<Field>` compares `address` to the field `name` in the collection
