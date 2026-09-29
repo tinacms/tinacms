@@ -205,6 +205,8 @@ export type TextElement = {
   strikethrough?: boolean;
   highlight?: boolean;
   highlightColor?: string;
+  /** CSS colour for the text itself, eg. `#CC4141` */
+  textColor?: string;
 };
 /**
  * @remarks
