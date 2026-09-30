@@ -84,28 +84,28 @@ export const createScreenRegistry = (
   resolved: ResolvedSegment[],
   plugins: PluginManifest[] = resolved.map(({ manifest }) => manifest)
 ): ScreenRegistry => {
-  const composed = composeOverridableRegistry<AdminScreen | null>(
-    [
-      ...resolved.flatMap(({ manifest, segment }) =>
-        (segment.screens ?? []).map((screen) => {
-          validateScreen(manifest.name, screen);
-          return {
-            key: screen.name,
-            value: screen,
-            isOverride: overridesScreenKey(manifest, screen.name),
-          };
-        })
-      ),
-      ...screensRemovedByOverride(resolved, plugins).map((key) => ({
-        key,
-        value: null,
-        isOverride: true,
-      })),
-    ],
+  const contributedScreens = resolved.flatMap(({ manifest, segment }) =>
+    (segment.screens ?? []).map((screen) => {
+      validateScreen(manifest.name, screen);
+      return {
+        key: screen.name,
+        value: screen,
+        isOverride: overridesScreenKey(manifest, screen.name),
+      };
+    })
+  );
+
+  const removedScreens = screensRemovedByOverride(resolved, plugins).map(
+    (key) => ({ key, value: null, isOverride: true })
+  );
+
+  const screensAfterOverrides = composeOverridableRegistry<AdminScreen | null>(
+    [...contributedScreens, ...removedScreens],
     screenConflictError
   );
+
   const registry: ScreenRegistry = new Map();
-  for (const [key, screen] of composed) {
+  for (const [key, screen] of screensAfterOverrides) {
     if (screen) registry.set(key, screen);
   }
   return registry;
