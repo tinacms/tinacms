@@ -3,6 +3,7 @@ import type { FieldDescriptor, ValidatorFactory } from './field/contract';
 import type { FormHookFactory } from './form/hooks';
 import { invariant } from './invariant';
 import type { AdminScreen } from './screen/contract';
+import type { SlotContributions } from './slot/contract';
 
 export type Capability =
   | 'field'
@@ -78,6 +79,7 @@ export interface ClientSegment {
   hooks?: Record<string, FormHookFactory>;
   slice?: ClientSlice;
   screens?: AdminScreen[];
+  slots?: SlotContributions;
 }
 
 export type ServerOp = (input: never) => Promise<unknown>;

@@ -23,6 +23,7 @@ import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { createScreenRegistry } from '../core/screen/registry';
+import { createGlobalNav } from '../core/slot/global-nav';
 import { addressesWithValidators } from '../core/validation';
 import { createValidatorRegistry } from '../core/validator/registry';
 import { removeDraft } from '../form/drafts';
@@ -98,12 +99,14 @@ export function TinaProvider({
     const boot = lifecycleTurn.then(async () => {
       validateCapabilityGraph(composedPlugins);
       const resolved = await resolveClientSegments(composedPlugins);
+      const screens = createScreenRegistry(resolved);
       const runtime: BootedRuntime = {
         registry: createFieldRegistry(resolved),
         validators: createValidatorRegistry(resolved),
         hooks: createFormHookRegistry(resolved),
         store: createTinaStore(resolved),
-        screens: createScreenRegistry(resolved),
+        screens,
+        globalNav: createGlobalNav(resolved, composedPlugins, screens),
       };
       const destroyPlugins = await initializePlugins(composedPlugins);
       if (mounted) setBooted(runtime);

@@ -1,6 +1,6 @@
 export type { AdminScreen, AdminScreenProps } from '../core/screen/contract';
 export { TinaAdmin, type TinaAdminProps } from './admin';
-export { useAdminScreens, useTinaSchema } from './hooks';
+export { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 export {
   type AdminRoute,
   COLLECTIONS_ROUTE,

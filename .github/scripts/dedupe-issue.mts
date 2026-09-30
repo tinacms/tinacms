@@ -1,16 +1,18 @@
 // Checks one newly opened issue against every open issue with Jev (typesafe.ai) and, when
 // confident, comments with the canonical issue and applies the "🤖 Duplicate" label.
-import { appendFileSync } from 'node:fs';
-
-const env = (name: string) => {
-  const value = process.env[name];
-  if (!value) throw new Error(`${name} is not set`);
-  return value;
-};
+import {
+  type ChoiceQuestion,
+  type Issue,
+  type NoulQuestion,
+  choice,
+  env,
+  github,
+  noul,
+  summary,
+  systemOne,
+} from './jev.mts';
 
 const repo = env('GITHUB_REPOSITORY');
-const ghToken = env('GH_TOKEN');
-const typesafeKey = env('TYPESAFE_API_KEY');
 const targetNumber = Number(env('ISSUE_NUMBER'));
 const dryRun = process.env.DRY_RUN === 'true';
 
@@ -22,32 +24,6 @@ const RELATED_THRESHOLD = 0.6;
 const EXCERPT_CHARS = 400;
 const BODY_CHARS = 4000;
 
-type Issue = {
-  number: number;
-  title: string;
-  body: string | null;
-  user: { login: string; type: string };
-  pull_request?: unknown;
-};
-
-const github = async <T,>(path: string, post?: unknown): Promise<T> => {
-  const res = await fetch(`https://api.github.com${path}`, {
-    method: post ? 'POST' : 'GET',
-    headers: {
-      Authorization: `Bearer ${ghToken}`,
-      Accept: 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...(post ? { 'Content-Type': 'application/json' } : {}),
-    },
-    body: post ? JSON.stringify(post) : undefined,
-  });
-  if (!res.ok)
-    throw new Error(
-      `GitHub ${post ? 'POST' : 'GET'} ${path}: ${res.status} ${await res.text()}`
-    );
-  return res.json() as Promise<T>;
-};
-
 const listOpenIssues = async () => {
   const issues: Issue[] = [];
   for (let page = 1; ; page++) {
@@ -56,63 +32,6 @@ const listOpenIssues = async () => {
     );
     issues.push(...batch);
     if (batch.length < 100) return issues;
-  }
-};
-
-type Instructions = string | Record<string, unknown>;
-type NoulQuestion = { type: 'noul'; instructions: Instructions };
-type ChoiceQuestion = {
-  type: 'choice';
-  instructions: Instructions;
-  criteria: Record<string, string | null>;
-};
-type Question = NoulQuestion | ChoiceQuestion;
-type Answer<Q extends Question> = Q extends ChoiceQuestion
-  ? {
-      type: 'choice';
-      choice: string;
-      probabilities: Record<string, number>;
-      confidence: number;
-    }
-  : { type: 'noul'; noul: number };
-type Answers<Q extends Record<string, Question>> = {
-  [K in keyof Q]: Answer<Q[K]>;
-};
-
-const noul = (instructions: Instructions): NoulQuestion => ({
-  type: 'noul',
-  instructions,
-});
-const choice = (
-  instructions: Instructions,
-  criteria: Record<string, string | null>
-): ChoiceQuestion => ({
-  type: 'choice',
-  instructions,
-  criteria,
-});
-
-const systemOne = async <Q extends Record<string, Question>>(
-  state: unknown,
-  questions: Q
-) => {
-  for (let attempt = 1; ; attempt++) {
-    const res = await fetch('https://api.typesafe.ai/v1/systemone', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${typesafeKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ model: 'jev-latest', state, questions }),
-    });
-    if (res.ok) {
-      const { answers } = (await res.json()) as { answers: Answers<Q> };
-      return answers;
-    }
-    const retryable = res.status === 429 || res.status >= 500;
-    if (!retryable || attempt === 3)
-      throw new Error(`TypeSafe ${res.status}: ${await res.text()}`);
-    await new Promise((r) => setTimeout(r, 1000 * 2 ** attempt));
   }
 };
 
@@ -212,13 +131,6 @@ const relatedComment = (winner: Issue) =>
   `This may be related to #${winner.number} (${winner.title}).\n\n` +
   'Worth a look before a maintainer triages this; if it is the same problem, please add your details there.';
 
-const summary = (lines: string[]) => {
-  const out = `${lines.join('\n')}\n`;
-  console.log(out);
-  if (process.env.GITHUB_STEP_SUMMARY)
-    appendFileSync(process.env.GITHUB_STEP_SUMMARY, out);
-};
-
 const target = await github<Issue>(`/repos/${repo}/issues/${targetNumber}`);
 const open = (await listOpenIssues()).filter(
   (i) => !i.pull_request && i.number !== target.number && i.user.type !== 'Bot'
@@ -271,9 +183,13 @@ if (tier === 'none' || dryRun) process.exit(0);
 
 const body =
   tier === 'duplicate' ? duplicateComment(winner) : relatedComment(winner);
-await github(`/repos/${repo}/issues/${target.number}/comments`, { body });
+await github(`/repos/${repo}/issues/${target.number}/comments`, {
+  method: 'POST',
+  body: { body },
+});
 if (tier === 'duplicate') {
   await github(`/repos/${repo}/issues/${target.number}/labels`, {
-    labels: [DUPLICATE_LABEL],
+    method: 'POST',
+    body: { labels: [DUPLICATE_LABEL] },
   });
 }
