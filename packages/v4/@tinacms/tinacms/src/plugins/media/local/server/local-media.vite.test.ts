@@ -38,10 +38,12 @@ afterEach(async () => {
 const requestDouble = (
   url: string,
   headers: Record<string, string>,
-  chunks: (string | Buffer)[]
+  chunks: (string | Buffer)[],
+  method = 'POST'
 ) => {
   const req = Object.assign(new EventEmitter(), {
     url,
+    method,
     headers,
     destroyed: false,
     setEncoding: () => {},
@@ -177,20 +179,39 @@ describe('local media endpoint', () => {
     expect(res.statusCode).toBe(413);
   });
 
-  it('serves a JSON list op', async () => {
+  it('lists a folder on GET', async () => {
     await upload();
     const res = responseDouble();
     await mediaMiddleware()(
-      requestDouble(
-        '/',
-        { ...SAME_ORIGIN, 'content-type': 'application/json' },
-        [JSON.stringify({ op: 'list', folder: 'posts' })]
-      ),
+      requestDouble('/?folder=posts', SAME_ORIGIN, [], 'GET'),
       res
     );
     expect(JSON.parse(res.body)).toEqual({
       items: [{ path: 'posts/hero.jpg', kind: 'file' }],
     });
+  });
+
+  it('403s a cross-site list', async () => {
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble(
+        '/?folder=',
+        { ...SAME_ORIGIN, 'sec-fetch-site': 'cross-site' },
+        [],
+        'GET'
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(403);
+  });
+
+  it('400s a list with a page size over the limit', async () => {
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble('/?limit=1000', SAME_ORIGIN, [], 'GET'),
+      res
+    );
+    expect(res.statusCode).toBe(400);
   });
 
   it('400s a delete outside the media folder', async () => {

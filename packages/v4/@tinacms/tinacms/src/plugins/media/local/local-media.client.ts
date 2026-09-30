@@ -34,8 +34,14 @@ export const createMediaSlice = (
       const { path } = (await response.json()) as { path: string };
       return path;
     },
-    list: (folder, page = {}) =>
-      postMediaRequest<MediaPage>(url, { op: 'list', folder, ...page }),
+    list: async (folder, page = {}) => {
+      const query = new URLSearchParams({ folder });
+      if (page.cursor !== undefined) query.set('cursor', page.cursor);
+      if (page.limit !== undefined) query.set('limit', String(page.limit));
+      const response = await fetch(`${url}?${query}`);
+      if (!response.ok) throw await failure(response, 'list');
+      return (await response.json()) as MediaPage;
+    },
     delete: async (path) => {
       await postMediaRequest<null>(url, { op: 'delete', path });
     },

@@ -13,7 +13,10 @@ import {
   RequestBodyTooLargeError,
 } from '../../../../core/request-body';
 import { createLocalMedia } from '../../../media/local/server/local-media';
-import { dispatchMediaRequest } from '../../../media/local/server/media-request';
+import {
+  dispatchMediaRequest,
+  listMedia,
+} from '../../../media/local/server/media-request';
 import { dispatchContentRequest } from './content-request';
 import {
   type LocalDataLayerOptions,
@@ -217,8 +220,15 @@ export const tinaLocalDataLayerVitePlugin = (
       return;
     }
     try {
-      if ((req.url ?? '').split('?')[0] === '/upload') {
+      const [route, query = ''] = (req.url ?? '').split('?');
+      if (route === '/upload') {
         await serveMediaUpload(req, res);
+        return;
+      }
+      if (req.method === 'GET') {
+        const page = await listMedia(media, new URLSearchParams(query));
+        res.setHeader('content-type', 'application/json');
+        res.end(JSON.stringify(page));
         return;
       }
       if (mimeEssenceOf(req) !== 'application/json') {

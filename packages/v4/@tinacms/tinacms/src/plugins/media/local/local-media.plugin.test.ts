@@ -5,6 +5,7 @@ import { localMediaPlugin } from './local-media.plugin';
 
 interface RecordedRequest {
   url: string;
+  method: string;
   body: unknown;
 }
 
@@ -12,9 +13,10 @@ const createSliceHarness = async (responseBody: unknown, ok = true) => {
   const requests: RecordedRequest[] = [];
   vi.stubGlobal(
     'fetch',
-    vi.fn(async (url: string, init: RequestInit) => {
+    vi.fn(async (url: string, init: RequestInit = {}) => {
       requests.push({
         url,
+        method: init.method ?? 'GET',
         body: typeof init.body === 'string' ? JSON.parse(init.body) : init.body,
       });
       return {
@@ -71,15 +73,12 @@ describe('media slice', () => {
     expect((form.get('file') as File).name).toBe('hero.jpg');
   });
 
-  it('posts a list op with the page', async () => {
+  it('gets a page of a folder', async () => {
     const page = { items: [{ path: 'a.png', kind: 'file' }] };
     const harness = await createSliceHarness(page);
-    expect(await harness.slice().list('', { limit: 10 })).toEqual(page);
-    expect(harness.requests[0].body).toEqual({
-      op: 'list',
-      folder: '',
-      limit: 10,
-    });
+    expect(await harness.slice().list('posts', { limit: 10 })).toEqual(page);
+    expect(harness.requests[0].url).toBe('/test/media?folder=posts&limit=10');
+    expect(harness.requests[0].method).toBe('GET');
   });
 
   it('posts a delete op', async () => {

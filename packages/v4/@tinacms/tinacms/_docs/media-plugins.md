@@ -55,8 +55,8 @@ export default defineConfig({
 ### Upload
 
 The browser sends the file as `multipart/form-data` to `{url}/upload`, with a
-`file` field and an optional `folder` field. The limit is 25 MB. `list` and
-`delete` use JSON requests to `{url}`.
+`file` field and an optional `folder` field. The limit is 25 MB. `list` is a
+`GET` request to `{url}?folder=posts`. `delete` is a JSON request to `{url}`.
 
 A multipart request does not get a CORS preflight. Thus a page on a different
 site can send one. The endpoint rejects a request that is not from a loopback

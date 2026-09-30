@@ -4,31 +4,34 @@ import type { LocalMedia } from './local-media';
 
 export const MAX_MEDIA_PAGE_SIZE = 200;
 
-const mediaRequestSchema = z.discriminatedUnion('op', [
-  z.object({
-    op: z.literal('list'),
-    folder: z.string(),
-    cursor: z.string().regex(/^\d+$/).optional(),
-    limit: z.number().int().min(1).max(MAX_MEDIA_PAGE_SIZE).optional(),
-  }),
-  z.object({ op: z.literal('delete'), path: z.string().min(1) }),
-]);
+const listQuerySchema = z.object({
+  folder: z.string().default(''),
+  cursor: z.string().regex(/^\d+$/).optional(),
+  limit: z.coerce.number().int().min(1).max(MAX_MEDIA_PAGE_SIZE).optional(),
+});
+
+const mediaRequestSchema = z.object({
+  op: z.literal('delete'),
+  path: z.string().min(1),
+});
 
 export type MediaRequest = z.infer<typeof mediaRequestSchema>;
+
+export const listMedia = (
+  media: LocalMedia,
+  query: URLSearchParams
+): Promise<MediaPage> => {
+  const { folder, cursor, limit } = listQuerySchema.parse(
+    Object.fromEntries(query)
+  );
+  return media.list(folder, { cursor, limit });
+};
 
 export const dispatchMediaRequest = async (
   media: LocalMedia,
   request: unknown
-): Promise<MediaPage | null> => {
+): Promise<null> => {
   const parsed = mediaRequestSchema.parse(request);
-  switch (parsed.op) {
-    case 'list':
-      return media.list(parsed.folder, {
-        cursor: parsed.cursor,
-        limit: parsed.limit,
-      });
-    case 'delete':
-      await media.delete(parsed.path);
-      return null;
-  }
+  await media.delete(parsed.path);
+  return null;
 };
