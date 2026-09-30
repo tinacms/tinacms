@@ -1,6 +1,6 @@
-import taxonomy from '../issue-labels.json' with { type: 'json' };
 // Classifies one newly opened issue with Jev (typesafe.ai) against the label taxonomy in
 // .github/issue-labels.json and applies the primary category, plus onboarding/🤖AI when clearly suitable.
+import taxonomy from '../issue-labels.json' with { type: 'json' };
 import {
   type Issue,
   choice,
