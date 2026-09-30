@@ -35,10 +35,12 @@ export const createGlobalNav = (
   return resolved
     .flatMap(({ manifest, segment }) =>
       (segment.slots?.globalNav ?? []).filter((entry) => {
-        validateEntry(manifest.name, entry, screens);
-        return (entry.dependsOn ?? []).every((capability) =>
+        const dependenciesMet = (entry.dependsOn ?? []).every((capability) =>
           provided.has(capability)
         );
+        if (!dependenciesMet) return false;
+        validateEntry(manifest.name, entry, screens);
+        return true;
       })
     )
     .sort(

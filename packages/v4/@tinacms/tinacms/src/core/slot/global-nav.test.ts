@@ -91,6 +91,35 @@ describe('global nav slot', () => {
     ).toThrow(/no installed plugin contributes a screen named "ghost"/);
   });
 
+  it('hides an entry whose screen belongs to a plugin that is not installed', () => {
+    expect(
+      labelsOf([
+        segmentOf('tina:sidebar:media', [
+          entry('Media', {
+            target: { kind: 'screen', screen: 'media' },
+            dependsOn: ['media'],
+          }),
+        ]),
+      ])
+    ).toEqual([]);
+  });
+
+  it('still rejects a missing screen once the dependencies are met', () => {
+    expect(() =>
+      labelsOf(
+        [
+          segmentOf('tina:sidebar:media', [
+            entry('Media', {
+              target: { kind: 'screen', screen: 'media' },
+              dependsOn: ['media'],
+            }),
+          ]),
+        ],
+        ['media']
+      )
+    ).toThrow(/no installed plugin contributes a screen named "media"/);
+  });
+
   it('rejects an entry with an empty label', () => {
     expect(() => labelsOf([segmentOf('one', [entry('')])])).toThrow(
       /empty label/
