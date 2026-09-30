@@ -50,7 +50,7 @@ const securityComment =
 const target = await github<Issue>(`/repos/${repo}/issues/${targetNumber}`);
 const labels = target.labels.map((l) => l.name);
 const deliberate = labels.filter((l) => isCategory(l) && l !== 'bug');
-if (deliberate.length > 0) {
+if (deliberate.length > 0 && !dryRun) {
   summary([
     `## Classify #${target.number}: ${target.title}`,
     '',
@@ -124,6 +124,9 @@ summary([
   `## Classify #${target.number}: ${target.title}`,
   '',
   `Decision: add ${add.join(', ') || 'nothing'}; remove ${remove.join(', ') || 'nothing'}${dryRun ? ' (dry run)' : ''}.`,
+  deliberate.length > 0
+    ? `Already labelled ${deliberate.join(', ')}; Jev picked ${category} (${confidence.toFixed(2)}). A live run would skip this issue.`
+    : '',
   category === 'security' && confident
     ? 'Flagged as a possible security report: commenting instead of labelling.'
     : '',
