@@ -61,6 +61,7 @@ export const screensRemovedByOverride = (
   resolved: ResolvedSegment[],
   plugins: PluginManifest[]
 ): string[] => {
+  //maps plugin names to the set of screen names they contribute
   const screenNamesByPlugin = new Map(
     resolved.map(({ manifest, segment }) => [
       manifest.name,
