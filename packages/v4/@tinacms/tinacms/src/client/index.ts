@@ -15,6 +15,14 @@ export type {
   FormHookScope,
   FormHooks,
 } from '../core/form/hooks';
+export type {
+  ActionTarget,
+  GlobalNavEntry,
+  NavTarget,
+  ScreenTarget,
+  SlotContributions,
+  UrlTarget,
+} from '../core/slot/contract';
 export type { ClientSegment };
 export {
   createRpcClient,
