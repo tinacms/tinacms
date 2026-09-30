@@ -146,6 +146,29 @@ describe('global nav slot', () => {
     ).toEqual([]);
   });
 
+  it('still rejects a missing screen that an override names but nobody contributes', () => {
+    const resolved = [
+      segmentOf('tina:sidebar:help', [
+        entry('Help', { target: { kind: 'screen', screen: 'help' } }),
+      ]),
+    ];
+    const plugins = [
+      ...resolved.map(({ manifest }) => manifest),
+      definePlugin({
+        name: 'tina:no-help-screen',
+        provides: ['screen'],
+        overrides: [{ capability: 'screen', key: 'help' }],
+      }),
+    ];
+    expect(() =>
+      createGlobalNav(
+        resolved,
+        plugins,
+        createScreenRegistry(resolved, plugins)
+      )
+    ).toThrow(/no installed plugin contributes a screen named "help"/);
+  });
+
   it('rejects an entry with an empty label', () => {
     expect(() => labelsOf([segmentOf('one', [entry('')])])).toThrow(
       /empty label/

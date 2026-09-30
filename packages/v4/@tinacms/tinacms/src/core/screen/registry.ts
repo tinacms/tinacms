@@ -68,13 +68,18 @@ export const screensRemovedByOverride = (
       new Set((segment.screens ?? []).map((screen) => screen.name)),
     ])
   );
+  const existingScreenNames = new Set(
+    [...screenNamesByPlugin.values()].flatMap((names) => [...names])
+  );
+
   return plugins.flatMap((plugin) => {
     const pluginScreenNames = screenNamesByPlugin.get(plugin.name);
 
     return plugin.overrides.flatMap((override) => {
       if (override.capability !== SCREEN_CAPABILITY) return [];
       const replacesScreen = pluginScreenNames?.has(override.key);
-      return replacesScreen ? [] : [override.key];
+      const screenExists = existingScreenNames.has(override.key);
+      return replacesScreen || !screenExists ? [] : [override.key];
     });
   });
 };
