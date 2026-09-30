@@ -26,18 +26,20 @@ const segmentOf = (
   segment: { screens, slots: { globalNav } },
 });
 
-const labelsOf = (resolved: ResolvedSegment[], provides: string[] = []) =>
-  createGlobalNav(
+const labelsOf = (resolved: ResolvedSegment[], provides: string[] = []) => {
+  const plugins = [
+    ...resolved.map(({ manifest }) => manifest),
+    definePlugin({
+      name: 'provider',
+      provides: provides as ('media' | 'search')[],
+    }),
+  ];
+  return createGlobalNav(
     resolved,
-    [
-      ...resolved.map(({ manifest }) => manifest),
-      definePlugin({
-        name: 'provider',
-        provides: provides as ('media' | 'search')[],
-      }),
-    ],
-    createScreenRegistry(resolved)
+    plugins,
+    createScreenRegistry(resolved, plugins)
   ).map(({ label }) => label);
+};
 
 describe('global nav slot', () => {
   it('stacks the entries of every plugin instead of conflicting', () => {

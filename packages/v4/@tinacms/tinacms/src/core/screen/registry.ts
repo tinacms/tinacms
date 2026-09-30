@@ -87,7 +87,7 @@ export const screensRemovedByOverride = (
 //gather all plugins screens into one Map keyed by screen name
 export const createScreenRegistry = (
   resolved: ResolvedSegment[],
-  plugins: PluginManifest[] = resolved.map(({ manifest }) => manifest)
+  plugins: PluginManifest[]
 ): ScreenRegistry => {
   const contributedScreens = resolved.flatMap(({ manifest, segment }) =>
     (segment.screens ?? []).map((screen) => {
