@@ -68,14 +68,15 @@ export const screensRemovedByOverride = (
       new Set((segment.screens ?? []).map((screen) => screen.name)),
     ])
   );
-  return plugins.flatMap((plugin) =>
-    plugin.overrides.flatMap((override) =>
-      override.capability === SCREEN_CAPABILITY &&
-      !screenNamesByPlugin.get(plugin.name)?.has(override.key)
-        ? [override.key]
-        : []
-    )
-  );
+  return plugins.flatMap((plugin) => {
+    const pluginScreenNames = screenNamesByPlugin.get(plugin.name);
+
+    return plugin.overrides.flatMap((override) => {
+      if (override.capability !== SCREEN_CAPABILITY) return [];
+      const replacesScreen = pluginScreenNames?.has(override.key);
+      return replacesScreen ? [] : [override.key];
+    });
+  });
 };
 
 //gather all plugins screens into one Map keyed by screen name
