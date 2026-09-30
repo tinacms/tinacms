@@ -48,7 +48,9 @@ const isCrossOriginRequest = (req: Connect.IncomingMessage): boolean => {
   );
 };
 
-const mimeEssenceOf = (req: Connect.IncomingMessage): string | undefined =>
+const coreContentTypeOfRequest = (
+  req: Connect.IncomingMessage
+): string | undefined =>
   req.headers['content-type']?.replace(/;.*/, '').trim().toLowerCase();
 
 const readRequestBytes = (
@@ -173,7 +175,7 @@ export const tinaLocalDataLayerVitePlugin = (
       res.end('Cross-origin request rejected');
       return;
     }
-    if (mimeEssenceOf(req) !== 'application/json') {
+    if (coreContentTypeOfRequest(req) !== 'application/json') {
       res.statusCode = 415;
       res.end('Expected application/json');
       return;
@@ -192,7 +194,7 @@ export const tinaLocalDataLayerVitePlugin = (
     req: Connect.IncomingMessage,
     res: ServerResponse
   ) => {
-    if (mimeEssenceOf(req) !== 'multipart/form-data') {
+    if (coreContentTypeOfRequest(req) !== 'multipart/form-data') {
       res.statusCode = 415;
       res.end('Expected multipart/form-data');
       return;
@@ -231,7 +233,7 @@ export const tinaLocalDataLayerVitePlugin = (
         res.end(JSON.stringify(page));
         return;
       }
-      if (mimeEssenceOf(req) !== 'application/json') {
+      if (coreContentTypeOfRequest(req) !== 'application/json') {
         res.statusCode = 415;
         res.end('Expected application/json');
         return;
