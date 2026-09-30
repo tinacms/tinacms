@@ -6,7 +6,8 @@ language js(typescript, jsx)
     JsxTagExpression(),
     JsParenthesizedExpression(),
     JsConditionalExpression(),
-    JsArrayExpression()
+    JsArrayExpression(),
+    JsCallExpression()
   },
   $right <: contains JsxTagExpression(),
   register_diagnostic(
