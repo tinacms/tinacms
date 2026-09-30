@@ -120,6 +120,32 @@ describe('global nav slot', () => {
     ).toThrow(/no installed plugin contributes a screen named "media"/);
   });
 
+  it('hides an entry whose screen another plugin removed', () => {
+    const View = () => null;
+    const resolved = [
+      segmentOf(
+        'tina:media',
+        [entry('Media', { target: { kind: 'screen', screen: 'media' } })],
+        [{ name: 'media', label: 'Media', component: View }]
+      ),
+    ];
+    const plugins = [
+      ...resolved.map(({ manifest }) => manifest),
+      definePlugin({
+        name: 'tina:no-media-screen',
+        provides: ['screen'],
+        overrides: [{ capability: 'screen', key: 'media' }],
+      }),
+    ];
+    expect(
+      createGlobalNav(
+        resolved,
+        plugins,
+        createScreenRegistry(resolved, plugins)
+      ).map(({ label }) => label)
+    ).toEqual([]);
+  });
+
   it('rejects an entry with an empty label', () => {
     expect(() => labelsOf([segmentOf('one', [entry('')])])).toThrow(
       /empty label/

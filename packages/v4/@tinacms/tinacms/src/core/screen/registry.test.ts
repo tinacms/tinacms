@@ -69,6 +69,74 @@ describe('admin screen registry', () => {
       createScreenRegistry([segmentOf('media-plugin', [screen('')])])
     ).toThrow(/admin-screen-no-name/);
   });
+
+  it('rejects a screen with no component', () => {
+    const noComponent = { name: 'media', label: 'Media' } as AdminScreen;
+    expect(() =>
+      createScreenRegistry([segmentOf('media-plugin', [noComponent])])
+    ).toThrow(/admin-screen-no-component/);
+  });
+});
+
+describe('screen overrides', () => {
+  const Replacement = () => null;
+  const overrideMedia = definePlugin({
+    name: 'tina:media-v2',
+    provides: ['screen'],
+    overrides: [{ capability: 'screen', key: 'media' }],
+  });
+
+  it("replaces another plugin's screen", () => {
+    const registry = createScreenRegistry([
+      segmentOf('media-plugin', [screen('media')]),
+      {
+        manifest: overrideMedia,
+        segment: { screens: [screen('media', { component: Replacement })] },
+      },
+    ]);
+    expect(registry.get('media')?.component).toBe(Replacement);
+  });
+
+  it('replaces a screen whichever plugin comes first', () => {
+    const registry = createScreenRegistry([
+      {
+        manifest: overrideMedia,
+        segment: { screens: [screen('media', { component: Replacement })] },
+      },
+      segmentOf('media-plugin', [screen('media')]),
+    ]);
+    expect(registry.get('media')?.component).toBe(Replacement);
+  });
+
+  it('removes a screen when the override contributes none', () => {
+    const resolved = [segmentOf('media-plugin', [screen('media')])];
+    const registry = createScreenRegistry(resolved, [
+      ...resolved.map(({ manifest }) => manifest),
+      overrideMedia,
+    ]);
+    expect(registry.has('media')).toBe(false);
+  });
+
+  it('rejects two overrides of one screen', () => {
+    const resolved = [
+      segmentOf('media-plugin', [screen('media')]),
+      {
+        manifest: overrideMedia,
+        segment: { screens: [screen('media', { component: Replacement })] },
+      },
+    ];
+    const secondOverride = definePlugin({
+      name: 'tina:media-v3',
+      provides: ['screen'],
+      overrides: [{ capability: 'screen', key: 'media' }],
+    });
+    expect(() =>
+      createScreenRegistry(resolved, [
+        ...resolved.map(({ manifest }) => manifest),
+        secondOverride,
+      ])
+    ).toThrow(/Only one may replace or remove it/);
+  });
 });
 
 describe('screen navigation order', () => {
