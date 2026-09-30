@@ -1,5 +1,6 @@
+import taxonomy from '../issue-labels.json' with { type: 'json' };
 // Classifies one newly opened issue with Jev (typesafe.ai) against the label taxonomy in
-// AGENTS.md and applies the primary category, plus onboarding/🤖AI when clearly suitable.
+// .github/issue-labels.json and applies the primary category, plus onboarding/🤖AI when clearly suitable.
 import {
   type Issue,
   choice,
@@ -18,26 +19,9 @@ const CATEGORY_THRESHOLD = 0.7;
 const SCOPE_THRESHOLD = 0.85;
 const BODY_CHARS = 4000;
 const PENDING_TRIAGE = 'pending triage';
-const PROGRAM_LABELS = ['v4.0', 'For 4.1'];
+const PROGRAM_LABELS = Object.keys(taxonomy.program);
 
-const CATEGORIES = {
-  bug: 'Broken behavior, error, crash, wrong output',
-  enhancement: 'Feature request, new capability',
-  security: 'Vulnerabilities, code-scanning alerts',
-  documentation: 'Docs, READMEs, guides',
-  'technical-debt': 'Refactor, dead code, architectural cleanup',
-  chore: 'Dep bumps, config, build, CI, scaffolding',
-  tests: 'Adding or expanding test coverage',
-  perf: 'Slow, scale, throughput, memory',
-  dx: 'Developer-facing CLI / errors / logging',
-  ux: 'Visual, UX, layout, copy, animation',
-  'rich-text': 'Plate, MDX, markdown rendering, body field, embed templates',
-  'form-system': 'Form fields, validation, dirty state, field plugins',
-  media: 'Media library, upload, browse',
-  'starter-template': 'create-tina-app, Astro/Next/Hugo starters',
-  'self-hosted': 'Self-hosted setup, externalization, database, sqlite-level',
-  'editorial-workflow': 'Branches, PRs, protected-branch flow',
-} as const satisfies Record<string, string>;
+const CATEGORIES = taxonomy.primary;
 type Category = keyof typeof CATEGORIES;
 
 const isCategory = (label: string): label is Category => label in CATEGORIES;

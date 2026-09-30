@@ -118,41 +118,11 @@ The non-default-setup detail in `### Your environment` is the field that most of
 
 ## Issue Triage & Labels
 
-This repo uses a fixed label taxonomy for backlog organisation. When filing or triaging issues, apply exactly **one primary category label** plus any program/scope labels that apply.
-
-### Primary category labels
-
-Pick the most specific that fits:
-
-| Label | Use for |
-|---|---|
-| `bug` | Broken behavior, error, crash, wrong output |
-| `enhancement` | Feature request, new capability |
-| `security` | Vulnerabilities, code-scanning alerts (file privately first per SECURITY.md) |
-| `documentation` | Docs, READMEs, guides |
-| `technical-debt` | Refactor, dead code, architectural cleanup |
-| `chore` | Dep bumps, config, build, CI, scaffolding |
-| `tests` | Adding or expanding test coverage |
-| `perf` | Slow, scale, throughput, memory |
-| `dx` | Developer-facing CLI / errors / logging |
-| `ux` | Visual, UX, layout, copy, animation |
-| `rich-text` | Plate, MDX, markdown rendering, body field, embed templates |
-| `form-system` | Form fields, validation, dirty state, field plugins |
-| `media` | Media library, upload, browse |
-| `starter-template` | create-tina-app, Astro/Next/Hugo starters |
-| `self-hosted` | Self-hosted setup, externalization, database, sqlite-level |
-| `editorial-workflow` | Branches, PRs, protected-branch flow |
-
-### Program / scope labels (apply alongside primary)
-
-- `v4.0` — part of the v4 architectural rewrite (epics #6830–#6837)
-- `For 4.1` — scheduled for the 4.1 release window
-- `onboarding` — small, well-scoped task suitable for developers new to the project
-- `🤖AI` — could be implemented end-to-end by an AI agent in a single prompt
+This repo uses a fixed label taxonomy for backlog organisation, defined in [`.github/issue-labels.json`](.github/issue-labels.json). Read it before filing or triaging issues. Apply exactly **one** label from `primary` (the most specific that fits), plus any `program` or `scope` labels that apply.
 
 ### Triage rules
 
-- **New issues are auto-classified.** `.github/workflows/classify-issue.yml` asks Jev for the primary category (and `onboarding`/`🤖AI`) against this table; the criteria live in `.github/scripts/classify-issue.mts`, so keep the two in sync.
+- **New issues are auto-classified.** `.github/workflows/classify-issue.yml` asks Jev for the primary category (and `onboarding`/`🤖AI`) using the same JSON file, so editing it updates both.
 - **Taxonomy is fixed.** Don't invent new category labels. If nothing fits, leave the label off and surface the issue for human triage.
 - **Don't apply `onboarding` or `🤖AI` to v4-program issues** — those are intentionally coordinated work.
 - **Closing an issue:** always link evidence (PR number, comment URL, "fixed in version X.Y") in the closing comment. If the issue is a meta-tracker blocked on a parent epic, leave a "Triage note — do not close" comment instead.
