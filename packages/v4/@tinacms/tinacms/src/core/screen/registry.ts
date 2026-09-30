@@ -61,7 +61,7 @@ export const screensRemovedByOverride = (
   resolved: ResolvedSegment[],
   plugins: PluginManifest[]
 ): string[] => {
-  const contributed = new Map(
+  const screenNamesByPlugin = new Map(
     resolved.map(({ manifest, segment }) => [
       manifest.name,
       new Set((segment.screens ?? []).map((screen) => screen.name)),
@@ -70,7 +70,7 @@ export const screensRemovedByOverride = (
   return plugins.flatMap((plugin) =>
     plugin.overrides.flatMap((override) =>
       override.capability === SCREEN_CAPABILITY &&
-      !contributed.get(plugin.name)?.has(override.key)
+      !screenNamesByPlugin.get(plugin.name)?.has(override.key)
         ? [override.key]
         : []
     )
