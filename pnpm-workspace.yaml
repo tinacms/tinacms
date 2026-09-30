@@ -39,7 +39,7 @@ catalog:
     "@aws-sdk/client-s3": ^3.744.0
     "@aws-sdk/s3-request-presigner": ^3.744.0
     "@azure/storage-blob": ^12.26.0
-    "@biomejs/biome": ^1.9.4
+    "@biomejs/biome": ^2.5.14
     "@changesets/changelog-github": ^0.5.0
     "@changesets/cli": 2.27.8
     "@clerk/backend": 0.31.3
