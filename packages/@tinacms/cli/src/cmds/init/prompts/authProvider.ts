@@ -4,7 +4,7 @@ import prompts from 'prompts';
 import type { Framework } from '../';
 import { askTinaCloudSetup } from './askTinaCloudSetup';
 import type { Config, PromptAuthProvider } from './types';
-const supportedAuthProviders: {
+export const supportedAuthProviders: {
   'tina-cloud': PromptAuthProvider;
   'next-auth': PromptAuthProvider;
   other: PromptAuthProvider;
@@ -36,12 +36,13 @@ const supportedAuthProviders: {
       },
     ],
     extraTinaCollections: ['TinaUserCollection'],
+    // Indented for its slot in the generated API route.
     backendAuthProvider: `AuthJsBackendAuthProvider({
-          authOptions: TinaAuthJSOptions({
-            databaseClient: databaseClient,
-            secret: process.env.NEXTAUTH_SECRET,
-          }),
-        })`,
+        authOptions: TinaAuthJSOptions({
+          databaseClient: databaseClient,
+          secret: process.env.NEXTAUTH_SECRET,
+        }),
+      })`,
     backendAuthProviderImports: [
       {
         from: 'tinacms-authjs',

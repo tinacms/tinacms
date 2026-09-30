@@ -3,7 +3,6 @@ import path from 'path';
 import { logger } from '../../logger';
 import { GeneratedFile, InitEnvironment } from './index';
 import { parseAstroMajor } from './astro-config-detect';
-import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 const checkGitignoreForItem = async ({
   baseDir,
@@ -68,20 +67,12 @@ const makeGeneratedFile = async (
 
 const detectEnvironment = async ({
   baseDir = '',
-  pathToForestryConfig,
-  rootPath,
   debug = false,
 }: {
   baseDir?: string;
-  pathToForestryConfig: string;
-  rootPath: string;
   debug?: boolean;
   tinaVersion?: string;
 }): Promise<InitEnvironment> => {
-  // If there is a forestry config, ask user to migrate it to tina collections
-  const hasForestryConfig = await fs.pathExists(
-    path.join(pathToForestryConfig, '.forestry', 'settings.yml')
-  );
   const sampleContentPath = path.join(
     baseDir,
     'content',
@@ -109,7 +100,6 @@ const detectEnvironment = async ({
   const generatedFiles: InitEnvironment['generatedFiles'] = {
     config: await makeGeneratedFile('config', 'config', tinaFolder),
     database: await makeGeneratedFile('database', 'database', tinaFolder),
-    templates: await makeGeneratedFile('templates', 'templates', tinaFolder),
     'next-api-handler': await makeGeneratedFile(
       '[...routes]',
       'next-api-handler',
@@ -189,27 +179,7 @@ const detectEnvironment = async ({
       baseDir,
       line: 'tina/__generated__',
     }));
-  let frontMatterFormat: ContentFrontmatterFormat;
-  if (hasForestryConfig) {
-    const hugoConfigPath = path.join(rootPath, 'config.toml');
-    if (await fs.pathExists(hugoConfigPath)) {
-      const hugoConfig = await fs.readFile(hugoConfigPath, 'utf8');
-      const metaDataFormat = hugoConfig
-        .toString()
-        .match(/metaDataFormat = "(.*)"/)?.[1];
-      if (
-        metaDataFormat &&
-        (metaDataFormat === 'yaml' ||
-          metaDataFormat === 'toml' ||
-          metaDataFormat === 'json')
-      ) {
-        frontMatterFormat = metaDataFormat;
-      }
-    }
-  }
   const env = {
-    forestryConfigExists: hasForestryConfig,
-    frontMatterFormat,
     gitIgnoreExists: hasGitIgnore,
     gitIgnoreNodeModulesExists: hasGitIgnoreNodeModules,
     gitIgnoreEnvExists: hasGitIgnoreEnv,
