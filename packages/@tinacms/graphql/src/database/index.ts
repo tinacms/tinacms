@@ -990,6 +990,7 @@ export class Database {
               for (const field of fields) {
                 if (
                   (field.indexed !== undefined && field.indexed === false) ||
+                  field.type === 'password' ||
                   field.type ===
                     'object' /* TODO do we want indexes on objects? */
                 ) {
