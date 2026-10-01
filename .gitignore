@@ -16,6 +16,9 @@ packages/cli/forestry/.env
 .idea/
 **/.cache/
 **/package-lock.json
+**/yarn.lock
+**/bun.lock
+**/bun.lockb
 tsconfig.tsbuildinfo
 # Vite writes these while bundling a config and normally removes them; a killed
 # dev server or CLI run leaves them behind.
