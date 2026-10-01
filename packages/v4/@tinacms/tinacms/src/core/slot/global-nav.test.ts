@@ -26,18 +26,20 @@ const segmentOf = (
   segment: { screens, slots: { globalNav } },
 });
 
-const labelsOf = (resolved: ResolvedSegment[], provides: string[] = []) =>
-  createGlobalNav(
+const labelsOf = (resolved: ResolvedSegment[], provides: string[] = []) => {
+  const plugins = [
+    ...resolved.map(({ manifest }) => manifest),
+    definePlugin({
+      name: 'provider',
+      provides: provides as ('media' | 'search')[],
+    }),
+  ];
+  return createGlobalNav(
     resolved,
-    [
-      ...resolved.map(({ manifest }) => manifest),
-      definePlugin({
-        name: 'provider',
-        provides: provides as ('media' | 'search')[],
-      }),
-    ],
-    createScreenRegistry(resolved)
+    plugins,
+    createScreenRegistry(resolved, plugins)
   ).map(({ label }) => label);
+};
 
 describe('global nav slot', () => {
   it('stacks the entries of every plugin instead of conflicting', () => {
@@ -118,6 +120,55 @@ describe('global nav slot', () => {
         ['media']
       )
     ).toThrow(/no installed plugin contributes a screen named "media"/);
+  });
+
+  it('hides an entry whose screen another plugin removed', () => {
+    const View = () => null;
+    const resolved = [
+      segmentOf(
+        'tina:media',
+        [entry('Media', { target: { kind: 'screen', screen: 'media' } })],
+        [{ name: 'media', label: 'Media', component: View }]
+      ),
+    ];
+    const plugins = [
+      ...resolved.map(({ manifest }) => manifest),
+      definePlugin({
+        name: 'tina:no-media-screen',
+        provides: ['screen'],
+        overrides: [{ capability: 'screen', key: 'media' }],
+      }),
+    ];
+    expect(
+      createGlobalNav(
+        resolved,
+        plugins,
+        createScreenRegistry(resolved, plugins)
+      ).map(({ label }) => label)
+    ).toEqual([]);
+  });
+
+  it('still rejects a missing screen that an override names but nobody contributes', () => {
+    const resolved = [
+      segmentOf('tina:sidebar:help', [
+        entry('Help', { target: { kind: 'screen', screen: 'help' } }),
+      ]),
+    ];
+    const plugins = [
+      ...resolved.map(({ manifest }) => manifest),
+      definePlugin({
+        name: 'tina:no-help-screen',
+        provides: ['screen'],
+        overrides: [{ capability: 'screen', key: 'help' }],
+      }),
+    ];
+    expect(() =>
+      createGlobalNav(
+        resolved,
+        plugins,
+        createScreenRegistry(resolved, plugins)
+      )
+    ).toThrow(/no installed plugin contributes a screen named "help"/);
   });
 
   it('rejects an entry with an empty label', () => {

@@ -1,6 +1,9 @@
 import { invariant } from '../invariant';
 import type { PluginManifest, ResolvedSegment } from '../plugin';
-import type { ScreenRegistry } from '../screen/registry';
+import {
+  type ScreenRegistry,
+  screensRemovedByOverride,
+} from '../screen/registry';
 import { DEFAULT_NAV_ORDER, type GlobalNavEntry } from './contract';
 
 const validateEntry = (
@@ -32,9 +35,13 @@ export const createGlobalNav = (
   screens: ScreenRegistry
 ): GlobalNavEntry[] => {
   const provided = new Set(plugins.flatMap((plugin) => plugin.provides));
+  const removed = new Set(screensRemovedByOverride(resolved, plugins));
+  const targetsRemovedScreen = ({ target }: GlobalNavEntry) =>
+    target.kind === 'screen' && removed.has(target.screen);
   return resolved
     .flatMap(({ manifest, segment }) =>
       (segment.slots?.globalNav ?? []).filter((entry) => {
+        if (targetsRemovedScreen(entry)) return false;
         const dependenciesMet = (entry.dependsOn ?? []).every((capability) =>
           provided.has(capability)
         );

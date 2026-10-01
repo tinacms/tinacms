@@ -99,7 +99,7 @@ export function TinaProvider({
     const boot = lifecycleTurn.then(async () => {
       validateCapabilityGraph(composedPlugins);
       const resolved = await resolveClientSegments(composedPlugins);
-      const screens = createScreenRegistry(resolved);
+      const screens = createScreenRegistry(resolved, composedPlugins);
       const runtime: BootedRuntime = {
         registry: createFieldRegistry(resolved),
         validators: createValidatorRegistry(resolved),
