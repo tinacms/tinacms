@@ -607,6 +607,114 @@ describe('MediaModel (Vite dev server)', () => {
     );
   });
 
+  describe('renameMedia file types', () => {
+    let mediaDir: string;
+
+    beforeEach(() => {
+      mediaDir = path.join(tmpDir, 'public', 'uploads');
+    });
+
+    it('refuses to rename a file to a type that is not allowed', async () => {
+      await fs.writeFile(path.join(mediaDir, 'a.png'), 'png');
+      const model = new MediaModel(config);
+      const result = await model.renameMedia({ from: 'a.png', to: 'a.html' });
+      expect(result).toMatchObject({
+        ok: false,
+        code: 'UNSUPPORTED_FILE_TYPE',
+      });
+      expect(await fs.pathExists(path.join(mediaDir, 'a.png'))).toBe(true);
+      expect(await fs.pathExists(path.join(mediaDir, 'a.html'))).toBe(false);
+    });
+
+    it('allows renaming a file that keeps its extensions', async () => {
+      await fs.writeFile(path.join(mediaDir, 'a.html'), 'html');
+      const model = new MediaModel(config);
+      const result = await model.renameMedia({ from: 'a.html', to: 'b.html' });
+      expect(result).toEqual({ ok: true });
+      expect(await fs.pathExists(path.join(mediaDir, 'b.html'))).toBe(true);
+    });
+
+    it('refuses a rename that adds an extension that is not allowed', async () => {
+      await fs.writeFile(path.join(mediaDir, 'notes'), 'text');
+      const model = new MediaModel(config);
+      const result = await model.renameMedia({
+        from: 'notes',
+        to: 'notes.html',
+      });
+      expect(result).toMatchObject({
+        ok: false,
+        code: 'UNSUPPORTED_FILE_TYPE',
+      });
+    });
+
+    it('checks the new name even when the extension is unchanged', async () => {
+      await fs.writeFile(path.join(mediaDir, 'a.txt'), 'text');
+      const model = new MediaModel(config);
+      for (const to of ['b.txt:s.txt', 'b.txt.', 'b.txt ']) {
+        const result = await model.renameMedia({ from: 'a.txt', to });
+        expect([to, result]).toMatchObject([
+          to,
+          { ok: false, code: 'UNSUPPORTED_FILE_TYPE' },
+        ]);
+      }
+      expect(await fs.readdir(mediaDir)).toEqual(['a.txt']);
+    });
+
+    it('reads the extension from the literal new name', async () => {
+      await fs.writeFile(path.join(mediaDir, 'a.png'), 'png');
+      const model = new MediaModel(config);
+      const result = await model.renameMedia({
+        from: 'a.png',
+        to: 'a.png#.html',
+      });
+      expect(result).toMatchObject({
+        ok: false,
+        code: 'UNSUPPORTED_FILE_TYPE',
+      });
+    });
+
+    it('checks the target of a link when renaming', async () => {
+      await fs.writeFile(path.join(mediaDir, 'real.png'), 'png');
+      try {
+        await fs.symlink(
+          path.join(mediaDir, 'real.png'),
+          path.join(mediaDir, 'alias.html')
+        );
+      } catch {
+        console.log('Links are not available here. Link case did not run.');
+        return;
+      }
+      const model = new MediaModel(config);
+      const result = await model.renameMedia({
+        from: 'alias.html',
+        to: 'alias2.html',
+      });
+      expect(result).toMatchObject({
+        ok: false,
+        code: 'UNSUPPORTED_FILE_TYPE',
+      });
+    });
+
+    it('compares extensions without regard to case', async () => {
+      await fs.writeFile(path.join(mediaDir, 'a.png'), 'png');
+      const model = new MediaModel(config);
+      expect(await model.renameMedia({ from: 'a.png', to: 'b.PNG' })).toEqual({
+        ok: true,
+      });
+      expect(
+        await model.renameMedia({ from: 'b.PNG', to: 'b.HTML' })
+      ).toMatchObject({ ok: false, code: 'UNSUPPORTED_FILE_TYPE' });
+    });
+
+    it('uses media.accept for the new name', async () => {
+      await fs.writeFile(path.join(mediaDir, 'a.png'), 'png');
+      const model = new MediaModel({ ...config, accept: '.html' });
+      expect(await model.renameMedia({ from: 'a.png', to: 'a.html' })).toEqual({
+        ok: true,
+      });
+    });
+  });
+
   describe('renameMedia symlink traversal', () => {
     let outsideDir: string;
 
@@ -798,6 +906,21 @@ describe('createMediaRouter', () => {
       });
       expect(res.statusCode).toBe(403);
       expect(res.body.code).toBe('INVALID_PATH');
+    });
+
+    it('returns 415 with code and message for a refused rename', async () => {
+      const mediaDir = path.join(tmpDir, 'public', 'uploads');
+      await fs.writeFile(path.join(mediaDir, 'a.png'), 'data');
+      const router = createMediaRouter(config);
+
+      const res = await callRename(router, { from: 'a.png', to: 'a.html' });
+
+      expect(res.statusCode).toBe(415);
+      expect(res.body).toEqual({
+        code: 'UNSUPPORTED_FILE_TYPE',
+        message:
+          'Files of type ".html" can\'t be uploaded. Allowed types are set by media.accept in your Tina config.',
+      });
     });
   });
 

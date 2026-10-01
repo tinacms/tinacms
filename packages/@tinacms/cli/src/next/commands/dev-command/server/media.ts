@@ -1,4 +1,8 @@
-import { checkUploadType } from '@tinacms/schema-tools';
+import {
+  checkUploadType,
+  isUploadNameAllowed,
+  uploadExtensions,
+} from '@tinacms/schema-tools';
 import busboy from 'busboy';
 import { randomUUID } from 'crypto';
 import fs from 'fs-extra';
@@ -276,6 +280,7 @@ export type RenameFailureCode =
   | 'NOT_FOUND'
   | 'NAME_COLLISION'
   | 'UNSUPPORTED'
+  | 'UNSUPPORTED_FILE_TYPE'
   | 'BACKEND_FAILURE';
 
 type RenameRecord =
@@ -286,6 +291,7 @@ const RENAME_ERROR_STATUS: Record<RenameFailureCode, number> = {
   NOT_FOUND: 404,
   NAME_COLLISION: 409,
   UNSUPPORTED: 400,
+  UNSUPPORTED_FILE_TYPE: 415,
   BACKEND_FAILURE: 500,
 };
 
@@ -457,10 +463,12 @@ export class MediaModel {
   public readonly rootPath: string;
   public readonly publicFolder: string;
   public readonly mediaRoot: string;
-  constructor({ rootPath, publicFolder, mediaRoot }: PathConfig) {
+  public readonly accept?: string | string[];
+  constructor({ rootPath, publicFolder, mediaRoot, accept }: PathConfig) {
     this.rootPath = rootPath;
     this.mediaRoot = mediaRoot;
     this.publicFolder = publicFolder;
+    this.accept = accept;
   }
   async listMedia(args: MediaArgs): Promise<ListMediaRes> {
     try {
@@ -682,6 +690,15 @@ export class MediaModel {
       };
     }
 
+    const rejection = this.renameTypeRejection(source, destination);
+    if (rejection) {
+      return {
+        ok: false,
+        code: 'UNSUPPORTED_FILE_TYPE',
+        message: rejection.message,
+      };
+    }
+
     // On case-insensitive filesystems the destination of a case-only rename
     // reports as existing because it *is* the source.
     const isCaseOnlyRename =
@@ -724,6 +741,25 @@ export class MediaModel {
             : 'Failed to rename the file.',
       };
     }
+  }
+
+  /**
+   * A rename that keeps every extension skips the type check, so an editor
+   * can rename a file already on disk that the accept list does not admit.
+   */
+  private renameTypeRejection(source: string, destination: string) {
+    const toName = path.basename(destination);
+    const toRealName = path.basename(resolveRealPath(destination));
+    if (!isUploadNameAllowed(toName) || !isUploadNameAllowed(toRealName)) {
+      return uploadTypeRejection([toName, toRealName], this.accept);
+    }
+    const toExtensions = uploadExtensions(toName).join('.');
+    const keepsExtensions = [
+      path.basename(source),
+      path.basename(resolveRealPath(source)),
+    ].every((name) => uploadExtensions(name).join('.') === toExtensions);
+    if (keepsExtensions) return undefined;
+    return uploadTypeRejection([toName, toRealName], this.accept);
   }
 
   /**
