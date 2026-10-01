@@ -90,7 +90,7 @@ const TRAVERSAL_VECTORS: Vector[] = [
     path: "evil\0.md",
     expectedGraphqlError: "Invalid path: relativePath contains invalid characters",
     expectedMediaError: {
-      upload: { status: 500, body: /"message":\{\}/ },
+      upload: { status: 500, body: /"message":"Malformed part header"/ },
       list: { status: 200, body: /"files":\[\]/ },
       delete: { status: 403, body: /Path traversal detected/ },
     },
