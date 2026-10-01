@@ -97,7 +97,6 @@
         "minimatch": "catalog:",
         "normalize-path": "catalog:",
         "posthog-node": "^5.17.2",
-        "prettier": "catalog:",
         "progress": "catalog:",
         "prompts": "catalog:",
         "readable-stream": "catalog:",

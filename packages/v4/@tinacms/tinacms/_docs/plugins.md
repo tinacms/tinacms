@@ -44,7 +44,7 @@ replace a built-in field at a key that is already in use. Refer to
 ## Capabilities
 
 `Capability` has these values: `'field'`, `'validator'`, `'hooks'`, `'content'`,
-`'auth'`, `'media'`, and `'search'`. `field`, `validator` and `hooks` are keyed
+`'auth'`, `'media'`, `'search'`, and `'screen'`. `field`, `validator` and `hooks` are keyed
 capabilities. Many field plugins can operate at the same time, one plugin for
 each schema `type` such as `string` or `image`. Many validator plugins can
 operate at the same time, and one plugin can register many validators; the key
@@ -231,6 +231,27 @@ replace a name on purpose. Refer to
 [ADR-025](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/025-form-hook-registration.md)
 for the decision.
 
+## Replace or remove a screen
+
+A plugin replaces the screen of a different plugin with an override. The
+plugin declares `provides: ['screen']` and
+`overrides: [{ capability: 'screen', key }]`, and contributes a screen with the
+same `name`:
+
+```ts
+definePlugin({
+  name: 'my:media',
+  provides: ['screen'],
+  overrides: [{ capability: 'screen', key: 'media' }],
+  client: () => import('./my-media.client'),
+});
+```
+
+If the plugin contributes no screen with that `name`, the override removes the
+screen. A `globalNav` entry that targets a removed screen does not render.
+Two overrides of one screen throw an error at boot
+(`core/screen/registry.ts`).
+
 ## More data
 
 - [Field plugins](./field-plugins.md) — how to write a field plugin
@@ -247,4 +268,5 @@ for the decision.
     supplies
   - [The `rich-text` field](./rich-text-field.md) — the Plate editor that v4
     supplies, and the markdown body that it controls
+- [UI slots](./ui-slots.md) — how a plugin adds entries to the admin sidebar
 - [Architecture](./architecture.md) — how a plugin gets to the screen
