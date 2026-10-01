@@ -360,6 +360,7 @@ export type MediaRenameErrorCode =
   | 'INVALID_PATH'
   | 'UNAUTHORIZED'
   | 'UNSUPPORTED'
+  | 'UNSUPPORTED_FILE_TYPE'
   | 'BACKEND_FAILURE';
 
 export class MediaRenameError extends Error {
