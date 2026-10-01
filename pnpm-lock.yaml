@@ -2134,6 +2134,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: 'catalog:'
         version: 3.952.0
+      '@tinacms/schema-tools':
+        specifier: workspace:^
+        version: link:../@tinacms/schema-tools
       multer:
         specifier: 'catalog:'
         version: 2.2.0
