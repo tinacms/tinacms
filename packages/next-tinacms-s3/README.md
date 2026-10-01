@@ -190,6 +190,25 @@ export default createMediaHandler({
 
 ```
 
+### Allowed file types
+
+Pass `accept` to `createMediaHandler` to set which file types editors can upload. It uses the same format as `media.accept` in your Tina config, so you can share one constant:
+
+```ts
+// tina/media-accept.ts
+export const mediaAccept = ['image/png', 'image/jpeg', 'application/pdf'];
+```
+
+When `accept` is not set, the default media types apply. Some types, such as SVG, need an exact entry such as `image/svg+xml` or `.svg`; a wildcard does not admit them. Files of those types are stored with `Content-Disposition: attachment`.
+
+We recommend serving media from its own domain and adding `X-Content-Type-Options: nosniff` at your CDN.
+
+If you allow a type that needs an exact entry, add `content-disposition` to `AllowedHeaders` in your bucket CORS rules.
+
+Deploy the admin and the API route together. The client and the handler must come from the same version.
+
+If you call `getUploadUrl` yourself, pass the options argument: `getUploadUrl(bucket, key, expiresIn, client, { contentType, accept })`. The four-argument form is deprecated and will be removed in the next major version.
+
 ## Update Schema
 
 Now that the media store is registered and the API route for media set up, let's add an image to your schema.
