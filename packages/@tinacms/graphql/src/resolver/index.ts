@@ -37,10 +37,19 @@ import {
 } from '../database/datalayer';
 import { TinaGraphQLError, TinaParseDocumentError } from './error';
 import { collectConditionsForField, resolveReferences } from './filter-utils';
+import { findUserInCollection, getUserDocumentContext } from './auth-fields';
 import {
   resolveMediaCloudToRelative,
   resolveMediaRelativeToCloud,
 } from './media-utils';
+
+export type AuthCollectionWriteOp =
+  | 'create'
+  | 'update'
+  | 'rename'
+  | 'delete'
+  | 'addPending'
+  | 'createFolder';
 
 interface ResolverConfig {
   config?: GraphQLConfig;
@@ -740,6 +749,80 @@ export class Resolver {
           `Invalid file extension: expected '.${collectionFormat}' but got '.${fileExtension}'`
         );
       }
+    }
+  };
+
+  private assertAuthCollectionWrite = async ({
+    collection,
+    realPath,
+    op,
+  }: {
+    collection: Collection<true>;
+    realPath: string;
+    op: AuthCollectionWriteOp;
+  }) => {
+    const authCollection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    if (!authCollection) {
+      return;
+    }
+    const normalizedPath = normalizePath(realPath);
+    if (
+      collection.name !== authCollection.name &&
+      !this.isStoredInCollection(normalizedPath, authCollection)
+    ) {
+      return;
+    }
+
+    const { admins, allowUnauthenticatedWrites } = this.database.authCollection;
+    if (this.ctxUser === undefined && allowUnauthenticatedWrites) {
+      return;
+    }
+
+    const sub = this.ctxUser?.sub;
+    const userStorePath = normalizePath(
+      path.join(authCollection.path, 'index.json')
+    );
+    if (
+      op === 'update' &&
+      normalizedPath === userStorePath &&
+      typeof sub === 'string' &&
+      sub !== '' &&
+      admins.includes(sub) &&
+      (await this.isStoredUser(sub))
+    ) {
+      return;
+    }
+
+    throw new Error('Not authorized');
+  };
+
+  private isStoredInCollection = (
+    realPath: string,
+    collection: Collection<true>
+  ) => {
+    try {
+      return (
+        this.tinaSchema.getCollectionByFullPath(realPath)?.name ===
+        collection.name
+      );
+    } catch {
+      return false;
+    }
+  };
+
+  private isStoredUser = async (sub: string) => {
+    try {
+      const { userField, users } = await getUserDocumentContext(
+        this.tinaSchema,
+        this
+      );
+      return (
+        Array.isArray(users) && !!findUserInCollection(users, userField, sub)
+      );
+    } catch {
+      return false;
     }
   };
 

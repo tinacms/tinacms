@@ -6,7 +6,7 @@ import { set } from 'es-toolkit/compat';
 import { checkPasswordHash, mapUserFields } from '../auth/utils';
 import type { Resolver } from './index';
 
-async function getUserDocumentContext(
+export async function getUserDocumentContext(
   tinaSchema: TinaSchema,
   resolver: Resolver
 ) {
@@ -39,7 +39,11 @@ async function getUserDocumentContext(
   return { collection, userField, users, userDoc, relativePath };
 }
 
-function findUserInCollection(users: any[], userField: any, userSub: string) {
+export function findUserInCollection(
+  users: any[],
+  userField: any,
+  userSub: string
+) {
   const { idFieldName } = userField;
   if (!idFieldName) {
     throw new Error('No uid field found on user field');
