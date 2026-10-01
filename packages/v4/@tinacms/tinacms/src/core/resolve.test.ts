@@ -8,7 +8,10 @@ const plugin = (
     provides?: Capability[];
     dependsOn?: Capability[];
     overrides?: {
-      capability: Exclude<Capability, 'field' | 'validator' | 'hooks'>;
+      capability: Exclude<
+        Capability,
+        'field' | 'validator' | 'hooks' | 'screen'
+      >;
     }[];
   } = {}
 ) => definePlugin({ name, ...spec });
@@ -138,6 +141,17 @@ describe('validateCapabilityGraph', () => {
         }),
       ])
     ).toThrow(/both declare an `overrides`/);
+  });
+
+  it('rejects a screen override from a plugin that does not provide screen', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        definePlugin({
+          name: 'tina:media-v2',
+          overrides: [{ capability: 'screen', key: 'media' }],
+        }),
+      ])
+    ).toThrow(/override-without-provides/);
   });
 
   it('rejects a dependency no plugin provides', () => {
