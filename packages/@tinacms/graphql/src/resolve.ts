@@ -38,7 +38,7 @@ export const resolve = async ({
   silenceErrors?: boolean;
   verbose?: boolean;
   isAudit?: boolean;
-  ctxUser?: { sub: string };
+  ctxUser?: { sub?: string } | null;
 }) => {
   try {
     const verboseValue = verbose ?? true;
@@ -59,6 +59,7 @@ export const resolve = async ({
       database,
       tinaSchema,
       isAudit: isAudit || false,
+      ctxUser,
     });
 
     // Track all field resolver promises to prevent runaway promises.
