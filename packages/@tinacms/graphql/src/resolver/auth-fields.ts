@@ -131,8 +131,10 @@ export async function handleUpdatePassword({
     throw new Error('No password provided');
   }
 
-  const { collection, userField, users, relativePath } =
-    await getUserDocumentContext(tinaSchema, resolver);
+  const { userField, users } = await getUserDocumentContext(
+    tinaSchema,
+    resolver
+  );
 
   const { idFieldName, passwordFieldName } = userField;
   const user = users.find((u: any) => u[idFieldName] === ctxUser.sub);
@@ -164,11 +166,7 @@ export async function handleUpdatePassword({
     })
   );
 
-  await resolver.resolveUpdateDocument({
-    collectionName: collection.name,
-    relativePath,
-    newBody,
-  });
+  await resolver.updateAuthDocument({ newBody });
 
   return true;
 }

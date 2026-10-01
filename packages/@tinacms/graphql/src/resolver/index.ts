@@ -1039,6 +1039,40 @@ export class Resolver {
     if (!newBody) {
       throw new Error('Body not provided for updated document.');
     }
+    return this.writeDocumentBody({ collection, realPath, doc, newBody });
+  };
+
+  /**
+   * Updates the user store of the auth collection for the auth field
+   * handlers. It does not check the request user, so the caller must do that.
+   */
+  public updateAuthDocument = async ({
+    newBody,
+  }: {
+    newBody: Record<string, unknown>;
+  }) => {
+    const collection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    if (!collection) {
+      throw new Error('Auth collection not found');
+    }
+    const { realPath } = this.getValidatedPath(collection.name, 'index.json');
+    const doc = await this.getDocument(realPath);
+    return this.writeDocumentBody({ collection, realPath, doc, newBody });
+  };
+
+  private writeDocumentBody = async ({
+    collection,
+    realPath,
+    doc,
+    newBody,
+  }: {
+    collection: Collection<true>;
+    realPath: string;
+    doc: Awaited<ReturnType<Resolver['getDocument']>>;
+    newBody: Record<string, unknown>;
+  }) => {
     const params = await this.buildObjectMutations(
       newBody,
       collection,
