@@ -158,7 +158,12 @@ export const createMediaRouter = (config: PathConfig) => {
         await pipeline(file, fs.createWriteStream(saveTo));
       })();
       writes.push(write);
-      write.catch(() => file.resume());
+      write.catch((error) => {
+        console.error(error);
+        respond(500, { message: 'Failed to save the uploaded file.' });
+        req.unpipe(bb);
+        req.resume();
+      });
     });
     bb.on('error', (error) => {
       if (error instanceof Error) {
@@ -170,9 +175,7 @@ export const createMediaRouter = (config: PathConfig) => {
     bb.on('close', async () => {
       try {
         await Promise.all(writes);
-      } catch (error) {
-        console.error(error);
-        respond(500, { message: 'Failed to save the uploaded file.' });
+      } catch {
         return;
       }
       respond(200, { success: true });

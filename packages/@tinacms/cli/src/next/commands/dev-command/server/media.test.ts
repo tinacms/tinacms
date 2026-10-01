@@ -1126,7 +1126,7 @@ describe('createMediaRouter', () => {
     function makeUploadReq(
       url: string,
       parts: Part[] = [{}],
-      opts: { truncate?: boolean } = {}
+      opts: { truncate?: boolean; chunkSize?: number } = {}
     ) {
       const boundary = `----TestBoundary${Date.now()}`;
       const chunks: Buffer[] = [];
@@ -1149,10 +1149,16 @@ describe('createMediaRouter', () => {
       }
       if (!opts.truncate) chunks.push(Buffer.from(`--${boundary}--\r\n`));
       const payload = Buffer.concat(chunks);
+      const chunkSize = opts.chunkSize ?? payload.length;
+      let offset = 0;
       const stream = new Readable({
         read() {
-          this.push(payload);
-          this.push(null);
+          if (offset >= payload.length) {
+            this.push(null);
+            return;
+          }
+          this.push(payload.subarray(offset, offset + chunkSize));
+          offset += chunkSize;
         },
       }) as any;
       stream.url = url;
@@ -1166,7 +1172,7 @@ describe('createMediaRouter', () => {
       routerConfig: PathConfig,
       url: string,
       parts?: Part[],
-      opts?: { truncate?: boolean }
+      opts?: { truncate?: boolean; chunkSize?: number }
     ) {
       const router = createMediaRouter(routerConfig);
       const req = makeUploadReq(url, parts, opts);
@@ -1439,6 +1445,15 @@ describe('createMediaRouter', () => {
       expect(result.statusCode).toBe(500);
       expect(result.bodies).toHaveLength(1);
       expect(result.body.message).toEqual(expect.any(String));
+
+      const large = await upload(
+        config,
+        '/media/upload/taken.txt',
+        [{ content: Buffer.alloc(4 * 1024 * 1024, 1) }],
+        { chunkSize: 16 * 1024 }
+      );
+      expect(large.statusCode).toBe(500);
+      expect(large.bodies).toHaveLength(1);
     });
   });
 });
