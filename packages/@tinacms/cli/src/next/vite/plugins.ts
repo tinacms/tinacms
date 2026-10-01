@@ -102,6 +102,7 @@ export const devServerEndPointsPlugin = ({
           apiURL,
           publicFolder: parseMediaFolder(mediaPaths?.publicFolder || ''),
           mediaRoot: parseMediaFolder(mediaPaths?.mediaRoot || ''),
+          accept: configManager.config.media?.accept,
         });
         const searchIndexRouter = createSearchIndexRouter({
           config: { apiURL, searchPath: 'searchIndex' },
