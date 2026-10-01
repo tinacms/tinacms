@@ -1,5 +1,17 @@
 # tinacms
 
+## 3.14.2
+
+### Patch Changes
+
+- [#7659](https://github.com/tinacms/tinacms/pull/7659) [`36040e7`](https://github.com/tinacms/tinacms/commit/36040e7a94039d3138ba665600b584f6e82b5a80) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Clicking a number value in visual editing now focuses its input, so editors no longer have to click the field a second time. The number input also keeps the field's `name`.
+
+- [#7642](https://github.com/tinacms/tinacms/pull/7642) [`5b78903`](https://github.com/tinacms/tinacms/commit/5b78903558530ae2837c8ebafed615dd586b6259) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - The sidebar now shows a "See latest Releases" link next to the TinaCMS version. It opens the TinaCMS What's New page in a new tab.
+
+- Updated dependencies [[`dff369c`](https://github.com/tinacms/tinacms/commit/dff369c296f84347ad816ab9f737e74fc8268073), [`e6bf2cf`](https://github.com/tinacms/tinacms/commit/e6bf2cf958e9acffffff73bfe90e492d3491bf05), [`82a7c3b`](https://github.com/tinacms/tinacms/commit/82a7c3be6e493f403050791ed25715a59d824339)]:
+  - @tinacms/schema-tools@2.10.1
+  - @tinacms/mdx@2.3.0
+
 ## 3.14.1
 
 ### Patch Changes
@@ -437,7 +449,6 @@
   ```
 
   The bridge submodules:
-
   - **`init()`** — top-level entry. Detects iframe embedding, registers all `[data-tina-form]` payloads with the admin (with retry, since the bridge boots faster than the admin's listener), wires data updates and click-to-focus.
   - **`refreshForms()`** — re-scans the DOM after soft navigations (Astro view transitions, Turbo, htmx). Posts `close` for forms that left and `open` for forms that appeared.
   - **`tinaField()`** — framework-free field-id helper, identical API to `tinacms/dist/react`'s export. Use on any element to make it click-to-edit.
@@ -456,7 +467,6 @@
   **Reference example: `examples/astro/visual-editing`**
 
   A new Astro 5 example that mirrors `examples/astro/kitchen-sink` field-for-field — same six collections (Tag, Author, Global, Post, Blog, Page), same shared content via `localContentPath`, same eight routes — but rendered with pure Astro components instead of React islands. Includes:
-
   - The **`@tinacms/astro` package's `TinaMarkdown`** — a vanilla Astro rich-text renderer that walks the Plate AST Tina returns, dispatches custom MDX components (NewsletterSignup, BlockQuote, DateTime, code blocks) by name to authored Astro components — the same `components` map shape as `TinaMarkdown` from `tinacms/dist/rich-text`, but emitting Astro markup
   - An island-refresh pattern: one dynamic endpoint at `src/pages/tina-island/[name].ts` backed by a registry in `src/lib/islands.ts`. The endpoint uses Astro's `experimental_AstroContainer` to render the matching component as a fragment-only response. Adding a new editable region is one entry in the registry
   - Multi-form pages: layout fetches global, route fetches its primary collection, both register independently — admin shows the right form based on which marked element you click
@@ -481,7 +491,6 @@
   A `__tina_edit` session cookie (SameSite=Strict, gated on `Sec-Fetch-Dest: iframe`) keeps the iframe in edit mode across in-iframe link clicks — without it, clicking a link inside the preview drops the `/admin/` Referer and the next request falls out of edit mode. Top-level visitors never get edit mode because the dest check fails before the cookie is consulted, so production HTML is unaffected.
 
   **Out of scope (follow-ups)**
-
   - Hugo / Eleventy adapters using the same bridge — the contract is framework-free, just needs an integration guide
   - TinaCloud overlay channel — not needed; the stateless POST protocol works against any backend
 
@@ -514,7 +523,6 @@
 - [#6652](https://github.com/tinacms/tinacms/pull/6652) [`3e4dcc7`](https://github.com/tinacms/tinacms/commit/3e4dcc76d5fb89ec900b778cb7e82f3aa3ed6501) Thanks [@kulesy](https://github.com/kulesy)! - Fix HTML code block language tag from 'htmlbars' to 'html'
 
 - [#6770](https://github.com/tinacms/tinacms/pull/6770) [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7) Thanks [@zaidkhatri-dev](https://github.com/zaidkhatri-dev)! - - Improved error handling for file and folder operations: errors are now shown as clear notifications in the UI rather than just logging to the console.
-
   - Fixed an issue where renaming a document to an already existing filename would silently fail; this now correctly triggers an error alert in the UI.
 
 - [#6761](https://github.com/tinacms/tinacms/pull/6761) [`b37187d`](https://github.com/tinacms/tinacms/commit/b37187d46b6e1a274db7ab79372f02aaa2ef992d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 fix Popover on rich-text fields from being hidden under other content
@@ -544,7 +552,6 @@
 - [#6410](https://github.com/tinacms/tinacms/pull/6410) [`4672251`](https://github.com/tinacms/tinacms/commit/4672251c813e51f4471f025943008d2dea700aca) Thanks [@TihomirIvanov](https://github.com/TihomirIvanov)! - Updated tinacms dependency mermaid
 
   Fixes security vulnerabilities
-
   - Fixes https://github.com/advisories/GHSA-p3vf-v8qc-cwcr
   - Fixes https://github.com/advisories/GHSA-gx9m-whjm-85jf
   - Fixes https://github.com/advisories/GHSA-mmhx-hmjr-r674
@@ -824,7 +831,6 @@
 ### Patch Changes
 
 - [#6262](https://github.com/tinacms/tinacms/pull/6262) [`3a12a39`](https://github.com/tinacms/tinacms/commit/3a12a392d5a8eb9bba5a5be65d080f24afa08de3) Thanks [@0xharkirat](https://github.com/0xharkirat)! - 🔒 Security: Update Next.js to 14.2.35 to address security vulnerabilities
-
   - Address CVE-2025-55184 (high): DoS via malicious HTTP request causing server to hang
   - Address CVE-2025-67779 (high): Complete fix for CVE-2025-55184 DoS vulnerability
   - Updated Next.js devDependency from 14.2.10/14.2.24 to 14.2.35
@@ -857,7 +863,6 @@
 ### Patch Changes
 
 - [#6216](https://github.com/tinacms/tinacms/pull/6216) [`5c1e891`](https://github.com/tinacms/tinacms/commit/5c1e89181f595d392ad6cb56ca5fc0b6d9e60a23) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - `@tinacms/graphql`: remove scmp dependency, replaced with modern code (now inbuilt)
-
   - `@tinacms/metrics`: remove isomorphic-fetch dependency, now relies on global fetch
   - `@tinacms/cli`: remove log4js dependency, replaced with custom logger implementation; update chalk to v5 (ESM-only)
   - `@tinacms/scripts`, `create-tina-app`: update chalk to v5 (ESM-only)
@@ -933,7 +938,6 @@
 
 - [#6145](https://github.com/tinacms/tinacms/pull/6145) [`d1bd1a1`](https://github.com/tinacms/tinacms/commit/d1bd1a1312fa910e237ec06608e7c11830c78346) Thanks [@18-th](https://github.com/18-th)! - Remove Lodash and replace usages with either native functions or es-toolkit equivalents
   Removed the following lodash usages:
-
   - debounce - was not used, removed the reference
   - camelcase - unused, removed the reference
   - upperfirst - unused, removed the reference
@@ -1115,7 +1119,6 @@
 - [#5786](https://github.com/tinacms/tinacms/pull/5786) [`e27c017`](https://github.com/tinacms/tinacms/commit/e27c0172005797af93b908152d51b2966c0cf059) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Modifies SlateJson rich text parser to store non-stringified json objects of the rich text content
 
 - [#5784](https://github.com/tinacms/tinacms/pull/5784) [`b25c5f0`](https://github.com/tinacms/tinacms/commit/b25c5f0b0e1d3f37870b780230b41dbc56bef1ab) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - Fixed padding issues in FormLists
-
   - Fixed Visual Editing's "Edit" button (Reference Fields)
 
 - [#5789](https://github.com/tinacms/tinacms/pull/5789) [`5040a6a`](https://github.com/tinacms/tinacms/commit/5040a6aa24e62166d942c47b61a3f18585caded6) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Adds click to focus for nested objects
@@ -1135,7 +1138,6 @@
   When the collection is using templates, the button will be disabled and a tooltip as to why
 
 - [#5697](https://github.com/tinacms/tinacms/pull/5697) [`856e07a`](https://github.com/tinacms/tinacms/commit/856e07a0b8d742ee78d5eba565623cf081a61534) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - - ✏️ Rename `CreateBranchModel` to `CreateBranchModal`
-
   - Add Deprecation no `CreateBranchModel`
 
 - [#5691](https://github.com/tinacms/tinacms/pull/5691) [`4d9c8ab`](https://github.com/tinacms/tinacms/commit/4d9c8abf6badd1bcc833bda432ab22dace4925ae) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - 🐛 Bug - Fix issue where editorial workflow fails to save from preview when path ends in slash
@@ -1214,7 +1216,6 @@
 ### Minor Changes
 
 - [#5504](https://github.com/tinacms/tinacms/pull/5504) [`7541614`](https://github.com/tinacms/tinacms/commit/7541614527a02268ea453b23ce84637f978dcf2d) Thanks [@Ben0189](https://github.com/Ben0189)! - Rich text editor - Add strikethrough support
-
   - Added a strikethrough button in the rich text editor, allowing users to apply strikethrough formatting.
   - Strikethrough syntax (`~~word~~`) correctly applies in Markdown mode.
   - **Known Issue:** In the rich text editor, typing `~~word~~` does not currently auto-convert to strikethrough. A fix will follow in an upcoming patch.
@@ -1468,7 +1469,6 @@
 ### Minor Changes
 
 - 324950a: Updates Plate Editor to latest version 36.
-
   - Upgrades all remaining packages `Typescript` to version `^5`
   - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
   - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
@@ -1657,7 +1657,6 @@
   ### Changes in the database file
 
   #### Deprecations and Additions
-
   - **Deprecated**: `onPut`, `onDelete`, and `level` arguments in `createDatabase`.
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
@@ -1695,7 +1694,6 @@
   ### Migrating `database.ts`
 
   #### a. Replacing `onPut` and `onDelete` with `gitProvider`
-
   - **GitHubProvider Usage**: Replace `onPut` and `onDelete` with `gitProvider`, using the provided `GitHubProvider` for GitHub.
 
   ```typescript
@@ -1724,7 +1722,6 @@
   ```
 
   #### b. Renaming `level` to `databaseAdapter`
-
   - **Renaming in Code**: Change `level` to `databaseAdapter` for clarity.
 
   ```diff
@@ -1735,7 +1732,6 @@
   ```
 
   #### c. `createLocalDatabase` Function
-
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
@@ -1744,7 +1740,6 @@
   ```
 
   #### d. Consolidated Example
-
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
@@ -1762,7 +1757,6 @@
   ### Summary of Authentication Updates in Config
 
   #### a. AuthProvider and AbstractAuthProvider
-
   - **New**: `authProvider` in `defineConfig`.
   - **Class**: `AbstractAuthProvider` for extending new auth providers.
   - **Clerk Auth Provider**: New provider added.
@@ -1770,11 +1764,9 @@
   - **Deprecation**: `admin.auth`.
 
   #### b. Auth Provider in Internal Client and Config
-
   - **Transition**: From auth functions to `authProvider` class.
 
   #### c. Migration for Authentication
-
   - **Previous API**:
 
   ```javascript
@@ -1806,7 +1798,6 @@
   ```
 
   ### TinaCMS Self Hosted backend updates
-
   - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
   - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
 
@@ -2701,6 +2692,7 @@
     }
   },
   ```
+
   - Allow `datetime` field to be undefined or empty
 - 8060d0949: Provide filename customization API.
 
@@ -2870,7 +2862,6 @@
 ### Minor Changes
 
 - 7b0dda55e: Updates to the `rich-text` component as well the shape of the `rich-text` field response from the API
-
   - Adds support for isTitle on MDX elements
   - Fixes issues related to nested marks
   - Uses monaco editor for code blocks
@@ -2887,7 +2878,6 @@
   This new option will build tina into a static `index.html` file. This will allow someone to use tina without having react as a dependency.
 
   ### How to update
-
   1.  Add a `.tina/config.{js,ts,tsx,jsx}` with the default export of define config.
 
   ```ts
@@ -3551,7 +3541,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
     },
     {
       useHttps: false,
-    }
+    },
   );
   ```
 
@@ -4162,7 +4152,6 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
   ## Defensive coding in Tina
 
   When working with GraphQL, there are 2 reasons a property may not be present.
-
   1. The data is not a required property. That is to say, if I have a blog post document, and "category" is an optional field, we'll need to make sure we factor that into how we render our page:
 
   ```tsx

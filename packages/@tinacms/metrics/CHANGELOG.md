@@ -1,5 +1,11 @@
 # @tinacms/metrics
 
+## 2.1.4
+
+### Patch Changes
+
+- [#7409](https://github.com/tinacms/tinacms/pull/7409) [`e6bf2cf`](https://github.com/tinacms/tinacms/commit/e6bf2cf958e9acffffff73bfe90e492d3491bf05) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Mark the `hasForestryConfig` field on the `tinacms:cli:init:invoke` event type as deprecated. `tinacms init` no longer sends it.
+
 ## 2.1.3
 
 ### Patch Changes
@@ -35,7 +41,6 @@
   ### Migration notes for existing multi-repo projects
 
   After upgrading (and once TinaCloud prod is on #3403):
-
   - **Stale `tina/` folder in your content repo.** Pre-upgrade builds committed `tina/__generated__/*` and `tina/tina-lock.json` to the content repo. Nothing updates or reads those files any more. They are safe — and recommended — to delete from the content repo in a single cleanup commit.
   - **`ConfigManager.generatedFolderPathContentRepo` is removed.** If any custom CLI code, plugins, or scripts referenced this field, they will fail at type-check or runtime. Use `generatedFolderPath` — it has always been the generator-relative path.
   - **`ConfigManager.getTinaFolderPath` no longer accepts an `isContentRoot` option.** The content root never needs a `tina/` folder now, so the option was removed. If any custom code called `getTinaFolderPath(path, { isContentRoot: true })`, drop the second argument.

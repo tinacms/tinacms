@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/mdx",
-	"version": "2.2.3",
+	"version": "2.3.0",
 	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
