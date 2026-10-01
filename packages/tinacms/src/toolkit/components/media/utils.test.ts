@@ -1,6 +1,9 @@
+import { DEFAULT_MEDIA_ACCEPT } from '@tinacms/schema-tools';
 import { describe, expect, it } from 'vitest';
 import {
+  DEFAULT_MEDIA_UPLOAD_TYPES,
   dropzoneAcceptFromExtensions,
+  dropzoneAcceptFromString,
   isImage,
   isVideo,
   previewRename,
@@ -41,6 +44,50 @@ describe('isImage / isVideo', () => {
   // image read as a plain file. Previewing it is the better answer.
   it('tolerates a fragment as well as a query string', () => {
     expect(isImage('hero.png#full')).toBe(true);
+  });
+});
+
+describe('DEFAULT_MEDIA_UPLOAD_TYPES', () => {
+  it('uses the shared default list for uploads', () => {
+    expect(DEFAULT_MEDIA_UPLOAD_TYPES).toBe(DEFAULT_MEDIA_ACCEPT.join(','));
+  });
+
+  it('lists image and text types one by one', () => {
+    const types = DEFAULT_MEDIA_UPLOAD_TYPES.split(',');
+    expect(types).not.toContain('image/*');
+    expect(types).not.toContain('text/*');
+    expect(types).toContain('image/png');
+    expect(types).toContain('text/plain');
+  });
+
+  it('keeps DEFAULT_MEDIA_UPLOAD_TYPES a comma-separated string', () => {
+    expect(typeof DEFAULT_MEDIA_UPLOAD_TYPES).toBe('string');
+    expect(DEFAULT_MEDIA_UPLOAD_TYPES.split(',').length).toBe(
+      DEFAULT_MEDIA_ACCEPT.length
+    );
+  });
+});
+
+describe('dropzoneAcceptFromString', () => {
+  it('uses the shared default list when no accept is set', () => {
+    expect(Object.keys(dropzoneAcceptFromString(''))).toEqual([
+      ...DEFAULT_MEDIA_ACCEPT,
+    ]);
+  });
+
+  it('keeps MIME entries as keys', () => {
+    expect(dropzoneAcceptFromString('image/*')).toEqual({ 'image/*': [] });
+  });
+
+  it('keys an extension entry by its MIME type for the file picker', () => {
+    expect(dropzoneAcceptFromString('.svg')).toEqual({
+      'image/svg+xml': ['.svg'],
+    });
+    expect(dropzoneAcceptFromString('image/png, .SVG, .zzz')).toEqual({
+      'image/png': [],
+      'image/svg+xml': ['.SVG'],
+      'application/octet-stream': ['.zzz'],
+    });
   });
 });
 
