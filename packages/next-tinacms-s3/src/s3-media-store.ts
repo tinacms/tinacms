@@ -14,6 +14,12 @@ const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
 
 import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from './errors';
 
+const isStringRecord = (value: unknown): value is Record<string, string> =>
+  typeof value === 'object' &&
+  value !== null &&
+  !Array.isArray(value) &&
+  Object.values(value).every((entry) => typeof entry === 'string');
+
 export class S3MediaStore implements MediaStore {
   fetchFunction = (input: RequestInfo, init?: RequestInit) => {
     return fetch(input, init);
@@ -46,8 +52,9 @@ export class S3MediaStore implements MediaStore {
         directory && directory !== '/' ? `${directory}/${safeName}` : safeName
       }`;
 
+      const contentType = item.file.type || 'application/octet-stream';
       const res = await this.fetchWithBasePath(
-        `/api/s3/media/upload_url?key=${path}`,
+        `/api/s3/media/upload_url?key=${path}&contentType=${encodeURIComponent(contentType)}`,
         {
           method: 'GET',
         }
@@ -57,7 +64,7 @@ export class S3MediaStore implements MediaStore {
         const responseData = await res.json();
         throw new Error(responseData.message);
       }
-      const { signedUrl, src } = await res.json();
+      const { signedUrl, src, headers } = await res.json();
       if (!signedUrl || !src) {
         throw new Error('Unexpected error generating upload url');
       }
@@ -65,9 +72,9 @@ export class S3MediaStore implements MediaStore {
       const uploadRes = await fetch(signedUrl, {
         method: 'PUT',
         body: item.file,
-        headers: {
-          'Content-Type': item.file.type || 'application/octet-stream',
-        },
+        headers: isStringRecord(headers)
+          ? headers
+          : { 'Content-Type': contentType },
       });
 
       if (!uploadRes.ok) {
