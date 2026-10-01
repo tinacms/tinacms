@@ -19,4 +19,5 @@ export default isLocal
         mongoUri: process.env.MONGODB_URI,
       }),
       namespace: process.env.GITHUB_BRANCH,
+      authCollection: { admins: ['tinauser'] },
     });

@@ -26,6 +26,8 @@ export default isLocal
       gitProvider: ${config.gitProvider?.gitProviderClassText},
       databaseAdapter: ${config.databaseAdapter?.databaseAdapterClassText},
       namespace: branch,
+      // Users who can add, edit, or remove users in the admin.
+      authCollection: { admins: ['tinauser'] },
     })
 `;
 };
