@@ -1148,16 +1148,16 @@ describe('createMediaRouter', () => {
         );
       }
       if (!opts.truncate) chunks.push(Buffer.from(`--${boundary}--\r\n`));
-      const payload = Buffer.concat(chunks);
-      const chunkSize = opts.chunkSize ?? payload.length;
+      const body = Buffer.concat(chunks);
+      const chunkSize = opts.chunkSize ?? body.length;
       let offset = 0;
       const stream = new Readable({
         read() {
-          if (offset >= payload.length) {
+          if (offset >= body.length) {
             this.push(null);
             return;
           }
-          this.push(payload.subarray(offset, offset + chunkSize));
+          this.push(body.subarray(offset, offset + chunkSize));
           offset += chunkSize;
         },
       }) as any;
@@ -1265,7 +1265,7 @@ describe('createMediaRouter', () => {
       for (const name of [
         'x.html.',
         'x.html%20',
-        'x.png%3Aevil.html',
+        'x.png%3Aside.html',
         '.htaccess',
       ]) {
         const result = await upload(config, `/media/upload/${name}`);
