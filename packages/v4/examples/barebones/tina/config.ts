@@ -7,6 +7,7 @@ import {
   type CollectionSchema,
   defineConfig,
   localContentPlugin,
+  localMediaPlugin,
   required,
   t,
 } from '@tinacms/tinacms';
@@ -87,6 +88,7 @@ export const pageCollection = {
 export default defineConfig({
   plugins: [
     localContentPlugin(),
+    localMediaPlugin(),
     ratingFieldPlugin,
     validatorsPlugin,
     hooksPlugin,

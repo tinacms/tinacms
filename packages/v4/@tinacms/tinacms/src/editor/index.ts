@@ -47,6 +47,7 @@ export {
   FormValidationError,
   useActiveField,
   useContentSlice,
+  useMediaSlice,
   useDiscardEdits,
   useDocumentPath,
   useStaleDraft,

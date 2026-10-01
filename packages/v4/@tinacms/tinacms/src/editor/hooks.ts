@@ -7,6 +7,7 @@ import {
 } from 'react-hook-form';
 import { useStore } from 'zustand';
 import type { ContentSlice } from '../core/content/contract';
+import type { MediaSlice } from '../core/media/contract';
 import type { FieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
 import { runAfterSave, runBeforeSave } from '../core/form/hooks';
@@ -69,6 +70,22 @@ export function useContentSlice(): ContentSlice {
     slice,
     'content-capability-missing',
     'No content capability with get, list and update is mounted — pass a content plugin (e.g. localContentPlugin()) to <TinaProvider plugins>'
+  );
+  return slice;
+}
+
+const isMediaSlice = (slice: SliceState): slice is SliceState & MediaSlice =>
+  typeof slice.upload === 'function' &&
+  typeof slice.list === 'function' &&
+  typeof slice.delete === 'function' &&
+  typeof slice.resolveUrl === 'function';
+
+export function useMediaSlice(): MediaSlice {
+  const slice = useTinaStore((state) => state.media);
+  invariant(
+    slice && isMediaSlice(slice),
+    'media-capability-missing',
+    'No media capability with upload, list, delete and resolveUrl is mounted — pass a media plugin (e.g. localMediaPlugin()) to <TinaProvider plugins>'
   );
   return slice;
 }
