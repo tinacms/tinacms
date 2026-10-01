@@ -99,10 +99,12 @@ export const EditoralBranchSwitcher = ({
         });
         setListState('ready');
       })
-      .catch((error) => {
-        cms.alerts.error(
-          error?.message || 'There was an error creating a new branch.'
-        );
+      .catch((error: unknown) => {
+        if (error instanceof Error) {
+          cms.alerts.error(error.message);
+        } else {
+          cms.alerts.error('There was an error creating a new branch.');
+        }
         setListState('ready');
       });
   }, []);

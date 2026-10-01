@@ -51,7 +51,6 @@ export const BranchSwitcherLegacy = ({
       baseBranch: currentBranch,
     })
       .then(async (createdBranchName) => {
-        // @ts-ignore
         cms.alerts.success('Branch created.');
         // add the newly created branch to the list
         setBranchList((oldBranchList) => {
