@@ -1,8 +1,8 @@
-import path from 'path';
 import fs from 'fs-extra';
+import path from 'path';
 import { Readable } from 'stream';
 import { PathTraversalError } from '../../../../utils/path';
-import { MediaModel, PathConfig, createMediaRouter } from './media';
+import { createMediaRouter, MediaModel, PathConfig } from './media';
 
 describe('MediaModel (Vite dev server)', () => {
   let tmpDir: string;
@@ -992,6 +992,330 @@ describe('createMediaRouter', () => {
       expect(statusCode).toBe(403);
       expect(JSON.parse(body)).toHaveProperty('error');
       expect(JSON.parse(body).error).toContain('Path traversal detected');
+    });
+
+    type Part = {
+      content?: string | Buffer;
+      partFilename?: string;
+      partContentType?: string;
+    };
+
+    function makeUploadReq(
+      url: string,
+      parts: Part[] = [{}],
+      opts: { truncate?: boolean } = {}
+    ) {
+      const boundary = `----TestBoundary${Date.now()}`;
+      const chunks: Buffer[] = [];
+      for (const part of parts) {
+        chunks.push(
+          Buffer.from(
+            [
+              `--${boundary}`,
+              `Content-Disposition: form-data; name="file"; filename="${part.partFilename ?? 'test.txt'}"`,
+              `Content-Type: ${part.partContentType ?? 'text/plain'}`,
+              '',
+              '',
+            ].join('\r\n')
+          ),
+          Buffer.isBuffer(part.content)
+            ? part.content
+            : Buffer.from(part.content ?? 'hello'),
+          Buffer.from('\r\n')
+        );
+      }
+      if (!opts.truncate) chunks.push(Buffer.from(`--${boundary}--\r\n`));
+      const payload = Buffer.concat(chunks);
+      const stream = new Readable({
+        read() {
+          this.push(payload);
+          this.push(null);
+        },
+      }) as any;
+      stream.url = url;
+      stream.headers = {
+        'content-type': `multipart/form-data; boundary=${boundary}`,
+      };
+      return stream;
+    }
+
+    async function upload(
+      routerConfig: PathConfig,
+      url: string,
+      parts?: Part[],
+      opts?: { truncate?: boolean }
+    ) {
+      const router = createMediaRouter(routerConfig);
+      const req = makeUploadReq(url, parts, opts);
+      let statusCode = 0;
+      const bodies: string[] = [];
+      await new Promise<void>((resolve) => {
+        const res = {
+          set statusCode(code: number) {
+            statusCode = code;
+          },
+          end(data: string) {
+            bodies.push(data);
+            resolve();
+          },
+        } as any;
+        router.handlePost(req, res);
+      });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      return {
+        statusCode,
+        bodies,
+        body: JSON.parse(bodies[0] || '{}'),
+      };
+    }
+
+    const uploadsDir = () => path.join(tmpDir, 'public', 'uploads');
+
+    const EXACT_ENTRY_EXTENSIONS = [
+      'html',
+      'htm',
+      'shtml',
+      'xhtml',
+      'xht',
+      'svg',
+      'svgz',
+      'xml',
+      'xsl',
+      'xslt',
+      'js',
+      'mjs',
+      'cjs',
+      'css',
+      'swf',
+      'mht',
+      'mhtml',
+      'hta',
+      'mpd',
+      'rdf',
+      'atom',
+      'rss',
+      'opml',
+    ];
+
+    it('rejects a file whose type is not in media.accept', async () => {
+      const result = await upload(config, '/media/upload/page.html');
+      expect(result.statusCode).toBe(415);
+      expect(result.body.code).toBe('UNSUPPORTED_FILE_TYPE');
+      expect(result.body.message).toEqual(expect.any(String));
+      expect(result.body.message.length).toBeGreaterThan(0);
+      expect(await fs.pathExists(path.join(uploadsDir(), 'page.html'))).toBe(
+        false
+      );
+    });
+
+    it('rejects each type that needs an exact entry', async () => {
+      for (const ext of EXACT_ENTRY_EXTENSIONS) {
+        const result = await upload(config, `/media/upload/file.${ext}`);
+        expect([ext, result.statusCode]).toEqual([ext, 415]);
+        expect(
+          await fs.pathExists(path.join(uploadsDir(), `file.${ext}`))
+        ).toBe(false);
+      }
+    });
+
+    it('decides by the file name, not the part content type', async () => {
+      const accepted = await upload(config, '/media/upload/photo.png', [
+        { partFilename: 'photo.png', partContentType: 'text/html' },
+      ]);
+      expect(accepted.statusCode).toBe(200);
+      const rejected = await upload(config, '/media/upload/page.html', [
+        { partFilename: 'page.png', partContentType: 'image/png' },
+      ]);
+      expect(rejected.statusCode).toBe(415);
+      expect(await fs.pathExists(path.join(uploadsDir(), 'page.html'))).toBe(
+        false
+      );
+    });
+
+    it('rejects a name the filesystem would change', async () => {
+      for (const name of [
+        'x.html.',
+        'x.html%20',
+        'x.png%3Aevil.html',
+        '.htaccess',
+      ]) {
+        const result = await upload(config, `/media/upload/${name}`);
+        expect([name, result.statusCode]).toEqual([name, 415]);
+      }
+      expect(await fs.readdir(uploadsDir())).toEqual([]);
+    });
+
+    it('matches extensions without regard to case', async () => {
+      const result = await upload(config, '/media/upload/x.HTML');
+      expect(result.statusCode).toBe(415);
+    });
+
+    it('reads every extension in the file name', async () => {
+      const result = await upload(config, '/media/upload/x.html.png');
+      expect(result.statusCode).toBe(415);
+    });
+
+    it('reads the extension from the decoded file name', async () => {
+      for (const name of ['x.png%23.html', 'x.png%3F.html']) {
+        const result = await upload(config, `/media/upload/${name}`);
+        expect([name, result.statusCode]).toEqual([name, 415]);
+      }
+      expect(await fs.readdir(uploadsDir())).toEqual([]);
+    });
+
+    it('leaves no directory behind when the type is rejected', async () => {
+      const result = await upload(config, '/media/upload/newdir/x.html');
+      expect(result.statusCode).toBe(415);
+      expect(await fs.pathExists(path.join(uploadsDir(), 'newdir'))).toBe(
+        false
+      );
+    });
+
+    it('uses media.accept when the config sets it', async () => {
+      const svgOnly = { ...config, accept: ['image/svg+xml'] };
+      expect((await upload(svgOnly, '/media/upload/a.svg')).statusCode).toBe(
+        200
+      );
+      expect((await upload(svgOnly, '/media/upload/a.png')).statusCode).toBe(
+        415
+      );
+      const svgExtension = { ...config, accept: '.svg' };
+      expect(
+        (await upload(svgExtension, '/media/upload/b.svg')).statusCode
+      ).toBe(200);
+    });
+
+    it('lets a wildcard in media.accept admit listed types only', async () => {
+      const textOnly = { ...config, accept: 'text/*' };
+      expect((await upload(textOnly, '/media/upload/a.txt')).statusCode).toBe(
+        200
+      );
+      expect((await upload(textOnly, '/media/upload/a.html')).statusCode).toBe(
+        415
+      );
+    });
+
+    it('admits a type that media.accept names exactly', async () => {
+      const result = await upload(
+        { ...config, accept: '.html' },
+        '/media/upload/a.html'
+      );
+      expect(result.statusCode).toBe(200);
+    });
+
+    it('admits audio under the default list', async () => {
+      const result = await upload(config, '/media/upload/song.mp3');
+      expect(result.statusCode).toBe(200);
+      expect(await fs.pathExists(path.join(uploadsDir(), 'song.mp3'))).toBe(
+        true
+      );
+    });
+
+    it('returns a message the admin UI can show', async () => {
+      const typed = await upload(config, '/media/upload/page.html');
+      expect(typed.body).toEqual({
+        code: 'UNSUPPORTED_FILE_TYPE',
+        message:
+          'Files of type ".html" can\'t be uploaded. Allowed types are set by media.accept in your Tina config.',
+        error:
+          'Files of type ".html" can\'t be uploaded. Allowed types are set by media.accept in your Tina config.',
+      });
+      const named = await upload(config, '/media/upload/.htaccess');
+      expect(named.body.message).toBe(
+        "This file name can't be used. Allowed types are set by media.accept in your Tina config."
+      );
+    });
+
+    describe('with links in the media folder', () => {
+      let canLink = true;
+
+      beforeAll(async () => {
+        const probe = path.join(
+          process.env.TMPDIR || '/tmp',
+          `tina-link-probe-${Date.now()}`
+        );
+        try {
+          await fs.symlink(__filename, probe);
+          await fs.remove(probe);
+        } catch {
+          canLink = false;
+          console.log('Links are not available here. Link cases did not run.');
+        }
+      });
+
+      it('checks the target of a link in the media folder', async () => {
+        if (!canLink) return;
+        await fs.writeFile(path.join(uploadsDir(), 'page.html'), 'original');
+        await fs.symlink(
+          path.join(uploadsDir(), 'page.html'),
+          path.join(uploadsDir(), 'alias.png')
+        );
+        const result = await upload(config, '/media/upload/alias.png', [
+          { content: 'replaced' },
+        ]);
+        expect(result.statusCode).toBe(415);
+        expect(
+          await fs.readFile(path.join(uploadsDir(), 'page.html'), 'utf8')
+        ).toBe('original');
+      });
+    });
+
+    it('writes the complete bytes of an accepted upload', async () => {
+      const content = Buffer.alloc(4 * 1024 * 1024, 7);
+      const router = createMediaRouter(config);
+      const req = makeUploadReq('/media/upload/big.bin', [{ content }]);
+      let statusCode = 0;
+      await new Promise<void>((resolve) => {
+        router.handlePost(req, {
+          set statusCode(code: number) {
+            statusCode = code;
+          },
+          end() {
+            resolve();
+          },
+        } as any);
+      });
+      expect(statusCode).toBe(200);
+      const written = await fs.readFile(path.join(uploadsDir(), 'big.bin'));
+      expect(written.length).toBe(content.length);
+      expect(written.equals(content)).toBe(true);
+    });
+
+    it('answers once when a request has several file parts', async () => {
+      const rejected = await upload(config, '/media/upload/page.html', [
+        { partFilename: 'page.html' },
+        { partFilename: 'photo.png', partContentType: 'image/png' },
+      ]);
+      expect(rejected.statusCode).toBe(415);
+      expect(rejected.bodies).toHaveLength(1);
+      expect(await fs.readdir(uploadsDir())).toEqual([]);
+
+      const accepted = await upload(config, '/media/upload/notes.txt', [
+        { content: 'one' },
+        { content: 'two' },
+      ]);
+      expect(accepted.statusCode).toBe(200);
+      expect(accepted.bodies).toHaveLength(1);
+    });
+
+    it('does not write after a parse error', async () => {
+      const result = await upload(
+        config,
+        '/media/upload/page.html',
+        [{ content: 'x' }, { content: 'y' }],
+        { truncate: true }
+      );
+      expect(result.statusCode).toBe(415);
+      expect(result.bodies).toHaveLength(1);
+      expect(await fs.readdir(uploadsDir())).toEqual([]);
+    });
+
+    it('reports a destination write error without a second response', async () => {
+      await fs.mkdirp(path.join(uploadsDir(), 'taken.txt'));
+      const result = await upload(config, '/media/upload/taken.txt');
+      expect(result.statusCode).toBe(500);
+      expect(result.bodies).toHaveLength(1);
+      expect(result.body.message).toEqual(expect.any(String));
     });
   });
 });

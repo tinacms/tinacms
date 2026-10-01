@@ -1,8 +1,10 @@
+import { checkUploadType } from '@tinacms/schema-tools';
+import busboy from 'busboy';
 import { randomUUID } from 'crypto';
+import fs from 'fs-extra';
 import type { ServerResponse } from 'http';
 import path, { join } from 'path';
-import busboy from 'busboy';
-import fs from 'fs-extra';
+import { pipeline } from 'stream/promises';
 import type { Connect } from 'vite';
 import { PathTraversalError } from '../../../../utils/path';
 
@@ -108,8 +110,22 @@ export const createMediaRouter = (config: PathConfig) => {
   ) {
     const bb = busboy({ headers: req.headers });
     let responded = false;
+    const writes: Promise<void>[] = [];
+
+    const respond = (statusCode: number, body: unknown) => {
+      if (responded) return;
+      responded = true;
+      res.statusCode = statusCode;
+      res.end(JSON.stringify(body));
+    };
 
     bb.on('file', async (_name, file, _info) => {
+      // A truncated body fails the part stream too. The bb error handler answers.
+      file.on('error', () => {});
+      if (responded) {
+        file.resume();
+        return;
+      }
       // @security User-controlled path — decoded here, validated immediately
       // below via resolveStrictlyWithinBase.
       const fullPath = decodeURIComponent(
@@ -119,33 +135,43 @@ export const createMediaRouter = (config: PathConfig) => {
       try {
         saveTo = resolveStrictlyWithinBase(fullPath, mediaFolder);
       } catch {
-        responded = true;
         file.resume(); // drain the stream to avoid hanging
-        res.statusCode = 403;
-        res.end(
-          JSON.stringify({
-            error: `Path traversal detected: ${fullPath}`,
-          })
-        );
+        respond(403, { error: `Path traversal detected: ${fullPath}` });
         return;
       }
-      // make sure the directory exists before writing the file. This is needed for creating new folders
-      await fs.ensureDir(path.dirname(saveTo));
-      file.pipe(fs.createWriteStream(saveTo));
+      const rejection = uploadTypeRejection(
+        [path.basename(saveTo), path.basename(resolveRealPath(saveTo))],
+        config.accept
+      );
+      if (rejection) {
+        file.resume();
+        respond(415, rejection);
+        return;
+      }
+      const write = (async () => {
+        // make sure the directory exists before writing the file. This is needed for creating new folders
+        await fs.ensureDir(path.dirname(saveTo));
+        await pipeline(file, fs.createWriteStream(saveTo));
+      })();
+      writes.push(write);
+      write.catch(() => file.resume());
     });
     bb.on('error', (error) => {
-      responded = true;
-      res.statusCode = 500;
       if (error instanceof Error) {
-        res.end(JSON.stringify({ message: error }));
+        respond(500, { message: error.message });
       } else {
-        res.end(JSON.stringify({ message: 'Unknown error while uploading' }));
+        respond(500, { message: 'Unknown error while uploading' });
       }
     });
-    bb.on('close', () => {
-      if (responded) return;
-      res.statusCode = 200;
-      res.end(JSON.stringify({ success: true }));
+    bb.on('close', async () => {
+      try {
+        await Promise.all(writes);
+      } catch (error) {
+        console.error(error);
+        respond(500, { message: 'Failed to save the uploaded file.' });
+        return;
+      }
+      respond(200, { success: true });
     });
     req.pipe(bb);
   };
@@ -214,7 +240,35 @@ export interface PathConfig {
   apiURL: string;
   publicFolder: string;
   mediaRoot: string;
+  accept?: string | string[];
 }
+
+const ACCEPT_HINT =
+  'Allowed types are set by media.accept in your Tina config.';
+
+type UploadTypeRejection = {
+  code: 'UNSUPPORTED_FILE_TYPE';
+  message: string;
+  error: string;
+};
+
+/** Checks each name against the upload rules and returns the first refusal. */
+const uploadTypeRejection = (
+  filenames: string[],
+  accept: string | string[] | undefined
+): UploadTypeRejection | undefined => {
+  for (const filename of filenames) {
+    const result = checkUploadType({ filename }, accept);
+    if ('reason' in result) {
+      const message =
+        result.reason === 'name' || !result.extension
+          ? `This file name can't be used. ${ACCEPT_HINT}`
+          : `Files of type ".${result.extension}" can't be uploaded. ${ACCEPT_HINT}`;
+      return { code: 'UNSUPPORTED_FILE_TYPE', message, error: message };
+    }
+  }
+  return undefined;
+};
 
 type SuccessRecord = { ok: true } | { ok: false; message: string };
 
