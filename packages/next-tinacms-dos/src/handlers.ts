@@ -13,6 +13,7 @@ import {
   DeleteObjectCommand,
   DeleteObjectCommandInput,
 } from '@aws-sdk/client-s3';
+import { checkUploadType } from '@tinacms/schema-tools/dist/upload-type.js';
 import type { Media, MediaListOptions } from 'tinacms';
 import path from 'path';
 import fs from 'fs';
@@ -32,6 +33,12 @@ export interface DOSConfig {
 
 export interface DOSOptions {
   cdnUrl?: string;
+  /**
+   * Sets which file types editors can upload. It uses the same format as
+   * `media.accept` in your Tina config. When `accept` is not set, the default
+   * media types apply.
+   */
+  accept?: string | string[];
 }
 
 export const mediaHandlerConfig = {
@@ -70,7 +77,15 @@ export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
       case 'GET':
         return listMedia(req, res, client, bucket, mediaRoot, cdnUrl);
       case 'POST':
-        return uploadMedia(req, res, client, bucket, mediaRoot, cdnUrl);
+        return uploadMedia(
+          req,
+          res,
+          client,
+          bucket,
+          mediaRoot,
+          cdnUrl,
+          options?.accept
+        );
       case 'DELETE':
         return deleteAsset(req, res, client, bucket, mediaRoot);
       default:
@@ -85,7 +100,8 @@ async function uploadMedia(
   client: S3Client,
   bucket: string,
   mediaRoot: string,
-  cdnUrl: string
+  cdnUrl: string,
+  accept: string | string[] | undefined
 ) {
   const upload = promisify(
     multer({
@@ -103,35 +119,59 @@ async function uploadMedia(
   // @ts-ignore
   await upload(req, res);
 
-  const { directory } = req.body;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const file: { path: string; mimetype?: string } | undefined = req.file;
+  if (!file) {
+    return res.status(400).json({ message: 'No file was sent.' });
+  }
+  const filePath = file.path;
+  const removeTempFile = () => {
+    try {
+      fs.unlinkSync(filePath);
+    } catch {
+      // The temp folder is cleaned by the system.
+    }
+  };
+
+  const directory = req.body?.directory || '';
   let prefix = directory.replace(/^\//, '').replace(/\/$/, '');
   if (prefix) prefix = prefix + '/';
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const filePath = req.file.path;
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const fileType = req.file?.mimetype;
-  const blob = fs.readFileSync(filePath);
   const filename = path.basename(filePath);
 
   let objectKey: string;
   try {
     objectKey = resolveKey(mediaRoot, prefix + filename, { decode: false });
   } catch (e) {
+    removeTempFile();
     if (e instanceof MediaKeyError) {
       return res.status(400).json({ message: e.message });
     }
     throw e;
   }
 
+  const uploadType = checkUploadType(
+    { filename: objectKey.split('/').pop() ?? '', contentType: file.mimetype },
+    accept
+  );
+  if (!('contentType' in uploadType)) {
+    removeTempFile();
+    return res.status(400).json({
+      message:
+        'This file type is not allowed. To allow it, add it to the accept option of createMediaHandler.',
+    });
+  }
+
+  const blob = fs.readFileSync(filePath);
+
   const params: PutObjectCommandInput = {
     Bucket: bucket,
     Key: objectKey,
     Body: blob,
     ACL: 'public-read',
-    ContentType: fileType || 'application/octet-stream',
+    ContentType: uploadType.contentType,
+    ...(uploadType.restricted ? { ContentDisposition: 'attachment' } : {}),
   };
   const command = new PutObjectCommand(params);
 
