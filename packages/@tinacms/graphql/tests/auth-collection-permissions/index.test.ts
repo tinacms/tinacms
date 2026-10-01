@@ -1,11 +1,11 @@
 import path from 'path';
-import { describe, it, expect } from 'vitest';
-import { buildConfig } from './tina/config';
-import referencesConfig from './references/tina/config';
-import templatesConfig from './templates/tina/config';
-import { setupMutation } from '../util';
+import { describe, expect, it } from 'vitest';
 import { buildSchema } from '../../src';
 import { checkPasswordHash } from '../../src/auth/utils';
+import { setupMutation } from '../util';
+import referencesConfig from './references/tina/config';
+import templatesConfig from './templates/tina/config';
+import { buildConfig } from './tina/config';
 
 const USERS_PATH = 'content/users/index.json';
 
@@ -498,5 +498,55 @@ describe('auth collection permissions with templates', () => {
     await expect(buildSchema(templatesConfig)).rejects.toThrow(
       'Auth collection must have a user field'
     );
+  });
+});
+
+describe('auth collection admins', () => {
+  const updateUsers = `mutation UpdateUsers($params: UserMutation!) { updateUser(relativePath: "index.json", params: $params) { __typename } }`;
+  const adminOnly = {
+    users: [
+      {
+        username: 'admin-user',
+        name: 'Admin User',
+        email: 'admin@example.com',
+        password: { passwordChangeRequired: false },
+      },
+    ],
+  };
+
+  it('rejects an admin listed in config whose user record was removed', async () => {
+    const { query } = await setupMutation(
+      __dirname,
+      buildConfig({ isDetached: true }),
+      { authCollection: { admins: ['admin-user', 'editor-user'] } }
+    );
+    const removal = await query({
+      query: updateUsers,
+      variables: { params: adminOnly },
+      ctxUser: { sub: 'admin-user' },
+    });
+    expect(removal.errors).toBeUndefined();
+
+    const result = await query({
+      query: updateUsers,
+      variables: { params: adminOnly },
+      ctxUser: { sub: 'editor-user' },
+    });
+    expect(result.errors?.[0]?.message).toBe('Not authorized');
+  });
+
+  it('rejects an admin when index.json is missing', async () => {
+    const { query, bridge } = await setupMutation(
+      path.join(__dirname, 'no-users'),
+      buildConfig({ isDetached: false }),
+      { authCollection: { admins: ['admin-user'] } }
+    );
+    const result = await query({
+      query: updateUsers,
+      variables: { params: adminOnly },
+      ctxUser: { sub: 'admin-user' },
+    });
+    expect(result.errors?.[0]?.message).toBe('Not authorized');
+    expect(bridge.getWrites().size).toBe(0);
   });
 });

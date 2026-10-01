@@ -995,6 +995,13 @@ export class Resolver {
       collectionName,
       relativePath
     );
+    if (!newRelativePath) {
+      await this.assertAuthCollectionWrite({
+        collection,
+        realPath,
+        op: 'update',
+      });
+    }
     const alreadyExists = await this.database.documentExists(realPath);
     if (!alreadyExists) {
       throw new Error(`Unable to update document, ${realPath} does not exist`);
@@ -1085,11 +1092,6 @@ export class Resolver {
     if (!newBody) {
       throw new Error('Body not provided for updated document.');
     }
-    await this.assertAuthCollectionWrite({
-      collection,
-      realPath,
-      op: 'update',
-    });
     return this.writeDocumentBody({ collection, realPath, doc, newBody });
   };
 
