@@ -5,7 +5,6 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type ResolvedConfig, asResolvedConfig } from '../../../../config';
 import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
-import { DEFAULT_MEDIA_URL } from '../../../../core/media/contract';
 import { definePlugin } from '../../../../core/plugin';
 import type { CollectionSchema } from '../../../../core/schema/types';
 import { createGraphQLPipeline } from '../graphql/graphql-pipeline';
@@ -401,7 +400,6 @@ describe('tinaLocalDataLayerVitePlugin dev codegen', () => {
     (plugin.configureServer as (s: unknown) => void)(server);
     expect(server.logs).toEqual([]);
     expect(server.mounted.map(({ route }) => route)).toEqual([
-      DEFAULT_MEDIA_URL,
       DEFAULT_CONTENT_URL,
     ]);
   });
@@ -522,7 +520,7 @@ describe('tinaLocalDataLayerVitePlugin shutdown', () => {
 });
 
 describe('tinaLocalDataLayerVitePlugin watch config', () => {
-  it('ignores the collection and media folders, in posix form', () => {
+  it('ignores the collection folders, in posix form', () => {
     const plugin = tinaLocalDataLayerVitePlugin({
       rootDir,
       collections: [POSTS],
@@ -533,10 +531,9 @@ describe('tinaLocalDataLayerVitePlugin watch config', () => {
         server: { watch: { ignored: string[] } };
       }
     ).server.watch.ignored;
-    expect(ignored).toHaveLength(2);
+    expect(ignored).toHaveLength(1);
     expect(ignored[0].endsWith('content/posts/**')).toBe(true);
-    expect(ignored[1].endsWith('public/uploads/**')).toBe(true);
-    for (const glob of ignored) expect(glob).not.toContain('\\');
+    expect(ignored[0]).not.toContain('\\');
   });
 
   it('refuses a collection with no path before it configures anything', () => {

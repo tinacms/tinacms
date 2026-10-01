@@ -49,8 +49,9 @@ export default defineConfig({
 | `url` | `/api/tina/media` | The media endpoint of the dev server. |
 | `mediaRoot` | `uploads` | The folder in the public folder that holds media. |
 
-`tinaLocalDataLayerVitePlugin` serves the endpoint. Give it the same
-`mediaUrl` and `mediaRoot` if you change them.
+`tinaLocalDataLayerVitePlugin` serves the endpoint only when the loaded config
+includes `localMediaPlugin()`. Give it the same `mediaUrl` and `mediaRoot` if
+you change them.
 
 ### Upload
 

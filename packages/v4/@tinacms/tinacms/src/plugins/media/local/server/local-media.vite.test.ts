@@ -3,13 +3,19 @@ import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { asResolvedConfig } from '../../../../config';
 import { DEFAULT_MEDIA_URL } from '../../../../core/media/contract';
 import { MAX_MEDIA_UPLOAD_BYTES } from '../../../../core/request-body';
 import type { CollectionSchema } from '../../../../core/schema/types';
 import { tinaLocalDataLayerVitePlugin } from '../../../content/local/server/local-data-layer.vite';
+import { localMediaPlugin } from '../local-media.plugin';
 
 vi.mock('../../../content/local/graphql/graphql-pipeline', () => ({
   createGraphQLPipeline: vi.fn(),
+}));
+
+vi.mock('../../../../cli/commands/codegen', () => ({
+  runCodegen: vi.fn(async () => ({ outcome: 'unchanged', admin: [] })),
 }));
 
 const POSTS: CollectionSchema = {
@@ -75,19 +81,30 @@ const responseDouble = () => {
   };
 };
 
-const mediaMiddleware = () => {
+const mountedRoutes = (plugins = [localMediaPlugin()]) => {
   const plugin = tinaLocalDataLayerVitePlugin({
     rootDir,
-    collections: [POSTS],
+    config: asResolvedConfig({
+      plugins,
+      schema: { collections: [POSTS] },
+      build: { publicFolder: 'public', outputFolder: 'admin' },
+    }),
   });
   const mounted = new Map<string, Function>();
   const server = {
+    config: { logger: { info: () => {} } },
     middlewares: {
-      use: (route: string, handler: Function) => mounted.set(route, handler),
+      use: (route: string | Function, handler?: Function) => {
+        if (typeof route === 'string' && handler) mounted.set(route, handler);
+      },
     },
   };
   (plugin.configureServer as (s: unknown) => void)(server);
-  const handler = mounted.get(DEFAULT_MEDIA_URL);
+  return mounted;
+};
+
+const mediaMiddleware = () => {
+  const handler = mountedRoutes().get(DEFAULT_MEDIA_URL);
   if (!handler) throw new Error('The plugin mounted no media middleware.');
   return handler;
 };
@@ -119,6 +136,10 @@ const upload = async (headers: Record<string, string> = SAME_ORIGIN) => {
 };
 
 describe('local media endpoint', () => {
+  it('is not mounted when the config has no localMediaPlugin()', () => {
+    expect(mountedRoutes([]).has(DEFAULT_MEDIA_URL)).toBe(false);
+  });
+
   it('saves a same-origin multipart upload under public/uploads', async () => {
     const res = await upload();
     expect(res.statusCode).toBe(200);

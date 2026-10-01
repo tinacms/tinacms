@@ -12,7 +12,11 @@ import {
   MAX_REQUEST_BODY_BYTES,
   RequestBodyTooLargeError,
 } from '../../../../core/request-body';
-import { createLocalMedia } from '../../../media/local/server/local-media';
+import { LOCAL_MEDIA_PLUGIN_NAME } from '../../../media/local/local-media.plugin';
+import {
+  type LocalMedia,
+  createLocalMedia,
+} from '../../../media/local/server/local-media';
 import {
   dispatchMediaRequest,
   listMedia,
@@ -110,6 +114,65 @@ const readRequestBody = (req: Connect.IncomingMessage): Promise<string> =>
     req.on('error', reject);
   });
 
+const createMediaHandler = (media: LocalMedia): Connect.NextHandleFunction => {
+  const serveMediaUpload = async (
+    req: Connect.IncomingMessage,
+    res: ServerResponse
+  ) => {
+    if (coreContentTypeOfRequest(req) !== 'multipart/form-data') {
+      res.statusCode = 415;
+      res.end('Expected multipart/form-data');
+      return;
+    }
+    const body = await readRequestBytes(req, MAX_MEDIA_UPLOAD_BYTES);
+    const form = await new Response(new Uint8Array(body), {
+      headers: { 'content-type': req.headers['content-type'] ?? '' },
+    }).formData();
+    const file = form.get('file');
+    const folder = form.get('folder') ?? '';
+    invariant(
+      file instanceof File && typeof folder === 'string',
+      'media-upload-no-file',
+      'A media upload needs a `file` field and an optional `folder` field.'
+    );
+    const mediaPath = await media.save(file, folder);
+    res.setHeader('content-type', 'application/json');
+    res.end(JSON.stringify({ path: mediaPath }));
+  };
+
+  return async (req, res) => {
+    if (isCrossOriginRequest(req)) {
+      res.statusCode = 403;
+      res.end('Cross-origin request rejected');
+      return;
+    }
+    try {
+      const [route, query = ''] = (req.url ?? '').split('?');
+      if (route === '/upload') {
+        await serveMediaUpload(req, res);
+        return;
+      }
+      if (req.method === 'GET') {
+        const page = await listMedia(media, new URLSearchParams(query));
+        res.setHeader('content-type', 'application/json');
+        res.end(JSON.stringify(page));
+        return;
+      }
+      if (coreContentTypeOfRequest(req) !== 'application/json') {
+        res.statusCode = 415;
+        res.end('Expected application/json');
+        return;
+      }
+      const body = await readRequestBody(req);
+      const result = await dispatchMediaRequest(media, JSON.parse(body));
+      res.setHeader('content-type', 'application/json');
+      res.end(JSON.stringify(result));
+    } catch (cause) {
+      sendError(req, res, cause);
+    }
+  };
+};
+
 export interface TinaVitePluginOptions
   extends Omit<LocalDataLayerOptions, 'collections'> {
   /**
@@ -138,11 +201,17 @@ export const tinaLocalDataLayerVitePlugin = (
     'tinaLocalDataLayerVitePlugin needs `config` (the loaded tina/config.ts) or `collections`.'
   );
   const dataLayer = createLocalDataLayer({ ...options, collections });
-  const media = createLocalMedia({
-    rootDir: options.rootDir,
-    publicFolder: resolveBuild(options.config?.build).publicFolder,
-    mediaRoot: options.mediaRoot,
-  });
+  const usesLocalMedia =
+    options.config?.plugins.some(
+      ({ name }) => name === LOCAL_MEDIA_PLUGIN_NAME
+    ) ?? false;
+  const media = usesLocalMedia
+    ? createLocalMedia({
+        rootDir: options.rootDir,
+        publicFolder: resolveBuild(options.config?.build).publicFolder,
+        mediaRoot: options.mediaRoot,
+      })
+    : undefined;
 
   // Dev codegen. The config is already loaded, so the loader hands it straight to
   // runCodegen instead of reading tina/config.ts a second time.
@@ -190,73 +259,17 @@ export const tinaLocalDataLayerVitePlugin = (
     }
   };
 
-  const serveMediaUpload = async (
-    req: Connect.IncomingMessage,
-    res: ServerResponse
-  ) => {
-    if (coreContentTypeOfRequest(req) !== 'multipart/form-data') {
-      res.statusCode = 415;
-      res.end('Expected multipart/form-data');
-      return;
-    }
-    const body = await readRequestBytes(req, MAX_MEDIA_UPLOAD_BYTES);
-    const form = await new Response(new Uint8Array(body), {
-      headers: { 'content-type': req.headers['content-type'] ?? '' },
-    }).formData();
-    const file = form.get('file');
-    const folder = form.get('folder') ?? '';
-    invariant(
-      file instanceof File && typeof folder === 'string',
-      'media-upload-no-file',
-      'A media upload needs a `file` field and an optional `folder` field.'
-    );
-    const mediaPath = await media.save(file, folder);
-    res.setHeader('content-type', 'application/json');
-    res.end(JSON.stringify({ path: mediaPath }));
-  };
-
-  const serveMediaRequest: Connect.NextHandleFunction = async (req, res) => {
-    if (isCrossOriginRequest(req)) {
-      res.statusCode = 403;
-      res.end('Cross-origin request rejected');
-      return;
-    }
-    try {
-      const [route, query = ''] = (req.url ?? '').split('?');
-      if (route === '/upload') {
-        await serveMediaUpload(req, res);
-        return;
-      }
-      if (req.method === 'GET') {
-        const page = await listMedia(media, new URLSearchParams(query));
-        res.setHeader('content-type', 'application/json');
-        res.end(JSON.stringify(page));
-        return;
-      }
-      if (coreContentTypeOfRequest(req) !== 'application/json') {
-        res.statusCode = 415;
-        res.end('Expected application/json');
-        return;
-      }
-      const body = await readRequestBody(req);
-      const result = await dispatchMediaRequest(media, JSON.parse(body));
-      res.setHeader('content-type', 'application/json');
-      res.end(JSON.stringify(result));
-    } catch (cause) {
-      sendError(req, res, cause);
-    }
-  };
   return {
     name: 'tina-local-data-layer',
     config: () => ({
       server: {
         watch: {
-          ignored: [
-            ...collections.map(({ path: folder }) =>
-              path.resolve(options.rootDir, folder, '**')
-            ),
-            path.join(media.mediaDir, '**'),
-          ].map((glob) => glob.split(path.sep).join('/')),
+          ignored: collections.map(({ path: folder }) =>
+            path
+              .resolve(options.rootDir, folder, '**')
+              .split(path.sep)
+              .join('/')
+          ),
         },
       },
     }),
@@ -297,10 +310,12 @@ export const tinaLocalDataLayerVitePlugin = (
           }
         });
       }
-      server.middlewares.use(
-        options.mediaUrl ?? DEFAULT_MEDIA_URL,
-        serveMediaRequest
-      );
+      if (media) {
+        server.middlewares.use(
+          options.mediaUrl ?? DEFAULT_MEDIA_URL,
+          createMediaHandler(media)
+        );
+      }
       server.middlewares.use(
         options.url ?? DEFAULT_CONTENT_URL,
         serveContentRequest
