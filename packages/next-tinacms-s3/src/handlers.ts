@@ -30,6 +30,12 @@ export interface S3Config {
 
 export interface S3Options {
   cdnUrl?: string;
+  /**
+   * Sets which file types editors can upload. It uses the same format as
+   * `media.accept` in your Tina config. When `accept` is not set, the default
+   * media types apply.
+   */
+  accept?: string | string[];
 }
 
 export const mediaHandlerConfig = {
@@ -96,6 +102,21 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
             }
             throw e;
           }
+          const rawContentType = Array.isArray(req.query.contentType)
+            ? req.query.contentType[0]
+            : req.query.contentType;
+          const uploadType = checkUploadType(
+            {
+              filename: s3_key.split('/').pop() ?? '',
+              contentType: rawContentType,
+            },
+            options?.accept
+          );
+          if (!('contentType' in uploadType)) {
+            return res
+              .status(400)
+              .json({ message: new UploadTypeError().message });
+          }
           if (await keyExists(client, bucket, s3_key)) {
             return res.status(400).json({ message: 'key already exists' });
           }
@@ -103,10 +124,17 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
             bucket,
             s3_key,
             expiresIn,
-            client
+            client,
+            { contentType: uploadType.contentType, accept: options?.accept }
           );
+          const headers: Record<string, string> = {
+            'Content-Type': uploadType.contentType,
+          };
+          if (uploadType.restricted) {
+            headers['Content-Disposition'] = 'attachment';
+          }
 
-          return res.json({ signedUrl, src: cdnUrl + s3_key });
+          return res.json({ signedUrl, src: cdnUrl + s3_key, headers });
         }
         return listMedia(req, res, client, bucket, mediaRoot, cdnUrl);
       case 'DELETE':

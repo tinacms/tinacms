@@ -113,3 +113,87 @@ describe('createMediaHandler upload URL checksum mode', () => {
     expect(params.has('x-amz-checksum-crc32')).toBe(true);
   });
 });
+
+describe('createMediaHandler upload URL request', () => {
+  it('returns a signed URL and headers for an allowed type', async () => {
+    notFound();
+    const res = await requestUploadUrl({
+      key: 'photo.png',
+      contentType: 'image/png',
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.headers).toEqual({ 'Content-Type': 'image/png' });
+    expect(signedHeaders(res.body.signedUrl)).toBe('content-type;host');
+  });
+
+  it('rejects an upload type outside the allowed list', async () => {
+    for (const contentType of [
+      'text/html',
+      'image/svg+xml',
+      'application/xml',
+      'Text/HTML',
+      'text/html; charset=utf-8',
+    ]) {
+      const send = notFound();
+      const res = await requestUploadUrl({ key: 'file.bin', contentType });
+      expect([contentType, res.statusCode]).toEqual([contentType, 400]);
+      expect(send).not.toHaveBeenCalled();
+      vi.restoreAllMocks();
+    }
+  });
+
+  it('checks the key extension as well as the declared type', async () => {
+    notFound();
+    const res = await requestUploadUrl({
+      key: 'x.html',
+      contentType: 'image/png',
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('uses the key extension when no content type is sent', async () => {
+    notFound();
+    const png = await requestUploadUrl({ key: 'photo.png' });
+    expect(png.statusCode).toBe(200);
+    expect(png.body.headers['Content-Type']).toBe('image/png');
+    const svg = await requestUploadUrl({ key: 'x.svg' });
+    expect(svg.statusCode).toBe(400);
+  });
+
+  it('uses the first value when contentType is repeated', async () => {
+    notFound();
+    const first = await requestUploadUrl({
+      key: 'photo.png',
+      contentType: ['image/png', 'text/html'],
+    });
+    expect(first.statusCode).toBe(200);
+    expect(first.body.headers['Content-Type']).toBe('image/png');
+    const second = await requestUploadUrl({
+      key: 'photo.png',
+      contentType: ['text/html', 'image/png'],
+    });
+    expect(second.statusCode).toBe(400);
+  });
+
+  it('honours the accept option', async () => {
+    notFound();
+    const res = await requestUploadUrl(
+      { key: 'logo.svg', contentType: 'image/svg+xml' },
+      { accept: '.svg' }
+    );
+    expect(res.statusCode).toBe(200);
+    expect(res.body.headers).toEqual({
+      'Content-Type': 'image/svg+xml',
+      'Content-Disposition': 'attachment',
+    });
+    expect(signedHeaders(res.body.signedUrl)).toBe(
+      'content-disposition;content-type;host'
+    );
+  });
+
+  it('checks the type before checking whether the key exists', async () => {
+    const send = notFound();
+    await requestUploadUrl({ key: 'page.html', contentType: 'text/html' });
+    expect(send).toHaveBeenCalledTimes(0);
+  });
+});
