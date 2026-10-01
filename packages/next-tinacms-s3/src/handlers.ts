@@ -15,6 +15,7 @@ import {
   HeadObjectCommandOutput,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { checkUploadType } from '@tinacms/schema-tools/dist/upload-type.js';
 import { Media, MediaListOptions } from 'tinacms';
 import path from 'node:path';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -38,7 +39,12 @@ export const mediaHandlerConfig = {
 };
 
 export const createMediaHandler = (config: S3Config, options?: S3Options) => {
-  const client = new S3Client(config.config);
+  const client = new S3Client({
+    ...config.config,
+    // The SDK default puts the checksum of an empty body in the upload URL.
+    requestChecksumCalculation:
+      config.config.requestChecksumCalculation ?? 'WHEN_REQUIRED',
+  });
   const bucket = config.bucket;
   const region = config.config.region || 'us-east-1';
   let mediaRoot = config.mediaRoot || '';
@@ -280,22 +286,78 @@ async function keyExists(client: S3Client, bucket: string, key: string) {
   }
 }
 
-export const getUploadUrl = async (
+export class UploadTypeError extends Error {
+  constructor() {
+    super(
+      'This file type is not allowed. To allow it, add it to the accept option of createMediaHandler.'
+    );
+    this.name = 'UploadTypeError';
+  }
+}
+
+export interface UploadUrlOptions {
+  contentType: string;
+  accept?: string | string[];
+}
+
+/**
+ * @deprecated Pass the options argument. The four-argument form will be removed in the next major version.
+ */
+export function getUploadUrl(
   bucket: string,
   key: string,
   expiresIn: number,
   client: S3Client
-): Promise<string> => {
-  // Create the presigned URL.
+): Promise<string>;
+export function getUploadUrl(
+  bucket: string,
+  key: string,
+  expiresIn: number,
+  client: S3Client,
+  options: UploadUrlOptions
+): Promise<string>;
+export async function getUploadUrl(
+  bucket: string,
+  key: string,
+  expiresIn: number,
+  client: S3Client,
+  options?: UploadUrlOptions
+): Promise<string> {
+  if (!options) {
+    return getSignedUrl(
+      client,
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+      }),
+      { expiresIn }
+    );
+  }
+  const uploadType = checkUploadType(
+    { filename: key.split('/').pop() ?? '', contentType: options.contentType },
+    options.accept
+  );
+  if (!('contentType' in uploadType)) {
+    throw new UploadTypeError();
+  }
   return getSignedUrl(
     client,
     new PutObjectCommand({
       Bucket: bucket,
       Key: key,
+      ContentType: uploadType.contentType,
+      ...(uploadType.restricted ? { ContentDisposition: 'attachment' } : {}),
     }),
-    { expiresIn }
+    {
+      expiresIn,
+      signableHeaders: new Set(
+        uploadType.restricted
+          ? ['content-type', 'content-disposition']
+          : ['content-type']
+      ),
+    }
   );
-};
+}
 
 function getS3ToTinaFunc(cdnUrl, mediaRoot?: string) {
   return function s3ToTina(file: _Object): Media {
