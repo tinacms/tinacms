@@ -1,9 +1,14 @@
-import path from 'path';
 import type { TinaSchema } from '@tinacms/schema-tools';
-import type { GraphQLResolveInfo } from 'graphql';
-import { get } from '../util';
+import { randomBytes } from 'crypto';
 import { set } from 'es-toolkit/compat';
-import { checkPasswordHash, mapUserFields } from '../auth/utils';
+import type { GraphQLResolveInfo } from 'graphql';
+import path from 'path';
+import {
+  checkPasswordHash,
+  generatePasswordHash,
+  mapUserFields,
+} from '../auth/utils';
+import { get } from '../util';
 import type { Resolver } from './index';
 
 export async function getUserDocumentContext(
@@ -65,6 +70,15 @@ function withoutPasswordValue(user: any, userField: any) {
   };
 }
 
+let dummyPasswordHash: Promise<string> | undefined;
+
+const getDummyPasswordHash = () => {
+  dummyPasswordHash ??= generatePasswordHash({
+    password: randomBytes(32).toString('hex'),
+  });
+  return dummyPasswordHash;
+};
+
 export async function handleAuthenticate({
   tinaSchema,
   resolver,
@@ -79,21 +93,27 @@ export async function handleAuthenticate({
   info: GraphQLResolveInfo;
   ctxUser?: { sub?: string } | null;
 }): Promise<any> {
-  const userSub = sub || ctxUser?.sub;
+  if (ctxUser !== undefined) {
+    return null;
+  }
+
   const { userField, users } = await getUserDocumentContext(
     tinaSchema,
     resolver
   );
 
-  const user = findUserInCollection(users, userField, userSub);
-  if (!user) {
-    return null;
-  }
-
+  const user = sub ? findUserInCollection(users, userField, sub) : null;
   const { passwordFieldName } = userField;
-  const saltedHash = get(user, [passwordFieldName || '', 'value']);
+  const saltedHash = user
+    ? get(user, [passwordFieldName || '', 'value'])
+    : undefined;
   if (!saltedHash) {
-    throw new Error('No password field found on user field');
+    // Run one hash check for each sign-in, also when there is no stored hash.
+    await checkPasswordHash({
+      saltedHash: await getDummyPasswordHash(),
+      password: password ?? '',
+    });
+    return null;
   }
 
   const matches = await checkPasswordHash({

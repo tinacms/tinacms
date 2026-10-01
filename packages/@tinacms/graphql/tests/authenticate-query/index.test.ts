@@ -1,8 +1,18 @@
-import { it, expect } from 'vitest';
-import config from './tina/config';
 import fs from 'fs-extra';
 import path from 'path';
+import { beforeEach, expect, it, vi } from 'vitest';
+import { checkPasswordHash } from '../../src/auth/utils';
 import { setup } from '../util';
+import config from './tina/config';
+
+vi.mock('../../src/auth/utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/auth/utils')>();
+  return { ...actual, checkPasswordHash: vi.fn(actual.checkPasswordHash) };
+});
+
+beforeEach(() => {
+  vi.mocked(checkPasswordHash).mockClear();
+});
 
 const authenticateQuery = `
   query authenticate($sub: String!, $password: String!) {
@@ -122,3 +132,88 @@ it('returns only the fields sign-in needs', async () => {
     password: { passwordChangeRequired: false },
   });
 });
+
+const generatedClientQuery = `query auth($username:String!, $password:String!) {
+              authenticate(sub:$username, password:$password) {
+               id:username name email _password: password { passwordChangeRequired }
+              }
+            }`;
+
+it('signs in through the generated client', async () => {
+  const { get } = await setup(__dirname, config);
+
+  const result = await get({
+    query: generatedClientQuery,
+    variables: { username: 'northwind', password: 'northwind123' },
+  });
+
+  expect(result.errors).toBeUndefined();
+  expect(result.data?.authenticate).toEqual({
+    id: 'northwind',
+    name: 'Mr Bob Northwind',
+    email: 'bob@northwind.com',
+    _password: { passwordChangeRequired: false },
+  });
+});
+
+it('only answers authenticate for sign-in requests', async () => {
+  const { get } = await setup(__dirname, config);
+
+  const result = await get({
+    query: generatedClientQuery,
+    variables: { username: 'northwind', password: 'northwind123' },
+    ctxUser: { sub: 'testuser' },
+  });
+
+  expect(result.errors).toBeUndefined();
+  expect(result.data?.authenticate).toBeNull();
+});
+
+it.each([{}, { sub: '' }, null])(
+  'treats any request user as a non-sign-in request (%j)',
+  async (ctxUser) => {
+    const { get } = await setup(__dirname, config);
+
+    const result = await get({
+      query: generatedClientQuery,
+      variables: { username: 'northwind', password: 'northwind123' },
+      ctxUser,
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.authenticate).toBeNull();
+  }
+);
+
+it.each([
+  { username: 'nonexistent', password: 'anypassword' },
+  { username: 'northwind', password: 'wrongpassword' },
+  { username: 'nohash-user', password: 'anypassword' },
+])(
+  'returns the same result for every failed sign-in ($username)',
+  async (variables) => {
+    const { get } = await setup(__dirname, config);
+
+    const result = await get({ query: generatedClientQuery, variables });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.authenticate).toBeNull();
+  }
+);
+
+it.each([
+  { username: 'nonexistent', password: 'anypassword' },
+  { username: 'nohash-user', password: 'anypassword' },
+  { username: 'northwind', password: 'wrongpassword' },
+  { username: 'northwind', password: 'northwind123' },
+])(
+  'compares a password once for every sign-in ($username)',
+  async (variables) => {
+    const { get } = await setup(__dirname, config);
+    vi.mocked(checkPasswordHash).mockClear();
+
+    await get({ query: generatedClientQuery, variables });
+
+    expect(checkPasswordHash).toHaveBeenCalledTimes(1);
+  }
+);
