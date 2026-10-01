@@ -47,6 +47,7 @@ interface ResolverConfig {
   database: Database;
   tinaSchema: TinaSchema;
   isAudit: boolean;
+  ctxUser?: { sub?: string } | null;
 }
 
 export const createResolver = (args: ResolverConfig) => {
@@ -347,12 +348,14 @@ export class Resolver {
   public database: Database;
   public tinaSchema: TinaSchema;
   public isAudit: boolean;
+  public ctxUser: { sub?: string } | null | undefined;
 
   constructor(public init: ResolverConfig) {
     this.config = init.config;
     this.database = init.database;
     this.tinaSchema = init.tinaSchema;
     this.isAudit = init.isAudit;
+    this.ctxUser = init.ctxUser;
   }
 
   public resolveCollection = async (

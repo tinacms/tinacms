@@ -81,6 +81,14 @@ export interface DatabaseArgs {
   version?: boolean;
   namespace?: string;
   levelBatchSize?: number;
+  authCollection?: AuthCollectionOptions;
+}
+
+export interface AuthCollectionOptions {
+  /** Values of the uid field of users who can edit the auth collection. */
+  admins?: string[];
+  /** Allow writes to the auth collection from requests without a user. */
+  allowUnauthenticatedWrites?: boolean;
 }
 
 export interface GitProvider {
@@ -114,6 +122,13 @@ export type CreateLocalDatabaseArgs = Omit<DatabaseArgs, 'level'> & {
   rootPath?: string;
 };
 
+const withUnauthenticatedWrites = (
+  options: AuthCollectionOptions | undefined
+): AuthCollectionOptions => ({
+  ...options,
+  allowUnauthenticatedWrites: options?.allowUnauthenticatedWrites ?? true,
+});
+
 export const createLocalDatabase = (config?: CreateLocalDatabaseArgs) => {
   const level = new TinaLevelClient(config?.port);
   level.openConnection();
@@ -122,6 +137,7 @@ export const createLocalDatabase = (config?: CreateLocalDatabaseArgs) => {
     bridge: fsBridge,
     ...(config || {}),
     level,
+    authCollection: withUnauthenticatedWrites(config?.authCollection),
   });
 };
 
@@ -170,11 +186,16 @@ export const createDatabase = (config: CreateDatabase) => {
   });
 };
 
+/**
+ * Builds a database for CLI tooling and tests. It trusts requests without a
+ * user, so do not use it for a public endpoint. Use `createDatabase` instead.
+ */
 export const createDatabaseInternal = (config: DatabaseArgs) => {
   return new Database({
     ...config,
     bridge: config.bridge,
     level: config.level,
+    authCollection: withUnauthenticatedWrites(config.authCollection),
   });
 };
 const SYSTEM_FILES = ['_schema', '_graphql', '_lookup'];
@@ -215,6 +236,10 @@ export class Database {
   private readonly onPut: OnPutCallback;
   private readonly onDelete: OnDeleteCallback;
   private readonly levelBatchSize: number;
+  public readonly authCollection: Readonly<{
+    admins: readonly string[];
+    allowUnauthenticatedWrites: boolean;
+  }>;
   private tinaSchema: TinaSchema | undefined;
   private contentNamespace: string | undefined;
 
@@ -237,6 +262,11 @@ export class Database {
     this.onDelete = config.onDelete || defaultOnDelete;
     this.levelBatchSize = config.levelBatchSize ?? DEFAULT_LEVEL_BATCH_SIZE;
     this.contentNamespace = config.namespace;
+    this.authCollection = Object.freeze({
+      admins: Object.freeze([...(config.authCollection?.admins ?? [])]),
+      allowUnauthenticatedWrites:
+        config.authCollection?.allowUnauthenticatedWrites === true,
+    });
   }
 
   private collectionForPath = async (filepath: string) => {

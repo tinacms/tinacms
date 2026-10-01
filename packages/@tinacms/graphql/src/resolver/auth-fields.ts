@@ -59,7 +59,7 @@ export async function handleAuthenticate({
   sub?: string;
   password: string;
   info: GraphQLResolveInfo;
-  ctxUser?: { sub?: string };
+  ctxUser?: { sub?: string } | null;
 }): Promise<any> {
   const userSub = sub || ctxUser?.sub;
   const { userField, users } = await getUserDocumentContext(
@@ -95,7 +95,7 @@ export async function handleAuthorize({
   resolver: Resolver;
   sub?: string;
   info: GraphQLResolveInfo;
-  ctxUser?: { sub?: string };
+  ctxUser?: { sub?: string } | null;
 }): Promise<any> {
   const userSub = sub || ctxUser?.sub;
   const { userField, users } = await getUserDocumentContext(
@@ -117,7 +117,7 @@ export async function handleUpdatePassword({
   resolver: Resolver;
   password: string;
   info: GraphQLResolveInfo;
-  ctxUser?: { sub?: string };
+  ctxUser?: { sub?: string } | null;
 }): Promise<boolean> {
   if (!ctxUser?.sub) {
     throw new Error('Not authorized');
