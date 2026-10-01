@@ -1,5 +1,26 @@
 # @tinacms/mdx
 
+## 2.3.0
+
+### Minor Changes
+
+- [#7409](https://github.com/tinacms/tinacms/pull/7409) [`e6bf2cf`](https://github.com/tinacms/tinacms/commit/e6bf2cf958e9acffffff73bfe90e492d3491bf05) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Replace `prettier` with a small printer built for the one job it did here: turning a JSON object into the `{…}` expression that `stringifyProps` writes into `.mdx` attributes.
+
+  `prettier` accounted for roughly 760 KB of the browser bundle, and the only thing ever handed to it was `JSON.stringify(value)`. No JSX, no expressions, nothing that needed a general-purpose formatter.
+
+  That output lands verbatim in content files, so the replacement has to lay objects out exactly as prettier did, or the next save rewrites props across every affected file in a repository. The new printer reproduces prettier 2.8.8's estree printer over the subset JSON can reach: quote preference, `printNumber` normalisation, numeric-string key unquoting, the concise `fill` layout for all-numeric arrays, the three assignment layouts, break propagation, and printWidth 80 measured with the `const dummyFunc = ` prefix. The bytes written into a repository do not change.
+
+  What prettier prints for 9,370 inputs is recorded in a checked-in snapshot, and the test compares the printer against that file. All 66 `src/next/tests` fixtures stay byte-identical.
+
+  `prettier` is removed from the package. `esutils` and `emoji-regex` are added, 50 KB combined, because prettier defines its identifier and string-width rules in terms of those two packages.
+
+  On top of the acorn de-duplication, the browser bundle drops from 1,578,764 to 869,572 bytes raw and from 356,471 to 170,980 gzipped.
+
+### Patch Changes
+
+- Updated dependencies [[`dff369c`](https://github.com/tinacms/tinacms/commit/dff369c296f84347ad816ab9f737e74fc8268073), [`82a7c3b`](https://github.com/tinacms/tinacms/commit/82a7c3be6e493f403050791ed25715a59d824339)]:
+  - @tinacms/schema-tools@2.10.1
+
 ## 2.2.3
 
 ### Patch Changes
@@ -311,7 +332,6 @@
 ### Minor Changes
 
 - [#5504](https://github.com/tinacms/tinacms/pull/5504) [`7541614`](https://github.com/tinacms/tinacms/commit/7541614527a02268ea453b23ce84637f978dcf2d) Thanks [@Ben0189](https://github.com/Ben0189)! - Rich text editor - Add strikethrough support
-
   - Added a strikethrough button in the rich text editor, allowing users to apply strikethrough formatting.
   - Strikethrough syntax (`~~word~~`) correctly applies in Markdown mode.
   - **Known Issue:** In the rich text editor, typing `~~word~~` does not currently auto-convert to strikethrough. A fix will follow in an upcoming patch.
@@ -413,7 +433,6 @@
 ### Minor Changes
 
 - 324950a: Updates Plate Editor to latest version 36.
-
   - Upgrades all remaining packages `Typescript` to version `^5`
   - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
   - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
@@ -490,7 +509,6 @@
   ### Changes in the database file
 
   #### Deprecations and Additions
-
   - **Deprecated**: `onPut`, `onDelete`, and `level` arguments in `createDatabase`.
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
@@ -528,7 +546,6 @@
   ### Migrating `database.ts`
 
   #### a. Replacing `onPut` and `onDelete` with `gitProvider`
-
   - **GitHubProvider Usage**: Replace `onPut` and `onDelete` with `gitProvider`, using the provided `GitHubProvider` for GitHub.
 
   ```typescript
@@ -557,7 +574,6 @@
   ```
 
   #### b. Renaming `level` to `databaseAdapter`
-
   - **Renaming in Code**: Change `level` to `databaseAdapter` for clarity.
 
   ```diff
@@ -568,7 +584,6 @@
   ```
 
   #### c. `createLocalDatabase` Function
-
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
@@ -577,7 +592,6 @@
   ```
 
   #### d. Consolidated Example
-
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
@@ -595,7 +609,6 @@
   ### Summary of Authentication Updates in Config
 
   #### a. AuthProvider and AbstractAuthProvider
-
   - **New**: `authProvider` in `defineConfig`.
   - **Class**: `AbstractAuthProvider` for extending new auth providers.
   - **Clerk Auth Provider**: New provider added.
@@ -603,11 +616,9 @@
   - **Deprecation**: `admin.auth`.
 
   #### b. Auth Provider in Internal Client and Config
-
   - **Transition**: From auth functions to `authProvider` class.
 
   #### c. Migration for Authentication
-
   - **Previous API**:
 
   ```javascript
@@ -639,7 +650,6 @@
   ```
 
   ### TinaCMS Self Hosted backend updates
-
   - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
   - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
 
@@ -869,7 +879,6 @@
 ### Patch Changes
 
 - 973e83f1f: Some fixes around image handling in the rich-text editor
-
   - Stop treating images as block-level
   - Fix issue where images inside links were being stripped out
   - Fix display of .avif images in the media manager
@@ -1160,7 +1169,6 @@
 ### Minor Changes
 
 - 7b0dda55e: Updates to the `rich-text` component as well the shape of the `rich-text` field response from the API
-
   - Adds support for isTitle on MDX elements
   - Fixes issues related to nested marks
   - Uses monaco editor for code blocks

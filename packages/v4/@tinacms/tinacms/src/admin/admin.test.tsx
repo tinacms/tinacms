@@ -582,6 +582,40 @@ describe('TinaAdmin screens', () => {
     );
   });
 
+  it('renders a replacement screen at the replaced name', async () => {
+    window.location.hash = '#/screens/media';
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          plugins: [
+            ...config.plugins,
+            definePlugin({
+              name: 'test:media-v2',
+              provides: ['screen'],
+              overrides: [{ capability: 'screen', key: 'media' }],
+              client: async () => ({
+                default: {
+                  screens: [
+                    {
+                      name: 'media',
+                      label: 'Media',
+                      component: () => <p>replacement media</p>,
+                    },
+                  ],
+                },
+              }),
+            }),
+          ],
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    expect(await screen.findByText('replacement media')).toBeInTheDocument();
+  });
+
   it('reports a screen no plugin registered', async () => {
     window.location.hash = '#/screens/ghost';
     renderAdmin();
