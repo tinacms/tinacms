@@ -86,7 +86,10 @@ describe('dropzoneAcceptFromString', () => {
     expect(dropzoneAcceptFromString('image/png, .SVG, .zzz')).toEqual({
       'image/png': [],
       'image/svg+xml': ['.SVG'],
-      'application/octet-stream': ['.zzz'],
+      '.zzz': [],
+    });
+    expect(dropzoneAcceptFromString('.constructor')).toEqual({
+      '.constructor': [],
     });
   });
 });

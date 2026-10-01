@@ -298,7 +298,14 @@ describe('checkUploadType', () => {
   });
 
   it('admits unknown extensions through application/octet-stream', () => {
-    for (const filename of ['archive.zip', 'font.woff2', 'LICENSE']) {
+    for (const filename of [
+      'archive.zip',
+      'font.woff2',
+      'LICENSE',
+      'file.constructor',
+      'file.__proto__',
+      'file.hasOwnProperty',
+    ]) {
       expect(checkUploadType({ filename })).toEqual({
         allowed: true,
         restricted: false,

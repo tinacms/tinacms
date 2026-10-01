@@ -10,19 +10,19 @@ import type { Accept } from 'react-dropzone';
 export const DEFAULT_MEDIA_UPLOAD_TYPES = DEFAULT_MEDIA_ACCEPT.join(',');
 
 /**
- * react-dropzone's `accept` shape for a `media.accept` string. An extension
- * entry is keyed by its MIME type, because the native file picker drops bare
- * extension keys.
+ * react-dropzone's `accept` shape for a `media.accept` string. A known
+ * extension entry is keyed by its MIME type, because the native file picker
+ * drops bare extension keys.
  */
 export const dropzoneAcceptFromString = (str: string): Accept => {
   const accept: Accept = {};
   for (const entry of (str || DEFAULT_MEDIA_UPLOAD_TYPES).split(',')) {
     const value = entry.trim();
     if (!value) continue;
-    if (value.startsWith('.')) {
-      const mimeType =
-        MEDIA_EXTENSION_MIME_TYPES[value.slice(1).toLowerCase()] ??
-        'application/octet-stream';
+    const mimeType = value.startsWith('.')
+      ? MEDIA_EXTENSION_MIME_TYPES[value.slice(1).toLowerCase()]
+      : undefined;
+    if (mimeType) {
       accept[mimeType] ??= [];
       accept[mimeType].push(value);
     } else {
