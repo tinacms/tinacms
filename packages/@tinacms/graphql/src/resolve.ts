@@ -10,7 +10,7 @@ import type { Collection, TinaSchema } from '@tinacms/schema-tools';
 import type { GraphQLConfig } from './types';
 import type { Database } from './database';
 import { createSchema } from './schema/createSchema';
-import { createResolver, Resolver } from './resolver';
+import { createResolver, Resolver, type CtxUser } from './resolver';
 import { assertShape } from './util';
 import { NAMER } from './ast-builder';
 import { handleFetchErrorError } from './resolver/error';
@@ -38,7 +38,7 @@ export const resolve = async ({
   silenceErrors?: boolean;
   verbose?: boolean;
   isAudit?: boolean;
-  ctxUser?: { sub?: string } | null;
+  ctxUser?: CtxUser;
 }) => {
   try {
     const verboseValue = verbose ?? true;

@@ -87,7 +87,10 @@ export interface DatabaseArgs {
 export interface AuthCollectionOptions {
   /** Values of the uid field of users who can edit the auth collection. */
   admins?: string[];
-  /** Allow writes to the auth collection from requests without a user. */
+  /**
+   * Allow writes to the auth collection from calls that pass no ctxUser.
+   * A null ctxUser means nobody is signed in, and is still refused.
+   */
   allowUnauthenticatedWrites?: boolean;
 }
 
