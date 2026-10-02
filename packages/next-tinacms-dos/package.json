@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",
+    "@tinacms/schema-tools": "workspace:^",
     "multer": "catalog:"
   }
 }
