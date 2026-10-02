@@ -2086,16 +2086,20 @@ describe('auth collection write guard', () => {
     admins = ['admin-user'],
     allowUnauthenticatedWrites = false,
     stored = storedUsers as Record<string, unknown> | undefined,
+    withAuthCollection = true,
   }: {
     collections?: any[];
     ctxUser?: { sub?: string } | null;
     admins?: string[];
     allowUnauthenticatedWrites?: boolean;
     stored?: Record<string, unknown>;
+    withAuthCollection?: boolean;
   } = {}) => {
     const tinaSchema = await createSchema({ schema: { collections } });
     const database = {
-      authCollection: { admins, allowUnauthenticatedWrites },
+      ...(withAuthCollection && {
+        authCollection: { admins, allowUnauthenticatedWrites },
+      }),
       get: vi.fn(async (fullPath: string) => {
         if (fullPath === 'content/users/index.json' && stored) {
           return stored;
@@ -2135,18 +2139,37 @@ describe('auth collection write guard', () => {
     ).resolves.toBeUndefined();
   });
 
-  it('rejects a write when there is no user and unauthenticated writes are off', async () => {
+  it('rejects a call with no ctxUser when unauthenticated writes are off', async () => {
     const check = await buildGuard();
     await expect(
       check('user', 'content/users/index.json', 'update')
     ).rejects.toThrow('Not authorized');
   });
 
-  it('allows a write when there is no user and unauthenticated writes are on', async () => {
+  it('allows a call with no ctxUser when unauthenticated writes are on', async () => {
     const check = await buildGuard({ allowUnauthenticatedWrites: true });
     await expect(
       check('user', 'content/users/other.json', 'create')
     ).resolves.toBeUndefined();
+  });
+
+  describe('with a Database from before authCollection existed', () => {
+    it('allows a call with no ctxUser, like createDatabaseInternal', async () => {
+      const check = await buildGuard({ withAuthCollection: false });
+      await expect(
+        check('user', 'content/users/index.json', 'update')
+      ).resolves.toBeUndefined();
+    });
+
+    it('rejects a signed-in user, since it lists no admins', async () => {
+      const check = await buildGuard({
+        withAuthCollection: false,
+        ctxUser: { sub: 'admin-user' },
+      });
+      await expect(
+        check('user', 'content/users/index.json', 'update')
+      ).rejects.toThrow('Not authorized');
+    });
   });
 
   it('rejects a write from a user who is not an admin', async () => {
