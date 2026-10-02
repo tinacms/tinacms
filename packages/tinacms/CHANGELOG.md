@@ -1,5 +1,11 @@
 # tinacms
 
+## 3.14.3
+
+### Patch Changes
+
+- [#7658](https://github.com/tinacms/tinacms/pull/7658) [`d281cdf`](https://github.com/tinacms/tinacms/commit/d281cdf3a1dc1d5ef42d2bfd15c29224acc9d201) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Show an orange border when hovering over a populated image selector.
+
 ## 3.14.2
 
 ### Patch Changes
@@ -2676,6 +2682,7 @@
 
 - 183249b11: - deprecate: `defaultValue`
   - add `defaultItem` to the collection (as a function or an object)
+
   ```ts
   defaultItem: () => {
     const m = new Date()
@@ -2694,6 +2701,7 @@
   ```
 
   - Allow `datetime` field to be undefined or empty
+
 - 8060d0949: Provide filename customization API.
 
   ```ts
