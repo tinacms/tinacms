@@ -1,4 +1,4 @@
-import type { TinaSchema } from '@tinacms/schema-tools';
+import type { Collection, TinaSchema } from '@tinacms/schema-tools';
 import { randomBytes } from 'crypto';
 import { set } from 'es-toolkit/compat';
 import type { GraphQLResolveInfo } from 'graphql';
@@ -79,6 +79,39 @@ const getDummyPasswordHash = () => {
   });
   return dummyPasswordHash;
 };
+
+/**
+ * A stored hash only carries over to a user with the same uid, so a new or
+ * renamed user saved without a password could never sign in.
+ */
+export function assertNewUsersHavePasswords(
+  collection: Collection<true>,
+  newBody: Record<string, unknown>,
+  existingData?: Record<string, unknown>
+) {
+  const userFields = mapUserFields(collection);
+  if (userFields.length !== 1) {
+    return;
+  }
+  const [{ path: usersPath, idFieldName, passwordFieldName }] = userFields;
+  const users = get(newBody, usersPath);
+  if (!Array.isArray(users) || !idFieldName || !passwordFieldName) {
+    return;
+  }
+  const storedUsers = get(existingData, usersPath);
+  const storedIds = new Set(
+    (Array.isArray(storedUsers) ? storedUsers : []).map((u) => u?.[idFieldName])
+  );
+  const withoutPassword = users
+    .filter(
+      (u) =>
+        !storedIds.has(u?.[idFieldName]) && !u?.[passwordFieldName]?.['value']
+    )
+    .map((u) => u?.[idFieldName]);
+  if (withoutPassword.length) {
+    throw new Error(`New users need a password: ${withoutPassword.join(', ')}`);
+  }
+}
 
 export async function handleAuthenticate({
   tinaSchema,
