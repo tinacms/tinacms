@@ -37,7 +37,11 @@ import {
 } from '../database/datalayer';
 import { TinaGraphQLError, TinaParseDocumentError } from './error';
 import { collectConditionsForField, resolveReferences } from './filter-utils';
-import { findUserInCollection, getUserDocumentContext } from './auth-fields';
+import {
+  assertNewUsersHavePasswords,
+  findUserInCollection,
+  getUserDocumentContext,
+} from './auth-fields';
 import {
   resolveMediaCloudToRelative,
   resolveMediaRelativeToCloud,
@@ -1126,6 +1130,9 @@ export class Resolver {
     doc: Awaited<ReturnType<Resolver['getDocument']>>;
     newBody: Record<string, unknown>;
   }) => {
+    if (collection.isAuthCollection) {
+      assertNewUsersHavePasswords(collection, newBody, doc?._rawData);
+    }
     const params = await this.buildObjectMutations(
       newBody,
       collection,
