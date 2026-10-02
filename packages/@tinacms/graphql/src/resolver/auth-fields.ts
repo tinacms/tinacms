@@ -51,6 +51,20 @@ export function findUserInCollection(
   return users.find((u) => u[idFieldName] === userSub) || null;
 }
 
+function withoutPasswordValue(user: any, userField: any) {
+  const { passwordFieldName } = userField;
+  if (!passwordFieldName) {
+    return user;
+  }
+  return {
+    ...user,
+    [passwordFieldName]: {
+      passwordChangeRequired:
+        user[passwordFieldName]?.passwordChangeRequired ?? false,
+    },
+  };
+}
+
 /**
  * A stored hash only carries over to a user with the same uid, so a new or
  * renamed user saved without a password could never sign in.
@@ -119,7 +133,7 @@ export async function handleAuthenticate({
     saltedHash,
     password,
   });
-  return matches ? user : null;
+  return matches ? withoutPasswordValue(user, userField) : null;
 }
 
 export async function handleAuthorize({
@@ -141,7 +155,7 @@ export async function handleAuthorize({
   );
 
   const user = findUserInCollection(users, userField, userSub);
-  return user ? user : null;
+  return user ? withoutPasswordValue(user, userField) : null;
 }
 
 export async function handleUpdatePassword({
