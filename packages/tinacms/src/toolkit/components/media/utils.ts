@@ -1,40 +1,35 @@
 import {
+  DEFAULT_MEDIA_ACCEPT,
+  extensionOf,
+  MEDIA_EXTENSION_MIME_TYPES,
   MEDIA_MIME_TYPES,
   type MediaExtension,
-  extensionOf,
 } from '@tinacms/schema-tools';
 import type { Accept } from 'react-dropzone';
 
-const supportedFileTypes = [
-  'text/*',
-  'application/pdf',
-  'application/octet-stream',
-  'application/json',
-  'application/ld+json',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/postscript',
-  'model/fbx',
-  'model/gltf+json',
-  'model/ply',
-  'model/u3d+mesh',
-  'model/vnd.usdz+zip',
-  'application/x-indesign',
-  'application/vnd.apple.mpegurl',
-  'application/dash+xml',
-  'application/mxf',
-  'image/*',
-  'video/*',
-];
-export const DEFAULT_MEDIA_UPLOAD_TYPES = supportedFileTypes.join(',');
+export const DEFAULT_MEDIA_UPLOAD_TYPES = DEFAULT_MEDIA_ACCEPT.join(',');
 
-export const dropzoneAcceptFromString = (str: string) => {
-  return Object.assign(
-    {},
-    ...(str || DEFAULT_MEDIA_UPLOAD_TYPES).split(',').map((x) => ({ [x]: [] }))
-  );
+/**
+ * react-dropzone's `accept` shape for a `media.accept` string. A known
+ * extension entry is keyed by its MIME type, because the native file picker
+ * drops bare extension keys.
+ */
+export const dropzoneAcceptFromString = (str: string): Accept => {
+  const accept: Accept = {};
+  for (const entry of (str || DEFAULT_MEDIA_UPLOAD_TYPES).split(',')) {
+    const value = entry.trim();
+    if (!value) continue;
+    const mimeType = value.startsWith('.')
+      ? MEDIA_EXTENSION_MIME_TYPES[value.slice(1).toLowerCase()]
+      : undefined;
+    if (mimeType) {
+      accept[mimeType] ??= [];
+      accept[mimeType].push(value);
+    } else {
+      accept[value] ??= [];
+    }
+  }
+  return accept;
 };
 
 /**

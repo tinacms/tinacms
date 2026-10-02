@@ -12,6 +12,10 @@
 		"entryPoints": [
 			{
 				"name": "src/index.ts"
+			},
+			{
+				"name": "src/upload-type.ts",
+				"target": "node"
 			}
 		]
 	},
