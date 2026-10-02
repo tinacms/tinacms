@@ -1,4 +1,3 @@
-import type { Directive } from './types';
 import type {
   CompileContext,
   Extension as FromMarkdownExtension,
@@ -6,6 +5,7 @@ import type {
   Token,
 } from 'mdast-util-from-markdown';
 import { parseEntities } from 'parse-entities';
+import type { Directive } from './types';
 
 const enterContainer: FromMarkdownHandle = function (token) {
   enter.call(this, 'containerDirective', token);

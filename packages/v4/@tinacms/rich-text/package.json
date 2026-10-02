@@ -1,0 +1,91 @@
+{
+  "name": "@tinacms/rich-text",
+  "version": "4.0.0-alpha.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "The Plate rich-text editor for TinaCMS v4. A value contract keeps the editor separate from the storage format. You can replace one of them, and the other stays the same.",
+  "type": "module",
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/v4/@tinacms/rich-text"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tinacms-scripts build",
+    "types": "tsc && tsc -p tsconfig.test.json",
+    "test": "vitest run --passWithNoTests",
+    "coverage": "vitest run --coverage"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./editor": {
+      "types": "./src/editor.ts",
+      "default": "./src/editor.ts"
+    }
+  },
+  "dependencies": {
+    "@ariakit/react": "catalog:",
+    "@headlessui/react": "catalog:",
+    "@radix-ui/react-dialog": "catalog:",
+    "@radix-ui/react-dropdown-menu": "catalog:",
+    "@radix-ui/react-popover": "catalog:",
+    "@radix-ui/react-separator": "catalog:",
+    "@radix-ui/react-slot": "catalog:",
+    "@radix-ui/react-toolbar": "catalog:",
+    "@radix-ui/react-tooltip": "catalog:",
+    "@tinacms/schema-tools": "workspace:*",
+    "@tinacms/ui": "workspace:*",
+    "@udecode/cn": "catalog:",
+    "@udecode/plate": "catalog:",
+    "@udecode/plate-autoformat": "catalog:",
+    "@udecode/plate-basic-marks": "catalog:",
+    "@udecode/plate-block-quote": "catalog:",
+    "@udecode/plate-break": "catalog:",
+    "@udecode/plate-code-block": "catalog:",
+    "@udecode/plate-combobox": "catalog:",
+    "@udecode/plate-dnd": "catalog:",
+    "@udecode/plate-floating": "catalog:",
+    "@udecode/plate-heading": "catalog:",
+    "@udecode/plate-highlight": "catalog:",
+    "@udecode/plate-horizontal-rule": "catalog:",
+    "@udecode/plate-indent-list": "catalog:",
+    "@udecode/plate-link": "catalog:",
+    "@udecode/plate-list": "catalog:",
+    "@udecode/plate-node-id": "catalog:",
+    "@udecode/plate-reset-node": "catalog:",
+    "@udecode/plate-resizable": "catalog:",
+    "@udecode/plate-selection": "catalog:",
+    "@udecode/plate-slash-command": "catalog:",
+    "@udecode/plate-table": "catalog:",
+    "@udecode/plate-trailing-block": "catalog:",
+    "class-variance-authority": "catalog:",
+    "cmdk": "catalog:",
+    "color-string": "catalog:",
+    "is-hotkey": "catalog:",
+    "lowlight": "catalog:",
+    "lucide-react": "catalog:",
+    "mermaid": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@testing-library/user-event": "catalog:",
+    "@tinacms/scripts": "workspace:*",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "catalog:",
+    "happy-dom": "catalog:",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.9"
+  }
+}

@@ -1,16 +1,22 @@
-import * as React from 'react';
-import { wrapFieldsWithMeta } from './wrap-field-with-meta';
-import { InputProps, ImageUpload } from '../components';
+import {
+  type MediaAccept,
+  extensionOf,
+  resolveMediaAccept,
+} from '@tinacms/schema-tools';
 import { Media } from '@toolkit/core';
 import { useCMS } from '@toolkit/react-core';
-import { parse } from './text-format';
+import * as React from 'react';
 import { useState } from 'react';
 import { FileError } from 'react-dropzone';
+import { ImageUpload, InputProps } from '../components';
+import { parse } from './text-format';
+import { wrapFieldsWithMeta } from './wrap-field-with-meta';
 
 interface ImageProps {
   path: string;
   uploadDir?(formValues: any): string;
   clearable?: boolean;
+  accept?: MediaAccept | MediaAccept[];
 }
 
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
@@ -34,6 +40,21 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
     async function onChange(media?: Media | Media[]) {
       if (media) {
         const item = Array.isArray(media) ? media[0] : media;
+
+        const allowed: readonly string[] = resolveMediaAccept(
+          props.field.accept
+        );
+        // Some stores carry the extension only on `src` — Cloudinary's
+        // `original_filename` drops it — so an unusable filename falls back
+        // rather than refusing every file the store returns.
+        const ext = extensionOf(item.filename) || extensionOf(item.src ?? '');
+        if (allowed.length && !allowed.includes(ext)) {
+          cms.alerts.error(
+            `${item.filename} is not an accepted file type. This field accepts ${allowed.join(', ')}.`
+          );
+          return;
+        }
+
         const parsedValue =
           typeof cms?.media?.store?.parse === 'function'
             ? cms.media.store.parse(item)
@@ -50,12 +71,14 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
         value={value}
         src={src}
         loading={isImgUploading}
+        accept={props.field.accept}
         onClick={() => {
           const directory = uploadDir(props.form.getState().values);
           cms.media.open({
             allowDelete: true,
             directory,
             onSelect: onChange,
+            accept: props.field.accept,
           });
         }}
         onDrop={async ([file]: File[], fileRejections) => {

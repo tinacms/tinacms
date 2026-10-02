@@ -1,9 +1,9 @@
-import { it, expect } from 'vitest';
+import { expect, it } from 'vitest';
 import { parseMDX } from '../../parse';
 import { stringifyMDX } from '../../stringify';
+import * as util from '../util';
 import { field } from './field';
 import input from './in.md?raw';
-import * as util from '../util';
 
 it('matches input', () => {
   const parseImageCallback = (v: string) => `http://some-url${v}`;

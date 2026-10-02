@@ -1,5 +1,5 @@
-import { expect } from 'vitest';
 import { toMatchFile } from 'jest-file-snapshot';
+import { expect } from 'vitest';
 
 const join = function (...parts: string[]) {
   // From: https://stackoverflow.com/questions/29855098/is-there-a-built-in-javascript-function-similar-to-os-path-join

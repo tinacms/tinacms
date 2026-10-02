@@ -139,6 +139,7 @@ const ADMIN_CSS = `@import "@tinacms/ui/globals.css";
    so name the package sources here. These lines go when the dist build lands. */
 @source "../node_modules/@tinacms/tinacms/src";
 @source "../node_modules/@tinacms/ui/src";
+@source "../node_modules/@tinacms/rich-text/src";
 `;
 
 const scaffoldOnce = async (

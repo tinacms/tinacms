@@ -1,3 +1,8 @@
+// The client half of the capability RPC (ADR-007). It is a typed Proxy that turns
+// `server.media.upload(input)` into one POST. The types cross through an `import type`,
+// which the compiler erases, so no server code and no secret reaches the browser. This
+// file runs in the browser, and it must not import from ../server or from ./handler.
+
 export type RpcProxy<TSegments> = {
   [Namespace in keyof TSegments]: {
     [Op in keyof TSegments[Namespace]]: TSegments[Namespace][Op] extends (
@@ -21,10 +26,16 @@ export class RpcError extends Error {
 
 export interface RpcClientConfig {
   url: string;
+  // The session credential is a bearer token, and the transport attaches it
+  // (ADR-023 §4). Without it, in local development with no auth, a request carries no
+  // credential, and only a publicOp answers.
   getToken?: () => string | null | Promise<string | null>;
   fetch?: typeof fetch;
 }
 
+// The two levels of the proxy match the two levels of the call. There is no cache. Every
+// read of a property leads to a network call, and no caller can depend on the identity of
+// a property.
 export const createRpcClient = <TSegments>(
   config: RpcClientConfig
 ): RpcProxy<TSegments> =>
@@ -38,6 +49,10 @@ export const createRpcClient = <TSegments>(
     }
   ) as RpcProxy<TSegments>;
 
+// A get trap sees every read of a property, and not the operation calls alone. Await
+// reads `then`, and console/inspector code reads `toString`, `valueOf`, and `toJSON`.
+// Each must read as absent, or `await client.media` hangs and an inspector call sends
+// an unwanted POST.
 const RESERVED_PROXY_KEYS: ReadonlySet<string> = new Set([
   'then',
   'toString',
@@ -80,6 +95,9 @@ const postOp = async (
   return unwrapRpcResponse(response, namespace, opName);
 };
 
+// A 2xx that is not JSON is not a result. An SSO interstitial or a proxy's own page
+// comes back with 200, and parsing it as "null" would resolve the call as an empty
+// success — the caller then writes that absence into the UI as though it were data.
 const unwrapRpcResponse = async (
   response: Response,
   namespace: string,

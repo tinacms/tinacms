@@ -18,8 +18,8 @@ jest.mock('esbuild', () => ({
 }));
 
 import path from 'path';
-import * as stripModule from './stripSearchTokenFromConfig';
 import { Codegen } from './index';
+import * as stripModule from './stripSearchTokenFromConfig';
 
 describe('Codegen.genClient', () => {
   function makeInstance(isTs: boolean): Codegen {

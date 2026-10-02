@@ -1,9 +1,9 @@
-import { eat } from './marks';
-import { stringifyProps } from './acorn';
 import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type * as Plate from '../../parse/plate';
 import type { RootElement } from '../../parse/plate';
+import { stringifyProps } from './acorn';
+import { eat } from './marks';
 
 export const preProcess = (
   tree: RootElement,
@@ -35,9 +35,7 @@ export const rootElement = (
 export const codeLinesToString = (children: any[]) => {
   return (children ?? []).map((line: any) =>
     Array.isArray(line.children) && line.children.length > 0
-      ? line.children
-          .map((t: any) => t.text)
-          .join('') // join in case of multiple text nodes
+      ? line.children.map((t: any) => t.text).join('') // join in case of multiple text nodes
       : ''
   );
 };
@@ -189,7 +187,9 @@ export const blockElement = (
         }),
       };
     default:
-      throw new Error(`BlockElement: ${content.type} is not yet supported`);
+      throw new Error(
+        `This block can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
+      );
   }
 };
 const listItemElement = (
@@ -202,6 +202,9 @@ const listItemElement = (
     // spread is always false since we don't support block elements in list items
     // good explanation of the difference: https://stackoverflow.com/questions/43503528/extra-lines-appearing-between-list-items-in-github-markdown
     spread: false,
+    ...(typeof content.checked === 'boolean'
+      ? { checked: content.checked }
+      : {}),
     children: content.children.map((child) => {
       if (child.type === 'lic') {
         return {

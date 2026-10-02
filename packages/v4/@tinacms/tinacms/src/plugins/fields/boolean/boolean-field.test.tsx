@@ -12,8 +12,12 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
-import { Field, FormProvider, TinaProvider } from '../../../editor';
+import { FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
+import { required } from '../../../plugins/fields';
+import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
+import { coreValidatorRegistry } from '../../../test/core-validators';
+import { LabelledFields } from '../../../test/labelled-fields';
 import booleanFieldPlugin from './boolean-field.plugin';
 
 const NO_COLLECTIONS = { collections: [] };
@@ -22,7 +26,13 @@ const collection: CollectionSchema = {
   name: 'post',
   label: 'Posts',
   format: 'mdx',
-  fields: [t.boolean({ name: 'featured', label: 'Featured', required: true })],
+  fields: [
+    t.boolean({
+      name: 'featured',
+      label: 'Featured',
+      validators: [required()],
+    }),
+  ],
 };
 
 const featuredNode = collection.fields[0];
@@ -34,7 +44,7 @@ const renderFeatured = (document?: TinaDocument) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [booleanFieldPlugin],
+        plugins: [booleanFieldPlugin, coreValidatorsPlugin],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -43,7 +53,7 @@ const renderFeatured = (document?: TinaDocument) =>
         path='content/posts/featured.mdx'
         document={document}
       >
-        <Field address='featured' />
+        <LabelledFields />
       </FormProvider>
     </TinaProvider>
   );
@@ -51,25 +61,19 @@ const renderFeatured = (document?: TinaDocument) =>
 describe('BooleanField rendering', () => {
   it('renders a stored true value as a checked box', async () => {
     renderFeatured({ featured: true });
-    const input = (await screen.findByLabelText(
-      'featured'
-    )) as HTMLInputElement;
+    const input = await screen.findByRole('checkbox', { name: 'Featured' });
     expect(input).toBeChecked();
   });
 
   it('renders a stored false value as an unchecked box', async () => {
     renderFeatured({ featured: false });
-    const input = (await screen.findByLabelText(
-      'featured'
-    )) as HTMLInputElement;
+    const input = await screen.findByRole('checkbox', { name: 'Featured' });
     expect(input).not.toBeChecked();
   });
 
   it('falls back to the descriptor default (false) when absent', async () => {
     renderFeatured();
-    const input = (await screen.findByLabelText(
-      'featured'
-    )) as HTMLInputElement;
+    const input = await screen.findByRole('checkbox', { name: 'Featured' });
     expect(input).not.toBeChecked();
   });
 });
@@ -77,9 +81,7 @@ describe('BooleanField rendering', () => {
 describe('BooleanField value updates', () => {
   it('toggles the value back through the form store', async () => {
     renderFeatured({ featured: false });
-    const input = (await screen.findByLabelText(
-      'featured'
-    )) as HTMLInputElement;
+    const input = await screen.findByRole('checkbox', { name: 'Featured' });
 
     await userEvent.click(input);
     expect(input).toBeChecked();
@@ -93,21 +95,25 @@ describe('BooleanField validation', () => {
   it('accepts both true and false even when the field is required', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('boolean');
-    expect(validateField(featuredNode, descriptor, true)).toEqual([]);
-    expect(validateField(featuredNode, descriptor, false)).toEqual([]);
+    expect(validateFieldWithCore(featuredNode, descriptor, true)).toEqual([]);
+    expect(validateFieldWithCore(featuredNode, descriptor, false)).toEqual([]);
   });
 
   it('accepts an absent value as optional', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('boolean');
-    expect(validateField(featuredNode, descriptor, undefined)).toEqual([]);
-    expect(validateField(featuredNode, descriptor, null)).toEqual([]);
+    expect(validateFieldWithCore(featuredNode, descriptor, undefined)).toEqual(
+      []
+    );
+    expect(validateFieldWithCore(featuredNode, descriptor, null)).toEqual([]);
   });
 
   it('rejects a non-boolean stored value', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('boolean');
-    expect(validateField(featuredNode, descriptor, 'yes')).not.toEqual([]);
+    expect(validateFieldWithCore(featuredNode, descriptor, 'yes')).not.toEqual(
+      []
+    );
   });
 
   it('appends a descriptor-level custom validate error', () => {
@@ -117,7 +123,7 @@ describe('BooleanField validation', () => {
       validate: (value: boolean) =>
         value === false ? 'Must be enabled' : null,
     };
-    expect(validateField(featuredNode, descriptor, false)).toContain(
+    expect(validateFieldWithCore(featuredNode, descriptor, false)).toContain(
       'Must be enabled'
     );
   });
@@ -127,21 +133,21 @@ describe('BooleanField ingest and digest', () => {
   it('round-trips true and false through ingest and digest', async () => {
     const registry = await resolveRegistry();
     for (const featured of [true, false]) {
-      const ingested = ingestDocument(
-        { featured },
-        collection.fields,
-        registry
-      );
-      expect(ingested).toEqual({ featured });
-      expect(digestDocument(ingested, collection.fields, registry)).toEqual({
-        featured,
+      const ingested = ingestDocument({ featured }, collection.fields, {
+        registry,
       });
+      expect(ingested).toEqual({ featured });
+      expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
+        {
+          featured,
+        }
+      );
     }
   });
 
   it('seeds the default value on ingest when the field is absent', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, registry)).toEqual({
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({
       featured: false,
     });
   });
@@ -155,3 +161,14 @@ describe('BooleanField metadata wrapping', () => {
     expect(descriptor?.defaultValue).toBe(false);
   });
 });
+
+const validateFieldWithCore: typeof validateField = (
+  node,
+  descriptor,
+  value,
+  options
+) =>
+  validateField(node, descriptor, value, {
+    validators: coreValidatorRegistry,
+    ...options,
+  });

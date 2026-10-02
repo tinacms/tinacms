@@ -87,6 +87,71 @@ describe('MediaModel (Vite dev server)', () => {
     });
   });
 
+  describe('listMedia ext filter', () => {
+    const seed = async (names: string[]) => {
+      const dir = path.join(tmpDir, 'public', 'uploads');
+      for (const name of names) await fs.writeFile(path.join(dir, name), 'x');
+      return new MediaModel(config);
+    };
+
+    it('returns only files matching the requested extensions', async () => {
+      const model = await seed(['a.png', 'b.pdf', 'c.svg']);
+      const result = await model.listMedia({ searchPath: '', ext: 'pdf,svg' });
+      expect(result.files.map((f) => f.filename).sort()).toEqual([
+        'b.pdf',
+        'c.svg',
+      ]);
+    });
+
+    it('matches case-insensitively on both sides', async () => {
+      const model = await seed(['SCAN.PDF']);
+      const result = await model.listMedia({ searchPath: '', ext: 'PdF' });
+      expect(result.files).toHaveLength(1);
+    });
+
+    it('treats an empty or blank value as no filter', async () => {
+      const model = await seed(['a.png', 'b.pdf']);
+      for (const ext of ['', ' , ,']) {
+        const result = await model.listMedia({ searchPath: '', ext });
+        expect(result.files).toHaveLength(2);
+      }
+    });
+
+    it('never matches a dotfile', async () => {
+      const model = await seed(['.DS_Store']);
+      const result = await model.listMedia({ searchPath: '', ext: 'ds_store' });
+      expect(result.files).toHaveLength(0);
+    });
+
+    // The point of filtering server-side: a page must be full of matches, not
+    // a page of everything with the non-matches removed afterwards.
+    it('filters before paginating', async () => {
+      const names: string[] = [];
+      for (let i = 0; i < 10; i++) names.push(`img-${i}.png`);
+      names.push('only.pdf');
+      const model = await seed(names);
+
+      const result = await model.listMedia({
+        searchPath: '',
+        ext: 'pdf',
+        limit: '4',
+      });
+
+      expect(result.files.map((f) => f.filename)).toEqual(['only.pdf']);
+      expect(result.cursor).toBeNull();
+    });
+
+    it('applies alongside search', async () => {
+      const model = await seed(['report-2024.pdf', 'report-2024.png']);
+      const result = await model.listMedia({
+        searchPath: '',
+        search: 'report',
+        ext: 'pdf',
+      });
+      expect(result.files.map((f) => f.filename)).toEqual(['report-2024.pdf']);
+    });
+  });
+
   describe('listMedia search', () => {
     const seed = async () => {
       const base = path.join(tmpDir, 'public', 'uploads');

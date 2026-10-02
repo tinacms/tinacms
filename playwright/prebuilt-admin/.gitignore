@@ -1,0 +1,17 @@
+# dependencies
+/node_modules
+
+# generated tina client + admin build output
+/tina/__generated__
+/public/admin
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright-test-results.json
+
+# misc
+.DS_Store
+*.log

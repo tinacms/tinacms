@@ -5,13 +5,9 @@ import { asResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
-import {
-  Field,
-  FormProvider,
-  TinaProvider,
-  useFormId,
-  useFormStatus,
-} from './index';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
+import { LabelledFields } from '../test/labelled-fields';
+import { FormProvider, TinaProvider, useFormId, useFormStatus } from './index';
 
 const NO_COLLECTIONS = { collections: [] };
 
@@ -30,7 +26,7 @@ describe('FormProvider form-store wiring', () => {
     render(
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [stringFieldPlugin],
+          plugins: [stringFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >
@@ -39,12 +35,12 @@ describe('FormProvider form-store wiring', () => {
           path='content/posts/wiring.mdx'
           document={{ title: 'Hi' }}
         >
-          <Field address='title' />
+          <LabelledFields />
           <StatusProbe />
         </FormProvider>
       </TinaProvider>
     );
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
 
     await userEvent.type(input, '!');

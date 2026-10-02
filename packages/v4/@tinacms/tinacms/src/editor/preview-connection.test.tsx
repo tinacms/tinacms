@@ -9,18 +9,23 @@ import userEvent from '@testing-library/user-event';
 import { type ReactNode, type RefObject, useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
+import type { ContentProvider } from '../core/content/contract';
 import { toFieldAddress } from '../core/field/address';
-import type { CollectionSchema } from '../core/schema/types';
+import { definePlugin } from '../core/plugin';
+import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { toFormId, useFormStore } from '../form/form-store';
 import { t } from '../index';
+import referenceFieldPlugin from '../plugins/fields/reference/reference-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import {
   activateMessage,
   readyMessage,
   valuesMessage,
 } from '../preview/protocol';
+import { LabelledFields } from '../test/labelled-fields';
 import { FormScopeContext } from './context';
-import { Field, FormProvider, TinaProvider } from './index';
+import { FormProvider, TinaProvider } from './index';
 import { usePreviewConnection } from './preview-connection';
 
 const NO_COLLECTIONS = { collections: [] };
@@ -71,7 +76,7 @@ const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [stringFieldPlugin],
+        plugins: [stringFieldPlugin, coreValidatorsPlugin],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -80,17 +85,127 @@ const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
         path={path}
         document={{ title: 'Hello' }}
       >
-        <Field address='title' />
+        <LabelledFields />
         <Connection iframeRef={iframeRef} />
       </FormProvider>
     </TinaProvider>
   );
 
+const REFERENCED_PATH = 'content/pages/deleted.mdx';
+
+const referenceCollection: CollectionSchema = {
+  name: 'post',
+  format: 'mdx',
+  fields: [
+    t.string({ name: 'title', label: 'Title' }),
+    t.reference({ name: 'page', label: 'Page', collections: ['page'] }),
+  ],
+};
+
+const pageCollection: CollectionSchema = {
+  name: 'page',
+  path: 'content/pages',
+  format: 'mdx',
+  fields: [t.string({ name: 'title', label: 'Title' })],
+};
+
+const renderWithReference = (
+  iframeRef: RefObject<HTMLIFrameElement | null>,
+  get: ContentProvider['get']
+) => {
+  const contentPlugin = definePlugin({
+    name: 'test:content:stub',
+    provides: ['content'],
+    client: async () => ({
+      default: {
+        slice: () => ({
+          get,
+          list: async () => [],
+          update: async (_c: string, p: string, value: TinaDocument) => ({
+            path: p,
+            document: value,
+          }),
+        }),
+      },
+    }),
+  });
+  return render(
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [
+          stringFieldPlugin,
+          referenceFieldPlugin,
+          contentPlugin,
+          coreValidatorsPlugin,
+        ],
+        schema: { collections: [referenceCollection, pageCollection] },
+      })}
+    >
+      <FormProvider
+        collection={referenceCollection}
+        path={path}
+        document={{ title: 'Hello', page: REFERENCED_PATH }}
+      >
+        <LabelledFields />
+        <Connection iframeRef={iframeRef} />
+      </FormProvider>
+    </TinaProvider>
+  );
+};
+
+describe('usePreviewConnection reference resolution', () => {
+  it('posts once per edit when a reference points at a document that is gone', async () => {
+    const get = vi.fn(async () => null);
+    const iframe = fakeIframe();
+    renderWithReference(iframe.ref, get);
+    const input = await screen.findByLabelText('Title');
+    await waitFor(() => expect(get).toHaveBeenCalledTimes(1));
+    iframe.postMessage.mockClear();
+
+    await userEvent.type(input, '!');
+    await waitFor(() => expect(iframe.postMessage).toHaveBeenCalled());
+
+    // `content.get` answers null for a document that is gone. Reading the
+    // cached document rather than the cache entry treats that null as a miss,
+    // so every edit re-enters the fetch and posts a second time.
+    expect(iframe.postMessage).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the path when the document is gone', async () => {
+    const iframe = fakeIframe();
+    renderWithReference(iframe.ref, async () => null);
+    await screen.findByLabelText('Title');
+
+    await waitFor(() =>
+      expect(iframe.postMessage).toHaveBeenCalledWith(
+        valuesMessage({ title: 'Hello', page: REFERENCED_PATH }),
+        window.origin
+      )
+    );
+  });
+
+  it('swaps the path for the document it points at', async () => {
+    const iframe = fakeIframe();
+    renderWithReference(iframe.ref, async () => ({
+      path: REFERENCED_PATH,
+      document: { title: 'Deleted Page' },
+    }));
+    await screen.findByLabelText('Title');
+
+    await waitFor(() =>
+      expect(iframe.postMessage).toHaveBeenCalledWith(
+        valuesMessage({ title: 'Hello', page: { title: 'Deleted Page' } }),
+        window.origin
+      )
+    );
+  });
+});
+
 describe('usePreviewConnection', () => {
   it('answers the ready handshake with the registered document', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
     iframe.postMessage.mockClear();
 
     messageFromPreview(readyMessage(), iframe.ref.current?.contentWindow);
@@ -103,7 +218,7 @@ describe('usePreviewConnection', () => {
   it('reposts on every edit — the store chokepoint carries changes to the wire', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     iframe.postMessage.mockClear();
 
     await userEvent.type(input, '!');
@@ -116,7 +231,7 @@ describe('usePreviewConnection', () => {
   it('does not repost on markSaved — the values reference is preserved', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
     iframe.postMessage.mockClear();
 
@@ -129,7 +244,7 @@ describe('usePreviewConnection', () => {
   it('sets a preview activate message active and focuses the field', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     expect(input).not.toHaveFocus();
 
     messageFromPreview(
@@ -146,7 +261,7 @@ describe('usePreviewConnection', () => {
   it('ignores the wrong origin, the wrong source, and malformed data', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
     iframe.postMessage.mockClear();
 
     messageFromPreview(
@@ -174,7 +289,7 @@ describe('usePreviewConnection', () => {
     render(
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [stringFieldPlugin],
+          plugins: [stringFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >
@@ -217,7 +332,7 @@ describe('usePreviewConnection', () => {
     const tree = (documentPath: string) => (
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [stringFieldPlugin],
+          plugins: [stringFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >
@@ -226,13 +341,13 @@ describe('usePreviewConnection', () => {
           path={documentPath}
           document={{ title: 'Hello' }}
         >
-          <Field address='title' />
+          <LabelledFields />
           <Connection iframeRef={iframe.ref} />
         </FormProvider>
       </TinaProvider>
     );
     const { rerender } = render(tree(path));
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
     iframe.postMessage.mockClear();
 
     rerender(tree(otherPath));
@@ -255,6 +370,8 @@ describe('usePreviewConnection', () => {
           onSave: null,
           seedKey: path,
           discardEdits: () => {},
+          hooks: [],
+          staleDraft: null,
         }}
       >
         {children}
@@ -271,7 +388,7 @@ describe('usePreviewConnection', () => {
   it('goes silent after unmount', async () => {
     const iframe = fakeIframe();
     const { unmount } = renderConnected(iframe.ref);
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
     unmount();
     iframe.postMessage.mockClear();
 

@@ -1,4 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import {
+  MAX_REQUEST_BODY_BYTES,
+  RequestBodyTooLargeError,
+} from '../../core/request-body';
 import { type RpcHandlerConfig, createRpcHandler } from '../../rpc/handler';
 
 export type { RpcHandlerConfig };
@@ -19,7 +23,13 @@ const readBody = async (req: ExpressLikeRequest): Promise<string> => {
     return typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
   }
   const chunks: Buffer[] = [];
-  for await (const chunk of req) chunks.push(chunk as Buffer);
+  let bytes = 0;
+  for await (const chunk of req) {
+    const part = chunk as Buffer;
+    bytes += part.byteLength;
+    if (bytes > MAX_REQUEST_BODY_BYTES) throw new RequestBodyTooLargeError();
+    chunks.push(part);
+  }
   return Buffer.concat(chunks).toString('utf8');
 };
 
@@ -69,6 +79,11 @@ export const tinaMiddleware = (config: RpcHandlerConfig): TinaMiddleware => {
       try {
         await sendWebResponse(await handler(await toWebRequest(req)), res);
       } catch (cause) {
+        if (cause instanceof RequestBodyTooLargeError) {
+          res.statusCode = 413;
+          res.end(cause.message);
+          return;
+        }
         next(cause);
       }
     })();

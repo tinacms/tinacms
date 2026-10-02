@@ -22,7 +22,7 @@
     "clsx": "^2.1.1",
     "graphql": "^15.10.1",
     "mongodb-level": "^0.0.4",
-    "next": "15.5.12",
+    "next": "15.5.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^4.12.0",

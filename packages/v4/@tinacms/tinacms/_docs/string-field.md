@@ -16,7 +16,7 @@ import { t } from '@tinacms/tinacms';
 const collection = {
   name: 'post',
   fields: [
-    t.string({ name: 'title', label: 'Title', required: true, min: 3 }),
+    t.string({ name: 'title', label: 'Title', validators: [required(), min(3)] }),
   ],
 };
 ```
@@ -27,10 +27,12 @@ The config (`StringFieldSchema`, which extends `BaseFieldSchema`):
 |---|---|---|
 | `name` | `string` (necessary) | The field key in the document. It is also the alternative label. |
 | `label` | `string` | The label on the screen. The validation messages use it. |
-| `required` | `boolean` | An empty value does not pass validation. Refer to the rules below. |
-| `min` | `number` | The minimum length |
-| `max` | `number` | The maximum length |
-| `pattern` | `string` | The `RegExp` source that the value must obey |
+
+> `required`, `min`, `max` and `pattern` are no longer config keys. They are
+> validators that a core plugin registers, and a collection attaches them with
+> `validators`. Refer to
+> [Validation in two layers](./field-plugins.md#validation-in-two-layers).
+
 
 ## The descriptor
 
@@ -39,7 +41,6 @@ The client segment (`string-field.client.tsx`) takes the `string` key:
 ```tsx
 defineClientPlugin({
   field: {
-    type: 'string',           // STRING_FIELD_TYPE
     Component: StringField,
     defaultValue: '',         // seeds a new/absent field on ingest
     metadata: { layout: 'inline' },
@@ -47,6 +48,11 @@ defineClientPlugin({
   },
 });
 ```
+
+The descriptor does not carry `type`. `string-field.plugin.ts` claims the
+`string` key with `field: { type: STRING_FIELD_TYPE, contractVersion: 1 }`
+on the manifest (see
+[`field-plugins.md`](./field-plugins.md#2-the-client-segment-and-the-descriptor-clienttsx)).
 
 The descriptor has no `validate`, `parse`, or `serialize` function. TinaCMS
 stores the value without a change, and `schema` holds all the rules.
@@ -59,16 +65,10 @@ schema. The messages use `label`. If the config has no `label`, the messages use
 
 | Config | Rule | Message |
 |---|---|---|
-| `min` | `.min(min)` | `<label> must be at least <min> characters` |
-| `max` | `.max(max)` | `<label> must be at most <max> characters` |
-| `pattern` | `.regex(...)` | `<label> is invalid` |
-| `required` | `.min(1)`, but only if `min` is not more than zero | `<label> is required` |
 
 These conditions are important:
 
-- **`required` with `min`** — If `min` is more than zero, `required` adds no
-  rule. The `min` message tells the user about the empty value. If a necessary
-  field has no `min`, the schema adds `.min(1, "<label> is required")`.
+
 - **Optional fields** — The schema changes `''` and `null` to `undefined`. These
   values pass validation as `.optional()`. Thus an empty optional string is
   correct.
@@ -98,7 +98,7 @@ export function StringField() {
 
   return (
     <div>
-      <input ref={inputRef} aria-label={address} value={value ?? ''}
+      <input ref={inputRef} id={address} value={value ?? ''}
         onChange={(e) => setValue(e.target.value)} />
       {errors.map((e) => <span key={e} role='alert'>{e}</span>)}
     </div>
@@ -109,8 +109,9 @@ export function StringField() {
 ## The connections
 
 - The manifest is `string-field.plugin.ts`. It calls `definePlugin({ name:
-  'tina:field:string', provides: ['field'], client: () =>
-  import('./string-field.client') })`, and it exports `stringFieldPlugin`.
+  'tina:field:string', provides: ['field'], field: { type: STRING_FIELD_TYPE,
+  contractVersion: 1 }, client: () => import('./string-field.client') })`, and
+  it exports `stringFieldPlugin`.
 - The registration is in `plugins/fields/index.ts`. That file adds the plugin to
   `corePlugins`, and it supplies `t.string`.
 

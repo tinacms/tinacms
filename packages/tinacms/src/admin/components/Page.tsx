@@ -7,6 +7,7 @@ import {
 } from '@tinacms/toolkit';
 import React from 'react';
 import { TinaIcon } from '@toolkit/icons';
+import { AnnouncementsBanner } from './AnnouncementsBanner';
 
 export const PageWrapper = ({
   headerClassName,
@@ -27,16 +28,13 @@ export const PageWrapper = ({
           <BranchPreviewButton />
         </div>
       </div>
+      <AnnouncementsBanner />
       {children}
     </div>
   );
 };
 
-export const PageHeader = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const PageHeader = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className='pt-4 pb-2 px-6'>
       <div className='w-full flex justify-between items-end'>{children}</div>

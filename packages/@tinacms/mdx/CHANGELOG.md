@@ -1,5 +1,95 @@
 # @tinacms/mdx
 
+## 2.3.0
+
+### Minor Changes
+
+- [#7409](https://github.com/tinacms/tinacms/pull/7409) [`e6bf2cf`](https://github.com/tinacms/tinacms/commit/e6bf2cf958e9acffffff73bfe90e492d3491bf05) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Replace `prettier` with a small printer built for the one job it did here: turning a JSON object into the `{…}` expression that `stringifyProps` writes into `.mdx` attributes.
+
+  `prettier` accounted for roughly 760 KB of the browser bundle, and the only thing ever handed to it was `JSON.stringify(value)`. No JSX, no expressions, nothing that needed a general-purpose formatter.
+
+  That output lands verbatim in content files, so the replacement has to lay objects out exactly as prettier did, or the next save rewrites props across every affected file in a repository. The new printer reproduces prettier 2.8.8's estree printer over the subset JSON can reach: quote preference, `printNumber` normalisation, numeric-string key unquoting, the concise `fill` layout for all-numeric arrays, the three assignment layouts, break propagation, and printWidth 80 measured with the `const dummyFunc = ` prefix. The bytes written into a repository do not change.
+
+  What prettier prints for 9,370 inputs is recorded in a checked-in snapshot, and the test compares the printer against that file. All 66 `src/next/tests` fixtures stay byte-identical.
+
+  `prettier` is removed from the package. `esutils` and `emoji-regex` are added, 50 KB combined, because prettier defines its identifier and string-width rules in terms of those two packages.
+
+  On top of the acorn de-duplication, the browser bundle drops from 1,578,764 to 869,572 bytes raw and from 356,471 to 170,980 gzipped.
+
+### Patch Changes
+
+- Updated dependencies [[`dff369c`](https://github.com/tinacms/tinacms/commit/dff369c296f84347ad816ab9f737e74fc8268073), [`82a7c3b`](https://github.com/tinacms/tinacms/commit/82a7c3be6e493f403050791ed25715a59d824339)]:
+  - @tinacms/schema-tools@2.10.1
+
+## 2.2.3
+
+### Patch Changes
+
+- [#7525](https://github.com/tinacms/tinacms/pull/7525) [`df35183`](https://github.com/tinacms/tinacms/commit/df351832c37fd0efaf5a06cb6cde9a5ec404201e) Thanks [@wicksipedia](https://github.com/wicksipedia)! - `sanitizeUrl` no longer returns the value it was given when `new URL()` cannot parse it. A value that still names a scheme, including one disguised with a null byte or a zero-width character, now returns an empty string. Relative URLs name no scheme and are kept as they were.
+
+## 2.2.2
+
+### Patch Changes
+
+- [#7449](https://github.com/tinacms/tinacms/pull/7449) [`d0593a3`](https://github.com/tinacms/tinacms/commit/d0593a37a42c9f393bbafea252cf0c1fd6a2f03a) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Parse a hard break, and strikethrough, inside a link. `[a\`⏎`b](/x)` and `[~~a~~](/x)` both threw, collapsing the whole rich-text field to an `invalid_markdown` blob. Part of #7415.
+
+- [#7450](https://github.com/tinacms/tinacms/pull/7450) [`dbd9234`](https://github.com/tinacms/tinacms/commit/dbd9234de2c8976e986faaeefd161e3f42520200) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Stop writing a hard break where markdown cannot represent one. `one\` with nothing after it, or a break before raw HTML or an inline template, came back as a literal backslash the author never typed. Fixes #5426. Part of #7415.
+
+- [#7476](https://github.com/tinacms/tinacms/pull/7476) [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d) Thanks [@kulesy](https://github.com/kulesy)! - chore(tinacms-pkgs): point `repository.directory` at each package's own folder
+
+  Eight packages declared a `repository.directory` copied from whichever package they were forked from, so the "repository" link on their npm pages resolved to unrelated source. Also drops a dead `generate:schema` script from `@tinacms/metrics`, `@tinacms/cli` and `@tinacms/schema-tools` - it referenced a `scripts/generateSchema.js` that has never existed in the repo and nothing invoked it.
+
+- [#7451](https://github.com/tinacms/tinacms/pull/7451) [`16b9ca1`](https://github.com/tinacms/tinacms/commit/16b9ca173a8f26e885d8a924a6ff89f0eb062f18) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Split an `h3`–`h6` on a hard break instead of losing it. Those levels have no setext form, so the break silently became a space. `#` and `##` are unchanged. Part of #7415.
+
+- Updated dependencies [[`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa), [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589)]:
+  - @tinacms/schema-tools@2.10.0
+
+## 2.2.1
+
+### Patch Changes
+
+- [#7407](https://github.com/tinacms/tinacms/pull/7407) [`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Ship one copy of the `acorn` parser in `@tinacms/mdx` instead of three, cutting `dist/index.browser.js` from 1,976,421 to 1,578,764 bytes (440,787 to 356,471 gzipped) and `dist/index.js` from 2,013,419 to 1,615,828 bytes (452,063 to 367,630 gzipped). The catalog pinned `acorn` to 8.8.2 while `micromark-extension-mdxjs` pulled 8.16.0, so two 8.x copies were bundled side by side; separately, `acorn-jsx` reaches `acorn` through `require`, which acorn's export map answers with its CJS build while every other importer gets the ESM build, bundling the parser a second time. Aligning the catalog to `^8.16.0` and aliasing `acorn` to its ESM entry in the `@tinacms/mdx` esbuild config collapses all three into one. Parser and serializer output is unchanged — `parseMDX`/`serializeMDX` round-trips over the package's 64 markdown fixtures produce byte-identical results from the old and new bundles.
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the unused `typedoc` dependency
+
+  `typedoc` landed in `@tinacms/mdx`'s runtime dependencies by copy-paste and has shipped to every consumer since, dragging an unmet `typescript` peer range with it. Nothing in `src/` imports it and only the `docs` script used it, so both are removed along with the now-orphaned `typedoc-plugin-markdown` and `concat-md` catalog entries.
+
+- [#7466](https://github.com/tinacms/tinacms/pull/7466) [`de5c7d7`](https://github.com/tinacms/tinacms/commit/de5c7d72b67f589f1f5c4bccc5f5677e70cd7e2d) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Stop importing the `uvu` test runner from shipped source
+
+  `@tinacms/mdx` listed `uvu` as a runtime dependency and imported it in two shortcode parsing files, in both cases only for `ok` as a one-line assertion helper. A local `assert` function replaces those six call sites, so the dependency and its catalog entry are gone. Shortcode parsing behaviour is unchanged.
+
+  This does not remove `uvu` from a consumer's `node_modules`. `micromark` and its extensions still depend on it at runtime, and `@tinacms/mdx` depends on those.
+
+- Updated dependencies []:
+  - @tinacms/schema-tools@2.9.0
+
+## 2.2.0
+
+### Minor Changes
+
+- [#7233](https://github.com/tinacms/tinacms/pull/7233) [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Add a dedicated `@tinacms/mdx/sanitize-url` subpath export containing just the URL-scheme sanitizer, and point `tinacms`'s rich-text renderer (`TinaMarkdown` / `StaticTinaMarkdown`) at it instead of the root `@tinacms/mdx` entry. Previously, importing `sanitizeUrl` pulled in `@tinacms/mdx`'s full remark/mdast/micromark markdown-parsing bundle (~2MB) into every site's client bundle, even though rich-text rendering only needs the ~15-line sanitizer. The root `@tinacms/mdx` export of `sanitizeUrl` is unchanged and still works.
+
+### Patch Changes
+
+- [#7431](https://github.com/tinacms/tinacms/pull/7431) [`064b78e`](https://github.com/tinacms/tinacms/commit/064b78e9407d5d7f91ab11dd8b99de8f8ac38ab1) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Serializer errors that a content editor can hit now say what to change.
+
+  The raw markdown editor prints the thrown message verbatim in the field, so these are read by whoever is editing, not only by developers. "Marks inside inline code are not supported" put a Slate term in front of someone who has never met it, and messages naming internal node types did the same.
+
+  Reworded: the two mark-combination errors, the block and inline node errors, and the one raised for a field type that cannot be written. Each now names what to remove. Schema and template errors are unchanged, since a developer hits those on first run and needs the exact term.
+
+- [#7403](https://github.com/tinacms/tinacms/pull/7403) [`a0e0d2e`](https://github.com/tinacms/tinacms/commit/a0e0d2e8d573abfbfb5a3d277ffe1c2b6d692e37) Thanks [@wicksipedia](https://github.com/wicksipedia)! - `parseMDX` now normalizes CRLF to LF before parsing. A carriage return used to survive micromark into the value of a text node, so a document authored on Windows carried `\r` into the editor.
+
+  GFM task list items now keep their checked state through a round trip. `parseMDX` reads `checked` onto the `li` node, and both stringifiers write it back. A ticked checkbox previously came back unticked on save. `ListItemElement` gains an optional `checked?: boolean` — set only on task list items.
+
+- [#7427](https://github.com/tinacms/tinacms/pull/7427) [`2860f56`](https://github.com/tinacms/tinacms/commit/2860f569b3f4f8f6115ee4399af855ea3baa61e1) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Bold, italic and strikethrough now survive a leading or trailing space in the selection. Selecting `word ` and applying bold used to save `**word **`. CommonMark cannot close emphasis that sits against a space, so the published page showed literal asterisks and the formatting was lost, even though the editor still looked right. The space now sits outside the markers, giving `a **word** more`.
+
+  Indentation at the start of a line is kept as well. A bare space there is whitespace a Markdown parser may discard, and four of them open an indented code block, so an indented line used to reload without its spaces on the `mdx` parser and as a code block on the `markdown` parser. This applies to the first line of a paragraph and to a line broken with Shift+Enter. The leading space is now written as `&#x20;`, so the text comes back the way it was left.
+
+  The fix also covers marks holding only whitespace, empty marks, marks spanning several text nodes, marks inside a link, and combined bold and italic. Whitespace inside a mark, as in `**Hello *world*, again**`, still round trips unchanged.
+
+- Updated dependencies [[`d7a1641`](https://github.com/tinacms/tinacms/commit/d7a16416b1b4bc1ba0e2aabdddcf39ed1e4135d7), [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d), [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d)]:
+  - @tinacms/schema-tools@2.9.0
+
 ## 2.1.11
 
 ### Patch Changes
@@ -242,7 +332,6 @@
 ### Minor Changes
 
 - [#5504](https://github.com/tinacms/tinacms/pull/5504) [`7541614`](https://github.com/tinacms/tinacms/commit/7541614527a02268ea453b23ce84637f978dcf2d) Thanks [@Ben0189](https://github.com/Ben0189)! - Rich text editor - Add strikethrough support
-
   - Added a strikethrough button in the rich text editor, allowing users to apply strikethrough formatting.
   - Strikethrough syntax (`~~word~~`) correctly applies in Markdown mode.
   - **Known Issue:** In the rich text editor, typing `~~word~~` does not currently auto-convert to strikethrough. A fix will follow in an upcoming patch.
@@ -344,7 +433,6 @@
 ### Minor Changes
 
 - 324950a: Updates Plate Editor to latest version 36.
-
   - Upgrades all remaining packages `Typescript` to version `^5`
   - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
   - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
@@ -421,7 +509,6 @@
   ### Changes in the database file
 
   #### Deprecations and Additions
-
   - **Deprecated**: `onPut`, `onDelete`, and `level` arguments in `createDatabase`.
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
@@ -459,7 +546,6 @@
   ### Migrating `database.ts`
 
   #### a. Replacing `onPut` and `onDelete` with `gitProvider`
-
   - **GitHubProvider Usage**: Replace `onPut` and `onDelete` with `gitProvider`, using the provided `GitHubProvider` for GitHub.
 
   ```typescript
@@ -488,7 +574,6 @@
   ```
 
   #### b. Renaming `level` to `databaseAdapter`
-
   - **Renaming in Code**: Change `level` to `databaseAdapter` for clarity.
 
   ```diff
@@ -499,7 +584,6 @@
   ```
 
   #### c. `createLocalDatabase` Function
-
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
@@ -508,7 +592,6 @@
   ```
 
   #### d. Consolidated Example
-
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
@@ -526,7 +609,6 @@
   ### Summary of Authentication Updates in Config
 
   #### a. AuthProvider and AbstractAuthProvider
-
   - **New**: `authProvider` in `defineConfig`.
   - **Class**: `AbstractAuthProvider` for extending new auth providers.
   - **Clerk Auth Provider**: New provider added.
@@ -534,11 +616,9 @@
   - **Deprecation**: `admin.auth`.
 
   #### b. Auth Provider in Internal Client and Config
-
   - **Transition**: From auth functions to `authProvider` class.
 
   #### c. Migration for Authentication
-
   - **Previous API**:
 
   ```javascript
@@ -570,7 +650,6 @@
   ```
 
   ### TinaCMS Self Hosted backend updates
-
   - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
   - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
 
@@ -800,7 +879,6 @@
 ### Patch Changes
 
 - 973e83f1f: Some fixes around image handling in the rich-text editor
-
   - Stop treating images as block-level
   - Fix issue where images inside links were being stripped out
   - Fix display of .avif images in the media manager
@@ -1091,7 +1169,6 @@
 ### Minor Changes
 
 - 7b0dda55e: Updates to the `rich-text` component as well the shape of the `rich-text` field response from the API
-
   - Adds support for isTitle on MDX elements
   - Fixes issues related to nested marks
   - Uses monaco editor for code blocks

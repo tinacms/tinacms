@@ -26,7 +26,8 @@ import { HashRouter } from 'react-router-dom';
 import type { ResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
-import { useCollectionDocuments } from '../editor/content-queries';
+import type { GlobalNavEntry, NavTarget } from '../core/slot/contract';
+import { useCollectionDocuments, useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
 import { TinaProvider } from '../editor/provider';
@@ -34,10 +35,12 @@ import { toFormId } from '../form/form-store';
 import { DocumentForm } from './document-form';
 import { DocumentScope } from './document-scope';
 import { FormStatusBadge } from './document-status';
-import { useAdminScreens, useTinaSchema } from './hooks';
+import { AdminErrorBoundary } from './error-boundary';
+import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 import { type AdminRoute, COLLECTIONS_ROUTE } from './routing';
 import { useAdminRoute } from './use-admin-route';
 import { useFormColumnWidth } from './use-form-column-width';
+import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
 
 const SHELL_WIDTH = { '--sidebar-width': '18rem' } as CSSProperties;
 
@@ -108,24 +111,17 @@ function DocumentMenu({
   }
   return (
     <SidebarMenu aria-label={`${label} documents`}>
-      {documents.map(({ path, error }) => (
+      {documents.map(({ path }) => (
         <SidebarMenuItem key={path}>
           <SidebarMenuButton
             isActive={path === activePath}
             aria-label={documentName(path)}
-            title={error}
             onClick={() =>
               navigate({ view: 'document', collection: collection.name, path })
             }
           >
             <span className='flex-1 truncate'>{documentName(path)}</span>
-            {error ? (
-              <span role='alert' className='text-destructive text-xs'>
-                Cannot read
-              </span>
-            ) : (
-              <FormStatusBadge formId={toFormId(path)} />
-            )}
+            <FormStatusBadge formId={toFormId(path)} />
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
@@ -133,26 +129,43 @@ function DocumentMenu({
   );
 }
 
-function ScreenMenu({
-  screens,
-  activeName,
+function GlobalNav({
+  entries,
+  activeScreen,
   navigate,
 }: {
-  screens: AdminScreen[];
-  activeName?: string;
+  entries: GlobalNavEntry[];
+  activeScreen?: string;
   navigate: (route: AdminRoute) => void;
 }) {
+  const open = (target: NavTarget) => {
+    if (target.kind === 'screen') {
+      navigate({ view: 'screen', screen: target.screen, segments: [] });
+    } else if (target.kind === 'action') {
+      target.run();
+    }
+  };
   return (
-    <SidebarMenu aria-label='Screens'>
-      {screens.map((screen) => (
-        <SidebarMenuItem key={screen.name}>
+    <SidebarMenu aria-label='Global navigation'>
+      {entries.map(({ label, icon: Icon, target }, index) => (
+        <SidebarMenuItem key={`${index}:${label}`}>
           <SidebarMenuButton
-            isActive={screen.name === activeName}
-            onClick={() =>
-              navigate({ view: 'screen', screen: screen.name, segments: [] })
+            isActive={
+              target.kind === 'screen' && target.screen === activeScreen
             }
+            render={
+              target.kind === 'url' ? (
+                <a
+                  href={target.href}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                />
+              ) : undefined
+            }
+            onClick={() => open(target)}
           >
-            {screen.label}
+            <Icon className='size-4' />
+            <span>{label}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
@@ -272,19 +285,23 @@ export interface TinaAdminProps {
 
 export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
   return (
-    <TinaProvider config={config} queryClient={queryClient}>
-      <HashRouter
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-      >
-        <AdminShell preview={preview} />
-      </HashRouter>
-    </TinaProvider>
+    <AdminErrorBoundary>
+      <TinaProvider config={config} queryClient={queryClient}>
+        <HashRouter
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
+          <AdminShell preview={preview} />
+        </HashRouter>
+      </TinaProvider>
+    </AdminErrorBoundary>
   );
 }
 
 function AdminShell({ preview }: { preview?: ReactNode }) {
+  useUnsavedChangesGuard();
   const schema = useTinaSchema();
   const screens = useAdminScreens();
+  const globalNav = useGlobalNav();
   const { route, navigate } = useAdminRoute();
 
   const activeCollectionName =
@@ -298,6 +315,20 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
   const activeScreen = route.view === 'screen' ? route : undefined;
   const isStaleCollectionRoute =
     activeCollectionName !== undefined && collection === undefined;
+
+  // `get` already answers whether the open path exists — `list` only names a
+  // collection's documents and would need a second, redundant query.
+  const {
+    entry: openEntry,
+    isLoading: isLoadingOpenDocument,
+    error: openDocumentError,
+  } = useDocument(collection?.name, openPath);
+  const isStaleDocumentRoute =
+    collection !== undefined &&
+    openPath !== undefined &&
+    !isLoadingOpenDocument &&
+    openDocumentError === null &&
+    openEntry === null;
 
   return (
     <SidebarProvider style={SHELL_WIDTH}>
@@ -343,12 +374,11 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
             </SidebarGroup>
           ) : null}
 
-          {screens.length > 0 ? (
+          {globalNav.length > 0 ? (
             <SidebarGroup>
-              <SidebarGroupLabel>Screens</SidebarGroupLabel>
-              <ScreenMenu
-                screens={screens}
-                activeName={activeScreen?.screen}
+              <GlobalNav
+                entries={globalNav}
+                activeScreen={activeScreen?.screen}
                 navigate={navigate}
               />
             </SidebarGroup>
@@ -364,6 +394,28 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
           )}
           segments={activeScreen.segments}
         />
+      ) : isStaleDocumentRoute ? (
+        <SidebarInset>
+          <div className='flex items-center gap-1 p-4 pb-2'>
+            <SidebarTrigger />
+          </div>
+          <div className='min-h-0 flex-1 overflow-y-auto'>
+            <Placeholder>No document named “{openPath}”.</Placeholder>
+          </div>
+        </SidebarInset>
+      ) : openPath !== undefined && openDocumentError !== null ? (
+        <SidebarInset>
+          <div className='flex items-center gap-1 p-4 pb-2'>
+            <SidebarTrigger />
+          </div>
+          <div className='min-h-0 flex-1 overflow-y-auto'>
+            <Placeholder>
+              <span role='alert'>
+                Cannot read “{openPath}”. {openDocumentError.message}
+              </span>
+            </Placeholder>
+          </div>
+        </SidebarInset>
       ) : (
         <DocumentScope collection={collection} path={openPath}>
           <SidebarInset className='flex-row'>

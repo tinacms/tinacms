@@ -6,7 +6,7 @@ import { Folder } from 'lucide-react';
 import React from 'react';
 import { useCMS } from 'tinacms';
 
-import 'graphiql/graphiql.min.css';
+import 'graphiql/style.css';
 
 const Playground = () => {
   const cms = useCMS();
@@ -56,8 +56,9 @@ const Playground = () => {
 
   const ref = React.useRef();
 
-  const getToken = () => {
-    return JSON.parse(localStorage.getItem('tinacms-auth') || '{}')?.id_token;
+  const getToken = async () => {
+    const token = await cms.api.tina.authProvider.getToken();
+    return token?.id_token ?? token?.access_token;
   };
 
   if (!autoQueries) {
@@ -133,14 +134,13 @@ const Playground = () => {
         fetcher={async (params, options) => {
           const fetcher = createGraphiQLFetcher({
             url: cms.api.tina.contentApiUrl || __API_URL__,
-            headers: { Authorization: `Bearer ${getToken()}` },
+            headers: { Authorization: `Bearer ${await getToken()}` },
           });
           return fetcher(params, options);
         }}
         query={query}
         defaultEditorToolsVisibility='variables'
         isHeadersEditorEnabled={false}
-        defaultTabs={[]}
         plugins={[
           {
             title: 'Queries',

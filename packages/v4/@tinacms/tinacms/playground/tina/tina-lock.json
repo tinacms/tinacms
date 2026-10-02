@@ -11,14 +11,29 @@
           {
             "name": "title",
             "label": "Title",
-            "required": true,
-            "min": 3,
+            "validators": [
+              {
+                "name": "required"
+              },
+              {
+                "name": "min",
+                "args": [
+                  3
+                ]
+              }
+            ],
             "type": "string"
           },
           {
             "name": "featured",
             "label": "Featured",
             "type": "boolean"
+          },
+          {
+            "name": "body",
+            "label": "Body",
+            "isBody": true,
+            "type": "rich-text"
           }
         ]
       }
@@ -32,6 +47,7 @@
   },
   "primitives": {
     "boolean": 1,
+    "rich-text": 1,
     "string": 1
   }
 }

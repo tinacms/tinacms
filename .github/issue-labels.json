@@ -1,0 +1,28 @@
+{
+  "primary": {
+    "bug": "Broken behavior, error, crash, wrong output",
+    "enhancement": "Feature request, new capability",
+    "security": "Vulnerabilities, code-scanning alerts (file privately first per SECURITY.md)",
+    "documentation": "Docs, READMEs, guides",
+    "technical-debt": "Refactor, dead code, architectural cleanup",
+    "chore": "Dep bumps, config, build, CI, scaffolding",
+    "tests": "Adding or expanding test coverage",
+    "perf": "Slow, scale, throughput, memory",
+    "dx": "Developer-facing CLI / errors / logging",
+    "ux": "Visual, UX, layout, copy, animation",
+    "rich-text": "Plate, MDX, markdown rendering, body field, embed templates",
+    "form-system": "Form fields, validation, dirty state, field plugins",
+    "media": "Media library, upload, browse",
+    "starter-template": "create-tina-app, Astro/Next/Hugo starters",
+    "self-hosted": "Self-hosted setup, externalization, database, sqlite-level",
+    "editorial-workflow": "Branches, PRs, protected-branch flow"
+  },
+  "program": {
+    "v4.0": "Part of the v4 architectural rewrite (epics #6830 to #6837)",
+    "For 4.1": "Scheduled for the 4.1 release window"
+  },
+  "scope": {
+    "onboarding": "Small, well-scoped task suitable for developers new to the project",
+    "🤖AI": "Could be implemented end-to-end by an AI agent in a single prompt"
+  }
+}

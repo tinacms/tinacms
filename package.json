@@ -31,7 +31,10 @@
 		"publish:dev": "pnpm publish -r --tag dev --no-git-checks --access public",
 		"push-tags": "pnpm exec changeset tag && git pull && git push --follow-tags",
 		"lint": "biome lint ./packages ./examples",
-		"format": "biome format --write ./packages/ ./examples/"
+		"format": "biome format --write ./packages/ ./examples/",
+		"size:check": "node scripts/size-baseline.mjs",
+		"size:update": "node scripts/size-baseline.mjs --update",
+		"coverage": "turbo run coverage --filter=\"./packages/v4/**\""
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",

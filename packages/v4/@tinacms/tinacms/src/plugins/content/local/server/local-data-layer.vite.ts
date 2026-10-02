@@ -1,10 +1,26 @@
 import { readFile } from 'node:fs/promises';
+import type { ServerResponse } from 'node:http';
 import path from 'node:path';
 import type { Connect, Plugin } from 'vite';
 import { runCodegen } from '../../../../cli/commands/codegen';
 import { type ResolvedConfig, resolveBuild } from '../../../../config';
 import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
+import { DEFAULT_MEDIA_URL } from '../../../../core/media/contract';
+import {
+  MAX_MEDIA_UPLOAD_BYTES,
+  MAX_REQUEST_BODY_BYTES,
+  RequestBodyTooLargeError,
+} from '../../../../core/request-body';
+import { LOCAL_MEDIA_PLUGIN_NAME } from '../../../media/local/local-media.plugin';
+import {
+  type LocalMedia,
+  createLocalMedia,
+} from '../../../media/local/server/local-media';
+import {
+  dispatchMediaRequest,
+  listMedia,
+} from '../../../media/local/server/media-request';
 import { dispatchContentRequest } from './content-request';
 import {
   type LocalDataLayerOptions,
@@ -25,14 +41,60 @@ const isLoopbackHost = (host: string | undefined): host is string =>
 const isSameOrigin = (origin: string | undefined, host: string): boolean =>
   !origin || origin === `http://${host}` || origin === `https://${host}`;
 
-const MAX_REQUEST_BODY_BYTES = 5 * 1024 * 1024;
+// A multipart upload is a "simple" request that skips the CORS preflight, so the
+// check must reject a cross-origin write itself, not only set CORS headers.
+const isCrossOriginRequest = (req: Connect.IncomingMessage): boolean => {
+  const { origin, host } = req.headers;
+  return (
+    !isLoopbackHost(host) ||
+    !isSameOrigin(origin, host) ||
+    req.headers['sec-fetch-site'] === 'cross-site'
+  );
+};
 
-class RequestBodyTooLargeError extends Error {
-  constructor() {
-    super(`The request body is larger than ${MAX_REQUEST_BODY_BYTES} bytes.`);
-    this.name = 'RequestBodyTooLargeError';
+const coreContentTypeOfRequest = (
+  req: Connect.IncomingMessage
+): string | undefined =>
+  req.headers['content-type']?.replace(/;.*/, '').trim().toLowerCase();
+
+const readRequestBytes = (
+  req: Connect.IncomingMessage,
+  limit: number
+): Promise<Buffer> =>
+  new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let bytes = 0;
+    req.on('data', (chunk: Buffer) => {
+      bytes += chunk.length;
+      if (bytes > limit) {
+        req.pause();
+        reject(new RequestBodyTooLargeError(limit));
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+
+const sendError = (
+  req: Connect.IncomingMessage,
+  res: ServerResponse,
+  cause: unknown
+): void => {
+  if (res.destroyed) return;
+  if (cause instanceof RequestBodyTooLargeError) {
+    res.statusCode = 413;
+    res.end(cause.message, () => req.destroy());
+    return;
   }
-}
+  res.statusCode = 400;
+  if (cause instanceof Error) {
+    res.end(cause.message);
+  } else {
+    res.end(String(cause));
+  }
+};
 
 const readRequestBody = (req: Connect.IncomingMessage): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -52,6 +114,65 @@ const readRequestBody = (req: Connect.IncomingMessage): Promise<string> =>
     req.on('error', reject);
   });
 
+const createMediaHandler = (media: LocalMedia): Connect.NextHandleFunction => {
+  const serveMediaUpload = async (
+    req: Connect.IncomingMessage,
+    res: ServerResponse
+  ) => {
+    if (coreContentTypeOfRequest(req) !== 'multipart/form-data') {
+      res.statusCode = 415;
+      res.end('Expected multipart/form-data');
+      return;
+    }
+    const body = await readRequestBytes(req, MAX_MEDIA_UPLOAD_BYTES);
+    const form = await new Response(new Uint8Array(body), {
+      headers: { 'content-type': req.headers['content-type'] ?? '' },
+    }).formData();
+    const file = form.get('file');
+    const folder = form.get('folder') ?? '';
+    invariant(
+      file instanceof File && typeof folder === 'string',
+      'media-upload-no-file',
+      'A media upload needs a `file` field and an optional `folder` field.'
+    );
+    const mediaPath = await media.save(file, folder);
+    res.setHeader('content-type', 'application/json');
+    res.end(JSON.stringify({ path: mediaPath }));
+  };
+
+  return async (req, res) => {
+    if (isCrossOriginRequest(req)) {
+      res.statusCode = 403;
+      res.end('Cross-origin request rejected');
+      return;
+    }
+    try {
+      const [route, query = ''] = (req.url ?? '').split('?');
+      if (route === '/upload') {
+        await serveMediaUpload(req, res);
+        return;
+      }
+      if (req.method === 'GET') {
+        const page = await listMedia(media, new URLSearchParams(query));
+        res.setHeader('content-type', 'application/json');
+        res.end(JSON.stringify(page));
+        return;
+      }
+      if (coreContentTypeOfRequest(req) !== 'application/json') {
+        res.statusCode = 415;
+        res.end('Expected application/json');
+        return;
+      }
+      const body = await readRequestBody(req);
+      const result = await dispatchMediaRequest(media, JSON.parse(body));
+      res.setHeader('content-type', 'application/json');
+      res.end(JSON.stringify(result));
+    } catch (cause) {
+      sendError(req, res, cause);
+    }
+  };
+};
+
 export interface TinaVitePluginOptions
   extends Omit<LocalDataLayerOptions, 'collections'> {
   /**
@@ -64,6 +185,10 @@ export interface TinaVitePluginOptions
   /** The collections, when the caller does not hand over the whole config. */
   collections?: LocalDataLayerOptions['collections'];
   url?: string;
+  /** Where the local media endpoint listens. */
+  mediaUrl?: string;
+  /** The folder inside the public folder that holds uploads (`uploads` by default). */
+  mediaRoot?: string;
 }
 
 export const tinaLocalDataLayerVitePlugin = (
@@ -76,6 +201,17 @@ export const tinaLocalDataLayerVitePlugin = (
     'tinaLocalDataLayerVitePlugin needs `config` (the loaded tina/config.ts) or `collections`.'
   );
   const dataLayer = createLocalDataLayer({ ...options, collections });
+  const usesLocalMedia =
+    options.config?.plugins.some(
+      ({ name }) => name === LOCAL_MEDIA_PLUGIN_NAME
+    ) ?? false;
+  const media = usesLocalMedia
+    ? createLocalMedia({
+        rootDir: options.rootDir,
+        publicFolder: resolveBuild(options.config?.build).publicFolder,
+        mediaRoot: options.mediaRoot,
+      })
+    : undefined;
 
   // Dev codegen. The config is already loaded, so the loader hands it straight to
   // runCodegen instead of reading tina/config.ts a second time.
@@ -95,27 +231,20 @@ export const tinaLocalDataLayerVitePlugin = (
         if (file.outcome === 'updated') log(`tina: updated ${file.path}`);
       }
     } catch (cause) {
-      log(
-        `tina: codegen failed — ${cause instanceof Error ? cause.message : cause}`
-      );
+      if (cause instanceof Error) {
+        log(`tina: codegen failed — ${cause.message}`);
+      } else {
+        log(`tina: codegen failed — ${String(cause)}`);
+      }
     }
   };
   const serveContentRequest: Connect.NextHandleFunction = async (req, res) => {
-    const { origin, host } = req.headers;
-    if (
-      !isLoopbackHost(host) ||
-      !isSameOrigin(origin, host) ||
-      req.headers['sec-fetch-site'] === 'cross-site'
-    ) {
+    if (isCrossOriginRequest(req)) {
       res.statusCode = 403;
       res.end('Cross-origin request rejected');
       return;
     }
-    const mimeEssence = req.headers['content-type']
-      ?.replace(/;.*/, '')
-      .trim()
-      .toLowerCase();
-    if (mimeEssence !== 'application/json') {
+    if (coreContentTypeOfRequest(req) !== 'application/json') {
       res.statusCode = 415;
       res.end('Expected application/json');
       return;
@@ -126,16 +255,10 @@ export const tinaLocalDataLayerVitePlugin = (
       res.setHeader('content-type', 'application/json');
       res.end(JSON.stringify(result));
     } catch (cause) {
-      if (res.destroyed) return;
-      if (cause instanceof RequestBodyTooLargeError) {
-        res.statusCode = 413;
-        res.end(cause.message, () => req.destroy());
-        return;
-      }
-      res.statusCode = 400;
-      res.end(cause instanceof Error ? cause.message : String(cause));
+      sendError(req, res, cause);
     }
   };
+
   return {
     name: 'tina-local-data-layer',
     config: () => ({
@@ -186,6 +309,12 @@ export const tinaLocalDataLayerVitePlugin = (
             next(cause);
           }
         });
+      }
+      if (media) {
+        server.middlewares.use(
+          options.mediaUrl ?? DEFAULT_MEDIA_URL,
+          createMediaHandler(media)
+        );
       }
       server.middlewares.use(
         options.url ?? DEFAULT_CONTENT_URL,

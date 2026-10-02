@@ -1,6 +1,7 @@
 import { Readable } from 'node:stream';
 import { describe, expect, it } from 'vitest';
 import { definePlugin } from '../core/plugin';
+import { MAX_REQUEST_BODY_BYTES } from '../core/request-body';
 import { defineServerPlugin, publicOp } from '../server';
 import { mountHandler as mountAstro } from './astro';
 import { type TinaMiddleware, tinaMiddleware } from './express';
@@ -58,15 +59,21 @@ describe('the Web-standard adapters', () => {
   });
 });
 
+const chunksOf = (body: string | string[] | undefined): Buffer[] => {
+  if (body === undefined) return [];
+  const parts = Array.isArray(body) ? body : [body];
+  return parts.map((part) => Buffer.from(part));
+};
+
 const nodeRequest = (init: {
   method?: string;
   url?: string;
   headers?: Record<string, string>;
-  body?: string;
+  body?: string | string[];
   parsedBody?: unknown;
   encrypted?: boolean;
 }) =>
-  Object.assign(Readable.from(init.body ? [Buffer.from(init.body)] : []), {
+  Object.assign(Readable.from(chunksOf(init.body)), {
     method: init.method ?? 'POST',
     url: init.url ?? ROUTE,
     headers: {
@@ -137,6 +144,14 @@ describe('the Express adapter', () => {
       })
     );
     expect(JSON.parse(recorder.body)).toEqual({ echoed: 'mounted' });
+  });
+
+  it('refuses a body larger than the limit', async () => {
+    const { recorder, errors } = await runMiddleware(
+      nodeRequest({ body: ['a'.repeat(MAX_REQUEST_BODY_BYTES), 'a'] })
+    );
+    expect(errors).toEqual([]);
+    expect(recorder.statusCode).toBe(413);
   });
 
   it('does not send a body on a GET, and reports the 405', async () => {

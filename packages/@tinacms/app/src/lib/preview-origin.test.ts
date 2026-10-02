@@ -1,11 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  getExpectedPreviewOrigin,
+  getPreviewOrigin,
   isFromTrustedPreviewOrigin,
   postMessageToPreview,
 } from './preview-origin';
 
-const ADMIN = 'https://admin.example';
 const PREVIEW = 'https://preview.example';
 
 // A stand-in for the iframe's content window; we only need an identity to
@@ -15,15 +14,23 @@ const makePeerWindow = () =>
     postMessage: ReturnType<typeof vi.fn>;
   };
 
-describe('getExpectedPreviewOrigin', () => {
-  it('resolves a relative admin URL to the admin origin', () => {
-    expect(getExpectedPreviewOrigin('/posts/hello', ADMIN)).toBe(ADMIN);
+describe('getPreviewOrigin', () => {
+  it('is the origin the admin itself is served from', () => {
+    expect(getPreviewOrigin()).toBe(window.location.origin);
   });
 
-  it('keeps the origin of an absolute preview URL', () => {
-    expect(getExpectedPreviewOrigin(`${PREVIEW}/posts/hello`, ADMIN)).toBe(
-      PREVIEW
-    );
+  /**
+   * The origin used to be resolved from the preview URL, so a URL naming
+   * another origin moved the trust anchor to it. The preview is always loaded
+   * from the admin's own origin, so nothing it carries is consulted here.
+   */
+  it('takes no argument that could name another origin', () => {
+    expect(getPreviewOrigin.length).toBe(0);
+    expect(
+      (getPreviewOrigin as (...args: unknown[]) => string)(
+        `${PREVIEW}/posts/hello`
+      )
+    ).toBe(window.location.origin);
   });
 });
 

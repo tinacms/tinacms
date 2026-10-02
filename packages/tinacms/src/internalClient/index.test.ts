@@ -1,9 +1,14 @@
-import { Client, LocalClient, LocalAuthProvider } from './index';
 import {
   EDITORIAL_WORKFLOW_ERROR,
   EDITORIAL_WORKFLOW_STATUS,
   EditorialWorkflowErrorDetails,
 } from '../toolkit/form-builder/editorial-workflow-constants';
+import {
+  Client,
+  LocalAuthProvider,
+  LocalClient,
+  TinaCloudAuthProvider,
+} from './index';
 
 const makeResponse = ({
   status,
@@ -84,7 +89,7 @@ describe('Tina Client', () => {
       expect(client.authProvider).toBeInstanceOf(LocalAuthProvider);
     });
 
-    it('sends no Authorization header because LocalAuthProvider returns an empty id_token', async () => {
+    it('sends Authorization header with LOCAL token from LocalAuthProvider', async () => {
       const fetchMock = stubFetchOnce(
         makeResponse({ status: 200, body: { data: {} } })
       );
@@ -92,7 +97,7 @@ describe('Tina Client', () => {
       await client.request('{ x }', { variables: {} });
 
       const [, init] = fetchMock.mock.calls[0];
-      expect(init.headers).not.toHaveProperty('Authorization');
+      expect(init.headers).toHaveProperty('Authorization', 'Bearer LOCAL');
     });
   });
 
@@ -212,6 +217,110 @@ describe('Tina Client', () => {
       });
 
       expect(client.contentApiUrl).toBe('https://schema-override.example.com');
+    });
+  });
+
+  describe('getAnnouncements', () => {
+    let client: Client;
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    it('returns null without fetching for a custom content API client', async () => {
+      client = buildClient({
+        customContentApiUrl: 'https://self-hosted.example.com/graphql',
+      });
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('returns null without fetching when contentApiUrlOverride is set in the schema', async () => {
+      client = buildClient({
+        schema: {
+          collections: [],
+          config: {
+            contentApiUrlOverride: '/api/tina/gql',
+          },
+        } as any,
+      });
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('returns null without fetching for a LocalClient', async () => {
+      client = new LocalClient();
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('fetches from the content API base and returns the announcements for a TinaCloud client', async () => {
+      client = buildClient();
+      const announcements = [
+        {
+          id: 'a-1',
+          headline: 'Hello',
+          body: 'World',
+          severity: 'info',
+        },
+      ];
+      stubFetchOnce(
+        makeResponse({
+          status: 200,
+          body: { announcements },
+        })
+      );
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toEqual(announcements);
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://content.tinajs.io/announcement?version=1.2.3'
+      );
+    });
+
+    it('returns null when the response is not ok', async () => {
+      client = buildClient();
+      stubFetchOnce(
+        makeResponse({
+          status: 500,
+          body: { error: 'boom' },
+        })
+      );
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+    });
+
+    it('returns null when the fetch rejects', async () => {
+      client = buildClient();
+      const fetchMock = vi.fn().mockRejectedValueOnce(new Error('network'));
+      vi.stubGlobal('fetch', fetchMock);
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      consoleError.mockRestore();
     });
   });
 
@@ -449,6 +558,64 @@ describe('Tina Client', () => {
       vi.restoreAllMocks();
     });
 
+    it('dispatches cms:session-expired and throws SessionExpiredError on a 401', async () => {
+      const dispatched: { type: string }[] = [];
+      client.events.subscribe('cms:session-expired', (e) => {
+        dispatched.push(e);
+      });
+      stubFetchOnce(
+        makeResponse({ status: 401, body: {}, statusText: 'Unauthorized' })
+      );
+
+      await expect(
+        client.request('{ x }', { variables: {} })
+      ).rejects.toMatchObject({ name: 'SessionExpiredError' });
+      expect(dispatched).toHaveLength(1);
+    });
+
+    it('drains the 401 response body and logs a diagnostic for custom content APIs', async () => {
+      client = buildClient({
+        branch: 'feature',
+        clientId: 'app-42',
+        customContentApiUrl: 'http://tina.io/override',
+      });
+      client.authProvider = {
+        getToken: vi.fn().mockResolvedValue(null),
+      } as any;
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      const response = makeResponse({
+        status: 401,
+        body: {},
+        statusText: 'Unauthorized',
+      });
+      stubFetchOnce(response);
+
+      await expect(
+        client.request('{ x }', { variables: {} })
+      ).rejects.toMatchObject({ name: 'SessionExpiredError' });
+      expect(response.json).toHaveBeenCalled();
+      expect(consoleError).toHaveBeenCalledWith(
+        expect.stringContaining('check the backend')
+      );
+    });
+
+    it('does not dispatch cms:session-expired on other failures', async () => {
+      const dispatched: { type: string }[] = [];
+      client.events.subscribe('cms:session-expired', (e) => {
+        dispatched.push(e);
+      });
+      stubFetchOnce(
+        makeResponse({ status: 500, body: {}, statusText: 'Server Error' })
+      );
+
+      await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
+        /Unable to complete request/
+      );
+      expect(dispatched).toHaveLength(0);
+    });
+
     it('throws with clientId and branch context on a non-200 against a tina.io URL', async () => {
       stubFetchOnce(
         makeResponse({
@@ -524,6 +691,57 @@ describe('Tina Client', () => {
     });
   });
 
+  describe('fetchWithToken session expiry', () => {
+    it('wires the sessionExpiredListener on construction for both clients', () => {
+      expect(typeof buildClient().authProvider.sessionExpiredListener).toBe(
+        'function'
+      );
+      expect(typeof new LocalClient().authProvider.sessionExpiredListener).toBe(
+        'function'
+      );
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    it('dispatches cms:session-expired when a tokened request gets a 401', async () => {
+      const client = buildClient();
+      client.authProvider.getToken = vi
+        .fn()
+        .mockResolvedValue({ access_token: 'stale' });
+      const dispatched: { type: string }[] = [];
+      client.events.subscribe('cms:session-expired', (e) => {
+        dispatched.push(e);
+      });
+      stubFetchOnce(
+        makeResponse({ status: 401, body: {}, statusText: 'Unauthorized' })
+      );
+
+      const res = await client.authProvider.fetchWithToken('/branches', {});
+
+      expect(res.status).toBe(401);
+      expect(dispatched).toHaveLength(1);
+    });
+
+    it('does not dispatch for a 401 without a token', async () => {
+      const client = buildClient();
+      client.authProvider.getToken = vi.fn().mockResolvedValue(null);
+      const dispatched: { type: string }[] = [];
+      client.events.subscribe('cms:session-expired', (e) => {
+        dispatched.push(e);
+      });
+      stubFetchOnce(
+        makeResponse({ status: 401, body: {}, statusText: 'Unauthorized' })
+      );
+
+      await client.authProvider.fetchWithToken('/branches', {});
+
+      expect(dispatched).toHaveLength(0);
+    });
+  });
+
   describe('auth token flow', () => {
     let client: Client;
     let getToken: ReturnType<typeof vi.fn>;
@@ -586,6 +804,74 @@ describe('Tina Client', () => {
       expect(fetchMock.mock.calls[1][1].headers).toMatchObject({
         Authorization: 'Bearer v2',
       });
+    });
+
+    it('prefers the id token when getToken returns both', async () => {
+      getToken.mockResolvedValue({ id_token: 'id', access_token: 'access' });
+      const fetchMock = stubFetchOnce(
+        makeResponse({ status: 200, body: { data: {} } })
+      );
+
+      await client.request('{ x }', { variables: {} });
+
+      const [, init] = fetchMock.mock.calls[0];
+      expect(init.headers).toMatchObject({ Authorization: 'Bearer id' });
+    });
+
+    it('falls back to the access token when there is no id token', async () => {
+      getToken.mockResolvedValue({ access_token: 'access' });
+      const fetchMock = stubFetchOnce(
+        makeResponse({ status: 200, body: { data: {} } })
+      );
+
+      await client.request('{ x }', { variables: {} });
+
+      const [, init] = fetchMock.mock.calls[0];
+      expect(init.headers).toMatchObject({ Authorization: 'Bearer access' });
+    });
+  });
+
+  describe('token sent to TinaCloud', () => {
+    const encode = (obj: Record<string, unknown>) =>
+      Buffer.from(JSON.stringify(obj)).toString('base64url');
+    const accessToken = `${encode({ alg: 'none' })}.${encode({
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    })}.sig`;
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('is the same for content requests and editorial workflow requests', async () => {
+      const client = buildClient({
+        clientId: 'client-id',
+        customContentApiUrl: 'http://tina.io/fakeURL',
+      });
+      (client.authProvider as TinaCloudAuthProvider).setToken({
+        access_token: accessToken,
+        id_token: 'id-token',
+        refresh_token: 'refresh',
+      });
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          makeResponse({ status: 200, body: { data: {} } })
+        )
+        .mockResolvedValueOnce(
+          makeResponse({ status: 200, body: { branchName: 'feature/test' } })
+        );
+      vi.stubGlobal('fetch', fetchMock);
+
+      await client.request('{ x }', { variables: {} });
+      await client.executeEditorialWorkflow({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+      });
+
+      const sent = fetchMock.mock.calls.map(([, init]) =>
+        new Headers(init.headers).get('Authorization')
+      );
+      expect(sent).toEqual(['Bearer id-token', 'Bearer id-token']);
     });
   });
 
@@ -812,6 +1098,40 @@ describe('Tina Client', () => {
       await rejection;
     });
 
+    it('carries the failing file from an indexing failure status', async () => {
+      fetchWithToken
+        .mockResolvedValueOnce(
+          makeResponse({
+            status: 200,
+            body: { requestId: 'req-123' },
+          })
+        )
+        .mockResolvedValueOnce(
+          makeResponse({
+            status: 200,
+            body: {
+              status: EDITORIAL_WORKFLOW_STATUS.ERROR,
+              message: 'Unable to seed content/posts/hello.mdx',
+              errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
+              file: 'content/posts/hello.mdx',
+            },
+          })
+        );
+
+      const promise = client.executeEditorialWorkflow({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+      });
+      const rejection = expect(promise).rejects.toMatchObject({
+        errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
+        file: 'content/posts/hello.mdx',
+      });
+
+      await vi.advanceTimersByTimeAsync(5000);
+
+      await rejection;
+    });
+
     it('retries transient polling failures', async () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
@@ -886,6 +1206,80 @@ describe('Tina Client', () => {
       await vi.advanceTimersByTimeAsync(180 * 5000);
 
       await rejection;
+    });
+  });
+
+  describe('startMediaEditorialWorkflow', () => {
+    let client: Client;
+    let fetchWithToken: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      client = buildClient({ clientId: 'client-id' });
+      fetchWithToken = vi.fn();
+      client.authProvider = { fetchWithToken } as any;
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('posts a rename with the source as repoPath and the target as targetRepoPath', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 202,
+          body: {
+            branchName: 'tina/media-rename-uploads-a-png',
+            requestId: 'workflow-1',
+            status: 'queued',
+          },
+        })
+      );
+
+      await client.startMediaEditorialWorkflow({
+        branchName: 'tina/media-rename-Uploads A.PNG',
+        baseBranch: 'main',
+        operation: 'rename',
+        repoPath: 'uploads/A.PNG',
+        targetRepoPath: 'uploads/b.png',
+      });
+
+      const [url, init] = fetchWithToken.mock.calls[0];
+      expect(url).toBe(
+        'https://content.tinajs.io/editorial-workflow/client-id/media'
+      );
+      expect(init.method).toBe('POST');
+      expect(JSON.parse(init.body)).toEqual({
+        branchName: 'tina/media-rename-Uploads A.PNG',
+        baseBranch: 'main',
+        operation: 'rename',
+        repoPath: 'uploads/A.PNG',
+        targetRepoPath: 'uploads/b.png',
+      });
+    });
+
+    it('still posts an upload without a targetRepoPath', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 202,
+          body: { branchName: 'tina/media-upload-x', requestId: 'workflow-2' },
+        })
+      );
+
+      await client.startMediaEditorialWorkflow({
+        branchName: 'tina/media-upload-x',
+        baseBranch: 'main',
+        operation: 'upload',
+        repoPath: 'uploads/x.png',
+      });
+
+      const body = JSON.parse(fetchWithToken.mock.calls[0][1].body);
+      expect(body).toEqual({
+        branchName: 'tina/media-upload-x',
+        baseBranch: 'main',
+        operation: 'upload',
+        repoPath: 'uploads/x.png',
+      });
+      expect('targetRepoPath' in body).toBe(false);
     });
   });
 });

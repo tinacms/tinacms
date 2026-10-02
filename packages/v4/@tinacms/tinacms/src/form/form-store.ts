@@ -10,6 +10,7 @@ import {
 } from '../core/form/compare';
 import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
+import { type StoredDraft, readDraft, removeDraft, writeDraft } from './drafts';
 
 export type FormId = Brand<string, 'FormId'>;
 
@@ -74,6 +75,7 @@ export interface FormStore {
   setActive: (formId: FormId, address: FieldAddress | null) => void;
   markSaved: (formId: FormId, savedValues?: FormValues) => void;
   discardEdits: (formId: FormId) => void;
+  resumeDraft: (formId: FormId, draft: FormDraft) => void;
   removeForm: (formId: FormId) => void;
 }
 
@@ -96,6 +98,49 @@ export const formStatus = (scope: OpenForm | undefined): FormStatus => {
     : 'dirty';
 };
 
+// The edited state also covers a clean form, so a clean form must not keep values that
+// hide a changed document. A dirty form keeps its edits across mounts. A clean form
+// keeps its values only while the document matches the baseline of the last save. A
+// different document shows that another writer changed the file after the save.
+export const keepsValues = (
+  scope: OpenForm | undefined,
+  incoming: FormValues
+): scope is Extract<OpenForm, { status: 'edited' }> => {
+  if (!isEdited(scope)) return false;
+  if (formStatus(scope) === 'dirty') return true;
+  return valuesEqual(scope.baseline, incoming, scope.equal);
+};
+
+type EditedForm = Extract<OpenForm, { status: 'edited' }>;
+
+export interface FormDraft {
+  readonly values: FormValues;
+  readonly baseline: FormValues;
+}
+
+// The scope a form opens on: this tab's own edits first, then a stored draft whose
+// baseline still matches the document. A draft of an older document is stale and
+// never merged; the editor decides whether to resume it.
+const openingScope = (
+  scope: OpenForm | undefined,
+  formId: FormId,
+  incoming: FormValues,
+  equal: FieldEquality
+): EditedForm | undefined => {
+  if (keepsValues(scope, incoming)) return scope;
+  const draft = readDraft(formId);
+  if (!draft) return undefined;
+  const baseline = toFormValues(draft.baseline);
+  if (!valuesEqual(baseline, incoming, equal)) return undefined;
+  return {
+    status: 'edited',
+    values: toFormValues(draft.values),
+    baseline,
+    errors: {},
+    equal,
+  };
+};
+
 export const fieldDirty = (
   scope: OpenForm | undefined,
   address: FieldAddress
@@ -115,6 +160,7 @@ const DEVTOOLS_ACTION = {
   setActive: 'form/setActive',
   markSaved: 'form/markSaved',
   discardEdits: 'form/discardEdits',
+  resumeDraft: 'form/resumeDraft',
   removeForm: 'form/removeForm',
 } as const;
 type DevtoolsActionLabel =
@@ -134,10 +180,12 @@ export const useFormStore = create<FormStore>()(
 
         registerForm: (formId, values, equal = STRUCTURAL_EQUALITY) =>
           apply((state) => {
-            // TODO(v4): the edited state also covers a clean form, so a clean form
-            // does not re-adopt content that changed outside the editor. A future
-            // auto-save slice arbitrates reload against dirty state.
-            if (isEdited(state.forms[formId])) return state;
+            const scope = state.forms[formId];
+            const opening = openingScope(scope, formId, values, equal);
+            if (opening) {
+              if (opening === scope) return state;
+              return { forms: { ...state.forms, [formId]: opening } };
+            }
             return {
               forms: {
                 ...state.forms,
@@ -195,7 +243,11 @@ export const useFormStore = create<FormStore>()(
                 [formId]: {
                   ...scope,
                   status: 'edited',
-                  baseline: savedValues ?? scope.values,
+                  // A caller passes the form library's own value tree, which it
+                  // keeps mutating in place. The baseline must be a private
+                  // snapshot or a later edit mutates it too and never reads as
+                  // dirty.
+                  baseline: structuredClone(savedValues ?? scope.values),
                   errors: isEdited(scope) ? scope.errors : {},
                 },
               },
@@ -218,6 +270,39 @@ export const useFormStore = create<FormStore>()(
             };
           }, DEVTOOLS_ACTION.discardEdits),
 
+        resumeDraft: (formId, draft) =>
+          apply((state) => {
+            const scope = state.forms[formId];
+            if (!scope) return state;
+            const document = isEdited(scope) ? scope.baseline : scope.values;
+            // Resume applies only the fields that the draft changed. The other
+            // fields keep the value of the current document. A field that the
+            // draft and another writer both changed takes the draft value.
+            const values = { ...document };
+            const addresses = new Set([
+              ...Object.keys(draft.values),
+              ...Object.keys(draft.baseline),
+            ]) as Set<FieldAddress>;
+            for (const address of addresses) {
+              const edited = draft.values[address];
+              if (!scope.equal(address, edited, draft.baseline[address])) {
+                values[address] = edited;
+              }
+            }
+            return {
+              forms: {
+                ...state.forms,
+                [formId]: {
+                  status: 'edited',
+                  values,
+                  baseline: document,
+                  errors: {},
+                  equal: scope.equal,
+                },
+              },
+            };
+          }, DEVTOOLS_ACTION.resumeDraft),
+
         removeForm: (formId) =>
           apply((state) => {
             if (!state.forms[formId]) return state;
@@ -234,6 +319,44 @@ export const useFormStore = create<FormStore>()(
 );
 
 export const readFormStore = (): FormStore => useFormStore.getState();
+
+export const readOpeningScope = (
+  formId: FormId,
+  incoming: FormValues,
+  equal: FieldEquality = STRUCTURAL_EQUALITY
+): EditedForm | undefined =>
+  openingScope(readFormStore().forms[formId], formId, incoming, equal);
+
+// A stored draft the form did not open on because its document changed since.
+export const staleDraft = (
+  formId: FormId,
+  incoming: FormValues,
+  equal: FieldEquality = STRUCTURAL_EQUALITY
+): StoredDraft | undefined => {
+  if (readOpeningScope(formId, incoming, equal)) return undefined;
+  return readDraft(formId);
+};
+
+// Mirrors this tab's edits into storage. Only forms whose scope changed in an
+// update are touched, so another tab's drafts are never rewritten. A form that
+// stops being dirty (saved, discarded, edited back) drops its draft; a form that
+// merely leaves memory keeps it.
+export const syncDrafts = () =>
+  useFormStore.subscribe((next, prev) => {
+    for (const formId of Object.keys(next.forms) as FormId[]) {
+      const scope = next.forms[formId];
+      const before = prev.forms[formId];
+      if (scope === before) continue;
+      if (isEdited(scope) && formStatus(scope) === 'dirty') {
+        writeDraft(formId, {
+          values: toDocument(scope.values),
+          baseline: toDocument(scope.baseline),
+        });
+      } else if (formStatus(before) === 'dirty') {
+        removeDraft(formId);
+      }
+    }
+  });
 
 export const useFormStatus = (formId: FormId): FormStatus =>
   useFormStore((state) => formStatus(state.forms[formId]));

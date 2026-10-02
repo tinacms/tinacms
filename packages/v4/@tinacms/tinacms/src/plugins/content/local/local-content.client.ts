@@ -1,6 +1,7 @@
 import type {
   ContentProvider,
   DocumentEntry,
+  DocumentSummary,
 } from '../../../core/content/contract';
 import type { ClientSlice } from '../../../core/plugin';
 import type { ContentRequest } from './server/content-request';
@@ -25,7 +26,7 @@ const postContentRequest = async <Result>(
 export const createContentSlice = (url: string): ClientSlice => {
   const slice: ContentProvider = {
     list: (collection) =>
-      postContentRequest<DocumentEntry[]>(url, { op: 'list', collection }),
+      postContentRequest<DocumentSummary[]>(url, { op: 'list', collection }),
     get: (collection, path) =>
       postContentRequest<DocumentEntry | null>(url, {
         op: 'get',

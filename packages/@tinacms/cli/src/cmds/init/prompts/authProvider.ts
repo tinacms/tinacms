@@ -1,10 +1,10 @@
-import crypto from 'crypto-js';
+import { randomBytes } from 'node:crypto';
 import prompts from 'prompts';
 
 import type { Framework } from '../';
 import { askTinaCloudSetup } from './askTinaCloudSetup';
 import type { Config, PromptAuthProvider } from './types';
-const supportedAuthProviders: {
+export const supportedAuthProviders: {
   'tina-cloud': PromptAuthProvider;
   'next-auth': PromptAuthProvider;
   other: PromptAuthProvider;
@@ -36,12 +36,13 @@ const supportedAuthProviders: {
       },
     ],
     extraTinaCollections: ['TinaUserCollection'],
+    // Indented for its slot in the generated API route.
     backendAuthProvider: `AuthJsBackendAuthProvider({
-          authOptions: TinaAuthJSOptions({
-            databaseClient: databaseClient,
-            secret: process.env.NEXTAUTH_SECRET,
-          }),
-        })`,
+        authOptions: TinaAuthJSOptions({
+          databaseClient: databaseClient,
+          secret: process.env.NEXTAUTH_SECRET,
+        }),
+      })`,
     backendAuthProviderImports: [
       {
         from: 'tinacms-authjs',
@@ -68,9 +69,7 @@ const authProviderUpdateConfig: {
         name: 'nextAuthSecret',
         type: 'text',
         message: `What is the NextAuth.js Secret? (Hit enter to use a randomly generated secret)`,
-        initial:
-          process.env.NEXTAUTH_SECRET ||
-          crypto.lib.WordArray.random(16).toString(),
+        initial: process.env.NEXTAUTH_SECRET || randomBytes(16).toString('hex'),
       },
     ]);
     config.envVars.push({

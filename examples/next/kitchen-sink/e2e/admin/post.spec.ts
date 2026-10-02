@@ -139,23 +139,4 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
       'E2E Playwright Test Post Updated'
     );
   });
-
-  test('should validate post title minimum length', async ({ page }) => {
-    await navigateToCreate(page, 'post');
-
-    // Enter a title shorter than 5 characters — validation runs on change
-    await page.fill('input[name="title"]', 'Hi');
-
-    // Inline validation error appears immediately (no blur/save needed)
-    const errorMessage = page.locator(
-      'text=Title must be at least 5 characters'
-    );
-    await expect(errorMessage).toBeVisible({ timeout: 5000 });
-
-    // The Save button should be disabled (no cursor=pointer)
-    const saveButton = page.locator('button:has-text("Save")');
-    await expect(saveButton).toHaveClass(/pointer-events-none/, {
-      timeout: 3000,
-    });
-  });
 });

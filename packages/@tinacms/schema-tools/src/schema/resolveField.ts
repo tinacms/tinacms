@@ -42,8 +42,11 @@ export const resolveField = (
       if (field.list) {
         return {
           component: 'list',
+          // The list plugin builds each item from `field.field` alone, so
+          // anything the item's input needs has to be carried in here.
           field: {
             component: 'image',
+            ...(field.accept ? { accept: field.accept } : {}),
           },
           ...field,
           ...extraFields,

@@ -1,6 +1,5 @@
 import { type FieldAddress, toFieldAddress } from '../field/address';
 import type { FieldTransformContext } from '../field/contract';
-import type { FieldRegistry } from '../field/registry';
 import type { FieldSchema } from '../schema/types';
 
 export const sameValue = (a: unknown, b: unknown): boolean => {
@@ -21,9 +20,9 @@ export const STRUCTURAL_EQUALITY: FieldEquality = (_address, a, b) =>
 
 export const fieldEqualityFor = (
   fields: FieldSchema[],
-  registry: FieldRegistry,
-  context: FieldTransformContext = {}
+  context: FieldTransformContext
 ): FieldEquality => {
+  const { registry } = context;
   const declared = new Map<FieldAddress, (a: unknown, b: unknown) => boolean>();
   for (const node of fields) {
     const isEqual = registry.get(node.type)?.isEqual;

@@ -2,12 +2,16 @@
   "name": "tinacms",
   "type": "module",
   "typings": "dist/index.d.ts",
-  "version": "3.11.0",
+  "version": "3.14.2",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./dist/client": "./dist/client.js",
+    "./dist/client": {
+      "types": "./dist/client.d.ts",
+      "browser": "./dist/client.browser.js",
+      "default": "./dist/client.js"
+    },
     "./react": "./dist/react.js",
     "./dist/react": "./dist/react.js",
     "./tina-field": "./dist/tina-field.js",
@@ -30,7 +34,8 @@
       {
         "name": "src/client.ts",
         "target": "node"
-      }
+      },
+      "src/client.browser.ts"
     ]
   },
   "license": "Apache-2.0",
@@ -86,12 +91,10 @@
     "@udecode/plate-slash-command": "catalog:",
     "@udecode/plate-table": "catalog:",
     "@udecode/plate-trailing-block": "catalog:",
-    "async-lock": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "cmdk": "catalog:",
     "color-string": "catalog:",
-    "crypto-js": "catalog:",
     "date-fns": "4.1.0",
     "es-toolkit": "^1.42.0",
     "final-form": "catalog:",
@@ -136,7 +139,7 @@
     "identity-obj-proxy": "catalog:",
     "jest-file-snapshot": "^0.7.0",
     "lowlight": "catalog:",
-    "next": "14.2.35",
+    "next": "15.5.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-is": "^18.3.1",

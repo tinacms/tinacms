@@ -26,11 +26,13 @@ export const createMediaRouter = (config: PathConfig) => {
       const limit = requestURL.searchParams.get('limit');
       const cursor = requestURL.searchParams.get('cursor');
       const search = requestURL.searchParams.get('search');
+      const ext = requestURL.searchParams.get('ext');
       const media = await mediaModel.listMedia({
         searchPath: folder,
         cursor,
         limit,
         search,
+        ext,
       });
       res.end(JSON.stringify(media));
     } catch (error) {
@@ -161,11 +163,32 @@ export const parseMediaFolder = (str: string) => {
   return returnString;
 };
 
+/**
+ * Lowercased extension without the dot. Query strings and dotfiles yield ''.
+ * Mirrors `extensionOf` in @tinacms/schema-tools — duplicated rather than
+ * imported so the dev server keeps no runtime dependency on the toolkit.
+ */
+const extensionOf = (value: string): string => {
+  const withoutQuery = value.split(/[?#]/)[0];
+  const dot = withoutQuery.lastIndexOf('.');
+  const slash = withoutQuery.lastIndexOf('/');
+  return dot > slash + 1 ? withoutQuery.slice(dot + 1).toLowerCase() : '';
+};
+
+/** Parses the `ext` param. An empty or all-blank value means "no filter". */
+const parseExt = (ext?: string): string[] =>
+  (ext ?? '')
+    .split(',')
+    .map((part) => part.trim().toLowerCase())
+    .filter(Boolean);
+
 interface MediaArgs {
   searchPath: string;
   cursor?: string;
   limit?: string;
   search?: string;
+  /** Comma-separated extensions, without the dot. Empty means no filter. */
+  ext?: string;
 }
 
 interface File {
@@ -399,6 +422,8 @@ export class MediaModel {
         };
       }
 
+      const ext = parseExt(args.ext);
+
       const search = args.search?.trim().toLowerCase();
       if (search) {
         return await this.searchMedia({
@@ -406,6 +431,7 @@ export class MediaModel {
           validatedPath,
           searchPath,
           search,
+          ext,
           cursor: args.cursor,
           limit: args.limit,
         });
@@ -461,7 +487,9 @@ export class MediaModel {
       const allDirectories = sortedItems
         .filter((x) => !x.isFile)
         .map((x) => x.src);
-      const allFiles = sortedItems.filter((x) => x.isFile);
+      const allFiles = sortedItems
+        .filter((x) => x.isFile)
+        .filter((x) => !ext.length || ext.includes(extensionOf(x.filename)));
 
       const directories = offset === 0 ? allDirectories : [];
       const files = allFiles.slice(offset, offset + limit);
@@ -491,6 +519,7 @@ export class MediaModel {
     validatedPath,
     searchPath,
     search,
+    ext,
     cursor,
     limit,
   }: {
@@ -498,6 +527,7 @@ export class MediaModel {
     validatedPath: string;
     searchPath: string;
     search: string;
+    ext: string[];
     cursor?: string;
     limit?: string;
   }): Promise<ListMediaRes> {
@@ -548,6 +578,7 @@ export class MediaModel {
           continue;
         }
         if (!relPath.toLowerCase().includes(search)) continue;
+        if (ext.length && !ext.includes(extensionOf(entry))) continue;
 
         let src = `/${relPath}`;
         if (searchPath) src = `/${searchPath}${src}`;

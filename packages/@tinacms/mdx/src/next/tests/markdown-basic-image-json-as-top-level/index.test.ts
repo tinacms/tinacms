@@ -1,7 +1,7 @@
-import { it, expect } from 'vitest';
+import { expect, it } from 'vitest';
 import { stringifyMDX } from '../../stringify';
-import { field } from './field';
 import * as util from '../util';
+import { field } from './field';
 import node from './node.json';
 
 it('matches input', () => {

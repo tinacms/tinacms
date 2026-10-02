@@ -1,3 +1,11 @@
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
 import { Label } from '@tinacms/ui/components/label';
 import { use, useState } from 'react';
@@ -5,8 +13,18 @@ import { toFieldAddress } from '../core/field/address';
 import type { FieldSchema } from '../core/schema/types';
 import { FormScopeContext } from '../editor/context';
 import { Field } from '../editor/field';
-import { useFieldRegistry, useFormId, useFormSave } from '../editor/hooks';
-import { useIsFieldDirty, useIsFormDirty } from '../form/form-store';
+import {
+  useDiscardEdits,
+  useFieldRegistry,
+  useFormId,
+  useFormSave,
+  useStaleDraft,
+} from '../editor/hooks';
+import {
+  useFormErrors,
+  useIsFieldDirty,
+  useIsFormDirty,
+} from '../form/form-store';
 import { DocumentStatus } from './document-status';
 
 function FieldRow({ node }: { node: FieldSchema }) {
@@ -16,7 +34,11 @@ function FieldRow({ node }: { node: FieldSchema }) {
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
   return (
     <div className='mb-4 min-w-0'>
-      <Label className='mb-1' htmlFor={labelable ? name : undefined}>
+      <Label
+        className='mb-1'
+        id={`${name}-label`}
+        htmlFor={labelable ? name : undefined}
+      >
         {node.label ?? name}
         {dirty ? (
           <>
@@ -34,25 +56,28 @@ function FieldRow({ node }: { node: FieldSchema }) {
 }
 
 function SaveButton() {
-  const dirty = useIsFormDirty(useFormId());
+  const formId = useFormId();
+  const dirty = useIsFormDirty(formId);
+  const invalid = Object.keys(useFormErrors(formId)).length > 0;
   const save = useFormSave();
   const [failure, setFailure] = useState<string | null>(null);
+  const canSave = dirty && !invalid;
   return (
     <div className='flex flex-col items-start gap-2'>
       <Button
         type='button'
         className='aria-disabled:pointer-events-none aria-disabled:opacity-50'
-        aria-disabled={!dirty}
+        aria-disabled={!canSave}
         onClick={() => {
-          if (!dirty) return;
+          if (!canSave) return;
           setFailure(null);
           save().catch((cause) => {
             console.error('[tinacms] Save failed:', cause);
-            setFailure(
-              cause instanceof Error && cause.message
-                ? cause.message
-                : 'Save failed.'
-            );
+            if (cause instanceof Error && cause.message) {
+              setFailure(cause.message);
+            } else {
+              setFailure('Save failed.');
+            }
           });
         }}
       >
@@ -64,6 +89,52 @@ function SaveButton() {
         </p>
       ) : null}
     </div>
+  );
+}
+
+function DiscardButton() {
+  const dirty = useIsFormDirty(useFormId());
+  const discard = useDiscardEdits();
+  return (
+    <Button
+      type='button'
+      variant='outline'
+      className='aria-disabled:pointer-events-none aria-disabled:opacity-50'
+      aria-disabled={!dirty}
+      onClick={() => {
+        if (!dirty) return;
+        discard();
+      }}
+    >
+      Discard
+    </Button>
+  );
+}
+
+// A modal, so no keystroke can overwrite the stored draft before the editor
+// decides what happens to it.
+function StaleDraftDialog() {
+  const stale = useStaleDraft();
+  return (
+    <AlertDialog open={stale !== null}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Resume your unsaved edits?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This document changed after you made these edits. Resume them on top
+            of the current version, or discard them.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <Button type='button' variant='outline' onClick={stale?.discard}>
+            Discard draft
+          </Button>
+          <Button type='button' onClick={stale?.resume}>
+            Resume edits
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
@@ -79,10 +150,14 @@ export function DocumentForm() {
         </h2>
         <DocumentStatus />
       </header>
+      <StaleDraftDialog />
       {scope.collection.fields.map((node) => (
         <FieldRow key={node.name} node={node} />
       ))}
-      <SaveButton />
+      <div className='flex items-start gap-2'>
+        <SaveButton />
+        <DiscardButton />
+      </div>
     </>
   );
 }

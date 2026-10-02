@@ -17,24 +17,50 @@ export type {
   ContentProvider,
   ContentSlice,
   DocumentEntry,
+  DocumentSummary,
 } from './core/content/contract';
+export type {
+  MediaItem,
+  MediaPage,
+  MediaPageRequest,
+  MediaProvider,
+  MediaSlice,
+} from './core/media/contract';
 export type { AdminScreen, AdminScreenProps } from './core/screen/contract';
 export {
   type Capability,
   definePlugin,
   type PluginManifest,
 } from './core/plugin';
+export {
+  defineHook,
+  defineHooksPlugin,
+  type HookDefinition,
+  type RegisteredHook,
+} from './core/form/hooks';
 export type {
   CollectionFormat,
   CollectionSchema,
   FieldSchema,
+  HookRef,
   TinaDocument,
+  ValidatorRef,
 } from './core/schema/types';
 export { localContentPlugin } from './plugins/content/local/local-content.plugin';
-export { corePlugins, t } from './plugins/fields';
+export { localMediaPlugin } from './plugins/media/local/local-media.plugin';
+export {
+  corePlugins,
+  max,
+  min,
+  pattern,
+  required,
+  t,
+  v,
+} from './plugins/fields';
 export type {
   BooleanFieldSchema,
   DatetimeFieldSchema,
   NumberFieldSchema,
+  RichTextFieldSchema,
   StringFieldSchema,
 } from './plugins/fields';

@@ -1,6 +1,6 @@
-import { factoryTag } from './factory-tag';
-import type { Construct, Tokenizer } from 'micromark-util-types';
 import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression';
+import type { Construct, Tokenizer } from 'micromark-util-types';
+import { factoryTag } from './factory-tag';
 
 export const jsxText: (
   acorn: Acorn | undefined,

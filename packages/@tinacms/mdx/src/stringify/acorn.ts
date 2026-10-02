@@ -5,12 +5,9 @@ import type {
 } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
-// @ts-ignore Fix this by updating prettier
-import parser from 'prettier/esm/parser-espree.mjs';
-// @ts-ignore Fix this by updating prettier
-import prettier from 'prettier/esm/standalone.mjs';
 import { rootElement, serializeMDX } from '.';
 import * as Plate from '../parse/plate';
+import { printObjectLiteral } from './print-object-literal';
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
@@ -261,7 +258,9 @@ export function stringifyProps(
         }
         break;
       default:
-        throw new Error(`Stringify props: ${field.type} not yet supported`);
+        throw new Error(
+          `A "${field.type}" field can't be saved as markdown yet. Remove this block, or ask a developer to change the field.`
+        );
     }
   });
   if (template.match) {
@@ -290,21 +289,9 @@ export function stringifyProps(
   return { attributes, children, useDirective, directiveType } as any;
 }
 
-/**
- * Use prettier to determine how to format potentially large objects as strings
- */
 function stringifyObj(obj: unknown, flatten: boolean) {
   if (typeof obj === 'object' && obj !== null) {
-    const dummyFunc = `const dummyFunc = `;
-    const res = prettier
-      .format(`${dummyFunc}${JSON.stringify(obj)}`, {
-        parser: 'acorn',
-        trailingComma: 'none',
-        semi: false,
-        plugins: [parser],
-      })
-      .trim()
-      .replace(dummyFunc, '');
+    const res = printObjectLiteral(obj);
     return flatten ? res.replaceAll('\n', '').replaceAll('  ', ' ') : res;
   } else {
     throw new Error(

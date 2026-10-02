@@ -8,8 +8,11 @@ import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
 import { useFormId } from '../editor/hooks';
+import { draftKey, readDraft } from '../form/drafts';
 import { useFormStore } from '../form/form-store';
+import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 import { useAdminRoute } from './use-admin-route';
 
@@ -30,7 +33,8 @@ const store: Record<string, DocumentEntry[]> = {
 };
 
 const provider: ContentProvider = {
-  list: async (collection) => store[collection] ?? [],
+  list: async (collection) =>
+    (store[collection] ?? []).map(({ path }) => ({ path })),
   get: async (collection, path) =>
     (store[collection] ?? []).find((entry) => entry.path === path) ?? null,
   update: async (collection, path, value) => {
@@ -44,6 +48,7 @@ const provider: ContentProvider = {
 };
 
 const listCalls: string[] = [];
+const getCalls: string[] = [];
 
 const contentPlugin = definePlugin({
   name: 'test:content',
@@ -55,7 +60,10 @@ const contentPlugin = definePlugin({
           listCalls.push(collection);
           return provider.list(collection);
         },
-        get: provider.get,
+        get: (collection: string, path: string) => {
+          getCalls.push(path);
+          return provider.get(collection, path);
+        },
         update: provider.update,
       }),
     },
@@ -79,17 +87,55 @@ function MediaScreen({ segments }: AdminScreenProps) {
   );
 }
 
+const NavIcon = () => null;
+const navAction = vi.fn();
+
 const screenPlugin = definePlugin({
   name: 'test:media-screen',
   client: async () => ({
     default: {
-      screens: [{ name: 'media', label: 'Media', component: MediaScreen }],
+      screens: [
+        { name: 'media', label: 'Media', component: MediaScreen },
+        { name: 'unlinked', label: 'Unlinked', component: MediaScreen },
+      ],
+      slots: {
+        globalNav: [
+          {
+            label: 'Docs',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://tina.io/docs' },
+            order: 10,
+          },
+          {
+            label: 'Media',
+            icon: NavIcon,
+            target: { kind: 'screen', screen: 'media' },
+          },
+          {
+            label: 'Switch branch',
+            icon: NavIcon,
+            target: { kind: 'action', run: navAction },
+            order: 5,
+          },
+          {
+            label: 'Search',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://example.com' },
+            dependsOn: ['search'],
+          },
+        ],
+      },
     },
   }),
 });
 
 const config = asResolvedConfig({
-  plugins: [contentPlugin, screenPlugin, stringFieldPlugin],
+  plugins: [
+    contentPlugin,
+    screenPlugin,
+    stringFieldPlugin,
+    coreValidatorsPlugin,
+  ],
   schema: {
     collections: [
       {
@@ -97,7 +143,14 @@ const config = asResolvedConfig({
         label: 'Posts',
         path: 'content/posts',
         format: 'mdx',
-        fields: [{ name: 'title', label: 'Title', type: 'string' }],
+        fields: [
+          {
+            name: 'title',
+            label: 'Title',
+            type: 'string',
+            validators: [required()],
+          },
+        ],
       },
       {
         name: 'page',
@@ -125,6 +178,12 @@ function PreviewProbe() {
   return <p>previewing {useFormId()}</p>;
 }
 
+const reloadIsBlocked = (): boolean => {
+  const unload = new Event('beforeunload', { cancelable: true });
+  window.dispatchEvent(unload);
+  return unload.defaultPrevented;
+};
+
 const FIXTURES: Record<string, DocumentEntry[]> = {
   post: [
     {
@@ -142,6 +201,7 @@ const FIXTURES: Record<string, DocumentEntry[]> = {
 beforeEach(() => {
   saved.length = 0;
   listCalls.length = 0;
+  getCalls.length = 0;
   window.location.hash = '';
   useFormStore.setState({ forms: {} });
   for (const [collection, entries] of Object.entries(FIXTURES)) {
@@ -167,7 +227,7 @@ describe('TinaAdmin', () => {
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
 
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     expect(input).toHaveValue('Hello');
 
     await user.type(input, '!');
@@ -184,10 +244,35 @@ describe('TinaAdmin', () => {
     expect(input).toHaveValue('Hello!');
   });
 
+  it('disables Save while the document has a validation error', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    const input = await screen.findByLabelText('Title');
+
+    await user.clear(input);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Title is required'
+    );
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+
+    await user.type(input, 'Hello again');
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
+        'aria-disabled',
+        'false'
+      )
+    );
+  });
+
   it('opens the document a deep link names', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fsecond.mdx';
     renderAdmin();
-    expect(await screen.findByLabelText('title')).toHaveValue('Second');
+    expect(await screen.findByLabelText('Title')).toHaveValue('Second');
   });
 
   it('navigating writes a shareable hash', async () => {
@@ -203,6 +288,19 @@ describe('TinaAdmin', () => {
     window.location.hash = '#/collections/ghost';
     renderAdmin();
     expect(await screen.findByText(/No collection named/)).toBeInTheDocument();
+  });
+
+  it('reports a document a deep link names that does not exist', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fghost.mdx';
+    renderAdmin();
+    expect(await screen.findByText(/No document named/)).toBeInTheDocument();
+  });
+
+  it('does not report a document a deep link names that does exist', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+    expect(await screen.findByLabelText('Title')).toHaveValue('Hello');
+    expect(screen.queryByText(/No document named/)).not.toBeInTheDocument();
   });
 
   it('renders the preview inside the open document form scope', async () => {
@@ -223,12 +321,12 @@ describe('TinaAdmin', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('title'), '!');
+    await user.type(await screen.findByLabelText('Title'), '!');
 
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
-    expect(await screen.findByLabelText('title')).toHaveValue('Second');
+    expect(await screen.findByLabelText('Title')).toHaveValue('Second');
 
     const helloEntry = await screen.findByRole('button', {
       name: /hello\.mdx/,
@@ -237,7 +335,100 @@ describe('TinaAdmin', () => {
   });
 });
 
+describe('TinaAdmin unsaved changes', () => {
+  it('blocks a reload while edits are unsaved, and lets it through once they are saved', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await screen.findByLabelText('Title');
+    expect(reloadIsBlocked()).toBe(false);
+
+    await user.type(screen.getByLabelText('Title'), '!');
+    expect(reloadIsBlocked()).toBe(true);
+
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(saved).toHaveLength(1));
+    await waitFor(() => expect(reloadIsBlocked()).toBe(false));
+  });
+
+  it('blocks a reload for a document that another one is open over', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText('Title'), '!');
+
+    await user.click(
+      await screen.findByRole('button', { name: /second\.mdx/ })
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText('Title')).toHaveValue('Second')
+    );
+    expect(reloadIsBlocked()).toBe(true);
+  });
+
+  it('stops blocking the reload when the admin unmounts', async () => {
+    const user = userEvent.setup();
+    const { unmount } = renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText('Title'), '!');
+    expect(reloadIsBlocked()).toBe(true);
+
+    unmount();
+    expect(reloadIsBlocked()).toBe(false);
+  });
+
+  it('discards unsaved edits back to the loaded document', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText('Title'), '!');
+    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('Title')).toHaveValue('Hello')
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('No changes');
+    expect(reloadIsBlocked()).toBe(false);
+  });
+});
+
 describe('TinaAdmin content reads', () => {
+  it('names the documents of a collection without reading any of them', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    const menu = await screen.findByRole('list', { name: 'Posts documents' });
+
+    expect(
+      within(menu)
+        .getAllByRole('button')
+        .map((button) => button.getAttribute('aria-label'))
+    ).toEqual(['hello.mdx', 'second.mdx']);
+    expect(getCalls).toEqual([]);
+  });
+
+  it('reads only the document it opens', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await screen.findByLabelText('Title');
+
+    expect(getCalls).toEqual(['content/posts/hello.mdx']);
+  });
+
   it('reads a collection once when two components ask for it', async () => {
     const user = userEvent.setup();
     renderAdmin();
@@ -262,6 +453,23 @@ describe('TinaAdmin content reads', () => {
     expect(listCalls).toEqual(['post', 'page']);
   });
 
+  it('does not report a document missing while it is still loading', async () => {
+    let resolveGet: (entry: DocumentEntry | null) => void = () => {};
+    const pending = new Promise<DocumentEntry | null>((resolve) => {
+      resolveGet = resolve;
+    });
+    const reading = vi.spyOn(provider, 'get').mockReturnValueOnce(pending);
+    window.location.hash = '#/collections/post/content%2Fposts%2Fghost.mdx';
+    renderAdmin();
+
+    await screen.findByRole('list', { name: 'Posts documents' });
+    expect(screen.queryByText(/No document named/)).not.toBeInTheDocument();
+
+    resolveGet(null);
+    expect(await screen.findByText(/No document named/)).toBeInTheDocument();
+    reading.mockRestore();
+  });
+
   it('reports a collection that failed to load', async () => {
     const user = userEvent.setup();
     const failing = vi
@@ -276,13 +484,25 @@ describe('TinaAdmin content reads', () => {
     failing.mockRestore();
   });
 
+  it('reports a document it cannot read', async () => {
+    const failing = vi
+      .spyOn(provider, 'get')
+      .mockRejectedValueOnce(new Error('could not be parsed'));
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+
+    const message = await screen.findByText(/Cannot read/);
+    expect(message).toHaveTextContent('could not be parsed');
+    failing.mockRestore();
+  });
+
   it('shows a save in the document list without re-reading the collection', async () => {
     const user = userEvent.setup();
     renderAdmin();
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('title'), '!');
+    await user.type(await screen.findByLabelText('Title'), '!');
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => expect(saved).toHaveLength(1));
@@ -290,17 +510,43 @@ describe('TinaAdmin content reads', () => {
   });
 });
 
-describe('TinaAdmin screens', () => {
-  it('lists the screens a plugin registered', async () => {
+describe('TinaAdmin global nav', () => {
+  it('lists the entries plugins contribute, in order, skipping unmet dependencies', async () => {
     renderAdmin();
-    const menu = await screen.findByRole('list', { name: 'Screens' });
+    const menu = await screen.findByRole('list', { name: 'Global navigation' });
     expect(
       within(menu)
-        .getAllByRole('button')
-        .map((button) => button.textContent)
-    ).toEqual(['Media']);
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['Media', 'Switch branch', 'Docs']);
   });
 
+  it('does not link a screen that no entry targets', async () => {
+    renderAdmin();
+    const menu = await screen.findByRole('list', { name: 'Global navigation' });
+    expect(within(menu).queryByText('Unlinked')).not.toBeInTheDocument();
+  });
+
+  it('opens a url entry in a new tab', async () => {
+    renderAdmin();
+    const link = await screen.findByRole('link', { name: 'Docs' });
+    expect(link).toHaveAttribute('href', 'https://tina.io/docs');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('runs an action entry', async () => {
+    const user = userEvent.setup();
+    navAction.mockClear();
+    renderAdmin();
+    await user.click(
+      await screen.findByRole('button', { name: 'Switch branch' })
+    );
+    expect(navAction).toHaveBeenCalledOnce();
+  });
+});
+
+describe('TinaAdmin screens', () => {
   it('opens a screen and writes a shareable hash', async () => {
     const user = userEvent.setup();
     renderAdmin();
@@ -336,6 +582,40 @@ describe('TinaAdmin screens', () => {
     );
   });
 
+  it('renders a replacement screen at the replaced name', async () => {
+    window.location.hash = '#/screens/media';
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          plugins: [
+            ...config.plugins,
+            definePlugin({
+              name: 'test:media-v2',
+              provides: ['screen'],
+              overrides: [{ capability: 'screen', key: 'media' }],
+              client: async () => ({
+                default: {
+                  screens: [
+                    {
+                      name: 'media',
+                      label: 'Media',
+                      component: () => <p>replacement media</p>,
+                    },
+                  ],
+                },
+              }),
+            }),
+          ],
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    expect(await screen.findByText('replacement media')).toBeInTheDocument();
+  });
+
   it('reports a screen no plugin registered', async () => {
     window.location.hash = '#/screens/ghost';
     renderAdmin();
@@ -363,7 +643,7 @@ describe('TinaAdmin screens', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('title'), '!');
+    await user.type(await screen.findByLabelText('Title'), '!');
 
     await user.click(await screen.findByRole('button', { name: 'Media' }));
     await screen.findByText(/media library at/);
@@ -371,7 +651,8 @@ describe('TinaAdmin screens', () => {
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
 
-    expect(await screen.findByLabelText('title')).toHaveValue('Hello!');
+    // The label of a dirty field also carries its unsaved marker.
+    expect(await screen.findByLabelText(/^Title/)).toHaveValue('Hello!');
   });
 });
 
@@ -384,8 +665,57 @@ describe('TinaAdmin form continuity', () => {
     const before = await screen.findByRole('list', { name: 'Posts documents' });
 
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
 
     expect(screen.getByRole('list', { name: 'Posts documents' })).toBe(before);
+  });
+});
+
+describe('TinaAdmin stale drafts', () => {
+  const storeStaleDraft = () =>
+    localStorage.setItem(
+      draftKey('content/posts/hello.mdx'),
+      JSON.stringify({
+        version: 1,
+        values: { title: 'Mine' },
+        baseline: { title: 'Old' },
+      })
+    );
+
+  const openHello = async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    return user;
+  };
+
+  it('asks to resume or discard before the form can be edited', async () => {
+    storeStaleDraft();
+    const user = await openHello();
+    const dialog = await screen.findByRole('alertdialog', {
+      name: 'Resume your unsaved edits?',
+    });
+
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Resume edits' })
+    );
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
+      'Mine'
+    );
+  });
+
+  it('discards the stale draft from the dialog', async () => {
+    storeStaleDraft();
+    const user = await openHello();
+    const dialog = await screen.findByRole('alertdialog');
+
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Discard draft' })
+    );
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(screen.getByLabelText('Title')).toHaveValue('Hello');
+    expect(readDraft('content/posts/hello.mdx')).toBeUndefined();
   });
 });
