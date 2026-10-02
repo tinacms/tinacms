@@ -55,12 +55,18 @@ export type AuthCollectionWriteOp =
   | 'addPending'
   | 'createFolder';
 
+/**
+ * The signed-in user behind a request. Leave it undefined only when the caller
+ * vouches for the call itself, and pass null when nobody is signed in.
+ */
+export type CtxUser = { sub?: string } | null | undefined;
+
 interface ResolverConfig {
   config?: GraphQLConfig;
   database: Database;
   tinaSchema: TinaSchema;
   isAudit: boolean;
-  ctxUser?: { sub?: string } | null;
+  ctxUser?: CtxUser;
 }
 
 export const createResolver = (args: ResolverConfig) => {
@@ -361,7 +367,7 @@ export class Resolver {
   public database: Database;
   public tinaSchema: TinaSchema;
   public isAudit: boolean;
-  public ctxUser: { sub?: string } | null | undefined;
+  public ctxUser: CtxUser;
 
   constructor(public init: ResolverConfig) {
     this.config = init.config;
@@ -784,8 +790,8 @@ export class Resolver {
       return;
     }
 
-    // NOTE: [2 Oct 2026] EK - TinaCloud runs each project's graphql version
-    // against a database from its own older copy, which has no authCollection.
+    // NOTE: [02 Oct 2026] EK - TinaCloud runs this against an older graphql's
+    // Database, which has no authCollection, so default to the internal one's.
     const { admins, allowUnauthenticatedWrites } = this.database
       .authCollection ?? { admins: [], allowUnauthenticatedWrites: true };
     if (this.ctxUser === undefined && allowUnauthenticatedWrites) {
