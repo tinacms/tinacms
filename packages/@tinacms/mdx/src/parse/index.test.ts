@@ -157,4 +157,34 @@ describe('parseMDX', () => {
       expect(mdxTree.children[0]?.type).toBe('invalid_markdown');
     });
   });
+
+  describe('image list props', () => {
+    it('parses an image field with list: true as an array', () => {
+      // Regression: the image-list branch called `.split(',')` on the array
+      // returned by extractScalar, throwing a TypeError that turned the whole
+      // node into invalid_markdown (content silently lost).
+      const imageListField: RichTextField = {
+        name: 'body',
+        type: 'rich-text',
+        parser: { type: 'mdx' },
+        templates: [
+          {
+            name: 'Gallery',
+            label: 'Gallery',
+            fields: [{ name: 'images', type: 'image', list: true }],
+          },
+        ],
+      };
+      const tree = parseMDX(
+        '<Gallery images={["/a.png", "/b.png"]} />',
+        imageListField,
+        passthrough
+      );
+      expect(tree.children[0]?.type).toBe('mdxJsxFlowElement');
+      expect((tree.children[0] as any).props.images).toEqual([
+        '/a.png',
+        '/b.png',
+      ]);
+    });
+  });
 });
