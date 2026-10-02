@@ -17,6 +17,7 @@ export interface InternalSys {
 
 type ReferenceFieldOptions = {
   optionComponent?: OptionComponent;
+  allowCreate?: boolean;
   experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>;
   collectionFilter?: CollectionFilters;
 };

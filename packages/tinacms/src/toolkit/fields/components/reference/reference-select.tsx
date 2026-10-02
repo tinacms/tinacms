@@ -25,6 +25,8 @@ interface ReferenceSelectProps {
   cms: TinaCMS;
   input: any;
   field: ReferenceFieldProps & Field;
+  /** Bump to refetch the option list, e.g. after a referenced document is created. */
+  optionsVersion?: number;
 }
 
 type Edge = {
@@ -55,7 +57,8 @@ interface Response {
 const useGetOptionSets = (
   cms: TinaCMS,
   collections: string[],
-  collectionFilter?: CollectionFilters | undefined // Record of filters, keyed by collection
+  collectionFilter?: CollectionFilters | undefined, // Record of filters, keyed by collection
+  optionsVersion = 0
 ) => {
   const [optionSets, setOptionSets] = React.useState<OptionSet[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -130,7 +133,7 @@ const useGetOptionSets = (
     } else {
       setOptionSets([]);
     }
-  }, [cms, collections]);
+  }, [cms, collections, optionsVersion]);
   return { optionSets, loading };
 };
 
@@ -147,23 +150,24 @@ const getFilename = (optionSets: OptionSet[], value: string): string | null => {
   return node ? node._internalSys.filename : null;
 };
 
-const Combobox: React.FC<ReferenceSelectProps> = ({ cms, input, field }) => {
+const Combobox: React.FC<ReferenceSelectProps> = ({
+  cms,
+  input,
+  field,
+  optionsVersion,
+}) => {
   const [open, setOpen] = React.useState<boolean>(false);
-  const [value, setValue] = React.useState<string | null>(input.value);
-  //Store display text for selected option
-  const [displayText, setDisplayText] = React.useState<string | null>(null);
+  const value: string | null = input.value ?? null;
   const { optionSets, loading } = useGetOptionSets(
     cms,
     field.collections,
-    field.collectionFilter
+    field.collectionFilter,
+    optionsVersion
   );
   const [filteredOptionsList, setFilteredOptionsList] =
     React.useState<OptionSet[]>(optionSets);
 
-  React.useEffect(() => {
-    setDisplayText(getFilename(optionSets, value));
-    input.onChange(value);
-  }, [value, input, optionSets]);
+  const displayText = getFilename(optionSets, value);
 
   // Assign list of options to filteredOptionsList when list of options is fetched/updated
   React.useEffect(() => {
@@ -228,7 +232,7 @@ const Combobox: React.FC<ReferenceSelectProps> = ({ cms, input, field }) => {
                           _values={_values}
                           node={node}
                           onSelect={(currentValue) => {
-                            setValue(currentValue);
+                            input.onChange(currentValue);
                             setOpen(false);
                           }}
                         />
