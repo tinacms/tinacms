@@ -345,8 +345,8 @@ describe.each([{ isDetached: true }, { isDetached: false }])(
         );
       });
 
-      it("keeps today's result when an admin renames a username without a new password", async () => {
-        const { query, readUsers } = await setup({ isDetached });
+      it('refuses a username rename without a new password, which would lock the user out', async () => {
+        const { query, expectNoChanges } = await setup({ isDetached });
         const result = await query({
           query: updateUsers,
           variables: {
@@ -363,11 +363,44 @@ describe.each([{ isDetached: true }, { isDetached: false }])(
           },
           ctxUser: admin,
         });
+        expect(result.errors?.[0]?.message).toBe(
+          'New users need a password: renamed-editor'
+        );
+        await expectNoChanges();
+      });
+
+      it('renames a username when the admin sets a new password', async () => {
+        const { query, readUsers } = await setup({ isDetached });
+        const result = await query({
+          query: updateUsers,
+          variables: {
+            params: {
+              users: [
+                untouched('admin-user', 'Admin User', 'admin@example.com'),
+                {
+                  username: 'renamed-editor',
+                  name: 'Editor User',
+                  email: 'editor@example.com',
+                  password: {
+                    value: 'renamed-password',
+                    passwordChangeRequired: true,
+                  },
+                },
+              ],
+            },
+          },
+          ctxUser: admin,
+        });
         expect(result.errors).toBeUndefined();
 
         const stored = await readUsers();
         expect(stored.users[1].username).toBe('renamed-editor');
-        expect(stored.users[1].password.value).toBeUndefined();
+        expect(
+          await checkPasswordHash({
+            saltedHash: stored.users[1].password.value,
+            password: 'renamed-password',
+          })
+        ).toBe(true);
       });
     });
 

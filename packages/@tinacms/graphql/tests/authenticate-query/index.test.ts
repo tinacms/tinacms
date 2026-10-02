@@ -33,6 +33,7 @@ it('authenticates user with valid credentials', async () => {
       sub: 'northwind',
       password: 'northwind123',
     },
+    isSignIn: true,
   });
 
   expect(result.errors).toBeUndefined();
@@ -52,6 +53,7 @@ it('returns null for invalid password', async () => {
       sub: 'northwind',
       password: 'wrongpassword',
     },
+    isSignIn: true,
   });
 
   expect(result.errors).toBeUndefined();
@@ -67,6 +69,7 @@ it('returns null for non-existent user', async () => {
       sub: 'nonexistent',
       password: 'anypassword',
     },
+    isSignIn: true,
   });
 
   expect(result.errors).toBeUndefined();
@@ -82,6 +85,7 @@ it('authenticates second test user with valid credentials', async () => {
       sub: 'testuser',
       password: 'testpassword',
     },
+    isSignIn: true,
   });
 
   expect(result.errors).toBeUndefined();
@@ -101,6 +105,7 @@ it('handles empty password gracefully', async () => {
       sub: 'northwind',
       password: '',
     },
+    isSignIn: true,
   });
 
   expect(result.errors).toBeUndefined();
@@ -116,10 +121,12 @@ it('returns only the fields sign-in needs', async () => {
   const withValue = await get({
     query: `query authenticate($sub: String!, $password: String!) { authenticate(sub: $sub, password: $password) { username password { passwordChangeRequired value } } }`,
     variables: { sub: 'northwind', password: 'northwind123' },
+    isSignIn: true,
   });
   const withoutValue = await get({
     query: `query authenticate($sub: String!, $password: String!) { authenticate(sub: $sub, password: $password) { username password { passwordChangeRequired } } }`,
     variables: { sub: 'northwind', password: 'northwind123' },
+    isSignIn: true,
   });
 
   const serialized = JSON.stringify([withValue, withoutValue]);
@@ -145,6 +152,7 @@ it('signs in through the generated client', async () => {
   const result = await get({
     query: generatedClientQuery,
     variables: { username: 'northwind', password: 'northwind123' },
+    isSignIn: true,
   });
 
   expect(result.errors).toBeUndefined();
@@ -156,21 +164,8 @@ it('signs in through the generated client', async () => {
   });
 });
 
-it('only answers authenticate for sign-in requests', async () => {
-  const { get } = await setup(__dirname, config);
-
-  const result = await get({
-    query: generatedClientQuery,
-    variables: { username: 'northwind', password: 'northwind123' },
-    ctxUser: { sub: 'testuser' },
-  });
-
-  expect(result.errors).toBeUndefined();
-  expect(result.data?.authenticate).toBeNull();
-});
-
-it.each([{}, { sub: '' }, null])(
-  'treats any request user as a non-sign-in request (%j)',
+it.each([undefined, null, {}, { sub: '' }, { sub: 'testuser' }])(
+  'only answers authenticate for sign-in calls (request user %j)',
   async (ctxUser) => {
     const { get } = await setup(__dirname, config);
 
@@ -194,7 +189,11 @@ it.each([
   async (variables) => {
     const { get } = await setup(__dirname, config);
 
-    const result = await get({ query: generatedClientQuery, variables });
+    const result = await get({
+      query: generatedClientQuery,
+      variables,
+      isSignIn: true,
+    });
 
     expect(result.errors).toBeUndefined();
     expect(result.data?.authenticate).toBeNull();
@@ -212,7 +211,7 @@ it.each([
     const { get } = await setup(__dirname, config);
     vi.mocked(checkPasswordHash).mockClear();
 
-    await get({ query: generatedClientQuery, variables });
+    await get({ query: generatedClientQuery, variables, isSignIn: true });
 
     expect(checkPasswordHash).toHaveBeenCalledTimes(1);
   }
