@@ -1776,6 +1776,45 @@ describe('TinaMediaStore — local rename', () => {
     });
   });
 
+  it('shows the server message when an upload is refused', async () => {
+    const { store, fetchFunction } = buildLocalStore();
+    const message =
+      'Files of type ".html" can\'t be uploaded. Allowed types are set by media.accept in your Tina config.';
+    fetchFunction.mockResolvedValue(
+      makeJsonResponse(415, {
+        code: 'UNSUPPORTED_FILE_TYPE',
+        message,
+        error: message,
+      })
+    );
+
+    const error = await captureRejection(() =>
+      store.persist([
+        {
+          directory: '',
+          file: new File(['<p>hi</p>'], 'page.html', { type: 'text/html' }),
+        },
+      ])
+    );
+
+    expect(error.message).toBe(message);
+  });
+
+  it('surfaces a refused file type on rename', async () => {
+    const { store, fetchFunction } = buildLocalStore();
+    fetchFunction.mockResolvedValue(
+      makeJsonResponse(415, {
+        code: 'UNSUPPORTED_FILE_TYPE',
+        message: 'Files of type ".html" can\'t be uploaded.',
+      })
+    );
+
+    const error = await store.rename('old.png', 'old.html').catch((e) => e);
+
+    expect(error).toBeInstanceOf(MediaRenameError);
+    expect(error.code).toBe('UNSUPPORTED_FILE_TYPE');
+  });
+
   it('surfaces the backend error code so the UI can be specific', async () => {
     const { store, fetchFunction } = buildLocalStore();
     fetchFunction.mockResolvedValue(

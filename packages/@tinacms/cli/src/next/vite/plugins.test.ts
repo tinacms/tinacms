@@ -28,13 +28,18 @@ const mockSearchPut = jest.fn(async (_req: any, res: any) => {
   res.end('{}');
 });
 
+const mockCreateMediaRouter = jest.fn();
+
 jest.mock('../commands/dev-command/server/media', () => ({
-  createMediaRouter: () => ({
-    handlePost: mockHandlePost,
-    handleDelete: mockHandleDelete,
-    handleList: mockHandleList,
-    handleRename: mockHandleRename,
-  }),
+  createMediaRouter: (config: unknown) => {
+    mockCreateMediaRouter(config);
+    return {
+      handlePost: mockHandlePost,
+      handleDelete: mockHandleDelete,
+      handleList: mockHandleList,
+      handleRename: mockHandleRename,
+    };
+  },
   parseMediaFolder: (s: string) => s,
 }));
 
@@ -349,5 +354,33 @@ describe('devServerEndPointsPlugin media route matching', () => {
     expect(res.statusCode).toBe(200);
     expect(mockHandleRename).toHaveBeenCalledTimes(1);
     expect(mockHandleDelete).not.toHaveBeenCalled();
+  });
+});
+
+describe('devServerEndPointsPlugin media config', () => {
+  it('passes media.accept to the media router', async () => {
+    const configManager = makeConfigManager();
+    configManager.config.media.accept = ['image/png', '.svg'];
+    const plugin = devServerEndPointsPlugin({
+      configManager,
+      apiURL: 'http://localhost:4001',
+      database: {} as any,
+      searchIndex: {},
+      databaseLock: async (fn) => fn(),
+    });
+    const middlewares: Function[] = [];
+    // @ts-ignore - configureServer only needs the `middlewares` shape here.
+    plugin.configureServer({
+      middlewares: { use: (fn: Function) => middlewares.push(fn) },
+    });
+
+    await invoke(middlewares[middlewares.length - 1], {
+      url: '/media/upload/a.png',
+      method: 'POST',
+    });
+
+    expect(mockCreateMediaRouter).toHaveBeenCalledWith(
+      expect.objectContaining({ accept: ['image/png', '.svg'] })
+    );
   });
 });
