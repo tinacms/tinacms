@@ -3,6 +3,7 @@ import type { FieldDescriptor, ValidatorFactory } from './field/contract';
 import type { FormHookFactory } from './form/hooks';
 import { invariant } from './invariant';
 import type { AdminScreen } from './screen/contract';
+import type { SlotContributions } from './slot/contract';
 
 export type Capability =
   | 'field'
@@ -11,7 +12,8 @@ export type Capability =
   | 'content'
   | 'auth'
   | 'media'
-  | 'search';
+  | 'search'
+  | 'screen';
 
 export const FIELD_CAPABILITY = 'field' as const satisfies Capability;
 
@@ -20,6 +22,8 @@ export const VALIDATOR_CAPABILITY = 'validator' as const satisfies Capability;
 export const HOOKS_CAPABILITY = 'hooks' as const satisfies Capability;
 
 export const AUTH_CAPABILITY = 'auth' as const satisfies Capability;
+
+export const SCREEN_CAPABILITY = 'screen' as const satisfies Capability;
 
 // TODO(v4): derive this list from per-capability descriptors.
 export const SINGLETON_SLICE_CAPABILITIES = [
@@ -46,6 +50,7 @@ export type CapabilityOverride =
   | { capability: typeof FIELD_CAPABILITY; key: string }
   | { capability: typeof VALIDATOR_CAPABILITY; key: string }
   | { capability: typeof HOOKS_CAPABILITY; key: string }
+  | { capability: typeof SCREEN_CAPABILITY; key: string }
   | { capability: SingletonSliceCapability };
 
 export type TinaStoreState = Record<string, SliceState>;
@@ -78,6 +83,7 @@ export interface ClientSegment {
   hooks?: Record<string, FormHookFactory>;
   slice?: ClientSlice;
   screens?: AdminScreen[];
+  slots?: SlotContributions;
 }
 
 export type ServerOp = (input: never) => Promise<unknown>;

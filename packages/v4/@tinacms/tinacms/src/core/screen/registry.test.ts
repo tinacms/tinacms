@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { type ResolvedSegment, definePlugin } from '../plugin';
+import {
+  type PluginManifest,
+  type ResolvedSegment,
+  definePlugin,
+} from '../plugin';
 import type { AdminScreen } from './contract';
 import { createScreenRegistry, screenList } from './registry';
 
@@ -20,12 +24,21 @@ const segmentOf = (name: string, screens: AdminScreen[]): ResolvedSegment => ({
   segment: { screens },
 });
 
+const registryOf = (
+  resolved: ResolvedSegment[],
+  extraPlugins: PluginManifest[] = []
+) =>
+  createScreenRegistry(resolved, [
+    ...resolved.map(({ manifest }) => manifest),
+    ...extraPlugins,
+  ]);
+
 const labelsOf = (resolved: ResolvedSegment[]) =>
-  screenList(createScreenRegistry(resolved)).map((entry) => entry.label);
+  screenList(registryOf(resolved)).map((entry) => entry.label);
 
 describe('admin screen registry', () => {
   it('composes the screens of every plugin', () => {
-    const registry = createScreenRegistry([
+    const registry = registryOf([
       segmentOf('media-plugin', [screen('media')]),
       segmentOf('search-plugin', [screen('search')]),
     ]);
@@ -33,7 +46,7 @@ describe('admin screen registry', () => {
   });
 
   it('takes more than one screen from a single plugin', () => {
-    const registry = createScreenRegistry([
+    const registry = registryOf([
       segmentOf('workflow', [screen('branches'), screen('pull-requests')]),
     ]);
     expect([...registry.keys()]).toEqual(['branches', 'pull-requests']);
@@ -41,15 +54,14 @@ describe('admin screen registry', () => {
 
   it('ignores a plugin that contributes no screen', () => {
     expect(
-      createScreenRegistry([
-        { manifest: definePlugin({ name: 'bare' }), segment: {} },
-      ]).size
+      registryOf([{ manifest: definePlugin({ name: 'bare' }), segment: {} }])
+        .size
     ).toBe(0);
   });
 
   it('rejects two plugins claiming one screen name', () => {
     expect(() =>
-      createScreenRegistry([
+      registryOf([
         segmentOf('first', [screen('media')]),
         segmentOf('second', [screen('media')]),
       ])
@@ -58,16 +70,76 @@ describe('admin screen registry', () => {
 
   it('rejects a screen name that holds a slash', () => {
     expect(() =>
-      createScreenRegistry([
-        segmentOf('media-plugin', [screen('media/photos')]),
-      ])
+      registryOf([segmentOf('media-plugin', [screen('media/photos')])])
     ).toThrow(/admin-screen-name-has-slash/);
   });
 
   it('rejects an empty screen name', () => {
+    expect(() => registryOf([segmentOf('media-plugin', [screen('')])])).toThrow(
+      /admin-screen-no-name/
+    );
+  });
+
+  it('rejects a screen with no component', () => {
+    const noComponent = { name: 'media', label: 'Media' } as AdminScreen;
     expect(() =>
-      createScreenRegistry([segmentOf('media-plugin', [screen('')])])
-    ).toThrow(/admin-screen-no-name/);
+      registryOf([segmentOf('media-plugin', [noComponent])])
+    ).toThrow(/admin-screen-no-component/);
+  });
+});
+
+describe('screen overrides', () => {
+  const Replacement = () => null;
+  const overrideMedia = definePlugin({
+    name: 'tina:media-v2',
+    provides: ['screen'],
+    overrides: [{ capability: 'screen', key: 'media' }],
+  });
+
+  it("replaces another plugin's screen", () => {
+    const registry = registryOf([
+      segmentOf('media-plugin', [screen('media')]),
+      {
+        manifest: overrideMedia,
+        segment: { screens: [screen('media', { component: Replacement })] },
+      },
+    ]);
+    expect(registry.get('media')?.component).toBe(Replacement);
+  });
+
+  it('replaces a screen whichever plugin comes first', () => {
+    const registry = registryOf([
+      {
+        manifest: overrideMedia,
+        segment: { screens: [screen('media', { component: Replacement })] },
+      },
+      segmentOf('media-plugin', [screen('media')]),
+    ]);
+    expect(registry.get('media')?.component).toBe(Replacement);
+  });
+
+  it('removes a screen when the override contributes none', () => {
+    const resolved = [segmentOf('media-plugin', [screen('media')])];
+    const registry = registryOf(resolved, [overrideMedia]);
+    expect(registry.has('media')).toBe(false);
+  });
+
+  it('rejects two overrides of one screen', () => {
+    const resolved = [
+      segmentOf('media-plugin', [screen('media')]),
+      {
+        manifest: overrideMedia,
+        segment: { screens: [screen('media', { component: Replacement })] },
+      },
+    ];
+    const secondOverride = definePlugin({
+      name: 'tina:media-v3',
+      provides: ['screen'],
+      overrides: [{ capability: 'screen', key: 'media' }],
+    });
+    expect(() => registryOf(resolved, [secondOverride])).toThrow(
+      /Only one may replace or remove it/
+    );
   });
 });
 

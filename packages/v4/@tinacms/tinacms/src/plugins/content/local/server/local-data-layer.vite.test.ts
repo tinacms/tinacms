@@ -399,8 +399,9 @@ describe('tinaLocalDataLayerVitePlugin dev codegen', () => {
     const server = serverDouble();
     (plugin.configureServer as (s: unknown) => void)(server);
     expect(server.logs).toEqual([]);
-    expect(server.mounted).toHaveLength(1);
-    expect(server.mounted[0].route).toBe(DEFAULT_CONTENT_URL);
+    expect(server.mounted.map(({ route }) => route)).toEqual([
+      DEFAULT_CONTENT_URL,
+    ]);
   });
 });
 
@@ -491,8 +492,11 @@ describe('tinaLocalDataLayerVitePlugin shutdown', () => {
     const server = serverDouble();
     (plugin.configureServer as (s: unknown) => void)(server);
 
+    const content = server.mounted.find(
+      ({ route }) => route === DEFAULT_CONTENT_URL
+    );
     const res = responseDouble();
-    await server.mounted[0].handler(
+    await content?.handler(
       requestDouble(
         JSON_HEADERS,
         JSON.stringify({ op: 'graphql', query: '{ __typename }' })

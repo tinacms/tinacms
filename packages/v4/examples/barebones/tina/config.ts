@@ -7,9 +7,11 @@ import {
   type CollectionSchema,
   defineConfig,
   localContentPlugin,
+  localMediaPlugin,
   required,
   t,
 } from '@tinacms/tinacms';
+import { helpNavPlugin } from './help-nav';
 import { hooksPlugin, logSave, requireStarsToPublish } from './hooks';
 import { rating, ratingFieldPlugin } from './rating-field';
 import { differentFrom, matches, validatorsPlugin } from './validators';
@@ -86,9 +88,11 @@ export const pageCollection = {
 export default defineConfig({
   plugins: [
     localContentPlugin(),
+    localMediaPlugin(),
     ratingFieldPlugin,
     validatorsPlugin,
     hooksPlugin,
+    helpNavPlugin,
   ],
   schema: { collections: [postCollection, pageCollection] },
 });

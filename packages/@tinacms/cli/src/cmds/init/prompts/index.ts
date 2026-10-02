@@ -1,19 +1,14 @@
 import prompts from 'prompts';
 import type { PromptObject } from 'prompts';
-import { Framework, InitEnvironment } from '../';
+import { Framework } from '../';
 import { linkText, logText } from '../../../utils/theme';
 import { Config, ImportStatement } from './types';
-import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 export * from './askTinaCloudSetup';
 export * from './types';
 export * from './gitProvider';
 export * from './databaseAdapter';
 export * from './authProvider';
-
-const forestryDisclaimer = logText(
-  `Note: This migration will update some of your content to match tina.  Please save a backup of your content before doing this migration. (This can be done with git)`
-);
 
 // Asks the user for the framework and package manager they are using
 export const askCommonSetUp = async () => {
@@ -56,47 +51,6 @@ export const askCommonSetUp = async () => {
     packageManager: 'pnpm' | 'yarn' | 'npm' | 'bun';
   };
 };
-export const askForestryMigrate = async ({
-  framework,
-  env,
-}: {
-  framework: Framework;
-  env: InitEnvironment;
-}) => {
-  const questions: PromptObject[] = [
-    {
-      name: 'forestryMigrate',
-      type: 'confirm',
-      initial: true,
-      message: `Would you like to migrate your Forestry templates?\n${forestryDisclaimer}`,
-    },
-  ];
-  if (framework.name === 'hugo') {
-    questions.push({
-      name: 'frontMatterFormat',
-      type: (_, answers) => {
-        if (answers.forestryMigrate) {
-          if (env.frontMatterFormat && env.frontMatterFormat[1]) {
-            return null;
-          }
-          return 'select';
-        }
-      },
-      choices: [
-        { title: 'yaml', value: 'yaml' },
-        { title: 'toml', value: 'toml' },
-        { title: 'json', value: 'json' },
-      ],
-      message: `What format are you using in your frontmatter?`,
-    });
-  }
-  const answers = await prompts(questions);
-  return answers as {
-    forestryMigrate: boolean;
-    frontMatterFormat?: ContentFrontmatterFormat;
-  };
-};
-
 export const askTinaSetupPrompts = async (params: {
   frameworkName: string;
   config: Config;
@@ -154,17 +108,29 @@ export const askIfUsingSelfHosted = async () => {
   return answers as { hosting: 'tina-cloud' | 'self-host' };
 };
 
+// Merges and sorts imports the way Biome's organizer does, so the generated
+// file passes a formatter check as written.
 export const makeImportString = (imports?: ImportStatement[]) => {
-  if (!imports) {
-    return '';
+  const byModule = new Map<string, Set<string>>();
+  for (const { from, imported } of imports || []) {
+    if (imported.length === 0) {
+      continue;
+    }
+    const names = byModule.get(from) || new Set<string>();
+    for (const name of imported) {
+      names.add(name);
+    }
+    byModule.set(from, names);
   }
-  const filtered = imports.filter((x) => x.imported.length > 0);
-  if (filtered.length === 0) {
-    return '';
-  }
-  return filtered
-    .map((x) => {
-      return `import { ${x.imported.join(',')} } from '${x.from}'`;
+  return [...byModule.keys()]
+    .sort()
+    .map((from) => {
+      const names = [...byModule.get(from)].sort();
+      const oneLine = `import { ${names.join(', ')} } from '${from}';`;
+      if (oneLine.length <= 80) {
+        return oneLine;
+      }
+      return `import {\n${names.map((n) => `  ${n},`).join('\n')}\n} from '${from}';`;
     })
     .join('\n');
 };
