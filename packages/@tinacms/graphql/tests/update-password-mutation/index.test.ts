@@ -2,6 +2,8 @@ import { it, expect } from 'vitest';
 import config from './tina/config';
 import { setupMutation } from '../util';
 import { checkPasswordHash } from '../../src/auth/utils';
+import fs from 'fs-extra';
+import path from 'path';
 
 const updatePasswordMutation = `
   mutation updatePassword($password: String!) {
@@ -101,5 +103,48 @@ it('fails to update password without password parameter', async () => {
   expect(result.errors).toBeDefined();
   expect(result.errors?.[0].message).toBe(
     'Variable "$password" of required type "String!" was not provided.'
+  );
+});
+
+it("updates the caller's own password when the caller is not an admin", async () => {
+  const { query, bridge } = await setupMutation(__dirname, config, {
+    authCollection: { admins: [], allowUnauthenticatedWrites: false },
+  });
+
+  const result = await query({
+    query: updatePasswordMutation,
+    variables: { password: 'newpassword123' },
+    ctxUser: { sub: 'editor-user' },
+  });
+
+  expect(result.errors).toBeUndefined();
+  expect(result.data?.updatePassword).toBe(true);
+  const userData = JSON.parse(bridge.getWrite('content/users/index.json')!);
+  expect(
+    await checkPasswordHash({
+      saltedHash: userData.users[1].password.value,
+      password: 'newpassword123',
+    })
+  ).toBe(true);
+});
+
+it("keeps other users' password hashes when a user changes their own password", async () => {
+  const { query, bridge } = await setupMutation(__dirname, config, {
+    authCollection: { admins: [], allowUnauthenticatedWrites: false },
+  });
+  const fixture = JSON.parse(
+    await fs.readFile(path.join(__dirname, 'content/users/index.json'), 'utf-8')
+  );
+
+  const result = await query({
+    query: updatePasswordMutation,
+    variables: { password: 'newpassword123' },
+    ctxUser: { sub: 'editor-user' },
+  });
+
+  expect(result.errors).toBeUndefined();
+  const userData = JSON.parse(bridge.getWrite('content/users/index.json')!);
+  expect(userData.users[0].password.value).toBe(
+    fixture.users[0].password.value
   );
 });

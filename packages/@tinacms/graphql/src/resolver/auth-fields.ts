@@ -1,5 +1,5 @@
 import path from 'path';
-import type { TinaSchema } from '@tinacms/schema-tools';
+import type { Collection, TinaSchema } from '@tinacms/schema-tools';
 import type { GraphQLResolveInfo } from 'graphql';
 import { get } from '../util';
 import { set } from 'es-toolkit/compat';
@@ -49,6 +49,39 @@ export function findUserInCollection(
     throw new Error('No uid field found on user field');
   }
   return users.find((u) => u[idFieldName] === userSub) || null;
+}
+
+/**
+ * A stored hash only carries over to a user with the same uid, so a new or
+ * renamed user saved without a password could never sign in.
+ */
+export function assertNewUsersHavePasswords(
+  collection: Collection<true>,
+  newBody: Record<string, unknown>,
+  existingData?: Record<string, unknown>
+) {
+  const userFields = mapUserFields(collection);
+  if (userFields.length !== 1) {
+    return;
+  }
+  const [{ path: usersPath, idFieldName, passwordFieldName }] = userFields;
+  const users = get(newBody, usersPath);
+  if (!Array.isArray(users) || !idFieldName || !passwordFieldName) {
+    return;
+  }
+  const storedUsers = get(existingData, usersPath);
+  const storedIds = new Set(
+    (Array.isArray(storedUsers) ? storedUsers : []).map((u) => u?.[idFieldName])
+  );
+  const withoutPassword = users
+    .filter(
+      (u) =>
+        !storedIds.has(u?.[idFieldName]) && !u?.[passwordFieldName]?.['value']
+    )
+    .map((u) => u?.[idFieldName]);
+  if (withoutPassword.length) {
+    throw new Error(`New users need a password: ${withoutPassword.join(', ')}`);
+  }
 }
 
 export async function handleAuthenticate({
@@ -131,8 +164,10 @@ export async function handleUpdatePassword({
     throw new Error('No password provided');
   }
 
-  const { collection, userField, users, relativePath } =
-    await getUserDocumentContext(tinaSchema, resolver);
+  const { userField, users } = await getUserDocumentContext(
+    tinaSchema,
+    resolver
+  );
 
   const { idFieldName, passwordFieldName } = userField;
   const user = users.find((u: any) => u[idFieldName] === ctxUser.sub);
@@ -164,11 +199,7 @@ export async function handleUpdatePassword({
     })
   );
 
-  await resolver.resolveUpdateDocument({
-    collectionName: collection.name,
-    relativePath,
-    newBody,
-  });
+  await resolver.updateAuthDocument({ newBody });
 
   return true;
 }

@@ -7,6 +7,7 @@ import {
   resolve,
   buildSchema,
 } from '../src';
+import type { AuthCollectionOptions } from '../src/database';
 import { z } from 'zod';
 
 class OutputBridge extends FilesystemBridge {
@@ -101,20 +102,25 @@ export const assertDoc = (doc: any) => {
   return z.object({ data: dataSchema, errors: z.any() }).parse(doc);
 };
 
-export const setupMutation = async (dir: string, config: any) => {
+export const setupMutation = async (
+  dir: string,
+  config: any,
+  databaseOptions?: { authCollection?: AuthCollectionOptions }
+) => {
   const bridge = new MemoryCaptureBridge(dir);
   const level = new MemoryLevel<string, Record<string, any>>();
   const database = createDatabaseInternal({
     bridge,
     level,
     tinaDirectory: 'tina',
+    ...databaseOptions,
   });
   await database.indexContent(await buildSchema(config));
 
   const query = async (options?: {
     query: string;
     variables: Record<string, unknown>;
-    ctxUser?: { sub: string };
+    ctxUser?: { sub?: string } | null;
   }) => {
     const result = await resolve({
       database,
@@ -125,7 +131,7 @@ export const setupMutation = async (dir: string, config: any) => {
     return result;
   };
 
-  return { query, bridge };
+  return { query, bridge, database };
 };
 
 export const loadVariables = async (

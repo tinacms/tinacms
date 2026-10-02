@@ -37,7 +37,11 @@ import {
 } from '../database/datalayer';
 import { TinaGraphQLError, TinaParseDocumentError } from './error';
 import { collectConditionsForField, resolveReferences } from './filter-utils';
-import { findUserInCollection, getUserDocumentContext } from './auth-fields';
+import {
+  assertNewUsersHavePasswords,
+  findUserInCollection,
+  getUserDocumentContext,
+} from './auth-fields';
 import {
   resolveMediaCloudToRelative,
   resolveMediaRelativeToCloud,
@@ -593,6 +597,11 @@ export class Resolver {
       collectionName,
       relativePath
     );
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'addPending',
+    });
 
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
@@ -807,6 +816,25 @@ export class Resolver {
     throw new Error('Not authorized');
   };
 
+  private assertReferenceUpdates = async (
+    realPath: string,
+    collection: Collection<true>
+  ) => {
+    if (!this.tinaSchema.getCollections().some((c) => c.isAuthCollection)) {
+      return;
+    }
+    const collRefs = await this.findReferences(realPath, collection);
+    for (const docsWithRefs of Object.values(collRefs)) {
+      for (const pathToDocWithRef of Object.keys(docsWithRefs)) {
+        await this.assertAuthCollectionWrite({
+          collection: this.tinaSchema.getCollectionByFullPath(pathToDocWithRef),
+          realPath: pathToDocWithRef,
+          op: 'update',
+        });
+      }
+    }
+  };
+
   private isStoredInCollection = (
     realPath: string,
     collection: Collection<true>
@@ -915,6 +943,11 @@ export class Resolver {
       `.gitkeep.${collection.format || 'md'}`
     );
     this.validatePath(realPath, collection);
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'createFolder',
+    });
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
       throw new Error(
@@ -942,6 +975,11 @@ export class Resolver {
       collectionName,
       relativePath
     );
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'create',
+    });
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
       throw new Error(
@@ -970,6 +1008,13 @@ export class Resolver {
       collectionName,
       relativePath
     );
+    if (!newRelativePath) {
+      await this.assertAuthCollectionWrite({
+        collection,
+        realPath,
+        op: 'update',
+      });
+    }
     const alreadyExists = await this.database.documentExists(realPath);
     if (!alreadyExists) {
       throw new Error(`Unable to update document, ${realPath} does not exist`);
@@ -996,6 +1041,18 @@ export class Resolver {
           `Unable to rename document, ${newRealPath} ${ERR_ALREADY_EXISTS}`
         );
       }
+
+      await this.assertAuthCollectionWrite({
+        collection,
+        realPath,
+        op: 'rename',
+      });
+      await this.assertAuthCollectionWrite({
+        collection,
+        realPath: newRealPath,
+        op: 'rename',
+      });
+      await this.assertReferenceUpdates(realPath, collection);
 
       // update the document
       await this.database.put(newRealPath, doc._rawData, collection.name);
@@ -1048,6 +1105,43 @@ export class Resolver {
     if (!newBody) {
       throw new Error('Body not provided for updated document.');
     }
+    return this.writeDocumentBody({ collection, realPath, doc, newBody });
+  };
+
+  /**
+   * Updates the user store of the auth collection for the auth field
+   * handlers. It does not check the request user, so the caller must do that.
+   */
+  public updateAuthDocument = async ({
+    newBody,
+  }: {
+    newBody: Record<string, unknown>;
+  }) => {
+    const collection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    if (!collection) {
+      throw new Error('Auth collection not found');
+    }
+    const { realPath } = this.getValidatedPath(collection.name, 'index.json');
+    const doc = await this.getDocument(realPath);
+    return this.writeDocumentBody({ collection, realPath, doc, newBody });
+  };
+
+  private writeDocumentBody = async ({
+    collection,
+    realPath,
+    doc,
+    newBody,
+  }: {
+    collection: Collection<true>;
+    realPath: string;
+    doc: Awaited<ReturnType<Resolver['getDocument']>>;
+    newBody: Record<string, unknown>;
+  }) => {
+    if (collection.isAuthCollection) {
+      assertNewUsersHavePasswords(collection, newBody, doc?._rawData);
+    }
     const params = await this.buildObjectMutations(
       newBody,
       collection,
@@ -1081,9 +1175,19 @@ export class Resolver {
       throw new Error(`Unable to delete document, ${realPath} does not exist`);
     }
 
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'delete',
+    });
+    const hasReferences = await this.hasReferences(realPath, collection);
+    if (hasReferences) {
+      await this.assertReferenceUpdates(realPath, collection);
+    }
+
     const doc = await this.getDocument(realPath);
     await this.deleteDocument(realPath);
-    if (await this.hasReferences(realPath, collection)) {
+    if (hasReferences) {
       const collRefs = await this.findReferences(realPath, collection);
       for (const [_collection, docsWithRefs] of Object.entries(collRefs)) {
         for (const [pathToDocWithRef, referencePaths] of Object.entries(
@@ -1184,6 +1288,11 @@ export class Resolver {
       });
     }
 
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'create',
+    });
     const params = await this.buildObjectMutations(
       // @ts-ignore
       args.params[collection.name],
@@ -1211,6 +1320,11 @@ export class Resolver {
     isAddPendingDocument: boolean;
     isCollectionSpecific: boolean;
   }) => {
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'update',
+    });
     const doc = await this.getDocument(realPath);
 
     const oldDoc = this.resolveLegacyValues(doc?._rawData || {}, collection);
