@@ -2,4 +2,4 @@
 '@tinacms/rich-text': patch
 ---
 
-Bump `@headlessui/react` from `2.1.8` to `2.2.10`. The pinned `2.1.8` release only declares a React 18 peer dependency, which produces `ERESOLVE overriding peer dependency` npm warnings for any project using React 19. `2.2.10` declares `react`/`react-dom` `^18 || ^19` and is otherwise API-compatible with the `Popover`/`PopoverButton`/`PopoverPanel`/`Transition` components already in use.
+Replace the Headless UI popover behind the embed Edit/Remove menu with the Radix Popover already used elsewhere in the rich-text editor, and drop `@headlessui/react` from `@tinacms/rich-text`. The package no longer depends on Headless UI's React peer range, so React 19 projects stop getting `ERESOLVE overriding peer dependency` warnings from it.
