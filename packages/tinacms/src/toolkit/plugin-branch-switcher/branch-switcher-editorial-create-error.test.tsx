@@ -44,16 +44,16 @@ async function openCreateBranchView() {
     await screen.findByLabelText('New Branch Name'),
     'bad-name'
   );
-  await userEvent.click(
-    screen.getByRole('button', { name: /create branch/i })
-  );
+  await userEvent.click(screen.getByRole('button', { name: /create branch/i }));
 }
 
 let createBranchMock: ReturnType<typeof vi.fn>;
 
 describe('EditoralBranchSwitcher when createBranch rejects', () => {
   it('shows the Error message when the rejection is an Error', async () => {
-    createBranchMock = vi.fn().mockRejectedValue(new Error('Invalid branch name'));
+    createBranchMock = vi
+      .fn()
+      .mockRejectedValue(new Error('Invalid branch name'));
 
     await openCreateBranchView();
 
