@@ -784,7 +784,10 @@ export class Resolver {
       return;
     }
 
-    const { admins, allowUnauthenticatedWrites } = this.database.authCollection;
+    // NOTE: [2 Oct 2026] EK - TinaCloud runs each project's graphql version
+    // against a database from its own older copy, which has no authCollection.
+    const { admins, allowUnauthenticatedWrites } = this.database
+      .authCollection ?? { admins: [], allowUnauthenticatedWrites: true };
     if (this.ctxUser === undefined && allowUnauthenticatedWrites) {
       return;
     }

@@ -568,6 +568,28 @@ describe('auth collection admins', () => {
     expect(result.errors?.[0]?.message).toBe('Not authorized');
   });
 
+  it('treats a database without the authCollection setting as having no admins', async () => {
+    const { query, database } = await setupMutation(
+      __dirname,
+      buildConfig({ isDetached: true })
+    );
+    // A database built by an older @tinacms/graphql, as on TinaCloud
+    Object.defineProperty(database, 'authCollection', { value: undefined });
+
+    const internal = await query({
+      query: updateUsers,
+      variables: { params: adminOnly },
+    });
+    expect(internal.errors).toBeUndefined();
+
+    const signedIn = await query({
+      query: updateUsers,
+      variables: { params: adminOnly },
+      ctxUser: { sub: 'admin-user' },
+    });
+    expect(signedIn.errors?.[0]?.message).toBe('Not authorized');
+  });
+
   it('rejects an admin when index.json is missing', async () => {
     const { query, bridge } = await setupMutation(
       path.join(__dirname, 'no-users'),
