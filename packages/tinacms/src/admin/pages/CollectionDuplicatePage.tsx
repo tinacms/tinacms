@@ -1,12 +1,12 @@
-import { useParams } from 'react-router-dom';
 import React from 'react';
+import { useParams } from 'react-router-dom';
 
+import type { TinaCMS } from '@tinacms/toolkit';
 import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
-import type { TinaCMS } from '@tinacms/toolkit';
-import { RenderForm } from './CollectionCreatePage';
 import GetDocument from '../components/GetDocument';
-import { parentFolder, useCollectionFolder } from './utils';
+import { RenderForm } from './CollectionCreatePage';
+import { decodeRouteParam, parentFolder, useCollectionFolder } from './utils';
 
 const CollectionDuplicatePage = () => {
   const folder = useCollectionFolder();
@@ -23,8 +23,11 @@ const CollectionDuplicatePage = () => {
           includeDocuments={false}
         >
           {(collection) => {
+            const decodedFilename = decodeRouteParam(filename);
             const relativePath = `${
-              filename.startsWith('~/') ? filename.substring(2) : filename
+              decodedFilename.startsWith('~/')
+                ? decodedFilename.substring(2)
+                : decodedFilename
             }.${collection.format}`;
 
             const mutationInfo = {
