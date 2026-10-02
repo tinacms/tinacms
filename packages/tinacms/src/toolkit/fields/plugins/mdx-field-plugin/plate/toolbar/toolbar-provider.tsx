@@ -1,16 +1,20 @@
 import React from 'react';
 import { type ReactNode, createContext, useContext, useMemo } from 'react';
 
-import type { Form } from '@toolkit/forms';
-import type { MdxTemplate } from '../types';
+import { isSafeCssColor } from '@tinacms/mdx/sanitize-css-color';
 import {
   ALL_HEADING_LEVELS,
-  normalizeHeadingLevels,
+  DEFAULT_HIGHLIGHT_COLORS,
+  DEFAULT_TEXT_COLORS,
   type HeadingLevel,
+  normalizeHeadingLevels,
 } from '@tinacms/schema-tools';
+import type { Form } from '@toolkit/forms';
+import type { MdxTemplate } from '../types';
 import type {
-  ToolbarOverrides,
+  RichTextColorOption,
   ToolbarOverrideType,
+  ToolbarOverrides,
 } from './toolbar-overrides';
 
 interface ToolbarContextProps {
@@ -25,12 +29,19 @@ interface ToolbarContextProps {
    * from "use the legacy default" without re-deriving the check.
    */
   headingLevelsConfigured: boolean;
+  /** Palette for the text colour dropdown (schema value or default). */
+  textColors: readonly RichTextColorOption[];
+  /** Palette for the highlight dropdown (schema value or default). */
+  highlightColors: readonly RichTextColorOption[];
 }
 
 interface ToolbarProviderProps
   extends Omit<
     ToolbarContextProps,
-    'headingLevels' | 'headingLevelsConfigured'
+    | 'headingLevels'
+    | 'headingLevelsConfigured'
+    | 'textColors'
+    | 'highlightColors'
   > {
   children: ReactNode;
 }
@@ -39,15 +50,33 @@ const ToolbarContext = createContext<ToolbarContextProps | undefined>(
   undefined
 );
 
+/**
+ * Returns the configured palette (or the default), minus colours the
+ * serialiser would drop on save — warning so misconfiguration isn't silent.
+ */
+const resolvePalette = (
+  name: 'textColors' | 'highlightColors',
+  configured: readonly RichTextColorOption[] | undefined,
+  fallback: readonly RichTextColorOption[]
+): readonly RichTextColorOption[] => {
+  if (!configured) return fallback;
+  return configured.filter(({ value }) => {
+    if (isSafeCssColor(value)) return true;
+    console.warn(
+      `[tinacms] Ignoring unsupported colour "${value}" in rich-text overrides.${name}. Use hex, a named colour, rgb()/hsl()/oklch()/oklab() or var(--name).`
+    );
+    return false;
+  });
+};
+
 export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
   tinaForm,
   templates,
   overrides,
   children,
 }) => {
-  const configured = !Array.isArray(overrides)
-    ? overrides?.headingLevels
-    : undefined;
+  const objectOverrides = !Array.isArray(overrides) ? overrides : undefined;
+  const configured = objectOverrides?.headingLevels;
   const headingLevelsConfigured = Array.isArray(configured);
 
   const headingLevels = useMemo<readonly HeadingLevel[]>(
@@ -64,6 +93,16 @@ export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
         overrides,
         headingLevels,
         headingLevelsConfigured,
+        textColors: resolvePalette(
+          'textColors',
+          objectOverrides?.textColors,
+          DEFAULT_TEXT_COLORS
+        ),
+        highlightColors: resolvePalette(
+          'highlightColors',
+          objectOverrides?.highlightColors,
+          DEFAULT_HIGHLIGHT_COLORS
+        ),
       }}
     >
       {children}

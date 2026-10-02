@@ -12,6 +12,7 @@ import { serializeBreaks } from '../break-serialization';
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown';
 import { stringifyMDX as stringifyMDXNext } from '../next';
 import type * as Plate from '../parse/plate';
+import { isSafeCssColor } from '../sanitize-css-color';
 import { stringifyProps } from './acorn';
 import { normalizeMarkWhitespace } from './mark-whitespace';
 import { eat } from './marks';
@@ -421,19 +422,38 @@ const blockContentElement = (
 };
 
 export type Marks =
+  | 'textColor'
   | 'strong'
   | 'emphasis'
   | 'inlineCode'
   | 'delete'
   | 'highlight';
 
+/** Text leaves sometimes reach us from the editor without a `type`. */
+export const isTextElement = (
+  content: Plate.InlineElement
+): content is Plate.TextElement =>
+  content.type === 'text' ||
+  (!content.type && typeof (content as { text?: unknown }).text === 'string');
+
+/**
+ * The marks on a text node, in tie-break order: when two marks cover equally
+ * long runs, the earlier one becomes the outer element. Text colour comes
+ * first so `<span style={{ color }}>**bold**</span>` wraps its formatting,
+ * while highlight stays innermost (`**<mark>bold</mark>**`). A text colour on
+ * highlighted text is written onto the `<mark>` instead of its own `<span>`.
+ */
 export const getMarks = (content: Plate.InlineElement) => {
   const marks: Marks[] = [];
-  const isText =
-    content.type === 'text' ||
-    (!content.type && typeof (content as any).text === 'string');
-  if (!isText) {
+  if (!isTextElement(content)) {
     return [];
+  }
+  if (
+    content.textColor &&
+    isSafeCssColor(content.textColor) &&
+    !content.highlight
+  ) {
+    marks.push('textColor');
   }
   if (content.bold) {
     marks.push('strong');

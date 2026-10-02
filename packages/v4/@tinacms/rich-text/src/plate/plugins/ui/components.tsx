@@ -31,6 +31,7 @@ import {
 import { ParagraphPlugin, PlateLeaf } from '@udecode/plate/react';
 import colorString from 'color-string';
 import React from 'react';
+import { ListItemElement } from '../../components/list-item-element';
 import { BlockquoteElement } from '../../components/plate-ui/blockquote-element';
 import { CodeBlockElement } from '../../components/plate-ui/code-block/code-block-element';
 import { CodeLeaf } from '../../components/plate-ui/code-leaf';
@@ -39,7 +40,6 @@ import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf';
 import { HrElement } from '../../components/plate-ui/hr-element';
 import { LinkElement } from '../../components/plate-ui/link-element';
 import { ListElement } from '../../components/plate-ui/list-element';
-import { ListItemElement } from '../../components/list-item-element';
 import { ParagraphElement } from '../../components/plate-ui/paragraph-element';
 import { SlashInputElement } from '../../components/plate-ui/slash-input-element';
 import {
@@ -48,6 +48,7 @@ import {
 } from '../../components/plate-ui/table/table-cell-element';
 import { TableElement } from '../../components/plate-ui/table/table-element';
 import { TableRowElement } from '../../components/plate-ui/table/table-row-element';
+import { TextColorPlugin } from '../text-color-plugin';
 import { classNames } from './helpers';
 
 const blockClasses = 'mt-0.5';
@@ -61,21 +62,62 @@ function getContrastColor(color: string): string {
   return luminance > 0.5 ? '#000000' : '#ffffff';
 }
 
+// Mirrors `isSafeCssColor` in @tinacms/mdx (src/sanitize-css-color.ts); this
+// package keeps a copy so it doesn't depend on @tinacms/mdx.
+const SAFE_CSS_COLOR_PATTERNS = [
+  /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i,
+  /^[a-z]+$/i,
+  /^(?:rgba?|hsla?|oklch|oklab)\([0-9.,%/ a-z-]*\)$/i,
+  /^var\(--[a-z0-9_-]+\)$/i,
+];
+
+/** True when `value` is a plain CSS colour that's safe to put in a `style`. */
+export const isSafeCssColor = (value: string) =>
+  SAFE_CSS_COLOR_PATTERNS.some((pattern) => pattern.test(value));
+
+/**
+ * Reads a colour leaf prop (leaf props are untyped in Plate), dropping values
+ * that aren't a plain CSS colour so pasted/loaded content can't inject CSS.
+ */
+const leafColor = (value: unknown) =>
+  typeof value === 'string' && isSafeCssColor(value) ? value : undefined;
+
+// Bold/italic/etc. nested inside a colour leaf get their colour from the
+// editor's prose styles; make them inherit the leaf's colour instead.
+const INHERIT_NESTED_COLOR =
+  '[&_strong]:text-inherit [&_em]:text-inherit [&_s]:text-inherit [&_u]:text-inherit';
+
 const HighlightLeaf = ({
   leaf,
   ...props
 }: React.ComponentProps<typeof PlateLeaf>) => {
-  const backgroundColor = (leaf.highlightColor as string) || '#FEF08A';
+  const backgroundColor = leafColor(leaf.highlightColor) ?? '#FEF08A';
+  // An explicit text colour wins over the auto-contrast colour, so the
+  // result doesn't depend on which leaf Plate nests outermost.
+  const color = leafColor(leaf.textColor) ?? getContrastColor(backgroundColor);
   return (
     <PlateLeaf
       as='mark'
-      className='rounded-sm'
-      style={{ backgroundColor, color: getContrastColor(backgroundColor) }}
+      className={`rounded-sm ${INHERIT_NESTED_COLOR}`}
+      style={{ backgroundColor, color }}
       leaf={leaf}
       {...props}
     />
   );
 };
+
+const TextColorLeaf = ({
+  leaf,
+  ...props
+}: React.ComponentProps<typeof PlateLeaf>) => (
+  <PlateLeaf
+    as='span'
+    className={INHERIT_NESTED_COLOR}
+    style={{ color: leafColor(leaf.textColor) }}
+    leaf={leaf}
+    {...props}
+  />
+);
 
 type HeadingComponentProps = {
   attributes: React.HTMLAttributes<HTMLHeadingElement>;
@@ -246,6 +288,7 @@ export const Components = () => {
     [LinkPlugin.key]: LinkElement,
     [CodePlugin.key]: CodeLeaf,
     [HighlightPlugin.key]: HighlightLeaf,
+    [TextColorPlugin.key]: TextColorLeaf,
     [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
     [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
     [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),

@@ -72,6 +72,31 @@ describe('a host that is not a framework', () => {
     ).toBe('<p><mark style="background-color: #ff0;">hi</mark></p>');
   });
 
+  it('colours text with a span', () => {
+    expect(
+      toHtml([{ type: 'p', children: [text('hi', { textColor: '#c00' })] }])
+    ).toBe('<p><span style="color: #c00;">hi</span></p>');
+  });
+
+  it('folds a text colour into the highlight mark', () => {
+    expect(
+      toHtml([
+        {
+          type: 'p',
+          children: [
+            text('hi', {
+              highlight: true,
+              highlightColor: '#ff0',
+              textColor: '#c00',
+            }),
+          ],
+        },
+      ])
+    ).toBe(
+      '<p><mark style="background-color: #ff0; color: #c00;">hi</mark></p>'
+    );
+  });
+
   it('renders a list', () => {
     expect(
       toHtml([

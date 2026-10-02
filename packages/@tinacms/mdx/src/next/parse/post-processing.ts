@@ -3,6 +3,7 @@ import type { Root } from 'mdast';
 import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx';
 import { visit } from 'unist-util-visit';
 import { remarkToSlate } from '../../parse/remarkToPlate';
+import { foldColorMarkHtml } from './color-marks';
 
 export const postProcessor = (
   tree: Root,
@@ -56,5 +57,5 @@ export const postProcessor = (
   // @ts-ignore - TODO: Type error: Type instantiation is excessively deep and possibly infinite.
   visit(tree, 'mdxJsxTextElement', addPropsToMdxFlow);
 
-  return remarkToSlate(tree, field, imageCallback, '', true);
+  return remarkToSlate(foldColorMarkHtml(tree), field, imageCallback, '', true);
 };

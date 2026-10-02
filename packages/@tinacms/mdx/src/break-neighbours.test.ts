@@ -79,16 +79,21 @@ describe('a break next to a line-start-sensitive neighbour', () => {
   });
 
   /**
-   * A `mark` becomes an inline element with no matching template on a markdown
-   * field, so it writes nothing — and the break in front of it became a
+   * A JSX template without a `match` pattern has no markdown form, so on a
+   * markdown field it writes nothing — and the break in front of it became a
    * dangling `\` only at write time, after the trim had already run.
    */
   it('leaves no dangling backslash when the neighbour writes nothing', () => {
-    const highlighted = { type: 'text', text: 'two', highlight: true };
+    const embed = {
+      type: 'mdxJsxTextElement',
+      name: 'DateTime',
+      props: { format: 'local' },
+      children: [emptyText],
+    };
 
     const written = write(
-      paragraph([text('one'), breakNode, emptyText, highlighted]),
-      markdownField
+      paragraph([text('one'), breakNode, emptyText, embed]),
+      { ...templateField, parser: { type: 'markdown' } }
     );
 
     expect(written).toBe('one\n');

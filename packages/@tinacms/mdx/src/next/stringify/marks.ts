@@ -1,16 +1,14 @@
 import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type * as Plate from '../../parse/plate';
-import { getMarks } from '../../stringify';
+import { isTextElement } from '../../stringify';
 import { stringifyPropsInline } from './acorn';
-
-const matches = (a: string[], b: string[]) => {
-  return a.some((v) => b.includes(v));
-};
-
-type InlineElementWithCallback = Plate.InlineElement & {
-  linkifyTextNode?: (arg: Md.Text) => Md.Link;
-};
+import {
+  cleanNode,
+  colorMarkHtml,
+  type InlineElementWithCallback,
+  pickMarkToProcess,
+} from '../../stringify/mark-runs';
 
 /**
  *
@@ -146,37 +144,22 @@ const text = (content: { text: string }) => {
   };
 };
 
-const markAttributes = (content: Plate.TextElement) => {
-  if (!content.highlightColor) {
-    return [];
-  }
-
-  return [
-    {
-      type: 'mdxJsxAttribute' as const,
-      name: 'style',
-      value: {
-        type: 'mdxJsxAttributeValueExpression' as const,
-        value: `{ backgroundColor: "${content.highlightColor}" }`,
-      },
-    },
-  ];
-};
-
+/**
+ * Serializes inline nodes, grouping neighbours that share a mark.
+ * `previous` is the sibling just written as bare text, if any; see `pickMarkToProcess`.
+ */
 export const eat = (
   c: InlineElementWithCallback[],
   field: RichTextField,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  previous?: InlineElementWithCallback
 ): Md.PhrasingContent[] => {
   const content = replaceLinksWithTextNodes(c);
   const first = content[0];
   if (!first) {
     return [];
   }
-  const firstIsText =
-    first.type === 'text' ||
-    (!first.type && typeof (first as any).text === 'string');
-  if (first && !firstIsText) {
+  if (!isTextElement(first)) {
     if (first.type === 'a') {
       return [
         {
@@ -198,165 +181,49 @@ export const eat = (
       ...eat(content.slice(1), field, imageCallback),
     ];
   }
-  const marks = getMarks(first);
-
-  if (marks.length === 0) {
-    const f = first as Plate.TextElement & {
-      linkifyTextNode?: (arg: Md.Text) => Md.Link;
-    };
-    if (first.linkifyTextNode) {
-      return [
-        first.linkifyTextNode(text({ text: f.text })),
-        ...eat(content.slice(1), field, imageCallback),
-      ];
-    } else {
-      return [
-        text({ text: f.text }),
-        ...eat(content.slice(1), field, imageCallback),
-      ];
-    }
-  }
-  let nonMatchingSiblingIndex: number = 0;
-  if (
-    content.slice(1).every((content, index) => {
-      if (matches(marks, getMarks(content))) {
-        return true;
-      } else {
-        nonMatchingSiblingIndex = index;
-        return false;
-      }
-    })
-  ) {
-    // Every sibling matches, so capture all of them in this node
-    nonMatchingSiblingIndex = content.length - 1;
-  }
-  const matchingSiblings = content.slice(1, nonMatchingSiblingIndex + 1);
-  const markCounts: {
-    [key in
-      | 'strong'
-      | 'emphasis'
-      | 'inlineCode'
-      | 'delete'
-      | 'highlight']?: number;
-  } = {};
-  marks.forEach((mark) => {
-    let count = 1;
-    matchingSiblings.every((sibling, index) => {
-      if (getMarks(sibling).includes(mark)) {
-        count = index + 1;
-        return true;
-      }
-    });
-    markCounts[mark] = count;
-  });
-  let count = 0;
-  let markToProcess:
-    | 'strong'
-    | 'emphasis'
-    | 'inlineCode'
-    | 'delete'
-    | 'highlight'
-    | null = null;
-  Object.entries(markCounts).forEach(([mark, markCount]) => {
-    const m = mark as
-      | 'strong'
-      | 'emphasis'
-      | 'inlineCode'
-      | 'delete'
-      | 'highlight';
-    if (markCount > count) {
-      count = markCount;
-      markToProcess = m;
-    }
-  });
+  const { markToProcess, runLength } = pickMarkToProcess(
+    content,
+    first,
+    previous
+  );
   if (!markToProcess) {
-    const f = first as Plate.TextElement & {
-      linkifyTextNode?: (arg: Md.Text) => Md.Link;
-    };
+    const node = text({ text: first.text });
     return [
-      text({ text: f.text }),
-      ...eat(content.slice(1), field, imageCallback),
+      first.linkifyTextNode?.(node) ?? node,
+      ...eat(content.slice(1), field, imageCallback, first),
     ];
   }
-  if (markToProcess === 'highlight') {
-    if (nonMatchingSiblingIndex) {
-      throw new Error(
-        "Highlighted text can't have other formatting on it. Remove the formatting from the highlighted text."
-      );
-    }
-    const f = first as Plate.TextElement;
-    const innerText = text({ text: f.text });
-    const child: Md.PhrasingContent = first.linkifyTextNode
-      ? first.linkifyTextNode(innerText)
-      : innerText;
-    return [
-      {
-        type: 'mdxJsxTextElement',
-        name: 'mark',
-        attributes: markAttributes(f),
-        children: [child],
-      } as unknown as Md.PhrasingContent,
-      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
-    ];
-  }
+  const rest = eat(content.slice(runLength), field, imageCallback);
   if (markToProcess === 'inlineCode') {
-    const f = first as Plate.TextElement & {
-      linkifyTextNode?: (arg: Md.Text) => Md.Link;
-    };
-    if (nonMatchingSiblingIndex) {
+    if (runLength > 1) {
       throw new Error(
         "Inline code can't have other formatting on it. Remove the formatting from the code text."
       );
     }
     const node = {
       type: markToProcess,
-      value: f.text,
+      value: first.text,
     };
     return [
       // @ts-ignore
       first.linkifyTextNode?.(node) ?? node,
-      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
+      ...rest,
     ];
+  }
+  // Everything in the run shares this mark, so serialize it once around them
+  const children = eat(
+    content.slice(0, runLength).map((node) => cleanNode(node, markToProcess)),
+    field,
+    imageCallback
+  );
+  if (markToProcess === 'highlight' || markToProcess === 'textColor') {
+    return [...colorMarkHtml(first, markToProcess, children), ...rest];
   }
   return [
     {
       type: markToProcess,
-      children: eat(
-        [
-          ...[first, ...matchingSiblings].map((sibling) =>
-            cleanNode(sibling, markToProcess)
-          ),
-        ],
-        field,
-        imageCallback
-      ),
+      children,
     },
-    ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
+    ...rest,
   ];
-};
-
-const cleanNode = (
-  node: InlineElementWithCallback,
-  mark: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight' | null
-): Plate.InlineElement => {
-  if (!mark) {
-    return node;
-  }
-  const cleanedNode: Record<string, unknown> = {};
-  const markToClear = {
-    strong: 'bold',
-    emphasis: 'italic',
-    inlineCode: 'code',
-    delete: 'strikethrough',
-    highlight: 'highlight',
-  }[mark];
-  Object.entries(node).map(([key, value]) => {
-    if (key !== markToClear) {
-      cleanedNode[key] = value;
-    }
-  });
-  if (node.linkifyTextNode) {
-    cleanedNode.callback = node.linkifyTextNode;
-  }
-  return cleanedNode as Plate.InlineElement;
 };

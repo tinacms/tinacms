@@ -1,3 +1,4 @@
+import { isSafeCssColor } from '@tinacms/mdx/sanitize-css-color';
 import { sanitizeUrl } from '@tinacms/mdx/sanitize-url';
 import type {
   RichTextChildren,
@@ -35,6 +36,7 @@ const MARK_FALLBACK_TAG: Record<Exclude<RichTextMarkKey, 'text'>, string> = {
   strikethrough: 's',
   code: 'code',
   highlight: 'mark',
+  textColor: 'span',
 };
 
 export function resolveRichTextNode(
@@ -193,28 +195,49 @@ export function resolveRichTextNode(
   }
 }
 
+/** A leaf colour that's safe to put in `style`, or `undefined` to drop it. */
+const safeColor = (value: string | undefined) =>
+  value && isSafeCssColor(value) ? value : undefined;
+
 function resolveLeaf(
   fields: RichTextNodeFields,
   components: SuppliedComponents
 ): RichTextInstruction {
   const marks: RichTextMark[] = [];
+  // `elementProps` lets the fallback tag read props a component doesn't take.
   const mark = (
     key: Exclude<RichTextMarkKey, 'text'>,
-    props: RichTextProps = {}
+    props: RichTextProps = {},
+    elementProps: RichTextProps = props
   ) => {
     marks.push(
       supplied(components, key)
         ? { kind: 'component', key, props }
-        : { kind: 'element', tag: MARK_FALLBACK_TAG[key], props }
+        : { kind: 'element', tag: MARK_FALLBACK_TAG[key], props: elementProps }
     );
   };
+  const textColor = safeColor(fields.textColor);
+  // With neither colour component supplied, the text colour folds into the
+  // same <mark>; otherwise each mark renders on its own, nested.
+  const foldTextColor =
+    Boolean(fields.highlight && textColor) &&
+    !supplied(components, 'highlight') &&
+    !supplied(components, 'textColor');
 
   if (fields.bold) mark('bold');
   if (fields.italic) mark('italic');
   if (fields.underline) mark('underline');
   if (fields.strikethrough) mark('strikethrough');
   if (fields.code) mark('code');
-  if (fields.highlight) mark('highlight', { color: fields.highlightColor });
+  if (fields.highlight) {
+    mark('highlight', {
+      color: safeColor(fields.highlightColor),
+      ...(foldTextColor && { textColor }),
+    });
+  }
+  if (textColor && !foldTextColor) {
+    mark('textColor', { color: textColor }, { textColor });
+  }
   if (supplied(components, 'text')) {
     marks.push({ kind: 'component', key: 'text', props: {} });
   }
