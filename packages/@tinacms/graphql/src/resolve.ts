@@ -30,6 +30,7 @@ export const resolve = async ({
   verbose,
   isAudit,
   ctxUser,
+  isSignIn,
 }: {
   config?: GraphQLConfig;
   query: string;
@@ -39,6 +40,8 @@ export const resolve = async ({
   verbose?: boolean;
   isAudit?: boolean;
   ctxUser?: { sub?: string } | null;
+  /** Set only by the generated database client's `authenticate()`. */
+  isSignIn?: boolean;
 }) => {
   try {
     const verboseValue = verbose ?? true;
@@ -119,7 +122,7 @@ export const resolve = async ({
                 sub: authArgs.sub,
                 password: authArgs.password,
                 info,
-                ctxUser,
+                isSignIn,
               });
             }
 

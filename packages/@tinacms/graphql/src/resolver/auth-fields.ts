@@ -84,16 +84,19 @@ export async function handleAuthenticate({
   resolver,
   sub,
   password,
-  ctxUser,
+  isSignIn,
 }: {
   tinaSchema: TinaSchema;
   resolver: Resolver;
   sub?: string;
   password: string;
   info: GraphQLResolveInfo;
-  ctxUser?: { sub?: string } | null;
+  isSignIn?: boolean;
 }): Promise<any> {
-  if (ctxUser !== undefined) {
+  // NOTE: [2 Oct 2026] EK - Only the generated client's authenticate() sets isSignIn
+  // (cli src/next/codegen/index.ts). Never infer it from a missing request user, or
+  // a route that forgets to pass one lets any caller test passwords.
+  if (!isSignIn) {
     return null;
   }
 
