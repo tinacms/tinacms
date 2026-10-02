@@ -25,7 +25,7 @@ import { FormifyCallback, createForm, createGlobalForm } from './build-form';
 import { showErrorModal } from './errors';
 import { expandQuery, isConnectionType, isNodeType } from './expand-query';
 import {
-  getExpectedPreviewOrigin,
+  getPreviewOrigin,
   isFromTrustedPreviewOrigin,
   postMessageToPreview,
 } from './preview-origin';
@@ -205,12 +205,9 @@ export const useGraphQLReducer = (
 
   const activeField = searchParams.get('active-field');
 
-  // Origin of the preview document we load in the iframe. Used to validate
+  // The preview is always loaded from the admin's own origin. Used to validate
   // inbound messages and as the explicit `targetOrigin` for outbound ones.
-  const expectedOrigin = React.useMemo(
-    () => getExpectedPreviewOrigin(url),
-    [url]
-  );
+  const expectedOrigin = getPreviewOrigin();
 
   React.useEffect(() => {
     const run = async () => {

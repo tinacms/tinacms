@@ -16,7 +16,7 @@ import { t } from '@tinacms/tinacms';
 const collection = {
   name: 'post',
   fields: [
-    t.string({ name: 'title', label: 'Title', required: true, min: 3 }),
+    t.string({ name: 'title', label: 'Title', validators: [required(), min(3)] }),
   ],
 };
 ```
@@ -27,10 +27,12 @@ The config (`StringFieldSchema`, which extends `BaseFieldSchema`):
 |---|---|---|
 | `name` | `string` (necessary) | The field key in the document. It is also the alternative label. |
 | `label` | `string` | The label on the screen. The validation messages use it. |
-| `required` | `boolean` | An empty value does not pass validation. Refer to the rules below. |
-| `min` | `number` | The minimum length |
-| `max` | `number` | The maximum length |
-| `pattern` | `string` | The `RegExp` source that the value must obey |
+
+> `required`, `min`, `max` and `pattern` are no longer config keys. They are
+> validators that a core plugin registers, and a collection attaches them with
+> `validators`. Refer to
+> [Validation in two layers](./field-plugins.md#validation-in-two-layers).
+
 
 ## The descriptor
 
@@ -63,16 +65,10 @@ schema. The messages use `label`. If the config has no `label`, the messages use
 
 | Config | Rule | Message |
 |---|---|---|
-| `min` | `.min(min)` | `<label> must be at least <min> characters` |
-| `max` | `.max(max)` | `<label> must be at most <max> characters` |
-| `pattern` | `.regex(...)` | `<label> is invalid` |
-| `required` | `.min(1)`, but only if `min` is not more than zero | `<label> is required` |
 
 These conditions are important:
 
-- **`required` with `min`** — If `min` is more than zero, `required` adds no
-  rule. The `min` message tells the user about the empty value. If a necessary
-  field has no `min`, the schema adds `.min(1, "<label> is required")`.
+
 - **Optional fields** — The schema changes `''` and `null` to `undefined`. These
   values pass validation as `.optional()`. Thus an empty optional string is
   correct.

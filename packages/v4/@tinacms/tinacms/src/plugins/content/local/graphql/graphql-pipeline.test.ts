@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { required } from '../../../../plugins/fields';
 import { dispatchContentRequest } from '../server/content-request';
 import {
   type LocalDataLayer,
@@ -11,9 +12,15 @@ import {
 const HELLO_RAW = `---
 title: Hello World
 featured: false
+author: content/authors/ada.md
 ---
 
 Body prose.
+`;
+
+const ADA_RAW = `---
+name: Ada
+---
 `;
 
 let rootDir: string;
@@ -23,6 +30,8 @@ beforeEach(async () => {
   rootDir = await fs.mkdtemp(path.join(tmpdir(), 'tina-graphql-'));
   await fs.mkdir(path.join(rootDir, 'content/posts'), { recursive: true });
   await fs.writeFile(path.join(rootDir, 'content/posts/hello.mdx'), HELLO_RAW);
+  await fs.mkdir(path.join(rootDir, 'content/authors'), { recursive: true });
+  await fs.writeFile(path.join(rootDir, 'content/authors/ada.md'), ADA_RAW);
   dataLayer = createLocalDataLayer({
     rootDir,
     collections: [
@@ -31,10 +40,17 @@ beforeEach(async () => {
         path: 'content/posts',
         format: 'mdx',
         fields: [
-          { name: 'title', type: 'string', required: true },
+          { name: 'title', type: 'string', validators: [required()] },
           { name: 'featured', type: 'boolean' },
+          { name: 'author', type: 'reference', collections: ['author'] },
           { name: 'body', type: 'rich-text', isBody: true },
         ],
+      },
+      {
+        name: 'author',
+        path: 'content/authors',
+        format: 'md',
+        fields: [{ name: 'name', type: 'string', validators: [required()] }],
       },
     ],
   });
@@ -52,6 +68,18 @@ describe('graphql (the v3 pipeline)', () => {
     expect(result.data?.post).toMatchObject({
       title: 'Hello World',
       featured: false,
+    });
+  });
+
+  it('resolves a reference into the document it points at', async () => {
+    const result = await dataLayer.graphql(
+      'query($relativePath: String!) { post(relativePath: $relativePath) { title author { ... on Author { name } } } }',
+      { relativePath: 'hello.mdx' }
+    );
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.post).toMatchObject({
+      title: 'Hello World',
+      author: { name: 'Ada' },
     });
   });
 
@@ -125,7 +153,7 @@ describe('a mixed-format collection through the v3 pipeline', () => {
           name: 'post',
           path: 'content/posts',
           format: ['mdx', 'json'],
-          fields: [{ name: 'title', type: 'string', required: true }],
+          fields: [{ name: 'title', type: 'string', validators: [required()] }],
         },
       ],
     });

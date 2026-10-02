@@ -6,6 +6,7 @@ import {
 import { isErrorNamed } from '@toolkit/core/errors';
 import { AUTH_TOKEN_KEY, authenticate } from '../auth/authenticate';
 import DefaultSessionProvider from '../auth/defaultSessionProvider';
+import { bearerToken } from './bearerToken';
 
 type Input = Parameters<AuthProvider['fetchWithToken']>[0];
 type Init = Parameters<AuthProvider['fetchWithToken']>[1];
@@ -46,8 +47,7 @@ export abstract class AbstractAuthProvider implements AuthProvider {
   }
 
   async getAccessToken(): Promise<string | null> {
-    const token = await this.getToken();
-    return token?.access_token ?? token?.id_token ?? null;
+    return bearerToken(await this.getToken());
   }
 
   async authorize(context?: any): Promise<any> {

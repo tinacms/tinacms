@@ -44,6 +44,7 @@ import {
 } from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
+import { bearerToken } from './bearerToken';
 import { AuthenticatedUser, TinaCloudProject } from './types';
 
 export * from './authProvider';
@@ -320,7 +321,7 @@ mutation addPendingDocumentMutation(
     const headers = {
       'Content-Type': 'application/json',
     };
-    const accessToken = token?.id_token ?? token?.access_token;
+    const accessToken = bearerToken(token);
     if (accessToken) {
       headers['Authorization'] = 'Bearer ' + accessToken;
     }
@@ -760,6 +761,9 @@ mutation addPendingDocumentMutation(
             statusResponseBody.message || 'Editorial workflow failed'
           ) as EditorialWorkflowErrorDetails;
           error.errorCode = statusResponseBody.errorCode || 'WORKFLOW_FAILED';
+          if (statusResponseBody.file) {
+            error.file = statusResponseBody.file;
+          }
           throw error;
         }
 
@@ -808,6 +812,9 @@ mutation addPendingDocumentMutation(
     }
     if (responseBody?.conflictingBranch) {
       error.conflictingBranch = responseBody.conflictingBranch;
+    }
+    if (responseBody?.file) {
+      error.file = responseBody.file;
     }
     return error;
   }

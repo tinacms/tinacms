@@ -113,6 +113,23 @@ for (const pkg of packages) {
       })
     }
 
+    if (pkgName === 'tinacms') {
+      it('browser client bundle excludes Node.js builtins', () => {
+        const manifest = JSON.parse(
+          fs.readFileSync(path.join(pkgDir, 'package.json'), 'utf8')
+        )
+        const clientExport = manifest.exports['./dist/client']
+        const browserClient = fs.readFileSync(
+          path.join(pkgDir, 'dist/client.browser.js'),
+          'utf8'
+        )
+
+        expect(clientExport.browser).toBe('./dist/client.browser.js')
+        expect(browserClient).not.toContain('__vite-browser-external')
+        expect(browserClient).not.toMatch(/['"]node:/)
+      })
+    }
+
     // ------------------------------------------------------------------
     // main
     // ------------------------------------------------------------------

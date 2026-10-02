@@ -7,11 +7,33 @@
         "label": "Posts",
         "path": "content/posts",
         "format": "mdx",
+        "hooks": [
+          {
+            "name": "requireStarsToPublish"
+          },
+          {
+            "name": "logSave",
+            "args": [
+              "saved"
+            ]
+          }
+        ],
         "fields": [
           {
             "name": "title",
             "label": "Title",
-            "required": true,
+            "validators": [
+              {
+                "name": "required"
+              },
+              {
+                "name": "matches",
+                "args": [
+                  "^[A-Z]",
+                  "Start with a capital letter"
+                ]
+              }
+            ],
             "type": "string"
           },
           {
@@ -38,11 +60,33 @@
                 "name": "name",
                 "label": "Name",
                 "type": "string"
+              },
+              {
+                "name": "alias",
+                "label": "Alias",
+                "validators": [
+                  {
+                    "name": "differentFrom",
+                    "args": [
+                      "name",
+                      "Alias must differ from the name"
+                    ]
+                  }
+                ],
+                "type": "string"
               }
             ],
             "type": "array"
-		  },
-		  {
+          },
+          {
+            "type": "reference",
+            "collections": [
+              "page"
+            ],
+            "name": "pages",
+            "label": "Pages Reference"
+          },
+          {
             "name": "status",
             "label": "Status",
             "options": [
@@ -56,6 +100,51 @@
               }
             ],
             "type": "select"
+          },
+          {
+            "name": "seo",
+            "label": "SEO",
+            "fields": [
+              {
+                "name": "title",
+                "label": "Title",
+                "validators": [
+                  {
+                    "name": "required"
+                  }
+                ],
+                "type": "string"
+              },
+              {
+                "name": "description",
+                "label": "Description",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      {
+        "name": "page",
+        "label": "Pages",
+        "path": "content/pages",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "featured",
+            "label": "Featured",
+            "type": "boolean"
           }
         ]
       }
@@ -70,7 +159,9 @@
   "primitives": {
     "array": 1,
     "boolean": 1,
+    "object": 1,
     "rating": 1,
+    "reference": 1,
     "rich-text": 1,
     "select": 1,
     "string": 1

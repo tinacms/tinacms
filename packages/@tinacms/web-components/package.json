@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/web-components",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "files": [
     "package.json",
@@ -25,6 +25,7 @@
     "dompurify": "catalog:"
   },
   "devDependencies": {
+    "@tinacms/mdx": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "happy-dom": "catalog:",
     "vite": "^5.4.14",

@@ -11,8 +11,17 @@
           {
             "name": "title",
             "label": "Title",
-            "required": true,
-            "min": 3,
+            "validators": [
+              {
+                "name": "required"
+              },
+              {
+                "name": "min",
+                "args": [
+                  3
+                ]
+              }
+            ],
             "type": "string"
           },
           {

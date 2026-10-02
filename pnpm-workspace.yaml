@@ -39,7 +39,7 @@ catalog:
     "@aws-sdk/client-s3": ^3.744.0
     "@aws-sdk/s3-request-presigner": ^3.744.0
     "@azure/storage-blob": ^12.26.0
-    "@biomejs/biome": ^1.9.4
+    "@biomejs/biome": ^2.5.14
     "@changesets/changelog-github": ^0.5.0
     "@changesets/cli": 2.27.8
     "@clerk/backend": 0.31.3
@@ -101,7 +101,6 @@ catalog:
     "@types/multer": ^1.4.12
     "@types/normalize-path": ^3.0.2
     "@types/picomatch": ^3.0.2
-    "@types/prettier": ^2.7.3
     "@types/progress": ^2.0.7
     "@types/prompts": ^2.4.9
     "@types/prop-types": ^15.7.14
@@ -166,8 +165,8 @@ catalog:
     esbuild: ^0.28.1
     estree-util-is-identifier-name: 2.1.0
     fast-glob: ^3.3.3
-    final-form: ^5.0.1
-    final-form-arrays: ^4.0.1
+    final-form: 4.20.10
+    final-form-arrays: ^3.1.0
     final-form-set-field-data: ^1.0.2
     fs-extra: ^11.3.0
     glob-parent: ^6.0.2
@@ -219,7 +218,6 @@ catalog:
     postcss: ^8.5.23
     postcss-import: ^14.1.0
     postcss-nesting: ^10.2.0
-    prettier: ^2.8.8
     prism-react-renderer: ^2.4.1
     progress: ^2.0.3
     prompts: ^2.4.2
@@ -230,7 +228,7 @@ catalog:
     react-dnd: ^16.0.1
     react-dnd-html5-backend: ^16.0.1
     react-dropzone: 14.2.3
-    react-final-form: ^7.0.1
+    react-final-form: ^6.5.9
     react-router-dom: ^6.30.3
     react-use: ^17.6.0
     readable-stream: ^4.7.0
@@ -257,5 +255,6 @@ catalog:
     url-pattern: ^1.0.3
     validate-npm-package-name: ^7.0.0
     vfile-message: 3.1.4
+    vite: ^7.3.6
     webfontloader: 1.6.28
     zod: ^3.24.2

@@ -32,9 +32,9 @@ const collection = {
     t.array({
       name: 'authors',
       label: 'Authors',
-      required: true,
+      validators: [required()],
       fields: [
-        t.string({ name: 'name', label: 'Name', required: true }),
+        t.string({ name: 'name', label: 'Name', validators: [required()] }),
         t.string({ name: 'role', label: 'Role' }),
       ],
     }),
@@ -47,8 +47,12 @@ const collection = {
 | Key | Type | Effect |
 |---|---|---|
 | `fields` | `FieldSchema[]` (required) | the item template; every item has this same shape |
-| `min` | `number` | the fewest items allowed; `required` alone implies `min: 1` |
-| `max` | `number` | the most items allowed |
+
+> `required`, `min`, `max` and `pattern` are no longer config keys. They are
+> validators that a core plugin registers, and a collection attaches them with
+> `validators`. Refer to
+> [Validation in two layers](./field-plugins.md#validation-in-two-layers).
+
 
 The stored value is an array of plain objects, one per item, keyed by each
 item field's own `name`.
@@ -83,8 +87,6 @@ defineClientPlugin({
 | Config | Rule | Message |
 |---|---|---|
 | `required` (no `min`) | fewer than 1 item | `<label> needs at least 1 item` |
-| `min` | fewer than `min` items | `<label> needs at least <min> items` |
-| `max` | more than `max` items | `<label> allows at most <max> items` |
 
 That schema checks the array's own shape only — it does not look inside an
 item. Each item field's own rules run through `validateChildren(value, node,
@@ -148,24 +150,11 @@ The registry is necessary: `invariant` throws `array-field-no-registry` if
 already-installed tool for exactly this job, with stable item keys so React
 does not misalign inputs across a reorder.
 
-For each item, for each item field, it renders a row — a `<label>` pointing at
-the item field's own nested address (unless that field's descriptor sets
-`labelable: false` too), then `<FieldNode address node>`:
-
-```tsx
-function ItemFieldRow({ address, node }: { address: string; node: FieldSchema }) {
-  const labelable =
-    useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
-  return (
-    <div>
-      <Label id={`${address}-label`} htmlFor={labelable ? address : undefined}>
-        {node.label ?? node.name}
-      </Label>
-      <FieldNode address={toFieldAddress(address)} node={node} />
-    </div>
-  );
-}
-```
+For each item, for each item field, it renders `<NestedFieldRow address node>`
+(`editor/field.tsx`) — a `<Label>` pointing at the item field's own nested
+address (unless that field's descriptor sets `labelable: false` too), then
+`<FieldNode address node>`. `object` renders the same row, so the row is
+shared, not copied per field.
 
 `<FieldNode>` (`editor/field.tsx`) is the part of `<Field>` that resolves a
 descriptor and supplies `FieldAddressContext`/`FieldSchemaContext` — it does

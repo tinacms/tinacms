@@ -12,7 +12,7 @@ updatedDate: 2024-03-15T00:00:00.000Z
 
 Before you begin, make sure you have:
 
-* Node.js 18 or higher
+* Node.js 22 or higher
 * A Next.js project
 * Basic knowledge of React
 

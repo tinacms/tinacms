@@ -10,12 +10,14 @@ export {
   useIsFieldDirty,
   useIsFormDirty,
 } from '../form/form-store';
-export type { SaveHandler } from './context';
+export type { SaveHandler, StaleDraftActions } from './context';
 export {
   Field,
   FieldNode,
   type FieldNodeProps,
   type FieldProps,
+  NestedFieldRow,
+  type NestedFieldRowProps,
 } from './field';
 export {
   FormProvider,
@@ -41,10 +43,14 @@ export {
 } from './content-queries';
 export {
   type ActiveField,
+  AfterSaveHookError,
+  FormValidationError,
   useActiveField,
   useContentSlice,
+  useMediaSlice,
   useDiscardEdits,
   useDocumentPath,
+  useStaleDraft,
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,

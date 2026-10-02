@@ -448,9 +448,12 @@ export class TinaMediaStore implements MediaStore {
   }
 
   private dispatchMediaWorkflowError(err: unknown): void {
+    // `error` carries the code and file the CMS needs to write its own copy;
+    // `message` stays for subscribers that predate it.
     this.cms.events.dispatch({
       type: 'media:workflow:error',
       message: err instanceof Error ? err.message : String(err),
+      error: err,
     });
   }
 
@@ -1125,7 +1128,7 @@ export class TinaMediaStore implements MediaStore {
       res = await this.api.authProvider.fetchWithToken(
         `${this.listUrl}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}${
+        }${options.offset ? `&cursor=${encodeURIComponent(options.offset)}` : ''}${
           encodedBranch ? `&branch=${encodedBranch}` : ''
         }${
           options.search ? `&search=${encodeURIComponent(options.search)}` : ''
@@ -1147,7 +1150,7 @@ export class TinaMediaStore implements MediaStore {
       res = await this.fetchFunction(
         `${this.url}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}${
+        }${options.offset ? `&cursor=${encodeURIComponent(options.offset)}` : ''}${
           options.search ? `&search=${encodeURIComponent(options.search)}` : ''
         }${
           options.ext?.length

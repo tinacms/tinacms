@@ -16,7 +16,10 @@ app renders one component and does not compose the provider by hand.
 the `client()` import of each manifest. Then it builds the `FieldRegistry`, a
 `Map<type, FieldDescriptor>`. If two plugins have the same `type`, the function
 throws an error. To prevent the error, one plugin must declare `overrides`.
-`RegistryContext` supplies the registry to the components below it.
+The same pass builds the `ValidatorRegistry`, a `Map<name, ValidatorFactory>`,
+from each plugin's `validators` (`core/validator/registry.ts`); the same
+conflict and `overrides` rules apply, keyed by name.
+`TinaRuntimeContext` supplies both registries to the components below it.
 
 ## 2. Seed a form from the document
 
@@ -69,14 +72,19 @@ that field again, but does not render the other fields again.
 ## 5. Validate
 
 At each change, react-hook-form runs the resolver. For each field, the resolver
-calls `validateFieldTree(node, descriptor, value, address, registry)`
+calls `validateFieldTree(node, descriptor, value, address, registry, scope)`
 (`core/validation.ts`), with `address` set to that field's own top-level name.
-That function calls `validateField(node, descriptor, value)`, which runs the
-Zod schema of the descriptor, `schema(node)`, then the optional `validate(value)`
-function. It joins the two sets of messages under `address`.
+That function calls `validateField(node, descriptor, value, { ...scope,
+address })`, which runs the Zod schema of the descriptor, `schema(node)`, then
+the optional plugin-level `validate(value, context)`, then each field-level
+validator the node lists. It joins the sets of messages under `address`.
+`schema(node)` gives the shape of the value and its coercion, not the rules:
+`required`, `min`, `max` and `pattern` are validators a core plugin registers.
+Refer to [Validation in two layers](./field-plugins.md#validation-in-two-layers).
 
 Then, if the descriptor is a compound field, `validateFieldTree` calls its
-optional `validateChildren(value, node, address, registry)` function — `address`
+optional `validateChildren(value, node, address, registry, scope)` function —
+`address`
 lets a nested compound field key its own children off where it actually sits,
 not off `node.name` alone. `validateChildren` calls `validateFieldTree` again,
 once for each item field, at that item's own nested address, such as
@@ -100,7 +108,13 @@ alongside that array. So the array's own address is never itself an entry
 once it has a child error — `useFieldErrors` on that address only ever sees
 something because it went looking underneath it.
 
-## 6. Digest at save
+## 6. Validate, then digest at save
+
+`useFormSave` (`editor/hooks.ts`) first calls react-hook-form's `trigger()`
+with no arguments, so every field validates, including a field the editor
+never touched. If any field has a message, save throws `FormValidationError`
+and the form stays dirty (ADR-018 §2). The admin `SaveButton` also reads
+`useFormErrors(formId)` and is disabled while the form has a message.
 
 `digestDocument(values, fields, registry)` (`core/form/ingest.ts`) does the
 opposite operation to `ingestDocument`. For each field, it calls the
@@ -113,6 +127,10 @@ registry alongside `documentPath`. A compound field's `parse`/`serialize`
 reads `context.registry` to call `ingestDocument`/`digestDocument` again, once
 for each item, with its own `fields` config. Thus it reuses the same
 conversion path for its items as the top-level form uses for its fields.
+
+`runBeforeSave` then threads the digested document through every `beforeSave`
+hook the collection lists. After `markSaved`, `runAfterSave` runs. Refer to
+[Form hook plugins](./plugins.md#form-hook-plugins).
 
 ## Form status
 

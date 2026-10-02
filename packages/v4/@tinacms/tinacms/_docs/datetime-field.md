@@ -24,7 +24,7 @@ import { t } from '@tinacms/tinacms';
 const collection = {
   name: 'post',
   fields: [
-    t.datetime({ name: 'published', label: 'Published', required: true }),
+    t.datetime({ name: 'published', label: 'Published', validators: [required()] }),
   ],
 };
 ```
@@ -103,7 +103,6 @@ then validates the result:
 |---|---|---|
 | — | The value must be a string | `<label> must be a date string` |
 | — | The string must be an ISO 8601 date or date-time, and it must parse with `Date.parse` | `<label> must be a valid date` |
-| `required` | An empty value (after step 2) fails the string check | `<label> is required` |
 | — | An optional empty value passes as `.optional()` | — |
 
 The shape rule keeps the schema and the component in agreement. `Date.parse`
