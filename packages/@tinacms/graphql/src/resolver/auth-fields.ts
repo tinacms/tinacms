@@ -2,8 +2,11 @@ import path from 'path';
 import type { Collection, TinaSchema } from '@tinacms/schema-tools';
 import type { GraphQLResolveInfo } from 'graphql';
 import { get } from '../util';
-import { set } from 'es-toolkit/compat';
-import { checkPasswordHash, mapUserFields } from '../auth/utils';
+import {
+  checkPasswordHash,
+  generatePasswordHash,
+  mapUserFields,
+} from '../auth/utils';
 import type { Resolver } from './index';
 
 export async function getUserDocumentContext(
@@ -170,36 +173,26 @@ export async function handleUpdatePassword({
   );
 
   const { idFieldName, passwordFieldName } = userField;
-  const user = users.find((u: any) => u[idFieldName] === ctxUser.sub);
-  if (!user) {
+  if (!users.find((u: any) => u[idFieldName] === ctxUser.sub)) {
     throw new Error('Not authorized');
   }
 
-  user[passwordFieldName] = {
-    value: password,
-    passwordChangeRequired: false,
-  };
-
-  const newBody = {};
-  set(
-    newBody,
-    userField.path.slice(1), // remove _rawData from users path
-    users.map((u: any) => {
-      if (user[idFieldName] === u[idFieldName]) {
-        return user;
-      }
-      return {
-        // don't overwrite other users' passwords
-        ...u,
-        [passwordFieldName]: {
-          ...u[passwordFieldName],
-          value: '',
-        },
-      };
-    })
-  );
-
-  await resolver.updateAuthDocument({ newBody });
+  // Hashing is slow, so it happens before the store is read for the write
+  const passwordHash = await generatePasswordHash({ password });
+  await resolver.updateAuthDocumentInternal((rawData) => {
+    const storedUsers = get(rawData, userField.path.slice(1)); // drop _rawData
+    const user = Array.isArray(storedUsers)
+      ? storedUsers.find((u: any) => u[idFieldName] === ctxUser.sub)
+      : undefined;
+    if (!user) {
+      throw new Error('Not authorized');
+    }
+    user[passwordFieldName] = {
+      value: passwordHash,
+      passwordChangeRequired: false,
+    };
+    return rawData;
+  });
 
   return true;
 }
