@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 4.0.1
+
+### Patch Changes
+
+- [`5db1597`](https://github.com/tinacms/tinacms/commit/5db1597953eb4dd24c23c7b5e441702b749d46ac) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Validate media upload file types on the server and reject active document types (e.g. `.html`, `.js`, `.xml`) instead of relying on the client-side accept filter alone.
+
+- Updated dependencies [[`d281cdf`](https://github.com/tinacms/tinacms/commit/d281cdf3a1dc1d5ef42d2bfd15c29224acc9d201)]:
+  - tinacms@3.14.3
+
 ## 4.0.0
 
 ### Major Changes

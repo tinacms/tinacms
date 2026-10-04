@@ -1,5 +1,14 @@
 # next-tinacms-azure
 
+## 15.1.1
+
+### Patch Changes
+
+- [`5db1597`](https://github.com/tinacms/tinacms/commit/5db1597953eb4dd24c23c7b5e441702b749d46ac) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Validate media upload file types on the server and reject active document types (e.g. `.html`, `.js`, `.xml`) instead of relying on the client-side accept filter alone.
+
+- Updated dependencies [[`d281cdf`](https://github.com/tinacms/tinacms/commit/d281cdf3a1dc1d5ef42d2bfd15c29224acc9d201)]:
+  - tinacms@3.14.3
+
 ## 15.1.0
 
 ### Minor Changes
@@ -308,7 +317,6 @@
 ### Patch Changes
 
 - [#6262](https://github.com/tinacms/tinacms/pull/6262) [`3a12a39`](https://github.com/tinacms/tinacms/commit/3a12a392d5a8eb9bba5a5be65d080f24afa08de3) Thanks [@0xharkirat](https://github.com/0xharkirat)! - 🔒 Security: Update Next.js to 14.2.35 to address security vulnerabilities
-
   - Address CVE-2025-55184 (high): DoS via malicious HTTP request causing server to hang
   - Address CVE-2025-67779 (high): Complete fix for CVE-2025-55184 DoS vulnerability
   - Updated Next.js devDependency from 14.2.10/14.2.24 to 14.2.35
