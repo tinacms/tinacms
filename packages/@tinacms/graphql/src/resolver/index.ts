@@ -846,17 +846,21 @@ export class Resolver {
     }
   };
 
+  private isAuthCollectionPath = (realPath: string) => {
+    const authCollection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    return (
+      !!authCollection &&
+      this.isStoredInCollection(normalizePath(realPath), authCollection)
+    );
+  };
+
   private withAuthCollectionLock = <T>(
     realPath: string,
     write: () => Promise<T>
   ): Promise<T> => {
-    const authCollection = this.tinaSchema
-      .getCollections()
-      .find((c) => c.isAuthCollection);
-    if (
-      !authCollection ||
-      !this.isStoredInCollection(normalizePath(realPath), authCollection)
-    ) {
+    if (!this.isAuthCollectionPath(realPath)) {
       return write();
     }
     const previous = authCollectionWrites.get(this.database);
@@ -1098,43 +1102,50 @@ export class Resolver {
       await this.deleteDocument(realPath);
       // update references to the document
       const collRefs = await this.findReferences(realPath, collection);
+      // resolveUpdateDocument already holds the lock when realPath is in the auth collection
+      const holdsLock = this.isAuthCollectionPath(realPath);
       for (const [_collection, docsWithRefs] of Object.entries(collRefs)) {
         for (const [pathToDocWithRef, referencePaths] of Object.entries(
           docsWithRefs
         )) {
-          // load the document with the references
-          let docWithRef = await this.getRaw(pathToDocWithRef);
+          const rewriteReferences = async () => {
+            // load the document with the references
+            let docWithRef = await this.getRaw(pathToDocWithRef);
 
-          let hasUpdate = false;
-          // update each reference to the updated document
-          for (const path of referencePaths) {
-            const { object, updated } = updateObjectWithJsonPath(
-              docWithRef,
-              path,
-              realPath,
-              newRealPath
-            );
-            docWithRef = object;
-            hasUpdate = updated || hasUpdate;
-          }
-
-          // save the updated document
-          if (hasUpdate) {
-            // lookup collection for the document with the references
-            const collectionWithRef =
-              this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
-            if (!collectionWithRef) {
-              throw new Error(
-                `Unable to find collection for ${pathToDocWithRef}`
+            let hasUpdate = false;
+            // update each reference to the updated document
+            for (const path of referencePaths) {
+              const { object, updated } = updateObjectWithJsonPath(
+                docWithRef,
+                path,
+                realPath,
+                newRealPath
               );
+              docWithRef = object;
+              hasUpdate = updated || hasUpdate;
             }
 
-            await this.database.put(
-              pathToDocWithRef,
-              docWithRef,
-              collectionWithRef.name
-            );
-          }
+            // save the updated document
+            if (hasUpdate) {
+              // lookup collection for the document with the references
+              const collectionWithRef =
+                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
+              if (!collectionWithRef) {
+                throw new Error(
+                  `Unable to find collection for ${pathToDocWithRef}`
+                );
+              }
+
+              await this.database.put(
+                pathToDocWithRef,
+                docWithRef,
+                collectionWithRef.name
+              );
+            }
+          };
+          await (holdsLock
+            ? rewriteReferences()
+            : this.withAuthCollectionLock(pathToDocWithRef, rewriteReferences));
         }
       }
       return this.getDocument(newRealPath);
@@ -1217,37 +1228,39 @@ export class Resolver {
         for (const [pathToDocWithRef, referencePaths] of Object.entries(
           docsWithRefs
         )) {
-          // load the doc with the references
-          let refDoc = await this.getRaw(pathToDocWithRef);
+          await this.withAuthCollectionLock(pathToDocWithRef, async () => {
+            // load the doc with the references
+            let refDoc = await this.getRaw(pathToDocWithRef);
 
-          let hasUpdate = false;
-          // Update each reference to the deleted document
-          for (const path of referencePaths) {
-            const { object, updated } = updateObjectWithJsonPath(
-              refDoc,
-              path,
-              realPath,
-              null
-            );
-            refDoc = object;
-            hasUpdate = updated || hasUpdate;
-          }
+            let hasUpdate = false;
+            // Update each reference to the deleted document
+            for (const path of referencePaths) {
+              const { object, updated } = updateObjectWithJsonPath(
+                refDoc,
+                path,
+                realPath,
+                null
+              );
+              refDoc = object;
+              hasUpdate = updated || hasUpdate;
+            }
 
-          if (hasUpdate) {
-            const collectionWithRef =
-              this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
-            if (!collectionWithRef) {
-              throw new Error(
-                `Unable to find collection for ${pathToDocWithRef}`
+            if (hasUpdate) {
+              const collectionWithRef =
+                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
+              if (!collectionWithRef) {
+                throw new Error(
+                  `Unable to find collection for ${pathToDocWithRef}`
+                );
+              }
+              // save the updated doc
+              await this.database.put(
+                pathToDocWithRef,
+                refDoc,
+                collectionWithRef.name
               );
             }
-            // save the updated doc
-            await this.database.put(
-              pathToDocWithRef,
-              refDoc,
-              collectionWithRef.name
-            );
-          }
+          });
         }
       }
     }
