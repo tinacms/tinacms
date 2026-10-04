@@ -568,6 +568,38 @@ describe('auth collection admins', () => {
     expect(result.errors?.[0]?.message).toBe('Not authorized');
   });
 
+  it.each([{ isDetached: true }, { isDetached: false }])(
+    'keeps a removed admin removed when their own password change is in flight (isDetached: $isDetached)',
+    async ({ isDetached }) => {
+      const { query, database } = await setupMutation(
+        __dirname,
+        buildConfig({ isDetached }),
+        { authCollection: { admins: ['admin-user', 'editor-user'] } }
+      );
+      const passwordChange = query({
+        query: `mutation { updatePassword(password: "editor-chosen") }`,
+        variables: {},
+        ctxUser: { sub: 'editor-user' },
+      });
+      const removal = await query({
+        query: updateUsers,
+        variables: { params: adminOnly },
+        ctxUser: { sub: 'admin-user' },
+      });
+      expect(removal.errors).toBeUndefined();
+      await passwordChange;
+
+      const stored = JSON.parse(JSON.stringify(await database.get(USERS_PATH)));
+      expect(stored.users.map((u: any) => u.username)).toEqual(['admin-user']);
+      const adminWrite = await query({
+        query: updateUsers,
+        variables: { params: adminOnly },
+        ctxUser: { sub: 'editor-user' },
+      });
+      expect(adminWrite.errors?.[0]?.message).toBe('Not authorized');
+    }
+  );
+
   it('rejects an admin when index.json is missing', async () => {
     const { query, bridge } = await setupMutation(
       path.join(__dirname, 'no-users'),

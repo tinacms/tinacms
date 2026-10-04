@@ -1105,40 +1105,6 @@ export class Resolver {
     if (!newBody) {
       throw new Error('Body not provided for updated document.');
     }
-    return this.writeDocumentBody({ collection, realPath, doc, newBody });
-  };
-
-  /**
-   * Updates the user store of the auth collection for the auth field
-   * handlers. It does not check the request user, so the caller must do that.
-   */
-  public updateAuthDocument = async ({
-    newBody,
-  }: {
-    newBody: Record<string, unknown>;
-  }) => {
-    const collection = this.tinaSchema
-      .getCollections()
-      .find((c) => c.isAuthCollection);
-    if (!collection) {
-      throw new Error('Auth collection not found');
-    }
-    const { realPath } = this.getValidatedPath(collection.name, 'index.json');
-    const doc = await this.getDocument(realPath);
-    return this.writeDocumentBody({ collection, realPath, doc, newBody });
-  };
-
-  private writeDocumentBody = async ({
-    collection,
-    realPath,
-    doc,
-    newBody,
-  }: {
-    collection: Collection<true>;
-    realPath: string;
-    doc: Awaited<ReturnType<Resolver['getDocument']>>;
-    newBody: Record<string, unknown>;
-  }) => {
     if (collection.isAuthCollection) {
       assertNewUsersHavePasswords(collection, newBody, doc?._rawData);
     }
@@ -1157,6 +1123,26 @@ export class Resolver {
       collection.name
     );
     return this.getDocument(realPath);
+  };
+
+  /**
+   * Rewrites the auth collection's user store without the admin check, so the
+   * caller must check the request user.
+   */
+  public updateAuthDocumentInternal = async (
+    update: (rawData: Record<string, any>) => Record<string, any>
+  ) => {
+    const collection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    if (!collection) {
+      throw new Error('Auth collection not found');
+    }
+    const { realPath } = this.getValidatedPath(collection.name, 'index.json');
+    // NOTE: [5 Oct 2026] EK - Keep `update` synchronous. Anything awaited between
+    // this read and the put lets a stale copy overwrite an admin's save.
+    const rawData = await this.getRaw(realPath);
+    await this.database.put(realPath, update(rawData), collection.name);
   };
 
   public resolveDeleteDocument = async ({
