@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import config from './tina/config';
+import config, { schema } from './tina/config';
 import { setupMutation } from '../util';
 import { checkPasswordHash } from '../../src/auth/utils';
 import fs from 'fs-extra';
@@ -88,6 +88,38 @@ it('fails to update password for non-existent user', async () => {
 
   expect(result.errors).toBeDefined();
   expect(result.errors?.[0].message).toBe('Not authorized');
+  expect(bridge.getWrites().size).toBe(0);
+});
+
+it('fails to update password when the user field has no password field', async () => {
+  const [users] = schema.collections;
+  const { query, bridge } = await setupMutation(__dirname, {
+    schema: {
+      collections: [
+        {
+          ...users,
+          fields: users.fields?.map((field) =>
+            field.type === 'object' && field.fields
+              ? {
+                  ...field,
+                  fields: field.fields.filter((f) => f.type !== 'password'),
+                }
+              : field
+          ),
+        },
+      ],
+    },
+  });
+
+  const result = await query({
+    query: updatePasswordMutation,
+    variables: { password: 'newpassword123' },
+    ctxUser: { sub: 'northwind' },
+  });
+
+  expect(result.errors?.[0].message).toBe(
+    'No password field found on user field'
+  );
   expect(bridge.getWrites().size).toBe(0);
 });
 
