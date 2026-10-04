@@ -173,6 +173,9 @@ export async function handleUpdatePassword({
   );
 
   const { idFieldName, passwordFieldName } = userField;
+  if (!passwordFieldName) {
+    throw new Error('No password field found on user field');
+  }
   if (!users.find((u: any) => u[idFieldName] === ctxUser.sub)) {
     throw new Error('Not authorized');
   }
