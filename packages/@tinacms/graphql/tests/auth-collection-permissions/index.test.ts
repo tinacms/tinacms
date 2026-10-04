@@ -600,6 +600,34 @@ describe('auth collection admins', () => {
     }
   );
 
+  it('keeps a removed admin removed when their password change lands while the removal commits', async () => {
+    let commitDelay = 0;
+    const { query, database } = await setupMutation(
+      __dirname,
+      buildConfig({ isDetached: false }),
+      {
+        authCollection: { admins: ['admin-user', 'editor-user'] },
+        onPut: () => new Promise((resolve) => setTimeout(resolve, commitDelay)),
+      }
+    );
+    commitDelay = 200;
+    const removal = query({
+      query: updateUsers,
+      variables: { params: adminOnly },
+      ctxUser: { sub: 'admin-user' },
+    });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    await query({
+      query: `mutation { updatePassword(password: "editor-chosen") }`,
+      variables: {},
+      ctxUser: { sub: 'editor-user' },
+    });
+    expect((await removal).errors).toBeUndefined();
+
+    const stored = JSON.parse(JSON.stringify(await database.get(USERS_PATH)));
+    expect(stored.users.map((u: any) => u.username)).toEqual(['admin-user']);
+  });
+
   it('rejects an admin when index.json is missing', async () => {
     const { query, bridge } = await setupMutation(
       path.join(__dirname, 'no-users'),

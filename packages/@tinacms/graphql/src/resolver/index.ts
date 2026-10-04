@@ -61,6 +61,17 @@ export type AuthCollectionWriteOp =
  */
 export type CtxUser = { sub?: string } | null | undefined;
 
+// NOTE: [5 Oct 2026] EK - Queues writes to the auth collection so a save cannot
+// write back a copy read before another one. Per process, so instances can race.
+const authCollectionWrites = new WeakMap<Database, Promise<unknown>>();
+
+type UpdateDocumentArgs = {
+  collectionName: string;
+  relativePath: string;
+  newRelativePath?: string;
+  newBody?: Record<string, unknown>;
+};
+
 interface ResolverConfig {
   config?: GraphQLConfig;
   database: Database;
@@ -835,6 +846,28 @@ export class Resolver {
     }
   };
 
+  private withAuthCollectionLock = <T>(
+    realPath: string,
+    write: () => Promise<T>
+  ): Promise<T> => {
+    const authCollection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    if (
+      !authCollection ||
+      !this.isStoredInCollection(normalizePath(realPath), authCollection)
+    ) {
+      return write();
+    }
+    const previous = authCollectionWrites.get(this.database);
+    const current = previous ? previous.then(write, write) : write();
+    authCollectionWrites.set(
+      this.database,
+      current.catch(() => undefined)
+    );
+    return current;
+  };
+
   private isStoredInCollection = (
     realPath: string,
     collection: Collection<true>
@@ -993,17 +1026,22 @@ export class Resolver {
     return this.getDocument(realPath);
   };
 
-  public resolveUpdateDocument = async ({
+  public resolveUpdateDocument = async (args: UpdateDocumentArgs) => {
+    const { realPath } = this.getValidatedPath(
+      args.collectionName,
+      args.relativePath
+    );
+    return this.withAuthCollectionLock(realPath, () =>
+      this.updateDocument(args)
+    );
+  };
+
+  private updateDocument = async ({
     collectionName,
     relativePath,
     newRelativePath,
     newBody,
-  }: {
-    collectionName: string;
-    relativePath: string;
-    newRelativePath?: string;
-    newBody?: Record<string, unknown>;
-  }) => {
+  }: UpdateDocumentArgs) => {
     const { collection, realPath } = this.getValidatedPath(
       collectionName,
       relativePath
@@ -1139,10 +1177,10 @@ export class Resolver {
       throw new Error('Auth collection not found');
     }
     const { realPath } = this.getValidatedPath(collection.name, 'index.json');
-    // NOTE: [5 Oct 2026] EK - Keep `update` synchronous. Anything awaited between
-    // this read and the put lets a stale copy overwrite an admin's save.
-    const rawData = await this.getRaw(realPath);
-    await this.database.put(realPath, update(rawData), collection.name);
+    await this.withAuthCollectionLock(realPath, async () => {
+      const rawData = await this.getRaw(realPath);
+      await this.database.put(realPath, update(rawData), collection.name);
+    });
   };
 
   public resolveDeleteDocument = async ({
