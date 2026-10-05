@@ -19,6 +19,7 @@ import { Media, MediaListOptions } from 'tinacms';
 import path from 'node:path';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
+import { isDisallowedUploadType } from './upload-type';
 
 export interface S3Config {
   config: S3ClientConfig;
@@ -89,6 +90,9 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
               return res.status(400).json({ message: e.message });
             }
             throw e;
+          }
+          if (isDisallowedUploadType(s3_key)) {
+            return res.status(415).json({ message: 'Unsupported file type' });
           }
           if (await keyExists(client, bucket, s3_key)) {
             return res.status(400).json({ message: 'key already exists' });
