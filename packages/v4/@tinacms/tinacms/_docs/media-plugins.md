@@ -21,13 +21,50 @@ A media plugin mounts a slice at `store.media`. The slice is a `MediaProvider`
 | Operation | Role |
 |---|---|
 | `upload(file, folder?)` | Saves the file in `folder`, and returns its media path. |
-| `list(folder, { cursor, limit }?)` | Returns one page of the items in `folder`: folders first, then files. `cursor` in the result gives the next page. |
+| `list(folder, { cursor, limit, search, extensions }?)` | Returns one page of the items in `folder`: folders first, then files. `cursor` in the result gives the next page. |
 | `delete(path)` | Deletes one file. It does not delete a folder. |
-| `resolveUrl(path)` | Returns the URL that a page loads for the media path. |
+| `resolveUrl(path, { width, height }?)` | Returns the URL that a page loads for the media path. |
 
 `useMediaSlice()` (`@tinacms/tinacms/react`) gives the slice. If no plugin
 mounts a slice with all four operations, it throws
 `media-capability-missing`.
+
+### Optional additions
+
+A provider can supply more. Each addition is optional. The
+[Media Manager](./media-manager.md) shows a control only when the provider
+supplies the addition for it.
+
+| Addition | Role |
+|---|---|
+| `list(..., { search })` | Returns only the items whose name matches `search`. Set `features.search` when `list` uses it. |
+| `list(..., { extensions })` | Returns only the files with one of the extensions, for example `['jpg', 'png']`. Extensions are lowercase and have no dot. Set `features.extensionFilter` when `list` uses it. |
+| `resolveUrl(path, { width, height })` | Returns a URL for an image at that size. A provider without image transforms ignores the options and returns the original URL ([ADR-022](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/022-media-capability-contract.md) §5). |
+| `rename(from, to)` | Moves a file to a new media path in the same media root, and returns the new path. On failure it throws `MediaRenameError`. |
+| `features` | Tells the UI what the provider supports. Refer to the next table. |
+| `status()` | Returns `{ kind: 'ready' }`, or `{ kind: 'needs-setup', message, actionLabel, actionUrl }` when the media store needs setup before use. |
+
+| `features` field | Role |
+|---|---|
+| `search` | `list` uses `search`. |
+| `extensionFilter` | `list` uses `extensions`. |
+| `accept` | The file types that `upload` accepts: MIME patterns such as `image/*`, or extensions such as `.svg`. |
+| `maxSize` | The largest file that `upload` accepts, in bytes. |
+| `readOnly` | The provider does not upload, rename or delete. |
+
+`MediaRenameError` has a `code`:
+
+| Code | Meaning |
+|---|---|
+| `not-found` | The file at `from` does not exist. |
+| `name-taken` | A file at `to` exists. |
+| `invalid-name` | The new file name is not valid. |
+| `invalid-path` | `to` is not a valid media path. |
+| `unauthorized` | The user cannot rename the file. |
+| `unsupported` | The media store cannot rename files. |
+| `backend-failure` | The media store failed. |
+
+`localMediaPlugin()` supplies none of the optional additions.
 
 ## `localMediaPlugin()`
 

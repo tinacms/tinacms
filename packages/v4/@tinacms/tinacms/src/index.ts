@@ -19,12 +19,17 @@ export type {
   DocumentEntry,
   DocumentSummary,
 } from './core/content/contract';
-export type {
-  MediaItem,
-  MediaPage,
-  MediaPageRequest,
-  MediaProvider,
-  MediaSlice,
+export {
+  type MediaFeatures,
+  type MediaItem,
+  type MediaPage,
+  type MediaPageRequest,
+  type MediaProvider,
+  MediaRenameError,
+  type MediaRenameErrorCode,
+  type MediaSlice,
+  type MediaStatus,
+  type MediaUrlOptions,
 } from './core/media/contract';
 export type { AdminScreen, AdminScreenProps } from './core/screen/contract';
 export {
@@ -48,6 +53,12 @@ export type {
 } from './core/schema/types';
 export { localContentPlugin } from './plugins/content/local/local-content.plugin';
 export { localMediaPlugin } from './plugins/media/local/local-media.plugin';
+export { mediaManagerPlugin } from './plugins/media-manager/media-manager.plugin';
+export type {
+  MediaAccept,
+  MediaCategory,
+  MediaExtension,
+} from './plugins/media-manager/media-types';
 export {
   corePlugins,
   max,

@@ -10,6 +10,10 @@ export {
   useIsFieldDirty,
   useIsFormDirty,
 } from '../form/form-store';
+export {
+  MediaBrowser,
+  type MediaBrowserProps,
+} from '../plugins/media-manager/media-browser';
 export type { SaveHandler, StaleDraftActions } from './context';
 export {
   Field,

@@ -23,6 +23,18 @@ export type {
   SlotContributions,
   UrlTarget,
 } from '../core/slot/contract';
+export {
+  type MediaFeatures,
+  type MediaItem,
+  type MediaPage,
+  type MediaPageRequest,
+  type MediaProvider,
+  MediaRenameError,
+  type MediaRenameErrorCode,
+  type MediaSlice,
+  type MediaStatus,
+  type MediaUrlOptions,
+} from '../core/media/contract';
 export type { ClientSegment };
 export {
   createRpcClient,

@@ -8,6 +8,9 @@ export interface MediaItem {
 export interface MediaPageRequest {
   cursor?: string;
   limit?: number;
+  search?: string;
+  /** Lowercase extensions without the dot, for example `['jpg', 'png']`. */
+  extensions?: string[];
 }
 
 export interface MediaPage {
@@ -15,11 +18,60 @@ export interface MediaPage {
   cursor?: string;
 }
 
+export interface MediaUrlOptions {
+  width?: number;
+  height?: number;
+}
+
+export interface MediaFeatures {
+  search?: boolean;
+  extensionFilter?: boolean;
+  /** MIME patterns (`image/*`, `application/pdf`) or extensions (`.svg`). */
+  accept?: string[];
+  /** Bytes. */
+  maxSize?: number;
+  readOnly?: boolean;
+}
+
+export type MediaStatus =
+  | { kind: 'ready' }
+  | {
+      kind: 'needs-setup';
+      message: string;
+      actionLabel: string;
+      actionUrl: string;
+    };
+
+export type MediaRenameErrorCode =
+  | 'not-found'
+  | 'name-taken'
+  | 'invalid-name'
+  | 'invalid-path'
+  | 'unauthorized'
+  | 'unsupported'
+  | 'backend-failure';
+
+export class MediaRenameError extends Error {
+  readonly code: MediaRenameErrorCode;
+
+  constructor(code: MediaRenameErrorCode, message: string) {
+    super(message);
+    this.name = 'MediaRenameError';
+    this.code = code;
+  }
+}
+
 export interface MediaProvider {
   upload(file: File, folder?: string): Promise<string>;
   list(folder: string, page?: MediaPageRequest): Promise<MediaPage>;
   delete(path: string): Promise<void>;
-  resolveUrl(path: string): string;
+  // ADR-022 §5: a provider without transforms ignores `options` and returns
+  // the original URL.
+  resolveUrl(path: string, options?: MediaUrlOptions): string;
+  /** Resolves to the new media path. Throws `MediaRenameError`. */
+  rename?(from: string, to: string): Promise<string>;
+  features?: MediaFeatures;
+  status?(): Promise<MediaStatus>;
 }
 
 export type MediaSlice = MediaProvider;
