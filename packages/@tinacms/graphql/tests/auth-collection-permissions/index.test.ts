@@ -479,6 +479,57 @@ describe('auth collection permissions with references', () => {
     );
   });
 
+  it.each([
+    {
+      change: 'rename',
+      mutation: `mutation { updateDocument(collection: "post", relativePath: "hello.md", params: { relativePath: "renamed.md" }) { __typename } }`,
+      favoritePost: 'content/posts/renamed.md',
+    },
+    {
+      change: 'delete',
+      mutation: `mutation { deleteDocument(collection: "post", relativePath: "hello.md") { __typename } }`,
+      favoritePost: null,
+    },
+  ])(
+    "keeps a password change made while an admin $change rewrites the users' references",
+    async ({ mutation, favoritePost }) => {
+      const { query, database } = await setupMutation(
+        referencesDir,
+        referencesConfig,
+        {
+          authCollection: { admins: ['admin-user'] },
+          onPut: (key, value) =>
+            key === USERS_PATH &&
+            !String(value).includes('content/posts/hello.md')
+              ? new Promise((resolve) => setTimeout(resolve, 200))
+              : Promise.resolve(),
+        }
+      );
+      const referenceRewrite = query({
+        query: mutation,
+        variables: {},
+        ctxUser: { sub: 'admin-user' },
+      });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      const passwordChange = await query({
+        query: `mutation { updatePassword(password: "editor-chosen") }`,
+        variables: {},
+        ctxUser: { sub: 'editor-user' },
+      });
+      expect(passwordChange.errors).toBeUndefined();
+      expect((await referenceRewrite).errors).toBeUndefined();
+
+      const stored = JSON.parse(JSON.stringify(await database.get(USERS_PATH)));
+      expect(stored.users[0].favoritePost ?? null).toBe(favoritePost);
+      expect(
+        await checkPasswordHash({
+          saltedHash: stored.users[1].password.value,
+          password: 'editor-chosen',
+        })
+      ).toBe(true);
+    }
+  );
+
   it('reads user documents through a reference with the same fields as a direct read', async () => {
     const { query, database } = await setupMutation(
       referencesDir,
@@ -566,6 +617,66 @@ describe('auth collection admins', () => {
       ctxUser: { sub: 'editor-user' },
     });
     expect(result.errors?.[0]?.message).toBe('Not authorized');
+  });
+
+  it.each([{ isDetached: true }, { isDetached: false }])(
+    'keeps a removed admin removed when their own password change is in flight (isDetached: $isDetached)',
+    async ({ isDetached }) => {
+      const { query, database } = await setupMutation(
+        __dirname,
+        buildConfig({ isDetached }),
+        { authCollection: { admins: ['admin-user', 'editor-user'] } }
+      );
+      const passwordChange = query({
+        query: `mutation { updatePassword(password: "editor-chosen") }`,
+        variables: {},
+        ctxUser: { sub: 'editor-user' },
+      });
+      const removal = await query({
+        query: updateUsers,
+        variables: { params: adminOnly },
+        ctxUser: { sub: 'admin-user' },
+      });
+      expect(removal.errors).toBeUndefined();
+      await passwordChange;
+
+      const stored = JSON.parse(JSON.stringify(await database.get(USERS_PATH)));
+      expect(stored.users.map((u: any) => u.username)).toEqual(['admin-user']);
+      const adminWrite = await query({
+        query: updateUsers,
+        variables: { params: adminOnly },
+        ctxUser: { sub: 'editor-user' },
+      });
+      expect(adminWrite.errors?.[0]?.message).toBe('Not authorized');
+    }
+  );
+
+  it('keeps a removed admin removed when their password change lands while the removal commits', async () => {
+    let commitDelay = 0;
+    const { query, database } = await setupMutation(
+      __dirname,
+      buildConfig({ isDetached: false }),
+      {
+        authCollection: { admins: ['admin-user', 'editor-user'] },
+        onPut: () => new Promise((resolve) => setTimeout(resolve, commitDelay)),
+      }
+    );
+    commitDelay = 200;
+    const removal = query({
+      query: updateUsers,
+      variables: { params: adminOnly },
+      ctxUser: { sub: 'admin-user' },
+    });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    await query({
+      query: `mutation { updatePassword(password: "editor-chosen") }`,
+      variables: {},
+      ctxUser: { sub: 'editor-user' },
+    });
+    expect((await removal).errors).toBeUndefined();
+
+    const stored = JSON.parse(JSON.stringify(await database.get(USERS_PATH)));
+    expect(stored.users.map((u: any) => u.username)).toEqual(['admin-user']);
   });
 
   it('rejects an admin when index.json is missing', async () => {

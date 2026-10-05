@@ -7,7 +7,7 @@ import {
   resolve,
   buildSchema,
 } from '../src';
-import type { AuthCollectionOptions } from '../src/database';
+import type { DatabaseArgs } from '../src/database';
 import { z } from 'zod';
 
 class OutputBridge extends FilesystemBridge {
@@ -107,7 +107,7 @@ export const assertDoc = (doc: any) => {
 export const setupMutation = async (
   dir: string,
   config: any,
-  databaseOptions?: { authCollection?: AuthCollectionOptions }
+  databaseOptions?: Pick<DatabaseArgs, 'authCollection' | 'onPut'>
 ) => {
   const bridge = new MemoryCaptureBridge(dir);
   const level = new MemoryLevel<string, Record<string, any>>();

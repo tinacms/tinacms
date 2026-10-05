@@ -61,6 +61,17 @@ export type AuthCollectionWriteOp =
  */
 export type CtxUser = { sub?: string } | null | undefined;
 
+// NOTE: [5 Oct 2026] EK - Queues writes to the auth collection so a save cannot
+// write back a copy read before another one. Per process, so instances can race.
+const authCollectionWrites = new WeakMap<Database, Promise<unknown>>();
+
+type UpdateDocumentArgs = {
+  collectionName: string;
+  relativePath: string;
+  newRelativePath?: string;
+  newBody?: Record<string, unknown>;
+};
+
 interface ResolverConfig {
   config?: GraphQLConfig;
   database: Database;
@@ -835,6 +846,32 @@ export class Resolver {
     }
   };
 
+  private isAuthCollectionPath = (realPath: string) => {
+    const authCollection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    return (
+      !!authCollection &&
+      this.isStoredInCollection(normalizePath(realPath), authCollection)
+    );
+  };
+
+  private withAuthCollectionLock = <T>(
+    realPath: string,
+    write: () => Promise<T>
+  ): Promise<T> => {
+    if (!this.isAuthCollectionPath(realPath)) {
+      return write();
+    }
+    const previous = authCollectionWrites.get(this.database);
+    const current = previous ? previous.then(write, write) : write();
+    authCollectionWrites.set(
+      this.database,
+      current.catch(() => undefined)
+    );
+    return current;
+  };
+
   private isStoredInCollection = (
     realPath: string,
     collection: Collection<true>
@@ -993,17 +1030,22 @@ export class Resolver {
     return this.getDocument(realPath);
   };
 
-  public resolveUpdateDocument = async ({
+  public resolveUpdateDocument = async (args: UpdateDocumentArgs) => {
+    const { realPath } = this.getValidatedPath(
+      args.collectionName,
+      args.relativePath
+    );
+    return this.withAuthCollectionLock(realPath, () =>
+      this.updateDocument(args)
+    );
+  };
+
+  private updateDocument = async ({
     collectionName,
     relativePath,
     newRelativePath,
     newBody,
-  }: {
-    collectionName: string;
-    relativePath: string;
-    newRelativePath?: string;
-    newBody?: Record<string, unknown>;
-  }) => {
+  }: UpdateDocumentArgs) => {
     const { collection, realPath } = this.getValidatedPath(
       collectionName,
       relativePath
@@ -1060,43 +1102,50 @@ export class Resolver {
       await this.deleteDocument(realPath);
       // update references to the document
       const collRefs = await this.findReferences(realPath, collection);
+      // resolveUpdateDocument already holds the lock when realPath is in the auth collection
+      const holdsLock = this.isAuthCollectionPath(realPath);
       for (const [_collection, docsWithRefs] of Object.entries(collRefs)) {
         for (const [pathToDocWithRef, referencePaths] of Object.entries(
           docsWithRefs
         )) {
-          // load the document with the references
-          let docWithRef = await this.getRaw(pathToDocWithRef);
+          const rewriteReferences = async () => {
+            // load the document with the references
+            let docWithRef = await this.getRaw(pathToDocWithRef);
 
-          let hasUpdate = false;
-          // update each reference to the updated document
-          for (const path of referencePaths) {
-            const { object, updated } = updateObjectWithJsonPath(
-              docWithRef,
-              path,
-              realPath,
-              newRealPath
-            );
-            docWithRef = object;
-            hasUpdate = updated || hasUpdate;
-          }
-
-          // save the updated document
-          if (hasUpdate) {
-            // lookup collection for the document with the references
-            const collectionWithRef =
-              this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
-            if (!collectionWithRef) {
-              throw new Error(
-                `Unable to find collection for ${pathToDocWithRef}`
+            let hasUpdate = false;
+            // update each reference to the updated document
+            for (const path of referencePaths) {
+              const { object, updated } = updateObjectWithJsonPath(
+                docWithRef,
+                path,
+                realPath,
+                newRealPath
               );
+              docWithRef = object;
+              hasUpdate = updated || hasUpdate;
             }
 
-            await this.database.put(
-              pathToDocWithRef,
-              docWithRef,
-              collectionWithRef.name
-            );
-          }
+            // save the updated document
+            if (hasUpdate) {
+              // lookup collection for the document with the references
+              const collectionWithRef =
+                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
+              if (!collectionWithRef) {
+                throw new Error(
+                  `Unable to find collection for ${pathToDocWithRef}`
+                );
+              }
+
+              await this.database.put(
+                pathToDocWithRef,
+                docWithRef,
+                collectionWithRef.name
+              );
+            }
+          };
+          await (holdsLock
+            ? rewriteReferences()
+            : this.withAuthCollectionLock(pathToDocWithRef, rewriteReferences));
         }
       }
       return this.getDocument(newRealPath);
@@ -1105,40 +1154,6 @@ export class Resolver {
     if (!newBody) {
       throw new Error('Body not provided for updated document.');
     }
-    return this.writeDocumentBody({ collection, realPath, doc, newBody });
-  };
-
-  /**
-   * Updates the user store of the auth collection for the auth field
-   * handlers. It does not check the request user, so the caller must do that.
-   */
-  public updateAuthDocument = async ({
-    newBody,
-  }: {
-    newBody: Record<string, unknown>;
-  }) => {
-    const collection = this.tinaSchema
-      .getCollections()
-      .find((c) => c.isAuthCollection);
-    if (!collection) {
-      throw new Error('Auth collection not found');
-    }
-    const { realPath } = this.getValidatedPath(collection.name, 'index.json');
-    const doc = await this.getDocument(realPath);
-    return this.writeDocumentBody({ collection, realPath, doc, newBody });
-  };
-
-  private writeDocumentBody = async ({
-    collection,
-    realPath,
-    doc,
-    newBody,
-  }: {
-    collection: Collection<true>;
-    realPath: string;
-    doc: Awaited<ReturnType<Resolver['getDocument']>>;
-    newBody: Record<string, unknown>;
-  }) => {
     if (collection.isAuthCollection) {
       assertNewUsersHavePasswords(collection, newBody, doc?._rawData);
     }
@@ -1157,6 +1172,26 @@ export class Resolver {
       collection.name
     );
     return this.getDocument(realPath);
+  };
+
+  /**
+   * Rewrites the auth collection's user store without the admin check, so the
+   * caller must check the request user.
+   */
+  public updateAuthDocumentInternal = async (
+    update: (rawData: Record<string, any>) => Record<string, any>
+  ) => {
+    const collection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    if (!collection) {
+      throw new Error('Auth collection not found');
+    }
+    const { realPath } = this.getValidatedPath(collection.name, 'index.json');
+    await this.withAuthCollectionLock(realPath, async () => {
+      const rawData = await this.getRaw(realPath);
+      await this.database.put(realPath, update(rawData), collection.name);
+    });
   };
 
   public resolveDeleteDocument = async ({
@@ -1193,37 +1228,39 @@ export class Resolver {
         for (const [pathToDocWithRef, referencePaths] of Object.entries(
           docsWithRefs
         )) {
-          // load the doc with the references
-          let refDoc = await this.getRaw(pathToDocWithRef);
+          await this.withAuthCollectionLock(pathToDocWithRef, async () => {
+            // load the doc with the references
+            let refDoc = await this.getRaw(pathToDocWithRef);
 
-          let hasUpdate = false;
-          // Update each reference to the deleted document
-          for (const path of referencePaths) {
-            const { object, updated } = updateObjectWithJsonPath(
-              refDoc,
-              path,
-              realPath,
-              null
-            );
-            refDoc = object;
-            hasUpdate = updated || hasUpdate;
-          }
+            let hasUpdate = false;
+            // Update each reference to the deleted document
+            for (const path of referencePaths) {
+              const { object, updated } = updateObjectWithJsonPath(
+                refDoc,
+                path,
+                realPath,
+                null
+              );
+              refDoc = object;
+              hasUpdate = updated || hasUpdate;
+            }
 
-          if (hasUpdate) {
-            const collectionWithRef =
-              this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
-            if (!collectionWithRef) {
-              throw new Error(
-                `Unable to find collection for ${pathToDocWithRef}`
+            if (hasUpdate) {
+              const collectionWithRef =
+                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
+              if (!collectionWithRef) {
+                throw new Error(
+                  `Unable to find collection for ${pathToDocWithRef}`
+                );
+              }
+              // save the updated doc
+              await this.database.put(
+                pathToDocWithRef,
+                refDoc,
+                collectionWithRef.name
               );
             }
-            // save the updated doc
-            await this.database.put(
-              pathToDocWithRef,
-              refDoc,
-              collectionWithRef.name
-            );
-          }
+          });
         }
       }
     }

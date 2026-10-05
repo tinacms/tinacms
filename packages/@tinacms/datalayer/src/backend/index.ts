@@ -24,17 +24,10 @@ export interface BackendAuthProvider {
     };
   };
 }
-/** Marks the auth provider that `LocalBackendAuthProvider` returns. */
-export const LOCAL_BACKEND_AUTH = Symbol.for('tinacms.localBackendAuth');
-
 export const LocalBackendAuthProvider = () =>
-  Object.defineProperty(
-    {
-      isAuthorized: async () => ({ isAuthorized: true }),
-    } as BackendAuthProvider,
-    LOCAL_BACKEND_AUTH,
-    { value: true }
-  );
+  ({
+    isAuthorized: async () => ({ isAuthorized: true }),
+  }) as BackendAuthProvider;
 
 export interface TinaBackendOptions {
   /**
@@ -91,7 +84,6 @@ export function TinaNodeBackend({
     extraRoutes,
     databaseClient,
     opts,
-    isLocal: authProvider[LOCAL_BACKEND_AUTH] === true,
   });
   return handler;
 }
@@ -101,11 +93,9 @@ function MakeNodeApiHandler({
   extraRoutes,
   databaseClient,
   opts,
-  isLocal,
 }: BackendAuthProvider & {
   databaseClient: DatabaseClient;
   opts: NodeRouteHandlerOptions;
-  isLocal: boolean;
 }) {
   const tinaBackendHandler: NodeApiHandler = async (req, res) => {
     // remove leading slash
@@ -182,7 +172,7 @@ function MakeNodeApiHandler({
             query,
             variables,
             // @ts-ignore
-            user: req?.session?.user ?? (isLocal ? undefined : null),
+            user: req?.session?.user,
           });
           res.statusCode = 200;
           res.write(JSON.stringify(result));
