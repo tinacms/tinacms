@@ -2764,6 +2764,9 @@ importers:
       gray-matter:
         specifier: 'catalog:'
         version: 4.0.3
+      lucide-react:
+        specifier: 'catalog:'
+        version: 0.424.0(react@19.2.7)
       react-hook-form:
         specifier: ^7.80.0
         version: 7.80.0(react@19.2.7)

@@ -2,7 +2,7 @@ import { Badge } from '@tinacms/ui/components/badge';
 import { cn } from '@tinacms/ui/lib/utils';
 import { useId } from 'react';
 import type { MediaItem, MediaUrlOptions } from '../../core/media/contract';
-import { FileIcon, FolderIcon, PlayIcon, VideoIcon } from './media-icons';
+import { ClapperboardIcon, FileIcon, FolderIcon, PlayIcon } from 'lucide-react';
 import { isImage, isVideo, mediaNameOf, typeBadgeOf } from './media-types';
 
 export type MediaViewMode = 'grid' | 'list';
@@ -107,7 +107,10 @@ function GridFileTile({
           ) : video ? (
             <span className='flex size-full items-center justify-center bg-gradient-to-br from-gray-700 to-gray-900'>
               <span className='flex size-10 items-center justify-center rounded-full bg-white/90 shadow'>
-                <PlayIcon className='ml-0.5 size-4 text-gray-700' />
+                <PlayIcon
+                  className='ml-0.5 size-4 text-gray-700'
+                  fill='currentColor'
+                />
               </span>
             </span>
           ) : (
@@ -144,7 +147,11 @@ function ListRow({
 }) {
   const name = mediaNameOf(item.path);
   const folder = item.kind === 'directory';
-  const Icon = folder ? FolderIcon : isVideo(name) ? VideoIcon : FileIcon;
+  const Icon = folder
+    ? FolderIcon
+    : isVideo(name)
+      ? ClapperboardIcon
+      : FileIcon;
   return (
     <li className='border-b'>
       <button

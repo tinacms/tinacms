@@ -1,5 +1,5 @@
 import { Button } from '@tinacms/ui/components/button';
-import { ArrowLeftIcon } from './media-icons';
+import { ArrowLeftIcon } from 'lucide-react';
 
 export function MediaBreadcrumb({
   folder,

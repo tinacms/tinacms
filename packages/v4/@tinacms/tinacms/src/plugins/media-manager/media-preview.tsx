@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 import type { MediaItem, MediaUrlOptions } from '../../core/media/contract';
 import { checkerboardStyle } from './media-grid';
 import {
-  CloseIcon,
+  ArrowDownToLineIcon,
+  ClapperboardIcon,
   CopyIcon,
   FileIcon,
-  InsertIcon,
-  RenameIcon,
-  TrashIcon,
-  VideoIcon,
-} from './media-icons';
+  TextCursorInputIcon,
+  Trash2Icon,
+  XIcon,
+} from 'lucide-react';
 import { absoluteUrlOf, isImage, isVideo, mediaNameOf } from './media-types';
 
 const COPIED_FOR_MS = 3000;
@@ -85,7 +85,7 @@ export function MediaPreview({
   onDelete: (() => void) | null;
 }) {
   const name = mediaNameOf(item.path);
-  const Icon = isVideo(name) ? VideoIcon : FileIcon;
+  const Icon = isVideo(name) ? ClapperboardIcon : FileIcon;
   return (
     <aside
       aria-label={`Details of ${name}`}
@@ -102,7 +102,7 @@ export function MediaPreview({
           aria-label='Close details'
           onClick={onClose}
         >
-          <CloseIcon className='size-4' />
+          <XIcon className='size-4' />
         </Button>
       </div>
       {isImage(name) ? (
@@ -121,19 +121,19 @@ export function MediaPreview({
       <div className='mt-auto flex w-full flex-wrap gap-2'>
         {onInsert ? (
           <Button type='button' onClick={() => onInsert(item)}>
-            <InsertIcon className='size-4' />
+            <ArrowDownToLineIcon className='size-4' />
             Insert
           </Button>
         ) : null}
         {onRename ? (
           <Button type='button' variant='outline' onClick={onRename}>
-            <RenameIcon className='size-4' />
+            <TextCursorInputIcon className='size-4' />
             Rename
           </Button>
         ) : null}
         {onDelete ? (
           <Button type='button' variant='destructive' onClick={onDelete}>
-            <TrashIcon className='size-4' />
+            <Trash2Icon className='size-4' />
             Delete
           </Button>
         ) : null}

@@ -1,5 +1,5 @@
 import { defineClientPlugin } from '../../client';
-import { ImageIcon } from './media-icons';
+import { ImageIcon } from 'lucide-react';
 import { MediaManagerScreen } from './media-manager-screen';
 import { MEDIA_SCREEN_NAME } from './media-manager.plugin';
 

@@ -1,6 +1,6 @@
 import { buttonVariants } from '@tinacms/ui/components/button';
 import { cn } from '@tinacms/ui/lib/utils';
-import { UploadIcon } from './media-icons';
+import { CloudUploadIcon } from 'lucide-react';
 
 export function MediaUploadButton({
   uploading,
@@ -32,7 +32,7 @@ export function MediaUploadButton({
         )}
       >
         {uploading ? 'Uploading…' : 'Upload'}
-        <UploadIcon className='size-4' />
+        <CloudUploadIcon className='size-4' />
       </span>
     </label>
   );

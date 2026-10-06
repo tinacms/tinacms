@@ -26,11 +26,11 @@ import {
 } from './media-filters';
 import { MediaGrid, type MediaViewMode } from './media-grid';
 import {
-  AlertIcon,
+  CircleAlertIcon,
   ExternalLinkIcon,
   FolderPlusIcon,
-  RefreshIcon,
-} from './media-icons';
+  RefreshCwIcon,
+} from 'lucide-react';
 import { MediaPreview } from './media-preview';
 import {
   DEFAULT_UPLOAD_RULES,
@@ -104,7 +104,7 @@ function SetupBanner({
   return (
     <div className='flex h-full items-center justify-center p-6'>
       <div className='flex items-start gap-2 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-yellow-800'>
-        <AlertIcon className='mt-0.5 size-5 shrink-0 text-yellow-500' />
+        <CircleAlertIcon className='mt-0.5 size-5 shrink-0 text-yellow-500' />
         <div className='flex flex-col items-start gap-2'>
           <p>{status.message}</p>
           <a
@@ -392,7 +392,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
           <div className='flex flex-wrap items-center gap-2'>
             <Button type='button' variant='outline' onClick={refresh}>
               Refresh
-              <RefreshIcon className='size-4' />
+              <RefreshCwIcon className='size-4' />
             </Button>
             <Button
               type='button'

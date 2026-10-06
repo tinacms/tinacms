@@ -15,14 +15,14 @@ import {
 import { cn } from '@tinacms/ui/lib/utils';
 import type { MediaViewMode } from './media-grid';
 import {
-  CloseIcon,
   FileIcon,
   FolderIcon,
-  GridIcon,
+  LayoutGridIcon,
   ListIcon,
   LockIcon,
   SearchIcon,
-} from './media-icons';
+  XIcon,
+} from 'lucide-react';
 import {
   MEDIA_CATEGORY_LABELS,
   type MediaAccept,
@@ -59,7 +59,7 @@ export function ViewModeToggle({
         className={segmentClass(value === 'grid')}
         onClick={() => onChange('grid')}
       >
-        <GridIcon className='size-4' />
+        <LayoutGridIcon className='size-4' />
       </Button>
       <Button
         type='button'
@@ -139,7 +139,7 @@ export function MediaSearchInput({
           className='absolute right-1.5'
           onClick={() => onChange('')}
         >
-          <CloseIcon className='size-3' />
+          <XIcon className='size-3' />
         </Button>
       ) : null}
     </div>
