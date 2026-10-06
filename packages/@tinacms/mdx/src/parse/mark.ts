@@ -25,85 +25,90 @@ const COLOR_STYLE_KEYS: Record<string, keyof ColorStyle> = {
   backgroundColor: 'backgroundColor',
 };
 
-/** Adds one declaration to `style`, or returns false if it isn't a safe colour. */
-const addColor = (style: ColorStyle, key: string, value: string) => {
-  const property = COLOR_STYLE_KEYS[key];
-  if (!property || !isSafeCssColor(value)) {
-    return false;
+/**
+ * The safe colours read from a `style`, and whether it held anything else
+ * (other properties, unsafe colours, or values that aren't string literals).
+ */
+type ReadStyle = { colors: ColorStyle; extra: boolean };
+
+const readDeclarations = (
+  declarations: Iterable<[key: string, value: string | null]>
+): ReadStyle => {
+  const colors: ColorStyle = {};
+  let extra = false;
+  for (const [key, value] of declarations) {
+    const property = COLOR_STYLE_KEYS[key];
+    if (property && value !== null && isSafeCssColor(value)) {
+      colors[property] = value;
+    } else {
+      extra = true;
+    }
   }
-  style[property] = value;
-  return true;
+  return { colors, extra };
 };
 
 /** Reads `style="color: #CC4141; background-color: #FEF08A"`. */
-const readStringStyle = (value: string): ColorStyle | null => {
-  const style: ColorStyle = {};
-  const declarations = value.split(';').filter((part) => part.trim());
-  for (const declaration of declarations) {
-    const [key = '', ...rest] = declaration.split(':');
-    if (!addColor(style, key.trim().toLowerCase(), rest.join(':').trim())) {
-      return null;
-    }
-  }
-  return style;
-};
+const readStringStyle = (value: string): ReadStyle =>
+  readDeclarations(
+    value
+      .split(';')
+      .filter((part) => part.trim())
+      .map((declaration): [string, string] => {
+        const [key = '', ...rest] = declaration.split(':');
+        return [key.trim().toLowerCase(), rest.join(':').trim()];
+      })
+  );
 
 /**
- * Reads `style={{ color: "#CC4141" }}` from its estree: only an object literal
- * whose properties are plain keys with string literal values qualifies, so
- * variables, spreads and expressions are never guessed at.
+ * Reads `style={{ color: "#CC4141" }}` from its estree. Only plain keys with
+ * string literal values count as colours, so variables, spreads and
+ * expressions are never guessed at.
  */
 const readExpressionStyle = (
   value: MdxJsxAttributeValueExpression
-): ColorStyle | null => {
+): ReadStyle => {
   const [statement, ...others] = value.data?.estree?.body ?? [];
   if (
     others.length ||
     statement?.type !== 'ExpressionStatement' ||
     statement.expression.type !== 'ObjectExpression'
   ) {
-    return null;
+    return { colors: {}, extra: true };
   }
-  const style: ColorStyle = {};
-  for (const property of statement.expression.properties) {
-    if (
-      property.type !== 'Property' ||
-      property.computed ||
-      property.kind !== 'init' ||
-      property.value.type !== 'Literal' ||
-      typeof property.value.value !== 'string'
-    ) {
-      return null;
-    }
-    const key =
-      property.key.type === 'Identifier'
-        ? property.key.name
-        : property.key.type === 'Literal'
-          ? String(property.key.value)
-          : '';
-    if (!addColor(style, key, property.value.value)) {
-      return null;
-    }
-  }
-  return style;
+  return readDeclarations(
+    statement.expression.properties.map((property): [string, string | null] => {
+      if (
+        property.type !== 'Property' ||
+        property.computed ||
+        property.kind !== 'init' ||
+        property.value.type !== 'Literal' ||
+        typeof property.value.value !== 'string'
+      ) {
+        return ['', null];
+      }
+      const key =
+        property.key.type === 'Identifier'
+          ? property.key.name
+          : property.key.type === 'Literal'
+            ? String(property.key.value)
+            : '';
+      return [key, property.value.value];
+    })
+  );
 };
 
-/**
- * The colours in an element's `style`: `{}` when it has none, null when the
- * style holds anything but safe `color` / `background-color` values (which
- * means the element must stay raw so nothing is lost).
- */
+/** The colours in an element's `style`, and whether it held anything else. */
 const readColorStyle = (
   // Missing on shortcode elements, whose attributes post-processing turns into props
   attributes: JsxAttribute[] = []
-): ColorStyle | null => {
+): ReadStyle => {
   const styleAttribute = attributes.find(
     (attribute): attribute is MdxJsxAttribute =>
       attribute.type === 'mdxJsxAttribute' && attribute.name === 'style'
   );
   const value = styleAttribute?.value;
   if (value === null || value === undefined) {
-    return {};
+    return { colors: {}, extra: false };
   }
   return typeof value === 'string'
     ? readStringStyle(value)
@@ -112,37 +117,33 @@ const readColorStyle = (
 
 /**
  * The Plate marks a `<mark>` or colour `<span>` stands for, or null when the
- * element isn't one of ours. A `<span>` is only claimed when its sole
- * attribute is a style holding just `color`, so spans carrying anything else
- * (classes, other styles) keep round-tripping as raw HTML. Unsafe colours
- * (see `isSafeCssColor`) leave either element raw.
+ * element isn't one of ours. Every `<mark>` is a highlight: it keeps its safe
+ * colours and drops the rest of its style, as it always has. A `<span>` is
+ * only claimed when its sole attribute is a style holding just a safe
+ * `color`, so spans carrying anything else (classes, other styles, unsafe
+ * colours) keep round-tripping as raw HTML.
  */
 export const getColorMarks = (
   content: MdxJsxTextElement
 ): ColorMarks | null => {
-  if (content.name !== 'mark' && content.name !== 'span') {
-    return null;
-  }
-  const style = readColorStyle(content.attributes);
-  if (!style) {
-    return null;
-  }
+  const { colors, extra } = readColorStyle(content.attributes);
   if (content.name === 'mark') {
     return {
       highlight: true,
-      ...(style.backgroundColor
-        ? { highlightColor: style.backgroundColor }
+      ...(colors.backgroundColor
+        ? { highlightColor: colors.backgroundColor }
         : {}),
-      ...(style.color ? { textColor: style.color } : {}),
+      ...(colors.color ? { textColor: colors.color } : {}),
     };
   }
   if (
     content.name === 'span' &&
+    !extra &&
     (content.attributes ?? []).length === 1 &&
-    style.color &&
-    !style.backgroundColor
+    colors.color &&
+    !colors.backgroundColor
   ) {
-    return { textColor: style.color };
+    return { textColor: colors.color };
   }
   return null;
 };

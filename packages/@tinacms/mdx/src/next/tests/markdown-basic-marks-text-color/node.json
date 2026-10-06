@@ -342,14 +342,9 @@
           "text": "Some "
         },
         {
-          "type": "html_inline",
-          "value": "<mark style={{ backgroundColor: \"url(https://evil/x)\" }}>unsafe highlight</mark>",
-          "children": [
-            {
-              "type": "text",
-              "text": ""
-            }
-          ]
+          "type": "text",
+          "text": "unsafe highlight",
+          "highlight": true
         },
         {
           "type": "text",
@@ -365,14 +360,10 @@
           "text": "Some "
         },
         {
-          "type": "html_inline",
-          "value": "<mark style=\"color: red; font-weight: bold\">extra style</mark>",
-          "children": [
-            {
-              "type": "text",
-              "text": ""
-            }
-          ]
+          "type": "text",
+          "text": "extra style",
+          "highlight": true,
+          "textColor": "red"
         },
         {
           "type": "text",

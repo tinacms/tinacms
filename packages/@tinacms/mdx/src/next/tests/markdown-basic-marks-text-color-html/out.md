@@ -12,7 +12,7 @@ x**a**<span style="color: #CC4141">**b**</span>y
 
 Some <span class="x">plain span</span> text
 
-Some <mark style="color: red; font-weight: bold">extra style</mark> text
+Some <mark style="color: red">extra style</mark> text
 
 Some <span style="color: red;position:fixed">unsafe</span> text
 

@@ -158,28 +158,10 @@
           "text": "Some "
         },
         {
-          "type": "html_inline",
-          "value": "<mark style=\"color: red; font-weight: bold\">",
-          "children": [
-            {
-              "type": "text",
-              "text": ""
-            }
-          ]
-        },
-        {
           "type": "text",
-          "text": "extra style"
-        },
-        {
-          "type": "html_inline",
-          "value": "</mark>",
-          "children": [
-            {
-              "type": "text",
-              "text": ""
-            }
-          ]
+          "text": "extra style",
+          "highlight": true,
+          "textColor": "red"
         },
         {
           "type": "text",

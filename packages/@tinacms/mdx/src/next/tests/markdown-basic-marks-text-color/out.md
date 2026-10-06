@@ -32,6 +32,6 @@ Some <span style={{ ...brand, color: "#CC4141" }}>spread</span> text
 
 Some <span style={{ color: "red;position:fixed" }}>unsafe</span> text
 
-Some <mark style={{ backgroundColor: "url(https://evil/x)" }}>unsafe highlight</mark> text
+Some <mark>unsafe highlight</mark> text
 
-Some <mark style="color: red; font-weight: bold">extra style</mark> text
+Some <mark style={{ color: "red" }}>extra style</mark> text
