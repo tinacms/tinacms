@@ -133,7 +133,11 @@ const ClearColorMarksOnEnterPlugin = createSlatePlugin({
 
       insertBreak();
 
-      if (!isPlainEnter || !hasColorMark) {
+      if (
+        !isPlainEnter ||
+        !hasColorMark ||
+        !editor.api.isEmpty(editor.selection, { block: true })
+      ) {
         return;
       }
 
