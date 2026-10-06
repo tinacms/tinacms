@@ -26,17 +26,6 @@ const paragraph = (children: Plate.InlineElement[]): Plate.RootElement => ({
 describe.each(fields)(
   'unsupported mark combinations (%s parser)',
   (_, field) => {
-    it('explains what to remove when code carries another mark', () => {
-      const value = paragraph([
-        { type: 'text', text: 'npm ', code: true },
-        { type: 'text', text: 'install', code: true, bold: true },
-        { type: 'text', text: ' first' },
-      ]);
-      expect(() => serializeMDX(value, field, passthrough)).toThrow(
-        "Inline code can't have other formatting on it. Remove the formatting from the code text."
-      );
-    });
-
     it('explains what to remove when a block cannot be written', () => {
       const value = {
         type: 'root' as const,
@@ -45,25 +34,6 @@ describe.each(fields)(
       expect(() => serializeMDX(value, field, passthrough)).toThrow(
         /This block can't be saved as markdown \("not_a_real_block"\)/
       );
-    });
-
-    it('avoids the word "marks", which no content editor uses', () => {
-      const value = paragraph([
-        { type: 'text', text: 'npm ', code: true },
-        { type: 'text', text: 'install', code: true, bold: true },
-        { type: 'text', text: ' first' },
-      ]);
-      let message = '';
-      try {
-        serializeMDX(value, field, passthrough);
-      } catch (err) {
-        if (err instanceof Error) {
-          message = err.message;
-        } else {
-          message = String(err);
-        }
-      }
-      expect(message).not.toMatch(/marks?/i);
     });
   }
 );

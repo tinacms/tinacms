@@ -75,7 +75,8 @@ const touchesWordChar = (
  * Picks which of `first`'s marks becomes the outermost element: the one
  * shared by the longest run of leading nodes, ties going to the earliest mark
  * in `getMarks` order. Only that run is wrapped, so neighbours without the
- * mark are never pulled into it.
+ * mark are never pulled into it. Inline code can't hold children, so it is
+ * only picked once no other mark is left, one node at a time.
  *
  * `**`, `*` and `~~` only open or close beside a letter when the other side
  * isn't punctuation, and a colour element's `<`/`>` is. So `x**<span>a</span>**`
@@ -89,20 +90,25 @@ export const pickMarkToProcess = (
   first: Plate.TextElement,
   previous?: InlineElementWithCallback
 ): { markToProcess: Marks | null; runLength: number } => {
+  const marks = getMarks(first);
   let markToProcess: Marks | null = null;
   let runLength = 0;
-  for (const mark of getMarks(first)) {
+  for (const mark of marks) {
+    if (mark === 'inlineCode') {
+      continue;
+    }
     const length = markRunLength(content, mark, first);
     if (length > runLength) {
       runLength = length;
       markToProcess = mark;
     }
   }
-  if (
-    !markToProcess ||
-    isColorMark(markToProcess) ||
-    markToProcess === 'inlineCode'
-  ) {
+  if (!markToProcess) {
+    return marks.includes('inlineCode')
+      ? { markToProcess: 'inlineCode', runLength: 1 }
+      : { markToProcess, runLength };
+  }
+  if (isColorMark(markToProcess)) {
     return { markToProcess, runLength };
   }
   const firstColor = colorMarkOf(first);

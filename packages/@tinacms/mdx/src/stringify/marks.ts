@@ -192,11 +192,6 @@ export const eat = (
   }
   const rest = eat(content.slice(runLength), field, imageCallback);
   if (markToProcess === 'inlineCode') {
-    if (runLength > 1) {
-      throw new Error(
-        "Inline code can't have other formatting on it. Remove the formatting from the code text."
-      );
-    }
     const node = {
       type: markToProcess,
       value: first.text,

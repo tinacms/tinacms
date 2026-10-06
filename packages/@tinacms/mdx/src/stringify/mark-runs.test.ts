@@ -35,6 +35,44 @@ describe('grouping marked text', () => {
   });
 });
 
+describe.each<[string, RichTextField, string]>([
+  [
+    'mdx',
+    { name: 'body', type: 'rich-text' },
+    '<span style={{ color: "#CC4141" }}>`beta`</span>',
+  ],
+  [
+    'markdown',
+    { name: 'body', type: 'rich-text', parser: { type: 'markdown' } },
+    '<span style="color: #CC4141">`beta`</span>',
+  ],
+])('inline code beside other formatting (%s)', (_, field, coloured) => {
+  it.each<[string, Plate.TextElement[], string]>([
+    [
+      'colour',
+      [
+        { type: 'text', text: 'alpha ', code: true },
+        { type: 'text', text: 'beta', code: true, textColor: '#CC4141' },
+      ],
+      `\`alpha \`${coloured}\n`,
+    ],
+    [
+      'bold',
+      [
+        { type: 'text', text: 'npm ', code: true },
+        { type: 'text', text: 'install', code: true, bold: true },
+        { type: 'text', text: ' first' },
+      ],
+      '`npm `**`install`** first\n',
+    ],
+  ])('keeps the code innermost under %s', (_, children, expected) => {
+    const value = paragraph(children);
+    const string = serializeMDX(value, field, passthrough);
+    expect(string).toBe(expected);
+    expect(parseMDX(string as string, field, passthrough)).toEqual(value);
+  });
+});
+
 describe('nested colours', () => {
   const field: RichTextField = { name: 'body', type: 'rich-text' };
   const markdownField: RichTextField = {
