@@ -37,16 +37,32 @@ import {
 } from '../database/datalayer';
 import { TinaGraphQLError, TinaParseDocumentError } from './error';
 import { collectConditionsForField, resolveReferences } from './filter-utils';
+import { findUserInCollection, getUserDocumentContext } from './auth-fields';
 import {
   resolveMediaCloudToRelative,
   resolveMediaRelativeToCloud,
 } from './media-utils';
+
+export type AuthCollectionWriteOp =
+  | 'create'
+  | 'update'
+  | 'rename'
+  | 'delete'
+  | 'addPending'
+  | 'createFolder';
+
+/**
+ * The signed-in user behind a request. Leave it undefined only when the caller
+ * vouches for the call itself, and pass null when nobody is signed in.
+ */
+export type CtxUser = { sub?: string } | null | undefined;
 
 interface ResolverConfig {
   config?: GraphQLConfig;
   database: Database;
   tinaSchema: TinaSchema;
   isAudit: boolean;
+  ctxUser?: CtxUser;
 }
 
 export const createResolver = (args: ResolverConfig) => {
@@ -347,12 +363,14 @@ export class Resolver {
   public database: Database;
   public tinaSchema: TinaSchema;
   public isAudit: boolean;
+  public ctxUser: CtxUser;
 
   constructor(public init: ResolverConfig) {
     this.config = init.config;
     this.database = init.database;
     this.tinaSchema = init.tinaSchema;
     this.isAudit = init.isAudit;
+    this.ctxUser = init.ctxUser;
   }
 
   public resolveCollection = async (
@@ -737,6 +755,83 @@ export class Resolver {
           `Invalid file extension: expected '.${collectionFormat}' but got '.${fileExtension}'`
         );
       }
+    }
+  };
+
+  private assertAuthCollectionWrite = async ({
+    collection,
+    realPath,
+    op,
+  }: {
+    collection: Collection<true>;
+    realPath: string;
+    op: AuthCollectionWriteOp;
+  }) => {
+    const authCollection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    if (!authCollection) {
+      return;
+    }
+    const normalizedPath = normalizePath(realPath);
+    if (
+      collection.name !== authCollection.name &&
+      !this.isStoredInCollection(normalizedPath, authCollection)
+    ) {
+      return;
+    }
+
+    // NOTE: [02 Oct 2026] EK - TinaCloud runs this against an older graphql's
+    // Database, which has no authCollection, so default to the internal one's.
+    const { admins, allowUnauthenticatedWrites } = this.database
+      .authCollection ?? { admins: [], allowUnauthenticatedWrites: true };
+    if (this.ctxUser === undefined && allowUnauthenticatedWrites) {
+      return;
+    }
+
+    const sub = this.ctxUser?.sub;
+    const userStorePath = normalizePath(
+      path.join(authCollection.path, 'index.json')
+    );
+    if (
+      op === 'update' &&
+      normalizedPath === userStorePath &&
+      typeof sub === 'string' &&
+      sub !== '' &&
+      admins.includes(sub) &&
+      (await this.isStoredUser(sub))
+    ) {
+      return;
+    }
+
+    throw new Error('Not authorized');
+  };
+
+  private isStoredInCollection = (
+    realPath: string,
+    collection: Collection<true>
+  ) => {
+    try {
+      return (
+        this.tinaSchema.getCollectionByFullPath(realPath)?.name ===
+        collection.name
+      );
+    } catch {
+      return false;
+    }
+  };
+
+  private isStoredUser = async (sub: string) => {
+    try {
+      const { userField, users } = await getUserDocumentContext(
+        this.tinaSchema,
+        this
+      );
+      return (
+        Array.isArray(users) && !!findUserInCollection(users, userField, sub)
+      );
+    } catch {
+      return false;
     }
   };
 
