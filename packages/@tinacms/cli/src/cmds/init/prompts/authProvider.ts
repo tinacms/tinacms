@@ -1,10 +1,17 @@
 import { randomBytes } from 'node:crypto';
 import prompts from 'prompts';
-
+import { logger } from '../../../logger';
 import type { Framework } from '../';
 import { askTinaCloudSetup } from './askTinaCloudSetup';
 import type { Config, PromptAuthProvider } from './types';
-const supportedAuthProviders: {
+
+const SELF_HOSTED_LOGIN_WARNING = `
+Note: the built-in username and password login (tinacms-authjs with the
+Tina user collection) is a starting point for trying TinaCMS. It is not
+production grade. Before you go to production, connect a dedicated auth
+provider, such as Auth.js with an OAuth provider, Clerk, or TinaCloud.
+`;
+export const supportedAuthProviders: {
   'tina-cloud': PromptAuthProvider;
   'next-auth': PromptAuthProvider;
   other: PromptAuthProvider;
@@ -36,12 +43,13 @@ const supportedAuthProviders: {
       },
     ],
     extraTinaCollections: ['TinaUserCollection'],
+    // Indented for its slot in the generated API route.
     backendAuthProvider: `AuthJsBackendAuthProvider({
-          authOptions: TinaAuthJSOptions({
-            databaseClient: databaseClient,
-            secret: process.env.NEXTAUTH_SECRET,
-          }),
-        })`,
+        authOptions: TinaAuthJSOptions({
+          databaseClient: databaseClient,
+          secret: process.env.NEXTAUTH_SECRET,
+        }),
+      })`,
     backendAuthProviderImports: [
       {
         from: 'tinacms-authjs',
@@ -63,6 +71,7 @@ const authProviderUpdateConfig: {
   other: async () => {},
   'tina-cloud': askTinaCloudSetup,
   'next-auth': async ({ config }) => {
+    logger.warn(SELF_HOSTED_LOGIN_WARNING);
     const result = await prompts([
       {
         name: 'nextAuthSecret',

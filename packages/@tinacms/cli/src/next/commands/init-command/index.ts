@@ -4,10 +4,6 @@ import { command } from '../../../cmds/init';
 
 export class InitCommand extends Command {
   static paths = [['init'], ['init', 'backend']];
-  pathToForestryConfig = Option.String('--forestryPath', {
-    description:
-      'Specify the relative path to the .forestry directory, if importing an existing forestry site.',
-  });
   rootPath = Option.String('--rootPath', {
     description:
       'Specify the root directory to run the CLI from (defaults to current working directory)',
@@ -38,7 +34,6 @@ export class InitCommand extends Command {
     await command.execute({
       isBackendInit: isBackend,
       rootPath: rootPath,
-      pathToForestryConfig: this.pathToForestryConfig || rootPath,
       noTelemetry: this.noTelemetry,
       debug: this.debug,
       tinaVersion: this.tinaVersion,

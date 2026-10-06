@@ -9,6 +9,7 @@ The smallest TinaCMS v4 app. One Vite project holds everything:
 | The admin | `public/admin/index.html` → `tina/admin.tsx` | Codegen scaffolds the shell in `public/` (the v3 shape, at the `build` folders from `defineConfig`), the entry, and `tina/admin.css` once. The admin serves on `/admin/` with no route of the project's own. After that, all three files belong to the project. |
 | The site | `index.html` → `src/preview/` | Visual editing with `useTina`, `tinaField`, and `TinaMarkdown` from `@tinacms/tinacms/adapters/react`. The admin's preview pane renders this page. |
 | A custom field | `tina/rating-field.tsx` | A whole field plugin in one `definePlugin({...})` call, in one project-owned file. The config registers it next to `localContentPlugin()`. |
+| A sidebar entry | `tina/help-nav.tsx` | A Help screen and an external docs link, contributed to the `globalNav` slot. |
 | The content | `content/posts/*.mdx` | Files in the repository. A save in the admin writes them back to disk. |
 | The lock | `tina/tina-lock.json` | Committed, not built (ADR-016). Dev refreshes it. |
 

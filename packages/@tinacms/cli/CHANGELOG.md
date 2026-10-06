@@ -1,5 +1,34 @@
 # tinacms-cli
 
+## 4.0.1
+
+### Patch Changes
+
+- [`5db1597`](https://github.com/tinacms/tinacms/commit/5db1597953eb4dd24c23c7b5e441702b749d46ac) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Validate media upload file types on the server and reject active document types (e.g. `.html`, `.js`, `.xml`) instead of relying on the client-side accept filter alone.
+
+- Updated dependencies [[`d281cdf`](https://github.com/tinacms/tinacms/commit/d281cdf3a1dc1d5ef42d2bfd15c29224acc9d201)]:
+  - tinacms@3.14.3
+
+## 4.0.0
+
+### Major Changes
+
+- [#7409](https://github.com/tinacms/tinacms/pull/7409) [`e6bf2cf`](https://github.com/tinacms/tinacms/commit/e6bf2cf958e9acffffff73bfe90e492d3491bf05) Thanks [@wicksipedia](https://github.com/wicksipedia)! - `tinacms init` no longer migrates a Forestry site.
+
+  The command used to look for `.forestry/settings.yml`, offer to convert the Forestry templates into Tina collections, and write a `tina/templates.ts` file next to the config. That path is gone, and so is the `--forestryPath` option. Running `tinacms init` in a project that still has a `.forestry` directory now sets up TinaCMS the same way it does for any other existing site, with one `post` collection to start from.
+
+  If you still need to move a Forestry site, run the migration with `@tinacms/cli` 3.x first, then upgrade. Forestry.io was sunset in 2023, and the conversion has not changed since.
+
+  `tinacms init` also no longer runs prettier over the generated `tina/config.ts` and Next.js API route. The files now use single quotes, semicolons and a two-space indent, and their imports are merged per module and sorted. Run your own formatter over them if your project uses a different style. `prettier` is no longer a dependency of `@tinacms/cli`.
+
+### Patch Changes
+
+- Updated dependencies [[`dff369c`](https://github.com/tinacms/tinacms/commit/dff369c296f84347ad816ab9f737e74fc8268073), [`e6bf2cf`](https://github.com/tinacms/tinacms/commit/e6bf2cf958e9acffffff73bfe90e492d3491bf05), [`36040e7`](https://github.com/tinacms/tinacms/commit/36040e7a94039d3138ba665600b584f6e82b5a80), [`82a7c3b`](https://github.com/tinacms/tinacms/commit/82a7c3be6e493f403050791ed25715a59d824339), [`5b78903`](https://github.com/tinacms/tinacms/commit/5b78903558530ae2837c8ebafed615dd586b6259)]:
+  - @tinacms/schema-tools@2.10.1
+  - @tinacms/metrics@2.1.4
+  - tinacms@3.14.2
+  - @tinacms/graphql@3.0.0
+
 ## 3.1.0
 
 ### Minor Changes
@@ -133,7 +162,6 @@
   `@graphql-codegen/plugin-helpers@7` drops lodash entirely. Before this, the CLI declared `plugin-helpers` directly at `^7.0.1` while the five codegen plugins it uses all wanted `^5` — so our pin took the hoisted slot and each plugin nested its own copy, each dragging a `lodash` pinned to `~4.17.0` that couldn't use the hoisted `4.18.1` either. Six copies of `plugin-helpers` and six of `lodash`, all but one identical. **Now one of each.**
 
   Three things v7 needs, all handled here:
-
   - **jest couldn't load it.** codegen v6's CJS build `require()`s `auto-bind@5`, which is ESM-only. Node 22 can do that; jest's module registry can't, and jest doesn't transform `node_modules`. Babel now down-levels that one package.
   - **`@graphql-inspector/core` v6** makes `ChangeType` a const rather than an enum; the type is `TypeOfChangeType`.
   - **codegen v5+ stops exporting `Exact`** from the generated `types.ts`, and defaults unmapped scalars to `unknown` instead of `any` — which would break every `<TinaMarkdown content={data.post._body} />`, since rich-text bodies ride on the `JSON` scalar. Both are pinned back.
@@ -236,7 +264,6 @@
 ### Minor Changes
 
 - [#7049](https://github.com/tinacms/tinacms/pull/7049) [`29a0e2e`](https://github.com/tinacms/tinacms/commit/29a0e2e43790af89408453a3a0ba9f77c31648df) Thanks [@0xharkirat](https://github.com/0xharkirat)! - Add **Astro** as a first-class framework in `tinacms init` (now listed first). Selecting Astro:
-
   - auto-sets the public assets folder to `public` (no prompt) and wraps the `package.json` `dev`/`build` scripts (`tinacms dev -c "astro dev"`, `tinacms build && astro build`)
   - installs `@tinacms/astro` plus an `@astrojs/node` adapter **pinned to the project's Astro major** (node 9 for Astro 5, node 10 for Astro 6), and matched `react`/`react-dom` (`^18.3.1`) as **dev dependencies** — the site stays React-free, but the admin SPA is built with React and a bare Astro project ships none (skipped when the project already declares both)
   - wires `astro.config` for SSR + visual editing, or — when your config is already customized — prints exactly what to add
@@ -302,7 +329,6 @@
   **The bug.** Since Tina v3's December 2025 ESM migration, bundling `tina/database.ts` with esbuild — and writing the output to `os.tmpdir()` — left users wedged between two failure modes: bundling native modules like `better-sqlite3` crashed with `__filename is not defined`, and externalizing them couldn't resolve `node_modules` from `/tmp/`. See #6675.
 
   **What changed:**
-
   - `loadDatabaseFile` and `loadConfigFile` now write esbuild output to `<project>/tina/__generated__/.cache/<timestamp>/` instead of `os.tmpdir()`, so Node's resolver can walk up to the project's `node_modules` at runtime.
   - `better-sqlite3` is externalized so Node loads it as CJS where `__filename` exists.
   - The build cache is swept on startup (clears residue from crashed prior runs), and each per-build subdir + its now-empty timestamp parent are removed after the dynamic-import resolves.
@@ -334,7 +360,6 @@
 - [#6864](https://github.com/tinacms/tinacms/pull/6864) [`638b47a`](https://github.com/tinacms/tinacms/commit/638b47aa7c11308bc0b93fbc40794b40a53b44e0) Thanks [@kulesy](https://github.com/kulesy)! - Extract the database-bundle esbuild options out of `loadDatabaseFile()` into a pure `buildDatabaseEsbuildConfig()` helper, and add unit tests covering the externalize / output-path contracts.
 
   The helper guarantees:
-
   - `external` includes `better-sqlite3` (and whatever else the caller passes)
   - `packages: 'external'` is never set (broad-externalize would break user-side named imports of CJS UMD packages like `sqlite-level` v1 and `mongodb-level`)
   - `outfile` is forwarded unchanged from the caller (caller is responsible for putting it inside the project tree via `prepareCacheLocation()`)
@@ -374,7 +399,6 @@
   ### Migration notes for existing multi-repo projects
 
   After upgrading (and once TinaCloud prod is on #3403):
-
   - **Stale `tina/` folder in your content repo.** Pre-upgrade builds committed `tina/__generated__/*` and `tina/tina-lock.json` to the content repo. Nothing updates or reads those files any more. They are safe — and recommended — to delete from the content repo in a single cleanup commit.
   - **`ConfigManager.generatedFolderPathContentRepo` is removed.** If any custom CLI code, plugins, or scripts referenced this field, they will fail at type-check or runtime. Use `generatedFolderPath` — it has always been the generator-relative path.
   - **`ConfigManager.getTinaFolderPath` no longer accepts an `isContentRoot` option.** The content root never needs a `tina/` folder now, so the option was removed. If any custom code called `getTinaFolderPath(path, { isContentRoot: true })`, drop the second argument.
@@ -395,7 +419,6 @@
 ### Patch Changes
 
 - [#6770](https://github.com/tinacms/tinacms/pull/6770) [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7) Thanks [@zaidkhatri-dev](https://github.com/zaidkhatri-dev)! - - Improved error handling for file and folder operations: errors are now shown as clear notifications in the UI rather than just logging to the console.
-
   - Fixed an issue where renaming a document to an already existing filename would silently fail; this now correctly triggers an error alert in the UI.
 
 - [#6739](https://github.com/tinacms/tinacms/pull/6739) [`7f66caa`](https://github.com/tinacms/tinacms/commit/7f66caab15d6cf2ea5d68afbc00db2b700c21aab) Thanks [@galsakuri](https://github.com/galsakuri)! - Fix missing .js extension on ./types import in generated client.ts and databaseClient.ts
@@ -742,7 +765,6 @@
 
 - [#6145](https://github.com/tinacms/tinacms/pull/6145) [`d1bd1a1`](https://github.com/tinacms/tinacms/commit/d1bd1a1312fa910e237ec06608e7c11830c78346) Thanks [@18-th](https://github.com/18-th)! - Remove Lodash and replace usages with either native functions or es-toolkit equivalents
   Removed the following lodash usages:
-
   - debounce - was not used, removed the reference
   - camelcase - unused, removed the reference
   - upperfirst - unused, removed the reference
@@ -1244,7 +1266,6 @@
 ### Minor Changes
 
 - 324950a: Updates Plate Editor to latest version 36.
-
   - Upgrades all remaining packages `Typescript` to version `^5`
   - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
   - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
@@ -1504,7 +1525,6 @@
   ### Changes in the database file
 
   #### Deprecations and Additions
-
   - **Deprecated**: `onPut`, `onDelete`, and `level` arguments in `createDatabase`.
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
@@ -1542,7 +1562,6 @@
   ### Migrating `database.ts`
 
   #### a. Replacing `onPut` and `onDelete` with `gitProvider`
-
   - **GitHubProvider Usage**: Replace `onPut` and `onDelete` with `gitProvider`, using the provided `GitHubProvider` for GitHub.
 
   ```typescript
@@ -1571,7 +1590,6 @@
   ```
 
   #### b. Renaming `level` to `databaseAdapter`
-
   - **Renaming in Code**: Change `level` to `databaseAdapter` for clarity.
 
   ```diff
@@ -1582,7 +1600,6 @@
   ```
 
   #### c. `createLocalDatabase` Function
-
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
@@ -1591,7 +1608,6 @@
   ```
 
   #### d. Consolidated Example
-
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
@@ -1609,7 +1625,6 @@
   ### Summary of Authentication Updates in Config
 
   #### a. AuthProvider and AbstractAuthProvider
-
   - **New**: `authProvider` in `defineConfig`.
   - **Class**: `AbstractAuthProvider` for extending new auth providers.
   - **Clerk Auth Provider**: New provider added.
@@ -1617,11 +1632,9 @@
   - **Deprecation**: `admin.auth`.
 
   #### b. Auth Provider in Internal Client and Config
-
   - **Transition**: From auth functions to `authProvider` class.
 
   #### c. Migration for Authentication
-
   - **Previous API**:
 
   ```javascript
@@ -1653,7 +1666,6 @@
   ```
 
   ### TinaCMS Self Hosted backend updates
-
   - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
   - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
 
@@ -2763,7 +2775,6 @@
   This new option will build tina into a static `index.html` file. This will allow someone to use tina without having react as a dependency.
 
   ### How to update
-
   1.  Add a `.tina/config.{js,ts,tsx,jsx}` with the default export of define config.
 
   ```ts
@@ -3180,12 +3191,10 @@
 - 98622111d: Use [esbuild](https://esbuild.github.io/) to build the schema instead of typescript.
 
   This allows the user to
-
   - use non typescript files like JS, JSX, TS
   - Import from outside of the tina folder
 
   The downside
-
   - Now type errors will still pass (The schema will compile) and one will get an error at runtime instead of compile time
 
 - Updated dependencies [c730fa1dd]
@@ -3722,7 +3731,6 @@
   ## Defensive coding in Tina
 
   When working with GraphQL, there are 2 reasons a property may not be present.
-
   1. The data is not a required property. That is to say, if I have a blog post document, and "category" is an optional field, we'll need to make sure we factor that into how we render our page:
 
   ```tsx

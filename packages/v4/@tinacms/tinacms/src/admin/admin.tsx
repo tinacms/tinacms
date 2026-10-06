@@ -26,6 +26,7 @@ import { HashRouter } from 'react-router-dom';
 import type { ResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
+import type { GlobalNavEntry, NavTarget } from '../core/slot/contract';
 import { useCollectionDocuments, useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
@@ -35,7 +36,7 @@ import { DocumentForm } from './document-form';
 import { DocumentScope } from './document-scope';
 import { FormStatusBadge } from './document-status';
 import { AdminErrorBoundary } from './error-boundary';
-import { useAdminScreens, useTinaSchema } from './hooks';
+import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 import { type AdminRoute, COLLECTIONS_ROUTE } from './routing';
 import { useAdminRoute } from './use-admin-route';
 import { useFormColumnWidth } from './use-form-column-width';
@@ -128,26 +129,43 @@ function DocumentMenu({
   );
 }
 
-function ScreenMenu({
-  screens,
-  activeName,
+function GlobalNav({
+  entries,
+  activeScreen,
   navigate,
 }: {
-  screens: AdminScreen[];
-  activeName?: string;
+  entries: GlobalNavEntry[];
+  activeScreen?: string;
   navigate: (route: AdminRoute) => void;
 }) {
+  const open = (target: NavTarget) => {
+    if (target.kind === 'screen') {
+      navigate({ view: 'screen', screen: target.screen, segments: [] });
+    } else if (target.kind === 'action') {
+      target.run();
+    }
+  };
   return (
-    <SidebarMenu aria-label='Screens'>
-      {screens.map((screen) => (
-        <SidebarMenuItem key={screen.name}>
+    <SidebarMenu aria-label='Global navigation'>
+      {entries.map(({ label, icon: Icon, target }, index) => (
+        <SidebarMenuItem key={`${index}:${label}`}>
           <SidebarMenuButton
-            isActive={screen.name === activeName}
-            onClick={() =>
-              navigate({ view: 'screen', screen: screen.name, segments: [] })
+            isActive={
+              target.kind === 'screen' && target.screen === activeScreen
             }
+            render={
+              target.kind === 'url' ? (
+                <a
+                  href={target.href}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                />
+              ) : undefined
+            }
+            onClick={() => open(target)}
           >
-            {screen.label}
+            <Icon className='size-4' />
+            <span>{label}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
@@ -283,6 +301,7 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
   useUnsavedChangesGuard();
   const schema = useTinaSchema();
   const screens = useAdminScreens();
+  const globalNav = useGlobalNav();
   const { route, navigate } = useAdminRoute();
 
   const activeCollectionName =
@@ -355,12 +374,11 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
             </SidebarGroup>
           ) : null}
 
-          {screens.length > 0 ? (
+          {globalNav.length > 0 ? (
             <SidebarGroup>
-              <SidebarGroupLabel>Screens</SidebarGroupLabel>
-              <ScreenMenu
-                screens={screens}
-                activeName={activeScreen?.screen}
+              <GlobalNav
+                entries={globalNav}
+                activeScreen={activeScreen?.screen}
                 navigate={navigate}
               />
             </SidebarGroup>

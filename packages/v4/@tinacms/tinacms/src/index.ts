@@ -19,6 +19,13 @@ export type {
   DocumentEntry,
   DocumentSummary,
 } from './core/content/contract';
+export type {
+  MediaItem,
+  MediaPage,
+  MediaPageRequest,
+  MediaProvider,
+  MediaSlice,
+} from './core/media/contract';
 export type { AdminScreen, AdminScreenProps } from './core/screen/contract';
 export {
   type Capability,
@@ -40,6 +47,7 @@ export type {
   ValidatorRef,
 } from './core/schema/types';
 export { localContentPlugin } from './plugins/content/local/local-content.plugin';
+export { localMediaPlugin } from './plugins/media/local/local-media.plugin';
 export {
   corePlugins,
   max,

@@ -87,11 +87,44 @@ function MediaScreen({ segments }: AdminScreenProps) {
   );
 }
 
+const NavIcon = () => null;
+const navAction = vi.fn();
+
 const screenPlugin = definePlugin({
   name: 'test:media-screen',
   client: async () => ({
     default: {
-      screens: [{ name: 'media', label: 'Media', component: MediaScreen }],
+      screens: [
+        { name: 'media', label: 'Media', component: MediaScreen },
+        { name: 'unlinked', label: 'Unlinked', component: MediaScreen },
+      ],
+      slots: {
+        globalNav: [
+          {
+            label: 'Docs',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://tina.io/docs' },
+            order: 10,
+          },
+          {
+            label: 'Media',
+            icon: NavIcon,
+            target: { kind: 'screen', screen: 'media' },
+          },
+          {
+            label: 'Switch branch',
+            icon: NavIcon,
+            target: { kind: 'action', run: navAction },
+            order: 5,
+          },
+          {
+            label: 'Search',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://example.com' },
+            dependsOn: ['search'],
+          },
+        ],
+      },
     },
   }),
 });
@@ -477,17 +510,43 @@ describe('TinaAdmin content reads', () => {
   });
 });
 
-describe('TinaAdmin screens', () => {
-  it('lists the screens a plugin registered', async () => {
+describe('TinaAdmin global nav', () => {
+  it('lists the entries plugins contribute, in order, skipping unmet dependencies', async () => {
     renderAdmin();
-    const menu = await screen.findByRole('list', { name: 'Screens' });
+    const menu = await screen.findByRole('list', { name: 'Global navigation' });
     expect(
       within(menu)
-        .getAllByRole('button')
-        .map((button) => button.textContent)
-    ).toEqual(['Media']);
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['Media', 'Switch branch', 'Docs']);
   });
 
+  it('does not link a screen that no entry targets', async () => {
+    renderAdmin();
+    const menu = await screen.findByRole('list', { name: 'Global navigation' });
+    expect(within(menu).queryByText('Unlinked')).not.toBeInTheDocument();
+  });
+
+  it('opens a url entry in a new tab', async () => {
+    renderAdmin();
+    const link = await screen.findByRole('link', { name: 'Docs' });
+    expect(link).toHaveAttribute('href', 'https://tina.io/docs');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('runs an action entry', async () => {
+    const user = userEvent.setup();
+    navAction.mockClear();
+    renderAdmin();
+    await user.click(
+      await screen.findByRole('button', { name: 'Switch branch' })
+    );
+    expect(navAction).toHaveBeenCalledOnce();
+  });
+});
+
+describe('TinaAdmin screens', () => {
   it('opens a screen and writes a shareable hash', async () => {
     const user = userEvent.setup();
     renderAdmin();
@@ -521,6 +580,40 @@ describe('TinaAdmin screens', () => {
     await waitFor(() =>
       expect(window.location.hash).toBe('#/screens/media/photos')
     );
+  });
+
+  it('renders a replacement screen at the replaced name', async () => {
+    window.location.hash = '#/screens/media';
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          plugins: [
+            ...config.plugins,
+            definePlugin({
+              name: 'test:media-v2',
+              provides: ['screen'],
+              overrides: [{ capability: 'screen', key: 'media' }],
+              client: async () => ({
+                default: {
+                  screens: [
+                    {
+                      name: 'media',
+                      label: 'Media',
+                      component: () => <p>replacement media</p>,
+                    },
+                  ],
+                },
+              }),
+            }),
+          ],
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    expect(await screen.findByText('replacement media')).toBeInTheDocument();
   });
 
   it('reports a screen no plugin registered', async () => {

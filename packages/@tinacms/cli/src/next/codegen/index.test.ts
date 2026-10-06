@@ -78,6 +78,16 @@ describe('Codegen.genDatabaseClient', () => {
     expect(result).toContain('from "./types.js"');
     expect(result).not.toMatch(/from ["']\.\/types["']/);
   });
+
+  it('flags only the generated authenticate call as a sign-in', async () => {
+    const result = await makeInstance(true).genDatabaseClient();
+    const authenticateFn = result.slice(
+      result.indexOf('export async function authenticate'),
+      result.indexOf('export async function authorize')
+    );
+    expect(authenticateFn).toContain('isSignIn: true');
+    expect(result.match(/isSignIn: true/g)).toHaveLength(1);
+  });
 });
 
 describe('Codegen.execute integration', () => {

@@ -50,6 +50,14 @@ The bug report template (`.github/ISSUE_TEMPLATE/bug-report.yml`) asks for the e
 
 If you are using an AI assistant (Claude Code, Cursor, etc.) to draft an issue, point it at `.github/ISSUE_TEMPLATE/bug-report.yml` so the formatting matches the form's H3 sections.
 
+## Picking up an issue
+
+- **Looking for a first task?** Issues labelled [`onboarding`](https://github.com/tinacms/tinacms/labels/onboarding) are small, well-scoped and suited to people new to the project.
+- **Check for a linked PR first.** Look at the issue's **Development** sidebar. If a PR is already open, comment there instead of starting a second one.
+- **You don't need to wait to be assigned.** Comment on the issue that you're picking it up, then open a draft PR early. That stops two people doubling up and gets you maintainer feedback sooner.
+- **Commit with the right email.** The [CLA check](#contributor-license-agreement) runs on every commit author in the PR, so commit with an email linked to the GitHub account that signed it.
+- **Got a question?** Ask in the [TinaCMS Discord](https://discord.com/invite/zumN63Ybpf).
+
 ## PR Workflow
 
 All pull requests should include a changeset. To create a changeset, ensure you don't have any uncommitted changes and then run the following command:
