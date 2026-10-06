@@ -137,9 +137,23 @@ export const resolveMediaAccept = (
   return [...resolved];
 };
 
-export const acceptPatternsOf = (extensions: MediaExtension[]): string[] => [
-  ...new Set(extensions.flatMap((ext) => [MEDIA_MIME_TYPES[ext], `.${ext}`])),
-];
+export interface UploadRules {
+  mimeTypes: string[];
+  extensions: string[];
+}
+
+export const DEFAULT_UPLOAD_RULES: UploadRules = {
+  mimeTypes: DEFAULT_MEDIA_UPLOAD_TYPES,
+  extensions: [],
+};
+
+export const uploadRulesOf = (extensions: MediaExtension[]): UploadRules => ({
+  mimeTypes: [...new Set(extensions.map((ext) => MEDIA_MIME_TYPES[ext]))],
+  extensions,
+});
+
+export const inputAcceptOf = ({ mimeTypes, extensions }: UploadRules): string =>
+  [...mimeTypes, ...extensions.map((ext) => `.${ext}`)].join(',');
 
 export const acceptEntryLabel = (entry: MediaAccept): string =>
   isMediaCategory(entry) ? MEDIA_CATEGORY_LABELS[entry] : entry.toUpperCase();
@@ -150,22 +164,25 @@ const mimeTypeOf = (file: File): string => {
   return isMediaExtension(ext) ? MEDIA_MIME_TYPES[ext] : '';
 };
 
-const matchesPattern = (file: File, pattern: string): boolean => {
-  const rule = pattern.trim().toLowerCase();
-  if (rule === '*' || rule === '*/*') return true;
-  if (rule.startsWith('.')) return file.name.toLowerCase().endsWith(rule);
+const matchesMimeType = (file: File, mimeType: string): boolean => {
+  const rule = mimeType.trim().toLowerCase();
+  if (rule === '*/*') return true;
   const type = mimeTypeOf(file).toLowerCase();
   if (rule.endsWith('/*')) return type.startsWith(rule.slice(0, -1));
   return type === rule;
 };
 
+const isAccepted = (file: File, rules: UploadRules): boolean =>
+  rules.mimeTypes.some((mimeType) => matchesMimeType(file, mimeType)) ||
+  rules.extensions.includes(extensionOf(file.name));
+
 export const uploadRejectionOf = (
   file: File,
-  accept: string[],
+  rules: UploadRules,
   maxSize: number | undefined
 ): string | null => {
   const reasons: string[] = [];
-  if (!accept.some((pattern) => matchesPattern(file, pattern))) {
+  if (!isAccepted(file, rules)) {
     reasons.push('Invalid file type');
   }
   if (maxSize !== undefined && file.size > maxSize) {

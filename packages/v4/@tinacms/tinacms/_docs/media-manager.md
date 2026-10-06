@@ -77,9 +77,11 @@ The browser shows some controls only when the media provider supports them.
 | Toolbar, upload, drag and drop, Delete | `features.readOnly` is not `true` |
 | Setup banner, in place of the browser | `status()` returns `needs-setup` |
 
-The upload checks use `features.accept` and `features.maxSize`. Without
-`features.accept`, the browser accepts the default v3 list: text, images,
-video, PDF, office documents and some 3D formats.
+The upload checks use `features.acceptedMimeTypes`,
+`features.acceptedExtensions` and `features.maxSize`. A file passes the type
+check if it matches one MIME type or one extension. If the provider sets
+neither list, the browser accepts the default v3 list: text, images, video,
+PDF, office documents and some 3D formats.
 
 `resolveUrl` gets a size for each image: 400x400 for the grid, 75x75 for the
 list and 1000x1000 for the details panel. A provider without image transforms
@@ -108,7 +110,8 @@ import { MediaBrowser } from '@tinacms/tinacms/react';
 | `accept` | `pick` only. A category (`image`, `video`, `audio`, `document`), an extension, or a list of them. |
 | `folder`, `onFolderChange` | Optional. Give both to control the open folder. |
 
-`accept` replaces `features.accept` for the upload checks. If the provider
+`accept` replaces `features.acceptedMimeTypes` and
+`features.acceptedExtensions` for the upload checks. If the provider
 sets `features.extensionFilter`, `accept` also limits the list. Then a locked
 chip such as "Images only" shows in place of the type filter.
 

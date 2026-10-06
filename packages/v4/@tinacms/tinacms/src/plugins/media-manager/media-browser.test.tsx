@@ -310,7 +310,7 @@ describe('MediaBrowser upload', () => {
   it('rejects files outside accept or over maxSize', async () => {
     const user = userEvent.setup({ applyAccept: false });
     const provider = createProvider({
-      features: { accept: ['image/*'], maxSize: 4 },
+      features: { acceptedMimeTypes: ['image/*'], maxSize: 4 },
     });
     renderBrowser(provider);
     await fileTile('logo.png');

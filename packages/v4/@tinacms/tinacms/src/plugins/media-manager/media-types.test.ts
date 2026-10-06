@@ -49,18 +49,29 @@ describe('resolveMediaAccept', () => {
 });
 
 describe('uploadRejectionOf', () => {
-  it('matches MIME patterns, extensions and the size limit', () => {
+  const rules = (mimeTypes: string[], extensions: string[] = []) => ({
+    mimeTypes,
+    extensions,
+  });
+
+  it('accepts a file that matches a MIME type or an extension', () => {
+    const png = new File(['12345'], 'a.PNG', { type: 'image/png' });
+    expect(uploadRejectionOf(png, rules(['image/*']), undefined)).toBeNull();
+    expect(uploadRejectionOf(png, rules([], ['png']), undefined)).toBeNull();
+  });
+
+  it('names each reason a file is rejected', () => {
     const png = new File(['12345'], 'a.png', { type: 'image/png' });
-    expect(uploadRejectionOf(png, ['image/*'], undefined)).toBeNull();
-    expect(uploadRejectionOf(png, ['.PNG'], undefined)).toBeNull();
-    expect(uploadRejectionOf(png, ['application/pdf'], 4)).toBe(
+    expect(uploadRejectionOf(png, rules(['application/pdf'], ['pdf']), 4)).toBe(
       'Invalid file type, File too large'
     );
   });
 
   it('reads the MIME type from the extension when the browser gives none', () => {
     const svg = new File(['x'], 'logo.svg');
-    expect(uploadRejectionOf(svg, ['image/svg+xml'], undefined)).toBeNull();
+    expect(
+      uploadRejectionOf(svg, rules(['image/svg+xml']), undefined)
+    ).toBeNull();
   });
 });
 

@@ -48,7 +48,8 @@ supplies the addition for it.
 |---|---|
 | `search` | `list` uses `search`. |
 | `extensionFilter` | `list` uses `extensions`. |
-| `accept` | The file types that `upload` accepts: MIME patterns such as `image/*`, or extensions such as `.svg`. |
+| `acceptedMimeTypes` | The MIME types that `upload` accepts, such as `application/pdf`, or a wildcard such as `image/*`. |
+| `acceptedExtensions` | The extensions that `upload` accepts, lowercase and without the dot, such as `svg`. |
 | `maxSize` | The largest file that `upload` accepts, in bytes. |
 | `readOnly` | The provider does not upload, rename or delete. |
 

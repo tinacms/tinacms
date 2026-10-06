@@ -26,8 +26,10 @@ export interface MediaUrlOptions {
 export interface MediaFeatures {
   search?: boolean;
   extensionFilter?: boolean;
-  /** MIME patterns (`image/*`, `application/pdf`) or extensions (`.svg`). */
-  accept?: string[];
+  /** MIME types, or `type/*` wildcards: `image/*`, `application/pdf`. */
+  acceptedMimeTypes?: string[];
+  /** Extensions, lowercase and without the dot: `svg`, `pdf`. */
+  acceptedExtensions?: string[];
   /** Bytes. */
   maxSize?: number;
   readOnly?: boolean;

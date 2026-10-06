@@ -1,14 +1,15 @@
 import { Button } from '@tinacms/ui/components/button';
 import { useRef } from 'react';
 import { UploadIcon } from './media-icons';
+import { type UploadRules, inputAcceptOf } from './media-types';
 
 export function MediaUploadButton({
   uploading,
-  accept,
+  rules,
   onUpload,
 }: {
   uploading: boolean;
-  accept: string[];
+  rules: UploadRules;
   onUpload: (files: File[]) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -19,7 +20,7 @@ export function MediaUploadButton({
         type='file'
         multiple
         hidden
-        accept={accept.join(',')}
+        accept={inputAcceptOf(rules)}
         aria-label='Choose files to upload'
         onChange={(event) => {
           const files = [...(event.target.files ?? [])];

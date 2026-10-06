@@ -33,13 +33,14 @@ import {
 } from './media-icons';
 import { MediaPreview } from './media-preview';
 import {
-  DEFAULT_MEDIA_UPLOAD_TYPES,
+  DEFAULT_UPLOAD_RULES,
   MEDIA_CATEGORIES,
   type MediaAccept,
-  acceptPatternsOf,
   joinMediaPath,
   mediaNameOf,
   resolveMediaAccept,
+  type UploadRules,
+  uploadRulesOf,
   uploadRejectionOf,
 } from './media-types';
 import { MediaUploadButton } from './media-upload';
@@ -137,10 +138,18 @@ export function MediaBrowser(props: MediaBrowserProps) {
       ? [props.accept].flat()
       : [];
   const pickExtensions = resolveMediaAccept(pickAccept);
-  const uploadAccept =
+  const providerRestrictsTypes =
+    features.acceptedMimeTypes !== undefined ||
+    features.acceptedExtensions !== undefined;
+  const uploadRules: UploadRules =
     pickExtensions.length > 0
-      ? acceptPatternsOf(pickExtensions)
-      : (features.accept ?? DEFAULT_MEDIA_UPLOAD_TYPES);
+      ? uploadRulesOf(pickExtensions)
+      : providerRestrictsTypes
+        ? {
+            mimeTypes: features.acceptedMimeTypes ?? [],
+            extensions: features.acceptedExtensions ?? [],
+          }
+        : DEFAULT_UPLOAD_RULES;
 
   const [viewMode, setViewMode] = useState<MediaViewMode>('grid');
   const [kindFilter, setKindFilter] = useState<MediaKindFilter>('all');
@@ -246,7 +255,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
     const failures: string[] = [];
     const accepted: File[] = [];
     for (const file of files) {
-      const rejection = uploadRejectionOf(file, uploadAccept, features.maxSize);
+      const rejection = uploadRejectionOf(file, uploadRules, features.maxSize);
       if (rejection) {
         failures.push(`${file.name}: ${rejection}`);
       } else {
@@ -394,7 +403,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
             </Button>
             <MediaUploadButton
               uploading={uploading}
-              accept={uploadAccept}
+              rules={uploadRules}
               onUpload={(files) => void upload(files)}
             />
           </div>
