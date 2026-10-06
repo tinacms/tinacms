@@ -1,9 +1,12 @@
 import path from 'path';
-import type { TinaSchema } from '@tinacms/schema-tools';
+import type { Collection, TinaSchema } from '@tinacms/schema-tools';
 import type { GraphQLResolveInfo } from 'graphql';
 import { get } from '../util';
-import { set } from 'es-toolkit/compat';
-import { checkPasswordHash, mapUserFields } from '../auth/utils';
+import {
+  checkPasswordHash,
+  generatePasswordHash,
+  mapUserFields,
+} from '../auth/utils';
 import type { Resolver } from './index';
 
 export async function getUserDocumentContext(
@@ -49,6 +52,39 @@ export function findUserInCollection(
     throw new Error('No uid field found on user field');
   }
   return users.find((u) => u[idFieldName] === userSub) || null;
+}
+
+/**
+ * A stored hash only carries over to a user with the same uid, so a new or
+ * renamed user saved without a password could never sign in.
+ */
+export function assertNewUsersHavePasswords(
+  collection: Collection<true>,
+  newBody: Record<string, unknown>,
+  existingData?: Record<string, unknown>
+) {
+  const userFields = mapUserFields(collection);
+  if (userFields.length !== 1) {
+    return;
+  }
+  const [{ path: usersPath, idFieldName, passwordFieldName }] = userFields;
+  const users = get(newBody, usersPath);
+  if (!Array.isArray(users) || !idFieldName || !passwordFieldName) {
+    return;
+  }
+  const storedUsers = get(existingData, usersPath);
+  const storedIds = new Set(
+    (Array.isArray(storedUsers) ? storedUsers : []).map((u) => u?.[idFieldName])
+  );
+  const withoutPassword = users
+    .filter(
+      (u) =>
+        !storedIds.has(u?.[idFieldName]) && !u?.[passwordFieldName]?.['value']
+    )
+    .map((u) => u?.[idFieldName]);
+  if (withoutPassword.length) {
+    throw new Error(`New users need a password: ${withoutPassword.join(', ')}`);
+  }
 }
 
 export async function handleAuthenticate({
@@ -131,43 +167,34 @@ export async function handleUpdatePassword({
     throw new Error('No password provided');
   }
 
-  const { collection, userField, users, relativePath } =
-    await getUserDocumentContext(tinaSchema, resolver);
+  const { userField, users } = await getUserDocumentContext(
+    tinaSchema,
+    resolver
+  );
 
   const { idFieldName, passwordFieldName } = userField;
-  const user = users.find((u: any) => u[idFieldName] === ctxUser.sub);
-  if (!user) {
+  if (!passwordFieldName) {
+    throw new Error('No password field found on user field');
+  }
+  if (!users.find((u: any) => u[idFieldName] === ctxUser.sub)) {
     throw new Error('Not authorized');
   }
 
-  user[passwordFieldName] = {
-    value: password,
-    passwordChangeRequired: false,
-  };
-
-  const newBody = {};
-  set(
-    newBody,
-    userField.path.slice(1), // remove _rawData from users path
-    users.map((u: any) => {
-      if (user[idFieldName] === u[idFieldName]) {
-        return user;
-      }
-      return {
-        // don't overwrite other users' passwords
-        ...u,
-        [passwordFieldName]: {
-          ...u[passwordFieldName],
-          value: '',
-        },
-      };
-    })
-  );
-
-  await resolver.resolveUpdateDocument({
-    collectionName: collection.name,
-    relativePath,
-    newBody,
+  // Hashing is slow, so it happens before the store is read for the write
+  const passwordHash = await generatePasswordHash({ password });
+  await resolver.updateAuthDocumentInternal((rawData) => {
+    const storedUsers = get(rawData, userField.path.slice(1)); // drop _rawData
+    const user = Array.isArray(storedUsers)
+      ? storedUsers.find((u: any) => u[idFieldName] === ctxUser.sub)
+      : undefined;
+    if (!user) {
+      throw new Error('Not authorized');
+    }
+    user[passwordFieldName] = {
+      value: passwordHash,
+      passwordChangeRequired: false,
+    };
+    return rawData;
   });
 
   return true;
