@@ -17,14 +17,12 @@ import { MediaBreadcrumb } from './media-breadcrumb';
 import { DeleteDialog, NewFolderDialog, RenameDialog } from './media-dialogs';
 import {
   LockedAcceptChip,
-  type MediaKindFilter,
   MediaKindToggle,
   MediaSearchInput,
   MediaTypeFilter,
-  type MediaTypeFilterValue,
   ViewModeToggle,
 } from './media-filters';
-import { MediaGrid, type MediaViewMode } from './media-grid';
+import { MediaGrid } from './media-grid';
 import {
   CircleAlertIcon,
   ExternalLinkIcon,
@@ -35,6 +33,9 @@ import { MediaPreview } from './media-preview';
 import {
   DEFAULT_UPLOAD_RULES,
   type MediaAccept,
+  type MediaKindFilter,
+  type MediaTypeFilterValue,
+  type MediaViewMode,
   joinMediaPath,
   mediaNameOf,
   resolveMediaAccept,

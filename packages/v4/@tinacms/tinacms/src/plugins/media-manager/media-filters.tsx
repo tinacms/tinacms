@@ -13,7 +13,6 @@ import {
   TooltipTrigger,
 } from '@tinacms/ui/components/tooltip';
 import { cn } from '@tinacms/ui/lib/utils';
-import type { MediaViewMode } from './media-grid';
 import {
   FileIcon,
   FolderIcon,
@@ -25,15 +24,15 @@ import {
 } from 'lucide-react';
 import {
   MEDIA_CATEGORY_LABELS,
+  MEDIA_KIND_OPTIONS,
   type MediaAccept,
   type MediaCategory,
   type MediaExtension,
+  type MediaKindFilter,
+  type MediaTypeFilterValue,
+  type MediaViewMode,
   acceptEntryLabel,
 } from './media-types';
-
-export type MediaKindFilter = 'all' | 'folders' | 'files';
-
-export type MediaTypeFilterValue = MediaCategory | 'all';
 
 const segmentClass = (active: boolean) =>
   cn(
@@ -76,12 +75,6 @@ export function ViewModeToggle({
   );
 }
 
-const KIND_OPTIONS: { value: MediaKindFilter; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'folders', label: 'Folders' },
-  { value: 'files', label: 'Files' },
-];
-
 export function MediaKindToggle({
   value,
   onChange,
@@ -91,7 +84,7 @@ export function MediaKindToggle({
 }) {
   return (
     <div role='group' aria-label='Show' className='flex rounded-lg border'>
-      {KIND_OPTIONS.map((option) => (
+      {MEDIA_KIND_OPTIONS.map((option) => (
         <Button
           key={option.value}
           type='button'

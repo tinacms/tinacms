@@ -34,6 +34,18 @@ export const MEDIA_CATEGORY_LABELS: Record<MediaCategory, string> = {
   document: 'Documents',
 };
 
+export const MEDIA_KIND_OPTIONS = [
+  { value: 'all', label: 'All' },
+  { value: 'folders', label: 'Folders' },
+  { value: 'files', label: 'Files' },
+] as const;
+
+export type MediaKindFilter = (typeof MEDIA_KIND_OPTIONS)[number]['value'];
+
+export type MediaTypeFilterValue = MediaCategory | 'all';
+
+export type MediaViewMode = 'grid' | 'list';
+
 const EXTENSIONS = Object.keys(MEDIA) as MediaExtension[];
 
 const extensionsWhere = (

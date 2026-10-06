@@ -3,9 +3,13 @@ import { cn } from '@tinacms/ui/lib/utils';
 import { useId } from 'react';
 import type { MediaItem, MediaUrlOptions } from '../../core/media/contract';
 import { ClapperboardIcon, FileIcon, FolderIcon, PlayIcon } from 'lucide-react';
-import { isImage, isVideo, mediaNameOf, typeBadgeOf } from './media-types';
-
-export type MediaViewMode = 'grid' | 'list';
+import {
+  type MediaViewMode,
+  isImage,
+  isVideo,
+  mediaNameOf,
+  typeBadgeOf,
+} from './media-types';
 
 type ResolveUrl = (path: string, options?: MediaUrlOptions) => string;
 
