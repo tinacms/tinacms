@@ -10,28 +10,10 @@ import { Button } from '@tinacms/ui/components/button';
 import { Input } from '@tinacms/ui/components/input';
 import { Label } from '@tinacms/ui/components/label';
 import { type FormEvent, useId, useState } from 'react';
-import { MediaRenameError } from '../../core/media/contract';
 import { previewRename, splitFilename } from './media-types';
 
-const renameFailureOf = (cause: unknown, attemptedName: string): string => {
-  if (cause instanceof MediaRenameError) {
-    switch (cause.code) {
-      case 'name-taken':
-        return `A file named "${attemptedName}" already exists in this folder. Choose a different name.`;
-      case 'not-found':
-        return 'This file no longer exists. Refresh the media library and try again.';
-      case 'invalid-name':
-      case 'invalid-path':
-        return "That name isn't valid. Avoid slashes and special characters.";
-      case 'unauthorized':
-        return "You don't have permission to rename this file.";
-      case 'unsupported':
-        return cause.message || 'This media store does not support renaming.';
-      case 'backend-failure':
-        return cause.message || 'Failed to rename the file. Please try again.';
-    }
-  }
-  if (cause instanceof Error && cause.message) {
+const renameFailureOf = (cause: unknown): string => {
+  if (cause instanceof Error) {
     return cause.message;
   } else {
     return 'Failed to rename the file. Please try again.';
@@ -102,7 +84,7 @@ export function RenameDialog({
       await onRename(sanitized);
       onClose();
     } catch (cause) {
-      setFailure(renameFailureOf(cause, sanitized));
+      setFailure(renameFailureOf(cause));
       setProcessing(false);
     }
   };

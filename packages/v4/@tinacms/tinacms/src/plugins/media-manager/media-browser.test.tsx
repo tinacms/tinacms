@@ -14,7 +14,7 @@ import {
   type MediaItem,
   type MediaPage,
   type MediaProvider,
-  MediaRenameError,
+  MediaError,
   type MediaUrlOptions,
 } from '../../core/media/contract';
 import { definePlugin } from '../../core/plugin';
@@ -494,7 +494,7 @@ describe('MediaBrowser rename', () => {
   it('shows the message for a rename error code', async () => {
     const user = userEvent.setup();
     const rename = vi.fn(async () => {
-      throw new MediaRenameError('name-taken', 'exists');
+      throw new MediaError('name-taken', 'exists');
     });
     renderBrowser(createProvider({ rename }));
     await user.click(await fileTile('logo.png'));
@@ -505,7 +505,7 @@ describe('MediaBrowser rename', () => {
     await user.type(input, 'photo');
     await user.click(within(dialog).getByRole('button', { name: 'Rename' }));
     expect(await within(dialog).findByRole('alert')).toHaveTextContent(
-      'A file named "photo.png" already exists in this folder. Choose a different name.'
+      'A file with that name already exists in this folder.'
     );
   });
 });

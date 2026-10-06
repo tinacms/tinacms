@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { MediaSlice } from '../../../core/media/contract';
 import type { SliceSet, SliceState } from '../../../core/plugin';
-import { localMediaPlugin } from './local-media.plugin';
+import { MEDIA_ERROR_HEADER, localMediaPlugin } from './local-media.plugin';
 
 interface RecordedRequest {
   url: string;
@@ -9,7 +9,13 @@ interface RecordedRequest {
   body: unknown;
 }
 
-const createSliceHarness = async (responseBody: unknown, ok = true) => {
+const createSliceHarness = async (
+  responseBody: unknown,
+  ok = true,
+  failure: { status: number; headers?: Record<string, string> } = {
+    status: 500,
+  }
+) => {
   const requests: RecordedRequest[] = [];
   vi.stubGlobal(
     'fetch',
@@ -21,8 +27,9 @@ const createSliceHarness = async (responseBody: unknown, ok = true) => {
       });
       return {
         ok,
-        status: ok ? 200 : 500,
+        status: ok ? 200 : failure.status,
         text: async () => 'boom',
+        headers: new Headers(failure.headers),
         json: async () => responseBody,
       };
     })
@@ -94,10 +101,27 @@ describe('media slice', () => {
     );
   });
 
-  it('surfaces a failed upload as a rejection', async () => {
+  it('reports an unknown failure as backend-failure', async () => {
     const harness = await createSliceHarness(null, false);
     await expect(
       harness.slice().upload(new File(['x'], 'x.png'))
-    ).rejects.toThrow(/upload failed \(500\): boom/);
+    ).rejects.toMatchObject({ code: 'backend-failure', detail: 'boom' });
+  });
+
+  it('reports a 413 as too-large', async () => {
+    const harness = await createSliceHarness(null, false, { status: 413 });
+    await expect(
+      harness.slice().upload(new File(['x'], 'x.png'))
+    ).rejects.toMatchObject({ code: 'too-large' });
+  });
+
+  it('keeps the code the server reports', async () => {
+    const harness = await createSliceHarness(null, false, {
+      status: 400,
+      headers: { [MEDIA_ERROR_HEADER]: 'not-found' },
+    });
+    await expect(harness.slice().delete('old.png')).rejects.toMatchObject({
+      code: 'not-found',
+    });
   });
 });

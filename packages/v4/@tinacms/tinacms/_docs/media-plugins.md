@@ -40,7 +40,7 @@ supplies the addition for it.
 | `list(..., { search })` | Returns only the items whose name matches `search`. Set `features.search` when `list` uses it. |
 | `list(..., { extensions })` | Returns only the files with one of the extensions, for example `['jpg', 'png']`. Extensions are lowercase and have no dot. Set `features.extensionFilter` when `list` uses it. |
 | `resolveUrl(path, { width, height })` | Returns a URL for an image at that size. A provider without image transforms ignores the options and returns the original URL ([ADR-022](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/022-media-capability-contract.md) §5). |
-| `rename(from, to)` | Moves a file to a new media path in the same media root, and returns the new path. On failure it throws `MediaRenameError`. |
+| `rename(from, to)` | Moves a file to a new media path in the same media root, and returns the new path. On failure it throws `MediaError`. |
 | `features` | Tells the UI what the provider supports. Refer to the next table. |
 | `status()` | Returns `{ kind: 'ready' }`, or `{ kind: 'needs-setup', message, actionLabel, actionUrl }` when the media store needs setup before use. |
 
@@ -53,16 +53,18 @@ supplies the addition for it.
 | `maxSize` | The largest file that `upload` accepts, in bytes. |
 | `readOnly` | The provider does not upload, rename or delete. |
 
-`MediaRenameError` has a `code`:
+Each operation reports a known failure as a `MediaError`. It has a `code`,
+a `message` to show the user, and an optional `detail` for logs:
 
 | Code | Meaning |
 |---|---|
-| `not-found` | The file at `from` does not exist. |
-| `name-taken` | A file at `to` exists. |
-| `invalid-name` | The new file name is not valid. |
-| `invalid-path` | `to` is not a valid media path. |
-| `unauthorized` | The user cannot rename the file. |
-| `unsupported` | The media store cannot rename files. |
+| `not-found` | The file does not exist. |
+| `name-taken` | A file with that name exists. |
+| `invalid-name` | The file name is not valid. |
+| `invalid-path` | The media path is not valid. |
+| `too-large` | The file is larger than the provider accepts. |
+| `unauthorized` | The user cannot do the operation. |
+| `unsupported` | The media store cannot do the operation. |
 | `backend-failure` | The media store failed. |
 
 `localMediaPlugin()` supplies none of the optional additions.
