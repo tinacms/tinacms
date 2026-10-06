@@ -37,14 +37,19 @@ describe('previewRename', () => {
 });
 
 describe('resolveMediaAccept', () => {
-  it('expands categories and aliases, and drops unknown values', () => {
+  it('expands a category, and an extension to every extension with its MIME type', () => {
     expect(resolveMediaAccept(['video', 'jpeg'])).toEqual([
       'mp4',
       'webm',
       'mov',
-      'jpeg',
       'jpg',
+      'jpeg',
     ]);
+  });
+
+  it('accepts a single value or nothing', () => {
+    expect(resolveMediaAccept('png')).toEqual(['png']);
+    expect(resolveMediaAccept()).toEqual([]);
   });
 });
 

@@ -34,12 +34,12 @@ import {
 import { MediaPreview } from './media-preview';
 import {
   DEFAULT_UPLOAD_RULES,
-  MEDIA_CATEGORIES,
   type MediaAccept,
   joinMediaPath,
   mediaNameOf,
   resolveMediaAccept,
   type UploadRules,
+  extensionsForCategory,
   inputAcceptOf,
   uploadRulesOf,
   uploadRejectionOf,
@@ -195,7 +195,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
       ? pickExtensions
       : typeFilter === 'all'
         ? []
-        : [...MEDIA_CATEGORIES[typeFilter]];
+        : extensionsForCategory(typeFilter);
   const request: MediaPageRequest = {
     search: features.search && debouncedSearch ? debouncedSearch : undefined,
     extensions: extensions.length > 0 ? extensions : undefined,

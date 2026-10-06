@@ -1,42 +1,30 @@
-export const MEDIA_EXTENSIONS = [
-  'jpg',
-  'jpeg',
-  'png',
-  'gif',
-  'webp',
-  'svg',
-  'avif',
-  'ico',
-  'mp4',
-  'webm',
-  'mov',
-  'mp3',
-  'wav',
-  'ogg',
-  'pdf',
-  'json',
-  'csv',
-  'txt',
-] as const;
+const MEDIA = {
+  jpg: { mime: 'image/jpeg', category: 'image' },
+  jpeg: { mime: 'image/jpeg', category: 'image' },
+  png: { mime: 'image/png', category: 'image' },
+  gif: { mime: 'image/gif', category: 'image' },
+  webp: { mime: 'image/webp', category: 'image' },
+  svg: { mime: 'image/svg+xml', category: 'image' },
+  avif: { mime: 'image/avif', category: 'image' },
+  ico: { mime: 'image/x-icon', category: 'image' },
 
-export type MediaExtension = (typeof MEDIA_EXTENSIONS)[number];
+  mp4: { mime: 'video/mp4', category: 'video' },
+  webm: { mime: 'video/webm', category: 'video' },
+  mov: { mime: 'video/quicktime', category: 'video' },
 
-export const MEDIA_CATEGORIES = {
-  image: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif', 'ico'],
-  video: ['mp4', 'webm', 'mov'],
-  audio: ['mp3', 'wav', 'ogg'],
-  document: ['pdf', 'json', 'csv', 'txt'],
-} as const satisfies Record<string, readonly MediaExtension[]>;
+  mp3: { mime: 'audio/mpeg', category: 'audio' },
+  wav: { mime: 'audio/wav', category: 'audio' },
+  ogg: { mime: 'audio/ogg', category: 'audio' },
 
-export type MediaCategory = keyof typeof MEDIA_CATEGORIES;
+  pdf: { mime: 'application/pdf', category: 'document' },
+  json: { mime: 'application/json', category: 'document' },
+  csv: { mime: 'text/csv', category: 'document' },
+  txt: { mime: 'text/plain', category: 'document' },
+} as const;
 
-export const MEDIA_CATEGORY_NAMES = [
-  'image',
-  'video',
-  'audio',
-  'document',
-] as const satisfies readonly MediaCategory[];
-
+export type MediaExtension = keyof typeof MEDIA;
+type MediaTypeEntry = (typeof MEDIA)[MediaExtension];
+export type MediaCategory = MediaTypeEntry['category'];
 export type MediaAccept = MediaExtension | MediaCategory;
 
 export const MEDIA_CATEGORY_LABELS: Record<MediaCategory, string> = {
@@ -46,33 +34,15 @@ export const MEDIA_CATEGORY_LABELS: Record<MediaCategory, string> = {
   document: 'Documents',
 };
 
-const MEDIA_EXTENSION_ALIASES: Partial<
-  Record<MediaExtension, readonly MediaExtension[]>
-> = {
-  jpg: ['jpeg'],
-  jpeg: ['jpg'],
-};
+const EXTENSIONS = Object.keys(MEDIA) as MediaExtension[];
 
-export const MEDIA_MIME_TYPES = {
-  jpg: 'image/jpeg',
-  jpeg: 'image/jpeg',
-  png: 'image/png',
-  gif: 'image/gif',
-  webp: 'image/webp',
-  svg: 'image/svg+xml',
-  avif: 'image/avif',
-  ico: 'image/x-icon',
-  mp4: 'video/mp4',
-  webm: 'video/webm',
-  mov: 'video/quicktime',
-  mp3: 'audio/mpeg',
-  wav: 'audio/wav',
-  ogg: 'audio/ogg',
-  pdf: 'application/pdf',
-  json: 'application/json',
-  csv: 'text/csv',
-  txt: 'text/plain',
-} as const satisfies Record<MediaExtension, string>;
+const extensionsWhere = (
+  match: (entry: MediaTypeEntry) => boolean
+): MediaExtension[] => EXTENSIONS.filter((ext) => match(MEDIA[ext]));
+
+export const extensionsForCategory = (
+  category: MediaCategory
+): MediaExtension[] => extensionsWhere((entry) => entry.category === category);
 
 export const DEFAULT_MEDIA_UPLOAD_TYPES = [
   'text/*',
@@ -99,10 +69,7 @@ export const DEFAULT_MEDIA_UPLOAD_TYPES = [
 ];
 
 const isMediaExtension = (value: string): value is MediaExtension =>
-  (MEDIA_EXTENSIONS as readonly string[]).includes(value);
-
-const isMediaCategory = (value: string): value is MediaCategory =>
-  value in MEDIA_CATEGORIES;
+  value in MEDIA;
 
 export const extensionOf = (value: string): string => {
   const path = value.split(/[?#]/)[0] ?? '';
@@ -118,24 +85,18 @@ export const joinMediaPath = (folder: string, name: string): string =>
   folder ? `${folder}/${name}` : name;
 
 export const resolveMediaAccept = (
-  accept: MediaAccept | MediaAccept[] | undefined
-): MediaExtension[] => {
-  if (!accept) return [];
-  const requested = Array.isArray(accept) ? accept : [accept];
-  const resolved = new Set<MediaExtension>();
-  const add = (ext: MediaExtension) => {
-    resolved.add(ext);
-    for (const alias of MEDIA_EXTENSION_ALIASES[ext] ?? []) resolved.add(alias);
-  };
-  for (const entry of requested) {
-    if (isMediaCategory(entry)) {
-      for (const ext of MEDIA_CATEGORIES[entry]) add(ext);
-    } else if (isMediaExtension(entry)) {
-      add(entry);
-    }
-  }
-  return [...resolved];
-};
+  accept?: MediaAccept | MediaAccept[]
+): MediaExtension[] => [
+  ...new Set(
+    [accept ?? []]
+      .flat()
+      .flatMap((value) =>
+        isMediaExtension(value)
+          ? extensionsWhere((entry) => entry.mime === MEDIA[value].mime)
+          : extensionsForCategory(value)
+      )
+  ),
+];
 
 export interface UploadRules {
   mimeTypes: string[];
@@ -148,7 +109,7 @@ export const DEFAULT_UPLOAD_RULES: UploadRules = {
 };
 
 export const uploadRulesOf = (extensions: MediaExtension[]): UploadRules => ({
-  mimeTypes: [...new Set(extensions.map((ext) => MEDIA_MIME_TYPES[ext]))],
+  mimeTypes: [...new Set(extensions.map((ext) => MEDIA[ext].mime))],
   extensions,
 });
 
@@ -156,12 +117,12 @@ export const inputAcceptOf = ({ mimeTypes, extensions }: UploadRules): string =>
   [...mimeTypes, ...extensions.map((ext) => `.${ext}`)].join(',');
 
 export const acceptEntryLabel = (entry: MediaAccept): string =>
-  isMediaCategory(entry) ? MEDIA_CATEGORY_LABELS[entry] : entry.toUpperCase();
+  isMediaExtension(entry) ? entry.toUpperCase() : MEDIA_CATEGORY_LABELS[entry];
 
 const mimeTypeOf = (file: File): string => {
   if (file.type) return file.type;
   const ext = extensionOf(file.name);
-  return isMediaExtension(ext) ? MEDIA_MIME_TYPES[ext] : '';
+  return isMediaExtension(ext) ? MEDIA[ext].mime : '';
 };
 
 const matchesMimeType = (file: File, mimeType: string): boolean => {
@@ -191,7 +152,7 @@ export const uploadRejectionOf = (
   return reasons.length > 0 ? reasons.join(', ') : null;
 };
 
-// Not `MEDIA_CATEGORIES.image`: `tiff` gets a preview, `ico` does not.
+// Not the `image` category: `tiff` gets a preview, `ico` does not.
 const PREVIEWABLE_IMAGE_EXTENSIONS = new Set([
   'gif',
   'jpg',

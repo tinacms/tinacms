@@ -25,7 +25,6 @@ import {
 } from './media-icons';
 import {
   MEDIA_CATEGORY_LABELS,
-  MEDIA_CATEGORY_NAMES,
   type MediaAccept,
   type MediaCategory,
   type MediaExtension,
@@ -149,10 +148,12 @@ export function MediaSearchInput({
 
 const TYPE_ITEMS: { value: MediaTypeFilterValue; label: string }[] = [
   { value: 'all', label: 'Any type' },
-  ...MEDIA_CATEGORY_NAMES.map((category) => ({
-    value: category,
-    label: MEDIA_CATEGORY_LABELS[category],
-  })),
+  ...(Object.keys(MEDIA_CATEGORY_LABELS) as MediaCategory[]).map(
+    (category) => ({
+      value: category,
+      label: MEDIA_CATEGORY_LABELS[category],
+    })
+  ),
 ];
 
 export function MediaTypeFilter({
