@@ -1,5 +1,7 @@
 import { it, expect } from 'vitest';
 import config from './tina/config';
+import fs from 'fs-extra';
+import path from 'path';
 import { setup } from '../util';
 
 const authorizeQuery = `
@@ -95,4 +97,32 @@ it('returns null when context user has null sub', async () => {
 
   expect(result.errors).toBeUndefined();
   expect(result.data?.authorize).toBeNull();
+});
+
+it('returns only the fields sign-in needs', async () => {
+  const { get } = await setup(__dirname, config);
+  const fixture = JSON.parse(
+    await fs.readFile(path.join(__dirname, 'content/users/index.json'), 'utf-8')
+  );
+
+  const withValue = await get({
+    query: `query { authorize { username password { passwordChangeRequired value } } }`,
+    variables: {},
+    ctxUser: { sub: 'northwind' },
+  });
+  const withoutValue = await get({
+    query: `query { authorize { username password { passwordChangeRequired } } }`,
+    variables: {},
+    ctxUser: { sub: 'northwind' },
+  });
+
+  const serialized = JSON.stringify([withValue, withoutValue]);
+  for (const user of fixture.users) {
+    expect(serialized).not.toContain(user.password.value);
+  }
+  expect(withoutValue.errors).toBeUndefined();
+  expect(withoutValue.data?.authorize).toEqual({
+    username: 'northwind',
+    password: { passwordChangeRequired: false },
+  });
 });

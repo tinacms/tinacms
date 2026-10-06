@@ -1,0 +1,5 @@
+{
+  "username": "second-user",
+  "title": "Alpha",
+  "password": { "value": "0000000000000000", "passwordChangeRequired": false }
+}
