@@ -72,11 +72,26 @@ const touchesWordChar = (
   (edge === 'start' ? /^[\p{L}\p{N}]/u : /[\p{L}\p{N}]$/u).test(node.text);
 
 /**
+ * Number of leading nodes that are plain inline code and so must share one
+ * code span, since back-to-back spans would merge on the next parse. Nodes
+ * differing only in marks markdown can't write (e.g. underline) end up here.
+ */
+const codeRunLength = (content: InlineElementWithCallback[]) => {
+  const isPlainCode = (node: InlineElementWithCallback | undefined) =>
+    !!node && !node.linkifyTextNode && getMarks(node).join() === 'inlineCode';
+  if (content[0]?.linkifyTextNode) {
+    return 1;
+  }
+  const end = content.findIndex((node) => !isPlainCode(node));
+  return end === -1 ? content.length : end;
+};
+
+/**
  * Picks which of `first`'s marks becomes the outermost element: the one
  * shared by the longest run of leading nodes, ties going to the earliest mark
  * in `getMarks` order. Only that run is wrapped, so neighbours without the
  * mark are never pulled into it. Inline code can't hold children, so it is
- * only picked once no other mark is left, one node at a time.
+ * only picked once no other mark is left.
  *
  * `**`, `*` and `~~` only open or close beside a letter when the other side
  * isn't punctuation, and a colour element's `<`/`>` is. So `x**<span>a</span>**`
@@ -105,7 +120,7 @@ export const pickMarkToProcess = (
   }
   if (!markToProcess) {
     return marks.includes('inlineCode')
-      ? { markToProcess: 'inlineCode', runLength: 1 }
+      ? { markToProcess: 'inlineCode', runLength: codeRunLength(content) }
       : { markToProcess, runLength };
   }
   if (isColorMark(markToProcess)) {

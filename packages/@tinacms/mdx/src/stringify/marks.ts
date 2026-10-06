@@ -194,7 +194,10 @@ export const eat = (
   if (markToProcess === 'inlineCode') {
     const node = {
       type: markToProcess,
-      value: first.text,
+      value: content
+        .slice(0, runLength)
+        .map((node) => (isTextElement(node) ? node.text : ''))
+        .join(''),
     };
     return [
       // @ts-ignore

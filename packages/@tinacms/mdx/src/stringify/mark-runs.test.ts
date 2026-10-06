@@ -71,6 +71,24 @@ describe.each<[string, RichTextField, string]>([
     expect(string).toBe(expected);
     expect(parseMDX(string as string, field, passthrough)).toEqual(value);
   });
+
+  it('writes code split only by underline as one span', () => {
+    const underlined = {
+      type: 'text' as const,
+      text: 'def',
+      code: true,
+      underline: true,
+    };
+    const value = paragraph([
+      { type: 'text', text: 'abc', code: true },
+      underlined,
+    ]);
+    const string = serializeMDX(value, field, passthrough);
+    expect(string).toBe('`abcdef`\n');
+    expect(parseMDX(string as string, field, passthrough)).toEqual(
+      paragraph([{ type: 'text', text: 'abcdef', code: true }])
+    );
+  });
 });
 
 describe('nested colours', () => {
