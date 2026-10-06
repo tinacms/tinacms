@@ -12,6 +12,7 @@ import {
   resolveMediaRelativeToCloud,
 } from './media-utils';
 import { generatePasswordHash } from '../auth/utils';
+import { createSchema } from '../schema/createSchema';
 
 vi.mock('../mdx', () => ({
   parseMDX: vi.fn(),
@@ -23,7 +24,8 @@ vi.mock('./media-utils', () => ({
   resolveMediaCloudToRelative: vi.fn((v) => v),
 }));
 
-vi.mock('../auth/utils', () => ({
+vi.mock('../auth/utils', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../auth/utils')>()),
   generatePasswordHash: vi.fn(),
 }));
 
@@ -2033,4 +2035,214 @@ describe('index', () => {
       expect(fromWindows._sys).toEqual(fromPosix._sys);
     });
   });
+});
+
+describe('auth collection write guard', () => {
+  const userCollection = {
+    name: 'user',
+    label: 'Users',
+    path: 'content/users',
+    format: 'json' as const,
+    isAuthCollection: true,
+    fields: [
+      {
+        type: 'object' as const,
+        name: 'users',
+        list: true,
+        fields: [
+          { type: 'string' as const, name: 'username', uid: true },
+          { type: 'password' as const, name: 'password' },
+        ],
+      },
+    ],
+  };
+  const postCollection = {
+    name: 'post',
+    label: 'Posts',
+    path: 'content/posts',
+    format: 'md' as const,
+    fields: [{ type: 'string' as const, name: 'title' }],
+  };
+  const dataCollection = {
+    name: 'data',
+    label: 'Data',
+    path: 'content',
+    format: 'json' as const,
+    fields: [{ type: 'string' as const, name: 'title' }],
+  };
+  // two users, one admin
+  const storedUsers = {
+    _collection: 'user',
+    _template: 'user',
+    users: [
+      { username: 'admin-user', password: { value: 'stored-hash-1' } },
+      { username: 'editor-user', password: { value: 'stored-hash-2' } },
+    ],
+  };
+
+  const buildGuard = async ({
+    collections = [userCollection, postCollection, dataCollection],
+    ctxUser,
+    admins = ['admin-user'],
+    allowUnauthenticatedWrites = false,
+    stored = storedUsers as Record<string, unknown> | undefined,
+    withAuthCollection = true,
+  }: {
+    collections?: any[];
+    ctxUser?: { sub?: string } | null;
+    admins?: string[];
+    allowUnauthenticatedWrites?: boolean;
+    stored?: Record<string, unknown>;
+    withAuthCollection?: boolean;
+  } = {}) => {
+    const tinaSchema = await createSchema({ schema: { collections } });
+    const database = {
+      ...(withAuthCollection && {
+        authCollection: { admins, allowUnauthenticatedWrites },
+      }),
+      get: vi.fn(async (fullPath: string) => {
+        if (fullPath === 'content/users/index.json' && stored) {
+          return stored;
+        }
+        throw new Error(`Unable to find record ${fullPath}`);
+      }),
+    };
+    const resolver = createResolver({
+      database: database as any,
+      tinaSchema,
+      isAudit: false,
+      ctxUser,
+    });
+    return (collectionName: string, realPath: string, op: string) =>
+      // @ts-ignore Since it's private
+      resolver.assertAuthCollectionWrite({
+        collection: tinaSchema.getCollection(collectionName),
+        realPath,
+        op,
+      });
+  };
+
+  it('allows any write when the schema has no auth collection', async () => {
+    const check = await buildGuard({
+      collections: [postCollection, dataCollection],
+      ctxUser: { sub: 'editor-user' },
+    });
+    await expect(
+      check('data', 'content/users/index.json', 'delete')
+    ).resolves.toBeUndefined();
+  });
+
+  it('allows writes to other collections', async () => {
+    const check = await buildGuard({ ctxUser: { sub: 'editor-user' } });
+    await expect(
+      check('post', 'content/posts/hello.md', 'delete')
+    ).resolves.toBeUndefined();
+  });
+
+  it('rejects a call with no ctxUser when unauthenticated writes are off', async () => {
+    const check = await buildGuard();
+    await expect(
+      check('user', 'content/users/index.json', 'update')
+    ).rejects.toThrow('Not authorized');
+  });
+
+  it('allows a call with no ctxUser when unauthenticated writes are on', async () => {
+    const check = await buildGuard({ allowUnauthenticatedWrites: true });
+    await expect(
+      check('user', 'content/users/other.json', 'create')
+    ).resolves.toBeUndefined();
+  });
+
+  describe('with a Database from before authCollection existed', () => {
+    it('allows a call with no ctxUser, like createDatabaseInternal', async () => {
+      const check = await buildGuard({ withAuthCollection: false });
+      await expect(
+        check('user', 'content/users/index.json', 'update')
+      ).resolves.toBeUndefined();
+    });
+
+    it('rejects a signed-in user, since it lists no admins', async () => {
+      const check = await buildGuard({
+        withAuthCollection: false,
+        ctxUser: { sub: 'admin-user' },
+      });
+      await expect(
+        check('user', 'content/users/index.json', 'update')
+      ).rejects.toThrow('Not authorized');
+    });
+  });
+
+  it('rejects a write from a user who is not an admin', async () => {
+    const check = await buildGuard({ ctxUser: { sub: 'editor-user' } });
+    await expect(
+      check('user', 'content/users/index.json', 'update')
+    ).rejects.toThrow('Not authorized');
+  });
+
+  it('rejects a write from an admin who is not in the user store', async () => {
+    const check = await buildGuard({
+      ctxUser: { sub: 'missing-user' },
+      admins: ['admin-user', 'missing-user'],
+    });
+    await expect(
+      check('user', 'content/users/index.json', 'update')
+    ).rejects.toThrow('Not authorized');
+  });
+
+  it('allows an admin to update index.json', async () => {
+    const check = await buildGuard({ ctxUser: { sub: 'admin-user' } });
+    await expect(
+      check('user', 'content/users/index.json', 'update')
+    ).resolves.toBeUndefined();
+  });
+
+  it.each(['create', 'delete', 'rename', 'addPending', 'createFolder'])(
+    'rejects an admin create, delete, rename, addPending and createFolder (%s)',
+    async (op) => {
+      const check = await buildGuard({ ctxUser: { sub: 'admin-user' } });
+      await expect(
+        check('user', 'content/users/index.json', op)
+      ).rejects.toThrow('Not authorized');
+    }
+  );
+
+  it('rejects an admin update of a document other than index.json', async () => {
+    const check = await buildGuard({ ctxUser: { sub: 'admin-user' } });
+    await expect(
+      check('user', 'content/users/other.json', 'update')
+    ).rejects.toThrow('Not authorized');
+  });
+
+  it('applies the user collection rules to every document stored in it', async () => {
+    const check = await buildGuard({ ctxUser: { sub: 'editor-user' } });
+    await expect(
+      check('data', 'content/users/index.json', 'update')
+    ).rejects.toThrow('Not authorized');
+    await expect(
+      check('data', 'content/settings.json', 'update')
+    ).resolves.toBeUndefined();
+  });
+
+  it('does not treat a user with ctxUser set as trusted when unauthenticated writes are on', async () => {
+    const check = await buildGuard({
+      ctxUser: { sub: 'editor-user' },
+      allowUnauthenticatedWrites: true,
+    });
+    await expect(
+      check('user', 'content/users/index.json', 'update')
+    ).rejects.toThrow('Not authorized');
+  });
+
+  it.each([{}, { sub: '' }, null])(
+    'rejects a write when ctxUser is present but has no sub (%j)',
+    async (ctxUser) => {
+      const check = await buildGuard({
+        ctxUser,
+        allowUnauthenticatedWrites: true,
+      });
+      await expect(
+        check('user', 'content/users/index.json', 'update')
+      ).rejects.toThrow('Not authorized');
+    }
+  );
 });
