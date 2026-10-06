@@ -95,6 +95,11 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     width: () => STANDARD_ICON_WIDTH,
     Component: <BoldToolbarButton />,
   },
+  italic: {
+    label: 'Italic',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <ItalicToolbarButton />,
+  },
   strikethrough: {
     label: 'Strikethrough',
     width: () => STANDARD_ICON_WIDTH,
@@ -109,11 +114,6 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Text Color',
     width: () => HIGHLIGHT_ICON_WIDTH,
     Component: <TextColorToolbarButton />,
-  },
-  italic: {
-    label: 'Italic',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <ItalicToolbarButton />,
   },
   code: {
     label: 'Code',

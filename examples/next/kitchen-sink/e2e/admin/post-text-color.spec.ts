@@ -21,9 +21,9 @@ const POST_FILE = fileURLToPath(
 
 const BODY_TEXT = 'Start crimson bright and marked words end';
 
-// Default palettes: text Red #DC2626 / Blue #2563EB, highlight Yellow #FEF08A
-const RED = 'rgb(220, 38, 38)';
-const BLUE = 'rgb(37, 99, 235)';
+// Default palettes: text Red #CC4141 / Blue #0066CC, highlight Yellow #FEF08A
+const RED = 'rgb(204, 65, 65)';
+const BLUE = 'rgb(0, 102, 204)';
 const YELLOW = 'rgb(254, 240, 138)';
 
 const bodyEditor = (page: Page) =>
@@ -114,10 +114,10 @@ test.describe('Post rich-text text colour', () => {
     await expect
       .poll(() => readFileSync(POST_FILE, 'utf8'))
       .toContain(
-        '<span style={{ color: "#DC2626" }}>crimson **bright**</span>'
+        '<span style={{ color: "#CC4141" }}>crimson **bright**</span>'
       );
     expect(readFileSync(POST_FILE, 'utf8')).toContain(
-      '<mark style={{ backgroundColor: "#FEF08A", color: "#2563EB" }}>marked</mark>'
+      '<mark style={{ backgroundColor: "#FEF08A", color: "#0066CC" }}>marked</mark>'
     );
 
     // Round-trip: the reloaded editor parses the MDX back into coloured leaves

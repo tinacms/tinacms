@@ -531,10 +531,11 @@ export const DEFAULT_HIGHLIGHT_COLORS: readonly RichTextColorOption[] = [
 ];
 /** Palette used by the "Text color" toolbar button when `overrides.textColors` is omitted. */
 export const DEFAULT_TEXT_COLORS: readonly RichTextColorOption[] = [
-  { label: 'Red', value: '#DC2626' },
-  { label: 'Blue', value: '#2563EB' },
-  { label: 'Green', value: '#16A34A' },
-  { label: 'Gray', value: '#6B7280' },
+  { label: 'Red', value: '#CC4141' },
+  { label: 'Blue', value: '#0066CC' },
+  { label: 'Green', value: '#2E7D32' },
+  { label: 'Orange', value: '#F97316' },
+  { label: 'Purple', value: '#6A4C93' },
 ];
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] };
 export type RichTextField<WithNamespace extends boolean = false> = (
@@ -569,7 +570,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
       headingLevels?: HeadingLevel[];
       /**
        * Colours offered by the "Text color" toolbar button.
-       * Defaults to red, blue, green and gray.
+       * Defaults to red, blue, green, orange and purple.
        *
        * @example textColors: [{ label: 'Brand', value: '#CC4141' }]
        */
