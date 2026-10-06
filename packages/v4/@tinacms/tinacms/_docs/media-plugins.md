@@ -50,7 +50,7 @@ supplies the addition for it.
 | `extensionFilter` | `list` uses `extensions`. |
 | `acceptedMimeTypes` | The MIME types that `upload` accepts, such as `application/pdf`, or a wildcard such as `image/*`. |
 | `acceptedExtensions` | The extensions that `upload` accepts, lowercase and without the dot, such as `svg`. |
-| `maxSize` | The largest file that `upload` accepts, in bytes. |
+| `maxSize` | The largest file that `upload` accepts, in bytes. Each media plugin sets its own limit. If it is not set, the Media Manager does not check the size before an upload. |
 | `readOnly` | The provider does not upload, rename or delete. |
 
 Each operation reports a known failure as a `MediaError`. It has a `code`,
@@ -96,8 +96,14 @@ you change them.
 ### Upload
 
 The browser sends the file as `multipart/form-data` to `{url}/upload`, with a
-`file` field and an optional `folder` field. The limit is 25 MB. `list` is a
-`GET` request to `{url}?folder=posts`. `delete` is a JSON request to `{url}`.
+`file` field and an optional `folder` field. `list` is a `GET` request to
+`{url}?folder=posts`. `delete` is a JSON request to `{url}`.
+
+The dev server accepts files up to 25 MB (`MAX_MEDIA_UPLOAD_BYTES`). This
+limit applies to `localMediaPlugin()` only. Other media plugins, such as
+TinaCloud, have their own limits. `localMediaPlugin()` does not set
+`features.maxSize`, so the Media Manager does not check the size first. A
+larger file fails at upload with a `too-large` error.
 
 A multipart request does not get a CORS preflight. Thus a page on a different
 site can send one. The endpoint rejects a request that is not from a loopback
