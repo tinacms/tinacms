@@ -291,7 +291,7 @@ describe('MediaBrowser upload', () => {
     renderBrowser(provider);
     await fileTile('logo.png');
     await user.upload(
-      screen.getByLabelText('Choose files to upload'),
+      screen.getByLabelText('Upload'),
       new File(['x'], 'new.png', { type: 'image/png' })
     );
     expect(provider.upload).toHaveBeenCalledWith(expect.any(File), '');
@@ -314,7 +314,7 @@ describe('MediaBrowser upload', () => {
     });
     renderBrowser(provider);
     await fileTile('logo.png');
-    await user.upload(screen.getByLabelText('Choose files to upload'), [
+    await user.upload(screen.getByLabelText('Upload'), [
       new File(['x'], 'doc.pdf', { type: 'application/pdf' }),
       new File(['too large'], 'big.png', { type: 'image/png' }),
       new File(['x'], 'ok.png', { type: 'image/png' }),
@@ -336,7 +336,7 @@ describe('MediaBrowser upload', () => {
     renderBrowser(provider);
     await fileTile('logo.png');
     await user.upload(
-      screen.getByLabelText('Choose files to upload'),
+      screen.getByLabelText('Upload'),
       new File(['x'], 'new.png', { type: 'image/png' })
     );
     expect(await screen.findByRole('alert')).toHaveTextContent(
@@ -366,7 +366,7 @@ describe('MediaBrowser upload', () => {
     await fileTile('logo.png');
     await user.click(screen.getByRole('button', { name: 'Folders' }));
     await user.upload(
-      screen.getByLabelText('Choose files to upload'),
+      screen.getByLabelText('Upload'),
       new File(['x'], 'new.png', { type: 'image/png' })
     );
     expect(await fileTile('new.png (new)')).toBeVisible();
@@ -672,7 +672,7 @@ describe('MediaBrowser pick mode', () => {
     );
     await fileTile('logo.png');
     await user.upload(
-      screen.getByLabelText('Choose files to upload'),
+      screen.getByLabelText('Upload'),
       new File(['x'], 'clip.mov', { type: 'video/quicktime' })
     );
     expect(await screen.findByRole('alert')).toHaveTextContent(

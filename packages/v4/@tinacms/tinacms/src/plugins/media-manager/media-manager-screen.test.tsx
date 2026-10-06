@@ -162,7 +162,7 @@ describe('media manager screen', () => {
     renderMediaManager('#/screens/media/posts');
     await screen.findByRole('list', { name: 'Files' });
     await user.upload(
-      screen.getByLabelText('Choose files to upload'),
+      screen.getByLabelText('Upload'),
       new File(['x'], 'new.png', { type: 'image/png' })
     );
     expect(fakeMedia.upload).toHaveBeenCalledWith(expect.any(File), 'posts');

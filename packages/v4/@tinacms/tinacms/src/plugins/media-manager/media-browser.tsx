@@ -40,6 +40,7 @@ import {
   mediaNameOf,
   resolveMediaAccept,
   type UploadRules,
+  inputAcceptOf,
   uploadRulesOf,
   uploadRejectionOf,
 } from './media-types';
@@ -403,7 +404,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
             </Button>
             <MediaUploadButton
               uploading={uploading}
-              rules={uploadRules}
+              accept={inputAcceptOf(uploadRules)}
               onUpload={(files) => void upload(files)}
             />
           </div>
