@@ -100,13 +100,6 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
     const singletonCapabilities = plugin.provides.filter(
       isSingletonSliceCapability
     );
-    invariant(
-      singletonCapabilities.length <= 1,
-      'plugin-multiple-singleton-slices',
-      `Plugin "${plugin.name}" provides ${singletonCapabilities.length} ` +
-        `singleton capabilities (${singletonCapabilities.join(', ')}), but a ` +
-        'plugin mounts at only one namespace. Split it into one plugin per capability.'
-    );
     return singletonCapabilities.map((capability) => ({
       key: capability,
       value: plugin,

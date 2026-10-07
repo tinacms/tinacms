@@ -269,6 +269,8 @@ export class Codegen {
     return this.apiURL;
   }
 
+  // NOTE: [2 Oct 2026] EK - The generated authenticate() must pass isSignIn: true, or
+  // @tinacms/graphql refuses every sign-in (graphql src/resolver/auth-fields.ts).
   async genDatabaseClient() {
     const authCollection = this.tinaSchema
       .getCollections()
@@ -301,7 +303,7 @@ import type { TinaClient } from "tinacms/dist/client";
 import { queries } from "./types.js";
 import database from "../database";
 
-export async function databaseRequest({ query, variables, user }) {
+export async function databaseRequest({ query, variables, user, isSignIn }) {
   const result = await resolve({
     config: {
       useRelativeMedia: true,
@@ -311,6 +313,7 @@ export async function databaseRequest({ query, variables, user }) {
     variables,
     verbose: true,
     ctxUser: user,
+    isSignIn,
   });
 
   return result;
@@ -324,6 +327,7 @@ export async function authenticate({ username, password }) {
               }
             }\`,
       variables: { username, password },
+      isSignIn: true,
     })
 }
 

@@ -231,6 +231,32 @@ describe('createRpcHandler', () => {
     expect(response.status).toBe(404);
   });
 
+  it('routes every namespace of a multi-singleton plugin to its one segment', async () => {
+    const onInit = vi.fn();
+    const cloud = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'tina:cloud',
+          provides: ['auth', 'media'],
+          onInit,
+          server: async () => ({
+            default: defineServerPlugin({
+              getSession: async () => sessionsByToken['editor-token'],
+              whoami: async () => 'cloud',
+              list: async () => ({ items: [] }),
+            }),
+          }),
+        }),
+      ],
+    });
+    expect((await cloud(post('/auth/whoami'))).status).toBe(200);
+    expect(await (await cloud(post('/media/list'))).json()).toEqual({
+      items: [],
+    });
+    expect((await cloud(post('/media/getSession'))).status).toBe(404);
+    expect(onInit).toHaveBeenCalledTimes(1);
+  });
+
   it('404s an unknown namespace or op', async () => {
     expect((await handler(post('/nope/list'))).status).toBe(404);
     expect(

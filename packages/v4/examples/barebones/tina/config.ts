@@ -8,6 +8,7 @@ import {
   defineConfig,
   localContentPlugin,
   localMediaPlugin,
+  mediaManagerPlugin,
   required,
   t,
 } from '@tinacms/tinacms';
@@ -89,6 +90,7 @@ export default defineConfig({
   plugins: [
     localContentPlugin(),
     localMediaPlugin(),
+    mediaManagerPlugin(),
     ratingFieldPlugin,
     validatorsPlugin,
     hooksPlugin,

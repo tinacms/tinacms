@@ -190,6 +190,14 @@ export default createMediaHandler({
 
 ```
 
+### How uploads work
+
+The media store asks the API route for an upload URL and sends the file's content type with the request. The route checks the type and signs it into the upload URL, so the upload must send the same `Content-Type` header. The route does not issue upload URLs for HTML, XML, script or multipart types.
+
+If the request has no content type, the route uses the standard type for the file extension, such as `image/png` for `.png`. It rejects an extension that has no standard type in its list.
+
+If you call `getUploadUrl` yourself, pass the content type in the options argument: `getUploadUrl(bucket, key, expiresIn, client, { contentType })`.
+
 ## Update Schema
 
 Now that the media store is registered and the API route for media set up, let's add an image to your schema.

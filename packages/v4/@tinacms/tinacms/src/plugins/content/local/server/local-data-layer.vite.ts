@@ -6,13 +6,16 @@ import { runCodegen } from '../../../../cli/commands/codegen';
 import { type ResolvedConfig, resolveBuild } from '../../../../config';
 import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
-import { DEFAULT_MEDIA_URL } from '../../../../core/media/contract';
+import { DEFAULT_MEDIA_URL, MediaError } from '../../../../core/media/contract';
 import {
   MAX_MEDIA_UPLOAD_BYTES,
   MAX_REQUEST_BODY_BYTES,
   RequestBodyTooLargeError,
 } from '../../../../core/request-body';
-import { LOCAL_MEDIA_PLUGIN_NAME } from '../../../media/local/local-media.plugin';
+import {
+  LOCAL_MEDIA_PLUGIN_NAME,
+  MEDIA_ERROR_HEADER,
+} from '../../../media/local/local-media.plugin';
 import {
   type LocalMedia,
   createLocalMedia,
@@ -168,6 +171,12 @@ const createMediaHandler = (media: LocalMedia): Connect.NextHandleFunction => {
       res.setHeader('content-type', 'application/json');
       res.end(JSON.stringify(result));
     } catch (cause) {
+      if (cause instanceof MediaError) {
+        res.statusCode = 400;
+        res.setHeader(MEDIA_ERROR_HEADER, cause.code);
+        res.end(cause.detail ?? '');
+        return;
+      }
       sendError(req, res, cause);
     }
   };

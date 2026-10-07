@@ -6,6 +6,8 @@ import { definePlugin, type PluginManifest } from '../../../core/plugin';
 
 export const LOCAL_MEDIA_PLUGIN_NAME = 'tina:media:local';
 
+export const MEDIA_ERROR_HEADER = 'x-tina-media-error';
+
 export const localMediaPlugin = (options?: {
   url?: string;
   mediaRoot?: string;
