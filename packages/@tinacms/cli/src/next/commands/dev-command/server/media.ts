@@ -5,6 +5,11 @@ import busboy from 'busboy';
 import fs from 'fs-extra';
 import type { Connect } from 'vite';
 import { PathTraversalError } from '../../../../utils/path';
+import {
+  isDisallowedUploadType,
+  looksLikeHtml,
+  shouldInspectBody,
+} from '../../../../utils/upload-type';
 
 export const createMediaRouter = (config: PathConfig) => {
   const mediaFolder = path.join(
@@ -129,9 +134,68 @@ export const createMediaRouter = (config: PathConfig) => {
         );
         return;
       }
-      // make sure the directory exists before writing the file. This is needed for creating new folders
-      await fs.ensureDir(path.dirname(saveTo));
-      file.pipe(fs.createWriteStream(saveTo));
+      // Check the resolved path that gets written, never the raw request path.
+      if (isDisallowedUploadType(saveTo)) {
+        responded = true;
+        file.resume(); // drain the stream to avoid hanging
+        res.statusCode = 415;
+        res.end(JSON.stringify({ error: 'Unsupported file type' }));
+        return;
+      }
+      // An unknown or absent extension passes the name check but is served with
+      // no content-type, so a body that reads as HTML would still run. Sniff the
+      // leading bytes of only those uploads and refuse that case.
+      const inspect = shouldInspectBody(saveTo);
+      const head: Buffer[] = [];
+      let headLen = 0;
+      let decided = false;
+      let blocked = false;
+      let out: fs.WriteStream | null = null;
+
+      const start = (bytes: Buffer) => {
+        decided = true;
+        if (inspect && looksLikeHtml(bytes)) {
+          blocked = true;
+          file.resume(); // drain the rest without writing it
+          return;
+        }
+        fs.ensureDirSync(path.dirname(saveTo));
+        out = fs.createWriteStream(saveTo);
+        // Without this a write failure (a name that is an existing directory,
+        // a full disk) is an unhandled 'error' that would exit the dev server.
+        out.on('error', () => {
+          if (!responded) {
+            responded = true;
+            res.statusCode = 500;
+            res.end(JSON.stringify({ message: 'Failed to write upload' }));
+          }
+          file.resume();
+        });
+        out.write(bytes);
+      };
+
+      file.on('data', (chunk: Buffer) => {
+        if (blocked) return;
+        if (!decided) {
+          head.push(chunk);
+          headLen += chunk.length;
+          if (headLen >= 512) start(Buffer.concat(head));
+          return;
+        }
+        if (out && !out.write(chunk)) {
+          file.pause();
+          out.once('drain', () => file.resume());
+        }
+      });
+      file.on('end', () => {
+        if (!decided) start(Buffer.concat(head));
+        if (out) out.end();
+        if (blocked && !responded) {
+          responded = true;
+          res.statusCode = 415;
+          res.end(JSON.stringify({ error: 'Unsupported file type' }));
+        }
+      });
     });
     bb.on('error', (error) => {
       responded = true;
@@ -610,6 +674,14 @@ export class MediaModel {
     const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
     const source = resolveStrictlyWithinBase(args.from, mediaBase);
     const destination = resolveStrictlyWithinBase(args.to, mediaBase);
+
+    if (isDisallowedUploadType(destination)) {
+      return {
+        ok: false,
+        code: 'UNSUPPORTED',
+        message: 'Unsupported file type.',
+      };
+    }
 
     try {
       const stats = await fs.stat(source);
