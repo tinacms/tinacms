@@ -303,13 +303,6 @@ import type { TinaClient } from "tinacms/dist/client";
 import { queries } from "./types.js";
 import database from "../database";
 
-// graphql-js builds its result objects with a null prototype. Those are rejected
-// when they cross the server/client boundary in React Server Components ("Only
-// plain objects can be passed to Client Components") and behave surprisingly
-// elsewhere (spread, instanceof, structuredClone). Normalise them here, at the
-// single choke point every self-hosted request goes through. Unlike
-// JSON.parse(JSON.stringify(value)) this keeps \`undefined\` and does not
-// stringify Date/Map/class instances.
 function toPlain(value) {
   if (Array.isArray(value)) {
     return value.map(toPlain);
@@ -317,7 +310,8 @@ function toPlain(value) {
   if (value === null || typeof value !== "object") {
     return value;
   }
-  if (Object.getPrototypeOf(value) !== null) {
+  const proto = Object.getPrototypeOf(value);
+  if (proto !== null && proto !== Object.prototype) {
     return value;
   }
   const out = {};

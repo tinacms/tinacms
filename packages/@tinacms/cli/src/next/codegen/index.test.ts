@@ -154,6 +154,20 @@ describe('Codegen.genDatabaseClient', () => {
       expect(plain.items.slice(1)).toEqual(['x', null, 7]);
     });
 
+    it('normalises the data inside a graphql execution result', async () => {
+      const toPlain = await loadToPlain();
+      const result = {
+        data: Object.assign(Object.create(null), {
+          post: Object.assign(Object.create(null), { title: 'hello' }),
+        }),
+      };
+
+      const plain = toPlain(result) as { data: { post: object } };
+
+      expect(Object.getPrototypeOf(plain.data)).toBe(Object.prototype);
+      expect(Object.getPrototypeOf(plain.data.post)).toBe(Object.prototype);
+    });
+
     it('returns objects that already have a prototype untouched', async () => {
       const toPlain = await loadToPlain();
       class Post {
