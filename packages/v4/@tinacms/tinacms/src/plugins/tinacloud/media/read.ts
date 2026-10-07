@@ -72,6 +72,8 @@ const toMediaPage = (folder: string, body: unknown): MediaPage => {
   }
   const directories: MediaItem[] = body.directories
     .filter((name): name is string => typeof name === 'string')
+    .map((name) => name.replace(/\/+$/, ''))
+    .filter(Boolean)
     .map((name) => ({ path: joinPath(folder, name), kind: 'directory' }));
   const files: MediaItem[] = body.files.flatMap((file) =>
     isRecord(file) && typeof file.filename === 'string'

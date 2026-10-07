@@ -73,12 +73,13 @@ describe('listMedia', () => {
       json({
         cursor: 'next-1',
         files: [{ filename: 'a.png', src: 'https://assets.tina.io/abc/a.png' }],
-        directories: ['nested'],
+        directories: ['nested/', 'plain'],
       })
     );
     expect(await listMedia(client, undefined, 'posts')).toEqual({
       items: [
         { path: 'posts/nested', kind: 'directory' },
+        { path: 'posts/plain', kind: 'directory' },
         { path: 'posts/a.png', kind: 'file' },
       ],
       cursor: 'next-1',
