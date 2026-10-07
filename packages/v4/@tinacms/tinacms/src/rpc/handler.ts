@@ -4,7 +4,7 @@
 // A codec for richer JSON is still an open question (ADR-007).
 
 import { invariant } from '../core/invariant';
-import { capabilityMountFor } from '../core/mount';
+import { capabilityMountsFor } from '../core/mount';
 import {
   REGISTRY_CONFLICTS,
   type RegistryConflict,
@@ -122,14 +122,13 @@ const composeServerRuntime = async (
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
   const segmentsByNamespace = composeOverridableRegistry(
-    resolved.map((segment) => {
-      const mount = capabilityMountFor(segment.manifest);
-      return {
+    resolved.flatMap((segment) =>
+      capabilityMountsFor(segment.manifest).map((mount) => ({
         key: mount.namespace,
         value: segment,
         isOverride: mount.isOverride,
-      };
-    }),
+      }))
+    ),
     serverConflictError
   );
   const authHooks = claimAuthTransportHooks(segmentsByNamespace);
@@ -141,20 +140,23 @@ const composeServerRuntime = async (
   return { segmentsByNamespace, authHooks, destroy };
 };
 
-// Read the transport hooks from the auth segment, and remove them from its routable
-// ops. The dispatch then returns 404 for their names through its normal lookup.
+// Read the transport hooks from the auth segment, and remove them from the routable
+// ops of every segment that provides auth. A plugin providing several singletons
+// mounts its one segment at each, so `media/getSession` would otherwise route. The
+// dispatch then returns 404 for their names through its normal lookup.
 // Without a callable getSession, this returns null, so every non-public op fails
 // closed. A rolePermissions that is not callable fails the composition.
 const claimAuthTransportHooks = (
   segmentsByNamespace: Map<string, ResolvedServerSegment>
 ): AuthTransportHooks | null => {
   const authSegment = segmentsByNamespace.get(AUTH_CAPABILITY);
+  for (const [namespace, segment] of segmentsByNamespace) {
+    if (!segment.manifest.provides.includes(AUTH_CAPABILITY)) continue;
+    const { getSession, rolePermissions, ...routableOps } = segment.ops;
+    segmentsByNamespace.set(namespace, { ...segment, ops: routableOps });
+  }
   if (!authSegment) return null;
-  const { getSession, rolePermissions, ...routableOps } = authSegment.ops;
-  segmentsByNamespace.set(AUTH_CAPABILITY, {
-    ...authSegment,
-    ops: routableOps,
-  });
+  const { getSession, rolePermissions } = authSegment.ops;
   if (typeof getSession !== 'function') return null;
   invariant(
     rolePermissions === undefined || typeof rolePermissions === 'function',

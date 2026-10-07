@@ -6,7 +6,7 @@ import {
   type ResolvedSegment,
   definePlugin,
 } from '../core/plugin';
-import { composePluginSlices } from './compose-slices';
+import { type SliceRegistry, composePluginSlices } from './compose-slices';
 import { createTinaStore, pickPersistableNamespaces } from './create-store';
 
 const resolved = (
@@ -130,17 +130,6 @@ describe('composePluginSlices conflicts', () => {
     expect(winner(composePluginSlices([override, base]))).toBe('s3');
   });
 
-  it('rejects a plugin providing two singleton capabilities', () => {
-    expect(() =>
-      composePluginSlices([
-        resolved(
-          { name: 'tina:everything', provides: ['auth', 'media'] },
-          () => ({})
-        ),
-      ])
-    ).toThrow(/only one namespace/);
-  });
-
   it('throws when two plugins both declare an override for the same capability', () => {
     const overrideFor = (name: string, from: string) =>
       resolved(
@@ -154,6 +143,78 @@ describe('composePluginSlices conflicts', () => {
     expect(() =>
       composePluginSlices([overrideFor('a', 'a'), overrideFor('b', 'b')])
     ).toThrow(/both declare an/);
+  });
+});
+
+describe('composePluginSlices multi-singleton plugins', () => {
+  const cloud = (
+    segment: ResolvedSegment['segment'],
+    provides: Capability[] = ['auth', 'media']
+  ): ResolvedSegment => ({
+    manifest: definePlugin({ name: 'tina:cloud', provides }),
+    segment,
+  });
+  const from = (registry: SliceRegistry, key: string) =>
+    registry.get(key)?.(
+      () => {},
+      () => ({})
+    ).from;
+
+  it('mounts each slice in `slices` at its capability key', () => {
+    const registry = composePluginSlices([
+      cloud({
+        slices: {
+          auth: () => ({ from: 'cloud-auth' }),
+          media: () => ({ from: 'cloud-media' }),
+        },
+      }),
+    ]);
+    expect([...registry.keys()]).toEqual(['auth', 'media']);
+    expect(from(registry, 'auth')).toBe('cloud-auth');
+    expect(from(registry, 'media')).toBe('cloud-media');
+  });
+
+  it('rejects a segment setting both `slice` and `slices`', () => {
+    expect(() =>
+      composePluginSlices([
+        cloud({ slice: () => ({}), slices: { auth: () => ({}) } }),
+      ])
+    ).toThrow(/plugin-slice-and-slices/);
+  });
+
+  it('rejects a lone `slice` on a plugin providing several singletons', () => {
+    expect(() => composePluginSlices([cloud({ slice: () => ({}) })])).toThrow(
+      /plugin-slice-ambiguous/
+    );
+  });
+
+  it('rejects a `slices` key the manifest does not provide', () => {
+    expect(() =>
+      composePluginSlices([
+        cloud({ slices: { auth: () => ({}), search: () => ({}) } }),
+      ])
+    ).toThrow(/plugin-slices-key-not-provided/);
+  });
+
+  it('lets another plugin override one capability and keeps the rest', () => {
+    const registry = composePluginSlices([
+      cloud({
+        slices: {
+          auth: () => ({ from: 'cloud-auth' }),
+          media: () => ({ from: 'cloud-media' }),
+        },
+      }),
+      resolved(
+        {
+          name: 'tina:media:s3',
+          provides: ['media'],
+          overrides: [{ capability: 'media' }],
+        },
+        () => ({ from: 's3' })
+      ),
+    ]);
+    expect(from(registry, 'auth')).toBe('cloud-auth');
+    expect(from(registry, 'media')).toBe('s3');
   });
 });
 

@@ -82,6 +82,12 @@ export interface ClientSegment {
    */
   hooks?: Record<string, FormHookFactory>;
   slice?: ClientSlice;
+  /**
+   * One slice for each singleton capability the manifest provides, for a
+   * plugin that provides more than one. Each mounts at its capability key.
+   * Set `slice` or `slices`, never both.
+   */
+  slices?: Partial<Record<SingletonSliceCapability, ClientSlice>>;
   screens?: AdminScreen[];
   slots?: SlotContributions;
 }
