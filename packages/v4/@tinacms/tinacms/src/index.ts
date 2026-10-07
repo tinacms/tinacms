@@ -60,6 +60,10 @@ export type {
   MediaExtension,
 } from './plugins/media-manager/media-types';
 export {
+  type TinaCloudOptions,
+  tinaCloud,
+} from './plugins/tinacloud/tinacloud.plugin';
+export {
   corePlugins,
   max,
   min,
