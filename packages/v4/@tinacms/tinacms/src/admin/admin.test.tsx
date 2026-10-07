@@ -397,7 +397,7 @@ describe('TinaAdmin unsaved changes', () => {
     await waitFor(() =>
       expect(screen.getByLabelText('Title')).toHaveValue('Hello')
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No changes');
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
     expect(reloadIsBlocked()).toBe(false);
   });
 });

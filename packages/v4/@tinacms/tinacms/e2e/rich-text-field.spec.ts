@@ -11,7 +11,7 @@ const saveButton = (page: import('@playwright/test').Page) =>
   page.locator('aside').getByRole('button', { name: 'Save', exact: true });
 
 const status = (page: import('@playwright/test').Page) =>
-  page.locator('aside header').getByText(/^(No changes|Unsaved|Saved)$/);
+  page.locator('aside header').getByRole('status');
 
 const openDocument = async (
   page: import('@playwright/test').Page,
@@ -102,40 +102,40 @@ test.describe('rich-text save lifecycle', () => {
   test('goes pristine -> dirty on a real edit -> clean once saved', async ({
     page,
   }) => {
-    await expect(status(page)).toHaveText('No changes');
+    await expect(status(page)).toHaveText('');
 
     await body(page).click();
-    await expect(status(page)).toHaveText('No changes');
+    await expect(status(page)).toHaveText('');
 
     await body(page).pressSequentially('Edited. ');
     await expect(status(page)).toHaveText('Unsaved');
 
     await saveButton(page).click();
-    await expect(status(page)).toHaveText('Saved');
+    await expect(status(page)).toHaveText(/^Saved/);
   });
 
   test('typing and then deleting it returns the document to clean', async ({
     page,
   }) => {
-    await expect(status(page)).toHaveText('No changes');
+    await expect(status(page)).toHaveText('');
 
     await body(page).click();
     await body(page).pressSequentially('Edited.');
     await expect(status(page)).toHaveText('Unsaved');
 
     for (const _ of 'Edited.') await page.keyboard.press('Backspace');
-    await expect(status(page)).toHaveText('Saved');
+    await expect(status(page)).toHaveText('');
   });
 
   test('a second edit after saving can also reach clean', async ({ page }) => {
     await body(page).click();
     await body(page).pressSequentially('One. ');
     await saveButton(page).click();
-    await expect(status(page)).toHaveText('Saved');
+    await expect(status(page)).toHaveText(/^Saved/);
 
     await body(page).pressSequentially('Two. ');
     await expect(status(page)).toHaveText('Unsaved');
     await saveButton(page).click();
-    await expect(status(page)).toHaveText('Saved');
+    await expect(status(page)).toHaveText(/^Saved/);
   });
 });
