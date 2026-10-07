@@ -121,7 +121,11 @@ export const runCli = async (
     }
     return await codegenCommand(values, { ...context, cwd, log, logError });
   } catch (cause) {
-    logError(cause instanceof Error ? cause.message : String(cause));
+    if (cause instanceof Error) {
+      logError(cause.message);
+    } else {
+      logError(String(cause));
+    }
     return 1;
   }
 };

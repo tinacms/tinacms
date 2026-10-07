@@ -1,9 +1,10 @@
 import type { Value } from '@udecode/plate';
+import { SoftBreakPlugin } from '@udecode/plate-break/react';
 import { createPlateEditor } from '@udecode/plate/react';
 import type { KeyboardEvent } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { ELEMENT_BREAK, KEY_HARD_BREAK, createHardBreakPlugin } from '.';
 import { createEditorPlugins } from '../editor-plugins';
-import { ELEMENT_BREAK, createBlockquoteEnterBreakPlugin } from '.';
 
 const makeEditor = (value: Value) => {
   const editor = createPlateEditor({
@@ -21,10 +22,18 @@ const paragraphDocument: Value = [{ type: 'p', children: [{ text: 'plain' }] }];
 
 const pressKey = (
   editor: ReturnType<typeof makeEditor>,
-  key: string
+  key: string,
+  modifiers: { shiftKey?: boolean; metaKey?: boolean } = {}
 ): { preventDefault: ReturnType<typeof vi.fn> } => {
-  const event = { key, preventDefault: vi.fn() };
-  const handler = createBlockquoteEnterBreakPlugin.handlers?.onKeyDown;
+  const event = {
+    key,
+    shiftKey: false,
+    metaKey: false,
+    ctrlKey: false,
+    ...modifiers,
+    preventDefault: vi.fn(),
+  };
+  const handler = createHardBreakPlugin.handlers?.onKeyDown;
   if (typeof handler !== 'function') {
     throw new Error('the plugin registers no keydown handler');
   }
@@ -38,7 +47,92 @@ const pressKey = (
 const countBreaks = (editor: ReturnType<typeof makeEditor>) =>
   JSON.stringify(editor.children).split(`"${ELEMENT_BREAK}"`).length - 1;
 
-describe('blockquote enter break', () => {
+const codeBlockDocument: Value = [
+  {
+    type: 'code_block',
+    children: [{ type: 'code_line', children: [{ text: 'const x' }] }],
+  },
+];
+
+const tableDocument: Value = [
+  {
+    type: 'table',
+    children: [
+      {
+        type: 'tr',
+        children: [
+          {
+            type: 'td',
+            children: [{ type: 'p', children: [{ text: 'cell' }] }],
+          },
+        ],
+      },
+    ],
+  },
+];
+
+describe('hard break', () => {
+  /**
+   * Nothing stops a double insert except order: this plugin calls
+   * preventDefault, and Plate's SoftBreakPlugin ignores an event that is
+   * already handled. Reorder the array and every shift+Enter writes both a
+   * break element and a literal newline.
+   */
+  it('is registered before Plate SoftBreakPlugin', () => {
+    const keys = createEditorPlugins().map(
+      (plugin: { key: string }) => plugin.key
+    );
+
+    expect(keys).toContain(KEY_HARD_BREAK);
+    expect(keys.indexOf(KEY_HARD_BREAK)).toBeLessThan(
+      keys.indexOf(SoftBreakPlugin.key)
+    );
+  });
+
+  /**
+   * Plate's SoftBreakPlugin puts a literal "\n" in the text. Markdown re-flows
+   * that into a space, and the author's line break is lost on save.
+   */
+  it('inserts a break on shift+Enter in a paragraph', () => {
+    const editor = makeEditor(paragraphDocument);
+    editor.tf.select({ path: [0, 0], offset: 5 });
+
+    const event = pressKey(editor, 'Enter', { shiftKey: true });
+
+    expect(countBreaks(editor)).toBe(1);
+    expect(event.preventDefault).toHaveBeenCalled();
+  });
+
+  it('leaves a code block alone, because it needs a real newline', () => {
+    const editor = makeEditor(codeBlockDocument);
+    editor.tf.select({ path: [0, 0, 0], offset: 7 });
+
+    const event = pressKey(editor, 'Enter', { shiftKey: true });
+
+    expect(countBreaks(editor)).toBe(0);
+    expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('leaves a table cell alone, because GFM cannot hold a hard break', () => {
+    const editor = makeEditor(tableDocument);
+    editor.tf.select({ path: [0, 0, 0, 0, 0], offset: 4 });
+
+    const event = pressKey(editor, 'Enter', { shiftKey: true });
+
+    expect(countBreaks(editor)).toBe(0);
+    expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('leaves mod+Enter in a blockquote to ExitBreakPlugin', () => {
+    const editor = makeEditor(blockquoteDocument);
+    editor.tf.select({ path: [0, 0], offset: 6 });
+
+    const event = pressKey(editor, 'Enter', { metaKey: true });
+
+    expect(countBreaks(editor)).toBe(0);
+    expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+
   /**
    * A blockquote holds one paragraph. Enter must stay inside the quote and
    * add a line, or every line of a pasted quotation becomes its own block.

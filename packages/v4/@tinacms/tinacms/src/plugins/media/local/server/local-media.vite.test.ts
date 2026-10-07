@@ -1,0 +1,255 @@
+import { EventEmitter } from 'node:events';
+import { promises as fs } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { asResolvedConfig } from '../../../../config';
+import { DEFAULT_MEDIA_URL } from '../../../../core/media/contract';
+import { MAX_MEDIA_UPLOAD_BYTES } from '../../../../core/request-body';
+import type { CollectionSchema } from '../../../../core/schema/types';
+import { tinaLocalDataLayerVitePlugin } from '../../../content/local/server/local-data-layer.vite';
+import { MEDIA_ERROR_HEADER, localMediaPlugin } from '../local-media.plugin';
+
+vi.mock('../../../content/local/graphql/graphql-pipeline', () => ({
+  createGraphQLPipeline: vi.fn(),
+}));
+
+vi.mock('../../../../cli/commands/codegen', () => ({
+  runCodegen: vi.fn(async () => ({ outcome: 'unchanged', admin: [] })),
+}));
+
+const POSTS: CollectionSchema = {
+  name: 'posts',
+  label: 'Posts',
+  path: 'content/posts',
+  format: 'mdx',
+  fields: [{ type: 'string', name: 'title', label: 'Title' }],
+};
+
+const SAME_ORIGIN = {
+  host: 'localhost:5173',
+  origin: 'http://localhost:5173',
+};
+
+let rootDir: string;
+
+beforeEach(async () => {
+  rootDir = await fs.mkdtemp(path.join(tmpdir(), 'tina-media-vite-'));
+});
+
+afterEach(async () => {
+  await fs.rm(rootDir, { recursive: true, force: true });
+});
+
+const requestDouble = (
+  url: string,
+  headers: Record<string, string>,
+  chunks: (string | Buffer)[],
+  method = 'POST'
+) => {
+  const req = Object.assign(new EventEmitter(), {
+    url,
+    method,
+    headers,
+    destroyed: false,
+    setEncoding: () => {},
+    pause: () => {},
+    destroy() {
+      req.destroyed = true;
+    },
+  });
+  queueMicrotask(() => {
+    for (const chunk of chunks) req.emit('data', chunk);
+    req.emit('end');
+  });
+  return req;
+};
+
+const responseDouble = () => {
+  const chunks: string[] = [];
+  const headers: Record<string, string> = {};
+  return {
+    statusCode: 200,
+    destroyed: false,
+    headers,
+    setHeader: (name: string, value: string) => {
+      headers[name] = value;
+    },
+    end(chunk?: string, callback?: () => void) {
+      if (chunk !== undefined) chunks.push(chunk);
+      callback?.();
+    },
+    get body() {
+      return chunks.join('');
+    },
+  };
+};
+
+const mountedRoutes = (plugins = [localMediaPlugin()]) => {
+  const plugin = tinaLocalDataLayerVitePlugin({
+    rootDir,
+    config: asResolvedConfig({
+      plugins,
+      schema: { collections: [POSTS] },
+      build: { publicFolder: 'public', outputFolder: 'admin' },
+    }),
+  });
+  const mounted = new Map<string, Function>();
+  const server = {
+    config: { logger: { info: () => {} } },
+    middlewares: {
+      use: (route: string | Function, handler?: Function) => {
+        if (typeof route === 'string' && handler) mounted.set(route, handler);
+      },
+    },
+  };
+  (plugin.configureServer as (s: unknown) => void)(server);
+  return mounted;
+};
+
+const mediaMiddleware = () => {
+  const handler = mountedRoutes().get(DEFAULT_MEDIA_URL);
+  if (!handler) throw new Error('The plugin mounted no media middleware.');
+  return handler;
+};
+
+const multipartOf = async (form: FormData) => {
+  const request = new Request('http://localhost/upload', {
+    method: 'POST',
+    body: form,
+  });
+  return {
+    contentType: request.headers.get('content-type') ?? '',
+    body: Buffer.from(await request.arrayBuffer()),
+  };
+};
+
+const upload = async (headers: Record<string, string> = SAME_ORIGIN) => {
+  const form = new FormData();
+  form.append('folder', 'posts');
+  form.append('file', new File(['jpeg'], 'hero.jpg'));
+  const { contentType, body } = await multipartOf(form);
+  const res = responseDouble();
+  await mediaMiddleware()(
+    requestDouble('/upload', { ...headers, 'content-type': contentType }, [
+      body,
+    ]),
+    res
+  );
+  return res;
+};
+
+describe('local media endpoint', () => {
+  it('is not mounted when the config has no localMediaPlugin()', () => {
+    expect(mountedRoutes([]).has(DEFAULT_MEDIA_URL)).toBe(false);
+  });
+
+  it('saves a same-origin multipart upload under public/uploads', async () => {
+    const res = await upload();
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toEqual({ path: 'posts/hero.jpg' });
+    expect(
+      await fs.readFile(
+        path.join(rootDir, 'public/uploads/posts/hero.jpg'),
+        'utf8'
+      )
+    ).toBe('jpeg');
+  });
+
+  it('403s a cross-origin upload, because multipart skips the preflight', async () => {
+    const res = await upload({
+      host: 'localhost:5173',
+      origin: 'https://evil.example',
+    });
+    expect(res.statusCode).toBe(403);
+    await expect(
+      fs.access(path.join(rootDir, 'public/uploads'))
+    ).rejects.toThrow();
+  });
+
+  it('403s an upload that states a cross-site relationship', async () => {
+    const res = await upload({
+      ...SAME_ORIGIN,
+      'sec-fetch-site': 'cross-site',
+    });
+    expect(res.statusCode).toBe(403);
+  });
+
+  it('415s an upload that is not multipart', async () => {
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble(
+        '/upload',
+        { ...SAME_ORIGIN, 'content-type': 'application/json' },
+        ['{}']
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(415);
+  });
+
+  it('413s an upload over the size limit', async () => {
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble(
+        '/upload',
+        {
+          ...SAME_ORIGIN,
+          'content-type': 'multipart/form-data; boundary=x',
+        },
+        [Buffer.alloc(MAX_MEDIA_UPLOAD_BYTES + 1)]
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(413);
+  });
+
+  it('lists a folder on GET', async () => {
+    await upload();
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble('/?folder=posts', SAME_ORIGIN, [], 'GET'),
+      res
+    );
+    expect(JSON.parse(res.body)).toEqual({
+      items: [{ path: 'posts/hero.jpg', kind: 'file' }],
+    });
+  });
+
+  it('403s a cross-site list', async () => {
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble(
+        '/?folder=',
+        { ...SAME_ORIGIN, 'sec-fetch-site': 'cross-site' },
+        [],
+        'GET'
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(403);
+  });
+
+  it('400s a list with a page size over the limit', async () => {
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble('/?limit=1000', SAME_ORIGIN, [], 'GET'),
+      res
+    );
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('400s a delete outside the media folder', async () => {
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble(
+        '/',
+        { ...SAME_ORIGIN, 'content-type': 'application/json' },
+        [JSON.stringify({ op: 'delete', path: '../../package.json' })]
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.headers[MEDIA_ERROR_HEADER]).toBe('invalid-path');
+  });
+});

@@ -87,6 +87,71 @@ describe('MediaModel (Vite dev server)', () => {
     });
   });
 
+  describe('listMedia ext filter', () => {
+    const seed = async (names: string[]) => {
+      const dir = path.join(tmpDir, 'public', 'uploads');
+      for (const name of names) await fs.writeFile(path.join(dir, name), 'x');
+      return new MediaModel(config);
+    };
+
+    it('returns only files matching the requested extensions', async () => {
+      const model = await seed(['a.png', 'b.pdf', 'c.svg']);
+      const result = await model.listMedia({ searchPath: '', ext: 'pdf,svg' });
+      expect(result.files.map((f) => f.filename).sort()).toEqual([
+        'b.pdf',
+        'c.svg',
+      ]);
+    });
+
+    it('matches case-insensitively on both sides', async () => {
+      const model = await seed(['SCAN.PDF']);
+      const result = await model.listMedia({ searchPath: '', ext: 'PdF' });
+      expect(result.files).toHaveLength(1);
+    });
+
+    it('treats an empty or blank value as no filter', async () => {
+      const model = await seed(['a.png', 'b.pdf']);
+      for (const ext of ['', ' , ,']) {
+        const result = await model.listMedia({ searchPath: '', ext });
+        expect(result.files).toHaveLength(2);
+      }
+    });
+
+    it('never matches a dotfile', async () => {
+      const model = await seed(['.DS_Store']);
+      const result = await model.listMedia({ searchPath: '', ext: 'ds_store' });
+      expect(result.files).toHaveLength(0);
+    });
+
+    // The point of filtering server-side: a page must be full of matches, not
+    // a page of everything with the non-matches removed afterwards.
+    it('filters before paginating', async () => {
+      const names: string[] = [];
+      for (let i = 0; i < 10; i++) names.push(`img-${i}.png`);
+      names.push('only.pdf');
+      const model = await seed(names);
+
+      const result = await model.listMedia({
+        searchPath: '',
+        ext: 'pdf',
+        limit: '4',
+      });
+
+      expect(result.files.map((f) => f.filename)).toEqual(['only.pdf']);
+      expect(result.cursor).toBeNull();
+    });
+
+    it('applies alongside search', async () => {
+      const model = await seed(['report-2024.pdf', 'report-2024.png']);
+      const result = await model.listMedia({
+        searchPath: '',
+        search: 'report',
+        ext: 'pdf',
+      });
+      expect(result.files.map((f) => f.filename)).toEqual(['report-2024.pdf']);
+    });
+  });
+
   describe('listMedia search', () => {
     const seed = async () => {
       const base = path.join(tmpDir, 'public', 'uploads');
@@ -644,6 +709,35 @@ describe('createMediaRouter', () => {
       expect(await fs.pathExists(path.join(mediaDir, 'new.txt'))).toBe(true);
     });
 
+    it.each(['image.html', 'image.html.', 'image.html/', 'sub/image.js'])(
+      'returns 400 UNSUPPORTED and keeps the source when renaming to %s',
+      async (to) => {
+        const mediaDir = path.join(tmpDir, 'public', 'uploads');
+        await fs.writeFile(path.join(mediaDir, 'image.png'), 'data');
+        const router = createMediaRouter(config);
+
+        const res = await callRename(router, { from: 'image.png', to });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toMatchObject({ code: 'UNSUPPORTED' });
+        expect(await fs.readdir(mediaDir)).toEqual(['image.png']);
+      }
+    );
+
+    it('still renames an SVG to another SVG name', async () => {
+      const mediaDir = path.join(tmpDir, 'public', 'uploads');
+      await fs.writeFile(path.join(mediaDir, 'logo.svg'), '<svg/>');
+      const router = createMediaRouter(config);
+
+      const res = await callRename(router, {
+        from: 'logo.svg',
+        to: 'brand.svg',
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(await fs.readdir(mediaDir)).toEqual(['brand.svg']);
+    });
+
     // Guards the contract, not the handler: unknown keys must not start
     // 400ing if body validation is ever tightened.
     it('accepts and ignores unknown fields in the body', async () => {
@@ -927,6 +1021,116 @@ describe('createMediaRouter', () => {
       expect(statusCode).toBe(403);
       expect(JSON.parse(body)).toHaveProperty('error');
       expect(JSON.parse(body).error).toContain('Path traversal detected');
+    });
+
+    const postUpload = async (url: string, fileContent?: string) => {
+      const router = createMediaRouter(config);
+      let statusCode = 0;
+      let body = '';
+      await new Promise<void>((resolve) => {
+        const res = {
+          set statusCode(code: number) {
+            statusCode = code;
+          },
+          end(data: string) {
+            body = data;
+            // Small delay for the file stream to flush
+            setTimeout(resolve, 50);
+          },
+        } as any;
+        router.handlePost(makeMultipartReq(url, fileContent), res);
+      });
+      return { statusCode, body: JSON.parse(body) };
+    };
+
+    it.each([
+      'evil.html',
+      'evil.HTM',
+      'evil.xml',
+      'nested/evil.js',
+      'evil.html/',
+      'evil.html.',
+      'evil.html%20',
+      'evil.html::$DATA',
+    ])(
+      'returns 415 and writes nothing for disallowed type %s',
+      async (name) => {
+        const { statusCode, body } = await postUpload(
+          `/media/upload/${name}`,
+          '<script>alert(1)</script>'
+        );
+
+        expect(statusCode).toBe(415);
+        expect(body).toHaveProperty('error');
+        expect(
+          await fs.readdir(path.join(tmpDir, 'public', 'uploads'))
+        ).toEqual([]);
+      }
+    );
+
+    it.each([
+      'photo.png',
+      'photo.JPG',
+      'logo.svg',
+      'clip.mp4',
+      'nested/clip.webm',
+      'doc.pdf',
+    ])('returns 200 and writes allowed type %s', async (name) => {
+      const { statusCode, body } = await postUpload(
+        `/media/upload/${name}`,
+        'media bytes'
+      );
+
+      expect(statusCode).toBe(200);
+      expect(body).toEqual({ success: true });
+      expect(
+        await fs.readFile(path.join(tmpDir, 'public', 'uploads', name), 'utf8')
+      ).toBe('media bytes');
+    });
+
+    // A name with an absent or unknown extension passes the extension check but
+    // is served with no content-type, so the body is sniffed.
+    it.each(['noextfile', 'odd.foo', 'report.unknown'])(
+      'returns 415 and writes nothing when %s has an HTML body',
+      async (name) => {
+        const { statusCode } = await postUpload(
+          `/media/upload/${name}`,
+          '<!doctype html><script>alert(1)</script>'
+        );
+
+        expect(statusCode).toBe(415);
+        expect(
+          await fs.readdir(path.join(tmpDir, 'public', 'uploads'))
+        ).toEqual([]);
+      }
+    );
+
+    it('allows an unknown extension whose body is not HTML', async () => {
+      const { statusCode } = await postUpload(
+        '/media/upload/model.bin',
+        'binary-ish not markup'
+      );
+
+      expect(statusCode).toBe(200);
+      expect(
+        await fs.readFile(
+          path.join(tmpDir, 'public', 'uploads', 'model.bin'),
+          'utf8'
+        )
+      ).toBe('binary-ish not markup');
+    });
+
+    it('allows an SVG even though it opens with a tag', async () => {
+      const svg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+      const { statusCode } = await postUpload('/media/upload/logo.svg', svg);
+
+      expect(statusCode).toBe(200);
+      expect(
+        await fs.readFile(
+          path.join(tmpDir, 'public', 'uploads', 'logo.svg'),
+          'utf8'
+        )
+      ).toBe(svg);
     });
   });
 });

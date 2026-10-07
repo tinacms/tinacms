@@ -1,22 +1,34 @@
 import { use, useCallback, useEffect, useEffectEvent, useMemo } from 'react';
-import { useController, useFormContext, useFormState } from 'react-hook-form';
+import {
+  get,
+  useController,
+  useFormContext,
+  useFormState,
+} from 'react-hook-form';
 import { useStore } from 'zustand';
 import type { ContentSlice } from '../core/content/contract';
+import type { MediaSlice } from '../core/media/contract';
 import type { FieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
+import { runAfterSave, runBeforeSave } from '../core/form/hooks';
 import { digestDocument } from '../core/form/ingest';
 import { invariant } from '../core/invariant';
 import type { SliceState, TinaStoreState } from '../core/plugin';
-import type { FieldSchema, TinaDocument } from '../core/schema/types';
+import type {
+  CollectionSchema,
+  FieldSchema,
+  TinaDocument,
+} from '../core/schema/types';
 import { type FormId, toFormValues, useFormStore } from '../form/form-store';
 import {
   FieldAddressContext,
   FieldSchemaContext,
   type FormScope,
   FormScopeContext,
+  type StaleDraftActions,
   TinaRuntimeContext,
 } from './context';
-import { type FieldErrorEntry, fieldErrorMessages } from './field-errors';
+import { collectFieldErrorMessages } from './field-errors';
 
 export function useFieldRegistry(): FieldRegistry {
   const runtime = use(TinaRuntimeContext);
@@ -47,12 +59,33 @@ const isContentSlice = (
   typeof slice.list === 'function' &&
   typeof slice.update === 'function';
 
-export function useContentSlice(): ContentSlice {
+export function useOptionalContentSlice(): ContentSlice | null {
   const slice = useTinaStore((state) => state.content);
+  return slice && isContentSlice(slice) ? slice : null;
+}
+
+export function useContentSlice(): ContentSlice {
+  const slice = useOptionalContentSlice();
   invariant(
-    slice && isContentSlice(slice),
+    slice,
     'content-capability-missing',
     'No content capability with get, list and update is mounted — pass a content plugin (e.g. localContentPlugin()) to <TinaProvider plugins>'
+  );
+  return slice;
+}
+
+const isMediaSlice = (slice: SliceState): slice is SliceState & MediaSlice =>
+  typeof slice.upload === 'function' &&
+  typeof slice.list === 'function' &&
+  typeof slice.delete === 'function' &&
+  typeof slice.resolveUrl === 'function';
+
+export function useMediaSlice(): MediaSlice {
+  const slice = useTinaStore((state) => state.media);
+  invariant(
+    slice && isMediaSlice(slice),
+    'media-capability-missing',
+    'No media capability with upload, list, delete and resolveUrl is mounted — pass a media plugin (e.g. localMediaPlugin()) to <TinaProvider plugins>'
   );
   return slice;
 }
@@ -67,6 +100,21 @@ export function useFormId(): FormId {
   return useFormScope('form-id-outside-provider', 'useFormId').formId;
 }
 
+export function useFormCollection(): CollectionSchema {
+  return useFormScope('form-collection-outside-provider', 'useFormCollection')
+    .collection;
+}
+
+export function useSchemaCollections(): CollectionSchema[] {
+  const runtime = use(TinaRuntimeContext);
+  invariant(
+    runtime,
+    'schema-collections-outside-provider',
+    'useSchemaCollections must be used within a TinaProvider'
+  );
+  return runtime.schema.collections;
+}
+
 export function useDocumentPath(): string {
   return useFormScope('document-path-outside-provider', 'useDocumentPath').path;
 }
@@ -79,6 +127,13 @@ export function useFormSeedKey(): string {
 export function useDiscardEdits(): () => void {
   return useFormScope('discard-edits-outside-provider', 'useDiscardEdits')
     .discardEdits;
+}
+
+// Set when the form opened on its document because a stored draft of an older
+// version of it exists; the editor resumes the draft or discards it.
+export function useStaleDraft(): StaleDraftActions | null {
+  return useFormScope('stale-draft-outside-provider', 'useStaleDraft')
+    .staleDraft;
 }
 
 export interface ActiveField {
@@ -99,19 +154,50 @@ export function useActiveField(): ActiveField {
   return useMemo(() => ({ active, setActive }), [active, setActive]);
 }
 
+// Save refused because the document has validation errors. The form stays
+// dirty and every field keeps its messages (ADR-018 §2).
+export class FormValidationError extends Error {
+  constructor() {
+    super('The document has validation errors. Fix them, then save again.');
+    this.name = 'FormValidationError';
+  }
+}
+
+export class AfterSaveHookError extends Error {
+  constructor(cause: unknown) {
+    super('The document was saved, but an afterSave hook failed.', { cause });
+    this.name = 'AfterSaveHookError';
+  }
+}
+
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
-  const { getValues } = useFormContext<TinaDocument>();
+  const { getValues, trigger } = useFormContext<TinaDocument>();
   return useCallback(async () => {
-    const { formId, path, collection, onSave } = scope;
+    const { formId, path, collection, onSave, hooks } = scope;
+    // Validate every field, not only the edited ones, so a required field the
+    // editor never touched surfaces its message at submit.
+    const valid = await trigger();
+    if (!valid) throw new FormValidationError();
     const values = getValues();
-    const digested = digestDocument(values, collection.fields, registry, {
-      documentPath: path,
-    });
+    const hookScope = { formId, path, collection };
+    const digested = await runBeforeSave(
+      hooks,
+      digestDocument(values, collection.fields, {
+        documentPath: path,
+        registry,
+      }),
+      hookScope
+    );
     await onSave?.(digested);
     useFormStore.getState().markSaved(formId, toFormValues(values));
-  }, [scope, getValues, registry]);
+    try {
+      await runAfterSave(hooks, digested, hookScope);
+    } catch (cause) {
+      throw new AfterSaveHookError(cause);
+    }
+  }, [scope, getValues, trigger, registry]);
 }
 
 export function useFieldAddress(): FieldAddress {
@@ -141,8 +227,11 @@ export function useFieldValue<T = unknown>(
 
 export function useFieldErrors(address: FieldAddress): string[] {
   const { errors } = useFormState({ name: address });
-  const fieldErrors = errors as Record<string, FieldErrorEntry | undefined>;
-  return fieldErrorMessages(fieldErrors[address]);
+  // `address` can nest through an index (`items.0.title`). `get` reads that
+  // path the same way react-hook-form does. `collectFieldErrorMessages` also
+  // walks down from it, so a compound field's address reports everything
+  // wrong underneath it, not only a message at that exact address.
+  return collectFieldErrorMessages(get(errors, address));
 }
 
 export function useFieldActivation(handler: () => void): void {

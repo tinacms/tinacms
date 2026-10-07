@@ -21,6 +21,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
 import { safeUploadName } from './upload-filename';
+import { isDisallowedUploadType } from './upload-type';
+import { resolveUploadContentType } from './upload-content-type';
 import { promisify } from 'util';
 
 export interface DOSConfig {
@@ -116,6 +118,14 @@ async function uploadMedia(
   const blob = fs.readFileSync(filePath);
   const filename = path.basename(filePath);
 
+  const contentType = resolveUploadContentType(
+    filename,
+    fileType || 'application/octet-stream'
+  );
+  if (isDisallowedUploadType(filename) || !contentType) {
+    return res.status(415).json({ message: 'Unsupported file type' });
+  }
+
   let objectKey: string;
   try {
     objectKey = resolveKey(mediaRoot, prefix + filename, { decode: false });
@@ -131,7 +141,7 @@ async function uploadMedia(
     Key: objectKey,
     Body: blob,
     ACL: 'public-read',
-    ContentType: fileType || 'application/octet-stream',
+    ContentType: contentType,
   };
   const command = new PutObjectCommand(params);
 

@@ -1,5 +1,7 @@
 export * from './cms';
+export * from './errors';
 export * from './event';
+export * from './session-expired';
 export * from './subscribable';
 export * from './plugins';
 export * from './media';

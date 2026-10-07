@@ -8,6 +8,12 @@ export const sampleDocument = {
   title: 'Hello World',
   featured: false,
   stars: 4,
+  authors: [
+    {
+      name: 'Author Name',
+    },
+  ],
+  status: 'draft',
   body: {
     type: 'root',
     children: [
@@ -16,5 +22,9 @@ export const sampleDocument = {
         children: [{ type: 'text', text: 'Body prose, edited as markdown.' }],
       },
     ],
+  },
+  pages: {
+    title: 'Test Title',
+    featured: true,
   },
 } satisfies TinaDocument;

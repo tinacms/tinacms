@@ -22,6 +22,7 @@ import {
   Select,
   type TinaCMS,
 } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
 import { Callout } from '@toolkit/react-sidebar/components/callout';
 import { cn } from '@utils/cn';
 import {
@@ -411,6 +412,7 @@ const CollectionListPage = () => {
                               );
                               return doc?.document?._sys?.hasReferences;
                             } catch (error) {
+                              if (isSessionExpiredError(error)) throw error;
                               cms.alerts.error(
                                 'Document was not found, ask a developer for help or check the console for an error message'
                               );
@@ -426,6 +428,7 @@ const CollectionListPage = () => {
                               );
                               reFetchCollection();
                             } catch (error) {
+                              if (isSessionExpiredError(error)) throw error;
                               if (error.message.includes(ERR_HAS_REFERENCES)) {
                                 cms.alerts.error(
                                   error.message.split('\n\t').filter(Boolean)[1]
@@ -456,6 +459,7 @@ const CollectionListPage = () => {
                             );
                             reFetchCollection();
                           } catch (error) {
+                            if (isSessionExpiredError(error)) throw error;
                             cms.alerts.warn(
                               'Document was not deleted, ask a developer for help or check the console for an error message'
                             );
@@ -490,6 +494,7 @@ const CollectionListPage = () => {
                             );
                             reFetchCollection();
                           } catch (error) {
+                            if (isSessionExpiredError(error)) throw error;
                             if (
                               error.message &&
                               error.message.includes(ERR_ALREADY_EXISTS)
@@ -551,6 +556,7 @@ const CollectionListPage = () => {
                             );
                             cms.alerts.info('Folder was successfully created');
                           } catch (error) {
+                            if (isSessionExpiredError(error)) throw error;
                             if (
                               error.message &&
                               error.message.includes(ERR_ALREADY_EXISTS)
@@ -1404,9 +1410,14 @@ const DeleteModal = ({
 }: DeleteModalProps) => {
   const [hasRefs, setHasRefs] = React.useState<true | false | undefined>();
   useEffect(() => {
-    checkRefsFunc().then((result) => {
-      setHasRefs(result);
-    });
+    checkRefsFunc()
+      .then((result) => {
+        setHasRefs(result);
+      })
+      .catch(() => {
+        // error is already handled by checkRefsFunc; on session expiry the
+        // auth wall unmounts this modal
+      });
   }, [filename, checkRefsFunc]);
   return (
     <Modal>
@@ -1425,7 +1436,12 @@ const DeleteModal = ({
             style={{ flexGrow: 3 }}
             variant='danger'
             onClick={async () => {
-              await deleteFunc();
+              try {
+                await deleteFunc();
+              } catch {
+                // error is already handled by deleteFunc; on session expiry
+                // the auth wall unmounts this modal
+              }
               close();
             }}
           >

@@ -5,8 +5,9 @@ import { asResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
-import { FormProvider, TinaProvider } from './index';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { Field } from './field';
+import { FormProvider, TinaProvider } from './index';
 
 const NO_COLLECTIONS = { collections: [] };
 
@@ -46,7 +47,7 @@ const renderField = (address: string, schema: CollectionSchema = collection) =>
     <CaptureError>
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [stringFieldPlugin],
+          plugins: [stringFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >
@@ -65,18 +66,19 @@ describe('Field outside its providers', () => {
   it('names the providers it needs', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     expect(() => render(<Field address='title' />)).toThrow(
-      '<Field> must be used within a TinaProvider and FormProvider'
+      '<Field> must be used within a FormProvider'
     );
   });
 
-  // The runtime is present here, so the guard reads its second half.
+  // The runtime is present here, but <Field> only needs FormScopeContext to
+  // resolve a node by name — it delegates the rest to <FieldNode>.
   it('names the providers it needs when only the form is missing', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     render(
       <CaptureError>
         <TinaProvider
           config={asResolvedConfig({
-            plugins: [stringFieldPlugin],
+            plugins: [stringFieldPlugin, coreValidatorsPlugin],
             schema: NO_COLLECTIONS,
           })}
         >
@@ -85,7 +87,7 @@ describe('Field outside its providers', () => {
       </CaptureError>
     );
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      '<Field> must be used within a TinaProvider and FormProvider'
+      '<Field> must be used within a FormProvider'
     );
   });
 });
@@ -115,7 +117,7 @@ describe('Field with a registered plugin', () => {
     render(
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [stringFieldPlugin],
+          plugins: [stringFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >

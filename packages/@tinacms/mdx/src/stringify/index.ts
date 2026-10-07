@@ -1,4 +1,4 @@
-import type { RichTextType } from '@tinacms/schema-tools';
+import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import { gfmToMarkdown } from 'mdast-util-gfm';
 import {
@@ -8,6 +8,7 @@ import {
 } from 'mdast-util-mdx-jsx';
 import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
 import { text } from 'mdast-util-to-markdown/lib/handle/text';
+import { serializeBreaks } from '../break-serialization';
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown';
 import { stringifyMDX as stringifyMDXNext } from '../next';
 import type * as Plate from '../parse/plate';
@@ -34,7 +35,7 @@ declare module 'mdast' {
 
 export const serializeMDX = (
   value: Plate.RootElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): string | Plate.RootElement | undefined => {
   if (field.parser?.type === 'markdown') {
@@ -82,7 +83,7 @@ export type Pattern = {
   type: 'block' | 'leaf';
 };
 
-export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
+export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
   const patterns: Pattern[] = [];
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
@@ -137,7 +138,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
     }
     return text(node, parent, context, safeOptions);
   };
-  return toMarkdown(tree, {
+  return toMarkdown(serializeBreaks(tree), {
     extensions: [
       directiveToMarkdown(patterns),
       mdxJsxToMarkdown(),
@@ -150,7 +151,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
 
 export const rootElement = (
   content: Plate.RootElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.Root => {
   const children: Md.Content[] = [];
@@ -179,7 +180,7 @@ export function codeLinesToString(content: Plate.CodeBlockElement): string {
 
 export const blockElement = (
   content: Plate.BlockElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.Content | null => {
   switch (content.type) {
@@ -360,7 +361,7 @@ export const blockElement = (
 };
 const listItemElement = (
   content: Plate.ListItemElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.ListItem => {
   return {
@@ -384,7 +385,7 @@ const listItemElement = (
 };
 const blockContentElement = (
   content: Plate.BlockElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.BlockContent => {
   switch (content.type) {

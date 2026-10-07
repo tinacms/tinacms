@@ -109,15 +109,17 @@ export const RenameModal = ({
             variant='primary'
             disabled={!canSubmit}
             onClick={async () => {
-              // Button only renders `disabled` as pointer-events-none styling,
-              // so the guard has to live here to stop a double submit.
-              if (!canSubmit) return;
               setProcessing(true);
               setError(null);
               try {
                 await renameFunc(sanitized);
                 close();
               } catch (e) {
+                // Dismissing the branch prompt isn't a failure to report.
+                if (e?.ERR_TYPE === 'MediaRenameCancelled') {
+                  close();
+                  return;
+                }
                 setError(renameErrorMessage(e, sanitized));
                 setProcessing(false);
               }

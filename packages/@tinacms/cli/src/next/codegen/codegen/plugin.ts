@@ -52,7 +52,7 @@ export const ExperimentalGetTinaClient = () =>
   getSdk(
     generateRequester(
       createClient({
-        url: "${apiURL}",
+        url: ${JSON.stringify(apiURL)},
         queries,
       })
     )

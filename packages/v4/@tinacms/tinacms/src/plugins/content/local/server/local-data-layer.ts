@@ -7,6 +7,7 @@ import type {
 } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
 import type { CollectionSchema } from '../../../../core/schema/types';
+import { isMissingFileError, realPathOf } from '../../../../server/real-path';
 import {
   type CollectionFormat,
   type FormatAdapter,
@@ -73,9 +74,6 @@ const resolveCollections = ({
   return resolved;
 };
 
-const isMissingFileError = (cause: unknown): boolean =>
-  cause instanceof Error && 'code' in cause && cause.code === 'ENOENT';
-
 const isUnparsable = (
   adapter: FormatAdapter,
   raw: string | undefined,
@@ -87,43 +85,6 @@ const isUnparsable = (
     return false;
   } catch {
     return true;
-  }
-};
-
-const MAX_LINK_DEPTH = 40;
-
-const linkTargetOf = async (candidate: string): Promise<string | undefined> => {
-  try {
-    const stats = await fs.lstat(candidate);
-    if (!stats.isSymbolicLink()) return undefined;
-    return await fs.readlink(candidate);
-  } catch {
-    return undefined;
-  }
-};
-
-// `realpath` fails for a link that has no target, and the fallback below then
-// resolves a path to itself. A link must resolve to its target, or the caller
-// cannot see where a write lands.
-const realPathOf = async (candidate: string, depth = 0): Promise<string> => {
-  try {
-    return await fs.realpath(candidate);
-  } catch {
-    const target = await linkTargetOf(candidate);
-    if (target !== undefined) {
-      invariant(
-        depth < MAX_LINK_DEPTH,
-        'content-path-link-depth',
-        'A document path follows too many links.'
-      );
-      return realPathOf(
-        path.resolve(path.dirname(candidate), target),
-        depth + 1
-      );
-    }
-    const parent = path.dirname(candidate);
-    if (parent === candidate) return candidate;
-    return path.join(await realPathOf(parent, depth), path.basename(candidate));
   }
 };
 
@@ -282,7 +243,12 @@ export const createLocalDataLayer = (
         try {
           raw = adapter.serialize(value, previousRaw, collection.bodyField);
         } catch (cause) {
-          const reason = cause instanceof Error ? cause.message : String(cause);
+          let reason: string;
+          if (cause instanceof Error) {
+            reason = cause.message;
+          } else {
+            reason = String(cause);
+          }
           throw new Error(
             isUnparsable(adapter, previousRaw, collection.bodyField)
               ? `Cannot save "${canonicalPath}": the contents of the file on disk could not be parsed (${reason}). Repair the file, then save again.`

@@ -1,5 +1,31 @@
 # @tinacms/schema-tools
 
+## 2.10.1
+
+### Patch Changes
+
+- [#7614](https://github.com/tinacms/tinacms/pull/7614) [`dff369c`](https://github.com/tinacms/tinacms/commit/dff369c296f84347ad816ab9f737e74fc8268073) Thanks [@Tyagiquamar](https://github.com/Tyagiquamar)! - Image fields with an unknown `accept` value now fail schema validation. The error names the value and lists the accepted extensions and categories, so a typo such as `accept: 'docx'` no longer silently disables the field's file filter.
+
+- [#7548](https://github.com/tinacms/tinacms/pull/7548) [`82a7c3b`](https://github.com/tinacms/tinacms/commit/82a7c3be6e493f403050791ed25715a59d824339) Thanks [@wakqasahmed](https://github.com/wakqasahmed)! - Schema validation now rejects a template with an empty `fields` array. Such a template generated a GraphQL filter input type with no fields, which is invalid per the GraphQL spec and broke every content API request for the project; on TinaCloud that surfaced later as a misleading "The remote GraphQL schema does not exist" error while indexing reported success. `tinacms build` and `tinacms dev` now fail fast with "Property `fields` cannot be empty."
+
+  This covers collection templates and the templates on `object` and `rich-text` fields. Any config it rejects could not serve queries before this change either, so no working setup is affected.
+
+## 2.10.0
+
+### Minor Changes
+
+- [#7477](https://github.com/tinacms/tinacms/pull/7477) [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add `accept` to the image field, restricting which file types the field will take. It takes an extension, a category (`image`, `video`, `audio`, `document`), or an array of either. The field's own dropzone and the media picker's both refuse a file outside it, the picker narrows the library to matching files, and a selection outside it raises an alert instead of being written. `jpg` and `jpeg` are treated as the same type. Existing values are left alone.
+
+### Patch Changes
+
+- [#7486](https://github.com/tinacms/tinacms/pull/7486) [`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa) Thanks [@kulesy](https://github.com/kulesy)! - `AuthProvider` gains an optional `sessionExpiredListener`, invoked when a tokened `fetchWithToken` request comes back 401 so the CMS can return the user to login. The Tina client wires it automatically; custom auth providers can opt in.
+
+- [#7476](https://github.com/tinacms/tinacms/pull/7476) [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d) Thanks [@kulesy](https://github.com/kulesy)! - chore(tinacms-pkgs): point `repository.directory` at each package's own folder
+
+  Eight packages declared a `repository.directory` copied from whichever package they were forked from, so the "repository" link on their npm pages resolved to unrelated source. Also drops a dead `generate:schema` script from `@tinacms/metrics`, `@tinacms/cli` and `@tinacms/schema-tools` - it referenced a `scripts/generateSchema.js` that has never existed in the repo and nothing invoked it.
+
+- [#7477](https://github.com/tinacms/tinacms/pull/7477) [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Make the image field's `accept` work on `list: true` fields, and filter by extension server-side everywhere. The list variant built each item input from a bare `{component: 'image'}`, so a gallery got no dropzone restriction and no insert guard. The local dev server now accepts an `ext` param on `/media/list`, filtering before it paginates, so the media manager's type filter no longer narrows a page after the fact. A `staticMedia` store reports no extension filtering and hides the control rather than showing one that would leave a near-empty grid.
+
 ## 2.9.0
 
 ### Minor Changes
@@ -47,7 +73,6 @@
   **The bug.** Since Tina v3's December 2025 ESM migration, bundling `tina/database.ts` with esbuild — and writing the output to `os.tmpdir()` — left users wedged between two failure modes: bundling native modules like `better-sqlite3` crashed with `__filename is not defined`, and externalizing them couldn't resolve `node_modules` from `/tmp/`. See #6675.
 
   **What changed:**
-
   - `loadDatabaseFile` and `loadConfigFile` now write esbuild output to `<project>/tina/__generated__/.cache/<timestamp>/` instead of `os.tmpdir()`, so Node's resolver can walk up to the project's `node_modules` at runtime.
   - `better-sqlite3` is externalized so Node loads it as CJS where `__filename` exists.
   - The build cache is swept on startup (clears residue from crashed prior runs), and each per-build subdir + its now-empty timestamp parent are removed after the dynamic-import resolves.
@@ -299,7 +324,6 @@
 ### Minor Changes
 
 - 324950a: Updates Plate Editor to latest version 36.
-
   - Upgrades all remaining packages `Typescript` to version `^5`
   - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
   - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
@@ -355,7 +379,6 @@
   ### Changes in the database file
 
   #### Deprecations and Additions
-
   - **Deprecated**: `onPut`, `onDelete`, and `level` arguments in `createDatabase`.
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
@@ -393,7 +416,6 @@
   ### Migrating `database.ts`
 
   #### a. Replacing `onPut` and `onDelete` with `gitProvider`
-
   - **GitHubProvider Usage**: Replace `onPut` and `onDelete` with `gitProvider`, using the provided `GitHubProvider` for GitHub.
 
   ```typescript
@@ -422,7 +444,6 @@
   ```
 
   #### b. Renaming `level` to `databaseAdapter`
-
   - **Renaming in Code**: Change `level` to `databaseAdapter` for clarity.
 
   ```diff
@@ -433,7 +454,6 @@
   ```
 
   #### c. `createLocalDatabase` Function
-
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
@@ -442,7 +462,6 @@
   ```
 
   #### d. Consolidated Example
-
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
@@ -460,7 +479,6 @@
   ### Summary of Authentication Updates in Config
 
   #### a. AuthProvider and AbstractAuthProvider
-
   - **New**: `authProvider` in `defineConfig`.
   - **Class**: `AbstractAuthProvider` for extending new auth providers.
   - **Clerk Auth Provider**: New provider added.
@@ -468,11 +486,9 @@
   - **Deprecation**: `admin.auth`.
 
   #### b. Auth Provider in Internal Client and Config
-
   - **Transition**: From auth functions to `authProvider` class.
 
   #### c. Migration for Authentication
-
   - **Previous API**:
 
   ```javascript
@@ -504,7 +520,6 @@
   ```
 
   ### TinaCMS Self Hosted backend updates
-
   - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
   - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
 
@@ -714,7 +729,6 @@
 - 0a5297800: feat: Allow adding aliases in field configs, to export special characters like names with dashes, or fields named "id"
 - 7a3e86ba1: fix: templates regression
 - 353899de1: Deprecate and reconfigure internal types. Most user-facing types should remain unchanged aside from a couple of bug fixes:
-
   - Fix missing `indexed` and `indexes` properties on `collection` and `field` configs.
 
   Deprecations
@@ -964,6 +978,7 @@
     }
   },
   ```
+
   - Allow `datetime` field to be undefined or empty
 - 8060d0949: Provide filename customization API.
 
@@ -1047,7 +1062,6 @@
 ### Minor Changes
 
 - 7b0dda55e: Updates to the `rich-text` component as well the shape of the `rich-text` field response from the API
-
   - Adds support for isTitle on MDX elements
   - Fixes issues related to nested marks
   - Uses monaco editor for code blocks
@@ -1064,7 +1078,6 @@
   This new option will build tina into a static `index.html` file. This will allow someone to use tina without having react as a dependency.
 
   ### How to update
-
   1.  Add a `.tina/config.{js,ts,tsx,jsx}` with the default export of define config.
 
   ```ts

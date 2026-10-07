@@ -1,6 +1,7 @@
 import {
   createResolver,
   resolveFieldData,
+  transformDocumentIntoPayload,
   updateObjectWithJsonPath,
 } from './index';
 import { describe, expect, it, vi } from 'vitest';
@@ -11,6 +12,7 @@ import {
   resolveMediaRelativeToCloud,
 } from './media-utils';
 import { generatePasswordHash } from '../auth/utils';
+import { createSchema } from '../schema/createSchema';
 
 vi.mock('../mdx', () => ({
   parseMDX: vi.fn(),
@@ -22,7 +24,8 @@ vi.mock('./media-utils', () => ({
   resolveMediaCloudToRelative: vi.fn((v) => v),
 }));
 
-vi.mock('../auth/utils', () => ({
+vi.mock('../auth/utils', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../auth/utils')>()),
   generatePasswordHash: vi.fn(),
 }));
 
@@ -1385,6 +1388,8 @@ describe('index', () => {
     const collection = { name: 'post', path: 'posts', format: 'md' } as any;
     const realPath = path.join('posts', 'hello.md');
     const newRealPath = path.join('posts', 'renamed.md');
+    const referenceValue = 'posts/hello.md';
+    const newReferenceValue = 'posts/renamed.md';
 
     const setup = () => {
       const database = {
@@ -1554,10 +1559,13 @@ describe('index', () => {
         });
         resolver.getRaw = vi
           .fn()
-          .mockResolvedValueOnce({ _collection: 'post', relatedPost: realPath })
           .mockResolvedValueOnce({
             _collection: 'post',
-            relatedPost: realPath,
+            relatedPost: referenceValue,
+          })
+          .mockResolvedValueOnce({
+            _collection: 'post',
+            relatedPost: referenceValue,
           });
 
         await resolver.resolveUpdateDocument({
@@ -1569,12 +1577,46 @@ describe('index', () => {
         expect(database.put).toHaveBeenCalledTimes(3);
         expect(database.put).toHaveBeenCalledWith(
           refDocA,
-          expect.objectContaining({ relatedPost: newRealPath }),
+          expect.objectContaining({ relatedPost: newReferenceValue }),
           'post'
         );
         expect(database.put).toHaveBeenCalledWith(
           refDocB,
-          expect.objectContaining({ relatedPost: newRealPath }),
+          expect.objectContaining({ relatedPost: newReferenceValue }),
+          'post'
+        );
+      });
+
+      it('rewrites a POSIX-stored reference when path segments are joined with Windows separators', async () => {
+        const { resolver, database } = setup();
+        const refDoc = 'posts/a.md';
+        database.documentExists.mockImplementation(
+          async (p: string) => p.replace(/\\/g, '/') === referenceValue
+        );
+        (resolver as any).findReferences.mockResolvedValue({
+          post: { [refDoc]: ['$.relatedPost'] },
+        });
+        resolver.getRaw = vi.fn().mockResolvedValue({
+          _collection: 'post',
+          relatedPost: referenceValue,
+        });
+        const joinSpy = vi
+          .spyOn(path, 'join')
+          .mockImplementation((...segments: string[]) => segments.join('\\'));
+
+        try {
+          await resolver.resolveUpdateDocument({
+            collectionName: 'post',
+            relativePath: 'hello.md',
+            newRelativePath: 'renamed.md',
+          });
+        } finally {
+          joinSpy.mockRestore();
+        }
+
+        expect(database.put).toHaveBeenCalledWith(
+          refDoc,
+          expect.objectContaining({ relatedPost: newReferenceValue }),
           'post'
         );
       });
@@ -1646,6 +1688,7 @@ describe('index', () => {
   describe('resolveDeleteDocument()', () => {
     const collection = { name: 'post', path: 'posts', format: 'md' } as any;
     const realPath = path.join('posts', 'hello.md');
+    const referenceValue = 'posts/hello.md';
 
     const setup = (overrides: { hasReferences?: boolean } = {}) => {
       const database = {
@@ -1723,8 +1766,14 @@ describe('index', () => {
       });
       resolver.getRaw = vi
         .fn()
-        .mockResolvedValueOnce({ _collection: 'post', relatedPost: realPath })
-        .mockResolvedValueOnce({ _collection: 'post', relatedPost: realPath });
+        .mockResolvedValueOnce({
+          _collection: 'post',
+          relatedPost: referenceValue,
+        })
+        .mockResolvedValueOnce({
+          _collection: 'post',
+          relatedPost: referenceValue,
+        });
 
       await resolver.resolveDeleteDocument({
         collectionName: 'post',
@@ -1754,7 +1803,7 @@ describe('index', () => {
         _collection: 'post',
         sections: [
           {
-            items: [{ author: realPath }, { author: 'authors/other.md' }],
+            items: [{ author: referenceValue }, { author: 'authors/other.md' }],
           },
         ],
       });
@@ -1804,6 +1853,44 @@ describe('index', () => {
       expect(
         await (resolverWithRefs as any).hasReferences('posts/x.md', collection)
       ).toBe(true);
+    });
+
+    it('hasReferences matches a POSIX refs-index entry given a Windows-style path', async () => {
+      const database = {
+        query: vi.fn().mockImplementation(async (queryOptions, cb) => {
+          if (queryOptions.filterChain[0].rightOperand === 'posts/hello.md') {
+            cb('posts/other.md', {});
+          }
+        }),
+      };
+      const resolver = createResolver({
+        database: database as any,
+        tinaSchema: {} as any,
+        isAudit: false,
+      });
+
+      expect(
+        await (resolver as any).hasReferences('posts\\hello.md', collection)
+      ).toBe(true);
+    });
+
+    it('findReferences matches a POSIX refs-index entry given a Windows-style path', async () => {
+      const database = {
+        query: vi.fn().mockImplementation(async (queryOptions, cb) => {
+          if (queryOptions.filterChain[0].rightOperand === 'posts/hello.md') {
+            cb('posts/other.md', { __tina_ref_path__: '$.author' });
+          }
+        }),
+      };
+      const resolver = createResolver({
+        database: database as any,
+        tinaSchema: {} as any,
+        isAudit: false,
+      });
+
+      expect(
+        await (resolver as any).findReferences('posts\\hello.md', collection)
+      ).toEqual({ post: { 'posts/other.md': ['$.author'] } });
     });
   });
 
@@ -1900,4 +1987,262 @@ describe('index', () => {
       });
     });
   });
+
+  describe('transformDocumentIntoPayload()', () => {
+    const collection = {
+      name: 'docs',
+      path: 'content/docs',
+      format: 'mdx',
+      namespace: ['docs'],
+      fields: [],
+    } as any;
+    const tinaSchema = {
+      getCollection: () => collection,
+      getTemplateForData: () => ({ namespace: ['docs'], fields: [] }),
+    } as any;
+    const rawData = { _collection: 'docs', _template: 'docs' } as any;
+    const windowsPath = 'content\\docs\\index.mdx';
+    const posixPath = 'content/docs/index.mdx';
+
+    it('normalizes a Windows-style path into the document identity and path metadata', async () => {
+      const payload = await transformDocumentIntoPayload(
+        windowsPath,
+        rawData,
+        tinaSchema
+      );
+
+      expect(payload.id).toBe(posixPath);
+      expect(payload._sys.path).toBe(posixPath);
+      expect(payload._sys.basename).toBe('index.mdx');
+      expect(payload._sys.filename).toBe('index');
+      expect(payload._sys.extension).toBe('.mdx');
+      expect(payload._sys.relativePath).toBe('index.mdx');
+    });
+
+    it('gives Windows-style and POSIX-style paths the same document identity', async () => {
+      const fromWindows = await transformDocumentIntoPayload(
+        windowsPath,
+        rawData,
+        tinaSchema
+      );
+      const fromPosix = await transformDocumentIntoPayload(
+        posixPath,
+        rawData,
+        tinaSchema
+      );
+
+      expect(fromWindows.id).toBe(fromPosix.id);
+      expect(fromWindows._sys).toEqual(fromPosix._sys);
+    });
+  });
+});
+
+describe('auth collection write guard', () => {
+  const userCollection = {
+    name: 'user',
+    label: 'Users',
+    path: 'content/users',
+    format: 'json' as const,
+    isAuthCollection: true,
+    fields: [
+      {
+        type: 'object' as const,
+        name: 'users',
+        list: true,
+        fields: [
+          { type: 'string' as const, name: 'username', uid: true },
+          { type: 'password' as const, name: 'password' },
+        ],
+      },
+    ],
+  };
+  const postCollection = {
+    name: 'post',
+    label: 'Posts',
+    path: 'content/posts',
+    format: 'md' as const,
+    fields: [{ type: 'string' as const, name: 'title' }],
+  };
+  const dataCollection = {
+    name: 'data',
+    label: 'Data',
+    path: 'content',
+    format: 'json' as const,
+    fields: [{ type: 'string' as const, name: 'title' }],
+  };
+  // two users, one admin
+  const storedUsers = {
+    _collection: 'user',
+    _template: 'user',
+    users: [
+      { username: 'admin-user', password: { value: 'stored-hash-1' } },
+      { username: 'editor-user', password: { value: 'stored-hash-2' } },
+    ],
+  };
+
+  const buildGuard = async ({
+    collections = [userCollection, postCollection, dataCollection],
+    ctxUser,
+    admins = ['admin-user'],
+    allowUnauthenticatedWrites = false,
+    stored = storedUsers as Record<string, unknown> | undefined,
+    withAuthCollection = true,
+  }: {
+    collections?: any[];
+    ctxUser?: { sub?: string } | null;
+    admins?: string[];
+    allowUnauthenticatedWrites?: boolean;
+    stored?: Record<string, unknown>;
+    withAuthCollection?: boolean;
+  } = {}) => {
+    const tinaSchema = await createSchema({ schema: { collections } });
+    const database = {
+      ...(withAuthCollection && {
+        authCollection: { admins, allowUnauthenticatedWrites },
+      }),
+      get: vi.fn(async (fullPath: string) => {
+        if (fullPath === 'content/users/index.json' && stored) {
+          return stored;
+        }
+        throw new Error(`Unable to find record ${fullPath}`);
+      }),
+    };
+    const resolver = createResolver({
+      database: database as any,
+      tinaSchema,
+      isAudit: false,
+      ctxUser,
+    });
+    return (collectionName: string, realPath: string, op: string) =>
+      // @ts-ignore Since it's private
+      resolver.assertAuthCollectionWrite({
+        collection: tinaSchema.getCollection(collectionName),
+        realPath,
+        op,
+      });
+  };
+
+  it('allows any write when the schema has no auth collection', async () => {
+    const check = await buildGuard({
+      collections: [postCollection, dataCollection],
+      ctxUser: { sub: 'editor-user' },
+    });
+    await expect(
+      check('data', 'content/users/index.json', 'delete')
+    ).resolves.toBeUndefined();
+  });
+
+  it('allows writes to other collections', async () => {
+    const check = await buildGuard({ ctxUser: { sub: 'editor-user' } });
+    await expect(
+      check('post', 'content/posts/hello.md', 'delete')
+    ).resolves.toBeUndefined();
+  });
+
+  it('rejects a call with no ctxUser when unauthenticated writes are off', async () => {
+    const check = await buildGuard();
+    await expect(
+      check('user', 'content/users/index.json', 'update')
+    ).rejects.toThrow('Not authorized');
+  });
+
+  it('allows a call with no ctxUser when unauthenticated writes are on', async () => {
+    const check = await buildGuard({ allowUnauthenticatedWrites: true });
+    await expect(
+      check('user', 'content/users/other.json', 'create')
+    ).resolves.toBeUndefined();
+  });
+
+  describe('with a Database from before authCollection existed', () => {
+    it('allows a call with no ctxUser, like createDatabaseInternal', async () => {
+      const check = await buildGuard({ withAuthCollection: false });
+      await expect(
+        check('user', 'content/users/index.json', 'update')
+      ).resolves.toBeUndefined();
+    });
+
+    it('rejects a signed-in user, since it lists no admins', async () => {
+      const check = await buildGuard({
+        withAuthCollection: false,
+        ctxUser: { sub: 'admin-user' },
+      });
+      await expect(
+        check('user', 'content/users/index.json', 'update')
+      ).rejects.toThrow('Not authorized');
+    });
+  });
+
+  it('rejects a write from a user who is not an admin', async () => {
+    const check = await buildGuard({ ctxUser: { sub: 'editor-user' } });
+    await expect(
+      check('user', 'content/users/index.json', 'update')
+    ).rejects.toThrow('Not authorized');
+  });
+
+  it('rejects a write from an admin who is not in the user store', async () => {
+    const check = await buildGuard({
+      ctxUser: { sub: 'missing-user' },
+      admins: ['admin-user', 'missing-user'],
+    });
+    await expect(
+      check('user', 'content/users/index.json', 'update')
+    ).rejects.toThrow('Not authorized');
+  });
+
+  it('allows an admin to update index.json', async () => {
+    const check = await buildGuard({ ctxUser: { sub: 'admin-user' } });
+    await expect(
+      check('user', 'content/users/index.json', 'update')
+    ).resolves.toBeUndefined();
+  });
+
+  it.each(['create', 'delete', 'rename', 'addPending', 'createFolder'])(
+    'rejects an admin create, delete, rename, addPending and createFolder (%s)',
+    async (op) => {
+      const check = await buildGuard({ ctxUser: { sub: 'admin-user' } });
+      await expect(
+        check('user', 'content/users/index.json', op)
+      ).rejects.toThrow('Not authorized');
+    }
+  );
+
+  it('rejects an admin update of a document other than index.json', async () => {
+    const check = await buildGuard({ ctxUser: { sub: 'admin-user' } });
+    await expect(
+      check('user', 'content/users/other.json', 'update')
+    ).rejects.toThrow('Not authorized');
+  });
+
+  it('applies the user collection rules to every document stored in it', async () => {
+    const check = await buildGuard({ ctxUser: { sub: 'editor-user' } });
+    await expect(
+      check('data', 'content/users/index.json', 'update')
+    ).rejects.toThrow('Not authorized');
+    await expect(
+      check('data', 'content/settings.json', 'update')
+    ).resolves.toBeUndefined();
+  });
+
+  it('does not treat a user with ctxUser set as trusted when unauthenticated writes are on', async () => {
+    const check = await buildGuard({
+      ctxUser: { sub: 'editor-user' },
+      allowUnauthenticatedWrites: true,
+    });
+    await expect(
+      check('user', 'content/users/index.json', 'update')
+    ).rejects.toThrow('Not authorized');
+  });
+
+  it.each([{}, { sub: '' }, null])(
+    'rejects a write when ctxUser is present but has no sub (%j)',
+    async (ctxUser) => {
+      const check = await buildGuard({
+        ctxUser,
+        allowUnauthenticatedWrites: true,
+      });
+      await expect(
+        check('user', 'content/users/index.json', 'update')
+      ).rejects.toThrow('Not authorized');
+    }
+  );
 });

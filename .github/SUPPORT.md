@@ -16,5 +16,5 @@ coming down the line. If you are exited about TinaCMS, help us grow the communit
 - [Slack](https://tinacms.slack.com)
 - [Forum](https://community.tinacms.org/)
 - [GitHub](https://github.com/tinacms/tinacms)
-  - [Submit a Bug Report](https://github.com/tinacms/tinacms/issues/new?labels=bug&template=bug-report.md)
-  - [Submit a Feature Request](https://github.com/tinacms/tinacms/issues/new?labels=enhancement&template=feature-request.md)
+  - [Submit a Bug Report](https://github.com/tinacms/tinacms/issues/new?labels=bug&template=bug-report.yml)
+  - [Submit a Feature Request](https://github.com/tinacms/tinacms/discussions/new?category=ideas)

@@ -172,31 +172,22 @@ describe('a document carries its format through ingest and digest', () => {
 
   it('round-trips a .md body that MDX would have failed on', async () => {
     const registry = await resolveRegistry();
-    const context = { documentPath: 'content/posts/prices.md' };
-    const values = ingestDocument(
-      { body: PROSE_WITH_BRACES },
-      fields,
-      registry,
-      context
-    );
+    const context = { documentPath: 'content/posts/prices.md', registry };
+    const values = ingestDocument({ body: PROSE_WITH_BRACES }, fields, context);
     expect(values.body).toMatchObject({
       children: [{ type: 'p' }],
     });
-    expect(digestDocument(values, fields, registry, context)).toEqual({
+    expect(digestDocument(values, fields, context)).toEqual({
       body: PROSE_WITH_BRACES,
     });
   });
 
   it('still parses the same body as MDX when the document is .mdx', async () => {
     const registry = await resolveRegistry();
-    const values = ingestDocument(
-      { body: PROSE_WITH_BRACES },
-      fields,
+    const values = ingestDocument({ body: PROSE_WITH_BRACES }, fields, {
+      documentPath: 'content/posts/prices.mdx',
       registry,
-      {
-        documentPath: 'content/posts/prices.mdx',
-      }
-    );
+    });
     expect(values.body).toMatchObject({
       children: [{ type: INVALID_MARKDOWN_TYPE }],
     });
@@ -212,11 +203,9 @@ describe('a field carries its content through its codec', () => {
 
   it('reads the stored body through the codec, not the markdown parser', async () => {
     const registry = await resolveRegistry();
-    const values = ingestDocument(
-      { body: 'hello there' },
-      collection.fields,
-      registry
-    );
+    const values = ingestDocument({ body: 'hello there' }, collection.fields, {
+      registry,
+    });
     expect(values.body).toEqual({
       type: 'root',
       children: [
@@ -227,12 +216,10 @@ describe('a field carries its content through its codec', () => {
 
   it('writes what the codec serializes, not markdown', async () => {
     const registry = await resolveRegistry();
-    const values = ingestDocument(
-      { body: 'hello there' },
-      collection.fields,
-      registry
-    );
-    expect(digestDocument(values, collection.fields, registry)).toEqual({
+    const values = ingestDocument({ body: 'hello there' }, collection.fields, {
+      registry,
+    });
+    expect(digestDocument(values, collection.fields, { registry })).toEqual({
       body: 'HELLO THERE',
     });
   });
@@ -247,12 +234,12 @@ describe('a field carries its content through its codec', () => {
     const values = ingestDocument(
       { body: '# Heading\n' },
       markdownCollection.fields,
-      registry
+      { registry }
     );
-    expect(digestDocument(values, markdownCollection.fields, registry)).toEqual(
-      {
-        body: '# Heading\n',
-      }
-    );
+    expect(
+      digestDocument(values, markdownCollection.fields, { registry })
+    ).toEqual({
+      body: '# Heading\n',
+    });
   });
 });

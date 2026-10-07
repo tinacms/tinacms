@@ -21,6 +21,7 @@ const buildCms = (isAuthenticated: boolean, searchResults = []) =>
       },
     },
     alerts: { error: vi.fn() },
+    events: { dispatch: vi.fn() },
   }) as unknown as TinaCMS;
 
 describe('useGetCollection', () => {
@@ -70,6 +71,45 @@ describe('useGetCollection', () => {
 
     await waitFor(() => expect(fetchCollection).not.toHaveBeenCalled());
     expect(result.current.loading).toBe(true);
+  });
+
+  it('drops the previous collection when the session check starts failing', async () => {
+    vi.spyOn(TinaAdminApi.prototype, 'fetchCollection').mockResolvedValue({
+      name: 'post',
+    });
+    const isAuthenticated = vi.fn().mockResolvedValue(true);
+    const cms = {
+      api: {
+        tina: {
+          schema: { getCollection: () => ({ name: 'post', fields: [] }) },
+          authProvider: { isAuthenticated },
+        },
+        search: { supportsClientSideIndexing: () => false, query: vi.fn() },
+      },
+      alerts: { error: vi.fn() },
+      events: { dispatch: vi.fn() },
+    } as unknown as TinaCMS;
+
+    const { result, rerender } = renderHook(
+      ({ name }) => useGetCollection(cms, name, true, loadedFolder),
+      { initialProps: { name: 'post' } }
+    );
+
+    await waitFor(() =>
+      expect(result.current.collection).toEqual({ name: 'post' })
+    );
+
+    // the session goes away, then the user switches collection
+    isAuthenticated.mockResolvedValue(false);
+    rerender({ name: 'author' });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    // stale data here would render the previous collection under the new heading
+    expect(result.current.collection).toBeUndefined();
+    // and the auth wall is told to drop back to the login modal
+    expect(cms.events.dispatch).toHaveBeenCalledWith({
+      type: 'cms:session-expired',
+    });
   });
 
   it('surfaces a fetch failure instead of loading forever', async () => {

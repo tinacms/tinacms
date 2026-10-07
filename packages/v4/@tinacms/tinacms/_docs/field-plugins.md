@@ -41,6 +41,19 @@ v4 supplies four more examples:
 - The `datetime` field ([`datetime-field.md`](./datetime-field.md)) holds a
   string on both sides. It defines `parse`, but no `serialize` and no
   `defaultValue`.
+- The `array` field ([`array-field.md`](./array-field.md)) repeats a fixed set
+  of item fields. Its items reuse the ordinary field contract through
+  `<FieldNode>` and `validateField` — see
+  [Compound fields](#compound-fields) below.
+- The `object` field ([`object-field.md`](./object-field.md)) groups a fixed
+  set of nested fields under one name. It is the `array` field without the
+  repetition, and it uses the same compound-field mechanism.
+- The `select` field ([`select-field.md`](./select-field.md)) picks one value
+  from a fixed `options` list. Its Zod validator is a `z.enum` with a custom
+  `errorMap`, and it has no `defaultValue`, `parse`, or `serialize`.
+- The `reference` field ([`reference-field.md`](./reference-field.md)) points
+  at another document, and stores that document's path. Its options come from
+  the content capability, not from a fixed list.
 - The `rich-text` field ([`rich-text-field.md`](./rich-text-field.md)) uses the
   `block` layout. With `isBody`, it controls the markdown body of the file.
 
@@ -103,7 +116,13 @@ The properties of the descriptor:
 - `metadata.labelable` — Set it to `false` to hide the outer field label. The
   `rich-text` field sets it to `false` because it renders its own label area.
 - `schema(node)` — It returns a Zod schema for the validation in layer 1.
-- `validate(value)` — A custom check for layer 2. It returns `string` or `null`.
+- `isEmpty(value)` — What the built-in `required` validator asks of this field
+  type. Declare it when the generic check is wrong.
+- `measure(value)` — What the built-in `min` and `max` validators compare, as
+  `{ amount, unit? }`. Declare it when the generic measure is wrong.
+- `validate(value, context)` — A custom check for layer 1. It returns one
+  message, a list of messages, or `null`. `context` is
+  `{ node, address }`: the field's own schema node and its current address.
 - `parse` and `serialize` — Optional conversions between the stored value and
   the editor value. Do not add them if the two values are the same. Each one
   also receives the field's own schema node and a `FieldTransformContext`
@@ -116,7 +135,15 @@ The properties of the descriptor:
   `isEqual(a, b, node, context) => boolean`. The form calls it instead of
   structural equality when it decides whether a field's value changed
   (`core/form/compare.ts`). The `rich-text` field uses it to treat two AST
-  values as equal when they serialize to the same markdown source.
+  values as equal when they serialize to the same markdown source. The form
+  applies `isEqual` to a top-level field only. A field nested in a compound
+  field falls back to structural equality, because the form compares a
+  compound field's value as one unit.
+- `validateChildren(value, node, address, registry, scope)` — An optional
+  function for a compound field. It returns a flat map of nested address to messages.
+  `address` is this field's own current address — not always `node.name`, since
+  a nested compound field is not addressed by its bare name. Refer to
+  [Compound fields](#compound-fields) below.
 
 ### 3. The schema helper function and the validator (`.schema.ts`)
 
@@ -168,19 +195,92 @@ Hooks:
 | `useFieldAddress()` | Gives the address of this field |
 | `useFieldSchema<T>()` | Gives the resolved schema node of this field, which holds the render hints such as `step` |
 | `useFieldValue<T>(address)` | Gives `[value, setValue]` from the react-hook-form controller |
-| `useFieldErrors(address)` | Gives the validation messages at the address |
+| `useFieldErrors(address)` | Gives every validation message at `address` or under it |
 | `useFieldActivation(handler)` | Runs `handler` when this field becomes the active field, for visual editing |
 
 ## Validation in two layers
 
 The form resolver (`editor/resolver.ts`) calls `validateField`
-(`core/validation.ts`). `validateField` runs the two layers and joins their
-messages:
+(`core/validation.ts`). `validateField` runs the two layers in order and joins
+their messages. The spec is
+[tinacmsv4-docs › field-plugins › Validation](https://github.com/tinacms/tinacmsv4-docs/blob/main/plugins/field-plugins.md#validation).
 
-1. **Zod** — `descriptor.schema(node).safeParse(value)`. This layer applies the
-   `required`, `min`, `max`, and `pattern` rules.
-2. **Custom** — `descriptor.validate(value)`. This layer returns one message or
-   `null`.
+1. **Plugin-level** — `descriptor.validate(value, context)`. It runs on every
+   field of the `type` the plugin owns. `context` is `PluginValidationContext`,
+   `{ node, address }`.
+2. **Field-level** — each `{ name, args }` entry in the node's `validators`
+   list, in order. A plugin registers a `ValidatorFactory` under `name`; the
+   factory takes `args` and returns the rule. The rule gets
+   `FieldValidationContext`: `{ node, address, siblings, values, isEmpty,
+   measure }`.
+
+Both layers return the same shape, `string | string[] | null`
+(`Validate<TValue, TContext>` in `core/field/contract.ts`). Only layer 2 sees
+`siblings`; a plugin-level rule is scoped to its own field.
+
+`descriptor.schema(node)` still runs first, but it is not a layer of rules. It
+gives the shape of the value and the coercion the editor needs: a number field
+holds a string in the form and a number in the document. A field type declares
+no `required`, `min`, `max` or `pattern` there.
+
+### The rules that v4 supplies
+
+`required`, `min`, `max` and `pattern` are field-level validators that a core
+plugin registers (`plugins/validators/`). A collection attaches them like any
+other:
+
+```ts
+t.string({ name: 'title', validators: [required(), min(3)] });
+t.array({ name: 'tags', fields: [...], validators: [max(5)] });
+```
+
+Two descriptor hooks let a field type answer them:
+
+- `isEmpty(value)` — what `required` asks. The default counts `null`,
+  `undefined`, `''`, an empty array and an empty object as empty. The
+  rich-text field declares its own, because an empty paragraph is an empty
+  document. The boolean field declares `() => false`, so `required` has no
+  effect on a checkbox.
+- `measure(value)` — what `min` and `max` compare, as
+  `{ amount, unit? }`. A string measures its length in `characters`, an array
+  its `items`, a number its own value. The number field declares its own,
+  because the editor holds a string.
+
+`min` and `max` pass an empty value, so a field with `required()` and `min(3)`
+reports one message, not two.
+
+A plugin registers factories through the `validator` capability
+([plugins.md](./plugins.md#validator-plugins)). `TinaProvider` builds the
+`ValidatorRegistry` from every installed plugin at boot, and `FormProvider`
+hands it to the resolver. `compileSchema` fails on a `name` no installed
+plugin registers, and `validateField` throws `validator-unknown` for the same
+case at runtime. The barebones example registers `matches` and `differentFrom`
+(`packages/v4/examples/barebones/tina/validators.ts`).
+
+### `args` holds data, never a function
+
+`args` is `JsonValue[]` (`core/json.ts`), because `compileSchema` writes each
+`{ name, args }` entry into `tina-lock.json`. A function does not survive
+JSON, so it cannot be an argument. The logic of a rule stays in the factory,
+in the plugin; the collection supplies only the data that configures it.
+
+```ts
+// Wrong. A function is not JSON, and this does not compile.
+t.string({
+  name: 'slug',
+  validators: [{ name: 'custom', args: [(value) => value.length > 3] }],
+});
+
+// Correct. The plugin holds the logic; the collection supplies the number.
+t.string({ name: 'slug', validators: [minLength(3)] });
+```
+
+A rule that one collection needs, and that no data can configure, is a field
+plugin of its own, not a validator.
+
+A compound field sets `siblings` for its children: the `array` field passes
+the item, the `object` field passes the object
+(`array-field.client.tsx`, `object-field.client.tsx`).
 
 ## Replace a built-in field
 
@@ -210,11 +310,156 @@ This example makes a color field:
    `type: 'color'`.
 4. Add the plugin to `corePlugins`, and add `color` to `t`. Both are in
    `plugins/fields/index.ts`.
+5. Confirm the new field works as an `array` item field, not only at the top
+   level of a collection. Put `color({...})` in an `array`'s own `fields`, and
+   render it nested (`items.0.swatch`). An item field renders through
+   `<FieldNode>`, not `<Field>` — refer to
+   [Compound fields](#compound-fields). A field that reads something only a
+   top-level field has (the collection, a top-level-only address assumption)
+   breaks there; a field built only from its own node, its own address, and
+   the hooks above does not.
 
 Do no more steps. You do not change the registry.
+
+## Adapt a v3 field
+
+A v3 custom field is a component that gets `input`, `meta` and `field` as
+props. A v4 field component has no props. A small adapter reads the v4 hooks
+and gives the v3 component the props it expects. Thus the v3 component runs
+without a rewrite.
+
+```tsx
+import type { ComponentType } from 'react';
+import type { FieldSchema } from '@tinacms/tinacms';
+import {
+  useFieldAddress, useFieldErrors, useFieldSchema, useFieldValue,
+} from '@tinacms/tinacms/react';
+
+interface V3FieldProps<T> {
+  input: { name: string; value: T; onChange: (value: T) => void };
+  meta: { error?: string };
+  field: FieldSchema;
+}
+
+export function fromV3Field<T>(V3Component: ComponentType<V3FieldProps<T>>) {
+  return function V3FieldAdapter() {
+    const address = useFieldAddress();
+    const [value, setValue] = useFieldValue<T>(address);
+    const errors = useFieldErrors(address);
+    const field = useFieldSchema();
+
+    return (
+      <div>
+        <V3Component
+          input={{ name: address, value, onChange: setValue }}
+          meta={{ error: errors[0] }}
+          field={field}
+        />
+        {errors.map((e) => <span key={e} role='alert'>{e}</span>)}
+      </div>
+    );
+  };
+}
+```
+
+Give the adapted component to the descriptor. The manifest is the same as for
+any field plugin (step 1):
+
+```tsx
+import { defineClientPlugin } from '@tinacms/tinacms/client';
+import { MyV3ColorPicker } from './my-v3-color-picker';
+
+export default defineClientPlugin({
+  field: {
+    Component: fromV3Field(MyV3ColorPicker),
+    defaultValue: '#000000',
+    metadata: { layout: 'inline' },
+  },
+});
+```
+
+What the adapter supplies:
+
+| v3 prop | v4 source |
+|---|---|
+| `input.name` | `useFieldAddress()` |
+| `input.value`, `input.onChange` | `useFieldValue(address)` |
+| `meta.error` | The first message from `useFieldErrors(address)` |
+| `field` | `useFieldSchema()` |
+
+Limits:
+
+- Remove `wrapFieldsWithMeta` from the v3 component. `<Field>` renders the
+  label, and the adapter renders the errors.
+- The adapter does not supply `form` or `tinaForm`. Those props are the v3
+  Final Form API, and v4 has no equivalent. A component that uses them needs a
+  rewrite as a v4 field (refer to [Write a new field plugin](#write-a-new-field-plugin)).
+- The adapter does not supply `input.onBlur`, `input.onFocus` or the other
+  `meta` flags. Remove those calls from the v3 component.
 
 ## Addresses
 
 `<Field>` compares `address` to the field `name` in the collection
 (`editor/field.tsx`). The two values must be the same. `useFieldErrors` uses
 that same name as the key of the errors.
+
+## Compound fields
+
+A compound field holds a value built from other fields — `array` is the
+shipped example. Its item fields are not in the collection schema, so they
+need three extra pieces. Each one has a plain, ordinary counterpart; refer to
+[`array-field.md`](./array-field.md) for the full, worked example.
+
+- **Rendering** — `<FieldNode address node>` (`editor/field.tsx`) renders one
+  resolved node at an address, the same way `<Field>` does after it resolves a
+  node by name. A compound field's component renders one child field per row
+  with `<NestedFieldRow address node>` (`editor/field.tsx`) — the label and
+  `<FieldNode>` pair, with a nested address such as `items.0.title`. `array`
+  and `object` both use it; a new compound field imports it, it does not copy
+  it.
+- **Parse and serialize** — `context.registry` (`FieldTransformContext`,
+  `core/field/contract.ts`) carries the registry into `parse` and `serialize`.
+  A compound field's `parse`/`serialize` calls `ingestDocument`/
+  `digestDocument` again, with its own item `fields` and that registry, so its
+  items go through the same conversion path as the top-level form.
+- **Validation** — `validateChildren(value, node, address, registry, scope)`
+  on the descriptor calls `validateFieldTree(subfield, subDescriptor, subValue,
+  \`${address}.${index}.${subfield.name}\`, registry, { ...scope, siblings: item
+  })` (`core/validation.ts`), once for each item field, and merges what it
+  returns. Set `siblings` to the item, so a field-level validator on an item
+  field reads the item, not the document root. Build the item's
+  address from the `address` parameter, not from `node.name` — a nested
+  compound field (an array inside an array) is not addressed by its bare name.
+  `validateFieldTree` runs `validateField`, then — if the item field is itself
+  compound — calls its `validateChildren` too, so the recursion is not
+  something you write by hand; it falls out of every compound field calling
+  `validateFieldTree` the same way. The top-level resolver
+  (`editor/resolver.ts`) starts this same call for each collection field, then
+  merges what it returns.
+
+  `validateFieldTree` does not additionally write a message onto a compound
+  field's own address — do not add that yourself either. react-hook-form
+  represents a registered `useFieldArray` address as a real array of its
+  items' errors, and drops anything else — including your own descriptor's
+  `type`/`message` — sitting alongside it. `useFieldErrors(address)`
+  (`editor/hooks.ts`) gets a compound field's own message from its children
+  instead, by reading: `collectFieldErrorMessages`
+  (`editor/field-errors.ts`) walks every node under `address` in whatever
+  tree react-hook-form actually kept, and collects every message it finds.
+  So `useFieldErrors('authors')` sees an item's message the same way
+  `useFieldErrors('authors.0.name')` does, at any depth, without the resolver
+  needing to place it there.
+
+This makes every ordinary field an item field for free — an `array`'s `fields`
+accepts any registered type, unmodified. One descriptor hook does not cross the
+boundary: `isEqual` runs for a top-level field only. A nested `rich-text` item
+uses structural equality for dirty tracking, not its source-level check, so
+editor-only changes to its tree read as an edit. The converse is not automatic:
+a new field type is not confirmed to work as an item field until you put one
+inside an `array` and render it nested. Refer to
+[Write a new field plugin, step 5](#write-a-new-field-plugin). Two compound
+fields nest for free too, as long as each one's `validateChildren` calls
+`validateFieldTree` with its own current `address` rather than `node.name` —
+`array` inside `array` is the test in `array-field.test.tsx`, and a future
+`reference` gets the same recursion without either field knowing about the
+other.

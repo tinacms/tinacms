@@ -7,6 +7,7 @@ import {
   resolve,
   buildSchema,
 } from '../src';
+import type { DatabaseArgs } from '../src/database';
 import { z } from 'zod';
 
 class OutputBridge extends FilesystemBridge {
@@ -74,13 +75,15 @@ export const setup = async (dir: string, config: any) => {
   const get = async (options?: {
     query: string;
     variables: Record<string, unknown>;
-    ctxUser?: { sub: string };
+    ctxUser?: { sub?: string } | null;
+    isSignIn?: boolean;
   }) => {
     const result = await resolve({
       database,
       query: options?.query || query,
       variables: options?.variables || {},
       ctxUser: options?.ctxUser,
+      isSignIn: options?.isSignIn,
     });
     return result;
   };
@@ -101,20 +104,25 @@ export const assertDoc = (doc: any) => {
   return z.object({ data: dataSchema, errors: z.any() }).parse(doc);
 };
 
-export const setupMutation = async (dir: string, config: any) => {
+export const setupMutation = async (
+  dir: string,
+  config: any,
+  databaseOptions?: Pick<DatabaseArgs, 'authCollection' | 'onPut'>
+) => {
   const bridge = new MemoryCaptureBridge(dir);
   const level = new MemoryLevel<string, Record<string, any>>();
   const database = createDatabaseInternal({
     bridge,
     level,
     tinaDirectory: 'tina',
+    ...databaseOptions,
   });
   await database.indexContent(await buildSchema(config));
 
   const query = async (options?: {
     query: string;
     variables: Record<string, unknown>;
-    ctxUser?: { sub: string };
+    ctxUser?: { sub?: string } | null;
   }) => {
     const result = await resolve({
       database,
@@ -125,7 +133,7 @@ export const setupMutation = async (dir: string, config: any) => {
     return result;
   };
 
-  return { query, bridge };
+  return { query, bridge, database };
 };
 
 export const loadVariables = async (

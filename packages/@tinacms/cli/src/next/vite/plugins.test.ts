@@ -38,6 +38,9 @@ jest.mock('../commands/dev-command/server/media', () => ({
   parseMediaFolder: (s: string) => s,
 }));
 
+// Vite is ESM-only, and jest's module registry cannot load it.
+jest.mock('vite', () => ({ transformWithEsbuild: jest.fn() }));
+
 jest.mock('../commands/dev-command/server/searchIndex', () => ({
   createSearchIndexRouter: () => ({
     put: mockSearchPut,

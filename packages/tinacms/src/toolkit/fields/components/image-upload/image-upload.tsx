@@ -2,8 +2,10 @@
 
 */
 
+import { type MediaAccept, resolveMediaAccept } from '@tinacms/schema-tools';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
+  dropzoneAcceptFromExtensions,
   dropzoneAcceptFromString,
   isImage,
 } from '@toolkit/components/media/utils';
@@ -24,6 +26,7 @@ interface ImageUploadProps {
   value?: string;
   src?: string;
   loading?: boolean;
+  accept?: MediaAccept | MediaAccept[];
 }
 
 export const StyledImage = ({ src }) => {
@@ -55,12 +58,15 @@ export const StyledFile = ({ src }) => {
 export const ImageUpload = React.forwardRef<
   HTMLButtonElement,
   ImageUploadProps
->(({ onDrop, onClear, onClick, value, src, loading }, ref) => {
+>(({ onDrop, onClear, onClick, value, src, loading, accept }, ref) => {
   const cms = useCMS();
   const { getRootProps, getInputProps } = useDropzone({
-    accept: dropzoneAcceptFromString(
-      cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
-    ),
+    // A field's `accept` overrides the global `media.accept`, so a file the
+    // field would refuse is rejected here rather than uploaded and then
+    // discarded by the insert guard.
+    accept:
+      dropzoneAcceptFromExtensions(resolveMediaAccept(accept)) ??
+      dropzoneAcceptFromString(cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES),
     onDrop,
     noClick: !!onClick,
   });
@@ -77,7 +83,7 @@ export const ImageUpload = React.forwardRef<
             }`}
           >
             <button
-              className='flex-shrink min-w-0 focus-within:shadow-outline focus-within:border-blue-500 rounded outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100'
+              className='flex-shrink min-w-0 focus-within:shadow-outline focus-within:border-blue-500 rounded outline-none overflow-visible cursor-pointer border-none hover:ring-2 hover:ring-orange-500 transition-shadow ease-in-out duration-200'
               onClick={onClick}
               ref={ref}
             >

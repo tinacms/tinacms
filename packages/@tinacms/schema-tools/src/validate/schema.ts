@@ -17,7 +17,7 @@ const Template = z
       required_error: 'Missing `label` property. Property `label` is required.',
     }),
     name: name,
-    fields: z.array(TinaFieldZod),
+    fields: z.array(TinaFieldZod).min(1, 'Property `fields` cannot be empty.'),
   })
   .superRefine((val, ctx) => {
     const dups = findDuplicates(val.fields?.map((x) => x.name));

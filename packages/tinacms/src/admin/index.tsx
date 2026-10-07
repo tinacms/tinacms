@@ -10,6 +10,7 @@ import {
   TinaCMS,
   useCMS,
 } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
 import React, { useState, useEffect } from 'react';
 import {
   Route,
@@ -29,6 +30,7 @@ import CollectionListPage from './pages/CollectionListPage';
 import CollectionUpdatePage from './pages/CollectionUpdatePage';
 import DashboardPage from './pages/DashboardPage';
 import ScreenPage from './pages/ScreenPage';
+import { resolvePreviewPath } from './preview-url';
 
 import pkg from '../../package.json';
 import { Client, TinaCloudAuthProvider } from '../internalClient';
@@ -168,12 +170,26 @@ const SetPreviewFlag = ({
 };
 
 const PreviewInner = ({ preview, config }) => {
+  const cms = useCMS();
   const params = useParams();
   const navigate = useNavigate();
-  const [url, setURL] = React.useState(`/${params['*']}`);
+  const splat = params['*'];
+  const { path: paramURL, offOrigin } = resolvePreviewPath(splat);
+  const [url, setURL] = React.useState(paramURL);
   const [reportedURL, setReportedURL] = useState<string | null>(null);
   const ref = React.useRef<HTMLIFrameElement>(null);
-  const paramURL = `/${params['*']}`;
+
+  React.useEffect(() => {
+    if (!offOrigin) {
+      return;
+    }
+    cms.alerts.warn(
+      'This preview link points to a different site, so it was not opened.'
+    );
+    // Replace the rejected address so neither the address bar nor the back
+    // button keeps pointing at the other site.
+    navigate(`/~${paramURL}`, { replace: true });
+  }, [splat, offOrigin]);
 
   React.useEffect(() => {
     if (reportedURL !== paramURL && paramURL) {
@@ -238,6 +254,10 @@ const CheckSchema = ({
           }
         })
         .catch((error) => {
+          if (isSessionExpiredError(error)) {
+            // request() already sent the user back to the login modal
+            return;
+          }
           // Matches a TinaCloud server contract (string owned upstream); see #6777.
           if (error.message.includes(ERR_NOT_INDEXED)) {
             setSchemaMissingError(true);

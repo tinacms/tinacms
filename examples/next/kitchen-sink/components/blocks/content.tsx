@@ -1,12 +1,12 @@
 'use client';
-import React from 'react';
-import { Section, Container } from '../layout';
-import { TinaMarkdown } from 'tinacms/dist/rich-text';
-import { tinaField } from 'tinacms/dist/react';
 import { customComponents } from '@/components/markdown-components';
 import { cn } from '@/lib/utils';
-import { colorFieldSchema } from '@/tina/schemas/shared-fields';
 import type { PageBlocksContent } from '@/tina/__generated__/types';
+import { colorFieldSchema } from '@/tina/schemas/shared-fields';
+import React from 'react';
+import { tinaField } from 'tinacms/dist/react';
+import { TinaMarkdown } from 'tinacms/dist/rich-text';
+import { Container, Section } from '../layout';
 
 interface ContentProps {
   data: PageBlocksContent;

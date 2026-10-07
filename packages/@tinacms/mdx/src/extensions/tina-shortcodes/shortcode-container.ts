@@ -10,7 +10,7 @@ import type {
   Token,
   Tokenizer,
 } from 'micromark-util-types';
-import { ok as assert } from 'uvu/assert';
+import { assert } from '../../assert';
 import type { Pattern } from '../../stringify';
 import { factoryAttributes } from './factory-attributes';
 import { factoryName } from './factory-name';

@@ -2,7 +2,6 @@ import { EventBus } from '@toolkit/core';
 import { describe, it, vi } from 'vitest';
 import { Alerts } from './alerts';
 
-// biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
 vi.useFakeTimers();
 
 const events = new EventBus();
@@ -131,5 +130,20 @@ describe('Alerts', () => {
 
       expect(alerts.add).toHaveBeenCalledWith('error', 'Error', 560);
     });
+  });
+});
+
+describe('suppression window', () => {
+  it('drops alerts between cms:session-expired and cms:login', () => {
+    const events = new EventBus();
+    const alerts = new Alerts(events);
+
+    events.dispatch({ type: 'cms:session-expired' });
+    alerts.error('painted over the login modal');
+    expect(alerts.all).toHaveLength(0);
+
+    events.dispatch({ type: 'cms:login' });
+    alerts.error('legitimate again');
+    expect(alerts.all).toHaveLength(1);
   });
 });

@@ -2,12 +2,15 @@
 
 */
 
-import React, { useState, useEffect } from 'react';
 import type { TinaCMS } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
+import { dispatchSessionExpired } from '@toolkit/core/session-expired';
+import React, { useState, useEffect } from 'react';
 import { TinaAdminApi } from '../api';
 import type { DocumentForm } from '../types';
-import LoadingPage from './LoadingPage';
 import { FullscreenError } from './FullscreenError';
+import LoadingPage from './LoadingPage';
+import { UnableToLoadModal } from './UnableToLoadModal';
 
 export const useGetDocument = (
   cms: TinaCMS,
@@ -34,16 +37,25 @@ export const useGetDocument = (
           if (!isCancelled) {
             setDocument(response.document);
           }
+        } else if (!isCancelled) {
+          // Session gone: drop the previous document rather than leave the form
+          // showing content the user can no longer save.
+          dispatchSessionExpired(cms.events);
+          setDocument(undefined);
         }
       } catch (error) {
         // Only handle error if the request hasn't been cancelled
         if (!isCancelled) {
-          cms.alerts.error(
-            `[${error.name}] GetDocument failed: ${error.message}`
-          );
-          console.error(error);
           setDocument(undefined);
-          setError(error);
+          // on session expiry request() already told the auth wall; no alert
+          // over the login modal
+          if (!isSessionExpiredError(error)) {
+            cms.alerts.error(
+              `[${error.name}] GetDocument failed: ${error.message}`
+            );
+            console.error(error);
+            setError(error);
+          }
         }
       }
 
@@ -87,6 +99,12 @@ const GetDocument = ({
 
   if (loading) {
     return <LoadingPage />;
+  }
+
+  // undefined when the session check skipped the fetch; consumers read
+  // `document._values` straight away, so never hand them undefined
+  if (!document) {
+    return <UnableToLoadModal message='This document could not be loaded.' />;
   }
 
   return <>{children(document, loading)}</>;

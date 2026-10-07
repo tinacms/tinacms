@@ -16,12 +16,17 @@ export const useFieldReference = (fieldName: string | null) => {
   const signal = React.useContext(MutationSignalContext);
   const [ele, setEle] = React.useState<HTMLElement | null>(null);
   React.useEffect(() => {
-    let doc: Document;
+    let doc: Document | null;
     const iframe = document.getElementById('tina-iframe') as HTMLIFrameElement;
     if (iframe) {
       doc = iframe.contentDocument;
     } else {
       doc = document;
+    }
+    // contentDocument is null when the preview is a cross-origin or sandboxed
+    // frame the admin cannot read into.
+    if (!doc) {
+      return;
     }
     const fieldEle = doc.querySelector<HTMLElement>(
       `[data-tinafield="${fieldName}"]`

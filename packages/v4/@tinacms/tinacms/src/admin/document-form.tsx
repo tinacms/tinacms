@@ -1,3 +1,11 @@
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
 import { Label } from '@tinacms/ui/components/label';
 import { use, useState } from 'react';
@@ -10,8 +18,13 @@ import {
   useFieldRegistry,
   useFormId,
   useFormSave,
+  useStaleDraft,
 } from '../editor/hooks';
-import { useIsFieldDirty, useIsFormDirty } from '../form/form-store';
+import {
+  useFormErrors,
+  useIsFieldDirty,
+  useIsFormDirty,
+} from '../form/form-store';
 import { DocumentStatus } from './document-status';
 
 function FieldRow({ node }: { node: FieldSchema }) {
@@ -43,25 +56,28 @@ function FieldRow({ node }: { node: FieldSchema }) {
 }
 
 function SaveButton() {
-  const dirty = useIsFormDirty(useFormId());
+  const formId = useFormId();
+  const dirty = useIsFormDirty(formId);
+  const invalid = Object.keys(useFormErrors(formId)).length > 0;
   const save = useFormSave();
   const [failure, setFailure] = useState<string | null>(null);
+  const canSave = dirty && !invalid;
   return (
     <div className='flex flex-col items-start gap-2'>
       <Button
         type='button'
         className='aria-disabled:pointer-events-none aria-disabled:opacity-50'
-        aria-disabled={!dirty}
+        aria-disabled={!canSave}
         onClick={() => {
-          if (!dirty) return;
+          if (!canSave) return;
           setFailure(null);
           save().catch((cause) => {
             console.error('[tinacms] Save failed:', cause);
-            setFailure(
-              cause instanceof Error && cause.message
-                ? cause.message
-                : 'Save failed.'
-            );
+            if (cause instanceof Error && cause.message) {
+              setFailure(cause.message);
+            } else {
+              setFailure('Save failed.');
+            }
           });
         }}
       >
@@ -95,6 +111,33 @@ function DiscardButton() {
   );
 }
 
+// A modal, so no keystroke can overwrite the stored draft before the editor
+// decides what happens to it.
+function StaleDraftDialog() {
+  const stale = useStaleDraft();
+  return (
+    <AlertDialog open={stale !== null}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Resume your unsaved edits?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This document changed after you made these edits. Resume them on top
+            of the current version, or discard them.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <Button type='button' variant='outline' onClick={stale?.discard}>
+            Discard draft
+          </Button>
+          <Button type='button' onClick={stale?.resume}>
+            Resume edits
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 export function DocumentForm() {
   const scope = use(FormScopeContext);
   if (!scope) return null;
@@ -107,6 +150,7 @@ export function DocumentForm() {
         </h2>
         <DocumentStatus />
       </header>
+      <StaleDraftDialog />
       {scope.collection.fields.map((node) => (
         <FieldRow key={node.name} node={node} />
       ))}

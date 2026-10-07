@@ -8,27 +8,41 @@ import {
   useRef,
   useState,
 } from 'react';
-import { FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
+import { FormProvider as RhfFormProvider, get, useForm } from 'react-hook-form';
 import type { ResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { fieldEqualityFor } from '../core/form/compare';
+import {
+  createFormHookRegistry,
+  resolveFormHooks,
+  runOnChange,
+} from '../core/form/hooks';
 import { ingestDocument } from '../core/form/ingest';
 import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { createScreenRegistry } from '../core/screen/registry';
+import { createGlobalNav } from '../core/slot/global-nav';
+import { addressesWithValidators } from '../core/validation';
+import { createValidatorRegistry } from '../core/validator/registry';
+import { removeDraft } from '../form/drafts';
 import {
   type FieldErrors,
   type FormId,
+  formStatus,
   isEdited,
-  keepsValues,
   readFormStore,
+  readOpeningScope,
+  staleDraft,
+  syncDrafts,
   toDocument,
   toFormId,
   toFormValues,
+  useFormStatus,
   useFormStore,
 } from '../form/form-store';
+import { SELF_CONTAINED_VALIDATORS } from '../plugins/validators/core-validators.schema';
 import { createTinaStore } from '../store/create-store';
 import {
   FormScopeContext,
@@ -36,11 +50,7 @@ import {
   type TinaRuntime,
   TinaRuntimeContext,
 } from './context';
-import {
-  type FieldErrorEntry,
-  fieldErrorMessages,
-  toFieldErrorEntry,
-} from './field-errors';
+import { flattenFieldErrors, nestFieldErrors } from './field-errors';
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
@@ -89,10 +99,14 @@ export function TinaProvider({
     const boot = lifecycleTurn.then(async () => {
       validateCapabilityGraph(composedPlugins);
       const resolved = await resolveClientSegments(composedPlugins);
+      const screens = createScreenRegistry(resolved, composedPlugins);
       const runtime: BootedRuntime = {
         registry: createFieldRegistry(resolved),
+        validators: createValidatorRegistry(resolved),
+        hooks: createFormHookRegistry(resolved),
         store: createTinaStore(resolved),
-        screens: createScreenRegistry(resolved),
+        screens,
+        globalNav: createGlobalNav(resolved, composedPlugins, screens),
       };
       const destroyPlugins = await initializePlugins(composedPlugins);
       if (mounted) setBooted(runtime);
@@ -122,6 +136,8 @@ export function TinaProvider({
       });
     };
   }, [pluginsKey]);
+
+  useEffect(() => syncDrafts(), []);
 
   const runtime = useMemo(
     () => (booted ? { ...booted, schema: config.schema } : null),
@@ -156,41 +172,45 @@ export function FormProvider({
   if (!runtime) {
     throw new Error('FormProvider must be used within a TinaProvider');
   }
-  const { registry } = runtime;
+  const { registry, validators, hooks } = runtime;
+  const formHooks = useMemo(
+    () => resolveFormHooks(hooks, collection.hooks ?? []),
+    [hooks, collection]
+  );
 
   const formId = toFormId(path);
-  const transformContext = useMemo(() => ({ documentPath: path }), [path]);
+  const transformContext = useMemo(
+    () => ({ documentPath: path, registry }),
+    [path, registry]
+  );
   const ingested = useMemo(
-    () =>
-      ingestDocument(document, collection.fields, registry, transformContext),
-    [document, collection, registry, transformContext]
+    () => ingestDocument(document, collection.fields, transformContext),
+    [document, collection, transformContext]
   );
   const equal = useMemo(
-    () => fieldEqualityFor(collection.fields, registry, transformContext),
-    [collection, registry, transformContext]
+    () => fieldEqualityFor(collection.fields, transformContext),
+    [collection, transformContext]
   );
   // What a fresh form instance adopts from the store. It samples the store one time,
   // because RHF replaces its full error state each time the `errors` option changes
   // identity — a rebuild on each document would overwrite the live errors of the user.
   const kept = useMemo(() => {
-    const scope = readFormStore().forms[formId];
-    if (!keepsValues(scope, toFormValues(ingested)))
-      return { seed: null, errors: {} };
-    const errors: Record<string, FieldErrorEntry> = {};
-    for (const [address, messages] of Object.entries(scope.errors)) {
-      if (messages?.length) errors[address] = toFieldErrorEntry(messages);
-    }
-    return { seed: toDocument(scope.values), errors };
+    const scope = readOpeningScope(formId, toFormValues(ingested), equal);
+    if (!scope) return { seed: null, errors: {} };
+    return {
+      seed: toDocument(scope.values),
+      errors: nestFieldErrors(scope.errors),
+    };
   }, [formId]);
   // Whether the scope still keeps its values against the document of this render. A
   // clean scope stops keeping them when another writer changes the file, so the test
   // must follow the document, not only the form id.
   const keepsIncoming = useMemo(
-    () => keepsValues(readFormStore().forms[formId], toFormValues(ingested)),
-    [formId, ingested]
+    () => readOpeningScope(formId, toFormValues(ingested), equal) !== undefined,
+    [formId, ingested, equal]
   );
   const seedValues = keepsIncoming ? (kept.seed ?? ingested) : ingested;
-  const resolver = buildFormResolver(collection, registry);
+  const resolver = buildFormResolver(collection, registry, validators);
   const methods = useForm<TinaDocument>({
     defaultValues: seedValues,
     errors: kept.errors,
@@ -208,9 +228,7 @@ export function FormProvider({
 
   const seededSignature = useRef<string | null>(null);
   useEffect(() => {
-    useFormStore
-      .getState()
-      .registerForm(formId, toFormValues(seedValues), equal);
+    useFormStore.getState().registerForm(formId, toFormValues(ingested), equal);
     const signature = JSON.stringify([formId, seedValues]);
     if (seededSignature.current === null) {
       seededSignature.current = signature;
@@ -221,7 +239,7 @@ export function FormProvider({
       methods.reset(seedValues, { keepErrors: seedValues === kept.seed });
       advanceSeedKey(formId);
     }
-  }, [formId, seedValues, kept, methods, equal, advanceSeedKey]);
+  }, [formId, ingested, seedValues, kept, methods, equal, advanceSeedKey]);
 
   const discardEdits = useCallback(() => {
     const store = readFormStore();
@@ -233,26 +251,82 @@ export function FormProvider({
     advanceSeedKey(formId);
   }, [formId, methods, advanceSeedKey]);
 
+  const [draftRevision, setDraftRevision] = useState(0);
+  const status = useFormStatus(formId);
+  const stale = useMemo(
+    () => staleDraft(formId, toFormValues(ingested), equal),
+    [formId, ingested, equal, draftRevision, status]
+  );
+  const staleDraftActions = useMemo(() => {
+    if (!stale) return null;
+    return {
+      resume: () => {
+        const store = readFormStore();
+        store.resumeDraft(formId, {
+          values: toFormValues(stale.values),
+          baseline: toFormValues(stale.baseline),
+        });
+        const resumed = readFormStore().forms[formId];
+        if (formStatus(resumed) !== 'dirty') removeDraft(formId);
+        methods.reset(toDocument(resumed?.values ?? {}));
+        advanceSeedKey(formId);
+        setDraftRevision((revision) => revision + 1);
+      },
+      discard: () => {
+        removeDraft(formId);
+        setDraftRevision((revision) => revision + 1);
+      },
+    };
+  }, [stale, formId, methods, advanceSeedKey]);
+
   useEffect(() => {
     const unsubscribe = methods.subscribe({
       formState: { values: true, errors: true },
       callback: ({ values, errors, name }) => {
         const store = useFormStore.getState();
         if (name !== undefined) {
-          store.setFieldValue(formId, toFieldAddress(name), values[name]);
+          // The store's live-values mirror is flat, one entry per top-level
+          // field. A nested field name collapses to its top-level address.
+          const topLevel = name.split('.')[0];
+          store.setFieldValue(
+            formId,
+            toFieldAddress(topLevel),
+            values[topLevel]
+          );
         }
+        const flat = flattenFieldErrors(errors ?? {});
         const mirrored: FieldErrors = {};
-        for (const [field, entry] of Object.entries(
-          (errors ?? {}) as Record<string, FieldErrorEntry | undefined>
-        )) {
-          const messages = fieldErrorMessages(entry);
-          if (messages.length > 0) mirrored[toFieldAddress(field)] = messages;
+        for (const [address, messages] of Object.entries(flat)) {
+          mirrored[toFieldAddress(address)] = messages;
         }
         store.setFieldErrors(formId, mirrored);
       },
     });
     return () => unsubscribe();
   }, [formId, methods]);
+
+  // react-hook-form applies the resolver's result to the changed field only,
+  // so a field-level rule that reads a sibling would keep a stale error after
+  // the sibling changes. Re-validate the fields that carry validators, and
+  // only those, so an untouched `required` field stays quiet. `watch` fires on
+  // value changes alone, not on the state `trigger` emits, so this cannot loop.
+  useEffect(() => {
+    const { unsubscribe } = methods.watch((values, { name }) => {
+      if (name === undefined) return;
+      runOnChange(
+        formHooks,
+        { address: toFieldAddress(name), value: get(values, name) },
+        { formId, path, collection }
+      );
+      const dependents = addressesWithValidators(
+        collection.fields,
+        values,
+        SELF_CONTAINED_VALIDATORS
+      );
+      if (dependents.length > 0) void methods.trigger(dependents);
+    });
+    return () => unsubscribe();
+  }, [methods, collection, formHooks, formId, path]);
 
   const formScope = useMemo(
     () => ({
@@ -262,8 +336,19 @@ export function FormProvider({
       onSave: onSave ?? null,
       seedKey,
       discardEdits,
+      hooks: formHooks,
+      staleDraft: staleDraftActions,
     }),
-    [formId, path, collection, onSave, seedKey, discardEdits]
+    [
+      formId,
+      path,
+      collection,
+      onSave,
+      seedKey,
+      discardEdits,
+      formHooks,
+      staleDraftActions,
+    ]
   );
 
   return (

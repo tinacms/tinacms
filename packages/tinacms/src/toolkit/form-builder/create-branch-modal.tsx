@@ -3,6 +3,10 @@ import { Form } from '@toolkit/forms';
 import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
 import { Button, DropdownButton } from '@toolkit/styles';
 import {
+  formatDefaultBranchName,
+  normalizeBranchName,
+} from '@utils/branch-name';
+import {
   CircleAlert,
   Eye,
   FileText,
@@ -21,42 +25,20 @@ import {
   ModalHeader,
   PopupModal,
 } from '../react-modals';
+import { EditorialWorkflowErrorBox } from './editorial-workflow-error-box';
 import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
-import { checkBranchGuard } from './editorial-workflow-utils';
+import {
+  type EditorialWorkflowErrorCopy,
+  type EditorialWorkflowErrorLink,
+  type EditorialWorkflowMessagePart,
+  checkBranchGuard,
+} from './editorial-workflow-utils';
 import {
   SAVE_CHOICE_KEY,
   type SaveChoice,
   resolveSaveOptions,
 } from './save-options';
 import { useEditorialWorkflow } from './use-editorial-workflow';
-
-// Format the default branch name by removing content/ prefix and file extension
-const formatDefaultBranchName = (
-  filePath: string,
-  crudType: string
-): string => {
-  let result = filePath;
-
-  const contentPrefix = 'content/';
-  // Remove "content/" prefix if present
-  if (result.startsWith(contentPrefix)) {
-    result = result.substring(contentPrefix.length);
-  }
-
-  // Remove file extension
-  const lastDot = result.lastIndexOf('.');
-  const lastSlash = Math.max(result.lastIndexOf('/'), result.lastIndexOf('\\'));
-  if (lastDot > lastSlash && lastDot > 0) {
-    result = result.slice(0, lastDot);
-  }
-
-  // Add deletion indicator for delete operations
-  if (crudType === 'delete') {
-    result = `❌-${result}`;
-  }
-
-  return result;
-};
 
 export const CreateBranchModal = ({
   close,
@@ -82,11 +64,12 @@ export const CreateBranchModal = ({
   );
   const [isBranchGuardChecking, setIsBranchGuardChecking] =
     React.useState(false);
+  const normalizedBranchName = normalizeBranchName(newBranchName);
   const branchGuardAbortRef = React.useRef<AbortController | null>(null);
 
   const {
     isExecuting,
-    errorMessage,
+    error,
     currentStep,
     elapsedTime,
     executeWorkflow,
@@ -112,7 +95,7 @@ export const CreateBranchModal = ({
     setIsBranchGuardChecking(true);
 
     const baseBranch = decodeURIComponent(tinaApi.branch);
-    const targetBranch = `tina/${newBranchName}`;
+    const targetBranch = `tina/${normalizedBranchName}`;
 
     const { baseBranchExists, targetBranchExists } = await checkBranchGuard(
       tinaApi,
@@ -182,8 +165,8 @@ export const CreateBranchModal = ({
         abortBranchGuard();
         close();
       }}
-      errorMessage={errorMessage}
-      disabled={newBranchName === '' || isBranchGuardChecking}
+      error={error}
+      disabled={normalizedBranchName === '' || isBranchGuardChecking}
       onBranchNameChange={(value) => {
         abortBranchGuard();
         reset();
@@ -201,21 +184,73 @@ export const CreateBranchModal = ({
   );
 };
 
+const getInitials = (name: string) => {
+  const atIndex = name.indexOf('@');
+  const localPart = atIndex === -1 ? name : name.slice(0, atIndex);
+  return localPart
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => [...part][0].toUpperCase())
+    .join('');
+};
+
+const CommittingAs = () => {
+  const cms = useCMS();
+  const user = cms.api?.tina?.user;
+  const author = typeof user === 'object' && user !== null ? user : undefined;
+  const mode = author?.gitAuthoring?.mode;
+
+  if (mode !== 'bot' && mode !== 'user') {
+    return null;
+  }
+
+  const authorName =
+    mode === 'bot' ? 'TinaCloud bot' : author.fullName || author.email;
+
+  if (!authorName) {
+    return null;
+  }
+
+  return (
+    <div className='flex items-center gap-3 mt-4 pt-4 border-t border-gray-100'>
+      <span className='flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-600 text-xs font-medium flex-shrink-0'>
+        {getInitials(authorName)}
+      </span>
+      <div className='flex-1 min-w-0'>
+        <p className='text-xs text-gray-500'>Committing as</p>
+        <p className='text-sm text-gray-700 font-medium truncate'>
+          {authorName}
+        </p>
+      </div>
+      <a
+        className='text-sm underline text-tina-orange-dark font-medium flex-shrink-0'
+        href={cms.api.tina.gitSettingsLink}
+        target='_blank'
+        rel='noreferrer'
+      >
+        Change
+      </a>
+    </div>
+  );
+};
+
 export const CreateBranchPromptModal = ({
   branchName,
   close,
   disabled,
-  errorMessage,
+  error,
   onBranchNameChange,
   onCreateBranch,
   onSaveToProtectedBranch,
   showSaveOptions = false,
   disablePublish = false,
+  allowSaveToProtectedBranch = true,
 }: {
   branchName: string;
   close: () => void;
   disabled?: boolean;
-  errorMessage?: string;
+  error?: EditorialWorkflowErrorCopy;
   onBranchNameChange: (value: string) => void;
   onCreateBranch: (isDraft: boolean) => void;
   onSaveToProtectedBranch: () => void;
@@ -224,6 +259,8 @@ export const CreateBranchPromptModal = ({
   showSaveOptions?: boolean;
   // Disable "Save and publish" (direct commit) on protected branches, w/ tooltip.
   disablePublish?: boolean;
+  // Drop "Save to Protected Branch" when the direct write it performs cannot succeed.
+  allowSaveToProtectedBranch?: boolean;
 }) => {
   // Remember the editor's last save choice; the main button reflects it
   // (default "Save draft"), the caret menu offers the others.
@@ -276,14 +313,7 @@ export const CreateBranchPromptModal = ({
         </ModalHeader>
         <ModalBody padded={true}>
           <div className='max-w-sm'>
-            {errorMessage && (
-              <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
-                <CircleAlert className='w-5 h-auto text-red-400 flex-shrink-0' />
-                <span className='text-sm'>
-                  <b>Error:</b> {errorMessage}
-                </span>
-              </div>
-            )}
+            {error && <EditorialWorkflowErrorBox error={error} />}
             <p className='text-lg text-gray-700 font-bold mb-2'>
               First, let's create a copy
             </p>
@@ -311,6 +341,7 @@ export const CreateBranchPromptModal = ({
                 onBranchNameChange(e.target.value);
               }}
             />
+            <CommittingAs />
           </div>
         </ModalBody>
         <ModalActions align='end'>
@@ -346,7 +377,7 @@ export const CreateBranchPromptModal = ({
               <MainIcon className='w-4 h-4 mr-1' style={{ fill: 'none' }} />
               {mainChoice.label}
             </DropdownButton>
-          ) : (
+          ) : allowSaveToProtectedBranch ? (
             <DropdownButton
               variant='primary'
               align='start'
@@ -367,6 +398,20 @@ export const CreateBranchPromptModal = ({
               />
               Save to a new branch
             </DropdownButton>
+          ) : (
+            // A plain button: the dropdown's only item is the one being dropped.
+            <Button
+              variant='primary'
+              className='w-full sm:w-auto'
+              disabled={disabled}
+              onClick={() => onCreateBranch(false)}
+            >
+              <GitBranchIcon
+                className='w-4 h-4 mr-1'
+                style={{ fill: 'none' }}
+              />
+              Save to a new branch
+            </Button>
           )}
         </ModalActions>
       </PopupModal>

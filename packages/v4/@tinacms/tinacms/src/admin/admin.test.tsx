@@ -8,8 +8,11 @@ import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
 import { useFormId } from '../editor/hooks';
+import { draftKey, readDraft } from '../form/drafts';
 import { useFormStore } from '../form/form-store';
+import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 import { useAdminRoute } from './use-admin-route';
 
@@ -84,17 +87,55 @@ function MediaScreen({ segments }: AdminScreenProps) {
   );
 }
 
+const NavIcon = () => null;
+const navAction = vi.fn();
+
 const screenPlugin = definePlugin({
   name: 'test:media-screen',
   client: async () => ({
     default: {
-      screens: [{ name: 'media', label: 'Media', component: MediaScreen }],
+      screens: [
+        { name: 'media', label: 'Media', component: MediaScreen },
+        { name: 'unlinked', label: 'Unlinked', component: MediaScreen },
+      ],
+      slots: {
+        globalNav: [
+          {
+            label: 'Docs',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://tina.io/docs' },
+            order: 10,
+          },
+          {
+            label: 'Media',
+            icon: NavIcon,
+            target: { kind: 'screen', screen: 'media' },
+          },
+          {
+            label: 'Switch branch',
+            icon: NavIcon,
+            target: { kind: 'action', run: navAction },
+            order: 5,
+          },
+          {
+            label: 'Search',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://example.com' },
+            dependsOn: ['search'],
+          },
+        ],
+      },
     },
   }),
 });
 
 const config = asResolvedConfig({
-  plugins: [contentPlugin, screenPlugin, stringFieldPlugin],
+  plugins: [
+    contentPlugin,
+    screenPlugin,
+    stringFieldPlugin,
+    coreValidatorsPlugin,
+  ],
   schema: {
     collections: [
       {
@@ -102,7 +143,14 @@ const config = asResolvedConfig({
         label: 'Posts',
         path: 'content/posts',
         format: 'mdx',
-        fields: [{ name: 'title', label: 'Title', type: 'string' }],
+        fields: [
+          {
+            name: 'title',
+            label: 'Title',
+            type: 'string',
+            validators: [required()],
+          },
+        ],
       },
       {
         name: 'page',
@@ -194,6 +242,31 @@ describe('TinaAdmin', () => {
       expect(screen.getByRole('status')).toHaveTextContent('Saved')
     );
     expect(input).toHaveValue('Hello!');
+  });
+
+  it('disables Save while the document has a validation error', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    const input = await screen.findByLabelText('Title');
+
+    await user.clear(input);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Title is required'
+    );
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+
+    await user.type(input, 'Hello again');
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
+        'aria-disabled',
+        'false'
+      )
+    );
   });
 
   it('opens the document a deep link names', async () => {
@@ -437,17 +510,43 @@ describe('TinaAdmin content reads', () => {
   });
 });
 
-describe('TinaAdmin screens', () => {
-  it('lists the screens a plugin registered', async () => {
+describe('TinaAdmin global nav', () => {
+  it('lists the entries plugins contribute, in order, skipping unmet dependencies', async () => {
     renderAdmin();
-    const menu = await screen.findByRole('list', { name: 'Screens' });
+    const menu = await screen.findByRole('list', { name: 'Global navigation' });
     expect(
       within(menu)
-        .getAllByRole('button')
-        .map((button) => button.textContent)
-    ).toEqual(['Media']);
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['Media', 'Switch branch', 'Docs']);
   });
 
+  it('does not link a screen that no entry targets', async () => {
+    renderAdmin();
+    const menu = await screen.findByRole('list', { name: 'Global navigation' });
+    expect(within(menu).queryByText('Unlinked')).not.toBeInTheDocument();
+  });
+
+  it('opens a url entry in a new tab', async () => {
+    renderAdmin();
+    const link = await screen.findByRole('link', { name: 'Docs' });
+    expect(link).toHaveAttribute('href', 'https://tina.io/docs');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('runs an action entry', async () => {
+    const user = userEvent.setup();
+    navAction.mockClear();
+    renderAdmin();
+    await user.click(
+      await screen.findByRole('button', { name: 'Switch branch' })
+    );
+    expect(navAction).toHaveBeenCalledOnce();
+  });
+});
+
+describe('TinaAdmin screens', () => {
   it('opens a screen and writes a shareable hash', async () => {
     const user = userEvent.setup();
     renderAdmin();
@@ -481,6 +580,40 @@ describe('TinaAdmin screens', () => {
     await waitFor(() =>
       expect(window.location.hash).toBe('#/screens/media/photos')
     );
+  });
+
+  it('renders a replacement screen at the replaced name', async () => {
+    window.location.hash = '#/screens/media';
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          plugins: [
+            ...config.plugins,
+            definePlugin({
+              name: 'test:media-v2',
+              provides: ['screen'],
+              overrides: [{ capability: 'screen', key: 'media' }],
+              client: async () => ({
+                default: {
+                  screens: [
+                    {
+                      name: 'media',
+                      label: 'Media',
+                      component: () => <p>replacement media</p>,
+                    },
+                  ],
+                },
+              }),
+            }),
+          ],
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    expect(await screen.findByText('replacement media')).toBeInTheDocument();
   });
 
   it('reports a screen no plugin registered', async () => {
@@ -535,5 +668,54 @@ describe('TinaAdmin form continuity', () => {
     await screen.findByLabelText('Title');
 
     expect(screen.getByRole('list', { name: 'Posts documents' })).toBe(before);
+  });
+});
+
+describe('TinaAdmin stale drafts', () => {
+  const storeStaleDraft = () =>
+    localStorage.setItem(
+      draftKey('content/posts/hello.mdx'),
+      JSON.stringify({
+        version: 1,
+        values: { title: 'Mine' },
+        baseline: { title: 'Old' },
+      })
+    );
+
+  const openHello = async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    return user;
+  };
+
+  it('asks to resume or discard before the form can be edited', async () => {
+    storeStaleDraft();
+    const user = await openHello();
+    const dialog = await screen.findByRole('alertdialog', {
+      name: 'Resume your unsaved edits?',
+    });
+
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Resume edits' })
+    );
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
+      'Mine'
+    );
+  });
+
+  it('discards the stale draft from the dialog', async () => {
+    storeStaleDraft();
+    const user = await openHello();
+    const dialog = await screen.findByRole('alertdialog');
+
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Discard draft' })
+    );
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(screen.getByLabelText('Title')).toHaveValue('Hello');
+    expect(readDraft('content/posts/hello.mdx')).toBeUndefined();
   });
 });

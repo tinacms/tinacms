@@ -37,12 +37,14 @@ export const BlockSelectorBig = ({
   templates,
   addItem,
   label,
+  fieldName,
 }: {
   templates: {
     [key: string]: BlockTemplate;
   };
   addItem: any;
   label: string | boolean;
+  fieldName?: string;
 }) => {
   const FormPortal = useFormPortal();
   const [pickerIsOpen, setPickerIsOpen] = React.useState(false);
@@ -102,6 +104,7 @@ export const BlockSelectorBig = ({
   return (
     <>
       <IconButton
+        data-test={fieldName ? `add-item-${fieldName}` : undefined}
         variant={pickerIsOpen ? 'secondary' : 'primary'}
         size='small'
         className={`${pickerIsOpen ? 'rotate-45 pointer-events-none' : ''}`}

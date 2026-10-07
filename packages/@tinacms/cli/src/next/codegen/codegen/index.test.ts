@@ -1,15 +1,16 @@
 import { buildSchema } from 'graphql';
 import { generateTypes } from './index';
 
-// Mirrors the shape @tinacms/graphql emits: rich-text fields are typed with the
-// generic JSON scalar, the same one `_values` uses.
+// Mirrors the shape @tinacms/graphql emits: rich-text fields get their own
+// RichText scalar, while `_values` still rides on the generic JSON scalar.
 const schema = buildSchema(`
   scalar JSON
   scalar Reference
+  scalar RichText
 
   type Post {
     title: String!
-    _body: JSON
+    _body: RichText
     _values: JSON!
   }
 
@@ -32,15 +33,23 @@ describe('generateTypes', () => {
     );
   });
 
-  it('types the JSON scalar as `any`', () => {
-    // Rich-text bodies ride on JSON and get passed straight to <TinaMarkdown/>,
-    // which takes TinaMarkdownContent. `unknown` — graphql-codegen's default for
-    // unmapped scalars — does not assign to that, so every consumer would break.
+  it('types rich-text as TinaMarkdownContent, not an opaque blob', () => {
+    expect(types).toContain(
+      'RichText: { input: TinaMarkdownContent; output: TinaMarkdownContent; }'
+    );
+    expect(types).toContain(
+      "import type { TinaMarkdownContent } from 'tinacms/dist/rich-text';"
+    );
+  });
+
+  it('leaves the JSON scalar as `any` — `_values` consumers still index it freely', () => {
+    // graphql-codegen defaults unmapped scalars to `unknown`, which does not
+    // assign to `any` and would break every `_values` consumer.
     expect(types).toContain('JSON: { input: any; output: any; }');
     expect(types).not.toMatch(/JSON: \{ input: unknown/);
   });
 
-  it('types the Reference scalar as `any`', () => {
+  it('leaves the Reference scalar as `any`', () => {
     expect(types).toContain('Reference: { input: any; output: any; }');
   });
 

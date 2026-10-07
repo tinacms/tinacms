@@ -54,10 +54,10 @@ tests/                 # Build verification tests
 ## Coding Standards
 
 - **Comments are a last resort.** Write code that explains itself; comment only what the code cannot say (a non-obvious invariant, a documented workaround). No narrated comments, no restating what the next line does, no essay-length headers riding on a few lines of code.
-- **Error narrowing is an `if`, not an expression.** Use `if (err instanceof Error) { … } else { … }` — never `(err instanceof Error && err.message) || fallback` or a ternary that smuggles narrowing into an expression.
-- **Linting/Formatting:** Biome (`biome.json` at root). Example apps extend with `"extends": ["../../../biome.json"]`
+- **Error narrowing is an `if`, not an expression.** Use `if (err instanceof Error) { … } else { … }` — never `(err instanceof Error && err.message) || fallback` or a ternary that smuggles narrowing into an expression. Lint enforces this in `packages/v4` only.
+- **Linting/Formatting:** Biome (`biome.json` at root). Example apps extend it with `"root": false, "extends": "//"` so the root plugin paths resolve.
 - **TypeScript:** Base config at `base.tsconfig.json`. Examples extend it. Strict mode enabled.
-- **Package manager:** pnpm only. Never use npm or yarn.
+- **Package manager:** pnpm only. Never use npm or yarn. One deliberate exception: the size-baseline harness (`scripts/size-baseline.mjs` + `tests/size-fixture/`) shells out to real `npm`, because npm's nested-duplicate hoisting is exactly the regression it measures — pnpm's content-addressed store would hide it.
 - **`CLAUDE.md` files** are git symlinks to the sibling `AGENTS.md`. On Windows without Developer Mode, if `git status` shows `TT` typechanges on them, run `git config --local core.symlinks false` — git then materialises them as regular pointer files. Linux/macOS clones get real symlinks automatically.
 
 ## Kitchen-Sink Examples
@@ -118,41 +118,11 @@ The non-default-setup detail in `### Your environment` is the field that most of
 
 ## Issue Triage & Labels
 
-This repo uses a fixed label taxonomy for backlog organisation. When filing or triaging issues, apply exactly **one primary category label** plus any program/scope labels that apply.
-
-### Primary category labels
-
-Pick the most specific that fits:
-
-| Label | Use for |
-|---|---|
-| `bug` | Broken behavior, error, crash, wrong output |
-| `enhancement` | Feature request, new capability |
-| `security` | Vulnerabilities, code-scanning alerts (file privately first per SECURITY.md) |
-| `documentation` | Docs, READMEs, guides |
-| `technical-debt` | Refactor, dead code, architectural cleanup |
-| `chore` | Dep bumps, config, build, CI, scaffolding |
-| `tests` | Adding or expanding test coverage |
-| `perf` | Slow, scale, throughput, memory |
-| `dx` | Developer-facing CLI / errors / logging |
-| `ux` | Visual, UX, layout, copy, animation |
-| `rich-text` | Plate, MDX, markdown rendering, body field, embed templates |
-| `form-system` | Form fields, validation, dirty state, field plugins |
-| `media` | Media library, upload, browse |
-| `starter-template` | create-tina-app, Astro/Next/Hugo starters |
-| `self-hosted` | Self-hosted setup, externalization, database, sqlite-level |
-| `editorial-workflow` | Branches, PRs, protected-branch flow |
-
-### Program / scope labels (apply alongside primary)
-
-- `v4` — part of the v4 architectural rewrite (epics #6830–#6837)
-- `For 4.1` — scheduled for the 4.1 release window
-- `Pre 4.0` — must land before v4 ships
-- `onboarding` — small, well-scoped task suitable for developers new to the project
-- `🤖AI` — could be implemented end-to-end by an AI agent in a single prompt
+This repo uses a fixed label taxonomy for backlog organisation, defined in [`.github/issue-labels.json`](.github/issue-labels.json). Read it before filing or triaging issues. Apply exactly **one** label from `primary` (the most specific that fits), plus any `program` or `scope` labels that apply.
 
 ### Triage rules
 
+- **New issues are auto-classified.** `.github/workflows/classify-issue.yml` asks Jev for the primary category (and `onboarding`/`🤖AI`) using the same JSON file, so editing it updates both.
 - **Taxonomy is fixed.** Don't invent new category labels. If nothing fits, leave the label off and surface the issue for human triage.
 - **Don't apply `onboarding` or `🤖AI` to v4-program issues** — those are intentionally coordinated work.
 - **Closing an issue:** always link evidence (PR number, comment URL, "fixed in version X.Y") in the closing comment. If the issue is a meta-tracker blocked on a parent epic, leave a "Triage note — do not close" comment instead.
@@ -162,4 +132,4 @@ Pick the most specific that fits:
 
 - Onboarding: <https://github.com/tinacms/tinacms/labels/onboarding>
 - AI-doable (one prompt): <https://github.com/tinacms/tinacms/labels/%F0%9F%A4%96AI>
-- v4 program: <https://github.com/tinacms/tinacms/labels/v4> · <https://github.com/tinacms/tinacms/labels/For%204.1> · <https://github.com/tinacms/tinacms/labels/Pre%204.0>
+- v4 program: <https://github.com/tinacms/tinacms/labels/v4.0> · <https://github.com/tinacms/tinacms/labels/For%204.1>

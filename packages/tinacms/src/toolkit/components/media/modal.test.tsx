@@ -22,15 +22,8 @@ const renderModal = (
     renameFunc,
     close,
     input: () => screen.getByPlaceholderText('File name') as HTMLInputElement,
-    // `Button` renders `disabled` as pointer-events-none styling rather than
-    // the DOM attribute, so "is it disabled" is asserted through the class and
-    // through the handler refusing to run.
     submit: () => screen.getByText('Rename').closest('button'),
-    submitBlocked: () =>
-      screen
-        .getByText('Rename')
-        .closest('button')
-        .className.includes('pointer-events-none'),
+    submitBlocked: () => screen.getByText('Rename').closest('button').disabled,
   };
 };
 
@@ -138,6 +131,20 @@ describe('RenameModal', () => {
     await screen.findByRole('alert');
     expect(screen.getByRole('alert').textContent).toContain('no longer exists');
     expect(close).not.toHaveBeenCalled();
+  });
+
+  it('closes without an error when the editor cancels the branch prompt', async () => {
+    const cancelled = Object.assign(new Error('Media rename cancelled.'), {
+      ERR_TYPE: 'MediaRenameCancelled',
+    });
+    const renameFunc = vi.fn().mockRejectedValue(cancelled);
+    const { input, submit, close } = renderModal({ renameFunc });
+
+    fireEvent.change(input(), { target: { value: 'renamed' } });
+    fireEvent.click(submit());
+
+    await waitFor(() => expect(close).toHaveBeenCalled());
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 
   it('disables the inputs while the rename is in flight', async () => {
