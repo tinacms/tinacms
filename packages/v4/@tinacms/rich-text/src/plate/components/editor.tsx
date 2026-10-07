@@ -26,7 +26,7 @@ const editorContainerVariants = cva(
         default: 'h-full',
         demo: 'h-[650px]',
         select: cn(
-          'group rounded-md border border-input ring-offset-background focus-within:focus-ring',
+          'group rounded-md border border-input focus-within:focus-ring',
           'has-data-readonly:w-fit has-data-readonly:cursor-default has-data-readonly:border-transparent has-data-readonly:focus-within:[box-shadow:none]'
         ),
       },
@@ -58,7 +58,7 @@ const editorVariants = cva(
   cn(
     'group/editor',
     'relative w-full cursor-text overflow-x-hidden overflow-y-auto break-words whitespace-pre-wrap select-text',
-    'rounded-md ring-offset-background focus-visible:outline-none',
+    'rounded-md focus-visible:outline-none',
     'placeholder:text-muted-foreground/80 **:data-slate-placeholder:top-[auto_!important] **:data-slate-placeholder:text-muted-foreground/80 **:data-slate-placeholder:opacity-100!',
     '[&_strong]:font-bold'
   ),

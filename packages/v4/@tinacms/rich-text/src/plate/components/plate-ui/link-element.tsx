@@ -35,9 +35,8 @@ export function LinkElement(props: PlateElementProps<TLinkElement>) {
       className='font-small underline underline-offset-2 text-primary hover:text-primary-hover transition-color ease-out duration-150'
       attributes={{
         ...props.attributes,
-        href: linkProps.href,
-        target: linkProps.target,
-        onMouseOver: linkProps.onMouseOver,
+        ...linkProps,
+        dir: linkProps.dir === 'rtl' ? 'rtl' : undefined,
       }}
     >
       {props.children}

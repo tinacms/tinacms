@@ -125,7 +125,7 @@ export function LinkFloatingToolbar({
       {!isValidUrl && currentUrl && (
         <div className='absolute -top-16 left-0 right-0 z-[1000000] mb-2'>
           <div
-            className='bg-status-failed-subtle border border-red-200 rounded-md p-2 shadow-lg'
+            className='bg-status-failed-subtle border border-status-failed-border rounded-md p-2 shadow-lg'
             role='alert'
             aria-live='polite'
           >
@@ -136,7 +136,7 @@ export function LinkFloatingToolbar({
                 path like /about
               </span>
             </div>
-            <div className='absolute -bottom-1 left-4 w-2 h-2 bg-status-failed-subtle border-r border-b border-red-200 transform rotate-45'></div>
+            <div className='absolute -bottom-1 left-4 w-2 h-2 bg-status-failed-subtle border-r border-b border-status-failed-border transform rotate-45'></div>
           </div>
         </div>
       )}

@@ -5,7 +5,7 @@ import { cn, withRef } from '@udecode/cn';
 import { type VariantProps, cva } from 'class-variance-authority';
 
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:focus-ring disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center whitespace-nowrap rounded text-sm font-medium transition-colors focus-visible:outline-none focus-visible:focus-ring disabled:pointer-events-none disabled:opacity-50',
   {
     defaultVariants: {
       size: 'default',

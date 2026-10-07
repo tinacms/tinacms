@@ -19,7 +19,13 @@ import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { NestedForm } from '../../nested-form';
 import { classNames } from '../ui/helpers';
 
-const Wrapper = ({ inline, children }) => {
+const Wrapper = ({
+  inline,
+  children,
+}: {
+  inline: boolean;
+  children: React.ReactNode;
+}) => {
   const Component = inline ? 'span' : 'div';
   return (
     <Component
@@ -102,7 +108,7 @@ export const InlineEmbed = ({
           ) : null}
           <span
             style={{ fontWeight: 'inherit', maxWidth: '275px' }}
-            className='truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l border border-border bg-card hover:bg-slate-50 focus:z-10 focus:focus-ring'
+            className='truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l border border-border bg-card hover:bg-accent focus:z-10 focus:focus-ring'
             onMouseDown={handleSelect}
           >
             {label}
@@ -164,7 +170,7 @@ export const BlockEmbed = ({
           ) : null}
           <span
             onMouseDown={handleSelect}
-            className='truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l border border-border bg-card text-sm font-medium text-foreground hover:bg-slate-50 focus:focus-ring'
+            className='truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l border border-border bg-card text-sm font-medium text-foreground hover:bg-accent focus:focus-ring'
           >
             {label}
           </span>
@@ -227,7 +233,7 @@ const DotMenu = ({
     <Popover as='span' className='-ml-px relative block'>
       <PopoverButton
         as='span'
-        className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-border bg-card text-muted-foreground hover:bg-slate-50 focus:focus-ring'
+        className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground focus:focus-ring'
       >
         <EllipsisIcon title='Open options' />
       </PopoverButton>

@@ -2,6 +2,7 @@ import { PlateElementProps, createPlatePlugin } from '@udecode/plate/react';
 import React from 'react';
 import {
   INVALID_MARKDOWN_TYPE,
+  type InvalidMarkdownElement as InvalidMarkdownNode,
   buildErrorMessage,
 } from '../../../error-message';
 
@@ -24,7 +25,7 @@ function InvalidMarkdownElement({
   attributes,
   element,
   children,
-}: PlateElementProps) {
+}: PlateElementProps<InvalidMarkdownNode>) {
   return (
     <div {...attributes}>
       <ErrorMessage error={element} />
@@ -33,7 +34,7 @@ function InvalidMarkdownElement({
   );
 }
 
-function ErrorMessage({ error }) {
+function ErrorMessage({ error }: { error: InvalidMarkdownNode }) {
   const message = buildErrorMessage(error);
   return (
     <div
