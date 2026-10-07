@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { defineClientPlugin } from '../client';
@@ -95,6 +95,24 @@ describe('field-level validators in the editor', () => {
     const title = await screen.findByRole('textbox', { name: 'Title' });
     await userEvent.type(title, '!');
     await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+  });
+
+  it('shows a sibling rule message at its own field, not at the sibling', async () => {
+    renderForm({ title: 'Hello', slug: 'Hello' });
+    const title = await screen.findByRole('textbox', { name: 'Title' });
+    await userEvent.type(title, '!');
+    const slug = screen.getByRole('textbox', { name: 'Slug' });
+    const slugWrapper = slug.closest<HTMLElement>(
+      '[data-slot="field-wrapper"]'
+    );
+    const titleWrapper = title.closest<HTMLElement>(
+      '[data-slot="field-wrapper"]'
+    );
+    if (!slugWrapper || !titleWrapper) throw new Error('No field wrapper');
+    expect(await within(slugWrapper).findByRole('alert')).toHaveTextContent(
+      'Must equal title'
+    );
+    expect(within(titleWrapper).queryByRole('alert')).toBeNull();
   });
 
   it('gives a validator the sibling values of its field', async () => {
