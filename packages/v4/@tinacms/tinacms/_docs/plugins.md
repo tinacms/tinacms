@@ -51,6 +51,15 @@ operate at the same time, and one plugin can register many validators; the key
 is the validator's name. Many hook plugins can operate at the same time, and
 one plugin can register many hooks; the key is the hook's name.
 
+`auth`, `content`, `media` and `search` are singleton capabilities. One plugin
+provides each, and its store slice mounts at the capability key, for example
+`store.media`. One plugin can provide several singletons, such as
+`provides: ['auth', 'media']`. Its client segment then sets `slices`, keyed by
+capability, instead of `slice`, and its server segment routes under each
+capability, for example `auth/<op>` and `media/<op>`. Another plugin can
+replace one of those capabilities with `overrides`, and the rest stay with the
+first plugin.
+
 ## Validator plugins
 
 A validator plugin registers named, parameterised rules that a collection

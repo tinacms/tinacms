@@ -1,8 +1,10 @@
 # Media plugins
 
 A media plugin supplies the `media` capability. `media` is a singleton
-capability: a project installs one media plugin. A second media plugin throws
-an error at boot, unless it declares `overrides`. Refer to
+capability: a project installs one plugin that provides `media`. A second one
+throws an error at boot, unless it declares `overrides`. The plugin can provide
+other singleton capabilities too, with one slice for each in `slices`. Refer
+to [plugins.md](./plugins.md#capabilities). Refer to
 [ADR-022](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/022-media-capability-contract.md)
 for the decision.
 
