@@ -27,7 +27,6 @@
   --tina-blue-800: #144696;
   --tina-red-50: #fef2f2;
   --tina-red-700: #b91c1c;
-  --tina-red-800: #991b1b;
 }
 
 :root {
@@ -52,7 +51,6 @@
   --selected: var(--tina-orange-100);
   --selected-foreground: var(--tina-orange-700);
   --destructive: var(--tina-red-700);
-  --destructive-hover: var(--tina-red-800);
   --destructive-foreground: var(--tina-white);
   --border: var(--tina-slate-300);
   --border-subtle: var(--tina-slate-200);
@@ -122,6 +120,7 @@
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-heading:
     "IBM Plex Sans", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --spacing: 0.25rem;
   --radius-xs: 2px;
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -147,7 +146,6 @@
   --color-selected: var(--selected);
   --color-selected-foreground: var(--selected-foreground);
   --color-destructive: var(--destructive);
-  --color-destructive-hover: var(--destructive-hover);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-border-subtle: var(--border-subtle);
