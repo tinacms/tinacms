@@ -96,66 +96,131 @@ const hoistFromMarks = (node: Parent) => {
   node.children = mergeText(hoisted);
 };
 
+/** The character each mark's delimiters are written with; equal ones join into one run. */
+const MARKERS: Record<string, string> = {
+  strong: '*',
+  emphasis: '*',
+  delete: '~',
+};
+
+/** Tags, brackets, backticks and other markers: all punctuation to the flanking rules. */
+const NOT_TEXT = '<';
+
 const isPunctuation = (char: string | undefined) =>
   !!char && /[\p{P}\p{S}]/u.test(char);
 
 const isWordChar = (char: string | undefined) =>
   !!char && !/\s/u.test(char) && !isPunctuation(char);
 
-/** The first or last character written for `node`; delimiters and tags are punctuation. */
-const writtenEdge = (
-  node: Md.PhrasingContent | undefined,
-  edge: 'lead' | 'trail'
-) => {
-  if (node?.type !== 'text') {
-    return node ? '*' : undefined;
-  }
-  const chars = Array.from(node.value);
-  return edge === 'lead' ? chars.at(0) : chars.at(-1);
-};
-
-const characterReference = (char: string) =>
-  `&#x${char.codePointAt(0)?.toString(16).toUpperCase()};`;
+const edgeChild = (node: Parent, edge: 'lead' | 'trail') =>
+  edge === 'lead' ? node.children.at(0) : node.children.at(-1);
 
 /**
- * Writes the letter beside a mark as a character reference when the mark's
- * own edge is punctuation. Otherwise `*a.*b` can't close (and `x*.a*` can't
- * open), so the mark is lost on reload, or inside a JSX element the whole
- * document fails to parse. `*a.*&#x62;` reads back as the same text.
+ * The character written at one edge of `node`, looking through marks drawn
+ * with `marker` since their delimiters join the same run.
  */
-const encodeFlankingNeighbours = (node: Parent) => {
-  const encoded: Md.PhrasingContent[] = [];
-  node.children.forEach((child, index) => {
-    const previous = encoded.at(-1);
-    const next = node.children[index + 1];
-    const mark = MARKS.has(child.type) ? asParent(child) : null;
-    if (!mark) {
-      encoded.push(child);
-      return;
-    }
-    if (
-      previous?.type === 'text' &&
-      isWordChar(writtenEdge(previous, 'trail')) &&
-      isPunctuation(writtenEdge(mark.children.at(0), 'lead'))
-    ) {
-      const chars = Array.from(previous.value);
-      const last = chars.pop() ?? '';
-      previous.value = chars.join('');
-      encoded.push({ type: 'html', value: characterReference(last) });
-    }
-    encoded.push(child);
-    if (
-      next?.type === 'text' &&
-      isWordChar(writtenEdge(next, 'lead')) &&
-      isPunctuation(writtenEdge(mark.children.at(-1), 'trail'))
-    ) {
-      const [first = '', ...rest] = Array.from(next.value);
-      next.value = rest.join('');
-      encoded.push({ type: 'html', value: characterReference(first) });
-    }
-  });
-  node.children = encoded;
+const contentEdge = (
+  node: Md.PhrasingContent | undefined,
+  edge: 'lead' | 'trail',
+  marker?: string
+): string | undefined => {
+  if (!node) {
+    return undefined;
+  }
+  if (node.type === 'text') {
+    const chars = Array.from(node.value);
+    return edge === 'lead' ? chars.at(0) : chars.at(-1);
+  }
+  const parent = asParent(node);
+  if (parent && marker && MARKERS[node.type] === marker) {
+    return contentEdge(edgeChild(parent, edge), edge, marker);
+  }
+  return MARKERS[node.type] ?? NOT_TEXT;
 };
+
+const characterReference = (char: string): Md.HTML => ({
+  type: 'html',
+  value: `&#x${char.codePointAt(0)?.toString(16).toUpperCase()};`,
+});
+
+/** Rewrites the character `contentEdge` finds as a character reference. */
+const encodeEdge = (
+  node: Md.PhrasingContent,
+  edge: 'lead' | 'trail',
+  marker?: string
+): Md.PhrasingContent[] => {
+  if (node.type === 'text') {
+    const chars = Array.from(node.value);
+    const char = (edge === 'lead' ? chars.shift() : chars.pop()) ?? '';
+    const rest: Md.Text[] = chars.length
+      ? [{ type: 'text', value: chars.join('') }]
+      : [];
+    return edge === 'lead'
+      ? [characterReference(char), ...rest]
+      : [...rest, characterReference(char)];
+  }
+  const parent = asParent(node);
+  const child = parent && edgeChild(parent, edge);
+  if (parent && child && marker && MARKERS[node.type] === marker) {
+    const encoded = encodeEdge(child, edge, marker);
+    parent.children =
+      edge === 'lead'
+        ? [...encoded, ...parent.children.slice(1)]
+        : [...parent.children.slice(0, -1), ...encoded];
+  }
+  return [node];
+};
+
+/**
+ * A delimiter run only closes when it isn't sandwiched between punctuation
+ * before it and a letter after it, and only opens in the mirror case. Mark
+ * edges are often punctuation (`.`, or the `>` of a `<mark>`), so `*a.*b`,
+ * `x*.a*` and `*<mark>…</mark>***b**` would all lose a mark on reload, or
+ * inside a JSX element fail to parse. The offending letter is written as a
+ * character reference (`*a.*&#x62;`), which reads back as the same text.
+ */
+const encodeFlankingNeighbours = (node: Parent): boolean => {
+  let changed = false;
+  for (let index = 0; index < node.children.length - 1; index++) {
+    const left = node.children[index];
+    const right = node.children[index + 1];
+    if (!left || !right) {
+      continue;
+    }
+    const leftMarker = MARKERS[left.type];
+    const rightMarker = MARKERS[right.type];
+    if (!leftMarker && !rightMarker) {
+      continue;
+    }
+    const joined = leftMarker === rightMarker;
+    const before = contentEdge(left, 'trail', leftMarker);
+    const after = contentEdge(
+      right,
+      'lead',
+      joined || !leftMarker ? rightMarker : undefined
+    );
+    const closes = !!leftMarker;
+    const opens = !!rightMarker && (joined || !leftMarker);
+    if (closes && isPunctuation(before) && isWordChar(after)) {
+      node.children.splice(
+        index + 1,
+        1,
+        ...encodeEdge(right, 'lead', joined ? rightMarker : undefined)
+      );
+      changed = true;
+    } else if (opens && isWordChar(before) && isPunctuation(after)) {
+      node.children.splice(index, 1, ...encodeEdge(left, 'trail', leftMarker));
+      changed = true;
+    }
+  }
+  return changed;
+};
+
+const encodeTree = (node: Parent): boolean =>
+  node.children.reduce((changed, child) => {
+    const parent = asParent(child);
+    return (parent ? encodeTree(parent) : false) || changed;
+  }, false) || encodeFlankingNeighbours(node);
 
 /**
  * Marks created in the editor can hold leading or trailing whitespace — a word
@@ -174,8 +239,11 @@ export const normalizeMarkWhitespace = (tree: Md.Root): Md.Root => {
       }
     });
     hoistFromMarks(node);
-    encodeFlankingNeighbours(node);
   };
   visit(tree as unknown as Parent);
+  // An encoded letter can be the far edge of its mark, or sit inside a mark
+  // already checked, so repeat until stable. Each change turns a letter into
+  // punctuation, so this ends.
+  while (encodeTree(tree as unknown as Parent)) {}
   return tree;
 };
