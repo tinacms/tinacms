@@ -1,0 +1,11 @@
+import { definePlugin } from '../../../core/plugin';
+import { IMAGE_FIELD_TYPE } from './image-field.schema';
+
+export const imageFieldPlugin = definePlugin({
+  name: 'tina:field:image',
+  provides: ['field'],
+  field: { type: IMAGE_FIELD_TYPE, contractVersion: 1 },
+  client: () => import('./image-field.client'),
+});
+
+export default imageFieldPlugin;

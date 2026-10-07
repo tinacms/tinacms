@@ -4,8 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 // rich-text client, and paying its transform cost inside a test's async
 // timeout flakes on contended CI runners.
 import '../plugins/fields/rich-text/rich-text-field.client';
-import { asResolvedConfig } from '../config';
-import { defineConfig } from '../config';
+import { asResolvedConfig, defineConfig } from '../config';
 import { definePlugin } from '../core/plugin';
 import { useFieldRegistry, useTinaStore } from './hooks';
 import { TinaProvider } from './provider';
@@ -39,7 +38,7 @@ describe('TinaProvider boot', () => {
       </TinaProvider>
     );
     expect(await screen.findByTestId('field-types')).toHaveTextContent(
-      'array,boolean,datetime,number,object,reference,rich-text,select,string'
+      'array,boolean,datetime,image,number,object,reference,rich-text,select,string'
     );
     expect(screen.getByTestId('namespaces')).toHaveTextContent(
       'branch,documents,ui'
