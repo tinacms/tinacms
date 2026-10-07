@@ -7,19 +7,56 @@
  * markdown-parsing toolchain the rest of `@tinacms/mdx` bundles.
  */
 
-const SAFE_CSS_COLOR_PATTERNS = [
-  /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i,
-  /^[a-z]+$/i,
-  /^(?:rgba?|hsla?|oklch|oklab)\([0-9.,%/ a-z-]*\)$/i,
-  /^var\(--[a-z0-9_-]+\)$/i,
-];
+const COLOR_FUNCTIONS = new Set([
+  'rgb',
+  'rgba',
+  'hsl',
+  'hsla',
+  'hwb',
+  'lab',
+  'lch',
+  'oklab',
+  'oklch',
+  'color',
+  'color-mix',
+  'light-dark',
+  'calc',
+  'var',
+]);
+
+const isSafeColorFunction = (value: string) => {
+  if (!/^[a-z-]+\([a-z0-9_.,%/#() +-]*\)$/i.test(value)) {
+    return false;
+  }
+  let depth = 0;
+  for (const [token, name = ''] of value.matchAll(/([a-z-]*)\(|\)/gi)) {
+    if (token === ')') {
+      depth--;
+    } else if (COLOR_FUNCTIONS.has(name.toLowerCase())) {
+      depth++;
+    } else {
+      return false;
+    }
+    if (depth < 0) {
+      return false;
+    }
+  }
+  return depth === 0;
+};
 
 /**
  * Whether `value` is a plain CSS colour that's safe to drop into a `style`:
- * hex, a named colour, `rgb()`/`hsl()`/`oklch()`/`oklab()` (and alpha forms)
- * or `var(--name)`. Anything else — `;`, braces, quotes, `url(` — is rejected
- * so a colour can't smuggle in extra CSS. Used when parsing and rendering
- * rich-text text colour and highlight colour.
+ * hex, a named colour, or colour functions (`rgb()`, `hsl()`, `lab()`,
+ * `oklch()`, `color-mix()`, `var(--name, fallback)` and the like) nested only
+ * in each other. Anything else (`;`, braces, quotes, comments, `url(`) is
+ * rejected so a colour can't smuggle in extra CSS. Used when parsing and
+ * rendering rich-text text colour and highlight colour.
  */
-export const isSafeCssColor = (value: string): boolean =>
-  SAFE_CSS_COLOR_PATTERNS.some((pattern) => pattern.test(value));
+export const isSafeCssColor = (value: string): boolean => {
+  const color = value.trim().replace(/\s+!important$/i, '');
+  return (
+    /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(color) ||
+    /^[a-z]+$/i.test(color) ||
+    isSafeColorFunction(color)
+  );
+};

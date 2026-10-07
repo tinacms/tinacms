@@ -16,6 +16,16 @@ describe('isSafeCssColor', () => {
     'oklch(0.63 0.19 25)',
     'oklab(0.6 0.1 -0.05)',
     'var(--brand-red)',
+    'var(--brand_red, #fff)',
+    'lab(50% 40 59)',
+    'lch(52% 72 50)',
+    'hwb(12 50% 0%)',
+    'color(display-p3 1 0 0)',
+    'color-mix(in srgb, var(--brand, red) 50%, white)',
+    'rgb(from red r g calc(b + 20))',
+    'transparent',
+    'currentColor',
+    '#fff !important',
   ])('accepts %s', (value) => {
     expect(isSafeCssColor(value)).toBe(true);
   });
@@ -35,6 +45,12 @@ describe('isSafeCssColor', () => {
     '<red>',
     'expression(alert(1))',
     'dark red',
+    'rgb(url(https://evil/x))',
+    'image(red)',
+    'rgb(1, 2, 3))',
+    'rgb((1, 2, 3)',
+    'rgb(1 2 3) /* x */',
+    'red !important;',
   ])('rejects %s', (value) => {
     expect(isSafeCssColor(value)).toBe(false);
   });

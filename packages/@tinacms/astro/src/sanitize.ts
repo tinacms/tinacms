@@ -65,21 +65,57 @@ export function sanitizeImageSrc(src: unknown): string {
 
 // Mirrors `isSafeCssColor` in @tinacms/mdx (src/sanitize-css-color.ts); this
 // package keeps a copy so it doesn't depend on @tinacms/mdx.
-const SAFE_CSS_COLOR_PATTERNS = [
-  /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i,
-  /^[a-z]+$/i,
-  /^(?:rgba?|hsla?|oklch|oklab)\([0-9.,%/ a-z-]*\)$/i,
-  /^var\(--[a-z0-9_-]+\)$/i,
-];
+const COLOR_FUNCTIONS = new Set([
+  'rgb',
+  'rgba',
+  'hsl',
+  'hsla',
+  'hwb',
+  'lab',
+  'lch',
+  'oklab',
+  'oklch',
+  'color',
+  'color-mix',
+  'light-dark',
+  'calc',
+  'var',
+]);
+
+const isSafeColorFunction = (value: string) => {
+  if (!/^[a-z-]+\([a-z0-9_.,%/#() +-]*\)$/i.test(value)) {
+    return false;
+  }
+  let depth = 0;
+  for (const [token, name = ''] of value.matchAll(/([a-z-]*)\(|\)/gi)) {
+    if (token === ')') {
+      depth--;
+    } else if (COLOR_FUNCTIONS.has(name.toLowerCase())) {
+      depth++;
+    } else {
+      return false;
+    }
+    if (depth < 0) {
+      return false;
+    }
+  }
+  return depth === 0;
+};
+
+const isSafeCssColor = (value: string) => {
+  const color = value.trim().replace(/\s+!important$/i, '');
+  return (
+    /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(color) ||
+    /^[a-z]+$/i.test(color) ||
+    isSafeColorFunction(color)
+  );
+};
 
 /**
- * Returns a CMS-supplied colour when it's a plain CSS colour (hex, named,
- * rgb()/hsl()/oklch()/oklab() or var(--name)), else `undefined`, so a
- * colour can't smuggle extra declarations into a `style` attribute.
+ * Returns a CMS-supplied colour when it's a plain CSS colour (hex, named, or
+ * colour functions like rgb()/lab()/color-mix()/var()), else `undefined`, so
+ * a colour can't smuggle extra declarations into a `style` attribute.
  */
 export function sanitizeCssColor(value: unknown): string | undefined {
-  return typeof value === 'string' &&
-    SAFE_CSS_COLOR_PATTERNS.some((pattern) => pattern.test(value))
-    ? value
-    : undefined;
+  return typeof value === 'string' && isSafeCssColor(value) ? value : undefined;
 }
