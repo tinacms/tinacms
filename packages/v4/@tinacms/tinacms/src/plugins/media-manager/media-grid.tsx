@@ -33,7 +33,7 @@ const tileLabel = (name: string, isNew: boolean) =>
 
 function NewBadge() {
   return (
-    <Badge className='absolute top-2 right-2 z-10 bg-green-100 text-[10px] font-bold tracking-wide text-green-700'>
+    <Badge className='absolute top-2 right-2 z-10 bg-status-published-subtle text-[10px] font-bold tracking-wide text-status-published'>
       NEW
     </Badge>
   );
@@ -51,7 +51,7 @@ function GridFolderTile({
     <li>
       <button
         type='button'
-        className='flex w-full flex-col overflow-hidden rounded-xl border bg-card text-left shadow-sm transition outline-none hover:border-primary/40 hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50'
+        className='flex w-full flex-col overflow-hidden rounded-md border bg-card text-left shadow-sm transition outline-none hover:border-primary/40 hover:shadow-md focus-visible:focus-ring'
         onClick={() => onClick(item)}
       >
         <span className='flex h-24 items-center justify-center'>
@@ -91,7 +91,7 @@ function GridFileTile({
         aria-label={tileLabel(name, isNew)}
         aria-pressed={active}
         className={cn(
-          'relative flex w-full flex-col overflow-hidden rounded-xl border bg-card text-left shadow-sm transition outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+          'relative flex w-full flex-col overflow-hidden rounded-md border bg-card text-left shadow-sm transition outline-none focus-visible:focus-ring',
           active
             ? 'border-2 border-primary shadow-md ring-2 ring-primary/20'
             : 'hover:border-primary/40 hover:shadow-md'
@@ -112,7 +112,7 @@ function GridFileTile({
             <span className='flex size-full items-center justify-center bg-gradient-to-br from-gray-700 to-gray-900'>
               <span className='flex size-10 items-center justify-center rounded-full bg-white/90 shadow'>
                 <PlayIcon
-                  className='ml-0.5 size-4 text-gray-700'
+                  className='ml-0.5 size-4 text-slate-700'
                   fill='currentColor'
                 />
               </span>
@@ -163,8 +163,8 @@ function ListRow({
         aria-label={tileLabel(name, isNew)}
         aria-pressed={folder ? undefined : active}
         className={cn(
-          'relative flex w-full items-center text-left transition outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50',
-          active ? 'bg-muted text-primary' : null
+          'relative flex w-full items-center text-left transition outline-none hover:bg-muted/50 focus-visible:focus-ring',
+          active ? 'bg-selected text-selected-foreground' : null
         )}
         onClick={() => onClick(item)}
       >

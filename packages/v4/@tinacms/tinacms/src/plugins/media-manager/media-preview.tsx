@@ -45,7 +45,7 @@ function CopyField({ value }: { value: string }) {
       <button
         type='button'
         disabled={copied}
-        className='relative flex w-full items-center gap-1.5 overflow-hidden rounded-lg border bg-muted/50 px-3 py-2 text-left text-sm break-all transition hover:bg-background hover:text-primary disabled:pointer-events-none'
+        className='relative flex w-full items-center gap-1.5 overflow-hidden rounded-sm border bg-muted/50 px-3 py-2 text-left text-sm break-all transition hover:bg-background hover:text-primary disabled:pointer-events-none'
         onClick={copy}
       >
         <CopyIcon className='size-4 shrink-0 text-primary' />

@@ -28,7 +28,7 @@ export function MediaUploadButton({
       <span
         className={cn(
           buttonVariants(),
-          'peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50'
+          'peer-focus-visible:focus-ring peer-disabled:cursor-not-allowed peer-disabled:opacity-50'
         )}
       >
         {uploading ? 'Uploading…' : 'Upload'}

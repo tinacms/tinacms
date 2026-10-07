@@ -48,7 +48,7 @@ export function ViewModeToggle({
   onChange: (value: MediaViewMode) => void;
 }) {
   return (
-    <div role='group' aria-label='View' className='flex rounded-lg border'>
+    <div role='group' aria-label='View' className='flex rounded-sm border'>
       <Button
         type='button'
         variant='ghost'
@@ -83,7 +83,7 @@ export function MediaKindToggle({
   onChange: (value: MediaKindFilter) => void;
 }) {
   return (
-    <div role='group' aria-label='Show' className='flex rounded-lg border'>
+    <div role='group' aria-label='Show' className='flex rounded-sm border'>
       {MEDIA_KIND_OPTIONS.map((option) => (
         <Button
           key={option.value}
@@ -198,7 +198,7 @@ export function LockedAcceptChip({
     <Tooltip>
       <TooltipTrigger
         render={<span />}
-        className='flex items-center gap-1.5 rounded-lg border border-dashed bg-muted px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground'
+        className='flex items-center gap-1.5 rounded-sm border border-dashed bg-muted px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground'
       >
         <LockIcon className='size-3.5' />
         {label}
