@@ -1,3 +1,4 @@
+import type { Value } from '@udecode/plate';
 import { createPlateEditor } from '@udecode/plate/react';
 import type { KeyboardEvent } from 'react';
 import { describe, expect, it } from 'vitest';
@@ -5,11 +6,15 @@ import { createEditorPlugins } from './editor-plugins';
 
 const RED = '#DC2626';
 
-const paragraph = [
+const paragraph: Value = [
   { type: 'p', children: [{ text: 'hello world', textColor: RED }] },
 ];
 
-const pressEnterAt = (offset: number, value = paragraph, path = [0, 0]) => {
+const pressEnterAt = (
+  offset: number,
+  value: Value = paragraph,
+  path = [0, 0]
+) => {
   const editor = createPlateEditor({ plugins: createEditorPlugins(), value });
   editor.tf.select({ path, offset });
   editor.currentKeyboardEvent = { key: 'Enter' } as KeyboardEvent;
@@ -35,7 +40,7 @@ describe('Enter in coloured text', () => {
   });
 
   it('starts an uncoloured list item from the end of coloured text', () => {
-    const list = [
+    const list: Value = [
       {
         type: 'ul',
         children: [
