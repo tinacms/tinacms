@@ -171,3 +171,30 @@ describe.each<[string, RichTextField]>([
     expect(parseMDX(string as string, field, passthrough)).toEqual(value);
   });
 });
+
+describe.each<[string, RichTextField]>([
+  ['mdx', { name: 'body', type: 'rich-text' }],
+  [
+    'markdown',
+    { name: 'body', type: 'rich-text', parser: { type: 'markdown' } },
+  ],
+])('line breaks inside a colour (%s)', (_, field) => {
+  it('keeps the break inside one element', () => {
+    const value: Plate.RootElement = {
+      type: 'root',
+      children: [
+        {
+          type: 'p',
+          children: [
+            { type: 'text', text: 'x', highlight: true },
+            { type: 'break', children: [{ type: 'text', text: '' }] },
+            { type: 'text', text: 'y', highlight: true },
+          ],
+        },
+      ],
+    };
+    const string = serializeMDX(value, field, passthrough);
+    expect(string).toBe('<mark>x\\\ny</mark>\n');
+    expect(parseMDX(string as string, field, passthrough)).toEqual(value);
+  });
+});

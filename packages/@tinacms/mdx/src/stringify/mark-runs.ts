@@ -40,14 +40,34 @@ const hasSameMark = (
   return true;
 };
 
-/** Number of leading nodes in `content` that share `mark` with the first. */
+/**
+ * Number of leading nodes in `content` that share `mark` with the first. A
+ * colour run carries on across a line break, since splitting it would put the
+ * next `<mark>`/`<span>` at the start of a line, where the break is dropped.
+ */
 const markRunLength = (
   content: Plate.InlineElement[],
   mark: Marks,
   first: Plate.TextElement
 ) => {
-  const end = content.findIndex((node) => !hasSameMark(node, mark, first));
-  return end === -1 ? content.length : end;
+  let length = 0;
+  while (length < content.length) {
+    const node = content[length];
+    const next = content[length + 1];
+    if (node && hasSameMark(node, mark, first)) {
+      length++;
+    } else if (
+      node?.type === 'break' &&
+      isColorMark(mark) &&
+      next &&
+      hasSameMark(next, mark, first)
+    ) {
+      length += 2;
+    } else {
+      break;
+    }
+  }
+  return length;
 };
 
 const isColorMark = (mark: Marks): mark is ColorMark =>
