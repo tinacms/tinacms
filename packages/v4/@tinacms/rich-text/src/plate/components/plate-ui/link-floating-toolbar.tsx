@@ -125,18 +125,18 @@ export function LinkFloatingToolbar({
       {!isValidUrl && currentUrl && (
         <div className='absolute -top-16 left-0 right-0 z-[1000000] mb-2'>
           <div
-            className='bg-red-50 border border-red-200 rounded-md p-2 shadow-lg'
+            className='bg-status-failed-subtle border border-red-200 rounded-md p-2 shadow-lg'
             role='alert'
             aria-live='polite'
           >
             <div className='flex items-center'>
-              <CircleX className='size-4 text-red-500 mr-2 flex-shrink-0' />
-              <span className='text-sm text-red-700 text-wrap'>
+              <CircleX className='size-4 text-destructive mr-2 flex-shrink-0' />
+              <span className='text-sm text-destructive text-wrap'>
                 Invalid URL. Please prefix link with https:// or use a relative
                 path like /about
               </span>
             </div>
-            <div className='absolute -bottom-1 left-4 w-2 h-2 bg-red-50 border-r border-b border-red-200 transform rotate-45'></div>
+            <div className='absolute -bottom-1 left-4 w-2 h-2 bg-status-failed-subtle border-r border-b border-red-200 transform rotate-45'></div>
           </div>
         </div>
       )}

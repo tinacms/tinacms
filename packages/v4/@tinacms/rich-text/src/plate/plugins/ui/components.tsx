@@ -217,7 +217,7 @@ export const Components = () => {
         <div
           {...attributes}
           className={classNames(
-            'font-mono text-sm bg-green-100 cursor-not-allowed mb-4',
+            'font-mono text-sm bg-muted cursor-not-allowed mb-4',
             className
           )}
         >
@@ -231,7 +231,7 @@ export const Components = () => {
         <span
           {...attributes}
           className={classNames(
-            'font-mono bg-green-100 cursor-not-allowed',
+            'font-mono bg-muted cursor-not-allowed',
             className
           )}
         >

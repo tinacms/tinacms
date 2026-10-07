@@ -49,7 +49,7 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
           <input
             type='text'
             placeholder='Filter templates...'
-            className='w-full p-2 border border-gray-300 rounded'
+            className='w-full p-2 border border-input rounded'
             value={filterText}
             onChange={(event) => setFilterText(event.target.value)}
           />

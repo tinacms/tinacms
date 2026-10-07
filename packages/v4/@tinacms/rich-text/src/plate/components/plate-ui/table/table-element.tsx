@@ -83,7 +83,7 @@ export const TableElement = withHOC(
         <div className='group/table relative w-fit'>
           <table
             className={cn(
-              'mr-0 table h-px border-collapse border border-gray-200 not-tina-prose my-2',
+              'mr-0 table h-px border-collapse border border-border-subtle not-tina-prose my-2',
               isSelectingCell && 'selection:bg-transparent'
             )}
             {...tableProps}

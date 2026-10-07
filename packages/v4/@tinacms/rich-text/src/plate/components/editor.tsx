@@ -26,7 +26,7 @@ const editorContainerVariants = cva(
         default: 'h-full',
         demo: 'h-[650px]',
         select: cn(
-          'group rounded-md border border-input ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+          'group rounded-md border border-input ring-offset-background focus-within:focus-ring',
           'has-data-readonly:w-fit has-data-readonly:cursor-default has-data-readonly:border-transparent has-data-readonly:focus-within:[box-shadow:none]'
         ),
       },
@@ -71,7 +71,7 @@ const editorVariants = cva(
         true: 'cursor-not-allowed opacity-50',
       },
       focused: {
-        true: 'ring-2 ring-ring ring-offset-2',
+        true: 'focus-ring',
       },
       variant: {
         ai: 'w-full px-0 text-base md:text-sm',

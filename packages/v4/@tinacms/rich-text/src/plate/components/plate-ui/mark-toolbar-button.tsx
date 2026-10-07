@@ -170,7 +170,7 @@ const HighlightColorToolbarButton = () => {
             onSelect={() => applyHighlight(color.value)}
           >
             <span
-              className='mr-2 inline-block size-4 rounded border border-gray-300'
+              className='mr-2 inline-block size-4 rounded border border-border'
               style={{ backgroundColor: color.value }}
             />
             {color.label}

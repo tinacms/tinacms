@@ -44,7 +44,7 @@ export const TableCellElement = withRef<
         rowSpan: api.table.getRowSpan(element),
       })}
       className={cn(
-        'relative h-full overflow-visible border border-gray-200 bg-background p-0',
+        'relative h-full overflow-visible border border-border-subtle bg-background p-0',
         element.background ? 'bg-[--cellBackground]' : 'bg-background',
         cn(
           isHeader && 'text-left [&_>_*]:m-0',
