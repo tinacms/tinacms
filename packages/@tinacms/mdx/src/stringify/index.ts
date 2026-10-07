@@ -16,6 +16,7 @@ import { isSafeCssColor } from '../sanitize-css-color';
 import { stringifyProps } from './acorn';
 import { normalizeMarkWhitespace } from './mark-whitespace';
 import { eat } from './marks';
+import { assertReadsBack, charactersOf } from './read-back';
 import { stringifyShortcode } from './stringifyShortcode';
 
 declare module 'mdast' {
@@ -34,7 +35,35 @@ declare module 'mdast' {
   }
 }
 
+/**
+ * `verify` refuses to save text that would read back differently (see
+ * `assertReadsBack`). Save paths pass it; previews of the markdown don't.
+ */
 export const serializeMDX = (
+  value: Plate.RootElement,
+  field: RichTextField,
+  imageCallback: (url: string) => string,
+  { verify = false }: { verify?: boolean } = {}
+): string | Plate.RootElement | undefined => {
+  const writtenRaw =
+    field.parser?.type === 'markdown' &&
+    !!field.parser.skipEscaping &&
+    field.parser.skipEscaping !== 'none';
+  if (!verify || writtenRaw) {
+    return writeMDX(value, field, imageCallback);
+  }
+  const written = charactersOf(value?.children);
+  const result = writeMDX(value, field, imageCallback);
+  if (
+    typeof result === 'string' &&
+    value?.children[0]?.type !== 'invalid_markdown'
+  ) {
+    assertReadsBack(written, result, field);
+  }
+  return result;
+};
+
+const writeMDX = (
   value: Plate.RootElement,
   field: RichTextField,
   imageCallback: (url: string) => string

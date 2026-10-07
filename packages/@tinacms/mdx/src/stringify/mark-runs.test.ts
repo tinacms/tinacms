@@ -165,9 +165,27 @@ describe.each<[string, RichTextField]>([
         { type: 'text', text: 'b', bold: true },
       ],
     ],
-  ])('keeps the mark %s', (_, children) => {
-    const value = paragraph(children);
-    const string = serializeMDX(value, field, passthrough);
+  ])('refuses to save a mark %s', (_, children) => {
+    expect(() =>
+      serializeMDX(paragraph(children), field, passthrough, { verify: true })
+    ).toThrow(/can't be saved yet/);
+  });
+
+  it('only refuses when asked to verify', () => {
+    const value = paragraph([
+      { type: 'text', text: 'a.', bold: true },
+      { type: 'text', text: 'b' },
+    ]);
+    expect(serializeMDX(value, field, passthrough)).toBe('**a.**b\n');
+  });
+
+  it('keeps characters outside the basic plane', () => {
+    const value = paragraph([
+      { type: 'text', text: '𠮷.', bold: true },
+      { type: 'text', text: ' 𠮷' },
+    ]);
+    const string = serializeMDX(value, field, passthrough, { verify: true });
+    expect(string).toBe('**𠮷.** 𠮷\n');
     expect(parseMDX(string as string, field, passthrough)).toEqual(value);
   });
 });
@@ -196,5 +214,27 @@ describe.each<[string, RichTextField]>([
     const string = serializeMDX(value, field, passthrough);
     expect(string).toBe('<mark>x\\\ny</mark>\n');
     expect(parseMDX(string as string, field, passthrough)).toEqual(value);
+  });
+});
+
+describe('verifying a save', () => {
+  it('leaves fields that skip escaping alone', () => {
+    const field: RichTextField = {
+      name: 'body',
+      type: 'rich-text',
+      parser: { type: 'markdown', skipEscaping: 'all' },
+    };
+    const value = paragraph([{ type: 'text', text: 'a *b* c' }]);
+    expect(serializeMDX(value, field, passthrough, { verify: true })).toBe(
+      'a *b* c\n'
+    );
+  });
+
+  it('says when the text would not load again', () => {
+    const field: RichTextField = { name: 'body', type: 'rich-text' };
+    const value = paragraph([{ type: 'text', text: 'a {c} d' }]);
+    expect(() =>
+      serializeMDX(value, field, passthrough, { verify: true })
+    ).toThrow(/can't be saved yet, it wouldn't load again/);
   });
 });

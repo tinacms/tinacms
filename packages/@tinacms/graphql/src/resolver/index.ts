@@ -1855,13 +1855,17 @@ export class Resolver {
           }
           break;
         case 'rich-text':
-          // @ts-ignore
-          accum[fieldName] = serializeMDX(fieldValue, field, (fieldValue) =>
-            resolveMediaCloudToRelative(
-              fieldValue as string,
-              this.config,
-              this.tinaSchema.schema
-            )
+          accum[fieldName] = serializeMDX(
+            // @ts-ignore
+            fieldValue,
+            field,
+            (fieldValue) =>
+              resolveMediaCloudToRelative(
+                fieldValue as string,
+                this.config,
+                this.tinaSchema.schema
+              ),
+            { verify: true }
           );
           break;
         case 'reference':
