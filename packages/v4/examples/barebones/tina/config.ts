@@ -96,6 +96,7 @@ export default defineConfig({
     tinaCloudClientId
       ? tinaCloud({
           clientId: tinaCloudClientId,
+          // Manual stand-in until TinaCloud login lands: https://github.com/tinacms/tinacms/issues/7689
           getToken: () => localStorage.getItem('tinacloud-token') ?? undefined,
         })
       : localMediaPlugin(),

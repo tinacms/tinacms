@@ -12,8 +12,9 @@ export interface TinaCloudOptions {
   /** The TinaCloud project client ID. */
   clientId: string;
   /**
-   * Returns the TinaCloud access token for the current editor. This option is
-   * interim: it goes when `tinaCloud()` provides the `auth` capability.
+   * Returns the TinaCloud access token for the current editor. Interim: v4 has
+   * no TinaCloud login yet, so the caller supplies the token. Removed once
+   * `tinaCloud()` provides `auth`, per https://github.com/tinacms/tinacms/issues/7689
    */
   getToken: () => string | undefined | Promise<string | undefined>;
 }
