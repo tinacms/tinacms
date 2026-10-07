@@ -268,9 +268,8 @@ const CheckSchema = ({
             </Button>
           }
         >
-          The current branch (
-          <span className='font-bold'>{currentBranch}</span>) has either been
-          merged or deleted.
+          The current branch (<span className='font-bold'>{currentBranch}</span>
+          ) has either been merged or deleted.
         </ErrorModal>
       ) : (
         children
