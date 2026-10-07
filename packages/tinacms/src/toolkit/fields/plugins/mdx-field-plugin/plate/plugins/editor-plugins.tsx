@@ -171,7 +171,6 @@ export const createEditorPlugins = ({
   createHardBreakPlugin,
   createInvalidMarkdownPlugin,
   CorrectNodeBehaviorPlugin,
-  ClearColorMarksOnEnterPlugin,
   LinkPlugin.configure({
     options: {
       // Custom validation function to allow relative links, e.g., /about
@@ -285,4 +284,6 @@ export const createEditorPlugins = ({
       ],
     },
   }),
+  // Last, so it wraps list and other block handlers that don't pass Enter on
+  ClearColorMarksOnEnterPlugin,
 ];

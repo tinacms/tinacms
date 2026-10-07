@@ -161,7 +161,6 @@ export const createEditorPlugins = ({
   createHardBreakPlugin,
   createInvalidMarkdownPlugin,
   CorrectNodeBehaviorPlugin,
-  ClearColorMarksOnEnterPlugin,
   LinkPlugin.configure({
     options: {
       isUrl: (url) => isUrl(url),
@@ -261,4 +260,6 @@ export const createEditorPlugins = ({
       ],
     },
   }),
+  // Last, so it wraps list and other block handlers that don't pass Enter on
+  ClearColorMarksOnEnterPlugin,
 ];
