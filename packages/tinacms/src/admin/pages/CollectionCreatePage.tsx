@@ -322,18 +322,19 @@ export const RenderForm = ({
           }, 10);
         } catch (error) {
           if (isSessionExpiredError(error)) throw error;
-          const defaultErrorText = 'There was a problem saving your document.';
           if (error.message && error.message.includes(ERR_ALREADY_EXISTS)) {
             cms.alerts.error(
-              `${defaultErrorText} The filename "${form.values.filename}.${collection.format || 'md'}" is already used for another document, please modify it.`
+              `The filename "${form.values.filename}.${collection.format || 'md'}" is already used for another document, please modify it.`,
+              { title: 'Save Failed' }
             );
           } else {
-            cms.alerts.error(() =>
-              ErrorDialog({
-                title: defaultErrorText,
-                message: 'Tina caught an error while creating the file',
-                error,
-              })
+            cms.alerts.error(
+              () =>
+                ErrorDialog({
+                  message: 'Tina caught an error while creating the file',
+                  error,
+                }),
+              { title: 'Save Failed' }
             );
           }
           throw new Error(

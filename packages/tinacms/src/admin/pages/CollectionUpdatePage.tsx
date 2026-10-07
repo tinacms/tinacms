@@ -147,12 +147,13 @@ const RenderForm = ({
           cms.alerts.success('Document updated!');
         } catch (error) {
           if (isSessionExpiredError(error)) throw error;
-          cms.alerts.error(() =>
-            ErrorDialog({
-              title: 'There was a problem saving your document',
-              message: 'Tina caught an error while updating the page',
-              error,
-            })
+          cms.alerts.error(
+            () =>
+              ErrorDialog({
+                message: 'Tina caught an error while updating the page',
+                error,
+              }),
+            { title: 'Save Failed' }
           );
           console.error(error);
           throw new Error(

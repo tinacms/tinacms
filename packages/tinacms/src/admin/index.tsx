@@ -1,12 +1,8 @@
 import { ERR_NOT_INDEXED } from '@tinacms/schema-tools';
 import {
   Button,
-  Modal,
-  ModalActions,
-  ModalBody,
-  ModalHeader,
+  ErrorModal,
   NavProvider,
-  PopupModal,
   TinaCMS,
   useCMS,
 } from '@tinacms/toolkit';
@@ -44,28 +40,9 @@ import {
   AnnouncementsBanner,
   AnnouncementsProvider,
 } from './components/AnnouncementsBanner';
+import { showErrorModal } from './components/ErrorDialog';
 
 type AuthType = 'tinacloud' | 'self-hosted' | 'local' | 'other';
-
-const TROUBLESHOOTING_URL = 'https://tina.io/docs/tinacloud/troubleshooting';
-
-const ErrorModalContent = (props: { title: string; message: string }) => {
-  const { title, message } = props;
-  return (
-    <>
-      <div>{title}</div>
-      <p>{message}</p>
-      <a href={TROUBLESHOOTING_URL} target='_blank' rel='noopener noreferrer'>
-        Learn more
-      </a>
-    </>
-  );
-};
-
-const showErrorModal = (title: string, message: string, cms: TinaCMS) => {
-  if (cms.alerts.all.some((a) => a.level === 'error')) return;
-  cms.alerts.error(() => <ErrorModalContent title={title} message={message} />);
-};
 
 const getBackendType = (client: Client | undefined): AuthType => {
   if (!client) return 'other';
@@ -276,32 +253,24 @@ const CheckSchema = ({
   return (
     <>
       {schemaMissingError ? (
-        <Modal>
-          <PopupModal>
-            <ModalHeader>Branch Not Found</ModalHeader>
-            <ModalBody padded={true}>
-              <div className='tina-prose'>
-                The current branch (
-                <span className='font-bold'>{currentBranch}</span>) has either
-                been merged or deleted.
-              </div>
-            </ModalBody>
-            <ModalActions>
-              <div className='flex-1'></div>
-              <Button
-                style={{ flexGrow: 1 }}
-                className='w-full'
-                variant='primary'
-                onClick={() => {
-                  window.localStorage.removeItem('tinacms-current-branch');
-                  window.location.reload();
-                }}
-              >
-                Switch back to default branch
-              </Button>
-            </ModalActions>
-          </PopupModal>
-        </Modal>
+        <ErrorModal
+          title='Branch Not Found'
+          actions={
+            <Button
+              className='w-full sm:w-auto'
+              variant='primary'
+              onClick={() => {
+                window.localStorage.removeItem('tinacms-current-branch');
+                window.location.reload();
+              }}
+            >
+              Switch back to default branch
+            </Button>
+          }
+        >
+          The current branch (<span className='font-bold'>{currentBranch}</span>
+          ) has either been merged or deleted.
+        </ErrorModal>
       ) : (
         children
       )}
