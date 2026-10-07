@@ -96,11 +96,74 @@ const hoistFromMarks = (node: Parent) => {
   node.children = mergeText(hoisted);
 };
 
+const isPunctuation = (char: string | undefined) =>
+  !!char && /[\p{P}\p{S}]/u.test(char);
+
+const isWordChar = (char: string | undefined) =>
+  !!char && !/\s/u.test(char) && !isPunctuation(char);
+
+/** The first or last character written for `node`; delimiters and tags are punctuation. */
+const writtenEdge = (
+  node: Md.PhrasingContent | undefined,
+  edge: 'lead' | 'trail'
+) => {
+  if (node?.type !== 'text') {
+    return node ? '*' : undefined;
+  }
+  const chars = Array.from(node.value);
+  return edge === 'lead' ? chars.at(0) : chars.at(-1);
+};
+
+const characterReference = (char: string) =>
+  `&#x${char.codePointAt(0)?.toString(16).toUpperCase()};`;
+
+/**
+ * Writes the letter beside a mark as a character reference when the mark's
+ * own edge is punctuation. Otherwise `*a.*b` can't close (and `x*.a*` can't
+ * open), so the mark is lost on reload, or inside a JSX element the whole
+ * document fails to parse. `*a.*&#x62;` reads back as the same text.
+ */
+const encodeFlankingNeighbours = (node: Parent) => {
+  const encoded: Md.PhrasingContent[] = [];
+  node.children.forEach((child, index) => {
+    const previous = encoded.at(-1);
+    const next = node.children[index + 1];
+    const mark = MARKS.has(child.type) ? asParent(child) : null;
+    if (!mark) {
+      encoded.push(child);
+      return;
+    }
+    if (
+      previous?.type === 'text' &&
+      isWordChar(writtenEdge(previous, 'trail')) &&
+      isPunctuation(writtenEdge(mark.children.at(0), 'lead'))
+    ) {
+      const chars = Array.from(previous.value);
+      const last = chars.pop() ?? '';
+      previous.value = chars.join('');
+      encoded.push({ type: 'html', value: characterReference(last) });
+    }
+    encoded.push(child);
+    if (
+      next?.type === 'text' &&
+      isWordChar(writtenEdge(next, 'lead')) &&
+      isPunctuation(writtenEdge(mark.children.at(-1), 'trail'))
+    ) {
+      const [first = '', ...rest] = Array.from(next.value);
+      next.value = rest.join('');
+      encoded.push({ type: 'html', value: characterReference(first) });
+    }
+  });
+  node.children = encoded;
+};
+
 /**
  * Marks created in the editor can hold leading or trailing whitespace — a word
  * selected along with the space after it. Markdown emphasis markers cannot sit
  * next to whitespace, so that whitespace is moved out of the mark and marks
- * left with nothing are dropped. Mutates the tree in place.
+ * left with nothing are dropped. Letters that would stop a mark opening or
+ * closing are then encoded (see `encodeFlankingNeighbours`). Mutates the tree
+ * in place.
  */
 export const normalizeMarkWhitespace = (tree: Md.Root): Md.Root => {
   const visit = (node: Parent) => {
@@ -111,6 +174,7 @@ export const normalizeMarkWhitespace = (tree: Md.Root): Md.Root => {
       }
     });
     hoistFromMarks(node);
+    encodeFlankingNeighbours(node);
   };
   visit(tree as unknown as Parent);
   return tree;

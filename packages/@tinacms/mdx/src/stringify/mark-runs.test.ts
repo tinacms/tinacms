@@ -135,3 +135,39 @@ describe('unsafe colours', () => {
     expect(serializeMDX(value, field, passthrough)).toBe('a<mark>b</mark>\n');
   });
 });
+
+describe.each<[string, RichTextField]>([
+  ['mdx', { name: 'body', type: 'rich-text' }],
+  [
+    'markdown',
+    { name: 'body', type: 'rich-text', parser: { type: 'markdown' } },
+  ],
+])('marks whose edge is punctuation beside a letter (%s)', (_, field) => {
+  it.each<[string, Plate.TextElement[]]>([
+    [
+      'closing inside a highlight',
+      [
+        { type: 'text', text: 'a.', bold: true, italic: true, highlight: true },
+        { type: 'text', text: 'b', bold: true, highlight: true },
+      ],
+    ],
+    [
+      'opening inside a highlight',
+      [
+        { type: 'text', text: 'x', bold: true, highlight: true },
+        { type: 'text', text: '.a', bold: true, italic: true, highlight: true },
+      ],
+    ],
+    [
+      'closing without a highlight',
+      [
+        { type: 'text', text: 'a.', bold: true, italic: true },
+        { type: 'text', text: 'b', bold: true },
+      ],
+    ],
+  ])('keeps the mark %s', (_, children) => {
+    const value = paragraph(children);
+    const string = serializeMDX(value, field, passthrough);
+    expect(parseMDX(string as string, field, passthrough)).toEqual(value);
+  });
+});
