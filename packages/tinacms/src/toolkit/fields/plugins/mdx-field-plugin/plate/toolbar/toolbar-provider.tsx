@@ -63,7 +63,7 @@ const resolvePalette = (
   return configured.filter(({ value }) => {
     if (isSafeCssColor(value)) return true;
     console.warn(
-      `[tinacms] Ignoring unsupported colour "${value}" in rich-text overrides.${name}. Use hex, a named colour, rgb()/hsl()/oklch()/oklab() or var(--name).`
+      `[tinacms] Ignoring unsupported colour "${value}" in rich-text overrides.${name}. Use hex, a named colour, a colour function such as rgb()/lab()/color-mix(), or var(--name).`
     );
     return false;
   });
@@ -85,6 +85,25 @@ export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
     [configured]
   );
 
+  const textColors = useMemo(
+    () =>
+      resolvePalette(
+        'textColors',
+        objectOverrides?.textColors,
+        DEFAULT_TEXT_COLORS
+      ),
+    [objectOverrides?.textColors]
+  );
+  const highlightColors = useMemo(
+    () =>
+      resolvePalette(
+        'highlightColors',
+        objectOverrides?.highlightColors,
+        DEFAULT_HIGHLIGHT_COLORS
+      ),
+    [objectOverrides?.highlightColors]
+  );
+
   return (
     <ToolbarContext.Provider
       value={{
@@ -93,16 +112,8 @@ export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
         overrides,
         headingLevels,
         headingLevelsConfigured,
-        textColors: resolvePalette(
-          'textColors',
-          objectOverrides?.textColors,
-          DEFAULT_TEXT_COLORS
-        ),
-        highlightColors: resolvePalette(
-          'highlightColors',
-          objectOverrides?.highlightColors,
-          DEFAULT_HIGHLIGHT_COLORS
-        ),
+        textColors,
+        highlightColors,
       }}
     >
       {children}

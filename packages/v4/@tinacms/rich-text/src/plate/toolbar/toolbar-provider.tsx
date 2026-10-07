@@ -1,5 +1,5 @@
 import React from 'react';
-import { type ReactNode, createContext, useContext } from 'react';
+import { type ReactNode, createContext, useContext, useMemo } from 'react';
 
 import {
   ALL_HEADING_LEVELS,
@@ -54,7 +54,7 @@ const resolvePalette = (
   return configured.filter(({ value }) => {
     if (isSafeCssColor(value)) return true;
     console.warn(
-      `[tinacms] Ignoring unsupported colour "${value}" in rich-text overrides.${name}. Use hex, a named colour, rgb()/hsl()/oklch()/oklab() or var(--name).`
+      `[tinacms] Ignoring unsupported colour "${value}" in rich-text overrides.${name}. Use hex, a named colour, a colour function such as rgb()/lab()/color-mix(), or var(--name).`
     );
     return false;
   });
@@ -72,6 +72,21 @@ export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
     ? normalizeHeadingLevels(configured)
     : ALL_HEADING_LEVELS;
 
+  const textColors = useMemo(
+    () =>
+      resolvePalette('textColors', overrides?.textColors, DEFAULT_TEXT_COLORS),
+    [overrides?.textColors]
+  );
+  const highlightColors = useMemo(
+    () =>
+      resolvePalette(
+        'highlightColors',
+        overrides?.highlightColors,
+        DEFAULT_HIGHLIGHT_COLORS
+      ),
+    [overrides?.highlightColors]
+  );
+
   return (
     <ToolbarContext.Provider
       value={{
@@ -79,16 +94,8 @@ export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
         overrides,
         headingLevels,
         headingLevelsConfigured,
-        textColors: resolvePalette(
-          'textColors',
-          overrides?.textColors,
-          DEFAULT_TEXT_COLORS
-        ),
-        highlightColors: resolvePalette(
-          'highlightColors',
-          overrides?.highlightColors,
-          DEFAULT_HIGHLIGHT_COLORS
-        ),
+        textColors,
+        highlightColors,
       }}
     >
       {children}
