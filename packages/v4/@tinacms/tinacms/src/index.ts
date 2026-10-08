@@ -13,6 +13,13 @@ export {
   type TinaConfig,
   type TinaSchema,
 } from './config';
+export {
+  AuthError,
+  type AuthErrorCode,
+  type AuthSlice,
+  type AuthStatus,
+  type AuthUser,
+} from './core/auth/contract';
 export type {
   ContentProvider,
   ContentSlice,

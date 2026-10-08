@@ -3,6 +3,7 @@
 // Never reaches the browser bundle.
 
 import { AsyncLocalStorage } from 'node:async_hooks';
+import type { AuthTransportHooks, Session } from '../core/auth/contract';
 import { invariant } from '../core/invariant';
 import type {
   ResolvedServerSegment,
@@ -10,7 +11,13 @@ import type {
   ServerSegment,
 } from '../core/plugin';
 
-export type { ResolvedServerSegment, ServerOp, ServerSegment };
+export type {
+  AuthTransportHooks,
+  ResolvedServerSegment,
+  ServerOp,
+  ServerSegment,
+  Session,
+};
 
 // Identity helper, mirroring definePlugin/defineClientPlugin: `TOps` is preserved so the
 // segment's exported type is what `import type` carries to the client for the RPC proxy
@@ -18,24 +25,6 @@ export type { ResolvedServerSegment, ServerOp, ServerSegment };
 export const defineServerPlugin = <TOps extends ServerSegment>(
   ops: TOps
 ): TOps => ops;
-
-// ADR-023 §1: the single primitive every verifier needs. Roles ride in the session;
-// core reads them per request and stores nothing (ADR-008).
-export interface Session {
-  identity: { id: string; name?: string; email?: string };
-  roles: string[];
-}
-
-// The transport hooks the RPC handler needs from whatever provides `auth`. They live on
-// the auth plugin's server segment under these names; compose claims them off the
-// routable ops (rpc/handler.ts), so the handler invokes them directly (getSession
-// receives the raw Request) and dispatch can never route them as RPC ops.
-export interface AuthTransportHooks {
-  getSession: (request: Request) => Promise<Session | null>;
-  // Role → permission bundles are the auth provider's domain (ADR-008 §3). Absent, the
-  // built-in editor/admin defaults apply.
-  rolePermissions?: (role: string) => Promise<string[]>;
-}
 
 // ADR-008 §4/§5: Tina ships editor/admin so TinaCloud works with zero config; new
 // permissions are granted to nobody by default except admin's wildcard. Null-prototype,
