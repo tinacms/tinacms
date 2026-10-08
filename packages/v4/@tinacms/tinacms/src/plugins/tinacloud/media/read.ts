@@ -12,7 +12,10 @@ import {
   TinaCloudError,
 } from '../client';
 import { encodePath } from '../../../utils/encode-path';
-import { isRecord } from '../../../utils/is-record';
+import {
+  listResponseSchema,
+  requestIdResponseSchema,
+} from './tinacloud-media-types';
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -52,30 +55,22 @@ const joinPath = (folder: string, name: string): string =>
   folder ? `${folder}/${name}` : name;
 
 const toMediaPage = (folder: string, body: unknown): MediaPage => {
-  if (
-    !isRecord(body) ||
-    !Array.isArray(body.files) ||
-    !Array.isArray(body.directories)
-  ) {
+  const parsed = listResponseSchema.safeParse(body);
+  if (!parsed.success) {
     throw new MediaError(
       'backend-failure',
       'TinaCloud returned a media list in an unknown format.'
     );
   }
-  const directories: MediaItem[] = body.directories
-    .filter((name): name is string => typeof name === 'string')
+  const directories: MediaItem[] = parsed.data.directories
     .map((name) => name.replace(/\/+$/, ''))
     .filter(Boolean)
     .map((name) => ({ path: joinPath(folder, name), kind: 'directory' }));
-  const files: MediaItem[] = body.files.flatMap((file) =>
-    isRecord(file) && typeof file.filename === 'string'
-      ? [{ path: joinPath(folder, file.filename), kind: 'file' as const }]
-      : []
-  );
-  const cursor =
-    typeof body.cursor === 'string' || typeof body.cursor === 'number'
-      ? String(body.cursor)
-      : '';
+  const files: MediaItem[] = parsed.data.files.map(({ filename }) => ({
+    path: joinPath(folder, filename),
+    kind: 'file',
+  }));
+  const cursor = String(parsed.data.cursor ?? '');
   return {
     items: [...directories, ...files],
     cursor: cursor && cursor !== '0' ? cursor : undefined,
@@ -115,8 +110,9 @@ export const deleteMedia = async (
       `${TINACLOUD_ASSETS_URL}/v1/${client.clientId}/${encodePath(path)}${branchQuery(branch)}`,
       { method: 'DELETE' }
     );
-    if (isRecord(body) && typeof body.requestId === 'string') {
-      await client.waitForRequest(body.requestId);
+    const parsed = requestIdResponseSchema.safeParse(body);
+    if (parsed.success && parsed.data.requestId) {
+      await client.waitForRequest(parsed.data.requestId);
     }
   } catch (cause) {
     throw toMediaError(cause);

@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { isRecord } from '../../utils/is-record';
 
 export const TINACLOUD_ASSETS_URL = 'https://assets.tinajs.io';
@@ -9,6 +10,11 @@ export const TINACLOUD_CDN_URL = 'https://assets.tina.io';
 const POLL_INTERVAL_MS = 1000;
 
 const POLL_TIMEOUT_MS = 30_000;
+
+const requestStatusSchema = z.object({
+  error: z.boolean(),
+  message: z.string().optional(),
+});
 
 export interface TinaCloudOptions {
   /** The TinaCloud project client ID. */
@@ -109,12 +115,13 @@ export const createTinaCloudClient = (options: TinaCloudOptions) => {
     const startedAt = Date.now();
     while (true) {
       await sleep(POLL_INTERVAL_MS);
-      const status = await authedFetch(url);
-      if (isRecord(status) && typeof status.error === 'boolean') {
-        if (!status.error) return;
+      const body = await authedFetch(url);
+      const status = requestStatusSchema.safeParse(body);
+      if (status.success) {
+        if (!status.data.error) return;
         throw new TinaCloudError(
-          bodyMessage(status) ?? 'TinaCloud reported that the request failed.',
-          { body: status }
+          status.data.message ?? 'TinaCloud reported that the request failed.',
+          { body }
         );
       }
       if (Date.now() - startedAt >= POLL_TIMEOUT_MS) {

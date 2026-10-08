@@ -2,7 +2,7 @@ import { MediaError } from '../../../core/media/contract';
 import { sanitizeFilename } from '../../media-manager/media-types';
 import { TINACLOUD_ASSETS_URL, type TinaCloudClient } from '../client';
 import { encodePath } from '../../../utils/encode-path';
-import { isRecord } from '../../../utils/is-record';
+import { uploadUrlResponseSchema } from './tinacloud-media-types';
 import { type MediaBranch, branchQuery, toMediaError } from './read';
 
 const s3Error = async (response: Response): Promise<MediaError> => {
@@ -43,15 +43,16 @@ export const uploadMedia = async (
     const body = await client.authedFetch(
       `${TINACLOUD_ASSETS_URL}/v1/${client.clientId}/upload_url/${encodePath(path)}${branchQuery(branch)}`
     );
-    if (!isRecord(body) || typeof body.signedUrl !== 'string') {
+    const parsed = uploadUrlResponseSchema.safeParse(body);
+    if (!parsed.success) {
       throw new MediaError(
         'backend-failure',
         'TinaCloud returned no upload URL.'
       );
     }
-    await putFile(body.signedUrl, file);
-    if (typeof body.requestId === 'string') {
-      await client.waitForRequest(body.requestId);
+    await putFile(parsed.data.signedUrl, file);
+    if (parsed.data.requestId) {
+      await client.waitForRequest(parsed.data.requestId);
     }
     return path;
   } catch (cause) {

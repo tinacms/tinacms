@@ -4,7 +4,10 @@ import {
   type TinaCloudClient,
   TinaCloudError,
 } from '../client';
-import { isRecord } from '../../../utils/is-record';
+import {
+  renameErrorBodySchema,
+  renameResponseSchema,
+} from './tinacloud-media-types';
 import { type MediaBranch, toMediaError } from './read';
 
 const RENAME_ERROR_CODES: Record<string, MediaErrorCode> = {
@@ -20,10 +23,10 @@ const RENAME_ERROR_CODES: Record<string, MediaErrorCode> = {
 const toRenameError = (cause: unknown): MediaError => {
   if (!(cause instanceof TinaCloudError)) return toMediaError(cause);
   const message = cause.serverMessage;
-  const reported =
-    isRecord(cause.body) && typeof cause.body.code === 'string'
-      ? RENAME_ERROR_CODES[cause.body.code]
-      : undefined;
+  const errorBody = renameErrorBodySchema.safeParse(cause.body);
+  const reported = errorBody.success
+    ? RENAME_ERROR_CODES[errorBody.data.code]
+    : undefined;
   if (reported) return new MediaError(reported, message);
   if (cause.status === 409 || /exists/i.test(message ?? '')) {
     return new MediaError('name-taken', message);
@@ -52,15 +55,17 @@ export const renameMedia = async (
   } catch (cause) {
     throw toRenameError(cause);
   }
-  if (!isRecord(body) || body.success !== true) {
+  const parsed = renameResponseSchema.safeParse(body);
+  if (!parsed.success) {
     throw new MediaError(
       'backend-failure',
       'TinaCloud did not confirm the rename.'
     );
   }
-  if (typeof body.requestId === 'string') {
+  const { requestId, path } = parsed.data;
+  if (requestId) {
     try {
-      await client.waitForRequest(body.requestId);
+      await client.waitForRequest(requestId);
     } catch (cause) {
       // The media index already shows the new name, so the rename may be done.
       throw new MediaError(
@@ -69,5 +74,5 @@ export const renameMedia = async (
       );
     }
   }
-  return typeof body.path === 'string' ? body.path : to;
+  return path ?? to;
 };
