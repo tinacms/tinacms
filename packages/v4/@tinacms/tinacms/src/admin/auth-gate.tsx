@@ -60,6 +60,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
       </div>
     );
   }
+  if (auth.LoginScreen) return <auth.LoginScreen />;
   return <SignInScreen login={auth.login} />;
 }
 

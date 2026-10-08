@@ -1,3 +1,5 @@
+import type { ComponentType } from 'react';
+
 export interface AuthUser {
   id: string;
   name?: string;
@@ -54,6 +56,7 @@ export type AuthSlice = (
   getToken(): Promise<string | undefined>;
   login(): Promise<void>;
   logout(): Promise<void>;
+  LoginScreen?: ComponentType;
 };
 
 export type AuthStatus = AuthSlice['status'];

@@ -39,6 +39,7 @@ The plugin mounts a slice at `store.auth`. The slice is an `AuthSlice`:
 | `getToken()` | Resolves to the current bearer token, or `undefined`. It refreshes a token that is about to expire. |
 | `login()` | Runs the sign-in flow of the provider: a redirect, a popup, or a hosted page. |
 | `logout()` | Ends the session. |
+| `LoginScreen?` | A component the admin shows instead of its default sign-in screen, for example an email and password form. It signs the editor in through the plugin, and sets `signed-in`. |
 
 The slice updates `status` and `user` with `set`, so the admin renders again.
 
@@ -60,8 +61,8 @@ A failure in `login()` or `getToken()` is an `AuthError`. It has a `code`, a
 
 1. The admin boots. The slice starts at `loading` while it checks for a
    session, then sets `signed-in` or `signed-out`.
-2. At `signed-out`, the admin shows a sign-in screen. Its button calls
-   `login()`.
+2. At `signed-out`, the admin shows the `LoginScreen` of the slice. Without
+   one, it shows a default screen whose button calls `login()`.
 3. `login()` completes, and the slice sets `signed-in` and `user`.
 4. The sidebar footer shows the user and a "Sign out" button that calls
    `logout()`.

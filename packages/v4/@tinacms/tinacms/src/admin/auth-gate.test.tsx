@@ -2,6 +2,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import type { AuthSlice } from '../core/auth/contract';
 import { asResolvedConfig } from '../config';
 import { type PluginManifest, definePlugin } from '../core/plugin';
 import { testAuthPlugin } from '../test/test-auth-plugin';
@@ -71,5 +72,50 @@ describe('AuthGate', () => {
       await screen.findByRole('button', { name: 'Sign in' })
     ).toBeInTheDocument();
     expect(screen.queryByRole('list', { name: 'Collections' })).toBeNull();
+  });
+
+  it("shows the plugin's own sign-in screen instead of the default", async () => {
+    const user = userEvent.setup();
+    const formAuthPlugin = definePlugin({
+      name: 'test:form-auth',
+      provides: ['auth'],
+      client: async () => ({
+        default: {
+          slice: (set) =>
+            ({
+              status: 'signed-out',
+              user: null,
+              getToken: async () => undefined,
+              login: async () => {},
+              logout: async () => set({ status: 'signed-out', user: null }),
+              LoginScreen: () => (
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    const email = new FormData(event.currentTarget).get(
+                      'email'
+                    );
+                    set({
+                      status: 'signed-in',
+                      user: { id: 'ada', email: String(email) },
+                    });
+                  }}
+                >
+                  <input name='email' aria-label='Email' />
+                  <button type='submit'>Continue</button>
+                </form>
+              ),
+            }) satisfies AuthSlice,
+        },
+      }),
+    });
+    renderAdmin([formAuthPlugin]);
+
+    await user.type(await screen.findByLabelText('Email'), 'ada@example.com');
+    expect(screen.queryByRole('button', { name: 'Sign in' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(
+      await screen.findByRole('list', { name: 'Account' })
+    ).toHaveTextContent('ada@example.com');
   });
 });
