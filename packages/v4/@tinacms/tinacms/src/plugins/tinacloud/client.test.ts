@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   TINACLOUD_CONTENT_URL,
+  TINACLOUD_IDENTITY_URL,
   TinaCloudError,
   createTinaCloudClient,
 } from './client';
@@ -107,5 +108,38 @@ describe('waitForRequest', () => {
     const assertion = expect(done).rejects.toThrow(/did not finish/);
     await vi.advanceTimersByTimeAsync(31_000);
     await assertion;
+  });
+});
+
+describe('getProject', () => {
+  it('fetches the project once and shares the result', async () => {
+    const fetchMock = stubFetch(
+      json({ defaultBranch: 'main', mediaBranch: 'main', role: 'admin' })
+    );
+    const tinaCloud = client();
+    const [first, second] = await Promise.all([
+      tinaCloud.getProject(),
+      tinaCloud.getProject(),
+    ]);
+    expect(first).toEqual({ defaultBranch: 'main', mediaBranch: 'main' });
+    expect(second).toBe(first);
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      `${TINACLOUD_IDENTITY_URL}/v2/apps/abc`
+    );
+  });
+
+  it('retries after a failure', async () => {
+    stubFetch(json({}, 500), json({ defaultBranch: 'main' }));
+    const tinaCloud = client();
+    await expect(tinaCloud.getProject()).rejects.toMatchObject({ status: 500 });
+    await expect(tinaCloud.getProject()).resolves.toEqual({
+      defaultBranch: 'main',
+    });
+  });
+
+  it('rejects a project in an unknown format', async () => {
+    stubFetch(json({ defaultBranch: 42 }));
+    await expect(client().getProject()).rejects.toThrow(/unknown format/);
   });
 });

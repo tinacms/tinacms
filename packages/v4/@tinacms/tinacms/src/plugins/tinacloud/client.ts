@@ -7,6 +7,8 @@ export const TINACLOUD_CONTENT_URL = 'https://content.tinajs.io';
 
 export const TINACLOUD_CDN_URL = 'https://assets.tina.io';
 
+export const TINACLOUD_IDENTITY_URL = 'https://identity.tinajs.io';
+
 const POLL_INTERVAL_MS = 1000;
 
 const POLL_TIMEOUT_MS = 30_000;
@@ -15,6 +17,13 @@ const requestStatusSchema = z.object({
   error: z.boolean(),
   message: z.string().optional(),
 });
+
+const projectSchema = z.object({
+  defaultBranch: z.string().optional(),
+  mediaBranch: z.string().optional(),
+});
+
+export type TinaCloudProject = z.infer<typeof projectSchema>;
 
 export interface TinaCloudOptions {
   /** The TinaCloud project client ID. */
@@ -133,5 +142,35 @@ export const createTinaCloudClient = (options: TinaCloudOptions) => {
     }
   };
 
-  return { clientId: options.clientId, authedFetch, waitForRequest };
+  let project: Promise<TinaCloudProject> | undefined;
+
+  // Fetched once and shared. A failure clears the cache so the next call retries.
+  const getProject = (): Promise<TinaCloudProject> => {
+    project ??= authedFetch(
+      `${TINACLOUD_IDENTITY_URL}/v2/apps/${options.clientId}`
+    ).then(
+      (body) => {
+        const parsed = projectSchema.safeParse(body);
+        if (!parsed.success) {
+          throw new TinaCloudError(
+            'TinaCloud returned the project in an unknown format.',
+            { body }
+          );
+        }
+        return parsed.data;
+      },
+      (cause: unknown) => {
+        project = undefined;
+        throw cause;
+      }
+    );
+    return project;
+  };
+
+  return {
+    clientId: options.clientId,
+    authedFetch,
+    waitForRequest,
+    getProject,
+  };
 };

@@ -150,13 +150,19 @@ a crop: `?fit=crop&max-w=400&max-h=400`.
 ### Branch
 
 Each operation reads the branch from `store.branch.name` when it runs. If
-`name` is not set, the operation uses the media branch of the project. No
-plugin writes `store.branch.name` yet, so all operations use the media branch.
+`name` is not set, the operation uses the default branch of the TinaCloud
+project. The branch is not a config option: it is operational data that the
+Data Layer owns (ADR-019, ADR-024). No plugin writes `store.branch.name` yet,
+so all operations use the default branch.
+
+On first use the slice reads the project from
+`https://identity.tinajs.io/v2/apps/{clientId}` for its default branch and its
+media branch, then keeps it for the session.
 
 | Branch | URL of `posts/hero.jpg` |
 |---|---|
-| Media branch | `https://assets.tina.io/{clientId}/posts/hero.jpg` |
-| Other branch | `https://assets.tina.io/{clientId}/__staging/{branch}/__file/posts/hero.jpg` |
+| The media branch | `https://assets.tina.io/{clientId}/posts/hero.jpg` |
+| Any other branch | `https://assets.tina.io/{clientId}/__staging/{branch}/__file/posts/hero.jpg` |
 
 ### Not supported yet
 

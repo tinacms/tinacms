@@ -6,7 +6,7 @@ import { type TinaRuntime, TinaRuntimeContext } from '../../editor/context';
 import { useMediaSlice } from '../../editor/hooks';
 import { createTinaStore } from '../../store/create-store';
 import { mediaManagerPlugin } from '../media-manager/media-manager.plugin';
-import { TINACLOUD_ASSETS_URL } from './client';
+import { TINACLOUD_ASSETS_URL, TINACLOUD_IDENTITY_URL } from './client';
 import { tinaCloud } from './tinacloud.plugin';
 
 const boot = async () => {
@@ -51,27 +51,59 @@ describe('tinaCloud()', () => {
     });
   });
 
-  it('uses the media branch when the store has no branch name', async () => {
+  const stubTinaCloud = (project: Record<string, unknown>) => {
+    const fetchMock = vi.fn(
+      async (url: string) =>
+        new Response(
+          JSON.stringify(
+            url.startsWith(TINACLOUD_IDENTITY_URL)
+              ? project
+              : { files: [], directories: [] }
+          )
+        )
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    return fetchMock;
+  };
+
+  it("uses the project's default branch when the store has no branch", async () => {
+    const fetchMock = stubTinaCloud({
+      defaultBranch: 'main',
+      mediaBranch: 'main',
+    });
     const { media } = await boot();
+    await media.list('');
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      `${TINACLOUD_IDENTITY_URL}/v2/apps/abc`,
+      `${TINACLOUD_ASSETS_URL}/v2/abc/list/?limit=20&branch=main`,
+    ]);
     expect(media.resolveUrl('hero.png')).toBe(
       'https://assets.tina.io/abc/hero.png'
     );
   });
 
   it('reads the branch from store.branch.name at call time', async () => {
-    const fetchMock = vi.fn(
-      async (_url: string) =>
-        new Response(JSON.stringify({ files: [], directories: [] }))
-    );
-    vi.stubGlobal('fetch', fetchMock);
+    const fetchMock = stubTinaCloud({
+      defaultBranch: 'main',
+      mediaBranch: 'main',
+    });
     const { store, media } = await boot();
     store.setState({ branch: { name: 'feat/x' } });
+    await media.list('');
+    expect(fetchMock.mock.calls[1][0]).toBe(
+      `${TINACLOUD_ASSETS_URL}/v2/abc/list/?limit=20&branch=feat%2Fx`
+    );
     expect(media.resolveUrl('hero.png')).toBe(
       'https://assets.tina.io/abc/__staging/feat/x/__file/hero.png'
     );
+  });
+
+  it('serves the default branch from staging when it is not the media branch', async () => {
+    stubTinaCloud({ defaultBranch: 'main', mediaBranch: 'tina-media' });
+    const { media } = await boot();
     await media.list('');
-    expect(fetchMock.mock.calls[0][0]).toBe(
-      `${TINACLOUD_ASSETS_URL}/v2/abc/list/?limit=20&branch=feat%2Fx`
+    expect(media.resolveUrl('hero.png')).toBe(
+      'https://assets.tina.io/abc/__staging/main/__file/hero.png'
     );
   });
 });
