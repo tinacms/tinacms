@@ -38,6 +38,7 @@ import { FormStatusBadge } from './document-status';
 import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 import { type AdminRoute, COLLECTIONS_ROUTE } from './routing';
+import { TinaLogo } from './tina-logo';
 import { useAdminRoute } from './use-admin-route';
 import { useFormColumnWidth } from './use-form-column-width';
 import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
@@ -206,7 +207,7 @@ function PreviewFrame({ src }: { src: string }) {
       ref={iframeRef}
       src={src}
       title='Preview'
-      className='size-full border-none'
+      className='size-full border-none bg-white'
     />
   );
 }
@@ -247,7 +248,7 @@ function FormColumn({ openPath }: { openPath?: string }) {
     <>
       <aside
         aria-label='Document form'
-        className='flex min-w-0 shrink-0 flex-col overflow-y-auto border-r border-border p-4'
+        className='flex min-w-0 shrink-0 flex-col overflow-y-auto border-r border-border bg-card p-4'
         style={{ width }}
       >
         <div className='mb-2 flex items-center gap-1'>
@@ -336,10 +337,12 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => navigate(COLLECTIONS_ROUTE)}>
-                <span className='text-xs font-semibold tracking-wide uppercase'>
-                  TinaCMS
-                </span>
+              <SidebarMenuButton
+                size='lg'
+                onClick={() => navigate(COLLECTIONS_ROUTE)}
+              >
+                {/* The menu button sizes every svg to 16px. */}
+                <TinaLogo className='h-5! w-auto!' />
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
