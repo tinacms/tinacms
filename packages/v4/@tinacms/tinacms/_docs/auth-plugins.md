@@ -84,6 +84,37 @@ with no login.
 - A permission check in the client is for the UI only. The server check is
   the security boundary.
 
+## TinaCloud
+
+`tinaCloud({ clientId })` is the reference auth plugin. It provides `auth`
+and `media` from one plugin.
+
+- `login()` opens the TinaCloud sign-in popup at `https://app.tina.io/signin`.
+  The slice accepts the tokens only from a message that the popup posts from
+  the `https://app.tina.io` origin.
+- The slice reads the user from
+  `https://identity.tinajs.io/v2/apps/{clientId}/currentUser`.
+- The tokens stay in a closure of the slice. A full reload signs the editor
+  out (ADR-023).
+- `getToken()` refreshes the token through
+  `https://identity.tinajs.io/oauth/token` when it expires in less than two
+  minutes. A refused refresh sets `signed-out` and throws `expired`.
+- The media slice of `tinaCloud()` gets its token from the same closure. It
+  never reads the token of another auth plugin.
+
+The server segment holds `getSession`. It sends the bearer token to the
+`currentUser` endpoint of the project. A verified, enabled user gets a
+`Session`. A TinaCloud `admin` gets the `admin` role, and any other user gets
+`editor`. `tinaCloud()` has no `rolePermissions`, so the built-in defaults
+apply.
+
+```ts
+defineConfig({
+  plugins: [localContentPlugin(), tinaCloud({ clientId: '<client id>' })],
+  schema: { collections: [] },
+});
+```
+
 ## Swap a provider
 
 Core reads only the contract, so a change of provider is a change of plugin.
@@ -113,4 +144,5 @@ keeps its other capabilities.
   `RpcError`; the slice does not change its status.
 - The token on requests of the local content and media plugins. They do not
   use the RPC client.
-- An auth slice for `tinaCloud()`.
+- The TinaCloud redirect sign-in flow (PKCE), for projects that use WorkOS.
+  `tinaCloud()` supports the popup flow only.
