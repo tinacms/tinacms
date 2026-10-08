@@ -6,8 +6,9 @@ export {
   AuthError,
   type AuthErrorCode,
   type AuthSlice,
-  type AuthStatus,
   type AuthUser,
+  toUserId,
+  type UserId,
 } from '../core/auth/contract';
 
 export type {

@@ -11,6 +11,7 @@ import type {
   ServerSegment,
 } from '../core/plugin';
 
+export { toUserId, type UserId } from '../core/auth/contract';
 export type {
   AuthTransportHooks,
   ResolvedServerSegment,

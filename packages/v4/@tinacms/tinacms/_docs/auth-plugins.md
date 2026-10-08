@@ -34,19 +34,32 @@ The plugin mounts a slice at `store.auth`. The slice is an `AuthSlice`:
 
 | Member | Role |
 |---|---|
-| `status` | `'loading'`, `'signed-out'` or `'signed-in'`. |
-| `user` | `{ id, name?, email? }` when `status` is `'signed-in'`, else `null`. |
+| `status` | `'loading'`, `'signed-out'`, `'signed-in'` or `'forbidden'`. |
+| `user` | `{ id, name?, email? }` when `status` is `'signed-in'` or `'forbidden'`, else `null`. `id` is a `UserId`; make it with `toUserId()`. |
+| `roles` | The roles of the editor, when `status` is `'signed-in'`. They have the same meaning as `Session.roles` on the server. |
 | `getToken()` | Resolves to the current bearer token, or `undefined`. It refreshes a token that is about to expire. |
 | `login()` | Runs the sign-in flow of the provider: a redirect, a popup, or a hosted page. |
 | `logout()` | Ends the session. |
+| `LoginScreen?` | A component the admin shows instead of its default sign-in screen, for example an email and password form. It signs the editor in through the plugin, and sets `signed-in`. |
 
-The slice updates `status` and `user` with `set`, so the admin renders again.
+The slice updates `status`, `user` and `roles` with `set`, so the admin
+renders again.
 
-`useAuthSlice()` (`@tinacms/tinacms/react`) gives the slice, or `null` when no
-plugin provides `auth`. A slice that lacks a member, or that is
-`signed-in` with no `user`, throws `auth-capability-malformed`.
+`'forbidden'` means that the editor is signed in, but the account cannot edit
+the project. The admin does not render. It shows a "You don't have access"
+screen with the user and a "Sign out" button.
 
-A failure in `login()` or `getToken()` is an `AuthError`. It has a `code`, a
+`useOptionalAuthSlice()` (`@tinacms/tinacms/react`) gives the slice, or `null`
+when no plugin provides `auth`. These slices throw
+`auth-capability-malformed`:
+
+- A slice that lacks a member.
+- A slice that is `signed-in` or `forbidden` with no `user`.
+- A slice that is `signed-in` with no `roles` array.
+- A slice whose `LoginScreen` is not a component. A function component and a
+  `memo` or `forwardRef` component are valid.
+
+A failure in `login()`, `logout()` or `getToken()` is an `AuthError`. It has a `code`, a
 `message` to show the user, and an optional `detail` for logs:
 
 | Code | Meaning |
@@ -59,12 +72,18 @@ A failure in `login()` or `getToken()` is an `AuthError`. It has a `code`, a
 ## The login flow
 
 1. The admin boots. The slice starts at `loading` while it checks for a
-   session, then sets `signed-in` or `signed-out`.
-2. At `signed-out`, the admin shows a sign-in screen. Its button calls
-   `login()`.
-3. `login()` completes, and the slice sets `signed-in` and `user`.
+   session, then sets `signed-in`, `forbidden` or `signed-out`.
+2. At `signed-out`, the admin shows the `LoginScreen` of the slice. Without
+   one, it shows a default screen whose button calls `login()`.
+3. `login()` completes, and the slice sets `signed-in`, `user` and `roles`.
+   If the account cannot edit the project, the slice sets `forbidden` and
+   `user`.
 4. The sidebar footer shows the user and a "Sign out" button that calls
    `logout()`.
+
+The slice must leave `loading`. If the session check fails, the slice sets
+`signed-out`. A slice that stays at `loading` shows the loading screen with
+no end, and core does not stop it.
 
 With no auth plugin, the admin shows no sign-in screen. A local setup works
 with no login.
@@ -79,9 +98,19 @@ with no login.
 - `useRpcClient({ url })` (`@tinacms/tinacms/react`) creates an RPC client
   that calls `getToken()` before each request and attaches the token. A
   plugin does not attach the token itself.
+- The local content and media plugins attach the token the same way. Each
+  request reads `store.auth` and calls `getToken()` at the time it is sent.
+- The local Data Layer (`tinaLocalDataLayerVitePlugin`) authorizes the
+  content and media requests as the RPC handler does. It answers `401` when
+  there is no session, or when the auth plugin has no `getSession`. It
+  answers `403` when the roles do not grant the `requires` permission of the
+  content or media plugin. With no auth plugin, it checks nothing.
+- The local Data Layer runs no `onInit`. A `getSession` must not depend on
+  state that `onInit` sets.
 - Roles and permissions are runtime data of the provider. They are not in
   `defineConfig`.
-- A permission check in the client is for the UI only. The server check is
+- `roles` on the slice and a permission check in the client are for the UI
+  only. They hide controls that the editor cannot use. The server check is
   the security boundary.
 
 ## TinaCloud
@@ -93,7 +122,10 @@ and `media` from one plugin.
   The slice accepts the tokens only from a message that the popup posts from
   the `https://app.tina.io` origin.
 - The slice reads the user from
-  `https://identity.tinajs.io/v2/apps/{clientId}/currentUser`.
+  `https://identity.tinajs.io/v2/apps/{clientId}/currentUser`. A TinaCloud
+  `admin` gets the `admin` role, and any other user gets `editor`.
+- An account that is not verified, or is disabled, sets `forbidden`. The slice
+  keeps no token for it.
 - The tokens stay in a closure of the slice. A full reload signs the editor
   out (ADR-023).
 - `getToken()` refreshes the token through
@@ -140,9 +172,16 @@ keeps its other capabilities.
 
 ## Not supported yet
 
-- Sign-out on a `401`. A request that carried a token and gets `401` throws
-  `RpcError`; the slice does not change its status.
-- The token on requests of the local content and media plugins. They do not
-  use the RPC client.
+- Sign-out on a `401`. A request that carried a token and gets `401` fails,
+  and the slice does not change its status.
 - The TinaCloud redirect sign-in flow (PKCE), for projects that use WorkOS.
   `tinaCloud()` supports the popup flow only.
+- `onLogin` and `onLogout` hooks in the config. A plugin does its own work
+  inside its `login()` and `logout()`.
+
+## From v3
+
+| v3 | v4 |
+|---|---|
+| `authProvider.authorize()` | The slice sets `forbidden` when the account cannot edit the project. |
+| `admin.authHooks.onLogin` and `onLogout` | No config hooks. The plugin does the work inside `login()` and `logout()`. |

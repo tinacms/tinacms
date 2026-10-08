@@ -20,7 +20,7 @@ export const testAuthPlugin = (
             getToken: async () => token,
             login: async () => {
               token = `${name}-token`;
-              set({ status: 'signed-in', user });
+              set({ status: 'signed-in', user, roles: ['editor'] });
             },
             logout: async () => {
               token = undefined;
