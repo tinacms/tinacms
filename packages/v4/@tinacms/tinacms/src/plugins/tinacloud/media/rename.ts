@@ -3,8 +3,8 @@ import {
   TINACLOUD_ASSETS_URL,
   type TinaCloudClient,
   TinaCloudError,
-  isRecord,
 } from '../client';
+import { isRecord } from '../../../utils/is-record';
 import { type MediaBranch, toMediaError } from './read';
 
 const RENAME_ERROR_CODES: Record<string, MediaErrorCode> = {

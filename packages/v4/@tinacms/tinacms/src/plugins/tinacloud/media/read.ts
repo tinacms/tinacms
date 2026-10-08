@@ -10,8 +10,9 @@ import {
   TINACLOUD_CDN_URL,
   type TinaCloudClient,
   TinaCloudError,
-  isRecord,
 } from '../client';
+import { encodePath } from '../../../utils/encode-path';
+import { isRecord } from '../../../utils/is-record';
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -49,9 +50,6 @@ export const toMediaError = (cause: unknown): MediaError => {
       return new MediaError('backend-failure', detail);
   }
 };
-
-export const encodePath = (path: string): string =>
-  path.split('/').map(encodeURIComponent).join('/');
 
 export const branchQuery = (branch: MediaBranch): string =>
   branch ? `?${new URLSearchParams({ branch })}` : '';

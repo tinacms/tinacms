@@ -1,3 +1,5 @@
+import { isRecord } from '../../utils/is-record';
+
 export const TINACLOUD_ASSETS_URL = 'https://assets.tinajs.io';
 
 export const TINACLOUD_CONTENT_URL = 'https://content.tinajs.io';
@@ -31,9 +33,6 @@ export class TinaCloudError extends Error {
     this.body = details.body;
   }
 }
-
-export const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 const parseBody = (text: string): unknown => {
   if (!text) return null;
