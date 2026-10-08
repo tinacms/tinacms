@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { AuthError } from '../../../core/auth/contract';
 import { MediaError } from '../../../core/media/contract';
 import { TinaCloudError } from '../client';
 import { toMediaError } from './shared';
@@ -24,6 +25,12 @@ describe('toMediaError', () => {
       })
     );
     expect(error.detail).toBe('TinaCloud responded with 500. S3 is down');
+  });
+
+  it('maps an AuthError to unauthorized', () => {
+    expect(
+      toMediaError(new AuthError('expired', 'Refresh refused.'))
+    ).toMatchObject({ code: 'unauthorized', detail: 'Refresh refused.' });
   });
 
   it('passes a MediaError through and wraps any other value', () => {

@@ -1,3 +1,4 @@
+import { AuthError } from '../../../core/auth/contract';
 import { MediaError } from '../../../core/media/contract';
 import { TinaCloudError } from '../client';
 
@@ -6,6 +7,9 @@ export type MediaBranch = string | undefined;
 
 export const toMediaError = (cause: unknown): MediaError => {
   if (cause instanceof MediaError) return cause;
+  if (cause instanceof AuthError) {
+    return new MediaError('unauthorized', cause.detail ?? cause.message);
+  }
   if (!(cause instanceof TinaCloudError)) {
     if (cause instanceof Error) {
       return new MediaError('backend-failure', cause.message);

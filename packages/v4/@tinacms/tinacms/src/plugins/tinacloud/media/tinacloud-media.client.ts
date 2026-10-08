@@ -1,13 +1,13 @@
 import type { MediaProvider } from '../../../core/media/contract';
 import type { ClientSlice, TinaStoreState } from '../../../core/plugin';
 import {
-  type TinaCloudOptions,
+  type TinaCloudClientOptions,
   type TinaCloudProject,
   createTinaCloudClient,
 } from '../client';
 import { deleteMedia } from './delete';
 import { listMedia, mediaUrl } from './read';
-import type { MediaBranch } from './shared';
+import { type MediaBranch, toMediaError } from './shared';
 import { renameMedia } from './rename';
 import { uploadMedia } from './upload';
 
@@ -21,12 +21,16 @@ const storeBranch = (state: TinaStoreState): MediaBranch => {
 // Branch is operational data the Data Layer owns (ADR-019, ADR-024), so with
 // no branch in the store the slice uses the project's default branch.
 export const createTinaCloudMediaSlice =
-  (options: TinaCloudOptions): ClientSlice =>
+  (options: TinaCloudClientOptions): ClientSlice =>
   (_set, get) => {
     const client = createTinaCloudClient(options);
     let project: TinaCloudProject | undefined;
     const branch = async (): Promise<MediaBranch> => {
-      project = await client.getProject();
+      try {
+        project = await client.getProject();
+      } catch (cause) {
+        throw toMediaError(cause);
+      }
       return storeBranch(get()) ?? project.defaultBranch;
     };
     const media = {
