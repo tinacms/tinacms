@@ -22,6 +22,8 @@ const badgeVariants = cva(
         draft: 'bg-status-draft-subtle text-status-draft',
         changed: 'bg-status-changed-subtle text-status-changed',
         failed: 'bg-status-failed-subtle text-status-failed',
+        count:
+          'min-w-5 bg-status-changed px-1.5 font-semibold text-primary-foreground tabular-nums',
       },
     },
     defaultVariants: {
