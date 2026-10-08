@@ -50,6 +50,7 @@ export {
   AfterSaveHookError,
   FormValidationError,
   useActiveField,
+  useAuthSlice,
   useContentSlice,
   useMediaSlice,
   useDiscardEdits,
@@ -64,5 +65,6 @@ export {
   useFormId,
   useFormSave,
   useFormSeedKey,
+  useRpcClient,
   useTinaStore,
 } from './hooks';

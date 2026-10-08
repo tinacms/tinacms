@@ -6,6 +6,7 @@ import {
   useFormState,
 } from 'react-hook-form';
 import { useStore } from 'zustand';
+import type { AuthSlice } from '../core/auth/contract';
 import type { ContentSlice } from '../core/content/contract';
 import type { MediaSlice } from '../core/media/contract';
 import type { FieldAddress } from '../core/field/address';
@@ -20,6 +21,11 @@ import type {
   TinaDocument,
 } from '../core/schema/types';
 import { type FormId, toFormValues, useFormStore } from '../form/form-store';
+import {
+  type RpcClientConfig,
+  type RpcProxy,
+  createRpcClient,
+} from '../rpc/proxy';
 import {
   FieldAddressContext,
   FieldSchemaContext,
@@ -88,6 +94,56 @@ export function useMediaSlice(): MediaSlice {
     'No media capability with upload, list, delete and resolveUrl is mounted — pass a media plugin (e.g. localMediaPlugin()) to <TinaProvider plugins>'
   );
   return slice;
+}
+
+const hasAuthState = ({ status, user }: SliceState): boolean => {
+  if (status === 'signed-in') {
+    return typeof user === 'object' && user !== null && !Array.isArray(user);
+  }
+  return (status === 'loading' || status === 'signed-out') && user === null;
+};
+
+const isAuthSlice = (slice: SliceState): slice is SliceState & AuthSlice =>
+  hasAuthState(slice) &&
+  typeof slice.getToken === 'function' &&
+  typeof slice.login === 'function' &&
+  typeof slice.logout === 'function';
+
+const authSliceOf = (state: TinaStoreState): AuthSlice | null => {
+  const slice = state.auth;
+  if (!slice) return null;
+  invariant(
+    isAuthSlice(slice),
+    'auth-capability-malformed',
+    'The auth capability is mounted, but its slice lacks a valid status, user, getToken, login or logout. Fix the auth plugin so its slice is an AuthSlice.'
+  );
+  return slice;
+};
+
+export function useAuthSlice(): AuthSlice | null {
+  return useTinaStore(authSliceOf);
+}
+
+export function useRpcClient<TSegments>(
+  config: Omit<RpcClientConfig, 'getToken'>
+): RpcProxy<TSegments> {
+  const runtime = use(TinaRuntimeContext);
+  invariant(
+    runtime,
+    'rpc-client-outside-provider',
+    'useRpcClient must be used within a TinaProvider'
+  );
+  const { store } = runtime;
+  const { url, fetch: fetchImpl } = config;
+  return useMemo(
+    () =>
+      createRpcClient<TSegments>({
+        url,
+        fetch: fetchImpl,
+        getToken: () => authSliceOf(store.getState())?.getToken(),
+      }),
+    [store, url, fetchImpl]
+  );
 }
 
 function useFormScope(hookCode: string, hookName: string): FormScope {
