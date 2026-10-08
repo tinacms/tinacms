@@ -49,9 +49,19 @@ interface InlineComboboxContextValue {
   trigger: string;
 }
 
-const InlineComboboxContext = createContext<InlineComboboxContextValue>(
-  null as any
+const InlineComboboxContext = createContext<InlineComboboxContextValue | null>(
+  null
 );
+
+const useInlineComboboxContext = () => {
+  const context = useContext(InlineComboboxContext);
+  if (!context) {
+    throw new Error(
+      'An InlineCombobox part must render inside InlineCombobox.'
+    );
+  }
+  return context;
+};
 
 export const defaultFilter: FilterFn = ({ keywords = [], value }, search) =>
   [value, ...keywords].some((keyword) => filterWords(keyword, search));
@@ -189,7 +199,7 @@ const InlineComboboxInput = forwardRef<
     inputRef: contextRef,
     showTrigger,
     trigger,
-  } = useContext(InlineComboboxContext);
+  } = useInlineComboboxContext();
 
   const store = useComboboxContext();
   const value = store.useState('value');
@@ -252,7 +262,7 @@ const comboboxItemVariants = cva(
     variants: {
       interactive: {
         false: '',
-        true: 'cursor-pointer transition-colors hover:bg-blue-500 hover:text-black data-[active-item=true]:bg-orange-400 data-[active-item=true]:text-black',
+        true: 'cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground data-[active-item=true]:bg-selected data-[active-item=true]:text-selected-foreground',
       },
     },
   }
@@ -271,7 +281,7 @@ const InlineComboboxItem = ({
 }: InlineComboboxItemProps) => {
   const { value } = props;
 
-  const { filter, removeInput } = useContext(InlineComboboxContext);
+  const { filter, removeInput } = useInlineComboboxContext();
 
   const store = useComboboxContext();
 
@@ -301,7 +311,7 @@ const InlineComboboxEmpty = ({
   children,
   className,
 }: HTMLAttributes<HTMLDivElement>) => {
-  const { setHasEmpty } = useContext(InlineComboboxContext);
+  const { setHasEmpty } = useInlineComboboxContext();
   const store = useComboboxContext();
   const items = store.useState('items');
 

@@ -26,6 +26,7 @@
   --tina-blue-50: #dceeff;
   --tina-blue-800: #144696;
   --tina-red-50: #fef2f2;
+  --tina-red-200: #fecaca;
   --tina-red-700: #b91c1c;
 }
 
@@ -47,6 +48,7 @@
   --secondary-foreground: var(--tina-slate-900);
   --muted: var(--tina-slate-100);
   --muted-foreground: var(--tina-slate-500);
+  --muted-foreground-strong: var(--tina-slate-600);
   --accent: var(--tina-slate-100);
   --accent-foreground: var(--tina-slate-900);
   --selected: var(--tina-slate-200);
@@ -66,6 +68,7 @@
   --status-changed-subtle: var(--tina-blue-50);
   --status-failed: var(--tina-red-700);
   --status-failed-subtle: var(--tina-red-50);
+  --status-failed-border: var(--tina-red-200);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -146,6 +149,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-muted-foreground-strong: var(--muted-foreground-strong);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-selected: var(--selected);
@@ -165,6 +169,7 @@
   --color-status-changed-subtle: var(--status-changed-subtle);
   --color-status-failed: var(--status-failed);
   --color-status-failed-subtle: var(--status-failed-subtle);
+  --color-status-failed-border: var(--status-failed-border);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);

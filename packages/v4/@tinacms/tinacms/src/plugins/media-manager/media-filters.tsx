@@ -36,8 +36,10 @@ import {
 
 const segmentClass = (active: boolean) =>
   cn(
-    'rounded-none border-0 first:rounded-l-lg last:rounded-r-lg [&:not(:first-child)]:border-l',
-    active ? 'bg-background text-primary' : 'bg-muted/50 text-muted-foreground'
+    'rounded-none border-0 first:rounded-l-sm last:rounded-r-sm [&:not(:first-child)]:border-l',
+    active
+      ? 'bg-background font-medium text-foreground'
+      : 'bg-muted/50 text-muted-foreground-strong'
   );
 
 export function ViewModeToggle({
@@ -48,7 +50,7 @@ export function ViewModeToggle({
   onChange: (value: MediaViewMode) => void;
 }) {
   return (
-    <div role='group' aria-label='View' className='flex rounded-lg border'>
+    <div role='group' aria-label='View' className='flex rounded-sm border'>
       <Button
         type='button'
         variant='ghost'
@@ -83,7 +85,7 @@ export function MediaKindToggle({
   onChange: (value: MediaKindFilter) => void;
 }) {
   return (
-    <div role='group' aria-label='Show' className='flex rounded-lg border'>
+    <div role='group' aria-label='Show' className='flex rounded-sm border'>
       {MEDIA_KIND_OPTIONS.map((option) => (
         <Button
           key={option.value}
@@ -167,7 +169,9 @@ export function MediaTypeFilter({
     >
       <SelectTrigger
         aria-label='File type'
-        className={value === 'all' ? undefined : 'border-primary text-primary'}
+        className={
+          value === 'all' ? undefined : 'border-foreground text-foreground'
+        }
       >
         <SelectValue />
       </SelectTrigger>
@@ -198,7 +202,7 @@ export function LockedAcceptChip({
     <Tooltip>
       <TooltipTrigger
         render={<span />}
-        className='flex items-center gap-1.5 rounded-lg border border-dashed bg-muted px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground'
+        className='flex items-center gap-1.5 rounded-sm border border-dashed bg-muted px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground-strong'
       >
         <LockIcon className='size-3.5' />
         {label}

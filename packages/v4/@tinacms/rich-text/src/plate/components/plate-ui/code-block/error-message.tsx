@@ -13,14 +13,17 @@ export function ErrorMessage({ error }: ErrorMessageProps) {
   return (
     <div
       contentEditable={false}
-      className='mt-2 flex items-start rounded-md border border-red-300 bg-red-50 p-3 shadow-sm'
+      className='mt-2 flex items-start rounded-md border border-status-failed-border bg-status-failed-subtle p-3 shadow-sm'
       role='alert'
     >
       <div className='flex-shrink-0'>
-        <AlertTriangle className='h-5 w-5 text-red-400' aria-hidden='true' />
+        <AlertTriangle
+          className='h-5 w-5 text-destructive'
+          aria-hidden='true'
+        />
       </div>
       <div className='ml-3 flex-1'>
-        <pre className='m-0 font-mono text-sm text-red-700 whitespace-pre-wrap break-words'>
+        <pre className='m-0 font-mono text-sm text-destructive whitespace-pre-wrap break-words'>
           {error}
         </pre>
       </div>

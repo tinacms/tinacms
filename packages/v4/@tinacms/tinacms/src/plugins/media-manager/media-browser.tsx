@@ -91,7 +91,7 @@ function LoadingGrid({ label }: { label: string }) {
       className='grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-4'
     >
       {Array.from({ length: 6 }, (_, index) => (
-        <Skeleton key={index} className='aspect-square rounded-xl' />
+        <Skeleton key={index} className='aspect-square rounded-md' />
       ))}
     </div>
   );
@@ -104,8 +104,8 @@ function SetupBanner({
 }) {
   return (
     <div className='flex h-full items-center justify-center p-6'>
-      <div className='flex items-start gap-2 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-yellow-800'>
-        <CircleAlertIcon className='mt-0.5 size-5 shrink-0 text-yellow-500' />
+      <div className='flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800'>
+        <CircleAlertIcon className='mt-0.5 size-5 shrink-0 text-amber-700' />
         <div className='flex flex-col items-start gap-2'>
           <p>{status.message}</p>
           <a
@@ -458,7 +458,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
           data-dragging={dragging ? 'true' : undefined}
           className={cn(
             'min-w-0 flex-1 overflow-y-auto border-2 border-transparent p-4 transition',
-            dragging ? 'rounded-lg border-orange-500' : null
+            dragging ? 'rounded-md border-dashed border-input bg-muted' : null
           )}
           onDragEnter={dragOver}
           onDragOver={dragOver}
