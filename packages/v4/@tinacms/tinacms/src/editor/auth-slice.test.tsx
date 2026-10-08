@@ -1,30 +1,48 @@
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
-import { createStore } from 'zustand';
+import { type AuthUser, toUserId } from '../core/auth/contract';
+import { createFieldRegistry } from '../core/field/registry';
+import { createFormHookRegistry } from '../core/form/hooks';
 import {
   type PluginManifest,
-  type TinaStoreState,
+  definePlugin,
   resolveClientSegments,
 } from '../core/plugin';
+import { createScreenRegistry } from '../core/screen/registry';
+import { createGlobalNav } from '../core/slot/global-nav';
+import { createValidatorRegistry } from '../core/validator/registry';
 import { createTinaStore } from '../store/create-store';
 import { testAuthPlugin } from '../test/test-auth-plugin';
 import { type TinaRuntime, TinaRuntimeContext } from './context';
-import { useAuthSlice, useRpcClient } from './hooks';
+import { useOptionalAuthSlice, useRpcClient } from './hooks';
 
-const wrapperFor = (store: TinaRuntime['store']) => {
-  const runtime = { store } as unknown as TinaRuntime;
-  return ({ children }: { children: ReactNode }) => (
-    <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
-  );
+const bootRuntime = async (plugins: PluginManifest[]): Promise<TinaRuntime> => {
+  const resolved = await resolveClientSegments(plugins);
+  const screens = createScreenRegistry(resolved, plugins);
+  return {
+    registry: createFieldRegistry(resolved),
+    validators: createValidatorRegistry(resolved),
+    hooks: createFormHookRegistry(resolved),
+    store: createTinaStore(resolved),
+    schema: { collections: [] },
+    screens,
+    globalNav: createGlobalNav(resolved, plugins, screens),
+  };
 };
 
+const wrapperFor =
+  (runtime: TinaRuntime) =>
+  ({ children }: { children: ReactNode }) => (
+    <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
+  );
+
 const boot = async (plugins: PluginManifest[]) => {
-  const store = createTinaStore(await resolveClientSegments(plugins));
+  const runtime = await bootRuntime(plugins);
   const authorizations: (string | null)[] = [];
   const { result } = renderHook(
     () => ({
-      auth: useAuthSlice(),
+      auth: useOptionalAuthSlice(),
       rpc: useRpcClient<{ search: { query: () => Promise<unknown> } }>({
         url: 'http://tina.local/api/tina',
         fetch: async (input, init) => {
@@ -35,22 +53,53 @@ const boot = async (plugins: PluginManifest[]) => {
         },
       }),
     }),
-    { wrapper: wrapperFor(store) }
+    { wrapper: wrapperFor(runtime) }
   );
   return { result, authorizations };
 };
 
-const ada = { id: 'ada', name: 'Ada' };
-const grace = { id: 'grace', name: 'Grace' };
+const malformedAuthPlugin = (slice: Record<string, unknown>) =>
+  definePlugin({
+    name: 'test:malformed-auth',
+    provides: ['auth'],
+    client: async () => ({ default: { slice: () => slice } }),
+  });
 
-describe('useAuthSlice', () => {
-  it('names the capability when the auth slice is malformed', () => {
-    const store = createStore<TinaStoreState>()(() => ({
-      auth: { status: 'signed-in', user: null, getToken: async () => 'x' },
-    }));
+const ada: AuthUser = { id: toUserId('ada'), name: 'Ada' };
+const grace: AuthUser = { id: toUserId('grace'), name: 'Grace' };
+const sessionMembers = {
+  getToken: async () => 'x',
+  login: async () => {},
+  logout: async () => {},
+};
+
+describe('useOptionalAuthSlice', () => {
+  it.each([
+    ['signed-in with no user', { status: 'signed-in', user: null }],
+    ['signed-in with no roles', { status: 'signed-in', user: ada }],
+    [
+      'a LoginScreen that is not a component',
+      { status: 'signed-out', user: null, LoginScreen: 'Sign in' },
+    ],
+  ])('names the capability when the slice is %s', async (_case, state) => {
+    const runtime = await bootRuntime([
+      malformedAuthPlugin({ ...sessionMembers, ...state }),
+    ]);
     expect(() =>
-      renderHook(() => useAuthSlice(), { wrapper: wrapperFor(store) })
+      renderHook(() => useOptionalAuthSlice(), {
+        wrapper: wrapperFor(runtime),
+      })
     ).toThrow(/auth-capability-malformed/);
+  });
+
+  it('carries the roles of the editor once they sign in', async () => {
+    const { result } = await boot([testAuthPlugin('test:auth', ada)]);
+    await act(() => result.current.auth?.login());
+    expect(result.current.auth).toMatchObject({
+      status: 'signed-in',
+      user: ada,
+      roles: ['editor'],
+    });
   });
 });
 

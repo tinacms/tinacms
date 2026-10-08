@@ -1,7 +1,20 @@
 import type { ComponentType } from 'react';
+import type { Brand } from '../brand';
+import { invariant } from '../invariant';
+
+export type UserId = Brand<string, 'UserId'>;
+
+export const toUserId = (id: string): UserId => {
+  invariant(
+    id.length > 0,
+    'user-id-empty',
+    'A user id must be a non-empty string.'
+  );
+  return id as UserId;
+};
 
 export interface AuthUser {
-  id: string;
+  id: UserId;
   name?: string;
   email?: string;
 }
@@ -49,8 +62,10 @@ export class AuthError extends Error {
 
 // ADR-023 §4/§5: the provider drives login and owns the token. The token stays in
 // memory, never in slice state or localStorage, and getToken refreshes it.
+// ADR-008: `roles` gate the UI only. The server check is the security boundary.
 export type AuthSlice = (
-  | { status: 'signed-in'; user: AuthUser }
+  | { status: 'signed-in'; user: AuthUser; roles: string[] }
+  | { status: 'forbidden'; user: AuthUser }
   | { status: 'loading' | 'signed-out'; user: null }
 ) & {
   getToken(): Promise<string | undefined>;
@@ -58,5 +73,3 @@ export type AuthSlice = (
   logout(): Promise<void>;
   LoginScreen?: ComponentType;
 };
-
-export type AuthStatus = AuthSlice['status'];

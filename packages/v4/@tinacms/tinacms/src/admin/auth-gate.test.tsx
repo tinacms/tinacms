@@ -2,7 +2,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import type { AuthSlice } from '../core/auth/contract';
+import { type AuthSlice, toUserId } from '../core/auth/contract';
 import { asResolvedConfig } from '../config';
 import { type PluginManifest, definePlugin } from '../core/plugin';
 import { testAuthPlugin } from '../test/test-auth-plugin';
@@ -58,7 +58,9 @@ describe('AuthGate', () => {
 
   it('signs the editor in, shows who they are, and signs them out', async () => {
     const user = userEvent.setup();
-    renderAdmin([testAuthPlugin('test:auth', { id: 'ada', name: 'Ada' })]);
+    renderAdmin([
+      testAuthPlugin('test:auth', { id: toUserId('ada'), name: 'Ada' }),
+    ]);
 
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
     const account = await screen.findByRole('list', { name: 'Account' });
@@ -97,7 +99,8 @@ describe('AuthGate', () => {
                     );
                     set({
                       status: 'signed-in',
-                      user: { id: 'ada', email: String(email) },
+                      user: { id: toUserId('ada'), email: String(email) },
+                      roles: ['editor'],
                     });
                   }}
                 >
@@ -117,5 +120,37 @@ describe('AuthGate', () => {
     expect(
       await screen.findByRole('list', { name: 'Account' })
     ).toHaveTextContent('ada@example.com');
+  });
+
+  it('shows who is signed in, keeps the admin closed, and signs out when the account has no access', async () => {
+    const user = userEvent.setup();
+    const forbiddenAuthPlugin = definePlugin({
+      name: 'test:forbidden-auth',
+      provides: ['auth'],
+      client: async () => ({
+        default: {
+          slice: (set) =>
+            ({
+              status: 'forbidden',
+              user: { id: toUserId('mal'), name: 'Mal' },
+              getToken: async () => undefined,
+              login: async () => {},
+              logout: async () => set({ status: 'signed-out', user: null }),
+            }) satisfies AuthSlice,
+        },
+      }),
+    });
+    renderAdmin([forbiddenAuthPlugin]);
+
+    expect(
+      await screen.findByRole('heading', { name: "You don't have access" })
+    ).toBeInTheDocument();
+    expect(screen.getByText(/signed in as Mal/)).toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: 'Collections' })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Sign out' }));
+    expect(
+      await screen.findByRole('button', { name: 'Sign in' })
+    ).toBeInTheDocument();
   });
 });

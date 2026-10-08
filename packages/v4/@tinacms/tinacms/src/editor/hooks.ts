@@ -1,4 +1,11 @@
-import { use, useCallback, useEffect, useEffectEvent, useMemo } from 'react';
+import {
+  use,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   get,
   useController,
@@ -26,6 +33,7 @@ import {
   type RpcProxy,
   createRpcClient,
 } from '../rpc/proxy';
+import { isRecord } from '../utils/is-record';
 import {
   FieldAddressContext,
   FieldSchemaContext,
@@ -96,18 +104,25 @@ export function useMediaSlice(): MediaSlice {
   return slice;
 }
 
-const hasAuthState = ({ status, user }: SliceState): boolean => {
-  if (status === 'signed-in') {
-    return typeof user === 'object' && user !== null && !Array.isArray(user);
-  }
+const isStringArray = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every((item) => typeof item === 'string');
+
+const hasAuthState = ({ status, user, roles }: SliceState): boolean => {
+  if (status === 'signed-in') return isRecord(user) && isStringArray(roles);
+  if (status === 'forbidden') return isRecord(user);
   return (status === 'loading' || status === 'signed-out') && user === null;
 };
+
+const isComponent = (value: unknown): boolean =>
+  typeof value === 'function' ||
+  (isRecord(value) && typeof value.$$typeof === 'symbol');
 
 const isAuthSlice = (slice: SliceState): slice is SliceState & AuthSlice =>
   hasAuthState(slice) &&
   typeof slice.getToken === 'function' &&
   typeof slice.login === 'function' &&
-  typeof slice.logout === 'function';
+  typeof slice.logout === 'function' &&
+  (slice.LoginScreen === undefined || isComponent(slice.LoginScreen));
 
 const authSliceOf = (state: TinaStoreState): AuthSlice | null => {
   const slice = state.auth;
@@ -115,12 +130,12 @@ const authSliceOf = (state: TinaStoreState): AuthSlice | null => {
   invariant(
     isAuthSlice(slice),
     'auth-capability-malformed',
-    'The auth capability is mounted, but its slice lacks a valid status, user, getToken, login or logout. Fix the auth plugin so its slice is an AuthSlice.'
+    'The auth capability is mounted, but its slice lacks a valid status, user, roles, getToken, login, logout or LoginScreen. Fix the auth plugin so its slice is an AuthSlice.'
   );
   return slice;
 };
 
-export function useAuthSlice(): AuthSlice | null {
+export function useOptionalAuthSlice(): AuthSlice | null {
   return useTinaStore(authSliceOf);
 }
 
@@ -135,14 +150,18 @@ export function useRpcClient<TSegments>(
   );
   const { store } = runtime;
   const { url, fetch: fetchImpl } = config;
+  const fetchRef = useRef(fetchImpl);
+  useEffect(() => {
+    fetchRef.current = fetchImpl;
+  });
   return useMemo(
     () =>
       createRpcClient<TSegments>({
         url,
-        fetch: fetchImpl,
+        fetch: (input, init) => (fetchRef.current ?? fetch)(input, init),
         getToken: () => authSliceOf(store.getState())?.getToken(),
       }),
-    [store, url, fetchImpl]
+    [store, url]
   );
 }
 
