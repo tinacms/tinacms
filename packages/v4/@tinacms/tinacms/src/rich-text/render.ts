@@ -133,7 +133,7 @@ function renderLeaf<Rendered>(
   return rendered;
 }
 
-/** Fallback mark style: `color` is the highlight background, `textColor` the text colour. */
+/** Fallback mark style: `color` is a `<mark>` background, `textColor` a `<span>` colour. */
 const markStyle = ({ color, textColor }: RichTextProps): RichTextProps => {
   const style = {
     ...(color ? { backgroundColor: color } : {}),

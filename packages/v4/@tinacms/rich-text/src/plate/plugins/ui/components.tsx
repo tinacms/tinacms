@@ -31,7 +31,6 @@ import {
 import { ParagraphPlugin, PlateLeaf } from '@udecode/plate/react';
 import colorString from 'color-string';
 import React from 'react';
-import { ListItemElement } from '../../components/list-item-element';
 import { BlockquoteElement } from '../../components/plate-ui/blockquote-element';
 import { CodeBlockElement } from '../../components/plate-ui/code-block/code-block-element';
 import { CodeLeaf } from '../../components/plate-ui/code-leaf';
@@ -40,6 +39,7 @@ import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf';
 import { HrElement } from '../../components/plate-ui/hr-element';
 import { LinkElement } from '../../components/plate-ui/link-element';
 import { ListElement } from '../../components/plate-ui/list-element';
+import { ListItemElement } from '../../components/list-item-element';
 import { ParagraphElement } from '../../components/plate-ui/paragraph-element';
 import { SlashInputElement } from '../../components/plate-ui/slash-input-element';
 import {

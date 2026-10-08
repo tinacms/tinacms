@@ -9,7 +9,7 @@ import type * as Md from 'mdast';
 import type * as Plate from '../parse/plate';
 import { stringifyPropsInline } from './acorn';
 import { longestMarkRun, textColorElement } from './text-color';
-import { getMarks } from './index';
+import { type Marks, getMarks } from './index';
 
 type InlineElementWithCallback = Plate.InlineElement & {
   linkifyTextNode?: (arg: Md.Text) => Md.Link;
@@ -195,15 +195,17 @@ export const eat = (
   const textNode = first as Plate.TextElement & InlineElementWithCallback;
   const { markToProcess, runLength } = longestMarkRun(
     content,
-    getMarks(textNode)
+    getMarks(textNode).filter(
+      (mark): mark is Exclude<Marks, 'highlight'> => mark !== 'highlight'
+    )
   );
-  if (!markToProcess) {
+  if (!markToProcess && !textNode.highlight) {
     return [
       ...leaf(textNode, text(textNode)),
       ...eat(content.slice(1), field, imageCallback),
     ];
   }
-  if (markToProcess === 'highlight') {
+  if (!markToProcess) {
     return [
       {
         type: 'mdxJsxTextElement',

@@ -76,11 +76,11 @@ export const textColorHtml = (
  * leading nodes, ties going to the earliest in `getMarks` order. Only that
  * run is wrapped, so neighbours without the mark never gain it.
  */
-export const longestMarkRun = (
+export const longestMarkRun = <M extends Marks>(
   content: Plate.InlineElement[],
-  marks: Marks[]
+  marks: M[]
 ) => {
-  let markToProcess: Marks | undefined;
+  let markToProcess: M | undefined;
   let runLength = 0;
   for (const mark of marks) {
     const end = content.findIndex((node) => !getMarks(node).includes(mark));

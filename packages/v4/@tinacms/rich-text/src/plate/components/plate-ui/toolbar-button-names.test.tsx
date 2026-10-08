@@ -12,7 +12,6 @@ import { Components } from '../../plugins/ui/components';
 import { ToolbarProvider } from '../../toolbar/toolbar-provider';
 import { HeadingsMenu } from '../headings-dropdown';
 import { CodeBlockToolbarButton } from './code-block-toolbar-button';
-import { HorizontalRuleToolbarButton } from './hr-toolbar-button';
 import {
   ArrowDownIcon,
   BoldIcon,
@@ -30,6 +29,7 @@ import {
   UnderlineIcon,
   UnorderedListIcon,
 } from './icons';
+import { HorizontalRuleToolbarButton } from './hr-toolbar-button';
 import { ImageToolbarButton } from './image-toolbar-button';
 import { ListToolbarButton } from './indent-list-toolbar-button';
 import { LinkToolbarButton } from './link-toolbar-button';

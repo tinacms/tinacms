@@ -35,6 +35,18 @@ describe('grouping marked text', () => {
       )
     ).toBe('***a**b*\n');
   });
+
+  it('keeps highlight innermost so the other marks stay', () => {
+    expect(
+      roundTrip(
+        [
+          { type: 'text', text: 'a', italic: true, highlight: true },
+          { type: 'text', text: 'b', highlight: true },
+        ],
+        mdx
+      )
+    ).toBe('*<mark>a</mark>*<mark>b</mark>\n');
+  });
 });
 
 describe.each<[string, RichTextField, (text: string) => string]>([

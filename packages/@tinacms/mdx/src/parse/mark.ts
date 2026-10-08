@@ -15,11 +15,11 @@ type ColorMarks = Pick<
   'highlight' | 'highlightColor' | 'textColor'
 >;
 
-/** The colours a `style` may carry on a colour mark. */
+/** The colour a `style` may carry on a text colour `<span>`. */
 type ColorStyle = { color?: string };
 
 /**
- * The safe colours read from a `style`, and whether it held anything else
+ * The safe colour read from a `style`, and whether it held anything else
  * (other properties, unsafe colours, or values that aren't string literals).
  */
 type ReadStyle = { colors: ColorStyle; extra: boolean };
@@ -39,7 +39,7 @@ const readDeclarations = (
   return { colors, extra };
 };
 
-/** Reads `style="color: #CC4141; background-color: #FEF08A"`. */
+/** Reads `style="color: #CC4141"`. */
 const readStringStyle = (value: string): ReadStyle =>
   readDeclarations(
     value
@@ -210,13 +210,9 @@ export const parseMarkMdxText = <
   });
 };
 
-/** The colour marks `item` already carries. */
-const innerColors = (item: Plate.TextElement): ColorMarks =>
-  Object.fromEntries(
-    (['highlightColor', 'textColor'] as const)
-      .filter((key) => item[key] !== undefined)
-      .map((key) => [key, item[key]])
-  );
+/** The text colour `item` already carries, which wins over an outer one. */
+const innerColor = ({ textColor }: Plate.TextElement): ColorMarks =>
+  textColor === undefined ? {} : { textColor };
 
 const applyMarksToInlineElements = (
   elements: Plate.InlineElement | Plate.InlineElement[],
@@ -226,11 +222,10 @@ const applyMarksToInlineElements = (
 
   return items.map((item) => {
     if (item.type === 'text') {
-      // Colours set by an inner element win over the outer one's
       return {
         ...item,
         ...marks,
-        ...innerColors(item),
+        ...innerColor(item),
       };
     }
 
