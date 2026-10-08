@@ -84,6 +84,7 @@ describe('TinaCloud auth slice', () => {
     expect(state).toMatchObject({
       status: 'signed-in',
       user: { id: 'ada', name: 'Ada Lovelace', email: 'ada@example.com' },
+      roles: ['admin'],
     });
     expect(JSON.stringify(state)).not.toContain('id-token');
     expect(localStorage.length).toBe(0);
@@ -147,8 +148,6 @@ describe('TinaCloud auth slice', () => {
 
   it.each([
     ['unauthenticated', () => json({ message: 'nope' }, 401)],
-    ['unauthenticated', () => json({ ...tinaCloudUser, verified: false })],
-    ['unauthenticated', () => json({ ...tinaCloudUser, enabled: false })],
     ['network', () => Promise.reject(new TypeError('Failed to fetch'))],
     ['network', () => json({}, 503)],
     ['invalid-response', () => json({ fullName: 'No Id' })],
@@ -165,6 +164,33 @@ describe('TinaCloud auth slice', () => {
     expect(state.status).toBe('signed-out');
     expect(await getToken()).toBeUndefined();
   });
+
+  it('gives a TinaCloud user that is not an admin the editor role', async () => {
+    stubFetch(() => json({ ...tinaCloudUser, role: 'user' }));
+    const { complete } = stubLoginPopup();
+    const { slice, state } = boot();
+    const login = slice.login();
+    complete();
+    await login;
+    expect(state).toMatchObject({ status: 'signed-in', roles: ['editor'] });
+  });
+
+  it.each([
+    ['not verified', { verified: false }],
+    ['disabled', { enabled: false }],
+  ])(
+    'sets forbidden, with no token, for an account that is %s',
+    async (_case, flags) => {
+      stubFetch(() => json({ ...tinaCloudUser, ...flags }));
+      const { complete } = stubLoginPopup();
+      const { slice, state, getToken } = boot();
+      const login = slice.login();
+      complete();
+      await login;
+      expect(state).toMatchObject({ status: 'forbidden', user: { id: 'ada' } });
+      expect(await getToken()).toBeUndefined();
+    }
+  );
 
   it('refreshes the token once when it expires within two minutes', async () => {
     const fetchMock = stubFetch((url) =>

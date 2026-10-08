@@ -1,8 +1,4 @@
-import {
-  AuthError,
-  type AuthSlice,
-  type AuthUser,
-} from '../../../core/auth/contract';
+import { AuthError, type AuthSlice } from '../../../core/auth/contract';
 import type { SliceSet } from '../../../core/plugin';
 import { isRecord } from '../../../utils/is-record';
 import {
@@ -81,10 +77,7 @@ const send = async (
   return { response, body };
 };
 
-const fetchUser = async (
-  clientId: string,
-  bearer: string
-): Promise<AuthUser> => {
+const fetchUser = async (clientId: string, bearer: string) => {
   const { response, body } = await send(currentUserUrl(clientId), {
     headers: { Authorization: `Bearer ${bearer}` },
   });
@@ -107,13 +100,7 @@ const fetchUser = async (
       'TinaCloud returned the user in an unknown format.'
     );
   }
-  if (!parsed.data.active) {
-    throw new AuthError(
-      'unauthenticated',
-      'The TinaCloud account is not verified or is disabled.'
-    );
-  }
-  return parsed.data.user;
+  return parsed.data;
 };
 
 const refreshTokens = async (
@@ -271,11 +258,16 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
       message.id_token,
       message.refresh_token
     );
-    const user = await fetchUser(clientId, next.bearer);
+    const { user, roles, active } = await fetchUser(clientId, next.bearer);
     if (signOuts !== signOutsAtStart) return;
-    tokens = next;
     refreshing = undefined;
-    set?.({ status: 'signed-in', user });
+    if (!active) {
+      tokens = undefined;
+      set?.({ status: 'forbidden', user });
+      return;
+    }
+    tokens = next;
+    set?.({ status: 'signed-in', user, roles });
   };
 
   const logout = async () => signOut();

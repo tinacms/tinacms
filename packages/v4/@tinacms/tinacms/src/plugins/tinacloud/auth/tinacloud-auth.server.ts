@@ -23,8 +23,8 @@ export const createTinaCloudAuthServer = ({ clientId }: TinaCloudOptions) =>
         await response.json().catch(() => null)
       );
       if (!parsed.success) return null;
-      const { user, role, active } = parsed.data;
+      const { user, roles, active } = parsed.data;
       if (!active) return null;
-      return { identity: user, roles: [role === 'admin' ? 'admin' : 'editor'] };
+      return { identity: user, roles };
     },
   });

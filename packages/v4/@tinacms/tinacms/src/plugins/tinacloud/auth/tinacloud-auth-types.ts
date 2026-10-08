@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AuthUser } from '../../../core/auth/contract';
+import { type AuthUser, toUserId } from '../../../core/auth/contract';
 import { TINACLOUD_IDENTITY_URL } from '../client';
 
 export const TINACLOUD_LOGIN_EVENT = 'tinaCloudLogin';
@@ -39,8 +39,12 @@ export const currentUserSchema = z
       });
       return z.NEVER;
     }
-    const user: AuthUser = { id: userId, name: fullName, email };
-    return { user, role, active: verified === true && enabled !== false };
+    const user: AuthUser = { id: toUserId(userId), name: fullName, email };
+    return {
+      user,
+      roles: [role === 'admin' ? 'admin' : 'editor'],
+      active: verified === true && enabled !== false,
+    };
   });
 
 export const currentUserUrl = (clientId: string) =>

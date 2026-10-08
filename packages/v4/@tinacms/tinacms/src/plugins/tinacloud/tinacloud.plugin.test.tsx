@@ -8,7 +8,7 @@ import { asResolvedConfig } from '../../config';
 import { MediaError } from '../../core/media/contract';
 import { definePlugin, resolveClientSegments } from '../../core/plugin';
 import { type TinaRuntime, TinaRuntimeContext } from '../../editor/context';
-import { useAuthSlice, useMediaSlice } from '../../editor/hooks';
+import { useOptionalAuthSlice, useMediaSlice } from '../../editor/hooks';
 import { createRpcHandler } from '../../rpc/handler';
 import { defineServerPlugin } from '../../server';
 import { createTinaStore } from '../../store/create-store';
@@ -44,7 +44,7 @@ const boot = async () => {
     <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
   );
   const { result } = renderHook(
-    () => ({ media: useMediaSlice(), auth: useAuthSlice() }),
+    () => ({ media: useMediaSlice(), auth: useOptionalAuthSlice() }),
     { wrapper }
   );
   return { store, result };
