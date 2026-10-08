@@ -45,14 +45,14 @@ function CopyField({ value }: { value: string }) {
       <button
         type='button'
         disabled={copied}
-        className='relative flex w-full items-center gap-1.5 overflow-hidden rounded-sm border bg-muted/50 px-3 py-2 text-left text-sm break-all transition hover:bg-background hover:text-primary disabled:pointer-events-none'
+        className='relative flex w-full items-center gap-1.5 overflow-hidden rounded-sm border bg-muted/50 px-3 py-2 text-left text-sm break-all transition hover:bg-background hover:text-foreground disabled:pointer-events-none'
         onClick={copy}
       >
-        <CopyIcon className='size-4 shrink-0 text-primary' />
+        <CopyIcon className='size-4 shrink-0 text-muted-foreground' />
         <span className='sr-only'>Copy URL </span>
         {value}
         {copied ? (
-          <span className='absolute inset-0 flex items-center justify-center bg-background/90 font-medium text-primary'>
+          <span className='absolute inset-0 flex items-center justify-center bg-background/90 font-medium text-foreground'>
             Copied to clipboard!
           </span>
         ) : null}
