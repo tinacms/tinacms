@@ -5,6 +5,7 @@ import {
   isMediaErrorCode,
 } from '../../../core/media/contract';
 import type { ClientSlice } from '../../../core/plugin';
+import { encodePath } from '../../../utils/encode-path';
 import { MEDIA_ERROR_HEADER } from './local-media.plugin';
 import type { MediaRequest } from './server/media-request';
 
@@ -56,8 +57,7 @@ export const createMediaSlice = (
     delete: async (path) => {
       await postMediaRequest<null>(url, { op: 'delete', path });
     },
-    resolveUrl: (path) =>
-      `/${mediaRoot}/${path.split('/').map(encodeURIComponent).join('/')}`,
+    resolveUrl: (path) => `/${mediaRoot}/${encodePath(path)}`,
   };
   return () => ({ ...slice });
 };
