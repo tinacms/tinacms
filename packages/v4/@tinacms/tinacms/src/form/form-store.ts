@@ -51,6 +51,7 @@ type OpenForm =
       readonly baseline: FormValues;
       readonly errors: FieldErrors;
       readonly equal: FieldEquality;
+      readonly savedAt?: number;
     };
 
 export const isEdited = (
@@ -249,6 +250,7 @@ export const useFormStore = create<FormStore>()(
                   // dirty.
                   baseline: structuredClone(savedValues ?? scope.values),
                   errors: isEdited(scope) ? scope.errors : {},
+                  savedAt: Date.now(),
                 },
               },
             };
@@ -356,6 +358,12 @@ export const syncDrafts = () =>
         removeDraft(formId);
       }
     }
+  });
+
+export const useLastSaved = (formId: FormId): number | undefined =>
+  useFormStore((state) => {
+    const scope = state.forms[formId];
+    return isEdited(scope) ? scope.savedAt : undefined;
   });
 
 export const useFormStatus = (formId: FormId): FormStatus =>

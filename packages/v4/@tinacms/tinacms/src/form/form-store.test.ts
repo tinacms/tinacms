@@ -128,6 +128,25 @@ describe('form-store save reset', () => {
     expect(statusOf(postA)).toBe('dirty');
   });
 
+  it('markSaved records the save time, and later edits keep it', () => {
+    const postC = toFormId('posts/c.mdx');
+    const savedAtOf = () => {
+      const scope = store.getState().forms[postC];
+      return isEdited(scope) ? scope.savedAt : undefined;
+    };
+    store.getState().registerForm(postC, { [title]: 'Hello' });
+    store.getState().setFieldValue(postC, title, 'Edited');
+    expect(savedAtOf()).toBeUndefined();
+
+    const before = Date.now();
+    store.getState().markSaved(postC);
+    const savedAt = savedAtOf();
+    expect(savedAt).toBeGreaterThanOrEqual(before);
+
+    store.getState().setFieldValue(postC, title, 'Edited again');
+    expect(savedAtOf()).toBe(savedAt);
+  });
+
   it('markSaved with a pre-save snapshot keeps in-flight edits dirty', () => {
     store.getState().registerForm(postA, { [title]: 'Hello' });
     store.getState().setFieldValue(postA, title, 'Saved value');
