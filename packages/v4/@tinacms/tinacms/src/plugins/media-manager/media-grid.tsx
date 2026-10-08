@@ -163,7 +163,7 @@ function ListRow({
         aria-label={tileLabel(name, isNew)}
         aria-pressed={folder ? undefined : active}
         className={cn(
-          'relative flex w-full items-center text-left transition outline-none hover:bg-muted/50 focus-visible:focus-ring',
+          'relative flex w-full items-center text-left transition outline-none hover:bg-muted/50 focus-visible:focus-ring-inset',
           active ? 'bg-selected text-selected-foreground' : null
         )}
         onClick={() => onClick(item)}
