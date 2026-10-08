@@ -15,10 +15,9 @@ import {
   loginMessageSchema,
   refreshResponseSchema,
 } from './tinacloud-auth-types';
+import { openCenteredPopup, waitForPopupMessage } from './popup';
 
 const REFRESH_MARGIN_SECONDS = 120;
-
-const POPUP_POLL_MS = 500;
 
 const POPUP_WIDTH = 1000;
 
@@ -142,68 +141,22 @@ const refreshTokens = async (
   return toTokens(access_token, id_token, refresh_token ?? tokens.refreshToken);
 };
 
-const openLoginPopup = (clientId: string): Promise<TinaCloudLoginMessage> =>
-  new Promise((resolve, reject) => {
-    const appOrigin = new URL(TINACLOUD_APP_URL).origin;
-    const url = new URL('/signin', TINACLOUD_APP_URL);
-    url.search = new URLSearchParams({
-      clientId,
-      origin: window.location.origin,
-    }).toString();
-    const left = window.screenX + (window.outerWidth - POPUP_WIDTH) / 2;
-    const top = window.screenY + (window.outerHeight - POPUP_HEIGHT) / 2;
-    const popup = window.open(
-      url,
-      '_blank',
-      `popup,width=${POPUP_WIDTH},height=${POPUP_HEIGHT},left=${left},top=${top}`
-    );
-    if (!popup) {
-      reject(
-        new AuthError(
-          'unauthenticated',
-          'The browser blocked the sign-in popup. Allow popups for this site.'
-        )
-      );
-      return;
-    }
-    const stop = () => {
-      clearInterval(poll);
-      window.removeEventListener('message', onMessage);
-    };
-    const onMessage = (event: MessageEvent) => {
-      if (event.origin !== appOrigin || event.source !== popup) return;
-      if (
-        !isRecord(event.data) ||
-        event.data.source !== TINACLOUD_LOGIN_EVENT
-      ) {
-        return;
-      }
-      stop();
-      popup.close();
-      const parsed = loginMessageSchema.safeParse(event.data);
-      if (parsed.success) {
-        resolve(parsed.data);
-      } else {
-        reject(
-          new AuthError(
-            'invalid-response',
-            'TinaCloud sent the sign-in tokens in an unknown format.'
-          )
-        );
-      }
-    };
-    const poll = setInterval(() => {
-      if (!popup.closed) return;
-      stop();
-      reject(
-        new AuthError(
-          'unauthenticated',
-          'The sign-in popup closed before sign-in finished.'
-        )
-      );
-    }, POPUP_POLL_MS);
-    window.addEventListener('message', onMessage);
+const openLoginPopup = async (
+  clientId: string
+): Promise<TinaCloudLoginMessage> => {
+  const url = new URL('/signin', TINACLOUD_APP_URL);
+  url.search = new URLSearchParams({
+    clientId,
+    origin: window.location.origin,
+  }).toString();
+  const popup = openCenteredPopup(url, POPUP_WIDTH, POPUP_HEIGHT);
+  return waitForPopupMessage(popup, {
+    origin: new URL(TINACLOUD_APP_URL).origin,
+    isCandidate: (data) =>
+      isRecord(data) && data.source === TINACLOUD_LOGIN_EVENT,
+    schema: loginMessageSchema,
   });
+};
 
 // ADR-023 §4: the tokens live in this closure only, never in slice state or storage.
 export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
