@@ -20,6 +20,15 @@ export const parentFolder = (folder: CollectionFolder) => {
     parentName: folder.parentName.split('/').slice(0, -1).join('/'),
   };
 };
+
+export const decodeRouteParam = (param = '') => {
+  try {
+    return decodeURIComponent(param);
+  } catch {
+    return param;
+  }
+};
+
 export const useCollectionFolder = () => {
   const [folder, setFolder] = useState<CollectionFolder>({
     loading: true,
