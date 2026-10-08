@@ -124,7 +124,7 @@ export const createMediaDeliveryHandlers = (config: AzureBlobStorageConfig) => {
           });
         }
 
-        let outputFormat: keyof sharp.FormatEnum = 'jpeg';
+        let outputFormat: 'jpeg' | 'webp' | 'avif' = 'jpeg';
         let outputContentType = 'image/jpeg';
 
         if (
