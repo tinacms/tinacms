@@ -99,8 +99,11 @@ export const createTinaCloudClient = (options: TinaCloudOptions) => {
     return body;
   };
 
-  // The same contract as v3 `waitForRequestStatus`: `error` is absent while
-  // the request runs, then `false` for success or `true` for failure.
+  // TinaCloud commits media writes in the background and returns a request id
+  // at once; waiting means a write only resolves once it has landed, and a
+  // failed commit surfaces as an error. The same contract as v3
+  // `waitForRequestStatus`: `error` is absent while the request runs, then
+  // `false` for success or `true` for failure.
   const waitForRequest = async (requestId: string): Promise<void> => {
     const url = `${TINACLOUD_CONTENT_URL}/request-status/${options.clientId}/${requestId}`;
     const startedAt = Date.now();
