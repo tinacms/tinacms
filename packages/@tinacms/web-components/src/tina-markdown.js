@@ -44,6 +44,24 @@ const MARKS = [
   ['highlight', 'mark'],
 ];
 
+const SANITIZER_PROBE = '<img src="x" onerror="1"><script>1</scr' + 'ipt>';
+let sanitizerVerified;
+
+// DOMPurify can be inert in non-browser DOM implementations, so raw HTML is
+// only rendered once a probe proves unsafe markup actually gets removed.
+function sanitizerRemovesUnsafeMarkup() {
+  if (sanitizerVerified === undefined) {
+    const probe = document.createElement('div');
+    probe.appendChild(
+      DOMPurify.sanitize(SANITIZER_PROBE, { RETURN_DOM_FRAGMENT: true })
+    );
+    sanitizerVerified =
+      probe.querySelector('script') === null &&
+      probe.querySelector('[onerror]') === null;
+  }
+  return sanitizerVerified;
+}
+
 /**
  * @param {Node} root
  * @returns {HTMLElement}
@@ -66,6 +84,10 @@ function renderNode(node) {
   if (node.type === 'text') return renderText(node);
 
   if (node.type === 'html' || node.type === 'html_inline') {
+    if (!sanitizerRemovesUnsafeMarkup()) {
+      return document.createTextNode(node.value ?? '');
+    }
+
     return DOMPurify.sanitize(node.value, { RETURN_DOM_FRAGMENT: true });
   }
 

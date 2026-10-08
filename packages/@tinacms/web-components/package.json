@@ -28,6 +28,7 @@
     "@tinacms/mdx": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "happy-dom": "catalog:",
+    "jsdom": "^30.0.1",
     "vite": "^5.4.14",
     "vitest": "^2.1.9"
   },
