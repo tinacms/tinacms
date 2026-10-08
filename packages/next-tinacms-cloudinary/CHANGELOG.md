@@ -1,5 +1,16 @@
 # next-tinacms-cloudinary
 
+## 27.0.6
+
+### Patch Changes
+
+- [#7666](https://github.com/tinacms/tinacms/pull/7666) [`53686ee`](https://github.com/tinacms/tinacms/commit/53686eef0b9511e1cf638b9530c84e1b36630c89) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump `multer` from `2.2.0` to `2.4.0`, which fixes CVE-2026-88932 and the four CVEs fixed in 2.3.0.
+
+  Uploads behave the same. Both adapters accept one file in the `file` field and read `directory` from the body. The behaviour changes in 2.3 and 2.4 cover upload limits, which neither adapter sets, and escaped characters in field names.
+
+- Updated dependencies [[`4f2758e`](https://github.com/tinacms/tinacms/commit/4f2758e3067ca2a2db40593a0e4a1040b51ad127)]:
+  - tinacms@3.14.4
+
 ## 27.0.5
 
 ### Patch Changes
