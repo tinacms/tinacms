@@ -27,10 +27,16 @@ describe('toMediaError', () => {
     expect(error.detail).toBe('TinaCloud responded with 500. S3 is down');
   });
 
-  it('maps an AuthError to unauthorized', () => {
-    expect(
-      toMediaError(new AuthError('expired', 'Refresh refused.'))
-    ).toMatchObject({ code: 'unauthorized', detail: 'Refresh refused.' });
+  it.each([
+    ['unauthenticated', 'unauthorized'],
+    ['expired', 'unauthorized'],
+    ['network', 'backend-failure'],
+    ['invalid-response', 'backend-failure'],
+  ] as const)('maps an AuthError %s to %s', (authCode, code) => {
+    expect(toMediaError(new AuthError(authCode, 'Why.'))).toMatchObject({
+      code,
+      detail: 'Why.',
+    });
   });
 
   it('passes a MediaError through and wraps any other value', () => {

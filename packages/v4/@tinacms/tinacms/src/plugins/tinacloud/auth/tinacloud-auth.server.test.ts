@@ -72,4 +72,11 @@ describe('TinaCloud getSession', () => {
     stubIdentity(respond);
     expect(await getSession(request('Bearer id-token'))).toBeNull();
   });
+
+  it('throws when TinaCloud cannot be reached, so the handler fails closed', async () => {
+    stubIdentity(() => Promise.reject(new TypeError('Failed to fetch')));
+    await expect(getSession(request('Bearer id-token'))).rejects.toThrow(
+      'Failed to fetch'
+    );
+  });
 });

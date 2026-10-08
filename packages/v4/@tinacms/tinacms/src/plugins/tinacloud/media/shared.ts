@@ -8,7 +8,11 @@ export type MediaBranch = string | undefined;
 export const toMediaError = (cause: unknown): MediaError => {
   if (cause instanceof MediaError) return cause;
   if (cause instanceof AuthError) {
-    return new MediaError('unauthorized', cause.detail ?? cause.message);
+    const detail = cause.detail ?? cause.message;
+    if (cause.code === 'unauthenticated' || cause.code === 'expired') {
+      return new MediaError('unauthorized', detail);
+    }
+    return new MediaError('backend-failure', detail);
   }
   if (!(cause instanceof TinaCloudError)) {
     if (cause instanceof Error) {

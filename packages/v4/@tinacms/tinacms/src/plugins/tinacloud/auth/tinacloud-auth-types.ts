@@ -30,7 +30,7 @@ export const currentUserSchema = z
     verified: z.boolean().optional(),
     enabled: z.boolean().optional(),
   })
-  .transform(({ id, email, fullName, ...account }, context) => {
+  .transform(({ id, email, fullName, role, verified, enabled }, context) => {
     const userId = id ?? email;
     if (!userId) {
       context.addIssue({
@@ -40,8 +40,8 @@ export const currentUserSchema = z
       return z.NEVER;
     }
     const user: AuthUser = { id: userId, name: fullName, email };
-    return { user, ...account };
+    return { user, role, active: verified === true && enabled !== false };
   });
 
 export const currentUserUrl = (clientId: string) =>
-  `${TINACLOUD_IDENTITY_URL}/v2/apps/${clientId}/currentUser`;
+  `${TINACLOUD_IDENTITY_URL}/v2/apps/${encodeURIComponent(clientId)}/currentUser`;

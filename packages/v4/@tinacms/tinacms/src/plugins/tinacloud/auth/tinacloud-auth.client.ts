@@ -107,6 +107,12 @@ const fetchUser = async (
       'TinaCloud returned the user in an unknown format.'
     );
   }
+  if (!parsed.data.active) {
+    throw new AuthError(
+      'unauthenticated',
+      'The TinaCloud account is not verified or is disabled.'
+    );
+  }
   return parsed.data.user;
 };
 
@@ -126,7 +132,7 @@ const refreshTokens = async (
       }).toString(),
     }
   );
-  if (response.status >= 400 && response.status < 500) {
+  if ([400, 401, 403].includes(response.status)) {
     throw new AuthError(
       'expired',
       `TinaCloud refused the refresh with ${response.status}.`
@@ -217,8 +223,10 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
   let tokens: TinaCloudTokens | undefined;
   let refreshing: Promise<TinaCloudTokens> | undefined;
   let set: SliceSet | undefined;
+  let signOuts = 0;
 
   const signOut = () => {
+    signOuts += 1;
     tokens = undefined;
     refreshing = undefined;
     set?.({ status: 'signed-out', user: null });
@@ -256,6 +264,7 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
   };
 
   const login = async () => {
+    const signOutsAtStart = signOuts;
     const message = await openLoginPopup(clientId);
     const next = toTokens(
       message.access_token,
@@ -263,6 +272,7 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
       message.refresh_token
     );
     const user = await fetchUser(clientId, next.bearer);
+    if (signOuts !== signOutsAtStart) return;
     tokens = next;
     refreshing = undefined;
     set?.({ status: 'signed-in', user });

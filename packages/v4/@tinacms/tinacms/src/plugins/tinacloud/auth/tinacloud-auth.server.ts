@@ -3,6 +3,8 @@ import { defineServerPlugin } from '../../../server';
 import type { TinaCloudOptions } from '../client';
 import { currentUserSchema, currentUserUrl } from './tinacloud-auth-types';
 
+const VERIFY_TIMEOUT_MS = 10_000;
+
 const BEARER = /^Bearer (\S+)$/i;
 
 export const createTinaCloudAuthServer = ({ clientId }: TinaCloudOptions) =>
@@ -14,14 +16,15 @@ export const createTinaCloudAuthServer = ({ clientId }: TinaCloudOptions) =>
       if (!token) return null;
       const response = await fetch(currentUserUrl(clientId), {
         headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(VERIFY_TIMEOUT_MS),
       });
       if (!response.ok) return null;
       const parsed = currentUserSchema.safeParse(
         await response.json().catch(() => null)
       );
       if (!parsed.success) return null;
-      const { user, role, verified, enabled } = parsed.data;
-      if (verified !== true || enabled === false) return null;
+      const { user, role, active } = parsed.data;
+      if (!active) return null;
       return { identity: user, roles: [role === 'admin' ? 'admin' : 'editor'] };
     },
   });

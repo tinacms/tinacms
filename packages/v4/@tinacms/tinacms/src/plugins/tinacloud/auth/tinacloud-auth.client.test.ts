@@ -147,6 +147,8 @@ describe('TinaCloud auth slice', () => {
 
   it.each([
     ['unauthenticated', () => json({ message: 'nope' }, 401)],
+    ['unauthenticated', () => json({ ...tinaCloudUser, verified: false })],
+    ['unauthenticated', () => json({ ...tinaCloudUser, enabled: false })],
     ['network', () => Promise.reject(new TypeError('Failed to fetch'))],
     ['network', () => json({}, 503)],
     ['invalid-response', () => json({ fullName: 'No Id' })],
@@ -235,6 +237,50 @@ describe('TinaCloud auth slice', () => {
     await expect(getToken()).rejects.toMatchObject({
       code: 'invalid-response',
     });
+  });
+
+  it('keeps the bearer and refresh token TinaCloud leaves out of a refresh', async () => {
+    const fetchMock = stubFetch((url) =>
+      url === TOKEN_URL
+        ? json({ access_token: jwtExpiringIn(60, 'second') })
+        : json(tinaCloudUser)
+    );
+    const { getToken } = await signIn(loginTokens(60));
+    expect(await getToken()).toBe(jwtExpiringIn(60, 'second'));
+    await getToken();
+    const refreshes = fetchMock.mock.calls.filter(([url]) => url === TOKEN_URL);
+    expect(
+      new URLSearchParams(String(refreshes[1][1]?.body)).get('refresh_token')
+    ).toBe('refresh-token');
+  });
+
+  it('keeps the session when TinaCloud rate-limits the refresh', async () => {
+    stubFetch((url) =>
+      url === TOKEN_URL ? json({}, 429) : json(tinaCloudUser)
+    );
+    const { state, getToken } = await signIn(loginTokens(60));
+    await expect(getToken()).rejects.toMatchObject({ code: 'network' });
+    expect(state.status).toBe('signed-in');
+  });
+
+  it('stays signed out when logout runs during a pending login', async () => {
+    let finishLookup = (_response: Response) => {};
+    stubFetch(
+      () =>
+        new Promise<Response>((resolve) => {
+          finishLookup = resolve;
+        })
+    );
+    const { complete } = stubLoginPopup();
+    const { slice, state, getToken } = boot();
+    const login = slice.login();
+    complete();
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    await slice.logout();
+    finishLookup(json(tinaCloudUser));
+    await login;
+    expect(state.status).toBe('signed-out');
+    expect(await getToken()).toBeUndefined();
   });
 
   it('drops a refresh that lands after logout', async () => {
