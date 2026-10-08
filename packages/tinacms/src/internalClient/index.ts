@@ -349,9 +349,18 @@ mutation addPendingDocumentMutation(
     }
 
     if (res.status !== 200) {
-      let errorMessage = `Unable to complete request, ${res.statusText}`;
-      const resBody = await res.json();
-      if (resBody.message) {
+      // `statusText` is empty over HTTP/2, where the status code is all the response carries.
+      let errorMessage = `Unable to complete request, ${
+        res.statusText || res.status
+      }`;
+      let resBody: { message?: string } | undefined;
+      try {
+        resBody = await res.json();
+      } catch {
+        // A proxy or gateway can answer a failure with HTML. Letting `json()` throw here would
+        // replace the HTTP error with a parse error that says nothing about what went wrong.
+      }
+      if (resBody?.message) {
         errorMessage = `${errorMessage}, Response: ${resBody.message}`;
       }
       if (!this.isCustomContentApi) {

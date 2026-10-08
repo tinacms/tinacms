@@ -666,6 +666,27 @@ describe('Tina Client', () => {
       );
     });
 
+    it('names the status code when the response carries no status text', async () => {
+      stubFetchOnce(makeResponse({ status: 502, body: {} }));
+
+      await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
+        /^Unable to complete request, 502,/
+      );
+    });
+
+    it('still reports the status when the body is not JSON', async () => {
+      stubFetchOnce({
+        ok: false,
+        status: 502,
+        statusText: '',
+        json: vi.fn().mockRejectedValue(new SyntaxError('Unexpected token <')),
+      } as any);
+
+      await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
+        /^Unable to complete request, 502,/
+      );
+    });
+
     it('joins GraphQL error messages from a 200 response', async () => {
       stubFetchOnce(
         makeResponse({
