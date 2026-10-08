@@ -1,5 +1,14 @@
 # tinacms
 
+## 3.14.4
+
+### Patch Changes
+
+- [#7738](https://github.com/tinacms/tinacms/pull/7738) [`4f2758e`](https://github.com/tinacms/tinacms/commit/4f2758e3067ca2a2db40593a0e4a1040b51ad127) Thanks [@kulesy](https://github.com/kulesy)! - Error modals now show their own title in the header, size the action button to its label, and link to the TinaCloud troubleshooting guide with descriptive text. `ErrorDialog` now renders as modal content instead of a standalone styled card, and its `title` prop is deprecated in favour of `cms.alerts.error(message, { title })`.
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.26
+
 ## 3.14.3
 
 ### Patch Changes

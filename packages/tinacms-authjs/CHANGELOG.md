@@ -1,5 +1,14 @@
 # tinacms-authjs
 
+## 24.0.5
+
+### Patch Changes
+
+- [#7722](https://github.com/tinacms/tinacms/pull/7722) [`f3cf692`](https://github.com/tinacms/tinacms/commit/f3cf6922cfa178e0e301547df88d6565d8a305a8) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Document the `authCollection.admins` database option.
+
+- Updated dependencies [[`4f2758e`](https://github.com/tinacms/tinacms/commit/4f2758e3067ca2a2db40593a0e4a1040b51ad127)]:
+  - tinacms@3.14.4
+
 ## 24.0.4
 
 ### Patch Changes
@@ -140,7 +149,6 @@
   The fix: the browser-target build now uses a predicate that externalises both the exact dep name AND any sub-path (`id === dep || id.startsWith(dep + "/")`), matching esbuild's default behaviour.
 
   Visible effect on `tinacms-authjs@21.0.2`:
-
   - `dist/tinacms.js`: 98 KB → 4.4 KB (no more inlined `react/jsx-runtime`, `next-auth/react`, or Babel helpers)
   - The bundle no longer carries assumptions about which React version the monorepo was on
 
@@ -319,7 +327,6 @@
 ### Patch Changes
 
 - [#6262](https://github.com/tinacms/tinacms/pull/6262) [`3a12a39`](https://github.com/tinacms/tinacms/commit/3a12a392d5a8eb9bba5a5be65d080f24afa08de3) Thanks [@0xharkirat](https://github.com/0xharkirat)! - 🔒 Security: Update Next.js to 14.2.35 to address security vulnerabilities
-
   - Address CVE-2025-55184 (high): DoS via malicious HTTP request causing server to hang
   - Address CVE-2025-67779 (high): Complete fix for CVE-2025-55184 DoS vulnerability
   - Updated Next.js devDependency from 14.2.10/14.2.24 to 14.2.35
@@ -852,7 +859,6 @@
   ### Changes in the database file
 
   #### Deprecations and Additions
-
   - **Deprecated**: `onPut`, `onDelete`, and `level` arguments in `createDatabase`.
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
@@ -890,7 +896,6 @@
   ### Migrating `database.ts`
 
   #### a. Replacing `onPut` and `onDelete` with `gitProvider`
-
   - **GitHubProvider Usage**: Replace `onPut` and `onDelete` with `gitProvider`, using the provided `GitHubProvider` for GitHub.
 
   ```typescript
@@ -919,7 +924,6 @@
   ```
 
   #### b. Renaming `level` to `databaseAdapter`
-
   - **Renaming in Code**: Change `level` to `databaseAdapter` for clarity.
 
   ```diff
@@ -930,7 +934,6 @@
   ```
 
   #### c. `createLocalDatabase` Function
-
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
@@ -939,7 +942,6 @@
   ```
 
   #### d. Consolidated Example
-
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
@@ -957,7 +959,6 @@
   ### Summary of Authentication Updates in Config
 
   #### a. AuthProvider and AbstractAuthProvider
-
   - **New**: `authProvider` in `defineConfig`.
   - **Class**: `AbstractAuthProvider` for extending new auth providers.
   - **Clerk Auth Provider**: New provider added.
@@ -965,11 +966,9 @@
   - **Deprecation**: `admin.auth`.
 
   #### b. Auth Provider in Internal Client and Config
-
   - **Transition**: From auth functions to `authProvider` class.
 
   #### c. Migration for Authentication
-
   - **Previous API**:
 
   ```javascript
@@ -1001,7 +1000,6 @@
   ```
 
   ### TinaCMS Self Hosted backend updates
-
   - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
   - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
 

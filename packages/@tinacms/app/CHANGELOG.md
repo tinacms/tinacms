@@ -1,5 +1,14 @@
 # @tinacms/app
 
+## 2.5.15
+
+### Patch Changes
+
+- [#7738](https://github.com/tinacms/tinacms/pull/7738) [`4f2758e`](https://github.com/tinacms/tinacms/commit/4f2758e3067ca2a2db40593a0e4a1040b51ad127) Thanks [@kulesy](https://github.com/kulesy)! - Error modals now show their own title in the header, size the action button to its label, and link to the TinaCloud troubleshooting guide with descriptive text. `ErrorDialog` now renders as modal content instead of a standalone styled card, and its `title` prop is deprecated in favour of `cms.alerts.error(message, { title })`.
+
+- Updated dependencies [[`4f2758e`](https://github.com/tinacms/tinacms/commit/4f2758e3067ca2a2db40593a0e4a1040b51ad127)]:
+  - tinacms@3.14.4
+
 ## 2.5.14
 
 ### Patch Changes
@@ -207,7 +216,6 @@
 - [#6843](https://github.com/tinacms/tinacms/pull/6843) [`0509095`](https://github.com/tinacms/tinacms/commit/0509095601fedc87f05a622e219e6414ef51a6b6) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Support TinaCMS visual editing on statically-built Astro pages.
 
   Wrap editable regions in `<TinaIsland>` and visual editing now works under `output: 'static'` (and mixed static/SSR), provided the adapter can serve the one on-demand route `/tina-island/[name]`. Highlights:
-
   - **Static page support.** `<TinaIsland>` emits a tiny in-iframe bootstrap that fetches `/admin/bridge.js`; on init the bridge "primes" any page with island markers but no server-injected form payloads by calling the island endpoints, which now return the page's form payloads alongside region HTML.
   - **Bridge served as a static asset.** Dropped the injected `/_tina/bridge.js` route (some adapters 404'd it) in favour of serving `/admin/bridge.js` from a dev-only Vite plugin and emitting the bundle into the build client output — no source-tree writes. The `@tinacms/astro/bridge-route` subpath export is removed.
   - **Re-prime on soft navigation.** `refreshForms` now re-primes when it sees island markers without server-injected payloads, so Astro `ClientRouter` swaps work without a hard reload.
@@ -566,7 +574,6 @@
   Forms header - Adds breadcrumb navigation
 
 - [#5784](https://github.com/tinacms/tinacms/pull/5784) [`b25c5f0`](https://github.com/tinacms/tinacms/commit/b25c5f0b0e1d3f37870b780230b41dbc56bef1ab) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - Fixed padding issues in FormLists
-
   - Fixed Visual Editing's "Edit" button (Reference Fields)
 
 - [#5789](https://github.com/tinacms/tinacms/pull/5789) [`5040a6a`](https://github.com/tinacms/tinacms/commit/5040a6aa24e62166d942c47b61a3f18585caded6) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Adds click to focus for nested objects
@@ -818,7 +825,6 @@
 ### Minor Changes
 
 - 324950a: Updates Plate Editor to latest version 36.
-
   - Upgrades all remaining packages `Typescript` to version `^5`
   - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
   - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
@@ -1668,7 +1674,6 @@
   This new option will build tina into a static `index.html` file. This will allow someone to use tina without having react as a dependency.
 
   ### How to update
-
   1.  Add a `.tina/config.{js,ts,tsx,jsx}` with the default export of define config.
 
   ```ts

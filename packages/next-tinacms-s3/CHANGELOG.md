@@ -1,5 +1,14 @@
 # next-tinacms-s3
 
+## 24.0.5
+
+### Patch Changes
+
+- [`d908d7f`](https://github.com/tinacms/tinacms/commit/d908d7f8e01b56b3ceb24ba8a2faebb00a996c03) Thanks [@wicksipedia](https://github.com/wicksipedia)! - The upload URL now includes the file's content type, and the upload must send that same type. The API route does not issue upload URLs for HTML, XML, script or multipart types. If a media store from an earlier version sends no content type, the route uses the standard type for the file extension. A plus sign in a file name is kept, and the media URL encodes it as `%2B`.
+
+- Updated dependencies [[`4f2758e`](https://github.com/tinacms/tinacms/commit/4f2758e3067ca2a2db40593a0e4a1040b51ad127)]:
+  - tinacms@3.14.4
+
 ## 24.0.4
 
 ### Patch Changes
