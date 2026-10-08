@@ -152,7 +152,7 @@ Coarse-grained boundaries (the whole `_body`) are usually what you want — clic
 | `code_block` | `<pre><code class="language-…">` | `code_block` |
 | `hr` | `<hr>` | `hr` |
 | `break` | `<br>` | `break` |
-| `text` (with `bold`/`italic`/`underline`/`strikethrough`/`code`/`highlight`) | nested `<strong>`/`<em>`/`<u>`/`<s>`/`<code>`/`<mark>` | n/a |
+| `text` (with `bold`/`italic`/`underline`/`strikethrough`/`code`/`highlight`/`textColor`) | nested `<strong>`/`<em>`/`<u>`/`<s>`/`<code>`/`<mark>`/`<span style="color:…">` | n/a |
 | `mdxJsxFlowElement`, `mdxJsxTextElement` | dispatched by `node.name` | n/a — register by name |
 | `html`, `html_inline` | raw HTML via `set:html` | n/a |
 | `invalid_markdown` | `<pre>{value}</pre>` | n/a |

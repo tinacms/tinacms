@@ -13,6 +13,8 @@ import {
   useMarkToolbarButtonState,
 } from '@udecode/plate/react';
 import React from 'react';
+import type { RichTextColorOption } from '../../toolbar/toolbar-overrides';
+import { useToolbarContext } from '../../toolbar/toolbar-provider';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,13 +37,6 @@ const MarkToolbarButton = withRef<
 
   return <ToolbarButton ref={ref} {...props} {...rest} />;
 });
-
-const highlightColors = [
-  { label: 'Yellow', value: '#FEF08A' },
-  { label: 'Green', value: '#BBF7D0' },
-  { label: 'Blue', value: '#BFDBFE' },
-  { label: 'Red', value: '#CC4141' },
-] as const;
 
 export const BoldToolbarButton = () => (
   <MarkToolbarButton tooltip='Bold (⌘+B)' nodeType={BoldPlugin.key}>
@@ -67,9 +62,17 @@ export const CodeToolbarButton = () => (
   </MarkToolbarButton>
 );
 
-export const HighlightToolbarButton = () => <HighlightColorToolbarButton />;
+/**
+ * Leaf props a colour dropdown writes for a chosen colour. `undefined`
+ * values are removed, so the same function also describes "clear".
+ */
+type ColorMarks = Record<string, string | boolean | undefined>;
 
-const useHighlightToolbar = () => {
+/**
+ * Shared behaviour for colour dropdowns: remembers the selection while the
+ * menu is open (focus moves into the menu) and applies/clears marks on it.
+ */
+const useColorMarkToolbar = (toMarks: (color?: string) => ColorMarks) => {
   const editor = useEditorRef();
   const openState = useOpenState();
   const savedSelection = React.useRef(editor.selection);
@@ -89,8 +92,8 @@ const useHighlightToolbar = () => {
     }
   }, [openState.open, rememberSelection]);
 
-  const applyHighlight = React.useCallback(
-    (highlightColor?: string) => {
+  const applyColor = React.useCallback(
+    (color?: string) => {
       if (inlineCodeActive) {
         openState.onOpenChange(false);
         return;
@@ -100,48 +103,53 @@ const useHighlightToolbar = () => {
         editor.tf.select(structuredClone(savedSelection.current));
       }
 
-      if (highlightColor) {
-        editor.tf.addMark('highlight', true);
-        editor.tf.addMark('highlightColor', highlightColor);
-      } else {
-        editor.tf.removeMark('highlight');
-        editor.tf.removeMark('highlightColor');
+      const marks = toMarks(color);
+      for (const [key, value] of Object.entries(marks)) {
+        if (value === undefined) {
+          editor.tf.removeMark(key);
+        } else {
+          editor.tf.addMark(key, value);
+        }
       }
 
-      editor.tf.setNodes(
-        highlightColor
-          ? {
-              highlight: true,
-              highlightColor,
-            }
-          : {
-              highlight: undefined,
-              highlightColor: undefined,
-            },
-        {
-          at: editor.selection ?? undefined,
-          match: (node) => editor.api.isText(node),
-          split: true,
-        }
-      );
+      editor.tf.setNodes(marks, {
+        at: editor.selection ?? undefined,
+        match: (node) => editor.api.isText(node),
+        split: true,
+      });
 
       editor.tf.focus();
       openState.onOpenChange(false);
     },
-    [editor, inlineCodeActive, openState]
+    [editor, inlineCodeActive, openState, toMarks]
   );
 
   return {
-    applyHighlight,
+    applyColor,
     inlineCodeActive,
     openState,
     rememberSelection,
   };
 };
 
-const HighlightColorToolbarButton = () => {
-  const { applyHighlight, inlineCodeActive, openState, rememberSelection } =
-    useHighlightToolbar();
+/** Toolbar dropdown offering "clear" plus one item per palette colour. */
+const ColorDropdownToolbarButton = ({
+  tooltip,
+  icon,
+  clearLabel,
+  colors,
+  toMarks,
+  renderSwatch,
+}: {
+  tooltip: string;
+  icon: React.ReactNode;
+  clearLabel: string;
+  colors: readonly RichTextColorOption[];
+  toMarks: (color?: string) => ColorMarks;
+  renderSwatch: (color: string) => React.ReactNode;
+}) => {
+  const { applyColor, inlineCodeActive, openState, rememberSelection } =
+    useColorMarkToolbar(toMarks);
 
   return (
     <DropdownMenu modal={false} {...openState}>
@@ -150,33 +158,82 @@ const HighlightColorToolbarButton = () => {
           isDropdown
           showArrow
           pressed={openState.open}
-          tooltip='Highlight color'
+          tooltip={tooltip}
           disabled={inlineCodeActive}
           onMouseDown={rememberSelection}
         >
-          <div className='flex items-center gap-1.5'>
-            <Icons.highlight />
-          </div>
+          <div className='flex items-center gap-1.5'>{icon}</div>
         </ToolbarButton>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align='start' className='min-w-[180px]'>
-        <DropdownMenuItem onSelect={() => applyHighlight()}>
-          Clear highlight
+        <DropdownMenuItem onSelect={() => applyColor()}>
+          {clearLabel}
         </DropdownMenuItem>
-        {highlightColors.map((color) => (
+        {colors.map((color) => (
           <DropdownMenuItem
             key={color.value}
-            onSelect={() => applyHighlight(color.value)}
+            onSelect={() => applyColor(color.value)}
           >
-            <span
-              className='mr-2 inline-block size-4 rounded border border-gray-300'
-              style={{ backgroundColor: color.value }}
-            />
+            {renderSwatch(color.value)}
             {color.label}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+};
+
+const toHighlightMarks = (color?: string): ColorMarks =>
+  color
+    ? { highlight: true, highlightColor: color }
+    : { highlight: undefined, highlightColor: undefined };
+
+const toTextColorMarks = (color?: string): ColorMarks => ({
+  textColor: color,
+});
+
+const highlightColors = [
+  { label: 'Yellow', value: '#FEF08A' },
+  { label: 'Green', value: '#BBF7D0' },
+  { label: 'Blue', value: '#BFDBFE' },
+  { label: 'Red', value: '#CC4141' },
+] as const;
+
+export const HighlightToolbarButton = () => (
+  <ColorDropdownToolbarButton
+    tooltip='Highlight color'
+    icon={<Icons.highlight />}
+    clearLabel='Clear highlight'
+    colors={highlightColors}
+    toMarks={toHighlightMarks}
+    renderSwatch={(color) => (
+      <span
+        className='mr-2 inline-block size-4 rounded border border-gray-300'
+        style={{ backgroundColor: color }}
+      />
+    )}
+  />
+);
+
+export const TextColorToolbarButton = () => {
+  const { textColors } = useToolbarContext();
+  return (
+    <ColorDropdownToolbarButton
+      tooltip='Text color'
+      icon={<Icons.textColor />}
+      clearLabel='Clear text color'
+      colors={textColors}
+      toMarks={toTextColorMarks}
+      renderSwatch={(color) => (
+        <span
+          aria-hidden
+          className='mr-2 inline-block w-4 text-center font-bold'
+          style={{ color }}
+        >
+          A
+        </span>
+      )}
+    />
   );
 };

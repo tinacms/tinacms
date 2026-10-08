@@ -33,6 +33,7 @@ import {
   HighlightToolbarButton,
   ItalicToolbarButton,
   StrikethroughToolbarButton,
+  TextColorToolbarButton,
 } from './plate-ui/mark-toolbar-button';
 import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button';
 import OverflowMenu from './plate-ui/overflow-menu';
@@ -103,6 +104,11 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Highlight',
     width: () => HIGHLIGHT_ICON_WIDTH,
     Component: <HighlightToolbarButton />,
+  },
+  textColor: {
+    label: 'Text Color',
+    width: () => HIGHLIGHT_ICON_WIDTH,
+    Component: <TextColorToolbarButton />,
   },
   italic: {
     label: 'Italic',

@@ -133,8 +133,14 @@ function renderLeaf<Rendered>(
   return rendered;
 }
 
-const markStyle = (props: RichTextProps): RichTextProps =>
-  props.color ? { style: { backgroundColor: props.color } } : {};
+/** Fallback mark style: `color` is a `<mark>` background, `textColor` a `<span>` colour. */
+const markStyle = ({ color, textColor }: RichTextProps): RichTextProps => {
+  const style = {
+    ...(color ? { backgroundColor: color } : {}),
+    ...(textColor ? { color: textColor } : {}),
+  };
+  return Object.keys(style).length ? { style } : {};
+};
 
 const TABLE_BORDER = '1px solid #EDECF3';
 const TABLE_CELL_PADDING = '0.25rem';

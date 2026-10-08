@@ -1,0 +1,249 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "text",
+          "text": "red",
+          "textColor": "#CC4141"
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "bold red",
+          "textColor": "#CC4141",
+          "bold": true
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "red,",
+          "textColor": "#CC4141"
+        },
+        {
+          "type": "text",
+          "text": " "
+        },
+        {
+          "type": "text",
+          "text": "bold red",
+          "textColor": "#CC4141",
+          "bold": true
+        },
+        {
+          "type": "text",
+          "text": " "
+        },
+        {
+          "type": "text",
+          "text": "and",
+          "textColor": "#CC4141"
+        },
+        {
+          "type": "text",
+          "text": " "
+        },
+        {
+          "type": "text",
+          "text": "italic red",
+          "textColor": "#CC4141",
+          "italic": true
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "bold and ",
+          "bold": true
+        },
+        {
+          "type": "text",
+          "text": "bold blue",
+          "textColor": "#2563EB",
+          "bold": true
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "red",
+          "textColor": "#CC4141"
+        },
+        {
+          "type": "text",
+          "text": "blue",
+          "textColor": "#2563EB"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "red,",
+          "textColor": "#CC4141"
+        },
+        {
+          "type": "text",
+          "text": "blue",
+          "textColor": "#2563EB"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "text",
+          "text": "red on yellow",
+          "textColor": "#CC4141",
+          "highlight": true,
+          "highlightColor": "#FEF08A"
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "text",
+          "text": "string style",
+          "textColor": "#CC4141"
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "html_inline",
+          "value": "<span aria-hidden=\"true\" className=\"x\">plain span</span>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "html_inline",
+          "value": "<span style={{ color: brand }}>variable</span>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "html_inline",
+          "value": "<span style={{ ...brand, color: \"#CC4141\" }}>spread</span>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "html_inline",
+          "value": "<span style={{ color: \"red;position:fixed\" }}>unsafe</span>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    }
+  ]
+}

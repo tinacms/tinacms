@@ -58,6 +58,12 @@ describe('fallback markup', () => {
     ).toBe('<p><mark style="background-color: #ff0;">hi</mark></p>');
   });
 
+  it('colours text with a span', () => {
+    expect(
+      html([{ type: 'p', children: [text('hi', { textColor: '#c00' })] }])
+    ).toBe('<p><span style="color: #c00;">hi</span></p>');
+  });
+
   it('renders a list', () => {
     expect(
       html([
