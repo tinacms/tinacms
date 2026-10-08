@@ -43,13 +43,14 @@
   --primary-active: var(--tina-orange-800);
   --primary-foreground: var(--tina-white);
   --secondary: var(--tina-slate-100);
+  --secondary-hover: var(--tina-slate-200);
   --secondary-foreground: var(--tina-slate-900);
   --muted: var(--tina-slate-100);
   --muted-foreground: var(--tina-slate-500);
   --accent: var(--tina-slate-100);
   --accent-foreground: var(--tina-slate-900);
-  --selected: var(--tina-orange-100);
-  --selected-foreground: var(--tina-orange-700);
+  --selected: var(--tina-slate-200);
+  --selected-foreground: var(--tina-slate-900);
   --destructive: var(--tina-red-700);
   --destructive-foreground: var(--tina-white);
   --border: var(--tina-slate-300);
@@ -70,7 +71,7 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: var(--tina-white);
+  --sidebar: var(--tina-slate-50);
   --sidebar-foreground: var(--tina-slate-900);
   --sidebar-primary: var(--tina-orange-600);
   --sidebar-primary-foreground: var(--tina-white);
@@ -121,6 +122,9 @@
   --font-heading:
     "IBM Plex Sans", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --spacing: 0.25rem;
+  /* 13px step between text-xs (12) and text-sm (14): secondary text, small buttons, table meta. */
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.125rem;
   --radius-xs: 2px;
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -138,6 +142,7 @@
   --color-primary-active: var(--primary-active);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
@@ -182,6 +187,15 @@
     0 0 0 2px var(--card),
     0 0 0 3px var(--ring),
     0 0 0 6px var(--focus-glow);
+}
+
+/* Same ring drawn inside the element, for rows in lists, menus and tables,
+   where an outer ring is clipped by the scroll container. */
+@utility focus-ring-inset {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 1px var(--ring),
+    inset 0 0 0 4px var(--focus-glow);
 }
 
 @layer base {
