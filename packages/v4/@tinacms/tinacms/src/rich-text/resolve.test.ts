@@ -129,7 +129,7 @@ describe('leaves', () => {
     ]);
   });
 
-  it('keeps the text colour apart when a highlight component is supplied', () => {
+  it('nests the text colour inside the highlight', () => {
     const coloured = node({
       type: 'text',
       text: 'hi',
@@ -137,7 +137,8 @@ describe('leaves', () => {
       textColor: '#c00',
     });
     expect((resolveRichTextNode(coloured, none) as any).marks).toEqual([
-      { kind: 'element', tag: 'mark', props: { textColor: '#c00' } },
+      { kind: 'element', tag: 'mark', props: {} },
+      { kind: 'element', tag: 'span', props: { textColor: '#c00' } },
     ]);
     expect(
       (

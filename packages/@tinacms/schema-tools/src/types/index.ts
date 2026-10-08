@@ -522,13 +522,6 @@ export const ALL_HEADING_LEVELS: readonly HeadingLevel[] = [
 ];
 /** A named colour offered by the rich-text colour dropdowns. `value` is any CSS colour. */
 export type RichTextColorOption = { label: string; value: string };
-/** Palette used by the "Highlight" toolbar button when `overrides.highlightColors` is omitted. */
-export const DEFAULT_HIGHLIGHT_COLORS: readonly RichTextColorOption[] = [
-  { label: 'Yellow', value: '#FEF08A' },
-  { label: 'Green', value: '#BBF7D0' },
-  { label: 'Blue', value: '#BFDBFE' },
-  { label: 'Red', value: '#CC4141' },
-];
 /** Palette used by the "Text color" toolbar button when `overrides.textColors` is omitted. */
 export const DEFAULT_TEXT_COLORS: readonly RichTextColorOption[] = [
   { label: 'Red', value: '#CC4141' },
@@ -575,11 +568,6 @@ export type RichTextField<WithNamespace extends boolean = false> = (
        * @example textColors: [{ label: 'Brand', value: '#CC4141' }]
        */
       textColors?: RichTextColorOption[];
-      /**
-       * Colours offered by the "Highlight" toolbar button.
-       * Defaults to yellow, green, blue and red.
-       */
-      highlightColors?: RichTextColorOption[];
     };
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser

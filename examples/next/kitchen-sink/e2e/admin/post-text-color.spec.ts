@@ -102,7 +102,7 @@ test.describe('Post rich-text text colour', () => {
     await selectText(editor, 'bright');
     await page.keyboard.press('ControlOrMeta+b');
 
-    // Highlight and text colour on the same run merge into one <mark>
+    // Highlight and text colour on the same run
     await selectText(editor, 'marked');
     await applyColor(page, 'Highlight color', 'Yellow');
     await selectText(editor, 'marked');
@@ -114,10 +114,10 @@ test.describe('Post rich-text text colour', () => {
     await expect
       .poll(() => readFileSync(POST_FILE, 'utf8'))
       .toContain(
-        '<span style={{ color: "#CC4141" }}>crimson **bright**</span>'
+        '<span style={{ color: "#CC4141" }}>crimson </span>**<span style={{ color: "#CC4141" }}>bright</span>**'
       );
     expect(readFileSync(POST_FILE, 'utf8')).toContain(
-      '<mark style={{ backgroundColor: "#FEF08A", color: "#0066CC" }}>marked</mark>'
+      '<mark style={{ backgroundColor: "#FEF08A" }}><span style={{ color: "#0066CC" }}>marked</span></mark>'
     );
 
     // Round-trip: the reloaded editor parses the MDX back into coloured leaves
@@ -148,6 +148,6 @@ test.describe('Post rich-text text colour', () => {
     );
     const frontendMark = prose.locator('mark', { hasText: 'marked' });
     await expect(frontendMark).toHaveCSS('background-color', YELLOW);
-    await expect(frontendMark).toHaveCSS('color', BLUE);
+    await expect(frontendMark.locator('span')).toHaveCSS('color', BLUE);
   });
 });

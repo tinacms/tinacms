@@ -8,13 +8,12 @@ import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type * as Plate from '../parse/plate';
 import { stringifyPropsInline } from './acorn';
-import {
-  cleanNode,
-  colorMarkElement,
-  type InlineElementWithCallback,
-  pickMarkToProcess,
-} from './mark-runs';
-import { isTextElement } from './index';
+import { longestMarkRun, textColorElement } from './text-color';
+import { getMarks } from './index';
+
+type InlineElementWithCallback = Plate.InlineElement & {
+  linkifyTextNode?: (arg: Md.Text) => Md.Link;
+};
 
 /**
  *
@@ -141,22 +140,37 @@ const text = (content: { text: string }) => {
   };
 };
 
-/**
- * Serializes inline nodes, grouping neighbours that share a mark.
- * `previous` is the sibling just written as bare text, if any; see `pickMarkToProcess`.
- */
+const markAttributes = (content: Plate.TextElement) => {
+  if (!content.highlightColor) {
+    return [];
+  }
+
+  return [
+    {
+      type: 'mdxJsxAttribute' as const,
+      name: 'style',
+      value: {
+        type: 'mdxJsxAttributeValueExpression' as const,
+        value: `{ backgroundColor: "${content.highlightColor}" }`,
+      },
+    },
+  ];
+};
+
 export const eat = (
   c: InlineElementWithCallback[],
   field: RichTextField,
-  imageCallback: (url: string) => string,
-  previous?: InlineElementWithCallback
+  imageCallback: (url: string) => string
 ): Md.PhrasingContent[] => {
   const content = replaceLinksWithTextNodes(c);
   const first = content[0];
   if (!first) {
     return [];
   }
-  if (!isTextElement(first)) {
+  const firstIsText =
+    first.type === 'text' ||
+    (!first.type && typeof (first as any).text === 'string');
+  if (first && !firstIsText) {
     if (first.type === 'a') {
       return [
         {
@@ -178,47 +192,92 @@ export const eat = (
       ...eat(content.slice(1), field, imageCallback),
     ];
   }
-  const { markToProcess, runLength } = pickMarkToProcess(
+  const textNode = first as Plate.TextElement & InlineElementWithCallback;
+  const { markToProcess, runLength } = longestMarkRun(
     content,
-    first,
-    previous
+    getMarks(textNode)
   );
   if (!markToProcess) {
-    const node = text({ text: first.text });
     return [
-      first.linkifyTextNode?.(node) ?? node,
-      ...eat(content.slice(1), field, imageCallback, first),
+      ...leaf(textNode, text(textNode)),
+      ...eat(content.slice(1), field, imageCallback),
     ];
   }
-  const rest = eat(content.slice(runLength), field, imageCallback);
+  if (markToProcess === 'highlight') {
+    return [
+      {
+        type: 'mdxJsxTextElement',
+        name: 'mark',
+        attributes: markAttributes(textNode),
+        children: leaf(textNode, text(textNode)),
+      } as unknown as Md.PhrasingContent,
+      ...eat(content.slice(1), field, imageCallback),
+    ];
+  }
   if (markToProcess === 'inlineCode') {
-    const node = {
-      type: markToProcess,
-      value: content
-        .slice(0, runLength)
-        .map((node) => (isTextElement(node) ? node.text : ''))
-        .join(''),
-    };
+    if (runLength > 1) {
+      throw new Error(
+        "Inline code can't have other formatting on it. Remove the formatting from the code text."
+      );
+    }
     return [
-      // @ts-ignore
-      first.linkifyTextNode?.(node) ?? node,
-      ...rest,
+      ...leaf(textNode, { type: 'inlineCode', value: textNode.text }),
+      ...eat(content.slice(1), field, imageCallback),
     ];
   }
-  // Everything in the run shares this mark, so serialize it once around them
-  const children = eat(
-    content.slice(0, runLength).map((node) => cleanNode(node, markToProcess)),
-    field,
-    imageCallback
-  );
-  if (markToProcess === 'highlight' || markToProcess === 'textColor') {
-    return [colorMarkElement(first, markToProcess, children), ...rest];
-  }
+
   return [
     {
       type: markToProcess,
-      children,
+      children: eat(
+        content
+          .slice(0, runLength)
+          .map((sibling) => cleanNode(sibling, markToProcess)),
+        field,
+        imageCallback
+      ),
     },
-    ...rest,
+    ...eat(content.slice(runLength), field, imageCallback),
   ];
+};
+
+/** A text leaf, wrapped in its text colour and then its link, if any. */
+const leaf = (
+  first: Plate.TextElement & InlineElementWithCallback,
+  node: Md.PhrasingContent
+): Md.PhrasingContent[] => {
+  return first.linkifyTextNode
+    ? [
+        {
+          ...first.linkifyTextNode({ type: 'text', value: '' }),
+          children: textColorElement(first, node) as Md.Link['children'],
+        },
+      ]
+    : textColorElement(first, node);
+};
+
+const cleanNode = (
+  node: InlineElementWithCallback,
+  mark: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight' | null
+): Plate.InlineElement => {
+  if (!mark) {
+    return node;
+  }
+  const cleanedNode: Record<string, unknown> = {};
+  const markToClear = {
+    strong: 'bold',
+    emphasis: 'italic',
+    inlineCode: 'code',
+    delete: 'strikethrough',
+    highlight: 'highlight',
+  }[mark];
+  Object.entries(node).map(([key, value]) => {
+    if (key !== markToClear) {
+      cleanedNode[key] = value;
+    }
+  });
+  if (node.linkifyTextNode) {
+    cleanedNode.callback = node.linkifyTextNode;
+  }
+  return cleanedNode as Plate.InlineElement;
 };

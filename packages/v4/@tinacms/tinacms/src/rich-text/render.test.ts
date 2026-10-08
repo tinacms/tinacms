@@ -78,7 +78,7 @@ describe('a host that is not a framework', () => {
     ).toBe('<p><span style="color: #c00;">hi</span></p>');
   });
 
-  it('folds a text colour into the highlight mark', () => {
+  it('nests a text colour inside the highlight mark', () => {
     expect(
       toHtml([
         {
@@ -93,7 +93,7 @@ describe('a host that is not a framework', () => {
         },
       ])
     ).toBe(
-      '<p><mark style="background-color: #ff0; color: #c00;">hi</mark></p>'
+      '<p><mark style="background-color: #ff0;"><span style="color: #c00;">hi</span></mark></p>'
     );
   });
 

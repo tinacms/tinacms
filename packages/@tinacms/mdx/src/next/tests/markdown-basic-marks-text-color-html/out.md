@@ -1,31 +1,15 @@
 Some <span style="color: #CC4141">red</span> text
 
-Some <mark style="background-color: #FEF08A; color: #CC4141">red on yellow</mark> text
+**<span style="color: #CC4141">bold red</span>**
 
-Some <mark style="color: #CC4141">red highlighted</mark> text
-
-<mark>highlighted and **bold highlighted**</mark>
-
-<span style="color: #CC4141">red </span><span style="color: #2563EB">blue</span>
-
-x**a**<span style="color: #CC4141">**b**</span>y
+<span style="color: #CC4141">red,</span><span style="color: #2563EB">blue</span>
 
 Some <span class="x">plain span</span> text
 
-Some <mark style="color: red">extra style</mark> text
-
 Some <span style="color: red;position:fixed">unsafe</span> text
 
-<mark>
-
-paragraph inside a block mark
-
-</mark>
+Some <mark>raw mark</mark> text
 
 before
 
-<span style="color: red">
-
-text
-
-</span>
+<span style="color: red">text</span>

@@ -217,12 +217,6 @@ function resolveLeaf(
     );
   };
   const textColor = safeColor(fields.textColor);
-  // With neither colour component supplied, the text colour folds into the
-  // same <mark>; otherwise each mark renders on its own, nested.
-  const foldTextColor =
-    Boolean(fields.highlight && textColor) &&
-    !supplied(components, 'highlight') &&
-    !supplied(components, 'textColor');
 
   if (fields.bold) mark('bold');
   if (fields.italic) mark('italic');
@@ -230,12 +224,9 @@ function resolveLeaf(
   if (fields.strikethrough) mark('strikethrough');
   if (fields.code) mark('code');
   if (fields.highlight) {
-    mark('highlight', {
-      color: safeColor(fields.highlightColor),
-      ...(foldTextColor && { textColor }),
-    });
+    mark('highlight', { color: safeColor(fields.highlightColor) });
   }
-  if (textColor && !foldTextColor) {
+  if (textColor) {
     mark('textColor', { color: textColor }, { textColor });
   }
   if (supplied(components, 'text')) {

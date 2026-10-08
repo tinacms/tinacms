@@ -30,8 +30,7 @@ export const serializeWithMdx = (
   const serialized = serializeMDX(
     value as Parameters<typeof serializeMDX>[0],
     field,
-    passthroughMedia,
-    { verify: true }
+    passthroughMedia
   );
   return typeof serialized === 'string' ? serialized : '';
 };

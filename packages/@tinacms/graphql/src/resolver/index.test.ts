@@ -965,8 +965,7 @@ describe('index', () => {
       expect(serializeMDX).toHaveBeenCalledWith(
         tree,
         template.fields[0],
-        expect.any(Function),
-        { verify: true }
+        expect.any(Function)
       );
       expect(result).toEqual({ body: '# Hello' });
     });

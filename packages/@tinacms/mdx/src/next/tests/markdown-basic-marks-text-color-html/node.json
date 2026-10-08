@@ -24,18 +24,9 @@
       "children": [
         {
           "type": "text",
-          "text": "Some "
-        },
-        {
-          "type": "text",
-          "text": "red on yellow",
-          "highlight": true,
-          "highlightColor": "#FEF08A",
-          "textColor": "#CC4141"
-        },
-        {
-          "type": "text",
-          "text": " text"
+          "text": "bold red",
+          "textColor": "#CC4141",
+          "bold": true
         }
       ]
     },
@@ -44,72 +35,13 @@
       "children": [
         {
           "type": "text",
-          "text": "Some "
-        },
-        {
-          "type": "text",
-          "text": "red highlighted",
-          "highlight": true,
-          "textColor": "#CC4141"
-        },
-        {
-          "type": "text",
-          "text": " text"
-        }
-      ]
-    },
-    {
-      "type": "p",
-      "children": [
-        {
-          "type": "text",
-          "text": "highlighted and ",
-          "highlight": true
-        },
-        {
-          "type": "text",
-          "text": "bold highlighted",
-          "bold": true,
-          "highlight": true
-        }
-      ]
-    },
-    {
-      "type": "p",
-      "children": [
-        {
-          "type": "text",
-          "text": "red ",
+          "text": "red,",
           "textColor": "#CC4141"
         },
         {
           "type": "text",
           "text": "blue",
           "textColor": "#2563EB"
-        }
-      ]
-    },
-    {
-      "type": "p",
-      "children": [
-        {
-          "type": "text",
-          "text": "x"
-        },
-        {
-          "type": "text",
-          "text": "a",
-          "bold": true
-        },
-        {
-          "type": "text",
-          "text": "b",
-          "bold": true,
-          "textColor": "#CC4141"
-        },
-        {
-          "type": "text",
-          "text": "y"
         }
       ]
     },
@@ -158,25 +90,6 @@
           "text": "Some "
         },
         {
-          "type": "text",
-          "text": "extra style",
-          "highlight": true,
-          "textColor": "red"
-        },
-        {
-          "type": "text",
-          "text": " text"
-        }
-      ]
-    },
-    {
-      "type": "p",
-      "children": [
-        {
-          "type": "text",
-          "text": "Some "
-        },
-        {
           "type": "html_inline",
           "value": "<span style=\"color: red;position:fixed\">",
           "children": [
@@ -207,31 +120,39 @@
       ]
     },
     {
-      "type": "html",
-      "value": "<mark>",
-      "children": [
-        {
-          "type": "text",
-          "text": ""
-        }
-      ]
-    },
-    {
       "type": "p",
       "children": [
         {
           "type": "text",
-          "text": "paragraph inside a block mark"
-        }
-      ]
-    },
-    {
-      "type": "html",
-      "value": "</mark>",
-      "children": [
+          "text": "Some "
+        },
+        {
+          "type": "html_inline",
+          "value": "<mark>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
         {
           "type": "text",
-          "text": ""
+          "text": "raw mark"
+        },
+        {
+          "type": "html_inline",
+          "value": "</mark>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " text"
         }
       ]
     },
@@ -245,31 +166,12 @@
       ]
     },
     {
-      "type": "html",
-      "value": "<span style=\"color: red\">",
-      "children": [
-        {
-          "type": "text",
-          "text": ""
-        }
-      ]
-    },
-    {
       "type": "p",
       "children": [
         {
           "type": "text",
-          "text": "text"
-        }
-      ]
-    },
-    {
-      "type": "html",
-      "value": "</span>",
-      "children": [
-        {
-          "type": "text",
-          "text": ""
+          "text": "text",
+          "textColor": "red"
         }
       ]
     }

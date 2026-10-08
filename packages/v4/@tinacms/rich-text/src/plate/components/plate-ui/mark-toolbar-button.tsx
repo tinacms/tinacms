@@ -193,24 +193,28 @@ const toTextColorMarks = (color?: string): ColorMarks => ({
   textColor: color,
 });
 
-export const HighlightToolbarButton = () => {
-  const { highlightColors } = useToolbarContext();
-  return (
-    <ColorDropdownToolbarButton
-      tooltip='Highlight color'
-      icon={<Icons.highlight />}
-      clearLabel='Clear highlight'
-      colors={highlightColors}
-      toMarks={toHighlightMarks}
-      renderSwatch={(color) => (
-        <span
-          className='mr-2 inline-block size-4 rounded border border-gray-300'
-          style={{ backgroundColor: color }}
-        />
-      )}
-    />
-  );
-};
+const highlightColors = [
+  { label: 'Yellow', value: '#FEF08A' },
+  { label: 'Green', value: '#BBF7D0' },
+  { label: 'Blue', value: '#BFDBFE' },
+  { label: 'Red', value: '#CC4141' },
+] as const;
+
+export const HighlightToolbarButton = () => (
+  <ColorDropdownToolbarButton
+    tooltip='Highlight color'
+    icon={<Icons.highlight />}
+    clearLabel='Clear highlight'
+    colors={highlightColors}
+    toMarks={toHighlightMarks}
+    renderSwatch={(color) => (
+      <span
+        className='mr-2 inline-block size-4 rounded border border-gray-300'
+        style={{ backgroundColor: color }}
+      />
+    )}
+  />
+);
 
 export const TextColorToolbarButton = () => {
   const { textColors } = useToolbarContext();

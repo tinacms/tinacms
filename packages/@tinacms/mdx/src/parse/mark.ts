@@ -16,14 +16,7 @@ type ColorMarks = Pick<
 >;
 
 /** The colours a `style` may carry on a colour mark. */
-type ColorStyle = { backgroundColor?: string; color?: string };
-
-/** Style keys (string and object forms) mapped to the colour they set. */
-const COLOR_STYLE_KEYS: Record<string, keyof ColorStyle> = {
-  color: 'color',
-  'background-color': 'backgroundColor',
-  backgroundColor: 'backgroundColor',
-};
+type ColorStyle = { color?: string };
 
 /**
  * The safe colours read from a `style`, and whether it held anything else
@@ -37,9 +30,8 @@ const readDeclarations = (
   const colors: ColorStyle = {};
   let extra = false;
   for (const [key, value] of declarations) {
-    const property = COLOR_STYLE_KEYS[key];
-    if (property && value !== null && isSafeCssColor(value)) {
-      colors[property] = value;
+    if (key === 'color' && value !== null && isSafeCssColor(value)) {
+      colors.color = value;
     } else {
       extra = true;
     }
@@ -115,33 +107,65 @@ const readColorStyle = (
     : readExpressionStyle(value);
 };
 
+export const getHighlightColorFromAttributes = (
+  attributes: (MdxJsxAttribute | MdxJsxExpressionAttribute)[] = []
+) => {
+  const styleAttribute = attributes.find(
+    (attribute) =>
+      attribute.type === 'mdxJsxAttribute' && attribute.name === 'style'
+  );
+
+  if (!styleAttribute) {
+    return undefined;
+  }
+
+  if (typeof styleAttribute.value === 'string') {
+    const backgroundColorMatch = /background-color:\s*([^;]+)/i.exec(
+      styleAttribute.value
+    );
+    return backgroundColorMatch?.[1]?.trim();
+  }
+
+  if (
+    styleAttribute.value &&
+    typeof styleAttribute.value === 'object' &&
+    styleAttribute.value.type === 'mdxJsxAttributeValueExpression'
+  ) {
+    const expression = styleAttribute.value.value;
+    const camelMatch =
+      /['"]?backgroundColor['"]?\s*:\s*['"]?([^'",}\s]+)['"]?/.exec(expression);
+    if (camelMatch?.[1]) {
+      return camelMatch[1].trim();
+    }
+    const kebabMatch =
+      /['"]?background-color['"]?\s*:\s*['"]?([^'",}\s]+)['"]?/.exec(
+        expression
+      );
+    return kebabMatch?.[1]?.trim();
+  }
+
+  return undefined;
+};
+
 /**
- * The Plate marks a `<mark>` or colour `<span>` stands for, or null when the
- * element isn't one of ours. Every `<mark>` is a highlight: it keeps its safe
- * colours and drops the rest of its style, as it always has. A `<span>` is
- * only claimed when its sole attribute is a style holding just a safe
- * `color`, so spans carrying anything else (classes, other styles, unsafe
- * colours) keep round-tripping as raw HTML.
+ * The Plate marks a `<mark>` or text colour `<span>` stands for, or null when
+ * the element isn't one of ours. A `<span>` is only claimed when its sole
+ * attribute is a style holding just a safe `color`, so spans carrying
+ * anything else keep round-tripping as raw HTML.
  */
 export const getColorMarks = (
   content: MdxJsxTextElement
 ): ColorMarks | null => {
-  const { colors, extra } = readColorStyle(content.attributes);
   if (content.name === 'mark') {
-    return {
-      highlight: true,
-      ...(colors.backgroundColor
-        ? { highlightColor: colors.backgroundColor }
-        : {}),
-      ...(colors.color ? { textColor: colors.color } : {}),
-    };
+    const highlightColor = getHighlightColorFromAttributes(content.attributes);
+    return { highlight: true, ...(highlightColor ? { highlightColor } : {}) };
   }
+  const { colors, extra } = readColorStyle(content.attributes);
   if (
     content.name === 'span' &&
     !extra &&
     (content.attributes ?? []).length === 1 &&
-    colors.color &&
-    !colors.backgroundColor
+    colors.color
   ) {
     return { textColor: colors.color };
   }

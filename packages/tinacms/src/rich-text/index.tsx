@@ -240,19 +240,9 @@ const Leaf = (props: {
         </Component>
       );
     }
-    // Fold the text colour into the same <mark> rather than nesting a <span>,
-    // unless a custom textColor component needs to render it.
-    const { textColor, ...markRest } = rest;
-    const foldedTextColor = props.components.textColor
-      ? undefined
-      : safeColor(textColor);
-    const style = {
-      ...(color && { backgroundColor: color }),
-      ...(foldedTextColor && { color: foldedTextColor }),
-    };
     return (
-      <mark style={Object.keys(style).length ? style : undefined}>
-        <Leaf {...(props.components.textColor ? rest : markRest)} />
+      <mark style={color ? { backgroundColor: color } : undefined}>
+        <Leaf {...rest} />
       </mark>
     );
   }

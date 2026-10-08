@@ -266,7 +266,7 @@ describe('TinaMarkdown colour marks', () => {
     expect(span?.getAttribute('style')).toBe('color: #CC4141;');
   });
 
-  it('folds textColor into a single mark when highlighted', () => {
+  it('nests textColor inside the mark when highlighted', () => {
     const { container } = render(
       <TinaMarkdown
         content={paragraphWith({
@@ -278,10 +278,10 @@ describe('TinaMarkdown colour marks', () => {
       />
     );
     const mark = container.querySelector('p > mark');
-    expect(mark?.getAttribute('style')).toBe(
-      'background-color: #FEF08A; color: #CC4141;'
-    );
-    expect(container.querySelector('span')).toBeNull();
+    expect(mark?.getAttribute('style')).toBe('background-color: #FEF08A;');
+    expect(
+      container.querySelector('p > mark > span')?.getAttribute('style')
+    ).toBe('color: #CC4141;');
   });
 
   it('passes textColor to a custom textColor component', () => {

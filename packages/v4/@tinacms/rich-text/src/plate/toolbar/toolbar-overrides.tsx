@@ -20,5 +20,4 @@ export type ToolbarOverrides = {
   showFloatingToolbar?: boolean;
   headingLevels?: HeadingLevel[];
   textColors?: RichTextColorOption[];
-  highlightColors?: RichTextColorOption[];
 };
