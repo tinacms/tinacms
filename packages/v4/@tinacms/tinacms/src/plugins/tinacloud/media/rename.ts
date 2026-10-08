@@ -18,13 +18,10 @@ const RENAME_ERROR_CODES: Record<string, MediaErrorCode> = {
 };
 
 const toRenameError = (cause: unknown): MediaError => {
-  if (!(cause instanceof TinaCloudError) || !isRecord(cause.body)) {
-    return toMediaError(cause);
-  }
-  const message =
-    typeof cause.body.message === 'string' ? cause.body.message : undefined;
+  if (!(cause instanceof TinaCloudError)) return toMediaError(cause);
+  const message = cause.serverMessage;
   const reported =
-    typeof cause.body.code === 'string'
+    isRecord(cause.body) && typeof cause.body.code === 'string'
       ? RENAME_ERROR_CODES[cause.body.code]
       : undefined;
   if (reported) return new MediaError(reported, message);

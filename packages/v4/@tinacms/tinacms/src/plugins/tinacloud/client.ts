@@ -21,6 +21,12 @@ export interface TinaCloudOptions {
   getToken: () => string | undefined | Promise<string | undefined>;
 }
 
+const bodyMessage = (body: unknown): string | undefined => {
+  if (typeof body === 'string' && body) return body;
+  if (isRecord(body) && typeof body.message === 'string') return body.message;
+  return undefined;
+};
+
 /** `status` is the HTTP status, or undefined when no response applies. */
 export class TinaCloudError extends Error {
   readonly status?: number;
@@ -31,6 +37,11 @@ export class TinaCloudError extends Error {
     this.name = 'TinaCloudError';
     this.status = details.status;
     this.body = details.body;
+  }
+
+  /** The message TinaCloud sent in the response body, if any. */
+  get serverMessage(): string | undefined {
+    return bodyMessage(this.body);
   }
 }
 
@@ -99,9 +110,7 @@ export const createTinaCloudClient = (options: TinaCloudOptions) => {
       if (isRecord(status) && typeof status.error === 'boolean') {
         if (!status.error) return;
         throw new TinaCloudError(
-          typeof status.message === 'string'
-            ? status.message
-            : 'TinaCloud reported that the request failed.',
+          bodyMessage(status) ?? 'TinaCloud reported that the request failed.',
           { body: status }
         );
       }

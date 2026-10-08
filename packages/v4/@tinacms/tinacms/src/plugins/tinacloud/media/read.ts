@@ -19,12 +19,6 @@ const DEFAULT_PAGE_SIZE = 20;
 /** An undefined branch is the media branch of the TinaCloud project. */
 export type MediaBranch = string | undefined;
 
-const bodyMessage = (body: unknown): string | undefined => {
-  if (typeof body === 'string' && body) return body;
-  if (isRecord(body) && typeof body.message === 'string') return body.message;
-  return undefined;
-};
-
 export const toMediaError = (cause: unknown): MediaError => {
   if (cause instanceof MediaError) return cause;
   if (!(cause instanceof TinaCloudError)) {
@@ -33,7 +27,7 @@ export const toMediaError = (cause: unknown): MediaError => {
     }
     return new MediaError('backend-failure', String(cause));
   }
-  const serverMessage = bodyMessage(cause.body);
+  const { serverMessage } = cause;
   const detail =
     serverMessage && serverMessage !== cause.message
       ? `${cause.message} ${serverMessage}`
