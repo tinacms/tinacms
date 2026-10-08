@@ -1,14 +1,8 @@
 import type { AlertLevel, Alerts as AlertsCollection } from '@toolkit/alerts';
 import { useSubscribable } from '@toolkit/react-core';
-import {
-  Modal,
-  ModalActions,
-  ModalBody,
-  ModalHeader,
-  PopupModal,
-} from '@toolkit/react-modals';
+import { ErrorModal } from '@toolkit/react-modals';
 import { Button } from '@toolkit/styles';
-import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from 'lucide-react';
+import { CircleCheck, Info, TriangleAlert, X } from 'lucide-react';
 import React from 'react';
 
 const parseUrlsInText = (text: string): React.ReactNode => {
@@ -92,35 +86,23 @@ export function Alerts({ alerts }: AlertsProps) {
                 }
               : alert.message;
 
+          const dismiss = () => {
+            alerts.dismiss(alert);
+          };
+
           return (
-            <Modal key={alert.id}>
-              <PopupModal>
-                <ModalHeader
-                  close={() => {
-                    alerts.dismiss(alert);
-                  }}
-                >
-                  <CircleAlert className='mr-1 w-6 h-auto inline-block text-red-600' />{' '}
-                  Error
-                </ModalHeader>
-                <ModalBody padded={true}>
-                  <div className='tina-prose whitespace-pre-wrap'>
-                    <AlertMessage />
-                  </div>
-                </ModalBody>
-                <ModalActions>
-                  <div className='flex-1' />
-                  <Button
-                    style={{ flexGrow: 1 }}
-                    onClick={() => {
-                      alerts.dismiss(alert);
-                    }}
-                  >
-                    Close
-                  </Button>
-                </ModalActions>
-              </PopupModal>
-            </Modal>
+            <ErrorModal
+              key={alert.id}
+              title={alert.title ?? 'Error'}
+              close={dismiss}
+              actions={
+                <Button className='w-full sm:w-auto' onClick={dismiss}>
+                  Close
+                </Button>
+              }
+            >
+              <AlertMessage />
+            </ErrorModal>
           );
         })}
     </>

@@ -10,7 +10,7 @@ export { useDocumentCreatorPlugin } from './hooks/use-content-creator';
 export { TinaAdmin } from './admin';
 export { RouteMappingPlugin } from './admin/plugins/route-mapping';
 export { TinaAdminApi } from './admin/api';
-export { ErrorDialog } from './admin/components/ErrorDialog';
+export { ErrorDialog, showErrorModal } from './admin/components/ErrorDialog';
 
 export * from './toolkit';
 export { Form } from './toolkit/forms/form';
