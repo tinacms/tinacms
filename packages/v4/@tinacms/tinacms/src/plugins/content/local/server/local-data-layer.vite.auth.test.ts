@@ -7,7 +7,12 @@ import { asResolvedConfig } from '../../../../config';
 import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
 import { DEFAULT_MEDIA_URL } from '../../../../core/media/contract';
 import { type PluginManifest, definePlugin } from '../../../../core/plugin';
-import { defineServerPlugin, toUserId } from '../../../../server';
+import {
+  type ServerSegment,
+  defineServerPlugin,
+  toUserId,
+  use,
+} from '../../../../server';
 import { localMediaPlugin } from '../../../media/local/local-media.plugin';
 import { tinaLocalDataLayerVitePlugin } from './local-data-layer.vite';
 
@@ -24,17 +29,18 @@ const SAME_ORIGIN = {
   origin: 'http://localhost:5173',
 };
 
-const authPlugin = definePlugin({
-  name: 'test:auth',
-  provides: ['auth'],
-  server: async () => ({
-    default: defineServerPlugin({
-      getSession: async (request: Request) =>
-        request.headers.get('authorization') === 'Bearer good'
-          ? { identity: { id: toUserId('ada') }, roles: ['editor'] }
-          : null,
-    }),
-  }),
+const authPluginWith = (server: ServerSegment) =>
+  definePlugin({
+    name: 'test:auth',
+    provides: ['auth'],
+    server: async () => ({ default: defineServerPlugin(server) }),
+  });
+
+const authPlugin = authPluginWith({
+  getSession: async (request: Request) =>
+    request.headers.get('authorization') === 'Bearer good'
+      ? { identity: { id: toUserId('ada') }, roles: ['editor'] }
+      : null,
 });
 
 let rootDir: string;
@@ -48,28 +54,30 @@ afterEach(async () => {
   await fs.rm(rootDir, { recursive: true, force: true });
 });
 
-// The body arrives once the handler reads it, as a paused Node stream delivers it.
+// The body flows once a reader attaches, as a paused Node stream delivers it.
 const requestDouble = (
   url: string,
   method: string,
   headers: Record<string, string>,
-  body = ''
+  body: string | Buffer = ''
 ) => {
   const req = Object.assign(new EventEmitter(), {
     url,
     method,
     headers,
     destroyed: false,
-    setEncoding: () => {
-      queueMicrotask(() => {
-        req.emit('data', body);
-        req.emit('end');
-      });
-    },
+    setEncoding: () => {},
     pause: () => {},
     destroy() {
       req.destroyed = true;
     },
+  });
+  req.on('newListener', (event) => {
+    if (event !== 'data') return;
+    queueMicrotask(() => {
+      req.emit('data', body);
+      req.emit('end');
+    });
   });
   return req;
 };
@@ -119,56 +127,141 @@ const mountedRoutes = (plugins: PluginManifest[]) => {
   return mounted;
 };
 
-const listContent = async (
+const send = async (
   plugins: PluginManifest[],
-  headers: Record<string, string> = {}
+  route: string,
+  req: ReturnType<typeof requestDouble>
 ) => {
   const res = responseDouble();
-  await mountedRoutes(plugins).get(DEFAULT_CONTENT_URL)?.(
-    requestDouble(
-      '/',
-      'POST',
-      { ...SAME_ORIGIN, 'content-type': 'application/json', ...headers },
-      JSON.stringify({ op: 'list', collection: 'posts' })
-    ),
-    res
-  );
+  await mountedRoutes(plugins).get(route)?.(req, res);
   return res;
 };
 
-const listMedia = async (
+const jsonHeaders = (headers: Record<string, string>) => ({
+  ...SAME_ORIGIN,
+  'content-type': 'application/json',
+  ...headers,
+});
+
+const uploadRequest = async (headers: Record<string, string>) => {
+  const form = new FormData();
+  form.append('folder', '');
+  form.append('file', new File(['x'], 'a.png'));
+  const request = new Request('http://localhost/upload', {
+    method: 'POST',
+    body: form,
+  });
+  return requestDouble(
+    '/upload',
+    'POST',
+    {
+      ...SAME_ORIGIN,
+      'content-type': request.headers.get('content-type') ?? '',
+      ...headers,
+    },
+    Buffer.from(await request.arrayBuffer())
+  );
+};
+
+const requests = {
+  'content list': async (headers: Record<string, string>) => ({
+    route: DEFAULT_CONTENT_URL,
+    req: requestDouble(
+      '/',
+      'POST',
+      jsonHeaders(headers),
+      JSON.stringify({ op: 'list', collection: 'posts' })
+    ),
+  }),
+  'media list': async (headers: Record<string, string>) => ({
+    route: DEFAULT_MEDIA_URL,
+    req: requestDouble('/?folder=', 'GET', { ...SAME_ORIGIN, ...headers }),
+  }),
+  'media upload': async (headers: Record<string, string>) => ({
+    route: DEFAULT_MEDIA_URL,
+    req: await uploadRequest(headers),
+  }),
+};
+
+type RequestName = keyof typeof requests;
+const REQUEST_NAMES = Object.keys(requests) as RequestName[];
+
+const sendNamed = async (
   plugins: PluginManifest[],
+  name: RequestName,
   headers: Record<string, string> = {}
 ) => {
-  const res = responseDouble();
-  await mountedRoutes(plugins).get(DEFAULT_MEDIA_URL)?.(
-    requestDouble('/?folder=', 'GET', { ...SAME_ORIGIN, ...headers }),
-    res
-  );
-  return res;
+  const { route, req } = await requests[name](headers);
+  return send(plugins, route, req);
 };
 
 describe('local Data Layer with an auth plugin', () => {
-  it('serves content and media to a request with a session', async () => {
-    const authorization = { authorization: 'Bearer good' };
-    expect((await listContent([authPlugin], authorization)).statusCode).toBe(
-      200
-    );
-    expect((await listMedia([authPlugin], authorization)).statusCode).toBe(200);
+  it.each(REQUEST_NAMES)('serves a %s with a session', async (name) => {
+    const res = await sendNamed([authPlugin], name, {
+      authorization: 'Bearer good',
+    });
+    expect(res.statusCode).toBe(200);
   });
 
-  it('401s content and media requests with no session', async () => {
-    const content = await listContent([authPlugin]);
-    expect(content.statusCode).toBe(401);
-    expect(content.body).toBe('No CMS session.');
-    const media = await listMedia([authPlugin], {
+  it.each(REQUEST_NAMES)('401s a %s with no session', async (name) => {
+    const res = await sendNamed([authPlugin], name, {
       authorization: 'Bearer bad',
     });
-    expect(media.statusCode).toBe(401);
+    expect(res.statusCode).toBe(401);
   });
 
-  it('serves a request with no token when no plugin provides auth', async () => {
-    expect((await listContent([])).statusCode).toBe(200);
-    expect((await listMedia([])).statusCode).toBe(200);
+  it('401s a media delete with no session, and deletes nothing', async () => {
+    const res = await send(
+      [authPlugin],
+      DEFAULT_MEDIA_URL,
+      requestDouble(
+        '/',
+        'POST',
+        jsonHeaders({}),
+        JSON.stringify({ op: 'delete', path: 'a.png' })
+      )
+    );
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('401s every request when the auth plugin has no getSession', async () => {
+    const res = await sendNamed([authPluginWith({})], 'content list', {
+      authorization: 'Bearer good',
+    });
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('resolves use(capability) inside getSession', async () => {
+    const composingAuth = authPluginWith({
+      ping: async () => true,
+      getSession: async () => {
+        await (use('auth').ping as () => Promise<unknown>)();
+        return { identity: { id: toUserId('ada') }, roles: ['editor'] };
+      },
+    });
+    expect((await sendNamed([composingAuth], 'content list')).statusCode).toBe(
+      200
+    );
+  });
+
+  it('500s with a generic body when getSession throws', async () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const throwingAuth = authPluginWith({
+      getSession: async () => {
+        throw new Error('database password is hunter2');
+      },
+    });
+    const res = await sendNamed([throwingAuth], 'content list');
+    expect(res.statusCode).toBe(500);
+    expect(res.body).toBe('Session check failed.');
+    consoleError.mockRestore();
+  });
+});
+
+describe('local Data Layer with no auth plugin', () => {
+  it.each(REQUEST_NAMES)('serves a %s with no token', async (name) => {
+    expect((await sendNamed([], name)).statusCode).toBe(200);
   });
 });

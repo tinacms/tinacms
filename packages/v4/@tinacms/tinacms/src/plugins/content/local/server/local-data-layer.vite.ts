@@ -4,7 +4,6 @@ import path from 'node:path';
 import type { Connect, Plugin } from 'vite';
 import { runCodegen } from '../../../../cli/commands/codegen';
 import { type ResolvedConfig, resolveBuild } from '../../../../config';
-import type { AuthTransportHooks } from '../../../../core/auth/contract';
 import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
 import { DEFAULT_MEDIA_URL, MediaError } from '../../../../core/media/contract';
@@ -14,7 +13,7 @@ import {
   RequestBodyTooLargeError,
 } from '../../../../core/request-body';
 import { AUTH_CAPABILITY, type PluginManifest } from '../../../../core/plugin';
-import { resolveAuthTransportHooks } from '../../../../rpc/handler';
+import { createRequestAuthorizer } from '../../../../rpc/handler';
 import {
   LOCAL_MEDIA_PLUGIN_NAME,
   MEDIA_ERROR_HEADER,
@@ -140,25 +139,26 @@ type SessionGate = (
   res: ServerResponse
 ) => Promise<boolean>;
 
-// ADR-023 §4: with an auth plugin, the Data Layer refuses a request with no session,
-// as rpc/handler.ts does. With no auth plugin, it composes nothing and checks nothing.
-const createSessionGate = (plugins: PluginManifest[]): SessionGate | null => {
+// ADR-023 §4: with an auth plugin, the Data Layer authorizes a request as
+// rpc/handler.ts does. With no auth plugin, it composes nothing and checks nothing.
+const createSessionGate = (
+  plugins: PluginManifest[],
+  capability: 'content' | 'media'
+): SessionGate | null => {
   if (!plugins.some(({ provides }) => provides.includes(AUTH_CAPABILITY))) {
     return null;
   }
-  let authHooks: Promise<AuthTransportHooks | null> | null = null;
+  const authorize = createRequestAuthorizer(plugins);
+  const permission = plugins.find(({ provides }) =>
+    provides.includes(capability)
+  )?.requires?.permission;
   return async (req, res) => {
     try {
-      authHooks ??= resolveAuthTransportHooks(plugins).catch((cause) => {
-        authHooks = null;
-        throw cause;
-      });
-      const hooks = await authHooks;
-      if (!hooks || (await hooks.getSession(sessionRequestOf(req)))) {
-        return true;
-      }
-      res.statusCode = 401;
-      res.end('No CMS session.');
+      const refusal = await authorize(sessionRequestOf(req), [permission]);
+      if (!refusal) return true;
+      res.statusCode = refusal.status;
+      res.setHeader('content-type', 'application/json');
+      res.end(await refusal.text());
     } catch (cause) {
       console.error('[tinacms] Data Layer session check failed:', cause);
       res.statusCode = 500;
@@ -265,7 +265,9 @@ export const tinaLocalDataLayerVitePlugin = (
     'tinaLocalDataLayerVitePlugin needs `config` (the loaded tina/config.ts) or `collections`.'
   );
   const dataLayer = createLocalDataLayer({ ...options, collections });
-  const sessionGate = createSessionGate(options.config?.plugins ?? []);
+  const plugins = options.config?.plugins ?? [];
+  const contentGate = createSessionGate(plugins, 'content');
+  const mediaGate = createSessionGate(plugins, 'media');
   const usesLocalMedia =
     options.config?.plugins.some(
       ({ name }) => name === LOCAL_MEDIA_PLUGIN_NAME
@@ -309,7 +311,7 @@ export const tinaLocalDataLayerVitePlugin = (
       res.end('Cross-origin request rejected');
       return;
     }
-    if (sessionGate && !(await sessionGate(req, res))) return;
+    if (contentGate && !(await contentGate(req, res))) return;
     if (coreContentTypeOfRequest(req) !== 'application/json') {
       res.statusCode = 415;
       res.end('Expected application/json');
@@ -379,7 +381,7 @@ export const tinaLocalDataLayerVitePlugin = (
       if (media) {
         server.middlewares.use(
           options.mediaUrl ?? DEFAULT_MEDIA_URL,
-          createMediaHandler(media, sessionGate)
+          createMediaHandler(media, mediaGate)
         );
       }
       server.middlewares.use(

@@ -6,15 +6,25 @@ import type { AuthSlice } from './contract';
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === 'string');
 
+const isAuthUser = (value: unknown): boolean =>
+  isRecord(value) && typeof value.id === 'string' && value.id.length > 0;
+
 const hasAuthState = ({ status, user, roles }: SliceState): boolean => {
-  if (status === 'signed-in') return isRecord(user) && isStringArray(roles);
-  if (status === 'forbidden') return isRecord(user);
+  if (status === 'signed-in') return isAuthUser(user) && isStringArray(roles);
+  if (status === 'forbidden') return isAuthUser(user);
   return (status === 'loading' || status === 'signed-out') && user === null;
 };
 
+const REACT_ELEMENT_TYPES = new Set([
+  Symbol.for('react.element'),
+  Symbol.for('react.transitional.element'),
+]);
+
 const isComponent = (value: unknown): boolean =>
   typeof value === 'function' ||
-  (isRecord(value) && typeof value.$$typeof === 'symbol');
+  (isRecord(value) &&
+    typeof value.$$typeof === 'symbol' &&
+    !REACT_ELEMENT_TYPES.has(value.$$typeof));
 
 const isAuthSlice = (slice: SliceState): slice is SliceState & AuthSlice =>
   hasAuthState(slice) &&

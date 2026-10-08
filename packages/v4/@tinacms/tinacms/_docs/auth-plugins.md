@@ -100,10 +100,13 @@ with no login.
   plugin does not attach the token itself.
 - The local content and media plugins attach the token the same way. Each
   request reads `store.auth` and calls `getToken()` at the time it is sent.
-- The local Data Layer (`tinaLocalDataLayerVitePlugin`) checks the content
-  and media requests with `getSession` of the auth plugin, as the RPC handler
-  does. It answers `401` when there is no session. With no auth plugin, or an
-  auth plugin with no `getSession`, it checks nothing.
+- The local Data Layer (`tinaLocalDataLayerVitePlugin`) authorizes the
+  content and media requests as the RPC handler does. It answers `401` when
+  there is no session, or when the auth plugin has no `getSession`. It
+  answers `403` when the roles do not grant the `requires` permission of the
+  content or media plugin. With no auth plugin, it checks nothing.
+- The local Data Layer runs no `onInit`. A `getSession` must not depend on
+  state that `onInit` sets.
 - Roles and permissions are runtime data of the provider. They are not in
   `defineConfig`.
 - `roles` on the slice and a permission check in the client are for the UI

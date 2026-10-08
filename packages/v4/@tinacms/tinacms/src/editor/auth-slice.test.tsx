@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import type { ReactNode } from 'react';
+import { type ReactNode, memo } from 'react';
 import { describe, expect, it } from 'vitest';
 import { type AuthUser, toUserId } from '../core/auth/contract';
 import { createFieldRegistry } from '../core/field/registry';
@@ -58,7 +58,7 @@ const boot = async (plugins: PluginManifest[]) => {
   return { result, authorizations };
 };
 
-const malformedAuthPlugin = (slice: Record<string, unknown>) =>
+const authPluginWith = (slice: Record<string, unknown>) =>
   definePlugin({
     name: 'test:malformed-auth',
     provides: ['auth'],
@@ -77,19 +77,40 @@ describe('useOptionalAuthSlice', () => {
   it.each([
     ['signed-in with no user', { status: 'signed-in', user: null }],
     ['signed-in with no roles', { status: 'signed-in', user: ada }],
+    ['forbidden with no user', { status: 'forbidden', user: null }],
     [
       'a LoginScreen that is not a component',
       { status: 'signed-out', user: null, LoginScreen: 'Sign in' },
     ],
+    [
+      'a LoginScreen that is an element',
+      { status: 'signed-out', user: null, LoginScreen: <p>Sign in</p> },
+    ],
   ])('names the capability when the slice is %s', async (_case, state) => {
     const runtime = await bootRuntime([
-      malformedAuthPlugin({ ...sessionMembers, ...state }),
+      authPluginWith({ ...sessionMembers, ...state }),
     ]);
     expect(() =>
       renderHook(() => useOptionalAuthSlice(), {
         wrapper: wrapperFor(runtime),
       })
     ).toThrow(/auth-capability-malformed/);
+  });
+
+  it('accepts a memo component as LoginScreen', async () => {
+    const LoginScreen = memo(() => <p>Sign in</p>);
+    const runtime = await bootRuntime([
+      authPluginWith({
+        ...sessionMembers,
+        status: 'signed-out',
+        user: null,
+        LoginScreen,
+      }),
+    ]);
+    const { result } = renderHook(() => useOptionalAuthSlice(), {
+      wrapper: wrapperFor(runtime),
+    });
+    expect(result.current?.LoginScreen).toBe(LoginScreen);
   });
 
   it('carries the roles of the editor once they sign in', async () => {

@@ -159,4 +159,10 @@ describe('media slice with an auth plugin', () => {
       'Bearer tok',
     ]);
   });
+
+  it('sends no authorization header with no auth plugin', async () => {
+    const harness = await createSliceHarness(null);
+    await harness.slice().delete('a.png');
+    expect(harness.requests[0].authorization).toBeNull();
+  });
 });

@@ -149,11 +149,27 @@ const composeServerRuntime = async (
   return { ...composed, destroy };
 };
 
-// Runs no onInit. The local Data Layer checks its requests with these hooks.
-export const resolveAuthTransportHooks = async (
-  plugins: PluginManifest[]
-): Promise<AuthTransportHooks | null> =>
-  (await composeServerSegments(plugins)).authHooks;
+// Runs no onInit, so a getSession must not depend on state that onInit sets.
+// The local Data Layer checks its requests through this.
+export const createRequestAuthorizer = (plugins: PluginManifest[]) => {
+  let composing: Promise<ServerRuntime> | null = null;
+  return async (
+    request: Request,
+    permissions: (string | undefined)[]
+  ): Promise<Response | null> => {
+    composing ??= composeServerSegments(plugins).then(
+      (composed) => ({ ...composed, destroy: async () => {} }),
+      (cause) => {
+        composing = null;
+        throw cause;
+      }
+    );
+    const runtime = await composing;
+    return serverRuntimeStorage.run(runtime, () =>
+      authorizeRequest(runtime, request, permissions)
+    );
+  };
+};
 
 // Read the transport hooks from the auth segment, and remove them from the routable
 // ops of every segment that provides auth. A plugin providing several singletons
@@ -287,31 +303,11 @@ const authorizeAndInvokeOp = async (
   // `requires`, because a caller with no session has no permissions to check.
   const meta = opMeta(op);
   if (!meta.public) {
-    if (!runtime.authHooks) {
-      return errorResponse(401, 'unauthenticated', 'No CMS session.');
-    }
-    const session = await runtime.authHooks.getSession(request);
-    if (!session) {
-      return errorResponse(401, 'unauthenticated', 'No CMS session.');
-    }
-    for (const permission of [
+    const refusal = await authorizeRequest(runtime, request, [
       mounted.manifest.requires?.permission,
       meta.permission,
-    ]) {
-      if (!permission) continue;
-      const allowed = await hasPermission(
-        runtime.authHooks,
-        session,
-        permission
-      );
-      if (!allowed) {
-        return errorResponse(
-          403,
-          'forbidden',
-          `Requires the "${permission}" permission.`
-        );
-      }
-    }
+    ]);
+    if (refusal) return refusal;
   }
 
   let input: unknown;
@@ -326,6 +322,33 @@ const authorizeAndInvokeOp = async (
 
   const result = await invokeOp(op, input);
   return Response.json(result ?? null);
+};
+
+// A refusal, or null when the session grants every permission.
+const authorizeRequest = async (
+  runtime: ServerRuntime,
+  request: Request,
+  permissions: (string | undefined)[]
+): Promise<Response | null> => {
+  if (!runtime.authHooks) {
+    return errorResponse(401, 'unauthenticated', 'No CMS session.');
+  }
+  const session = await runtime.authHooks.getSession(request);
+  if (!session) {
+    return errorResponse(401, 'unauthenticated', 'No CMS session.');
+  }
+  for (const permission of permissions) {
+    if (!permission) continue;
+    const allowed = await hasPermission(runtime.authHooks, session, permission);
+    if (!allowed) {
+      return errorResponse(
+        403,
+        'forbidden',
+        `Requires the "${permission}" permission.`
+      );
+    }
+  }
+  return null;
 };
 
 // The own-property check and the function check keep the prototype members, such as
