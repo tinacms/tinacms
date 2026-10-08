@@ -13,16 +13,21 @@ import {
   t,
 } from '@tinacms/tinacms';
 import { helpNavPlugin } from './help-nav';
-import { hooksPlugin, logSave, requireStarsToPublish } from './hooks';
+import { hooksPlugin, logSave, trimTitle } from './hooks';
 import { rating, ratingFieldPlugin } from './rating-field';
-import { differentFrom, matches, validatorsPlugin } from './validators';
+import {
+  differentFrom,
+  matches,
+  requiredWhen,
+  validatorsPlugin,
+} from './validators';
 
 export const postCollection = {
   name: 'post',
   label: 'Posts',
   path: 'content/posts',
   format: 'mdx',
-  hooks: [requireStarsToPublish(), logSave('saved')],
+  hooks: [trimTitle(), logSave('saved')],
   fields: [
     t.string({
       name: 'title',
@@ -34,7 +39,18 @@ export const postCollection = {
     }),
     t.boolean({ name: 'featured', label: 'Featured' }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
-    rating({ name: 'stars', label: 'Stars' }),
+    rating({
+      name: 'stars',
+      label: 'Stars',
+      // A sibling rule: `stars` is top level, so `siblings` is the document root.
+      validators: [
+        requiredWhen(
+          'status',
+          'published',
+          'Rate the post before you publish it'
+        ),
+      ],
+    }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
     t.array({
       name: 'authors',
