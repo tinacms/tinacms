@@ -458,13 +458,8 @@ export function MediaPicker({
                 .join(', ')}`
             );
           });
-          cms.alerts.error(() => {
-            return (
-              <>
-                Upload Failed. <br />
-                {messages.join('. ')}.
-              </>
-            );
+          cms.alerts.error(`${messages.join('. ')}.`, {
+            title: 'Upload Failed',
           });
         }
 
