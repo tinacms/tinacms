@@ -230,11 +230,106 @@ describe('verifying a save', () => {
     );
   });
 
-  it('says when the text would not load again', () => {
+  it('saves text whose escaping gap formatting has no part in', () => {
     const field: RichTextField = { name: 'body', type: 'rich-text' };
     const value = paragraph([{ type: 'text', text: 'a {c} d' }]);
+    expect(serializeMDX(value, field, passthrough, { verify: true })).toBe(
+      'a {c} d\n'
+    );
+  });
+
+  const box: RichTextField = {
+    name: 'body',
+    type: 'rich-text',
+    templates: [
+      {
+        name: 'Box',
+        fields: [
+          { name: 'text', type: 'string' },
+          { name: 'body', type: 'rich-text' },
+        ],
+      },
+    ],
+  };
+  const inBox = (children: Plate.TextElement[]) =>
+    ({
+      type: 'root',
+      children: [
+        {
+          type: 'mdxJsxFlowElement',
+          name: 'Box',
+          children: [{ type: 'text', text: '' }],
+          props: {
+            text: 'hi',
+            body: { type: 'root', children: [{ type: 'p', children }] },
+          },
+        },
+      ],
+    }) as Plate.RootElement;
+
+  it('checks rich text inside a component', () => {
+    const value = inBox([
+      { type: 'text', text: 'a.', bold: true },
+      { type: 'text', text: 'b' },
+    ]);
+    expect(() =>
+      serializeMDX(value, box, passthrough, { verify: true })
+    ).toThrow(/This formatting can't be saved yet/);
+  });
+
+  it('saves a component whose text hits an older escaping gap', () => {
+    const value = inBox([{ type: 'text', text: 'a > b' }]);
+    expect(() =>
+      serializeMDX(value, box, passthrough, { verify: true })
+    ).not.toThrow();
+  });
+
+  it("checks rich text written as a component's children", () => {
+    const field: RichTextField = {
+      name: 'body',
+      type: 'rich-text',
+      templates: [
+        { name: 'Box', fields: [{ name: 'children', type: 'rich-text' }] },
+      ],
+    };
+    const value = {
+      type: 'root',
+      children: [
+        {
+          type: 'mdxJsxFlowElement',
+          name: 'Box',
+          children: [{ type: 'text', text: '' }],
+          props: {
+            children: {
+              type: 'root',
+              children: [
+                {
+                  type: 'p',
+                  children: [
+                    { type: 'text', text: 'a.', bold: true },
+                    { type: 'text', text: 'b' },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      ],
+    } as Plate.RootElement;
     expect(() =>
       serializeMDX(value, field, passthrough, { verify: true })
-    ).toThrow(/can't be saved yet, it wouldn't load again/);
+    ).toThrow(/can't be saved yet/);
+  });
+
+  it('still refuses formatting that breaks loading beside inline code', () => {
+    const field: RichTextField = { name: 'body', type: 'rich-text' };
+    const value = paragraph([
+      { type: 'text', text: 'a.', bold: true, italic: true, highlight: true },
+      { type: 'text', text: 'b', bold: true, highlight: true },
+      { type: 'text', text: ' {x} ', code: true },
+    ]);
+    expect(() =>
+      serializeMDX(value, field, passthrough, { verify: true })
+    ).toThrow(/can't be saved yet/);
   });
 });

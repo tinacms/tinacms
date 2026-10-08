@@ -35,6 +35,47 @@ declare module 'mdast' {
   }
 }
 
+/** Set while a verified save is written, so nested rich text verifies too. */
+let verifying = false;
+
+/** The marks written as `*`, `_` or `~`; code and colour change escaping, so stay. */
+const DELIMITED = new Set(['bold', 'italic', 'strikethrough']);
+
+type Node = { text?: unknown; children?: unknown; props?: unknown };
+
+const withoutDelimited = (node: Node): Node => {
+  if (!Array.isArray(node.children) && typeof node.text === 'string') {
+    return Object.fromEntries(
+      Object.entries(node).filter(([key]) => !DELIMITED.has(key))
+    );
+  }
+  return {
+    ...node,
+    ...(Array.isArray(node.children)
+      ? { children: node.children.map(withoutDelimited) }
+      : {}),
+    ...(node.props ? { props: propsWithoutDelimited(node.props) } : {}),
+  };
+};
+
+const propsWithoutDelimited = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(propsWithoutDelimited);
+  }
+  if (!value || typeof value !== 'object') {
+    return value;
+  }
+  if ((value as { type?: unknown }).type === 'root') {
+    return withoutDelimited(value as Node);
+  }
+  return Object.fromEntries(
+    Object.entries(value).map(([key, child]) => [
+      key,
+      propsWithoutDelimited(child),
+    ])
+  );
+};
+
 /**
  * `verify` refuses to save text that would read back differently (see
  * `assertReadsBack`). Save paths pass it; previews of the markdown don't.
@@ -43,22 +84,35 @@ export const serializeMDX = (
   value: Plate.RootElement,
   field: RichTextField,
   imageCallback: (url: string) => string,
-  { verify = false }: { verify?: boolean } = {}
+  { verify = verifying }: { verify?: boolean } = {}
 ): string | Plate.RootElement | undefined => {
   const writtenRaw =
     field.parser?.type === 'markdown' &&
     !!field.parser.skipEscaping &&
     field.parser.skipEscaping !== 'none';
-  if (!verify || writtenRaw) {
+  if (
+    !verify ||
+    writtenRaw ||
+    !value?.children ||
+    value.children[0]?.type === 'invalid_markdown'
+  ) {
     return writeMDX(value, field, imageCallback);
   }
-  const written = charactersOf(value?.children);
-  const result = writeMDX(value, field, imageCallback);
-  if (
-    typeof result === 'string' &&
-    value?.children[0]?.type !== 'invalid_markdown'
-  ) {
-    assertReadsBack(written, result, field);
+  const written = charactersOf(value.children);
+  const plain = withoutDelimited(value) as Plate.RootElement;
+  const outer = verifying;
+  verifying = true;
+  let result: ReturnType<typeof writeMDX>;
+  try {
+    result = writeMDX(value, field, imageCallback);
+  } finally {
+    verifying = outer;
+  }
+  if (typeof result === 'string') {
+    assertReadsBack(written, result, field, () => {
+      const markdown = writeMDX(plain, field, imageCallback);
+      return typeof markdown === 'string' ? markdown : '';
+    });
   }
   return result;
 };

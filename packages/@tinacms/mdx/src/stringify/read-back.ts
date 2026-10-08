@@ -12,46 +12,49 @@ type Character = { char: string; key: string };
 /** Text between raw HTML, which is skipped when comparing. */
 type Run = Character[];
 
-const isTextLeaf = (value: object): value is Plate.TextElement =>
-  typeof (value as { text?: unknown }).text === 'string';
+type Node = {
+  type?: string;
+  text?: unknown;
+  children?: unknown;
+  props?: { children?: { children?: unknown } };
+};
 
-const collect = (value: unknown, runs: Run[]) => {
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      collect(item, runs);
+/**
+ * Walks `children` only. Component props are left out: rich text inside them
+ * is checked on its own when it's written, and the rest isn't formatted text.
+ * A rich-text prop named `children` is the exception, as it's written inline.
+ */
+const collect = (nodes: Node[], runs: Run[]) => {
+  for (const node of nodes) {
+    if (OPAQUE.has(node.type ?? '')) {
+      runs.push([]);
+    } else if (Array.isArray(node.children)) {
+      collect(node.children, runs);
+      const inline = node.props?.children?.children;
+      if (Array.isArray(inline)) {
+        collect(inline, runs);
+      }
+    } else if (typeof node.text === 'string') {
+      const leaf = node as Plate.TextElement;
+      const formatting = FORMATTING.filter((mark) => leaf[mark]).join();
+      const run = runs.at(-1);
+      for (const char of leaf.text) {
+        run?.push({
+          char,
+          key: /\s/u.test(char) ? '' : `${char}\u0001${formatting}\u0002`,
+        });
+      }
     }
-    return;
-  }
-  if (!value || typeof value !== 'object') {
-    return;
-  }
-  if (OPAQUE.has((value as { type?: unknown }).type as string)) {
-    runs.push([]);
-    return;
-  }
-  if (isTextLeaf(value)) {
-    const formatting = FORMATTING.filter((mark) => value[mark]).join();
-    const run = runs.at(-1);
-    for (const char of value.text) {
-      run?.push({
-        char,
-        key: /\s/u.test(char) ? '' : `${char}\u0001${formatting}\u0002`,
-      });
-    }
-    return;
-  }
-  for (const key of Object.keys(value).sort()) {
-    collect(value[key as keyof typeof value], runs);
   }
 };
 
 /**
- * Every character in the document, in order, with the formatting markdown
- * writes as delimiters, split into runs at raw HTML.
+ * Every character in a document's own text, in order, with the formatting
+ * markdown writes as delimiters, split into runs at raw HTML.
  */
-export const charactersOf = (value: unknown): Run[] => {
+export const charactersOf = (nodes: Node[] = []): Run[] => {
   const runs: Run[] = [[]];
-  collect(value, runs);
+  collect(nodes, runs);
   return runs;
 };
 
@@ -110,9 +113,19 @@ const firstMismatch = (
 export const assertReadsBack = (
   written: Run[],
   markdown: string,
-  field: RichTextField
+  field: RichTextField,
+  withoutFormatting: () => string
 ) => {
   const { children } = parseMDX(markdown, field, (url) => url);
+  const loads = (nodes: Node[]) => nodes[0]?.type !== 'invalid_markdown';
+  if (
+    !loads(children) &&
+    !loads(parseMDX(withoutFormatting(), field, (url) => url).children)
+  ) {
+    // The text itself hits an older escaping gap that formatting has no part
+    // in; refusing would only lock the document.
+    return;
+  }
   const read = charactersOf(children).map(keyOf).join('');
   const mismatch = firstMismatch(written, read);
   if (!mismatch) {
