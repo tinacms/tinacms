@@ -39,7 +39,7 @@
     "@tinacms/scripts": "workspace:*",
     "@types/js-cookie": "^2.2.7",
     "@types/node": "^22.13.1",
-    "next": "15.5.21",
+    "next": "15.5.27",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tinacms": "workspace:*",
