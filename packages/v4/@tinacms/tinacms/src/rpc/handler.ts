@@ -116,9 +116,9 @@ export const createRpcHandler = ({
   return handler;
 };
 
-const composeServerRuntime = async (
+const composeServerSegments = async (
   plugins: PluginManifest[]
-): Promise<ServerRuntime> => {
+): Promise<Omit<ServerRuntime, 'destroy'>> => {
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
   const segmentsByNamespace = composeOverridableRegistry(
@@ -131,14 +131,29 @@ const composeServerRuntime = async (
     ),
     serverConflictError
   );
-  const authHooks = claimAuthTransportHooks(segmentsByNamespace);
+  return {
+    segmentsByNamespace,
+    authHooks: claimAuthTransportHooks(segmentsByNamespace),
+  };
+};
+
+const composeServerRuntime = async (
+  plugins: PluginManifest[]
+): Promise<ServerRuntime> => {
+  const composed = await composeServerSegments(plugins);
   // The init runs last, so a failed composition leaves no initialized plugin behind
   // for the next attempt. The teardown travels on the runtime: a handler that is
   // replaced rather than ending with the process — a dev server re-evaluating its
   // route module — would otherwise run every onInit again with no matching onDestroy.
   const destroy = await initializePlugins(plugins);
-  return { segmentsByNamespace, authHooks, destroy };
+  return { ...composed, destroy };
 };
+
+// Runs no onInit. The local Data Layer checks its requests with these hooks.
+export const resolveAuthTransportHooks = async (
+  plugins: PluginManifest[]
+): Promise<AuthTransportHooks | null> =>
+  (await composeServerSegments(plugins)).authHooks;
 
 // Read the transport hooks from the auth segment, and remove them from the routable
 // ops of every segment that provides auth. A plugin providing several singletons

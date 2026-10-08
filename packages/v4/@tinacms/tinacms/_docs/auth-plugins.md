@@ -98,6 +98,12 @@ with no login.
 - `useRpcClient({ url })` (`@tinacms/tinacms/react`) creates an RPC client
   that calls `getToken()` before each request and attaches the token. A
   plugin does not attach the token itself.
+- The local content and media plugins attach the token the same way. Each
+  request reads `store.auth` and calls `getToken()` at the time it is sent.
+- The local Data Layer (`tinaLocalDataLayerVitePlugin`) checks the content
+  and media requests with `getSession` of the auth plugin, as the RPC handler
+  does. It answers `401` when there is no session. With no auth plugin, or an
+  auth plugin with no `getSession`, it checks nothing.
 - Roles and permissions are runtime data of the provider. They are not in
   `defineConfig`.
 - `roles` on the slice and a permission check in the client are for the UI
@@ -129,10 +135,8 @@ keeps its other capabilities.
 
 ## Not supported yet
 
-- Sign-out on a `401`. A request that carried a token and gets `401` throws
-  `RpcError`; the slice does not change its status.
-- The token on requests of the local content and media plugins. They do not
-  use the RPC client.
+- Sign-out on a `401`. A request that carried a token and gets `401` fails,
+  and the slice does not change its status.
 - An auth slice for `tinaCloud()`.
 - `onLogin` and `onLogout` hooks in the config. A plugin does its own work
   inside its `login()` and `logout()`.

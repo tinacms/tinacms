@@ -4,6 +4,7 @@ import path from 'node:path';
 import type { Connect, Plugin } from 'vite';
 import { runCodegen } from '../../../../cli/commands/codegen';
 import { type ResolvedConfig, resolveBuild } from '../../../../config';
+import type { AuthTransportHooks } from '../../../../core/auth/contract';
 import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
 import { DEFAULT_MEDIA_URL, MediaError } from '../../../../core/media/contract';
@@ -12,6 +13,8 @@ import {
   MAX_REQUEST_BODY_BYTES,
   RequestBodyTooLargeError,
 } from '../../../../core/request-body';
+import { AUTH_CAPABILITY, type PluginManifest } from '../../../../core/plugin';
+import { resolveAuthTransportHooks } from '../../../../rpc/handler';
 import {
   LOCAL_MEDIA_PLUGIN_NAME,
   MEDIA_ERROR_HEADER,
@@ -117,7 +120,58 @@ const readRequestBody = (req: Connect.IncomingMessage): Promise<string> =>
     req.on('error', reject);
   });
 
-const createMediaHandler = (media: LocalMedia): Connect.NextHandleFunction => {
+const sessionRequestOf = (req: Connect.IncomingMessage): Request => {
+  const headers = new Headers();
+  for (const [name, value] of Object.entries(req.headers)) {
+    if (value === undefined || name.startsWith(':')) continue;
+    for (const item of Array.isArray(value) ? value : [value]) {
+      headers.append(name, item);
+    }
+  }
+  const url = new URL(
+    req.originalUrl ?? req.url ?? '/',
+    `http://${req.headers.host ?? 'localhost'}`
+  );
+  return new Request(url, { method: req.method, headers });
+};
+
+type SessionGate = (
+  req: Connect.IncomingMessage,
+  res: ServerResponse
+) => Promise<boolean>;
+
+// ADR-023 §4: with an auth plugin, the Data Layer refuses a request with no session,
+// as rpc/handler.ts does. With no auth plugin, it composes nothing and checks nothing.
+const createSessionGate = (plugins: PluginManifest[]): SessionGate | null => {
+  if (!plugins.some(({ provides }) => provides.includes(AUTH_CAPABILITY))) {
+    return null;
+  }
+  let authHooks: Promise<AuthTransportHooks | null> | null = null;
+  return async (req, res) => {
+    try {
+      authHooks ??= resolveAuthTransportHooks(plugins).catch((cause) => {
+        authHooks = null;
+        throw cause;
+      });
+      const hooks = await authHooks;
+      if (!hooks || (await hooks.getSession(sessionRequestOf(req)))) {
+        return true;
+      }
+      res.statusCode = 401;
+      res.end('No CMS session.');
+    } catch (cause) {
+      console.error('[tinacms] Data Layer session check failed:', cause);
+      res.statusCode = 500;
+      res.end('Session check failed.');
+    }
+    return false;
+  };
+};
+
+const createMediaHandler = (
+  media: LocalMedia,
+  sessionGate: SessionGate | null
+): Connect.NextHandleFunction => {
   const serveMediaUpload = async (
     req: Connect.IncomingMessage,
     res: ServerResponse
@@ -149,6 +203,7 @@ const createMediaHandler = (media: LocalMedia): Connect.NextHandleFunction => {
       res.end('Cross-origin request rejected');
       return;
     }
+    if (sessionGate && !(await sessionGate(req, res))) return;
     try {
       const [route, query = ''] = (req.url ?? '').split('?');
       if (route === '/upload') {
@@ -210,6 +265,7 @@ export const tinaLocalDataLayerVitePlugin = (
     'tinaLocalDataLayerVitePlugin needs `config` (the loaded tina/config.ts) or `collections`.'
   );
   const dataLayer = createLocalDataLayer({ ...options, collections });
+  const sessionGate = createSessionGate(options.config?.plugins ?? []);
   const usesLocalMedia =
     options.config?.plugins.some(
       ({ name }) => name === LOCAL_MEDIA_PLUGIN_NAME
@@ -253,6 +309,7 @@ export const tinaLocalDataLayerVitePlugin = (
       res.end('Cross-origin request rejected');
       return;
     }
+    if (sessionGate && !(await sessionGate(req, res))) return;
     if (coreContentTypeOfRequest(req) !== 'application/json') {
       res.statusCode = 415;
       res.end('Expected application/json');
@@ -322,7 +379,7 @@ export const tinaLocalDataLayerVitePlugin = (
       if (media) {
         server.middlewares.use(
           options.mediaUrl ?? DEFAULT_MEDIA_URL,
-          createMediaHandler(media)
+          createMediaHandler(media, sessionGate)
         );
       }
       server.middlewares.use(
