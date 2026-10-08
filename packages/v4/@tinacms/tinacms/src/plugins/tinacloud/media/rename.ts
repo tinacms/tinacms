@@ -8,7 +8,7 @@ import {
   renameErrorBodySchema,
   renameResponseSchema,
 } from './tinacloud-media-types';
-import { type MediaBranch, toMediaError } from './read';
+import { type MediaBranch, toMediaError } from './shared';
 
 const RENAME_ERROR_CODES: Record<string, MediaErrorCode> = {
   NOT_FOUND: 'not-found',

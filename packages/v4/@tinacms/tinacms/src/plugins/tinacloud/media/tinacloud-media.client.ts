@@ -5,7 +5,9 @@ import {
   type TinaCloudProject,
   createTinaCloudClient,
 } from '../client';
-import { type MediaBranch, deleteMedia, listMedia, mediaUrl } from './read';
+import { deleteMedia } from './delete';
+import { listMedia, mediaUrl } from './read';
+import type { MediaBranch } from './shared';
 import { renameMedia } from './rename';
 import { uploadMedia } from './upload';
 

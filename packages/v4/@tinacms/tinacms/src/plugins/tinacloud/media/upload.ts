@@ -3,7 +3,7 @@ import { sanitizeFilename } from '../../media-manager/media-types';
 import { TINACLOUD_ASSETS_URL, type TinaCloudClient } from '../client';
 import { encodePath } from '../../../utils/encode-path';
 import { uploadUrlResponseSchema } from './tinacloud-media-types';
-import { type MediaBranch, branchQuery, toMediaError } from './read';
+import { type MediaBranch, branchQuery, toMediaError } from './shared';
 
 const s3Error = async (response: Response): Promise<MediaError> => {
   const xml = await response.text();

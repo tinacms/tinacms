@@ -9,47 +9,12 @@ import {
   TINACLOUD_ASSETS_URL,
   TINACLOUD_CDN_URL,
   type TinaCloudClient,
-  TinaCloudError,
 } from '../client';
 import { encodePath } from '../../../utils/encode-path';
-import {
-  listResponseSchema,
-  requestIdResponseSchema,
-} from './tinacloud-media-types';
+import { type MediaBranch, toMediaError } from './shared';
+import { listResponseSchema } from './tinacloud-media-types';
 
 const DEFAULT_PAGE_SIZE = 20;
-
-/** An undefined branch is the media branch of the TinaCloud project. */
-export type MediaBranch = string | undefined;
-
-export const toMediaError = (cause: unknown): MediaError => {
-  if (cause instanceof MediaError) return cause;
-  if (!(cause instanceof TinaCloudError)) {
-    if (cause instanceof Error) {
-      return new MediaError('backend-failure', cause.message);
-    }
-    return new MediaError('backend-failure', String(cause));
-  }
-  const { serverMessage } = cause;
-  const detail =
-    serverMessage && serverMessage !== cause.message
-      ? `${cause.message} ${serverMessage}`
-      : cause.message;
-  switch (cause.status) {
-    case 401:
-    case 403:
-      return new MediaError('unauthorized', detail);
-    case 404:
-      return new MediaError('not-found', detail);
-    case 413:
-      return new MediaError('too-large', detail);
-    default:
-      return new MediaError('backend-failure', detail);
-  }
-};
-
-export const branchQuery = (branch: MediaBranch): string =>
-  branch ? `?${new URLSearchParams({ branch })}` : '';
 
 const joinPath = (folder: string, name: string): string =>
   folder ? `${folder}/${name}` : name;
@@ -95,25 +60,6 @@ export const listMedia = async (
       `${TINACLOUD_ASSETS_URL}/v2/${client.clientId}/list/${encodePath(folder)}?${query}`
     );
     return toMediaPage(folder, body);
-  } catch (cause) {
-    throw toMediaError(cause);
-  }
-};
-
-export const deleteMedia = async (
-  client: TinaCloudClient,
-  branch: MediaBranch,
-  path: string
-): Promise<void> => {
-  try {
-    const body = await client.authedFetch(
-      `${TINACLOUD_ASSETS_URL}/v1/${client.clientId}/${encodePath(path)}${branchQuery(branch)}`,
-      { method: 'DELETE' }
-    );
-    const parsed = requestIdResponseSchema.safeParse(body);
-    if (parsed.success && parsed.data.requestId) {
-      await client.waitForRequest(parsed.data.requestId);
-    }
   } catch (cause) {
     throw toMediaError(cause);
   }
