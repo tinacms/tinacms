@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { toUserId } from '../../../core/auth/contract';
 import type { MediaSlice } from '../../../core/media/contract';
 import type { SliceSet, SliceState } from '../../../core/plugin';
 import { MEDIA_ERROR_HEADER, localMediaPlugin } from './local-media.plugin';
@@ -7,14 +8,25 @@ interface RecordedRequest {
   url: string;
   method: string;
   body: unknown;
+  authorization: string | null;
 }
+
+const signedInAs = (token: string): SliceState => ({
+  status: 'signed-in',
+  user: { id: toUserId('ada') },
+  roles: ['editor'],
+  getToken: async () => token,
+  login: async () => {},
+  logout: async () => {},
+});
 
 const createSliceHarness = async (
   responseBody: unknown,
   ok = true,
   failure: { status: number; headers?: Record<string, string> } = {
     status: 500,
-  }
+  },
+  auth?: SliceState
 ) => {
   const requests: RecordedRequest[] = [];
   vi.stubGlobal(
@@ -24,6 +36,7 @@ const createSliceHarness = async (
         url,
         method: init.method ?? 'GET',
         body: typeof init.body === 'string' ? JSON.parse(init.body) : init.body,
+        authorization: new Headers(init.headers).get('authorization'),
       });
       return {
         ok,
@@ -45,7 +58,10 @@ const createSliceHarness = async (
       ...(typeof partial === 'function' ? partial(state) : partial),
     };
   };
-  state = sliceCreator(set, () => ({ media: state }));
+  state = sliceCreator(set, () => ({
+    media: state,
+    ...(auth ? { auth } : {}),
+  }));
   return { requests, slice: () => state as unknown as MediaSlice };
 };
 
@@ -123,5 +139,24 @@ describe('media slice', () => {
     await expect(harness.slice().delete('old.png')).rejects.toMatchObject({
       code: 'not-found',
     });
+  });
+});
+
+describe('media slice with an auth plugin', () => {
+  it('sends the bearer token on an upload, a list and a delete', async () => {
+    const harness = await createSliceHarness(
+      { path: 'a.png', items: [] },
+      true,
+      undefined,
+      signedInAs('tok')
+    );
+    await harness.slice().upload(new File(['x'], 'a.png'));
+    await harness.slice().list('');
+    await harness.slice().delete('a.png');
+    expect(harness.requests.map(({ authorization }) => authorization)).toEqual([
+      'Bearer tok',
+      'Bearer tok',
+      'Bearer tok',
+    ]);
   });
 });

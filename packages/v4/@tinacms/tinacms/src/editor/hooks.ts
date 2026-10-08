@@ -14,6 +14,7 @@ import {
 } from 'react-hook-form';
 import { useStore } from 'zustand';
 import type { AuthSlice } from '../core/auth/contract';
+import { authSliceOf, authTokenOf } from '../core/auth/slice';
 import type { ContentSlice } from '../core/content/contract';
 import type { MediaSlice } from '../core/media/contract';
 import type { FieldAddress } from '../core/field/address';
@@ -33,7 +34,6 @@ import {
   type RpcProxy,
   createRpcClient,
 } from '../rpc/proxy';
-import { isRecord } from '../utils/is-record';
 import {
   FieldAddressContext,
   FieldSchemaContext,
@@ -104,37 +104,6 @@ export function useMediaSlice(): MediaSlice {
   return slice;
 }
 
-const isStringArray = (value: unknown): value is string[] =>
-  Array.isArray(value) && value.every((item) => typeof item === 'string');
-
-const hasAuthState = ({ status, user, roles }: SliceState): boolean => {
-  if (status === 'signed-in') return isRecord(user) && isStringArray(roles);
-  if (status === 'forbidden') return isRecord(user);
-  return (status === 'loading' || status === 'signed-out') && user === null;
-};
-
-const isComponent = (value: unknown): boolean =>
-  typeof value === 'function' ||
-  (isRecord(value) && typeof value.$$typeof === 'symbol');
-
-const isAuthSlice = (slice: SliceState): slice is SliceState & AuthSlice =>
-  hasAuthState(slice) &&
-  typeof slice.getToken === 'function' &&
-  typeof slice.login === 'function' &&
-  typeof slice.logout === 'function' &&
-  (slice.LoginScreen === undefined || isComponent(slice.LoginScreen));
-
-const authSliceOf = (state: TinaStoreState): AuthSlice | null => {
-  const slice = state.auth;
-  if (!slice) return null;
-  invariant(
-    isAuthSlice(slice),
-    'auth-capability-malformed',
-    'The auth capability is mounted, but its slice lacks a valid status, user, roles, getToken, login, logout or LoginScreen. Fix the auth plugin so its slice is an AuthSlice.'
-  );
-  return slice;
-};
-
 export function useOptionalAuthSlice(): AuthSlice | null {
   return useTinaStore(authSliceOf);
 }
@@ -159,7 +128,7 @@ export function useRpcClient<TSegments>(
       createRpcClient<TSegments>({
         url,
         fetch: (input, init) => (fetchRef.current ?? fetch)(input, init),
-        getToken: () => authSliceOf(store.getState())?.getToken(),
+        getToken: () => authTokenOf(store.getState()),
       }),
     [store, url]
   );
