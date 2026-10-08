@@ -1,5 +1,5 @@
 import type { Session } from '../../../core/auth/contract';
-import { defineServerPlugin } from '../../../server';
+import type { ServerSegment } from '../../../core/plugin';
 import type { TinaCloudOptions } from '../client';
 import { currentUserSchema, currentUserUrl } from './tinacloud-auth-types';
 
@@ -8,7 +8,7 @@ const VERIFY_TIMEOUT_MS = 10_000;
 const BEARER = /^Bearer (\S+)$/i;
 
 export const createTinaCloudAuthServer = ({ clientId }: TinaCloudOptions) =>
-  defineServerPlugin({
+  ({
     getSession: async (request: Request): Promise<Session | null> => {
       const token = BEARER.exec(
         request.headers.get('authorization') ?? ''
@@ -27,4 +27,4 @@ export const createTinaCloudAuthServer = ({ clientId }: TinaCloudOptions) =>
       if (!active) return null;
       return { identity: user, roles };
     },
-  });
+  }) satisfies ServerSegment;
