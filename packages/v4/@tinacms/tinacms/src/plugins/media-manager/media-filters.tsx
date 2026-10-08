@@ -36,9 +36,9 @@ import {
 
 const segmentClass = (active: boolean) =>
   cn(
-    'rounded-none border-0 first:rounded-l-lg last:rounded-r-lg [&:not(:first-child)]:border-l',
+    'rounded-none border-0 first:rounded-l-sm last:rounded-r-sm [&:not(:first-child)]:border-l',
     active
-      ? 'bg-background text-primary'
+      ? 'bg-background font-medium text-foreground'
       : 'bg-muted/50 text-muted-foreground-strong'
   );
 
@@ -169,7 +169,9 @@ export function MediaTypeFilter({
     >
       <SelectTrigger
         aria-label='File type'
-        className={value === 'all' ? undefined : 'border-primary text-primary'}
+        className={
+          value === 'all' ? undefined : 'border-foreground text-foreground'
+        }
       >
         <SelectValue />
       </SelectTrigger>

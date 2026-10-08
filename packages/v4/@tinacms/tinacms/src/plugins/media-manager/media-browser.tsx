@@ -458,7 +458,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
           data-dragging={dragging ? 'true' : undefined}
           className={cn(
             'min-w-0 flex-1 overflow-y-auto border-2 border-transparent p-4 transition',
-            dragging ? 'rounded-md border-primary' : null
+            dragging ? 'rounded-md border-dashed border-input bg-muted' : null
           )}
           onDragEnter={dragOver}
           onDragOver={dragOver}

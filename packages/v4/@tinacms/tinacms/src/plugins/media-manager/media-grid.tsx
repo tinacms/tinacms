@@ -51,11 +51,11 @@ function GridFolderTile({
     <li>
       <button
         type='button'
-        className='flex w-full flex-col overflow-hidden rounded-md border bg-card text-left shadow-sm transition outline-none hover:border-primary/40 hover:shadow-md focus-visible:focus-ring'
+        className='flex w-full flex-col overflow-hidden rounded-md border bg-card text-left shadow-sm transition outline-none hover:border-input hover:shadow-md focus-visible:focus-ring'
         onClick={() => onClick(item)}
       >
         <span className='flex h-24 items-center justify-center'>
-          <FolderIcon className='size-11 text-primary' />
+          <FolderIcon className='size-11 text-muted-foreground' />
         </span>
         <span
           title={name}
@@ -93,8 +93,8 @@ function GridFileTile({
         className={cn(
           'relative flex w-full flex-col overflow-hidden rounded-md border bg-card text-left shadow-sm transition outline-none focus-visible:focus-ring',
           active
-            ? 'border-2 border-primary shadow-md ring-2 ring-primary/20'
-            : 'hover:border-primary/40 hover:shadow-md'
+            ? 'border-2 border-foreground shadow-md'
+            : 'hover:border-input hover:shadow-md'
         )}
         onClick={() => onClick(item)}
       >
@@ -179,12 +179,7 @@ function ListRow({
               style={checkerboardStyle}
             />
           ) : (
-            <Icon
-              className={cn(
-                'size-8',
-                folder ? 'text-primary' : 'text-muted-foreground'
-              )}
-            />
+            <Icon className='size-8 text-muted-foreground' />
           )}
         </span>
         <span title={name} className='w-full truncate px-3 py-2'>
