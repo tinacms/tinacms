@@ -70,7 +70,7 @@ describe('GetCollection', () => {
     const { caught } = renderCollection(cms);
 
     await waitFor(() =>
-      expect(screen.getByText('Unable to load')).toBeTruthy()
+      expect(screen.getByText('Unable to Load')).toBeTruthy()
     );
     expect(fetchCollection).not.toHaveBeenCalled();
     expect(cms.events.dispatch).toHaveBeenCalledWith({

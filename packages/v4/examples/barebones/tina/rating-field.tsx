@@ -1,4 +1,4 @@
-import { definePlugin } from '@tinacms/tinacms';
+import { type ValidatorRef, definePlugin } from '@tinacms/tinacms';
 import { defineClientPlugin } from '@tinacms/tinacms/client';
 import {
   useFieldAddress,
@@ -7,7 +7,11 @@ import {
 } from '@tinacms/tinacms/react';
 
 // TODO: this won't be needed once we are building 't' from all plugins.
-export const rating = (config: { name: string; label?: string }) => ({
+export const rating = (config: {
+  name: string;
+  label?: string;
+  validators?: ValidatorRef[];
+}) => ({
   ...config,
   type: 'rating' as const,
 });

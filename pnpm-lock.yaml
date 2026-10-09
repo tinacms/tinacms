@@ -73,8 +73,8 @@ catalogs:
       specifier: ^10.8.1
       version: 10.11.0
     '@headlessui/react':
-      specifier: 2.1.8
-      version: 2.1.8
+      specifier: 2.2.10
+      version: 2.2.10
     '@iarna/toml':
       specifier: ^2.2.5
       version: 2.2.5
@@ -999,8 +999,8 @@ importers:
   examples/next/tina-self-hosted-demo:
     dependencies:
       '@headlessui/react':
-        specifier: 2.1.8
-        version: 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.2.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@octokit/rest':
         specifier: 'catalog:'
         version: 22.0.1
@@ -2583,9 +2583,6 @@ importers:
       '@ariakit/react':
         specifier: 'catalog:'
         version: 0.4.20(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@headlessui/react':
-        specifier: 'catalog:'
-        version: 2.1.8(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@radix-ui/react-dialog':
         specifier: 'catalog:'
         version: 1.1.18(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -5495,13 +5492,6 @@ packages:
     resolution: {integrity: sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==}
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
-
-  '@headlessui/react@2.1.8':
-    resolution: {integrity: sha512-uajqVkAcVG/wHwG9Fh5PFMcFpf2VxM4vNRNKxRjuK009kePVur8LkuuygHfIE+2uZ7z7GnlTtYsyUe6glPpTLg==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      react: ^18
-      react-dom: ^18
 
   '@headlessui/react@2.2.10':
     resolution: {integrity: sha512-5pVLNK9wlpxTUTy9GpgbX/SdcRh+HBnPktjM2wbiLTH4p+2EPHBO1aoSryUCuKUIItdDWO9ITlhUL8UnUN/oIA==}
@@ -19856,14 +19846,6 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       tabbable: 6.3.0
 
-  '@floating-ui/react@0.26.28(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@floating-ui/react-dom': 2.1.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@floating-ui/utils': 0.2.10
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      tabbable: 6.3.0
-
   '@floating-ui/react@0.27.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@floating-ui/react-dom': 2.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -20121,24 +20103,6 @@ snapshots:
   '@graphql-typed-document-node/core@3.2.0(graphql@15.8.0)':
     dependencies:
       graphql: 15.8.0
-
-  '@headlessui/react@2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@floating-ui/react': 0.26.28(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@react-aria/focus': 3.21.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@react-aria/interactions': 3.25.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@tanstack/react-virtual': 3.13.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
-  '@headlessui/react@2.1.8(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@floating-ui/react': 0.26.28(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@react-aria/focus': 3.21.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@react-aria/interactions': 3.25.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-virtual': 3.13.13(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
 
   '@headlessui/react@2.2.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -22351,16 +22315,6 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@react-aria/focus@3.21.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@react-aria/interactions': 3.25.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@react-aria/utils': 3.31.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@react-types/shared': 3.32.1(react@19.2.7)
-      '@swc/helpers': 0.5.17
-      clsx: 2.1.1
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-
   '@react-aria/interactions@3.25.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@react-aria/ssr': 3.9.10(react@18.3.1)
@@ -22371,25 +22325,10 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@react-aria/interactions@3.25.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@react-aria/ssr': 3.9.10(react@19.2.7)
-      '@react-aria/utils': 3.31.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@react-stately/flags': 3.1.2
-      '@react-types/shared': 3.32.1(react@19.2.7)
-      '@swc/helpers': 0.5.17
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-
   '@react-aria/ssr@3.9.10(react@18.3.1)':
     dependencies:
       '@swc/helpers': 0.5.17
       react: 18.3.1
-
-  '@react-aria/ssr@3.9.10(react@19.2.7)':
-    dependencies:
-      '@swc/helpers': 0.5.17
-      react: 19.2.7
 
   '@react-aria/utils@3.31.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -22401,17 +22340,6 @@ snapshots:
       clsx: 2.1.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-
-  '@react-aria/utils@3.31.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@react-aria/ssr': 3.9.10(react@19.2.7)
-      '@react-stately/flags': 3.1.2
-      '@react-stately/utils': 3.10.8(react@19.2.7)
-      '@react-types/shared': 3.32.1(react@19.2.7)
-      '@swc/helpers': 0.5.17
-      clsx: 2.1.1
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
 
   '@react-dnd/asap@5.0.2': {}
 
@@ -22453,18 +22381,9 @@ snapshots:
       '@swc/helpers': 0.5.17
       react: 18.3.1
 
-  '@react-stately/utils@3.10.8(react@19.2.7)':
-    dependencies:
-      '@swc/helpers': 0.5.17
-      react: 19.2.7
-
   '@react-types/shared@3.32.1(react@18.3.1)':
     dependencies:
       react: 18.3.1
-
-  '@react-types/shared@3.32.1(react@19.2.7)':
-    dependencies:
-      react: 19.2.7
 
   '@remix-run/router@1.23.2': {}
 
@@ -23358,12 +23277,6 @@ snapshots:
       '@tanstack/virtual-core': 3.13.13
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-
-  '@tanstack/react-virtual@3.13.13(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@tanstack/virtual-core': 3.13.13
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
 
   '@tanstack/table-core@8.21.3': {}
 
