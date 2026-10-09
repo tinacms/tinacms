@@ -94,10 +94,15 @@ const isMediaSlice = (slice: SliceState): slice is SliceState & MediaSlice =>
   typeof slice.delete === 'function' &&
   typeof slice.resolveUrl === 'function';
 
-export function useMediaSlice(): MediaSlice {
+export function useOptionalMediaSlice(): MediaSlice | null {
   const slice = useTinaStore((state) => state.media);
+  return slice && isMediaSlice(slice) ? slice : null;
+}
+
+export function useMediaSlice(): MediaSlice {
+  const slice = useOptionalMediaSlice();
   invariant(
-    slice && isMediaSlice(slice),
+    slice,
     'media-capability-missing',
     'No media capability with upload, list, delete and resolveUrl is mounted — pass a media plugin (e.g. localMediaPlugin()) to <TinaProvider plugins>'
   );

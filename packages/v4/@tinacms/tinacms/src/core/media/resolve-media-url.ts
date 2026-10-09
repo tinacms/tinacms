@@ -1,7 +1,7 @@
 import type { ResolvedConfig } from '../../config';
 import { invariant } from '../invariant';
 import { declaresCapabilityOverride } from '../mount';
-import type { MediaUrlOptions } from './contract';
+import type { ResolveMediaUrlOptions } from './contract';
 
 const MEDIA_CAPABILITY = 'media';
 
@@ -9,12 +9,12 @@ const MEDIA_CAPABILITY = 'media';
  * Turns a stored media path into the URL a page loads, with the installed
  * media plugin. Runs anywhere: static rendering, preview, the server.
  *
- *   <img src={resolveMediaUrl(config, post.heroImage, { width: 1200 })} />
+ *   <img src={resolveMediaUrl(config, post.heroImage, { width: 1200, branch: mediaBranch })} />
  */
 export const resolveMediaUrl = (
   config: ResolvedConfig,
   path: string,
-  options?: MediaUrlOptions
+  options?: ResolveMediaUrlOptions
 ): string => {
   const providers = config.plugins.filter((plugin) =>
     plugin.provides.includes(MEDIA_CAPABILITY)

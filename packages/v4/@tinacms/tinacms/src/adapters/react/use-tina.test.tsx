@@ -22,8 +22,14 @@ const embedInEditor = () => {
   return editor;
 };
 
-const valuesFromEditor = (editor: Window, values: Record<string, unknown>) => {
-  const event = new MessageEvent('message', { data: valuesMessage(values) });
+const valuesFromEditor = (
+  editor: Window,
+  values: Record<string, unknown>,
+  mediaBranch?: string
+) => {
+  const event = new MessageEvent('message', {
+    data: valuesMessage(values, mediaBranch),
+  });
   Object.defineProperty(event, 'origin', { value: window.origin });
   Object.defineProperty(event, 'source', { value: editor });
   act(() => {
@@ -67,6 +73,16 @@ describe('useTina embedded in the editor', () => {
       data: { title: 'Edited live' },
       isEditing: true,
     });
+  });
+
+  it('exposes the media branch the editor sends', () => {
+    const editor = embedInEditor();
+    const { result } = renderHook(() => useTina({ data: { title: 'Static' } }));
+    expect(result.current.mediaBranch).toBeUndefined();
+    valuesFromEditor(editor, { title: 'Edited live' }, 'feat/x');
+    expect(result.current.mediaBranch).toBe('feat/x');
+    valuesFromEditor(editor, { title: 'Edited live' });
+    expect(result.current.mediaBranch).toBeUndefined();
   });
 
   it('streamed values win over a later data prop change', () => {

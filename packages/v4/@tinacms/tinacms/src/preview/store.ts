@@ -7,9 +7,14 @@ export interface CreatePreviewStoreOptions {
   editorWindow?: Window;
 }
 
+export interface PreviewSnapshot {
+  values: TinaDocument;
+  mediaBranch?: string;
+}
+
 export interface PreviewStore {
   subscribe: (onChange: () => void) => () => void;
-  getSnapshot: () => TinaDocument | null;
+  getSnapshot: () => PreviewSnapshot | null;
   getServerSnapshot: () => null;
 }
 
@@ -22,7 +27,7 @@ export function createPreviewStore({
   const editor = editorWindow ?? preview?.parent;
   const embedded = Boolean(preview && editor && editor !== preview);
 
-  let streamed: TinaDocument | null = null;
+  let streamed: PreviewSnapshot | null = null;
   let connection: PreviewConnection | null = null;
   const listeners = new Set<() => void>();
 
@@ -36,8 +41,8 @@ export function createPreviewStore({
         previewWindow: preview,
         editorWindow: editor,
         allowedOrigin: allowedOrigin ?? preview.origin,
-        onValues: (values) => {
-          streamed = values;
+        onValues: (values, mediaBranch) => {
+          streamed = { values, mediaBranch };
           for (const listener of listeners) listener();
         },
       });

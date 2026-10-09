@@ -12,7 +12,13 @@ import { sampleDocument } from '../content';
 // opens / directly. Inside the editor, useTina adopts the values that
 // arrive. tinaField marks the elements that an author can click.
 export function PostPreview() {
-  const { data: post, isEditing } = useTina({ data: sampleDocument });
+  const {
+    data: post,
+    isEditing,
+    mediaBranch,
+  } = useTina({
+    data: sampleDocument,
+  });
 
   return (
     <article style={{ maxWidth: '42rem', margin: '0 auto', padding: '3rem' }}>
@@ -33,7 +39,10 @@ export function PostPreview() {
       {post.heroImage ? (
         <img
           {...tinaField('heroImage')}
-          src={resolveMediaUrl(config, post.heroImage, { width: 1200 })}
+          src={resolveMediaUrl(config, post.heroImage, {
+            width: 1200,
+            branch: mediaBranch,
+          })}
           alt=''
           style={{ width: '100%', borderRadius: '0.75rem', marginTop: '1rem' }}
         />

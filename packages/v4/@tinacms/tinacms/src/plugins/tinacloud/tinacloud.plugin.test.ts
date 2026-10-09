@@ -40,6 +40,7 @@ describe('tinaCloud()', () => {
       'delete',
       'features',
       'list',
+      'mediaBranch',
       'rename',
       'resolveUrl',
       'upload',

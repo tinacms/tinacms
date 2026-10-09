@@ -178,15 +178,26 @@ site turns it into a URL with `resolveMediaUrl`, from `@tinacms/tinacms`:
 
 ```tsx
 import { resolveMediaUrl } from '@tinacms/tinacms';
+import { useTina } from '@tinacms/tinacms/adapters/react';
 import config from '../tina/config';
 
+const { data: post, mediaBranch } = useTina({ data });
+
 {post.heroImage ? (
-  <img src={resolveMediaUrl(config, post.heroImage, { width: 1200 })} alt='' />
+  <img
+    src={resolveMediaUrl(config, post.heroImage, {
+      width: 1200,
+      branch: mediaBranch,
+    })}
+    alt=''
+  />
 ) : null}
 ```
 
 The same call works in static rendering and in the preview, because the
-preview also sends the path. `localMediaPlugin()` gives
+preview also sends the path. In the preview, `mediaBranch` is the branch the
+editor reads media from, so the image matches the one in the field. Outside
+the editor it is undefined. `localMediaPlugin()` gives
 `/uploads/posts/hero.jpg` and ignores the size. `tinaCloud()` gives a CDN URL
 with a crop. Refer to [media.md](./media.md#rendering-media-on-the-site).
 

@@ -32,6 +32,19 @@ describe('protocol guards', () => {
     }
   );
 
+  it('carries a media branch only when one is given', () => {
+    expect(valuesMessage({}, 'feat/x')).toEqual({
+      type: 'tina:values',
+      values: {},
+      mediaBranch: 'feat/x',
+    });
+    expect(valuesMessage({})).not.toHaveProperty('mediaBranch');
+    expect(isValuesMessage(valuesMessage({}, 'feat/x'))).toBe(true);
+    expect(
+      isValuesMessage({ type: 'tina:values', values: {}, mediaBranch: 7 })
+    ).toBe(false);
+  });
+
   it('rejects a values message whose payload is not an object', () => {
     expect(isValuesMessage({ type: 'tina:values' })).toBe(false);
     expect(isValuesMessage({ type: 'tina:values', values: null })).toBe(false);

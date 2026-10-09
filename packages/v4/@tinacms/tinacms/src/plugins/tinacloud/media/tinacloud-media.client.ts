@@ -6,7 +6,7 @@ import {
   createTinaCloudClient,
 } from '../client';
 import { deleteMedia } from './delete';
-import { listMedia, mediaUrl } from './read';
+import { listMedia, tinaCloudMediaUrl } from './read';
 import type { MediaBranch } from './shared';
 import { renameMedia } from './rename';
 import { uploadMedia } from './upload';
@@ -24,10 +24,15 @@ export const createTinaCloudMediaSlice =
   (options: TinaCloudOptions): ClientSlice =>
   (_set, get) => {
     const client = createTinaCloudClient(options);
+    const resolveUrl = tinaCloudMediaUrl(options.clientId);
     let project: TinaCloudProject | undefined;
     const branch = async (): Promise<MediaBranch> => {
       project = await client.getProject();
       return storeBranch(get()) ?? project.defaultBranch;
+    };
+    const mediaBranch = (): MediaBranch => {
+      const target = storeBranch(get()) ?? project?.defaultBranch;
+      return target === project?.mediaBranch ? undefined : target;
     };
     const media = {
       upload: async (file, folder) =>
@@ -36,11 +41,9 @@ export const createTinaCloudMediaSlice =
         listMedia(client, await branch(), folder, page),
       delete: async (path) => deleteMedia(client, await branch(), path),
       rename: async (from, to) => renameMedia(client, await branch(), from, to),
-      resolveUrl: (path, size) => {
-        const target = storeBranch(get()) ?? project?.defaultBranch;
-        const staged = target === project?.mediaBranch ? undefined : target;
-        return mediaUrl(options.clientId, staged, path, size);
-      },
+      mediaBranch,
+      resolveUrl: (path, size) =>
+        resolveUrl(path, { ...size, branch: mediaBranch() }),
       features: {
         search: true,
         extensionFilter: true,

@@ -40,6 +40,12 @@ path, options?)` (`@tinacms/tinacms`) calls it. Refer to
 [media.md](./media.md#rendering-media-on-the-site). `media.resolveUrl` is
 optional, but without it `resolveMediaUrl` throws `media-plugin-no-resolve-url`.
 
+A provider that stages media per branch reads `branch` from the options of
+`media.resolveUrl`, and sets `mediaBranch()` on the slice to the branch that
+the slice reads from now. The editor sends that value to the preview, and
+`useTina` gives it to the site as `mediaBranch`. Thus the site passes it back
+as `branch`, and builds the same URL as the editor.
+
 ### Optional additions
 
 A provider can supply more. Each addition is optional. The
@@ -164,8 +170,10 @@ project. The branch is not a config option: it is operational data that the
 Data Layer owns (ADR-019, ADR-024). No plugin writes `store.branch.name` yet,
 so all operations use the default branch.
 
-`media.resolveUrl` on the manifest runs on the site, which has no store, so it
-always gives the URL on the media branch.
+`mediaBranch()` on the slice gives the branch that `resolveUrl` reads from, or
+undefined for the media branch. `media.resolveUrl` on the manifest takes the
+same value as `branch`. Without a `branch` it gives the URL on the media
+branch.
 
 On first use the slice reads the project from
 `https://identity.tinajs.io/v2/apps/{clientId}` for its default branch and its
