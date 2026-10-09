@@ -2,16 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { calculateBreadcrumbs } from '../tina-state';
 import { Form } from './form';
 
-/**
- * A nested templated list whose field name is also used at the top of the document — a page's
- * `blocks` holding a row, whose column holds its own `blocks`, one of which is an accordion holding
- * `blocks` again.
- *
- * Every field a form renders is bound to data by its `name` alone, so a name that does not carry
- * its path addresses the top of the document. For a list that means the list plugin's add, remove
- * and reorder all reach the wrong array, which is why these assertions are about names rather than
- * about what is drawn.
- */
 const text = {
   name: 'content',
   label: 'Text',
@@ -143,11 +133,6 @@ describe('getActiveField within a nested list sharing the root list name', () =>
 });
 
 describe('breadcrumbs into a nested list', () => {
-  /**
-   * Each crumb addresses the list its group holds rather than the item, since walking up the path
-   * reaches the list first and both produce the same label. That is why the names a path ending on
-   * a list returns have to carry their path.
-   */
   it('reaches every group between the form and the edited block', () => {
     const form = makeForm();
     const activeFieldName = `${ACCORDION}.blocks.0`;

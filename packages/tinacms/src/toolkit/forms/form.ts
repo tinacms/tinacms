@@ -377,13 +377,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
         if (field.templates) {
           if (field.list) {
             if (isLastItem) {
-              /**
-               * The path stopped on the list itself rather than on one of its items, which is where
-               * walking up a breadcrumb trail lands. The group holding the list is what to show,
-               * but its field names have to carry the path: a bare name resolves against the form
-               * root, so rendering one binds the field — and every mutation the list plugin makes
-               * through it — to whatever shares that name at the top of the document.
-               */
+              // A bare name resolves against the form root, so these have to carry the path.
               const fieldName = namePath.slice(0, namePathIndex).join('.');
               if (!fieldName) {
                 return formOrObjectField;
