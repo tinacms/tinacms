@@ -54,6 +54,9 @@ v4 supplies four more examples:
 - The `reference` field ([`reference-field.md`](./reference-field.md)) points
   at another document, and stores that document's path. Its options come from
   the content capability, not from a fixed list.
+- The `image` field ([`image-field.md`](./image-field.md)) stores the media
+  path of one image. It depends on the `media` capability, and it picks with
+  `MediaBrowser` in `pick` mode.
 - The `rich-text` field ([`rich-text-field.md`](./rich-text-field.md)) uses the
   `block` layout. With `isBody`, it controls the markdown body of the file.
 

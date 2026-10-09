@@ -5,12 +5,27 @@ import { render, screen } from '@testing-library/react';
 import '../plugins/fields/rich-text/rich-text-field.client';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../config';
+import type { MediaProvider } from '../core/media/contract';
+import { definePlugin } from '../core/plugin';
 import type { CollectionSchema } from '../core/schema/types';
 import { FormProvider, TinaProvider } from '../editor';
 import { corePlugins, t } from '../plugins/fields';
 import { DocumentForm } from './document-form';
 
 const NO_COLLECTIONS = { collections: [] };
+
+const media: MediaProvider = {
+  upload: async (file) => file.name,
+  list: async () => ({ items: [] }),
+  delete: async () => {},
+  resolveUrl: (path) => `/uploads/${path}`,
+};
+
+const mediaPlugin = definePlugin({
+  name: 'test:media:stub',
+  provides: ['media'],
+  client: async () => ({ default: { slice: () => ({ ...media }) } }),
+});
 
 const collection: CollectionSchema = {
   name: 'post',
@@ -22,6 +37,7 @@ const collection: CollectionSchema = {
     t.boolean({ name: 'isDraft', label: 'Draft' }),
     t.datetime({ name: 'pubAt', label: 'Publish date' }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
+    t.image({ name: 'hero', label: 'Hero image' }),
     t.string({ name: 'slug' }),
   ],
 };
@@ -30,7 +46,7 @@ const renderForm = () =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: corePlugins,
+        plugins: [...corePlugins, mediaPlugin],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -76,6 +92,13 @@ describe('the accessible name of a field', () => {
     renderForm();
     expect(
       await screen.findByRole('textbox', { name: 'Body' })
+    ).toBeInTheDocument();
+  });
+
+  it('is the label of an image field', async () => {
+    renderForm();
+    expect(
+      await screen.findByRole('group', { name: 'Hero image' })
     ).toBeInTheDocument();
   });
 
