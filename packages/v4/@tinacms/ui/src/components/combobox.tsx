@@ -31,7 +31,10 @@ function ComboboxTrigger({
       {...props}
     >
       {children}
-      <ChevronDownIcon className='pointer-events-none size-4 text-muted-foreground' />
+      <ChevronDownIcon
+        aria-hidden='true'
+        className='pointer-events-none size-4 text-muted-foreground'
+      />
     </ComboboxPrimitive.Trigger>
   );
 }
@@ -74,6 +77,7 @@ function ComboboxInput({
             size='icon-xs'
             variant='ghost'
             render={<ComboboxTrigger />}
+            aria-label='Show options'
             data-slot='input-group-button'
             className='data-pressed:bg-transparent'
             disabled={disabled}
