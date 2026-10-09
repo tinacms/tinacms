@@ -44,7 +44,7 @@ function FieldRow({ node }: { node: FieldSchema }) {
           <>
             <span
               aria-hidden='true'
-              className='size-1.5 rounded-full bg-primary'
+              className='size-1.5 rounded-full bg-status-changed'
             />
             <span className='sr-only'>(unsaved)</span>
           </>
@@ -145,7 +145,10 @@ export function DocumentForm() {
   return (
     <>
       <header className='mb-4 flex items-center justify-between gap-2'>
-        <h2 className='truncate text-sm font-semibold' title={scope.path}>
+        <h2
+          className='truncate font-heading text-sm font-semibold'
+          title={scope.path}
+        >
           {scope.path.split('/').at(-1)}
         </h2>
         <DocumentStatus />
