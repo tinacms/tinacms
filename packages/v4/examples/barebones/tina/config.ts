@@ -12,6 +12,7 @@ import {
   required,
   t,
 } from '@tinacms/tinacms';
+import { fieldGalleryPlugin } from './field-gallery/plugin';
 import { helpNavPlugin } from './help-nav';
 import { hooksPlugin, logSave, requireStarsToPublish } from './hooks';
 import { rating, ratingFieldPlugin } from './rating-field';
@@ -95,6 +96,7 @@ export default defineConfig({
     validatorsPlugin,
     hooksPlugin,
     helpNavPlugin,
+    fieldGalleryPlugin,
   ],
   schema: { collections: [postCollection, pageCollection] },
 });
