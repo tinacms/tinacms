@@ -101,18 +101,18 @@ Bug reports go through the same checklist whether they land via Discord `#ask-fo
 
 **Required H3 sections** (use these exact headings when formatting an issue body programmatically):
 
-- `### The exact error message` — copy-pasted literal string, not paraphrased
-- `### Steps to reproduce` — what the user clicked, in order
-- `### What you expected vs. what actually happened`
+- `### Describe the bug` — what is going wrong, in prose; the literal error text belongs in its own section below
 - `### Your environment` — versions, framework, **and anything non-default** (custom MediaStore, custom auth, self-hosted setup, etc.)
 
 **Optional but encouraged:**
 
+- `### The exact error message` — copy-pasted literal string, not paraphrased
+- `### Steps to reproduce` — what the user clicked, in order
+- `### What you expected vs. what actually happened`
 - `### A way for us to reproduce` — link to a minimal repro repo
-- `### Relevant sections of your schema file`
 - `### Client ID` — for TinaCloud-related issues
 
-If you're an agent (Claude Code, Cursor, ChatGPT, an internal bot like `ssw-yakshaver`) drafting an issue programmatically, format the body with those H3 headings before calling `POST /repos/{owner}/{repo}/issues`.
+If you're an agent (Claude Code, Cursor, ChatGPT, an internal bot like `ssw-yakshaver`) drafting an issue programmatically, format the body with those H3 headings before calling `POST /repos/{owner}/{repo}/issues`. Omit a section you have nothing for rather than writing `_No response_` under it: `.github/workflows/strip-empty-issue-sections.yml` strips those from a form submission, but only one carrying the `bug` label, so an issue filed through the API keeps whatever it was sent.
 
 The non-default-setup detail in `### Your environment` is the field that most often points us straight at the root cause. Do not omit it.
 

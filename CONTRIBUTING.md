@@ -46,7 +46,7 @@ Before filing a new bug report:
 - **For TinaCloud bugs or general questions:** start in the [TinaCMS Discord](https://discord.com/invite/zumN63Ybpf) `#ask-for-help` channel — the post guidelines there enforce the same checklist
 - **For security vulnerabilities:** never file publicly. See [`SECURITY.md`](SECURITY.md) for the private disclosure path.
 
-The bug report template (`.github/ISSUE_TEMPLATE/bug-report.yml`) asks for the exact error message, repro steps, expected vs. actual behavior, your environment (including any custom adapters or non-default setup), and ideally a reproduction repo. The same checklist is published at https://tina.io/docs/contributing/bug-reports.
+The bug report template (`.github/ISSUE_TEMPLATE/bug-report.yml`) asks for a description of the bug and your environment (including any custom adapters or non-default setup), and encourages the exact error message, repro steps and a reproduction repo. The same checklist is published at https://tina.io/docs/contributing/bug-reports.
 
 If you are using an AI assistant (Claude Code, Cursor, etc.) to draft an issue, point it at `.github/ISSUE_TEMPLATE/bug-report.yml` so the formatting matches the form's H3 sections.
 
