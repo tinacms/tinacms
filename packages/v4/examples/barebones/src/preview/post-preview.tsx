@@ -3,6 +3,8 @@ import {
   tinaField,
   useTina,
 } from '@tinacms/tinacms/adapters/react';
+import { resolveMediaUrl } from '@tinacms/tinacms';
+import config from '../../tina/config';
 import { sampleDocument } from '../content';
 
 // The site side of visual editing, written as a real site would write it. useTina seeds
@@ -10,7 +12,13 @@ import { sampleDocument } from '../content';
 // opens / directly. Inside the editor, useTina adopts the values that
 // arrive. tinaField marks the elements that an author can click.
 export function PostPreview() {
-  const { data: post, isEditing } = useTina({ data: sampleDocument });
+  const {
+    data: post,
+    isEditing,
+    mediaBranch,
+  } = useTina({
+    data: sampleDocument,
+  });
 
   return (
     <article style={{ maxWidth: '42rem', margin: '0 auto', padding: '3rem' }}>
@@ -28,6 +36,17 @@ export function PostPreview() {
       >
         {post.featured ? '★ Featured' : '☆ Not featured'}
       </span>
+      {post.heroImage ? (
+        <img
+          {...tinaField('heroImage')}
+          src={resolveMediaUrl(config, post.heroImage, {
+            width: 1200,
+            branch: mediaBranch,
+          })}
+          alt=''
+          style={{ width: '100%', borderRadius: '0.75rem', marginTop: '1rem' }}
+        />
+      ) : null}
       <h1 {...tinaField('title')}>{String(post.title ?? '')}</h1>
       {/* The custom field renders like any other: click the stars to focus it. */}
       <p

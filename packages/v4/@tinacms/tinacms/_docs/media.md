@@ -37,6 +37,40 @@ A plugin that provides `media` has its slice mounted at `store.media` in  the `T
 
 The media plugin provides the backend functionality of media for the TinaCMS app, no UI. 
 
+The plugin also sets `media.resolveUrl` on its manifest. It is the same function the slice uses as `resolveUrl`, so it is sync, holds no secrets, and runs without the editor. The site uses it through `resolveMediaUrl` (next section).
+
+```ts
+definePlugin({
+  name: 'acme:media',
+  provides: ['media'],
+  media: { resolveUrl: (path, options) => `https://cdn.acme.dev/${path}` },
+  client: async () => ({ default: { slice: createAcmeMediaSlice() } }),
+});
+```
+
+### Rendering media on the site
+
+Content stores a media path (`posts/hero.jpg`), never a URL (ADR-022). The site turns a path into a URL with `resolveMediaUrl`, from `@tinacms/tinacms`:
+
+```tsx
+import { resolveMediaUrl } from '@tinacms/tinacms';
+import { useTina } from '@tinacms/tinacms/adapters/react';
+import config from '../tina/config';
+
+const { data: post, mediaBranch } = useTina({ data });
+
+<img src={resolveMediaUrl(config, post.heroImage, { width: 1200, branch: mediaBranch })} />
+```
+
+`resolveMediaUrl(config, path, options?)` finds the plugin that provides `media` in the resolved config and calls its `media.resolveUrl`. The same call works in static rendering and in preview, because the preview also sends paths, not URLs. It throws `media-capability-missing` when no plugin provides `media`, and `media-plugin-no-resolve-url` when that plugin sets no `media.resolveUrl`.
+
+| Plugin | `resolveMediaUrl(config, 'posts/hero.jpg', { width: 400 })` |
+|---|---|
+| `localMediaPlugin()` | `/uploads/posts/hero.jpg` (no transforms, so `options` is ignored) |
+| `tinaCloud({ clientId })` | `https://assets.tina.io/{clientId}/posts/hero.jpg?fit=crop&max-w=400` |
+
+`branch` picks the branch to read media from. In the preview, `useTina` gives it as `mediaBranch`: the editor sends the branch its media plugin reads from (`mediaBranch()` on the slice) with each values message. Outside the editor `mediaBranch` is undefined, so a static page reads the media branch of the project. `tinaCloud()` reads any other branch from `__staging/{branch}/__file/`, the same URL the editor shows. `localMediaPlugin()` ignores `branch`.
+
 ### The Media UI - The Media Manager
 
 The Media Manager is a separate plugin, and only provides the UI. It uses whatever media plugin is installed. 

@@ -39,6 +39,7 @@ export const postCollection = {
       ],
     }),
     t.boolean({ name: 'featured', label: 'Featured' }),
+    t.image({ name: 'heroImage', label: 'Hero image' }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
     rating({
       name: 'stars',

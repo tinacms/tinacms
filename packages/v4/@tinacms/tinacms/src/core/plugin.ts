@@ -2,6 +2,7 @@ import type { StoreApi } from 'zustand';
 import type { FieldDescriptor, ValidatorFactory } from './field/contract';
 import type { FormHookFactory } from './form/hooks';
 import { invariant } from './invariant';
+import type { MediaManifest } from './media/contract';
 import type { AdminScreen } from './screen/contract';
 import type { SlotContributions } from './slot/contract';
 
@@ -156,6 +157,8 @@ export interface PluginManifestInput {
   validators?: string[];
   /** The form hook names this plugin registers. Same rules as `validators`. */
   hooks?: string[];
+  /** Set by a plugin that provides `media`. */
+  media?: MediaManifest;
   client?: () => Promise<{ default: ClientSegment }>;
   server?: () => Promise<{ default: ServerSegment }>;
   // TODO(ADR-008 §3): type `permissions` against codegen's Permission union once it lands.

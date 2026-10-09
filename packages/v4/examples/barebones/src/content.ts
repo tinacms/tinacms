@@ -7,6 +7,7 @@ import type { TinaDocument } from '@tinacms/tinacms';
 export const sampleDocument = {
   title: 'Hello World',
   featured: false,
+  heroImage: 'posts/llama.avif',
   stars: 4,
   authors: [
     {

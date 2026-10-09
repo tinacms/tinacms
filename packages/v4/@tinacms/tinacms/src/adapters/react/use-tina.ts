@@ -10,6 +10,11 @@ export interface UseTinaOptions<T extends TinaDocument> {
 export interface UseTinaResult<T extends TinaDocument> {
   data: T;
   isEditing: boolean;
+  /**
+   * The branch the editor reads media from, for `resolveMediaUrl(config, path,
+   * { branch: mediaBranch })`. Undefined outside the editor.
+   */
+  mediaBranch?: string;
 }
 
 export function useTina<T extends TinaDocument = TinaDocument>({
@@ -23,7 +28,11 @@ export function useTina<T extends TinaDocument = TinaDocument>({
     store.getServerSnapshot
   );
 
-  return { data: (streamed as T | null) ?? data, isEditing: streamed !== null };
+  return {
+    data: (streamed?.values as T | undefined) ?? data,
+    isEditing: streamed !== null,
+    mediaBranch: streamed?.mediaBranch,
+  };
 }
 
 function usePreviewStore(allowedOrigin: string | undefined): PreviewStore {

@@ -45,7 +45,22 @@ describe('connectToEditor', () => {
     window.dispatchEvent(
       messageEvent(valuesMessage({ title: 'Hello' }), window.origin, editor)
     );
-    expect(onValues).toHaveBeenCalledWith({ title: 'Hello' });
+    expect(onValues).toHaveBeenCalledWith({ title: 'Hello' }, undefined);
+  });
+
+  it('passes on the media branch the editor sends', () => {
+    const editor = fakeEditorWindow();
+    const onValues = vi.fn();
+    connection = connectToEditor({
+      previewWindow: window,
+      editorWindow: editor,
+      allowedOrigin: window.origin,
+      onValues,
+    });
+    window.dispatchEvent(
+      messageEvent(valuesMessage({}, 'feat/x'), window.origin, editor)
+    );
+    expect(onValues).toHaveBeenCalledWith({}, 'feat/x');
   });
 
   it('ignores the wrong origin, the wrong source, and malformed data', () => {
@@ -138,7 +153,7 @@ describe('connectToEditor', () => {
     window.dispatchEvent(
       messageEvent(valuesMessage({ title: 'cross' }), editorOrigin, editor)
     );
-    expect(onValues).toHaveBeenCalledWith({ title: 'cross' });
+    expect(onValues).toHaveBeenCalledWith({ title: 'cross' }, undefined);
   });
 
   it('disconnect removes both listeners', () => {

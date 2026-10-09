@@ -3,10 +3,10 @@ import {
   MediaError,
   type MediaPage,
   type MediaProvider,
+  type ResolveMediaUrl,
   isMediaErrorCode,
 } from '../../../core/media/contract';
 import type { ClientSlice, TinaStoreState } from '../../../core/plugin';
-import { encodePath } from '../../../utils/encode-path';
 import { MEDIA_ERROR_HEADER } from './local-media.plugin';
 import type { MediaRequest } from './server/media-request';
 
@@ -38,7 +38,7 @@ const postMediaRequest = async <Result>(
 };
 
 export const createMediaSlice =
-  (url: string, mediaRoot: string): ClientSlice =>
+  (url: string, resolveUrl: ResolveMediaUrl): ClientSlice =>
   (_set, get) => {
     const slice: MediaProvider = {
       upload: async (file, folder = '') => {
@@ -67,7 +67,7 @@ export const createMediaSlice =
       delete: async (path) => {
         await postMediaRequest<null>(url, get(), { op: 'delete', path });
       },
-      resolveUrl: (path) => `/${mediaRoot}/${encodePath(path)}`,
+      resolveUrl,
     };
     return { ...slice };
   };

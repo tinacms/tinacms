@@ -30,6 +30,7 @@ export type {
 export {
   type MediaFeatures,
   type MediaItem,
+  type MediaManifest,
   type MediaPage,
   type MediaPageRequest,
   type MediaProvider,
@@ -38,7 +39,9 @@ export {
   type MediaSlice,
   type MediaStatus,
   type MediaUrlOptions,
+  type ResolveMediaUrl,
 } from './core/media/contract';
+export { resolveMediaUrl } from './core/media/resolve-media-url';
 export type { AdminScreen, AdminScreenProps } from './core/screen/contract';
 export {
   type Capability,

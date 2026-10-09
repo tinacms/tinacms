@@ -92,6 +92,7 @@ ignores the size.
 `MediaBrowser` (`@tinacms/tinacms/react`) also has a `pick` mode, for a field
 that selects media. In `pick` mode the details panel has an "Insert" button.
 The browser keeps the open folder in its own state, not in the URL.
+The [`image` field](./image-field.md) uses `pick` mode in a dialog.
 
 ```tsx
 import { MediaBrowser } from '@tinacms/tinacms/react';

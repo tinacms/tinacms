@@ -62,7 +62,7 @@ describe('a preview embedded in the editor', () => {
     streamValues(editor, { title: 'Edited live' });
 
     expect(onChange).toHaveBeenCalledTimes(1);
-    expect(store.getSnapshot()).toEqual({ title: 'Edited live' });
+    expect(store.getSnapshot()).toEqual({ values: { title: 'Edited live' } });
   });
 
   it('holds the snapshot steady between messages', () => {

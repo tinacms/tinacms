@@ -23,6 +23,29 @@ export interface MediaUrlOptions {
   height?: number;
 }
 
+export interface ResolveMediaUrlOptions extends MediaUrlOptions {
+  /**
+   * The branch to read media from, for a provider that stages media per
+   * branch. In the preview it is `mediaBranch` from `useTina`; undefined reads
+   * the provider's own media branch.
+   */
+  branch?: string;
+}
+
+export type ResolveMediaUrl = (
+  path: string,
+  options?: ResolveMediaUrlOptions
+) => string;
+
+/**
+ * The part of a media plugin that runs without the editor, so a site turns a
+ * stored path into a URL in static and preview rendering alike. It is sync and
+ * holds no secrets. The plugin's slice reuses the same `resolveUrl`.
+ */
+export interface MediaManifest {
+  resolveUrl: ResolveMediaUrl;
+}
+
 export interface MediaFeatures {
   search?: boolean;
   extensionFilter?: boolean;
@@ -86,6 +109,11 @@ export interface MediaProvider {
   rename?(from: string, to: string): Promise<string>;
   features?: MediaFeatures;
   status?(): Promise<MediaStatus>;
+  /**
+   * The branch `resolveUrl` reads from now, or undefined for the media branch.
+   * The editor sends it to the preview, so the site builds the same URL.
+   */
+  mediaBranch?(): string | undefined;
 }
 
 export type MediaSlice = MediaProvider;
