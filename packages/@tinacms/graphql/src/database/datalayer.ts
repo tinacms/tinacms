@@ -741,10 +741,7 @@ export const makeFolderOpsForCollection = <T extends object>(
     let folderSortingIdx = 0;
     for (const path of Array.from(folder).sort()) {
       for (const [sort] of Object.entries(indexDefinitions)) {
-        const indexSublevel = folderCollectionSublevel.sublevel(
-          sort,
-          SUBLEVEL_OPTIONS
-        );
+        const indexSublevel = makeIndexSublevel(folderCollectionSublevel, sort);
         const subFolderKey = sha.hex(path);
         if (sort === DEFAULT_COLLECTION_SORT_KEY) {
           result.push({
@@ -789,6 +786,11 @@ export const makeFolderOpsForCollection = <T extends object>(
   return result;
 };
 
+// Every write, read and delete sweep of a sort index goes through here, so all
+// of them address the same sublevel.
+export const makeIndexSublevel = (collectionSublevel: Level, sort: string) =>
+  collectionSublevel.sublevel(sort, SUBLEVEL_OPTIONS);
+
 export const makeIndexOpsForDocument = <T extends object>(
   filepath: string,
   collection: string | undefined,
@@ -804,7 +806,7 @@ export const makeIndexOpsForDocument = <T extends object>(
     const collectionSublevel = level.sublevel(collection, SUBLEVEL_OPTIONS);
     for (const [sort, definition] of Object.entries(indexDefinitions)) {
       const indexedValue = makeKeyForField<T>(definition, data, escapeStr);
-      const indexSublevel = collectionSublevel.sublevel(sort, SUBLEVEL_OPTIONS);
+      const indexSublevel = makeIndexSublevel(collectionSublevel, sort);
       if (sort === DEFAULT_COLLECTION_SORT_KEY) {
         result.push({
           type: opType,

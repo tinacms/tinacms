@@ -15,6 +15,7 @@ import { MemoryLevel } from 'memory-level';
 import { buildSchema, createDatabaseInternal } from '..';
 import type { Bridge } from './bridge';
 import type { Schema } from '@tinacms/schema-tools';
+import { makeIndexSublevel } from './datalayer';
 import {
   CONTENT_ROOT_PREFIX,
   INDEX_KEY_FIELD_SEPARATOR,
@@ -58,6 +59,7 @@ const testSchema: Schema = {
       fields: [
         { name: 'title', label: 'Title', type: 'string' },
         { name: 'score', label: 'Score', type: 'number' },
+        { name: 'when', label: 'When', type: 'datetime' },
       ],
     },
   ],
@@ -70,8 +72,14 @@ const KEEP = 'content/posts/keep.json';
 
 async function setupDatabase() {
   const bridge = new InMemoryBridge();
-  bridge.seed(KEEP, jsonDoc({ title: 'Keep', score: 1 }));
-  bridge.seed(GHOST, jsonDoc({ title: 'Ghost', score: 42 }));
+  bridge.seed(
+    KEEP,
+    jsonDoc({ title: 'Keep', score: 1, when: '2026-01-01T00:00:00.000Z' })
+  );
+  bridge.seed(
+    GHOST,
+    jsonDoc({ title: 'Ghost', score: 42, when: '2026-06-30T00:00:00.000Z' })
+  );
 
   const level = new MemoryLevel<string, Record<string, any>>({
     valueEncoding: 'json',
@@ -99,24 +107,25 @@ describe('Database.deleteIndexEntriesForPaths()', () => {
     const content = database.contentLevel!;
 
     // Simulate a stranded old-value entry (from a prior un-cleaned value change)
-    // in both the collection and root-folder `score` sort indexes.
+    // in the collection and root-folder `score` and `when` sort indexes.
     const strandedKey = `OLD${INDEX_KEY_FIELD_SEPARATOR}${GHOST}`;
     for (const name of ['post', 'post_~']) {
-      await content
-        .sublevel(name, SUBLEVEL_OPTIONS)
-        .sublevel('score', SUBLEVEL_OPTIONS)
-        .put(strandedKey, {} as any);
+      for (const sort of ['score', 'when']) {
+        await makeIndexSublevel(
+          content.sublevel(name, SUBLEVEL_OPTIONS),
+          sort
+        ).put(strandedKey, {} as any);
+      }
     }
 
     await database.deleteIndexEntriesForPaths([GHOST]);
 
-    // No `score` entry (real or stranded) for the removed path survives in the
-    // collection index or the root-folder index.
+    // Iterating a collection sublevel walks every index nested under it, so this
+    // holds however a sort index is named.
     for (const name of ['post', 'post_~']) {
-      const scoreSub = content
-        .sublevel(name, SUBLEVEL_OPTIONS)
-        .sublevel('score', SUBLEVEL_OPTIONS);
-      expect(await ghostKeysIn(scoreSub)).toEqual([]);
+      expect(
+        await ghostKeysIn(content.sublevel(name, SUBLEVEL_OPTIONS))
+      ).toEqual([]);
     }
 
     // The record is gone too, and (without the read-time tolerance) a field-sorted
@@ -125,11 +134,13 @@ describe('Database.deleteIndexEntriesForPaths()', () => {
     expect(await rootSub.get(GHOST)).toBeUndefined();
 
     const hydrate = (path: string) => database.get(path);
-    const fieldSorted = await database.query(
-      { collection: 'post', sort: 'score', filterChain: [] },
-      hydrate
-    );
-    expect(fieldSorted.edges).toHaveLength(1);
+    for (const sort of ['score', 'when']) {
+      const fieldSorted = await database.query(
+        { collection: 'post', sort, filterChain: [] },
+        hydrate
+      );
+      expect(fieldSorted.edges).toHaveLength(1);
+    }
   });
 
   it('leaves other documents untouched', async () => {

@@ -38,6 +38,7 @@ import {
   makeFilterSuffixes,
   makeFolderOpsForCollection,
   makeIndexOpsForDocument,
+  makeIndexSublevel,
   makeRefOpsForDocument,
 } from './datalayer';
 import {
@@ -1083,16 +1084,17 @@ export class Database {
       SUBLEVEL_OPTIONS
     );
     const sublevel = indexDefinition
-      ? level
-          .sublevel(
+      ? makeIndexSublevel(
+          level.sublevel(
             `${collection.name}${
               folder
                 ? `_${folder === FOLDER_ROOT ? folder : sha.hex(folder)}`
                 : ''
             }`,
             SUBLEVEL_OPTIONS
-          )
-          .sublevel(sort, SUBLEVEL_OPTIONS)
+          ),
+          sort
+        )
       : rootLevel;
 
     if (!query.gt && !query.gte) {
@@ -1409,10 +1411,7 @@ export class Database {
           if (sortKey === REFS_COLLECTIONS_SORT_KEY) {
             continue;
           }
-          const indexSublevel = collectionSublevel.sublevel(
-            sortKey,
-            SUBLEVEL_OPTIONS
-          );
+          const indexSublevel = makeIndexSublevel(collectionSublevel, sortKey);
           if (sortKey === DEFAULT_COLLECTION_SORT_KEY) {
             for (const p of paths) {
               ops.push({ type: 'del', key: p, sublevel: indexSublevel });
