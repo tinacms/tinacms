@@ -13,7 +13,7 @@
     "format": "biome format --write ."
   },
   "dependencies": {
-    "@headlessui/react": "2.1.8",
+    "@headlessui/react": "catalog:",
     "@octokit/rest": "catalog:",
     "@tailwindcss/typography": "catalog:",
     "@tinacms/datalayer": "workspace:*",
