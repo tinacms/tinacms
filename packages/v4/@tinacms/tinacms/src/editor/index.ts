@@ -52,6 +52,7 @@ export {
   useActiveField,
   useContentSlice,
   useMediaSlice,
+  useOptionalAuthSlice,
   useDiscardEdits,
   useDocumentPath,
   useStaleDraft,
@@ -64,5 +65,6 @@ export {
   useFormId,
   useFormSave,
   useFormSeedKey,
+  useRpcClient,
   useTinaStore,
 } from './hooks';

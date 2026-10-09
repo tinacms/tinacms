@@ -2,6 +2,15 @@ import type { ClientSegment } from '../core/plugin';
 
 export type { JsonValue } from '../core/json';
 
+export {
+  AuthError,
+  type AuthErrorCode,
+  type AuthSlice,
+  type AuthUser,
+  toUserId,
+  type UserId,
+} from '../core/auth/contract';
+
 export type {
   FieldDescriptor,
   FieldValidationContext,
