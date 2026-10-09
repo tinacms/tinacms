@@ -8,7 +8,7 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
     <CheckboxPrimitive.Root
       data-slot='checkbox'
       className={cn(
-        'peer relative flex size-4 shrink-0 items-center justify-center rounded-xs border border-input transition-colors outline-none group-has-disabled/field:opacity-50 after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:focus-ring data-disabled:cursor-not-allowed data-disabled:border-border-subtle data-disabled:bg-muted data-disabled:data-checked:border-border data-disabled:data-checked:bg-border-subtle data-disabled:data-checked:text-muted-foreground aria-invalid:border-destructive aria-invalid:aria-checked:border-primary dark:bg-input/30 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground dark:data-checked:bg-primary',
+        'peer relative flex size-4 shrink-0 items-center justify-center rounded-xs border border-input transition-colors outline-none group-has-disabled/field:opacity-50 after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:focus-ring data-disabled:cursor-not-allowed data-disabled:border-border data-disabled:opacity-60 data-disabled:data-checked:border-border data-disabled:data-checked:bg-transparent data-disabled:data-checked:text-muted-foreground aria-invalid:border-destructive aria-invalid:aria-checked:border-primary dark:bg-input/30 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground dark:data-checked:bg-primary',
         className
       )}
       {...props}
