@@ -399,6 +399,23 @@ describe('Tina Client', () => {
       ).rejects.toThrow('Branch already exists');
     });
 
+    it('createBranch reports the status when the error body is not JSON', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      fetchWithToken.mockResolvedValueOnce({
+        ok: false,
+        status: 502,
+        statusText: '',
+        json: vi.fn().mockRejectedValue(new SyntaxError('Unexpected token <')),
+      });
+
+      await expect(
+        client.createBranch({
+          baseBranch: 'main',
+          branchName: 'feature-x',
+        })
+      ).rejects.toThrow('Unable to create branch, 502');
+    });
+
     it('listBranches GETs the list_branches endpoint and parses the response through the zod schema', async () => {
       fetchWithToken.mockResolvedValueOnce(
         makeResponse({
