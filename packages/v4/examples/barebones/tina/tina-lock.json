@@ -42,6 +42,11 @@
             "type": "boolean"
           },
           {
+            "name": "heroImage",
+            "label": "Hero image",
+            "type": "image"
+          },
+          {
             "name": "stars",
             "label": "Stars",
             "validators": [
@@ -169,6 +174,7 @@
   "primitives": {
     "array": 1,
     "boolean": 1,
+    "image": 1,
     "object": 1,
     "rating": 1,
     "reference": 1,

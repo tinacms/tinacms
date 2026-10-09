@@ -3,6 +3,8 @@ import {
   tinaField,
   useTina,
 } from '@tinacms/tinacms/adapters/react';
+import { resolveMediaUrl } from '@tinacms/tinacms';
+import config from '../../tina/config';
 import { sampleDocument } from '../content';
 
 // The site side of visual editing, written as a real site would write it. useTina seeds
@@ -28,6 +30,14 @@ export function PostPreview() {
       >
         {post.featured ? '★ Featured' : '☆ Not featured'}
       </span>
+      {post.heroImage ? (
+        <img
+          {...tinaField('heroImage')}
+          src={resolveMediaUrl(config, post.heroImage, { width: 1200 })}
+          alt=''
+          style={{ width: '100%', borderRadius: '0.75rem', marginTop: '1rem' }}
+        />
+      ) : null}
       <h1 {...tinaField('title')}>{String(post.title ?? '')}</h1>
       {/* The custom field renders like any other: click the stars to focus it. */}
       <p
