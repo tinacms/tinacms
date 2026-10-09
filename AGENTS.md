@@ -108,6 +108,7 @@ Bug reports go through the same checklist whether they land via Discord `#ask-fo
 
 - `### The exact error message` — copy-pasted literal string, not paraphrased
 - `### Steps to reproduce` — what the user clicked, in order
+- `### What you expected vs. what actually happened`
 - `### A way for us to reproduce` — link to a minimal repro repo
 - `### Client ID` — for TinaCloud-related issues
 
