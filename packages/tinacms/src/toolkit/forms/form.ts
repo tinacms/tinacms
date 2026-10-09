@@ -377,7 +377,21 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
         if (field.templates) {
           if (field.list) {
             if (isLastItem) {
-              return formOrObjectField;
+              // A bare name resolves against the form root, so these have to carry the path.
+              const fieldName = namePath.slice(0, namePathIndex).join('.');
+              if (!fieldName) {
+                return formOrObjectField;
+              }
+              return {
+                ...formOrObjectField,
+                name: fieldName,
+                fields: formOrObjectField.fields.map((field) => {
+                  return {
+                    ...field,
+                    name: [fieldName, field.name].join('.'),
+                  };
+                }),
+              };
             } else {
               const namePathIndexForListItem = namePathIndex + 1;
               const index = namePath[namePathIndexForListItem];
