@@ -1,4 +1,11 @@
-import { use, useCallback, useEffect, useEffectEvent, useMemo } from 'react';
+import {
+  use,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   get,
   useController,
@@ -6,6 +13,8 @@ import {
   useFormState,
 } from 'react-hook-form';
 import { useStore } from 'zustand';
+import type { AuthSlice } from '../core/auth/contract';
+import { authSliceOf, authTokenOf } from '../core/auth/slice';
 import type { ContentSlice } from '../core/content/contract';
 import type { MediaSlice } from '../core/media/contract';
 import type { FieldAddress } from '../core/field/address';
@@ -20,6 +29,11 @@ import type {
   TinaDocument,
 } from '../core/schema/types';
 import { type FormId, toFormValues, useFormStore } from '../form/form-store';
+import {
+  type RpcClientConfig,
+  type RpcProxy,
+  createRpcClient,
+} from '../rpc/proxy';
 import {
   FieldAddressContext,
   FieldSchemaContext,
@@ -88,6 +102,36 @@ export function useMediaSlice(): MediaSlice {
     'No media capability with upload, list, delete and resolveUrl is mounted — pass a media plugin (e.g. localMediaPlugin()) to <TinaProvider plugins>'
   );
   return slice;
+}
+
+export function useOptionalAuthSlice(): AuthSlice | null {
+  return useTinaStore(authSliceOf);
+}
+
+export function useRpcClient<TSegments>(
+  config: Omit<RpcClientConfig, 'getToken'>
+): RpcProxy<TSegments> {
+  const runtime = use(TinaRuntimeContext);
+  invariant(
+    runtime,
+    'rpc-client-outside-provider',
+    'useRpcClient must be used within a TinaProvider'
+  );
+  const { store } = runtime;
+  const { url, fetch: fetchImpl } = config;
+  const fetchRef = useRef(fetchImpl);
+  useEffect(() => {
+    fetchRef.current = fetchImpl;
+  });
+  return useMemo(
+    () =>
+      createRpcClient<TSegments>({
+        url,
+        fetch: (input, init) => (fetchRef.current ?? fetch)(input, init),
+        getToken: () => authTokenOf(store.getState()),
+      }),
+    [store, url]
+  );
 }
 
 function useFormScope(hookCode: string, hookName: string): FormScope {

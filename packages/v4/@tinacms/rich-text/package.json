@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "@ariakit/react": "catalog:",
-    "@headlessui/react": "catalog:",
     "@radix-ui/react-dialog": "catalog:",
     "@radix-ui/react-dropdown-menu": "catalog:",
     "@radix-ui/react-popover": "catalog:",
