@@ -21,6 +21,7 @@ const badgeVariants = cva(
         published: 'bg-status-published-subtle text-status-published',
         draft: 'bg-status-draft-subtle text-status-draft',
         changed: 'bg-status-changed-subtle text-status-changed',
+        unsaved: 'bg-status-unsaved-subtle text-status-unsaved',
         failed: 'bg-status-failed-subtle text-status-failed',
         count:
           'min-w-5 bg-status-changed px-1.5 font-semibold text-primary-foreground tabular-nums',

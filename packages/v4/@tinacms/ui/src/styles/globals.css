@@ -25,6 +25,9 @@
   --tina-green-700: #15803d;
   --tina-blue-50: #dceeff;
   --tina-blue-800: #144696;
+  --tina-amber-50: #fffbeb;
+  --tina-amber-600: #d97706;
+  --tina-amber-800: #92400e;
   --tina-red-50: #fef2f2;
   --tina-red-200: #fecaca;
   --tina-red-700: #b91c1c;
@@ -66,6 +69,9 @@
   --status-draft-subtle: var(--tina-slate-100);
   --status-changed: var(--tina-blue-800);
   --status-changed-subtle: var(--tina-blue-50);
+  --status-unsaved: var(--tina-amber-800);
+  --status-unsaved-subtle: var(--tina-amber-50);
+  --status-unsaved-mark: var(--tina-amber-600);
   --status-failed: var(--tina-red-700);
   --status-failed-subtle: var(--tina-red-50);
   --status-failed-border: var(--tina-red-200);
@@ -167,6 +173,9 @@
   --color-status-draft-subtle: var(--status-draft-subtle);
   --color-status-changed: var(--status-changed);
   --color-status-changed-subtle: var(--status-changed-subtle);
+  --color-status-unsaved: var(--status-unsaved);
+  --color-status-unsaved-subtle: var(--status-unsaved-subtle);
+  --color-status-unsaved-mark: var(--status-unsaved-mark);
   --color-status-failed: var(--status-failed);
   --color-status-failed-subtle: var(--status-failed-subtle);
   --color-status-failed-border: var(--status-failed-border);

@@ -81,7 +81,7 @@ export function FormStatusBadge({
   const savedAt = useLastSaved(formId);
   if (status === 'dirty') {
     return (
-      <Badge variant='changed'>
+      <Badge variant='unsaved'>
         <CircleDot data-icon='inline-start' aria-hidden='true' />
         Unsaved
       </Badge>
