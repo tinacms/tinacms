@@ -20,7 +20,6 @@ describe('FormStatus', () => {
     expect(screen.getByRole('img', { name: 'Unsaved changes' })).toBeTruthy();
   });
 
-  // The colour alone does not carry for everyone who can see it, so the dot is titled as well.
   it('titles the dot so hovering it answers the question too', () => {
     const { container } = render(<FormStatus pristine={false} />);
 

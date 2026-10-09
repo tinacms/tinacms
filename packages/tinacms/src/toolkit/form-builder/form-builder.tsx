@@ -384,14 +384,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 export const FormStatus = ({ pristine }: { pristine: boolean }) => {
   const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
   const label = pristine ? 'No unsaved changes' : 'Unsaved changes';
-  /**
-   * The colour is the whole message, so it has to be said in words too: named for assistive
-   * technology, and titled so hovering answers the question for anyone who cannot tell green from
-   * red. Not a live region — this flips on the first keystroke, and announcing that would talk over
-   * the editor as they type.
-   *
-   * fill-current keeps this a solid status dot; lucide icons are stroke-only by default.
-   */
+  // fill-current keeps this a solid status dot; lucide icons are stroke-only by default.
   return (
     <Circle
       role='img'
