@@ -8,13 +8,24 @@ export const TINACLOUD_PLUGIN_NAME = 'tina:tinacloud';
 export const tinaCloud = (options: TinaCloudOptions): PluginManifest =>
   definePlugin({
     name: TINACLOUD_PLUGIN_NAME,
-    provides: ['media'],
+    provides: ['media', 'auth'],
     client: async () => {
-      const { createTinaCloudMediaSlice } = await import(
-        './media/tinacloud-media.client'
-      );
+      const [{ createTinaCloudAuth }, { createTinaCloudMediaSlice }] =
+        await Promise.all([
+          import('./auth/tinacloud-auth.client'),
+          import('./media/tinacloud-media.client'),
+        ]);
+      const auth = createTinaCloudAuth(options);
       return {
-        default: { slices: { media: createTinaCloudMediaSlice(options) } },
+        default: {
+          slices: {
+            auth: auth.slice,
+            media: createTinaCloudMediaSlice({
+              clientId: options.clientId,
+              getToken: auth.getToken,
+            }),
+          },
+        },
       };
     },
   });

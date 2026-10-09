@@ -104,7 +104,8 @@ with no login.
   content and media requests as the RPC handler does. It answers `401` when
   there is no session, or when the auth plugin has no `getSession`. It
   answers `403` when the roles do not grant the `requires` permission of the
-  content or media plugin. With no auth plugin, it checks nothing.
+  content or media plugin. With no auth plugin, or one with no server
+  segment, it checks nothing.
 - The local Data Layer runs no `onInit`. A `getSession` must not depend on
   state that `onInit` sets.
 - Roles and permissions are runtime data of the provider. They are not in
@@ -112,6 +113,39 @@ with no login.
 - `roles` on the slice and a permission check in the client are for the UI
   only. They hide controls that the editor cannot use. The server check is
   the security boundary.
+
+## TinaCloud
+
+`tinaCloud({ clientId })` is the reference auth plugin. It provides `auth`
+and `media` from one plugin.
+
+- `login()` opens the TinaCloud sign-in popup at `https://app.tina.io/signin`.
+  The slice accepts the tokens only from a message that the popup posts from
+  the `https://app.tina.io` origin.
+- The slice reads the user from
+  `https://identity.tinajs.io/v2/apps/{clientId}/currentUser`. A TinaCloud
+  `admin` gets the `admin` role, and any other user gets `editor`.
+- An account that is not verified, or is disabled, sets `forbidden`. The slice
+  keeps no token for it.
+- The tokens stay in a closure of the slice. A full reload signs the editor
+  out (ADR-023).
+- The media slice of `tinaCloud()` gets its token from the same closure. It
+  never reads the token of another auth plugin.
+- Before a media request, the closure refreshes the token through
+  `https://identity.tinajs.io/oauth/token` when it expires in less than two
+  minutes. A refused refresh sets `signed-out` and throws `expired`.
+
+The tokens only ever go to TinaCloud, as in v3. They are tied to the whole
+TinaCloud account, not to one project, so the slice's `getToken()` returns
+`undefined` and the site's own server never receives them. `tinaCloud()` has
+no server segment, so the local Data Layer checks nothing, as in v3.
+
+```ts
+defineConfig({
+  plugins: [localContentPlugin(), tinaCloud({ clientId: '<client id>' })],
+  schema: { collections: [] },
+});
+```
 
 ## Swap a provider
 
@@ -140,7 +174,8 @@ keeps its other capabilities.
 
 - Sign-out on a `401`. A request that carried a token and gets `401` fails,
   and the slice does not change its status.
-- An auth slice for `tinaCloud()`.
+- The TinaCloud redirect sign-in flow (PKCE), for projects that use WorkOS.
+  `tinaCloud()` supports the popup flow only.
 - `onLogin` and `onLogout` hooks in the config. A plugin does its own work
   inside its `login()` and `logout()`.
 
