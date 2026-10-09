@@ -23,6 +23,20 @@ export interface MediaUrlOptions {
   height?: number;
 }
 
+export type ResolveMediaUrl = (
+  path: string,
+  options?: MediaUrlOptions
+) => string;
+
+/**
+ * The part of a media plugin that runs without the editor, so a site turns a
+ * stored path into a URL in static and preview rendering alike. It is sync and
+ * holds no secrets. The plugin's slice reuses the same `resolveUrl`.
+ */
+export interface MediaManifest {
+  resolveUrl: ResolveMediaUrl;
+}
+
 export interface MediaFeatures {
   search?: boolean;
   extensionFilter?: boolean;

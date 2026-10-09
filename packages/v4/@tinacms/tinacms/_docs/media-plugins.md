@@ -31,6 +31,15 @@ A media plugin mounts a slice at `store.media`. The slice is a `MediaProvider`
 mounts a slice with all four operations, it throws
 `media-capability-missing`.
 
+### On the site
+
+The site renders media without the editor, so it has no slice. A media plugin
+also sets `media.resolveUrl` on its manifest: a sync function with no secrets
+that gives the same URL as the `resolveUrl` of the slice. `resolveMediaUrl(config,
+path, options?)` (`@tinacms/tinacms`) calls it. Refer to
+[media.md](./media.md#rendering-media-on-the-site). `media.resolveUrl` is
+optional, but without it `resolveMediaUrl` throws `media-plugin-no-resolve-url`.
+
 ### Optional additions
 
 A provider can supply more. Each addition is optional. The
@@ -154,6 +163,9 @@ Each operation reads the branch from `store.branch.name` when it runs. If
 project. The branch is not a config option: it is operational data that the
 Data Layer owns (ADR-019, ADR-024). No plugin writes `store.branch.name` yet,
 so all operations use the default branch.
+
+`media.resolveUrl` on the manifest runs on the site, which has no store, so it
+always gives the URL on the media branch.
 
 On first use the slice reads the project from
 `https://identity.tinajs.io/v2/apps/{clientId}` for its default branch and its
