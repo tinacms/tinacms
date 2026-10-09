@@ -19,5 +19,5 @@
       "react-dom/*": ["./node_modules/@types/react-dom/*"]
     }
   },
-  "include": ["src", "tina", "vite.config.ts"]
+  "include": ["src", "tina", "test", "vite.config.ts", "vitest.config.ts"]
 }
