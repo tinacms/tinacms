@@ -52,7 +52,7 @@ It holds the core sections (ui, branch, documents) and each plugins slice.
 
 ### Slice 
 
-A plugin's section of the store, set by the `slice` property of its `ClientSegment`.
+A plugin's section of the store, set by the `slice` property of its `ClientSegment`. A plugin that provides several single-provider jobs sets `slices` instead, one slice for each job, keyed by the job's name.
 
 ### Screen
 

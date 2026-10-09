@@ -399,6 +399,23 @@ describe('Tina Client', () => {
       ).rejects.toThrow('Branch already exists');
     });
 
+    it('createBranch reports the status when the error body is not JSON', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      fetchWithToken.mockResolvedValueOnce({
+        ok: false,
+        status: 502,
+        statusText: '',
+        json: vi.fn().mockRejectedValue(new SyntaxError('Unexpected token <')),
+      });
+
+      await expect(
+        client.createBranch({
+          baseBranch: 'main',
+          branchName: 'feature-x',
+        })
+      ).rejects.toThrow('Unable to create branch, 502');
+    });
+
     it('listBranches GETs the list_branches endpoint and parses the response through the zod schema', async () => {
       fetchWithToken.mockResolvedValueOnce(
         makeResponse({
@@ -663,6 +680,27 @@ describe('Tina Client', () => {
 
       await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
         /Response: boom/
+      );
+    });
+
+    it('names the status code when the response carries no status text', async () => {
+      stubFetchOnce(makeResponse({ status: 502, body: {} }));
+
+      await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
+        /^Unable to complete request, 502,/
+      );
+    });
+
+    it('still reports the status when the body is not JSON', async () => {
+      stubFetchOnce({
+        ok: false,
+        status: 502,
+        statusText: '',
+        json: vi.fn().mockRejectedValue(new SyntaxError('Unexpected token <')),
+      } as any);
+
+      await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
+        /^Unable to complete request, 502,/
       );
     });
 

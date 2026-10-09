@@ -8,6 +8,7 @@ import type {
 import type { FieldRegistry } from './field/registry';
 import { invariant } from './invariant';
 import type { FieldSchema } from './schema/types';
+import { isRecord } from '../utils/is-record';
 
 export interface ValidateFieldOptions extends ValidationScope {
   address?: string;
@@ -126,9 +127,6 @@ export const validateFieldTree = (
   return errors;
 };
 
-const isPlainObject = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
 const hasItemFields = (
   node: FieldSchema
 ): node is FieldSchema & { fields: FieldSchema[] } =>
@@ -155,7 +153,7 @@ export const addressesWithValidators = (
       ? [address]
       : [];
     if (!hasItemFields(node)) return own;
-    const value = isPlainObject(values) ? values[node.name] : undefined;
+    const value = isRecord(values) ? values[node.name] : undefined;
     if (Array.isArray(value)) {
       return own.concat(
         value.flatMap((item, index) =>

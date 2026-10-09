@@ -16,23 +16,15 @@ export const declaresCapabilityOverride = (
 ): boolean =>
   manifest.overrides.some((override) => override.capability === capability);
 
-export const capabilityMountFor = (
+export const capabilityMountsFor = (
   manifest: PluginManifest
-): CapabilityMount => {
+): CapabilityMount[] => {
   const singletons = manifest.provides.filter(isSingletonSliceCapability);
-  invariant(
-    singletons.length <= 1,
-    'plugin-multiple-singleton-slices',
-    `Plugin "${manifest.name}" provides ${singletons.length} singleton ` +
-      `capabilities (${singletons.join(', ')}), but a plugin mounts at only ` +
-      'one namespace. Split it into one plugin per capability.'
-  );
-  const capability = singletons[0];
-  if (capability) {
-    return {
+  if (singletons.length > 0) {
+    return singletons.map((capability) => ({
       namespace: capability,
       isOverride: declaresCapabilityOverride(manifest, capability),
-    };
+    }));
   }
   invariant(
     !isSingletonSliceCapability(manifest.name),
@@ -41,5 +33,5 @@ export const capabilityMountFor = (
       'but does not provide it, so it would mount at that reserved ' +
       `namespace. Rename the plugin or declare \`provides: ["${manifest.name}"]\`.`
   );
-  return { namespace: manifest.name, isOverride: false };
+  return [{ namespace: manifest.name, isOverride: false }];
 };
