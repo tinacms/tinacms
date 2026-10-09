@@ -140,14 +140,16 @@ type SessionGate = (
 ) => Promise<boolean>;
 
 // ADR-023 §4: with an auth plugin, the Data Layer authorizes a request as
-// rpc/handler.ts does. With no auth plugin, it composes nothing and checks nothing.
+// rpc/handler.ts does. With no auth plugin, or one with no server segment, it
+// composes nothing and checks nothing.
 const createSessionGate = (
   plugins: PluginManifest[],
   capability: 'content' | 'media'
 ): SessionGate | null => {
-  if (!plugins.some(({ provides }) => provides.includes(AUTH_CAPABILITY))) {
-    return null;
-  }
+  const authPlugin = plugins.find(({ provides }) =>
+    provides.includes(AUTH_CAPABILITY)
+  );
+  if (!authPlugin?.server) return null;
   const authorize = createRequestAuthorizer(plugins);
   const permission = plugins.find(({ provides }) =>
     provides.includes(capability)

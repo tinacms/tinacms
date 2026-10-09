@@ -28,10 +28,4 @@ export const tinaCloud = (options: TinaCloudOptions): PluginManifest =>
         },
       };
     },
-    server: async () => {
-      const { createTinaCloudAuthServer } = await import(
-        './auth/tinacloud-auth.server'
-      );
-      return { default: createTinaCloudAuthServer(options) };
-    },
   });

@@ -6,11 +6,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TinaAdmin } from '../../admin/admin';
 import { asResolvedConfig } from '../../config';
 import { MediaError } from '../../core/media/contract';
+import { authTokenOf } from '../../core/auth/slice';
 import { definePlugin, resolveClientSegments } from '../../core/plugin';
 import { type TinaRuntime, TinaRuntimeContext } from '../../editor/context';
 import { useOptionalAuthSlice, useMediaSlice } from '../../editor/hooks';
-import { createRpcHandler } from '../../rpc/handler';
-import { defineServerPlugin } from '../../server';
 import { createTinaStore } from '../../store/create-store';
 import { stubLoginPopup, tinaCloudUser } from '../../test/tinacloud-login';
 import { mediaManagerPlugin } from '../media-manager/media-manager.plugin';
@@ -70,10 +69,17 @@ afterEach(() => {
 });
 
 describe('tinaCloud()', () => {
-  it('provides media and auth, with a server segment', () => {
+  it('provides media and auth, with no server segment', () => {
     const plugin = tinaCloud({ clientId: 'abc' });
     expect(plugin.provides).toEqual(['media', 'auth']);
-    expect(plugin.server).toBeTypeOf('function');
+    expect(plugin.server).toBeUndefined();
+  });
+
+  it('gives the site no token once signed in', async () => {
+    stubTinaCloud();
+    const { store } = await bootSignedIn();
+    expect(store.getState().auth).toMatchObject({ status: 'signed-in' });
+    await expect(authTokenOf(store.getState())).resolves.toBeUndefined();
   });
 
   it('mounts a media slice and a signed-out auth slice', async () => {
@@ -199,43 +205,5 @@ describe('tinaCloud()', () => {
       await screen.findByRole('list', { name: 'Account' })
     ).toHaveTextContent('Ada Lovelace');
     expect(screen.getByRole('list', { name: 'Collections' })).toBeVisible();
-  });
-});
-
-describe('tinaCloud() on the server', () => {
-  const editorialPlugin = definePlugin({
-    name: 'editorial',
-    server: async () => ({
-      default: defineServerPlugin({ publish: async () => 'queued' }),
-    }),
-  });
-
-  const handler = createRpcHandler({
-    plugins: [tinaCloud({ clientId: 'abc' }), editorialPlugin],
-  });
-
-  const post = (path: string, token?: string) =>
-    handler(
-      new Request(`http://tina.local/api/tina${path}`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          ...(token ? { authorization: `Bearer ${token}` } : {}),
-        },
-      })
-    );
-
-  it('authenticates RPC requests through TinaCloud', async () => {
-    stubTinaCloud();
-    expect((await post('/editorial/publish')).status).toBe(401);
-    const response = await post('/editorial/publish', 'id-token');
-    expect(response.status).toBe(200);
-    expect(await response.json()).toBe('queued');
-  });
-
-  it('does not route getSession as an operation', async () => {
-    stubTinaCloud();
-    expect((await post('/auth/getSession', 'id-token')).status).toBe(404);
-    expect((await post('/media/getSession', 'id-token')).status).toBe(404);
   });
 });

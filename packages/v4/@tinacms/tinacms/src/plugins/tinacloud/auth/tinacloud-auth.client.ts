@@ -227,7 +227,13 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
 
   const slice = (sliceSet: SliceSet): AuthSlice => {
     set = sliceSet;
-    return { status: 'signed-out', user: null, getToken, login, logout };
+    return {
+      status: 'signed-out',
+      user: null,
+      getToken: async () => undefined,
+      login,
+      logout,
+    };
   };
 
   return { slice, getToken };

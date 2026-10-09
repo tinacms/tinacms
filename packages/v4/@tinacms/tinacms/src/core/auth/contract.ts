@@ -62,6 +62,7 @@ export class AuthError extends Error {
 
 // ADR-023 §4/§5: the provider drives login and owns the token. The token stays in
 // memory, never in slice state or localStorage, and getToken refreshes it.
+// getToken is the token the site's own server receives; undefined sends none.
 // ADR-008: `roles` gate the UI only. The server check is the security boundary.
 export type AuthSlice = (
   | { status: 'signed-in'; user: AuthUser; roles: string[] }

@@ -104,7 +104,8 @@ with no login.
   content and media requests as the RPC handler does. It answers `401` when
   there is no session, or when the auth plugin has no `getSession`. It
   answers `403` when the roles do not grant the `requires` permission of the
-  content or media plugin. With no auth plugin, it checks nothing.
+  content or media plugin. With no auth plugin, or one with no server
+  segment, it checks nothing.
 - The local Data Layer runs no `onInit`. A `getSession` must not depend on
   state that `onInit` sets.
 - Roles and permissions are runtime data of the provider. They are not in
@@ -128,17 +129,16 @@ and `media` from one plugin.
   keeps no token for it.
 - The tokens stay in a closure of the slice. A full reload signs the editor
   out (ADR-023).
-- `getToken()` refreshes the token through
-  `https://identity.tinajs.io/oauth/token` when it expires in less than two
-  minutes. A refused refresh sets `signed-out` and throws `expired`.
 - The media slice of `tinaCloud()` gets its token from the same closure. It
   never reads the token of another auth plugin.
+- Before a media request, the closure refreshes the token through
+  `https://identity.tinajs.io/oauth/token` when it expires in less than two
+  minutes. A refused refresh sets `signed-out` and throws `expired`.
 
-The server segment holds `getSession`. It sends the bearer token to the
-`currentUser` endpoint of the project. A verified, enabled user gets a
-`Session`. A TinaCloud `admin` gets the `admin` role, and any other user gets
-`editor`. `tinaCloud()` has no `rolePermissions`, so the built-in defaults
-apply.
+The tokens only ever go to TinaCloud, as in v3. They are tied to the whole
+TinaCloud account, not to one project, so the slice's `getToken()` returns
+`undefined` and the site's own server never receives them. `tinaCloud()` has
+no server segment, so the local Data Layer checks nothing, as in v3.
 
 ```ts
 defineConfig({
