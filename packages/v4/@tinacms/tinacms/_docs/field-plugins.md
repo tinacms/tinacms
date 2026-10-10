@@ -56,6 +56,9 @@ v4 supplies four more examples:
   the content capability, not from a fixed list.
 - The `rich-text` field ([`rich-text-field.md`](./rich-text-field.md)) uses the
   `block` layout. With `isBody`, it controls the markdown body of the file.
+- The `image` field ([`image-field.md`](./image-field.md)) holds the path of one
+  media file, never a URL (ADR-022 §5). Its `accept` config names media
+  extensions or categories for a picker, and it is not a validator.
 
 ### 1. The manifest (`.plugin.ts`)
 

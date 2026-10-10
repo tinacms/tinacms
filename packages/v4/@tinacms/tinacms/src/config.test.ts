@@ -52,9 +52,9 @@ describe('defineConfig', () => {
 
   it('rejects a dependency no installed plugin provides', () => {
     const needsMedia = definePlugin({
-      name: 'test:image',
+      name: 'test:needs-media',
       provides: ['field'],
-      field: { type: 'image', contractVersion: 1 },
+      field: { type: 'test-needs-media', contractVersion: 1 },
       dependsOn: ['media'],
     });
     expect(() =>

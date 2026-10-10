@@ -5,6 +5,8 @@ import booleanFieldPlugin from './boolean/boolean-field.plugin';
 import { boolean } from './boolean/boolean-field.schema';
 import datetimeFieldPlugin from './datetime/datetime-field.plugin';
 import { datetime } from './datetime/datetime-field.schema';
+import imageFieldPlugin from './image/image-field.plugin';
+import { image } from './image/image-field.schema';
 import numberFieldPlugin from './number/number-field.plugin';
 import { number } from './number/number-field.schema';
 import objectFieldPlugin from './object/object-field.plugin';
@@ -23,6 +25,7 @@ export const corePlugins = [
   booleanFieldPlugin,
   numberFieldPlugin,
   datetimeFieldPlugin,
+  imageFieldPlugin,
   arrayFieldPlugin,
   objectFieldPlugin,
   selectFieldPlugin,
@@ -37,6 +40,7 @@ export const t = {
   boolean,
   number,
   datetime,
+  image,
   select,
   array,
   object,
@@ -47,6 +51,7 @@ export const t = {
 export type { ArrayFieldSchema } from './array/array-field.schema';
 export type { BooleanFieldSchema } from './boolean/boolean-field.schema';
 export type { DatetimeFieldSchema } from './datetime/datetime-field.schema';
+export type { ImageFieldSchema } from './image/image-field.schema';
 export type { NumberFieldSchema } from './number/number-field.schema';
 export type { ObjectFieldSchema } from './object/object-field.schema';
 export type { RichTextFieldSchema } from './rich-text/rich-text-field.schema';
