@@ -88,6 +88,95 @@ describe('Codegen.genDatabaseClient', () => {
     expect(authenticateFn).toContain('isSignIn: true');
     expect(result.match(/isSignIn: true/g)).toHaveLength(1);
   });
+
+  // graphql-js builds result objects with a null prototype, which React Server
+  // Components refuse to serialise across the server/client boundary. The
+  // generated databaseRequest() must hand back plain objects instead.
+  it('routes every request result through the plain-object normaliser', async () => {
+    const result = await makeInstance(true).genDatabaseClient();
+    expect(result).toContain('return toPlain(result);');
+    expect(result).not.toContain('return result;');
+  });
+
+  describe('generated toPlain helper', () => {
+    // Pull the helper out of the emitted source so these assertions run against
+    // the code users actually get, rather than a copy kept in this test file.
+    async function loadToPlain(): Promise<(value: unknown) => unknown> {
+      const result = await makeInstance(true).genDatabaseClient();
+      const start = result.indexOf('function toPlain(');
+      const end = result.indexOf('export async function databaseRequest');
+      expect(start).toBeGreaterThan(-1);
+      expect(end).toBeGreaterThan(start);
+      const source = result.slice(start, end).trim();
+      // eslint-disable-next-line no-new-func
+      return new Function(`${source}; return toPlain;`)() as (
+        value: unknown
+      ) => unknown;
+    }
+
+    it('converts a null-prototype object into a plain one', async () => {
+      const toPlain = await loadToPlain();
+      const fromGraphql = Object.assign(Object.create(null), {
+        getPost: { title: 'hello', views: 3 },
+      });
+
+      expect(Object.getPrototypeOf(fromGraphql)).toBeNull();
+      const plain = toPlain(fromGraphql) as Record<string, any>;
+
+      expect(Object.getPrototypeOf(plain)).toBe(Object.prototype);
+      expect(Object.getPrototypeOf(plain.getPost)).toBe(Object.prototype);
+      expect(plain).toEqual({ getPost: { title: 'hello', views: 3 } });
+    });
+
+    it('keeps undefined and does not stringify Date values', async () => {
+      const toPlain = await loadToPlain();
+      const when = new Date('2024-05-01T00:00:00.000Z');
+      const plain = toPlain(
+        Object.assign(Object.create(null), { when, missing: undefined })
+      ) as Record<string, any>;
+
+      expect(Object.getPrototypeOf(plain)).toBe(Object.prototype);
+      expect(plain.missing).toBeUndefined();
+      expect(Object.prototype.hasOwnProperty.call(plain, 'missing')).toBe(true);
+      expect(plain.when).toBe(when);
+    });
+
+    it('recurses through arrays and leaves non-objects alone', async () => {
+      const toPlain = await loadToPlain();
+      const nested = Object.assign(Object.create(null), {
+        items: [Object.assign(Object.create(null), { id: 1 }), 'x', null, 7],
+      });
+
+      const plain = toPlain(nested) as Record<string, any>;
+
+      expect(plain.items[0]).toEqual({ id: 1 });
+      expect(Object.getPrototypeOf(plain.items[0])).toBe(Object.prototype);
+      expect(plain.items.slice(1)).toEqual(['x', null, 7]);
+    });
+
+    it('normalises the data inside a graphql execution result', async () => {
+      const toPlain = await loadToPlain();
+      const result = {
+        data: Object.assign(Object.create(null), {
+          post: Object.assign(Object.create(null), { title: 'hello' }),
+        }),
+      };
+
+      const plain = toPlain(result) as { data: { post: object } };
+
+      expect(Object.getPrototypeOf(plain.data)).toBe(Object.prototype);
+      expect(Object.getPrototypeOf(plain.data.post)).toBe(Object.prototype);
+    });
+
+    it('returns objects that already have a prototype untouched', async () => {
+      const toPlain = await loadToPlain();
+      class Post {
+        constructor(public title: string) {}
+      }
+      const instance = new Post('kept');
+      expect(toPlain(instance)).toBe(instance);
+    });
+  });
 });
 
 describe('Codegen.execute integration', () => {
