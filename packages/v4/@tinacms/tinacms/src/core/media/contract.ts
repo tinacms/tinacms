@@ -23,18 +23,9 @@ export interface MediaUrlOptions {
   height?: number;
 }
 
-export interface ResolveMediaUrlOptions extends MediaUrlOptions {
-  /**
-   * The branch to read media from, for a provider that stages media per
-   * branch. In the preview it is `mediaBranch` from `useTina`; undefined reads
-   * the provider's own media branch.
-   */
-  branch?: string;
-}
-
 export type ResolveMediaUrl = (
   path: string,
-  options?: ResolveMediaUrlOptions
+  options?: MediaUrlOptions
 ) => string;
 
 /**
@@ -109,11 +100,6 @@ export interface MediaProvider {
   rename?(from: string, to: string): Promise<string>;
   features?: MediaFeatures;
   status?(): Promise<MediaStatus>;
-  /**
-   * The branch `resolveUrl` reads from now, or undefined for the media branch.
-   * The editor sends it to the preview, so the site builds the same URL.
-   */
-  mediaBranch?(): string | undefined;
 }
 
 export type MediaSlice = MediaProvider;

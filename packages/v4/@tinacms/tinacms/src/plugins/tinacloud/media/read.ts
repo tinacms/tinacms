@@ -4,7 +4,6 @@ import {
   type MediaPage,
   type MediaPageRequest,
   type MediaUrlOptions,
-  type ResolveMediaUrl,
 } from '../../../core/media/contract';
 import {
   TINACLOUD_ASSETS_URL,
@@ -83,8 +82,3 @@ export const mediaUrl = (
   if (size.height !== undefined) query.set('max-h', String(size.height));
   return `${url}?${query}`;
 };
-
-export const tinaCloudMediaUrl =
-  (clientId: string): ResolveMediaUrl =>
-  (path, options = {}) =>
-    mediaUrl(clientId, options.branch, path, options);

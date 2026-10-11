@@ -10,9 +10,8 @@ import { type ReactNode, type RefObject, useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { ContentProvider } from '../core/content/contract';
-import type { MediaSlice } from '../core/media/contract';
 import { toFieldAddress } from '../core/field/address';
-import { type PluginManifest, definePlugin } from '../core/plugin';
+import { definePlugin } from '../core/plugin';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { toFormId, useFormStore } from '../form/form-store';
 import { t } from '../index';
@@ -73,14 +72,11 @@ const messageFromPreview = (
   });
 };
 
-const renderConnected = (
-  iframeRef: RefObject<HTMLIFrameElement | null>,
-  plugins: PluginManifest[] = []
-) =>
+const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [stringFieldPlugin, coreValidatorsPlugin, ...plugins],
+        plugins: [stringFieldPlugin, coreValidatorsPlugin],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -206,31 +202,6 @@ describe('usePreviewConnection reference resolution', () => {
 });
 
 describe('usePreviewConnection', () => {
-  it('sends the branch the media plugin reads from', async () => {
-    const media: MediaSlice = {
-      upload: async () => '',
-      list: async () => ({ items: [] }),
-      delete: async () => {},
-      resolveUrl: (mediaPath) => mediaPath,
-      mediaBranch: () => 'feat/x',
-    };
-    const mediaPlugin = definePlugin({
-      name: 'test:media:stub',
-      provides: ['media'],
-      client: async () => ({ default: { slice: () => ({ ...media }) } }),
-    });
-    const iframe = fakeIframe();
-    renderConnected(iframe.ref, [mediaPlugin]);
-    await screen.findByLabelText('Title');
-
-    await waitFor(() =>
-      expect(iframe.postMessage).toHaveBeenCalledWith(
-        valuesMessage({ title: 'Hello' }, 'feat/x'),
-        window.origin
-      )
-    );
-  });
-
   it('answers the ready handshake with the registered document', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);

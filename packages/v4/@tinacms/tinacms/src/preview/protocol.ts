@@ -11,8 +11,6 @@ export interface ReadyMessage {
 export interface ValuesMessage {
   type: typeof VALUES_MESSAGE_TYPE;
   values: TinaDocument;
-  /** The branch the editor's media plugin reads from; absent for the media branch. */
-  mediaBranch?: string;
 }
 
 export interface ActivateMessage {
@@ -22,13 +20,9 @@ export interface ActivateMessage {
 
 export const readyMessage = (): ReadyMessage => ({ type: READY_MESSAGE_TYPE });
 
-export const valuesMessage = (
-  values: TinaDocument,
-  mediaBranch?: string
-): ValuesMessage => ({
+export const valuesMessage = (values: TinaDocument): ValuesMessage => ({
   type: VALUES_MESSAGE_TYPE,
   values,
-  ...(mediaBranch === undefined ? {} : { mediaBranch }),
 });
 
 export const activateMessage = (address: string): ActivateMessage => ({
@@ -47,10 +41,7 @@ export const isReadyMessage = (data: unknown): data is ReadyMessage =>
 export const isValuesMessage = (data: unknown): data is ValuesMessage =>
   hasMessageType(data, VALUES_MESSAGE_TYPE) &&
   typeof (data as { values?: unknown }).values === 'object' &&
-  (data as { values?: unknown }).values !== null &&
-  ['undefined', 'string'].includes(
-    typeof (data as { mediaBranch?: unknown }).mediaBranch
-  );
+  (data as { values?: unknown }).values !== null;
 
 export const isActivateMessage = (data: unknown): data is ActivateMessage =>
   hasMessageType(data, ACTIVATE_MESSAGE_TYPE) &&

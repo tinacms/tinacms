@@ -15,7 +15,6 @@ import {
   useFormCollection,
   useFormId,
   useOptionalContentSlice,
-  useOptionalMediaSlice,
   useSchemaCollections,
 } from './hooks';
 
@@ -38,7 +37,6 @@ export function usePreviewConnection(
   const { fields } = useFormCollection();
   const collections = useSchemaCollections();
   const content = useOptionalContentSlice();
-  const media = useOptionalMediaSlice();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -57,10 +55,7 @@ export function usePreviewConnection(
         collections,
         ({ collection, path }) => cachedDocument(collection, path)
       );
-      target()?.postMessage(
-        valuesMessage(document, media?.mediaBranch?.()),
-        targetOrigin
-      );
+      target()?.postMessage(valuesMessage(document), targetOrigin);
     };
 
     const repost = () => {
@@ -141,7 +136,6 @@ export function usePreviewConnection(
     fields,
     collections,
     content,
-    media,
     queryClient,
   ]);
 }

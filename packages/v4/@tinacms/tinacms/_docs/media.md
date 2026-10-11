@@ -52,14 +52,11 @@ definePlugin({
 
 Content stores a media path (`posts/hero.jpg`), never a URL (ADR-022). The site turns a path into a URL with `resolveMediaUrl`, from `@tinacms/tinacms`:
 
-```tsx
+```ts
 import { resolveMediaUrl } from '@tinacms/tinacms';
-import { useTina } from '@tinacms/tinacms/adapters/react';
 import config from '../tina/config';
 
-const { data: post, mediaBranch } = useTina({ data });
-
-<img src={resolveMediaUrl(config, post.heroImage, { width: 1200, branch: mediaBranch })} />
+<img src={resolveMediaUrl(config, post.heroImage, { width: 1200 })} />
 ```
 
 `resolveMediaUrl(config, path, options?)` finds the plugin that provides `media` in the resolved config and calls its `media.resolveUrl`. The same call works in static rendering and in preview, because the preview also sends paths, not URLs. It throws `media-capability-missing` when no plugin provides `media`, and `media-plugin-no-resolve-url` when that plugin sets no `media.resolveUrl`.
@@ -69,7 +66,7 @@ const { data: post, mediaBranch } = useTina({ data });
 | `localMediaPlugin()` | `/uploads/posts/hero.jpg` (no transforms, so `options` is ignored) |
 | `tinaCloud({ clientId })` | `https://assets.tina.io/{clientId}/posts/hero.jpg?fit=crop&max-w=400` |
 
-`branch` picks the branch to read media from. In the preview, `useTina` gives it as `mediaBranch`: the editor sends the branch its media plugin reads from (`mediaBranch()` on the slice) with each values message. Outside the editor `mediaBranch` is undefined, so a static page reads the media branch of the project. `tinaCloud()` reads any other branch from `__staging/{branch}/__file/`, the same URL the editor shows. `localMediaPlugin()` ignores `branch`.
+The site has no store and no branch, so `tinaCloud()` gives URLs on the media branch of the project. The editor uses the branch in `store.branch.name`.
 
 ### The Media UI - The Media Manager
 

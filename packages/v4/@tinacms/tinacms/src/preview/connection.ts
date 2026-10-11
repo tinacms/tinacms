@@ -11,7 +11,7 @@ export interface ConnectToEditorOptions {
   previewWindow: Window;
   editorWindow: Window;
   allowedOrigin: string;
-  onValues: (values: TinaDocument, mediaBranch?: string) => void;
+  onValues: (values: TinaDocument) => void;
 }
 
 export interface PreviewConnection {
@@ -31,9 +31,7 @@ export const connectToEditor = ({
   );
   const onMessage = (event: MessageEvent) => {
     if (event.origin !== allowedOrigin || event.source !== editorWindow) return;
-    if (isValuesMessage(event.data)) {
-      onValues(event.data.values, event.data.mediaBranch);
-    }
+    if (isValuesMessage(event.data)) onValues(event.data.values);
   };
   const onClick = (event: MouseEvent) => {
     if (!(event.target instanceof Element)) return;

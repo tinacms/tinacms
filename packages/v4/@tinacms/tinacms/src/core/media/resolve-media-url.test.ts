@@ -27,10 +27,9 @@ const tinaCloudPlugin = tinaCloud({
   getToken: () => 'secret',
 });
 
-const mountedMedia = async (plugin: PluginManifest) => {
+const mountedMedia = async (plugin: PluginManifest): Promise<MediaSlice> => {
   const store = createTinaStore(await resolveClientSegments([plugin]));
-  const media = () => store.getState().media as unknown as MediaSlice;
-  return { store, media };
+  return store.getState().media as unknown as MediaSlice;
 };
 
 describe('resolveMediaUrl', () => {
@@ -89,48 +88,16 @@ describe('resolveMediaUrl', () => {
     );
   });
 
-  it('reads a TinaCloud branch from its staging folder', () => {
-    expect(
-      resolveMediaUrl(configWith(tinaCloudPlugin), 'hero.jpg', {
-        branch: 'feat/x',
-        width: 75,
-      })
-    ).toBe(
-      'https://assets.tina.io/abc/__staging/feat/x/__file/hero.jpg?fit=crop&max-w=75'
-    );
-  });
-
-  it('ignores the branch for local media', () => {
-    expect(
-      resolveMediaUrl(configWith(localMediaPlugin()), 'hero.jpg', {
-        branch: 'feat/x',
-      })
-    ).toBe('/uploads/hero.jpg');
-  });
-
   it.each([
     ['localMediaPlugin()', localMediaPlugin()],
     ['tinaCloud()', tinaCloudPlugin],
   ])('gives the same URL as the %s editor slice', async (_name, plugin) => {
-    const { media } = await mountedMedia(plugin);
+    const media = await mountedMedia(plugin);
     const config = configWith(plugin);
     for (const options of [undefined, { width: 75, height: 75 }]) {
       expect(resolveMediaUrl(config, 'posts/my hero.jpg', options)).toBe(
-        media().resolveUrl('posts/my hero.jpg', options)
+        media.resolveUrl('posts/my hero.jpg', options)
       );
     }
-  });
-
-  it('gives the TinaCloud slice URL for the branch in the store', async () => {
-    const { store, media } = await mountedMedia(tinaCloudPlugin);
-    store.setState({ branch: { name: 'feat/x' } });
-    const branch = media().mediaBranch?.();
-    expect(branch).toBe('feat/x');
-    expect(
-      resolveMediaUrl(configWith(tinaCloudPlugin), 'posts/hero.jpg', {
-        branch,
-        width: 400,
-      })
-    ).toBe(media().resolveUrl('posts/hero.jpg', { width: 400 }));
   });
 });
