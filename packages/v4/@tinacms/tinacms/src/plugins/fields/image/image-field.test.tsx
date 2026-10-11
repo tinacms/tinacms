@@ -149,13 +149,23 @@ describe('ImageField rendering', () => {
     const media = createMedia();
     renderField({ hero: HERO }, media);
     const group = await fieldGroup('Hero');
-    expect(
-      within(group).getByRole('img', { name: 'hero.jpg' })
-    ).toHaveAttribute('src', `/uploads/${HERO}?w=400&h=400`);
+    expect(within(group).getByAltText('hero.jpg')).toHaveAttribute(
+      'src',
+      `/uploads/${HERO}?w=400&h=400`
+    );
     expect(media.resolveUrl).toHaveBeenCalledWith(HERO, {
       width: 400,
       height: 400,
     });
+  });
+
+  it('hides the thumbnail until it loads', async () => {
+    renderField({ hero: HERO });
+    const group = await fieldGroup('Hero');
+    const image = within(group).getByAltText('hero.jpg');
+    expect(image).not.toBeVisible();
+    fireEvent.load(image);
+    expect(image).toBeVisible();
   });
 
   it('shows the empty state when the field is absent', async () => {
@@ -280,7 +290,7 @@ describe('ImageField missing images', () => {
   });
 
   const failToLoad = async (group: HTMLElement, name: string) => {
-    fireEvent.error(within(group).getByRole('img', { name }));
+    fireEvent.error(within(group).getByAltText(name));
     await act(() => vi.runOnlyPendingTimersAsync());
   };
 
@@ -289,7 +299,7 @@ describe('ImageField missing images', () => {
     const group = await fieldGroup('Hero');
     vi.useFakeTimers();
     await failToLoad(group, 'hero.jpg');
-    const image = within(group).getByRole('img', { name: 'hero.jpg' });
+    const image = within(group).getByAltText('hero.jpg');
     expect(image).toHaveAttribute(
       'src',
       `/uploads/${HERO}?w=400&h=400&retry=1`
@@ -306,7 +316,7 @@ describe('ImageField missing images', () => {
       await failToLoad(group, 'deleted.jpg');
       expect(within(group).queryByText(/\(missing\)/)).not.toBeInTheDocument();
     }
-    fireEvent.error(within(group).getByRole('img', { name: 'deleted.jpg' }));
+    fireEvent.error(within(group).getByAltText('deleted.jpg'));
     expect(
       within(group).getByText('posts/deleted.jpg (missing)')
     ).toBeVisible();
@@ -320,11 +330,13 @@ describe('ImageField missing images', () => {
     for (let attempt = 0; attempt < 3; attempt++) {
       await failToLoad(group, 'photo.jpg');
     }
-    fireEvent.error(within(group).getByRole('img', { name: 'photo.jpg' }));
+    fireEvent.error(within(group).getByAltText('photo.jpg'));
     expect(within(group).getByText('photo.jpg (missing)')).toBeVisible();
     vi.useRealTimers();
     await pickFromLibrary(group, 'Replace');
-    expect(within(group).getByRole('img', { name: 'photo.jpg' })).toBeVisible();
+    const image = within(group).getByAltText('photo.jpg');
+    fireEvent.load(image);
+    expect(image).toBeVisible();
     expect(within(group).queryByText(/\(missing\)/)).not.toBeInTheDocument();
   });
 });

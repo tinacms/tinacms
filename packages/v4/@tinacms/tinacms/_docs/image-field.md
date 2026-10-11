@@ -131,7 +131,8 @@ field shows a thumbnail and the file name above a "Replace" button and a
 
 The thumbnail comes from `resolveUrl(path, { width: 400, height: 400 })`, on
 the checkerboard background of the Media Manager. A provider without image
-transforms ignores the size.
+transforms ignores the size. The `<img>` stays hidden until it loads, so a
+slow or missing file never shows the broken-image icon of the browser.
 
 A required field shows no "Clear" button.
 

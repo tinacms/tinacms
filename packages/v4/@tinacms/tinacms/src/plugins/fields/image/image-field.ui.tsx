@@ -64,6 +64,7 @@ export function ImageField() {
     path: string;
     count: number;
   } | null>(null);
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
 
   useFieldActivation(() => mainButtonRef.current?.focus());
   useEffect(() => () => clearTimeout(retryTimer.current), []);
@@ -72,6 +73,13 @@ export function ImageField() {
   const canUpload = features.readOnly !== true;
   const failures = value != null && failure?.path === value ? failure.count : 0;
   const missing = failures > RETRY_DELAYS_MS.length;
+  const thumbnailSrc =
+    value == null
+      ? null
+      : withRetry(
+          media.resolveUrl(value, { width: 400, height: 400 }),
+          failures
+        );
 
   const store = (path: string) => {
     clearTimeout(retryTimer.current);
@@ -172,16 +180,19 @@ export function ImageField() {
                   />
                 </span>
               ) : (
-                <img
-                  src={withRetry(
-                    media.resolveUrl(value, { width: 400, height: 400 }),
-                    failures
-                  )}
-                  alt={mediaNameOf(value)}
+                <span
                   style={checkerboardStyle}
-                  className='size-16 shrink-0 rounded border object-cover'
-                  onError={() => imageFailed(value)}
-                />
+                  className='size-16 shrink-0 overflow-hidden rounded border'
+                >
+                  <img
+                    src={thumbnailSrc ?? undefined}
+                    alt={mediaNameOf(value)}
+                    hidden={loadedSrc !== thumbnailSrc}
+                    className='size-full object-cover'
+                    onLoad={() => setLoadedSrc(thumbnailSrc)}
+                    onError={() => imageFailed(value)}
+                  />
+                </span>
               )}
               <span className='min-w-0 flex-1 truncate text-sm' title={value}>
                 {missing ? `${value} (missing)` : mediaNameOf(value)}
