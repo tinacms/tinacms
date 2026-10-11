@@ -231,6 +231,22 @@ describe('local Data Layer with an auth plugin', () => {
     expect(res.statusCode).toBe(401);
   });
 
+  it('checks sessions when a server auth plugin overrides a client-only one', async () => {
+    const clientOnlyAuth = definePlugin({
+      name: 'test:client-auth',
+      provides: ['auth'],
+    });
+    const override = {
+      ...authPlugin,
+      name: 'test:override-auth',
+      overrides: [{ capability: 'auth' }],
+    };
+    const res = await sendNamed([clientOnlyAuth, override], 'content list', {
+      authorization: 'Bearer bad',
+    });
+    expect(res.statusCode).toBe(401);
+  });
+
   it('resolves use(capability) inside getSession', async () => {
     const composingAuth = authPluginWith({
       ping: async () => true,
