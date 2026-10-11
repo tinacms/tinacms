@@ -11,6 +11,7 @@ export interface CreateOptions {
   noTelemetry: boolean;
   projectName: string;
   verbose: boolean;
+  yes: boolean;
   theme?: string;
 }
 
@@ -34,6 +35,10 @@ export function extractOptions(args: string[]): CreateOptions {
       'Choose which directory to run this script from.'
     )
     .option('-v, --verbose', 'Enable verbose output.')
+    .option(
+      '-y, --yes',
+      'Use the default package manager, project name, and starter template.'
+    )
     .option('--noTelemetry', 'Disable anonymous telemetry that is collected.')
     .option(
       '--theme <theme>',
