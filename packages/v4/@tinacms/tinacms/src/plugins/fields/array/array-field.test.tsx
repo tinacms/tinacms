@@ -170,6 +170,34 @@ describe('ArrayField add, remove, and reorder', () => {
     const names = screen.getAllByLabelText('Name') as HTMLInputElement[];
     expect(names.map((input) => input.value)).toEqual(['Brook', 'Ivan']);
   });
+
+  it("keeps a removed item's value off the item that takes its place", async () => {
+    renderField({
+      authors: [{ name: 'Ivan' }, { name: 'Josh', age: 30 }, { name: 'Brook' }],
+    });
+    await screen.findAllByLabelText('Name');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 2' })
+    );
+    expect(valueOf('authors')).toEqual([{ name: 'Ivan' }, { name: 'Brook' }]);
+    expect(
+      screen
+        .getAllByLabelText('Age')
+        .map((input) => (input as HTMLInputElement).value)
+    ).toEqual(['', '']);
+  });
+
+  it("keeps a moved item's value with that item", async () => {
+    renderField({ authors: [{ name: 'Ivan', age: 30 }, { name: 'Brook' }] });
+    await screen.findAllByLabelText('Name');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Move item 2 up' })
+    );
+    expect(valueOf('authors')).toEqual([
+      { name: 'Brook' },
+      { name: 'Ivan', age: '30' },
+    ]);
+  });
 });
 
 describe('ArrayField dirty tracking', () => {

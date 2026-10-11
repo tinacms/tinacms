@@ -1,6 +1,6 @@
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import { get, set, useFieldArray, useFormContext } from 'react-hook-form';
 import { ingestDocument } from '../../../core/form/ingest';
 import type { TinaDocument } from '../../../core/schema/types';
 import {
@@ -27,9 +27,33 @@ export function ArrayField() {
     move,
   } = useFieldArray({ control, name: address });
 
+  // An item field that mounts without a value falls back to react-hook-form's
+  // default at its path, and array operations do not shift the defaults.
+  const shiftDefaults = (change: (defaults: unknown[]) => void) => {
+    const current: unknown = get(control._defaultValues, address);
+    const defaults = items.map((_, index) =>
+      Array.isArray(current) ? current[index] : undefined
+    );
+    change(defaults);
+    set(control._defaultValues, address, defaults);
+  };
+
   const addItem = () => {
     const item = ingestDocument({}, field.fields, { documentPath, registry });
+    shiftDefaults((defaults) => defaults.push(item));
     append(item as TinaDocument);
+  };
+
+  const removeItem = (index: number) => {
+    shiftDefaults((defaults) => defaults.splice(index, 1));
+    remove(index);
+  };
+
+  const moveItem = (from: number, to: number) => {
+    shiftDefaults((defaults) =>
+      defaults.splice(to, 0, ...defaults.splice(from, 1))
+    );
+    move(from, to);
   };
 
   return (
@@ -52,7 +76,7 @@ export function ArrayField() {
                   size='sm'
                   aria-label={`Move item ${index + 1} up`}
                   disabled={index === 0}
-                  onClick={() => move(index, index - 1)}
+                  onClick={() => moveItem(index, index - 1)}
                 >
                   Up
                 </Button>
@@ -62,7 +86,7 @@ export function ArrayField() {
                   size='sm'
                   aria-label={`Move item ${index + 1} down`}
                   disabled={index === items.length - 1}
-                  onClick={() => move(index, index + 1)}
+                  onClick={() => moveItem(index, index + 1)}
                 >
                   Down
                 </Button>
@@ -71,7 +95,7 @@ export function ArrayField() {
                   variant='outline'
                   size='sm'
                   aria-label={`Remove item ${index + 1}`}
-                  onClick={() => remove(index)}
+                  onClick={() => removeItem(index)}
                 >
                   Remove
                 </Button>

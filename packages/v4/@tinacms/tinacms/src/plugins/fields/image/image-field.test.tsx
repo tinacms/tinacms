@@ -29,6 +29,8 @@ import { required } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
 import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
+import arrayFieldPlugin from '../array/array-field.plugin';
+import stringFieldPlugin from '../string/string-field.plugin';
 import imageFieldPlugin from './image-field.plugin';
 
 const DOCUMENT_PATH = 'content/posts/hello.mdx';
@@ -96,25 +98,28 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 
 const renderField = (
   document?: TinaDocument,
-  media: MediaProvider = createMedia()
+  media: MediaProvider = createMedia(),
+  schema: CollectionSchema = collection
 ) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
         plugins: [
           imageFieldPlugin,
+          arrayFieldPlugin,
+          stringFieldPlugin,
           contentPlugin(),
           mediaPlugin(media),
           coreValidatorsPlugin,
         ],
-        schema: { collections: [collection] },
+        schema: { collections: [schema] },
       })}
       queryClient={
         new QueryClient({ defaultOptions: { queries: { retry: false } } })
       }
     >
       <FormProvider
-        collection={collection}
+        collection={schema}
         path={DOCUMENT_PATH}
         document={document}
       >
@@ -321,6 +326,42 @@ describe('ImageField missing images', () => {
     await pickFromLibrary(group, 'Replace');
     expect(within(group).getByRole('img', { name: 'photo.jpg' })).toBeVisible();
     expect(within(group).queryByText(/\(missing\)/)).not.toBeInTheDocument();
+  });
+});
+
+describe('ImageField inside an array', () => {
+  it("keeps a removed item's image off the item that takes its place", async () => {
+    const authors: CollectionSchema = {
+      name: 'post',
+      format: 'mdx',
+      fields: [
+        t.array({
+          name: 'authors',
+          label: 'Authors',
+          fields: [
+            t.string({ name: 'name', label: 'Name' }),
+            t.image({ name: 'avatar', label: 'Avatar' }),
+          ],
+        }),
+      ],
+    };
+    renderField(
+      {
+        authors: [
+          { name: 'Ivan' },
+          { name: 'Josh', avatar: HERO },
+          { name: 'Brook' },
+        ],
+      },
+      createMedia(),
+      authors
+    );
+    await screen.findAllByRole('group', { name: 'Avatar' });
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 2' })
+    );
+    expect(valueOf('authors')).toEqual([{ name: 'Ivan' }, { name: 'Brook' }]);
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 });
 
