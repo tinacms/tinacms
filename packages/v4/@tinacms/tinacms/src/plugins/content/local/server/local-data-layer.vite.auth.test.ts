@@ -236,7 +236,7 @@ describe('local Data Layer with an auth plugin', () => {
       name: 'test:client-auth',
       provides: ['auth'],
     });
-    const override = {
+    const override: PluginManifest = {
       ...authPlugin,
       name: 'test:override-auth',
       overrides: [{ capability: 'auth' }],
