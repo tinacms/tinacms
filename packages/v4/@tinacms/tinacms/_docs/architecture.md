@@ -64,6 +64,7 @@ The component gets all its data from hooks that use the address
 | `useFieldSchema()` | `FieldSchemaContext`, which holds the resolved node of the field |
 | `useFieldValue(address)` | `useController` from react-hook-form, which gives `[value, setValue]` |
 | `useFieldErrors(address)` | `useFormState` from react-hook-form, then `collectFieldErrorMessages` walks everything react-hook-form kept under `address` |
+| `useFieldList(address)` | `useFieldArray` from react-hook-form, which gives `items`, `append`, `remove` and `move`; it also moves each item's default with the item, so a list field uses it instead of `useFieldArray` |
 | `useFieldActivation(handler)` | Operates when the address of the active field is the same as this address |
 
 Each field has its own react-hook-form subscription. Thus a keystroke renders

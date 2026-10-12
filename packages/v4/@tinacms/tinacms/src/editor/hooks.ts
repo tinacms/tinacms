@@ -7,8 +7,11 @@ import {
   useRef,
 } from 'react';
 import {
+  type FieldArrayWithId,
   get,
+  set,
   useController,
+  useFieldArray,
   useFormContext,
   useFormState,
 } from 'react-hook-form';
@@ -267,6 +270,48 @@ export function useFieldValue<T = unknown>(
 ): [T, (value: T) => void] {
   const { field } = useController({ name: address });
   return [field.value as T, field.onChange as (value: T) => void];
+}
+
+export interface FieldList {
+  items: FieldArrayWithId[];
+  append: (item: TinaDocument) => void;
+  remove: (index: number) => void;
+  move: (from: number, to: number) => void;
+}
+
+// List fields use this instead of `useFieldArray`. An item field that mounts
+// without a value falls back to react-hook-form's default at its path, and
+// `useFieldArray` does not shift those defaults, so this does (#7802).
+export function useFieldList(address: FieldAddress): FieldList {
+  const { control } = useFormContext();
+  const { fields: items, ...list } = useFieldArray({ control, name: address });
+
+  const shiftDefaults = (change: (defaults: unknown[]) => void) => {
+    const current: unknown = get(control._defaultValues, address);
+    const defaults = items.map((_, index) =>
+      Array.isArray(current) ? current[index] : undefined
+    );
+    change(defaults);
+    set(control._defaultValues, address, defaults);
+  };
+
+  return {
+    items,
+    append: (item) => {
+      shiftDefaults((defaults) => defaults.push(item));
+      list.append(item);
+    },
+    remove: (index) => {
+      shiftDefaults((defaults) => defaults.splice(index, 1));
+      list.remove(index);
+    },
+    move: (from, to) => {
+      shiftDefaults((defaults) =>
+        defaults.splice(to, 0, ...defaults.splice(from, 1))
+      );
+      list.move(from, to);
+    },
+  };
 }
 
 export function useFieldErrors(address: FieldAddress): string[] {

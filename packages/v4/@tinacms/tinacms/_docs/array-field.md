@@ -145,10 +145,13 @@ The registry is necessary: `invariant` throws `array-field-no-registry` if
 
 ## The component
 
-`ArrayField` (`array-field.ui.tsx`) uses react-hook-form's own
-`useFieldArray({ control, name: address })` for add, remove, and reorder — the
-already-installed tool for exactly this job, with stable item keys so React
-does not misalign inputs across a reorder.
+`ArrayField` (`array-field.ui.tsx`) uses `useFieldList(address)`
+(`editor/hooks.ts`) for add, remove, and reorder. It wraps react-hook-form's
+`useFieldArray`, which gives stable item keys so React does not misalign inputs
+across a reorder. It also moves each item's react-hook-form default with the
+item, so a removed item's value does not land on the item that takes its place
+([#7802](https://github.com/tinacms/tinacms/issues/7802)). Any list field
+should use `useFieldList` instead of `useFieldArray` directly.
 
 For each item, for each item field, it renders `<NestedFieldRow address node>`
 (`editor/field.tsx`) — a `<Label>` pointing at the item field's own nested
