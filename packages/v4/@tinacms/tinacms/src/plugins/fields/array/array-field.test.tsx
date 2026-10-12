@@ -139,6 +139,23 @@ describe('ArrayField rendering', () => {
     renderField();
     expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
   });
+
+  it('shows a stored value that is not a list read-only, and clears it', async () => {
+    renderField({ authors: 'Ivan' });
+    expect(await screen.findByText(/not a list of items/)).toBeInTheDocument();
+    expect(screen.getByText('"Ivan"')).toBeInTheDocument();
+    expect(valueOf('authors')).toBe('Ivan');
+    await userEvent.click(screen.getAllByRole('button', { name: 'Clear' })[0]);
+    expect(valueOf('authors')).toEqual([]);
+    await waitFor(() =>
+      expect(
+        screen.queryByText(/must be a list of items/)
+      ).not.toBeInTheDocument()
+    );
+    expect(
+      screen.getAllByRole('button', { name: 'Add item' }).length
+    ).toBeGreaterThan(0);
+  });
 });
 
 describe('ArrayField add, remove, and reorder', () => {
@@ -302,7 +319,62 @@ describe('ArrayField value updates', () => {
   });
 });
 
+describe('ArrayField with a stored value of the wrong shape', () => {
+  it('blocks a save until the value is cleared, then saves without it', async () => {
+    const onSave = vi.fn(async () => {});
+    const oneArray: CollectionSchema = {
+      name: 'post',
+      label: 'Posts',
+      format: 'mdx',
+      fields: [
+        t.array({
+          name: 'authors',
+          label: 'Authors',
+          fields: [t.string({ name: 'name', label: 'Name' })],
+        }),
+      ],
+    };
+    render(
+      <TinaProvider
+        config={asResolvedConfig({ plugins: PLUGINS, schema: NO_COLLECTIONS })}
+      >
+        <FormProvider
+          collection={oneArray}
+          path={DOCUMENT_PATH}
+          document={{ authors: 'Ivan' }}
+          onSave={onSave}
+        >
+          <LabelledFields />
+          <SaveProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+    await userEvent.click(await screen.findByText('save'));
+    expect(
+      await screen.findByText('Authors must be a list of items')
+    ).toBeInTheDocument();
+    expect(onSave).not.toHaveBeenCalled();
+    await userEvent.click(screen.getAllByRole('button', { name: 'Clear' })[0]);
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Authors must be a list of items')
+      ).not.toBeInTheDocument()
+    );
+    await userEvent.click(screen.getByText('save'));
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+  });
+});
+
 describe('ArrayField validation', () => {
+  it('rejects a value that is not a list of items', async () => {
+    const descriptor = (await resolveRegistry()).get('array');
+    for (const bad of ['Ivan', 42, { name: 'Ivan' }, ['Ivan']]) {
+      expect(validateFieldWithCore(authorsNode, descriptor, bad)).toEqual([
+        'Authors must be a list of items',
+      ]);
+    }
+  });
+
   it('requires at least one item', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('array');
@@ -432,12 +504,16 @@ describe('ArrayField ingest and digest', () => {
     ).toEqual({ authors: [], tags: null, groups: null });
   });
 
-  it('refuses stored content that is not an array of objects', async () => {
+  it('keeps stored content that is not an array of objects unchanged', async () => {
     const registry = await resolveRegistry();
     for (const bad of ['oops', 42, { name: 'Ivan' }, ['Ivan'], [null]]) {
-      expect(() =>
-        ingestDocument({ authors: bad }, collection.fields, { registry })
-      ).toThrow(/expected an array of objects/);
+      const ingested = ingestDocument({ authors: bad }, collection.fields, {
+        registry,
+      });
+      expect(ingested.authors).toEqual(bad);
+      expect(
+        digestDocument(ingested, collection.fields, { registry }).authors
+      ).toEqual(bad);
     }
   });
 });

@@ -119,6 +119,16 @@ way it would at the top level.
 `parse` reads a `null` stored value as an empty object, the same way the
 `array` field reads `null` as an empty list.
 
+### A stored value of the wrong shape
+
+A hand-edited file can hold a value that is not an object, such as
+`seo: Home`. ADR-012 says a document must never fail to open, so `parse` and
+`serialize` return that value unchanged, and a save writes it back as it was.
+The schema rejects it with `<label> must be a group of fields`, and
+`validateChildren` checks no nested fields. The component shows the raw value
+read-only (`plugins/fields/uneditable-value.tsx`), with a Clear button that
+sets the field to `null`.
+
 ## The component
 
 `ObjectField` (`object-field.ui.tsx`) renders every nested field, always. An
@@ -163,5 +173,6 @@ editing for the same reason.
 - It round-trips the object through ingest and digest, including a nested field
   with its own `parse`/`serialize`.
 - It reads a `null` stored value as an empty object.
-- It refuses stored content that is not an object.
+- It keeps a stored value that is not an object unchanged through ingest and
+  digest, rejects it in validation, shows it read-only, and clears it.
 - It examines the metadata of the descriptor.

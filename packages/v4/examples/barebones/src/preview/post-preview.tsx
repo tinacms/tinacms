@@ -59,11 +59,13 @@ export function PostPreview() {
       <div {...tinaField('body')}>
         <TinaMarkdown content={post.body} />
       </div>
-      {post.authors?.map((author, index) => (
-        <p key={index} {...tinaField(`authors.${index}.name`)}>
-          {author.name}
-        </p>
-      ))}
+      {(Array.isArray(post.authors) ? post.authors : []).map(
+        (author, index) => (
+          <p key={index} {...tinaField(`authors.${index}.name`)}>
+            {author.name}
+          </p>
+        )
+      )}
       <div style={{ backgroundColor: '#33333330', padding: '1rem' }}>
         <p>Pages Reference: </p>
         <span {...tinaField('pages')}>Title of File: {post?.pages?.title}</span>

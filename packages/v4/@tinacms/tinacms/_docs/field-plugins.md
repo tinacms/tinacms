@@ -323,7 +323,7 @@ This example makes a color field:
    the hooks above does not.
 6. Add the field to `FIELDS` in `plugins/fields/stored-values.test.tsx`. A
    hand-edited file can hold any value in any field, so the component must
-   render a number, a list or an object without a crash.
+   render a value of any type without a crash.
 
 Do no more steps. You do not change the registry.
 

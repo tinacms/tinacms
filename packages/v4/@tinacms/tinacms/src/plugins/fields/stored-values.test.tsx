@@ -44,6 +44,16 @@ const FIELDS: FieldSchema[] = [
   t.select({ name: 'field', label: 'Field', options: [{ value: 'a' }] }),
   t.reference({ name: 'field', label: 'Field', collections: ['post'] }),
   t.image({ name: 'field', label: 'Field' }),
+  t.array({
+    name: 'field',
+    label: 'Field',
+    fields: [t.string({ name: 'name', label: 'Name' })],
+  }),
+  t.object({
+    name: 'field',
+    label: 'Field',
+    fields: [t.string({ name: 'name', label: 'Name' })],
+  }),
 ];
 
 // A hand-edited content file can hold any YAML or JSON value in any field.

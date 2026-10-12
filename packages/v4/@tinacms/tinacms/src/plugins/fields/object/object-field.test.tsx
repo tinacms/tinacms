@@ -143,6 +143,17 @@ describe('ObjectField rendering', () => {
     expect(title.value).toBe('');
   });
 
+  it('shows a stored value that is not an object read-only, and clears it', async () => {
+    renderField({ seo: 'Home' });
+    expect(
+      await screen.findByText(/not a group of fields/)
+    ).toBeInTheDocument();
+    expect(valueOf('seo')).toBe('Home');
+    await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+    expect(valueOf('seo')).toBeNull();
+    expect(await screen.findByLabelText('Title')).toBeInTheDocument();
+  });
+
   it('renders an object nested inside an object', async () => {
     renderField({ meta: { social: { handle: '@tina' } } });
     const handle = (await screen.findByLabelText('Handle')) as HTMLInputElement;
@@ -177,6 +188,15 @@ describe('ObjectField dirty tracking', () => {
 });
 
 describe('ObjectField validation', () => {
+  it('rejects a value that is not an object', async () => {
+    const descriptor = (await resolveRegistry()).get('object');
+    for (const bad of ['Home', 42, ['Home']]) {
+      expect(validateFieldWithCore(metaNode, descriptor, bad)).toEqual([
+        'Meta must be a group of fields',
+      ]);
+    }
+  });
+
   it('rejects an empty value on a required object field', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('object');
@@ -270,12 +290,16 @@ describe('ObjectField ingest and digest', () => {
     });
   });
 
-  it('refuses stored content that is not an object', async () => {
+  it('keeps stored content that is not an object unchanged', async () => {
     const registry = await resolveRegistry();
     for (const bad of ['oops', 42, true, ['Home']]) {
-      expect(() =>
-        ingestDocument({ seo: bad }, collection.fields, { registry })
-      ).toThrow(/expected an object/);
+      const ingested = ingestDocument({ seo: bad }, collection.fields, {
+        registry,
+      });
+      expect(ingested.seo).toEqual(bad);
+      expect(
+        digestDocument(ingested, collection.fields, { registry }).seo
+      ).toEqual(bad);
     }
   });
 });
