@@ -1,5 +1,11 @@
 # @tinacms/web-components
 
+## 0.2.2
+
+### Patch Changes
+
+- [#7780](https://github.com/tinacms/tinacms/pull/7780) [`fe16aa5`](https://github.com/tinacms/tinacms/commit/fe16aa5c6585aa5d00bc51798d3716a315684097) Thanks [@kulesy](https://github.com/kulesy)! - Update dompurify to 3.4.16 and make tina-markdown render raw HTML as plain text in DOM environments where the sanitizer cannot remove unsafe markup
+
 ## 0.2.1
 
 ### Patch Changes
