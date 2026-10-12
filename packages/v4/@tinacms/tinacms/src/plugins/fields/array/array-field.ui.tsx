@@ -142,8 +142,13 @@ function ScalarItems({
   field,
 }: ItemListProps & { field: ScalarArrayFieldSchema }) {
   const registry = useFieldRegistry();
+  const { getValues } = useFormContext();
   const [value, setValue] = useFieldValue<unknown[] | undefined>(address);
   const items = value ?? [];
+  // An edit inside an item writes `<address>.<index>`, which does not refresh
+  // `value`. Read the live list at click time, or a move or remove writes the
+  // stale list back over the edit.
+  const liveItems = (): unknown[] => getValues(address) ?? [];
   // Each row needs a key that follows its value. An index key keeps a moved or
   // removed row mounted at the old position, and the row shows a stale value.
   const keys = useRef<string[]>([]);
@@ -152,18 +157,21 @@ function ScalarItems({
   }
 
   const move = (from: number, to: number) => {
-    const next = [...items];
+    const next = [...liveItems()];
     next.splice(to, 0, ...next.splice(from, 1));
     keys.current.splice(to, 0, ...keys.current.splice(from, 1));
     setValue(next);
   };
   const remove = (index: number) => {
     keys.current = keys.current.filter((_, position) => position !== index);
-    setValue(items.filter((_, position) => position !== index));
+    setValue(liveItems().filter((_, position) => position !== index));
   };
   const addItem = () => {
     keys.current = [...keys.current, nextScalarKey()];
-    setValue([...items, registry.get(field.of.type)?.defaultValue ?? null]);
+    setValue([
+      ...liveItems(),
+      registry.get(field.of.type)?.defaultValue ?? null,
+    ]);
   };
 
   return (

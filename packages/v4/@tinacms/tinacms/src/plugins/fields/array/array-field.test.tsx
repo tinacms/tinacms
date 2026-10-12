@@ -692,6 +692,25 @@ describe('ArrayField of', () => {
     expect(await screen.findAllByLabelText('Score')).toHaveLength(3);
   });
 
+  it('keeps a value typed into a new item when the item moves', async () => {
+    renderPage({ scores: [3, 5] });
+    await screen.findAllByLabelText('Score');
+    await userEvent.click(screen.getByRole('button', { name: 'Add item' }));
+    const inputs = (await screen.findAllByLabelText(
+      'Score'
+    )) as HTMLInputElement[];
+    await userEvent.type(inputs[2], '9');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Move item 3 up' })
+    );
+    await waitFor(() => expect(pageValueOf('scores')).toEqual(['3', '9', '5']));
+    expect(
+      (screen.getAllByLabelText('Score') as HTMLInputElement[]).map(
+        (input) => input.value
+      )
+    ).toEqual(['3', '9', '5']);
+  });
+
   it('keeps an empty item empty through ingest and digest', async () => {
     const registry = await resolveRegistry();
     const fields = [
