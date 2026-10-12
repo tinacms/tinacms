@@ -1,5 +1,18 @@
 # next-tinacms-cloudinary
 
+## 24.0.6
+
+### Patch Changes
+
+- [`d908d7f`](https://github.com/tinacms/tinacms/commit/d908d7f8e01b56b3ceb24ba8a2faebb00a996c03) Thanks [@wicksipedia](https://github.com/wicksipedia)! - The upload route checks the content type the browser sends and returns 415 for HTML, XML, script or multipart types, so it no longer stores a file that a browser would run as a page.
+
+- [#7666](https://github.com/tinacms/tinacms/pull/7666) [`53686ee`](https://github.com/tinacms/tinacms/commit/53686eef0b9511e1cf638b9530c84e1b36630c89) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump `multer` from `2.2.0` to `2.4.0`, which fixes CVE-2026-88932 and the four CVEs fixed in 2.3.0.
+
+  Uploads behave the same. Both adapters accept one file in the `file` field and read `directory` from the body. The behaviour changes in 2.3 and 2.4 cover upload limits, which neither adapter sets, and escaped characters in field names.
+
+- Updated dependencies [[`7998180`](https://github.com/tinacms/tinacms/commit/799818046dcea70ea6367199cea025d7ff4b0e3d), [`15818bc`](https://github.com/tinacms/tinacms/commit/15818bce7a4b83072d2b0d4a9e96025b6ac8f14a), [`12cdee6`](https://github.com/tinacms/tinacms/commit/12cdee614c5273d1f772ee8dc18ce37b91a2197c), [`4f2758e`](https://github.com/tinacms/tinacms/commit/4f2758e3067ca2a2db40593a0e4a1040b51ad127)]:
+  - tinacms@3.14.4
+
 ## 24.0.5
 
 ### Patch Changes
