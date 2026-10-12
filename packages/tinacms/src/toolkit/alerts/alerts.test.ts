@@ -131,6 +131,15 @@ describe('Alerts', () => {
       expect(alerts.add).toHaveBeenCalledWith('error', 'Error', 560);
     });
   });
+  describe('alerts.error("Broken", { title: "Upload Failed" })', () => {
+    it('keeps the title on the alert', () => {
+      const alerts = new Alerts(events);
+
+      alerts.error('Broken', { title: 'Upload Failed' });
+
+      expect(alerts.all.pop()?.title).toBe('Upload Failed');
+    });
+  });
 });
 
 describe('suppression window', () => {

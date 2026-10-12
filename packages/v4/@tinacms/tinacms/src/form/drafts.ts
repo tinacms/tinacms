@@ -1,4 +1,5 @@
 import type { TinaDocument } from '../core/schema/types';
+import { isRecord } from '../utils/is-record';
 
 const DRAFT_KEY_PREFIX = 'tina-drafts:';
 const DRAFT_VERSION = 1;
@@ -9,9 +10,6 @@ export interface StoredDraft {
 }
 
 export const draftKey = (formId: string) => `${DRAFT_KEY_PREFIX}${formId}`;
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 const hasBlankName = (fields: Record<string, unknown>) =>
   Object.keys(fields).some((name) => name.length === 0);

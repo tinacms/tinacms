@@ -13,6 +13,14 @@ export {
   type TinaConfig,
   type TinaSchema,
 } from './config';
+export {
+  AuthError,
+  type AuthErrorCode,
+  type AuthSlice,
+  type AuthUser,
+  toUserId,
+  type UserId,
+} from './core/auth/contract';
 export type {
   ContentProvider,
   ContentSlice,
@@ -59,6 +67,10 @@ export type {
   MediaCategory,
   MediaExtension,
 } from './plugins/media-manager/media-types';
+export {
+  type TinaCloudOptions,
+  tinaCloud,
+} from './plugins/tinacloud/tinacloud.plugin';
 export {
   corePlugins,
   max,

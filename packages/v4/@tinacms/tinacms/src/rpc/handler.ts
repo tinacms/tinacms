@@ -4,7 +4,7 @@
 // A codec for richer JSON is still an open question (ADR-007).
 
 import { invariant } from '../core/invariant';
-import { capabilityMountFor } from '../core/mount';
+import { capabilityMountsFor } from '../core/mount';
 import {
   REGISTRY_CONFLICTS,
   type RegistryConflict,
@@ -116,45 +116,78 @@ export const createRpcHandler = ({
   return handler;
 };
 
-const composeServerRuntime = async (
+const composeServerSegments = async (
   plugins: PluginManifest[]
-): Promise<ServerRuntime> => {
+): Promise<Omit<ServerRuntime, 'destroy'>> => {
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
   const segmentsByNamespace = composeOverridableRegistry(
-    resolved.map((segment) => {
-      const mount = capabilityMountFor(segment.manifest);
-      return {
+    resolved.flatMap((segment) =>
+      capabilityMountsFor(segment.manifest).map((mount) => ({
         key: mount.namespace,
         value: segment,
         isOverride: mount.isOverride,
-      };
-    }),
+      }))
+    ),
     serverConflictError
   );
-  const authHooks = claimAuthTransportHooks(segmentsByNamespace);
+  return {
+    segmentsByNamespace,
+    authHooks: claimAuthTransportHooks(segmentsByNamespace),
+  };
+};
+
+const composeServerRuntime = async (
+  plugins: PluginManifest[]
+): Promise<ServerRuntime> => {
+  const composed = await composeServerSegments(plugins);
   // The init runs last, so a failed composition leaves no initialized plugin behind
   // for the next attempt. The teardown travels on the runtime: a handler that is
   // replaced rather than ending with the process — a dev server re-evaluating its
   // route module — would otherwise run every onInit again with no matching onDestroy.
   const destroy = await initializePlugins(plugins);
-  return { segmentsByNamespace, authHooks, destroy };
+  return { ...composed, destroy };
 };
 
-// Read the transport hooks from the auth segment, and remove them from its routable
-// ops. The dispatch then returns 404 for their names through its normal lookup.
+// Runs no onInit, so a getSession must not depend on state that onInit sets.
+// The local Data Layer checks its requests through this.
+export const createRequestAuthorizer = (plugins: PluginManifest[]) => {
+  let composing: Promise<ServerRuntime> | null = null;
+  return async (
+    request: Request,
+    permissions: (string | undefined)[]
+  ): Promise<Response | null> => {
+    composing ??= composeServerSegments(plugins).then(
+      (composed) => ({ ...composed, destroy: async () => {} }),
+      (cause) => {
+        composing = null;
+        throw cause;
+      }
+    );
+    const runtime = await composing;
+    return serverRuntimeStorage.run(runtime, () =>
+      authorizeRequest(runtime, request, permissions)
+    );
+  };
+};
+
+// Read the transport hooks from the auth segment, and remove them from the routable
+// ops of every segment that provides auth. A plugin providing several singletons
+// mounts its one segment at each, so `media/getSession` would otherwise route. The
+// dispatch then returns 404 for their names through its normal lookup.
 // Without a callable getSession, this returns null, so every non-public op fails
 // closed. A rolePermissions that is not callable fails the composition.
 const claimAuthTransportHooks = (
   segmentsByNamespace: Map<string, ResolvedServerSegment>
 ): AuthTransportHooks | null => {
   const authSegment = segmentsByNamespace.get(AUTH_CAPABILITY);
+  for (const [namespace, segment] of segmentsByNamespace) {
+    if (!segment.manifest.provides.includes(AUTH_CAPABILITY)) continue;
+    const { getSession, rolePermissions, ...routableOps } = segment.ops;
+    segmentsByNamespace.set(namespace, { ...segment, ops: routableOps });
+  }
   if (!authSegment) return null;
-  const { getSession, rolePermissions, ...routableOps } = authSegment.ops;
-  segmentsByNamespace.set(AUTH_CAPABILITY, {
-    ...authSegment,
-    ops: routableOps,
-  });
+  const { getSession, rolePermissions } = authSegment.ops;
   if (typeof getSession !== 'function') return null;
   invariant(
     rolePermissions === undefined || typeof rolePermissions === 'function',
@@ -270,31 +303,11 @@ const authorizeAndInvokeOp = async (
   // `requires`, because a caller with no session has no permissions to check.
   const meta = opMeta(op);
   if (!meta.public) {
-    if (!runtime.authHooks) {
-      return errorResponse(401, 'unauthenticated', 'No CMS session.');
-    }
-    const session = await runtime.authHooks.getSession(request);
-    if (!session) {
-      return errorResponse(401, 'unauthenticated', 'No CMS session.');
-    }
-    for (const permission of [
+    const refusal = await authorizeRequest(runtime, request, [
       mounted.manifest.requires?.permission,
       meta.permission,
-    ]) {
-      if (!permission) continue;
-      const allowed = await hasPermission(
-        runtime.authHooks,
-        session,
-        permission
-      );
-      if (!allowed) {
-        return errorResponse(
-          403,
-          'forbidden',
-          `Requires the "${permission}" permission.`
-        );
-      }
-    }
+    ]);
+    if (refusal) return refusal;
   }
 
   let input: unknown;
@@ -309,6 +322,33 @@ const authorizeAndInvokeOp = async (
 
   const result = await invokeOp(op, input);
   return Response.json(result ?? null);
+};
+
+// A refusal, or null when the session grants every permission.
+const authorizeRequest = async (
+  runtime: ServerRuntime,
+  request: Request,
+  permissions: (string | undefined)[]
+): Promise<Response | null> => {
+  if (!runtime.authHooks) {
+    return errorResponse(401, 'unauthenticated', 'No CMS session.');
+  }
+  const session = await runtime.authHooks.getSession(request);
+  if (!session) {
+    return errorResponse(401, 'unauthenticated', 'No CMS session.');
+  }
+  for (const permission of permissions) {
+    if (!permission) continue;
+    const allowed = await hasPermission(runtime.authHooks, session, permission);
+    if (!allowed) {
+      return errorResponse(
+        403,
+        'forbidden',
+        `Requires the "${permission}" permission.`
+      );
+    }
+  }
+  return null;
 };
 
 // The own-property check and the function check keep the prototype members, such as
