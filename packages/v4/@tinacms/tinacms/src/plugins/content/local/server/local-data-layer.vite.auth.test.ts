@@ -260,6 +260,19 @@ describe('local Data Layer with an auth plugin', () => {
     expect(res.statusCode).toBe(200);
   });
 
+  it('checks the permission the winning media plugin requires', async () => {
+    const override: PluginManifest = {
+      ...localMediaPlugin(),
+      name: 'test:media',
+      overrides: [{ capability: 'media' }],
+      requires: { permission: 'media:admin' },
+    };
+    const res = await sendNamed([authPlugin, override], 'media list', {
+      authorization: 'Bearer good',
+    });
+    expect(res.statusCode).toBe(403);
+  });
+
   it('resolves use(capability) inside getSession', async () => {
     const composingAuth = authPluginWith({
       ping: async () => true,

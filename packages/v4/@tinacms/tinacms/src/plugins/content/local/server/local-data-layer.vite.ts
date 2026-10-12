@@ -149,9 +149,8 @@ const createSessionGate = (
 ): SessionGate | null => {
   if (!capabilityProvider(plugins, AUTH_CAPABILITY)?.server) return null;
   const authorize = createRequestAuthorizer(plugins);
-  const permission = plugins.find(({ provides }) =>
-    provides.includes(capability)
-  )?.requires?.permission;
+  const permission = capabilityProvider(plugins, capability)?.requires
+    ?.permission;
   return async (req, res) => {
     try {
       const refusal = await authorize(sessionRequestOf(req), [permission]);

@@ -41,7 +41,15 @@ export const tinaCloudUser = {
   id: 'ada',
   email: 'ada@example.com',
   fullName: 'Ada Lovelace',
-  role: 'admin',
   verified: true,
   enabled: true,
 };
+
+/** Answers the two TinaCloud identity lookups that sign-in makes. */
+export const tinaCloudIdentity = (
+  url: string,
+  {
+    user = tinaCloudUser,
+    role = 'admin',
+  }: { user?: object; role?: string } = {}
+) => Response.json(url.endsWith('/currentUser') ? user : { role });

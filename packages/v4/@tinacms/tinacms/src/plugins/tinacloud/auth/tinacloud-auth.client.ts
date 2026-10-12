@@ -1,3 +1,4 @@
+import type { z } from 'zod';
 import { AuthError, type AuthSlice } from '../../../core/auth/contract';
 import type { SliceSet } from '../../../core/plugin';
 import { isRecord } from '../../../utils/is-record';
@@ -13,6 +14,8 @@ import {
   currentUserUrl,
   jwtPayloadSchema,
   loginMessageSchema,
+  projectRolesSchema,
+  projectUrl,
   refreshResponseSchema,
 } from './tinacloud-auth-types';
 import { openCenteredPopup, waitForPopupMessage } from './popup';
@@ -76,14 +79,21 @@ const send = async (
   return { response, body };
 };
 
-const fetchUser = async (clientId: string, bearer: string) => {
-  const { response, body } = await send(currentUserUrl(clientId), {
+const fetchIdentity = async <Output>(
+  url: string,
+  bearer: string,
+  schema: z.ZodType<Output, z.ZodTypeDef, unknown>
+): Promise<Output> => {
+  const { response, body } = await send(url, {
     headers: { Authorization: `Bearer ${bearer}` },
   });
-  if (response.status === 401 || response.status === 403) {
+  if (response.status === 401) {
+    throw new AuthError('unauthenticated', 'TinaCloud refused the session.');
+  }
+  if (response.status === 403) {
     throw new AuthError(
-      'unauthenticated',
-      `TinaCloud refused the session with ${response.status}.`
+      'no-access',
+      'TinaCloud refused access to the project.'
     );
   }
   if (!response.ok) {
@@ -92,11 +102,11 @@ const fetchUser = async (clientId: string, bearer: string) => {
       `TinaCloud responded with ${response.status}.`
     );
   }
-  const parsed = currentUserSchema.safeParse(body);
+  const parsed = schema.safeParse(body);
   if (!parsed.success) {
     throw new AuthError(
       'invalid-response',
-      'TinaCloud returned the user in an unknown format.'
+      `TinaCloud returned ${url} in an unknown format.`
     );
   }
   return parsed.data;
@@ -185,13 +195,8 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
       if (tokens === current) tokens = next;
       return tokens;
     } catch (cause) {
-      if (
-        tokens === current &&
-        cause instanceof AuthError &&
-        cause.code === 'expired'
-      ) {
-        signOut();
-      }
+      if (tokens !== current) return tokens && freshTokens(tokens);
+      if (cause instanceof AuthError && cause.code === 'expired') signOut();
       throw cause;
     } finally {
       if (refreshing === pending) refreshing = undefined;
@@ -212,7 +217,18 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
       message.id_token,
       message.refresh_token
     );
-    const { user, roles, active } = await fetchUser(clientId, next.bearer);
+    const { user, active } = await fetchIdentity(
+      currentUserUrl(clientId),
+      next.bearer,
+      currentUserSchema
+    );
+    const roles = active
+      ? await fetchIdentity(
+          projectUrl(clientId),
+          next.bearer,
+          projectRolesSchema
+        )
+      : [];
     if (signOuts !== signOutsAtStart) return;
     refreshing = undefined;
     if (!active) {

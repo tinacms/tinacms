@@ -16,10 +16,7 @@ export const openCenteredPopup = (
     `popup,width=${width},height=${height},left=${left},top=${top}`
   );
   if (!popup) {
-    throw new AuthError(
-      'unauthenticated',
-      'The browser blocked the sign-in popup. Allow popups for this site.'
-    );
+    throw new AuthError('popup-blocked', 'window.open returned null.');
   }
   return popup;
 };

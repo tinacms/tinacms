@@ -40,6 +40,9 @@ export interface AuthTransportHooks {
 const AUTH_ERROR_MESSAGES = {
   unauthenticated: 'You are signed out. Sign in to continue.',
   expired: 'Your session has expired. Sign in again.',
+  'no-access': 'This account has no access to this project.',
+  'popup-blocked':
+    'The browser blocked the sign-in window. Allow popups for this site.',
   network: "Can't reach the sign-in service. Check your connection.",
   'invalid-response':
     'The sign-in service sent a response that Tina cannot read.',

@@ -21,16 +21,20 @@ export const refreshResponseSchema = z.object({
 
 export const jwtPayloadSchema = z.object({ exp: z.number() });
 
+// TinaCloud sends a missing name or email as "".
+const optionalText = z
+  .string()
+  .optional()
+  .transform((text) => text || undefined);
+
 export const currentUserSchema = z
   .object({
-    id: z.string().min(1).optional(),
-    email: z.string().min(1).optional(),
-    fullName: z.string().min(1).optional(),
-    role: z.string().optional(),
+    id: optionalText,
+    email: optionalText,
+    fullName: optionalText,
     verified: z.boolean().optional(),
-    enabled: z.boolean().optional(),
   })
-  .transform(({ id, email, fullName, role, verified, enabled }, context) => {
+  .transform(({ id, email, fullName, verified }, context) => {
     const userId = id ?? email;
     if (!userId) {
       context.addIssue({
@@ -40,12 +44,19 @@ export const currentUserSchema = z
       return z.NEVER;
     }
     const user: AuthUser = { id: toUserId(userId), name: fullName, email };
-    return {
-      user,
-      roles: [role === 'admin' ? 'admin' : 'editor'],
-      active: verified === true && enabled !== false,
-    };
+    return { user, active: verified === true };
   });
 
+// As TinaCloud's CanAdminApp: a project owner or admin, or an org admin or
+// superuser, whose role TinaCloud sends as "" because they have no project row.
+export const projectRolesSchema = z
+  .object({ role: z.string().optional() })
+  .transform(({ role = '' }) => [
+    ['', 'admin', 'owner'].includes(role.toLowerCase()) ? 'admin' : 'editor',
+  ]);
+
+export const projectUrl = (clientId: string) =>
+  `${TINACLOUD_IDENTITY_URL}/v2/apps/${encodeURIComponent(clientId)}`;
+
 export const currentUserUrl = (clientId: string) =>
-  `${TINACLOUD_IDENTITY_URL}/v2/apps/${encodeURIComponent(clientId)}/currentUser`;
+  `${projectUrl(clientId)}/currentUser`;
