@@ -17,7 +17,7 @@ const staleLockFileHint = (messages: string[]) => {
   if (!hasEmptyRootType) {
     return '';
   }
-  return `\n\nThe remote schema has no collections, which usually means tina/tina-lock.json is out of date. Only \`tinacms dev\` regenerates that file, so a project that only runs \`tinacms build\` keeps publishing a stale lock file. Run \`tinacms dev\` locally, then commit and push tina/tina-lock.json.`;
+  return `\n\nThe remote schema has no collections, which usually means tina/tina-lock.json is out of date. Run \`tinacms build\` or \`tinacms dev\` locally, then commit and push tina/tina-lock.json.`;
 };
 
 export const fetchRemoteGraphqlSchema = async ({
