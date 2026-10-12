@@ -1,5 +1,21 @@
 # tinacms-cli
 
+## 4.0.2
+
+### Patch Changes
+
+- [#7051](https://github.com/tinacms/tinacms/pull/7051) [`5b3bcfb`](https://github.com/tinacms/tinacms/commit/5b3bcfb7bcdbbf7868e89bd2ffbfc6ec57ca6e4e) Thanks [@kulesy](https://github.com/kulesy)! - `tinacms build` now regenerates `tina/tina-lock.json`, which TinaCloud reads to index your schema. Before this, only `tinacms dev` wrote it, so a project that changed its schema and only ran `tinacms build` locally committed a stale lock file. A build in CI still doesn't commit the file, so after a schema change run `tinacms build` or `tinacms dev` locally and push `tina/tina-lock.json`.
+
+- [#7786](https://github.com/tinacms/tinacms/pull/7786) [`34e54fa`](https://github.com/tinacms/tinacms/commit/34e54faecddca4ea057b74f44e43b91a195f0d59) Thanks [@kulesy](https://github.com/kulesy)! - When `tinacms build` stops on a failed TinaCloud index, print the reason TinaCloud gives, such as the YAML error behind "Unable to seed", instead of only the file name or the word "undefined".
+
+- [#7722](https://github.com/tinacms/tinacms/pull/7722) [`f3cf692`](https://github.com/tinacms/tinacms/commit/f3cf6922cfa178e0e301547df88d6565d8a305a8) Thanks [@wicksipedia](https://github.com/wicksipedia)! - The self-hosted init template now shows the `authCollection.admins` option. `tinacms init` now notes that the built-in self-hosted login is not production grade and points to dedicated auth providers.
+
+- Updated dependencies [[`7998180`](https://github.com/tinacms/tinacms/commit/799818046dcea70ea6367199cea025d7ff4b0e3d), [`15818bc`](https://github.com/tinacms/tinacms/commit/15818bce7a4b83072d2b0d4a9e96025b6ac8f14a), [`f3cf692`](https://github.com/tinacms/tinacms/commit/f3cf6922cfa178e0e301547df88d6565d8a305a8), [`12cdee6`](https://github.com/tinacms/tinacms/commit/12cdee614c5273d1f772ee8dc18ce37b91a2197c), [`4f2758e`](https://github.com/tinacms/tinacms/commit/4f2758e3067ca2a2db40593a0e4a1040b51ad127)]:
+  - tinacms@3.14.4
+  - @tinacms/graphql@4.0.0
+  - @tinacms/app@2.5.15
+  - @tinacms/search@1.2.26
+
 ## 4.0.1
 
 ### Patch Changes
