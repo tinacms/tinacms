@@ -51,6 +51,15 @@ operate at the same time, and one plugin can register many validators; the key
 is the validator's name. Many hook plugins can operate at the same time, and
 one plugin can register many hooks; the key is the hook's name.
 
+`auth`, `content`, `media` and `search` are singleton capabilities. One plugin
+provides each, and its store slice mounts at the capability key, for example
+`store.media`. One plugin can provide several singletons, such as
+`provides: ['auth', 'media']`. Its client segment then sets `slices`, keyed by
+capability, instead of `slice`, and its server segment routes under each
+capability, for example `auth/<op>` and `media/<op>`. Another plugin can
+replace one of those capabilities with `overrides`, and the rest stay with the
+first plugin.
+
 ## Validator plugins
 
 A validator plugin registers named, parameterised rules that a collection
@@ -116,17 +125,12 @@ returns the hooks to run. Every hook is optional.
 // tina/hooks.ts
 import { defineHook, defineHooksPlugin } from '@tinacms/tinacms';
 
-export const requireStarsToPublish = defineHook(
-  'requireStarsToPublish',
-  () => ({
-    beforeSave: (document) => {
-      if (document.status === 'published' && !document.stars) {
-        throw new Error('Rate the post before you publish it');
-      }
-      return document;
-    },
-  })
-);
+export const trimTitle = defineHook('trimTitle', () => ({
+  beforeSave: (document) => ({
+    ...document,
+    title: String(document.title ?? '').trim(),
+  }),
+}));
 
 export const logSave = defineHook('logSave', (prefix: string) => ({
   afterSave: (_document, { path }) => {
@@ -135,12 +139,12 @@ export const logSave = defineHook('logSave', (prefix: string) => ({
 }));
 
 export const hooksPlugin = defineHooksPlugin('example:hooks', [
-  requireStarsToPublish,
+  trimTitle,
   logSave,
 ]);
 
 // tina/config.ts
-import { hooksPlugin, logSave, requireStarsToPublish } from './hooks';
+import { hooksPlugin, logSave, trimTitle } from './hooks';
 
 export default defineConfig({
   plugins: [localContentPlugin(), hooksPlugin],
@@ -149,7 +153,7 @@ export default defineConfig({
 
 export const postCollection = {
   name: 'post',
-  hooks: [requireStarsToPublish(), logSave('saved')],
+  hooks: [trimTitle(), logSave('saved')],
   fields: [...],
 };
 ```
@@ -167,23 +171,21 @@ long form.
 import { type HookRef, definePlugin } from '@tinacms/tinacms';
 import { type JsonValue, defineClientPlugin } from '@tinacms/tinacms/client';
 
-export const requireStarsToPublish = (): HookRef => ({ name: 'requireStarsToPublish' });
+export const trimTitle = (): HookRef => ({ name: 'trimTitle' });
 export const logSave = (prefix: string): HookRef => ({ name: 'logSave', args: [prefix] });
 
 export const hooksPlugin = definePlugin({
   name: 'example:hooks',
   provides: ['hooks'],
-  hooks: ['requireStarsToPublish', 'logSave'],
+  hooks: ['trimTitle', 'logSave'],
   client: async () => ({
     default: defineClientPlugin({
       hooks: {
-        requireStarsToPublish: () => ({
-          beforeSave: (document) => {
-            if (document.status === 'published' && !document.stars) {
-              throw new Error('Rate the post before you publish it');
-            }
-            return document;
-          },
+        trimTitle: () => ({
+          beforeSave: (document) => ({
+            ...document,
+            title: String(document.title ?? '').trim(),
+          }),
         }),
         logSave: (prefix: JsonValue) => ({
           afterSave: (_document, { path }) => console.info(`${String(prefix)} ${path}`),
@@ -204,6 +206,11 @@ as a field plugin.
 | `onChange` | on every field value change | `{ address, value }` of the changed field; `value` is the form value, not the stored one | `void`, synchronously |
 
 Every hook also receives a scope: `{ formId, path, collection }`.
+
+A hook transforms the document. A rule about a field is a field validator,
+also when the rule reads other fields. The validator reads them through
+`siblings`, and the form shows its message at that field. A `beforeSave`
+throw cannot point at a field, so the editor sees it only at the save button.
 
 These hooks run in the browser. A `beforeSave` throw stops the save in the
 form only. A direct call to the content API does not run it. Enforcement
@@ -270,5 +277,6 @@ Two overrides of one screen throw an error at boot
     supplies, and the markdown body that it controls
 - [Media plugins](./media-plugins.md) — how a plugin stores media, and the local media plugin
   - [The Media Manager](./media-manager.md) — the screen to browse, upload, rename and delete media, and the `MediaBrowser` component
+- [Auth plugins](./auth-plugins.md): how a plugin verifies a request and signs the editor in
 - [UI slots](./ui-slots.md) — how a plugin adds entries to the admin sidebar
 - [Architecture](./architecture.md) — how a plugin gets to the screen

@@ -1,8 +1,10 @@
 # Media plugins
 
 A media plugin supplies the `media` capability. `media` is a singleton
-capability: a project installs one media plugin. A second media plugin throws
-an error at boot, unless it declares `overrides`. Refer to
+capability: a project installs one plugin that provides `media`. A second one
+throws an error at boot, unless it declares `overrides`. The plugin can provide
+other singleton capabilities too, with one slice for each in `slices`. Refer
+to [plugins.md](./plugins.md#capabilities). Refer to
 [ADR-022](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/022-media-capability-contract.md)
 for the decision.
 
@@ -114,3 +116,57 @@ The content endpoint uses the same checks.
 
 The plugin rejects a path that goes outside the media folder, through `..` or
 through a symbolic link. It rejects a file name that holds a path separator.
+
+## `tinaCloud()`
+
+`tinaCloud()` keeps media in TinaCloud. It provides `media`, with one slice in
+`slices.media`. A later release adds the `auth` capability to the same plugin.
+
+```ts
+import { defineConfig, localContentPlugin, tinaCloud } from '@tinacms/tinacms';
+
+export default defineConfig({
+  plugins: [
+    localContentPlugin(),
+    tinaCloud({ clientId: '<client id>', getToken: () => readToken() }),
+  ],
+  schema: { collections: [] },
+});
+```
+
+| Option | Role |
+|---|---|
+| `clientId` | The client ID of the TinaCloud project. |
+| `getToken` | Returns the TinaCloud access token of the editor, or `undefined`. It can return a promise. |
+
+`getToken` is interim. When `tinaCloud()` provides `auth`, the plugin gets the
+token itself and the option goes. Until then, the app supplies the token. With
+no token, each operation fails with `unauthorized`.
+
+The slice supplies `rename`, `features.search`, `features.extensionFilter` and
+a `features.maxSize` of 100 MB. `resolveUrl` gives a CDN URL, and a size adds
+a crop: `?fit=crop&max-w=400&max-h=400`.
+
+### Branch
+
+Each operation reads the branch from `store.branch.name` when it runs. If
+`name` is not set, the operation uses the default branch of the TinaCloud
+project. The branch is not a config option: it is operational data that the
+Data Layer owns (ADR-019, ADR-024). No plugin writes `store.branch.name` yet,
+so all operations use the default branch.
+
+On first use the slice reads the project from
+`https://identity.tinajs.io/v2/apps/{clientId}` for its default branch and its
+media branch, then keeps it for the session.
+
+| Branch | URL of `posts/hero.jpg` |
+|---|---|
+| The media branch | `https://assets.tina.io/{clientId}/posts/hero.jpg` |
+| Any other branch | `https://assets.tina.io/{clientId}/__staging/{branch}/__file/posts/hero.jpg` |
+
+### Not supported yet
+
+- The `auth` capability. It replaces `getToken`.
+- Media on an editorial workflow branch.
+- Static media, built at build time.
+- An assets API URL other than `https://assets.tinajs.io`.

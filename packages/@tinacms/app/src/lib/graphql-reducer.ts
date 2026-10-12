@@ -18,11 +18,11 @@ import {
   TinaState,
   isSessionExpiredError,
   resolveField,
+  showErrorModal,
   useCMS,
 } from 'tinacms';
 import { z } from 'zod';
 import { FormifyCallback, createForm, createGlobalForm } from './build-form';
-import { showErrorModal } from './errors';
 import { expandQuery, isConnectionType, isNodeType } from './expand-query';
 import {
   getPreviewOrigin,
@@ -722,12 +722,13 @@ const onSubmit = async (
   } catch (e) {
     // request() already sent the user back to the login modal; no alert over it
     if (isSessionExpiredError(e)) throw e;
-    cms.alerts.error(() =>
-      ErrorDialog({
-        title: 'There was a problem saving your document',
-        message: 'Tina caught an error while updating the page',
-        error: e,
-      })
+    cms.alerts.error(
+      () =>
+        ErrorDialog({
+          message: 'Tina caught an error while updating the page',
+          error: e,
+        }),
+      { title: 'Save Failed' }
     );
     console.error(e);
   }
