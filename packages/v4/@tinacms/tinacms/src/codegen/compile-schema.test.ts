@@ -133,6 +133,27 @@ describe('compileSchema with an array of scalar items', () => {
     expect(lock.primitives).toEqual({ array: 1, datetime: 2 });
   });
 
+  it('pins the type of an of field inside a template', () => {
+    const lock = compileSchema(
+      configWith(
+        [
+          {
+            name: 'blocks',
+            type: 'array',
+            templates: [
+              {
+                name: 'gallery',
+                fields: [tags({ name: 'at', type: 'datetime' })],
+              },
+            ],
+          },
+        ],
+        [fieldPlugin('array', 1), fieldPlugin('datetime', 2)]
+      )
+    );
+    expect(lock.primitives).toEqual({ array: 1, datetime: 2 });
+  });
+
   it('rejects an unregistered validator on the of field', () => {
     expect(() =>
       compileSchema(

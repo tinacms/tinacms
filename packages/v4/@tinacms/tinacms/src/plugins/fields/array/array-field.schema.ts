@@ -103,6 +103,16 @@ export const asArrayFieldSchema = (node: FieldSchema): ArrayFieldSchema => {
     'array-field-schema-invalid',
     `The array field "${node.name}" needs "templates" to be an array with at least one template.`
   );
+  const names = Array.isArray(candidate.templates)
+    ? candidate.templates.map((template: unknown) =>
+        isRecord(template) ? template.name : undefined
+      )
+    : [];
+  invariant(
+    new Set(names).size === names.length,
+    'array-field-schema-invalid',
+    `The array field "${node.name}" declares two templates with the same name.`
+  );
   invariant(
     candidate.of === undefined ||
       (isRecord(candidate.of) && typeof candidate.of.type === 'string'),

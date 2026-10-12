@@ -430,6 +430,18 @@ describe('asArrayFieldSchema', () => {
     expect(() => asArrayFieldSchema(badOf)).toThrow(/a field with a "type"/);
   });
 
+  it('throws on two templates with the same name', () => {
+    const node = {
+      name: 'blocks',
+      type: 'array',
+      templates: [
+        { name: 'hero', fields: [] },
+        { name: 'hero', fields: [] },
+      ],
+    } as FieldSchema;
+    expect(() => asArrayFieldSchema(node)).toThrow(/same name/);
+  });
+
   it('throws when fields is not an array', () => {
     const node = { name: 'authors', type: 'array', fields: {} } as FieldSchema;
     expect(() => asArrayFieldSchema(node)).toThrow(/to be an array/);
@@ -586,11 +598,15 @@ describe('ArrayField templates', () => {
       ],
     });
     expect(
-      ((await screen.findByLabelText('Headline')) as HTMLInputElement).value
+      (
+        (await screen.findByRole('textbox', {
+          name: 'Headline',
+        })) as HTMLInputElement
+      ).value
     ).toBe('Hi');
-    expect((screen.getByLabelText('Link') as HTMLInputElement).value).toBe(
-      '/docs'
-    );
+    expect(
+      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+    ).toBe('/docs');
     expect(screen.getByText('Hero')).toBeInTheDocument();
     expect(screen.getByText('Call to action')).toBeInTheDocument();
   });
@@ -601,7 +617,11 @@ describe('ArrayField templates', () => {
       await screen.findByRole('button', { name: 'Add Hero' })
     );
     expect(
-      ((await screen.findByLabelText('Headline')) as HTMLInputElement).value
+      (
+        (await screen.findByRole('textbox', {
+          name: 'Headline',
+        })) as HTMLInputElement
+      ).value
     ).toBe('Welcome');
     await waitFor(() =>
       expect(pageValueOf('blocks')).toEqual([
@@ -617,7 +637,7 @@ describe('ArrayField templates', () => {
         { _template: 'cta', link: '/docs' },
       ],
     });
-    await screen.findByLabelText('Headline');
+    await screen.findByRole('textbox', { name: 'Headline' });
     await userEvent.click(
       screen.getByRole('button', { name: 'Move item 2 up' })
     );
@@ -627,6 +647,41 @@ describe('ArrayField templates', () => {
         { _template: 'hero', headline: 'Hi' },
       ])
     );
+  });
+
+  it('edits a field of a template item and writes it back', async () => {
+    renderPage({ blocks: [{ _template: 'cta', link: '/docs' }] });
+    const link = await screen.findByRole('textbox', { name: 'Link' });
+    await userEvent.type(link, '/v4');
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { _template: 'cta', link: '/docs/v4' },
+      ])
+    );
+  });
+
+  it('removes a template item and keeps the others', async () => {
+    renderPage({
+      blocks: [
+        { _template: 'hero', headline: 'Hi' },
+        { _template: 'cta', link: '/docs' },
+      ],
+    });
+    await screen.findByRole('textbox', { name: 'Headline' });
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { _template: 'cta', link: '/docs' },
+      ])
+    );
+    expect(
+      screen.queryByRole('textbox', { name: 'Headline' })
+    ).not.toBeInTheDocument();
+    expect(
+      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+    ).toBe('/docs');
   });
 
   it("validates each item against its own template's fields", async () => {
@@ -668,10 +723,12 @@ describe('ArrayField of', () => {
   it('renders, edits, adds, reorders and removes scalar items', async () => {
     renderPage({ scores: [3, 5, 7] });
     const shown = () =>
-      (screen.getAllByLabelText('Score') as HTMLInputElement[]).map(
-        (input) => input.value
-      );
-    await screen.findAllByLabelText('Score');
+      (
+        screen.getAllByRole('spinbutton', {
+          name: 'Score',
+        }) as HTMLInputElement[]
+      ).map((input) => input.value);
+    await screen.findAllByRole('spinbutton', { name: 'Score' });
     expect(shown()).toEqual(['3', '5', '7']);
 
     await userEvent.click(
@@ -684,30 +741,37 @@ describe('ArrayField of', () => {
     );
     await waitFor(() => expect(shown()).toEqual(['7', '5']));
 
-    await userEvent.type(screen.getAllByLabelText('Score')[0], '1');
+    await userEvent.type(
+      screen.getAllByRole('spinbutton', { name: 'Score' })[0],
+      '1'
+    );
     await waitFor(() => expect(pageValueOf('scores')).toEqual(['71', '5']));
     expect(shown()).toEqual(['71', '5']);
 
     await userEvent.click(screen.getByRole('button', { name: 'Add item' }));
-    expect(await screen.findAllByLabelText('Score')).toHaveLength(3);
+    expect(
+      await screen.findAllByRole('spinbutton', { name: 'Score' })
+    ).toHaveLength(3);
   });
 
   it('keeps a value typed into a new item when the item moves', async () => {
     renderPage({ scores: [3, 5] });
-    await screen.findAllByLabelText('Score');
+    await screen.findAllByRole('spinbutton', { name: 'Score' });
     await userEvent.click(screen.getByRole('button', { name: 'Add item' }));
-    const inputs = (await screen.findAllByLabelText(
-      'Score'
-    )) as HTMLInputElement[];
+    const inputs = (await screen.findAllByRole('spinbutton', {
+      name: 'Score',
+    })) as HTMLInputElement[];
     await userEvent.type(inputs[2], '9');
     await userEvent.click(
       screen.getByRole('button', { name: 'Move item 3 up' })
     );
     await waitFor(() => expect(pageValueOf('scores')).toEqual(['3', '9', '5']));
     expect(
-      (screen.getAllByLabelText('Score') as HTMLInputElement[]).map(
-        (input) => input.value
-      )
+      (
+        screen.getAllByRole('spinbutton', {
+          name: 'Score',
+        }) as HTMLInputElement[]
+      ).map((input) => input.value)
     ).toEqual(['3', '9', '5']);
   });
 

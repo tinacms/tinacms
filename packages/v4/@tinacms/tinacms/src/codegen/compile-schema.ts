@@ -56,12 +56,7 @@ const registeredValidatorsOf = (plugins: PluginManifest[]): Set<string> =>
   );
 
 const templateFieldTypesIn = (templates: TemplateSchema[] = []): string[] =>
-  templates.flatMap((template) =>
-    (template.fields ?? []).flatMap((nested) => [
-      ...(nested.type ? [nested.type] : []),
-      ...templateFieldTypesIn(nested.templates),
-    ])
-  );
+  templates.flatMap((template) => fieldTypesIn(template.fields ?? []));
 
 // An array with `of` nests one field. `FieldSchema` does not declare it, because
 // only the array plugin owns that key.

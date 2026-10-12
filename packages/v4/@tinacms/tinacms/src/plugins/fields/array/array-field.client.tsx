@@ -4,7 +4,9 @@ import { invariant } from '../../../core/invariant';
 import type { TinaDocument } from '../../../core/schema/types';
 import { validateFieldTree } from '../../../core/validation';
 import {
+  type FieldsArrayFieldSchema,
   TEMPLATE_KEY,
+  type TemplatesArrayFieldSchema,
   arraySchema,
   asArrayFieldSchema,
   isScalarArray,
@@ -39,6 +41,17 @@ const asScalarArray = (stored: unknown, name: string): unknown[] => {
   return stored;
 };
 
+// The fields of an item never include `_template`, so ingest and digest drop it.
+// Both paths put it back first, which keeps the stored key order.
+const withTemplate = (
+  field: FieldsArrayFieldSchema | TemplatesArrayFieldSchema,
+  item: TinaDocument,
+  values: TinaDocument
+): TinaDocument =>
+  isTemplatesArray(field)
+    ? { [TEMPLATE_KEY]: templateOf(field, item).name, ...values }
+    : values;
+
 export default defineClientPlugin({
   field: {
     Component: ArrayField,
@@ -53,10 +66,11 @@ export default defineClientPlugin({
         );
       }
       return asItemArray(stored, node.name).map((item) => {
-        const values = ingestDocument(item, itemFieldsOf(field, item), context);
-        return isTemplatesArray(field)
-          ? { [TEMPLATE_KEY]: templateOf(field, item).name, ...values }
-          : values;
+        return withTemplate(
+          field,
+          item,
+          ingestDocument(item, itemFieldsOf(field, item), context)
+        );
       });
     },
     serialize: (value: unknown[], node, context) => {
@@ -69,10 +83,11 @@ export default defineClientPlugin({
         });
       }
       return asItemArray(value, node.name).map((item) => {
-        const values = digestDocument(item, itemFieldsOf(field, item), context);
-        return isTemplatesArray(field)
-          ? { [TEMPLATE_KEY]: templateOf(field, item).name, ...values }
-          : values;
+        return withTemplate(
+          field,
+          item,
+          digestDocument(item, itemFieldsOf(field, item), context)
+        );
       });
     },
     validateChildren: (value: unknown[], node, address, registry, scope) => {
