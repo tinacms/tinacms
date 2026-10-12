@@ -2033,8 +2033,8 @@ importers:
         specifier: 'catalog:'
         version: 2.4.2
       systeminformation:
-        specifier: ^5.27.13
-        version: 5.27.14
+        specifier: ^5.31.7
+        version: 5.33.15
       tar:
         specifier: 'catalog:'
         version: 7.5.22
@@ -2060,6 +2060,9 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
+      vitest:
+        specifier: ^0.32.4
+        version: 0.32.4(happy-dom@15.10.2)(jsdom@29.1.1)(lightningcss@1.32.0)(playwright@1.61.1)(sass@1.97.3)(terser@5.46.0)
 
   packages/next-tinacms-azure:
     dependencies:
@@ -14783,9 +14786,9 @@ packages:
     resolution: {integrity: sha512-MeQTA1r0litLUf0Rp/iisCaL8761lKAZHaimlbGK4j0HysC4PLfqygQj9srcs0m2RdtDYnF8UuYyKpbjHYp7Jw==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
-  systeminformation@5.27.14:
-    resolution: {integrity: sha512-3DoNDYSZBLxBwaJtQGWNpq0fonga/VZ47HY1+7/G3YoIPaPz93Df6egSzzTKbEMmlzUpy3eQ0nR9REuYIycXGg==}
-    engines: {node: '>=8.0.0'}
+  systeminformation@5.33.15:
+    resolution: {integrity: sha512-s5RloL0F7xhN0ZjfHtLGnbf7EW74EI0N8NFL+1xR7Oxz9QA33obNZsl7lyfnJOhN04E/kGFPoJPlvY7TZ5fzmw==}
+    engines: {node: '>=10.0.0'}
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
 
@@ -32581,7 +32584,7 @@ snapshots:
     dependencies:
       '@pkgr/core': 0.2.9
 
-  systeminformation@5.27.14: {}
+  systeminformation@5.33.15: {}
 
   tabbable@6.3.0: {}
 

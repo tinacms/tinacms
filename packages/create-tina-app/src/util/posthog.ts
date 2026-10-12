@@ -38,9 +38,9 @@ export function generateSessionId(): string {
 export async function getAnonymousUserId(): Promise<string> {
   try {
     const sysInfo = await getSystemInfo();
-    const systemUuid = sysInfo.uuid || 'unknown';
+    const systemUuid = sysInfo.uuid;
 
-    if (systemUuid === 'unknown' || !systemUuid) {
+    if (!systemUuid || systemUuid === '-') {
       // Fallback to a random UUID if system UUID is not available
       return `fallback-${randomUUID()}`;
     }
