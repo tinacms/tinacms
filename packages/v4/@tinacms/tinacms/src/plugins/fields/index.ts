@@ -49,7 +49,10 @@ export type { BooleanFieldSchema } from './boolean/boolean-field.schema';
 export type { DatetimeFieldSchema } from './datetime/datetime-field.schema';
 export type { NumberFieldSchema } from './number/number-field.schema';
 export type { ObjectFieldSchema } from './object/object-field.schema';
-export type { RichTextFieldSchema } from './rich-text/rich-text-field.schema';
+export type {
+  RichTextFieldSchema,
+  RichTextTemplate,
+} from './rich-text/rich-text-field.schema';
 export type {
   SelectFieldOption,
   SelectFieldSchema,

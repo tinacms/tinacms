@@ -7,7 +7,6 @@ import type { FieldProvision, PluginManifest } from '../core/plugin';
 import type {
   CollectionSchema,
   FieldSchema,
-  TemplateFieldSchema,
   TemplateSchema,
 } from '../core/schema/types';
 import {
@@ -64,10 +63,18 @@ const templateFieldTypesIn = (templates: TemplateSchema[] = []): string[] =>
     ])
   );
 
+// An array with `of` nests one field. `FieldSchema` does not declare it, because
+// only the array plugin owns that key.
+const scalarItemOf = (field: FieldSchema): FieldSchema[] => {
+  const { of } = field as { of?: FieldSchema };
+  return of ? [of] : [];
+};
+
 const fieldTypesIn = (fields: FieldSchema[]): string[] =>
   fields.flatMap((field) => [
     field.type,
     ...templateFieldTypesIn(field.templates),
+    ...fieldTypesIn(scalarItemOf(field)),
   ]);
 
 const usedFieldTypes = (collections: CollectionSchema[]): string[] => [
@@ -76,12 +83,13 @@ const usedFieldTypes = (collections: CollectionSchema[]): string[] => [
   ),
 ];
 
-const validatorNamesIn = (fields: TemplateFieldSchema[]): string[] =>
+const validatorNamesIn = (fields: FieldSchema[]): string[] =>
   fields.flatMap((field) => [
     ...(field.validators ?? []).map((ref) => ref.name),
     ...(field.templates ?? []).flatMap((template) =>
       validatorNamesIn(template.fields ?? [])
     ),
+    ...validatorNamesIn(scalarItemOf(field)),
   ]);
 
 const usedValidators = (collections: CollectionSchema[]): string[] => [

@@ -11,6 +11,7 @@ import {
   mediaManagerPlugin,
   required,
   t,
+  type TemplateSchema,
   tinaCloud,
 } from '@tinacms/tinacms';
 import { helpNavPlugin } from './help-nav';
@@ -92,6 +93,25 @@ export const postCollection = {
   ],
 } satisfies CollectionSchema;
 
+const heroTemplate = {
+  name: 'hero',
+  label: 'Hero',
+  defaultItem: { headline: 'A new hero' },
+  fields: [
+    t.string({ name: 'headline', label: 'Headline', validators: [required()] }),
+    t.string({ name: 'tagline', label: 'Tagline' }),
+  ],
+} satisfies TemplateSchema;
+
+const ctaTemplate = {
+  name: 'cta',
+  label: 'Call to action',
+  fields: [
+    t.string({ name: 'label', label: 'Label', validators: [required()] }),
+    t.string({ name: 'link', label: 'Link' }),
+  ],
+} satisfies TemplateSchema;
+
 export const pageCollection = {
   name: 'page',
   label: 'Pages',
@@ -100,6 +120,16 @@ export const pageCollection = {
   fields: [
     t.string({ name: 'title', label: 'Title', validators: [required()] }),
     t.boolean({ name: 'featured', label: 'Featured' }),
+    t.array({
+      name: 'tags',
+      label: 'Tags',
+      of: t.string({ name: 'tag', label: 'Tag' }),
+    }),
+    t.array({
+      name: 'blocks',
+      label: 'Blocks',
+      templates: [heroTemplate, ctaTemplate],
+    }),
   ],
 } satisfies CollectionSchema;
 

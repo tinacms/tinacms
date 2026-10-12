@@ -1,8 +1,11 @@
 import { INVALID_MARKDOWN_TYPE } from '@tinacms/rich-text';
 import type { ToolbarOverrides } from '@tinacms/rich-text/editor';
-import type { MdxTemplate } from '@tinacms/rich-text/editor';
 import { type ZodType, z } from 'zod';
-import type { BaseFieldSchema, FieldSchema } from '../../../core/schema/types';
+import type {
+  BaseFieldSchema,
+  FieldSchema,
+  TemplateSchema,
+} from '../../../core/schema/types';
 
 export const RICH_TEXT_FIELD_TYPE = 'rich-text';
 
@@ -18,10 +21,16 @@ export type {
   RichTextValue,
 } from './rich-text-codec';
 
+export interface RichTextTemplate extends TemplateSchema {
+  label: string;
+  key: string;
+  inline?: boolean;
+}
+
 export interface RichTextFieldSchema extends BaseFieldSchema {
   type: typeof RICH_TEXT_FIELD_TYPE;
   isBody?: boolean;
-  templates?: MdxTemplate[];
+  templates?: RichTextTemplate[];
   overrides?: ToolbarOverrides;
   codec?: RichTextCodec;
 }

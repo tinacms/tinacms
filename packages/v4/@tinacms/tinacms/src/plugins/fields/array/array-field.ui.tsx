@@ -1,8 +1,14 @@
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
+import { type ReactNode, useRef } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import type { FieldAddress } from '../../../core/field/address';
 import { ingestDocument } from '../../../core/form/ingest';
-import type { TinaDocument } from '../../../core/schema/types';
+import type {
+  FieldSchema,
+  TemplateSchema,
+  TinaDocument,
+} from '../../../core/schema/types';
 import {
   NestedFieldRow,
   useDocumentPath,
@@ -10,13 +16,46 @@ import {
   useFieldErrors,
   useFieldRegistry,
   useFieldSchema,
+  useFieldValue,
 } from '../../../editor';
-import { asArrayFieldSchema } from './array-field.schema';
+import {
+  type FieldsArrayFieldSchema,
+  type ScalarArrayFieldSchema,
+  TEMPLATE_KEY,
+  type TemplatesArrayFieldSchema,
+  asArrayFieldSchema,
+  isScalarArray,
+  isTemplatesArray,
+  itemFieldsOf,
+  templateOf,
+} from './array-field.schema';
 
 export function ArrayField() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
   const errors = useFieldErrors(address);
+
+  return (
+    <FieldWrapper errors={errors}>
+      {isScalarArray(field) ? (
+        <ScalarItems address={address} field={field} />
+      ) : (
+        <ObjectItems address={address} field={field} />
+      )}
+    </FieldWrapper>
+  );
+}
+
+interface ItemListProps {
+  address: FieldAddress;
+}
+
+function ObjectItems({
+  address,
+  field,
+}: ItemListProps & {
+  field: FieldsArrayFieldSchema | TemplatesArrayFieldSchema;
+}) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
   const { control } = useFormContext();
@@ -27,64 +66,124 @@ export function ArrayField() {
     move,
   } = useFieldArray({ control, name: address });
 
-  const addItem = () => {
-    const item = ingestDocument({}, field.fields, { documentPath, registry });
-    append(item as TinaDocument);
-  };
+  const seed = (template: TemplateSchema | undefined, fields: FieldSchema[]) =>
+    ingestDocument(template?.defaultItem ?? {}, fields, {
+      documentPath,
+      registry,
+    });
+  const addFieldsItem = (fields: FieldSchema[]) =>
+    append(seed(undefined, fields));
+  const addTemplateItem = (template: TemplateSchema) =>
+    append({
+      [TEMPLATE_KEY]: template.name,
+      ...seed(template, template.fields),
+    });
 
   return (
-    <FieldWrapper errors={errors}>
+    <>
       <div
         role='group'
         aria-labelledby={`${address}-label`}
         className='flex flex-col gap-3'
       >
-        {items.map((item, index) => (
-          <div key={item.id} className='rounded-md border p-3'>
-            <div className='mb-3 flex items-center justify-between gap-2'>
-              <span className='text-sm font-medium text-muted-foreground'>
-                Item {index + 1}
-              </span>
-              <div className='flex items-center gap-1'>
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  aria-label={`Move item ${index + 1} up`}
-                  disabled={index === 0}
-                  onClick={() => move(index, index - 1)}
-                >
-                  Up
-                </Button>
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  aria-label={`Move item ${index + 1} down`}
-                  disabled={index === items.length - 1}
-                  onClick={() => move(index, index + 1)}
-                >
-                  Down
-                </Button>
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  aria-label={`Remove item ${index + 1}`}
-                  onClick={() => remove(index)}
-                >
-                  Remove
-                </Button>
-              </div>
-            </div>
-            {field.fields.map((subfield) => (
-              <NestedFieldRow
-                key={subfield.name}
-                address={`${address}.${index}.${subfield.name}`}
-                node={subfield}
-              />
-            ))}
-          </div>
+        {items.map((item, index) => {
+          const values = item as TinaDocument;
+          const heading = isTemplatesArray(field)
+            ? labelOf(templateOf(field, values))
+            : `Item ${index + 1}`;
+          return (
+            <ItemRow
+              key={item.id}
+              heading={heading}
+              index={index}
+              count={items.length}
+              onMove={move}
+              onRemove={remove}
+            >
+              {itemFieldsOf(field, values).map((subfield) => (
+                <NestedFieldRow
+                  key={subfield.name}
+                  address={`${address}.${index}.${subfield.name}`}
+                  node={subfield}
+                />
+              ))}
+            </ItemRow>
+          );
+        })}
+      </div>
+      <div className='mt-3 flex flex-wrap gap-2'>
+        {isTemplatesArray(field) ? (
+          field.templates.map((template) => (
+            <Button
+              key={template.name}
+              type='button'
+              variant='outline'
+              onClick={() => addTemplateItem(template)}
+            >
+              Add {labelOf(template)}
+            </Button>
+          ))
+        ) : (
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => addFieldsItem(field.fields)}
+          >
+            Add item
+          </Button>
+        )}
+      </div>
+    </>
+  );
+}
+
+function ScalarItems({
+  address,
+  field,
+}: ItemListProps & { field: ScalarArrayFieldSchema }) {
+  const registry = useFieldRegistry();
+  const [value, setValue] = useFieldValue<unknown[] | undefined>(address);
+  const items = value ?? [];
+  // Each row needs a key that follows its value. An index key keeps a moved or
+  // removed row mounted at the old position, and the row shows a stale value.
+  const keys = useRef<string[]>([]);
+  if (keys.current.length !== items.length) {
+    keys.current = items.map(nextScalarKey);
+  }
+
+  const move = (from: number, to: number) => {
+    const next = [...items];
+    next.splice(to, 0, ...next.splice(from, 1));
+    keys.current.splice(to, 0, ...keys.current.splice(from, 1));
+    setValue(next);
+  };
+  const remove = (index: number) => {
+    keys.current = keys.current.filter((_, position) => position !== index);
+    setValue(items.filter((_, position) => position !== index));
+  };
+  const addItem = () => {
+    keys.current = [...keys.current, nextScalarKey()];
+    setValue([...items, registry.get(field.of.type)?.defaultValue ?? null]);
+  };
+
+  return (
+    <>
+      <div
+        role='group'
+        aria-labelledby={`${address}-label`}
+        className='flex flex-col gap-3'
+      >
+        {items.map((_, index) => (
+          <ItemRow
+            key={keys.current[index]}
+            heading={`Item ${index + 1}`}
+            index={index}
+            count={items.length}
+            onMove={move}
+            onRemove={remove}
+          >
+            <NestedFieldRow address={`${address}.${index}`} node={field.of} />
+          </ItemRow>
         ))}
       </div>
       <Button
@@ -95,6 +194,73 @@ export function ArrayField() {
       >
         Add item
       </Button>
-    </FieldWrapper>
+    </>
   );
 }
+
+interface ItemRowProps {
+  heading: string;
+  index: number;
+  count: number;
+  onMove: (from: number, to: number) => void;
+  onRemove: (index: number) => void;
+  children: ReactNode;
+}
+
+function ItemRow({
+  heading,
+  index,
+  count,
+  onMove,
+  onRemove,
+  children,
+}: ItemRowProps) {
+  const position = index + 1;
+  return (
+    <div className='rounded-md border p-3'>
+      <div className='mb-3 flex items-center justify-between gap-2'>
+        <span className='text-sm font-medium text-muted-foreground'>
+          {heading}
+        </span>
+        <div className='flex items-center gap-1'>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            aria-label={`Move item ${position} up`}
+            disabled={index === 0}
+            onClick={() => onMove(index, index - 1)}
+          >
+            Up
+          </Button>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            aria-label={`Move item ${position} down`}
+            disabled={index === count - 1}
+            onClick={() => onMove(index, index + 1)}
+          >
+            Down
+          </Button>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            aria-label={`Remove item ${position}`}
+            onClick={() => onRemove(index)}
+          >
+            Remove
+          </Button>
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+const labelOf = (template: TemplateSchema): string =>
+  template.label ?? template.name;
+
+let scalarKeyCount = 0;
+const nextScalarKey = (): string => `scalar-item-${scalarKeyCount++}`;

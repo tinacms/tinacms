@@ -19,43 +19,53 @@ The four files are in `plugins/fields/array/`:
 
 ## Authoring
 
-`t.array({...})` adds `type: 'array'` (`ARRAY_FIELD_TYPE`) to the config. Its
-`fields` property is the item template — an ordinary array of `FieldSchema`
-nodes, the same shape a collection uses for its own `fields`:
+`t.array({...})` adds `type: 'array'` (`ARRAY_FIELD_TYPE`) to the config. An
+array declares its items with exactly one of `fields`, `templates` or `of`
+([ADR-017 §4](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/017-content-model.md)).
+Each shape sets the other two keys to `never`, so TypeScript rejects a config
+that sets two of them. `asArrayFieldSchema` makes the same check at runtime.
 
 ```ts
-import { t } from '@tinacms/tinacms';
+import { t, type TemplateSchema } from '@tinacms/tinacms';
+
+const hero = {
+  name: 'hero',
+  label: 'Hero',
+  defaultItem: { headline: 'A new hero' },
+  fields: [t.string({ name: 'headline', label: 'Headline' })],
+} satisfies TemplateSchema;
 
 const collection = {
-  name: 'post',
+  name: 'page',
   fields: [
+    // Every item has the same shape.
     t.array({
       name: 'authors',
-      label: 'Authors',
-      validators: [required()],
-      fields: [
-        t.string({ name: 'name', label: 'Name', validators: [required()] }),
-        t.string({ name: 'role', label: 'Role' }),
-      ],
+      fields: [t.string({ name: 'name', label: 'Name' })],
     }),
+    // Each item picks a template. This is a block-based field.
+    t.array({ name: 'blocks', templates: [hero] }),
+    // Each item is a single value of the `of` field type.
+    t.array({ name: 'tags', of: t.string({ name: 'tag', label: 'Tag' }) }),
   ],
 };
 ```
 
-`ArrayFieldSchema` extends `BaseFieldSchema`. It adds three properties:
+| Key | Type | Items | Stored value |
+|---|---|---|---|
+| `fields` | `FieldSchema[]` | objects with one shape | `[{ name: 'Ivan' }]` |
+| `templates` | `TemplateSchema[]` | objects, each with its own template | `[{ _template: 'hero', headline: 'Hi' }]` |
+| `of` | `FieldSchema` | single values | `['news', 'release']` |
 
-| Key | Type | Effect |
-|---|---|---|
-| `fields` | `FieldSchema[]` (required) | the item template; every item has this same shape |
+A template is the shared `TemplateSchema` from `core/schema/types.ts`:
+`name`, `label?`, `fields` and `defaultItem?`. A new item of a template starts
+from its `defaultItem`.
 
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with
 > `validators`. Refer to
 > [Validation in two layers](./field-plugins.md#validation-in-two-layers).
 
-
-The stored value is an array of plain objects, one per item, keyed by each
-item field's own `name`.
 
 ## The descriptor
 
@@ -140,6 +150,13 @@ registry from `context.registry` (`FieldTransformContext`,
 an item field with its own `parse`/`serialize` — a nested `datetime` field, for
 example — converts the same way it would at the top level.
 
+For `templates`, `parse` reads the `_template` of each item and uses the fields
+of that template. `parse` and `serialize` keep `_template` on every item. An
+item with no `_template`, or with an unknown one, throws
+`array-field-template-unknown`, so a save cannot remove the item. For `of`,
+`parse` and `serialize` call the `parse`/`serialize` of the `of` field type on
+each item.
+
 The registry is necessary: `invariant` throws `array-field-no-registry` if
 `context.registry` is absent when `parse` or `serialize` runs.
 
@@ -164,9 +181,17 @@ already works for visual editing: `<FieldNode>` marks its address active on
 focus, exactly as `<Field>` does for a top-level field, and the address it
 uses happens to be a nested one.
 
-A new item's default shape comes from `ingestDocument({}, field.fields,
-registry, context)` — the same seeding a fresh top-level form gets, reused
-rather than re-implemented.
+For `templates`, the component shows one "Add <label>" button for each
+template, and the label of the template at the top of each item. For `of`,
+`useFieldArray` does not apply, because it needs objects. The component keeps
+the value as a plain array, and it adds, removes, and reorders items with
+`useFieldValue`. Each item renders the `of` field at `<address>.<index>`.
+
+A new `fields` item starts from `ingestDocument({}, field.fields, …)`, the
+same seeding that a new top-level form gets. A new template item starts from
+the `defaultItem` of its template. A new `of` item starts from the
+`defaultValue` of the `of` field type, or `null`. For `of`, an empty item
+(`null` or `undefined`) skips `parse` and `serialize`, and it saves as `null`.
 
 ## The connections
 
@@ -196,3 +221,12 @@ rather than re-implemented.
 - It round-trips items through ingest and digest, including an item field
   with its own `parse`/`serialize`.
 - It examines the metadata of the descriptor.
+- It rejects a config with none, or more than one, of `fields`, `templates`
+  and `of`, at the type level and at runtime.
+- For `templates`: it keeps `_template` through ingest and digest, refuses a
+  missing or unknown template, renders the label and fields of each template,
+  adds an item from `defaultItem`, keeps the template on a reorder, and
+  validates each item against its own template.
+- For `of`: it runs the `parse`/`serialize` of the `of` field on each item,
+  refuses stored content that is not an array, edits, adds, reorders and
+  removes items, and validates each item at `<address>.<index>`.
