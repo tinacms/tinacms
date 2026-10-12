@@ -114,7 +114,7 @@ test.describe('Post rich-text text colour', () => {
     await expect
       .poll(() => readFileSync(POST_FILE, 'utf8'))
       .toContain(
-        '<span style={{ color: "#CC4141" }}>crimson </span>**<span style={{ color: "#CC4141" }}>bright</span>**'
+        '<span style={{ color: "#CC4141" }}>crimson</span> **<span style={{ color: "#CC4141" }}>bright</span>**'
       );
     expect(readFileSync(POST_FILE, 'utf8')).toContain(
       '<mark style={{ backgroundColor: "#FEF08A" }}><span style={{ color: "#0066CC" }}>marked</span></mark>'

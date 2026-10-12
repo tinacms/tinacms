@@ -22,8 +22,10 @@ const wrapColor = (
   if (node.type !== 'text') {
     return wrap(color, node);
   }
-  const [, lead = '', core = '', trail = ''] =
-    /^(\s*)([\s\S]*?)(\s*)$/.exec(node.value) ?? [];
+  const { value } = node;
+  const core = value.trim();
+  const lead = value.slice(0, value.length - value.trimStart().length);
+  const trail = value.slice(value.trimEnd().length);
   if (!core) {
     return [node];
   }
