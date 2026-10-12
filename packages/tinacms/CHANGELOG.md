@@ -1,5 +1,20 @@
 # tinacms
 
+## 3.14.4
+
+### Patch Changes
+
+- [#7791](https://github.com/tinacms/tinacms/pull/7791) [`7998180`](https://github.com/tinacms/tinacms/commit/799818046dcea70ea6367199cea025d7ff4b0e3d) Thanks [@sarahanntolsma-ff](https://github.com/sarahanntolsma-ff)! - Give the form's saved/unsaved indicator an accessible name. It was a coloured dot with no text, so its state reached neither a screen reader nor anyone who cannot distinguish the two colours.
+
+- [#7789](https://github.com/tinacms/tinacms/pull/7789) [`15818bc`](https://github.com/tinacms/tinacms/commit/15818bce7a4b83072d2b0d4a9e96025b6ac8f14a) Thanks [@sarahanntolsma-ff](https://github.com/sarahanntolsma-ff)! - Fix the form fields shown after navigating back to a nested block through the breadcrumb. A path ending on a list field rather than on one of its items returned the surrounding group with its field names unprefixed, and an unprefixed name addresses the top of the document. Where a nested list shared a name with a top-level field, the breadcrumb therefore rendered the top-level list under the nested list's templates, and the list's add, remove and reorder reached the wrong array.
+
+- [#7790](https://github.com/tinacms/tinacms/pull/7790) [`12cdee6`](https://github.com/tinacms/tinacms/commit/12cdee614c5273d1f772ee8dc18ce37b91a2197c) Thanks [@sarahanntolsma-ff](https://github.com/sarahanntolsma-ff)! - Report the status code when a failed TinaCloud response carries no status text, and keep the HTTP error when the response body is not JSON. Over HTTP/2 the error read `Unable to complete request, ` with nothing after the comma, and a gateway answering with HTML replaced the error with a JSON parse error. This also applies to creating branches and pull requests, checking the latest version, and polling editorial workflow status.
+
+- [#7738](https://github.com/tinacms/tinacms/pull/7738) [`4f2758e`](https://github.com/tinacms/tinacms/commit/4f2758e3067ca2a2db40593a0e4a1040b51ad127) Thanks [@kulesy](https://github.com/kulesy)! - Error modals now show their own title in the header, size the action button to its label, and link to the TinaCloud troubleshooting guide with descriptive text. `ErrorDialog` now renders as modal content instead of a standalone styled card, and its `title` prop is deprecated in favour of `cms.alerts.error(message, { title })`.
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.26
+
 ## 3.14.3
 
 ### Patch Changes

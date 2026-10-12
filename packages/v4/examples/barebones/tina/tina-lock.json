@@ -9,7 +9,7 @@
         "format": "mdx",
         "hooks": [
           {
-            "name": "requireStarsToPublish"
+            "name": "trimTitle"
           },
           {
             "name": "logSave",
@@ -44,6 +44,16 @@
           {
             "name": "stars",
             "label": "Stars",
+            "validators": [
+              {
+                "name": "requiredWhen",
+                "args": [
+                  "status",
+                  "published",
+                  "Rate the post before you publish it"
+                ]
+              }
+            ],
             "type": "rating"
           },
           {

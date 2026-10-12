@@ -83,6 +83,7 @@
     "@tinacms/rich-text": "workspace:*",
     "@tinacms/ui": "workspace:*",
     "gray-matter": "catalog:",
+    "lucide-react": "catalog:",
     "react-hook-form": "^7.80.0",
     "react-router-dom": "catalog:",
     "sqlite-level": "catalog:",

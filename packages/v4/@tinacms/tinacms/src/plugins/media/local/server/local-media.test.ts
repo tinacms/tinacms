@@ -61,9 +61,9 @@ describe('local media list', () => {
   });
 
   it('rejects a folder outside the media root', async () => {
-    await expect(media.list('../..')).rejects.toThrow(
-      /media-path-outside-root/
-    );
+    await expect(media.list('../..')).rejects.toMatchObject({
+      code: 'invalid-path',
+    });
   });
 });
 
@@ -80,9 +80,9 @@ describe('local media save', () => {
   });
 
   it('rejects a folder that climbs out of the media root', async () => {
-    await expect(media.save(fileOf('x.png'), '../../src')).rejects.toThrow(
-      /media-path-outside-root/
-    );
+    await expect(
+      media.save(fileOf('x.png'), '../../src')
+    ).rejects.toMatchObject({ code: 'invalid-path' });
   });
 
   it.each(['../x.png', 'a/b.png', 'a\\b.png', '..', ''])(
@@ -91,7 +91,9 @@ describe('local media save', () => {
       const file = Object.defineProperty(fileOf('x.png'), 'name', {
         value: name,
       });
-      await expect(media.save(file)).rejects.toThrow(/media-file-name-invalid/);
+      await expect(media.save(file)).rejects.toMatchObject({
+        code: 'invalid-name',
+      });
     }
   );
 
@@ -100,16 +102,16 @@ describe('local media save', () => {
     await fs.mkdir(outside);
     await fs.mkdir(uploads(), { recursive: true });
     await fs.symlink(outside, uploads('linked'));
-    await expect(media.save(fileOf('x.png'), 'linked')).rejects.toThrow(
-      /media-path-outside-root/
-    );
+    await expect(media.save(fileOf('x.png'), 'linked')).rejects.toMatchObject({
+      code: 'invalid-path',
+    });
     expect(await fs.readdir(outside)).toEqual([]);
   });
 
   it('rejects a null byte', async () => {
-    await expect(media.save(fileOf('x.png'), 'a\0b')).rejects.toThrow(
-      /media-path-null-byte/
-    );
+    await expect(media.save(fileOf('x.png'), 'a\0b')).rejects.toMatchObject({
+      code: 'invalid-path',
+    });
   });
 });
 
@@ -122,20 +124,28 @@ describe('local media delete', () => {
 
   it('refuses to delete a folder', async () => {
     await fs.mkdir(uploads('posts'), { recursive: true });
-    await expect(media.delete('posts')).rejects.toThrow(
-      /media-delete-not-file/
-    );
+    await expect(media.delete('posts')).rejects.toMatchObject({
+      code: 'unsupported',
+    });
   });
 
   it('refuses to delete the media root itself', async () => {
     await fs.mkdir(uploads(), { recursive: true });
-    await expect(media.delete('.')).rejects.toThrow(/media-path-outside-root/);
+    await expect(media.delete('.')).rejects.toMatchObject({
+      code: 'invalid-path',
+    });
+  });
+
+  it('reports a file that does not exist as not-found', async () => {
+    await expect(media.delete('missing.png')).rejects.toMatchObject({
+      code: 'not-found',
+    });
   });
 
   it('refuses a file outside the media root', async () => {
     await fs.writeFile(path.join(rootDir, 'secret.txt'), '');
-    await expect(media.delete('../../secret.txt')).rejects.toThrow(
-      /media-path-outside-root/
-    );
+    await expect(media.delete('../../secret.txt')).rejects.toMatchObject({
+      code: 'invalid-path',
+    });
   });
 });

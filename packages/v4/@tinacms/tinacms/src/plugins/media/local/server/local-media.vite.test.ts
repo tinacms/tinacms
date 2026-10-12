@@ -8,7 +8,7 @@ import { DEFAULT_MEDIA_URL } from '../../../../core/media/contract';
 import { MAX_MEDIA_UPLOAD_BYTES } from '../../../../core/request-body';
 import type { CollectionSchema } from '../../../../core/schema/types';
 import { tinaLocalDataLayerVitePlugin } from '../../../content/local/server/local-data-layer.vite';
-import { localMediaPlugin } from '../local-media.plugin';
+import { MEDIA_ERROR_HEADER, localMediaPlugin } from '../local-media.plugin';
 
 vi.mock('../../../content/local/graphql/graphql-pipeline', () => ({
   createGraphQLPipeline: vi.fn(),
@@ -67,10 +67,14 @@ const requestDouble = (
 
 const responseDouble = () => {
   const chunks: string[] = [];
+  const headers: Record<string, string> = {};
   return {
     statusCode: 200,
     destroyed: false,
-    setHeader: () => {},
+    headers,
+    setHeader: (name: string, value: string) => {
+      headers[name] = value;
+    },
     end(chunk?: string, callback?: () => void) {
       if (chunk !== undefined) chunks.push(chunk);
       callback?.();
@@ -246,6 +250,6 @@ describe('local media endpoint', () => {
       res
     );
     expect(res.statusCode).toBe(400);
-    expect(res.body).toMatch(/media-path-outside-root/);
+    expect(res.headers[MEDIA_ERROR_HEADER]).toBe('invalid-path');
   });
 });

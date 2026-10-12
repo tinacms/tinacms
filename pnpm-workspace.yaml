@@ -56,8 +56,7 @@ catalog:
     "@graphql-codegen/visitor-plugin-common": ^7.2.0
     "@graphql-tools/graphql-file-loader": ^7.5.17
     "@graphql-tools/load": ^7.8.14
-    "@graphql-tools/utils": ^10.8.1
-    "@headlessui/react": 2.1.8
+    "@headlessui/react": 2.2.10
     "@iarna/toml": ^2.2.5
     "@monaco-editor/loader": ^1.7.0
     "@octokit/rest": ^22.0.1
@@ -145,7 +144,7 @@ catalog:
     altair-express-middleware: ^7.3.6
     auto-bind: ^4.0.0
     autoprefixer: ^10.4.20
-    axios: 1.7.5
+    axios: 1.20.0
     body-parser: ^1.20.3
     busboy: ^1.6.0
     c8: ^7.14.0
@@ -160,7 +159,7 @@ catalog:
     color-string: ^1.9.1
     cors: ^2.8.5
     cross-spawn: ^7.0.6
-    dompurify: ^3.3.1
+    dompurify: ^3.4.16
     dotenv: ^16.4.7
     esbuild: ^0.28.1
     estree-util-is-identifier-name: 2.1.0
@@ -208,14 +207,14 @@ catalog:
     minimatch: ^5.1.6
     monaco-editor: 0.31.0
     mongodb-level: ^0.0.4
-    multer: 2.2.0
+    multer: 2.4.0
     next-themes: ^0.3.0
     normalize-path: ^3.0.0
     ora: ^8.2.0
     parse-entities: 4.0.1
     picomatch: ^4.0.2
     picomatch-browser: 2.2.6
-    postcss: ^8.5.23
+    postcss: ^8.5.27
     postcss-import: ^14.1.0
     postcss-nesting: ^10.2.0
     prism-react-renderer: ^2.4.1

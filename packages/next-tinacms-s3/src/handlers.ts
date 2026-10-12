@@ -20,6 +20,7 @@ import path from 'node:path';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
 import { isDisallowedUploadType } from './upload-type';
+import { resolveUploadContentType } from './upload-content-type';
 
 export interface S3Config {
   config: S3ClientConfig;
@@ -39,7 +40,12 @@ export const mediaHandlerConfig = {
 };
 
 export const createMediaHandler = (config: S3Config, options?: S3Options) => {
-  const client = new S3Client(config.config);
+  // A presigned PUT cannot carry a checksum of a body that the browser sends later.
+  const client = new S3Client({
+    ...config.config,
+    requestChecksumCalculation:
+      config.config.requestChecksumCalculation ?? 'WHEN_REQUIRED',
+  });
   const bucket = config.bucket;
   const region = config.config.region || 'us-east-1';
   let mediaRoot = config.mediaRoot || '';
@@ -91,7 +97,11 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
             }
             throw e;
           }
-          if (isDisallowedUploadType(s3_key)) {
+          const rawContentType = Array.isArray(req.query.contentType)
+            ? req.query.contentType[0]
+            : req.query.contentType;
+          const contentType = resolveUploadContentType(s3_key, rawContentType);
+          if (isDisallowedUploadType(s3_key) || !contentType) {
             return res.status(415).json({ message: 'Unsupported file type' });
           }
           if (await keyExists(client, bucket, s3_key)) {
@@ -101,10 +111,15 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
             bucket,
             s3_key,
             expiresIn,
-            client
+            client,
+            { contentType }
           );
 
-          return res.json({ signedUrl, src: cdnUrl + s3_key });
+          return res.json({
+            signedUrl,
+            src: mediaUrl(cdnUrl, s3_key),
+            headers: { 'Content-Type': contentType },
+          });
         }
         return listMedia(req, res, client, bucket, mediaRoot, cdnUrl);
       case 'DELETE':
@@ -284,22 +299,35 @@ async function keyExists(client: S3Client, bucket: string, key: string) {
   }
 }
 
+export interface UploadUrlOptions {
+  /** Signs this type into the URL. The upload must send the same `Content-Type`. */
+  contentType?: string;
+}
+
 export const getUploadUrl = async (
   bucket: string,
   key: string,
   expiresIn: number,
-  client: S3Client
+  client: S3Client,
+  options?: UploadUrlOptions
 ): Promise<string> => {
-  // Create the presigned URL.
+  const contentType = options?.contentType;
   return getSignedUrl(
     client,
     new PutObjectCommand({
       Bucket: bucket,
       Key: key,
+      ...(contentType ? { ContentType: contentType } : {}),
     }),
-    { expiresIn }
+    contentType
+      ? { expiresIn, signableHeaders: new Set(['content-type']) }
+      : { expiresIn }
   );
 };
+
+// S3 reads a literal "+" in a URL path as a space, so a key with a plus needs %2B.
+const mediaUrl = (cdnUrl: string, key: string) =>
+  cdnUrl + key.replace(/\+/g, '%2B');
 
 function getS3ToTinaFunc(cdnUrl, mediaRoot?: string) {
   return function s3ToTina(file: _Object): Media {
@@ -307,7 +335,7 @@ function getS3ToTinaFunc(cdnUrl, mediaRoot?: string) {
     const filename = path.basename(strippedKey);
     const directory = path.dirname(strippedKey) + '/';
 
-    const src = cdnUrl + file.Key;
+    const src = mediaUrl(cdnUrl, file.Key);
     return {
       id: file.Key,
       filename,

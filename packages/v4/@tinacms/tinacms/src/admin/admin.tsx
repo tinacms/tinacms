@@ -2,6 +2,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -32,6 +33,8 @@ import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
 import { TinaProvider } from '../editor/provider';
 import { toFormId } from '../form/form-store';
+import { AccountMenu } from './account-menu';
+import { AuthGate } from './auth-gate';
 import { DocumentForm } from './document-form';
 import { DocumentScope } from './document-scope';
 import { FormStatusBadge } from './document-status';
@@ -290,7 +293,9 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
         <HashRouter
           future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
         >
-          <AdminShell preview={preview} />
+          <AuthGate>
+            <AdminShell preview={preview} />
+          </AuthGate>
         </HashRouter>
       </TinaProvider>
     </AdminErrorBoundary>
@@ -384,6 +389,10 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
             </SidebarGroup>
           ) : null}
         </SidebarContent>
+
+        <SidebarFooter>
+          <AccountMenu />
+        </SidebarFooter>
       </Sidebar>
 
       {activeScreen ? (
