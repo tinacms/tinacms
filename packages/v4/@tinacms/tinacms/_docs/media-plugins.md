@@ -121,6 +121,11 @@ site can send one. The endpoint rejects a request that is not from a loopback
 host, that has a different `Origin`, or that has `Sec-Fetch-Site: cross-site`.
 The content endpoint uses the same checks.
 
+Vite serves a new file in the public folder only after its file watcher
+reports the file. Until then, a request for a just-uploaded image gets a 404.
+Thus the dev server serves each file that it uploaded itself, from the media
+folder, and gives every other request to Vite.
+
 ### Paths
 
 The plugin rejects a path that goes outside the media folder, through `..` or

@@ -24,13 +24,13 @@ const isMediaPath = (value: string): boolean =>
 
 // The shape of the value only. `required` is a validator the collection
 // attaches.
-export const imageSchema = (node: FieldSchema): ZodType =>
-  z.preprocess(
+export const imageSchema = (node: FieldSchema): ZodType => {
+  const message = `${labelOf(node)} must be a media path, like posts/hero.jpg`;
+  return z.preprocess(
     (value) => (value === '' || value == null ? undefined : value),
     z
-      .string()
-      .refine(isMediaPath, {
-        message: `${labelOf(node)} must be a media path, like posts/hero.jpg`,
-      })
+      .string({ invalid_type_error: message })
+      .refine(isMediaPath, { message })
       .optional()
   );
+};

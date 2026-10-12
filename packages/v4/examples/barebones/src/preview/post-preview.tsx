@@ -30,7 +30,7 @@ export function PostPreview() {
       >
         {post.featured ? '★ Featured' : '☆ Not featured'}
       </span>
-      {post.heroImage ? (
+      {post.heroImage && typeof post.heroImage === 'string' ? (
         <img
           {...tinaField('heroImage')}
           src={resolveMediaUrl(config, post.heroImage, { width: 1200 })}

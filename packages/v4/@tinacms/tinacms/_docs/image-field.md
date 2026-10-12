@@ -84,16 +84,14 @@ defineClientPlugin({
     Component: ImageField,
     metadata: { layout: 'inline', labelable: false },
     schema: imageSchema,
-    parse: (stored: string) => (stored == null ? undefined : stored),
-    serialize: (value: string | null) => value ?? undefined,
   },
 });
 ```
 
 The descriptor has no `defaultValue`. An absent image stays absent.
 
-The editor writes `null` when an author clears the field. `serialize` turns
-that `null` into `undefined`, so a cleared image leaves the document.
+The editor writes `null` when an author clears the field. The digest leaves
+out `null`, so a cleared image leaves the document.
 
 `labelable: false` is necessary because the field has no single input. The
 widget is a `group` that reads the label of its row through `aria-labelledby`,
@@ -108,8 +106,7 @@ exists.
 | Config | Rule | Message |
 |---|---|---|
 | (none) | an absent or empty value passes | |
-| (none) | a value that is not a string fails | the Zod message |
-| (none) | a URL, a path that starts with `/`, or a path with a `..` segment fails | `{label} must be a media path, like posts/hero.jpg` |
+| (none) | a value that is not a string, a URL, a path that starts with `/`, or a path with a `..` segment fails | `{label} must be a media path, like posts/hero.jpg` |
 
 The string goes through `z.preprocess`, so `''` and `null` become `undefined`
 and pass. A `required()` validator then rejects an absent value.
@@ -169,6 +166,10 @@ the field tries again after 500, 1000 and 2000 ms, each time with a new
 `path (missing)` in place of the file name. It keeps the stored value, so a missing file does not silently
 empty the field. The author can replace or clear it.
 
+A hand-edited file can hold a value that is not a string, such as
+`heroImage: 2024`. The field shows `Not a media path` and keeps the value
+until the author replaces or clears it.
+
 ### Activation
 
 `useFieldActivation` focuses the main button: "Choose image" when the field is
@@ -217,8 +218,10 @@ with a crop. Refer to [media.md](./media.md#rendering-media-on-the-site).
 - It clears an optional image, and shows no clear button on a required one.
 - It retries an image that fails to load with a new URL, marks an image that
   never loads as missing, and keeps the value.
+- It shows a stored value that is not a string as not a media path.
 - It rejects a missing value on a required field, passes an empty value on an
-  optional field, and rejects a value that is not a string.
+  optional field, and rejects a URL, a path outside the media root, or a
+  value that is not a string.
 - It passes a stored path through ingest and digest without a change, and
   digests a cleared image as absent.
 - It examines the metadata of the descriptor and the `media` dependency.

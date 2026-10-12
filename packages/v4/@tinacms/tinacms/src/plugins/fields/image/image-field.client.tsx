@@ -7,7 +7,5 @@ export default defineClientPlugin({
     Component: ImageField,
     metadata: { layout: 'inline', labelable: false },
     schema: imageSchema,
-    parse: (stored: string) => (stored == null ? undefined : stored),
-    serialize: (value: string | null) => value ?? undefined,
   },
 });

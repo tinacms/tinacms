@@ -323,6 +323,14 @@ describe('ImageField missing images', () => {
     expect(valueOf('hero')).toBe('posts/deleted.jpg');
   });
 
+  it('shows a stored value that is not a string as not a media path', async () => {
+    renderField({ hero: 2024 });
+    const group = await fieldGroup('Hero');
+    expect(within(group).getByText('Not a media path')).toBeVisible();
+    await pickFromLibrary(group, 'Replace');
+    expect(valueOf('hero')).toBe('photo.jpg');
+  });
+
   it('previews an image again once the same path is picked again', async () => {
     renderField({ hero: 'photo.jpg' });
     const group = await fieldGroup('Hero');
@@ -404,7 +412,7 @@ describe('ImageField validation', () => {
     expect(validateFieldWithCore(heroNode, descriptor, 42)).not.toEqual([]);
   });
 
-  it('rejects a URL or a path outside the media root', async () => {
+  it('rejects a URL, a path outside the media root, or a non-string', async () => {
     const descriptor = (await resolveRegistry()).get('image');
     for (const value of [
       'https://example.com/hero.jpg',
@@ -412,6 +420,8 @@ describe('ImageField validation', () => {
       '/uploads/posts/hero.jpg',
       'data:image/png;base64,AAAA',
       'posts/../../hero.jpg',
+      2024,
+      ['posts/hero.jpg'],
     ]) {
       expect(validateFieldWithCore(heroNode, descriptor, value)).toEqual([
         'Hero must be a media path, like posts/hero.jpg',

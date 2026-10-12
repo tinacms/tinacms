@@ -51,7 +51,9 @@ const messageOf = (cause: unknown): string => {
 export function ImageField() {
   const address = useFieldAddress();
   const field = useFieldSchema<ImageFieldSchema>();
-  const [value, setValue] = useFieldValue<string | null>(address);
+  const [value, setValue] = useFieldValue<unknown>(address);
+  const path = typeof value === 'string' ? value : null;
+  const notAPath = value != null && path === null;
   const errors = useFieldErrors(address);
   const media = useMediaSlice();
   const mainButtonRef = useRef<HTMLButtonElement>(null);
@@ -71,13 +73,13 @@ export function ImageField() {
 
   const features = media.features ?? {};
   const canUpload = features.readOnly !== true;
-  const failures = value != null && failure?.path === value ? failure.count : 0;
-  const missing = failures > RETRY_DELAYS_MS.length;
+  const failures = path !== null && failure?.path === path ? failure.count : 0;
+  const missing = notAPath || failures > RETRY_DELAYS_MS.length;
   const thumbnailSrc =
-    value == null
+    path === null
       ? null
       : withRetry(
-          media.resolveUrl(value, { width: 400, height: 400 }),
+          media.resolveUrl(path, { width: 400, height: 400 }),
           failures
         );
 
@@ -151,7 +153,7 @@ export function ImageField() {
         data-dragging={dragging ? 'true' : undefined}
         className={cn(
           'flex flex-col gap-2 rounded-md border p-2 transition',
-          value ? null : 'border-dashed',
+          value == null ? 'border-dashed' : null,
           dragging ? 'border-orange-500' : null
         )}
         onDragEnter={dragOver}
@@ -186,16 +188,23 @@ export function ImageField() {
                 >
                   <img
                     src={thumbnailSrc ?? undefined}
-                    alt={mediaNameOf(value)}
+                    alt={path === null ? '' : mediaNameOf(path)}
                     hidden={loadedSrc !== thumbnailSrc}
                     className='size-full object-cover'
                     onLoad={() => setLoadedSrc(thumbnailSrc)}
-                    onError={() => imageFailed(value)}
+                    onError={() => path !== null && imageFailed(path)}
                   />
                 </span>
               )}
-              <span className='min-w-0 flex-1 truncate text-sm' title={value}>
-                {missing ? `${value} (missing)` : mediaNameOf(value)}
+              <span
+                className='min-w-0 flex-1 truncate text-sm'
+                title={path ?? undefined}
+              >
+                {path === null
+                  ? 'Not a media path'
+                  : missing
+                    ? `${path} (missing)`
+                    : mediaNameOf(path)}
               </span>
             </>
           )}

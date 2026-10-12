@@ -321,6 +321,9 @@ This example makes a color field:
    top-level field has (the collection, a top-level-only address assumption)
    breaks there; a field built only from its own node, its own address, and
    the hooks above does not.
+6. Add the field to `FIELDS` in `plugins/fields/stored-values.test.tsx`. A
+   hand-edited file can hold any value in any field, so the component must
+   render a number, a list or an object without a crash.
 
 Do no more steps. You do not change the registry.
 
