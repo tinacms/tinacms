@@ -70,7 +70,9 @@ export class AuthError extends Error {
 export type AuthSlice = (
   | { status: 'signed-in'; user: AuthUser; roles: string[] }
   | { status: 'forbidden'; user: AuthUser }
-  | { status: 'loading' | 'signed-out'; user: null }
+  | { status: 'loading'; user: null }
+  // `error` is why a sign-in that did not run inside login() failed.
+  | { status: 'signed-out'; user: null; error?: AuthError }
 ) & {
   getToken(): Promise<string | undefined>;
   login(): Promise<void>;

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthError } from '../../../core/auth/contract';
 import type { SliceState } from '../../../core/plugin';
 import {
@@ -15,6 +15,8 @@ import { createTinaCloudAuth } from './tinacloud-auth.client';
 const CURRENT_USER_URL = `${TINACLOUD_IDENTITY_URL}/v2/apps/abc/currentUser`;
 
 const PROJECT_URL = `${TINACLOUD_IDENTITY_URL}/v2/apps/abc`;
+
+const AUTH_CONFIG_URL = `${TINACLOUD_IDENTITY_URL}/v2/auth/config`;
 
 const TOKEN_URL = `${TINACLOUD_IDENTITY_URL}/oauth/token`;
 
@@ -53,7 +55,13 @@ const signIn = async (tokens = loginTokens()) => {
   return booted;
 };
 
+beforeEach(() => {
+  stubFetch((url) => tinaCloudIdentity(url));
+});
+
 afterEach(() => {
+  sessionStorage.clear();
+  window.history.replaceState(null, '', '/');
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   vi.useRealTimers();
@@ -80,10 +88,13 @@ describe('TinaCloud auth slice', () => {
       `https://app.tina.io/signin?clientId=abc&origin=${encodeURIComponent(window.location.origin)}`
     );
     expect(popup.close).toHaveBeenCalled();
-    expect(fetchMock.mock.calls[0][0]).toBe(CURRENT_USER_URL);
-    expect(fetchMock.mock.calls[1][0]).toBe(PROJECT_URL);
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      AUTH_CONFIG_URL,
+      CURRENT_USER_URL,
+      PROJECT_URL,
+    ]);
     expect(
-      new Headers(fetchMock.mock.calls[0][1]?.headers).get('Authorization')
+      new Headers(fetchMock.mock.calls[1][1]?.headers).get('Authorization')
     ).toBe('Bearer id-token');
     expect(state).toMatchObject({
       status: 'signed-in',
@@ -97,15 +108,16 @@ describe('TinaCloud auth slice', () => {
 
   it('ignores messages from another origin or another window', async () => {
     const fetchMock = stubFetch((url) => tinaCloudIdentity(url));
-    const { popup, complete } = stubLoginPopup();
+    const { popup, opened, complete } = stubLoginPopup();
     const { slice, state } = boot();
 
     const login = slice.login();
+    await opened();
     postMessageFrom(popup, loginTokens(), 'https://evil.example');
     postMessageFrom(window, loginTokens());
     postMessageFrom(popup, { ...loginTokens(), source: 'other' });
     expect(popup.close).not.toHaveBeenCalled();
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledOnce();
 
     complete();
     await login;
@@ -114,10 +126,11 @@ describe('TinaCloud auth slice', () => {
 
   it('rejects with unauthenticated when the editor closes the popup', async () => {
     vi.useFakeTimers();
-    const { popup } = stubLoginPopup();
+    const { popup, opened } = stubLoginPopup();
     const { slice, state } = boot();
 
     const login = slice.login();
+    await opened();
     const assertion = expect(login).rejects.toMatchObject({
       code: 'unauthenticated',
       detail: expect.stringContaining('closed'),
@@ -157,7 +170,9 @@ describe('TinaCloud auth slice', () => {
     ['invalid-response', () => json({ fullName: 'No Id' })],
     ['invalid-response', () => new Response('<html>')],
   ])('maps a failed user lookup to %s', async (code, respond) => {
-    stubFetch(respond);
+    stubFetch((url) =>
+      url === AUTH_CONFIG_URL ? tinaCloudIdentity(url) : respond()
+    );
     const { complete } = stubLoginPopup();
     const { slice, state, tinaCloudToken } = boot();
     const login = slice.login();
@@ -215,7 +230,7 @@ describe('TinaCloud auth slice', () => {
     await login;
     expect(state).toMatchObject({ status: 'forbidden', user: { id: 'ada' } });
     expect(await tinaCloudToken()).toBeUndefined();
-    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(fetchMock).not.toHaveBeenCalledWith(PROJECT_URL, expect.anything());
   });
 
   it('refreshes the token once when it expires within two minutes', async () => {
@@ -249,7 +264,7 @@ describe('TinaCloud auth slice', () => {
     const fetchMock = stubFetch((url) => tinaCloudIdentity(url));
     const { tinaCloudToken } = await signIn();
     expect(await tinaCloudToken()).toBe('id-token');
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).not.toHaveBeenCalledWith(TOKEN_URL, expect.anything());
   });
 
   it('signs out with expired when TinaCloud refuses the refresh', async () => {
@@ -329,7 +344,9 @@ describe('TinaCloud auth slice', () => {
     const { slice, state, tinaCloudToken } = boot();
     const login = slice.login();
     complete();
-    await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    await vi.waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(CURRENT_USER_URL, expect.anything())
+    );
     await slice.logout();
     finishLookup(json(tinaCloudUser));
     await login;
@@ -348,7 +365,9 @@ describe('TinaCloud auth slice', () => {
     );
     const { slice, tinaCloudToken } = await signIn(loginTokens(60));
     const pending = tinaCloudToken();
-    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
+    await vi.waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(TOKEN_URL, expect.anything())
+    );
     await slice.logout();
     finishRefresh(
       json({ access_token: jwtExpiringIn(3600), id_token: 'late' })
@@ -368,7 +387,9 @@ describe('TinaCloud auth slice', () => {
     );
     const { slice, tinaCloudToken } = await signIn(loginTokens(60));
     const pending = tinaCloudToken();
-    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
+    await vi.waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(TOKEN_URL, expect.anything())
+    );
     await slice.logout();
     const { complete } = stubLoginPopup();
     const login = slice.login();
@@ -384,5 +405,159 @@ describe('TinaCloud auth slice', () => {
     await slice.logout();
     expect(state).toMatchObject({ status: 'signed-out', user: null });
     expect(await tinaCloudToken()).toBeUndefined();
+  });
+});
+
+describe('TinaCloud redirect sign-in', () => {
+  const PKCE_KEY = 'tinacms-tinacloud-pkce';
+
+  const returnFromTinaCloud = (
+    query: string,
+    pending: Record<string, string> | null = {
+      clientId: 'abc',
+      verifier: 'the-verifier',
+      state: 'the-state',
+      search: '?site=1',
+      hash: '#/collections/posts',
+    }
+  ) => {
+    if (pending) sessionStorage.setItem(PKCE_KEY, JSON.stringify(pending));
+    window.history.replaceState(null, '', `/admin/?${query}`);
+  };
+
+  const currentPath = () =>
+    `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
+  const signedInTokens = () =>
+    json({ access_token: jwtExpiringIn(3600), refresh_token: 'refresh' });
+
+  it('redirects to the WorkOS sign-in instead of opening the popup', async () => {
+    stubFetch((url) => tinaCloudIdentity(url, { workosEnabled: true }));
+    const open = vi.spyOn(window, 'open');
+    const assign = vi
+      .spyOn(window.location, 'assign')
+      .mockImplementation(() => {});
+    window.history.replaceState(null, '', '/admin/?site=1#/collections/posts');
+
+    void boot().slice.login();
+    await vi.waitFor(() => expect(assign).toHaveBeenCalled());
+
+    expect(open).not.toHaveBeenCalled();
+    const target = new URL(String(assign.mock.calls[0][0]));
+    expect(target.origin + target.pathname).toBe(
+      `${TINACLOUD_IDENTITY_URL}/v2/auth/tinacms`
+    );
+    const pending = JSON.parse(sessionStorage.getItem(PKCE_KEY) ?? '{}');
+    const digest = await crypto.subtle.digest(
+      'SHA-256',
+      new TextEncoder().encode(pending.verifier)
+    );
+    const challenge = btoa(String.fromCharCode(...new Uint8Array(digest)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+    expect(Object.fromEntries(target.searchParams)).toEqual({
+      response_type: 'code',
+      client_id: 'abc',
+      redirect_uri: `${window.location.origin}/admin/`,
+      code_challenge: challenge,
+      code_challenge_method: 'S256',
+      state: pending.state,
+    });
+    expect(pending).toMatchObject({
+      clientId: 'abc',
+      search: '?site=1',
+      hash: '#/collections/posts',
+    });
+  });
+
+  it('signs in with the code TinaCloud returns, keeping no token in storage', async () => {
+    const fetchMock = stubFetch((url) =>
+      url === TOKEN_URL ? signedInTokens() : tinaCloudIdentity(url)
+    );
+    returnFromTinaCloud('code=the-code&state=the-state');
+
+    const { state, tinaCloudToken } = boot();
+
+    expect(state.status).toBe('loading');
+    expect(currentPath()).toBe('/admin/?site=1#/collections/posts');
+    await vi.waitFor(() => expect(state.status).toBe('signed-in'));
+    const exchange = fetchMock.mock.calls.find(([url]) => url === TOKEN_URL);
+    expect(
+      Object.fromEntries(new URLSearchParams(String(exchange?.[1]?.body)))
+    ).toEqual({
+      grant_type: 'authorization_code',
+      code: 'the-code',
+      code_verifier: 'the-verifier',
+      redirect_uri: `${window.location.origin}/admin/`,
+      client_id: 'abc',
+    });
+    expect(state).toMatchObject({ user: { id: 'ada' }, roles: ['admin'] });
+    expect(sessionStorage.length).toBe(0);
+    expect(localStorage.length).toBe(0);
+    expect(await tinaCloudToken()).toBe(jwtExpiringIn(3600));
+  });
+
+  it('shares one code exchange when StrictMode boots the admin twice', async () => {
+    const fetchMock = stubFetch((url) =>
+      url === TOKEN_URL ? signedInTokens() : tinaCloudIdentity(url)
+    );
+    returnFromTinaCloud('code=the-code&state=the-state');
+
+    const discarded = boot();
+    const { state } = boot();
+
+    expect(state.status).toBe('loading');
+    await vi.waitFor(() => expect(state.status).toBe('signed-in'));
+    expect(discarded.state.status).toBe('signed-in');
+    expect(
+      fetchMock.mock.calls.filter(([url]) => url === TOKEN_URL)
+    ).toHaveLength(1);
+    expect(sessionStorage.length).toBe(0);
+  });
+
+  it.each([
+    ['a state this tab did not send', 'code=the-code&state=forged'],
+    ['an error', 'error=access_denied&state=the-state'],
+  ])('shows why when the sign-in returns with %s', async (_case, query) => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const fetchMock = stubFetch((url) => tinaCloudIdentity(url));
+    returnFromTinaCloud(query);
+
+    const { state } = boot();
+
+    await vi.waitFor(() =>
+      expect(state).toMatchObject({
+        status: 'signed-out',
+        error: { code: 'unauthenticated' },
+      })
+    );
+    expect(currentPath()).toBe('/admin/?site=1#/collections/posts');
+    expect(fetchMock).not.toHaveBeenCalledWith(TOKEN_URL, expect.anything());
+  });
+
+  it('shows why when TinaCloud refuses the code', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    stubFetch((url) =>
+      url === TOKEN_URL ? json({}, 401) : tinaCloudIdentity(url)
+    );
+    returnFromTinaCloud('code=the-code&state=the-state');
+
+    const { state, tinaCloudToken } = boot();
+
+    await vi.waitFor(() =>
+      expect(state).toMatchObject({
+        status: 'signed-out',
+        error: { code: 'unauthenticated' },
+      })
+    );
+    expect(await tinaCloudToken()).toBeUndefined();
+  });
+
+  it('leaves a code that this tab did not ask for alone', () => {
+    returnFromTinaCloud('code=site-code&state=x', null);
+    const { state } = boot();
+    expect(state.status).toBe('signed-out');
+    expect(window.location.search).toBe('?code=site-code&state=x');
   });
 });

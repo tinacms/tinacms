@@ -1,21 +1,28 @@
 import { Button } from '@tinacms/ui/components/button';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import type { ReactNode } from 'react';
-import type { AuthUser } from '../core/auth/contract';
+import type { AuthError, AuthUser } from '../core/auth/contract';
 import { useOptionalAuthSlice } from '../editor/hooks';
 import { useAuthAction } from './use-auth-action';
 
-function SignInScreen({ login }: { login: () => Promise<void> }) {
+function SignInScreen({
+  login,
+  error,
+}: {
+  login: () => Promise<void>;
+  error?: AuthError;
+}) {
   const signIn = useAuthAction(login, 'Sign-in failed. Please try again.');
+  const message = signIn.pending ? null : (signIn.error ?? error?.message);
   return (
     <main className='flex min-h-svh flex-col items-center justify-center gap-4 p-4'>
       <h1 className='text-lg font-semibold'>Sign in to TinaCMS</h1>
       <Button onClick={signIn.run} disabled={signIn.pending}>
         Sign in
       </Button>
-      {signIn.error ? (
+      {message ? (
         <p role='alert' className='text-sm text-destructive'>
-          {signIn.error}
+          {message}
         </p>
       ) : null}
     </main>
@@ -67,5 +74,5 @@ export function AuthGate({ children }: { children: ReactNode }) {
     return <ForbiddenScreen user={auth.user} logout={auth.logout} />;
   }
   if (auth.LoginScreen) return <auth.LoginScreen />;
-  return <SignInScreen login={auth.login} />;
+  return <SignInScreen login={auth.login} error={auth.error} />;
 }

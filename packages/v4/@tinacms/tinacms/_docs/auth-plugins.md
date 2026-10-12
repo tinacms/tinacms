@@ -121,18 +121,27 @@ with no login.
 `tinaCloud({ clientId })` is the reference auth plugin. It provides `auth`
 and `media` from one plugin.
 
-- `login()` opens the TinaCloud sign-in popup at `https://app.tina.io/signin`.
-  The slice accepts the tokens only from a message that the popup posts from
-  the `https://app.tina.io` origin.
+- `login()` signs in the way `https://identity.tinajs.io/v2/auth/config`
+  says, as v3 does:
+  - With `workosEnabled` off, it opens the TinaCloud sign-in popup at
+    `https://app.tina.io/signin`. The slice accepts the tokens only from a
+    message that the popup posts from the `https://app.tina.io` origin.
+  - With `workosEnabled` on, it redirects to
+    `https://identity.tinajs.io/v2/auth/tinacms` with a PKCE challenge. When
+    the browser returns with a `code` and the `state` this tab sent, the slice
+    exchanges the code at `/oauth/token` and restores the admin URL. The
+    verifier stays in `sessionStorage` for the round trip; the tokens do not.
+    A sign-in that fails on the way back sets `signed-out` with an `error`,
+    which the sign-in screen shows.
 - The slice reads the user from
   `https://identity.tinajs.io/v2/apps/{clientId}/currentUser`, and their role
   in the project from `https://identity.tinajs.io/v2/apps/{clientId}`. A
   project `owner` or `admin`, or an org admin, gets the `admin` role, and any
   other user gets `editor`.
-- `login()` throws `no-access` for an account with no access to the project.
+- An account with no access to the project fails with `no-access`.
 - An account that is not verified sets `forbidden`, and the slice keeps no
-  token for it. TinaCloud refuses a disabled account, so `login()` throws
-  `no-access` for it.
+  token for it. TinaCloud refuses a disabled account, so it fails with
+  `no-access`.
 - The tokens stay in a closure of the slice. A full reload signs the editor
   out (ADR-023).
 - The media slice of `tinaCloud()` gets its token from the same closure. It
@@ -183,8 +192,6 @@ only, and the first plugin keeps its other capabilities.
 
 - Sign-out on a `401`. A request that carried a token and gets `401` fails,
   and the slice does not change its status.
-- The TinaCloud redirect sign-in flow (PKCE), for projects that use WorkOS.
-  `tinaCloud()` supports the popup flow only.
 - `onLogin` and `onLogout` hooks in the config. A plugin does its own work
   inside its `login()` and `logout()`.
 

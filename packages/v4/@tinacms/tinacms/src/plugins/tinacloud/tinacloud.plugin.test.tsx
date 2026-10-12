@@ -23,6 +23,9 @@ const stubTinaCloud = (
   }
 ) => {
   const fetchMock = vi.fn(async (url: string, _init?: RequestInit) => {
+    if (url.endsWith('/v2/auth/config')) {
+      return Response.json({ workosEnabled: false });
+    }
     if (url.endsWith('/currentUser')) return Response.json(tinaCloudUser);
     if (url.startsWith(TINACLOUD_IDENTITY_URL)) return Response.json(project);
     return Response.json({ files: [], directories: [] });
@@ -111,7 +114,9 @@ describe('tinaCloud()', () => {
       .catch((cause: unknown) => cause);
     expect(failure).toBeInstanceOf(MediaError);
     expect(failure).toMatchObject({ code: 'unauthorized' });
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      `${TINACLOUD_IDENTITY_URL}/v2/auth/config`,
+    ]);
   });
 
   it("sends the auth slice's token on media requests after sign-in", async () => {

@@ -19,6 +19,12 @@ export const refreshResponseSchema = z.object({
   refresh_token: z.string().min(1).optional(),
 });
 
+export const codeResponseSchema = refreshResponseSchema.required({
+  refresh_token: true,
+});
+
+export const authConfigSchema = z.object({ workosEnabled: z.boolean() });
+
 export const jwtPayloadSchema = z.object({ exp: z.number() });
 
 // TinaCloud sends a missing name or email as "".

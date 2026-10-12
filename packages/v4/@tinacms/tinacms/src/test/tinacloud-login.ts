@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { expect, vi } from 'vitest';
 import { TINACLOUD_APP_URL } from '../plugins/tinacloud/client';
 
 export const jwtExpiringIn = (seconds: number, subject = 'access') =>
@@ -32,9 +32,12 @@ export const stubLoginPopup = () => {
   const open = vi
     .spyOn(window, 'open')
     .mockReturnValue(popup as unknown as Window);
-  const complete = (data: unknown = loginTokens()) =>
+  const opened = () => vi.waitFor(() => expect(open).toHaveBeenCalled());
+  const complete = async (data: unknown = loginTokens()) => {
+    await opened();
     postMessageFrom(popup, data);
-  return { popup, open, complete };
+  };
+  return { popup, open, opened, complete };
 };
 
 export const tinaCloudUser = {
@@ -45,11 +48,15 @@ export const tinaCloudUser = {
   enabled: true,
 };
 
-/** Answers the two TinaCloud identity lookups that sign-in makes. */
+/** Answers the TinaCloud identity lookups that sign-in makes. */
 export const tinaCloudIdentity = (
   url: string,
   {
     user = tinaCloudUser,
     role = 'admin',
-  }: { user?: object; role?: string } = {}
-) => Response.json(url.endsWith('/currentUser') ? user : { role });
+    workosEnabled = false,
+  }: { user?: object; role?: string; workosEnabled?: boolean } = {}
+) => {
+  if (url.endsWith('/v2/auth/config')) return Response.json({ workosEnabled });
+  return Response.json(url.endsWith('/currentUser') ? user : { role });
+};

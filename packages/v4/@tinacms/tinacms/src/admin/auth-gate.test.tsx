@@ -2,7 +2,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import { type AuthSlice, toUserId } from '../core/auth/contract';
+import { AuthError, type AuthSlice, toUserId } from '../core/auth/contract';
 import { asResolvedConfig } from '../config';
 import { type PluginManifest, definePlugin } from '../core/plugin';
 import { testAuthPlugin } from '../test/test-auth-plugin';
@@ -74,6 +74,31 @@ describe('AuthGate', () => {
       await screen.findByRole('button', { name: 'Sign in' })
     ).toBeInTheDocument();
     expect(screen.queryByRole('list', { name: 'Collections' })).toBeNull();
+  });
+
+  it('shows why the last sign-in failed on the sign-in screen', async () => {
+    const failedAuthPlugin = definePlugin({
+      name: 'test:failed-auth',
+      provides: ['auth'],
+      client: async () => ({
+        default: {
+          slice: () =>
+            ({
+              status: 'signed-out',
+              user: null,
+              error: new AuthError('no-access'),
+              getToken: async () => undefined,
+              login: async () => {},
+              logout: async () => {},
+            }) satisfies AuthSlice,
+        },
+      }),
+    });
+    renderAdmin([failedAuthPlugin]);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'This account has no access to this project.'
+    );
   });
 
   it("shows the plugin's own sign-in screen instead of the default", async () => {

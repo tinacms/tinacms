@@ -10,6 +10,8 @@ import {
 import {
   TINACLOUD_LOGIN_EVENT,
   type TinaCloudLoginMessage,
+  authConfigSchema,
+  codeResponseSchema,
   currentUserSchema,
   currentUserUrl,
   jwtPayloadSchema,
@@ -19,6 +21,12 @@ import {
   refreshResponseSchema,
 } from './tinacloud-auth-types';
 import { openCenteredPopup, waitForPopupMessage } from './popup';
+import {
+  type RedirectResult,
+  clearPendingRedirect,
+  readPendingRedirect,
+  startRedirectSignIn,
+} from './redirect';
 
 const REFRESH_MARGIN_SECONDS = 120;
 
@@ -151,6 +159,69 @@ const refreshTokens = async (
   return toTokens(access_token, id_token, refresh_token ?? tokens.refreshToken);
 };
 
+// TinaCloud signs in through WorkOS once this is on, and only by redirect.
+const fetchWorkosEnabled = async (): Promise<boolean> => {
+  const { response, body } = await send(
+    `${TINACLOUD_IDENTITY_URL}/v2/auth/config`,
+    {}
+  );
+  if (!response.ok) {
+    throw new AuthError(
+      'network',
+      `TinaCloud responded with ${response.status}.`
+    );
+  }
+  const parsed = authConfigSchema.safeParse(body);
+  if (!parsed.success) {
+    throw new AuthError(
+      'invalid-response',
+      'TinaCloud returned the auth config in an unknown format.'
+    );
+  }
+  return parsed.data.workosEnabled;
+};
+
+const exchangeCode = async (
+  clientId: string,
+  { code, verifier, redirectUri }: RedirectResult
+): Promise<TinaCloudTokens> => {
+  const { response, body } = await send(
+    `${TINACLOUD_IDENTITY_URL}/oauth/token`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code,
+        code_verifier: verifier,
+        redirect_uri: redirectUri,
+        client_id: clientId,
+      }).toString(),
+    }
+  );
+  if ([400, 401, 403].includes(response.status)) {
+    throw new AuthError(
+      'unauthenticated',
+      `TinaCloud refused the sign-in code with ${response.status}.`
+    );
+  }
+  if (!response.ok) {
+    throw new AuthError(
+      'network',
+      `TinaCloud responded with ${response.status}.`
+    );
+  }
+  const parsed = codeResponseSchema.safeParse(body);
+  if (!parsed.success) {
+    throw new AuthError(
+      'invalid-response',
+      'TinaCloud returned the signed-in tokens in an unknown format.'
+    );
+  }
+  const { access_token, id_token, refresh_token } = parsed.data;
+  return toTokens(access_token, id_token, refresh_token);
+};
+
 const openLoginPopup = async (
   clientId: string
 ): Promise<TinaCloudLoginMessage> => {
@@ -168,6 +239,34 @@ const openLoginPopup = async (
   });
 };
 
+// StrictMode boots the admin twice, and the code TinaCloud returns works once,
+// so both boots share one exchange, keyed by the state the sign-in sent.
+const redirectExchanges = new Map<string, Promise<TinaCloudTokens>>();
+
+const redirectTokens = (
+  clientId: string
+): Promise<TinaCloudTokens> | undefined => {
+  const pending = readPendingRedirect(clientId);
+  if (!pending) return undefined;
+  const shared = redirectExchanges.get(pending.state);
+  if (shared || !pending.outcome) return shared;
+  const { outcome } = pending;
+  let exchange: Promise<TinaCloudTokens>;
+  if (outcome instanceof AuthError) {
+    exchange = Promise.reject(outcome);
+  } else {
+    exchange = exchangeCode(clientId, outcome);
+  }
+  redirectExchanges.set(pending.state, exchange);
+  exchange
+    .finally(() => {
+      redirectExchanges.delete(pending.state);
+      clearPendingRedirect();
+    })
+    .catch(() => {});
+  return exchange;
+};
+
 // ADR-023 §4: the tokens live in this closure only, never in slice state or storage.
 export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
   let tokens: TinaCloudTokens | undefined;
@@ -179,7 +278,7 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     signOuts += 1;
     tokens = undefined;
     refreshing = undefined;
-    set?.({ status: 'signed-out', user: null });
+    set?.({ status: 'signed-out', user: null, error: undefined });
   };
 
   const freshTokens = async (
@@ -209,14 +308,7 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     return (await freshTokens(tokens))?.bearer;
   };
 
-  const login = async () => {
-    const signOutsAtStart = signOuts;
-    const message = await openLoginPopup(clientId);
-    const next = toTokens(
-      message.access_token,
-      message.id_token,
-      message.refresh_token
-    );
+  const signInWith = async (next: TinaCloudTokens, signOutsAtStart: number) => {
     const { user, active } = await fetchIdentity(
       currentUserUrl(clientId),
       next.bearer,
@@ -240,12 +332,66 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     set?.({ status: 'signed-in', user, roles });
   };
 
+  // Fetched ahead of the click, so the popup opens within its user gesture.
+  let workosEnabled: boolean | undefined;
+  let fetchingWorkosEnabled: Promise<boolean> | undefined;
+  const prefetchWorkosEnabled = () => {
+    fetchingWorkosEnabled ??= fetchWorkosEnabled().then(
+      (enabled) => {
+        workosEnabled = enabled;
+        return enabled;
+      },
+      (cause) => {
+        fetchingWorkosEnabled = undefined;
+        throw cause;
+      }
+    );
+    return fetchingWorkosEnabled;
+  };
+
+  const login = async () => {
+    const signOutsAtStart = signOuts;
+    if (workosEnabled ?? (await prefetchWorkosEnabled())) {
+      await startRedirectSignIn(clientId);
+      // The page is leaving for TinaCloud; settling would re-enable the button.
+      await new Promise<never>(() => {});
+    }
+    const message = await openLoginPopup(clientId);
+    await signInWith(
+      toTokens(message.access_token, message.id_token, message.refresh_token),
+      signOutsAtStart
+    );
+  };
+
+  const finishRedirectSignIn = async (exchange: Promise<TinaCloudTokens>) => {
+    const signOutsAtStart = signOuts;
+    try {
+      await signInWith(await exchange, signOutsAtStart);
+    } catch (cause) {
+      console.error('[tinacms] TinaCloud sign-in failed:', cause);
+      if (signOuts !== signOutsAtStart) return;
+      tokens = undefined;
+      if (cause instanceof AuthError) {
+        set?.({ status: 'signed-out', user: null, error: cause });
+      } else {
+        set?.({
+          status: 'signed-out',
+          user: null,
+          error: new AuthError('invalid-response', String(cause)),
+        });
+      }
+    }
+  };
+
   const logout = async () => signOut();
 
   const slice = (sliceSet: SliceSet): AuthSlice => {
     set = sliceSet;
+    void prefetchWorkosEnabled().catch(() => {});
+    const redirect = redirectTokens(clientId);
+    if (redirect) void finishRedirectSignIn(redirect);
     return {
-      status: 'signed-out',
+      status: redirect ? 'loading' : 'signed-out',
       user: null,
       getToken: async () => undefined,
       login,
