@@ -11,6 +11,7 @@ import {
   mediaManagerPlugin,
   required,
   t,
+  tinaCloud,
 } from '@tinacms/tinacms';
 import { helpNavPlugin } from './help-nav';
 import { hooksPlugin, logSave, trimTitle } from './hooks';
@@ -102,10 +103,19 @@ export const pageCollection = {
   ],
 } satisfies CollectionSchema;
 
+const tinaCloudClientId: string | undefined = import.meta.env
+  .TINA_PUBLIC_CLIENT_ID;
+
 export default defineConfig({
   plugins: [
     localContentPlugin(),
-    localMediaPlugin(),
+    tinaCloudClientId
+      ? tinaCloud({
+          clientId: tinaCloudClientId,
+          // Manual stand-in until TinaCloud login lands: https://github.com/tinacms/tinacms/issues/7689
+          getToken: () => localStorage.getItem('tinacloud-token') ?? undefined,
+        })
+      : localMediaPlugin(),
     mediaManagerPlugin(),
     ratingFieldPlugin,
     validatorsPlugin,

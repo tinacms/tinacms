@@ -1,9 +1,3 @@
-import {
-  Popover,
-  PopoverButton,
-  PopoverPanel,
-  Transition,
-} from '@headlessui/react';
 import { ElementApi } from '@udecode/plate';
 import {
   ParagraphPlugin,
@@ -13,6 +7,11 @@ import {
 import React from 'react';
 import { ELEMENT_MDX_INLINE } from '.';
 import { EllipsisIcon } from '../../components/plate-ui/icons';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '../../components/plate-ui/popover';
 import { useTemplates } from '../../editor-context';
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { NestedForm } from '../../nested-form';
@@ -218,50 +217,50 @@ const DotMenu = ({
   showEdit: boolean;
 }) => {
   return (
-    <Popover as='span' className='-ml-px relative block'>
-      <PopoverButton
-        as='span'
-        className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+    <Popover>
+      <span className='-ml-px relative block'>
+        <PopoverTrigger asChild>
+          <span
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={(e) => e.stopPropagation()}
+            className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+          >
+            <EllipsisIcon title='Open options' />
+          </span>
+        </PopoverTrigger>
+      </span>
+      <PopoverContent
+        align='end'
+        sideOffset={8}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
+        className='w-auto p-0 border-0 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5'
       >
-        <EllipsisIcon title='Open options' />
-      </PopoverButton>
-      <Transition
-        enter='transition ease-out duration-100'
-        enterFrom='transform opacity-0 scale-95'
-        enterTo='transform opacity-100 scale-100'
-        leave='transition ease-in duration-75'
-        leaveFrom='transform opacity-100 scale-100'
-        leaveTo='transform opacity-0 scale-95'
-      >
-        <PopoverPanel className='z-30 fixed origin-top-right right-0'>
-          <div className='mt-2 -mr-1 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
-            <div className='py-1'>
-              {showEdit ? (
-                <span
-                  onClick={onOpen}
-                  className={classNames(
-                    'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
-                  )}
-                >
-                  Edit
-                </span>
-              ) : null}
-              <button
-                type='button'
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  onRemove();
-                }}
-                className={classNames(
-                  'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
-                )}
-              >
-                Remove
-              </button>
-            </div>
-          </div>
-        </PopoverPanel>
-      </Transition>
+        <div className='py-1'>
+          {showEdit ? (
+            <span
+              onClick={onOpen}
+              className={classNames(
+                'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
+              )}
+            >
+              Edit
+            </span>
+          ) : null}
+          <button
+            type='button'
+            onMouseDown={(e) => {
+              e.preventDefault();
+              onRemove();
+            }}
+            className={classNames(
+              'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
+            )}
+          >
+            Remove
+          </button>
+        </div>
+      </PopoverContent>
     </Popover>
   );
 };

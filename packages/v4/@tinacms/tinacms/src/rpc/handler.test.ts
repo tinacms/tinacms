@@ -5,6 +5,7 @@ import {
   defineServerPlugin,
   protectedOp,
   publicOp,
+  toUserId,
   use,
 } from '../server';
 import { createRpcHandler } from './handler';
@@ -12,9 +13,12 @@ import { createRpcHandler } from './handler';
 const sessionsByToken: Record<string, Session> = Object.assign(
   Object.create(null),
   {
-    'admin-token': { identity: { id: 'ada' }, roles: ['admin'] },
-    'editor-token': { identity: { id: 'eli' }, roles: ['editor'] },
-    'proto-token': { identity: { id: 'mal' }, roles: ['constructor'] },
+    'admin-token': { identity: { id: toUserId('ada') }, roles: ['admin'] },
+    'editor-token': { identity: { id: toUserId('eli') }, roles: ['editor'] },
+    'proto-token': {
+      identity: { id: toUserId('mal') },
+      roles: ['constructor'],
+    },
   }
 );
 
@@ -201,7 +205,7 @@ describe('createRpcHandler', () => {
           getSession: async (request: Request) => {
             await (use('media').health as () => Promise<unknown>)();
             return request.headers.get('authorization')
-              ? { identity: { id: 'ada' }, roles: ['admin'] }
+              ? { identity: { id: toUserId('ada') }, roles: ['admin'] }
               : null;
           },
         }),
