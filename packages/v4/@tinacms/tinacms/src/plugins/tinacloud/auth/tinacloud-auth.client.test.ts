@@ -38,7 +38,7 @@ const boot = () => {
     );
   });
   Object.assign(state, slice);
-  return { slice, state, getToken: auth.getToken };
+  return { slice, state, tinaCloudToken: auth.tinaCloudToken };
 };
 
 const signIn = async (tokens = loginTokens()) => {
@@ -58,15 +58,15 @@ afterEach(() => {
 
 describe('TinaCloud auth slice', () => {
   it('starts signed out with no token', async () => {
-    const { state, getToken } = boot();
+    const { state, tinaCloudToken } = boot();
     expect(state).toMatchObject({ status: 'signed-out', user: null });
-    expect(await getToken()).toBeUndefined();
+    expect(await tinaCloudToken()).toBeUndefined();
   });
 
   it('signs in through the TinaCloud popup and keeps the token in memory', async () => {
     const fetchMock = stubFetch(() => json(tinaCloudUser));
     const { popup, open, complete } = stubLoginPopup();
-    const { slice, state, getToken } = boot();
+    const { slice, state, tinaCloudToken } = boot();
 
     const login = slice.login();
     complete();
@@ -88,7 +88,7 @@ describe('TinaCloud auth slice', () => {
     });
     expect(JSON.stringify(state)).not.toContain('id-token');
     expect(localStorage.length).toBe(0);
-    expect(await getToken()).toBe('id-token');
+    expect(await tinaCloudToken()).toBe('id-token');
   });
 
   it('ignores messages from another origin or another window', async () => {
@@ -155,14 +155,14 @@ describe('TinaCloud auth slice', () => {
   ])('maps a failed user lookup to %s', async (code, respond) => {
     stubFetch(respond);
     const { complete } = stubLoginPopup();
-    const { slice, state, getToken } = boot();
+    const { slice, state, tinaCloudToken } = boot();
     const login = slice.login();
     complete();
     const failure = await login.catch((cause: unknown) => cause);
     expect(failure).toBeInstanceOf(AuthError);
     expect(failure).toMatchObject({ code });
     expect(state.status).toBe('signed-out');
-    expect(await getToken()).toBeUndefined();
+    expect(await tinaCloudToken()).toBeUndefined();
   });
 
   it('gives a TinaCloud user that is not an admin the editor role', async () => {
@@ -183,12 +183,12 @@ describe('TinaCloud auth slice', () => {
     async (_case, flags) => {
       stubFetch(() => json({ ...tinaCloudUser, ...flags }));
       const { complete } = stubLoginPopup();
-      const { slice, state, getToken } = boot();
+      const { slice, state, tinaCloudToken } = boot();
       const login = slice.login();
       complete();
       await login;
       expect(state).toMatchObject({ status: 'forbidden', user: { id: 'ada' } });
-      expect(await getToken()).toBeUndefined();
+      expect(await tinaCloudToken()).toBeUndefined();
     }
   );
 
@@ -198,9 +198,9 @@ describe('TinaCloud auth slice', () => {
         ? json({ access_token: jwtExpiringIn(3600), id_token: 'id-token-2' })
         : json(tinaCloudUser)
     );
-    const { getToken } = await signIn(loginTokens(60));
+    const { tinaCloudToken } = await signIn(loginTokens(60));
 
-    expect(await Promise.all([getToken(), getToken()])).toEqual([
+    expect(await Promise.all([tinaCloudToken(), tinaCloudToken()])).toEqual([
       'id-token-2',
       'id-token-2',
     ]);
@@ -213,7 +213,7 @@ describe('TinaCloud auth slice', () => {
       refresh_token: 'refresh-token',
       client_id: 'abc',
     });
-    expect(await getToken()).toBe('id-token-2');
+    expect(await tinaCloudToken()).toBe('id-token-2');
     expect(
       fetchMock.mock.calls.filter(([url]) => url === TOKEN_URL)
     ).toHaveLength(1);
@@ -221,8 +221,8 @@ describe('TinaCloud auth slice', () => {
 
   it('does not refresh a token that is far from expiry', async () => {
     const fetchMock = stubFetch(() => json(tinaCloudUser));
-    const { getToken } = await signIn();
-    expect(await getToken()).toBe('id-token');
+    const { tinaCloudToken } = await signIn();
+    expect(await tinaCloudToken()).toBe('id-token');
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
@@ -232,10 +232,10 @@ describe('TinaCloud auth slice', () => {
         ? json({ error: 'invalid_grant' }, 400)
         : json(tinaCloudUser)
     );
-    const { state, getToken } = await signIn(loginTokens(60));
-    await expect(getToken()).rejects.toMatchObject({ code: 'expired' });
+    const { state, tinaCloudToken } = await signIn(loginTokens(60));
+    await expect(tinaCloudToken()).rejects.toMatchObject({ code: 'expired' });
     expect(state).toMatchObject({ status: 'signed-out', user: null });
-    expect(await getToken()).toBeUndefined();
+    expect(await tinaCloudToken()).toBeUndefined();
   });
 
   it('keeps the session when the refresh cannot reach TinaCloud', async () => {
@@ -248,19 +248,19 @@ describe('TinaCloud auth slice', () => {
         id_token: 'id-token-2',
       });
     });
-    const { state, getToken } = await signIn(loginTokens(60));
-    await expect(getToken()).rejects.toMatchObject({ code: 'network' });
+    const { state, tinaCloudToken } = await signIn(loginTokens(60));
+    await expect(tinaCloudToken()).rejects.toMatchObject({ code: 'network' });
     expect(state.status).toBe('signed-in');
     online = true;
-    expect(await getToken()).toBe('id-token-2');
+    expect(await tinaCloudToken()).toBe('id-token-2');
   });
 
   it('rejects refreshed tokens in an unknown format', async () => {
     stubFetch((url) =>
       url === TOKEN_URL ? json({ id_token: 'x' }) : json(tinaCloudUser)
     );
-    const { getToken } = await signIn(loginTokens(60));
-    await expect(getToken()).rejects.toMatchObject({
+    const { tinaCloudToken } = await signIn(loginTokens(60));
+    await expect(tinaCloudToken()).rejects.toMatchObject({
       code: 'invalid-response',
     });
   });
@@ -271,9 +271,9 @@ describe('TinaCloud auth slice', () => {
         ? json({ access_token: jwtExpiringIn(60, 'second') })
         : json(tinaCloudUser)
     );
-    const { getToken } = await signIn(loginTokens(60));
-    expect(await getToken()).toBe(jwtExpiringIn(60, 'second'));
-    await getToken();
+    const { tinaCloudToken } = await signIn(loginTokens(60));
+    expect(await tinaCloudToken()).toBe(jwtExpiringIn(60, 'second'));
+    await tinaCloudToken();
     const refreshes = fetchMock.mock.calls.filter(([url]) => url === TOKEN_URL);
     expect(
       new URLSearchParams(String(refreshes[1][1]?.body)).get('refresh_token')
@@ -284,8 +284,8 @@ describe('TinaCloud auth slice', () => {
     stubFetch((url) =>
       url === TOKEN_URL ? json({}, 429) : json(tinaCloudUser)
     );
-    const { state, getToken } = await signIn(loginTokens(60));
-    await expect(getToken()).rejects.toMatchObject({ code: 'network' });
+    const { state, tinaCloudToken } = await signIn(loginTokens(60));
+    await expect(tinaCloudToken()).rejects.toMatchObject({ code: 'network' });
     expect(state.status).toBe('signed-in');
   });
 
@@ -298,7 +298,7 @@ describe('TinaCloud auth slice', () => {
         })
     );
     const { complete } = stubLoginPopup();
-    const { slice, state, getToken } = boot();
+    const { slice, state, tinaCloudToken } = boot();
     const login = slice.login();
     complete();
     await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
@@ -306,7 +306,7 @@ describe('TinaCloud auth slice', () => {
     finishLookup(json(tinaCloudUser));
     await login;
     expect(state.status).toBe('signed-out');
-    expect(await getToken()).toBeUndefined();
+    expect(await tinaCloudToken()).toBeUndefined();
   });
 
   it('drops a refresh that lands after logout', async () => {
@@ -318,22 +318,22 @@ describe('TinaCloud auth slice', () => {
           })
         : json(tinaCloudUser)
     );
-    const { slice, getToken } = await signIn(loginTokens(60));
-    const pending = getToken();
+    const { slice, tinaCloudToken } = await signIn(loginTokens(60));
+    const pending = tinaCloudToken();
     await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
     await slice.logout();
     finishRefresh(
       json({ access_token: jwtExpiringIn(3600), id_token: 'late' })
     );
     expect(await pending).toBeUndefined();
-    expect(await getToken()).toBeUndefined();
+    expect(await tinaCloudToken()).toBeUndefined();
   });
 
   it('forgets the token on logout', async () => {
     stubFetch(() => json(tinaCloudUser));
-    const { slice, state, getToken } = await signIn();
+    const { slice, state, tinaCloudToken } = await signIn();
     await slice.logout();
     expect(state).toMatchObject({ status: 'signed-out', user: null });
-    expect(await getToken()).toBeUndefined();
+    expect(await tinaCloudToken()).toBeUndefined();
   });
 });

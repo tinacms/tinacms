@@ -6,6 +6,7 @@ import { runCodegen } from '../../../../cli/commands/codegen';
 import { type ResolvedConfig, resolveBuild } from '../../../../config';
 import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
+import { capabilityProvider } from '../../../../core/mount';
 import { DEFAULT_MEDIA_URL, MediaError } from '../../../../core/media/contract';
 import {
   MAX_MEDIA_UPLOAD_BYTES,
@@ -140,16 +141,13 @@ type SessionGate = (
 ) => Promise<boolean>;
 
 // ADR-023 §4: with an auth plugin, the Data Layer authorizes a request as
-// rpc/handler.ts does. With no auth plugin that has a server segment, it
-// composes nothing and checks nothing.
+// rpc/handler.ts does. When no auth plugin, or the winning one has no server
+// segment, it composes nothing and checks nothing.
 const createSessionGate = (
   plugins: PluginManifest[],
   capability: 'content' | 'media'
 ): SessionGate | null => {
-  const hasServerAuth = plugins.some(
-    ({ provides, server }) => provides.includes(AUTH_CAPABILITY) && server
-  );
-  if (!hasServerAuth) return null;
+  if (!capabilityProvider(plugins, AUTH_CAPABILITY)?.server) return null;
   const authorize = createRequestAuthorizer(plugins);
   const permission = plugins.find(({ provides }) =>
     provides.includes(capability)

@@ -104,8 +104,8 @@ with no login.
   content and media requests as the RPC handler does. It answers `401` when
   there is no session, or when the auth plugin has no `getSession`. It
   answers `403` when the roles do not grant the `requires` permission of the
-  content or media plugin. With no auth plugin, or one with no server
-  segment, it checks nothing.
+  content or media plugin. With no auth plugin, or when the winning one has
+  no server segment, it checks nothing.
 - The local Data Layer runs no `onInit`. A `getSession` must not depend on
   state that `onInit` sets.
 - Roles and permissions are runtime data of the provider. They are not in
@@ -166,7 +166,8 @@ defineConfig({
 });
 ```
 
-The overriding plugin mounts `store.auth`. For a plugin that provides more
+The overriding plugin mounts `store.auth` and answers `getSession`, so an
+override with no server segment leaves the RPC handler with no session. For a plugin that provides more
 than one capability, the override replaces `auth` only, and the first plugin
 keeps its other capabilities.
 

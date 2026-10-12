@@ -22,7 +22,7 @@ export const tinaCloud = (options: TinaCloudOptions): PluginManifest =>
             auth: auth.slice,
             media: createTinaCloudMediaSlice({
               clientId: options.clientId,
-              getToken: auth.getToken,
+              getToken: auth.tinaCloudToken,
             }),
           },
         },
