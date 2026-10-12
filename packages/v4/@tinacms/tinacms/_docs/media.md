@@ -19,7 +19,7 @@ Note: the `media` capability is a single-provider capability; so we can only eve
 ```ts
 plugins: [
   localContentPlugin(),
-  isLocal ? localMediaPlugin() : tinaCloud({ clientId, getToken }),
+  isLocal ? localMediaPlugin() : tinaCloud({ clientId }),
 ]
 ```
 

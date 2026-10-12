@@ -4,7 +4,7 @@
 // A codec for richer JSON is still an open question (ADR-007).
 
 import { invariant } from '../core/invariant';
-import { capabilityMountsFor } from '../core/mount';
+import { capabilityMountsFor, capabilityProvider } from '../core/mount';
 import {
   REGISTRY_CONFLICTS,
   type RegistryConflict,
@@ -133,7 +133,10 @@ const composeServerSegments = async (
   );
   return {
     segmentsByNamespace,
-    authHooks: claimAuthTransportHooks(segmentsByNamespace),
+    authHooks: claimAuthTransportHooks(
+      segmentsByNamespace,
+      capabilityProvider(plugins, AUTH_CAPABILITY)
+    ),
   };
 };
 
@@ -175,10 +178,12 @@ export const createRequestAuthorizer = (plugins: PluginManifest[]) => {
 // ops of every segment that provides auth. A plugin providing several singletons
 // mounts its one segment at each, so `media/getSession` would otherwise route. The
 // dispatch then returns 404 for their names through its normal lookup.
+// A client-only auth plugin that overrides a server one leaves no hooks.
 // Without a callable getSession, this returns null, so every non-public op fails
 // closed. A rolePermissions that is not callable fails the composition.
 const claimAuthTransportHooks = (
-  segmentsByNamespace: Map<string, ResolvedServerSegment>
+  segmentsByNamespace: Map<string, ResolvedServerSegment>,
+  authProvider: PluginManifest | undefined
 ): AuthTransportHooks | null => {
   const authSegment = segmentsByNamespace.get(AUTH_CAPABILITY);
   for (const [namespace, segment] of segmentsByNamespace) {
@@ -186,7 +191,7 @@ const claimAuthTransportHooks = (
     const { getSession, rolePermissions, ...routableOps } = segment.ops;
     segmentsByNamespace.set(namespace, { ...segment, ops: routableOps });
   }
-  if (!authSegment) return null;
+  if (!authSegment || authSegment.manifest !== authProvider) return null;
   const { getSession, rolePermissions } = authSegment.ops;
   if (typeof getSession !== 'function') return null;
   invariant(

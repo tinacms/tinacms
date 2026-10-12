@@ -119,8 +119,9 @@ through a symbolic link. It rejects a file name that holds a path separator.
 
 ## `tinaCloud()`
 
-`tinaCloud()` keeps media in TinaCloud. It provides `media`, with one slice in
-`slices.media`. A later release adds the `auth` capability to the same plugin.
+`tinaCloud()` keeps media in TinaCloud. It provides `media` and `auth`, with
+one slice in `slices.media` and one in `slices.auth`. Refer to
+[auth-plugins.md](./auth-plugins.md#tinacloud) for the sign-in flow.
 
 ```ts
 import { defineConfig, localContentPlugin, tinaCloud } from '@tinacms/tinacms';
@@ -128,7 +129,7 @@ import { defineConfig, localContentPlugin, tinaCloud } from '@tinacms/tinacms';
 export default defineConfig({
   plugins: [
     localContentPlugin(),
-    tinaCloud({ clientId: '<client id>', getToken: () => readToken() }),
+    tinaCloud({ clientId: '<client id>' }),
   ],
   schema: { collections: [] },
 });
@@ -137,11 +138,9 @@ export default defineConfig({
 | Option | Role |
 |---|---|
 | `clientId` | The client ID of the TinaCloud project. |
-| `getToken` | Returns the TinaCloud access token of the editor, or `undefined`. It can return a promise. |
 
-`getToken` is interim. When `tinaCloud()` provides `auth`, the plugin gets the
-token itself and the option goes. Until then, the app supplies the token. With
-no token, each operation fails with `unauthorized`.
+The media slice gets the token from the auth slice of the same plugin. Before
+the editor signs in, each operation fails with `unauthorized`.
 
 The slice supplies `rename`, `features.search`, `features.extensionFilter` and
 a `features.maxSize` of 100 MB. `resolveUrl` gives a CDN URL, and a size adds
@@ -166,7 +165,6 @@ media branch, then keeps it for the session.
 
 ### Not supported yet
 
-- The `auth` capability. It replaces `getToken`.
 - Media on an editorial workflow branch.
 - Static media, built at build time.
 - An assets API URL other than `https://assets.tinajs.io`.
