@@ -267,11 +267,11 @@ describe('StringField ingest and digest', () => {
     });
   });
 
-  it('preserves null vs absent on digest', async () => {
+  it('digests null as absent', async () => {
     const registry = await resolveRegistry();
     expect(
       digestDocument({ title: null }, collection.fields, { registry })
-    ).toEqual({ title: null });
+    ).toEqual({});
     expect(digestDocument({}, collection.fields, { registry })).toEqual({});
   });
 });

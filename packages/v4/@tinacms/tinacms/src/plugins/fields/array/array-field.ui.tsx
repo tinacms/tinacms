@@ -1,12 +1,13 @@
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import { ingestDocument } from '../../../core/form/ingest';
+import type { TinaDocument } from '../../../core/schema/types';
 import {
   NestedFieldRow,
   useDocumentPath,
   useFieldAddress,
   useFieldErrors,
-  useFieldList,
   useFieldRegistry,
   useFieldSchema,
 } from '../../../editor';
@@ -18,10 +19,17 @@ export function ArrayField() {
   const errors = useFieldErrors(address);
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
-  const { items, append, remove, move } = useFieldList(address);
+  const { control } = useFormContext();
+  const {
+    fields: items,
+    append,
+    remove,
+    move,
+  } = useFieldArray({ control, name: address });
 
   const addItem = () => {
-    append(ingestDocument({}, field.fields, { documentPath, registry }));
+    const item = ingestDocument({}, field.fields, { documentPath, registry });
+    append(item as TinaDocument);
   };
 
   return (

@@ -65,7 +65,7 @@ The client segment (`object-field.client.tsx`) takes the `object` key:
 defineClientPlugin({
   field: {
     Component: ObjectField,
-    // No defaultValue — an absent field stays absent, same as array.
+    // No defaultValue — an absent object starts as null and is not saved.
     metadata: { layout: 'block', labelable: false },
     schema: objectSchema,
     parse, serialize,       // recurse into nested fields — see below

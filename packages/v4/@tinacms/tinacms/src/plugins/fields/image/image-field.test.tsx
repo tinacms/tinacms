@@ -225,7 +225,7 @@ describe('ImageField uploading', () => {
       'notes.pdf: Invalid file type'
     );
     expect(media.upload).not.toHaveBeenCalled();
-    expect(valueOf('hero')).toBeUndefined();
+    expect(valueOf('hero')).toBeNull();
   });
 
   it('shows the message of a failed upload', async () => {
@@ -242,7 +242,7 @@ describe('ImageField uploading', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'That file is too large to upload.'
     );
-    expect(valueOf('hero')).toBeUndefined();
+    expect(valueOf('hero')).toBeNull();
   });
 
   it('offers no upload when the provider is read-only', async () => {
@@ -372,7 +372,10 @@ describe('ImageField inside an array', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 2' })
     );
-    expect(valueOf('authors')).toEqual([{ name: 'Ivan' }, { name: 'Brook' }]);
+    expect(valueOf('authors')).toEqual([
+      { name: 'Ivan', avatar: null },
+      { name: 'Brook', avatar: null },
+    ]);
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 });

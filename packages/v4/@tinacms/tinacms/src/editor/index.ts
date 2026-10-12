@@ -59,8 +59,6 @@ export {
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,
-  type FieldList,
-  useFieldList,
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,

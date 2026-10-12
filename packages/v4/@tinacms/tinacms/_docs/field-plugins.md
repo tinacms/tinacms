@@ -114,7 +114,7 @@ The properties of the descriptor:
 - `Component` (necessary) — It has no props. It gets all its data from the
   hooks below.
 - `defaultValue` — The initial value for a new or absent field, applied on
-  ingest.
+  ingest. Without it, the field starts as `null`.
 - `metadata.layout` — The layout hint: `inline` or `block`.
 - `metadata.labelable` — Set it to `false` to hide the outer field label. The
   `rich-text` field sets it to `false` because it renders its own label area.

@@ -179,12 +179,31 @@ describe('ArrayField add, remove, and reorder', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 2' })
     );
-    expect(valueOf('authors')).toEqual([{ name: 'Ivan' }, { name: 'Brook' }]);
+    expect(valueOf('authors')).toEqual([
+      { name: 'Ivan', age: null },
+      { name: 'Brook', age: null },
+    ]);
     expect(
       screen
         .getAllByLabelText('Age')
         .map((input) => (input as HTMLInputElement).value)
     ).toEqual(['', '']);
+  });
+
+  it("keeps a removed item's value off an item whose value was cleared", async () => {
+    renderField({
+      authors: [
+        { name: 'Ivan', age: 5 },
+        { name: 'Brook', age: 3 },
+      ],
+    });
+    const ages = await screen.findAllByLabelText('Age');
+    await userEvent.clear(ages[1]);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    expect(valueOf('authors')).toEqual([{ name: 'Brook', age: null }]);
+    expect((screen.getByLabelText('Age') as HTMLInputElement).value).toBe('');
   });
 
   it("keeps a moved item's value with that item", async () => {
@@ -194,7 +213,7 @@ describe('ArrayField add, remove, and reorder', () => {
       screen.getByRole('button', { name: 'Move item 2 up' })
     );
     expect(valueOf('authors')).toEqual([
-      { name: 'Brook' },
+      { name: 'Brook', age: null },
       { name: 'Ivan', age: '30' },
     ]);
   });
@@ -223,7 +242,10 @@ describe('ArrayField dirty tracking', () => {
     await userEvent.clear(second);
     await userEvent.type(second, 'Brook');
 
-    expect(valueOf('authors')).toEqual([{ name: 'Ivan' }, { name: 'Brook' }]);
+    expect(valueOf('authors')).toEqual([
+      { name: 'Ivan', age: null },
+      { name: 'Brook', age: null },
+    ]);
     expect(status()).toBe('clean');
   });
 });
@@ -234,7 +256,7 @@ describe('ArrayField value updates', () => {
     const name = await screen.findByLabelText('Name');
     await userEvent.clear(name);
     await userEvent.type(name, 'Brook');
-    expect(valueOf('authors')).toEqual([{ name: 'Brook' }]);
+    expect(valueOf('authors')).toEqual([{ name: 'Brook', age: null }]);
   });
 
   it('goes dirty again when an item field is edited after a save', async () => {
@@ -383,15 +405,23 @@ describe('ArrayField ingest and digest', () => {
     const registry = await resolveRegistry();
     const stored = { authors: [{ name: 'Ivan', age: 30 }] };
     const ingested = ingestDocument(stored, collection.fields, { registry });
-    expect(ingested).toEqual({ authors: [{ name: 'Ivan', age: '30' }] });
+    expect(ingested).toEqual({
+      authors: [{ name: 'Ivan', age: '30' }],
+      tags: null,
+      groups: null,
+    });
     expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
       stored
     );
   });
 
-  it('leaves an absent field absent (no default seeding)', async () => {
+  it('holds an absent field as null and digests it as absent', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({
+      authors: null,
+      tags: null,
+      groups: null,
+    });
     expect(digestDocument({}, collection.fields, { registry })).toEqual({});
   });
 
@@ -399,7 +429,7 @@ describe('ArrayField ingest and digest', () => {
     const registry = await resolveRegistry();
     expect(
       ingestDocument({ authors: null }, collection.fields, { registry })
-    ).toEqual({ authors: [] });
+    ).toEqual({ authors: [], tags: null, groups: null });
   });
 
   it('refuses stored content that is not an array of objects', async () => {
