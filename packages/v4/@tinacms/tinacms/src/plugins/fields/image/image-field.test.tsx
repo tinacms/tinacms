@@ -403,6 +403,24 @@ describe('ImageField validation', () => {
     const descriptor = (await resolveRegistry()).get('image');
     expect(validateFieldWithCore(heroNode, descriptor, 42)).not.toEqual([]);
   });
+
+  it('rejects a URL or a path outside the media root', async () => {
+    const descriptor = (await resolveRegistry()).get('image');
+    for (const value of [
+      'https://example.com/hero.jpg',
+      '//example.com/hero.jpg',
+      '/uploads/posts/hero.jpg',
+      'data:image/png;base64,AAAA',
+      'posts/../../hero.jpg',
+    ]) {
+      expect(validateFieldWithCore(heroNode, descriptor, value)).toEqual([
+        'Hero must be a media path, like posts/hero.jpg',
+      ]);
+    }
+    expect(
+      validateFieldWithCore(heroNode, descriptor, 'posts/my photo é.avif')
+    ).toEqual([]);
+  });
 });
 
 describe('ImageField ingest and digest', () => {

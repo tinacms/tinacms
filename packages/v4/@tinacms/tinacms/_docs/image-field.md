@@ -101,13 +101,15 @@ and each button keeps its own name.
 
 ## Validation
 
-`imageSchema(node)` builds a `z.string()`. It checks that the value is a path.
-It does not check that the file exists.
+`imageSchema(node)` builds a `z.string()`. It checks that the value is a media
+path, relative to the media root (ADR-022). It does not check that the file
+exists.
 
 | Config | Rule | Message |
 |---|---|---|
 | (none) | an absent or empty value passes | |
 | (none) | a value that is not a string fails | the Zod message |
+| (none) | a URL, a path that starts with `/`, or a path with a `..` segment fails | `{label} must be a media path, like posts/hero.jpg` |
 
 The string goes through `z.preprocess`, so `''` and `null` become `undefined`
 and pass. A `required()` validator then rejects an absent value.

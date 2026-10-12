@@ -11,10 +11,26 @@ export const image = (
   config: Omit<ImageFieldSchema, 'type'>
 ): ImageFieldSchema => ({ ...config, type: IMAGE_FIELD_TYPE });
 
-// The shape of the value only: a media path (ADR-022), never a URL.
-// `required` is a validator the collection attaches.
-export const imageSchema = (_node: FieldSchema): ZodType =>
+const labelOf = (field: FieldSchema): string => field.label ?? field.name;
+
+const URL_SCHEME = /^[a-z][a-z\d+.-]*:/i;
+
+// A media path is relative to the media root (ADR-022): no URL scheme, no
+// leading `/`, and no `..` segment.
+const isMediaPath = (value: string): boolean =>
+  !URL_SCHEME.test(value) &&
+  !value.startsWith('/') &&
+  !value.split('/').includes('..');
+
+// The shape of the value only. `required` is a validator the collection
+// attaches.
+export const imageSchema = (node: FieldSchema): ZodType =>
   z.preprocess(
     (value) => (value === '' || value == null ? undefined : value),
-    z.string().optional()
+    z
+      .string()
+      .refine(isMediaPath, {
+        message: `${labelOf(node)} must be a media path, like posts/hero.jpg`,
+      })
+      .optional()
   );
