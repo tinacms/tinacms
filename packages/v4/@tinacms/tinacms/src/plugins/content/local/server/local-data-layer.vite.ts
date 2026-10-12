@@ -392,6 +392,7 @@ export const tinaLocalDataLayerVitePlugin = (
         const uploaded = new Set<string>();
         const uploadsRoute = `/${options.mediaRoot ?? DEFAULT_MEDIA_ROOT}/`;
         server.middlewares.use(async (req, res, next) => {
+          if (!isLoopbackHost(req.headers.host)) return next();
           const pathname = (req.url ?? '').split('?')[0];
           if (!pathname.startsWith(uploadsRoute)) return next();
           let mediaPath: string;

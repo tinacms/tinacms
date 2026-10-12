@@ -164,13 +164,16 @@ describe('local media endpoint', () => {
   it('serves an uploaded file before Vite has noticed it', async () => {
     const routes = mountedRoutes();
     await upload(SAME_ORIGIN, routes.get(DEFAULT_MEDIA_URL));
-    const serve = async (url: string) => {
+    const serve = async (
+      url: string,
+      headers: Record<string, string> = SAME_ORIGIN
+    ) => {
       const res = responseDouble();
       let handled = false;
       for (const [route, handler] of routes) {
         if (!route.startsWith('*')) continue;
         let passed = false;
-        await handler(requestDouble(url, SAME_ORIGIN, [], 'GET'), res, () => {
+        await handler(requestDouble(url, headers, [], 'GET'), res, () => {
           passed = true;
         });
         if (!passed) {
@@ -186,6 +189,10 @@ describe('local media endpoint', () => {
     expect(served.res.body).toBe('jpeg');
     expect((await serve('/uploads/posts/other.jpg')).handled).toBe(false);
     expect((await serve('/uploads/posts/%E0%A4%A.jpg')).handled).toBe(false);
+    expect(
+      (await serve('/uploads/posts/hero.jpg', { host: 'evil.example:5173' }))
+        .handled
+    ).toBe(false);
   });
 
   it('403s a cross-origin upload, because multipart skips the preflight', async () => {
