@@ -1,6 +1,10 @@
 import { type ZodType, z } from 'zod';
 import { invariant } from '../../../core/invariant';
-import type { BaseFieldSchema, FieldSchema } from '../../../core/schema/types';
+import type {
+  BaseFieldSchema,
+  FieldSchema,
+  TinaDocument,
+} from '../../../core/schema/types';
 
 export const OBJECT_FIELD_TYPE = 'object';
 
@@ -27,5 +31,13 @@ export const asObjectFieldSchema = (node: FieldSchema): ObjectFieldSchema => {
 
 // The shape of the value only. `required` is a validator the collection
 // attaches, and an object with no keys is empty.
-export const objectSchema = (_node: FieldSchema): ZodType =>
-  z.preprocess((value) => value ?? {}, z.record(z.string(), z.unknown()));
+export const isPlainObject = (value: unknown): value is TinaDocument =>
+  value != null && typeof value === 'object' && !Array.isArray(value);
+
+export const objectSchema = (node: FieldSchema): ZodType =>
+  z.preprocess(
+    (value) => value ?? {},
+    z.custom<TinaDocument>(isPlainObject, {
+      message: `${node.label ?? node.name} must be a group of fields`,
+    })
+  );

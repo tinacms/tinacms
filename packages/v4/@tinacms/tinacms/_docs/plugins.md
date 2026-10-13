@@ -273,6 +273,8 @@ Two overrides of one screen throw an error at boot
     supplies
   - [The `reference` field](./reference-field.md) — the document picker that v4
     supplies
+  - [The `image` field](./image-field.md): the media picker that v4 supplies,
+    when a media plugin is installed
   - [The `rich-text` field](./rich-text-field.md) — the Plate editor that v4
     supplies, and the markdown body that it controls
 - [Media plugins](./media-plugins.md) — how a plugin stores media, and the local media plugin

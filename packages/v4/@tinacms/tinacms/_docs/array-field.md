@@ -65,7 +65,7 @@ The client segment (`array-field.client.tsx`) takes the `array` key:
 defineClientPlugin({
   field: {
     Component: ArrayField,
-    // No defaultValue — an absent field stays absent, same as number/datetime.
+    // No defaultValue — an absent list starts as null and is not saved.
     metadata: { layout: 'block', labelable: false },
     schema: arraySchema,
     parse, serialize,       // recurse into item fields — see below
@@ -81,7 +81,8 @@ defineClientPlugin({
 
 ## Validation
 
-`arraySchema(node)` checks cardinality with `z.array(...).min(...).max(...)`.
+`arraySchema(node)` checks that the value is a list of objects. The
+`required`, `min` and `max` validators check the item count.
 `required` implies `min: 1` unless `min` is set explicitly:
 
 | Config | Rule | Message |
@@ -143,6 +144,16 @@ example — converts the same way it would at the top level.
 The registry is necessary: `invariant` throws `array-field-no-registry` if
 `context.registry` is absent when `parse` or `serialize` runs.
 
+### A stored value of the wrong shape
+
+A hand-edited file can hold a value that is not a list of objects, such as
+`authors: Ivan`. ADR-012 says a document must never fail to open, so `parse`
+and `serialize` return that value unchanged, and a save writes it back as it
+was. The schema rejects it with `<label> must be a list of items`, and
+`validateChildren` checks no items. The component shows the raw value
+read-only (`plugins/fields/uneditable-value.tsx`), with a Clear button that
+sets the field to an empty list.
+
 ## The component
 
 `ArrayField` (`array-field.ui.tsx`) uses react-hook-form's own
@@ -195,4 +206,7 @@ rather than re-implemented.
   original values.
 - It round-trips items through ingest and digest, including an item field
   with its own `parse`/`serialize`.
+- It keeps a stored value that is not a list of objects unchanged through
+  ingest and digest, rejects it in validation, shows it read-only, and clears
+  it.
 - It examines the metadata of the descriptor.

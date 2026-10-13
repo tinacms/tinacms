@@ -31,6 +31,15 @@ A media plugin mounts a slice at `store.media`. The slice is a `MediaProvider`
 mounts a slice with all four operations, it throws
 `media-capability-missing`.
 
+### On the site
+
+The site renders media without the editor, so it has no slice. A media plugin
+also sets `media.resolveUrl` on its manifest: a sync function with no secrets
+that gives the same URL as the `resolveUrl` of the slice. `resolveMediaUrl(config,
+path, options?)` (`@tinacms/tinacms`) calls it. Refer to
+[media.md](./media.md#rendering-media-on-the-site). `media.resolveUrl` is
+optional, but without it `resolveMediaUrl` throws `media-plugin-no-resolve-url`.
+
 ### Optional additions
 
 A provider can supply more. Each addition is optional. The
@@ -112,6 +121,11 @@ site can send one. The endpoint rejects a request that is not from a loopback
 host, that has a different `Origin`, or that has `Sec-Fetch-Site: cross-site`.
 The content endpoint uses the same checks.
 
+Vite serves a new file in the public folder only after its file watcher
+reports the file. Until then, a request for a just-uploaded image gets a 404.
+Thus the dev server serves each file that it uploaded itself, from the media
+folder, and gives every other request to Vite.
+
 ### Paths
 
 The plugin rejects a path that goes outside the media folder, through `..` or
@@ -119,8 +133,9 @@ through a symbolic link. It rejects a file name that holds a path separator.
 
 ## `tinaCloud()`
 
-`tinaCloud()` keeps media in TinaCloud. It provides `media`, with one slice in
-`slices.media`. A later release adds the `auth` capability to the same plugin.
+`tinaCloud()` keeps media in TinaCloud. It provides `media` and `auth`, with
+one slice in `slices.media` and one in `slices.auth`. Refer to
+[auth-plugins.md](./auth-plugins.md#tinacloud) for the sign-in flow.
 
 ```ts
 import { defineConfig, localContentPlugin, tinaCloud } from '@tinacms/tinacms';
@@ -128,7 +143,7 @@ import { defineConfig, localContentPlugin, tinaCloud } from '@tinacms/tinacms';
 export default defineConfig({
   plugins: [
     localContentPlugin(),
-    tinaCloud({ clientId: '<client id>', getToken: () => readToken() }),
+    tinaCloud({ clientId: '<client id>' }),
   ],
   schema: { collections: [] },
 });
@@ -137,11 +152,9 @@ export default defineConfig({
 | Option | Role |
 |---|---|
 | `clientId` | The client ID of the TinaCloud project. |
-| `getToken` | Returns the TinaCloud access token of the editor, or `undefined`. It can return a promise. |
 
-`getToken` is interim. When `tinaCloud()` provides `auth`, the plugin gets the
-token itself and the option goes. Until then, the app supplies the token. With
-no token, each operation fails with `unauthorized`.
+The media slice gets the token from the auth slice of the same plugin. Before
+the editor signs in, each operation fails with `unauthorized`.
 
 The slice supplies `rename`, `features.search`, `features.extensionFilter` and
 a `features.maxSize` of 100 MB. `resolveUrl` gives a CDN URL, and a size adds
@@ -155,6 +168,9 @@ project. The branch is not a config option: it is operational data that the
 Data Layer owns (ADR-019, ADR-024). No plugin writes `store.branch.name` yet,
 so all operations use the default branch.
 
+`media.resolveUrl` on the manifest runs on the site, which has no store, so it
+always gives the URL on the media branch.
+
 On first use the slice reads the project from
 `https://identity.tinajs.io/v2/apps/{clientId}` for its default branch and its
 media branch, then keeps it for the session.
@@ -166,7 +182,6 @@ media branch, then keeps it for the session.
 
 ### Not supported yet
 
-- The `auth` capability. It replaces `getToken`.
 - Media on an editorial workflow branch.
 - Static media, built at build time.
 - An assets API URL other than `https://assets.tinajs.io`.

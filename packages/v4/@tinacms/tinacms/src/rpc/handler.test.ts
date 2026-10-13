@@ -582,6 +582,24 @@ describe('createRpcHandler composition', () => {
     await handler.destroy();
     expect(onDestroy).not.toHaveBeenCalled();
   });
+
+  it('takes no session from a server auth plugin that a client-only one overrides', async () => {
+    const handler = createRpcHandler({
+      plugins: [
+        authPlugin(),
+        definePlugin({
+          name: 'client-auth',
+          provides: ['auth'],
+          overrides: [{ capability: 'auth' }],
+        }),
+        mediaPlugin,
+      ],
+    });
+    const res = await handler(
+      post('/media/list', { token: 'admin-token', body: { dir: 'a' } })
+    );
+    expect(res.status).toBe(401);
+  });
 });
 
 describe('createRpcHandler mountPath', () => {

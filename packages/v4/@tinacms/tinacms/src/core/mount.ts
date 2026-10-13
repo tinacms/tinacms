@@ -16,6 +16,21 @@ export const declaresCapabilityOverride = (
 ): boolean =>
   manifest.overrides.some((override) => override.capability === capability);
 
+// The plugin that serves a singleton capability: its override, or else its one provider.
+export const capabilityProvider = (
+  plugins: PluginManifest[],
+  capability: Capability
+): PluginManifest | undefined => {
+  const providers = plugins.filter(({ provides }) =>
+    provides.includes(capability)
+  );
+  return (
+    providers.find((plugin) =>
+      declaresCapabilityOverride(plugin, capability)
+    ) ?? providers[0]
+  );
+};
+
 export const capabilityMountsFor = (
   manifest: PluginManifest
 ): CapabilityMount[] => {

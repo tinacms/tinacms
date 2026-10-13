@@ -28,7 +28,10 @@ conflict and `overrides` rules apply, keyed by name.
 - `ingestDocument(document, fields, registry)` (`core/form/ingest.ts`) makes the
   `defaultValues` object for react-hook-form. For each field, it calls the
   `parse(stored, node, context)` function of the descriptor. If the document
-  does not contain that key, it uses `defaultValue`.
+  does not contain that key, it uses `defaultValue`, else `null`. A stored
+  value that `parse` turns into `undefined` is also `null`. An unset field is `null` and never `undefined`,
+  because react-hook-form fills an `undefined` field from its default at that
+  path, and those defaults do not move when a list item is removed or moved.
 - `buildFormResolver(collection, registry)` (`editor/resolver.ts`) is the
   resolver for react-hook-form.
 - `useForm({ defaultValues, resolver, mode: 'onChange' })` holds the values. If
@@ -120,7 +123,8 @@ and the form stays dirty (ADR-018 §2). The admin `SaveButton` also reads
 opposite operation to `ingestDocument`. For each field, it calls the
 `serialize(value, node, context)` function of the descriptor. If the
 descriptor has no `serialize` function, the value does not change. The
-function removes the `undefined` values, but keeps the `null` values.
+function leaves out the `null` and `undefined` values, so an unset field is
+absent from the saved document.
 
 `context` (`FieldTransformContext`, `core/field/contract.ts`) carries the
 registry alongside `documentPath`. A compound field's `parse`/`serialize`

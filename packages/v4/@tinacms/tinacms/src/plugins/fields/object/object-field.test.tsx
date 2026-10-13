@@ -143,6 +143,17 @@ describe('ObjectField rendering', () => {
     expect(title.value).toBe('');
   });
 
+  it('shows a stored value that is not an object read-only, and clears it', async () => {
+    renderField({ seo: 'Home' });
+    expect(
+      await screen.findByText(/not a group of fields/)
+    ).toBeInTheDocument();
+    expect(valueOf('seo')).toBe('Home');
+    await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+    expect(valueOf('seo')).toBeNull();
+    expect(await screen.findByLabelText('Title')).toBeInTheDocument();
+  });
+
   it('renders an object nested inside an object', async () => {
     renderField({ meta: { social: { handle: '@tina' } } });
     const handle = (await screen.findByLabelText('Handle')) as HTMLInputElement;
@@ -156,7 +167,7 @@ describe('ObjectField value updates', () => {
     const title = await screen.findByLabelText('Title');
     await userEvent.clear(title);
     await userEvent.type(title, 'About');
-    expect(valueOf('seo')).toEqual({ title: 'About' });
+    expect(valueOf('seo')).toEqual({ title: 'About', views: null });
   });
 });
 
@@ -171,12 +182,21 @@ describe('ObjectField dirty tracking', () => {
 
     await userEvent.clear(title);
     await userEvent.type(title, 'Home');
-    expect(valueOf('seo')).toEqual({ title: 'Home' });
+    expect(valueOf('seo')).toEqual({ title: 'Home', views: null });
     expect(status()).toBe('clean');
   });
 });
 
 describe('ObjectField validation', () => {
+  it('rejects a value that is not an object', async () => {
+    const descriptor = (await resolveRegistry()).get('object');
+    for (const bad of ['Home', 42, ['Home']]) {
+      expect(validateFieldWithCore(metaNode, descriptor, bad)).toEqual([
+        'Meta must be a group of fields',
+      ]);
+    }
+  });
+
   it('rejects an empty value on a required object field', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('object');
@@ -233,31 +253,53 @@ describe('ObjectField ingest and digest', () => {
     const registry = await resolveRegistry();
     const stored = { seo: { title: 'Home', views: 10 } };
     const ingested = ingestDocument(stored, collection.fields, { registry });
-    expect(ingested).toEqual({ seo: { title: 'Home', views: '10' } });
+    expect(ingested).toEqual({
+      seo: { title: 'Home', views: '10' },
+      meta: null,
+      blocks: null,
+      layout: null,
+    });
     expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
       stored
     );
   });
 
-  it('leaves an absent object absent (no default seeding)', async () => {
+  it('holds an absent object as null and digests it as absent', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
-    expect(digestDocument({}, collection.fields, { registry })).toEqual({});
+    const ingested = ingestDocument({}, collection.fields, { registry });
+    expect(ingested).toEqual({
+      seo: null,
+      meta: null,
+      blocks: null,
+      layout: null,
+    });
+    expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
+      {}
+    );
   });
 
   it('reads null as an empty object', async () => {
     const registry = await resolveRegistry();
     expect(
       ingestDocument({ meta: null }, collection.fields, { registry })
-    ).toEqual({ meta: {} });
+    ).toEqual({
+      seo: null,
+      meta: { social: null },
+      blocks: null,
+      layout: null,
+    });
   });
 
-  it('refuses stored content that is not an object', async () => {
+  it('keeps stored content that is not an object unchanged', async () => {
     const registry = await resolveRegistry();
     for (const bad of ['oops', 42, true, ['Home']]) {
-      expect(() =>
-        ingestDocument({ seo: bad }, collection.fields, { registry })
-      ).toThrow(/expected an object/);
+      const ingested = ingestDocument({ seo: bad }, collection.fields, {
+        registry,
+      });
+      expect(ingested.seo).toEqual(bad);
+      expect(
+        digestDocument(ingested, collection.fields, { registry }).seo
+      ).toEqual(bad);
     }
   });
 });
@@ -267,7 +309,12 @@ describe('ObjectField composed with array', () => {
     const registry = await resolveRegistry();
     const stored = { blocks: [{ hero: { height: 10 } }] };
     const ingested = ingestDocument(stored, collection.fields, { registry });
-    expect(ingested).toEqual({ blocks: [{ hero: { height: '10' } }] });
+    expect(ingested).toEqual({
+      seo: null,
+      meta: null,
+      blocks: [{ hero: { height: '10' } }],
+      layout: null,
+    });
     expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
       stored
     );
@@ -279,7 +326,12 @@ describe('ObjectField composed with array', () => {
       layout: { rows: [{ label: 'top' }, { label: 'bottom' }] },
     };
     const ingested = ingestDocument(stored, collection.fields, { registry });
-    expect(ingested).toEqual(stored);
+    expect(ingested).toEqual({
+      seo: null,
+      meta: null,
+      blocks: null,
+      ...stored,
+    });
     expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
       stored
     );
