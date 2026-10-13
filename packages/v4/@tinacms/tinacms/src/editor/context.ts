@@ -1,18 +1,46 @@
 import { createContext } from 'react';
+import type { StoreApi } from 'zustand';
+import type { TinaSchema } from '../config';
 import type { FieldAddress } from '../core/field/address';
+import type { ValidatorRegistry } from '../core/field/contract';
 import type { FieldRegistry } from '../core/field/registry';
-import type { CollectionSchema } from '../core/schema/types';
+import type {
+  FormHookRegistry,
+  FormHookScope,
+  FormHooks,
+} from '../core/form/hooks';
+import type { TinaStoreState } from '../core/plugin';
+import type { FieldSchema, TinaDocument } from '../core/schema/types';
+import type { ScreenRegistry } from '../core/screen/registry';
+import type { GlobalNavEntry } from '../core/slot/contract';
 
-export interface ActiveField {
-  active: FieldAddress | null;
-  setActive: (address: FieldAddress | null) => void;
+export type SaveHandler = (document: TinaDocument) => void | Promise<void>;
+
+export interface TinaRuntime {
+  registry: FieldRegistry;
+  validators: ValidatorRegistry;
+  hooks: FormHookRegistry;
+  store: StoreApi<TinaStoreState>;
+  schema: TinaSchema;
+  screens: ScreenRegistry;
+  globalNav: GlobalNavEntry[];
+}
+export const TinaRuntimeContext = createContext<TinaRuntime | null>(null);
+
+export interface FormScope extends FormHookScope {
+  onSave: SaveHandler | null;
+  seedKey: string;
+  discardEdits: () => void;
+  hooks: readonly FormHooks[];
+  staleDraft: StaleDraftActions | null;
 }
 
-// TODO(zustand): RegistryContext and ActiveFieldContext become reads off the global
-// store (ADR-003) once it exists. CollectionContext is form-scoped (the open
-// document's schema), and FieldAddressContext is intentionally plain React context —
-// per ADR-009 the only thing a field receives is its address, passed down by <Field>.
-export const RegistryContext = createContext<FieldRegistry | null>(null);
-export const CollectionContext = createContext<CollectionSchema | null>(null);
+export interface StaleDraftActions {
+  resume: () => void;
+  discard: () => void;
+}
+export const FormScopeContext = createContext<FormScope | null>(null);
+
 export const FieldAddressContext = createContext<FieldAddress | null>(null);
-export const ActiveFieldContext = createContext<ActiveField | null>(null);
+
+export const FieldSchemaContext = createContext<FieldSchema | null>(null);

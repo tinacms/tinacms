@@ -1,0 +1,13 @@
+{
+  "extends": "../../../../base.tsconfig.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@tinacms/ui/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}

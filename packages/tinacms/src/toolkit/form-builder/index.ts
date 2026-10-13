@@ -4,7 +4,7 @@ export * from './form';
 export * from './form-builder';
 export * from './form-legacy';
 export * from './form-portal';
-export * from './loading-dots';
+export * from '../styles/loading-dots';
 export * from './reset-form';
 export * from './form-actions';
 export * from './create-branch-modal';

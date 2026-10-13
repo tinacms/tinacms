@@ -1,0 +1,15 @@
+node_modules/
+
+# The repo root ignores `**/package-lock.json` and `.npmrc` (pnpm-only policy).
+# This fixture is the documented npm carve-out — see the "Package manager" note
+# in the root AGENTS.md — so `.npmrc` is tracked here on purpose.
+!.npmrc
+
+# The pins live in package-lock.fixture.json, which IS tracked; they keep the
+# install closure and the zero-tolerance watchlist counts from drifting on
+# upstream point releases. The harness stages that file as package-lock.json
+# for the install and deletes it afterwards, so the name npm needs stays
+# ignored: this fixture installs `tinacms`, so a lockfile of its whole closure
+# committed under a name scanners recognise reads as ~1400 newly-introduced
+# dependencies, and fails on advisories the diff never introduced.
+package-lock.json

@@ -33,7 +33,7 @@
     "autoprefixer": "catalog:",
     "cross-env": "^7.0.3",
     "hugo-extended": "^0.158.0",
-    "postcss": "^8.5.2",
+    "postcss": "catalog:",
     "postcss-cli": "^11.0.0",
     "tailwindcss": "^4.0.0",
     "@playwright/test": "catalog:",

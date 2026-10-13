@@ -32,20 +32,25 @@ const isUserAuthorized = async (args: {
 };
 
 export const isAuthorized = async (
-  req: NextRequest
+  _req: NextRequest,
+  expectedClientID?: string
 ): Promise<TinaCloudUser | undefined> => {
-  const clientID = req.nextUrl.searchParams.get('clientID');
   const token = (await headers()).get('authorization');
-  if (typeof clientID === 'string' && typeof token === 'string') {
-    return await isUserAuthorized({ clientID, token });
+  // Validate against the site's configured app id, never a request value.
+  const clientID = (
+    expectedClientID ?? process.env.NEXT_PUBLIC_TINA_CLIENT_ID
+  )?.trim();
+  if (typeof clientID !== 'string' || clientID.length === 0) {
+    console.error(
+      "isAuthorized could not resolve this site's clientID. Pass it explicitly or set the NEXT_PUBLIC_TINA_CLIENT_ID env var. Refusing to authorize."
+    );
+    return undefined;
   }
-  const errorMessage = (queryParam: string) => {
-    return `An ${queryParam} query param is required for isAuthorized function but not found please use cms.api.tina.fetchWithToken('/api/something?clientID=YourClientID')`;
-  };
-  if (!clientID) console.error(errorMessage('clientID'));
-  if (!token)
+  if (typeof token !== 'string') {
     console.error(
       'A authorization header was not found. Please use the cms.api.tina.fetchWithToken function on the frontend'
     );
-  return undefined;
+    return undefined;
+  }
+  return await isUserAuthorized({ clientID, token });
 };

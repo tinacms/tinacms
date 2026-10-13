@@ -21,6 +21,7 @@ export interface TinaCMSAuditInvoke extends EventsBase {
 export interface TinaCMSInitInvoke extends EventsBase {
   name: 'tinacms:cli:init:invoke';
   schemaFileType?: string;
+  /** @deprecated No longer sent. */
   hasForestryConfig?: boolean;
 }
 

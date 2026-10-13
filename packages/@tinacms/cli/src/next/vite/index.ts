@@ -3,12 +3,7 @@ import type { Database } from '@tinacms/graphql';
 import react from '@vitejs/plugin-react';
 import fs from 'fs-extra';
 import normalizePath from 'normalize-path';
-import {
-  type BuildOptions,
-  type InlineConfig,
-  type Plugin,
-  splitVendorChunkPlugin,
-} from 'vite';
+import type { BuildOptions, InlineConfig, Plugin } from 'vite';
 import type { ConfigManager } from '../config-manager';
 import { buildCorsOriginCheck } from './cors';
 import { filterPublicEnv } from './filterPublicEnv';
@@ -100,6 +95,20 @@ async function listFilesRecursively({
   return chunkArrayIntoObject(staticMediaItems, 20);
 }
 
+/**
+ * The URL base Vite serves the admin SPA under (e.g. `/admin/`, or
+ * `/<basePath>/admin/`). Vite 6 serves its dev endpoints (`@vite/client`,
+ * `@react-refresh`, `src/main.tsx`) under this base — Vite 4 served them at
+ * the server root regardless — so `devHTML` must prefix them with the same
+ * value. Shared here so the two can't drift.
+ */
+export const getBasePath = (configManager: ConfigManager) => {
+  const basePath = configManager.config.build.basePath;
+  return `/${basePath ? `${normalizePath(basePath)}/` : ''}${normalizePath(
+    configManager.config.build.outputFolder
+  )}/`;
+};
+
 export const createConfig = async ({
   configManager,
   apiURL,
@@ -155,18 +164,11 @@ export const createConfig = async ({
       : configManager.generatedTypesJSFilePath;
   }
 
-  let basePath;
-  if (configManager.config.build.basePath) {
-    basePath = configManager.config.build.basePath;
-  }
-
   const fullVersion = configManager.getTinaGraphQLVersion();
   const version = `${fullVersion.major}.${fullVersion.minor}`;
   const config: InlineConfig = {
     root: configManager.spaRootPath,
-    base: `/${basePath ? `${normalizePath(basePath)}/` : ''}${normalizePath(
-      configManager.config.build.outputFolder
-    )}/`,
+    base: getBasePath(configManager),
     appType: 'spa',
     resolve: {
       alias,
@@ -183,11 +185,13 @@ export const createConfig = async ({
        *  - `process.env.__NEXT_CROSS_ORIGIN`
        *  - `process.env.__NEXT_I18N_SUPPORT`
        *
-       * Also, interestingly some of the advice for handling this doesn't work, references to replacing
-       * `process.env` with `{}` are problematic, because browsers don't understand the `{}.` syntax,
-       * but node does. This was a surprise, but using `new Object()` seems to do the trick.
+       * esbuild >=0.25 (bundled by vite >=6) requires define values to be
+       * entity names or JS literals; the `new Object(...)` workaround is
+       * rejected. A plain JSON object literal is safe: esbuild hoists it
+       * into a variable before substituting, so the historical `{}.`
+       * browser-syntax problem can't occur.
        */
-      'process.env': `new Object(${JSON.stringify(publicEnv)})`,
+      'process.env': JSON.stringify(publicEnv),
       // Used by picomatch https://github.com/micromatch/picomatch/blob/master/lib/utils.js#L4
       'process.platform': `"${process.platform}"`,
       __API_URL__: `"${apiURL}"`,
@@ -242,18 +246,12 @@ export const createConfig = async ({
       rollupOptions: rollupOptions,
     },
     plugins: [
-      /**
-       * `splitVendorChunkPlugin` is needed because `tinacms` is quite large,
-       * Vite's chunking strategy chokes on memory issues for smaller machines (ie. on CI).
-       */
       react({
         babel: {
           // Supresses the warning [NOTE] babel The code generator has deoptimised the styling of
           compact: true,
         },
-        fastRefresh: false,
       }),
-      splitVendorChunkPlugin(),
       tinaTailwind(configManager.spaRootPath, configManager.prebuildFilePath),
       ...plugins,
     ],

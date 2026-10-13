@@ -1,4 +1,4 @@
-import type { RichTextType } from '@tinacms/schema-tools';
+import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import { gfmToMarkdown } from 'mdast-util-gfm';
 import {
@@ -8,10 +8,12 @@ import {
 } from 'mdast-util-mdx-jsx';
 import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
 import { text } from 'mdast-util-to-markdown/lib/handle/text';
+import { serializeBreaks } from '../break-serialization';
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown';
 import { stringifyMDX as stringifyMDXNext } from '../next';
 import type * as Plate from '../parse/plate';
 import { stringifyProps } from './acorn';
+import { normalizeMarkWhitespace } from './mark-whitespace';
 import { eat } from './marks';
 import { stringifyShortcode } from './stringifyShortcode';
 
@@ -33,7 +35,7 @@ declare module 'mdast' {
 
 export const serializeMDX = (
   value: Plate.RootElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): string | Plate.RootElement | undefined => {
   if (field.parser?.type === 'markdown') {
@@ -54,7 +56,9 @@ export const serializeMDX = (
       return value.children[0].value;
     }
   }
-  const tree = rootElement(value, field, imageCallback);
+  const tree = normalizeMarkWhitespace(
+    rootElement(value, field, imageCallback)
+  );
   const res = toTinaMarkdown(tree, field);
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
@@ -79,7 +83,7 @@ export type Pattern = {
   type: 'block' | 'leaf';
 };
 
-export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
+export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
   const patterns: Pattern[] = [];
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
@@ -104,11 +108,14 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
   // @ts-ignore
   const handlers: Handlers = {};
   handlers['text'] = (node, parent, context, safeOptions) => {
-    // Empty spaces before/after strings
+    // Empty spaces before/after strings. The rule guarding a space at the
+    // start of a line stays: without it four of them open an indented code
+    // block, and the author's indentation comes back as `code_block`.
     context.unsafe = context.unsafe.filter((unsafeItem) => {
       if (
         unsafeItem.character === ' ' &&
-        unsafeItem.inConstruct === 'phrasing'
+        unsafeItem.inConstruct === 'phrasing' &&
+        unsafeItem.before !== '[\\r\\n]'
       ) {
         return false;
       }
@@ -131,7 +138,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
     }
     return text(node, parent, context, safeOptions);
   };
-  return toMarkdown(tree, {
+  return toMarkdown(serializeBreaks(tree), {
     extensions: [
       directiveToMarkdown(patterns),
       mdxJsxToMarkdown(),
@@ -144,7 +151,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
 
 export const rootElement = (
   content: Plate.RootElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.Root => {
   const children: Md.Content[] = [];
@@ -173,7 +180,7 @@ export function codeLinesToString(content: Plate.CodeBlockElement): string {
 
 export const blockElement = (
   content: Plate.BlockElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.Content | null => {
   switch (content.type) {
@@ -347,12 +354,14 @@ export const blockElement = (
         }),
       };
     default:
-      throw new Error(`BlockElement: ${content.type} is not yet supported`);
+      throw new Error(
+        `This block can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
+      );
   }
 };
 const listItemElement = (
   content: Plate.ListItemElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.ListItem => {
   return {
@@ -360,6 +369,9 @@ const listItemElement = (
     // spread is always false since we don't support block elements in list items
     // good explanation of the difference: https://stackoverflow.com/questions/43503528/extra-lines-appearing-between-list-items-in-github-markdown
     spread: false,
+    ...(typeof content.checked === 'boolean'
+      ? { checked: content.checked }
+      : {}),
     children: content.children.map((child) => {
       if (child.type === 'lic') {
         return {
@@ -373,7 +385,7 @@ const listItemElement = (
 };
 const blockContentElement = (
   content: Plate.BlockElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.BlockContent => {
   switch (content.type) {
@@ -403,7 +415,7 @@ const blockContentElement = (
       };
     default:
       throw new Error(
-        `BlockContentElement: ${content.type} is not yet supported`
+        `This block can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
       );
   }
 };

@@ -1,13 +1,13 @@
-import fs from 'fs-extra';
 import path from 'path';
-import { buildASTSchema, printSchema } from 'graphql';
-import type { GraphQLSchema, DocumentNode } from 'graphql';
-import { generateTypes } from './codegen';
-import { transform } from 'esbuild';
-import { ConfigManager } from '../config-manager';
-import type { TinaSchema } from '@tinacms/schema-tools';
 import { mapUserFields } from '@tinacms/graphql';
+import type { TinaSchema } from '@tinacms/schema-tools';
+import { transform } from 'esbuild';
+import fs from 'fs-extra';
+import { buildASTSchema, printSchema } from 'graphql';
+import type { DocumentNode, GraphQLSchema } from 'graphql';
 import normalizePath from 'normalize-path';
+import { ConfigManager } from '../config-manager';
+import { generateTypes } from './codegen';
 import { stripSearchTokenFromConfig } from './stripSearchTokenFromConfig';
 export const TINA_HOST = 'content.tinajs.io';
 
@@ -215,6 +215,7 @@ export class Codegen {
     }
     return apiURL;
   }
+
   private _createApiUrl() {
     const branch = this.configManager.config?.branch;
     const clientId = this.configManager.config?.clientId;
@@ -268,6 +269,8 @@ export class Codegen {
     return this.apiURL;
   }
 
+  // NOTE: [2 Oct 2026] EK - The generated authenticate() must pass isSignIn: true, or
+  // @tinacms/graphql refuses every sign-in (graphql src/resolver/auth-fields.ts).
   async genDatabaseClient() {
     const authCollection = this.tinaSchema
       .getCollections()
@@ -300,7 +303,7 @@ import type { TinaClient } from "tinacms/dist/client";
 import { queries } from "./types.js";
 import database from "../database";
 
-export async function databaseRequest({ query, variables, user }) {
+export async function databaseRequest({ query, variables, user, isSignIn }) {
   const result = await resolve({
     config: {
       useRelativeMedia: true,
@@ -310,6 +313,7 @@ export async function databaseRequest({ query, variables, user }) {
     variables,
     verbose: true,
     ctxUser: user,
+    isSignIn,
   });
 
   return result;
@@ -323,6 +327,7 @@ export async function authenticate({ username, password }) {
               }
             }\`,
       variables: { username, password },
+      isSignIn: true,
     })
 }
 
@@ -368,12 +373,16 @@ export default databaseClient;
 import { queries } from "./types.js";
 export const client = createClient({ ${
       this.noClientBuildCache === false
-        ? `cacheDir: '${normalizePath(
-            this.configManager.generatedCachePath
-          )}', `
+        ? `cacheDir: ${JSON.stringify(
+            normalizePath(this.configManager.generatedCachePath)
+          )}, `
         : ''
-    }url: ${this.localContentBuild ? `process.env.TINA_LOCAL_URL || '${apiURL}'` : `'${apiURL}'`}, token: '${token}', queries, ${
-      errorPolicy ? `errorPolicy: '${errorPolicy}'` : ''
+    }url: ${
+      this.localContentBuild
+        ? `process.env.TINA_LOCAL_URL || ${JSON.stringify(apiURL)}`
+        : JSON.stringify(apiURL)
+    }, token: ${JSON.stringify(String(token))}, queries, ${
+      errorPolicy ? `errorPolicy: ${JSON.stringify(String(errorPolicy))}` : ''
     } });
 export default client;
   `;

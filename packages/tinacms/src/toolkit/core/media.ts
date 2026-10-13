@@ -1,3 +1,4 @@
+import type { MediaAccept, MediaExtension } from '@tinacms/schema-tools';
 import { EventBus } from './event';
 import { DummyMediaStore } from './media-store.default';
 
@@ -92,11 +93,14 @@ export interface MediaStore {
   list(options?: MediaListOptions): Promise<MediaList>;
 
   /**
-   * Reserved hook for renaming a media object in the store.
+   * Renames a media object in the store. `from` and `to` are media-root-relative
+   * `directory/filename` paths, matching what `delete` receives.
    *
-   * Not yet implemented in `TinaMediaStore` or surfaced in `MediaManager` —
-   * declared here as an extension point so stores can begin to opt in once
-   * the corresponding assets-api endpoint is built.
+   * Optional by design: the media manager only offers a Rename action when the
+   * store instance actually defines it, so stores opt in individually. Defining
+   * it on the prototype but leaving it unsupported at runtime would surface an
+   * action that always fails — see `TinaMediaStore`, which assigns it per
+   * instance.
    */
   rename?(from: string, to: string): Promise<Media>;
 
@@ -106,6 +110,24 @@ export interface MediaStore {
    * @default false
    */
   isStatic?: boolean;
+
+  /**
+   * Indicates that `list` honours the `search` option, so the media manager
+   * may show a search box. Stores that ignore `search` should leave this
+   * unset to avoid a search box that returns unfiltered results.
+   *
+   * @default false
+   */
+  searchable?: boolean;
+
+  /**
+   * Indicates that `list` honours the `ext` option. Stores that ignore it
+   * should leave this unset, so a field declaring `accept` falls back to
+   * showing everything rather than silently listing the wrong files.
+   *
+   * @default false
+   */
+  extensionFilterable?: boolean;
 
   /**
    * Converts a Media object to the value stored in a form field.
@@ -126,6 +148,12 @@ export interface MediaListOptions {
   offset?: MediaListOffset;
   thumbnailSizes?: { w: number; h: number }[];
   filesOnly?: boolean;
+  search?: string;
+  /**
+   * Restricts the listing to these file extensions. Resolved from categories
+   * before it reaches the store, so it is always concrete extensions here.
+   */
+  ext?: MediaExtension[];
 }
 
 /**
@@ -228,6 +256,29 @@ export class MediaManager implements MediaStore {
     }
   }
 
+  /**
+   * `from` and `to` are media-root-relative `directory/filename` paths — the
+   * same shape `delete` sends. They must not carry an origin, a CDN host, the
+   * public folder, or the media root prefix.
+   */
+  async rename(from: string, to: string): Promise<Media> {
+    if (typeof this.store.rename !== 'function') {
+      throw new MediaRenameError({
+        code: 'UNSUPPORTED',
+        message: 'This media store does not support renaming.',
+      });
+    }
+    try {
+      this.events.dispatch({ type: 'media:rename:start', from, to });
+      const media = await this.store.rename(from, to);
+      this.events.dispatch({ type: 'media:rename:success', from, to, media });
+      return media;
+    } catch (error) {
+      this.events.dispatch({ type: 'media:rename:failure', from, to, error });
+      throw error;
+    }
+  }
+
   async list(options: MediaListOptions): Promise<MediaList> {
     try {
       this.events.dispatch({ type: 'media:list:start', ...options });
@@ -260,6 +311,10 @@ export interface SelectMediaOptions {
   allowDelete?: boolean;
   directory?: string;
   onSelect?(media: Media): void;
+  /**
+   * Narrows the picker to these file types, from a field's `accept`.
+   */
+  accept?: MediaAccept | MediaAccept[];
 }
 
 interface MediaListErrorConfig {
@@ -296,4 +351,32 @@ export const E_DEFAULT = new MediaListError({
   title: 'An Error Occurred',
   message: 'Something went wrong accessing your media from TinaCloud.',
   docsLink: 'https://tina.io/docs/r/repo-based-media',
+});
+
+export type MediaRenameErrorCode =
+  | 'NOT_FOUND'
+  | 'NAME_COLLISION'
+  | 'INVALID_FILENAME'
+  | 'INVALID_PATH'
+  | 'UNAUTHORIZED'
+  | 'UNSUPPORTED'
+  | 'BACKEND_FAILURE';
+
+export class MediaRenameError extends Error {
+  public ERR_TYPE = 'MediaRenameError';
+  public code: MediaRenameErrorCode;
+
+  constructor(config: { code: MediaRenameErrorCode; message: string }) {
+    super(config.message);
+    this.code = config.code;
+  }
+}
+
+export const E_SELF_HOSTED_MEDIA = new MediaListError({
+  title: "Repo-based media isn't available when self-hosting",
+  message:
+    "Self-hosted TinaCMS can't serve media from your repo through TinaCloud. " +
+    'Configure an external media store (e.g. S3, Cloudinary, DigitalOcean Spaces, or Azure) ' +
+    'with media.loadCustomStore, or add media to your repo manually.',
+  docsLink: 'https://tina.io/docs/r/backend-media-handler/',
 });

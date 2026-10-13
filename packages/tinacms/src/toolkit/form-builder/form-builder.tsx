@@ -1,30 +1,31 @@
+import { isSessionExpiredError } from '@toolkit/core/session-expired';
 import type { Form } from '@toolkit/forms';
+import { Button } from '@toolkit/styles';
+import { cn } from '@utils/cn';
+import { FORM_ERROR } from 'final-form';
+import { Circle, FileStack } from 'lucide-react';
 import * as React from 'react';
 import { type FC, useEffect } from 'react';
-import { FORM_ERROR } from 'final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { Button } from '@toolkit/styles';
+import {
+  EditorialWorkflowSaveEvent,
+  FormResetEvent,
+  SaveContentErrorEvent,
+  SavedContentEvent,
+} from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import {
   DragDropContext,
   type DropResult,
 } from '../fields/plugins/dnd-kit-wrapper';
-import { FaCircle } from 'react-icons/fa';
-import { cn } from '@utils/cn';
-import { FileStack } from 'lucide-react';
 import { useCMS } from '../react-core';
+import { BranchDeletedModal } from './branch-deleted-modal';
+import { CreateBranchModal } from './create-branch-modal';
 import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
-import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
-import { CreateBranchModal } from './create-branch-modal';
-import { BranchDeletedModal } from './branch-deleted-modal';
-import {
-  SavedContentEvent,
-  SaveContentErrorEvent,
-  FormResetEvent,
-} from '../../lib/posthog/posthog';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
+import type { SaveChoice } from './save-options';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -184,7 +185,19 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           !hasValidationErrors &&
           !(invalid && !dirtySinceLastSubmit);
 
-        const safeSubmit = async () => {
+        const safeSubmit = async (editorialWorkflowChoice?: SaveChoice) => {
+          // When invoked as the "Save and publish" choice from the editorial
+          // workflow modal, also record the choice + outcome in one event.
+          const captureWorkflowChoice = (success: boolean, error?: string) => {
+            if (editorialWorkflowChoice) {
+              captureEvent(EditorialWorkflowSaveEvent, {
+                choice: editorialWorkflowChoice,
+                success,
+                error,
+              });
+            }
+          };
+
           if (canSubmit) {
             const alertsBefore = new Set(cms.alerts.all.map((a) => a.id));
             console.debug(
@@ -214,7 +227,14 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     cms.alerts.dismiss(alert);
                   }
                 }
+                captureWorkflowChoice(false, errorMsg);
                 setDeletedBranchModalOpen(true);
+                return;
+              }
+
+              if (isSessionExpiredError(error)) {
+                // not a save failure: the auth wall is already re-arming
+                captureWorkflowChoice(false, errorMsg);
                 return;
               }
 
@@ -222,10 +242,12 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 documentPath: tinaForm.path,
                 error: errorMsg,
               });
+              captureWorkflowChoice(false, errorMsg);
             } else {
               captureEvent(SavedContentEvent, {
                 documentPath: tinaForm.path,
               });
+              captureWorkflowChoice(true);
             }
           } else {
             console.debug(
@@ -336,11 +358,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       <Button
                         onClick={safeHandleSubmit}
                         disabled={!canSubmit || isGuardChecking}
-                        busy={submitting || isGuardChecking}
+                        busy={submitting}
                         variant='primary'
                       >
-                        {submitting && <LoadingDots />}
-                        {!submitting && tinaForm.buttons.save}
+                        {tinaForm.buttons.save}
                       </Button>
                       {tinaForm.actions.length > 0 && (
                         <FormActionMenu
@@ -362,7 +383,17 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
 export const FormStatus = ({ pristine }: { pristine: boolean }) => {
   const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
-  return <FaCircle className={cn('h-3', pristineClass)} />;
+  const label = pristine ? 'No unsaved changes' : 'Unsaved changes';
+  // fill-current keeps this a solid status dot; lucide icons are stroke-only by default.
+  return (
+    <Circle
+      role='img'
+      aria-label={label}
+      className={cn('w-3 h-3 fill-current', pristineClass)}
+    >
+      <title>{label}</title>
+    </Circle>
+  );
 };
 
 const RelatedFilesBanner = () => {

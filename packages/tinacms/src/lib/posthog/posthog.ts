@@ -34,6 +34,16 @@ export type SaveContentErrorPayload = {
   error?: string;
 };
 
+// When a user saves from the editorial-workflow modal: which option they
+// chose (draft / ready for review / publish) and whether the save succeeded.
+export const EditorialWorkflowSaveEvent: string = 'editorial-workflow-save';
+export type EditorialWorkflowSavePayload = {
+  choice: 'draft' | 'review' | 'publish';
+  success: boolean;
+  // Failure reason when success is false.
+  error?: string;
+};
+
 // When a user resets a form in the TinaCMS Editor
 export const FormResetEvent: string = 'form-reset';
 

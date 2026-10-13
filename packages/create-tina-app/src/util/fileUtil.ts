@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { TextStyles } from './textstyles';
+import { LOCK_FILES, type PackageManager } from './packageManagers';
 
 export async function isWriteable(directory: string): Promise<boolean> {
   try {
@@ -148,4 +149,14 @@ export async function updateTelemetryConfig(
       return;
     }
   }
+}
+
+export async function removeForeignLockFiles(
+  dir: string,
+  pkgManager: PackageManager
+) {
+  const foreign = Object.entries(LOCK_FILES)
+    .filter(([manager]) => manager !== pkgManager)
+    .flatMap(([, files]) => files);
+  await Promise.all(foreign.map((file) => fs.remove(path.join(dir, file))));
 }

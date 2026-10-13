@@ -1,7 +1,14 @@
-// Server-only — `tinacms/astro`.
-// Mounts the runtime-composed RPC handler as Astro endpoint handlers.
-//
-// Intended exports:
-//   mountHandler(config) → { GET, POST }   for src/pages/api/tina/[...slug].ts
+import { type RpcHandlerConfig, createRpcHandler } from '../../rpc/handler';
 
-export {};
+export type { RpcHandlerConfig };
+
+export interface AstroRouteHandlers {
+  GET: (context: { request: Request }) => Promise<Response>;
+  POST: (context: { request: Request }) => Promise<Response>;
+}
+
+export const mountHandler = (config: RpcHandlerConfig): AstroRouteHandlers => {
+  const handler = createRpcHandler(config);
+  const route = ({ request }: { request: Request }) => handler(request);
+  return { GET: route, POST: route };
+};

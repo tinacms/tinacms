@@ -179,7 +179,7 @@ export default createMediaHandler({
       return true;
     }
     try {
-      const user = await isAuthorized(req);
+      const user = await isAuthorized(req, process.env.NEXT_PUBLIC_TINA_CLIENT_ID);
       return user && user.verified;
     } catch (e) {
       console.error(e);
@@ -189,6 +189,14 @@ export default createMediaHandler({
 });
 
 ```
+
+### How uploads work
+
+The media store asks the API route for an upload URL and sends the file's content type with the request. The route checks the type and signs it into the upload URL, so the upload must send the same `Content-Type` header. The route does not issue upload URLs for HTML, XML, script or multipart types.
+
+If the request has no content type, the route uses the standard type for the file extension, such as `image/png` for `.png`. It rejects an extension that has no standard type in its list.
+
+If you call `getUploadUrl` yourself, pass the content type in the options argument: `getUploadUrl(bucket, key, expiresIn, client, { contentType })`.
 
 ## Update Schema
 

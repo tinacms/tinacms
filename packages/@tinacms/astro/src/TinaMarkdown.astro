@@ -18,19 +18,14 @@ export { requestWithMetadata } from './data';
 export { tinaField } from './tina-field';
 
 import Node from './Node.astro';
-import type { CustomComponentsMap, TinaRichTextContent } from './types';
+import type { TinaMarkdownProps, TinaRichTextNode } from './types';
 
-interface Props {
-  content: TinaRichTextContent;
-  components?: CustomComponentsMap;
-}
+type Props = TinaMarkdownProps;
 
 const { content, components = {} } = Astro.props;
 
-const nodes = !content
-  ? []
-  : Array.isArray(content)
-    ? content
-    : (content.children ?? []);
+const nodes = (
+  !content ? [] : Array.isArray(content) ? content : (content.children ?? [])
+) as TinaRichTextNode[];
 ---
 {nodes.map((node) => <Node node={node} components={components} />)}

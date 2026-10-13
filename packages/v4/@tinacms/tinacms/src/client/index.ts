@@ -1,14 +1,56 @@
-// Browser-only entry — `tinacms/client`.
-// Imported by plugin client segments.
-// Must NOT import from ./server or ./adapters/*.
-//
-// `defineClientPlugin` declares a plugin's client segment — the field descriptor
-// it owns (ADR-009). The `server` RPC proxy (ADR-007) lands with server segments.
-
 import type { ClientSegment } from '../core/plugin';
 
-export type { FieldDescriptor } from '../core/field/contract';
+export type { JsonValue } from '../core/json';
+
+export {
+  AuthError,
+  type AuthErrorCode,
+  type AuthSlice,
+  type AuthUser,
+  toUserId,
+  type UserId,
+} from '../core/auth/contract';
+
+export type {
+  FieldDescriptor,
+  FieldValidationContext,
+  PluginValidationContext,
+  Validate,
+  ValidatorFactory,
+} from '../core/field/contract';
+export type {
+  FieldEdit,
+  FormHookFactory,
+  FormHookScope,
+  FormHooks,
+} from '../core/form/hooks';
+export type {
+  ActionTarget,
+  GlobalNavEntry,
+  NavTarget,
+  ScreenTarget,
+  SlotContributions,
+  UrlTarget,
+} from '../core/slot/contract';
+export {
+  type MediaFeatures,
+  type MediaItem,
+  type MediaPage,
+  type MediaPageRequest,
+  type MediaProvider,
+  MediaError,
+  type MediaErrorCode,
+  type MediaSlice,
+  type MediaStatus,
+  type MediaUrlOptions,
+} from '../core/media/contract';
 export type { ClientSegment };
+export {
+  createRpcClient,
+  RpcError,
+  type RpcClientConfig,
+  type RpcProxy,
+} from '../rpc/proxy';
 
 export const defineClientPlugin = (segment: ClientSegment): ClientSegment =>
   segment;
