@@ -171,6 +171,17 @@ describe('resolveReferences', () => {
     ).toEqual({ page: 'content/pages/test.mdx' });
   });
 
+  it('leaves out unset fields, as the saved document does', () => {
+    expect(
+      resolveReferences(
+        { title: null, page: null, related: [{ page: null }] },
+        fields,
+        collections,
+        resolve
+      )
+    ).toEqual({ related: [{}] });
+  });
+
   it('leaves the values it was given alone', () => {
     const values = { page: 'content/pages/test.mdx' };
     resolveReferences(values, fields, collections, resolve);

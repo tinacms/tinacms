@@ -231,6 +231,48 @@ describe('local Data Layer with an auth plugin', () => {
     expect(res.statusCode).toBe(401);
   });
 
+  it('checks sessions when a server auth plugin overrides a client-only one', async () => {
+    const clientOnlyAuth = definePlugin({
+      name: 'test:client-auth',
+      provides: ['auth'],
+    });
+    const override: PluginManifest = {
+      ...authPlugin,
+      name: 'test:override-auth',
+      overrides: [{ capability: 'auth' }],
+    };
+    const res = await sendNamed([clientOnlyAuth, override], 'content list', {
+      authorization: 'Bearer bad',
+    });
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('checks nothing when a client-only auth plugin overrides a server one', async () => {
+    const clientOnlyOverride = definePlugin({
+      name: 'test:client-auth',
+      provides: ['auth'],
+      overrides: [{ capability: 'auth' }],
+    });
+    const res = await sendNamed(
+      [authPlugin, clientOnlyOverride],
+      'content list'
+    );
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('checks the permission the winning media plugin requires', async () => {
+    const override: PluginManifest = {
+      ...localMediaPlugin(),
+      name: 'test:media',
+      overrides: [{ capability: 'media' }],
+      requires: { permission: 'media:admin' },
+    };
+    const res = await sendNamed([authPlugin, override], 'media list', {
+      authorization: 'Bearer good',
+    });
+    expect(res.statusCode).toBe(403);
+  });
+
   it('resolves use(capability) inside getSession', async () => {
     const composingAuth = authPluginWith({
       ping: async () => true,

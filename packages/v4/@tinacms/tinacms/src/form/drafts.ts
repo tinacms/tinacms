@@ -2,7 +2,7 @@ import type { TinaDocument } from '../core/schema/types';
 import { isRecord } from '../utils/is-record';
 
 const DRAFT_KEY_PREFIX = 'tina-drafts:';
-const DRAFT_VERSION = 1;
+const DRAFT_VERSION = 2;
 
 export interface StoredDraft {
   readonly values: TinaDocument;

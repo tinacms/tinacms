@@ -23,12 +23,28 @@ import {
   type ObjectArrayFieldSchema,
   type ScalarArrayFieldSchema,
   asArrayFieldSchema,
+  isListFor,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
 } from './array-field.schema';
+import { UneditableValue } from '../uneditable-value';
 
 export function ArrayField() {
+  const address = useFieldAddress();
+  const field = asArrayFieldSchema(useFieldSchema());
+  const [value] = useFieldValue<unknown>(address);
+  return value == null || isListFor(field, value) ? (
+    <ItemList />
+  ) : (
+    <UneditableValue
+      problem='This value is not a list of items, so it cannot be edited here.'
+      cleared={[]}
+    />
+  );
+}
+
+function ItemList() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
   const errors = useFieldErrors(address);

@@ -1,6 +1,5 @@
 import { defineClientPlugin } from '../../../client';
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
-import { invariant } from '../../../core/invariant';
 import { TEMPLATE_KEY } from '../../../core/schema/children';
 import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
 import { validateFieldTree } from '../../../core/validation';
@@ -8,36 +7,13 @@ import {
   type ObjectArrayFieldSchema,
   arraySchema,
   asArrayFieldSchema,
+  isItemArray,
+  isListFor,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
 } from './array-field.schema';
 import { ArrayField } from './array-field.ui';
-
-const isItemObject = (item: unknown): item is TinaDocument =>
-  item != null && typeof item === 'object' && !Array.isArray(item);
-
-// Refuse content of the wrong shape. Coercing it to `[]` here means the next
-// save writes that `[]` back over whatever the file held.
-const asItemArray = (stored: unknown, name: string): TinaDocument[] => {
-  if (stored == null) return [];
-  invariant(
-    Array.isArray(stored) && stored.every(isItemObject),
-    'array-field-content-invalid',
-    `The array field "${name}" expected an array of objects in the stored content.`
-  );
-  return stored;
-};
-
-const asScalarArray = (stored: unknown, name: string): unknown[] => {
-  if (stored == null) return [];
-  invariant(
-    Array.isArray(stored),
-    'array-field-content-invalid',
-    `The array field "${name}" expected an array in the stored content.`
-  );
-  return stored;
-};
 
 // Ingest and digest drop `_template`, so put it back first to keep the stored
 // key order.
@@ -76,22 +52,27 @@ export default defineClientPlugin({
     Component: ArrayField,
     metadata: { layout: 'block', labelable: false },
     schema: arraySchema,
+    // A stored value of the wrong shape stays as it is, so a save writes it
+    // back unchanged (ADR-012: never throw on open).
     parse: (stored: unknown, node, context) => {
+      if (stored == null) return [];
       const field = asArrayFieldSchema(node);
+      if (!isListFor(field, stored)) return stored;
       if (isScalarArray(field)) {
         const parse = context.registry.get(field.of.type)?.parse;
-        return asScalarArray(stored, node.name).map((item) =>
+        return stored.map((item) =>
           item == null || !parse ? item : parse(item, field.of, context)
         );
       }
-      const items = asItemArray(stored, node.name);
-      warnUnknownTemplates(field, items);
-      return convertItems(field, items, (item, fields) =>
+      if (!isItemArray(stored)) return stored;
+      warnUnknownTemplates(field, stored);
+      return convertItems(field, stored, (item, fields) =>
         ingestDocument(item, fields, context)
       );
     },
-    serialize: (value: unknown[], node, context) => {
+    serialize: (value: unknown, node, context) => {
       const field = asArrayFieldSchema(node);
+      if (!isListFor(field, value)) return value;
       if (isScalarArray(field)) {
         const serialize = context.registry.get(field.of.type)?.serialize;
         return value.map((item) => {
@@ -99,19 +80,18 @@ export default defineClientPlugin({
           return serialize ? serialize(item, field.of, context) : item;
         });
       }
-      return convertItems(
-        field,
-        asItemArray(value, node.name),
-        (item, fields) => digestDocument(item, fields, context)
+      if (!isItemArray(value)) return value;
+      return convertItems(field, value, (item, fields) =>
+        digestDocument(item, fields, context)
       );
     },
-    validateChildren: (value: unknown[], node, address, registry, scope) => {
+    validateChildren: (value: unknown, node, address, registry, scope) => {
       const field = asArrayFieldSchema(node);
-      const items = Array.isArray(value) ? value : [];
+      if (!isListFor(field, value)) return {};
       const errors: Record<string, string[]> = {};
       if (isScalarArray(field)) {
         const descriptor = registry.get(field.of.type);
-        items.forEach((item, index) => {
+        value.forEach((item, index) => {
           Object.assign(
             errors,
             validateFieldTree(
@@ -126,8 +106,8 @@ export default defineClientPlugin({
         });
         return errors;
       }
-      items.forEach((item, index) => {
-        const values = isItemObject(item) ? item : {};
+      if (!isItemArray(value)) return errors;
+      value.forEach((values, index) => {
         for (const subfield of itemFieldsOf(field, values) ?? []) {
           Object.assign(
             errors,

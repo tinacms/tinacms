@@ -40,6 +40,7 @@ export const postCollection = {
       ],
     }),
     t.boolean({ name: 'featured', label: 'Featured' }),
+    t.image({ name: 'heroImage', label: 'Hero image' }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
     rating({
       name: 'stars',
@@ -140,11 +141,7 @@ export default defineConfig({
   plugins: [
     localContentPlugin(),
     tinaCloudClientId
-      ? tinaCloud({
-          clientId: tinaCloudClientId,
-          // Manual stand-in until TinaCloud login lands: https://github.com/tinacms/tinacms/issues/7689
-          getToken: () => localStorage.getItem('tinacloud-token') ?? undefined,
-        })
+      ? tinaCloud({ clientId: tinaCloudClientId })
       : localMediaPlugin(),
     mediaManagerPlugin(),
     ratingFieldPlugin,

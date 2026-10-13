@@ -151,7 +151,28 @@ export const itemFieldsOf = (
     ? templateFor(field.templates, item)?.fields
     : field.fields;
 
+const isItem = (item: unknown): item is TinaDocument =>
+  item != null && typeof item === 'object' && !Array.isArray(item);
+
+export const isItemArray = (value: unknown): value is TinaDocument[] =>
+  Array.isArray(value) && value.every(isItem);
+
+// Whether a value is the list this array edits: objects for `fields` and
+// `templates`, any values for `of`.
+export const isListFor = (
+  field: ArrayFieldSchema,
+  value: unknown
+): value is unknown[] =>
+  isScalarArray(field) ? Array.isArray(value) : isItemArray(value);
+
 // The shape of the value only. `required`, `min` and `max` are validators the
 // collection attaches, and they measure the item count.
-export const arraySchema = (_node: FieldSchema): ZodType =>
-  z.preprocess((value) => value ?? [], z.array(z.unknown()));
+export const arraySchema = (node: FieldSchema): ZodType => {
+  const field = asArrayFieldSchema(node);
+  return z.preprocess(
+    (value) => value ?? [],
+    z.custom<unknown[]>((value) => isListFor(field, value), {
+      message: `${node.label ?? node.name} must be a list of items`,
+    })
+  );
+};

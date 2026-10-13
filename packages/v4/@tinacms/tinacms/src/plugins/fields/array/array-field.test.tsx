@@ -143,6 +143,23 @@ describe('ArrayField rendering', () => {
     renderField();
     expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
   });
+
+  it('shows a stored value that is not a list read-only, and clears it', async () => {
+    renderField({ authors: 'Ivan' });
+    expect(await screen.findByText(/not a list of items/)).toBeInTheDocument();
+    expect(screen.getByText('"Ivan"')).toBeInTheDocument();
+    expect(valueOf('authors')).toBe('Ivan');
+    await userEvent.click(screen.getAllByRole('button', { name: 'Clear' })[0]);
+    expect(valueOf('authors')).toEqual([]);
+    await waitFor(() =>
+      expect(
+        screen.queryByText(/must be a list of items/)
+      ).not.toBeInTheDocument()
+    );
+    expect(
+      screen.getAllByRole('button', { name: 'Add item' }).length
+    ).toBeGreaterThan(0);
+  });
 });
 
 describe('ArrayField add, remove, and reorder', () => {
@@ -174,6 +191,53 @@ describe('ArrayField add, remove, and reorder', () => {
     const names = screen.getAllByLabelText('Name') as HTMLInputElement[];
     expect(names.map((input) => input.value)).toEqual(['Brook', 'Ivan']);
   });
+
+  it("keeps a removed item's value off the item that takes its place", async () => {
+    renderField({
+      authors: [{ name: 'Ivan' }, { name: 'Josh', age: 30 }, { name: 'Brook' }],
+    });
+    await screen.findAllByLabelText('Name');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 2' })
+    );
+    expect(valueOf('authors')).toEqual([
+      { name: 'Ivan', age: null },
+      { name: 'Brook', age: null },
+    ]);
+    expect(
+      screen
+        .getAllByLabelText('Age')
+        .map((input) => (input as HTMLInputElement).value)
+    ).toEqual(['', '']);
+  });
+
+  it("keeps a removed item's value off an item whose value was cleared", async () => {
+    renderField({
+      authors: [
+        { name: 'Ivan', age: 5 },
+        { name: 'Brook', age: 3 },
+      ],
+    });
+    const ages = await screen.findAllByLabelText('Age');
+    await userEvent.clear(ages[1]);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    expect(valueOf('authors')).toEqual([{ name: 'Brook', age: null }]);
+    expect((screen.getByLabelText('Age') as HTMLInputElement).value).toBe('');
+  });
+
+  it("keeps a moved item's value with that item", async () => {
+    renderField({ authors: [{ name: 'Ivan', age: 30 }, { name: 'Brook' }] });
+    await screen.findAllByLabelText('Name');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Move item 2 up' })
+    );
+    expect(valueOf('authors')).toEqual([
+      { name: 'Brook', age: null },
+      { name: 'Ivan', age: '30' },
+    ]);
+  });
 });
 
 describe('ArrayField dirty tracking', () => {
@@ -199,7 +263,10 @@ describe('ArrayField dirty tracking', () => {
     await userEvent.clear(second);
     await userEvent.type(second, 'Brook');
 
-    expect(valueOf('authors')).toEqual([{ name: 'Ivan' }, { name: 'Brook' }]);
+    expect(valueOf('authors')).toEqual([
+      { name: 'Ivan', age: null },
+      { name: 'Brook', age: null },
+    ]);
     expect(status()).toBe('clean');
   });
 });
@@ -210,7 +277,7 @@ describe('ArrayField value updates', () => {
     const name = await screen.findByLabelText('Name');
     await userEvent.clear(name);
     await userEvent.type(name, 'Brook');
-    expect(valueOf('authors')).toEqual([{ name: 'Brook' }]);
+    expect(valueOf('authors')).toEqual([{ name: 'Brook', age: null }]);
   });
 
   it('goes dirty again when an item field is edited after a save', async () => {
@@ -256,7 +323,62 @@ describe('ArrayField value updates', () => {
   });
 });
 
+describe('ArrayField with a stored value of the wrong shape', () => {
+  it('blocks a save until the value is cleared, then saves without it', async () => {
+    const onSave = vi.fn(async () => {});
+    const oneArray: CollectionSchema = {
+      name: 'post',
+      label: 'Posts',
+      format: 'mdx',
+      fields: [
+        t.array({
+          name: 'authors',
+          label: 'Authors',
+          fields: [t.string({ name: 'name', label: 'Name' })],
+        }),
+      ],
+    };
+    render(
+      <TinaProvider
+        config={asResolvedConfig({ plugins: PLUGINS, schema: NO_COLLECTIONS })}
+      >
+        <FormProvider
+          collection={oneArray}
+          path={DOCUMENT_PATH}
+          document={{ authors: 'Ivan' }}
+          onSave={onSave}
+        >
+          <LabelledFields />
+          <SaveProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+    await userEvent.click(await screen.findByText('save'));
+    expect(
+      await screen.findByText('Authors must be a list of items')
+    ).toBeInTheDocument();
+    expect(onSave).not.toHaveBeenCalled();
+    await userEvent.click(screen.getAllByRole('button', { name: 'Clear' })[0]);
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Authors must be a list of items')
+      ).not.toBeInTheDocument()
+    );
+    await userEvent.click(screen.getByText('save'));
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+  });
+});
+
 describe('ArrayField validation', () => {
+  it('rejects a value that is not a list of items', async () => {
+    const descriptor = (await resolveRegistry()).get('array');
+    for (const bad of ['Ivan', 42, { name: 'Ivan' }, ['Ivan']]) {
+      expect(validateFieldWithCore(authorsNode, descriptor, bad)).toEqual([
+        'Authors must be a list of items',
+      ]);
+    }
+  });
+
   it('requires at least one item', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('array');
@@ -359,15 +481,23 @@ describe('ArrayField ingest and digest', () => {
     const registry = await resolveRegistry();
     const stored = { authors: [{ name: 'Ivan', age: 30 }] };
     const ingested = ingestDocument(stored, collection.fields, { registry });
-    expect(ingested).toEqual({ authors: [{ name: 'Ivan', age: '30' }] });
+    expect(ingested).toEqual({
+      authors: [{ name: 'Ivan', age: '30' }],
+      tags: null,
+      groups: null,
+    });
     expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
       stored
     );
   });
 
-  it('leaves an absent field absent (no default seeding)', async () => {
+  it('holds an absent field as null and digests it as absent', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({
+      authors: null,
+      tags: null,
+      groups: null,
+    });
     expect(digestDocument({}, collection.fields, { registry })).toEqual({});
   });
 
@@ -375,15 +505,19 @@ describe('ArrayField ingest and digest', () => {
     const registry = await resolveRegistry();
     expect(
       ingestDocument({ authors: null }, collection.fields, { registry })
-    ).toEqual({ authors: [] });
+    ).toEqual({ authors: [], tags: null, groups: null });
   });
 
-  it('refuses stored content that is not an array of objects', async () => {
+  it('keeps stored content that is not an array of objects unchanged', async () => {
     const registry = await resolveRegistry();
     for (const bad of ['oops', 42, { name: 'Ivan' }, ['Ivan'], [null]]) {
-      expect(() =>
-        ingestDocument({ authors: bad }, collection.fields, { registry })
-      ).toThrow(/expected an array of objects/);
+      const ingested = ingestDocument({ authors: bad }, collection.fields, {
+        registry,
+      });
+      expect(ingested.authors).toEqual(bad);
+      expect(
+        digestDocument(ingested, collection.fields, { registry }).authors
+      ).toEqual(bad);
     }
   });
 });
@@ -596,6 +730,7 @@ describe('ArrayField templates', () => {
         { _template: 'hero', headline: 'Hi' },
         { _template: 'cta', link: '/docs', weight: '2' },
       ],
+      scores: null,
     });
     expect(
       digestDocument(ingested, blocksCollection.fields, { registry })
@@ -621,6 +756,7 @@ describe('ArrayField templates', () => {
         { headline: 'No template' },
         { _template: 'cta', link: '/docs', weight: '2' },
       ],
+      scores: null,
     });
     expect(
       digestDocument(ingested, blocksCollection.fields, { registry })
@@ -653,7 +789,7 @@ describe('ArrayField templates', () => {
     );
     await waitFor(() =>
       expect(pageValueOf('blocks')).toEqual([
-        { _template: 'cta', link: '/docs' },
+        { _template: 'cta', link: '/docs', weight: null },
       ])
     );
     warn.mockRestore();
@@ -712,7 +848,7 @@ describe('ArrayField templates', () => {
     );
     await waitFor(() =>
       expect(pageValueOf('blocks')).toEqual([
-        { _template: 'cta', link: '/docs' },
+        { _template: 'cta', link: '/docs', weight: null },
         { _template: 'hero', headline: 'Hi' },
       ])
     );
@@ -724,7 +860,7 @@ describe('ArrayField templates', () => {
     await userEvent.type(link, '/v4');
     await waitFor(() =>
       expect(pageValueOf('blocks')).toEqual([
-        { _template: 'cta', link: '/docs/v4' },
+        { _template: 'cta', link: '/docs/v4', weight: null },
       ])
     );
   });
@@ -742,7 +878,7 @@ describe('ArrayField templates', () => {
     );
     await waitFor(() =>
       expect(pageValueOf('blocks')).toEqual([
-        { _template: 'cta', link: '/docs' },
+        { _template: 'cta', link: '/docs', weight: null },
       ])
     );
     expect(
@@ -796,7 +932,7 @@ describe('ArrayField templates', () => {
     await waitFor(() =>
       expect(pageValueOf('blocks')).toEqual([
         { headline: 'Orphan' },
-        { _template: 'cta', link: '/docs' },
+        { _template: 'cta', link: '/docs', weight: null },
       ])
     );
     warn.mockRestore();
@@ -810,17 +946,36 @@ describe('ArrayField of', () => {
     const ingested = ingestDocument(stored, blocksCollection.fields, {
       registry,
     });
-    expect(ingested).toEqual({ scores: ['3', '5'] });
+    expect(ingested).toEqual({ blocks: null, scores: ['3', '5'] });
     expect(
       digestDocument(ingested, blocksCollection.fields, { registry })
     ).toEqual(stored);
   });
 
-  it('refuses stored content that is not an array', async () => {
+  it('shows a stored value that is not a list read-only, for templates and of', async () => {
+    renderPage({ blocks: 'oops', scores: { a: 1 } });
+    expect(await screen.findAllByText(/not a list of items/)).toHaveLength(2);
+    expect(pageValueOf('blocks')).toBe('oops');
+    expect(pageValueOf('scores')).toEqual({ a: 1 });
+  });
+
+  it('rejects a value that is not a list of items', async () => {
+    const descriptor = (await resolveRegistry()).get('array');
+    expect(validateFieldWithCore(scoresNode, descriptor, 'oops')).toEqual([
+      'Scores must be a list of items',
+    ]);
+    expect(validateFieldWithCore(scoresNode, descriptor, [1, 2])).toEqual([]);
+  });
+
+  it('keeps stored content that is not an array unchanged', async () => {
     const registry = await resolveRegistry();
-    expect(() =>
-      ingestDocument({ scores: 3 }, blocksCollection.fields, { registry })
-    ).toThrow(/expected an array in the stored content/);
+    const ingested = ingestDocument({ scores: 3 }, blocksCollection.fields, {
+      registry,
+    });
+    expect(ingested.scores).toBe(3);
+    expect(
+      digestDocument(ingested, blocksCollection.fields, { registry }).scores
+    ).toBe(3);
   });
 
   it('renders, edits, adds, reorders and removes scalar items', async () => {
