@@ -415,9 +415,7 @@ export class Database {
 
     const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
     const collectionIndexDefinitions = indexDefinitions?.[collection.name];
-    const collectionReferences = (await this.getCollectionReferences())?.[
-      collection.name
-    ];
+    const referenceSchema = await this.getSchema();
     const normalizedPath = normalizePath(filepath);
     if (!collection?.isDetached) {
       if (this.bridge) {
@@ -452,7 +450,7 @@ export class Database {
         ...makeRefOpsForDocument(
           normalizedPath,
           collection?.name,
-          collectionReferences,
+          referenceSchema,
           dataFields,
           'put',
           level
@@ -488,7 +486,7 @@ export class Database {
             ...makeRefOpsForDocument(
               normalizedPath,
               collection?.name,
-              collectionReferences,
+              referenceSchema,
               existingItem,
               'del',
               level
@@ -550,9 +548,7 @@ export class Database {
           );
           collectionIndexDefinitions = indexDefinitions?.[collectionName];
         }
-        const collectionReferences = (await this.getCollectionReferences())?.[
-          collectionName
-        ];
+        const referenceSchema = await this.getSchema();
 
         const normalizedPath = normalizePath(filepath);
         const dataFields = await this.formatBodyOnPayload(filepath, data);
@@ -630,7 +626,7 @@ export class Database {
             ...makeRefOpsForDocument(
               normalizedPath,
               collectionName,
-              collectionReferences,
+              referenceSchema,
               dataFields,
               'put',
               level
@@ -666,7 +662,7 @@ export class Database {
                 ...makeRefOpsForDocument(
                   normalizedPath,
                   collectionName,
-                  collectionReferences,
+                  referenceSchema,
                   existingItem,
                   'del',
                   level
@@ -1445,9 +1441,7 @@ export class Database {
       throw new Error(`No collection found for path: ${filepath}`);
     }
     const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
-    const collectionReferences = (await this.getCollectionReferences())?.[
-      collection.name
-    ];
+    const referenceSchema = await this.getSchema();
     const collectionIndexDefinitions = indexDefinitions?.[collection.name];
 
     let level = this.contentLevel;
@@ -1470,7 +1464,7 @@ export class Database {
         ...makeRefOpsForDocument(
           normalizedPath,
           collection.name,
-          collectionReferences,
+          referenceSchema,
           item,
           'del',
           level
@@ -1695,10 +1689,6 @@ const _indexContent = async ({
     }
     collectionPath = collection.path;
   }
-  const collectionReferences = (await database.getCollectionReferences())?.[
-    collection?.name
-  ];
-
   const tinaSchema = await database.getSchema();
   let templateInfo: CollectionTemplateable | null = null;
   if (collection) {
@@ -1740,7 +1730,7 @@ const _indexContent = async ({
             ...makeRefOpsForDocument(
               normalizedPath,
               collection?.name,
-              collectionReferences,
+              tinaSchema,
               item,
               'del',
               level
@@ -1777,7 +1767,7 @@ const _indexContent = async ({
           ...makeRefOpsForDocument(
             normalizedPath,
             collection?.name,
-            collectionReferences,
+            tinaSchema,
             aliasedData,
             'put',
             level
@@ -1857,10 +1847,6 @@ const _deleteIndexContent = async (
     }
   }
 
-  const collectionReferences = (await database.getCollectionReferences())?.[
-    collection?.name
-  ];
-
   const tinaSchema = await database.getSchema();
   let templateInfo: CollectionTemplateable | null = null;
   if (collection) {
@@ -1891,7 +1877,7 @@ const _deleteIndexContent = async (
         ...makeRefOpsForDocument(
           itemKey,
           collection?.name,
-          collectionReferences,
+          tinaSchema,
           aliasedData,
           'del',
           database.contentLevel
