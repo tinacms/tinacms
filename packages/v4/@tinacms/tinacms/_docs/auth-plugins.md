@@ -66,6 +66,8 @@ A failure in `login()`, `logout()` or `getToken()` is an `AuthError`. It has a `
 |---|---|
 | `unauthenticated` | No session exists. |
 | `expired` | The session expired and did not refresh. |
+| `no-access` | The account has no access to this project. |
+| `popup-blocked` | The browser blocked the sign-in window. |
 | `network` | The sign-in service did not answer. |
 | `invalid-response` | The sign-in service sent a response that the plugin cannot read. |
 
@@ -102,9 +104,10 @@ with no login.
   request reads `store.auth` and calls `getToken()` at the time it is sent.
 - The local Data Layer (`tinaLocalDataLayerVitePlugin`) authorizes the
   content and media requests as the RPC handler does. It answers `401` when
-  there is no session, or when the auth plugin has no `getSession`. It
-  answers `403` when the roles do not grant the `requires` permission of the
-  content or media plugin. With no auth plugin, it checks nothing.
+  there is no session, or when the winning auth plugin has no `getSession`.
+  It answers `403` when the roles do not grant the `requires` permission of
+  the winning content or media plugin. With no auth plugin, or when the winning one has
+  no server segment, it checks nothing.
 - The local Data Layer runs no `onInit`. A `getSession` must not depend on
   state that `onInit` sets.
 - Roles and permissions are runtime data of the provider. They are not in
@@ -112,6 +115,54 @@ with no login.
 - `roles` on the slice and a permission check in the client are for the UI
   only. They hide controls that the editor cannot use. The server check is
   the security boundary.
+
+## TinaCloud
+
+`tinaCloud({ clientId })` is the reference auth plugin. It provides `auth`
+and `media` from one plugin.
+
+- `login()` signs in the way `https://identity.tinajs.io/v2/auth/config`
+  says, as v3 does:
+  - With `workosEnabled` off, it opens the TinaCloud sign-in popup at
+    `https://app.tina.io/signin`. The slice accepts the tokens only from a
+    message that the popup posts from the `https://app.tina.io` origin.
+  - With `workosEnabled` on, it redirects to
+    `https://identity.tinajs.io/v2/auth/tinacms` with a PKCE challenge. When
+    the browser returns with a `code` and the `state` this tab sent, the slice
+    exchanges the code at `/oauth/token` and restores the admin URL. The
+    verifier stays in `sessionStorage` for the round trip; the tokens do not.
+    A sign-in that fails on the way back sets `signed-out` with an `error`,
+    which the sign-in screen shows.
+- The slice reads the user from
+  `https://identity.tinajs.io/v2/apps/{clientId}/currentUser`, and their role
+  in the project from `https://identity.tinajs.io/v2/apps/{clientId}`. A
+  project `owner` or `admin`, or an org admin, gets the `admin` role, and any
+  other user gets `editor`.
+- An account with no access to the project fails with `no-access`.
+- An account that is not verified sets `forbidden`, and the slice keeps no
+  token for it. TinaCloud refuses a disabled account, so it fails with
+  `no-access`.
+- The tokens stay in a closure of the slice. A full reload signs the editor
+  out (ADR-023).
+- The media slice of `tinaCloud()` gets its token from the same closure. It
+  never reads the token of another auth plugin, so TinaCloud media needs
+  `tinaCloud()` to keep `auth`.
+- Before a media request, the closure refreshes the token through
+  `https://identity.tinajs.io/oauth/token` when it expires in less than two
+  minutes. A refused refresh sets `signed-out` and throws `expired`.
+
+The tokens only ever go to TinaCloud, as in v3. They are tied to the whole
+TinaCloud account, not to one project, so the slice's `getToken()` returns
+`undefined` and the site's own server never receives them. `tinaCloud()` has
+no server segment, so the local Data Layer checks nothing, as in v3, and the
+RPC handler refuses every operation that needs a session.
+
+```ts
+defineConfig({
+  plugins: [localContentPlugin(), tinaCloud({ clientId: '<client id>' })],
+  schema: { collections: [] },
+});
+```
 
 ## Swap a provider
 
@@ -132,15 +183,15 @@ defineConfig({
 });
 ```
 
-The overriding plugin mounts `store.auth`. For a plugin that provides more
-than one capability, the override replaces `auth` only, and the first plugin
-keeps its other capabilities.
+The overriding plugin mounts `store.auth` and answers `getSession`, so an
+override with no server segment leaves the RPC handler with no session. For a
+plugin that provides more than one capability, the override replaces `auth`
+only, and the first plugin keeps its other capabilities.
 
 ## Not supported yet
 
 - Sign-out on a `401`. A request that carried a token and gets `401` fails,
   and the slice does not change its status.
-- An auth slice for `tinaCloud()`.
 - `onLogin` and `onLogout` hooks in the config. A plugin does its own work
   inside its `login()` and `logout()`.
 

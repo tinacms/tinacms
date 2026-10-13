@@ -6,7 +6,12 @@ import { runCodegen } from '../../../../cli/commands/codegen';
 import { type ResolvedConfig, resolveBuild } from '../../../../config';
 import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
-import { DEFAULT_MEDIA_URL, MediaError } from '../../../../core/media/contract';
+import { capabilityProvider } from '../../../../core/mount';
+import {
+  DEFAULT_MEDIA_ROOT,
+  DEFAULT_MEDIA_URL,
+  MediaError,
+} from '../../../../core/media/contract';
 import {
   MAX_MEDIA_UPLOAD_BYTES,
   MAX_REQUEST_BODY_BYTES,
@@ -26,6 +31,7 @@ import {
   dispatchMediaRequest,
   listMedia,
 } from '../../../media/local/server/media-request';
+import { mimeTypeOfPath } from '../../../media-manager/media-types';
 import { dispatchContentRequest } from './content-request';
 import {
   type LocalDataLayerOptions,
@@ -140,18 +146,16 @@ type SessionGate = (
 ) => Promise<boolean>;
 
 // ADR-023 §4: with an auth plugin, the Data Layer authorizes a request as
-// rpc/handler.ts does. With no auth plugin, it composes nothing and checks nothing.
+// rpc/handler.ts does. When no auth plugin, or the winning one has no server
+// segment, it composes nothing and checks nothing.
 const createSessionGate = (
   plugins: PluginManifest[],
   capability: 'content' | 'media'
 ): SessionGate | null => {
-  if (!plugins.some(({ provides }) => provides.includes(AUTH_CAPABILITY))) {
-    return null;
-  }
+  if (!capabilityProvider(plugins, AUTH_CAPABILITY)?.server) return null;
   const authorize = createRequestAuthorizer(plugins);
-  const permission = plugins.find(({ provides }) =>
-    provides.includes(capability)
-  )?.requires?.permission;
+  const permission = capabilityProvider(plugins, capability)?.requires
+    ?.permission;
   return async (req, res) => {
     try {
       const refusal = await authorize(sessionRequestOf(req), [permission]);
@@ -170,7 +174,8 @@ const createSessionGate = (
 
 const createMediaHandler = (
   media: LocalMedia,
-  sessionGate: SessionGate | null
+  sessionGate: SessionGate | null,
+  onUpload: (mediaPath: string) => void
 ): Connect.NextHandleFunction => {
   const serveMediaUpload = async (
     req: Connect.IncomingMessage,
@@ -193,6 +198,7 @@ const createMediaHandler = (
       'A media upload needs a `file` field and an optional `folder` field.'
     );
     const mediaPath = await media.save(file, folder);
+    onUpload(mediaPath);
     res.setHeader('content-type', 'application/json');
     res.end(JSON.stringify({ path: mediaPath }));
   };
@@ -379,9 +385,36 @@ export const tinaLocalDataLayerVitePlugin = (
         });
       }
       if (media) {
+        // Vite serves a new public/ file only once its file watcher reports it,
+        // so a site that loads an image straight after its upload gets a 404.
+        // Serve the files this server uploaded until then.
+        const uploaded = new Set<string>();
+        const uploadsRoute = `/${options.mediaRoot ?? DEFAULT_MEDIA_ROOT}/`;
+        server.middlewares.use(async (req, res, next) => {
+          if (!isLoopbackHost(req.headers.host)) return next();
+          const pathname = (req.url ?? '').split('?')[0];
+          if (!pathname.startsWith(uploadsRoute)) return next();
+          let mediaPath: string;
+          try {
+            mediaPath = decodeURIComponent(pathname.slice(uploadsRoute.length));
+          } catch {
+            return next();
+          }
+          const contentType = mimeTypeOfPath(mediaPath);
+          if (!uploaded.has(mediaPath) || !contentType) return next();
+          try {
+            const bytes = await readFile(path.join(media.mediaDir, mediaPath));
+            res.setHeader('content-type', contentType);
+            res.end(bytes);
+          } catch {
+            next();
+          }
+        });
         server.middlewares.use(
           options.mediaUrl ?? DEFAULT_MEDIA_URL,
-          createMediaHandler(media, mediaGate)
+          createMediaHandler(media, mediaGate, (mediaPath) =>
+            uploaded.add(mediaPath)
+          )
         );
       }
       server.middlewares.use(
