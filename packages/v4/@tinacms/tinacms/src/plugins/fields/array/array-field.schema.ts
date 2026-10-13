@@ -27,8 +27,15 @@ export interface TemplatesArrayFieldSchema extends ArrayFieldBase {
   of?: never;
 }
 
+// ADR-017 §4: `of` holds scalars, so its field nests no items of its own.
+export type ScalarFieldSchema = FieldSchema & {
+  fields?: never;
+  templates?: never;
+  of?: never;
+};
+
 export interface ScalarArrayFieldSchema extends ArrayFieldBase {
-  of: FieldSchema;
+  of: ScalarFieldSchema;
   fields?: never;
   templates?: never;
 }
@@ -119,6 +126,15 @@ export const asArrayFieldSchema = (node: FieldSchema): ArrayFieldSchema => {
       (isRecord(candidate.of) && typeof candidate.of.type === 'string'),
     'array-field-schema-invalid',
     `The array field "${node.name}" needs "of" to be a field with a "type".`
+  );
+  const { of } = candidate;
+  const nested = isRecord(of)
+    ? ITEM_KEYS.filter((key) => of[key] !== undefined)
+    : [];
+  invariant(
+    nested.length === 0,
+    'array-field-schema-invalid',
+    `The array field "${node.name}" needs "of" to be a single-value field, but it declares ${nested.map((key) => `"${key}"`).join(' and ')}. Use "fields" for a list of objects, or "templates" for blocks.`
   );
   return node as ArrayFieldSchema;
 };

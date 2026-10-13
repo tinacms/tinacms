@@ -442,6 +442,23 @@ describe('asArrayFieldSchema', () => {
     expect(() => asArrayFieldSchema(node)).toThrow(/same name/);
   });
 
+  it('throws when of is not a single-value field', () => {
+    const objectOf = {
+      name: 'people',
+      type: 'array',
+      of: { name: 'person', type: 'object', fields: [] },
+    } as FieldSchema;
+    const arrayOf = {
+      name: 'grid',
+      type: 'array',
+      of: { name: 'row', type: 'array', of: { name: 'cell', type: 'number' } },
+    } as FieldSchema;
+    expect(() => asArrayFieldSchema(objectOf)).toThrow(
+      /declares "fields". Use "fields" for a list of objects/
+    );
+    expect(() => asArrayFieldSchema(arrayOf)).toThrow(/declares "of"/);
+  });
+
   it('throws when fields is not an array', () => {
     const node = { name: 'authors', type: 'array', fields: {} } as FieldSchema;
     expect(() => asArrayFieldSchema(node)).toThrow(/to be an array/);
@@ -467,6 +484,19 @@ describe('t.array', () => {
     t.array({ name: 'blocks', fields: [], templates: [] });
     // @ts-expect-error one of fields, templates or of is required
     t.array({ name: 'blocks' });
+  });
+
+  it('rejects an object or array as `of` at the type level', () => {
+    t.array({
+      name: 'people',
+      // @ts-expect-error `of` takes a single-value field
+      of: t.object({ name: 'person', fields: [] }),
+    });
+    t.array({
+      name: 'grid',
+      // @ts-expect-error `of` takes a single-value field
+      of: t.array({ name: 'row', of: t.number({ name: 'cell' }) }),
+    });
   });
 });
 

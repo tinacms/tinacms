@@ -55,7 +55,7 @@ const collection = {
 |---|---|---|---|
 | `fields` | `FieldSchema[]` | objects with one shape | `[{ name: 'Ivan' }]` |
 | `templates` | `TemplateSchema[]` | objects, each with its own template | `[{ _template: 'hero', headline: 'Hi' }]` |
-| `of` | `FieldSchema` | single values | `['news', 'release']` |
+| `of` | `ScalarFieldSchema` | single values; an object or array here is rejected (ADR-017 §4) | `['news', 'release']` |
 
 A template is the shared `TemplateSchema` from `core/schema/types.ts`:
 `name`, `label?`, `fields` and `defaultItem?`. A new item of a template starts
