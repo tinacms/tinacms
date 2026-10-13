@@ -1,8 +1,9 @@
 # The `array` field
 
-The `array` field is one of the field plugins that v4 supplies. It repeats a
-fixed set of item fields, and the author adds, removes, and reorders the
-items. It is a compound field — see
+The `array` field is one of the field plugins that v4 supplies. It holds a
+list of items, and the author adds, removes, and reorders them. Each item is
+an object of fixed fields (`fields`), a block of one of several templates
+(`templates`), or a single value (`of`). It is a compound field — see
 [field-plugins.md](./field-plugins.md#compound-fields) for the shared
 mechanism it uses.
 
@@ -91,8 +92,10 @@ defineClientPlugin({
 
 ## Validation
 
-`arraySchema(node)` checks that the value is a list of objects. The
-`required`, `min` and `max` validators check the item count.
+`arraySchema(node)` checks that the value is a list: a list of objects for
+`fields` and `templates`, any list for `of`. A value of the wrong shape fails
+with `<label> must be a list of items`. The `required`, `min` and `max`
+validators check the item count.
 `required` implies `min: 1` unless `min` is set explicitly:
 
 | Config | Rule | Message |
@@ -100,11 +103,16 @@ defineClientPlugin({
 | `required` (no `min`) | fewer than 1 item | `<label> needs at least 1 item` |
 
 That schema checks the array's own shape only — it does not look inside an
-item. Each item field's own rules run through `validateChildren(value, node,
-address, registry)`, which calls `validateFieldTree(subfield, descriptor,
-item[subfield.name], \`${address}.${index}.${subfield.name}\`, registry)`
-(`core/validation.ts`) for every item field of every item, and merges what it
-returns. It builds each item's address from its own `address` parameter, not
+item. Each item's own rules run through `validateChildren(value, node,
+address, registry)`, which calls `validateFieldTree` (`core/validation.ts`)
+and merges what it returns:
+
+- For `fields`, it runs each item field at
+  \`${address}.${index}.${subfield.name}\`.
+- For `templates`, it looks up each item's template by `_template` and runs
+  that template's fields at the same addresses. An item whose template is
+  unknown is skipped.
+- For `of`, it runs the `of` field on each item at \`${address}.${index}\`. It builds each item's address from its own `address` parameter, not
 `node.name` — an array nested inside another array is not addressed by its
 bare name (`members`), only by where it actually sits
 (`groups.0.members`).
