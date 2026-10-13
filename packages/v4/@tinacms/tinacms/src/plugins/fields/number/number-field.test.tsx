@@ -131,7 +131,7 @@ describe('NumberField value updates', () => {
     renderField({ weight: 3 });
     const input = await screen.findByLabelText('Weight');
     await userEvent.clear(input);
-    expect(valueOf('weight')).toBeUndefined();
+    expect(valueOf('weight')).toBeNull();
   });
 
   it('keeps a typed value in the store', async () => {
@@ -233,9 +233,13 @@ describe('NumberField ingest and digest', () => {
     );
   });
 
-  it('leaves an absent field absent (no default seeding)', async () => {
+  it('holds an absent field as null and digests it as absent', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({
+      rating: null,
+      count: null,
+      weight: null,
+    });
     expect(digestDocument({}, collection.fields, { registry })).toEqual({});
   });
 
@@ -251,7 +255,7 @@ describe('NumberField ingest and digest', () => {
     const ingested = ingestDocument({ weight: null }, collection.fields, {
       registry,
     });
-    expect(ingested.weight).toBeUndefined();
+    expect(ingested.weight).toBeNull();
     expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
       {}
     );

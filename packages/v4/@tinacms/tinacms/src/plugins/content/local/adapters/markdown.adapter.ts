@@ -44,9 +44,13 @@ const isSameValue = (next: unknown, previous: unknown): boolean =>
 
 const mergeFrontmatter = (
   document: Record<string, unknown>,
-  previousData: Record<string, unknown>
+  previousData: Record<string, unknown>,
+  schemaKeys: readonly string[] = []
 ): Record<string, unknown> => {
   const frontmatter: Record<string, unknown> = { ...previousData };
+  for (const key of schemaKeys) {
+    if (!(key in document)) delete frontmatter[key];
+  }
   for (const [key, value] of Object.entries(document)) {
     frontmatter[key] = isSameValue(value, previousData[key])
       ? previousData[key]
@@ -63,10 +67,14 @@ export const markdownAdapter = (extension: string): FormatAdapter => ({
       ? { ...data, [bodyField]: dropLayoutBlankLine(content) }
       : data;
   },
-  serialize: (document, previousRaw, bodyField) => {
+  serialize: (document, previousRaw, bodyField, schemaKeys) => {
     const crlf = previousRaw?.includes(CRLF) ?? false;
     const previous = matter(toLineFeeds(previousRaw ?? ''), MATTER_OPTIONS);
-    const frontmatter = mergeFrontmatter(document, previous.data);
+    const frontmatter = mergeFrontmatter(
+      document,
+      previous.data,
+      schemaKeys?.filter((key) => key !== bodyField)
+    );
     if (bodyField != null) {
       delete frontmatter[bodyField];
     }

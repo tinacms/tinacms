@@ -92,8 +92,8 @@ An optional field wraps the enum in `z.preprocess`, so `''` and `null` become
 
 The field has no `parse` or `serialize` function, so `ingestDocument` and
 `digestDocument` pass the stored value through unchanged. A document with no
-stored value stays absent after ingest, because the descriptor sets no
-`defaultValue`.
+stored value is `null` after ingest, because the descriptor sets no
+`defaultValue`, and digests as absent.
 
 ## The component
 
@@ -164,5 +164,5 @@ come from `@tinacms/ui/components/select`, the shadcn primitive that wraps
   on an optional field.
 - It rejects a value that is not in `options`.
 - It passes a stored value through ingest and digest without a change, and
-  leaves an absent field absent.
+  holds an absent field as `null` and digests it as absent.
 - It examines the metadata of the descriptor.
