@@ -7,6 +7,7 @@ import type {
 } from './field/contract';
 import type { FieldRegistry } from './field/registry';
 import { invariant } from './invariant';
+import { fieldsetOf, scalarItemOf } from './schema/children';
 import type { FieldSchema } from './schema/types';
 import { isRecord } from '../utils/is-record';
 
@@ -127,11 +128,6 @@ export const validateFieldTree = (
   return errors;
 };
 
-const hasItemFields = (
-  node: FieldSchema
-): node is FieldSchema & { fields: FieldSchema[] } =>
-  'fields' in node && Array.isArray(node.fields);
-
 // The addresses whose rules can depend on a sibling, so the form knows what to
 // validate again when another field changes. `selfContained` names the rules
 // that read their own value alone: a field carrying only those needs no
@@ -144,29 +140,28 @@ export const addressesWithValidators = (
   values: unknown,
   selfContained: ReadonlySet<string> = new Set(),
   prefix = ''
-): string[] =>
-  fields.flatMap((node) => {
-    const address = prefix ? `${prefix}.${node.name}` : node.name;
-    const own = (node.validators ?? []).some(
-      (ref) => !selfContained.has(ref.name)
-    )
+): string[] => {
+  const ownAddress = (node: FieldSchema, address: string): string[] =>
+    (node.validators ?? []).some((ref) => !selfContained.has(ref.name))
       ? [address]
       : [];
-    if (!hasItemFields(node)) return own;
+  const nested = (node: FieldSchema, value: unknown, address: string) => {
+    const fieldset = fieldsetOf(node, value);
+    return fieldset
+      ? addressesWithValidators(fieldset, value, selfContained, address)
+      : [];
+  };
+  return fields.flatMap((node) => {
+    const address = prefix ? `${prefix}.${node.name}` : node.name;
     const value = isRecord(values) ? values[node.name] : undefined;
-    if (Array.isArray(value)) {
-      return own.concat(
-        value.flatMap((item, index) =>
-          addressesWithValidators(
-            node.fields,
-            item,
-            selfContained,
-            `${address}.${index}`
-          )
+    const scalar = scalarItemOf(node);
+    const children = Array.isArray(value)
+      ? value.flatMap((item, index) =>
+          scalar
+            ? ownAddress(scalar, `${address}.${index}`)
+            : nested(node, item, `${address}.${index}`)
         )
-      );
-    }
-    return own.concat(
-      addressesWithValidators(node.fields, value, selfContained, address)
-    );
+      : nested(node, value, address);
+    return [...ownAddress(node, address), ...children];
   });
+};

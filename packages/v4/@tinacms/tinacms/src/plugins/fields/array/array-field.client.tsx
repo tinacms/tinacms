@@ -1,11 +1,11 @@
 import { defineClientPlugin } from '../../../client';
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import { invariant } from '../../../core/invariant';
+import { TEMPLATE_KEY } from '../../../core/schema/children';
 import type { TinaDocument } from '../../../core/schema/types';
 import { validateFieldTree } from '../../../core/validation';
 import {
   type FieldsArrayFieldSchema,
-  TEMPLATE_KEY,
   type TemplatesArrayFieldSchema,
   arraySchema,
   asArrayFieldSchema,

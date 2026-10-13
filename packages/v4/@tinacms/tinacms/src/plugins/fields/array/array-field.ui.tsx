@@ -4,6 +4,7 @@ import { type ReactNode, useRef } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import type { FieldAddress } from '../../../core/field/address';
 import { ingestDocument } from '../../../core/form/ingest';
+import { TEMPLATE_KEY } from '../../../core/schema/children';
 import type {
   FieldSchema,
   TemplateSchema,
@@ -21,7 +22,6 @@ import {
 import {
   type FieldsArrayFieldSchema,
   type ScalarArrayFieldSchema,
-  TEMPLATE_KEY,
   type TemplatesArrayFieldSchema,
   asArrayFieldSchema,
   isScalarArray,

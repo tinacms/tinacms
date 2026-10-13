@@ -1,3 +1,4 @@
+import { fieldsetOf, scalarItemOf } from '../schema/children';
 import type {
   CollectionSchema,
   FieldSchema,
@@ -11,11 +12,6 @@ export interface ReferenceTarget {
 
 const isDocument = (value: unknown): value is TinaDocument =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const childFieldsOf = (node: FieldSchema): FieldSchema[] | undefined => {
-  const { fields } = node as { fields?: FieldSchema[] };
-  return Array.isArray(fields) ? fields : undefined;
-};
 
 // A reference stores the path of the document it points at, and it is the only
 // node that declares `collections`. Reading that rather than the type key keeps
@@ -39,9 +35,8 @@ const targetOf = (
   return owner ? { collection: owner.name, path: value } : null;
 };
 
-// TODO(#7534): this walk reads `node.fields`, so it misses any other way a
-// plugin nests children. `templates` is the live gap. Fold it into the
-// registry-driven path that `ingest.ts` uses.
+// TODO(#7534): these walks read `fields`, `templates` and `of` by key. Fold
+// them into the registry-driven path that `ingest.ts` uses.
 export const collectReferences = (
   values: TinaDocument | undefined,
   fields: FieldSchema[],
@@ -56,12 +51,15 @@ export const collectReferences = (
         targets.push(target);
         continue;
       }
-      const children = childFieldsOf(node);
-      if (!children) continue;
-      if (Array.isArray(value)) {
-        for (const item of value) if (isDocument(item)) walk(item, children);
-      } else if (isDocument(value)) {
-        walk(value, children);
+      const scalar = scalarItemOf(node);
+      for (const item of Array.isArray(value) ? value : [value]) {
+        if (scalar) {
+          const itemTarget = targetOf(scalar, item, collections);
+          if (itemTarget) targets.push(itemTarget);
+          continue;
+        }
+        const children = fieldsetOf(node, item);
+        if (children && isDocument(item)) walk(item, children);
       }
     }
   };
@@ -82,6 +80,15 @@ export const resolveReferences = (
   collections: CollectionSchema[],
   resolve: ReferenceResolver
 ): TinaDocument => {
+  const resolveNested = (node: FieldSchema, item: unknown): unknown => {
+    const scalar = scalarItemOf(node);
+    if (scalar) {
+      const target = targetOf(scalar, item, collections);
+      return (target ? resolve(target) : undefined) ?? item;
+    }
+    const children = fieldsetOf(node, item);
+    return children && isDocument(item) ? walk(item, children) : item;
+  };
   const walk = (document: TinaDocument, nodes: FieldSchema[]): TinaDocument => {
     const resolved: TinaDocument = { ...document };
     for (const node of nodes) {
@@ -92,14 +99,10 @@ export const resolveReferences = (
         if (referenced) resolved[node.name] = referenced;
         continue;
       }
-      const children = childFieldsOf(node);
-      if (!children) continue;
       if (Array.isArray(value)) {
-        resolved[node.name] = value.map((item) =>
-          isDocument(item) ? walk(item, children) : item
-        );
+        resolved[node.name] = value.map((item) => resolveNested(node, item));
       } else if (isDocument(value)) {
-        resolved[node.name] = walk(value, children);
+        resolved[node.name] = resolveNested(node, value);
       }
     }
     return resolved;

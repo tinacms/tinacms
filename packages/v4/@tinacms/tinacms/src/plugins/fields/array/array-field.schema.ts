@@ -1,5 +1,6 @@
 import { type ZodType, z } from 'zod';
 import { invariant } from '../../../core/invariant';
+import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
 import { isRecord } from '../../../utils/is-record';
 import type {
   BaseFieldSchema,
@@ -122,14 +123,12 @@ export const asArrayFieldSchema = (node: FieldSchema): ArrayFieldSchema => {
   return node as ArrayFieldSchema;
 };
 
-export const TEMPLATE_KEY = '_template';
-
 export const templateOf = (
   field: TemplatesArrayFieldSchema,
   item: TinaDocument
 ): TemplateSchema => {
   const name = item[TEMPLATE_KEY];
-  const template = field.templates.find((candidate) => candidate.name === name);
+  const template = templateFor(field.templates, item);
   invariant(
     template,
     'array-field-template-unknown',
