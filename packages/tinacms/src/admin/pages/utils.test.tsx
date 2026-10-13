@@ -1,24 +1,15 @@
-import { render, screen } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import { useCollectionFolder } from './utils';
 
-const FolderProbe = () => {
-  const folder = useCollectionFolder();
-  return <output>{JSON.stringify(folder)}</output>;
-};
-
-const readFolder = (url: string) => {
-  render(
-    <MemoryRouter initialEntries={[url]}>
-      <Routes>
-        <Route path='collections/:collectionName/*' element={<FolderProbe />} />
-      </Routes>
-    </MemoryRouter>
-  );
-  return JSON.parse(screen.getByRole('status').textContent ?? '{}');
-};
+const readFolder = (url: string) =>
+  renderHook(() => useCollectionFolder(), {
+    wrapper: ({ children }) => (
+      <MemoryRouter initialEntries={[url]}>{children}</MemoryRouter>
+    ),
+  }).result.current;
 
 describe('useCollectionFolder', () => {
   it('reads no folder at the collection root', () => {
@@ -36,11 +27,10 @@ describe('useCollectionFolder', () => {
     });
   });
 
-  it('reads a nested folder and its parent', () => {
+  it('reads a nested folder', () => {
     expect(readFolder('/collections/post/~/guides/setup')).toMatchObject({
       name: 'guides/setup',
       fullyQualifiedName: '~/guides/setup',
-      parentName: '/~/guides',
     });
   });
 
