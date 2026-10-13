@@ -1233,10 +1233,10 @@ export class Database {
             cursor: btoa(cursor),
           };
         } catch (error) {
-          // A sort-index entry can outlive its record (a stale entry stranded by a
-          // partial index write). Drop the dangling entry rather than failing the
-          // whole collection; audit/reindex removes it permanently.
           if (error instanceof NotFoundError) {
+            console.warn(
+              `Skipping ${path} in collection ${collection.name}: its index entry has no record. Reindex to remove it.`
+            );
             return null;
           }
           console.log(error);

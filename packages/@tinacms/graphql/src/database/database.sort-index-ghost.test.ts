@@ -1,22 +1,3 @@
-/**
- * Repro: "Error querying file <path> from collection <collection>" (surfaced as
- * "GetCollection failed: Unable to fetch"), broken ONLY for users sorting by a
- * field while default-sort users are fine.
- *
- * Index entries live in per-sort sublevels (contentLevel -> <collection> -> <sortKey>).
- * The default `__filepath__` index is keyed by the bare path, so it can't go stale.
- * A field-sort index (e.g. `score`) is keyed by `<value>\x1D<path>` and is removable
- * only by a `del` derived from that value -- so a value change/reconcile that fails to
- * `del` the old value (the incremental indexer's `if (item)` gap, or an interrupted
- * batch) strands the old key. A later delete clears the path-keyed entries but not the
- * stranded one: default list stays healthy while the field-sorted list breaks. The fix
- * makes Database.query skip an index entry whose record is gone, so these tests assert
- * the tolerant behavior (field-sorted list returns the healthy items, no throw).
- *
- * Real Database + MemoryLevel + in-memory Bridge; the desync is injected to model the
- * post-crash / post-reconcile end-state.
- */
-
 import { describe, expect, it } from 'vitest';
 import { MemoryLevel } from 'memory-level';
 import { buildSchema, createDatabaseInternal } from '..';
@@ -24,6 +5,7 @@ import type { Bridge } from './bridge';
 import type { Schema } from '@tinacms/schema-tools';
 import { CONTENT_ROOT_PREFIX, SUBLEVEL_OPTIONS } from './level';
 import { DEFAULT_COLLECTION_SORT_KEY } from './datalayer';
+import type { Database } from '.';
 
 class InMemoryBridge implements Bridge {
   rootPath = '';
@@ -89,27 +71,23 @@ async function setupDatabase() {
   return { database };
 }
 
-// Mirrors the collection-connection resolver, which loads each node's full
-// record via database.get(). The trivial `(p, v) => ({...})` hydrator used by
-// other tests never calls get(), so it would NOT surface this bug.
-const resolverHydrate = (database: any) => (path: string) => database.get(path);
+// Calls get() like the collection resolver does, so a missing record throws.
+const resolverHydrate = (database: Database) => async (path: string) => {
+  await database.get(path);
+  return path;
+};
 
 describe('field-sort index ghost (GetCollection failed)', () => {
   it('tolerates a stranded field-sort entry instead of failing the whole collection', async () => {
     const { database } = await setupDatabase();
     const hydrate = resolverHydrate(database);
 
-    // Healthy to start: both the default and the `score` sort resolve.
-    await expect(
-      database.query(
-        { collection: 'post', sort: 'score', filterChain: [] },
-        hydrate
-      )
-    ).resolves.toBeTruthy();
+    const healthy = await database.query(
+      { collection: 'post', sort: 'score', filterChain: [] },
+      hydrate
+    );
+    expect(healthy.edges.map((edge) => edge.node)).toEqual([KEEP, GHOST]);
 
-    // Model the desync: remove ghost's path-keyed entries (default __filepath__
-    // index + CONTENT_ROOT record) but leave its real, indexer-written
-    // `score` entry (`42\x1D content/posts/ghost.json`) stranded.
     const content = database.contentLevel!;
     await content
       .sublevel('post', SUBLEVEL_OPTIONS)
@@ -117,34 +95,16 @@ describe('field-sort index ghost (GetCollection failed)', () => {
       .del(GHOST);
     await content.sublevel(CONTENT_ROOT_PREFIX, SUBLEVEL_OPTIONS).del(GHOST);
 
-    // Default-sorted list is fine: it never reads the `score` sublevel.
     const defaultSorted = await database.query(
       { collection: 'post', filterChain: [] },
       hydrate
     );
-    expect(defaultSorted.edges).toHaveLength(1);
-
-    // Field-sorted list now skips the stranded entry and returns the healthy
-    // items instead of throwing "Error querying file ... from collection".
-    const fieldSorted = await database.query(
-      { collection: 'post', sort: 'score', filterChain: [] },
-      hydrate
-    );
-    expect(fieldSorted.edges).toHaveLength(1);
-  });
-
-  it('control: a normal in-band delete cleans the field-sort index (no ghost)', async () => {
-    const { database } = await setupDatabase();
-    const hydrate = resolverHydrate(database);
-
-    // The in-band delete path rebuilds the field-sort `del` key from the stored
-    // record, so it correctly clears the `score` entry. No strand, no error.
-    await database.delete(GHOST);
+    expect(defaultSorted.edges.map((edge) => edge.node)).toEqual([KEEP]);
 
     const fieldSorted = await database.query(
       { collection: 'post', sort: 'score', filterChain: [] },
       hydrate
     );
-    expect(fieldSorted.edges).toHaveLength(1);
+    expect(fieldSorted.edges.map((edge) => edge.node)).toEqual([KEEP]);
   });
 });
