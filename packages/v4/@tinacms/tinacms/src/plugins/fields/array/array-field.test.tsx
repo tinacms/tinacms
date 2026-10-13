@@ -572,22 +572,61 @@ describe('ArrayField templates', () => {
     ).toEqual(stored);
   });
 
-  it('refuses an item with a missing or unknown template', async () => {
+  it('keeps an item with a missing or unknown template unchanged', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const registry = await resolveRegistry();
-    expect(() =>
-      ingestDocument(
-        { blocks: [{ headline: 'Hi' }] },
-        blocksCollection.fields,
-        { registry }
-      )
-    ).toThrow(/has no "_template"/);
-    expect(() =>
-      ingestDocument(
-        { blocks: [{ _template: 'gallery' }] },
-        blocksCollection.fields,
-        { registry }
-      )
-    ).toThrow(/unknown template "gallery"/);
+    const stored = {
+      blocks: [
+        { _template: 'gallery', images: ['a.png'] },
+        { headline: 'No template' },
+        { _template: 'cta', link: '/docs', weight: 2 },
+      ],
+    };
+    const ingested = ingestDocument(stored, blocksCollection.fields, {
+      registry,
+    });
+    expect(ingested).toEqual({
+      blocks: [
+        { _template: 'gallery', images: ['a.png'] },
+        { headline: 'No template' },
+        { _template: 'cta', link: '/docs', weight: '2' },
+      ],
+    });
+    expect(
+      digestDocument(ingested, blocksCollection.fields, { registry })
+    ).toEqual(stored);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('the unknown template "gallery"')
+    );
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('no "_template"')
+    );
+    warn.mockRestore();
+  });
+
+  it('shows an unknown block that can be removed, beside working blocks', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPage({
+      blocks: [
+        { _template: 'gallery', images: ['a.png'] },
+        { _template: 'cta', link: '/docs' },
+      ],
+    });
+    expect(
+      await screen.findByText('Unknown block "gallery"')
+    ).toBeInTheDocument();
+    expect(
+      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+    ).toBe('/docs');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { _template: 'cta', link: '/docs' },
+      ])
+    );
+    warn.mockRestore();
   });
 
   it("renders each item with its template's label and fields", async () => {
@@ -697,6 +736,40 @@ describe('ArrayField templates', () => {
       { validators: coreValidatorRegistry }
     );
     expect(errors).toEqual({ 'blocks.1.link': ['Link is required'] });
+  });
+
+  it('skips an item whose template is unknown when validating', async () => {
+    const registry = await resolveRegistry();
+    const errors = registry
+      .get('array')
+      ?.validateChildren?.(
+        [{ _template: 'gallery', link: '' }],
+        blocksNode,
+        'blocks',
+        registry,
+        { validators: coreValidatorRegistry }
+      );
+    expect(errors).toEqual({});
+  });
+
+  it('shows an item with no template and moves it like any other', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPage({
+      blocks: [{ _template: 'cta', link: '/docs' }, { headline: 'Orphan' }],
+    });
+    expect(
+      await screen.findByText('Block with no template')
+    ).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Move item 2 up' })
+    );
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { headline: 'Orphan' },
+        { _template: 'cta', link: '/docs' },
+      ])
+    );
+    warn.mockRestore();
   });
 });
 

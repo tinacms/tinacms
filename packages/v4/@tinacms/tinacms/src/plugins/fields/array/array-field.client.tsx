@@ -2,17 +2,15 @@ import { defineClientPlugin } from '../../../client';
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import { invariant } from '../../../core/invariant';
 import { TEMPLATE_KEY } from '../../../core/schema/children';
-import type { TinaDocument } from '../../../core/schema/types';
+import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
 import { validateFieldTree } from '../../../core/validation';
 import {
-  type FieldsArrayFieldSchema,
-  type TemplatesArrayFieldSchema,
+  type ObjectArrayFieldSchema,
   arraySchema,
   asArrayFieldSchema,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
-  templateOf,
 } from './array-field.schema';
 import { ArrayField } from './array-field.ui';
 
@@ -41,16 +39,37 @@ const asScalarArray = (stored: unknown, name: string): unknown[] => {
   return stored;
 };
 
-// The fields of an item never include `_template`, so ingest and digest drop it.
-// Both paths put it back first, which keeps the stored key order.
-const withTemplate = (
-  field: FieldsArrayFieldSchema | TemplatesArrayFieldSchema,
-  item: TinaDocument,
-  values: TinaDocument
-): TinaDocument =>
-  isTemplatesArray(field)
-    ? { [TEMPLATE_KEY]: templateOf(field, item).name, ...values }
-    : values;
+// Ingest and digest drop `_template`, so put it back first to keep the stored
+// key order.
+const convertItems = (
+  field: ObjectArrayFieldSchema,
+  items: TinaDocument[],
+  convert: (item: TinaDocument, fields: FieldSchema[]) => TinaDocument
+): TinaDocument[] =>
+  items.map((item) => {
+    const fields = itemFieldsOf(field, item);
+    if (!fields) return { ...item };
+    const values = convert(item, fields);
+    return isTemplatesArray(field)
+      ? { [TEMPLATE_KEY]: item[TEMPLATE_KEY], ...values }
+      : values;
+  });
+
+const warnUnknownTemplates = (
+  field: ObjectArrayFieldSchema,
+  items: TinaDocument[]
+) => {
+  for (const item of items) {
+    if (itemFieldsOf(field, item)) continue;
+    console.warn(
+      `The array field "${field.name}" has an item with ${
+        item[TEMPLATE_KEY] === undefined
+          ? `no "${TEMPLATE_KEY}"`
+          : `the unknown template "${String(item[TEMPLATE_KEY])}"`
+      }. It is kept unchanged.`
+    );
+  }
+};
 
 export default defineClientPlugin({
   field: {
@@ -65,13 +84,11 @@ export default defineClientPlugin({
           item == null || !parse ? item : parse(item, field.of, context)
         );
       }
-      return asItemArray(stored, node.name).map((item) => {
-        return withTemplate(
-          field,
-          item,
-          ingestDocument(item, itemFieldsOf(field, item), context)
-        );
-      });
+      const items = asItemArray(stored, node.name);
+      warnUnknownTemplates(field, items);
+      return convertItems(field, items, (item, fields) =>
+        ingestDocument(item, fields, context)
+      );
     },
     serialize: (value: unknown[], node, context) => {
       const field = asArrayFieldSchema(node);
@@ -82,13 +99,11 @@ export default defineClientPlugin({
           return serialize ? serialize(item, field.of, context) : item;
         });
       }
-      return asItemArray(value, node.name).map((item) => {
-        return withTemplate(
-          field,
-          item,
-          digestDocument(item, itemFieldsOf(field, item), context)
-        );
-      });
+      return convertItems(
+        field,
+        asItemArray(value, node.name),
+        (item, fields) => digestDocument(item, fields, context)
+      );
     },
     validateChildren: (value: unknown[], node, address, registry, scope) => {
       const field = asArrayFieldSchema(node);
@@ -113,7 +128,7 @@ export default defineClientPlugin({
       }
       items.forEach((item, index) => {
         const values = isItemObject(item) ? item : {};
-        for (const subfield of itemFieldsOf(field, values)) {
+        for (const subfield of itemFieldsOf(field, values) ?? []) {
           Object.assign(
             errors,
             validateFieldTree(

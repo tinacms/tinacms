@@ -16,7 +16,7 @@ export const fieldsOf = (node: FieldSchema): FieldSchema[] | undefined =>
 // How a node nests children, read from its keys so core never names a field
 // type: `fields` (object, or array of objects), `templates` (each object names
 // its own) or `of` (array of scalars). A value naming no known template has no
-// fieldset; the owning plugin's parse already refuses it.
+// fieldset, so a walk skips it.
 export const fieldsetOf = (
   node: FieldSchema,
   value: unknown

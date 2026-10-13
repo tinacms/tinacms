@@ -4,7 +4,7 @@ import { type ReactNode, useRef } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import type { FieldAddress } from '../../../core/field/address';
 import { ingestDocument } from '../../../core/form/ingest';
-import { TEMPLATE_KEY } from '../../../core/schema/children';
+import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
 import type {
   FieldSchema,
   TemplateSchema,
@@ -20,14 +20,12 @@ import {
   useFieldValue,
 } from '../../../editor';
 import {
-  type FieldsArrayFieldSchema,
+  type ObjectArrayFieldSchema,
   type ScalarArrayFieldSchema,
-  type TemplatesArrayFieldSchema,
   asArrayFieldSchema,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
-  templateOf,
 } from './array-field.schema';
 
 export function ArrayField() {
@@ -54,7 +52,7 @@ function ObjectItems({
   address,
   field,
 }: ItemListProps & {
-  field: FieldsArrayFieldSchema | TemplatesArrayFieldSchema;
+  field: ObjectArrayFieldSchema;
 }) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
@@ -88,25 +86,30 @@ function ObjectItems({
       >
         {items.map((item, index) => {
           const values = item as TinaDocument;
-          const heading = isTemplatesArray(field)
-            ? labelOf(templateOf(field, values))
-            : `Item ${index + 1}`;
+          const fields = itemFieldsOf(field, values);
           return (
             <ItemRow
               key={item.id}
-              heading={heading}
+              heading={headingOf(field, values, index)}
               index={index}
               count={items.length}
               onMove={move}
               onRemove={remove}
             >
-              {itemFieldsOf(field, values).map((subfield) => (
-                <NestedFieldRow
-                  key={subfield.name}
-                  address={`${address}.${index}.${subfield.name}`}
-                  node={subfield}
-                />
-              ))}
+              {fields ? (
+                fields.map((subfield) => (
+                  <NestedFieldRow
+                    key={subfield.name}
+                    address={`${address}.${index}.${subfield.name}`}
+                    node={subfield}
+                  />
+                ))
+              ) : (
+                <p className='text-sm text-muted-foreground'>
+                  This block's template is not in the config. It is saved
+                  unchanged. Remove it, or add the template back.
+                </p>
+              )}
             </ItemRow>
           );
         })}
@@ -269,6 +272,20 @@ function ItemRow({
 
 const labelOf = (template: TemplateSchema): string =>
   template.label ?? template.name;
+
+const headingOf = (
+  field: ObjectArrayFieldSchema,
+  item: TinaDocument,
+  index: number
+): string => {
+  if (!isTemplatesArray(field)) return `Item ${index + 1}`;
+  const template = templateFor(field.templates, item);
+  if (template) return labelOf(template);
+  const name = item[TEMPLATE_KEY];
+  return name === undefined
+    ? 'Block with no template'
+    : `Unknown block "${String(name)}"`;
+};
 
 let scalarKeyCount = 0;
 const nextScalarKey = (): string => `scalar-item-${scalarKeyCount++}`;

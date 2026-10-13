@@ -1,6 +1,6 @@
 import { type ZodType, z } from 'zod';
 import { invariant } from '../../../core/invariant';
-import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
+import { templateFor } from '../../../core/schema/children';
 import { isRecord } from '../../../utils/is-record';
 import type {
   BaseFieldSchema,
@@ -123,27 +123,17 @@ export const asArrayFieldSchema = (node: FieldSchema): ArrayFieldSchema => {
   return node as ArrayFieldSchema;
 };
 
-export const templateOf = (
-  field: TemplatesArrayFieldSchema,
-  item: TinaDocument
-): TemplateSchema => {
-  const name = item[TEMPLATE_KEY];
-  const template = templateFor(field.templates, item);
-  invariant(
-    template,
-    'array-field-template-unknown',
-    name === undefined
-      ? `An item of the array field "${field.name}" has no "${TEMPLATE_KEY}".`
-      : `An item of the array field "${field.name}" uses the unknown template "${String(name)}".`
-  );
-  return template;
-};
+export type ObjectArrayFieldSchema =
+  | FieldsArrayFieldSchema
+  | TemplatesArrayFieldSchema;
 
 export const itemFieldsOf = (
-  field: FieldsArrayFieldSchema | TemplatesArrayFieldSchema,
+  field: ObjectArrayFieldSchema,
   item: TinaDocument
-): FieldSchema[] =>
-  isTemplatesArray(field) ? templateOf(field, item).fields : field.fields;
+): FieldSchema[] | undefined =>
+  isTemplatesArray(field)
+    ? templateFor(field.templates, item)?.fields
+    : field.fields;
 
 // The shape of the value only. `required`, `min` and `max` are validators the
 // collection attaches, and they measure the item count.

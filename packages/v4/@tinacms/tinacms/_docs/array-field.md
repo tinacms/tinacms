@@ -152,8 +152,10 @@ example — converts the same way it would at the top level.
 
 For `templates`, `parse` reads the `_template` of each item and uses the fields
 of that template. `parse` and `serialize` keep `_template` on every item. An
-item with no `_template`, or with an unknown one, throws
-`array-field-template-unknown`, so a save cannot remove the item. For `of`,
+item with no `_template`, or with an unknown one, passes through `parse` and
+`serialize` unchanged, with a console warning. The component shows it as an
+unknown block that the editor can move or remove, so a renamed or removed
+template never deletes content. For `of`,
 `parse` and `serialize` call the `parse`/`serialize` of the `of` field type on
 each item.
 
@@ -223,8 +225,9 @@ the `defaultItem` of its template. A new `of` item starts from the
 - It examines the metadata of the descriptor.
 - It rejects a config with none, or more than one, of `fields`, `templates`
   and `of`, at the type level and at runtime.
-- For `templates`: it keeps `_template` through ingest and digest, refuses a
-  missing or unknown template, renders the label and fields of each template,
+- For `templates`: it keeps `_template` through ingest and digest, keeps an
+  item with a missing or unknown template unchanged and shows it as an unknown
+  block, renders the label and fields of each template,
   adds an item from `defaultItem`, keeps the template on a reorder, and
   validates each item against its own template.
 - For `of`: it runs the `parse`/`serialize` of the `of` field on each item,
