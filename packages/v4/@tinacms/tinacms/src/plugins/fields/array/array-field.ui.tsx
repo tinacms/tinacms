@@ -10,10 +10,24 @@ import {
   useFieldErrors,
   useFieldRegistry,
   useFieldSchema,
+  useFieldValue,
 } from '../../../editor';
-import { asArrayFieldSchema } from './array-field.schema';
+import { UneditableValue } from '../uneditable-value';
+import { asArrayFieldSchema, isItemArray } from './array-field.schema';
 
 export function ArrayField() {
+  const [value] = useFieldValue<unknown>(useFieldAddress());
+  return value == null || isItemArray(value) ? (
+    <ItemList />
+  ) : (
+    <UneditableValue
+      problem='This value is not a list of items, so it cannot be edited here.'
+      cleared={[]}
+    />
+  );
+}
+
+function ItemList() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
   const errors = useFieldErrors(address);

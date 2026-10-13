@@ -74,10 +74,10 @@ meant. A new value gets UTC.
 ## Why there is no `defaultValue` and no `serialize`
 
 - **`defaultValue`** — `datetime` follows the same rule as `number`: an absent
-  field stays absent. `ingestDocument` seeds a field only when the descriptor
-  sets `defaultValue` (`core/form/ingest.ts`); `datetime` opts out, so a
-  document with no stored date shows an empty input instead of a fabricated
-  one. This matches an established pattern, so it reads as deliberate.
+  field stays empty. `ingestDocument` seeds a field only when the descriptor
+  sets `defaultValue` (`core/form/ingest.ts`), and holds it as `null`
+  otherwise; `datetime` opts out, so a document with no stored date shows an
+  empty input instead of a fabricated one. This matches an established pattern, so it reads as deliberate.
 
 - **`serialize`** — The editor value and the stored value use one
   representation: an ISO 8601 string. `digestDocument` writes the editor value
@@ -120,7 +120,7 @@ address from context and pulls value/errors through address-keyed hooks:
 ```tsx
 export function DatetimeField() {
   const address = useFieldAddress();
-  const [value, setValue] = useFieldValue<string | undefined>(address);
+  const [value, setValue] = useFieldValue<string | null>(address);
   const errors = useFieldErrors(address);
   const inputRef = useRef<HTMLInputElement>(null);
 

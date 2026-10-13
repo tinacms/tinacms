@@ -1,5 +1,6 @@
 import { type PluginManifest, definePlugin } from '../../core/plugin';
 import type { TinaCloudOptions } from './client';
+import { mediaUrl } from './media/read';
 
 export type { TinaCloudOptions } from './client';
 
@@ -9,6 +10,11 @@ export const tinaCloud = (options: TinaCloudOptions): PluginManifest =>
   definePlugin({
     name: TINACLOUD_PLUGIN_NAME,
     provides: ['media', 'auth'],
+    // The site has no store, so it reads from the media branch.
+    media: {
+      resolveUrl: (path, size) =>
+        mediaUrl(options.clientId, undefined, path, size),
+    },
     client: async () => {
       const [{ createTinaCloudAuth }, { createTinaCloudMediaSlice }] =
         await Promise.all([
