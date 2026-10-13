@@ -845,9 +845,9 @@ export const makeRefOpsForDocument = <T extends object>(
         continue;
       }
       const collectionSublevel = level.sublevel(c, SUBLEVEL_OPTIONS);
-      const refSublevel = collectionSublevel.sublevel(
-        REFS_COLLECTIONS_SORT_KEY,
-        SUBLEVEL_OPTIONS
+      const refSublevel = makeIndexSublevel(
+        collectionSublevel,
+        REFS_COLLECTIONS_SORT_KEY
       );
       const references: Record<string, string[]> = {};
       for (const path of referencePaths) {

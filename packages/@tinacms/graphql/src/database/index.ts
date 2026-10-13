@@ -1358,11 +1358,9 @@ export class Database {
   };
 
   /**
-   * Deletes every index entry for the given paths by matching on the path rather
-   * than the stored value. Unlike delete()/deleteContentByPaths(), which target
-   * `<currentValue>\x1D<path>`, this also clears stale value-keyed sort entries
-   * left by an earlier value change that never removed the old key, so a removed
-   * document leaves no dangling entry that would fail a field-sorted collection query.
+   * Deletes every sort-index and reference entry for the given paths by matching the
+   * path rather than the stored value, so entries left by an earlier value change go
+   * too. Run it after deleteContentByPaths with the same paths.
    */
   public deleteIndexEntriesForPaths = async (documentPaths: string[]) => {
     await this.initLevel();
@@ -1375,16 +1373,48 @@ export class Database {
       documentPaths
     );
     const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
+    const collectionReferences = await this.getCollectionReferences(
+      this.contentLevel
+    );
     const rootSublevel = this.contentLevel.sublevel(
       CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
     );
     const ops: DelOp[] = [];
 
+    // Value-keyed (`<value>\x1D<path>`): the path is a suffix and can't be
+    // seeked, so scan and match the trailing path segment.
+    const delKeysEndingInPaths = async (
+      indexSublevel: ReturnType<typeof makeIndexSublevel>,
+      pathSet: Set<string>
+    ) => {
+      for await (const [key] of indexSublevel.iterator()) {
+        const keyPath = key.slice(
+          key.lastIndexOf(INDEX_KEY_FIELD_SEPARATOR) + 1
+        );
+        if (pathSet.has(keyPath)) {
+          ops.push({ type: 'del', key, sublevel: indexSublevel });
+        }
+      }
+    };
+
+    const allPaths = new Set<string>();
+    const referencedCollections = new Set<string>();
+
     for (const collectionName of Object.keys(pathsByCollection)) {
       const collection = collections[collectionName];
       const paths = pathsByCollection[collectionName].map(normalizePath);
       const pathSet = new Set(paths);
+      for (const p of paths) {
+        allPaths.add(p);
+      }
+      for (const [referenced, jsonPaths] of Object.entries(
+        collectionReferences[collectionName] ?? {}
+      )) {
+        if (jsonPaths.length) {
+          referencedCollections.add(referenced);
+        }
+      }
       const collectionIndexDefinitions =
         indexDefinitions?.[collectionName] ?? {};
 
@@ -1406,8 +1436,8 @@ export class Database {
           SUBLEVEL_OPTIONS
         );
         for (const sortKey of Object.keys(collectionIndexDefinitions)) {
-          // Reference entries are keyed under the referenced collection and
-          // cleaned via delete(); leave them alone.
+          // Reference entries live under the referenced collection, so they are
+          // swept separately below.
           if (sortKey === REFS_COLLECTIONS_SORT_KEY) {
             continue;
           }
@@ -1417,16 +1447,7 @@ export class Database {
               ops.push({ type: 'del', key: p, sublevel: indexSublevel });
             }
           } else {
-            // Value-keyed (`<value>\x1D<path>`): the path is a suffix and can't
-            // be seeked, so scan and match the trailing path segment.
-            for await (const [key] of indexSublevel.iterator()) {
-              const keyPath = key.slice(
-                key.lastIndexOf(INDEX_KEY_FIELD_SEPARATOR) + 1
-              );
-              if (pathSet.has(keyPath)) {
-                ops.push({ type: 'del', key, sublevel: indexSublevel });
-              }
-            }
+            await delKeysEndingInPaths(indexSublevel, pathSet);
           }
         }
       }
@@ -1434,6 +1455,16 @@ export class Database {
       for (const p of paths) {
         ops.push({ type: 'del', key: p, sublevel: rootSublevel });
       }
+    }
+
+    for (const referenced of referencedCollections) {
+      await delKeysEndingInPaths(
+        makeIndexSublevel(
+          this.contentLevel.sublevel(referenced, SUBLEVEL_OPTIONS),
+          REFS_COLLECTIONS_SORT_KEY
+        ),
+        allPaths
+      );
     }
 
     for (let i = 0; i < ops.length; i += this.levelBatchSize) {

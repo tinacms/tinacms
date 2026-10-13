@@ -3,11 +3,13 @@
  * index is keyed by `<value>\x1D<path>`, and delete()/deleteContentByPaths() only
  * remove the CURRENT value's key. A value change that never removed the old key
  * strands `<oldValue>\x1D<path>`; a later delete can't target it, so a field-sorted
- * query later loads its missing record and throws.
+ * query later loads its missing record and throws. Reference entries
+ * (`<referencedPath>\x1D<jsonPath>\x1D<referencingPath>`) strand the same way.
  *
  * deleteIndexEntriesForPaths() matches on the path instead of the value, so it clears
- * every entry for a removed path, including stranded ones, from the collection index
- * and its folder index. Real Database + MemoryLevel + in-memory Bridge.
+ * every entry for a removed path, including stranded ones, from the collection index,
+ * its folder index and the referenced collections' reference indexes.
+ * Real Database + MemoryLevel + in-memory Bridge.
  */
 
 import { describe, expect, it } from 'vitest';
@@ -15,7 +17,8 @@ import { MemoryLevel } from 'memory-level';
 import { buildSchema, createDatabaseInternal } from '..';
 import type { Bridge } from './bridge';
 import type { Schema } from '@tinacms/schema-tools';
-import { makeIndexSublevel } from './datalayer';
+import { createResolver } from '../resolver';
+import { REFS_COLLECTIONS_SORT_KEY, makeIndexSublevel } from './datalayer';
 import {
   CONTENT_ROOT_PREFIX,
   INDEX_KEY_FIELD_SEPARATOR,
@@ -60,7 +63,20 @@ const testSchema: Schema = {
         { name: 'title', label: 'Title', type: 'string' },
         { name: 'score', label: 'Score', type: 'number' },
         { name: 'when', label: 'When', type: 'datetime' },
+        {
+          name: 'author',
+          label: 'Author',
+          type: 'reference',
+          collections: ['author'],
+        },
       ],
+    },
+    {
+      name: 'author',
+      label: 'Author',
+      path: 'content/authors',
+      format: 'json',
+      fields: [{ name: 'name', label: 'Name', type: 'string' }],
     },
   ],
 };
@@ -69,16 +85,33 @@ const jsonDoc = (data: Record<string, unknown>) => JSON.stringify(data);
 
 const GHOST = 'content/posts/ghost.json';
 const KEEP = 'content/posts/keep.json';
+const A1 = 'content/authors/a1.json';
+const A2 = 'content/authors/a2.json';
+
+const refKey = (referenced: string, referencing: string) =>
+  [referenced, '$.author', referencing].join(INDEX_KEY_FIELD_SEPARATOR);
 
 async function setupDatabase() {
   const bridge = new InMemoryBridge();
+  bridge.seed(A1, jsonDoc({ name: 'One' }));
+  bridge.seed(A2, jsonDoc({ name: 'Two' }));
   bridge.seed(
     KEEP,
-    jsonDoc({ title: 'Keep', score: 1, when: '2026-01-01T00:00:00.000Z' })
+    jsonDoc({
+      title: 'Keep',
+      score: 1,
+      when: '2026-01-01T00:00:00.000Z',
+      author: A1,
+    })
   );
   bridge.seed(
     GHOST,
-    jsonDoc({ title: 'Ghost', score: 42, when: '2026-06-30T00:00:00.000Z' })
+    jsonDoc({
+      title: 'Ghost',
+      score: 42,
+      when: '2026-06-30T00:00:00.000Z',
+      author: A1,
+    })
   );
 
   const level = new MemoryLevel<string, Record<string, any>>({
@@ -118,11 +151,18 @@ describe('Database.deleteIndexEntriesForPaths()', () => {
       }
     }
 
+    // Likewise a stranded reference entry: GHOST once pointed at a2.
+    const authorRefs = makeIndexSublevel(
+      content.sublevel('author', SUBLEVEL_OPTIONS),
+      REFS_COLLECTIONS_SORT_KEY
+    );
+    await authorRefs.put(refKey(A2, GHOST), {} as any);
+
     await database.deleteIndexEntriesForPaths([GHOST]);
 
     // Iterating a collection sublevel walks every index nested under it, so this
     // holds however a sort index is named.
-    for (const name of ['post', 'post_~']) {
+    for (const name of ['post', 'post_~', 'author']) {
       expect(
         await ghostKeysIn(content.sublevel(name, SUBLEVEL_OPTIONS))
       ).toEqual([]);
@@ -141,12 +181,34 @@ describe('Database.deleteIndexEntriesForPaths()', () => {
       );
       expect(fieldSorted.edges).toHaveLength(1);
     }
+
+    // A stranded reference entry would make the resolver load the deleted post
+    // while unlinking it from a2.
+    const resolver = createResolver({
+      database,
+      tinaSchema: await database.getSchema(),
+      isAudit: false,
+    });
+    await expect(
+      resolver.resolveDeleteDocument({
+        collectionName: 'author',
+        relativePath: 'a2.json',
+      })
+    ).resolves.toBeDefined();
   });
 
   it('leaves other documents untouched', async () => {
     const { database } = await setupDatabase();
+    const authorRefs = makeIndexSublevel(
+      database.contentLevel!.sublevel('author', SUBLEVEL_OPTIONS),
+      REFS_COLLECTIONS_SORT_KEY
+    );
+    expect(await authorRefs.get(refKey(A1, KEEP))).toBeDefined();
 
     await database.deleteIndexEntriesForPaths([GHOST]);
+
+    expect(await authorRefs.get(refKey(A1, KEEP))).toBeDefined();
+    expect(await authorRefs.get(refKey(A1, GHOST))).toBeUndefined();
 
     const hydrate = (path: string) => database.get(path);
     const byTitle = await database.query(

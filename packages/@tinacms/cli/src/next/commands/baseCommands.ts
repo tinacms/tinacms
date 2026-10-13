@@ -171,6 +171,7 @@ export abstract class BaseCommand extends Command {
             }
             if (deleted.length > 0) {
               await database.deleteContentByPaths(deleted);
+              await database.deleteIndexEntriesForPaths(deleted);
             }
           }
         } else {
