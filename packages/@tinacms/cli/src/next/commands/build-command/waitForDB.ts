@@ -5,18 +5,13 @@ import { logger } from '../../../logger';
 import { sleepAndCallFunc } from '../../../utils/sleep';
 import { spin } from '../../../utils/spinner';
 import { logText } from '../../../utils/theme';
+import { type IndexStatusResponse, indexFailedMessage } from './index-status';
 
 const POLLING_INTERVAL = 5000;
 
 const STATUS_INPROGRESS = 'inprogress';
 const STATUS_COMPLETE = 'complete';
 const STATUS_FAILED = 'failed';
-
-export interface IndexStatusResponse {
-  status: 'inprogress' | 'complete' | 'failed' | 'unknown';
-  timestamp: number;
-  error?: string;
-}
 
 class IndexFailedError extends Error {
   constructor(message: string) {
@@ -67,7 +62,8 @@ export const waitForDB = async (
           cache: 'no-cache',
         }
       );
-      const { status, error } = (await response.json()) as IndexStatusResponse;
+      const { status, error, message, cause } =
+        (await response.json()) as IndexStatusResponse;
 
       const statusMessage = `Indexing status: '${status}'`;
 
@@ -87,17 +83,25 @@ export const waitForDB = async (
         // Index Failed
       } else if (status === STATUS_FAILED) {
         throw new IndexFailedError(
-          `Attempting to index but responded with status 'failed'. To retry the indexing process, click the "Reindex" button for '${
-            previewName || branch
-          }' in the TinaCloud configuration for this project.  ${error}`
+          indexFailedMessage({
+            status: STATUS_FAILED,
+            branch: previewName || branch,
+            error,
+            message,
+            cause,
+          })
         );
 
         // Index Unknown
       } else {
         throw new IndexFailedError(
-          `Attempting to index but responded with status 'unknown'. To retry the indexing process, click the "Reindex" button for '${
-            previewName || branch
-          }' in the TinaCloud configuration for this project.  ${error}`
+          indexFailedMessage({
+            status: 'unknown',
+            branch: previewName || branch,
+            error,
+            message,
+            cause,
+          })
         );
       }
     } catch (e) {

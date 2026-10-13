@@ -22,10 +22,7 @@ const configWith = (...plugins: PluginManifest[]) =>
     schema: { collections: [] },
   });
 
-const tinaCloudPlugin = tinaCloud({
-  clientId: 'abc',
-  getToken: () => 'secret',
-});
+const tinaCloudPlugin = tinaCloud({ clientId: 'abc' });
 
 const mountedMedia = async (plugin: PluginManifest): Promise<MediaSlice> => {
   const store = createTinaStore(await resolveClientSegments([plugin]));

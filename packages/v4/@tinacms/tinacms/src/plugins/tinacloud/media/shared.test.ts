@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { AuthError } from '../../../core/auth/contract';
 import { MediaError } from '../../../core/media/contract';
 import { TinaCloudError } from '../client';
 import { toMediaError } from './shared';
@@ -24,6 +25,18 @@ describe('toMediaError', () => {
       })
     );
     expect(error.detail).toBe('TinaCloud responded with 500. S3 is down');
+  });
+
+  it.each([
+    ['unauthenticated', 'unauthorized'],
+    ['expired', 'unauthorized'],
+    ['network', 'backend-failure'],
+    ['invalid-response', 'backend-failure'],
+  ] as const)('maps an AuthError %s to %s', (authCode, code) => {
+    expect(toMediaError(new AuthError(authCode, 'Why.'))).toMatchObject({
+      code,
+      detail: 'Why.',
+    });
   });
 
   it('passes a MediaError through and wraps any other value', () => {

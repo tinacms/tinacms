@@ -9,6 +9,8 @@ export const TINACLOUD_CDN_URL = 'https://assets.tina.io';
 
 export const TINACLOUD_IDENTITY_URL = 'https://identity.tinajs.io';
 
+export const TINACLOUD_APP_URL = 'https://app.tina.io';
+
 const POLL_INTERVAL_MS = 1000;
 
 const POLL_TIMEOUT_MS = 30_000;
@@ -28,11 +30,9 @@ export type TinaCloudProject = z.infer<typeof projectSchema>;
 export interface TinaCloudOptions {
   /** The TinaCloud project client ID. */
   clientId: string;
-  /**
-   * Returns the TinaCloud access token for the current editor. Interim: v4 has
-   * no TinaCloud login yet, so the caller supplies the token. Removed once
-   * `tinaCloud()` provides `auth`, per https://github.com/tinacms/tinacms/issues/7689
-   */
+}
+
+export interface TinaCloudClientOptions extends TinaCloudOptions {
   getToken: () => string | undefined | Promise<string | undefined>;
 }
 
@@ -81,7 +81,7 @@ const sleep = (ms: number) =>
 
 export type TinaCloudClient = ReturnType<typeof createTinaCloudClient>;
 
-export const createTinaCloudClient = (options: TinaCloudOptions) => {
+export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
   /** Resolves to the parsed JSON body, the raw text if it is not JSON, or null. */
   const authedFetch = async (
     url: string,

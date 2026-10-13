@@ -40,6 +40,9 @@ export interface AuthTransportHooks {
 const AUTH_ERROR_MESSAGES = {
   unauthenticated: 'You are signed out. Sign in to continue.',
   expired: 'Your session has expired. Sign in again.',
+  'no-access': 'This account has no access to this project.',
+  'popup-blocked':
+    'The browser blocked the sign-in window. Allow popups for this site.',
   network: "Can't reach the sign-in service. Check your connection.",
   'invalid-response':
     'The sign-in service sent a response that Tina cannot read.',
@@ -62,11 +65,14 @@ export class AuthError extends Error {
 
 // ADR-023 §4/§5: the provider drives login and owns the token. The token stays in
 // memory, never in slice state or localStorage, and getToken refreshes it.
+// getToken is the token the site's own server receives; undefined sends none.
 // ADR-008: `roles` gate the UI only. The server check is the security boundary.
 export type AuthSlice = (
   | { status: 'signed-in'; user: AuthUser; roles: string[] }
   | { status: 'forbidden'; user: AuthUser }
-  | { status: 'loading' | 'signed-out'; user: null }
+  | { status: 'loading'; user: null }
+  // `error` is why a sign-in that did not run inside login() failed.
+  | { status: 'signed-out'; user: null; error?: AuthError }
 ) & {
   getToken(): Promise<string | undefined>;
   login(): Promise<void>;
