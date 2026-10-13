@@ -171,7 +171,11 @@ export abstract class BaseCommand extends Command {
             }
             if (deleted.length > 0) {
               await database.deleteContentByPaths(deleted);
-              await database.deleteIndexEntriesForPaths(deleted);
+              // NOTE: [14 Oct 2026] EK - A self-hosted database is built by the site's
+              // own @tinacms/graphql, which can predate this method.
+              if (typeof database.deleteIndexEntriesForPaths === 'function') {
+                await database.deleteIndexEntriesForPaths(deleted);
+              }
             }
           }
         } else {
