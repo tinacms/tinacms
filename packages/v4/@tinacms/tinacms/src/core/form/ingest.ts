@@ -11,13 +11,14 @@ export const ingestDocument = (
   for (const node of fields) {
     const descriptor = registry.get(node.type);
     const stored = storedDocument?.[node.name];
-    if (stored !== undefined) {
-      values[node.name] = descriptor?.parse
-        ? descriptor.parse(stored, node, context)
-        : stored;
-    } else if (descriptor?.defaultValue !== undefined) {
-      values[node.name] = descriptor.defaultValue;
+    if (stored === undefined) {
+      values[node.name] = descriptor?.defaultValue ?? null;
+      continue;
     }
+    const parsed = descriptor?.parse
+      ? descriptor.parse(stored, node, context)
+      : stored;
+    values[node.name] = parsed ?? null;
   }
   return values;
 };
@@ -31,7 +32,7 @@ export const digestDocument = (
   const reconstructedDocument: TinaDocument = {};
   for (const node of fields) {
     const value = values?.[node.name];
-    if (value === undefined) continue;
+    if (value == null) continue;
     const descriptor = registry.get(node.type);
     reconstructedDocument[node.name] = descriptor?.serialize
       ? descriptor.serialize(value, node, context)

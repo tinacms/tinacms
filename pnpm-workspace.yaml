@@ -22,6 +22,8 @@ overrides:
     "@clerk/clerk-js>react-dom": 19.2.3
     "@clerk/backend>react": 19.2.3
     markdown-it: ^14.3.0
+    "js-yaml@>=3.0.0 <3.15.2": ^3.15.2
+    "js-yaml@>=4.0.0 <4.3.2": ^4.3.2
 allowBuilds:
     "@biomejs/biome": true
     "@parcel/watcher": true
@@ -56,8 +58,7 @@ catalog:
     "@graphql-codegen/visitor-plugin-common": ^7.2.0
     "@graphql-tools/graphql-file-loader": ^7.5.17
     "@graphql-tools/load": ^7.8.14
-    "@graphql-tools/utils": ^10.8.1
-    "@headlessui/react": 2.1.8
+    "@headlessui/react": 2.2.10
     "@iarna/toml": ^2.2.5
     "@monaco-editor/loader": ^1.7.0
     "@octokit/rest": ^22.0.1
@@ -160,7 +161,7 @@ catalog:
     color-string: ^1.9.1
     cors: ^2.8.5
     cross-spawn: ^7.0.6
-    dompurify: ^3.3.1
+    dompurify: ^3.4.16
     dotenv: ^16.4.7
     esbuild: ^0.28.1
     estree-util-is-identifier-name: 2.1.0

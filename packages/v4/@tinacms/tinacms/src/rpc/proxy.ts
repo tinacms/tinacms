@@ -29,7 +29,11 @@ export interface RpcClientConfig {
   // The session credential is a bearer token, and the transport attaches it
   // (ADR-023 §4). Without it, in local development with no auth, a request carries no
   // credential, and only a publicOp answers.
-  getToken?: () => string | null | Promise<string | null>;
+  getToken?: () =>
+    | string
+    | null
+    | undefined
+    | Promise<string | null | undefined>;
   fetch?: typeof fetch;
 }
 
