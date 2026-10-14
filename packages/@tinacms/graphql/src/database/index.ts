@@ -1214,42 +1214,51 @@ export class Database {
       edges = [...edges, { cursor: key, path: filepath, value: itemRecord }];
     }
 
-    return {
-      edges: await sequential(
-        edges,
-        async ({
-          cursor,
-          path,
-          value,
-        }: {
-          cursor: string;
-          path: string;
-          value?: Record<string, any>;
-        }) => {
-          try {
-            // pass the path to the matched item and the raw index value
-            const node = await hydrator(path, value);
-            return {
-              node,
-              cursor: btoa(cursor),
-            };
-          } catch (error) {
-            console.log(error);
-            if (
-              error instanceof Error &&
-              (!path.includes('.tina/__generated__/_graphql.json') ||
-                !path.includes('tina/__generated__/_graphql.json'))
-            ) {
-              throw new TinaQueryError({
-                originalError: error,
-                file: path,
-                collection: collection.name,
-              });
-            }
-            // I dont think this should ever happen
-            throw error;
+    const hydratedEdges = await sequential(
+      edges,
+      async ({
+        cursor,
+        path,
+        value,
+      }: {
+        cursor: string;
+        path: string;
+        value?: Record<string, any>;
+      }) => {
+        try {
+          // pass the path to the matched item and the raw index value
+          const node = await hydrator(path, value);
+          return {
+            node,
+            cursor: btoa(cursor),
+          };
+        } catch (error) {
+          if (error instanceof NotFoundError) {
+            console.warn(
+              `Skipping ${path} in collection ${collection.name}: its index entry has no record. Reindex to remove it.`
+            );
+            return null;
           }
+          console.log(error);
+          if (
+            error instanceof Error &&
+            (!path.includes('.tina/__generated__/_graphql.json') ||
+              !path.includes('tina/__generated__/_graphql.json'))
+          ) {
+            throw new TinaQueryError({
+              originalError: error,
+              file: path,
+              collection: collection.name,
+            });
+          }
+          // I dont think this should ever happen
+          throw error;
         }
+      }
+    );
+    return {
+      edges: hydratedEdges.filter(
+        (edge): edge is NonNullable<typeof edge> => edge !== null
       ),
       pageInfo: {
         hasPreviousPage,

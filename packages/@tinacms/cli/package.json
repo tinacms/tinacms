@@ -1,7 +1,7 @@
 {
     "name": "@tinacms/cli",
     "type": "module",
-    "version": "4.0.1",
+    "version": "4.0.2",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "files": [
@@ -28,8 +28,6 @@
         "react-dom": ">=18.3.1 <20.0.0"
     },
     "devDependencies": {
-        "@babel/core": "^8.0.0",
-        "@babel/preset-env": "^7.28.5",
         "@tinacms/scripts": "workspace:*",
         "@types/clear": "catalog:",
         "@types/cli-spinner": "catalog:",
@@ -44,7 +42,6 @@
         "@types/node": "^22.13.1",
         "@types/progress": "catalog:",
         "@types/prompts": "catalog:",
-        "babel-jest": "^29.7.0",
         "jest": "catalog:",
         "mongodb-level": "catalog:",
         "sqlite-level": "catalog:",
@@ -91,7 +88,7 @@
         "esbuild": "catalog:",
         "fs-extra": "catalog:",
         "graphql": "15.8.0",
-        "js-yaml": "^4.3.1",
+        "js-yaml": "^4.3.2",
         "many-level": "catalog:",
         "memory-level": "catalog:",
         "minimatch": "catalog:",

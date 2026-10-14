@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { toUserId } from '../../../core/auth/contract';
 import type {
   ContentSlice,
   DocumentEntry,
@@ -14,12 +15,27 @@ const ENTRIES: DocumentEntry[] = [
 
 const SUMMARIES: DocumentSummary[] = ENTRIES.map(({ path }) => ({ path }));
 
-const createSliceHarness = async (responseBody: unknown, ok = true) => {
+const signedInAs = (token: string): SliceState => ({
+  status: 'signed-in',
+  user: { id: toUserId('ada') },
+  roles: ['editor'],
+  getToken: async () => token,
+  login: async () => {},
+  logout: async () => {},
+});
+
+const createSliceHarness = async (
+  responseBody: unknown,
+  ok = true,
+  auth?: SliceState
+) => {
   const requests: unknown[] = [];
+  const authorizations: (string | null)[] = [];
   vi.stubGlobal(
     'fetch',
     vi.fn(async (_url: string, init: RequestInit) => {
       requests.push(JSON.parse(init.body as string));
+      authorizations.push(new Headers(init.headers).get('authorization'));
       return {
         ok,
         status: ok ? 200 : 500,
@@ -39,9 +55,13 @@ const createSliceHarness = async (responseBody: unknown, ok = true) => {
       ...(typeof partial === 'function' ? partial(state) : partial),
     };
   };
-  state = sliceCreator(set, () => ({ content: state }));
+  state = sliceCreator(set, () => ({
+    content: state,
+    ...(auth ? { auth } : {}),
+  }));
   return {
     requests,
+    authorizations,
     slice: () => state as unknown as ContentSlice,
   };
 };
@@ -96,5 +116,24 @@ describe('content slice', () => {
     const harness = await createSliceHarness(ENTRIES);
     await harness.slice().list('post');
     expect(Object.keys(harness.slice())).toEqual(['list', 'get', 'update']);
+  });
+});
+
+describe('content slice with an auth plugin', () => {
+  it('sends the bearer token on a read and a save', async () => {
+    const harness = await createSliceHarness(
+      ENTRIES[0],
+      true,
+      signedInAs('tok')
+    );
+    await harness.slice().get('post', 'content/posts/hello.mdx');
+    await harness.slice().update('post', 'content/posts/hello.mdx', {});
+    expect(harness.authorizations).toEqual(['Bearer tok', 'Bearer tok']);
+  });
+
+  it('sends no authorization header with no auth plugin', async () => {
+    const harness = await createSliceHarness(ENTRIES[0]);
+    await harness.slice().get('post', 'content/posts/hello.mdx');
+    expect(harness.authorizations).toEqual([null]);
   });
 });

@@ -74,8 +74,9 @@ export type ReferenceResolver = (
 ) => TinaDocument | undefined;
 
 // The preview renders the site's own shape, where a reference reads as the
-// document it points at. An unresolved target keeps its path, so the site sees
-// the same value it would for a reference that no longer exists.
+// document it points at and an unset field is absent. An unresolved target
+// keeps its path, so the site sees the same value it would for a reference that
+// no longer exists.
 export const resolveReferences = (
   values: TinaDocument | undefined,
   fields: FieldSchema[],
@@ -86,6 +87,10 @@ export const resolveReferences = (
     const resolved: TinaDocument = { ...document };
     for (const node of nodes) {
       const value = document[node.name];
+      if (value === null) {
+        delete resolved[node.name];
+        continue;
+      }
       const target = targetOf(node, value, collections);
       if (target) {
         const referenced = resolve(target);

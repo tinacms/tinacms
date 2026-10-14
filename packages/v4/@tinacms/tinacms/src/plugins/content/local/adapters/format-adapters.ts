@@ -12,10 +12,15 @@ export type { CollectionFormat };
 export interface FormatAdapter {
   extension: string;
   parse(raw: string, bodyField?: string): TinaDocument;
+  /**
+   * Keys of `previousRaw` that `document` leaves out are kept, unless
+   * `schemaKeys` names them: a cleared field is saved as absent.
+   */
   serialize(
     document: TinaDocument,
     previousRaw?: string,
-    bodyField?: string
+    bodyField?: string,
+    schemaKeys?: readonly string[]
   ): string;
 }
 

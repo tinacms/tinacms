@@ -7,6 +7,7 @@ import {
   parse,
   DEFAULT_DATE_DISPLAY_FORMAT,
   DEFAULT_TIME_DISPLAY_FORMAT,
+  getHourCycle,
 } from './date-format';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore importing css is not recognized
@@ -67,7 +68,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DateFieldProps>(
             )
           }
           timeFormat={getTimeFormat()}
-          hourCycle={12}
+          hourCycle={getHourCycle(getTimeFormat())}
           dateFormat={getDateFormat()}
           value={date}
           locale={

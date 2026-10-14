@@ -1,4 +1,5 @@
-import { capabilityMountFor } from '../core/mount';
+import { invariant } from '../core/invariant';
+import { capabilityMountsFor } from '../core/mount';
 import {
   REGISTRY_CONFLICTS,
   type RegistryConflict,
@@ -34,17 +35,52 @@ const sliceConflictError = (
   );
 };
 
+const validatedSlices = ({
+  manifest,
+  segment,
+}: ResolvedSegment): Partial<Record<string, ClientSlice>> | undefined => {
+  invariant(
+    !(segment.slice && segment.slices),
+    'plugin-slice-and-slices',
+    `Plugin "${manifest.name}" sets both \`slice\` and \`slices\`. Set one.`
+  );
+  if (segment.slices) {
+    for (const key of Object.keys(segment.slices)) {
+      invariant(
+        isSingletonSliceCapability(key) && manifest.provides.includes(key),
+        'plugin-slices-key-not-provided',
+        `Plugin "${manifest.name}" has a slice under \`slices.${key}\`, but ` +
+          `"${key}" is not a singleton capability it provides.`
+      );
+    }
+    return segment.slices;
+  }
+  return undefined;
+};
+
 export const composePluginSlices = (
   resolved: ResolvedSegment[]
 ): SliceRegistry =>
   composeOverridableRegistry(
-    resolved.flatMap(({ manifest, segment }) => {
-      const slice = segment.slice;
-      if (!slice) return [];
-      const mount = capabilityMountFor(manifest);
-      return [
-        { key: mount.namespace, value: slice, isOverride: mount.isOverride },
-      ];
+    resolved.flatMap((entry) => {
+      const { manifest, segment } = entry;
+      const slices = validatedSlices(entry);
+      if (!slices && !segment.slice) return [];
+      const mounts = capabilityMountsFor(manifest);
+      invariant(
+        slices || mounts.length === 1,
+        'plugin-slice-ambiguous',
+        `Plugin "${manifest.name}" provides ${mounts.length} singleton ` +
+          `capabilities (${mounts.map((mount) => mount.namespace).join(', ')}) ` +
+          'but sets one `slice`. Set `slices`, keyed by capability.'
+      );
+      return mounts.flatMap((mount) => {
+        const slice = slices ? slices[mount.namespace] : segment.slice;
+        if (!slice) return [];
+        return [
+          { key: mount.namespace, value: slice, isOverride: mount.isOverride },
+        ];
+      });
     }),
     sliceConflictError
   );

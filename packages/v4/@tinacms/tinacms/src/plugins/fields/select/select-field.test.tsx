@@ -163,9 +163,12 @@ describe('SelectField ingest and digest', () => {
     );
   });
 
-  it('leaves an absent field absent (no default seeding)', async () => {
+  it('holds an absent field as null and digests it as absent', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({
+      status: null,
+      priority: null,
+    });
     expect(digestDocument({}, collection.fields, { registry })).toEqual({});
   });
 
@@ -176,11 +179,11 @@ describe('SelectField ingest and digest', () => {
     ).toEqual({});
   });
 
-  it('ingests a stored null as absent', async () => {
+  it('ingests a stored null as null', async () => {
     const registry = await resolveRegistry();
     expect(
       ingestDocument({ priority: null }, collection.fields, { registry })
-    ).toEqual({});
+    ).toEqual({ status: null, priority: null });
   });
 });
 

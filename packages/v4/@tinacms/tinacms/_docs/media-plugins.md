@@ -1,8 +1,10 @@
 # Media plugins
 
 A media plugin supplies the `media` capability. `media` is a singleton
-capability: a project installs one media plugin. A second media plugin throws
-an error at boot, unless it declares `overrides`. Refer to
+capability: a project installs one plugin that provides `media`. A second one
+throws an error at boot, unless it declares `overrides`. The plugin can provide
+other singleton capabilities too, with one slice for each in `slices`. Refer
+to [plugins.md](./plugins.md#capabilities). Refer to
 [ADR-022](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/022-media-capability-contract.md)
 for the decision.
 
@@ -28,6 +30,15 @@ A media plugin mounts a slice at `store.media`. The slice is a `MediaProvider`
 `useMediaSlice()` (`@tinacms/tinacms/react`) gives the slice. If no plugin
 mounts a slice with all four operations, it throws
 `media-capability-missing`.
+
+### On the site
+
+The site renders media without the editor, so it has no slice. A media plugin
+also sets `media.resolveUrl` on its manifest: a sync function with no secrets
+that gives the same URL as the `resolveUrl` of the slice. `resolveMediaUrl(config,
+path, options?)` (`@tinacms/tinacms`) calls it. Refer to
+[media.md](./media.md#rendering-media-on-the-site). `media.resolveUrl` is
+optional, but without it `resolveMediaUrl` throws `media-plugin-no-resolve-url`.
 
 ### Optional additions
 
@@ -110,7 +121,67 @@ site can send one. The endpoint rejects a request that is not from a loopback
 host, that has a different `Origin`, or that has `Sec-Fetch-Site: cross-site`.
 The content endpoint uses the same checks.
 
+Vite serves a new file in the public folder only after its file watcher
+reports the file. Until then, a request for a just-uploaded image gets a 404.
+Thus the dev server serves each file that it uploaded itself, from the media
+folder, and gives every other request to Vite.
+
 ### Paths
 
 The plugin rejects a path that goes outside the media folder, through `..` or
 through a symbolic link. It rejects a file name that holds a path separator.
+
+## `tinaCloud()`
+
+`tinaCloud()` keeps media in TinaCloud. It provides `media` and `auth`, with
+one slice in `slices.media` and one in `slices.auth`. Refer to
+[auth-plugins.md](./auth-plugins.md#tinacloud) for the sign-in flow.
+
+```ts
+import { defineConfig, localContentPlugin, tinaCloud } from '@tinacms/tinacms';
+
+export default defineConfig({
+  plugins: [
+    localContentPlugin(),
+    tinaCloud({ clientId: '<client id>' }),
+  ],
+  schema: { collections: [] },
+});
+```
+
+| Option | Role |
+|---|---|
+| `clientId` | The client ID of the TinaCloud project. |
+
+The media slice gets the token from the auth slice of the same plugin. Before
+the editor signs in, each operation fails with `unauthorized`.
+
+The slice supplies `rename`, `features.search`, `features.extensionFilter` and
+a `features.maxSize` of 100 MB. `resolveUrl` gives a CDN URL, and a size adds
+a crop: `?fit=crop&max-w=400&max-h=400`.
+
+### Branch
+
+Each operation reads the branch from `store.branch.name` when it runs. If
+`name` is not set, the operation uses the default branch of the TinaCloud
+project. The branch is not a config option: it is operational data that the
+Data Layer owns (ADR-019, ADR-024). No plugin writes `store.branch.name` yet,
+so all operations use the default branch.
+
+`media.resolveUrl` on the manifest runs on the site, which has no store, so it
+always gives the URL on the media branch.
+
+On first use the slice reads the project from
+`https://identity.tinajs.io/v2/apps/{clientId}` for its default branch and its
+media branch, then keeps it for the session.
+
+| Branch | URL of `posts/hero.jpg` |
+|---|---|
+| The media branch | `https://assets.tina.io/{clientId}/posts/hero.jpg` |
+| Any other branch | `https://assets.tina.io/{clientId}/__staging/{branch}/__file/posts/hero.jpg` |
+
+### Not supported yet
+
+- Media on an editorial workflow branch.
+- Static media, built at build time.
+- An assets API URL other than `https://assets.tinajs.io`.

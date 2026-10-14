@@ -23,6 +23,7 @@ const tina = await loadTinaConfig(
 );
 
 export default defineConfig({
+  envPrefix: ['VITE_', 'TINA_PUBLIC_'],
   plugins: [
     react(),
     tailwindcss(),
