@@ -13,12 +13,7 @@ import { useOptionalAuthSlice, useMediaSlice } from '../../editor/hooks';
 import { createTinaStore } from '../../store/create-store';
 import { stubLoginPopup, tinaCloudUser } from '../../test/tinacloud-login';
 import { mediaManagerPlugin } from '../media-manager/media-manager.plugin';
-import {
-  TINACLOUD_APP_URL,
-  TINACLOUD_ASSETS_URL,
-  TINACLOUD_IDENTITY_URL,
-} from './client';
-import { TINACLOUD_SUPPORT_URL } from './nav/tinacloud-nav.client';
+import { TINACLOUD_ASSETS_URL, TINACLOUD_IDENTITY_URL } from './client';
 import { tinaCloud } from './tinacloud.plugin';
 
 const stubTinaCloud = (
@@ -92,19 +87,19 @@ describe('tinaCloud()', () => {
         label: 'Project Config',
         target: {
           kind: 'url',
-          href: `${TINACLOUD_APP_URL}/projects/abc/overview`,
+          href: 'https://app.tina.io/projects/abc/overview',
         },
       },
       {
         label: 'User Management',
         target: {
           kind: 'url',
-          href: `${TINACLOUD_APP_URL}/projects/abc/collaborators`,
+          href: 'https://app.tina.io/projects/abc/collaborators',
         },
       },
       {
         label: 'Support',
-        target: { kind: 'url', href: TINACLOUD_SUPPORT_URL },
+        target: { kind: 'url', href: 'https://tina.io/docs/r/support' },
       },
     ]);
   });
