@@ -6,9 +6,8 @@ Instructions for agents working under `packages/v4/`.
 
 - [`README.md`](./README.md) — the package map: what v4 releases, publish
   rules, and why the CLI stays out of the build pipeline.
-- The full v4 architecture spec lives in a separate repo:
-  [tinacms/tinacmsv4-docs](https://github.com/tinacms/tinacmsv4-docs)
-  (start at `CONTEXT.md`, then the ADR set).
+- The full v4 architecture spec lives in [`adr/v4/`](../../adr/v4/)
+  (start at `CONTEXT.md`, then the ADRs).
 - The source of truth for the final shape of v4 live in `@tinacms/tinacms/_docs/`
   (architecture, plugins, field plugins, per-field specs).
 

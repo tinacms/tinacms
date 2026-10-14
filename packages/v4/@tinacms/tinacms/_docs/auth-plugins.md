@@ -6,7 +6,7 @@ throws an error at boot, unless it declares `overrides`. Refer to
 [plugins.md](./plugins.md#capabilities). Refer to
 [ADR-023](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/023-auth-session-mechanics.md)
 for the mechanics and
-[ADR-008](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/008-authorization-permissions-roles.md)
+[ADR-008](../../../../../adr/v4/008-authorization-permissions-roles.md)
 for the policy.
 
 Core implements no auth. The plugin supplies two halves: hooks on its server
