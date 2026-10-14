@@ -1,7 +1,8 @@
 import { type ZodType, z } from 'zod';
 import { invariant } from '../../../core/invariant';
-import { templateFor } from '../../../core/schema/children';
+import { isFieldNode, templateFor } from '../../../core/schema/children';
 import { isRecord } from '../../../utils/is-record';
+import { OBJECT_FIELD_TYPE } from '../object/object-field.schema';
 import type {
   BaseFieldSchema,
   FieldSchema,
@@ -10,6 +11,8 @@ import type {
 } from '../../../core/schema/types';
 
 export const ARRAY_FIELD_TYPE = 'array';
+
+const COMPOUND_TYPES: string[] = [ARRAY_FIELD_TYPE, OBJECT_FIELD_TYPE];
 
 interface ArrayFieldBase extends BaseFieldSchema {
   type: typeof ARRAY_FIELD_TYPE;
@@ -122,19 +125,24 @@ export const asArrayFieldSchema = (node: FieldSchema): ArrayFieldSchema => {
     `The array field "${node.name}" declares two templates with the same name.`
   );
   invariant(
-    candidate.of === undefined ||
-      (isRecord(candidate.of) && typeof candidate.of.type === 'string'),
+    candidate.of === undefined || isFieldNode(candidate.of),
     'array-field-schema-invalid',
     `The array field "${node.name}" needs "of" to be a field with a "type".`
   );
   const { of } = candidate;
-  const nested = isRecord(of)
-    ? ITEM_KEYS.filter((key) => of[key] !== undefined)
-    : [];
+  const ofRecord = isRecord(of) ? of : {};
+  const ofDeclares = ITEM_KEYS.filter((key) => ofRecord[key] !== undefined);
+  const holdsItems =
+    isFieldNode(of) &&
+    (COMPOUND_TYPES.includes(of.type) || ofDeclares.length > 0);
   invariant(
-    nested.length === 0,
+    !holdsItems,
     'array-field-schema-invalid',
-    `The array field "${node.name}" needs "of" to be a single-value field, but it declares ${nested.map((key) => `"${key}"`).join(' and ')}. Use "fields" for a list of objects, or "templates" for blocks.`
+    `The array field "${node.name}" needs "of" to be a single-value field, but it is ${
+      ofDeclares.length > 0
+        ? `a field that declares ${ofDeclares.map((key) => `"${key}"`).join(' and ')}`
+        : `of type "${String(ofRecord.type)}"`
+    }. Use "fields" for a list of objects, or "templates" for blocks.`
   );
   return node as ArrayFieldSchema;
 };

@@ -587,10 +587,21 @@ describe('asArrayFieldSchema', () => {
       type: 'array',
       of: { name: 'row', type: 'array', of: { name: 'cell', type: 'number' } },
     } as FieldSchema;
-    expect(() => asArrayFieldSchema(objectOf)).toThrow(
-      /declares "fields". Use "fields" for a list of objects/
-    );
-    expect(() => asArrayFieldSchema(arrayOf)).toThrow(/declares "of"/);
+    const bareObjectOf = {
+      name: 'people',
+      type: 'array',
+      of: { name: 'person', type: 'object' },
+    } as FieldSchema;
+    const bareArrayOf = {
+      name: 'grid',
+      type: 'array',
+      of: { name: 'row', type: 'array' },
+    } as FieldSchema;
+    for (const node of [objectOf, arrayOf, bareObjectOf, bareArrayOf]) {
+      expect(() => asArrayFieldSchema(node)).toThrow(
+        /needs "of" to be a single-value field, but it is .*Use "fields" for a list of objects/
+      );
+    }
   });
 
   it('throws when fields is not an array', () => {

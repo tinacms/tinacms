@@ -1,4 +1,4 @@
-import { fieldsetOf, scalarItemOf } from '../schema/children';
+import { type NestedValue, nestedValuesOf } from '../schema/children';
 import type {
   CollectionSchema,
   FieldSchema,
@@ -51,15 +51,13 @@ export const collectReferences = (
         targets.push(target);
         continue;
       }
-      const scalar = scalarItemOf(node);
-      for (const item of Array.isArray(value) ? value : [value]) {
-        if (scalar) {
-          const itemTarget = targetOf(scalar, item, collections);
+      for (const nested of nestedValuesOf(node, value)) {
+        if ('field' in nested) {
+          const itemTarget = targetOf(nested.field, nested.value, collections);
           if (itemTarget) targets.push(itemTarget);
-          continue;
+        } else if (isDocument(nested.value)) {
+          walk(nested.value, nested.fields);
         }
-        const children = fieldsetOf(node, item);
-        if (children && isDocument(item)) walk(item, children);
       }
     }
   };
@@ -81,14 +79,14 @@ export const resolveReferences = (
   collections: CollectionSchema[],
   resolve: ReferenceResolver
 ): TinaDocument => {
-  const resolveNested = (node: FieldSchema, item: unknown): unknown => {
-    const scalar = scalarItemOf(node);
-    if (scalar) {
-      const target = targetOf(scalar, item, collections);
-      return (target ? resolve(target) : undefined) ?? item;
+  const resolveNested = (nested: NestedValue): unknown => {
+    if ('field' in nested) {
+      const target = targetOf(nested.field, nested.value, collections);
+      return (target ? resolve(target) : undefined) ?? nested.value;
     }
-    const children = fieldsetOf(node, item);
-    return children && isDocument(item) ? walk(item, children) : item;
+    return isDocument(nested.value)
+      ? walk(nested.value, nested.fields)
+      : nested.value;
   };
   const walk = (document: TinaDocument, nodes: FieldSchema[]): TinaDocument => {
     const resolved: TinaDocument = { ...document };
@@ -104,10 +102,16 @@ export const resolveReferences = (
         if (referenced) resolved[node.name] = referenced;
         continue;
       }
+      const nestedValues = nestedValuesOf(node, value);
       if (Array.isArray(value)) {
-        resolved[node.name] = value.map((item) => resolveNested(node, item));
-      } else if (isDocument(value)) {
-        resolved[node.name] = resolveNested(node, value);
+        const items = [...value];
+        for (const nested of nestedValues) {
+          if (nested.index !== undefined)
+            items[nested.index] = resolveNested(nested);
+        }
+        resolved[node.name] = items;
+      } else if (nestedValues[0]) {
+        resolved[node.name] = resolveNested(nestedValues[0]);
       }
     }
     return resolved;

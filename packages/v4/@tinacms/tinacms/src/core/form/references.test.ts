@@ -90,6 +90,16 @@ describe('collectReferences', () => {
     ]);
   });
 
+  it('ignores an `of` value that is not a list', () => {
+    expect(
+      collectReferences(
+        { pages: 'content/pages/test.mdx' },
+        fields,
+        collections
+      )
+    ).toEqual([]);
+  });
+
   it('ignores a path that no listed collection owns', () => {
     expect(
       collectReferences(

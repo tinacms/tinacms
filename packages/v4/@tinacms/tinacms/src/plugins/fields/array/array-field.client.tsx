@@ -1,6 +1,7 @@
 import { defineClientPlugin } from '../../../client';
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
-import { TEMPLATE_KEY } from '../../../core/schema/children';
+import { TEMPLATE_KEY, nestedValuesOf } from '../../../core/schema/children';
+import { isRecord } from '../../../utils/is-record';
 import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
 import { validateFieldTree } from '../../../core/validation';
 import {
@@ -89,39 +90,39 @@ export default defineClientPlugin({
       const field = asArrayFieldSchema(node);
       if (!isListFor(field, value)) return {};
       const errors: Record<string, string[]> = {};
-      if (isScalarArray(field)) {
-        const descriptor = registry.get(field.of.type);
-        value.forEach((item, index) => {
+      for (const nested of nestedValuesOf(field, value)) {
+        if (nested.index === undefined) continue;
+        const at = `${address}.${nested.index}`;
+        if ('field' in nested) {
           Object.assign(
             errors,
             validateFieldTree(
-              field.of,
-              descriptor,
-              item,
-              `${address}.${index}`,
+              nested.field,
+              registry.get(nested.field.type),
+              nested.value,
+              at,
               registry,
               scope
             )
           );
-        });
-        return errors;
-      }
-      if (!isItemArray(value)) return errors;
-      value.forEach((values, index) => {
-        for (const subfield of itemFieldsOf(field, values) ?? []) {
+          continue;
+        }
+        if (!isRecord(nested.value)) continue;
+        const siblings = nested.value;
+        for (const subfield of nested.fields) {
           Object.assign(
             errors,
             validateFieldTree(
               subfield,
               registry.get(subfield.type),
-              values[subfield.name],
-              `${address}.${index}.${subfield.name}`,
+              siblings[subfield.name],
+              `${at}.${subfield.name}`,
               registry,
-              { ...scope, siblings: values }
+              { ...scope, siblings }
             )
           );
         }
-      });
+      }
       return errors;
     },
   },

@@ -7,7 +7,7 @@ import type {
 } from './field/contract';
 import type { FieldRegistry } from './field/registry';
 import { invariant } from './invariant';
-import { fieldsetOf, scalarItemOf } from './schema/children';
+import { nestedValuesOf } from './schema/children';
 import type { FieldSchema } from './schema/types';
 import { isRecord } from '../utils/is-record';
 
@@ -145,23 +145,21 @@ export const addressesWithValidators = (
     (node.validators ?? []).some((ref) => !selfContained.has(ref.name))
       ? [address]
       : [];
-  const nested = (node: FieldSchema, value: unknown, address: string) => {
-    const fieldset = fieldsetOf(node, value);
-    return fieldset
-      ? addressesWithValidators(fieldset, value, selfContained, address)
-      : [];
-  };
   return fields.flatMap((node) => {
     const address = prefix ? `${prefix}.${node.name}` : node.name;
     const value = isRecord(values) ? values[node.name] : undefined;
-    const scalar = scalarItemOf(node);
-    const children = Array.isArray(value)
-      ? value.flatMap((item, index) =>
-          scalar
-            ? ownAddress(scalar, `${address}.${index}`)
-            : nested(node, item, `${address}.${index}`)
-        )
-      : nested(node, value, address);
+    const children = nestedValuesOf(node, value).flatMap((nested) => {
+      const at =
+        nested.index === undefined ? address : `${address}.${nested.index}`;
+      return 'field' in nested
+        ? ownAddress(nested.field, at)
+        : addressesWithValidators(
+            nested.fields,
+            nested.value,
+            selfContained,
+            at
+          );
+    });
     return [...ownAddress(node, address), ...children];
   });
 };

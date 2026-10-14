@@ -13,10 +13,7 @@ export const templateFor = (
 export const fieldsOf = (node: FieldSchema): FieldSchema[] | undefined =>
   'fields' in node && Array.isArray(node.fields) ? node.fields : undefined;
 
-// How a node nests children, read from its keys so core never names a field
-// type: `fields` (object, or array of objects), `templates` (each object names
-// its own) or `of` (array of scalars). A value naming no known template has no
-// fieldset, so a walk skips it.
+// A value naming no known template has no fieldset.
 export const fieldsetOf = (
   node: FieldSchema,
   value: unknown
@@ -29,10 +26,37 @@ export const fieldsetOf = (
   return undefined;
 };
 
-// `FieldSchema` does not declare `of`; only the array plugin owns that key, and
-// its schema check requires no more than a `type`.
-const isFieldNode = (value: unknown): value is FieldSchema =>
+export const isFieldNode = (value: unknown): value is FieldSchema =>
   isRecord(value) && typeof value.type === 'string';
 
+// `FieldSchema` does not declare `of`; only the array plugin owns that key.
 export const scalarItemOf = (node: FieldSchema): FieldSchema | undefined =>
   'of' in node && isFieldNode(node.of) ? node.of : undefined;
+
+// A value nested under a node, read either as one value with `field` (an `of`
+// item) or as an object with `fields`. `index` is set for an item of a list.
+export type NestedValue = { index?: number; value: unknown } & (
+  | { field: FieldSchema }
+  | { fields: FieldSchema[] }
+);
+
+// The walks that read values (references, validation) find a node's children
+// here, read from its keys so core never names a field type: `fields`, the
+// template an item names, or `of`. An item with no known fieldset, or an `of`
+// value that is not a list, has no children.
+export const nestedValuesOf = (
+  node: FieldSchema,
+  value: unknown
+): NestedValue[] => {
+  const scalar = scalarItemOf(node);
+  if (Array.isArray(value)) {
+    return value.flatMap((item, index): NestedValue[] => {
+      if (scalar) return [{ index, value: item, field: scalar }];
+      const fields = fieldsetOf(node, item);
+      return fields ? [{ index, value: item, fields }] : [];
+    });
+  }
+  if (scalar) return [];
+  const fields = fieldsetOf(node, value);
+  return fields ? [{ value, fields }] : [];
+};
