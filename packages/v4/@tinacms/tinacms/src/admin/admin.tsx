@@ -290,9 +290,7 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
   return (
     <AdminErrorBoundary>
       <TinaProvider config={config} queryClient={queryClient}>
-        <HashRouter
-          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-        >
+        <HashRouter>
           <AuthGate>
             <AdminShell preview={preview} />
           </AuthGate>
