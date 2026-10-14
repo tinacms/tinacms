@@ -11,7 +11,8 @@ interface RecordedRequest {
   authorization: string | null;
 }
 
-const signedInAs = (token: string): SliceState => ({
+const signedInAs = (token: string, sendsTokenToSite = true): SliceState => ({
+  sendsTokenToSite,
   status: 'signed-in',
   user: { id: toUserId('ada') },
   roles: ['editor'],
@@ -162,6 +163,17 @@ describe('media slice with an auth plugin', () => {
 
   it('sends no authorization header with no auth plugin', async () => {
     const harness = await createSliceHarness(null);
+    await harness.slice().delete('a.png');
+    expect(harness.requests[0].authorization).toBeNull();
+  });
+
+  it('sends no token when the auth plugin has no server segment', async () => {
+    const harness = await createSliceHarness(
+      null,
+      true,
+      undefined,
+      signedInAs('tok', false)
+    );
     await harness.slice().delete('a.png');
     expect(harness.requests[0].authorization).toBeNull();
   });

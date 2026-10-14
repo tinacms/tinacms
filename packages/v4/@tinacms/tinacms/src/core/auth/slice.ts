@@ -49,9 +49,18 @@ export const authTokenOf = async (
   state: TinaStoreState
 ): Promise<string | undefined> => authSliceOf(state)?.getToken();
 
-export const authHeadersOf = async (
+// The store sets this on the auth namespace at mount. A site's server gets the
+// token only when the auth plugin has a server segment that checks it.
+export const SITE_TOKEN_FLAG = 'sendsTokenToSite';
+
+export const siteAuthTokenOf = async (
+  state: TinaStoreState
+): Promise<string | undefined> =>
+  state.auth?.[SITE_TOKEN_FLAG] === true ? authTokenOf(state) : undefined;
+
+export const siteAuthHeadersOf = async (
   state: TinaStoreState
 ): Promise<Record<string, string>> => {
-  const token = await authTokenOf(state);
+  const token = await siteAuthTokenOf(state);
   return token ? { authorization: `Bearer ${token}` } : {};
 };

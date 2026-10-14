@@ -43,7 +43,7 @@ const boot = () => {
     );
   });
   Object.assign(state, slice);
-  return { slice, state, tinaCloudToken: auth.tinaCloudToken };
+  return { slice, state, tinaCloudToken: slice.getToken };
 };
 
 const signIn = async (tokens = loginTokens()) => {

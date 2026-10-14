@@ -302,7 +302,6 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     }
   };
 
-  // The account-wide TinaCloud token, sent to TinaCloud only and never to the site.
   const tinaCloudToken = async (): Promise<string | undefined> => {
     if (!tokens) return undefined;
     return (await freshTokens(tokens))?.bearer;
@@ -393,11 +392,11 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     return {
       status: redirect ? 'loading' : 'signed-out',
       user: null,
-      getToken: async () => undefined,
+      getToken: tinaCloudToken,
       login,
       logout,
     };
   };
 
-  return { slice, tinaCloudToken };
+  return { slice };
 };

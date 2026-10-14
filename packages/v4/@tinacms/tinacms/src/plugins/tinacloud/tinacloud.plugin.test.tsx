@@ -7,13 +7,24 @@ import { TinaAdmin } from '../../admin/admin';
 import { asResolvedConfig } from '../../config';
 import { MediaError } from '../../core/media/contract';
 import { authTokenOf } from '../../core/auth/slice';
-import { definePlugin, resolveClientSegments } from '../../core/plugin';
+import { resolveClientSegments } from '../../core/plugin';
+import { validateCapabilityGraph } from '../../core/resolve';
 import { type TinaRuntime, TinaRuntimeContext } from '../../editor/context';
-import { useOptionalAuthSlice, useMediaSlice } from '../../editor/hooks';
+import {
+  useContentSlice,
+  useMediaSlice,
+  useOptionalAuthSlice,
+} from '../../editor/hooks';
 import { createTinaStore } from '../../store/create-store';
 import { stubLoginPopup, tinaCloudUser } from '../../test/tinacloud-login';
+import { localContentPlugin } from '../content/local/local-content.plugin';
 import { mediaManagerPlugin } from '../media-manager/media-manager.plugin';
-import { TINACLOUD_ASSETS_URL, TINACLOUD_IDENTITY_URL } from './client';
+import {
+  TINACLOUD_ASSETS_URL,
+  TINACLOUD_CONTENT_URL,
+  TINACLOUD_IDENTITY_URL,
+} from './client';
+import { contentUrl } from './content/request';
 import { tinaCloud } from './tinacloud.plugin';
 
 const stubTinaCloud = (
@@ -28,6 +39,18 @@ const stubTinaCloud = (
     }
     if (url.endsWith('/currentUser')) return Response.json(tinaCloudUser);
     if (url.startsWith(TINACLOUD_IDENTITY_URL)) return Response.json(project);
+    if (url.startsWith(TINACLOUD_CONTENT_URL)) {
+      return Response.json({
+        data: {
+          collection: {
+            documents: {
+              edges: [],
+              pageInfo: { hasNextPage: false, endCursor: null },
+            },
+          },
+        },
+      });
+    }
     return Response.json({ files: [], directories: [] });
   });
   vi.stubGlobal('fetch', fetchMock);
@@ -46,7 +69,11 @@ const boot = async () => {
     <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
   );
   const { result } = renderHook(
-    () => ({ media: useMediaSlice(), auth: useOptionalAuthSlice() }),
+    () => ({
+      media: useMediaSlice(),
+      auth: useOptionalAuthSlice(),
+      content: useContentSlice(),
+    }),
     { wrapper }
   );
   return { store, result };
@@ -58,7 +85,11 @@ const bootSignedIn = async () => {
   const login = booted.result.current.auth?.login();
   complete();
   await act(() => login);
-  return { store: booted.store, media: booted.result.current.media };
+  return {
+    store: booted.store,
+    media: booted.result.current.media,
+    content: booted.result.current.content,
+  };
 };
 
 const listUrls = (fetchMock: ReturnType<typeof stubTinaCloud>) =>
@@ -72,17 +103,37 @@ afterEach(() => {
 });
 
 describe('tinaCloud()', () => {
-  it('provides media and auth, with no server segment', () => {
+  it('provides media, auth and content, with no server segment', () => {
     const plugin = tinaCloud({ clientId: 'abc' });
-    expect(plugin.provides).toEqual(['media', 'auth']);
+    expect(plugin.provides).toEqual(['media', 'auth', 'content']);
     expect(plugin.server).toBeUndefined();
   });
 
-  it('gives the site no token once signed in', async () => {
+  it('fails at boot next to another content plugin', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        tinaCloud({ clientId: 'abc' }),
+        localContentPlugin(),
+      ])
+    ).toThrow('Two plugins provide the "content" capability.');
+  });
+
+  it('returns the TinaCloud token from getToken once signed in', async () => {
     stubTinaCloud();
     const { store } = await bootSignedIn();
     expect(store.getState().auth).toMatchObject({ status: 'signed-in' });
-    await expect(authTokenOf(store.getState())).resolves.toBeUndefined();
+    await expect(authTokenOf(store.getState())).resolves.toBe('id-token');
+  });
+
+  it("sends the auth slice's token on content requests after sign-in", async () => {
+    const fetchMock = stubTinaCloud();
+    const { content } = await bootSignedIn();
+    await content.list('post');
+    const [url, init] = fetchMock.mock.calls.at(-1) ?? [];
+    expect(url).toBe(contentUrl('abc', 'main'));
+    expect(new Headers(init?.headers).get('Authorization')).toBe(
+      'Bearer id-token'
+    );
   });
 
   it('mounts a media slice and a signed-out auth slice', async () => {
@@ -167,25 +218,10 @@ describe('tinaCloud()', () => {
     stubTinaCloud();
     const user = userEvent.setup();
     const { complete } = stubLoginPopup();
-    const contentPlugin = definePlugin({
-      name: 'test:content',
-      provides: ['content'],
-      client: async () => ({
-        default: {
-          slice: () => ({
-            list: async () => [],
-            get: async () => null,
-            update: async () => {
-              throw new Error('read-only');
-            },
-          }),
-        },
-      }),
-    });
     render(
       <TinaAdmin
         config={asResolvedConfig({
-          plugins: [contentPlugin, tinaCloud({ clientId: 'abc' })],
+          plugins: [tinaCloud({ clientId: 'abc' })],
           schema: {
             collections: [
               {
