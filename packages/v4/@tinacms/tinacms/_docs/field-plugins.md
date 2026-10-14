@@ -206,7 +206,7 @@ Hooks:
 The form resolver (`editor/resolver.ts`) calls `validateField`
 (`core/validation.ts`). `validateField` runs the two layers in order and joins
 their messages. The spec is
-[adr/v4 › field-plugins › Validation](../../../../../adr/v4/plugins/field-plugins.md#validation).
+[the field plugins spec, Validation section](../../../../../adr/v4/plugins/field-plugins.md#validation).
 
 1. **Plugin-level** — `descriptor.validate(value, context)`. It runs on every
    field of the `type` the plugin owns. `context` is `PluginValidationContext`,

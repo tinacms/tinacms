@@ -4,7 +4,7 @@ An auth plugin supplies the `auth` capability. `auth` is a singleton
 capability: a project installs one plugin that provides `auth`. A second one
 throws an error at boot, unless it declares `overrides`. Refer to
 [plugins.md](./plugins.md#capabilities). Refer to
-[ADR-023](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/023-auth-session-mechanics.md)
+ADR-023 (not yet public)
 for the mechanics and
 [ADR-008](../../../../../adr/v4/008-authorization-permissions-roles.md)
 for the policy.
