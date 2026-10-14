@@ -38,7 +38,10 @@ export const helpPlugin = definePlugin({
 });
 ```
 
-`examples/barebones/tina/help-nav.tsx` is a full example.
+`examples/barebones/tina/help-nav.tsx` is a full example. `tinaCloud()`
+(`plugins/tinacloud/nav/tinacloud-nav.client.ts`) is a shipped plugin that
+contributes three `url` entries: Project Config, User Management and Support.
+A project without `tinaCloud()` does not show them.
 
 ## `globalNav`
 

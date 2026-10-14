@@ -13,7 +13,12 @@ import { useOptionalAuthSlice, useMediaSlice } from '../../editor/hooks';
 import { createTinaStore } from '../../store/create-store';
 import { stubLoginPopup, tinaCloudUser } from '../../test/tinacloud-login';
 import { mediaManagerPlugin } from '../media-manager/media-manager.plugin';
-import { TINACLOUD_ASSETS_URL, TINACLOUD_IDENTITY_URL } from './client';
+import {
+  TINACLOUD_APP_URL,
+  TINACLOUD_ASSETS_URL,
+  TINACLOUD_IDENTITY_URL,
+} from './client';
+import { TINACLOUD_SUPPORT_URL } from './nav/tinacloud-nav.client';
 import { tinaCloud } from './tinacloud.plugin';
 
 const stubTinaCloud = (
@@ -76,6 +81,32 @@ describe('tinaCloud()', () => {
     const plugin = tinaCloud({ clientId: 'abc' });
     expect(plugin.provides).toEqual(['media', 'auth']);
     expect(plugin.server).toBeUndefined();
+  });
+
+  it('links the sidebar to the project in the TinaCloud dashboard', async () => {
+    const segment = (await tinaCloud({ clientId: 'abc' }).client?.())?.default;
+    expect(
+      segment?.slots?.globalNav?.map(({ label, target }) => ({ label, target }))
+    ).toEqual([
+      {
+        label: 'Project Config',
+        target: {
+          kind: 'url',
+          href: `${TINACLOUD_APP_URL}/projects/abc/overview`,
+        },
+      },
+      {
+        label: 'User Management',
+        target: {
+          kind: 'url',
+          href: `${TINACLOUD_APP_URL}/projects/abc/collaborators`,
+        },
+      },
+      {
+        label: 'Support',
+        target: { kind: 'url', href: TINACLOUD_SUPPORT_URL },
+      },
+    ]);
   });
 
   it('gives the site no token once signed in', async () => {
