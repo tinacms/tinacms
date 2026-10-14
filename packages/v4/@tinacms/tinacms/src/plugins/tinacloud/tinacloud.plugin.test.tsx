@@ -7,7 +7,7 @@ import { TinaAdmin } from '../../admin/admin';
 import { asResolvedConfig } from '../../config';
 import { MediaError } from '../../core/media/contract';
 import { authTokenOf } from '../../core/auth/slice';
-import { resolveClientSegments } from '../../core/plugin';
+import { definePlugin, resolveClientSegments } from '../../core/plugin';
 import { validateCapabilityGraph } from '../../core/resolve';
 import { type TinaRuntime, TinaRuntimeContext } from '../../editor/context';
 import {
@@ -15,6 +15,8 @@ import {
   useMediaSlice,
   useOptionalAuthSlice,
 } from '../../editor/hooks';
+import { createRpcHandler } from '../../rpc/handler';
+import { defineServerPlugin } from '../../server';
 import { createTinaStore } from '../../store/create-store';
 import { stubLoginPopup, tinaCloudUser } from '../../test/tinacloud-login';
 import { localContentPlugin } from '../content/local/local-content.plugin';
@@ -103,10 +105,10 @@ afterEach(() => {
 });
 
 describe('tinaCloud()', () => {
-  it('provides media, auth and content, with no server segment', () => {
+  it('provides media, auth and content, with a server segment', () => {
     const plugin = tinaCloud({ clientId: 'abc' });
     expect(plugin.provides).toEqual(['media', 'auth', 'content']);
-    expect(plugin.server).toBeUndefined();
+    expect(plugin.server).toBeTypeOf('function');
   });
 
   it('fails at boot next to another content plugin', () => {
@@ -246,5 +248,46 @@ describe('tinaCloud()', () => {
       await screen.findByRole('list', { name: 'Account' })
     ).toHaveTextContent('Ada Lovelace');
     expect(screen.getByRole('list', { name: 'Collections' })).toBeVisible();
+  });
+});
+
+describe('tinaCloud() on the server', () => {
+  const editorialPlugin = definePlugin({
+    name: 'editorial',
+    server: async () => ({
+      default: defineServerPlugin({ publish: async () => 'queued' }),
+    }),
+  });
+
+  const handler = createRpcHandler({
+    plugins: [tinaCloud({ clientId: 'abc' }), editorialPlugin],
+  });
+
+  const post = (path: string, token?: string) =>
+    handler(
+      new Request(`http://tina.local/api/tina${path}`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          ...(token ? { authorization: `Bearer ${token}` } : {}),
+        },
+      })
+    );
+
+  it('authenticates RPC requests through TinaCloud', async () => {
+    stubTinaCloud();
+    expect((await post('/editorial/publish')).status).toBe(401);
+    const response = await post('/editorial/publish', 'id-token');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toBe('queued');
+  });
+
+  it('does not route getSession as an operation', async () => {
+    stubTinaCloud();
+    for (const namespace of ['auth', 'media', 'content']) {
+      expect((await post(`/${namespace}/getSession`, 'id-token')).status).toBe(
+        404
+      );
+    }
   });
 });

@@ -163,7 +163,7 @@ describe('useRpcClient', () => {
     expect(authorizations).toEqual([null]);
   });
 
-  it('sends no TinaCloud token to the site', async () => {
+  it('sends the TinaCloud token to the site', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string) => tinaCloudIdentity(url))
@@ -177,7 +177,6 @@ describe('useRpcClient', () => {
     await act(() => login);
     await result.current.rpc.search.query();
     expect(result.current.auth?.status).toBe('signed-in');
-    await expect(result.current.auth?.getToken()).resolves.toBe('id-token');
-    expect(authorizations).toEqual([null]);
+    expect(authorizations).toEqual(['Bearer id-token']);
   });
 });

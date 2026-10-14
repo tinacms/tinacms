@@ -155,11 +155,17 @@ with no login.
   `https://identity.tinajs.io/oauth/token` when it expires in less than two
   minutes. A refused refresh sets `signed-out` and throws `expired`.
 
-The tokens only ever go to TinaCloud, as in v3. They are tied to the whole
-TinaCloud account, not to one project. The slice's `getToken()` returns the
-TinaCloud token. `tinaCloud()` has no server segment, so no request to the
-site's own server carries the token. The RPC handler
-refuses every operation that needs a session.
+The server segment holds `getSession`. It sends the bearer token to the same
+`currentUser` and project endpoints as the slice, and maps the role the same
+way. An account that is not verified, or that TinaCloud refuses, gets no
+session. When TinaCloud cannot be reached, `getSession` throws, so the
+request fails closed. `tinaCloud()` has no `rolePermissions`, so the built-in
+defaults apply.
+
+Because `tinaCloud()` has a server segment, requests to the site's own server
+carry the TinaCloud token. For now that is the token of the whole TinaCloud
+account, not of one project. ADR-023 §7 replaces it with a short-lived,
+project-scoped editor token before v4 ships, once TinaCloud can issue one.
 
 ```ts
 defineConfig({
