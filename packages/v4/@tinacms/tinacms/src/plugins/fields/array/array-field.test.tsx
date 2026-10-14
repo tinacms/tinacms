@@ -792,6 +792,7 @@ describe('ArrayField templates', () => {
     expect(
       await screen.findByText('Unknown block "gallery"')
     ).toBeInTheDocument();
+    expect(screen.getByText(/"images"/)).toBeInTheDocument();
     expect(
       (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
     ).toBe('/docs');
@@ -927,6 +928,66 @@ describe('ArrayField templates', () => {
         { validators: coreValidatorRegistry }
       );
     expect(errors).toEqual({});
+  });
+
+  it('shows an item that is not an object read-only, beside working blocks', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const registry = await resolveRegistry();
+    const stored = { blocks: ['hello', { _template: 'cta', link: '/docs' }] };
+    expect(
+      digestDocument(
+        ingestDocument(stored, blocksCollection.fields, { registry }),
+        blocksCollection.fields,
+        { registry }
+      )
+    ).toEqual(stored);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('an item that is not an object')
+    );
+    expect(
+      validateFieldWithCore(blocksNode, registry.get('array'), stored.blocks)
+    ).toEqual(['Blocks must be a list of items']);
+    renderPage(stored);
+    expect(
+      await screen.findByText('Item 1 is not an object')
+    ).toBeInTheDocument();
+    expect(screen.getByText('"hello"')).toBeInTheDocument();
+    expect(
+      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+    ).toBe('/docs');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { _template: 'cta', link: '/docs', weight: null },
+      ])
+    );
+    warn.mockRestore();
+  });
+
+  it('skips a non-object item when validating the items of a fields array', async () => {
+    const registry = await resolveRegistry();
+    const people = t.array({
+      name: 'people',
+      label: 'People',
+      fields: [
+        t.string({ name: 'name', label: 'Name', validators: [required()] }),
+      ],
+    });
+    expect(
+      registry
+        .get('array')
+        ?.validateChildren?.(
+          ['hello', { name: '' }],
+          people,
+          'people',
+          registry,
+          {
+            validators: coreValidatorRegistry,
+          }
+        )
+    ).toEqual({ 'people.1.name': ['Name is required'] });
   });
 
   it('shows an item with no template and moves it like any other', async () => {

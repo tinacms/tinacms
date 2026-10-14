@@ -8,8 +8,7 @@ import {
   type ObjectArrayFieldSchema,
   arraySchema,
   asArrayFieldSchema,
-  isItemArray,
-  isListFor,
+  isItem,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
@@ -20,10 +19,11 @@ import { ArrayField } from './array-field.ui';
 // key order.
 const convertItems = (
   field: ObjectArrayFieldSchema,
-  items: TinaDocument[],
+  items: unknown[],
   convert: (item: TinaDocument, fields: FieldSchema[]) => TinaDocument
-): TinaDocument[] =>
+): unknown[] =>
   items.map((item) => {
+    if (!isItem(item)) return item;
     const fields = itemFieldsOf(field, item);
     if (!fields) return { ...item };
     const values = convert(item, fields);
@@ -32,19 +32,25 @@ const convertItems = (
       : values;
   });
 
-const warnUnknownTemplates = (
+const describeKeptItem = (
   field: ObjectArrayFieldSchema,
-  items: TinaDocument[]
-) => {
+  item: unknown
+): string | undefined => {
+  if (!isItem(item)) return 'an item that is not an object';
+  if (itemFieldsOf(field, item)) return undefined;
+  return item[TEMPLATE_KEY] === undefined
+    ? `an item with no "${TEMPLATE_KEY}"`
+    : `an item with the unknown template "${String(item[TEMPLATE_KEY])}"`;
+};
+
+const warnKeptItems = (field: ObjectArrayFieldSchema, items: unknown[]) => {
   for (const item of items) {
-    if (itemFieldsOf(field, item)) continue;
-    console.warn(
-      `The array field "${field.name}" has an item with ${
-        item[TEMPLATE_KEY] === undefined
-          ? `no "${TEMPLATE_KEY}"`
-          : `the unknown template "${String(item[TEMPLATE_KEY])}"`
-      }. It is kept unchanged.`
-    );
+    const problem = describeKeptItem(field, item);
+    if (problem) {
+      console.warn(
+        `The array field "${field.name}" has ${problem}. It is kept unchanged.`
+      );
+    }
   }
 };
 
@@ -58,22 +64,21 @@ export default defineClientPlugin({
     parse: (stored: unknown, node, context) => {
       if (stored == null) return [];
       const field = asArrayFieldSchema(node);
-      if (!isListFor(field, stored)) return stored;
+      if (!Array.isArray(stored)) return stored;
       if (isScalarArray(field)) {
         const parse = context.registry.get(field.of.type)?.parse;
         return stored.map((item) =>
           item == null || !parse ? item : parse(item, field.of, context)
         );
       }
-      if (!isItemArray(stored)) return stored;
-      warnUnknownTemplates(field, stored);
+      warnKeptItems(field, stored);
       return convertItems(field, stored, (item, fields) =>
         ingestDocument(item, fields, context)
       );
     },
     serialize: (value: unknown, node, context) => {
       const field = asArrayFieldSchema(node);
-      if (!isListFor(field, value)) return value;
+      if (!Array.isArray(value)) return value;
       if (isScalarArray(field)) {
         const serialize = context.registry.get(field.of.type)?.serialize;
         return value.map((item) => {
@@ -81,14 +86,13 @@ export default defineClientPlugin({
           return serialize ? serialize(item, field.of, context) : item;
         });
       }
-      if (!isItemArray(value)) return value;
       return convertItems(field, value, (item, fields) =>
         digestDocument(item, fields, context)
       );
     },
     validateChildren: (value: unknown, node, address, registry, scope) => {
       const field = asArrayFieldSchema(node);
-      if (!isListFor(field, value)) return {};
+      if (!Array.isArray(value)) return {};
       const errors: Record<string, string[]> = {};
       for (const nested of nestedValuesOf(field, value)) {
         if (nested.index === undefined) continue;

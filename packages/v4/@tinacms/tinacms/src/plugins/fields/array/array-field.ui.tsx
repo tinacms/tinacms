@@ -23,18 +23,18 @@ import {
   type ObjectArrayFieldSchema,
   type ScalarArrayFieldSchema,
   asArrayFieldSchema,
-  isListFor,
+  isItem,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
 } from './array-field.schema';
-import { UneditableValue } from '../uneditable-value';
+import { StoredValue, UneditableValue } from '../uneditable-value';
 
 export function ArrayField() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
   const [value] = useFieldValue<unknown>(address);
-  return value == null || isListFor(field, value) ? (
+  return value == null || Array.isArray(value) ? (
     <ItemList />
   ) : (
     <UneditableValue
@@ -72,7 +72,7 @@ function ObjectItems({
 }) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
   const {
     fields: items,
     append,
@@ -101,12 +101,14 @@ function ObjectItems({
         className='flex flex-col gap-3'
       >
         {items.map((item, index) => {
-          const values = item as TinaDocument;
-          const fields = itemFieldsOf(field, values);
+          const stored: unknown = getValues(`${address}.${index}`);
+          const fields = isItem(stored)
+            ? itemFieldsOf(field, stored)
+            : undefined;
           return (
             <ItemRow
               key={item.id}
-              heading={headingOf(field, values, index)}
+              heading={headingOf(field, stored, index)}
               index={index}
               count={items.length}
               onMove={move}
@@ -121,10 +123,14 @@ function ObjectItems({
                   />
                 ))
               ) : (
-                <p className='text-sm text-muted-foreground'>
-                  This block's template is not in the config. It is saved
-                  unchanged. Remove it, or add the template back.
-                </p>
+                <div className='flex flex-col gap-2'>
+                  <p className='text-sm text-muted-foreground'>
+                    {isItem(stored)
+                      ? "This block's template is not in the config. It is saved unchanged. Remove it, or add the template back."
+                      : 'This item is not an object, so it cannot be edited here. Remove it to save the list.'}
+                  </p>
+                  <StoredValue value={stored} />
+                </div>
               )}
             </ItemRow>
           );
@@ -291,9 +297,10 @@ const labelOf = (template: TemplateSchema): string =>
 
 const headingOf = (
   field: ObjectArrayFieldSchema,
-  item: TinaDocument,
+  item: unknown,
   index: number
 ): string => {
+  if (!isItem(item)) return `Item ${index + 1} is not an object`;
   if (!isTemplatesArray(field)) return `Item ${index + 1}`;
   const template = templateFor(field.templates, item);
   if (template) return labelOf(template);

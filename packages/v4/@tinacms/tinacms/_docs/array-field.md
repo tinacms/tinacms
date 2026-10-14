@@ -164,7 +164,10 @@ of that template. `parse` and `serialize` keep `_template` on every item. An
 item with no `_template`, or with an unknown one, passes through `parse` and
 `serialize` unchanged, with a console warning. The component shows it as an
 unknown block that the editor can move or remove, so a renamed or removed
-template never deletes content. For `of`,
+template never deletes content. An item of a `fields` or `templates` array that is
+not an object is kept the same way, shown read-only with its stored value, and
+fails validation (`<label> must be a list of items`) until it is removed. A
+value that is not a list at all is shown read-only for the whole field. For `of`,
 `parse` and `serialize` call the `parse`/`serialize` of the `of` field type on
 each item.
 

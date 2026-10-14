@@ -159,7 +159,7 @@ export const itemFieldsOf = (
     ? templateFor(field.templates, item)?.fields
     : field.fields;
 
-const isItem = (item: unknown): item is TinaDocument =>
+export const isItem = (item: unknown): item is TinaDocument =>
   item != null && typeof item === 'object' && !Array.isArray(item);
 
 export const isItemArray = (value: unknown): value is TinaDocument[] =>
