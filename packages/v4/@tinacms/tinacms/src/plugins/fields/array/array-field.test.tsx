@@ -173,6 +173,15 @@ describe('ArrayField add, remove, and reorder', () => {
     expect(await screen.findByLabelText('Name')).toBeInTheDocument();
   });
 
+  it('goes dirty when an item is added to an absent list', async () => {
+    renderField({});
+    const [addAuthor] = await screen.findAllByRole('button', {
+      name: 'Add item',
+    });
+    await userEvent.click(addAuthor);
+    await waitFor(() => expect(status()).toBe('dirty'));
+  });
+
   it('removes an item', async () => {
     renderField({ authors: [{ name: 'Ivan' }] });
     await screen.findByLabelText('Name');
