@@ -10,13 +10,13 @@ export default {
       },
     ],
     '^.+\\.m?jsx?$': [
-      'babel-jest',
+      'ts-jest',
       {
-        presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
+        tsconfig: { allowJs: true, module: 'commonjs', isolatedModules: true },
       },
     ],
   },
   // graphql-codegen reaches auto-bind@5, which is ESM-only. Node can require()
-  // that; jest's module registry cannot, so babel has to down-level it.
+  // that; jest's module registry cannot, so ts-jest has to down-level it.
   transformIgnorePatterns: ['node_modules/(?!.*auto-bind)'],
 };
