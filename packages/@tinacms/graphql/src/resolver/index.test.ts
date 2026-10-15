@@ -1385,7 +1385,31 @@ describe('index', () => {
   });
 
   describe('resolveUpdateDocument()', () => {
-    const collection = { name: 'post', path: 'posts', format: 'md' } as any;
+    // The rewrite is schema-driven, so the fixture declares the fields it rewrites.
+    const collection = {
+      name: 'post',
+      path: 'posts',
+      format: 'md',
+      fields: [
+        { name: 'title', type: 'string' },
+        { name: 'relatedPost', type: 'reference', collections: ['post'] },
+        {
+          name: 'sections',
+          type: 'object',
+          list: true,
+          fields: [
+            {
+              name: 'items',
+              type: 'object',
+              list: true,
+              fields: [
+                { name: 'author', type: 'reference', collections: ['post'] },
+              ],
+            },
+          ],
+        },
+      ],
+    } as any;
     const realPath = path.join('posts', 'hello.md');
     const newRealPath = path.join('posts', 'renamed.md');
     const referenceValue = 'posts/hello.md';
@@ -1403,6 +1427,7 @@ describe('index', () => {
         getCollections: () => [collection],
         getCollection: () => collection,
         getCollectionByFullPath: vi.fn().mockReturnValue(collection),
+        getTemplateForData: ({ collection: collectable }: any) => collectable,
       };
       const resolver = createResolver({
         database: database as any,
@@ -1686,7 +1711,31 @@ describe('index', () => {
   });
 
   describe('resolveDeleteDocument()', () => {
-    const collection = { name: 'post', path: 'posts', format: 'md' } as any;
+    // The rewrite is schema-driven, so the fixture declares the fields it rewrites.
+    const collection = {
+      name: 'post',
+      path: 'posts',
+      format: 'md',
+      fields: [
+        { name: 'title', type: 'string' },
+        { name: 'relatedPost', type: 'reference', collections: ['post'] },
+        {
+          name: 'sections',
+          type: 'object',
+          list: true,
+          fields: [
+            {
+              name: 'items',
+              type: 'object',
+              list: true,
+              fields: [
+                { name: 'author', type: 'reference', collections: ['post'] },
+              ],
+            },
+          ],
+        },
+      ],
+    } as any;
     const realPath = path.join('posts', 'hello.md');
     const referenceValue = 'posts/hello.md';
 
@@ -1700,6 +1749,7 @@ describe('index', () => {
         getCollections: () => [collection],
         getCollection: () => collection,
         getCollectionByFullPath: vi.fn().mockReturnValue(collection),
+        getTemplateForData: ({ collection: collectable }: any) => collectable,
       };
       const resolver = createResolver({
         database: database as any,
