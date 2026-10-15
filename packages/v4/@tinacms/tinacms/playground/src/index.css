@@ -1,6 +1,9 @@
 @import "@tinacms/ui/globals.css";
 
 /* Tailwind only auto-scans the vite root (playground/); the classes actually
-   rendered live in the package's field components and the ui package. */
+   rendered live in the package's field components, the ui package, and the
+   rich-text editor. Miss one and its utilities are simply never generated —
+   the editor renders unstyled and overflows its container. */
 @source "../../src";
 @source "../../../ui/src";
+@source "../../../rich-text/src";

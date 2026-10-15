@@ -2,12 +2,16 @@
   "name": "tinacms",
   "type": "module",
   "typings": "dist/index.d.ts",
-  "version": "3.11.0",
+  "version": "3.14.4",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./dist/client": "./dist/client.js",
+    "./dist/client": {
+      "types": "./dist/client.d.ts",
+      "browser": "./dist/client.browser.js",
+      "default": "./dist/client.js"
+    },
     "./react": "./dist/react.js",
     "./dist/react": "./dist/react.js",
     "./tina-field": "./dist/tina-field.js",
@@ -30,7 +34,8 @@
       {
         "name": "src/client.ts",
         "target": "node"
-      }
+      },
+      "src/client.browser.ts"
     ]
   },
   "license": "Apache-2.0",
@@ -48,8 +53,6 @@
     "@floating-ui/dom": "catalog:",
     "@floating-ui/react-dom": "catalog:",
     "@graphql-inspector/core": "^6.2.1",
-    "@headlessui/react": "2.1.8",
-    "@heroicons/react": "^1.0.6",
     "@radix-ui/react-dialog": "catalog:",
     "@radix-ui/react-dropdown-menu": "catalog:",
     "@radix-ui/react-popover": "catalog:",
@@ -88,12 +91,10 @@
     "@udecode/plate-slash-command": "catalog:",
     "@udecode/plate-table": "catalog:",
     "@udecode/plate-trailing-block": "catalog:",
-    "async-lock": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "cmdk": "catalog:",
     "color-string": "catalog:",
-    "crypto-js": "catalog:",
     "date-fns": "4.1.0",
     "es-toolkit": "^1.42.0",
     "final-form": "catalog:",
@@ -103,7 +104,7 @@
     "graphql-tag": "catalog:",
     "is-hotkey": "catalog:",
     "lucide-react": "catalog:",
-    "mermaid": "^11.12.2",
+    "mermaid": "catalog:",
     "posthog-js": "^1.347.1",
     "prism-react-renderer": "catalog:",
     "prop-types": "catalog:",
@@ -113,7 +114,6 @@
     "react-dnd-html5-backend": "catalog:",
     "react-dropzone": "catalog:",
     "react-final-form": "catalog:",
-    "react-icons": "^5.4.0",
     "react-router-dom": "catalog:",
     "react-use": "catalog:",
     "tailwind-merge": "^2.6.0",
@@ -122,7 +122,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@graphql-tools/utils": "catalog:",
     "@testing-library/dom": "catalog:",
     "@testing-library/jest-dom": "catalog:",
     "@testing-library/react": "catalog:",
@@ -139,7 +138,7 @@
     "identity-obj-proxy": "catalog:",
     "jest-file-snapshot": "^0.7.0",
     "lowlight": "catalog:",
-    "next": "14.2.35",
+    "next": "15.5.27",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-is": "^18.3.1",

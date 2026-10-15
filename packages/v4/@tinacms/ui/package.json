@@ -3,13 +3,15 @@
   "version": "4.0.0-alpha.0",
   "private": true,
   "license": "Apache-2.0",
-  "description": "TinaCMS v4 shared UI primitives (shadcn/ui). Add or update components with the shadcn CLI from this directory: `pnpm dlx shadcn@latest add <component>`.",
+  "description": "The shared user interface components of TinaCMS v4. The components come from shadcn/ui. To add a component, or to update one, run the shadcn CLI in this directory: pnpm dlx shadcn@latest add <component>.",
   "type": "module",
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
     "directory": "packages/v4/@tinacms/ui"
   },
-  "sideEffects": ["**/*.css"],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "scripts": {
     "types": "tsc"
   },
@@ -22,6 +24,10 @@
     "./lib/*": {
       "types": "./src/lib/*.ts",
       "default": "./src/lib/*.ts"
+    },
+    "./hooks/*": {
+      "types": "./src/hooks/*.ts",
+      "default": "./src/hooks/*.ts"
     }
   },
   "dependencies": {

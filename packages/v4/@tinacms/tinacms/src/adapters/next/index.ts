@@ -1,7 +1,13 @@
-// Server-only — `tinacms/adapters/next`.
-// Mounts the runtime-composed RPC handler as Next.js route handlers.
-//
-// Intended exports:
-//   mountHandler(config) → { GET, POST }   for app/api/tina/[...slug]/route.ts
+import { type RpcHandlerConfig, createRpcHandler } from '../../rpc/handler';
 
-export {};
+export type { RpcHandlerConfig };
+
+export interface NextRouteHandlers {
+  GET: (request: Request) => Promise<Response>;
+  POST: (request: Request) => Promise<Response>;
+}
+
+export const mountHandler = (config: RpcHandlerConfig): NextRouteHandlers => {
+  const handler = createRpcHandler(config);
+  return { GET: handler, POST: handler };
+};

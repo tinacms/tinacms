@@ -1,68 +1,69 @@
 # v4 deprecations
 
-Packages listed here are **not** part of the v4 publish surface defined in
-[`README.md`](./README.md). Each row records the decision, the v4 successor
-(if any), and the migration path for consumers.
+v4 does not release the packages in this file. [`README.md`](./README.md) gives
+the packages that v4 releases. Each row below records the decision, the v4
+replacement if one exists, and the migration path for users.
 
 Status values:
 
-- **deprecate** — keep on npm, mark `deprecated` in package.json, stop
-  feature work, fold capability into a retained v4 package. Source remains
-  in the monorepo until the absorbing package replaces it.
-- **remove** — delete from the monorepo. Already unused at the application
-  surface; v3 consumers will get the final v3 version forever.
-- **fold** — capability moves into a retained v4 package; no public npm
-  successor.
+- **deprecate** — Keep the package on npm. Add the `deprecated` field to
+  `package.json`. Stop the feature work. Move the capability into a v4 package
+  that stays. The source code stays in the monorepo until the new package has
+  the capability.
+- **remove** — Delete the package from the monorepo. The applications do not use
+  it. v3 users keep the last v3 version permanently.
+- **fold** — Move the capability into a v4 package that stays. npm gets no
+  replacement package.
 
 ## Decision table
 
-| Current package (workspace path) | Status | v4 successor / replacement | Migration path |
+| Current package (workspace path) | Status | v4 replacement | Migration path |
 |---|---|---|---|
-| `@tinacms/datalayer` (`packages/@tinacms/datalayer`) | deprecate → fold | Folded into `@tinacms/tinacms` (`src/store/` and the local-content plugin) and the cross-repo Level adapters (`mongodb-level`, `sqlite-level`, `upstash-redis-level`). | Self-hosted apps using `@tinacms/datalayer` directly switch to the matching Level adapter and the local-content plugin in `@tinacms/tinacms`. |
-| `@tinacms/metrics` (`packages/@tinacms/metrics`) | deprecate → fold | Folded into the v4 CLI inside `@tinacms/tinacms` and runtime internals. | No consumer action — package is internal-only today; v4 ships the same telemetry behind the CLI. |
-| `@tinacms/schema-tools` (`packages/@tinacms/schema-tools`) | deprecate → fold | Schema helpers move into `@tinacms/tinacms` (the universal entry's `t` helpers and the codegen module). | Replace `import { ... } from '@tinacms/schema-tools'` with the equivalent re-export from `@tinacms/tinacms`. |
-| `@tinacms/scripts` (`packages/@tinacms/scripts`) | deprecate (keep private) | Retained as a private build tool for the monorepo only. Will be marked `"private": true` and dropped from publish. | None — internal tooling. v4 packages keep using `tinacms-scripts build` until they migrate to `tsup` directly. |
-| `@tinacms/vercel-previews` (`packages/@tinacms/vercel-previews`) | deprecate → fold | Preview wiring folded into `@tinacms/bridge` (the visual-editing/preview story). | Replace usage with `@tinacms/bridge` preview helpers. |
-| `@tinacms/cli` (`packages/@tinacms/cli`) | deprecate | Folded into `@tinacms/tinacms` — the `tinacms` bin moves with it. | Install `@tinacms/tinacms` instead of `@tinacms/cli`; the `tinacms` command is unchanged. |
-| `@tinacms/react-modals` *(not currently in monorepo HEAD)* | remove | None. | Use Headless UI / Radix primitives via `@tinacms/app`'s admin shell. |
-| `@tinacms/react-screens` *(not currently in monorepo HEAD)* | remove | None. | Use the v4 admin shell in `@tinacms/tinacms`. |
-| `@tinacms/sharedctx` *(not currently in monorepo HEAD)* | remove | None. | The v4 Zustand store composer replaces the shared-context pattern. |
-| `@tinacms/toolkit` *(not currently in monorepo HEAD)* | remove | None. | The v4 admin shell (`@tinacms/app` + `@tinacms/tinacms/react`) replaces the toolkit. |
-| `@tinacms/webpack-helpers` (`packages/@tinacms/webpack-helpers`) | remove | None. | v4 ships ESM-only; no webpack-specific helpers are needed for the supported adapters (`next`, `astro`, `express`, `hono`). |
-| `@tinacms/core` *(workspace dir present, no published package)* | remove | None. | Internal core lives in `@tinacms/tinacms/src/core/`. |
-| `@tinacms/ui` *(workspace dir present, no published package)* | remove | None. | Admin UI lives in `@tinacms/app`. |
-| `react-tinacms-editor` *(not in monorepo HEAD)* | remove | None. | Use the v4 rich-text field in `@tinacms/tinacms`. |
-| `tina-cloud-next` *(not in monorepo HEAD)* | remove | None. | TinaCloud integration is provided by `@tinacms/tinacms/adapters/next`. |
-| `tina-graphql` *(not in monorepo HEAD)* | remove | `@tinacms/graphql` | Replace import. |
-| `tina-graphql-gateway` *(not in monorepo HEAD)* | remove | None. | Use `@tinacms/graphql` directly or the TinaCloud API. |
-| `tina-graphql-gateway-cli` *(not in monorepo HEAD)* | remove | None. | Use the `tinacms` CLI in `@tinacms/tinacms`. |
-| `tina-graphql-helpers` *(not in monorepo HEAD)* | remove | None. | Use `@tinacms/graphql` types/helpers. |
-| `tina-graphql-primitives` *(not in monorepo HEAD)* | remove | None. | Use `@tinacms/graphql` primitives. |
+| `@tinacms/datalayer` (`packages/@tinacms/datalayer`) | deprecate, then fold | `@tinacms/tinacms` (`src/store/` and the local-content plugin), and the Level adapters in other repositories: `mongodb-level`, `sqlite-level`, `upstash-redis-level`. | A self-hosted app that uses `@tinacms/datalayer` directly must change to the correct Level adapter and to the local-content plugin in `@tinacms/tinacms`. |
+| `@tinacms/metrics` (`packages/@tinacms/metrics`) | deprecate, then fold | The v4 CLI in `@tinacms/tinacms`, and the runtime internals. | No user action is necessary. The package is internal only. v4 supplies the same telemetry through the CLI. |
+| `@tinacms/schema-tools` (`packages/@tinacms/schema-tools`) | deprecate, then fold | The schema helper functions move into `@tinacms/tinacms`: the `t` helper functions of the universal entry, and the codegen module. | Replace `import { ... } from '@tinacms/schema-tools'` with the equivalent export from `@tinacms/tinacms`. |
+| `@tinacms/scripts` (`packages/@tinacms/scripts`) | deprecate, but keep private | The monorepo keeps it as a private build tool. The team adds `"private": true` and stops the release. | None. This is internal tooling. The v4 packages continue to use `tinacms-scripts build` until they move to `tsup`. |
+| `@tinacms/vercel-previews` (`packages/@tinacms/vercel-previews`) | deprecate, then fold | `@tinacms/bridge` gets the preview code, with the other visual-editing functions. | Use the preview helper functions in `@tinacms/bridge`. |
+| `@tinacms/cli` (`packages/@tinacms/cli`) | deprecate | `@tinacms/tinacms` gets the code, and the `tinacms` bin moves with it. | Install `@tinacms/tinacms` in place of `@tinacms/cli`. The `tinacms` command does not change. |
+| `@tinacms/react-modals` *(not in the monorepo HEAD now)* | remove | None. | Use the Headless UI primitives or the Radix primitives through the admin shell of `@tinacms/app`. |
+| `@tinacms/react-screens` *(not in the monorepo HEAD now)* | remove | None. | Use the v4 admin shell in `@tinacms/tinacms`. |
+| `@tinacms/sharedctx` *(not in the monorepo HEAD now)* | remove | None. | The v4 Zustand store composer replaces the shared-context pattern. |
+| `@tinacms/toolkit` *(not in the monorepo HEAD now)* | remove | None. | The v4 admin shell replaces the toolkit: `@tinacms/app` and `@tinacms/tinacms/react`. |
+| `@tinacms/webpack-helpers` (`packages/@tinacms/webpack-helpers`) | remove | None. | v4 releases ESM only. The supported adapters (`next`, `astro`, `express`, `hono`) do not need webpack helper functions. |
+| `@tinacms/core` *(a workspace directory, but no released package)* | remove | None. | The internal core is in `@tinacms/tinacms/src/core/`. |
+| `@tinacms/ui` *(a workspace directory, but no released package)* | remove | None. | The admin UI is in `@tinacms/app`. |
+| `react-tinacms-editor` *(not in the monorepo HEAD now)* | remove | None. | Use the v4 rich-text field in `@tinacms/tinacms`. |
+| `tina-cloud-next` *(not in the monorepo HEAD now)* | remove | None. | `@tinacms/tinacms/adapters/next` supplies the TinaCloud integration. |
+| `tina-graphql` *(not in the monorepo HEAD now)* | remove | `@tinacms/graphql` | Change the import. |
+| `tina-graphql-gateway` *(not in the monorepo HEAD now)* | remove | None. | Use `@tinacms/graphql` directly, or use the TinaCloud API. |
+| `tina-graphql-gateway-cli` *(not in the monorepo HEAD now)* | remove | None. | Use the `tinacms` CLI in `@tinacms/tinacms`. |
+| `tina-graphql-helpers` *(not in the monorepo HEAD now)* | remove | None. | Use the types and the helper functions in `@tinacms/graphql`. |
+| `tina-graphql-primitives` *(not in the monorepo HEAD now)* | remove | None. | Use the primitives in `@tinacms/graphql`. |
 
-> "Not currently in monorepo HEAD" packages are listed for traceability against
-> the PBI — they were named in the original review. They are already absent
-> from this branch, so the action is to confirm they are not reintroduced.
+> The table also lists the packages that are not in the monorepo HEAD now. The
+> first review named them in the product backlog item, thus this list keeps the
+> record complete. This branch does not contain them. Make sure that no person
+> adds them again.
 
-## Process for the deprecation rollout
+## The deprecation procedure
 
-1. On the v4 branch, mark each in-tree package above with a `deprecated`
-   field in its `package.json` (npm displays this on install) and update its
-   `description` to point at the successor. This file is the source of truth
-   for what the `deprecated` string should say.
-2. When the absorbing v4 package gains the corresponding capability, open
-   the changeset that flips the v3 package to a final patch release whose
-   release notes link here.
-3. Once a successor has shipped one stable release, delete the in-tree
-   source for packages marked **remove**. Leave a tombstone entry in this
-   file so the migration path stays discoverable.
+1. On the v4 branch, add a `deprecated` field to the `package.json` file of each
+   package in the tree above. npm shows this field at installation.
+2. Change the `description` field of each of those packages to point to the
+   replacement. This file specifies the text of the `deprecated` field.
+3. When a v4 package gets the related capability, open the changeset. The
+   changeset releases the final v3 patch version. Its release notes link to this
+   file.
+4. When a replacement has one stable release, delete the source code of each
+   package with the status **remove**. Keep its row in this file, so that the
+   migration path stays available.
 
-## Removed vs frozen — what consumers see
+## The result for users
 
-- `pnpm install` on a v3 project that pins `@tinacms/datalayer@2.x`
-  continues to succeed; npm displays the deprecation message added in step
-  1 above.
-- `pnpm install` on a v4 project that depends on `@tinacms/tinacms` will
-  pull a single tree that no longer references the deprecated packages.
-- A v3 → v4 upgrade is a single `package.json` change (`tinacms` →
-  `@tinacms/tinacms`) plus per-import rewrites driven by the rows above; it
-  is not a coordinated multi-package replace.
+- `pnpm install` continues to operate correctly for a v3 project that pins
+  `@tinacms/datalayer@2.x`. npm shows the deprecation message from step 1.
+- `pnpm install` for a v4 project that depends on `@tinacms/tinacms` gets one
+  tree. That tree does not refer to the deprecated packages.
+- An upgrade from v3 to v4 needs one change in `package.json`: `tinacms` becomes
+  `@tinacms/tinacms`. Then rewrite the imports that the rows above specify. This
+  upgrade is not a replacement of many packages at the same time.

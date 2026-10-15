@@ -1,10 +1,10 @@
-import type { Pattern } from '../../stringify';
-import type { Construct, Tokenizer, State } from 'micromark-util-types';
 import { factorySpace } from 'micromark-factory-space';
 import { markdownLineEnding, markdownSpace } from 'micromark-util-character';
 import { codes } from 'micromark-util-symbol/codes';
-import { values } from 'micromark-util-symbol/values';
 import { types } from 'micromark-util-symbol/types';
+import { values } from 'micromark-util-symbol/values';
+import type { Construct, State, Tokenizer } from 'micromark-util-types';
+import type { Pattern } from '../../stringify';
 import { factoryAttributes } from './factory-attributes';
 import { factoryName } from './factory-name';
 

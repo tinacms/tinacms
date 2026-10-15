@@ -1,7 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import * as React from 'react';
-import { describe, expect, it } from 'vitest';
-import { Button } from './button';
+import { describe, expect, it, vi } from 'vitest';
+import { Button, IconButton } from './button';
+
+const buttonEl = () => screen.getByRole('button') as HTMLButtonElement;
 
 describe('Button', () => {
   it('renders its children when not busy', () => {
@@ -16,5 +18,133 @@ describe('Button', () => {
     // one up.
     expect(screen.queryByText('Save draft')).toBeNull();
     expect(container.querySelector('[style*="loading-dots"]')).toBeTruthy();
+  });
+
+  it('disables the underlying button element', () => {
+    render(<Button disabled>Save draft</Button>);
+    expect(buttonEl().disabled).toBe(true);
+  });
+
+  it('does not activate its handler when disabled', () => {
+    const onClick = vi.fn();
+    render(
+      <Button disabled onClick={onClick}>
+        Save draft
+      </Button>
+    );
+    buttonEl().click();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('does not activate its handler while busy', () => {
+    const onClick = vi.fn();
+    render(
+      <Button busy onClick={onClick}>
+        Save draft
+      </Button>
+    );
+    expect(buttonEl().disabled).toBe(true);
+    buttonEl().click();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('omits disabled when rendered as a tag that does not support it', () => {
+    const { container } = render(
+      <Button as='a' href='https://tina.io' disabled>
+        Read our docs
+      </Button>
+    );
+    expect(container.querySelector('a')?.hasAttribute('disabled')).toBe(false);
+  });
+
+  it('strips href from a disabled link so it cannot be activated', () => {
+    const onClick = vi.fn();
+    const { container } = render(
+      <Button as='a' href='https://tina.io' disabled onClick={onClick}>
+        Read our docs
+      </Button>
+    );
+    const link = container.querySelector('a') as HTMLAnchorElement;
+    // aria-disabled and tabIndex are advisory; a missing href is what actually
+    // stops an anchor being focusable and activatable.
+    expect(link.hasAttribute('href')).toBe(false);
+    expect(link.getAttribute('aria-disabled')).toBe('true');
+    expect(link.tabIndex).toBe(-1);
+    link.click();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('does not activate a busy link', () => {
+    const onClick = vi.fn();
+    const { container } = render(
+      <Button as='a' href='https://tina.io' busy onClick={onClick}>
+        Read our docs
+      </Button>
+    );
+    const link = container.querySelector('a') as HTMLAnchorElement;
+    expect(link.hasAttribute('href')).toBe(false);
+    link.click();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('leaves an enabled link untouched', () => {
+    const onClick = vi.fn();
+    render(
+      <Button as='a' href='https://tina.io' onClick={onClick}>
+        Read our docs
+      </Button>
+    );
+    const link = screen.getByRole('link');
+    expect(link.getAttribute('href')).toBe('https://tina.io');
+    expect(link.hasAttribute('aria-disabled')).toBe(false);
+    expect(link.hasAttribute('tabindex')).toBe(false);
+    link.click();
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('forwards disabled to a component passed via as', () => {
+    const Custom = (props: React.ComponentProps<'button'>) => (
+      <button type='button' {...props} />
+    );
+    render(
+      <Button as={Custom} disabled>
+        Save draft
+      </Button>
+    );
+    expect(buttonEl().disabled).toBe(true);
+  });
+
+  it('stays disabled when both disabled and busy are set', () => {
+    const onClick = vi.fn();
+    render(
+      <Button disabled busy onClick={onClick}>
+        Save draft
+      </Button>
+    );
+    expect(buttonEl().disabled).toBe(true);
+    buttonEl().click();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+});
+
+describe('IconButton', () => {
+  it('disables the underlying button element', () => {
+    render(<IconButton disabled aria-label='Delete' />);
+    expect(buttonEl().disabled).toBe(true);
+  });
+
+  it('does not activate its handler when disabled', () => {
+    const onClick = vi.fn();
+    render(<IconButton disabled aria-label='Delete' onClick={onClick} />);
+    buttonEl().click();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('does not activate its handler while busy', () => {
+    const onClick = vi.fn();
+    render(<IconButton busy aria-label='Delete' onClick={onClick} />);
+    expect(buttonEl().disabled).toBe(true);
+    buttonEl().click();
+    expect(onClick).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,6 @@
-import * as React from 'react';
 import { cn } from '@utils/cn';
-import { MdCheckCircle, MdError, MdInfo, MdWarning } from 'react-icons/md';
+import { CircleAlert, CircleCheck, Info, TriangleAlert } from 'lucide-react';
+import * as React from 'react';
 
 export const Callout = ({
   children,
@@ -23,16 +23,16 @@ export const Callout = ({
 
   const icon = {
     warning: (
-      <MdWarning className='w-5 h-auto inline-block mr-1 opacity-70 text-amber-600' />
+      <TriangleAlert className='w-5 h-auto inline-block mr-1 opacity-70 text-amber-600' />
     ),
     info: (
-      <MdInfo className='w-5 h-auto inline-block mr-1 opacity-70 text-[#1D4ED8]' />
+      <Info className='w-5 h-auto inline-block mr-1 opacity-70 text-[#1D4ED8]' />
     ),
     success: (
-      <MdCheckCircle className='w-5 h-auto inline-block mr-1 opacity-70 text-green-600' />
+      <CircleCheck className='w-5 h-auto inline-block mr-1 opacity-70 text-green-600' />
     ),
     error: (
-      <MdError className='w-5 h-auto inline-block mr-1 opacity-70 text-red-600' />
+      <CircleAlert className='w-5 h-auto inline-block mr-1 opacity-70 text-red-600' />
     ),
   };
 

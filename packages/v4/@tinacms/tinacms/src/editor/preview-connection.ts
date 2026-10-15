@@ -1,5 +1,8 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { type RefObject, useEffect } from 'react';
+import type { DocumentEntry } from '../core/content/contract';
 import { toFieldAddress } from '../core/field/address';
+import { collectReferences, resolveReferences } from '../core/form/references';
 import { invariant } from '../core/invariant';
 import { type FormValues, toDocument, useFormStore } from '../form/form-store';
 import {
@@ -7,56 +10,107 @@ import {
   isReadyMessage,
   valuesMessage,
 } from '../preview/protocol';
-import { useActiveField, useFormId } from './hooks';
+import { CONTENT_STALE_TIME, contentKeys } from './content-queries';
+import {
+  useFormCollection,
+  useFormId,
+  useOptionalContentSlice,
+  useSchemaCollections,
+} from './hooks';
 
 export interface PreviewConnectionOptions {
-  // The preview iframe's origin. Defaults to the editor's own origin;
-  // cross-origin embedding is an explicit opt-in, never '*'.
   targetOrigin?: string;
 }
 
-// The editor half of visual editing (the v4 slice of #6944): stream the hosted
-// form's values into the preview iframe and set preview clicks active. The
-// form-store — not RHF — is the wire source: the scope's `values` object is
-// replaced immutably on every registerForm/setFieldValue and preserved by
-// markSaved/setActive, so a reference compare posts exactly on value changes
-// (registration included, which also covers a ready arriving before the form
-// exists). Values messages are idempotent full-state, so there is no send
-// queue — every ready is answered with the current values (covers an iframe
-// reload), and connecting posts the current scope outright (covers switching
-// to an already-edited form, whose re-registration is a store no-op). Must sit
-// under FormProvider (useFormId's invariant says so otherwise).
 export function usePreviewConnection(
   iframeRef: RefObject<HTMLIFrameElement | null>,
   options?: PreviewConnectionOptions
 ): void {
-  const formId = useFormId();
-  const { setActive } = useActiveField();
   const targetOrigin = options?.targetOrigin ?? window.origin;
-  // Enforced at construction, not by documentation: '*' would stream the
-  // document's values to whatever window embedded the editor.
   invariant(
     targetOrigin !== '*',
     'preview-target-origin-wildcard',
     "targetOrigin must name the preview's origin — never '*'."
   );
 
+  const formId = useFormId();
+  const { fields } = useFormCollection();
+  const collections = useSchemaCollections();
+  const content = useOptionalContentSlice();
+  const queryClient = useQueryClient();
+
   useEffect(() => {
     const target = () => iframeRef.current?.contentWindow ?? null;
-    const postValues = (values: FormValues) =>
-      target()?.postMessage(valuesMessage(toDocument(values)), targetOrigin);
+
+    const cachedDocument = (collection: string, path: string) =>
+      queryClient.getQueryData<DocumentEntry | null>(
+        contentKeys.document(collection, path)
+      )?.document;
+
+    // Posting stays synchronous, so it only ever reads the cache
+    const postValues = (values: FormValues) => {
+      const document = resolveReferences(
+        toDocument(values),
+        fields,
+        collections,
+        ({ collection, path }) => cachedDocument(collection, path)
+      );
+      target()?.postMessage(valuesMessage(document), targetOrigin);
+    };
+
+    const repost = () => {
+      const scope = useFormStore.getState().forms[formId];
+      if (scope) postValues(scope.values);
+    };
+
+    const warmReferences = (values: FormValues) => {
+      if (!content) return;
+      for (const { collection, path } of collectReferences(
+        toDocument(values),
+        fields,
+        collections
+      )) {
+        const key = contentKeys.document(collection, path);
+        // Test the cache entry, not the document. `content.get` resolves null
+        // for a document that is gone, and that null is a cached answer.
+        if (queryClient.getQueryState(key)) continue;
+        queryClient
+          .fetchQuery({
+            queryKey: key,
+            queryFn: () => content.get(collection, path),
+            staleTime: CONTENT_STALE_TIME,
+          })
+          .then(repost)
+          .catch((cause: unknown) => {
+            let reason: string;
+            if (cause instanceof Error) {
+              reason = cause.message;
+            } else {
+              reason = String(cause);
+            }
+            console.warn(
+              `Tina could not read "${path}" from the "${collection}" collection, so the preview keeps its path. ${reason}`
+            );
+          });
+      }
+    };
+
+    const publish = (values: FormValues) => {
+      postValues(values);
+      warmReferences(values);
+    };
 
     const onMessage = (event: MessageEvent) => {
-      // The null check matters: with no iframe mounted, target() === null would
-      // otherwise equal a stray same-origin message's null source.
       const source = target();
       if (!source || event.origin !== targetOrigin || event.source !== source)
         return;
       if (isReadyMessage(event.data)) {
         const scope = useFormStore.getState().forms[formId];
-        if (scope) postValues(scope.values);
+        if (scope) publish(scope.values);
       } else if (isActivateMessage(event.data)) {
-        setActive(toFieldAddress(event.data.address));
+        useFormStore
+          .getState()
+          .setActive(formId, toFieldAddress(event.data.address));
       }
     };
     window.addEventListener('message', onMessage);
@@ -64,16 +118,24 @@ export function usePreviewConnection(
     const unsubscribe = useFormStore.subscribe((state, previous) => {
       const values = state.forms[formId]?.values;
       if (values && values !== previous.forms[formId]?.values) {
-        postValues(values);
+        publish(values);
       }
     });
 
     const scope = useFormStore.getState().forms[formId];
-    if (scope) postValues(scope.values);
+    if (scope) publish(scope.values);
 
     return () => {
       window.removeEventListener('message', onMessage);
       unsubscribe();
     };
-  }, [iframeRef, formId, setActive, targetOrigin]);
+  }, [
+    iframeRef,
+    formId,
+    targetOrigin,
+    fields,
+    collections,
+    content,
+    queryClient,
+  ]);
 }

@@ -287,19 +287,12 @@ describe('Fuzzy Search Integration', () => {
       expect(duration).toBeLessThan(1000);
     });
 
-    it('should use cache for repeated queries', async () => {
-      // First query - cold cache
-      const start1 = Date.now();
-      await client.query('docment', { fuzzy: true, limit: 10 });
-      const duration1 = Date.now() - start1;
+    it('returns identical results for a repeated query', async () => {
+      const first = await client.query('docment', { fuzzy: true, limit: 10 });
+      const second = await client.query('docment', { fuzzy: true, limit: 10 });
 
-      // Second query - warm cache
-      const start2 = Date.now();
-      await client.query('docment', { fuzzy: true, limit: 10 });
-      const duration2 = Date.now() - start2;
-
-      // Second query should be faster or similar (cache helps)
-      expect(duration2).toBeLessThanOrEqual(duration1 * 1.5);
+      expect(second).toEqual(first);
+      expect(second.results.length).toBeGreaterThan(0);
     });
   });
 

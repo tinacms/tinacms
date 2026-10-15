@@ -1,31 +1,31 @@
 import { ccount } from 'ccount';
-import { parseEntities } from 'parse-entities';
-import { stringifyPosition } from 'unist-util-stringify-position';
-import { VFileMessage } from 'vfile-message';
-import { stringifyEntitiesLight } from 'stringify-entities';
-import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow.js';
-import { containerPhrasing } from 'mdast-util-to-markdown/lib/util/container-phrasing.js';
-import { indentLines } from 'mdast-util-to-markdown/lib/util/indent-lines.js';
-import { track } from 'mdast-util-to-markdown/lib/util/track.js';
-import { Pattern } from '../lib/syntax';
 import type {
   Handle as FromMarkdownHandle,
-  Token,
   OnEnterError,
   OnExitError,
+  Token,
 } from 'mdast-util-from-markdown';
 import type {
-  Handle as ToMarkdownHandle,
-  Map as ToMarkdownMap,
-  Options,
-} from 'mdast-util-to-markdown';
-import type {
-  MdxJsxAttributeValueExpression,
   MdxJsxAttribute,
+  MdxJsxAttributeValueExpression,
   MdxJsxExpressionAttribute,
   MdxJsxFlowElement,
   MdxJsxTextElement,
 } from 'mdast-util-mdx-jsx';
+import type {
+  Options,
+  Handle as ToMarkdownHandle,
+  Map as ToMarkdownMap,
+} from 'mdast-util-to-markdown';
+import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow.js';
+import { containerPhrasing } from 'mdast-util-to-markdown/lib/util/container-phrasing.js';
+import { indentLines } from 'mdast-util-to-markdown/lib/util/indent-lines.js';
+import { track } from 'mdast-util-to-markdown/lib/util/track.js';
+import { parseEntities } from 'parse-entities';
+import { stringifyEntitiesLight } from 'stringify-entities';
+import { stringifyPosition } from 'unist-util-stringify-position';
+import { VFileMessage } from 'vfile-message';
+import { Pattern } from '../lib/syntax';
 
 type Tag = {
   name: string | undefined;

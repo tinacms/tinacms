@@ -37,13 +37,7 @@ const makeForm = (id: string) =>
 
 // Renders the GlobalFormPlugin's Component against a real reducer. `seed`
 // lets a test pre-populate state.forms to simulate the form already present.
-function Harness({
-  form,
-  seed,
-}: {
-  form: any;
-  seed?: TinaAction[];
-}) {
+function Harness({ form, seed }: { form: any; seed?: TinaAction[] }) {
   const [state, dispatch] = React.useReducer(tinaReducer, undefined, () => {
     let s = initialState({} as any);
     (seed || []).forEach((action) => {

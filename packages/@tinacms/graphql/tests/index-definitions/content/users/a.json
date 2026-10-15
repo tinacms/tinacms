@@ -1,0 +1,5 @@
+{
+  "username": "first-user",
+  "title": "Zeta",
+  "password": { "value": "ffffffffffffffff", "passwordChangeRequired": false }
+}

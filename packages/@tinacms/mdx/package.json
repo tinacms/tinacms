@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/mdx",
-	"version": "2.1.11",
+	"version": "2.3.0",
 	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -34,9 +34,9 @@
 	"scripts": {
 		"types": "tsc",
 		"build": "tinacms-scripts build",
-		"docs": "typedoc --plugin typedoc-plugin-markdown src/parse/plate.ts --theme markdown && concat-md --decrease-title-levels --dir-name-as-title docs > spec.md",
 		"serve": "nodemon dist/server.js",
 		"test": "vitest run",
+		"snapshot:print-object-literal": "node --experimental-strip-types scripts/generate-print-object-literal-snapshot.mjs",
 		"coverage": "vitest run --coverage",
 		"test-watch": "vitest"
 	},
@@ -44,7 +44,9 @@
 		"@tinacms/schema-tools": "workspace:^",
 		"acorn": "catalog:",
 		"ccount": "catalog:",
+		"emoji-regex": "9.2.2",
 		"estree-util-is-identifier-name": "catalog:",
+		"esutils": "2.0.3",
 		"mdast-util-compact": "catalog:",
 		"mdast-util-directive": "catalog:",
 		"mdast-util-from-markdown": "catalog:",
@@ -59,16 +61,13 @@
 		"micromark-util-symbol": "catalog:",
 		"micromark-util-types": "catalog:",
 		"parse-entities": "catalog:",
-		"prettier": "catalog:",
 		"remark": "catalog:",
 		"remark-gfm": "catalog:",
 		"remark-mdx": "catalog:",
 		"stringify-entities": "catalog:",
-		"typedoc": "catalog:",
 		"unist-util-source": "catalog:",
 		"unist-util-stringify-position": "catalog:",
 		"unist-util-visit": "catalog:",
-		"uvu": "catalog:",
 		"vfile-message": "catalog:"
 	},
 	"publishConfig": {
@@ -76,20 +75,18 @@
 	},
 	"repository": {
 		"url": "https://github.com/tinacms/tinacms.git",
-		"directory": "packages/tina-graphql"
+		"directory": "packages/@tinacms/mdx"
 	},
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",
 		"@types/estree": "1.0.0",
+		"@types/esutils": "^2.0.2",
 		"@types/mdast": "catalog:",
 		"@types/node": "^22.13.1",
-		"@types/prettier": "catalog:",
 		"@types/unist": "catalog:",
 		"c8": "catalog:",
-		"concat-md": "catalog:",
 		"jest-file-snapshot": "^0.5.0",
 		"ts-node": "catalog:",
-		"typedoc-plugin-markdown": "catalog:",
 		"typescript": "^5.7.3",
 		"vite": "^4.5.9",
 		"vitest": "^0.32.4"

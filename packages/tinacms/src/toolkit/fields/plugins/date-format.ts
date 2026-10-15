@@ -12,6 +12,11 @@ export interface DateFieldProps {
 export const DEFAULT_DATE_DISPLAY_FORMAT = 'MMM DD, YYYY';
 export const DEFAULT_TIME_DISPLAY_FORMAT = 'h:mm A';
 
+export const getHourCycle = (timeFormat?: string): 12 | 24 => {
+  const tokens = (timeFormat ?? '').replace(/\[[^\]]*\]/g, '');
+  return /[Hk]/.test(tokens) ? 24 : 12;
+};
+
 // formats a function from default datetime format to given format
 export const format = (
   val: string,

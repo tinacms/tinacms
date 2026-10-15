@@ -2,15 +2,16 @@ import path from 'path';
 import { Database, FilesystemBridge, buildSchema } from '@tinacms/graphql';
 import { Telemetry } from '@tinacms/metrics';
 import { LocalSearchIndexClient, SearchIndexer } from '@tinacms/search';
-import AsyncLock from 'async-lock';
 import chokidar from 'chokidar';
 import { Command, Option } from 'clipanion';
 import fs from 'fs-extra';
+import { AsyncLock } from 'tinacms/dist/client';
 import { logger, summary } from '../../../logger';
 import { isHostExposed } from '../../../utils/host';
 import { spin } from '../../../utils/spinner';
 import { dangerText, warnText } from '../../../utils/theme';
 import { Codegen } from '../../codegen';
+import { writeTinaLockFile } from '../../codegen/writeTinaLockFile';
 import { ConfigManager } from '../../config-manager';
 import { createAndInitializeDatabase, createDBServer } from '../../database';
 import { getBasePath } from '../../vite';
@@ -118,28 +119,7 @@ export class DevCommand extends BaseCommand {
         });
         const apiURL = await codegen.execute();
 
-        if (!configManager.isUsingLegacyFolder) {
-          const schemaObject = await fs.readJSON(
-            configManager.generatedSchemaJSONPath
-          );
-          const lookupObject = await fs.readJSON(
-            configManager.generatedLookupJSONPath
-          );
-          const graphqlSchemaObject = await fs.readJSON(
-            configManager.generatedGraphQLJSONPath
-          );
-
-          const tinaLockFilename = 'tina-lock.json';
-          const tinaLockContent = JSON.stringify({
-            schema: schemaObject,
-            lookup: lookupObject,
-            graphql: graphqlSchemaObject,
-          });
-          fs.writeFileSync(
-            path.join(configManager.tinaFolderPath, tinaLockFilename),
-            tinaLockContent
-          );
-        }
+        await writeTinaLockFile(configManager);
 
         await this.indexContentWithSpinner({
           database,
