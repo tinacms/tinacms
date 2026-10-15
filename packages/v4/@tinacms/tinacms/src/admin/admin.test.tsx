@@ -9,7 +9,7 @@ import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
 import { useFormId } from '../editor/hooks';
 import { draftKey, readDraft } from '../form/drafts';
-import { useFormStore } from '../form/form-store';
+import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
@@ -672,9 +672,10 @@ describe('TinaAdmin form continuity', () => {
 });
 
 describe('TinaAdmin stale drafts', () => {
+  const helloFormId = toFormId('content/posts/hello.mdx');
   const storeStaleDraft = () =>
     localStorage.setItem(
-      draftKey('content/posts/hello.mdx'),
+      draftKey(helloFormId),
       JSON.stringify({
         version: 2,
         values: { title: 'Mine' },
@@ -716,6 +717,6 @@ describe('TinaAdmin stale drafts', () => {
     );
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByLabelText('Title')).toHaveValue('Hello');
-    expect(readDraft('content/posts/hello.mdx')).toBeUndefined();
+    expect(readDraft(helloFormId)).toBeUndefined();
   });
 });
