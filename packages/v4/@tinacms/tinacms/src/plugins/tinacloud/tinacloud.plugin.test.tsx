@@ -78,6 +78,32 @@ describe('tinaCloud()', () => {
     expect(plugin.server).toBeUndefined();
   });
 
+  it('links the sidebar to the project in the TinaCloud dashboard', async () => {
+    const segment = (await tinaCloud({ clientId: 'abc' }).client?.())?.default;
+    expect(
+      segment?.slots?.globalNav?.map(({ label, target }) => ({ label, target }))
+    ).toEqual([
+      {
+        label: 'Project Config',
+        target: {
+          kind: 'url',
+          href: 'https://app.tina.io/projects/abc/overview',
+        },
+      },
+      {
+        label: 'User Management',
+        target: {
+          kind: 'url',
+          href: 'https://app.tina.io/projects/abc/collaborators',
+        },
+      },
+      {
+        label: 'Support',
+        target: { kind: 'url', href: 'https://tina.io/docs/r/support' },
+      },
+    ]);
+  });
+
   it('gives the site no token once signed in', async () => {
     stubTinaCloud();
     const { store } = await bootSignedIn();
