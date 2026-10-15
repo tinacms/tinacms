@@ -10,7 +10,6 @@ import {
 } from '@udecode/plate-code-block';
 import { PlateElement } from '@udecode/plate/react';
 import { BracesIcon } from 'lucide-react';
-import mermaid from 'mermaid';
 
 import {
   CodeLineElement,
@@ -20,6 +19,8 @@ import { Button } from '../button';
 import { CodeBlockCombobox } from '../code-block-combobox';
 import { MermaidElementWithRef } from '../mermaid-element';
 import { ErrorMessage } from './error-message';
+
+const PARSE_FAILED = 'An error occurred while parsing the diagram.';
 
 export function codeLineToString(content: PlateCodeBlockElement): string {
   return (content.children || [])
@@ -50,6 +51,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
 
       const validateMermaid = async () => {
         try {
+          const { default: mermaid } = await import('mermaid');
           await mermaid.parse(
             codeLineToString(element as PlateCodeBlockElement)
           );
@@ -57,12 +59,14 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
           if (!isCancelled) {
             setCodeBlockError(null);
           }
-        } catch (err) {
-          if (!isCancelled) {
-            setCodeBlockError(
-              String(err.message) ||
-                'An error occurred while parsing the diagram.'
-            );
+        } catch (cause) {
+          if (isCancelled) {
+            return;
+          }
+          if (cause instanceof Error) {
+            setCodeBlockError(cause.message || PARSE_FAILED);
+          } else {
+            setCodeBlockError(PARSE_FAILED);
           }
         }
       };

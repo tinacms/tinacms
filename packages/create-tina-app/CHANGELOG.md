@@ -1,5 +1,35 @@
 # create-tina-app
 
+## 2.2.3
+
+### Patch Changes
+
+- [#7641](https://github.com/tinacms/tinacms/pull/7641) [`02a5a52`](https://github.com/tinacms/tinacms/commit/02a5a52939dae7508b619e6d035e466d37d97458) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Scaffolded projects now keep only the lock file for the chosen package manager. Lock files the starter ships for other package managers are deleted before install, so they no longer end up in the project's first commit.
+
+## 2.2.2
+
+### Patch Changes
+
+- [#7623](https://github.com/tinacms/tinacms/pull/7623) [`cb46575`](https://github.com/tinacms/tinacms/commit/cb46575822fa035f551943199593aaa7c35d58f0) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Tidy the `create-tina-app` startup output. The version line now reads `NPM Package: create-tina-app vX.Y.Z`, the telemetry notice is three sentences (usage is anonymous, no personal or project code is collected, `--noTelemetry` opts out), and each starter feature is listed as `✅ Visual Editing` instead of `• Visual Editing: ✅`.
+
+## 2.2.1
+
+### Patch Changes
+
+- [#7438](https://github.com/tinacms/tinacms/pull/7438) [`fc8ddd4`](https://github.com/tinacms/tinacms/commit/fc8ddd4e90558408fc649f0dd3ddbcdbdb7ed028) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump `tar` to 7.5.22
+
+## 2.2.0
+
+### Minor Changes
+
+- [#6961](https://github.com/tinacms/tinacms/pull/6961) [`e201abe`](https://github.com/tinacms/tinacms/commit/e201abee5e8ef040ed1335dadb75050b73430898) Thanks [@kulesy](https://github.com/kulesy)! - Make Astro the default starter. The interactive `What starter code would you like to use?` prompt now pre-selects `Astro Starter` (moved to the top of the list). When `create-tina-app` runs without a TTY and without a `--template` flag, the Astro starter is now selected automatically instead of the prompt receiving empty input and exiting as `user cancelled`.
+
+  Note that a fully non-interactive run still needs `--pkg-manager` and a project name. Those two prompts have no non-TTY fallback yet, so a bare `create-tina-app` in CI still stops at the package manager question.
+
+### Patch Changes
+
+- [#7320](https://github.com/tinacms/tinacms/pull/7320) [`b8c3c13`](https://github.com/tinacms/tinacms/commit/b8c3c13e9fb64d9fe539f265ba517429e37cbe42) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump `tar` to 7.5.21
+
 ## 2.1.11
 
 ### Patch Changes
@@ -236,7 +266,6 @@
 ### Patch Changes
 
 - [#4820](https://github.com/tinacms/tinacms/pull/4820) [`1f9bad5`](https://github.com/tinacms/tinacms/commit/1f9bad55f97d0256e1ddc493587add6b97ca4eff) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - - Created `Logger` class. Moved all pre-defined styles into `Logger`.
-
   - Moved global variables such as `program` to local space.
   - Updated `preRunChecks` to warn the user if they're using a non-supported version of Node.
   - Replaced `throw new Error('...')` with `exit(1)` to clean up CLI error outputs.
@@ -265,7 +294,6 @@
 ### Minor Changes
 
 - 324950a: Updates Plate Editor to latest version 36.
-
   - Upgrades all remaining packages `Typescript` to version `^5`
   - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
   - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file

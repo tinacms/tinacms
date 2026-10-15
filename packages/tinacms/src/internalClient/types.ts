@@ -56,3 +56,13 @@ export interface TinaMedia {
   publicFolder: string;
   mediaRoot: string;
 }
+
+/**
+ * The TinaCloud user from `GET /v2/apps/{clientId}/currentUser`.
+ * `gitAuthoring` is absent on older TinaCloud deployments.
+ */
+export interface AuthenticatedUser {
+  fullName?: string;
+  email?: string;
+  gitAuthoring?: { mode: 'bot' | 'user' };
+}

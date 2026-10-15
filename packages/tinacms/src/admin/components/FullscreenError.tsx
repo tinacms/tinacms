@@ -1,6 +1,6 @@
-import React from 'react';
 import { Button } from '@tinacms/toolkit';
-import { BiError, BiSync } from 'react-icons/bi';
+import { CircleAlert, RefreshCw } from 'lucide-react';
+import React from 'react';
 
 export const FullscreenError = ({
   title = 'Error',
@@ -9,12 +9,12 @@ export const FullscreenError = ({
   return (
     <div className='flex flex-col justify-center items-center h-screen bg-gray-100'>
       <div className='text-red-500 text-4xl mb-6 flex items-center'>
-        <BiError className='w-12 h-auto fill-current text-red-400 opacity-70 mr-1' />{' '}
+        <CircleAlert className='w-12 h-auto text-red-400 opacity-70 mr-1' />{' '}
         {title}
       </div>
       <p className='text-gray-700 text-xl mb-8'>{errorMessage}</p>
       <Button variant='danger' onClick={() => window.location.reload()}>
-        <BiSync className='w-7 h-auto fill-current opacity-70 mr-1' /> Reload
+        <RefreshCw className='w-7 h-auto opacity-70 mr-1' /> Reload
       </Button>
     </div>
   );

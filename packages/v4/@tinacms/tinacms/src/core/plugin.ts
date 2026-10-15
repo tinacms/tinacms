@@ -1,21 +1,32 @@
 import type { StoreApi } from 'zustand';
-import type { FieldDescriptor } from './field/contract';
+import type { FieldDescriptor, ValidatorFactory } from './field/contract';
+import type { FormHookFactory } from './form/hooks';
 import { invariant } from './invariant';
+import type { MediaManifest } from './media/contract';
+import type { AdminScreen } from './screen/contract';
+import type { SlotContributions } from './slot/contract';
 
-export type Capability = 'field' | 'content' | 'auth' | 'media' | 'search';
+export type Capability =
+  | 'field'
+  | 'validator'
+  | 'hooks'
+  | 'content'
+  | 'auth'
+  | 'media'
+  | 'search'
+  | 'screen';
 
-// The one keyed capability (many field types, one registry). Named so runtime checks
-// reference the constant, not a repeated literal.
 export const FIELD_CAPABILITY = 'field' as const satisfies Capability;
 
-// Capabilities whose provider owns a single client store namespace — its slice mounts at the
-// capability key (store-architecture.md), not the plugin name. The one place this
-// categorisation lives, so the store composer reads it here instead of re-listing. `content`
-// is included though it has no client slice yet; `field` is absent (keyed, and Form state is
-// core, ADR-010).
-//
-// TODO(v4): fold into a richer per-capability descriptor (kind: 'singleton-slice' | 'keyed' |
-// 'backend') and derive this list from that once more capabilities land.
+export const VALIDATOR_CAPABILITY = 'validator' as const satisfies Capability;
+
+export const HOOKS_CAPABILITY = 'hooks' as const satisfies Capability;
+
+export const AUTH_CAPABILITY = 'auth' as const satisfies Capability;
+
+export const SCREEN_CAPABILITY = 'screen' as const satisfies Capability;
+
+// TODO(v4): derive this list from per-capability descriptors.
 export const SINGLETON_SLICE_CAPABILITIES = [
   'auth',
   'content',
@@ -26,45 +37,33 @@ export const SINGLETON_SLICE_CAPABILITIES = [
 export type SingletonSliceCapability =
   (typeof SINGLETON_SLICE_CAPABILITIES)[number];
 
-// The one guard over that list; takes a raw string so namespace checks use it too.
 export const isSingletonSliceCapability = (
   value: string
 ): value is SingletonSliceCapability =>
   (SINGLETON_SLICE_CAPABILITIES as readonly string[]).includes(value);
 
-// A plugin's declaration that its segment replaces a built-in. `field` is keyed, so its
-// override names the field type; singletons have exactly one slot, so the union forbids
-// a dead `key` on them.
+export interface FieldProvision {
+  type: string;
+  contractVersion: number;
+}
+
 export type CapabilityOverride =
   | { capability: typeof FIELD_CAPABILITY; key: string }
+  | { capability: typeof VALIDATOR_CAPABILITY; key: string }
+  | { capability: typeof HOOKS_CAPABILITY; key: string }
+  | { capability: typeof SCREEN_CAPABILITY; key: string }
   | { capability: SingletonSliceCapability };
 
-// The whole boot-composed client store: a flat bag of namespaces, each holding one
-// slice's state, open-shaped because plugins register arbitrary namespaces at boot.
-// Core and plugin slices both mount here; a slice reads peers from it. Single
-// definition — store/slice.ts re-exports it.
 export type TinaStoreState = Record<string, SliceState>;
 
-// One slice's own state: the object a slice returns and mounts at its namespace — its
-// data fields plus its action functions, e.g. `{ items: [], add: (item) => … }`. Keys
-// and value shapes are the slice author's to define, hence `Record<string, unknown>`.
 export type SliceState = Record<string, unknown>;
 
-// The `set` a slice is handed, scoped to its own namespace. It takes either the next
-// partial state or an updater computing it from the slice's current state (Zustand's two
-// `set` forms), plus an optional devtools action label. Writes land under the slice's
-// namespace only — never the whole store.
 export type SliceSet = (
   partial: Partial<SliceState> | ((current: SliceState) => Partial<SliceState>),
   replace?: boolean,
   action?: string
 ) => void;
 
-// A client segment's store slice (store-architecture.md): given its namespace-scoped `set`
-// and the whole-store `get`, it returns the state + actions the runtime mounts at the
-// plugin's namespace. `get` reads peers by namespace (`get().auth.user`). It's deliberately
-// middleware-agnostic — slices never see the host's devtools/persist. Field plugins
-// contribute none: Form state is core (ADR-010).
 export type ClientSlice = (
   set: SliceSet,
   get: StoreApi<TinaStoreState>['getState']
@@ -72,24 +71,62 @@ export type ClientSlice = (
 
 export interface ClientSegment {
   field?: FieldDescriptor;
+  /**
+   * One `ValidatorFactory` for each name the manifest declares in
+   * `validators`. A name the manifest does not declare, or a declared name
+   * with no factory here, throws at boot.
+   */
+  validators?: Record<string, ValidatorFactory>;
+  /**
+   * One `FormHookFactory` for each name the manifest declares in `hooks`.
+   * Same rules as `validators`.
+   */
+  hooks?: Record<string, FormHookFactory>;
   slice?: ClientSlice;
+  /**
+   * One slice for each singleton capability the manifest provides, for a
+   * plugin that provides more than one. Each mounts at its capability key.
+   * Set `slice` or `slices`, never both.
+   */
+  slices?: Partial<Record<SingletonSliceCapability, ClientSlice>>;
+  screens?: AdminScreen[];
+  slots?: SlotContributions;
 }
 
-// A manifest paired with its loaded client segment — the boot-resolved unit both
-// registries (field types, store slices) compose from.
+export type ServerOp = (input: never) => Promise<unknown>;
+
+export type ServerSegment = Record<string, ServerOp>;
+
+export interface ResolvedServerSegment {
+  manifest: PluginManifest;
+  ops: ServerSegment;
+}
+
 export interface ResolvedSegment {
   manifest: PluginManifest;
   segment: ClientSegment;
 }
 
-// Load every plugin's client segment once. The one boot-time resolution pass — its
-// result feeds both createFieldRegistry and createTinaStore so the two compose from
-// the same segments and can't diverge.
 export const resolveClientSegments = async (
   plugins: PluginManifest[]
 ): Promise<ResolvedSegment[]> => {
   const resolved: ResolvedSegment[] = [];
   for (const manifest of plugins) {
+    invariant(
+      !(manifest.field && !manifest.client),
+      'field-plugin-no-client',
+      `Plugin "${manifest.name}" declares the field type "${manifest.field?.type}" but has no client segment to render it.`
+    );
+    invariant(
+      !(manifest.validators?.length && !manifest.client),
+      'validator-plugin-no-client',
+      `Plugin "${manifest.name}" declares validators but has no client segment to hold their factories.`
+    );
+    invariant(
+      !(manifest.hooks?.length && !manifest.client),
+      'hooks-plugin-no-client',
+      `Plugin "${manifest.name}" declares hooks but has no client segment to hold their factories.`
+    );
     if (!manifest.client) continue;
     const clientModule = await manifest.client();
     invariant(
@@ -102,19 +139,47 @@ export const resolveClientSegments = async (
   return resolved;
 };
 
-export interface PluginManifest {
+export interface PluginManifestInput {
   name: string;
-  // Honored today: `name`, `client`, `provides` (slice mount key), and `overrides`.
-  // The rest are the declared plugin contract (ADR-002/006/007/008), not yet wired —
-  // noops for now.
   provides?: Capability[];
   dependsOn?: Capability[];
+  field?: FieldProvision;
+  /**
+   * The validator names this plugin registers, as plain strings. They live on
+   * the manifest so `compileSchema` can check a collection's `validators`
+   * without loading client code; the factories themselves live on the client
+   * segment, under the same names.
+   *
+   * A name is the registry key, so it is global: two plugins registering
+   * `after` conflict at boot. Give a third-party name a prefix
+   * (`acme.after`); a name v4 supplies stays bare (`required`).
+   */
+  validators?: string[];
+  /** The form hook names this plugin registers. Same rules as `validators`. */
+  hooks?: string[];
+  /** Set by a plugin that provides `media`. */
+  media?: MediaManifest;
   client?: () => Promise<{ default: ClientSegment }>;
-  server?: () => Promise<unknown>;
+  server?: () => Promise<{ default: ServerSegment }>;
+  // TODO(ADR-008 §3): type `permissions` against codegen's Permission union once it lands.
   permissions?: { name: string; description?: string }[];
   requires?: { permission: string };
   overrides?: CapabilityOverride[];
+  onInit?: () => void | Promise<void>;
+  onDestroy?: () => void | Promise<void>;
 }
 
-export const definePlugin = (manifest: PluginManifest): PluginManifest =>
-  manifest;
+export interface PluginManifest extends PluginManifestInput {
+  provides: Capability[];
+  dependsOn: Capability[];
+  overrides: CapabilityOverride[];
+}
+
+export const definePlugin = (
+  manifest: PluginManifestInput
+): PluginManifest => ({
+  ...manifest,
+  provides: manifest.provides ?? [],
+  dependsOn: manifest.dependsOn ?? [],
+  overrides: manifest.overrides ?? [],
+});

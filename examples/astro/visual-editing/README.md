@@ -6,7 +6,7 @@ The Astro version of the TinaCMS kitchen-sink — same six collections, same sha
 
 ## Prerequisites
 
-- Node.js 18+ (or Bun — see [Hosting](#hosting))
+- Node.js 22+ (or Bun — see [Hosting](#hosting))
 - pnpm
 
 ## Development

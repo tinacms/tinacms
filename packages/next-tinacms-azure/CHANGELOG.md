@@ -1,5 +1,45 @@
 # next-tinacms-azure
 
+## 15.1.1
+
+### Patch Changes
+
+- [`5db1597`](https://github.com/tinacms/tinacms/commit/5db1597953eb4dd24c23c7b5e441702b749d46ac) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Validate media upload file types on the server and reject active document types (e.g. `.html`, `.js`, `.xml`) instead of relying on the client-side accept filter alone.
+
+- Updated dependencies [[`d281cdf`](https://github.com/tinacms/tinacms/commit/d281cdf3a1dc1d5ef42d2bfd15c29224acc9d201)]:
+  - tinacms@3.14.3
+
+## 15.1.0
+
+### Minor Changes
+
+- [#7316](https://github.com/tinacms/tinacms/pull/7316) [`6cd24ce`](https://github.com/tinacms/tinacms/commit/6cd24cea33eda2ebe44d9d3a56eeb2f42c8802e6) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Stop bundling Next.js into the published package.
+
+  `handlers.ts`, `delivery-handlers.ts` and `auth.ts` import values from `next/server` and `next/headers`, not just types. The build marks a package's `dependencies` and `peerDependencies` as external, and `next` sat in `devDependencies`, so esbuild inlined Next.js and part of React into three of the four entry points. `dist/handlers.js` was 288 KB, `dist/delivery-handlers.js` 287 KB and `dist/auth.js` 228 KB.
+
+  A consumer therefore loaded a second copy of the Next.js runtime alongside the one their app already had, which is a hazard around server-component and request-context boundaries as well as a size problem.
+
+  Declaring `next` as a peer dependency puts it back on the external list. `dist/` drops from 868 KB to 44 KB, and the three entry points now emit plain `import … from "next/server"` and `import … from "next/headers"`.
+
+  Every consumer of this package already has Next.js installed, so the peer requirement reflects what the code has always needed at runtime.
+
+### Patch Changes
+
+- Updated dependencies [[`ff3088e`](https://github.com/tinacms/tinacms/commit/ff3088e9aae28dea93bd8b9c8cad8f8a33d3a78d), [`288244e`](https://github.com/tinacms/tinacms/commit/288244efb544f4ad0712002c8609a5dc6f1d83db), [`b5ad014`](https://github.com/tinacms/tinacms/commit/b5ad014f1ec6c3009b8396315608f1a82efd31c1)]:
+  - tinacms@3.14.1
+
+## 15.0.4
+
+### Patch Changes
+
+- [#7484](https://github.com/tinacms/tinacms/pull/7484) [`7dd8ed0`](https://github.com/tinacms/tinacms/commit/7dd8ed07f05796e64496cdadc21571dbc580f362) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the unused `@types/crypto-js` devDependency
+
+  `crypto-js` itself was removed from `tinacms` and `@tinacms/cli`, and no source file in these packages imports it, so the type package had nothing left to type.
+
+- Updated dependencies [[`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`d7cdea7`](https://github.com/tinacms/tinacms/commit/d7cdea75219702574fa78b6adcc90c368e4e71eb), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`4d08c25`](https://github.com/tinacms/tinacms/commit/4d08c2546f96fa7b8fbef48b19e19c45e24b44d5), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af)]:
+  - tinacms@3.12.1
+  - @tinacms/auth@1.1.4
+
 ## 15.0.3
 
 ### Patch Changes
@@ -277,7 +317,6 @@
 ### Patch Changes
 
 - [#6262](https://github.com/tinacms/tinacms/pull/6262) [`3a12a39`](https://github.com/tinacms/tinacms/commit/3a12a392d5a8eb9bba5a5be65d080f24afa08de3) Thanks [@0xharkirat](https://github.com/0xharkirat)! - 🔒 Security: Update Next.js to 14.2.35 to address security vulnerabilities
-
   - Address CVE-2025-55184 (high): DoS via malicious HTTP request causing server to hang
   - Address CVE-2025-67779 (high): Complete fix for CVE-2025-55184 DoS vulnerability
   - Updated Next.js devDependency from 14.2.10/14.2.24 to 14.2.35

@@ -164,11 +164,7 @@ const InnerField = ({
   );
 };
 
-export const FieldsGroup = ({
-  children,
-}: {
-  children?: any | any[];
-}) => {
+export const FieldsGroup = ({ children }: { children?: any | any[] }) => {
   return (
     <div
       className={`relative flex flex-wrap w-full h-full whitespace-nowrap overflow-x-visible`}

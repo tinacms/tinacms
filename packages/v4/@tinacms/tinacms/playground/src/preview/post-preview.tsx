@@ -1,10 +1,10 @@
-import { tinaField, useTina } from '@tinacms/tinacms/adapters/react';
+import {
+  TinaMarkdown,
+  tinaField,
+  useTina,
+} from '@tinacms/tinacms/adapters/react';
 import { sampleDocument } from '../content';
 
-// The site side of visual editing, as a real site would write it: useTina
-// seeds from the statically-rendered document (the whole story when
-// /preview.html is opened directly) and adopts the editor's streamed values
-// when embedded; tinaField marks the clickable elements.
 export function PostPreview() {
   const { data: post, isEditing } = useTina({ data: sampleDocument });
 
@@ -30,6 +30,9 @@ export function PostPreview() {
           ? 'This preview renders the document streamed from the editor. Click the title or the badge to focus its field in the sidebar.'
           : 'Standalone preview — rendering the static document.'}
       </p>
+      <div {...tinaField('body')}>
+        <TinaMarkdown content={post.body} />
+      </div>
     </article>
   );
 }

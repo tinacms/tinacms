@@ -8,8 +8,10 @@
     "baseUrl": ".",
     "paths": {
       "@tinacms/tinacms/react": ["../src/editor/index.ts"],
-      "@tinacms/tinacms/preview": ["../src/preview/index.ts"],
-      "@tinacms/tinacms": ["../src/index.ts"]
+      "@tinacms/tinacms/admin": ["../src/admin/index.ts"],
+      "@tinacms/tinacms/adapters/react": ["../src/adapters/react/index.ts"],
+      "@tinacms/tinacms": ["../src/index.ts"],
+      "@tinacms/graphql": ["../src/plugins/content/local/graphql/tinacms-graphql.d.ts"]
     }
   },
   "include": ["src", "vite.config.ts"]

@@ -1,8 +1,8 @@
-import { jsxText } from './jsx-text';
-import { jsxFlow } from './jsx-flow';
-import { findCode } from './util';
-import type { Construct, Extension } from 'micromark-util-types';
 import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression';
+import type { Construct, Extension } from 'micromark-util-types';
+import { jsxFlow } from './jsx-flow';
+import { jsxText } from './jsx-text';
+import { findCode } from './util';
 
 export type Pattern = {
   start: string;

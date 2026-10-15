@@ -10,7 +10,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import { promisify } from 'util';
 import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
+import { escapeSearchValue } from './search-expression';
 import { safeUploadName } from './upload-filename';
+import { isDisallowedUploadType } from './upload-type';
 
 export interface CloudinaryConfig {
   cloud_name: string;
@@ -81,6 +83,10 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
   // @ts-ignore - multer augments the request with `file`
   const filename: string = req.file.originalname;
 
+  if (isDisallowedUploadType(filename)) {
+    return res.status(415).json({ message: 'Unsupported file type' });
+  }
+
   let folder: string;
   try {
     // Cloudinary has no mediaRoot concept yet; an empty folder (root upload)
@@ -119,8 +125,15 @@ async function listMedia(
   opts?: CloudinaryOptions
 ) {
   try {
+    // A repeated query param (?directory=a&directory=b) arrives as an array,
+    // so narrow it before it reaches the string-typed escaper below.
+    const rawDirectory = req.query.directory;
+    const directory = Array.isArray(rawDirectory)
+      ? rawDirectory[0]
+      : rawDirectory;
+
     const mediaListOptions: MediaListOptions = {
-      directory: (req.query.directory as string) || '""',
+      directory: directory || '""',
       limit: parseInt(req.query.limit as string, 10) || 500,
       offset: req.query.offset as string,
       filesOnly: req.query.filesOnly === 'true' || false,
@@ -133,12 +146,9 @@ async function listMedia(
 
     if (!useRootDirectory) {
       try {
-        // Validation only: reject upward traversal in the listing directory for
-        // consistency with the other adapters. The normalised result is
-        // intentionally discarded; the raw directory is still interpolated into
-        // the search expression below, so this does NOT bound the listing the
-        // way resolveDirectory bounds the S3/DOS prefix. Search-expression
-        // escaping (SEC-5) is a separate follow-up.
+        // Validation only: rejects traversal but does NOT bound the listing
+        // the way resolveDirectory bounds the S3/DOS prefix. The normalised
+        // result is discarded; its trailing slash matches no folder= term.
         resolveDirectory(mediaListOptions.directory);
       } catch (e) {
         if (e instanceof MediaKeyError) {
@@ -151,7 +161,7 @@ async function listMedia(
 
     const query = useRootDirectory
       ? 'folder=""'
-      : `folder="${mediaListOptions.directory}"`;
+      : `folder="${escapeSearchValue(mediaListOptions.directory)}"`;
 
     const response = await cloudinary.search
       .expression(query)
