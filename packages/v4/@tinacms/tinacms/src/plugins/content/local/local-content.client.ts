@@ -1,4 +1,4 @@
-import { authHeadersOf } from '../../../core/auth/slice';
+import { siteAuthHeadersOf } from '../../../core/auth/slice';
 import type {
   ContentProvider,
   DocumentEntry,
@@ -16,7 +16,7 @@ const postContentRequest = async <Result>(
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      ...(await authHeadersOf(state)),
+      ...(await siteAuthHeadersOf(state)),
     },
     body: JSON.stringify(request),
   });

@@ -137,12 +137,13 @@ export const pageCollection = {
 const tinaCloudClientId: string | undefined = import.meta.env
   .TINA_PUBLIC_CLIENT_ID;
 
+const isLocal = !tinaCloudClientId;
+
 export default defineConfig({
   plugins: [
-    localContentPlugin(),
-    tinaCloudClientId
-      ? tinaCloud({ clientId: tinaCloudClientId })
-      : localMediaPlugin(),
+    ...(isLocal
+      ? [localContentPlugin(), localMediaPlugin()]
+      : [tinaCloud({ clientId: tinaCloudClientId })]),
     mediaManagerPlugin(),
     ratingFieldPlugin,
     validatorsPlugin,

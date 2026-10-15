@@ -133,17 +133,31 @@ through a symbolic link. It rejects a file name that holds a path separator.
 
 ## `tinaCloud()`
 
-`tinaCloud()` keeps media in TinaCloud. It provides `media` and `auth`, with
-one slice in `slices.media` and one in `slices.auth`. Refer to
-[auth-plugins.md](./auth-plugins.md#tinacloud) for the sign-in flow.
+`tinaCloud()` keeps media and content in TinaCloud. It provides `media`,
+`auth` and `content`, with one slice each in `slices.media`, `slices.auth` and
+`slices.content`. Refer to [auth-plugins.md](./auth-plugins.md#tinacloud) for
+the sign-in flow.
+
+`tinaCloud()` provides `content`, so it cannot sit next to
+`localContentPlugin()`. Swap all of it for the local plugins in local
+development:
 
 ```ts
-import { defineConfig, localContentPlugin, tinaCloud } from '@tinacms/tinacms';
+import {
+  defineConfig,
+  localContentPlugin,
+  localMediaPlugin,
+  tinaCloud,
+} from '@tinacms/tinacms';
+
+const clientId = import.meta.env.TINA_PUBLIC_CLIENT_ID;
+const isLocal = !clientId;
 
 export default defineConfig({
   plugins: [
-    localContentPlugin(),
-    tinaCloud({ clientId: '<client id>' }),
+    ...(isLocal
+      ? [localContentPlugin(), localMediaPlugin()]
+      : [tinaCloud({ clientId })]),
   ],
   schema: { collections: [] },
 });
@@ -153,8 +167,9 @@ export default defineConfig({
 |---|---|
 | `clientId` | The client ID of the TinaCloud project. |
 
-The media slice gets the token from the auth slice of the same plugin. Before
-the editor signs in, each operation fails with `unauthorized`.
+The media and content slices get the token from `getToken()` of the installed
+auth slice. Before the editor signs in, each operation fails with
+`unauthorized`.
 
 The slice supplies `rename`, `features.search`, `features.extensionFilter` and
 a `features.maxSize` of 100 MB. `resolveUrl` gives a CDN URL, and a size adds
