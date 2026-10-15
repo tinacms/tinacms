@@ -4,6 +4,7 @@ import { toFieldAddress } from '../core/field/address';
 import { simulateReload } from '../test/simulate-reload';
 import { draftKey, readDraft, removeDraft, writeDraft } from './drafts';
 import {
+  type FormId,
   formStatus,
   staleDraft,
   syncDrafts,
@@ -22,7 +23,7 @@ const store = useFormStore;
 
 const syncing = () => onTestFinished(syncDrafts());
 
-const otherTabWrites = (formId: string, text: string) =>
+const otherTabWrites = (formId: FormId, text: string) =>
   localStorage.setItem(
     draftKey(formId),
     JSON.stringify({

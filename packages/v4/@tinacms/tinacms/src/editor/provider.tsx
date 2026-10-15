@@ -31,7 +31,7 @@ import { createScreenRegistry } from '../core/screen/registry';
 import { createGlobalNav } from '../core/slot/global-nav';
 import { addressesWithValidators } from '../core/validation';
 import { createValidatorRegistry } from '../core/validator/registry';
-import { removeDraft } from '../form/drafts';
+import { type DraftUserScope, removeDraft } from '../form/drafts';
 import {
   type FieldErrors,
   type FormId,
@@ -174,6 +174,262 @@ export function TinaProvider({
   );
 }
 
+const seedSignatureOf = (
+  formId: FormId,
+  userId: DraftUserScope,
+  seedValues: TinaDocument
+) =>
+  JSON.stringify([
+    formId,
+    userId === undefined ? 'unscoped' : userId,
+    seedValues,
+  ]);
+
+const readKeptSeed = (
+  formId: FormId,
+  ingested: TinaDocument,
+  equal: ReturnType<typeof fieldEqualityFor>
+) => {
+  const scope = readOpeningScope(formId, toFormValues(ingested), equal);
+  if (!scope) return { seed: null, errors: {} };
+  return {
+    seed: toDocument(scope.values),
+    errors: nestFieldErrors(scope.errors),
+  };
+};
+
+const syncSeededForm = (
+  seededSignature: { current: string | null },
+  formId: FormId,
+  userId: DraftUserScope,
+  ingested: TinaDocument,
+  equal: ReturnType<typeof fieldEqualityFor>,
+  seedValues: TinaDocument,
+  keptSeed: TinaDocument | null,
+  resetForm: (values: TinaDocument, options?: { keepErrors?: boolean }) => void,
+  advanceSeedKey: (formId: FormId) => void
+) => {
+  useFormStore.getState().registerForm(formId, toFormValues(ingested), equal);
+  const signature = seedSignatureOf(formId, userId, seedValues);
+  if (seededSignature.current === null) {
+    seededSignature.current = signature;
+    return;
+  }
+  if (seededSignature.current !== signature) {
+    seededSignature.current = signature;
+    resetForm(seedValues, { keepErrors: seedValues === keptSeed });
+    advanceSeedKey(formId);
+  }
+};
+
+const discardFormEdits = (
+  formId: FormId,
+  resetForm: (values: TinaDocument) => void,
+  advanceSeedKey: (formId: FormId) => void
+) => {
+  const store = readFormStore();
+  const scope = store.forms[formId];
+  if (!isEdited(scope)) return;
+  const baseline = toDocument(scope.baseline);
+  store.discardEdits(formId);
+  resetForm(baseline);
+  advanceSeedKey(formId);
+};
+
+const buildStaleDraftActions = (
+  stale: ReturnType<typeof staleDraft>,
+  formId: FormId,
+  resetForm: (values: TinaDocument) => void,
+  advanceSeedKey: (formId: FormId) => void,
+  bumpDraftRevision: () => void
+) => {
+  if (!stale) return null;
+  return {
+    resume: () => {
+      const store = readFormStore();
+      store.resumeDraft(formId, {
+        values: toFormValues(stale.values),
+        baseline: toFormValues(stale.baseline),
+      });
+      const resumed = readFormStore().forms[formId];
+      if (formStatus(resumed) !== 'dirty') {
+        removeDraft(formId, readFormStore().userId);
+      }
+      resetForm(toDocument(resumed?.values ?? {}));
+      advanceSeedKey(formId);
+      bumpDraftRevision();
+    },
+    discard: () => {
+      removeDraft(formId, readFormStore().userId);
+      bumpDraftRevision();
+    },
+  };
+};
+
+const mirrorFormStateToStore = (
+  formId: FormId,
+  values: TinaDocument,
+  errors: Record<string, unknown> | undefined,
+  name: string | undefined
+) => {
+  const store = useFormStore.getState();
+  if (name !== undefined) {
+    // The store's live-values mirror is flat, one entry per top-level
+    // field. A nested field name collapses to its top-level address.
+    const topLevel = name.split('.')[0];
+    store.setFieldValue(formId, toFieldAddress(topLevel), values[topLevel]);
+  }
+  const flat = flattenFieldErrors(errors ?? {});
+  const mirrored: FieldErrors = {};
+  for (const [address, messages] of Object.entries(flat)) {
+    mirrored[toFieldAddress(address)] = messages;
+  }
+  store.setFieldErrors(formId, mirrored);
+};
+
+const notifyWatchedFieldChange = (
+  name: string | undefined,
+  values: TinaDocument,
+  formHooks: ReturnType<typeof resolveFormHooks>,
+  formId: FormId,
+  path: string,
+  collection: CollectionSchema,
+  trigger: (names: string[]) => Promise<boolean>
+) => {
+  if (name === undefined) return;
+  runOnChange(
+    formHooks,
+    { address: toFieldAddress(name), value: get(values, name) },
+    { formId, path, collection }
+  );
+  const dependents = addressesWithValidators(
+    collection.fields,
+    values,
+    SELF_CONTAINED_VALIDATORS
+  );
+  if (dependents.length > 0) void trigger(dependents);
+};
+
+const resolveSeedValues = (
+  keepsIncoming: boolean,
+  keptSeed: TinaDocument | null,
+  ingested: TinaDocument
+): TinaDocument => {
+  if (!keepsIncoming || keptSeed === null) return ingested;
+  return keptSeed;
+};
+
+function useDocumentIngestion(
+  path: string,
+  document: TinaDocument | undefined,
+  collection: CollectionSchema,
+  registry: ReturnType<typeof createFieldRegistry>,
+  hooks: ReturnType<typeof createFormHookRegistry>
+) {
+  const formHooks = useMemo(
+    () => resolveFormHooks(hooks, collection.hooks ?? []),
+    [hooks, collection]
+  );
+  const transformContext = useMemo(
+    () => ({ documentPath: path, registry }),
+    [path, registry]
+  );
+  const ingested = useMemo(
+    () => ingestDocument(document, collection.fields, transformContext),
+    [document, collection, transformContext]
+  );
+  const equal = useMemo(
+    () => fieldEqualityFor(collection.fields, transformContext),
+    [collection, transformContext]
+  );
+  return { formHooks, ingested, equal };
+}
+
+function useSeededFormSync(
+  formId: FormId,
+  userId: DraftUserScope,
+  ingested: TinaDocument,
+  equal: ReturnType<typeof fieldEqualityFor>,
+  seedValues: TinaDocument,
+  keptSeed: TinaDocument | null,
+  resetForm: (values: TinaDocument, options?: { keepErrors?: boolean }) => void
+) {
+  const reseeds = useRef(0);
+  const [seedKey, setSeedKey] = useState(() => `${formId}#${reseeds.current}`);
+  const advanceSeedKey = useCallback((seededFormId: FormId) => {
+    reseeds.current += 1;
+    setSeedKey(`${seededFormId}#${reseeds.current}`);
+  }, []);
+
+  const seededSignature = useRef<string | null>(null);
+  useEffect(() => {
+    syncSeededForm(
+      seededSignature,
+      formId,
+      userId,
+      ingested,
+      equal,
+      seedValues,
+      keptSeed,
+      resetForm,
+      advanceSeedKey
+    );
+  }, [
+    formId,
+    userId,
+    ingested,
+    seedValues,
+    keptSeed,
+    resetForm,
+    equal,
+    advanceSeedKey,
+  ]);
+
+  const discardEdits = useCallback(
+    () => discardFormEdits(formId, resetForm, advanceSeedKey),
+    [formId, resetForm, advanceSeedKey]
+  );
+
+  return { seedKey, advanceSeedKey, discardEdits };
+}
+
+function useFormMethodSubscriptions(
+  formId: FormId,
+  path: string,
+  collection: CollectionSchema,
+  formHooks: ReturnType<typeof resolveFormHooks>,
+  methods: ReturnType<typeof useForm<TinaDocument>>
+) {
+  useEffect(() => {
+    const unsubscribe = methods.subscribe({
+      formState: { values: true, errors: true },
+      callback: ({ values, errors, name }) =>
+        mirrorFormStateToStore(formId, values, errors, name),
+    });
+    return () => unsubscribe();
+  }, [formId, methods]);
+
+  // react-hook-form applies the resolver's result to the changed field only,
+  // so a field-level rule that reads a sibling would keep a stale error after
+  // the sibling changes. Re-validate the fields that carry validators, and
+  // only those, so an untouched `required` field stays quiet. `watch` fires on
+  // value changes alone, not on the state `trigger` emits, so this cannot loop.
+  useEffect(() => {
+    const { unsubscribe } = methods.watch((values, { name }) =>
+      notifyWatchedFieldChange(
+        name,
+        values,
+        formHooks,
+        formId,
+        path,
+        collection,
+        methods.trigger
+      )
+    );
+    return () => unsubscribe();
+  }, [methods, collection, formHooks, formId, path]);
+}
+
 export interface FormProviderProps {
   collection: CollectionSchema;
   path: string;
@@ -194,36 +450,23 @@ export function FormProvider({
     throw new Error('FormProvider must be used within a TinaProvider');
   }
   const { registry, validators, hooks } = runtime;
-  const formHooks = useMemo(
-    () => resolveFormHooks(hooks, collection.hooks ?? []),
-    [hooks, collection]
-  );
 
   const formId = toFormId(path);
   const userId = useFormStore((state) => state.userId);
-  const transformContext = useMemo(
-    () => ({ documentPath: path, registry }),
-    [path, registry]
-  );
-  const ingested = useMemo(
-    () => ingestDocument(document, collection.fields, transformContext),
-    [document, collection, transformContext]
-  );
-  const equal = useMemo(
-    () => fieldEqualityFor(collection.fields, transformContext),
-    [collection, transformContext]
+  const { formHooks, ingested, equal } = useDocumentIngestion(
+    path,
+    document,
+    collection,
+    registry,
+    hooks
   );
   // What a fresh form instance adopts from the store. It samples the store one time,
   // because RHF replaces its full error state each time the `errors` option changes
   // identity — a rebuild on each document would overwrite the live errors of the user.
-  const kept = useMemo(() => {
-    const scope = readOpeningScope(formId, toFormValues(ingested), equal);
-    if (!scope) return { seed: null, errors: {} };
-    return {
-      seed: toDocument(scope.values),
-      errors: nestFieldErrors(scope.errors),
-    };
-  }, [formId, userId]);
+  const kept = useMemo(
+    () => readKeptSeed(formId, ingested, equal),
+    [formId, userId]
+  );
   // Whether the scope still keeps its values against the document of this render. A
   // clean scope stops keeping them when another writer changes the file, so the test
   // must follow the document, not only the form id.
@@ -231,7 +474,7 @@ export function FormProvider({
     () => readOpeningScope(formId, toFormValues(ingested), equal) !== undefined,
     [formId, userId, ingested, equal]
   );
-  const seedValues = keepsIncoming ? (kept.seed ?? ingested) : ingested;
+  const seedValues = resolveSeedValues(keepsIncoming, kept.seed, ingested);
   const resolver = buildFormResolver(collection, registry, validators);
   const methods = useForm<TinaDocument>({
     defaultValues: seedValues,
@@ -241,46 +484,15 @@ export function FormProvider({
     shouldFocusError: false,
   });
 
-  const reseeds = useRef(0);
-  const [seedKey, setSeedKey] = useState(() => `${formId}#${reseeds.current}`);
-  const advanceSeedKey = useCallback((seededFormId: FormId) => {
-    reseeds.current += 1;
-    setSeedKey(`${seededFormId}#${reseeds.current}`);
-  }, []);
-
-  const seededSignature = useRef<string | null>(null);
-  useEffect(() => {
-    useFormStore.getState().registerForm(formId, toFormValues(ingested), equal);
-    const signature = JSON.stringify([formId, userId, seedValues]);
-    if (seededSignature.current === null) {
-      seededSignature.current = signature;
-      return;
-    }
-    if (seededSignature.current !== signature) {
-      seededSignature.current = signature;
-      methods.reset(seedValues, { keepErrors: seedValues === kept.seed });
-      advanceSeedKey(formId);
-    }
-  }, [
+  const { seedKey, advanceSeedKey, discardEdits } = useSeededFormSync(
     formId,
     userId,
     ingested,
-    seedValues,
-    kept,
-    methods,
     equal,
-    advanceSeedKey,
-  ]);
-
-  const discardEdits = useCallback(() => {
-    const store = readFormStore();
-    const scope = store.forms[formId];
-    if (!isEdited(scope)) return;
-    const baseline = toDocument(scope.baseline);
-    store.discardEdits(formId);
-    methods.reset(baseline);
-    advanceSeedKey(formId);
-  }, [formId, methods, advanceSeedKey]);
+    seedValues,
+    kept.seed,
+    methods.reset
+  );
 
   const [draftRevision, setDraftRevision] = useState(0);
   const status = useFormStatus(formId);
@@ -288,78 +500,15 @@ export function FormProvider({
     () => staleDraft(formId, toFormValues(ingested), equal),
     [formId, userId, ingested, equal, draftRevision, status]
   );
-  const staleDraftActions = useMemo(() => {
-    if (!stale) return null;
-    return {
-      resume: () => {
-        const store = readFormStore();
-        store.resumeDraft(formId, {
-          values: toFormValues(stale.values),
-          baseline: toFormValues(stale.baseline),
-        });
-        const resumed = readFormStore().forms[formId];
-        if (formStatus(resumed) !== 'dirty') {
-          removeDraft(formId, readFormStore().userId);
-        }
-        methods.reset(toDocument(resumed?.values ?? {}));
-        advanceSeedKey(formId);
-        setDraftRevision((revision) => revision + 1);
-      },
-      discard: () => {
-        removeDraft(formId, readFormStore().userId);
-        setDraftRevision((revision) => revision + 1);
-      },
-    };
-  }, [stale, formId, methods, advanceSeedKey]);
+  const staleDraftActions = useMemo(
+    () =>
+      buildStaleDraftActions(stale, formId, methods.reset, advanceSeedKey, () =>
+        setDraftRevision((revision) => revision + 1)
+      ),
+    [stale, formId, methods, advanceSeedKey]
+  );
 
-  useEffect(() => {
-    const unsubscribe = methods.subscribe({
-      formState: { values: true, errors: true },
-      callback: ({ values, errors, name }) => {
-        const store = useFormStore.getState();
-        if (name !== undefined) {
-          // The store's live-values mirror is flat, one entry per top-level
-          // field. A nested field name collapses to its top-level address.
-          const topLevel = name.split('.')[0];
-          store.setFieldValue(
-            formId,
-            toFieldAddress(topLevel),
-            values[topLevel]
-          );
-        }
-        const flat = flattenFieldErrors(errors ?? {});
-        const mirrored: FieldErrors = {};
-        for (const [address, messages] of Object.entries(flat)) {
-          mirrored[toFieldAddress(address)] = messages;
-        }
-        store.setFieldErrors(formId, mirrored);
-      },
-    });
-    return () => unsubscribe();
-  }, [formId, methods]);
-
-  // react-hook-form applies the resolver's result to the changed field only,
-  // so a field-level rule that reads a sibling would keep a stale error after
-  // the sibling changes. Re-validate the fields that carry validators, and
-  // only those, so an untouched `required` field stays quiet. `watch` fires on
-  // value changes alone, not on the state `trigger` emits, so this cannot loop.
-  useEffect(() => {
-    const { unsubscribe } = methods.watch((values, { name }) => {
-      if (name === undefined) return;
-      runOnChange(
-        formHooks,
-        { address: toFieldAddress(name), value: get(values, name) },
-        { formId, path, collection }
-      );
-      const dependents = addressesWithValidators(
-        collection.fields,
-        values,
-        SELF_CONTAINED_VALIDATORS
-      );
-      if (dependents.length > 0) void methods.trigger(dependents);
-    });
-    return () => unsubscribe();
-  }, [methods, collection, formHooks, formId, path]);
+  useFormMethodSubscriptions(formId, path, collection, formHooks, methods);
 
   const formScope = useMemo(
     () => ({

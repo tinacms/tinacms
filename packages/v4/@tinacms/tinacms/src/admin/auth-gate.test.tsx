@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../config';
@@ -189,25 +189,33 @@ describe('AuthGate', () => {
     ).toBeInTheDocument();
   });
 
-  it('isolates unsaved edits per editor in the same tab and across a reload', async () => {
+  it('isolates unsaved edits per editor in the same tab, across session expiry, and across a reload', async () => {
     window.location.hash = '';
     const ada: AuthUser = { id: toUserId('ada'), name: 'Ada' };
     const grace: AuthUser = { id: toUserId('grace'), name: 'Grace' };
     let nextUser: AuthUser = ada;
+    let expireSession: (() => void) | undefined;
     const sharedBrowserAuth = definePlugin({
       name: 'test:shared-browser-auth',
       provides: ['auth'],
       client: async () => ({
         default: {
-          slice: (set) =>
-            ({
+          slice: (set) => {
+            expireSession = () =>
+              set({
+                status: 'signed-out',
+                user: null,
+                error: new AuthError('expired', 'Your session has expired.'),
+              });
+            return {
               status: 'signed-out',
               user: null,
               getToken: async () => undefined,
               login: async () =>
                 set({ status: 'signed-in', user: nextUser, roles: ['editor'] }),
               logout: async () => set({ status: 'signed-out', user: null }),
-            }) satisfies AuthSlice,
+            } satisfies AuthSlice;
+          },
         },
       }),
     });
@@ -215,7 +223,6 @@ describe('AuthGate', () => {
     const user = userEvent.setup();
     const firstTab = renderAdmin([sharedBrowserAuth]);
 
-    // Ada signs in, opens hello.mdx, leaves unsaved edits, and signs out.
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
@@ -225,9 +232,12 @@ describe('AuthGate', () => {
     await waitFor(() =>
       expect(screen.getByRole('status')).toHaveTextContent('Unsaved')
     );
-    await user.click(screen.getByRole('button', { name: 'Sign out' }));
 
-    // Grace signs in on the same tab and sees the saved document, not Ada's edits.
+    act(() => expireSession?.());
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Your session has expired.'
+    );
+
     nextUser = grace;
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
     const graceInput = await screen.findByRole('textbox', { name: /^Title/ });
@@ -235,7 +245,6 @@ describe('AuthGate', () => {
     expect(screen.getByRole('status')).toHaveTextContent('No changes');
     await user.click(screen.getByRole('button', { name: 'Sign out' }));
 
-    // Ada signs back in on the same tab and recovers her draft.
     nextUser = ada;
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
     const adaRestored = await screen.findByRole('textbox', { name: /^Title/ });
@@ -243,7 +252,6 @@ describe('AuthGate', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
     await user.click(screen.getByRole('button', { name: 'Sign out' }));
 
-    // After a reload, Grace still sees the saved document and Ada still recovers her draft.
     firstTab.unmount();
     simulateReload();
 

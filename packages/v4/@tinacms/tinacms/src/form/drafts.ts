@@ -1,6 +1,7 @@
 import type { UserId } from '../core/auth/contract';
 import type { TinaDocument } from '../core/schema/types';
 import { isRecord } from '../utils/is-record';
+import type { FormId } from './form-store';
 
 const DRAFT_KEY_PREFIX = 'tina-drafts:';
 const USER_DRAFT_KEY_PREFIX = 'tina-drafts@';
@@ -15,7 +16,7 @@ export interface StoredDraft {
   readonly baseline: TinaDocument;
 }
 
-export const draftKey = (formId: string, userId?: UserId) =>
+export const draftKey = (formId: FormId, userId?: UserId) =>
   userId === undefined
     ? `${DRAFT_KEY_PREFIX}${formId}`
     : `${USER_DRAFT_KEY_PREFIX}${encodeURIComponent(userId)}:${formId}`;
@@ -36,7 +37,7 @@ const storage = (): Storage | undefined => {
 // Storage is untrusted: an entry from another version or in an unknown shape is
 // treated as no draft.
 export const readDraft = (
-  formId: string,
+  formId: FormId,
   userId?: DraftUserScope
 ): StoredDraft | undefined => {
   if (userId === null) return undefined;
@@ -58,7 +59,7 @@ export const readDraft = (
 
 // A failed write (quota, private mode) must never break editing, so it only warns.
 export const writeDraft = (
-  formId: string,
+  formId: FormId,
   draft: StoredDraft,
   userId?: DraftUserScope
 ) => {
@@ -73,7 +74,7 @@ export const writeDraft = (
   }
 };
 
-export const removeDraft = (formId: string, userId?: DraftUserScope) => {
+export const removeDraft = (formId: FormId, userId?: DraftUserScope) => {
   if (userId === null) return;
   storage()?.removeItem(draftKey(formId, userId));
 };
