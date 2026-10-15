@@ -321,6 +321,52 @@ describe('ArrayField value updates', () => {
     await userEvent.type(name, 'b');
     expect(screen.getByTestId('form-status')).toHaveTextContent('dirty');
   });
+
+  it('goes clean after saving a document with no list values', async () => {
+    const absentLists: CollectionSchema = {
+      name: 'post',
+      format: 'mdx',
+      fields: [
+        t.string({ name: 'title', label: 'Title' }),
+        t.array({
+          name: 'authors',
+          label: 'Authors',
+          fields: [t.string({ name: 'name', label: 'Name' })],
+        }),
+        t.array({
+          name: 'blocks',
+          label: 'Blocks',
+          templates: [
+            {
+              name: 'hero',
+              label: 'Hero',
+              fields: [t.string({ name: 'headline', label: 'Headline' })],
+            },
+          ],
+        }),
+      ],
+    };
+    render(
+      <TinaProvider
+        config={asResolvedConfig({ plugins: PLUGINS, schema: NO_COLLECTIONS })}
+      >
+        <FormProvider
+          collection={absentLists}
+          path={DOCUMENT_PATH}
+          document={{ title: 'Hello' }}
+          onSave={vi.fn()}
+        >
+          <LabelledFields />
+          <SaveProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+
+    await userEvent.type(await screen.findByLabelText('Title'), '!');
+    await userEvent.click(screen.getByText('save'));
+
+    expect(await screen.findByTestId('form-status')).toHaveTextContent('clean');
+  });
 });
 
 describe('ArrayField with a stored value of the wrong shape', () => {
