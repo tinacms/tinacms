@@ -18,7 +18,11 @@ import type {
   TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools';
-import { ERR_ALREADY_EXISTS, RELATIVE_PATH_REGEX } from '@tinacms/schema-tools';
+import {
+  ERR_ALREADY_EXISTS,
+  RELATIVE_PATH_REGEX,
+  normalizePath,
+} from '@tinacms/schema-tools';
 
 import type { GraphQLConfig } from '../types';
 
@@ -34,15 +38,46 @@ import {
 import { TinaGraphQLError, TinaParseDocumentError } from './error';
 import { collectConditionsForField, resolveReferences } from './filter-utils';
 import {
+  assertNewUsersHavePasswords,
+  findUserInCollection,
+  getUserDocumentContext,
+} from './auth-fields';
+import {
   resolveMediaCloudToRelative,
   resolveMediaRelativeToCloud,
 } from './media-utils';
+
+export type AuthCollectionWriteOp =
+  | 'create'
+  | 'update'
+  | 'rename'
+  | 'delete'
+  | 'addPending'
+  | 'createFolder';
+
+/**
+ * The signed-in user behind a request. Leave it undefined only when the caller
+ * vouches for the call itself, and pass null when nobody is signed in.
+ */
+export type CtxUser = { sub?: string } | null | undefined;
+
+// NOTE: [5 Oct 2026] EK - Queues writes to the auth collection so a save cannot
+// write back a copy read before another one. Per process, so instances can race.
+const authCollectionWrites = new WeakMap<Database, Promise<unknown>>();
+
+type UpdateDocumentArgs = {
+  collectionName: string;
+  relativePath: string;
+  newRelativePath?: string;
+  newBody?: Record<string, unknown>;
+};
 
 interface ResolverConfig {
   config?: GraphQLConfig;
   database: Database;
   tinaSchema: TinaSchema;
   isAudit: boolean;
+  ctxUser?: CtxUser;
 }
 
 export const createResolver = (args: ResolverConfig) => {
@@ -199,6 +234,7 @@ export const transformDocumentIntoPayload = async (
   hasReferences?: boolean
 ) => {
   const collection = tinaSchema.getCollection(rawData._collection);
+  const normalizedPath = normalizePath(fullPath);
   try {
     const template = tinaSchema.getTemplateForData({
       data: rawData,
@@ -209,10 +245,9 @@ export const transformDocumentIntoPayload = async (
       base: basename,
       ext: extension,
       name: filename,
-    } = path.parse(fullPath);
+    } = path.parse(normalizedPath);
 
-    const relativePath = fullPath
-      .replace(/\\/g, '/')
+    const relativePath = normalizedPath
       .replace(collection.path, '')
       .replace(/^\/|\/$/g, '');
 
@@ -255,7 +290,7 @@ export const transformDocumentIntoPayload = async (
       __typename: collection.fields
         ? NAMER.documentTypeName(collection.namespace)
         : NAMER.documentTypeName(template.namespace),
-      id: fullPath,
+      id: normalizedPath,
       ...data,
       _sys: {
         title: title || '',
@@ -263,7 +298,7 @@ export const transformDocumentIntoPayload = async (
         filename,
         extension,
         hasReferences,
-        path: fullPath,
+        path: normalizedPath,
         relativePath,
         breadcrumbs,
         collection,
@@ -343,12 +378,14 @@ export class Resolver {
   public database: Database;
   public tinaSchema: TinaSchema;
   public isAudit: boolean;
+  public ctxUser: CtxUser;
 
   constructor(public init: ResolverConfig) {
     this.config = init.config;
     this.database = init.database;
     this.tinaSchema = init.tinaSchema;
     this.isAudit = init.isAudit;
+    this.ctxUser = init.ctxUser;
   }
 
   public resolveCollection = async (
@@ -571,6 +608,11 @@ export class Resolver {
       collectionName,
       relativePath
     );
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'addPending',
+    });
 
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
@@ -736,6 +778,128 @@ export class Resolver {
     }
   };
 
+  private assertAuthCollectionWrite = async ({
+    collection,
+    realPath,
+    op,
+  }: {
+    collection: Collection<true>;
+    realPath: string;
+    op: AuthCollectionWriteOp;
+  }) => {
+    const authCollection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    if (!authCollection) {
+      return;
+    }
+    const normalizedPath = normalizePath(realPath);
+    if (
+      collection.name !== authCollection.name &&
+      !this.isStoredInCollection(normalizedPath, authCollection)
+    ) {
+      return;
+    }
+
+    // NOTE: [02 Oct 2026] EK - TinaCloud runs this against an older graphql's
+    // Database, which has no authCollection, so default to the internal one's.
+    const { admins, allowUnauthenticatedWrites } = this.database
+      .authCollection ?? { admins: [], allowUnauthenticatedWrites: true };
+    if (this.ctxUser === undefined && allowUnauthenticatedWrites) {
+      return;
+    }
+
+    const sub = this.ctxUser?.sub;
+    const userStorePath = normalizePath(
+      path.join(authCollection.path, 'index.json')
+    );
+    if (
+      op === 'update' &&
+      normalizedPath === userStorePath &&
+      typeof sub === 'string' &&
+      sub !== '' &&
+      admins.includes(sub) &&
+      (await this.isStoredUser(sub))
+    ) {
+      return;
+    }
+
+    throw new Error('Not authorized');
+  };
+
+  private assertReferenceUpdates = async (
+    realPath: string,
+    collection: Collection<true>
+  ) => {
+    if (!this.tinaSchema.getCollections().some((c) => c.isAuthCollection)) {
+      return;
+    }
+    const collRefs = await this.findReferences(realPath, collection);
+    for (const docsWithRefs of Object.values(collRefs)) {
+      for (const pathToDocWithRef of Object.keys(docsWithRefs)) {
+        await this.assertAuthCollectionWrite({
+          collection: this.tinaSchema.getCollectionByFullPath(pathToDocWithRef),
+          realPath: pathToDocWithRef,
+          op: 'update',
+        });
+      }
+    }
+  };
+
+  private isAuthCollectionPath = (realPath: string) => {
+    const authCollection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    return (
+      !!authCollection &&
+      this.isStoredInCollection(normalizePath(realPath), authCollection)
+    );
+  };
+
+  private withAuthCollectionLock = <T>(
+    realPath: string,
+    write: () => Promise<T>
+  ): Promise<T> => {
+    if (!this.isAuthCollectionPath(realPath)) {
+      return write();
+    }
+    const previous = authCollectionWrites.get(this.database);
+    const current = previous ? previous.then(write, write) : write();
+    authCollectionWrites.set(
+      this.database,
+      current.catch(() => undefined)
+    );
+    return current;
+  };
+
+  private isStoredInCollection = (
+    realPath: string,
+    collection: Collection<true>
+  ) => {
+    try {
+      return (
+        this.tinaSchema.getCollectionByFullPath(realPath)?.name ===
+        collection.name
+      );
+    } catch {
+      return false;
+    }
+  };
+
+  private isStoredUser = async (sub: string) => {
+    try {
+      const { userField, users } = await getUserDocumentContext(
+        this.tinaSchema,
+        this
+      );
+      return (
+        Array.isArray(users) && !!findUserInCollection(users, userField, sub)
+      );
+    } catch {
+      return false;
+    }
+  };
+
   /**
    * Helper method to get collection and construct validated path.
    * This encapsulates the common pattern of getting a collection, joining paths,
@@ -744,7 +908,9 @@ export class Resolver {
    * @param collectionName - Name of the collection
    * @param relativePath - Relative path within the collection
    * @param options - Optional configuration
-   * @returns Object containing the collection and validated real path
+   * @returns Object containing the collection and the validated real path,
+   * normalized to POSIX separators so it matches the document identities and
+   * reference values stored in content files on every platform
    */
   private getValidatedPath = (
     collectionName: string,
@@ -765,7 +931,7 @@ export class Resolver {
       pathSegments.push(...options.extraSegments.map(Resolver.sanitizePath));
     }
 
-    const realPath = path.join(...pathSegments);
+    const realPath = normalizePath(path.join(...pathSegments));
     const shouldValidateExtension = options?.validateExtension !== false;
     this.validatePath(
       realPath,
@@ -814,6 +980,11 @@ export class Resolver {
       `.gitkeep.${collection.format || 'md'}`
     );
     this.validatePath(realPath, collection);
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'createFolder',
+    });
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
       throw new Error(
@@ -841,6 +1012,11 @@ export class Resolver {
       collectionName,
       relativePath
     );
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'create',
+    });
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
       throw new Error(
@@ -854,21 +1030,33 @@ export class Resolver {
     return this.getDocument(realPath);
   };
 
-  public resolveUpdateDocument = async ({
+  public resolveUpdateDocument = async (args: UpdateDocumentArgs) => {
+    const { realPath } = this.getValidatedPath(
+      args.collectionName,
+      args.relativePath
+    );
+    return this.withAuthCollectionLock(realPath, () =>
+      this.updateDocument(args)
+    );
+  };
+
+  private updateDocument = async ({
     collectionName,
     relativePath,
     newRelativePath,
     newBody,
-  }: {
-    collectionName: string;
-    relativePath: string;
-    newRelativePath?: string;
-    newBody?: Record<string, unknown>;
-  }) => {
+  }: UpdateDocumentArgs) => {
     const { collection, realPath } = this.getValidatedPath(
       collectionName,
       relativePath
     );
+    if (!newRelativePath) {
+      await this.assertAuthCollectionWrite({
+        collection,
+        realPath,
+        op: 'update',
+      });
+    }
     const alreadyExists = await this.database.documentExists(realPath);
     if (!alreadyExists) {
       throw new Error(`Unable to update document, ${realPath} does not exist`);
@@ -896,49 +1084,68 @@ export class Resolver {
         );
       }
 
+      await this.assertAuthCollectionWrite({
+        collection,
+        realPath,
+        op: 'rename',
+      });
+      await this.assertAuthCollectionWrite({
+        collection,
+        realPath: newRealPath,
+        op: 'rename',
+      });
+      await this.assertReferenceUpdates(realPath, collection);
+
       // update the document
       await this.database.put(newRealPath, doc._rawData, collection.name);
       // delete the old document
       await this.deleteDocument(realPath);
       // update references to the document
       const collRefs = await this.findReferences(realPath, collection);
+      // resolveUpdateDocument already holds the lock when realPath is in the auth collection
+      const holdsLock = this.isAuthCollectionPath(realPath);
       for (const [_collection, docsWithRefs] of Object.entries(collRefs)) {
         for (const [pathToDocWithRef, referencePaths] of Object.entries(
           docsWithRefs
         )) {
-          // load the document with the references
-          let docWithRef = await this.getRaw(pathToDocWithRef);
+          const rewriteReferences = async () => {
+            // load the document with the references
+            let docWithRef = await this.getRaw(pathToDocWithRef);
 
-          let hasUpdate = false;
-          // update each reference to the updated document
-          for (const path of referencePaths) {
-            const { object, updated } = updateObjectWithJsonPath(
-              docWithRef,
-              path,
-              realPath,
-              newRealPath
-            );
-            docWithRef = object;
-            hasUpdate = updated || hasUpdate;
-          }
-
-          // save the updated document
-          if (hasUpdate) {
-            // lookup collection for the document with the references
-            const collectionWithRef =
-              this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
-            if (!collectionWithRef) {
-              throw new Error(
-                `Unable to find collection for ${pathToDocWithRef}`
+            let hasUpdate = false;
+            // update each reference to the updated document
+            for (const path of referencePaths) {
+              const { object, updated } = updateObjectWithJsonPath(
+                docWithRef,
+                path,
+                realPath,
+                newRealPath
               );
+              docWithRef = object;
+              hasUpdate = updated || hasUpdate;
             }
 
-            await this.database.put(
-              pathToDocWithRef,
-              docWithRef,
-              collectionWithRef.name
-            );
-          }
+            // save the updated document
+            if (hasUpdate) {
+              // lookup collection for the document with the references
+              const collectionWithRef =
+                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
+              if (!collectionWithRef) {
+                throw new Error(
+                  `Unable to find collection for ${pathToDocWithRef}`
+                );
+              }
+
+              await this.database.put(
+                pathToDocWithRef,
+                docWithRef,
+                collectionWithRef.name
+              );
+            }
+          };
+          await (holdsLock
+            ? rewriteReferences()
+            : this.withAuthCollectionLock(pathToDocWithRef, rewriteReferences));
         }
       }
       return this.getDocument(newRealPath);
@@ -946,6 +1153,9 @@ export class Resolver {
 
     if (!newBody) {
       throw new Error('Body not provided for updated document.');
+    }
+    if (collection.isAuthCollection) {
+      assertNewUsersHavePasswords(collection, newBody, doc?._rawData);
     }
     const params = await this.buildObjectMutations(
       newBody,
@@ -964,6 +1174,26 @@ export class Resolver {
     return this.getDocument(realPath);
   };
 
+  /**
+   * Rewrites the auth collection's user store without the admin check, so the
+   * caller must check the request user.
+   */
+  public updateAuthDocumentInternal = async (
+    update: (rawData: Record<string, any>) => Record<string, any>
+  ) => {
+    const collection = this.tinaSchema
+      .getCollections()
+      .find((c) => c.isAuthCollection);
+    if (!collection) {
+      throw new Error('Auth collection not found');
+    }
+    const { realPath } = this.getValidatedPath(collection.name, 'index.json');
+    await this.withAuthCollectionLock(realPath, async () => {
+      const rawData = await this.getRaw(realPath);
+      await this.database.put(realPath, update(rawData), collection.name);
+    });
+  };
+
   public resolveDeleteDocument = async ({
     collectionName,
     relativePath,
@@ -980,45 +1210,57 @@ export class Resolver {
       throw new Error(`Unable to delete document, ${realPath} does not exist`);
     }
 
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'delete',
+    });
+    const hasReferences = await this.hasReferences(realPath, collection);
+    if (hasReferences) {
+      await this.assertReferenceUpdates(realPath, collection);
+    }
+
     const doc = await this.getDocument(realPath);
     await this.deleteDocument(realPath);
-    if (await this.hasReferences(realPath, collection)) {
+    if (hasReferences) {
       const collRefs = await this.findReferences(realPath, collection);
       for (const [_collection, docsWithRefs] of Object.entries(collRefs)) {
         for (const [pathToDocWithRef, referencePaths] of Object.entries(
           docsWithRefs
         )) {
-          // load the doc with the references
-          let refDoc = await this.getRaw(pathToDocWithRef);
+          await this.withAuthCollectionLock(pathToDocWithRef, async () => {
+            // load the doc with the references
+            let refDoc = await this.getRaw(pathToDocWithRef);
 
-          let hasUpdate = false;
-          // Update each reference to the deleted document
-          for (const path of referencePaths) {
-            const { object, updated } = updateObjectWithJsonPath(
-              refDoc,
-              path,
-              realPath,
-              null
-            );
-            refDoc = object;
-            hasUpdate = updated || hasUpdate;
-          }
+            let hasUpdate = false;
+            // Update each reference to the deleted document
+            for (const path of referencePaths) {
+              const { object, updated } = updateObjectWithJsonPath(
+                refDoc,
+                path,
+                realPath,
+                null
+              );
+              refDoc = object;
+              hasUpdate = updated || hasUpdate;
+            }
 
-          if (hasUpdate) {
-            const collectionWithRef =
-              this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
-            if (!collectionWithRef) {
-              throw new Error(
-                `Unable to find collection for ${pathToDocWithRef}`
+            if (hasUpdate) {
+              const collectionWithRef =
+                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
+              if (!collectionWithRef) {
+                throw new Error(
+                  `Unable to find collection for ${pathToDocWithRef}`
+                );
+              }
+              // save the updated doc
+              await this.database.put(
+                pathToDocWithRef,
+                refDoc,
+                collectionWithRef.name
               );
             }
-            // save the updated doc
-            await this.database.put(
-              pathToDocWithRef,
-              refDoc,
-              collectionWithRef.name
-            );
-          }
+          });
         }
       }
     }
@@ -1083,6 +1325,11 @@ export class Resolver {
       });
     }
 
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'create',
+    });
     const params = await this.buildObjectMutations(
       // @ts-ignore
       args.params[collection.name],
@@ -1110,6 +1357,11 @@ export class Resolver {
     isAddPendingDocument: boolean;
     isCollectionSpecific: boolean;
   }) => {
+    await this.assertAuthCollectionWrite({
+      collection,
+      realPath,
+      op: 'update',
+    });
     const doc = await this.getDocument(realPath);
 
     const oldDoc = this.resolveLegacyValues(doc?._rawData || {}, collection);
@@ -1465,7 +1717,7 @@ export class Resolver {
               filterExpression: {
                 _type: 'string',
                 _list: false,
-                eq: id,
+                eq: normalizePath(id),
               },
             },
           ],
@@ -1502,7 +1754,7 @@ export class Resolver {
               filterExpression: {
                 _type: 'string',
                 _list: false,
-                eq: id,
+                eq: normalizePath(id),
               },
             },
           ],

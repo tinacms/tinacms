@@ -8,6 +8,7 @@ import type { MediaListOptions } from 'tinacms';
 import path from 'node:path';
 import { type NextRequest, NextResponse } from 'next/server';
 import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
+import { isDisallowedUploadType } from './upload-type';
 
 type RouteParams = { params: { media: string[] } };
 
@@ -77,6 +78,13 @@ async function uploadMedia(req: NextRequest, config: AzureBlobStorageConfig) {
     }
     throw e;
   }
+  if (isDisallowedUploadType(blobName)) {
+    return NextResponse.json(
+      { error: 'Unsupported file type' },
+      { status: 415 }
+    );
+  }
+
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
   await blockBlobClient.uploadData(buffer);
 

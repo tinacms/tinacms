@@ -1,5 +1,77 @@
 # next-tinacms-cloudinary
 
+## 27.0.6
+
+### Patch Changes
+
+- [#7666](https://github.com/tinacms/tinacms/pull/7666) [`53686ee`](https://github.com/tinacms/tinacms/commit/53686eef0b9511e1cf638b9530c84e1b36630c89) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump `multer` from `2.2.0` to `2.4.0`, which fixes CVE-2026-88932 and the four CVEs fixed in 2.3.0.
+
+  Uploads behave the same. Both adapters accept one file in the `file` field and read `directory` from the body. The behaviour changes in 2.3 and 2.4 cover upload limits, which neither adapter sets, and escaped characters in field names.
+
+- Updated dependencies [[`7998180`](https://github.com/tinacms/tinacms/commit/799818046dcea70ea6367199cea025d7ff4b0e3d), [`15818bc`](https://github.com/tinacms/tinacms/commit/15818bce7a4b83072d2b0d4a9e96025b6ac8f14a), [`12cdee6`](https://github.com/tinacms/tinacms/commit/12cdee614c5273d1f772ee8dc18ce37b91a2197c), [`4f2758e`](https://github.com/tinacms/tinacms/commit/4f2758e3067ca2a2db40593a0e4a1040b51ad127)]:
+  - tinacms@3.14.4
+
+## 27.0.5
+
+### Patch Changes
+
+- [`5db1597`](https://github.com/tinacms/tinacms/commit/5db1597953eb4dd24c23c7b5e441702b749d46ac) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Validate media upload file types on the server and reject active document types (e.g. `.html`, `.js`, `.xml`) instead of relying on the client-side accept filter alone.
+
+- Updated dependencies [[`d281cdf`](https://github.com/tinacms/tinacms/commit/d281cdf3a1dc1d5ef42d2bfd15c29224acc9d201)]:
+  - tinacms@3.14.3
+
+## 27.0.4
+
+### Patch Changes
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Bump `cloudinary` to `^2.7.0`
+
+  The catalog pinned `^1.41.3`, which carried GHSA-g4mf-96x5-5m2c (argument injection via ampersand, patched in 2.7.0) and pulled in the deprecated `q` promise library. v2 drops `q`, `core-js` and `cloudinary-core`, leaving `lodash` as its only dependency.
+
+  No code changes were needed: the package already imports the v2 API, and every method it uses (`config`, `uploader.upload`, `uploader.destroy`, `search`, `api.root_folders`, `api.sub_folders`) is unchanged. Of v2.0.0's three breaking changes, `secure` defaulting to true is already set explicitly, URL analytics only affects SDK-generated URLs rather than the Search API response fields this package reads, and the dropped Node 6/8 support is long past.
+
+- [#7484](https://github.com/tinacms/tinacms/pull/7484) [`7dd8ed0`](https://github.com/tinacms/tinacms/commit/7dd8ed07f05796e64496cdadc21571dbc580f362) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the unused `@types/crypto-js` devDependency
+
+  `crypto-js` itself was removed from `tinacms` and `@tinacms/cli`, and no source file in these packages imports it, so the type package had nothing left to type.
+
+- Updated dependencies [[`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`d7cdea7`](https://github.com/tinacms/tinacms/commit/d7cdea75219702574fa78b6adcc90c368e4e71eb), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`4d08c25`](https://github.com/tinacms/tinacms/commit/4d08c2546f96fa7b8fbef48b19e19c45e24b44d5), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af)]:
+  - tinacms@3.12.1
+
+## 27.0.3
+
+### Patch Changes
+
+- [#7436](https://github.com/tinacms/tinacms/pull/7436) [`4ef6b6d`](https://github.com/tinacms/tinacms/commit/4ef6b6d8f9afa7d596e2f74add3e9c5561e09563) Thanks [@kulesy](https://github.com/kulesy)! - Bump `multer` to 2.2.0. multer 1.x is end of life; 2.x changes file-handling behaviour, so review upload paths when upgrading.
+
+- [#7394](https://github.com/tinacms/tinacms/pull/7394) [`e66f1a4`](https://github.com/tinacms/tinacms/commit/e66f1a496b68078328c5a9e75ca41093426c8f77) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Escape the listing directory before interpolating it into the Cloudinary search expression, so folder names are always matched literally.
+
+- Updated dependencies [[`d7a1641`](https://github.com/tinacms/tinacms/commit/d7a16416b1b4bc1ba0e2aabdddcf39ed1e4135d7), [`f014558`](https://github.com/tinacms/tinacms/commit/f014558a7ece15964b3b2eda942c02fc609dc32f), [`17931b7`](https://github.com/tinacms/tinacms/commit/17931b72762afb575505c383ee6355476207a44e), [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d), [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`bd4df92`](https://github.com/tinacms/tinacms/commit/bd4df92a7e00bd74ee13eaf9f9b584fbb1a864ab), [`566f977`](https://github.com/tinacms/tinacms/commit/566f9775bc306f1a41806a29eb22182700765974), [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01), [`b6199da`](https://github.com/tinacms/tinacms/commit/b6199da1eeea7de01d5216c9b50c9e158440f891), [`ece366b`](https://github.com/tinacms/tinacms/commit/ece366bd5aa86e048d22f829319e41fe3d1267ba), [`4a19d66`](https://github.com/tinacms/tinacms/commit/4a19d669b069c0af959c6461cd60b5910aea6512), [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d), [`5112e60`](https://github.com/tinacms/tinacms/commit/5112e60bd0c98f6de36f63dbf068d252993e586f), [`8c8e297`](https://github.com/tinacms/tinacms/commit/8c8e297efb12324f23785a5f8f7acbceeb3f0a4a)]:
+  - tinacms@3.12.0
+
+## 27.0.2
+
+### Patch Changes
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`711ba30`](https://github.com/tinacms/tinacms/commit/711ba30f6e8955bbcea134fd22a5b498b7734325), [`908fe7d`](https://github.com/tinacms/tinacms/commit/908fe7ddc1c01a2c091f1e4f3c1b00f3696577b4), [`566af78`](https://github.com/tinacms/tinacms/commit/566af78ded66891edeb6fdf928b6543d45ac76fd), [`b8df6ee`](https://github.com/tinacms/tinacms/commit/b8df6eeee85b603406d204042a5ef95d49e8a9cf), [`59efccc`](https://github.com/tinacms/tinacms/commit/59efcccd3f1713870e40ebd9db25659cd6357237), [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - tinacms@3.11.0
+
+## 27.0.1
+
+### Patch Changes
+
+- [#7146](https://github.com/tinacms/tinacms/pull/7146) [`54e066f`](https://github.com/tinacms/tinacms/commit/54e066fce4863504cf7f7fd744df7b0a5190cdb1) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Sanitize the uploaded filename before writing it to the temp directory, and fix an inert multer `destination` misconfiguration.
+
+- Updated dependencies []:
+  - tinacms@3.10.1
+
 ## 27.0.0
 
 ### Patch Changes
@@ -239,7 +311,6 @@
 ### Patch Changes
 
 - [#6262](https://github.com/tinacms/tinacms/pull/6262) [`3a12a39`](https://github.com/tinacms/tinacms/commit/3a12a392d5a8eb9bba5a5be65d080f24afa08de3) Thanks [@0xharkirat](https://github.com/0xharkirat)! - 🔒 Security: Update Next.js to 14.2.35 to address security vulnerabilities
-
   - Address CVE-2025-55184 (high): DoS via malicious HTTP request causing server to hang
   - Address CVE-2025-67779 (high): Complete fix for CVE-2025-55184 DoS vulnerability
   - Updated Next.js devDependency from 14.2.10/14.2.24 to 14.2.35
@@ -752,7 +823,6 @@
   ### Changes in the database file
 
   #### Deprecations and Additions
-
   - **Deprecated**: `onPut`, `onDelete`, and `level` arguments in `createDatabase`.
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
@@ -790,7 +860,6 @@
   ### Migrating `database.ts`
 
   #### a. Replacing `onPut` and `onDelete` with `gitProvider`
-
   - **GitHubProvider Usage**: Replace `onPut` and `onDelete` with `gitProvider`, using the provided `GitHubProvider` for GitHub.
 
   ```typescript
@@ -819,7 +888,6 @@
   ```
 
   #### b. Renaming `level` to `databaseAdapter`
-
   - **Renaming in Code**: Change `level` to `databaseAdapter` for clarity.
 
   ```diff
@@ -830,7 +898,6 @@
   ```
 
   #### c. `createLocalDatabase` Function
-
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
@@ -839,7 +906,6 @@
   ```
 
   #### d. Consolidated Example
-
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
@@ -857,7 +923,6 @@
   ### Summary of Authentication Updates in Config
 
   #### a. AuthProvider and AbstractAuthProvider
-
   - **New**: `authProvider` in `defineConfig`.
   - **Class**: `AbstractAuthProvider` for extending new auth providers.
   - **Clerk Auth Provider**: New provider added.
@@ -865,11 +930,9 @@
   - **Deprecation**: `admin.auth`.
 
   #### b. Auth Provider in Internal Client and Config
-
   - **Transition**: From auth functions to `authProvider` class.
 
   #### c. Migration for Authentication
-
   - **Previous API**:
 
   ```javascript
@@ -901,7 +964,6 @@
   ```
 
   ### TinaCMS Self Hosted backend updates
-
   - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
   - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
 
@@ -1209,7 +1271,7 @@
     },
     {
       useHttps: false,
-    }
+    },
   );
   ```
 

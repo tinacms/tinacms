@@ -1,6 +1,6 @@
 import type { Field } from '@toolkit/forms';
+import { ChevronDown } from 'lucide-react';
 import * as React from 'react';
-import { MdKeyboardArrowDown } from 'react-icons/md';
 
 type Option = {
   value: string;
@@ -58,7 +58,7 @@ export const Select: React.FC<SelectProps> = ({
           <option>{input.value}</option>
         )}
       </select>
-      <MdKeyboardArrowDown className='absolute top-1/2 right-2 w-6 h-auto -translate-y-1/2 text-gray-300 group-hover:text-blue-500 transition duration-150 ease-out pointer-events-none' />
+      <ChevronDown className='absolute top-1/2 right-2 w-6 h-auto -translate-y-1/2 text-gray-300 group-hover:text-blue-500 transition duration-150 ease-out pointer-events-none' />
     </div>
   );
 };

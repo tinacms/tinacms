@@ -1,0 +1,247 @@
+{
+  "version": 5,
+  "schema": {
+    "collections": [
+      {
+        "name": "post",
+        "label": "Posts",
+        "path": "content/posts",
+        "format": "mdx",
+        "hooks": [
+          {
+            "name": "trimTitle"
+          },
+          {
+            "name": "logSave",
+            "args": [
+              "saved"
+            ]
+          }
+        ],
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "validators": [
+              {
+                "name": "required"
+              },
+              {
+                "name": "matches",
+                "args": [
+                  "^[A-Z]",
+                  "Start with a capital letter"
+                ]
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "featured",
+            "label": "Featured",
+            "type": "boolean"
+          },
+          {
+            "name": "heroImage",
+            "label": "Hero image",
+            "type": "image"
+          },
+          {
+            "name": "stars",
+            "label": "Stars",
+            "validators": [
+              {
+                "name": "requiredWhen",
+                "args": [
+                  "status",
+                  "published",
+                  "Rate the post before you publish it"
+                ]
+              }
+            ],
+            "type": "rating"
+          },
+          {
+            "name": "body",
+            "label": "Body",
+            "isBody": true,
+            "type": "rich-text"
+          },
+          {
+            "name": "authors",
+            "label": "Authors",
+            "fields": [
+              {
+                "name": "name",
+                "label": "Name",
+                "type": "string"
+              },
+              {
+                "name": "alias",
+                "label": "Alias",
+                "validators": [
+                  {
+                    "name": "differentFrom",
+                    "args": [
+                      "name",
+                      "Alias must differ from the name"
+                    ]
+                  }
+                ],
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          },
+          {
+            "type": "reference",
+            "collections": [
+              "page"
+            ],
+            "name": "pages",
+            "label": "Pages Reference"
+          },
+          {
+            "name": "status",
+            "label": "Status",
+            "options": [
+              {
+                "value": "draft",
+                "label": "Draft"
+              },
+              {
+                "value": "published",
+                "label": "Published"
+              }
+            ],
+            "type": "select"
+          },
+          {
+            "name": "seo",
+            "label": "SEO",
+            "fields": [
+              {
+                "name": "title",
+                "label": "Title",
+                "validators": [
+                  {
+                    "name": "required"
+                  }
+                ],
+                "type": "string"
+              },
+              {
+                "name": "description",
+                "label": "Description",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      {
+        "name": "page",
+        "label": "Pages",
+        "path": "content/pages",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "featured",
+            "label": "Featured",
+            "type": "boolean"
+          },
+          {
+            "name": "tags",
+            "label": "Tags",
+            "of": {
+              "name": "tag",
+              "label": "Tag",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "name": "blocks",
+            "label": "Blocks",
+            "templates": [
+              {
+                "name": "hero",
+                "label": "Hero",
+                "defaultItem": {
+                  "headline": "A new hero"
+                },
+                "fields": [
+                  {
+                    "name": "headline",
+                    "label": "Headline",
+                    "validators": [
+                      {
+                        "name": "required"
+                      }
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "name": "tagline",
+                    "label": "Tagline",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "cta",
+                "label": "Call to action",
+                "fields": [
+                  {
+                    "name": "label",
+                    "label": "Label",
+                    "validators": [
+                      {
+                        "name": "required"
+                      }
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "name": "link",
+                    "label": "Link",
+                    "type": "string"
+                  }
+                ]
+              }
+            ],
+            "type": "array"
+          }
+        ]
+      }
+    ],
+    "version": {
+      "fullVersion": "4.0.0-alpha.0",
+      "major": "4",
+      "minor": "0",
+      "patch": "0-alpha"
+    }
+  },
+  "primitives": {
+    "array": 1,
+    "boolean": 1,
+    "image": 1,
+    "object": 1,
+    "rating": 1,
+    "reference": 1,
+    "rich-text": 1,
+    "select": 1,
+    "string": 1
+  }
+}

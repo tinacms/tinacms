@@ -1,11 +1,13 @@
-import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
+import react from '@astrojs/react';
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'astro/config';
 import tinaDirective from './astro-tina-directive/register.js';
 
 export default defineConfig({
   integrations: [react(), mdx(), tinaDirective()],
   vite: {
+    plugins: [tailwindcss()],
     ssr: {
       // react-icons uses a directory import that Node ESM doesn't support.
       // Telling Vite to bundle it during SSR avoids the resolution error.

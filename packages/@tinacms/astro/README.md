@@ -14,7 +14,7 @@ pnpm add @tinacms/astro tinacms
 pnpm add -D @tinacms/cli
 ```
 
-Requires Astro 5 or 6 and an SSR adapter (`@astrojs/node`, `vercel`, `netlify`, or `cloudflare`) — the island-refresh endpoint (`/tina-island/[name]`) is on-demand. `output: 'server'` is the simplest choice; `output: 'static'` also works as long as editable regions are wrapped in [`<TinaIsland>`](#static-site-editing) and the adapter can serve that one on-demand route.
+Requires Astro 5, 6, or 7 and an SSR adapter (`@astrojs/node`, `vercel`, `netlify`, or `cloudflare`) — the island-refresh endpoint (`/tina-island/[name]`) is on-demand. `output: 'server'` is the simplest choice; `output: 'static'` also works as long as editable regions are wrapped in [`<TinaIsland>`](#static-site-editing) and the adapter can serve that one on-demand route.
 
 ## Usage
 
@@ -76,7 +76,7 @@ Trade-off: a page that uses `<TinaIsland>` carries that one-line inline bootstra
 | `@tinacms/astro/TinaMarkdown.astro` | `<TinaMarkdown content components />` — rich-text renderer. Import from this subpath so Astro's check sees a real `.astro` component (the bare-package default resolves through the types condition to a placeholder). |
 | `@tinacms/astro/integration` | `tina()` integration — auto-wires the middleware and stages the static `/admin/bridge.js` asset so `requestWithMetadata()` works without you threading `Astro.request` or writing wiring components |
 | `@tinacms/astro/TinaIsland.astro` | `<TinaIsland name wrapper params [primary] />` — marker wrapper for an editable region; pass `primary` on the page's main region so the editor opens that form instead of the "Referenced Files" list |
-| `@tinacms/astro/types` | `TinaRichTextContent`, `CustomComponentsMap`, `TinaRichTextNode`, `MdxElement`, `TextElement` |
+| `@tinacms/astro/types` | `TinaRichTextContent`, `TinaMarkdownProps`, `CustomComponentsMap`, `TinaRichTextNode`, `MdxElement`, `TextElement` |
 | `@tinacms/astro/sanitize` | `sanitizeHref` / `sanitizeImageSrc` for CMS-supplied URLs |
 | `@tinacms/astro/bridge` | `init`, `refreshForms`, and the rest of `@tinacms/bridge` |
 | `@tinacms/astro/tina-field` | `tinaField()` helper |

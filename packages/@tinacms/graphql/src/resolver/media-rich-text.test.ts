@@ -12,7 +12,7 @@
  */
 
 import { parseMDX, serializeMDX } from '@tinacms/mdx';
-import type { RichTextType, Schema } from '@tinacms/schema-tools';
+import type { RichTextField, Schema } from '@tinacms/schema-tools';
 import { describe, expect, it } from 'vitest';
 import type { GraphQLConfig } from '../types';
 import {
@@ -20,7 +20,7 @@ import {
   resolveMediaRelativeToCloud,
 } from './media-utils';
 
-const bodyField: RichTextType = {
+const bodyField: RichTextField = {
   type: 'rich-text',
   name: 'body',
   templates: [

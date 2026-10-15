@@ -1,123 +1,361 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   type ReactNode,
   use,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
-import type { FieldAddress } from '../core/field/address';
+import { FormProvider as RhfFormProvider, get, useForm } from 'react-hook-form';
+import type { ResolvedConfig } from '../config';
+import { toFieldAddress } from '../core/field/address';
+import { createFieldRegistry } from '../core/field/registry';
+import { fieldEqualityFor } from '../core/form/compare';
 import {
-  type FieldRegistry,
-  resolveFieldPlugins,
-} from '../core/field/registry';
+  createFormHookRegistry,
+  resolveFormHooks,
+  runOnChange,
+} from '../core/form/hooks';
 import { ingestDocument } from '../core/form/ingest';
-import type { PluginManifest } from '../core/plugin';
+import { type PluginManifest, resolveClientSegments } from '../core/plugin';
+import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
+import { createScreenRegistry } from '../core/screen/registry';
+import { createGlobalNav } from '../core/slot/global-nav';
+import { addressesWithValidators } from '../core/validation';
+import { createValidatorRegistry } from '../core/validator/registry';
+import { removeDraft } from '../form/drafts';
 import {
-  ActiveFieldContext,
-  CollectionContext,
-  RegistryContext,
+  type FieldErrors,
+  type FormId,
+  formStatus,
+  isEdited,
+  readFormStore,
+  readOpeningScope,
+  staleDraft,
+  syncDrafts,
+  toDocument,
+  toFormId,
+  toFormValues,
+  useFormStatus,
+  useFormStore,
+} from '../form/form-store';
+import { SELF_CONTAINED_VALIDATORS } from '../plugins/validators/core-validators.schema';
+import { createTinaStore } from '../store/create-store';
+import {
+  FormScopeContext,
+  type SaveHandler,
+  type TinaRuntime,
+  TinaRuntimeContext,
 } from './context';
+import { flattenFieldErrors, nestFieldErrors } from './field-errors';
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
-  plugins: PluginManifest[];
+  config: ResolvedConfig;
+  queryClient?: QueryClient;
   children: ReactNode;
 }
 
-export function TinaProvider({ plugins, children }: TinaProviderProps) {
-  // TODO(zustand): the resolved registry + this loading/error state belong in the
-  // global Tina store (ADR-003), composed once at boot — not per-provider state.
-  const [registry, setRegistry] = useState<FieldRegistry | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const pluginsKey = plugins.map((plugin) => plugin.name).join('|');
+const createDefaultQueryClient = () =>
+  new QueryClient({ defaultOptions: { queries: { retry: 1 } } });
 
-  // TODO(zustand): resolve plugins once at boot into the global store (ADR-003)
-  // rather than in this effect — the provider would then just read a ready
-  // registry, with no loading state or in-effect async here.
+type BootedRuntime = Omit<TinaRuntime, 'schema'>;
+
+const usePluginsKey = (plugins: PluginManifest[]): number => {
+  const previous = useRef<PluginManifest[] | null>(null);
+  const token = useRef(0);
+  const unchanged =
+    previous.current !== null &&
+    previous.current.length === plugins.length &&
+    previous.current.every(
+      (plugin, index) => plugin.name === plugins[index].name
+    );
+  if (!unchanged) {
+    previous.current = plugins;
+    token.current += 1;
+  }
+  return token.current;
+};
+
+let lifecycleTurn: Promise<void> = Promise.resolve();
+
+export function TinaProvider({
+  config,
+  queryClient,
+  children,
+}: TinaProviderProps) {
+  const [ownQueryClient] = useState(createDefaultQueryClient);
+  const activeQueryClient = queryClient ?? ownQueryClient;
+  const [booted, setBooted] = useState<BootedRuntime | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const composedPlugins = config.plugins;
+  const pluginsKey = usePluginsKey(composedPlugins);
+
   useEffect(() => {
     let mounted = true;
-    resolveFieldPlugins(plugins)
-      .then((resolved) => {
-        if (mounted) setRegistry(resolved);
-      })
-      .catch((cause) => {
-        if (mounted) {
-          setError(cause instanceof Error ? cause : new Error(String(cause)));
-        }
-      });
+    const boot = lifecycleTurn.then(async () => {
+      validateCapabilityGraph(composedPlugins);
+      const resolved = await resolveClientSegments(composedPlugins);
+      const screens = createScreenRegistry(resolved, composedPlugins);
+      const runtime: BootedRuntime = {
+        registry: createFieldRegistry(resolved),
+        validators: createValidatorRegistry(resolved),
+        hooks: createFormHookRegistry(resolved),
+        store: createTinaStore(resolved),
+        screens,
+        globalNav: createGlobalNav(resolved, composedPlugins, screens),
+      };
+      const destroyPlugins = await initializePlugins(composedPlugins);
+      if (mounted) setBooted(runtime);
+      return destroyPlugins;
+    });
+    lifecycleTurn = boot.then(
+      () => undefined,
+      () => undefined
+    );
+    boot.catch((cause) => {
+      if (!mounted) return;
+      if (cause instanceof Error) {
+        setError(cause);
+      } else {
+        setError(new Error(String(cause)));
+      }
+    });
     return () => {
       mounted = false;
+      const destroyBootedPlugins = async () => {
+        const destroyPlugins = await boot.catch(() => null);
+        await destroyPlugins?.();
+      };
+      const previousTurn = lifecycleTurn;
+      lifecycleTurn = previousTurn.then(destroyBootedPlugins).catch((cause) => {
+        console.error('[tinacms] plugin teardown failed:', cause);
+      });
     };
   }, [pluginsKey]);
 
+  useEffect(() => syncDrafts(), []);
+
+  const runtime = useMemo(
+    () => (booted ? { ...booted, schema: config.schema } : null),
+    [booted, config.schema]
+  );
+
   if (error) throw error;
-  if (!registry) return null;
-  return <RegistryContext value={registry}>{children}</RegistryContext>;
+  if (!runtime) return null;
+  return (
+    <QueryClientProvider client={activeQueryClient}>
+      <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
+    </QueryClientProvider>
+  );
 }
 
 export interface FormProviderProps {
   collection: CollectionSchema;
+  path: string;
   document?: TinaDocument;
+  onSave?: SaveHandler;
   children: ReactNode;
 }
 
 export function FormProvider({
   collection,
+  path,
   document,
+  onSave,
   children,
 }: FormProviderProps) {
-  const registry = use(RegistryContext);
-  if (!registry) {
+  const runtime = use(TinaRuntimeContext);
+  if (!runtime) {
     throw new Error('FormProvider must be used within a TinaProvider');
   }
+  const { registry, validators, hooks } = runtime;
+  const formHooks = useMemo(
+    () => resolveFormHooks(hooks, collection.hooks ?? []),
+    [hooks, collection]
+  );
 
-  const defaultValues = useMemo(
-    () => ingestDocument(document, collection.fields, registry),
-    [document, collection, registry]
+  const formId = toFormId(path);
+  const transformContext = useMemo(
+    () => ({ documentPath: path, registry }),
+    [path, registry]
   );
-  const resolver = useMemo(
-    () => buildFormResolver(collection, registry),
-    [collection, registry]
+  const ingested = useMemo(
+    () => ingestDocument(document, collection.fields, transformContext),
+    [document, collection, transformContext]
   );
+  const equal = useMemo(
+    () => fieldEqualityFor(collection.fields, transformContext),
+    [collection, transformContext]
+  );
+  // What a fresh form instance adopts from the store. It samples the store one time,
+  // because RHF replaces its full error state each time the `errors` option changes
+  // identity — a rebuild on each document would overwrite the live errors of the user.
+  const kept = useMemo(() => {
+    const scope = readOpeningScope(formId, toFormValues(ingested), equal);
+    if (!scope) return { seed: null, errors: {} };
+    return {
+      seed: toDocument(scope.values),
+      errors: nestFieldErrors(scope.errors),
+    };
+  }, [formId]);
+  // Whether the scope still keeps its values against the document of this render. A
+  // clean scope stops keeping them when another writer changes the file, so the test
+  // must follow the document, not only the form id.
+  const keepsIncoming = useMemo(
+    () => readOpeningScope(formId, toFormValues(ingested), equal) !== undefined,
+    [formId, ingested, equal]
+  );
+  const seedValues = keepsIncoming ? (kept.seed ?? ingested) : ingested;
+  const resolver = buildFormResolver(collection, registry, validators);
   const methods = useForm<TinaDocument>({
-    defaultValues,
+    defaultValues: seedValues,
+    errors: kept.errors,
     resolver,
     mode: 'onChange',
+    shouldFocusError: false,
   });
 
-  // Re-seed the form only when the document's content actually changes (compared by
-  // a JSON signature). RHF's useForm reads defaultValues only at mount, so this
-  // reset reloads the form when you switch documents — while a same-content
-  // re-render won't wipe in-progress edits.
+  const reseeds = useRef(0);
+  const [seedKey, setSeedKey] = useState(() => `${formId}#${reseeds.current}`);
+  const advanceSeedKey = useCallback((seededFormId: FormId) => {
+    reseeds.current += 1;
+    setSeedKey(`${seededFormId}#${reseeds.current}`);
+  }, []);
+
   const seededSignature = useRef<string | null>(null);
   useEffect(() => {
-    const signature = JSON.stringify(defaultValues);
+    useFormStore.getState().registerForm(formId, toFormValues(ingested), equal);
+    const signature = JSON.stringify([formId, seedValues]);
     if (seededSignature.current === null) {
       seededSignature.current = signature;
       return;
     }
     if (seededSignature.current !== signature) {
       seededSignature.current = signature;
-      methods.reset(defaultValues);
+      methods.reset(seedValues, { keepErrors: seedValues === kept.seed });
+      advanceSeedKey(formId);
     }
-  }, [defaultValues, methods]);
+  }, [formId, ingested, seedValues, kept, methods, equal, advanceSeedKey]);
 
-  // TODO(zustand): active-field / UI state should live in the global Tina store.
-  const [active, setActive] = useState<FieldAddress | null>(null);
-  const activeField = useMemo(() => ({ active, setActive }), [active]);
+  const discardEdits = useCallback(() => {
+    const store = readFormStore();
+    const scope = store.forms[formId];
+    if (!isEdited(scope)) return;
+    const baseline = toDocument(scope.baseline);
+    store.discardEdits(formId);
+    methods.reset(baseline);
+    advanceSeedKey(formId);
+  }, [formId, methods, advanceSeedKey]);
+
+  const [draftRevision, setDraftRevision] = useState(0);
+  const status = useFormStatus(formId);
+  const stale = useMemo(
+    () => staleDraft(formId, toFormValues(ingested), equal),
+    [formId, ingested, equal, draftRevision, status]
+  );
+  const staleDraftActions = useMemo(() => {
+    if (!stale) return null;
+    return {
+      resume: () => {
+        const store = readFormStore();
+        store.resumeDraft(formId, {
+          values: toFormValues(stale.values),
+          baseline: toFormValues(stale.baseline),
+        });
+        const resumed = readFormStore().forms[formId];
+        if (formStatus(resumed) !== 'dirty') removeDraft(formId);
+        methods.reset(toDocument(resumed?.values ?? {}));
+        advanceSeedKey(formId);
+        setDraftRevision((revision) => revision + 1);
+      },
+      discard: () => {
+        removeDraft(formId);
+        setDraftRevision((revision) => revision + 1);
+      },
+    };
+  }, [stale, formId, methods, advanceSeedKey]);
+
+  useEffect(() => {
+    const unsubscribe = methods.subscribe({
+      formState: { values: true, errors: true },
+      callback: ({ values, errors, name }) => {
+        const store = useFormStore.getState();
+        if (name !== undefined) {
+          // The store's live-values mirror is flat, one entry per top-level
+          // field. A nested field name collapses to its top-level address.
+          const topLevel = name.split('.')[0];
+          store.setFieldValue(
+            formId,
+            toFieldAddress(topLevel),
+            values[topLevel]
+          );
+        }
+        const flat = flattenFieldErrors(errors ?? {});
+        const mirrored: FieldErrors = {};
+        for (const [address, messages] of Object.entries(flat)) {
+          mirrored[toFieldAddress(address)] = messages;
+        }
+        store.setFieldErrors(formId, mirrored);
+      },
+    });
+    return () => unsubscribe();
+  }, [formId, methods]);
+
+  // react-hook-form applies the resolver's result to the changed field only,
+  // so a field-level rule that reads a sibling would keep a stale error after
+  // the sibling changes. Re-validate the fields that carry validators, and
+  // only those, so an untouched `required` field stays quiet. `watch` fires on
+  // value changes alone, not on the state `trigger` emits, so this cannot loop.
+  useEffect(() => {
+    const { unsubscribe } = methods.watch((values, { name }) => {
+      if (name === undefined) return;
+      runOnChange(
+        formHooks,
+        { address: toFieldAddress(name), value: get(values, name) },
+        { formId, path, collection }
+      );
+      const dependents = addressesWithValidators(
+        collection.fields,
+        values,
+        SELF_CONTAINED_VALIDATORS
+      );
+      if (dependents.length > 0) void methods.trigger(dependents);
+    });
+    return () => unsubscribe();
+  }, [methods, collection, formHooks, formId, path]);
+
+  const formScope = useMemo(
+    () => ({
+      formId,
+      path,
+      collection,
+      onSave: onSave ?? null,
+      seedKey,
+      discardEdits,
+      hooks: formHooks,
+      staleDraft: staleDraftActions,
+    }),
+    [
+      formId,
+      path,
+      collection,
+      onSave,
+      seedKey,
+      discardEdits,
+      formHooks,
+      staleDraftActions,
+    ]
+  );
 
   return (
-    <CollectionContext value={collection}>
-      <ActiveFieldContext value={activeField}>
-        <RhfFormProvider {...methods}>
-          {/* Fragment pins children to a ReactElement — RHF's FormProvider children
-              type predates the bigint that React 19's ReactNode includes. */}
-          <>{children}</>
-        </RhfFormProvider>
-      </ActiveFieldContext>
-    </CollectionContext>
+    <FormScopeContext value={formScope}>
+      <RhfFormProvider {...methods}>
+        <>{children}</>
+      </RhfFormProvider>
+    </FormScopeContext>
   );
 }

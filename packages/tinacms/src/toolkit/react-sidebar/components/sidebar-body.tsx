@@ -1,4 +1,4 @@
-import { Transition } from '@headlessui/react';
+import { Transition } from '@toolkit/components/transition';
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -18,9 +18,8 @@ import { FormBuilder, FormStatus } from '@toolkit/form-builder';
 import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
-import { History } from 'lucide-react';
+import { ArrowLeft, History } from 'lucide-react';
 import * as React from 'react';
-import { BiArrowBack } from 'react-icons/bi';
 import {
   Tooltip,
   TooltipContent,
@@ -187,10 +186,9 @@ export interface FormHeaderProps {
   isLocalMode?: boolean;
   repoProvider?: {
     defaultBranchName?: string;
-    historyUrl?: (context: {
-      relativePath: string;
-      branch: string;
-    }) => { url: string };
+    historyUrl?: (context: { relativePath: string; branch: string }) => {
+      url: string;
+    };
   };
 }
 
@@ -257,10 +255,9 @@ interface RepositoryProviderProps {
   tinaBranch?: string;
   isLocalMode?: boolean;
   defaultBranchName?: string;
-  historyUrl?: (context: {
-    relativePath: string;
-    branch: string;
-  }) => { url: string };
+  historyUrl?: (context: { relativePath: string; branch: string }) => {
+    url: string;
+  };
 }
 
 export const FileHistoryProvider = ({
@@ -314,7 +311,10 @@ export const FileHistoryProvider = ({
 const BreadcrumbItemLink = ({
   breadcrumb,
   onClick,
-}: { breadcrumb: string; onClick: () => void }) => {
+}: {
+  breadcrumb: string;
+  onClick: () => void;
+}) => {
   return (
     <BreadcrumbItem className='shrink min-w-0'>
       <BreadcrumbLink
@@ -333,7 +333,10 @@ const BreadcrumbItemLink = ({
 const CollectionBreadcrumbItem = ({
   label,
   onClick,
-}: { label: string; onClick: () => void }) => {
+}: {
+  label: string;
+  onClick: () => void;
+}) => {
   return (
     <BreadcrumbItem className='shrink min-w-0'>
       <BreadcrumbLink
@@ -346,7 +349,7 @@ const CollectionBreadcrumbItem = ({
           aria-label={`Back to ${label}`}
           className='flex items-center gap-1.5 min-w-0'
         >
-          <BiArrowBack className='w-4 h-4 shrink-0 opacity-80' />
+          <ArrowLeft className='w-4 h-4 shrink-0 opacity-80' />
           <span className='truncate min-w-0'>{label}</span>
         </button>
       </BreadcrumbLink>

@@ -1,17 +1,12 @@
 import { useCMS } from '@toolkit/react-tinacms';
-import * as React from 'react';
-import {
-  BiChevronDown,
-  BiGitBranch,
-  BiLinkExternal,
-  BiLockAlt,
-} from 'react-icons/bi';
 import { cn } from '@utils/cn';
+import { ChevronDown, ExternalLink, GitBranch, Lock } from 'lucide-react';
+import * as React from 'react';
+import { BranchSwitcherOpenedEvent } from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import { Button } from '../styles/button';
 import { useBranchData } from './branch-data';
 import { BranchModal } from './branch-modal';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
-import { BranchSwitcherOpenedEvent } from '../../lib/posthog/posthog';
 
 export const BranchButton = ({ className = '' }) => {
   const [open, setOpen] = React.useState(false);
@@ -42,12 +37,12 @@ export const BranchButton = ({ className = '' }) => {
         title={currentBranch}
       >
         {isProtected ? (
-          <BiLockAlt className='flex-shrink-0 h-6 w-auto opacity-70' />
+          <Lock className='flex-shrink-0 h-6 w-auto opacity-70' />
         ) : (
-          <BiGitBranch className='flex-shrink-0 h-6 w-auto opacity-70 text-zinc-400' />
+          <GitBranch className='flex-shrink-0 h-6 w-auto opacity-70 text-zinc-400' />
         )}
         <span className='truncate max-w-full -mr-1'>{currentBranch}</span>
-        <BiChevronDown
+        <ChevronDown
           className='-mr-1 h-4 w-4 opacity-70 shrink-0'
           aria-hidden='true'
         />
@@ -89,7 +84,7 @@ export const BranchPreviewButton = (
       title='Preview site in new tab'
     >
       <span className='sr-only'>Preview</span>
-      <BiLinkExternal className='h-5 w-auto' />
+      <ExternalLink className='h-5 w-auto' />
     </button>
   );
 };

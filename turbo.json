@@ -2,20 +2,42 @@
   "$schema": "https://turborepo.org/schema.json",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**"
+      ]
     },
     "test": {
-      "dependsOn": ["build", "types"]
+      "dependsOn": [
+        "build",
+        "types"
+      ]
     },
     "types": {
-      "dependsOn": ["build", "^types"],
+      "dependsOn": [
+        "build",
+        "^types"
+      ],
       "outputs": [
         "dist/**"
       ]
     },
     "lint": {
-      "dependsOn": ["build", "types"]
+      "dependsOn": [
+        "build",
+        "types"
+      ]
+    },
+    "coverage": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
     }
   }
 }

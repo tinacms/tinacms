@@ -16,9 +16,13 @@ import {
 import type { Media, MediaListOptions } from 'tinacms';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
+import { safeUploadName } from './upload-filename';
+import { isDisallowedUploadType } from './upload-type';
+import { resolveUploadContentType } from './upload-content-type';
 import { promisify } from 'util';
 
 export interface DOSConfig {
@@ -88,13 +92,11 @@ async function uploadMedia(
   const upload = promisify(
     multer({
       storage: multer.diskStorage({
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        directory: (req, file, cb) => {
-          cb(null, '/tmp');
+        destination: (req, file, cb) => {
+          cb(null, os.tmpdir());
         },
         filename: (req, file, cb) => {
-          cb(null, file.originalname);
+          cb(null, safeUploadName(file.originalname));
         },
       }),
     }).single('file')
@@ -116,6 +118,14 @@ async function uploadMedia(
   const blob = fs.readFileSync(filePath);
   const filename = path.basename(filePath);
 
+  const contentType = resolveUploadContentType(
+    filename,
+    fileType || 'application/octet-stream'
+  );
+  if (isDisallowedUploadType(filename) || !contentType) {
+    return res.status(415).json({ message: 'Unsupported file type' });
+  }
+
   let objectKey: string;
   try {
     objectKey = resolveKey(mediaRoot, prefix + filename, { decode: false });
@@ -131,7 +141,7 @@ async function uploadMedia(
     Key: objectKey,
     Body: blob,
     ACL: 'public-read',
-    ContentType: fileType || 'application/octet-stream',
+    ContentType: contentType,
   };
   const command = new PutObjectCommand(params);
 
