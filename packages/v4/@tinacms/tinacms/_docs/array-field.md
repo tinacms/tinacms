@@ -1,8 +1,9 @@
 # The `array` field
 
-The `array` field is one of the field plugins that v4 supplies. It repeats a
-fixed set of item fields, and the author adds, removes, and reorders the
-items. It is a compound field — see
+The `array` field is one of the field plugins that v4 supplies. It holds a
+list of items, and the author adds, removes, and reorders them. Each item is
+an object of fixed fields (`fields`), a block of one of several templates
+(`templates`), or a single value (`of`). It is a compound field — see
 [field-plugins.md](./field-plugins.md#compound-fields) for the shared
 mechanism it uses.
 
@@ -19,43 +20,53 @@ The four files are in `plugins/fields/array/`:
 
 ## Authoring
 
-`t.array({...})` adds `type: 'array'` (`ARRAY_FIELD_TYPE`) to the config. Its
-`fields` property is the item template — an ordinary array of `FieldSchema`
-nodes, the same shape a collection uses for its own `fields`:
+`t.array({...})` adds `type: 'array'` (`ARRAY_FIELD_TYPE`) to the config. An
+array declares its items with exactly one of `fields`, `templates` or `of`
+([ADR-017 §4](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/017-content-model.md)).
+Each shape sets the other two keys to `never`, so TypeScript rejects a config
+that sets two of them. `asArrayFieldSchema` makes the same check at runtime.
 
 ```ts
-import { t } from '@tinacms/tinacms';
+import { t, type TemplateSchema } from '@tinacms/tinacms';
+
+const hero = {
+  name: 'hero',
+  label: 'Hero',
+  defaultItem: { headline: 'A new hero' },
+  fields: [t.string({ name: 'headline', label: 'Headline' })],
+} satisfies TemplateSchema;
 
 const collection = {
-  name: 'post',
+  name: 'page',
   fields: [
+    // Every item has the same shape.
     t.array({
       name: 'authors',
-      label: 'Authors',
-      validators: [required()],
-      fields: [
-        t.string({ name: 'name', label: 'Name', validators: [required()] }),
-        t.string({ name: 'role', label: 'Role' }),
-      ],
+      fields: [t.string({ name: 'name', label: 'Name' })],
     }),
+    // Each item picks a template. This is a block-based field.
+    t.array({ name: 'blocks', templates: [hero] }),
+    // Each item is a single value of the `of` field type.
+    t.array({ name: 'tags', of: t.string({ name: 'tag', label: 'Tag' }) }),
   ],
 };
 ```
 
-`ArrayFieldSchema` extends `BaseFieldSchema`. It adds three properties:
+| Key | Type | Items | Stored value |
+|---|---|---|---|
+| `fields` | `FieldSchema[]` | objects with one shape | `[{ name: 'Ivan' }]` |
+| `templates` | `TemplateSchema[]` | objects, each with its own template | `[{ _template: 'hero', headline: 'Hi' }]` |
+| `of` | `ScalarFieldSchema` | single values; an object or array here is rejected (ADR-017 §4) | `['news', 'release']` |
 
-| Key | Type | Effect |
-|---|---|---|
-| `fields` | `FieldSchema[]` (required) | the item template; every item has this same shape |
+A template is the shared `TemplateSchema` from `core/schema/types.ts`:
+`name`, `label?`, `fields` and `defaultItem?`. A new item of a template starts
+from its `defaultItem`.
 
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with
 > `validators`. Refer to
 > [Validation in two layers](./field-plugins.md#validation-in-two-layers).
 
-
-The stored value is an array of plain objects, one per item, keyed by each
-item field's own `name`.
 
 ## The descriptor
 
@@ -81,8 +92,10 @@ defineClientPlugin({
 
 ## Validation
 
-`arraySchema(node)` checks that the value is a list of objects. The
-`required`, `min` and `max` validators check the item count.
+`arraySchema(node)` checks that the value is a list: a list of objects for
+`fields` and `templates`, any list for `of`. A value of the wrong shape fails
+with `<label> must be a list of items`. The `required`, `min` and `max`
+validators check the item count.
 `required` implies `min: 1` unless `min` is set explicitly:
 
 | Config | Rule | Message |
@@ -90,11 +103,16 @@ defineClientPlugin({
 | `required` (no `min`) | fewer than 1 item | `<label> needs at least 1 item` |
 
 That schema checks the array's own shape only — it does not look inside an
-item. Each item field's own rules run through `validateChildren(value, node,
-address, registry)`, which calls `validateFieldTree(subfield, descriptor,
-item[subfield.name], \`${address}.${index}.${subfield.name}\`, registry)`
-(`core/validation.ts`) for every item field of every item, and merges what it
-returns. It builds each item's address from its own `address` parameter, not
+item. Each item's own rules run through `validateChildren(value, node,
+address, registry)`, which calls `validateFieldTree` (`core/validation.ts`)
+and merges what it returns:
+
+- For `fields`, it runs each item field at
+  \`${address}.${index}.${subfield.name}\`.
+- For `templates`, it looks up each item's template by `_template` and runs
+  that template's fields at the same addresses. An item whose template is
+  unknown is skipped.
+- For `of`, it runs the `of` field on each item at \`${address}.${index}\`. It builds each item's address from its own `address` parameter, not
 `node.name` — an array nested inside another array is not addressed by its
 bare name (`members`), only by where it actually sits
 (`groups.0.members`).
@@ -141,6 +159,18 @@ registry from `context.registry` (`FieldTransformContext`,
 an item field with its own `parse`/`serialize` — a nested `datetime` field, for
 example — converts the same way it would at the top level.
 
+For `templates`, `parse` reads the `_template` of each item and uses the fields
+of that template. `parse` and `serialize` keep `_template` on every item. An
+item with no `_template`, or with an unknown one, passes through `parse` and
+`serialize` unchanged, with a console warning. The component shows it as an
+unknown block that the editor can move or remove, so a renamed or removed
+template never deletes content. An item of a `fields` or `templates` array that is
+not an object is kept the same way, shown read-only with its stored value, and
+fails validation (`<label> must be a list of items`) until it is removed. A
+value that is not a list at all is shown read-only for the whole field. For `of`,
+`parse` and `serialize` call the `parse`/`serialize` of the `of` field type on
+each item.
+
 The registry is necessary: `invariant` throws `array-field-no-registry` if
 `context.registry` is absent when `parse` or `serialize` runs.
 
@@ -175,9 +205,17 @@ already works for visual editing: `<FieldNode>` marks its address active on
 focus, exactly as `<Field>` does for a top-level field, and the address it
 uses happens to be a nested one.
 
-A new item's default shape comes from `ingestDocument({}, field.fields,
-registry, context)` — the same seeding a fresh top-level form gets, reused
-rather than re-implemented.
+For `templates`, the component shows one "Add <label>" button for each
+template, and the label of the template at the top of each item. For `of`,
+`useFieldArray` does not apply, because it needs objects. The component keeps
+the value as a plain array, and it adds, removes, and reorders items with
+`useFieldValue`. Each item renders the `of` field at `<address>.<index>`.
+
+A new `fields` item starts from `ingestDocument({}, field.fields, …)`, the
+same seeding that a new top-level form gets. A new template item starts from
+the `defaultItem` of its template. A new `of` item starts from the
+`defaultValue` of the `of` field type, or `null`. For `of`, an empty item
+(`null` or `undefined`) skips `parse` and `serialize`, and it saves as `null`.
 
 ## The connections
 
@@ -210,3 +248,13 @@ rather than re-implemented.
   ingest and digest, rejects it in validation, shows it read-only, and clears
   it.
 - It examines the metadata of the descriptor.
+- It rejects a config with none, or more than one, of `fields`, `templates`
+  and `of`, at the type level and at runtime.
+- For `templates`: it keeps `_template` through ingest and digest, keeps an
+  item with a missing or unknown template unchanged and shows it as an unknown
+  block, renders the label and fields of each template,
+  adds an item from `defaultItem`, keeps the template on a reorder, and
+  validates each item against its own template.
+- For `of`: it runs the `parse`/`serialize` of the `of` field on each item,
+  refuses stored content that is not an array, edits, adds, reorders and
+  removes items, and validates each item at `<address>.<index>`.
