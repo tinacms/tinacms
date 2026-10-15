@@ -349,9 +349,11 @@ mutation addPendingDocumentMutation(
     }
 
     if (res.status !== 200) {
-      let errorMessage = `Unable to complete request, ${res.statusText}`;
-      const resBody = await res.json();
-      if (resBody.message) {
+      let errorMessage = `Unable to complete request, ${res.statusText || res.status}`;
+      const resBody: { message?: string } | undefined = await res
+        .json()
+        .catch(() => undefined);
+      if (resBody?.message) {
         errorMessage = `${errorMessage}, Response: ${resBody.message}`;
       }
       if (!this.isCustomContentApi) {
@@ -453,7 +455,7 @@ mutation addPendingDocumentMutation(
       });
 
       if (!res.ok) {
-        let errorMessage = `There was an error creating a pull request. ${res.statusText}`;
+        let errorMessage = `There was an error creating a pull request. ${res.statusText || res.status}`;
         if (res.status === 422) {
           errorMessage = `Please make sure you have made changes on ${branch} before creating a pull request.`;
         }
@@ -684,8 +686,13 @@ mutation addPendingDocumentMutation(
       });
       if (!res.ok) {
         console.error('There was an error creating a new branch.');
-        const error = await res.json();
-        throw new Error(error?.message);
+        const error: { message?: string } | undefined = await res
+          .json()
+          .catch(() => undefined);
+        throw new Error(
+          error?.message ??
+            `Unable to create branch, ${res.statusText || res.status}`
+        );
       }
       const values = await res.json();
       return parseRefForBranchName(values.data.ref);
@@ -705,7 +712,9 @@ mutation addPendingDocumentMutation(
       });
 
       if (!res.ok) {
-        throw new Error(`Failed to fetch latest version: ${res.statusText}`);
+        throw new Error(
+          `Failed to fetch latest version: ${res.statusText || res.status}`
+        );
       }
 
       const data = await res.json();
@@ -777,7 +786,7 @@ mutation addPendingDocumentMutation(
         if (statusResponse.status !== 202) {
           const error = new Error(
             statusResponseBody.message ||
-              `Failed to check workflow status: ${statusResponse.statusText}`
+              `Failed to check workflow status: ${statusResponse.statusText || statusResponse.status}`
           ) as EditorialWorkflowErrorDetails;
           error.errorCode = 'WORKFLOW_STATUS_FAILED';
           throw error;

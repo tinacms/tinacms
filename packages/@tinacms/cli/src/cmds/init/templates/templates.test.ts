@@ -15,6 +15,7 @@ import type { Framework } from '..';
 import { supportedAuthProviders } from '../prompts/authProvider';
 import type { Config } from '../prompts/types';
 import { generateConfig } from './config';
+import { databaseTemplate } from './database';
 import { nextApiRouteTemplate } from './tinaNextRoute';
 
 // Run with UPDATE_GOLDEN=1 to rewrite the fixtures after an intended change.
@@ -148,5 +149,17 @@ describe('nextApiRouteTemplate', () => {
         env: env(false),
       })
     );
+  });
+});
+
+describe('databaseTemplate', () => {
+  it('shows the authCollection.admins option in the production database', () => {
+    const output = databaseTemplate({
+      config: makeConfig('next', {
+        hosting: 'self-host',
+        authProvider: supportedAuthProviders['next-auth'],
+      }),
+    });
+    expect(output).toContain("authCollection: { admins: ['tinauser'] },");
   });
 });

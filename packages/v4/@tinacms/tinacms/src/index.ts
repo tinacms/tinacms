@@ -13,19 +13,35 @@ export {
   type TinaConfig,
   type TinaSchema,
 } from './config';
+export {
+  AuthError,
+  type AuthErrorCode,
+  type AuthSlice,
+  type AuthUser,
+  toUserId,
+  type UserId,
+} from './core/auth/contract';
 export type {
   ContentProvider,
   ContentSlice,
   DocumentEntry,
   DocumentSummary,
 } from './core/content/contract';
-export type {
-  MediaItem,
-  MediaPage,
-  MediaPageRequest,
-  MediaProvider,
-  MediaSlice,
+export {
+  type MediaFeatures,
+  type MediaItem,
+  type MediaManifest,
+  type MediaPage,
+  type MediaPageRequest,
+  type MediaProvider,
+  MediaError,
+  type MediaErrorCode,
+  type MediaSlice,
+  type MediaStatus,
+  type MediaUrlOptions,
+  type ResolveMediaUrl,
 } from './core/media/contract';
+export { resolveMediaUrl } from './core/media/resolve-media-url';
 export type { AdminScreen, AdminScreenProps } from './core/screen/contract';
 export {
   type Capability,
@@ -43,11 +59,22 @@ export type {
   CollectionSchema,
   FieldSchema,
   HookRef,
+  TemplateSchema,
   TinaDocument,
   ValidatorRef,
 } from './core/schema/types';
 export { localContentPlugin } from './plugins/content/local/local-content.plugin';
 export { localMediaPlugin } from './plugins/media/local/local-media.plugin';
+export { mediaManagerPlugin } from './plugins/media-manager/media-manager.plugin';
+export type {
+  MediaAccept,
+  MediaCategory,
+  MediaExtension,
+} from './plugins/media-manager/media-types';
+export {
+  type TinaCloudOptions,
+  tinaCloud,
+} from './plugins/tinacloud/tinacloud.plugin';
 export {
   corePlugins,
   max,
@@ -62,5 +89,6 @@ export type {
   DatetimeFieldSchema,
   NumberFieldSchema,
   RichTextFieldSchema,
+  RichTextTemplate,
   StringFieldSchema,
 } from './plugins/fields';

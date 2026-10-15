@@ -119,6 +119,59 @@ describe('compileSchema field-level validators', () => {
   });
 });
 
+describe('compileSchema with an array of scalar items', () => {
+  const tags = (of: FieldSchema) =>
+    ({ name: 'tags', type: 'array', of }) as FieldSchema;
+
+  it('pins the type of the of field', () => {
+    const lock = compileSchema(
+      configWith(
+        [tags({ name: 'tag', type: 'datetime' })],
+        [fieldPlugin('array', 1), fieldPlugin('datetime', 2)]
+      )
+    );
+    expect(lock.primitives).toEqual({ array: 1, datetime: 2 });
+  });
+
+  it('pins the type of an of field inside a template', () => {
+    const lock = compileSchema(
+      configWith(
+        [
+          {
+            name: 'blocks',
+            type: 'array',
+            templates: [
+              {
+                name: 'gallery',
+                fields: [tags({ name: 'at', type: 'datetime' })],
+              },
+            ],
+          },
+        ],
+        [fieldPlugin('array', 1), fieldPlugin('datetime', 2)]
+      )
+    );
+    expect(lock.primitives).toEqual({ array: 1, datetime: 2 });
+  });
+
+  it('rejects an unregistered validator on the of field', () => {
+    expect(() =>
+      compileSchema(
+        configWith(
+          [
+            tags({
+              name: 'tag',
+              type: 'string',
+              validators: [{ name: 'matches', args: ['^[a-z]+$'] }],
+            }),
+          ],
+          [fieldPlugin('array', 1), fieldPlugin('string', 1)]
+        )
+      )
+    ).toThrow(/uses the validator "matches"/);
+  });
+});
+
 describe('compileSchema collection-level hooks', () => {
   it('accepts a form hook an installed plugin registers', () => {
     const hookPlugin = definePlugin({

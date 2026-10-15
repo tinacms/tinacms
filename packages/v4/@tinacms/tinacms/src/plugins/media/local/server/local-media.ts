@@ -1,9 +1,9 @@
 import type { Dirent } from 'node:fs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { invariant } from '../../../../core/invariant';
 import {
   DEFAULT_MEDIA_ROOT,
+  MediaError,
   type MediaItem,
   type MediaPage,
   type MediaPageRequest,
@@ -44,11 +44,12 @@ export const createLocalMedia = (options: LocalMediaOptions): LocalMedia => {
     mediaPath: string,
     { allowRoot }: { allowRoot: boolean }
   ): Promise<string> => {
-    invariant(
-      !mediaPath.includes('\0'),
-      'media-path-null-byte',
-      'A media path cannot hold a null byte.'
-    );
+    if (mediaPath.includes('\0')) {
+      throw new MediaError(
+        'invalid-path',
+        'A media path cannot hold a null byte.'
+      );
+    }
     const absolute = path.resolve(mediaDir, mediaPath);
     const [realRoot, realAbsolute] = await Promise.all([
       realPathOf(mediaDir),
@@ -57,11 +58,12 @@ export const createLocalMedia = (options: LocalMediaOptions): LocalMedia => {
     const isInside = (root: string, candidate: string) =>
       candidate.startsWith(root + path.sep) ||
       (allowRoot && candidate === root);
-    invariant(
-      isInside(mediaDir, absolute) && isInside(realRoot, realAbsolute),
-      'media-path-outside-root',
-      `Path "${mediaPath}" is outside the media folder.`
-    );
+    if (!(isInside(mediaDir, absolute) && isInside(realRoot, realAbsolute))) {
+      throw new MediaError(
+        'invalid-path',
+        `Path "${mediaPath}" is outside the media folder.`
+      );
+    }
     return absolute;
   };
 
@@ -100,15 +102,18 @@ export const createLocalMedia = (options: LocalMediaOptions): LocalMedia => {
 
     async save(file, folder = '') {
       const name = file.name;
-      invariant(
+      const isValidName =
         name.length > 0 &&
-          name !== '.' &&
-          name !== '..' &&
-          path.basename(name) === name &&
-          !name.includes('\\'),
-        'media-file-name-invalid',
-        `"${name}" is not a valid file name.`
-      );
+        name !== '.' &&
+        name !== '..' &&
+        path.basename(name) === name &&
+        !name.includes('\\');
+      if (!isValidName) {
+        throw new MediaError(
+          'invalid-name',
+          `"${name}" is not a valid file name.`
+        );
+      }
       const absolute = await resolveInside(path.posix.join(folder, name), {
         allowRoot: false,
       });
@@ -119,12 +124,15 @@ export const createLocalMedia = (options: LocalMediaOptions): LocalMedia => {
 
     async delete(mediaPath) {
       const absolute = await resolveInside(mediaPath, { allowRoot: false });
-      const stats = await fs.lstat(absolute);
-      invariant(
-        stats.isFile(),
-        'media-delete-not-file',
-        `"${mediaPath}" is not a file. Only files can be deleted.`
-      );
+      const stats = await fs.lstat(absolute).catch((cause: unknown) => {
+        if (isMissingFileError(cause)) {
+          throw new MediaError('not-found', `"${mediaPath}" does not exist.`);
+        }
+        throw cause;
+      });
+      if (!stats.isFile()) {
+        throw new MediaError('unsupported', `"${mediaPath}" is not a file.`);
+      }
       await fs.unlink(absolute);
     },
   };

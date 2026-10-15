@@ -41,7 +41,7 @@ The client segment (`number-field.client.tsx`) takes the `number` key:
 defineClientPlugin({
   field: {
     Component: NumberField,
-    // no defaultValue — an absent field stays absent
+    // no defaultValue — an absent field starts as null and is not saved
     metadata: { layout: 'inline' },
     schema: numberSchema,
     parse: (stored) => (stored == null ? undefined : String(stored)),  // load: number → string
@@ -62,9 +62,9 @@ number. `parse` and `serialize` do the conversion. Thus the editor keeps an
 incomplete entry such as `-` or `1.` while the user types, and the document
 always gets a correct number.
 
-An empty value is `undefined`. The conversion occurs in one location only: the
-`onChange` function of the component changes `''` to `undefined`. The field has
-no `defaultValue`. `digestDocument` removes the `undefined` values before it
+An empty value is `null`. The conversion occurs in one location only: the
+`onChange` function of the component changes `''` to `null`. The field has
+no `defaultValue`. `digestDocument` removes the `null` values before it
 calls `serialize`. Thus `serialize` always gets a real string and returns a
 `number`. It never returns `number | undefined`. The saved document does not
 contain an empty field. `parse` changes a stored `null` value to an empty value.
@@ -97,7 +97,7 @@ errors from hooks that use the address. It gets its own node with
 export function NumberField() {
   const address = useFieldAddress();
   const field = useFieldSchema<NumberFieldSchema>();
-  const [value, setValue] = useFieldValue<string | undefined>(address);
+  const [value, setValue] = useFieldValue<string | null>(address);
   const errors = useFieldErrors(address);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -107,7 +107,7 @@ export function NumberField() {
     <div>
       <input ref={inputRef} type='number' step={field.step} id={address}
         value={value ?? ''}
-        onChange={(e) => setValue(e.target.value === '' ? undefined : e.target.value)} />
+        onChange={(e) => setValue(e.target.value === '' ? null : e.target.value)} />
       {errors.map((e) => <span key={e} role='alert'>{e}</span>)}
     </div>
   );

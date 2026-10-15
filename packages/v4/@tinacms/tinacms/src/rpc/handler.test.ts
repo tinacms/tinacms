@@ -5,6 +5,7 @@ import {
   defineServerPlugin,
   protectedOp,
   publicOp,
+  toUserId,
   use,
 } from '../server';
 import { createRpcHandler } from './handler';
@@ -12,9 +13,12 @@ import { createRpcHandler } from './handler';
 const sessionsByToken: Record<string, Session> = Object.assign(
   Object.create(null),
   {
-    'admin-token': { identity: { id: 'ada' }, roles: ['admin'] },
-    'editor-token': { identity: { id: 'eli' }, roles: ['editor'] },
-    'proto-token': { identity: { id: 'mal' }, roles: ['constructor'] },
+    'admin-token': { identity: { id: toUserId('ada') }, roles: ['admin'] },
+    'editor-token': { identity: { id: toUserId('eli') }, roles: ['editor'] },
+    'proto-token': {
+      identity: { id: toUserId('mal') },
+      roles: ['constructor'],
+    },
   }
 );
 
@@ -201,7 +205,7 @@ describe('createRpcHandler', () => {
           getSession: async (request: Request) => {
             await (use('media').health as () => Promise<unknown>)();
             return request.headers.get('authorization')
-              ? { identity: { id: 'ada' }, roles: ['admin'] }
+              ? { identity: { id: toUserId('ada') }, roles: ['admin'] }
               : null;
           },
         }),
@@ -229,6 +233,32 @@ describe('createRpcHandler', () => {
       post('/auth/getSession', { token: 'admin-token' })
     );
     expect(response.status).toBe(404);
+  });
+
+  it('routes every namespace of a multi-singleton plugin to its one segment', async () => {
+    const onInit = vi.fn();
+    const cloud = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'tina:cloud',
+          provides: ['auth', 'media'],
+          onInit,
+          server: async () => ({
+            default: defineServerPlugin({
+              getSession: async () => sessionsByToken['editor-token'],
+              whoami: async () => 'cloud',
+              list: async () => ({ items: [] }),
+            }),
+          }),
+        }),
+      ],
+    });
+    expect((await cloud(post('/auth/whoami'))).status).toBe(200);
+    expect(await (await cloud(post('/media/list'))).json()).toEqual({
+      items: [],
+    });
+    expect((await cloud(post('/media/getSession'))).status).toBe(404);
+    expect(onInit).toHaveBeenCalledTimes(1);
   });
 
   it('404s an unknown namespace or op', async () => {
@@ -551,6 +581,24 @@ describe('createRpcHandler composition', () => {
     });
     await handler.destroy();
     expect(onDestroy).not.toHaveBeenCalled();
+  });
+
+  it('takes no session from a server auth plugin that a client-only one overrides', async () => {
+    const handler = createRpcHandler({
+      plugins: [
+        authPlugin(),
+        definePlugin({
+          name: 'client-auth',
+          provides: ['auth'],
+          overrides: [{ capability: 'auth' }],
+        }),
+        mediaPlugin,
+      ],
+    });
+    const res = await handler(
+      post('/media/list', { token: 'admin-token', body: { dir: 'a' } })
+    );
+    expect(res.status).toBe(401);
   });
 });
 

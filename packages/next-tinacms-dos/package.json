@@ -1,7 +1,7 @@
 {
   "name": "next-tinacms-dos",
   "type": "module",
-  "version": "24.0.4",
+  "version": "24.0.6",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [
@@ -29,7 +29,7 @@
     "@tinacms/scripts": "workspace:*",
     "@types/js-cookie": "^2.2.7",
     "@types/node": "^22.13.1",
-    "next": "15.5.21",
+    "next": "15.5.27",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tinacms": "workspace:*",

@@ -235,15 +235,19 @@ describe('ReferenceField ingest and digest', () => {
     const registry = await resolveRegistry();
     const stored = { author: ADA, page: ABOUT };
     const ingested = ingestDocument(stored, collection.fields, { registry });
-    expect(ingested).toEqual(stored);
+    expect(ingested).toEqual({ ...stored, related: null });
     expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
       stored
     );
   });
 
-  it('leaves an absent reference absent', async () => {
+  it('holds an absent reference as null and digests it as absent', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({
+      author: null,
+      page: null,
+      related: null,
+    });
     expect(digestDocument({}, collection.fields, { registry })).toEqual({});
   });
 

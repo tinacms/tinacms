@@ -11,7 +11,7 @@ import type { NumberFieldSchema } from './number-field.schema';
 export function NumberField() {
   const address = useFieldAddress();
   const field = useFieldSchema<NumberFieldSchema>();
-  const [value, setValue] = useFieldValue<string | undefined>(address);
+  const [value, setValue] = useFieldValue<string | null>(address);
   const errors = useFieldErrors(address);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -27,7 +27,7 @@ export function NumberField() {
         id={address}
         value={value ?? ''}
         onChange={(event) =>
-          setValue(event.target.value === '' ? undefined : event.target.value)
+          setValue(event.target.value === '' ? null : event.target.value)
         }
         onWheel={(event) => event.currentTarget.blur()}
       />

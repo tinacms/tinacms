@@ -37,17 +37,13 @@ export interface BaseFieldSchema {
   validators?: ValidatorRef[];
 }
 
-export interface TemplateFieldSchema extends BaseFieldSchema {
-  type?: string;
-  templates?: TemplateSchema[];
-}
-
+// ADR-017 §3: a template is a named fieldset. A field plugin extends it with
+// its own options, as rich-text does for MDX embeds.
 export interface TemplateSchema {
   name: string;
   label?: string;
-  key?: string;
-  inline?: boolean;
-  fields?: TemplateFieldSchema[];
+  fields: FieldSchema[];
+  defaultItem?: TinaDocument;
 }
 
 export interface FieldSchema extends BaseFieldSchema {
