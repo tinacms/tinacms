@@ -8,20 +8,28 @@ import {
   defineConfig,
   localContentPlugin,
   localMediaPlugin,
+  mediaManagerPlugin,
   required,
   t,
+  type TemplateSchema,
+  tinaCloud,
 } from '@tinacms/tinacms';
 import { helpNavPlugin } from './help-nav';
-import { hooksPlugin, logSave, requireStarsToPublish } from './hooks';
+import { hooksPlugin, logSave, trimTitle } from './hooks';
 import { rating, ratingFieldPlugin } from './rating-field';
-import { differentFrom, matches, validatorsPlugin } from './validators';
+import {
+  differentFrom,
+  matches,
+  requiredWhen,
+  validatorsPlugin,
+} from './validators';
 
 export const postCollection = {
   name: 'post',
   label: 'Posts',
   path: 'content/posts',
   format: 'mdx',
-  hooks: [requireStarsToPublish(), logSave('saved')],
+  hooks: [trimTitle(), logSave('saved')],
   fields: [
     t.string({
       name: 'title',
@@ -32,8 +40,20 @@ export const postCollection = {
       ],
     }),
     t.boolean({ name: 'featured', label: 'Featured' }),
+    t.image({ name: 'heroImage', label: 'Hero image' }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
-    rating({ name: 'stars', label: 'Stars' }),
+    rating({
+      name: 'stars',
+      label: 'Stars',
+      // A sibling rule: `stars` is top level, so `siblings` is the document root.
+      validators: [
+        requiredWhen(
+          'status',
+          'published',
+          'Rate the post before you publish it'
+        ),
+      ],
+    }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
     t.array({
       name: 'authors',
@@ -74,6 +94,25 @@ export const postCollection = {
   ],
 } satisfies CollectionSchema;
 
+const heroTemplate = {
+  name: 'hero',
+  label: 'Hero',
+  defaultItem: { headline: 'A new hero' },
+  fields: [
+    t.string({ name: 'headline', label: 'Headline', validators: [required()] }),
+    t.string({ name: 'tagline', label: 'Tagline' }),
+  ],
+} satisfies TemplateSchema;
+
+const ctaTemplate = {
+  name: 'cta',
+  label: 'Call to action',
+  fields: [
+    t.string({ name: 'label', label: 'Label', validators: [required()] }),
+    t.string({ name: 'link', label: 'Link' }),
+  ],
+} satisfies TemplateSchema;
+
 export const pageCollection = {
   name: 'page',
   label: 'Pages',
@@ -82,13 +121,29 @@ export const pageCollection = {
   fields: [
     t.string({ name: 'title', label: 'Title', validators: [required()] }),
     t.boolean({ name: 'featured', label: 'Featured' }),
+    t.array({
+      name: 'tags',
+      label: 'Tags',
+      of: t.string({ name: 'tag', label: 'Tag' }),
+    }),
+    t.array({
+      name: 'blocks',
+      label: 'Blocks',
+      templates: [heroTemplate, ctaTemplate],
+    }),
   ],
 } satisfies CollectionSchema;
+
+const tinaCloudClientId: string | undefined = import.meta.env
+  .TINA_PUBLIC_CLIENT_ID;
 
 export default defineConfig({
   plugins: [
     localContentPlugin(),
-    localMediaPlugin(),
+    tinaCloudClientId
+      ? tinaCloud({ clientId: tinaCloudClientId })
+      : localMediaPlugin(),
+    mediaManagerPlugin(),
     ratingFieldPlugin,
     validatorsPlugin,
     hooksPlugin,

@@ -3,12 +3,8 @@
 This directory contains the v4 scaffold. It is adjacent to the v3 packages at
 the top of `packages/`. Thus the team can release v3 fixes while it builds v4.
 
-The v4 architecture specification is in a different repository,
-[github.com/tinacms/tinacmsv4-docs](https://github.com/tinacms/tinacmsv4-docs).
-Start at
-[`CONTEXT.md`](https://github.com/tinacms/tinacmsv4-docs/blob/main/CONTEXT.md),
-then read the
-[ADR set](https://github.com/tinacms/tinacmsv4-docs/tree/main/adr).
+The v4 architecture specification is in [`adr/v4/`](../../adr/v4/). Start at
+[`CONTEXT.md`](../../adr/v4/CONTEXT.md), then read the ADRs.
 
 This file is the package map for the repository. It gives this data:
 

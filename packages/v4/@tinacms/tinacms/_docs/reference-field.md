@@ -117,7 +117,7 @@ reports that case instead; see [Missing references](#missing-references).
 ## Ingest and digest
 
 `ingestDocument` and `digestDocument` pass the stored path through unchanged. A
-document with no stored value stays absent after ingest, because the descriptor
+document with no stored value is `null` after ingest, because the descriptor
 sets no `defaultValue`. A cleared reference digests as absent, not as `null`.
 
 ## The component

@@ -54,6 +54,9 @@ v4 supplies four more examples:
 - The `reference` field ([`reference-field.md`](./reference-field.md)) points
   at another document, and stores that document's path. Its options come from
   the content capability, not from a fixed list.
+- The `image` field ([`image-field.md`](./image-field.md)) stores the media
+  path of one image. It depends on the `media` capability, and it picks with
+  `MediaBrowser` in `pick` mode.
 - The `rich-text` field ([`rich-text-field.md`](./rich-text-field.md)) uses the
   `block` layout. With `isBody`, it controls the markdown body of the file.
 
@@ -111,7 +114,7 @@ The properties of the descriptor:
 - `Component` (necessary) — It has no props. It gets all its data from the
   hooks below.
 - `defaultValue` — The initial value for a new or absent field, applied on
-  ingest.
+  ingest. Without it, the field starts as `null`.
 - `metadata.layout` — The layout hint: `inline` or `block`.
 - `metadata.labelable` — Set it to `false` to hide the outer field label. The
   `rich-text` field sets it to `false` because it renders its own label area.
@@ -203,7 +206,7 @@ Hooks:
 The form resolver (`editor/resolver.ts`) calls `validateField`
 (`core/validation.ts`). `validateField` runs the two layers in order and joins
 their messages. The spec is
-[tinacmsv4-docs › field-plugins › Validation](https://github.com/tinacms/tinacmsv4-docs/blob/main/plugins/field-plugins.md#validation).
+[the field plugins spec, Validation section](../../../../../adr/v4/plugins/field-plugins.md#validation).
 
 1. **Plugin-level** — `descriptor.validate(value, context)`. It runs on every
    field of the `type` the plugin owns. `context` is `PluginValidationContext`,
@@ -318,6 +321,9 @@ This example makes a color field:
    top-level field has (the collection, a top-level-only address assumption)
    breaks there; a field built only from its own node, its own address, and
    the hooks above does not.
+6. Add the field to `FIELDS` in `plugins/fields/stored-values.test.tsx`. A
+   hand-edited file can hold any value in any field, so the component must
+   render a value of any type without a crash.
 
 Do no more steps. You do not change the registry.
 

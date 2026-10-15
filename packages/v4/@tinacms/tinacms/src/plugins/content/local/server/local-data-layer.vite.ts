@@ -6,13 +6,23 @@ import { runCodegen } from '../../../../cli/commands/codegen';
 import { type ResolvedConfig, resolveBuild } from '../../../../config';
 import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
-import { DEFAULT_MEDIA_URL } from '../../../../core/media/contract';
+import { capabilityProvider } from '../../../../core/mount';
+import {
+  DEFAULT_MEDIA_ROOT,
+  DEFAULT_MEDIA_URL,
+  MediaError,
+} from '../../../../core/media/contract';
 import {
   MAX_MEDIA_UPLOAD_BYTES,
   MAX_REQUEST_BODY_BYTES,
   RequestBodyTooLargeError,
 } from '../../../../core/request-body';
-import { LOCAL_MEDIA_PLUGIN_NAME } from '../../../media/local/local-media.plugin';
+import { AUTH_CAPABILITY, type PluginManifest } from '../../../../core/plugin';
+import { createRequestAuthorizer } from '../../../../rpc/handler';
+import {
+  LOCAL_MEDIA_PLUGIN_NAME,
+  MEDIA_ERROR_HEADER,
+} from '../../../media/local/local-media.plugin';
 import {
   type LocalMedia,
   createLocalMedia,
@@ -21,6 +31,7 @@ import {
   dispatchMediaRequest,
   listMedia,
 } from '../../../media/local/server/media-request';
+import { mimeTypeOfPath } from '../../../media-manager/media-types';
 import { dispatchContentRequest } from './content-request';
 import {
   type LocalDataLayerOptions,
@@ -114,7 +125,58 @@ const readRequestBody = (req: Connect.IncomingMessage): Promise<string> =>
     req.on('error', reject);
   });
 
-const createMediaHandler = (media: LocalMedia): Connect.NextHandleFunction => {
+const sessionRequestOf = (req: Connect.IncomingMessage): Request => {
+  const headers = new Headers();
+  for (const [name, value] of Object.entries(req.headers)) {
+    if (value === undefined || name.startsWith(':')) continue;
+    for (const item of Array.isArray(value) ? value : [value]) {
+      headers.append(name, item);
+    }
+  }
+  const url = new URL(
+    req.originalUrl ?? req.url ?? '/',
+    `http://${req.headers.host ?? 'localhost'}`
+  );
+  return new Request(url, { method: req.method, headers });
+};
+
+type SessionGate = (
+  req: Connect.IncomingMessage,
+  res: ServerResponse
+) => Promise<boolean>;
+
+// ADR-023 §4: with an auth plugin, the Data Layer authorizes a request as
+// rpc/handler.ts does. When no auth plugin, or the winning one has no server
+// segment, it composes nothing and checks nothing.
+const createSessionGate = (
+  plugins: PluginManifest[],
+  capability: 'content' | 'media'
+): SessionGate | null => {
+  if (!capabilityProvider(plugins, AUTH_CAPABILITY)?.server) return null;
+  const authorize = createRequestAuthorizer(plugins);
+  const permission = capabilityProvider(plugins, capability)?.requires
+    ?.permission;
+  return async (req, res) => {
+    try {
+      const refusal = await authorize(sessionRequestOf(req), [permission]);
+      if (!refusal) return true;
+      res.statusCode = refusal.status;
+      res.setHeader('content-type', 'application/json');
+      res.end(await refusal.text());
+    } catch (cause) {
+      console.error('[tinacms] Data Layer session check failed:', cause);
+      res.statusCode = 500;
+      res.end('Session check failed.');
+    }
+    return false;
+  };
+};
+
+const createMediaHandler = (
+  media: LocalMedia,
+  sessionGate: SessionGate | null,
+  onUpload: (mediaPath: string) => void
+): Connect.NextHandleFunction => {
   const serveMediaUpload = async (
     req: Connect.IncomingMessage,
     res: ServerResponse
@@ -136,6 +198,7 @@ const createMediaHandler = (media: LocalMedia): Connect.NextHandleFunction => {
       'A media upload needs a `file` field and an optional `folder` field.'
     );
     const mediaPath = await media.save(file, folder);
+    onUpload(mediaPath);
     res.setHeader('content-type', 'application/json');
     res.end(JSON.stringify({ path: mediaPath }));
   };
@@ -146,6 +209,7 @@ const createMediaHandler = (media: LocalMedia): Connect.NextHandleFunction => {
       res.end('Cross-origin request rejected');
       return;
     }
+    if (sessionGate && !(await sessionGate(req, res))) return;
     try {
       const [route, query = ''] = (req.url ?? '').split('?');
       if (route === '/upload') {
@@ -168,6 +232,12 @@ const createMediaHandler = (media: LocalMedia): Connect.NextHandleFunction => {
       res.setHeader('content-type', 'application/json');
       res.end(JSON.stringify(result));
     } catch (cause) {
+      if (cause instanceof MediaError) {
+        res.statusCode = 400;
+        res.setHeader(MEDIA_ERROR_HEADER, cause.code);
+        res.end(cause.detail ?? '');
+        return;
+      }
       sendError(req, res, cause);
     }
   };
@@ -201,6 +271,9 @@ export const tinaLocalDataLayerVitePlugin = (
     'tinaLocalDataLayerVitePlugin needs `config` (the loaded tina/config.ts) or `collections`.'
   );
   const dataLayer = createLocalDataLayer({ ...options, collections });
+  const plugins = options.config?.plugins ?? [];
+  const contentGate = createSessionGate(plugins, 'content');
+  const mediaGate = createSessionGate(plugins, 'media');
   const usesLocalMedia =
     options.config?.plugins.some(
       ({ name }) => name === LOCAL_MEDIA_PLUGIN_NAME
@@ -244,6 +317,7 @@ export const tinaLocalDataLayerVitePlugin = (
       res.end('Cross-origin request rejected');
       return;
     }
+    if (contentGate && !(await contentGate(req, res))) return;
     if (coreContentTypeOfRequest(req) !== 'application/json') {
       res.statusCode = 415;
       res.end('Expected application/json');
@@ -311,9 +385,36 @@ export const tinaLocalDataLayerVitePlugin = (
         });
       }
       if (media) {
+        // Vite serves a new public/ file only once its file watcher reports it,
+        // so a site that loads an image straight after its upload gets a 404.
+        // Serve the files this server uploaded until then.
+        const uploaded = new Set<string>();
+        const uploadsRoute = `/${options.mediaRoot ?? DEFAULT_MEDIA_ROOT}/`;
+        server.middlewares.use(async (req, res, next) => {
+          if (!isLoopbackHost(req.headers.host)) return next();
+          const pathname = (req.url ?? '').split('?')[0];
+          if (!pathname.startsWith(uploadsRoute)) return next();
+          let mediaPath: string;
+          try {
+            mediaPath = decodeURIComponent(pathname.slice(uploadsRoute.length));
+          } catch {
+            return next();
+          }
+          const contentType = mimeTypeOfPath(mediaPath);
+          if (!uploaded.has(mediaPath) || !contentType) return next();
+          try {
+            const bytes = await readFile(path.join(media.mediaDir, mediaPath));
+            res.setHeader('content-type', contentType);
+            res.end(bytes);
+          } catch {
+            next();
+          }
+        });
         server.middlewares.use(
           options.mediaUrl ?? DEFAULT_MEDIA_URL,
-          createMediaHandler(media)
+          createMediaHandler(media, mediaGate, (mediaPath) =>
+            uploaded.add(mediaPath)
+          )
         );
       }
       server.middlewares.use(

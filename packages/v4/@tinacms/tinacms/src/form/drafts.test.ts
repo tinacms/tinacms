@@ -23,7 +23,7 @@ const otherTabWrites = (formId: string, text: string) =>
   localStorage.setItem(
     draftKey(formId),
     JSON.stringify({
-      version: 1,
+      version: 2,
       values: { title: text },
       baseline: { title: 'Hello' },
     })
@@ -92,7 +92,7 @@ describe('form drafts', () => {
   });
 
   it('opens on the file when the stored draft has an unknown shape', () => {
-    localStorage.setItem(draftKey(postA), JSON.stringify({ version: 1 }));
+    localStorage.setItem(draftKey(postA), JSON.stringify({ version: 2 }));
     store.getState().registerForm(postA, { [title]: 'Hello' });
     expect(formStatus(store.getState().forms[postA])).toBe('pristine');
   });
@@ -182,7 +182,7 @@ describe('form drafts', () => {
     localStorage.setItem(
       draftKey(postA),
       JSON.stringify({
-        version: 1,
+        version: 2,
         values: { '': 'x', title: 'Mine' },
         baseline: { title: 'Hello' },
       })

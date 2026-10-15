@@ -241,7 +241,12 @@ export const createLocalDataLayer = (
         }
         let raw: string;
         try {
-          raw = adapter.serialize(value, previousRaw, collection.bodyField);
+          raw = adapter.serialize(
+            value,
+            previousRaw,
+            collection.bodyField,
+            collection.schema.fields.map((field) => field.name)
+          );
         } catch (cause) {
           let reason: string;
           if (cause instanceof Error) {

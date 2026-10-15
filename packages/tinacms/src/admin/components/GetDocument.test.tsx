@@ -86,7 +86,7 @@ describe('GetDocument', () => {
     );
 
     await waitFor(() =>
-      expect(screen.getByText('Unable to load')).toBeTruthy()
+      expect(screen.getByText('Unable to Load')).toBeTruthy()
     );
     expect(fetchDocument).not.toHaveBeenCalled();
     expect(screen.queryByTestId('child')).toBeNull();

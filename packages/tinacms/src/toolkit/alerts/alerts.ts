@@ -65,7 +65,8 @@ export class Alerts {
   add(
     level: AlertLevel,
     message: string | React.FunctionComponent,
-    timeout = 4000
+    timeout = 4000,
+    title?: string
   ): () => void {
     if (this.suppressed) {
       return () => {};
@@ -74,6 +75,7 @@ export class Alerts {
       level,
       message,
       timeout,
+      title,
       id: `${message}|${Date.now()}`,
     };
 
@@ -121,16 +123,27 @@ export class Alerts {
   warn(message: string | React.FunctionComponent, timeout?: number) {
     return this.add('warn', message, timeout);
   }
-  error(message: string | React.FunctionComponent, timeout?: number) {
-    return this.add('error', message, timeout);
+  error(
+    message: string | React.FunctionComponent,
+    options?: number | ErrorAlertOptions
+  ) {
+    if (typeof options === 'number') {
+      return this.add('error', message, options);
+    }
+    return this.add('error', message, undefined, options?.title);
   }
 }
 
 export type AlertLevel = 'info' | 'success' | 'warn' | 'error';
+
+export interface ErrorAlertOptions {
+  title?: string;
+}
 
 export interface Alert {
   id: string;
   level: AlertLevel;
   message: string | React.FunctionComponent;
   timeout: number;
+  title?: string;
 }
