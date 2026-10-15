@@ -1,15 +1,24 @@
+import type { UserId } from '../core/auth/contract';
 import type { TinaDocument } from '../core/schema/types';
 import { isRecord } from '../utils/is-record';
 
 const DRAFT_KEY_PREFIX = 'tina-drafts:';
+const USER_DRAFT_KEY_PREFIX = 'tina-drafts@';
 const DRAFT_VERSION = 2;
+
+// `undefined` scopes drafts to a project with no auth plugin; `null` marks a
+// signed-out or loading session under an auth plugin, where drafts stay off.
+export type DraftUserScope = UserId | null | undefined;
 
 export interface StoredDraft {
   readonly values: TinaDocument;
   readonly baseline: TinaDocument;
 }
 
-export const draftKey = (formId: string) => `${DRAFT_KEY_PREFIX}${formId}`;
+export const draftKey = (formId: string, userId?: UserId) =>
+  userId === undefined
+    ? `${DRAFT_KEY_PREFIX}${formId}`
+    : `${USER_DRAFT_KEY_PREFIX}${encodeURIComponent(userId)}:${formId}`;
 
 const hasBlankName = (fields: Record<string, unknown>) =>
   Object.keys(fields).some((name) => name.length === 0);
@@ -26,8 +35,12 @@ const storage = (): Storage | undefined => {
 
 // Storage is untrusted: an entry from another version or in an unknown shape is
 // treated as no draft.
-export const readDraft = (formId: string): StoredDraft | undefined => {
-  const raw = storage()?.getItem(draftKey(formId));
+export const readDraft = (
+  formId: string,
+  userId?: DraftUserScope
+): StoredDraft | undefined => {
+  if (userId === null) return undefined;
+  const raw = storage()?.getItem(draftKey(formId, userId));
   if (raw == null) return undefined;
   let entry: unknown;
   try {
@@ -44,10 +57,15 @@ export const readDraft = (formId: string): StoredDraft | undefined => {
 };
 
 // A failed write (quota, private mode) must never break editing, so it only warns.
-export const writeDraft = (formId: string, draft: StoredDraft) => {
+export const writeDraft = (
+  formId: string,
+  draft: StoredDraft,
+  userId?: DraftUserScope
+) => {
+  if (userId === null) return;
   try {
     storage()?.setItem(
-      draftKey(formId),
+      draftKey(formId, userId),
       JSON.stringify({ version: DRAFT_VERSION, ...draft })
     );
   } catch (cause) {
@@ -55,6 +73,7 @@ export const writeDraft = (formId: string, draft: StoredDraft) => {
   }
 };
 
-export const removeDraft = (formId: string) => {
-  storage()?.removeItem(draftKey(formId));
+export const removeDraft = (formId: string, userId?: DraftUserScope) => {
+  if (userId === null) return;
+  storage()?.removeItem(draftKey(formId, userId));
 };

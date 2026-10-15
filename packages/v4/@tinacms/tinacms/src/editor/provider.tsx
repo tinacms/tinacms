@@ -8,8 +8,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import { FormProvider as RhfFormProvider, get, useForm } from 'react-hook-form';
+import { get, FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
 import type { ResolvedConfig } from '../config';
+import { authSliceOf } from '../core/auth/slice';
 import { toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { fieldEqualityFor } from '../core/form/compare';
@@ -19,7 +20,11 @@ import {
   runOnChange,
 } from '../core/form/hooks';
 import { ingestDocument } from '../core/form/ingest';
-import { type PluginManifest, resolveClientSegments } from '../core/plugin';
+import {
+  type PluginManifest,
+  resolveClientSegments,
+  type TinaStoreState,
+} from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { createScreenRegistry } from '../core/screen/registry';
@@ -82,6 +87,12 @@ const usePluginsKey = (plugins: PluginManifest[]): number => {
 
 let lifecycleTurn: Promise<void> = Promise.resolve();
 
+const draftUserOf = (state: TinaStoreState) => {
+  const auth = authSliceOf(state);
+  if (!auth) return undefined;
+  return auth.status === 'signed-in' ? auth.user.id : null;
+};
+
 export function TinaProvider({
   config,
   queryClient,
@@ -96,6 +107,7 @@ export function TinaProvider({
 
   useEffect(() => {
     let mounted = true;
+    let unsubscribeAuth: (() => void) | undefined;
     const boot = lifecycleTurn.then(async () => {
       validateCapabilityGraph(composedPlugins);
       const resolved = await resolveClientSegments(composedPlugins);
@@ -109,7 +121,15 @@ export function TinaProvider({
         globalNav: createGlobalNav(resolved, composedPlugins, screens),
       };
       const destroyPlugins = await initializePlugins(composedPlugins);
-      if (mounted) setBooted(runtime);
+      if (mounted) {
+        useFormStore
+          .getState()
+          .setUserId(draftUserOf(runtime.store.getState()));
+        unsubscribeAuth = runtime.store.subscribe((state) =>
+          useFormStore.getState().setUserId(draftUserOf(state))
+        );
+        setBooted(runtime);
+      }
       return destroyPlugins;
     });
     lifecycleTurn = boot.then(
@@ -126,6 +146,7 @@ export function TinaProvider({
     });
     return () => {
       mounted = false;
+      unsubscribeAuth?.();
       const destroyBootedPlugins = async () => {
         const destroyPlugins = await boot.catch(() => null);
         await destroyPlugins?.();
@@ -179,6 +200,7 @@ export function FormProvider({
   );
 
   const formId = toFormId(path);
+  const userId = useFormStore((state) => state.userId);
   const transformContext = useMemo(
     () => ({ documentPath: path, registry }),
     [path, registry]
@@ -201,13 +223,13 @@ export function FormProvider({
       seed: toDocument(scope.values),
       errors: nestFieldErrors(scope.errors),
     };
-  }, [formId]);
+  }, [formId, userId]);
   // Whether the scope still keeps its values against the document of this render. A
   // clean scope stops keeping them when another writer changes the file, so the test
   // must follow the document, not only the form id.
   const keepsIncoming = useMemo(
     () => readOpeningScope(formId, toFormValues(ingested), equal) !== undefined,
-    [formId, ingested, equal]
+    [formId, userId, ingested, equal]
   );
   const seedValues = keepsIncoming ? (kept.seed ?? ingested) : ingested;
   const resolver = buildFormResolver(collection, registry, validators);
@@ -229,7 +251,7 @@ export function FormProvider({
   const seededSignature = useRef<string | null>(null);
   useEffect(() => {
     useFormStore.getState().registerForm(formId, toFormValues(ingested), equal);
-    const signature = JSON.stringify([formId, seedValues]);
+    const signature = JSON.stringify([formId, userId, seedValues]);
     if (seededSignature.current === null) {
       seededSignature.current = signature;
       return;
@@ -239,7 +261,16 @@ export function FormProvider({
       methods.reset(seedValues, { keepErrors: seedValues === kept.seed });
       advanceSeedKey(formId);
     }
-  }, [formId, ingested, seedValues, kept, methods, equal, advanceSeedKey]);
+  }, [
+    formId,
+    userId,
+    ingested,
+    seedValues,
+    kept,
+    methods,
+    equal,
+    advanceSeedKey,
+  ]);
 
   const discardEdits = useCallback(() => {
     const store = readFormStore();
@@ -255,7 +286,7 @@ export function FormProvider({
   const status = useFormStatus(formId);
   const stale = useMemo(
     () => staleDraft(formId, toFormValues(ingested), equal),
-    [formId, ingested, equal, draftRevision, status]
+    [formId, userId, ingested, equal, draftRevision, status]
   );
   const staleDraftActions = useMemo(() => {
     if (!stale) return null;
@@ -267,13 +298,15 @@ export function FormProvider({
           baseline: toFormValues(stale.baseline),
         });
         const resumed = readFormStore().forms[formId];
-        if (formStatus(resumed) !== 'dirty') removeDraft(formId);
+        if (formStatus(resumed) !== 'dirty') {
+          removeDraft(formId, readFormStore().userId);
+        }
         methods.reset(toDocument(resumed?.values ?? {}));
         advanceSeedKey(formId);
         setDraftRevision((revision) => revision + 1);
       },
       discard: () => {
-        removeDraft(formId);
+        removeDraft(formId, readFormStore().userId);
         setDraftRevision((revision) => revision + 1);
       },
     };

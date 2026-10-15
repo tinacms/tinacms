@@ -83,6 +83,10 @@ A failure in `login()`, `logout()` or `getToken()` is an `AuthError`. It has a `
 4. The sidebar footer shows the user and a "Sign out" button that calls
    `logout()`.
 
+Unsaved form state and `localStorage` drafts are scoped to `user.id`, so
+signing out or switching editors on a shared browser clears in-memory forms
+and keeps each editor's drafts separate.
+
 The slice must leave `loading`. If the session check fails, the slice sets
 `signed-out`. A slice that stays at `loading` shows the loading screen with
 no end, and core does not stop it.
