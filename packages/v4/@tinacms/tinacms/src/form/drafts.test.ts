@@ -229,7 +229,6 @@ describe('form drafts', () => {
     editA('Ada draft');
     expect(readDraft(postA, ada)?.values).toEqual({ title: 'Ada draft' });
 
-    // Ada signs out; Grace signs in on the same tab.
     store.getState().setUserId(null);
     expect(store.getState().forms[postA]).toBeUndefined();
     expect(readDraft(postA, ada)?.values).toEqual({ title: 'Ada draft' });
@@ -240,7 +239,6 @@ describe('form drafts', () => {
     expect(formStatus(store.getState().forms[postA])).toBe('pristine');
     expect(staleDraft(postA, { [title]: 'Hello' })).toBeUndefined();
 
-    // Grace signs out; Ada signs back in and gets her draft back.
     store.getState().setUserId(null);
     store.getState().setUserId(ada);
     store.getState().registerForm(postA, { [title]: 'Hello' });
