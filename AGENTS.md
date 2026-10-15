@@ -21,6 +21,7 @@ When writing regression tests that guard against a quietly-reported finding, mar
 ## Monorepo Structure
 
 ```
+adr/v4/                # v4 architecture: ADRs, CONTEXT.md domain language, supporting docs
 packages/              # Core packages (tinacms, tinacms-authjs, create-tina-app, etc.)
 packages/@tinacms/     # Scoped packages (cli, app, datalayer, graphql, mdx, scripts, etc.)
 examples/              # Framework example apps

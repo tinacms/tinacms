@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { required } from '../../../../plugins/fields';
+import { required, t } from '../../../../plugins/fields';
 import { dispatchContentRequest } from '../server/content-request';
 import {
   type LocalDataLayer,
@@ -179,5 +179,71 @@ describe('a mixed-format collection through the v3 pipeline', () => {
       title: 'Edited anyway',
     });
     expect(saved.document.title).toBe('Edited anyway');
+  });
+});
+
+describe('arrays through the v3 pipeline', () => {
+  let pages: LocalDataLayer;
+
+  beforeEach(async () => {
+    await fs.mkdir(path.join(rootDir, 'content/pages'), { recursive: true });
+    await fs.writeFile(
+      path.join(rootDir, 'content/pages/home.json'),
+      JSON.stringify({
+        tags: ['docs', 'news'],
+        links: [{ label: 'Docs', url: '/docs' }],
+        blocks: [
+          { _template: 'hero', headline: 'Welcome' },
+          { _template: 'cta', link: '/start' },
+        ],
+      })
+    );
+    pages = createLocalDataLayer({
+      rootDir,
+      collections: [
+        {
+          name: 'page',
+          path: 'content/pages',
+          format: 'json',
+          fields: [
+            t.array({ name: 'tags', of: t.string({ name: 'tag' }) }),
+            t.array({
+              name: 'links',
+              fields: [t.string({ name: 'label' }), t.string({ name: 'url' })],
+            }),
+            t.array({
+              name: 'blocks',
+              templates: [
+                { name: 'hero', fields: [t.string({ name: 'headline' })] },
+                { name: 'cta', fields: [t.string({ name: 'link' })] },
+              ],
+            }),
+          ],
+        },
+      ],
+    });
+  });
+
+  it('queries an `of` list, a `fields` list and a `templates` list', async () => {
+    const result = await pages.graphql(`query {
+      page(relativePath: "home.json") {
+        tags
+        links { label url }
+        blocks {
+          __typename
+          ... on PageBlocksHero { headline }
+          ... on PageBlocksCta { link }
+        }
+      }
+    }`);
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.page).toEqual({
+      tags: ['docs', 'news'],
+      links: [{ label: 'Docs', url: '/docs' }],
+      blocks: [
+        { __typename: 'PageBlocksHero', headline: 'Welcome' },
+        { __typename: 'PageBlocksCta', link: '/start' },
+      ],
+    });
   });
 });

@@ -59,6 +59,7 @@ export type {
   CollectionSchema,
   FieldSchema,
   HookRef,
+  TemplateSchema,
   TinaDocument,
   ValidatorRef,
 } from './core/schema/types';
@@ -88,5 +89,6 @@ export type {
   DatetimeFieldSchema,
   NumberFieldSchema,
   RichTextFieldSchema,
+  RichTextTemplate,
   StringFieldSchema,
 } from './plugins/fields';

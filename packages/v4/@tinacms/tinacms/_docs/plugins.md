@@ -235,7 +235,7 @@ TinaCMS does not await an `onChange` hook.
 Names are global, so a third-party plugin gives them a prefix
 (`acme.logSave`). Declare `overrides: [{ capability: 'hooks', key }]` to
 replace a name on purpose. Refer to
-[ADR-025](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/025-form-hook-registration.md)
+[ADR-025](../../../../../adr/v4/025-form-hook-registration.md)
 for the decision.
 
 ## Replace or remove a screen

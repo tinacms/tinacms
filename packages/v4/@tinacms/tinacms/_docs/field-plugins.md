@@ -206,7 +206,7 @@ Hooks:
 The form resolver (`editor/resolver.ts`) calls `validateField`
 (`core/validation.ts`). `validateField` runs the two layers in order and joins
 their messages. The spec is
-[tinacmsv4-docs › field-plugins › Validation](https://github.com/tinacms/tinacmsv4-docs/blob/main/plugins/field-plugins.md#validation).
+[the field plugins spec, Validation section](../../../../../adr/v4/plugins/field-plugins.md#validation).
 
 1. **Plugin-level** — `descriptor.validate(value, context)`. It runs on every
    field of the `type` the plugin owns. `context` is `PluginValidationContext`,
