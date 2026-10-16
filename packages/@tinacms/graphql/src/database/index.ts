@@ -1417,9 +1417,6 @@ export class Database {
       documentPaths
     );
     const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
-    const collectionReferences = await this.getCollectionReferences(
-      this.contentLevel
-    );
     const rootSublevel = this.contentLevel.sublevel(
       CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
@@ -1443,7 +1440,6 @@ export class Database {
     };
 
     const allPaths = new Set<string>();
-    const referencedCollections = new Set<string>();
 
     for (const collectionName of Object.keys(pathsByCollection)) {
       const collection = collections[collectionName];
@@ -1451,13 +1447,6 @@ export class Database {
       const pathSet = new Set(paths);
       for (const p of paths) {
         allPaths.add(p);
-      }
-      for (const [referenced, jsonPaths] of Object.entries(
-        collectionReferences[collectionName] ?? {}
-      )) {
-        if (jsonPaths.length) {
-          referencedCollections.add(referenced);
-        }
       }
       const collectionIndexDefinitions =
         indexDefinitions?.[collectionName] ?? {};
@@ -1501,10 +1490,12 @@ export class Database {
       }
     }
 
-    for (const referenced of referencedCollections) {
+    // Every collection, because the reference walk records targets that the
+    // schema's reference paths don't list (rich-text and templated lists).
+    for (const referenced of tinaSchema.getCollections()) {
       await delKeysEndingInPaths(
         makeIndexSublevel(
-          this.contentLevel.sublevel(referenced, SUBLEVEL_OPTIONS),
+          this.contentLevel.sublevel(referenced.name, SUBLEVEL_OPTIONS),
           REFS_COLLECTIONS_SORT_KEY
         ),
         allPaths

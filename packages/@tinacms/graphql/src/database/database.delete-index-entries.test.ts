@@ -160,6 +160,12 @@ describe('Database.deleteIndexEntriesForPaths()', () => {
       REFS_COLLECTIONS_SORT_KEY
     );
     await authorRefs.put(refKey(A2, GHOST), {} as any);
+    // And one under a collection no schema reference path names, as a reference
+    // inside rich-text would leave.
+    await makeIndexSublevel(
+      content.sublevel('post', SUBLEVEL_OPTIONS),
+      REFS_COLLECTIONS_SORT_KEY
+    ).put(refKey(KEEP, GHOST), {} as any);
 
     await database.deleteIndexEntriesForPaths([GHOST]);
 
