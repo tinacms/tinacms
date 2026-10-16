@@ -10,7 +10,7 @@
  * throws with a clear redirect if someone reaches it.
  */
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
-import type { CustomComponentsMap, TinaRichTextContent } from './types';
+import type { TinaMarkdownProps } from './types';
 
 export { requestWithMetadata, type QueryResult } from './data';
 export { tinaField } from './tina-field';
@@ -19,6 +19,7 @@ export type {
   CustomComponentsMap,
   MdxElement,
   TextElement,
+  TinaMarkdownProps,
   TinaRichTextContent,
   TinaRichTextNode,
   TinaRichTextRoot,
@@ -37,10 +38,7 @@ export type {
  * component AND offer prop completions / type errors at the call site.
  */
 type TinaMarkdownComponent = AstroComponentFactory & {
-  (props: {
-    content: TinaRichTextContent;
-    components?: CustomComponentsMap;
-  }): unknown;
+  (props: TinaMarkdownProps): unknown;
 };
 
 const TinaMarkdownPlaceholder = (() => {

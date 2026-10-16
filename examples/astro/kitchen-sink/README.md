@@ -4,7 +4,7 @@ The Astro version of the TinaCMS kitchen-sink example app. Demonstrates all core
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 22+
 - pnpm
 
 ## Development

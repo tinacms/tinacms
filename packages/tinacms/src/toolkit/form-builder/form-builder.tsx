@@ -1,31 +1,30 @@
+import { isSessionExpiredError } from '@toolkit/core/session-expired';
 import type { Form } from '@toolkit/forms';
+import { Button } from '@toolkit/styles';
+import { cn } from '@utils/cn';
+import { FORM_ERROR } from 'final-form';
+import { Circle, FileStack } from 'lucide-react';
 import * as React from 'react';
 import { type FC, useEffect } from 'react';
-import { FORM_ERROR } from 'final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { Button } from '@toolkit/styles';
+import {
+  EditorialWorkflowSaveEvent,
+  FormResetEvent,
+  SaveContentErrorEvent,
+  SavedContentEvent,
+} from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import {
   DragDropContext,
   type DropResult,
 } from '../fields/plugins/dnd-kit-wrapper';
-import { FaCircle } from 'react-icons/fa';
-import { cn } from '@utils/cn';
-import { FileStack } from 'lucide-react';
 import { useCMS } from '../react-core';
+import { BranchDeletedModal } from './branch-deleted-modal';
+import { CreateBranchModal } from './create-branch-modal';
 import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
-import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
-import { CreateBranchModal } from './create-branch-modal';
-import { BranchDeletedModal } from './branch-deleted-modal';
-import {
-  SavedContentEvent,
-  SaveContentErrorEvent,
-  EditorialWorkflowSaveEvent,
-  FormResetEvent,
-} from '../../lib/posthog/posthog';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
 import type { SaveChoice } from './save-options';
 
 export interface FormBuilderProps {
@@ -233,6 +232,12 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 return;
               }
 
+              if (isSessionExpiredError(error)) {
+                // not a save failure: the auth wall is already re-arming
+                captureWorkflowChoice(false, errorMsg);
+                return;
+              }
+
               captureEvent(SaveContentErrorEvent, {
                 documentPath: tinaForm.path,
                 error: errorMsg,
@@ -353,11 +358,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       <Button
                         onClick={safeHandleSubmit}
                         disabled={!canSubmit || isGuardChecking}
-                        busy={submitting || isGuardChecking}
+                        busy={submitting}
                         variant='primary'
                       >
-                        {submitting && <LoadingDots />}
-                        {!submitting && tinaForm.buttons.save}
+                        {tinaForm.buttons.save}
                       </Button>
                       {tinaForm.actions.length > 0 && (
                         <FormActionMenu
@@ -379,7 +383,17 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
 export const FormStatus = ({ pristine }: { pristine: boolean }) => {
   const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
-  return <FaCircle className={cn('h-3', pristineClass)} />;
+  const label = pristine ? 'No unsaved changes' : 'Unsaved changes';
+  // fill-current keeps this a solid status dot; lucide icons are stroke-only by default.
+  return (
+    <Circle
+      role='img'
+      aria-label={label}
+      className={cn('w-3 h-3 fill-current', pristineClass)}
+    >
+      <title>{label}</title>
+    </Circle>
+  );
 };
 
 const RelatedFilesBanner = () => {

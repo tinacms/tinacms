@@ -1,26 +1,73 @@
+import coreValidatorsPlugin from '../validators/core-validators.plugin';
+import arrayFieldPlugin from './array/array-field.plugin';
+import { array } from './array/array-field.schema';
 import booleanFieldPlugin from './boolean/boolean-field.plugin';
 import { boolean } from './boolean/boolean-field.schema';
+import datetimeFieldPlugin from './datetime/datetime-field.plugin';
+import { datetime } from './datetime/datetime-field.schema';
+import imageFieldPlugin from './image/image-field.plugin';
+import { image } from './image/image-field.schema';
 import numberFieldPlugin from './number/number-field.plugin';
 import { number } from './number/number-field.schema';
+import objectFieldPlugin from './object/object-field.plugin';
+import { object } from './object/object-field.schema';
+import referenceFieldPlugin from './reference/reference-field.plugin';
+import { reference } from './reference/reference-field.schema';
+import richTextFieldPlugin from './rich-text/rich-text-field.plugin';
+import { richText } from './rich-text/rich-text-field.schema';
+import selectFieldPlugin from './select/select-field.plugin';
+import { select } from './select/select-field.schema';
 import stringFieldPlugin from './string/string-field.plugin';
 import { string } from './string/string-field.schema';
 
-// The built-in field plugins TinaCMS ships. The "is this a core plugin" check
-// reads this list, not the plugin name.
 export const corePlugins = [
   stringFieldPlugin,
   booleanFieldPlugin,
   numberFieldPlugin,
+  datetimeFieldPlugin,
+  arrayFieldPlugin,
+  objectFieldPlugin,
+  selectFieldPlugin,
+  richTextFieldPlugin,
+  referenceFieldPlugin,
+  imageFieldPlugin,
+  coreValidatorsPlugin,
 ];
 
-// Schema-authoring helpers, one per built-in field. Kept explicit (rather than
-// derived in a loop) so `t.string` stays statically typed; co-located with
-// corePlugins so the built-in set lives in one place.
-// TODO: once defineConfig (ADR-024) lands, generate `t` from the configured plugin
-// set so user-registered field plugins join it (typed). This stays the built-in
-// default until then.
-export const t = { string, boolean, number };
+// TODO: build `t` from the configured plugin set when defineConfig arrives
+export const t = {
+  string,
+  boolean,
+  number,
+  datetime,
+  select,
+  array,
+  object,
+  richText,
+  reference,
+  image,
+};
 
+export type { ArrayFieldSchema } from './array/array-field.schema';
 export type { BooleanFieldSchema } from './boolean/boolean-field.schema';
+export type { DatetimeFieldSchema } from './datetime/datetime-field.schema';
+export type { ImageFieldSchema } from './image/image-field.schema';
 export type { NumberFieldSchema } from './number/number-field.schema';
+export type { ObjectFieldSchema } from './object/object-field.schema';
+export type {
+  RichTextFieldSchema,
+  RichTextTemplate,
+} from './rich-text/rich-text-field.schema';
+export type {
+  SelectFieldOption,
+  SelectFieldSchema,
+} from './select/select-field.schema';
 export type { StringFieldSchema } from './string/string-field.schema';
+export type { ReferenceFieldSchema } from './reference/reference-field.schema';
+export {
+  max,
+  min,
+  pattern,
+  required,
+  v,
+} from '../validators/core-validators.schema';

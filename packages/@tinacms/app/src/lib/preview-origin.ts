@@ -7,23 +7,15 @@
  */
 
 /**
- * Returns the origin expected for the preview iframe.
+ * Returns the origin the preview iframe is allowed to be on.
  *
- * Relative URLs resolve against `baseOrigin`; absolute URLs keep their own
- * origin.
+ * The admin only ever loads the preview from its own origin, so this is that
+ * origin and nothing else. It is deliberately not derived from the preview URL:
+ * reading the trust anchor out of a value the URL supplies is what allowed a
+ * crafted link to nominate the origin it would then be trusted from.
  */
-export const getExpectedPreviewOrigin = (
-  url: string,
-  baseOrigin: string = typeof window !== 'undefined'
-    ? window.location.origin
-    : ''
-): string => {
-  try {
-    return new URL(url, baseOrigin || undefined).origin;
-  } catch {
-    return baseOrigin;
-  }
-};
+export const getPreviewOrigin = (): string =>
+  typeof window !== 'undefined' ? window.location.origin : '';
 
 /**
  * Checks whether a MessageEvent came from the trusted preview iframe.

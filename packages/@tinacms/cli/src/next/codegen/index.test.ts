@@ -18,8 +18,8 @@ jest.mock('esbuild', () => ({
 }));
 
 import path from 'path';
-import * as stripModule from './stripSearchTokenFromConfig';
 import { Codegen } from './index';
+import * as stripModule from './stripSearchTokenFromConfig';
 
 describe('Codegen.genClient', () => {
   function makeInstance(isTs: boolean): Codegen {
@@ -77,6 +77,16 @@ describe('Codegen.genDatabaseClient', () => {
     const result = await makeInstance(false).genDatabaseClient();
     expect(result).toContain('from "./types.js"');
     expect(result).not.toMatch(/from ["']\.\/types["']/);
+  });
+
+  it('flags only the generated authenticate call as a sign-in', async () => {
+    const result = await makeInstance(true).genDatabaseClient();
+    const authenticateFn = result.slice(
+      result.indexOf('export async function authenticate'),
+      result.indexOf('export async function authorize')
+    );
+    expect(authenticateFn).toContain('isSignIn: true');
+    expect(result.match(/isSignIn: true/g)).toHaveLength(1);
   });
 });
 

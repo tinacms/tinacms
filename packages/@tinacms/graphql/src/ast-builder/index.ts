@@ -546,6 +546,7 @@ export const astBuilder = {
     SystemInfo: 'SystemInfo',
     Boolean: 'Boolean',
     JSON: 'JSON',
+    RichText: 'RichText',
     Node: 'Node',
     PageInfo: 'PageInfo',
     Connection: 'Connection',

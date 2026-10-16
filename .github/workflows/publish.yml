@@ -51,7 +51,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Upgrade npm for OIDC support
-        run: npm install -g npm@latest
+        run: npm install -g npm@$(node -p "require('./package.json').engines.npm")
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         name: Install pnpm
@@ -87,6 +87,9 @@ jobs:
         run: |
           echo running on branch ${BRANCH_NAME}
           pnpm version:snapshot $(echo ${{ github.sha }} | cut -c1-7)
+          # Re-pin to workspace:* so snapshots publish exact internal versions —
+          # caret prerelease ranges can resolve to a different snapshot batch.
+          git diff --name-only -- '*package.json' | xargs -r sed -i 's/"workspace:\^"/"workspace:*"/g'
           pnpm publish -r --tag ${BRANCH_NAME} --no-git-checks --access public
           echo "Published NPM tag: $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
         env:
@@ -240,7 +243,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Upgrade npm for OIDC support
-        run: npm install -g npm@latest
+        run: npm install -g npm@$(node -p "require('./package.json').engines.npm")
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         name: Install pnpm
@@ -285,6 +288,9 @@ jobs:
           publish: pnpm run publish
           createGithubReleases: true
           setupGitUser: false
+          # github-api mode makes GitHub create and sign the Version Packages
+          # commit server-side, satisfying main's required-signatures rule
+          commitMode: github-api
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
           NPM_CONFIG_PROVENANCE: true
@@ -292,8 +298,20 @@ jobs:
       - name: Release to @dev channel
         if: steps.changesets.outputs.hasChangesets == 'true'
         run: |
-          git checkout ${{ github.sha }}
+          # Hard reset (not checkout) so the snapshot runs against the pristine
+          # release commit. changesets/action's github-api commit mode leaves the
+          # version bumps uncommitted in the working tree; a plain checkout keeps
+          # them, so `version:snapshot` finds no changesets and publishes the real
+          # release version to the beta tag, which then blocks the latest publish.
+          git reset --hard ${{ github.sha }}
           pnpm version:snapshot $(echo ${{ github.sha }} | cut -c1-7)
+          # Re-pin to workspace:* so snapshots publish exact internal versions —
+          # caret prerelease ranges can resolve to a different snapshot batch.
+          git diff --name-only -- '*package.json' | xargs -r sed -i 's/"workspace:\^"/"workspace:*"/g'
+          # Sync the lockfile with the re-pinned manifests so the deps check
+          # in `pnpm run` passes. Offline: the sync must never resolve
+          # anything new — workspace re-pins don't need the registry.
+          pnpm install --lockfile-only --no-frozen-lockfile --offline
           pnpm run publish:beta
           echo "A release PR has been created: <https://github.com/tinacms/tinacms/pull/${{ steps.changesets.outputs.pullRequestNumber }}>" >> $GITHUB_STEP_SUMMARY
         env:

@@ -1,13 +1,10 @@
-// @ts-ignore TODO: Fix this
-import prettier from 'prettier/esm/standalone.mjs';
-// @ts-ignore TODO: Fix this
-import parser from 'prettier/esm/parser-espree.mjs';
 import type { RichTextField, RichTextTemplate } from '@tinacms/schema-tools';
-import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
-import * as Plate from '../../parse/plate';
 import type * as Md from 'mdast';
-import { rootElement } from './pre-processing';
+import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
 import { stringifyMDX } from '.';
+import * as Plate from '../../parse/plate';
+import { printObjectLiteral } from '../../stringify/print-object-literal';
+import { rootElement } from './pre-processing';
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
@@ -245,7 +242,9 @@ export function stringifyProps(
         }
         break;
       default:
-        throw new Error(`Stringify props: ${field.type} not yet supported`);
+        throw new Error(
+          `A "${field.type}" field can't be saved as markdown yet. Remove this block, or ask a developer to change the field.`
+        );
     }
   });
   if (template.match) {
@@ -274,21 +273,9 @@ export function stringifyProps(
   return { attributes, children, useDirective, directiveType } as any;
 }
 
-/**
- * Use prettier to determine how to format potentially large objects as strings
- */
 function stringifyObj(obj: unknown, flatten: boolean) {
   if (typeof obj === 'object' && obj !== null) {
-    const dummyFunc = `const dummyFunc = `;
-    const res = prettier
-      .format(`${dummyFunc}${JSON.stringify(obj)}`, {
-        parser: 'acorn',
-        trailingComma: 'none',
-        semi: false,
-        plugins: [parser],
-      })
-      .trim()
-      .replace(dummyFunc, '');
+    const res = printObjectLiteral(obj);
     return flatten ? res.replaceAll('\n', '').replaceAll('  ', ' ') : res;
   } else {
     throw new Error(

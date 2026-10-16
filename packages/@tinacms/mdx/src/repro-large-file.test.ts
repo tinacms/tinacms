@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
 import type { RichTextField } from '@tinacms/schema-tools';
+import { describe, expect, it } from 'vitest';
 import { parseMDX } from './parse';
 import { serializeMDX } from './stringify';
 

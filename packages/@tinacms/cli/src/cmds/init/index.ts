@@ -9,7 +9,6 @@ import configure from './configure';
 import { CLICommand } from '../index';
 import apply from './apply';
 import { Config } from './prompts';
-import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'astro' | 'other';
@@ -22,7 +21,6 @@ export type GeneratedFileType =
   | 'next-api-handler'
   | 'config'
   | 'database'
-  | 'templates'
   | 'reactive-example'
   | 'sample-content'
   | 'users-json';
@@ -47,8 +45,6 @@ export type InitEnvironment = {
   hasTinaDeps: boolean;
   hasReactDep: boolean;
   astroMajor?: number;
-  forestryConfigExists: boolean;
-  frontMatterFormat: ContentFrontmatterFormat;
   gitIgnoreExists: boolean;
   gitIgnoreNodeModulesExists: boolean;
   gitIgnoreTinaEnvExists: boolean;
@@ -66,7 +62,6 @@ export type InitEnvironment = {
 
 export type InitParams = {
   rootPath: string;
-  pathToForestryConfig: string;
   noTelemetry: boolean;
   isBackendInit: boolean;
   baseDir?: string;
@@ -80,16 +75,12 @@ export const command = new CLICommand<InitEnvironment, InitParams>({
     process.chdir(params.rootPath);
   },
   detectEnvironment({
-    rootPath,
-    pathToForestryConfig,
     baseDir = '',
     debug = false,
     tinaVersion,
   }: InitParams): Promise<InitEnvironment> {
     return detectEnvironment({
       baseDir,
-      pathToForestryConfig,
-      rootPath,
       debug,
       tinaVersion,
     });

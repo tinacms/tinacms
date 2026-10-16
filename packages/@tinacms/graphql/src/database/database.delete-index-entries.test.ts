@@ -18,6 +18,7 @@ import { buildSchema, createDatabaseInternal } from '..';
 import type { Bridge } from './bridge';
 import type { Schema } from '@tinacms/schema-tools';
 import { createResolver } from '../resolver';
+import { encodeLocator } from '../references/visit';
 import { REFS_COLLECTIONS_SORT_KEY, makeIndexSublevel } from './datalayer';
 import {
   CONTENT_ROOT_PREFIX,
@@ -89,7 +90,9 @@ const A1 = 'content/authors/a1.json';
 const A2 = 'content/authors/a2.json';
 
 const refKey = (referenced: string, referencing: string) =>
-  [referenced, '$.author', referencing].join(INDEX_KEY_FIELD_SEPARATOR);
+  [referenced, encodeLocator(['author']), referencing].join(
+    INDEX_KEY_FIELD_SEPARATOR
+  );
 
 async function setupDatabase() {
   const bridge = new InMemoryBridge();

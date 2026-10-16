@@ -6,7 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const { nodeCacheMock } = vi.hoisted(() => ({ nodeCacheMock: vi.fn() }));
 vi.mock('../cache/node-cache.js', () => ({ NodeCache: nodeCacheMock }));
 
-import { createClient } from './index';
+import { createClient } from '../client';
+import { createClient as createBrowserClient } from '../client.browser';
 
 const CACHE_DIR = '/tmp/tina-cache/abc';
 
@@ -113,6 +114,21 @@ describe('TinaClient cache initialization', () => {
 
     await client.request({ query: 'query { x }' }, {});
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the fs cache out of the browser client', async () => {
+    asNode();
+    const client = createBrowserClient({
+      url: 'https://content.tinajs.io/content/abc/github/main',
+      queries: () => ({}),
+      cacheDir: CACHE_DIR,
+    });
+
+    await client.init();
+
+    expect(nodeCacheMock).not.toHaveBeenCalled();
+    expect(client.cache).toBeFalsy();
+    expect(client.cacheLock).toBeUndefined();
   });
 });
 

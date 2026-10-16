@@ -1,5 +1,75 @@
 import { describe, expect, it } from 'vitest';
-import { sanitizeFilename } from './utils';
+import {
+  dropzoneAcceptFromExtensions,
+  isImage,
+  isVideo,
+  previewRename,
+  sanitizeFilename,
+  splitFilename,
+} from './utils';
+
+describe('isImage / isVideo', () => {
+  it('matches by extension, case-insensitively', () => {
+    expect(isImage('photo.PNG')).toBe(true);
+    expect(isImage('scan.tiff')).toBe(true);
+    expect(isVideo('clip.MP4')).toBe(true);
+  });
+
+  it('ignores a query string, as TinaCloud appends one', () => {
+    expect(isImage('hero.png?fit=crop&max-w=400')).toBe(true);
+    expect(isVideo('clip.mov?v=2')).toBe(true);
+  });
+
+  it('only considers the final extension', () => {
+    expect(isImage('photo.png.txt')).toBe(false);
+    expect(isVideo('clip.mp4.bak')).toBe(false);
+  });
+
+  it('rejects non-media and degenerate names', () => {
+    expect(isImage('notes.pdf')).toBe(false);
+    expect(isImage('README')).toBe(false);
+    expect(isImage('.gitignore')).toBe(false);
+    expect(isImage(undefined as unknown as string)).toBe(false);
+  });
+
+  it('keeps ico out of previews and tiff in', () => {
+    expect(isImage('favicon.ico')).toBe(false);
+    expect(isImage('scan.tiff')).toBe(true);
+  });
+
+  // The previous regex only tolerated a query string, so a fragment made an
+  // image read as a plain file. Previewing it is the better answer.
+  it('tolerates a fragment as well as a query string', () => {
+    expect(isImage('hero.png#full')).toBe(true);
+  });
+});
+
+describe('dropzoneAcceptFromExtensions', () => {
+  it('returns undefined for an empty list so callers fall through', () => {
+    expect(dropzoneAcceptFromExtensions([])).toBeUndefined();
+  });
+
+  it('keys by MIME type, not by bare extension', () => {
+    // A bare `.pdf` key is dropped from the native file picker, which then
+    // offers every file and only rejects the choice afterwards.
+    expect(dropzoneAcceptFromExtensions(['pdf'])).toEqual({
+      'application/pdf': ['.pdf'],
+    });
+  });
+
+  it('groups extensions that share a MIME type', () => {
+    expect(dropzoneAcceptFromExtensions(['jpg', 'jpeg'])).toEqual({
+      'image/jpeg': ['.jpg', '.jpeg'],
+    });
+  });
+
+  it('keeps distinct MIME types separate', () => {
+    expect(dropzoneAcceptFromExtensions(['png', 'svg'])).toEqual({
+      'image/png': ['.png'],
+      'image/svg+xml': ['.svg'],
+    });
+  });
+});
 
 describe('sanitizeFilename', () => {
   it('returns simple ASCII names unchanged', () => {
@@ -72,5 +142,88 @@ describe('sanitizeFilename', () => {
     const result = sanitizeFilename(`${'a'.repeat(500)}.jpg`);
     expect(result.endsWith('.jpg')).toBe(true);
     expect(result.length).toBeLessThanOrEqual(204);
+  });
+});
+
+describe('splitFilename', () => {
+  it('splits on the final dot', () => {
+    expect(splitFilename('a.b.jpg')).toEqual({ base: 'a.b', ext: '.jpg' });
+  });
+
+  it('treats a leading dot as part of the base, not an extension', () => {
+    expect(splitFilename('.gitignore')).toEqual({
+      base: '.gitignore',
+      ext: '',
+    });
+  });
+
+  it('returns an empty extension for a trailing dot', () => {
+    expect(splitFilename('photo.')).toEqual({ base: 'photo.', ext: '' });
+  });
+
+  it('agrees with sanitizeFilename about what the extension is', () => {
+    for (const name of ['a.b.jpg', '.gitignore', 'photo.', 'plain']) {
+      const { ext } = splitFilename(name);
+      expect(sanitizeFilename(name).endsWith(ext)).toBe(true);
+    }
+  });
+});
+
+describe('previewRename', () => {
+  it('keeps the extension when the base contains dots', () => {
+    const { sanitized } = previewRename('report.v2', 'report.pdf');
+    expect(sanitized).toBe('report.v2.pdf');
+  });
+
+  it('never lets the base rewrite or drop the extension', () => {
+    expect(previewRename('a/b/c.png', 'photo.jpg').sanitized).toBe('c.png.jpg');
+    expect(previewRename('///', 'photo.jpg').sanitized).toBe('file.jpg');
+  });
+
+  it('produces a name that sanitizeFilename leaves alone', () => {
+    for (const [input, current] of [
+      ['my photo', 'a.jpg'],
+      ['réport', 'a.PDF'],
+      ['a#b&c', 'a.jpg'],
+    ]) {
+      const { sanitized } = previewRename(input, current);
+      expect(sanitizeFilename(sanitized)).toBe(sanitized);
+    }
+  });
+
+  it('trims surrounding whitespace before validating', () => {
+    const { sanitized, valid } = previewRename('  renamed  ', 'photo.jpg');
+    expect(sanitized).toBe('renamed.jpg');
+    expect(valid).toBe(true);
+  });
+
+  it('is invalid and hints when the input is empty', () => {
+    const { valid, hint, preview } = previewRename('   ', 'photo.jpg');
+    expect(valid).toBe(false);
+    expect(hint).toBe('Enter a file name.');
+    expect(preview).toBeNull();
+  });
+
+  it('is invalid and hints when the input sanitizes away entirely', () => {
+    const { valid, hint } = previewRename('///', 'photo.jpg');
+    expect(valid).toBe(false);
+    expect(hint).toMatch(/isn't valid/);
+  });
+
+  it('still allows the literal fallback name to be typed', () => {
+    const { valid, hint } = previewRename('file', 'photo.jpg');
+    expect(valid).toBe(true);
+    expect(hint).toBeNull();
+  });
+
+  it('is invalid when the result matches the current name', () => {
+    const { valid, hint } = previewRename('photo', 'photo.jpg');
+    expect(valid).toBe(false);
+    expect(hint).toBeNull();
+  });
+
+  it('only previews when the result differs from what was typed', () => {
+    expect(previewRename('renamed', 'photo.jpg').preview).toBeNull();
+    expect(previewRename('my photo', 'photo.jpg').preview).toBe('my-photo.jpg');
   });
 });

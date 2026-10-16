@@ -1,6 +1,6 @@
 {
     "name": "create-tina-app",
-    "version": "2.1.9",
+    "version": "2.2.3",
     "type": "module",
     "main": "dist/index.js",
     "files": [
@@ -25,6 +25,7 @@
     "scripts": {
         "types": "pnpm tsc",
         "build": "tinacms-scripts build",
+        "test": "vitest run",
         "test-run-bin": "pnpm create-tina-app"
     },
     "publishConfig": {
@@ -41,7 +42,8 @@
         "@types/node": "^22.13.1",
         "@types/prompts": "catalog:",
         "@types/tar": "catalog:",
-        "typescript": "^5.7.3"
+        "typescript": "^5.7.3",
+        "vitest": "^0.32.4"
     },
     "dependencies": {
         "chalk": "catalog:",
@@ -51,7 +53,7 @@
         "ora": "catalog:",
         "posthog-node": "^5.17.2",
         "prompts": "catalog:",
-        "systeminformation": "^5.27.13",
+        "systeminformation": "^5.31.7",
         "tar": "catalog:"
     }
 }

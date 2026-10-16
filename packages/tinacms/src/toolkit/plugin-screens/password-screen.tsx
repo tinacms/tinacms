@@ -1,11 +1,11 @@
-import { MdVpnKey } from 'react-icons/md';
-import { createScreen } from '@toolkit/react-screens';
 import { UpdatePassword } from '@toolkit/components/account/update-password';
+import { createScreen } from '@toolkit/react-screens';
+import { KeyRound } from 'lucide-react';
 
 export const PasswordScreenPlugin = createScreen({
   name: 'Change Password',
   Component: UpdatePassword,
-  Icon: MdVpnKey,
+  Icon: KeyRound,
   layout: 'fullscreen',
   navCategory: 'Account',
 });

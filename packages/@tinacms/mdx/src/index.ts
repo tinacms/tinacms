@@ -6,4 +6,4 @@ export * from './parse/plate';
 
 export { parseMDX };
 export { serializeMDX };
-export { sanitizeUrl } from './parse/remarkToPlate';
+export { sanitizeUrl } from './sanitize-url';

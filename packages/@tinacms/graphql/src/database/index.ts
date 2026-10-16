@@ -82,6 +82,17 @@ export interface DatabaseArgs {
   version?: boolean;
   namespace?: string;
   levelBatchSize?: number;
+  authCollection?: AuthCollectionOptions;
+}
+
+export interface AuthCollectionOptions {
+  /** Values of the uid field of users who can edit the auth collection. */
+  admins?: string[];
+  /**
+   * Allow writes to the auth collection from calls that pass no ctxUser.
+   * A null ctxUser means nobody is signed in, and is still refused.
+   */
+  allowUnauthenticatedWrites?: boolean;
 }
 
 export interface GitProvider {
@@ -115,6 +126,13 @@ export type CreateLocalDatabaseArgs = Omit<DatabaseArgs, 'level'> & {
   rootPath?: string;
 };
 
+const withUnauthenticatedWrites = (
+  options: AuthCollectionOptions | undefined
+): AuthCollectionOptions => ({
+  ...options,
+  allowUnauthenticatedWrites: options?.allowUnauthenticatedWrites ?? true,
+});
+
 export const createLocalDatabase = (config?: CreateLocalDatabaseArgs) => {
   const level = new TinaLevelClient(config?.port);
   level.openConnection();
@@ -123,6 +141,7 @@ export const createLocalDatabase = (config?: CreateLocalDatabaseArgs) => {
     bridge: fsBridge,
     ...(config || {}),
     level,
+    authCollection: withUnauthenticatedWrites(config?.authCollection),
   });
 };
 
@@ -171,11 +190,16 @@ export const createDatabase = (config: CreateDatabase) => {
   });
 };
 
+/**
+ * Builds a database for CLI tooling and tests. It trusts requests without a
+ * user, so do not use it for a public endpoint. Use `createDatabase` instead.
+ */
 export const createDatabaseInternal = (config: DatabaseArgs) => {
   return new Database({
     ...config,
     bridge: config.bridge,
     level: config.level,
+    authCollection: withUnauthenticatedWrites(config.authCollection),
   });
 };
 const SYSTEM_FILES = ['_schema', '_graphql', '_lookup'];
@@ -216,6 +240,10 @@ export class Database {
   private readonly onPut: OnPutCallback;
   private readonly onDelete: OnDeleteCallback;
   private readonly levelBatchSize: number;
+  public readonly authCollection: Readonly<{
+    admins: readonly string[];
+    allowUnauthenticatedWrites: boolean;
+  }>;
   private tinaSchema: TinaSchema | undefined;
   private contentNamespace: string | undefined;
 
@@ -238,6 +266,11 @@ export class Database {
     this.onDelete = config.onDelete || defaultOnDelete;
     this.levelBatchSize = config.levelBatchSize ?? DEFAULT_LEVEL_BATCH_SIZE;
     this.contentNamespace = config.namespace;
+    this.authCollection = Object.freeze({
+      admins: Object.freeze([...(config.authCollection?.admins ?? [])]),
+      allowUnauthenticatedWrites:
+        config.authCollection?.allowUnauthenticatedWrites === true,
+    });
   }
 
   private collectionForPath = async (filepath: string) => {
@@ -383,9 +416,7 @@ export class Database {
 
     const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
     const collectionIndexDefinitions = indexDefinitions?.[collection.name];
-    const collectionReferences = (await this.getCollectionReferences())?.[
-      collection.name
-    ];
+    const referenceSchema = await this.getSchema();
     const normalizedPath = normalizePath(filepath);
     if (!collection?.isDetached) {
       if (this.bridge) {
@@ -420,7 +451,7 @@ export class Database {
         ...makeRefOpsForDocument(
           normalizedPath,
           collection?.name,
-          collectionReferences,
+          referenceSchema,
           dataFields,
           'put',
           level
@@ -456,7 +487,7 @@ export class Database {
             ...makeRefOpsForDocument(
               normalizedPath,
               collection?.name,
-              collectionReferences,
+              referenceSchema,
               existingItem,
               'del',
               level
@@ -518,9 +549,7 @@ export class Database {
           );
           collectionIndexDefinitions = indexDefinitions?.[collectionName];
         }
-        const collectionReferences = (await this.getCollectionReferences())?.[
-          collectionName
-        ];
+        const referenceSchema = await this.getSchema();
 
         const normalizedPath = normalizePath(filepath);
         const dataFields = await this.formatBodyOnPayload(filepath, data);
@@ -598,7 +627,7 @@ export class Database {
             ...makeRefOpsForDocument(
               normalizedPath,
               collectionName,
-              collectionReferences,
+              referenceSchema,
               dataFields,
               'put',
               level
@@ -634,7 +663,7 @@ export class Database {
                 ...makeRefOpsForDocument(
                   normalizedPath,
                   collectionName,
-                  collectionReferences,
+                  referenceSchema,
                   existingItem,
                   'del',
                   level
@@ -681,11 +710,16 @@ export class Database {
       if (error instanceof GraphQLError) {
         throw error;
       }
-      throw new TinaFetchError(`Error in PUT for ${filepath}`, {
-        originalError: error,
-        file: filepath,
-        collection: collectionName,
-      });
+      throw new TinaFetchError(
+        `Error in PUT for ${filepath}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+        {
+          originalError: error,
+          file: filepath,
+          collection: collectionName,
+        }
+      );
     }
   };
 
@@ -956,6 +990,7 @@ export class Database {
               for (const field of fields) {
                 if (
                   (field.indexed !== undefined && field.indexed === false) ||
+                  field.type === 'password' ||
                   field.type ===
                     'object' /* TODO do we want indexes on objects? */
                 ) {
@@ -1177,42 +1212,51 @@ export class Database {
       edges = [...edges, { cursor: key, path: filepath, value: itemRecord }];
     }
 
-    return {
-      edges: await sequential(
-        edges,
-        async ({
-          cursor,
-          path,
-          value,
-        }: {
-          cursor: string;
-          path: string;
-          value?: Record<string, any>;
-        }) => {
-          try {
-            // pass the path to the matched item and the raw index value
-            const node = await hydrator(path, value);
-            return {
-              node,
-              cursor: btoa(cursor),
-            };
-          } catch (error) {
-            console.log(error);
-            if (
-              error instanceof Error &&
-              (!path.includes('.tina/__generated__/_graphql.json') ||
-                !path.includes('tina/__generated__/_graphql.json'))
-            ) {
-              throw new TinaQueryError({
-                originalError: error,
-                file: path,
-                collection: collection.name,
-              });
-            }
-            // I dont think this should ever happen
-            throw error;
+    const hydratedEdges = await sequential(
+      edges,
+      async ({
+        cursor,
+        path,
+        value,
+      }: {
+        cursor: string;
+        path: string;
+        value?: Record<string, any>;
+      }) => {
+        try {
+          // pass the path to the matched item and the raw index value
+          const node = await hydrator(path, value);
+          return {
+            node,
+            cursor: btoa(cursor),
+          };
+        } catch (error) {
+          if (error instanceof NotFoundError) {
+            console.warn(
+              `Skipping ${path} in collection ${collection.name}: its index entry has no record. Reindex to remove it.`
+            );
+            return null;
           }
+          console.log(error);
+          if (
+            error instanceof Error &&
+            (!path.includes('.tina/__generated__/_graphql.json') ||
+              !path.includes('tina/__generated__/_graphql.json'))
+          ) {
+            throw new TinaQueryError({
+              originalError: error,
+              file: path,
+              collection: collection.name,
+            });
+          }
+          // I dont think this should ever happen
+          throw error;
         }
+      }
+    );
+    return {
+      edges: hydratedEdges.filter(
+        (edge): edge is NonNullable<typeof edge> => edge !== null
       ),
       pageInfo: {
         hasPreviousPage,
@@ -1514,9 +1558,7 @@ export class Database {
       throw new Error(`No collection found for path: ${filepath}`);
     }
     const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
-    const collectionReferences = (await this.getCollectionReferences())?.[
-      collection.name
-    ];
+    const referenceSchema = await this.getSchema();
     const collectionIndexDefinitions = indexDefinitions?.[collection.name];
 
     let level = this.contentLevel;
@@ -1539,7 +1581,7 @@ export class Database {
         ...makeRefOpsForDocument(
           normalizedPath,
           collection.name,
-          collectionReferences,
+          referenceSchema,
           item,
           'del',
           level
@@ -1764,10 +1806,6 @@ const _indexContent = async ({
     }
     collectionPath = collection.path;
   }
-  const collectionReferences = (await database.getCollectionReferences())?.[
-    collection?.name
-  ];
-
   const tinaSchema = await database.getSchema();
   let templateInfo: CollectionTemplateable | null = null;
   if (collection) {
@@ -1809,7 +1847,7 @@ const _indexContent = async ({
             ...makeRefOpsForDocument(
               normalizedPath,
               collection?.name,
-              collectionReferences,
+              tinaSchema,
               item,
               'del',
               level
@@ -1846,7 +1884,7 @@ const _indexContent = async ({
           ...makeRefOpsForDocument(
             normalizedPath,
             collection?.name,
-            collectionReferences,
+            tinaSchema,
             aliasedData,
             'put',
             level
@@ -1926,10 +1964,6 @@ const _deleteIndexContent = async (
     }
   }
 
-  const collectionReferences = (await database.getCollectionReferences())?.[
-    collection?.name
-  ];
-
   const tinaSchema = await database.getSchema();
   let templateInfo: CollectionTemplateable | null = null;
   if (collection) {
@@ -1960,7 +1994,7 @@ const _deleteIndexContent = async (
         ...makeRefOpsForDocument(
           itemKey,
           collection?.name,
-          collectionReferences,
+          tinaSchema,
           aliasedData,
           'del',
           database.contentLevel
