@@ -2,6 +2,7 @@ import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type * as Plate from '../../parse/plate';
 import { getMarks } from '../../stringify';
+import { isColour, stringLiteral } from '../../stringify/attribute-values';
 import { stringifyPropsInline } from './acorn';
 
 const matches = (a: string[], b: string[]) => {
@@ -147,7 +148,7 @@ const text = (content: { text: string }) => {
 };
 
 const markAttributes = (content: Plate.TextElement) => {
-  if (!content.highlightColor) {
+  if (!content.highlightColor || !isColour(content.highlightColor)) {
     return [];
   }
 
@@ -157,7 +158,7 @@ const markAttributes = (content: Plate.TextElement) => {
       name: 'style',
       value: {
         type: 'mdxJsxAttributeValueExpression' as const,
-        value: `{ backgroundColor: "${content.highlightColor}" }`,
+        value: `{ backgroundColor: ${stringLiteral(content.highlightColor)} }`,
       },
     },
   ];
