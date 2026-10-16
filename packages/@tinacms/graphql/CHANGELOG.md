@@ -1,5 +1,19 @@
 # tina-graphql
 
+## 4.0.1
+
+### Patch Changes
+
+- [#7782](https://github.com/tinacms/tinacms/pull/7782) [`dc74885`](https://github.com/tinacms/tinacms/commit/dc7488576604c019bb3284401a7088777dcfbe90) Thanks [@kulesy](https://github.com/kulesy)! - Bump `js-yaml` to `^4.3.2` in `@tinacms/cli` and `^3.15.2` in `@tinacms/graphql`, which fixes a high-severity advisory in each.
+
+- [#7851](https://github.com/tinacms/tinacms/pull/7851) [`e627dc9`](https://github.com/tinacms/tinacms/commit/e627dc9c20b59d851b59a36c015f8232359448c0) Thanks [@sarahanntolsma-ff](https://github.com/sarahanntolsma-ff)! - Find a document's references by walking it against its schema rather than by evaluating schema-derived JSONPath over it. The expressions could not describe a templated list item, which is tagged `_template` rather than nested under a key of that name, and could not reach inside a `rich-text` field, which is stored as text. References in either shape were missing from the index, so `_sys.hasReferences` reported false for them and renaming or deleting such a document left those references pointing at a path that no longer existed. `findReferences` also took the default page of 50, which silently capped how many a rename or delete went on to fix.
+
+  Existing indexes keep answering lookups, but entries the old build wrote are not replaced on a single document write — reindex to pick up the references it missed and to clear stale entries.
+
+- [#7133](https://github.com/tinacms/tinacms/pull/7133) [`d828a9e`](https://github.com/tinacms/tinacms/commit/d828a9efdd40c0c554df5adc4d635e5818f96598) Thanks [@kulesy](https://github.com/kulesy)! - A collection list sorted by a field now loads when that field's sort index still lists a deleted document. The query skips the missing document instead of failing the whole list with "Error querying file ... from collection". A full reindex removes the stale entry.
+
+- [#7295](https://github.com/tinacms/tinacms/pull/7295) [`5750d3b`](https://github.com/tinacms/tinacms/commit/5750d3bc84c18d4fb6332aa5a499d33fca973b0f) Thanks [@shininglegend](https://github.com/shininglegend)! - Fix an intermittent, silent hang at "Indexing local files" in `tinacms dev`/`build`/`audit`. `TinaLevelClient.openConnection` connected to the in-process datalayer server without waiting for the server's `listen()` to complete; when the connection lost that race, `many-level` queued every database operation forever with no error. The connection is now retried (100 ms × 50), and if it ultimately fails the RPC stream is destroyed so queued operations reject with `LEVEL_CONNECTION_LOST` instead of hanging. The race is timing-sensitive: on Node 25 it was lost almost every run, on Node 22 occasionally.
+
 ## 4.0.0
 
 ### Major Changes
