@@ -38,6 +38,7 @@ import {
   makeFilterSuffixes,
   makeFolderOpsForCollection,
   makeIndexOpsForDocument,
+  makeIndexSublevel,
   makeRefOpsForDocument,
 } from './datalayer';
 import {
@@ -1118,16 +1119,17 @@ export class Database {
       SUBLEVEL_OPTIONS
     );
     const sublevel = indexDefinition
-      ? level
-          .sublevel(
+      ? makeIndexSublevel(
+          level.sublevel(
             `${collection.name}${
               folder
                 ? `_${folder === FOLDER_ROOT ? folder : sha.hex(folder)}`
                 : ''
             }`,
             SUBLEVEL_OPTIONS
-          )
-          .sublevel(sort, SUBLEVEL_OPTIONS)
+          ),
+          sort
+        )
       : rootLevel;
 
     if (!query.gt && !query.gte) {
@@ -1396,6 +1398,112 @@ export class Database {
     });
     while (operations.length) {
       await this.contentLevel.batch(operations.splice(0, this.levelBatchSize));
+    }
+  };
+
+  /**
+   * Deletes every sort-index and reference entry for the given paths by matching the
+   * path rather than the stored value, so entries left by an earlier value change go
+   * too. Run it after deleteContentByPaths with the same paths.
+   */
+  public deleteIndexEntriesForPaths = async (documentPaths: string[]) => {
+    await this.initLevel();
+    if (!documentPaths.length) {
+      return;
+    }
+    const tinaSchema = await this.getSchema(this.contentLevel);
+    const { pathsByCollection, collections } = await partitionPathsByCollection(
+      tinaSchema,
+      documentPaths
+    );
+    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
+    const rootSublevel = this.contentLevel.sublevel(
+      CONTENT_ROOT_PREFIX,
+      SUBLEVEL_OPTIONS
+    );
+    const ops: DelOp[] = [];
+
+    // Value-keyed (`<value>\x1D<path>`): the path is a suffix and can't be
+    // seeked, so scan and match the trailing path segment.
+    const delKeysEndingInPaths = async (
+      indexSublevel: ReturnType<typeof makeIndexSublevel>,
+      pathSet: Set<string>
+    ) => {
+      for await (const [key] of indexSublevel.iterator()) {
+        const keyPath = key.slice(
+          key.lastIndexOf(INDEX_KEY_FIELD_SEPARATOR) + 1
+        );
+        if (pathSet.has(keyPath)) {
+          ops.push({ type: 'del', key, sublevel: indexSublevel });
+        }
+      }
+    };
+
+    const allPaths = new Set<string>();
+
+    for (const collectionName of Object.keys(pathsByCollection)) {
+      const collection = collections[collectionName];
+      const paths = pathsByCollection[collectionName].map(normalizePath);
+      const pathSet = new Set(paths);
+      for (const p of paths) {
+        allPaths.add(p);
+      }
+      const collectionIndexDefinitions =
+        indexDefinitions?.[collectionName] ?? {};
+
+      // Each document is indexed under the collection index and its folder
+      // index, so sweep both for every affected folder.
+      const folderKeys = new Set<string>();
+      const folderTreeBuilder = new FolderTreeBuilder();
+      for (const p of paths) {
+        folderKeys.add(folderTreeBuilder.update(p, collection?.path || ''));
+      }
+      const collectionSublevelNames = [
+        collectionName,
+        ...[...folderKeys].map((folderKey) => `${collectionName}_${folderKey}`),
+      ];
+
+      for (const sublevelName of collectionSublevelNames) {
+        const collectionSublevel = this.contentLevel.sublevel(
+          sublevelName,
+          SUBLEVEL_OPTIONS
+        );
+        for (const sortKey of Object.keys(collectionIndexDefinitions)) {
+          // Reference entries live under the referenced collection, so they are
+          // swept separately below.
+          if (sortKey === REFS_COLLECTIONS_SORT_KEY) {
+            continue;
+          }
+          const indexSublevel = makeIndexSublevel(collectionSublevel, sortKey);
+          if (sortKey === DEFAULT_COLLECTION_SORT_KEY) {
+            for (const p of paths) {
+              ops.push({ type: 'del', key: p, sublevel: indexSublevel });
+            }
+          } else {
+            await delKeysEndingInPaths(indexSublevel, pathSet);
+          }
+        }
+      }
+
+      for (const p of paths) {
+        ops.push({ type: 'del', key: p, sublevel: rootSublevel });
+      }
+    }
+
+    // Every collection, because the reference walk records targets that the
+    // schema's reference paths don't list (rich-text and templated lists).
+    for (const referenced of tinaSchema.getCollections()) {
+      await delKeysEndingInPaths(
+        makeIndexSublevel(
+          this.contentLevel.sublevel(referenced.name, SUBLEVEL_OPTIONS),
+          REFS_COLLECTIONS_SORT_KEY
+        ),
+        allPaths
+      );
+    }
+
+    for (let i = 0; i < ops.length; i += this.levelBatchSize) {
+      await this.contentLevel.batch(ops.slice(i, i + this.levelBatchSize));
     }
   };
 
