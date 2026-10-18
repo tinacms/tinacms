@@ -43,7 +43,7 @@ The ADRs are the canonical decisions. Read them in order; each one's `Status` fi
 - [ADR-024: `defineConfig` Shape — The Composition Root](./024-defineconfig-shape.md)
 - [ADR-025: Form Hook Registration](./025-form-hook-registration.md)
 - [ADR-026: Draft Persistence in the Form Store](./026-draft-persistence-in-form-store.md)
-- [ADR-027: Global Nav Groups](./027-global-nav-groups.md)
+- [ADR-027: Global Nav Groups](./027-global-nav-groups.md) — *extends ADR-013*
 
 ## Supporting documentation
 

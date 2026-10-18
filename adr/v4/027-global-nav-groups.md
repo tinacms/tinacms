@@ -1,146 +1,73 @@
 # ADR-027: Global Nav Groups
 
 ## Status
-**Proposed**. Two decisions are open for review: how an entry joins a group (Decision 1) and where groups sit in the sidebar (Decision 2). Extends [ADR-013](./013-ui-extension-slots.md) (the `globalNav` slot), under its §6 rule that ordering is explicit, never load-order. A related question also stays open: whether **Collections** becomes an ordinary group, so plugins can add entries under it.
+**Accepted** (2026-10-19). Decided by Brook, Eli and Josh. Adopts **declared groups** (Option 1C) placed **inline** (Option 2A). Extends [ADR-013](./013-ui-extension-slots.md) (the `globalNav` slot), under its §6 rule that ordering is explicit, never load-order.
 
 ## Context
 The v3 sidebar groups its entries under headings: **Collections**, **Cloud** for the TinaCloud links, and one heading per screen `navCategory` (`'Account' | 'Site' | 'Dashboard'`). The v4 `globalNav` slot has no grouping. Every entry renders in one flat list after Collections, sorted by `order`. Once [tinacms#7855](https://github.com/tinacms/tinacms/pull/7855) merges, the TinaCloud plugin's Project Config, User Management and Support links ([tinacms#6883](https://github.com/tinacms/tinacms/issues/6883)) sit there with no heading, beside entries such as Media.
 
-ADR-013 accepts that a new slot needs a core change. Whether a new *heading* also needs one is the main trade-off in Decision 1.
+ADR-013 accepts that a new slot needs a core change. The question here was whether a new *heading* also needs one, and where headed groups sit among ungrouped entries.
 
-## Decision 1: How an entry joins a group
+## Decision
 
-### Option 1A: Free-text group on the entry
-`GlobalNavEntry` gains an optional `group: string`. The sidebar renders one heading per distinct `group`; the name is also the heading text, and names match exactly.
-
-```ts
-globalNav: [
-  { label: 'Project Config', group: 'Cloud', icon: CloudIcon, target: { kind: 'url', href } },
-  { label: 'Support', group: 'Cloud', icon: CircleHelpIcon, target: { kind: 'url', href: supportUrl } },
-]
-```
-
-- **+** One optional field; existing entries are unaffected; plugins add headings with no core change.
-- **−** A typo (`'Cloud'` vs `'cloud'`) makes a second heading, which only shows when the admin renders. Plugins sharing a heading must agree on its exact text.
-
-### Option 1B: Fixed group list in core
-`group` is a core union, as v3's `navCategory` was.
-
-```ts
-group?: 'Cloud' | 'Account' | 'Site';
-```
-
-- **+** Headings are consistent, and core controls their order.
-- **−** Every new heading needs a core change; v3 left third parties with three categories that did not fit them.
-
-### Option 1C: Declared groups
-Plugins contribute groups, and entries reference them by id. An unknown id throws at boot, as an unknown screen target does.
+### 1. Plugins declare groups; entries reference them by id
+A new `navGroups` slot takes `{ id, label, order }`. A `globalNav` entry joins a group with an optional `group` set to that id. An entry that names an unknown group id throws at boot, as an unknown screen target does.
 
 ```ts
 slots: {
-  navGroups: [{ id: 'tinacloud', label: 'Cloud', order: 50 }],
-  globalNav: [{ label: 'Support', group: 'tinacloud', /* … */ }],
+  navGroups: [{ id: 'tinacloud', label: 'Cloud', order: 5 }],
+  globalNav: [
+    { label: 'Project Config', group: 'tinacloud', order: 0, icon: CloudIcon, target: { kind: 'url', href } },
+    { label: 'Support', group: 'tinacloud', order: 20, icon: CircleHelpIcon, target: { kind: 'url', href: supportUrl } },
+  ],
 }
 ```
 
-- **+** Groups get their own `order`, typos fail at boot, and the id is separate from the label.
-- **−** A second concept to learn and document. Moving from 1A to 1C later breaks every entry whose group is not declared, unless core creates a group for each undeclared string (with the string as both id and label).
+Entries without `group` are unaffected. Any plugin can add a heading without a core change, and the id is separate from the label, so a label can change without breaking the entries that use it.
 
-### Option 1D: One slot per section
-`globalNav.cloud`, `globalNav.account`, and so on.
-
-- **+** Fully typed.
-- **−** Every heading becomes a core change, which defeats a fan-in slot.
-
-### Option 1E: Nested entries
-An entry carries `children: GlobalNavEntry[]`.
-
-- **+** Collapsible sections come for free.
-- **−** The list becomes a tree, and it is unclear what a click on the parent does.
-
-### Option 1F: One heading per plugin
-The heading is the contributing plugin's name; no API change.
-
-- **+** Nothing to add.
-- **−** One-link plugins get a pointless heading, and a plugin cannot split its entries across sections.
-
-### Option 1G: No headings
-Keep the flat list; plugins rely on `order` ranges alone.
-
-- **+** Nothing to build.
-- **−** Loses v3 parity, and the sidebar gets harder to scan as plugins add entries.
-
-## Decision 2: Where groups sit
-
-Applies to any Decision 1 option that produces headings. In every option below, entries sort by `order` as before, entries inside a group keep that order, and groups order among themselves by their lowest-ordered entry (or by the group's own `order` under 1C). Ties, between entries or between groups, keep the plugin order in `defineConfig`, as `globalNav` already does (ADR-013 §6 asks for a stable fallback; `packages/v4/@tinacms/tinacms/_docs/ui-slots.md` in tinacms defines it).
-
-All three examples render these entries (illustrative labels and `order` values):
+### 2. Groups sit inline among ungrouped entries
+Ungrouped entries and groups sort together in one list: an ungrouped entry by its `order`, a group by its declared `order`. Inside a group, entries sort by their own `order`. Ties, between entries or between groups, keep the plugin order in `defineConfig`, as `globalNav` already does (ADR-013 §6 asks for a stable fallback; `packages/v4/@tinacms/tinacms/_docs/ui-slots.md` defines it).
 
 ```text
-  Media        0
-  Project Cfg  5   Cloud
-  Branches     6
-  User Mgmt    8   Cloud
-  Support      20  Cloud
+  Media        0                 Media
+  Cloud group  5                 CLOUD
+    Project Cfg  0     renders     Project Cfg
+    User Mgmt    8     ───────▶    User Mgmt
+    Support      20                Support
+  Branches     6                 Branches
 ```
 
-### Option 2A: Inline
-Each group takes the position of its lowest-ordered entry, and pulls its other entries up beside it.
-
-```text
-  Media
-  CLOUD
-    Project Cfg
-    User Mgmt
-    Support
-  Branches
-```
-
-- **+** Respects every plugin's `order`; a plugin can place its group anywhere.
-- **−** A grouped entry can appear above entries with a lower `order` (Support, 20, renders above Branches, 6), so the result is the hardest to predict.
-
-### Option 2B: Groups first, then Other
-All groups render first. Ungrouped entries go under an **Other** heading at the end.
-
-```text
-  CLOUD
-    Project Cfg
-    User Mgmt
-    Support
-  OTHER
-    Media
-    Branches
-```
-
-- **+** Every entry sits under a heading, so the sidebar looks uniform.
-- **−** Other becomes a catch-all, and a plugin's main link (Media) sinks below every section.
-
-### Option 2C: Ungrouped first, then groups
-All ungrouped entries render first, with no heading. Groups follow.
-
-```text
-  Media
-  Branches
-  CLOUD
-    Project Cfg
-    User Mgmt
-    Support
-```
-
-- **+** The simplest rule to explain, ungrouped entries keep their relative order, and loose links stay next to Collections.
-- **−** Every grouped entry renders below every ungrouped one, whatever its `order` (Project Cfg, 5, renders below Branches, 6), so a plugin cannot place a group above an ungrouped entry.
+A plugin places its group anywhere in the sidebar, and every `order` is respected. Because the group's position comes from the group's own `order`, a grouped entry's `order` only ranks it inside its group.
 
 ## Consequences
 
 ### Positive
-- Under any option except 1G, the sidebar regains headings as v3 had; every option except 1F and 1G can restore v3's Cloud heading for `tinaCloud()`.
+- The sidebar regains headings as v3 had, and `tinaCloud()` can restore v3's Cloud heading.
+- A typo in a group id fails at boot, not as a stray second heading in the rendered admin.
+- Plugins sharing a heading agree on an id, not on exact label text.
 
 ### Negative
-- Headings change how a plugin's `order` reads under every Decision 2 option, so the slot docs (`packages/v4/@tinacms/tinacms/_docs/ui-slots.md` in tinacms) and a `global-nav` test must spell out the chosen rule.
+- `navGroups` is a second concept for plugin authors to learn, and the slot docs must cover it.
+- A grouped entry's `order` now means "position inside the group", not "position in the sidebar". The slot docs (`packages/v4/@tinacms/tinacms/_docs/ui-slots.md`) and a `global-nav` test must spell out the rule above.
+
+## Open question
+Whether **Collections** becomes an ordinary declared group, so plugins can add entries under it. This ADR does not decide it; Collections keeps its fixed place above `globalNav` until it does.
 
 ## Alternatives Considered
-The options under Decision 1 and Decision 2 are the alternatives; the ones not adopted move here once the decisions are made.
+
+### How an entry joins a group
+- **1A: Free-text `group: string` on the entry.** One optional field, and the name doubles as the heading. Rejected: a typo (`'Cloud'` vs `'cloud'`) makes a second heading that only shows when the admin renders, and plugins sharing a heading must agree on its exact text.
+- **1B: Fixed group union in core** (`'Cloud' | 'Account' | 'Site'`, as v3's `navCategory`). Rejected: every new heading needs a core change, and v3 left third parties with three categories that did not fit them.
+- **1D: One slot per section** (`globalNav.cloud`, `globalNav.account`). Fully typed, but every heading becomes a core change, which defeats a fan-in slot.
+- **1E: Nested entries** (`children: GlobalNavEntry[]`). The list becomes a tree, and it is unclear what a click on the parent does.
+- **1F: One heading per plugin.** One-link plugins get a pointless heading, and a plugin cannot split its entries across sections.
+- **1G: No headings.** Loses v3 parity, and the sidebar gets harder to scan as plugins add entries.
+
+### Where groups sit
+- **2B: Groups first, then an Other heading for ungrouped entries.** Rejected: Other becomes a catch-all, and a plugin's main link (Media) sinks below every section.
+- **2C: Ungrouped entries first, then groups.** The simplest rule to explain, but every grouped entry renders below every ungrouped one whatever its `order`, so a plugin cannot place a group above an ungrouped entry.
 
 ## References
 - [tinacms#6883](https://github.com/tinacms/tinacms/issues/6883), [tinacms#7855](https://github.com/tinacms/tinacms/pull/7855)
+- [tinacmsv4-docs#7](https://github.com/tinacms/tinacmsv4-docs/pull/7), where the options were proposed
 - [ADR-006](./006-plugin-dependency-resolution.md), [ADR-013](./013-ui-extension-slots.md)
