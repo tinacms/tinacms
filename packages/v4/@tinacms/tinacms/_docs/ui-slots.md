@@ -3,7 +3,7 @@
 A UI slot is a named region of the admin. Many plugins contribute into one
 slot. The contributions stack. They do not conflict, and no contribution
 replaces a different one. Refer to
-[ADR-013](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/013-ui-extension-slots.md)
+[ADR-013](../../../../../adr/v4/013-ui-extension-slots.md)
 for the decision.
 
 A slot is not a capability. A capability such as `field` or `media` has one

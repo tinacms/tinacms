@@ -18,6 +18,10 @@
 		"./sanitize-url": {
 			"types": "./dist/sanitize-url.d.ts",
 			"default": "./dist/sanitize-url.js"
+		},
+		"./sanitize-css-color": {
+			"types": "./dist/sanitize-css-color.d.ts",
+			"default": "./dist/sanitize-css-color.js"
 		}
 	},
 	"license": "Apache-2.0",
@@ -28,7 +32,8 @@
 				"target": "node",
 				"bundleDeps": true
 			},
-			"src/sanitize-url.ts"
+			"src/sanitize-url.ts",
+			"src/sanitize-css-color.ts"
 		]
 	},
 	"scripts": {

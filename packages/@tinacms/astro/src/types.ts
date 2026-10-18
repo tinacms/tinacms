@@ -128,6 +128,8 @@ export type TextElement = {
   code?: boolean;
   highlight?: boolean;
   highlightColor?: string;
+  /** CSS colour of the text; its presence is the mark. */
+  textColor?: string;
 };
 
 export type MdxElement = {

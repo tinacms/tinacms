@@ -40,6 +40,32 @@ describe('TinaMarkdown', () => {
     expect(html).toContain('<code>inline code</code>');
   });
 
+  it('drops unsafe leaf colours but keeps the text', async () => {
+    const html = await render({
+      props: {
+        content: {
+          type: 'root',
+          children: [
+            {
+              type: 'p',
+              children: [
+                {
+                  type: 'text',
+                  text: 'safe',
+                  highlight: true,
+                  textColor:
+                    'red;position:fixed;background:url(https://evil/x)',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+    expect(html).toContain('<mark>safe</mark>');
+    expect(html).not.toContain('evil');
+  });
+
   it('renders code blocks with language class', async () => {
     const html = await render({ props: { content: codeBlock } });
     expect(html).toMatchSnapshot();
