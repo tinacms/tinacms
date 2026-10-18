@@ -7,14 +7,15 @@ import {
 import {
   DEFAULT_NAV_ORDER,
   type GlobalNavEntry,
-  type GlobalNavItem,
+  type GlobalNavSection,
 } from './contract';
+
+type DeclaredGroups = ReadonlyMap<string, GlobalNavSection>;
 
 const validateEntry = (
   pluginName: string,
   entry: GlobalNavEntry,
-  screens: ScreenRegistry,
-  groups: Map<string, GroupItem>
+  screens: ScreenRegistry
 ): void => {
   invariant(
     entry.label.length > 0,
@@ -30,20 +31,26 @@ const validateEntry = (
         `but no installed plugin contributes a screen named "${target.screen}".`
     );
   }
-  if (entry.group !== undefined) {
-    invariant(
-      groups.has(entry.group),
-      'global-nav-unknown-group',
-      `Plugin "${pluginName}" puts the global nav entry "${entry.label}" in the group "${entry.group}", ` +
-        'but no installed plugin declares that group.'
-    );
-  }
 };
 
-type GroupItem = Extract<GlobalNavItem, { kind: 'group' }>;
+const validateGroup = (
+  pluginName: string,
+  { label, group }: GlobalNavEntry,
+  groups: DeclaredGroups
+): void => {
+  if (group === undefined) return;
+  invariant(
+    groups.has(group),
+    'global-nav-unknown-group',
+    `Plugin "${pluginName}" puts the global nav entry "${label}" in the group "${group}", ` +
+      'but no installed plugin declares that group.'
+  );
+};
 
-const declareGroups = (resolved: ResolvedSegment[]): Map<string, GroupItem> => {
-  const groups = new Map<string, GroupItem>();
+const declareGroups = (
+  resolved: ResolvedSegment[]
+): Map<string, GlobalNavSection> => {
+  const groups = new Map<string, GlobalNavSection>();
   for (const { manifest, segment } of resolved) {
     for (const group of segment.slots?.navGroups ?? []) {
       invariant(
@@ -52,7 +59,7 @@ const declareGroups = (resolved: ResolvedSegment[]): Map<string, GroupItem> => {
         `Plugin "${manifest.name}" declares the nav group "${group.id}", ` +
           'but another plugin already declares it.'
       );
-      groups.set(group.id, { kind: 'group', group, entries: [] });
+      groups.set(group.id, { group, entries: [] });
     }
   }
   return groups;
@@ -68,13 +75,52 @@ const sortByOrder = <T>(
       (orderOf(right) ?? DEFAULT_NAV_ORDER)
   );
 
+// Gives a segment's groups, then one section for each of its ungrouped
+// entries, in plugin order. Grouped entries go into their group's section.
+const collectSegment = (
+  { manifest, segment }: ResolvedSegment,
+  screens: ScreenRegistry,
+  groups: DeclaredGroups,
+  isShown: (entry: GlobalNavEntry) => boolean
+): GlobalNavSection[] => {
+  const sections = (segment.slots?.navGroups ?? []).flatMap(
+    ({ id }) => groups.get(id) ?? []
+  );
+  for (const entry of segment.slots?.globalNav ?? []) {
+    validateGroup(manifest.name, entry, groups);
+    if (!isShown(entry)) continue;
+    validateEntry(manifest.name, entry, screens);
+    if (entry.group === undefined) {
+      sections.push({ entries: [entry] });
+    } else {
+      groups.get(entry.group)?.entries.push(entry);
+    }
+  }
+  return sections;
+};
+
+const mergeUngroupedRuns = (
+  sections: GlobalNavSection[]
+): GlobalNavSection[] => {
+  const merged: GlobalNavSection[] = [];
+  for (const section of sections) {
+    const last = merged.at(-1);
+    if (section.group === undefined && last && last.group === undefined) {
+      last.entries.push(...section.entries);
+    } else {
+      merged.push(section);
+    }
+  }
+  return merged;
+};
+
 // TODO(ADR-013 §5): gate entries on `requires: { permission }` once ADR-008 lands.
-// Turns every plugin's navGroups and globalNav into one sorted list (ADR-027).
+// See ADR-027 for groups and their order.
 export const createGlobalNav = (
   resolved: ResolvedSegment[],
   plugins: PluginManifest[],
   screens: ScreenRegistry
-): GlobalNavItem[] => {
+): GlobalNavSection[] => {
   const provided = new Set(plugins.flatMap((plugin) => plugin.provides));
   const removed = new Set(screensRemovedByOverride(resolved, plugins));
   const isShown = ({ target, dependsOn = [] }: GlobalNavEntry) =>
@@ -82,28 +128,16 @@ export const createGlobalNav = (
     dependsOn.every((capability) => provided.has(capability));
 
   const groups = declareGroups(resolved);
-  const items: GlobalNavItem[] = [];
-  for (const { manifest, segment } of resolved) {
-    for (const { id } of segment.slots?.navGroups ?? []) {
-      const group = groups.get(id);
-      if (group) items.push(group);
-    }
-    for (const entry of segment.slots?.globalNav ?? []) {
-      if (!isShown(entry)) continue;
-      validateEntry(manifest.name, entry, screens, groups);
-      if (entry.group === undefined) {
-        items.push({ kind: 'entry', entry });
-      } else {
-        groups.get(entry.group)?.entries.push(entry);
-      }
-    }
+  const sections = resolved.flatMap((segment) =>
+    collectSegment(segment, screens, groups, isShown)
+  );
+  for (const { entries } of groups.values()) {
+    sortByOrder(entries, (entry) => entry.order);
   }
-
-  for (const group of groups.values()) {
-    sortByOrder(group.entries, (entry) => entry.order);
-  }
-  return sortByOrder(
-    items.filter((item) => item.kind === 'entry' || item.entries.length > 0),
-    (item) => (item.kind === 'group' ? item.group.order : item.entry.order)
+  return mergeUngroupedRuns(
+    sortByOrder(
+      sections.filter(({ entries }) => entries.length > 0),
+      ({ group, entries }) => (group ? group.order : entries[0]?.order)
+    )
   );
 };

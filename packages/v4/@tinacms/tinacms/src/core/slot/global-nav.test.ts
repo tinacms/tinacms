@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { type ResolvedSegment, definePlugin } from '../plugin';
 import type { AdminScreen } from '../screen/contract';
 import { createScreenRegistry } from '../screen/registry';
-import type { GlobalNavEntry, GlobalNavItem, NavGroup } from './contract';
+import type { GlobalNavEntry, GlobalNavSection, NavGroup } from './contract';
 import { createGlobalNav } from './global-nav';
 
 const Icon = () => null;
@@ -27,11 +27,9 @@ const segmentOf = (
   segment: { screens, slots: { globalNav, navGroups } },
 });
 
-const flatLabels = (items: GlobalNavItem[]) =>
-  items.flatMap((item) =>
-    item.kind === 'entry'
-      ? [item.entry.label]
-      : item.entries.map(({ label }) => `${item.group.label}/${label}`)
+const flatLabels = (sections: GlobalNavSection[]) =>
+  sections.flatMap(({ group, entries }) =>
+    entries.map(({ label }) => (group ? `${group.label}/${label}` : label))
   );
 
 const labelsOf = (resolved: ResolvedSegment[], provides: string[] = []) => {
@@ -231,9 +229,49 @@ describe('global nav groups', () => {
     ).toEqual([]);
   });
 
-  it('rejects an entry in a group no plugin declares', () => {
+  it('keeps plugin order when a group and an entry share an order', () => {
+    expect(
+      labelsOf([
+        segmentOf('first', [entry('Media', { order: 5 })]),
+        segmentOf('cloud', [entry('Project', { group: 'cloud' })], [], [cloud]),
+        segmentOf('last', [entry('Branches', { order: 5 })]),
+      ])
+    ).toEqual(['Media', 'Cloud/Project', 'Branches']);
+  });
+
+  it('merges ungrouped entries next to each other into one section', () => {
+    const resolved = [
+      segmentOf('cloud', [entry('Project', { group: 'cloud' })], [], [cloud]),
+      segmentOf('other', [
+        entry('Media'),
+        entry('Docs'),
+        entry('Branches', { order: 6 }),
+      ]),
+    ];
+    const plugins = resolved.map(({ manifest }) => manifest);
+    expect(
+      createGlobalNav(
+        resolved,
+        plugins,
+        createScreenRegistry(resolved, plugins)
+      ).map(({ group, entries }) => [
+        group?.label,
+        entries.map(({ label }) => label),
+      ])
+    ).toEqual([
+      [undefined, ['Media', 'Docs']],
+      ['Cloud', ['Project']],
+      [undefined, ['Branches']],
+    ]);
+  });
+
+  it('rejects an entry in a group no plugin declares, even when it is hidden', () => {
     expect(() =>
-      labelsOf([segmentOf('one', [entry('Ghost', { group: 'clod' })])])
+      labelsOf([
+        segmentOf('one', [
+          entry('Ghost', { group: 'clod', dependsOn: ['search'] }),
+        ]),
+      ])
     ).toThrow(/no installed plugin declares that group/);
   });
 

@@ -27,7 +27,7 @@ export type {
 export type {
   ActionTarget,
   GlobalNavEntry,
-  GlobalNavItem,
+  GlobalNavSection,
   NavGroup,
   NavTarget,
   ScreenTarget,

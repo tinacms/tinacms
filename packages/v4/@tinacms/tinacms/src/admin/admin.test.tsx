@@ -114,6 +114,12 @@ const screenPlugin = definePlugin({
             order: 10,
           },
           {
+            label: 'Changelog',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://tina.io/changelog' },
+            order: 30,
+          },
+          {
             label: 'Media',
             icon: NavIcon,
             target: { kind: 'screen', screen: 'media' },
@@ -536,6 +542,22 @@ describe('TinaAdmin global nav', () => {
         .getAllByRole('listitem')
         .map((item) => item.textContent)
     ).toEqual(['Guides']);
+  });
+
+  it('places a group between the ungrouped entries by its order', async () => {
+    renderAdmin();
+    const [first, ...rest] = await screen.findAllByRole('list', {
+      name: 'Global navigation',
+    });
+    expect(rest).toHaveLength(0);
+    const heading = screen.getByText('Help');
+    expect(
+      first.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+    expect(
+      heading.compareDocumentPosition(screen.getByText('Changelog')) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
   });
 
   it('does not link a screen that no entry targets', async () => {

@@ -30,8 +30,7 @@ import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
 import type {
   GlobalNavEntry,
-  GlobalNavItem,
-  NavGroup,
+  GlobalNavSection,
   NavTarget,
 } from '../core/slot/contract';
 import { useCollectionDocuments, useDocument } from '../editor/content-queries';
@@ -138,35 +137,17 @@ function DocumentMenu({
   );
 }
 
-interface NavSection {
-  group?: NavGroup;
-  entries: GlobalNavEntry[];
-}
-
-const toSections = (items: GlobalNavItem[]): NavSection[] => {
-  const sections: NavSection[] = [];
-  for (const item of items) {
-    const last = sections.at(-1);
-    if (item.kind === 'group') {
-      sections.push({ group: item.group, entries: item.entries });
-    } else if (last && last.group === undefined) {
-      last.entries.push(item.entry);
-    } else {
-      sections.push({ entries: [item.entry] });
-    }
-  }
-  return sections;
-};
-
 function GlobalNavMenu({
   entries,
   activeScreen,
   navigate,
+  label,
   labelledBy,
 }: {
   entries: GlobalNavEntry[];
   activeScreen?: string;
   navigate: (route: AdminRoute) => void;
+  label?: string;
   labelledBy?: string;
 }) {
   const open = (target: NavTarget) => {
@@ -177,10 +158,7 @@ function GlobalNavMenu({
     }
   };
   return (
-    <SidebarMenu
-      aria-label={labelledBy ? undefined : 'Global navigation'}
-      aria-labelledby={labelledBy}
-    >
+    <SidebarMenu aria-label={label} aria-labelledby={labelledBy}>
       {entries.map(({ label, icon: Icon, target }, index) => (
         <SidebarMenuItem key={`${index}:${label}`}>
           <SidebarMenuButton
@@ -208,17 +186,18 @@ function GlobalNavMenu({
 }
 
 function GlobalNav({
-  items,
+  sections,
   activeScreen,
   navigate,
 }: {
-  items: GlobalNavItem[];
+  sections: GlobalNavSection[];
   activeScreen?: string;
   navigate: (route: AdminRoute) => void;
 }) {
   const labelPrefix = useId();
-  return toSections(items).map(({ group, entries }, index) => {
-    const labelId = group ? `${labelPrefix}-${group.id}` : undefined;
+  const firstUngrouped = sections.findIndex(({ group }) => !group);
+  return sections.map(({ group, entries }, index) => {
+    const labelId = group ? `${labelPrefix}-${index}` : undefined;
     return (
       <SidebarGroup key={group ? `group:${group.id}` : `entries:${index}`}>
         {group ? (
@@ -228,6 +207,7 @@ function GlobalNav({
           entries={entries}
           activeScreen={activeScreen}
           navigate={navigate}
+          label={index === firstUngrouped ? 'Global navigation' : undefined}
           labelledBy={labelId}
         />
       </SidebarGroup>
@@ -437,7 +417,7 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
           ) : null}
 
           <GlobalNav
-            items={globalNav}
+            sections={globalNav}
             activeScreen={activeScreen?.screen}
             navigate={navigate}
           />

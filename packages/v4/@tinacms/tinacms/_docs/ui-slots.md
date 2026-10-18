@@ -7,8 +7,9 @@ replaces a different one. Refer to
 for the decision.
 
 A slot is not a capability. A capability such as `field` or `media` has one
-provider for each key, and a second provider is a conflict. A slot has no keys
-and no `overrides`.
+provider for each key, and a second provider is a conflict. A slot has no
+`overrides`. A contribution to `globalNav` has no key. A group in `navGroups`
+has an `id` only so that entries can refer to it.
 
 The core owns the list of slots. A plugin cannot define a new slot. v4 has two
 slots now: `globalNav` and `navGroups`.
@@ -72,7 +73,8 @@ collections. Each entry is a `GlobalNavEntry` (`core/slot/contract.ts`):
   `order` keep the order of the plugins in `defineConfig`, then the order in
   the `globalNav` array.
 - **Groups:** an entry with a `group` must name a group that an installed
-  plugin declares. If it does not, boot throws `global-nav-unknown-group`.
+  plugin declares. If it does not, boot throws `global-nav-unknown-group`,
+  also for an entry that `dependsOn` hides.
 - **Screen targets:** a `screen` target must name a screen that an installed
   plugin contributes. If it does not, boot throws `global-nav-unknown-screen`
   (`core/slot/global-nav.ts`).
@@ -107,6 +109,8 @@ slots: {
 
 - **Position:** groups and entries without a group sort together, each by its
   own `order`. The `order` of an entry in a group does not move the group.
+- **Ties:** a group and an entry with the same `order` keep the order of the
+  plugins in `defineConfig`. A plugin's groups come before its own entries.
 - **Shared groups:** a plugin can put entries in a group that a different
   plugin declares.
 - **One declaration:** two plugins cannot declare the same `id`. Boot throws
@@ -115,10 +119,10 @@ slots: {
 
 ## Read the nav
 
-`useGlobalNav()` (`@tinacms/tinacms/admin`) gives a list of `GlobalNavItem`
-values after the filter and the sort. An item is an entry without a group
-(`kind: 'entry'`), or a group with its sorted entries (`kind: 'group'`). The
-admin sidebar uses it.
+`useGlobalNav()` (`@tinacms/tinacms/admin`) gives a list of
+`GlobalNavSection` values after the filter and the sort. A section is a group
+with its entries, or a run of entries without a group (`group` is
+`undefined`). The admin sidebar renders one menu for each section.
 
 ## Not supported yet
 

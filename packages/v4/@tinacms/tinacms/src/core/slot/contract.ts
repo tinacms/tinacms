@@ -23,9 +23,11 @@ export interface NavGroup {
   order?: number;
 }
 
-export type GlobalNavItem =
-  | { kind: 'entry'; entry: GlobalNavEntry }
-  | { kind: 'group'; group: NavGroup; entries: GlobalNavEntry[] };
+// A run of entries without a group, or one group with its entries.
+export interface GlobalNavSection {
+  group?: NavGroup;
+  entries: GlobalNavEntry[];
+}
 
 // Definitions for global navigation slot options
 export interface SlotContributions {
