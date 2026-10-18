@@ -113,16 +113,15 @@ const layoutNode = collection.fields[3];
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins(PLUGINS);
 
-const renderField = (document?: TinaDocument) =>
+const renderField = (
+  document?: TinaDocument,
+  coll: CollectionSchema = collection
+) =>
   render(
     <TinaProvider
       config={asResolvedConfig({ plugins: PLUGINS, schema: NO_COLLECTIONS })}
     >
-      <FormProvider
-        collection={collection}
-        path={DOCUMENT_PATH}
-        document={document}
-      >
+      <FormProvider collection={coll} path={DOCUMENT_PATH} document={document}>
         <LabelledFields />
       </FormProvider>
     </TinaProvider>
@@ -305,6 +304,49 @@ describe('ObjectField ingest and digest', () => {
 });
 
 describe('ObjectField composed with array', () => {
+  it("keeps a removed item's object off the item that takes its place", async () => {
+    const authors: CollectionSchema = {
+      name: 'post',
+      format: 'mdx',
+      fields: [
+        t.array({
+          name: 'authors',
+          label: 'Authors',
+          fields: [
+            t.string({ name: 'name', label: 'Name' }),
+            t.object({
+              name: 'profile',
+              label: 'Profile',
+              fields: [
+                t.string({ name: 'bio', label: 'Bio' }),
+                t.number({ name: 'score', label: 'Score' }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    };
+    renderField(
+      {
+        authors: [
+          { name: 'Ivan' },
+          { name: 'Josh', profile: { bio: 'Editor', score: 10 } },
+          { name: 'Brook' },
+        ],
+      },
+      authors
+    );
+    await screen.findAllByLabelText('Bio');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 2' })
+    );
+    expect(valueOf('authors')).toEqual([
+      { name: 'Ivan', profile: null },
+      { name: 'Brook', profile: null },
+    ]);
+    expect(screen.queryByLabelText('Bio')).not.toBeInTheDocument();
+  });
+
   it('round-trips an object nested inside an array', async () => {
     const registry = await resolveRegistry();
     const stored = { blocks: [{ hero: { height: 10 } }] };

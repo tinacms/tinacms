@@ -17,6 +17,7 @@ export default defineClientPlugin({
     // A stored value that is not an object stays as it is, so a save writes it
     // back unchanged (ADR-012: never throw on open).
     parse: (stored: unknown, node, context) => {
+      if (stored === undefined) return null;
       const value = stored ?? {};
       if (!isPlainObject(value)) return value;
       return ingestDocument(value, asObjectFieldSchema(node).fields, context);
