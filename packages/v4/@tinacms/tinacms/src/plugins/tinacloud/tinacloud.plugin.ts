@@ -35,7 +35,7 @@ export const tinaCloud = (options: TinaCloudOptions): PluginManifest =>
               getToken: auth.tinaCloudToken,
             }),
           },
-          slots: { globalNav: tinaCloudNav(options.clientId) },
+          slots: tinaCloudNav(options.clientId),
         },
       };
     },

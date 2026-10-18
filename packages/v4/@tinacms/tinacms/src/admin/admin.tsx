@@ -20,6 +20,7 @@ import {
   startTransition,
   use,
   useEffect,
+  useId,
   useRef,
   useState,
 } from 'react';
@@ -27,7 +28,12 @@ import { HashRouter } from 'react-router-dom';
 import type { ResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
-import type { GlobalNavEntry, NavTarget } from '../core/slot/contract';
+import type {
+  GlobalNavEntry,
+  GlobalNavItem,
+  NavGroup,
+  NavTarget,
+} from '../core/slot/contract';
 import { useCollectionDocuments, useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
@@ -132,14 +138,36 @@ function DocumentMenu({
   );
 }
 
-function GlobalNav({
+interface NavSection {
+  group?: NavGroup;
+  entries: GlobalNavEntry[];
+}
+
+const toSections = (items: GlobalNavItem[]): NavSection[] => {
+  const sections: NavSection[] = [];
+  for (const item of items) {
+    const last = sections.at(-1);
+    if (item.kind === 'group') {
+      sections.push({ group: item.group, entries: item.entries });
+    } else if (last && last.group === undefined) {
+      last.entries.push(item.entry);
+    } else {
+      sections.push({ entries: [item.entry] });
+    }
+  }
+  return sections;
+};
+
+function GlobalNavMenu({
   entries,
   activeScreen,
   navigate,
+  labelledBy,
 }: {
   entries: GlobalNavEntry[];
   activeScreen?: string;
   navigate: (route: AdminRoute) => void;
+  labelledBy?: string;
 }) {
   const open = (target: NavTarget) => {
     if (target.kind === 'screen') {
@@ -149,7 +177,10 @@ function GlobalNav({
     }
   };
   return (
-    <SidebarMenu aria-label='Global navigation'>
+    <SidebarMenu
+      aria-label={labelledBy ? undefined : 'Global navigation'}
+      aria-labelledby={labelledBy}
+    >
       {entries.map(({ label, icon: Icon, target }, index) => (
         <SidebarMenuItem key={`${index}:${label}`}>
           <SidebarMenuButton
@@ -174,6 +205,34 @@ function GlobalNav({
       ))}
     </SidebarMenu>
   );
+}
+
+function GlobalNav({
+  items,
+  activeScreen,
+  navigate,
+}: {
+  items: GlobalNavItem[];
+  activeScreen?: string;
+  navigate: (route: AdminRoute) => void;
+}) {
+  const labelPrefix = useId();
+  return toSections(items).map(({ group, entries }, index) => {
+    const labelId = group ? `${labelPrefix}-${group.id}` : undefined;
+    return (
+      <SidebarGroup key={group ? `group:${group.id}` : `entries:${index}`}>
+        {group ? (
+          <SidebarGroupLabel id={labelId}>{group.label}</SidebarGroupLabel>
+        ) : null}
+        <GlobalNavMenu
+          entries={entries}
+          activeScreen={activeScreen}
+          navigate={navigate}
+          labelledBy={labelId}
+        />
+      </SidebarGroup>
+    );
+  });
 }
 
 function ScreenOutlet({
@@ -377,15 +436,11 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
             </SidebarGroup>
           ) : null}
 
-          {globalNav.length > 0 ? (
-            <SidebarGroup>
-              <GlobalNav
-                entries={globalNav}
-                activeScreen={activeScreen?.screen}
-                navigate={navigate}
-              />
-            </SidebarGroup>
-          ) : null}
+          <GlobalNav
+            items={globalNav}
+            activeScreen={activeScreen?.screen}
+            navigate={navigate}
+          />
         </SidebarContent>
 
         <SidebarFooter>

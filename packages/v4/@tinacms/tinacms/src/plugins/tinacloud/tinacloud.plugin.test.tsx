@@ -78,8 +78,14 @@ describe('tinaCloud()', () => {
     expect(plugin.server).toBeUndefined();
   });
 
-  it('links the sidebar to the project in the TinaCloud dashboard', async () => {
+  it('links the sidebar to the project in the TinaCloud dashboard, under Cloud', async () => {
     const segment = (await tinaCloud({ clientId: 'abc' }).client?.())?.default;
+    expect(segment?.slots?.navGroups).toEqual([
+      { id: 'tinacloud', label: 'Cloud', order: 100 },
+    ]);
+    expect(
+      segment?.slots?.globalNav?.every(({ group }) => group === 'tinacloud')
+    ).toBe(true);
     expect(
       segment?.slots?.globalNav?.map(({ label, target }) => ({ label, target }))
     ).toEqual([

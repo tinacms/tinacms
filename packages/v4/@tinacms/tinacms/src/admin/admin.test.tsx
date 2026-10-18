@@ -99,7 +99,14 @@ const screenPlugin = definePlugin({
         { name: 'unlinked', label: 'Unlinked', component: MediaScreen },
       ],
       slots: {
+        navGroups: [{ id: 'help', label: 'Help', order: 20 }],
         globalNav: [
+          {
+            label: 'Guides',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://tina.io/guides' },
+            group: 'help',
+          },
           {
             label: 'Docs',
             icon: NavIcon,
@@ -519,6 +526,16 @@ describe('TinaAdmin global nav', () => {
         .getAllByRole('listitem')
         .map((item) => item.textContent)
     ).toEqual(['Media', 'Switch branch', 'Docs']);
+  });
+
+  it('lists the entries of a group under its heading', async () => {
+    renderAdmin();
+    const menu = await screen.findByRole('list', { name: 'Help' });
+    expect(
+      within(menu)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['Guides']);
   });
 
   it('does not link a screen that no entry targets', async () => {
