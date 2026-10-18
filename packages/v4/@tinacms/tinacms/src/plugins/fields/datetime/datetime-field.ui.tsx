@@ -23,7 +23,7 @@ const toLocalWallClock = (instant: Date): string =>
  * instant, so the input shows the local wall clock of that instant. A stored
  * value with no zone already spells a wall clock, so it passes through.
  */
-const toInputValue = (stored: string | undefined): string => {
+const toInputValue = (stored: string | null): string => {
   if (!stored) return '';
   if (!stored.includes('T')) return `${stored}T00:00`;
   if (!CARRIES_A_ZONE.test(stored)) return stored.slice(0, 16);
@@ -40,10 +40,10 @@ const toInputValue = (stored: string | undefined): string => {
  */
 const fromInputValue = (
   wallClock: string,
-  stored: string | undefined
-): string | undefined => {
-  if (wallClock === '') return undefined;
-  if (stored !== undefined && !CARRIES_A_ZONE.test(stored)) return wallClock;
+  stored: string | null
+): string | null => {
+  if (wallClock === '') return null;
+  if (stored != null && !CARRIES_A_ZONE.test(stored)) return wallClock;
   const instant = new Date(wallClock);
   if (Number.isNaN(instant.getTime())) return wallClock;
   return instant.toISOString();
@@ -51,7 +51,7 @@ const fromInputValue = (
 
 export function DatetimeField() {
   const address = useFieldAddress();
-  const [value, setValue] = useFieldValue<string | undefined>(address);
+  const [value, setValue] = useFieldValue<string | null>(address);
   const errors = useFieldErrors(address);
   const inputRef = useRef<HTMLInputElement>(null);
 

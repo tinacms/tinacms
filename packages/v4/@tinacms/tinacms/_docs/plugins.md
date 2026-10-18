@@ -235,7 +235,7 @@ TinaCMS does not await an `onChange` hook.
 Names are global, so a third-party plugin gives them a prefix
 (`acme.logSave`). Declare `overrides: [{ capability: 'hooks', key }]` to
 replace a name on purpose. Refer to
-[ADR-025](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/025-form-hook-registration.md)
+[ADR-025](../../../../../adr/v4/025-form-hook-registration.md)
 for the decision.
 
 ## Replace or remove a screen
@@ -273,6 +273,8 @@ Two overrides of one screen throw an error at boot
     supplies
   - [The `reference` field](./reference-field.md) — the document picker that v4
     supplies
+  - [The `image` field](./image-field.md): the media picker that v4 supplies,
+    when a media plugin is installed
   - [The `rich-text` field](./rich-text-field.md) — the Plate editor that v4
     supplies, and the markdown body that it controls
 - [Media plugins](./media-plugins.md) — how a plugin stores media, and the local media plugin

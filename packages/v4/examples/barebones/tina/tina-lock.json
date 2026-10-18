@@ -42,6 +42,11 @@
             "type": "boolean"
           },
           {
+            "name": "heroImage",
+            "label": "Hero image",
+            "type": "image"
+          },
+          {
             "name": "stars",
             "label": "Stars",
             "validators": [
@@ -155,6 +160,68 @@
             "name": "featured",
             "label": "Featured",
             "type": "boolean"
+          },
+          {
+            "name": "tags",
+            "label": "Tags",
+            "of": {
+              "name": "tag",
+              "label": "Tag",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "name": "blocks",
+            "label": "Blocks",
+            "templates": [
+              {
+                "name": "hero",
+                "label": "Hero",
+                "defaultItem": {
+                  "headline": "A new hero"
+                },
+                "fields": [
+                  {
+                    "name": "headline",
+                    "label": "Headline",
+                    "validators": [
+                      {
+                        "name": "required"
+                      }
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "name": "tagline",
+                    "label": "Tagline",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "cta",
+                "label": "Call to action",
+                "fields": [
+                  {
+                    "name": "label",
+                    "label": "Label",
+                    "validators": [
+                      {
+                        "name": "required"
+                      }
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "name": "link",
+                    "label": "Link",
+                    "type": "string"
+                  }
+                ]
+              }
+            ],
+            "type": "array"
           }
         ]
       }
@@ -169,6 +236,7 @@
   "primitives": {
     "array": 1,
     "boolean": 1,
+    "image": 1,
     "object": 1,
     "rating": 1,
     "reference": 1,

@@ -131,11 +131,13 @@ export const inputAcceptOf = ({ mimeTypes, extensions }: UploadRules): string =>
 export const acceptEntryLabel = (entry: MediaAccept): string =>
   isMediaExtension(entry) ? entry.toUpperCase() : MEDIA_CATEGORY_LABELS[entry];
 
-const mimeTypeOf = (file: File): string => {
-  if (file.type) return file.type;
-  const ext = extensionOf(file.name);
+export const mimeTypeOfPath = (path: string): string => {
+  const ext = extensionOf(path);
   return isMediaExtension(ext) ? MEDIA[ext].mime : '';
 };
+
+const mimeTypeOf = (file: File): string =>
+  file.type || mimeTypeOfPath(file.name);
 
 const matchesMimeType = (file: File, mimeType: string): boolean => {
   const rule = mimeType.trim().toLowerCase();

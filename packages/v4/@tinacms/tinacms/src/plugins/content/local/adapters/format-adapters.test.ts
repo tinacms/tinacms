@@ -44,6 +44,18 @@ describe('markdown adapter', () => {
     expect(saved).toContain('Body prose the schema does not know about.');
   });
 
+  it('removes a schema field the save leaves out, and keeps unknown keys', () => {
+    const saved = adapter.serialize({ title: 'Renamed' }, MDX_RAW, undefined, [
+      'title',
+      'featured',
+    ]);
+    expect(adapter.parse(saved)).toEqual({
+      title: 'Renamed',
+      date: new Date('2024-01-01T00:00:00.000Z'),
+      category: 'not-in-schema',
+    });
+  });
+
   it('serializes a fresh document without a previous file', () => {
     const saved = adapter.serialize({ title: 'New' });
     expect(adapter.parse(saved)).toEqual({ title: 'New' });
@@ -193,6 +205,19 @@ describe('json adapter', () => {
     const saved = adapter.serialize({ title: 'New' }, previous);
     expect(adapter.parse(saved)).toEqual({ title: 'New', extra: 'kept' });
     expect(saved.endsWith('\n')).toBe(true);
+  });
+
+  it('removes a schema field the save leaves out, and keeps unknown keys', () => {
+    const previous = JSON.stringify({
+      title: 'Old',
+      hero: 'a.jpg',
+      extra: 'kept',
+    });
+    const saved = adapter.serialize({ title: 'New' }, previous, undefined, [
+      'title',
+      'hero',
+    ]);
+    expect(adapter.parse(saved)).toEqual({ title: 'New', extra: 'kept' });
   });
 });
 

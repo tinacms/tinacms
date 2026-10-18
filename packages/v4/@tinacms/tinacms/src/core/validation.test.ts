@@ -258,4 +258,37 @@ describe('addressesWithValidators', () => {
       'seo.ogTitle',
     ]);
   });
+
+  it('walks each template item with its own template', () => {
+    const fields = [
+      t.array({
+        name: 'blocks',
+        templates: [
+          { name: 'hero', fields: [t.string({ name: 'headline' })] },
+          {
+            name: 'cta',
+            fields: [t.string({ name: 'link', validators: [ref] })],
+          },
+        ],
+      }),
+    ];
+    expect(
+      addressesWithValidators(fields, {
+        blocks: [{ _template: 'hero' }, { _template: 'cta' }],
+      })
+    ).toEqual(['blocks.1.link']);
+  });
+
+  it('lists each scalar item when the `of` field carries a validator', () => {
+    const fields = [
+      t.array({
+        name: 'tags',
+        of: t.string({ name: 'tag', validators: [ref] }),
+      }),
+    ];
+    expect(addressesWithValidators(fields, { tags: ['a', 'b'] })).toEqual([
+      'tags.0',
+      'tags.1',
+    ]);
+  });
 });

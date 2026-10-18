@@ -144,6 +144,32 @@ describe('update', () => {
     expect(entry?.document).toEqual(saved.document);
   });
 
+  it('removes a cleared schema field from the file, and keeps unknown keys', async () => {
+    const withFeatured = createLocalDataLayer({
+      rootDir,
+      collections: [
+        {
+          name: 'post',
+          path: 'content/posts',
+          format: 'mdx',
+          fields: [
+            { name: 'title', type: 'string' },
+            { name: 'featured', type: 'boolean' },
+            { name: 'body', type: 'rich-text', isBody: true },
+          ],
+        },
+      ],
+    });
+    const saved = await withFeatured.update('post', 'content/posts/hello.mdx', {
+      title: 'Hello World',
+    });
+    expect(saved.document).toEqual({
+      title: 'Hello World',
+      category: 'not-in-schema',
+      body: 'Body prose.\n',
+    });
+  });
+
   it('routes the isBody field to the markdown body, not the frontmatter', async () => {
     await dataLayer.update('post', 'content/posts/hello.mdx', {
       title: 'Renamed',

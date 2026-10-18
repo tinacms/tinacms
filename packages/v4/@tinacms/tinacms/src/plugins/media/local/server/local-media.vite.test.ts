@@ -95,11 +95,13 @@ const mountedRoutes = (plugins = [localMediaPlugin()]) => {
     }),
   });
   const mounted = new Map<string, Function>();
+  let unrouted = 0;
   const server = {
     config: { logger: { info: () => {} } },
     middlewares: {
       use: (route: string | Function, handler?: Function) => {
         if (typeof route === 'string' && handler) mounted.set(route, handler);
+        if (typeof route === 'function') mounted.set(`*${unrouted++}`, route);
       },
     },
   };
@@ -124,13 +126,16 @@ const multipartOf = async (form: FormData) => {
   };
 };
 
-const upload = async (headers: Record<string, string> = SAME_ORIGIN) => {
+const upload = async (
+  headers: Record<string, string> = SAME_ORIGIN,
+  handler = mediaMiddleware()
+) => {
   const form = new FormData();
   form.append('folder', 'posts');
   form.append('file', new File(['jpeg'], 'hero.jpg'));
   const { contentType, body } = await multipartOf(form);
   const res = responseDouble();
-  await mediaMiddleware()(
+  await handler(
     requestDouble('/upload', { ...headers, 'content-type': contentType }, [
       body,
     ]),
@@ -154,6 +159,40 @@ describe('local media endpoint', () => {
         'utf8'
       )
     ).toBe('jpeg');
+  });
+
+  it('serves an uploaded file before Vite has noticed it', async () => {
+    const routes = mountedRoutes();
+    await upload(SAME_ORIGIN, routes.get(DEFAULT_MEDIA_URL));
+    const serve = async (
+      url: string,
+      headers: Record<string, string> = SAME_ORIGIN
+    ) => {
+      const res = responseDouble();
+      let handled = false;
+      for (const [route, handler] of routes) {
+        if (!route.startsWith('*')) continue;
+        let passed = false;
+        await handler(requestDouble(url, headers, [], 'GET'), res, () => {
+          passed = true;
+        });
+        if (!passed) {
+          handled = true;
+          break;
+        }
+      }
+      return { handled, res };
+    };
+    const served = await serve('/uploads/posts/hero.jpg?w=1200');
+    expect(served.handled).toBe(true);
+    expect(served.res.headers['content-type']).toBe('image/jpeg');
+    expect(served.res.body).toBe('jpeg');
+    expect((await serve('/uploads/posts/other.jpg')).handled).toBe(false);
+    expect((await serve('/uploads/posts/%E0%A4%A.jpg')).handled).toBe(false);
+    expect(
+      (await serve('/uploads/posts/hero.jpg', { host: 'evil.example:5173' }))
+        .handled
+    ).toBe(false);
   });
 
   it('403s a cross-origin upload, because multipart skips the preflight', async () => {

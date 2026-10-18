@@ -21,6 +21,19 @@ const fields: FieldSchema[] = [
     type: 'array',
     fields: [pageReference],
   } as FieldSchema,
+  {
+    name: 'blocks',
+    type: 'array',
+    templates: [
+      { name: 'hero', fields: [{ name: 'title', type: 'string' }] },
+      { name: 'featured', fields: [pageReference] },
+    ],
+  },
+  {
+    name: 'pages',
+    type: 'array',
+    of: pageReference,
+  } as FieldSchema,
 ];
 
 const page = { title: 'Test Title' };
@@ -47,6 +60,44 @@ describe('collectReferences', () => {
     expect(targets).toEqual([
       { collection: 'page', path: 'content/pages/test.mdx' },
     ]);
+  });
+
+  it('reaches references inside template items', () => {
+    const targets = collectReferences(
+      {
+        blocks: [
+          { _template: 'hero', title: 'content/pages/test.mdx' },
+          { _template: 'featured', page: 'content/pages/test.mdx' },
+        ],
+      },
+      fields,
+      collections
+    );
+    expect(targets).toEqual([
+      { collection: 'page', path: 'content/pages/test.mdx' },
+    ]);
+  });
+
+  it('reaches each reference in an `of` list', () => {
+    const targets = collectReferences(
+      { pages: ['content/pages/test.mdx', 'content/pages/other.mdx'] },
+      fields,
+      collections
+    );
+    expect(targets).toEqual([
+      { collection: 'page', path: 'content/pages/test.mdx' },
+      { collection: 'page', path: 'content/pages/other.mdx' },
+    ]);
+  });
+
+  it('ignores an `of` value that is not a list', () => {
+    expect(
+      collectReferences(
+        { pages: 'content/pages/test.mdx' },
+        fields,
+        collections
+      )
+    ).toEqual([]);
   });
 
   it('ignores a path that no listed collection owns', () => {
@@ -87,6 +138,38 @@ describe('resolveReferences', () => {
     ).toEqual({ related: [{ page }] });
   });
 
+  it('resolves inside template items', () => {
+    expect(
+      resolveReferences(
+        {
+          blocks: [
+            { _template: 'hero', title: 'Hi' },
+            { _template: 'featured', page: 'content/pages/test.mdx' },
+          ],
+        },
+        fields,
+        collections,
+        resolve
+      )
+    ).toEqual({
+      blocks: [
+        { _template: 'hero', title: 'Hi' },
+        { _template: 'featured', page },
+      ],
+    });
+  });
+
+  it('resolves each reference in an `of` list', () => {
+    expect(
+      resolveReferences(
+        { pages: ['content/pages/test.mdx'] },
+        fields,
+        collections,
+        resolve
+      )
+    ).toEqual({ pages: [page] });
+  });
+
   it('keeps the path when the document is not available', () => {
     expect(
       resolveReferences(
@@ -96,6 +179,17 @@ describe('resolveReferences', () => {
         () => undefined
       )
     ).toEqual({ page: 'content/pages/test.mdx' });
+  });
+
+  it('leaves out unset fields, as the saved document does', () => {
+    expect(
+      resolveReferences(
+        { title: null, page: null, related: [{ page: null }] },
+        fields,
+        collections,
+        resolve
+      )
+    ).toEqual({ related: [{}] });
   });
 
   it('leaves the values it was given alone', () => {

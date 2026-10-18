@@ -4,10 +4,24 @@ import {
   useFieldAddress,
   useFieldErrors,
   useFieldSchema,
+  useFieldValue,
 } from '../../../editor';
-import { asObjectFieldSchema } from './object-field.schema';
+import { UneditableValue } from '../uneditable-value';
+import { asObjectFieldSchema, isPlainObject } from './object-field.schema';
 
 export function ObjectField() {
+  const [value] = useFieldValue<unknown>(useFieldAddress());
+  return value == null || isPlainObject(value) ? (
+    <FieldGroup />
+  ) : (
+    <UneditableValue
+      problem='This value is not a group of fields, so it cannot be edited here.'
+      cleared={null}
+    />
+  );
+}
+
+function FieldGroup() {
   const address = useFieldAddress();
   const field = asObjectFieldSchema(useFieldSchema());
   const errors = useFieldErrors(address);

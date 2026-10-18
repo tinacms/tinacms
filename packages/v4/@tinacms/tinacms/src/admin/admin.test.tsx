@@ -676,7 +676,7 @@ describe('TinaAdmin stale drafts', () => {
     localStorage.setItem(
       draftKey('content/posts/hello.mdx'),
       JSON.stringify({
-        version: 1,
+        version: 2,
         values: { title: 'Mine' },
         baseline: { title: 'Old' },
       })

@@ -282,9 +282,13 @@ describe('DatetimeField ingest and digest', () => {
     expect(ingested).toEqual({ published: '2024-05-01T09:30:00.000Z' });
   });
 
-  it('writes nothing for an absent value', async () => {
+  it('holds an absent value as null and writes nothing for it', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
+    const ingested = ingestDocument({}, collection.fields, { registry });
+    expect(ingested).toEqual({ published: null });
+    expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
+      {}
+    );
   });
 });
 

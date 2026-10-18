@@ -1,3 +1,4 @@
+import { type NestedValue, nestedValuesOf } from '../schema/children';
 import type {
   CollectionSchema,
   FieldSchema,
@@ -11,11 +12,6 @@ export interface ReferenceTarget {
 
 const isDocument = (value: unknown): value is TinaDocument =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const childFieldsOf = (node: FieldSchema): FieldSchema[] | undefined => {
-  const { fields } = node as { fields?: FieldSchema[] };
-  return Array.isArray(fields) ? fields : undefined;
-};
 
 // A reference stores the path of the document it points at, and it is the only
 // node that declares `collections`. Reading that rather than the type key keeps
@@ -39,9 +35,8 @@ const targetOf = (
   return owner ? { collection: owner.name, path: value } : null;
 };
 
-// TODO(#7534): this walk reads `node.fields`, so it misses any other way a
-// plugin nests children. `templates` is the live gap. Fold it into the
-// registry-driven path that `ingest.ts` uses.
+// TODO(#7534): these walks read `fields`, `templates` and `of` by key. Fold
+// them into the registry-driven path that `ingest.ts` uses.
 export const collectReferences = (
   values: TinaDocument | undefined,
   fields: FieldSchema[],
@@ -56,12 +51,13 @@ export const collectReferences = (
         targets.push(target);
         continue;
       }
-      const children = childFieldsOf(node);
-      if (!children) continue;
-      if (Array.isArray(value)) {
-        for (const item of value) if (isDocument(item)) walk(item, children);
-      } else if (isDocument(value)) {
-        walk(value, children);
+      for (const nested of nestedValuesOf(node, value)) {
+        if ('field' in nested) {
+          const itemTarget = targetOf(nested.field, nested.value, collections);
+          if (itemTarget) targets.push(itemTarget);
+        } else if (isDocument(nested.value)) {
+          walk(nested.value, nested.fields);
+        }
       }
     }
   };
@@ -74,32 +70,48 @@ export type ReferenceResolver = (
 ) => TinaDocument | undefined;
 
 // The preview renders the site's own shape, where a reference reads as the
-// document it points at. An unresolved target keeps its path, so the site sees
-// the same value it would for a reference that no longer exists.
+// document it points at and an unset field is absent. An unresolved target
+// keeps its path, so the site sees the same value it would for a reference that
+// no longer exists.
 export const resolveReferences = (
   values: TinaDocument | undefined,
   fields: FieldSchema[],
   collections: CollectionSchema[],
   resolve: ReferenceResolver
 ): TinaDocument => {
+  const resolveNested = (nested: NestedValue): unknown => {
+    if ('field' in nested) {
+      const target = targetOf(nested.field, nested.value, collections);
+      return (target ? resolve(target) : undefined) ?? nested.value;
+    }
+    return isDocument(nested.value)
+      ? walk(nested.value, nested.fields)
+      : nested.value;
+  };
   const walk = (document: TinaDocument, nodes: FieldSchema[]): TinaDocument => {
     const resolved: TinaDocument = { ...document };
     for (const node of nodes) {
       const value = document[node.name];
+      if (value === null) {
+        delete resolved[node.name];
+        continue;
+      }
       const target = targetOf(node, value, collections);
       if (target) {
         const referenced = resolve(target);
         if (referenced) resolved[node.name] = referenced;
         continue;
       }
-      const children = childFieldsOf(node);
-      if (!children) continue;
+      const nestedValues = nestedValuesOf(node, value);
       if (Array.isArray(value)) {
-        resolved[node.name] = value.map((item) =>
-          isDocument(item) ? walk(item, children) : item
-        );
-      } else if (isDocument(value)) {
-        resolved[node.name] = walk(value, children);
+        const items = [...value];
+        for (const nested of nestedValues) {
+          if (nested.index !== undefined)
+            items[nested.index] = resolveNested(nested);
+        }
+        resolved[node.name] = items;
+      } else if (nestedValues[0]) {
+        resolved[node.name] = resolveNested(nestedValues[0]);
       }
     }
     return resolved;
