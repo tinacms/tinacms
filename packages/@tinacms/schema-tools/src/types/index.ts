@@ -500,6 +500,7 @@ export type ToolbarOverrideType =
   | 'italic'
   | 'strikethrough'
   | 'highlight'
+  | 'textColor'
   | 'raw'
   | 'embed'
   | 'mermaid'
@@ -518,6 +519,16 @@ export const ALL_HEADING_LEVELS: readonly HeadingLevel[] = [
   'h4',
   'h5',
   'h6',
+];
+/** A named colour offered by the rich-text colour dropdowns. `value` is any CSS colour. */
+export type RichTextColorOption = { label: string; value: string };
+/** Palette used by the "Text color" toolbar button when `overrides.textColors` is omitted. */
+export const DEFAULT_TEXT_COLORS: readonly RichTextColorOption[] = [
+  { label: 'Red', value: '#CC4141' },
+  { label: 'Blue', value: '#0066CC' },
+  { label: 'Green', value: '#2E7D32' },
+  { label: 'Orange', value: '#F97316' },
+  { label: 'Purple', value: '#6A4C93' },
 ];
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] };
 export type RichTextField<WithNamespace extends boolean = false> = (
@@ -550,6 +561,13 @@ export type RichTextField<WithNamespace extends boolean = false> = (
        * @example headingLevels: ['h1', 'h2', 'h3']
        */
       headingLevels?: HeadingLevel[];
+      /**
+       * Colours offered by the "Text color" toolbar button.
+       * Defaults to red, blue, green, orange and purple.
+       *
+       * @example textColors: [{ label: 'Brand', value: '#CC4141' }]
+       */
+      textColors?: RichTextColorOption[];
     };
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser
