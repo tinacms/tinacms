@@ -1,8 +1,7 @@
-import { authTokenOf } from '../../../core/auth/slice';
 import type { MediaProvider } from '../../../core/media/contract';
 import type { ClientSlice, TinaStoreState } from '../../../core/plugin';
 import {
-  type TinaCloudOptions,
+  type TinaCloudClientOptions,
   type TinaCloudProject,
   createTinaCloudClient,
 } from '../client';
@@ -22,12 +21,9 @@ const storeBranch = (state: TinaStoreState): MediaBranch => {
 // Branch is operational data the Data Layer owns (ADR-019, ADR-024), so with
 // no branch in the store the slice uses the project's default branch.
 export const createTinaCloudMediaSlice =
-  (options: TinaCloudOptions): ClientSlice =>
+  (options: TinaCloudClientOptions): ClientSlice =>
   (_set, get) => {
-    const client = createTinaCloudClient({
-      ...options,
-      getToken: () => authTokenOf(get()),
-    });
+    const client = createTinaCloudClient(options);
     let project: TinaCloudProject | undefined;
     const branch = async (): Promise<MediaBranch> => {
       try {

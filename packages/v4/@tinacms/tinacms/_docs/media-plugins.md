@@ -167,9 +167,10 @@ export default defineConfig({
 |---|---|
 | `clientId` | The client ID of the TinaCloud project. |
 
-The media and content slices get the token from `getToken()` of the installed
-auth slice. Before the editor signs in, each operation fails with
-`unauthorized`.
+The media and content slices send the TinaCloud token from `tinaCloud()`'s own
+sign-in. Before the editor signs in, each operation fails with
+`unauthorized`. With `auth` overridden, each operation fails. Refer to
+[auth-plugins.md](./auth-plugins.md#swap-a-provider).
 
 The slice supplies `rename`, `features.search`, `features.extensionFilter` and
 a `features.maxSize` of 100 MB. `resolveUrl` gives a CDN URL, and a size adds

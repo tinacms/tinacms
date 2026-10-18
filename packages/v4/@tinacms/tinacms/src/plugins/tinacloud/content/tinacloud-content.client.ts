@@ -1,10 +1,9 @@
-import { authTokenOf } from '../../../core/auth/slice';
 import type {
   ContentProvider,
   DocumentSummary,
 } from '../../../core/content/contract';
 import type { SliceSet, TinaStoreState } from '../../../core/plugin';
-import { type TinaCloudOptions, createTinaCloudClient } from '../client';
+import { type TinaCloudClientOptions, createTinaCloudClient } from '../client';
 import { toContentError } from './errors';
 import {
   TinaCloudGraphQLError,
@@ -16,12 +15,9 @@ import {
 // Branch is operational data the Data Layer owns (ADR-019, ADR-024), so with
 // no branch in the store the slice uses the project's default branch.
 export const createTinaCloudContentSlice =
-  (options: TinaCloudOptions) =>
+  (options: TinaCloudClientOptions) =>
   (_set: SliceSet, get: () => TinaStoreState) => {
-    const client = createTinaCloudClient({
-      ...options,
-      getToken: () => authTokenOf(get()),
-    });
+    const client = createTinaCloudClient(options);
     const branch = async (): Promise<string> => {
       const name = get().branch?.name;
       if (typeof name === 'string' && name) return name;

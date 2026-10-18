@@ -8,15 +8,11 @@ import { createTinaCloudContentSlice } from './tinacloud-content.client';
 const state: TinaStoreState = {};
 
 const content = () => {
-  state.auth = {
-    status: 'signed-out',
-    user: null,
-    getToken: async () => 'secret',
-    login: async () => {},
-    logout: async () => {},
-  };
   delete state.branch;
-  return createTinaCloudContentSlice({ clientId: 'abc' })(
+  return createTinaCloudContentSlice({
+    clientId: 'abc',
+    getToken: async () => 'secret',
+  })(
     () => {},
     () => state
   );

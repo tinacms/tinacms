@@ -105,8 +105,9 @@ with no login.
 - A request to the site's own server carries the token only when the winning
   auth plugin has a server segment that checks it. The store records this at
   mount. `useRpcClient` and the local content and media plugins read the
-  same record. A plugin that calls its own backend, such as `tinaCloud()`,
-  reads the token through `getToken()` with no such check.
+  same record. A plugin that calls its own backend reads the token through
+  `getToken()` with no such check. `tinaCloud()` is different: it sends
+  TinaCloud its own token and does not read `store.auth`.
 - The local Data Layer (`tinaLocalDataLayerVitePlugin`) authorizes the
   content and media requests as the RPC handler does. It answers `401` when
   there is no session, or when the winning auth plugin has no `getSession`.
@@ -149,8 +150,9 @@ with no login.
   `no-access`.
 - The tokens stay in a closure of the slice. A full reload signs the editor
   out (ADR-023).
-- The media and content slices of `tinaCloud()` read the token through
-  `getToken()` of the installed auth slice (ADR-023 §4).
+- The media and content slices of `tinaCloud()` send the TinaCloud token to
+  TinaCloud. They do not read `store.auth`, because TinaCloud accepts no
+  token from another auth plugin.
 - Before a request, the closure refreshes the token through
   `https://identity.tinajs.io/oauth/token` when it expires in less than two
   minutes. A refused refresh sets `signed-out` and throws `expired`.
@@ -197,6 +199,11 @@ The overriding plugin mounts `store.auth` and answers `getSession`, so an
 override with no server segment leaves the RPC handler with no session. For a
 plugin that provides more than one capability, the override replaces `auth`
 only, and the first plugin keeps its other capabilities.
+
+`tinaCloud()` keeps its media and content, but they need its own sign-in.
+With `auth` overridden, each of their operations fails with
+`tinacloud-auth-overridden`. Replace media and content too, or remove the
+override.
 
 ## Not supported yet
 

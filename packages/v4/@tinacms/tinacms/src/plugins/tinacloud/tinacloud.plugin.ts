@@ -25,12 +25,14 @@ export const tinaCloud = (options: TinaCloudOptions): PluginManifest =>
         import('./media/tinacloud-media.client'),
         import('./content/tinacloud-content.client'),
       ]);
+      const auth = createTinaCloudAuth(options);
+      const clientOptions = { ...options, getToken: auth.tinaCloudToken };
       return {
         default: {
           slices: {
-            auth: createTinaCloudAuth(options).slice,
-            media: createTinaCloudMediaSlice(options),
-            content: createTinaCloudContentSlice(options),
+            auth: auth.slice,
+            media: createTinaCloudMediaSlice(clientOptions),
+            content: createTinaCloudContentSlice(clientOptions),
           },
         },
       };

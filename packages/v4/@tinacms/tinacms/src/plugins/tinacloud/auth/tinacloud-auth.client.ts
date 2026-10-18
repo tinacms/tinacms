@@ -1,4 +1,5 @@
 import { AuthError, type AuthSlice } from '../../../core/auth/contract';
+import { invariant } from '../../../core/invariant';
 import type { SliceSet } from '../../../core/plugin';
 import { isRecord } from '../../../utils/is-record';
 import {
@@ -213,6 +214,7 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
   let tokens: TinaCloudTokens | undefined;
   let refreshing: Promise<TinaCloudTokens> | undefined;
   let set: SliceSet | undefined;
+  let mounted = false;
   let signOuts = 0;
 
   const signOut = () => {
@@ -244,6 +246,13 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
   };
 
   const tinaCloudToken = async (): Promise<string | undefined> => {
+    invariant(
+      mounted,
+      'tinacloud-auth-overridden',
+      'Another plugin overrides `auth`, so no one signs in to TinaCloud and ' +
+        "tinaCloud()'s content and media cannot reach it. Remove the override, " +
+        'or replace content and media with plugins that use your auth.'
+    );
     if (!tokens) return undefined;
     return (await freshTokens(tokens))?.bearer;
   };
@@ -316,6 +325,7 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
 
   const slice = (sliceSet: SliceSet): AuthSlice => {
     set = sliceSet;
+    mounted = true;
     void prefetchWorkosEnabled().catch(() => {});
     const redirect = redirectTokens(clientId);
     if (redirect) void finishRedirectSignIn(redirect);
@@ -328,5 +338,5 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     };
   };
 
-  return { slice };
+  return { slice, tinaCloudToken };
 };

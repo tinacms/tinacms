@@ -6,8 +6,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TinaAdmin } from '../../admin/admin';
 import { asResolvedConfig } from '../../config';
 import { MediaError } from '../../core/media/contract';
+import { toUserId } from '../../core/auth/contract';
 import { authTokenOf } from '../../core/auth/slice';
-import { definePlugin, resolveClientSegments } from '../../core/plugin';
+import {
+  type PluginManifest,
+  definePlugin,
+  resolveClientSegments,
+} from '../../core/plugin';
 import { validateCapabilityGraph } from '../../core/resolve';
 import { type TinaRuntime, TinaRuntimeContext } from '../../editor/context';
 import {
@@ -18,6 +23,7 @@ import {
 import { createRpcHandler } from '../../rpc/handler';
 import { defineServerPlugin } from '../../server';
 import { createTinaStore } from '../../store/create-store';
+import { testAuthPlugin } from '../../test/test-auth-plugin';
 import { stubLoginPopup, tinaCloudUser } from '../../test/tinacloud-login';
 import { localContentPlugin } from '../content/local/local-content.plugin';
 import { mediaManagerPlugin } from '../media-manager/media-manager.plugin';
@@ -59,13 +65,13 @@ const stubTinaCloud = (
   return fetchMock;
 };
 
-const boot = async () => {
-  const store = createTinaStore(
-    await resolveClientSegments([
-      tinaCloud({ clientId: 'abc' }),
-      mediaManagerPlugin(),
-    ])
-  );
+const boot = async (
+  plugins: PluginManifest[] = [
+    tinaCloud({ clientId: 'abc' }),
+    mediaManagerPlugin(),
+  ]
+) => {
+  const store = createTinaStore(await resolveClientSegments(plugins));
   const runtime = { store } as unknown as TinaRuntime;
   const wrapper = ({ children }: { children: ReactNode }) => (
     <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
@@ -136,6 +142,26 @@ describe('tinaCloud()', () => {
     expect(new Headers(init?.headers).get('Authorization')).toBe(
       'Bearer id-token'
     );
+  });
+
+  it('sends TinaCloud no token from a plugin that overrides auth', async () => {
+    const fetchMock = stubTinaCloud();
+    const { result } = await boot([
+      tinaCloud({ clientId: 'abc' }),
+      mediaManagerPlugin(),
+      testAuthPlugin('acme', { id: toUserId('editor-1') }, [
+        { capability: 'auth' },
+      ]),
+    ]);
+    await act(() => result.current.auth?.login());
+    const overridden = { detail: expect.stringContaining('overrides `auth`') };
+    await expect(result.current.content.list('post')).rejects.toMatchObject(
+      overridden
+    );
+    await expect(result.current.media.list('')).rejects.toMatchObject(
+      overridden
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('mounts a media slice and a signed-out auth slice', async () => {
