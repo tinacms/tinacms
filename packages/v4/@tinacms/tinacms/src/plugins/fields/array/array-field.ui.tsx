@@ -84,12 +84,15 @@ function ObjectItems({
     const next = liveItems().filter((_, position) => position !== index);
     setValue(
       address,
-      next.map((item) =>
-        ingestDocument(isItem(item) ? item : {}, field.fields, {
+      next.map((item) => {
+        if (!isItem(item)) return item;
+        const fields = itemFieldsOf(field, item);
+        if (!fields) return item;
+        return ingestDocument(item, fields, {
           documentPath,
           registry,
-        })
-      ),
+        });
+      }),
       { shouldDirty: true }
     );
   };
