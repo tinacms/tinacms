@@ -1,5 +1,20 @@
 # @tinacms/mdx
 
+## 2.4.0
+
+### Minor Changes
+
+- [#7683](https://github.com/tinacms/tinacms/pull/7683) [`034e88f`](https://github.com/tinacms/tinacms/commit/034e88ff9fb8035b1443397b5d981313a44fa30f) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Rich-text fields can now colour text. A Text Color dropdown now appears next to Highlight in the default toolbar. Fields with a custom `overrides.toolbar` need `'textColor'` added to it. Coloured text saves as a `<span>` with a `color` style, inside any bold, italic, strikethrough or highlight. The palette can be set per field under `overrides.textColors` (a list of `{ label, value }`).
+
+  Also fixes:
+  - Adjacent text with different marks no longer picks up a neighbour's mark on save (e.g. bold italic text followed by italic text saved both as bold).
+  - Renderers only apply plain CSS colours, so content can no longer inject arbitrary CSS through a highlight or text colour.
+
+### Patch Changes
+
+- Updated dependencies [[`034e88f`](https://github.com/tinacms/tinacms/commit/034e88ff9fb8035b1443397b5d981313a44fa30f)]:
+  - @tinacms/schema-tools@2.11.0
+
 ## 2.3.0
 
 ### Minor Changes
