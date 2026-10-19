@@ -1,0 +1,127 @@
+{
+  "name": "@tinacms/sveltekit",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "package.json",
+    "src",
+    "!src/__tests__",
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./data": {
+      "types": "./dist/data.d.ts",
+      "default": "./dist/data.js"
+    },
+    "./hooks": {
+      "types": "./dist/hooks.d.ts",
+      "default": "./dist/hooks.js"
+    },
+    "./is-edit-mode": {
+      "types": "./dist/is-edit-mode.d.ts",
+      "default": "./dist/is-edit-mode.js"
+    },
+    "./tina-field": {
+      "types": "./dist/tina-field.d.ts",
+      "default": "./dist/tina-field.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/types.js"
+    },
+    "./sanitize": {
+      "types": "./dist/sanitize.d.ts",
+      "default": "./dist/sanitize.js"
+    },
+    "./experimental": {
+      "types": "./dist/experimental.d.ts",
+      "default": "./dist/experimental.js"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "default": "./dist/vite.js"
+    },
+    "./use-tina": {
+      "types": "./src/use-tina.svelte.ts",
+      "svelte": "./src/use-tina.svelte.ts",
+      "default": "./src/use-tina.svelte.ts"
+    },
+    "./TinaBridge.svelte": {
+      "svelte": "./src/TinaBridge.svelte",
+      "default": "./src/TinaBridge.svelte"
+    },
+    "./TinaIsland.svelte": {
+      "svelte": "./src/TinaIsland.svelte",
+      "default": "./src/TinaIsland.svelte"
+    },
+    "./TinaMarkdown.svelte": {
+      "svelte": "./src/TinaMarkdown.svelte",
+      "default": "./src/TinaMarkdown.svelte"
+    }
+  },
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      "src/index.ts",
+      "src/data.ts",
+      "src/hooks.ts",
+      "src/is-edit-mode.ts",
+      "src/tina-field.ts",
+      {
+        "name": "src/experimental.ts",
+        "target": "node"
+      },
+      {
+        "name": "src/vite.ts",
+        "target": "node"
+      },
+      "src/types.ts",
+      "src/sanitize.ts",
+      "src/internal/forms-store.ts",
+      "src/internal/escape.ts"
+    ]
+  },
+  "scripts": {
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "types": "tsc",
+    "build": "tinacms-scripts build",
+    "test": "vitest run",
+    "test-watch": "vitest",
+    "test-browser": "vitest run --config vitest.browser.config.ts"
+  },
+  "dependencies": {
+    "@tinacms/bridge": "workspace:^"
+  },
+  "peerDependencies": {
+    "@sveltejs/kit": "^3.0.0",
+    "svelte": "^5.57.1",
+    "vite": "^8.0.12"
+  },
+  "devDependencies": {
+    "@vitest/browser-playwright": "^4.1.8",
+    "@sveltejs/kit": "^3.0.0",
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "@tinacms/scripts": "workspace:*",
+    "@types/node": "^22.13.1",
+    "svelte": "^5.57.1",
+    "svelte-check": "^4.6.0",
+    "typescript": "^6.0.0",
+    "vite": "^8.0.12",
+    "vitest": "^4.1.8",
+    "vitest-browser-svelte": "^2.1.1",
+    "playwright": "^1.60.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/sveltekit"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "extends": "../../../base.tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"]
+  },
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/__tests__"],
+  "include": ["src"]
+}
