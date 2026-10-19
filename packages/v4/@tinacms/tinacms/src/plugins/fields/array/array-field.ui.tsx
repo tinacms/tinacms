@@ -91,12 +91,19 @@ function ObjectItems({
     }
     const ingested = liveItems()
       .filter((_, position) => position !== index)
-      .map((item) =>
-        ingestDocument(isItem(item) ? item : {}, field.fields, {
+      .map((item) => {
+        const raw = isItem(item) ? item : {};
+        const next = ingestDocument(raw, field.fields, {
           documentPath,
           registry,
-        })
-      );
+        });
+        for (const subfield of field.fields) {
+          if (!(subfield.name in raw)) {
+            next[subfield.name] = null;
+          }
+        }
+        return next;
+      });
     replace(ingested);
     if (formScope) {
       useFormStore
