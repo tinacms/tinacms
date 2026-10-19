@@ -288,6 +288,12 @@ component, one line in `index.ts`.
   `theme.css`. "White" is a neutral gray accent, since pure white would be
   invisible on light pages.
 - **Tailwind.** Not used (EX-02).
+- **Clicking a post's author block doesn't focus the Author field.** The
+  block is marked correctly (`tinaField(post, 'author')`, the same as the
+  Next.js reference) and the admin selects the right field, but Tina's
+  reference field doesn't focus itself. The same goes for the author page's
+  `hobbies` list. See "Known limitations" in the package's
+  [DESIGN.md](../../../packages/@tinacms/sveltekit/DESIGN.md).
 - **GitHub Pages + TinaCloud is untested.** In particular, TinaCloud may not
   index content that lives outside the Tina folder (`localContentPath`). See
   [DEPLOY.md](./DEPLOY.md).
