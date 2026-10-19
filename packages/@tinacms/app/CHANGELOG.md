@@ -1,5 +1,17 @@
 # @tinacms/app
 
+## 2.6.0
+
+### Minor Changes
+
+- [#7606](https://github.com/tinacms/tinacms/pull/7606) [`787c7a9`](https://github.com/tinacms/tinacms/commit/787c7a9daf7740dbfb148d25a74367948bcbaade) Thanks [@dependabot](https://github.com/apps/dependabot)! - Upgrade `react-router-dom` from 6.30 to 7.18, which fixes GHSA-wrjc-x8rr-h8h6 and GHSA-337j-9hxr-rhxg; no 6.x release carries these fixes. React Router 7 requires React 18 or later.
+
+### Patch Changes
+
+- Updated dependencies [[`53ae895`](https://github.com/tinacms/tinacms/commit/53ae8954de8668e5eeb92d817bfbf12bf39cb17d), [`787c7a9`](https://github.com/tinacms/tinacms/commit/787c7a9daf7740dbfb148d25a74367948bcbaade), [`034e88f`](https://github.com/tinacms/tinacms/commit/034e88ff9fb8035b1443397b5d981313a44fa30f), [`abb7c15`](https://github.com/tinacms/tinacms/commit/abb7c153b2db6cd9bf42da6ddfaa5d2b08029861)]:
+  - tinacms@3.15.0
+  - @tinacms/mdx@2.4.0
+
 ## 2.5.15
 
 ### Patch Changes
