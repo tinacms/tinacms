@@ -17,7 +17,9 @@ export default defineConfig({
         runes: ({ filename }) =>
           filename.split(/[/\\]/).includes('node_modules') ? undefined : true,
       },
-      paths: { base: basePath },
+      // Absolute URLs: page-relative ones (SvelteKit's default) break when the same data is
+      // rendered at another depth, e.g. after client-side navigation or live preview updates.
+      paths: { base: basePath, relative: false },
       adapter: isStaticBuild
         ? adapterStatic({
             pages: 'build-static',

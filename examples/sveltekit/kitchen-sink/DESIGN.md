@@ -223,6 +223,15 @@ project doesn't have.
   every CMS link and image gets the prefix.
 - Rich text uses the `a` and `img` overrides in
   `src/lib/components/markdown/` (the package renderer doesn't know the base).
+- `paths.relative: false` in `vite.config.ts`. By default SvelteKit makes
+  `resolve()` return **page-relative** paths during server rendering
+  (`../uploads/x.avif` on `/posts/a`). That string is only right for the page
+  it was rendered on. After client-side navigation or a live-preview update,
+  the same data is shown at another folder depth: `../uploads` then points to
+  `/posts/uploads/…`, the request hits the posts route, and Tina is asked for
+  a post called `uploads/x.avif.md`. That's how images on nested posts
+  disappeared in the live preview. Absolute paths (`/uploads/…`, or
+  `/<repo>/uploads/…` with a base path) are correct everywhere.
 
 **Consequences.** The same code works at the domain root (where `BASE_PATH` is
 empty and `withBase` changes nothing) and under a subpath. A missed link
