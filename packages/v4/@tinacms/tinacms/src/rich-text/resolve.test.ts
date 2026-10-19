@@ -129,6 +129,58 @@ describe('leaves', () => {
     ]);
   });
 
+  it('nests the text colour inside the highlight', () => {
+    const coloured = node({
+      type: 'text',
+      text: 'hi',
+      highlight: true,
+      textColor: '#c00',
+    });
+    expect((resolveRichTextNode(coloured, none) as any).marks).toEqual([
+      { kind: 'element', tag: 'mark', props: {} },
+      { kind: 'element', tag: 'span', props: { textColor: '#c00' } },
+    ]);
+    expect(
+      (
+        resolveRichTextNode(
+          coloured,
+          supplying('highlight', 'textColor')
+        ) as any
+      ).marks
+    ).toEqual([
+      { kind: 'component', key: 'highlight', props: {} },
+      { kind: 'component', key: 'textColor', props: { color: '#c00' } },
+    ]);
+  });
+
+  it('nests a supplied textColor component inside the fallback mark', () => {
+    const coloured = node({
+      type: 'text',
+      text: 'hi',
+      highlight: true,
+      textColor: '#c00',
+    });
+    expect(
+      (resolveRichTextNode(coloured, supplying('textColor')) as any).marks
+    ).toEqual([
+      { kind: 'element', tag: 'mark', props: {} },
+      { kind: 'component', key: 'textColor', props: { color: '#c00' } },
+    ]);
+  });
+
+  it('drops colours that are not a plain CSS colour', () => {
+    const unsafe = node({
+      type: 'text',
+      text: 'hi',
+      highlight: true,
+      highlightColor: 'red;position:fixed',
+      textColor: 'red;background:url(https://evil/x)',
+    });
+    expect((resolveRichTextNode(unsafe, none) as any).marks).toEqual([
+      { kind: 'element', tag: 'mark', props: {} },
+    ]);
+  });
+
   it('puts a supplied text component innermost', () => {
     const instruction = resolveRichTextNode(
       node({ type: 'text', text: 'hi', bold: true }),

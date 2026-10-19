@@ -1,5 +1,11 @@
 # @tinacms/web-components
 
+## 0.2.3
+
+### Patch Changes
+
+- [#7846](https://github.com/tinacms/tinacms/pull/7846) [`3a7c39b`](https://github.com/tinacms/tinacms/commit/3a7c39b1f39ceb2a9d9aa29353465ae0f43d01d4) Thanks [@dependabot](https://github.com/apps/dependabot)! - Update dompurify to 3.4.17 for its sanitizer hardening fixes
+
 ## 0.2.2
 
 ### Patch Changes
