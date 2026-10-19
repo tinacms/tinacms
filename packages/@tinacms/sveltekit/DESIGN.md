@@ -403,12 +403,13 @@ checks are not automated in CI yet.
   steps: the bridge sends `field:selected` with the field's name (that part
   is ours and works for every field), then the admin asks that field to
   focus itself. Only some of Tina's field types respond: text, textarea,
-  number, date, image and tags. **Reference** fields (e.g. a post's
-  `author`), selects, toggles, radio and checkbox groups, colors and lists
-  ignore the request, so clicking them opens the sidebar but focuses nothing.
-  This is in Tina's admin (`packages/tinacms/src/toolkit/fields/plugins/`,
-  the `experimental_focusIntent` prop), and affects every framework. The
-  Next.js example behaves the same way.
+  number, date, image, tags and select. **Reference** fields (e.g. a post's
+  `author`) ignore the request, so clicking them opens the sidebar but
+  focuses nothing. From the code, toggles, radio and checkbox groups, colors
+  and lists likely behave the same (only the reference field was checked in
+  the browser). This is in Tina's admin
+  (`packages/tinacms/src/toolkit/fields/`, the `experimental_focusIntent`
+  prop), and affects every framework: the Astro example behaves the same.
 - **Clicking an object list (not one of its items) shows broken fields.**
   A wrapper marked with the whole list, e.g. `tinaField(block, 'actions')`
   around a hero's buttons, sends a path that ends on the list
