@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { type ResolvedSegment, definePlugin } from '../plugin';
 import type { AdminScreen } from '../screen/contract';
 import { createScreenRegistry } from '../screen/registry';
-import type { GlobalNavEntry } from './contract';
+import type { GlobalNavEntry, GlobalNavSection, NavGroup } from './contract';
 import { createGlobalNav } from './global-nav';
 
 const Icon = () => null;
@@ -20,11 +20,17 @@ const entry = (
 const segmentOf = (
   name: string,
   globalNav: GlobalNavEntry[],
-  screens: AdminScreen[] = []
+  screens: AdminScreen[] = [],
+  navGroups: NavGroup[] = []
 ): ResolvedSegment => ({
   manifest: definePlugin({ name }),
-  segment: { screens, slots: { globalNav } },
+  segment: { screens, slots: { globalNav, navGroups } },
 });
+
+const flatLabels = (sections: GlobalNavSection[]) =>
+  sections.flatMap(({ group, entries }) =>
+    entries.map(({ label }) => (group ? `${group.label}/${label}` : label))
+  );
 
 const labelsOf = (resolved: ResolvedSegment[], provides: string[] = []) => {
   const plugins = [
@@ -34,11 +40,9 @@ const labelsOf = (resolved: ResolvedSegment[], provides: string[] = []) => {
       provides: provides as ('media' | 'search')[],
     }),
   ];
-  return createGlobalNav(
-    resolved,
-    plugins,
-    createScreenRegistry(resolved, plugins)
-  ).map(({ label }) => label);
+  return flatLabels(
+    createGlobalNav(resolved, plugins, createScreenRegistry(resolved, plugins))
+  );
 };
 
 describe('global nav slot', () => {
@@ -140,11 +144,13 @@ describe('global nav slot', () => {
       }),
     ];
     expect(
-      createGlobalNav(
-        resolved,
-        plugins,
-        createScreenRegistry(resolved, plugins)
-      ).map(({ label }) => label)
+      flatLabels(
+        createGlobalNav(
+          resolved,
+          plugins,
+          createScreenRegistry(resolved, plugins)
+        )
+      )
     ).toEqual([]);
   });
 
@@ -175,5 +181,106 @@ describe('global nav slot', () => {
     expect(() => labelsOf([segmentOf('one', [entry('')])])).toThrow(
       /empty label/
     );
+  });
+});
+
+describe('global nav groups', () => {
+  const cloud: NavGroup = { id: 'cloud', label: 'Cloud', order: 5 };
+
+  it('places a group by its own order and ranks its entries inside it', () => {
+    expect(
+      labelsOf([
+        segmentOf(
+          'cloud',
+          [
+            entry('Support', { group: 'cloud', order: 20 }),
+            entry('Project', { group: 'cloud', order: -1 }),
+          ],
+          [],
+          [cloud]
+        ),
+        segmentOf('other', [
+          entry('Media', { order: 0 }),
+          entry('Branches', { order: 6 }),
+        ]),
+      ])
+    ).toEqual(['Media', 'Cloud/Project', 'Cloud/Support', 'Branches']);
+  });
+
+  it('lets a plugin add an entry to a group another plugin declares', () => {
+    expect(
+      labelsOf([
+        segmentOf('extra', [entry('Billing', { group: 'cloud' })]),
+        segmentOf('cloud', [entry('Project', { group: 'cloud' })], [], [cloud]),
+      ])
+    ).toEqual(['Cloud/Billing', 'Cloud/Project']);
+  });
+
+  it('hides a group with no entry to show', () => {
+    expect(
+      labelsOf([
+        segmentOf(
+          'cloud',
+          [entry('Search', { group: 'cloud', dependsOn: ['search'] })],
+          [],
+          [cloud]
+        ),
+      ])
+    ).toEqual([]);
+  });
+
+  it('keeps plugin order when a group and an entry share an order', () => {
+    expect(
+      labelsOf([
+        segmentOf('first', [entry('Media', { order: 5 })]),
+        segmentOf('cloud', [entry('Project', { group: 'cloud' })], [], [cloud]),
+        segmentOf('last', [entry('Branches', { order: 5 })]),
+      ])
+    ).toEqual(['Media', 'Cloud/Project', 'Branches']);
+  });
+
+  it('merges ungrouped entries next to each other into one section', () => {
+    const resolved = [
+      segmentOf('cloud', [entry('Project', { group: 'cloud' })], [], [cloud]),
+      segmentOf('other', [
+        entry('Media'),
+        entry('Docs'),
+        entry('Branches', { order: 6 }),
+      ]),
+    ];
+    const plugins = resolved.map(({ manifest }) => manifest);
+    expect(
+      createGlobalNav(
+        resolved,
+        plugins,
+        createScreenRegistry(resolved, plugins)
+      ).map(({ group, entries }) => [
+        group?.label,
+        entries.map(({ label }) => label),
+      ])
+    ).toEqual([
+      [undefined, ['Media', 'Docs']],
+      ['Cloud', ['Project']],
+      [undefined, ['Branches']],
+    ]);
+  });
+
+  it('rejects an entry in a group no plugin declares, even when it is hidden', () => {
+    expect(() =>
+      labelsOf([
+        segmentOf('one', [
+          entry('Ghost', { group: 'clod', dependsOn: ['search'] }),
+        ]),
+      ])
+    ).toThrow(/no installed plugin declares that group/);
+  });
+
+  it('rejects a group that two plugins declare', () => {
+    expect(() =>
+      labelsOf([
+        segmentOf('one', [], [], [cloud]),
+        segmentOf('two', [], [], [cloud]),
+      ])
+    ).toThrow(/another plugin already declares it/);
   });
 });

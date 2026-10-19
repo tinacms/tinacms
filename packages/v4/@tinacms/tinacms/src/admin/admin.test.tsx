@@ -99,12 +99,25 @@ const screenPlugin = definePlugin({
         { name: 'unlinked', label: 'Unlinked', component: MediaScreen },
       ],
       slots: {
+        navGroups: [{ id: 'help', label: 'Help', order: 20 }],
         globalNav: [
+          {
+            label: 'Guides',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://tina.io/guides' },
+            group: 'help',
+          },
           {
             label: 'Docs',
             icon: NavIcon,
             target: { kind: 'url', href: 'https://tina.io/docs' },
             order: 10,
+          },
+          {
+            label: 'Changelog',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://tina.io/changelog' },
+            order: 30,
           },
           {
             label: 'Media',
@@ -519,6 +532,32 @@ describe('TinaAdmin global nav', () => {
         .getAllByRole('listitem')
         .map((item) => item.textContent)
     ).toEqual(['Media', 'Switch branch', 'Docs']);
+  });
+
+  it('lists the entries of a group under its heading', async () => {
+    renderAdmin();
+    const menu = await screen.findByRole('list', { name: 'Help' });
+    expect(
+      within(menu)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['Guides']);
+  });
+
+  it('places a group between the ungrouped entries by its order', async () => {
+    renderAdmin();
+    const [first, ...rest] = await screen.findAllByRole('list', {
+      name: 'Global navigation',
+    });
+    expect(rest).toHaveLength(0);
+    const heading = screen.getByText('Help');
+    expect(
+      first.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+    expect(
+      heading.compareDocumentPosition(screen.getByText('Changelog')) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
   });
 
   it('does not link a screen that no entry targets', async () => {
