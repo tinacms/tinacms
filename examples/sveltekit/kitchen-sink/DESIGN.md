@@ -294,6 +294,13 @@ component, one line in `index.ts`.
   reference field doesn't focus itself. The same goes for the author page's
   `hobbies` list. See "Known limitations" in the package's
   [DESIGN.md](../../../packages/@tinacms/sveltekit/DESIGN.md).
+- **Clicking around the hero (or CTA) buttons shows empty, editable fields.**
+  The wrapper is marked with the whole `actions` list (as in the Next.js
+  reference), and Tina's admin opens an index-less copy of the button's
+  fields for it. Click a button itself to edit it, and don't type into those
+  empty fields. Details in the package's
+  [DESIGN.md](../../../packages/@tinacms/sveltekit/DESIGN.md) under "Known
+  limitations".
 - **GitHub Pages + TinaCloud is untested.** In particular, TinaCloud may not
   index content that lives outside the Tina folder (`localContentPath`). See
   [DEPLOY.md](./DEPLOY.md).

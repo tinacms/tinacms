@@ -409,6 +409,18 @@ checks are not automated in CI yet.
   This is in Tina's admin (`packages/tinacms/src/toolkit/fields/plugins/`,
   the `experimental_focusIntent` prop), and affects every framework. The
   Next.js example behaves the same way.
+- **Clicking an object list (not one of its items) shows broken fields.**
+  A wrapper marked with the whole list, e.g. `tinaField(block, 'actions')`
+  around a hero's buttons, sends a path that ends on the list
+  (`page.blocks.0.actions`). The admin's `Form.getFieldGroup`
+  (`packages/tinacms/src/toolkit/forms/form.ts`) handles that case for block
+  lists (`templates`) by opening the parent group. Lists of plain objects
+  (`fields`) have no such check: the item index is read as `undefined`, and
+  the sidebar shows the item's fields without an index (`blocks.0.actions.label`).
+  They are empty, the breadcrumbs don't update, and **they can still be
+  edited**, which would write onto the list itself. Clicking an item
+  (`…actions.0`) works. This is admin-side, affects every framework, and the
+  Next.js example uses the same markup.
 - **React warning in the admin.** "Maximum update depth exceeded" can appear
   when typing very fast. It comes from Tina's admin code (served from the
   Tina dev server), not from this package: one keystroke sends exactly one
