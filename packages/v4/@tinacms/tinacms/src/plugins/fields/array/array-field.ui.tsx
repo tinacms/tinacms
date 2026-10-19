@@ -72,28 +72,29 @@ function ObjectItems({
 }) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
-  const { control, getValues, setValue } = useFormContext();
+  const { control, getValues } = useFormContext();
   const {
     fields: items,
     append,
     remove,
     move,
+    replace,
   } = useFieldArray({ control, name: address });
   const liveItems = (): TinaDocument[] => getValues(address) ?? [];
   const removeItem = (index: number) => {
+    if (isTemplatesArray(field)) {
+      remove(index);
+      return;
+    }
     const next = liveItems().filter((_, position) => position !== index);
-    setValue(
-      address,
+    replace(
       next.map((item) => {
         if (!isItem(item)) return item;
-        const fields = itemFieldsOf(field, item);
-        if (!fields) return item;
-        return ingestDocument(item, fields, {
+        return ingestDocument(item, field.fields, {
           documentPath,
           registry,
         });
-      }),
-      { shouldDirty: true }
+      })
     );
   };
 
