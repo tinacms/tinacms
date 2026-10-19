@@ -1,0 +1,49 @@
+{
+	"name": "kitchen-sink",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "tinacms dev -c \"vite dev\"",
+		"build": "TINA_PUBLIC_IS_LOCAL=true tinacms build --local --skip-cloud-checks -c \"TINA_PUBLIC_IS_LOCAL=true vite build\"",
+		"build:static": "TINA_STATIC_BUILD=true TINA_PUBLIC_IS_LOCAL=true tinacms build --local --skip-cloud-checks -c \"TINA_STATIC_BUILD=true TINA_PUBLIC_IS_LOCAL=true vite build\" && node -e \"require('node:fs').rmSync('build-static/admin', { recursive: true, force: true })\"",
+		"build:pages": "TINA_STATIC_BUILD=true tinacms build -c \"TINA_STATIC_BUILD=true vite build\"",
+		"preview": "TINA_PUBLIC_IS_LOCAL=true vite preview",
+		"start": "node build",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test:unit": "vitest",
+		"test": "vitest --run",
+		"preview:static": "TINA_PUBLIC_IS_LOCAL=true vite preview --outDir build-static"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^8.0.0",
+		"@sveltejs/adapter-node": "^6.0.0",
+		"@sveltejs/adapter-static": "^4.0.0",
+		"@sveltejs/kit": "^3.0.0",
+		"@sveltejs/vite-plugin-svelte": "^7.2.0",
+		"@tinacms/app": "workspace:*",
+		"@tinacms/cli": "workspace:*",
+		"@tinacms/scripts": "workspace:*",
+		"@tinacms/datalayer": "workspace:*",
+		"@tinacms/sveltekit": "workspace:*",
+		"@types/node": "^26.6.5",
+		"@vitest/browser-playwright": "^4.1.8",
+		"playwright": "^1.60.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"svelte": "^5.57.1",
+		"svelte-check": "^4.6.0",
+		"tinacms": "workspace:*",
+		"typescript": "^6.0.3",
+		"vite": "^8.3.0",
+		"vitest": "^4.1.8",
+		"vitest-browser-svelte": "^2.1.1"
+	},
+	"imports": {
+		"#lib": "./src/lib/index.js",
+		"#lib/*": "./src/lib/*",
+		"#tina/*": "./tina/*"
+	}
+}
