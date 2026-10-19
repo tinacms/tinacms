@@ -1,7 +1,9 @@
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, use, useRef } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { FormScopeContext } from '../../../editor/context';
+import { useFormStore } from '../../../form/form-store';
 import type { FieldAddress } from '../../../core/field/address';
 import { ingestDocument } from '../../../core/form/ingest';
 import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
@@ -72,12 +74,14 @@ function ObjectItems({
 }) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
-  const { control, getValues, setValue } = useFormContext();
+  const formScope = use(FormScopeContext);
+  const { control, getValues } = useFormContext();
   const {
     fields: items,
     append,
     remove,
     move,
+    replace,
   } = useFieldArray({ control, name: address });
   const liveItems = (): TinaDocument[] => getValues(address) ?? [];
   const removeItem = (index: number) => {
@@ -85,17 +89,20 @@ function ObjectItems({
       remove(index);
       return;
     }
-    const next = liveItems().filter((_, position) => position !== index);
-    setValue(
-      address,
-      next.map((item) =>
+    const ingested = liveItems()
+      .filter((_, position) => position !== index)
+      .map((item) =>
         ingestDocument(isItem(item) ? item : {}, field.fields, {
           documentPath,
           registry,
         })
-      ),
-      { shouldDirty: true }
-    );
+      );
+    replace(ingested);
+    if (formScope) {
+      useFormStore
+        .getState()
+        .setFieldValue(formScope.formId, address, ingested);
+    }
   };
 
   const seed = (template: TemplateSchema | undefined, fields: FieldSchema[]) =>
