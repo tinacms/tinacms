@@ -17,8 +17,8 @@ A new `navGroups` slot takes `{ id, label, order }`. A `globalNav` entry joins a
 slots: {
   navGroups: [{ id: 'tinacloud', label: 'Cloud', order: 5 }],
   globalNav: [
-    { label: 'Project Config', group: 'tinacloud', order: 0, icon: CloudIcon, target: { kind: 'url', href } },
-    { label: 'Support', group: 'tinacloud', order: 20, icon: CircleHelpIcon, target: { kind: 'url', href: supportUrl } },
+    { label: 'Project Config', group: 'tinacloud', icon: CloudIcon, target: { kind: 'url', href } },
+    { label: 'Support', group: 'tinacloud', icon: CircleHelpIcon, target: { kind: 'url', href: supportUrl } },
   ],
 }
 ```
@@ -28,16 +28,30 @@ Entries without `group` are unaffected. Any plugin can add a heading without a c
 ### 2. Groups sit inline among ungrouped entries
 Ungrouped entries and groups sort together in one list: an ungrouped entry by its `order`, a group by its declared `order`. Inside a group, entries sort by their own `order`. Ties, between entries or between groups, keep the plugin order in `defineConfig`, as `globalNav` already does (ADR-013 §6 asks for a stable fallback; `packages/v4/@tinacms/tinacms/_docs/ui-slots.md` defines it).
 
-```text
-  Media        0                 Media
-  Cloud group  5                 CLOUD
-    Project Cfg  0     renders     Project Cfg
-    User Mgmt    8     ───────▶    User Mgmt
-    Support      20                Support
-  Branches     6                 Branches
+A plugin places its group anywhere in the sidebar, and every `order` is respected. Because the group's position comes from the group's own `order`, a grouped entry's `order` only ranks it inside its group.
+
+Inside one plugin, entries without `order` keep their list order, so the §1 example needs none. `order` places an entry among the entries of another plugin. Here, a billing plugin puts its entry in the Cloud group, between two TinaCloud entries:
+
+```ts
+// tinaCloud()
+globalNav: [
+  { label: 'Project Config', group: 'tinacloud', order: 0, ... },
+  { label: 'User Management', group: 'tinacloud', order: 10, ... },
+]
+// billingPlugin()
+globalNav: [{ label: 'Billing', group: 'tinacloud', order: 5, ... }]
 ```
 
-A plugin places its group anywhere in the sidebar, and every `order` is respected. Because the group's position comes from the group's own `order`, a grouped entry's `order` only ranks it inside its group.
+```text
+  Media          0                 Media
+  Cloud group    5                 CLOUD
+    Project Cfg  0     renders       Project Cfg
+    Billing      5     ───────▶      Billing
+    User Mgmt    10                  User Mgmt
+  Branches       6                 Branches
+```
+
+Without `order`, Billing can only come before or after every TinaCloud entry, depending on where `defineConfig` lists the two plugins.
 
 ## Consequences
 
