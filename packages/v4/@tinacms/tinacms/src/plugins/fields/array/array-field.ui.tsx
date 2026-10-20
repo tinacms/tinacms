@@ -38,16 +38,18 @@ import {
 } from '../object/object-field.schema';
 import { StoredValue, UneditableValue } from '../uneditable-value';
 
-const defaultNestedStored = (
+const isPristineNestedObject = (
+  value: unknown,
   subfield: FieldSchema,
   context: FieldTransformContext
-): TinaDocument => {
+): boolean => {
+  if (!isPlainObject(value)) return false;
   const objectField = asObjectFieldSchema(subfield);
-  return digestDocument(
-    ingestDocument({}, objectField.fields, context),
-    objectField.fields,
-    context
-  );
+  const ingested = ingestDocument(value, objectField.fields, context);
+  return objectField.fields.every((nested) => {
+    const nestedValue = ingested[nested.name];
+    return nestedValue == null || nestedValue === '';
+  });
 };
 
 const storedArrayItem = (
@@ -55,23 +57,16 @@ const storedArrayItem = (
   fields: FieldSchema[],
   context: FieldTransformContext
 ): TinaDocument => {
-  const stored = digestDocument(raw, fields, context);
+  const sanitized: TinaDocument = { ...raw };
   for (const subfield of fields) {
-    if (subfield.type !== OBJECT_FIELD_TYPE || !(subfield.name in stored)) {
+    if (subfield.type !== OBJECT_FIELD_TYPE || !(subfield.name in sanitized)) {
       continue;
     }
-    const value = stored[subfield.name];
-    if (!isPlainObject(value)) continue;
-    const objectField = asObjectFieldSchema(subfield);
-    const serialized = digestDocument(value, objectField.fields, context);
-    if (
-      JSON.stringify(serialized) ===
-      JSON.stringify(defaultNestedStored(subfield, context))
-    ) {
-      delete stored[subfield.name];
+    if (isPristineNestedObject(sanitized[subfield.name], subfield, context)) {
+      delete sanitized[subfield.name];
     }
   }
-  return stored;
+  return digestDocument(sanitized, fields, context);
 };
 
 export function ArrayField() {
