@@ -3,7 +3,7 @@ import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { type ReactNode, use, useRef } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FormScopeContext } from '../../../editor/context';
-import { useFormStore } from '../../../form/form-store';
+import { isEdited, useFormStore } from '../../../form/form-store';
 import type { FieldAddress } from '../../../core/field/address';
 import type { FieldTransformContext } from '../../../core/field/contract';
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
@@ -127,11 +127,39 @@ function ObjectItems({
       return;
     }
     const itemContext = { documentPath, registry };
+    const form = formScope
+      ? useFormStore.getState().forms[formScope.formId]
+      : undefined;
+    let baselineItems: unknown[] | null = null;
+    if (form && Array.isArray(form.values[address])) {
+      if (form.status === 'pristine') {
+        baselineItems = form.values[address];
+      } else if (isEdited(form) && Array.isArray(form.baseline[address])) {
+        baselineItems = form.baseline[address];
+      }
+    }
     const ingested = liveItems()
-      .filter((_, position) => position !== index)
-      .map((item) => {
+      .map((item, position) => ({ item, position }))
+      .filter(({ position }) => position !== index)
+      .map(({ item, position }) => {
         const raw = isItem(item) ? item : {};
-        const stored = storedArrayItem(raw, field.fields, itemContext);
+        let stored = storedArrayItem(raw, field.fields, itemContext);
+        if (baselineItems && isItem(baselineItems[position])) {
+          const baselineStored = digestDocument(
+            baselineItems[position],
+            field.fields,
+            itemContext
+          );
+          for (const subfield of field.fields) {
+            if (subfield.name in baselineStored) continue;
+            if (
+              !(subfield.name in raw) ||
+              isPristineNestedObject(raw[subfield.name], subfield, itemContext)
+            ) {
+              delete stored[subfield.name];
+            }
+          }
+        }
         const next = ingestDocument(stored, field.fields, itemContext);
         for (const subfield of field.fields) {
           if (!(subfield.name in stored)) {
