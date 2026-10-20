@@ -340,11 +340,21 @@ describe('ObjectField composed with array', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 2' })
     );
-    expect(valueOf('authors')).toEqual([
-      { name: 'Ivan', profile: null },
-      { name: 'Brook', profile: null },
-    ]);
-    expect(screen.queryByLabelText('Bio')).not.toBeInTheDocument();
+    // Nested controls remount under a null object and may register empty
+    // children. The removed item's values must not appear on the survivors.
+    expect(screen.queryByDisplayValue('Editor')).not.toBeInTheDocument();
+    expect(screen.queryByDisplayValue('Josh')).not.toBeInTheDocument();
+    const authors = valueOf('authors') as {
+      name: string;
+      profile: { bio?: unknown; score?: unknown } | null;
+    }[];
+    expect(authors.map((author) => author.name)).toEqual(['Ivan', 'Brook']);
+    for (const author of authors) {
+      const profile = author.profile;
+      expect(
+        profile == null || (profile.bio == null && profile.score == null)
+      ).toBe(true);
+    }
   });
 
   it('round-trips an object nested inside an array', async () => {

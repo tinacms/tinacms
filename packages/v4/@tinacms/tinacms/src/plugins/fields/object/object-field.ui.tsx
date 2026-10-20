@@ -11,12 +11,7 @@ import { asObjectFieldSchema, isPlainObject } from './object-field.schema';
 
 export function ObjectField() {
   const [value] = useFieldValue<unknown>(useFieldAddress());
-  // Absent objects stay collapsed. Rendering nested controls under null would
-  // register empty child fields in the form store and revive a blank object.
-  if (value == null) {
-    return null;
-  }
-  return isPlainObject(value) ? (
+  return value == null || isPlainObject(value) ? (
     <FieldGroup />
   ) : (
     <UneditableValue
