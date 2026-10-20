@@ -143,7 +143,7 @@ function ObjectItems({
       .filter(({ position }) => position !== index)
       .map(({ item, position }) => {
         const raw = isItem(item) ? item : {};
-        let stored = storedArrayItem(raw, field.fields, itemContext);
+        const stored = storedArrayItem(raw, field.fields, itemContext);
         if (baselineItems && isItem(baselineItems[position])) {
           const baselineStored = digestDocument(
             baselineItems[position],
