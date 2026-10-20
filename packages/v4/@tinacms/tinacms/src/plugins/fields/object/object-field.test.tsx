@@ -342,8 +342,11 @@ describe('ObjectField composed with array', () => {
     );
     // Nested controls remount under a null object and may register empty
     // children. The removed item's values must not appear on the survivors.
-    expect(screen.queryByDisplayValue('Editor')).not.toBeInTheDocument();
-    expect(screen.queryByDisplayValue('Josh')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByDisplayValue('Editor')).not.toBeInTheDocument();
+      expect(screen.queryByDisplayValue('Josh')).not.toBeInTheDocument();
+    });
+
     const authors = valueOf('authors') as {
       name: string;
       profile: { bio?: unknown; score?: unknown } | null;
