@@ -5,6 +5,7 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FormScopeContext } from '../../../editor/context';
 import { useFormStore } from '../../../form/form-store';
 import type { FieldAddress } from '../../../core/field/address';
+import type { FieldTransformContext } from '../../../core/field/contract';
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
 import type {
@@ -30,7 +31,48 @@ import {
   isTemplatesArray,
   itemFieldsOf,
 } from './array-field.schema';
+import {
+  OBJECT_FIELD_TYPE,
+  asObjectFieldSchema,
+  isPlainObject,
+} from '../object/object-field.schema';
 import { StoredValue, UneditableValue } from '../uneditable-value';
+
+const defaultNestedStored = (
+  subfield: FieldSchema,
+  context: FieldTransformContext
+): TinaDocument => {
+  const objectField = asObjectFieldSchema(subfield);
+  return digestDocument(
+    ingestDocument({}, objectField.fields, context),
+    objectField.fields,
+    context
+  );
+};
+
+const storedArrayItem = (
+  raw: TinaDocument,
+  fields: FieldSchema[],
+  context: FieldTransformContext
+): TinaDocument => {
+  const stored = digestDocument(raw, fields, context);
+  for (const subfield of fields) {
+    if (subfield.type !== OBJECT_FIELD_TYPE || !(subfield.name in stored)) {
+      continue;
+    }
+    const value = stored[subfield.name];
+    if (!isPlainObject(value)) continue;
+    const objectField = asObjectFieldSchema(subfield);
+    const serialized = digestDocument(value, objectField.fields, context);
+    if (
+      JSON.stringify(serialized) ===
+      JSON.stringify(defaultNestedStored(subfield, context))
+    ) {
+      delete stored[subfield.name];
+    }
+  }
+  return stored;
+};
 
 export function ArrayField() {
   const address = useFieldAddress();
@@ -94,9 +136,14 @@ function ObjectItems({
       .filter((_, position) => position !== index)
       .map((item) => {
         const raw = isItem(item) ? item : {};
-        const parsed = ingestDocument(raw, field.fields, itemContext);
-        const stored = digestDocument(parsed, field.fields, itemContext);
-        return ingestDocument(stored, field.fields, itemContext);
+        const stored = storedArrayItem(raw, field.fields, itemContext);
+        const next = ingestDocument(stored, field.fields, itemContext);
+        for (const subfield of field.fields) {
+          if (!(subfield.name in stored)) {
+            next[subfield.name] = null;
+          }
+        }
+        return next;
       });
     replace(ingested);
     if (formScope) {
