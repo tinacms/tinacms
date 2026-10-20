@@ -112,7 +112,7 @@ function ObjectItems({
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
   const formScope = use(FormScopeContext);
-  const { control, getValues, setValue } = useFormContext();
+  const { control, getValues, setValue, reset } = useFormContext();
   const {
     fields: items,
     append,
@@ -168,7 +168,8 @@ function ObjectItems({
         }
         return next;
       });
-    setValue(address, ingested, { shouldDirty: true });
+    const updatedValues = { ...getValues(), [address]: ingested };
+    reset(updatedValues);
     replace(ingested);
     if (formScope) {
       useFormStore
