@@ -5,7 +5,7 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FormScopeContext } from '../../../editor/context';
 import { useFormStore } from '../../../form/form-store';
 import type { FieldAddress } from '../../../core/field/address';
-import { ingestDocument } from '../../../core/form/ingest';
+import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
 import type {
   FieldSchema,
@@ -89,20 +89,14 @@ function ObjectItems({
       remove(index);
       return;
     }
+    const itemContext = { documentPath, registry };
     const ingested = liveItems()
       .filter((_, position) => position !== index)
       .map((item) => {
         const raw = isItem(item) ? item : {};
-        const next = ingestDocument(raw, field.fields, {
-          documentPath,
-          registry,
-        });
-        for (const subfield of field.fields) {
-          if (!(subfield.name in raw)) {
-            next[subfield.name] = null;
-          }
-        }
-        return next;
+        const parsed = ingestDocument(raw, field.fields, itemContext);
+        const stored = digestDocument(parsed, field.fields, itemContext);
+        return ingestDocument(stored, field.fields, itemContext);
       });
     replace(ingested);
     if (formScope) {
