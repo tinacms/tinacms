@@ -305,7 +305,7 @@ describe('ObjectField ingest and digest', () => {
 
 describe('ObjectField composed with array', () => {
   it("keeps a removed item's object off the item that takes its place", async () => {
-    const authors: CollectionSchema = {
+    const postCollection: CollectionSchema = {
       name: 'post',
       format: 'mdx',
       fields: [
@@ -334,7 +334,7 @@ describe('ObjectField composed with array', () => {
           { name: 'Brook' },
         ],
       },
-      authors
+      postCollection
     );
     await screen.findAllByLabelText('Bio');
     await userEvent.click(
