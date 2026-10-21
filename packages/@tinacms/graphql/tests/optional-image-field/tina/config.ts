@@ -23,6 +23,28 @@ export const schema: Schema = {
           type: 'image',
           required: true,
         },
+        {
+          name: 'hero',
+          label: 'Hero',
+          type: 'object',
+          fields: [{ name: 'image', label: 'Image', type: 'image' }],
+        },
+        {
+          name: 'blocks',
+          label: 'Blocks',
+          type: 'object',
+          list: true,
+          templates: [
+            {
+              name: 'feature',
+              label: 'Feature',
+              fields: [
+                { name: 'title', label: 'Title', type: 'string' },
+                { name: 'image', label: 'Image', type: 'image' },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],

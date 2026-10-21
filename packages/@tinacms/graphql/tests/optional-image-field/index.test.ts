@@ -40,7 +40,7 @@ it('leaves an empty optional image out of the frontmatter on create', async () =
   expect(result.errors).toBeUndefined();
   const written = bridge.getWrite('posts/new.md');
   expect(written).not.toContain('coverImage');
-  expect(written).toContain("heroImage: ''");
+  expect(written).toContain('heroImage:');
 });
 
 it('removes an optional image from the frontmatter when it is cleared on update', async () => {
@@ -66,4 +66,58 @@ it('keeps an optional image that has a value on update', async () => {
   expect(bridge.getWrite('posts/with-image.md')).toContain(
     'coverImage: /uploads/new-cover.png'
   );
+});
+
+it('leaves an empty optional image inside an object out of the frontmatter', async () => {
+  const { query, bridge } = await setupMutation(__dirname, config);
+
+  const result = await query({
+    query: `
+      mutation {
+        createDocument(
+          collection: "post"
+          relativePath: "nested.md"
+          params: {
+            post: { title: "Nested", heroImage: "/uploads/hero.png", hero: { image: "" } }
+          }
+        ) {
+          __typename
+        }
+      }
+    `,
+    variables: {},
+  });
+
+  expect(result.errors).toBeUndefined();
+  expect(bridge.getWrite('posts/nested.md')).not.toContain('image: ');
+});
+
+it('leaves an empty optional image inside a block out of the frontmatter', async () => {
+  const { query, bridge } = await setupMutation(__dirname, config);
+
+  const result = await query({
+    query: `
+      mutation {
+        createDocument(
+          collection: "post"
+          relativePath: "block.md"
+          params: {
+            post: {
+              title: "Block"
+              heroImage: "/uploads/hero.png"
+              blocks: [{ feature: { title: "Feature", image: "" } }]
+            }
+          }
+        ) {
+          __typename
+        }
+      }
+    `,
+    variables: {},
+  });
+
+  expect(result.errors).toBeUndefined();
+  const written = bridge.getWrite('posts/block.md');
+  expect(written).toContain('title: Feature');
+  expect(written).not.toContain('image: ');
 });
