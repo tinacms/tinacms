@@ -3,11 +3,11 @@ import { fieldConflictError, overridesFieldKey } from '../core/field/registry';
 import { hookConflictError, overridesHookKey } from '../core/form/hooks';
 import { invariant } from '../core/invariant';
 import { composeOverridableRegistry } from '../core/overridable-registry';
+import { scalarItemOf } from '../core/schema/children';
 import type { FieldProvision, PluginManifest } from '../core/plugin';
 import type {
   CollectionSchema,
   FieldSchema,
-  TemplateFieldSchema,
   TemplateSchema,
 } from '../core/schema/types';
 import {
@@ -57,17 +57,18 @@ const registeredValidatorsOf = (plugins: PluginManifest[]): Set<string> =>
   );
 
 const templateFieldTypesIn = (templates: TemplateSchema[] = []): string[] =>
-  templates.flatMap((template) =>
-    (template.fields ?? []).flatMap((nested) => [
-      ...(nested.type ? [nested.type] : []),
-      ...templateFieldTypesIn(nested.templates),
-    ])
-  );
+  templates.flatMap((template) => fieldTypesIn(template.fields ?? []));
+
+const ofAsList = (field: FieldSchema): FieldSchema[] => {
+  const of = scalarItemOf(field);
+  return of ? [of] : [];
+};
 
 const fieldTypesIn = (fields: FieldSchema[]): string[] =>
   fields.flatMap((field) => [
     field.type,
     ...templateFieldTypesIn(field.templates),
+    ...fieldTypesIn(ofAsList(field)),
   ]);
 
 const usedFieldTypes = (collections: CollectionSchema[]): string[] => [
@@ -76,12 +77,13 @@ const usedFieldTypes = (collections: CollectionSchema[]): string[] => [
   ),
 ];
 
-const validatorNamesIn = (fields: TemplateFieldSchema[]): string[] =>
+const validatorNamesIn = (fields: FieldSchema[]): string[] =>
   fields.flatMap((field) => [
     ...(field.validators ?? []).map((ref) => ref.name),
     ...(field.templates ?? []).flatMap((template) =>
       validatorNamesIn(template.fields ?? [])
     ),
+    ...validatorNamesIn(ofAsList(field)),
   ]);
 
 const usedValidators = (collections: CollectionSchema[]): string[] => [

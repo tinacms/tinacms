@@ -4,9 +4,9 @@ An auth plugin supplies the `auth` capability. `auth` is a singleton
 capability: a project installs one plugin that provides `auth`. A second one
 throws an error at boot, unless it declares `overrides`. Refer to
 [plugins.md](./plugins.md#capabilities). Refer to
-[ADR-023](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/023-auth-session-mechanics.md)
+ADR-023 (not yet public)
 for the mechanics and
-[ADR-008](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/008-authorization-permissions-roles.md)
+[ADR-008](../../../../../adr/v4/008-authorization-permissions-roles.md)
 for the policy.
 
 Core implements no auth. The plugin supplies two halves: hooks on its server
@@ -82,6 +82,10 @@ A failure in `login()`, `logout()` or `getToken()` is an `AuthError`. It has a `
    `user`.
 4. The sidebar footer shows the user and a "Sign out" button that calls
    `logout()`.
+
+Core scopes unsaved form state and `localStorage` drafts to `user.id`.
+Signing out clears the in-memory forms. Each editor keeps separate drafts on a
+shared browser.
 
 The slice must leave `loading`. If the session check fails, the slice sets
 `signed-out`. A slice that stays at `loading` shows the loading screen with

@@ -5,7 +5,7 @@ capability: a project installs one plugin that provides `media`. A second one
 throws an error at boot, unless it declares `overrides`. The plugin can provide
 other singleton capabilities too, with one slice for each in `slices`. Refer
 to [plugins.md](./plugins.md#capabilities). Refer to
-[ADR-022](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/022-media-capability-contract.md)
+[ADR-022](../../../../../adr/v4/022-media-capability-contract.md)
 for the decision.
 
 ## Media paths
@@ -50,7 +50,7 @@ supplies the addition for it.
 |---|---|
 | `list(..., { search })` | Returns only the items whose name matches `search`. Set `features.search` when `list` uses it. |
 | `list(..., { extensions })` | Returns only the files with one of the extensions, for example `['jpg', 'png']`. Extensions are lowercase and have no dot. Set `features.extensionFilter` when `list` uses it. |
-| `resolveUrl(path, { width, height })` | Returns a URL for an image at that size. A provider without image transforms ignores the options and returns the original URL ([ADR-022](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/022-media-capability-contract.md) §5). |
+| `resolveUrl(path, { width, height })` | Returns a URL for an image at that size. A provider without image transforms ignores the options and returns the original URL ([ADR-022](../../../../../adr/v4/022-media-capability-contract.md) §5). |
 | `rename(from, to)` | Moves a file to a new media path in the same media root, and returns the new path. On failure it throws `MediaError`. |
 | `features` | Tells the UI what the provider supports. Refer to the next table. |
 | `status()` | Returns `{ kind: 'ready' }`, or `{ kind: 'needs-setup', message, actionLabel, actionUrl }` when the media store needs setup before use. |

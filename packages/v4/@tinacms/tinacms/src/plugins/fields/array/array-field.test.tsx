@@ -30,7 +30,11 @@ import { LabelledFields } from '../../../test/labelled-fields';
 import numberFieldPlugin from '../number/number-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import arrayFieldPlugin from './array-field.plugin';
-import { asArrayFieldSchema } from './array-field.schema';
+import {
+  asArrayFieldSchema,
+  isScalarArray,
+  isTemplatesArray,
+} from './array-field.schema';
 
 const NO_COLLECTIONS = { collections: [] };
 const DOCUMENT_PATH = 'content/posts/featured.mdx';
@@ -167,6 +171,15 @@ describe('ArrayField add, remove, and reorder', () => {
     expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
     await userEvent.click(addAuthor);
     expect(await screen.findByLabelText('Name')).toBeInTheDocument();
+  });
+
+  it('goes dirty when an item is added to an absent list', async () => {
+    renderField({});
+    const [addAuthor] = await screen.findAllByRole('button', {
+      name: 'Add item',
+    });
+    await userEvent.click(addAuthor);
+    await waitFor(() => expect(status()).toBe('dirty'));
   });
 
   it('removes an item', async () => {
@@ -316,6 +329,52 @@ describe('ArrayField value updates', () => {
 
     await userEvent.type(name, 'b');
     expect(screen.getByTestId('form-status')).toHaveTextContent('dirty');
+  });
+
+  it('goes clean after saving a document with no list values', async () => {
+    const absentLists: CollectionSchema = {
+      name: 'post',
+      format: 'mdx',
+      fields: [
+        t.string({ name: 'title', label: 'Title' }),
+        t.array({
+          name: 'authors',
+          label: 'Authors',
+          fields: [t.string({ name: 'name', label: 'Name' })],
+        }),
+        t.array({
+          name: 'blocks',
+          label: 'Blocks',
+          templates: [
+            {
+              name: 'hero',
+              label: 'Hero',
+              fields: [t.string({ name: 'headline', label: 'Headline' })],
+            },
+          ],
+        }),
+      ],
+    };
+    render(
+      <TinaProvider
+        config={asResolvedConfig({ plugins: PLUGINS, schema: NO_COLLECTIONS })}
+      >
+        <FormProvider
+          collection={absentLists}
+          path={DOCUMENT_PATH}
+          document={{ title: 'Hello' }}
+          onSave={vi.fn()}
+        >
+          <LabelledFields />
+          <SaveProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+
+    await userEvent.type(await screen.findByLabelText('Title'), '!');
+    await userEvent.click(screen.getByText('save'));
+
+    expect(await screen.findByTestId('form-status')).toHaveTextContent('clean');
   });
 });
 
@@ -519,18 +578,125 @@ describe('ArrayField ingest and digest', () => {
 });
 
 describe('asArrayFieldSchema', () => {
-  it('throws on an array node with no fields rather than passing it through', () => {
+  it('throws on an array node that declares none of fields, templates or of', () => {
     const node = { name: 'authors', type: 'array' } as FieldSchema;
-    expect(() => asArrayFieldSchema(node)).toThrow(/needs a "fields" array/);
+    expect(() => asArrayFieldSchema(node)).toThrow(
+      /needs one of "fields", "templates" or "of"/
+    );
   });
 
-  it('returns the narrowed node when fields is present', () => {
+  it('throws on an array node that declares more than one item shape', () => {
     const node = {
-      name: 'authors',
+      name: 'blocks',
       type: 'array',
       fields: [],
+      templates: [],
     } as FieldSchema;
-    expect(asArrayFieldSchema(node).fields).toEqual([]);
+    expect(() => asArrayFieldSchema(node)).toThrow(
+      /declares "fields" and "templates"; use exactly one/
+    );
+  });
+
+  it.each([
+    ['fields', { fields: [] }],
+    ['templates', { templates: [{ name: 'hero', fields: [] }] }],
+    ['of', { of: { name: 'tag', type: 'string' } }],
+  ])('accepts an array node that declares only %s', (_key, shape) => {
+    const node = { name: 'items', type: 'array', ...shape } as FieldSchema;
+    expect(asArrayFieldSchema(node)).toBe(node);
+  });
+
+  it('throws on templates with no template, and on an of with no type', () => {
+    const noTemplates = {
+      name: 'blocks',
+      type: 'array',
+      templates: [],
+    } as FieldSchema;
+    expect(() => asArrayFieldSchema(noTemplates)).toThrow(
+      /at least one template/
+    );
+    const badOf = { name: 'tags', type: 'array', of: 'string' } as FieldSchema;
+    expect(() => asArrayFieldSchema(badOf)).toThrow(/a field with a "type"/);
+  });
+
+  it('throws on two templates with the same name', () => {
+    const node = {
+      name: 'blocks',
+      type: 'array',
+      templates: [
+        { name: 'hero', fields: [] },
+        { name: 'hero', fields: [] },
+      ],
+    } as FieldSchema;
+    expect(() => asArrayFieldSchema(node)).toThrow(/same name/);
+  });
+
+  it('throws when of is not a single-value field', () => {
+    const objectOf = {
+      name: 'people',
+      type: 'array',
+      of: { name: 'person', type: 'object', fields: [] },
+    } as FieldSchema;
+    const arrayOf = {
+      name: 'grid',
+      type: 'array',
+      of: { name: 'row', type: 'array', of: { name: 'cell', type: 'number' } },
+    } as FieldSchema;
+    const bareObjectOf = {
+      name: 'people',
+      type: 'array',
+      of: { name: 'person', type: 'object' },
+    } as FieldSchema;
+    const bareArrayOf = {
+      name: 'grid',
+      type: 'array',
+      of: { name: 'row', type: 'array' },
+    } as FieldSchema;
+    for (const node of [objectOf, arrayOf, bareObjectOf, bareArrayOf]) {
+      expect(() => asArrayFieldSchema(node)).toThrow(
+        /needs "of" to be a single-value field, but it is .*Use "fields" for a list of objects/
+      );
+    }
+  });
+
+  it('throws when fields is not an array', () => {
+    const node = { name: 'authors', type: 'array', fields: {} } as FieldSchema;
+    expect(() => asArrayFieldSchema(node)).toThrow(/to be an array/);
+  });
+});
+
+describe('t.array', () => {
+  it('narrows to the item shape it is given', () => {
+    const blocks = t.array({
+      name: 'blocks',
+      templates: [{ name: 'hero', fields: [t.string({ name: 'headline' })] }],
+    });
+    const tags = t.array({ name: 'tags', of: t.string({ name: 'tag' }) });
+
+    expect(isTemplatesArray(blocks)).toBe(true);
+    expect(isScalarArray(tags)).toBe(true);
+    expect(blocks.templates[0].name).toBe('hero');
+    expect(tags.of.type).toBe('string');
+  });
+
+  it('rejects more than one item shape at the type level', () => {
+    // @ts-expect-error fields and templates are mutually exclusive
+    t.array({ name: 'blocks', fields: [], templates: [] });
+    // @ts-expect-error one of fields, templates or of is required
+    t.array({ name: 'blocks' });
+  });
+
+  it('rejects an object or array as `of` at the type level', () => {
+    t.array({
+      name: 'people',
+      // @ts-expect-error `of` takes a single-value field
+      of: t.object({ name: 'person', fields: [] }),
+    });
+    t.array({
+      name: 'grid',
+      // @ts-expect-error `of` takes a single-value field
+      of: t.array({ name: 'row', of: t.number({ name: 'cell' }) }),
+    });
   });
 });
 
@@ -556,3 +722,468 @@ const validateFieldWithCore: typeof validateField = (
     validators: coreValidatorRegistry,
     ...options,
   });
+
+const blocksCollection: CollectionSchema = {
+  name: 'page',
+  label: 'Pages',
+  format: 'mdx',
+  fields: [
+    t.array({
+      name: 'blocks',
+      label: 'Blocks',
+      templates: [
+        {
+          name: 'hero',
+          label: 'Hero',
+          defaultItem: { headline: 'Welcome' },
+          fields: [t.string({ name: 'headline', label: 'Headline' })],
+        },
+        {
+          name: 'cta',
+          label: 'Call to action',
+          fields: [
+            t.string({ name: 'link', label: 'Link', validators: [required()] }),
+            t.number({ name: 'weight', label: 'Weight' }),
+          ],
+        },
+      ],
+    }),
+    t.array({
+      name: 'scores',
+      label: 'Scores',
+      of: t.number({ name: 'score', label: 'Score', validators: [required()] }),
+    }),
+  ],
+};
+
+const [blocksNode, scoresNode] = blocksCollection.fields;
+const PAGE_PATH = 'content/pages/home.mdx';
+
+const pageValueOf = (name: string) =>
+  useFormStore.getState().forms[toFormId(PAGE_PATH)]?.values[
+    toFieldAddress(name)
+  ];
+
+const renderPage = (document?: TinaDocument) =>
+  render(
+    <TinaProvider
+      config={asResolvedConfig({ plugins: PLUGINS, schema: NO_COLLECTIONS })}
+    >
+      <FormProvider
+        collection={blocksCollection}
+        path={PAGE_PATH}
+        document={document}
+      >
+        <LabelledFields />
+      </FormProvider>
+    </TinaProvider>
+  );
+
+describe('ArrayField templates', () => {
+  it("keeps each item's template through ingest and digest", async () => {
+    const registry = await resolveRegistry();
+    const stored = {
+      blocks: [
+        { _template: 'hero', headline: 'Hi' },
+        { _template: 'cta', link: '/docs', weight: 2 },
+      ],
+    };
+    const ingested = ingestDocument(stored, blocksCollection.fields, {
+      registry,
+    });
+    expect(ingested).toEqual({
+      blocks: [
+        { _template: 'hero', headline: 'Hi' },
+        { _template: 'cta', link: '/docs', weight: '2' },
+      ],
+      scores: null,
+    });
+    expect(
+      digestDocument(ingested, blocksCollection.fields, { registry })
+    ).toEqual(stored);
+  });
+
+  it('keeps an item with a missing or unknown template unchanged', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const registry = await resolveRegistry();
+    const stored = {
+      blocks: [
+        { _template: 'gallery', images: ['a.png'] },
+        { headline: 'No template' },
+        { _template: 'cta', link: '/docs', weight: 2 },
+      ],
+    };
+    const ingested = ingestDocument(stored, blocksCollection.fields, {
+      registry,
+    });
+    expect(ingested).toEqual({
+      blocks: [
+        { _template: 'gallery', images: ['a.png'] },
+        { headline: 'No template' },
+        { _template: 'cta', link: '/docs', weight: '2' },
+      ],
+      scores: null,
+    });
+    expect(
+      digestDocument(ingested, blocksCollection.fields, { registry })
+    ).toEqual(stored);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('the unknown template "gallery"')
+    );
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('no "_template"')
+    );
+    warn.mockRestore();
+  });
+
+  it('shows an unknown block that can be removed, beside working blocks', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPage({
+      blocks: [
+        { _template: 'gallery', images: ['a.png'] },
+        { _template: 'cta', link: '/docs' },
+      ],
+    });
+    expect(
+      await screen.findByText('Unknown block "gallery"')
+    ).toBeInTheDocument();
+    expect(screen.getByText(/"images"/)).toBeInTheDocument();
+    expect(
+      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+    ).toBe('/docs');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { _template: 'cta', link: '/docs', weight: null },
+      ])
+    );
+    warn.mockRestore();
+  });
+
+  it("renders each item with its template's label and fields", async () => {
+    renderPage({
+      blocks: [
+        { _template: 'hero', headline: 'Hi' },
+        { _template: 'cta', link: '/docs' },
+      ],
+    });
+    expect(
+      (
+        (await screen.findByRole('textbox', {
+          name: 'Headline',
+        })) as HTMLInputElement
+      ).value
+    ).toBe('Hi');
+    expect(
+      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+    ).toBe('/docs');
+    expect(screen.getByText('Hero')).toBeInTheDocument();
+    expect(screen.getByText('Call to action')).toBeInTheDocument();
+  });
+
+  it('adds an item of the chosen template, seeded from its defaultItem', async () => {
+    renderPage({ blocks: [] });
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Add Hero' })
+    );
+    expect(
+      (
+        (await screen.findByRole('textbox', {
+          name: 'Headline',
+        })) as HTMLInputElement
+      ).value
+    ).toBe('Welcome');
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { _template: 'hero', headline: 'Welcome' },
+      ])
+    );
+  });
+
+  it('keeps each template with its item on a reorder', async () => {
+    renderPage({
+      blocks: [
+        { _template: 'hero', headline: 'Hi' },
+        { _template: 'cta', link: '/docs' },
+      ],
+    });
+    await screen.findByRole('textbox', { name: 'Headline' });
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Move item 2 up' })
+    );
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { _template: 'cta', link: '/docs', weight: null },
+        { _template: 'hero', headline: 'Hi' },
+      ])
+    );
+  });
+
+  it('edits a field of a template item and writes it back', async () => {
+    renderPage({ blocks: [{ _template: 'cta', link: '/docs' }] });
+    const link = await screen.findByRole('textbox', { name: 'Link' });
+    await userEvent.type(link, '/v4');
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { _template: 'cta', link: '/docs/v4', weight: null },
+      ])
+    );
+  });
+
+  it('removes a template item and keeps the others', async () => {
+    renderPage({
+      blocks: [
+        { _template: 'hero', headline: 'Hi' },
+        { _template: 'cta', link: '/docs' },
+      ],
+    });
+    await screen.findByRole('textbox', { name: 'Headline' });
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { _template: 'cta', link: '/docs', weight: null },
+      ])
+    );
+    expect(
+      screen.queryByRole('textbox', { name: 'Headline' })
+    ).not.toBeInTheDocument();
+    expect(
+      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+    ).toBe('/docs');
+  });
+
+  it("validates each item against its own template's fields", async () => {
+    const registry = await resolveRegistry();
+    const errors = registry.get('array')?.validateChildren?.(
+      [
+        { _template: 'hero', headline: '' },
+        { _template: 'cta', link: '' },
+      ],
+      blocksNode,
+      'blocks',
+      registry,
+      { validators: coreValidatorRegistry }
+    );
+    expect(errors).toEqual({ 'blocks.1.link': ['Link is required'] });
+  });
+
+  it('skips an item whose template is unknown when validating', async () => {
+    const registry = await resolveRegistry();
+    const errors = registry
+      .get('array')
+      ?.validateChildren?.(
+        [{ _template: 'gallery', link: '' }],
+        blocksNode,
+        'blocks',
+        registry,
+        { validators: coreValidatorRegistry }
+      );
+    expect(errors).toEqual({});
+  });
+
+  it('shows an item that is not an object read-only, beside working blocks', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const registry = await resolveRegistry();
+    const stored = { blocks: ['hello', { _template: 'cta', link: '/docs' }] };
+    expect(
+      digestDocument(
+        ingestDocument(stored, blocksCollection.fields, { registry }),
+        blocksCollection.fields,
+        { registry }
+      )
+    ).toEqual(stored);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('an item that is not an object')
+    );
+    expect(
+      validateFieldWithCore(blocksNode, registry.get('array'), stored.blocks)
+    ).toEqual(['Blocks must be a list of items']);
+    renderPage(stored);
+    expect(
+      await screen.findByText('Item 1 is not an object')
+    ).toBeInTheDocument();
+    expect(screen.getByText('"hello"')).toBeInTheDocument();
+    expect(
+      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+    ).toBe('/docs');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { _template: 'cta', link: '/docs', weight: null },
+      ])
+    );
+    warn.mockRestore();
+  });
+
+  it('skips a non-object item when validating the items of a fields array', async () => {
+    const registry = await resolveRegistry();
+    const people = t.array({
+      name: 'people',
+      label: 'People',
+      fields: [
+        t.string({ name: 'name', label: 'Name', validators: [required()] }),
+      ],
+    });
+    expect(
+      registry
+        .get('array')
+        ?.validateChildren?.(
+          ['hello', { name: '' }],
+          people,
+          'people',
+          registry,
+          {
+            validators: coreValidatorRegistry,
+          }
+        )
+    ).toEqual({ 'people.1.name': ['Name is required'] });
+  });
+
+  it('shows an item with no template and moves it like any other', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPage({
+      blocks: [{ _template: 'cta', link: '/docs' }, { headline: 'Orphan' }],
+    });
+    expect(
+      await screen.findByText('Block with no template')
+    ).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Move item 2 up' })
+    );
+    await waitFor(() =>
+      expect(pageValueOf('blocks')).toEqual([
+        { headline: 'Orphan' },
+        { _template: 'cta', link: '/docs', weight: null },
+      ])
+    );
+    warn.mockRestore();
+  });
+});
+
+describe('ArrayField of', () => {
+  it("runs the of field's parse and serialize on each item", async () => {
+    const registry = await resolveRegistry();
+    const stored = { scores: [3, 5] };
+    const ingested = ingestDocument(stored, blocksCollection.fields, {
+      registry,
+    });
+    expect(ingested).toEqual({ blocks: null, scores: ['3', '5'] });
+    expect(
+      digestDocument(ingested, blocksCollection.fields, { registry })
+    ).toEqual(stored);
+  });
+
+  it('shows a stored value that is not a list read-only, for templates and of', async () => {
+    renderPage({ blocks: 'oops', scores: { a: 1 } });
+    expect(await screen.findAllByText(/not a list of items/)).toHaveLength(2);
+    expect(pageValueOf('blocks')).toBe('oops');
+    expect(pageValueOf('scores')).toEqual({ a: 1 });
+  });
+
+  it('rejects a value that is not a list of items', async () => {
+    const descriptor = (await resolveRegistry()).get('array');
+    expect(validateFieldWithCore(scoresNode, descriptor, 'oops')).toEqual([
+      'Scores must be a list of items',
+    ]);
+    expect(validateFieldWithCore(scoresNode, descriptor, [1, 2])).toEqual([]);
+  });
+
+  it('keeps stored content that is not an array unchanged', async () => {
+    const registry = await resolveRegistry();
+    const ingested = ingestDocument({ scores: 3 }, blocksCollection.fields, {
+      registry,
+    });
+    expect(ingested.scores).toBe(3);
+    expect(
+      digestDocument(ingested, blocksCollection.fields, { registry }).scores
+    ).toBe(3);
+  });
+
+  it('renders, edits, adds, reorders and removes scalar items', async () => {
+    renderPage({ scores: [3, 5, 7] });
+    const shown = () =>
+      (
+        screen.getAllByRole('spinbutton', {
+          name: 'Score',
+        }) as HTMLInputElement[]
+      ).map((input) => input.value);
+    await screen.findAllByRole('spinbutton', { name: 'Score' });
+    expect(shown()).toEqual(['3', '5', '7']);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Move item 3 up' })
+    );
+    await waitFor(() => expect(shown()).toEqual(['3', '7', '5']));
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await waitFor(() => expect(shown()).toEqual(['7', '5']));
+
+    await userEvent.type(
+      screen.getAllByRole('spinbutton', { name: 'Score' })[0],
+      '1'
+    );
+    await waitFor(() => expect(pageValueOf('scores')).toEqual(['71', '5']));
+    expect(shown()).toEqual(['71', '5']);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Add item' }));
+    expect(
+      await screen.findAllByRole('spinbutton', { name: 'Score' })
+    ).toHaveLength(3);
+  });
+
+  it('keeps a value typed into a new item when the item moves', async () => {
+    renderPage({ scores: [3, 5] });
+    await screen.findAllByRole('spinbutton', { name: 'Score' });
+    await userEvent.click(screen.getByRole('button', { name: 'Add item' }));
+    const inputs = (await screen.findAllByRole('spinbutton', {
+      name: 'Score',
+    })) as HTMLInputElement[];
+    await userEvent.type(inputs[2], '9');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Move item 3 up' })
+    );
+    await waitFor(() => expect(pageValueOf('scores')).toEqual(['3', '9', '5']));
+    expect(
+      (
+        screen.getAllByRole('spinbutton', {
+          name: 'Score',
+        }) as HTMLInputElement[]
+      ).map((input) => input.value)
+    ).toEqual(['3', '9', '5']);
+  });
+
+  it('keeps an empty item empty through ingest and digest', async () => {
+    const registry = await resolveRegistry();
+    const fields = [
+      t.array({ name: 'scores', of: t.number({ name: 'score' }) }),
+    ];
+    const ingested = ingestDocument({ scores: [1, null] }, fields, {
+      registry,
+    });
+    expect(ingested).toEqual({ scores: ['1', null] });
+    expect(digestDocument(ingested, fields, { registry })).toEqual({
+      scores: [1, null],
+    });
+    expect(
+      digestDocument({ scores: ['1', undefined] }, fields, { registry })
+    ).toEqual({ scores: [1, null] });
+  });
+
+  it('validates each item at its index address', async () => {
+    const registry = await resolveRegistry();
+    const errors = registry
+      .get('array')
+      ?.validateChildren?.(['3', ''], scoresNode, 'scores', registry, {
+        validators: coreValidatorRegistry,
+      });
+    expect(errors).toEqual({ 'scores.1': ['Score is required'] });
+  });
+});

@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 2.2.4
+
+### Patch Changes
+
+- [#7744](https://github.com/tinacms/tinacms/pull/7744) [`3d23cd7`](https://github.com/tinacms/tinacms/commit/3d23cd7b5405bf073305d93ff3650177d86d3b86) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump `systeminformation` from `^5.27.13` to `^5.31.7`, which fixes four command-injection advisories. Machines where `systeminformation` cannot read a hardware UUID now get a random anonymous telemetry ID instead of all sharing one.
+
 ## 2.2.3
 
 ### Patch Changes

@@ -9,6 +9,7 @@ import { NAMER } from '../ast-builder';
 import { Database } from '../database';
 import { parseMDX, serializeMDX } from '../mdx';
 import { assertShape, lastItem, sequential } from '../util';
+import { visitReferences } from '../references/visit';
 
 import type {
   Collectable,
@@ -1101,53 +1102,12 @@ export class Resolver {
       // delete the old document
       await this.deleteDocument(realPath);
       // update references to the document
-      const collRefs = await this.findReferences(realPath, collection);
-      // resolveUpdateDocument already holds the lock when realPath is in the auth collection
-      const holdsLock = this.isAuthCollectionPath(realPath);
-      for (const [_collection, docsWithRefs] of Object.entries(collRefs)) {
-        for (const [pathToDocWithRef, referencePaths] of Object.entries(
-          docsWithRefs
-        )) {
-          const rewriteReferences = async () => {
-            // load the document with the references
-            let docWithRef = await this.getRaw(pathToDocWithRef);
-
-            let hasUpdate = false;
-            // update each reference to the updated document
-            for (const path of referencePaths) {
-              const { object, updated } = updateObjectWithJsonPath(
-                docWithRef,
-                path,
-                realPath,
-                newRealPath
-              );
-              docWithRef = object;
-              hasUpdate = updated || hasUpdate;
-            }
-
-            // save the updated document
-            if (hasUpdate) {
-              // lookup collection for the document with the references
-              const collectionWithRef =
-                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
-              if (!collectionWithRef) {
-                throw new Error(
-                  `Unable to find collection for ${pathToDocWithRef}`
-                );
-              }
-
-              await this.database.put(
-                pathToDocWithRef,
-                docWithRef,
-                collectionWithRef.name
-              );
-            }
-          };
-          await (holdsLock
-            ? rewriteReferences()
-            : this.withAuthCollectionLock(pathToDocWithRef, rewriteReferences));
-        }
-      }
+      await this.rewriteReferences(
+        realPath,
+        newRealPath,
+        collection,
+        this.isAuthCollectionPath(realPath)
+      );
       return this.getDocument(newRealPath);
     }
 
@@ -1223,46 +1183,7 @@ export class Resolver {
     const doc = await this.getDocument(realPath);
     await this.deleteDocument(realPath);
     if (hasReferences) {
-      const collRefs = await this.findReferences(realPath, collection);
-      for (const [_collection, docsWithRefs] of Object.entries(collRefs)) {
-        for (const [pathToDocWithRef, referencePaths] of Object.entries(
-          docsWithRefs
-        )) {
-          await this.withAuthCollectionLock(pathToDocWithRef, async () => {
-            // load the doc with the references
-            let refDoc = await this.getRaw(pathToDocWithRef);
-
-            let hasUpdate = false;
-            // Update each reference to the deleted document
-            for (const path of referencePaths) {
-              const { object, updated } = updateObjectWithJsonPath(
-                refDoc,
-                path,
-                realPath,
-                null
-              );
-              refDoc = object;
-              hasUpdate = updated || hasUpdate;
-            }
-
-            if (hasUpdate) {
-              const collectionWithRef =
-                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
-              if (!collectionWithRef) {
-                throw new Error(
-                  `Unable to find collection for ${pathToDocWithRef}`
-                );
-              }
-              // save the updated doc
-              await this.database.put(
-                pathToDocWithRef,
-                refDoc,
-                collectionWithRef.name
-              );
-            }
-          });
-        }
-      }
+      await this.rewriteReferences(realPath, null, collection, false);
     }
     return doc;
   };
@@ -1700,6 +1621,58 @@ export class Resolver {
   };
 
   /**
+   * Repoints every reference to `from` at `to`, or clears it when `to` is null.
+   *
+   * Each referring document is re-walked rather than addressed by the locators the index stored,
+   * since a stored path cannot address a reference inside rich text. Only a document the walk
+   * changed is written back.
+   */
+  private rewriteReferences = async (
+    from: string,
+    to: string | null,
+    collection: Collection,
+    // `resolveUpdateDocument` already holds the auth-collection lock; `resolveDeleteDocument` does
+    // not, so it cannot be inferred from `from`.
+    holdsLock: boolean
+  ) => {
+    const collRefs = await this.findReferences(from, collection);
+    for (const docsWithRefs of Object.values(collRefs)) {
+      for (const pathToDocWithRef of Object.keys(docsWithRefs)) {
+        const rewrite = async () => {
+          const collectionWithRef =
+            this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
+          if (!collectionWithRef) {
+            throw new Error(
+              `Unable to find collection for ${pathToDocWithRef}`
+            );
+          }
+          const docWithRef = await this.getRaw(pathToDocWithRef);
+          const changed = visitReferences(
+            docWithRef,
+            collectionWithRef,
+            this.tinaSchema,
+            (reference) => {
+              if (reference.value === from) {
+                reference.replace(to);
+              }
+            }
+          );
+          if (changed) {
+            await this.database.put(
+              pathToDocWithRef,
+              docWithRef,
+              collectionWithRef.name
+            );
+          }
+        };
+        await (holdsLock
+          ? rewrite()
+          : this.withAuthCollectionLock(pathToDocWithRef, rewrite));
+      }
+    }
+  };
+
+  /**
    * Checks if a document has references to it
    * @param id  The id of the document to check for references
    * @param c The collection to check for references
@@ -1709,6 +1682,8 @@ export class Resolver {
     let count = 0;
     await this.database.query(
       {
+        // One key answers a boolean; the default page is 50.
+        first: 1,
         collection: c.name,
         filterChain: makeFilterChain({
           conditions: [
@@ -1746,6 +1721,9 @@ export class Resolver {
     const references: Record<string, Record<string, string[]>> = {};
     await this.database.query(
       {
+        // Every reference, not the default page of 50, which otherwise caps how many a rename or
+        // delete updates.
+        first: -1,
         collection: c.name,
         filterChain: makeFilterChain({
           conditions: [
