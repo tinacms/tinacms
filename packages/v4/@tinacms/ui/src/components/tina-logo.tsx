@@ -18,23 +18,22 @@ const WORDMARK = (
   </>
 );
 
-type TinaLogoProps = Omit<ComponentProps<'svg'>, 'viewBox' | 'children'> & {
-  variant?: 'full' | 'llama';
-};
-
-function TinaLogo({ variant = 'full', className, ...props }: TinaLogoProps) {
+function TinaLogo({
+  className,
+  ...props
+}: Omit<ComponentProps<'svg'>, 'viewBox' | 'children'>) {
   return (
     <svg
       data-slot='tina-logo'
       role='img'
       aria-label='TinaCMS'
-      viewBox={variant === 'full' ? '0 0 637 254' : '0 0 183 254'}
+      viewBox='0 0 637 254'
       fill='currentColor'
       className={cn('text-brand', className)}
       {...props}
     >
       {LLAMA}
-      {variant === 'full' ? WORDMARK : null}
+      {WORDMARK}
     </svg>
   );
 }

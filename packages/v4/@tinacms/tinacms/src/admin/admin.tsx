@@ -380,11 +380,7 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton onClick={() => navigate(COLLECTIONS_ROUTE)}>
-                <TinaLogo className='h-5! w-auto! group-data-[collapsible=icon]:hidden' />
-                <TinaLogo
-                  variant='llama'
-                  className='hidden h-5! w-auto! group-data-[collapsible=icon]:block'
-                />
+                <TinaLogo className='h-5! w-auto!' />
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

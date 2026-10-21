@@ -252,7 +252,7 @@ const Heading5 = ({
       headerClasses,
       blockClasses,
       className,
-      'text-lg mb-4 last:mb-0 mt-6 first:mt-0'
+      'text-md mb-4 last:mb-0 mt-6 first:mt-0'
     )}
     style={headerFontStyle}
   >
