@@ -14,7 +14,7 @@ import {
 } from 'react-hook-form';
 import { useStore } from 'zustand';
 import type { AuthSlice } from '../core/auth/contract';
-import { authSliceOf, authTokenOf } from '../core/auth/slice';
+import { authSliceOf, siteAuthTokenOf } from '../core/auth/slice';
 import type { ContentSlice } from '../core/content/contract';
 import type { MediaSlice } from '../core/media/contract';
 import type { FieldAddress } from '../core/field/address';
@@ -128,7 +128,7 @@ export function useRpcClient<TSegments>(
       createRpcClient<TSegments>({
         url,
         fetch: (input, init) => (fetchRef.current ?? fetch)(input, init),
-        getToken: () => authTokenOf(store.getState()),
+        getToken: () => siteAuthTokenOf(store.getState()),
       }),
     [store, url]
   );

@@ -1,4 +1,4 @@
-import { authHeadersOf } from '../../../core/auth/slice';
+import { siteAuthHeadersOf } from '../../../core/auth/slice';
 import {
   MediaError,
   type MediaPage,
@@ -29,7 +29,7 @@ const postMediaRequest = async <Result>(
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      ...(await authHeadersOf(state)),
+      ...(await siteAuthHeadersOf(state)),
     },
     body: JSON.stringify(request),
   });
@@ -47,7 +47,7 @@ export const createMediaSlice =
         body.append('file', file);
         const response = await fetch(`${url}/upload`, {
           method: 'POST',
-          headers: await authHeadersOf(get()),
+          headers: await siteAuthHeadersOf(get()),
           body,
         });
         if (!response.ok) throw await failure(response);
@@ -59,7 +59,7 @@ export const createMediaSlice =
         if (page.cursor !== undefined) query.set('cursor', page.cursor);
         if (page.limit !== undefined) query.set('limit', String(page.limit));
         const response = await fetch(`${url}?${query}`, {
-          headers: await authHeadersOf(get()),
+          headers: await siteAuthHeadersOf(get()),
         });
         if (!response.ok) throw await failure(response);
         return (await response.json()) as MediaPage;

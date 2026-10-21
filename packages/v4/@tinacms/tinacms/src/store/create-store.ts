@@ -1,7 +1,14 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { SITE_TOKEN_FLAG } from '../core/auth/slice';
 import { invariant } from '../core/invariant';
-import type { ResolvedSegment, SliceSet, TinaStoreState } from '../core/plugin';
+import { capabilityProvider } from '../core/mount';
+import {
+  AUTH_CAPABILITY,
+  type ResolvedSegment,
+  type SliceSet,
+  type TinaStoreState,
+} from '../core/plugin';
 import { composePluginSlices } from './compose-slices';
 
 const CORE_NAMESPACES = ['ui', 'branch', 'documents'] as const;
@@ -54,6 +61,12 @@ const DEVTOOLS_STORE_NAME = 'TinaStore';
 
 export const createTinaStore = (resolved: ResolvedSegment[]) => {
   const pluginSlices = composePluginSlices(resolved);
+  const sendsTokenToSite = Boolean(
+    capabilityProvider(
+      resolved.map(({ manifest }) => manifest),
+      AUTH_CAPABILITY
+    )?.server
+  );
   return create<TinaStoreState>()(
     devtools(
       persist(
@@ -69,6 +82,9 @@ export const createTinaStore = (resolved: ResolvedSegment[]) => {
             );
             const scopedSet = createNamespacedSet(namespace, set as RootSet);
             state[namespace] = slice(scopedSet, get);
+          }
+          if (state.auth) {
+            state.auth = { ...state.auth, [SITE_TOKEN_FLAG]: sendsTokenToSite };
           }
           return state;
         },

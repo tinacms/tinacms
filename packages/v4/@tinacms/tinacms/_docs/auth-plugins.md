@@ -106,6 +106,12 @@ with no login.
   plugin does not attach the token itself.
 - The local content and media plugins attach the token the same way. Each
   request reads `store.auth` and calls `getToken()` at the time it is sent.
+- A request to the site's own server carries the token only when the winning
+  auth plugin has a server segment that checks it. The store records this at
+  mount. `useRpcClient` and the local content and media plugins read the
+  same record. A plugin that calls its own backend reads the token through
+  `getToken()` with no such check. `tinaCloud()` is different: it sends
+  TinaCloud its own token and does not read `store.auth`.
 - The local Data Layer (`tinaLocalDataLayerVitePlugin`) authorizes the
   content and media requests as the RPC handler does. It answers `401` when
   there is no session, or when the winning auth plugin has no `getSession`.
@@ -122,8 +128,8 @@ with no login.
 
 ## TinaCloud
 
-`tinaCloud({ clientId })` is the reference auth plugin. It provides `auth`
-and `media` from one plugin.
+`tinaCloud({ clientId })` is the reference auth plugin. It provides `auth`,
+`media` and `content` from one plugin.
 
 - `login()` signs in the way `https://identity.tinajs.io/v2/auth/config`
   says, as v3 does:
@@ -148,22 +154,28 @@ and `media` from one plugin.
   `no-access`.
 - The tokens stay in a closure of the slice. A full reload signs the editor
   out (ADR-023).
-- The media slice of `tinaCloud()` gets its token from the same closure. It
-  never reads the token of another auth plugin, so TinaCloud media needs
-  `tinaCloud()` to keep `auth`.
-- Before a media request, the closure refreshes the token through
+- The media and content slices of `tinaCloud()` send the TinaCloud token to
+  TinaCloud. They do not read `store.auth`, because TinaCloud accepts no
+  token from another auth plugin.
+- Before a request, the closure refreshes the token through
   `https://identity.tinajs.io/oauth/token` when it expires in less than two
   minutes. A refused refresh sets `signed-out` and throws `expired`.
 
-The tokens only ever go to TinaCloud, as in v3. They are tied to the whole
-TinaCloud account, not to one project, so the slice's `getToken()` returns
-`undefined` and the site's own server never receives them. `tinaCloud()` has
-no server segment, so the local Data Layer checks nothing, as in v3, and the
-RPC handler refuses every operation that needs a session.
+The server segment holds `getSession`. It sends the bearer token to the same
+`currentUser` and project endpoints as the slice, and maps the role the same
+way. An account that is not verified, or that TinaCloud refuses, gets no
+session. When TinaCloud cannot be reached, `getSession` throws, so the
+request fails closed. `tinaCloud()` has no `rolePermissions`, so the built-in
+defaults apply.
+
+Because `tinaCloud()` has a server segment, requests to the site's own server
+carry the TinaCloud token. For now that is the token of the whole TinaCloud
+account, not of one project. ADR-023 §7 replaces it with a short-lived,
+project-scoped editor token before v4 ships, once TinaCloud can issue one.
 
 ```ts
 defineConfig({
-  plugins: [localContentPlugin(), tinaCloud({ clientId: '<client id>' })],
+  plugins: [tinaCloud({ clientId: '<client id>' })],
   schema: { collections: [] },
 });
 ```
@@ -191,6 +203,11 @@ The overriding plugin mounts `store.auth` and answers `getSession`, so an
 override with no server segment leaves the RPC handler with no session. For a
 plugin that provides more than one capability, the override replaces `auth`
 only, and the first plugin keeps its other capabilities.
+
+`tinaCloud()` keeps its media and content, but they need its own sign-in.
+With `auth` overridden, each of their operations fails with
+`tinacloud-auth-overridden`. Replace media and content too, or remove the
+override.
 
 ## Not supported yet
 
