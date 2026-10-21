@@ -1,3 +1,4 @@
+import type { FieldAddress } from '../field/address';
 import type { TinaDocument } from '../schema/types';
 
 // `list` names the documents of a collection. It carries no content, because a
@@ -11,6 +12,41 @@ export interface DocumentEntry extends DocumentSummary {
   document: TinaDocument;
 }
 
+const CONTENT_ERROR_MESSAGES = {
+  unauthorized: 'Your session has ended. Sign in again.',
+  forbidden: "You don't have permission to do that.",
+  'not-found': 'This document no longer exists. Refresh and try again.',
+  'branch-not-found': "This branch doesn't exist. Choose another branch.",
+  'not-indexed': "This branch isn't ready yet. Try again in a moment.",
+  validation: 'Some fields are not valid. Fix them and try again.',
+  network: "Can't reach the content server. Check your connection.",
+  'backend-failure': 'Something went wrong. Please try again.',
+} satisfies Record<string, string>;
+
+export type ContentErrorCode = keyof typeof CONTENT_ERROR_MESSAGES;
+
+export type ContentFieldErrors = Partial<Record<FieldAddress, string[]>>;
+
+/** `message` is the sentence to show the user; `detail` is the technical reason. */
+export class ContentError extends Error {
+  readonly code: ContentErrorCode;
+  readonly detail?: string;
+  readonly fieldErrors?: ContentFieldErrors;
+
+  constructor(
+    code: ContentErrorCode,
+    detail?: string,
+    fieldErrors?: ContentFieldErrors
+  ) {
+    super(CONTENT_ERROR_MESSAGES[code]);
+    this.name = 'ContentError';
+    this.code = code;
+    this.detail = detail;
+    this.fieldErrors = fieldErrors;
+  }
+}
+
+/** Each operation reports a known failure as a `ContentError`. */
 export interface ContentProvider {
   get(collection: string, path: string): Promise<DocumentEntry | null>;
   list(collection: string): Promise<DocumentSummary[]>;

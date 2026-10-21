@@ -21,11 +21,14 @@ export {
   toUserId,
   type UserId,
 } from './core/auth/contract';
-export type {
-  ContentProvider,
-  ContentSlice,
-  DocumentEntry,
-  DocumentSummary,
+export {
+  ContentError,
+  type ContentErrorCode,
+  type ContentFieldErrors,
+  type ContentProvider,
+  type ContentSlice,
+  type DocumentEntry,
+  type DocumentSummary,
 } from './core/content/contract';
 export {
   type MediaFeatures,

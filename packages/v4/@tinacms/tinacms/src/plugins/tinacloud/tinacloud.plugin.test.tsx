@@ -6,14 +6,33 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TinaAdmin } from '../../admin/admin';
 import { asResolvedConfig } from '../../config';
 import { MediaError } from '../../core/media/contract';
+import { toUserId } from '../../core/auth/contract';
 import { authTokenOf } from '../../core/auth/slice';
-import { definePlugin, resolveClientSegments } from '../../core/plugin';
+import {
+  type PluginManifest,
+  definePlugin,
+  resolveClientSegments,
+} from '../../core/plugin';
+import { validateCapabilityGraph } from '../../core/resolve';
 import { type TinaRuntime, TinaRuntimeContext } from '../../editor/context';
-import { useOptionalAuthSlice, useMediaSlice } from '../../editor/hooks';
+import {
+  useContentSlice,
+  useMediaSlice,
+  useOptionalAuthSlice,
+} from '../../editor/hooks';
+import { createRpcHandler } from '../../rpc/handler';
+import { defineServerPlugin } from '../../server';
 import { createTinaStore } from '../../store/create-store';
+import { testAuthPlugin } from '../../test/test-auth-plugin';
 import { stubLoginPopup, tinaCloudUser } from '../../test/tinacloud-login';
+import { localContentPlugin } from '../content/local/local-content.plugin';
 import { mediaManagerPlugin } from '../media-manager/media-manager.plugin';
-import { TINACLOUD_ASSETS_URL, TINACLOUD_IDENTITY_URL } from './client';
+import {
+  TINACLOUD_ASSETS_URL,
+  TINACLOUD_CONTENT_URL,
+  TINACLOUD_IDENTITY_URL,
+} from './client';
+import { contentUrl } from './content/request';
 import { tinaCloud } from './tinacloud.plugin';
 
 const stubTinaCloud = (
@@ -28,25 +47,41 @@ const stubTinaCloud = (
     }
     if (url.endsWith('/currentUser')) return Response.json(tinaCloudUser);
     if (url.startsWith(TINACLOUD_IDENTITY_URL)) return Response.json(project);
+    if (url.startsWith(TINACLOUD_CONTENT_URL)) {
+      return Response.json({
+        data: {
+          collection: {
+            documents: {
+              edges: [],
+              pageInfo: { hasNextPage: false, endCursor: null },
+            },
+          },
+        },
+      });
+    }
     return Response.json({ files: [], directories: [] });
   });
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;
 };
 
-const boot = async () => {
-  const store = createTinaStore(
-    await resolveClientSegments([
-      tinaCloud({ clientId: 'abc' }),
-      mediaManagerPlugin(),
-    ])
-  );
+const boot = async (
+  plugins: PluginManifest[] = [
+    tinaCloud({ clientId: 'abc' }),
+    mediaManagerPlugin(),
+  ]
+) => {
+  const store = createTinaStore(await resolveClientSegments(plugins));
   const runtime = { store } as unknown as TinaRuntime;
   const wrapper = ({ children }: { children: ReactNode }) => (
     <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
   );
   const { result } = renderHook(
-    () => ({ media: useMediaSlice(), auth: useOptionalAuthSlice() }),
+    () => ({
+      media: useMediaSlice(),
+      auth: useOptionalAuthSlice(),
+      content: useContentSlice(),
+    }),
     { wrapper }
   );
   return { store, result };
@@ -58,7 +93,11 @@ const bootSignedIn = async () => {
   const login = booted.result.current.auth?.login();
   complete();
   await act(() => login);
-  return { store: booted.store, media: booted.result.current.media };
+  return {
+    store: booted.store,
+    media: booted.result.current.media,
+    content: booted.result.current.content,
+  };
 };
 
 const listUrls = (fetchMock: ReturnType<typeof stubTinaCloud>) =>
@@ -72,10 +111,19 @@ afterEach(() => {
 });
 
 describe('tinaCloud()', () => {
-  it('provides media and auth, with no server segment', () => {
+  it('provides media, auth and content, with a server segment', () => {
     const plugin = tinaCloud({ clientId: 'abc' });
-    expect(plugin.provides).toEqual(['media', 'auth']);
-    expect(plugin.server).toBeUndefined();
+    expect(plugin.provides).toEqual(['media', 'auth', 'content']);
+    expect(plugin.server).toBeTypeOf('function');
+  });
+
+  it('fails at boot next to another content plugin', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        tinaCloud({ clientId: 'abc' }),
+        localContentPlugin(),
+      ])
+    ).toThrow('Two plugins provide the "content" capability.');
   });
 
   it('links the sidebar to the project in the TinaCloud dashboard, under Cloud', async () => {
@@ -110,11 +158,42 @@ describe('tinaCloud()', () => {
     ]);
   });
 
-  it('gives the site no token once signed in', async () => {
+  it('returns the TinaCloud token from getToken once signed in', async () => {
     stubTinaCloud();
     const { store } = await bootSignedIn();
     expect(store.getState().auth).toMatchObject({ status: 'signed-in' });
-    await expect(authTokenOf(store.getState())).resolves.toBeUndefined();
+    await expect(authTokenOf(store.getState())).resolves.toBe('id-token');
+  });
+
+  it("sends the auth slice's token on content requests after sign-in", async () => {
+    const fetchMock = stubTinaCloud();
+    const { content } = await bootSignedIn();
+    await content.list('post');
+    const [url, init] = fetchMock.mock.calls.at(-1) ?? [];
+    expect(url).toBe(contentUrl('abc', 'main'));
+    expect(new Headers(init?.headers).get('Authorization')).toBe(
+      'Bearer id-token'
+    );
+  });
+
+  it('sends TinaCloud no token from a plugin that overrides auth', async () => {
+    const fetchMock = stubTinaCloud();
+    const { result } = await boot([
+      tinaCloud({ clientId: 'abc' }),
+      mediaManagerPlugin(),
+      testAuthPlugin('acme', { id: toUserId('editor-1') }, [
+        { capability: 'auth' },
+      ]),
+    ]);
+    await act(() => result.current.auth?.login());
+    const overridden = { detail: expect.stringContaining('overrides `auth`') };
+    await expect(result.current.content.list('post')).rejects.toMatchObject(
+      overridden
+    );
+    await expect(result.current.media.list('')).rejects.toMatchObject(
+      overridden
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('mounts a media slice and a signed-out auth slice', async () => {
@@ -199,25 +278,10 @@ describe('tinaCloud()', () => {
     stubTinaCloud();
     const user = userEvent.setup();
     const { complete } = stubLoginPopup();
-    const contentPlugin = definePlugin({
-      name: 'test:content',
-      provides: ['content'],
-      client: async () => ({
-        default: {
-          slice: () => ({
-            list: async () => [],
-            get: async () => null,
-            update: async () => {
-              throw new Error('read-only');
-            },
-          }),
-        },
-      }),
-    });
     render(
       <TinaAdmin
         config={asResolvedConfig({
-          plugins: [contentPlugin, tinaCloud({ clientId: 'abc' })],
+          plugins: [tinaCloud({ clientId: 'abc' })],
           schema: {
             collections: [
               {
@@ -242,5 +306,46 @@ describe('tinaCloud()', () => {
       await screen.findByRole('list', { name: 'Account' })
     ).toHaveTextContent('Ada Lovelace');
     expect(screen.getByRole('list', { name: 'Collections' })).toBeVisible();
+  });
+});
+
+describe('tinaCloud() on the server', () => {
+  const editorialPlugin = definePlugin({
+    name: 'editorial',
+    server: async () => ({
+      default: defineServerPlugin({ publish: async () => 'queued' }),
+    }),
+  });
+
+  const handler = createRpcHandler({
+    plugins: [tinaCloud({ clientId: 'abc' }), editorialPlugin],
+  });
+
+  const post = (path: string, token?: string) =>
+    handler(
+      new Request(`http://tina.local/api/tina${path}`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          ...(token ? { authorization: `Bearer ${token}` } : {}),
+        },
+      })
+    );
+
+  it('authenticates RPC requests through TinaCloud', async () => {
+    stubTinaCloud();
+    expect((await post('/editorial/publish')).status).toBe(401);
+    const response = await post('/editorial/publish', 'id-token');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toBe('queued');
+  });
+
+  it('does not route getSession as an operation', async () => {
+    stubTinaCloud();
+    for (const namespace of ['auth', 'media', 'content']) {
+      expect((await post(`/${namespace}/getSession`, 'id-token')).status).toBe(
+        404
+      );
+    }
   });
 });
