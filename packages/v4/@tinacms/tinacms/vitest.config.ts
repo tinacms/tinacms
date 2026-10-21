@@ -8,11 +8,7 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     testTimeout: 30_000,
-    poolOptions: {
-      forks: {
-        execArgv: ['--no-experimental-webstorage'],
-      },
-    },
+    execArgv: ['--no-experimental-webstorage'],
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     coverage: {
