@@ -17,7 +17,6 @@
   },
   "exports": {
     "./globals.css": "./src/styles/globals.css",
-    "./tokens.css": "./src/styles/tokens.css",
     "./components/*": {
       "types": "./src/components/*.tsx",
       "default": "./src/components/*.tsx"
