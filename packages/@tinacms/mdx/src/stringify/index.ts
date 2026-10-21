@@ -145,6 +145,9 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
       gfmToMarkdown(),
     ],
     listItemIndent: 'one',
+    // Setting these replaces the `<!---->` separator between same-kind lists, which MDX rejects.
+    bulletOther: '-',
+    bulletOrderedOther: ')',
     handlers,
   });
 };
