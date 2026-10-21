@@ -17,6 +17,7 @@
   },
   "exports": {
     "./globals.css": "./src/styles/globals.css",
+    "./assets/*": "./src/assets/*",
     "./components/*": {
       "types": "./src/components/*.tsx",
       "default": "./src/components/*.tsx"
