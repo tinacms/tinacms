@@ -239,6 +239,23 @@ describe('update', () => {
     expect(saved.document.title).toBe('Fixed');
   });
 
+  it('matches a save to the collection that owns the file', async () => {
+    const nested = createLocalDataLayer({
+      rootDir,
+      collections: [
+        { name: 'site', path: 'content', format: 'mdx', fields: [] },
+        { name: 'post', path: 'content/posts', format: 'mdx', fields: [] },
+      ],
+    });
+    const file = path.join(rootDir, 'content/posts/claimed.mdx');
+    await expect(
+      nested.update('site', 'content/posts/claimed.mdx', { title: 'x' })
+    ).rejects.toThrow(/belongs to collection "post"/);
+    await expect(fs.access(file)).rejects.toThrow();
+    await nested.update('post', 'content/posts/claimed.mdx', { title: 'x' });
+    await expect(fs.access(file)).resolves.toBeUndefined();
+  });
+
   it('names the document when the value itself cannot be written', async () => {
     await expect(
       dataLayer.update('post', 'content/posts/hello.mdx', {

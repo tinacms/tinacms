@@ -1,17 +1,15 @@
 import { z } from 'zod';
 import type { Session } from '../auth/contract';
-import type {
-  ContentSaveInput,
-  ContentSaveResult,
-  DocumentEntry,
+import {
+  type ContentSaveInput,
+  type ContentSaveResult,
+  type DocumentEntry,
+  InvalidSaveInputError,
 } from '../content/contract';
-import { errorResponse } from '../../rpc/error-response';
 import { invariant } from '../invariant';
-import { RequestBodyTooLargeError } from '../request-body';
 import type { PluginManifest, ResolvedServerSegment } from '../plugin';
 import type { CollectionSchema, HookRef } from '../schema/types';
 import {
-  HookRejectedError,
   type ServerFormHooks,
   type ServerHookFactory,
   type ServerHookScope,
@@ -95,43 +93,21 @@ export interface ServerSaveConfig {
   // server hook is installed.
   collections: readonly CollectionSchema[] | undefined;
   write: (input: ContentSaveInput) => Promise<unknown>;
+  resolveBranch?: (branch: string | undefined) => Promise<string | undefined>;
 }
-
-export class InvalidSaveInputError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'InvalidSaveInputError';
-  }
-}
-
-// The response for a failed save. A failure with no known cause keeps its
-// message out of the body and in the server log under `label`.
-export const toSaveErrorResponse = (
-  cause: unknown,
-  label: string
-): Response => {
-  if (cause instanceof HookRejectedError) {
-    return errorResponse(422, 'hook-rejected', cause.message);
-  }
-  if (cause instanceof InvalidSaveInputError) {
-    return errorResponse(400, 'invalid-input', cause.message);
-  }
-  if (cause instanceof RequestBodyTooLargeError) {
-    return errorResponse(413, 'body-too-large', cause.message);
-  }
-  console.error(`[tinacms] ${label} failed:`, cause);
-  return errorResponse(500, 'op-failed', 'Operation failed.');
-};
 
 export type ServerSave = (
   input: unknown,
   session: Session | null
 ) => Promise<ContentSaveResult>;
 
-// beforeSave pipeline → the provider's write → every afterSave. An afterSave
-// failure is logged, and the save stands with a warning that names the hook.
 export const createServerSave =
-  ({ hooks, collections, write }: ServerSaveConfig): ServerSave =>
+  ({
+    hooks,
+    collections,
+    write,
+    resolveBranch,
+  }: ServerSaveConfig): ServerSave =>
   async (input, session) => {
     const parsed = contentSaveInputSchema.safeParse(input);
     if (!parsed.success) {
@@ -151,8 +127,11 @@ export const createServerSave =
     const resolved = collection
       ? resolveServerHooks(hooks, collection.hooks ?? [])
       : [];
+    const branch = resolveBranch
+      ? await resolveBranch(save.branch)
+      : save.branch;
     const scope: ServerHookScope | null = collection
-      ? { path: save.path, collection, session, branch: save.branch }
+      ? { path: save.path, collection, session, branch }
       : null;
     const value = scope
       ? await runBeforeSave(
@@ -166,7 +145,7 @@ export const createServerSave =
         collection: save.collection,
         path: save.path,
         value,
-        branch: save.branch,
+        branch,
       })
     );
     const entry: DocumentEntry = {

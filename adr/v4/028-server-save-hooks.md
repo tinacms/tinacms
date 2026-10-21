@@ -35,7 +35,7 @@ export default defineServerHook(() => ({
 }));
 ```
 
-A server hook receives `{ path, collection, session, branch }` (ADR-025 §7). `session` is the saving user's **Session**, or `null` without an auth plugin. `branch` is `undefined` on the default branch.
+A server hook receives `{ path, collection, session, branch }` (ADR-025 §7). `session` is the saving user's **Session**, or `null` without an auth plugin. `branch` is the branch the provider writes to: `tinaCloud()` resolves the project's default branch when the caller sends none. It is `undefined` on a Data Layer with no branches, such as the Local Data Layer.
 
 ### 2. Server-hooked saves go through the Backend
 A **server-hooked collection** lists at least one hook with a server side. A save to it takes this path:
@@ -65,7 +65,9 @@ At compose time, core wraps the `content` provider's server `update` op with the
 
 The op requires the `content:save` permission (ADR-008, ADR-014 §4). The default `editor` role holds it, so editors can save server-hooked collections (ADR-008 §5).
 
-The provider's `update` takes only its input, as every op does. It reads the request through `requestContext()` from `tinacms/server`, which returns `{ request, session, authProvider }` for the op that is running, the way `use()` returns another capability. `tinaCloud()` uses the request to write with the token of the editor who saved.
+The provider's `update` takes only its input, as every op does. It reads the request through `requestContext()` from `tinacms/server`, which returns `{ request, session, authProvider }` for the op that is running, the way `use()` returns another capability. `tinaCloud()` uses the request to write with the token of the editor who saved. The accessor lives in a module that imports no node module, because a lazy `server` loader still lands in a browser build, and a `node:async_hooks` import there fails the barebones admin build.
+
+A write that does not go through an RPC op, such as a webhook or a script that calls the provider directly, runs no hooks.
 
 To find a collection's hooks, the RPC handler needs the config's `schema` (`mountHandler(config)`). `schema` is optional until a plugin registers a server hook. After that, a handler without it fails when it composes, on its first request.
 

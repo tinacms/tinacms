@@ -8,13 +8,12 @@ import type { Session } from '../../../../core/auth/contract';
 import {
   CONTENT_SAVE_PERMISSION,
   DEFAULT_CONTENT_URL,
+  InvalidSaveInputError,
 } from '../../../../core/content/contract';
 import {
-  InvalidSaveInputError,
   type ServerSave,
   createServerHookRegistry,
   createServerSave,
-  toSaveErrorResponse,
 } from '../../../../core/form/server-hooks';
 import { invariant } from '../../../../core/invariant';
 import { capabilityProvider } from '../../../../core/mount';
@@ -30,7 +29,7 @@ import {
 } from '../../../../core/request-body';
 import { AUTH_CAPABILITY, type PluginManifest } from '../../../../core/plugin';
 import { resolveServerSegments } from '../../../../core/resolve';
-import { errorResponse } from '../../../../rpc/error-response';
+import { errorResponse, toErrorResponse } from '../../../../rpc/error-response';
 import { createRequestAuthorizer } from '../../../../rpc/handler';
 import { DEFAULT_RPC_URL } from '../../../../rpc/proxy';
 import {
@@ -225,7 +224,7 @@ const createServerSaveHandler = (
       const save = await loadServerSave();
       return Response.json(await save(input, session));
     } catch (cause) {
-      return toSaveErrorResponse(cause, 'Local content/update');
+      return toErrorResponse(cause, 'Local content/update');
     }
   };
   return async (req, res) => {
@@ -432,7 +431,7 @@ export const tinaLocalDataLayerVitePlugin = (
       const { entry } = await (await loadServerSave())(request, session);
       return Response.json(entry);
     } catch (cause) {
-      return toSaveErrorResponse(cause, 'Local content update');
+      return toErrorResponse(cause, 'Local content update');
     }
   };
 

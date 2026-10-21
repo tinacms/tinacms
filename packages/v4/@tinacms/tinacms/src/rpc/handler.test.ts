@@ -693,7 +693,12 @@ describe('createRpcHandler content saves with server hooks', () => {
           name: 'test:cloud',
           provides: ['content', 'media', 'auth'],
           server: async () => ({
-            default: defineServerPlugin({ getSession, update }),
+            default: defineServerPlugin({
+              getSession,
+              update,
+              resolveBranch: async (branch: string | undefined) =>
+                branch ?? 'main',
+            }),
           }),
         }),
         hooksPlugin,
@@ -897,7 +902,11 @@ describe('createRpcHandler content saves with server hooks', () => {
 
   it('never routes the reserved hooks key of a server segment', async () => {
     const { handler } = saving([]);
-    for (const path of ['/content/hooks', '/test:hooks/hooks']) {
+    for (const path of [
+      '/content/hooks',
+      '/test:hooks/hooks',
+      '/content/resolveBranch',
+    ]) {
       const response = await handler(post(path, { token: 'admin-token' }));
       expect(response.status).toBe(404);
     }

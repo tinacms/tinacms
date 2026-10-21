@@ -7,9 +7,9 @@ import type { TinaSchema } from '../config';
 import { CONTENT_SAVE_PERMISSION } from '../core/content/contract';
 import {
   type ServerHookRegistry,
+  type ServerSaveConfig,
   createServerHookRegistry,
   createServerSave,
-  toSaveErrorResponse,
 } from '../core/form/server-hooks';
 import { invariant } from '../core/invariant';
 import { capabilityMountsFor, capabilityProvider } from '../core/mount';
@@ -29,6 +29,7 @@ import {
   DEFAULT_ROLE_PERMISSIONS,
   type ResolvedServerSegment,
   type ServerOp,
+  type ServerSegment,
   type ServerRuntime,
   type Session,
   opMeta,
@@ -37,7 +38,7 @@ import {
   requestContextStorage,
   serverRuntimeStorage,
 } from '../server';
-import { errorResponse } from './error-response';
+import { errorResponse, toErrorResponse } from './error-response';
 
 export type RpcHandler = ((request: Request) => Promise<Response>) & {
   // Tear the composed plugins down. A host that replaces a handler instead of ending
@@ -136,10 +137,19 @@ export const createRpcHandler = ({
 
 const composeServerSegments = async (
   plugins: PluginManifest[]
-): Promise<Omit<ServerRuntime, 'destroy'> & { hooks: ServerHookRegistry }> => {
+): Promise<
+  Omit<ServerRuntime, 'destroy'> & {
+    hooks: ServerHookRegistry;
+    resolveBranch: ServerSegment['resolveBranch'];
+  }
+> => {
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
   const hooks = createServerHookRegistry(plugins, resolved);
+  const contentProvider = capabilityProvider(plugins, 'content');
+  const resolveBranch = resolved.find(
+    ({ manifest }) => manifest === contentProvider
+  )?.ops.resolveBranch;
   const segmentsByNamespace = composeOverridableRegistry(
     resolved.flatMap((segment) =>
       capabilityMountsFor(segment.manifest).map((mount) => ({
@@ -150,9 +160,10 @@ const composeServerSegments = async (
     ),
     serverConflictError
   );
-  claimServerHookFactories(segmentsByNamespace);
+  claimReservedKeys(segmentsByNamespace);
   return {
     hooks,
+    resolveBranch,
     segmentsByNamespace,
     authHooks: claimAuthTransportHooks(
       segmentsByNamespace,
@@ -166,7 +177,8 @@ const composeServerRuntime = async (
   plugins: PluginManifest[],
   schema: TinaSchema | undefined
 ): Promise<ServerRuntime> => {
-  const { hooks, ...composed } = await composeServerSegments(plugins);
+  const { hooks, resolveBranch, ...composed } =
+    await composeServerSegments(plugins);
   invariant(
     hooks.size === 0 || schema,
     'rpc-server-hooks-no-schema',
@@ -176,8 +188,7 @@ const composeServerRuntime = async (
   wrapContentSave(
     composed.segmentsByNamespace,
     capabilityProvider(plugins, 'content'),
-    hooks,
-    schema
+    { hooks, collections: schema?.collections, resolveBranch }
   );
   // The init runs last, so a failed composition leaves no initialized plugin behind
   // for the next attempt. The teardown travels on the runtime: a handler that is
@@ -209,12 +220,12 @@ export const createRequestAuthorizer = (plugins: PluginManifest[]) => {
   };
 };
 
-// The reserved `hooks` key holds server hook factories, not an op, so it never routes.
-const claimServerHookFactories = (
+// The reserved keys hold core's own inputs, not ops, so they never route.
+const claimReservedKeys = (
   segmentsByNamespace: Map<string, ResolvedServerSegment>
 ): void => {
   for (const [namespace, segment] of segmentsByNamespace) {
-    const { hooks, ...routableOps } = segment.ops;
+    const { hooks, resolveBranch, ...routableOps } = segment.ops;
     segmentsByNamespace.set(namespace, { ...segment, ops: routableOps });
   }
 };
@@ -225,8 +236,7 @@ const claimServerHookFactories = (
 const wrapContentSave = (
   segmentsByNamespace: Map<string, ResolvedServerSegment>,
   contentProvider: PluginManifest | undefined,
-  hooks: ServerHookRegistry,
-  schema: TinaSchema | undefined
+  saveConfig: Omit<ServerSaveConfig, 'write'>
 ): void => {
   for (const [namespace, segment] of segmentsByNamespace) {
     const { update, ...otherOps } = segment.ops;
@@ -236,8 +246,7 @@ const wrapContentSave = (
       continue;
     }
     const save = createServerSave({
-      hooks,
-      collections: schema?.collections,
+      ...saveConfig,
       write: (input) => invokeOp(update, input),
     });
     segmentsByNamespace.set(namespace, {
@@ -361,7 +370,7 @@ const dispatch = async (
       authorizeAndInvokeOp(runtime, request, namespace, opName)
     );
   } catch (cause) {
-    return toSaveErrorResponse(cause, `RPC op "${namespace}/${opName}"`);
+    return toErrorResponse(cause, `RPC op "${namespace}/${opName}"`);
   }
 };
 

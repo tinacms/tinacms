@@ -279,8 +279,9 @@ never loads it.
 A server hook receives `{ path, collection, session, branch }`. It has no
 `formId`, because a server save has no form. `session` is the saving user's
 `Session`, or `null` when no auth plugin verifies the request. `branch` is the
-branch the editor picked, or `undefined` on the default branch and on a Data
-Layer with no branches.
+branch the provider writes to. `tinaCloud()` gives the project's default
+branch when the editor picked none. A Data Layer with no branches, such as the
+local one, gives `undefined`.
 
 A save to a collection that lists a hook with a server side goes to the
 `content/update` op of the site's server. That op verifies the session, runs

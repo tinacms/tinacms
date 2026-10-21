@@ -1,9 +1,10 @@
 import type { Dirent } from 'node:fs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import type {
-  ContentProvider,
-  DocumentSummary,
+import {
+  type ContentProvider,
+  ContentWriteError,
+  type DocumentSummary,
 } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
 import type { CollectionSchema } from '../../../../core/schema/types';
@@ -149,6 +150,14 @@ export const createLocalDataLayer = (
     return { absolute, adapter };
   };
 
+  // Collection folders can nest, so a file belongs to the deepest one.
+  const ownerOf = (absolute: string): ResolvedCollection | undefined =>
+    [...collections.values()]
+      .filter(({ absoluteFolder }) =>
+        absolute.startsWith(absoluteFolder + path.sep)
+      )
+      .sort((a, b) => b.absoluteFolder.length - a.absoluteFolder.length)[0];
+
   const documentIdFor = (absolute: string): string =>
     path.relative(rootDir, absolute).split(path.sep).join('/');
 
@@ -232,6 +241,12 @@ export const createLocalDataLayer = (
         documentPath
       );
       const canonicalPath = documentIdFor(absolute);
+      const owner = ownerOf(absolute);
+      if (owner !== collection) {
+        throw new ContentWriteError(
+          `Cannot save "${canonicalPath}" in collection "${collection.schema.name}": the file belongs to collection "${owner?.schema.name}".`
+        );
+      }
       return afterPendingSaves(canonicalPath, async () => {
         let previousRaw: string | undefined;
         try {
@@ -254,7 +269,7 @@ export const createLocalDataLayer = (
           } else {
             reason = String(cause);
           }
-          throw new Error(
+          throw new ContentWriteError(
             isUnparsable(adapter, previousRaw, collection.bodyField)
               ? `Cannot save "${canonicalPath}": the contents of the file on disk could not be parsed (${reason}). Repair the file, then save again.`
               : `Cannot save "${canonicalPath}": ${reason}`

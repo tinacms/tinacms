@@ -120,8 +120,8 @@ const toServerSaveError = (cause: unknown): ContentError => {
     }
     return new ContentError('backend-failure', String(cause));
   }
-  if (cause.code === 'hook-rejected') {
-    return new ContentError('hook-rejected', cause.message);
+  if (cause.code === 'hook-rejected' || cause.code === 'write-refused') {
+    return new ContentError(cause.code, cause.message);
   }
   if (
     cause.status === 404 ||

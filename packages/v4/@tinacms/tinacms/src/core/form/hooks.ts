@@ -45,8 +45,8 @@ export type FormHookFactory = (...args: JsonValue[]) => FormHooks;
 export type FormHookRegistry = ReadonlyMap<string, FormHookFactory>;
 
 // A server hook has no form, so its scope has no `formId`. `session` is null
-// when no auth plugin verifies the request. `branch` is undefined on the
-// default branch, and on a Data Layer that has no branches.
+// when no auth plugin verifies the request. `branch` is the branch the provider
+// writes to, or undefined on a Data Layer that has no branches.
 export interface ServerHookScope {
   path: string;
   collection: CollectionSchema;

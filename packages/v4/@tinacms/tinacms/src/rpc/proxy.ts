@@ -5,12 +5,12 @@
 
 export const DEFAULT_RPC_URL = '/api/tina';
 
-// `hooks` is the reserved server-hook key of a segment, which never routes.
+// `hooks` and `resolveBranch` are reserved keys of a segment, which never route.
 export type RpcProxy<TSegments> = {
   [Namespace in keyof TSegments]: {
     [Op in Exclude<
       keyof TSegments[Namespace],
-      'hooks'
+      'hooks' | 'resolveBranch'
     >]: TSegments[Namespace][Op] extends (
       ...args: infer TArgs
     ) => Promise<infer TResult>

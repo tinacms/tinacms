@@ -102,6 +102,11 @@ export interface ServerSegment {
    * `serverHooks`. Reserved: it is never routed as an op.
    */
   hooks?: Record<string, ServerHookFactory>;
+  /**
+   * On a `content` provider: the branch a save writes to, given the branch the
+   * caller sent. Reserved: it is never routed as an op.
+   */
+  resolveBranch?: (branch: string | undefined) => Promise<string | undefined>;
 }
 
 export interface ResolvedServerSegment {

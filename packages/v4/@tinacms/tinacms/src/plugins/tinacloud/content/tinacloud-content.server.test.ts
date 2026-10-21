@@ -59,25 +59,26 @@ const stubTinaCloud = () => {
   return fetchMock;
 };
 
+const saveRequest = (value: Record<string, unknown>) =>
+  new Request('http://tina.local/api/tina/content/update', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: 'Bearer id-token',
+    },
+    body: JSON.stringify({
+      collection: 'post',
+      path: 'content/posts/a.mdx',
+      value,
+    }),
+  });
+
 afterEach(() => vi.unstubAllGlobals());
 
 describe('tinaCloud() content/update on the site server', () => {
   it('verifies the session, runs the server hook, then writes the result with the editor token', async () => {
     const fetchMock = stubTinaCloud();
-    const response = await handler(
-      new Request('http://tina.local/api/tina/content/update', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          authorization: 'Bearer id-token',
-        },
-        body: JSON.stringify({
-          collection: 'post',
-          path: 'content/posts/a.mdx',
-          value: { title: 'hi' },
-        }),
-      })
-    );
+    const response = await handler(saveRequest({ title: 'hi' }));
 
     expect(response.status).toBe(200);
     const write = fetchMock.mock.calls.find(
@@ -97,6 +98,35 @@ describe('tinaCloud() content/update on the site server', () => {
       },
       hookWarnings: [],
     });
+  });
+
+  it('hands the hook the default branch when the save names none', async () => {
+    stubTinaCloud();
+    const seen = vi.fn();
+    const probe = defineHook('branchProbe', {
+      server: async () => ({
+        default: defineServerHook(() => ({
+          beforeSave: (document, { branch }) => {
+            seen(branch);
+            return document;
+          },
+        })),
+      }),
+    });
+    const probing = createRpcHandler({
+      plugins: [
+        tinaCloud({ clientId: 'abc' }),
+        defineHooksPlugin('test:branch', [probe]),
+      ],
+      schema: {
+        collections: [
+          { name: 'post', format: 'mdx', fields: [], hooks: [probe()] },
+        ],
+      },
+    });
+    const response = await probing(saveRequest({ title: 'hi' }));
+    expect(response.status).toBe(200);
+    expect(seen).toHaveBeenCalledWith('main');
   });
 
   it('needs tinaCloud() as the auth provider for its content write', async () => {

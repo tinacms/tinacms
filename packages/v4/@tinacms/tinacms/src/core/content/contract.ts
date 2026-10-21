@@ -24,7 +24,13 @@ const CONTENT_ERROR_MESSAGES = {
   'hook-rejected': 'A save hook rejected this save.',
   'server-route-missing':
     "This collection has server hooks, so it needs the site's server route.",
+  'write-refused': 'The content server refused this save.',
 } satisfies Record<string, string>;
+
+const CODES_WITH_OWN_MESSAGE: ReadonlySet<string> = new Set([
+  'hook-rejected',
+  'write-refused',
+]);
 
 export type ContentErrorCode = keyof typeof CONTENT_ERROR_MESSAGES;
 
@@ -32,7 +38,8 @@ export type ContentFieldErrors = Partial<Record<FieldAddress, string[]>>;
 
 /**
  * `message` is the sentence to show the user; `detail` is the technical reason.
- * A `hook-rejected` error shows its `detail`, the message the hook rejected with.
+ * A `hook-rejected` or `write-refused` error shows its `detail`, the message
+ * the server sent.
  */
 export class ContentError extends Error {
   readonly code: ContentErrorCode;
@@ -45,7 +52,9 @@ export class ContentError extends Error {
     fieldErrors?: ContentFieldErrors
   ) {
     super(
-      code === 'hook-rejected' && detail ? detail : CONTENT_ERROR_MESSAGES[code]
+      CODES_WITH_OWN_MESSAGE.has(code) && detail
+        ? detail
+        : CONTENT_ERROR_MESSAGES[code]
     );
     this.name = 'ContentError';
     this.code = code;
@@ -69,7 +78,6 @@ export type ContentSlice = ContentProvider;
 
 export const CONTENT_SAVE_PERMISSION = 'content:save';
 
-// The save that goes through the site's server, for a collection with a server hook.
 export interface ContentSaveInput {
   collection: string;
   path: string;
@@ -80,6 +88,22 @@ export interface ContentSaveInput {
 export interface ContentSaveResult {
   entry: DocumentEntry;
   hookWarnings: string[];
+}
+
+export class InvalidSaveInputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidSaveInputError';
+  }
+}
+
+// A write the Data Layer refuses for a reason the editor can act on. Its message
+// reaches the editor.
+export class ContentWriteError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ContentWriteError';
+  }
 }
 
 export const DEFAULT_CONTENT_URL = '/api/tina/content';

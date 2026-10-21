@@ -447,6 +447,28 @@ describe('local Data Layer updates', () => {
     consoleError.mockRestore();
   });
 
+  it('answers a refused write with 400 and its message on both routes', async () => {
+    await fs.writeFile(
+      path.join(rootDir, 'content/posts/a.mdx'),
+      '---\ntitle: [unclosed\nother: "x\n---\nbody\n'
+    );
+    const routes = routesWith([]);
+    const responses = [
+      await call(routes, '/api/tina/content/update', update({ title: 'A' })),
+      await call(
+        routes,
+        DEFAULT_CONTENT_URL,
+        JSON.stringify({ op: 'update', ...JSON.parse(update({ title: 'A' })) })
+      ),
+    ];
+    for (const res of responses) {
+      expect(res.statusCode).toBe(400);
+      const { error } = JSON.parse(res.body);
+      expect(error.code).toBe('write-refused');
+      expect(error.message).toMatch(/Repair the file, then save again\./);
+    }
+  });
+
   it('answers 413 for a content/update body over the size limit', async () => {
     const res = await call(
       routesWith([]),
