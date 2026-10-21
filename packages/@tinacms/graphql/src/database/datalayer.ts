@@ -12,7 +12,12 @@ import {
   Level,
   SUBLEVEL_OPTIONS,
 } from './level';
-import type { Collection } from '@tinacms/schema-tools';
+import type {
+  Collectable,
+  Collection,
+  TinaSchema,
+} from '@tinacms/schema-tools';
+import { encodeLocator, visitReferences } from '../references/visit';
 import path from 'path';
 import { normalizePath } from './util';
 
@@ -829,60 +834,50 @@ export const makeIndexOpsForDocument = <T extends object>(
 
 export const makeRefOpsForDocument = <T extends object>(
   filepath: string,
-  collection: string | undefined,
-  references: Record<string, string[]> | undefined | null,
+  collectionName: string | undefined,
+  tinaSchema: TinaSchema | undefined,
   data: T,
   opType: 'put' | 'del',
   level: Level
 ): BatchOp[] => {
   const result: BatchOp[] = [];
+  if (!collectionName || !tinaSchema) {
+    return result;
+  }
 
-  if (collection) {
-    for (const [c, referencePaths] of Object.entries(references || {})) {
-      if (!referencePaths.length) {
-        continue;
-      }
-      const collectionSublevel = level.sublevel(c, SUBLEVEL_OPTIONS);
-      const refSublevel = collectionSublevel.sublevel(
-        REFS_COLLECTIONS_SORT_KEY,
-        SUBLEVEL_OPTIONS
-      );
-      const references: Record<string, string[]> = {};
-      for (const path of referencePaths) {
-        const ref = JSONPath({ path, json: data });
-        if (!ref) {
-          continue;
-        }
-        if (Array.isArray(ref)) {
-          for (const r of ref) {
-            if (!r) {
-              continue;
-            }
-            if (references[r]) {
-              references[r].push(path);
-            } else {
-              references[r] = [path];
-            }
-          }
-        } else {
-          if (references[ref]) {
-            references[ref].push(path);
-          } else {
-            references[ref] = [path];
-          }
-        }
-      }
+  let collection: Collectable;
+  try {
+    collection = tinaSchema.getCollection(collectionName);
+  } catch {
+    return result;
+  }
 
-      for (const ref of Object.keys(references)) {
-        for (const path of references[ref]) {
-          result.push({
-            type: opType,
-            key: `${ref}${INDEX_KEY_FIELD_SEPARATOR}${path}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`,
-            sublevel: refSublevel,
-            value: opType === 'put' ? ({} as T) : undefined,
-          });
-        }
+  const byCollection = new Map<string, { ref: string; locator: string }[]>();
+  visitReferences(
+    data as Record<string, unknown>,
+    collection,
+    tinaSchema,
+    ({ value, collections, locator }) => {
+      const encoded = encodeLocator(locator);
+      for (const target of collections) {
+        const entries = byCollection.get(target) ?? [];
+        entries.push({ ref: value, locator: encoded });
+        byCollection.set(target, entries);
       }
+    }
+  );
+
+  for (const [target, entries] of byCollection) {
+    const refSublevel = level
+      .sublevel(target, SUBLEVEL_OPTIONS)
+      .sublevel(REFS_COLLECTIONS_SORT_KEY, SUBLEVEL_OPTIONS);
+    for (const { ref, locator } of entries) {
+      result.push({
+        type: opType,
+        key: `${ref}${INDEX_KEY_FIELD_SEPARATOR}${locator}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`,
+        sublevel: refSublevel,
+        value: opType === 'put' ? ({} as T) : undefined,
+      });
     }
   }
   return result;

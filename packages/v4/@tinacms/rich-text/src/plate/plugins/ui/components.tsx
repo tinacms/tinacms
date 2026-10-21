@@ -48,6 +48,7 @@ import {
 } from '../../components/plate-ui/table/table-cell-element';
 import { TableElement } from '../../components/plate-ui/table/table-element';
 import { TableRowElement } from '../../components/plate-ui/table/table-row-element';
+import { TextColorPlugin } from '../text-color-plugin';
 import { classNames } from './helpers';
 
 const blockClasses = 'mt-0.5';
@@ -61,21 +62,101 @@ function getContrastColor(color: string): string {
   return luminance > 0.5 ? '#000000' : '#ffffff';
 }
 
+// Mirrors `isSafeCssColor` in @tinacms/mdx (src/sanitize-css-color.ts); this
+// package keeps a copy so it doesn't depend on @tinacms/mdx.
+const COLOR_FUNCTIONS = new Set([
+  'rgb',
+  'rgba',
+  'hsl',
+  'hsla',
+  'hwb',
+  'lab',
+  'lch',
+  'oklab',
+  'oklch',
+  'color',
+  'color-mix',
+  'light-dark',
+  'calc',
+  'var',
+]);
+
+const isSafeColorFunction = (value: string) => {
+  if (!/^[a-z-]+\([a-z0-9_.,%/#() +-]*\)$/i.test(value)) {
+    return false;
+  }
+  let depth = 0;
+  for (const [token, name = ''] of value.matchAll(/([a-z-]*)\(|\)/gi)) {
+    if (token === ')') {
+      depth--;
+    } else if (COLOR_FUNCTIONS.has(name.toLowerCase())) {
+      depth++;
+    } else {
+      return false;
+    }
+    if (depth < 0) {
+      return false;
+    }
+  }
+  return depth === 0;
+};
+
+/** True when `value` is a plain CSS colour that's safe to put in a `style`. */
+export const isSafeCssColor = (value: string) => {
+  const trimmed = value.trim();
+  const color = trimmed.toLowerCase().endsWith('!important')
+    ? trimmed.slice(0, -'!important'.length).trimEnd()
+    : trimmed;
+  return (
+    /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(color) ||
+    /^[a-z]+$/i.test(color) ||
+    isSafeColorFunction(color)
+  );
+};
+
+/**
+ * Reads a colour leaf prop (leaf props are untyped in Plate), dropping values
+ * that aren't a plain CSS colour so pasted/loaded content can't inject CSS.
+ */
+const leafColor = (value: unknown) =>
+  typeof value === 'string' && isSafeCssColor(value) ? value : undefined;
+
+// Bold/italic/etc. nested inside a colour leaf get their colour from the
+// editor's prose styles; make them inherit the leaf's colour instead.
+const INHERIT_NESTED_COLOR =
+  '[&_strong]:text-inherit [&_em]:text-inherit [&_s]:text-inherit [&_u]:text-inherit';
+
 const HighlightLeaf = ({
   leaf,
   ...props
 }: React.ComponentProps<typeof PlateLeaf>) => {
-  const backgroundColor = (leaf.highlightColor as string) || '#FEF08A';
+  const backgroundColor = leafColor(leaf.highlightColor) ?? '#FEF08A';
+  // An explicit text colour wins over the auto-contrast colour, so the
+  // result doesn't depend on which leaf Plate nests outermost.
+  const color = leafColor(leaf.textColor) ?? getContrastColor(backgroundColor);
   return (
     <PlateLeaf
       as='mark'
-      className='rounded-sm'
-      style={{ backgroundColor, color: getContrastColor(backgroundColor) }}
+      className={`rounded-sm ${INHERIT_NESTED_COLOR}`}
+      style={{ backgroundColor, color }}
       leaf={leaf}
       {...props}
     />
   );
 };
+
+const TextColorLeaf = ({
+  leaf,
+  ...props
+}: React.ComponentProps<typeof PlateLeaf>) => (
+  <PlateLeaf
+    as='span'
+    className={INHERIT_NESTED_COLOR}
+    style={{ color: leafColor(leaf.textColor) }}
+    leaf={leaf}
+    {...props}
+  />
+);
 
 type HeadingComponentProps = {
   attributes: React.HTMLAttributes<HTMLHeadingElement>;
@@ -246,6 +327,7 @@ export const Components = () => {
     [LinkPlugin.key]: LinkElement,
     [CodePlugin.key]: CodeLeaf,
     [HighlightPlugin.key]: HighlightLeaf,
+    [TextColorPlugin.key]: TextColorLeaf,
     [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
     [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
     [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),

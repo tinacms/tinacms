@@ -20,6 +20,7 @@ import {
   startTransition,
   use,
   useEffect,
+  useId,
   useRef,
   useState,
 } from 'react';
@@ -27,7 +28,11 @@ import { HashRouter } from 'react-router-dom';
 import type { ResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
-import type { GlobalNavEntry, NavTarget } from '../core/slot/contract';
+import type {
+  GlobalNavEntry,
+  GlobalNavSection,
+  NavTarget,
+} from '../core/slot/contract';
 import { useCollectionDocuments, useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
@@ -132,14 +137,18 @@ function DocumentMenu({
   );
 }
 
-function GlobalNav({
+function GlobalNavMenu({
   entries,
   activeScreen,
   navigate,
+  label,
+  labelledBy,
 }: {
   entries: GlobalNavEntry[];
   activeScreen?: string;
   navigate: (route: AdminRoute) => void;
+  label?: string;
+  labelledBy?: string;
 }) {
   const open = (target: NavTarget) => {
     if (target.kind === 'screen') {
@@ -149,7 +158,7 @@ function GlobalNav({
     }
   };
   return (
-    <SidebarMenu aria-label='Global navigation'>
+    <SidebarMenu aria-label={label} aria-labelledby={labelledBy}>
       {entries.map(({ label, icon: Icon, target }, index) => (
         <SidebarMenuItem key={`${index}:${label}`}>
           <SidebarMenuButton
@@ -174,6 +183,36 @@ function GlobalNav({
       ))}
     </SidebarMenu>
   );
+}
+
+function GlobalNav({
+  sections,
+  activeScreen,
+  navigate,
+}: {
+  sections: GlobalNavSection[];
+  activeScreen?: string;
+  navigate: (route: AdminRoute) => void;
+}) {
+  const labelPrefix = useId();
+  const firstUngrouped = sections.findIndex(({ group }) => !group);
+  return sections.map(({ group, entries }, index) => {
+    const labelId = group ? `${labelPrefix}-${index}` : undefined;
+    return (
+      <SidebarGroup key={group ? `group:${group.id}` : `entries:${index}`}>
+        {group ? (
+          <SidebarGroupLabel id={labelId}>{group.label}</SidebarGroupLabel>
+        ) : null}
+        <GlobalNavMenu
+          entries={entries}
+          activeScreen={activeScreen}
+          navigate={navigate}
+          label={index === firstUngrouped ? 'Global navigation' : undefined}
+          labelledBy={labelId}
+        />
+      </SidebarGroup>
+    );
+  });
 }
 
 function ScreenOutlet({
@@ -377,15 +416,11 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
             </SidebarGroup>
           ) : null}
 
-          {globalNav.length > 0 ? (
-            <SidebarGroup>
-              <GlobalNav
-                entries={globalNav}
-                activeScreen={activeScreen?.screen}
-                navigate={navigate}
-              />
-            </SidebarGroup>
-          ) : null}
+          <GlobalNav
+            sections={globalNav}
+            activeScreen={activeScreen?.screen}
+            navigate={navigate}
+          />
         </SidebarContent>
 
         <SidebarFooter>

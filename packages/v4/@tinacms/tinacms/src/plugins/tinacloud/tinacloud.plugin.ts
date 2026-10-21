@@ -16,11 +16,15 @@ export const tinaCloud = (options: TinaCloudOptions): PluginManifest =>
         mediaUrl(options.clientId, undefined, path, size),
     },
     client: async () => {
-      const [{ createTinaCloudAuth }, { createTinaCloudMediaSlice }] =
-        await Promise.all([
-          import('./auth/tinacloud-auth.client'),
-          import('./media/tinacloud-media.client'),
-        ]);
+      const [
+        { createTinaCloudAuth },
+        { createTinaCloudMediaSlice },
+        { tinaCloudNav },
+      ] = await Promise.all([
+        import('./auth/tinacloud-auth.client'),
+        import('./media/tinacloud-media.client'),
+        import('./nav/tinacloud-nav.client'),
+      ]);
       const auth = createTinaCloudAuth(options);
       return {
         default: {
@@ -31,6 +35,7 @@ export const tinaCloud = (options: TinaCloudOptions): PluginManifest =>
               getToken: auth.tinaCloudToken,
             }),
           },
+          slots: tinaCloudNav(options.clientId),
         },
       };
     },
