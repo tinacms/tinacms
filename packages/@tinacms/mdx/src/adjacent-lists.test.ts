@@ -61,8 +61,39 @@ describe('adjacent lists in an mdx field', () => {
       props: { children: root(ul('A'), ul('B')) },
       children: [{ type: 'text', text: '' }],
     };
-    expect(serializeMDX(root(embed), templateField, passthrough)).toBe(
-      '<Cta>\n  * A\n\n  - B\n</Cta>\n'
-    );
+    const markdown = serializeMDX(
+      root(embed),
+      templateField,
+      passthrough
+    ) as string;
+    expect(markdown).toBe('<Cta>\n  * A\n\n  - B\n</Cta>\n');
+    const parsed = parseMDX(markdown, templateField, passthrough);
+    expect(parsed.children[0]).toMatchObject({
+      props: { children: { children: [{ type: 'ul' }, { type: 'ul' }] } },
+    });
+  });
+
+  it('separates two lists nested in a list item', () => {
+    const nested = {
+      type: 'ul',
+      children: [
+        {
+          type: 'li',
+          children: [
+            { type: 'lic', children: [{ type: 'text', text: 'A' }] },
+            ul('x'),
+            ul('y'),
+          ],
+        },
+      ],
+    };
+    const { markdown, parsed } = roundTrip(root(nested));
+    expect(markdown).toBe('* A\n  * x\n  - y\n');
+    expect(parsed.children[0]).toMatchObject({
+      children: [
+        { children: [{ type: 'lic' }, { type: 'ul' }, { type: 'ul' }] },
+      ],
+    });
+    expect(serializeMDX(parsed, mdxField, passthrough)).toBe(markdown);
   });
 });

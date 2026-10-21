@@ -145,10 +145,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
       gfmToMarkdown(),
     ],
     listItemIndent: 'one',
-    // Two lists of the same kind in a row would otherwise be separated by
-    // `<!---->`, which MDX rejects: the file failed to parse on its next load
-    // and the whole document fell back to raw text (#5238). The values are the
-    // library's own fallbacks; only their presence turns the comment off.
+    // Setting these replaces the `<!---->` separator between same-kind lists, which MDX rejects.
     bulletOther: '-',
     bulletOrderedOther: ')',
     handlers,
