@@ -647,6 +647,14 @@ export const makeFilterSuffixes = (
       }
     }
 
+    if (orderedFilterChain.length < indexFields.length) {
+      const prefix = baseFragments.join(INDEX_KEY_FIELD_SEPARATOR);
+      return {
+        left: prefix,
+        right: prefix,
+      };
+    }
+
     return {
       left:
         (leftSuffix &&
