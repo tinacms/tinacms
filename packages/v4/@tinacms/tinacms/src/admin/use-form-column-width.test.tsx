@@ -23,12 +23,12 @@ const setViewportWidth = (width: number) => {
 
 const storedWidth = () => localStorage.getItem(STORAGE_KEY);
 
-// happy-dom's Storage cannot undo a vi.spyOn on one of its methods, so the spy
-// would outlive its test. Swapping the global gives unstubAllGlobals a clean undo.
+// happy-dom's Storage cannot undo a vi.spyOn on its methods, so these tests swap the global.
+// The overrides are defined, not assigned, because Storage's set trap drops an assigned one.
 const stubLocalStorage = (overrides: Partial<Storage>) =>
   vi.stubGlobal(
     'localStorage',
-    Object.assign(Object.create(localStorage), overrides)
+    Object.create(localStorage, Object.getOwnPropertyDescriptors(overrides))
   );
 
 function Handle() {
@@ -82,6 +82,7 @@ describe('useFormColumnWidth reading the stored width', () => {
   });
 
   it('uses the default width when storage denies a read', () => {
+    localStorage.setItem(STORAGE_KEY, '600');
     stubLocalStorage({
       getItem: () => {
         throw new Error('storage is not available');
@@ -99,6 +100,7 @@ describe('useFormColumnWidth reading the stored width', () => {
     });
     const { result } = renderHook(() => useFormColumnWidth());
     expect(result.current.width).toBe(DEFAULT_WIDTH);
+    expect(storedWidth()).toBeNull();
   });
 });
 
@@ -306,6 +308,7 @@ describe('useFormColumnWidth stored width survival', () => {
       },
     });
     renderHook(() => useFormColumnWidth());
+    expect(writes).toContain('600');
     expect(writes).not.toContain(String(DEFAULT_WIDTH));
   });
 });
