@@ -71,11 +71,16 @@ function ObjectItems({
   const documentPath = useDocumentPath();
   const formScope = use(FormScopeContext);
   const { control, getValues } = useFormContext();
-  const { fields: items, append, move } = useFieldArray({
+  const {
+    fields: items,
+    append,
+    move,
+  } = useFieldArray({
     control,
     name: address,
   });
-  const removeItem = (index: number) => formScope?.removeListItem(address, index);
+  const removeItem = (index: number) =>
+    formScope?.removeListItem(address, index);
 
   const seed = (template: TemplateSchema | undefined, fields: FieldSchema[]) =>
     ingestDocument(template?.defaultItem ?? {}, fields, {

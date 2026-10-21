@@ -252,9 +252,7 @@ describe('ArrayField add, remove, and reorder', () => {
 
 describe('ArrayField remove with stored objects', () => {
   const OBJECT_PLUGINS = [...PLUGINS, objectFieldPlugin];
-  const peopleCollection = (
-    profileRequired = false
-  ): CollectionSchema => ({
+  const peopleCollection = (profileRequired = false): CollectionSchema => ({
     name: 'person',
     label: 'People',
     format: 'mdx',
@@ -368,11 +366,7 @@ describe('ArrayField remove with stored objects', () => {
       screen.getByRole('button', { name: 'Remove item 1' })
     );
     await userEvent.click(screen.getByText('save'));
-    const alerts = await screen.findAllByRole(
-      'alert',
-      {},
-      { timeout: 5000 }
-    );
+    const alerts = await screen.findAllByRole('alert', {}, { timeout: 5000 });
     expect(
       alerts.some((alert) => alert.textContent?.includes('Bio is required'))
     ).toBe(true);
