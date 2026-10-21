@@ -28,12 +28,16 @@ const CONTENT_ERROR_MESSAGES = {
 } satisfies Record<string, string>;
 
 // The refusals whose message the server writes for the editor.
-export const CONTENT_REFUSAL_CODES = [
-  'hook-rejected',
-  'write-refused',
-] as const;
+export const CONTENT_REFUSALS = {
+  hookRejected: 'hook-rejected',
+  writeRefused: 'write-refused',
+} as const;
 
-export type ContentRefusalCode = (typeof CONTENT_REFUSAL_CODES)[number];
+export type ContentRefusalCode =
+  (typeof CONTENT_REFUSALS)[keyof typeof CONTENT_REFUSALS];
+
+const CONTENT_REFUSAL_CODES: readonly ContentRefusalCode[] =
+  Object.values(CONTENT_REFUSALS);
 
 export const isContentRefusalCode = (
   code: unknown

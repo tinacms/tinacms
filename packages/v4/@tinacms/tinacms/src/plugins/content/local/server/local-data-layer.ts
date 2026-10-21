@@ -77,6 +77,23 @@ const resolveCollections = ({
   return resolved;
 };
 
+const FILE_SYSTEM_REASONS: Record<string, string> = {
+  EACCES: 'permission denied',
+  EPERM: 'permission denied',
+  EROFS: 'the file system is read-only',
+  ENOSPC: 'the disk is full',
+  EISDIR: 'a folder has that name',
+  ENOTDIR: 'a parent of the file is not a folder',
+};
+
+const fileSystemReasonOf = (cause: unknown): string => {
+  if (cause instanceof Error && 'code' in cause) {
+    const reason = FILE_SYSTEM_REASONS[String(cause.code)];
+    if (reason) return reason;
+  }
+  return 'the file system refused the write';
+};
+
 const isUnparsable = (
   adapter: FormatAdapter,
   raw: string | undefined,
@@ -139,20 +156,22 @@ export const createLocalDataLayer = (
       realPathOf(collection.absoluteFolder),
       realPathOf(absolute),
     ]);
-    invariant(
-      absolute.startsWith(collection.absoluteFolder + path.sep) &&
-        realAbsolute.startsWith(realFolder + path.sep),
-      'content-path-outside-collection',
-      `Path "${documentPath}" is outside collection "${collection.schema.name}".`
-    );
+    if (
+      !absolute.startsWith(collection.absoluteFolder + path.sep) ||
+      !realAbsolute.startsWith(realFolder + path.sep)
+    ) {
+      throw new ContentWriteError(
+        `Path "${documentPath}" is outside collection "${collection.schema.name}".`
+      );
+    }
     const adapter = adapterForPath(collection.adapters, absolute);
-    invariant(
-      adapter,
-      'content-path-unknown-format',
-      `Path "${documentPath}" is not a ${collection.adapters
-        .map((each) => each.extension)
-        .join(' or ')} file in collection "${collection.schema.name}".`
-    );
+    if (!adapter) {
+      throw new ContentWriteError(
+        `Path "${documentPath}" is not a ${collection.adapters
+          .map((each) => each.extension)
+          .join(' or ')} file in collection "${collection.schema.name}".`
+      );
+    }
     return { absolute, realAbsolute, adapter };
   };
 
@@ -179,12 +198,21 @@ export const createLocalDataLayer = (
   const documentIdFor = (absolute: string): string =>
     path.relative(rootDir, absolute).split(path.sep).join('/');
 
+  let realRoot: Promise<string> | undefined;
+  const realDocumentIdFor = async (realAbsolute: string): Promise<string> => {
+    realRoot ??= realPathOf(rootDir);
+    return path
+      .relative(await realRoot, realAbsolute)
+      .split(path.sep)
+      .join('/');
+  };
+
   const resolveOwnedPath = async (
     collection: ResolvedCollection,
     documentPath: string
   ) => {
     const resolved = await resolveDocumentPath(collection, documentPath);
-    const canonicalPath = documentIdFor(resolved.absolute);
+    const canonicalPath = await realDocumentIdFor(resolved.realAbsolute);
     const owner = await ownerOf(resolved.realAbsolute);
     if (owner !== collection) {
       throw new ContentWriteError(
@@ -277,16 +305,20 @@ export const createLocalDataLayer = (
 
     async update(collectionName, documentPath, value) {
       const collection = collectionFor(collectionName);
-      const { absolute, adapter, canonicalPath } = await resolveOwnedPath(
+      const { realAbsolute, adapter, canonicalPath } = await resolveOwnedPath(
         collection,
         documentPath
       );
+      const refusedWrite = (cause: unknown) =>
+        new ContentWriteError(
+          `Cannot save "${canonicalPath}": ${fileSystemReasonOf(cause)}.`
+        );
       return afterPendingSaves(canonicalPath, async () => {
         let previousRaw: string | undefined;
         try {
-          previousRaw = await fs.readFile(absolute, 'utf8');
+          previousRaw = await fs.readFile(realAbsolute, 'utf8');
         } catch (cause) {
-          if (!isMissingFileError(cause)) throw cause;
+          if (!isMissingFileError(cause)) throw refusedWrite(cause);
         }
         let raw: string;
         try {
@@ -309,8 +341,12 @@ export const createLocalDataLayer = (
               : `Cannot save "${canonicalPath}": ${reason}`
           );
         }
-        await fs.mkdir(path.dirname(absolute), { recursive: true });
-        await fs.writeFile(absolute, raw);
+        try {
+          await fs.mkdir(path.dirname(realAbsolute), { recursive: true });
+          await fs.writeFile(realAbsolute, raw);
+        } catch (cause) {
+          throw refusedWrite(cause);
+        }
         if (pipeline) {
           try {
             const readyPipeline = await pipeline;

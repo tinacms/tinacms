@@ -503,6 +503,81 @@ describe('local Data Layer updates', () => {
     expect(seenPaths).toHaveBeenCalledWith('content/posts/a.mdx');
   });
 
+  it("gives the hook the real file's path for a save through a link", async () => {
+    const seenPaths = vi.fn();
+    const pathProbe = defineHook('pathProbe', {
+      server: async () => ({
+        default: defineServerHook(() => ({
+          beforeSave: (document, { path: documentPath }) => {
+            seenPaths(documentPath);
+            return document;
+          },
+        })),
+      }),
+    });
+    await fs.writeFile(path.join(rootDir, 'content/posts/a.mdx'), '---\n---\n');
+    await fs.symlink(
+      path.join(rootDir, 'content/posts/a.mdx'),
+      path.join(rootDir, 'content/posts/alias.mdx')
+    );
+    const res = await call(
+      mountedRoutes(
+        [localContentPlugin(), defineHooksPlugin('test:paths', [pathProbe])],
+        [pathProbe()]
+      ),
+      '/api/tina/content/update',
+      JSON.stringify({
+        collection: 'posts',
+        path: 'content/posts/alias.mdx',
+        value: {},
+      })
+    );
+    expect(res.statusCode).toBe(200);
+    expect(seenPaths).toHaveBeenCalledWith('content/posts/a.mdx');
+  });
+
+  it.each([
+    [
+      'a file of the wrong format',
+      'content/posts/a.txt',
+      /is not a \.mdx file/,
+    ],
+    [
+      'a name outside the collection folder',
+      'content/posts/../a.mdx',
+      /is outside collection/,
+    ],
+  ])('answers 400 write-refused for %s', async (_, documentPath, message) => {
+    const res = await call(
+      routesWith([]),
+      '/api/tina/content/update',
+      JSON.stringify({ collection: 'posts', path: documentPath, value: {} })
+    );
+    expect(res.statusCode).toBe(400);
+    const { error } = JSON.parse(res.body);
+    expect(error.code).toBe('write-refused');
+    expect(error.message).toMatch(message);
+  });
+
+  it('answers 400 write-refused for a file the server cannot write', async () => {
+    const file = path.join(rootDir, 'content/posts/a.mdx');
+    await fs.writeFile(file, '---\ntitle: A\n---\n');
+    await fs.chmod(file, 0o444);
+    const res = await call(
+      routesWith([]),
+      '/api/tina/content/update',
+      update({ title: 'B' })
+    );
+    await fs.chmod(file, 0o644);
+    expect(res.statusCode).toBe(400);
+    const { error } = JSON.parse(res.body);
+    expect(error.code).toBe('write-refused');
+    expect(error.message).toBe(
+      'Cannot save "content/posts/a.mdx": permission denied.'
+    );
+    expect(error.message).not.toContain(rootDir);
+  });
+
   it('refuses a mismatched save before any hook runs', async () => {
     const seen = vi.fn();
     const probe = defineHook('probe', {

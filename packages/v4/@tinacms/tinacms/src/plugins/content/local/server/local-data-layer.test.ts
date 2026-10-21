@@ -223,6 +223,25 @@ describe('update', () => {
     expect(entry?.document).toMatchObject({ title: 'A', featured: true });
   });
 
+  it('serialises a save through a link and one through the real name on one lock', async () => {
+    await fs.symlink(
+      path.join(rootDir, 'content/posts/hello.mdx'),
+      path.join(rootDir, 'content/posts/alias.mdx')
+    );
+    const [throughLink] = await Promise.all([
+      dataLayer.update('post', 'content/posts/alias.mdx', { title: 'A' }),
+      dataLayer.update('post', 'content/posts/hello.mdx', { featured: true }),
+    ]);
+    expect(throughLink.path).toBe('content/posts/hello.mdx');
+    const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
+    expect(entry?.document).toMatchObject({ title: 'A', featured: true });
+    expect(
+      (
+        await fs.lstat(path.join(rootDir, 'content/posts/alias.mdx'))
+      ).isSymbolicLink()
+    ).toBe(true);
+  });
+
   it('keeps saves of different documents parallel', async () => {
     await Promise.all([
       dataLayer.update('post', 'content/posts/hello.mdx', { title: 'A' }),
