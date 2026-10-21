@@ -27,6 +27,7 @@ import { max, min, required } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
 import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
+import booleanFieldPlugin from '../boolean/boolean-field.plugin';
 import numberFieldPlugin from '../number/number-field.plugin';
 import objectFieldPlugin from '../object/object-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
@@ -352,6 +353,70 @@ describe('ArrayField remove with stored objects', () => {
     expect(await saved(onSave)).toEqual({
       people: [{ name: 'Brook', profile: { bio: '' } }],
     });
+  });
+
+  it('keeps an empty object the document states, with its field defaults', async () => {
+    const onSave = vi.fn();
+    renderPeople(
+      { people: [{ name: 'A' }, { name: 'Brook', profile: {} }] },
+      onSave
+    );
+    await screen.findAllByLabelText('Name');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    expect(await saved(onSave)).toEqual({
+      people: [{ name: 'Brook', profile: { bio: '' } }],
+    });
+  });
+
+  it('leaves an absent object with a boolean subfield out of the saved document', async () => {
+    const onSave = vi.fn();
+    const flagsCollection: CollectionSchema = {
+      name: 'person',
+      label: 'People',
+      format: 'mdx',
+      fields: [
+        t.array({
+          name: 'people',
+          label: 'People',
+          fields: [
+            t.string({ name: 'name', label: 'Name' }),
+            t.object({
+              name: 'profile',
+              label: 'Profile',
+              fields: [t.boolean({ name: 'active', label: 'Active' })],
+            }),
+          ],
+        }),
+      ],
+    };
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [...OBJECT_PLUGINS, booleanFieldPlugin],
+          schema: NO_COLLECTIONS,
+        })}
+      >
+        <FormProvider
+          collection={flagsCollection}
+          path={DOCUMENT_PATH}
+          document={{
+            people: [{ name: 'A', profile: { active: true } }, { name: 'B' }],
+          }}
+          onSave={onSave}
+        >
+          <LabelledFields />
+          <SaveProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+    await screen.findAllByLabelText('Name');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    const document = await saved(onSave);
+    expect(document).toEqual({ people: [{ name: 'B' }] });
   });
 
   it('still fails validation when a required object is absent after a removal', async () => {
