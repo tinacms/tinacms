@@ -11,7 +11,7 @@ The v4 form store (ADR-010) already holds every open form as `values` plus a `ba
 ## Decision
 
 ### 1. The form store persists drafts
-The form store wraps Zustand's `persist` middleware under its own storage key (`tina-drafts`), separate from the main store's `tina-store`. `partialize` keeps only **dirty** forms, and for each one only `values` and `baseline`. Pristine and clean forms are never written. Field equality functions are not serializable, so they are re-attached when the form registers.
+`syncDrafts` writes dirty forms to `localStorage` under a key per document, separate from the main store's `tina-store`. When an editor signs in, `draftKey` scopes the key to `user.id` (`tina-drafts@<encodeURIComponent(userId)>:<formId>`). Without an auth plugin, `draftKey` uses `tina-drafts:<formId>`. While auth is loading, signed out, or forbidden (`userId === null`), the store skips draft reads and writes. Only **dirty** forms are written, and for each one only `values` and `baseline`. Pristine and clean forms are never written. When the active `userId` changes, `useFormStore` clears its in-memory `forms` so another editor on a shared browser never inherits open edits. Field equality functions are not serializable, so they are re-attached when the form registers.
 
 Because the store is flat by top-level address, nested objects, lists and blocks persist with their top-level field. No per-field-type work is needed.
 
@@ -36,7 +36,7 @@ No draft lifecycle events ship yet. Nothing consumes them today, and code that n
 - A restored draft never reverts another writer's save to a field the editor did not touch.
 
 ### Negative
-- Drafts in `localStorage` are per browser, not per user: a shared machine shares drafts. A storage adapter keyed by identity fixes this later.
+- Unauthenticated projects (`userId === undefined`) still share `tina-drafts:<formId>` keys across the browser.
 - `localStorage` has a size limit (about 5 MB), which large rich-text documents could reach.
 - The draft shape becomes a stored format; changing it needs `persist`'s `version` and `migrate`.
 - A field both the editor and another writer changed resolves to the editor's value with no warning.

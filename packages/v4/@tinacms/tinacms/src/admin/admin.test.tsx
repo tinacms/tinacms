@@ -9,7 +9,7 @@ import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
 import { useFormId } from '../editor/hooks';
 import { draftKey, readDraft } from '../form/drafts';
-import { useFormStore } from '../form/form-store';
+import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
@@ -99,12 +99,25 @@ const screenPlugin = definePlugin({
         { name: 'unlinked', label: 'Unlinked', component: MediaScreen },
       ],
       slots: {
+        navGroups: [{ id: 'help', label: 'Help', order: 20 }],
         globalNav: [
+          {
+            label: 'Guides',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://tina.io/guides' },
+            group: 'help',
+          },
           {
             label: 'Docs',
             icon: NavIcon,
             target: { kind: 'url', href: 'https://tina.io/docs' },
             order: 10,
+          },
+          {
+            label: 'Changelog',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://tina.io/changelog' },
+            order: 30,
           },
           {
             label: 'Media',
@@ -521,6 +534,32 @@ describe('TinaAdmin global nav', () => {
     ).toEqual(['Media', 'Switch branch', 'Docs']);
   });
 
+  it('lists the entries of a group under its heading', async () => {
+    renderAdmin();
+    const menu = await screen.findByRole('list', { name: 'Help' });
+    expect(
+      within(menu)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['Guides']);
+  });
+
+  it('places a group between the ungrouped entries by its order', async () => {
+    renderAdmin();
+    const [first, ...rest] = await screen.findAllByRole('list', {
+      name: 'Global navigation',
+    });
+    expect(rest).toHaveLength(0);
+    const heading = screen.getByText('Help');
+    expect(
+      first.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+    expect(
+      heading.compareDocumentPosition(screen.getByText('Changelog')) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+  });
+
   it('does not link a screen that no entry targets', async () => {
     renderAdmin();
     const menu = await screen.findByRole('list', { name: 'Global navigation' });
@@ -672,9 +711,10 @@ describe('TinaAdmin form continuity', () => {
 });
 
 describe('TinaAdmin stale drafts', () => {
+  const helloFormId = toFormId('content/posts/hello.mdx');
   const storeStaleDraft = () =>
     localStorage.setItem(
-      draftKey('content/posts/hello.mdx'),
+      draftKey(helloFormId),
       JSON.stringify({
         version: 2,
         values: { title: 'Mine' },
@@ -716,6 +756,6 @@ describe('TinaAdmin stale drafts', () => {
     );
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByLabelText('Title')).toHaveValue('Hello');
-    expect(readDraft('content/posts/hello.mdx')).toBeUndefined();
+    expect(readDraft(helloFormId)).toBeUndefined();
   });
 });
