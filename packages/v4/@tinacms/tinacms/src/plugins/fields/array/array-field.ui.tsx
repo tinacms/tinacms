@@ -250,7 +250,7 @@ function ItemRow({
 }: ItemRowProps) {
   const position = index + 1;
   return (
-    <div className='rounded-md border p-3'>
+    <div className='rounded-sm border p-3'>
       <div className='mb-3 flex items-center justify-between gap-2'>
         <span className='text-sm font-medium text-muted-foreground'>
           {heading}

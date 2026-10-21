@@ -1,0 +1,199 @@
+/* Maps tokens.css onto Tailwind. tokens.css must stay unlayered: some mappings repeat the
+   token's name (`--text-xs: var(--text-xs)`) and only resolve because the unlayered value wins. */
+
+/* shadcn names the ui components still read, pointed at TinaCMS tokens. */
+:root {
+  --card-foreground: var(--foreground);
+  --popover-foreground: var(--foreground);
+  --secondary-foreground: var(--foreground);
+  --accent: var(--muted);
+  --accent-foreground: var(--foreground);
+  --sidebar: var(--background);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-accent: var(--muted);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+}
+
+@theme inline {
+  --color-white: var(--white);
+  --color-orange-100: var(--orange-100);
+  --color-orange-200: var(--orange-200);
+  --color-orange-500: var(--orange-500);
+  --color-orange-600: var(--orange-600);
+  --color-orange-700: var(--orange-700);
+  --color-orange-800: var(--orange-800);
+  --color-slate-50: var(--slate-50);
+  --color-slate-100: var(--slate-100);
+  --color-slate-200: var(--slate-200);
+  --color-slate-300: var(--slate-300);
+  --color-slate-500: var(--slate-500);
+  --color-slate-600: var(--slate-600);
+  --color-slate-700: var(--slate-700);
+  --color-slate-800: var(--slate-800);
+  --color-slate-900: var(--slate-900);
+  --color-green-50: var(--green-50);
+  --color-green-700: var(--green-700);
+  --color-amber-50: var(--amber-50);
+  --color-amber-500: var(--amber-500);
+  --color-amber-600: var(--amber-600);
+  --color-amber-800: var(--amber-800);
+  --color-red-50: var(--red-50);
+  --color-red-200: var(--red-200);
+  --color-red-700: var(--red-700);
+  --color-blue-50: var(--blue-50);
+  --color-blue-200: var(--blue-200);
+  --color-blue-700: var(--blue-700);
+
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted-foreground-strong: var(--muted-foreground-strong);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-selected-foreground: var(--selected-foreground);
+
+  --color-background: var(--background);
+  --color-card: var(--card);
+  --color-popover: var(--popover);
+  --color-muted: var(--muted);
+  --color-muted-hover: var(--muted-hover);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-selected: var(--selected);
+  --color-list-ground: var(--list-ground);
+  --color-list-add-hover: var(--list-add-hover);
+  --color-embed-ground: var(--embed-ground);
+
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-input: var(--input);
+  --color-input-hover: var(--input-hover);
+  --color-list-card-border: var(--list-card-border);
+
+  --color-brand: var(--brand);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-ring: var(--ring);
+  --color-focus-glow: var(--focus-glow);
+  --color-field-active-border: var(--field-active-border);
+
+  --color-destructive: var(--destructive);
+  --color-unsaved: var(--unsaved);
+  --color-unsaved-subtle: var(--unsaved-subtle);
+  --color-unsaved-edge: var(--unsaved-edge);
+  --color-unsaved-dot: var(--unsaved-dot);
+  --color-status-published: var(--status-published);
+  --color-status-published-subtle: var(--status-published-subtle);
+  --color-status-changed: var(--status-changed);
+  --color-status-changed-subtle: var(--status-changed-subtle);
+  --color-status-failed: var(--status-failed);
+  --color-status-failed-subtle: var(--status-failed-subtle);
+  --color-status-failed-border: var(--status-failed-border);
+  --color-tone-info: var(--tone-info);
+  --color-tone-info-subtle: var(--tone-info-subtle);
+
+  --color-card-foreground: var(--card-foreground);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-inv-bg: var(--inv-bg);
+  --color-inv-ink: var(--inv-ink);
+  --color-inv-muted: var(--inv-muted);
+  --color-inv-line: var(--inv-line);
+  --color-inv-hover: var(--inv-hover);
+  --color-inv-warn: var(--inv-warn);
+  --color-tone-success-on-dark: var(--tone-success-on-dark);
+  --color-tone-danger-on-dark: var(--tone-danger-on-dark);
+  --color-tone-warning-on-dark: var(--tone-warning-on-dark);
+  --color-tone-info-on-dark: var(--tone-info-on-dark);
+
+  --color-scrim: var(--scrim);
+  --color-scrim-light: var(--scrim-light);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-popover: var(--shadow-popover);
+  --shadow-toast: var(--shadow-toast);
+  --shadow-toast-dark: var(--shadow-toast-dark);
+  --shadow-lifted: var(--shadow-lifted);
+  --shadow-dialog: var(--shadow-dialog);
+  --shadow-focus-ring: var(--focus-ring);
+  --shadow-focus-field: var(--focus-field);
+  --shadow-focus-inset: var(--focus-inset);
+  --shadow-field-active: var(--field-active-shadow);
+  --shadow-unsaved-glow: var(--unsaved-glow);
+  --shadow-key: var(--shadow-key);
+  --shadow-button-primary: var(--shadow-button-primary);
+  --shadow-segment: var(--shadow-segment);
+
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
+  --font-mono: var(--font-mono);
+
+  --text-3xs: var(--text-3xs);
+  --text-2xs: var(--text-2xs);
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-md: var(--text-md);
+  --text-lg: var(--text-lg);
+
+  --tracking-code: var(--tracking-code);
+  --tracking-initials: var(--tracking-initials);
+  --tracking-format: var(--tracking-format);
+
+  --leading-control: var(--leading-control);
+  --leading-title: var(--leading-title);
+  --leading-code: var(--leading-code);
+
+  --ease-standard: var(--ease);
+  --default-transition-timing-function: var(--ease);
+  --default-transition-duration: var(--dur);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0s !important;
+      animation-duration: 0s !important;
+    }
+  }
+}

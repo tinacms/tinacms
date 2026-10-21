@@ -137,7 +137,7 @@ const HighlightLeaf = ({
   return (
     <PlateLeaf
       as='mark'
-      className={`rounded-sm ${INHERIT_NESTED_COLOR}`}
+      className={`rounded-xs ${INHERIT_NESTED_COLOR}`}
       style={{ backgroundColor, color }}
       leaf={leaf}
       {...props}
