@@ -1,9 +1,9 @@
 import {
   CONTENT_REFUSALS,
-  ContentWriteError,
-  InvalidSaveInputError,
+  isContentWriteError,
+  isInvalidSaveInputError,
 } from '../core/content/contract';
-import { HookRejectedError } from '../core/form/hooks';
+import { isHookRejectedError } from '../core/form/hooks';
 import { RequestBodyTooLargeError } from '../core/request-body';
 
 // Every response that is not a 2xx holds `{ error: { code, message } }`. The
@@ -18,13 +18,13 @@ export const errorResponse = (
 // A failure with no known cause keeps its message out of the body and in the
 // server log under `label`.
 export const toErrorResponse = (cause: unknown, label: string): Response => {
-  if (cause instanceof HookRejectedError) {
+  if (isHookRejectedError(cause)) {
     return errorResponse(422, CONTENT_REFUSALS.hookRejected, cause.message);
   }
-  if (cause instanceof InvalidSaveInputError) {
+  if (isInvalidSaveInputError(cause)) {
     return errorResponse(400, 'invalid-input', cause.message);
   }
-  if (cause instanceof ContentWriteError) {
+  if (isContentWriteError(cause)) {
     return errorResponse(400, CONTENT_REFUSALS.writeRefused, cause.message);
   }
   if (cause instanceof RequestBodyTooLargeError) {

@@ -1,3 +1,4 @@
+import { hasErrorBrand } from '../error-brand';
 import type { FieldAddress } from '../field/address';
 import type { TinaDocument } from '../schema/types';
 
@@ -102,7 +103,13 @@ export interface ContentSaveResult {
   hookWarnings: string[];
 }
 
+const INVALID_SAVE_INPUT_BRAND: unique symbol = Symbol.for(
+  'tinacms.error.invalid-save-input'
+);
+
 export class InvalidSaveInputError extends Error {
+  readonly [INVALID_SAVE_INPUT_BRAND] = true;
+
   constructor(message: string) {
     super(message);
     this.name = 'InvalidSaveInputError';
@@ -111,11 +118,23 @@ export class InvalidSaveInputError extends Error {
 
 // A write the Data Layer refuses for a reason the editor can act on. Its message
 // reaches the editor.
+const CONTENT_WRITE_BRAND: unique symbol = Symbol.for(
+  'tinacms.error.content-write'
+);
+
 export class ContentWriteError extends Error {
+  readonly [CONTENT_WRITE_BRAND] = true;
+
   constructor(message: string) {
     super(message);
     this.name = 'ContentWriteError';
   }
 }
+
+export const isInvalidSaveInputError = (value: unknown): value is Error =>
+  hasErrorBrand(value, INVALID_SAVE_INPUT_BRAND);
+
+export const isContentWriteError = (value: unknown): value is Error =>
+  hasErrorBrand(value, CONTENT_WRITE_BRAND);
 
 export const DEFAULT_CONTENT_URL = '/api/tina/content';

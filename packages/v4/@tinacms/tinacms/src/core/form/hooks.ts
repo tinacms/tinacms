@@ -1,6 +1,7 @@
 import type { FormId } from '../../form/form-store';
 import type { Session } from '../auth/contract';
 import type { FieldAddress } from '../field/address';
+import { hasErrorBrand } from '../error-brand';
 import { invariant } from '../invariant';
 import type { JsonValue } from '../json';
 import {
@@ -73,12 +74,21 @@ export const defineServerHook = <Args extends JsonValue[]>(
   factory: (...args: Args) => ServerFormHooks
 ): ((...args: Args) => ServerFormHooks) => factory;
 
+const HOOK_REJECTED_BRAND: unique symbol = Symbol.for(
+  'tinacms.error.hook-rejected'
+);
+
 export class HookRejectedError extends Error {
+  readonly [HOOK_REJECTED_BRAND] = true;
+
   constructor(message: string) {
     super(message);
     this.name = 'HookRejectedError';
   }
 }
+
+export const isHookRejectedError = (value: unknown): value is Error =>
+  hasErrorBrand(value, HOOK_REJECTED_BRAND);
 
 // The one way a server hook's message reaches the editor. Any other throw
 // answers with a generic failure.
