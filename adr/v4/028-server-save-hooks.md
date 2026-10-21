@@ -69,6 +69,8 @@ The provider's `update` takes only its input, as every op does. It reads the req
 
 A write that does not go through an RPC op, such as a webhook or a script that calls the provider directly, runs no hooks.
 
+On the Local Data Layer, a save must target the collection that owns the file: the deepest collection folder whose format matches it. Core checks that before any hook runs, and passes the hooks the canonical repo-relative path.
+
 To find a collection's hooks, the RPC handler needs the config's `schema` (`mountHandler(config)`). `schema` is optional until a plugin registers a server hook. After that, a handler without it fails when it composes, on its first request.
 
 ### 5. `reject(message)` is how a hook talks to the editor

@@ -2,8 +2,10 @@ import { siteAuthHeadersOf } from '../../../core/auth/slice';
 import {
   type ContentProvider,
   ContentError,
+  type ContentRefusalCode,
   type DocumentEntry,
   type DocumentSummary,
+  isContentRefusalCode,
 } from '../../../core/content/contract';
 import { isRecord } from '../../../utils/is-record';
 import type { ClientSlice, TinaStoreState } from '../../../core/plugin';
@@ -11,7 +13,7 @@ import type { ContentRequest } from './server/content-request';
 
 const refusalIn = (
   text: string
-): { code: 'hook-rejected' | 'write-refused'; message: string } | null => {
+): { code: ContentRefusalCode; message: string } | null => {
   let body: unknown;
   try {
     body = JSON.parse(text);
@@ -20,9 +22,7 @@ const refusalIn = (
   }
   const error = isRecord(body) ? body.error : undefined;
   if (!isRecord(error) || typeof error.message !== 'string') return null;
-  if (error.code !== 'hook-rejected' && error.code !== 'write-refused') {
-    return null;
-  }
+  if (!isContentRefusalCode(error.code)) return null;
   return { code: error.code, message: error.message };
 };
 

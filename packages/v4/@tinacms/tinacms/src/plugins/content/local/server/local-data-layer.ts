@@ -34,6 +34,8 @@ export interface LocalDataLayerOptions {
 }
 
 export interface LocalDataLayer extends ContentProvider {
+  // The repo-relative path a save of `documentPath` in `collection` writes to.
+  canonicalPath(collection: string, documentPath: string): Promise<string>;
   graphql(query: string, variables?: GraphQLVariables): Promise<GraphQLResult>;
   close(): Promise<void>;
 }
@@ -122,7 +124,11 @@ export const createLocalDataLayer = (
   const resolveDocumentPath = async (
     collection: ResolvedCollection,
     documentPath: string
-  ): Promise<{ absolute: string; adapter: FormatAdapter }> => {
+  ): Promise<{
+    absolute: string;
+    realAbsolute: string;
+    adapter: FormatAdapter;
+  }> => {
     invariant(
       !documentPath.includes('\0'),
       'content-path-null-byte',
@@ -147,19 +153,46 @@ export const createLocalDataLayer = (
         .map((each) => each.extension)
         .join(' or ')} file in collection "${collection.schema.name}".`
     );
-    return { absolute, adapter };
+    return { absolute, realAbsolute, adapter };
   };
 
-  // Collection folders can nest, so a file belongs to the deepest one.
-  const ownerOf = (absolute: string): ResolvedCollection | undefined =>
-    [...collections.values()]
-      .filter(({ absoluteFolder }) =>
-        absolute.startsWith(absoluteFolder + path.sep)
+  // Collection folders can nest and can share a folder across formats, so a
+  // file belongs to the deepest folder whose collection reads its format.
+  const ownerOf = async (
+    realAbsolute: string
+  ): Promise<ResolvedCollection | undefined> => {
+    const folders = await Promise.all(
+      [...collections.values()].map(async (candidate) => ({
+        candidate,
+        realFolder: await realPathOf(candidate.absoluteFolder),
+      }))
+    );
+    return folders
+      .filter(
+        ({ candidate, realFolder }) =>
+          realAbsolute.startsWith(realFolder + path.sep) &&
+          adapterForPath(candidate.adapters, realAbsolute)
       )
-      .sort((a, b) => b.absoluteFolder.length - a.absoluteFolder.length)[0];
+      .sort((a, b) => b.realFolder.length - a.realFolder.length)[0]?.candidate;
+  };
 
   const documentIdFor = (absolute: string): string =>
     path.relative(rootDir, absolute).split(path.sep).join('/');
+
+  const resolveOwnedPath = async (
+    collection: ResolvedCollection,
+    documentPath: string
+  ) => {
+    const resolved = await resolveDocumentPath(collection, documentPath);
+    const canonicalPath = documentIdFor(resolved.absolute);
+    const owner = await ownerOf(resolved.realAbsolute);
+    if (owner !== collection) {
+      throw new ContentWriteError(
+        `Cannot save "${canonicalPath}" in collection "${collection.schema.name}": the file belongs to collection "${owner?.schema.name}".`
+      );
+    }
+    return { ...resolved, canonicalPath };
+  };
 
   const savesByPath = new Map<string, Promise<unknown>>();
   const afterPendingSaves = <T>(
@@ -179,6 +212,12 @@ export const createLocalDataLayer = (
   };
 
   return {
+    async canonicalPath(collectionName, documentPath) {
+      return (
+        await resolveOwnedPath(collectionFor(collectionName), documentPath)
+      ).canonicalPath;
+    },
+
     async get(collectionName, documentPath) {
       const collection = collectionFor(collectionName);
       const { absolute, adapter } = await resolveDocumentPath(
@@ -220,8 +259,9 @@ export const createLocalDataLayer = (
       const summaries: DocumentSummary[] = [];
       for (const absolute of files) {
         if (!adapterForPath(collection.adapters, absolute)) continue;
+        let realAbsolute: string;
         try {
-          await resolveDocumentPath(collection, absolute);
+          ({ realAbsolute } = await resolveDocumentPath(collection, absolute));
         } catch (cause) {
           console.warn(
             `Skipping document "${absolute}": it does not resolve inside collection "${collection.schema.name}".`,
@@ -229,6 +269,7 @@ export const createLocalDataLayer = (
           );
           continue;
         }
+        if ((await ownerOf(realAbsolute)) !== collection) continue;
         summaries.push({ path: documentIdFor(absolute) });
       }
       return summaries;
@@ -236,17 +277,10 @@ export const createLocalDataLayer = (
 
     async update(collectionName, documentPath, value) {
       const collection = collectionFor(collectionName);
-      const { absolute, adapter } = await resolveDocumentPath(
+      const { absolute, adapter, canonicalPath } = await resolveOwnedPath(
         collection,
         documentPath
       );
-      const canonicalPath = documentIdFor(absolute);
-      const owner = ownerOf(absolute);
-      if (owner !== collection) {
-        throw new ContentWriteError(
-          `Cannot save "${canonicalPath}" in collection "${collection.schema.name}": the file belongs to collection "${owner?.schema.name}".`
-        );
-      }
       return afterPendingSaves(canonicalPath, async () => {
         let previousRaw: string | undefined;
         try {

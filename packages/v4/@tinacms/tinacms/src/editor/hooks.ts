@@ -242,9 +242,7 @@ const adoptSavedValues = (
   const store = useFormStore.getState();
   const open = store.forms[formId];
   if (!open) return null;
-  const changed = [
-    ...new Set([...Object.keys(submitted), ...Object.keys(saved)]),
-  ]
+  const changed = Object.keys(saved)
     .map(toFieldAddress)
     .filter(
       (address) => !open.equal(address, submitted[address], saved[address])

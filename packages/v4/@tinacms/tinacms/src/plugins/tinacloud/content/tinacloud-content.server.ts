@@ -7,10 +7,8 @@ import { type TinaCloudOptions, createTinaCloudClient } from '../client';
 import { TINACLOUD_PLUGIN_NAME } from '../name';
 import { updateDocument } from './request';
 
-// The write behind core's `content/update` op, which runs the server hooks
-// first. It writes with the token of the editor who saved. A browser bundle can
-// reach this module through the lazy `server` segment, so it imports no node
-// module.
+// A browser bundle can reach this module through the lazy `server` segment, so
+// it imports no node module.
 export const createTinaCloudContentServer = (options: TinaCloudOptions) => {
   const editorClient = () => {
     const context = requestContext();

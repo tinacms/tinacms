@@ -1,4 +1,5 @@
 import {
+  CONTENT_REFUSAL_CODES,
   ContentWriteError,
   InvalidSaveInputError,
 } from '../core/content/contract';
@@ -14,17 +15,19 @@ export const errorResponse = (
   message: string
 ): Response => Response.json({ error: { code, message } }, { status });
 
+const [HOOK_REJECTED, WRITE_REFUSED] = CONTENT_REFUSAL_CODES;
+
 // A failure with no known cause keeps its message out of the body and in the
 // server log under `label`.
 export const toErrorResponse = (cause: unknown, label: string): Response => {
   if (cause instanceof HookRejectedError) {
-    return errorResponse(422, 'hook-rejected', cause.message);
+    return errorResponse(422, HOOK_REJECTED, cause.message);
   }
   if (cause instanceof InvalidSaveInputError) {
     return errorResponse(400, 'invalid-input', cause.message);
   }
   if (cause instanceof ContentWriteError) {
-    return errorResponse(400, 'write-refused', cause.message);
+    return errorResponse(400, WRITE_REFUSED, cause.message);
   }
   if (cause instanceof RequestBodyTooLargeError) {
     return errorResponse(413, 'body-too-large', cause.message);

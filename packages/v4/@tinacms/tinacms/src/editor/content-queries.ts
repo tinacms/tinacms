@@ -11,6 +11,7 @@ import {
   type ContentSaveResult,
   type DocumentEntry,
   type DocumentSummary,
+  isContentRefusalCode,
 } from '../core/content/contract';
 import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
@@ -120,7 +121,7 @@ const toServerSaveError = (cause: unknown): ContentError => {
     }
     return new ContentError('backend-failure', String(cause));
   }
-  if (cause.code === 'hook-rejected' || cause.code === 'write-refused') {
+  if (isContentRefusalCode(cause.code)) {
     return new ContentError(cause.code, cause.message);
   }
   if (

@@ -63,7 +63,6 @@ interface NamedServerHooks {
   hooks: ServerFormHooks;
 }
 
-// A name with no server side is a client-only hook, which the server skips.
 const resolveServerHooks = (
   registry: ServerHookRegistry,
   refs: readonly HookRef[]
@@ -94,6 +93,7 @@ export interface ServerSaveConfig {
   collections: readonly CollectionSchema[] | undefined;
   write: (input: ContentSaveInput) => Promise<unknown>;
   resolveBranch?: (branch: string | undefined) => Promise<string | undefined>;
+  resolvePath?: (collection: string, documentPath: string) => Promise<string>;
 }
 
 export type ServerSave = (
@@ -101,29 +101,37 @@ export type ServerSave = (
   session: Session | null
 ) => Promise<ContentSaveResult>;
 
+const parseSave = (
+  input: unknown,
+  collections: readonly CollectionSchema[] | undefined
+) => {
+  const parsed = contentSaveInputSchema.safeParse(input);
+  if (!parsed.success) {
+    throw new InvalidSaveInputError(
+      'A save needs a collection, a path and a document value.'
+    );
+  }
+  const save = parsed.data;
+  const collection = collections?.find(({ name }) => name === save.collection);
+  if (collections && !collection) {
+    throw new InvalidSaveInputError(`Unknown collection "${save.collection}".`);
+  }
+  return { save, collection };
+};
+
 export const createServerSave =
   ({
     hooks,
     collections,
     write,
     resolveBranch,
+    resolvePath,
   }: ServerSaveConfig): ServerSave =>
   async (input, session) => {
-    const parsed = contentSaveInputSchema.safeParse(input);
-    if (!parsed.success) {
-      throw new InvalidSaveInputError(
-        'A save needs a collection, a path and a document value.'
-      );
-    }
-    const save = parsed.data;
-    const collection = collections?.find(
-      ({ name }) => name === save.collection
-    );
-    if (collections && !collection) {
-      throw new InvalidSaveInputError(
-        `Unknown collection "${save.collection}".`
-      );
-    }
+    const { save, collection } = parseSave(input, collections);
+    const documentPath = resolvePath
+      ? await resolvePath(save.collection, save.path)
+      : save.path;
     const resolved = collection
       ? resolveServerHooks(hooks, collection.hooks ?? [])
       : [];
@@ -131,7 +139,7 @@ export const createServerSave =
       ? await resolveBranch(save.branch)
       : save.branch;
     const scope: ServerHookScope | null = collection
-      ? { path: save.path, collection, session, branch }
+      ? { path: documentPath, collection, session, branch }
       : null;
     const value = scope
       ? await runBeforeSave(
@@ -143,7 +151,7 @@ export const createServerSave =
     const written = documentEntrySchema.parse(
       await write({
         collection: save.collection,
-        path: save.path,
+        path: documentPath,
         value,
         branch,
       })

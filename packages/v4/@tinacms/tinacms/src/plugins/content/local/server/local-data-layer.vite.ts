@@ -375,6 +375,8 @@ export const tinaLocalDataLayerVitePlugin = (
           collections,
           write: ({ collection, path: documentPath, value }) =>
             dataLayer.update(collection, documentPath, value),
+          resolvePath: (collection, documentPath) =>
+            dataLayer.canonicalPath(collection, documentPath),
         }),
       (cause) => {
         serverSave = undefined;

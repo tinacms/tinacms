@@ -15,7 +15,7 @@ import {
   reject,
 } from '../../../../core/form/hooks';
 import { type PluginManifest, definePlugin } from '../../../../core/plugin';
-import type { HookRef } from '../../../../core/schema/types';
+import type { CollectionSchema, HookRef } from '../../../../core/schema/types';
 import {
   type ServerSegment,
   defineServerPlugin,
@@ -108,7 +108,11 @@ const responseDouble = () => {
   };
 };
 
-const mountedRoutes = (plugins: PluginManifest[], hooks: HookRef[] = []) => {
+const mountedRoutes = (
+  plugins: PluginManifest[],
+  hooks: HookRef[] = [],
+  extraCollections: CollectionSchema[] = []
+) => {
   const plugin = tinaLocalDataLayerVitePlugin({
     rootDir,
     config: asResolvedConfig({
@@ -122,6 +126,7 @@ const mountedRoutes = (plugins: PluginManifest[], hooks: HookRef[] = []) => {
             fields: [{ type: 'string', name: 'title' }],
             hooks,
           },
+          ...extraCollections,
         ],
       },
       build: { publicFolder: 'public', outputFolder: 'admin' },
@@ -467,6 +472,75 @@ describe('local Data Layer updates', () => {
       expect(error.code).toBe('write-refused');
       expect(error.message).toMatch(/Repair the file, then save again\./);
     }
+  });
+
+  it('names the canonical path in the hook scope', async () => {
+    const seenPaths = vi.fn();
+    const pathProbe = defineHook('pathProbe', {
+      server: async () => ({
+        default: defineServerHook(() => ({
+          beforeSave: (document, { path: documentPath }) => {
+            seenPaths(documentPath);
+            return document;
+          },
+        })),
+      }),
+    });
+    const routes = mountedRoutes(
+      [localContentPlugin(), defineHooksPlugin('test:paths', [pathProbe])],
+      [pathProbe()]
+    );
+    const res = await call(
+      routes,
+      '/api/tina/content/update',
+      JSON.stringify({
+        collection: 'posts',
+        path: 'content/posts/../posts/./a.mdx',
+        value: {},
+      })
+    );
+    expect(res.statusCode).toBe(200);
+    expect(seenPaths).toHaveBeenCalledWith('content/posts/a.mdx');
+  });
+
+  it('refuses a mismatched save before any hook runs', async () => {
+    const seen = vi.fn();
+    const probe = defineHook('probe', {
+      server: async () => ({
+        default: defineServerHook(() => ({
+          beforeSave: (document) => {
+            seen();
+            return document;
+          },
+        })),
+      }),
+    });
+    const routes = mountedRoutes(
+      [localContentPlugin(), defineHooksPlugin('test:probe', [probe])],
+      [probe()],
+      [
+        {
+          name: 'site',
+          path: 'content',
+          format: 'mdx',
+          fields: [],
+          hooks: [probe()],
+        },
+      ]
+    );
+    const res = await call(
+      routes,
+      '/api/tina/content/update',
+      JSON.stringify({
+        collection: 'site',
+        path: 'content/posts/a.mdx',
+        value: {},
+      })
+    );
+    expect(res.statusCode).toBe(400);
+    expect(JSON.parse(res.body).error.code).toBe('write-refused');
+    expect(seen).not.toHaveBeenCalled();
+    expect(existsSync(path.join(rootDir, 'content/posts/a.mdx'))).toBe(false);
   });
 
   it('answers 413 for a content/update body over the size limit', async () => {

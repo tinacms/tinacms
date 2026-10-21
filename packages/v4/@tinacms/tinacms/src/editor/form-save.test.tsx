@@ -305,16 +305,6 @@ describe('useFormSave', () => {
     expect(screen.getByTestId('status')).toHaveTextContent('clean');
   });
 
-  it('clears a field the stored document drops, and reads clean', async () => {
-    renderWithSave(async () => ({ document: {} }));
-    const input = await screen.findByLabelText('Title');
-    await userEvent.type(input, '!');
-
-    await userEvent.click(screen.getByText('save'));
-    await vi.waitFor(() => expect(input).toHaveValue(''));
-    expect(screen.getByTestId('status')).toHaveTextContent('clean');
-  });
-
   it('keeps edits typed while a save runs, and stays dirty', async () => {
     let finish: () => void = () => {};
     const onSave = vi.fn(

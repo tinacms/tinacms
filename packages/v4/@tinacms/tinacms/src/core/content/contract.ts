@@ -27,10 +27,18 @@ const CONTENT_ERROR_MESSAGES = {
   'write-refused': 'The content server refused this save.',
 } satisfies Record<string, string>;
 
-const CODES_WITH_OWN_MESSAGE: ReadonlySet<string> = new Set([
+// The refusals whose message the server writes for the editor.
+export const CONTENT_REFUSAL_CODES = [
   'hook-rejected',
   'write-refused',
-]);
+] as const;
+
+export type ContentRefusalCode = (typeof CONTENT_REFUSAL_CODES)[number];
+
+export const isContentRefusalCode = (
+  code: unknown
+): code is ContentRefusalCode =>
+  CONTENT_REFUSAL_CODES.some((refusal) => refusal === code);
 
 export type ContentErrorCode = keyof typeof CONTENT_ERROR_MESSAGES;
 
@@ -52,7 +60,7 @@ export class ContentError extends Error {
     fieldErrors?: ContentFieldErrors
   ) {
     super(
-      CODES_WITH_OWN_MESSAGE.has(code) && detail
+      isContentRefusalCode(code) && detail
         ? detail
         : CONTENT_ERROR_MESSAGES[code]
     );

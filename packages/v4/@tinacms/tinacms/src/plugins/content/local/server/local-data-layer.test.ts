@@ -108,6 +108,21 @@ describe('list', () => {
   });
 });
 
+describe('list with nested collections', () => {
+  it('leaves out the files of a nested collection', async () => {
+    const nested = createLocalDataLayer({
+      rootDir,
+      collections: [
+        { name: 'site', path: 'content', format: 'mdx', fields: [] },
+        { name: 'post', path: 'content/posts', format: 'mdx', fields: [] },
+      ],
+    });
+    await fs.mkdir(path.join(rootDir, 'content'), { recursive: true });
+    await fs.writeFile(path.join(rootDir, 'content/about.mdx'), '---\n---\n');
+    expect(await nested.list('site')).toEqual([{ path: 'content/about.mdx' }]);
+  });
+});
+
 describe('get', () => {
   it('returns the parsed document', async () => {
     const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
@@ -254,6 +269,24 @@ describe('update', () => {
     await expect(fs.access(file)).rejects.toThrow();
     await nested.update('post', 'content/posts/claimed.mdx', { title: 'x' });
     await expect(fs.access(file)).resolves.toBeUndefined();
+  });
+
+  it('saves each format to the collection that reads it in a shared folder', async () => {
+    const shared = createLocalDataLayer({
+      rootDir,
+      collections: [
+        { name: 'pages', path: 'content', format: 'mdx', fields: [] },
+        { name: 'settings', path: 'content', format: 'json', fields: [] },
+      ],
+    });
+    await shared.update('settings', 'content/x.json', { title: 'json' });
+    await shared.update('pages', 'content/x.mdx', { title: 'mdx' });
+    expect((await shared.get('settings', 'content/x.json'))?.document).toEqual({
+      title: 'json',
+    });
+    expect((await shared.get('pages', 'content/x.mdx'))?.document).toEqual({
+      title: 'mdx',
+    });
   });
 
   it('names the document when the value itself cannot be written', async () => {
