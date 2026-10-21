@@ -33,6 +33,8 @@ definePlugin({
   permissions?: PermissionDecl[]            // declared permissions; aggregated by codegen
   requires?: { permission: Permission }     // plugin-level gate (hides UI + ops)
   overrides?: OverrideDecl[]                // intentional same-key replacements
+  hooks?: string[]                          // hook names this plugin registers (ADR-025)
+  serverHooks?: string[]                    // the names in `hooks` with a server side (ADR-028)
   onInit?: (ctx: PluginInitContext) => void | Promise<void>
   onDestroy?: () => void | Promise<void>
 })
@@ -103,6 +105,30 @@ defineServerPlugin<TOps>(ops: TOps)
 ```
 
 Where `TOps` is a record of operations. The shape of `TOps` is what `import type` infers across the boundary to produce the typed `server.<plugin>.<op>(...)` proxy on the client. ([ADR-007](../007-full-stack-plugins-client-backend-segments.md))
+
+### Reserved `hooks` key
+
+`hooks` on a server segment is reserved. It is not an op:
+
+```ts
+defineServerPlugin({
+  hooks?: Record<string, ServerHookFactory>   // server hook factories, keyed by hook name
+  // …ops
+})
+```
+
+The runtime loads these factories once at compose time and runs them inside the `content` provider's `update` op. It never routes `hooks`: `<ns>/hooks` is a 404, and the `server` proxy has no `hooks` key. `defineHooksPlugin` fills the key from each hook's `server` loader. A server hook name follows the same collision and `overrides` rule as a client hook name. ([ADR-028](../028-server-save-hooks.md))
+
+### The `content` provider's `update` op
+
+Core wraps the `content` provider's server `update` op with the server hooks and gates it on `content:save`. It calls the provider's own `update` with a second argument, the request context:
+
+```ts
+update(input: ContentSaveInput, context?: RequestContext): Promise<DocumentEntry>
+interface RequestContext { request: Request; session: Session | null }
+```
+
+This is the only op that receives a second argument. ([ADR-028](../028-server-save-hooks.md))
 
 ### Authorization wrappers
 
@@ -188,6 +214,8 @@ The handler internally:
 2. Lazy-loads each `server` segment.
 3. Wraps each operation in the auth + permission transport.
 4. Routes incoming requests by `<plugin-or-capability>/<op>` to the right handler.
+
+The handler config takes the config's `schema` too. It is optional until a plugin registers a server hook. After that, a handler without it fails to compose. ([ADR-028](../028-server-save-hooks.md))
 
 ## What plugin code may not do
 
