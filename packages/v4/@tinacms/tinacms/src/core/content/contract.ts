@@ -21,13 +21,19 @@ const CONTENT_ERROR_MESSAGES = {
   validation: 'Some fields are not valid. Fix them and try again.',
   network: "Can't reach the content server. Check your connection.",
   'backend-failure': 'Something went wrong. Please try again.',
+  'hook-rejected': 'A save hook rejected this save.',
+  'server-route-missing':
+    "This collection has server hooks, so it needs the site's server route.",
 } satisfies Record<string, string>;
 
 export type ContentErrorCode = keyof typeof CONTENT_ERROR_MESSAGES;
 
 export type ContentFieldErrors = Partial<Record<FieldAddress, string[]>>;
 
-/** `message` is the sentence to show the user; `detail` is the technical reason. */
+/**
+ * `message` is the sentence to show the user; `detail` is the technical reason.
+ * A `hook-rejected` error shows its `detail`, the message the hook rejected with.
+ */
 export class ContentError extends Error {
   readonly code: ContentErrorCode;
   readonly detail?: string;
@@ -38,7 +44,9 @@ export class ContentError extends Error {
     detail?: string,
     fieldErrors?: ContentFieldErrors
   ) {
-    super(CONTENT_ERROR_MESSAGES[code]);
+    super(
+      code === 'hook-rejected' && detail ? detail : CONTENT_ERROR_MESSAGES[code]
+    );
     this.name = 'ContentError';
     this.code = code;
     this.detail = detail;
@@ -58,5 +66,20 @@ export interface ContentProvider {
 }
 
 export type ContentSlice = ContentProvider;
+
+export const CONTENT_SAVE_PERMISSION = 'content:save';
+
+// The save that goes through the site's server, for a collection with a server hook.
+export interface ContentSaveInput {
+  collection: string;
+  path: string;
+  value: TinaDocument;
+  branch?: string;
+}
+
+export interface ContentSaveResult {
+  entry: DocumentEntry;
+  hookWarnings: string[];
+}
 
 export const DEFAULT_CONTENT_URL = '/api/tina/content';

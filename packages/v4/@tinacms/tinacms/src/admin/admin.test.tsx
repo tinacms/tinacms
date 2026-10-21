@@ -759,3 +759,79 @@ describe('TinaAdmin stale drafts', () => {
     expect(readDraft(helloFormId)).toBeUndefined();
   });
 });
+
+describe('TinaAdmin after a save that changes the document', () => {
+  it('keeps the afterSave failure message visible', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const storing = definePlugin({
+      name: 'test:content',
+      provides: ['content'],
+      client: async () => ({
+        default: {
+          slice: () => ({
+            list: provider.list,
+            get: provider.get,
+            update: async (
+              _collection: string,
+              path: string,
+              value: TinaDocument
+            ) => ({
+              path,
+              document: { ...value, title: String(value.title).toUpperCase() },
+            }),
+          }),
+        },
+      }),
+    });
+    const failingAudit = definePlugin({
+      name: 'test:hooks',
+      provides: ['hooks'],
+      hooks: ['audit'],
+      client: async () => ({
+        default: {
+          hooks: {
+            audit: () => ({
+              afterSave: () => {
+                throw new Error('audit endpoint down');
+              },
+            }),
+          },
+        },
+      }),
+    });
+    const user = userEvent.setup();
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          plugins: [storing, failingAudit, stringFieldPlugin],
+          schema: {
+            collections: [
+              {
+                name: 'post',
+                label: 'Posts',
+                path: 'content/posts',
+                format: 'mdx',
+                hooks: [{ name: 'audit' }],
+                fields: [{ name: 'title', label: 'Title', type: 'string' }],
+              },
+            ],
+          },
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText('Title'), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(await screen.findByDisplayValue('HELLO!')).toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The document was saved, but an afterSave hook failed.'
+    );
+    vi.restoreAllMocks();
+  });
+});

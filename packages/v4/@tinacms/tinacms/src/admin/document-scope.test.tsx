@@ -1,9 +1,14 @@
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { ContentProvider, DocumentEntry } from '../core/content/contract';
+import {
+  defineHook,
+  defineHooksPlugin,
+  defineServerHook,
+} from '../core/form/hooks';
 import { definePlugin } from '../core/plugin';
 import type { CollectionSchema } from '../core/schema/types';
 import { contentKeys, useDocument } from '../editor/content-queries';
@@ -35,28 +40,26 @@ const providerReading = (read: ContentProvider['get']): ContentProvider => ({
   }),
 });
 
-const configReading = (read: ContentProvider['get']) => {
-  const provider = providerReading(read);
-  return asResolvedConfig({
-    plugins: [
-      definePlugin({
-        name: 'test:content',
-        provides: ['content'],
-        client: async () => ({
-          default: {
-            slice: () => ({
-              list: provider.list,
-              get: provider.get,
-              update: provider.update,
-            }),
-          },
+const contentPlugin = (provider: ContentProvider) =>
+  definePlugin({
+    name: 'test:content',
+    provides: ['content'],
+    client: async () => ({
+      default: {
+        slice: () => ({
+          list: provider.list,
+          get: provider.get,
+          update: provider.update,
         }),
-      }),
-      stringFieldPlugin,
-    ],
+      },
+    }),
+  });
+
+const configReading = (read: ContentProvider['get']) =>
+  asResolvedConfig({
+    plugins: [contentPlugin(providerReading(read)), stringFieldPlugin],
     schema: { collections: [collection] },
   });
-};
 
 const config = configReading(async () => ON_LOAD);
 
@@ -158,5 +161,60 @@ describe('DocumentScope on a document the data layer cannot give', () => {
       expect(screen.getByTestId('cached')).toBeEmptyDOMElement()
     );
     expect(screen.queryByLabelText('Title')).not.toBeInTheDocument();
+  });
+});
+
+describe('DocumentScope on a collection with a server hook', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('shows the message a server hook rejects with, and keeps the form dirty', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Response.json(
+          {
+            error: {
+              code: 'hook-rejected',
+              message: 'Only admins can publish',
+            },
+          },
+          { status: 422 }
+        )
+      )
+    );
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const guard = defineHook('guard', {
+      server: async () => ({ default: defineServerHook(() => ({})) }),
+    });
+    const guarded: CollectionSchema = { ...collection, hooks: [guard()] };
+    const provider = providerReading(async () => ON_LOAD);
+    const update = vi.spyOn(provider, 'update');
+    const guardedConfig = asResolvedConfig({
+      plugins: [
+        contentPlugin(provider),
+        stringFieldPlugin,
+        defineHooksPlugin('test:hooks', [guard]),
+      ],
+      schema: { collections: [guarded] },
+    });
+    render(
+      <TinaProvider config={guardedConfig} queryClient={makeQueryClient()}>
+        <DocumentScope collection={guarded} path={path}>
+          <DocumentForm />
+        </DocumentScope>
+        <StatusProbe />
+      </TinaProvider>
+    );
+    await userEvent.type(await screen.findByLabelText('Title'), '!');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Only admins can publish'
+    );
+    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+    expect(update).not.toHaveBeenCalled();
   });
 });

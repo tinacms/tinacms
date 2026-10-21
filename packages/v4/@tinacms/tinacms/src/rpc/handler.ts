@@ -3,6 +3,15 @@
 // handler. It carries JSON only. Binary data belongs to the media capability (ADR-022).
 // A codec for richer JSON is still an open question (ADR-007).
 
+import type { TinaSchema } from '../config';
+import { CONTENT_SAVE_PERMISSION } from '../core/content/contract';
+import { HookRejectedError } from '../core/form/hooks';
+import {
+  InvalidSaveInputError,
+  type ServerHookRegistry,
+  createServerHookRegistry,
+  createServerSave,
+} from '../core/form/server-hooks';
 import { invariant } from '../core/invariant';
 import { capabilityMountsFor, capabilityProvider } from '../core/mount';
 import {
@@ -24,8 +33,14 @@ import {
   type ServerRuntime,
   type Session,
   opMeta,
+  protectedOp,
   serverRuntimeStorage,
 } from '../server';
+import {
+  type ContentWriteContext,
+  requestContext,
+  requestContextStorage,
+} from '../server/request-context';
 
 export type RpcHandler = ((request: Request) => Promise<Response>) & {
   // Tear the composed plugins down. A host that replaces a handler instead of ending
@@ -39,6 +54,9 @@ export interface RpcHandlerConfig {
   // is the last two segments of the path, so any prefix reaches an operation and a
   // proxy rule keyed on an exact path does not hold. Set it to pin the route.
   mountPath?: string;
+  // The collections, so a content save runs the server hooks each one lists.
+  // Required once a plugin registers a server hook.
+  schema?: TinaSchema;
 }
 
 // The composition runs once, at the first request. A failed composition leaves the
@@ -46,6 +64,7 @@ export interface RpcHandlerConfig {
 export const createRpcHandler = ({
   plugins,
   mountPath,
+  schema,
 }: RpcHandlerConfig): RpcHandler => {
   let runtimePromise: Promise<ServerRuntime> | null = null;
   // The composition and the teardown of this handler run in one sequence. destroy()
@@ -57,7 +76,9 @@ export const createRpcHandler = ({
   // Compose after the current turn, and become the next one, so a destroy that arrives
   // mid-composition tears down what this composition initialized.
   const composeAfterCurrentTurn = (): Promise<ServerRuntime> => {
-    const composing = lifecycleTurn.then(() => composeServerRuntime(plugins));
+    const composing = lifecycleTurn.then(() =>
+      composeServerRuntime(plugins, schema)
+    );
     lifecycleTurn = composing.then(
       () => undefined,
       () => undefined
@@ -118,9 +139,10 @@ export const createRpcHandler = ({
 
 const composeServerSegments = async (
   plugins: PluginManifest[]
-): Promise<Omit<ServerRuntime, 'destroy'>> => {
+): Promise<Omit<ServerRuntime, 'destroy'> & { hooks: ServerHookRegistry }> => {
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
+  const hooks = createServerHookRegistry(plugins, resolved);
   const segmentsByNamespace = composeOverridableRegistry(
     resolved.flatMap((segment) =>
       capabilityMountsFor(segment.manifest).map((mount) => ({
@@ -131,7 +153,9 @@ const composeServerSegments = async (
     ),
     serverConflictError
   );
+  claimServerHookFactories(segmentsByNamespace);
   return {
+    hooks,
     segmentsByNamespace,
     authHooks: claimAuthTransportHooks(
       segmentsByNamespace,
@@ -141,9 +165,23 @@ const composeServerSegments = async (
 };
 
 const composeServerRuntime = async (
-  plugins: PluginManifest[]
+  plugins: PluginManifest[],
+  schema: TinaSchema | undefined
 ): Promise<ServerRuntime> => {
-  const composed = await composeServerSegments(plugins);
+  const { hooks, ...composed } = await composeServerSegments(plugins);
+  invariant(
+    hooks.size === 0 || schema,
+    'rpc-server-hooks-no-schema',
+    'A plugin registers a server hook, but the RPC handler has no `schema`. ' +
+      'Pass the config schema to mountHandler so a save runs the hooks its collection lists.'
+  );
+  wrapContentSave(
+    composed.segmentsByNamespace,
+    capabilityProvider(plugins, 'content'),
+    capabilityProvider(plugins, AUTH_CAPABILITY)?.name,
+    hooks,
+    schema
+  );
   // The init runs last, so a failed composition leaves no initialized plugin behind
   // for the next attempt. The teardown travels on the runtime: a handler that is
   // replaced rather than ending with the process — a dev server re-evaluating its
@@ -159,7 +197,7 @@ export const createRequestAuthorizer = (plugins: PluginManifest[]) => {
   return async (
     request: Request,
     permissions: (string | undefined)[]
-  ): Promise<Response | null> => {
+  ): Promise<Authorization> => {
     composing ??= composeServerSegments(plugins).then(
       (composed) => ({ ...composed, destroy: async () => {} }),
       (cause) => {
@@ -172,6 +210,52 @@ export const createRequestAuthorizer = (plugins: PluginManifest[]) => {
       authorizeRequest(runtime, request, permissions)
     );
   };
+};
+
+// The reserved `hooks` key holds server hook factories, not an op, so it never routes.
+const claimServerHookFactories = (
+  segmentsByNamespace: Map<string, ResolvedServerSegment>
+): void => {
+  for (const [namespace, segment] of segmentsByNamespace) {
+    const { hooks, ...routableOps } = segment.ops;
+    segmentsByNamespace.set(namespace, { ...segment, ops: routableOps });
+  }
+};
+
+// The hooks live in the content provider's own `update` op, so every namespace that
+// mounts it runs them: a plugin that provides several singletons mounts at each. A
+// plugin that provides content but lost it to an override keeps no `update`.
+const wrapContentSave = (
+  segmentsByNamespace: Map<string, ResolvedServerSegment>,
+  contentProvider: PluginManifest | undefined,
+  authProvider: string | undefined,
+  hooks: ServerHookRegistry,
+  schema: TinaSchema | undefined
+): void => {
+  for (const [namespace, segment] of segmentsByNamespace) {
+    const { update, ...otherOps } = segment.ops;
+    if (!segment.manifest.provides.includes('content') || !update) continue;
+    if (segment.manifest !== contentProvider || typeof update !== 'function') {
+      segmentsByNamespace.set(namespace, { ...segment, ops: otherOps });
+      continue;
+    }
+    const save = createServerSave({
+      hooks,
+      collections: schema?.collections,
+      write: (input) =>
+        invokeOp(update, input, { ...requestContext(), authProvider }),
+    });
+    segmentsByNamespace.set(namespace, {
+      ...segment,
+      ops: {
+        ...segment.ops,
+        update: protectedOp(
+          { permission: CONTENT_SAVE_PERMISSION },
+          async (input: unknown) => save(input, requestContext().session)
+        ),
+      },
+    });
+  }
 };
 
 // Read the transport hooks from the auth segment, and remove them from the routable
@@ -282,6 +366,12 @@ const dispatch = async (
       authorizeAndInvokeOp(runtime, request, namespace, opName)
     );
   } catch (cause) {
+    if (cause instanceof HookRejectedError) {
+      return errorResponse(422, 'hook-rejected', cause.message);
+    }
+    if (cause instanceof InvalidSaveInputError) {
+      return errorResponse(400, 'invalid-input', cause.message);
+    }
     console.error(`[tinacms] RPC op "${namespace}/${opName}" failed:`, cause);
     return errorResponse(500, 'op-failed', 'Operation failed.');
   }
@@ -307,12 +397,14 @@ const authorizeAndInvokeOp = async (
   // operation. A publicOp is the one exception. It also skips the plugin-level
   // `requires`, because a caller with no session has no permissions to check.
   const meta = opMeta(op);
+  let session: Session | null = null;
   if (!meta.public) {
-    const refusal = await authorizeRequest(runtime, request, [
+    const authorization = await authorizeRequest(runtime, request, [
       mounted.manifest.requires?.permission,
       meta.permission,
     ]);
-    if (refusal) return refusal;
+    if ('refusal' in authorization) return authorization.refusal;
+    session = authorization.session;
   }
 
   let input: unknown;
@@ -325,35 +417,45 @@ const authorizeAndInvokeOp = async (
     }
   }
 
-  const result = await invokeOp(op, input);
+  const result = await requestContextStorage.run({ request, session }, () =>
+    invokeOp(op, input)
+  );
   return Response.json(result ?? null);
 };
 
-// A refusal, or null when the session grants every permission.
+export type Authorization = { session: Session } | { refusal: Response };
+
+const refuse = (
+  status: number,
+  code: string,
+  message: string
+): Authorization => ({ refusal: errorResponse(status, code, message) });
+
+// The session, when it grants every permission. Otherwise the refusal to send.
 const authorizeRequest = async (
   runtime: ServerRuntime,
   request: Request,
   permissions: (string | undefined)[]
-): Promise<Response | null> => {
+): Promise<Authorization> => {
   if (!runtime.authHooks) {
-    return errorResponse(401, 'unauthenticated', 'No CMS session.');
+    return refuse(401, 'unauthenticated', 'No CMS session.');
   }
   const session = await runtime.authHooks.getSession(request);
   if (!session) {
-    return errorResponse(401, 'unauthenticated', 'No CMS session.');
+    return refuse(401, 'unauthenticated', 'No CMS session.');
   }
   for (const permission of permissions) {
     if (!permission) continue;
     const allowed = await hasPermission(runtime.authHooks, session, permission);
     if (!allowed) {
-      return errorResponse(
+      return refuse(
         403,
         'forbidden',
         `Requires the "${permission}" permission.`
       );
     }
   }
-  return null;
+  return { session };
 };
 
 // The own-property check and the function check keep the prototype members, such as
@@ -369,9 +471,17 @@ const routedOp = (
 };
 
 // The one place that removes the `never` input of ServerOp for the call.
-// core/plugin.ts explains that choice.
-const invokeOp = (op: ServerOp, input: unknown): Promise<unknown> =>
-  (op as (input: unknown) => Promise<unknown>)(input);
+// core/plugin.ts explains that choice. Only core's content save hands the
+// provider's `update` the request context.
+const invokeOp = (
+  op: ServerOp,
+  input: unknown,
+  context?: ContentWriteContext
+): Promise<unknown> =>
+  (op as (input: unknown, context?: ContentWriteContext) => Promise<unknown>)(
+    input,
+    context
+  );
 
 const hasPermission = async (
   authHooks: AuthTransportHooks,
@@ -393,7 +503,7 @@ const hasPermission = async (
 // Every response that is not a 2xx holds `{ error: { code, message } }`. The
 // specification in tinacmsv4 plans/007 records the code table, until the ADR for the
 // error model exists. The tests hold the literal values.
-const errorResponse = (
+export const errorResponse = (
   status: number,
   code: string,
   message: string

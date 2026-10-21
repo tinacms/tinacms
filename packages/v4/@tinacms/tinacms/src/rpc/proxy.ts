@@ -3,9 +3,15 @@
 // which the compiler erases, so no server code and no secret reaches the browser. This
 // file runs in the browser, and it must not import from ../server or from ./handler.
 
+export const DEFAULT_RPC_URL = '/api/tina';
+
+// `hooks` is the reserved server-hook key of a segment, which never routes.
 export type RpcProxy<TSegments> = {
   [Namespace in keyof TSegments]: {
-    [Op in keyof TSegments[Namespace]]: TSegments[Namespace][Op] extends (
+    [Op in Exclude<
+      keyof TSegments[Namespace],
+      'hooks'
+    >]: TSegments[Namespace][Op] extends (
       ...args: infer TArgs
     ) => Promise<infer TResult>
       ? (...args: TArgs) => Promise<TResult>

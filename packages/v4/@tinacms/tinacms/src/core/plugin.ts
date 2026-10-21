@@ -1,6 +1,6 @@
 import type { StoreApi } from 'zustand';
 import type { FieldDescriptor, ValidatorFactory } from './field/contract';
-import type { FormHookFactory } from './form/hooks';
+import type { FormHookFactory, ServerHookFactory } from './form/hooks';
 import { invariant } from './invariant';
 import type { MediaManifest } from './media/contract';
 import type { AdminScreen } from './screen/contract';
@@ -95,7 +95,14 @@ export interface ClientSegment {
 
 export type ServerOp = (input: never) => Promise<unknown>;
 
-export type ServerSegment = Record<string, ServerOp>;
+export interface ServerSegment {
+  [op: string]: ServerOp | Record<string, ServerHookFactory>;
+  /**
+   * One `ServerHookFactory` for each name the manifest declares in
+   * `serverHooks`. Reserved: it is never routed as an op.
+   */
+  hooks?: Record<string, ServerHookFactory>;
+}
 
 export interface ResolvedServerSegment {
   manifest: PluginManifest;
@@ -123,11 +130,15 @@ export const resolveClientSegments = async (
       `Plugin "${manifest.name}" declares validators but has no client segment to hold their factories.`
     );
     invariant(
-      !(manifest.hooks?.length && !manifest.client),
+      !(manifest.hooks?.length && !manifest.client && !manifest.server),
       'hooks-plugin-no-client',
-      `Plugin "${manifest.name}" declares hooks but has no client segment to hold their factories.`
+      `Plugin "${manifest.name}" declares hooks but has no client or server segment to hold their factories.`
     );
-    if (!manifest.client) continue;
+    if (!manifest.client) {
+      if (manifest.serverHooks?.length)
+        resolved.push({ manifest, segment: {} });
+      continue;
+    }
     const clientModule = await manifest.client();
     invariant(
       clientModule?.default,
@@ -157,6 +168,11 @@ export interface PluginManifestInput {
   validators?: string[];
   /** The form hook names this plugin registers. Same rules as `validators`. */
   hooks?: string[];
+  /**
+   * The names in `hooks` that have a server side. The client reads them to
+   * route a save through the site's server without loading server code.
+   */
+  serverHooks?: string[];
   /** Set by a plugin that provides `media`. */
   media?: MediaManifest;
   client?: () => Promise<{ default: ClientSegment }>;

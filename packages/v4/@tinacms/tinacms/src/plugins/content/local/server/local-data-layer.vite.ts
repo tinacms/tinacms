@@ -4,7 +4,18 @@ import path from 'node:path';
 import type { Connect, Plugin } from 'vite';
 import { runCodegen } from '../../../../cli/commands/codegen';
 import { type ResolvedConfig, resolveBuild } from '../../../../config';
-import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
+import type { Session } from '../../../../core/auth/contract';
+import {
+  CONTENT_SAVE_PERMISSION,
+  DEFAULT_CONTENT_URL,
+} from '../../../../core/content/contract';
+import { HookRejectedError } from '../../../../core/form/hooks';
+import {
+  InvalidSaveInputError,
+  type ServerSave,
+  createServerHookRegistry,
+  createServerSave,
+} from '../../../../core/form/server-hooks';
 import { invariant } from '../../../../core/invariant';
 import { capabilityProvider } from '../../../../core/mount';
 import {
@@ -18,7 +29,12 @@ import {
   RequestBodyTooLargeError,
 } from '../../../../core/request-body';
 import { AUTH_CAPABILITY, type PluginManifest } from '../../../../core/plugin';
-import { createRequestAuthorizer } from '../../../../rpc/handler';
+import { resolveServerSegments } from '../../../../core/resolve';
+import {
+  createRequestAuthorizer,
+  errorResponse,
+} from '../../../../rpc/handler';
+import { DEFAULT_RPC_URL } from '../../../../rpc/proxy';
 import {
   LOCAL_MEDIA_PLUGIN_NAME,
   MEDIA_ERROR_HEADER,
@@ -31,7 +47,9 @@ import {
   dispatchMediaRequest,
   listMedia,
 } from '../../../media/local/server/media-request';
+import { isRecord } from '../../../../utils/is-record';
 import { mimeTypeOfPath } from '../../../media-manager/media-types';
+import { LOCAL_CONTENT_PLUGIN_NAME } from '../local-content.plugin';
 import { dispatchContentRequest } from './content-request';
 import {
   type LocalDataLayerOptions,
@@ -140,10 +158,12 @@ const sessionRequestOf = (req: Connect.IncomingMessage): Request => {
   return new Request(url, { method: req.method, headers });
 };
 
+// The verified session, or null once the gate has sent its refusal.
 type SessionGate = (
   req: Connect.IncomingMessage,
-  res: ServerResponse
-) => Promise<boolean>;
+  res: ServerResponse,
+  permission?: string
+) => Promise<Session | null>;
 
 // ADR-023 §4: with an auth plugin, the Data Layer authorizes a request as
 // rpc/handler.ts does. When no auth plugin, or the winning one has no server
@@ -156,20 +176,100 @@ const createSessionGate = (
   const authorize = createRequestAuthorizer(plugins);
   const permission = capabilityProvider(plugins, capability)?.requires
     ?.permission;
-  return async (req, res) => {
+  return async (req, res, opPermission) => {
     try {
-      const refusal = await authorize(sessionRequestOf(req), [permission]);
-      if (!refusal) return true;
-      res.statusCode = refusal.status;
-      res.setHeader('content-type', 'application/json');
-      res.end(await refusal.text());
+      const authorization = await authorize(sessionRequestOf(req), [
+        permission,
+        opPermission,
+      ]);
+      if (!('refusal' in authorization)) return authorization.session;
+      await sendResponse(res, authorization.refusal);
     } catch (cause) {
       console.error('[tinacms] Data Layer session check failed:', cause);
       res.statusCode = 500;
       res.end('Session check failed.');
     }
-    return false;
+    return null;
   };
+};
+
+const readJsonBody = async (req: Connect.IncomingMessage): Promise<unknown> => {
+  const body = await readRequestBody(req);
+  try {
+    return JSON.parse(body);
+  } catch {
+    throw new InvalidSaveInputError('The body is not JSON.');
+  }
+};
+
+const sendResponse = async (
+  res: ServerResponse,
+  response: Response
+): Promise<void> => {
+  res.statusCode = response.status;
+  res.setHeader('content-type', 'application/json');
+  res.end(await response.text());
+};
+
+// The local route of the RPC `content/update` op, so `vite dev` runs the server
+// hooks. The RPC handler itself refuses every op without an auth plugin, and
+// local development runs without one.
+const createServerSaveHandler = (
+  loadServerSave: () => Promise<ServerSave>,
+  gate: SessionGate | null
+): Connect.NextHandleFunction => {
+  const respond = async (
+    req: Connect.IncomingMessage,
+    session: Session | null
+  ): Promise<Response> => {
+    try {
+      const input = await readJsonBody(req);
+      const save = await loadServerSave();
+      return Response.json(await save(input, session));
+    } catch (cause) {
+      if (cause instanceof HookRejectedError) {
+        return errorResponse(422, 'hook-rejected', cause.message);
+      }
+      if (cause instanceof InvalidSaveInputError) {
+        return errorResponse(400, 'invalid-input', cause.message);
+      }
+      console.error('[tinacms] Local content/update failed:', cause);
+      return errorResponse(500, 'op-failed', 'Operation failed.');
+    }
+  };
+  return async (req, res) => {
+    if (isCrossOriginRequest(req)) {
+      res.statusCode = 403;
+      res.end('Cross-origin request rejected');
+      return;
+    }
+    if (coreContentTypeOfRequest(req) !== 'application/json') {
+      await sendResponse(
+        res,
+        errorResponse(
+          415,
+          'unsupported-media-type',
+          'RPC requests must be application/json.'
+        )
+      );
+      return;
+    }
+    const session = gate ? await gate(req, res, CONTENT_SAVE_PERMISSION) : null;
+    if (gate && !session) return;
+    await sendResponse(res, await respond(req, session));
+  };
+};
+
+// The client build stubs every `*.server.*` module under tina/, so a server
+// hook's `server` loader never bundles server code (ADR-007).
+const SERVER_MODULE = /\.server(\.[cm]?[jt]sx?)?$/;
+const SERVER_MODULE_STUB = '\0tina:server-module-stub';
+
+const isServerModuleIn = (tinaDir: string, id: string): boolean => {
+  const file = id.split('?')[0];
+  if (!SERVER_MODULE.test(file)) return false;
+  const relative = path.relative(tinaDir, file);
+  return !relative.startsWith('..') && !path.isAbsolute(relative);
 };
 
 const createMediaHandler = (
@@ -274,6 +374,26 @@ export const tinaLocalDataLayerVitePlugin = (
   const plugins = options.config?.plugins ?? [];
   const contentGate = createSessionGate(plugins, 'content');
   const mediaGate = createSessionGate(plugins, 'media');
+  let serverSave: Promise<ServerSave> | undefined;
+  const loadServerSave = (): Promise<ServerSave> => {
+    serverSave ??= resolveServerSegments(plugins).then(
+      (resolved) =>
+        createServerSave({
+          hooks: createServerHookRegistry(plugins, resolved),
+          collections,
+          write: ({ collection, path: documentPath, value }) =>
+            dataLayer.update(collection, documentPath, value),
+        }),
+      (cause) => {
+        serverSave = undefined;
+        throw cause;
+      }
+    );
+    return serverSave;
+  };
+  const tinaDir = path.resolve(options.rootDir, 'tina');
+  const servesContentSave =
+    capabilityProvider(plugins, 'content')?.name === LOCAL_CONTENT_PLUGIN_NAME;
   const usesLocalMedia =
     options.config?.plugins.some(
       ({ name }) => name === LOCAL_MEDIA_PLUGIN_NAME
@@ -311,30 +431,78 @@ export const tinaLocalDataLayerVitePlugin = (
       }
     }
   };
-  const serveContentRequest: Connect.NextHandleFunction = async (req, res) => {
+  // Connect mounts by prefix, so a sub-path such as the RPC `content/update`
+  // passes on to the next handler instead of reading as a content request.
+  const serveContentRequest: Connect.NextHandleFunction = async (
+    req,
+    res,
+    next
+  ) => {
+    if ((req.url ?? '/').split('?')[0] !== '/') {
+      next();
+      return;
+    }
     if (isCrossOriginRequest(req)) {
       res.statusCode = 403;
       res.end('Cross-origin request rejected');
       return;
     }
-    if (contentGate && !(await contentGate(req, res))) return;
     if (coreContentTypeOfRequest(req) !== 'application/json') {
       res.statusCode = 415;
       res.end('Expected application/json');
       return;
     }
+    let request: unknown;
     try {
-      const body = await readRequestBody(req);
-      const result = await dispatchContentRequest(dataLayer, JSON.parse(body));
+      request = JSON.parse(await readRequestBody(req));
+    } catch (cause) {
+      sendError(req, res, cause);
+      return;
+    }
+    const isUpdate = isRecord(request) && request.op === 'update';
+    const session = contentGate
+      ? await contentGate(
+          req,
+          res,
+          isUpdate ? CONTENT_SAVE_PERMISSION : undefined
+        )
+      : null;
+    if (contentGate && !session) return;
+    try {
+      const result = isUpdate
+        ? (await (await loadServerSave())(request, session)).entry
+        : await dispatchContentRequest(dataLayer, request);
       res.setHeader('content-type', 'application/json');
       res.end(JSON.stringify(result));
     } catch (cause) {
+      if (cause instanceof HookRejectedError) {
+        res.statusCode = 422;
+        res.end(cause.message);
+        return;
+      }
       sendError(req, res, cause);
     }
   };
 
   return {
     name: 'tina-local-data-layer',
+    // The stub must resolve a server module before the resolver of vite does.
+    enforce: 'pre',
+    async resolveId(source, importer, resolveOptions) {
+      if (resolveOptions?.ssr || !importer) return null;
+      const resolved = await this.resolve(source, importer, {
+        ...resolveOptions,
+        skipSelf: true,
+      });
+      if (resolved && isServerModuleIn(tinaDir, resolved.id)) {
+        return SERVER_MODULE_STUB;
+      }
+      return resolved;
+    },
+    load: (id) =>
+      id === SERVER_MODULE_STUB
+        ? "throw new Error('A *.server.* module under tina/ runs on the server only. Load it only through the server loader of a hook.');"
+        : null,
     config: () => ({
       server: {
         watch: {
@@ -415,6 +583,12 @@ export const tinaLocalDataLayerVitePlugin = (
           createMediaHandler(media, mediaGate, (mediaPath) =>
             uploaded.add(mediaPath)
           )
+        );
+      }
+      if (servesContentSave) {
+        server.middlewares.use(
+          `${options.config?.rpcUrl ?? DEFAULT_RPC_URL}/content/update`,
+          createServerSaveHandler(loadServerSave, contentGate)
         );
       }
       server.middlewares.use(

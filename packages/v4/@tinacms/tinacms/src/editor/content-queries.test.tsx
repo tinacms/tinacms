@@ -1,14 +1,16 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createStore } from 'zustand';
-import type {
-  ContentProvider,
-  DocumentEntry,
-  DocumentSummary,
+import {
+  type ContentProvider,
+  ContentError,
+  type DocumentEntry,
+  type DocumentSummary,
 } from '../core/content/contract';
 import type { TinaStoreState } from '../core/plugin';
+import type { CollectionSchema } from '../core/schema/types';
 import {
   contentKeys,
   useCollectionDocuments,
@@ -24,11 +26,21 @@ const ENTRIES: DocumentEntry[] = [
 
 const SUMMARIES: DocumentSummary[] = ENTRIES.map(({ path }) => ({ path }));
 
-const renderWithContent = (provider: ContentProvider) => {
+const renderWithContent = (
+  provider: ContentProvider,
+  collections: CollectionSchema[] = [],
+  serverHooks: ReadonlySet<string> = new Set(),
+  rpcUrl = '/api/tina'
+) => {
   const store = createStore<TinaStoreState>()(() => ({
     content: provider as unknown as Record<string, unknown>,
   }));
-  const runtime = { store } as unknown as TinaRuntime;
+  const runtime = {
+    store,
+    schema: { collections },
+    serverHooks,
+    rpcUrl,
+  } as unknown as TinaRuntime;
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
@@ -266,5 +278,137 @@ describe('useSaveDocument', () => {
         value: {},
       })
     ).rejects.toThrow(/update failed \(500\)/);
+  });
+});
+
+describe('useSaveDocument on a collection with a server hook', () => {
+  const post: CollectionSchema = {
+    name: 'post',
+    format: 'mdx',
+    hooks: [{ name: 'guard' }],
+    fields: [],
+  };
+  const tag: CollectionSchema = { name: 'tag', format: 'json', fields: [] };
+
+  const renderServerHooked = (rpcUrl?: string) => {
+    const provider = stubProvider();
+    const { wrapper } = renderWithContent(
+      provider,
+      [post, tag],
+      new Set(['guard']),
+      rpcUrl
+    );
+    const { result } = renderHook(() => useSaveDocument(), { wrapper });
+    return { provider, save: result.current.save };
+  };
+
+  const stubRoute = (respond: () => Response | Promise<Response>) => {
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) =>
+      respond()
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    return fetchMock;
+  };
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('saves a server-hooked collection through content/update, and any other straight to the provider', async () => {
+    const fetchMock = stubRoute(() =>
+      Response.json({
+        entry: { path: 'content/posts/a.mdx', document: { title: 'A' } },
+        hookWarnings: [],
+      })
+    );
+    const { provider, save } = renderServerHooked();
+
+    await save({ collection: 'tag', path: 'content/tags/t.json', value: {} });
+    expect(provider.update).toHaveBeenCalledTimes(1);
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    const saved = await save({
+      collection: 'post',
+      path: 'content/posts/a.mdx',
+      value: { title: 'A' },
+    });
+    expect(provider.update).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/tina/content/update');
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({
+      collection: 'post',
+      path: 'content/posts/a.mdx',
+      value: { title: 'A' },
+    });
+    expect(saved).toEqual({
+      path: 'content/posts/a.mdx',
+      document: { title: 'A' },
+      hookWarnings: [],
+    });
+  });
+
+  it.each([
+    ['answers 404', () => new Response('Not found', { status: 404 })],
+    [
+      'is unreachable',
+      () => {
+        throw new TypeError('Failed to fetch');
+      },
+    ],
+  ])(
+    'fails with the server-route error when the site server %s, and never writes directly',
+    async (_, respond) => {
+      stubRoute(respond);
+      const { provider, save } = renderServerHooked();
+
+      const rejection = save({
+        collection: 'post',
+        path: 'content/posts/a.mdx',
+        value: {},
+      });
+      await expect(rejection).rejects.toBeInstanceOf(ContentError);
+      await expect(rejection).rejects.toThrow(
+        "This collection has server hooks, so it needs the site's server route."
+      );
+      expect(provider.update).not.toHaveBeenCalled();
+    }
+  );
+
+  it('posts to the RPC URL the config names', async () => {
+    const fetchMock = stubRoute(() =>
+      Response.json({
+        entry: { path: 'content/posts/a.mdx', document: {} },
+        hookWarnings: [],
+      })
+    );
+    const { save } = renderServerHooked('/cms/rpc');
+    await save({ collection: 'post', path: 'content/posts/a.mdx', value: {} });
+    expect(fetchMock.mock.calls[0][0]).toBe('/cms/rpc/content/update');
+  });
+
+  it('reports any other failure as a backend failure', async () => {
+    stubRoute(() => {
+      throw new Error('stream reset');
+    });
+    const { save } = renderServerHooked();
+    await expect(
+      save({ collection: 'post', path: 'content/posts/a.mdx', value: {} })
+    ).rejects.toMatchObject({ code: 'backend-failure' });
+  });
+
+  it("shows a hook's rejection message", async () => {
+    stubRoute(() =>
+      Response.json(
+        {
+          error: { code: 'hook-rejected', message: 'Only admins can publish' },
+        },
+        { status: 422 }
+      )
+    );
+    const { save } = renderServerHooked();
+
+    await expect(
+      save({ collection: 'post', path: 'content/posts/a.mdx', value: {} })
+    ).rejects.toMatchObject({
+      code: 'hook-rejected',
+      message: 'Only admins can publish',
+    });
   });
 });
