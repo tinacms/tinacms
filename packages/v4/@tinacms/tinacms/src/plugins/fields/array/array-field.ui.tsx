@@ -3,16 +3,10 @@ import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { type ReactNode, use, useRef } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FormScopeContext } from '../../../editor/context';
-import { isEdited, useFormStore } from '../../../form/form-store';
 import type { FieldAddress } from '../../../core/field/address';
-import type { FieldTransformContext } from '../../../core/field/contract';
-import { digestDocument, ingestDocument } from '../../../core/form/ingest';
+import { ingestDocument } from '../../../core/form/ingest';
 import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
-import type {
-  FieldSchema,
-  TemplateSchema,
-  TinaDocument,
-} from '../../../core/schema/types';
+import type { FieldSchema, TemplateSchema } from '../../../core/schema/types';
 import {
   NestedFieldRow,
   useDocumentPath,
@@ -31,43 +25,7 @@ import {
   isTemplatesArray,
   itemFieldsOf,
 } from './array-field.schema';
-import {
-  OBJECT_FIELD_TYPE,
-  asObjectFieldSchema,
-  isPlainObject,
-} from '../object/object-field.schema';
 import { StoredValue, UneditableValue } from '../uneditable-value';
-
-const isPristineNestedObject = (
-  value: unknown,
-  subfield: FieldSchema,
-  context: FieldTransformContext
-): boolean => {
-  if (!isPlainObject(value)) return false;
-  const objectField = asObjectFieldSchema(subfield);
-  const ingested = ingestDocument(value, objectField.fields, context);
-  return objectField.fields.every((nested) => {
-    const nestedValue = ingested[nested.name];
-    return nestedValue == null || nestedValue === '';
-  });
-};
-
-const storedArrayItem = (
-  raw: TinaDocument,
-  fields: FieldSchema[],
-  context: FieldTransformContext
-): TinaDocument => {
-  const sanitized: TinaDocument = { ...raw };
-  for (const subfield of fields) {
-    if (subfield.type !== OBJECT_FIELD_TYPE || !(subfield.name in sanitized)) {
-      continue;
-    }
-    if (isPristineNestedObject(sanitized[subfield.name], subfield, context)) {
-      delete sanitized[subfield.name];
-    }
-  }
-  return digestDocument(sanitized, fields, context);
-};
 
 export function ArrayField() {
   const address = useFieldAddress();
@@ -112,71 +70,12 @@ function ObjectItems({
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
   const formScope = use(FormScopeContext);
-  const { control, getValues, setValue, reset } = useFormContext();
-  const {
-    fields: items,
-    append,
-    remove,
-    move,
-    replace,
-  } = useFieldArray({ control, name: address });
-  const liveItems = (): TinaDocument[] => getValues(address) ?? [];
-  const removeItem = (index: number) => {
-    if (isTemplatesArray(field)) {
-      remove(index);
-      return;
-    }
-    const itemContext = { documentPath, registry };
-    const form = formScope
-      ? useFormStore.getState().forms[formScope.formId]
-      : undefined;
-    let baselineItems: unknown[] | null = null;
-    if (form && Array.isArray(form.values[address])) {
-      if (form.status === 'pristine') {
-        baselineItems = form.values[address];
-      } else if (isEdited(form) && Array.isArray(form.baseline[address])) {
-        baselineItems = form.baseline[address];
-      }
-    }
-    const ingested = liveItems()
-      .map((item, position) => ({ item, position }))
-      .filter(({ position }) => position !== index)
-      .map(({ item, position }) => {
-        const raw = isItem(item) ? item : {};
-        const stored = storedArrayItem(raw, field.fields, itemContext);
-        if (baselineItems && isItem(baselineItems[position])) {
-          const baselineStored = digestDocument(
-            baselineItems[position],
-            field.fields,
-            itemContext
-          );
-          for (const subfield of field.fields) {
-            if (subfield.name in baselineStored) continue;
-            if (
-              !(subfield.name in raw) ||
-              isPristineNestedObject(raw[subfield.name], subfield, itemContext)
-            ) {
-              delete stored[subfield.name];
-            }
-          }
-        }
-        const next = ingestDocument(stored, field.fields, itemContext);
-        for (const subfield of field.fields) {
-          if (!(subfield.name in stored)) {
-            next[subfield.name] = null;
-          }
-        }
-        return next;
-      });
-    const updatedValues = { ...getValues(), [address]: ingested };
-    reset(updatedValues);
-    replace(ingested);
-    if (formScope) {
-      useFormStore
-        .getState()
-        .setFieldValue(formScope.formId, address, ingested);
-    }
-  };
+  const { control, getValues } = useFormContext();
+  const { fields: items, append, move } = useFieldArray({
+    control,
+    name: address,
+  });
+  const removeItem = (index: number) => formScope?.removeListItem(address, index);
 
   const seed = (template: TemplateSchema | undefined, fields: FieldSchema[]) =>
     ingestDocument(template?.defaultItem ?? {}, fields, {
