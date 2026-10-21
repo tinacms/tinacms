@@ -5,12 +5,11 @@
 
 import type { TinaSchema } from '../config';
 import { CONTENT_SAVE_PERMISSION } from '../core/content/contract';
-import { HookRejectedError } from '../core/form/hooks';
 import {
-  InvalidSaveInputError,
   type ServerHookRegistry,
   createServerHookRegistry,
   createServerSave,
+  toSaveErrorResponse,
 } from '../core/form/server-hooks';
 import { invariant } from '../core/invariant';
 import { capabilityMountsFor, capabilityProvider } from '../core/mount';
@@ -34,13 +33,11 @@ import {
   type Session,
   opMeta,
   protectedOp,
-  serverRuntimeStorage,
-} from '../server';
-import {
-  type ContentWriteContext,
   requestContext,
   requestContextStorage,
-} from '../server/request-context';
+  serverRuntimeStorage,
+} from '../server';
+import { errorResponse } from './error-response';
 
 export type RpcHandler = ((request: Request) => Promise<Response>) & {
   // Tear the composed plugins down. A host that replaces a handler instead of ending
@@ -50,10 +47,10 @@ export type RpcHandler = ((request: Request) => Promise<Response>) & {
 
 export interface RpcHandlerConfig {
   plugins: PluginManifest[];
-  // Where the adapter mounted this handler, such as `/api/tina`. Without it the route
-  // is the last two segments of the path, so any prefix reaches an operation and a
-  // proxy rule keyed on an exact path does not hold. Set it to pin the route.
-  mountPath?: string;
+  // The config's `rpcUrl`: where the adapter mounted this handler. Without it the
+  // route is the last two segments of the path, so any prefix reaches an operation and
+  // a proxy rule keyed on an exact path does not hold. Set it to pin the route.
+  rpcUrl?: string;
   // The collections, so a content save runs the server hooks each one lists.
   // Required once a plugin registers a server hook.
   schema?: TinaSchema;
@@ -63,7 +60,7 @@ export interface RpcHandlerConfig {
 // cache, so the next request tries again.
 export const createRpcHandler = ({
   plugins,
-  mountPath,
+  rpcUrl,
   schema,
 }: RpcHandlerConfig): RpcHandler => {
   let runtimePromise: Promise<ServerRuntime> | null = null;
@@ -96,7 +93,7 @@ export const createRpcHandler = ({
     // — so an unauthenticated GET would start that work again on every request.
     const refusal = refusalOf(request);
     if (refusal) return refusal;
-    const route = routeOf(request, mountPath);
+    const route = routeOf(request, rpcUrl);
     if (!route) {
       return errorResponse(404, 'not-found', 'Expected …/<capability>/<op>.');
     }
@@ -161,6 +158,7 @@ const composeServerSegments = async (
       segmentsByNamespace,
       capabilityProvider(plugins, AUTH_CAPABILITY)
     ),
+    authProvider: capabilityProvider(plugins, AUTH_CAPABILITY)?.name,
   };
 };
 
@@ -178,7 +176,6 @@ const composeServerRuntime = async (
   wrapContentSave(
     composed.segmentsByNamespace,
     capabilityProvider(plugins, 'content'),
-    capabilityProvider(plugins, AUTH_CAPABILITY)?.name,
     hooks,
     schema
   );
@@ -228,7 +225,6 @@ const claimServerHookFactories = (
 const wrapContentSave = (
   segmentsByNamespace: Map<string, ResolvedServerSegment>,
   contentProvider: PluginManifest | undefined,
-  authProvider: string | undefined,
   hooks: ServerHookRegistry,
   schema: TinaSchema | undefined
 ): void => {
@@ -242,8 +238,7 @@ const wrapContentSave = (
     const save = createServerSave({
       hooks,
       collections: schema?.collections,
-      write: (input) =>
-        invokeOp(update, input, { ...requestContext(), authProvider }),
+      write: (input) => invokeOp(update, input),
     });
     segmentsByNamespace.set(namespace, {
       ...segment,
@@ -366,14 +361,7 @@ const dispatch = async (
       authorizeAndInvokeOp(runtime, request, namespace, opName)
     );
   } catch (cause) {
-    if (cause instanceof HookRejectedError) {
-      return errorResponse(422, 'hook-rejected', cause.message);
-    }
-    if (cause instanceof InvalidSaveInputError) {
-      return errorResponse(400, 'invalid-input', cause.message);
-    }
-    console.error(`[tinacms] RPC op "${namespace}/${opName}" failed:`, cause);
-    return errorResponse(500, 'op-failed', 'Operation failed.');
+    return toSaveErrorResponse(cause, `RPC op "${namespace}/${opName}"`);
   }
 };
 
@@ -417,8 +405,9 @@ const authorizeAndInvokeOp = async (
     }
   }
 
-  const result = await requestContextStorage.run({ request, session }, () =>
-    invokeOp(op, input)
+  const result = await requestContextStorage.run(
+    { request, session, authProvider: runtime.authProvider },
+    () => invokeOp(op, input)
   );
   return Response.json(result ?? null);
 };
@@ -471,17 +460,9 @@ const routedOp = (
 };
 
 // The one place that removes the `never` input of ServerOp for the call.
-// core/plugin.ts explains that choice. Only core's content save hands the
-// provider's `update` the request context.
-const invokeOp = (
-  op: ServerOp,
-  input: unknown,
-  context?: ContentWriteContext
-): Promise<unknown> =>
-  (op as (input: unknown, context?: ContentWriteContext) => Promise<unknown>)(
-    input,
-    context
-  );
+// core/plugin.ts explains that choice.
+const invokeOp = (op: ServerOp, input: unknown): Promise<unknown> =>
+  (op as (input: unknown) => Promise<unknown>)(input);
 
 const hasPermission = async (
   authHooks: AuthTransportHooks,
@@ -499,15 +480,6 @@ const hasPermission = async (
   }
   return false;
 };
-
-// Every response that is not a 2xx holds `{ error: { code, message } }`. The
-// specification in tinacmsv4 plans/007 records the code table, until the ADR for the
-// error model exists. The tests hold the literal values.
-export const errorResponse = (
-  status: number,
-  code: string,
-  message: string
-): Response => Response.json({ error: { code, message } }, { status });
 
 const serverConflictError = (
   conflict: RegistryConflict,

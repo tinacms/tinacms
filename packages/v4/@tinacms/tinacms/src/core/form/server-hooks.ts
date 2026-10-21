@@ -5,10 +5,13 @@ import type {
   ContentSaveResult,
   DocumentEntry,
 } from '../content/contract';
+import { errorResponse } from '../../rpc/error-response';
 import { invariant } from '../invariant';
+import { RequestBodyTooLargeError } from '../request-body';
 import type { PluginManifest, ResolvedServerSegment } from '../plugin';
 import type { CollectionSchema, HookRef } from '../schema/types';
 import {
+  HookRejectedError,
   type ServerFormHooks,
   type ServerHookFactory,
   type ServerHookScope,
@@ -100,6 +103,25 @@ export class InvalidSaveInputError extends Error {
     this.name = 'InvalidSaveInputError';
   }
 }
+
+// The response for a failed save. A failure with no known cause keeps its
+// message out of the body and in the server log under `label`.
+export const toSaveErrorResponse = (
+  cause: unknown,
+  label: string
+): Response => {
+  if (cause instanceof HookRejectedError) {
+    return errorResponse(422, 'hook-rejected', cause.message);
+  }
+  if (cause instanceof InvalidSaveInputError) {
+    return errorResponse(400, 'invalid-input', cause.message);
+  }
+  if (cause instanceof RequestBodyTooLargeError) {
+    return errorResponse(413, 'body-too-large', cause.message);
+  }
+  console.error(`[tinacms] ${label} failed:`, cause);
+  return errorResponse(500, 'op-failed', 'Operation failed.');
+};
 
 export type ServerSave = (
   input: unknown,

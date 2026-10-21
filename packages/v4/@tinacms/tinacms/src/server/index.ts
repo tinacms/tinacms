@@ -6,6 +6,10 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import type { AuthTransportHooks, Session } from '../core/auth/contract';
 import { CONTENT_SAVE_PERMISSION } from '../core/content/contract';
 import { invariant } from '../core/invariant';
+import {
+  type RequestContext,
+  bindRequestContextStore,
+} from './request-context';
 import type {
   ResolvedServerSegment,
   ServerOp,
@@ -13,6 +17,7 @@ import type {
 } from '../core/plugin';
 
 export { toUserId, type UserId } from '../core/auth/contract';
+export { type RequestContext, requestContext } from './request-context';
 export {
   defineServerHook,
   HookRejectedError,
@@ -93,6 +98,7 @@ export const opMeta = (handler: ServerOp): OpMeta =>
 export interface ServerRuntime {
   segmentsByNamespace: Map<string, ResolvedServerSegment>;
   authHooks: AuthTransportHooks | null;
+  authProvider: string | undefined;
   // The teardown from initializePlugins. It runs every onDestroy that its matching
   // onInit paired with, and a second call destroys nothing.
   destroy: () => Promise<void>;
@@ -101,6 +107,9 @@ export interface ServerRuntime {
 // Carries the runtime across a dispatch so the module-level `use()` resolves against
 // the handler that dispatched it — safe under interleaved requests.
 export const serverRuntimeStorage = new AsyncLocalStorage<ServerRuntime>();
+
+export const requestContextStorage = new AsyncLocalStorage<RequestContext>();
+bindRequestContextStore(() => requestContextStorage.getStore());
 
 // Server→server in-process capability accessor (ADR-007) — `use('content').listAll()`.
 // Typed per-capability contracts arrive with ADR-019/021/022; until then callers cast.

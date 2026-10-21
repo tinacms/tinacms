@@ -608,23 +608,23 @@ describe('createRpcHandler composition', () => {
   });
 });
 
-describe('createRpcHandler mountPath', () => {
+describe('createRpcHandler rpcUrl', () => {
   const plugins = [mediaPlugin, authPlugin()];
 
-  it('routes a prefixed path when no mountPath is set', async () => {
+  it('routes a prefixed path when no rpcUrl is set', async () => {
     const handler = createRpcHandler({ plugins });
     const response = await handler(post('/junk/media/health'));
     expect(response.status).toBe(200);
   });
 
-  it('404s that same prefixed path when a mountPath is set', async () => {
-    const handler = createRpcHandler({ plugins, mountPath: '/api/tina' });
+  it('404s that same prefixed path when an rpcUrl is set', async () => {
+    const handler = createRpcHandler({ plugins, rpcUrl: '/api/tina' });
     const response = await handler(post('/junk/media/health'));
     expect(response.status).toBe(404);
   });
 
   it('serves the exact mounted path', async () => {
-    const handler = createRpcHandler({ plugins, mountPath: '/api/tina' });
+    const handler = createRpcHandler({ plugins, rpcUrl: '/api/tina' });
     const response = await handler(post('/media/health'));
     expect(response.status).toBe(200);
   });

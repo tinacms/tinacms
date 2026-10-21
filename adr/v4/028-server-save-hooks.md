@@ -65,9 +65,9 @@ At compose time, core wraps the `content` provider's server `update` op with the
 
 The op requires the `content:save` permission (ADR-008, ADR-014 §4). The default `editor` role holds it, so editors can save server-hooked collections (ADR-008 §5).
 
-Core hands the provider's `update` the request context, `{ request, session }`, as a second argument. The provider never reads it from global state. `tinaCloud()` uses the request to write with the token of the editor who saved.
+The provider's `update` takes only its input, as every op does. It reads the request through `requestContext()` from `tinacms/server`, which returns `{ request, session, authProvider }` for the op that is running, the way `use()` returns another capability. `tinaCloud()` uses the request to write with the token of the editor who saved.
 
-To find a collection's hooks, the RPC handler needs the config's `schema` (`mountHandler({ plugins, schema })`). `schema` is optional until a plugin registers a server hook. After that, a handler without it fails when it composes, on its first request.
+To find a collection's hooks, the RPC handler needs the config's `schema` (`mountHandler(config)`). `schema` is optional until a plugin registers a server hook. After that, a handler without it fails when it composes, on its first request.
 
 ### 5. `reject(message)` is how a hook talks to the editor
 `reject(message)` is the only way a hook's message reaches the editor. It throws a `HookRejectedError`, and the Backend answers 422 with `{ error: { code: 'hook-rejected', message } }`. The provider is never called. The admin raises a `ContentError` with code `hook-rejected` that shows the hook's message, and the form stays dirty.

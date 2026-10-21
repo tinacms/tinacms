@@ -54,16 +54,15 @@ export interface ServerHookScope {
   branch?: string;
 }
 
-export interface ServerFormHooks {
+export interface SaveHooks<Scope> {
   beforeSave?: (
     document: TinaDocument,
-    scope: ServerHookScope
+    scope: Scope
   ) => TinaDocument | Promise<TinaDocument>;
-  afterSave?: (
-    document: TinaDocument,
-    scope: ServerHookScope
-  ) => void | Promise<void>;
+  afterSave?: (document: TinaDocument, scope: Scope) => void | Promise<void>;
 }
+
+export type ServerFormHooks = SaveHooks<ServerHookScope>;
 
 export type ServerHookFactory = (...args: JsonValue[]) => ServerFormHooks;
 
@@ -87,19 +86,13 @@ export const reject = (message: string): never => {
   throw new HookRejectedError(message);
 };
 
-export const overridesHookKey = (
-  manifest: PluginManifest,
-  key: string
-): boolean =>
+const overridesHookKey = (manifest: PluginManifest, key: string): boolean =>
   manifest.overrides.some(
     (override) =>
       override.capability === HOOKS_CAPABILITY && override.key === key
   );
 
-export const hookConflictError = (
-  conflict: RegistryConflict,
-  key: string
-): Error => {
+const hookConflictError = (conflict: RegistryConflict, key: string): Error => {
   if (conflict === REGISTRY_CONFLICTS.duplicateOverride) {
     return new Error(
       `Two plugins both declare an \`overrides\` for the form hook "${key}". ` +
@@ -191,14 +184,6 @@ export const resolveFormHooks = (
     );
     return factory(...(ref.args ?? []));
   });
-
-interface SaveHooks<Scope> {
-  beforeSave?: (
-    document: TinaDocument,
-    scope: Scope
-  ) => TinaDocument | Promise<TinaDocument>;
-  afterSave?: (document: TinaDocument, scope: Scope) => void | Promise<void>;
-}
 
 export const runBeforeSave = async <Scope>(
   hooks: readonly SaveHooks<Scope>[],

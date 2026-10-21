@@ -121,14 +121,14 @@ The runtime loads these factories once at compose time and runs them inside the 
 
 ### The `content` provider's `update` op
 
-Core wraps the `content` provider's server `update` op with the server hooks and gates it on `content:save`. It calls the provider's own `update` with a second argument, the request context:
+Core wraps the `content` provider's server `update` op with the server hooks and gates it on `content:save`. The provider's own `update` takes only its input. It reads the request through `requestContext()` from `tinacms/server`:
 
 ```ts
-update(input: ContentSaveInput, context?: RequestContext): Promise<DocumentEntry>
-interface RequestContext { request: Request; session: Session | null }
+update(input: ContentSaveInput): Promise<DocumentEntry>
+requestContext(): { request: Request; session: Session | null; authProvider: string | undefined }
 ```
 
-This is the only op that receives a second argument. ([ADR-028](../028-server-save-hooks.md))
+`requestContext()` throws outside an op that the RPC handler dispatched. `authProvider` is the name of the plugin whose `getSession` verified the request. ([ADR-028](../028-server-save-hooks.md))
 
 ### Authorization wrappers
 

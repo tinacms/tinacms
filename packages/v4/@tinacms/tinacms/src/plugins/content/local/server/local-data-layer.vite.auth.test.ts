@@ -7,6 +7,7 @@ import { existsSync } from 'node:fs';
 import { asResolvedConfig } from '../../../../config';
 import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
 import { DEFAULT_MEDIA_URL } from '../../../../core/media/contract';
+import { MAX_REQUEST_BODY_BYTES } from '../../../../core/request-body';
 import {
   defineHook,
   defineHooksPlugin,
@@ -379,6 +380,7 @@ describe('local Data Layer updates', () => {
       default: defineServerHook(() => ({
         beforeSave: (document) => {
           if (document.draft) reject('Publish the post before you save it');
+          if (document.broken) throw new Error('quota table offline');
           return document;
         },
       })),
@@ -421,7 +423,38 @@ describe('local Data Layer updates', () => {
       JSON.stringify({ op: 'update', ...JSON.parse(update({ draft: true })) })
     );
     expect(res.statusCode).toBe(422);
+    expect(JSON.parse(res.body)).toEqual({
+      error: {
+        code: 'hook-rejected',
+        message: 'Publish the post before you save it',
+      },
+    });
     expect(existsSync(path.join(rootDir, 'content/posts/a.mdx'))).toBe(false);
+  });
+
+  it('answers a plain hook throw on the content route with the generic 500', async () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const res = await call(
+      routesWith([]),
+      DEFAULT_CONTENT_URL,
+      JSON.stringify({ op: 'update', ...JSON.parse(update({ broken: true })) })
+    );
+    expect(res.statusCode).toBe(500);
+    expect(JSON.parse(res.body).error.code).toBe('op-failed');
+    expect(res.body).not.toContain('quota table offline');
+    consoleError.mockRestore();
+  });
+
+  it('answers 413 for a content/update body over the size limit', async () => {
+    const res = await call(
+      routesWith([]),
+      '/api/tina/content/update',
+      'x'.repeat(MAX_REQUEST_BODY_BYTES + 1)
+    );
+    expect(res.statusCode).toBe(413);
+    expect(JSON.parse(res.body).error.code).toBe('body-too-large');
   });
 
   it('requires content:save for every local update', async () => {

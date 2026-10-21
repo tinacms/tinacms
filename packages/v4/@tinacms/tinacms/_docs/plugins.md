@@ -297,9 +297,9 @@ collection goes straight to the content provider.
 - A slow server hook slows every save to its collection.
 
 The save needs the site's server route. Mount the RPC handler with the
-schema, for example `mountHandler({ plugins: config.plugins, schema:
-config.schema })`. The admin calls it at `/api/tina`; set `rpcUrl` in
-`defineConfig` when the site mounts it somewhere else. A site with no server runtime cannot save to the
+whole config, `mountHandler(config)`, so it gets the schema. The admin calls
+it at `/api/tina`. Set `rpcUrl` in `defineConfig` when the site mounts it
+somewhere else, and the handler pins its route to the same value. A site with no server runtime cannot save to the
 collection, and the save fails with "This collection has server hooks, so it
 needs the site's server route." Core never falls back to a direct write. On
 `vite dev`, `tinaLocalDataLayerVitePlugin` serves the route for the local

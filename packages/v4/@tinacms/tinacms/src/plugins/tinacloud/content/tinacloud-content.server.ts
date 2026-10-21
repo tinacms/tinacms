@@ -1,27 +1,20 @@
 import type { ContentSaveInput } from '../../../core/content/contract';
 import { invariant } from '../../../core/invariant';
 import type { ServerSegment } from '../../../core/plugin';
-import type { ContentWriteContext } from '../../../server/request-context';
+import { requestContext } from '../../../server/request-context';
 import { bearerTokenOf } from '../auth/tinacloud-auth.server';
 import { type TinaCloudOptions, createTinaCloudClient } from '../client';
-import { TINACLOUD_PLUGIN_NAME } from '../tinacloud.plugin';
+import { TINACLOUD_PLUGIN_NAME } from '../name';
 import { updateDocument } from './request';
 
 // The write behind core's `content/update` op, which runs the server hooks
-// first and hands over the request. It writes with the token of the editor who
-// saved. A browser bundle can reach this module through the lazy `server`
-// segment, so it imports no node module.
+// first. It writes with the token of the editor who saved. A browser bundle can
+// reach this module through the lazy `server` segment, so it imports no node
+// module.
 export const createTinaCloudContentServer = (options: TinaCloudOptions) =>
   ({
-    update: async (
-      { collection, path, value, branch }: ContentSaveInput,
-      context?: ContentWriteContext
-    ) => {
-      invariant(
-        context,
-        'tinacloud-update-no-request',
-        'The TinaCloud content write runs only inside the content/update op.'
-      );
+    update: async ({ collection, path, value, branch }: ContentSaveInput) => {
+      const context = requestContext();
       invariant(
         context.authProvider === TINACLOUD_PLUGIN_NAME,
         'tinacloud-update-foreign-auth',

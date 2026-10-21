@@ -9,12 +9,12 @@ import {
   CONTENT_SAVE_PERMISSION,
   DEFAULT_CONTENT_URL,
 } from '../../../../core/content/contract';
-import { HookRejectedError } from '../../../../core/form/hooks';
 import {
   InvalidSaveInputError,
   type ServerSave,
   createServerHookRegistry,
   createServerSave,
+  toSaveErrorResponse,
 } from '../../../../core/form/server-hooks';
 import { invariant } from '../../../../core/invariant';
 import { capabilityProvider } from '../../../../core/mount';
@@ -30,10 +30,8 @@ import {
 } from '../../../../core/request-body';
 import { AUTH_CAPABILITY, type PluginManifest } from '../../../../core/plugin';
 import { resolveServerSegments } from '../../../../core/resolve';
-import {
-  createRequestAuthorizer,
-  errorResponse,
-} from '../../../../rpc/handler';
+import { errorResponse } from '../../../../rpc/error-response';
+import { createRequestAuthorizer } from '../../../../rpc/handler';
 import { DEFAULT_RPC_URL } from '../../../../rpc/proxy';
 import {
   LOCAL_MEDIA_PLUGIN_NAME,
@@ -227,14 +225,7 @@ const createServerSaveHandler = (
       const save = await loadServerSave();
       return Response.json(await save(input, session));
     } catch (cause) {
-      if (cause instanceof HookRejectedError) {
-        return errorResponse(422, 'hook-rejected', cause.message);
-      }
-      if (cause instanceof InvalidSaveInputError) {
-        return errorResponse(400, 'invalid-input', cause.message);
-      }
-      console.error('[tinacms] Local content/update failed:', cause);
-      return errorResponse(500, 'op-failed', 'Operation failed.');
+      return toSaveErrorResponse(cause, 'Local content/update');
     }
   };
   return async (req, res) => {
@@ -256,7 +247,9 @@ const createServerSaveHandler = (
     }
     const session = gate ? await gate(req, res, CONTENT_SAVE_PERMISSION) : null;
     if (gate && !session) return;
-    await sendResponse(res, await respond(req, session));
+    const response = await respond(req, session);
+    await sendResponse(res, response);
+    if (response.status === 413) req.destroy();
   };
 };
 
@@ -431,6 +424,18 @@ export const tinaLocalDataLayerVitePlugin = (
       }
     }
   };
+  const saveContentUpdate = async (
+    request: unknown,
+    session: Session | null
+  ): Promise<Response> => {
+    try {
+      const { entry } = await (await loadServerSave())(request, session);
+      return Response.json(entry);
+    } catch (cause) {
+      return toSaveErrorResponse(cause, 'Local content update');
+    }
+  };
+
   // Connect mounts by prefix, so a sub-path such as the RPC `content/update`
   // passes on to the next handler instead of reading as a content request.
   const serveContentRequest: Connect.NextHandleFunction = async (
@@ -468,18 +473,15 @@ export const tinaLocalDataLayerVitePlugin = (
         )
       : null;
     if (contentGate && !session) return;
+    if (isUpdate) {
+      await sendResponse(res, await saveContentUpdate(request, session));
+      return;
+    }
     try {
-      const result = isUpdate
-        ? (await (await loadServerSave())(request, session)).entry
-        : await dispatchContentRequest(dataLayer, request);
+      const result = await dispatchContentRequest(dataLayer, request);
       res.setHeader('content-type', 'application/json');
       res.end(JSON.stringify(result));
     } catch (cause) {
-      if (cause instanceof HookRejectedError) {
-        res.statusCode = 422;
-        res.end(cause.message);
-        return;
-      }
       sendError(req, res, cause);
     }
   };
