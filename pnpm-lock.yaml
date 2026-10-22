@@ -2858,12 +2858,30 @@ importers:
         specifier: ^3.4.1
         version: 3.6.0
     devDependencies:
+      '@testing-library/dom':
+        specifier: 'catalog:'
+        version: 10.4.1
+      '@testing-library/jest-dom':
+        specifier: 'catalog:'
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.1(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@testing-library/user-event':
+        specifier: 'catalog:'
+        version: 14.6.1(@testing-library/dom@10.4.1)
       '@types/react':
         specifier: ^19.2.17
         version: 19.2.17
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.17)
+      '@vitejs/plugin-react':
+        specifier: 'catalog:'
+        version: 4.7.0(vite@4.5.14(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0))
+      happy-dom:
+        specifier: 'catalog:'
+        version: 15.10.2
       react:
         specifier: ^19.2.7
         version: 19.2.7
@@ -2876,6 +2894,9 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@25.1.0)(happy-dom@15.10.2)(jsdom@29.1.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
 
   packages/v4/examples/barebones:
     dependencies:
@@ -23613,6 +23634,18 @@ snapshots:
 
   '@vercel/stega@0.0.5': {}
 
+  '@vitejs/plugin-react@4.7.0(vite@4.5.14(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0))':
+    dependencies:
+      '@babel/core': 7.28.5
+      '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
+      '@babel/plugin-transform-react-jsx-source': 7.27.1(@babel/core@7.28.5)
+      '@rolldown/pluginutils': 1.0.0-beta.27
+      '@types/babel__core': 7.20.5
+      react-refresh: 0.17.0
+      vite: 4.5.14(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
+    transitivePeerDependencies:
+      - supports-color
+
   '@vitejs/plugin-react@4.7.0(vite@5.4.21(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0))':
     dependencies:
       '@babel/core': 7.28.5
@@ -32954,6 +32987,18 @@ snapshots:
       rollup: 3.29.5
     optionalDependencies:
       '@types/node': 22.19.3
+      fsevents: 2.3.3
+      lightningcss: 1.32.0
+      sass: 1.97.3
+      terser: 5.46.0
+
+  vite@4.5.14(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0):
+    dependencies:
+      esbuild: 0.18.20
+      postcss: 8.5.6
+      rollup: 3.29.5
+    optionalDependencies:
+      '@types/node': 25.1.0
       fsevents: 2.3.3
       lightningcss: 1.32.0
       sass: 1.97.3
