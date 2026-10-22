@@ -19,14 +19,14 @@ const editorContainerVariants = cva(
       variant: {
         comment: cn(
           'flex flex-wrap justify-between gap-1 px-1 py-0.5 text-sm',
-          'rounded-md border-[1.5px] border-transparent bg-transparent',
+          'rounded-sm border-[1.5px] border-transparent bg-transparent',
           'has-[[data-slate-editor]:focus]:border-brand/50 has-[[data-slate-editor]:focus]:ring-2 has-[[data-slate-editor]:focus]:ring-brand/30',
           'has-aria-disabled:border-input has-aria-disabled:bg-muted'
         ),
         default: 'h-full',
         demo: 'h-[650px]',
         select: cn(
-          'group rounded-md border border-input ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+          'group rounded-sm border border-input ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
           'has-data-readonly:w-fit has-data-readonly:cursor-default has-data-readonly:border-transparent has-data-readonly:focus-within:[box-shadow:none]'
         ),
       },
@@ -58,7 +58,7 @@ const editorVariants = cva(
   cn(
     'group/editor',
     'relative w-full cursor-text overflow-x-hidden overflow-y-auto break-words whitespace-pre-wrap select-text',
-    'rounded-md ring-offset-background focus-visible:outline-none',
+    'rounded-sm ring-offset-background focus-visible:outline-none',
     'placeholder:text-muted-foreground/80 **:data-slate-placeholder:top-[auto_!important] **:data-slate-placeholder:text-muted-foreground/80 **:data-slate-placeholder:opacity-100!',
     '[&_strong]:font-bold'
   ),
