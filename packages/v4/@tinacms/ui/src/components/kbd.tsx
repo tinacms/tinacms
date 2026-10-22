@@ -29,7 +29,7 @@ function Kbd({ size = 'md', className, ...props }: KbdProps) {
   );
 }
 
-/** How each symbol key is spoken, and its \`aria-keyshortcuts\` name. */
+/** How each symbol key is spoken, and its `aria-keyshortcuts` name. */
 const KEYS: Record<string, { spoken: string; aria: string }> = {
   '⌘': { spoken: 'Command', aria: 'Meta' },
   '⌥': { spoken: 'Option', aria: 'Alt' },

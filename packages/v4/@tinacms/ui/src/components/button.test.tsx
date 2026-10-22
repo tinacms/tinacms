@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { AddInput } from '@tinacms/ui/components/add-button';
-import { Button, buttonVariants } from '@tinacms/ui/components/button';
+import { Button } from '@tinacms/ui/components/button';
 import {
   Dialog,
   DialogContent,
@@ -48,18 +48,10 @@ describe('Button', () => {
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 
-  it('styles a link through buttonVariants', () => {
-    render(
-      <a
-        href='https://tina.io/docs'
-        className={buttonVariants({ variant: 'primary' })}
-      >
-        Docs
-      </a>
-    );
-    expect(screen.getByRole('link', { name: 'Docs' })).toHaveClass(
-      'bg-primary'
-    );
+  it('is always a button: links style an <a> with buttonVariants instead', () => {
+    // @ts-expect-error Button has no href; a link would get role="button"
+    render(<Button href='/docs'>Docs</Button>);
+    expect(screen.queryByRole('link')).toBeNull();
   });
 
   it('keeps the name and icon when a dialog renders it as its close button', () => {

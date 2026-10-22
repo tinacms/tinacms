@@ -52,6 +52,7 @@ export function ViewModeToggle({
       <Button
         type='button'
         variant='icon'
+        size='sm'
         aria-label='Grid view'
         aria-pressed={value === 'grid'}
         className={segmentClass(value === 'grid')}
@@ -62,6 +63,7 @@ export function ViewModeToggle({
       <Button
         type='button'
         variant='icon'
+        size='sm'
         aria-label='List view'
         aria-pressed={value === 'list'}
         className={segmentClass(value === 'list')}
@@ -127,7 +129,7 @@ export function MediaSearchInput({
           variant='icon'
           size='sm'
           aria-label='Clear search'
-          className='absolute right-1.5'
+          className='absolute right-1 size-6'
           onClick={() => onChange('')}
         >
           <XIcon className='size-3' />

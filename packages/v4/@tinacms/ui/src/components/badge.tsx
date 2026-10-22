@@ -1,7 +1,7 @@
 import { type VariantProps, cva } from 'class-variance-authority';
-import { CircleAlert } from 'lucide-react';
 import type { ComponentProps, ReactNode } from 'react';
 
+import { Icon } from '@tinacms/ui/components/icon';
 import { cn } from '@tinacms/ui/lib/utils';
 
 const WORDS = 'h-5.5 gap-1.5 px-2.25';
@@ -148,7 +148,7 @@ function Badge({
     );
   }
 
-  if (kind === 'count' && count === 0) return null;
+  if (kind === 'count' && !count) return null;
 
   const classes = cn(
     badgeVariants({
@@ -180,7 +180,7 @@ function Badge({
       case 'errors':
         return (
           <>
-            <CircleAlert aria-hidden='true' />
+            <Icon glyph='error' size={12} />
             <span aria-hidden='true'>{count}</span>
             {srOnly}
           </>

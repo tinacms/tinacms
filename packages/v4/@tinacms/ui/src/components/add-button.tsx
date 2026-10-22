@@ -1,6 +1,6 @@
 import { type ComponentProps, useState } from 'react';
 
-import { Button } from '@tinacms/ui/components/button';
+import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { Icon } from '@tinacms/ui/components/icon';
 import { KbdShortcut } from '@tinacms/ui/components/kbd';
 import { cn } from '@tinacms/ui/lib/utils';
@@ -21,29 +21,27 @@ function PlusMark() {
   );
 }
 
-type AddButtonProps = Omit<
-  ComponentProps<typeof Button>,
-  'children' | 'variant' | 'size'
-> & {
+type AddButtonProps = Omit<ButtonPrimitive.Props, 'children'> & {
   /** What the row adds, such as "Add author". */
   children: string;
 };
 
 /** The quiet "+ Add …" row at the end of a list. */
-function AddButton({ children, className, ...props }: AddButtonProps) {
+function AddButton({ children, className, type, ...props }: AddButtonProps) {
   return (
-    <Button
-      variant='ghost'
+    <ButtonPrimitive
+      data-slot='add-button'
+      type={type ?? 'button'}
       className={cn(
         ADD_ROW,
-        'max-w-none focus:shadow-focus-field disabled:opacity-60',
+        'cursor-pointer outline-none transition-all focus:border-ring focus:bg-card focus:shadow-focus-field disabled:pointer-events-none disabled:opacity-60',
         className
       )}
       {...props}
     >
       <PlusMark />
       <span className='min-w-0 truncate px-1.5'>{children}</span>
-    </Button>
+    </ButtonPrimitive>
   );
 }
 
