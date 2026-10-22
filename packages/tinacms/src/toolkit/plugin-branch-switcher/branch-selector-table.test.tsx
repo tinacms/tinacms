@@ -99,7 +99,9 @@ function renderTable(overrides: Partial<typeof defaultProps> = {}) {
 
 beforeEach(() => {
   vi.restoreAllMocks();
-  // Re-apply default mock implementations after restoreAllMocks clears them
+  // restoreAllMocks leaves vi.fn() call history in place, so reset it too.
+  vi.resetAllMocks();
+  // Re-apply default mock implementations after resetAllMocks clears them
   mockCaptureEvent.mockImplementation(() => {});
   mockCms.api.tina.usingProtectedBranch.mockReturnValue(true);
   mockCms.api.tina.createPullRequest.mockReset();
