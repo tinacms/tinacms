@@ -20,7 +20,7 @@ type ButtonVariant =
 type ButtonSize = 'md' | 'sm';
 
 const buttonVariants = cva(
-  "group/button relative box-border inline-flex h-9 min-w-0 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-sm border-0 px-3.75 font-sans text-base leading-control font-medium whitespace-nowrap no-underline outline-none select-none focus:shadow-focus-ring disabled:pointer-events-none disabled:opacity-45 disabled:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button relative box-border inline-flex transition-all h-9 min-w-0 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-sm border-0 px-3.75 font-sans text-base leading-control font-medium whitespace-nowrap no-underline outline-none select-none focus:shadow-focus-ring disabled:pointer-events-none disabled:opacity-45 disabled:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {

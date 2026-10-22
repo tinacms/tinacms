@@ -54,7 +54,7 @@ function Avatar({
       aria-label={labelled ? label : undefined}
       aria-hidden={labelled ? undefined : true}
       className={cn(
-        'relative box-border flex flex-none shrink-0 rounded-full select-none',
+        'relative box-border flex flex-none shrink-0 rounded-full select-none after:absolute after:inset-0 after:rounded-full after:border after:border-border after:mix-blend-darken',
         SIZES[size].circle,
         isButton &&
           'transition-shadow group-hover/avatar-button:ring-2 group-hover/avatar-button:ring-slate-300 group-hover/avatar-button:ring-offset-2 group-hover/avatar-button:ring-offset-card',

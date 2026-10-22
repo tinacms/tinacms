@@ -12,7 +12,7 @@ const OUTLINED =
   'bg-card text-muted-foreground-strong inset-ring inset-ring-border';
 
 const badgeVariants = cva(
-  'box-border inline-flex flex-none items-center justify-center rounded-full py-0 font-sans text-xs leading-none font-medium whitespace-nowrap tabular-nums [&>svg]:size-3',
+  'box-border inline-flex flex-none items-center justify-center rounded-full py-0 transition-all font-sans text-xs leading-none font-medium whitespace-nowrap tabular-nums [&>svg]:size-3',
   {
     variants: {
       kind: {
