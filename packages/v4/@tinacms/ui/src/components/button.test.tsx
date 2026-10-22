@@ -3,7 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { AddInput } from '@tinacms/ui/components/add-button';
-import { Button } from '@tinacms/ui/components/button';
+import { Button, buttonVariants } from '@tinacms/ui/components/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@tinacms/ui/components/dialog';
 
 describe('Button', () => {
   it('names an icon button from its string children', () => {
@@ -43,12 +48,30 @@ describe('Button', () => {
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 
-  it('renders href as a link that says it opens a new tab', () => {
-    render(<Button href='https://tina.io/docs'>Docs</Button>);
-    const link = screen.getByRole('link', {
-      name: 'Docs (opens in a new tab)',
-    });
-    expect(link).toHaveAttribute('target', '_blank');
+  it('styles a link through buttonVariants', () => {
+    render(
+      <a
+        href='https://tina.io/docs'
+        className={buttonVariants({ variant: 'primary' })}
+      >
+        Docs
+      </a>
+    );
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveClass(
+      'bg-primary'
+    );
+  });
+
+  it('keeps the name and icon when a dialog renders it as its close button', () => {
+    render(
+      <Dialog open>
+        <DialogContent>
+          <DialogTitle>Rename</DialogTitle>
+        </DialogContent>
+      </Dialog>
+    );
+    const close = screen.getByRole('button', { name: 'Close' });
+    expect(close.querySelector('svg')).not.toBeNull();
   });
 });
 

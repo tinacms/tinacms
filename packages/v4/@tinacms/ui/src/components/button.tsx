@@ -75,11 +75,8 @@ const buttonVariants = cva(
   }
 );
 
-const ICON_SIZE: Record<number, string> = {
-  12: 'size-3',
-  16: 'size-4',
-  19: 'size-4.75',
-};
+const ICON_SIZE = { 12: 'size-3', 16: 'size-4', 19: 'size-4.75' } as const;
+type IconPixels = keyof typeof ICON_SIZE;
 
 type ButtonProps = Omit<ButtonPrimitive.Props, 'children'> & {
   /** `primary` (one per screen), `secondary`, `toolbar`, `ghost`, `inverse` (on a dark bar), `icon`, `icon-inverse` or `destructive`. */
@@ -90,27 +87,25 @@ type ButtonProps = Omit<ButtonPrimitive.Props, 'children'> & {
   children?: ReactNode;
   /** An icon before the words: a named glyph or any lucide icon. */
   icon?: Glyph | LucideIcon;
-  /** An icon after the words. `chevron-down` stays small, for a button that opens a menu. */
+  /** An icon after the words. `chevron-down` stays small, for a button that opens a menu. Not on icon buttons. */
   iconEnd?: Glyph | LucideIcon;
   /** The look for the screen or panel that is open. Pair it with `aria-pressed` or `aria-current`. */
   selected?: boolean;
-  /** Fills the width of its container. */
   full?: boolean;
-  /** The amber dot before the words, for a button that leads to unsaved work. */
+  /** The amber dot before the words, for a button that leads to unsaved work. Not on icon buttons. */
   dot?: boolean;
   /** The words in the code font, such as a branch name. */
   mono?: boolean;
-  /** Keyboard keys after the words, such as `⌘K`. */
+  /** Keyboard keys after the words, such as `⌘K`. Not on icon buttons. */
   shortcut?: string;
   /** The amber count in the corner of an icon button, shown from 1. Put the number in the button's name too. */
   count?: number;
-  /** Makes the button a link that opens in a new tab. */
-  href?: string;
 };
 
 /**
  * Every button in the admin. Base UI handles the keyboard; focus, by click or by keyboard,
  * draws the orange ring with a soft glow. An icon button needs a name: string `children` or `aria-label`.
+ * For a link, style an `<a>` with `buttonVariants({ variant })`; this component is always a button.
  */
 function Button({
   variant = 'secondary',
@@ -124,7 +119,6 @@ function Button({
   mono = false,
   shortcut,
   count,
-  href,
   className,
   type,
   ...props
@@ -134,99 +128,64 @@ function Button({
     iconOnly && typeof children === 'string' && children !== ''
       ? children
       : undefined;
-  const label = textName === undefined ? children : null;
-  const hasLabel =
-    label !== null && label !== undefined && label !== '' && label !== false;
-  const hasShortcut = Boolean(shortcut) && !iconOnly;
-  const hasIconEnd = Boolean(iconEnd) && !iconOnly;
-  const iconSize = iconOnly ? (size === 'sm' ? 16 : 19) : 16;
-  const iconEndSize = iconEnd === 'chevron-down' ? 12 : 16;
-  const classes = cn(
-    buttonVariants({
-      variant,
-      size,
-      selected,
-      full,
-      bothIcons: Boolean(icon) && hasIconEnd,
-      shortcut: hasShortcut,
-    }),
-    className
-  );
-  const name = props['aria-label'] ?? textName;
-
-  const leading = icon ? (
-    <span
-      className={cn(
-        'inline-flex',
-        variant === 'ghost' &&
-          'text-slate-600 group-hover/button:text-foreground',
-        variant === 'icon' && selected && 'text-primary'
-      )}
-    >
-      <Icon glyph={icon} size={iconSize} className={ICON_SIZE[iconSize]} />
-    </span>
-  ) : null;
-  const words = hasLabel ? (
-    typeof label === 'string' ? (
-      <span
-        className={cn(
-          'min-w-0 truncate',
-          mono && 'font-mono text-xs tracking-code'
-        )}
-      >
-        {label}
-      </span>
-    ) : (
-      label
-    )
-  ) : null;
-  const trailing =
-    hasIconEnd && iconEnd ? (
-      <Icon
-        glyph={iconEnd}
-        size={iconEndSize}
-        className={ICON_SIZE[iconEndSize]}
-      />
-    ) : null;
-
-  if (href) {
-    return (
-      <a
-        id={props.id}
-        title={props.title}
-        aria-label={name}
-        href={href}
-        target='_blank'
-        rel='noopener'
-        data-slot='button'
-        className={classes}
-      >
-        {leading}
-        {words}
-        {trailing}
-        {hasLabel ? (
-          <span className='sr-only'> (opens in a new tab)</span>
-        ) : null}
-      </a>
-    );
-  }
+  const label = textName === undefined ? children : undefined;
+  const endIcon = iconOnly ? undefined : iconEnd;
+  const keys = iconOnly ? undefined : shortcut || undefined;
+  const iconSize: IconPixels = iconOnly && size === 'md' ? 19 : 16;
+  const endIconSize: IconPixels = endIcon === 'chevron-down' ? 12 : 16;
 
   return (
     <ButtonPrimitive
       data-slot='button'
       type={type ?? 'button'}
-      aria-keyshortcuts={
-        hasShortcut && shortcut ? keyShortcuts(shortcut) : undefined
-      }
+      aria-keyshortcuts={keys ? keyShortcuts(keys) : undefined}
       {...props}
-      aria-label={name}
-      className={classes}
+      aria-label={props['aria-label'] ?? textName}
+      className={cn(
+        buttonVariants({
+          variant,
+          size,
+          selected,
+          full,
+          bothIcons: Boolean(icon && endIcon),
+          shortcut: Boolean(keys),
+        }),
+        className
+      )}
     >
       {dot && !iconOnly ? <Badge kind='dot' /> : null}
-      {leading}
-      {words}
-      {hasShortcut && shortcut ? <KbdShortcut keys={shortcut} end /> : null}
-      {trailing}
+      {icon ? (
+        <span
+          className={cn(
+            'inline-flex',
+            variant === 'ghost' &&
+              'text-slate-600 group-hover/button:text-foreground',
+            variant === 'icon' && selected && 'text-primary'
+          )}
+        >
+          <Icon glyph={icon} size={iconSize} className={ICON_SIZE[iconSize]} />
+        </span>
+      ) : null}
+      {typeof label === 'string' && label !== '' ? (
+        <span
+          className={cn(
+            'min-w-0 truncate',
+            mono && 'font-mono text-xs tracking-code'
+          )}
+        >
+          {label}
+        </span>
+      ) : (
+        label
+      )}
+      {keys ? <KbdShortcut keys={keys} end /> : null}
+      {endIcon ? (
+        <Icon
+          glyph={endIcon}
+          size={endIconSize}
+          className={ICON_SIZE[endIconSize]}
+        />
+      ) : null}
       {iconOnly && count !== undefined && count > 0 ? (
         <Badge kind='count' count={count} corner />
       ) : null}

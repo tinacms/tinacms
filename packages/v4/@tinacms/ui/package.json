@@ -3,7 +3,7 @@
   "version": "4.0.0-alpha.0",
   "private": true,
   "license": "Apache-2.0",
-  "description": "The shared user interface components of TinaCMS v4. The components come from shadcn/ui. To add a component, or to update one, run the shadcn CLI in this directory: pnpm dlx shadcn@latest add <component>.",
+  "description": "The shared user interface components of TinaCMS v4, built on shadcn/ui and restyled to the TinaCMS design. Add a new component with the shadcn CLI in this directory (pnpm dlx shadcn@latest add <component>), then restyle it. Never re-add an existing component: that overwrites its TinaCMS styling.",
   "type": "module",
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
@@ -58,6 +58,7 @@
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.2",
     "typescript": "^5.7.3",
+    "vite": "^5.4.0",
     "vitest": "^2.1.9"
   }
 }

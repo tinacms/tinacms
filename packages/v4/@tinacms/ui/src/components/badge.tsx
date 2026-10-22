@@ -44,7 +44,7 @@ const badgeVariants = cva(
     },
     defaultVariants: {
       kind: 'unsaved',
-      tone: 'none',
+      tone: 'neutral',
       mono: false,
       corner: false,
       end: false,
@@ -76,7 +76,10 @@ type BadgeStatus =
   | 'committed'
   | 'merged'
   | 'failed';
-type BadgeTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+type BadgeTone = Exclude<
+  NonNullable<VariantProps<typeof badgeVariants>['tone']>,
+  'none'
+>;
 
 const STATUS: Record<
   BadgeStatus,
@@ -177,8 +180,9 @@ function Badge({
       case 'errors':
         return (
           <>
-            <CircleAlert />
-            {count}
+            <CircleAlert aria-hidden='true' />
+            <span aria-hidden='true'>{count}</span>
+            {srOnly}
           </>
         );
       case 'status':
@@ -213,7 +217,9 @@ function Badge({
       data-slot='badge'
       title={kind === 'count' ? srLabel : undefined}
       aria-hidden={
-        (kind === 'count' && corner) || kind === 'errors' ? true : undefined
+        (kind === 'count' && corner) || (kind === 'errors' && !srLabel)
+          ? true
+          : undefined
       }
       className={classes}
       {...props}

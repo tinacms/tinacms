@@ -18,6 +18,11 @@ describe('Badge', () => {
     expect(screen.getByText('Failed')).toBeVisible();
   });
 
+  it('announces an error count only through its srLabel', () => {
+    render(<Badge kind='errors' count={3} srLabel='3 errors' />);
+    expect(screen.getByText('3 errors')).toBeInTheDocument();
+  });
+
   it('defaults an unsaved badge to "Unsaved"', () => {
     render(<Badge />);
     expect(screen.getByText('Unsaved')).toBeVisible();
@@ -72,6 +77,7 @@ describe('KbdShortcut', () => {
 
   it('maps one press to aria-keyshortcuts and skips sequences', () => {
     expect(keyShortcuts('⌘⇧P')).toBe('Meta+Shift+P');
+    expect(keyShortcuts('⎋')).toBe('Escape');
     expect(keyShortcuts('G H')).toBeUndefined();
   });
 });

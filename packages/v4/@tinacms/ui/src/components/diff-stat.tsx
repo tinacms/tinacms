@@ -30,8 +30,8 @@ function DiffStat({
   className,
   ...props
 }: DiffStatProps) {
-  const a = whole(added);
-  const r = whole(removed);
+  const addedLines = whole(added);
+  const removedLines = whole(removed);
   return (
     <span
       data-slot='diff-stat'
@@ -44,18 +44,18 @@ function DiffStat({
     >
       <span
         aria-hidden='true'
-        className={sideVariants({ side: a ? 'added' : 'zero' })}
+        className={sideVariants({ side: addedLines ? 'added' : 'zero' })}
       >
-        +{a}
+        +{addedLines}
       </span>
       <span
         aria-hidden='true'
-        className={sideVariants({ side: r ? 'removed' : 'zero' })}
+        className={sideVariants({ side: removedLines ? 'removed' : 'zero' })}
       >
-        −{r}
+        −{removedLines}
       </span>
       <span className='sr-only'>
-        {lines(a)} added, {lines(r)} removed
+        {lines(addedLines)} added, {lines(removedLines)} removed
       </span>
     </span>
   );

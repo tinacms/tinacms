@@ -29,29 +29,22 @@ function Kbd({ size = 'md', className, ...props }: KbdProps) {
   );
 }
 
-const KEY_NAMES: Record<string, string> = {
-  '⌘': 'Command',
-  '⌥': 'Option',
-  '⇧': 'Shift',
-  '⌃': 'Control',
-  '↵': 'Enter',
-  '⎋': 'Escape',
-  '⌫': 'Delete',
-};
-
-const ARIA_KEY_NAMES: Record<string, string> = {
-  '⌘': 'Meta',
-  '⌥': 'Alt',
-  '⇧': 'Shift',
-  '⌃': 'Control',
-  '↵': 'Enter',
+/** How each symbol key is spoken, and its \`aria-keyshortcuts\` name. */
+const KEYS: Record<string, { spoken: string; aria: string }> = {
+  '⌘': { spoken: 'Command', aria: 'Meta' },
+  '⌥': { spoken: 'Option', aria: 'Alt' },
+  '⇧': { spoken: 'Shift', aria: 'Shift' },
+  '⌃': { spoken: 'Control', aria: 'Control' },
+  '↵': { spoken: 'Enter', aria: 'Enter' },
+  '⎋': { spoken: 'Escape', aria: 'Escape' },
+  '⌫': { spoken: 'Delete', aria: 'Backspace' },
 };
 
 const pressesOf = (keys: string) => keys.trim().split(/\s+/).filter(Boolean);
 
 const spoken = (presses: string[]) =>
   presses
-    .map((press) => [...press].map((c) => KEY_NAMES[c] ?? c).join(' '))
+    .map((press) => [...press].map((c) => KEYS[c]?.spoken ?? c).join(' '))
     .join(', then ');
 
 /**
@@ -61,9 +54,7 @@ const spoken = (presses: string[]) =>
 function keyShortcuts(keys: string) {
   const presses = pressesOf(keys);
   if (presses.length !== 1) return undefined;
-  return [...presses[0]]
-    .map((c) => ARIA_KEY_NAMES[c] ?? c.toUpperCase())
-    .join('+');
+  return [...presses[0]].map((c) => KEYS[c]?.aria ?? c.toUpperCase()).join('+');
 }
 
 type KbdShortcutProps = Omit<ComponentProps<'span'>, 'children'> & {
