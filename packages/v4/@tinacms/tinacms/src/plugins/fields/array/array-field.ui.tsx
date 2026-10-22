@@ -1,15 +1,12 @@
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, use, useRef } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { FormScopeContext } from '../../../editor/context';
 import type { FieldAddress } from '../../../core/field/address';
 import { ingestDocument } from '../../../core/form/ingest';
 import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
-import type {
-  FieldSchema,
-  TemplateSchema,
-  TinaDocument,
-} from '../../../core/schema/types';
+import type { FieldSchema, TemplateSchema } from '../../../core/schema/types';
 import {
   NestedFieldRow,
   useDocumentPath,
@@ -72,13 +69,18 @@ function ObjectItems({
 }) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
+  const formScope = use(FormScopeContext);
   const { control, getValues } = useFormContext();
   const {
     fields: items,
     append,
-    remove,
     move,
-  } = useFieldArray({ control, name: address });
+  } = useFieldArray({
+    control,
+    name: address,
+  });
+  const removeItem = (index: number) =>
+    formScope?.removeListItem(address, index);
 
   const seed = (template: TemplateSchema | undefined, fields: FieldSchema[]) =>
     ingestDocument(template?.defaultItem ?? {}, fields, {
@@ -112,7 +114,7 @@ function ObjectItems({
               index={index}
               count={items.length}
               onMove={move}
-              onRemove={remove}
+              onRemove={removeItem}
             >
               {fields ? (
                 fields.map((subfield) => (

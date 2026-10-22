@@ -24,6 +24,10 @@ export default defineClientPlugin({
     serialize: (value: unknown, node, context) => {
       if (!isPlainObject(value)) return value;
       const field = asObjectFieldSchema(node);
+      // Registering a subfield of an object the document does not have leaves an
+      // empty container behind. The document never stated this object, so keep it
+      // out of the document instead of writing `{}`.
+      if (Object.values(value).every((entry) => entry == null)) return null;
       return digestDocument(value, field.fields, context);
     },
     validateChildren: (value: unknown, node, address, registry, scope) => {

@@ -34,9 +34,12 @@ export const digestDocument = (
     const value = values?.[node.name];
     if (value == null) continue;
     const descriptor = registry.get(node.type);
-    reconstructedDocument[node.name] = descriptor?.serialize
+    const serialized = descriptor?.serialize
       ? descriptor.serialize(value, node, context)
       : value;
+    // A field's serializer reports that the field is absent by returning null.
+    if (serialized == null) continue;
+    reconstructedDocument[node.name] = serialized;
   }
   return reconstructedDocument;
 };

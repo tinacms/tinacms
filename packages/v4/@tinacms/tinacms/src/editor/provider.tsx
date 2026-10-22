@@ -11,7 +11,7 @@ import {
 import { get, FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
 import type { ResolvedConfig } from '../config';
 import { authSliceOf } from '../core/auth/slice';
-import { toFieldAddress } from '../core/field/address';
+import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { fieldEqualityFor } from '../core/form/compare';
 import {
@@ -510,6 +510,27 @@ export function FormProvider({
 
   useFormMethodSubscriptions(formId, path, collection, formHooks, methods);
 
+  // react-hook-form keeps its defaults by index and only shifts its values when a
+  // list item is removed, so the item that takes the removed one's place inherits
+  // the removed item's defaults. Re-seeding the values here rewrites values and
+  // defaults together, and leaves every other field, including list items that are
+  // not objects, exactly as it is.
+  const removeListItem = useCallback(
+    (listAddress: FieldAddress, index: number) => {
+      const current = methods.getValues(listAddress);
+      if (!Array.isArray(current) || index < 0 || index >= current.length) {
+        return;
+      }
+      const next = current.filter((_, position) => position !== index);
+      methods.reset(
+        { ...methods.getValues(), [listAddress]: next },
+        { keepErrors: true }
+      );
+      useFormStore.getState().setFieldValue(formId, listAddress, next);
+    },
+    [formId, methods]
+  );
+
   const formScope = useMemo(
     () => ({
       formId,
@@ -520,6 +541,7 @@ export function FormProvider({
       discardEdits,
       hooks: formHooks,
       staleDraft: staleDraftActions,
+      removeListItem,
     }),
     [
       formId,
@@ -530,6 +552,7 @@ export function FormProvider({
       discardEdits,
       formHooks,
       staleDraftActions,
+      removeListItem,
     ]
   );
 
