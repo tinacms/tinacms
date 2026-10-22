@@ -1,3 +1,4 @@
+import { AddButton } from '@tinacms/ui/components/add-button';
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { type ReactNode, useRef } from 'react';
@@ -139,23 +140,17 @@ function ObjectItems({
       <div className='mt-3 flex flex-wrap gap-2'>
         {isTemplatesArray(field) ? (
           field.templates.map((template) => (
-            <Button
+            <AddButton
               key={template.name}
-              type='button'
-              variant='outline'
               onClick={() => addTemplateItem(template)}
             >
-              Add {labelOf(template)}
-            </Button>
+              {`Add ${labelOf(template)}`}
+            </AddButton>
           ))
         ) : (
-          <Button
-            type='button'
-            variant='outline'
-            onClick={() => addFieldsItem(field.fields)}
-          >
+          <AddButton onClick={() => addFieldsItem(field.fields)}>
             Add item
-          </Button>
+          </AddButton>
         )}
       </div>
     </>
@@ -219,14 +214,9 @@ function ScalarItems({
           </ItemRow>
         ))}
       </div>
-      <Button
-        type='button'
-        variant='outline'
-        className='mt-3'
-        onClick={addItem}
-      >
+      <AddButton className='mt-3' onClick={addItem}>
         Add item
-      </Button>
+      </AddButton>
     </>
   );
 }
@@ -258,7 +248,7 @@ function ItemRow({
         <div className='flex items-center gap-1'>
           <Button
             type='button'
-            variant='outline'
+            variant='toolbar'
             size='sm'
             aria-label={`Move item ${position} up`}
             disabled={index === 0}
@@ -268,7 +258,7 @@ function ItemRow({
           </Button>
           <Button
             type='button'
-            variant='outline'
+            variant='toolbar'
             size='sm'
             aria-label={`Move item ${position} down`}
             disabled={index === count - 1}
@@ -278,7 +268,7 @@ function ItemRow({
           </Button>
           <Button
             type='button'
-            variant='outline'
+            variant='toolbar'
             size='sm'
             aria-label={`Remove item ${position}`}
             onClick={() => onRemove(index)}

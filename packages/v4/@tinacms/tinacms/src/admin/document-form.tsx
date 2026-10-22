@@ -65,6 +65,7 @@ function SaveButton() {
   return (
     <div className='flex flex-col items-start gap-2'>
       <Button
+        variant='primary'
         type='button'
         className='aria-disabled:pointer-events-none aria-disabled:opacity-50'
         aria-disabled={!canSave}
@@ -98,7 +99,7 @@ function DiscardButton() {
   return (
     <Button
       type='button'
-      variant='outline'
+      variant='secondary'
       className='aria-disabled:pointer-events-none aria-disabled:opacity-50'
       aria-disabled={!dirty}
       onClick={() => {
@@ -126,10 +127,10 @@ function StaleDraftDialog() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <Button type='button' variant='outline' onClick={stale?.discard}>
+          <Button type='button' variant='secondary' onClick={stale?.discard}>
             Discard draft
           </Button>
-          <Button type='button' onClick={stale?.resume}>
+          <Button variant='primary' type='button' onClick={stale?.resume}>
             Resume edits
           </Button>
         </AlertDialogFooter>

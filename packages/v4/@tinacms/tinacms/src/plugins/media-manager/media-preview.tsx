@@ -97,8 +97,8 @@ export function MediaPreview({
         </h3>
         <Button
           type='button'
-          variant='ghost'
-          size='icon-sm'
+          variant='icon'
+          size='sm'
           aria-label='Close details'
           onClick={onClose}
         >
@@ -120,13 +120,17 @@ export function MediaPreview({
       <CopyField value={absoluteUrlOf(resolveUrl(item.path))} />
       <div className='mt-auto flex w-full flex-wrap gap-2'>
         {onInsert ? (
-          <Button type='button' onClick={() => onInsert(item)}>
+          <Button
+            variant='primary'
+            type='button'
+            onClick={() => onInsert(item)}
+          >
             <ArrowDownToLineIcon className='size-4' />
             Insert
           </Button>
         ) : null}
         {onRename ? (
-          <Button type='button' variant='outline' onClick={onRename}>
+          <Button type='button' variant='secondary' onClick={onRename}>
             <TextCursorInputIcon className='size-4' />
             Rename
           </Button>

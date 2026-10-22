@@ -213,7 +213,7 @@ export function ImageField() {
           <Button
             ref={mainButtonRef}
             type='button'
-            variant='outline'
+            variant='toolbar'
             size='sm'
             disabled={uploading}
             onClick={choose}

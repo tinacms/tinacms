@@ -27,7 +27,7 @@ export function MediaUploadButton({
       />
       <span
         className={cn(
-          buttonVariants(),
+          buttonVariants({ variant: 'primary' }),
           'peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50'
         )}
       >

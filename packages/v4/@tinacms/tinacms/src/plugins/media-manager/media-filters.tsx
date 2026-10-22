@@ -51,8 +51,7 @@ export function ViewModeToggle({
     <div role='group' aria-label='View' className='flex rounded-sm border'>
       <Button
         type='button'
-        variant='ghost'
-        size='icon'
+        variant='icon'
         aria-label='Grid view'
         aria-pressed={value === 'grid'}
         className={segmentClass(value === 'grid')}
@@ -62,8 +61,7 @@ export function ViewModeToggle({
       </Button>
       <Button
         type='button'
-        variant='ghost'
-        size='icon'
+        variant='icon'
         aria-label='List view'
         aria-pressed={value === 'list'}
         className={segmentClass(value === 'list')}
@@ -126,8 +124,8 @@ export function MediaSearchInput({
       {value ? (
         <Button
           type='button'
-          variant='ghost'
-          size='icon-xs'
+          variant='icon'
+          size='sm'
           aria-label='Clear search'
           className='absolute right-1.5'
           onClick={() => onChange('')}

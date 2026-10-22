@@ -91,7 +91,7 @@ function LoadingGrid({ label }: { label: string }) {
       className='grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-4'
     >
       {Array.from({ length: 6 }, (_, index) => (
-        <Skeleton key={index} className='aspect-square rounded-md' />
+        <Skeleton key={index} shape='block' className='aspect-square' />
       ))}
     </div>
   );
@@ -112,7 +112,7 @@ function SetupBanner({
             href={status.actionUrl}
             target='_blank'
             rel='noreferrer noopener'
-            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+            className={buttonVariants({ variant: 'toolbar', size: 'sm' })}
           >
             {status.actionLabel}
             <ExternalLinkIcon className='size-3.5' />
@@ -391,13 +391,13 @@ export function MediaBrowser(props: MediaBrowserProps) {
         </div>
         {readOnly ? null : (
           <div className='flex flex-wrap items-center gap-2'>
-            <Button type='button' variant='outline' onClick={refresh}>
+            <Button type='button' variant='toolbar' onClick={refresh}>
               Refresh
               <RefreshCwIcon className='size-4' />
             </Button>
             <Button
               type='button'
-              variant='outline'
+              variant='toolbar'
               onClick={() => setDialog('new-folder')}
             >
               New Folder
@@ -475,7 +475,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
               <p>Could not load media: {messageOf(listing.error)}</p>
               <Button
                 type='button'
-                variant='outline'
+                variant='toolbar'
                 size='sm'
                 onClick={() => listing.refetch()}
               >
