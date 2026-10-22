@@ -550,6 +550,22 @@ describe('makeFilterSuffixes', () => {
       ],
     };
 
+    it('builds left/right when EQ filter covers only the first field of a two-field index', () => {
+      const result = makeFilterSuffixes(
+        [binary('category', 'string', OP.EQ, 'tech')],
+        twoFieldIdx
+      );
+      expect(result).toEqual({ left: 'tech', right: 'tech' });
+    });
+
+    it('returns undefined when leading field uses non-EQ operator on a partial index filter', () => {
+      const result = makeFilterSuffixes(
+        [binary('category', 'string', OP.GT, 'tech')],
+        twoFieldIdx
+      );
+      expect(result).toBeUndefined();
+    });
+
     it('builds compound left/right when lower-order field uses EQ', () => {
       const result = makeFilterSuffixes(
         [
@@ -581,6 +597,38 @@ describe('makeFilterSuffixes', () => {
         twoFieldIdx
       );
       expect(result).toBeUndefined();
+    });
+
+    describe('three-field compound index', () => {
+      const threeFieldIdx: IndexDefinition = {
+        fields: [
+          { name: 'section', type: 'string', list: false },
+          { name: 'category', type: 'string', list: false },
+          { name: 'title', type: 'string', list: false },
+        ],
+      };
+
+      it('builds prefix range when EQ covers only the first field', () => {
+        const result = makeFilterSuffixes(
+          [binary('section', 'string', OP.EQ, 'docs')],
+          threeFieldIdx
+        );
+        expect(result).toEqual({ left: 'docs', right: 'docs' });
+      });
+
+      it('builds compound prefix range when EQ covers the first two fields', () => {
+        const result = makeFilterSuffixes(
+          [
+            binary('section', 'string', OP.EQ, 'docs'),
+            binary('category', 'string', OP.EQ, 'guides'),
+          ],
+          threeFieldIdx
+        );
+        expect(result).toEqual({
+          left: `docs${INDEX_KEY_FIELD_SEPARATOR}guides`,
+          right: `docs${INDEX_KEY_FIELD_SEPARATOR}guides`,
+        });
+      });
     });
   });
 });
