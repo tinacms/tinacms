@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   AlertDialog,
@@ -227,6 +227,10 @@ describe('Tooltip', () => {
 });
 
 describe('Toast', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it.each([
     { title: 'Changes saved', tone: 'success', role: 'status' },
     { title: 'Couldn’t save', tone: 'error', role: 'alert' },
@@ -274,7 +278,6 @@ describe('Toast', () => {
     await act(() => vi.advanceTimersByTimeAsync(10_000));
     await waitFor(() => expect(screen.queryByText('Changes saved')).toBeNull());
     expect(screen.getByRole('alert')).toHaveTextContent('Couldn’t save');
-    vi.useRealTimers();
   });
 
   it('replaces a toast by id, and runs onDismiss when code dismisses it', async () => {

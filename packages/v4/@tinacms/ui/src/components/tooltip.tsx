@@ -25,7 +25,7 @@ function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
   return <TooltipPrimitive.Trigger data-slot='tooltip-trigger' {...props} />;
 }
 
-/** A dark bubble with no arrow, 6px from its control. Put a shortcut in it as a `KbdShortcut size='sm'`. */
+/** Put a shortcut in it as a `KbdShortcut size='sm'`. */
 function TooltipContent({
   className,
   side = 'top',

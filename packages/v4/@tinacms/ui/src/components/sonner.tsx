@@ -2,11 +2,12 @@
 
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
 
+import { cn } from '@tinacms/ui/lib/utils';
+
 /**
  * Where toasts appear. Mount one near the root of the app, then show toasts
  * with `toast()` from `@tinacms/ui/components/toast`. Sonner keeps the stack,
- * the timers and the pause on hover. Toasts stack 8px apart, newest at the
- * bottom, rather than collapse behind each other.
+ * the timers and the pause on hover.
  */
 function Toaster({
   position = 'bottom-center',
@@ -20,7 +21,10 @@ function Toaster({
       className='toaster group'
       expand
       gap={8}
-      toastOptions={{ className: 'w-(--width)', ...toastOptions }}
+      toastOptions={{
+        ...toastOptions,
+        className: cn('w-(--width)', toastOptions?.className),
+      }}
       {...props}
     />
   );
