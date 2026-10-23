@@ -40,6 +40,17 @@ The preview updates as you type, before you save.
 | `pnpm build:pages` | `build-static/` + `admin/` | GitHub Pages with TinaCloud. See [DEPLOY.md](DEPLOY.md) |
 | `pnpm preview:static` | Serves `build-static/` | Trying the static build locally |
 | `pnpm check` | — | Type-checking with `svelte-check` |
+| `pnpm test` | — | `svelte-check` plus the component tests (Vitest, in a real browser) |
+| `pnpm test:e2e` | — | Playwright end-to-end suite in `e2e/` (starts `pnpm dev` itself) |
+| `pnpm lint` / `pnpm format` | — | Biome, using the repo's root config |
+
+`pnpm check` and `pnpm test` need two kinds of generated files. Run
+`pnpm dev` or `pnpm build` once so Tina writes `tina/__generated__` (the
+client and query types). And after `pnpm build` at the repo root, also run
+`pnpm types`, or svelte-check follows the placeholder `dist/*.d.ts` files into
+the packages' source and reports hundreds of unrelated errors. Stop any running `pnpm dev`
+before `pnpm test:e2e`: locally, Playwright reuses a server already on
+port 5173.
 
 The build scripts run `vite build` *through* `tinacms build -c` so Tina's local
 GraphQL server stays up while SvelteKit prerenders. `TINA_PUBLIC_IS_LOCAL=true`

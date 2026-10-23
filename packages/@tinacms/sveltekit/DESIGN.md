@@ -108,7 +108,7 @@ forms ("priming"), then re-renders those regions as the editor types (SK-13).
 | `src/TinaMarkdown.svelte`, `src/sanitize.ts`, `src/types.ts` | Rich-text renderer and its types |
 | `src/TinaIsland.svelte`, `src/experimental/island.ts` | Island marker and endpoint (experimental) |
 | `src/tina-field.ts` | Re-export of the bridge's `tinaField()` |
-| `src/__tests__/` | `*.test.ts` run in Node; `*.browser.test.ts` run in headless Chromium |
+| `src/__tests__/` | `*.test.ts` run in Node; `*.svelte.test.ts` run in happy-dom |
 
 ## Decisions
 
@@ -370,17 +370,21 @@ which once hid nine type errors in `TinaMarkdown.svelte`.
 visual checks are slow and expensive.
 
 **Decision.** Three layers:
-1. **Node tests** (`pnpm test`): hook injection and streaming, form ordering,
-   overlays, the island handler, the Vite plugin.
-2. **Headless Chromium tests** (`pnpm test-browser`): rendering and
-   reactivity, e.g. replaying editor updates with `rerender()`, and sending
-   real `updateData` messages from the parent frame to test `useTina()`.
-3. **End-to-end checks with Playwright** against the example (manual, run
-   before merging): live edits, click-to-focus, navigation, island responses,
-   console warnings.
+1. **Node tests** (`*.test.ts`): hook injection and streaming, form ordering,
+   overlays, the island handler, the Vite plugin, server-rendered markup.
+2. **happy-dom tests** (`*.svelte.test.ts`): reactivity on the client. Props
+   live in `$state` and change between `flushSync()` calls to replay editor
+   updates; `useTina()` gets `updateData` messages from a stand-in
+   `window.parent`, as in `@tinacms/bridge`'s tests. Both projects run in
+   `pnpm test`, after `svelte-check`.
+3. **Playwright end-to-end suite** in the example (`e2e/`, mirroring the
+   Astro kitchen-sink): frontend pages and admin create/edit flows.
 
-**Consequences.** Most regressions are caught by fast tests. The end-to-end
-checks are not automated in CI yet.
+**Consequences.** Everything runs in CI: `main.yml` runs the package's
+`pnpm test`, and `playwright-sveltekit-kitchen-sink.yml` runs the example's
+checks and e2e suite. happy-dom must be 20.x: 15.10.2 doesn't show paragraphs
+added to existing content, so the reactivity test fails on it. There's no
+real-browser test of layout; the default renderer has no styles to check.
 
 ## Known limitations
 

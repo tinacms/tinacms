@@ -161,7 +161,7 @@ Two parts of it are easy to get wrong when copied by hand:
   subscription restart for the new page's form after navigation.
 
 `useTina()` keeps both in one tested place (`src/use-tina.svelte.ts`, covered
-by `use-tina.browser.test.ts`). It's the SvelteKit counterpart of `useTina` in
+by `use-tina.svelte.test.ts`). It's the SvelteKit counterpart of `useTina` in
 `tinacms/dist/react`, so the call looks familiar to Tina users.
 
 ### Rules and downsides
@@ -281,9 +281,8 @@ From the monorepo root:
 
 ```sh
 pnpm install
-pnpm --filter @tinacms/sveltekit test          # Vitest, server suite
-pnpm --filter @tinacms/sveltekit test-browser  # headless Chromium suite
-pnpm --filter @tinacms/sveltekit check         # svelte-check (.svelte and .svelte.ts files)
+pnpm --filter @tinacms/sveltekit test          # svelte-check, then Vitest (Node and happy-dom projects)
+pnpm --filter @tinacms/sveltekit check         # svelte-check only (.svelte and .svelte.ts files)
 pnpm --filter @tinacms/sveltekit types
 pnpm --filter @tinacms/sveltekit build
 ```
@@ -299,9 +298,6 @@ The `.svelte` components and `use-tina.svelte.ts` ship as source and are
 compiled by the consuming app. Tests are excluded from the tarball
 (`"!src/__tests__"` in `files`).
 
-The first browser run on a fresh machine needs
-`pnpm --filter @tinacms/sveltekit exec playwright install --with-deps chromium`.
-
 Layout:
 
 | Path | Purpose |
@@ -314,7 +310,7 @@ Layout:
 | `src/TinaMarkdown.svelte` | Rich-text renderer |
 | `src/TinaIsland.svelte`, `src/experimental/` | Island marker and endpoint |
 | `src/internal/` | Per-request form store (on `event.locals`), escaping |
-| `src/__tests__/` | `*.test.ts` (server), `*.browser.test.ts` (Chromium) |
+| `src/__tests__/` | `*.test.ts` (Node), `*.svelte.test.ts` (happy-dom, can use runes) |
 
 Design decisions:
 
@@ -327,7 +323,8 @@ Design decisions:
   check in the example app.
 
 Working in WSL without a browser: reproduce renderer bugs with a
-`*.browser.test.ts` (headless, using `rerender()` to replay editor updates),
+`*.svelte.test.ts` (happy-dom; hold props in `$state`, change them and call
+`flushSync()` to replay editor updates),
 check the dev server with `curl -s localhost:5173/<path> | grep data-tina`, and
 leave visual checks in the Tina admin to a human. Don't read
 `tina/__generated__/` files whole; grep for what you need.
@@ -343,7 +340,8 @@ Verified:
   Dev: live title and rich text, click-to-focus, navigation, no console
   warnings. Same-origin checks need the server to see the browser's protocol;
   see the example README on `pnpm start` over plain HTTP.
-- 19 server tests and 3 browser tests pass; `svelte-check` reports no errors.
+- `pnpm test` passes (23 tests in Node and happy-dom, plus `svelte-check`),
+  and so does the example's Playwright suite (53 tests). CI runs both.
 
 Next:
 1. **Publishing:** done for a local tarball: installed in a standalone
@@ -351,6 +349,13 @@ Next:
    `svelte-check` passes. Still to do: a changeset and the real npm release.
 2. **Content invalidation:** check whether Vite needs a watcher for content
    and routes created in Tina during dev.
+3. **Shared server helpers:** move edit-mode detection, form payloads,
+   escaping, the island checks and the bridge dev server into
+   `@tinacms/bridge`, and switch this package and `@tinacms/astro` to them
+   (follow-up PR).
+4. **happy-dom:** this package pins `happy-dom ^20.14.6` because 15.10.2 (the
+   catalog version) doesn't show paragraphs added to existing content. Go
+   back to `catalog:` once the catalog moves to 20.x.
 
 References: [Tina Astro visual editing](https://tina.io/docs/contextual-editing/astro),
 [SvelteKit adapters](https://svelte.dev/docs/kit/adapters),

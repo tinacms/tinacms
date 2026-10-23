@@ -79,10 +79,16 @@ scopes styles per component.
 element switches the color palette. Each component has its own `<style>`
 block.
 
+Rich text from `TinaMarkdown` is plain HTML, so `src/lib/styles/prose.css`
+defines a `.prose` class that mimics Tailwind Typography with the Next
+example's overrides. The post, blog, content-block and hero wrappers use it,
+just as the Next and Astro examples use `prose`.
+
 **Consequences.** No build-time CSS tooling, and the styles are easy to read.
 It is a **deliberate deviation** from the repo standard: reviewers may ask
 about it, and porting markup from the Next example means translating
-Tailwind classes into CSS.
+Tailwind classes into CSS. Moving to `@tailwindcss/typography` later only
+means deleting `prose.css`.
 
 ### EX-03 — `#lib/*` subpath imports instead of `$lib`
 
@@ -282,11 +288,11 @@ component, one line in `index.ts`.
 
 ## Known issues and differences from the reference
 
-- **Theme colors.** The `color` field was missing from the global schema, so
-  the theme was always blue. It's back, as a plain select (the Next example
-  uses a React color picker), with palettes for all nine options in
-  `theme.css`. "White" is a neutral gray accent, since pure white would be
-  invisible on light pages.
+- **Theme colors.** The `color` field uses the React color picker from the
+  Hugo example (`tina/fields/color.tsx`), since the admin is React whatever
+  the site runs on and compiles the picker's Tailwind classes itself.
+  `theme.css` has palettes for all nine options. "White" is a neutral gray
+  accent, since pure white would be invisible on light pages.
 - **Tailwind.** Not used (EX-02).
 - **Clicking a post's author block doesn't focus the Author field.** The
   block is marked correctly (`tinaField(post, 'author')`, the same as the
@@ -304,12 +310,12 @@ component, one line in `index.ts`.
 - **GitHub Pages + TinaCloud is untested.** In particular, TinaCloud may not
   index content that lives outside the Tina folder (`localContentPath`). See
   [DEPLOY.md](./DEPLOY.md).
-- **`svelte-check` noise.** It also reports errors from
-  `tina/__generated__/` and the core `tinacms` sources, because of the
-  tsconfig scope. Filter with
-  `--output machine | grep ERROR | grep '"src/'`.
-- **No automated end-to-end tests** yet. The other examples use Playwright
-  suites (`e2e/`); this one was checked with Playwright by hand.
+- **`svelte-check` needs generated files.** It reports errors from the
+  workspace packages' source unless `pnpm types` has run after `pnpm build`
+  at the repo root, and it can't type queries until `tina/__generated__`
+  exists (run `pnpm dev` or `pnpm build` once). The tsconfig only includes
+  TypeScript files under `tina/`, so the generated `config.prebuild.jsx`
+  isn't checked.
 
 ## Checklist for adding a new route
 
