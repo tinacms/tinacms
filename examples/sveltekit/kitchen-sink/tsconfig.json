@@ -5,5 +5,5 @@
 		"types": ["$app/types", "node"],
 		"jsx": "preserve",
 	},
-	"include": ["src", "vite.config.ts", "tina"]
+	"include": ["src", "vite.config.ts", "tina/**/*.ts", "tina/**/*.tsx"]
 }

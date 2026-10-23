@@ -38,6 +38,10 @@ jobs:
       - name: Install Playwright browsers
         working-directory: examples/sveltekit/kitchen-sink
         run: pnpm exec playwright install --with-deps chromium
+      # Also generates tina/__generated__, which the checks below need.
+      - name: Build the SvelteKit kitchen-sink
+        working-directory: examples/sveltekit/kitchen-sink
+        run: pnpm build
       - name: Run SvelteKit kitchen-sink checks and unit tests
         working-directory: examples/sveltekit/kitchen-sink
         run: pnpm test
