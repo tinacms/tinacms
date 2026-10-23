@@ -92,7 +92,7 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "types": "tsc",
     "build": "tinacms-scripts build",
-    "test": "vitest run",
+    "test": "pnpm check && vitest run",
     "test-watch": "vitest",
     "test-browser": "vitest run --config vitest.browser.config.ts"
   },
