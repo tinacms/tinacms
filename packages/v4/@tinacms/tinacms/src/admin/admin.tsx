@@ -14,6 +14,7 @@ import {
   SidebarTrigger,
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
+import tinaLogo from '@tinacms/ui/assets/tinacms-logo.svg';
 import {
   type CSSProperties,
   type ReactNode,
@@ -379,9 +380,7 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton onClick={() => navigate(COLLECTIONS_ROUTE)}>
-                <span className='text-xs font-semibold tracking-wide uppercase'>
-                  TinaCMS
-                </span>
+                <img src={tinaLogo} alt='TinaCMS' className='h-5 w-auto' />
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

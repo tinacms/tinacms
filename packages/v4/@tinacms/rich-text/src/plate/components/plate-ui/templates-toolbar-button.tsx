@@ -43,13 +43,13 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align='start'
-        className='max-h-72 overflow-y-auto border-border rounded-none rounded-bl rounded-br'
+        className='max-h-72 overflow-y-auto border-border rounded-none rounded-bl-sm rounded-br-sm'
       >
         {templates.length > TEMPLATE_COUNT_NEEDING_FILTER && (
           <input
             type='text'
             placeholder='Filter templates...'
-            className='w-full p-2 border border-gray-300 rounded'
+            className='w-full p-2 border border-gray-300 rounded-sm'
             value={filterText}
             onChange={(event) => setFilterText(event.target.value)}
           />

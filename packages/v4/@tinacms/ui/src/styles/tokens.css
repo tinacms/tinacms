@@ -1,0 +1,189 @@
+/* The TinaCMS design tokens. Light theme only. Each token names its one-line use. */
+:root {
+  /* @group Palette: plain colours. Prefer the named tokens below. */
+  --white: #ffffff; /* Cards, fields and text on a primary button */
+  --orange-100: #ffede4; /* Lightest orange, for a selected fill */
+  --orange-200: #ffd3c1; /* Light orange, for a glow behind orange */
+  --orange-500: #ec4815; /* The TinaCMS logo orange, read through --brand */
+  --orange-600: #d13f13; /* Primary orange, read through --primary */
+  --orange-700: #a5310f; /* Primary hover, read through --primary-hover */
+  --orange-800: #7a230b; /* Primary pressed, read through --primary-active */
+  --slate-50: #f8fafc; /* Page ground, read through --background */
+  --slate-100: #f1f5f9; /* Muted and secondary fills */
+  --slate-200: #e2e8f0; /* Secondary hover and the preview page ground */
+  --slate-300: #cbd5e1; /* Disabled borders and muted lines on the dark bar */
+  --slate-500: #64748b; /* Lines on the dark bar, read through --inv-line */
+  --slate-600: #475569; /* Muted text, read through --muted-foreground */
+  --slate-700: #334155; /* Secondary text, such as a neutral badge */
+  --slate-800: #1e293b; /* Body text, read through --foreground */
+  --slate-900: #0f172a; /* The dark bar, read through --inv-bg */
+  --green-50: #f0fdf4; /* Published fill */
+  --green-700: #15803d; /* Published text */
+  --amber-50: #fffbeb; /* Unsaved fill */
+  --amber-500: #f59e0b; /* Unsaved dot */
+  --amber-600: #d97706; /* Unsaved bar on a changed field */
+  --amber-800: #92400e; /* Unsaved and warning text */
+  --red-50: #fef2f2; /* Failed fill */
+  --red-200: #fecaca; /* Failed border */
+  --red-700: #b91c1c; /* Errors, required and Failed text */
+  --blue-50: #eff6ff; /* Info fill */
+  --blue-200: #bfdbfe; /* Light blue, kept for an info border */
+  --blue-700: #1d4ed8; /* Info text */
+
+  /* @group Text */
+  --foreground: var(--slate-800); /* Text, Slate 800 */
+  --muted-foreground: var(
+    --slate-600
+  ); /* Help text and placeholders, Slate 600 */
+  --muted-foreground-strong: var(
+    --slate-600
+  ); /* Stronger muted text, such as labels and numbers in badges */
+  --primary-foreground: var(--white); /* Text on a primary button */
+  --selected-foreground: #c2410c; /* Text on a selected row */
+
+  /* @group Surfaces */
+  --background: var(--slate-50); /* Page, Slate 50 */
+  --card: var(--white); /* Cards and fields */
+  --popover: var(--white); /* Menus and option lists */
+  --muted: var(--slate-100); /* Read-only and muted fill, Slate 100 */
+  --muted-hover: rgba(241, 245, 249, 0.7); /* Hover on a muted row */
+  --secondary: var(--slate-100); /* Secondary button */
+  --secondary-hover: var(--slate-200); /* Secondary button hover */
+  --selected: #fff3e8; /* Selected row */
+  --list-ground: rgba(241, 245, 249, 0.5); /* Behind the cards of a list */
+  --list-add-hover: rgba(
+    255,
+    255,
+    255,
+    0.7
+  ); /* Hover on the add slot of a list */
+  --embed-ground: rgba(241, 245, 249, 0.5); /* Embed card in rich text */
+
+  /* @group Borders */
+  --border: #e2e8f0; /* Borders on toolbars and menus, a soft slate */
+  --border-subtle: #edf1f6; /* Dividers and card outlines, a soft slate */
+  --input: #cfd8e3; /* Inputs and list cards, a light slate. Darkens on hover; orange on focus */
+  --input-hover: #a9b5c4; /* Input border on hover */
+  --list-card-border: var(--input); /* Cards in a list, same as inputs */
+
+  /* @group Brand and focus */
+  --brand: var(--orange-500); /* The TinaCMS logo only */
+  --primary: var(
+    --orange-600
+  ); /* Primary buttons and checked boxes, Orange 600 */
+  --primary-hover: var(--orange-700); /* Primary button hover */
+  --primary-active: var(--orange-800); /* Primary button pressed */
+  --ring: #e0701f; /* Keyboard focus line, a warm orange (3.2:1), well clear of error red */
+  --focus-glow: #ffe2c7; /* Keyboard focus glow, soft peach */
+  --field-active-border: #f0883e; /* Active or selected field after a click or tap, light orange, no glow */
+  --focus-ring:
+    0 0 0 2px var(--card), 0 0 0 3px var(--ring), 0 0 0 6px var(--focus-glow); /* Keyboard focus on buttons and controls: a gap, the line, then the glow */
+  --focus-field: 0 0 0 3px var(--focus-glow); /* Keyboard focus glow around a field, with the line as its border */
+  --focus-inset:
+    inset 0 0 0 1px var(--ring), inset 0 0 0 4px var(--focus-glow); /* Keyboard focus inside a row or menu item, drawn inward */
+  --field-active-shadow: none; /* Active field after a click or tap: no glow */
+
+  /* @group Status */
+  --destructive: var(--red-700); /* Errors and required, Red 700 */
+  --unsaved: var(--amber-800); /* Unsaved text, Amber 800 */
+  --unsaved-subtle: var(--amber-50); /* Unsaved badge fill, Amber 50 */
+  --unsaved-edge: var(
+    --amber-600
+  ); /* Unsaved bar on a changed field, Amber 600 */
+  --unsaved-dot: var(
+    --amber-500
+  ); /* Unsaved dot, Amber 500 with a soft glow (--unsaved-glow) */
+  --unsaved-glow:
+    0 0 0 2.5px rgba(245, 158, 11, 0.16), 0 0 8px 1px rgba(245, 158, 11, 0.45); /* The soft ring and glow around the unsaved dot */
+  --status-published: var(--green-700); /* Published, Green 700 */
+  --status-published-subtle: var(--green-50); /* Published fill */
+  --status-changed: var(--unsaved); /* Changed, same as unsaved */
+  --status-changed-subtle: var(
+    --unsaved-subtle
+  ); /* Changed fill, same as unsaved */
+  --status-failed: var(--red-700); /* Failed */
+  --status-failed-subtle: var(--red-50); /* Failed fill */
+  --status-failed-border: var(--red-200); /* Failed border */
+  --tone-info: var(
+    --blue-700
+  ); /* Info text, such as a New tag or a branch name */
+  --tone-info-subtle: var(--blue-50); /* Info fill */
+
+  /* @group Dark surfaces: the dark toast, notice and Undo bar */
+  --inv-bg: var(--slate-900); /* Dark bar, such as Undo */
+  --inv-ink: var(--slate-100); /* Text on the dark bar */
+  --inv-muted: var(--slate-300); /* Muted text on the dark bar */
+  --inv-line: var(--slate-500); /* Lines on the dark bar */
+  --inv-hover: var(--slate-800); /* Hover on the dark bar */
+  --inv-warn: #f2b48f; /* Warning text on the dark bar */
+  --tone-success-on-dark: #86efac; /* Success icon on a dark toast */
+  --tone-danger-on-dark: #fca5a5; /* Danger icon on a dark toast */
+  --tone-warning-on-dark: #fcd34d; /* Warning icon on a dark toast */
+  --tone-info-on-dark: #93c5fd; /* Info icon on a dark toast */
+
+  /* @group Overlays and shadows */
+  --scrim: rgba(20, 20, 22, 0.32); /* Behind a dialog */
+  --scrim-light: rgba(
+    20,
+    20,
+    22,
+    0.14
+  ); /* Behind a sheet or a lighter overlay */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04); /* Buttons, inputs and other raised controls */
+  --shadow-popover:
+    0 0 0 1px rgba(15, 23, 42, 0.05), 0 4px 8px -2px rgba(15, 23, 42, 0.05),
+    0 16px 36px -8px rgba(15, 23, 42, 0.14); /* Menus, selects and option lists */
+  --shadow-toast:
+    0 0 0 1px rgba(15, 23, 42, 0.06), 0 12px 28px -6px rgba(15, 23, 42, 0.22); /* Toasts */
+  --shadow-lifted:
+    0 0 0 1px rgba(15, 23, 42, 0.04), 0 2px 4px rgba(15, 23, 42, 0.05),
+    0 12px 24px -8px rgba(15, 23, 42, 0.14); /* A list card while it is dragged */
+  --shadow-dialog:
+    0 0 0 1px rgba(15, 23, 42, 0.05), 0 20px 50px -12px rgba(15, 23, 42, 0.22); /* Dialogs */
+
+  /* @group Radius */
+  --radius-xs: 5px; /* Checkboxes and small marks */
+  --radius-sm: 8px; /* Inputs, buttons and list cards */
+  --radius-md: 12px; /* Cards, menus and list containers */
+  --radius-lg: 20px; /* Dialogs only */
+
+  /* @group Type */
+  --font-sans:
+    "Inter Variable", Inter, ui-sans-serif, system-ui, sans-serif; /* Labels, values and everything else */
+  --font-heading:
+    "IBM Plex Sans", "Inter Variable", Inter, ui-sans-serif, system-ui,
+    sans-serif; /* Page titles and headings */
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; /* Code, file types and branch names */
+  --text-xs: 0.75rem; /* Badges and chips, 12px */
+  --text-sm: 0.8125rem; /* Help text, errors and warnings, 13px */
+  --text-base: 0.875rem; /* Labels, values and body, 14px */
+  --text-md: 1rem; /* Panel titles, 16px */
+  --text-lg: 1.25rem; /* Page titles, 20px */
+
+  /* @group Motion */
+  --ease: cubic-bezier(
+    0.2,
+    0,
+    0,
+    1
+  ); /* The one easing for colour, border and shadow changes */
+  --dur: 0.14s; /* The one duration for colour, border and shadow changes */
+
+  /* @group Details: letter spacing, line heights and extra shadows */
+  --tracking-code: -0.01em; /* Letter spacing for the code font in badges, such as file types and branch names */
+  --tracking-initials: 0.01em; /* Letter spacing for the initials on an avatar */
+  --text-2xs: 0.6875rem; /* Small keycaps and the "then" between keys, 11px */
+  --text-3xs: 0.625rem; /* Initials on a small avatar, 10px */
+  --shadow-key: 0 1px 0 var(--border); /* The darker bottom edge of a keycap, so it reads as a key and not a badge */
+  --shadow-button-primary:
+    0 1px 2px rgba(122, 35, 11, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12); /* The primary button's soft drop and top highlight */
+  --leading-control: 1.45; /* Line height of the label on a button */
+  --shadow-segment:
+    var(--shadow-xs), 0 0 0 1px rgba(15, 23, 42, 0.04); /* The picked choice of a segmented control: a soft drop and a faint outline */
+  --tracking-format: -0.03em; /* Letter spacing for the file type (MDX, MD) that stands in for an icon on a nav row */
+  --leading-title: 1.3; /* Line height of a panel title in a panel header */
+  --leading-code: 1.55; /* Line height of the code lines in a diff view */
+  --shadow-toast-dark:
+    0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 40px -8px rgba(15, 23, 42, 0.45); /* A dark toast: a faint light edge and a deeper drop */
+}

@@ -110,7 +110,7 @@ const ADMIN_HTML = `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TinaCMS</title>
     <style>
-      body { margin: 0; font-family: system-ui, sans-serif; }
+      body { margin: 0; }
     </style>
   </head>
   <body>
