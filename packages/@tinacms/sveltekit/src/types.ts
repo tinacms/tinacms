@@ -83,6 +83,7 @@ export type TextElement = {
   code?: boolean;
   highlight?: boolean;
   highlightColor?: string;
+  textColor?: string;
 };
 
 export type MdxElement = {

@@ -37,6 +37,47 @@ describe('TinaMarkdown', () => {
     expect(body).toContain('Quote');
   });
 
+  it('renders text and highlight colours, dropping ones that are not a plain CSS colour', () => {
+    const { body } = render(TinaMarkdown, {
+      props: {
+        content: [
+          {
+            type: 'p',
+            children: [
+              { type: 'text', text: 'Red', textColor: '#ff0000' },
+              {
+                type: 'text',
+                text: 'Marked',
+                highlight: true,
+                highlightColor: 'rgb(255 255 0)',
+                textColor: 'blue',
+              },
+              {
+                type: 'text',
+                text: 'Unsafe text',
+                textColor: 'red;background:url(x)',
+              },
+              {
+                type: 'text',
+                text: 'Unsafe mark',
+                highlight: true,
+                highlightColor: 'red;background:url(x)',
+              },
+            ],
+          },
+        ] satisfies TinaRichTextContent,
+      },
+    });
+    const html = body.replace(/<!--.*?-->/g, '');
+
+    expect(html).toContain('<span style="color:#ff0000">Red</span>');
+    expect(html).toContain(
+      '<mark style="background-color:rgb(255 255 0)"><span style="color:blue">Marked</span></mark>'
+    );
+    expect(html).toContain('</mark>Unsafe text<mark>Unsafe mark</mark>');
+    expect(html).not.toContain('url(x)');
+  });
+
   it('renders code blocks and named MDX nodes through app overrides', () => {
     const { body } = render(TinaMarkdown, {
       props: {

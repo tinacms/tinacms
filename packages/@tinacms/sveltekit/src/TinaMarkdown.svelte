@@ -1,5 +1,5 @@
 <script lang="ts">
-import { sanitizeHref, sanitizeImageSrc } from './sanitize';
+import { sanitizeCssColor, sanitizeHref, sanitizeImageSrc } from './sanitize';
 import type {
   CodeBlockElement,
   CustomComponentsMap,
@@ -73,9 +73,14 @@ function cellInline(value: unknown): TinaRichTextNode[] {
   {:else if node.code}
     <code class="tina-markdown-inline-code">{@render renderLeaf({ ...node, code: false })}</code>
   {:else if node.highlight}
-    <mark style={node.highlightColor ? `background-color:${node.highlightColor}` : undefined}>
+    {@const highlightColor = sanitizeCssColor(node.highlightColor)}
+    <mark style={highlightColor ? `background-color:${highlightColor}` : undefined}>
       {@render renderLeaf({ ...node, highlight: false, highlightColor: undefined })}
     </mark>
+  {:else if sanitizeCssColor(node.textColor)}
+    <span style={`color:${sanitizeCssColor(node.textColor)}`}>
+      {@render renderLeaf({ ...node, textColor: undefined })}
+    </span>
   {:else}
     {node.text}
   {/if}
