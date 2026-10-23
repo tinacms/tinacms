@@ -40,6 +40,8 @@ definePlugin({
 ### Lazy segments are the bundle-safety mechanism
 `client`/`server` are lazy `() => import()` references, not inline objects. The client build statically follows `client` and never traverses `server`, so Node code and secrets physically cannot reach the browser. This is what makes ADR-001's single-package tree-shaking promise actually hold for server code.
 
+Server save hooks ([ADR-028](./028-server-save-hooks.md)) are weaker. A hook's `server: () => import('./x.server')` loader sits in a module the client imports, so a bundler can still emit a chunk for it. Under Vite, the Local Data Layer's plugin resolves any `*.server.*` import from `tina/` to a stub that throws in client builds, so no server hook code is bundled. Next.js has no such step. There, core guarantees nothing beyond a documented rule: import `*.server.*` files only through a `server:` loader.
+
 ### Type-safe RPC without codegen
 The client→server `server.x.y(...)` proxy is typed end-to-end by **type-only inference** (the tRPC pattern), not a generated client:
 - The server segment exports the *type* of its operations; the client imports it with `import type` — which the TS compiler **erases** before bundling, so it carries types across the boundary with zero runtime and pulls in none of the server's `@aws-sdk`/`process.env` code.

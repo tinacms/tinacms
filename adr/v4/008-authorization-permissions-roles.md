@@ -1,7 +1,7 @@
 # ADR-008: Authorization — Secure-by-Default RPC, Permission-Based RBAC
 
 ## Status
-**Accepted** — builds on [ADR-006](./006-plugin-dependency-resolution.md) (capabilities) and [ADR-007](./007-full-stack-plugins-client-backend-segments.md) (Capability RPC). The original v4 docs treated auth as "just a plugin" and said nothing about authorizing the RPC surface; this fills that gap.
+**Accepted**, amended by [ADR-028](./028-server-save-hooks.md): the default `editor` role holds `content:save` (§5). Builds on [ADR-006](./006-plugin-dependency-resolution.md) (capabilities) and [ADR-007](./007-full-stack-plugins-client-backend-segments.md) (Capability RPC). The original v4 docs treated auth as "just a plugin" and said nothing about authorizing the RPC surface; this fills that gap.
 
 ## Context
 Every Capability RPC operation becomes an HTTP route on the user's **Backend**. Without a rule for who may call them, authorization is per-plugin discipline — and one forgotten check ships an unauthenticated mutation to production. We also want plugins to be restrictable by role/permission, configurable per project.
@@ -41,6 +41,7 @@ definePlugin({ name: 'editorial-workflow', requires: { permission: 'content:publ
 - **Client checks are UX; the server transport is the sole enforcement.** The client hides/disables plugin UI the user can't use; the server rejects the RPC. The server never trusts the client.
 - **RBAC data is operational, not content → it is not stored in git.** This preserves "git is the source of truth *for content*" without pretending assignment data belongs in commits.
 - **New permissions are granted to nobody by default** except `admin` (`['*']`). Installing a plugin never silently widens an existing role.
+- **One exception: the default `editor` role holds `content:save`** ([ADR-028](./028-server-save-hooks.md)). A save to a collection with a server hook goes through the Backend's `content/update` op, which requires `content:save`. Without it, an editor could not save those collections. A role that should not save, such as a viewer, still leaves it out (ADR-014 §4).
 
 ## Consequences
 

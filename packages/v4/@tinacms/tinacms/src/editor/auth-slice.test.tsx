@@ -26,6 +26,8 @@ const bootRuntime = async (plugins: PluginManifest[]): Promise<TinaRuntime> => {
     registry: createFieldRegistry(resolved),
     validators: createValidatorRegistry(resolved),
     hooks: createFormHookRegistry(resolved),
+    serverHooks: new Set(),
+    rpcUrl: '/api/tina',
     store: createTinaStore(resolved),
     schema: { collections: [] },
     screens,

@@ -8,7 +8,7 @@ import {
 } from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
 import { Label } from '@tinacms/ui/components/label';
-import { use, useState } from 'react';
+import { use } from 'react';
 import { toFieldAddress } from '../core/field/address';
 import type { FieldSchema } from '../core/schema/types';
 import { FormScopeContext } from '../editor/context';
@@ -18,6 +18,7 @@ import {
   useFieldRegistry,
   useFormId,
   useFormSave,
+  useSaveFailure,
   useStaleDraft,
 } from '../editor/hooks';
 import {
@@ -60,7 +61,7 @@ function SaveButton() {
   const dirty = useIsFormDirty(formId);
   const invalid = Object.keys(useFormErrors(formId)).length > 0;
   const save = useFormSave();
-  const [failure, setFailure] = useState<string | null>(null);
+  const [failure, setFailure] = useSaveFailure();
   const canSave = dirty && !invalid;
   return (
     <div className='flex flex-col items-start gap-2'>

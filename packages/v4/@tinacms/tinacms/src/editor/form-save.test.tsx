@@ -24,6 +24,7 @@ import {
   useFieldValue,
   useFormId,
   useFormSave,
+  useFormSeedKey,
   useFormStatus,
 } from './index';
 
@@ -84,6 +85,7 @@ function SaveProbe({ onFailure }: { onFailure?: (cause: unknown) => void }) {
   const status = useFormStatus(useFormId());
   return (
     <div>
+      <span data-testid='seed'>{useFormSeedKey()}</span>
       <button
         type='button'
         onClick={() => save().catch(onFailure ?? (() => {}))}
@@ -288,6 +290,84 @@ describe('useFormSave', () => {
     expect(onSave).toHaveBeenCalled();
     expect(observed).not.toHaveBeenCalled();
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+  });
+
+  it('shows the document the save stored, and reads clean', async () => {
+    const onSave = vi.fn(async (document: TinaDocument) => ({
+      document: { ...document, title: String(document.title).toUpperCase() },
+    }));
+    renderWithSave(onSave);
+    const input = await screen.findByLabelText('Title');
+    await userEvent.type(input, '!');
+
+    await userEvent.click(screen.getByText('save'));
+    expect(await screen.findByDisplayValue('HI!')).toBe(input);
+    expect(screen.getByTestId('status')).toHaveTextContent('clean');
+  });
+
+  it('keeps edits typed while a save runs, and stays dirty', async () => {
+    let finish: () => void = () => {};
+    const onSave = vi.fn(
+      (document: TinaDocument) =>
+        new Promise<{ document: TinaDocument }>((resolve) => {
+          finish = () =>
+            resolve({ document: { ...document, title: 'Stored' } });
+        })
+    );
+    renderWithSave(onSave);
+    const input = await screen.findByLabelText('Title');
+    await userEvent.type(input, '!');
+
+    await userEvent.click(screen.getByText('save'));
+    await vi.waitFor(() => expect(onSave).toHaveBeenCalled());
+    await userEvent.type(input, '?');
+    finish();
+
+    await vi.waitFor(() =>
+      expect(screen.getByTestId('status')).toHaveTextContent('dirty')
+    );
+    expect(input).toHaveValue('Hi!?');
+  });
+
+  it('advances the seed key only when the stored document differs, so uncontrolled widgets redraw', async () => {
+    const onSave = vi.fn(async (document: TinaDocument) => ({ document }));
+    renderWithSave(onSave);
+    const input = await screen.findByLabelText('Title');
+    const seed = () => screen.getByTestId('seed').textContent;
+    const opened = seed();
+
+    await userEvent.type(input, '!');
+    await userEvent.click(screen.getByText('save'));
+    expect(await screen.findByTestId('status')).toHaveTextContent('clean');
+    expect(seed()).toBe(opened);
+
+    onSave.mockImplementation(async (document) => ({
+      document: { ...document, title: 'Changed by a hook' },
+    }));
+    await userEvent.type(input, '?');
+    await userEvent.click(screen.getByText('save'));
+    await screen.findByDisplayValue('Changed by a hook');
+    expect(seed()).not.toBe(opened);
+  });
+
+  it('rejects with an AfterSaveHookError when the save reports a failed server afterSave', async () => {
+    const failures: unknown[] = [];
+    renderWithSave(
+      async (document) => ({
+        document,
+        hookWarnings: ['The afterSave hook "audit" failed.'],
+      }),
+      collection,
+      { title: 'Hi' },
+      (cause) => failures.push(cause)
+    );
+    await userEvent.type(await screen.findByLabelText('Title'), '!');
+
+    await userEvent.click(screen.getByText('save'));
+    expect(await screen.findByTestId('status')).toHaveTextContent('clean');
+    await vi.waitFor(() =>
+      expect(failures[0]).toBeInstanceOf(AfterSaveHookError)
+    );
   });
 
   it('does not run beforeSave when validation fails', async () => {

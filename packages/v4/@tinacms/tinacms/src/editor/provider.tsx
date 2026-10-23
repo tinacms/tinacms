@@ -18,6 +18,7 @@ import {
   createFormHookRegistry,
   resolveFormHooks,
   runOnChange,
+  serverHookNamesOf,
 } from '../core/form/hooks';
 import { ingestDocument } from '../core/form/ingest';
 import {
@@ -48,6 +49,7 @@ import {
   useFormStore,
 } from '../form/form-store';
 import { SELF_CONTAINED_VALIDATORS } from '../plugins/validators/core-validators.schema';
+import { DEFAULT_RPC_URL } from '../rpc/proxy';
 import { createTinaStore } from '../store/create-store';
 import {
   FormScopeContext,
@@ -67,7 +69,7 @@ export interface TinaProviderProps {
 const createDefaultQueryClient = () =>
   new QueryClient({ defaultOptions: { queries: { retry: 1 } } });
 
-type BootedRuntime = Omit<TinaRuntime, 'schema'>;
+type BootedRuntime = Omit<TinaRuntime, 'schema' | 'rpcUrl'>;
 
 const usePluginsKey = (plugins: PluginManifest[]): number => {
   const previous = useRef<PluginManifest[] | null>(null);
@@ -116,6 +118,7 @@ export function TinaProvider({
         registry: createFieldRegistry(resolved),
         validators: createValidatorRegistry(resolved),
         hooks: createFormHookRegistry(resolved),
+        serverHooks: serverHookNamesOf(composedPlugins),
         store: createTinaStore(resolved),
         screens,
         globalNav: createGlobalNav(resolved, composedPlugins, screens),
@@ -161,8 +164,15 @@ export function TinaProvider({
   useEffect(() => syncDrafts(), []);
 
   const runtime = useMemo(
-    () => (booted ? { ...booted, schema: config.schema } : null),
-    [booted, config.schema]
+    () =>
+      booted
+        ? {
+            ...booted,
+            schema: config.schema,
+            rpcUrl: config.rpcUrl ?? DEFAULT_RPC_URL,
+          }
+        : null,
+    [booted, config.schema, config.rpcUrl]
   );
 
   if (error) throw error;
@@ -510,6 +520,23 @@ export function FormProvider({
 
   useFormMethodSubscriptions(formId, path, collection, formHooks, methods);
 
+  const [fieldReseeds, setFieldReseeds] = useState(0);
+  const reseedFields = useCallback(
+    () => setFieldReseeds((count) => count + 1),
+    []
+  );
+  const fieldSeedKey = `${seedKey}~${fieldReseeds}`;
+  const [failure, setFailure] = useState<{
+    formId: FormId;
+    message: string;
+  } | null>(null);
+  const saveFailure = failure?.formId === formId ? failure.message : null;
+  const setSaveFailure = useCallback(
+    (message: string | null) =>
+      setFailure(message === null ? null : { formId, message }),
+    [formId]
+  );
+
   const formScope = useMemo(
     () => ({
       formId,
@@ -517,6 +544,10 @@ export function FormProvider({
       collection,
       onSave: onSave ?? null,
       seedKey,
+      fieldSeedKey,
+      reseedFields,
+      saveFailure,
+      setSaveFailure,
       discardEdits,
       hooks: formHooks,
       staleDraft: staleDraftActions,
@@ -527,6 +558,10 @@ export function FormProvider({
       collection,
       onSave,
       seedKey,
+      fieldSeedKey,
+      reseedFields,
+      saveFailure,
+      setSaveFailure,
       discardEdits,
       formHooks,
       staleDraftActions,

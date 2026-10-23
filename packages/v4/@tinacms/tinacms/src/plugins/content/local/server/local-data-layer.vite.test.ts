@@ -8,6 +8,7 @@ import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
 import { definePlugin } from '../../../../core/plugin';
 import type { CollectionSchema } from '../../../../core/schema/types';
 import { createGraphQLPipeline } from '../graphql/graphql-pipeline';
+import type { Rollup } from 'vite';
 import { tinaLocalDataLayerVitePlugin } from './local-data-layer.vite';
 
 vi.mock('../graphql/graphql-pipeline', () => ({
@@ -543,5 +544,41 @@ describe('tinaLocalDataLayerVitePlugin watch config', () => {
         collections: [{ ...POSTS, path: undefined as unknown as string }],
       })
     ).toThrow(/content-collection-no-path/);
+  });
+});
+
+describe('tinaLocalDataLayerVitePlugin server modules', () => {
+  const resolveThroughAlias = async (ssr: boolean) => {
+    const plugin = tinaLocalDataLayerVitePlugin({
+      rootDir,
+      collections: [POSTS],
+    });
+    const { resolveId, load } = plugin;
+    if (typeof resolveId !== 'function' || typeof load !== 'function') {
+      throw new Error('The plugin has no resolveId or load hook.');
+    }
+    const aliasResolver = {
+      resolve: async () => ({ id: path.join(rootDir, 'tina/slug.server.ts') }),
+    } as unknown as Rollup.PluginContext;
+    const id = await resolveId.call(
+      aliasResolver,
+      '@hooks/slug',
+      path.join(rootDir, 'tina/hooks.ts'),
+      { ssr, attributes: {}, isEntry: false }
+    );
+    return {
+      id,
+      code: typeof id === 'string' ? load.call(aliasResolver, id) : null,
+    };
+  };
+
+  it('stubs an aliased import of a server module under tina/ in a client build', async () => {
+    const { code } = await resolveThroughAlias(false);
+    expect(code).toContain('runs on the server only');
+  });
+
+  it('keeps the server module in a server build', async () => {
+    const { id } = await resolveThroughAlias(true);
+    expect(id).toBeNull();
   });
 });

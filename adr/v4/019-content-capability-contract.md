@@ -27,7 +27,7 @@ A read targets a **state**: **published** (main) for the website, a **preview br
 - **Document system metadata.** Every document carries `createdAt` / `updatedAt` / `lastAuthor`, **always present** and **not content fields** — derived from **git** (log + blame) in production, **fs mtime** locally (no git ops run locally, per ADR-018). `list` can **sort/filter** on it, and the **default collection-list sort is `updatedAt` descending** so newly-created docs surface at the top (fixing "a new doc gets lost among thousands"). A collection may *also* declare a content-level date field for SEO/display — that's independent of this guaranteed system metadata. Field-level authorship (git-blame mapped to fields) is a possible future enhancement.
 
 ### 5. Write operations
-GraphQL mutations, **Client → Data Layer directly, enforced at the Data Layer** (ADR-018):
+GraphQL mutations, **Client → Data Layer directly, enforced at the Data Layer** (ADR-018). A save to a collection with a server hook goes through the Backend's `content/update` op first ([ADR-028](./028-server-save-hooks.md)). The operations:
 - **`create(collection, path, value, template?)`** — `path` from an explicit slug or a **collection-configured slug pattern**; `template` picks a polymorphic collection's shape.
 - **`update(collection, path, value, baseRef?)`** — the save; optional conflict base-ref (ADR-018).
 - **`delete(collection, path)`** — **warn-and-allow**: surfaces referrers ("3 documents reference this"), proceeds on confirm; never a hard block.
