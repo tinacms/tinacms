@@ -17,9 +17,13 @@ In the `plugins: [ ... ]` declaration a mediaPlugin needs to be defined.
 Note: the `media` capability is a single-provider capability; so we can only ever have 1 active  media provider. An example of how this is used in an app could be: 
 
 ```ts
+const clientId = import.meta.env.TINA_PUBLIC_CLIENT_ID;
+const isLocal = !clientId;
+
 plugins: [
-  localContentPlugin(),
-  isLocal ? localMediaPlugin() : tinaCloud({ clientId }),
+  ...(isLocal
+    ? [localContentPlugin(), localMediaPlugin()]
+    : [tinaCloud({ clientId })]),
 ]
 ```
 

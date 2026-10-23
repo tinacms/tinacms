@@ -17,8 +17,8 @@ export function MediaBreadcrumb({
       {parts.length > 0 ? (
         <Button
           type='button'
-          variant='ghost'
-          size='icon-sm'
+          variant='icon'
+          size='sm'
           aria-label='Parent folder'
           onClick={() => onOpen(parts.slice(0, -1).join('/'))}
         >

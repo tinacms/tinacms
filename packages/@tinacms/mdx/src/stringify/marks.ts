@@ -8,11 +8,8 @@ import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type * as Plate from '../parse/plate';
 import { stringifyPropsInline } from './acorn';
-import { getMarks } from './index';
-
-const matches = (a: string[], b: string[]) => {
-  return a.some((v) => b.includes(v));
-};
+import { longestMarkRun, textColorElement } from './text-color';
+import { type Marks, getMarks } from './index';
 
 type InlineElementWithCallback = Plate.InlineElement & {
   linkifyTextNode?: (arg: Md.Text) => Md.Link;
@@ -195,122 +192,39 @@ export const eat = (
       ...eat(content.slice(1), field, imageCallback),
     ];
   }
-  const marks = getMarks(first);
-
-  if (marks.length === 0) {
-    if (first.linkifyTextNode) {
-      const f = first as Plate.TextElement & {
-        linkifyTextNode?: (arg: Md.Text) => Md.Link;
-      };
-      return [
-        first.linkifyTextNode(text({ text: f.text })),
-        ...eat(content.slice(1), field, imageCallback),
-      ];
-    } else {
-      const f = first as Plate.TextElement & {
-        linkifyTextNode?: (arg: Md.Text) => Md.Link;
-      };
-      return [
-        text({ text: f.text }),
-        ...eat(content.slice(1), field, imageCallback),
-      ];
-    }
-  }
-  let nonMatchingSiblingIndex: number = 0;
-  if (
-    content.slice(1).every((content, index) => {
-      if (matches(marks, getMarks(content))) {
-        return true;
-      } else {
-        nonMatchingSiblingIndex = index;
-        return false;
-      }
-    })
-  ) {
-    // Every sibling matches, so capture all of them in this node
-    nonMatchingSiblingIndex = content.length - 1;
-  }
-  const matchingSiblings = content.slice(1, nonMatchingSiblingIndex + 1);
-  const markCounts: {
-    [key in
-      | 'strong'
-      | 'emphasis'
-      | 'inlineCode'
-      | 'delete'
-      | 'highlight']?: number;
-  } = {};
-  marks.forEach((mark) => {
-    let count = 1;
-    matchingSiblings.every((sibling, index) => {
-      if (getMarks(sibling).includes(mark)) {
-        count = index + 1;
-        return true;
-      }
-    });
-    markCounts[mark] = count;
-  });
-  let count = 0;
-  let markToProcess:
-    | 'strong'
-    | 'emphasis'
-    | 'inlineCode'
-    | 'delete'
-    | 'highlight'
-    | null = null;
-  Object.entries(markCounts).forEach(([mark, markCount]) => {
-    const m = mark as
-      | 'strong'
-      | 'emphasis'
-      | 'inlineCode'
-      | 'delete'
-      | 'highlight';
-    if (markCount > count) {
-      count = markCount;
-      markToProcess = m;
-    }
-  });
-  if (!markToProcess) {
-    const f = first as Plate.TextElement & {
-      linkifyTextNode?: (arg: Md.Text) => Md.Link;
-    };
+  const textNode = first as Plate.TextElement & InlineElementWithCallback;
+  const { markToProcess, runLength } = longestMarkRun(
+    content,
+    getMarks(textNode).filter(
+      (mark): mark is Exclude<Marks, 'highlight'> => mark !== 'highlight'
+    )
+  );
+  if (!markToProcess && !textNode.highlight) {
     return [
-      text({ text: f.text }),
+      ...leaf(textNode, text(textNode)),
       ...eat(content.slice(1), field, imageCallback),
     ];
   }
-  if (markToProcess === 'highlight') {
-    const f = first as Plate.TextElement;
-    const innerText = text({ text: f.text });
-    const child: Md.PhrasingContent = first.linkifyTextNode
-      ? first.linkifyTextNode(innerText)
-      : innerText;
+  if (!markToProcess) {
     return [
       {
         type: 'mdxJsxTextElement',
         name: 'mark',
-        attributes: markAttributes(f),
-        children: [child],
+        attributes: markAttributes(textNode),
+        children: leaf(textNode, text(textNode)),
       } as unknown as Md.PhrasingContent,
       ...eat(content.slice(1), field, imageCallback),
     ];
   }
   if (markToProcess === 'inlineCode') {
-    if (nonMatchingSiblingIndex) {
+    if (runLength > 1) {
       throw new Error(
         "Inline code can't have other formatting on it. Remove the formatting from the code text."
       );
     }
-    const f = first as Plate.TextElement & {
-      linkifyTextNode?: (arg: Md.Text) => Md.Link;
-    };
-    const node = {
-      type: markToProcess,
-      value: f.text,
-    };
     return [
-      // @ts-ignore
-      first.linkifyTextNode?.(node) ?? node,
-      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
+      ...leaf(textNode, { type: 'inlineCode', value: textNode.text }),
+      ...eat(content.slice(1), field, imageCallback),
     ];
   }
 
@@ -318,17 +232,30 @@ export const eat = (
     {
       type: markToProcess,
       children: eat(
-        [
-          ...[first, ...matchingSiblings].map((sibling) =>
-            cleanNode(sibling, markToProcess)
-          ),
-        ],
+        content
+          .slice(0, runLength)
+          .map((sibling) => cleanNode(sibling, markToProcess)),
         field,
         imageCallback
       ),
     },
-    ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
+    ...eat(content.slice(runLength), field, imageCallback),
   ];
+};
+
+/** A text leaf, wrapped in its text colour and then its link, if any. */
+const leaf = (
+  first: Plate.TextElement & InlineElementWithCallback,
+  node: Md.PhrasingContent
+): Md.PhrasingContent[] => {
+  return first.linkifyTextNode
+    ? [
+        {
+          ...first.linkifyTextNode({ type: 'text', value: '' }),
+          children: textColorElement(first, node) as Md.Link['children'],
+        },
+      ]
+    : textColorElement(first, node);
 };
 
 const cleanNode = (

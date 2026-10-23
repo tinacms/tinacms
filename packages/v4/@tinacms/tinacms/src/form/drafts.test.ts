@@ -1,8 +1,10 @@
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { toUserId } from '../core/auth/contract';
 import { toFieldAddress } from '../core/field/address';
 import { simulateReload } from '../test/simulate-reload';
-import { draftKey, readDraft } from './drafts';
+import { draftKey, readDraft, removeDraft, writeDraft } from './drafts';
 import {
+  type FormId,
   formStatus,
   staleDraft,
   syncDrafts,
@@ -15,11 +17,13 @@ const seo = toFieldAddress('seo');
 const summary = toFieldAddress('summary');
 const postA = toFormId('posts/a.mdx');
 const postB = toFormId('posts/b.mdx');
+const ada = toUserId('ada');
+const grace = toUserId('grace');
 const store = useFormStore;
 
 const syncing = () => onTestFinished(syncDrafts());
 
-const otherTabWrites = (formId: string, text: string) =>
+const otherTabWrites = (formId: FormId, text: string) =>
   localStorage.setItem(
     draftKey(formId),
     JSON.stringify({
@@ -192,5 +196,73 @@ describe('form drafts', () => {
       store.getState().registerForm(postA, { [title]: 'Hello' })
     ).not.toThrow();
     expect(formStatus(store.getState().forms[postA])).toBe('pristine');
+  });
+
+  it('encodes special characters in user ids so keys never collide', () => {
+    const colonUser = toUserId('auth0:ada');
+    const plainUser = toUserId('auth0');
+    const subPost = toFormId('ada:posts/a.mdx');
+    expect(draftKey(postA, colonUser)).not.toBe(draftKey(subPost, plainUser));
+    expect(draftKey(postA, ada)).not.toBe(draftKey(postA));
+  });
+
+  it('neither reads nor writes drafts while signed out under an auth plugin', () => {
+    writeDraft(
+      postA,
+      { values: { title: 'Mine' }, baseline: { title: 'Hello' } },
+      null
+    );
+    expect(localStorage.length).toBe(0);
+
+    writeDraft(postA, {
+      values: { title: 'Mine' },
+      baseline: { title: 'Hello' },
+    });
+    expect(readDraft(postA, null)).toBeUndefined();
+    removeDraft(postA, null);
+    expect(readDraft(postA)).toBeDefined();
+  });
+
+  it('keeps unsaved edits from carrying over to the next editor in the same tab, and restores them when the first editor returns', () => {
+    syncing();
+    store.getState().setUserId(ada);
+    editA('Ada draft');
+    expect(readDraft(postA, ada)?.values).toEqual({ title: 'Ada draft' });
+
+    store.getState().setUserId(null);
+    expect(store.getState().forms[postA]).toBeUndefined();
+    expect(readDraft(postA, ada)?.values).toEqual({ title: 'Ada draft' });
+
+    store.getState().setUserId(grace);
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    expect(store.getState().forms[postA]?.values[title]).toBe('Hello');
+    expect(formStatus(store.getState().forms[postA])).toBe('pristine');
+    expect(staleDraft(postA, { [title]: 'Hello' })).toBeUndefined();
+
+    store.getState().setUserId(null);
+    store.getState().setUserId(ada);
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    expect(store.getState().forms[postA]?.values[title]).toBe('Ada draft');
+    expect(formStatus(store.getState().forms[postA])).toBe('dirty');
+  });
+
+  it('isolates drafts per editor across a browser reload', () => {
+    syncing();
+    store.getState().setUserId(ada);
+    editA('Ada draft');
+    store.getState().setUserId(null);
+
+    simulateReload();
+    store.getState().setUserId(grace);
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    expect(store.getState().forms[postA]?.values[title]).toBe('Hello');
+    expect(formStatus(store.getState().forms[postA])).toBe('pristine');
+    expect(staleDraft(postA, { [title]: 'Hello' })).toBeUndefined();
+
+    simulateReload();
+    store.getState().setUserId(ada);
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    expect(store.getState().forms[postA]?.values[title]).toBe('Ada draft');
+    expect(formStatus(store.getState().forms[postA])).toBe('dirty');
   });
 });

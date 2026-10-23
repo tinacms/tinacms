@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sanitizeHref, sanitizeImageSrc } from '../sanitize';
+import { sanitizeCssColor, sanitizeHref, sanitizeImageSrc } from '../sanitize';
 
 describe('sanitizeHref', () => {
   it('blocks javascript: scheme', () => {
@@ -71,5 +71,18 @@ describe('sanitizeImageSrc', () => {
     expect(sanitizeImageSrc(undefined)).toBe('');
     expect(sanitizeImageSrc('')).toBe('');
     expect(sanitizeImageSrc(42)).toBe('');
+  });
+});
+
+describe('sanitizeCssColor', () => {
+  it('keeps plain colours', () => {
+    expect(sanitizeCssColor('#CC4141')).toBe('#CC4141');
+    expect(sanitizeCssColor('rgb(1, 2, 3)')).toBe('rgb(1, 2, 3)');
+  });
+
+  it('drops values that inject extra CSS', () => {
+    expect(
+      sanitizeCssColor('red;position:fixed;background:url(https://evil/x)')
+    ).toBeUndefined();
   });
 });

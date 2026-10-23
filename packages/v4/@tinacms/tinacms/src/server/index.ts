@@ -2,9 +2,11 @@
 // Imported by plugin server segments and by per-framework adapters.
 // Never reaches the browser bundle.
 
-import { AsyncLocalStorage } from 'node:async_hooks';
 import type { AuthTransportHooks, Session } from '../core/auth/contract';
+import { CONTENT_SAVE_PERMISSION } from '../core/content/contract';
 import { invariant } from '../core/invariant';
+import { tagOp } from './op-meta';
+import { serverRuntimeStorage } from './runtime-storage';
 import type {
   ResolvedServerSegment,
   ServerOp,
@@ -12,6 +14,15 @@ import type {
 } from '../core/plugin';
 
 export { toUserId, type UserId } from '../core/auth/contract';
+export { type RequestContext, requestContext } from './request-context';
+export {
+  defineServerHook,
+  HookRejectedError,
+  reject,
+  type ServerFormHooks,
+  type ServerHookFactory,
+  type ServerHookScope,
+} from '../core/form/hooks';
 export type {
   AuthTransportHooks,
   ResolvedServerSegment,
@@ -27,70 +38,27 @@ export const defineServerPlugin = <TOps extends ServerSegment>(
   ops: TOps
 ): TOps => ops;
 
-// ADR-008 §4/§5: Tina ships editor/admin so TinaCloud works with zero config; new
-// permissions are granted to nobody by default except admin's wildcard. Null-prototype,
-// so a role named after an Object.prototype member ("constructor", "__proto__")
-// resolves to nothing rather than an inherited function.
+// ADR-008 §4/§5: Tina ships editor/admin so TinaCloud works with zero config. An editor
+// saves content (ADR-014 §4); every other permission is granted to nobody by default
+// except admin's wildcard. Null-prototype, so a role named after an Object.prototype
+// member ("constructor", "__proto__") resolves to nothing rather than an inherited
+// function.
 export const DEFAULT_ROLE_PERMISSIONS: Readonly<
   Record<string, readonly string[]>
 > = Object.freeze(
   Object.assign(Object.create(null), {
     admin: Object.freeze(['*']),
-    editor: Object.freeze([]),
+    editor: Object.freeze([CONTENT_SAVE_PERMISSION]),
   })
 );
 
-// Op-level authorization marks (ADR-008): bare handlers are protected by default;
-// `publicOp` is the only unauthenticated opt-out (greppable); `protectedOp` names the
-// required permission (`string` until codegen builds the typed union). Wrapping, not
-// mutating, so one handler under two wrappers can't cross-tag; `Symbol.for`, so
-// duplicate module copies still agree on the tag.
-const OP_META = Symbol.for('tinacms.op-meta');
-
-interface OpMeta {
-  public?: true;
-  permission?: string;
-}
-
-interface TaggedOp {
-  [OP_META]?: OpMeta;
-}
-
-const tagOp = <TOp extends ServerOp>(handler: TOp, meta: OpMeta): TOp => {
-  invariant(
-    (handler as TaggedOp)[OP_META] === undefined,
-    'op-already-tagged',
-    'This handler already carries an authorization mark; wrap the bare handler instead.'
-  );
-  const wrapped = ((input: never) => handler(input)) as TOp & TaggedOp;
-  wrapped[OP_META] = meta;
-  return wrapped;
-};
-
 export const publicOp = <TOp extends ServerOp>(handler: TOp): TOp =>
-  tagOp(handler, { public: true });
+  tagOp(handler, { public: true, permissions: [] });
 
 export const protectedOp = <TOp extends ServerOp>(
   opts: { permission: string },
   handler: TOp
-): TOp => tagOp(handler, { permission: opts.permission });
-
-export const opMeta = (handler: ServerOp): OpMeta =>
-  (handler as TaggedOp)[OP_META] ?? {};
-
-// The composed server runtime (built once per handler, rpc/handler.ts): segments by
-// mount namespace, plus the auth hooks claimed at compose — `null` fails closed.
-export interface ServerRuntime {
-  segmentsByNamespace: Map<string, ResolvedServerSegment>;
-  authHooks: AuthTransportHooks | null;
-  // The teardown from initializePlugins. It runs every onDestroy that its matching
-  // onInit paired with, and a second call destroys nothing.
-  destroy: () => Promise<void>;
-}
-
-// Carries the runtime across a dispatch so the module-level `use()` resolves against
-// the handler that dispatched it — safe under interleaved requests.
-export const serverRuntimeStorage = new AsyncLocalStorage<ServerRuntime>();
+): TOp => tagOp(handler, { permissions: [opts.permission] });
 
 // Server→server in-process capability accessor (ADR-007) — `use('content').listAll()`.
 // Typed per-capability contracts arrive with ADR-019/021/022; until then callers cast.

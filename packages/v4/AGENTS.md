@@ -17,7 +17,7 @@ Instructions for agents working under `packages/v4/`.
 |---|---|---|
 | `@tinacms/tinacms` | `@tinacms/tinacms` | The v4 runtime + CLI in one package. `private: true`, `4.0.0-alpha.x`. Subpath exports for `/react`, `/client`, `/server`, `/local-data-layer`, and framework adapters (`/adapters/next`, `/express`, `/astro`, `/hono`). |
 | `@tinacms/rich-text` | `@tinacms/rich-text` | Plate rich-text editor. A value contract separates the editor from the storage format — keep that boundary (see `src/boundary.test.ts`). |
-| `@tinacms/ui` | `@tinacms/ui` | Shared UI components from shadcn/ui. |
+| `@tinacms/ui` | `@tinacms/ui` | Shared UI components, built on shadcn/ui and restyled to the TinaCMS design. |
 
 ## Commands (run inside the package directory)
 
@@ -45,9 +45,11 @@ use it to verify runtime/editor changes in a browser.
   `packages/@tinacms/*`) is in support mode: bug and security fixes only.
 - **Don't move level adapters or external integrations into this repo** —
   the README lists where they live.
-- **shadcn components:** add or update via
-  `pnpm dlx shadcn@latest add <component>` run in `@tinacms/ui/` — don't
-  hand-write new primitives that shadcn already provides.
+- **shadcn components:** add a new one via
+  `pnpm dlx shadcn@latest add <component>` run in `@tinacms/ui/`, then restyle
+  it to the TinaCMS design. Don't hand-write primitives that shadcn already
+  provides, and never re-add an existing component: that overwrites its
+  TinaCMS styling.
 
 ## Types
 

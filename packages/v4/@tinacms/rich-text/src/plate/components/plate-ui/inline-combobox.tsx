@@ -234,7 +234,7 @@ const InlineComboboxContent: typeof ComboboxPopover = ({
     <Portal>
       <ComboboxPopover
         className={cn(
-          'z-[9999999] max-h-[288px] w-[300px] overflow-y-auto rounded bg-white shadow-md',
+          'z-[9999999] max-h-[288px] w-[300px] overflow-y-auto rounded-sm bg-white shadow-md',
           className
         )}
         {...props}
@@ -244,7 +244,7 @@ const InlineComboboxContent: typeof ComboboxPopover = ({
 };
 
 const comboboxItemVariants = cva(
-  'relative flex h-9 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none',
+  'relative flex h-9 select-none items-center rounded-xs px-2 py-1.5 text-sm outline-none',
   {
     defaultVariants: {
       interactive: true,

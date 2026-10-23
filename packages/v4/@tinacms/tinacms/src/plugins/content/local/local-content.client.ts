@@ -1,11 +1,30 @@
-import { authHeadersOf } from '../../../core/auth/slice';
-import type {
-  ContentProvider,
-  DocumentEntry,
-  DocumentSummary,
+import { siteAuthHeadersOf } from '../../../core/auth/slice';
+import {
+  type ContentProvider,
+  ContentError,
+  type ContentRefusalCode,
+  type DocumentEntry,
+  type DocumentSummary,
+  isContentRefusalCode,
 } from '../../../core/content/contract';
+import { isRecord } from '../../../utils/is-record';
 import type { ClientSlice, TinaStoreState } from '../../../core/plugin';
 import type { ContentRequest } from './server/content-request';
+
+const refusalIn = (
+  text: string
+): { code: ContentRefusalCode; message: string } | null => {
+  let body: unknown;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    return null;
+  }
+  const error = isRecord(body) ? body.error : undefined;
+  if (!isRecord(error) || typeof error.message !== 'string') return null;
+  if (!isContentRefusalCode(error.code)) return null;
+  return { code: error.code, message: error.message };
+};
 
 const postContentRequest = async <Result>(
   url: string,
@@ -16,13 +35,16 @@ const postContentRequest = async <Result>(
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      ...(await authHeadersOf(state)),
+      ...(await siteAuthHeadersOf(state)),
     },
     body: JSON.stringify(request),
   });
   if (!response.ok) {
+    const text = await response.text();
+    const refusal = refusalIn(text);
+    if (refusal) throw new ContentError(refusal.code, refusal.message);
     throw new Error(
-      `Content request ${request.op} failed (${response.status}): ${await response.text()}`
+      `Content request ${request.op} failed (${response.status}): ${text}`
     );
   }
   return response.json();
