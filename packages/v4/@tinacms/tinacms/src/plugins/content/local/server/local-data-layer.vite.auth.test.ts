@@ -19,6 +19,7 @@ import type { CollectionSchema, HookRef } from '../../../../core/schema/types';
 import {
   type ServerSegment,
   defineServerPlugin,
+  requestContext,
   toUserId,
   use,
 } from '../../../../server';
@@ -576,6 +577,33 @@ describe('local Data Layer updates', () => {
       'Cannot save "content/posts/a.mdx": permission denied.'
     );
     expect(error.message).not.toContain(rootDir);
+  });
+
+  it('gives a hook on the local route the request context', async () => {
+    const seenTypes = vi.fn();
+    const contextProbe = defineHook('contextProbe', {
+      server: async () => ({
+        default: defineServerHook(() => ({
+          beforeSave: (document) => {
+            seenTypes(requestContext().request.headers.get('content-type'));
+            return document;
+          },
+        })),
+      }),
+    });
+    const res = await call(
+      mountedRoutes(
+        [
+          localContentPlugin(),
+          defineHooksPlugin('test:context', [contextProbe]),
+        ],
+        [contextProbe()]
+      ),
+      '/api/tina/content/update',
+      update({})
+    );
+    expect(res.statusCode).toBe(200);
+    expect(seenTypes).toHaveBeenCalledWith('application/json');
   });
 
   it('refuses a mismatched save before any hook runs', async () => {

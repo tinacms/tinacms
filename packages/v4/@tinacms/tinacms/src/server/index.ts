@@ -64,7 +64,7 @@ const OP_META = Symbol.for('tinacms.op-meta');
 
 interface OpMeta {
   public?: true;
-  permission?: string;
+  permissions: readonly string[];
 }
 
 interface TaggedOp {
@@ -83,15 +83,22 @@ const tagOp = <TOp extends ServerOp>(handler: TOp, meta: OpMeta): TOp => {
 };
 
 export const publicOp = <TOp extends ServerOp>(handler: TOp): TOp =>
-  tagOp(handler, { public: true });
+  tagOp(handler, { public: true, permissions: [] });
 
 export const protectedOp = <TOp extends ServerOp>(
   opts: { permission: string },
   handler: TOp
-): TOp => tagOp(handler, { permission: opts.permission });
+): TOp => tagOp(handler, { permissions: [opts.permission] });
+
+// Internal: core's content save requires `content:save` and every permission
+// the provider's own `update` required.
+export const requiringPermissions = <TOp extends ServerOp>(
+  permissions: readonly string[],
+  handler: TOp
+): TOp => tagOp(handler, { permissions });
 
 export const opMeta = (handler: ServerOp): OpMeta =>
-  (handler as TaggedOp)[OP_META] ?? {};
+  (handler as TaggedOp)[OP_META] ?? { permissions: [] };
 
 // The composed server runtime (built once per handler, rpc/handler.ts): segments by
 // mount namespace, plus the auth hooks claimed at compose — `null` fails closed.

@@ -144,6 +144,7 @@ export const createLocalDataLayer = (
   ): Promise<{
     absolute: string;
     realAbsolute: string;
+    realFolder: string;
     adapter: FormatAdapter;
   }> => {
     invariant(
@@ -172,7 +173,7 @@ export const createLocalDataLayer = (
           .join(' or ')} file in collection "${collection.schema.name}".`
       );
     }
-    return { absolute, realAbsolute, adapter };
+    return { absolute, realAbsolute, realFolder, adapter };
   };
 
   // Collection folders can nest and can share a folder across formats, so a
@@ -198,21 +199,19 @@ export const createLocalDataLayer = (
   const documentIdFor = (absolute: string): string =>
     path.relative(rootDir, absolute).split(path.sep).join('/');
 
-  let realRoot: Promise<string> | undefined;
-  const realDocumentIdFor = async (realAbsolute: string): Promise<string> => {
-    realRoot ??= realPathOf(rootDir);
-    return path
-      .relative(await realRoot, realAbsolute)
-      .split(path.sep)
-      .join('/');
-  };
-
   const resolveOwnedPath = async (
     collection: ResolvedCollection,
     documentPath: string
   ) => {
     const resolved = await resolveDocumentPath(collection, documentPath);
-    const canonicalPath = await realDocumentIdFor(resolved.realAbsolute);
+    // The real file, named under the folder the collection configures, so a
+    // linked collection folder keeps its configured name.
+    const canonicalPath = documentIdFor(
+      path.join(
+        collection.absoluteFolder,
+        path.relative(resolved.realFolder, resolved.realAbsolute)
+      )
+    );
     const owner = await ownerOf(resolved.realAbsolute);
     if (owner !== collection) {
       throw new ContentWriteError(
@@ -224,15 +223,15 @@ export const createLocalDataLayer = (
 
   const savesByPath = new Map<string, Promise<unknown>>();
   const afterPendingSaves = <T>(
-    canonicalPath: string,
+    realAbsolute: string,
     save: () => Promise<T>
   ): Promise<T> => {
-    const pending = savesByPath.get(canonicalPath) ?? Promise.resolve();
+    const pending = savesByPath.get(realAbsolute) ?? Promise.resolve();
     const run = pending.catch(() => {}).then(save);
-    savesByPath.set(canonicalPath, run);
+    savesByPath.set(realAbsolute, run);
     const forget = () => {
-      if (savesByPath.get(canonicalPath) === run) {
-        savesByPath.delete(canonicalPath);
+      if (savesByPath.get(realAbsolute) === run) {
+        savesByPath.delete(realAbsolute);
       }
     };
     run.then(forget, forget);
@@ -313,7 +312,7 @@ export const createLocalDataLayer = (
         new ContentWriteError(
           `Cannot save "${canonicalPath}": ${fileSystemReasonOf(cause)}.`
         );
-      return afterPendingSaves(canonicalPath, async () => {
+      return afterPendingSaves(realAbsolute, async () => {
         let previousRaw: string | undefined;
         try {
           previousRaw = await fs.readFile(realAbsolute, 'utf8');

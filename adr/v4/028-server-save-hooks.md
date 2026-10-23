@@ -23,7 +23,7 @@ export const slug = defineHook('slug', {
 });
 
 // tina/slug.server.ts
-import { defineServerHook, reject } from 'tinacms/server';
+import { defineServerHook, reject } from '@tinacms/tinacms/server';
 
 export default defineServerHook(() => ({
   beforeSave: (doc, { session }) => {
@@ -63,9 +63,9 @@ The client knows which hooks have a server side without loading any server code.
 ### 4. The hooks wrap the content provider's server `update` op
 At compose time, core wraps the `content` provider's server `update` op with the hook pipeline. The hooks live in the op itself, so every mount of that op runs them, including the extra mounts of a plugin that provides several singletons (`tinaCloud()` mounts as `content`, `media` and `auth`).
 
-The op requires the `content:save` permission (ADR-008, ADR-014 §4). The default `editor` role holds it, so editors can save server-hooked collections (ADR-008 §5).
+The op requires the `content:save` permission (ADR-008, ADR-014 §4). The default `editor` role holds it, so editors can save server-hooked collections (ADR-008 §5). It also requires every permission that the provider's own `update` declared with `protectedOp`. A provider `update` marked `publicOp` still requires `content:save`, because a save is never public.
 
-The provider's `update` takes only its input, as every op does. It reads the request through `requestContext()` from `tinacms/server`, which returns `{ request, session, authProvider }` for the op that is running, the way `use()` returns another capability. `tinaCloud()` uses the request to write with the token of the editor who saved. The accessor lives in a module that imports no node module, because a lazy `server` loader still lands in a browser build, and a `node:async_hooks` import there fails the barebones admin build.
+The provider's `update` takes only its input, as every op does. It reads the request through `requestContext()` from `@tinacms/tinacms/server`, which returns `{ request, session, authProvider }` for the op that is running, the way `use()` returns another capability. `tinaCloud()` uses the request to write with the token of the editor who saved. The accessor lives in a module that imports no node module, because a lazy `server` loader still lands in a browser build, and a `node:async_hooks` import there fails the barebones admin build.
 
 A write that does not go through an RPC op, such as a webhook or a script that calls the provider directly, runs no hooks.
 
@@ -84,7 +84,7 @@ A successful save answers `{ entry, hookWarnings }`. An `afterSave` throw is log
 A site with no server runtime has no Backend to run the hooks. A save to a server-hooked collection then fails with a `ContentError` with code `server-route-missing`: "This collection has server hooks, so it needs the site's server route." Core raises it when the route answers 404 or 405, answers with something other than JSON, or can't be reached. Core never falls back to a direct write, because that would skip the hooks without telling anyone.
 
 ### 7. Local dev runs the same hooks
-When `localContentPlugin()` provides `content`, the Local Data Layer's Vite plugin serves `POST /api/tina/content/update` itself. It does not mount the RPC handler, which refuses every op without an auth plugin, and local dev usually runs without one. The route runs the same hook pipeline and then writes the file. When an auth plugin is installed, the route requires `content:save`. Without one, hooks receive a `null` session. A developer can test a server hook locally. Local dev is not the reason for this design. Production is.
+When `localContentPlugin()` provides `content`, the Local Data Layer's Vite plugin serves `POST /api/tina/content/update` itself. It does not mount the RPC handler, which refuses every op without an auth plugin, and local dev usually runs without one. The route runs the same hook pipeline and then writes the file, inside the same runtime and request contexts as a dispatched op, so a hook can call `use()` and `requestContext()` there too. When an auth plugin is installed, the route requires `content:save`. Without one, hooks receive a `null` session. A developer can test a server hook locally. Local dev is not the reason for this design. Production is.
 
 ### 8. Known gap: direct writes to TinaCloud skip the hooks
 The editor's token can still write to TinaCloud directly. Until TinaCloud requires a project server secret for writes to hooked collections, a request written by hand straight to TinaCloud skips the hooks. Only the site server would hold that secret, never an editor.

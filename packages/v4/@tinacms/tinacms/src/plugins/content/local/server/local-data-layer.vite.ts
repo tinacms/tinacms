@@ -7,6 +7,7 @@ import { type ResolvedConfig, resolveBuild } from '../../../../config';
 import type { Session } from '../../../../core/auth/contract';
 import {
   CONTENT_SAVE_PERMISSION,
+  type ContentSaveResult,
   DEFAULT_CONTENT_URL,
   InvalidSaveInputError,
 } from '../../../../core/content/contract';
@@ -30,7 +31,10 @@ import {
 import { AUTH_CAPABILITY, type PluginManifest } from '../../../../core/plugin';
 import { resolveServerSegments } from '../../../../core/resolve';
 import { errorResponse, toErrorResponse } from '../../../../rpc/error-response';
-import { createRequestAuthorizer } from '../../../../rpc/handler';
+import {
+  createOpContextRunner,
+  createRequestAuthorizer,
+} from '../../../../rpc/handler';
 import { DEFAULT_RPC_URL } from '../../../../rpc/proxy';
 import {
   LOCAL_MEDIA_PLUGIN_NAME,
@@ -211,8 +215,14 @@ const sendResponse = async (
 // The local route of the RPC `content/update` op, so `vite dev` runs the server
 // hooks. The RPC handler itself refuses every op without an auth plugin, and
 // local development runs without one.
+type LocalSave = (
+  req: Connect.IncomingMessage,
+  input: unknown,
+  session: Session | null
+) => Promise<ContentSaveResult>;
+
 const createServerSaveHandler = (
-  loadServerSave: () => Promise<ServerSave>,
+  save: LocalSave,
   gate: SessionGate | null
 ): Connect.NextHandleFunction => {
   const respond = async (
@@ -221,8 +231,7 @@ const createServerSaveHandler = (
   ): Promise<Response> => {
     try {
       const input = await readJsonBody(req);
-      const save = await loadServerSave();
-      return Response.json(await save(input, session));
+      return Response.json(await save(req, input, session));
     } catch (cause) {
       return toErrorResponse(cause, 'Local content/update');
     }
@@ -425,12 +434,19 @@ export const tinaLocalDataLayerVitePlugin = (
       }
     }
   };
+  const runInOpContext = createOpContextRunner(plugins);
+  const saveLocally: LocalSave = (req, input, session) =>
+    runInOpContext(sessionRequestOf(req), session, async () =>
+      (await loadServerSave())(input, session)
+    );
+
   const saveContentUpdate = async (
+    req: Connect.IncomingMessage,
     request: unknown,
     session: Session | null
   ): Promise<Response> => {
     try {
-      const { entry } = await (await loadServerSave())(request, session);
+      const { entry } = await saveLocally(req, request, session);
       return Response.json(entry);
     } catch (cause) {
       return toErrorResponse(cause, 'Local content update');
@@ -475,7 +491,7 @@ export const tinaLocalDataLayerVitePlugin = (
       : null;
     if (contentGate && !session) return;
     if (isUpdate) {
-      await sendResponse(res, await saveContentUpdate(request, session));
+      await sendResponse(res, await saveContentUpdate(req, request, session));
       return;
     }
     try {
@@ -591,7 +607,7 @@ export const tinaLocalDataLayerVitePlugin = (
       if (servesContentSave) {
         server.middlewares.use(
           `${options.config?.rpcUrl ?? DEFAULT_RPC_URL}/content/update`,
-          createServerSaveHandler(loadServerSave, contentGate)
+          createServerSaveHandler(saveLocally, contentGate)
         );
       }
       server.middlewares.use(

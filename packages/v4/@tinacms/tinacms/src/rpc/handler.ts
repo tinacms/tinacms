@@ -33,9 +33,9 @@ import {
   type ServerRuntime,
   type Session,
   opMeta,
-  protectedOp,
   requestContext,
   requestContextStorage,
+  requiringPermissions,
   serverRuntimeStorage,
 } from '../server';
 import { errorResponse, toErrorResponse } from './error-response';
@@ -146,10 +146,6 @@ const composeServerSegments = async (
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
   const hooks = createServerHookRegistry(plugins, resolved);
-  const contentProvider = capabilityProvider(plugins, 'content');
-  const resolveBranch = resolved.find(
-    ({ manifest }) => manifest === contentProvider
-  )?.ops.resolveBranch;
   const segmentsByNamespace = composeOverridableRegistry(
     resolved.flatMap((segment) =>
       capabilityMountsFor(segment.manifest).map((mount) => ({
@@ -160,10 +156,13 @@ const composeServerSegments = async (
     ),
     serverConflictError
   );
-  claimReservedKeys(segmentsByNamespace);
+  claimServerHookFactories(segmentsByNamespace);
   return {
     hooks,
-    resolveBranch,
+    resolveBranch: claimBranchResolver(
+      segmentsByNamespace,
+      capabilityProvider(plugins, 'content')
+    ),
     segmentsByNamespace,
     authHooks: claimAuthTransportHooks(
       segmentsByNamespace,
@@ -199,13 +198,9 @@ const composeServerRuntime = async (
 };
 
 // Runs no onInit, so a getSession must not depend on state that onInit sets.
-// The local Data Layer checks its requests through this.
-export const createRequestAuthorizer = (plugins: PluginManifest[]) => {
+const lazyRuntimeOf = (plugins: PluginManifest[]) => {
   let composing: Promise<ServerRuntime> | null = null;
-  return async (
-    request: Request,
-    permissions: (string | undefined)[]
-  ): Promise<Authorization> => {
+  return (): Promise<ServerRuntime> => {
     composing ??= composeServerSegments(plugins).then(
       (composed) => ({ ...composed, destroy: async () => {} }),
       (cause) => {
@@ -213,21 +208,69 @@ export const createRequestAuthorizer = (plugins: PluginManifest[]) => {
         throw cause;
       }
     );
-    const runtime = await composing;
+    return composing;
+  };
+};
+
+// The local Data Layer checks its requests through this.
+export const createRequestAuthorizer = (plugins: PluginManifest[]) => {
+  const runtimeOf = lazyRuntimeOf(plugins);
+  return async (
+    request: Request,
+    permissions: (string | undefined)[]
+  ): Promise<Authorization> => {
+    const runtime = await runtimeOf();
     return serverRuntimeStorage.run(runtime, () =>
       authorizeRequest(runtime, request, permissions)
     );
   };
 };
 
-// The reserved keys hold core's own inputs, not ops, so they never route.
-const claimReservedKeys = (
+// Runs code that a route outside the handler serves, such as the local Data
+// Layer's save, inside the contexts a dispatched op has, so `use()` and
+// `requestContext()` resolve there too.
+export const createOpContextRunner = (plugins: PluginManifest[]) => {
+  const runtimeOf = lazyRuntimeOf(plugins);
+  return async <T>(
+    request: Request,
+    session: Session | null,
+    run: () => Promise<T>
+  ): Promise<T> => {
+    const runtime = await runtimeOf();
+    return serverRuntimeStorage.run(runtime, () =>
+      requestContextStorage.run(
+        { request, session, authProvider: runtime.authProvider },
+        run
+      )
+    );
+  };
+};
+
+// The reserved `hooks` key holds server hook factories, not an op, so it never routes.
+const claimServerHookFactories = (
   segmentsByNamespace: Map<string, ResolvedServerSegment>
 ): void => {
   for (const [namespace, segment] of segmentsByNamespace) {
-    const { hooks, resolveBranch, ...routableOps } = segment.ops;
+    const { hooks, ...routableOps } = segment.ops;
     segmentsByNamespace.set(namespace, { ...segment, ops: routableOps });
   }
+};
+
+// Read `resolveBranch` from the content provider's segment, and remove it from
+// the routable ops of every segment, as claimAuthTransportHooks does for auth.
+const claimBranchResolver = (
+  segmentsByNamespace: Map<string, ResolvedServerSegment>,
+  contentProvider: PluginManifest | undefined
+): ServerSegment['resolveBranch'] => {
+  let claimed: ServerSegment['resolveBranch'];
+  for (const [namespace, segment] of segmentsByNamespace) {
+    const { resolveBranch, ...routableOps } = segment.ops;
+    if (segment.manifest === contentProvider && resolveBranch) {
+      claimed = resolveBranch;
+    }
+    segmentsByNamespace.set(namespace, { ...segment, ops: routableOps });
+  }
+  return claimed;
 };
 
 // The hooks live in the content provider's own `update` op, so every namespace that
@@ -253,8 +296,8 @@ const wrapContentSave = (
       ...segment,
       ops: {
         ...segment.ops,
-        update: protectedOp(
-          { permission: CONTENT_SAVE_PERMISSION },
+        update: requiringPermissions(
+          [CONTENT_SAVE_PERMISSION, ...opMeta(update).permissions],
           async (input: unknown) => save(input, requestContext().session)
         ),
       },
@@ -398,7 +441,7 @@ const authorizeAndInvokeOp = async (
   if (!meta.public) {
     const authorization = await authorizeRequest(runtime, request, [
       mounted.manifest.requires?.permission,
-      meta.permission,
+      ...meta.permissions,
     ]);
     if ('refusal' in authorization) return authorization.refusal;
     session = authorization.session;

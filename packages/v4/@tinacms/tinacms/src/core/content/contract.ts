@@ -137,4 +137,47 @@ export const isInvalidSaveInputError = (value: unknown): value is Error =>
 export const isContentWriteError = (value: unknown): value is Error =>
   hasErrorBrand(value, CONTENT_WRITE_BRAND);
 
+// The failures of a provider's server write that reach the editor with their code.
+const PROVIDER_REFUSAL_CODES = [
+  'unauthorized',
+  'forbidden',
+  'not-found',
+  'branch-not-found',
+  'not-indexed',
+  'validation',
+  'network',
+] as const satisfies readonly ContentErrorCode[];
+
+export type ProviderRefusalCode = (typeof PROVIDER_REFUSAL_CODES)[number];
+
+export const isProviderRefusalCode = (
+  code: unknown
+): code is ProviderRefusalCode =>
+  PROVIDER_REFUSAL_CODES.some((refusal) => refusal === code);
+
+const PROVIDER_REFUSAL_BRAND: unique symbol = Symbol.for(
+  'tinacms.error.provider-refusal'
+);
+
+export class ProviderRefusalError extends Error {
+  readonly [PROVIDER_REFUSAL_BRAND] = true;
+
+  constructor(
+    readonly code: ProviderRefusalCode,
+    message: string
+  ) {
+    super(message);
+    this.name = 'ProviderRefusalError';
+  }
+}
+
+export const isProviderRefusalError = (
+  value: unknown
+): value is Error & { code: ProviderRefusalCode } => {
+  if (hasErrorBrand(value, PROVIDER_REFUSAL_BRAND)) {
+    return 'code' in value && isProviderRefusalCode(value.code);
+  }
+  return false;
+};
+
 export const DEFAULT_CONTENT_URL = '/api/tina/content';

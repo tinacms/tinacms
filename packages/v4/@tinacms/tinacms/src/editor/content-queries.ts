@@ -11,7 +11,9 @@ import {
   type ContentSaveResult,
   type DocumentEntry,
   type DocumentSummary,
+  type ContentErrorCode,
   isContentRefusalCode,
+  isProviderRefusalCode,
 } from '../core/content/contract';
 import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
@@ -111,9 +113,14 @@ interface ContentSaveSegments {
 }
 
 // A static host answers a route it lacks with 404 or 405, or with an HTML page.
+const STATUS_ERROR_CODES: Partial<Record<number, ContentErrorCode>> = {
+  401: 'unauthorized',
+  403: 'forbidden',
+};
+
 const toServerSaveError = (cause: unknown): ContentError => {
   if (cause instanceof TypeError) {
-    return new ContentError('server-route-missing', cause.message);
+    return new ContentError('network', cause.message);
   }
   if (!(cause instanceof RpcError)) {
     if (cause instanceof Error) {
@@ -131,10 +138,13 @@ const toServerSaveError = (cause: unknown): ContentError => {
   ) {
     return new ContentError('server-route-missing', cause.message);
   }
-  if (cause.status === 401)
-    return new ContentError('unauthorized', cause.message);
-  if (cause.status === 403) return new ContentError('forbidden', cause.message);
-  return new ContentError('backend-failure', cause.message);
+  if (isProviderRefusalCode(cause.code)) {
+    return new ContentError(cause.code, cause.message);
+  }
+  return new ContentError(
+    STATUS_ERROR_CODES[cause.status] ?? 'backend-failure',
+    cause.message
+  );
 };
 
 export const useSaveDocument = (): DocumentSave => {

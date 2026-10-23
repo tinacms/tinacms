@@ -242,6 +242,30 @@ describe('update', () => {
     ).toBe(true);
   });
 
+  it('saves through a collection folder that is a link', async () => {
+    await fs.mkdir(path.join(rootDir, 'shared/posts'), { recursive: true });
+    await fs.symlink(
+      path.join(rootDir, 'shared/posts'),
+      path.join(rootDir, 'content/linked')
+    );
+    const linked = createLocalDataLayer({
+      rootDir,
+      collections: [
+        { name: 'linked', path: 'content/linked', format: 'mdx', fields: [] },
+      ],
+    });
+    const canonical = await linked.canonicalPath(
+      'linked',
+      'content/linked/a.mdx'
+    );
+    expect(canonical).toBe('content/linked/a.mdx');
+    const saved = await linked.update('linked', canonical, { title: 'A' });
+    expect(saved.path).toBe('content/linked/a.mdx');
+    expect(
+      await fs.readFile(path.join(rootDir, 'shared/posts/a.mdx'), 'utf8')
+    ).toContain('title: A');
+  });
+
   it('keeps saves of different documents parallel', async () => {
     await Promise.all([
       dataLayer.update('post', 'content/posts/hello.mdx', { title: 'A' }),

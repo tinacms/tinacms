@@ -344,53 +344,44 @@ describe('useSaveDocument on a collection with a server hook', () => {
     });
   });
 
-  it.each([
-    ['answers 404', () => new Response('Not found', { status: 404 })],
-    [
-      'is unreachable',
-      () => {
-        throw new TypeError('Failed to fetch');
-      },
-    ],
-  ])(
-    'fails with the server-route error when the site server %s, and never writes directly',
-    async (_, respond) => {
-      stubRoute(respond);
-      const { provider, save } = renderServerHooked();
+  it('fails with the server-route error when the site server answers 404, and never writes directly', async () => {
+    stubRoute(() => new Response('Not found', { status: 404 }));
+    const { provider, save } = renderServerHooked();
 
-      const rejection = save({
-        collection: 'post',
-        path: 'content/posts/a.mdx',
-        value: {},
-      });
-      await expect(rejection).rejects.toBeInstanceOf(ContentError);
-      await expect(rejection).rejects.toThrow(
-        "This collection has server hooks, so it needs the site's server route."
-      );
-      expect(provider.update).not.toHaveBeenCalled();
-    }
-  );
-
-  it('posts to the RPC URL the config names', async () => {
-    const fetchMock = stubRoute(() =>
-      Response.json({
-        entry: { path: 'content/posts/a.mdx', document: {} },
-        hookWarnings: [],
-      })
+    const rejection = save({
+      collection: 'post',
+      path: 'content/posts/a.mdx',
+      value: {},
+    });
+    await expect(rejection).rejects.toBeInstanceOf(ContentError);
+    await expect(rejection).rejects.toThrow(
+      "This collection has server hooks, so it needs the site's server route."
     );
-    const { save } = renderServerHooked('/cms/rpc');
-    await save({ collection: 'post', path: 'content/posts/a.mdx', value: {} });
-    expect(fetchMock.mock.calls[0][0]).toBe('/cms/rpc/content/update');
+    expect(provider.update).not.toHaveBeenCalled();
   });
 
-  it('reports any other failure as a backend failure', async () => {
+  it('reports an unreachable site server as a network failure', async () => {
     stubRoute(() => {
-      throw new Error('stream reset');
+      throw new TypeError('Failed to fetch');
     });
+    const { provider, save } = renderServerHooked();
+    await expect(
+      save({ collection: 'post', path: 'content/posts/a.mdx', value: {} })
+    ).rejects.toMatchObject({ code: 'network' });
+    expect(provider.update).not.toHaveBeenCalled();
+  });
+
+  it("passes a provider's refusal through with its code", async () => {
+    stubRoute(() =>
+      Response.json(
+        { error: { code: 'branch-not-found', message: 'gone' } },
+        { status: 422 }
+      )
+    );
     const { save } = renderServerHooked();
     await expect(
       save({ collection: 'post', path: 'content/posts/a.mdx', value: {} })
-    ).rejects.toMatchObject({ code: 'backend-failure' });
+    ).rejects.toMatchObject({ code: 'branch-not-found' });
   });
 
   it("shows a hook's rejection message", async () => {

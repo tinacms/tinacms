@@ -5,6 +5,7 @@ import { definePlugin } from '../core/plugin';
 import type { HookRef } from '../core/schema/types';
 import {
   type ServerFormHooks,
+  type ServerOp,
   type Session,
   defineServerHook,
   defineServerPlugin,
@@ -858,6 +859,56 @@ describe('createRpcHandler content saves with server hooks', () => {
     expect(update).not.toHaveBeenCalled();
   });
 
+  const guardedSave = (update: ServerOp) =>
+    createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'test:cloud',
+          provides: ['content', 'auth'],
+          server: async () => ({
+            default: defineServerPlugin({
+              getSession: async (request: Request) => {
+                const token = request.headers
+                  .get('authorization')
+                  ?.replace('Bearer ', '');
+                return (token && sessionsByToken[token]) || null;
+              },
+              update,
+            }),
+          }),
+        }),
+      ],
+      schema: { collections: [{ name: 'post', format: 'mdx', fields: [] }] },
+    });
+  const saveBody = {
+    collection: 'post',
+    path: 'content/posts/a.mdx',
+    value: {},
+  };
+  const echoUpdate = async (input: ContentSaveInput) => ({
+    path: input.path,
+    document: input.value,
+  });
+
+  it("requires content:save and the permission the provider's update declares", async () => {
+    const handler = guardedSave(
+      protectedOp({ permission: 'content:publish' }, echoUpdate)
+    );
+    const asEditor = await handler(
+      post('/content/update', { token: 'editor-token', body: saveBody })
+    );
+    const asAdmin = await handler(
+      post('/content/update', { token: 'admin-token', body: saveBody })
+    );
+    expect([asEditor.status, asAdmin.status]).toEqual([403, 200]);
+  });
+
+  it("requires content:save even when the provider's update is a publicOp", async () => {
+    const handler = guardedSave(publicOp(echoUpdate));
+    const response = await handler(post('/content/update', { body: saveBody }));
+    expect(response.status).toBe(401);
+  });
+
   it('routes no update of a plugin that lost content to an override', async () => {
     const rawUpdate = vi.fn(async () => ({ path: 'x', document: {} }));
     const handler = createRpcHandler({
@@ -906,6 +957,7 @@ describe('createRpcHandler content saves with server hooks', () => {
       '/content/hooks',
       '/test:hooks/hooks',
       '/content/resolveBranch',
+      '/media/resolveBranch',
     ]) {
       const response = await handler(post(path, { token: 'admin-token' }));
       expect(response.status).toBe(404);
