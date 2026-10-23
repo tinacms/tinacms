@@ -1,5 +1,4 @@
 import { Button } from '@tinacms/ui/components/button';
-import { Input } from '@tinacms/ui/components/input';
 import {
   Select,
   SelectContent,
@@ -7,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@tinacms/ui/components/select';
+import { SearchBox } from '@tinacms/ui/components/search-box';
 import {
   Tooltip,
   TooltipContent,
@@ -19,8 +19,6 @@ import {
   LayoutGridIcon,
   ListIcon,
   LockIcon,
-  SearchIcon,
-  XIcon,
 } from 'lucide-react';
 import {
   MEDIA_CATEGORY_LABELS,
@@ -113,29 +111,14 @@ export function MediaSearchInput({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className='relative flex max-w-md min-w-50 flex-1 items-center'>
-      <SearchIcon className='pointer-events-none absolute left-2.5 size-4 text-muted-foreground' />
-      <Input
-        type='search'
-        value={value}
-        aria-label='Search media library'
-        placeholder='Search this library...'
-        className='pr-8 pl-8'
-        onChange={(event) => onChange(event.target.value)}
-      />
-      {value ? (
-        <Button
-          type='button'
-          variant='icon'
-          size='sm'
-          aria-label='Clear search'
-          className='absolute right-1 size-6'
-          onClick={() => onChange('')}
-        >
-          <XIcon className='size-3' />
-        </Button>
-      ) : null}
-    </div>
+    <SearchBox
+      label='Search media library'
+      placeholder='Search this library...'
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      onClear={() => onChange('')}
+      className='max-w-md min-w-50 flex-1'
+    />
   );
 }
 
