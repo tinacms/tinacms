@@ -91,7 +91,7 @@ function LoadingGrid({ label }: { label: string }) {
       className='grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-4'
     >
       {Array.from({ length: 6 }, (_, index) => (
-        <Skeleton key={index} className='aspect-square rounded-xl' />
+        <Skeleton key={index} shape='block' className='aspect-square' />
       ))}
     </div>
   );
@@ -104,7 +104,7 @@ function SetupBanner({
 }) {
   return (
     <div className='flex h-full items-center justify-center p-6'>
-      <div className='flex items-start gap-2 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-yellow-800'>
+      <div className='flex items-start gap-2 rounded-sm border border-yellow-200 bg-yellow-50 px-4 py-3 text-yellow-800'>
         <CircleAlertIcon className='mt-0.5 size-5 shrink-0 text-yellow-500' />
         <div className='flex flex-col items-start gap-2'>
           <p>{status.message}</p>
@@ -112,7 +112,7 @@ function SetupBanner({
             href={status.actionUrl}
             target='_blank'
             rel='noreferrer noopener'
-            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+            className={buttonVariants({ variant: 'toolbar', size: 'sm' })}
           >
             {status.actionLabel}
             <ExternalLinkIcon className='size-3.5' />
@@ -391,13 +391,13 @@ export function MediaBrowser(props: MediaBrowserProps) {
         </div>
         {readOnly ? null : (
           <div className='flex flex-wrap items-center gap-2'>
-            <Button type='button' variant='outline' onClick={refresh}>
+            <Button type='button' variant='toolbar' onClick={refresh}>
               Refresh
               <RefreshCwIcon className='size-4' />
             </Button>
             <Button
               type='button'
-              variant='outline'
+              variant='toolbar'
               onClick={() => setDialog('new-folder')}
             >
               New Folder
@@ -458,7 +458,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
           data-dragging={dragging ? 'true' : undefined}
           className={cn(
             'min-w-0 flex-1 overflow-y-auto border-2 border-transparent p-4 transition',
-            dragging ? 'rounded-lg border-orange-500' : null
+            dragging ? 'rounded-sm border-orange-500' : null
           )}
           onDragEnter={dragOver}
           onDragOver={dragOver}
@@ -475,7 +475,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
               <p>Could not load media: {messageOf(listing.error)}</p>
               <Button
                 type='button'
-                variant='outline'
+                variant='toolbar'
                 size='sm'
                 onClick={() => listing.refetch()}
               >

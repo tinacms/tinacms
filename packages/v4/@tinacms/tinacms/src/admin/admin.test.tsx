@@ -99,12 +99,25 @@ const screenPlugin = definePlugin({
         { name: 'unlinked', label: 'Unlinked', component: MediaScreen },
       ],
       slots: {
+        navGroups: [{ id: 'help', label: 'Help', order: 20 }],
         globalNav: [
+          {
+            label: 'Guides',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://tina.io/guides' },
+            group: 'help',
+          },
           {
             label: 'Docs',
             icon: NavIcon,
             target: { kind: 'url', href: 'https://tina.io/docs' },
             order: 10,
+          },
+          {
+            label: 'Changelog',
+            icon: NavIcon,
+            target: { kind: 'url', href: 'https://tina.io/changelog' },
+            order: 30,
           },
           {
             label: 'Media',
@@ -521,6 +534,32 @@ describe('TinaAdmin global nav', () => {
     ).toEqual(['Media', 'Switch branch', 'Docs']);
   });
 
+  it('lists the entries of a group under its heading', async () => {
+    renderAdmin();
+    const menu = await screen.findByRole('list', { name: 'Help' });
+    expect(
+      within(menu)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['Guides']);
+  });
+
+  it('places a group between the ungrouped entries by its order', async () => {
+    renderAdmin();
+    const [first, ...rest] = await screen.findAllByRole('list', {
+      name: 'Global navigation',
+    });
+    expect(rest).toHaveLength(0);
+    const heading = screen.getByText('Help');
+    expect(
+      first.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+    expect(
+      heading.compareDocumentPosition(screen.getByText('Changelog')) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+  });
+
   it('does not link a screen that no entry targets', async () => {
     renderAdmin();
     const menu = await screen.findByRole('list', { name: 'Global navigation' });
@@ -718,5 +757,81 @@ describe('TinaAdmin stale drafts', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByLabelText('Title')).toHaveValue('Hello');
     expect(readDraft(helloFormId)).toBeUndefined();
+  });
+});
+
+describe('TinaAdmin after a save that changes the document', () => {
+  it('keeps the afterSave failure message visible', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const storing = definePlugin({
+      name: 'test:content',
+      provides: ['content'],
+      client: async () => ({
+        default: {
+          slice: () => ({
+            list: provider.list,
+            get: provider.get,
+            update: async (
+              _collection: string,
+              path: string,
+              value: TinaDocument
+            ) => ({
+              path,
+              document: { ...value, title: String(value.title).toUpperCase() },
+            }),
+          }),
+        },
+      }),
+    });
+    const failingAudit = definePlugin({
+      name: 'test:hooks',
+      provides: ['hooks'],
+      hooks: ['audit'],
+      client: async () => ({
+        default: {
+          hooks: {
+            audit: () => ({
+              afterSave: () => {
+                throw new Error('audit endpoint down');
+              },
+            }),
+          },
+        },
+      }),
+    });
+    const user = userEvent.setup();
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          plugins: [storing, failingAudit, stringFieldPlugin],
+          schema: {
+            collections: [
+              {
+                name: 'post',
+                label: 'Posts',
+                path: 'content/posts',
+                format: 'mdx',
+                hooks: [{ name: 'audit' }],
+                fields: [{ name: 'title', label: 'Title', type: 'string' }],
+              },
+            ],
+          },
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText('Title'), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(await screen.findByDisplayValue('HELLO!')).toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The document was saved, but an afterSave hook failed.'
+    );
+    vi.restoreAllMocks();
   });
 });

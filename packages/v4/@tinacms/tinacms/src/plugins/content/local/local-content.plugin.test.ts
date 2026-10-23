@@ -15,7 +15,8 @@ const ENTRIES: DocumentEntry[] = [
 
 const SUMMARIES: DocumentSummary[] = ENTRIES.map(({ path }) => ({ path }));
 
-const signedInAs = (token: string): SliceState => ({
+const signedInAs = (token: string, sendsTokenToSite = true): SliceState => ({
+  sendsTokenToSite,
   status: 'signed-in',
   user: { id: toUserId('ada') },
   roles: ['editor'],
@@ -112,6 +113,25 @@ describe('content slice', () => {
     ).rejects.toThrow(/update failed \(500\): boom/);
   });
 
+  it("surfaces a refused write with the server's message", async () => {
+    const harness = await createSliceHarness(null);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Response.json(
+          { error: { code: 'write-refused', message: 'Repair the file.' } },
+          { status: 400 }
+        )
+      )
+    );
+    await expect(
+      harness.slice().update('post', 'content/posts/hello.mdx', {})
+    ).rejects.toMatchObject({
+      code: 'write-refused',
+      message: 'Repair the file.',
+    });
+  });
+
   it('writes no store state, because it holds no cache', async () => {
     const harness = await createSliceHarness(ENTRIES);
     await harness.slice().list('post');
@@ -133,6 +153,16 @@ describe('content slice with an auth plugin', () => {
 
   it('sends no authorization header with no auth plugin', async () => {
     const harness = await createSliceHarness(ENTRIES[0]);
+    await harness.slice().get('post', 'content/posts/hello.mdx');
+    expect(harness.authorizations).toEqual([null]);
+  });
+
+  it('sends no token when the auth plugin has no server segment', async () => {
+    const harness = await createSliceHarness(
+      ENTRIES[0],
+      true,
+      signedInAs('tok', false)
+    );
     await harness.slice().get('post', 'content/posts/hello.mdx');
     expect(harness.authorizations).toEqual([null]);
   });
