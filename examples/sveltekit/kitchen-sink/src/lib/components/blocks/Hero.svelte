@@ -1,11 +1,11 @@
 <script lang="ts">
-import Section from '../layout/Section.svelte';
-import Container from '../layout/Container.svelte';
-import Actions from '../layout/Actions.svelte';
-import TinaMarkdown from '@tinacms/sveltekit/TinaMarkdown.svelte';
-import { customComponents } from '../markdown/index.ts';
 import { tinaField } from '@tinacms/sveltekit';
+import TinaMarkdown from '@tinacms/sveltekit/TinaMarkdown.svelte';
 import { sanitizeImageSrc } from '#lib/utils.ts';
+import Actions from '../layout/Actions.svelte';
+import Container from '../layout/Container.svelte';
+import Section from '../layout/Section.svelte';
+import { customComponents } from '../markdown/index.ts';
 
 let { data }: { data: any } = $props();
 

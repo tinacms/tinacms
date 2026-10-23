@@ -1,7 +1,7 @@
 <script lang="ts">
+import Container from '#lib/components/layout/Container.svelte';
 import { withBase } from '#lib/utils.ts';
 import { page } from '$app/state';
-import Container from '#lib/components/layout/Container.svelte';
 </script>
 
 <svelte:head>

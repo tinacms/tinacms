@@ -1,8 +1,8 @@
 export {
-  requestWithMetadata,
-  subscribeToTinaData,
   type QueryResult,
   type RequestOptions,
+  requestWithMetadata,
+  subscribeToTinaData,
 } from './data';
 export { tinaHandle } from './hooks';
 export { isEditMode } from './is-edit-mode';

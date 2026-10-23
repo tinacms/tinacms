@@ -1,13 +1,13 @@
 <script lang="ts">
-import Section from '../layout/Section.svelte';
-import Container from '../layout/Container.svelte';
-import GradientTitle from '../ui/GradientTitle.svelte';
-import Badge from '../ui/Badge.svelte';
-import NoData from '../ui/NoData.svelte';
 import { tinaField } from '@tinacms/sveltekit';
 import type { QueryResult } from '@tinacms/sveltekit/data';
 import { useTina } from '@tinacms/sveltekit/use-tina';
 import { sanitizeImageSrc } from '#lib/utils.ts';
+import Container from '../layout/Container.svelte';
+import Section from '../layout/Section.svelte';
+import Badge from '../ui/Badge.svelte';
+import GradientTitle from '../ui/GradientTitle.svelte';
+import NoData from '../ui/NoData.svelte';
 
 let { query }: { query: QueryResult<any> } = $props();
 

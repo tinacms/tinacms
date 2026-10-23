@@ -1,7 +1,7 @@
-import { PREVIEW_CONTENT_TYPE, PRIME_HEADER } from '@tinacms/bridge/preview';
 import type { RequestHandler } from '@sveltejs/kit';
-import { render } from 'svelte/server';
+import { PREVIEW_CONTENT_TYPE, PRIME_HEADER } from '@tinacms/bridge/preview';
 import type { Component } from 'svelte';
+import { render } from 'svelte/server';
 import { escapeAttr } from '../internal/escape';
 import {
   renderFormPayloadDiv,

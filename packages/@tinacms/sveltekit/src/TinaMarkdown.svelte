@@ -1,4 +1,5 @@
 <script lang="ts">
+import { sanitizeHref, sanitizeImageSrc } from './sanitize';
 import type {
   CodeBlockElement,
   CustomComponentsMap,
@@ -11,7 +12,6 @@ import type {
   TinaMarkdownProps,
   TinaRichTextNode,
 } from './types';
-import { sanitizeHref, sanitizeImageSrc } from './sanitize';
 
 let { content, components = {} }: TinaMarkdownProps = $props();
 

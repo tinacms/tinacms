@@ -1,12 +1,12 @@
+import type { RequestHandler } from '@sveltejs/kit';
 import { hashFromQuery } from '@tinacms/bridge/metadata';
 import { PREVIEW_CONTENT_TYPE, PRIME_HEADER } from '@tinacms/bridge/preview';
-import type { RequestHandler } from '@sveltejs/kit';
 import { render } from 'svelte/server';
 import { describe, expect, it } from 'vitest';
-import CalloutOverride from './fixtures/CalloutOverride.svelte';
-import TinaIslandFixture from './fixtures/TinaIslandFixture.svelte';
 import { requestWithMetadata } from '../data';
 import { experimental_createIslandHandler } from '../experimental/island';
+import CalloutOverride from './fixtures/CalloutOverride.svelte';
+import TinaIslandFixture from './fixtures/TinaIslandFixture.svelte';
 
 const query =
   'query Post($relativePath: String!) { post(relativePath: $relativePath) }';

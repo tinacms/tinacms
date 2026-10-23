@@ -1,9 +1,9 @@
-import { hashFromQuery } from '@tinacms/bridge/metadata';
 import type { Handle } from '@sveltejs/kit/hooks';
+import { hashFromQuery } from '@tinacms/bridge/metadata';
 import { describe, expect, it, vi } from 'vitest';
 import { requestWithMetadata } from '../data';
-import { EDIT_COOKIE } from '../is-edit-mode';
 import { tinaHandle } from '../hooks';
+import { EDIT_COOKIE } from '../is-edit-mode';
 
 function makeEvent(request: Request) {
   return {

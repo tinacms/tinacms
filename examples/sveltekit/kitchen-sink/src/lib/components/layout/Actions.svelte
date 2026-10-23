@@ -1,6 +1,6 @@
 <script lang="ts">
-import { isFileLink, sanitizeHref, withBase } from '#lib/utils.ts';
 import { tinaField } from '@tinacms/sveltekit';
+import { isFileLink, sanitizeHref, withBase } from '#lib/utils.ts';
 
 export interface NavAction {
   label?: string | null;

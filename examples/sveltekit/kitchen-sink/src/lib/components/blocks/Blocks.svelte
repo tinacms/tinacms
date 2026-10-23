@@ -1,10 +1,10 @@
 <script lang="ts">
-import Hero from './Hero.svelte';
-import Features from './Features.svelte';
-import CTA from './CTA.svelte';
-import Testimonial from './Testimonial.svelte';
-import Content from './Content.svelte';
 import { tinaField } from '@tinacms/sveltekit';
+import Content from './Content.svelte';
+import CTA from './CTA.svelte';
+import Features from './Features.svelte';
+import Hero from './Hero.svelte';
+import Testimonial from './Testimonial.svelte';
 
 let { blocks = [] }: { blocks?: Array<any | null> } = $props();
 

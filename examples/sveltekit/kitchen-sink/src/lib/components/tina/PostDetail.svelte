@@ -1,14 +1,14 @@
 <script lang="ts">
-import Section from '../layout/Section.svelte';
-import Container from '../layout/Container.svelte';
-import GradientTitle from '../ui/GradientTitle.svelte';
-import NoData from '../ui/NoData.svelte';
-import TinaMarkdown from '@tinacms/sveltekit/TinaMarkdown.svelte';
 import { tinaField } from '@tinacms/sveltekit';
 import type { QueryResult } from '@tinacms/sveltekit/data';
+import TinaMarkdown from '@tinacms/sveltekit/TinaMarkdown.svelte';
 import { useTina } from '@tinacms/sveltekit/use-tina';
-import { sanitizeImageSrc, formatDate, withBase } from '#lib/utils.ts';
 import { customComponents } from '#lib/components/markdown/index.ts';
+import { formatDate, sanitizeImageSrc, withBase } from '#lib/utils.ts';
+import Container from '../layout/Container.svelte';
+import Section from '../layout/Section.svelte';
+import GradientTitle from '../ui/GradientTitle.svelte';
+import NoData from '../ui/NoData.svelte';
 
 let {
   query,

@@ -1,10 +1,10 @@
 <script lang="ts">
-import Section from '../layout/Section.svelte';
+import { tinaField } from '@tinacms/sveltekit';
+import Actions from '../layout/Actions.svelte';
 import Container from '../layout/Container.svelte';
 import Icon from '../layout/Icon.svelte';
-import Actions from '../layout/Actions.svelte';
+import Section from '../layout/Section.svelte';
 import Card from '../ui/Card.svelte';
-import { tinaField } from '@tinacms/sveltekit';
 
 let { data }: { data: any } = $props();
 

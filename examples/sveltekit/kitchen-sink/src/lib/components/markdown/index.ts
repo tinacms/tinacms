@@ -1,9 +1,9 @@
-import DateTime from './DateTime.svelte';
 import BlockQuote from './BlockQuote.svelte';
-import PullQuote from './PullQuote.svelte';
-import NewsletterSignup from './NewsletterSignup.svelte';
+import DateTime from './DateTime.svelte';
 import Image from './Image.svelte';
 import Link from './Link.svelte';
+import NewsletterSignup from './NewsletterSignup.svelte';
+import PullQuote from './PullQuote.svelte';
 
 export const customComponents: Record<string, any> = {
   DateTime,

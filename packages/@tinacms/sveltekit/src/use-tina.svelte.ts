@@ -1,4 +1,4 @@
-import { subscribeToTinaData, type QueryResult } from './data';
+import { type QueryResult, subscribeToTinaData } from './data';
 
 /**
  * Live Tina data for a page or layout. Returns the server-loaded data, replaced by the

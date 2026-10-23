@@ -1,11 +1,11 @@
 import type { Handle } from '@sveltejs/kit/hooks';
-import { EDIT_COOKIE_HEADER, isEditMode } from './is-edit-mode';
 import {
   renderFormPayloadDiv,
   sortByPriority,
   TINA_FORMS,
   type TinaLocals,
 } from './internal/forms-store';
+import { EDIT_COOKIE_HEADER, isEditMode } from './is-edit-mode';
 
 const HEAD_CLOSE = '</head>';
 const HEAD_CLOSE_PATTERN = /<\/head>/i;

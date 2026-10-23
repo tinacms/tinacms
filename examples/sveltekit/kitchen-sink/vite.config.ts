@@ -1,9 +1,9 @@
-import { defineConfig } from 'vitest/config';
-import { playwright } from '@vitest/browser-playwright';
 import adapterNode from '@sveltejs/adapter-node';
 import adapterStatic from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { tinaVitePlugin } from '@tinacms/sveltekit/vite';
+import { playwright } from '@vitest/browser-playwright';
+import { defineConfig } from 'vitest/config';
 
 const isStaticBuild = process.env.TINA_STATIC_BUILD === 'true';
 // Set by the GitHub Pages workflow, e.g. "/my-repo"; empty for root deployments.

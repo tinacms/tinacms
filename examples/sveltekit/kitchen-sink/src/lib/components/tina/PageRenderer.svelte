@@ -1,8 +1,8 @@
 <script lang="ts">
-import Blocks from '../blocks/Blocks.svelte';
 import { tinaField } from '@tinacms/sveltekit';
 import type { QueryResult } from '@tinacms/sveltekit/data';
 import { useTina } from '@tinacms/sveltekit/use-tina';
+import Blocks from '../blocks/Blocks.svelte';
 
 let { query }: { query: QueryResult<any> } = $props();
 const tina = useTina(() => query);

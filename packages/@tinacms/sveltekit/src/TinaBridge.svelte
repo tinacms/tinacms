@@ -1,6 +1,6 @@
 <script lang="ts">
-import { afterNavigate } from '$app/navigation';
 import { onMount } from 'svelte';
+import { afterNavigate } from '$app/navigation';
 
 let refreshForms: (() => void) | undefined;
 

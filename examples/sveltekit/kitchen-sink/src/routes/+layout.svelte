@@ -1,10 +1,10 @@
 <script lang="ts">
 import '#lib/styles/theme.css';
-import favicon from '#lib/assets/favicon.svg';
-import Header from '#lib/components/layout/Header.svelte';
-import Footer from '#lib/components/layout/Footer.svelte';
 import TinaBridge from '@tinacms/sveltekit/TinaBridge.svelte';
 import { useTina } from '@tinacms/sveltekit/use-tina';
+import favicon from '#lib/assets/favicon.svg';
+import Footer from '#lib/components/layout/Footer.svelte';
+import Header from '#lib/components/layout/Header.svelte';
 import type { LayoutProps } from './$types';
 
 let { data, children }: LayoutProps = $props();

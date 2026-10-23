@@ -1,6 +1,6 @@
+import type { RequestEvent } from '@sveltejs/kit';
 import { addMetadata, hashFromQuery } from '@tinacms/bridge/metadata';
 import { readOverlay } from '@tinacms/bridge/preview';
-import type { RequestEvent } from '@sveltejs/kit';
 import { recordForm, type TinaLocals } from './internal/forms-store';
 
 export interface QueryResult<TData> {

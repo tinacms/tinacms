@@ -1,8 +1,8 @@
 <script lang="ts">
-import Section from '#lib/components/layout/Section.svelte';
 import Container from '#lib/components/layout/Container.svelte';
-import GradientTitle from '#lib/components/ui/GradientTitle.svelte';
+import Section from '#lib/components/layout/Section.svelte';
 import Card from '#lib/components/ui/Card.svelte';
+import GradientTitle from '#lib/components/ui/GradientTitle.svelte';
 import { sanitizeImageSrc, withBase } from '#lib/utils.ts';
 import type { PageProps } from './$types';
 

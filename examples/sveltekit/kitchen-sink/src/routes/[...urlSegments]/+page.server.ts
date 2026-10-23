@@ -1,8 +1,8 @@
 import { error } from '@sveltejs/kit';
-import type { PageServerLoad, EntryGenerator } from './$types';
 import { requestWithMetadata } from '@tinacms/sveltekit/data';
-import client from '#tina/__generated__/client.ts';
 import { isFileLink } from '#lib/utils.ts';
+import client from '#tina/__generated__/client.ts';
+import type { EntryGenerator, PageServerLoad } from './$types';
 
 export const prerender = true;
 

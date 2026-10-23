@@ -1,7 +1,7 @@
 <script lang="ts">
-import Section from '../layout/Section.svelte';
-import Container from '../layout/Container.svelte';
 import { tinaField } from '@tinacms/sveltekit';
+import Container from '../layout/Container.svelte';
+import Section from '../layout/Section.svelte';
 
 let { data }: { data: any } = $props();
 const isPrimary = $derived(data.color === 'primary');

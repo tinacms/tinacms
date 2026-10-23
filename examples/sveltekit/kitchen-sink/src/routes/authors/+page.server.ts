@@ -1,5 +1,5 @@
-import type { PageServerLoad } from './$types';
 import client from '#tina/__generated__/client.ts';
+import type { PageServerLoad } from './$types';
 
 export const prerender = true;
 

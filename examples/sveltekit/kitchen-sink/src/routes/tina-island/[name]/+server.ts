@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
-import { experimental_createIslandHandler } from '@tinacms/sveltekit/experimental';
 import { requestWithMetadata } from '@tinacms/sveltekit/data';
+import { experimental_createIslandHandler } from '@tinacms/sveltekit/experimental';
 import PostView from '#lib/components/PostView.svelte';
 import client from '#tina/__generated__/client.ts';
 

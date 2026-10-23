@@ -1,6 +1,6 @@
-import type { LayoutServerLoad } from './$types';
 import { requestWithMetadata } from '@tinacms/sveltekit/data';
 import client from '#tina/__generated__/client.ts';
+import type { LayoutServerLoad } from './$types';
 
 // requestWithMetadata never throws: if the query fails it logs a warning and returns
 // empty data, so the layout falls back to its defaults instead of crashing the site.
