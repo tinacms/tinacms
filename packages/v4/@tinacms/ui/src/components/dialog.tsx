@@ -3,6 +3,7 @@ import type { VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
 import {
   dialogDescriptionClasses,
+  dialogFooterClasses,
   dialogOverlayClasses,
   dialogTitleClasses,
   dialogVariants,
@@ -103,10 +104,7 @@ function DialogFooter({
   return (
     <div
       data-slot='dialog-footer'
-      className={cn(
-        'flex flex-wrap items-center justify-end gap-2 pt-2',
-        className
-      )}
+      className={cn(dialogFooterClasses, className)}
       {...props}
     >
       {children}

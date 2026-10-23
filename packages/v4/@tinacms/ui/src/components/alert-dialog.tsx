@@ -3,6 +3,7 @@ import type * as React from 'react';
 
 import {
   dialogDescriptionClasses,
+  dialogFooterClasses,
   dialogOverlayClasses,
   dialogTitleClasses,
   dialogVariants,
@@ -77,10 +78,7 @@ function AlertDialogFooter({
   return (
     <div
       data-slot='alert-dialog-footer'
-      className={cn(
-        'flex flex-wrap items-center justify-end gap-2 pt-2',
-        className
-      )}
+      className={cn(dialogFooterClasses, className)}
       {...props}
     />
   );
