@@ -80,6 +80,35 @@ describe('tinaHandle', () => {
     expect(response.headers.get('set-cookie')).toContain(`${EDIT_COOKIE}=1`);
   });
 
+  it('injects right before </head> when the head contains non-ASCII text', async () => {
+    const event = makeEvent(editRequest());
+    const resolve: Parameters<Handle>[0]['resolve'] = async (
+      _event,
+      options
+    ) => {
+      await requestWithMetadata(
+        {
+          data: { title: 'Post' },
+          query: 'query Post { post { title } }',
+          variables: {},
+        },
+        event
+      );
+      const html = options?.transformPageChunk?.({
+        html: '<html><head><title>İstanbul ẞtraße</title></HEAD><body>Post</body></html>',
+        done: true,
+      });
+      return new Response(html ?? '', {
+        headers: { 'content-type': 'text/html; charset=utf-8' },
+      });
+    };
+
+    const html = await (await tinaHandle({ event, resolve })).text();
+
+    expect(html).toContain('<title>İstanbul ẞtraße</title><template');
+    expect(html).toContain('</template></HEAD><body>Post</body>');
+  });
+
   it('returns ordinary responses untouched and does not request a transform', async () => {
     const event = makeEvent(new Request('https://site.test/posts/hello'));
     const response = new Response('ordinary page', {

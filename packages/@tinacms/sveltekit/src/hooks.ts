@@ -8,6 +8,8 @@ import {
 } from './internal/forms-store';
 
 const HEAD_CLOSE = '</head>';
+const HEAD_CLOSE_PATTERN = /<\/head>/i;
+
 /**
  * SvelteKit server hook for Tina visual editing. Compose this with other
  * handles using `sequence` from `@sveltejs/kit/hooks`.
@@ -26,7 +28,7 @@ export const tinaHandle: Handle = async ({ event, resolve }) => {
 
           const buffered = pending + html;
           pending = '';
-          const headEnd = buffered.toLowerCase().indexOf(HEAD_CLOSE);
+          const headEnd = buffered.search(HEAD_CLOSE_PATTERN);
           if (headEnd !== -1) {
             injected = true;
             return (
