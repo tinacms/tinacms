@@ -14,7 +14,7 @@ import {
 import {
   selectListClassName,
   selectOptionClassName,
-} from '@tinacms/ui/components/select';
+} from '@tinacms/ui/lib/field-styles';
 import { CheckIcon, ChevronDownIcon, XIcon } from 'lucide-react';
 
 const Combobox = ComboboxPrimitive.Root;
@@ -71,7 +71,10 @@ function ComboboxInput({
         render={<InputGroupInput disabled={disabled} />}
         {...props}
       />
-      <InputGroupAddon align='inline-end'>
+      <InputGroupAddon
+        align='inline-end'
+        className='group-has-[[data-slot=input-group-control][data-readonly]]/input-group:hidden'
+      >
         {showTrigger && (
           <InputGroupButton
             size='icon-xs'

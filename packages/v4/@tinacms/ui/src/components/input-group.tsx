@@ -139,18 +139,14 @@ const CONTROL_RESET =
 
 function InputGroupInput({
   className,
-  size = 'md',
   ...props
-}: Omit<React.ComponentProps<typeof Input>, 'size'> & {
-  /** Match the group's size. */
-  size?: 'md' | 'sm';
-}) {
+}: React.ComponentProps<typeof Input>) {
   return (
     <Input
       data-slot='input-group-control'
       className={cn(
         CONTROL_RESET,
-        size === 'md' ? 'h-7.5' : 'h-6.5 text-sm',
+        'h-7.5 group-data-[size=sm]/input-group:h-6.5 group-data-[size=sm]/input-group:text-sm',
         className
       )}
       {...props}
@@ -178,5 +174,4 @@ export {
   InputGroupText,
   InputGroupInput,
   InputGroupTextarea,
-  inputGroupVariants,
 };

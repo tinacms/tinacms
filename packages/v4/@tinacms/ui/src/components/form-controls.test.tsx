@@ -153,3 +153,33 @@ describe('SearchBox', () => {
     expect(onClear).toHaveBeenCalledOnce();
   });
 });
+
+describe('Segmented icons', () => {
+  it('names an icon-only choice by its label', () => {
+    render(
+      <Segmented
+        aria-label='View'
+        options={[
+          {
+            value: 'grid',
+            label: 'Grid view',
+            icon: 'component',
+            iconOnly: true,
+          },
+          { value: 'list', label: 'List view', icon: 'doc', iconOnly: true },
+        ]}
+      />
+    );
+    expect(screen.getByRole('group', { name: 'View' })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Grid view' })
+    ).not.toHaveTextContent('Grid view');
+  });
+});
+
+describe('SearchBox clear', () => {
+  it('only offers onClear when the caller controls the value', () => {
+    // @ts-expect-error onClear cannot empty a box the caller does not control
+    void (<SearchBox label='Search' defaultValue='logo' onClear={() => {}} />);
+  });
+});
