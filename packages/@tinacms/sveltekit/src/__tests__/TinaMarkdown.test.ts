@@ -5,6 +5,17 @@ import type { TinaRichTextContent } from '../types';
 import CalloutOverride from './fixtures/CalloutOverride.svelte';
 import CodeBlockOverride from './fixtures/CodeBlockOverride.svelte';
 
+// Svelte's server output wraps blocks in comment markers (`<!--[-->`, `<!--]-->`).
+// Strip them until none are left so assertions can compare plain markup.
+function withoutHydrationMarkers(html: string): string {
+  let previous: string;
+  do {
+    previous = html;
+    html = html.replace(/<!--.*?-->/g, '');
+  } while (html !== previous);
+  return html;
+}
+
 describe('TinaMarkdown', () => {
   it('renders semantic text and marks as plain HTML', () => {
     const { body } = render(TinaMarkdown, {
@@ -28,7 +39,7 @@ describe('TinaMarkdown', () => {
       },
     });
 
-    const html = body.replace(/<!--.*?-->/g, '');
+    const html = withoutHydrationMarkers(body);
     expect(html).toContain('<h1>Renderer title</h1>');
     expect(html).toContain('<strong>Bold text</strong>');
     expect(html).toContain('<code> and inline code</code>');
@@ -67,7 +78,7 @@ describe('TinaMarkdown', () => {
         ] satisfies TinaRichTextContent,
       },
     });
-    const html = body.replace(/<!--.*?-->/g, '');
+    const html = withoutHydrationMarkers(body);
 
     expect(html).toContain('<span style="color:#ff0000">Red</span>');
     expect(html).toContain(
@@ -145,7 +156,7 @@ describe('TinaMarkdown', () => {
       },
     });
 
-    const html = body.replace(/<!--.*?-->/g, '');
+    const html = withoutHydrationMarkers(body);
     expect(html).toContain('<a href="#">unsafe link</a>');
     expect(html).toContain('<img src="" alt="unsafe image"/>');
     expect(html).toContain(
