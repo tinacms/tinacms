@@ -1,4 +1,5 @@
 import type { Collection } from 'tinacms';
+import { ColorPickerInput } from '../fields/color';
 
 const Global: Collection = {
   label: 'Global',
@@ -97,19 +98,9 @@ const Global: Collection = {
           type: 'string',
           label: 'Primary Color',
           name: 'color',
-          // Same values as the Next.js reference, as a plain select: its color picker is a
-          // React component. Each value needs a [data-theme] palette in theme.css.
-          options: [
-            { label: 'Blue', value: 'blue' },
-            { label: 'Teal', value: 'teal' },
-            { label: 'Green', value: 'green' },
-            { label: 'Yellow', value: 'yellow' },
-            { label: 'Orange', value: 'orange' },
-            { label: 'Red', value: 'red' },
-            { label: 'Pink', value: 'pink' },
-            { label: 'Purple', value: 'purple' },
-            { label: 'White', value: 'white' },
-          ],
+          ui: {
+            component: ColorPickerInput,
+          },
         },
         {
           type: 'string',
