@@ -13,11 +13,14 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "biome lint .",
+		"format": "biome format --write .",
 		"test:unit": "vitest",
 		"test": "vitest --run",
 		"preview:static": "TINA_PUBLIC_IS_LOCAL=true vite preview --outDir build-static"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "catalog:",
 		"@sveltejs/adapter-auto": "^8.0.0",
 		"@sveltejs/adapter-node": "^6.0.0",
 		"@sveltejs/adapter-static": "^4.0.0",
