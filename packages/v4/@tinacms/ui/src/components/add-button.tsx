@@ -34,7 +34,7 @@ function AddButton({ children, className, type, ...props }: AddButtonProps) {
       type={type ?? 'button'}
       className={cn(
         ADD_ROW,
-        'cursor-pointer outline-none transition-all focus:border-ring focus:bg-card focus:shadow-focus-field disabled:pointer-events-none disabled:opacity-60',
+        'cursor-pointer outline-none transition-all select-none disabled:pointer-events-none disabled:opacity-60',
         className
       )}
       {...props}

@@ -44,7 +44,7 @@ const badgeVariants = cva(
     },
     defaultVariants: {
       kind: 'unsaved',
-      tone: 'neutral',
+      tone: 'none',
       mono: false,
       corner: false,
       end: false,
@@ -101,7 +101,7 @@ type BadgeProps = SpanProps &
       }
     | { kind: 'label'; children: ReactNode }
     /** In the corner of an icon button, hidden from screen readers: put the number in the button's name. 0 renders nothing. */
-    | { kind: 'count'; count?: number; corner: true }
+    | { kind: 'count'; count?: number; corner: true; srLabel?: never }
     /** Inline, so screen readers need words such as "3 unsaved changes". 0 renders nothing. */
     | { kind: 'count'; count?: number; corner?: false; srLabel: string }
     | { kind: 'number'; count: number }
@@ -176,21 +176,21 @@ function Badge(props: BadgeProps) {
     }
     case 'label': {
       const { kind, ...rest } = props;
-      return <Pill variant={{ kind, tone: 'none' }} {...rest} />;
+      return <Pill variant={{ kind }} {...rest} />;
     }
     case 'count': {
       if (!props.count) return null;
       if (props.corner === true) {
-        const { kind, count, corner, ...rest } = props;
+        const { kind, count, corner, srLabel: _srLabel, ...rest } = props;
         return (
-          <Pill variant={{ kind, tone: 'none', corner }} aria-hidden {...rest}>
+          <Pill variant={{ kind, corner }} aria-hidden {...rest}>
             {count}
           </Pill>
         );
       }
       const { kind, count, corner: _corner, srLabel, ...rest } = props;
       return (
-        <Pill variant={{ kind, tone: 'none' }} title={srLabel} {...rest}>
+        <Pill variant={{ kind }} title={srLabel} {...rest}>
           <span aria-hidden='true'>{count}</span>
           {srOnly(srLabel)}
         </Pill>
@@ -199,7 +199,7 @@ function Badge(props: BadgeProps) {
     case 'number': {
       const { kind, count, ...rest } = props;
       return (
-        <Pill variant={{ kind, tone: 'none' }} {...rest}>
+        <Pill variant={{ kind }} {...rest}>
           {count}
         </Pill>
       );
@@ -208,7 +208,7 @@ function Badge(props: BadgeProps) {
       const { kind, count, srLabel, ...rest } = props;
       return (
         <Pill
-          variant={{ kind, tone: 'none' }}
+          variant={{ kind }}
           aria-hidden={srLabel ? undefined : true}
           {...rest}
         >
@@ -218,14 +218,19 @@ function Badge(props: BadgeProps) {
         </Pill>
       );
     }
-    default: {
+    case undefined:
+    case 'unsaved': {
       const { kind: _kind, children, ...rest } = props;
       return (
-        <Pill variant={{ kind: 'unsaved', tone: 'none' }} {...rest}>
+        <Pill variant={{ kind: 'unsaved' }} {...rest}>
           <span aria-hidden='true' className={dotVariants()} />
           {children ?? 'Unsaved'}
         </Pill>
       );
+    }
+    default: {
+      const unhandled: never = props;
+      return unhandled;
     }
   }
 }
@@ -233,4 +238,4 @@ function Badge(props: BadgeProps) {
 type BadgeKind = NonNullable<BadgeProps['kind']>;
 
 export type { BadgeKind, BadgeProps, BadgeStatus, BadgeTone };
-export { Badge, badgeVariants };
+export { Badge };
