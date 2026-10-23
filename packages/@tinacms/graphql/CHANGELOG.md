@@ -1,5 +1,14 @@
 # tina-graphql
 
+## 4.0.2
+
+### Patch Changes
+
+- [#7863](https://github.com/tinacms/tinacms/pull/7863) [`2811d2c`](https://github.com/tinacms/tinacms/commit/2811d2c4d353a5ff45a12862b3cd4170d7119fd3) Thanks [@Apu-Emdad](https://github.com/Apu-Emdad)! - An optional image field left empty is no longer written to frontmatter as an empty string. Clearing an existing optional image now removes the key.
+
+- Updated dependencies [[`40cf662`](https://github.com/tinacms/tinacms/commit/40cf6628da02f81bd0cb5994a3ed78b71cba699a), [`33bb5f3`](https://github.com/tinacms/tinacms/commit/33bb5f3a1e0c178fac0d9b8c8547fd0a2e4cee9d)]:
+  - @tinacms/mdx@2.4.1
+
 ## 4.0.1
 
 ### Patch Changes
