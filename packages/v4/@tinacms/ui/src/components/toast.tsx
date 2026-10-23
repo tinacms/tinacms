@@ -1,3 +1,5 @@
+'use client';
+
 import { cva } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
 import { toast as sonner } from 'sonner';
@@ -64,17 +66,12 @@ const TONE_ICON: Record<
 type ToastProps = Omit<ComponentProps<'div'>, 'title' | 'children'> & {
   /** Sets the icon and its colour. Each tone has its own icon shape, so colour is never the only signal. */
   tone?: ToastTone;
-  /** Dark stands out over busy content. */
   theme?: ToastTheme;
-  /** What happened. */
   title: string;
-  /** An optional line of detail under the title. */
   text?: string;
-  /** The main action, such as "Retry". */
   action?: ToastAction;
-  /** A second, quieter action. `destructive` gives it red words and the trash icon (light theme only). */
+  /** `destructive` applies on the light theme only. */
   secondaryAction?: ToastAction & { destructive?: boolean };
-  /** Shows the close button. Leave it off when a second action such as Dismiss already closes it. */
   dismissible?: boolean;
   dismissLabel?: string;
   onDismiss?: () => void;
@@ -189,29 +186,22 @@ function Toast({
 type ToastOptions = Omit<ToastProps, 'id'> & {
   /** Milliseconds, or `Infinity` to stay until the person acts. Errors and warnings stay by default. */
   duration?: number;
-  /** Replaces the toast with this id rather than adding another. */
   id?: string | number;
 };
 
 /**
- * Shows a Toast in the Toaster and returns its id. Errors and warnings stay until dismissed or
- * replaced; pass the same `id` to replace one. Close one in code with `toast.dismiss(id)`.
+ * Shows a Toast in the Toaster and returns its id. Errors and warnings stay until dismissed.
+ * Pass the same `id` to replace a toast. `onDismiss` runs however the toast closes.
  */
 function toast({ duration, onDismiss, id, ...props }: ToastOptions) {
   const urgent = props.tone === 'error' || props.tone === 'warning';
   return sonner.custom(
-    (toastId) => (
-      <Toast
-        {...props}
-        onDismiss={() => {
-          sonner.dismiss(toastId);
-          onDismiss?.();
-        }}
-      />
-    ),
+    (toastId) => <Toast {...props} onDismiss={() => sonner.dismiss(toastId)} />,
     {
       duration: duration ?? (urgent ? Number.POSITIVE_INFINITY : undefined),
       id,
+      onDismiss,
+      onAutoClose: onDismiss,
     }
   );
 }

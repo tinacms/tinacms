@@ -276,4 +276,20 @@ describe('Toast', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Couldn’t save');
     vi.useRealTimers();
   });
+
+  it('replaces a toast by id, and runs onDismiss when code dismisses it', async () => {
+    const onDismiss = vi.fn();
+    render(<Toaster />);
+    act(() => {
+      toast({ id: 'save', tone: 'info', title: 'Saving', onDismiss });
+      toast({ id: 'save', tone: 'success', title: 'Changes saved', onDismiss });
+    });
+    expect(await screen.findByText('Changes saved')).toBeInTheDocument();
+    expect(screen.queryByText('Saving')).toBeNull();
+    act(() => {
+      toast.dismiss('save');
+    });
+    await waitFor(() => expect(screen.queryByText('Changes saved')).toBeNull());
+    expect(onDismiss).toHaveBeenCalledOnce();
+  });
 });

@@ -6,7 +6,7 @@ import {
   dialogOverlayClasses,
   dialogTitleClasses,
   dialogVariants,
-} from '@tinacms/ui/components/dialog';
+} from '@tinacms/ui/lib/dialog-styles';
 import { cn } from '@tinacms/ui/lib/utils';
 
 function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
@@ -38,7 +38,6 @@ function AlertDialogOverlay({
   );
 }
 
-/** The Dialog card at its small width, with no close button: the person picks an action or presses Escape. */
 function AlertDialogContent({
   className,
   children,
