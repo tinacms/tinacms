@@ -138,6 +138,7 @@
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
+  --radius-tip: var(--radius-tip);
   --radius-xl: initial;
   --radius-2xl: initial;
   --radius-3xl: initial;
@@ -161,6 +162,7 @@
 
   --leading-control: var(--leading-control);
   --leading-title: var(--leading-title);
+  --leading-tip: var(--leading-tip);
   --leading-code: var(--leading-code);
 
   --ease-standard: var(--ease);

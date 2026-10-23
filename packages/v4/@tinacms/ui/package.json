@@ -39,6 +39,7 @@
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "lucide-react": "catalog:",
+    "sonner": "^2.0.8",
     "tailwind-merge": "^3.4.1"
   },
   "peerDependencies": {
