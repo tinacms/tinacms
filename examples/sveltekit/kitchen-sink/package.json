@@ -16,7 +16,7 @@
 		"lint": "biome lint .",
 		"format": "biome format --write .",
 		"test:unit": "vitest",
-		"test": "vitest --run",
+		"test": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && vitest --run",
 		"preview:static": "TINA_PUBLIC_IS_LOCAL=true vite preview --outDir build-static"
 	},
 	"devDependencies": {
