@@ -1,3 +1,5 @@
+'use client';
+
 import { Menu as MenuPrimitive } from '@base-ui/react/menu';
 import type { LucideIcon } from 'lucide-react';
 import type * as React from 'react';
@@ -6,16 +8,15 @@ import { Avatar } from '@tinacms/ui/components/avatar';
 import { type Glyph, Icon } from '@tinacms/ui/components/icon';
 import { cn } from '@tinacms/ui/lib/utils';
 
-const ROW =
+const menuRowClasses =
   'relative box-border flex min-h-9 w-full cursor-default items-center gap-2.5 rounded-sm px-2.5 py-0 font-sans text-base leading-control text-foreground no-underline outline-none select-none focus-visible:shadow-focus-inset data-highlighted:bg-muted data-disabled:text-muted-foreground data-disabled:data-highlighted:bg-transparent';
 
-const DESTRUCTIVE =
+const destructiveRowClasses =
   'data-[variant=destructive]:not-data-disabled:text-destructive data-[variant=destructive]:not-data-disabled:data-highlighted:bg-status-failed-subtle';
 
 type RowExtras = {
-  /** An icon before the words. */
   icon?: Glyph | LucideIcon;
-  /** Small grey words at the end, such as where a new item goes ("in Docs"), or why a greyed item is off. */
+  /** Small grey words at the end, such as where a new item goes, or why a greyed item is off. */
   hint?: string;
 };
 
@@ -23,19 +24,11 @@ function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
   return <MenuPrimitive.Root data-slot='dropdown-menu' {...props} />;
 }
 
-function DropdownMenuPortal({ ...props }: MenuPrimitive.Portal.Props) {
-  return <MenuPrimitive.Portal data-slot='dropdown-menu-portal' {...props} />;
-}
-
 function DropdownMenuTrigger({ ...props }: MenuPrimitive.Trigger.Props) {
   return <MenuPrimitive.Trigger data-slot='dropdown-menu-trigger' {...props} />;
 }
 
-/**
- * The menu card, 264px wide. Base UI handles the keyboard: the arrow keys move and wrap,
- * Home and End jump, Enter or Space picks, and Escape closes and returns focus to the trigger.
- * Give it an `aria-label`.
- */
+/** Give it an `aria-label`: screen readers name the menu by it. */
 function DropdownMenuContent({
   align = 'start',
   alignOffset = 0,
@@ -75,7 +68,6 @@ function DropdownMenuGroup({ ...props }: MenuPrimitive.Group.Props) {
   return <MenuPrimitive.Group data-slot='dropdown-menu-group' {...props} />;
 }
 
-/** A group's heading. Place it first inside a DropdownMenuGroup. */
 function DropdownMenuLabel({
   className,
   ...props
@@ -116,9 +108,8 @@ function RowHint({ hint }: { hint?: string }) {
 }
 
 /**
- * An action. A `destructive` item, for one that throws something away, has red words, the trash
- * icon unless `icon` gives another, and a pale red fill when highlighted. Greyed items stay in
- * place and the arrow keys skip them.
+ * A `destructive` item shows the trash icon unless `icon` gives another. A greyed item keeps
+ * focus with `aria-disabled`, so the arrow keys reach it, but picking it does nothing.
  */
 function DropdownMenuItem({
   className,
@@ -135,7 +126,7 @@ function DropdownMenuItem({
     <MenuPrimitive.Item
       data-slot='dropdown-menu-item'
       data-variant={variant}
-      className={cn(ROW, DESTRUCTIVE, className)}
+      className={cn(menuRowClasses, destructiveRowClasses, className)}
       {...props}
     >
       <RowLead icon={icon ?? (variant === 'destructive' ? 'trash' : undefined)}>
@@ -155,10 +146,10 @@ function DropdownMenuLinkItem({
   return (
     <MenuPrimitive.LinkItem
       data-slot='dropdown-menu-link-item'
-      target='_blank'
-      rel='noopener'
-      className={cn(ROW, className)}
+      className={cn(menuRowClasses, className)}
       {...props}
+      target='_blank'
+      rel='noopener noreferrer'
     >
       <span className='min-w-0 flex-1 truncate'>
         {children}
@@ -173,7 +164,7 @@ function DropdownMenuLinkItem({
   );
 }
 
-/** An on or off choice, with a tick at the end while it is on. Picking it closes the menu. */
+/** Unlike Base UI's default, picking it closes the menu. */
 function DropdownMenuCheckboxItem({
   className,
   children,
@@ -185,7 +176,7 @@ function DropdownMenuCheckboxItem({
   return (
     <MenuPrimitive.CheckboxItem
       data-slot='dropdown-menu-checkbox-item'
-      className={cn(ROW, 'pr-8', className)}
+      className={cn(menuRowClasses, 'pr-8', className)}
       closeOnClick={closeOnClick}
       {...props}
     >
@@ -216,7 +207,6 @@ function DropdownMenuSeparator({
   );
 }
 
-/** Small grey words that nobody picks, such as the version number. */
 function DropdownMenuNote({
   className,
   ...props
@@ -230,7 +220,6 @@ function DropdownMenuNote({
   );
 }
 
-/** The signed-in person at the top of the account menu. */
 function DropdownMenuPerson({
   name,
   sub,
@@ -259,7 +248,6 @@ function DropdownMenuPerson({
   );
 }
 
-/** A bold heading with an optional line under it, such as "Local files" in local mode. */
 function DropdownMenuHeading({
   heading,
   sub,
@@ -285,7 +273,6 @@ function DropdownMenuHeading({
 
 export {
   DropdownMenu,
-  DropdownMenuPortal,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,

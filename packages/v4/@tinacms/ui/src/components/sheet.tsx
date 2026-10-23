@@ -3,11 +3,11 @@ import { cva } from 'class-variance-authority';
 import type * as React from 'react';
 
 import { Button } from '@tinacms/ui/components/button';
+import { dialogTitleClasses } from '@tinacms/ui/lib/dialog-styles';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type SheetSide = 'top' | 'right' | 'bottom' | 'left';
 
-/** Right and left sheets are 400px wide; top and bottom sheets round their inner corners. */
 const sheetVariants = cva(
   'fixed z-50 flex flex-col bg-card font-sans text-base leading-control text-foreground shadow-dialog outline-none transition-[translate,opacity] duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0',
   {
@@ -54,7 +54,6 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
   );
 }
 
-/** A panel that slides in from `side`. Compose SheetHeader, SheetBody and SheetFooter inside it. */
 function SheetContent({
   className,
   children,
@@ -107,7 +106,6 @@ function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-/** The part of the sheet between header and footer. It scrolls on its own. */
 function SheetBody({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -138,10 +136,7 @@ function SheetTitle({ className, ...props }: SheetPrimitive.Title.Props) {
   return (
     <SheetPrimitive.Title
       data-slot='sheet-title'
-      className={cn(
-        'font-sans text-md leading-title font-semibold text-foreground',
-        className
-      )}
+      className={cn(dialogTitleClasses, className)}
       {...props}
     />
   );
@@ -160,7 +155,6 @@ function SheetDescription({
   );
 }
 
-export type { SheetSide };
 export {
   Sheet,
   SheetTrigger,
@@ -171,5 +165,4 @@ export {
   SheetFooter,
   SheetTitle,
   SheetDescription,
-  sheetVariants,
 };

@@ -1,30 +1,15 @@
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
-import { cva, type VariantProps } from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
+import {
+  dialogDescriptionClasses,
+  dialogOverlayClasses,
+  dialogTitleClasses,
+  dialogVariants,
+} from '@tinacms/ui/lib/dialog-styles';
 import { cn } from '@tinacms/ui/lib/utils';
 
 import { Button } from '@tinacms/ui/components/button';
-
-const dialogOverlayClasses =
-  'fixed inset-0 isolate z-50 bg-scrim transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0';
-
-/** The card that Dialog and AlertDialog share: 20px corners, the dialog shadow and a width from `size`. */
-const dialogVariants = cva(
-  [
-    'fixed inset-4 z-50 m-auto flex h-fit max-h-full w-auto flex-col gap-4 overflow-y-auto rounded-lg bg-popover p-6 font-sans text-base leading-control text-foreground shadow-dialog outline-none',
-    'transition-[opacity,scale] duration-150 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0',
-  ],
-  {
-    variants: { size: { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-xl' } },
-    defaultVariants: { size: 'md' },
-  }
-);
-
-const dialogTitleClasses =
-  'font-sans text-md leading-title font-semibold text-foreground';
-
-const dialogDescriptionClasses =
-  'text-base text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground';
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot='dialog' {...props} />;
@@ -55,7 +40,6 @@ function DialogOverlay({
   );
 }
 
-/** sm 384px, md 448px (default) or lg 576px wide, and never wider than the screen. */
 function DialogContent({
   className,
   children,
@@ -169,8 +153,4 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-  dialogDescriptionClasses,
-  dialogOverlayClasses,
-  dialogTitleClasses,
-  dialogVariants,
 };
