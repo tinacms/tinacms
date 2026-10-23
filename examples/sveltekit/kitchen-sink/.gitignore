@@ -24,3 +24,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 tina/__generated__
+
+# Playwright
+/test-results
+/playwright-report

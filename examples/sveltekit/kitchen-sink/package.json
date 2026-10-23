@@ -17,10 +17,13 @@
 		"format": "biome format --write .",
 		"test:unit": "vitest",
 		"test": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && vitest --run",
-		"preview:static": "TINA_PUBLIC_IS_LOCAL=true vite preview --outDir build-static"
+		"preview:static": "TINA_PUBLIC_IS_LOCAL=true vite preview --outDir build-static",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
+		"@playwright/test": "catalog:",
 		"@sveltejs/adapter-auto": "^8.0.0",
 		"@sveltejs/adapter-node": "^6.0.0",
 		"@sveltejs/adapter-static": "^4.0.0",
