@@ -1,0 +1,273 @@
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+
+import { Breadcrumb } from '@tinacms/ui/components/breadcrumb';
+import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
+import { NavRow } from '@tinacms/ui/components/nav-row';
+import { Pagination, pageRun } from '@tinacms/ui/components/pagination';
+import { PanelHeader } from '@tinacms/ui/components/panel-header';
+import { StatusBar } from '@tinacms/ui/components/status-bar';
+import { Tabs, TabsPanel } from '@tinacms/ui/components/tabs';
+
+const tools = [
+  { value: 'fields', label: 'Fields' },
+  { value: 'history', label: 'History' },
+  { value: 'references', label: 'References' },
+] as const;
+
+describe('Tabs', () => {
+  it('moves and shows tabs with the arrow keys, Home and End', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Tabs
+        tabs={tools}
+        aria-label='Document tools'
+        onValueChange={onValueChange}
+      >
+        {tools.map((tab) => (
+          <TabsPanel key={tab.value} value={tab.value}>
+            {tab.label} panel
+          </TabsPanel>
+        ))}
+      </Tabs>
+    );
+    expect(
+      screen.getByRole('tablist', { name: 'Document tools' })
+    ).toBeVisible();
+    await user.tab();
+    expect(screen.getByRole('tab', { name: 'Fields' })).toHaveFocus();
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('tab', { name: 'History' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
+    expect(screen.getByText('History panel')).toBeVisible();
+    await user.keyboard('{End}');
+    expect(screen.getByRole('tab', { name: 'References' })).toHaveFocus();
+    await user.keyboard('{Home}');
+    expect(screen.getByRole('tab', { name: 'Fields' })).toHaveFocus();
+    expect(onValueChange.mock.calls).toEqual([
+      ['history'],
+      ['references'],
+      ['fields'],
+    ]);
+  });
+
+  it('keeps only the shown tab in the Tab order', async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <Tabs tabs={tools} defaultValue='history' />
+        <button type='button'>After</button>
+      </>
+    );
+    await user.tab();
+    expect(screen.getByRole('tab', { name: 'History' })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
+  });
+});
+
+describe('Breadcrumb', () => {
+  const path = ['Posts', '2026', 'October', 'Launch', 'Hello world'];
+
+  it('folds the middle of a long path into a menu', async () => {
+    const user = userEvent.setup();
+    const onOpen = vi.fn();
+    render(
+      <Breadcrumb
+        items={path.map((label, index) => ({
+          label,
+          onClick: index < path.length - 1 ? () => onOpen(label) : undefined,
+        }))}
+      />
+    );
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(within(nav).getByRole('button', { name: 'Posts' })).toBeVisible();
+    expect(within(nav).queryByText('2026')).toBeNull();
+    expect(within(nav).getByRole('button', { name: 'Launch' })).toBeVisible();
+    expect(within(nav).getByText('Hello world')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(
+      within(nav).queryByRole('button', { name: 'Hello world' })
+    ).toBeNull();
+
+    const fold = within(nav).getByRole('button', {
+      name: 'Show 2 more levels',
+    });
+    fold.focus();
+    await user.keyboard('{Enter}');
+    await user.click(await screen.findByRole('menuitem', { name: 'October' }));
+    expect(onOpen).toHaveBeenCalledWith('October');
+
+    await user.click(fold);
+    await screen.findByRole('menu');
+    await user.keyboard('{Escape}');
+    expect(fold).toHaveFocus();
+  });
+
+  it('shows every step of a short path', () => {
+    render(
+      <Breadcrumb
+        items={[{ label: 'Posts', href: '/posts' }, { label: 'Hello' }]}
+      />
+    );
+    expect(screen.getByRole('link', { name: 'Posts' })).toHaveAttribute(
+      'href',
+      '/posts'
+    );
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+});
+
+describe('NavRow', () => {
+  it('tells screen readers a folder is open', async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(
+      <NavRow kind='folder' open onClick={onClick}>
+        Posts
+      </NavRow>
+    );
+    const row = screen.getByRole('button', { name: 'Posts' });
+    expect(row).toHaveAttribute('aria-expanded', 'true');
+    row.focus();
+    await user.keyboard('{Enter}');
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it('names the unsaved dot and the unsaved count', () => {
+    render(
+      <>
+        <NavRow unsaved selected aria-current='page'>
+          Hello world
+        </NavRow>
+        <NavRow kind='group' count={2}>
+          Posts
+        </NavRow>
+      </>
+    );
+    expect(
+      screen.getByRole('button', { name: 'Hello world Unsaved' })
+    ).toHaveAttribute('aria-current', 'page');
+    expect(
+      screen.getByRole('button', { name: 'Posts 2 unsaved' })
+    ).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('says a link row opens a new tab', () => {
+    render(<NavRow href='https://tina.io/docs'>Docs</NavRow>);
+    expect(
+      screen.getByRole('link', { name: 'Docs (opens in a new tab)' })
+    ).toHaveAttribute('target', '_blank');
+  });
+
+  it('rejects props that do nothing for a kind', () => {
+    // @ts-expect-error only a document is unsaved
+    void (<NavRow kind='group' unsaved />);
+    // @ts-expect-error only a group or folder opens
+    void (<NavRow kind='doc' open />);
+  });
+});
+
+describe('PanelHeader', () => {
+  it('tabs through back, the action, the menu and close', async () => {
+    const user = userEvent.setup();
+    render(
+      <PanelHeader
+        backLabel='Return to navigator'
+        action={<button type='button'>New</button>}
+        menu={<DropdownMenuItem>Sort</DropdownMenuItem>}
+        menuLabel='Collections actions'
+        closeLabel='Close Collections'
+      />
+    );
+    await user.tab();
+    expect(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    ).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'New' })).toHaveFocus();
+    await user.tab();
+    expect(
+      screen.getByRole('button', { name: 'Collections actions' })
+    ).toHaveFocus();
+    await user.tab();
+    expect(
+      screen.getByRole('button', { name: 'Close Collections' })
+    ).toHaveFocus();
+  });
+
+  it('has no menu button without menu items', () => {
+    render(<PanelHeader heading='Collections' />);
+    expect(screen.getByRole('heading', { name: 'Collections' })).toBeVisible();
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+});
+
+describe('StatusBar', () => {
+  it('marks a protected branch', () => {
+    render(<StatusBar branch='main' protectedBranch />);
+    expect(screen.getByText('main (protected)')).toBeVisible();
+  });
+
+  it('shows local mode', () => {
+    render(<StatusBar local />);
+    expect(screen.getByText('Local files')).toBeVisible();
+  });
+
+  it('announces a failed save without its action', async () => {
+    const user = userEvent.setup();
+    const onRetry = vi.fn();
+    render(
+      <StatusBar
+        branch='docs/v4-launch'
+        state='failed'
+        action={{ label: 'Retry', onClick: onRetry }}
+      >
+        Save failed
+      </StatusBar>
+    );
+    const live = screen.getByText('Save failed');
+    expect(live).toHaveAttribute('aria-live', 'polite');
+    const retry = screen.getByRole('button', { name: 'Retry' });
+    expect(live).not.toContainElement(retry);
+    await user.click(retry);
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+});
+
+describe('Pagination', () => {
+  it('folds a long run of pages around the current page', () => {
+    expect(pageRun(6, 13)).toEqual([1, null, 5, 6, 7, null, 13]);
+    expect(pageRun(2, 13)).toEqual([1, 2, 3, 4, 5, null, 13]);
+    expect(pageRun(12, 13)).toEqual([1, null, 9, 10, 11, 12, 13]);
+    expect(pageRun(3, 5)).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  it('shows the range and moves between pages', async () => {
+    const user = userEvent.setup();
+    const onPageChange = vi.fn();
+    render(<Pagination total={48} page={2} onPageChange={onPageChange} />);
+    expect(screen.getByText('Showing 11–20 of 48')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Page 2' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    await user.click(screen.getByRole('button', { name: 'Next' }));
+    await user.click(screen.getByRole('button', { name: 'Page 5' }));
+    expect(onPageChange.mock.calls).toEqual([[3], [5]]);
+  });
+
+  it('disables the ends instead of hiding them', () => {
+    const { rerender } = render(<Pagination total={48} page={1} />);
+    expect(screen.getByRole('button', { name: 'Previous' })).toBeDisabled();
+    rerender(<Pagination total={48} page={5} />);
+    expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
+    expect(screen.getByText('Showing 41–48 of 48')).toBeVisible();
+  });
+});

@@ -279,7 +279,7 @@ describe('MediaBrowser folders', () => {
     expect(
       within(
         screen.getByRole('navigation', { name: 'Media folders' })
-      ).getByRole('button', { name: 'drafts' })
+      ).getByText('drafts')
     ).toHaveAttribute('aria-current', 'page');
   });
 });
