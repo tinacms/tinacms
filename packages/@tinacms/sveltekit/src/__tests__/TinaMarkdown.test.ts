@@ -11,7 +11,7 @@ function withoutHydrationMarkers(html: string): string {
   let previous: string;
   do {
     previous = html;
-    html = html.replace(/<!--.*?-->/g, '');
+    html = html.replace(/<!--[\s\S]*?-->/g, '');
   } while (html !== previous);
   return html;
 }
