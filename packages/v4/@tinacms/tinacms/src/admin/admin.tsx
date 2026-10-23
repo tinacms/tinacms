@@ -14,6 +14,7 @@ import {
   SidebarTrigger,
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
+import { Toaster } from '@tinacms/ui/components/sonner';
 import tinaLogo from '@tinacms/ui/assets/tinacms-logo.svg';
 import {
   type CSSProperties,
@@ -335,6 +336,7 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
             <AdminShell preview={preview} />
           </AuthGate>
         </HashRouter>
+        <Toaster />
       </TinaProvider>
     </AdminErrorBoundary>
   );
