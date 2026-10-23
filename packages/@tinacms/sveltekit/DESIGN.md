@@ -303,9 +303,10 @@ tables, code blocks and MDX components). React has
 `tinacms/dist/rich-text`; Svelte needs its own.
 
 **Decision.**
-- One component renders every node type recursively, with semantic default
-  HTML and light `tina-markdown-*` styles. Any node can be replaced through
-  `components` (by node type, or by MDX template name).
+- One component renders every node type recursively, as plain semantic HTML
+  with no classes or styles (matching the React and Astro renderers); the app
+  styles it from a wrapper. Any node can be replaced through `components` (by
+  node type, or by MDX template name).
 - **Safety:** `html` nodes are rendered as escaped text; link and image URLs
   go through `sanitize.ts` (blocks `javascript:`, `data:`, protocol-relative
   URLs). Never pass CMS HTML to `{@html}`.

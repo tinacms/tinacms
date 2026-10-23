@@ -71,7 +71,7 @@ function cellInline(value: unknown): TinaRichTextNode[] {
   {:else if node.strikethrough}
     <s>{@render renderLeaf({ ...node, strikethrough: false })}</s>
   {:else if node.code}
-    <code class="tina-markdown-inline-code">{@render renderLeaf({ ...node, code: false })}</code>
+    <code>{@render renderLeaf({ ...node, code: false })}</code>
   {:else if node.highlight}
     {@const highlightColor = sanitizeCssColor(node.highlightColor)}
     <mark style={highlightColor ? `background-color:${highlightColor}` : undefined}>
@@ -92,7 +92,7 @@ function cellInline(value: unknown): TinaRichTextNode[] {
   {#if Override}
     <Override>{@render renderNodes(node.children ?? [])}</Override>
   {:else}
-    <svelte:element this={tag} class={`tina-markdown-${node.type}`}>
+    <svelte:element this={tag}>
       {@render renderNodes(node.children ?? [])}
     </svelte:element>
   {/if}
@@ -108,22 +108,20 @@ function cellInline(value: unknown): TinaRichTextNode[] {
     {#if Override}
       <Override url={node.url}>{@render renderNodes(node.children)}</Override>
     {:else}
-      <a class="tina-markdown-link" href={sanitizeHref(node.url)}>{@render renderNodes(node.children)}</a>
+      <a href={sanitizeHref(node.url)}>{@render renderNodes(node.children)}</a>
     {/if}
   {:else if node.type === 'img'}
     {#if Override}
       <Override url={node.url} alt={node.alt} caption={node.caption} />
     {:else}
-      <img class="tina-markdown-image" src={sanitizeImageSrc(node.url)} alt={node.alt ?? ''} />
+      <img src={sanitizeImageSrc(node.url)} alt={node.alt ?? ''} />
     {/if}
   {:else if node.type === 'code_block'}
     {@const value = codeValue(node)}
     {#if Override}
       <Override value={value} lang={node.lang} />
     {:else}
-      <pre class="tina-markdown-code-block">
-        <code class={node.lang ? `language-${node.lang}` : undefined}>{value}</code>
-      </pre>
+      <pre><code class={node.lang ? `language-${node.lang}` : undefined}>{value}</code></pre>
     {/if}
   {:else if node.type === 'table'}
     {@render renderTable(node)}
@@ -147,7 +145,7 @@ function cellInline(value: unknown): TinaRichTextNode[] {
   {:else if node.name === 'table'}
     {@render renderLegacyTable(node)}
   {:else}
-    <span class="tina-missing-component">No component provided for {node.name}</span>
+    <span style="display:inline-block;padding:0.25rem 0.5rem;background:#fee;color:#900;border-radius:0.25rem;font-family:monospace;font-size:0.85em;">No component provided for {node.name}</span>
   {/if}
 {/snippet}
 
@@ -165,7 +163,7 @@ function cellInline(value: unknown): TinaRichTextNode[] {
       {@render nativeTableBody(header, body, align, TrOverride, ThOverride, TdOverride)}
     </TableOverride>
   {:else}
-    <table class="tina-markdown-table">
+    <table>
       {@render nativeTableBody(header, body, align, TrOverride, ThOverride, TdOverride)}
     </table>
   {/if}
@@ -208,7 +206,7 @@ function cellInline(value: unknown): TinaRichTextNode[] {
   {@const body = table.firstRowHeader ? rows.slice(1) : rows}
   {@const ThOverride = components.th}
   {@const TdOverride = components.td}
-  <table class="tina-markdown-table">
+  <table>
     {#if header}
       <thead><tr>
         {#each header.tableCells ?? [] as cell, index (`head-${index}`)}
@@ -234,73 +232,3 @@ function cellInline(value: unknown): TinaRichTextNode[] {
 
 {@render renderNodes(nodes)}
 
-<style>
-  .tina-markdown-h1,
-  .tina-markdown-h2,
-  .tina-markdown-h3,
-  .tina-markdown-h4,
-  .tina-markdown-h5,
-  .tina-markdown-h6 {
-    margin-block: 1.5em 0.65em;
-    font-weight: 650;
-    line-height: 1.2;
-    letter-spacing: -0.025em;
-  }
-
-  .tina-markdown-h1 { font-size: 2.25rem; }
-  .tina-markdown-h2 { font-size: 1.875rem; }
-  .tina-markdown-h3 { font-size: 1.5rem; }
-  .tina-markdown-h4 { font-size: 1.25rem; }
-  .tina-markdown-h5 { font-size: 1.125rem; }
-  .tina-markdown-h6 { font-size: 1rem; }
-
-  .tina-markdown-p,
-  .tina-markdown-ul,
-  .tina-markdown-ol,
-  .tina-markdown-blockquote {
-    margin-block: 1em;
-    line-height: 1.7;
-  }
-
-  .tina-markdown-ul,
-  .tina-markdown-ol { padding-inline-start: 1.5em; }
-  .tina-markdown-lic { margin-block: 0.35em; }
-
-  .tina-markdown-blockquote {
-    margin-inline: 0;
-    padding-inline-start: 1rem;
-    border-inline-start: 3px solid currentColor;
-    opacity: 0.8;
-  }
-
-  .tina-markdown-link { text-decoration: underline; text-underline-offset: 0.18em; }
-  .tina-markdown-image { display: block; max-width: 100%; height: auto; border-radius: 0.75rem; }
-
-  .tina-markdown-inline-code {
-    padding: 0.12em 0.35em;
-    border-radius: 0.3em;
-    background: color-mix(in srgb, currentColor 10%, transparent);
-    font-size: 0.9em;
-  }
-
-  .tina-markdown-code-block {
-    margin-block: 1.5rem;
-    padding: 1rem 1.25rem;
-    overflow-x: auto;
-    border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-    border-radius: 0.75rem;
-    background: #111827;
-    color: #e5e7eb;
-    font-size: 0.9rem;
-    line-height: 1.65;
-  }
-
-  .tina-markdown-table { width: 100%; border-collapse: collapse; text-align: start; }
-  .tina-markdown-table th,
-  .tina-markdown-table td {
-    padding: 0.65rem 0.85rem;
-    border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
-  }
-
-  .tina-markdown-table th { font-weight: 650; text-align: start; }
-</style>

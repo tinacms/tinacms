@@ -204,13 +204,15 @@ Renders Tina rich-text and lets you override any node through `components`:
 | MDX template name, e.g. `Callout` | Missing-component label | The template's props |
 
 - Text marks (`bold`, `italic`, `underline`, `strikethrough`, `code`,
-  `highlight`) render as semantic HTML. Leaves are recognised by `type: 'text'`
+  `highlight`, text colour) render as semantic HTML; colours that aren't a
+  plain CSS colour are dropped. Leaves are recognised by `type: 'text'`
   *or* by a string `text` field, because the editor sends newly typed text as
   `{ text }` without a type.
 - Shortcode templates declare `match: { start: '{{%', name: 'pull-quote', end: '%}}' }`
   in the schema and are keyed by template name in `components`.
-- Default nodes have `tina-markdown-*` classes and light built-in styles;
-  overrides are fully app-styled.
+- Default nodes render as plain HTML with no classes or styles, like Tina's
+  React and Astro renderers. Style them from a wrapper (for example a `prose`
+  class); code blocks keep a `language-*` class for syntax highlighters.
 - Link and image URLs are sanitized. Never pass CMS HTML to `{@html}`.
 - Syntax highlighting is up to the app: install Shiki yourself and pass a
   `code_block` override that renders Shiki's output.

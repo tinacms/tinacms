@@ -1,5 +1,6 @@
 <script lang="ts">
 import '#lib/styles/theme.css';
+import '#lib/styles/prose.css';
 import TinaBridge from '@tinacms/sveltekit/TinaBridge.svelte';
 import { useTina } from '@tinacms/sveltekit/use-tina';
 import favicon from '#lib/assets/favicon.svg';

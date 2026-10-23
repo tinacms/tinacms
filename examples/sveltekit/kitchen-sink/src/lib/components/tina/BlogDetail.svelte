@@ -94,7 +94,7 @@ const heroSrc = $derived(
     {/if}
 
     <Container width="small" size="large">
-      <div class="blog-body" data-tina-field={tinaField(blog, '_body')}>
+      <div class="blog-body prose" data-tina-field={tinaField(blog, '_body')}>
         <TinaMarkdown content={blog._body} components={customComponents} />
       </div>
     </Container>

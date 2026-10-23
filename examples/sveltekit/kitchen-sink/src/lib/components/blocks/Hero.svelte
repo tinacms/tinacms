@@ -31,7 +31,7 @@ const isPrimary = $derived(data.color === 'primary');
       {/if}
 
       {#if data.text}
-        <div data-tina-field={tinaField(data, 'text')} class="hero-text {isPrimary ? 'text-primary-mode' : ''}">
+        <div data-tina-field={tinaField(data, 'text')} class="hero-text prose {isPrimary ? 'text-primary-mode' : ''}">
           <TinaMarkdown content={data.text} components={customComponents} />
         </div>
       {/if}

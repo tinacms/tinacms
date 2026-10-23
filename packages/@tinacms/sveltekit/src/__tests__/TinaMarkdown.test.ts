@@ -6,7 +6,7 @@ import CalloutOverride from './fixtures/CalloutOverride.svelte';
 import CodeBlockOverride from './fixtures/CodeBlockOverride.svelte';
 
 describe('TinaMarkdown', () => {
-  it('renders semantic text, marks, and default presentation classes', () => {
+  it('renders semantic text and marks as plain HTML', () => {
     const { body } = render(TinaMarkdown, {
       props: {
         content: [
@@ -28,13 +28,12 @@ describe('TinaMarkdown', () => {
       },
     });
 
-    expect(body).toContain('<h1');
-    expect(body).toContain('class="tina-markdown-h1');
-    expect(body).toContain('<strong>');
-    expect(body).toContain('Bold text');
-    expect(body).toContain('<code class="tina-markdown-inline-code');
-    expect(body).toContain('class="tina-markdown-blockquote');
-    expect(body).toContain('Quote');
+    const html = body.replace(/<!--.*?-->/g, '');
+    expect(html).toContain('<h1>Renderer title</h1>');
+    expect(html).toContain('<strong>Bold text</strong>');
+    expect(html).toContain('<code> and inline code</code>');
+    expect(html).toContain('<blockquote><p>Quote</p></blockquote>');
+    expect(html).not.toContain('class=');
   });
 
   it('renders text and highlight colours, dropping ones that are not a plain CSS colour', () => {
@@ -107,7 +106,7 @@ describe('TinaMarkdown', () => {
     expect(body).toContain('Heads up');
   });
 
-  it('renders native tables and sanitizes CMS-provided links and image URLs', () => {
+  it('renders native tables and code blocks and sanitizes CMS-provided links and image URLs', () => {
     const { body } = render(TinaMarkdown, {
       props: {
         content: [
@@ -121,6 +120,7 @@ describe('TinaMarkdown', () => {
             url: 'data:image/png;base64,abc',
             alt: 'unsafe image',
           },
+          { type: 'code_block', lang: 'ts', value: 'const answer = 42' },
           {
             type: 'table',
             props: { align: ['left'] },
@@ -145,11 +145,13 @@ describe('TinaMarkdown', () => {
       },
     });
 
-    expect(body).toContain('<a class="tina-markdown-link');
-    expect(body).toContain('href="#"');
-    expect(body).toContain('<img class="tina-markdown-image');
-    expect(body).toContain('src=""');
-    expect(body).toContain('<table class="tina-markdown-table');
-    expect(body).toContain('Cell value');
+    const html = body.replace(/<!--.*?-->/g, '');
+    expect(html).toContain('<a href="#">unsafe link</a>');
+    expect(html).toContain('<img src="" alt="unsafe image"/>');
+    expect(html).toContain(
+      '<pre><code class="language-ts">const answer = 42</code></pre>'
+    );
+    expect(html).toContain('<table>');
+    expect(html).toContain('Cell value');
   });
 });

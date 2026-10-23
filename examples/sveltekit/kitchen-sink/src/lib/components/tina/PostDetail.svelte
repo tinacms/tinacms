@@ -74,7 +74,7 @@ const heroSrc = $derived(post?.heroImg ? sanitizeImageSrc(post.heroImg) : '');
         </div>
       {/if}
 
-      <div class="post-body" data-tina-field={tinaField(post, '_body')}>
+      <div class="post-body prose" data-tina-field={tinaField(post, '_body')}>
         <TinaMarkdown content={post._body || post.body} components={customComponents} />
       </div>
     </Container>

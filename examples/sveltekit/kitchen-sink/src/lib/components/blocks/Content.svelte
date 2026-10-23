@@ -10,7 +10,7 @@ let { data }: { data: any } = $props();
 
 <Section color={data.color}>
   <Container size="large" width="medium" class="content-block-container">
-    <div data-tina-field={tinaField(data, 'body')} class="content-body">
+    <div data-tina-field={tinaField(data, 'body')} class="content-body prose">
       <TinaMarkdown content={data.body} components={customComponents} />
     </div>
   </Container>

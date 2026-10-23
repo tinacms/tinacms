@@ -5,4 +5,4 @@ let { url, alt, caption }: { url: string; alt?: string; caption?: string } =
   $props();
 </script>
 
-<img class="tina-markdown-image" src={sanitizeImageSrc(url)} alt={alt ?? ''} title={caption} />
+<img src={sanitizeImageSrc(url)} alt={alt ?? ''} title={caption} />
