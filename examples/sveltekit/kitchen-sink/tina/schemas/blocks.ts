@@ -1,6 +1,8 @@
+import type { Template } from 'tinacms';
+import { iconSchema } from './icon';
 import { actionsFieldSchema, colorFieldSchema } from './shared-fields';
 
-export const heroBlockSchema = {
+export const heroBlockSchema: Template = {
   name: 'hero',
   label: 'Hero',
   ui: {
@@ -52,7 +54,7 @@ export const heroBlockSchema = {
   ],
 };
 
-export const featureBlockSchema = {
+export const featureBlockSchema: Template = {
   name: 'features',
   label: 'Features',
   ui: {
@@ -82,14 +84,18 @@ export const featureBlockSchema = {
       name: 'items',
       list: true,
       ui: {
-        itemProps: (item: Record<string, unknown>) => {
-          return {
-            label: typeof item === 'string' ? item : item?.title,
-          };
+        itemProps: (item) => {
+          return { label: item?.title };
         },
-        defaultItem: 'New Feature',
+        defaultItem: { title: 'New Feature' },
       },
       fields: [
+        iconSchema,
+        {
+          type: 'string',
+          label: 'Title',
+          name: 'title',
+        },
         {
           type: 'string',
           label: 'Text',
@@ -105,7 +111,7 @@ export const featureBlockSchema = {
   ],
 };
 
-export const ctaBlockSchema = {
+export const ctaBlockSchema: Template = {
   name: 'cta',
   label: 'CTA',
   ui: {
@@ -130,7 +136,7 @@ export const ctaBlockSchema = {
   ],
 };
 
-export const testimonialBlockSchema = {
+export const testimonialBlockSchema: Template = {
   name: 'testimonial',
   label: 'Testimonial',
   ui: {
@@ -160,7 +166,7 @@ export const testimonialBlockSchema = {
   ],
 };
 
-export const contentBlockSchema = {
+export const contentBlockSchema: Template = {
   name: 'content',
   label: 'Content',
   ui: {

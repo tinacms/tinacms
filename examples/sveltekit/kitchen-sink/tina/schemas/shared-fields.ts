@@ -3,6 +3,8 @@
  * Centralises common field patterns so they stay in sync.
  */
 
+import type { TinaField } from 'tinacms';
+
 /** Creates a slugify function with a collection-specific fallback prefix. */
 export const makeSlugify = (prefix: string) => (values: any) =>
   `${(values?.title || `${prefix}-${Date.now()}`).toLowerCase().split(' ').join('-')}`;
@@ -38,7 +40,7 @@ export const dateFieldSchemas = [
 ];
 
 /** Reusable "actions" list field — buttons/links with label, type, link & icon. */
-export const actionsFieldSchema = {
+export const actionsFieldSchema: TinaField = {
   label: 'Actions',
   name: 'actions',
   type: 'object',
@@ -81,7 +83,7 @@ export const actionsFieldSchema = {
 };
 
 /** Reusable color picker for section backgrounds (default / tint / primary). */
-export const colorFieldSchema = {
+export const colorFieldSchema: TinaField = {
   type: 'string',
   label: 'Color',
   name: 'color',
