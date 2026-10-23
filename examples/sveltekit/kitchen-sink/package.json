@@ -34,7 +34,7 @@
 		"@tinacms/scripts": "workspace:*",
 		"@tinacms/datalayer": "workspace:*",
 		"@tinacms/sveltekit": "workspace:*",
-		"@types/node": "^26.6.5",
+		"@types/node": "^25.1.0",
 		"@vitest/browser-playwright": "^4.1.8",
 		"playwright": "^1.60.0",
 		"react": "^18.3.1",
