@@ -60,15 +60,6 @@ const dotVariants = cva(
   }
 );
 
-type BadgeKind =
-  | 'unsaved'
-  | 'count'
-  | 'dot'
-  | 'status'
-  | 'tag'
-  | 'number'
-  | 'label'
-  | 'errors';
 type BadgeStatus =
   | 'published'
   | 'draft'
@@ -81,10 +72,7 @@ type BadgeTone = Exclude<
   'none'
 >;
 
-const STATUS: Record<
-  BadgeStatus,
-  { text: string; tone: VariantProps<typeof badgeVariants>['tone'] }
-> = {
+const STATUS: Record<BadgeStatus, { text: string; tone: BadgeTone }> = {
   published: { text: 'Published', tone: 'success' },
   merged: { text: 'Merged', tone: 'success' },
   committed: { text: 'Committed', tone: 'neutral' },
@@ -93,141 +81,156 @@ const STATUS: Record<
   failed: { text: 'Failed', tone: 'danger' },
 };
 
-type BadgeProps = Omit<ComponentProps<'span'>, 'children'> & {
-  kind?: BadgeKind;
-  /** With kind `status`: sets the words and the colour. */
-  status?: BadgeStatus;
-  /** With kind `tag`: the colour. */
-  tone?: BadgeTone;
-  /** With kind `tag`: the code font, for file types and branch names. */
-  mono?: boolean;
-  /** With kind `tag`: an icon before the words. */
-  icon?: ReactNode;
-  /** The words. Kinds `unsaved` and `status` have their own default words. */
-  children?: ReactNode;
-  /** The number for kinds `count`, `number` and `errors`. A `count` of 0 renders nothing. */
-  count?: number;
-  /** The words screen readers hear, also shown on hover. Set it on every `count` and `dot`. */
-  srLabel?: string;
+type SpanProps = Omit<ComponentProps<'span'>, 'children'> & {
   /** Pushes the badge to the end of its row. */
   end?: boolean;
-  /** With kind `count`: sits in the top corner of an icon button, hidden from screen readers. */
-  corner?: boolean;
 };
 
-/** A small pill for state, counts and tags: Unsaved, Published, a file type, a number of errors. */
-function Badge({
-  kind = 'unsaved',
-  status = 'published',
-  tone = 'neutral',
-  mono = false,
-  icon,
-  children,
-  count,
-  srLabel,
-  end = false,
-  corner = false,
-  className,
-  ...props
-}: BadgeProps) {
-  const srOnly =
-    srLabel && !corner ? <span className='sr-only'>{srLabel}</span> : null;
-
-  if (kind === 'dot') {
-    return (
-      <>
-        <span
-          data-slot='badge'
-          title={srLabel}
-          aria-hidden={srLabel ? undefined : true}
-          className={cn(dotVariants({ end }), className)}
-          {...props}
-        />
-        {srOnly}
-      </>
-    );
-  }
-
-  if (kind === 'count' && !count) return null;
-
-  const classes = cn(
-    badgeVariants({
-      kind,
-      tone:
-        kind === 'status'
-          ? STATUS[status].tone
-          : kind === 'tag'
-            ? tone
-            : 'none',
-      mono: kind === 'tag' && mono,
-      corner: kind === 'count' && corner,
-      end,
-    }),
-    className
+/** Each kind takes only the props it uses. */
+type BadgeProps = SpanProps &
+  (
+    | { kind?: 'unsaved'; children?: ReactNode }
+    | { kind: 'status'; status: BadgeStatus; children?: ReactNode }
+    | {
+        kind: 'tag';
+        tone?: BadgeTone;
+        /** The code font, for file types and branch names. */
+        mono?: boolean;
+        icon?: ReactNode;
+        children: ReactNode;
+      }
+    | { kind: 'label'; children: ReactNode }
+    /** In the corner of an icon button, hidden from screen readers: put the number in the button's name. 0 renders nothing. */
+    | { kind: 'count'; count?: number; corner: true }
+    /** Inline, so screen readers need words such as "3 unsaved changes". 0 renders nothing. */
+    | { kind: 'count'; count?: number; corner?: false; srLabel: string }
+    | { kind: 'number'; count: number }
+    /** Without `srLabel` it is hidden from screen readers, for a row that already says it. */
+    | { kind: 'errors'; count: number; srLabel?: string }
+    | { kind: 'dot'; srLabel?: string }
   );
 
-  const content = (() => {
-    switch (kind) {
-      case 'count':
-        return (
-          <>
-            <span aria-hidden='true'>{count}</span>
-            {srOnly}
-          </>
-        );
-      case 'number':
-        return count;
-      case 'errors':
-        return (
-          <>
-            <Icon glyph='error' size={12} />
-            <span aria-hidden='true'>{count}</span>
-            {srOnly}
-          </>
-        );
-      case 'status':
-        return (
-          <>
-            <span
-              aria-hidden='true'
-              className='inline-block size-1.5 flex-none rounded-full bg-current'
-            />
-            {children ?? STATUS[status].text}
-          </>
-        );
-      case 'unsaved':
-        return (
-          <>
-            <span aria-hidden='true' className={dotVariants()} />
-            {children ?? 'Unsaved'}
-          </>
-        );
-      default:
-        return (
-          <>
-            {kind === 'tag' ? icon : null}
-            {children}
-          </>
-        );
-    }
-  })();
+type PillProps = SpanProps & {
+  variant: Omit<VariantProps<typeof badgeVariants>, 'end'>;
+  children?: ReactNode;
+};
 
+function Pill({ variant, end = false, className, ...props }: PillProps) {
   return (
     <span
       data-slot='badge'
-      title={kind === 'count' ? srLabel : undefined}
-      aria-hidden={
-        (kind === 'count' && corner) || (kind === 'errors' && !srLabel)
-          ? true
-          : undefined
-      }
-      className={classes}
+      className={cn(badgeVariants({ ...variant, end }), className)}
       {...props}
-    >
-      {content}
-    </span>
+    />
   );
 }
+
+const srOnly = (label?: string) =>
+  label ? <span className='sr-only'>{label}</span> : null;
+
+/** A small pill for state, counts and tags: Unsaved, Published, a file type, a number of errors. */
+function Badge(props: BadgeProps) {
+  switch (props.kind) {
+    case 'dot': {
+      const { kind: _kind, srLabel, end = false, className, ...rest } = props;
+      return (
+        <>
+          <span
+            data-slot='badge'
+            title={srLabel}
+            aria-hidden={srLabel ? undefined : true}
+            className={cn(dotVariants({ end }), className)}
+            {...rest}
+          />
+          {srOnly(srLabel)}
+        </>
+      );
+    }
+    case 'status': {
+      const { kind, status, children, ...rest } = props;
+      return (
+        <Pill variant={{ kind, tone: STATUS[status].tone }} {...rest}>
+          <span
+            aria-hidden='true'
+            className='inline-block size-1.5 flex-none rounded-full bg-current'
+          />
+          {children ?? STATUS[status].text}
+        </Pill>
+      );
+    }
+    case 'tag': {
+      const {
+        kind,
+        tone = 'neutral',
+        mono = false,
+        icon,
+        children,
+        ...rest
+      } = props;
+      return (
+        <Pill variant={{ kind, tone, mono }} {...rest}>
+          {icon}
+          {children}
+        </Pill>
+      );
+    }
+    case 'label': {
+      const { kind, ...rest } = props;
+      return <Pill variant={{ kind, tone: 'none' }} {...rest} />;
+    }
+    case 'count': {
+      if (!props.count) return null;
+      if (props.corner === true) {
+        const { kind, count, corner, ...rest } = props;
+        return (
+          <Pill variant={{ kind, tone: 'none', corner }} aria-hidden {...rest}>
+            {count}
+          </Pill>
+        );
+      }
+      const { kind, count, corner: _corner, srLabel, ...rest } = props;
+      return (
+        <Pill variant={{ kind, tone: 'none' }} title={srLabel} {...rest}>
+          <span aria-hidden='true'>{count}</span>
+          {srOnly(srLabel)}
+        </Pill>
+      );
+    }
+    case 'number': {
+      const { kind, count, ...rest } = props;
+      return (
+        <Pill variant={{ kind, tone: 'none' }} {...rest}>
+          {count}
+        </Pill>
+      );
+    }
+    case 'errors': {
+      const { kind, count, srLabel, ...rest } = props;
+      return (
+        <Pill
+          variant={{ kind, tone: 'none' }}
+          aria-hidden={srLabel ? undefined : true}
+          {...rest}
+        >
+          <Icon glyph='error' size={12} />
+          <span aria-hidden='true'>{count}</span>
+          {srOnly(srLabel)}
+        </Pill>
+      );
+    }
+    default: {
+      const { kind: _kind, children, ...rest } = props;
+      return (
+        <Pill variant={{ kind: 'unsaved', tone: 'none' }} {...rest}>
+          <span aria-hidden='true' className={dotVariants()} />
+          {children ?? 'Unsaved'}
+        </Pill>
+      );
+    }
+  }
+}
+
+type BadgeKind = NonNullable<BadgeProps['kind']>;
 
 export type { BadgeKind, BadgeProps, BadgeStatus, BadgeTone };
 export { Badge, badgeVariants };

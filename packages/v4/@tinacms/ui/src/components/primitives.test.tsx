@@ -9,7 +9,9 @@ import { KbdShortcut, keyShortcuts } from '@tinacms/ui/components/kbd';
 
 describe('Badge', () => {
   it('renders nothing for a count of 0', () => {
-    const { container } = render(<Badge kind='count' count={0} />);
+    const { container } = render(
+      <Badge kind='count' count={0} srLabel='No changes' />
+    );
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -21,6 +23,15 @@ describe('Badge', () => {
   it('announces an error count only through its srLabel', () => {
     render(<Badge kind='errors' count={3} srLabel='3 errors' />);
     expect(screen.getByText('3 errors')).toBeInTheDocument();
+  });
+
+  it('rejects props that do nothing for a kind', () => {
+    // @ts-expect-error a status badge picks its own colour
+    void (<Badge kind='status' status='failed' tone='danger' />);
+    // @ts-expect-error an inline count needs words for screen readers
+    void (<Badge kind='count' count={3} />);
+    // @ts-expect-error only tags take the code font
+    void (<Badge kind='label' mono children='Draft' />);
   });
 
   it('defaults an unsaved badge to "Unsaved"', () => {

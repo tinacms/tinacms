@@ -1,4 +1,5 @@
-import { Badge, type BadgeProps } from '@tinacms/ui/components/badge';
+import { Badge } from '@tinacms/ui/components/badge';
+import type { ReactNode } from 'react';
 import { useFormId } from '../editor/hooks';
 import {
   type FormId,
@@ -6,21 +7,18 @@ import {
   useFormStatus,
 } from '../form/form-store';
 
-const STATUS_BADGES: Record<FormStatus, Pick<BadgeProps, 'kind' | 'tone'>> = {
-  pristine: { kind: 'label' },
-  dirty: { kind: 'unsaved' },
-  clean: { kind: 'tag', tone: 'success' },
-};
-
-const STATUS_LABELS: Record<FormStatus, string> = {
-  pristine: 'No changes',
-  dirty: 'Unsaved',
-  clean: 'Saved',
+const STATUS_BADGES: Record<FormStatus, ReactNode> = {
+  pristine: <Badge kind='label'>No changes</Badge>,
+  dirty: <Badge kind='unsaved' />,
+  clean: (
+    <Badge kind='tag' tone='success'>
+      Saved
+    </Badge>
+  ),
 };
 
 export function FormStatusBadge({ formId }: { formId: FormId }) {
-  const status = useFormStatus(formId);
-  return <Badge {...STATUS_BADGES[status]}>{STATUS_LABELS[status]}</Badge>;
+  return STATUS_BADGES[useFormStatus(formId)];
 }
 
 export function DocumentStatus() {
