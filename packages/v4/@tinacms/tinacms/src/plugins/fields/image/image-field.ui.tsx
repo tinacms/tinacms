@@ -213,7 +213,7 @@ export function ImageField() {
           <Button
             ref={mainButtonRef}
             type='button'
-            variant='outline'
+            variant='toolbar'
             size='sm'
             disabled={uploading}
             onClick={choose}
@@ -236,7 +236,7 @@ export function ImageField() {
               <span
                 className={cn(
                   buttonVariants({ variant: 'ghost', size: 'sm' }),
-                  'peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50'
+                  'peer-focus:shadow-focus-ring peer-disabled:cursor-not-allowed peer-disabled:opacity-50'
                 )}
               >
                 {uploading ? 'Uploading…' : 'Upload'}

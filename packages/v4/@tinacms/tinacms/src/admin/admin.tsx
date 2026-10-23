@@ -265,10 +265,10 @@ function PreviewSlot({ preview }: { preview?: ReactNode }) {
 function FormColumnSkeleton() {
   return (
     <div role='status' aria-label='Loading document' className='space-y-4'>
-      <Skeleton className='h-5 w-2/3' />
-      <Skeleton className='h-8 w-full' />
-      <Skeleton className='h-5 w-1/3' />
-      <Skeleton className='h-40 w-full' />
+      <Skeleton className='w-2/3' />
+      <Skeleton shape='block' className='h-8' />
+      <Skeleton className='w-1/3' />
+      <Skeleton shape='block' className='h-40' />
     </div>
   );
 }

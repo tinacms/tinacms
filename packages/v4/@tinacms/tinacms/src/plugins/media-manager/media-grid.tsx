@@ -33,8 +33,8 @@ const tileLabel = (name: string, isNew: boolean) =>
 
 function NewBadge() {
   return (
-    <Badge className='absolute top-2 right-2 z-10 bg-green-100 text-[10px] font-bold tracking-wide text-green-700'>
-      NEW
+    <Badge kind='tag' tone='info' className='absolute top-2 right-2 z-10'>
+      New
     </Badge>
   );
 }
