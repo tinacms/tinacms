@@ -6,7 +6,7 @@ import {
   isProviderRefusalError,
 } from '../core/content/contract';
 import { isHookRejectedError } from '../core/form/hooks';
-import { RequestBodyTooLargeError } from '../core/request-body';
+import { isRequestBodyTooLargeError } from '../core/request-body';
 
 // Every response that is not a 2xx holds `{ error: { code, message } }`. The
 // specification in tinacmsv4 plans/007 records the code table, until the ADR for the
@@ -46,7 +46,7 @@ export const toErrorResponse = (cause: unknown, label: string): Response => {
   if (isContentWriteError(cause)) {
     return errorResponse(400, CONTENT_REFUSALS.writeRefused, cause.message);
   }
-  if (cause instanceof RequestBodyTooLargeError) {
+  if (isRequestBodyTooLargeError(cause)) {
     return errorResponse(413, 'body-too-large', cause.message);
   }
   console.error(`[tinacms] ${label} failed:`, cause);

@@ -30,14 +30,15 @@ import {
   type ResolvedServerSegment,
   type ServerOp,
   type ServerSegment,
-  type ServerRuntime,
   type Session,
-  opMeta,
   requestContext,
-  requestContextStorage,
-  requiringPermissions,
-  serverRuntimeStorage,
 } from '../server';
+import { opMeta, requiringPermissions } from '../server/op-meta';
+import {
+  type ServerRuntime,
+  requestContextStorage,
+  serverRuntimeStorage,
+} from '../server/runtime-storage';
 import { errorResponse, toErrorResponse } from './error-response';
 
 export type RpcHandler = ((request: Request) => Promise<Response>) & {

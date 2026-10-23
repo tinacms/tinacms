@@ -2,14 +2,11 @@
 // Imported by plugin server segments and by per-framework adapters.
 // Never reaches the browser bundle.
 
-import { AsyncLocalStorage } from 'node:async_hooks';
 import type { AuthTransportHooks, Session } from '../core/auth/contract';
 import { CONTENT_SAVE_PERMISSION } from '../core/content/contract';
 import { invariant } from '../core/invariant';
-import {
-  type RequestContext,
-  bindRequestContextStore,
-} from './request-context';
+import { tagOp } from './op-meta';
+import { serverRuntimeStorage } from './runtime-storage';
 import type {
   ResolvedServerSegment,
   ServerOp,
@@ -55,33 +52,6 @@ export const DEFAULT_ROLE_PERMISSIONS: Readonly<
   })
 );
 
-// Op-level authorization marks (ADR-008): bare handlers are protected by default;
-// `publicOp` is the only unauthenticated opt-out (greppable); `protectedOp` names the
-// required permission (`string` until codegen builds the typed union). Wrapping, not
-// mutating, so one handler under two wrappers can't cross-tag; `Symbol.for`, so
-// duplicate module copies still agree on the tag.
-const OP_META = Symbol.for('tinacms.op-meta');
-
-interface OpMeta {
-  public?: true;
-  permissions: readonly string[];
-}
-
-interface TaggedOp {
-  [OP_META]?: OpMeta;
-}
-
-const tagOp = <TOp extends ServerOp>(handler: TOp, meta: OpMeta): TOp => {
-  invariant(
-    (handler as TaggedOp)[OP_META] === undefined,
-    'op-already-tagged',
-    'This handler already carries an authorization mark; wrap the bare handler instead.'
-  );
-  const wrapped = ((input: never) => handler(input)) as TOp & TaggedOp;
-  wrapped[OP_META] = meta;
-  return wrapped;
-};
-
 export const publicOp = <TOp extends ServerOp>(handler: TOp): TOp =>
   tagOp(handler, { public: true, permissions: [] });
 
@@ -89,34 +59,6 @@ export const protectedOp = <TOp extends ServerOp>(
   opts: { permission: string },
   handler: TOp
 ): TOp => tagOp(handler, { permissions: [opts.permission] });
-
-// Internal: core's content save requires `content:save` and every permission
-// the provider's own `update` required.
-export const requiringPermissions = <TOp extends ServerOp>(
-  permissions: readonly string[],
-  handler: TOp
-): TOp => tagOp(handler, { permissions });
-
-export const opMeta = (handler: ServerOp): OpMeta =>
-  (handler as TaggedOp)[OP_META] ?? { permissions: [] };
-
-// The composed server runtime (built once per handler, rpc/handler.ts): segments by
-// mount namespace, plus the auth hooks claimed at compose — `null` fails closed.
-export interface ServerRuntime {
-  segmentsByNamespace: Map<string, ResolvedServerSegment>;
-  authHooks: AuthTransportHooks | null;
-  authProvider: string | undefined;
-  // The teardown from initializePlugins. It runs every onDestroy that its matching
-  // onInit paired with, and a second call destroys nothing.
-  destroy: () => Promise<void>;
-}
-
-// Carries the runtime across a dispatch so the module-level `use()` resolves against
-// the handler that dispatched it — safe under interleaved requests.
-export const serverRuntimeStorage = new AsyncLocalStorage<ServerRuntime>();
-
-export const requestContextStorage = new AsyncLocalStorage<RequestContext>();
-bindRequestContextStore(() => requestContextStorage.getStore());
 
 // Server→server in-process capability accessor (ADR-007) — `use('content').listAll()`.
 // Typed per-capability contracts arrive with ADR-019/021/022; until then callers cast.

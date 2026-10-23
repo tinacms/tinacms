@@ -76,15 +76,24 @@ To find a collection's hooks, the RPC handler needs the config's `schema` (`moun
 ### 5. `reject(message)` is how a hook talks to the editor
 `reject(message)` is the only way a hook's message reaches the editor. It throws a `HookRejectedError`, and the Backend answers 422 with `{ error: { code: 'hook-rejected', message } }`. The provider is never called. The admin raises a `ContentError` with code `hook-rejected` that shows the hook's message, and the form stays dirty.
 
+A provider's own write can refuse a save with a known content error. It answers with that code and the provider's user-facing message, and the admin raises a `ContentError` with the same code:
+
+| Status | Codes |
+|---|---|
+| 401 | `unauthorized` |
+| 403 | `forbidden` |
+| 422 | `not-found`, `branch-not-found`, `not-indexed`, `validation` |
+| 502 | `network` |
+
 Any other throw is a generic 500 (`op-failed`, "Operation failed."). The message is kept out of the response body, so internal errors never reach the browser.
 
 A successful save answers `{ entry, hookWarnings }`. An `afterSave` throw is logged and does not undo the save. Instead, `hookWarnings` gets one line per failed hook, and the admin raises the `AfterSaveHookError` that ADR-025 §6 defines.
 
 ### 6. No server runtime means no saves to server-hooked collections
-A site with no server runtime has no Backend to run the hooks. A save to a server-hooked collection then fails with a `ContentError` with code `server-route-missing`: "This collection has server hooks, so it needs the site's server route." Core raises it when the route answers 404 or 405, answers with something other than JSON, or can't be reached. Core never falls back to a direct write, because that would skip the hooks without telling anyone.
+A site with no server runtime has no Backend to run the hooks. A save to a server-hooked collection then fails with a `ContentError` with code `server-route-missing`: "This collection has server hooks, so it needs the site's server route." Core raises it when the route answers 404 or 405, or answers with something other than JSON. A fetch that fails before any answer, such as when the browser is offline or DNS fails, raises `network` instead. Core never falls back to a direct write, because that would skip the hooks without telling anyone.
 
 ### 7. Local dev runs the same hooks
-When `localContentPlugin()` provides `content`, the Local Data Layer's Vite plugin serves `POST /api/tina/content/update` itself. It does not mount the RPC handler, which refuses every op without an auth plugin, and local dev usually runs without one. The route runs the same hook pipeline and then writes the file, inside the same runtime and request contexts as a dispatched op, so a hook can call `use()` and `requestContext()` there too. When an auth plugin is installed, the route requires `content:save`. Without one, hooks receive a `null` session. A developer can test a server hook locally. Local dev is not the reason for this design. Production is.
+When `localContentPlugin()` provides `content`, the Local Data Layer's Vite plugin serves `POST /api/tina/content/update` itself. It does not mount the RPC handler, which refuses every op without an auth plugin, and local dev usually runs without one. The route runs the same hook pipeline and then writes the file, inside the same runtime and request contexts as a dispatched op, so a hook can call `use()` and `requestContext()` there too. It does not run plugins' `onInit`. `use('content').update` there is the provider's raw op, without the hook wrapper, because the Local Data Layer is not a mounted server segment. When an auth plugin is installed, the route requires `content:save`. Without one, hooks receive a `null` session. A developer can test a server hook locally. Local dev is not the reason for this design. Production is.
 
 ### 8. Known gap: direct writes to TinaCloud skip the hooks
 The editor's token can still write to TinaCloud directly. Until TinaCloud requires a project server secret for writes to hooked collections, a request written by hand straight to TinaCloud skips the hooks. Only the site server would hold that secret, never an editor.
