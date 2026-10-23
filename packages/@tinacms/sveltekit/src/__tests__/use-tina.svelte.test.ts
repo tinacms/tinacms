@@ -22,7 +22,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  if (parentDescriptor) Object.defineProperty(window, 'parent', parentDescriptor);
+  if (parentDescriptor)
+    Object.defineProperty(window, 'parent', parentDescriptor);
   document.body.innerHTML = '';
 });
 
