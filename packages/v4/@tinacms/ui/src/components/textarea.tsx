@@ -1,6 +1,6 @@
 import type * as React from 'react';
 
-import { fieldVariants } from '@tinacms/ui/components/input';
+import { fieldVariants } from '@tinacms/ui/lib/field-styles';
 import { cn } from '@tinacms/ui/lib/utils';
 
 function Textarea({

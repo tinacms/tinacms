@@ -3,13 +3,22 @@ import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { cva } from 'class-variance-authority';
 import { type ComponentProps, useState } from 'react';
 
+import type { LucideIcon } from 'lucide-react';
+
+import { type Glyph, Icon } from '@tinacms/ui/components/icon';
 import { cn } from '@tinacms/ui/lib/utils';
 
-type SegmentedOption<T extends string> = { value: T; label: string };
+type SegmentedOption<T extends string> = {
+  value: T;
+  /** The choice's name. With `iconOnly`, screen readers read it; it is not shown. */
+  label: string;
+  icon?: Glyph | LucideIcon;
+  iconOnly?: boolean;
+};
 
 const segmentVariants = cva(
   [
-    'h-9 min-w-20 cursor-pointer rounded-full border-0 bg-transparent px-3.5 font-sans text-base leading-control font-medium text-muted-foreground-strong outline-none transition-[background-color,color,box-shadow]',
+    'inline-flex h-9 min-w-20 cursor-pointer items-center justify-center gap-1.5 rounded-full border-0 bg-transparent px-3.5 font-sans text-base leading-control font-medium text-muted-foreground-strong outline-none transition-[background-color,color,box-shadow]',
     'hover:text-foreground data-pressed:bg-card data-pressed:text-foreground data-pressed:shadow-segment',
     'focus:shadow-focus-ring data-pressed:focus:shadow-focus-ring',
     'disabled:cursor-not-allowed disabled:opacity-45',
@@ -17,8 +26,13 @@ const segmentVariants = cva(
   {
     variants: {
       size: { md: '', sm: 'h-7 min-w-0 px-3 text-sm' },
+      iconOnly: { true: 'min-w-0 px-0', false: '' },
     },
-    defaultVariants: { size: 'md' },
+    compoundVariants: [
+      { size: 'md', iconOnly: true, className: 'w-9' },
+      { size: 'sm', iconOnly: true, className: 'w-7' },
+    ],
+    defaultVariants: { size: 'md', iconOnly: false },
   }
 );
 
@@ -71,9 +85,16 @@ function Segmented<T extends string>({
         <Toggle
           key={option.value}
           value={option.value}
-          className={segmentVariants({ size })}
+          aria-label={option.iconOnly ? option.label : undefined}
+          className={segmentVariants({
+            size,
+            iconOnly: option.iconOnly ?? false,
+          })}
         >
-          {option.label}
+          {option.icon ? (
+            <Icon glyph={option.icon} size={16} className='size-4' />
+          ) : null}
+          {option.iconOnly ? null : option.label}
         </Toggle>
       ))}
     </ToggleGroup>

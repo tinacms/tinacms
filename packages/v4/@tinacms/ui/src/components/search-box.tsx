@@ -11,7 +11,10 @@ import {
 import { KbdShortcut, keyShortcuts } from '@tinacms/ui/components/kbd';
 import { cn } from '@tinacms/ui/lib/utils';
 
-type SearchBoxProps = Omit<ComponentProps<'input'>, 'size' | 'type'> & {
+type SearchBoxProps = Omit<
+  ComponentProps<'input'>,
+  'size' | 'type' | 'value' | 'defaultValue'
+> & {
   /** What the box searches, such as "Search titles". Screen readers read it; it is not shown. */
   label: string;
   /** Defaults to the label. */
@@ -21,9 +24,14 @@ type SearchBoxProps = Omit<ComponentProps<'input'>, 'size' | 'type'> & {
   size?: 'md' | 'sm';
   /** Keys shown at the end, such as `/` or `⌘K`. */
   shortcut?: string;
-  /** Shows a Clear button while the box has a value. */
-  onClear?: () => void;
-};
+} & (
+    | {
+        value: string;
+        /** Shows a Clear button while the box has a value. */
+        onClear?: () => void;
+      }
+    | { value?: undefined; defaultValue?: string; onClear?: never }
+  );
 
 /**
  * The admin's search and filter box. Content that an editor writes is a
@@ -43,7 +51,6 @@ function SearchBox({
 }: SearchBoxProps) {
   const autoId = useId();
   const inputId = id ?? autoId;
-  const hasValue = value !== undefined && String(value) !== '';
   return (
     <div
       data-slot='search-box'
@@ -59,7 +66,6 @@ function SearchBox({
         <InputGroupInput
           id={inputId}
           type='search'
-          size={size}
           value={value}
           autoComplete='off'
           spellCheck={false}
@@ -68,7 +74,7 @@ function SearchBox({
           className='[&::-webkit-search-cancel-button]:hidden'
           {...props}
         />
-        {onClear && hasValue ? (
+        {onClear && value ? (
           <InputGroupAddon align='inline-end'>
             <InputGroupButton
               size='icon-xs'

@@ -1,4 +1,3 @@
-import { Button } from '@tinacms/ui/components/button';
 import {
   Select,
   SelectContent,
@@ -8,11 +7,14 @@ import {
 } from '@tinacms/ui/components/select';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import {
+  Segmented,
+  type SegmentedOption,
+} from '@tinacms/ui/components/segmented';
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@tinacms/ui/components/tooltip';
-import { cn } from '@tinacms/ui/lib/utils';
 import {
   FileIcon,
   FolderIcon,
@@ -32,11 +34,10 @@ import {
   acceptEntryLabel,
 } from './media-types';
 
-const segmentClass = (active: boolean) =>
-  cn(
-    'rounded-none border-0 first:rounded-l-sm last:rounded-r-sm [&:not(:first-child)]:border-l',
-    active ? 'bg-background text-primary' : 'bg-muted/50 text-muted-foreground'
-  );
+const VIEW_MODE_OPTIONS = [
+  { value: 'grid', label: 'Grid view', icon: LayoutGridIcon, iconOnly: true },
+  { value: 'list', label: 'List view', icon: ListIcon, iconOnly: true },
+] as const satisfies readonly SegmentedOption<MediaViewMode>[];
 
 export function ViewModeToggle({
   value,
@@ -46,32 +47,22 @@ export function ViewModeToggle({
   onChange: (value: MediaViewMode) => void;
 }) {
   return (
-    <div role='group' aria-label='View' className='flex rounded-sm border'>
-      <Button
-        type='button'
-        variant='icon'
-        size='sm'
-        aria-label='Grid view'
-        aria-pressed={value === 'grid'}
-        className={segmentClass(value === 'grid')}
-        onClick={() => onChange('grid')}
-      >
-        <LayoutGridIcon className='size-4' />
-      </Button>
-      <Button
-        type='button'
-        variant='icon'
-        size='sm'
-        aria-label='List view'
-        aria-pressed={value === 'list'}
-        className={segmentClass(value === 'list')}
-        onClick={() => onChange('list')}
-      >
-        <ListIcon className='size-4' />
-      </Button>
-    </div>
+    <Segmented
+      aria-label='View'
+      size='sm'
+      options={VIEW_MODE_OPTIONS}
+      value={value}
+      onValueChange={onChange}
+    />
   );
 }
+
+const KIND_ICONS = { all: undefined, folders: FolderIcon, files: FileIcon };
+
+const KIND_OPTIONS = MEDIA_KIND_OPTIONS.map((option) => ({
+  ...option,
+  icon: KIND_ICONS[option.value],
+}));
 
 export function MediaKindToggle({
   value,
@@ -81,25 +72,13 @@ export function MediaKindToggle({
   onChange: (value: MediaKindFilter) => void;
 }) {
   return (
-    <div role='group' aria-label='Show' className='flex rounded-sm border'>
-      {MEDIA_KIND_OPTIONS.map((option) => (
-        <Button
-          key={option.value}
-          type='button'
-          variant='ghost'
-          aria-pressed={value === option.value}
-          className={segmentClass(value === option.value)}
-          onClick={() => onChange(option.value)}
-        >
-          {option.value === 'folders' ? (
-            <FolderIcon className='size-4' />
-          ) : option.value === 'files' ? (
-            <FileIcon className='size-4' />
-          ) : null}
-          {option.label}
-        </Button>
-      ))}
-    </div>
+    <Segmented
+      aria-label='Show'
+      size='sm'
+      options={KIND_OPTIONS}
+      value={value}
+      onValueChange={onChange}
+    />
   );
 }
 
@@ -150,7 +129,11 @@ export function MediaTypeFilter({
     >
       <SelectTrigger
         aria-label='File type'
-        className={value === 'all' ? undefined : 'border-primary text-primary'}
+        className={
+          value === 'all'
+            ? undefined
+            : 'border-primary text-primary hover:border-primary data-popup-open:border-primary'
+        }
       >
         <SelectValue />
       </SelectTrigger>
