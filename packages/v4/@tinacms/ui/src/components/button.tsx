@@ -79,33 +79,26 @@ const ICON_SIZE = { 12: 'size-3', 16: 'size-4', 19: 'size-4.75' } as const;
 type IconPixels = keyof typeof ICON_SIZE;
 
 type ButtonProps = Omit<ButtonPrimitive.Props, 'children'> & {
-  /** `primary` (one per screen), `secondary`, `toolbar`, `ghost`, `inverse` (on a dark bar), `icon`, `icon-inverse` or `destructive`. */
   variant?: ButtonVariant;
-  /** `md` is 36px high, `sm` is 32px. Toolbar and ghost buttons are always 32px. */
   size?: ButtonSize;
-  /** The words. On an icon button, words become its accessible name; an element such as an svg renders as is. */
+  /** On an icon button, string children become its accessible name. */
   children?: ReactNode;
-  /** An icon before the words: a named glyph or any lucide icon. */
   icon?: Glyph | LucideIcon;
-  /** An icon after the words. `chevron-down` stays small, for a button that opens a menu. Not on icon buttons. */
   iconEnd?: Glyph | LucideIcon;
-  /** The look for the screen or panel that is open. Pair it with `aria-pressed` or `aria-current`. */
+  /** Pair it with `aria-pressed` or `aria-current`. */
   selected?: boolean;
   full?: boolean;
-  /** The amber dot before the words, for a button that leads to unsaved work. Not on icon buttons. */
   dot?: boolean;
-  /** The words in the code font, such as a branch name. */
   mono?: boolean;
-  /** Keyboard keys after the words, such as `⌘K`. Not on icon buttons. */
   shortcut?: string;
-  /** The amber count in the corner of an icon button, shown from 1. Put the number in the button's name too. */
+  /** Shown from 1. Put the number in the button's name too. */
   count?: number;
 };
 
 /**
- * Every button in the admin. Base UI handles the keyboard; focus, by click or by keyboard,
- * draws the orange ring with a soft glow. An icon button needs a name: string `children` or `aria-label`.
- * For a link, style an `<a>` with `buttonVariants({ variant })`; this component is always a button.
+ * Every button in the admin. Focus, by click or by keyboard, draws the orange ring.
+ * An icon button needs a name, and ignores `iconEnd`, `dot` and `shortcut`.
+ * For a link, style an `<a>` with `buttonVariants({ variant })`.
  */
 function Button({
   variant = 'secondary',
