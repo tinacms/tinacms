@@ -1,6 +1,6 @@
 import type { ResolvedConfig, TinaSchema } from '../config';
 import { fieldConflictError, overridesFieldKey } from '../core/field/registry';
-import { hookConflictError, overridesHookKey } from '../core/form/hooks';
+import { hookProvidersOf } from '../core/form/hooks';
 import { invariant } from '../core/invariant';
 import { composeOverridableRegistry } from '../core/overridable-registry';
 import { scalarItemOf } from '../core/schema/children';
@@ -93,18 +93,7 @@ const usedValidators = (collections: CollectionSchema[]): string[] => [
 ];
 
 const registeredHooksOf = (plugins: PluginManifest[]): Set<string> =>
-  new Set(
-    composeOverridableRegistry(
-      plugins.flatMap((plugin) =>
-        (plugin.hooks ?? []).map((name) => ({
-          key: name,
-          value: plugin,
-          isOverride: overridesHookKey(plugin, name),
-        }))
-      ),
-      hookConflictError
-    ).keys()
-  );
+  new Set(hookProvidersOf(plugins).keys());
 
 const usedHooks = (collections: CollectionSchema[]): string[] => [
   ...new Set(

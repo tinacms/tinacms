@@ -296,7 +296,7 @@ describe('MediaBrowser upload', () => {
     );
     expect(provider.upload).toHaveBeenCalledWith(expect.any(File), '');
     const tile = await fileTile('new.png (new)');
-    expect(within(tile).getByText('NEW')).toBeVisible();
+    expect(within(tile).getByText('New')).toBeVisible();
     expect(
       within(screen.getByRole('list', { name: 'Files' })).getAllByRole(
         'button'

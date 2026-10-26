@@ -14,6 +14,8 @@ import {
   SidebarTrigger,
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
+import { Toaster } from '@tinacms/ui/components/sonner';
+import tinaLogo from '@tinacms/ui/assets/tinacms-logo.svg';
 import {
   type CSSProperties,
   type ReactNode,
@@ -264,10 +266,10 @@ function PreviewSlot({ preview }: { preview?: ReactNode }) {
 function FormColumnSkeleton() {
   return (
     <div role='status' aria-label='Loading document' className='space-y-4'>
-      <Skeleton className='h-5 w-2/3' />
-      <Skeleton className='h-8 w-full' />
-      <Skeleton className='h-5 w-1/3' />
-      <Skeleton className='h-40 w-full' />
+      <Skeleton className='w-2/3' />
+      <Skeleton shape='block' className='h-8' />
+      <Skeleton className='w-1/3' />
+      <Skeleton shape='block' className='h-40' />
     </div>
   );
 }
@@ -334,6 +336,7 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
             <AdminShell preview={preview} />
           </AuthGate>
         </HashRouter>
+        <Toaster />
       </TinaProvider>
     </AdminErrorBoundary>
   );
@@ -379,9 +382,7 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton onClick={() => navigate(COLLECTIONS_ROUTE)}>
-                <span className='text-xs font-semibold tracking-wide uppercase'>
-                  TinaCMS
-                </span>
+                <img src={tinaLogo} alt='TinaCMS' className='h-5 w-auto' />
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

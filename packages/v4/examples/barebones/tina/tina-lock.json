@@ -12,6 +12,9 @@
             "name": "trimTitle"
           },
           {
+            "name": "slug"
+          },
+          {
             "name": "logSave",
             "args": [
               "saved"
@@ -34,6 +37,11 @@
                 ]
               }
             ],
+            "type": "string"
+          },
+          {
+            "name": "slug",
+            "label": "Slug",
             "type": "string"
           },
           {

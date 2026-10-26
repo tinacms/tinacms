@@ -7,12 +7,13 @@ const VERIFY_TIMEOUT_MS = 10_000;
 
 const BEARER = /^Bearer (\S+)$/i;
 
+export const bearerTokenOf = (request: Request): string | undefined =>
+  BEARER.exec(request.headers.get('authorization') ?? '')?.[1];
+
 export const createTinaCloudAuthServer = ({ clientId }: TinaCloudOptions) =>
   ({
     getSession: async (request: Request): Promise<Session | null> => {
-      const token = BEARER.exec(
-        request.headers.get('authorization') ?? ''
-      )?.[1];
+      const token = bearerTokenOf(request);
       if (!token) return null;
       try {
         const identity = await fetchProjectIdentity(

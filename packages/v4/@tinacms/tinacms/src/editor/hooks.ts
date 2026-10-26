@@ -17,10 +17,10 @@ import type { AuthSlice } from '../core/auth/contract';
 import { authSliceOf, siteAuthTokenOf } from '../core/auth/slice';
 import type { ContentSlice } from '../core/content/contract';
 import type { MediaSlice } from '../core/media/contract';
-import type { FieldAddress } from '../core/field/address';
+import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
 import { runAfterSave, runBeforeSave } from '../core/form/hooks';
-import { digestDocument } from '../core/form/ingest';
+import { digestDocument, ingestDocument } from '../core/form/ingest';
 import { invariant } from '../core/invariant';
 import type { SliceState, TinaStoreState } from '../core/plugin';
 import type {
@@ -28,7 +28,12 @@ import type {
   FieldSchema,
   TinaDocument,
 } from '../core/schema/types';
-import { type FormId, toFormValues, useFormStore } from '../form/form-store';
+import {
+  type FormId,
+  type FormValues,
+  toFormValues,
+  useFormStore,
+} from '../form/form-store';
 import {
   type RpcClientConfig,
   type RpcProxy,
@@ -165,7 +170,18 @@ export function useDocumentPath(): string {
 
 export function useFormSeedKey(): string {
   return useFormScope('form-seed-key-outside-provider', 'useFormSeedKey')
-    .seedKey;
+    .fieldSeedKey;
+}
+
+export function useSaveFailure(): [
+  string | null,
+  (message: string | null) => void,
+] {
+  const { saveFailure, setSaveFailure } = useFormScope(
+    'save-failure-outside-provider',
+    'useSaveFailure'
+  );
+  return [saveFailure, setSaveFailure];
 }
 
 export function useDiscardEdits(): () => void {
@@ -214,34 +230,74 @@ export class AfterSaveHookError extends Error {
   }
 }
 
+// The stored document becomes the baseline. A field the save changed takes the
+// stored value, unless the editor changed it again while the save ran. Returns
+// the fields it wrote, or null when the save changed nothing.
+const adoptSavedValues = (
+  formId: FormId,
+  submitted: FormValues,
+  saved: FormValues,
+  setValue: (address: FieldAddress, value: unknown) => void
+): FieldAddress[] | null => {
+  const store = useFormStore.getState();
+  const open = store.forms[formId];
+  if (!open) return null;
+  const changed = Object.keys(saved)
+    .map(toFieldAddress)
+    .filter(
+      (address) => !open.equal(address, submitted[address], saved[address])
+    );
+  if (changed.length === 0) return null;
+  const written = changed.filter((address) =>
+    open.equal(address, open.values[address], submitted[address])
+  );
+  for (const address of written) {
+    store.setFieldValue(formId, address, saved[address]);
+    setValue(address, saved[address]);
+  }
+  store.markSaved(formId, saved);
+  return written;
+};
+
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
-  const { getValues, trigger } = useFormContext<TinaDocument>();
+  const { getValues, trigger, setValue } = useFormContext<TinaDocument>();
   return useCallback(async () => {
-    const { formId, path, collection, onSave, hooks } = scope;
+    const { formId, path, collection, onSave, hooks, reseedFields } = scope;
     // Validate every field, not only the edited ones, so a required field the
     // editor never touched surfaces its message at submit.
     const valid = await trigger();
     if (!valid) throw new FormValidationError();
     const values = getValues();
+    const submitted = structuredClone(toFormValues(values));
+    const context = { documentPath: path, registry };
     const hookScope = { formId, path, collection };
     const digested = await runBeforeSave(
       hooks,
-      digestDocument(values, collection.fields, {
-        documentPath: path,
-        registry,
-      }),
+      digestDocument(values, collection.fields, context),
       hookScope
     );
-    await onSave?.(digested);
-    useFormStore.getState().markSaved(formId, toFormValues(values));
+    const saved = await onSave?.(digested);
+    const savedDocument = saved ? saved.document : digested;
+    const written = adoptSavedValues(
+      formId,
+      submitted,
+      toFormValues(ingestDocument(savedDocument, collection.fields, context)),
+      (address, value) => setValue(address, value)
+    );
+    if (!written) useFormStore.getState().markSaved(formId, submitted);
+    if (written && written.length > 0) reseedFields();
     try {
-      await runAfterSave(hooks, digested, hookScope);
+      await runAfterSave(hooks, savedDocument, hookScope);
     } catch (cause) {
       throw new AfterSaveHookError(cause);
     }
-  }, [scope, getValues, trigger, registry]);
+    const warnings = saved ? (saved.hookWarnings ?? []) : [];
+    if (warnings.length > 0) {
+      throw new AfterSaveHookError(new Error(warnings.join(' ')));
+    }
+  }, [scope, getValues, trigger, setValue, registry]);
 }
 
 export function useFieldAddress(): FieldAddress {

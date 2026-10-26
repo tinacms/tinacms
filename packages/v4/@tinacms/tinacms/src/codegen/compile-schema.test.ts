@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { type ResolvedConfig, asResolvedConfig } from '../config';
+import {
+  defineHook,
+  defineHooksPlugin,
+  defineServerHook,
+} from '../core/form/hooks';
 import { definePlugin } from '../core/plugin';
 import type { FieldSchema } from '../core/schema/types';
 import { LOCK_VERSION, checkLock, compileSchema } from './compile-schema';
@@ -198,6 +203,31 @@ describe('compileSchema collection-level hooks', () => {
     expect(lock.schema.collections[0].hooks).toEqual([
       { name: 'logSave', args: ['saved'] },
     ]);
+  });
+
+  it('accepts a hook that only has a server side', () => {
+    const slug = defineHook('slug', {
+      server: async () => ({ default: defineServerHook(() => ({})) }),
+    });
+    const lock = compileSchema(
+      asResolvedConfig({
+        plugins: [
+          fieldPlugin('string', 1),
+          defineHooksPlugin('test:hooks', [slug]),
+        ],
+        schema: {
+          collections: [
+            {
+              name: 'post',
+              format: 'mdx',
+              hooks: [slug()],
+              fields: [{ name: 'title', type: 'string' }],
+            },
+          ],
+        },
+      })
+    );
+    expect(lock.schema.collections[0].hooks).toEqual([{ name: 'slug' }]);
   });
 
   it('rejects a form hook no installed plugin registers', () => {

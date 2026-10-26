@@ -1,10 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { ContentSaveInput } from '../core/content/contract';
+import { defineHook, defineHooksPlugin } from '../core/form/hooks';
 import { definePlugin } from '../core/plugin';
+import type { HookRef } from '../core/schema/types';
 import {
+  type ServerFormHooks,
+  type ServerOp,
   type Session,
+  defineServerHook,
   defineServerPlugin,
   protectedOp,
   publicOp,
+  reject,
   toUserId,
   use,
 } from '../server';
@@ -602,24 +609,358 @@ describe('createRpcHandler composition', () => {
   });
 });
 
-describe('createRpcHandler mountPath', () => {
+describe('createRpcHandler rpcUrl', () => {
   const plugins = [mediaPlugin, authPlugin()];
 
-  it('routes a prefixed path when no mountPath is set', async () => {
+  it('routes a prefixed path when no rpcUrl is set', async () => {
     const handler = createRpcHandler({ plugins });
     const response = await handler(post('/junk/media/health'));
     expect(response.status).toBe(200);
   });
 
-  it('404s that same prefixed path when a mountPath is set', async () => {
-    const handler = createRpcHandler({ plugins, mountPath: '/api/tina' });
+  it('404s that same prefixed path when an rpcUrl is set', async () => {
+    const handler = createRpcHandler({ plugins, rpcUrl: '/api/tina' });
     const response = await handler(post('/junk/media/health'));
     expect(response.status).toBe(404);
   });
 
   it('serves the exact mounted path', async () => {
-    const handler = createRpcHandler({ plugins, mountPath: '/api/tina' });
+    const handler = createRpcHandler({ plugins, rpcUrl: '/api/tina' });
     const response = await handler(post('/media/health'));
     expect(response.status).toBe(200);
+  });
+});
+
+describe('createRpcHandler content saves with server hooks', () => {
+  const audited = vi.fn();
+
+  const serverHook = <Args extends string[]>(
+    name: string,
+    factory: (...args: Args) => ServerFormHooks
+  ) =>
+    defineHook(name, {
+      server: async () => ({ default: defineServerHook(factory) }),
+    });
+
+  const hooksPlugin = defineHooksPlugin('test:hooks', [
+    serverHook('stamp', (label: string) => ({
+      beforeSave: (document) => ({
+        ...document,
+        trail: `${String(document.trail ?? '')}${label}`,
+      }),
+    })),
+    serverHook('guard', () => ({
+      beforeSave: (document, { session }) => {
+        if (document.published && !session?.roles.includes('admin')) {
+          reject('Only admins can publish');
+        }
+        return document;
+      },
+    })),
+    serverHook('explode', () => ({
+      beforeSave: () => {
+        throw new Error('db down');
+      },
+    })),
+    serverHook('brokenAudit', () => ({
+      afterSave: () => {
+        throw new Error('audit endpoint down');
+      },
+    })),
+    serverHook('audit', () => ({ afterSave: audited })),
+    serverHook('whoSaves', () => ({
+      beforeSave: (document, { session }) => ({
+        ...document,
+        savedBy: session?.identity.id ?? null,
+      }),
+    })),
+  ]);
+
+  // One plugin that provides content, media and auth, as tinaCloud() does.
+  const saving = (hooks: HookRef[]) => {
+    const update = vi.fn(async (input: ContentSaveInput) => ({
+      path: input.path,
+      document: input.value,
+    }));
+    const getSession = vi.fn(async (request: Request) => {
+      const token = request.headers
+        .get('authorization')
+        ?.replace('Bearer ', '');
+      return (token && sessionsByToken[token]) || null;
+    });
+    const handler = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'test:cloud',
+          provides: ['content', 'media', 'auth'],
+          server: async () => ({
+            default: defineServerPlugin({
+              getSession,
+              update,
+              resolveBranch: async (branch: string | undefined) =>
+                branch ?? 'main',
+            }),
+          }),
+        }),
+        hooksPlugin,
+      ],
+      schema: {
+        collections: [{ name: 'post', format: 'mdx', fields: [], hooks }],
+      },
+    });
+    const save = (value: Record<string, unknown>, namespace = 'content') =>
+      handler(
+        post(`/${namespace}/update`, {
+          token: 'editor-token',
+          body: { collection: 'post', path: 'content/posts/a.mdx', value },
+        })
+      );
+    return { save, update, getSession, handler };
+  };
+
+  it('runs two server beforeSave hooks in the collection order, each on the previous output', async () => {
+    const { save, update } = saving([
+      { name: 'stamp', args: ['b'] },
+      { name: 'stamp', args: ['a'] },
+    ]);
+    const response = await save({ title: 'Hi' });
+    expect(response.status).toBe(200);
+    expect(update.mock.calls[0][0].value).toEqual({ title: 'Hi', trail: 'ba' });
+    expect(await response.json()).toEqual({
+      entry: {
+        path: 'content/posts/a.mdx',
+        document: { title: 'Hi', trail: 'ba' },
+      },
+      hookWarnings: [],
+    });
+  });
+
+  it('answers 422 hook-rejected with the message of reject(), and never writes', async () => {
+    const { save, update } = saving([{ name: 'guard' }]);
+    const response = await save({ published: true });
+    expect(response.status).toBe(422);
+    expect(await response.json()).toEqual({
+      error: { code: 'hook-rejected', message: 'Only admins can publish' },
+    });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('500s a hook that throws a plain error, without leaking its message', async () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const { save, update } = saving([{ name: 'explode' }]);
+    const response = await save({});
+    expect(response.status).toBe(500);
+    expect(await response.text()).not.toContain('db down');
+    expect(update).not.toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
+  it.each(['media', 'auth'])(
+    'runs the hooks on %s/update of a plugin that provides content',
+    async (namespace) => {
+      const { save, update } = saving([{ name: 'stamp', args: ['x'] }]);
+      const response = await save({}, namespace);
+      expect(response.status).toBe(200);
+      expect(update.mock.calls[0][0].value).toEqual({ trail: 'x' });
+    }
+  );
+
+  it('runs every afterSave after one throws, keeps the save, and warns', async () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    audited.mockClear();
+    const { save, update } = saving([
+      { name: 'brokenAudit' },
+      { name: 'audit' },
+    ]);
+    const response = await save({ title: 'Hi' });
+    expect(response.status).toBe(200);
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(audited).toHaveBeenCalledWith(
+      { title: 'Hi' },
+      expect.objectContaining({ path: 'content/posts/a.mdx' })
+    );
+    const { hookWarnings } = await response.json();
+    expect(hookWarnings).toEqual(['The afterSave hook "brokenAudit" failed.']);
+    expect(JSON.stringify(hookWarnings)).not.toContain('audit endpoint down');
+    consoleError.mockRestore();
+  });
+
+  it('hands the hooks the session getSession verified, with one getSession per save', async () => {
+    const { save, update, getSession } = saving([{ name: 'whoSaves' }]);
+    await save({});
+    expect(update.mock.calls[0][0].value).toEqual({ savedBy: 'eli' });
+    expect(getSession).toHaveBeenCalledTimes(1);
+  });
+
+  it('hands the hooks the branch the save names', async () => {
+    const seen = vi.fn();
+    const handler = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'test:cloud',
+          provides: ['content', 'auth'],
+          server: async () => ({
+            default: defineServerPlugin({
+              getSession: async () => sessionsByToken['editor-token'],
+              update: async (input: ContentSaveInput) => ({
+                path: input.path,
+                document: input.value,
+              }),
+            }),
+          }),
+        }),
+        defineHooksPlugin('test:branch', [
+          serverHook('branchProbe', () => ({
+            beforeSave: (document, { branch }) => {
+              seen(branch);
+              return document;
+            },
+          })),
+        ]),
+      ],
+      schema: {
+        collections: [
+          {
+            name: 'post',
+            format: 'mdx',
+            fields: [],
+            hooks: [{ name: 'branchProbe' }],
+          },
+        ],
+      },
+    });
+    await handler(
+      post('/content/update', {
+        body: {
+          collection: 'post',
+          path: 'content/posts/a.mdx',
+          value: {},
+          branch: 'feature',
+        },
+      })
+    );
+    expect(seen).toHaveBeenCalledWith('feature');
+  });
+
+  it.each([
+    ['a body with no value', { collection: 'post', path: 'a.mdx' }],
+    ['an unknown collection', { collection: 'nope', path: 'a.mdx', value: {} }],
+  ])('400s %s with invalid-input', async (_, body) => {
+    const { handler, update } = saving([]);
+    const response = await handler(
+      post('/content/update', { token: 'editor-token', body })
+    );
+    expect(response.status).toBe(400);
+    expect((await response.json()).error.code).toBe('invalid-input');
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  const guardedSave = (update: ServerOp) =>
+    createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'test:cloud',
+          provides: ['content', 'auth'],
+          server: async () => ({
+            default: defineServerPlugin({
+              getSession: async (request: Request) => {
+                const token = request.headers
+                  .get('authorization')
+                  ?.replace('Bearer ', '');
+                return (token && sessionsByToken[token]) || null;
+              },
+              update,
+            }),
+          }),
+        }),
+      ],
+      schema: { collections: [{ name: 'post', format: 'mdx', fields: [] }] },
+    });
+  const saveBody = {
+    collection: 'post',
+    path: 'content/posts/a.mdx',
+    value: {},
+  };
+  const echoUpdate = async (input: ContentSaveInput) => ({
+    path: input.path,
+    document: input.value,
+  });
+
+  it("requires content:save and the permission the provider's update declares", async () => {
+    const handler = guardedSave(
+      protectedOp({ permission: 'content:publish' }, echoUpdate)
+    );
+    const asEditor = await handler(
+      post('/content/update', { token: 'editor-token', body: saveBody })
+    );
+    const asAdmin = await handler(
+      post('/content/update', { token: 'admin-token', body: saveBody })
+    );
+    expect([asEditor.status, asAdmin.status]).toEqual([403, 200]);
+  });
+
+  it("requires content:save even when the provider's update is a publicOp", async () => {
+    const handler = guardedSave(publicOp(echoUpdate));
+    const response = await handler(post('/content/update', { body: saveBody }));
+    expect(response.status).toBe(401);
+  });
+
+  it('routes no update of a plugin that lost content to an override', async () => {
+    const rawUpdate = vi.fn(async () => ({ path: 'x', document: {} }));
+    const handler = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'test:cloud',
+          provides: ['content', 'media', 'auth'],
+          server: async () => ({
+            default: defineServerPlugin({
+              getSession: async () => sessionsByToken['admin-token'],
+              update: rawUpdate,
+            }),
+          }),
+        }),
+        definePlugin({
+          name: 'test:other-content',
+          provides: ['content'],
+          overrides: [{ capability: 'content' }],
+        }),
+      ],
+    });
+    for (const namespace of ['media', 'auth']) {
+      const response = await handler(
+        post(`/${namespace}/update`, { token: 'admin-token', body: {} })
+      );
+      expect(response.status).toBe(404);
+    }
+    expect(rawUpdate).not.toHaveBeenCalled();
+  });
+
+  it('fails to compose when a server hook is installed but no schema is passed', async () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const handler = createRpcHandler({ plugins: [hooksPlugin] });
+    const response = await handler(post('/content/update', { body: {} }));
+    expect(response.status).toBe(500);
+    expect((await response.json()).error.code).toBe('runtime-compose-failed');
+    expect(String(consoleError.mock.calls[0]?.[1])).toMatch(/no `schema`/);
+    consoleError.mockRestore();
+  });
+
+  it('never routes the reserved hooks key of a server segment', async () => {
+    const { handler } = saving([]);
+    for (const path of [
+      '/content/hooks',
+      '/test:hooks/hooks',
+      '/content/resolveBranch',
+      '/media/resolveBranch',
+    ]) {
+      const response = await handler(post(path, { token: 'admin-token' }));
+      expect(response.status).toBe(404);
+    }
   });
 });
