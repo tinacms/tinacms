@@ -171,7 +171,9 @@ function ListRow({
               disabled && 'text-muted-foreground-strong'
             )}
           >
-            {prefix ? <span className='text-slate-600'>{prefix}</span> : null}
+            {prefix ? (
+              <span className='text-muted-foreground'>{prefix}</span>
+            ) : null}
             <Title title={title} match={match} />
           </span>
           {meta ? (

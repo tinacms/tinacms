@@ -19,7 +19,7 @@ const lineVariants = cva(
       type: {
         add: 'bg-status-published-subtle text-status-published',
         del: 'bg-status-failed-subtle text-status-failed',
-        ctx: 'text-slate-600',
+        ctx: 'text-muted-foreground',
       },
     },
   }

@@ -23,8 +23,10 @@ const listCardVariants = cva(
     variants: {
       state: {
         rest: 'border-input has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
-        invalid: 'border-destructive',
-        readOnly: 'border-border-subtle bg-muted shadow-none',
+        invalid:
+          'border-destructive has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
+        readOnly:
+          'border-border-subtle bg-muted shadow-none has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
         disabled: 'border-border shadow-none',
         dragging: 'z-10 border-input shadow-lifted',
       },
@@ -33,7 +35,6 @@ const listCardVariants = cva(
   }
 );
 
-// One hover for the whole head: a light tint, and the grip and the menu's dots darken.
 const HEAD_HOVER =
   'hover:bg-muted *:data-grip:group-hover/head:text-foreground **:data-more:group-hover/head:text-foreground';
 

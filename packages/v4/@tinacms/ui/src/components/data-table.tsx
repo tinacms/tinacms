@@ -80,7 +80,6 @@ const cellVariants = cva('px-4 py-2.5 whitespace-normal', {
   defaultVariants: { type: 'text', align: 'left', hideNarrow: false },
 });
 
-// A badge sits in a flex line of its own, so it is centred on the row and on the words beside it.
 const INLINE = 'flex min-w-0 items-center';
 
 const ARROW: Record<DataTableSort, string> = { asc: '↑', desc: '↓', none: '↕' };
@@ -172,7 +171,6 @@ function DataCell({
     >
       {cell.type === 'file' ? (
         // A column sizes from its content, so a long path would squeeze the titles. The path
-        // ends in an ellipsis inside a cell that takes a fifth of the width.
         <span className='block truncate'>{cell.text}</span>
       ) : (
         cell.text
@@ -257,7 +255,6 @@ function DataTable({
           <TableBody>
             {rows.map((row, index) => (
               <TableRow
-                // Rows carry no id of their own; the order is the one the caller sorted.
                 key={index}
                 className='relative border-border-subtle hover:bg-muted'
               >
