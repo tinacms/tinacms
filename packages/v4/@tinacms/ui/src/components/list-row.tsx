@@ -22,6 +22,13 @@ const listRowVariants = cva(
         false: '',
       },
     },
+    compoundVariants: [
+      {
+        selected: true,
+        disabled: true,
+        className: 'has-[[data-slot=list-row-main]:hover]:bg-selected',
+      },
+    ],
     defaultVariants: { selected: false, flush: false, disabled: false },
   }
 );
@@ -122,13 +129,13 @@ function ListRow({
   className,
   ...props
 }: ListRowProps) {
-  const on = Boolean(selected);
+  const isSelected = Boolean(selected);
   const hasDiff = added !== undefined || removed !== undefined;
   return (
     <div
       data-slot='list-row'
       className={cn(
-        listRowVariants({ selected: on, flush, disabled }),
+        listRowVariants({ selected: isSelected, flush, disabled }),
         className
       )}
       {...props}
@@ -136,16 +143,18 @@ function ListRow({
       <button
         type='button'
         data-slot='list-row-main'
-        aria-pressed={selected === undefined ? undefined : on}
+        aria-pressed={selected === undefined ? undefined : isSelected}
         aria-disabled={disabled ? true : undefined}
         onClick={disabled ? undefined : onClick}
-        className={mainVariants({ twoLine: Boolean(meta), flush, disabled })}
+        className={cn(
+          mainVariants({ twoLine: Boolean(meta), flush, disabled })
+        )}
       >
         {icon ? (
           <span
             className={cn(
               'inline-flex flex-none text-muted-foreground',
-              on && 'text-primary',
+              isSelected && 'text-primary',
               disabled && 'text-muted-foreground-strong'
             )}
           >
@@ -157,7 +166,7 @@ function ListRow({
             className={cn(
               'min-w-0 truncate',
               meta && 'font-medium',
-              on && 'font-semibold',
+              isSelected && 'font-semibold',
               mono && 'font-mono tracking-code',
               disabled && 'text-muted-foreground-strong'
             )}
@@ -170,7 +179,7 @@ function ListRow({
               className={cn(
                 'min-w-0 truncate font-mono text-xs tracking-code text-muted-foreground',
                 mono && 'font-sans tracking-normal',
-                on && 'text-muted-foreground-strong'
+                isSelected && 'text-muted-foreground-strong'
               )}
             >
               {meta}
@@ -196,7 +205,12 @@ function ListRow({
       </button>
       {actionLabel ? (
         <span className='inline-flex flex-none pr-2'>
-          <Button size='sm' aria-label={actionAria} onClick={onAction}>
+          <Button
+            size='sm'
+            aria-label={actionAria}
+            disabled={disabled}
+            onClick={onAction}
+          >
             {actionLabel}
           </Button>
         </span>

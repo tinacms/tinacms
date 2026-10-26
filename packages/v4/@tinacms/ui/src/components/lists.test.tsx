@@ -38,6 +38,23 @@ describe('ListRow', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
+  it('does not run the action of a disabled row', async () => {
+    const user = userEvent.setup();
+    const onAction = vi.fn();
+    render(
+      <ListRow
+        title='Preparing'
+        disabled
+        actionLabel='Commit'
+        onAction={onAction}
+      />
+    );
+    const action = screen.getByRole('button', { name: 'Commit' });
+    expect(action).toBeDisabled();
+    await user.click(action);
+    expect(onAction).not.toHaveBeenCalled();
+  });
+
   it('keeps the action outside the row button, as a second Tab stop', async () => {
     const user = userEvent.setup();
     const onAction = vi.fn();
@@ -173,9 +190,23 @@ describe('ListCard', () => {
     expect(onMove.mock.calls).toEqual([[1], [-1]]);
   });
 
-  it('carries no unsaved marker', () => {
-    render(<ListCard name='Tag 1' value='news' />);
-    expect(screen.queryByText('Unsaved')).toBeNull();
+  it('shows no grip tooltip and fires nothing when disabled', async () => {
+    const user = userEvent.setup();
+    const onMove = vi.fn();
+    render(<ListCard name='Tag 1' value='news' disabled onMove={onMove} />);
+    const grip = screen.getByRole('button', { name: 'Move Tag 1' });
+    expect(grip).toBeDisabled();
+    expect(grip).not.toHaveAttribute('title');
+    await user.keyboard('{ArrowDown}');
+    expect(onMove).not.toHaveBeenCalled();
+  });
+
+  it('flags an invalid card to screen readers, not only by its border', () => {
+    render(<ListCard name='Tag 1' value='' invalid />);
+    expect(screen.getByRole('textbox', { name: 'Tag 1' })).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
   });
 });
 

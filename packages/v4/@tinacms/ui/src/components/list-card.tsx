@@ -163,7 +163,11 @@ function ListCard({
             <button
               type='button'
               aria-label={`Move ${name}`}
-              title='Drag to move, or press the up and down arrow keys'
+              title={
+                disabled
+                  ? undefined
+                  : 'Drag to move, or press the up and down arrow keys'
+              }
               disabled={disabled}
               onKeyDown={onGripKey}
               onPointerDown={onGripPointerDown}
@@ -184,8 +188,8 @@ function ListCard({
               <input
                 type={inputType}
                 aria-label={name}
-                aria-invalid={error ? true : undefined}
-                value={value}
+                aria-invalid={bad || undefined}
+                value={value ?? ''}
                 placeholder={placeholder}
                 readOnly={readOnly}
                 disabled={disabled}

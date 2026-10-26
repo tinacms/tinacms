@@ -67,7 +67,7 @@ function Tile({
           </Badge>
         ) : null}
       </div>
-      <div className='relative flex min-w-0 items-end justify-between gap-2'>
+      <div className='flex min-w-0 items-end justify-between gap-2'>
         <span
           className={cn(
             'max-w-full min-w-0 truncate text-sm text-muted-foreground',
@@ -80,7 +80,7 @@ function Tile({
           <Button
             size='sm'
             icon='plus'
-            className='ml-auto'
+            className='relative ml-auto'
             aria-label={actionAria ?? `${actionLabel} in ${title}`}
             onClick={onAction ?? onOpen}
           >
