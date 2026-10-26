@@ -66,7 +66,7 @@ function PanelHeader({
           {heading}
         </h2>
       ) : null}
-      {action ?? null}
+      {action}
       <span aria-hidden='true' className='flex-1' />
       {menu ? (
         <DropdownMenu>

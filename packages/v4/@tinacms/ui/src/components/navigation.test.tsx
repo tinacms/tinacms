@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -137,6 +137,51 @@ describe('Breadcrumb', () => {
     expect(fold).toHaveFocus();
   });
 
+  it('moves focus to the new current step when a fold item removes the fold', async () => {
+    const user = userEvent.setup();
+    function Trail() {
+      const [depth, setDepth] = useState(path.length);
+      return (
+        <Breadcrumb
+          items={path.slice(0, depth).map((label, index) => ({
+            label,
+            onClick: index < depth - 1 ? () => setDepth(index + 1) : undefined,
+          }))}
+        />
+      );
+    }
+    render(<Trail />);
+    await user.click(
+      screen.getByRole('button', { name: 'Show 2 more levels' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: '2026' }));
+    await waitFor(() => expect(screen.getByText('2026')).toHaveFocus());
+    expect(screen.queryByRole('button', { name: /more level/ })).toBeNull();
+  });
+
+  it('marks only the step pinned as current', () => {
+    render(
+      <Breadcrumb
+        items={[
+          { label: 'Posts' },
+          { label: 'Hello', current: true },
+          { label: 'Draft' },
+        ]}
+      />
+    );
+    expect(
+      screen
+        .getAllByText(/Posts|Hello|Draft/)
+        .filter((step) => step.hasAttribute('aria-current'))
+    ).toEqual([screen.getByText('Hello')]);
+  });
+
+  it('draws a step with nothing to do as text, not a button', () => {
+    render(<Breadcrumb items={[{ label: 'Posts' }, { label: 'Hello' }]} />);
+    expect(screen.queryByRole('button')).toBeNull();
+    expect(screen.getByText('Posts')).not.toHaveAttribute('aria-current');
+  });
+
   it('shows every step of a short path', () => {
     render(
       <Breadcrumb
@@ -216,11 +261,58 @@ describe('NavRow', () => {
     );
   });
 
-  it('says a link row opens a new tab', () => {
-    render(<NavRow href='https://tina.io/docs'>Docs</NavRow>);
+  it('says an external link row opens a new tab', () => {
+    render(
+      <NavRow
+        external
+        render={
+          <a
+            href='https://tina.io/docs'
+            target='_blank'
+            rel='noopener noreferrer'
+          />
+        }
+      >
+        Docs
+      </NavRow>
+    );
     expect(
       screen.getByRole('link', { name: 'Docs (opens in a new tab)' })
     ).toHaveAttribute('target', '_blank');
+  });
+
+  it('keeps every prop when drawn as a link', async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn((event: { preventDefault: () => void }) =>
+      event.preventDefault()
+    );
+    render(
+      <NavRow
+        selected
+        aria-current='page'
+        onClick={onClick}
+        render={<a href='#/collections/post' />}
+      >
+        Posts
+      </NavRow>
+    );
+    const row = screen.getByRole('link', { name: 'Posts' });
+    expect(row).toHaveAttribute('aria-current', 'page');
+    expect(row).not.toHaveAttribute('type');
+    await user.click(row);
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it('cannot be pressed when disabled', async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(
+      <NavRow disabled onClick={onClick}>
+        Posts
+      </NavRow>
+    );
+    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    expect(onClick).not.toHaveBeenCalled();
   });
 
   it('rejects props that do nothing for a kind', () => {
@@ -315,7 +407,7 @@ describe('Pagination', () => {
     const user = userEvent.setup();
     const onPageChange = vi.fn();
     render(<Pagination total={48} page={2} onPageChange={onPageChange} />);
-    expect(screen.getByText('Showing 11–20 of 48')).toBeVisible();
+    expect(screen.getByText('Showing 11 to 20 of 48')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Page 2' })).toHaveAttribute(
       'aria-current',
       'page'
@@ -350,6 +442,6 @@ describe('Pagination', () => {
       'aria-disabled',
       'true'
     );
-    expect(screen.getByText('Showing 41–48 of 48')).toBeVisible();
+    expect(screen.getByText('Showing 41 to 48 of 48')).toBeVisible();
   });
 });

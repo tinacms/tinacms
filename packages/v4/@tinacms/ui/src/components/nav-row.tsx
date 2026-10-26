@@ -1,17 +1,21 @@
+import { mergeProps } from '@base-ui/react/merge-props';
+import { useRender } from '@base-ui/react/use-render';
 import { cva } from 'class-variance-authority';
 import type { LucideIcon } from 'lucide-react';
 import type { ComponentProps, ReactNode } from 'react';
 
 import { Badge } from '@tinacms/ui/components/badge';
 import { type Glyph, Icon } from '@tinacms/ui/components/icon';
+import { quietControl } from '@tinacms/ui/lib/nav-styles';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type NavRowKind = 'group' | 'folder' | 'doc' | 'more' | 'section';
 
 const navRowVariants = cva(
   [
-    'group/nav-row relative m-0 box-border flex min-h-8.5 w-full cursor-pointer items-center gap-2 rounded-sm border-0 bg-transparent py-1.5 pr-2.5 pl-1.5 text-left font-sans text-base leading-control text-slate-600 no-underline outline-none',
-    'hover:bg-muted hover:text-foreground focus-visible:shadow-focus-ring',
+    'group/nav-row relative m-0 box-border flex min-h-8.5 w-full cursor-pointer items-center gap-2 py-1.5 pr-2.5 pl-1.5 text-left text-base leading-control',
+    quietControl,
+    'disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent disabled:hover:text-slate-600',
   ],
   {
     variants: {
@@ -269,16 +273,17 @@ function NavRowContent({
   }
 }
 
-type RowDomProps = Omit<ComponentProps<'button'>, 'children' | 'type'>;
+type RowDomProps = Omit<ComponentProps<'button'>, 'children'>;
 
 type NavRowProps = NavRowKindProps &
   NavRowCommonProps &
   RowDomProps & {
-    type?: ComponentProps<'button'>['type'];
     /** Inside a group or folder: a selected row shows the dark bar on the left. */
     nested?: boolean;
-    /** Makes it a link that opens a new tab. A link keeps `id`, `title`, `aria-current` and `className`. */
-    href?: string;
+    /** Draws the row as another element, such as a router link. */
+    render?: useRender.ComponentProps<'button'>['render'];
+    /** The row opens a new tab: the external icon replaces the marks. Pair it with a `render` link. */
+    external?: boolean;
   };
 
 /** Splits the kind's props from the ones that go on the element, so none reach the DOM. */
@@ -320,56 +325,39 @@ function NavRow({
   badge,
   unsavedLook,
   nested = false,
-  href,
+  external = false,
+  render,
   className,
-  type,
   ...rest
 }: NavRowProps) {
   const [kindProps, domProps] = splitKindProps(rest);
-  const classes = cn(
-    navRowVariants({ kind: kindProps.kind ?? 'doc', selected, nested }),
-    className
-  );
-  const content = (
-    <NavRowContent
-      {...kindProps}
-      icon={icon}
-      selected={selected}
-      badge={badge}
-      unsavedLook={unsavedLook}
-      external={href !== undefined}
-    >
-      {children}
-    </NavRowContent>
-  );
-
-  if (href !== undefined) {
-    return (
-      <a
-        data-slot='nav-row'
-        id={domProps.id}
-        title={domProps.title}
-        aria-current={domProps['aria-current']}
-        href={href}
-        target='_blank'
-        rel='noopener noreferrer'
-        className={classes}
-      >
-        {content}
-      </a>
-    );
-  }
-
-  return (
-    <button
-      data-slot='nav-row'
-      type={type ?? 'button'}
-      {...domProps}
-      className={classes}
-    >
-      {content}
-    </button>
-  );
+  return useRender({
+    defaultTagName: 'button',
+    render,
+    props: mergeProps<'button'>(
+      {
+        type: render === undefined ? 'button' : undefined,
+        className: cn(
+          navRowVariants({ kind: kindProps.kind ?? 'doc', selected, nested }),
+          className
+        ),
+        children: (
+          <NavRowContent
+            {...kindProps}
+            icon={icon}
+            selected={selected}
+            badge={badge}
+            unsavedLook={unsavedLook}
+            external={external}
+          >
+            {children}
+          </NavRowContent>
+        ),
+      },
+      domProps
+    ),
+    state: { slot: 'nav-row' },
+  });
 }
 
 export type { NavRowContentProps, NavRowKind, NavRowProps };

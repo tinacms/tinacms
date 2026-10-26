@@ -14,12 +14,13 @@ import {
   DropdownMenuTrigger,
 } from '@tinacms/ui/components/dropdown-menu';
 import { Icon } from '@tinacms/ui/components/icon';
+import { quietControl } from '@tinacms/ui/lib/nav-styles';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type BreadcrumbStep = {
   label: string;
   onClick?: () => void;
-  /** The last step is the current page unless it has `onClick`. */
+  /** Marks this step as the current page. Otherwise the last step is, unless it has `onClick`. */
   current?: boolean;
   /** The open document's file, shown on hover. */
   file?: string;
@@ -30,25 +31,25 @@ type BreadcrumbSize = 'md' | 'sm';
 /** A longer path keeps the first step and the last two, and folds the rest. */
 const MAX_STEPS = 3;
 
-const stepVariants = cva(
-  'block truncate rounded-sm border-0 bg-transparent font-sans text-slate-600 no-underline outline-none hover:bg-muted hover:text-foreground focus-visible:shadow-focus-ring',
-  {
-    variants: {
-      size: {
-        md: 'max-w-60 px-1.5 py-1 text-base',
-        sm: 'max-w-50 px-1 py-0.5 text-sm',
-      },
-      current: {
-        true: 'cursor-default font-medium text-foreground hover:bg-transparent',
-        false: 'cursor-pointer',
-      },
+const stepVariants = cva(['block truncate', quietControl], {
+  variants: {
+    size: {
+      md: 'max-w-60 px-1.5 py-1 text-base',
+      sm: 'max-w-50 px-1 py-0.5 text-sm',
     },
-    defaultVariants: { size: 'md', current: false },
-  }
-);
+    current: {
+      true: 'cursor-default font-medium text-foreground hover:bg-transparent',
+      false: 'cursor-pointer',
+    },
+  },
+  defaultVariants: { size: 'md', current: false },
+});
 
 const foldVariants = cva(
-  'inline-flex flex-none cursor-pointer items-center justify-center rounded-sm border-0 bg-transparent p-0 text-slate-600 outline-none hover:bg-muted hover:text-foreground focus-visible:shadow-focus-ring data-popup-open:bg-muted data-popup-open:text-foreground',
+  [
+    'inline-flex flex-none cursor-pointer items-center justify-center p-0 data-popup-open:bg-muted data-popup-open:text-foreground',
+    quietControl,
+  ],
   {
     variants: { size: { md: 'size-7', sm: 'size-6' } },
     defaultVariants: { size: 'md' },
@@ -103,7 +104,7 @@ function Step({
   step: BreadcrumbStep;
   current: boolean;
   size: BreadcrumbSize;
-  onClick: () => void;
+  onClick?: () => void;
 }) {
   if (current) {
     return (
@@ -112,6 +113,18 @@ function Step({
         tabIndex={-1}
         title={step.file}
         className={stepVariants({ size, current: true })}
+      >
+        {step.label}
+      </span>
+    );
+  }
+  if (!onClick) {
+    return (
+      <span
+        className={cn(
+          stepVariants({ size }),
+          'cursor-default hover:bg-transparent hover:text-slate-600'
+        )}
       >
         {step.label}
       </span>
@@ -146,14 +159,18 @@ function Breadcrumb({
   const shown: (BreadcrumbStep | null)[] = fold
     ? [items[0], null, ...items.slice(-2)]
     : [...items];
+  const pinned = items.some((step) => step.current === true);
 
   // A pressed step often turns into the current page, a span, so its button and focus go away.
   const navRef = useRef<HTMLElement>(null);
   const refocus = useRef(false);
-  const press = (onClick?: () => void) => () => {
-    refocus.current = true;
-    onClick?.();
-  };
+  const press = (onClick?: () => void) =>
+    onClick
+      ? () => {
+          refocus.current = true;
+          onClick();
+        }
+      : undefined;
   useLayoutEffect(() => {
     if (!refocus.current) return;
     refocus.current = false;
@@ -207,8 +224,9 @@ function Breadcrumb({
                   step={step}
                   size={size}
                   current={
-                    step.current === true ||
-                    (index === shown.length - 1 && !step.onClick)
+                    pinned
+                      ? step.current === true
+                      : index === shown.length - 1 && !step.onClick
                   }
                   onClick={press(step.onClick)}
                 />
