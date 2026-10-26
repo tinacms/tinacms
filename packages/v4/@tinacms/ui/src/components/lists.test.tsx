@@ -2,7 +2,10 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { DataTable } from '@tinacms/ui/components/data-table';
+import {
+  DataTable,
+  type DataTableRow,
+} from '@tinacms/ui/components/data-table';
 import { DiffView } from '@tinacms/ui/components/diff-view';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { EmptyState } from '@tinacms/ui/components/empty-state';
@@ -210,6 +213,14 @@ describe('ListCard', () => {
   });
 });
 
+describe('Tile without a handler', () => {
+  it('shows the title as plain text', () => {
+    render(<Tile title='Docs' />);
+    expect(screen.queryByRole('button', { name: 'Docs' })).toBeNull();
+    expect(screen.getByText('Docs')).toBeVisible();
+  });
+});
+
 describe('EmptyState', () => {
   it('shows the way out only with an action, and announces when live', async () => {
     const user = userEvent.setup();
@@ -254,10 +265,12 @@ describe('DiffView', () => {
 });
 
 describe('DataTable', () => {
-  const rows = [
+  const rows: DataTableRow[] = [
     {
-      title: { type: 'link', text: 'About' } as const,
-      status: { type: 'badge', text: 'Unsaved', kind: 'unsaved' } as const,
+      cells: {
+        title: { type: 'link', text: 'About' },
+        status: { type: 'badge', text: 'Unsaved', kind: 'unsaved' },
+      },
     },
   ];
 
@@ -292,11 +305,54 @@ describe('DataTable', () => {
       <DataTable
         caption='Docs documents'
         columns={[{ key: 'title', label: 'Title' }]}
-        rows={[{ title: { type: 'link', text: 'About', onClick } }]}
+        rows={[{ cells: { title: { type: 'link', text: 'About', onClick } } }]}
       />
     );
     await user.click(screen.getByRole('button', { name: 'About' }));
     expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it('renders a link cell with no handler as plain text, and a node cell as given', () => {
+    render(
+      <DataTable
+        caption='Docs documents'
+        columns={[
+          { key: 'title', label: 'Title' },
+          { key: 'extra', label: 'Extra' },
+        ]}
+        rows={[
+          {
+            cells: {
+              title: { type: 'link', text: 'About' },
+              extra: { type: 'node', node: <em>Plugin badge</em> },
+            },
+          },
+        ]}
+      />
+    );
+    expect(screen.queryByRole('button', { name: 'About' })).toBeNull();
+    expect(screen.getByText('About')).toBeVisible();
+    expect(screen.getByText('Plugin badge')).toBeVisible();
+  });
+
+  it('keeps focus on the same document when a sort reorders rows', async () => {
+    const user = userEvent.setup();
+    const row = (id: string) =>
+      ({
+        id,
+        cells: { title: { type: 'link', text: id, onClick: () => {} } },
+      }) satisfies DataTableRow;
+    const columns = [{ key: 'title', label: 'Title' }];
+    const { rerender } = render(
+      <DataTable caption='Docs' columns={columns} rows={[row('A'), row('B')]} />
+    );
+    await user.tab();
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'B' })).toHaveFocus();
+    rerender(
+      <DataTable caption='Docs' columns={columns} rows={[row('B'), row('A')]} />
+    );
+    expect(screen.getByRole('button', { name: 'B' })).toHaveFocus();
   });
 
   it('shows the live empty state with no rows', () => {

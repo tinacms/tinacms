@@ -41,33 +41,14 @@ const HEAD_HOVER =
 const GRIP =
   'flex h-8 w-6 flex-none cursor-grab touch-none items-center justify-center rounded-sm border-0 bg-transparent p-0 text-muted-foreground outline-none focus-visible:shadow-focus-ring disabled:cursor-not-allowed';
 
-type ListCardProps = Omit<ComponentProps<'div'>, 'children'> & {
-  /** `value` holds one value in an inline box, such as a tag. `group` is a head that opens the item's fields. */
-  kind?: 'value' | 'group';
+type ListCardCommonProps = Omit<
+  ComponentProps<'div'>,
+  'children' | 'title' | 'onToggle'
+> & {
   /** The item's name for screen readers, such as "Tag 1". The grip and menu are named after it. */
   name: string;
-  /** With kind `value`: the value. */
-  value?: string;
-  onValueChange?: (value: string) => void;
   /** The grey words while it is empty, such as "Empty tag". */
   placeholder?: string;
-  /** With kind `value`: `number` for a list of numbers. */
-  inputType?: 'text' | 'number';
-  /** With kind `group`: a bold template name before the summary, for blocks. */
-  title?: string;
-  /** With kind `group`: the item's summary, such as its first field. */
-  summary?: string;
-  /** With kind `group`: a small picture before the words. */
-  thumbnail?: ReactNode;
-  /** With kind `group`: `in-place` (default) opens the fields under the head. `next-level` goes to them. */
-  opens?: 'in-place' | 'next-level';
-  /** With kind `group` that opens in place: whether its fields show. */
-  open?: boolean;
-  onToggle?: () => void;
-  /** With kind `group`: a short amber note at the end of the head, such as "No alt text". */
-  hint?: string;
-  /** The count of invalid fields inside. It shows while the card is closed; open cards carry none. */
-  errorCount?: number;
   /** The message under the card. Draws the red border. */
   error?: string;
   /** The red border without a message. */
@@ -83,23 +64,101 @@ type ListCardProps = Omit<ComponentProps<'div'>, 'children'> & {
   onGripPointerDown?: (event: PointerEvent<HTMLButtonElement>) => void;
   /** `DropdownMenuItem`s for the item menu. Remove is a `destructive` item. Without them there is no menu. */
   actions?: ReactNode;
-  /** With kind `group` open in place: the item's fields. */
+};
+
+/** Each kind takes only the props it uses. */
+type ValueKindProps = {
+  /** One value in an inline box, such as a tag. */
+  kind?: 'value';
+  value?: string;
+  onValueChange?: (value: string) => void;
+  /** `number` for a list of numbers. */
+  inputType?: 'text' | 'number';
+};
+
+type GroupKindProps = {
+  /** A head that opens the item's fields. */
+  kind: 'group';
+  /** A bold template name before the summary, for blocks. */
+  title?: string;
+  /** The item's summary, such as its first field. */
+  summary?: string;
+  /** A small picture before the words. */
+  thumbnail?: ReactNode;
+  /** `in-place` (default) opens the fields under the head. `next-level` goes to them. */
+  opens?: 'in-place' | 'next-level';
+  /** With `in-place`: whether the fields show. */
+  open?: boolean;
+  onToggle?: () => void;
+  /** A short amber note at the end of the head, such as "No alt text". */
+  hint?: string;
+  /** The count of invalid fields inside. It shows while the card is closed; open cards carry none. */
+  errorCount?: number;
+  /** The item's fields, shown when open in place. */
   children?: ReactNode;
 };
 
-/**
- * One item of an array field: a grip that drags, or moves with the up and down arrow keys; the
- * item itself; and the item menu. A card carries no unsaved marker, because unsaved shows on the
- * document and not on its fields. `className` styles the card; other props go on the wrapper that
- * also holds the message under the card.
- */
-function ListCard({
-  kind = 'value',
+type ListCardProps = ListCardCommonProps & (ValueKindProps | GroupKindProps);
+
+// Every kind's props at once, so ListCard can take them apart in one destructure.
+type EveryKindProps = { kind?: 'value' | 'group' } & Partial<
+  Omit<ValueKindProps, 'kind'>
+> &
+  Partial<Omit<GroupKindProps, 'kind'>>;
+
+type ValueBodyProps = Pick<
+  ListCardCommonProps,
+  'name' | 'placeholder' | 'readOnly' | 'disabled'
+> & {
+  error: boolean;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  inputType: 'text' | 'number';
+};
+
+function ValueBody({
   name,
+  placeholder,
+  readOnly,
+  disabled,
+  error,
   value,
   onValueChange,
+  inputType,
+}: ValueBodyProps) {
+  return (
+    <>
+      {readOnly ? null : (
+        <span
+          aria-hidden='true'
+          className='mr-1 ml-0.5 h-4 w-px flex-none bg-border-subtle'
+        />
+      )}
+      <input
+        type={inputType}
+        aria-label={name}
+        aria-invalid={error || undefined}
+        value={value ?? ''}
+        placeholder={placeholder}
+        readOnly={readOnly}
+        disabled={disabled}
+        onChange={(event) => onValueChange?.(event.target.value)}
+        className='h-8 min-w-0 flex-1 appearance-none border-0 bg-transparent px-1.5 font-sans text-base text-ellipsis text-foreground tabular-nums outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
+      />
+    </>
+  );
+}
+
+type GroupHeadProps = Pick<
+  ListCardCommonProps,
+  'name' | 'placeholder' | 'disabled'
+> &
+  Omit<GroupKindProps, 'kind' | 'children'>;
+
+function GroupHead({
+  name,
   placeholder,
-  inputType = 'text',
+  disabled,
   title,
   summary,
   thumbnail,
@@ -108,18 +167,105 @@ function ListCard({
   onToggle,
   hint,
   errorCount = 0,
-  error,
-  invalid = false,
-  readOnly = false,
-  disabled = false,
-  dragging = false,
-  onMove,
-  onGripPointerDown,
-  actions,
-  className,
-  children,
-  ...props
-}: ListCardProps) {
+}: GroupHeadProps) {
+  const inPlace = opens === 'in-place';
+  return (
+    <button
+      type='button'
+      aria-expanded={inPlace ? open : undefined}
+      disabled={disabled}
+      onClick={onToggle}
+      className='flex h-8 min-w-0 flex-1 cursor-pointer items-center gap-0.5 rounded-sm border-0 bg-transparent px-0.5 text-left font-sans text-base text-foreground outline-none focus-visible:shadow-focus-ring disabled:cursor-not-allowed'
+    >
+      {inPlace ? (
+        <span
+          aria-hidden='true'
+          className={cn(
+            'flex flex-none text-muted-foreground transition-transform',
+            open && 'rotate-90'
+          )}
+        >
+          <Icon glyph='chevron-right' size={16} />
+        </span>
+      ) : null}
+      {thumbnail ? (
+        <span
+          aria-hidden='true'
+          className='ml-1 flex size-7 flex-none overflow-hidden rounded-xs'
+        >
+          {thumbnail}
+        </span>
+      ) : null}
+      <span className='min-w-0 flex-1 truncate px-1.5'>
+        <span className='sr-only'>{name}: </span>
+        {title ? <span className='font-medium'>{title}</span> : null}
+        {title && summary ? (
+          <span className='text-muted-foreground'> · {summary}</span>
+        ) : null}
+        {title ? null : (
+          <span className={cn(!summary && 'text-muted-foreground')}>
+            {summary || placeholder}
+          </span>
+        )}
+      </span>
+      {hint ? (
+        <span className='flex-none text-xs whitespace-nowrap text-unsaved'>
+          {hint}
+        </span>
+      ) : null}
+      {errorCount > 0 && !(inPlace && open) ? (
+        <Badge
+          kind='errors'
+          count={errorCount}
+          srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
+        />
+      ) : null}
+      {inPlace ? null : (
+        <span
+          aria-hidden='true'
+          className='flex w-7 flex-none justify-center text-muted-foreground'
+        >
+          <Icon glyph='chevron-right' size={16} />
+        </span>
+      )}
+    </button>
+  );
+}
+
+/**
+ * One item of an array field: a grip that drags, or moves with the up and down arrow keys; the
+ * item itself; and the item menu. A card carries no unsaved marker, because unsaved shows on the
+ * document and not on its fields. `className` styles the card; other props go on the wrapper that
+ * also holds the message under the card.
+ */
+function ListCard(props: ListCardProps) {
+  const {
+    name,
+    placeholder,
+    error,
+    invalid = false,
+    readOnly = false,
+    disabled = false,
+    dragging = false,
+    onMove,
+    onGripPointerDown,
+    actions,
+    className,
+    kind = 'value',
+    value,
+    onValueChange,
+    inputType = 'text',
+    title,
+    summary,
+    thumbnail,
+    opens = 'in-place',
+    open = false,
+    onToggle,
+    hint,
+    errorCount = 0,
+    children,
+    ...rest
+  }: ListCardCommonProps & EveryKindProps = props;
   const bad = invalid || Boolean(error) || errorCount > 0;
   const state = readOnly
     ? 'readOnly'
@@ -130,8 +276,8 @@ function ListCard({
         : bad
           ? 'invalid'
           : 'rest';
-  const inPlace = opens === 'in-place';
-  const showFields = kind === 'group' && inPlace && open && Boolean(children);
+  const showFields =
+    kind === 'group' && opens === 'in-place' && open && Boolean(children);
 
   const onGripKey = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -144,7 +290,7 @@ function ListCard({
     <div
       data-slot='list-card-item'
       className='relative flex min-w-0 flex-col gap-1'
-      {...props}
+      {...rest}
     >
       <div
         data-slot='list-card'
@@ -178,86 +324,31 @@ function ListCard({
               <Icon glyph={GripVertical} size={16} />
             </button>
           )}
-          {kind === 'value' ? (
-            <>
-              {readOnly ? null : (
-                <span
-                  aria-hidden='true'
-                  className='mr-1 ml-0.5 h-4 w-px flex-none bg-border-subtle'
-                />
-              )}
-              <input
-                type={inputType}
-                aria-label={name}
-                aria-invalid={bad || undefined}
-                value={value ?? ''}
-                placeholder={placeholder}
-                readOnly={readOnly}
-                disabled={disabled}
-                onChange={(event) => onValueChange?.(event.target.value)}
-                className='h-8 min-w-0 flex-1 appearance-none border-0 bg-transparent px-1.5 font-sans text-base text-ellipsis text-foreground tabular-nums outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
-              />
-            </>
-          ) : (
-            <button
-              type='button'
-              aria-expanded={inPlace ? open : undefined}
+          {kind === 'group' ? (
+            <GroupHead
+              name={name}
+              placeholder={placeholder}
               disabled={disabled}
-              onClick={onToggle}
-              className='flex h-8 min-w-0 flex-1 cursor-pointer items-center gap-0.5 rounded-sm border-0 bg-transparent px-0.5 text-left font-sans text-base text-foreground outline-none focus-visible:shadow-focus-ring disabled:cursor-not-allowed'
-            >
-              {inPlace ? (
-                <span
-                  aria-hidden='true'
-                  className={cn(
-                    'flex flex-none text-muted-foreground transition-transform',
-                    open && 'rotate-90'
-                  )}
-                >
-                  <Icon glyph='chevron-right' size={16} />
-                </span>
-              ) : null}
-              {thumbnail ? (
-                <span
-                  aria-hidden='true'
-                  className='ml-1 flex size-7 flex-none overflow-hidden rounded-xs'
-                >
-                  {thumbnail}
-                </span>
-              ) : null}
-              <span className='min-w-0 flex-1 truncate px-1.5'>
-                <span className='sr-only'>{name}: </span>
-                {title ? <span className='font-medium'>{title}</span> : null}
-                {title && summary ? (
-                  <span className='text-muted-foreground'> · {summary}</span>
-                ) : null}
-                {title ? null : (
-                  <span className={cn(!summary && 'text-muted-foreground')}>
-                    {summary || placeholder}
-                  </span>
-                )}
-              </span>
-              {hint ? (
-                <span className='flex-none text-xs whitespace-nowrap text-unsaved'>
-                  {hint}
-                </span>
-              ) : null}
-              {errorCount > 0 && !(inPlace && open) ? (
-                <Badge
-                  kind='errors'
-                  count={errorCount}
-                  srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
-                />
-              ) : null}
-              {inPlace ? null : (
-                <span
-                  aria-hidden='true'
-                  className='flex w-7 flex-none justify-center text-muted-foreground'
-                >
-                  <Icon glyph='chevron-right' size={16} />
-                </span>
-              )}
-            </button>
+              title={title}
+              summary={summary}
+              thumbnail={thumbnail}
+              opens={opens}
+              open={open}
+              onToggle={onToggle}
+              hint={hint}
+              errorCount={errorCount}
+            />
+          ) : (
+            <ValueBody
+              name={name}
+              placeholder={placeholder}
+              readOnly={readOnly}
+              disabled={disabled}
+              error={bad}
+              value={value}
+              onValueChange={onValueChange}
+              inputType={inputType}
+            />
           )}
           {!readOnly && actions ? (
             <DropdownMenu>

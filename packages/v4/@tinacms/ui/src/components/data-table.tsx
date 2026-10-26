@@ -55,14 +55,23 @@ type DataTableCell =
       text: string;
     }
   | {
+      /** Anything else, such as a plugin's badge. */
+      type: 'node';
+      node: ReactNode;
+    }
+  | {
       type: 'badge';
       text: string;
       kind?: 'tag' | 'unsaved';
       tone?: BadgeTone;
     };
 
-/** One row: a cell for each column key. A missing key leaves the cell empty. */
-type DataTableRow = Record<string, DataTableCell | undefined>;
+type DataTableRow = {
+  /** Keeps focus on the same row when the order changes. Defaults to the row's position. */
+  id?: string;
+  /** A cell for each column key. A missing key leaves the cell empty. */
+  cells: Record<string, DataTableCell | undefined>;
+};
 
 const cellVariants = cva('px-4 py-2.5 whitespace-normal', {
   variants: {
@@ -70,6 +79,7 @@ const cellVariants = cva('px-4 py-2.5 whitespace-normal', {
       link: '',
       text: '',
       badge: '',
+      node: '',
       muted: 'text-sm text-muted-foreground',
       file: 'w-1/5 max-w-0 font-mono text-xs tracking-code whitespace-nowrap text-muted-foreground',
       num: 'text-right text-sm whitespace-nowrap text-muted-foreground tabular-nums',
@@ -79,6 +89,9 @@ const cellVariants = cva('px-4 py-2.5 whitespace-normal', {
   },
   defaultVariants: { type: 'text', align: 'left', hideNarrow: false },
 });
+
+const LINK =
+  'inline-flex min-w-0 items-center gap-2.5 font-sans text-base leading-control font-medium text-pretty text-foreground';
 
 const INLINE = 'flex min-w-0 items-center';
 
@@ -121,6 +134,9 @@ function DataCell({
     column.className
   );
   if (!cell) return <TableCell className={className} />;
+  if (cell.type === 'node') {
+    return <TableCell className={className}>{cell.node}</TableCell>;
+  }
   if (cell.type === 'badge') {
     return (
       <TableCell className={className}>
@@ -137,28 +153,40 @@ function DataCell({
     );
   }
   if (cell.type === 'link') {
+    const linkBody = (
+      <>
+        {cell.icon ? (
+          <span className='inline-flex flex-none text-muted-foreground'>
+            <Icon glyph={cell.icon} size={16} />
+          </span>
+        ) : null}
+        <span
+          className={cn(
+            'decoration-slate-300 underline-offset-3 group-hover/link:underline',
+            cell.mono && 'font-mono text-sm tracking-code'
+          )}
+        >
+          {cell.text}
+        </span>
+      </>
+    );
     return (
       <TableCell className={className}>
         <span className={cn(INLINE, 'gap-2.5')}>
-          <button
-            type='button'
-            onClick={cell.onClick}
-            className="group/link inline-flex min-w-0 cursor-pointer items-center gap-2.5 rounded-xs border-0 bg-transparent p-0 text-left font-sans text-base leading-control font-medium text-pretty text-foreground outline-none after:absolute after:inset-0 after:content-[''] focus-visible:shadow-focus-ring"
-          >
-            {cell.icon ? (
-              <span className='inline-flex flex-none text-muted-foreground'>
-                <Icon glyph={cell.icon} size={16} />
-              </span>
-            ) : null}
-            <span
+          {cell.onClick ? (
+            <button
+              type='button'
+              onClick={cell.onClick}
               className={cn(
-                'decoration-slate-300 underline-offset-3 group-hover/link:underline',
-                cell.mono && 'font-mono text-sm tracking-code'
+                LINK,
+                "group/link cursor-pointer rounded-xs border-0 bg-transparent p-0 text-left outline-none after:absolute after:inset-0 after:content-[''] focus-visible:shadow-focus-ring"
               )}
             >
-              {cell.text}
-            </span>
-          </button>
+              {linkBody}
+            </button>
+          ) : (
+            <span className={LINK}>{linkBody}</span>
+          )}
           {cell.tag ? <Badge kind='label'>{cell.tag}</Badge> : null}
         </span>
       </TableCell>
@@ -254,14 +282,14 @@ function DataTable({
           <TableBody>
             {rows.map((row, index) => (
               <TableRow
-                key={index}
+                key={row.id ?? index}
                 className='relative border-border-subtle hover:bg-muted'
               >
                 {columns.map((column) => (
                   <DataCell
                     key={column.key}
                     column={column}
-                    cell={row[column.key]}
+                    cell={row.cells[column.key]}
                   />
                 ))}
               </TableRow>

@@ -5,10 +5,13 @@ import { Button } from '@tinacms/ui/components/button';
 import { Card } from '@tinacms/ui/components/card';
 import { cn } from '@tinacms/ui/lib/utils';
 
+const NAME =
+  'm-0 max-w-full min-w-0 font-sans text-base leading-title font-semibold text-pretty text-foreground';
+
 type TileProps = Omit<ComponentProps<'div'>, 'children' | 'title'> & {
   /** The collection or global it opens. */
   title: string;
-  /** What a press anywhere on the tile does. */
+  /** What a press anywhere on the tile does. Without it the title is plain text. */
   onOpen?: () => void;
   /** The count, such as "148 documents", or the file path with `metaMono`. */
   meta?: string;
@@ -53,14 +56,21 @@ function Tile({
       {...props}
     >
       <div className='flex min-w-0 items-start justify-between gap-2'>
-        <button
-          type='button'
-          data-slot='tile-name'
-          onClick={onOpen}
-          className="m-0 max-w-full min-w-0 cursor-pointer rounded-xs border-0 bg-transparent p-0 text-left font-sans text-base leading-title font-semibold text-pretty text-foreground decoration-slate-300 underline-offset-3 outline-none after:absolute after:inset-0 after:rounded-md after:content-[''] hover:underline"
-        >
-          {title}
-        </button>
+        {onOpen ? (
+          <button
+            type='button'
+            data-slot='tile-name'
+            onClick={onOpen}
+            className={cn(
+              NAME,
+              "cursor-pointer rounded-xs border-0 bg-transparent p-0 text-left decoration-slate-300 underline-offset-3 outline-none after:absolute after:inset-0 after:rounded-md after:content-[''] hover:underline"
+            )}
+          >
+            {title}
+          </button>
+        ) : (
+          <span className={NAME}>{title}</span>
+        )}
         {unsaved ? (
           <Badge kind='unsaved' className='-my-0.5 flex-none'>
             {unsaved}
