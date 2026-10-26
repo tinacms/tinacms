@@ -1241,7 +1241,7 @@ importers:
         version: 8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)
       vitest:
         specifier: ^4.1.8
-        version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(happy-dom@20.14.6)(jsdom@29.1.1)(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
+        version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(happy-dom@21.0.4)(jsdom@29.1.1)(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
       vitest-browser-svelte:
         specifier: ^2.1.1
         version: 2.2.1(svelte@5.57.2)(vitest@4.1.12)
@@ -2037,8 +2037,8 @@ importers:
         specifier: ^22.13.1
         version: 22.19.17
       happy-dom:
-        specifier: ^20.14.6
-        version: 20.14.6
+        specifier: ^21.0.4
+        version: 21.0.4
       svelte:
         specifier: ^5.57.1
         version: 5.57.2
@@ -2053,7 +2053,7 @@ importers:
         version: 8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)
       vitest:
         specifier: ^4.1.8
-        version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/browser-playwright@4.1.12)(happy-dom@20.14.6)(jsdom@29.1.1)(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
+        version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/browser-playwright@4.1.12)(happy-dom@21.0.4)(jsdom@29.1.1)(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   packages/@tinacms/vercel-previews:
     dependencies:
@@ -11482,8 +11482,8 @@ packages:
     resolution: {integrity: sha512-NbA5XrSovenJIIcfixCREX3ZnV7yHP4phhbfuxxf4CPn+LZpz/jIM9EqJ2DrPwgVDSMoAKH3pZwQvkbsSiCrUw==}
     engines: {node: '>=18.0.0'}
 
-  happy-dom@20.14.6:
-    resolution: {integrity: sha512-5DDsf4QmEIlRL6NkCv/fxSjYHHkZceL/IaYQdJc2h3G7DRTEai++VTjbfL0LB9geW2VrA3+vrjF3Efx+OTtX0Q==}
+  happy-dom@21.0.4:
+    resolution: {integrity: sha512-tFm+GaLBgo6o0awHnvHaNoraVo27qJ+2tZEtZ+cIa08hXbeitrxAJajLI05hsUy/2/YTKcUjQYzHe5mCcraLBw==}
     engines: {node: '>=20.0.0'}
 
   harmony-reflect@1.6.2:
@@ -24429,7 +24429,7 @@ snapshots:
       '@vitest/mocker': 4.1.12(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
       playwright: 1.61.1
       tinyrainbow: 3.2.0
-      vitest: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/browser-playwright@4.1.12)(happy-dom@20.14.6)(jsdom@29.1.1)(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
+      vitest: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/browser-playwright@4.1.12)(happy-dom@21.0.4)(jsdom@29.1.1)(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
     transitivePeerDependencies:
       - bufferutil
       - msw
@@ -24443,7 +24443,7 @@ snapshots:
       '@vitest/mocker': 4.1.12(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
       playwright: 1.61.1
       tinyrainbow: 3.2.0
-      vitest: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(happy-dom@20.14.6)(jsdom@29.1.1)(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
+      vitest: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(happy-dom@21.0.4)(jsdom@29.1.1)(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
     transitivePeerDependencies:
       - bufferutil
       - msw
@@ -24477,7 +24477,7 @@ snapshots:
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.2.0
-      vitest: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/browser-playwright@4.1.12)(happy-dom@20.14.6)(jsdom@29.1.1)(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
+      vitest: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/browser-playwright@4.1.12)(happy-dom@21.0.4)(jsdom@29.1.1)(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
       ws: 8.22.0
     transitivePeerDependencies:
       - bufferutil
@@ -24495,7 +24495,7 @@ snapshots:
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.2.0
-      vitest: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(happy-dom@20.14.6)(jsdom@29.1.1)(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
+      vitest: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(happy-dom@21.0.4)(jsdom@29.1.1)(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
       ws: 8.22.0
     transitivePeerDependencies:
       - bufferutil
@@ -27611,7 +27611,7 @@ snapshots:
       webidl-conversions: 7.0.0
       whatwg-mimetype: 3.0.0
 
-  happy-dom@20.14.6:
+  happy-dom@21.0.4:
     dependencies:
       '@types/node': 22.19.17
       '@types/whatwg-mimetype': 3.0.2
@@ -34304,7 +34304,7 @@ snapshots:
     dependencies:
       '@testing-library/svelte-core': 1.1.3(svelte@5.57.2)
       svelte: 5.57.2
-      vitest: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(happy-dom@20.14.6)(jsdom@29.1.1)(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
+      vitest: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(happy-dom@21.0.4)(jsdom@29.1.1)(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   vitest@0.32.4(@vitest/browser@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(lightningcss@1.32.0)(playwright@1.61.1)(sass@1.97.3)(terser@5.46.0):
     dependencies:
@@ -34578,7 +34578,7 @@ snapshots:
       - tsx
       - yaml
 
-  vitest@4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/browser-playwright@4.1.12)(happy-dom@20.14.6)(jsdom@29.1.1)(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)):
+  vitest@4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/browser-playwright@4.1.12)(happy-dom@21.0.4)(jsdom@29.1.1)(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)):
     dependencies:
       '@vitest/expect': 4.1.12
       '@vitest/mocker': 4.1.12(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
@@ -34604,12 +34604,12 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       '@types/node': 22.19.17
       '@vitest/browser-playwright': 4.1.12(playwright@1.61.1)(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))(vitest@4.1.12)
-      happy-dom: 20.14.6
+      happy-dom: 21.0.4
       jsdom: 29.1.1
     transitivePeerDependencies:
       - msw
 
-  vitest@4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(happy-dom@20.14.6)(jsdom@29.1.1)(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)):
+  vitest@4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(happy-dom@21.0.4)(jsdom@29.1.1)(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)):
     dependencies:
       '@vitest/expect': 4.1.12
       '@vitest/mocker': 4.1.12(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
@@ -34635,7 +34635,7 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       '@types/node': 25.1.0
       '@vitest/browser-playwright': 4.1.12(playwright@1.61.1)(vite@8.3.5(@types/node@25.1.0)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))(vitest@4.1.12)
-      happy-dom: 20.14.6
+      happy-dom: 21.0.4
       jsdom: 29.1.1
     transitivePeerDependencies:
       - msw

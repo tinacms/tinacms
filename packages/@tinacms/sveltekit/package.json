@@ -108,7 +108,7 @@
     "@sveltejs/vite-plugin-svelte": "^7.2.0",
     "@tinacms/scripts": "workspace:*",
     "@types/node": "^22.13.1",
-    "happy-dom": "^20.14.6",
+    "happy-dom": "^21.0.4",
     "svelte": "^5.57.1",
     "svelte-check": "^4.6.0",
     "typescript": "^6.0.0",

@@ -382,9 +382,10 @@ visual checks are slow and expensive.
 
 **Consequences.** Everything runs in CI: `main.yml` runs the package's
 `pnpm test`, and `playwright-sveltekit-kitchen-sink.yml` runs the example's
-checks and e2e suite. happy-dom must be 20.x: 15.10.2 doesn't show paragraphs
-added to existing content, so the reactivity test fails on it. There's no
-real-browser test of layout; the default renderer has no styles to check.
+checks and e2e suite. happy-dom must be 20 or later (the package pins
+`^21.0.4`): 15.10.2 doesn't show paragraphs added to existing content, so the
+reactivity test fails on it. There's no real-browser test of layout; the
+default renderer has no styles to check.
 
 ## Known limitations
 

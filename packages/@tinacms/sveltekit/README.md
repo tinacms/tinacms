@@ -353,9 +353,10 @@ Next:
    escaping, the island checks and the bridge dev server into
    `@tinacms/bridge`, and switch this package and `@tinacms/astro` to them
    (follow-up PR).
-4. **happy-dom:** this package pins `happy-dom ^20.14.6` because 15.10.2 (the
-   catalog version) doesn't show paragraphs added to existing content. Go
-   back to `catalog:` once the catalog moves to 20.x.
+4. **happy-dom:** this package pins `happy-dom ^21.0.4`: 15.10.2 (the catalog
+   version) doesn't show paragraphs added to existing content, and versions up
+   to 21.0.3 are covered by security advisories. Go back to `catalog:` once
+   the catalog is bumped.
 
 References: [Tina Astro visual editing](https://tina.io/docs/contextual-editing/astro),
 [SvelteKit adapters](https://svelte.dev/docs/kit/adapters),
