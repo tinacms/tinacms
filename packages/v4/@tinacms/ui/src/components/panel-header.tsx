@@ -11,18 +11,16 @@ import { cn } from '@tinacms/ui/lib/utils';
 type PanelHeaderProps = Omit<ComponentProps<'div'>, 'children'> & {
   /** Long titles end in an ellipsis. A back button replaces it. */
   heading?: string;
-  /** Shows a back button with these words in place of the title, such as "Return to navigator". */
+  /** Shows a back button with these words in place of the title. */
   backLabel?: string;
-  /** Shown on hover over the back button. */
   backTitle?: string;
   onBack?: () => void;
-  /** The panel's one action after the title, such as New: a ghost `Button size='sm'`. */
+  /** At most one action, as a ghost `Button size='sm'`. */
   action?: ReactElement;
-  /** The ⋯ menu's items, such as maximise, sort and collapse all. Without items there is no ⋯ button. */
+  /** `DropdownMenuItem`s. Without them there is no ⋯ button. */
   menu?: ReactNode;
-  /** Names the ⋯ button and its menu. Defaults to "<heading> actions". */
   menuLabel?: string;
-  /** Shows close, with these words for screen readers, such as "Close Collections". */
+  /** Shows close, with these words for screen readers. */
   closeLabel?: string;
   onClose?: () => void;
 };

@@ -1,11 +1,12 @@
 import { render, screen, within } from '@testing-library/react';
+import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Breadcrumb } from '@tinacms/ui/components/breadcrumb';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { NavRow } from '@tinacms/ui/components/nav-row';
-import { Pagination, pageRun } from '@tinacms/ui/components/pagination';
+import { Pagination } from '@tinacms/ui/components/pagination';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { StatusBar } from '@tinacms/ui/components/status-bar';
 import { Tabs, TabsPanel } from '@tinacms/ui/components/tabs';
@@ -70,6 +71,32 @@ describe('Tabs', () => {
   });
 });
 
+describe('Tabs, disabled', () => {
+  it('reaches a disabled tab with the arrow keys but never shows it', async () => {
+    const user = userEvent.setup();
+    render(
+      <Tabs
+        tabs={[
+          { value: 'fields', label: 'Fields' },
+          { value: 'history', label: 'History', disabled: true },
+          { value: 'references', label: 'References' },
+        ]}
+      />
+    );
+    await user.tab();
+    await user.keyboard('{ArrowRight}');
+    const history = screen.getByRole('tab', { name: 'History' });
+    expect(history).toHaveFocus();
+    expect(history).toHaveAttribute('aria-disabled', 'true');
+    expect(history).toHaveAttribute('aria-selected', 'false');
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('tab', { name: 'References' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
+  });
+});
+
 describe('Breadcrumb', () => {
   const path = ['Posts', '2026', 'October', 'Launch', 'Hello world'];
 
@@ -113,14 +140,32 @@ describe('Breadcrumb', () => {
   it('shows every step of a short path', () => {
     render(
       <Breadcrumb
-        items={[{ label: 'Posts', href: '/posts' }, { label: 'Hello' }]}
+        items={[{ label: 'Posts', onClick: () => {} }, { label: 'Hello' }]}
       />
     );
-    expect(screen.getByRole('link', { name: 'Posts' })).toHaveAttribute(
-      'href',
-      '/posts'
-    );
-    expect(screen.queryByRole('button')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Posts' })).toBeVisible();
+    expect(screen.getByText('Hello')).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('keeps focus on the trail when a pressed step becomes the current page', async () => {
+    const user = userEvent.setup();
+    function Trail() {
+      const [depth, setDepth] = useState(path.length);
+      return (
+        <Breadcrumb
+          items={path.slice(0, depth).map((label, index) => ({
+            label,
+            onClick: index < depth - 1 ? () => setDepth(index + 1) : undefined,
+          }))}
+        />
+      );
+    }
+    render(<Trail />);
+    await user.click(screen.getByRole('button', { name: 'Launch' }));
+    expect(screen.getByText('Launch')).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('Launch')).toHaveFocus();
+    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    expect(screen.getByText('Posts')).toHaveFocus();
   });
 });
 
@@ -157,6 +202,18 @@ describe('NavRow', () => {
     expect(
       screen.getByRole('button', { name: 'Posts 2 unsaved' })
     ).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('keeps its own aria-expanded on a folder', () => {
+    render(
+      <NavRow kind='folder' aria-expanded>
+        Posts
+      </NavRow>
+    );
+    expect(screen.getByRole('button', { name: 'Posts' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
   });
 
   it('says a link row opens a new tab', () => {
@@ -242,11 +299,16 @@ describe('StatusBar', () => {
 });
 
 describe('Pagination', () => {
-  it('folds a long run of pages around the current page', () => {
-    expect(pageRun(6, 13)).toEqual([1, null, 5, 6, 7, null, 13]);
-    expect(pageRun(2, 13)).toEqual([1, 2, 3, 4, 5, null, 13]);
-    expect(pageRun(12, 13)).toEqual([1, null, 9, 10, 11, 12, 13]);
-    expect(pageRun(3, 5)).toEqual([1, 2, 3, 4, 5]);
+  it.each([
+    [6, '1 … 5 6 7 … 13'],
+    [2, '1 2 3 4 5 … 13'],
+    [12, '1 … 9 10 11 12 13'],
+  ])('folds a long run of pages around page %i', (page, run) => {
+    const { container } = render(<Pagination total={130} page={page} />);
+    const shown = [...container.querySelectorAll('li')].map((item) =>
+      item.getAttribute('aria-hidden') ? '…' : item.textContent
+    );
+    expect(shown.slice(1, -1).join(' ')).toBe(run);
   });
 
   it('shows the range and moves between pages', async () => {
@@ -263,11 +325,31 @@ describe('Pagination', () => {
     expect(onPageChange.mock.calls).toEqual([[3], [5]]);
   });
 
+  it('keeps focus on Next when it reaches the last page', async () => {
+    const user = userEvent.setup();
+    function Pages() {
+      const [page, setPage] = useState(4);
+      return <Pagination total={48} page={page} onPageChange={setPage} />;
+    }
+    render(<Pages />);
+    const next = screen.getByRole('button', { name: 'Next' });
+    next.focus();
+    await user.keyboard('{Enter}');
+    expect(next).toHaveAttribute('aria-disabled', 'true');
+    expect(next).toHaveFocus();
+  });
+
   it('disables the ends instead of hiding them', () => {
     const { rerender } = render(<Pagination total={48} page={1} />);
-    expect(screen.getByRole('button', { name: 'Previous' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Previous' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
     rerender(<Pagination total={48} page={5} />);
-    expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
     expect(screen.getByText('Showing 41–48 of 48')).toBeVisible();
   });
 });

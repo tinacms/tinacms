@@ -5,9 +5,9 @@ import { Button } from '@tinacms/ui/components/button';
 import { type Glyph, Icon } from '@tinacms/ui/components/icon';
 import { cn } from '@tinacms/ui/lib/utils';
 
-type SaveState = 'unsaved' | 'saving' | 'saved' | 'failed';
+type StatusBarState = 'unsaved' | 'saving' | 'saved' | 'failed';
 
-const STATE_GLYPH: Record<SaveState, Glyph | undefined> = {
+const STATE_GLYPH: Record<StatusBarState, Glyph | undefined> = {
   unsaved: undefined,
   saving: 'spinner',
   saved: 'check',
@@ -19,19 +19,17 @@ type StatusBarWhere =
   | { local: true; branch?: never; protectedBranch?: never }
   | {
       local?: false;
-      /** Such as `docs/v4-launch`. */
       branch: string;
-      /** Reads "main (protected)". */
       protectedBranch?: boolean;
     };
 
 type StatusBarProps = Omit<ComponentProps<'footer'>, 'children'> &
   StatusBarWhere & {
     /** Draws the icon, or the unsaved dot, before the words. `failed` turns them red. */
-    state?: SaveState;
-    /** The state in words, such as "Saving to a new branch". Screen readers hear each change. */
+    state?: StatusBarState;
+    /** The state in words. Screen readers hear each change. */
     children?: ReactNode;
-    /** One small button after the words, such as Retry or Open. Screen readers do not hear it with the words. */
+    /** Screen readers do not hear it with the words. */
     action?: { label: string; onClick: () => void };
   };
 
@@ -108,5 +106,5 @@ function StatusBar({
   );
 }
 
-export type { SaveState, StatusBarProps };
+export type { StatusBarState, StatusBarProps };
 export { StatusBar };

@@ -1,5 +1,11 @@
 import { cva } from 'class-variance-authority';
-import { type ComponentProps, Fragment, type ReactNode } from 'react';
+import {
+  type ComponentProps,
+  Fragment,
+  type ReactNode,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 
 import {
   DropdownMenu,
@@ -7,21 +13,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@tinacms/ui/components/dropdown-menu';
-import { type Glyph, Icon } from '@tinacms/ui/components/icon';
+import { Icon } from '@tinacms/ui/components/icon';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type BreadcrumbStep = {
   label: string;
   onClick?: () => void;
-  /** Makes the step a link instead of a button. */
-  href?: string;
-  /** The last step is the current page unless it has `onClick` or `href`. */
+  /** The last step is the current page unless it has `onClick`. */
   current?: boolean;
   /** The open document's file, shown on hover. */
   file?: string;
 };
 
 type BreadcrumbSize = 'md' | 'sm';
+
+/** A longer path keeps the first step and the last two, and folds the rest. */
+const MAX_STEPS = 3;
 
 const stepVariants = cva(
   'block truncate rounded-sm border-0 bg-transparent font-sans text-slate-600 no-underline outline-none hover:bg-muted hover:text-foreground focus-visible:shadow-focus-ring',
@@ -48,35 +55,20 @@ const foldVariants = cva(
   }
 );
 
-type FoldItem = {
-  label: string;
-  onClick?: () => void;
-  /** Shown after the words, such as a count badge or the unsaved dot. */
-  marks?: ReactNode;
-};
+type FoldItem = { label: string; onClick?: () => void };
 
 type BreadcrumbFoldProps = Omit<
   ComponentProps<typeof DropdownMenuTrigger>,
   'children'
 > & {
-  /** The folded levels, top first. */
   items: readonly FoldItem[];
-  /** The icon before each level in the menu. */
-  icon?: Glyph | null;
   size?: BreadcrumbSize;
-  /** What the trigger shows. The more icon by default. */
-  children?: ReactNode;
 };
 
-/**
- * The button for the folded levels of a breadcrumb or a field trail, and the menu
- * of those levels it opens. Escape closes the menu and returns focus here.
- */
+/** The button for the folded levels of a breadcrumb or a field trail, and the menu it opens. */
 function BreadcrumbFold({
   items,
-  icon = 'folder',
   size = 'md',
-  children,
   className,
   ...props
 }: BreadcrumbFoldProps) {
@@ -88,20 +80,13 @@ function BreadcrumbFold({
         className={cn(foldVariants({ size }), className)}
         {...props}
       >
-        {children ?? <Icon glyph='more' size={16} />}
+        <Icon glyph='more' size={16} />
       </DropdownMenuTrigger>
       <DropdownMenuContent aria-label={label} className='w-60'>
         {items.map((item, index) => (
-          <DropdownMenuItem
-            // Two levels can share a name, so the position is the key.
-            key={index}
-            icon={icon ?? undefined}
-            onClick={item.onClick}
-          >
-            <span className='flex min-w-0 items-center gap-1.5'>
-              <span className='min-w-0 truncate'>{item.label}</span>
-              {item.marks}
-            </span>
+          // Two levels can share a name, so the position is the key.
+          <DropdownMenuItem key={index} icon='folder' onClick={item.onClick}>
+            {item.label}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
@@ -109,36 +94,80 @@ function BreadcrumbFold({
   );
 }
 
+function Step({
+  step,
+  current,
+  size,
+  onClick,
+}: {
+  step: BreadcrumbStep;
+  current: boolean;
+  size: BreadcrumbSize;
+  onClick: () => void;
+}) {
+  if (current) {
+    return (
+      <span
+        aria-current='page'
+        tabIndex={-1}
+        title={step.file}
+        className={stepVariants({ size, current: true })}
+      >
+        {step.label}
+      </span>
+    );
+  }
+  return (
+    <button type='button' onClick={onClick} className={stepVariants({ size })}>
+      {step.label}
+    </button>
+  );
+}
+
 type BreadcrumbProps = Omit<ComponentProps<'nav'>, 'children'> & {
   /** Top first. The separators are drawn for you. */
   items: readonly BreadcrumbStep[];
-  /** sm inside a panel header or the preview bar. */
   size?: BreadcrumbSize;
-  /** Steps shown before the middle folds into a menu. Never fewer than 3. */
-  max?: number;
 };
 
 /**
  * Where the open document sits. Each step above it is a Tab stop that goes back;
  * the last step is the page itself, marked as the current page.
- * A longer path keeps the first step and the last two, and folds the rest.
  */
 function Breadcrumb({
   items,
   size = 'md',
-  max = 3,
   'aria-label': label = 'Breadcrumb',
   className,
   ...props
 }: BreadcrumbProps) {
-  const fold = items.length > Math.max(3, max);
+  const fold = items.length > MAX_STEPS;
   const hidden = fold ? items.slice(1, -2) : [];
   const shown: (BreadcrumbStep | null)[] = fold
     ? [items[0], null, ...items.slice(-2)]
     : [...items];
 
+  // A pressed step often turns into the current page, a span, so its button and focus go away.
+  const navRef = useRef<HTMLElement>(null);
+  const refocus = useRef(false);
+  const press = (onClick?: () => void) => () => {
+    refocus.current = true;
+    onClick?.();
+  };
+  useLayoutEffect(() => {
+    if (!refocus.current) return;
+    refocus.current = false;
+    const focused = document.activeElement;
+    const kept = focused?.isConnected && focused !== document.body;
+    if (kept && !navRef.current?.contains(focused)) return;
+    navRef.current
+      ?.querySelector<HTMLElement>('[aria-current="page"]')
+      ?.focus();
+  }, [items]);
+
   return (
     <nav
+      ref={navRef}
       data-slot='breadcrumb'
       aria-label={label}
       className={cn(
@@ -148,65 +177,45 @@ function Breadcrumb({
       {...props}
     >
       <ol className='m-0 flex min-w-0 list-none items-center overflow-hidden p-0'>
-        {shown.map((step, index) => {
-          const current =
-            step !== null &&
-            (Boolean(step.current) ||
-              (index === shown.length - 1 && !step.onClick && !step.href));
-          return (
-            // Two steps can share a name, so the position is the key.
-            <Fragment key={index}>
-              {index > 0 ? (
-                <li
-                  aria-hidden='true'
-                  className='flex-none px-px text-muted-foreground select-none'
-                >
-                  ›
-                </li>
-              ) : null}
+        {shown.map((step, index) => (
+          // Two steps can share a name, so the position is the key.
+          <Fragment key={index}>
+            {index > 0 ? (
               <li
-                className={cn(
-                  'flex min-w-0 items-center',
-                  (index === 0 || step === null) && 'flex-none'
-                )}
+                aria-hidden='true'
+                className='flex-none px-px text-muted-foreground select-none'
               >
-                {step === null ? (
-                  <BreadcrumbFold
-                    size={size}
-                    items={hidden.map(({ label, onClick }) => ({
-                      label,
-                      onClick,
-                    }))}
-                  />
-                ) : current ? (
-                  <span
-                    aria-current='page'
-                    title={step.file}
-                    className={stepVariants({ size, current: true })}
-                  >
-                    {step.label}
-                  </span>
-                ) : step.href ? (
-                  <a
-                    href={step.href}
-                    onClick={step.onClick}
-                    className={stepVariants({ size })}
-                  >
-                    {step.label}
-                  </a>
-                ) : (
-                  <button
-                    type='button'
-                    onClick={step.onClick}
-                    className={stepVariants({ size })}
-                  >
-                    {step.label}
-                  </button>
-                )}
+                ›
               </li>
-            </Fragment>
-          );
-        })}
+            ) : null}
+            <li
+              className={cn(
+                'flex min-w-0 items-center',
+                (index === 0 || step === null) && 'flex-none'
+              )}
+            >
+              {step === null ? (
+                <BreadcrumbFold
+                  size={size}
+                  items={hidden.map((item) => ({
+                    label: item.label,
+                    onClick: press(item.onClick),
+                  }))}
+                />
+              ) : (
+                <Step
+                  step={step}
+                  size={size}
+                  current={
+                    step.current === true ||
+                    (index === shown.length - 1 && !step.onClick)
+                  }
+                  onClick={press(step.onClick)}
+                />
+              )}
+            </li>
+          </Fragment>
+        ))}
       </ol>
     </nav>
   );

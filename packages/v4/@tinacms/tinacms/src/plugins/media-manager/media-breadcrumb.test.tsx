@@ -27,4 +27,20 @@ describe('MediaBreadcrumb', () => {
     await user.click(screen.getByRole('button', { name: 'Media' }));
     expect(onOpen.mock.calls).toEqual([['posts'], ['']]);
   });
+
+  it('folds the middle of a deep folder into a menu that opens each level', async () => {
+    const onOpen = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <MediaBreadcrumb folder='posts/2026/october/launch' onOpen={onOpen} />
+    );
+    expect(screen.getByRole('button', { name: 'Media' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'october' })).toBeVisible();
+    expect(screen.getByText('launch')).toHaveAttribute('aria-current', 'page');
+    await user.click(
+      screen.getByRole('button', { name: 'Show 2 more levels' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: '2026' }));
+    expect(onOpen).toHaveBeenCalledWith('posts/2026');
+  });
 });

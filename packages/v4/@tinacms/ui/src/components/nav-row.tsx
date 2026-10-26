@@ -43,7 +43,6 @@ const navRowVariants = cva(
 /** Each kind takes only the props it uses. */
 type NavRowKindProps =
   | {
-      /** A document. */
       kind?: 'doc';
       /** A file type such as `MDX` or `{ }`, shown in place of the icon. */
       fmt?: string;
@@ -53,21 +52,17 @@ type NavRowKindProps =
       unsavedLabel?: string;
     }
   | {
-      /** A collection or Globals, or a folder in one. */
       kind: 'group' | 'folder';
-      /** The rows under it show. Turns the chevron down. */
       open?: boolean;
-      /** The unsaved documents under it, shown from 1. */
+      /** Shown from 1. */
       count?: number;
       /** Defaults to "N unsaved". */
       countLabel?: string;
     }
-  /** A link to the full table. */
   | { kind: 'more' }
   | {
-      /** A side nav entry. */
       kind: 'section';
-      /** It opens a panel beside the side nav, so a chevron shows at the end. */
+      /** It opens a panel beside the side nav. */
       opens?: boolean;
     };
 
@@ -77,7 +72,7 @@ type NavRowCommonProps = {
   /** Groups, folders and documents have one by default. */
   icon?: Glyph | LucideIcon;
   selected?: boolean;
-  /** A grey outlined label, such as "FR missing". */
+  /** A grey outlined label. */
   badge?: string;
   /** `badge` puts unsaved edits in words, so editors can find them again. */
   unsavedLook?: 'dot' | 'badge';
@@ -85,37 +80,19 @@ type NavRowCommonProps = {
 
 type NavRowContentProps = NavRowKindProps &
   NavRowCommonProps & {
-    /** The row opens a new tab: the external icon replaces the marks. */
     external?: boolean;
   };
 
-function leadGlyph(props: NavRowKindProps): Glyph | undefined {
-  switch (props.kind) {
-    case 'folder':
-      return props.open ? 'folder-open' : 'folder';
-    case 'group':
-      return 'collection';
-    case undefined:
-    case 'doc':
-      return props.fmt ? undefined : 'doc';
-    default:
-      return undefined;
-  }
-}
+type MarkProps = Pick<NavRowCommonProps, 'badge' | 'unsavedLook'>;
 
-/** What sits inside a row, for a control that draws the row's box with `navRowVariants`. */
-function NavRowContent({
-  children,
-  icon,
-  selected = false,
-  badge,
-  unsavedLook = 'dot',
-  external = false,
-  ...kindProps
-}: NavRowContentProps) {
-  const glyph =
-    kindProps.kind === 'more' ? undefined : (icon ?? leadGlyph(kindProps));
-  const lead = glyph ? (
+function Lead({
+  glyph,
+  selected,
+}: {
+  glyph: Glyph | LucideIcon | undefined;
+  selected: boolean;
+}) {
+  return glyph ? (
     <span
       data-slot='nav-row-icon'
       className={cn(
@@ -126,95 +103,169 @@ function NavRowContent({
       <Icon glyph={glyph} size={16} />
     </span>
   ) : null;
-  const label = (
+}
+
+function Label({
+  children,
+  external = false,
+}: {
+  children: ReactNode;
+  external?: boolean;
+}) {
+  return (
     <span data-slot='nav-row-label' className='min-w-0 flex-1 truncate'>
       {children}
       {external ? <span className='sr-only'> (opens in a new tab)</span> : null}
     </span>
   );
+}
 
-  if (external) {
-    return (
-      <>
-        {lead}
-        {label}
-        <Icon glyph='external' size={14} />
-      </>
-    );
-  }
-
-  const chevron = (
+function Chevron({ open = false, end = false }) {
+  return (
     <span
       className={cn(
         'inline-flex flex-none text-muted-foreground-strong transition-transform',
-        kindProps.kind === 'section' && 'ml-auto',
-        (kindProps.kind === 'group' || kindProps.kind === 'folder') &&
-          kindProps.open &&
-          'rotate-90'
+        end && 'ml-auto',
+        open && 'rotate-90'
       )}
     >
       <Icon glyph='chevron-right' size={14} />
     </span>
   );
-  const tag = unsavedLook === 'badge';
+}
 
-  switch (kindProps.kind) {
+const Gap = () => <span aria-hidden='true' className='w-3.5 flex-none' />;
+
+function LabelBadge({ badge }: MarkProps) {
+  return badge ? <Badge kind='label'>{badge}</Badge> : null;
+}
+
+type PartProps = Pick<NavRowCommonProps, 'children' | 'icon' | 'badge'> & {
+  selected: boolean;
+  /** Unsaved edits show as the Unsaved tag in words. */
+  tag: boolean;
+};
+
+type KindOf<K extends NavRowKind> = Extract<
+  NavRowKindProps,
+  { kind: K } | { kind?: K }
+>;
+
+function BranchParts({
+  kind,
+  open = false,
+  count = 0,
+  countLabel = `${count} unsaved`,
+  children,
+  icon,
+  badge,
+  selected,
+  tag,
+}: KindOf<'group' | 'folder'> & PartProps) {
+  const glyph =
+    kind === 'group' ? 'collection' : open ? 'folder-open' : 'folder';
+  const mark = tag ? (
+    <Badge>{countLabel}</Badge>
+  ) : (
+    <Badge kind='count' count={count} srLabel={countLabel} />
+  );
+  return (
+    <>
+      <Chevron open={open} />
+      <Lead glyph={icon ?? glyph} selected={selected} />
+      <Label>{children}</Label>
+      <LabelBadge badge={badge} />
+      {count > 0 ? mark : null}
+    </>
+  );
+}
+
+function DocParts({
+  fmt,
+  unsaved = false,
+  unsavedLabel = 'Unsaved',
+  children,
+  icon,
+  badge,
+  selected,
+  tag,
+}: KindOf<'doc'> & PartProps) {
+  const mark = tag ? (
+    <Badge>{unsavedLabel}</Badge>
+  ) : (
+    <Badge kind='dot' srLabel={unsavedLabel} />
+  );
+  return (
+    <>
+      <Gap />
+      <Lead glyph={icon ?? (fmt ? undefined : 'doc')} selected={selected} />
+      {fmt ? (
+        <span
+          aria-hidden='true'
+          className={cn(
+            'w-5.5 flex-none text-center font-mono text-3xs font-bold tracking-format text-muted-foreground',
+            selected && 'text-primary'
+          )}
+        >
+          {fmt}
+        </span>
+      ) : null}
+      <Label>{children}</Label>
+      <LabelBadge badge={badge} />
+      {unsaved ? mark : null}
+    </>
+  );
+}
+
+function SectionParts({
+  opens = false,
+  children,
+  icon,
+  badge,
+  selected,
+}: KindOf<'section'> & PartProps) {
+  return (
+    <>
+      <Lead glyph={icon} selected={selected} />
+      <Label>{children}</Label>
+      <LabelBadge badge={badge} />
+      {opens ? <Chevron end /> : null}
+    </>
+  );
+}
+
+/** What sits inside a row, for a control that draws the row's box with `navRowVariants`. */
+function NavRowContent({
+  selected = false,
+  unsavedLook = 'dot',
+  external = false,
+  ...props
+}: NavRowContentProps) {
+  const shared = { selected, tag: unsavedLook === 'badge' };
+  if (external) {
+    return (
+      <>
+        <Lead glyph={props.icon} selected={selected} />
+        <Label external>{props.children}</Label>
+        <Icon glyph='external' size={14} />
+      </>
+    );
+  }
+  switch (props.kind) {
     case 'group':
-    case 'folder': {
-      const { count = 0, countLabel = `${count} unsaved` } = kindProps;
-      return (
-        <>
-          {chevron}
-          {lead}
-          {label}
-          {badge ? <Badge kind='label'>{badge}</Badge> : null}
-          {count > 0 && tag ? <Badge>{countLabel}</Badge> : null}
-          {count > 0 && !tag ? (
-            <Badge kind='count' count={count} srLabel={countLabel} />
-          ) : null}
-        </>
-      );
-    }
+    case 'folder':
+      return <BranchParts {...props} {...shared} />;
     case 'section':
-      return (
-        <>
-          {lead}
-          {label}
-          {badge ? <Badge kind='label'>{badge}</Badge> : null}
-          {kindProps.opens ? chevron : null}
-        </>
-      );
+      return <SectionParts {...props} {...shared} />;
     case 'more':
       return (
         <>
-          <span aria-hidden='true' className='w-3.5 flex-none' />
-          {label}
+          <Gap />
+          <Label>{props.children}</Label>
         </>
       );
-    default: {
-      const { fmt, unsaved = false, unsavedLabel = 'Unsaved' } = kindProps;
-      return (
-        <>
-          <span aria-hidden='true' className='w-3.5 flex-none' />
-          {lead}
-          {fmt ? (
-            <span
-              aria-hidden='true'
-              className={cn(
-                'w-5.5 flex-none text-center font-mono text-3xs font-bold tracking-format text-muted-foreground',
-                selected && 'text-primary'
-              )}
-            >
-              {fmt}
-            </span>
-          ) : null}
-          {label}
-          {badge ? <Badge kind='label'>{badge}</Badge> : null}
-          {unsaved && tag ? <Badge>{unsavedLabel}</Badge> : null}
-          {unsaved && !tag ? <Badge kind='dot' srLabel={unsavedLabel} /> : null}
-        </>
-      );
-    }
+    default:
+      return <DocParts {...props} {...shared} />;
   }
 }
 
@@ -229,6 +280,34 @@ type NavRowProps = NavRowKindProps &
     /** Makes it a link that opens a new tab. A link keeps `id`, `title`, `aria-current` and `className`. */
     href?: string;
   };
+
+/** Splits the kind's props from the ones that go on the element, so none reach the DOM. */
+function splitKindProps(
+  props: NavRowKindProps & RowDomProps
+): [NavRowKindProps, RowDomProps] {
+  switch (props.kind) {
+    case 'group':
+    case 'folder': {
+      const { kind, open = false, count, countLabel, ...dom } = props;
+      return [
+        { kind, open, count, countLabel },
+        { ...dom, 'aria-expanded': open },
+      ];
+    }
+    case 'section': {
+      const { kind, opens, ...dom } = props;
+      return [{ kind, opens }, dom];
+    }
+    case 'more': {
+      const { kind, ...dom } = props;
+      return [{ kind }, dom];
+    }
+    default: {
+      const { kind, fmt, unsaved, unsavedLabel, ...dom } = props;
+      return [{ kind, fmt, unsaved, unsavedLabel }, dom];
+    }
+  }
+}
 
 /**
  * One row of the navigator or the side nav. A group or folder tells screen readers
@@ -246,7 +325,7 @@ function NavRow({
   type,
   ...rest
 }: NavRowProps) {
-  const [kindProps, buttonProps] = splitKindProps(rest);
+  const [kindProps, domProps] = splitKindProps(rest);
   const classes = cn(
     navRowVariants({ kind: kindProps.kind ?? 'doc', selected, nested }),
     className
@@ -268,9 +347,9 @@ function NavRow({
     return (
       <a
         data-slot='nav-row'
-        id={buttonProps.id}
-        title={buttonProps.title}
-        aria-current={buttonProps['aria-current']}
+        id={domProps.id}
+        title={domProps.title}
+        aria-current={domProps['aria-current']}
         href={href}
         target='_blank'
         rel='noopener noreferrer'
@@ -285,42 +364,12 @@ function NavRow({
     <button
       data-slot='nav-row'
       type={type ?? 'button'}
-      aria-expanded={
-        kindProps.kind === 'group' || kindProps.kind === 'folder'
-          ? (kindProps.open ?? false)
-          : buttonProps['aria-expanded']
-      }
-      {...buttonProps}
+      {...domProps}
       className={classes}
     >
       {content}
     </button>
   );
-}
-
-/** Splits the kind's props from the ones that go on the element, so none reach the DOM. */
-function splitKindProps(
-  props: NavRowKindProps & RowDomProps
-): [NavRowKindProps, RowDomProps] {
-  switch (props.kind) {
-    case 'group':
-    case 'folder': {
-      const { kind, open, count, countLabel, ...dom } = props;
-      return [{ kind, open, count, countLabel }, dom];
-    }
-    case 'section': {
-      const { kind, opens, ...dom } = props;
-      return [{ kind, opens }, dom];
-    }
-    case 'more': {
-      const { kind, ...dom } = props;
-      return [{ kind }, dom];
-    }
-    default: {
-      const { kind, fmt, unsaved, unsavedLabel, ...dom } = props;
-      return [{ kind, fmt, unsaved, unsavedLabel }, dom];
-    }
-  }
 }
 
 export type { NavRowContentProps, NavRowKind, NavRowProps };
