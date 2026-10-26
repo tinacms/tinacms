@@ -3,19 +3,17 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@tinacms/ui/lib/utils';
 
-type Tab<T extends string> = { value: T; label: string };
+type Tab<T extends string> = { value: T; label: string; disabled?: boolean };
 
 type TabsProps<T extends string> = Omit<
   TabsPrimitive.Root.Props,
   'value' | 'defaultValue' | 'onValueChange' | 'children'
 > & {
-  /** Such as Fields, History, References and Translations. */
   tabs: readonly Tab<T>[];
   value?: NoInfer<T>;
   /** Defaults to the first tab. */
   defaultValue?: NoInfer<T>;
   onValueChange?: (value: NoInfer<T>) => void;
-  /** The tab list's name, such as "Document tools". */
   'aria-label'?: string;
   /** One `TabsPanel` per tab. */
   children?: ReactNode;
@@ -59,7 +57,8 @@ function Tabs<T extends string>({
           <TabsPrimitive.Tab
             key={tab.value}
             value={tab.value}
-            className='-mb-px h-10 flex-none cursor-pointer border-0 border-b-2 border-transparent bg-transparent px-0.5 py-0 font-sans text-base font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:shadow-focus-ring disabled:cursor-not-allowed disabled:opacity-45 data-active:border-primary data-active:text-foreground'
+            disabled={tab.disabled}
+            className='-mb-px h-10 flex-none cursor-pointer border-0 border-b-2 border-transparent bg-transparent px-0.5 py-0 font-sans text-base font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:shadow-focus-ring data-disabled:cursor-not-allowed data-disabled:opacity-45 data-disabled:hover:text-muted-foreground data-active:border-primary data-active:text-foreground'
           >
             {tab.label}
           </TabsPrimitive.Tab>

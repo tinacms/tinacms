@@ -50,6 +50,11 @@ use it to verify runtime/editor changes in a browser.
   it to the TinaCMS design. Don't hand-write primitives that shadcn already
   provides, and never re-add an existing component: that overwrites its
   TinaCMS styling.
+- **Hand-written on Base UI:** `tabs.tsx`, `breadcrumb.tsx` and
+  `pagination.tsx` in `@tinacms/ui` do not come from shadcn. Never run
+  `shadcn add` for them, or for a registry item that depends on them. The
+  `add` command writes an `import { cn } from "cn"` and adds a `cn` npm
+  dependency, and it asks to overwrite `button.tsx`.
 
 ## Types
 

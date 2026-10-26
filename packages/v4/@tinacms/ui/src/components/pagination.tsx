@@ -6,6 +6,8 @@ import { cn } from '@tinacms/ui/lib/utils';
 
 const SLOTS = 7;
 const NUMBER = 'min-w-8 justify-center px-2 tabular-nums';
+const END =
+  'data-disabled:cursor-not-allowed data-disabled:opacity-45 data-disabled:hover:bg-secondary';
 
 /**
  * The page numbers to draw, with `null` for an ellipsis: every page up to seven,
@@ -21,17 +23,14 @@ function pageRun(page: number, pages: number): (number | null)[] {
 }
 
 type PaginationProps = Omit<ComponentProps<'nav'>, 'children'> & {
-  /** Items in the whole list, such as 48 documents. */
+  /** Items in the whole list. */
   total: number;
-  /** 10 by default. */
   pageSize?: number;
   /** From 1. */
   page: number;
-  /** Gets the page to show, from 1. */
   onPageChange?: (page: number) => void;
-  /** Such as "Newer" for documents sorted by date. */
+  /** "Newer" reads better for documents sorted by date. */
   prevLabel?: string;
-  /** Such as "Older". */
   nextLabel?: string;
 };
 
@@ -50,12 +49,10 @@ function Pagination({
   className,
   ...props
 }: PaginationProps) {
-  const items = Math.max(0, Math.floor(total) || 0);
-  const size = Math.max(1, Math.floor(pageSize) || 1);
-  const pages = Math.max(1, Math.ceil(items / size));
-  const current = Math.min(pages, Math.max(1, Math.floor(page) || 1));
-  const from = items === 0 ? 0 : (current - 1) * size + 1;
-  const to = Math.min(items, current * size);
+  const pages = Math.max(1, Math.ceil(total / pageSize));
+  const current = Math.min(pages, Math.max(1, page));
+  const from = total === 0 ? 0 : (current - 1) * pageSize + 1;
+  const to = Math.min(total, current * pageSize);
   const go = (next: number) => () => onPageChange?.(next);
 
   return (
@@ -69,7 +66,7 @@ function Pagination({
       {...props}
     >
       <span aria-live='polite' className='tabular-nums'>
-        Showing {from === to ? to : `${from}–${to}`} of {items}
+        Showing {from === to ? to : `${from}–${to}`} of {total}
       </span>
       <ul className='m-0 flex list-none flex-wrap items-center gap-1 p-0'>
         <li>
@@ -77,13 +74,15 @@ function Pagination({
             size='sm'
             icon='chevron-left'
             disabled={current <= 1}
+            focusableWhenDisabled
+            className={END}
             onClick={go(current - 1)}
           >
             {prevLabel}
           </Button>
         </li>
-        {pageRun(current, pages).map((number, index) =>
-          number === null ? (
+        {pageRun(current, pages).map((pageNumber, index) =>
+          pageNumber === null ? (
             // The run has at most two ellipses, each fixed in place.
             <li key={`gap-${index}`} aria-hidden='true'>
               <Icon
@@ -93,17 +92,17 @@ function Pagination({
               />
             </li>
           ) : (
-            <li key={number}>
+            <li key={pageNumber}>
               <Button
                 size='sm'
-                variant={number === current ? 'secondary' : 'ghost'}
-                selected={number === current}
-                aria-current={number === current ? 'page' : undefined}
-                aria-label={`Page ${number}`}
+                variant={pageNumber === current ? 'secondary' : 'ghost'}
+                selected={pageNumber === current}
+                aria-current={pageNumber === current ? 'page' : undefined}
+                aria-label={`Page ${pageNumber}`}
                 className={NUMBER}
-                onClick={number === current ? undefined : go(number)}
+                onClick={pageNumber === current ? undefined : go(pageNumber)}
               >
-                {number}
+                {pageNumber}
               </Button>
             </li>
           )
@@ -113,6 +112,8 @@ function Pagination({
             size='sm'
             iconEnd='chevron-right'
             disabled={current >= pages}
+            focusableWhenDisabled
+            className={END}
             onClick={go(current + 1)}
           >
             {nextLabel}
@@ -124,4 +125,4 @@ function Pagination({
 }
 
 export type { PaginationProps };
-export { Pagination, pageRun };
+export { Pagination };
