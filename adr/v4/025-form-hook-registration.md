@@ -1,7 +1,7 @@
 # ADR-025: Form Hook Registration
 
 ## Status
-**Proposed**: resolves the registration question that [ADR-014](./014-document-lifecycle-hooks.md) left open. ADR-014 defines the three hooks (`onChange`, `beforeSave`, `afterSave`), their power and their client/server split. It does not say how a hook reaches a form. This ADR does. It follows the model that [ADR-016](./016-schema-compiled-artifact.md) and the validation layers in [Field Plugins](./plugins/field-plugins.md#field-level-named-validators) already use for validators.
+**Proposed**, amended by [ADR-028](./028-server-save-hooks.md): a hook may have a server side (§1), and a server hook receives a `session` (§7). Resolves the registration question that [ADR-014](./014-document-lifecycle-hooks.md) left open. ADR-014 defines the three hooks (`onChange`, `beforeSave`, `afterSave`), their power and their client/server split. It does not say how a hook reaches a form. This ADR does. It follows the model that [ADR-016](./016-schema-compiled-artifact.md) and the validation layers in [Field Plugins](./plugins/field-plugins.md#field-level-named-validators) already use for validators.
 
 ## Context
 The first implementation of ADR-014 in `@tinacms/tinacms` (tinacms/tinacms#7622) registers hooks **per plugin**: a plugin declares `provides: ['hooks']`, puts a `hooks` object on its client segment, and boot collects every plugin's hooks into one flat list. Every hook then runs on every form of every collection, in `config.plugins` order. A hook that only applies to one collection has to test `scope.collection.name` itself.
@@ -73,6 +73,8 @@ export default defineClientPlugin({
 
 `hooks` is a **Keyed capability** like `validator`: the name is the registry key, it is global, and two plugins that register the same name conflict at boot unless one declares `overrides`. Third-party names take a prefix (`acme.logSave`); first-party names stay bare.
 
+A hook may also have a server side, which runs on the Backend when the document is saved ([ADR-028](./028-server-save-hooks.md)). `defineHook(name, { client, server })` declares both sides. The name is declared once and shared by both sides, and both sides come from the same plugin. `server` is a lazy `() => import('./x.server')`, and the manifest lists the names that have a server side in `serverHooks`. The `defineHook(name, factory)` form above means client only.
+
 ### 2. A collection consumes hooks by name
 A collection lists the hooks that run on its forms, with their `args`, in the order they run. The reference shape is the validator's: `{ name, args }`, with a typed helper per hook so the config reads as a call.
 
@@ -108,8 +110,10 @@ The edit observer is `onChange`, not `afterEdit`. tinacms/tinacms#6912 used `aft
 ### 6. Failure semantics follow ADR-014, with one typed signal
 A `beforeSave` throw stops the save; the form stays dirty. `afterSave` and `onChange` are observers: every one runs even when an earlier one throws. An `onChange` failure goes to the console. An `afterSave` failure reaches the caller of `useFormSave` as an `AfterSaveHookError` after the save has landed, so the admin can show "saved, but a hook failed" instead of "not saved". This is the "logged, not rolled back" rule of ADR-014 §2 with a typed error added for the UI.
 
-### 7. The scope a hook receives does not change
-Every hook still receives `{ formId, path, collection }` beside its payload. A hook no longer needs `collection` to decide whether to act, but a shared hook (an audit hook on several collections) still needs it for its output.
+### 7. The scope a hook receives
+A client hook still receives `{ formId, path, collection }` beside its payload. A hook no longer needs `collection` to decide whether to act, but a shared hook (an audit hook on several collections) still needs it for its output.
+
+A server hook receives `{ path, collection, session, branch }`. It has no `formId`, because a server write has no form. `session` is the saving user's `Session`, or `null` without an auth plugin. `branch` is the branch the save names, or `undefined` on the default branch.
 
 ## Consequences
 
@@ -133,6 +137,6 @@ Every hook still receives `{ formId, path, collection }` beside its payload. A h
 
 ## References
 - [CONTEXT.md](./CONTEXT.md): Document lifecycle hooks, Keyed capability, Collection
-- [ADR-014](./014-document-lifecycle-hooks.md), [ADR-016](./016-schema-compiled-artifact.md), [ADR-018](./018-save-flow.md)
+- [ADR-014](./014-document-lifecycle-hooks.md), [ADR-016](./016-schema-compiled-artifact.md), [ADR-018](./018-save-flow.md), [ADR-028](./028-server-save-hooks.md)
 - [Field Plugins: named validators](./plugins/field-plugins.md#field-level-named-validators)
 - tinacms/tinacms#6912 (the issue), tinacms/tinacms#7622 (the first implementation)

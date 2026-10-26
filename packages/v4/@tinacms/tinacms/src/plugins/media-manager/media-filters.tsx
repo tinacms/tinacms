@@ -36,7 +36,7 @@ import {
 
 const segmentClass = (active: boolean) =>
   cn(
-    'rounded-none border-0 first:rounded-l-lg last:rounded-r-lg [&:not(:first-child)]:border-l',
+    'rounded-none border-0 first:rounded-l-sm last:rounded-r-sm [&:not(:first-child)]:border-l',
     active ? 'bg-background text-primary' : 'bg-muted/50 text-muted-foreground'
   );
 
@@ -48,11 +48,11 @@ export function ViewModeToggle({
   onChange: (value: MediaViewMode) => void;
 }) {
   return (
-    <div role='group' aria-label='View' className='flex rounded-lg border'>
+    <div role='group' aria-label='View' className='flex rounded-sm border'>
       <Button
         type='button'
-        variant='ghost'
-        size='icon'
+        variant='icon'
+        size='sm'
         aria-label='Grid view'
         aria-pressed={value === 'grid'}
         className={segmentClass(value === 'grid')}
@@ -62,8 +62,8 @@ export function ViewModeToggle({
       </Button>
       <Button
         type='button'
-        variant='ghost'
-        size='icon'
+        variant='icon'
+        size='sm'
         aria-label='List view'
         aria-pressed={value === 'list'}
         className={segmentClass(value === 'list')}
@@ -83,7 +83,7 @@ export function MediaKindToggle({
   onChange: (value: MediaKindFilter) => void;
 }) {
   return (
-    <div role='group' aria-label='Show' className='flex rounded-lg border'>
+    <div role='group' aria-label='Show' className='flex rounded-sm border'>
       {MEDIA_KIND_OPTIONS.map((option) => (
         <Button
           key={option.value}
@@ -126,10 +126,10 @@ export function MediaSearchInput({
       {value ? (
         <Button
           type='button'
-          variant='ghost'
-          size='icon-xs'
+          variant='icon'
+          size='sm'
           aria-label='Clear search'
-          className='absolute right-1.5'
+          className='absolute right-1 size-6'
           onClick={() => onChange('')}
         >
           <XIcon className='size-3' />
@@ -198,7 +198,7 @@ export function LockedAcceptChip({
     <Tooltip>
       <TooltipTrigger
         render={<span />}
-        className='flex items-center gap-1.5 rounded-lg border border-dashed bg-muted px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground'
+        className='flex items-center gap-1.5 rounded-sm border border-dashed bg-muted px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground'
       >
         <LockIcon className='size-3.5' />
         {label}

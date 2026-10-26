@@ -152,7 +152,7 @@ export function ImageField() {
         aria-labelledby={`${address}-label`}
         data-dragging={dragging ? 'true' : undefined}
         className={cn(
-          'flex flex-col gap-2 rounded-md border p-2 transition',
+          'flex flex-col gap-2 rounded-sm border p-2 transition',
           value == null ? 'border-dashed' : null,
           dragging ? 'border-orange-500' : null
         )}
@@ -175,7 +175,7 @@ export function ImageField() {
           ) : (
             <>
               {missing ? (
-                <span className='flex size-16 shrink-0 items-center justify-center rounded border bg-muted/50'>
+                <span className='flex size-16 shrink-0 items-center justify-center rounded-sm border bg-muted/50'>
                   <ImageOffIcon
                     aria-hidden='true'
                     className='size-6 text-muted-foreground'
@@ -184,7 +184,7 @@ export function ImageField() {
               ) : (
                 <span
                   style={checkerboardStyle}
-                  className='size-16 shrink-0 overflow-hidden rounded border'
+                  className='size-16 shrink-0 overflow-hidden rounded-sm border'
                 >
                   <img
                     src={thumbnailSrc ?? undefined}
@@ -213,7 +213,7 @@ export function ImageField() {
           <Button
             ref={mainButtonRef}
             type='button'
-            variant='outline'
+            variant='toolbar'
             size='sm'
             disabled={uploading}
             onClick={choose}
@@ -236,7 +236,7 @@ export function ImageField() {
               <span
                 className={cn(
                   buttonVariants({ variant: 'ghost', size: 'sm' }),
-                  'peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50'
+                  'peer-focus:shadow-focus-ring peer-disabled:cursor-not-allowed peer-disabled:opacity-50'
                 )}
               >
                 {uploading ? 'Uploading…' : 'Upload'}

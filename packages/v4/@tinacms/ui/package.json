@@ -3,7 +3,7 @@
   "version": "4.0.0-alpha.0",
   "private": true,
   "license": "Apache-2.0",
-  "description": "The shared user interface components of TinaCMS v4. The components come from shadcn/ui. To add a component, or to update one, run the shadcn CLI in this directory: pnpm dlx shadcn@latest add <component>.",
+  "description": "The shared user interface components of TinaCMS v4, built on shadcn/ui and restyled to the TinaCMS design. Add a new component with the shadcn CLI in this directory (pnpm dlx shadcn@latest add <component>), then restyle it. Never re-add an existing component: that overwrites its TinaCMS styling.",
   "type": "module",
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
@@ -13,10 +13,12 @@
     "**/*.css"
   ],
   "scripts": {
-    "types": "tsc"
+    "types": "tsc",
+    "test": "vitest run"
   },
   "exports": {
     "./globals.css": "./src/styles/globals.css",
+    "./assets/*": "./src/assets/*",
     "./components/*": {
       "types": "./src/components/*.tsx",
       "default": "./src/components/*.tsx"
@@ -32,6 +34,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/ibm-plex-sans": "^5.3.0",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "lucide-react": "catalog:",
@@ -42,11 +46,19 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@testing-library/dom": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@testing-library/user-event": "catalog:",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "catalog:",
+    "happy-dom": "catalog:",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vite": "^5.4.0",
+    "vitest": "^2.1.9"
   }
 }

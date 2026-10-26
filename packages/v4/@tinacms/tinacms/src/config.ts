@@ -31,12 +31,15 @@ export interface TinaConfig {
   plugins?: PluginManifest[];
   schema: TinaSchema;
   build?: TinaBuildConfig;
+  /** Where the site mounts its RPC handler. `/api/tina` by default. */
+  rpcUrl?: string;
 }
 
 export interface ComposedConfig {
   plugins: PluginManifest[];
   schema: TinaSchema;
   build?: Required<TinaBuildConfig>;
+  rpcUrl?: string;
 }
 
 export type ResolvedConfig = Brand<ComposedConfig, 'ResolvedConfig'>;
@@ -142,6 +145,7 @@ export const composeConfig = (
     plugins,
     schema: config.schema,
     build: resolveBuild(config.build),
+    ...(config.rpcUrl ? { rpcUrl: config.rpcUrl } : {}),
   });
 };
 

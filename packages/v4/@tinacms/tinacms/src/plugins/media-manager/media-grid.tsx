@@ -33,8 +33,8 @@ const tileLabel = (name: string, isNew: boolean) =>
 
 function NewBadge() {
   return (
-    <Badge className='absolute top-2 right-2 z-10 bg-green-100 text-[10px] font-bold tracking-wide text-green-700'>
-      NEW
+    <Badge kind='tag' tone='info' className='absolute top-2 right-2 z-10'>
+      New
     </Badge>
   );
 }
@@ -51,7 +51,7 @@ function GridFolderTile({
     <li>
       <button
         type='button'
-        className='flex w-full flex-col overflow-hidden rounded-xl border bg-card text-left shadow-sm transition outline-none hover:border-primary/40 hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50'
+        className='flex w-full flex-col overflow-hidden rounded-md border bg-card text-left shadow-sm transition outline-none hover:border-primary/40 hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50'
         onClick={() => onClick(item)}
       >
         <span className='flex h-24 items-center justify-center'>
@@ -91,7 +91,7 @@ function GridFileTile({
         aria-label={tileLabel(name, isNew)}
         aria-pressed={active}
         className={cn(
-          'relative flex w-full flex-col overflow-hidden rounded-xl border bg-card text-left shadow-sm transition outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+          'relative flex w-full flex-col overflow-hidden rounded-md border bg-card text-left shadow-sm transition outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
           active
             ? 'border-2 border-primary shadow-md ring-2 ring-primary/20'
             : 'hover:border-primary/40 hover:shadow-md'
@@ -123,7 +123,7 @@ function GridFileTile({
             </span>
           )}
           {badge ? (
-            <span className='absolute bottom-2 left-2 rounded bg-black/65 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-white'>
+            <span className='absolute bottom-2 left-2 rounded-sm bg-black/65 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-white'>
               {badge}
             </span>
           ) : null}

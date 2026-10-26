@@ -1,5 +1,5 @@
 import { fieldConflictError, overridesFieldKey } from './field/registry';
-import { hookConflictError, overridesHookKey } from './form/hooks';
+import { hookProvidersOf } from './form/hooks';
 import { invariant } from './invariant';
 import { declaresCapabilityOverride } from './mount';
 import {
@@ -85,16 +85,7 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
     validatorConflictError
   );
 
-  composeOverridableRegistry(
-    plugins.flatMap((plugin) =>
-      (plugin.hooks ?? []).map((name) => ({
-        key: name,
-        value: plugin,
-        isOverride: overridesHookKey(plugin, name),
-      }))
-    ),
-    hookConflictError
-  );
+  hookProvidersOf(plugins);
 
   const capabilityEntries = plugins.flatMap((plugin) => {
     const singletonCapabilities = plugin.provides.filter(

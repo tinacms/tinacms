@@ -49,7 +49,7 @@ export function DocumentScope({
   const save = useRef(async (value: TinaDocument) => {
     const { target, saveDocument: latestSave } = saveRef.current;
     if (!target) return;
-    await latestSave({ ...target, value });
+    return latestSave({ ...target, value });
   }).current;
 
   if (!(collection && path)) return children;
