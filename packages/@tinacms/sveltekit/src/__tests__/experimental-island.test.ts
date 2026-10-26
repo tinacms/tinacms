@@ -137,6 +137,47 @@ describe('experimental_createIslandHandler', () => {
     expect(response.status).toBe(413);
   });
 
+  it('answers a failing loader with a generic 500', async () => {
+    const handler = experimental_createIslandHandler({
+      post: {
+        component: CalloutOverride,
+        wrapper: { tag: 'article' },
+        fetch: () => Promise.reject(new Error('backend down')),
+        propsFromData: () => ({}),
+      },
+    });
+    const request = new Request('http://localhost/tina-island/post', {
+      method: 'POST',
+      headers: {
+        'content-type': PREVIEW_CONTENT_TYPE,
+        origin: 'http://localhost',
+      },
+      body: '{}',
+    });
+    const response = await handler(makeEvent(request));
+
+    expect(response.status).toBe(500);
+    expect(await response.text()).toBe('Island render failed');
+  });
+
+  it('throws on an invalid registry', () => {
+    const island = {
+      component: CalloutOverride,
+      fetch: async () => ({}),
+      propsFromData: () => ({}),
+    };
+    expect(() =>
+      experimental_createIslandHandler({
+        'not/a/segment': { ...island, wrapper: { tag: 'div' } },
+      })
+    ).toThrow(TypeError);
+    expect(() =>
+      experimental_createIslandHandler({
+        post: { ...island, wrapper: { tag: 'img' } },
+      })
+    ).toThrow(TypeError);
+  });
+
   it('renders the island wrapper with encoded parameters', () => {
     const { body } = render(TinaIslandFixture);
 
