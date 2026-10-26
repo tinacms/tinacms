@@ -176,7 +176,7 @@ function Breadcrumb({
       )}
       {...props}
     >
-      <ol className='m-0 flex min-w-0 list-none items-center overflow-hidden p-0'>
+      <ol className='-m-1.5 flex min-w-0 list-none items-center overflow-hidden p-1.5'>
         {shown.map((step, index) => (
           // Two steps can share a name, so the position is the key.
           <Fragment key={index}>
