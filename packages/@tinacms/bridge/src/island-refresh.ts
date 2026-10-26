@@ -12,7 +12,9 @@ import type { DataStore } from './types';
  * Listen for admin `updateData` events and re-fetch every island on the
  * page with the unsaved data POSTed as a JSON body. POST (vs header)
  * avoids the ~8KB Latin-1 cap. Refetches collapse into one debounced
- * pass (every refresh re-renders every island).
+ * pass (every refresh re-renders every island). Managed islands are kept
+ * current by a client-side framework, so they're primed but never
+ * re-fetched: swapping their HTML would detach the framework's DOM nodes.
  */
 export interface IslandRefreshOptions {
   debounceMs: number;
@@ -21,6 +23,7 @@ export interface IslandRefreshOptions {
 const ISLAND_SELECTOR = '[data-tina-island]';
 const ENDPOINT_ATTR = 'data-tina-island';
 const PRIMARY_ISLAND_ATTR = 'data-tina-island-primary';
+const MANAGED_ISLAND_ATTR = 'data-tina-island-managed';
 /** Marks a `[data-tina-form]` div that a prime pass appended (vs. one the
  *  server injected), so a later re-scan can drop it before re-priming. */
 export const PRIMED_FORM_ATTR = 'data-tina-primed';
@@ -34,6 +37,7 @@ export function initIslandRefresh(
   const refreshAll = () => {
     const islands = document.querySelectorAll<HTMLElement>(ISLAND_SELECTOR);
     for (const island of islands) {
+      if (island.hasAttribute(MANAGED_ISLAND_ATTR)) continue;
       void refreshIsland(island, store);
     }
   };

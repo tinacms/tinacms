@@ -43,6 +43,7 @@ On the page, the region's outer element carries the endpoint it refreshes from:
 
 - On every edit, the bridge POSTs the editor's unsaved data (`Content-Type: application/x-tina-preview+json`, a JSON object keyed by form id) to each island's endpoint, then replaces the region's children with the response's.
 - On a page with no server-written `[data-tina-form]`, the bridge primes once on load: the same POST with the `X-Tina-Prime` header. The endpoint then puts the forms it used before the region HTML. `data-tina-island-primary` marks the island whose first form the editor opens.
+- `data-tina-island-managed` marks an island whose content a client-side framework keeps current (for example Svelte with `useTina`). The bridge still primes it, but never re-fetches it on edits: replacing its HTML would detach the framework's DOM nodes, so its event handlers and later updates would stop reaching the page. Only use it when everything inside the island updates on the client.
 
 On the server, an adapter answers that endpoint with `handleIslandRequest`, passing only the framework-specific step:
 
