@@ -139,15 +139,18 @@ component has a scoped `<style>` block.
    `data-tina-form` and should not load `/admin/bridge.js`.
 3. After `pnpm build:static`: `build-static/index.html` exists and
    `build-static/admin/` does not.
-4. After `pnpm build && pnpm preview`: in the admin, the preview POSTs to
-   `/tina-island/post?slug=…`, gets 200, and updates as you edit.
+4. After `pnpm build && pnpm preview`: in the admin, the preview POSTs once to
+   `/tina-island/post?slug=…` (with `X-Tina-Prime`) and gets 200, so the
+   post's form opens. The post island is `managed`, so edits then update
+   through `useTina` without further island requests.
 
 **`pnpm start` over plain HTTP.** adapter-node 6 assumes `https` unless
-`PROTOCOL_HEADER` names a header your proxy sets (e.g. `x-forwarded-proto`).
-Over plain `http://localhost` the island endpoint then sees a different origin
-than the browser sends and answers 403, so live editing fails. Use
-`pnpm preview` locally; in production, serve over HTTPS or set
-`PROTOCOL_HEADER`.
+`PROTOCOL_HEADER` names a header your proxy sets (e.g. `x-forwarded-proto`),
+so over plain `http://localhost` the server's view of its own origin differs
+from the browser's. The island endpoint trusts the browser's
+`Sec-Fetch-Site: same-origin` header, so editing in a current browser still
+works. Clients that don't send that header fall back to an `Origin` check and
+get 403 there; set `PROTOCOL_HEADER` (or serve over HTTPS) if you need them.
 
 `pnpm check` also lists errors from `tina/__generated__/` and the core
 `tinacms` sources. Those come from the tsconfig scope, not this app's code.
