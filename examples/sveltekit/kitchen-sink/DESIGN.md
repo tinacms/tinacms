@@ -292,7 +292,10 @@ component, one line in `index.ts`.
   Hugo example (`tina/fields/color.tsx`), since the admin is React whatever
   the site runs on and compiles the picker's Tailwind classes itself.
   `theme.css` has palettes for all nine options. "White" is a neutral gray
-  accent, since pure white would be invisible on light pages.
+  accent, since pure white would be invisible on light pages. The layout
+  also applies the theme's font (loading Nunito or Lato from Google Fonts
+  only when selected) and dark mode: "Dark" and "Light" override the OS,
+  "System" follows it. All three update live in the editor.
 - **Tailwind.** Not used (EX-02).
 - **Clicking a post's author block doesn't focus the Author field.** The
   block is marked correctly (`tinaField(post, 'author')`, the same as the

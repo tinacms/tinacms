@@ -139,9 +139,9 @@
   --theme-on: #ffffff;
 }
 
-/* Dark mode adjustments */
+/* Dark mode: the layout sets data-mode from the Global theme; "system" follows the OS. */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-mode="light"]) {
+  :root:not(:has([data-mode="light"])) {
     --bg-page: #0f172a;
     --bg-surface: #1e293b;
     --bg-tint: #334155;
@@ -152,7 +152,7 @@
   }
 }
 
-[data-mode="dark"] {
+:root:has([data-mode="dark"]) {
   --bg-page: #0f172a;
   --bg-surface: #1e293b;
   --bg-tint: #334155;
@@ -160,6 +160,14 @@
   --text-secondary: #cbd5e1;
   --text-muted: #64748b;
   --border-subtle: #334155;
+}
+
+[data-font="nunito"] {
+  font-family: var(--font-nunito);
+}
+
+[data-font="lato"] {
+  font-family: var(--font-lato);
 }
 
 body {
