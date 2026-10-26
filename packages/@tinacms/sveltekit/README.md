@@ -30,7 +30,9 @@ iframe:
 2. `TinaBridge` (root layout, **required**) starts the bridge only inside the
    iframe, after hydration, and refreshes forms after client-side navigation.
    The hook deliberately injects no bridge script: one that runs before Svelte
-   hydrates changes the DOM and causes a hydration mismatch.
+   hydrates changes the DOM and causes a hydration mismatch. Inside the editor,
+   navigating to another page reloads it, so that page's forms load; visitors
+   keep client-side navigation.
 3. `useTina()` (built on `subscribeToTinaData`) delivers unsaved sidebar edits
    (`updateData` messages) to the page, so it re-renders without reloading.
 4. `tinaField()` adds `data-tina-field` attributes so clicking an element
