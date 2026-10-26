@@ -18,7 +18,9 @@ const contentPlugin = definePlugin({
 
 const configWith = (...plugins: PluginManifest[]) =>
   defineConfig({
-    plugins: [contentPlugin, ...plugins],
+    plugins: plugins.some(({ provides }) => provides.includes('content'))
+      ? plugins
+      : [contentPlugin, ...plugins],
     schema: { collections: [] },
   });
 

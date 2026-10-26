@@ -1,5 +1,27 @@
 # tinacms
 
+## 3.15.0
+
+### Minor Changes
+
+- [#7606](https://github.com/tinacms/tinacms/pull/7606) [`787c7a9`](https://github.com/tinacms/tinacms/commit/787c7a9daf7740dbfb148d25a74367948bcbaade) Thanks [@dependabot](https://github.com/apps/dependabot)! - Upgrade `react-router-dom` from 6.30 to 7.18, which fixes GHSA-wrjc-x8rr-h8h6 and GHSA-337j-9hxr-rhxg; no 6.x release carries these fixes. React Router 7 requires React 18 or later.
+
+- [#7683](https://github.com/tinacms/tinacms/pull/7683) [`034e88f`](https://github.com/tinacms/tinacms/commit/034e88ff9fb8035b1443397b5d981313a44fa30f) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Rich-text fields can now colour text. A Text Color dropdown now appears next to Highlight in the default toolbar. Fields with a custom `overrides.toolbar` need `'textColor'` added to it. Coloured text saves as a `<span>` with a `color` style, inside any bold, italic, strikethrough or highlight. The palette can be set per field under `overrides.textColors` (a list of `{ label, value }`).
+
+  Also fixes:
+  - Adjacent text with different marks no longer picks up a neighbour's mark on save (e.g. bold italic text followed by italic text saved both as bold).
+  - Renderers only apply plain CSS colours, so content can no longer inject arbitrary CSS through a highlight or text colour.
+
+### Patch Changes
+
+- [#7798](https://github.com/tinacms/tinacms/pull/7798) [`53ae895`](https://github.com/tinacms/tinacms/commit/53ae8954de8668e5eeb92d817bfbf12bf39cb17d) Thanks [@andrewwbuilds](https://github.com/andrewwbuilds)! - The date field's time picker now follows `timeFormat`. A format with a 24-hour hour token, such as `HH:mm`, opens a 24-hour picker with no AM/PM select. 12-hour formats and `timeFormat: true` keep the 12-hour picker.
+
+- [#7734](https://github.com/tinacms/tinacms/pull/7734) [`abb7c15`](https://github.com/tinacms/tinacms/commit/abb7c153b2db6cd9bf42da6ddfaa5d2b08029861) Thanks [@wakqasahmed](https://github.com/wakqasahmed)! - List field descriptions now wrap onto multiple lines like other field descriptions, instead of being cut off with an ellipsis.
+
+- Updated dependencies [[`034e88f`](https://github.com/tinacms/tinacms/commit/034e88ff9fb8035b1443397b5d981313a44fa30f)]:
+  - @tinacms/mdx@2.4.0
+  - @tinacms/schema-tools@2.11.0
+
 ## 3.14.4
 
 ### Patch Changes

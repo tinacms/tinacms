@@ -19,7 +19,7 @@ Single package per [ADR-001](../001-single-package-architecture.md). Per-framewo
 | `tinacms` | universal (config + types) | `defineConfig`, `defineCollection`, `definePlugin`, `t` schema helpers, `Permission` type |
 | `tinacms/react` | browser | `TinaProvider`, `useTinaStore`, address-keyed hooks (`useFieldValue`, `useFieldAddress`, `useFieldActivation`, `useFieldErrors`, `useChildKeys`, `useSiblingValue`, `useFormActions`, `useHasPermission`) |
 | `tinacms/client` | browser | client-segment authoring (`defineClientPlugin`), the `server` RPC proxy |
-| `tinacms/server` | server only | `defineServerPlugin`, `protectedOp`, `publicOp`, `use(...)`, `mountHandler` |
+| `tinacms/server` | server only | `defineServerPlugin`, `protectedOp`, `publicOp`, `use(...)`, `requestContext()`, `mountHandler`, `defineServerHook`, `reject`, `HookRejectedError`, `ServerHookScope`, `ServerFormHooks`, `ServerHookFactory` |
 | `tinacms/next`, `tinacms/express`, … | server only | per-framework adapters that mount the RPC handler |
 
 The client entry never imports backend code; the `server`/adapter entries never end up in the browser bundle. Type-only crossings between segments use `import type`.
@@ -173,7 +173,12 @@ import { defineServerPlugin, protectedOp, publicOp, use } from 'tinacms/server'
 | `protectedOp({ permission })` | Wrap an op to require a permission |
 | `publicOp()` | Greppable opt-out for unauthenticated endpoints |
 | `use('cap')` | In-process accessor for another capability's server segment |
+| `requestContext()` | The request, session and auth provider of the op that is running ([ADR-028](../028-server-save-hooks.md)) |
 | `mountHandler` | Internal — used by per-framework adapters |
+| `defineServerHook` | Type a server hook's factory, so `doc` and `session` are typed ([ADR-028](../028-server-save-hooks.md)) |
+| `reject(message)` | Stop the save from a server `beforeSave` by throwing a `HookRejectedError`. The message reaches the editor |
+| `ServerHookScope` | What a server hook receives: `{ path, collection, session, branch }` |
+| `ServerFormHooks` | A server hook's shape: `{ beforeSave?, afterSave? }` |
 
 ## Per-framework adapters
 
@@ -185,7 +190,7 @@ import config from '../../../../tina.config'
 export const { GET, POST } = mountHandler(config)
 ```
 
-The adapter mounts the runtime-composed server-segment handler (all server segments + RPC transport). Express, Hono, Remix, etc. have equivalent adapters.
+The adapter mounts the runtime-composed server-segment handler (all server segments + RPC transport). It needs the config's `schema` once a plugin registers a server hook ([ADR-028](../028-server-save-hooks.md)). Express, Hono, Remix, etc. have equivalent adapters.
 
 ## Stability
 

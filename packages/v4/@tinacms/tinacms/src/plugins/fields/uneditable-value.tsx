@@ -23,7 +23,7 @@ export function UneditableValue({
       <div
         role='group'
         aria-labelledby={`${address}-label`}
-        className='flex flex-col gap-2 rounded-md border border-dashed p-2'
+        className='flex flex-col gap-2 rounded-sm border border-dashed p-2'
       >
         <span className='text-sm'>{problem}</span>
         <StoredValue value={value} />
@@ -44,7 +44,7 @@ export function UneditableValue({
 // The raw stored value, for a value or item the editor keeps but cannot edit.
 export function StoredValue({ value }: { value: unknown }) {
   return (
-    <pre className='overflow-x-auto rounded bg-muted/50 p-2 text-xs text-muted-foreground'>
+    <pre className='overflow-x-auto rounded-sm bg-muted/50 p-2 text-xs text-muted-foreground'>
       {JSON.stringify(value, null, 2)}
     </pre>
   );

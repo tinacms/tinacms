@@ -24,7 +24,7 @@ The ADRs are the canonical decisions. Read them in order; each one's `Status` fi
 - [ADR-005: Module System Design](./005-module-system.md) — **superseded by ADR-006** (historical only)
 - [ADR-006: Plugin Dependency Resolution via Capabilities](./006-plugin-dependency-resolution.md)
 - [ADR-007: Full-Stack Plugins with Client/Server Segments](./007-full-stack-plugins-client-backend-segments.md)
-- [ADR-008: Authorization — Secure-by-Default RPC, Permission-Based RBAC](./008-authorization-permissions-roles.md)
+- [ADR-008: Authorization — Secure-by-Default RPC, Permission-Based RBAC](./008-authorization-permissions-roles.md) — *amended by ADR-028*
 - [ADR-009: Field Plugins — Keyed Capability, Composition by Delegation](./009-field-plugins.md) — *extends ADR-006*
 - [ADR-010: Form State Model — Flat, Normalized-by-Address](./010-form-state-model.md)
 - [ADR-011: Reference Fields — Select-Only in v4](./011-reference-fields.md)
@@ -34,15 +34,17 @@ The ADRs are the canonical decisions. Read them in order; each one's `Status` fi
 - [ADR-015: Execution Boundary — What Runs Where](./015-execution-boundary.md)
 - [ADR-016: Schema as the Compiled Core Artifact](./016-schema-compiled-artifact.md)
 - [ADR-017: Content Model — Collections, Documents, Templates, Fields](./017-content-model.md)
-- [ADR-018: Save Flow](./018-save-flow.md)
+- [ADR-018: Save Flow](./018-save-flow.md) — *amended by ADR-028*
 - [ADR-019: Content Capability Contract](./019-content-capability-contract.md)
 - [ADR-020: `tina doctor` — Static Audit](./020-tina-doctor-audit.md)
 - [ADR-021: Search Capability Contract](./021-search-capability-contract.md)
 - [ADR-022: Media Capability Contract](./022-media-capability-contract.md) — *resolves ADR-007's binary sub-decision*
 - [ADR-023: Auth & Session Mechanics](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/023-auth-session-mechanics.md) — *not yet public*
 - [ADR-024: `defineConfig` Shape — The Composition Root](./024-defineconfig-shape.md)
-- [ADR-025: Form Hook Registration](./025-form-hook-registration.md)
+- [ADR-025: Form Hook Registration](./025-form-hook-registration.md) — *amended by ADR-028*
 - [ADR-026: Draft Persistence in the Form Store](./026-draft-persistence-in-form-store.md)
+- [ADR-027: Global Nav Groups](./027-global-nav-groups.md) — *extends ADR-013*
+- [ADR-028: Server Save Hooks](./028-server-save-hooks.md) — *amends ADR-008, ADR-018 and ADR-025*
 
 ## Supporting documentation
 

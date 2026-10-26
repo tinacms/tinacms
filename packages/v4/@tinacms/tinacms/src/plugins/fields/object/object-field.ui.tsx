@@ -31,7 +31,7 @@ function FieldGroup() {
       <div
         role='group'
         aria-labelledby={`${address}-label`}
-        className='rounded-md border p-3'
+        className='rounded-sm border p-3'
       >
         {field.fields.map((subfield) => (
           <NestedFieldRow
