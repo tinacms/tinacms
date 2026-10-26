@@ -41,7 +41,8 @@ On the page, the region's outer element carries the endpoint it refreshes from:
 <article class="prose" data-tina-island="/tina-island/post?slug=hello" data-tina-island-primary>…</article>
 ```
 
-- On every edit, the bridge POSTs the editor's unsaved data (`Content-Type: application/x-tina-preview+json`, a JSON object keyed by form id) to each island's endpoint, then replaces the region's children with the response's.
+- When the editor changes data, the bridge POSTs the unsaved data (`Content-Type: application/x-tina-preview+json`, a JSON object keyed by form id) to the endpoint of each island that uses a changed form, then replaces the region's children with the response's. Edits are debounced; the burst of updates the admin sends when it opens becomes a single pass, and updates identical to a form's previous one are ignored.
+- The endpoint's response lists the island's forms in `data-tina-island-forms` (space-separated form ids), and so does priming. Until an island has that list, it's refreshed on every pass.
 - On a page with no server-written `[data-tina-form]`, the bridge primes once on load: the same POST with the `X-Tina-Prime` header. The endpoint then puts the forms it used before the region HTML. `data-tina-island-primary` marks the island whose first form the editor opens.
 - `data-tina-island-managed` marks an island whose content a client-side framework keeps current (for example Svelte with `useTina`). The bridge still primes it, but never re-fetches it on edits: replacing its HTML would detach the framework's DOM nodes, so its event handlers and later updates would stop reaching the page. Only use it when everything inside the island updates on the client.
 
@@ -75,7 +76,7 @@ export function POST(request: Request, name: string) {
 | Island name not registered (own properties only) | 404 |
 | `render` throws | 500, with no error detail |
 
-A successful response is `text/html` with `Cache-Control: no-store` and `X-Content-Type-Options: nosniff`. It contains the rendered HTML inside the island's wrapper element (escaped `class`, plus the request path as `data-tina-island`). On a prime request, the form payloads come first, and only a form recorded with `priority: 'primary'` gets `data-tina-primary`.
+A successful response is `text/html` with `Cache-Control: no-store` and `X-Content-Type-Options: nosniff`. It contains the rendered HTML inside the island's wrapper element (escaped `class`, the request path as `data-tina-island`, and the ids of the forms `render` returned as `data-tina-island-forms`). On a prime request, the form payloads come first, and only a form recorded with `priority: 'primary'` gets `data-tina-primary`.
 
 The origin check trusts the browser's `Sec-Fetch-Site` header when it's present, because behind a proxy (or on an adapter that only trusts configured hosts) the URL the server sees can differ from the one the browser used. Only requests without it are compared against the request URL.
 

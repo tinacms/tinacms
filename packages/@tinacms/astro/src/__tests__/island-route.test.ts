@@ -1,3 +1,4 @@
+import { hashFromQuery } from '@tinacms/bridge/metadata';
 import { PREVIEW_CONTENT_TYPE, PRIME_HEADER } from '@tinacms/bridge/preview';
 import type { APIContext } from 'astro';
 import { describe, expect, it } from 'vitest';
@@ -59,8 +60,14 @@ describe('experimental_createIslandRoute', () => {
     const res = await call({});
     expect(res.status).toBe(200);
     const html = await res.text();
+    const id = hashFromQuery(
+      JSON.stringify({
+        query: 'query Post',
+        variables: { relativePath: 'hello.md' },
+      })
+    );
     expect(html).toContain(
-      '<article class="prose" data-tina-island="/tina-island/post">'
+      `<article class="prose" data-tina-island="/tina-island/post" data-tina-island-forms="${id}">`
     );
     expect(html).toContain('stub');
     expect(html).not.toContain('data-tina-form=');

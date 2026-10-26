@@ -109,9 +109,28 @@ describe('handleIslandRequest', () => {
     expect(response.headers.get('cache-control')).toBe('no-store');
     expect(response.headers.get('x-content-type-options')).toBe('nosniff');
     expect(await response.text()).toBe(
-      '<article class="prose &quot;x&quot;" data-tina-island="/tina-island/post?slug=a&amp;b=%3Cc%3E">' +
+      '<article class="prose &quot;x&quot;" data-tina-island="/tina-island/post?slug=a&amp;b=%3Cc%3E" data-tina-island-forms="global post">' +
         '<p>content</p></article>'
     );
+  });
+
+  it('lists each form the island used once, and omits the list without forms', async () => {
+    const form = { id: 'a"b', query: 'q', variables: {}, data: {} };
+    const listed = await (
+      await handle(islandRequest(), 'post', async () => ({
+        html: '',
+        forms: [form, form],
+      }))
+    ).text();
+    expect(listed).toContain('data-tina-island-forms="a&quot;b">');
+
+    const unlisted = await (
+      await handle(islandRequest(), 'post', async () => ({
+        html: '',
+        forms: [],
+      }))
+    ).text();
+    expect(unlisted).not.toContain('data-tina-island-forms');
   });
 
   it('prepends form payloads on a prime request, primary only when asserted', async () => {
