@@ -177,6 +177,28 @@ describe('Segmented icons', () => {
   });
 });
 
+describe('Segmented sizes', () => {
+  it('drops the md size from a small icon-only choice', () => {
+    render(
+      <Segmented
+        aria-label='View'
+        size='sm'
+        options={[
+          {
+            value: 'grid',
+            label: 'Grid view',
+            icon: 'component',
+            iconOnly: true,
+          },
+        ]}
+      />
+    );
+    const choice = screen.getByRole('button', { name: 'Grid view' });
+    expect(choice).toHaveClass('h-7', 'w-7', 'px-0', 'min-w-0');
+    expect(choice).not.toHaveClass('h-9', 'px-3.5', 'min-w-20');
+  });
+});
+
 describe('SearchBox clear', () => {
   it('only offers onClear when the caller controls the value', () => {
     // @ts-expect-error onClear cannot empty a box the caller does not control

@@ -86,10 +86,9 @@ function Segmented<T extends string>({
           key={option.value}
           value={option.value}
           aria-label={option.iconOnly ? option.label : undefined}
-          className={segmentVariants({
-            size,
-            iconOnly: option.iconOnly ?? false,
-          })}
+          className={cn(
+            segmentVariants({ size, iconOnly: option.iconOnly ?? false })
+          )}
         >
           {option.icon ? (
             <Icon glyph={option.icon} size={16} className='size-4' />
