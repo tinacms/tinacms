@@ -170,7 +170,6 @@ function DataCell({
       title={cell.type === 'file' ? cell.text : undefined}
     >
       {cell.type === 'file' ? (
-        // A column sizes from its content, so a long path would squeeze the titles. The path
         <span className='block truncate'>{cell.text}</span>
       ) : (
         cell.text
