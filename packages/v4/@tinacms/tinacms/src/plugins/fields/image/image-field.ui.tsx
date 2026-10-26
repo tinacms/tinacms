@@ -263,7 +263,7 @@ export function ImageField() {
       <Dialog open={picking} onOpenChange={setPicking}>
         <DialogContent
           finalFocus={mainButtonRef}
-          className='flex h-[80vh] flex-col gap-0 p-0 sm:max-w-5xl'
+          className='flex h-[80vh] flex-col gap-0 p-0 max-w-5xl'
         >
           <DialogHeader className='border-b px-4 py-3'>
             <DialogTitle>Choose an image</DialogTitle>

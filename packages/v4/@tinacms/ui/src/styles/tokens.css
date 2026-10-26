@@ -146,6 +146,7 @@
   --radius-sm: 8px; /* Inputs, buttons and list cards */
   --radius-md: 12px; /* Cards, menus and list containers */
   --radius-lg: 20px; /* Dialogs only */
+  --radius-tip: 6px; /* Corners of the dark tooltip bubble */
 
   /* @group Type */
   --font-sans:
@@ -183,6 +184,7 @@
     var(--shadow-xs), 0 0 0 1px rgba(15, 23, 42, 0.04); /* The picked choice of a segmented control: a soft drop and a faint outline */
   --tracking-format: -0.03em; /* Letter spacing for the file type (MDX, MD) that stands in for an icon on a nav row */
   --leading-title: 1.3; /* Line height of a panel title in a panel header */
+  --leading-tip: 1.4; /* Line height of the words in a tooltip, which may wrap to two lines */
   --leading-code: 1.55; /* Line height of the code lines in a diff view */
   --shadow-toast-dark:
     0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 40px -8px rgba(15, 23, 42, 0.45); /* A dark toast: a faint light edge and a deeper drop */

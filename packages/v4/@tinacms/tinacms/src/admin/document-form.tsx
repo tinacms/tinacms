@@ -45,7 +45,7 @@ function FieldRow({ node }: { node: FieldSchema }) {
           <>
             <span
               aria-hidden='true'
-              className='size-1.5 rounded-full bg-primary'
+              className='ml-1 size-1.5 rounded-full bg-primary'
             />
             <span className='sr-only'>(unsaved)</span>
           </>
