@@ -20,7 +20,7 @@ export default defineConfig({
       ],
       // Low because no test mounts `RichEditor`. The toolbar tree loads with
       // it, so one mount moves this a long way.
-      thresholds: { statements: 48, branches: 50, functions: 52, lines: 48 },
+      thresholds: { statements: 64, branches: 50, functions: 52, lines: 65 },
     },
   },
 });
