@@ -18,6 +18,8 @@ const PRIMARY_ISLAND_ATTR = 'data-tina-island-primary';
 const MANAGED_ISLAND_ATTR = 'data-tina-island-managed';
 const FORMS_ATTR = 'data-tina-island-forms';
 const FIRST_UPDATE_WINDOW_MS = 50;
+/** The latest refresh started for each island; an older response is dropped. */
+const latestRefresh = new WeakMap<HTMLElement, number>();
 /** Marks a `[data-tina-form]` div that a prime pass appended (vs. one the
  *  server injected), so a later re-scan can drop it before re-priming. */
 export const PRIMED_FORM_ATTR = 'data-tina-primed';
@@ -107,6 +109,8 @@ async function refreshIsland(
     const data = store.get(id);
     if (data) overlay[id] = data;
   }
+  const refresh = (latestRefresh.get(island) ?? 0) + 1;
+  latestRefresh.set(island, refresh);
 
   try {
     debug('refreshing island', endpoint);
@@ -126,6 +130,10 @@ async function refreshIsland(
       return;
     }
     const html = await response.text();
+    if (latestRefresh.get(island) !== refresh) {
+      debug('island refetch superseded', endpoint);
+      return;
+    }
     swapIslandHtml(island, html);
     reportQuickEdit();
   } catch (error) {

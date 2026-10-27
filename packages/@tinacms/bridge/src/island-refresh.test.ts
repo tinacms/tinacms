@@ -209,6 +209,40 @@ describe('initIslandRefresh', () => {
     );
   });
 
+  it('ignores a response that a later refresh of the same island has superseded', async () => {
+    document.body.innerHTML = `<article data-tina-island="/tina-island/post"><h1>Published</h1></article>`;
+    const answers: Array<(heading: string) => void> = [];
+    fetchMock.mockImplementation(
+      () =>
+        new Promise<Response>((resolve) => {
+          answers.push((heading) =>
+            resolve(
+              new Response(
+                `<article data-tina-island="/tina-island/post"><h1>${heading}</h1></article>`,
+                { headers: { 'Content-Type': 'text/html' } }
+              )
+            )
+          );
+        })
+    );
+    const store = initDataStore();
+    store.seed('post', { title: 'Published' });
+    initIslandRefresh(store, { debounceMs: 0 });
+
+    store.set('post', { title: 'First' });
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    store.set('post', { title: 'Second' });
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+
+    answers[1]!('Second');
+    await vi.waitFor(() =>
+      expect(document.querySelector('h1')!.textContent).toBe('Second')
+    );
+    answers[0]!('First');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(document.querySelector('h1')!.textContent).toBe('Second');
+  });
+
   it('still primes a managed island', async () => {
     document.body.innerHTML = `<article data-tina-island="/tina-island/post" data-tina-island-managed data-tina-island-primary></article>`;
     fetchMock.mockResolvedValue(
