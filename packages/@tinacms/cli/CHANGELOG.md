@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 4.0.4
+
+### Patch Changes
+
+- [#7145](https://github.com/tinacms/tinacms/pull/7145) [`46f5bab`](https://github.com/tinacms/tinacms/commit/46f5babc3bcb23a0390247dfd8b715661e8c814a) Thanks [@kulesy](https://github.com/kulesy)! - `tinacms build --partial-reindex` now clears every index entry for deleted documents, including entries left over from an earlier value. Self-hosted sites that build this way no longer hit "Error querying file" on a collection sorted by a field that changed before the document was deleted.
+
+- Updated dependencies [[`46f5bab`](https://github.com/tinacms/tinacms/commit/46f5babc3bcb23a0390247dfd8b715661e8c814a), [`2811d2c`](https://github.com/tinacms/tinacms/commit/2811d2c4d353a5ff45a12862b3cd4170d7119fd3)]:
+  - @tinacms/graphql@4.1.0
+
 ## 4.0.3
 
 ### Patch Changes
