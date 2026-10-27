@@ -29,7 +29,7 @@
     "@tinacms/scripts": "workspace:*",
     "happy-dom": "catalog:",
     "jsdom": "^29.1.1",
-    "vite": "^5.4.14",
+    "vite": "^6.4.4",
     "vitest": "^2.1.9"
   },
   "publishConfig": {
