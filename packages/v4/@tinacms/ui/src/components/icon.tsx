@@ -25,6 +25,7 @@ import {
   Info,
   Layers2,
   LayoutGrid,
+  LoaderCircle,
   type LucideIcon,
   type LucideProps,
   Maximize2,
@@ -94,6 +95,7 @@ const glyphs = {
   bookmark: { icon: Bookmark, weight: 1.75, filled: true },
   error: { icon: CircleAlert, weight: 2.25 },
   trash: { icon: Trash2, weight: 1.75 },
+  spinner: { icon: LoaderCircle, weight: 2 },
 } satisfies Record<string, GlyphEntry>;
 
 type Glyph = keyof typeof glyphs;
