@@ -1,5 +1,6 @@
 ---
 import TinaIsland from '@tinacms/astro/TinaIsland.astro';
+import { isEditMode } from '@tinacms/astro/is-edit-mode';
 import Footer from '../components/layout/Footer.astro';
 import Header from '../components/layout/Header.astro';
 import { getGlobal } from '../lib/data';
@@ -13,6 +14,7 @@ interface Props {
 const { title = 'TinaCMS Astro visual editing' } = Astro.props;
 
 const global = await getGlobal();
+const editing = isEditMode(Astro.request);
 
 const themeColor = global.data.global?.theme?.color ?? 'blue';
 const darkMode = global.data.global?.theme?.darkMode ?? 'system';
@@ -42,7 +44,11 @@ const fontClass =
   </head>
   <body class:list={['antialiased min-h-screen flex flex-col', fontClass]}>
     <TinaIsland name="global" wrapper={islands.global.wrapper} params={{ path: Astro.url.pathname }}>
-      <Header data={global.data.global?.header ?? null} pathname={Astro.url.pathname} />
+      <Header
+        data={global.data.global?.header ?? null}
+        pathname={Astro.url.pathname}
+        theme={editing ? global.data.global?.theme : undefined}
+      />
     </TinaIsland>
     <main class="flex-1">
       <slot />
@@ -50,5 +56,30 @@ const fontClass =
     <TinaIsland name="global-footer" wrapper={islands['global-footer'].wrapper} params={{ path: Astro.url.pathname }}>
       <Footer data={global.data.global?.footer ?? null} />
     </TinaIsland>
+    {editing && (
+      <script is:inline>
+        // The theme lives on <html> and <body>, outside every island, so copy
+        // it from the header island each time the bridge swaps that in.
+        (function () {
+          const island = document.querySelector('[data-theme-sync]')?.closest('[data-tina-island]');
+          if (!island) return;
+          const fonts = { sans: 'font-sans', nunito: 'font-nunito', lato: 'font-lato' };
+          new MutationObserver(() => {
+            const theme = island.querySelector('[data-theme-sync]');
+            if (!theme) return;
+            const { color, darkMode, font } = theme.dataset;
+            const root = document.documentElement;
+            root.dataset.theme = color || 'blue';
+            root.classList.toggle(
+              'dark',
+              darkMode === 'dark' ||
+                (darkMode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
+            );
+            document.body.classList.remove(...Object.values(fonts));
+            document.body.classList.add(fonts[font] ?? 'font-sans');
+          }).observe(island, { childList: true });
+        })();
+      </script>
+    )}
   </body>
 </html>
