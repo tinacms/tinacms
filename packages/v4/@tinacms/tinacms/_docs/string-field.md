@@ -31,6 +31,9 @@ The config (`StringFieldSchema`, which extends `BaseFieldSchema`):
 | `mono` | `boolean` | Shows the value in the code font, in either box. |
 | `placeholder` | `string` | Grey hint text in an empty box. |
 
+Turning `multiline` off for a field with stored paragraphs shows the lines
+joined. The stored value changes to the joined text on the next edit.
+
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with
 > `validators`. Refer to
@@ -97,10 +100,24 @@ export function StringField() {
   const { multiline, mono, placeholder } = useFieldSchema<StringFieldSchema>();
   const [value, setValue] = useFieldValue<string>(address);
   const frame = useFieldFrame();
-  // ...one callback ref for both boxes
+  const boxRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+
   useFieldActivation(() => boxRef.current?.focus());
 
-  return <StringFieldView {...frame} id={address} value={value ?? ''} onChange={setValue} />;
+  return (
+    <StringFieldView
+      {...frame}
+      ref={(box) => {
+        boxRef.current = box;
+      }}
+      id={address}
+      value={value ?? ''}
+      onChange={setValue}
+      multiline={multiline}
+      mono={mono}
+      placeholder={placeholder}
+    />
+  );
 }
 ```
 

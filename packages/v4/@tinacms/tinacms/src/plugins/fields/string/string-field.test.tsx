@@ -12,7 +12,12 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
-import { FormProvider, TinaProvider } from '../../../editor';
+import {
+  FormProvider,
+  TinaProvider,
+  toFieldAddress,
+  useActiveField,
+} from '../../../editor';
 import { t } from '../../../index';
 import { max, min, pattern, required } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
@@ -334,7 +339,7 @@ describe('StringField options', () => {
 
   it('renders a textarea for multiline and writes keystrokes to the store', async () => {
     renderWith({ multiline: true });
-    const box = await screen.findByLabelText(/^Excerpt\b/);
+    const box = await screen.findByRole('textbox', { name: /^Excerpt\b/ });
     expect(box.tagName).toBe('TEXTAREA');
     await userEvent.type(box, 'one{Enter}two');
     expect((box as HTMLTextAreaElement).value).toBe('one\ntwo');
@@ -353,4 +358,51 @@ describe('StringField options', () => {
       excerpt: 'a\nb',
     });
   });
+});
+
+describe('StringField activation', () => {
+  function Activate({ name }: { name: string }) {
+    const { setActive } = useActiveField();
+    return (
+      <button type='button' onClick={() => setActive(toFieldAddress(name))}>
+        activate {name}
+      </button>
+    );
+  }
+
+  it.each([
+    { multiline: true, tag: 'TEXTAREA' },
+    { multiline: false, tag: 'INPUT' },
+  ])(
+    'focuses the box when multiline is $multiline',
+    async ({ multiline, tag }) => {
+      render(
+        <TinaProvider
+          config={asResolvedConfig({
+            plugins: [stringFieldPlugin],
+            schema: NO_COLLECTIONS,
+          })}
+        >
+          <FormProvider
+            collection={{
+              name: 'post',
+              label: 'Posts',
+              format: 'mdx',
+              fields: [
+                t.string({ name: 'excerpt', label: 'Excerpt', multiline }),
+              ],
+            }}
+            path='content/posts/test.mdx'
+          >
+            <LabelledFields />
+            <Activate name='excerpt' />
+          </FormProvider>
+        </TinaProvider>
+      );
+      const box = await screen.findByRole('textbox', { name: /^Excerpt\b/ });
+      expect(box.tagName).toBe(tag);
+      await userEvent.click(screen.getByText('activate excerpt'));
+      expect(box).toHaveFocus();
+    }
+  );
 });

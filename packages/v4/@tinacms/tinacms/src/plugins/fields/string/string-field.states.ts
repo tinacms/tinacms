@@ -42,5 +42,20 @@ export const stringFieldStates: StringFieldState[] = [
     name: 'multi-line invalid',
     props: { ...base, multiline: true, errors: ['Title is too short'] },
   },
+  {
+    name: 'help and warning',
+    props: {
+      ...base,
+      help: 'Shown in search results.',
+      helpId: 'title-help',
+      warnings: ['Longer than 60 characters'],
+    },
+  },
   { name: 'mono', props: { ...base, mono: true, value: 'my-post-slug' } },
 ];
+
+export const stringFieldState = (name: string): StringFieldViewProps => {
+  const state = stringFieldStates.find((entry) => entry.name === name);
+  if (!state) throw new Error(`No String field state named ${name}`);
+  return state.props;
+};

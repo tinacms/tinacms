@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import { stringFieldStates } from './string-field.states';
+import { stringFieldState, stringFieldStates } from './string-field.states';
 import { StringFieldView } from './string-field.view';
 
 describe('String field states', () => {
@@ -33,18 +33,24 @@ describe('String field states', () => {
   });
 
   it('reads required once', () => {
-    render(<StringFieldView {...stringFieldStates[2].props} />);
+    render(<StringFieldView {...stringFieldState('required')} />);
     const box = screen.getByRole('textbox', { name: 'Title (required)' });
     expect(box).toBeRequired();
+    expect(box).not.toHaveAccessibleDescription(/required/i);
+  });
+
+  it('ties the help text to the box', () => {
+    render(<StringFieldView {...stringFieldState('help and warning')} />);
+    expect(screen.getByRole('textbox')).toHaveAccessibleDescription(
+      'Shown in search results.'
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('Longer than 60');
   });
 
   it('applies the code font to both boxes', () => {
     for (const multiline of [false, true]) {
       const { unmount } = render(
-        <StringFieldView
-          {...stringFieldStates[9].props}
-          multiline={multiline}
-        />
+        <StringFieldView {...stringFieldState('mono')} multiline={multiline} />
       );
       expect(screen.getByRole('textbox')).toHaveClass('font-mono');
       unmount();
@@ -53,10 +59,8 @@ describe('String field states', () => {
 
   it('drops newlines when multiline is turned off on a stored value', () => {
     render(
-      <StringFieldView {...stringFieldStates[7].props} multiline={false} />
+      <StringFieldView {...stringFieldState('multi-line')} multiline={false} />
     );
-    expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
-      'First lineSecond line'
-    );
+    expect(screen.getByRole('textbox')).toHaveValue('First lineSecond line');
   });
 });

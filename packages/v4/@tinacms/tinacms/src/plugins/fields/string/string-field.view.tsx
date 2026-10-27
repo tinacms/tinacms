@@ -4,6 +4,7 @@ import {
 } from '@tinacms/ui/components/field-wrapper';
 import { Input } from '@tinacms/ui/components/input';
 import { Textarea } from '@tinacms/ui/components/textarea';
+import { cn } from '@tinacms/ui/lib/utils';
 
 export type StringFieldViewProps = Pick<
   FieldWrapperProps,
@@ -57,24 +58,19 @@ export function StringFieldView({
     onBlur,
     'aria-invalid': errors.length > 0 || undefined,
     'aria-describedby': frame.help ? frame.helpId : undefined,
-    // The wrapper already fades a disabled field, so the box must not fade again.
-    className: 'disabled:opacity-100',
+    onChange: (event: { target: { value: string } }) =>
+      onChange?.(event.target.value),
   };
 
   return (
     <FieldWrapper {...frame} disabled={disabled}>
       {multiline ? (
-        <Textarea
-          {...control}
-          ref={ref}
-          onChange={(event) => onChange?.(event.target.value)}
-        />
+        <Textarea {...control} ref={ref} className='disabled:opacity-100' />
       ) : (
         <Input
           {...control}
           ref={ref}
-          className={`${control.className} text-ellipsis`}
-          onChange={(event) => onChange?.(event.target.value)}
+          className={cn('text-ellipsis', 'disabled:opacity-100')}
         />
       )}
     </FieldWrapper>
