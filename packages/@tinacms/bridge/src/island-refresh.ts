@@ -209,11 +209,13 @@ function isHtmlResponse(response: Response): boolean {
  * Only attributes the island contract actually uses are carried over from
  * the server response. Anything else (event handlers, inline `style`, etc.)
  * is dropped — the bridge trusts the island endpoint's HTML body but not
- * its attribute surface.
+ * its attribute surface. The endpoint stays the page's: it's the URL the
+ * browser can reach, and the server's view of its own path can differ
+ * behind a proxy.
  */
 function isAllowedSwapAttribute(name: string): boolean {
   if (name === 'class' || name === 'id') return true;
-  return name.startsWith('data-tina-');
+  return name.startsWith('data-tina-') && name !== ENDPOINT_ATTR;
 }
 
 function swapIslandHtml(island: HTMLElement, html: string): void {

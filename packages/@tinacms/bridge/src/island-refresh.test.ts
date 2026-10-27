@@ -243,6 +243,25 @@ describe('initIslandRefresh', () => {
     expect(document.querySelector('h1')!.textContent).toBe('Second');
   });
 
+  it("keeps the page's endpoint when the response names a different one", async () => {
+    document.body.innerHTML = `<article data-tina-island="/site/tina-island/post?slug=a"><h1>Published</h1></article>`;
+    fetchMock.mockResolvedValue(
+      new Response(
+        `<article data-tina-island="/tina-island/post?slug=a" data-tina-island-forms="post"><h1>From server</h1></article>`,
+        { headers: { 'Content-Type': 'text/html' } }
+      )
+    );
+
+    await update();
+
+    const island = document.querySelector('article')!;
+    expect(island.getAttribute('data-tina-island')).toBe(
+      '/site/tina-island/post?slug=a'
+    );
+    expect(island.getAttribute('data-tina-island-forms')).toBe('post');
+    expect(island.querySelector('h1')!.textContent).toBe('From server');
+  });
+
   it('still primes a managed island', async () => {
     document.body.innerHTML = `<article data-tina-island="/tina-island/post" data-tina-island-managed data-tina-island-primary></article>`;
     fetchMock.mockResolvedValue(
