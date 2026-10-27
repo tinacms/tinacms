@@ -72,11 +72,11 @@ describe('nested form levels', () => {
     const user = userEvent.setup();
     renderForm();
     expect(await screen.findByText('Two')).toBeVisible();
-    expect(screen.queryByLabelText('Handle')).toBeNull();
+    expect(screen.queryByLabelText(/^Handle\b/)).toBeNull();
     expect(screen.queryByRole('navigation', { name: 'Field path' })).toBeNull();
 
     await user.click(screen.getByRole('button', { name: 'Open Three' }));
-    expect(await screen.findByLabelText('Handle')).toHaveValue('hi');
+    expect(await screen.findByLabelText(/^Handle\b/)).toHaveValue('hi');
     expect(
       screen.getByRole('navigation', { name: 'Field path' })
     ).toBeInTheDocument();
@@ -91,7 +91,7 @@ describe('nested form levels', () => {
     const user = userEvent.setup();
     renderForm();
     await user.click(await screen.findByRole('button', { name: 'Open Three' }));
-    const handle = await screen.findByLabelText('Handle');
+    const handle = await screen.findByLabelText(/^Handle\b/);
     await user.clear(handle);
     expect(screen.queryByRole('alert')).toBeNull();
 
@@ -110,13 +110,29 @@ describe('nested form levels', () => {
     const user = userEvent.setup();
     renderForm();
     await user.click(await screen.findByRole('button', { name: 'Open Three' }));
-    await user.clear(await screen.findByLabelText('Handle'));
+    await user.clear(await screen.findByLabelText(/^Handle\b/));
     await user.click(
       await screen.findByRole('button', { name: /Up to home\.mdx/ })
     );
-    await user.type(await screen.findByLabelText('Title'), '!');
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.tab();
     await user.click(screen.getByRole('button', { name: 'Save' }));
     expect((await screen.findAllByRole('alert')).length).toBeGreaterThan(0);
+  });
+
+  it('closes an open level when the edits are discarded', async () => {
+    const user = userEvent.setup();
+    renderForm();
+    await user.click(await screen.findByRole('button', { name: 'Open Three' }));
+    await user.type(await screen.findByLabelText(/^Handle\b/), '!');
+    expect(
+      screen.getByRole('navigation', { name: 'Field path' })
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    expect(screen.queryByRole('navigation', { name: 'Field path' })).toBeNull();
+    expect(
+      await screen.findByRole('button', { name: 'Open Three' })
+    ).toBeVisible();
   });
 });

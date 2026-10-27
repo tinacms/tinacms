@@ -125,8 +125,8 @@ function SaveProbe() {
 describe('ArrayField rendering', () => {
   it("renders each item's own fields with their own labels and values", async () => {
     renderField({ authors: [{ name: 'Ivan', age: 30 }] });
-    const name = (await screen.findByLabelText('Name')) as HTMLInputElement;
-    const age = (await screen.findByLabelText('Age')) as HTMLInputElement;
+    const name = (await screen.findByLabelText(/^Name\b/)) as HTMLInputElement;
+    const age = (await screen.findByLabelText(/^Age\b/)) as HTMLInputElement;
     expect(name.value).toBe('Ivan');
     expect(age.value).toBe('30');
   });
@@ -134,14 +134,14 @@ describe('ArrayField rendering', () => {
   it('renders one row per item', async () => {
     renderField({ authors: [{ name: 'Ivan' }, { name: 'Brook' }] });
     const names = (await screen.findAllByLabelText(
-      'Name'
+      /^Name\b/
     )) as HTMLInputElement[];
     expect(names.map((input) => input.value)).toEqual(['Ivan', 'Brook']);
   });
 
   it('renders no rows when the field is absent', async () => {
     renderField();
-    expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Name\b/)).not.toBeInTheDocument();
   });
 
   it('shows a stored value that is not a list read-only, and clears it', async () => {
@@ -168,9 +168,9 @@ describe('ArrayField add, remove, and reorder', () => {
     const [addAuthor] = await screen.findAllByRole('button', {
       name: 'Add item',
     });
-    expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Name\b/)).not.toBeInTheDocument();
     await userEvent.click(addAuthor);
-    expect(await screen.findByLabelText('Name')).toBeInTheDocument();
+    expect(await screen.findByLabelText(/^Name\b/)).toBeInTheDocument();
   });
 
   it('goes dirty when an item is added to an absent list', async () => {
@@ -184,20 +184,20 @@ describe('ArrayField add, remove, and reorder', () => {
 
   it('removes an item', async () => {
     renderField({ authors: [{ name: 'Ivan' }] });
-    await screen.findByLabelText('Name');
+    await screen.findByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 1' })
     );
-    expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Name\b/)).not.toBeInTheDocument();
   });
 
   it('reorders items', async () => {
     renderField({ authors: [{ name: 'Ivan' }, { name: 'Brook' }] });
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Move item 2 up' })
     );
-    const names = screen.getAllByLabelText('Name') as HTMLInputElement[];
+    const names = screen.getAllByLabelText(/^Name\b/) as HTMLInputElement[];
     expect(names.map((input) => input.value)).toEqual(['Brook', 'Ivan']);
   });
 
@@ -205,7 +205,7 @@ describe('ArrayField add, remove, and reorder', () => {
     renderField({
       authors: [{ name: 'Ivan' }, { name: 'Josh', age: 30 }, { name: 'Brook' }],
     });
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 2' })
     );
@@ -215,7 +215,7 @@ describe('ArrayField add, remove, and reorder', () => {
     ]);
     expect(
       screen
-        .getAllByLabelText('Age')
+        .getAllByLabelText(/^Age\b/)
         .map((input) => (input as HTMLInputElement).value)
     ).toEqual(['', '']);
   });
@@ -227,18 +227,20 @@ describe('ArrayField add, remove, and reorder', () => {
         { name: 'Brook', age: 3 },
       ],
     });
-    const ages = await screen.findAllByLabelText('Age');
+    const ages = await screen.findAllByLabelText(/^Age\b/);
     await userEvent.clear(ages[1]);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 1' })
     );
     expect(valueOf('authors')).toEqual([{ name: 'Brook', age: null }]);
-    expect((screen.getByLabelText('Age') as HTMLInputElement).value).toBe('');
+    expect((screen.getByLabelText(/^Age\b/) as HTMLInputElement).value).toBe(
+      ''
+    );
   });
 
   it("keeps a moved item's value with that item", async () => {
     renderField({ authors: [{ name: 'Ivan', age: 30 }, { name: 'Brook' }] });
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Move item 2 up' })
     );
@@ -252,7 +254,7 @@ describe('ArrayField add, remove, and reorder', () => {
 describe('ArrayField dirty tracking', () => {
   it('goes dirty on a reorder, then back to clean once edits restore the original values', async () => {
     renderField({ authors: [{ name: 'Ivan' }, { name: 'Brook' }] });
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     expect(status()).toBe('pristine');
 
     await userEvent.click(
@@ -260,13 +262,13 @@ describe('ArrayField dirty tracking', () => {
     );
     expect(
       screen
-        .getAllByLabelText('Name')
+        .getAllByLabelText(/^Name\b/)
         .map((input) => (input as HTMLInputElement).value)
     ).toEqual(['Brook', 'Ivan']);
     expect(status()).toBe('dirty');
 
     // Edit the swapped items back to what they were before the reorder.
-    const [first, second] = screen.getAllByLabelText('Name');
+    const [first, second] = screen.getAllByLabelText(/^Name\b/);
     await userEvent.clear(first);
     await userEvent.type(first, 'Ivan');
     await userEvent.clear(second);
@@ -283,7 +285,7 @@ describe('ArrayField dirty tracking', () => {
 describe('ArrayField value updates', () => {
   it('writes an item field edit back through the store', async () => {
     renderField({ authors: [{ name: 'Ivan' }] });
-    const name = await screen.findByLabelText('Name');
+    const name = await screen.findByLabelText(/^Name\b/);
     await userEvent.clear(name);
     await userEvent.type(name, 'Brook');
     expect(valueOf('authors')).toEqual([{ name: 'Brook', age: null }]);
@@ -318,7 +320,7 @@ describe('ArrayField value updates', () => {
       </TinaProvider>
     );
 
-    const name = await screen.findByLabelText('Name');
+    const name = await screen.findByLabelText(/^Name\b/);
 
     await userEvent.type(name, 'a');
     expect(screen.getByTestId('form-status')).toHaveTextContent('dirty');
@@ -371,7 +373,7 @@ describe('ArrayField value updates', () => {
       </TinaProvider>
     );
 
-    await userEvent.type(await screen.findByLabelText('Title'), '!');
+    await userEvent.type(await screen.findByLabelText(/^Title\b/), '!');
     await userEvent.click(screen.getByText('save'));
 
     expect(await screen.findByTestId('form-status')).toHaveTextContent('clean');
@@ -498,7 +500,7 @@ describe('ArrayField validation', () => {
 
   it('surfaces an item field error at its own address, and rolls it up onto the array itself', async () => {
     renderField({ authors: [{ name: 'Ivan' }] });
-    const name = await screen.findByLabelText('Name');
+    const name = await screen.findByLabelText(/^Name\b/);
     await userEvent.clear(name);
     await userEvent.tab();
     await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2));
@@ -522,7 +524,7 @@ describe('ArrayField validation', () => {
 
   it('rolls a doubly-nested item field error up through every ancestor array', async () => {
     renderField({ groups: [{ members: [{ name: 'Ivan' }] }] });
-    const name = await screen.findByLabelText('Name');
+    const name = await screen.findByLabelText(/^Name\b/);
     await userEvent.clear(name);
     await userEvent.tab();
     // The leaf field, the `members` array, and the `groups` array each show it.
@@ -851,7 +853,8 @@ describe('ArrayField templates', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/"images"/)).toBeInTheDocument();
     expect(
-      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+      (screen.getByRole('textbox', { name: /^Link\b/ }) as HTMLInputElement)
+        .value
     ).toBe('/docs');
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 1' })
@@ -879,7 +882,8 @@ describe('ArrayField templates', () => {
       ).value
     ).toBe('Hi');
     expect(
-      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+      (screen.getByRole('textbox', { name: /^Link\b/ }) as HTMLInputElement)
+        .value
     ).toBe('/docs');
     expect(screen.getByText('Hero')).toBeInTheDocument();
     expect(screen.getByText('Call to action')).toBeInTheDocument();
@@ -925,7 +929,7 @@ describe('ArrayField templates', () => {
 
   it('edits a field of a template item and writes it back', async () => {
     renderPage({ blocks: [{ _template: 'cta', link: '/docs' }] });
-    const link = await screen.findByRole('textbox', { name: 'Link' });
+    const link = await screen.findByRole('textbox', { name: /^Link\b/ });
     await userEvent.type(link, '/v4');
     await waitFor(() =>
       expect(pageValueOf('blocks')).toEqual([
@@ -954,7 +958,8 @@ describe('ArrayField templates', () => {
       screen.queryByRole('textbox', { name: 'Headline' })
     ).not.toBeInTheDocument();
     expect(
-      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+      (screen.getByRole('textbox', { name: /^Link\b/ }) as HTMLInputElement)
+        .value
     ).toBe('/docs');
   });
 
@@ -1010,7 +1015,8 @@ describe('ArrayField templates', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('"hello"')).toBeInTheDocument();
     expect(
-      (screen.getByRole('textbox', { name: 'Link' }) as HTMLInputElement).value
+      (screen.getByRole('textbox', { name: /^Link\b/ }) as HTMLInputElement)
+        .value
     ).toBe('/docs');
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 1' })
@@ -1112,10 +1118,10 @@ describe('ArrayField of', () => {
     const shown = () =>
       (
         screen.getAllByRole('spinbutton', {
-          name: 'Score',
+          name: /^Score\b/,
         }) as HTMLInputElement[]
       ).map((input) => input.value);
-    await screen.findAllByRole('spinbutton', { name: 'Score' });
+    await screen.findAllByRole('spinbutton', { name: /^Score\b/ });
     expect(shown()).toEqual(['3', '5', '7']);
 
     await userEvent.click(
@@ -1129,7 +1135,7 @@ describe('ArrayField of', () => {
     await waitFor(() => expect(shown()).toEqual(['7', '5']));
 
     await userEvent.type(
-      screen.getAllByRole('spinbutton', { name: 'Score' })[0],
+      screen.getAllByRole('spinbutton', { name: /^Score\b/ })[0],
       '1'
     );
     await waitFor(() => expect(pageValueOf('scores')).toEqual(['71', '5']));
@@ -1137,16 +1143,16 @@ describe('ArrayField of', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Add item' }));
     expect(
-      await screen.findAllByRole('spinbutton', { name: 'Score' })
+      await screen.findAllByRole('spinbutton', { name: /^Score\b/ })
     ).toHaveLength(3);
   });
 
   it('keeps a value typed into a new item when the item moves', async () => {
     renderPage({ scores: [3, 5] });
-    await screen.findAllByRole('spinbutton', { name: 'Score' });
+    await screen.findAllByRole('spinbutton', { name: /^Score\b/ });
     await userEvent.click(screen.getByRole('button', { name: 'Add item' }));
     const inputs = (await screen.findAllByRole('spinbutton', {
-      name: 'Score',
+      name: /^Score\b/,
     })) as HTMLInputElement[];
     await userEvent.type(inputs[2], '9');
     await userEvent.click(
@@ -1156,7 +1162,7 @@ describe('ArrayField of', () => {
     expect(
       (
         screen.getAllByRole('spinbutton', {
-          name: 'Score',
+          name: /^Score\b/,
         }) as HTMLInputElement[]
       ).map((input) => input.value)
     ).toEqual(['3', '9', '5']);

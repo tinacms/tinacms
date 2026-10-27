@@ -30,6 +30,7 @@ import {
   isTemplatesArray,
   itemFieldsOf,
 } from './array-field.schema';
+import { DrillInField } from '../drill-in-field';
 import { StoredValue, UneditableValue } from '../uneditable-value';
 
 export function ArrayField() {
@@ -52,19 +53,7 @@ function ItemList() {
   const frame = useFieldFrame();
   const drill = useDrillIn();
 
-  if (drill.drills) {
-    return (
-      <FieldWrapper {...frame}>
-        <Button
-          variant='secondary'
-          iconEnd='chevron-right'
-          onClick={drill.open}
-        >
-          {`Open ${frame.label}`}
-        </Button>
-      </FieldWrapper>
-    );
-  }
+  if (drill.drills) return <DrillInField frame={frame} open={drill.open} />;
 
   return (
     <FieldWrapper {...frame}>

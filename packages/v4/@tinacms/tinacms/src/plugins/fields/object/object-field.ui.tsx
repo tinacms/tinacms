@@ -1,4 +1,3 @@
-import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import {
   NestedFieldRow,
@@ -8,6 +7,7 @@ import {
   useFieldSchema,
   useFieldValue,
 } from '../../../editor';
+import { DrillInField } from '../drill-in-field';
 import { UneditableValue } from '../uneditable-value';
 import { asObjectFieldSchema, isPlainObject } from './object-field.schema';
 
@@ -29,19 +29,7 @@ function FieldGroup() {
   const frame = useFieldFrame();
   const drill = useDrillIn();
 
-  if (drill.drills) {
-    return (
-      <FieldWrapper {...frame}>
-        <Button
-          variant='secondary'
-          iconEnd='chevron-right'
-          onClick={drill.open}
-        >
-          {`Open ${frame.label}`}
-        </Button>
-      </FieldWrapper>
-    );
-  }
+  if (drill.drills) return <DrillInField frame={frame} open={drill.open} />;
 
   return (
     <FieldWrapper {...frame}>

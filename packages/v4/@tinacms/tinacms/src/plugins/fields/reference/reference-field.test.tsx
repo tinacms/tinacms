@@ -107,12 +107,12 @@ const renderField = (document?: TinaDocument, content = contentPlugin()) =>
 describe('ReferenceField rendering', () => {
   it('shows the path of the referenced document', async () => {
     renderField({ page: ABOUT });
-    expect(await screen.findByLabelText('Page')).toHaveValue(ABOUT);
+    expect(await screen.findByLabelText(/^Page\b/)).toHaveValue(ABOUT);
   });
 
   it('shows the placeholder when the field is absent', async () => {
     renderField();
-    expect(await screen.findByLabelText('Page')).toHaveAttribute(
+    expect(await screen.findByLabelText(/^Page\b/)).toHaveAttribute(
       'placeholder',
       'Search documents…'
     );
@@ -122,7 +122,7 @@ describe('ReferenceField rendering', () => {
 describe('ReferenceField searching', () => {
   it('narrows the options to what was typed', async () => {
     renderField();
-    await userEvent.type(await screen.findByLabelText('Page'), 'contact');
+    await userEvent.type(await screen.findByLabelText(/^Page\b/), 'contact');
     expect(await screen.findByRole('option', { name: CONTACT })).toBeVisible();
     expect(
       screen.queryByRole('option', { name: ABOUT })
@@ -131,7 +131,7 @@ describe('ReferenceField searching', () => {
 
   it('says so when nothing matches', async () => {
     renderField();
-    await userEvent.type(await screen.findByLabelText('Page'), 'nothing');
+    await userEvent.type(await screen.findByLabelText(/^Page\b/), 'nothing');
     expect(await screen.findByText('No documents match.')).toBeVisible();
   });
 });
@@ -139,14 +139,14 @@ describe('ReferenceField searching', () => {
 describe('ReferenceField lookup', () => {
   it('offers every document of the collection it names', async () => {
     renderField();
-    await userEvent.click(await screen.findByLabelText('Page'));
+    await userEvent.click(await screen.findByLabelText(/^Page\b/));
     expect(await screen.findByRole('option', { name: ABOUT })).toBeVisible();
     expect(await screen.findByRole('option', { name: CONTACT })).toBeVisible();
   });
 
   it('draws candidates from every collection a field names', async () => {
     renderField();
-    await userEvent.click(await screen.findByLabelText('Related'));
+    await userEvent.click(await screen.findByLabelText(/^Related\b/));
     expect(await screen.findByRole('option', { name: ABOUT })).toBeVisible();
     expect(await screen.findByRole('option', { name: ADA })).toBeVisible();
   });
@@ -154,7 +154,7 @@ describe('ReferenceField lookup', () => {
   it('asks the content capability for each collection a field names', async () => {
     const list = vi.fn(async (name: string) => SUMMARIES[name] ?? []);
     renderField(undefined, contentPlugin({ list }));
-    await userEvent.click(await screen.findByLabelText('Related'));
+    await userEvent.click(await screen.findByLabelText(/^Related\b/));
     await screen.findByRole('option', { name: ADA });
     expect(list.mock.calls.map(([name]) => name).sort()).toEqual([
       'author',
@@ -166,14 +166,14 @@ describe('ReferenceField lookup', () => {
 describe('ReferenceField value updates', () => {
   it('stores the path of the chosen document', async () => {
     renderField();
-    await userEvent.click(await screen.findByLabelText('Page'));
+    await userEvent.click(await screen.findByLabelText(/^Page\b/));
     await userEvent.click(await screen.findByRole('option', { name: ABOUT }));
     expect(valueOf('page')).toBe(ABOUT);
   });
 
   it('clears an optional reference through the clear button', async () => {
     renderField({ page: ABOUT });
-    const input = await screen.findByLabelText('Page');
+    const input = await screen.findByLabelText(/^Page\b/);
     await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
     expect(valueOf('page')).toBeNull();
     expect(input).toHaveValue('');
@@ -181,7 +181,7 @@ describe('ReferenceField value updates', () => {
 
   it('offers no clear button on a required reference', async () => {
     renderField({ author: ADA });
-    await screen.findByLabelText('Author');
+    await screen.findByLabelText(/^Author\b/);
     expect(
       screen.queryByRole('button', { name: 'Clear' })
     ).not.toBeInTheDocument();
@@ -191,14 +191,14 @@ describe('ReferenceField value updates', () => {
 describe('ReferenceField missing references', () => {
   it('marks a stored path that no document answers', async () => {
     renderField({ page: 'content/pages/deleted.mdx' });
-    expect(await screen.findByLabelText('Page')).toHaveValue(
+    expect(await screen.findByLabelText(/^Page\b/)).toHaveValue(
       'content/pages/deleted.mdx (missing)'
     );
   });
 
   it('keeps a missing reference selectable so it is not silently dropped', async () => {
     renderField({ page: 'content/pages/deleted.mdx' });
-    await userEvent.click(await screen.findByLabelText('Page'));
+    await userEvent.click(await screen.findByLabelText(/^Page\b/));
     expect(
       await screen.findByRole('option', {
         name: 'content/pages/deleted.mdx (missing)',

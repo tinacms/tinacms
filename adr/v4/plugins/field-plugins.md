@@ -42,26 +42,29 @@ export default defineClientPlugin({
 A field component receives *only* its **Field address** via context. Everything else is pulled through address-keyed hooks:
 
 ```tsx
-import { useFieldValue, useFieldErrors, useFieldActivation, useFieldAddress } from 'tinacms/react'
+import { useFieldValue, useFieldFrame, useFieldActivation, useFieldAddress } from 'tinacms/react'
+import { FieldWrapper } from '@tinacms/ui/components/field-wrapper'
 
 function StringField() {
   const address = useFieldAddress()
   const [value, setValue] = useFieldValue<string>(address)
-  const errors = useFieldErrors(address)
+  const frame = useFieldFrame()
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Opt into focusing when this field becomes the active field
   useFieldActivation(() => inputRef.current?.focus())
 
+  // The wrapper draws the label, the required marker and the errors the editor
+  // should see now (after the field is left, or after a save was tried)
   return (
-    <div>
+    <FieldWrapper {...frame}>
       <input
         ref={inputRef}
+        id={address}
         value={value ?? ''}
         onChange={(e) => setValue(e.target.value)}
       />
-      {errors.map((e) => <span key={e} className="error">{e}</span>)}
-    </div>
+    </FieldWrapper>
   )
 }
 ```

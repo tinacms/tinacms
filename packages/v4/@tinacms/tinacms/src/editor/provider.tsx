@@ -396,12 +396,14 @@ function useSeededFormSync(
     advanceSeedKey,
   ]);
 
-  const discardEdits = useCallback(
-    () => discardFormEdits(formId, resetForm, advanceSeedKey),
-    [formId, resetForm, advanceSeedKey]
-  );
+  const view = useFormViewState(formId);
+  const { closeLevelsAbove } = view;
+  const discardEdits = useCallback(() => {
+    closeLevelsAbove(0);
+    discardFormEdits(formId, resetForm, advanceSeedKey);
+  }, [formId, resetForm, advanceSeedKey, closeLevelsAbove]);
 
-  return { seedKey, advanceSeedKey, discardEdits };
+  return { seedKey, advanceSeedKey, discardEdits, view };
 }
 
 function useFormMethodSubscriptions(
@@ -495,7 +497,7 @@ export function FormProvider({
     shouldFocusError: false,
   });
 
-  const { seedKey, advanceSeedKey, discardEdits } = useSeededFormSync(
+  const { seedKey, advanceSeedKey, discardEdits, view } = useSeededFormSync(
     formId,
     userId,
     ingested,
@@ -537,8 +539,6 @@ export function FormProvider({
       setFailure(message === null ? null : { formId, message }),
     [formId]
   );
-
-  const view = useFormViewState(formId);
 
   const formScope = useMemo(
     () => ({

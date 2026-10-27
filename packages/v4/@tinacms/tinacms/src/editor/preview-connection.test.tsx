@@ -158,7 +158,7 @@ describe('usePreviewConnection reference resolution', () => {
     const get = vi.fn(async () => null);
     const iframe = fakeIframe();
     renderWithReference(iframe.ref, get);
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await waitFor(() => expect(get).toHaveBeenCalledTimes(1));
     iframe.postMessage.mockClear();
 
@@ -174,7 +174,7 @@ describe('usePreviewConnection reference resolution', () => {
   it('keeps the path when the document is gone', async () => {
     const iframe = fakeIframe();
     renderWithReference(iframe.ref, async () => null);
-    await screen.findByLabelText('Title');
+    await screen.findByLabelText(/^Title\b/);
 
     await waitFor(() =>
       expect(iframe.postMessage).toHaveBeenCalledWith(
@@ -190,7 +190,7 @@ describe('usePreviewConnection reference resolution', () => {
       path: REFERENCED_PATH,
       document: { title: 'Deleted Page' },
     }));
-    await screen.findByLabelText('Title');
+    await screen.findByLabelText(/^Title\b/);
 
     await waitFor(() =>
       expect(iframe.postMessage).toHaveBeenCalledWith(
@@ -205,7 +205,7 @@ describe('usePreviewConnection', () => {
   it('answers the ready handshake with the registered document', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    await screen.findByLabelText('Title');
+    await screen.findByLabelText(/^Title\b/);
     iframe.postMessage.mockClear();
 
     messageFromPreview(readyMessage(), iframe.ref.current?.contentWindow);
@@ -218,7 +218,7 @@ describe('usePreviewConnection', () => {
   it('reposts on every edit — the store chokepoint carries changes to the wire', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     iframe.postMessage.mockClear();
 
     await userEvent.type(input, '!');
@@ -231,7 +231,7 @@ describe('usePreviewConnection', () => {
   it('does not repost on markSaved — the values reference is preserved', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, '!');
     iframe.postMessage.mockClear();
 
@@ -244,7 +244,7 @@ describe('usePreviewConnection', () => {
   it('sets a preview activate message active and focuses the field', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     expect(input).not.toHaveFocus();
 
     messageFromPreview(
@@ -261,7 +261,7 @@ describe('usePreviewConnection', () => {
   it('ignores the wrong origin, the wrong source, and malformed data', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    await screen.findByLabelText('Title');
+    await screen.findByLabelText(/^Title\b/);
     iframe.postMessage.mockClear();
 
     messageFromPreview(
@@ -347,7 +347,7 @@ describe('usePreviewConnection', () => {
       </TinaProvider>
     );
     const { rerender } = render(tree(path));
-    await screen.findByLabelText('Title');
+    await screen.findByLabelText(/^Title\b/);
     iframe.postMessage.mockClear();
 
     rerender(tree(otherPath));
@@ -401,7 +401,7 @@ describe('usePreviewConnection', () => {
   it('goes silent after unmount', async () => {
     const iframe = fakeIframe();
     const { unmount } = renderConnected(iframe.ref);
-    await screen.findByLabelText('Title');
+    await screen.findByLabelText(/^Title\b/);
     unmount();
     iframe.postMessage.mockClear();
 

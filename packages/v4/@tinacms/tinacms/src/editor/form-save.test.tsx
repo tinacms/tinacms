@@ -129,7 +129,7 @@ describe('useFormSave', () => {
   it('delivers the digested document to onSave and marks the form clean', async () => {
     const onSave = vi.fn();
     renderWithSave(onSave);
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, '!');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
 
@@ -141,7 +141,7 @@ describe('useFormSave', () => {
   it('refuses to save while a field has a validation error', async () => {
     const onSave = vi.fn();
     renderWithSave(onSave, requiredTitle);
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.clear(input);
     await userEvent.tab();
     expect(await screen.findByRole('alert')).toHaveTextContent(
@@ -173,7 +173,7 @@ describe('useFormSave', () => {
   it('leaves the form dirty when onSave rejects', async () => {
     const onSave = vi.fn().mockRejectedValue(new Error('save failed'));
     renderWithSave(onSave);
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
@@ -193,7 +193,7 @@ describe('useFormSave', () => {
       undefined,
       [stampPlugin]
     );
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
@@ -206,7 +206,7 @@ describe('useFormSave', () => {
     renderWithSave(onSave, collection, { title: 'Hi' }, undefined, [
       stampPlugin,
     ]);
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
@@ -223,7 +223,7 @@ describe('useFormSave', () => {
       (cause) => failures.push(cause),
       [stampPlugin]
     );
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
@@ -242,7 +242,7 @@ describe('useFormSave', () => {
       undefined,
       [stampPlugin]
     );
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
@@ -266,7 +266,7 @@ describe('useFormSave', () => {
       (cause) => failures.push(cause),
       [stampPlugin]
     );
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
@@ -286,7 +286,7 @@ describe('useFormSave', () => {
       undefined,
       [stampPlugin]
     );
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
@@ -300,7 +300,7 @@ describe('useFormSave', () => {
       document: { ...document, title: String(document.title).toUpperCase() },
     }));
     renderWithSave(onSave);
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
@@ -318,7 +318,7 @@ describe('useFormSave', () => {
         })
     );
     renderWithSave(onSave);
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
@@ -335,7 +335,7 @@ describe('useFormSave', () => {
   it('advances the seed key only when the stored document differs, so uncontrolled widgets redraw', async () => {
     const onSave = vi.fn(async (document: TinaDocument) => ({ document }));
     renderWithSave(onSave);
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     const seed = () => screen.getByTestId('seed').textContent;
     const opened = seed();
 
@@ -364,7 +364,7 @@ describe('useFormSave', () => {
       { title: 'Hi' },
       (cause) => failures.push(cause)
     );
-    await userEvent.type(await screen.findByLabelText('Title'), '!');
+    await userEvent.type(await screen.findByLabelText(/^Title\b/), '!');
 
     await userEvent.click(screen.getByText('save'));
     expect(await screen.findByTestId('status')).toHaveTextContent('clean');
@@ -447,7 +447,7 @@ describe('useFormSave with a structured field value', () => {
       </TinaProvider>
     );
 
-    const input = await screen.findByLabelText('body');
+    const input = await screen.findByLabelText(/^body\b/);
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
 
     await userEvent.type(input, '!');

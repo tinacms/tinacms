@@ -24,10 +24,11 @@ import { runAfterSave, runBeforeSave } from '../core/form/hooks';
 import { digestDocument, ingestDocument } from '../core/form/ingest';
 import { invariant } from '../core/invariant';
 import type { SliceState, TinaStoreState } from '../core/plugin';
-import type {
-  CollectionSchema,
-  FieldSchema,
-  TinaDocument,
+import {
+  type CollectionSchema,
+  type FieldSchema,
+  type TinaDocument,
+  hasValidator,
 } from '../core/schema/types';
 import {
   type FormId,
@@ -341,7 +342,7 @@ export function useFieldErrors(address: FieldAddress): string[] {
 // errors the editor should see now (see `isRevealed`).
 export function useFieldFrame(): Pick<
   FieldWrapperProps,
-  'label' | 'htmlFor' | 'labelId' | 'errors'
+  'label' | 'htmlFor' | 'labelId' | 'required' | 'errors'
 > {
   const address = useFieldAddress();
   const node = useFieldSchema();
@@ -356,6 +357,7 @@ export function useFieldFrame(): Pick<
     label: node.label ?? node.name,
     htmlFor: labelable ? address : undefined,
     labelId: `${address}-label`,
+    required: hasValidator(node, 'required'),
     errors: isRevealed(view, address) ? errors : [],
   };
 }
