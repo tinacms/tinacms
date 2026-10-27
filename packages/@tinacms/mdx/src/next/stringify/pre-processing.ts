@@ -212,6 +212,12 @@ const listItemElement = (
           children: eat(child.children, field, imageCallback),
         };
       }
+      if (typeof (child as Partial<Plate.TextElement>).text === 'string') {
+        return {
+          type: 'paragraph',
+          children: eat([child as Plate.TextElement], field, imageCallback),
+        };
+      }
       return blockContentElement(child, field, imageCallback);
     }),
   };
