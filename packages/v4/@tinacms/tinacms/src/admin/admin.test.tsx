@@ -257,7 +257,7 @@ describe('TinaAdmin', () => {
     expect(input).toHaveValue('Hello!');
   });
 
-  it('disables Save while the document has a validation error', async () => {
+  it('keeps a document with a validation error from saving, and shows the error after a save is tried', async () => {
     const user = userEvent.setup();
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
@@ -265,21 +265,11 @@ describe('TinaAdmin', () => {
     const input = await screen.findByLabelText('Title');
 
     await user.clear(input);
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Title is required'
-    );
-    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
-      'aria-disabled',
-      'true'
-    );
+    expect(screen.queryByRole('alert')).toBeNull();
 
-    await user.type(input, 'Hello again');
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
-        'aria-disabled',
-        'false'
-      )
-    );
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const alerts = await screen.findAllByRole('alert');
+    expect(alerts[0]).toHaveTextContent('Title is required');
   });
 
   it('opens the document a deep link names', async () => {

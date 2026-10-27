@@ -4,20 +4,20 @@ import { useRef } from 'react';
 import {
   useFieldActivation,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldValue,
 } from '../../../editor';
 
 export function StringField() {
   const address = useFieldAddress();
   const [value, setValue] = useFieldValue<string>(address);
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus());
 
   return (
-    <FieldWrapper errors={errors}>
+    <FieldWrapper {...frame}>
       <Input
         ref={inputRef}
         id={address}

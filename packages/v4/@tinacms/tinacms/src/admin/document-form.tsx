@@ -7,62 +7,27 @@ import {
   AlertDialogTitle,
 } from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
-import { Label } from '@tinacms/ui/components/label';
+import { FormLevel } from '@tinacms/ui/components/form-level';
 import { use } from 'react';
-import { toFieldAddress } from '../core/field/address';
-import type { FieldSchema } from '../core/schema/types';
 import { FormScopeContext } from '../editor/context';
-import { Field } from '../editor/field';
+import { Field, FieldNode } from '../editor/field';
+import { isRevealed } from '../editor/form-view-state';
 import {
   useDiscardEdits,
-  useFieldRegistry,
   useFormId,
   useFormSave,
   useSaveFailure,
   useStaleDraft,
 } from '../editor/hooks';
-import {
-  useFormErrors,
-  useIsFieldDirty,
-  useIsFormDirty,
-} from '../form/form-store';
+import { useFormErrors, useIsFormDirty } from '../form/form-store';
 import { DocumentStatus } from './document-status';
-
-function FieldRow({ node }: { node: FieldSchema }) {
-  const name = node.name;
-  const dirty = useIsFieldDirty(useFormId(), toFieldAddress(name));
-  const labelable =
-    useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
-  return (
-    <div className='mb-4 min-w-0'>
-      <Label
-        className='mb-1'
-        id={`${name}-label`}
-        htmlFor={labelable ? name : undefined}
-      >
-        {node.label ?? name}
-        {dirty ? (
-          <>
-            <span
-              aria-hidden='true'
-              className='ml-1 size-1.5 rounded-full bg-primary'
-            />
-            <span className='sr-only'>(unsaved)</span>
-          </>
-        ) : null}
-      </Label>
-      <Field address={name} />
-    </div>
-  );
-}
 
 function SaveButton() {
   const formId = useFormId();
   const dirty = useIsFormDirty(formId);
-  const invalid = Object.keys(useFormErrors(formId)).length > 0;
   const save = useFormSave();
   const [failure, setFailure] = useSaveFailure();
-  const canSave = dirty && !invalid;
+  const canSave = dirty;
   return (
     <div className='flex flex-col items-start gap-2'>
       <Button
@@ -140,6 +105,53 @@ function StaleDraftDialog() {
   );
 }
 
+// The document's fields, or the fields of the nested level the editor opened,
+// under a Field trail that leads back up.
+function FormFields() {
+  const scope = use(FormScopeContext);
+  const errors = useFormErrors(useFormId());
+  if (!scope) return null;
+  const { view, collection, path } = scope;
+
+  if (view.openLevels.length === 0) {
+    return (
+      <FormLevel>
+        {collection.fields.map((node) => (
+          <Field key={node.name} address={node.name} />
+        ))}
+      </FormLevel>
+    );
+  }
+
+  const holdsError = (address: string) =>
+    isRevealed(view, address) &&
+    Object.keys(errors).some(
+      (key) => key === address || key.startsWith(`${address}.`)
+    );
+  const open = view.openLevels;
+  const steps = [
+    {
+      label: path.split('/').at(-1) ?? path,
+      onClick: () => view.closeLevelsAbove(0),
+      invalid: Object.keys(errors).some((key) => isRevealed(view, key)),
+    },
+    ...open.map((level, index) => ({
+      label: level.label,
+      onClick: () => view.closeLevelsAbove(index + 1),
+      invalid: holdsError(level.address),
+    })),
+  ];
+  const current = open[open.length - 1];
+  return (
+    <FormLevel
+      steps={steps}
+      onUp={() => view.closeLevelsAbove(open.length - 1)}
+    >
+      <FieldNode address={current.address} node={current.node} />
+    </FormLevel>
+  );
+}
+
 export function DocumentForm() {
   const scope = use(FormScopeContext);
   if (!scope) return null;
@@ -153,9 +165,7 @@ export function DocumentForm() {
         <DocumentStatus />
       </header>
       <StaleDraftDialog />
-      {scope.collection.fields.map((node) => (
-        <FieldRow key={node.name} node={node} />
-      ))}
+      <FormFields />
       <div className='flex items-start gap-2'>
         <SaveButton />
         <DiscardButton />

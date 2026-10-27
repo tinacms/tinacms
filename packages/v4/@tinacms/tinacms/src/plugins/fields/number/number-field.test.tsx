@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
@@ -116,10 +116,11 @@ describe('NumberField value updates', () => {
     expect(input.value).toBe('-5');
   });
 
-  it('surfaces the shared min message while editing', async () => {
+  it('surfaces the shared min message once the editor leaves the field', async () => {
     renderField();
     const input = await screen.findByLabelText('Rating');
     await userEvent.type(input, '0');
+    await userEvent.tab();
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Rating must be at least 1'
     );
@@ -148,7 +149,7 @@ describe('NumberField wheel guard', () => {
   it('drops focus when the wheel scrolls over the input', async () => {
     renderField({ weight: 3 });
     const input = await screen.findByLabelText('Weight');
-    input.focus();
+    act(() => input.focus());
     expect(input).toHaveFocus();
     fireEvent.wheel(input);
     expect(input).not.toHaveFocus();

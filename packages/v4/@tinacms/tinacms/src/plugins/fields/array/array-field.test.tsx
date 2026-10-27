@@ -500,6 +500,7 @@ describe('ArrayField validation', () => {
     renderField({ authors: [{ name: 'Ivan' }] });
     const name = await screen.findByLabelText('Name');
     await userEvent.clear(name);
+    await userEvent.tab();
     await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2));
     for (const alert of screen.getAllByRole('alert')) {
       expect(alert).toHaveTextContent('Name is required');
@@ -523,6 +524,7 @@ describe('ArrayField validation', () => {
     renderField({ groups: [{ members: [{ name: 'Ivan' }] }] });
     const name = await screen.findByLabelText('Name');
     await userEvent.clear(name);
+    await userEvent.tab();
     // The leaf field, the `members` array, and the `groups` array each show it.
     await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(3));
     for (const alert of screen.getAllByRole('alert')) {

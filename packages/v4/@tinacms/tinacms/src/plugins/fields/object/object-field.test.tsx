@@ -241,6 +241,7 @@ describe('ObjectField validation', () => {
     renderField({ seo: { title: 'Home' } });
     const title = await screen.findByLabelText('Title');
     await userEvent.clear(title);
+    await userEvent.tab();
     await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2));
     for (const alert of screen.getAllByRole('alert')) {
       expect(alert).toHaveTextContent('Title is required');

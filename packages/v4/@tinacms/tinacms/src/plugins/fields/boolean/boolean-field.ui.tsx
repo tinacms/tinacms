@@ -4,20 +4,20 @@ import { useRef } from 'react';
 import {
   useFieldActivation,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldValue,
 } from '../../../editor';
 
 export function BooleanField() {
   const address = useFieldAddress();
   const [value, setValue] = useFieldValue<boolean>(address);
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
   const inputRef = useRef<HTMLButtonElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus());
 
   return (
-    <FieldWrapper errors={errors}>
+    <FieldWrapper {...frame}>
       <Checkbox
         ref={inputRef}
         id={address}

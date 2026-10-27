@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { JsonValue } from '../core/json';
@@ -21,6 +22,7 @@ import {
   type SaveHandler,
   TinaProvider,
   useFieldAddress,
+  useFieldFrame,
   useFieldValue,
   useFormId,
   useFormSave,
@@ -141,6 +143,7 @@ describe('useFormSave', () => {
     renderWithSave(onSave, requiredTitle);
     const input = await screen.findByLabelText('Title');
     await userEvent.clear(input);
+    await userEvent.tab();
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Title is required'
     );
@@ -406,11 +409,13 @@ function StructureField() {
   const address = useFieldAddress();
   const [value, setValue] = useFieldValue<{ text: string }>(address);
   return (
-    <input
-      id={address}
-      value={value?.text ?? ''}
-      onChange={(event) => setValue({ text: event.target.value })}
-    />
+    <FieldWrapper {...useFieldFrame()}>
+      <input
+        id={address}
+        value={value?.text ?? ''}
+        onChange={(event) => setValue({ text: event.target.value })}
+      />
+    </FieldWrapper>
   );
 }
 

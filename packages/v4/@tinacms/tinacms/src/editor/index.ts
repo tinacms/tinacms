@@ -59,6 +59,8 @@ export {
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,
+  useDrillIn,
+  useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,

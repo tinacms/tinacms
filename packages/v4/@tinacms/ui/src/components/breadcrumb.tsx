@@ -56,7 +56,12 @@ const foldVariants = cva(
   }
 );
 
-type FoldItem = { label: string; onClick?: () => void };
+type FoldItem = {
+  label: string;
+  onClick?: () => void;
+  /** Shown after the label, such as an error dot. */
+  marks?: ReactNode;
+};
 
 type BreadcrumbFoldProps = Omit<
   ComponentProps<typeof DropdownMenuTrigger>,
@@ -88,6 +93,7 @@ function BreadcrumbFold({
           // Two levels can share a name, so the position is the key.
           <DropdownMenuItem key={index} icon='folder' onClick={item.onClick}>
             {item.label}
+            {item.marks}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

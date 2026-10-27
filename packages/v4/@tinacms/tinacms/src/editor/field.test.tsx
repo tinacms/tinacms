@@ -122,7 +122,6 @@ describe('Field with a registered plugin', () => {
         })}
       >
         <FormProvider collection={collection} path='content/posts/a.mdx'>
-          <label htmlFor='title'>Title</label>
           <Field address='title' />
         </FormProvider>
       </TinaProvider>

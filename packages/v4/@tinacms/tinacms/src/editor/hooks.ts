@@ -13,6 +13,7 @@ import {
   useFormState,
 } from 'react-hook-form';
 import { useStore } from 'zustand';
+import type { FieldWrapperProps } from '@tinacms/ui/components/field-wrapper';
 import type { AuthSlice } from '../core/auth/contract';
 import { authSliceOf, siteAuthTokenOf } from '../core/auth/slice';
 import type { ContentSlice } from '../core/content/contract';
@@ -48,6 +49,7 @@ import {
   TinaRuntimeContext,
 } from './context';
 import { collectFieldErrorMessages } from './field-errors';
+import { DRILL_DEPTH, fieldDepth, isRevealed } from './form-view-state';
 
 export function useFieldRegistry(): FieldRegistry {
   const runtime = use(TinaRuntimeContext);
@@ -267,6 +269,7 @@ export function useFormSave(): () => Promise<void> {
     const { formId, path, collection, onSave, hooks, reseedFields } = scope;
     // Validate every field, not only the edited ones, so a required field the
     // editor never touched surfaces its message at submit.
+    scope.view.attemptSave();
     const valid = await trigger();
     if (!valid) throw new FormValidationError();
     const values = getValues();
@@ -332,6 +335,44 @@ export function useFieldErrors(address: FieldAddress): string[] {
   // walks down from it, so a compound field's address reports everything
   // wrong underneath it, not only a message at that exact address.
   return collectFieldErrorMessages(get(errors, address));
+}
+
+// What a field passes to FieldWrapper: its name, the label's ids, and the
+// errors the editor should see now (see `isRevealed`).
+export function useFieldFrame(): Pick<
+  FieldWrapperProps,
+  'label' | 'htmlFor' | 'labelId' | 'errors'
+> {
+  const address = useFieldAddress();
+  const node = useFieldSchema();
+  const { view } = useFormScope(
+    'field-frame-outside-provider',
+    'useFieldFrame'
+  );
+  const labelable =
+    useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
+  const errors = useFieldErrors(address);
+  return {
+    label: node.label ?? node.name,
+    htmlFor: labelable ? address : undefined,
+    labelId: `${address}-label`,
+    errors: isRevealed(view, address) ? errors : [],
+  };
+}
+
+// A compound field this deep opens as its own form level instead of
+// expanding in place, unless it is the level already open.
+export function useDrillIn(): { drills: boolean; open: () => void } {
+  const address = useFieldAddress();
+  const node = useFieldSchema();
+  const { view } = useFormScope('drill-in-outside-provider', 'useDrillIn');
+  const label = node.label ?? node.name;
+  return {
+    drills:
+      fieldDepth(address) >= DRILL_DEPTH &&
+      view.openLevels.at(-1)?.address !== address,
+    open: () => view.openLevel({ address, label, node }),
+  };
 }
 
 export function useFieldActivation(handler: () => void): void {

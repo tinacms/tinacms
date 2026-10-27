@@ -82,10 +82,11 @@ describe('StringField value updates', () => {
 });
 
 describe('StringField validation', () => {
-  it('surfaces the shared min-length message while editing', async () => {
+  it('surfaces the shared min-length message once the editor leaves the field', async () => {
     renderTitle({ title: '' });
     const input = await screen.findByLabelText('Title');
     await userEvent.type(input, 'ab');
+    await userEvent.tab();
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Title must be at least 3 characters'
     );

@@ -58,6 +58,7 @@ import {
   TinaRuntimeContext,
 } from './context';
 import { flattenFieldErrors, nestFieldErrors } from './field-errors';
+import { useFormViewState } from './form-view-state';
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
@@ -537,6 +538,8 @@ export function FormProvider({
     [formId]
   );
 
+  const view = useFormViewState(formId);
+
   const formScope = useMemo(
     () => ({
       formId,
@@ -548,6 +551,7 @@ export function FormProvider({
       reseedFields,
       saveFailure,
       setSaveFailure,
+      view,
       discardEdits,
       hooks: formHooks,
       staleDraft: staleDraftActions,
@@ -562,6 +566,7 @@ export function FormProvider({
       reseedFields,
       saveFailure,
       setSaveFailure,
+      view,
       discardEdits,
       formHooks,
       staleDraftActions,

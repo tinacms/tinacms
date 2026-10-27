@@ -15,7 +15,8 @@ import {
   NestedFieldRow,
   useDocumentPath,
   useFieldAddress,
-  useFieldErrors,
+  useDrillIn,
+  useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
@@ -48,10 +49,25 @@ export function ArrayField() {
 function ItemList() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
+  const drill = useDrillIn();
+
+  if (drill.drills) {
+    return (
+      <FieldWrapper {...frame}>
+        <Button
+          variant='secondary'
+          iconEnd='chevron-right'
+          onClick={drill.open}
+        >
+          {`Open ${frame.label}`}
+        </Button>
+      </FieldWrapper>
+    );
+  }
 
   return (
-    <FieldWrapper errors={errors}>
+    <FieldWrapper {...frame}>
       {isScalarArray(field) ? (
         <ScalarItems address={address} field={field} />
       ) : (

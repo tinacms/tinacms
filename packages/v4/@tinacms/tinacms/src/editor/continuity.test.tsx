@@ -181,6 +181,7 @@ describe('form continuity across mounts', () => {
     const inputA = await screen.findByLabelText('Title');
     await userEvent.clear(inputA);
     await userEvent.type(inputA, 'x');
+    await userEvent.tab();
     await screen.findByText('Title must be at least 3 characters');
 
     rerender(host(pathB, { title: 'Doc B' }, onSave));
@@ -194,7 +195,11 @@ describe('form continuity across mounts', () => {
     rerender(host(pathA, { title: 'Doc A' }, onSave));
     const backOnA = await screen.findByLabelText('Title');
     await waitFor(() => expect(backOnA).toHaveValue('x'));
-    await screen.findByText('Title must be at least 3 characters');
+    await waitFor(() =>
+      expect(
+        errorsOf(useFormStore.getState().forms, toFormId(pathA))?.[title]
+      ).toEqual(['Title must be at least 3 characters'])
+    );
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
 
@@ -280,7 +285,11 @@ describe('form continuity across mounts', () => {
       if (errors !== errorsOf(previous.forms, formIdA)) seen.push(errors);
     });
     render(host(pathA, { title: 'Doc A' }));
-    await screen.findByText('Title must be at least 3 characters');
+    await waitFor(() =>
+      expect(errorsOf(useFormStore.getState().forms, formIdA)?.[title]).toEqual(
+        ['Title must be at least 3 characters']
+      )
+    );
     unsubscribe();
     expect(
       seen.every((errors) => errors != null && Object.keys(errors).length > 0)
@@ -394,7 +403,11 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
     await waitFor(() =>
       expect(screen.getByLabelText('Title')).toHaveValue('xy')
     );
-    await screen.findByText('Title must be at least 3 characters');
+    await waitFor(() =>
+      expect(errorsOf(useFormStore.getState().forms, formIdB)?.[title]).toEqual(
+        ['Title must be at least 3 characters']
+      )
+    );
     unsubscribe();
 
     expect(
@@ -476,6 +489,7 @@ describe('discarding edits', () => {
     const input = await screen.findByLabelText('Title');
     await userEvent.clear(input);
     await userEvent.type(input, 'x');
+    await userEvent.tab();
     await screen.findByText('Title must be at least 3 characters');
 
     await userEvent.click(screen.getByText('discard'));

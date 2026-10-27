@@ -1,8 +1,10 @@
+import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import {
   NestedFieldRow,
+  useDrillIn,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldSchema,
   useFieldValue,
 } from '../../../editor';
@@ -24,10 +26,25 @@ export function ObjectField() {
 function FieldGroup() {
   const address = useFieldAddress();
   const field = asObjectFieldSchema(useFieldSchema());
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
+  const drill = useDrillIn();
+
+  if (drill.drills) {
+    return (
+      <FieldWrapper {...frame}>
+        <Button
+          variant='secondary'
+          iconEnd='chevron-right'
+          onClick={drill.open}
+        >
+          {`Open ${frame.label}`}
+        </Button>
+      </FieldWrapper>
+    );
+  }
 
   return (
-    <FieldWrapper errors={errors}>
+    <FieldWrapper {...frame}>
       <div
         role='group'
         aria-labelledby={`${address}-label`}
