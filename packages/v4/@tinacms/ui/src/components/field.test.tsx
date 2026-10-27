@@ -2,7 +2,8 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { FieldTrail, foldTrail } from '@tinacms/ui/components/field-trail';
+import { foldPath } from '@tinacms/ui/components/breadcrumb';
+import { FieldTrail } from '@tinacms/ui/components/field-trail';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { FormLevel } from '@tinacms/ui/components/form-level';
 import { Input } from '@tinacms/ui/components/input';
@@ -56,23 +57,19 @@ describe('FieldWrapper', () => {
   });
 });
 
-describe('foldTrail', () => {
+describe('foldPath', () => {
   const steps = (count: number) =>
     Array.from({ length: count }, (_, index) => `L${index + 1}`);
 
   it('keeps every step up to the limit', () => {
-    expect(foldTrail(steps(4))).toEqual({ shown: steps(4), hidden: [] });
+    expect(foldPath(steps(4), 4)).toEqual({ shown: steps(4), hidden: [] });
   });
 
   it('keeps the first and the last two past the limit', () => {
-    expect(foldTrail(steps(6))).toEqual({
+    expect(foldPath(steps(6), 4)).toEqual({
       shown: ['L1', null, 'L5', 'L6'],
       hidden: ['L2', 'L3', 'L4'],
     });
-  });
-
-  it('never folds fewer than three steps', () => {
-    expect(foldTrail(steps(3), 1).hidden).toEqual([]);
   });
 });
 

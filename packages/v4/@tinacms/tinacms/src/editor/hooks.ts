@@ -49,8 +49,8 @@ import {
   type StaleDraftActions,
   TinaRuntimeContext,
 } from './context';
-import { collectFieldErrorMessages } from './field-errors';
-import { DRILL_DEPTH, fieldDepth, isRevealed } from './form-view-state';
+import { collectFieldErrorMessages, ownFieldErrors } from './field-errors';
+import { isRevealed } from './form-view-state';
 
 export function useFieldRegistry(): FieldRegistry {
   const runtime = use(TinaRuntimeContext);
@@ -297,6 +297,7 @@ export function useFormSave(): () => Promise<void> {
     } catch (cause) {
       throw new AfterSaveHookError(cause);
     }
+    scope.view.resetReveal();
     const warnings = saved ? (saved.hookWarnings ?? []) : [];
     if (warnings.length > 0) {
       throw new AfterSaveHookError(new Error(warnings.join(' ')));
@@ -338,8 +339,6 @@ export function useFieldErrors(address: FieldAddress): string[] {
   return collectFieldErrorMessages(get(errors, address));
 }
 
-// What a field passes to FieldWrapper: its name, the label's ids, and the
-// errors the editor should see now (see `isRevealed`).
 export function useFieldFrame(): Pick<
   FieldWrapperProps,
   'label' | 'htmlFor' | 'labelId' | 'required' | 'errors'
@@ -352,28 +351,20 @@ export function useFieldFrame(): Pick<
   );
   const labelable =
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
-  const errors = useFieldErrors(address);
+  const { errors } = useFormState({ name: address });
+  const shown = new Set<string>();
+  for (const [key, messages] of Object.entries(
+    ownFieldErrors(get(errors, address), address)
+  )) {
+    if (isRevealed(view, key))
+      for (const message of messages) shown.add(message);
+  }
   return {
     label: node.label ?? node.name,
     htmlFor: labelable ? address : undefined,
     labelId: `${address}-label`,
     required: hasValidator(node, 'required'),
-    errors: isRevealed(view, address) ? errors : [],
-  };
-}
-
-// A compound field this deep opens as its own form level instead of
-// expanding in place, unless it is the level already open.
-export function useDrillIn(): { drills: boolean; open: () => void } {
-  const address = useFieldAddress();
-  const node = useFieldSchema();
-  const { view } = useFormScope('drill-in-outside-provider', 'useDrillIn');
-  const label = node.label ?? node.name;
-  return {
-    drills:
-      fieldDepth(address) >= DRILL_DEPTH &&
-      view.openLevels.at(-1)?.address !== address,
-    open: () => view.openLevel({ address, label, node }),
+    errors: [...shown],
   };
 }
 

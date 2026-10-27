@@ -711,6 +711,7 @@ describe('ArrayField metadata wrapping', () => {
     expect(descriptor?.metadata).toEqual({
       layout: 'block',
       labelable: false,
+      drillable: true,
     });
     expect(descriptor?.defaultValue).toBeUndefined();
   });

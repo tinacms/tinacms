@@ -378,6 +378,7 @@ describe('usePreviewConnection', () => {
             saveAttempted: false,
             touch: () => {},
             attemptSave: () => {},
+            resetReveal: () => {},
             openLevels: [],
             openLevel: () => {},
             closeLevelsAbove: () => {},

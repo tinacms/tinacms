@@ -44,6 +44,65 @@ const collection: CollectionSchema = {
   ],
 };
 
+const groupCollection: CollectionSchema = {
+  name: 'page',
+  label: 'Pages',
+  format: 'mdx',
+  fields: [
+    t.object({
+      name: 'seo',
+      label: 'SEO',
+      fields: [
+        t.string({ name: 'title', label: 'Title', validators: [required()] }),
+        t.string({ name: 'desc', label: 'Desc' }),
+      ],
+    }),
+    t.array({
+      name: 'blocks',
+      label: 'Blocks',
+      fields: [
+        t.object({
+          name: 'meta',
+          label: 'Meta',
+          fields: [
+            t.object({
+              name: 'deep',
+              label: 'Deep',
+              fields: [t.string({ name: 'note', label: 'Note' })],
+            }),
+          ],
+        }),
+      ],
+    }),
+  ],
+};
+
+const renderGroups = () =>
+  render(
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [
+          objectFieldPlugin,
+          arrayFieldPlugin,
+          stringFieldPlugin,
+          coreValidatorsPlugin,
+        ],
+        schema: { collections: [] },
+      })}
+    >
+      <FormProvider
+        collection={groupCollection}
+        path='content/pages/groups.mdx'
+        document={{
+          seo: { title: '', desc: '' },
+          blocks: [{ meta: { deep: { note: 'n' } } }],
+        }}
+      >
+        <DocumentForm />
+      </FormProvider>
+    </TinaProvider>
+  );
+
 const renderForm = () =>
   render(
     <TinaProvider
@@ -134,5 +193,31 @@ describe('nested form levels', () => {
     expect(
       await screen.findByRole('button', { name: 'Open Three' })
     ).toBeVisible();
+  });
+
+  it('keeps a group quiet about a required child the editor never visited', async () => {
+    const user = userEvent.setup();
+    renderGroups();
+    await user.type(await screen.findByLabelText(/^Desc\b/), 'x');
+    await user.tab();
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('shows the exact message of an unvisited required field once a save is tried', async () => {
+    const user = userEvent.setup();
+    renderGroups();
+    await user.type(await screen.findByLabelText(/^Desc\b/), 'x');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const alerts = await screen.findAllByRole('alert');
+    expect(alerts[0]).toHaveTextContent('Title is required');
+  });
+
+  it('opens level 3 of an array item as its own form level', async () => {
+    const user = userEvent.setup();
+    renderGroups();
+    await user.click(await screen.findByRole('button', { name: 'Open Deep' }));
+    expect(await screen.findByLabelText(/^Note\b/)).toHaveValue('n');
+    const trail = screen.getByRole('navigation', { name: 'Field path' });
+    expect(within(trail).getByText('Deep')).toBeVisible();
   });
 });

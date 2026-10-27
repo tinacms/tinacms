@@ -3,6 +3,8 @@ import type { FieldAddress } from '../core/field/address';
 import { toFieldAddress } from '../core/field/address';
 import type { FieldSchema } from '../core/schema/types';
 import { useFormStore } from '../form/form-store';
+import { DrillInField } from './drill-in-field';
+import { DRILL_DEPTH, fieldDepth } from './form-view-state';
 import {
   FieldAddressContext,
   FieldSchemaContext,
@@ -40,7 +42,11 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     setActive(scope.formId, address);
   };
 
-  const Component = descriptor.Component;
+  const drills =
+    descriptor.metadata?.drillable === true &&
+    fieldDepth(address) >= DRILL_DEPTH &&
+    scope.view.openLevels.at(-1)?.address !== address;
+  const Component = drills ? DrillInField : descriptor.Component;
   return (
     <FieldAddressContext value={address}>
       <FieldSchemaContext value={node}>

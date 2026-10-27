@@ -9,7 +9,6 @@ import { cn } from '@tinacms/ui/lib/utils';
 type FormLevelProps = Omit<ComponentProps<'div'>, 'children'> & {
   /** The levels from the document down to this one. At the top level there is nowhere to go back to, so no trail shows. */
   steps?: FieldTrailStep[];
-  /** What the trail's up arrow does: back up one level. */
   onUp?: () => void;
   children: ReactNode;
 };

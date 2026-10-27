@@ -1,13 +1,11 @@
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import {
   NestedFieldRow,
-  useDrillIn,
   useFieldAddress,
   useFieldFrame,
   useFieldSchema,
   useFieldValue,
 } from '../../../editor';
-import { DrillInField } from '../drill-in-field';
 import { UneditableValue } from '../uneditable-value';
 import { asObjectFieldSchema, isPlainObject } from './object-field.schema';
 
@@ -27,9 +25,6 @@ function FieldGroup() {
   const address = useFieldAddress();
   const field = asObjectFieldSchema(useFieldSchema());
   const frame = useFieldFrame();
-  const drill = useDrillIn();
-
-  if (drill.drills) return <DrillInField frame={frame} open={drill.open} />;
 
   return (
     <FieldWrapper {...frame}>

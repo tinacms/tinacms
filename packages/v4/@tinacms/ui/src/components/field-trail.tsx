@@ -1,9 +1,12 @@
 import type { ComponentProps } from 'react';
 
 import { Badge } from '@tinacms/ui/components/badge';
-import { BreadcrumbFold } from '@tinacms/ui/components/breadcrumb';
+import {
+  BreadcrumbFold,
+  foldPath,
+  stepVariants,
+} from '@tinacms/ui/components/breadcrumb';
 import { Button } from '@tinacms/ui/components/button';
-import { quietControl } from '@tinacms/ui/lib/nav-styles';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type FieldTrailStep = {
@@ -13,26 +16,6 @@ type FieldTrailStep = {
   /** This level holds an invalid field: a red dot after the step. */
   invalid?: boolean;
 };
-
-const crumb = cn(
-  quietControl,
-  'inline-flex max-w-50 items-center gap-1.5 overflow-hidden px-1 py-0.5 text-sm whitespace-nowrap'
-);
-
-/**
- * More than `max` steps (never fewer than 3) keep the first and the last two,
- * with `null` where the rest fold away. `hidden` is what folded, in order.
- */
-function foldTrail<T>(
-  steps: T[],
-  max = 4
-): { shown: (T | null)[]; hidden: T[] } {
-  if (steps.length <= Math.max(3, max)) return { shown: steps, hidden: [] };
-  return {
-    shown: [steps[0], null, ...steps.slice(-2)],
-    hidden: steps.slice(1, -2),
-  };
-}
 
 function Marks({ step }: { step: FieldTrailStep }) {
   return step.invalid ? <Badge kind='dot' srLabel=', has errors' /> : null;
@@ -55,7 +38,7 @@ function FieldTrail({
   className,
   ...props
 }: FieldTrailProps) {
-  const { shown, hidden } = foldTrail(steps, max);
+  const { shown, hidden } = foldPath(steps, Math.max(3, max));
   const parent = steps.length > 1 ? steps[steps.length - 2] : undefined;
 
   return (
@@ -108,8 +91,8 @@ function FieldTrail({
                 <span
                   aria-current='location'
                   className={cn(
-                    crumb,
-                    'cursor-default font-medium text-foreground hover:bg-transparent'
+                    stepVariants({ size: 'sm', current: true }),
+                    'inline-flex items-center gap-1.5'
                   )}
                 >
                   <span className='min-w-0 truncate'>{step.label}</span>
@@ -118,7 +101,10 @@ function FieldTrail({
               ) : (
                 <button
                   type='button'
-                  className={cn(crumb, 'cursor-pointer')}
+                  className={cn(
+                    stepVariants({ size: 'sm' }),
+                    'inline-flex items-center gap-1.5'
+                  )}
                   onClick={step.onClick}
                 >
                   <span className='min-w-0 truncate'>{step.label}</span>
@@ -134,4 +120,4 @@ function FieldTrail({
 }
 
 export type { FieldTrailProps, FieldTrailStep };
-export { FieldTrail, foldTrail };
+export { FieldTrail };

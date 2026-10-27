@@ -15,7 +15,6 @@ import {
   NestedFieldRow,
   useDocumentPath,
   useFieldAddress,
-  useDrillIn,
   useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
@@ -30,7 +29,6 @@ import {
   isTemplatesArray,
   itemFieldsOf,
 } from './array-field.schema';
-import { DrillInField } from '../drill-in-field';
 import { StoredValue, UneditableValue } from '../uneditable-value';
 
 export function ArrayField() {
@@ -51,9 +49,6 @@ function ItemList() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
   const frame = useFieldFrame();
-  const drill = useDrillIn();
-
-  if (drill.drills) return <DrillInField frame={frame} open={drill.open} />;
 
   return (
     <FieldWrapper {...frame}>

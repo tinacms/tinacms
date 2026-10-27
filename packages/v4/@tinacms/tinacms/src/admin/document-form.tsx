@@ -11,7 +11,7 @@ import { FormLevel } from '@tinacms/ui/components/form-level';
 import { use } from 'react';
 import { FormScopeContext } from '../editor/context';
 import { Field, FieldNode } from '../editor/field';
-import { isRevealed } from '../editor/form-view-state';
+import { holdsRevealedError } from '../editor/form-view-state';
 import {
   useDiscardEdits,
   useFormId,
@@ -105,8 +105,6 @@ function StaleDraftDialog() {
   );
 }
 
-// The document's fields, or the fields of the nested level the editor opened,
-// under a Field trail that leads back up.
 function FormFields() {
   const scope = use(FormScopeContext);
   const errors = useFormErrors(useFormId());
@@ -123,22 +121,18 @@ function FormFields() {
     );
   }
 
-  const holdsError = (address: string) =>
-    isRevealed(view, address) &&
-    Object.keys(errors).some(
-      (key) => key === address || key.startsWith(`${address}.`)
-    );
+  const errorAddresses = Object.keys(errors);
   const open = view.openLevels;
   const steps = [
     {
       label: path.split('/').at(-1) ?? path,
       onClick: () => view.closeLevelsAbove(0),
-      invalid: Object.keys(errors).some((key) => isRevealed(view, key)),
+      invalid: holdsRevealedError(view, errorAddresses),
     },
     ...open.map((level, index) => ({
       label: level.label,
       onClick: () => view.closeLevelsAbove(index + 1),
-      invalid: holdsError(level.address),
+      invalid: holdsRevealedError(view, errorAddresses, level.address),
     })),
   ];
   const current = open[open.length - 1];

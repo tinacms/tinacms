@@ -77,7 +77,8 @@ Why no value/onChange props? Because forms are **flat, normalized by address** (
 |---|---|---|
 | `useFieldAddress()` | — | identity of *this* field |
 | `useFieldValue<T>(address)` | one leaf address | read+write a value |
-| `useFieldErrors(address)` | errors at an address | display validation |
+| `useFieldErrors(address)` | every error at an address, shown at once | custom error display |
+| `useFieldFrame()` | label, ids, required, and the errors to show now. Reads the address from context | spread into `FieldWrapper` |
 | `useFieldActivation(handler)` | active-field === my address | opt-in focus/popover/center |
 | `useSiblingValue(address, name)` | sibling leaf | conditional UI across fields (not validation: see [Validation](#validation)) |
 | `useChildKeys(address)` | structure index entry | composite child ordering |

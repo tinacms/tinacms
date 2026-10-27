@@ -28,8 +28,22 @@ type BreadcrumbStep = {
 
 type BreadcrumbSize = 'md' | 'sm';
 
-/** A longer path keeps the first step and the last two, and folds the rest. */
 const MAX_STEPS = 3;
+
+/**
+ * A path longer than `max` keeps the first step and the last two, with `null` where
+ * the rest fold away. `hidden` is what folded, in order.
+ */
+function foldPath<T>(
+  items: readonly T[],
+  max = MAX_STEPS
+): { shown: (T | null)[]; hidden: T[] } {
+  if (items.length <= max) return { shown: [...items], hidden: [] };
+  return {
+    shown: [items[0], null, ...items.slice(-2)],
+    hidden: items.slice(1, -2),
+  };
+}
 
 const stepVariants = cva(['block truncate', quietControl], {
   variants: {
@@ -160,11 +174,7 @@ function Breadcrumb({
   className,
   ...props
 }: BreadcrumbProps) {
-  const fold = items.length > MAX_STEPS;
-  const hidden = fold ? items.slice(1, -2) : [];
-  const shown: (BreadcrumbStep | null)[] = fold
-    ? [items[0], null, ...items.slice(-2)]
-    : [...items];
+  const { shown, hidden } = foldPath(items);
   const pinned = items.some((step) => step.current === true);
 
   // A pressed step often turns into the current page, a span, so its button and focus go away.
@@ -246,4 +256,4 @@ function Breadcrumb({
 }
 
 export type { BreadcrumbFoldProps, BreadcrumbProps, BreadcrumbStep, FoldItem };
-export { Breadcrumb, BreadcrumbFold };
+export { Breadcrumb, BreadcrumbFold, foldPath, stepVariants };

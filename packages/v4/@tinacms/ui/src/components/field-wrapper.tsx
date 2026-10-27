@@ -5,12 +5,15 @@ import { Icon } from '@tinacms/ui/components/icon';
 import { Label } from '@tinacms/ui/components/label';
 import { cn } from '@tinacms/ui/lib/utils';
 
-const messageVariants = cva('m-0 flex gap-1.5 font-sans text-sm leading-4.5', {
-  variants: {
-    tone: { error: 'text-destructive', warning: 'text-unsaved' },
-  },
-  defaultVariants: { tone: 'error' },
-});
+const messageVariants = cva(
+  'm-0 flex gap-1.5 font-sans text-sm leading-field-message',
+  {
+    variants: {
+      tone: { error: 'text-destructive', warning: 'text-unsaved' },
+    },
+    defaultVariants: { tone: 'error' },
+  }
+);
 
 type FieldMessageProps = Omit<ComponentProps<'p'>, 'children'> & {
   /** Red and announced at once, or amber: needs a look, never blocks saving. */
@@ -18,7 +21,6 @@ type FieldMessageProps = Omit<ComponentProps<'p'>, 'children'> & {
   children: ReactNode;
 };
 
-/** One validation message under a field: an icon and the words. */
 function FieldMessage({
   tone = 'error',
   className,
@@ -45,7 +47,6 @@ function FieldMessage({
 type FieldWrapperProps = Omit<ComponentProps<'div'>, 'children'> & {
   /** Leave it out when the control brings its own, such as a checkbox with its words beside it. */
   label?: ReactNode;
-  /** The `id` of the control the label names. */
   htmlFor?: string;
   /** The `id` the label gets, for a control that points at it with `aria-labelledby`. */
   labelId?: string;
@@ -104,7 +105,7 @@ function FieldWrapper({
           {help ? (
             <p
               id={helpId}
-              className='m-0 text-sm leading-4.5 font-normal text-muted-foreground'
+              className='m-0 text-sm leading-field-message font-normal text-muted-foreground'
             >
               {help}
             </p>

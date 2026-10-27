@@ -60,7 +60,7 @@ const warnKeptItems = (field: ObjectArrayFieldSchema, items: unknown[]) => {
 export default defineClientPlugin({
   field: {
     Component: ArrayField,
-    metadata: { layout: 'block', labelable: false },
+    metadata: { layout: 'block', labelable: false, drillable: true },
     schema: arraySchema,
     // A stored value of the wrong shape stays as it is, so a save writes it
     // back unchanged (ADR-012: never throw on open).

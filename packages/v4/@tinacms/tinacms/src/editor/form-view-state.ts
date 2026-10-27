@@ -14,6 +14,7 @@ export interface FormViewState {
   saveAttempted: boolean;
   touch: (address: FieldAddress) => void;
   attemptSave: () => void;
+  resetReveal: () => void;
   openLevels: readonly OpenLevel[];
   openLevel: (level: OpenLevel) => void;
   closeLevelsAbove: (keep: number) => void;
@@ -33,9 +34,6 @@ const fresh = (formId: FormId): Tracked => ({
   openLevels: [],
 });
 
-// What the editor has done in one form that decides what the form shows: which
-// fields were left, whether a save was tried, and which nested levels are open.
-// Tracked per form id, so opening another document starts clean.
 export function useFormViewState(formId: FormId): FormViewState {
   const [tracked, setTracked] = useState<Tracked>(() => fresh(formId));
   const current = tracked.formId === formId ? tracked : fresh(formId);
@@ -58,6 +56,15 @@ export function useFormViewState(formId: FormId): FormViewState {
   );
   const attemptSave = useCallback(
     () => update((state) => ({ ...state, saveAttempted: true })),
+    [update]
+  );
+  const resetReveal = useCallback(
+    () =>
+      update((state) => ({
+        ...state,
+        touched: new Set(),
+        saveAttempted: false,
+      })),
     [update]
   );
   const openLevel = useCallback(
@@ -83,6 +90,7 @@ export function useFormViewState(formId: FormId): FormViewState {
       saveAttempted: current.saveAttempted,
       touch,
       attemptSave,
+      resetReveal,
       openLevels: current.openLevels,
       openLevel,
       closeLevelsAbove,
@@ -93,14 +101,13 @@ export function useFormViewState(formId: FormId): FormViewState {
       current.openLevels,
       touch,
       attemptSave,
+      resetReveal,
       openLevel,
       closeLevelsAbove,
     ]
   );
 }
 
-// An error shows once the editor leaves the field (or anything inside it), or
-// after a save was tried.
 export const isRevealed = (
   view: Pick<FormViewState, 'touched' | 'saveAttempted'>,
   address: string
@@ -112,9 +119,25 @@ export const isRevealed = (
   return false;
 };
 
-// A compound field at the third level of nesting or deeper opens as its own
-// form level. Array positions are not levels.
+// Array positions are not levels.
 export const DRILL_DEPTH = 3;
 
 export const fieldDepth = (address: string): number =>
   address.split('.').filter((part) => !/^\d+$/.test(part)).length;
+
+export const holdsRevealedError = (
+  view: Pick<FormViewState, 'touched' | 'saveAttempted'>,
+  errorAddresses: readonly string[],
+  address?: string
+): boolean => {
+  const own = errorAddresses.filter(
+    (key) => !errorAddresses.some((other) => other.startsWith(`${key}.`))
+  );
+  return own.some(
+    (key) =>
+      (address === undefined ||
+        key === address ||
+        key.startsWith(`${address}.`)) &&
+      isRevealed(view, key)
+  );
+};
