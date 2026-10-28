@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { FieldAddress } from '../core/field/address';
+import { fieldsetOf, fieldsOf, scalarItemOf } from '../core/schema/children';
 import type { FieldSchema } from '../core/schema/types';
 import type { FormId } from '../form/form-store';
 
@@ -17,6 +18,7 @@ export interface FormViewState {
   resetReveal: () => void;
   openLevels: readonly OpenLevel[];
   openLevel: (level: OpenLevel) => void;
+  showLevels: (levels: readonly OpenLevel[]) => void;
   closeLevelsAbove: (keep: number) => void;
 }
 
@@ -75,6 +77,11 @@ export function useFormViewState(formId: FormId): FormViewState {
       })),
     [update]
   );
+  const showLevels = useCallback(
+    (levels: readonly OpenLevel[]) =>
+      update((state) => ({ ...state, openLevels: levels })),
+    [update]
+  );
   const closeLevelsAbove = useCallback(
     (keep: number) =>
       update((state) => ({
@@ -93,6 +100,7 @@ export function useFormViewState(formId: FormId): FormViewState {
       resetReveal,
       openLevels: current.openLevels,
       openLevel,
+      showLevels,
       closeLevelsAbove,
     }),
     [
@@ -103,6 +111,7 @@ export function useFormViewState(formId: FormId): FormViewState {
       attemptSave,
       resetReveal,
       openLevel,
+      showLevels,
       closeLevelsAbove,
     ]
   );
@@ -140,4 +149,42 @@ export const holdsRevealedError = (
         key.startsWith(`${address}.`)) &&
       isRevealed(view, key)
   );
+};
+
+// The levels that must be open for the field at `address` to be on screen.
+export const levelsFor = (
+  address: string,
+  fields: readonly FieldSchema[],
+  valueAt: (address: string) => unknown,
+  isDrillable: (node: FieldSchema) => boolean
+): OpenLevel[] => {
+  const levels: OpenLevel[] = [];
+  let siblings: readonly FieldSchema[] | undefined = fields;
+  let node: FieldSchema | undefined;
+  let path = '';
+  for (const segment of address.split('.')) {
+    path = path ? `${path}.${segment}` : segment;
+    if (/^\d+$/.test(segment)) {
+      siblings =
+        node && !scalarItemOf(node)
+          ? fieldsetOf(node, valueAt(path))
+          : undefined;
+      continue;
+    }
+    node = siblings?.find((field) => field.name === segment);
+    if (!node) break;
+    if (
+      path !== address &&
+      isDrillable(node) &&
+      fieldDepth(path) >= DRILL_DEPTH
+    ) {
+      levels.push({
+        address: path as FieldAddress,
+        label: node.label ?? node.name,
+        node,
+      });
+    }
+    siblings = fieldsOf(node);
+  }
+  return levels;
 };

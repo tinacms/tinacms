@@ -8,18 +8,24 @@ import {
 } from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
 import { FormLevel } from '@tinacms/ui/components/form-level';
-import { use } from 'react';
+import { use, useEffect, useEffectEvent } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { FormScopeContext } from '../editor/context';
 import { Field, FieldNode } from '../editor/field';
-import { holdsRevealedError } from '../editor/form-view-state';
+import { holdsRevealedError, levelsFor } from '../editor/form-view-state';
 import {
   useDiscardEdits,
+  useFieldRegistry,
   useFormId,
   useFormSave,
   useSaveFailure,
   useStaleDraft,
 } from '../editor/hooks';
-import { useFormErrors, useIsFormDirty } from '../form/form-store';
+import {
+  useFormErrors,
+  useFormStore,
+  useIsFormDirty,
+} from '../form/form-store';
 import { DocumentStatus } from './document-status';
 
 function SaveButton() {
@@ -105,9 +111,39 @@ function StaleDraftDialog() {
   );
 }
 
+function useOpenLevelsForActiveField() {
+  const scope = use(FormScopeContext);
+  const registry = useFieldRegistry();
+  const { getValues } = useFormContext();
+  const active = useFormStore((state) => state.active);
+  const showLevelsFor = useEffectEvent((address: string) => {
+    if (!scope) return;
+    const { view, collection } = scope;
+    const levels = levelsFor(
+      address,
+      collection.fields,
+      (path) => getValues(path),
+      (node) => registry.get(node.type)?.metadata?.drillable === true
+    );
+    const top = view.openLevels.at(-1)?.address;
+    const sameLevels =
+      levels.length === view.openLevels.length &&
+      levels.every(
+        (level, index) => level.address === view.openLevels[index]?.address
+      );
+    if (sameLevels || top === address || top?.startsWith(`${address}.`)) return;
+    view.showLevels(levels);
+  });
+  useEffect(() => {
+    if (active && active.formId === scope?.formId)
+      showLevelsFor(active.address);
+  }, [active, scope?.formId]);
+}
+
 function FormFields() {
   const scope = use(FormScopeContext);
   const errors = useFormErrors(useFormId());
+  useOpenLevelsForActiveField();
   if (!scope) return null;
   const { view, collection, path } = scope;
 

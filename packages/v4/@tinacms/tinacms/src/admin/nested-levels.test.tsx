@@ -1,9 +1,11 @@
 import { render, screen, within } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
-import { FormProvider, TinaProvider } from '../editor';
+import { toFieldAddress } from '../core/field/address';
+import { FormProvider, TinaProvider, useActiveField } from '../editor';
 import { t } from '../index';
 import { required } from '../plugins/fields';
 import arrayFieldPlugin from '../plugins/fields/array/array-field.plugin';
@@ -103,7 +105,7 @@ const renderGroups = () =>
     </TinaProvider>
   );
 
-const renderForm = () =>
+const renderForm = (extra?: ReactNode) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
@@ -122,9 +124,19 @@ const renderForm = () =>
         document={{ title: 'Home', one: { two: { three: { handle: 'hi' } } } }}
       >
         <DocumentForm />
+        {extra}
       </FormProvider>
     </TinaProvider>
   );
+
+function Activate({ address, name }: { address: string; name: string }) {
+  const { setActive } = useActiveField();
+  return (
+    <button type='button' onClick={() => setActive(toFieldAddress(address))}>
+      {name}
+    </button>
+  );
+}
 
 describe('nested form levels', () => {
   it('expands levels 1 and 2 in place and opens level 3 as its own form level', async () => {
@@ -219,5 +231,26 @@ describe('nested form levels', () => {
     expect(await screen.findByLabelText(/^Note\b/)).toHaveValue('n');
     const trail = screen.getByRole('navigation', { name: 'Field path' });
     expect(within(trail).getByText('Deep')).toBeVisible();
+  });
+
+  it('opens the levels on the way to a field activated from the preview', async () => {
+    const user = userEvent.setup();
+    renderForm(<Activate address='one.two.three.handle' name='preview' />);
+    expect(await screen.findByText('Two')).toBeVisible();
+    expect(screen.queryByLabelText(/^Handle\b/)).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'preview' }));
+    expect(await screen.findByLabelText(/^Handle\b/)).toHaveFocus();
+  });
+
+  it('closes an open level when a field outside it is activated from the preview', async () => {
+    const user = userEvent.setup();
+    renderForm(<Activate address='title' name='preview' />);
+    await user.click(await screen.findByRole('button', { name: 'Open Three' }));
+    expect(await screen.findByLabelText(/^Handle\b/)).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'preview' }));
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveFocus();
+    expect(screen.queryByLabelText(/^Handle\b/)).toBeNull();
   });
 });

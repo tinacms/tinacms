@@ -381,6 +381,7 @@ describe('usePreviewConnection', () => {
             resetReveal: () => {},
             openLevels: [],
             openLevel: () => {},
+            showLevels: () => {},
             closeLevelsAbove: () => {},
           },
           discardEdits: () => {},
