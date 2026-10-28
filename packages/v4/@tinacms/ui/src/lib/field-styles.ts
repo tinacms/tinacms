@@ -31,4 +31,4 @@ export const selectListClassName =
   'w-auto min-w-(--anchor-width) rounded-md bg-popover p-1 font-sans text-base text-foreground shadow-popover';
 
 export const selectOptionClassName =
-  "relative flex min-h-8 w-full cursor-default items-center gap-3 rounded-sm py-1.5 pr-8 pl-2 text-base leading-5 text-foreground outline-hidden select-none focus:bg-muted data-highlighted:bg-muted data-selected:font-medium data-disabled:cursor-not-allowed data-disabled:text-muted-foreground data-disabled:line-through data-disabled:focus:bg-transparent data-disabled:data-highlighted:bg-transparent [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+  "relative flex min-h-8 w-full cursor-default items-center gap-3 rounded-sm py-1.5 pr-8 pl-2 text-base leading-5 text-foreground outline-hidden select-none focus:bg-muted data-highlighted:bg-muted data-selected:font-medium data-disabled:cursor-not-allowed data-disabled:text-muted-foreground data-disabled:focus:bg-transparent data-disabled:data-highlighted:bg-transparent [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";

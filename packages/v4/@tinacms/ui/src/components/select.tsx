@@ -43,7 +43,7 @@ function SelectTrigger({
       data-slot='select-trigger'
       data-size={size}
       className={cn(
-        "box-border flex w-fit max-w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-sm border border-input bg-card py-0 pr-2 pl-2.5 font-sans text-base leading-5 whitespace-nowrap text-foreground transition-[border-color,box-shadow] outline-none select-none hover:border-input-hover data-popup-open:border-field-active-border focus:border-ring focus:shadow-focus-field disabled:cursor-not-allowed disabled:opacity-45 aria-invalid:border-destructive data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:text-sm *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:truncate [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "box-border flex w-fit max-w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-sm border border-input bg-card py-0 pr-2 pl-2.5 font-sans text-base leading-5 whitespace-nowrap text-foreground transition-[border-color,box-shadow] outline-none select-none enabled:not-data-readonly:hover:border-input-hover data-popup-open:border-field-active-border focus-visible:border-ring focus-visible:shadow-focus-field disabled:cursor-not-allowed disabled:border-border disabled:opacity-45 data-readonly:cursor-default data-readonly:border-border-subtle data-readonly:bg-muted data-readonly:focus-visible:border-border-subtle data-readonly:focus-visible:shadow-none aria-invalid:border-destructive data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:text-sm *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:truncate [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
@@ -51,7 +51,7 @@ function SelectTrigger({
       {children}
       <SelectPrimitive.Icon
         render={
-          <ChevronDownIcon className='pointer-events-none size-3.5 text-muted-foreground transition-transform in-data-popup-open:rotate-180' />
+          <ChevronDownIcon className='pointer-events-none size-3.5 text-muted-foreground transition-transform in-data-popup-open:rotate-180 in-data-readonly:hidden' />
         }
       />
     </SelectPrimitive.Trigger>
