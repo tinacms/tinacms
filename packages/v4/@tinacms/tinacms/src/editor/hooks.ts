@@ -13,6 +13,7 @@ import {
   useFormState,
 } from 'react-hook-form';
 import { useStore } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 import type { FieldWrapperProps } from '@tinacms/ui/components/field-wrapper';
 import type { AuthSlice } from '../core/auth/contract';
 import { authSliceOf, siteAuthTokenOf } from '../core/auth/slice';
@@ -270,7 +271,7 @@ export function useFormSave(): () => Promise<void> {
     const { formId, path, collection, onSave, hooks, reseedFields } = scope;
     // Validate every field, not only the edited ones, so a required field the
     // editor never touched surfaces its message at submit.
-    scope.view.attemptSave();
+    scope.view.getState().attemptSave();
     const valid = await trigger();
     if (!valid) throw new FormValidationError();
     const values = getValues();
@@ -297,7 +298,7 @@ export function useFormSave(): () => Promise<void> {
     } catch (cause) {
       throw new AfterSaveHookError(cause);
     }
-    scope.view.resetReveal();
+    scope.view.getState().resetReveal();
     const warnings = saved ? (saved.hookWarnings ?? []) : [];
     if (warnings.length > 0) {
       throw new AfterSaveHookError(new Error(warnings.join(' ')));
@@ -352,13 +353,15 @@ export function useFieldFrame(): Pick<
   const labelable =
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
   const { errors } = useFormState({ name: address });
+  const own = ownFieldErrors(get(errors, address), address);
+  const keys = Object.keys(own);
+  const revealed = useStore(
+    view,
+    useShallow((state) => keys.filter((key) => isRevealed(state, key)))
+  );
   const shown = new Set<string>();
-  for (const [key, messages] of Object.entries(
-    ownFieldErrors(get(errors, address), address)
-  )) {
-    if (isRevealed(view, key))
-      for (const message of messages) shown.add(message);
-  }
+  for (const key of revealed)
+    for (const message of own[key] ?? []) shown.add(message);
   return {
     label: node.label ?? node.name,
     htmlFor: labelable ? address : undefined,

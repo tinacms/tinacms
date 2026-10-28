@@ -10,9 +10,14 @@ import { Button } from '@tinacms/ui/components/button';
 import { FormLevel } from '@tinacms/ui/components/form-level';
 import { use, useEffect, useEffectEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { FormScopeContext } from '../editor/context';
+import { useStore } from 'zustand';
+import { type FormScope, FormScopeContext } from '../editor/context';
 import { Field, FieldNode } from '../editor/field';
-import { holdsRevealedError, levelsFor } from '../editor/form-view-state';
+import {
+  fieldsAlong,
+  holdsRevealedError,
+  levelsFor,
+} from '../editor/form-view-state';
 import {
   useDiscardEdits,
   useFieldRegistry,
@@ -111,43 +116,43 @@ function StaleDraftDialog() {
   );
 }
 
-function useOpenLevelsForActiveField() {
-  const scope = use(FormScopeContext);
+function useOpenLevelsForActiveField(scope: FormScope) {
   const registry = useFieldRegistry();
   const { getValues } = useFormContext();
   const active = useFormStore((state) => state.active);
   const showLevelsFor = useEffectEvent((address: string) => {
-    if (!scope) return;
     const { view, collection } = scope;
+    const { openLevels } = view.getState();
     const levels = levelsFor(
       address,
       collection.fields,
       (path) => getValues(path),
       (node) => registry.get(node.type)?.metadata?.drillable === true
     );
-    const top = view.openLevels.at(-1)?.address;
+    const top = openLevels.at(-1)?.address;
     const sameLevels =
-      levels.length === view.openLevels.length &&
+      levels.length === openLevels.length &&
       levels.every(
-        (level, index) => level.address === view.openLevels[index]?.address
+        (level, index) => level.address === openLevels[index]?.address
       );
     if (sameLevels || top === address || top?.startsWith(`${address}.`)) return;
-    view.showLevels(levels);
+    view.getState().showLevels(levels);
   });
   useEffect(() => {
-    if (active && active.formId === scope?.formId)
-      showLevelsFor(active.address);
-  }, [active, scope?.formId]);
+    if (active && active.formId === scope.formId) showLevelsFor(active.address);
+  }, [active, scope.formId]);
 }
 
-function FormFields() {
-  const scope = use(FormScopeContext);
+function FormFields({ scope }: { scope: FormScope }) {
   const errors = useFormErrors(useFormId());
-  useOpenLevelsForActiveField();
-  if (!scope) return null;
-  const { view, collection, path } = scope;
+  const { getValues } = useFormContext();
+  const view = useStore(scope.view);
+  useOpenLevelsForActiveField(scope);
+  const { collection, path } = scope;
+  const { closeLevelsAbove } = scope.view.getState();
 
-  if (view.openLevels.length === 0) {
+  const current = view.openLevels.at(-1);
+  if (!current) {
     return (
       <FormLevel>
         {collection.fields.map((node) => (
@@ -158,25 +163,29 @@ function FormFields() {
   }
 
   const errorAddresses = Object.keys(errors);
-  const open = view.openLevels;
   const steps = [
     {
       label: path.split('/').at(-1) ?? path,
-      onClick: () => view.closeLevelsAbove(0),
+      onClick: () => closeLevelsAbove(0),
       invalid: holdsRevealedError(view, errorAddresses),
     },
-    ...open.map((level, index) => ({
-      label: level.label,
-      onClick: () => view.closeLevelsAbove(index + 1),
-      invalid: holdsRevealedError(view, errorAddresses, level.address),
-    })),
+    ...fieldsAlong(current.address, collection.fields, getValues).map(
+      (step) => {
+        const keep = view.openLevels.filter(
+          (level) =>
+            level.address === step.address ||
+            step.address.startsWith(`${level.address}.`)
+        ).length;
+        return {
+          label: step.label,
+          onClick: () => closeLevelsAbove(keep),
+          invalid: holdsRevealedError(view, errorAddresses, step.address),
+        };
+      }
+    ),
   ];
-  const current = open[open.length - 1];
   return (
-    <FormLevel
-      steps={steps}
-      onUp={() => view.closeLevelsAbove(open.length - 1)}
-    >
+    <FormLevel steps={steps} onUp={steps.at(-2)?.onClick}>
       <FieldNode address={current.address} node={current.node} />
     </FormLevel>
   );
@@ -195,7 +204,7 @@ export function DocumentForm() {
         <DocumentStatus />
       </header>
       <StaleDraftDialog />
-      <FormFields />
+      <FormFields scope={scope} />
       <div className='flex items-start gap-2'>
         <SaveButton />
         <DiscardButton />

@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
+import { createStore, type StoreApi } from 'zustand';
 import type { FieldAddress } from '../core/field/address';
 import { fieldsetOf, fieldsOf, scalarItemOf } from '../core/schema/children';
 import type { FieldSchema } from '../core/schema/types';
@@ -13,108 +14,46 @@ export interface OpenLevel {
 export interface FormViewState {
   touched: ReadonlySet<string>;
   saveAttempted: boolean;
+  openLevels: readonly OpenLevel[];
   touch: (address: FieldAddress) => void;
   attemptSave: () => void;
   resetReveal: () => void;
-  openLevels: readonly OpenLevel[];
   openLevel: (level: OpenLevel) => void;
   showLevels: (levels: readonly OpenLevel[]) => void;
   closeLevelsAbove: (keep: number) => void;
 }
 
-interface Tracked {
-  formId: FormId;
-  touched: ReadonlySet<string>;
-  saveAttempted: boolean;
-  openLevels: readonly OpenLevel[];
-}
+export type FormViewStore = StoreApi<FormViewState>;
 
-const fresh = (formId: FormId): Tracked => ({
-  formId,
-  touched: new Set(),
-  saveAttempted: false,
-  openLevels: [],
-});
-
-export function useFormViewState(formId: FormId): FormViewState {
-  const [tracked, setTracked] = useState<Tracked>(() => fresh(formId));
-  const current = tracked.formId === formId ? tracked : fresh(formId);
-
-  const update = useCallback(
-    (change: (state: Tracked) => Tracked) =>
-      setTracked((previous) =>
-        change(previous.formId === formId ? previous : fresh(formId))
-      ),
-    [formId]
-  );
-  const touch = useCallback(
-    (address: FieldAddress) =>
-      update((state) =>
+export const createFormViewStore = (): FormViewStore =>
+  createStore<FormViewState>()((set) => ({
+    touched: new Set(),
+    saveAttempted: false,
+    openLevels: [],
+    touch: (address) =>
+      set((state) =>
         state.touched.has(address)
           ? state
-          : { ...state, touched: new Set(state.touched).add(address) }
+          : { touched: new Set(state.touched).add(address) }
       ),
-    [update]
-  );
-  const attemptSave = useCallback(
-    () => update((state) => ({ ...state, saveAttempted: true })),
-    [update]
-  );
-  const resetReveal = useCallback(
-    () =>
-      update((state) => ({
-        ...state,
-        touched: new Set(),
-        saveAttempted: false,
-      })),
-    [update]
-  );
-  const openLevel = useCallback(
-    (level: OpenLevel) =>
-      update((state) => ({
-        ...state,
-        openLevels: [...state.openLevels, level],
-      })),
-    [update]
-  );
-  const showLevels = useCallback(
-    (levels: readonly OpenLevel[]) =>
-      update((state) => ({ ...state, openLevels: levels })),
-    [update]
-  );
-  const closeLevelsAbove = useCallback(
-    (keep: number) =>
-      update((state) => ({
-        ...state,
-        openLevels: state.openLevels.slice(0, keep),
-      })),
-    [update]
-  );
+    attemptSave: () => set({ saveAttempted: true }),
+    resetReveal: () => set({ touched: new Set(), saveAttempted: false }),
+    openLevel: (level) =>
+      set((state) => ({ openLevels: [...state.openLevels, level] })),
+    showLevels: (levels) => set({ openLevels: levels }),
+    closeLevelsAbove: (keep) =>
+      set((state) => ({ openLevels: state.openLevels.slice(0, keep) })),
+  }));
 
-  return useMemo(
-    () => ({
-      touched: current.touched,
-      saveAttempted: current.saveAttempted,
-      touch,
-      attemptSave,
-      resetReveal,
-      openLevels: current.openLevels,
-      openLevel,
-      showLevels,
-      closeLevelsAbove,
-    }),
-    [
-      current.touched,
-      current.saveAttempted,
-      current.openLevels,
-      touch,
-      attemptSave,
-      resetReveal,
-      openLevel,
-      showLevels,
-      closeLevelsAbove,
-    ]
-  );
+export function useFormViewStore(formId: FormId): FormViewStore {
+  const [held, setHeld] = useState(() => ({
+    formId,
+    store: createFormViewStore(),
+  }));
+  if (held.formId === formId) return held.store;
+  const next = { formId, store: createFormViewStore() };
+  setHeld(next);
+  return next.store;
 }
 
 export const isRevealed = (
@@ -151,14 +90,13 @@ export const holdsRevealedError = (
   );
 };
 
-// The levels that must be open for the field at `address` to be on screen.
-export const levelsFor = (
+// Every named field on the way to `address`, the field itself last.
+export const fieldsAlong = (
   address: string,
   fields: readonly FieldSchema[],
-  valueAt: (address: string) => unknown,
-  isDrillable: (node: FieldSchema) => boolean
+  valueAt: (address: string) => unknown
 ): OpenLevel[] => {
-  const levels: OpenLevel[] = [];
+  const along: OpenLevel[] = [];
   let siblings: readonly FieldSchema[] | undefined = fields;
   let node: FieldSchema | undefined;
   let path = '';
@@ -173,18 +111,26 @@ export const levelsFor = (
     }
     node = siblings?.find((field) => field.name === segment);
     if (!node) break;
-    if (
-      path !== address &&
-      isDrillable(node) &&
-      fieldDepth(path) >= DRILL_DEPTH
-    ) {
-      levels.push({
-        address: path as FieldAddress,
-        label: node.label ?? node.name,
-        node,
-      });
-    }
+    along.push({
+      address: path as FieldAddress,
+      label: node.label ?? node.name,
+      node,
+    });
     siblings = fieldsOf(node);
   }
-  return levels;
+  return along;
 };
+
+// The levels that must be open for the field at `address` to be on screen.
+export const levelsFor = (
+  address: string,
+  fields: readonly FieldSchema[],
+  valueAt: (address: string) => unknown,
+  isDrillable: (node: FieldSchema) => boolean
+): OpenLevel[] =>
+  fieldsAlong(address, fields, valueAt).filter(
+    (step) =>
+      step.address !== address &&
+      isDrillable(step.node) &&
+      fieldDepth(step.address) >= DRILL_DEPTH
+  );

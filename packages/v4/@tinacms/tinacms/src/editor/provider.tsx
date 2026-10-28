@@ -58,7 +58,7 @@ import {
   TinaRuntimeContext,
 } from './context';
 import { flattenFieldErrors, nestFieldErrors } from './field-errors';
-import { useFormViewState } from './form-view-state';
+import { useFormViewStore } from './form-view-state';
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
@@ -396,13 +396,13 @@ function useSeededFormSync(
     advanceSeedKey,
   ]);
 
-  const view = useFormViewState(formId);
-  const { closeLevelsAbove, resetReveal } = view;
+  const view = useFormViewStore(formId);
   const discardEdits = useCallback(() => {
+    const { closeLevelsAbove, resetReveal } = view.getState();
     closeLevelsAbove(0);
     resetReveal();
     discardFormEdits(formId, resetForm, advanceSeedKey);
-  }, [formId, resetForm, advanceSeedKey, closeLevelsAbove, resetReveal]);
+  }, [formId, resetForm, advanceSeedKey, view]);
 
   return { seedKey, advanceSeedKey, discardEdits, view };
 }
@@ -530,10 +530,9 @@ export function FormProvider({
     []
   );
   const fieldSeedKey = `${seedKey}~${fieldReseeds}`;
-  const { closeLevelsAbove } = view;
   useEffect(() => {
-    closeLevelsAbove(0);
-  }, [fieldSeedKey, closeLevelsAbove]);
+    view.getState().closeLevelsAbove(0);
+  }, [fieldSeedKey, view]);
   const [failure, setFailure] = useState<{
     formId: FormId;
     message: string;

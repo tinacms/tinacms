@@ -20,7 +20,7 @@ export function DrillInField() {
         variant='secondary'
         iconEnd='chevron-right'
         onClick={() =>
-          scope.view.openLevel({
+          scope.view.getState().openLevel({
             address,
             label: node.label ?? node.name,
             node,

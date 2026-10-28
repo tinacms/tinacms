@@ -18,7 +18,13 @@ type FieldTrailStep = {
 };
 
 function Marks({ step }: { step: FieldTrailStep }) {
-  return step.invalid ? <Badge kind='dot' srLabel=', has errors' /> : null;
+  return step.invalid ? (
+    <Badge
+      kind='dot'
+      srLabel=', has errors'
+      className='bg-destructive shadow-none'
+    />
+  ) : null;
 }
 
 type FieldTrailProps = Omit<ComponentProps<'nav'>, 'children'> & {

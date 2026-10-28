@@ -42,8 +42,7 @@ export default defineClientPlugin({
 A field component receives *only* its **Field address** via context. Everything else is pulled through address-keyed hooks:
 
 ```tsx
-import { useFieldValue, useFieldFrame, useFieldActivation, useFieldAddress } from 'tinacms/react'
-import { FieldWrapper } from '@tinacms/ui/components/field-wrapper'
+import { FieldWrapper, useFieldValue, useFieldFrame, useFieldActivation, useFieldAddress } from 'tinacms/react'
 
 function StringField() {
   const address = useFieldAddress()

@@ -1,11 +1,11 @@
 import { type ValidatorRef, definePlugin } from '@tinacms/tinacms';
 import { defineClientPlugin } from '@tinacms/tinacms/client';
 import {
+  FieldWrapper,
   useFieldAddress,
   useFieldFrame,
   useFieldValue,
 } from '@tinacms/tinacms/react';
-import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 
 // TODO: this won't be needed once we are building 't' from all plugins.
 export const rating = (config: {

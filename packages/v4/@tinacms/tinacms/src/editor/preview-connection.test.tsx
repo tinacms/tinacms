@@ -25,6 +25,7 @@ import {
 } from '../preview/protocol';
 import { LabelledFields } from '../test/labelled-fields';
 import { FormScopeContext } from './context';
+import { createFormViewStore } from './form-view-state';
 import { FormProvider, TinaProvider } from './index';
 import { usePreviewConnection } from './preview-connection';
 
@@ -373,17 +374,7 @@ describe('usePreviewConnection', () => {
           reseedFields: () => {},
           saveFailure: null,
           setSaveFailure: () => {},
-          view: {
-            touched: new Set(),
-            saveAttempted: false,
-            touch: () => {},
-            attemptSave: () => {},
-            resetReveal: () => {},
-            openLevels: [],
-            openLevel: () => {},
-            showLevels: () => {},
-            closeLevelsAbove: () => {},
-          },
+          view: createFormViewStore(),
           discardEdits: () => {},
           hooks: [],
           staleDraft: null,

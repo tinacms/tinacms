@@ -2,6 +2,7 @@ import { use } from 'react';
 import type { FieldAddress } from '../core/field/address';
 import { toFieldAddress } from '../core/field/address';
 import type { FieldSchema } from '../core/schema/types';
+import { useStore } from 'zustand';
 import { useFormStore } from '../form/form-store';
 import { DrillInField } from './drill-in-field';
 import { DRILL_DEPTH, fieldDepth } from './form-view-state';
@@ -42,10 +43,14 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     setActive(scope.formId, address);
   };
 
+  const openAddress = useStore(
+    scope.view,
+    (state) => state.openLevels.at(-1)?.address
+  );
   const drills =
     descriptor.metadata?.drillable === true &&
     fieldDepth(address) >= DRILL_DEPTH &&
-    scope.view.openLevels.at(-1)?.address !== address;
+    openAddress !== address;
   const Component = drills ? DrillInField : descriptor.Component;
   return (
     <FieldAddressContext value={address}>
@@ -55,7 +60,7 @@ export function FieldNode({ address, node }: FieldNodeProps) {
           onFocus={markActive}
           onBlur={(event) => {
             if (!event.currentTarget.contains(event.relatedTarget)) {
-              scope.view.touch(address);
+              scope.view.getState().touch(address);
             }
           }}
         >

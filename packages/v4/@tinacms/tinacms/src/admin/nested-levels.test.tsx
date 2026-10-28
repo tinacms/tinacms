@@ -152,7 +152,24 @@ describe('nested form levels', () => {
       screen.getByRole('navigation', { name: 'Field path' })
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Up to home.mdx' }));
+    await user.click(screen.getByRole('button', { name: 'Up to Two' }));
+    expect(
+      await screen.findByRole('button', { name: 'Open Three' })
+    ).toBeVisible();
+  });
+
+  it('shows every field on the way in the trail, and goes back to one of them', async () => {
+    const user = userEvent.setup();
+    renderForm();
+    await user.click(await screen.findByRole('button', { name: 'Open Three' }));
+    const trail = await screen.findByRole('navigation', { name: 'Field path' });
+    expect(
+      within(trail)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['home.mdx', '›One', '›Two', '›Three']);
+
+    await user.click(within(trail).getByRole('button', { name: 'One' }));
     expect(
       await screen.findByRole('button', { name: 'Open Three' })
     ).toBeVisible();
@@ -182,9 +199,7 @@ describe('nested form levels', () => {
     renderForm();
     await user.click(await screen.findByRole('button', { name: 'Open Three' }));
     await user.clear(await screen.findByLabelText(/^Handle\b/));
-    await user.click(
-      await screen.findByRole('button', { name: /Up to home\.mdx/ })
-    );
+    await user.click(await screen.findByRole('button', { name: /Up to Two/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.tab();
     await user.click(screen.getByRole('button', { name: 'Save' }));
