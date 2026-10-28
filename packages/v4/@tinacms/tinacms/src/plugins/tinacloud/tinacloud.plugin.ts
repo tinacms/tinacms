@@ -1,10 +1,9 @@
 import { type PluginManifest, definePlugin } from '../../core/plugin';
 import type { TinaCloudOptions } from './client';
 import { mediaUrl } from './media/read';
+import { TINACLOUD_PLUGIN_NAME } from './name';
 
 export type { TinaCloudOptions } from './client';
-
-export const TINACLOUD_PLUGIN_NAME = 'tina:tinacloud';
 
 export const tinaCloud = (options: TinaCloudOptions): PluginManifest =>
   definePlugin({
@@ -41,9 +40,16 @@ export const tinaCloud = (options: TinaCloudOptions): PluginManifest =>
       };
     },
     server: async () => {
-      const { createTinaCloudAuthServer } = await import(
-        './auth/tinacloud-auth.server'
-      );
-      return { default: createTinaCloudAuthServer(options) };
+      const [{ createTinaCloudAuthServer }, { createTinaCloudContentServer }] =
+        await Promise.all([
+          import('./auth/tinacloud-auth.server'),
+          import('./content/tinacloud-content.server'),
+        ]);
+      return {
+        default: {
+          ...createTinaCloudAuthServer(options),
+          ...createTinaCloudContentServer(options),
+        },
+      };
     },
   });

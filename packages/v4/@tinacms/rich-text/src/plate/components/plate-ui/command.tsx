@@ -23,7 +23,7 @@ import {
 import { inputVariants } from './input';
 
 const commandVariants = cva(
-  'flex size-full flex-col rounded-md bg-popover text-popover-foreground focus-visible:outline-hidden',
+  'flex size-full flex-col rounded-sm bg-popover text-popover-foreground focus-visible:outline-hidden',
   {
     defaultVariants: {
       variant: 'default',
@@ -67,7 +67,7 @@ export const CommandInput = withRef<typeof CommandPrimitive.Input>(
       <CommandPrimitive.Input
         ref={ref}
         className={cn(
-          'flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none',
+          'flex h-11 w-full rounded-sm bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none',
           className
         )}
         {...props}
@@ -104,7 +104,7 @@ export const CommandSeparator = withCn(
 
 export const CommandItem = withCn(
   CommandPrimitive.Item,
-  'relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0'
+  'relative flex cursor-default items-center gap-2 rounded-xs px-2 py-1.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0'
 );
 
 export const CommandShortcut = withCn(

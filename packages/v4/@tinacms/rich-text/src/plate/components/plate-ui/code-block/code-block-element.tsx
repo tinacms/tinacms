@@ -122,7 +122,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
           .tina-code-block .hljs-deletion { background: #ffeef0; color: #b31d28; }
           .slate-code_line > span:last-child {margin-right: 1rem;}
         `}</style>
-        <div className='relative rounded-md bg-[#F1F5F9] shadow-sm'>
+        <div className='relative rounded-sm bg-[#F1F5F9] shadow-sm'>
           {isEditing ? (
             <pre
               spellCheck={false}
@@ -137,7 +137,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
             />
           )}
 
-          <div className='absolute top-0 py-1 pr-1 rounded-t-md z-10 flex w-full justify-end gap-0.5 select-none border-b border-[#CBD5E1] bg-[#F1F5F9]'>
+          <div className='absolute top-0 py-1 pr-1 rounded-t-sm z-10 flex w-full justify-end gap-0.5 select-none border-b border-[#CBD5E1] bg-[#F1F5F9]'>
             {isLangSupported(element.lang as string) && (
               <Button
                 tabIndex={-1}

@@ -209,7 +209,7 @@ export const HighlightToolbarButton = () => (
     toMarks={toHighlightMarks}
     renderSwatch={(color) => (
       <span
-        className='mr-2 inline-block size-4 rounded border border-gray-300'
+        className='mr-2 inline-block size-4 rounded-sm border border-gray-300'
         style={{ backgroundColor: color }}
       />
     )}

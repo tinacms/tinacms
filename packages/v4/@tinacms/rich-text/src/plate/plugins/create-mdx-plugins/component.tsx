@@ -88,14 +88,14 @@ export const InlineEmbed = ({
       <Wrapper inline={true}>
         <span
           style={{ margin: '0 0.5px' }}
-          className='relative inline-flex shadow-sm rounded leading-none'
+          className='relative inline-flex shadow-sm rounded-sm leading-none'
         >
           {selected ? (
-            <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded z-10 pointer-events-none' />
+            <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-sm z-10 pointer-events-none' />
           ) : null}
           <span
             style={{ fontWeight: 'inherit', maxWidth: '275px' }}
-            className='truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+            className='truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l-sm border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
             onMouseDown={handleSelect}
           >
             {label}
@@ -151,13 +151,13 @@ export const BlockEmbed = ({
     <div {...attributes} className='w-full my-2'>
       {children}
       <Wrapper inline={false}>
-        <span className='relative w-full inline-flex shadow-sm rounded'>
+        <span className='relative w-full inline-flex shadow-sm rounded-sm'>
           {selected ? (
-            <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded z-10 pointer-events-none' />
+            <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-sm z-10 pointer-events-none' />
           ) : null}
           <span
             onMouseDown={handleSelect}
-            className='truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+            className='truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l-sm border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
           >
             {label}
           </span>
@@ -223,7 +223,7 @@ const DotMenu = ({
           <span
             onMouseDown={(e) => e.preventDefault()}
             onClick={(e) => e.stopPropagation()}
-            className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+            className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r-sm border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
           >
             <EllipsisIcon title='Open options' />
           </span>
@@ -234,7 +234,7 @@ const DotMenu = ({
         sideOffset={8}
         onOpenAutoFocus={(e) => e.preventDefault()}
         onCloseAutoFocus={(e) => e.preventDefault()}
-        className='w-auto p-0 border-0 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5'
+        className='w-auto p-0 border-0 rounded-sm shadow-lg bg-white ring-1 ring-black ring-opacity-5'
       >
         <div className='py-1'>
           {showEdit ? (

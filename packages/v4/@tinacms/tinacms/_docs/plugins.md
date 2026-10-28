@@ -205,25 +205,26 @@ as a field plugin.
 | `afterSave` | after `onSave` resolves and the form is clean | the saved document | `void` or a Promise |
 | `onChange` | on every field value change | `{ address, value }` of the changed field; `value` is the form value, not the stored one | `void`, synchronously |
 
-Every hook also receives a scope: `{ formId, path, collection }`.
+Every client hook also receives a scope: `{ formId, path, collection }`.
 
 A hook transforms the document. A rule about a field is a field validator,
 also when the rule reads other fields. The validator reads them through
 `siblings`, and the form shows its message at that field. A `beforeSave`
 throw cannot point at a field, so the editor sees it only at the save button.
 
-These hooks run in the browser. A `beforeSave` throw stops the save in the
-form only. A direct call to the content API does not run it. Enforcement
-belongs in the server segment (ADR-014 §3), which v4 does not supply yet.
+A hook from the forms above runs in the browser. A `beforeSave` throw stops
+the save in the form only. A direct call to the content API does not run it.
+To enforce a rule, give the hook a server side
+([Client and server hooks](#client-and-server-hooks)).
 
 A collection runs the hooks it lists, in the order it lists them. A
 collection with no `hooks` runs no hooks. `config.plugins` order and
 `dependsOn` do not change hook order.
 
-The form does not show a change that a `beforeSave` hook makes. The form
-keeps the values the editor typed until the host loads the saved document
-again. A key that the collection does not declare does not go through
-`serialize`.
+After a save, the form shows the document that the save stored. A value
+that a `beforeSave` hook changed shows at once, with no reload. A key that
+the collection does not declare does not go through `serialize`, and the
+form does not show it.
 
 `beforeSave` hooks form a pipeline. Each one receives the document the
 previous one returned. A hook that throws stops the save. `onSave` does not
@@ -237,6 +238,84 @@ Names are global, so a third-party plugin gives them a prefix
 replace a name on purpose. Refer to
 [ADR-025](../../../../../adr/v4/025-form-hook-registration.md)
 for the decision.
+
+### Client and server hooks
+
+A hook can have a server side. The server side runs on the site's own server
+(the Backend) for every save to a collection that lists the hook. It runs for
+every Data Layer, TinaCloud included.
+
+```ts
+// tina/hooks.ts
+import { defineHook, defineHooksPlugin } from '@tinacms/tinacms';
+
+export const slug = defineHook('slug', {
+  client: () => ({
+    beforeSave: (document) => ({ ...document, slug: String(document.slug ?? '').toLowerCase() }),
+  }),
+  server: () => import('./slug.server'),
+});
+
+export const hooksPlugin = defineHooksPlugin('example:hooks', [slug]);
+
+// tina/slug.server.ts
+import { defineServerHook, reject } from '@tinacms/tinacms/server';
+
+export default defineServerHook(() => ({
+  beforeSave: (document, { session }) => {
+    if (document.published && !session?.roles.includes('admin')) {
+      reject('Only admins can publish');
+    }
+    return document;
+  },
+}));
+```
+
+`client` and `server` are both optional. `defineHook(name, factory)` stays
+client only. Both sides take the same `args`, and `defineHook` checks that
+their types agree. `server` is a lazy `() => import(...)`, so the browser
+never loads it.
+
+A server hook receives `{ path, collection, session, branch }`. It has no
+`formId`, because a server save has no form. `session` is the saving user's
+`Session`, or `null` when no auth plugin verifies the request. `branch` is the
+branch the provider writes to. `tinaCloud()` gives the project's default
+branch when the editor picked none. A Data Layer with no branches, such as the
+local one, gives `undefined`.
+
+A save to a collection that lists a hook with a server side goes to the
+`content/update` op of the site's server. That op verifies the session, runs
+the server `beforeSave` hooks in the collection's order, writes through the
+content provider, and then runs every server `afterSave`. A save to any other
+collection goes straight to the content provider.
+
+- `reject(message)` stops the save. The editor sees `message` at the save
+  button, and the form stays dirty. The provider does not write.
+- Any other throw stops the save with a generic error. The response does not
+  carry the message, so no internal detail reaches the browser.
+- A server `afterSave` throw does not undo the save. Every other `afterSave`
+  still runs, and the form raises an `AfterSaveHookError`.
+- A slow server hook slows every save to its collection.
+
+The save needs the site's server route. Mount the RPC handler with the
+whole config, `mountHandler(config)`, so it gets the schema. The admin calls
+it at `/api/tina`. Set `rpcUrl` in `defineConfig` when the site mounts it
+somewhere else, and the handler pins its route to the same value. A site with no server runtime cannot save to the
+collection, and the save fails with "This collection has server hooks, so it
+needs the site's server route." Core never falls back to a direct write. On
+`vite dev`, `tinaLocalDataLayerVitePlugin` serves the route for the local
+Data Layer.
+
+Import a `*.server.*` file only through a `server` loader.
+`tinaLocalDataLayerVitePlugin` replaces each `*.server.*` module under
+`tina/` with a stub in a client build. A Next.js site has no such step, so
+the rule is the only guard there.
+
+TinaCloud still accepts a write that an editor's token sends straight to it.
+Such a write skips the server hooks. Until TinaCloud requires a server-only
+secret for writes to a hooked collection, server hooks guard saves that go
+through the admin, not every possible write. Refer to
+[ADR-028](../../../../../adr/v4/028-server-save-hooks.md) for the decision.
 
 ## Replace or remove a screen
 

@@ -23,6 +23,13 @@ them, so they are never routable ops (`rpc/handler.ts`).
 | `getSession(request)` | Reads the bearer token from the request, and returns a `Session` (`{ identity, roles }`), or `null`. |
 | `rolePermissions(role)?` | Returns the permissions of a role. Without it, the built-in `editor` and `admin` defaults apply. |
 
+A role saves content only if it holds `content:save`. The built-in `editor`
+role holds it. A `rolePermissions` that you write must grant it too, or the
+editor cannot save. With an auth plugin installed, local development checks
+`content:save` on every save. On every host, a save to a collection with a
+server hook needs it
+([ADR-028](../../../../../adr/v4/028-server-save-hooks.md)).
+
 The handler refuses every op that is not a `publicOp`: `401` with no session,
 `403` when the roles do not grant the permission. With no auth plugin, only a
 `publicOp` answers. Import `Session` and `AuthTransportHooks` from

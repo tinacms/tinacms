@@ -45,7 +45,7 @@ function CopyField({ value }: { value: string }) {
       <button
         type='button'
         disabled={copied}
-        className='relative flex w-full items-center gap-1.5 overflow-hidden rounded-lg border bg-muted/50 px-3 py-2 text-left text-sm break-all transition hover:bg-background hover:text-primary disabled:pointer-events-none'
+        className='relative flex w-full items-center gap-1.5 overflow-hidden rounded-sm border bg-muted/50 px-3 py-2 text-left text-sm break-all transition hover:bg-background hover:text-primary disabled:pointer-events-none'
         onClick={copy}
       >
         <CopyIcon className='size-4 shrink-0 text-primary' />
@@ -97,8 +97,8 @@ export function MediaPreview({
         </h3>
         <Button
           type='button'
-          variant='ghost'
-          size='icon-sm'
+          variant='icon'
+          size='sm'
           aria-label='Close details'
           onClick={onClose}
         >
@@ -110,23 +110,27 @@ export function MediaPreview({
           src={resolveUrl(item.path, { width: 1000, height: 1000 })}
           alt={name}
           style={checkerboardStyle}
-          className='m-auto block max-h-[50vh] max-w-full rounded border object-contain shadow'
+          className='m-auto block max-h-[50vh] max-w-full rounded-sm border object-contain shadow'
         />
       ) : (
-        <span className='rounded border bg-muted/50 p-3 shadow'>
+        <span className='rounded-sm border bg-muted/50 p-3 shadow'>
           <Icon className='size-14 text-muted-foreground' />
         </span>
       )}
       <CopyField value={absoluteUrlOf(resolveUrl(item.path))} />
       <div className='mt-auto flex w-full flex-wrap gap-2'>
         {onInsert ? (
-          <Button type='button' onClick={() => onInsert(item)}>
+          <Button
+            variant='primary'
+            type='button'
+            onClick={() => onInsert(item)}
+          >
             <ArrowDownToLineIcon className='size-4' />
             Insert
           </Button>
         ) : null}
         {onRename ? (
-          <Button type='button' variant='outline' onClick={onRename}>
+          <Button type='button' variant='secondary' onClick={onRename}>
             <TextCursorInputIcon className='size-4' />
             Rename
           </Button>
