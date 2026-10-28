@@ -96,7 +96,6 @@ export function NumberFieldView({
           }}
           id={id}
           type='number'
-          inputMode='decimal'
           step={step ?? 'any'}
           value={value ?? ''}
           required={required}
