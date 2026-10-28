@@ -1,7 +1,7 @@
 # ADR-029: Field Options Live at the Top Level, Not Under `ui`
 
 ## Status
-**Proposed** (2026-10-29). Decisions 1 to 7 were approved by the team. Collection options (`router`, `filename`, `allowedActions`, `global`, `beforeSubmit`) are out of scope and need their own ADR. Resolves the field-level half of Field Type Implementation: Decide which v3 ui options stay and where they live ([#7850](https://github.com/tinacms/tinacms/issues/7850)). Builds on [ADR-009](./009-field-plugins.md) and [ADR-017](./017-content-model.md).
+**Accepted** (2026-10-29). Decisions 1 to 7 were approved by the team. Collection options (`router`, `filename`, `allowedActions`, `global`, `beforeSubmit`) are out of scope and need their own ADR. Resolves the field-level half of Field Type Implementation: Decide which v3 ui options stay and where they live ([#7850](https://github.com/tinacms/tinacms/issues/7850)). Builds on [ADR-009](./009-field-plugins.md) and [ADR-017](./017-content-model.md).
 
 ## Context
 v3 configured fields through a `ui` object: `ui.component`, `ui.hidden`, `ui.defaultValue`, `ui.itemProps` and more. v4 has no decision on them. No ADR covers `ui`, and the v4 docs use only `ui.component` and `ui.hidden`, in passing.
