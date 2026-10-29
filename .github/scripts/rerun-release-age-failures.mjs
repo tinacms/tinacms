@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 const VIOLATION = 'ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION';
 const GRACE_MS = 5 * 60 * 1000;
 const FAILED_CONCLUSIONS = new Set(['failure', 'timed_out']);
+const FATAL_STATUSES = new Set([401, 403, 429]);
 
 export const readMinimumReleaseAgeMinutes = (workspaceYaml) => {
   const match = workspaceYaml.match(/^minimumReleaseAge:\s*(\d+)/m);
@@ -168,7 +169,7 @@ async function main() {
     try {
       toRerun.push(...(await runsToRerun(pr, minutes, now)));
     } catch (err) {
-      if (!(err instanceof Error)) throw err;
+      if (!(err instanceof Error) || FATAL_STATUSES.has(err.status)) throw err;
       console.log(`::warning::PR ${pr.number}: ${err.message}`);
     }
   }
