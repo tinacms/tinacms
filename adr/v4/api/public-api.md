@@ -50,7 +50,7 @@ export default defineConfig({
         format: 'mdx',
         fields: [
           t.string({ name: 'title', label: 'Title', required: true }),
-          t.string({ name: 'body', label: 'Body', ui: { component: 'rich-text' } }),
+          t.richText({ name: 'body', label: 'Body' }),
         ],
       }),
     ],
@@ -102,8 +102,9 @@ Schema-side helpers (unchanged in spirit from v2, but evaluated against the new 
 defineCollection({
   name, label, path, format,           // 'md' | 'mdx' | 'json' | 'yaml'
   fields: [
-    t.string({ name, label, required, min, max, pattern, ui: { component: 'rich-text' } }),
-    t.number({ name, label, min, max, step }),
+    t.string({ name, label, description, defaultValue, hidden, validators: [required(), min(3), max(80), pattern(/^[a-z]+$/)] }),
+    t.richText({ name, label }),
+    t.number({ name, label, validators: [min(0), max(10)], step }),
     t.boolean({ name, label }),
     t.datetime({ name, label }),
     t.object({ name, label, fields: [...] }),
@@ -114,7 +115,7 @@ defineCollection({
 })
 ```
 
-The `ui.component` value names the **`field` capability key** to render. Custom field types are added by registering a `field` plugin at that key — see [Field Plugins](../plugins/field-plugins.md).
+The field builder (`t.string`, `t.richText`, …) names the **`field` capability key** to render. Field options sit at the top level of the field; there is no `ui` wrapper ([ADR-029](../029-field-ui-options.md)). Custom field types are added by registering a `field` plugin at that key — see [Field Plugins](../plugins/field-plugins.md).
 
 ## React API (`tinacms/react`)
 

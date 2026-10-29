@@ -45,6 +45,9 @@ an array of `SelectFieldOption`:
 | `value` | `string` (required) | the value the document stores |
 | `label` | `string` | the text the trigger and the option list show; the field falls back to `value` when `label` is absent |
 
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
+
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with
 > `validators`. Refer to

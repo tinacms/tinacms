@@ -201,6 +201,78 @@ Hooks:
 | `useFieldErrors(address)` | Gives every validation message at `address` or under it |
 | `useFieldActivation(handler)` | Runs `handler` when this field becomes the active field, for visual editing |
 
+## Options every field takes
+
+These options sit at the top level of a field. v4 has no `ui` wrapper
+([ADR-029](../../../../../adr/v4/029-field-ui-options.md)).
+
+| Key | Type | Effect |
+|---|---|---|
+| `description` | `string` | Help text under the label. It is the input's accessible description. |
+| `defaultValue` | `JsonValue` (not `null`) | The value a document that lacks the key starts with. |
+| `hidden` | `boolean` | Renders no label, description or editor. The value is kept. |
+
+### `defaultValue`
+
+- It is a stored-form value: what the file would hold, not what the editor
+  holds. Ingest substitutes it for an absent key before the plugin's `parse`
+  runs. A falsy default (`0`, `''`, `false`) is a real default.
+- It fills an absent key only. A cleared field is saved as an explicit `null`
+  and stays empty after a reload. A string clears to `''`, which is kept as is.
+  A field with no `defaultValue` still drops `null` on save.
+- Precedence: the field's `defaultValue`, then the plugin's own default, then
+  `null`. The plugin's default is an editor value and skips `parse`.
+- An object default is cloned for each document.
+- A default on a field inside an object or array item applies when the parent
+  is present and lacks the key, when the parent is stored as `null`, and when
+  an array item lacks the key. It does not apply when the parent key is
+  missing entirely.
+- Trade-off: a document is not dirty until an edit. The first edited save
+  writes the default into the file. Adding a default to an existing collection
+  gives each document a noisy diff on its first edited save.
+- A rich-text default is written in stored form. With the default codec, that
+  is markdown:
+
+```ts
+t.richText({ name: 'body', defaultValue: 'Write something here.\n\n- First point' })
+```
+
+### `hidden`
+
+- The value is loaded, parsed, serialized and saved like any other value.
+- A hidden field is skipped by editor validation, so it never blocks Save. A
+  hidden object or array also skips its children.
+- It works on any field type, at the top level and inside an item.
+- `hidden` wins over `description`.
+- On the `of` field of a scalar array, `hidden` and `description` fail the
+  build. Set them on the array.
+
+### What is not a field option
+
+Widgets, `parse`, `format` and validation belong to the field plugin and to
+validators. To show a value with another widget, register a field plugin for
+it. For a one-off transform on one field, use a collection hook. Array-only
+options (`defaultItem`, `itemLabel`, `picker`, `previewImage`) are in
+[array-field.md](./array-field.md).
+
+### Dropped options fail the build
+
+`tinacms build` fails when a field sets a v3 option that v4 does not have. The
+error names the field and the collection, and says what to use instead:
+
+| Option | Use instead |
+|---|---|
+| `ui` | Top-level `description`, `defaultValue`, `hidden`, `itemLabel`, `picker`. |
+| `component` | A field plugin for the widget. |
+| `parse` | `parse` on the field plugin, or a collection hook. |
+| `format` | `serialize` on the field plugin, or a collection hook. |
+| `validate` | Named validators in `validators`. |
+| `min`, `max` | The `min()` and `max()` validators. |
+
+A templates array that sets `defaultItem` fails the build too. Set it on each
+template. A `picker` value other than `'list'` or `'grid'`, or a `picker` on an
+array without `templates`, fails the build.
+
 ## Validation in two layers
 
 The form resolver (`editor/resolver.ts`) calls `validateField`

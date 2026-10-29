@@ -33,6 +33,9 @@ has no `min`, `max`, or `pattern` property, because a boolean value has no
 constraints. The config accepts `required`, but `required` has no effect. The
 next section gives the reason.
 
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
+
 ## The descriptor
 
 The client segment (`boolean-field.client.tsx`) takes the `boolean` key:
