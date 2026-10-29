@@ -8,7 +8,7 @@ import {
 } from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
 import { FormLevel } from '@tinacms/ui/components/form-level';
-import { use, useEffect, useEffectEvent } from 'react';
+import { type ReactNode, use, useEffect, useEffectEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useStore } from 'zustand';
 import { type FormScope, FormScopeContext } from '../editor/context';
@@ -17,6 +17,7 @@ import {
   fieldsAlong,
   holdsRevealedError,
   levelsFor,
+  type OpenLevel,
 } from '../editor/form-view-state';
 import {
   useDiscardEdits,
@@ -116,7 +117,7 @@ function StaleDraftDialog() {
   );
 }
 
-function useOpenLevelsForActiveField(scope: FormScope) {
+function ActiveFieldLevels({ scope }: { scope: FormScope }) {
   const registry = useFieldRegistry();
   const { getValues } = useFormContext();
   const active = useFormStore((state) => state.active);
@@ -141,26 +142,25 @@ function useOpenLevelsForActiveField(scope: FormScope) {
   useEffect(() => {
     if (active && active.formId === scope.formId) showLevelsFor(active.address);
   }, [active, scope.formId]);
+  return null;
 }
 
-function FormFields({ scope }: { scope: FormScope }) {
+// Reads the whole view and every error for the trail. `children` keeps its
+// element identity, so a re-render here does not reach the fields.
+function OpenLevelFrame({
+  scope,
+  current,
+  children,
+}: {
+  scope: FormScope;
+  current: OpenLevel;
+  children: ReactNode;
+}) {
   const errors = useFormErrors(useFormId());
   const { getValues } = useFormContext();
   const view = useStore(scope.view);
-  useOpenLevelsForActiveField(scope);
   const { collection, path } = scope;
   const { closeLevelsAbove } = scope.view.getState();
-
-  const current = view.openLevels.at(-1);
-  if (!current) {
-    return (
-      <FormLevel>
-        {collection.fields.map((node) => (
-          <Field key={node.name} address={node.name} />
-        ))}
-      </FormLevel>
-    );
-  }
 
   const errorAddresses = Object.keys(errors);
   const steps = [
@@ -186,8 +186,26 @@ function FormFields({ scope }: { scope: FormScope }) {
   ];
   return (
     <FormLevel steps={steps} onUp={steps.at(-2)?.onClick}>
-      <FieldNode address={current.address} node={current.node} />
+      {children}
     </FormLevel>
+  );
+}
+
+function FormFields({ scope }: { scope: FormScope }) {
+  const current = useStore(scope.view, (state) => state.openLevels.at(-1));
+  if (!current) {
+    return (
+      <FormLevel>
+        {scope.collection.fields.map((node) => (
+          <Field key={node.name} address={node.name} />
+        ))}
+      </FormLevel>
+    );
+  }
+  return (
+    <OpenLevelFrame scope={scope} current={current}>
+      <FieldNode address={current.address} node={current.node} />
+    </OpenLevelFrame>
   );
 }
 
@@ -204,6 +222,7 @@ export function DocumentForm() {
         <DocumentStatus />
       </header>
       <StaleDraftDialog />
+      <ActiveFieldLevels scope={scope} />
       <FormFields scope={scope} />
       <div className='flex items-start gap-2'>
         <SaveButton />
