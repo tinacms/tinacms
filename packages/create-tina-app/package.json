@@ -53,7 +53,7 @@
         "ora": "catalog:",
         "posthog-node": "^5.17.2",
         "prompts": "catalog:",
-        "systeminformation": "^5.31.7",
+        "systeminformation": "^5.33.16",
         "tar": "catalog:"
     }
 }
