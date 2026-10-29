@@ -174,7 +174,7 @@ catalog:
     graphiql: ^4.1.2
     graphql-tag: ^2.12.6
     gray-matter: ^4.0.3
-    happy-dom: 15.10.2
+    happy-dom: 21.0.4
     highlight.js: ^11.11.1
     identity-obj-proxy: ^3.0.0
     is-hotkey: ^0.2.0
