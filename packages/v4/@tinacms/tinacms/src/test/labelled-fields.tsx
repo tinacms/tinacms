@@ -1,7 +1,7 @@
 import { Fragment, use } from 'react';
 import { toFieldAddress } from '../core/field/address';
 import { FormScopeContext } from '../editor/context';
-import { Field } from '../editor/field';
+import { Field, FieldDescription } from '../editor/field';
 
 /**
  * Gives each field of the open collection an accessible name, and renders
@@ -16,17 +16,20 @@ export function LabelledFields() {
 
   return (
     <>
-      {scope.collection.fields.map((node) => (
-        <Fragment key={node.name}>
-          {/* `htmlFor` names a labelable widget. A widget with
+      {scope.collection.fields
+        .filter((node) => !node.hidden)
+        .map((node) => (
+          <Fragment key={node.name}>
+            {/* `htmlFor` names a labelable widget. A widget with
               `metadata.labelable: false` reads the id through
               `aria-labelledby` instead. */}
-          <label htmlFor={node.name} id={`${node.name}-label`}>
-            {node.label ?? node.name}
-          </label>
-          <Field address={toFieldAddress(node.name)} />
-        </Fragment>
-      ))}
+            <label htmlFor={node.name} id={`${node.name}-label`}>
+              {node.label ?? node.name}
+            </label>
+            <FieldDescription address={node.name} node={node} />
+            <Field address={toFieldAddress(node.name)} />
+          </Fragment>
+        ))}
     </>
   );
 }

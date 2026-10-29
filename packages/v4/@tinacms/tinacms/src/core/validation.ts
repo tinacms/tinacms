@@ -108,6 +108,8 @@ export const validateFieldTree = (
   scope: ValidationScope = {}
 ): Record<string, string[]> => {
   const errors: Record<string, string[]> = {};
+  // An editor cannot see or fix a hidden field, so it never blocks Save.
+  if (node.hidden) return errors;
   const messages = validateField(node, descriptor, value, {
     ...scope,
     address,

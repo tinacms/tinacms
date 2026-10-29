@@ -12,7 +12,7 @@ import { use } from 'react';
 import { toFieldAddress } from '../core/field/address';
 import type { FieldSchema } from '../core/schema/types';
 import { FormScopeContext } from '../editor/context';
-import { Field } from '../editor/field';
+import { Field, FieldDescription } from '../editor/field';
 import {
   useDiscardEdits,
   useFieldRegistry,
@@ -33,6 +33,7 @@ function FieldRow({ node }: { node: FieldSchema }) {
   const dirty = useIsFieldDirty(useFormId(), toFieldAddress(name));
   const labelable =
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
+  if (node.hidden) return null;
   return (
     <div className='mb-4 min-w-0'>
       <Label
@@ -51,6 +52,7 @@ function FieldRow({ node }: { node: FieldSchema }) {
           </>
         ) : null}
       </Label>
+      <FieldDescription address={name} node={node} />
       <Field address={name} />
     </div>
   );

@@ -17,6 +17,7 @@ export {
 export type { SaveHandler, StaleDraftActions } from './context';
 export {
   Field,
+  FieldDescription,
   FieldNode,
   type FieldNodeProps,
   type FieldProps,
