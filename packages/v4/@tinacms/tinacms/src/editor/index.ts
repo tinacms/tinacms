@@ -14,6 +14,18 @@ export {
   MediaBrowser,
   type MediaBrowserProps,
 } from '../plugins/media-manager/media-browser';
+export {
+  CONTENT_STALE_TIME,
+  type CollectionDocuments,
+  contentKeys,
+  type DocumentRead,
+  type DocumentSave,
+  type SaveDocumentInput,
+  useCollectionDocuments,
+  useDocument,
+  useInvalidateContent,
+  useSaveDocument,
+} from './content-queries';
 export type { SaveHandler, StaleDraftActions } from './context';
 export {
   Field,
@@ -24,38 +36,13 @@ export {
   type NestedFieldRowProps,
 } from './field';
 export {
-  FormProvider,
-  type FormProviderProps,
-  TinaProvider,
-  type TinaProviderProps,
-} from './provider';
-export {
-  type PreviewConnectionOptions,
-  usePreviewConnection,
-} from './preview-connection';
-export {
-  type CollectionDocuments,
-  CONTENT_STALE_TIME,
-  contentKeys,
-  type DocumentRead,
-  type DocumentSave,
-  type SaveDocumentInput,
-  useCollectionDocuments,
-  useDocument,
-  useInvalidateContent,
-  useSaveDocument,
-} from './content-queries';
-export {
   type ActiveField,
   AfterSaveHookError,
   FormValidationError,
   useActiveField,
   useContentSlice,
-  useMediaSlice,
-  useOptionalAuthSlice,
   useDiscardEdits,
   useDocumentPath,
-  useStaleDraft,
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,
@@ -65,6 +52,21 @@ export {
   useFormId,
   useFormSave,
   useFormSeedKey,
+  useMediaSlice,
+  useMoveListItem,
+  useOptionalAuthSlice,
+  useRemoveListItem,
   useRpcClient,
+  useStaleDraft,
   useTinaStore,
 } from './hooks';
+export {
+  type PreviewConnectionOptions,
+  usePreviewConnection,
+} from './preview-connection';
+export {
+  FormProvider,
+  type FormProviderProps,
+  TinaProvider,
+  type TinaProviderProps,
+} from './provider';

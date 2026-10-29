@@ -24,6 +24,12 @@ export default defineClientPlugin({
     serialize: (value: unknown, node, context) => {
       if (!isPlainObject(value)) return value;
       const field = asObjectFieldSchema(node);
+      // An absent object's subfields stay undefined. A stated object's subfields
+      // ingest as null when they have no default, so null is not absence. Only
+      // an all-undefined object was never in the document, and returning null
+      // drops that key instead of writing `{}`.
+      if (Object.values(value).every((entry) => entry === undefined))
+        return null;
       return digestDocument(value, field.fields, context);
     },
     validateChildren: (value: unknown, node, address, registry, scope) => {

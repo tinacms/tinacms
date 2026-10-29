@@ -8,10 +8,16 @@ import {
   useRef,
   useState,
 } from 'react';
-import { get, FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
+import {
+  type FieldError,
+  get,
+  FormProvider as RhfFormProvider,
+  set,
+  useForm,
+} from 'react-hook-form';
 import type { ResolvedConfig } from '../config';
 import { authSliceOf } from '../core/auth/slice';
-import { toFieldAddress } from '../core/field/address';
+import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { fieldEqualityFor } from '../core/form/compare';
 import {
@@ -68,6 +74,32 @@ export interface TinaProviderProps {
 
 const createDefaultQueryClient = () =>
   new QueryClient({ defaultOptions: { queries: { retry: 1 } } });
+
+const ERROR_ENTRY_KEYS = new Set(['type', 'message', 'types', 'ref']);
+
+const restoreListErrors = (
+  setError: (address: string, error: FieldError) => void,
+  node: unknown,
+  address: string
+) => {
+  if (!node || typeof node !== 'object') return;
+  if (address && 'type' in node && typeof node.type === 'string') {
+    setError(address, node as FieldError);
+  }
+  for (const [key, child] of Object.entries(node)) {
+    if (!ERROR_ENTRY_KEYS.has(key)) {
+      restoreListErrors(setError, child, address ? `${address}.${key}` : key);
+    }
+  }
+};
+
+const dropAt = (items: unknown[], index: number): unknown[] => {
+  const next: unknown[] = [];
+  for (let position = 0; position < items.length; position += 1) {
+    if (position !== index) next.push(items[position]);
+  }
+  return next;
+};
 
 type BootedRuntime = Omit<TinaRuntime, 'schema' | 'rpcUrl'>;
 
@@ -519,6 +551,9 @@ export function FormProvider({
   );
 
   useFormMethodSubscriptions(formId, path, collection, formHooks, methods);
+  // Read the error tree during render so a later click sees the current
+  // errors. react-hook-form leaves an unread formState proxy empty.
+  void methods.formState.errors;
 
   const [fieldReseeds, setFieldReseeds] = useState(0);
   const reseedFields = useCallback(
@@ -537,6 +572,81 @@ export function FormProvider({
     [formId]
   );
 
+  // react-hook-form keeps its defaults by index and only shifts its values when a
+  // list item is removed or moved, so the item that takes another's place inherits
+  // the other item's defaults. Re-seeding the list at its nested address rewrites
+  // values and defaults together, and leaves every other field as it is.
+  const commitList = useCallback(
+    (
+      listAddress: FieldAddress,
+      next: unknown[],
+      nextErrors: unknown[] | null
+    ) => {
+      const values = structuredClone(methods.getValues());
+      set(values, listAddress, next);
+      const errors = structuredClone(methods.formState.errors);
+      if (nextErrors) set(errors, listAddress, nextErrors);
+      // Keep the errors, then write back the tree without the removed item's
+      // entry. reset alone drops every error in the form.
+      methods.reset(values, { keepErrors: true });
+      methods.clearErrors();
+      restoreListErrors(
+        (address, error) => methods.setError(address, error),
+        errors,
+        ''
+      );
+      const [topLevel] = listAddress.split('.');
+      useFormStore
+        .getState()
+        .setFieldValue(formId, toFieldAddress(topLevel), values[topLevel]);
+    },
+    [formId, methods]
+  );
+
+  const removeListItem = useCallback(
+    (listAddress: FieldAddress, index: number) => {
+      const current = methods.getValues(listAddress);
+      if (!Array.isArray(current) || index < 0 || index >= current.length) {
+        return;
+      }
+      const listErrors = get(methods.formState.errors, listAddress);
+      commitList(
+        listAddress,
+        dropAt(current, index),
+        Array.isArray(listErrors) ? dropAt(listErrors, index) : null
+      );
+    },
+    [commitList, methods]
+  );
+
+  const moveListItem = useCallback(
+    (listAddress: FieldAddress, from: number, to: number) => {
+      const current = methods.getValues(listAddress);
+      if (
+        !Array.isArray(current) ||
+        from === to ||
+        from < 0 ||
+        to < 0 ||
+        from >= current.length ||
+        to >= current.length
+      ) {
+        return;
+      }
+      const next = [...current];
+      const [item] = next.splice(from, 1);
+      next.splice(to, 0, item);
+      const listErrors = get(methods.formState.errors, listAddress);
+      let nextErrors: unknown[] | null = null;
+      if (Array.isArray(listErrors)) {
+        nextErrors = [...listErrors];
+        const [error] = nextErrors.splice(from, 1);
+        nextErrors.splice(to, 0, error);
+      }
+      commitList(listAddress, next, nextErrors);
+    },
+    [commitList, methods]
+  );
+
   const formScope = useMemo(
     () => ({
       formId,
@@ -551,6 +661,8 @@ export function FormProvider({
       discardEdits,
       hooks: formHooks,
       staleDraft: staleDraftActions,
+      removeListItem,
+      moveListItem,
     }),
     [
       formId,
@@ -565,6 +677,8 @@ export function FormProvider({
       discardEdits,
       formHooks,
       staleDraftActions,
+      removeListItem,
+      moveListItem,
     ]
   );
 

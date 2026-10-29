@@ -6,11 +6,7 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import type { FieldAddress } from '../../../core/field/address';
 import { ingestDocument } from '../../../core/form/ingest';
 import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
-import type {
-  FieldSchema,
-  TemplateSchema,
-  TinaDocument,
-} from '../../../core/schema/types';
+import type { FieldSchema, TemplateSchema } from '../../../core/schema/types';
 import {
   NestedFieldRow,
   useDocumentPath,
@@ -19,17 +15,19 @@ import {
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
+  useMoveListItem,
+  useRemoveListItem,
 } from '../../../editor';
+import { StoredValue, UneditableValue } from '../uneditable-value';
 import {
-  type ObjectArrayFieldSchema,
-  type ScalarArrayFieldSchema,
   asArrayFieldSchema,
   isItem,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
+  type ObjectArrayFieldSchema,
+  type ScalarArrayFieldSchema,
 } from './array-field.schema';
-import { StoredValue, UneditableValue } from '../uneditable-value';
 
 export function ArrayField() {
   const address = useFieldAddress();
@@ -73,13 +71,16 @@ function ObjectItems({
 }) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
+  const removeListItem = useRemoveListItem();
+  const moveListItem = useMoveListItem();
   const { control, getValues } = useFormContext();
-  const {
-    fields: items,
-    append,
-    remove,
-    move,
-  } = useFieldArray({ control, name: address });
+  const { fields: items, append } = useFieldArray({
+    control,
+    name: address,
+  });
+  const removeItem = (index: number) => removeListItem(address, index);
+  const moveItem = (from: number, to: number) =>
+    moveListItem(address, from, to);
 
   const seed = (template: TemplateSchema | undefined, fields: FieldSchema[]) =>
     ingestDocument(template?.defaultItem ?? {}, fields, {
@@ -112,8 +113,8 @@ function ObjectItems({
               heading={headingOf(field, stored, index)}
               index={index}
               count={items.length}
-              onMove={move}
-              onRemove={remove}
+              onMove={moveItem}
+              onRemove={removeItem}
             >
               {fields ? (
                 fields.map((subfield) => (

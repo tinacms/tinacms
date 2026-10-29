@@ -49,6 +49,8 @@ export interface FormScope extends FormHookScope {
   discardEdits: () => void;
   hooks: readonly FormHooks[];
   staleDraft: StaleDraftActions | null;
+  removeListItem: (address: FieldAddress, index: number) => void;
+  moveListItem: (address: FieldAddress, from: number, to: number) => void;
 }
 
 export interface StaleDraftActions {

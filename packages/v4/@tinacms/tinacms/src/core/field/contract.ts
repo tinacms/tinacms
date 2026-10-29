@@ -107,6 +107,10 @@ export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
     node: FieldSchema,
     context: FieldTransformContext
   ) => TValue;
+  /**
+   * Converts the editor value back to the stored value. A null return drops
+   * the key: `digestDocument` leaves that field out of the saved document.
+   */
   serialize?: (
     value: TValue,
     node: FieldSchema,
