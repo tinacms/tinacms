@@ -452,6 +452,13 @@ describe('compileSchema dropped v3 options', () => {
         ],
       } as FieldSchema,
     ],
+    'a template': (extra) => [
+      {
+        name: 'l',
+        type: 'array',
+        templates: [{ name: 't', fields: [], ...extra }],
+      } as FieldSchema,
+    ],
     'an of field': (extra) => [
       {
         name: 'l',
@@ -545,6 +552,24 @@ describe('compileSchema array options', () => {
         )
       )
     ).toThrow(/"picker" takes/);
+  });
+
+  it('leaves picker and of to a non-array field that defines them', () => {
+    expect(() =>
+      compileSchema(
+        configWith(
+          [
+            {
+              name: 'w',
+              type: 'wheel',
+              picker: 'spin',
+              of: { name: 'a', type: 'string', description: 'x' },
+            } as FieldSchema,
+          ],
+          [...plugins, fieldPlugin('wheel', 1)]
+        )
+      )
+    ).not.toThrow();
   });
 
   it('writes no itemLabel, and no picker when unset, to the lock', () => {

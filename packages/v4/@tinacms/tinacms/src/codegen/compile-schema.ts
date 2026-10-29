@@ -15,6 +15,7 @@ import {
   overridesValidatorKey,
   validatorConflictError,
 } from '../core/validator/registry';
+import { ARRAY_FIELD_TYPE } from '../plugins/fields/array/array-field.schema';
 import { type PackageVersion, packageVersion } from './package-version';
 
 export const LOCK_VERSION = 5;
@@ -137,25 +138,39 @@ const nodesIn = (fields: unknown[] = []): Record<string, unknown>[] =>
     ];
   });
 
+const templatesOf = (
+  node: Record<string, unknown>
+): Record<string, unknown>[] =>
+  Array.isArray(node.templates) ? node.templates.filter(isRecord) : [];
+
 const assertNoDroppedOptions = (collections: CollectionSchema[]): void => {
   for (const collection of collections) {
     for (const node of nodesIn(collection.fields)) {
-      for (const [option, replacement] of Object.entries(DROPPED_OPTIONS)) {
-        invariant(
-          !(option in node),
-          'schema-dropped-option',
-          `The field "${String(node.name)}" in collection "${collection.name}" sets "${option}", which v4 does not have: ${replacement}.`
-        );
+      const owners = [
+        { kind: 'field', owner: node },
+        ...templatesOf(node).map((owner) => ({ kind: 'template', owner })),
+      ];
+      for (const { kind, owner } of owners) {
+        for (const [option, replacement] of Object.entries(DROPPED_OPTIONS)) {
+          invariant(
+            !(option in owner),
+            'schema-dropped-option',
+            `The ${kind} "${String(owner.name)}" in collection "${collection.name}" sets "${option}", which v4 does not have: ${replacement}.`
+          );
+        }
       }
     }
   }
 };
 
+const isArrayNode = (node: Record<string, unknown>): boolean =>
+  node.type === ARRAY_FIELD_TYPE;
+
 // Each `of` item row would repeat the help text, or show a row with no editor.
 const assertScalarItemsAreVisible = (collections: CollectionSchema[]): void => {
   for (const collection of collections) {
     for (const node of nodesIn(collection.fields)) {
-      if (!isRecord(node.of)) continue;
+      if (!isArrayNode(node) || !isRecord(node.of)) continue;
       for (const option of ['hidden', 'description']) {
         invariant(
           !(option in node.of),
@@ -172,6 +187,7 @@ const PICKERS = ['list', 'grid'];
 const assertTemplatesArrayOptions = (collections: CollectionSchema[]): void => {
   for (const collection of collections) {
     for (const node of nodesIn(collection.fields)) {
+      if (!isArrayNode(node)) continue;
       const where = `The array "${String(node.name)}" in collection "${collection.name}"`;
       if (Array.isArray(node.templates)) {
         invariant(
