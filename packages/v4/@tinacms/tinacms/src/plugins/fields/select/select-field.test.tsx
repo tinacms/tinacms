@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
@@ -230,15 +230,18 @@ describe('SelectField choosing', () => {
     await userEvent.click(await screen.findByLabelText(/^Stage\b/));
     await userEvent.click(await screen.findByRole('option', { name: 'live' }));
     expect(await screen.findByRole('alert')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
   });
 
   it('shows the error right after an invalid pick by keyboard', async () => {
     renderStage();
-    (await screen.findByLabelText(/^Stage\b/)).focus();
+    await screen.findByLabelText(/^Stage\b/);
+    await userEvent.tab();
     await userEvent.keyboard('{ArrowDown}');
     await screen.findByRole('listbox');
     await userEvent.keyboard('{ArrowDown}{ArrowDown}{Enter}');
     expect(await screen.findByRole('alert')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
   });
 });
 

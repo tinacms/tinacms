@@ -127,7 +127,7 @@ collides with the "None" row, which uses `''`. The schema does not forbid it.
 
 - **Disabled:** the Field wrapper fades the whole field once. The trigger does
   not fade again. The list never opens, and there is no hover.
-- **Read-only:** the view sets the Base UI `readOnly` prop and `open={false}`.
+- **Read-only:** the view sets the Base UI `readOnly` prop, which keeps the list shut.
   The trigger has a muted fill, a subtle border and no chevron. The list never
   opens, and there is no hover.
 - **Disabled option:** `SelectFieldViewItem` has optional `disabled` and `hint`.

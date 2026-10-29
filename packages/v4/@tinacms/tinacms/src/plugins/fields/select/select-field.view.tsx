@@ -71,7 +71,6 @@ export function SelectFieldView({
         required={required}
         disabled={disabled}
         readOnly={readOnly}
-        open={readOnly ? false : undefined}
         onValueChange={(next) => onChange?.(next === '' ? null : next)}
       >
         <SelectTrigger
