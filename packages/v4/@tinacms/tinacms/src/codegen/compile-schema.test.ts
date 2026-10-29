@@ -501,3 +501,58 @@ describe('compileSchema dropped v3 options', () => {
     }
   });
 });
+
+describe('compileSchema array options', () => {
+  const plugins = [fieldPlugin('string', 1), fieldPlugin('array', 1)];
+  const blocks = (extra: object): FieldSchema[] => [
+    {
+      name: 'blocks',
+      type: 'array',
+      templates: [
+        {
+          name: 'hero',
+          fields: [],
+          itemLabel: () => 'x',
+          previewImage: 'a.png',
+        },
+      ],
+      ...extra,
+    } as FieldSchema,
+  ];
+
+  it('rejects defaultItem on a templates array', () => {
+    expect(() =>
+      compileSchema(configWith(blocks({ defaultItem: {} }), plugins))
+    ).toThrow(/sets "defaultItem" on the array/);
+  });
+
+  it('rejects an unknown picker, and a picker on an array without templates', () => {
+    expect(() =>
+      compileSchema(configWith(blocks({ picker: 'carousel' }), plugins))
+    ).toThrow(/"picker" takes "list" or "grid"/);
+    expect(() =>
+      compileSchema(
+        configWith(
+          [
+            {
+              name: 'l',
+              type: 'array',
+              picker: 'grid',
+              fields: [],
+            } as FieldSchema,
+          ],
+          plugins
+        )
+      )
+    ).toThrow(/"picker" takes/);
+  });
+
+  it('writes no itemLabel, and no picker when unset, to the lock', () => {
+    const lock = JSON.parse(
+      JSON.stringify(compileSchema(configWith(blocks({}), plugins)))
+    );
+    const [template] = lock.schema.collections[0].fields[0].templates;
+    expect(template).not.toHaveProperty('itemLabel');
+    expect(lock.schema.collections[0].fields[0]).not.toHaveProperty('picker');
+  });
+});

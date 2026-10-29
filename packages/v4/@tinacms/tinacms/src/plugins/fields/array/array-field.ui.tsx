@@ -2,15 +2,11 @@ import { AddButton } from '@tinacms/ui/components/add-button';
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { type ReactNode, useRef } from 'react';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import type { FieldAddress } from '../../../core/field/address';
 import { ingestDocument } from '../../../core/form/ingest';
 import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
-import type {
-  FieldSchema,
-  TemplateSchema,
-  TinaDocument,
-} from '../../../core/schema/types';
+import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
 import {
   NestedFieldRow,
   useDocumentPath,
@@ -21,6 +17,8 @@ import {
   useFieldValue,
 } from '../../../editor';
 import {
+  type ArrayTemplateSchema,
+  type ItemLabel,
   type ObjectArrayFieldSchema,
   type ScalarArrayFieldSchema,
   asArrayFieldSchema,
@@ -80,18 +78,19 @@ function ObjectItems({
     remove,
     move,
   } = useFieldArray({ control, name: address });
+  // Subscribes the headings to edits, so an `itemLabel` follows typing.
+  const watched: unknown = useWatch({ control, name: address });
 
-  const seed = (template: TemplateSchema | undefined, fields: FieldSchema[]) =>
-    ingestDocument(template?.defaultItem ?? {}, fields, {
-      documentPath,
-      registry,
-    });
-  const addFieldsItem = (fields: FieldSchema[]) =>
-    append(seed(undefined, fields));
-  const addTemplateItem = (template: TemplateSchema) =>
+  const seed = (defaultItem: TinaDocument | undefined, fields: FieldSchema[]) =>
+    ingestDocument(defaultItem ?? {}, fields, { documentPath, registry });
+  const addFieldsItem = (
+    fields: FieldSchema[],
+    defaultItem: TinaDocument | undefined
+  ) => append(seed(defaultItem, fields));
+  const addTemplateItem = (template: ArrayTemplateSchema) =>
     append({
       [TEMPLATE_KEY]: template.name,
-      ...seed(template, template.fields),
+      ...seed(template.defaultItem, template.fields),
     });
 
   return (
@@ -103,13 +102,17 @@ function ObjectItems({
       >
         {items.map((item, index) => {
           const stored: unknown = getValues(`${address}.${index}`);
+          // The watched copy only re-renders the heading; it can lag a move.
+          const shown: unknown = Array.isArray(watched)
+            ? watched[index]
+            : stored;
           const fields = isItem(stored)
             ? itemFieldsOf(field, stored)
             : undefined;
           return (
             <ItemRow
               key={item.id}
-              heading={headingOf(field, stored, index)}
+              heading={headingOf(field, shown, index)}
               index={index}
               count={items.length}
               onMove={move}
@@ -148,7 +151,9 @@ function ObjectItems({
             </AddButton>
           ))
         ) : (
-          <AddButton onClick={() => addFieldsItem(field.fields)}>
+          <AddButton
+            onClick={() => addFieldsItem(field.fields, field.defaultItem)}
+          >
             Add item
           </AddButton>
         )}
@@ -162,6 +167,7 @@ function ScalarItems({
   field,
 }: ItemListProps & { field: ScalarArrayFieldSchema }) {
   const registry = useFieldRegistry();
+  const documentPath = useDocumentPath();
   const { getValues } = useFormContext();
   const [value, setValue] = useFieldValue<unknown[] | undefined>(address);
   const items = value ?? [];
@@ -188,10 +194,16 @@ function ScalarItems({
   };
   const addItem = () => {
     keys.current = [...keys.current, nextScalarKey()];
-    setValue([
-      ...liveItems(),
-      registry.get(field.of.type)?.defaultValue ?? null,
-    ]);
+    setValue([...liveItems(), seedScalar()]);
+  };
+  // `defaultItem`, then `of.defaultValue`, then the item type's own default.
+  const seedScalar = (): unknown => {
+    const descriptor = registry.get(field.of.type);
+    const stored = field.defaultItem ?? field.of.defaultValue;
+    if (stored === undefined) return descriptor?.defaultValue ?? null;
+    return descriptor?.parse
+      ? descriptor.parse(stored, field.of, { documentPath, registry })
+      : stored;
   };
 
   return (
@@ -282,8 +294,21 @@ function ItemRow({
   );
 }
 
-const labelOf = (template: TemplateSchema): string =>
+const labelOf = (template: ArrayTemplateSchema): string =>
   template.label ?? template.name;
+
+// A throw or a result that is not a non-empty string is no heading.
+const customHeading = (
+  itemLabel: ItemLabel | undefined,
+  item: TinaDocument
+): string | undefined => {
+  try {
+    const label = itemLabel?.(item);
+    return typeof label === 'string' && label !== '' ? label : undefined;
+  } catch {
+    return undefined;
+  }
+};
 
 const headingOf = (
   field: ObjectArrayFieldSchema,
@@ -291,9 +316,13 @@ const headingOf = (
   index: number
 ): string => {
   if (!isItem(item)) return `Item ${index + 1} is not an object`;
-  if (!isTemplatesArray(field)) return `Item ${index + 1}`;
+  if (!isTemplatesArray(field)) {
+    return customHeading(field.itemLabel, item) ?? `Item ${index + 1}`;
+  }
   const template = templateFor(field.templates, item);
-  if (template) return labelOf(template);
+  if (template) {
+    return customHeading(template.itemLabel, item) ?? labelOf(template);
+  }
   const name = item[TEMPLATE_KEY];
   return name === undefined
     ? 'Block with no template'

@@ -167,9 +167,35 @@ const assertScalarItemsAreVisible = (collections: CollectionSchema[]): void => {
   }
 };
 
+const PICKERS = ['list', 'grid'];
+
+const assertTemplatesArrayOptions = (collections: CollectionSchema[]): void => {
+  for (const collection of collections) {
+    for (const node of nodesIn(collection.fields)) {
+      const where = `The array "${String(node.name)}" in collection "${collection.name}"`;
+      if (Array.isArray(node.templates)) {
+        invariant(
+          !('defaultItem' in node),
+          'schema-templates-default-item',
+          `${where} sets "defaultItem" on the array. Set "defaultItem" on each template instead.`
+        );
+      }
+      if ('picker' in node) {
+        invariant(
+          Array.isArray(node.templates) &&
+            PICKERS.includes(String(node.picker)),
+          'schema-picker-invalid',
+          `${where} sets "picker" to ${JSON.stringify(node.picker)}. "picker" takes ${PICKERS.map((picker) => `"${picker}"`).join(' or ')} and only applies to an array with "templates".`
+        );
+      }
+    }
+  }
+};
+
 export const compileSchema = (config: ResolvedConfig): TinaLock => {
   assertNoDroppedOptions(config.schema.collections);
   assertScalarItemsAreVisible(config.schema.collections);
+  assertTemplatesArrayOptions(config.schema.collections);
   const provisions = fieldProvisionsOf(config.plugins);
   const primitives: Record<string, number> = {};
   for (const type of usedFieldTypes(config.schema.collections).sort()) {

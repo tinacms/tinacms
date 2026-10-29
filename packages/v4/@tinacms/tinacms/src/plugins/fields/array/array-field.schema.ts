@@ -18,14 +18,33 @@ interface ArrayFieldBase extends BaseFieldSchema {
   type: typeof ARRAY_FIELD_TYPE;
 }
 
+/**
+ * Row heading for an item, from the item's form value. Anything but a
+ * non-empty string, or a throw, falls back to the default heading.
+ */
+export type ItemLabel = (item: TinaDocument) => unknown;
+
+/** A template of a templates array. Rich-text embed templates cannot take these. */
+export interface ArrayTemplateSchema extends TemplateSchema {
+  itemLabel?: ItemLabel;
+  /** Media-root-relative path of the image the grid picker shows. */
+  previewImage?: string;
+}
+
 export interface FieldsArrayFieldSchema extends ArrayFieldBase {
   fields: FieldSchema[];
+  /** The starting value of a new item. */
+  defaultItem?: TinaDocument;
+  itemLabel?: ItemLabel;
   templates?: never;
   of?: never;
 }
 
 export interface TemplatesArrayFieldSchema extends ArrayFieldBase {
-  templates: TemplateSchema[];
+  templates: ArrayTemplateSchema[];
+  /** Each template carries its own `defaultItem`. */
+  defaultItem?: never;
+  itemLabel?: never;
   fields?: never;
   of?: never;
 }
@@ -39,6 +58,9 @@ export type ScalarFieldSchema = FieldSchema & {
 
 export interface ScalarArrayFieldSchema extends ArrayFieldBase {
   of: ScalarFieldSchema;
+  /** The starting value of a new item. Wins over `of.defaultValue`. */
+  defaultItem?: string | number | boolean;
+  itemLabel?: never;
   fields?: never;
   templates?: never;
 }

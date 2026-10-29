@@ -4,10 +4,10 @@ import type { FieldSchema, TemplateSchema } from './types';
 // ADR-017 §3: an item of a `templates` position names its template here.
 export const TEMPLATE_KEY = '_template';
 
-export const templateFor = (
-  templates: TemplateSchema[],
+export const templateFor = <T extends TemplateSchema>(
+  templates: T[],
   item: Record<string, unknown>
-): TemplateSchema | undefined =>
+): T | undefined =>
   templates.find((template) => template.name === item[TEMPLATE_KEY]);
 
 export const fieldsOf = (node: FieldSchema): FieldSchema[] | undefined =>
