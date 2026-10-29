@@ -1,3 +1,4 @@
+import { isColour, stringLiteral } from './attribute-values';
 /**
 
 
@@ -141,7 +142,7 @@ const text = (content: { text: string }) => {
 };
 
 const markAttributes = (content: Plate.TextElement) => {
-  if (!content.highlightColor) {
+  if (!content.highlightColor || !isColour(content.highlightColor)) {
     return [];
   }
 
@@ -151,7 +152,7 @@ const markAttributes = (content: Plate.TextElement) => {
       name: 'style',
       value: {
         type: 'mdxJsxAttributeValueExpression' as const,
-        value: `{ backgroundColor: "${content.highlightColor}" }`,
+        value: `{ backgroundColor: ${stringLiteral(content.highlightColor)} }`,
       },
     },
   ];

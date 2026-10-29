@@ -1,5 +1,12 @@
 import type { TinaField } from '@tinacms/schema-tools';
-import type { ExpressionStatement, ObjectExpression, Property } from 'estree';
+import type {
+  Expression,
+  ExpressionStatement,
+  ObjectExpression,
+  Pattern,
+  Property,
+  SpreadElement,
+} from 'estree';
 import type {
   MdxJsxAttribute,
   MdxJsxAttributeValueExpression,
@@ -109,12 +116,10 @@ const extractScalar = <
     assertType(attribute.expression, 'ArrayExpression');
     return attribute.expression.elements.map((element) => {
       assertHasType(element);
-      assertType(element, 'Literal');
-      return element.value;
+      return extractLiteral(element);
     });
   } else {
-    assertType(attribute.expression, 'Literal');
-    return attribute.expression.value;
+    return extractLiteral(attribute.expression);
   }
 };
 
@@ -191,8 +196,7 @@ const extractKeyValue = (
     assertType(property.value, 'ArrayExpression');
     const value = property.value.elements.map((element) => {
       assertHasType(element);
-      assertType(element, 'Literal');
-      return element.value;
+      return extractLiteral(element);
     });
     return { key, value };
   } else if (field?.type === 'rich-text') {
@@ -203,9 +207,21 @@ const extractKeyValue = (
     }
     throw new Error(`Unable to parse rich-text`);
   } else {
-    assertType(property.value, 'Literal');
-    return { key, value: property.value.value };
+    return { key, value: extractLiteral(property.value) };
   }
+};
+
+const extractLiteral = (node: Expression | SpreadElement | Pattern) => {
+  if (
+    node.type === 'UnaryExpression' &&
+    node.operator === '-' &&
+    node.argument.type === 'Literal' &&
+    typeof node.argument.value === 'number'
+  ) {
+    return -node.argument.value;
+  }
+  assertType(node, 'Literal');
+  return node.value;
 };
 
 const extractStatement = (
