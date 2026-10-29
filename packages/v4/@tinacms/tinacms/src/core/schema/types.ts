@@ -34,15 +34,8 @@ export interface HookRef {
 export interface BaseFieldSchema {
   name: string;
   label?: string;
-  /** Help text under the field label. */
   description?: string;
-  /**
-   * The stored-form value a document that lacks this key starts with. It wins
-   * over the plugin's own default and runs through the plugin's `parse`. It
-   * fills an absent key only; a cleared field is saved as `null` and stays empty.
-   */
   defaultValue?: Exclude<JsonValue, null>;
-  /** Renders no label, description or editor. The stored value is kept. */
   hidden?: boolean;
   validators?: ValidatorRef[];
 }
