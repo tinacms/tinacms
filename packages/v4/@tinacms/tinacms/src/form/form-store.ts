@@ -10,7 +10,13 @@ import {
 } from '../core/form/compare';
 import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
-import { type StoredDraft, readDraft, removeDraft, writeDraft } from './drafts';
+import {
+  type DraftUserScope,
+  readDraft,
+  removeDraft,
+  type StoredDraft,
+  writeDraft,
+} from './drafts';
 
 export type FormId = Brand<string, 'FormId'>;
 
@@ -59,8 +65,10 @@ export const isEdited = (
   scope?.status === 'edited';
 
 export interface FormStore {
+  userId: DraftUserScope;
   forms: Partial<Record<FormId, OpenForm>>;
   active: { formId: FormId; address: FieldAddress } | null;
+  setUserId: (userId: DraftUserScope) => void;
   registerForm: (
     formId: FormId,
     values: FormValues,
@@ -125,10 +133,11 @@ const openingScope = (
   scope: OpenForm | undefined,
   formId: FormId,
   incoming: FormValues,
-  equal: FieldEquality
+  equal: FieldEquality,
+  userId: DraftUserScope
 ): EditedForm | undefined => {
   if (keepsValues(scope, incoming)) return scope;
-  const draft = readDraft(formId);
+  const draft = readDraft(formId, userId);
   if (!draft) return undefined;
   const baseline = toFormValues(draft.baseline);
   if (!valuesEqual(baseline, incoming, equal)) return undefined;
@@ -154,6 +163,7 @@ const errorsEqual = (current: FieldErrors, next: FieldErrors): boolean =>
 
 const DEVTOOLS_STORE_NAME = 'TinaFormStore';
 const DEVTOOLS_ACTION = {
+  setUserId: 'form/setUserId',
   register: 'form/register',
   setFieldValue: 'form/setFieldValue',
   setFieldErrors: 'form/setFieldErrors',
@@ -175,13 +185,26 @@ export const useFormStore = create<FormStore>()(
       ) => set(patch, false, action);
 
       return {
+        userId: undefined,
         forms: {},
         active: null,
+
+        setUserId: (userId) =>
+          apply((state) => {
+            if (state.userId === userId) return state;
+            return { userId, forms: {}, active: null };
+          }, DEVTOOLS_ACTION.setUserId),
 
         registerForm: (formId, values, equal = STRUCTURAL_EQUALITY) =>
           apply((state) => {
             const scope = state.forms[formId];
-            const opening = openingScope(scope, formId, values, equal);
+            const opening = openingScope(
+              scope,
+              formId,
+              values,
+              equal,
+              state.userId
+            );
             if (opening) {
               if (opening === scope) return state;
               return { forms: { ...state.forms, [formId]: opening } };
@@ -324,8 +347,10 @@ export const readOpeningScope = (
   formId: FormId,
   incoming: FormValues,
   equal: FieldEquality = STRUCTURAL_EQUALITY
-): EditedForm | undefined =>
-  openingScope(readFormStore().forms[formId], formId, incoming, equal);
+): EditedForm | undefined => {
+  const { forms, userId } = readFormStore();
+  return openingScope(forms[formId], formId, incoming, equal, userId);
+};
 
 // A stored draft the form did not open on because its document changed since.
 export const staleDraft = (
@@ -334,7 +359,7 @@ export const staleDraft = (
   equal: FieldEquality = STRUCTURAL_EQUALITY
 ): StoredDraft | undefined => {
   if (readOpeningScope(formId, incoming, equal)) return undefined;
-  return readDraft(formId);
+  return readDraft(formId, readFormStore().userId);
 };
 
 // Mirrors this tab's edits into storage. Only forms whose scope changed in an
@@ -343,17 +368,22 @@ export const staleDraft = (
 // merely leaves memory keeps it.
 export const syncDrafts = () =>
   useFormStore.subscribe((next, prev) => {
+    if (next.userId !== prev.userId || next.userId === null) return;
     for (const formId of Object.keys(next.forms) as FormId[]) {
       const scope = next.forms[formId];
       const before = prev.forms[formId];
       if (scope === before) continue;
       if (isEdited(scope) && formStatus(scope) === 'dirty') {
-        writeDraft(formId, {
-          values: toDocument(scope.values),
-          baseline: toDocument(scope.baseline),
-        });
+        writeDraft(
+          formId,
+          {
+            values: toDocument(scope.values),
+            baseline: toDocument(scope.baseline),
+          },
+          next.userId
+        );
       } else if (formStatus(before) === 'dirty') {
-        removeDraft(formId);
+        removeDraft(formId, next.userId);
       }
     }
   });

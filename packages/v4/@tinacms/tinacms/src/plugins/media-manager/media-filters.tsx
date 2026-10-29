@@ -1,5 +1,3 @@
-import { Button } from '@tinacms/ui/components/button';
-import { Input } from '@tinacms/ui/components/input';
 import {
   Select,
   SelectContent,
@@ -7,20 +5,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@tinacms/ui/components/select';
+import { SearchBox } from '@tinacms/ui/components/search-box';
+import {
+  Segmented,
+  type SegmentedOption,
+} from '@tinacms/ui/components/segmented';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@tinacms/ui/components/tooltip';
-import { cn } from '@tinacms/ui/lib/utils';
 import {
   FileIcon,
   FolderIcon,
   LayoutGridIcon,
   ListIcon,
   LockIcon,
-  SearchIcon,
-  XIcon,
 } from 'lucide-react';
 import {
   MEDIA_CATEGORY_LABELS,
@@ -34,11 +34,10 @@ import {
   acceptEntryLabel,
 } from './media-types';
 
-const segmentClass = (active: boolean) =>
-  cn(
-    'rounded-none border-0 first:rounded-l-lg last:rounded-r-lg [&:not(:first-child)]:border-l',
-    active ? 'bg-background text-primary' : 'bg-muted/50 text-muted-foreground'
-  );
+const VIEW_MODE_OPTIONS = [
+  { value: 'grid', label: 'Grid view', icon: LayoutGridIcon, iconOnly: true },
+  { value: 'list', label: 'List view', icon: ListIcon, iconOnly: true },
+] as const satisfies readonly SegmentedOption<MediaViewMode>[];
 
 export function ViewModeToggle({
   value,
@@ -48,32 +47,22 @@ export function ViewModeToggle({
   onChange: (value: MediaViewMode) => void;
 }) {
   return (
-    <div role='group' aria-label='View' className='flex rounded-lg border'>
-      <Button
-        type='button'
-        variant='ghost'
-        size='icon'
-        aria-label='Grid view'
-        aria-pressed={value === 'grid'}
-        className={segmentClass(value === 'grid')}
-        onClick={() => onChange('grid')}
-      >
-        <LayoutGridIcon className='size-4' />
-      </Button>
-      <Button
-        type='button'
-        variant='ghost'
-        size='icon'
-        aria-label='List view'
-        aria-pressed={value === 'list'}
-        className={segmentClass(value === 'list')}
-        onClick={() => onChange('list')}
-      >
-        <ListIcon className='size-4' />
-      </Button>
-    </div>
+    <Segmented
+      aria-label='View'
+      size='sm'
+      options={VIEW_MODE_OPTIONS}
+      value={value}
+      onValueChange={onChange}
+    />
   );
 }
+
+const KIND_ICONS = { all: undefined, folders: FolderIcon, files: FileIcon };
+
+const KIND_OPTIONS = MEDIA_KIND_OPTIONS.map((option) => ({
+  ...option,
+  icon: KIND_ICONS[option.value],
+}));
 
 export function MediaKindToggle({
   value,
@@ -83,25 +72,13 @@ export function MediaKindToggle({
   onChange: (value: MediaKindFilter) => void;
 }) {
   return (
-    <div role='group' aria-label='Show' className='flex rounded-lg border'>
-      {MEDIA_KIND_OPTIONS.map((option) => (
-        <Button
-          key={option.value}
-          type='button'
-          variant='ghost'
-          aria-pressed={value === option.value}
-          className={segmentClass(value === option.value)}
-          onClick={() => onChange(option.value)}
-        >
-          {option.value === 'folders' ? (
-            <FolderIcon className='size-4' />
-          ) : option.value === 'files' ? (
-            <FileIcon className='size-4' />
-          ) : null}
-          {option.label}
-        </Button>
-      ))}
-    </div>
+    <Segmented
+      aria-label='Show'
+      size='sm'
+      options={KIND_OPTIONS}
+      value={value}
+      onValueChange={onChange}
+    />
   );
 }
 
@@ -113,29 +90,14 @@ export function MediaSearchInput({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className='relative flex max-w-md min-w-50 flex-1 items-center'>
-      <SearchIcon className='pointer-events-none absolute left-2.5 size-4 text-muted-foreground' />
-      <Input
-        type='search'
-        value={value}
-        aria-label='Search media library'
-        placeholder='Search this library...'
-        className='pr-8 pl-8'
-        onChange={(event) => onChange(event.target.value)}
-      />
-      {value ? (
-        <Button
-          type='button'
-          variant='ghost'
-          size='icon-xs'
-          aria-label='Clear search'
-          className='absolute right-1.5'
-          onClick={() => onChange('')}
-        >
-          <XIcon className='size-3' />
-        </Button>
-      ) : null}
-    </div>
+    <SearchBox
+      label='Search media library'
+      placeholder='Search this library...'
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      onClear={() => onChange('')}
+      className='max-w-md min-w-50 flex-1'
+    />
   );
 }
 
@@ -167,7 +129,11 @@ export function MediaTypeFilter({
     >
       <SelectTrigger
         aria-label='File type'
-        className={value === 'all' ? undefined : 'border-primary text-primary'}
+        className={
+          value === 'all'
+            ? undefined
+            : 'border-primary text-primary hover:border-primary data-popup-open:border-primary'
+        }
       >
         <SelectValue />
       </SelectTrigger>
@@ -198,7 +164,7 @@ export function LockedAcceptChip({
     <Tooltip>
       <TooltipTrigger
         render={<span />}
-        className='flex items-center gap-1.5 rounded-lg border border-dashed bg-muted px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground'
+        className='flex items-center gap-1.5 rounded-sm border border-dashed bg-muted px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground'
       >
         <LockIcon className='size-3.5' />
         {label}

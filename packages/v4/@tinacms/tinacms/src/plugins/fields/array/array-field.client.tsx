@@ -43,6 +43,9 @@ const describeKeptItem = (
     : `an item with the unknown template "${String(item[TEMPLATE_KEY])}"`;
 };
 
+const isEmptyList = (value: unknown) =>
+  value == null || (Array.isArray(value) && value.length === 0);
+
 const warnKeptItems = (field: ObjectArrayFieldSchema, items: unknown[]) => {
   for (const item of items) {
     const problem = describeKeptItem(field, item);
@@ -90,6 +93,7 @@ export default defineClientPlugin({
         digestDocument(item, fields, context)
       );
     },
+    isEqual: (a, b) => isEmptyList(a) && isEmptyList(b),
     validateChildren: (value: unknown, node, address, registry, scope) => {
       const field = asArrayFieldSchema(node);
       if (!Array.isArray(value)) return {};

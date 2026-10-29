@@ -15,7 +15,7 @@ import {
   tinaCloud,
 } from '@tinacms/tinacms';
 import { helpNavPlugin } from './help-nav';
-import { hooksPlugin, logSave, trimTitle } from './hooks';
+import { hooksPlugin, logSave, slug, trimTitle } from './hooks';
 import { rating, ratingFieldPlugin } from './rating-field';
 import {
   differentFrom,
@@ -24,12 +24,17 @@ import {
   validatorsPlugin,
 } from './validators';
 
+const tinaCloudClientId: string | undefined = import.meta.env
+  .TINA_PUBLIC_CLIENT_ID;
+
+const isLocal = !tinaCloudClientId;
+
 export const postCollection = {
   name: 'post',
   label: 'Posts',
   path: 'content/posts',
   format: 'mdx',
-  hooks: [trimTitle(), logSave('saved')],
+  hooks: [trimTitle(), ...(isLocal ? [slug()] : []), logSave('saved')],
   fields: [
     t.string({
       name: 'title',
@@ -39,6 +44,7 @@ export const postCollection = {
         matches('^[A-Z]', 'Start with a capital letter'),
       ],
     }),
+    t.string({ name: 'slug', label: 'Slug' }),
     t.boolean({ name: 'featured', label: 'Featured' }),
     t.image({ name: 'heroImage', label: 'Hero image' }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
@@ -134,15 +140,11 @@ export const pageCollection = {
   ],
 } satisfies CollectionSchema;
 
-const tinaCloudClientId: string | undefined = import.meta.env
-  .TINA_PUBLIC_CLIENT_ID;
-
 export default defineConfig({
   plugins: [
-    localContentPlugin(),
-    tinaCloudClientId
-      ? tinaCloud({ clientId: tinaCloudClientId })
-      : localMediaPlugin(),
+    ...(isLocal
+      ? [localContentPlugin(), localMediaPlugin()]
+      : [tinaCloud({ clientId: tinaCloudClientId })]),
     mediaManagerPlugin(),
     ratingFieldPlugin,
     validatorsPlugin,

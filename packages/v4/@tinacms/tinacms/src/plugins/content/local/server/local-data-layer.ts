@@ -1,9 +1,10 @@
 import type { Dirent } from 'node:fs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import type {
-  ContentProvider,
-  DocumentSummary,
+import {
+  type ContentProvider,
+  ContentWriteError,
+  type DocumentSummary,
 } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
 import type { CollectionSchema } from '../../../../core/schema/types';
@@ -33,6 +34,8 @@ export interface LocalDataLayerOptions {
 }
 
 export interface LocalDataLayer extends ContentProvider {
+  // The repo-relative path a save of `documentPath` in `collection` writes to.
+  canonicalPath(collection: string, documentPath: string): Promise<string>;
   graphql(query: string, variables?: GraphQLVariables): Promise<GraphQLResult>;
   close(): Promise<void>;
 }
@@ -72,6 +75,23 @@ const resolveCollections = ({
     });
   }
   return resolved;
+};
+
+const FILE_SYSTEM_REASONS: Record<string, string> = {
+  EACCES: 'permission denied',
+  EPERM: 'permission denied',
+  EROFS: 'the file system is read-only',
+  ENOSPC: 'the disk is full',
+  EISDIR: 'a folder has that name',
+  ENOTDIR: 'a parent of the file is not a folder',
+};
+
+const fileSystemReasonOf = (cause: unknown): string => {
+  if (cause instanceof Error && 'code' in cause) {
+    const reason = FILE_SYSTEM_REASONS[String(cause.code)];
+    if (reason) return reason;
+  }
+  return 'the file system refused the write';
 };
 
 const isUnparsable = (
@@ -121,7 +141,12 @@ export const createLocalDataLayer = (
   const resolveDocumentPath = async (
     collection: ResolvedCollection,
     documentPath: string
-  ): Promise<{ absolute: string; adapter: FormatAdapter }> => {
+  ): Promise<{
+    absolute: string;
+    realAbsolute: string;
+    realFolder: string;
+    adapter: FormatAdapter;
+  }> => {
     invariant(
       !documentPath.includes('\0'),
       'content-path-null-byte',
@@ -132,37 +157,81 @@ export const createLocalDataLayer = (
       realPathOf(collection.absoluteFolder),
       realPathOf(absolute),
     ]);
-    invariant(
-      absolute.startsWith(collection.absoluteFolder + path.sep) &&
-        realAbsolute.startsWith(realFolder + path.sep),
-      'content-path-outside-collection',
-      `Path "${documentPath}" is outside collection "${collection.schema.name}".`
-    );
+    if (
+      !absolute.startsWith(collection.absoluteFolder + path.sep) ||
+      !realAbsolute.startsWith(realFolder + path.sep)
+    ) {
+      throw new ContentWriteError(
+        `Path "${documentPath}" is outside collection "${collection.schema.name}".`
+      );
+    }
     const adapter = adapterForPath(collection.adapters, absolute);
-    invariant(
-      adapter,
-      'content-path-unknown-format',
-      `Path "${documentPath}" is not a ${collection.adapters
-        .map((each) => each.extension)
-        .join(' or ')} file in collection "${collection.schema.name}".`
+    if (!adapter) {
+      throw new ContentWriteError(
+        `Path "${documentPath}" is not a ${collection.adapters
+          .map((each) => each.extension)
+          .join(' or ')} file in collection "${collection.schema.name}".`
+      );
+    }
+    return { absolute, realAbsolute, realFolder, adapter };
+  };
+
+  // Collection folders can nest and can share a folder across formats, so a
+  // file belongs to the deepest folder whose collection reads its format.
+  const ownerOf = async (
+    realAbsolute: string
+  ): Promise<ResolvedCollection | undefined> => {
+    const folders = await Promise.all(
+      [...collections.values()].map(async (candidate) => ({
+        candidate,
+        realFolder: await realPathOf(candidate.absoluteFolder),
+      }))
     );
-    return { absolute, adapter };
+    return folders
+      .filter(
+        ({ candidate, realFolder }) =>
+          realAbsolute.startsWith(realFolder + path.sep) &&
+          adapterForPath(candidate.adapters, realAbsolute)
+      )
+      .sort((a, b) => b.realFolder.length - a.realFolder.length)[0]?.candidate;
   };
 
   const documentIdFor = (absolute: string): string =>
     path.relative(rootDir, absolute).split(path.sep).join('/');
 
+  const resolveOwnedPath = async (
+    collection: ResolvedCollection,
+    documentPath: string
+  ) => {
+    const resolved = await resolveDocumentPath(collection, documentPath);
+    // The real file, named under the folder the collection configures, so a
+    // linked collection folder keeps its configured name.
+    const canonicalPath = documentIdFor(
+      path.join(
+        collection.absoluteFolder,
+        path.relative(resolved.realFolder, resolved.realAbsolute)
+      )
+    );
+    const owner = await ownerOf(resolved.realAbsolute);
+    if (owner !== collection) {
+      throw new ContentWriteError(
+        `Cannot save "${canonicalPath}" in collection "${collection.schema.name}": the file belongs to collection "${owner?.schema.name}".`
+      );
+    }
+    return { ...resolved, canonicalPath };
+  };
+
   const savesByPath = new Map<string, Promise<unknown>>();
   const afterPendingSaves = <T>(
-    canonicalPath: string,
+    realAbsolute: string,
     save: () => Promise<T>
   ): Promise<T> => {
-    const pending = savesByPath.get(canonicalPath) ?? Promise.resolve();
+    const pending = savesByPath.get(realAbsolute) ?? Promise.resolve();
     const run = pending.catch(() => {}).then(save);
-    savesByPath.set(canonicalPath, run);
+    savesByPath.set(realAbsolute, run);
     const forget = () => {
-      if (savesByPath.get(canonicalPath) === run) {
-        savesByPath.delete(canonicalPath);
+      if (savesByPath.get(realAbsolute) === run) {
+        savesByPath.delete(realAbsolute);
       }
     };
     run.then(forget, forget);
@@ -170,6 +239,12 @@ export const createLocalDataLayer = (
   };
 
   return {
+    async canonicalPath(collectionName, documentPath) {
+      return (
+        await resolveOwnedPath(collectionFor(collectionName), documentPath)
+      ).canonicalPath;
+    },
+
     async get(collectionName, documentPath) {
       const collection = collectionFor(collectionName);
       const { absolute, adapter } = await resolveDocumentPath(
@@ -211,8 +286,9 @@ export const createLocalDataLayer = (
       const summaries: DocumentSummary[] = [];
       for (const absolute of files) {
         if (!adapterForPath(collection.adapters, absolute)) continue;
+        let realAbsolute: string;
         try {
-          await resolveDocumentPath(collection, absolute);
+          ({ realAbsolute } = await resolveDocumentPath(collection, absolute));
         } catch (cause) {
           console.warn(
             `Skipping document "${absolute}": it does not resolve inside collection "${collection.schema.name}".`,
@@ -220,6 +296,7 @@ export const createLocalDataLayer = (
           );
           continue;
         }
+        if ((await ownerOf(realAbsolute)) !== collection) continue;
         summaries.push({ path: documentIdFor(absolute) });
       }
       return summaries;
@@ -227,17 +304,20 @@ export const createLocalDataLayer = (
 
     async update(collectionName, documentPath, value) {
       const collection = collectionFor(collectionName);
-      const { absolute, adapter } = await resolveDocumentPath(
+      const { realAbsolute, adapter, canonicalPath } = await resolveOwnedPath(
         collection,
         documentPath
       );
-      const canonicalPath = documentIdFor(absolute);
-      return afterPendingSaves(canonicalPath, async () => {
+      const refusedWrite = (cause: unknown) =>
+        new ContentWriteError(
+          `Cannot save "${canonicalPath}": ${fileSystemReasonOf(cause)}.`
+        );
+      return afterPendingSaves(realAbsolute, async () => {
         let previousRaw: string | undefined;
         try {
-          previousRaw = await fs.readFile(absolute, 'utf8');
+          previousRaw = await fs.readFile(realAbsolute, 'utf8');
         } catch (cause) {
-          if (!isMissingFileError(cause)) throw cause;
+          if (!isMissingFileError(cause)) throw refusedWrite(cause);
         }
         let raw: string;
         try {
@@ -254,14 +334,18 @@ export const createLocalDataLayer = (
           } else {
             reason = String(cause);
           }
-          throw new Error(
+          throw new ContentWriteError(
             isUnparsable(adapter, previousRaw, collection.bodyField)
               ? `Cannot save "${canonicalPath}": the contents of the file on disk could not be parsed (${reason}). Repair the file, then save again.`
               : `Cannot save "${canonicalPath}": ${reason}`
           );
         }
-        await fs.mkdir(path.dirname(absolute), { recursive: true });
-        await fs.writeFile(absolute, raw);
+        try {
+          await fs.mkdir(path.dirname(realAbsolute), { recursive: true });
+          await fs.writeFile(realAbsolute, raw);
+        } catch (cause) {
+          throw refusedWrite(cause);
+        }
         if (pipeline) {
           try {
             const readyPipeline = await pipeline;

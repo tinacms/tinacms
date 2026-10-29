@@ -2,7 +2,7 @@
   "name": "tinacms",
   "type": "module",
   "typings": "dist/index.d.ts",
-  "version": "3.14.4",
+  "version": "3.15.0",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "exports": {
@@ -145,8 +145,8 @@
     "tsc-alias": "catalog:",
     "tslib": "catalog:",
     "typescript": "^5.7.3",
-    "vite": "^5.4.14",
-    "vitest": "^2.1.9"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "react": ">=16.14.0",

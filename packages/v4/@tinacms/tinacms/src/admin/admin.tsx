@@ -14,12 +14,15 @@ import {
   SidebarTrigger,
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
+import { Toaster } from '@tinacms/ui/components/sonner';
+import tinaLogo from '@tinacms/ui/assets/tinacms-logo.svg';
 import {
   type CSSProperties,
   type ReactNode,
   startTransition,
   use,
   useEffect,
+  useId,
   useRef,
   useState,
 } from 'react';
@@ -27,7 +30,11 @@ import { HashRouter } from 'react-router-dom';
 import type { ResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
-import type { GlobalNavEntry, NavTarget } from '../core/slot/contract';
+import type {
+  GlobalNavEntry,
+  GlobalNavSection,
+  NavTarget,
+} from '../core/slot/contract';
 import { useCollectionDocuments, useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
@@ -132,14 +139,18 @@ function DocumentMenu({
   );
 }
 
-function GlobalNav({
+function GlobalNavMenu({
   entries,
   activeScreen,
   navigate,
+  label,
+  labelledBy,
 }: {
   entries: GlobalNavEntry[];
   activeScreen?: string;
   navigate: (route: AdminRoute) => void;
+  label?: string;
+  labelledBy?: string;
 }) {
   const open = (target: NavTarget) => {
     if (target.kind === 'screen') {
@@ -149,7 +160,7 @@ function GlobalNav({
     }
   };
   return (
-    <SidebarMenu aria-label='Global navigation'>
+    <SidebarMenu aria-label={label} aria-labelledby={labelledBy}>
       {entries.map(({ label, icon: Icon, target }, index) => (
         <SidebarMenuItem key={`${index}:${label}`}>
           <SidebarMenuButton
@@ -174,6 +185,36 @@ function GlobalNav({
       ))}
     </SidebarMenu>
   );
+}
+
+function GlobalNav({
+  sections,
+  activeScreen,
+  navigate,
+}: {
+  sections: GlobalNavSection[];
+  activeScreen?: string;
+  navigate: (route: AdminRoute) => void;
+}) {
+  const labelPrefix = useId();
+  const firstUngrouped = sections.findIndex(({ group }) => !group);
+  return sections.map(({ group, entries }, index) => {
+    const labelId = group ? `${labelPrefix}-${index}` : undefined;
+    return (
+      <SidebarGroup key={group ? `group:${group.id}` : `entries:${index}`}>
+        {group ? (
+          <SidebarGroupLabel id={labelId}>{group.label}</SidebarGroupLabel>
+        ) : null}
+        <GlobalNavMenu
+          entries={entries}
+          activeScreen={activeScreen}
+          navigate={navigate}
+          label={index === firstUngrouped ? 'Global navigation' : undefined}
+          labelledBy={labelId}
+        />
+      </SidebarGroup>
+    );
+  });
 }
 
 function ScreenOutlet({
@@ -225,10 +266,10 @@ function PreviewSlot({ preview }: { preview?: ReactNode }) {
 function FormColumnSkeleton() {
   return (
     <div role='status' aria-label='Loading document' className='space-y-4'>
-      <Skeleton className='h-5 w-2/3' />
-      <Skeleton className='h-8 w-full' />
-      <Skeleton className='h-5 w-1/3' />
-      <Skeleton className='h-40 w-full' />
+      <Skeleton className='w-2/3' />
+      <Skeleton shape='block' className='h-8' />
+      <Skeleton className='w-1/3' />
+      <Skeleton shape='block' className='h-40' />
     </div>
   );
 }
@@ -295,6 +336,7 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
             <AdminShell preview={preview} />
           </AuthGate>
         </HashRouter>
+        <Toaster />
       </TinaProvider>
     </AdminErrorBoundary>
   );
@@ -340,9 +382,7 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton onClick={() => navigate(COLLECTIONS_ROUTE)}>
-                <span className='text-xs font-semibold tracking-wide uppercase'>
-                  TinaCMS
-                </span>
+                <img src={tinaLogo} alt='TinaCMS' className='h-5 w-auto' />
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -377,15 +417,11 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
             </SidebarGroup>
           ) : null}
 
-          {globalNav.length > 0 ? (
-            <SidebarGroup>
-              <GlobalNav
-                entries={globalNav}
-                activeScreen={activeScreen?.screen}
-                navigate={navigate}
-              />
-            </SidebarGroup>
-          ) : null}
+          <GlobalNav
+            sections={globalNav}
+            activeScreen={activeScreen?.screen}
+            navigate={navigate}
+          />
         </SidebarContent>
 
         <SidebarFooter>

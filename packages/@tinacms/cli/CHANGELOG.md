@@ -1,5 +1,34 @@
 # tinacms-cli
 
+## 4.0.4
+
+### Patch Changes
+
+- [#7145](https://github.com/tinacms/tinacms/pull/7145) [`46f5bab`](https://github.com/tinacms/tinacms/commit/46f5babc3bcb23a0390247dfd8b715661e8c814a) Thanks [@kulesy](https://github.com/kulesy)! - `tinacms build --partial-reindex` now clears every index entry for deleted documents, including entries left over from an earlier value. Self-hosted sites that build this way no longer hit "Error querying file" on a collection sorted by a field that changed before the document was deleted.
+
+- Updated dependencies [[`46f5bab`](https://github.com/tinacms/tinacms/commit/46f5babc3bcb23a0390247dfd8b715661e8c814a), [`2811d2c`](https://github.com/tinacms/tinacms/commit/2811d2c4d353a5ff45a12862b3cd4170d7119fd3)]:
+  - @tinacms/graphql@4.1.0
+
+## 4.0.3
+
+### Patch Changes
+
+- [#7782](https://github.com/tinacms/tinacms/pull/7782) [`dc74885`](https://github.com/tinacms/tinacms/commit/dc7488576604c019bb3284401a7088777dcfbe90) Thanks [@kulesy](https://github.com/kulesy)! - Bump `js-yaml` to `^4.3.2` in `@tinacms/cli` and `^3.15.2` in `@tinacms/graphql`, which fixes a high-severity advisory in each.
+
+- [#7741](https://github.com/tinacms/tinacms/pull/7741) [`c89dfca`](https://github.com/tinacms/tinacms/commit/c89dfca256247c0fb3512fedcc4132c32cc96684) Thanks [@haigou-web](https://github.com/haigou-web)! - Return plain objects from the self-hosted database client
+
+  `graphql-js` builds its result objects with a `null` prototype. React Server
+  Components reject those when they cross the server/client boundary ("Only plain
+  objects can be passed to Client Components"), so self-hosted queries failed in
+  the Next.js App Router. The generated `databaseRequest()` now normalises the
+  result before returning it.
+
+- Updated dependencies [[`53ae895`](https://github.com/tinacms/tinacms/commit/53ae8954de8668e5eeb92d817bfbf12bf39cb17d), [`dc74885`](https://github.com/tinacms/tinacms/commit/dc7488576604c019bb3284401a7088777dcfbe90), [`787c7a9`](https://github.com/tinacms/tinacms/commit/787c7a9daf7740dbfb148d25a74367948bcbaade), [`e627dc9`](https://github.com/tinacms/tinacms/commit/e627dc9c20b59d851b59a36c015f8232359448c0), [`034e88f`](https://github.com/tinacms/tinacms/commit/034e88ff9fb8035b1443397b5d981313a44fa30f), [`d828a9e`](https://github.com/tinacms/tinacms/commit/d828a9efdd40c0c554df5adc4d635e5818f96598), [`5750d3b`](https://github.com/tinacms/tinacms/commit/5750d3bc84c18d4fb6332aa5a499d33fca973b0f), [`abb7c15`](https://github.com/tinacms/tinacms/commit/abb7c153b2db6cd9bf42da6ddfaa5d2b08029861)]:
+  - tinacms@3.15.0
+  - @tinacms/graphql@4.0.1
+  - @tinacms/app@2.6.0
+  - @tinacms/schema-tools@2.11.0
+
 ## 4.0.2
 
 ### Patch Changes
