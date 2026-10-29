@@ -588,8 +588,8 @@ export const makeFilterSuffixes = (
     let leftSuffix;
     let ternaryFilter = false;
     if (
-      orderedFilterChain[filterChain.length - 1] &&
-      !orderedFilterChain[filterChain.length - 1].operator
+      orderedFilterChain[orderedFilterChain.length - 1] &&
+      !orderedFilterChain[orderedFilterChain.length - 1].operator
     ) {
       ternaryFilter = true;
     }
@@ -600,7 +600,7 @@ export const makeFilterSuffixes = (
         return;
       }
 
-      if (Number(i) < indexFields.length - 1) {
+      if (Number(i) < orderedFilterChain.length - 1) {
         if (!(filter as BinaryFilter).operator) {
           // Lower order fields can not use TernaryFilter
           return;
@@ -619,29 +619,46 @@ export const makeFilterSuffixes = (
           )
         );
       } else {
-        if (ternaryFilter) {
-          leftSuffix = applyPadding(
-            orderedFilterChain[i].leftOperand,
-            orderedFilterChain[i].pad
-          );
-          rightSuffix = applyPadding(
-            orderedFilterChain[i].rightOperand,
-            orderedFilterChain[i].pad
-          );
-        } else {
-          const op = orderedFilterChain[i].operator;
+        const isPartialIndex = orderedFilterChain.length < indexFields.length;
+        if (isPartialIndex) {
+          if (ternaryFilter) {
+            return;
+          }
+          const op = (filter as BinaryFilter).operator;
+          if (op !== OP.EQ && op !== OP.STARTS_WITH) {
+            return;
+          }
           const operand = applyPadding(
             orderedFilterChain[i].rightOperand,
             orderedFilterChain[i].pad
           );
-          if (op === OP.LT || op === OP.LTE) {
-            rightSuffix = operand;
-          } else if (op === OP.GT || op === OP.GTE) {
-            leftSuffix = operand;
+          rightSuffix = operand;
+          leftSuffix = operand;
+        } else {
+          if (ternaryFilter) {
+            leftSuffix = applyPadding(
+              orderedFilterChain[i].leftOperand,
+              orderedFilterChain[i].pad
+            );
+            rightSuffix = applyPadding(
+              orderedFilterChain[i].rightOperand,
+              orderedFilterChain[i].pad
+            );
           } else {
-            // STARTS_WITH or EQ
-            rightSuffix = operand;
-            leftSuffix = operand;
+            const op = orderedFilterChain[i].operator;
+            const operand = applyPadding(
+              orderedFilterChain[i].rightOperand,
+              orderedFilterChain[i].pad
+            );
+            if (op === OP.LT || op === OP.LTE) {
+              rightSuffix = operand;
+            } else if (op === OP.GT || op === OP.GTE) {
+              leftSuffix = operand;
+            } else {
+              // STARTS_WITH or EQ
+              rightSuffix = operand;
+              leftSuffix = operand;
+            }
           }
         }
       }

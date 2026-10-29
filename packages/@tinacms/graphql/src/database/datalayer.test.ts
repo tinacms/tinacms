@@ -582,6 +582,49 @@ describe('makeFilterSuffixes', () => {
       );
       expect(result).toBeUndefined();
     });
+
+    it('builds key range when EQ filter covers leading field of two-field index', () => {
+      const result = makeFilterSuffixes(
+        [binary('category', 'string', OP.EQ, 'tech')],
+        twoFieldIdx
+      );
+      expect(result).toEqual({ left: 'tech', right: 'tech' });
+    });
+
+    it('builds key range when STARTS_WITH filter covers leading field of two-field index', () => {
+      const result = makeFilterSuffixes(
+        [binary('category', 'string', OP.STARTS_WITH, 'te')],
+        twoFieldIdx
+      );
+      expect(result).toEqual({ left: 'te', right: 'te' });
+    });
+
+    it('returns undefined when leading field of two-field index uses non-prefix operator', () => {
+      const result = makeFilterSuffixes(
+        [binary('category', 'string', OP.GT, 'tech')],
+        twoFieldIdx
+      );
+      expect(result).toBeUndefined();
+    });
+
+    it('builds key range when EQ filters cover leading fields of three-field index', () => {
+      const threeFieldIdx: IndexDefinition = {
+        fields: [
+          { name: 'category', type: 'string', list: false },
+          { name: 'author', type: 'string', list: false },
+          { name: 'title', type: 'string', list: false },
+        ],
+      };
+      const result = makeFilterSuffixes(
+        [
+          binary('category', 'string', OP.EQ, 'tech'),
+          binary('author', 'string', OP.EQ, 'alice'),
+        ],
+        threeFieldIdx
+      );
+      expect(result?.left).toBe(`tech${INDEX_KEY_FIELD_SEPARATOR}alice`);
+      expect(result?.right).toBe(`tech${INDEX_KEY_FIELD_SEPARATOR}alice`);
+    });
   });
 });
 
