@@ -1,4 +1,4 @@
-const COLOUR = /^[\w\s#.,%/()+-]{1,100}$/;
+const COLOUR = /^[\w\s#.,%/()+\u{80}-\u{10FFFF}-]{1,100}$/u;
 
 export const isColour = (value: string) => COLOUR.test(value);
 

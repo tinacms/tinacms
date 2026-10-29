@@ -195,6 +195,7 @@ describe.each([
     'var(--brand-highlight)',
     'var(--brand, #fff)',
     'oklch(70% 0.15 200)',
+    'var(--café)',
   ])('keeps %s', (colour) => {
     expect(mark(colour).attributes[0]?.value).toMatchObject({
       value: `{ backgroundColor: "${colour}" }`,
