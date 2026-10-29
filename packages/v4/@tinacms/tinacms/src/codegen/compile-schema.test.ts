@@ -418,3 +418,86 @@ describe('checkLock across lock formats', () => {
     ).toEqual({ status: 'current' });
   });
 });
+
+describe('compileSchema dropped v3 options', () => {
+  const plugins = [
+    fieldPlugin('string', 1),
+    fieldPlugin('object', 1),
+    fieldPlugin('array', 1),
+  ];
+  const dropped = [
+    'ui',
+    'component',
+    'parse',
+    'format',
+    'validate',
+    'min',
+    'max',
+  ];
+  const placements: Record<string, (extra: object) => FieldSchema[]> = {
+    'a top-level field': (extra) => [{ name: 'a', type: 'string', ...extra }],
+    'a field inside fields': (extra) => [
+      {
+        name: 'o',
+        type: 'object',
+        fields: [{ name: 'a', type: 'string', ...extra }],
+      } as FieldSchema,
+    ],
+    'a field inside templates': (extra) => [
+      {
+        name: 'l',
+        type: 'array',
+        templates: [
+          { name: 't', fields: [{ name: 'a', type: 'string', ...extra }] },
+        ],
+      } as FieldSchema,
+    ],
+    'an of field': (extra) => [
+      {
+        name: 'l',
+        type: 'array',
+        of: { name: 'a', type: 'string', ...extra },
+      } as FieldSchema,
+    ],
+  };
+
+  for (const option of dropped) {
+    it(`rejects "${option}" at any depth, naming the option`, () => {
+      for (const make of Object.values(placements)) {
+        expect(() =>
+          compileSchema(configWith(make({ [option]: 1 }), plugins))
+        ).toThrow(new RegExp(`sets "${option}", which v4 does not have`));
+      }
+    });
+  }
+
+  it('allows a collection format and other plugin-defined keys', () => {
+    expect(() =>
+      compileSchema(
+        configWith(
+          [{ name: 'a', type: 'string', pluginOption: 1 } as FieldSchema],
+          plugins
+        )
+      )
+    ).not.toThrow();
+  });
+
+  it('rejects hidden and description on a scalar array item', () => {
+    for (const option of ['hidden', 'description']) {
+      expect(() =>
+        compileSchema(
+          configWith(
+            [
+              {
+                name: 'l',
+                type: 'array',
+                of: { name: 'a', type: 'string', [option]: true },
+              } as FieldSchema,
+            ],
+            plugins
+          )
+        )
+      ).toThrow(new RegExp(`sets "${option}" on its "of" field`));
+    }
+  });
+});

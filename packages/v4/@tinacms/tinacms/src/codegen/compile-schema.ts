@@ -3,6 +3,7 @@ import { fieldConflictError, overridesFieldKey } from '../core/field/registry';
 import { hookProvidersOf } from '../core/form/hooks';
 import { invariant } from '../core/invariant';
 import { composeOverridableRegistry } from '../core/overridable-registry';
+import { isRecord } from '../utils/is-record';
 import { scalarItemOf } from '../core/schema/children';
 import type { FieldProvision, PluginManifest } from '../core/plugin';
 import type {
@@ -103,7 +104,72 @@ const usedHooks = (collections: CollectionSchema[]): string[] => [
   ),
 ];
 
+// v3 field options that v4 does not have, with what replaces each (ADR-029).
+const DROPPED_OPTIONS: Record<string, string> = {
+  ui: 'v4 has no `ui` wrapper: put description, defaultValue, hidden, itemLabel and picker at the top level of the field',
+  component:
+    'register a field plugin for the widget; the field type picks the plugin that renders it',
+  parse:
+    'declare `parse` on the field plugin, or use a collection hook for a one-off transform',
+  format:
+    'declare `serialize` on the field plugin, or use a collection hook for a one-off transform',
+  validate: 'attach named validators with `validators`',
+  min: 'use the `min()` validator in `validators`',
+  max: 'use the `max()` validator in `validators`',
+};
+
+// Every field node under `fields`, following `fields`, `templates` and `of`.
+const nodesIn = (fields: unknown[] = []): Record<string, unknown>[] =>
+  fields.flatMap((field) => {
+    if (!isRecord(field)) return [];
+    const templates = Array.isArray(field.templates) ? field.templates : [];
+    return [
+      field,
+      ...nodesIn(Array.isArray(field.fields) ? field.fields : []),
+      ...nodesIn(
+        templates.flatMap((template) =>
+          isRecord(template) && Array.isArray(template.fields)
+            ? template.fields
+            : []
+        )
+      ),
+      ...nodesIn(isRecord(field.of) ? [field.of] : []),
+    ];
+  });
+
+const assertNoDroppedOptions = (collections: CollectionSchema[]): void => {
+  for (const collection of collections) {
+    for (const node of nodesIn(collection.fields)) {
+      for (const [option, replacement] of Object.entries(DROPPED_OPTIONS)) {
+        invariant(
+          !(option in node),
+          'schema-dropped-option',
+          `The field "${String(node.name)}" in collection "${collection.name}" sets "${option}", which v4 does not have: ${replacement}.`
+        );
+      }
+    }
+  }
+};
+
+// Each `of` item row would repeat the help text, or show a row with no editor.
+const assertScalarItemsAreVisible = (collections: CollectionSchema[]): void => {
+  for (const collection of collections) {
+    for (const node of nodesIn(collection.fields)) {
+      if (!isRecord(node.of)) continue;
+      for (const option of ['hidden', 'description']) {
+        invariant(
+          !(option in node.of),
+          'schema-scalar-item-option',
+          `The array "${String(node.name)}" in collection "${collection.name}" sets "${option}" on its "of" field. Set it on the array itself.`
+        );
+      }
+    }
+  }
+};
+
 export const compileSchema = (config: ResolvedConfig): TinaLock => {
+  assertNoDroppedOptions(config.schema.collections);
+  assertScalarItemsAreVisible(config.schema.collections);
   const provisions = fieldProvisionsOf(config.plugins);
   const primitives: Record<string, number> = {};
   for (const type of usedFieldTypes(config.schema.collections).sort()) {
