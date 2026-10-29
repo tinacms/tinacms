@@ -45,6 +45,7 @@ The ADRs are the canonical decisions. Read them in order; each one's `Status` fi
 - [ADR-026: Draft Persistence in the Form Store](./026-draft-persistence-in-form-store.md)
 - [ADR-027: Global Nav Groups](./027-global-nav-groups.md) — *extends ADR-013*
 - [ADR-028: Server Save Hooks](./028-server-save-hooks.md) — *amends ADR-008, ADR-018 and ADR-025*
+- [ADR-029: Field Options Live at the Top Level, Not Under `ui`](./029-field-ui-options.md) — *builds on ADR-009 and ADR-017*
 
 ## Supporting documentation
 
