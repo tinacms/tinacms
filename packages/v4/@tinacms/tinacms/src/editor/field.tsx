@@ -1,9 +1,11 @@
-import { Label } from '@tinacms/ui/components/label';
 import { use } from 'react';
 import type { FieldAddress } from '../core/field/address';
 import { toFieldAddress } from '../core/field/address';
 import type { FieldSchema } from '../core/schema/types';
+import { useStore } from 'zustand';
 import { useFormStore } from '../form/form-store';
+import { DrillInField } from './drill-in-field';
+import { DRILL_DEPTH, fieldDepth } from './form-view-state';
 import {
   FieldAddressContext,
   FieldSchemaContext,
@@ -41,11 +43,27 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     setActive(scope.formId, address);
   };
 
-  const Component = descriptor.Component;
+  const openAddress = useStore(
+    scope.view,
+    (state) => state.openLevels.at(-1)?.address
+  );
+  const drills =
+    descriptor.metadata?.drillable === true &&
+    fieldDepth(address) >= DRILL_DEPTH &&
+    openAddress !== address;
+  const Component = drills ? DrillInField : descriptor.Component;
   return (
     <FieldAddressContext value={address}>
       <FieldSchemaContext value={node}>
-        <div style={{ display: 'contents' }} onFocus={markActive}>
+        <div
+          style={{ display: 'contents' }}
+          onFocus={markActive}
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              scope.view.getState().touch(address);
+            }
+          }}
+        >
           <Component />
         </div>
       </FieldSchemaContext>
@@ -58,23 +76,11 @@ export interface NestedFieldRowProps {
   node: FieldSchema;
 }
 
-// The label + <FieldNode> pair a compound field (array, object) renders for
-// each of its child fields. A child whose descriptor sets `labelable: false`
-// gets no `htmlFor` — its widget reads the row's label id through
-// `aria-labelledby` instead.
+// The row a compound field (array, object) renders for each of its child
+// fields. The child's own FieldWrapper draws the label.
 export function NestedFieldRow({ address, node }: NestedFieldRowProps) {
-  const runtime = use(TinaRuntimeContext);
-  const labelable =
-    runtime?.registry.get(node.type)?.metadata?.labelable !== false;
   return (
     <div className='mb-3 min-w-0 last:mb-0'>
-      <Label
-        className='mb-1'
-        id={`${address}-label`}
-        htmlFor={labelable ? address : undefined}
-      >
-        {node.label ?? node.name}
-      </Label>
       <FieldNode address={toFieldAddress(address)} node={node} />
     </div>
   );

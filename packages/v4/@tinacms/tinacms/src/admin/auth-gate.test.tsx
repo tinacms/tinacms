@@ -149,7 +149,10 @@ describe('AuthGate', () => {
     });
     renderAdmin([formAuthPlugin]);
 
-    await user.type(await screen.findByLabelText('Email'), 'ada@example.com');
+    await user.type(
+      await screen.findByLabelText(/^Email\b/),
+      'ada@example.com'
+    );
     expect(screen.queryByRole('button', { name: 'Sign in' })).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     expect(

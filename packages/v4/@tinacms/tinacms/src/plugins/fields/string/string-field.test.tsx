@@ -61,13 +61,17 @@ const renderTitle = (document?: TinaDocument) =>
 describe('StringField rendering', () => {
   it('renders the ingested value into a text input', async () => {
     renderTitle({ title: 'Hello' });
-    const input = (await screen.findByLabelText('Title')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Title\b/
+    )) as HTMLInputElement;
     expect(input.value).toBe('Hello');
   });
 
   it('falls back to the descriptor default value when absent', async () => {
     renderTitle();
-    const input = (await screen.findByLabelText('Title')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Title\b/
+    )) as HTMLInputElement;
     expect(input.value).toBe('');
   });
 });
@@ -75,17 +79,20 @@ describe('StringField rendering', () => {
 describe('StringField value updates', () => {
   it('writes keystrokes back through the form store', async () => {
     renderTitle({ title: '' });
-    const input = (await screen.findByLabelText('Title')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Title\b/
+    )) as HTMLInputElement;
     await userEvent.type(input, 'A new title');
     expect(input.value).toBe('A new title');
   });
 });
 
 describe('StringField validation', () => {
-  it('surfaces the shared min-length message while editing', async () => {
+  it('surfaces the shared min-length message once the editor leaves the field', async () => {
     renderTitle({ title: '' });
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.type(input, 'ab');
+    await userEvent.tab();
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Title must be at least 3 characters'
     );

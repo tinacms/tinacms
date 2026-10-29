@@ -1,8 +1,10 @@
+import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
+import { Input } from '@tinacms/ui/components/input';
 import { useRef } from 'react';
 import {
   useFieldActivation,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldSchema,
   useFieldValue,
 } from '../../../editor';
@@ -12,15 +14,14 @@ export function NumberField() {
   const address = useFieldAddress();
   const field = useFieldSchema<NumberFieldSchema>();
   const [value, setValue] = useFieldValue<string | null>(address);
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus());
 
-  // TODO(shadcn): replace with the shared components in src/ui/.
   return (
-    <div>
-      <input
+    <FieldWrapper {...frame}>
+      <Input
         ref={inputRef}
         type='number'
         step={field.step ?? 'any'}
@@ -31,11 +32,6 @@ export function NumberField() {
         }
         onWheel={(event) => event.currentTarget.blur()}
       />
-      {errors.map((error) => (
-        <span key={error} role='alert'>
-          {error}
-        </span>
-      ))}
-    </div>
+    </FieldWrapper>
   );
 }

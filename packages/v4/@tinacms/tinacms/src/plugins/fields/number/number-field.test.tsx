@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
@@ -72,31 +72,41 @@ const renderField = (document?: TinaDocument) =>
 describe('NumberField rendering', () => {
   it('renders a stored number as its string value', async () => {
     renderField({ weight: 3 });
-    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Weight\b/
+    )) as HTMLInputElement;
     expect(input.value).toBe('3');
   });
 
   it('renders empty when the field is absent (no default value)', async () => {
     renderField();
-    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Weight\b/
+    )) as HTMLInputElement;
     expect(input.value).toBe('');
   });
 
   it('renders a stored zero rather than blanking it', async () => {
     renderField({ count: 0 });
-    const input = (await screen.findByLabelText('Count')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Count\b/
+    )) as HTMLInputElement;
     expect(input.value).toBe('0');
   });
 
   it('applies the schema step to the input', async () => {
     renderField({ rating: 3 });
-    const input = (await screen.findByLabelText('Rating')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Rating\b/
+    )) as HTMLInputElement;
     expect(input.step).toBe('0.5');
   });
 
   it('accepts any step when the schema sets none', async () => {
     renderField({ weight: 3 });
-    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Weight\b/
+    )) as HTMLInputElement;
     expect(input.step).toBe('any');
   });
 });
@@ -104,22 +114,27 @@ describe('NumberField rendering', () => {
 describe('NumberField value updates', () => {
   it('writes a decimal keystroke sequence back through the store', async () => {
     renderField();
-    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Weight\b/
+    )) as HTMLInputElement;
     await userEvent.type(input, '1.5');
     expect(input.value).toBe('1.5');
   });
 
   it('accepts a negative value', async () => {
     renderField();
-    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Weight\b/
+    )) as HTMLInputElement;
     await userEvent.type(input, '-5');
     expect(input.value).toBe('-5');
   });
 
-  it('surfaces the shared min message while editing', async () => {
+  it('surfaces the shared min message once the editor leaves the field', async () => {
     renderField();
-    const input = await screen.findByLabelText('Rating');
+    const input = await screen.findByLabelText(/^Rating\b/);
     await userEvent.type(input, '0');
+    await userEvent.tab();
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Rating must be at least 1'
     );
@@ -129,14 +144,14 @@ describe('NumberField value updates', () => {
   // through `Number('')` and write a 0 that the editor never typed.
   it('empties the field rather than storing an empty string', async () => {
     renderField({ weight: 3 });
-    const input = await screen.findByLabelText('Weight');
+    const input = await screen.findByLabelText(/^Weight\b/);
     await userEvent.clear(input);
     expect(valueOf('weight')).toBeNull();
   });
 
   it('keeps a typed value in the store', async () => {
     renderField();
-    const input = await screen.findByLabelText('Weight');
+    const input = await screen.findByLabelText(/^Weight\b/);
     await userEvent.type(input, '42');
     expect(valueOf('weight')).toBe('42');
   });
@@ -147,8 +162,8 @@ describe('NumberField wheel guard', () => {
   // field drops focus so a scroll past the form cannot edit the document.
   it('drops focus when the wheel scrolls over the input', async () => {
     renderField({ weight: 3 });
-    const input = await screen.findByLabelText('Weight');
-    input.focus();
+    const input = await screen.findByLabelText(/^Weight\b/);
+    act(() => input.focus());
     expect(input).toHaveFocus();
     fireEvent.wheel(input);
     expect(input).not.toHaveFocus();

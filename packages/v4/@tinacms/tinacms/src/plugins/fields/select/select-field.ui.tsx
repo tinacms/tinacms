@@ -11,7 +11,7 @@ import { hasValidator } from '../../../core/schema/types';
 import {
   useFieldActivation,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldSchema,
   useFieldValue,
 } from '../../../editor';
@@ -21,7 +21,7 @@ export function SelectField() {
   const address = useFieldAddress();
   const field = useFieldSchema<SelectFieldSchema>();
   const [value, setValue] = useFieldValue<string | null>(address);
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   useFieldActivation(() => triggerRef.current?.focus());
@@ -35,7 +35,7 @@ export function SelectField() {
   const items = isRequired ? optionItems : [noneItem, ...optionItems];
 
   return (
-    <FieldWrapper errors={errors}>
+    <FieldWrapper {...frame}>
       <Select
         items={items}
         value={value ?? null}

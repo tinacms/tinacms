@@ -128,7 +128,8 @@ const renderField = (
     </TinaProvider>
   );
 
-const fieldGroup = (name: string) => screen.findByRole('group', { name });
+const fieldGroup = (name: string) =>
+  screen.findByRole('group', { name: new RegExp(`^${name}\\b`) });
 
 const imageFile = (name = 'new.png') =>
   new File(['image'], name, { type: 'image/png' });
@@ -207,7 +208,10 @@ describe('ImageField uploading', () => {
     const media = createMedia();
     renderField(undefined, media);
     const group = await fieldGroup('Hero');
-    await userEvent.upload(within(group).getByLabelText('Upload'), imageFile());
+    await userEvent.upload(
+      within(group).getByLabelText(/^Upload\b/),
+      imageFile()
+    );
     expect(media.upload).toHaveBeenCalledOnce();
     expect(valueOf('hero')).toBe('uploads-dir/new.png');
   });
@@ -238,7 +242,10 @@ describe('ImageField uploading', () => {
       })
     );
     const group = await fieldGroup('Hero');
-    await userEvent.upload(within(group).getByLabelText('Upload'), imageFile());
+    await userEvent.upload(
+      within(group).getByLabelText(/^Upload\b/),
+      imageFile()
+    );
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'That file is too large to upload.'
     );
@@ -249,7 +256,7 @@ describe('ImageField uploading', () => {
     const features: MediaFeatures = { readOnly: true };
     renderField(undefined, createMedia({ features }));
     const group = await fieldGroup('Hero');
-    expect(within(group).queryByLabelText('Upload')).not.toBeInTheDocument();
+    expect(within(group).queryByLabelText(/^Upload\b/)).not.toBeInTheDocument();
   });
 });
 

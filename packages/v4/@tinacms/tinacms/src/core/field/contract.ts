@@ -9,6 +9,7 @@ export type FieldLayout = 'inline' | 'block';
 export interface FieldMetadata {
   layout?: FieldLayout;
   labelable?: boolean;
+  drillable?: boolean;
 }
 
 export interface FieldTransformContext {

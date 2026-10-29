@@ -61,19 +61,19 @@ const renderFeatured = (document?: TinaDocument) =>
 describe('BooleanField rendering', () => {
   it('renders a stored true value as a checked box', async () => {
     renderFeatured({ featured: true });
-    const input = await screen.findByRole('checkbox', { name: 'Featured' });
+    const input = await screen.findByRole('checkbox', { name: /^Featured\b/ });
     expect(input).toBeChecked();
   });
 
   it('renders a stored false value as an unchecked box', async () => {
     renderFeatured({ featured: false });
-    const input = await screen.findByRole('checkbox', { name: 'Featured' });
+    const input = await screen.findByRole('checkbox', { name: /^Featured\b/ });
     expect(input).not.toBeChecked();
   });
 
   it('falls back to the descriptor default (false) when absent', async () => {
     renderFeatured();
-    const input = await screen.findByRole('checkbox', { name: 'Featured' });
+    const input = await screen.findByRole('checkbox', { name: /^Featured\b/ });
     expect(input).not.toBeChecked();
   });
 });
@@ -81,7 +81,7 @@ describe('BooleanField rendering', () => {
 describe('BooleanField value updates', () => {
   it('toggles the value back through the form store', async () => {
     renderFeatured({ featured: false });
-    const input = await screen.findByRole('checkbox', { name: 'Featured' });
+    const input = await screen.findByRole('checkbox', { name: /^Featured\b/ });
 
     await userEvent.click(input);
     expect(input).toBeChecked();

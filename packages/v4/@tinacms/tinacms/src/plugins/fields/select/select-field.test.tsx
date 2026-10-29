@@ -78,19 +78,19 @@ const renderField = (document?: TinaDocument) =>
 describe('SelectField rendering', () => {
   it('renders the label of a stored option', async () => {
     renderField({ status: 'published' });
-    const trigger = await screen.findByLabelText('Status');
+    const trigger = await screen.findByLabelText(/^Status\b/);
     expect(trigger).toHaveTextContent('Published');
   });
 
   it('falls back to the raw value when an option has no label', async () => {
     renderField({ priority: 'low' });
-    const trigger = await screen.findByLabelText('Priority');
+    const trigger = await screen.findByLabelText(/^Priority\b/);
     expect(trigger).toHaveTextContent('low');
   });
 
   it('shows the placeholder when the field is absent', async () => {
     renderField();
-    const trigger = await screen.findByLabelText('Priority');
+    const trigger = await screen.findByLabelText(/^Priority\b/);
     expect(trigger).toHaveTextContent('Select...');
   });
 });
@@ -98,7 +98,7 @@ describe('SelectField rendering', () => {
 describe('SelectField value updates', () => {
   it('writes the chosen option value back through the store', async () => {
     renderField();
-    const trigger = await screen.findByLabelText('Status');
+    const trigger = await screen.findByLabelText(/^Status\b/);
     await userEvent.click(trigger);
     await userEvent.click(await screen.findByRole('option', { name: 'Draft' }));
     expect(valueOf('status')).toBe('draft');
@@ -106,7 +106,7 @@ describe('SelectField value updates', () => {
 
   it('offers no clear option on a required field', async () => {
     renderField();
-    const trigger = await screen.findByLabelText('Status');
+    const trigger = await screen.findByLabelText(/^Status\b/);
     await userEvent.click(trigger);
     expect(
       screen.queryByRole('option', { name: 'None' })
@@ -115,7 +115,7 @@ describe('SelectField value updates', () => {
 
   it('clears an optional field back to absent through the None option', async () => {
     renderField({ priority: 'low' });
-    const trigger = await screen.findByLabelText('Priority');
+    const trigger = await screen.findByLabelText(/^Priority\b/);
     await userEvent.click(trigger);
     await userEvent.click(await screen.findByRole('option', { name: 'None' }));
     expect(valueOf('priority')).toBeNull();
