@@ -11,4 +11,5 @@ export {
   experimental_createIslandRoute,
   type IslandConfig,
   type IslandRegistry,
+  type IslandRouteOptions,
 } from './island-route';
