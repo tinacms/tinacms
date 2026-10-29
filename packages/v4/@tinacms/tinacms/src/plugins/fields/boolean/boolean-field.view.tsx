@@ -1,5 +1,6 @@
 import { Checkbox } from '@tinacms/ui/components/checkbox';
 import {
+  FieldHelp,
   FieldWrapper,
   type FieldWrapperProps,
 } from '@tinacms/ui/components/field-wrapper';
@@ -71,14 +72,7 @@ export function BooleanFieldView({
           >
             {label}
           </Label>
-          {help ? (
-            <p
-              id={helpId}
-              className='m-0 text-sm leading-field-message font-normal text-muted-foreground'
-            >
-              {help}
-            </p>
-          ) : null}
+          {help ? <FieldHelp id={helpId}>{help}</FieldHelp> : null}
         </div>
       </div>
     </FieldWrapper>

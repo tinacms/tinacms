@@ -10,7 +10,7 @@ import { BooleanFieldView } from './boolean-field.view';
 export function BooleanField() {
   const address = useFieldAddress();
   const [value, setValue] = useFieldValue<boolean>(address);
-  const { required: _required, htmlFor: _htmlFor, ...frame } = useFieldFrame();
+  const frame = useFieldFrame();
   const inputRef = useRef<HTMLButtonElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus());

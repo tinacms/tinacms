@@ -113,7 +113,7 @@ checkbox renders this field again, but does not render the other fields again.
 export function BooleanField() {
   const address = useFieldAddress();
   const [value, setValue] = useFieldValue<boolean>(address);
-  const { required, htmlFor, ...frame } = useFieldFrame();
+  const frame = useFieldFrame();
   const inputRef = useRef<HTMLButtonElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus()); // focus when active
@@ -132,8 +132,9 @@ never required and never empty, so no star shows. There is no unsaved marker.
 A real error (a stored value that is not a boolean, or a custom validator)
 shows under the field, and the checkbox gets `aria-invalid`.
 
-The label points at the checkbox, and the checkbox points at the help with
-`aria-describedby` only when help exists.
+The help uses `FieldHelp` from the Field wrapper, so it has the same look as
+the help of the other fields. The label points at the checkbox, and the
+checkbox points at the help with `aria-describedby` only when help exists.
 
 ## States and keys
 
@@ -148,6 +149,7 @@ only. The editor frame supplies none of them yet, as with the Number field.
   Enter. They do not change on hover.
 - Space toggles the focused box. Enter toggles it too, once: the view handles
   Enter itself, because the base checkbox ignores it, and it ignores key repeat.
+- The focus ring shows on keyboard focus only, not on a click.
 
 ## The connections
 
