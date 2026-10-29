@@ -72,7 +72,9 @@ export function experimental_createIslandRoute(
       const html = await requestStore.run(request, () =>
         formsStore.run(forms, async () => {
           const data = await island.fetch(request, url.searchParams);
-          const container = await AstroContainer.create(options?.containerOptions);
+          const container = await AstroContainer.create(
+            options?.containerOptions
+          );
           return container.renderToString(island.component, {
             props: island.propsFromData(data, url.searchParams),
           });
