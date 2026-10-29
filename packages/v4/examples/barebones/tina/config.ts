@@ -92,7 +92,6 @@ export const postCollection = {
     t.select({
       name: 'status',
       label: 'Status',
-      defaultValue: 'draft',
       options: [
         { value: 'draft', label: 'Draft' },
         { value: 'published', label: 'Published' },
@@ -127,7 +126,7 @@ const ctaTemplate = {
   label: 'Call to action',
   fields: [
     t.string({ name: 'label', label: 'Label', validators: [required()] }),
-    t.string({ name: 'link', label: 'Link' }),
+    t.string({ name: 'link', label: 'Link', defaultValue: '/docs' }),
   ],
 } satisfies ArrayTemplateSchema;
 

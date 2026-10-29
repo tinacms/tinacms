@@ -5,8 +5,11 @@ import { asResolvedConfig } from '../config';
 import '../plugins/fields/rich-text/rich-text-field.client';
 import type { MediaProvider } from '../core/media/contract';
 import { definePlugin } from '../core/plugin';
-import { formatAdapterFor } from '../plugins/content/local/adapters/format-adapters';
-import { digestDocument, ingestDocument } from '../core/form/ingest';
+import {
+  digestDocument,
+  ingestDocument,
+  seedDocument,
+} from '../core/form/ingest';
 import { resolveFieldPlugins } from '../core/field/registry';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { FormProvider, type SaveHandler, TinaProvider } from '../editor';
@@ -125,96 +128,57 @@ describe('hidden field', () => {
 });
 
 describe('field defaultValue', () => {
-  const collection = collectionOf(
-    t.string({ name: 'title', defaultValue: 'Untitled' }),
+  const { fields } = collectionOf(
+    t.string({ name: 'title', label: 'Title', defaultValue: 'Untitled' }),
     t.string({ name: 'plain' }),
     t.number({ name: 'price', defaultValue: 5 }),
     t.number({ name: 'zero', defaultValue: 0 }),
     t.boolean({ name: 'flag', defaultValue: true })
   );
-  const ingest = async (document: TinaDocument) => {
-    const registry = await resolveFieldPlugins(corePlugins);
-    const context = { registry };
-    const values = ingestDocument(document, collection.fields, context);
-    return {
-      values,
-      digest: digestDocument(values, collection.fields, context),
-    };
-  };
-
-  it('fills an absent key, keeps stored falsy values, and falls back to the plugin default', async () => {
-    const { values } = await ingest({ title: '', flag: false });
-    expect(values.title).toBe('');
-    expect(values.flag).toBe(false);
-    expect(values.price).toBe('5');
-    expect(values.plain).toBe('');
-    expect((await ingest({})).values.title).toBe('Untitled');
+  const contextOf = async () => ({
+    registry: await resolveFieldPlugins(corePlugins),
   });
 
-  it('keeps a cleared defaulted field as null and bypasses serialize', async () => {
-    const { values, digest } = await ingest({ price: null, zero: null });
-    expect(values.price).toBe(null);
-    expect(digest).toMatchObject({ price: null, zero: null });
-    const again = await ingest(digest);
-    expect(again.values.price).toBe(null);
-    expect(again.digest.price).toBe(null);
+  it('fills a new item, keeps falsy defaults, and falls back to the plugin default', async () => {
+    const values = seedDocument(undefined, fields, await contextOf());
+    expect(values).toMatchObject({
+      title: 'Untitled',
+      plain: '',
+      price: '5',
+      zero: '0',
+      flag: true,
+    });
   });
 
-  it('still drops null for a field without a default', async () => {
-    const { digest } = await ingest({ plain: null });
-    expect(digest).not.toHaveProperty('plain');
+  it('lets defaultItem win over a field default', async () => {
+    const values = seedDocument({ title: 'Mine' }, fields, await contextOf());
+    expect(values.title).toBe('Mine');
   });
 
-  it('does not share an object default between documents', async () => {
-    const obj = collectionOf(
+  it('does not share an object default between items', async () => {
+    const { fields: objectFields } = collectionOf(
       t.object({
         name: 'o',
         defaultValue: { a: 'x' },
         fields: [t.string({ name: 'a' })],
       })
     );
-    const registry = await resolveFieldPlugins(corePlugins);
-    const a = ingestDocument({}, obj.fields, { registry });
-    const b = ingestDocument({}, obj.fields, { registry });
+    const context = await contextOf();
+    const a = seedDocument(undefined, objectFields, context);
+    const b = seedDocument(undefined, objectFields, context);
     expect(a.o).toEqual({ a: 'x' });
     expect(a.o).not.toBe(b.o);
   });
-});
 
-describe('clearing a field that has a defaultValue', () => {
-  const collection = collectionOf(
-    t.number({ name: 'price', defaultValue: 5 }),
-    t.select({
-      name: 'size',
-      options: [{ value: 's' }, { value: 'm' }],
-      defaultValue: 'm',
-    }),
-    t.datetime({ name: 'when', defaultValue: '2026-01-01T00:00' }),
-    t.reference({ name: 'author', collections: ['author'], defaultValue: 'a' }),
-    t.image({ name: 'hero', defaultValue: 'a.png' })
-  );
-  const cleared = Object.fromEntries(
-    collection.fields.map((field) => [field.name, null])
-  );
+  it('never fills a loaded document, so a cleared field stays cleared', async () => {
+    const context = await contextOf();
+    const values = ingestDocument({ title: 'A' }, fields, context);
+    expect(values.price).toBe(null);
+    expect(digestDocument(values, fields, context)).not.toHaveProperty('price');
+  });
 
-  it.each(['json', 'md'] as const)(
-    'survives save and reload in a %s collection',
-    async (format) => {
-      const registry = await resolveFieldPlugins([...corePlugins, mediaPlugin]);
-      const context = { registry };
-      const adapter = formatAdapterFor(format);
-      const keys = collection.fields.map((field) => field.name);
-      const saved = digestDocument(cleared, collection.fields, context);
-      const raw = adapter.serialize(saved, undefined, undefined, keys);
-      const reloaded = ingestDocument(
-        adapter.parse(raw),
-        collection.fields,
-        context
-      );
-      expect(reloaded).toEqual(cleared);
-      expect(digestDocument(reloaded, collection.fields, context)).toEqual(
-        cleared
-      );
-    }
-  );
+  it('leaves a loaded document alone in the editor', async () => {
+    renderForm(collectionOf(fields[0]));
+    expect(await screen.findByLabelText('Title')).toHaveValue('');
+  });
 });

@@ -209,27 +209,21 @@ These options sit at the top level of a field. v4 has no `ui` wrapper
 | Key | Type | Effect |
 |---|---|---|
 | `description` | `string` | Help text under the label. It is the input's accessible description. |
-| `defaultValue` | `JsonValue` (not `null`) | The value a document that lacks the key starts with. |
+| `defaultValue` | `JsonValue` (not `null`) | The value the field starts with in a new item. |
 | `hidden` | `boolean` | Renders no label, description or editor. The value is kept. |
 
 ### `defaultValue`
 
+- It fills the field when an editor adds a new item to an array, for example
+  with the Add button of a list of objects or a block. A loaded document never
+  gets it, so a cleared field stays cleared.
 - It is a stored-form value: what the file would hold, not what the editor
-  holds. Ingest substitutes it for an absent key before the plugin's `parse`
-  runs. A falsy default (`0`, `''`, `false`) is a real default.
-- It fills an absent key only. A cleared field is saved as an explicit `null`
-  and stays empty after a reload. A string clears to `''`, which is kept as is.
-  A field with no `defaultValue` still drops `null` on save.
-- Precedence: the field's `defaultValue`, then the plugin's own default, then
-  `null`. The plugin's default is an editor value and skips `parse`.
-- An object default is cloned for each document.
-- A default on a field inside an object or array item applies when the parent
-  is present and lacks the key, when the parent is stored as `null`, and when
-  an array item lacks the key. It does not apply when the parent key is
-  missing entirely.
-- Trade-off: a document is not dirty until an edit. The first edited save
-  writes the default into the file. Adding a default to an existing collection
-  gives each document a noisy diff on its first edited save.
+  holds. It runs through the plugin's `parse`. A falsy default (`0`, `''`,
+  `false`) is a real default.
+- Precedence in a new item: the array's or template's `defaultItem`, then the
+  field's `defaultValue`, then the plugin's own default, then `null`. The
+  plugin's default is an editor value and skips `parse`.
+- An object default is cloned for each new item.
 - A rich-text default is written in stored form. With the default codec, that
   is markdown:
 

@@ -14,8 +14,7 @@ export interface FormatAdapter {
   parse(raw: string, bodyField?: string): TinaDocument;
   /**
    * Keys of `previousRaw` that `document` leaves out are kept, unless
-   * `schemaKeys` names them: a cleared field is saved as absent, except a field
-   * with a `defaultValue`, which is saved as an explicit `null`.
+   * `schemaKeys` names them: a cleared field is saved as absent.
    */
   serialize(
     document: TinaDocument,

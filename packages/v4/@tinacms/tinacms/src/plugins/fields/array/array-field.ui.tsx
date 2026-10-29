@@ -4,7 +4,7 @@ import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { type ReactNode, useRef, useState } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import type { FieldAddress } from '../../../core/field/address';
-import { ingestDocument } from '../../../core/form/ingest';
+import { seedDocument } from '../../../core/form/ingest';
 import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
 import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
 import {
@@ -86,7 +86,7 @@ function ObjectItems({
   const watched: unknown = useWatch({ control, name: address });
 
   const seed = (defaultItem: TinaDocument | undefined, fields: FieldSchema[]) =>
-    ingestDocument(defaultItem ?? {}, fields, { documentPath, registry });
+    seedDocument(defaultItem, fields, { documentPath, registry });
   const addFieldsItem = (
     fields: FieldSchema[],
     defaultItem: TinaDocument | undefined

@@ -189,7 +189,7 @@ v4 has no `ui` wrapper. Field options sit at the top level of the field ([ADR-02
 
 Kept, now top level:
 - `ui.description` is `description`.
-- `ui.defaultValue` is `defaultValue`. It is a stored-form value and fills an absent key only. The first edited save writes it into each existing document, so adding one to an existing collection gives noisy diffs.
+- `ui.defaultValue` is `defaultValue`. It is a stored-form value. It fills the field in a new array item only, and never changes a loaded document.
 - `ui.hidden` is `hidden`. The value is kept and Save is never blocked by it.
 - `defaultItem` stays on arrays and templates. A templates array takes it per template only.
 
