@@ -2,10 +2,13 @@ const COLOUR = /^[\w\s#.,%/()+-]{1,100}$/;
 
 export const isColour = (value: string) => COLOUR.test(value);
 
+const isEmpty = (value: unknown) =>
+  value === null || value === undefined || value === '';
+
 export const stringLiteral = (value: unknown) => JSON.stringify(String(value));
 
 export const numberLiteral = (value: unknown, fieldName: string) => {
-  if (value === null) {
+  if (isEmpty(value)) {
     return 'null';
   }
   const number =
@@ -17,7 +20,7 @@ export const numberLiteral = (value: unknown, fieldName: string) => {
 };
 
 export const booleanLiteral = (value: unknown, fieldName: string) => {
-  if (value === null) {
+  if (isEmpty(value)) {
     return 'null';
   }
   if (value === true || value === 'true') {

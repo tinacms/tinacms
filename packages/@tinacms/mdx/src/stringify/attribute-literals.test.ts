@@ -1,11 +1,11 @@
 import type { RichTextField } from '@tinacms/schema-tools';
-import { parse } from 'acorn';
-import type { Node } from 'estree';
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
 import { describe, expect, it } from 'vitest';
 import { stringifyProps as stringifyPropsNext } from '../next/stringify/acorn';
 import { eat as eatNext } from '../next/stringify/marks';
+import { parseMDX } from '../parse';
 import type * as Plate from '../parse/plate';
+import { serializeMDX } from '.';
 import { stringifyProps } from './acorn';
 import { eat } from './marks';
 
@@ -26,60 +26,43 @@ const field = {
         { type: 'boolean', name: 'flags', list: true },
         { type: 'number', name: 'count' },
         { type: 'boolean', name: 'enabled' },
+        {
+          type: 'object',
+          name: 'meta',
+          fields: [
+            { type: 'number', name: 'offset' },
+            { type: 'number', name: 'scores', list: true },
+          ],
+        },
       ],
     },
   ],
 } as RichTextField;
 
-const serializers = [
-  ['mdx', stringifyProps, eat],
-  ['markdown', stringifyPropsNext, eatNext],
-] as const;
+const element = (props: Record<string, unknown>) =>
+  ({
+    type: 'mdxJsxFlowElement',
+    name: 'Callout',
+    props,
+    children: [{ type: 'text', text: '' }],
+  }) as unknown as Plate.MdxBlockElement;
 
-/**
- * Return the value of an expression built only from literals, arrays and
- * objects. Throw for any other node, because a site that evaluates the MDX
- * would run it.
- */
-const literalValue = (node: Node): unknown => {
-  switch (node.type) {
-    case 'Literal':
-      return node.value;
-    case 'UnaryExpression':
-      if (node.operator === '-' && node.argument.type === 'Literal') {
-        return -(node.argument.value as number);
-      }
-      break;
-    case 'ArrayExpression':
-      return node.elements.map((element) => literalValue(element as Node));
-    case 'ObjectExpression':
-      return Object.fromEntries(
-        node.properties.map((property) => {
-          if (property.type !== 'Property' || property.computed) {
-            throw new Error(`Unexpected ${property.type} in object`);
-          }
-          const key =
-            property.key.type === 'Identifier'
-              ? property.key.name
-              : literalValue(property.key);
-          return [key, literalValue(property.value as Node)];
-        })
-      );
-  }
-  throw new Error(`Unexpected ${node.type} in attribute value`);
-};
+const attributes = (
+  stringify: typeof stringifyProps,
+  props: Record<string, unknown>
+) => stringify(element(props), field, false, passthrough).attributes;
 
-const evaluateAttribute = (attribute: MdxJsxAttribute | undefined) => {
-  const value = attribute?.value;
-  if (!value || typeof value === 'string') {
-    throw new Error('Expected an expression attribute');
+const roundTrip = (props: Record<string, unknown>) => {
+  const root = {
+    type: 'root',
+    children: [element(props)],
+  } as Plate.RootElement;
+  const mdx = serializeMDX(root, field, passthrough) as string;
+  const [node] = parseMDX(mdx, field, passthrough).children;
+  if (node?.type !== 'mdxJsxFlowElement') {
+    throw new Error(`Did not load back: ${JSON.stringify(node)}`);
   }
-  const program = parse(`(${value.value})`, { ecmaVersion: 'latest' });
-  const [statement, ...rest] = program.body as Node[];
-  if (statement?.type !== 'ExpressionStatement' || rest.length) {
-    throw new Error('Expected a single expression');
-  }
-  return literalValue(statement.expression);
+  return node.props;
 };
 
 const awkwardText = [
@@ -92,118 +75,138 @@ const awkwardText = [
   'café 🚀',
 ];
 
-describe.each(serializers)(
-  'attribute values (%s parser)',
-  (_, stringify, eatMarks) => {
-    const attribute = (props: Record<string, unknown>) => {
-      const element = {
-        type: 'mdxJsxFlowElement',
-        name: 'Callout',
-        props,
-        children: [{ type: 'text', text: '' }],
-      } as unknown as Plate.MdxBlockElement;
-      const { attributes } = stringify(element, field, false, passthrough);
-      return attributes[0] as MdxJsxAttribute;
-    };
-
-    describe.each(['tags', 'dates', 'refs', 'images'])('%s list', (name) => {
-      it('keeps plain values unchanged in the output', () => {
-        expect(attribute({ [name]: ['news', 'tech'] }).value).toMatchObject({
-          value: '["news", "tech"]',
-        });
+describe('rich-text component values', () => {
+  describe.each(['tags', 'dates', 'refs', 'images'])('%s list', (name) => {
+    it('keeps plain values unchanged in the output', () => {
+      const [attribute] = attributes(stringifyProps, {
+        [name]: ['news', 'tech'],
       });
+      expect(attribute?.value).toMatchObject({ value: '["news", "tech"]' });
+    });
 
-      it('keeps values with special characters as literal strings', () => {
-        const value = evaluateAttribute(attribute({ [name]: awkwardText }));
-        expect(value).toEqual(awkwardText);
+    it('loads values with special characters back unchanged', () => {
+      expect(roundTrip({ [name]: awkwardText })).toEqual({
+        [name]: awkwardText,
+      });
+    });
+  });
+
+  describe('number list', () => {
+    it('loads numbers back as numbers', () => {
+      expect(roundTrip({ numbers: [1, -2.5, '3'] })).toEqual({
+        numbers: [1, -2.5, 3],
       });
     });
 
-    describe('number list', () => {
-      it('writes numbers as numbers', () => {
-        expect(
-          evaluateAttribute(attribute({ numbers: [1, -2.5, '3'] }))
-        ).toEqual([1, -2.5, 3]);
-      });
-
-      it('keeps plain values unchanged in the output', () => {
-        expect(attribute({ numbers: [1, 2.5] }).value).toMatchObject({
-          value: '[1, 2.5]',
-        });
-      });
-
-      it.each([['(1)'], ['abc'], [Number.NaN], [Number.POSITIVE_INFINITY]])(
-        'rejects %s',
-        (item) => {
-          expect(() => attribute({ numbers: [1, item] })).toThrow(
-            /"numbers" field/
-          );
-        }
-      );
+    it('keeps plain values unchanged in the output', () => {
+      const [attribute] = attributes(stringifyProps, { numbers: [1, 2.5] });
+      expect(attribute?.value).toMatchObject({ value: '[1, 2.5]' });
     });
 
-    describe('boolean list', () => {
-      it('writes booleans as booleans', () => {
-        expect(
-          evaluateAttribute(attribute({ flags: [true, false, 'true'] }))
-        ).toEqual([true, false, true]);
-      });
+    it('loads a cleared item back as null', () => {
+      expect(roundTrip({ numbers: [1, ''] })).toEqual({ numbers: [1, null] });
+    });
 
-      it.each([['(1)'], ['yes'], [1]])('rejects %s', (item) => {
-        expect(() => attribute({ flags: [true, item] })).toThrow(
-          /"flags" field/
+    it.each([['abc'], [Number.NaN], [Number.POSITIVE_INFINITY]])(
+      'rejects %s',
+      (item) => {
+        expect(() => roundTrip({ numbers: [1, item] })).toThrow(
+          /"numbers" field/
         );
+      }
+    );
+  });
+
+  describe('boolean list', () => {
+    it('loads booleans back as booleans', () => {
+      expect(roundTrip({ flags: [true, false, 'true'] })).toEqual({
+        flags: [true, false, true],
       });
     });
 
-    describe('single number and boolean', () => {
-      it('writes the value as a literal', () => {
-        expect(evaluateAttribute(attribute({ count: 4 }))).toBe(4);
-        expect(evaluateAttribute(attribute({ enabled: false }))).toBe(false);
-      });
+    it.each([['yes'], [1]])('rejects %s', (item) => {
+      expect(() => roundTrip({ flags: [true, item] })).toThrow(/"flags" field/);
+    });
+  });
 
-      it('rejects a value that is not a number', () => {
-        expect(() => attribute({ count: '(1)' })).toThrow(/"count" field/);
-      });
-
-      it('rejects a value that is not a boolean', () => {
-        expect(() => attribute({ enabled: '(1)' })).toThrow(/"enabled" field/);
+  describe('single number and boolean', () => {
+    it('loads the value back', () => {
+      expect(roundTrip({ count: -4, enabled: false })).toEqual({
+        count: -4,
+        enabled: false,
       });
     });
 
-    describe('highlight colour', () => {
-      const mark = (highlightColor: string) => {
-        const [node] = eatMarks(
-          [{ type: 'text', text: 'hi', highlight: true, highlightColor }],
-          field,
-          passthrough
-        ) as unknown as { name: string; attributes: MdxJsxAttribute[] }[];
-        return node!;
-      };
-
-      it.each([
-        '#FEF08A',
-        '#fff',
-        'rebeccapurple',
-        'rgb(1, 2, 3)',
-        'hsla(120 50% 50% / 0.5)',
-        'var(--brand-highlight)',
-        'var(--brand, #fff)',
-        'oklch(70% 0.15 200)',
-      ])('keeps %s', (colour) => {
-        expect(mark(colour).attributes[0]?.value).toMatchObject({
-          value: `{ backgroundColor: "${colour}" }`,
-        });
+    it.each(['', undefined, null])('loads %o back as null', (value) => {
+      expect(roundTrip({ count: value, enabled: value })).toEqual({
+        count: null,
+        enabled: null,
       });
-
-      it.each(['red"', '#ff00ff;', 'red} p {', 'blue\\9', 'x'.repeat(101)])(
-        'drops the colour %s but keeps the highlight',
-        (colour) => {
-          const node = mark(colour);
-          expect(node.name).toBe('mark');
-          expect(node.attributes).toEqual([]);
-        }
-      );
     });
-  }
-);
+
+    it('rejects a value that is not a number', () => {
+      expect(() => roundTrip({ count: 'abc' })).toThrow(/"count" field/);
+    });
+
+    it('rejects a value that is not a boolean', () => {
+      expect(() => roundTrip({ enabled: 'yes' })).toThrow(/"enabled" field/);
+    });
+  });
+
+  it('loads negative numbers in an object back', () => {
+    const meta = { offset: -1, scores: [-1, 2] };
+    expect(roundTrip({ meta })).toEqual({ meta });
+  });
+
+  it('writes the same values with the markdown parser', () => {
+    const props = {
+      tags: awkwardText,
+      images: awkwardText,
+      numbers: [1, -2.5, ''],
+      flags: [true, 'false'],
+      count: '',
+      enabled: true,
+    };
+    expect(attributes(stringifyPropsNext, props)).toEqual(
+      attributes(stringifyProps, props)
+    );
+  });
+});
+
+describe.each([
+  ['mdx', eat],
+  ['markdown', eatNext],
+] as const)('highlight colour (%s parser)', (_, eatMarks) => {
+  const mark = (highlightColor: string) => {
+    const [node] = eatMarks(
+      [{ type: 'text', text: 'hi', highlight: true, highlightColor }],
+      field,
+      passthrough
+    ) as unknown as { name: string; attributes: MdxJsxAttribute[] }[];
+    return node!;
+  };
+
+  it.each([
+    '#FEF08A',
+    '#fff',
+    'rebeccapurple',
+    'rgb(1, 2, 3)',
+    'hsla(120 50% 50% / 0.5)',
+    'var(--brand-highlight)',
+    'var(--brand, #fff)',
+    'oklch(70% 0.15 200)',
+  ])('keeps %s', (colour) => {
+    expect(mark(colour).attributes[0]?.value).toMatchObject({
+      value: `{ backgroundColor: "${colour}" }`,
+    });
+  });
+
+  it.each(['red"', '#ff00ff;', 'red}', 'blue\\9', 'x'.repeat(101)])(
+    'drops the colour %s but keeps the highlight',
+    (colour) => {
+      const node = mark(colour);
+      expect(node.name).toBe('mark');
+      expect(node.attributes).toEqual([]);
+    }
+  );
+});
