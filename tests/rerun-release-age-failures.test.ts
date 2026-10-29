@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import {
+  latestPullRequestRuns,
   newestFlaggedPublishTime,
   readMinimumReleaseAgeMinutes,
   readyAt,
@@ -69,10 +70,48 @@ describe('newestFlaggedPublishTime', () => {
     ).toBeNull();
   });
 
-  it('returns null when the violation lists no publish times', () => {
+  it('falls back to the failure time when fewer entries are listed than pnpm counted', () => {
+    const log = failureLog([
+      entry('@aws-sdk/core@3.978.7', '2026-10-28T18:47:57.212Z'),
+    ]).replace('1 lockfile entries', '3 lockfile entries');
+    expect(newestFlaggedPublishTime(log)).toBe(
+      Date.parse('2026-10-29T01:29:53.4229029Z')
+    );
+  });
+
+  it('falls back to the failure time when the violation lists no entries', () => {
     const log =
       '2026-10-29T01:29:53.4229029Z [ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION] boom';
-    expect(newestFlaggedPublishTime(log)).toBeNull();
+    expect(newestFlaggedPublishTime(log)).toBe(
+      Date.parse('2026-10-29T01:29:53.4229029Z')
+    );
+  });
+});
+
+describe('latestPullRequestRuns', () => {
+  const run = (overrides: Record<string, unknown>) => ({
+    workflow_id: 1,
+    run_number: 1,
+    event: 'pull_request',
+    head_repository: { full_name: 'tinacms/tinacms' },
+    ...overrides,
+  });
+
+  it('keeps only the newest run of each workflow', () => {
+    const failed = run({ run_number: 1, conclusion: 'failure' });
+    const rerunAfterLabel = run({ run_number: 2, conclusion: 'success' });
+    const other = run({ workflow_id: 2, conclusion: 'failure' });
+    expect(
+      latestPullRequestRuns([failed, rerunAfterLabel, other], 'tinacms/tinacms')
+    ).toEqual([rerunAfterLabel, other]);
+  });
+
+  it('ignores runs from forks and from other events', () => {
+    const fork = run({ head_repository: { full_name: 'someone/tinacms' } });
+    const pushed = run({ event: 'push' });
+    expect(latestPullRequestRuns([fork, pushed], 'tinacms/tinacms')).toEqual(
+      []
+    );
   });
 });
 

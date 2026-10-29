@@ -18,9 +18,9 @@ export const readMinimumReleaseAgeMinutes = (workspaceYaml) => {
 
 // Latest time a release flagged in this job log could have been published, or null when
 // the job did not fail on the release-age check.
-// NOTE: [29 Oct 2026] EK - pnpm lists only the first 20 flagged entries and then "...and N more",
-// so a truncated list cannot show the newest release. The failure time is the safe bound,
-// because nothing published after the install ran can have been flagged.
+// NOTE: [29 Oct 2026] EK - pnpm lists only the first 20 flagged entries ("...and N more"),
+// so a list shorter than the stated total cannot show the newest release. The failure time is
+// the safe bound, because nothing published after the install ran can have been flagged.
 // See https://github.com/tinacms/tinacms/issues/7949.
 export const newestFlaggedPublishTime = (log) => {
   const violationLine = log
@@ -28,17 +28,39 @@ export const newestFlaggedPublishTime = (log) => {
     .find((line) => line.includes(`[${VIOLATION}]`));
   if (!violationLine) return null;
 
-  if (/…and \d+ more|\.\.\.and \d+ more/.test(log)) {
-    const failedAt = Date.parse(violationLine.split(' ')[0]);
-    return Number.isNaN(failedAt) ? null : failedAt;
-  }
-
   const published = [...log.matchAll(/was published at (\S+Z),/g)].map((m) =>
     Date.parse(m[1])
   );
-  return published.length > 0 && !published.some(Number.isNaN)
-    ? Math.max(...published)
-    : null;
+  const flagged = Number(violationLine.match(/(\d+) lockfile entries/)?.[1]);
+  if (
+    published.length > 0 &&
+    published.length >= flagged &&
+    !published.some(Number.isNaN)
+  ) {
+    return Math.max(...published);
+  }
+
+  const failedAt = Date.parse(violationLine.split(' ')[0]);
+  return Number.isNaN(failedAt) ? null : failedAt;
+};
+
+// The newest pull_request run of each workflow on this repo's own branch. A label or a push
+// adds a fresh run beside the failed one, and only the fresh one says whether the PR still fails.
+export const latestPullRequestRuns = (runs, repository) => {
+  const latest = new Map();
+  for (const run of runs) {
+    if (
+      run.event !== 'pull_request' ||
+      run.head_repository?.full_name !== repository
+    ) {
+      continue;
+    }
+    const seen = latest.get(run.workflow_id);
+    if (!seen || run.run_number > seen.run_number) {
+      latest.set(run.workflow_id, run);
+    }
+  }
+  return [...latest.values()];
 };
 
 // Epoch ms from which a re-run clears the gate, or null when any failed job failed for
@@ -60,7 +82,11 @@ const api = async (route, { method = 'GET', text = false } = {}) => {
       Accept: 'application/vnd.github+json',
     },
   });
-  if (!res.ok) throw new Error(`${method} ${route} failed: ${res.status}`);
+  if (!res.ok) {
+    throw Object.assign(new Error(`${method} ${route} failed: ${res.status}`), {
+      status: res.status,
+    });
+  }
   return text ? res.text() : res.json();
 };
 
@@ -79,14 +105,57 @@ const failedJobLogs = async (runId) => {
     `actions/runs/${runId}/jobs?filter=latest&per_page=100`
   );
   const failed = jobs.filter((job) => FAILED_CONCLUSIONS.has(job.conclusion));
+  // An expired log reads as empty, so the PR counts as failing for another reason.
   return Promise.all(
-    failed.map((job) => api(`actions/jobs/${job.id}/logs`, { text: true }))
+    failed.map((job) =>
+      api(`actions/jobs/${job.id}/logs`, { text: true }).catch((err) => {
+        if (err.status === 404 || err.status === 410) return '';
+        throw err;
+      })
+    )
   );
 };
 
 const setOutput = (name, value) => {
   if (process.env.GITHUB_OUTPUT)
     appendFileSync(process.env.GITHUB_OUTPUT, `${name}=${value}\n`);
+};
+
+const runsToRerun = async (pr, minutes, now) => {
+  const label = `https://github.com/${repo}/pull/${pr.number}`;
+  const { workflow_runs: allRuns } = await api(
+    `actions/runs?head_sha=${pr.head.sha}&per_page=100`
+  );
+  const runs = latestPullRequestRuns(allRuns, repo);
+
+  if (runs.some((run) => run.status !== 'completed')) {
+    console.log(`${label}: CI still running, skipping`);
+    return [];
+  }
+  const failed = runs.filter((run) => FAILED_CONCLUSIONS.has(run.conclusion));
+  if (failed.length === 0) return [];
+
+  if (failed.some((run) => run.run_attempt > 1)) {
+    console.log(`${label}: already re-run once, leaving it alone`);
+    return [];
+  }
+
+  const logs = (
+    await Promise.all(failed.map((run) => failedJobLogs(run.id)))
+  ).flat();
+  const readyTime = readyAt(logs, minutes);
+  if (readyTime === null) {
+    console.log(`${label}: failing for another reason, leaving it alone`);
+    return [];
+  }
+  if (now < readyTime) {
+    console.log(`${label}: waiting until ${new Date(readyTime).toISOString()}`);
+    return [];
+  }
+  console.log(
+    `${label}: every flagged release has aged out, re-running ${failed.length} run(s)`
+  );
+  return failed.map((run) => run.id);
 };
 
 async function main() {
@@ -96,38 +165,11 @@ async function main() {
   const toRerun = [];
 
   for (const pr of await openDependabotPulls()) {
-    const label = `https://github.com/${repo}/pull/${pr.number}`;
-    const { workflow_runs: runs } = await api(
-      `actions/runs?head_sha=${pr.head.sha}&per_page=100`
-    );
-
-    if (runs.some((run) => run.status !== 'completed')) {
-      console.log(`${label}: CI still running, skipping`);
-      continue;
-    }
-    const failed = runs.filter((run) => FAILED_CONCLUSIONS.has(run.conclusion));
-    if (failed.length === 0) continue;
-
-    if (failed.some((run) => run.run_attempt > 1)) {
-      console.log(`${label}: already re-run once, leaving it alone`);
-      continue;
-    }
-
-    const logs = (
-      await Promise.all(failed.map((run) => failedJobLogs(run.id)))
-    ).flat();
-    const readyTime = readyAt(logs, minutes);
-    if (readyTime === null) {
-      console.log(`${label}: failing for another reason, leaving it alone`);
-    } else if (now < readyTime) {
-      console.log(
-        `${label}: waiting until ${new Date(readyTime).toISOString()}`
-      );
-    } else {
-      console.log(
-        `${label}: every flagged release has aged out, re-running ${failed.length} run(s)`
-      );
-      toRerun.push(...failed.map((run) => run.id));
+    try {
+      toRerun.push(...(await runsToRerun(pr, minutes, now)));
+    } catch (err) {
+      if (!(err instanceof Error)) throw err;
+      console.log(`::warning::PR ${pr.number}: ${err.message}`);
     }
   }
 
