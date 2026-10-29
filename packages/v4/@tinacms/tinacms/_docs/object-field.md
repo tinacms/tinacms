@@ -119,6 +119,11 @@ way it would at the top level.
 `parse` reads a `null` stored value as an empty object, the same way the
 `array` field reads `null` as an empty list.
 
+`serialize` returns null when every subfield is `undefined`. That is an object
+the document never stated, and `digestDocument` drops the key. A stated object
+whose subfields have no default ingests as `null`, not `undefined`, so the
+next save keeps it. An empty stated object is written back as `{}`.
+
 ### A stored value of the wrong shape
 
 A hand-edited file can hold a value that is not an object, such as

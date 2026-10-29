@@ -187,9 +187,11 @@ sets the field to an empty list.
 ## The component
 
 `ArrayField` (`array-field.ui.tsx`) uses react-hook-form's own
-`useFieldArray({ control, name: address })` for add, remove, and reorder — the
-already-installed tool for exactly this job, with stable item keys so React
-does not misalign inputs across a reorder.
+`useFieldArray({ control, name: address })` to add an object item and to keep
+stable item keys. Remove and move go through `useRemoveListItem` and
+`useMoveListItem`. Those rewrite the list at its nested address, such as
+`groups.0.members`, so the defaults and the item errors move with the items.
+A scalar `of` list still adds, removes, and reorders through `useFieldValue`.
 
 For each item, for each item field, it renders `<NestedFieldRow address node>`
 (`editor/field.tsx`) — a `<Label>` pointing at the item field's own nested
