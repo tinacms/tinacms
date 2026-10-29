@@ -106,7 +106,7 @@ catalog:
     "@types/prompts": ^2.4.9
     "@types/prop-types": ^15.7.14
     "@types/react-dom": ^18.3.5
-    "@vitest/coverage-v8": ^2.1.9
+    "@vitest/coverage-v8": ^4.1.11
     "@types/search-index": ^3.2.4
     "@types/styled-components": ^5.1.34
     "@types/tar": 6.1.13
@@ -257,5 +257,6 @@ catalog:
     validate-npm-package-name: ^7.0.0
     vfile-message: 3.1.4
     vite: ^7.3.6
+    vitest: ^4.1.11
     webfontloader: 1.6.28
     zod: ^3.24.2
