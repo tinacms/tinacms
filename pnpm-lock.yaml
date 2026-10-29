@@ -627,6 +627,9 @@ catalogs:
     vite:
       specifier: ^7.3.6
       version: 7.3.6
+    vitest:
+      specifier: ^4.1.11
+      version: 4.1.12
     webfontloader:
       specifier: 1.6.28
       version: 1.6.28
@@ -691,7 +694,7 @@ importers:
         specifier: 'catalog:'
         version: 7.3.6(@types/node@22.19.17)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)
       vitest:
-        specifier: ^4.1.11
+        specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/coverage-v8@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(vite@7.3.6(@types/node@22.19.17)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   examples/astro/kitchen-sink:
@@ -1248,7 +1251,7 @@ importers:
         specifier: 'catalog:'
         version: 7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)
       vitest:
-        specifier: ^4.1.11
+        specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/coverage-v8@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(vite@7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   packages/@tinacms/astro:
@@ -1273,7 +1276,7 @@ importers:
         specifier: ^8.0.0
         version: 8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2)
       vitest:
-        specifier: ^4.1.11
+        specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/coverage-v8@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(vite@8.1.3(@types/node@22.19.17)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))
 
   packages/@tinacms/auth:
@@ -1315,7 +1318,7 @@ importers:
         specifier: 'catalog:'
         version: 7.3.6(@types/node@22.19.17)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)
       vitest:
-        specifier: ^4.1.11
+        specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/coverage-v8@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(vite@7.3.6(@types/node@22.19.17)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   packages/@tinacms/cli:
@@ -1990,7 +1993,7 @@ importers:
         specifier: 'catalog:'
         version: 7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)
       vitest:
-        specifier: ^4.1.11
+        specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/coverage-v8@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(vite@7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   packages/@tinacms/webpack-helpers:
@@ -2051,7 +2054,7 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
       vitest:
-        specifier: ^4.1.11
+        specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.3)(@vitest/coverage-v8@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(vite@7.3.6(@types/node@22.19.3)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   packages/next-tinacms-azure:
@@ -2494,7 +2497,7 @@ importers:
         specifier: 'catalog:'
         version: 7.3.6(@types/node@22.19.3)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)
       vitest:
-        specifier: ^4.1.11
+        specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@22.19.3)(@vitest/coverage-v8@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(vite@7.3.6(@types/node@22.19.3)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   packages/tinacms-authjs:
@@ -2731,7 +2734,7 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
       vitest:
-        specifier: ^4.1.11
+        specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/coverage-v8@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(vite@7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   packages/v4/@tinacms/tinacms:
@@ -2831,7 +2834,7 @@ importers:
         specifier: 'catalog:'
         version: 7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)
       vitest:
-        specifier: ^4.1.11
+        specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/coverage-v8@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(vite@7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   packages/v4/@tinacms/ui:
@@ -2901,7 +2904,7 @@ importers:
         specifier: 'catalog:'
         version: 7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)
       vitest:
-        specifier: ^4.1.11
+        specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/coverage-v8@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(vite@7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   packages/v4/examples/barebones:

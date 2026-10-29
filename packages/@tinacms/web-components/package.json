@@ -30,7 +30,7 @@
     "happy-dom": "catalog:",
     "jsdom": "^29.1.1",
     "vite": "catalog:",
-    "vitest": "^4.1.11"
+    "vitest": "catalog:"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

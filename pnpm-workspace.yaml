@@ -257,5 +257,6 @@ catalog:
     validate-npm-package-name: ^7.0.0
     vfile-message: 3.1.4
     vite: ^7.3.6
+    vitest: ^4.1.11
     webfontloader: 1.6.28
     zod: ^3.24.2
