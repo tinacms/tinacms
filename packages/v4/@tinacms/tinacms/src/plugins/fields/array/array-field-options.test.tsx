@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
+import type { MediaProvider } from '../../../core/media/contract';
+import { definePlugin } from '../../../core/plugin';
 import type {
   CollectionSchema,
   TinaDocument,
@@ -13,7 +15,25 @@ import numberFieldPlugin from '../number/number-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import arrayFieldPlugin from './array-field.plugin';
 
-const PLUGINS = [arrayFieldPlugin, stringFieldPlugin, numberFieldPlugin];
+const media: MediaProvider = {
+  upload: async (file) => file.name,
+  list: async () => ({ items: [] }),
+  delete: async () => {},
+  resolveUrl: (path) => `/uploads/${path}`,
+};
+
+const mediaPlugin = definePlugin({
+  name: 'test:media:stub',
+  provides: ['media'],
+  client: async () => ({ default: { slice: () => ({ ...media }) } }),
+});
+
+const PLUGINS = [
+  arrayFieldPlugin,
+  stringFieldPlugin,
+  numberFieldPlugin,
+  mediaPlugin,
+];
 
 const renderCollection = (
   collection: CollectionSchema,
@@ -185,5 +205,57 @@ describe('itemLabel', () => {
         },
       ],
     });
+  });
+});
+
+describe('picker and previewImage', () => {
+  const blocks = (picker?: 'list' | 'grid', previewImage?: string) =>
+    pageOf(
+      t.array({
+        name: 'blocks',
+        label: 'Blocks',
+        picker,
+        templates: [
+          {
+            name: 'hero',
+            label: 'Hero',
+            previewImage,
+            fields: [t.string({ name: 'headline', label: 'Headline' })],
+          },
+        ],
+      })
+    );
+  const tiles = () => document.querySelectorAll('img');
+
+  it('lists Add buttons when no template has a previewImage', async () => {
+    renderCollection(blocks());
+    expect(
+      await screen.findByRole('button', { name: 'Add Hero' })
+    ).toBeInTheDocument();
+    expect(tiles()).toHaveLength(0);
+  });
+
+  it('shows a grid with each preview and label when a template has a previewImage', async () => {
+    const user = userEvent.setup();
+    renderCollection(blocks(undefined, 'blocks/hero.png'));
+    const tile = await screen.findByRole('button', { name: 'Add Hero' });
+    expect(tile).toHaveTextContent('Hero');
+    expect(tiles()[0]).toHaveAttribute('src', '/uploads/blocks/hero.png');
+    await user.click(tile);
+    expect(screen.getByLabelText('Headline')).toBeInTheDocument();
+  });
+
+  it('honours an explicit list over a previewImage', async () => {
+    renderCollection(blocks('list', 'blocks/hero.png'));
+    await screen.findByRole('button', { name: 'Add Hero' });
+    expect(tiles()).toHaveLength(0);
+  });
+
+  it('shows the label alone for a URL previewImage', async () => {
+    renderCollection(blocks('grid', 'https://example.com/hero.png'));
+    expect(
+      await screen.findByRole('button', { name: 'Add Hero' })
+    ).toHaveTextContent('Hero');
+    expect(tiles()).toHaveLength(0);
   });
 });

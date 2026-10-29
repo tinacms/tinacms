@@ -1,7 +1,7 @@
 import { AddButton } from '@tinacms/ui/components/add-button';
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import type { FieldAddress } from '../../../core/field/address';
 import { ingestDocument } from '../../../core/form/ingest';
@@ -15,18 +15,22 @@ import {
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
+  useMediaSlice,
 } from '../../../editor';
 import {
   type ArrayTemplateSchema,
   type ItemLabel,
   type ObjectArrayFieldSchema,
   type ScalarArrayFieldSchema,
+  type TemplatesArrayFieldSchema,
   asArrayFieldSchema,
   isItem,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
+  pickerOf,
 } from './array-field.schema';
+import { isMediaPath } from '../image/image-field.schema';
 import { StoredValue, UneditableValue } from '../uneditable-value';
 
 export function ArrayField() {
@@ -142,14 +146,7 @@ function ObjectItems({
       </div>
       <div className='mt-3 flex flex-wrap gap-2'>
         {isTemplatesArray(field) ? (
-          field.templates.map((template) => (
-            <AddButton
-              key={template.name}
-              onClick={() => addTemplateItem(template)}
-            >
-              {`Add ${labelOf(template)}`}
-            </AddButton>
-          ))
+          <TemplatePicker field={field} onAdd={addTemplateItem} />
         ) : (
           <AddButton
             onClick={() => addFieldsItem(field.fields, field.defaultItem)}
@@ -159,6 +156,65 @@ function ObjectItems({
         )}
       </div>
     </>
+  );
+}
+
+function TemplatePicker({
+  field,
+  onAdd,
+}: {
+  field: TemplatesArrayFieldSchema;
+  onAdd: (template: ArrayTemplateSchema) => void;
+}) {
+  if (pickerOf(field) === 'list') {
+    return field.templates.map((template) => (
+      <AddButton key={template.name} onClick={() => onAdd(template)}>
+        {`Add ${labelOf(template)}`}
+      </AddButton>
+    ));
+  }
+  return (
+    <div className='grid w-full grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2'>
+      {field.templates.map((template) => (
+        <button
+          key={template.name}
+          type='button'
+          aria-label={`Add ${labelOf(template)}`}
+          className='flex flex-col gap-2 rounded-sm border p-2 text-left text-sm hover:border-input focus-visible:shadow-focus-ring'
+          onClick={() => onAdd(template)}
+        >
+          {template.previewImage ? (
+            <PreviewImage path={template.previewImage} />
+          ) : null}
+          <span className='font-medium'>{labelOf(template)}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// A bad path or a broken image shows the template label alone.
+function PreviewImage({ path }: { path: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!isMediaPath(path) || failed) return null;
+  return <ResolvedPreview path={path} onError={() => setFailed(true)} />;
+}
+
+function ResolvedPreview({
+  path,
+  onError,
+}: {
+  path: string;
+  onError: () => void;
+}) {
+  const media = useMediaSlice();
+  return (
+    <img
+      src={media.resolveUrl(path, { width: 256, height: 160 })}
+      alt=''
+      className='aspect-video w-full rounded-sm object-cover'
+      onError={onError}
+    />
   );
 }
 

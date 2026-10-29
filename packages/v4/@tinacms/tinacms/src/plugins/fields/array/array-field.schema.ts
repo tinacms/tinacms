@@ -40,8 +40,15 @@ export interface FieldsArrayFieldSchema extends ArrayFieldBase {
   of?: never;
 }
 
+export type Picker = 'list' | 'grid';
+
 export interface TemplatesArrayFieldSchema extends ArrayFieldBase {
   templates: ArrayTemplateSchema[];
+  /**
+   * How an editor picks a block to add. Defaults to `'grid'` when any template
+   * has a `previewImage`, else `'list'`.
+   */
+  picker?: Picker;
   /** Each template carries its own `defaultItem`. */
   defaultItem?: never;
   itemLabel?: never;
@@ -95,6 +102,10 @@ export function array(
 ): ArrayFieldSchema {
   return { ...config, type: ARRAY_FIELD_TYPE } as ArrayFieldSchema;
 }
+
+export const pickerOf = (field: TemplatesArrayFieldSchema): Picker =>
+  field.picker ??
+  (field.templates.some((template) => template.previewImage) ? 'grid' : 'list');
 
 export const isTemplatesArray = (
   field: ArrayFieldSchema

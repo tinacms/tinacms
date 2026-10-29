@@ -517,7 +517,7 @@ describe('compileSchema array options', () => {
         },
       ],
       ...extra,
-    } as FieldSchema,
+    } as unknown as FieldSchema,
   ];
 
   it('rejects defaultItem on a templates array', () => {
