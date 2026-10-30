@@ -130,17 +130,22 @@ function FormContextProbe({ ticks }: { ticks: { count: number } }) {
   return null;
 }
 
-function SetNameError() {
-  const { setError } = useFormContext();
+function SetNameError({
+  onSet,
+}: {
+  onSet: (errors: unknown) => void;
+}) {
+  const { setError, control } = useFormContext();
   return (
     <button
       type='button'
-      onClick={() =>
+      onClick={() => {
         setError('authors.0.name', {
           type: 'required',
           message: 'Name is required',
-        })
-      }
+        });
+        onSet(control._formState.errors);
+      }}
     >
       Set name error
     </button>
@@ -859,11 +864,12 @@ describe('ArrayField validation', () => {
 
   it('does not re-render the form when an error changes on one field', async () => {
     const ticks = { count: 0 };
+    const seen: { errors: unknown } = { errors: null };
     renderField(
       { authors: [{ name: 'Ivan' }] },
       <>
         <FormContextProbe ticks={ticks} />
-        <SetNameError />
+        <SetNameError onSet={(errors) => (seen.errors = errors)} />
       </>
     );
     await screen.findByLabelText('Name');
@@ -872,9 +878,9 @@ describe('ArrayField validation', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'Set name error' })
     );
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Name is required'
-    );
+    expect(seen.errors).toMatchObject({
+      authors: [{ name: { message: 'Name is required' } }],
+    });
     expect(ticks.count).toBe(settled);
   });
 
