@@ -61,7 +61,7 @@ function SearchBox({
       </label>
       <InputGroup size={size}>
         <InputGroupAddon>
-          <Icon glyph={icon} size={16} className='size-4' />
+          <Icon glyph={icon} size={16} />
         </InputGroupAddon>
         <InputGroupInput
           id={inputId}
@@ -81,7 +81,7 @@ function SearchBox({
               aria-label='Clear search'
               onClick={onClear}
             >
-              <Icon glyph='close' size={12} className='size-3' />
+              <Icon glyph='close' size={14} />
             </InputGroupButton>
           </InputGroupAddon>
         ) : shortcut ? (

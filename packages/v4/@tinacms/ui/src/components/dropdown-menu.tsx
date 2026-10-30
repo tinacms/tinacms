@@ -93,7 +93,7 @@ function RowLead({
 }) {
   return (
     <>
-      {icon ? <Icon glyph={icon} size={16} className='size-4' /> : null}
+      {icon ? <Icon glyph={icon} size={16} /> : null}
       <span className='min-w-0 flex-1 truncate'>{children}</span>
     </>
   );
@@ -155,11 +155,7 @@ function DropdownMenuLinkItem({
         {children}
         <span className='sr-only'> (opens in a new tab)</span>
       </span>
-      <Icon
-        glyph='external'
-        size={13}
-        className='size-3.25 text-muted-foreground'
-      />
+      <Icon glyph='external' size={14} className='text-muted-foreground' />
     </MenuPrimitive.LinkItem>
   );
 }
@@ -187,7 +183,7 @@ function DropdownMenuCheckboxItem({
         data-slot='dropdown-menu-checkbox-item-indicator'
       >
         <MenuPrimitive.CheckboxItemIndicator>
-          <Icon glyph='check' size={16} className='size-4' />
+          <Icon glyph='check' size={16} />
         </MenuPrimitive.CheckboxItemIndicator>
       </span>
     </MenuPrimitive.CheckboxItem>

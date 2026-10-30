@@ -93,7 +93,7 @@ function StatusBar({
         </span>
         {action ? (
           <Button
-            variant='toolbar'
+            variant='outline'
             size='sm'
             onClick={action.onClick}
             className='h-5 px-1.5 text-xs'

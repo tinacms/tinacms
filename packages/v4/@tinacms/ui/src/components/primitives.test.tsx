@@ -20,9 +20,32 @@ describe('Badge', () => {
     expect(screen.getByText('Failed')).toBeVisible();
   });
 
-  it('announces an error count only through its srLabel', () => {
-    render(<Badge kind='errors' count={3} srLabel='3 errors' />);
-    expect(screen.getByText('3 errors')).toBeInTheDocument();
+  it('announces a count in words, not as a bare number', () => {
+    render(<Badge kind='count' tone='error' count={3} srLabel=', 3 errors' />);
+    expect(screen.getByText(', 3 errors')).toBeInTheDocument();
+    expect(screen.getByText('3')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('caps a count at 99+', () => {
+    const { rerender } = render(
+      <Badge kind='count' count={99} srLabel=', 99 changes' />
+    );
+    expect(screen.getByText('99')).toBeInTheDocument();
+    rerender(<Badge kind='count' count={100} srLabel=', 100 changes' />);
+    expect(screen.getByText('99+')).toBeInTheDocument();
+  });
+
+  it('colours a count by tone', () => {
+    const { rerender } = render(
+      <Badge kind='count' tone='error' count={2} srLabel=', 2 errors' />
+    );
+    const errorClasses = screen.getByText('2').parentElement?.className;
+    rerender(
+      <Badge kind='count' tone='change' count={2} srLabel=', 2 changes' />
+    );
+    expect(screen.getByText('2').parentElement?.className).not.toBe(
+      errorClasses
+    );
   });
 
   it('rejects props that do nothing for a kind', () => {
@@ -30,6 +53,8 @@ describe('Badge', () => {
     void (<Badge kind='status' status='failed' tone='danger' />);
     // @ts-expect-error an inline count needs words for screen readers
     void (<Badge kind='count' count={3} />);
+    // @ts-expect-error the number and errors kinds are one count badge now
+    void (<Badge kind='errors' count={3} />);
     // @ts-expect-error only tags take the code font
     void (<Badge kind='label' mono children='Draft' />);
   });
@@ -75,6 +100,17 @@ describe('Icon', () => {
     );
     expect(screen.getByTestId('plain')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByRole('img', { name: 'Warning' })).toBeVisible();
+  });
+});
+
+describe('Icon sizes', () => {
+  it('accepts only 14, 16 and 20', () => {
+    // @ts-expect-error 18 is not a design-system size
+    void (<Icon glyph='doc' size={18} />);
+    // @ts-expect-error 12 is not a design-system size
+    void (<Icon glyph='doc' size={12} />);
+    render(<Icon glyph='doc' size={14} data-testid='icon' />);
+    expect(screen.getByTestId('icon')).toBeInTheDocument();
   });
 });
 

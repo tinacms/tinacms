@@ -316,7 +316,7 @@ function ItemRow({
         <div className='flex items-center gap-1'>
           <Button
             type='button'
-            variant='toolbar'
+            variant='outline'
             size='sm'
             aria-label={`Move item ${position} up`}
             disabled={index === 0}
@@ -326,7 +326,7 @@ function ItemRow({
           </Button>
           <Button
             type='button'
-            variant='toolbar'
+            variant='outline'
             size='sm'
             aria-label={`Move item ${position} down`}
             disabled={index === count - 1}
@@ -336,7 +336,7 @@ function ItemRow({
           </Button>
           <Button
             type='button'
-            variant='toolbar'
+            variant='outline'
             size='sm'
             aria-label={`Remove item ${position}`}
             onClick={() => onRemove(index)}

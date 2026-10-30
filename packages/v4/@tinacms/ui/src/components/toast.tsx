@@ -18,6 +18,10 @@ type ToastAction = {
   'aria-label'?: string;
 };
 
+/** Buttons on the dark toast: light words that lift to white on hover. */
+const ON_DARK =
+  'text-inv-ink not-disabled:not-aria-disabled:hover:bg-inv-hover not-disabled:not-aria-disabled:hover:text-white';
+
 const toastVariants = cva(
   'box-border flex w-full max-w-full items-start gap-2.5 rounded-md py-3 pr-2 pl-3.5 font-sans text-sm leading-control',
   {
@@ -117,7 +121,7 @@ function Toast({
           !oneLine && 'mt-px'
         )}
       >
-        <Icon glyph={TONE_ICON[tone].glyph} size={18} className='size-4.5' />
+        <Icon glyph={TONE_ICON[tone].glyph} size={16} />
       </span>
       <div
         className={cn(
@@ -141,29 +145,48 @@ function Toast({
         {hasActions ? (
           <div className='flex flex-wrap gap-1.5 pt-2'>
             {action ? (
-              <Button
-                variant={dark ? 'inverse' : 'toolbar'}
-                size='sm'
-                aria-label={action['aria-label']}
-                onClick={action.onClick}
-              >
-                {action.label}
-              </Button>
+              dark ? (
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  aria-label={action['aria-label']}
+                  className={ON_DARK}
+                  onClick={action.onClick}
+                >
+                  {action.label}
+                </Button>
+              ) : (
+                <Button
+                  variant='outline'
+                  size='sm'
+                  aria-label={action['aria-label']}
+                  onClick={action.onClick}
+                >
+                  {action.label}
+                </Button>
+              )
             ) : null}
             {secondaryAction ? (
-              <Button
-                variant={dark ? 'inverse' : 'ghost'}
-                size='sm'
-                icon={destructive ? 'trash' : undefined}
-                aria-label={secondaryAction['aria-label']}
-                className={cn(
-                  destructive &&
-                    'text-destructive hover:text-destructive [&_[data-slot=icon]]:text-destructive'
-                )}
-                onClick={secondaryAction.onClick}
-              >
-                {secondaryAction.label}
-              </Button>
+              destructive ? (
+                <Button
+                  variant='destructive'
+                  size='sm'
+                  aria-label={secondaryAction['aria-label']}
+                  onClick={secondaryAction.onClick}
+                >
+                  {secondaryAction.label}
+                </Button>
+              ) : (
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  aria-label={secondaryAction['aria-label']}
+                  className={dark ? ON_DARK : undefined}
+                  onClick={secondaryAction.onClick}
+                >
+                  {secondaryAction.label}
+                </Button>
+              )
             ) : null}
           </div>
         ) : null}
@@ -171,10 +194,11 @@ function Toast({
       {dismissible ? (
         <span className={cn('ml-auto flex-none', !oneLine && '-my-1')}>
           <Button
-            variant={dark ? 'icon-inverse' : 'icon'}
+            variant='icon'
             size='sm'
             icon='close'
             aria-label={dismissLabel}
+            className={dark ? ON_DARK : undefined}
             onClick={onDismiss}
           />
         </span>
