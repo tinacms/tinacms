@@ -5,11 +5,8 @@ import { asResolvedConfig } from '../config';
 import '../plugins/fields/rich-text/rich-text-field.client';
 import type { MediaProvider } from '../core/media/contract';
 import { definePlugin } from '../core/plugin';
-import {
-  digestDocument,
-  ingestDocument,
-  seedDocument,
-} from '../core/form/ingest';
+import { digestDocument, ingestDocument } from '../core/form/ingest';
+import { seedItem } from '../plugins/fields/array/seed-item';
 import { resolveFieldPlugins } from '../core/field/registry';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { FormProvider, type SaveHandler, TinaProvider } from '../editor';
@@ -140,7 +137,7 @@ describe('field defaultValue', () => {
   });
 
   it('fills a new item, keeps falsy defaults, and falls back to the plugin default', async () => {
-    const values = seedDocument(undefined, fields, await contextOf());
+    const values = seedItem(undefined, fields, await contextOf());
     expect(values).toMatchObject({
       title: 'Untitled',
       plain: '',
@@ -151,7 +148,7 @@ describe('field defaultValue', () => {
   });
 
   it('lets defaultItem win over a field default', async () => {
-    const values = seedDocument({ title: 'Mine' }, fields, await contextOf());
+    const values = seedItem({ title: 'Mine' }, fields, await contextOf());
     expect(values.title).toBe('Mine');
   });
 
@@ -164,10 +161,30 @@ describe('field defaultValue', () => {
       })
     );
     const context = await contextOf();
-    const a = seedDocument(undefined, objectFields, context);
-    const b = seedDocument(undefined, objectFields, context);
+    const a = seedItem(undefined, objectFields, context);
+    const b = seedItem(undefined, objectFields, context);
     expect(a.o).toEqual({ a: 'x' });
     expect(a.o).not.toBe(b.o);
+  });
+
+  it('fills a field inside an object of a new item', async () => {
+    const { fields: nestedFields } = collectionOf(
+      t.object({
+        name: 'seo',
+        fields: [
+          t.string({ name: 'title', defaultValue: 'x' }),
+          t.string({ name: 'note' }),
+        ],
+      })
+    );
+    const context = await contextOf();
+    expect(seedItem(undefined, nestedFields, context).seo).toEqual({
+      title: 'x',
+      note: '',
+    });
+    expect(seedItem({ seo: { note: 'n' } }, nestedFields, context).seo).toEqual(
+      { title: 'x', note: 'n' }
+    );
   });
 
   it('never fills a loaded document, so a cleared field stays cleared', async () => {

@@ -215,8 +215,9 @@ These options sit at the top level of a field. v4 has no `ui` wrapper
 ### `defaultValue`
 
 - It fills the field when an editor adds a new item to an array, for example
-  with the Add button of a list of objects or a block. A loaded document never
-  gets it, so a cleared field stays cleared.
+  with the Add button of a list of objects or a block. Fields inside an object
+  of the new item get theirs too. A loaded document never gets it, so a
+  cleared field stays cleared.
 - It is a stored-form value: what the file would hold, not what the editor
   holds. It runs through the plugin's `parse`. A falsy default (`0`, `''`,
   `false`) is a real default.

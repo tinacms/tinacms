@@ -12,6 +12,7 @@ import { FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import { LabelledFields } from '../../../test/labelled-fields';
 import numberFieldPlugin from '../number/number-field.plugin';
+import objectFieldPlugin from '../object/object-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import arrayFieldPlugin from './array-field.plugin';
 
@@ -32,6 +33,7 @@ const PLUGINS = [
   arrayFieldPlugin,
   stringFieldPlugin,
   numberFieldPlugin,
+  objectFieldPlugin,
   mediaPlugin,
 ];
 
@@ -81,6 +83,33 @@ describe('defaultItem', () => {
     await user.click(await screen.findByRole('button', { name: 'Add item' }));
     expect(screen.getByLabelText('Label')).toHaveValue('New link');
     expect(screen.getByLabelText('URL')).toHaveValue('/');
+  });
+
+  it('seeds a field default inside an object of a new item', async () => {
+    const user = userEvent.setup();
+    renderCollection(
+      pageOf(
+        t.array({
+          name: 'links',
+          label: 'Links',
+          fields: [
+            t.object({
+              name: 'meta',
+              label: 'Meta',
+              fields: [
+                t.string({
+                  name: 'rel',
+                  label: 'Rel',
+                  defaultValue: 'nofollow',
+                }),
+              ],
+            }),
+          ],
+        })
+      )
+    );
+    await user.click(await screen.findByRole('button', { name: 'Add item' }));
+    expect(screen.getByLabelText('Rel')).toHaveValue('nofollow');
   });
 
   it('seeds each template from its own defaultItem', async () => {

@@ -23,21 +23,6 @@ export const ingestDocument = (
   return values;
 };
 
-// ADR-029: a field `defaultValue` fills a new item only. A loaded document
-// never gets it, so a cleared field stays cleared.
-export const seedDocument = (
-  defaultItem: TinaDocument | undefined,
-  fields: FieldSchema[],
-  context: FieldTransformContext
-): TinaDocument => {
-  const stored: TinaDocument = {};
-  for (const node of fields) {
-    const value = defaultItem?.[node.name] ?? node.defaultValue;
-    if (value !== undefined) stored[node.name] = structuredClone(value);
-  }
-  return ingestDocument(stored, fields, context);
-};
-
 export const digestDocument = (
   values: TinaDocument | undefined,
   fields: FieldSchema[],
