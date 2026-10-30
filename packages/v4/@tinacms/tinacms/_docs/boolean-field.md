@@ -37,6 +37,9 @@ has no `min`, `max`, or `pattern` property, because a boolean value has no
 constraints. A `required` validator on the field has no effect, and the field
 shows no star. The next section gives the reason.
 
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
+
 ## The descriptor
 
 The client segment (`boolean-field.client.tsx`) takes the `boolean` key:

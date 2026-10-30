@@ -1,16 +1,12 @@
 import { AddButton } from '@tinacms/ui/components/add-button';
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { type ReactNode, useRef } from 'react';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import { type ReactNode, useRef, useState } from 'react';
+import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import type { FieldAddress } from '../../../core/field/address';
-import { ingestDocument } from '../../../core/form/ingest';
+import { seedItem } from './seed-item';
 import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
-import type {
-  FieldSchema,
-  TemplateSchema,
-  TinaDocument,
-} from '../../../core/schema/types';
+import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
 import {
   NestedFieldRow,
   useDocumentPath,
@@ -19,16 +15,22 @@ import {
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
+  useMediaSlice,
 } from '../../../editor';
 import {
+  type ArrayTemplateSchema,
+  type ItemLabel,
   type ObjectArrayFieldSchema,
   type ScalarArrayFieldSchema,
+  type TemplatesArrayFieldSchema,
   asArrayFieldSchema,
   isItem,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
+  pickerOf,
 } from './array-field.schema';
+import { isMediaPath } from '../image/image-field.schema';
 import { StoredValue, UneditableValue } from '../uneditable-value';
 
 export function ArrayField() {
@@ -80,18 +82,19 @@ function ObjectItems({
     remove,
     move,
   } = useFieldArray({ control, name: address });
+  // Subscribes the headings to edits, so an `itemLabel` follows typing.
+  const watched: unknown = useWatch({ control, name: address });
 
-  const seed = (template: TemplateSchema | undefined, fields: FieldSchema[]) =>
-    ingestDocument(template?.defaultItem ?? {}, fields, {
-      documentPath,
-      registry,
-    });
-  const addFieldsItem = (fields: FieldSchema[]) =>
-    append(seed(undefined, fields));
-  const addTemplateItem = (template: TemplateSchema) =>
+  const seed = (defaultItem: TinaDocument | undefined, fields: FieldSchema[]) =>
+    seedItem(defaultItem, fields, { documentPath, registry });
+  const addFieldsItem = (
+    fields: FieldSchema[],
+    defaultItem: TinaDocument | undefined
+  ) => append(seed(defaultItem, fields));
+  const addTemplateItem = (template: ArrayTemplateSchema) =>
     append({
       [TEMPLATE_KEY]: template.name,
-      ...seed(template, template.fields),
+      ...seed(template.defaultItem, template.fields),
     });
 
   return (
@@ -103,13 +106,17 @@ function ObjectItems({
       >
         {items.map((item, index) => {
           const stored: unknown = getValues(`${address}.${index}`);
+          // The watched copy only re-renders the heading; it can lag a move.
+          const shown: unknown = Array.isArray(watched)
+            ? watched[index]
+            : stored;
           const fields = isItem(stored)
             ? itemFieldsOf(field, stored)
             : undefined;
           return (
             <ItemRow
               key={item.id}
-              heading={headingOf(field, stored, index)}
+              heading={headingOf(field, shown, index)}
               index={index}
               count={items.length}
               onMove={move}
@@ -139,16 +146,11 @@ function ObjectItems({
       </div>
       <div className='mt-3 flex flex-wrap gap-2'>
         {isTemplatesArray(field) ? (
-          field.templates.map((template) => (
-            <AddButton
-              key={template.name}
-              onClick={() => addTemplateItem(template)}
-            >
-              {`Add ${labelOf(template)}`}
-            </AddButton>
-          ))
+          <TemplatePicker field={field} onAdd={addTemplateItem} />
         ) : (
-          <AddButton onClick={() => addFieldsItem(field.fields)}>
+          <AddButton
+            onClick={() => addFieldsItem(field.fields, field.defaultItem)}
+          >
             Add item
           </AddButton>
         )}
@@ -157,11 +159,71 @@ function ObjectItems({
   );
 }
 
+function TemplatePicker({
+  field,
+  onAdd,
+}: {
+  field: TemplatesArrayFieldSchema;
+  onAdd: (template: ArrayTemplateSchema) => void;
+}) {
+  if (pickerOf(field) === 'list') {
+    return field.templates.map((template) => (
+      <AddButton key={template.name} onClick={() => onAdd(template)}>
+        {`Add ${labelOf(template)}`}
+      </AddButton>
+    ));
+  }
+  return (
+    <div className='grid w-full grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2'>
+      {field.templates.map((template) => (
+        <button
+          key={template.name}
+          type='button'
+          aria-label={`Add ${labelOf(template)}`}
+          className='flex flex-col gap-2 rounded-sm border p-2 text-left text-sm hover:border-input focus-visible:shadow-focus-ring'
+          onClick={() => onAdd(template)}
+        >
+          {template.previewImage ? (
+            <PreviewImage path={template.previewImage} />
+          ) : null}
+          <span className='font-medium'>{labelOf(template)}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// A bad path or a broken image shows the template label alone.
+function PreviewImage({ path }: { path: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!isMediaPath(path) || failed) return null;
+  return <ResolvedPreview path={path} onError={() => setFailed(true)} />;
+}
+
+function ResolvedPreview({
+  path,
+  onError,
+}: {
+  path: string;
+  onError: () => void;
+}) {
+  const media = useMediaSlice();
+  return (
+    <img
+      src={media.resolveUrl(path, { width: 256, height: 160 })}
+      alt=''
+      className='aspect-video w-full rounded-sm object-cover'
+      onError={onError}
+    />
+  );
+}
+
 function ScalarItems({
   address,
   field,
 }: ItemListProps & { field: ScalarArrayFieldSchema }) {
   const registry = useFieldRegistry();
+  const documentPath = useDocumentPath();
   const { getValues } = useFormContext();
   const [value, setValue] = useFieldValue<unknown[] | undefined>(address);
   const items = value ?? [];
@@ -188,10 +250,16 @@ function ScalarItems({
   };
   const addItem = () => {
     keys.current = [...keys.current, nextScalarKey()];
-    setValue([
-      ...liveItems(),
-      registry.get(field.of.type)?.defaultValue ?? null,
-    ]);
+    setValue([...liveItems(), seedScalar()]);
+  };
+  // `defaultItem`, then `of.defaultValue`, then the item type's own default.
+  const seedScalar = (): unknown => {
+    const descriptor = registry.get(field.of.type);
+    const stored = field.defaultItem ?? field.of.defaultValue;
+    if (stored === undefined) return descriptor?.defaultValue ?? null;
+    return descriptor?.parse
+      ? descriptor.parse(stored, field.of, { documentPath, registry })
+      : stored;
   };
 
   return (
@@ -282,8 +350,21 @@ function ItemRow({
   );
 }
 
-const labelOf = (template: TemplateSchema): string =>
+const labelOf = (template: ArrayTemplateSchema): string =>
   template.label ?? template.name;
+
+// A throw or a result that is not a non-empty string is no heading.
+const customHeading = (
+  itemLabel: ItemLabel | undefined,
+  item: TinaDocument
+): string | undefined => {
+  try {
+    const label = itemLabel?.(item);
+    return typeof label === 'string' && label !== '' ? label : undefined;
+  } catch {
+    return undefined;
+  }
+};
 
 const headingOf = (
   field: ObjectArrayFieldSchema,
@@ -291,9 +372,13 @@ const headingOf = (
   index: number
 ): string => {
   if (!isItem(item)) return `Item ${index + 1} is not an object`;
-  if (!isTemplatesArray(field)) return `Item ${index + 1}`;
+  if (!isTemplatesArray(field)) {
+    return customHeading(field.itemLabel, item) ?? `Item ${index + 1}`;
+  }
   const template = templateFor(field.templates, item);
-  if (template) return labelOf(template);
+  if (template) {
+    return customHeading(template.itemLabel, item) ?? labelOf(template);
+  }
   const name = item[TEMPLATE_KEY];
   return name === undefined
     ? 'Block with no template'

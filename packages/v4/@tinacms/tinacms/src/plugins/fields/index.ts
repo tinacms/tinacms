@@ -48,7 +48,10 @@ export const t = {
   image,
 };
 
-export type { ArrayFieldSchema } from './array/array-field.schema';
+export type {
+  ArrayFieldSchema,
+  ArrayTemplateSchema,
+} from './array/array-field.schema';
 export type { BooleanFieldSchema } from './boolean/boolean-field.schema';
 export type { DatetimeFieldSchema } from './datetime/datetime-field.schema';
 export type { ImageFieldSchema } from './image/image-field.schema';

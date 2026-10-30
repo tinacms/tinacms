@@ -85,7 +85,7 @@ A **Field plugin** whose value is a *pointer* to another document (target collec
 _Avoid_: storing the referenced document's content in the field; editing the target inline in v4; silently resetting a dangling reference on load
 
 **Hidden field**:
-A **Field plugin** instance that *is* declared in the schema but marked not-to-render in the **Form** (e.g. `ui: { hidden: true }`). Its value is loaded, preserved, and saved like any field — it just has no editing UI. The intentional counterpart of an **Unknown field**: a developer acknowledges legitimate extra document data by adding it to the schema as a hidden field.
+A **Field plugin** instance that *is* declared in the schema but marked not-to-render in the **Form** (e.g. `hidden: true`). Its value is loaded, preserved, and saved like any field — it just has no editing UI. The intentional counterpart of an **Unknown field**: a developer acknowledges legitimate extra document data by adding it to the schema as a hidden field.
 _Avoid_: confusing with **Unknown field** — a hidden field is *known*, just not shown
 
 **Unknown field**:
@@ -117,7 +117,7 @@ The committed, compiled form of the **Schema**, read by the client, the **Data L
 _Avoid_: baking primitive field definitions into the lock (couples it to Tina's internals → silent breakage)
 
 **Collection**:
-The organizing unit of the **Schema**: a named set of **Documents** sharing a shape, mapped to content files by `path` (folder) + `format` (md/mdx/json/yaml/toml) + `match` (glob). Its field definitions (`name`, `type` → a **Field plugin**, `label`, `required?`, options, `ui` hints, default) drive forms, generated GraphQL, serialization, and validation. **Multiplicity is its own `type: 'list'` composite type — not a `list: true` modifier** (v3); a `list` declares its items with exactly one of `fields` (homogeneous object — `type` decides cardinality, `fields` describes the shape, no `_template` on disk), `templates` (polymorphic blocks — `_template` discriminator on disk), or `of` (scalars). Item field plugins are always single-valued; the list plugin owns add/remove/reorder. For markdown formats, scalar fields map to **frontmatter** and one rich-text field is the document **body** (`isBody`).
+The organizing unit of the **Schema**: a named set of **Documents** sharing a shape, mapped to content files by `path` (folder) + `format` (md/mdx/json/yaml/toml) + `match` (glob). Its field definitions (`name`, `type` → a **Field plugin**, `label`, `required?`, options, top-level `description`/`defaultValue`/`hidden`, default) drive forms, generated GraphQL, serialization, and validation. **Multiplicity is its own `type: 'list'` composite type — not a `list: true` modifier** (v3); a `list` declares its items with exactly one of `fields` (homogeneous object — `type` decides cardinality, `fields` describes the shape, no `_template` on disk), `templates` (polymorphic blocks — `_template` discriminator on disk), or `of` (scalars). Item field plugins are always single-valued; the list plugin owns add/remove/reorder. For markdown formats, scalar fields map to **frontmatter** and one rich-text field is the document **body** (`isBody`).
 _Avoid_: one collection spanning multiple formats/folders — one collection = one `path` + one `format`
 
 **Document**:

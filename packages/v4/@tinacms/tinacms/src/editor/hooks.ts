@@ -342,7 +342,7 @@ export function useFieldErrors(address: FieldAddress): string[] {
 
 export function useFieldFrame(): Pick<
   FieldWrapperProps,
-  'label' | 'htmlFor' | 'labelId' | 'required' | 'errors'
+  'label' | 'htmlFor' | 'labelId' | 'required' | 'errors' | 'help' | 'helpId'
 > {
   const address = useFieldAddress();
   const node = useFieldSchema();
@@ -368,6 +368,8 @@ export function useFieldFrame(): Pick<
     labelId: `${address}-label`,
     required: hasValidator(node, 'required'),
     errors: [...shown],
+    help: node.description,
+    helpId: node.description ? `${address}-help` : undefined,
   };
 }
 

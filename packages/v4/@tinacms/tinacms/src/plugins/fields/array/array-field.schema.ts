@@ -18,14 +18,28 @@ interface ArrayFieldBase extends BaseFieldSchema {
   type: typeof ARRAY_FIELD_TYPE;
 }
 
+export type ItemLabel = (item: TinaDocument) => unknown;
+
+export interface ArrayTemplateSchema extends TemplateSchema {
+  itemLabel?: ItemLabel;
+  previewImage?: string;
+}
+
 export interface FieldsArrayFieldSchema extends ArrayFieldBase {
   fields: FieldSchema[];
+  defaultItem?: TinaDocument;
+  itemLabel?: ItemLabel;
   templates?: never;
   of?: never;
 }
 
+export type Picker = 'list' | 'grid';
+
 export interface TemplatesArrayFieldSchema extends ArrayFieldBase {
-  templates: TemplateSchema[];
+  templates: ArrayTemplateSchema[];
+  picker?: Picker;
+  defaultItem?: never;
+  itemLabel?: never;
   fields?: never;
   of?: never;
 }
@@ -39,6 +53,8 @@ export type ScalarFieldSchema = FieldSchema & {
 
 export interface ScalarArrayFieldSchema extends ArrayFieldBase {
   of: ScalarFieldSchema;
+  defaultItem?: string | number | boolean;
+  itemLabel?: never;
   fields?: never;
   templates?: never;
 }
@@ -52,8 +68,6 @@ export type ArrayFieldSchema =
 
 type ArrayFieldConfig<T extends ArrayFieldSchema> = Omit<T, 'type'>;
 
-// Overloads: one per item shape, so the return type matches the config.
-// `t.array({ templates })` returns `TemplatesArrayFieldSchema`, not the union.
 export function array(
   config: ArrayFieldConfig<FieldsArrayFieldSchema>
 ): FieldsArrayFieldSchema;
@@ -66,13 +80,15 @@ export function array(
   config: ArrayFieldConfig<ScalarArrayFieldSchema>
 ): ScalarArrayFieldSchema;
 
-// The implementation. Callers never see this signature. TypeScript cannot
-// prove that the spread keeps one shape, so the cast is necessary.
 export function array(
   config: ArrayFieldConfig<ArrayFieldSchema>
 ): ArrayFieldSchema {
   return { ...config, type: ARRAY_FIELD_TYPE } as ArrayFieldSchema;
 }
+
+export const pickerOf = (field: TemplatesArrayFieldSchema): Picker =>
+  field.picker ??
+  (field.templates.some((template) => template.previewImage) ? 'grid' : 'list');
 
 export const isTemplatesArray = (
   field: ArrayFieldSchema
@@ -84,8 +100,6 @@ export const isScalarArray = (
 
 const ITEM_KEYS = ['fields', 'templates', 'of'] as const;
 
-// A raw config or codegen output reaches the descriptor as a bare `FieldSchema`.
-// Narrow it here so a malformed node fails loudly, not later on `.map`.
 export const asArrayFieldSchema = (node: FieldSchema): ArrayFieldSchema => {
   invariant(
     node.type === ARRAY_FIELD_TYPE,
@@ -165,16 +179,12 @@ export const isItem = (item: unknown): item is TinaDocument =>
 export const isItemArray = (value: unknown): value is TinaDocument[] =>
   Array.isArray(value) && value.every(isItem);
 
-// Whether a value is the list this array edits: objects for `fields` and
-// `templates`, any values for `of`.
 export const isListFor = (
   field: ArrayFieldSchema,
   value: unknown
 ): value is unknown[] =>
   isScalarArray(field) ? Array.isArray(value) : isItemArray(value);
 
-// The shape of the value only. `required`, `min` and `max` are validators the
-// collection attaches, and they measure the item count.
 export const arraySchema = (node: FieldSchema): ZodType => {
   const field = asArrayFieldSchema(node);
   return z.preprocess(

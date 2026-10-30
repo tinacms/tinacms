@@ -33,6 +33,12 @@ const collection = {
 `required`. There's no `min`/`max`/`pattern`; a date has nothing else to
 constrain.
 
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
+
+There is no `dateFormat` or `timeFormat` option. The field uses the native
+`datetime-local` input, which has no format tokens.
+
 ## Descriptor
 
 The client segment (`datetime-field.client.tsx`) claims the `datetime` key:

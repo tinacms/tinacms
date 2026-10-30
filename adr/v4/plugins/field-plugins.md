@@ -389,8 +389,8 @@ export default defineClientPlugin({
   },
 })
 
-// usage in user's schema
-t.string({ name: 'primaryColor', label: 'Primary Color', ui: { component: 'color' } })
+// usage in user's schema: the plugin's `type` picks the field
+t.color({ name: 'primaryColor', label: 'Primary Color' })
 ```
 
 ## Removed from earlier drafts

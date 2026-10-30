@@ -17,7 +17,7 @@ const URL_SCHEME = /^[a-z][a-z\d+.-]*:/i;
 
 // A media path is relative to the media root (ADR-022): no URL scheme, no
 // leading `/`, and no `..` segment.
-const isMediaPath = (value: string): boolean =>
+export const isMediaPath = (value: string): boolean =>
   !URL_SCHEME.test(value) &&
   !value.startsWith('/') &&
   !value.split('/').includes('..');

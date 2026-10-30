@@ -34,6 +34,9 @@ The config (`StringFieldSchema`, which extends `BaseFieldSchema`):
 Turning `multiline` off for a field with stored paragraphs shows the lines
 joined. The stored value changes to the joined text on the next edit.
 
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
+
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with
 > `validators`. Refer to
