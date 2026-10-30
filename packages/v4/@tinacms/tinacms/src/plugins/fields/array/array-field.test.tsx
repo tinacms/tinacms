@@ -124,15 +124,8 @@ const renderField = (document?: TinaDocument, children?: ReactNode) =>
     </TinaProvider>
   );
 
-function FormContextProbe({
-  ticks,
-  readErrors,
-}: {
-  ticks: { count: number };
-  readErrors: { current: () => unknown };
-}) {
-  const { control } = useFormContext();
-  readErrors.current = () => control._formState.errors;
+function FormContextProbe({ ticks }: { ticks: { count: number } }) {
+  useFormContext();
   ticks.count += 1;
   return null;
 }
@@ -866,15 +859,10 @@ describe('ArrayField validation', () => {
 
   it('does not re-render the form when an error changes on one field', async () => {
     const ticks = { count: 0 };
-    const readErrors = {
-      current: (): unknown => {
-        throw new Error('form is not mounted');
-      },
-    };
     renderField(
       { authors: [{ name: 'Ivan' }] },
       <>
-        <FormContextProbe ticks={ticks} readErrors={readErrors} />
+        <FormContextProbe ticks={ticks} />
         <SetNameError />
       </>
     );
@@ -884,9 +872,9 @@ describe('ArrayField validation', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'Set name error' })
     );
-    expect(readErrors.current()).toMatchObject({
-      authors: [{ name: { message: 'Name is required' } }],
-    });
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Name is required'
+    );
     expect(ticks.count).toBe(settled);
   });
 
