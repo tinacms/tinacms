@@ -101,6 +101,13 @@ const dropAt = (items: unknown[], index: number): unknown[] => {
   return next;
 };
 
+// `formState` is a proxy that subscribes the reader. Reading `errors` while
+// the provider renders subscribes it to every error, so every field re-renders
+// when any error changes. The control copy is the same tree, kept current
+// without that subscription.
+const liveErrors = (methods: ReturnType<typeof useForm<TinaDocument>>) =>
+  methods.control._formState.errors;
+
 type BootedRuntime = Omit<TinaRuntime, 'schema' | 'rpcUrl'>;
 
 const usePluginsKey = (plugins: PluginManifest[]): number => {
@@ -551,9 +558,6 @@ export function FormProvider({
   );
 
   useFormMethodSubscriptions(formId, path, collection, formHooks, methods);
-  // Read the error tree during render so a later click sees the current
-  // errors. react-hook-form leaves an unread formState proxy empty.
-  void methods.formState.errors;
 
   const [fieldReseeds, setFieldReseeds] = useState(0);
   const reseedFields = useCallback(
@@ -584,7 +588,7 @@ export function FormProvider({
     ) => {
       const values = structuredClone(methods.getValues());
       set(values, listAddress, next);
-      const errors = structuredClone(methods.formState.errors);
+      const errors = structuredClone(liveErrors(methods));
       if (nextErrors) set(errors, listAddress, nextErrors);
       // Keep the errors, then write back the tree without the removed item's
       // entry. reset alone drops every error in the form.
@@ -609,7 +613,7 @@ export function FormProvider({
       if (!Array.isArray(current) || index < 0 || index >= current.length) {
         return;
       }
-      const listErrors = get(methods.formState.errors, listAddress);
+      const listErrors = get(liveErrors(methods), listAddress);
       commitList(
         listAddress,
         dropAt(current, index),
@@ -635,7 +639,7 @@ export function FormProvider({
       const next = [...current];
       const [item] = next.splice(from, 1);
       next.splice(to, 0, item);
-      const listErrors = get(methods.formState.errors, listAddress);
+      const listErrors = get(liveErrors(methods), listAddress);
       let nextErrors: unknown[] | null = null;
       if (Array.isArray(listErrors)) {
         nextErrors = [...listErrors];

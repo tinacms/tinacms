@@ -78,22 +78,71 @@ function ObjectItems({
     control,
     name: address,
   });
-  const removeItem = (index: number) => removeListItem(address, index);
-  const moveItem = (from: number, to: number) =>
+  // Reset gives every useFieldArray new ids, so keying rows by `item.id`
+  // remounts every row of every list and the pressed button loses focus.
+  // These keys stay with the rows that remain, and follow a move or remove.
+  // `keysHeld` skips one length check while a click has already shifted the
+  // keys and the field array has not rendered the new length yet.
+  const keys = useRef<string[]>([]);
+  const keysHeld = useRef(false);
+  if (keysHeld.current) {
+    if (keys.current.length === items.length) keysHeld.current = false;
+  } else if (keys.current.length !== items.length) {
+    keys.current = items.map(nextObjectKey);
+  }
+  const listLength = () => {
+    const current: unknown = getValues(address);
+    return Array.isArray(current) ? current.length : items.length;
+  };
+  const removeItem = (index: number) => {
+    const length = listLength();
+    if (index < 0 || index >= length) return;
+    if (keys.current.length === length) {
+      keys.current = keys.current.filter((_, position) => position !== index);
+      keysHeld.current = true;
+    }
+    removeListItem(address, index);
+  };
+  const moveItem = (from: number, to: number) => {
+    const length = listLength();
+    if (
+      from === to ||
+      from < 0 ||
+      to < 0 ||
+      from >= length ||
+      to >= length
+    ) {
+      return;
+    }
+    if (keys.current.length === length) {
+      const next = [...keys.current];
+      const [key] = next.splice(from, 1);
+      next.splice(to, 0, key);
+      keys.current = next;
+    }
     moveListItem(address, from, to);
+  };
 
   const seed = (template: TemplateSchema | undefined, fields: FieldSchema[]) =>
     ingestDocument(template?.defaultItem ?? {}, fields, {
       documentPath,
       registry,
     });
-  const addFieldsItem = (fields: FieldSchema[]) =>
+  const trackAddedRow = () => {
+    keys.current = [...keys.current, nextObjectKey()];
+    keysHeld.current = true;
+  };
+  const addFieldsItem = (fields: FieldSchema[]) => {
+    trackAddedRow();
     append(seed(undefined, fields));
-  const addTemplateItem = (template: TemplateSchema) =>
+  };
+  const addTemplateItem = (template: TemplateSchema) => {
+    trackAddedRow();
     append({
       [TEMPLATE_KEY]: template.name,
       ...seed(template, template.fields),
     });
+  };
 
   return (
     <>
@@ -102,14 +151,14 @@ function ObjectItems({
         aria-labelledby={`${address}-label`}
         className='flex flex-col gap-3'
       >
-        {items.map((item, index) => {
+        {items.map((_, index) => {
           const stored: unknown = getValues(`${address}.${index}`);
           const fields = isItem(stored)
             ? itemFieldsOf(field, stored)
             : undefined;
           return (
             <ItemRow
-              key={item.id}
+              key={keys.current[index]}
               heading={headingOf(field, stored, index)}
               index={index}
               count={items.length}
@@ -303,3 +352,6 @@ const headingOf = (
 
 let scalarKeyCount = 0;
 const nextScalarKey = (): string => `scalar-item-${scalarKeyCount++}`;
+
+let objectKeyCount = 0;
+const nextObjectKey = (): string => `object-item-${objectKeyCount++}`;

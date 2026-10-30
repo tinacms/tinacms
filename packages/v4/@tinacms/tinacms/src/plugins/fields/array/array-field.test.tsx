@@ -1,5 +1,7 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { type ReactNode } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../../config';
 import { toFieldAddress } from '../../../core/field/address';
@@ -106,7 +108,7 @@ const [authorsNode, tagsNode, groupsNode] = collection.fields;
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins(PLUGINS);
 
-const renderField = (document?: TinaDocument) =>
+const renderField = (document?: TinaDocument, children?: ReactNode) =>
   render(
     <TinaProvider
       config={asResolvedConfig({ plugins: PLUGINS, schema: NO_COLLECTIONS })}
@@ -117,9 +119,40 @@ const renderField = (document?: TinaDocument) =>
         document={document}
       >
         <LabelledFields />
+        {children}
       </FormProvider>
     </TinaProvider>
   );
+
+function FormContextProbe({
+  ticks,
+  readErrors,
+}: {
+  ticks: { count: number };
+  readErrors: { current: () => unknown };
+}) {
+  const { control } = useFormContext();
+  readErrors.current = () => control._formState.errors;
+  ticks.count += 1;
+  return null;
+}
+
+function SetNameError() {
+  const { setError } = useFormContext();
+  return (
+    <button
+      type='button'
+      onClick={() =>
+        setError('authors.0.name', {
+          type: 'required',
+          message: 'Name is required',
+        })
+      }
+    >
+      Set name error
+    </button>
+  );
+}
 
 function SaveProbe() {
   const save = useFormSave();
@@ -246,6 +279,69 @@ describe('ArrayField add, remove, and reorder', () => {
     );
     expect(valueOf('authors')).toEqual([{ name: 'Brook', age: null }]);
     expect((screen.getByLabelText('Age') as HTMLInputElement).value).toBe('');
+  });
+
+  it('keeps focus on the move button and leaves other rows mounted', async () => {
+    renderField({
+      authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: 'Ada' }],
+      tags: [{ value: 'one' }, { value: 'two' }],
+    });
+    const authors = await screen.findByRole('group', { name: 'Authors' });
+    const tags = screen.getByRole('group', { name: 'Tags' });
+    const moveDown = within(authors).getByRole('button', {
+      name: 'Move item 1 down',
+    });
+    const brookRemove = within(authors).getByRole('button', {
+      name: 'Remove item 2',
+    });
+    const tagRemove = within(tags).getByRole('button', {
+      name: 'Remove item 1',
+    });
+    await userEvent.click(moveDown);
+    await waitFor(() => {
+      expect(
+        within(authors)
+          .getAllByLabelText('Name')
+          .map((input) => (input as HTMLInputElement).value)
+      ).toEqual(['Brook', 'Ivan', 'Ada']);
+    });
+    expect(moveDown.isConnected).toBe(true);
+    expect(document.activeElement).toBe(moveDown);
+    expect(brookRemove.isConnected).toBe(true);
+    expect(tagRemove.isConnected).toBe(true);
+  });
+
+  it('keeps surviving rows mounted when an item is removed', async () => {
+    renderField({
+      authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: 'Ada' }],
+      tags: [{ value: 'one' }],
+    });
+    const authors = await screen.findByRole('group', { name: 'Authors' });
+    const tags = screen.getByRole('group', { name: 'Tags' });
+    const removeIvan = within(authors).getByRole('button', {
+      name: 'Remove item 1',
+    });
+    const removeBrook = within(authors).getByRole('button', {
+      name: 'Remove item 2',
+    });
+    const removeAda = within(authors).getByRole('button', {
+      name: 'Remove item 3',
+    });
+    const tagRemove = within(tags).getByRole('button', {
+      name: 'Remove item 1',
+    });
+    await userEvent.click(removeBrook);
+    await waitFor(() => {
+      expect(
+        within(authors)
+          .getAllByLabelText('Name')
+          .map((input) => (input as HTMLInputElement).value)
+      ).toEqual(['Ivan', 'Ada']);
+    });
+    expect(removeBrook.isConnected).toBe(false);
+    expect(removeIvan.isConnected).toBe(true);
+    expect(removeAda.isConnected).toBe(true);
+    expect(tagRemove.isConnected).toBe(true);
   });
 
   it("keeps a moved item's value with that item", async () => {
@@ -766,6 +862,32 @@ describe('ArrayField validation', () => {
       { validators: coreValidatorRegistry }
     );
     expect(errors).toEqual({ 'authors.0.name': ['Name is required'] });
+  });
+
+  it('does not re-render the form when an error changes on one field', async () => {
+    const ticks = { count: 0 };
+    const readErrors = {
+      current: (): unknown => {
+        throw new Error('form is not mounted');
+      },
+    };
+    renderField(
+      { authors: [{ name: 'Ivan' }] },
+      <>
+        <FormContextProbe ticks={ticks} readErrors={readErrors} />
+        <SetNameError />
+      </>
+    );
+    await screen.findByLabelText('Name');
+    const settled = ticks.count;
+    expect(settled).toBeGreaterThan(0);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Set name error' })
+    );
+    expect(readErrors.current()).toMatchObject({
+      authors: [{ name: { message: 'Name is required' } }],
+    });
+    expect(ticks.count).toBe(settled);
   });
 
   it('surfaces an item field error at its own address, and rolls it up onto the array itself', async () => {
