@@ -157,6 +157,95 @@ describe('NumberField value updates', () => {
   });
 });
 
+describe('NumberField stepping', () => {
+  it('steps by the schema step with the buttons', async () => {
+    renderField({ rating: 3, weight: 2.5 });
+    await screen.findByLabelText(/^Rating\b/);
+    const rows = screen.getAllByRole('button', { name: 'Increase' });
+    await userEvent.click(rows[0]);
+    expect(valueOf('rating')).toBe('3.5');
+    await userEvent.click(rows[2]);
+    expect(valueOf('weight')).toBe('3.5');
+    expect(screen.getByLabelText(/^Weight\b/)).toHaveFocus();
+  });
+
+  it('steps once per arrow key and keeps the value a string', async () => {
+    renderField({ rating: 3 });
+    const input = await screen.findByLabelText(/^Rating\b/);
+    await userEvent.click(input);
+    await userEvent.keyboard('{ArrowUp}');
+    expect(valueOf('rating')).toBe('3.5');
+    await userEvent.keyboard('{ArrowDown}{ArrowDown}');
+    expect(valueOf('rating')).toBe('2.5');
+  });
+
+  it('stops at the limits and disables the button there', async () => {
+    renderField({ rating: 5 });
+    const input = await screen.findByLabelText(/^Rating\b/);
+    expect(
+      screen.getAllByRole('button', { name: 'Increase' })[0]
+    ).toBeDisabled();
+    await userEvent.click(input);
+    await userEvent.keyboard('{ArrowUp}');
+    expect(valueOf('rating')).toBe('5');
+  });
+
+  it('steps up from empty to the minimum', async () => {
+    renderField();
+    await screen.findByLabelText(/^Rating\b/);
+    await userEvent.click(
+      screen.getAllByRole('button', { name: 'Increase' })[0]
+    );
+    expect(valueOf('rating')).toBe('1');
+  });
+
+  it('keeps a typed value past the limit and shows the error after blur', async () => {
+    renderField();
+    const input = (await screen.findByLabelText(
+      /^Rating\b/
+    )) as HTMLInputElement;
+    await userEvent.type(input, '6');
+    await userEvent.tab();
+    expect(input.value).toBe('6');
+    expect(valueOf('rating')).toBe('6');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Rating must be at most 5'
+    );
+  });
+
+  it('skips the step buttons with Tab', async () => {
+    renderField({ rating: 3 });
+    const input = await screen.findByLabelText(/^Rating\b/);
+    await userEvent.click(input);
+    await userEvent.tab();
+    expect(input).not.toHaveFocus();
+    expect(document.activeElement?.tagName).not.toBe('BUTTON');
+  });
+
+  it('stores null and shows the required error after clearing a required field', async () => {
+    renderField({ count: 5 });
+    const input = await screen.findByLabelText(/^Count\b/);
+    await userEvent.clear(input);
+    await userEvent.tab();
+    expect(valueOf('count')).toBeNull();
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Count is required'
+    );
+  });
+});
+
+describe('NumberField sibling edits', () => {
+  it('keeps its value while another field is edited', async () => {
+    renderField({ rating: 3, weight: 2 });
+    const rating = (await screen.findByLabelText(
+      /^Rating\b/
+    )) as HTMLInputElement;
+    await userEvent.type(await screen.findByLabelText(/^Weight\b/), '5');
+    expect(valueOf('weight')).toBe('25');
+    expect(rating.value).toBe('3');
+  });
+});
+
 describe('NumberField wheel guard', () => {
   // A wheel over a focused number input steps its value in a browser. The
   // field drops focus so a scroll past the form cannot edit the document.
@@ -214,6 +303,23 @@ describe('NumberField validation', () => {
     expect(validateFieldWithCore(countNode, descriptor, '   ')).toEqual([
       'Count is required',
     ]);
+  });
+
+  it('names an unlabelled field by its name in the error', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('number');
+    const unlabelled = t.number({ name: 'width' });
+    expect(validateFieldWithCore(unlabelled, descriptor, 'abc')).toEqual([
+      'width must be a number',
+    ]);
+  });
+
+  it('measures a finite number and nothing else', async () => {
+    const registry = await resolveRegistry();
+    const measure = registry.get('number')?.measure;
+    expect(measure?.('3.5')).toEqual({ amount: 3.5 });
+    expect(measure?.('abc')).toBeNull();
+    expect(measure?.('1e999')).toBeNull();
   });
 
   it('passes an optional field left empty', async () => {

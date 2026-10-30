@@ -1,5 +1,3 @@
-import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { Input } from '@tinacms/ui/components/input';
 import { useRef } from 'react';
 import {
   useFieldActivation,
@@ -9,6 +7,8 @@ import {
   useFieldValue,
 } from '../../../editor';
 import type { NumberFieldSchema } from './number-field.schema';
+import { limitOf } from './number-field.step';
+import { NumberFieldView } from './number-field.view';
 
 export function NumberField() {
   const address = useFieldAddress();
@@ -20,18 +20,15 @@ export function NumberField() {
   useFieldActivation(() => inputRef.current?.focus());
 
   return (
-    <FieldWrapper {...frame}>
-      <Input
-        ref={inputRef}
-        type='number'
-        step={field.step ?? 'any'}
-        id={address}
-        value={value ?? ''}
-        onChange={(event) =>
-          setValue(event.target.value === '' ? null : event.target.value)
-        }
-        onWheel={(event) => event.currentTarget.blur()}
-      />
-    </FieldWrapper>
+    <NumberFieldView
+      {...frame}
+      ref={inputRef}
+      id={address}
+      value={value ?? null}
+      onChange={setValue}
+      min={limitOf(field, 'min')}
+      max={limitOf(field, 'max')}
+      step={field.step}
+    />
   );
 }
