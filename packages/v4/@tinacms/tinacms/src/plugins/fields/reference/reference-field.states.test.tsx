@@ -179,6 +179,60 @@ describe('reference field states', () => {
     }
   });
 
+  it('hides Open while the field is disabled, even for a listed document', () => {
+    render(
+      <ReferenceFieldView
+        {...referenceFieldState('loading with a document already listed')}
+      />
+    );
+    expect(screen.queryByRole('button', { name: /^Open/ })).toBeNull();
+  });
+
+  it('keeps collections with equal labels in separate groups, in order', async () => {
+    const doc = (collection: string, group: string) => ({
+      value: `content/${collection}/one.md`,
+      label: `content/${collection}/one.md`,
+      meta: `${group} · content/${collection}/one.md`,
+      group,
+      collection,
+    });
+    render(
+      <ReferenceFieldView
+        {...referenceFieldState('empty')}
+        documents={[
+          doc('a', 'Articles'),
+          doc('b', 'Other'),
+          doc('c', 'Articles'),
+        ]}
+      />
+    );
+    await userEvent.click(screen.getByRole('combobox'));
+    await screen.findByRole('listbox');
+    expect(
+      screen
+        .getAllByRole('group')
+        .filter((g) => g.dataset.slot === 'combobox-group')
+        .map((g) => g.querySelector('[data-slot=combobox-label]')?.textContent)
+    ).toEqual(['Articles', 'Other', 'Articles']);
+  });
+
+  it('draws no heading when only some documents name a group', async () => {
+    const props = referenceFieldState('several collections');
+    render(
+      <ReferenceFieldView
+        {...props}
+        documents={props.documents.map((document, index) =>
+          index === 0 ? document : { ...document, group: undefined }
+        )}
+      />
+    );
+    await userEvent.click(screen.getByRole('combobox'));
+    await screen.findByRole('listbox');
+    expect(
+      document.querySelectorAll('[data-slot=combobox-label]')
+    ).toHaveLength(0);
+  });
+
   it('keeps Open usable on a read-only field', async () => {
     const onOpen = vi.fn();
     render(

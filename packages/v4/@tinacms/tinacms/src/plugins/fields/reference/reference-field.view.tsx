@@ -14,7 +14,7 @@ import {
   FieldWrapper,
   type FieldWrapperProps,
 } from '@tinacms/ui/components/field-wrapper';
-import type { Ref } from 'react';
+import { type Ref, useMemo } from 'react';
 
 export interface ReferenceFieldViewDocument {
   /** The stored value: the document's path. */
@@ -56,22 +56,31 @@ export type ReferenceFieldViewProps = Pick<
 };
 
 interface DocumentGroup {
+  /** The collection name, so collections with equal labels stay apart. */
   value: string;
+  label: string;
   items: ReferenceFieldViewDocument[];
 }
 
 const hasGroups = (documents: ReferenceFieldViewDocument[]) =>
-  documents.some((document) => document.group !== undefined);
+  documents.length > 0 &&
+  documents.every((document) => document.group !== undefined);
 
 const groupDocuments = (
   documents: ReferenceFieldViewDocument[]
 ): DocumentGroup[] => {
-  const groups = new Map<string, ReferenceFieldViewDocument[]>();
+  const groups = new Map<string, DocumentGroup>();
   for (const document of documents) {
-    const heading = document.group ?? '';
-    groups.set(heading, [...(groups.get(heading) ?? []), document]);
+    const group = groups.get(document.collection);
+    if (group) group.items.push(document);
+    else
+      groups.set(document.collection, {
+        value: document.collection,
+        label: document.group ?? document.collection,
+        items: [document],
+      });
   }
-  return [...groups].map(([value, items]) => ({ value, items }));
+  return [...groups.values()];
 };
 
 function DocumentOption({
@@ -113,14 +122,21 @@ export function ReferenceFieldView({
 }: ReferenceFieldViewProps) {
   const found = documents.find((document) => document.value === value);
   // A stored path no list answers still fills the box, as it was saved.
-  const selected: ReferenceFieldViewDocument | null =
-    found ??
-    (value === null
-      ? null
-      : { value, label: value, meta: value, collection: '' });
+  const selected = useMemo<ReferenceFieldViewDocument | null>(
+    () =>
+      found ??
+      (value === null
+        ? null
+        : { value, label: value, meta: value, collection: '' }),
+    [found, value]
+  );
   const editable = !disabled && !readOnly;
   const clearable = (!frame.required || missing) && editable && value !== null;
-  const items = hasGroups(documents) ? groupDocuments(documents) : documents;
+  const grouped = hasGroups(documents);
+  const items = useMemo(
+    () => (grouped ? groupDocuments(documents) : documents),
+    [grouped, documents]
+  );
 
   return (
     <FieldWrapper {...frame} disabled={disabled}>
@@ -128,6 +144,7 @@ export function ReferenceFieldView({
         <Combobox
           items={items}
           value={selected}
+          isItemEqualToValue={(item, chosen) => item.value === chosen.value}
           disabled={disabled}
           readOnly={readOnly}
           onValueChange={(next: ReferenceFieldViewDocument | null) =>
@@ -141,6 +158,7 @@ export function ReferenceFieldView({
             disabled={disabled}
             showClear={clearable}
             triggerTabbable={false}
+            clearTabbable
             placeholder={placeholder}
             aria-invalid={frame.errors?.length ? true : undefined}
             aria-describedby={frame.help ? frame.helpId : undefined}
@@ -148,10 +166,10 @@ export function ReferenceFieldView({
           <ComboboxContent className='w-max min-w-(--anchor-width)'>
             <ComboboxEmpty>No documents match.</ComboboxEmpty>
             <ComboboxList>
-              {hasGroups(documents)
+              {grouped
                 ? (group: DocumentGroup) => (
                     <ComboboxGroup key={group.value} items={group.items}>
-                      <ComboboxLabel>{group.value}</ComboboxLabel>
+                      <ComboboxLabel>{group.label}</ComboboxLabel>
                       <ComboboxCollection>
                         {(document: ReferenceFieldViewDocument) => (
                           <DocumentOption
@@ -170,7 +188,7 @@ export function ReferenceFieldView({
         </Combobox>
         {onOpen ? (
           <span className='size-8 flex-none'>
-            {found && !missing ? (
+            {found && !missing && !disabled ? (
               <Button
                 variant='icon'
                 size='sm'

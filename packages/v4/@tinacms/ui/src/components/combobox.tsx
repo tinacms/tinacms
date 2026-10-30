@@ -60,12 +60,15 @@ function ComboboxInput({
   disabled = false,
   showTrigger = true,
   triggerTabbable = true,
+  clearTabbable = false,
   showClear = false,
   ...props
 }: ComboboxPrimitive.Input.Props & {
   showTrigger?: boolean;
   /** Set false when the input itself opens the list, so Tab skips the chevron. */
   triggerTabbable?: boolean;
+  /** Makes the clear button a tab stop, which Base UI leaves out by default. */
+  clearTabbable?: boolean;
   showClear?: boolean;
 }) {
   return (
@@ -90,7 +93,12 @@ function ComboboxInput({
             disabled={disabled}
           />
         )}
-        {showClear && <ComboboxClear disabled={disabled} tabIndex={0} />}
+        {showClear && (
+          <ComboboxClear
+            disabled={disabled}
+            {...(clearTabbable ? { tabIndex: 0 } : {})}
+          />
+        )}
       </InputGroupAddon>
       {children}
     </InputGroup>

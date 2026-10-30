@@ -35,6 +35,7 @@ const DOCUMENT_PATH = 'content/posts/featured.mdx';
 const ABOUT = 'content/pages/about.mdx';
 const CONTACT = 'content/pages/contact.mdx';
 const ADA = 'content/authors/ada.mdx';
+const NEWEST = 'content/pages/newest.mdx';
 
 const SUMMARIES: Record<string, DocumentSummary[]> = {
   page: [{ path: ABOUT }, { path: CONTACT }],
@@ -278,6 +279,30 @@ describe('ReferenceField missing references', () => {
     expect(input).toHaveAttribute('placeholder', 'Search documents…');
   });
 
+  it('keeps what is typed when a background refetch brings new documents', async () => {
+    let refetched = false;
+    const queryClient = new QueryClient();
+    renderField(
+      { page: ABOUT },
+      contentPlugin({
+        list: async (name: string) => [
+          ...(SUMMARIES[name] ?? []),
+          ...(refetched && name === 'page' ? [{ path: NEWEST }] : []),
+        ],
+      }),
+      Fragment,
+      queryClient
+    );
+    const input = await screen.findByLabelText(/^Page\b/);
+    await waitFor(() => expect(input).toBeEnabled());
+    await userEvent.clear(input);
+    await userEvent.type(input, 'cont');
+    refetched = true;
+    await queryClient.refetchQueries({ queryKey: contentKeys.list('page') });
+    expect(await screen.findByRole('option', option(NEWEST))).toBeVisible();
+    expect(input).toHaveValue('cont');
+  });
+
   it('treats a stored value that is not a path as no value', async () => {
     renderField({ page: 42 } as unknown as TinaDocument);
     const input = await screen.findByLabelText(/^Page\b/);
@@ -391,6 +416,23 @@ describe('ReferenceField opening a document', () => {
         path: ABOUT,
       }).slice(1)
     );
+  });
+
+  it('hides Open while another collection of the field is still loading', async () => {
+    renderField(
+      { related: ABOUT },
+      contentPlugin({
+        list: (name: string) =>
+          name === 'author'
+            ? new Promise(() => {})
+            : Promise.resolve(SUMMARIES[name] ?? []),
+      }),
+      InRouter
+    );
+    const input = await screen.findByLabelText(/^Related\b/);
+    expect(input).toHaveValue(ABOUT);
+    expect(input).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /^Open/ })).toBeNull();
   });
 
   it('hides Open for a missing document', async () => {

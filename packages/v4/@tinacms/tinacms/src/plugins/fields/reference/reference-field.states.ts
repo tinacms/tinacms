@@ -86,6 +86,15 @@ export const referenceFieldStates = [
     },
   },
   {
+    name: 'loading with a document already listed',
+    props: {
+      ...base,
+      value: 'content/authors/ada.md',
+      disabled: true,
+      placeholder: 'Loading documents…',
+    },
+  },
+  {
     name: 'read-only',
     props: { ...base, value: 'content/authors/ada.md', readOnly: true },
   },

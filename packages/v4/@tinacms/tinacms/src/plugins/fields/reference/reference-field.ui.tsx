@@ -1,5 +1,5 @@
 import { useQueries } from '@tanstack/react-query';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useInRouterContext } from 'react-router-dom';
 import { useAdminRoute } from '../../../admin/use-admin-route';
 import {
@@ -94,11 +94,12 @@ export function ReferenceField() {
   useFieldActivation(() => inputRef.current?.focus());
 
   const { lists, isLoading, error } = useReferenceLists(field.collections);
-  const labelOf = (name: string) => {
-    const collection = schemaCollections.find((c) => c.name === name);
-    return collection?.label ?? name;
-  };
-  const documents = error ? [] : toDocuments(lists, labelOf);
+  const documents = useMemo(() => {
+    if (error) return [];
+    const labelOf = (name: string) =>
+      schemaCollections.find((c) => c.name === name)?.label ?? name;
+    return toDocuments(lists, labelOf);
+  }, [error, lists, schemaCollections]);
   const value = typeof stored === 'string' && stored !== '' ? stored : null;
   const missing =
     value !== null &&
