@@ -1,17 +1,29 @@
 import { cva } from 'class-variance-authority';
 
 /**
- * The field box shared by Input and Textarea. `data-readonly` marks read-only,
- * because `:read-only` also matches a disabled field.
+ * The invalid, disabled and read-only looks shared by Input, Textarea and the Select trigger.
+ * `data-readonly` marks read-only, because `:read-only` also matches a disabled field.
+ * Each rule covers `focus` and `focus-visible` so it outranks either focus style.
  */
+export const fieldInvalidClassName =
+  'aria-invalid:border-destructive aria-invalid:hover:border-destructive aria-invalid:focus:border-destructive aria-invalid:focus-visible:border-destructive';
+
+export const fieldDisabledClassName =
+  'disabled:cursor-not-allowed disabled:border-border disabled:hover:border-border';
+
+export const fieldReadOnlyClassName =
+  'data-readonly:border-border-subtle data-readonly:bg-muted data-readonly:hover:border-border-subtle data-readonly:focus:border-border-subtle data-readonly:focus:shadow-none data-readonly:focus-visible:border-border-subtle data-readonly:focus-visible:shadow-none';
+
+/** The field box shared by Input and Textarea. */
 export const fieldVariants = cva(
   [
     'box-border w-full min-w-0 rounded-sm border border-input bg-card px-2.5 font-sans text-base text-foreground shadow-none transition-[border-color,box-shadow] outline-none',
     'placeholder:text-muted-foreground hover:border-input-hover',
     'focus:border-ring focus:shadow-focus-field',
-    'aria-invalid:border-destructive aria-invalid:hover:border-destructive aria-invalid:focus:border-destructive',
-    'disabled:cursor-not-allowed disabled:border-border disabled:opacity-60',
-    'data-readonly:border-border-subtle data-readonly:bg-muted data-readonly:hover:border-border-subtle data-readonly:focus:border-border-subtle data-readonly:focus:shadow-none',
+    fieldInvalidClassName,
+    fieldDisabledClassName,
+    'disabled:opacity-60',
+    fieldReadOnlyClassName,
   ],
   {
     variants: {
@@ -31,4 +43,4 @@ export const selectListClassName =
   'w-auto min-w-(--anchor-width) rounded-md bg-popover p-1 font-sans text-base text-foreground shadow-popover';
 
 export const selectOptionClassName =
-  "relative flex min-h-8 w-full cursor-default items-center gap-3 rounded-sm py-1.5 pr-8 pl-2 text-base leading-5 text-foreground outline-hidden select-none focus:bg-muted data-highlighted:bg-muted data-selected:font-medium data-disabled:cursor-not-allowed data-disabled:text-muted-foreground data-disabled:line-through data-disabled:focus:bg-transparent data-disabled:data-highlighted:bg-transparent [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+  "relative flex min-h-8 w-full cursor-default items-center gap-3 rounded-sm py-1.5 pr-8 pl-2 text-base leading-5 text-foreground outline-hidden select-none focus:bg-muted data-highlighted:bg-muted data-selected:font-medium data-disabled:cursor-not-allowed data-disabled:text-muted-foreground data-disabled:focus:bg-transparent data-disabled:data-highlighted:bg-transparent [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
