@@ -1,5 +1,14 @@
 # tinacms
 
+## 3.15.1
+
+### Patch Changes
+
+- [`124567b`](https://github.com/tinacms/tinacms/commit/124567b2e75e0f00b8d040d096532d8c6176f08f) Thanks [@Tyagiquamar](https://github.com/Tyagiquamar)! - Fix empty, index-less active field group when clicking a tinaField targeting an object list with fields.
+
+- Updated dependencies [[`80502f8`](https://github.com/tinacms/tinacms/commit/80502f86b0224fb67ec05f0644db71bf5d38fde4), [`19285c6`](https://github.com/tinacms/tinacms/commit/19285c6deeee52c380e8b2fdeafedc9530dc0618)]:
+  - @tinacms/mdx@2.4.2
+
 ## 3.15.0
 
 ### Minor Changes
