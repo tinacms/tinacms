@@ -1,5 +1,3 @@
-import { Checkbox } from '@tinacms/ui/components/checkbox';
-import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { useRef } from 'react';
 import {
   useFieldActivation,
@@ -7,6 +5,7 @@ import {
   useFieldFrame,
   useFieldValue,
 } from '../../../editor';
+import { BooleanFieldView } from './boolean-field.view';
 
 export function BooleanField() {
   const address = useFieldAddress();
@@ -17,13 +16,12 @@ export function BooleanField() {
   useFieldActivation(() => inputRef.current?.focus());
 
   return (
-    <FieldWrapper {...frame}>
-      <Checkbox
-        ref={inputRef}
-        id={address}
-        checked={value ?? false}
-        onCheckedChange={(checked) => setValue(checked === true)}
-      />
-    </FieldWrapper>
+    <BooleanFieldView
+      {...frame}
+      ref={inputRef}
+      id={address}
+      checked={value ?? false}
+      onChange={setValue}
+    />
   );
 }

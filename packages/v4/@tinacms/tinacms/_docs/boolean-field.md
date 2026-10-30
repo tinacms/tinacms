@@ -1,17 +1,21 @@
 # The `boolean` field
 
-The `boolean` field is one of the field plugins that v4 supplies. It is one
-checkbox, and a Zod type guard checks the value.
+The `boolean` field is one of the field plugins that v4 supplies. It is a
+checkbox with its label beside it and its help under the label, and a Zod type
+guard checks the value.
 
 ## Files
 
-The four files are in `plugins/fields/boolean/`:
+The files are in `plugins/fields/boolean/`:
 
 | File | Role |
 |---|---|
 | `boolean-field.schema.ts` | The `t.boolean()` helper function, and the `booleanSchema` guard |
 | `boolean-field.client.tsx` | The descriptor, which takes the `boolean` key |
-| `boolean-field.ui.tsx` | The `BooleanField` checkbox component |
+| `boolean-field.ui.tsx` | The `BooleanField` editor component: reads the address, value and frame from the editor hooks |
+| `boolean-field.view.tsx` | `BooleanFieldView`: the checkbox, label and help, from props only |
+| `boolean-field.states.ts` | The state catalogue: every look, with a lookup by name |
+| `boolean-field.states.test.tsx` | One render test over every state, plus the toggle and inert tests |
 | `boolean-field.plugin.ts` | The manifest, `tina:field:boolean` |
 
 ## Authoring
@@ -27,11 +31,11 @@ const collection = {
 };
 ```
 
-`BooleanFieldSchema` extends `BaseFieldSchema`. It has three properties: `name`,
-which is the field key and the alternative label; `label`; and `required`. It
+`BooleanFieldSchema` extends `BaseFieldSchema` and adds nothing: `name` is the
+field key and the alternative label, and `label` is the text beside the box. It
 has no `min`, `max`, or `pattern` property, because a boolean value has no
-constraints. The config accepts `required`, but `required` has no effect. The
-next section gives the reason.
+constraints. A `required` validator on the field has no effect, and the field
+shows no star. The next section gives the reason.
 
 ## The descriptor
 
@@ -69,8 +73,7 @@ For these reasons, `required` cannot do a useful check:
 - If `required` rejected an unset value, the user would have to select the box.
   Then the user would release it to make the value `false`.
 
-Thus `BaseFieldSchema` supplies the `required` property, but the field adds no
-rule for it. The toggle field of v3 rejected `undefined` and `null`, and it had
+Thus the field adds no rule for `required`. The toggle field of v3 rejected `undefined` and `null`, and it had
 this problem. v4 does not repeat it.
 
 ## Validation
@@ -102,29 +105,51 @@ path do not change the values.
 ## The component
 
 `BooleanField` (`boolean-field.ui.tsx`) has no props. It reads its address from
-the context. It gets the value and the errors from hooks that use the address.
-Thus a change to the checkbox renders this field again, but does not render the
-other fields again.
+the context, and the value and the frame from hooks that use the address. It
+passes them to `BooleanFieldView`, which takes props only. A change to the
+checkbox renders this field again, but does not render the other fields again.
 
 ```tsx
 export function BooleanField() {
   const address = useFieldAddress();
   const [value, setValue] = useFieldValue<boolean>(address);
-  const errors = useFieldErrors(address);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const frame = useFieldFrame();
+  const inputRef = useRef<HTMLButtonElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus()); // focus when active
 
   return (
-    <div>
-      <input ref={inputRef} type='checkbox' id={address}
-        checked={value ?? false}
-        onChange={(e) => setValue(e.target.checked)} />
-      {errors.map((e) => <span key={e} role='alert'>{e}</span>)}
-    </div>
+    <BooleanFieldView {...frame} ref={inputRef} id={address}
+      checked={value ?? false} onChange={setValue} />
   );
 }
 ```
+
+The view draws the label beside the checkbox and the help under the label, so it
+does not give them to the Field wrapper, which would put them above the control.
+The wrapper still draws the warnings and the errors below the row. The field is
+never required and never empty, so no star shows. There is no unsaved marker.
+A real error (a stored value that is not a boolean, or a custom validator)
+shows under the field, and the checkbox gets `aria-invalid`.
+
+The help uses `FieldHelp` from the Field wrapper, so it has the same look as
+the help of the other fields. The label points at the checkbox, and the
+checkbox points at the help with `aria-describedby` only when help exists.
+
+## States and keys
+
+`boolean-field.states.ts` lists every look: `on`, `off`, `disabled`,
+`read-only`, `long label`, `help and warning` and `error`. The render test runs
+over the list. Help, warnings, disabled and read-only come from the catalogue
+only. The editor frame supplies none of them yet, as with the Number field.
+
+- Disabled fades the field once, with a plain border and a grey tick.
+- Read-only shows a grey fill with the tick, and sets `aria-readonly`.
+- Disabled and read-only ignore a click on the box or the label, and Space and
+  Enter. They do not change on hover.
+- Space toggles the focused box. Enter toggles it too, once: the view handles
+  Enter itself, because the base checkbox ignores it, and it ignores key repeat.
+- The focus ring shows on keyboard focus only, not on a click.
 
 ## The connections
 
@@ -144,3 +169,8 @@ export function BooleanField() {
 - It converts `true` and `false` with ingest, then converts them again with
   digest. It also seeds the default value when the document has no value.
 - It examines the metadata of the descriptor.
+- It focuses the checkbox when the field is activated.
+
+`boolean-field.states.test.tsx` renders every state from the catalogue, and
+checks that disabled and read-only ignore input, that a label click, Space and
+Enter each toggle once, and that Enter key repeat does not toggle again.

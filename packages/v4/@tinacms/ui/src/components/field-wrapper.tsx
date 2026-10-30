@@ -44,6 +44,20 @@ function FieldMessage({
   );
 }
 
+/** The muted line under a label that says what the field is for. */
+function FieldHelp({ className, ...props }: ComponentProps<'p'>) {
+  return (
+    <p
+      data-slot='field-help'
+      className={cn(
+        'm-0 text-sm leading-field-message font-normal text-muted-foreground',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
 type FieldWrapperProps = Omit<ComponentProps<'div'>, 'children'> & {
   /** Leave it out when the control brings its own, such as a checkbox with its words beside it. */
   label?: ReactNode;
@@ -102,14 +116,7 @@ function FieldWrapper({
               {required ? <span className='sr-only'> (required)</span> : null}
             </Label>
           ) : null}
-          {help ? (
-            <p
-              id={helpId}
-              className='m-0 text-sm leading-field-message font-normal text-muted-foreground'
-            >
-              {help}
-            </p>
-          ) : null}
+          {help ? <FieldHelp id={helpId}>{help}</FieldHelp> : null}
         </div>
       ) : null}
       {children}
@@ -126,4 +133,4 @@ function FieldWrapper({
 }
 
 export type { FieldMessageProps, FieldWrapperProps };
-export { FieldMessage, FieldWrapper };
+export { FieldHelp, FieldMessage, FieldWrapper };
