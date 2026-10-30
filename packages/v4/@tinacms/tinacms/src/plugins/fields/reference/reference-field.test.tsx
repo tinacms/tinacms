@@ -1,5 +1,5 @@
 import { type ComponentType, Fragment, type ReactNode } from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
@@ -21,7 +21,8 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
-import { FormProvider, TinaProvider } from '../../../editor';
+import { QueryClient } from '@tanstack/react-query';
+import { FormProvider, TinaProvider, contentKeys } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
 import { required } from '../../../plugins/fields';
@@ -97,11 +98,13 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 const renderField = (
   document?: TinaDocument,
   content = contentPlugin(),
-  Wrapper: ComponentType<{ children: ReactNode }> = Fragment
+  Wrapper: ComponentType<{ children: ReactNode }> = Fragment,
+  queryClient?: QueryClient
 ) =>
   render(
     <Wrapper>
       <TinaProvider
+        queryClient={queryClient}
         config={asResolvedConfig({
           plugins: [referenceFieldPlugin, content, coreValidatorsPlugin],
           schema: { collections: [collection] },
@@ -243,6 +246,36 @@ describe('ReferenceField missing references', () => {
     expect(input).toBeDisabled();
     expect(input).toHaveAttribute('placeholder', 'Loading documents…');
     expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('keeps the warning and the box while a background refetch runs', async () => {
+    let refetching = false;
+    const refetchStarted = vi.fn();
+    const queryClient = new QueryClient();
+    renderField(
+      { page: DELETED },
+      contentPlugin({
+        list: async (name: string) => {
+          if (refetching) {
+            refetchStarted();
+            return new Promise(() => {});
+          }
+          return SUMMARIES[name] ?? [];
+        },
+      }),
+      Fragment,
+      queryClient
+    );
+    const input = await screen.findByLabelText(/^Page\b/);
+    await screen.findByRole('status');
+    refetching = true;
+    void queryClient.refetchQueries({ queryKey: contentKeys.list('page') });
+    await waitFor(() => expect(refetchStarted).toHaveBeenCalled());
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'This document no longer exists.'
+    );
+    expect(input).toBeEnabled();
+    expect(input).toHaveAttribute('placeholder', 'Search documents…');
   });
 
   it('treats a stored value that is not a path as no value', async () => {

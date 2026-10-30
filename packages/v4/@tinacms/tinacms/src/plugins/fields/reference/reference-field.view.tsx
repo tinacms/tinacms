@@ -145,7 +145,7 @@ export function ReferenceFieldView({
             aria-invalid={frame.errors?.length ? true : undefined}
             aria-describedby={frame.help ? frame.helpId : undefined}
           />
-          <ComboboxContent>
+          <ComboboxContent className='w-max min-w-(--anchor-width)'>
             <ComboboxEmpty>No documents match.</ComboboxEmpty>
             <ComboboxList>
               {hasGroups(documents)
