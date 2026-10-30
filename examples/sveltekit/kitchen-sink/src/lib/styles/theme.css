@@ -1,0 +1,192 @@
+:root {
+  --font-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+  --font-nunito: "Nunito", var(--font-sans);
+  --font-lato: "Lato", var(--font-sans);
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Radii */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Neutral palette (Light) */
+  --bg-page: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-tint: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border-subtle: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* Default Theme: Blue */
+  --theme-50: #dceeff;
+  --theme-200: #85c5fe;
+  --theme-300: #4eabfe;
+  --theme-400: #2296fe;
+  --theme-500: #0084ff;
+  --theme-600: #0574e4;
+  --theme-700: #0d5dbd;
+  --theme-on: #ffffff;
+}
+
+/* Theme color variations */
+[data-theme="teal"] {
+  --theme-50: #ecfeff;
+  --theme-200: #a5f3fc;
+  --theme-300: #67e8f9;
+  --theme-400: #22d3ee;
+  --theme-500: #06b6d4;
+  --theme-600: #0891b2;
+  --theme-700: #0e7490;
+  --theme-on: #ffffff;
+}
+
+[data-theme="green"] {
+  --theme-50: #ecfdf5;
+  --theme-200: #a7f3d0;
+  --theme-300: #6ee7b7;
+  --theme-400: #34d399;
+  --theme-500: #10b981;
+  --theme-600: #059669;
+  --theme-700: #047857;
+  --theme-on: #ffffff;
+}
+
+[data-theme="red"] {
+  --theme-50: #fff1f2;
+  --theme-200: #fecdd3;
+  --theme-300: #fda4af;
+  --theme-400: #fb7185;
+  --theme-500: #f43f5e;
+  --theme-600: #e11d48;
+  --theme-700: #be123c;
+  --theme-on: #ffffff;
+}
+
+[data-theme="purple"] {
+  --theme-50: #faf5ff;
+  --theme-200: #e9d5ff;
+  --theme-300: #d8b4fe;
+  --theme-400: #c084fc;
+  --theme-500: #a855f7;
+  --theme-600: #9333ea;
+  --theme-700: #7e22ce;
+  --theme-on: #ffffff;
+}
+
+[data-theme="yellow"] {
+  --theme-50: #fefce8;
+  --theme-200: #fef08a;
+  --theme-300: #fde047;
+  --theme-400: #facc15;
+  --theme-500: #eab308;
+  --theme-600: #ca8a04;
+  --theme-700: #a16207;
+  --theme-on: #1f2937;
+}
+
+[data-theme="orange"] {
+  --theme-50: #fff7ed;
+  --theme-200: #fed7aa;
+  --theme-300: #fdba74;
+  --theme-400: #fb923c;
+  --theme-500: #f97316;
+  --theme-600: #ea580c;
+  --theme-700: #c2410c;
+  --theme-on: #ffffff;
+}
+
+[data-theme="pink"] {
+  --theme-50: #fdf2f8;
+  --theme-200: #fbcfe8;
+  --theme-300: #f9a8d4;
+  --theme-400: #f472b6;
+  --theme-500: #ec4899;
+  --theme-600: #db2777;
+  --theme-700: #be185d;
+  --theme-on: #ffffff;
+}
+
+/* "White" is a neutral gray accent; pure white would be invisible on light pages. */
+[data-theme="white"] {
+  --theme-50: #f9fafb;
+  --theme-200: #e5e7eb;
+  --theme-300: #d1d5db;
+  --theme-400: #9ca3af;
+  --theme-500: #6b7280;
+  --theme-600: #4b5563;
+  --theme-700: #374151;
+  --theme-on: #ffffff;
+}
+
+/* Dark mode: the layout sets data-mode from the Global theme; "system" follows the OS. */
+@media (prefers-color-scheme: dark) {
+  :root:not(:has([data-mode="light"])) {
+    --bg-page: #0f172a;
+    --bg-surface: #1e293b;
+    --bg-tint: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
+    --border-subtle: #334155;
+  }
+}
+
+:root:has([data-mode="dark"]) {
+  --bg-page: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-tint: #334155;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --border-subtle: #334155;
+}
+
+[data-font="nunito"] {
+  font-family: var(--font-nunito);
+}
+
+[data-font="lato"] {
+  font-family: var(--font-lato);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
