@@ -39,6 +39,7 @@ describe('stepValue', () => {
     ['1', 'down', 1, { min: 1 }, null],
     ['3', 'up', -2, none, '4'],
     ['3', 'up', Number.NaN, none, '4'],
+    ['-1', 'up', 1, { max: -0 }, '0'],
   ] as const)(
     '%s %s by %s with %j gives %s',
     (raw, direction, step, limits, expected) => {

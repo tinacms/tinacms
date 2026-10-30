@@ -234,6 +234,18 @@ describe('NumberField stepping', () => {
   });
 });
 
+describe('NumberField sibling edits', () => {
+  it('keeps its value while another field is edited', async () => {
+    renderField({ rating: 3, weight: 2 });
+    const rating = (await screen.findByLabelText(
+      /^Rating\b/
+    )) as HTMLInputElement;
+    await userEvent.type(await screen.findByLabelText(/^Weight\b/), '5');
+    expect(valueOf('weight')).toBe('25');
+    expect(rating.value).toBe('3');
+  });
+});
+
 describe('NumberField wheel guard', () => {
   // A wheel over a focused number input steps its value in a browser. The
   // field drops focus so a scroll past the form cannot edit the document.
@@ -291,6 +303,23 @@ describe('NumberField validation', () => {
     expect(validateFieldWithCore(countNode, descriptor, '   ')).toEqual([
       'Count is required',
     ]);
+  });
+
+  it('names an unlabelled field by its name in the error', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('number');
+    const unlabelled = t.number({ name: 'width' });
+    expect(validateFieldWithCore(unlabelled, descriptor, 'abc')).toEqual([
+      'width must be a number',
+    ]);
+  });
+
+  it('measures a finite number and nothing else', async () => {
+    const registry = await resolveRegistry();
+    const measure = registry.get('number')?.measure;
+    expect(measure?.('3.5')).toEqual({ amount: 3.5 });
+    expect(measure?.('abc')).toBeNull();
+    expect(measure?.('1e999')).toBeNull();
   });
 
   it('passes an optional field left empty', async () => {
