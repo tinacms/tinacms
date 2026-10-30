@@ -34,6 +34,9 @@ export interface HookRef {
 export interface BaseFieldSchema {
   name: string;
   label?: string;
+  description?: string;
+  defaultValue?: Exclude<JsonValue, null>;
+  hidden?: boolean;
   validators?: ValidatorRef[];
 }
 

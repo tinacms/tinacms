@@ -16,7 +16,7 @@ import {
   useContentSlice,
   useFieldActivation,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldSchema,
   useFieldValue,
 } from '../../../editor';
@@ -68,7 +68,7 @@ export function ReferenceField() {
   const address = useFieldAddress();
   const field = useFieldSchema<ReferenceFieldSchema>();
   const [value, setValue] = useFieldValue<string | null>(address);
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus());
@@ -88,7 +88,10 @@ export function ReferenceField() {
   const unusable = isLoading || error !== null;
 
   return (
-    <FieldWrapper errors={error ? [...errors, error.message] : errors}>
+    <FieldWrapper
+      {...frame}
+      errors={error ? [...frame.errors, error.message] : frame.errors}
+    >
       <Combobox
         items={items}
         value={selected}

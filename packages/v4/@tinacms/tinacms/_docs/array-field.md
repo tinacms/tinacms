@@ -58,9 +58,54 @@ const collection = {
 | `templates` | `TemplateSchema[]` | objects, each with its own template | `[{ _template: 'hero', headline: 'Hi' }]` |
 | `of` | `ScalarFieldSchema` | single values; an object or array here is rejected (ADR-017 §4) | `['news', 'release']` |
 
-A template is the shared `TemplateSchema` from `core/schema/types.ts`:
-`name`, `label?`, `fields` and `defaultItem?`. A new item of a template starts
-from its `defaultItem`.
+A template of a templates array has `name`, `label?`, `fields`, `defaultItem?`,
+`itemLabel?` and `previewImage?`. A rich-text embed template takes only `name`,
+`label?`, `fields` and `defaultItem?`.
+
+### Array options
+
+| Key | On | Effect |
+|---|---|---|
+| `defaultItem` | a `fields` array, a scalar array, a template | The starting value of a new item. |
+| `itemLabel` | a `fields` array, a template | `(item) => string`. The row heading. |
+| `picker` | a `templates` array | `'list'` or `'grid'`. How an editor picks a block to add. |
+| `previewImage` | a template | The image the grid picker shows. |
+
+- `defaultItem` takes a scalar on a scalar array (it wins over `of.defaultValue`)
+  and a document on a `fields` array. A templates array takes no `defaultItem`
+  on the array: set it on each template. Keys that the document omits fall back
+  to field and plugin defaults.
+- `itemLabel` receives the item's current form value, so the heading follows
+  what the editor types. When the result is empty or not a string, or when the
+  function throws, the row shows the default heading. A scalar array and a
+  rich-text template take no `itemLabel`. It is a function, so it is never
+  written to `tina-lock.json`.
+- `picker` defaults to `'grid'` when any template has a `previewImage`, and to
+  `'list'` otherwise. It replaces the v3 `visualSelector`.
+- `previewImage` is a path relative to the media root, with no URL scheme. It
+  replaces the v3 `previewSrc`.
+
+```ts
+t.array({
+  name: 'blocks',
+  picker: 'grid',
+  templates: [
+    {
+      name: 'hero',
+      previewImage: '/blocks/hero.png',
+      defaultItem: { headline: 'New hero' },
+      itemLabel: (item) => String(item.headline ?? ''),
+      fields: [t.string({ name: 'headline' })],
+    },
+  ],
+})
+```
+
+`hidden` and `description` on the `of` field of a scalar array fail the build.
+Set them on the array.
+
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
 
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with

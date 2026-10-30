@@ -5,13 +5,16 @@ fixed list of options, and a Zod enum checks the value.
 
 ## Files
 
-The four files are in `plugins/fields/select/`:
+The files are in `plugins/fields/select/`:
 
 | File | Role |
 |---|---|
 | `select-field.schema.ts` | The `t.select()` helper function, and the `selectSchema` validator |
 | `select-field.client.tsx` | The descriptor, which takes the `select` key |
-| `select-field.ui.tsx` | The `SelectField` component |
+| `select-field.ui.tsx` | The `SelectField` editor component: reads the address, value and frame from the editor hooks |
+| `select-field.view.tsx` | `SelectFieldView`: the trigger and option list, from props only |
+| `select-field.states.ts` | The state catalogue: every look, with a lookup by name |
+| `select-field.states.test.tsx` | One render test over every state, plus the inert, keyboard, None and disabled-option tests |
 | `select-field.plugin.ts` | The manifest, `tina:field:select` |
 
 ## Authoring
@@ -44,6 +47,9 @@ an array of `SelectFieldOption`:
 |---|---|---|
 | `value` | `string` (required) | the value the document stores |
 | `label` | `string` | the text the trigger and the option list show; the field falls back to `value` when `label` is absent |
+
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
 
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with
@@ -97,53 +103,51 @@ stored value is `null` after ingest, because the descriptor sets no
 
 ## The component
 
-`SelectField` (`select-field.ui.tsx`) has no props. It reads its address and
-its resolved schema node from the context, and it gets the value and the
-errors from hooks that use the address.
+`SelectField` (`select-field.ui.tsx`) has no props. It reads its address, its
+resolved schema node and the frame from hooks, and passes them to
+`SelectFieldView`. `useFieldActivation` focuses the trigger.
+
+`SelectFieldView` (`select-field.view.tsx`) holds no editor state. It takes the
+frame props (`label`, `required`, `errors`, `help`, `warnings`), `items`,
+`value`, `onChange`, and the optional `placeholder` (default `Select...`),
+`disabled` and `readOnly`. It draws the Form Controls Select inside the Field
+wrapper.
 
 The trigger shows an option's `label`, not its raw `value`. `@base-ui/react`'s
 `Select.Value` only renders a `label` when `Select.Root` gets an `items` prop
-that pairs each `value` with a `label`, so the component builds that list from
-`field.options`:
+that pairs each `value` with a `label`, so the view passes its list there. A
+stored value that is not in `items` shows as its raw value, next to the
+"must be one of the listed options" error.
 
-```tsx
-export function SelectField() {
-  const address = useFieldAddress();
-  const field = useFieldSchema<SelectFieldSchema>();
-  const [value, setValue] = useFieldValue<string>(address);
-  const errors = useFieldErrors(address);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+### The "None" row
 
-  useFieldActivation(() => triggerRef.current?.focus());
+An optional field has a "None" row. It is the only way to clear a stored value,
+and it sets the value to `null`. A required field has no "None" row. The view
+adds the row from the `required` flag. An option with an empty-string value
+collides with the "None" row, which uses `''`. The schema does not forbid it.
 
-  const items = field.options.map((option) => ({
-    value: option.value,
-    label: option.label ?? option.value,
-  }));
+### Looks
 
-  return (
-    <FieldWrapper errors={errors}>
-      <Select items={items} value={value ?? null}
-        onValueChange={(newValue) => setValue(newValue ?? undefined)}>
-        <SelectTrigger ref={triggerRef} id={address}>
-          <SelectValue placeholder='Select...' />
-        </SelectTrigger>
-        <SelectContent>
-          {field.options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label ?? option.value}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </FieldWrapper>
-  );
-}
-```
+- **Disabled:** the Field wrapper fades the whole field once. The trigger does
+  not fade again. The list never opens, and there is no hover.
+- **Read-only:** the view sets the Base UI `readOnly` prop, which keeps the list shut.
+  The trigger has a muted fill, a subtle border and no chevron. The list never
+  opens, and there is no hover.
+- **Disabled option:** `SelectFieldViewItem` has optional `disabled` and `hint`.
+  A disabled option is grey, with no strikethrough and no hover, and cannot be
+  picked. The `hint` shows as the option `title`. `SelectFieldOption` in the
+  public schema does not have these keys, so only the catalogue sets them.
+- **Width:** the trigger fills the field width and truncates a long label. The
+  width is set in the view, so the shared trigger keeps `w-fit` for other
+  consumers.
+- **Focus:** the trigger shows its ring on `focus-visible` only.
 
-`Select`, `SelectTrigger`, `SelectValue`, `SelectContent`, and `SelectItem`
-come from `@tinacms/ui/components/select`, the shadcn primitive that wraps
-`@base-ui/react/select`.
+`disabled`, `readOnly`, `help` and `warnings` have no source in the real editor
+today. Only the catalogue and tests reach them.
+
+The shared trigger and option classes live in `@tinacms/ui`
+(`components/select.tsx` and `lib/field-styles.ts`). Combobox, the media
+filters and the Reference field use them.
 
 ## The connections
 
@@ -166,3 +170,11 @@ come from `@tinacms/ui/components/select`, the shadcn primitive that wraps
 - It passes a stored value through ingest and digest without a change, and
   holds an absent field as `null` and digests it as absent.
 - It examines the metadata of the descriptor.
+- `select-field.states.test.tsx` renders every state in the catalogue and checks
+  the accessible name, the messages, `aria-invalid`, help, the disabled and
+  read-only attributes, and the absence of an "unsaved" marker. It also checks
+  that inert states never open or change, that the keyboard opens and picks,
+  that Escape closes without a change, the "None" row, and that a disabled
+  option cannot be picked.
+- `select-field.test.tsx` also checks that an invalid pick, by mouse and by
+  keyboard, shows its error with no extra blur.

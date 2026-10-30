@@ -2,40 +2,33 @@ import { useRef } from 'react';
 import {
   useFieldActivation,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldSchema,
   useFieldValue,
 } from '../../../editor';
 import type { NumberFieldSchema } from './number-field.schema';
+import { limitOf } from './number-field.step';
+import { NumberFieldView } from './number-field.view';
 
 export function NumberField() {
   const address = useFieldAddress();
   const field = useFieldSchema<NumberFieldSchema>();
   const [value, setValue] = useFieldValue<string | null>(address);
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus());
 
-  // TODO(shadcn): replace with the shared components in src/ui/.
   return (
-    <div>
-      <input
-        ref={inputRef}
-        type='number'
-        step={field.step ?? 'any'}
-        id={address}
-        value={value ?? ''}
-        onChange={(event) =>
-          setValue(event.target.value === '' ? null : event.target.value)
-        }
-        onWheel={(event) => event.currentTarget.blur()}
-      />
-      {errors.map((error) => (
-        <span key={error} role='alert'>
-          {error}
-        </span>
-      ))}
-    </div>
+    <NumberFieldView
+      {...frame}
+      ref={inputRef}
+      id={address}
+      value={value ?? null}
+      onChange={setValue}
+      min={limitOf(field, 'min')}
+      max={limitOf(field, 'max')}
+      step={field.step}
+    />
   );
 }

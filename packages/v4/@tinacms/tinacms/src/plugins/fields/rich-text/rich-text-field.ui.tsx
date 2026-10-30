@@ -8,7 +8,7 @@ import {
   useDocumentPath,
   useFieldActivation,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldSchema,
   useFieldValue,
   useFormSeedKey,
@@ -24,7 +24,7 @@ export function RichTextField() {
   const seedKey = useFormSeedKey();
   const field = useFieldSchema<RichTextFieldSchema>();
   const [value, setValue] = useFieldValue<RichTextValue>(address);
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { setActive } = useActiveField();
@@ -60,7 +60,7 @@ export function RichTextField() {
   });
 
   return (
-    <FieldWrapper errors={errors}>
+    <FieldWrapper {...frame}>
       <div ref={containerRef} className='min-w-0'>
         <EditorContext.Provider
           key={seedKey}

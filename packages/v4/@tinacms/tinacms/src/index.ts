@@ -88,6 +88,7 @@ export {
   v,
 } from './plugins/fields';
 export type {
+  ArrayTemplateSchema,
   BooleanFieldSchema,
   DatetimeFieldSchema,
   NumberFieldSchema,

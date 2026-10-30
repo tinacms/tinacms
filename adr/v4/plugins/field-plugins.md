@@ -42,26 +42,28 @@ export default defineClientPlugin({
 A field component receives *only* its **Field address** via context. Everything else is pulled through address-keyed hooks:
 
 ```tsx
-import { useFieldValue, useFieldErrors, useFieldActivation, useFieldAddress } from 'tinacms/react'
+import { FieldWrapper, useFieldValue, useFieldFrame, useFieldActivation, useFieldAddress } from 'tinacms/react'
 
 function StringField() {
   const address = useFieldAddress()
   const [value, setValue] = useFieldValue<string>(address)
-  const errors = useFieldErrors(address)
+  const frame = useFieldFrame()
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Opt into focusing when this field becomes the active field
   useFieldActivation(() => inputRef.current?.focus())
 
+  // The wrapper draws the label, the required marker and the errors the editor
+  // should see now (after the field is left, or after a save was tried)
   return (
-    <div>
+    <FieldWrapper {...frame}>
       <input
         ref={inputRef}
+        id={address}
         value={value ?? ''}
         onChange={(e) => setValue(e.target.value)}
       />
-      {errors.map((e) => <span key={e} className="error">{e}</span>)}
-    </div>
+    </FieldWrapper>
   )
 }
 ```
@@ -74,7 +76,8 @@ Why no value/onChange props? Because forms are **flat, normalized by address** (
 |---|---|---|
 | `useFieldAddress()` | — | identity of *this* field |
 | `useFieldValue<T>(address)` | one leaf address | read+write a value |
-| `useFieldErrors(address)` | errors at an address | display validation |
+| `useFieldErrors(address)` | every error at an address, shown at once | custom error display |
+| `useFieldFrame()` | label, ids, required, and the errors to show now. Reads the address from context | spread into `FieldWrapper` |
 | `useFieldActivation(handler)` | active-field === my address | opt-in focus/popover/center |
 | `useSiblingValue(address, name)` | sibling leaf | conditional UI across fields (not validation: see [Validation](#validation)) |
 | `useChildKeys(address)` | structure index entry | composite child ordering |
@@ -386,8 +389,8 @@ export default defineClientPlugin({
   },
 })
 
-// usage in user's schema
-t.string({ name: 'primaryColor', label: 'Primary Color', ui: { component: 'color' } })
+// usage in user's schema: the plugin's `type` picks the field
+t.color({ name: 'primaryColor', label: 'Primary Color' })
 ```
 
 ## Removed from earlier drafts
