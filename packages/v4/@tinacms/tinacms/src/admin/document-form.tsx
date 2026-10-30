@@ -38,6 +38,7 @@ import {
   useFormStore,
   useIsFormDirty,
 } from '../form/form-store';
+import { countFailingFields } from '../editor/field-errors';
 import { DocumentStatus } from './document-status';
 
 function SaveButton() {
@@ -45,7 +46,7 @@ function SaveButton() {
   const dirty = useIsFormDirty(formId);
   const save = useFormSave();
   const [failure, setFailure] = useSaveFailure();
-  const errorCount = Object.keys(useFormErrors(formId)).length;
+  const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
   const [pending, setPending] = useState(false);
   return (
     <div className='flex flex-col items-start gap-2'>
