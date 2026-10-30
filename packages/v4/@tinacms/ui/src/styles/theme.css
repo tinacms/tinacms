@@ -163,6 +163,7 @@
   --leading-control: var(--leading-control);
   --leading-title: var(--leading-title);
   --leading-tip: var(--leading-tip);
+  --leading-field-message: var(--leading-field-message);
   --leading-code: var(--leading-code);
 
   --ease-standard: var(--ease);

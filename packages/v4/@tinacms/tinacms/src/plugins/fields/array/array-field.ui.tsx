@@ -11,7 +11,7 @@ import {
   NestedFieldRow,
   useDocumentPath,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
@@ -50,10 +50,10 @@ export function ArrayField() {
 function ItemList() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
 
   return (
-    <FieldWrapper errors={errors}>
+    <FieldWrapper {...frame}>
       {isScalarArray(field) ? (
         <ScalarItems address={address} field={field} />
       ) : (

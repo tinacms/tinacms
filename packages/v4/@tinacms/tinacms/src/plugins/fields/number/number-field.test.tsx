@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
@@ -72,31 +72,41 @@ const renderField = (document?: TinaDocument) =>
 describe('NumberField rendering', () => {
   it('renders a stored number as its string value', async () => {
     renderField({ weight: 3 });
-    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Weight\b/
+    )) as HTMLInputElement;
     expect(input.value).toBe('3');
   });
 
   it('renders empty when the field is absent (no default value)', async () => {
     renderField();
-    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Weight\b/
+    )) as HTMLInputElement;
     expect(input.value).toBe('');
   });
 
   it('renders a stored zero rather than blanking it', async () => {
     renderField({ count: 0 });
-    const input = (await screen.findByLabelText('Count')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Count\b/
+    )) as HTMLInputElement;
     expect(input.value).toBe('0');
   });
 
   it('applies the schema step to the input', async () => {
     renderField({ rating: 3 });
-    const input = (await screen.findByLabelText('Rating')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Rating\b/
+    )) as HTMLInputElement;
     expect(input.step).toBe('0.5');
   });
 
   it('accepts any step when the schema sets none', async () => {
     renderField({ weight: 3 });
-    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Weight\b/
+    )) as HTMLInputElement;
     expect(input.step).toBe('any');
   });
 });
@@ -104,22 +114,27 @@ describe('NumberField rendering', () => {
 describe('NumberField value updates', () => {
   it('writes a decimal keystroke sequence back through the store', async () => {
     renderField();
-    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Weight\b/
+    )) as HTMLInputElement;
     await userEvent.type(input, '1.5');
     expect(input.value).toBe('1.5');
   });
 
   it('accepts a negative value', async () => {
     renderField();
-    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
+    const input = (await screen.findByLabelText(
+      /^Weight\b/
+    )) as HTMLInputElement;
     await userEvent.type(input, '-5');
     expect(input.value).toBe('-5');
   });
 
-  it('surfaces the shared min message while editing', async () => {
+  it('surfaces the shared min message once the editor leaves the field', async () => {
     renderField();
-    const input = await screen.findByLabelText('Rating');
+    const input = await screen.findByLabelText(/^Rating\b/);
     await userEvent.type(input, '0');
+    await userEvent.tab();
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Rating must be at least 1'
     );
@@ -129,16 +144,105 @@ describe('NumberField value updates', () => {
   // through `Number('')` and write a 0 that the editor never typed.
   it('empties the field rather than storing an empty string', async () => {
     renderField({ weight: 3 });
-    const input = await screen.findByLabelText('Weight');
+    const input = await screen.findByLabelText(/^Weight\b/);
     await userEvent.clear(input);
     expect(valueOf('weight')).toBeNull();
   });
 
   it('keeps a typed value in the store', async () => {
     renderField();
-    const input = await screen.findByLabelText('Weight');
+    const input = await screen.findByLabelText(/^Weight\b/);
     await userEvent.type(input, '42');
     expect(valueOf('weight')).toBe('42');
+  });
+});
+
+describe('NumberField stepping', () => {
+  it('steps by the schema step with the buttons', async () => {
+    renderField({ rating: 3, weight: 2.5 });
+    await screen.findByLabelText(/^Rating\b/);
+    const rows = screen.getAllByRole('button', { name: 'Increase' });
+    await userEvent.click(rows[0]);
+    expect(valueOf('rating')).toBe('3.5');
+    await userEvent.click(rows[2]);
+    expect(valueOf('weight')).toBe('3.5');
+    expect(screen.getByLabelText(/^Weight\b/)).toHaveFocus();
+  });
+
+  it('steps once per arrow key and keeps the value a string', async () => {
+    renderField({ rating: 3 });
+    const input = await screen.findByLabelText(/^Rating\b/);
+    await userEvent.click(input);
+    await userEvent.keyboard('{ArrowUp}');
+    expect(valueOf('rating')).toBe('3.5');
+    await userEvent.keyboard('{ArrowDown}{ArrowDown}');
+    expect(valueOf('rating')).toBe('2.5');
+  });
+
+  it('stops at the limits and disables the button there', async () => {
+    renderField({ rating: 5 });
+    const input = await screen.findByLabelText(/^Rating\b/);
+    expect(
+      screen.getAllByRole('button', { name: 'Increase' })[0]
+    ).toBeDisabled();
+    await userEvent.click(input);
+    await userEvent.keyboard('{ArrowUp}');
+    expect(valueOf('rating')).toBe('5');
+  });
+
+  it('steps up from empty to the minimum', async () => {
+    renderField();
+    await screen.findByLabelText(/^Rating\b/);
+    await userEvent.click(
+      screen.getAllByRole('button', { name: 'Increase' })[0]
+    );
+    expect(valueOf('rating')).toBe('1');
+  });
+
+  it('keeps a typed value past the limit and shows the error after blur', async () => {
+    renderField();
+    const input = (await screen.findByLabelText(
+      /^Rating\b/
+    )) as HTMLInputElement;
+    await userEvent.type(input, '6');
+    await userEvent.tab();
+    expect(input.value).toBe('6');
+    expect(valueOf('rating')).toBe('6');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Rating must be at most 5'
+    );
+  });
+
+  it('skips the step buttons with Tab', async () => {
+    renderField({ rating: 3 });
+    const input = await screen.findByLabelText(/^Rating\b/);
+    await userEvent.click(input);
+    await userEvent.tab();
+    expect(input).not.toHaveFocus();
+    expect(document.activeElement?.tagName).not.toBe('BUTTON');
+  });
+
+  it('stores null and shows the required error after clearing a required field', async () => {
+    renderField({ count: 5 });
+    const input = await screen.findByLabelText(/^Count\b/);
+    await userEvent.clear(input);
+    await userEvent.tab();
+    expect(valueOf('count')).toBeNull();
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Count is required'
+    );
+  });
+});
+
+describe('NumberField sibling edits', () => {
+  it('keeps its value while another field is edited', async () => {
+    renderField({ rating: 3, weight: 2 });
+    const rating = (await screen.findByLabelText(
+      /^Rating\b/
+    )) as HTMLInputElement;
+    await userEvent.type(await screen.findByLabelText(/^Weight\b/), '5');
+    expect(valueOf('weight')).toBe('25');
+    expect(rating.value).toBe('3');
   });
 });
 
@@ -147,8 +251,8 @@ describe('NumberField wheel guard', () => {
   // field drops focus so a scroll past the form cannot edit the document.
   it('drops focus when the wheel scrolls over the input', async () => {
     renderField({ weight: 3 });
-    const input = await screen.findByLabelText('Weight');
-    input.focus();
+    const input = await screen.findByLabelText(/^Weight\b/);
+    act(() => input.focus());
     expect(input).toHaveFocus();
     fireEvent.wheel(input);
     expect(input).not.toHaveFocus();
@@ -199,6 +303,23 @@ describe('NumberField validation', () => {
     expect(validateFieldWithCore(countNode, descriptor, '   ')).toEqual([
       'Count is required',
     ]);
+  });
+
+  it('names an unlabelled field by its name in the error', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('number');
+    const unlabelled = t.number({ name: 'width' });
+    expect(validateFieldWithCore(unlabelled, descriptor, 'abc')).toEqual([
+      'width must be a number',
+    ]);
+  });
+
+  it('measures a finite number and nothing else', async () => {
+    const registry = await resolveRegistry();
+    const measure = registry.get('number')?.measure;
+    expect(measure?.('3.5')).toEqual({ amount: 3.5 });
+    expect(measure?.('abc')).toBeNull();
+    expect(measure?.('1e999')).toBeNull();
   });
 
   it('passes an optional field left empty', async () => {

@@ -2,7 +2,7 @@ import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import {
   NestedFieldRow,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldSchema,
   useFieldValue,
 } from '../../../editor';
@@ -24,10 +24,10 @@ export function ObjectField() {
 function FieldGroup() {
   const address = useFieldAddress();
   const field = asObjectFieldSchema(useFieldSchema());
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
 
   return (
-    <FieldWrapper errors={errors}>
+    <FieldWrapper {...frame}>
       <div
         role='group'
         aria-labelledby={`${address}-label`}

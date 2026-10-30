@@ -1,3 +1,4 @@
+export { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 export { type FieldAddress, toFieldAddress } from '../core/field/address';
 export {
   type FieldErrors,
@@ -17,7 +18,6 @@ export {
 export type { SaveHandler, StaleDraftActions } from './context';
 export {
   Field,
-  FieldDescription,
   FieldNode,
   type FieldNodeProps,
   type FieldProps,
@@ -60,6 +60,7 @@ export {
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,
+  useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,

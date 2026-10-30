@@ -1,9 +1,11 @@
-import { Label } from '@tinacms/ui/components/label';
 import { use, useLayoutEffect, useRef } from 'react';
 import type { FieldAddress } from '../core/field/address';
 import { toFieldAddress } from '../core/field/address';
 import type { FieldSchema } from '../core/schema/types';
+import { useStore } from 'zustand';
 import { useFormStore } from '../form/form-store';
+import { DrillInField } from './drill-in-field';
+import { DRILL_DEPTH, fieldDepth } from './form-view-state';
 import {
   FieldAddressContext,
   FieldSchemaContext,
@@ -41,7 +43,15 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     setActive(scope.formId, address);
   };
 
-  // Widgets own their input, so the description is linked from here: the input
+  const openAddress = useStore(
+    scope.view,
+    (state) => state.openLevels.at(-1)?.address
+  );
+  const drills =
+    descriptor.metadata?.drillable === true &&
+    fieldDepth(address) >= DRILL_DEPTH &&
+    openAddress !== address;
+  // Widgets own their input, so the help text is linked from here: the input
   // is the element with the field's id, or the group named by the field label.
   const frame = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -49,38 +59,27 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     const target = frame.current?.querySelector(
       `[id="${address}"], [aria-labelledby="${address}-label"]`
     );
-    target?.setAttribute('aria-describedby', `${address}-description`);
+    target?.setAttribute('aria-describedby', `${address}-help`);
   }, [address, node.description]);
 
-  const Component = descriptor.Component;
+  const Component = drills ? DrillInField : descriptor.Component;
   return (
     <FieldAddressContext value={address}>
       <FieldSchemaContext value={node}>
-        <div ref={frame} style={{ display: 'contents' }} onFocus={markActive}>
+        <div
+          ref={frame}
+          style={{ display: 'contents' }}
+          onFocus={markActive}
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              scope.view.getState().touch(address);
+            }
+          }}
+        >
           <Component />
         </div>
       </FieldSchemaContext>
     </FieldAddressContext>
-  );
-}
-
-// Help text under a field label. `aria-describedby` wiring is left to the
-// widget, which owns its input.
-export function FieldDescription({
-  address,
-  node,
-}: {
-  address: string;
-  node: FieldSchema;
-}) {
-  if (!node.description) return null;
-  return (
-    <p
-      id={`${address}-description`}
-      className='mb-1 text-sm text-muted-foreground'
-    >
-      {node.description}
-    </p>
   );
 }
 
@@ -89,25 +88,12 @@ export interface NestedFieldRowProps {
   node: FieldSchema;
 }
 
-// The label + <FieldNode> pair a compound field (array, object) renders for
-// each of its child fields. A child whose descriptor sets `labelable: false`
-// gets no `htmlFor` — its widget reads the row's label id through
-// `aria-labelledby` instead.
+// The row a compound field (array, object) renders for each of its child
+// fields. The child's own FieldWrapper draws the label.
 export function NestedFieldRow({ address, node }: NestedFieldRowProps) {
-  const runtime = use(TinaRuntimeContext);
-  const labelable =
-    runtime?.registry.get(node.type)?.metadata?.labelable !== false;
   if (node.hidden) return null;
   return (
     <div className='mb-3 min-w-0 last:mb-0'>
-      <Label
-        className='mb-1'
-        id={`${address}-label`}
-        htmlFor={labelable ? address : undefined}
-      >
-        {node.label ?? node.name}
-      </Label>
-      <FieldDescription address={address} node={node} />
       <FieldNode address={toFieldAddress(address)} node={node} />
     </div>
   );
@@ -129,6 +115,7 @@ export function Field({ address }: FieldProps) {
       `No field "${address}" in collection "${scope.collection.name}"`
     );
   }
+  if (node.hidden) return null;
 
   return <FieldNode address={toFieldAddress(address)} node={node} />;
 }

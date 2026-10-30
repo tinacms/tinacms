@@ -240,7 +240,7 @@ describe('TinaAdmin', () => {
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
 
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     expect(input).toHaveValue('Hello');
 
     await user.type(input, '!');
@@ -257,35 +257,25 @@ describe('TinaAdmin', () => {
     expect(input).toHaveValue('Hello!');
   });
 
-  it('disables Save while the document has a validation error', async () => {
+  it('keeps a document with a validation error from saving, and shows the error after a save is tried', async () => {
     const user = userEvent.setup();
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
 
     await user.clear(input);
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Title is required'
-    );
-    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
-      'aria-disabled',
-      'true'
-    );
+    expect(screen.queryByRole('alert')).toBeNull();
 
-    await user.type(input, 'Hello again');
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
-        'aria-disabled',
-        'false'
-      )
-    );
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const alerts = await screen.findAllByRole('alert');
+    expect(alerts[0]).toHaveTextContent('Title is required');
   });
 
   it('opens the document a deep link names', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fsecond.mdx';
     renderAdmin();
-    expect(await screen.findByLabelText('Title')).toHaveValue('Second');
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Second');
   });
 
   it('navigating writes a shareable hash', async () => {
@@ -312,7 +302,7 @@ describe('TinaAdmin', () => {
   it('does not report a document a deep link names that does exist', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     renderAdmin();
-    expect(await screen.findByLabelText('Title')).toHaveValue('Hello');
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello');
     expect(screen.queryByText(/No document named/)).not.toBeInTheDocument();
   });
 
@@ -334,12 +324,12 @@ describe('TinaAdmin', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('Title'), '!');
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
-    expect(await screen.findByLabelText('Title')).toHaveValue('Second');
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Second');
 
     const helloEntry = await screen.findByRole('button', {
       name: /hello\.mdx/,
@@ -355,10 +345,10 @@ describe('TinaAdmin unsaved changes', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await screen.findByLabelText('Title');
+    await screen.findByLabelText(/^Title\b/);
     expect(reloadIsBlocked()).toBe(false);
 
-    await user.type(screen.getByLabelText('Title'), '!');
+    await user.type(screen.getByLabelText(/^Title\b/), '!');
     expect(reloadIsBlocked()).toBe(true);
 
     await user.click(screen.getByRole('button', { name: 'Save' }));
@@ -372,13 +362,13 @@ describe('TinaAdmin unsaved changes', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('Title'), '!');
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
     await waitFor(() =>
-      expect(screen.getByLabelText('Title')).toHaveValue('Second')
+      expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Second')
     );
     expect(reloadIsBlocked()).toBe(true);
   });
@@ -389,7 +379,7 @@ describe('TinaAdmin unsaved changes', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('Title'), '!');
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
     expect(reloadIsBlocked()).toBe(true);
 
     unmount();
@@ -402,13 +392,13 @@ describe('TinaAdmin unsaved changes', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('Title'), '!');
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
     expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
 
     await user.click(screen.getByRole('button', { name: 'Discard' }));
 
     await waitFor(() =>
-      expect(screen.getByLabelText('Title')).toHaveValue('Hello')
+      expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello')
     );
     expect(screen.getByRole('status')).toHaveTextContent('No changes');
     expect(reloadIsBlocked()).toBe(false);
@@ -437,7 +427,7 @@ describe('TinaAdmin content reads', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await screen.findByLabelText('Title');
+    await screen.findByLabelText(/^Title\b/);
 
     expect(getCalls).toEqual(['content/posts/hello.mdx']);
   });
@@ -515,7 +505,7 @@ describe('TinaAdmin content reads', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('Title'), '!');
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => expect(saved).toHaveLength(1));
@@ -682,7 +672,7 @@ describe('TinaAdmin screens', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('Title'), '!');
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
     await user.click(await screen.findByRole('button', { name: 'Media' }));
     await screen.findByText(/media library at/);
@@ -704,7 +694,7 @@ describe('TinaAdmin form continuity', () => {
     const before = await screen.findByRole('list', { name: 'Posts documents' });
 
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await screen.findByLabelText('Title');
+    await screen.findByLabelText(/^Title\b/);
 
     expect(screen.getByRole('list', { name: 'Posts documents' })).toBe(before);
   });
@@ -755,7 +745,7 @@ describe('TinaAdmin stale drafts', () => {
       within(dialog).getByRole('button', { name: 'Discard draft' })
     );
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
-    expect(screen.getByLabelText('Title')).toHaveValue('Hello');
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello');
     expect(readDraft(helloFormId)).toBeUndefined();
   });
 });
@@ -825,7 +815,7 @@ describe('TinaAdmin after a save that changes the document', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('Title'), '!');
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(await screen.findByDisplayValue('HELLO!')).toBeInTheDocument();

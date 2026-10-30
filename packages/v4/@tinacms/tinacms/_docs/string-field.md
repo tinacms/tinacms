@@ -27,6 +27,12 @@ The config (`StringFieldSchema`, which extends `BaseFieldSchema`):
 |---|---|---|
 | `name` | `string` (necessary) | The field key in the document. It is also the alternative label. |
 | `label` | `string` | The label on the screen. The validation messages use it. |
+| `multiline` | `boolean` | A 96px box for plain paragraphs. It scrolls inside and drags taller. Without it, one line that ends in an ellipsis. |
+| `mono` | `boolean` | Shows the value in the code font, in either box. |
+| `placeholder` | `string` | Grey hint text in an empty box. |
+
+Turning `multiline` off for a field with stored paragraphs shows the lines
+joined. The stored value changes to the joined text on the next edit.
 
 Every field also takes `description`, `defaultValue` and `hidden`. Refer to
 [Options every field takes](./field-plugins.md#options-every-field-takes).
@@ -85,29 +91,42 @@ These rules run on the shared two-layer path. `validateField` calls
 
 ## The component
 
-`StringField` (`string-field.ui.tsx`) has no props. It reads its address from
-the context. It gets the value and the errors from hooks that use the address.
-Thus a keystroke renders this field again, but does not render the other fields
-again.
+`StringField` (`string-field.ui.tsx`) has no props. It reads its address, schema
+options, value and frame (label, required, errors) from hooks, and it renders
+`StringFieldView` (`string-field.view.tsx`). The view puts an `Input` or a
+`Textarea` inside `FieldWrapper`. It sets `aria-invalid` when there are errors.
+A disabled box does not fade a second time, because the wrapper already fades it.
 
 ```tsx
 export function StringField() {
   const address = useFieldAddress();
+  const { multiline, mono, placeholder } = useFieldSchema<StringFieldSchema>();
   const [value, setValue] = useFieldValue<string>(address);
-  const errors = useFieldErrors(address);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const frame = useFieldFrame();
+  const boxRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
 
-  useFieldActivation(() => inputRef.current?.focus()); // focus when active
+  useFieldActivation(() => boxRef.current?.focus());
 
   return (
-    <div>
-      <input ref={inputRef} id={address} value={value ?? ''}
-        onChange={(e) => setValue(e.target.value)} />
-      {errors.map((e) => <span key={e} role='alert'>{e}</span>)}
-    </div>
+    <StringFieldView
+      {...frame}
+      ref={(box) => {
+        boxRef.current = box;
+      }}
+      id={address}
+      value={value ?? ''}
+      onChange={setValue}
+      multiline={multiline}
+      mono={mono}
+      placeholder={placeholder}
+    />
   );
 }
 ```
+
+The view also takes `disabled`, `readOnly`, `help` and `warnings`. No schema key
+sets them yet, so only `string-field.states.ts` uses them. That file lists every
+look of the field, and a test renders each one.
 
 ## The connections
 

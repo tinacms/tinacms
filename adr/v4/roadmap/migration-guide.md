@@ -89,8 +89,11 @@ The unified `definePlugin` shape:
 + function MyField() {
 +   const address = useFieldAddress()
 +   const [value, setValue] = useFieldValue<string>(address)
-+   const errors = useFieldErrors(address)
-+   return <input value={value ?? ''} onChange={(e) => setValue(e.target.value)} />
++   return (
++     <FieldWrapper {...useFieldFrame()}>
++       <input id={address} value={value ?? ''} onChange={(e) => setValue(e.target.value)} />
++     </FieldWrapper>
++   )
 + }
 ```
 

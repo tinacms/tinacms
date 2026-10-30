@@ -40,7 +40,7 @@ describe('FormProvider form-store wiring', () => {
         </FormProvider>
       </TinaProvider>
     );
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
 
     await userEvent.type(input, '!');

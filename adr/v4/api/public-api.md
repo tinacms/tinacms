@@ -17,7 +17,7 @@ Single package per [ADR-001](../001-single-package-architecture.md). Per-framewo
 | Import path | Where it runs | Contains |
 |---|---|---|
 | `tinacms` | universal (config + types) | `defineConfig`, `defineCollection`, `definePlugin`, `t` schema helpers, `Permission` type |
-| `tinacms/react` | browser | `TinaProvider`, `useTinaStore`, address-keyed hooks (`useFieldValue`, `useFieldAddress`, `useFieldActivation`, `useFieldErrors`, `useChildKeys`, `useSiblingValue`, `useFormActions`, `useHasPermission`) |
+| `tinacms/react` | browser | `TinaProvider`, `useTinaStore`, address-keyed hooks (`useFieldValue`, `useFieldAddress`, `useFieldActivation`, `useFieldErrors`, `useFieldFrame`, `useChildKeys`, `useSiblingValue`, `useFormActions`, `useHasPermission`) |
 | `tinacms/client` | browser | client-segment authoring (`defineClientPlugin`), the `server` RPC proxy |
 | `tinacms/server` | server only | `defineServerPlugin`, `protectedOp`, `publicOp`, `use(...)`, `requestContext()`, `mountHandler`, `defineServerHook`, `reject`, `HookRejectedError`, `ServerHookScope`, `ServerFormHooks`, `ServerHookFactory` |
 | `tinacms/next`, `tinacms/express`, … | server only | per-framework adapters that mount the RPC handler |
@@ -144,7 +144,8 @@ const current = useTinaStore((s) => s.branch.current)
 |---|---|
 | `useFieldAddress()` | identity of *this* field |
 | `useFieldValue<T>(address)` | one leaf value (stable reference) |
-| `useFieldErrors(address)` | errors at an address |
+| `useFieldErrors(address)` | every error at an address, shown at once |
+| `useFieldFrame()` | props for `FieldWrapper`: label, ids, required, and the errors to show now (after the field is left, or after a save was tried). Reads the address from context |
 | `useFieldActivation(handler)` | opt-in callback when this field becomes active |
 | `useSiblingValue(address, name)` | sibling leaf |
 | `useChildKeys(address)` | ordered child keys at a composite address |
