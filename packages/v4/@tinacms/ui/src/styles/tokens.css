@@ -12,7 +12,6 @@
   --slate-100: #f1f5f9; /* Muted and secondary fills */
   --slate-200: #e2e8f0; /* Secondary hover and the preview page ground */
   --slate-300: #cbd5e1; /* Disabled borders and muted lines on the dark bar */
-  --slate-500: #64748b; /* Lines on the dark bar, read through --inv-line */
   --slate-600: #475569; /* Muted text, read through --muted-foreground */
   --slate-700: #334155; /* Secondary text, such as a neutral badge */
   --slate-800: #1e293b; /* Body text, read through --foreground */
@@ -50,6 +49,7 @@
   --secondary: var(--slate-100); /* Secondary button */
   --secondary-hover: var(--slate-200); /* Secondary button hover */
   --selected: #fff3e8; /* Selected row */
+  --pressed: var(--slate-200); /* Pressed outline button */
   --list-ground: rgba(241, 245, 249, 0.5); /* Behind the cards of a list */
   --list-add-hover: rgba(
     255,
@@ -97,10 +97,6 @@
     0 0 0 2.5px rgba(245, 158, 11, 0.16), 0 0 8px 1px rgba(245, 158, 11, 0.45); /* The soft ring and glow around the unsaved dot */
   --status-published: var(--green-700); /* Published, Green 700 */
   --status-published-subtle: var(--green-50); /* Published fill */
-  --status-changed: var(--unsaved); /* Changed, same as unsaved */
-  --status-changed-subtle: var(
-    --unsaved-subtle
-  ); /* Changed fill, same as unsaved */
   --status-failed: var(--red-700); /* Failed */
   --status-failed-subtle: var(--red-50); /* Failed fill */
   --status-failed-border: var(--red-200); /* Failed border */
@@ -113,9 +109,7 @@
   --inv-bg: var(--slate-900); /* Dark bar, such as Undo */
   --inv-ink: var(--slate-100); /* Text on the dark bar */
   --inv-muted: var(--slate-300); /* Muted text on the dark bar */
-  --inv-line: var(--slate-500); /* Lines on the dark bar */
   --inv-hover: var(--slate-800); /* Hover on the dark bar */
-  --inv-warn: #f2b48f; /* Warning text on the dark bar */
   --tone-success-on-dark: #86efac; /* Success icon on a dark toast */
   --tone-danger-on-dark: #fca5a5; /* Danger icon on a dark toast */
   --tone-warning-on-dark: #fcd34d; /* Warning icon on a dark toast */

@@ -28,7 +28,6 @@
   --color-slate-100: var(--slate-100);
   --color-slate-200: var(--slate-200);
   --color-slate-300: var(--slate-300);
-  --color-slate-500: var(--slate-500);
   --color-slate-600: var(--slate-600);
   --color-slate-700: var(--slate-700);
   --color-slate-800: var(--slate-800);
@@ -60,6 +59,7 @@
   --color-secondary: var(--secondary);
   --color-secondary-hover: var(--secondary-hover);
   --color-selected: var(--selected);
+  --color-pressed: var(--pressed);
   --color-list-ground: var(--list-ground);
   --color-list-add-hover: var(--list-add-hover);
   --color-embed-ground: var(--embed-ground);
@@ -85,8 +85,6 @@
   --color-unsaved-dot: var(--unsaved-dot);
   --color-status-published: var(--status-published);
   --color-status-published-subtle: var(--status-published-subtle);
-  --color-status-changed: var(--status-changed);
-  --color-status-changed-subtle: var(--status-changed-subtle);
   --color-status-failed: var(--status-failed);
   --color-status-failed-subtle: var(--status-failed-subtle);
   --color-status-failed-border: var(--status-failed-border);
@@ -108,9 +106,7 @@
   --color-inv-bg: var(--inv-bg);
   --color-inv-ink: var(--inv-ink);
   --color-inv-muted: var(--inv-muted);
-  --color-inv-line: var(--inv-line);
   --color-inv-hover: var(--inv-hover);
-  --color-inv-warn: var(--inv-warn);
   --color-tone-success-on-dark: var(--tone-success-on-dark);
   --color-tone-danger-on-dark: var(--tone-danger-on-dark);
   --color-tone-warning-on-dark: var(--tone-warning-on-dark);

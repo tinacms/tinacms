@@ -215,7 +215,8 @@ function GroupHead({
       ) : null}
       {errorCount > 0 && !(inPlace && open) ? (
         <Badge
-          kind='errors'
+          kind='count'
+          tone='error'
           count={errorCount}
           srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
         />

@@ -1,11 +1,9 @@
 import { type VariantProps, cva } from 'class-variance-authority';
 import type { ComponentProps, ReactNode } from 'react';
 
-import { Icon } from '@tinacms/ui/components/icon';
 import { cn } from '@tinacms/ui/lib/utils';
 
 const WORDS = 'h-5.5 gap-1.5 px-2.25';
-const NUMBERS = 'h-5 min-w-5 px-1.75';
 const AMBER =
   'bg-unsaved-subtle text-unsaved inset-ring inset-ring-unsaved-edge/20';
 const OUTLINED =
@@ -20,9 +18,12 @@ const badgeVariants = cva(
         status: `${WORDS} pl-2`,
         tag: WORDS,
         label: `${WORDS} ${OUTLINED}`,
-        count: `${NUMBERS} ${AMBER}`,
-        number: `${NUMBERS} bg-muted text-muted-foreground-strong inset-ring inset-ring-slate-700/12`,
-        errors: 'h-auto gap-0.5 rounded-none px-0 text-destructive',
+        count: 'h-5 min-w-5 px-1.5',
+      },
+      countTone: {
+        none: '',
+        change: AMBER,
+        error: 'bg-destructive text-white',
       },
       tone: {
         none: '',
@@ -44,6 +45,7 @@ const badgeVariants = cva(
     },
     defaultVariants: {
       kind: 'unsaved',
+      countTone: 'none',
       tone: 'none',
       mono: false,
       corner: false,
@@ -52,21 +54,18 @@ const badgeVariants = cva(
   }
 );
 
-const dotVariants = cva(
-  'inline-block size-1.75 flex-none rounded-full bg-unsaved-dot shadow-unsaved-glow',
-  {
-    variants: { end: { true: 'ml-auto', false: '' } },
-    defaultVariants: { end: false },
-  }
-);
+const dotVariants = cva('inline-block size-1.75 flex-none rounded-full', {
+  variants: {
+    tone: {
+      change: 'bg-unsaved-dot shadow-unsaved-glow',
+      error: 'bg-destructive',
+    },
+    end: { true: 'ml-auto', false: '' },
+  },
+  defaultVariants: { tone: 'change', end: false },
+});
 
-type BadgeStatus =
-  | 'published'
-  | 'draft'
-  | 'changed'
-  | 'committed'
-  | 'merged'
-  | 'failed';
+type BadgeStatus = 'published' | 'draft' | 'committed' | 'merged' | 'failed';
 type BadgeTone = Exclude<
   NonNullable<VariantProps<typeof badgeVariants>['tone']>,
   'none'
@@ -77,9 +76,10 @@ const STATUS: Record<BadgeStatus, { text: string; tone: BadgeTone }> = {
   merged: { text: 'Merged', tone: 'success' },
   committed: { text: 'Committed', tone: 'neutral' },
   draft: { text: 'Draft', tone: 'outline' },
-  changed: { text: 'Changed', tone: 'warning' },
   failed: { text: 'Failed', tone: 'danger' },
 };
+
+type CountTone = 'error' | 'change';
 
 type SpanProps = Omit<ComponentProps<'span'>, 'children'> & {
   /** Pushes the badge to the end of its row. */
@@ -100,14 +100,24 @@ type BadgeProps = SpanProps &
         children: ReactNode;
       }
     | { kind: 'label'; children: ReactNode }
-    /** In the corner of an icon button, hidden from screen readers: put the number in the button's name. 0 renders nothing. */
-    | { kind: 'count'; count?: number; corner: true; srLabel?: never }
-    /** Inline, so screen readers need words such as "3 unsaved changes". 0 renders nothing. */
-    | { kind: 'count'; count?: number; corner?: false; srLabel: string }
-    | { kind: 'number'; count: number }
-    /** Without `srLabel` it is hidden from screen readers, for a row that already says it. */
-    | { kind: 'errors'; count: number; srLabel?: string }
-    | { kind: 'dot'; srLabel?: string }
+    /** In the corner of an icon button, hidden from screen readers: put the number in the button's name. 0 renders nothing; over 99 shows "99+". */
+    | {
+        kind: 'count';
+        count?: number;
+        tone?: CountTone;
+        corner: true;
+        srLabel?: never;
+      }
+    /** Inline, so screen readers need words such as ", 3 errors". 0 renders nothing; over 99 shows "99+". */
+    | {
+        kind: 'count';
+        count?: number;
+        tone?: CountTone;
+        corner?: false;
+        srLabel: string;
+      }
+    /** `tone='error'` is the red dot on a step or card that holds an error. */
+    | { kind: 'dot'; tone?: CountTone; srLabel?: string }
   );
 
 type PillProps = SpanProps & {
@@ -132,14 +142,21 @@ const srOnly = (label?: string) =>
 function Badge(props: BadgeProps) {
   switch (props.kind) {
     case 'dot': {
-      const { kind: _kind, srLabel, end = false, className, ...rest } = props;
+      const {
+        kind: _kind,
+        tone = 'change',
+        srLabel,
+        end = false,
+        className,
+        ...rest
+      } = props;
       return (
         <>
           <span
             data-slot='badge'
             title={srLabel}
             aria-hidden={srLabel ? undefined : true}
-            className={cn(dotVariants({ end }), className)}
+            className={cn(dotVariants({ tone, end }), className)}
             {...rest}
           />
           {srOnly(srLabel)}
@@ -180,40 +197,41 @@ function Badge(props: BadgeProps) {
     }
     case 'count': {
       if (!props.count) return null;
+      const shown = props.count > 99 ? '99+' : props.count;
       if (props.corner === true) {
-        const { kind, count, corner, srLabel: _srLabel, ...rest } = props;
+        const {
+          kind,
+          count: _count,
+          tone = 'change',
+          corner,
+          srLabel: _srLabel,
+          ...rest
+        } = props;
         return (
-          <Pill variant={{ kind, corner }} aria-hidden {...rest}>
-            {count}
+          <Pill
+            variant={{ kind, countTone: tone, corner }}
+            aria-hidden
+            {...rest}
+          >
+            {shown}
           </Pill>
         );
       }
-      const { kind, count, corner: _corner, srLabel, ...rest } = props;
-      return (
-        <Pill variant={{ kind }} title={srLabel} {...rest}>
-          <span aria-hidden='true'>{count}</span>
-          {srOnly(srLabel)}
-        </Pill>
-      );
-    }
-    case 'number': {
-      const { kind, count, ...rest } = props;
-      return (
-        <Pill variant={{ kind }} {...rest}>
-          {count}
-        </Pill>
-      );
-    }
-    case 'errors': {
-      const { kind, count, srLabel, ...rest } = props;
+      const {
+        kind,
+        count: _count,
+        tone = 'change',
+        corner: _corner,
+        srLabel,
+        ...rest
+      } = props;
       return (
         <Pill
-          variant={{ kind }}
-          aria-hidden={srLabel ? undefined : true}
+          variant={{ kind, countTone: tone }}
+          title={tone === 'change' ? srLabel : undefined}
           {...rest}
         >
-          <Icon glyph='error' size={12} />
-          <span aria-hidden='true'>{count}</span>
+          <span aria-hidden='true'>{shown}</span>
           {srOnly(srLabel)}
         </Pill>
       );
@@ -237,5 +255,5 @@ function Badge(props: BadgeProps) {
 
 type BadgeKind = NonNullable<BadgeProps['kind']>;
 
-export type { BadgeKind, BadgeProps, BadgeStatus, BadgeTone };
+export type { BadgeKind, BadgeProps, BadgeStatus, BadgeTone, CountTone };
 export { Badge };

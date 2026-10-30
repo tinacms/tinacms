@@ -2,7 +2,7 @@ import { cn } from '@tinacms/ui/lib/utils';
 import { type VariantProps, cva } from 'class-variance-authority';
 import * as React from 'react';
 
-import { Button } from '@tinacms/ui/components/button';
+import { Button, type ButtonBaseProps } from '@tinacms/ui/components/button';
 import { Input } from '@tinacms/ui/components/input';
 import { Textarea } from '@tinacms/ui/components/textarea';
 
@@ -102,19 +102,19 @@ const inputGroupButtonVariants = cva(
 function InputGroupButton({
   className,
   type = 'button',
-  variant = 'ghost',
   size = 'xs',
   ...props
-}: Omit<React.ComponentProps<typeof Button>, 'size' | 'type'> &
+}: Omit<ButtonBaseProps, 'size' | 'type'> &
   VariantProps<typeof inputGroupButtonVariants> & {
     type?: 'button' | 'submit' | 'reset';
+    children?: React.ReactNode;
   }) {
   return (
     <Button
       type={type}
       data-slot='input-group-button'
       data-size={size}
-      variant={variant}
+      variant='ghost'
       className={cn(inputGroupButtonVariants({ size }), className)}
       {...props}
     />

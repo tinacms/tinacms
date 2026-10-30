@@ -15,7 +15,7 @@ function PlusMark() {
       className='flex h-8 w-6 flex-none items-center justify-center'
     >
       <span className='flex size-5 items-center justify-center rounded-xs bg-card text-muted-foreground shadow-xs ring-1 ring-border-subtle'>
-        <Icon glyph='plus' size={14} className='size-3.5' />
+        <Icon glyph='plus' size={14} />
       </span>
     </span>
   );

@@ -45,7 +45,7 @@ export function DeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <Button type='button' variant='secondary' onClick={onClose}>
+          <Button type='button' variant='ghost' onClick={onClose}>
             Cancel
           </Button>
           <Button type='button' variant='destructive' onClick={onConfirm}>
@@ -136,7 +136,7 @@ export function RenameDialog({
           <AlertDialogFooter>
             <Button
               type='button'
-              variant='secondary'
+              variant='ghost'
               disabled={processing}
               onClick={onClose}
             >
@@ -195,7 +195,7 @@ export function NewFolderDialog({
             />
           </div>
           <AlertDialogFooter>
-            <Button type='button' variant='secondary' onClick={onClose}>
+            <Button type='button' variant='ghost' onClick={onClose}>
               Cancel
             </Button>
             <Button variant='primary' type='submit' disabled={!folderName}>

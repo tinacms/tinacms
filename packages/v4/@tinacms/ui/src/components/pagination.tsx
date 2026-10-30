@@ -93,17 +93,28 @@ function Pagination({
             </li>
           ) : (
             <li key={pageNumber}>
-              <Button
-                size='sm'
-                variant={pageNumber === current ? 'secondary' : 'ghost'}
-                selected={pageNumber === current}
-                aria-current={pageNumber === current ? 'page' : undefined}
-                aria-label={`Page ${pageNumber}`}
-                className={NUMBER}
-                onClick={pageNumber === current ? undefined : go(pageNumber)}
-              >
-                {pageNumber}
-              </Button>
+              {pageNumber === current ? (
+                <Button
+                  size='sm'
+                  variant='outline'
+                  selected
+                  aria-current='page'
+                  aria-label={`Page ${pageNumber}`}
+                  className={NUMBER}
+                >
+                  {pageNumber}
+                </Button>
+              ) : (
+                <Button
+                  size='sm'
+                  variant='ghost'
+                  aria-label={`Page ${pageNumber}`}
+                  className={NUMBER}
+                  onClick={go(pageNumber)}
+                >
+                  {pageNumber}
+                </Button>
+              )}
             </li>
           )
         )}

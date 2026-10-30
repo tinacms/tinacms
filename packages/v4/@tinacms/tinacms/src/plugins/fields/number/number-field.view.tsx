@@ -137,9 +137,8 @@ export function NumberFieldView({
                 }}
               >
                 <Icon
-                  glyph='chevron-down'
-                  size={12}
-                  className={direction === 'up' ? 'rotate-180' : undefined}
+                  glyph={direction === 'up' ? 'chevron-up' : 'chevron-down'}
+                  size={14}
                 />
               </button>
             ))}

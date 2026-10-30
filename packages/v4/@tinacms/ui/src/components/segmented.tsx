@@ -90,9 +90,7 @@ function Segmented<T extends string>({
             segmentVariants({ size, iconOnly: option.iconOnly ?? false })
           )}
         >
-          {option.icon ? (
-            <Icon glyph={option.icon} size={16} className='size-4' />
-          ) : null}
+          {option.icon ? <Icon glyph={option.icon} size={16} /> : null}
           {option.iconOnly ? null : option.label}
         </Toggle>
       ))}
