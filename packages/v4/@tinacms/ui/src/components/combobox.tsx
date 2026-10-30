@@ -59,10 +59,13 @@ function ComboboxInput({
   children,
   disabled = false,
   showTrigger = true,
+  triggerTabbable = true,
   showClear = false,
   ...props
 }: ComboboxPrimitive.Input.Props & {
   showTrigger?: boolean;
+  /** Set false when the input itself opens the list, so Tab skips the chevron. */
+  triggerTabbable?: boolean;
   showClear?: boolean;
 }) {
   return (
@@ -79,13 +82,15 @@ function ComboboxInput({
           <InputGroupButton
             size='icon-xs'
             variant='ghost'
-            render={<ComboboxTrigger />}
+            render={
+              <ComboboxTrigger tabIndex={triggerTabbable ? undefined : -1} />
+            }
             data-slot='input-group-button'
             className='group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent'
             disabled={disabled}
           />
         )}
-        {showClear && <ComboboxClear disabled={disabled} />}
+        {showClear && <ComboboxClear disabled={disabled} tabIndex={0} />}
       </InputGroupAddon>
       {children}
     </InputGroup>

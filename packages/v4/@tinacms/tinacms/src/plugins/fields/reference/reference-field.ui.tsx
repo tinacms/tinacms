@@ -1,15 +1,7 @@
 import { useQueries } from '@tanstack/react-query';
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from '@tinacms/ui/components/combobox';
-import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { useRef } from 'react';
-import { hasValidator } from '../../../core/schema/types';
+import { useInRouterContext } from 'react-router-dom';
+import { useAdminRoute } from '../../../admin/use-admin-route';
 import {
   CONTENT_STALE_TIME,
   contentKeys,
@@ -19,16 +11,18 @@ import {
   useFieldFrame,
   useFieldSchema,
   useFieldValue,
+  useSchemaCollections,
 } from '../../../editor';
 import type { ReferenceFieldSchema } from './reference-field.schema';
+import {
+  ReferenceFieldView,
+  type ReferenceFieldViewDocument,
+  type ReferenceFieldViewProps,
+} from './reference-field.view';
 
-interface ReferenceOption {
-  value: string;
-  label: string;
-}
-
-interface ReferenceOptions {
-  options: ReferenceOption[];
+interface ReferenceLists {
+  /** One entry per collection the field names, in that order. */
+  lists: { collection: string; paths: string[] }[];
   isLoading: boolean;
   error: Error | null;
 }
@@ -36,7 +30,7 @@ interface ReferenceOptions {
 // `useCollectionDocuments` reads one collection, and a reference field can name
 // several. `useQueries` takes the whole set in one call, so the hook order
 // stays stable.
-const useReferenceOptions = (collections: string[]): ReferenceOptions => {
+const useReferenceLists = (collections: string[]): ReferenceLists => {
   const content = useContentSlice();
   return useQueries({
     queries: collections.map((collection) => ({
@@ -45,78 +39,94 @@ const useReferenceOptions = (collections: string[]): ReferenceOptions => {
       staleTime: CONTENT_STALE_TIME,
     })),
     combine: (results) => ({
-      options: results.flatMap(
-        (result) =>
-          result.data?.map((summary) => ({
-            value: summary.path,
-            label: summary.path,
-          })) ?? []
-      ),
+      lists: collections.map((collection, index) => ({
+        collection,
+        paths: results[index]?.data?.map((summary) => summary.path) ?? [],
+      })),
       isLoading: results.some((result) => result.isLoading),
       error: results.find((result) => result.error)?.error ?? null,
     }),
   });
 };
 
-const placeholderFor = ({ isLoading, error }: ReferenceOptions): string => {
-  if (isLoading) return 'Loading…';
-  if (error) return 'Could not load documents';
-  return 'Search documents…';
+/** The first collection to list a path wins, so each document appears once. */
+const toDocuments = (
+  lists: ReferenceLists['lists'],
+  labelOf: (collection: string) => string
+): ReferenceFieldViewDocument[] => {
+  const seen = new Set<string>();
+  const grouped = lists.length > 1;
+  return lists.flatMap(({ collection, paths }) =>
+    paths
+      .filter((path) => !seen.has(path) && seen.add(path))
+      .map((path) => ({
+        value: path,
+        label: path,
+        meta: `${labelOf(collection)} · ${path}`,
+        group: grouped ? labelOf(collection) : undefined,
+        collection,
+      }))
+  );
 };
+
+/** Only mounted inside a Router, because `useAdminRoute` throws outside one. */
+function RoutedReferenceFieldView(props: ReferenceFieldViewProps) {
+  const { navigate } = useAdminRoute();
+  return (
+    <ReferenceFieldView
+      {...props}
+      onOpen={({ collection, value }) =>
+        navigate({ view: 'document', collection, path: value })
+      }
+    />
+  );
+}
 
 export function ReferenceField() {
   const address = useFieldAddress();
   const field = useFieldSchema<ReferenceFieldSchema>();
-  const [value, setValue] = useFieldValue<string | null>(address);
+  const [stored, setValue] = useFieldValue<string | null>(address);
   const frame = useFieldFrame();
   const inputRef = useRef<HTMLInputElement>(null);
+  const inRouter = useInRouterContext();
+  const schemaCollections = useSchemaCollections();
 
   useFieldActivation(() => inputRef.current?.focus());
 
-  const lookup = useReferenceOptions(field.collections);
-  const { options, isLoading, error } = lookup;
-
-  // A stored path whose document is gone stays selectable, so opening the
-  // field does not silently drop the reference.
+  const { lists, isLoading, error } = useReferenceLists(field.collections);
+  const labelOf = (name: string) => {
+    const collection = schemaCollections.find((c) => c.name === name);
+    return collection?.label ?? name;
+  };
+  const documents = error ? [] : toDocuments(lists, labelOf);
+  const value = typeof stored === 'string' && stored !== '' ? stored : null;
   const missing =
-    value && !isLoading && !error && !options.some((o) => o.value === value)
-      ? { value, label: `${value} (missing)` }
-      : null;
+    value !== null &&
+    !isLoading &&
+    !error &&
+    !documents.some((document) => document.value === value);
 
-  const items = missing ? [missing, ...options] : options;
-  const selected = items.find((item) => item.value === value) ?? null;
-  const unusable = isLoading || error !== null;
+  let placeholder = 'Search documents…';
+  if (isLoading) placeholder = 'Loading documents…';
+  else if (error) placeholder = 'Could not load documents';
 
-  return (
-    <FieldWrapper
-      {...frame}
-      errors={error ? [...frame.errors, error.message] : frame.errors}
-    >
-      <Combobox
-        items={items}
-        value={selected}
-        onValueChange={(next: ReferenceOption | null) =>
-          setValue(next?.value ?? null)
-        }
-      >
-        <ComboboxInput
-          ref={inputRef}
-          id={address}
-          disabled={unusable}
-          showClear={!hasValidator(field, 'required')}
-          placeholder={placeholderFor(lookup)}
-        />
-        <ComboboxContent>
-          <ComboboxEmpty>No documents match.</ComboboxEmpty>
-          <ComboboxList>
-            {(item: ReferenceOption) => (
-              <ComboboxItem key={item.value} value={item}>
-                {item.label}
-              </ComboboxItem>
-            )}
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
-    </FieldWrapper>
+  const props: ReferenceFieldViewProps = {
+    ...frame,
+    errors: error ? [...frame.errors, error.message] : frame.errors,
+    warnings: missing ? ['This document no longer exists.'] : undefined,
+    id: address,
+    documents,
+    value,
+    missing,
+    placeholder,
+    disabled: isLoading || error !== null,
+    onChange: setValue,
+    ref: inputRef,
+  };
+
+  return inRouter ? (
+    <RoutedReferenceFieldView {...props} />
+  ) : (
+    <ReferenceFieldView {...props} />
   );
 }
