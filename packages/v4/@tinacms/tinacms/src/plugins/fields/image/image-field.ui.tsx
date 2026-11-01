@@ -13,7 +13,7 @@ import { hasValidator } from '../../../core/schema/types';
 import {
   useFieldActivation,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldSchema,
   useFieldValue,
   useMediaSlice,
@@ -54,7 +54,7 @@ export function ImageField() {
   const [value, setValue] = useFieldValue<unknown>(address);
   const path = typeof value === 'string' ? value : null;
   const notAPath = value != null && path === null;
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
   const media = useMediaSlice();
   const mainButtonRef = useRef<HTMLButtonElement>(null);
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -146,7 +146,10 @@ export function ImageField() {
   };
 
   return (
-    <FieldWrapper errors={uploadError ? [...errors, uploadError] : errors}>
+    <FieldWrapper
+      {...frame}
+      errors={uploadError ? [...frame.errors, uploadError] : frame.errors}
+    >
       <div
         role='group'
         aria-labelledby={`${address}-label`}

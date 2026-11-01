@@ -36,15 +36,18 @@ The config (`RichTextFieldSchema`, which extends `BaseFieldSchema`):
 | `templates` | `MdxTemplate[]` | The MDX components that an author can embed in the text. |
 | `overrides` | `ToolbarOverrides` | The toolbar buttons and the heading levels that the editor shows. |
 
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
+
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with
 > `validators`. Refer to
 > [Validation in two layers](./field-plugins.md#validation-in-two-layers).
 
 
-v3 also took a bare list of buttons under `toolbarOverride`. v4 drops it:
-`overrides.toolbar` takes the same list, and it is the only shape the editor
-reads. A v3 schema with `toolbarOverride: ['bold', 'italic']` becomes
+v3 also took a bare list of buttons under `toolbarOverride`. v4 has no
+`toolbarOverride` yet (pending a ruling in ADR-029). `overrides.toolbar` takes
+the same list: `toolbarOverride: ['bold', 'italic']` is
 `overrides: { toolbar: ['bold', 'italic'] }`.
 
 There is no `parser` option. Both of v3's values lose content through this
@@ -54,6 +57,13 @@ that as an empty body. `markdown` uses a stringifier that has no
 unset value — the only value — takes the path that both round-trips markdown
 and returns the original source for a body it could not parse. Add the option
 again, behind tests, if a real collection needs it.
+
+A rich-text `defaultValue` is written in stored form, which is the codec's source
+string. With the default codec, that is markdown:
+
+```ts
+t.richText({ name: 'body', defaultValue: 'Write something here.\n\n- First point' })
+```
 
 ## The codec: what the file holds, and what the editor edits
 

@@ -11,6 +11,7 @@ import type {
 } from '../core/form/hooks';
 import type { TinaStoreState } from '../core/plugin';
 import type { FieldSchema, TinaDocument } from '../core/schema/types';
+import type { FormViewStore } from './form-view-state';
 import type { ScreenRegistry } from '../core/screen/registry';
 import type { GlobalNavSection } from '../core/slot/contract';
 
@@ -46,6 +47,7 @@ export interface FormScope extends FormHookScope {
   // Lives above the form fields, so a remount of the fields keeps it.
   saveFailure: string | null;
   setSaveFailure: (message: string | null) => void;
+  view: FormViewStore;
   discardEdits: () => void;
   hooks: readonly FormHooks[];
   staleDraft: StaleDraftActions | null;

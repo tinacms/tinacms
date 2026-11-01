@@ -89,8 +89,11 @@ The unified `definePlugin` shape:
 + function MyField() {
 +   const address = useFieldAddress()
 +   const [value, setValue] = useFieldValue<string>(address)
-+   const errors = useFieldErrors(address)
-+   return <input value={value ?? ''} onChange={(e) => setValue(e.target.value)} />
++   return (
++     <FieldWrapper {...useFieldFrame()}>
++       <input id={address} value={value ?? ''} onChange={(e) => setValue(e.target.value)} />
++     </FieldWrapper>
++   )
 + }
 ```
 
@@ -182,6 +185,36 @@ The workflow shape (branches → PR → merge) is unchanged. The **location** of
 ## Schema
 
 The schema helpers (`defineCollection`, `t.string`, `t.object`, `t.list`, `t.reference`) are conceptually preserved from v2. The exact API will be pinned down in the Configuration ADR (not yet written — see [Milestones M3](./milestones.md)).
+
+### Field options
+
+v4 has no `ui` wrapper. Field options sit at the top level of the field ([ADR-029](../029-field-ui-options.md)). A schema that still sets a dropped option fails `tinacms build` with the replacement in the message.
+
+Kept, now top level:
+- `ui.description` is `description`.
+- `ui.defaultValue` is `defaultValue`. It is a stored-form value. It fills the field in a new array item only, and never changes a loaded document.
+- `ui.hidden` is `hidden`. The value is kept and Save is never blocked by it.
+- `defaultItem` stays on arrays and templates. A templates array takes it per template only.
+
+Dropped, with a replacement:
+- `ui.component`: the field type picks the plugin. Register a field plugin for another widget.
+- `ui.parse` and `ui.format`: declare `parse` and `serialize` on the field plugin. For a one-off transform, use a collection hook.
+- `ui.validate`: use named `validators`.
+- `min` and `max`: use the `min()` and `max()` validators.
+
+Renamed:
+- `ui.itemProps` is `itemLabel: (item) => string`. v4 has no item `key`.
+- `visualSelector` is `picker: 'list' | 'grid'`.
+- `previewSrc` is `previewImage`, a path relative to the media root.
+
+Already in v4: rich-text `overrides`.
+
+Pending (not built, no replacement yet):
+- Color `colorFormat`, `widget`, `width`, `colors`: v4 has no color field plugin.
+- `toolbarOverride`: v3 deprecates it for `overrides.toolbar`, which v4 rich-text supports. Needs a maintainer ruling.
+- Reference `collectionFilter`: the v4 content contract lists `{ path }` only. Needs a contract change.
+- `dateFormat` and `timeFormat`: the v4 datetime field uses the native `datetime-local` input, which has no token grammar. Needs a widget and grammar decision.
+- `category` and `optionComponent`: undecided open questions in ADR-029.
 
 ## What this guide *can't* cover yet
 

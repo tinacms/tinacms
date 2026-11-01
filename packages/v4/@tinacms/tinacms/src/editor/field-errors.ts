@@ -86,3 +86,21 @@ export const nestFieldErrors = (
   }
   return tree;
 };
+
+export const ownFieldErrors = (
+  node: unknown,
+  prefix: string,
+  out: Record<string, string[]> = {}
+): Record<string, string[]> => {
+  if (isFieldErrorEntry(node)) {
+    const messages = fieldErrorMessages(node);
+    if (messages.length > 0) out[prefix] = messages;
+  }
+  if (node && typeof node === 'object') {
+    for (const [key, child] of Object.entries(node)) {
+      if (ENTRY_KEYS.has(key)) continue;
+      ownFieldErrors(child, `${prefix}.${key}`, out);
+    }
+  }
+  return out;
+};

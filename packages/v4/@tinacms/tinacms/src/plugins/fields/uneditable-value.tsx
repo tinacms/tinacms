@@ -1,6 +1,6 @@
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { useFieldAddress, useFieldErrors, useFieldValue } from '../../editor';
+import { useFieldAddress, useFieldFrame, useFieldValue } from '../../editor';
 
 /**
  * Shows a stored value of the wrong shape read-only, so the document still
@@ -16,10 +16,10 @@ export function UneditableValue({
 }) {
   const address = useFieldAddress();
   const [value, setValue] = useFieldValue<unknown>(address);
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
 
   return (
-    <FieldWrapper errors={errors}>
+    <FieldWrapper {...frame}>
       <div
         role='group'
         aria-labelledby={`${address}-label`}

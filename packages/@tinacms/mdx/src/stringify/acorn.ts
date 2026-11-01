@@ -5,8 +5,13 @@ import type {
 } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
-import { rootElement, serializeMDX } from '.';
 import * as Plate from '../parse/plate';
+import { rootElement, serializeMDX } from '.';
+import {
+  booleanLiteral,
+  numberLiteral,
+  stringLiteral,
+} from './attribute-values';
 import { printObjectLiteral } from './print-object-literal';
 
 export const stringifyPropsInline = (
@@ -94,7 +99,7 @@ export function stringifyProps(
               name,
               value: {
                 type: 'mdxJsxAttributeValueExpression',
-                value: `[${value.map((item) => `"${item}"`).join(', ')}]`,
+                value: `[${value.map(stringLiteral).join(', ')}]`,
               },
             });
           }
@@ -117,7 +122,7 @@ export function stringifyProps(
               name,
               value: {
                 type: 'mdxJsxAttributeValueExpression',
-                value: `[${value.map((item) => `"${item}"`).join(', ')}]`,
+                value: `[${value.map(stringLiteral).join(', ')}]`,
               },
             });
           }
@@ -144,7 +149,7 @@ export function stringifyProps(
               value: {
                 type: 'mdxJsxAttributeValueExpression',
                 value: `[${value
-                  .map((item) => `"${imageCallback(item)}"`)
+                  .map((item) => stringLiteral(imageCallback(item)))
                   .join(', ')}]`,
               },
             });
@@ -158,7 +163,9 @@ export function stringifyProps(
         }
         break;
       case 'number':
-      case 'boolean':
+      case 'boolean': {
+        const toLiteral =
+          field.type === 'number' ? numberLiteral : booleanLiteral;
         if (field.list) {
           if (Array.isArray(value)) {
             attributes.push({
@@ -166,7 +173,7 @@ export function stringifyProps(
               name,
               value: {
                 type: 'mdxJsxAttributeValueExpression',
-                value: `[${value.map((item) => `${item}`).join(', ')}]`,
+                value: `[${value.map((item) => toLiteral(item, field.name)).join(', ')}]`,
               },
             });
           }
@@ -176,11 +183,12 @@ export function stringifyProps(
             name,
             value: {
               type: 'mdxJsxAttributeValueExpression',
-              value: String(value),
+              value: toLiteral(value, field.name),
             },
           });
         }
         break;
+      }
       case 'object':
         const result = findAndTransformNestedRichText(
           field,

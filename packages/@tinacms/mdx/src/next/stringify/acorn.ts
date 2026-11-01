@@ -1,9 +1,14 @@
 import type { RichTextField, RichTextTemplate } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
-import { stringifyMDX } from '.';
 import * as Plate from '../../parse/plate';
+import {
+  booleanLiteral,
+  numberLiteral,
+  stringLiteral,
+} from '../../stringify/attribute-values';
 import { printObjectLiteral } from '../../stringify/print-object-literal';
+import { stringifyMDX } from '.';
 import { rootElement } from './pre-processing';
 
 export const stringifyPropsInline = (
@@ -91,7 +96,7 @@ export function stringifyProps(
               name,
               value: {
                 type: 'mdxJsxAttributeValueExpression',
-                value: `[${value.map((item) => `"${item}"`).join(', ')}]`,
+                value: `[${value.map(stringLiteral).join(', ')}]`,
               },
             });
           }
@@ -114,7 +119,7 @@ export function stringifyProps(
               name,
               value: {
                 type: 'mdxJsxAttributeValueExpression',
-                value: `[${value.map((item) => `"${item}"`).join(', ')}]`,
+                value: `[${value.map(stringLiteral).join(', ')}]`,
               },
             });
           }
@@ -141,7 +146,7 @@ export function stringifyProps(
               value: {
                 type: 'mdxJsxAttributeValueExpression',
                 value: `[${value
-                  .map((item) => `"${imageCallback(item)}"`)
+                  .map((item) => stringLiteral(imageCallback(item)))
                   .join(', ')}]`,
               },
             });
@@ -155,7 +160,9 @@ export function stringifyProps(
         }
         break;
       case 'number':
-      case 'boolean':
+      case 'boolean': {
+        const toLiteral =
+          field.type === 'number' ? numberLiteral : booleanLiteral;
         if (field.list) {
           if (Array.isArray(value)) {
             attributes.push({
@@ -163,7 +170,7 @@ export function stringifyProps(
               name,
               value: {
                 type: 'mdxJsxAttributeValueExpression',
-                value: `[${value.map((item) => `${item}`).join(', ')}]`,
+                value: `[${value.map((item) => toLiteral(item, field.name)).join(', ')}]`,
               },
             });
           }
@@ -173,11 +180,12 @@ export function stringifyProps(
             name,
             value: {
               type: 'mdxJsxAttributeValueExpression',
-              value: String(value),
+              value: toLiteral(value, field.name),
             },
           });
         }
         break;
+      }
       case 'object':
         attributes.push({
           type: 'mdxJsxAttribute',
