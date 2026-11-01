@@ -70,7 +70,7 @@ describe('active-field rail', () => {
         </FormProvider>
       </TinaProvider>
     );
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     expect(input).not.toHaveFocus();
 
     await userEvent.click(screen.getByText('activate'));
@@ -95,7 +95,7 @@ describe('active-field rail', () => {
         </FormProvider>
       </TinaProvider>
     );
-    const input = await screen.findByLabelText('Title');
+    const input = await screen.findByLabelText(/^Title\b/);
     await userEvent.click(screen.getByText('activate'));
     expect(input).toHaveFocus();
 
@@ -125,10 +125,10 @@ describe('active-field rail', () => {
     );
     expect(await screen.findByTestId('active')).toHaveTextContent('none');
 
-    await userEvent.click(screen.getByLabelText('Title'));
+    await userEvent.click(screen.getByLabelText(/^Title\b/));
     expect(screen.getByTestId('active')).toHaveTextContent('title');
 
-    await userEvent.click(screen.getByLabelText('Summary'));
+    await userEvent.click(screen.getByLabelText(/^Summary\b/));
     expect(screen.getByTestId('active')).toHaveTextContent('summary');
   });
 
@@ -153,7 +153,7 @@ describe('active-field rail', () => {
       </TinaProvider>
     );
     await userEvent.click(await screen.findByText('activate'));
-    expect(screen.getByLabelText('Title')).toHaveFocus();
+    expect(screen.getByLabelText(/^Title\b/)).toHaveFocus();
     expect(entries).toEqual(['title']);
   });
 });

@@ -49,6 +49,9 @@ const collection = {
 |---|---|---|
 | `fields` | `FieldSchema[]` (required) | the nested fields, keyed by each field's own `name` |
 
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
+
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with
 > `validators`. Refer to

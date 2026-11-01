@@ -58,6 +58,9 @@ export default defineConfig({
 The v3 keys `uploadDir`, `previewSrc`, `parse` and `format` are functions.
 A function cannot go in `tina-lock.json`, so the v4 field does not have them.
 
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
+
 ## The stored value
 
 The document stores the media path of the image, relative to the media root

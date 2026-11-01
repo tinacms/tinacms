@@ -13,6 +13,8 @@ import {
   useFormState,
 } from 'react-hook-form';
 import { useStore } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
+import type { FieldWrapperProps } from '@tinacms/ui/components/field-wrapper';
 import type { AuthSlice } from '../core/auth/contract';
 import { authSliceOf, siteAuthTokenOf } from '../core/auth/slice';
 import type { ContentSlice } from '../core/content/contract';
@@ -23,10 +25,11 @@ import { runAfterSave, runBeforeSave } from '../core/form/hooks';
 import { digestDocument, ingestDocument } from '../core/form/ingest';
 import { invariant } from '../core/invariant';
 import type { SliceState, TinaStoreState } from '../core/plugin';
-import type {
-  CollectionSchema,
-  FieldSchema,
-  TinaDocument,
+import {
+  type CollectionSchema,
+  type FieldSchema,
+  type TinaDocument,
+  hasValidator,
 } from '../core/schema/types';
 import {
   type FormId,
@@ -47,7 +50,8 @@ import {
   type StaleDraftActions,
   TinaRuntimeContext,
 } from './context';
-import { collectFieldErrorMessages } from './field-errors';
+import { collectFieldErrorMessages, ownFieldErrors } from './field-errors';
+import { isRevealed } from './form-view-state';
 
 export function useFieldRegistry(): FieldRegistry {
   const runtime = use(TinaRuntimeContext);
@@ -267,6 +271,7 @@ export function useFormSave(): () => Promise<void> {
     const { formId, path, collection, onSave, hooks, reseedFields } = scope;
     // Validate every field, not only the edited ones, so a required field the
     // editor never touched surfaces its message at submit.
+    scope.view.getState().attemptSave();
     const valid = await trigger();
     if (!valid) throw new FormValidationError();
     const values = getValues();
@@ -293,6 +298,7 @@ export function useFormSave(): () => Promise<void> {
     } catch (cause) {
       throw new AfterSaveHookError(cause);
     }
+    scope.view.getState().resetReveal();
     const warnings = saved ? (saved.hookWarnings ?? []) : [];
     if (warnings.length > 0) {
       throw new AfterSaveHookError(new Error(warnings.join(' ')));
@@ -332,6 +338,39 @@ export function useFieldErrors(address: FieldAddress): string[] {
   // walks down from it, so a compound field's address reports everything
   // wrong underneath it, not only a message at that exact address.
   return collectFieldErrorMessages(get(errors, address));
+}
+
+export function useFieldFrame(): Pick<
+  FieldWrapperProps,
+  'label' | 'htmlFor' | 'labelId' | 'required' | 'errors' | 'help' | 'helpId'
+> {
+  const address = useFieldAddress();
+  const node = useFieldSchema();
+  const { view } = useFormScope(
+    'field-frame-outside-provider',
+    'useFieldFrame'
+  );
+  const labelable =
+    useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
+  const { errors } = useFormState({ name: address });
+  const own = ownFieldErrors(get(errors, address), address);
+  const keys = Object.keys(own);
+  const revealed = useStore(
+    view,
+    useShallow((state) => keys.filter((key) => isRevealed(state, key)))
+  );
+  const shown = new Set<string>();
+  for (const key of revealed)
+    for (const message of own[key] ?? []) shown.add(message);
+  return {
+    label: node.label ?? node.name,
+    htmlFor: labelable ? address : undefined,
+    labelId: `${address}-label`,
+    required: hasValidator(node, 'required'),
+    errors: [...shown],
+    help: node.description,
+    helpId: node.description ? `${address}-help` : undefined,
+  };
 }
 
 export function useFieldActivation(handler: () => void): void {

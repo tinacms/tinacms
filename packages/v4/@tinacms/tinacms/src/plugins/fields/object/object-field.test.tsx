@@ -131,15 +131,21 @@ const renderField = (document?: TinaDocument) =>
 describe('ObjectField rendering', () => {
   it('renders each nested field with its own label and value', async () => {
     renderField({ seo: { title: 'Home', views: 10 } });
-    const title = (await screen.findByLabelText('Title')) as HTMLInputElement;
-    const views = (await screen.findByLabelText('Views')) as HTMLInputElement;
+    const title = (await screen.findByLabelText(
+      /^Title\b/
+    )) as HTMLInputElement;
+    const views = (await screen.findByLabelText(
+      /^Views\b/
+    )) as HTMLInputElement;
     expect(title.value).toBe('Home');
     expect(views.value).toBe('10');
   });
 
   it('renders the nested fields even when the object is absent', async () => {
     renderField();
-    const title = (await screen.findByLabelText('Title')) as HTMLInputElement;
+    const title = (await screen.findByLabelText(
+      /^Title\b/
+    )) as HTMLInputElement;
     expect(title.value).toBe('');
   });
 
@@ -151,12 +157,14 @@ describe('ObjectField rendering', () => {
     expect(valueOf('seo')).toBe('Home');
     await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
     expect(valueOf('seo')).toBeNull();
-    expect(await screen.findByLabelText('Title')).toBeInTheDocument();
+    expect(await screen.findByLabelText(/^Title\b/)).toBeInTheDocument();
   });
 
   it('renders an object nested inside an object', async () => {
     renderField({ meta: { social: { handle: '@tina' } } });
-    const handle = (await screen.findByLabelText('Handle')) as HTMLInputElement;
+    const handle = (await screen.findByLabelText(
+      /^Handle\b/
+    )) as HTMLInputElement;
     expect(handle.value).toBe('@tina');
   });
 });
@@ -164,7 +172,7 @@ describe('ObjectField rendering', () => {
 describe('ObjectField value updates', () => {
   it('writes a nested field edit back through the store', async () => {
     renderField({ seo: { title: 'Home' } });
-    const title = await screen.findByLabelText('Title');
+    const title = await screen.findByLabelText(/^Title\b/);
     await userEvent.clear(title);
     await userEvent.type(title, 'About');
     expect(valueOf('seo')).toEqual({ title: 'About', views: null });
@@ -174,7 +182,7 @@ describe('ObjectField value updates', () => {
 describe('ObjectField dirty tracking', () => {
   it('goes dirty on a nested edit, then back to clean once it is undone', async () => {
     renderField({ seo: { title: 'Home' } });
-    const title = await screen.findByLabelText('Title');
+    const title = await screen.findByLabelText(/^Title\b/);
     expect(status()).toBe('pristine');
 
     await userEvent.type(title, '!');
@@ -239,8 +247,9 @@ describe('ObjectField validation', () => {
 
   it('surfaces a nested field error at its own address, and rolls it up onto the object', async () => {
     renderField({ seo: { title: 'Home' } });
-    const title = await screen.findByLabelText('Title');
+    const title = await screen.findByLabelText(/^Title\b/);
     await userEvent.clear(title);
+    await userEvent.tab();
     await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2));
     for (const alert of screen.getAllByRole('alert')) {
       expect(alert).toHaveTextContent('Title is required');
@@ -370,6 +379,7 @@ describe('ObjectField metadata', () => {
     expect(descriptor?.metadata).toEqual({
       layout: 'block',
       labelable: false,
+      drillable: true,
     });
     expect(descriptor?.defaultValue).toBeUndefined();
   });

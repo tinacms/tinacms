@@ -12,7 +12,7 @@ import { ObjectField } from './object-field.ui';
 export default defineClientPlugin({
   field: {
     Component: ObjectField,
-    metadata: { layout: 'block', labelable: false },
+    metadata: { layout: 'block', labelable: false, drillable: true },
     schema: objectSchema,
     // A stored value that is not an object stays as it is, so a save writes it
     // back unchanged (ADR-012: never throw on open).

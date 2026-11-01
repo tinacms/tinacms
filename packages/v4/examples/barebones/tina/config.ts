@@ -11,7 +11,7 @@ import {
   mediaManagerPlugin,
   required,
   t,
-  type TemplateSchema,
+  type ArrayTemplateSchema,
   tinaCloud,
 } from '@tinacms/tinacms';
 import { helpNavPlugin } from './help-nav';
@@ -44,7 +44,13 @@ export const postCollection = {
         matches('^[A-Z]', 'Start with a capital letter'),
       ],
     }),
-    t.string({ name: 'slug', label: 'Slug' }),
+    t.string({
+      name: 'slug',
+      label: 'Slug',
+      description: 'Filled in from the title when you save',
+    }),
+    // Hidden: no editor, but the stored value is kept on every save.
+    t.string({ name: 'legacyId', hidden: true }),
     t.boolean({ name: 'featured', label: 'Featured' }),
     t.image({ name: 'heroImage', label: 'Hero image' }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
@@ -64,6 +70,8 @@ export const postCollection = {
     t.array({
       name: 'authors',
       label: 'Authors',
+      defaultItem: { name: 'New author' },
+      itemLabel: (item) => item.name,
       fields: [
         t.string({ name: 'name', label: 'Name' }),
         t.string({
@@ -104,20 +112,23 @@ const heroTemplate = {
   name: 'hero',
   label: 'Hero',
   defaultItem: { headline: 'A new hero' },
+  itemLabel: (item) => item.headline,
+  // Shown as a tile in the block picker, so `blocks` below gets the grid.
+  previewImage: 'posts/llama.avif',
   fields: [
     t.string({ name: 'headline', label: 'Headline', validators: [required()] }),
     t.string({ name: 'tagline', label: 'Tagline' }),
   ],
-} satisfies TemplateSchema;
+} satisfies ArrayTemplateSchema;
 
 const ctaTemplate = {
   name: 'cta',
   label: 'Call to action',
   fields: [
     t.string({ name: 'label', label: 'Label', validators: [required()] }),
-    t.string({ name: 'link', label: 'Link' }),
+    t.string({ name: 'link', label: 'Link', defaultValue: '/docs' }),
   ],
-} satisfies TemplateSchema;
+} satisfies ArrayTemplateSchema;
 
 export const pageCollection = {
   name: 'page',
@@ -135,6 +146,7 @@ export const pageCollection = {
     t.array({
       name: 'blocks',
       label: 'Blocks',
+      picker: 'grid',
       templates: [heroTemplate, ctaTemplate],
     }),
   ],

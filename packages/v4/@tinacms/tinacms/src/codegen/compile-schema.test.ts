@@ -418,3 +418,166 @@ describe('checkLock across lock formats', () => {
     ).toEqual({ status: 'current' });
   });
 });
+
+describe('compileSchema dropped v3 options', () => {
+  const plugins = [
+    fieldPlugin('string', 1),
+    fieldPlugin('object', 1),
+    fieldPlugin('array', 1),
+  ];
+  const dropped = [
+    'ui',
+    'component',
+    'parse',
+    'format',
+    'validate',
+    'min',
+    'max',
+  ];
+  const placements: Record<string, (extra: object) => FieldSchema[]> = {
+    'a top-level field': (extra) => [{ name: 'a', type: 'string', ...extra }],
+    'a field inside fields': (extra) => [
+      {
+        name: 'o',
+        type: 'object',
+        fields: [{ name: 'a', type: 'string', ...extra }],
+      } as FieldSchema,
+    ],
+    'a field inside templates': (extra) => [
+      {
+        name: 'l',
+        type: 'array',
+        templates: [
+          { name: 't', fields: [{ name: 'a', type: 'string', ...extra }] },
+        ],
+      } as FieldSchema,
+    ],
+    'a template': (extra) => [
+      {
+        name: 'l',
+        type: 'array',
+        templates: [{ name: 't', fields: [], ...extra }],
+      } as FieldSchema,
+    ],
+    'an of field': (extra) => [
+      {
+        name: 'l',
+        type: 'array',
+        of: { name: 'a', type: 'string', ...extra },
+      } as FieldSchema,
+    ],
+  };
+
+  for (const option of dropped) {
+    it(`rejects "${option}" at any depth, naming the option`, () => {
+      for (const make of Object.values(placements)) {
+        expect(() =>
+          compileSchema(configWith(make({ [option]: 1 }), plugins))
+        ).toThrow(new RegExp(`sets "${option}", which v4 does not have`));
+      }
+    });
+  }
+
+  it('allows a collection format and other plugin-defined keys', () => {
+    expect(() =>
+      compileSchema(
+        configWith(
+          [{ name: 'a', type: 'string', pluginOption: 1 } as FieldSchema],
+          plugins
+        )
+      )
+    ).not.toThrow();
+  });
+
+  it('rejects hidden and description on a scalar array item', () => {
+    for (const option of ['hidden', 'description']) {
+      expect(() =>
+        compileSchema(
+          configWith(
+            [
+              {
+                name: 'l',
+                type: 'array',
+                of: { name: 'a', type: 'string', [option]: true },
+              } as FieldSchema,
+            ],
+            plugins
+          )
+        )
+      ).toThrow(new RegExp(`sets "${option}" on its "of" field`));
+    }
+  });
+});
+
+describe('compileSchema array options', () => {
+  const plugins = [fieldPlugin('string', 1), fieldPlugin('array', 1)];
+  const blocks = (extra: object): FieldSchema[] => [
+    {
+      name: 'blocks',
+      type: 'array',
+      templates: [
+        {
+          name: 'hero',
+          fields: [],
+          itemLabel: () => 'x',
+          previewImage: 'a.png',
+        },
+      ],
+      ...extra,
+    } as unknown as FieldSchema,
+  ];
+
+  it('rejects defaultItem on a templates array', () => {
+    expect(() =>
+      compileSchema(configWith(blocks({ defaultItem: {} }), plugins))
+    ).toThrow(/sets "defaultItem" on the array/);
+  });
+
+  it('rejects an unknown picker, and a picker on an array without templates', () => {
+    expect(() =>
+      compileSchema(configWith(blocks({ picker: 'carousel' }), plugins))
+    ).toThrow(/"picker" takes "list" or "grid"/);
+    expect(() =>
+      compileSchema(
+        configWith(
+          [
+            {
+              name: 'l',
+              type: 'array',
+              picker: 'grid',
+              fields: [],
+            } as FieldSchema,
+          ],
+          plugins
+        )
+      )
+    ).toThrow(/"picker" takes/);
+  });
+
+  it('leaves picker and of to a non-array field that defines them', () => {
+    expect(() =>
+      compileSchema(
+        configWith(
+          [
+            {
+              name: 'w',
+              type: 'wheel',
+              picker: 'spin',
+              of: { name: 'a', type: 'string', description: 'x' },
+            } as FieldSchema,
+          ],
+          [...plugins, fieldPlugin('wheel', 1)]
+        )
+      )
+    ).not.toThrow();
+  });
+
+  it('writes no itemLabel, and no picker when unset, to the lock', () => {
+    const lock = JSON.parse(
+      JSON.stringify(compileSchema(configWith(blocks({}), plugins)))
+    );
+    const [template] = lock.schema.collections[0].fields[0].templates;
+    expect(template).not.toHaveProperty('itemLabel');
+    expect(lock.schema.collections[0].fields[0]).not.toHaveProperty('picker');
+  });
+});
