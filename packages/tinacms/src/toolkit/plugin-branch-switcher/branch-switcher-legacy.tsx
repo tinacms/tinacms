@@ -1,4 +1,3 @@
-import { ASYNC_POLLER_ERROR } from '@tinacms/schema-tools';
 import { BaseTextField, Input } from '@toolkit/fields';
 import { LoadingDots } from '@toolkit/form-builder';
 import { useCMS } from '@toolkit/react-core';
@@ -17,7 +16,11 @@ import {
   X,
 } from 'lucide-react';
 import * as React from 'react';
-import { useBranchData } from './branch-data';
+import {
+  mergeBranchIndexStatuses,
+  useBranchData,
+  useBranchIndexStatuses,
+} from './branch-data';
 import { Branch, BranchSwitcherProps } from './types';
 
 type ListState = 'loading' | 'ready' | 'error';
@@ -80,51 +83,6 @@ export const BranchSwitcherLegacy = ({
   React.useEffect(() => {
     refreshBranchList();
   }, []);
-
-  // Keep branch list up to date
-  React.useEffect(() => {
-    if (listState === 'ready') {
-      const cancelFuncs = [];
-      // update all branches that have indexing status of 'inprogress' or 'unknown'
-      branchList
-        .filter(
-          (x) =>
-            x?.indexStatus?.status === 'inprogress' ||
-            x?.indexStatus?.status === 'unknown'
-        )
-        .forEach(async (x) => {
-          const [
-            // When this promise resolves, we know the index status is no longer 'inprogress' or 'unknown'
-            waitForIndexStatusPromise,
-            // Calling this function will cancel the polling
-            cancelWaitForIndexFunc,
-          ] = cms.api.tina.waitForIndexStatus({
-            ref: x.name,
-          });
-          cancelFuncs.push(cancelWaitForIndexFunc);
-          waitForIndexStatusPromise
-            // @ts-ignore
-            .then((indexStatus) => {
-              setBranchList((previousBranchList) => {
-                // update the index status of the branch
-                const newBranchList = Array.from(previousBranchList);
-                const index = newBranchList.findIndex((y) => y.name === x.name);
-                newBranchList[index].indexStatus = indexStatus;
-                return newBranchList;
-              });
-            })
-            .catch((e) => {
-              if (e.message === ASYNC_POLLER_ERROR.CANCELLED) return;
-              console.error(e);
-            });
-        });
-      return () => {
-        cancelFuncs.forEach((x) => {
-          x();
-        });
-      };
-    }
-  }, [listState, branchList.length]);
 
   return (
     <div className='w-full flex justify-center p-5'>
@@ -228,8 +186,20 @@ const BranchSelector = ({
 }) => {
   const [newBranchName, setNewBranchName] = React.useState('');
   const [filter, setFilter] = React.useState('');
+  const branchNames = React.useMemo(
+    () => branchList.map((branch) => branch.name),
+    [branchList]
+  );
+  const { statuses, getRowRef } = useBranchIndexStatuses({
+    branchNames,
+    currentBranch,
+  });
+  const branchesWithIndexStatus = React.useMemo(
+    () => mergeBranchIndexStatuses(branchList, statuses),
+    [branchList, statuses]
+  );
   const filteredBranchList = getFilteredBranchList(
-    branchList,
+    branchesWithIndexStatus,
     filter,
     currentBranch
   );
@@ -276,6 +246,7 @@ const BranchSelector = ({
                       : 'cursor-pointer hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
                 }`}
                 key={branch.name}
+                ref={getRowRef(branch.name)}
                 onClick={() => {
                   if (indexingStatus === 'complete') {
                     onChange(branch.name);

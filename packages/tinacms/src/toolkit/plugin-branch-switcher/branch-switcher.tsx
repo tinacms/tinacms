@@ -1,4 +1,3 @@
-import { ASYNC_POLLER_ERROR } from '@tinacms/schema-tools';
 import { BaseTextField, FieldLabel, Select } from '@toolkit/fields';
 import {
   Tooltip,
@@ -11,6 +10,7 @@ import { LoadingDots, PrefixedTextField } from '@toolkit/form-builder';
 import { useCMS } from '@toolkit/react-core';
 import { Badge } from '@toolkit/react-sidebar/components/badge';
 import { Button } from '@toolkit/styles';
+import { formatBranchName, normalizeBranchName } from '@utils/branch-name';
 import { formatDistanceToNow } from 'date-fns';
 import {
   ArrowRight,
@@ -28,11 +28,9 @@ import {
 } from 'lucide-react';
 import * as React from 'react';
 import { useBranchData } from './branch-data';
+import BranchSelectorTable from './branch-selector-table';
 import { BranchSwitcherLegacy } from './branch-switcher-legacy';
 import { Branch, BranchSwitcherProps } from './types';
-
-import { formatBranchName, normalizeBranchName } from '@utils/branch-name';
-import BranchSelectorTable from './branch-selector-table';
 
 type ListState = 'loading' | 'ready' | 'error';
 
@@ -114,51 +112,6 @@ export const EditoralBranchSwitcher = ({
   React.useEffect(() => {
     refreshBranchList();
   }, []);
-
-  // Keep branch list up to date
-  React.useEffect(() => {
-    if (listState === 'ready') {
-      const cancelFuncs = [];
-      // update all branches that have indexing status of 'inprogress' or 'unknown'
-      branchList
-        .filter(
-          (x) =>
-            x?.indexStatus?.status === 'inprogress' ||
-            x?.indexStatus?.status === 'unknown'
-        )
-        .forEach(async (x) => {
-          const [
-            // When this promise resolves, we know the index status is no longer 'inprogress' or 'unknown'
-            waitForIndexStatusPromise,
-            // Calling this function will cancel the polling
-            cancelWaitForIndexFunc,
-          ] = cms.api.tina.waitForIndexStatus({
-            ref: x.name,
-          });
-          cancelFuncs.push(cancelWaitForIndexFunc);
-          waitForIndexStatusPromise
-            // @ts-ignore
-            .then((indexStatus) => {
-              setBranchList((previousBranchList) => {
-                // update the index status of the branch
-                const newBranchList = Array.from(previousBranchList);
-                const index = newBranchList.findIndex((y) => y.name === x.name);
-                newBranchList[index].indexStatus = indexStatus;
-                return newBranchList;
-              });
-            })
-            .catch((e) => {
-              if (e.message === ASYNC_POLLER_ERROR.CANCELLED) return;
-              console.error(e);
-            });
-        });
-      return () => {
-        cancelFuncs.forEach((x) => {
-          x();
-        });
-      };
-    }
-  }, [listState, branchList.length]);
 
   return (
     <div className='w-full flex justify-center p-5'>

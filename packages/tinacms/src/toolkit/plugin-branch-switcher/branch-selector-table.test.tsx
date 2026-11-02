@@ -12,6 +12,7 @@ const mockCms = {
       schema: { config: { config: { ui: { previewUrl: undefined } } } },
       usingProtectedBranch: vi.fn(() => true),
       createPullRequest: vi.fn(),
+      getIndexStatus: vi.fn(),
     },
   },
   alerts: {
@@ -39,7 +40,94 @@ vi.mock('../../lib/posthog/posthog', async () => {
   };
 });
 
+import {
+  INDEX_STATUS_POLL_INTERVAL,
+  MAX_CONCURRENT_INDEX_STATUS_REQUESTS,
+} from './branch-data';
 import BranchSelectorTable from './branch-selector-table';
+
+// ---------------------------------------------------------------------------
+// IntersectionObserver stub
+// ---------------------------------------------------------------------------
+
+// happy-dom never lays rows out, so visibility is reported explicitly: a test
+// decides which registered rows count as being on screen.
+class MockIntersectionObserver {
+  static instances: MockIntersectionObserver[] = [];
+  callback: IntersectionObserverCallback;
+  elements = new Set<Element>();
+
+  constructor(callback: IntersectionObserverCallback) {
+    this.callback = callback;
+    MockIntersectionObserver.instances.push(this);
+  }
+  observe(element: Element) {
+    this.elements.add(element);
+  }
+  unobserve(element: Element) {
+    this.elements.delete(element);
+  }
+  disconnect() {
+    this.elements.clear();
+  }
+  takeRecords() {
+    return [];
+  }
+  report(isVisible: (element: Element) => boolean) {
+    const entries = [...this.elements].map((element) => ({
+      target: element,
+      isIntersecting: isVisible(element),
+    }));
+    this.callback(
+      entries as unknown as IntersectionObserverEntry[],
+      this as unknown as IntersectionObserver
+    );
+  }
+}
+
+vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
+
+function reportVisibility(isVisible: (element: Element) => boolean) {
+  const observer =
+    MockIntersectionObserver.instances[
+      MockIntersectionObserver.instances.length - 1
+    ];
+  if (!observer) throw new Error('Expected an IntersectionObserver to exist');
+  act(() => {
+    observer.report(isVisible);
+  });
+}
+
+function showOnlyVisibleRows(...branchNames: string[]) {
+  reportVisibility((element) =>
+    branchNames.some((name) => element.textContent?.includes(name))
+  );
+}
+
+function requestedBranchNames() {
+  return mockCms.api.tina.getIndexStatus.mock.calls.map(
+    ([{ ref }]: [{ ref: string }]) => ref
+  );
+}
+
+const flushPromises = async () => {
+  await act(async () => {
+    for (let index = 0; index < 5; index++) {
+      await Promise.resolve();
+    }
+  });
+};
+
+/**
+ * Let the lazy index status lookups settle after the first render. They
+ * resolve asynchronously and re-render the table, which replaces the pinned
+ * button elements that an earlier query would have returned.
+ */
+const settleInitialStatusFetch = async () => {
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+};
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -105,6 +193,12 @@ beforeEach(() => {
   mockCaptureEvent.mockImplementation(() => {});
   mockCms.api.tina.usingProtectedBranch.mockReturnValue(true);
   mockCms.api.tina.createPullRequest.mockReset();
+  mockCms.api.tina.getIndexStatus.mockReset();
+  mockCms.api.tina.getIndexStatus.mockResolvedValue({
+    status: 'complete',
+    timestamp: now - 3600_000,
+  });
+  MockIntersectionObserver.instances = [];
   mockCms.api.tina.branch = 'main';
 });
 
@@ -353,8 +447,10 @@ describe('BranchSelectorTable', () => {
         const { user, getByTitle } = renderTable({
           branchList: branchesWithPR,
         });
+        await settleInitialStatusFetch();
 
-        await user.click(getByTitle('Open Git Pull Request'));
+        const button = getByTitle('Open Git Pull Request');
+        await user.click(button);
 
         expect(mockCaptureEvent).toHaveBeenCalledWith(
           'branch-switcher-pr-clicked',
@@ -412,6 +508,7 @@ describe('BranchSelectorTable', () => {
           branchList: createPRBranches,
           refreshBranchList,
         });
+        await settleInitialStatusFetch();
 
         await user.click(getByTitle('Create Pull Request'));
 
@@ -437,6 +534,7 @@ describe('BranchSelectorTable', () => {
         const { user, getByTitle } = renderTable({
           branchList: createPRBranches,
         });
+        await settleInitialStatusFetch();
 
         await user.click(getByTitle('Create Pull Request'));
 
@@ -454,6 +552,7 @@ describe('BranchSelectorTable', () => {
         const { user, getByTitle, queryByText } = renderTable({
           branchList: createPRBranches,
         });
+        await settleInitialStatusFetch();
 
         // Start the PR creation without awaiting resolution
         const clickPromise = user.click(getByTitle('Create Pull Request'));
@@ -470,6 +569,137 @@ describe('BranchSelectorTable', () => {
         await waitFor(() => {
           expect(queryByText('Creating PR...')).toBeNull();
         });
+      });
+    });
+  });
+
+  // ---- Index status loading ----------------------------------------------
+
+  describe('index status loading', () => {
+    const withoutStatus = (name: string, extra: Partial<Branch> = {}) =>
+      makeBranch({ name, indexStatus: undefined, ...extra });
+
+    it('requests status only for the current branch and the rows on screen', async () => {
+      const branches = [
+        makeBranch({ name: 'main', protected: true }),
+        withoutStatus('tina/visible'),
+        withoutStatus('tina/hidden-one'),
+        withoutStatus('tina/hidden-two'),
+      ];
+
+      renderTable({ branchList: branches });
+
+      await waitFor(() => {
+        expect(requestedBranchNames()).toEqual(['main']);
+      });
+
+      showOnlyVisibleRows('tina/visible');
+
+      await waitFor(() => {
+        expect(requestedBranchNames().sort()).toEqual(['main', 'tina/visible']);
+      });
+      expect(requestedBranchNames()).toHaveLength(2);
+    });
+
+    it('stops polling an indexing branch once its row leaves the screen', async () => {
+      vi.useFakeTimers();
+      try {
+        mockCms.api.tina.getIndexStatus.mockResolvedValue({
+          status: 'inprogress',
+        });
+        const branches = [
+          makeBranch({ name: 'main', protected: true }),
+          withoutStatus('tina/indexing'),
+        ];
+
+        renderTable({ branchList: branches });
+        await flushPromises();
+
+        showOnlyVisibleRows('tina/indexing');
+        await flushPromises();
+
+        const indexingRequests = () =>
+          requestedBranchNames().filter((name) => name === 'tina/indexing')
+            .length;
+        expect(indexingRequests()).toBe(1);
+
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(INDEX_STATUS_POLL_INTERVAL);
+        });
+        expect(indexingRequests()).toBe(2);
+
+        showOnlyVisibleRows();
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(INDEX_STATUS_POLL_INTERVAL * 3);
+        });
+        expect(indexingRequests()).toBe(2);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('loads the remaining statuses, capped, when choosing the Last Updated sort', async () => {
+      const timestamps: Record<string, number> = {
+        main: now - 5000,
+        'tina/older': now - 4000,
+        'tina/oldest': now - 6000,
+        'tina/newer': now - 2000,
+        'tina/newest': now - 1000,
+      };
+      let active = 0;
+      let maxActive = 0;
+      mockCms.api.tina.getIndexStatus.mockImplementation(async ({ ref }) => {
+        active += 1;
+        maxActive = Math.max(maxActive, active);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        active -= 1;
+        return { status: 'complete', timestamp: timestamps[ref] };
+      });
+
+      const branches = [
+        makeBranch({ name: 'main', protected: true }),
+        withoutStatus('tina/older'),
+        withoutStatus('tina/oldest'),
+        withoutStatus('tina/newer'),
+        withoutStatus('tina/newest'),
+      ];
+
+      const { user, getByText, container } = renderTable({
+        branchList: branches,
+      });
+
+      await waitFor(() => {
+        expect(requestedBranchNames()).toEqual(['main']);
+      });
+      // The lazy status lookup for the current branch re-renders the table;
+      // wait for it so the header button is the live one.
+      await settleInitialStatusFetch();
+
+      await user.click(getByText('Last Updated'));
+
+      await waitFor(() => {
+        expect(requestedBranchNames().sort()).toEqual([
+          'main',
+          'tina/newer',
+          'tina/newest',
+          'tina/older',
+          'tina/oldest',
+        ]);
+      });
+      expect(maxActive).toBeLessThanOrEqual(
+        MAX_CONCURRENT_INDEX_STATUS_REQUESTS
+      );
+
+      await waitFor(() => {
+        // The current branch stays pinned first; the rest sort oldest first.
+        const rows = [...container.querySelectorAll('tbody tr')].map(
+          (row) => row.textContent ?? ''
+        );
+        expect(rows).toHaveLength(5);
+        expect(rows[1]).toContain('tina/oldest');
+        expect(rows[2]).toContain('tina/older');
+        expect(rows[3]).toContain('tina/newer');
+        expect(rows[4]).toContain('tina/newest');
       });
     });
   });

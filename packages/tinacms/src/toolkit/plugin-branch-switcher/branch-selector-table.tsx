@@ -1,9 +1,27 @@
 'use client';
 
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+} from '@tanstack/react-table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@toolkit/components/ui/table';
 import { BaseTextField, Select } from '@toolkit/fields';
 import { TooltipProvider } from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
 import { useCMS } from '@toolkit/react-core';
+import { Badge } from '@toolkit/react-sidebar/components/badge';
 import { Button } from '@toolkit/styles';
+import { cn } from '@utils/cn';
 import { formatDistanceToNow } from 'date-fns';
 import {
   ArrowDown,
@@ -21,33 +39,18 @@ import {
   X,
 } from 'lucide-react';
 import * as React from 'react';
-import { extractPullRequestId, getFilteredBranchList } from './branch-switcher';
-import { Branch } from './types';
-
-import {
-  ColumnDef,
-  SortingState,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@toolkit/components/ui/table';
-import { Badge } from '@toolkit/react-sidebar/components/badge';
-import { cn } from '@utils/cn';
 import {
   BranchSwitcherDropDownEvent,
   BranchSwitcherPRClickedEvent,
   BranchSwitcherSearchEvent,
 } from '../../lib/posthog/posthog';
 import { captureEvent } from '../../lib/posthog/posthogProvider';
+import {
+  mergeBranchIndexStatuses,
+  useBranchIndexStatuses,
+} from './branch-data';
+import { extractPullRequestId, getFilteredBranchList } from './branch-switcher';
+import { Branch } from './types';
 
 type Status = 'failed' | 'unknown' | 'complete' | 'inprogress' | 'timeout';
 
@@ -134,6 +137,19 @@ export default function BranchSelectorTable({
 
   const cms = useCMS();
 
+  const branchNames = React.useMemo(
+    () => branchList.map((branch) => branch.name),
+    [branchList]
+  );
+  const { statuses, getRowRef, loadAllStatuses } = useBranchIndexStatuses({
+    branchNames,
+    currentBranch,
+  });
+  const branchesWithIndexStatus = React.useMemo(
+    () => mergeBranchIndexStatuses(branchList, statuses),
+    [branchList, statuses]
+  );
+
   const isCurrentBranchDeleted = !branchList.some(
     (b) => b.name === currentBranch
   );
@@ -203,9 +219,10 @@ export default function BranchSelectorTable({
       accessorKey: 'lastUpdated',
       accessorFn: (row) => row.indexStatus?.timestamp,
       cell: ({ row }) => {
+        const timestamp = row.original.indexStatus?.timestamp;
         return (
           <div>
-            {formatDistanceToNow(new Date(row.original.indexStatus?.timestamp))}
+            {timestamp ? formatDistanceToNow(new Date(timestamp)) : null}
           </div>
         );
       },
@@ -214,7 +231,10 @@ export default function BranchSelectorTable({
         return (
           <button
             className='text-gray-700 !cursor-pointer font-bold flex items-center gap-1'
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            onClick={() => {
+              loadAllStatuses();
+              column.toggleSorting(column.getIsSorted() === 'asc');
+            }}
           >
             Last Updated
             {sorted === 'asc' ? (
@@ -246,8 +266,13 @@ export default function BranchSelectorTable({
   ];
 
   const filteredBranchList = React.useMemo(() => {
-    return getFilteredBranchList(branchList, search, currentBranch, filter);
-  }, [branchList, search, currentBranch, filter]);
+    return getFilteredBranchList(
+      branchesWithIndexStatus,
+      search,
+      currentBranch,
+      filter
+    );
+  }, [branchesWithIndexStatus, search, currentBranch, filter]);
 
   // Separate current branch from the rest so it's always first and not affected by sorting
   const currentBranchData = React.useMemo(() => {
@@ -376,6 +401,7 @@ export default function BranchSelectorTable({
               {/* Current branch is always the first row */}
               {currentBranchData && (
                 <TableRow
+                  ref={getRowRef(currentBranchData.name)}
                   className={cn(
                     'bg-transparent hover:!bg-transparent',
                     isCurrentBranchDeleted
@@ -451,6 +477,7 @@ export default function BranchSelectorTable({
 
                 return (
                   <TableRow
+                    ref={getRowRef(row.original.name)}
                     className={cn(
                       !isComplete &&
                         'bg-gray-50 text-gray-400 hover:!bg-gray-50 cursor-default',
