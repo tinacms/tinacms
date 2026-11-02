@@ -227,9 +227,7 @@ export const useBranchIndexStatuses = ({
   // down as soon as a row leaves the view, the list closes, or indexing ends.
   React.useEffect(() => {
     if (!pollingKey) return;
-    const names = pollingKey
-      .split('\n')
-      .slice(0, MAX_CONCURRENT_INDEX_STATUS_REQUESTS);
+    const names = pollingKey.split('\n');
     const interval = setInterval(() => {
       for (const name of names) {
         void fetchIndexStatus(name);
