@@ -5,7 +5,7 @@ import { useRender } from '@base-ui/react/use-render';
 import { type VariantProps, cva } from 'class-variance-authority';
 import * as React from 'react';
 
-import { Button } from '@tinacms/ui/components/button';
+import { Button, type ButtonBaseProps } from '@tinacms/ui/components/button';
 import { Input } from '@tinacms/ui/components/input';
 import { Separator } from '@tinacms/ui/components/separator';
 import {
@@ -23,7 +23,6 @@ import {
 } from '@tinacms/ui/components/tooltip';
 import { useIsMobile } from '@tinacms/ui/hooks/use-mobile';
 import { cn } from '@tinacms/ui/lib/utils';
-import { PanelLeftIcon } from 'lucide-react';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -257,7 +256,7 @@ function SidebarTrigger({
   className,
   onClick,
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: Omit<ButtonBaseProps, 'children' | 'size'>) {
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -266,16 +265,15 @@ function SidebarTrigger({
       data-slot='sidebar-trigger'
       variant='icon'
       size='sm'
+      icon='sidebar'
+      aria-label='Toggle Sidebar'
       className={cn(className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
       }}
       {...props}
-    >
-      <PanelLeftIcon />
-      <span className='sr-only'>Toggle Sidebar</span>
-    </Button>
+    />
   );
 }
 

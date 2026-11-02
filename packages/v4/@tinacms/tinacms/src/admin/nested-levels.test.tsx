@@ -202,7 +202,7 @@ describe('nested form levels', () => {
     await user.click(await screen.findByRole('button', { name: /Up to Two/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.tab();
-    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
     expect((await screen.findAllByRole('alert')).length).toBeGreaterThan(0);
   });
 
@@ -234,7 +234,7 @@ describe('nested form levels', () => {
     const user = userEvent.setup();
     renderGroups();
     await user.type(await screen.findByLabelText(/^Desc\b/), 'x');
-    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
     const alerts = await screen.findAllByRole('alert');
     expect(alerts[0]).toHaveTextContent('Title is required');
   });

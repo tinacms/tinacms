@@ -8,7 +8,13 @@ import {
 } from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
 import { FormLevel } from '@tinacms/ui/components/form-level';
-import { type ReactNode, use, useEffect, useEffectEvent } from 'react';
+import {
+  type ReactNode,
+  use,
+  useEffect,
+  useEffectEvent,
+  useState,
+} from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useStore } from 'zustand';
 import { type FormScope, FormScopeContext } from '../editor/context';
@@ -32,6 +38,7 @@ import {
   useFormStore,
   useIsFormDirty,
 } from '../form/form-store';
+import { countFailingFields } from '../editor/field-errors';
 import { DocumentStatus } from './document-status';
 
 function SaveButton() {
@@ -39,25 +46,30 @@ function SaveButton() {
   const dirty = useIsFormDirty(formId);
   const save = useFormSave();
   const [failure, setFailure] = useSaveFailure();
-  const canSave = dirty;
+  const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
+  const [pending, setPending] = useState(false);
   return (
     <div className='flex flex-col items-start gap-2'>
       <Button
         variant='primary'
         type='button'
-        className='aria-disabled:pointer-events-none aria-disabled:opacity-50'
-        aria-disabled={!canSave}
+        disabled={!dirty && !pending}
+        busy={pending}
+        count={errorCount}
+        srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
         onClick={() => {
-          if (!canSave) return;
           setFailure(null);
-          save().catch((cause) => {
-            console.error('[tinacms] Save failed:', cause);
-            if (cause instanceof Error && cause.message) {
-              setFailure(cause.message);
-            } else {
-              setFailure('Save failed.');
-            }
-          });
+          setPending(true);
+          save()
+            .catch((cause) => {
+              console.error('[tinacms] Save failed:', cause);
+              if (cause instanceof Error && cause.message) {
+                setFailure(cause.message);
+              } else {
+                setFailure('Save failed.');
+              }
+            })
+            .finally(() => setPending(false));
         }}
       >
         Save
@@ -77,13 +89,9 @@ function DiscardButton() {
   return (
     <Button
       type='button'
-      variant='secondary'
-      className='aria-disabled:pointer-events-none aria-disabled:opacity-50'
-      aria-disabled={!dirty}
-      onClick={() => {
-        if (!dirty) return;
-        discard();
-      }}
+      variant='destructive'
+      disabled={!dirty}
+      onClick={discard}
     >
       Discard
     </Button>
@@ -105,7 +113,7 @@ function StaleDraftDialog() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <Button type='button' variant='secondary' onClick={stale?.discard}>
+          <Button type='button' variant='destructive' onClick={stale?.discard}>
             Discard draft
           </Button>
           <Button variant='primary' type='button' onClick={stale?.resume}>

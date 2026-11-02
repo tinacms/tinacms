@@ -267,7 +267,7 @@ describe('TinaAdmin', () => {
     await user.clear(input);
     expect(screen.queryByRole('alert')).toBeNull();
 
-    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
     const alerts = await screen.findAllByRole('alert');
     expect(alerts[0]).toHaveTextContent('Title is required');
   });
@@ -335,6 +335,65 @@ describe('TinaAdmin', () => {
       name: /hello\.mdx/,
     });
     expect(helloEntry).toHaveTextContent('Unsaved');
+  });
+});
+
+describe('TinaAdmin Save button', () => {
+  const openHello = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    return screen.findByLabelText(/^Title\b/);
+  };
+
+  it('is disabled while the form is clean', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await openHello(user);
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Discard' })).toBeDisabled();
+  });
+
+  it('is busy while saving: one save, and it keeps focus', async () => {
+    const user = userEvent.setup();
+    let finish: () => void = () => {};
+    const update = vi
+      .spyOn(provider, 'update')
+      .mockImplementationOnce(async (collection, path, value) => {
+        await new Promise<void>((resolve) => {
+          finish = resolve;
+        });
+        return { path, document: { ...value } };
+      });
+    renderAdmin();
+    const input = await openHello(user);
+    await user.type(input, '!');
+    const save = screen.getByRole('button', { name: 'Save' });
+    save.focus();
+    await user.keyboard('{Enter}');
+    await waitFor(() => expect(save).toHaveAttribute('aria-disabled', 'true'));
+    await user.keyboard('{Enter}');
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(save).toHaveFocus();
+    finish();
+    await waitFor(() =>
+      expect(
+        screen
+          .getByRole('button', { name: 'Save' })
+          .querySelector('.lucide-loader-circle')
+      ).toBeNull()
+    );
+    update.mockRestore();
+  });
+
+  it('shows how many fields hold an error', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    const input = await openHello(user);
+    await user.clear(input);
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    expect(
+      await screen.findByRole('button', { name: /^Save\s?, 1 error$/ })
+    ).toBeVisible();
   });
 });
 
