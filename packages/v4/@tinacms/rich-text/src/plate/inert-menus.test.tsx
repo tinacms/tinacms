@@ -73,14 +73,14 @@ describe('Plate menus', () => {
     expect(await selectHello(editor)).toBe(1);
   });
 
-  it('never shows the floating toolbar when read-only or disabled', async () => {
+  it('never shows the floating toolbar over a selection when read-only', async () => {
     const editor = await mount(true);
     expect(await selectHello(editor)).toBe(0);
   });
 
   // happy-dom does not turn a typed "/" into a Slate edit, so the slash menu
   // is checked at its only entry: the DOM text input that read-only turns off.
-  it('takes no typed input when read-only, so the slash menu cannot start', async () => {
+  it('turns the text input off when read-only, which closes the only way to the slash menu', async () => {
     await mount(false);
     expect(editable()).toHaveAttribute('contenteditable', 'true');
     cleanup();

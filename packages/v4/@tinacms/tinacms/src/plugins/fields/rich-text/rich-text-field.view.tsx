@@ -62,6 +62,7 @@ export function RichTextFieldView({
         'min-w-0 overflow-hidden rounded-sm',
         !body &&
           'border border-input bg-card hover:border-input-hover has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
+        !body && disabled && 'hover:border-input',
         !body && invalid && 'border-destructive hover:border-destructive',
         !body &&
           readOnly &&
@@ -81,6 +82,8 @@ export function RichTextFieldView({
           input={{ value, onChange }}
           field={field}
           ariaLabelledBy={labelId}
+          ariaInvalid={invalid}
+          ariaDescribedBy={frame.help ? frame.helpId : undefined}
           placeholder={placeholder}
           readOnly={readOnly}
           disabled={disabled}

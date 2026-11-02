@@ -51,7 +51,7 @@ describe('rich text field states', () => {
     expect(await screen.findByText('Start writing…')).toBeVisible();
   });
 
-  it('puts the toolbar beside a scrolling text box, not inside it', async () => {
+  it('keeps the toolbar outside the text box and gives the text box its scroll classes', async () => {
     const { container } = render(
       <RichTextFieldView {...richTextFieldState('too long for the box')} />
     );
@@ -92,7 +92,7 @@ describe('rich text field states', () => {
     const { container } = render(
       <RichTextFieldView {...richTextFieldState('invalid')} />
     );
-    await findEditor();
+    expect(await findEditor()).toHaveAttribute('aria-invalid', 'true');
     expect(
       container.querySelector('[data-slot=rich-text-frame]')?.className
     ).toContain('border-destructive');
@@ -111,7 +111,7 @@ describe('rich text field states', () => {
     }
   );
 
-  it('keeps a disabled toolbar inert and a disabled field out of the tab order', async () => {
+  it('wraps a disabled toolbar in inert and drops hover on the frame', async () => {
     const { container } = render(
       <RichTextFieldView {...richTextFieldState('disabled')} />
     );
@@ -119,6 +119,20 @@ describe('rich text field states', () => {
     const inert = container.querySelector('[inert]');
     expect(inert).not.toBeNull();
     expect(inert?.contains(screen.getByRole('toolbar'))).toBe(true);
+    expect(
+      container.querySelector('[data-slot=rich-text-frame]')?.className
+    ).toContain('hover:border-input');
+  });
+
+  it('links help text to the editor', async () => {
+    render(
+      <RichTextFieldView
+        {...richTextFieldState('filled')}
+        help='Markdown is supported'
+        helpId='body-help'
+      />
+    );
+    expect(await findEditor()).toHaveAttribute('aria-describedby', 'body-help');
   });
 
   it('shows an embed with a menu, and no menu when read-only', async () => {
