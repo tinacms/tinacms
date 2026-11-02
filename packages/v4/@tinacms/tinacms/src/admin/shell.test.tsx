@@ -32,6 +32,8 @@ let updates: { branch: string; path: string; value: TinaDocument }[];
 let releaseUpdate: (() => void) | undefined;
 let holdUpdates: boolean;
 let searchEnabled: boolean;
+let failGet: boolean;
+let failAfterSave: boolean;
 
 const contentPlugin = () =>
   definePlugin({
@@ -53,9 +55,13 @@ const contentPlugin = () =>
               : {}),
             list: async () =>
               (DATA[branch()] ?? []).map(({ path }) => ({ path })),
-            get: async (_collection: string, path: string) =>
-              (DATA[branch()] ?? []).find((entry) => entry.path === path) ??
-              null,
+            get: async (_collection: string, path: string) => {
+              if (failGet) throw new Error('disk unreadable');
+              return (
+                (DATA[branch()] ?? []).find((entry) => entry.path === path) ??
+                null
+              );
+            },
             update: async (
               _collection: string,
               path: string,
@@ -87,12 +93,42 @@ const searchPlugin = definePlugin({
   }),
 });
 
+const auditPlugin = definePlugin({
+  name: 'test:audit',
+  provides: ['hooks'],
+  hooks: ['audit'],
+  client: async () => ({
+    default: {
+      hooks: {
+        audit: () => ({
+          afterSave: () => {
+            if (failAfterSave) throw new Error('audit endpoint down');
+          },
+        }),
+      },
+    },
+  }),
+});
+
+const NotesScreen = () => <p>notes screen</p>;
+
+const screenPlugin = definePlugin({
+  name: 'test:notes',
+  client: async () => ({
+    default: {
+      screens: [{ name: 'notes', label: 'Notes', component: NotesScreen }],
+    },
+  }),
+});
+
 const renderAdmin = (projectName?: string) =>
   render(
     <TinaAdmin
       config={asResolvedConfig({
         plugins: [
           contentPlugin(),
+          auditPlugin,
+          screenPlugin,
           ...(searchEnabled ? [searchPlugin] : []),
           stringFieldPlugin,
           coreValidatorsPlugin,
@@ -105,6 +141,7 @@ const renderAdmin = (projectName?: string) =>
               label: 'Posts',
               path: 'content/posts',
               format: 'mdx',
+              hooks: [{ name: 'audit' }],
               fields: [
                 {
                   name: 'title',
@@ -140,6 +177,8 @@ beforeEach(() => {
   holdUpdates = false;
   releaseUpdate = undefined;
   searchEnabled = false;
+  failGet = false;
+  failAfterSave = false;
   window.location.hash = '';
 });
 
@@ -460,6 +499,17 @@ describe('save state', () => {
     );
   });
 
+  it('says the save failed when an afterSave hook fails, after the document is saved', async () => {
+    failAfterSave = true;
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Save failed')).toBeVisible()
+    );
+    expect(updates).toHaveLength(1);
+  });
+
   it('says the save failed when validation fails, with the inline alert kept', async () => {
     const { user, input } = await openHello();
     await user.clear(input);
@@ -496,6 +546,37 @@ describe('toasts', () => {
     expect(toaster).toHaveAttribute('data-y-position', 'bottom');
     const form = screen.getByRole('complementary', { name: 'Document form' });
     expect(within(form).getAllByRole('alert').length).toBeGreaterThan(0);
+  });
+});
+
+describe('read-error and screen views', () => {
+  it('draws one toggle and a Close in the read-error view', async () => {
+    failGet = true;
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    renderAdmin();
+    expect(
+      await screen.findByRole('heading', { name: 'Cannot open document' })
+    ).toBeVisible();
+    expect(
+      screen
+        .getAllByRole('alert')
+        .some((alert) => /disk unreadable/.test(alert.textContent ?? ''))
+    ).toBe(true);
+    expect(toggles()).toHaveLength(1);
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
+  });
+
+  it('titles a screen with its label and closes it to the collections route', async () => {
+    window.location.hash = '#/screens/notes';
+    const user = userEvent.setup();
+    renderAdmin();
+    expect(await screen.findByRole('heading', { name: 'Notes' })).toBeVisible();
+    expect(screen.getByText('notes screen')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
+    expect(screen.queryByText('notes screen')).toBeNull();
   });
 });
 
