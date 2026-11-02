@@ -112,7 +112,7 @@ function SetupBanner({
             href={status.actionUrl}
             target='_blank'
             rel='noreferrer noopener'
-            className={buttonVariants({ variant: 'toolbar', size: 'sm' })}
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
           >
             {status.actionLabel}
             <ExternalLinkIcon className='size-3.5' />
@@ -391,13 +391,13 @@ export function MediaBrowser(props: MediaBrowserProps) {
         </div>
         {readOnly ? null : (
           <div className='flex flex-wrap items-center gap-2'>
-            <Button type='button' variant='toolbar' onClick={refresh}>
+            <Button type='button' variant='outline' onClick={refresh}>
               Refresh
               <RefreshCwIcon className='size-4' />
             </Button>
             <Button
               type='button'
-              variant='toolbar'
+              variant='outline'
               onClick={() => setDialog('new-folder')}
             >
               New Folder
@@ -475,7 +475,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
               <p>Could not load media: {messageOf(listing.error)}</p>
               <Button
                 type='button'
-                variant='toolbar'
+                variant='outline'
                 size='sm'
                 onClick={() => listing.refetch()}
               >

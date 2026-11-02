@@ -1,5 +1,3 @@
-import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { Input } from '@tinacms/ui/components/input';
 import { useRef } from 'react';
 import {
   useFieldActivation,
@@ -7,6 +5,7 @@ import {
   useFieldFrame,
   useFieldValue,
 } from '../../../editor';
+import { DatetimeFieldView } from './datetime-field.view';
 
 const CARRIES_A_ZONE = /(?:Z|[+-]\d{2}:\d{2})$/;
 
@@ -58,16 +57,12 @@ export function DatetimeField() {
   useFieldActivation(() => inputRef.current?.focus());
 
   return (
-    <FieldWrapper {...frame}>
-      <Input
-        ref={inputRef}
-        type='datetime-local'
-        id={address}
-        value={toInputValue(value)}
-        onChange={(event) =>
-          setValue(fromInputValue(event.target.value, value))
-        }
-      />
-    </FieldWrapper>
+    <DatetimeFieldView
+      {...frame}
+      ref={inputRef}
+      id={address}
+      value={toInputValue(value)}
+      onChange={(wallClock) => setValue(fromInputValue(wallClock, value))}
+    />
   );
 }
