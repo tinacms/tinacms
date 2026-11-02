@@ -1,11 +1,16 @@
-import { useReadOnly, useSelected } from '@udecode/plate/react';
+import type { TElement } from '@udecode/plate';
+import {
+  type PlateEditor,
+  useReadOnly,
+  useSelected,
+} from '@udecode/plate/react';
 import { isHotkey } from 'is-hotkey';
 import React from 'react';
 import { useEditorContext } from '../editor-context';
 
-const handleCloseBase = (editor, element) => {
-  const path = editor.findPath(element);
-  const editorEl = editor.toDOMNode(editor, editor);
+const handleCloseBase = (editor: PlateEditor, element: TElement) => {
+  const path = editor.api.findPath(element);
+  const editorEl = editor.api.toDOMNode(editor);
   if (editorEl) {
     // Returning from a nested form needs focus and the selection. The
     // selection has to follow focus on a later tick, or it does not take.
@@ -21,14 +26,14 @@ const handleCloseBase = (editor, element) => {
   }
 };
 
-const handleRemoveBase = (editor, element) => {
-  const path = editor.findPath(element);
+const handleRemoveBase = (editor: PlateEditor, element: TElement) => {
+  const path = editor.api.findPath(element);
   editor.tf.removeNodes({
     at: path,
   });
 };
 
-export const useHotkey = (key, callback) => {
+export const useHotkey = (key: string, callback: () => void) => {
   const selected = useSelected();
   const readOnly = useReadOnly();
 
@@ -45,7 +50,11 @@ export const useHotkey = (key, callback) => {
   }, []);
 };
 
-export const useEmbedHandles = (editor, element, baseFieldName: string) => {
+export const useEmbedHandles = (
+  editor: PlateEditor,
+  element: TElement,
+  baseFieldName: string
+) => {
   const { onActivateField } = useEditorContext();
   const readOnly = useReadOnly();
   const [isExpanded, setIsExpanded] = React.useState(false);
@@ -64,7 +73,7 @@ export const useEmbedHandles = (editor, element, baseFieldName: string) => {
     setIsExpanded(false);
     deferredSelect.current = handleCloseBase(editor, element);
   };
-  const path = editor.findPath(element);
+  const path = editor.api.findPath(element);
   const fieldName = `${baseFieldName}.children.${path.join('.children.')}.props`;
   const handleSelect = () => {
     if (!readOnly) onActivateField(fieldName);

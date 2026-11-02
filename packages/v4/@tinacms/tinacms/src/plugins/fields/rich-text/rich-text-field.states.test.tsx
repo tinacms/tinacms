@@ -126,6 +126,32 @@ describe('rich text field states', () => {
     expect(classes).not.toContain('hover:border-input-hover');
   });
 
+  it('shows the invalid border on a read-only field that has errors', async () => {
+    const { container } = render(
+      <RichTextFieldView
+        {...richTextFieldState('read-only')}
+        errors={['Body is required']}
+      />
+    );
+    await findEditor();
+    const classes = container
+      .querySelector('[data-slot=rich-text-frame]')
+      ?.className.split(' ');
+    expect(classes).toContain('border-destructive');
+    expect(classes).not.toContain('border-border-subtle');
+  });
+
+  it('does not point the body editor at help text that body mode never renders', async () => {
+    render(
+      <RichTextFieldView
+        {...richTextFieldState('body')}
+        help='Markdown is supported'
+        helpId='body-help'
+      />
+    );
+    expect(await findEditor()).not.toHaveAttribute('aria-describedby');
+  });
+
   it('links help text to the editor', async () => {
     render(
       <RichTextFieldView

@@ -19,12 +19,10 @@ export type RichTextFieldViewProps = Pick<
   | 'helpId'
   | 'warnings'
 > & {
-  /** The field address, which also names the embeds' forms. */
   id: string;
   value: RichTextValue;
   onChange?: (value: RichTextValue) => void;
   field: Pick<RichTextFieldSchema, 'templates' | 'overrides'>;
-  /** Called with an embed's address when its label is clicked. */
   onActivateEmbed?: (address: string) => void;
   placeholder?: string;
   disabled?: boolean;
@@ -35,11 +33,6 @@ export type RichTextFieldViewProps = Pick<
 
 const noop = () => {};
 
-/**
- * The rich-text editor inside its frame, with no form state. `RichTextField`
- * feeds it from the form; the state catalogue feeds it by hand. The editor
- * is named by the label, which stays as screen-reader text in `body` mode.
- */
 export function RichTextFieldView({
   id,
   value,
@@ -63,10 +56,10 @@ export function RichTextFieldView({
         !body &&
           'border border-input bg-card hover:border-input-hover has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
         !body && disabled && 'hover:border-input',
-        !body && invalid && 'border-destructive hover:border-destructive',
         !body &&
           readOnly &&
-          'border-border-subtle bg-muted hover:border-border-subtle'
+          'border-border-subtle bg-muted hover:border-border-subtle',
+        !body && invalid && 'border-destructive hover:border-destructive'
       )}
     >
       <EditorContext.Provider
@@ -83,7 +76,7 @@ export function RichTextFieldView({
           field={field}
           ariaLabelledBy={labelId}
           ariaInvalid={invalid}
-          ariaDescribedBy={frame.help ? frame.helpId : undefined}
+          ariaDescribedBy={!body && frame.help ? frame.helpId : undefined}
           placeholder={placeholder}
           readOnly={readOnly}
           disabled={disabled}

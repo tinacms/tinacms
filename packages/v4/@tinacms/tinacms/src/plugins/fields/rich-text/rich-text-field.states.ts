@@ -53,7 +53,6 @@ const long = Array.from(
   (_, index) => `Paragraph ${index + 1} keeps the box growing.`
 );
 
-/** Every look of the rich-text field, for the design sign-off and the render test. */
 export const richTextFieldStates = [
   { name: 'empty', props: { ...base, value: empty } },
   { name: 'filled', props: base },

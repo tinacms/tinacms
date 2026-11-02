@@ -1,6 +1,7 @@
+import type { Value } from '@udecode/plate';
 import { Plate } from '@udecode/plate/react';
 import React from 'react';
-import type { RichTextNode, RichTextValue } from '../value';
+import type { RichTextValue } from '../value';
 import { Editor, EditorContainer } from './components/editor';
 import FixedToolbarButtons from './components/fixed-toolbar-buttons';
 import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
@@ -21,11 +22,9 @@ export interface RichEditorProps {
   ariaLabelledBy?: string;
   ariaInvalid?: boolean;
   ariaDescribedBy?: string;
-  /** Hides the toolbar and stops edits. */
   readOnly?: boolean;
   /** Stops edits and all pointer and keyboard input, toolbar included. */
   disabled?: boolean;
-  /** Shown in the first block while it is empty. */
   placeholder?: string;
   /** `framed` stops growing at a fixed height and scrolls; `body` has a minimum height and grows. */
   layout?: 'framed' | 'body';
@@ -78,10 +77,8 @@ export const RichEditor = ({
       <Plate
         editor={editor}
         readOnly={readOnly || disabled}
-        onChange={(value) => {
-          const normalized = (value.value as RichTextNode[]).map(
-            normalizeLinksInCodeBlocks
-          );
+        onValueChange={({ value }) => {
+          const normalized = (value as Value).map(normalizeLinksInCodeBlocks);
 
           input.onChange({
             type: 'root',
