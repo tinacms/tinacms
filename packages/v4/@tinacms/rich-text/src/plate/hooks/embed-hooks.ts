@@ -1,4 +1,4 @@
-import { useSelected } from '@udecode/plate/react';
+import { useReadOnly, useSelected } from '@udecode/plate/react';
 import { isHotkey } from 'is-hotkey';
 import React from 'react';
 import { useEditorContext } from '../editor-context';
@@ -30,9 +30,10 @@ const handleRemoveBase = (editor, element) => {
 
 export const useHotkey = (key, callback) => {
   const selected = useSelected();
+  const readOnly = useReadOnly();
 
   const onKeyDown = React.useEffectEvent((e) => {
-    if (!selected || !isHotkey(key, e)) return;
+    if (readOnly || !selected || !isHotkey(key, e)) return;
     e.preventDefault();
     callback();
   });
@@ -46,6 +47,7 @@ export const useHotkey = (key, callback) => {
 
 export const useEmbedHandles = (editor, element, baseFieldName: string) => {
   const { onActivateField } = useEditorContext();
+  const readOnly = useReadOnly();
   const [isExpanded, setIsExpanded] = React.useState(false);
   const deferredSelect = React.useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -64,9 +66,12 @@ export const useEmbedHandles = (editor, element, baseFieldName: string) => {
   };
   const path = editor.findPath(element);
   const fieldName = `${baseFieldName}.children.${path.join('.children.')}.props`;
-  const handleSelect = () => onActivateField(fieldName);
+  const handleSelect = () => {
+    if (!readOnly) onActivateField(fieldName);
+  };
 
   const handleRemove = () => {
+    if (readOnly) return;
     handleRemoveBase(editor, element);
   };
 

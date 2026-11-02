@@ -19,12 +19,29 @@ export interface RichEditorProps {
   };
   field: RichEditorField;
   ariaLabelledBy?: string;
+  /** Hides the toolbar and stops edits. */
+  readOnly?: boolean;
+  /** Stops edits and all pointer and keyboard input, toolbar included. */
+  disabled?: boolean;
+  /** Shown in the first block while it is empty. */
+  placeholder?: string;
+  /** `framed` stops growing at a fixed height and scrolls; `body` has a minimum height and grows. */
+  layout?: 'framed' | 'body';
 }
+
+const layoutClass = {
+  framed: 'max-h-60',
+  body: 'min-h-56',
+} as const;
 
 export const RichEditor = ({
   input,
   field,
   ariaLabelledBy,
+  readOnly = false,
+  disabled = false,
+  placeholder,
+  layout = 'framed',
 }: RichEditorProps) => {
   const [initialValue] = React.useState(() => {
     if (input.value?.children?.length) {
@@ -53,9 +70,10 @@ export const RichEditor = ({
   });
 
   return (
-    <div>
+    <div inert={disabled || undefined} aria-disabled={disabled || undefined}>
       <Plate
         editor={editor}
+        readOnly={readOnly || disabled}
         onChange={(value) => {
           const normalized = (value.value as any[]).map(
             normalizeLinksInCodeBlocks
@@ -73,10 +91,16 @@ export const RichEditor = ({
               templates={field.templates ?? []}
               overrides={field?.overrides}
             >
-              <FixedToolbar>
-                <FixedToolbarButtons />
-              </FixedToolbar>
-              <Editor aria-labelledby={ariaLabelledBy} />
+              {readOnly ? null : (
+                <FixedToolbar>
+                  <FixedToolbarButtons />
+                </FixedToolbar>
+              )}
+              <Editor
+                aria-labelledby={ariaLabelledBy}
+                placeholder={placeholder}
+                className={layoutClass[layout]}
+              />
             </ToolbarProvider>
           </TooltipProvider>
         </EditorContainer>
