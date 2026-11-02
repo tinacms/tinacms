@@ -126,19 +126,20 @@ interface Pending {
 // new item and puts focus where the editor was working.
 function useAfterChange(
   changed: unknown,
-  onOpen?: (index: number) => void
+  onOpen?: (index: number) => boolean
 ): {
   listRef: RefObject<HTMLDivElement | null>;
   afterChange: (pending: Pending) => void;
 } {
   const listRef = useRef<HTMLDivElement>(null);
   const pending = useRef<Pending | undefined>(undefined);
-  const open = useEffectEvent((index: number) => onOpen?.(index));
+  const open = useEffectEvent((index: number) => onOpen?.(index) ?? false);
   useEffect(() => {
     const todo = pending.current;
     if (!todo || changed === undefined) return;
     pending.current = undefined;
-    if (todo.open !== undefined) open(todo.open);
+    // An item that opened as a form level replaced the list, so no grip is left.
+    if (todo.open !== undefined && open(todo.open)) return;
     // Only this list's own cards count: a list nested in an open card has
     // grips and an Add control of its own.
     const list = listRef.current;
@@ -181,6 +182,7 @@ function ObjectItems({
   const documentPath = useDocumentPath();
   const scope = useScope();
   const activation = useActivation();
+  const { setActive } = useActiveField();
   const { control, getValues } = useFormContext();
   const {
     fields: items,
@@ -210,17 +212,22 @@ function ObjectItems({
   );
 
   // Opens an item where its depth says: in place, or as the next form level.
-  function showItem(index: number) {
+  // Returns whether it opened a form level.
+  function showItem(index: number): boolean {
     const itemAddress = `${address}.${index}`;
     const stored: unknown = getValues(itemAddress);
     const fields = isItem(stored) ? itemFieldsOf(field, stored) : undefined;
     if (fields && itemOpensNextLevel(itemAddress)) {
       const heading = itemHeadingOf(field, stored, index);
       scope.view.getState().openLevel(itemLevel(itemAddress, heading, fields));
-      return;
+      // The level replaced the list, so focus moves to its first field.
+      const first = fields.find((subfield) => !subfield.hidden);
+      if (first) setActive(toFieldAddress(`${itemAddress}.${first.name}`));
+      return true;
     }
     const id = items[index]?.id;
     if (id) setOpen((held) => new Set(held).add(id));
+    return false;
   }
   const openOnActivation = useEffectEvent((target: string) => {
     items.forEach((item, index) => {
@@ -246,12 +253,22 @@ function ObjectItems({
           isTemplatesArray(field) ? [] : field.fields
         );
 
+  // Read at click time: a picker left open can outlive the render that drew it.
+  const atMax = () => {
+    const list: unknown = getValues(address);
+    return max !== undefined && Array.isArray(list) && list.length >= max;
+  };
   const insertAt = (index: number, template?: ArrayTemplateSchema) => {
+    if (atMax()) {
+      setPicking(null);
+      return;
+    }
     afterChange({ open: index, focus: index });
     insert(index, seedFor(template));
     setPicking(null);
   };
   const add = (template?: ArrayTemplateSchema) => {
+    if (atMax()) return;
     afterChange({ open: items.length, focus: items.length });
     append(seedFor(template));
   };
@@ -351,6 +368,7 @@ function ObjectItems({
               content: (
                 <TemplatePicker
                   field={field}
+                  full={full}
                   onPick={(template) => insertAt(picking, template)}
                   onCancel={() => setPicking(null)}
                 />
@@ -365,6 +383,7 @@ function ObjectItems({
         else insertAt(at);
       }}
       onDuplicate={(index) => {
+        if (atMax()) return;
         afterChange({ open: index + 1, focus: index + 1 });
         insert(index + 1, structuredClone(getValues(`${address}.${index}`)));
       }}
@@ -520,7 +539,9 @@ function ScalarItems({
     afterChange({ focus: focusAfterRemove(index, items.length - 1) });
     setList(liveItems().filter((_, position) => position !== index));
   };
+  const atMax = () => max !== undefined && liveItems().length >= max;
   const insertValue = (index: number, entry: unknown) => {
+    if (atMax()) return;
     keys.current.splice(index, 0, nextScalarKey());
     const next = [...liveItems()];
     next.splice(index, 0, entry);
@@ -554,7 +575,6 @@ function ScalarItems({
         kind: 'group',
         alwaysOpen: true,
         summary: base.name,
-        error,
         children: <NestedFieldRow address={itemAddress} node={field.of} />,
       };
     }
@@ -586,6 +606,7 @@ function ScalarItems({
       addInputType={box === 'number' ? 'number' : 'text'}
       addLabel='Add item'
       onAdd={(text) => {
+        if (atMax()) return;
         const entry = text === undefined ? seedScalar() : text;
         keys.current = [...keys.current, nextScalarKey()];
         afterChange({ focus: 'add' });

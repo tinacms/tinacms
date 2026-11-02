@@ -372,4 +372,18 @@ describe('array items as form levels', () => {
       screen.getByRole('navigation', { name: 'Field path' })
     ).toBeVisible();
   });
+
+  it('focuses the first field of the item level that Duplicate opens', async () => {
+    const user = userEvent.setup();
+    renderRows();
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Item 1' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Duplicate' })
+    );
+    expect(
+      await screen.findByRole('textbox', { name: /^Label\b/ })
+    ).toHaveFocus();
+  });
 });

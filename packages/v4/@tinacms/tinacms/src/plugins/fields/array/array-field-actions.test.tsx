@@ -15,7 +15,7 @@ import {
 } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
-import { max } from '../../../plugins/fields';
+import { max, min } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
 import { LabelledFields } from '../../../test/labelled-fields';
 import booleanFieldPlugin from '../boolean/boolean-field.plugin';
@@ -77,6 +77,28 @@ const collection: CollectionSchema = {
           name: 'hero',
           label: 'Hero',
           previewImage: 'https://example.com/hero.png',
+          fields: [t.string({ name: 'headline', label: 'Headline' })],
+        },
+      ],
+    }),
+    t.array({
+      name: 'notes',
+      label: 'Notes',
+      of: t.string({
+        name: 'note',
+        label: 'Note',
+        multiline: true,
+        validators: [min(3)],
+      }),
+    }),
+    t.array({
+      name: 'cappedBlocks',
+      label: 'Capped blocks',
+      validators: [max(2)],
+      templates: [
+        {
+          name: 'hero',
+          label: 'Hero',
           fields: [t.string({ name: 'headline', label: 'Headline' })],
         },
       ],
@@ -154,8 +176,9 @@ const chooseAction = async (list: string, item: number, action: string) => {
 
 // The cards that belong to the list itself, not to a list nested in a card.
 const ownCards = (group: HTMLElement) =>
-  Array.from(group.children).filter((child) =>
-    child.hasAttribute('data-array-item')
+  Array.from(group.children).filter(
+    (child): child is HTMLElement =>
+      child instanceof HTMLElement && child.hasAttribute('data-array-item')
   );
 
 const linkHeads = async () =>
@@ -408,6 +431,37 @@ describe('ArrayField focus and activation', () => {
     await userEvent.click(screen.getByText('activate'));
     await waitFor(() =>
       expect(screen.getByRole('textbox', { name: 'Item 2' })).toHaveFocus()
+    );
+  });
+
+  it('adds nothing from an insertion picker left open after the list fills', async () => {
+    renderPage({ cappedBlocks: [{ _template: 'hero', headline: 'One' }] });
+    await chooseAction('Capped blocks', 1, 'Insert above');
+    const group = await screen.findByRole('group', { name: 'Capped blocks' });
+    const pickers = await within(group).findAllByRole('button', {
+      name: 'Add Hero',
+    });
+    expect(pickers).toHaveLength(2);
+    await userEvent.click(pickers[1]);
+    await waitFor(() => expect(valueOf('cappedBlocks')).toHaveLength(2));
+    const pending = await within(group).findAllByRole('button', {
+      name: 'Add Hero',
+    });
+    for (const button of pending) expect(button).toBeDisabled();
+    await userEvent.click(pending[0]);
+    expect(valueOf('cappedBlocks')).toHaveLength(2);
+  });
+
+  it('shows the error of a list item that keeps its widget once', async () => {
+    renderPage({ notes: ['ok!'] });
+    const note = await screen.findByRole('textbox', { name: /^Note\b/ });
+    await userEvent.clear(note);
+    await userEvent.type(note, 'no');
+    await userEvent.tab();
+    // The list itself still shows the rolled-up message; the card adds none.
+    const group = await screen.findByRole('group', { name: 'Notes' });
+    await waitFor(() =>
+      expect(within(ownCards(group)[0]).getAllByRole('alert')).toHaveLength(1)
     );
   });
 });
