@@ -119,9 +119,11 @@ describe('rich text field states', () => {
     const inert = container.querySelector('[inert]');
     expect(inert).not.toBeNull();
     expect(inert?.contains(screen.getByRole('toolbar'))).toBe(true);
-    expect(
-      container.querySelector('[data-slot=rich-text-frame]')?.className
-    ).toContain('hover:border-input');
+    const classes = container
+      .querySelector('[data-slot=rich-text-frame]')
+      ?.className.split(' ');
+    expect(classes).toContain('hover:border-input');
+    expect(classes).not.toContain('hover:border-input-hover');
   });
 
   it('links help text to the editor', async () => {
