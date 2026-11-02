@@ -51,6 +51,7 @@ export {
   AfterSaveHookError,
   FormValidationError,
   useActiveField,
+  useActivation,
   useContentSlice,
   useMediaSlice,
   useOptionalAuthSlice,

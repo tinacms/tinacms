@@ -17,7 +17,7 @@ import {
   useFieldValue,
   useFormErrors,
   useFormId,
-  useActiveField,
+  useActivation,
 } from '../../../editor';
 import { UneditableValue } from '../uneditable-value';
 import {
@@ -100,16 +100,15 @@ function useObjectSummary() {
 function FieldGroup() {
   const { address, field, frame, invalidCount, summary } = useObjectSummary();
   const { view } = useScope();
-  const { active } = useActiveField();
+  const activation = useActivation();
   const [open, setOpen] = useState(false);
   const isOpenLevel =
     useStore(view, (state) => state.openLevels.at(-1)?.address) === address;
 
-  // Matches the object or anything under it, so a preview click on a folded
-  // field opens the fold before the field takes focus.
   useEffect(() => {
-    if (active === address || active?.startsWith(`${address}.`)) setOpen(true);
-  }, [active, address]);
+    const target = activation?.address;
+    if (target === address || target?.startsWith(`${address}.`)) setOpen(true);
+  }, [activation, address]);
 
   return (
     <ObjectFieldView
@@ -142,6 +141,7 @@ export function ObjectDrillIn() {
     <ObjectFieldView
       {...frame}
       display='drillIn'
+      name={field.name}
       summary={summary}
       invalidCount={invalidCount}
       onDrillIn={() =>

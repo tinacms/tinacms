@@ -1,4 +1,4 @@
-import { Collapsible } from '@tinacms/ui/components/collapsible';
+import { CollapsibleSection } from '@tinacms/ui/components/collapsible-section';
 import { DrillInCard } from '@tinacms/ui/components/drill-in-card';
 import {
   FieldWrapper,
@@ -15,6 +15,8 @@ export interface ObjectFieldViewProps
     'label' | 'labelId' | 'required' | 'errors' | 'help' | 'helpId'
   > {
   display: ObjectDisplay;
+  /** The field name. It names the drill-in card when `label` is not text. */
+  name?: string;
   /** Collapsible only. */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -33,86 +35,109 @@ export interface ObjectFieldViewProps
   children?: ReactNode;
 }
 
-/** The three looks of an object field. It reads no store; the connected field feeds it. */
-export function ObjectFieldView({
-  display,
-  open = false,
-  onOpenChange = () => {},
-  onDrillIn = () => {},
-  summary,
-  invalidCount = 0,
-  disabled = false,
-  readOnly = false,
-  inPlace = false,
-  onHeaderFocus,
-  label,
-  labelId,
-  required,
+type LookProps = ObjectFieldViewProps;
+
+function Frame({
   errors,
   help,
   helpId,
   children,
-}: ObjectFieldViewProps) {
-  const text = typeof label === 'string' ? label : undefined;
+}: Pick<LookProps, 'errors' | 'help' | 'helpId' | 'children'>) {
+  return (
+    <FieldWrapper errors={errors} help={help} helpId={helpId}>
+      {children}
+    </FieldWrapper>
+  );
+}
 
-  if (inPlace) {
-    return (
-      <FieldWrapper errors={errors} help={help} helpId={helpId}>
-        <div className='min-w-0'>{children}</div>
-      </FieldWrapper>
-    );
-  }
+function InPlaceLook(props: LookProps) {
+  return (
+    <Frame {...props}>
+      <div className='min-w-0'>{props.children}</div>
+    </Frame>
+  );
+}
 
-  if (display === 'drillIn') {
-    return (
-      <FieldWrapper errors={errors} help={help} helpId={helpId}>
-        <DrillInCard
-          label={text ?? ''}
-          summary={summary ?? NOT_SET}
-          invalidCount={invalidCount}
-          disabled={disabled}
-          readOnly={readOnly}
-          onOpen={onDrillIn}
-        />
-      </FieldWrapper>
-    );
-  }
+function DrillInLook(props: LookProps) {
+  const { label, name, required, summary, invalidCount, disabled, readOnly } =
+    props;
+  return (
+    <Frame {...props}>
+      <DrillInCard
+        label={typeof label === 'string' ? label : (name ?? '')}
+        required={required}
+        summary={summary ?? NOT_SET}
+        invalidCount={invalidCount}
+        disabled={disabled}
+        readOnly={readOnly}
+        onOpen={props.onDrillIn ?? noop}
+      />
+    </Frame>
+  );
+}
 
-  if (display === 'collapsible') {
-    return (
-      <FieldWrapper errors={errors} help={help} helpId={helpId}>
-        <Collapsible
-          label={label}
-          labelId={labelId}
-          summary={summary ?? NOT_SET}
-          invalidCount={invalidCount}
-          open={open}
-          onOpenChange={onOpenChange}
-          disabled={disabled}
-          readOnly={readOnly}
-          onHeaderFocus={onHeaderFocus}
-        >
-          <div role='group' aria-labelledby={labelId}>
-            {children}
-          </div>
-        </Collapsible>
-      </FieldWrapper>
-    );
-  }
+function CollapsibleLook(props: LookProps) {
+  const {
+    label,
+    labelId,
+    required,
+    summary,
+    invalidCount,
+    disabled,
+    readOnly,
+  } = props;
+  return (
+    <Frame {...props}>
+      <CollapsibleSection
+        label={label}
+        labelId={labelId}
+        required={required}
+        summary={summary ?? NOT_SET}
+        invalidCount={invalidCount}
+        open={props.open ?? false}
+        onOpenChange={props.onOpenChange ?? noop}
+        disabled={disabled}
+        readOnly={readOnly}
+        onHeaderFocus={props.onHeaderFocus}
+      >
+        <div role='group' aria-labelledby={labelId}>
+          {props.children}
+        </div>
+      </CollapsibleSection>
+    </Frame>
+  );
+}
 
+function FieldsetLook(props: LookProps) {
   return (
     <FieldWrapper
-      label={label}
-      labelId={labelId}
-      required={required}
-      errors={errors}
-      help={help}
-      helpId={helpId}
-      disabled={disabled}
+      label={props.label}
+      labelId={props.labelId}
+      required={props.required}
+      errors={props.errors}
+      help={props.help}
+      helpId={props.helpId}
+      disabled={props.disabled}
+      data-read-only={props.readOnly || undefined}
     >
-      <div role='group' aria-labelledby={labelId} className='min-w-0'>
-        {children}
+      <div role='group' aria-labelledby={props.labelId} className='min-w-0'>
+        {props.children}
       </div>
     </FieldWrapper>
   );
+}
+
+const LOOKS: Record<ObjectDisplay, (props: LookProps) => ReactNode> = {
+  fieldset: FieldsetLook,
+  collapsible: CollapsibleLook,
+  drillIn: DrillInLook,
+};
+
+const noop = () => {};
+
+/** The three looks of an object field. It reads no store; the connected field feeds it. */
+export function ObjectFieldView(props: ObjectFieldViewProps) {
+  if (props.inPlace) return <InPlaceLook {...props} />;
+  const Look = LOOKS[props.display];
+  return <Look {...props} />;
 }

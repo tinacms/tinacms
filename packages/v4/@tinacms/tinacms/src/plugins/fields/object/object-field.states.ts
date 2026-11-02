@@ -14,6 +14,15 @@ export const objectFieldStates = [
   { name: 'fieldset', props: base },
   { name: 'fieldset invalid', props: { ...base, errors: ['SEO is required'] } },
   { name: 'fieldset long label', props: { ...base, label: longLabel } },
+  {
+    name: 'fieldset unbroken label',
+    props: {
+      ...base,
+      label:
+        'search-engine-and-social-sharing-details-for-every-region-and-language',
+    },
+  },
+  { name: 'fieldset required', props: { ...base, required: true } },
   { name: 'fieldset disabled', props: { ...base, disabled: true } },
   { name: 'fieldset read-only', props: { ...base, readOnly: true } },
   {
@@ -23,6 +32,16 @@ export const objectFieldStates = [
       display: 'collapsible',
       open: false,
       summary: 'Home page',
+    },
+  },
+  {
+    name: 'collapsible closed required',
+    props: {
+      ...base,
+      display: 'collapsible',
+      open: false,
+      summary: 'Home page',
+      required: true,
     },
   },
   {
@@ -85,6 +104,15 @@ export const objectFieldStates = [
   {
     name: 'drill-in filled',
     props: { ...base, display: 'drillIn', summary: 'Home page' },
+  },
+  {
+    name: 'drill-in required',
+    props: {
+      ...base,
+      display: 'drillIn',
+      summary: 'Home page',
+      required: true,
+    },
   },
   { name: 'drill-in empty', props: { ...base, display: 'drillIn' } },
   {

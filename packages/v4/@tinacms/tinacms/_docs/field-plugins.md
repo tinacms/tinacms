@@ -118,6 +118,14 @@ The properties of the descriptor:
 - `metadata.layout` — The layout hint: `inline` or `block`.
 - `metadata.labelable` — Set it to `false` to hide the outer field label. The
   `rich-text` field sets it to `false` because it renders its own label area.
+- `metadata.drillable` — Set it to `true` when the field can open as its own form
+  level. The editor drills in at nesting depth 3 and deeper.
+- `metadata.drillsIn(node)` — Overrides the depth rule for one node. `true`
+  drills in, `false` opens in place, `undefined` keeps the depth rule. The
+  `object` field returns it from `display`.
+- `DrillInComponent` — Draws the field in place of the drill-in button when the
+  field drills in. Without it, the editor draws its generic button. The `object`
+  field supplies a card.
 - `schema(node)` — It returns a Zod schema for the validation in layer 1.
 - `isEmpty(value)` — What the built-in `required` validator asks of this field
   type. Declare it when the generic check is wrong.

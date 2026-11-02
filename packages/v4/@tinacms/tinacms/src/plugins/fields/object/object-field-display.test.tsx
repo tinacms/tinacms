@@ -16,6 +16,7 @@ import { t } from '../../../index';
 import { required } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
 import arrayFieldPlugin from '../array/array-field.plugin';
+import booleanFieldPlugin from '../boolean/boolean-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import objectFieldPlugin from './object-field.plugin';
 import { type ObjectDisplay, displayOf } from './object-field.schema';
@@ -24,6 +25,7 @@ const PLUGINS = [
   objectFieldPlugin,
   arrayFieldPlugin,
   stringFieldPlugin,
+  booleanFieldPlugin,
   coreValidatorsPlugin,
 ];
 
@@ -202,6 +204,47 @@ describe('object display', () => {
     await userEvent.click(header());
     await waitFor(() => expect(badge()).toHaveTextContent('1'));
     expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('reopens a collapsible that was folded by hand when the same field is activated again', async () => {
+    renderForm(
+      collectionWith(undefined, 'collapsible'),
+      undefined,
+      <Activate address='seo.title' />
+    );
+    const activate = await screen.findByRole('button', {
+      name: 'activate seo.title',
+    });
+    await userEvent.click(activate);
+    await screen.findByLabelText(/^Title\b/);
+    await userEvent.click(screen.getByRole('button', { name: /SEO/ }));
+    expect(screen.queryByLabelText(/^Title\b/)).toBeNull();
+
+    await userEvent.click(activate);
+    expect(await screen.findByLabelText(/^Title\b/)).toBeVisible();
+  });
+
+  it('shows Not set and the required mark for a required object with no text field', async () => {
+    renderForm(
+      {
+        name: 'page',
+        label: 'Pages',
+        format: 'mdx',
+        fields: [
+          t.object({
+            name: 'flags',
+            label: 'Flags',
+            display: 'collapsible',
+            validators: [required()],
+            fields: [t.boolean({ name: 'on', label: 'On' })],
+          }),
+        ],
+      },
+      { flags: { on: true } }
+    );
+    const header = await screen.findByRole('button', { name: /Flags/ });
+    expect(header).toHaveTextContent('Not set');
+    expect(header).toHaveTextContent('(required)');
   });
 
   it('keeps the depth rule for a plugin with no drillsIn, and lets drillsIn override it', () => {

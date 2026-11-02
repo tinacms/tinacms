@@ -86,22 +86,29 @@ export const drillsInAt = (
   return metadata.drillsIn?.(node) ?? fieldDepth(address) >= DRILL_DEPTH;
 };
 
+// The failing fields that show an error, innermost only: a parent whose
+// deeper error is also revealed counts through that deeper error.
+const revealedLeaves = (
+  view: Pick<FormViewState, 'touched' | 'saveAttempted'>,
+  errorAddresses: readonly string[]
+): string[] => {
+  const revealed = errorAddresses.filter((key) => isRevealed(view, key));
+  return revealed.filter(
+    (key) => !revealed.some((other) => other.startsWith(`${key}.`))
+  );
+};
+
+const isWithin = (key: string, address: string): boolean =>
+  key === address || key.startsWith(`${address}.`);
+
 export const holdsRevealedError = (
   view: Pick<FormViewState, 'touched' | 'saveAttempted'>,
   errorAddresses: readonly string[],
   address?: string
-): boolean => {
-  const own = errorAddresses.filter(
-    (key) => !errorAddresses.some((other) => other.startsWith(`${key}.`))
+): boolean =>
+  revealedLeaves(view, errorAddresses).some(
+    (key) => address === undefined || isWithin(key, address)
   );
-  return own.some(
-    (key) =>
-      (address === undefined ||
-        key === address ||
-        key.startsWith(`${address}.`)) &&
-      isRevealed(view, key)
-  );
-};
 
 // How many fields under `address` hold a revealed error. Counts each failing
 // field once, however many messages it has.
@@ -110,12 +117,8 @@ export const countRevealedErrors = (
   errorAddresses: readonly string[],
   address: string
 ): number =>
-  errorAddresses.filter(
-    (key) =>
-      (key === address || key.startsWith(`${address}.`)) &&
-      !errorAddresses.some((other) => other.startsWith(`${key}.`)) &&
-      isRevealed(view, key)
-  ).length;
+  revealedLeaves(view, errorAddresses).filter((key) => isWithin(key, address))
+    .length;
 
 // Every named field on the way to `address`, the field itself last.
 export const fieldsAlong = (

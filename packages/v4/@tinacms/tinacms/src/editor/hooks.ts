@@ -200,6 +200,14 @@ export function useStaleDraft(): StaleDraftActions | null {
     .staleDraft;
 }
 
+/** The current activation. Each `setActive` call makes a new one, even for the same address. */
+export function useActivation() {
+  const formId = useFormId();
+  return useFormStore((state) =>
+    state.active?.formId === formId ? state.active : null
+  );
+}
+
 export interface ActiveField {
   active: FieldAddress | null;
   setActive: (address: FieldAddress | null) => void;

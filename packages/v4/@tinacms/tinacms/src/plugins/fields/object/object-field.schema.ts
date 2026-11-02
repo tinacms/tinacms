@@ -16,6 +16,9 @@ export const OBJECT_DISPLAYS: readonly ObjectDisplay[] = [
   'drillIn',
 ];
 
+export const isObjectDisplay = (value: unknown): value is ObjectDisplay =>
+  OBJECT_DISPLAYS.some((display) => display === value);
+
 export interface ObjectFieldSchema extends BaseFieldSchema {
   type: typeof OBJECT_FIELD_TYPE;
   fields: FieldSchema[];

@@ -17,9 +17,9 @@ import {
 } from '../core/validator/registry';
 import { ARRAY_FIELD_TYPE } from '../plugins/fields/array/array-field.schema';
 import {
+  isObjectDisplay,
   OBJECT_DISPLAYS,
   OBJECT_FIELD_TYPE,
-  type ObjectDisplay,
 } from '../plugins/fields/object/object-field.schema';
 import { type PackageVersion, packageVersion } from './package-version';
 
@@ -195,7 +195,7 @@ const assertObjectDisplays = (collections: CollectionSchema[]): void => {
       if (node.type !== OBJECT_FIELD_TYPE || !('display' in node)) continue;
       if (node.display === undefined) continue;
       invariant(
-        OBJECT_DISPLAYS.includes(node.display as ObjectDisplay),
+        isObjectDisplay(node.display),
         'schema-object-display-invalid',
         `The object "${String(node.name)}" in collection "${collection.name}" sets "display" to ${JSON.stringify(node.display)}. "display" takes ${OBJECT_DISPLAYS.map((display) => `"${display}"`).join(', ')}.`
       );

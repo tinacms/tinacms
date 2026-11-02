@@ -1,7 +1,10 @@
 import { type ComponentProps, type ReactNode, useId } from 'react';
 
 import { Badge } from '@tinacms/ui/components/badge';
-import { invalidWords } from '@tinacms/ui/components/collapsible';
+import {
+  invalidWords,
+  RequiredMark,
+} from '@tinacms/ui/components/collapsible-section';
 import { Icon } from '@tinacms/ui/components/icon';
 import { cn } from '@tinacms/ui/lib/utils';
 
@@ -10,6 +13,8 @@ type DrillInCardProps = Omit<
   'children' | 'title' | 'type'
 > & {
   label: string;
+  /** Shows a red asterisk after the label. */
+  required?: boolean;
   /** A short line under the label. */
   summary?: ReactNode;
   /** The red count of invalid fields inside. 0 shows nothing. */
@@ -25,6 +30,7 @@ type DrillInCardProps = Omit<
  */
 function DrillInCard({
   label,
+  required = false,
   summary,
   invalidCount = 0,
   readOnly = false,
@@ -56,6 +62,7 @@ function DrillInCard({
     >
       <span className='flex min-w-0 flex-1 items-baseline gap-1.5'>
         <span className='min-w-0 truncate text-base font-medium'>{label}</span>
+        {required ? <RequiredMark /> : null}
         {summary ? (
           <span className='min-w-0 flex-1 truncate text-sm leading-4.5 text-muted-foreground'>
             {summary}

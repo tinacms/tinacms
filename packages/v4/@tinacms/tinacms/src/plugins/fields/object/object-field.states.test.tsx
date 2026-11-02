@@ -22,48 +22,92 @@ const renderView = (props: ObjectFieldViewProps) =>
     </ObjectFieldView>
   );
 
+const ofLook = (display: ObjectFieldViewProps['display']) =>
+  states.filter(({ props }) => props.display === display);
+
+const countWords = (count: number) =>
+  `${count} invalid ${count === 1 ? 'field' : 'fields'}`;
+
+function expectDrillInCard(props: ObjectFieldViewProps) {
+  const card = screen.getByRole('button', {
+    name: `Open ${props.label as string}`,
+  });
+  const count = props.invalidCount ?? 0;
+  expect(card).toHaveTextContent(props.summary ?? NOT_SET);
+  expect(screen.queryByLabelText('Title')).toBeNull();
+  if (count > 0) {
+    expect(card).toHaveAccessibleDescription(countWords(count));
+  } else {
+    expect(card).not.toHaveAccessibleDescription();
+  }
+}
+
+function expectCollapsible(props: ObjectFieldViewProps) {
+  const count = props.invalidCount ?? 0;
+  const header = screen.getByRole('button', { expanded: !!props.open });
+  expect(header).toHaveTextContent(props.label as string);
+  expect(!!screen.queryByLabelText('Title')).toBe(!!props.open);
+  if (props.open) {
+    expect(header).not.toHaveTextContent(NOT_SET);
+    expect(header.querySelector('[data-slot=badge]')).toBeNull();
+    return;
+  }
+  expect(header).toHaveTextContent(props.summary ?? NOT_SET);
+  expect(header.querySelector('[data-slot=badge]') !== null).toBe(count > 0);
+}
+
 describe('object field states', () => {
-  it.each(states)('renders $name', ({ props }) => {
+  it.each(states)(
+    'renders $name without unsaved marks or tooltips',
+    ({ props }) => {
+      renderView(props);
+      expect(screen.queryByText(/unsaved/i)).toBeNull();
+      expect(screen.queryByRole('alert') !== null).toBe(!!props.errors?.length);
+      expect(document.querySelector('[title]')).toBeNull();
+      expect(screen.queryByText('(required)') !== null).toBe(!!props.required);
+    }
+  );
+
+  it.each(ofLook('drillIn'))('draws $name as a card', ({ props }) => {
     renderView(props);
-    const label = props.label as string;
-    const count = props.invalidCount ?? 0;
-    expect(screen.queryByText(/unsaved/i)).toBeNull();
-    expect(screen.queryByRole('alert') !== null).toBe(!!props.errors?.length);
-    expect(document.querySelector('[title]')).toBeNull();
+    expectDrillInCard(props);
+  });
 
-    if (props.display === 'drillIn') {
-      const card = screen.getByRole('button', { name: `Open ${label}` });
-      expect(card).toHaveTextContent(props.summary ?? NOT_SET);
-      expect(screen.queryByLabelText('Title')).toBeNull();
-      if (count > 0) {
-        expect(card).toHaveAccessibleDescription(
-          `${count} invalid ${count === 1 ? 'field' : 'fields'}`
-        );
-      } else {
-        expect(card).not.toHaveAccessibleDescription();
-      }
-      return;
+  it.each(ofLook('collapsible'))('draws $name as a header', ({ props }) => {
+    renderView(props);
+    expectCollapsible(props);
+  });
+
+  it.each(ofLook('fieldset'))(
+    'draws $name as a labelled group',
+    ({ props }) => {
+      renderView(props);
+      expect(
+        screen.getByRole('group', {
+          name: (name) => name.startsWith(props.label as string),
+        })
+      ).toContainElement(screen.getByLabelText('Title'));
     }
+  );
 
-    if (props.display === 'collapsible') {
-      const header = screen.getByRole('button', { expanded: !!props.open });
-      expect(header).toHaveTextContent(label);
-      expect(!!screen.queryByLabelText('Title')).toBe(!!props.open);
-      if (props.open) {
-        expect(header).not.toHaveTextContent(NOT_SET);
-        expect(header.querySelector('[data-slot=badge]')).toBeNull();
-      } else {
-        expect(header).toHaveTextContent(props.summary ?? NOT_SET);
-        expect(header.querySelector('[data-slot=badge]') !== null).toBe(
-          count > 0
-        );
-      }
-      return;
-    }
-
-    expect(screen.getByRole('group', { name: label })).toContainElement(
-      screen.getByLabelText('Title')
+  it('marks a read-only fieldset for its slots', () => {
+    renderView({ display: 'fieldset', label: 'SEO', readOnly: true });
+    expect(document.querySelector('[data-slot=field-wrapper]')).toHaveAttribute(
+      'data-read-only',
+      'true'
     );
+  });
+
+  it('names a drill-in card by the field name when the label is not text', () => {
+    render(
+      <ObjectFieldView
+        display='drillIn'
+        name='seo'
+        label={<em>SEO</em>}
+        onDrillIn={() => {}}
+      />
+    );
+    expect(screen.getByRole('button', { name: 'Open seo' })).toBeVisible();
   });
 
   it.each(states.filter(inert))('never opens when $name', async ({ props }) => {
