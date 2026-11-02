@@ -101,7 +101,8 @@ const renderField = (
   document?: TinaDocument,
   media: MediaProvider = createMedia(),
   schema: CollectionSchema = collection,
-  extra?: ReactNode
+  extra?: ReactNode,
+  morePlugins: PluginManifest[] = []
 ) =>
   render(
     <TinaProvider
@@ -113,6 +114,7 @@ const renderField = (
           contentPlugin(),
           mediaPlugin(media),
           coreValidatorsPlugin,
+          ...morePlugins,
         ],
         schema: { collections: [schema] },
       })}
@@ -517,6 +519,32 @@ describe('ImageField gallery', () => {
     renderField(images ? { images } : undefined, media, galleryCollection);
 
   const gallery = () => fieldGroup('Images');
+
+  it('draws the list view of an overriding image plugin', async () => {
+    const override = definePlugin({
+      name: 'custom:image',
+      provides: ['field'],
+      overrides: [{ capability: 'field', key: 'image' }],
+      field: { type: 'image', contractVersion: 1 },
+      client: async () => ({
+        default: {
+          field: {
+            Component: () => null,
+            ListView: () => <p>Custom image list</p>,
+          },
+        },
+      }),
+    });
+    renderField(
+      { images: ['a/one.jpg'] },
+      createMedia(),
+      galleryCollection,
+      undefined,
+      [override]
+    );
+    expect(await screen.findByText('Custom image list')).toBeVisible();
+    expect(screen.queryByRole('figure')).not.toBeInTheDocument();
+  });
 
   it('shows a tile for each image and an Add images tile', async () => {
     renderGallery(['a/one.jpg', 'b/two.jpg']);

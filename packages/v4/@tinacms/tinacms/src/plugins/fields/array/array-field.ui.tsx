@@ -30,8 +30,7 @@ import {
   itemFieldsOf,
   pickerOf,
 } from './array-field.schema';
-import { IMAGE_FIELD_TYPE, isMediaPath } from '../image/image-field.schema';
-import { ImageGallery } from '../image/image-gallery.ui';
+import { isMediaPath } from '../image/image-field.schema';
 import { StoredValue, UneditableValue } from '../uneditable-value';
 
 export function ArrayField() {
@@ -52,10 +51,12 @@ function ItemList() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
   const frame = useFieldFrame();
+  const registry = useFieldRegistry();
+  const ListView = isScalarArray(field)
+    ? registry.get(field.of.type)?.ListView
+    : undefined;
 
-  if (isScalarArray(field) && field.of.type === IMAGE_FIELD_TYPE) {
-    return <ImageGallery />;
-  }
+  if (ListView) return <ListView />;
 
   return (
     <FieldWrapper {...frame}>

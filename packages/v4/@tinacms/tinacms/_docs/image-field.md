@@ -202,7 +202,7 @@ until the author replaces or removes it.
 
 ### The gallery
 
-A list of images renders `ImageGallery` (`image-gallery.ui.tsx`) in place of
+A list of images renders `ImageGallery` (`image-gallery.ui.tsx`, the image descriptor's `ListView`) in place of
 the generic scalar list: square tiles three across and an "Add images" tile at
 the end. It has one wrapper and one picker. "Add images" appends only after a
 pick, and each pick adds one image. Remove splices the item out, so the saved
@@ -214,8 +214,10 @@ Focus stays on the moved tile, and a polite live region says "Moved {file} to
 position N of M". The generic "Move item" and "Remove item" row buttons do not
 apply to the gallery.
 
-The gallery keys on `of.type === 'image'`, so a site that overrides the stock
-`image` plugin still gets the stock gallery inside arrays.
+The gallery is the `ListView` of the image descriptor. The array field asks the
+registry for `ListView` on `of.type`, so a site that overrides the stock `image`
+plugin replaces the gallery too. An override without a `ListView` gets one
+row per item.
 
 ### Activation
 
