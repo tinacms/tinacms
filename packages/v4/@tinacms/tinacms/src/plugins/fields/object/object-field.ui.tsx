@@ -23,7 +23,9 @@ import { UneditableValue } from '../uneditable-value';
 import {
   asObjectFieldSchema,
   displayOf,
+  firstText,
   isPlainObject,
+  summaryFieldsOf,
 } from './object-field.schema';
 import { ObjectFieldView } from './object-field.view';
 
@@ -56,15 +58,10 @@ function useSummary(
   address: string,
   fields: ReturnType<typeof asObjectFieldSchema>['fields']
 ): string | undefined {
-  const texts = fields.filter(
-    (field) => !field.hidden && field.type === 'string'
-  );
   const values: unknown[] = useWatch({
-    name: texts.map((field) => `${address}.${field.name}`),
+    name: summaryFieldsOf(fields).map((field) => `${address}.${field.name}`),
   });
-  return values.find(
-    (entry): entry is string => typeof entry === 'string' && entry.trim() !== ''
-  );
+  return firstText(values);
 }
 
 // What the object shows about itself: its own errors only (each child shows

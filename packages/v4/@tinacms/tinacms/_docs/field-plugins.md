@@ -125,7 +125,8 @@ The properties of the descriptor:
   `object` field returns it from `display`.
 - `DrillInComponent` — Draws the field in place of the drill-in button when the
   field drills in. Without it, the editor draws its generic button. The `object`
-  field supplies a card.
+  and `array` fields supply a card. The items of an `array` also open as a form
+  level, one level below the array (see [the array field](./array-field.md#opening-an-item)).
 - `schema(node)` — It returns a Zod schema for the validation in layer 1.
 - `isEmpty(value)` — What the built-in `required` validator asks of this field
   type. Declare it when the generic check is wrong.

@@ -1,25 +1,59 @@
 import { AddButton } from '@tinacms/ui/components/add-button';
 import { Button } from '@tinacms/ui/components/button';
-import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { type ReactNode, useRef, useState } from 'react';
-import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
-import type { FieldAddress } from '../../../core/field/address';
-import { seedItem } from './seed-item';
-import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
+import {
+  use,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+  type RefObject,
+} from 'react';
+import {
+  get,
+  useFieldArray,
+  useFormContext,
+  useFormState,
+  useWatch,
+} from 'react-hook-form';
+import { useShallow } from 'zustand/react/shallow';
+import { useStore } from 'zustand';
+import { type FieldAddress, toFieldAddress } from '../../../core/field/address';
+import { invariant } from '../../../core/invariant';
+import {
+  customItemLabel,
+  itemHeadingOf,
+  TEMPLATE_KEY,
+  templateFor,
+  templateTitle,
+} from '../../../core/schema/children';
 import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
 import {
   NestedFieldRow,
+  useActivation,
   useDocumentPath,
   useFieldAddress,
   useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
+  useFormErrors,
+  useFormId,
   useMediaSlice,
 } from '../../../editor';
+import { FormScopeContext } from '../../../editor/context';
+import { ownFieldErrors } from '../../../editor/field-errors';
+import {
+  countRevealedErrors,
+  isRevealed,
+  itemLevel,
+  itemOpensNextLevel,
+} from '../../../editor/form-view-state';
+import { isMediaPath } from '../image/image-field.schema';
+import { limitOf } from '../number/number-field.step';
+import { firstText, summaryFieldsOf } from '../object/object-field.schema';
+import { StoredValue, UneditableValue } from '../uneditable-value';
 import {
   type ArrayTemplateSchema,
-  type ItemLabel,
   type ObjectArrayFieldSchema,
   type ScalarArrayFieldSchema,
   type TemplatesArrayFieldSchema,
@@ -30,12 +64,16 @@ import {
   itemFieldsOf,
   pickerOf,
 } from './array-field.schema';
-import { isMediaPath } from '../image/image-field.schema';
-import { StoredValue, UneditableValue } from '../uneditable-value';
+import { seedItem } from './seed-item';
+import {
+  ArrayDrillInView,
+  ArrayFieldView,
+  type ArrayItemView,
+  FULL_REASON,
+} from './array-field.view';
 
 export function ArrayField() {
   const address = useFieldAddress();
-  const field = asArrayFieldSchema(useFieldSchema());
   const [value] = useFieldValue<unknown>(address);
   return value == null || Array.isArray(value) ? (
     <ItemList />
@@ -47,148 +85,340 @@ export function ArrayField() {
   );
 }
 
+function useScope() {
+  const scope = use(FormScopeContext);
+  invariant(
+    scope,
+    'array-field-outside-provider',
+    'The array field must be used within a FormProvider'
+  );
+  return scope;
+}
+
 function ItemList() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
   const frame = useFieldFrame();
-
-  return (
-    <FieldWrapper {...frame}>
-      {isScalarArray(field) ? (
-        <ScalarItems address={address} field={field} />
-      ) : (
-        <ObjectItems address={address} field={field} />
-      )}
-    </FieldWrapper>
+  const { htmlFor: _htmlFor, ...shown } = frame;
+  return isScalarArray(field) ? (
+    <ScalarItems address={address} field={field} frame={shown} />
+  ) : (
+    <ObjectItems address={address} field={field} frame={shown} />
   );
 }
 
+type Frame = Omit<ReturnType<typeof useFieldFrame>, 'htmlFor'>;
+
 interface ItemListProps {
   address: FieldAddress;
+  frame: Frame;
 }
+
+interface Pending {
+  /** Open this item once it exists. */
+  open?: number;
+  /** Move focus to this item's grip, or to the add control. */
+  focus: number | 'add';
+}
+
+// A list change lands on the next render. This waits for it, then opens the
+// new item and puts focus where the editor was working.
+function useAfterChange(
+  changed: unknown,
+  onOpen?: (index: number) => void
+): {
+  listRef: RefObject<HTMLDivElement | null>;
+  afterChange: (pending: Pending) => void;
+} {
+  const listRef = useRef<HTMLDivElement>(null);
+  const pending = useRef<Pending | undefined>(undefined);
+  const open = useEffectEvent((index: number) => onOpen?.(index));
+  useEffect(() => {
+    const todo = pending.current;
+    if (!todo || changed === undefined) return;
+    pending.current = undefined;
+    if (todo.open !== undefined) open(todo.open);
+    const list = listRef.current;
+    if (todo.focus === 'add') {
+      list
+        ?.querySelector<HTMLElement>(
+          '[data-slot=add-button], [data-slot=add-input] input'
+        )
+        ?.focus();
+    } else {
+      list?.querySelectorAll<HTMLElement>('[data-grip]')[todo.focus]?.focus();
+    }
+  }, [changed]);
+  return {
+    listRef,
+    afterChange: (next) => {
+      pending.current = next;
+    },
+  };
+}
+
+// Where focus goes after item `index` leaves a list that now holds `left` items.
+const focusAfterRemove = (index: number, left: number): Pending['focus'] =>
+  left === 0 ? 'add' : Math.min(index, left - 1);
 
 function ObjectItems({
   address,
   field,
-}: ItemListProps & {
-  field: ObjectArrayFieldSchema;
-}) {
+  frame,
+}: ItemListProps & { field: ObjectArrayFieldSchema }) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
+  const scope = useScope();
+  const activation = useActivation();
   const { control, getValues } = useFormContext();
   const {
     fields: items,
     append,
+    insert,
     remove,
     move,
   } = useFieldArray({ control, name: address });
   // Subscribes the headings to edits, so an `itemLabel` follows typing.
   const watched: unknown = useWatch({ control, name: address });
+  const flat = useFormErrors(useFormId());
+  const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
+  const [picking, setPicking] = useState<number | null>(null);
+  const { listRef, afterChange } = useAfterChange(items, (index) => {
+    const id = items[index]?.id;
+    if (id) setOpen((held) => new Set(held).add(id));
+  });
+  const max = limitOf(field, 'max');
+  const full = max !== undefined && items.length >= max;
+
+  const counts = useStore(
+    scope.view,
+    useShallow((state) =>
+      items.map((_, index) =>
+        countRevealedErrors(state, Object.keys(flat), `${address}.${index}`)
+      )
+    )
+  );
+
+  const openOnActivation = useEffectEvent((target: string) => {
+    items.forEach((item, index) => {
+      if (target.startsWith(`${address}.${index}.`)) {
+        setOpen((held) => new Set(held).add(item.id));
+      }
+    });
+  });
+  useEffect(() => {
+    if (activation) openOnActivation(activation.address);
+  }, [activation]);
 
   const seed = (defaultItem: TinaDocument | undefined, fields: FieldSchema[]) =>
     seedItem(defaultItem, fields, { documentPath, registry });
-  const addFieldsItem = (
-    fields: FieldSchema[],
-    defaultItem: TinaDocument | undefined
-  ) => append(seed(defaultItem, fields));
-  const addTemplateItem = (template: ArrayTemplateSchema) =>
-    append({
-      [TEMPLATE_KEY]: template.name,
-      ...seed(template.defaultItem, template.fields),
-    });
+  const seedFor = (template?: ArrayTemplateSchema): TinaDocument =>
+    template
+      ? {
+          [TEMPLATE_KEY]: template.name,
+          ...seed(template.defaultItem, template.fields),
+        }
+      : seed(
+          isTemplatesArray(field) ? undefined : field.defaultItem,
+          isTemplatesArray(field) ? [] : field.fields
+        );
+
+  const insertAt = (index: number, template?: ArrayTemplateSchema) => {
+    afterChange({ open: index, focus: index });
+    insert(index, seedFor(template));
+    setPicking(null);
+  };
+  const add = (template?: ArrayTemplateSchema) => {
+    afterChange({ open: items.length, focus: items.length });
+    append(seedFor(template));
+  };
+  const moveTo = (from: number, to: number) => {
+    if (to < 0 || to >= items.length) return;
+    afterChange({ focus: to });
+    move(from, to);
+  };
+
+  const views: ArrayItemView[] = items.map((item, index) => {
+    const itemAddress = `${address}.${index}`;
+    const stored: unknown = getValues(itemAddress);
+    // The watched copy only re-renders the heading; it can lag a move.
+    const watchedItem: unknown = Array.isArray(watched)
+      ? watched[index]
+      : stored;
+    const current = isItem(watchedItem)
+      ? watchedItem
+      : isItem(stored)
+        ? stored
+        : undefined;
+    const fields = isItem(stored) ? itemFieldsOf(field, stored) : undefined;
+    const template =
+      isTemplatesArray(field) && current
+        ? templateFor(field.templates, current)
+        : undefined;
+    const heading = itemHeadingOf(field, current ?? watchedItem, index);
+
+    let title: string | undefined;
+    let summary: string | undefined = heading;
+    if (fields && current) {
+      const custom = customItemLabel(template ?? field, current);
+      const text = firstText(
+        summaryFieldsOf(fields).map((subfield) => current[subfield.name])
+      );
+      title = template ? (custom ?? templateTitle(template)) : undefined;
+      summary = template ? (custom ? undefined : text) : (custom ?? text);
+    }
+
+    const opens =
+      fields && itemOpensNextLevel(itemAddress) ? 'next-level' : 'in-place';
+    return {
+      id: item.id,
+      name: `Item ${index + 1}`,
+      kind: 'group',
+      title,
+      summary,
+      opens,
+      open: open.has(item.id),
+      errorCount: counts[index],
+      onToggle: () => {
+        if (opens === 'next-level' && fields) {
+          scope.view
+            .getState()
+            .openLevel(itemLevel(itemAddress, heading, fields));
+          return;
+        }
+        setOpen((held) => {
+          const next = new Set(held);
+          if (!next.delete(item.id)) next.add(item.id);
+          return next;
+        });
+      },
+      children: fields ? (
+        fields.map((subfield) => (
+          <NestedFieldRow
+            key={subfield.name}
+            address={`${itemAddress}.${subfield.name}`}
+            node={subfield}
+          />
+        ))
+      ) : (
+        <div className='flex flex-col gap-2'>
+          <p className='text-sm text-muted-foreground'>
+            {isItem(stored)
+              ? "This block's template is not in the config. It is saved unchanged. Remove it, or add the template back."
+              : 'This item is not an object, so it cannot be edited here. Remove it to save the list.'}
+          </p>
+          <StoredValue value={stored} />
+        </div>
+      ),
+    };
+  });
+
+  const insertTarget = (index: number, where: 'above' | 'below') =>
+    where === 'above' ? index : index + 1;
 
   return (
-    <>
-      <div
-        role='group'
-        aria-labelledby={`${address}-label`}
-        className='flex flex-col gap-3'
-      >
-        {items.map((item, index) => {
-          const stored: unknown = getValues(`${address}.${index}`);
-          // The watched copy only re-renders the heading; it can lag a move.
-          const shown: unknown = Array.isArray(watched)
-            ? watched[index]
-            : stored;
-          const fields = isItem(stored)
-            ? itemFieldsOf(field, stored)
-            : undefined;
-          return (
-            <ItemRow
-              key={item.id}
-              heading={headingOf(field, shown, index)}
-              index={index}
-              count={items.length}
-              onMove={move}
-              onRemove={remove}
-            >
-              {fields ? (
-                fields.map((subfield) => (
-                  <NestedFieldRow
-                    key={subfield.name}
-                    address={`${address}.${index}.${subfield.name}`}
-                    node={subfield}
-                  />
-                ))
-              ) : (
-                <div className='flex flex-col gap-2'>
-                  <p className='text-sm text-muted-foreground'>
-                    {isItem(stored)
-                      ? "This block's template is not in the config. It is saved unchanged. Remove it, or add the template back."
-                      : 'This item is not an object, so it cannot be edited here. Remove it to save the list.'}
-                  </p>
-                  <StoredValue value={stored} />
-                </div>
-              )}
-            </ItemRow>
-          );
-        })}
-      </div>
-      <div className='mt-3 flex flex-wrap gap-2'>
-        {isTemplatesArray(field) ? (
-          <TemplatePicker field={field} onAdd={addTemplateItem} />
-        ) : (
-          <AddButton
-            onClick={() => addFieldsItem(field.fields, field.defaultItem)}
-          >
-            Add item
-          </AddButton>
-        )}
-      </div>
-    </>
+    <ArrayFieldView
+      {...frame}
+      listRef={listRef}
+      items={views}
+      full={full}
+      add='button'
+      addLabel='Add item'
+      onAdd={() => add()}
+      addSlot={
+        isTemplatesArray(field) ? (
+          <TemplatePicker field={field} full={full} onPick={add} />
+        ) : undefined
+      }
+      inserting={
+        picking !== null && isTemplatesArray(field)
+          ? {
+              index: picking,
+              content: (
+                <TemplatePicker
+                  field={field}
+                  onPick={(template) => insertAt(picking, template)}
+                  onCancel={() => setPicking(null)}
+                />
+              ),
+            }
+          : undefined
+      }
+      onMove={moveTo}
+      onInsert={(index, where) => {
+        const at = insertTarget(index, where);
+        if (isTemplatesArray(field)) setPicking(at);
+        else insertAt(at);
+      }}
+      onDuplicate={(index) => {
+        afterChange({ open: index + 1, focus: index + 1 });
+        insert(index + 1, structuredClone(getValues(`${address}.${index}`)));
+      }}
+      onRemove={(index) => {
+        afterChange({ focus: focusAfterRemove(index, items.length - 1) });
+        remove(index);
+      }}
+    />
   );
 }
 
 function TemplatePicker({
   field,
-  onAdd,
+  full = false,
+  onPick,
+  onCancel,
 }: {
   field: TemplatesArrayFieldSchema;
-  onAdd: (template: ArrayTemplateSchema) => void;
+  full?: boolean;
+  onPick: (template: ArrayTemplateSchema) => void;
+  onCancel?: () => void;
 }) {
+  const cancel = onCancel ? (
+    <Button type='button' variant='outline' size='sm' onClick={onCancel}>
+      Cancel
+    </Button>
+  ) : null;
+  const reason = full ? (
+    <p className='px-1 text-sm text-muted-foreground'>{FULL_REASON}</p>
+  ) : null;
   if (pickerOf(field) === 'list') {
-    return field.templates.map((template) => (
-      <AddButton key={template.name} onClick={() => onAdd(template)}>
-        {`Add ${labelOf(template)}`}
-      </AddButton>
-    ));
+    return (
+      <div className='flex flex-col gap-1'>
+        {field.templates.map((template) => (
+          <AddButton
+            key={template.name}
+            disabled={full}
+            onClick={() => onPick(template)}
+          >
+            {`Add ${templateTitle(template)}`}
+          </AddButton>
+        ))}
+        {reason}
+        {cancel}
+      </div>
+    );
   }
   return (
-    <div className='grid w-full grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2'>
-      {field.templates.map((template) => (
-        <button
-          key={template.name}
-          type='button'
-          aria-label={`Add ${labelOf(template)}`}
-          className='flex flex-col gap-2 rounded-sm border p-2 text-left text-sm hover:border-input focus-visible:shadow-focus-ring'
-          onClick={() => onAdd(template)}
-        >
-          {template.previewImage ? (
-            <PreviewImage path={template.previewImage} />
-          ) : null}
-          <span className='font-medium'>{labelOf(template)}</span>
-        </button>
-      ))}
+    <div className='flex flex-col gap-2'>
+      <div className='grid w-full grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2'>
+        {field.templates.map((template) => (
+          <button
+            key={template.name}
+            type='button'
+            disabled={full}
+            aria-label={`Add ${templateTitle(template)}`}
+            className='flex flex-col gap-2 rounded-sm border bg-card p-2 text-left text-sm hover:border-input focus-visible:shadow-focus-ring disabled:opacity-60'
+            onClick={() => onPick(template)}
+          >
+            {template.previewImage ? (
+              <PreviewImage path={template.previewImage} />
+            ) : null}
+            <span className='font-medium'>{templateTitle(template)}</span>
+          </button>
+        ))}
+      </div>
+      {reason}
+      {cancel}
     </div>
   );
 }
@@ -218,15 +448,35 @@ function ResolvedPreview({
   );
 }
 
+// A string without a box shape, or a number, edits in the card's own box.
+// Every other type keeps its widget.
+const boxTypeOf = (of: FieldSchema): 'text' | 'number' | undefined => {
+  if (of.type === 'number') return 'number';
+  const shape = of as FieldSchema & { multiline?: boolean; mono?: boolean };
+  return of.type === 'string' && !shape.multiline && !shape.mono
+    ? 'text'
+    : undefined;
+};
+
 function ScalarItems({
   address,
   field,
+  frame,
 }: ItemListProps & { field: ScalarArrayFieldSchema }) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
-  const { getValues } = useFormContext();
-  const [value, setValue] = useFieldValue<unknown[] | undefined>(address);
+  const scope = useScope();
+  const { getValues, setValue } = useFormContext();
+  const [value, setList] = useFieldValue<unknown[] | undefined>(address);
+  const live: unknown = useWatch({ name: address });
+  const { errors } = useFormState({ name: address });
+  const shown = Array.isArray(live) ? live : (value ?? []);
   const items = value ?? [];
+  const { listRef, afterChange } = useAfterChange(value ?? []);
+  const box = boxTypeOf(field.of);
+  const max = limitOf(field, 'max');
+  const full = max !== undefined && items.length >= max;
+
   // An edit inside an item writes `<address>.<index>`, which does not refresh
   // `value`. Read the live list at click time, or a move or remove writes the
   // stale list back over the edit.
@@ -239,18 +489,24 @@ function ScalarItems({
   }
 
   const move = (from: number, to: number) => {
+    if (to < 0 || to >= items.length) return;
     const next = [...liveItems()];
     next.splice(to, 0, ...next.splice(from, 1));
     keys.current.splice(to, 0, ...keys.current.splice(from, 1));
-    setValue(next);
+    afterChange({ focus: to });
+    setList(next);
   };
   const remove = (index: number) => {
     keys.current = keys.current.filter((_, position) => position !== index);
-    setValue(liveItems().filter((_, position) => position !== index));
+    afterChange({ focus: focusAfterRemove(index, items.length - 1) });
+    setList(liveItems().filter((_, position) => position !== index));
   };
-  const addItem = () => {
-    keys.current = [...keys.current, nextScalarKey()];
-    setValue([...liveItems(), seedScalar()]);
+  const insertValue = (index: number, entry: unknown) => {
+    keys.current.splice(index, 0, nextScalarKey());
+    const next = [...liveItems()];
+    next.splice(index, 0, entry);
+    afterChange({ focus: index });
+    setList(next);
   };
   // `defaultItem`, then `of.defaultValue`, then the item type's own default.
   const seedScalar = (): unknown => {
@@ -262,128 +518,100 @@ function ScalarItems({
       : stored;
   };
 
+  const views: ArrayItemView[] = items.map((_, index) => {
+    const itemAddress = `${address}.${index}`;
+    const base = {
+      id: keys.current[index] ?? itemAddress,
+      name: `Item ${index + 1}`,
+    };
+    if (!box) {
+      return {
+        ...base,
+        kind: 'group',
+        fixed: true,
+        summary: base.name,
+        children: <NestedFieldRow address={itemAddress} node={field.of} />,
+      };
+    }
+    const messages = ownFieldErrors(get(errors, itemAddress), itemAddress)[
+      itemAddress
+    ];
+    const revealed = isRevealed(scope.view.getState(), itemAddress);
+    const entry = shown[index];
+    return {
+      ...base,
+      kind: 'value',
+      inputType: box,
+      value: entry == null ? '' : String(entry),
+      error: revealed ? messages?.[0] : undefined,
+      onValueChange: (text) =>
+        setValue(itemAddress, text, {
+          shouldDirty: true,
+          shouldValidate: true,
+        }),
+      onBlur: () => scope.view.getState().touch(toFieldAddress(itemAddress)),
+    };
+  });
+
+  const typed = box !== undefined && field.defaultItem === undefined;
   return (
-    <>
-      <div
-        role='group'
-        aria-labelledby={`${address}-label`}
-        className='flex flex-col gap-3'
-      >
-        {items.map((_, index) => (
-          <ItemRow
-            key={keys.current[index]}
-            heading={`Item ${index + 1}`}
-            index={index}
-            count={items.length}
-            onMove={move}
-            onRemove={remove}
-          >
-            <NestedFieldRow address={`${address}.${index}`} node={field.of} />
-          </ItemRow>
-        ))}
-      </div>
-      <AddButton className='mt-3' onClick={addItem}>
-        Add item
-      </AddButton>
-    </>
+    <ArrayFieldView
+      {...frame}
+      listRef={listRef}
+      items={views}
+      full={full}
+      add={typed ? 'input' : 'button'}
+      addInputType={box === 'number' ? 'number' : 'text'}
+      addLabel='Add item'
+      onAdd={(text) => {
+        const entry = text === undefined ? seedScalar() : text;
+        keys.current = [...keys.current, nextScalarKey()];
+        afterChange({ focus: 'add' });
+        setList([...liveItems(), entry]);
+      }}
+      onMove={move}
+      onInsert={(index, where) =>
+        insertValue(where === 'above' ? index : index + 1, seedScalar())
+      }
+      onDuplicate={(index) =>
+        insertValue(index + 1, structuredClone(liveItems()[index]))
+      }
+      onRemove={remove}
+    />
   );
 }
 
-interface ItemRowProps {
-  heading: string;
-  index: number;
-  count: number;
-  onMove: (from: number, to: number) => void;
-  onRemove: (index: number) => void;
-  children: ReactNode;
-}
-
-function ItemRow({
-  heading,
-  index,
-  count,
-  onMove,
-  onRemove,
-  children,
-}: ItemRowProps) {
-  const position = index + 1;
+// Drawn in place of the field where it drills in.
+export function ArrayDrillIn() {
+  const address = useFieldAddress();
+  const field = asArrayFieldSchema(useFieldSchema());
+  const node = useFieldSchema();
+  const frame = useFieldFrame();
+  const scope = useScope();
+  const [value] = useFieldValue<unknown>(address);
+  const flat = useFormErrors(useFormId());
+  const invalidCount = useStore(
+    scope.view,
+    useShallow((state) =>
+      countRevealedErrors(state, Object.keys(flat), address)
+    )
+  );
   return (
-    <div className='rounded-sm border p-3'>
-      <div className='mb-3 flex items-center justify-between gap-2'>
-        <span className='text-sm font-medium text-muted-foreground'>
-          {heading}
-        </span>
-        <div className='flex items-center gap-1'>
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            aria-label={`Move item ${position} up`}
-            disabled={index === 0}
-            onClick={() => onMove(index, index - 1)}
-          >
-            Up
-          </Button>
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            aria-label={`Move item ${position} down`}
-            disabled={index === count - 1}
-            onClick={() => onMove(index, index + 1)}
-          >
-            Down
-          </Button>
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            aria-label={`Remove item ${position}`}
-            onClick={() => onRemove(index)}
-          >
-            Remove
-          </Button>
-        </div>
-      </div>
-      {children}
-    </div>
+    <ArrayDrillInView
+      {...frame}
+      name={field.name}
+      count={Array.isArray(value) ? value.length : 0}
+      invalidCount={invalidCount}
+      onDrillIn={() =>
+        scope.view.getState().openLevel({
+          address,
+          label: field.label ?? field.name,
+          node,
+        })
+      }
+    />
   );
 }
-
-const labelOf = (template: ArrayTemplateSchema): string =>
-  template.label ?? template.name;
-
-// A throw or a result that is not a non-empty string is no heading.
-const customHeading = (
-  itemLabel: ItemLabel | undefined,
-  item: TinaDocument
-): string | undefined => {
-  try {
-    const label = itemLabel?.(item);
-    return typeof label === 'string' && label !== '' ? label : undefined;
-  } catch {
-    return undefined;
-  }
-};
-
-const headingOf = (
-  field: ObjectArrayFieldSchema,
-  item: unknown,
-  index: number
-): string => {
-  if (!isItem(item)) return `Item ${index + 1} is not an object`;
-  if (!isTemplatesArray(field)) {
-    return customHeading(field.itemLabel, item) ?? `Item ${index + 1}`;
-  }
-  const template = templateFor(field.templates, item);
-  if (template) {
-    return customHeading(template.itemLabel, item) ?? labelOf(template);
-  }
-  const name = item[TEMPLATE_KEY];
-  return name === undefined
-    ? 'Block with no template'
-    : `Unknown block "${String(name)}"`;
-};
 
 let scalarKeyCount = 0;
 const nextScalarKey = (): string => `scalar-item-${scalarKeyCount++}`;

@@ -1,10 +1,12 @@
 import { cva } from 'class-variance-authority';
 import { GripVertical } from 'lucide-react';
-import type {
-  ComponentProps,
-  KeyboardEvent,
-  PointerEvent,
-  ReactNode,
+import {
+  type ComponentProps,
+  createContext,
+  type KeyboardEvent,
+  type PointerEvent,
+  type ReactNode,
+  use,
 } from 'react';
 
 import { Badge } from '@tinacms/ui/components/badge';
@@ -34,6 +36,20 @@ const listCardVariants = cva(
     defaultVariants: { state: 'rest' },
   }
 );
+
+/** How many open heads stick while their fields scroll. */
+const MAX_PINNED = 2;
+
+/** Where a pinned head sticks, by how many pinned heads sit above it. */
+const PIN_TOP = ['top-0', 'top-10'] as const;
+
+/** `null` means the surrounding form level does not pin heads. */
+const PinDepthContext = createContext<number | null>(null);
+
+/** Turns on pinning for the cards inside: the head of an open card sticks, two deep at most. */
+function PinHeads({ children }: { children: ReactNode }) {
+  return <PinDepthContext value={0}>{children}</PinDepthContext>;
+}
 
 const HEAD_HOVER =
   'hover:bg-muted *:data-grip:group-hover/head:text-foreground **:data-more:group-hover/head:text-foreground';
@@ -90,6 +106,8 @@ type GroupKindProps = {
   /** With `in-place`: whether the fields show. */
   open?: boolean;
   onToggle?: () => void;
+  /** The fields always show under a head that does not fold. */
+  fixed?: boolean;
   /** A short amber note at the end of the head, such as "No alt text". */
   hint?: string;
   /** The count of invalid fields inside. It shows while the card is closed; open cards carry none. */
@@ -167,8 +185,27 @@ function GroupHead({
   onToggle,
   hint,
   errorCount = 0,
+  fixed = false,
 }: GroupHeadProps) {
   const inPlace = opens === 'in-place';
+  if (fixed) {
+    return (
+      <div className='flex h-8 min-w-0 flex-1 items-center px-2 font-sans text-base text-foreground'>
+        <span className='min-w-0 flex-1 truncate'>
+          <span className='sr-only'>{name}: </span>
+          {title ? <span className='font-medium'>{title}</span> : null}
+          {title && summary ? (
+            <span className='text-muted-foreground'> · {summary}</span>
+          ) : null}
+          {title ? null : (
+            <span className={cn(!summary && 'text-muted-foreground')}>
+              {summary || placeholder}
+            </span>
+          )}
+        </span>
+      </div>
+    );
+  }
   return (
     <button
       type='button'
@@ -264,6 +301,7 @@ function ListCard(props: ListCardProps) {
     onToggle,
     hint,
     errorCount = 0,
+    fixed = false,
     children,
     ...rest
   }: ListCardCommonProps & EveryKindProps = props;
@@ -278,7 +316,12 @@ function ListCard(props: ListCardProps) {
           ? 'invalid'
           : 'rest';
   const showFields =
-    kind === 'group' && opens === 'in-place' && open && Boolean(children);
+    kind === 'group' &&
+    opens === 'in-place' &&
+    (open || fixed) &&
+    Boolean(children);
+  const pinDepth = use(PinDepthContext);
+  const pinned = showFields && pinDepth !== null && pinDepth < MAX_PINNED;
 
   const onGripKey = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -299,9 +342,11 @@ function ListCard(props: ListCardProps) {
       >
         <div
           data-slot='list-card-head'
+          data-pinned={pinned || undefined}
           className={cn(
             'group/head flex min-h-10 min-w-0 items-center gap-0.5 pr-1 pl-0.5 transition-colors',
             showFields ? 'rounded-t-sm' : 'rounded-sm',
+            pinned && ['sticky z-10 bg-card', PIN_TOP[pinDepth ?? 0]],
             !readOnly && !disabled && !dragging && HEAD_HOVER
           )}
         >
@@ -338,6 +383,7 @@ function ListCard(props: ListCardProps) {
               onToggle={onToggle}
               hint={hint}
               errorCount={errorCount}
+              fixed={fixed}
             />
           ) : (
             <ValueBody
@@ -377,7 +423,11 @@ function ListCard(props: ListCardProps) {
         </div>
         {showFields ? (
           <div className='flex flex-col gap-4 border-t border-border-subtle pt-1.5 pr-3 pb-3.5 pl-8.5'>
-            {children}
+            {pinDepth === null ? (
+              children
+            ) : (
+              <PinDepthContext value={pinDepth + 1}>{children}</PinDepthContext>
+            )}
           </div>
         ) : null}
       </div>
@@ -424,4 +474,4 @@ function CardList({
 }
 
 export type { CardListProps, ListCardProps };
-export { CardList, ListCard, listCardVariants };
+export { CardList, ListCard, listCardVariants, PinHeads };

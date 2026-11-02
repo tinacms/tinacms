@@ -944,7 +944,7 @@ importers:
         version: 0.0.4(mongodb@4.17.2)
       next:
         specifier: 15.5.28
-        version: 15.5.28(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(@types/node@25.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
+        version: 15.5.28(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(@types/node@25.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -2739,6 +2739,15 @@ importers:
 
   packages/v4/@tinacms/tinacms:
     dependencies:
+      '@dnd-kit/core':
+        specifier: 'catalog:'
+        version: 6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@dnd-kit/sortable':
+        specifier: 'catalog:'
+        version: 8.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+      '@dnd-kit/utilities':
+        specifier: 'catalog:'
+        version: 3.2.2(react@19.2.7)
       '@tanstack/react-query':
         specifier: ^5.101.4
         version: 5.101.4(react@19.2.7)
@@ -17876,12 +17885,25 @@ snapshots:
       react: 18.3.1
       tslib: 2.8.1
 
+  '@dnd-kit/accessibility@3.1.1(react@19.2.7)':
+    dependencies:
+      react: 19.2.7
+      tslib: 2.8.1
+
   '@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@dnd-kit/accessibility': 3.1.1(react@18.3.1)
       '@dnd-kit/utilities': 3.2.2(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
+      tslib: 2.8.1
+
+  '@dnd-kit/core@6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+    dependencies:
+      '@dnd-kit/accessibility': 3.1.1(react@19.2.7)
+      '@dnd-kit/utilities': 3.2.2(react@19.2.7)
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
       tslib: 2.8.1
 
   '@dnd-kit/sortable@8.0.0(@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
@@ -17891,9 +17913,21 @@ snapshots:
       react: 18.3.1
       tslib: 2.8.1
 
+  '@dnd-kit/sortable@8.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)':
+    dependencies:
+      '@dnd-kit/core': 6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@dnd-kit/utilities': 3.2.2(react@19.2.7)
+      react: 19.2.7
+      tslib: 2.8.1
+
   '@dnd-kit/utilities@3.2.2(react@18.3.1)':
     dependencies:
       react: 18.3.1
+      tslib: 2.8.1
+
+  '@dnd-kit/utilities@3.2.2(react@19.2.7)':
+    dependencies:
+      react: 19.2.7
       tslib: 2.8.1
 
   '@emmetio/abbreviation@2.3.3':
@@ -28995,6 +29029,34 @@ snapshots:
       - '@types/node'
       - babel-plugin-macros
 
+  next@15.5.28(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(@types/node@25.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3):
+    dependencies:
+      '@next/env': 15.5.28
+      '@swc/helpers': 0.5.15
+      caniuse-lite: 1.0.30001760
+      postcss: 8.4.31
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      styled-jsx: 5.1.6(@babel/core@7.28.5)(react@18.3.1)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 15.5.28
+      '@next/swc-darwin-x64': 15.5.28
+      '@next/swc-linux-arm64-gnu': 15.5.28
+      '@next/swc-linux-arm64-musl': 15.5.28
+      '@next/swc-linux-x64-gnu': 15.5.28
+      '@next/swc-linux-x64-musl': 15.5.28
+      '@next/swc-win32-arm64-msvc': 15.5.28
+      '@next/swc-win32-x64-msvc': 15.5.28
+      '@opentelemetry/api': 1.9.0
+      '@playwright/test': 1.61.1
+      babel-plugin-react-compiler: 1.0.0
+      sass: 1.97.3
+      sharp: 0.35.5(@types/node@25.1.0)
+    transitivePeerDependencies:
+      - '@babel/core'
+      - '@types/node'
+      - babel-plugin-macros
+
   next@15.5.28(@babel/core@7.29.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(@types/node@22.19.17)(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.97.3):
     dependencies:
       '@next/env': 15.5.28
@@ -29102,34 +29164,6 @@ snapshots:
       babel-plugin-react-compiler: 1.0.0
       sass: 1.97.3
       sharp: 0.35.5(@types/node@22.19.3)
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@types/node'
-      - babel-plugin-macros
-
-  next@15.5.28(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(@types/node@25.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3):
-    dependencies:
-      '@next/env': 15.5.28
-      '@swc/helpers': 0.5.15
-      caniuse-lite: 1.0.30001760
-      postcss: 8.4.31
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.6(@babel/core@7.28.5)(react@18.3.1)
-    optionalDependencies:
-      '@next/swc-darwin-arm64': 15.5.28
-      '@next/swc-darwin-x64': 15.5.28
-      '@next/swc-linux-arm64-gnu': 15.5.28
-      '@next/swc-linux-arm64-musl': 15.5.28
-      '@next/swc-linux-x64-gnu': 15.5.28
-      '@next/swc-linux-x64-musl': 15.5.28
-      '@next/swc-win32-arm64-msvc': 15.5.28
-      '@next/swc-win32-x64-msvc': 15.5.28
-      '@opentelemetry/api': 1.9.0
-      '@playwright/test': 1.61.1
-      babel-plugin-react-compiler: 1.0.0
-      sass: 1.97.3
-      sharp: 0.35.5(@types/node@25.1.0)
     transitivePeerDependencies:
       - '@babel/core'
       - '@types/node'

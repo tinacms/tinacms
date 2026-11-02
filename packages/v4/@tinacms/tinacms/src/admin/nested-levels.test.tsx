@@ -242,6 +242,7 @@ describe('nested form levels', () => {
   it('opens level 3 of an array item as its own form level', async () => {
     const user = userEvent.setup();
     renderGroups();
+    await user.click(await screen.findByRole('button', { name: /^Item 1:/ }));
     await user.click(await screen.findByRole('button', { name: 'Open Deep' }));
     expect(await screen.findByLabelText(/^Note\b/)).toHaveValue('n');
     const trail = screen.getByRole('navigation', { name: 'Field path' });
@@ -267,5 +268,92 @@ describe('nested form levels', () => {
     await user.click(screen.getByRole('button', { name: 'preview' }));
     expect(await screen.findByLabelText(/^Title\b/)).toHaveFocus();
     expect(screen.queryByLabelText(/^Handle\b/)).toBeNull();
+  });
+});
+
+const rowsCollection: CollectionSchema = {
+  name: 'page',
+  label: 'Pages',
+  format: 'mdx',
+  fields: [
+    t.object({
+      name: 'wrap',
+      label: 'Wrap',
+      fields: [
+        t.array({
+          name: 'rows',
+          label: 'Rows',
+          itemLabel: (item) => item.label,
+          fields: [
+            t.string({ name: 'label', label: 'Label' }),
+            t.string({ name: 'note', label: 'Note' }),
+          ],
+        }),
+      ],
+    }),
+  ],
+};
+
+const renderRows = (extra?: ReactNode) =>
+  render(
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [objectFieldPlugin, arrayFieldPlugin, stringFieldPlugin],
+        schema: { collections: [] },
+      })}
+    >
+      <FormProvider
+        collection={rowsCollection}
+        path='content/pages/rows.mdx'
+        document={{ wrap: { rows: [{ label: 'First', note: 'n1' }] } }}
+      >
+        <DocumentForm />
+        {extra}
+      </FormProvider>
+    </TinaProvider>
+  );
+
+describe('array items as form levels', () => {
+  it('opens an item of a list at level 2 as the next form level, with its own trail step', async () => {
+    const user = userEvent.setup();
+    renderRows();
+    expect(screen.queryByLabelText(/^Note\b/)).toBeNull();
+    await user.click(await screen.findByRole('button', { name: /^Item 1:/ }));
+    expect(await screen.findByLabelText(/^Note\b/)).toHaveValue('n1');
+    const trail = screen.getByRole('navigation', { name: 'Field path' });
+    expect(within(trail).getByText('First')).toBeVisible();
+  });
+
+  it('keeps the item level open while a field inside it is focused', async () => {
+    const user = userEvent.setup();
+    renderRows();
+    await user.click(await screen.findByRole('button', { name: /^Item 1:/ }));
+    const note = await screen.findByLabelText(/^Note\b/);
+    await user.click(note);
+    await user.type(note, '!');
+    expect(screen.getByLabelText(/^Note\b/)).toHaveValue('n1!');
+    expect(
+      screen.getByRole('navigation', { name: 'Field path' })
+    ).toBeVisible();
+  });
+
+  it('opens the item level when a field inside it is activated from the preview', async () => {
+    const user = userEvent.setup();
+    renderRows(<Activate address='wrap.rows.0.note' name='preview' />);
+    await screen.findByRole('button', { name: /^Item 1:/ });
+    await user.click(screen.getByRole('button', { name: 'preview' }));
+    expect(await screen.findByLabelText(/^Note\b/)).toHaveFocus();
+  });
+
+  it('goes back up from the item level to the list', async () => {
+    const user = userEvent.setup();
+    renderRows();
+    await user.click(await screen.findByRole('button', { name: /^Item 1:/ }));
+    const trail = await screen.findByRole('navigation', { name: 'Field path' });
+    await user.click(within(trail).getByRole('button', { name: 'Rows' }));
+    expect(screen.queryByLabelText(/^Note\b/)).toBeNull();
+    expect(
+      await screen.findByRole('button', { name: /^Item 1:/ })
+    ).toBeVisible();
   });
 });

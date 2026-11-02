@@ -291,10 +291,10 @@ function FormColumn({ openPath }: { openPath?: string }) {
     <>
       <aside
         aria-label='Document form'
-        className='flex min-w-0 shrink-0 flex-col overflow-y-auto border-r border-border p-4'
+        className='sticky top-0 flex h-svh min-w-0 shrink-0 flex-col overflow-y-auto border-r border-border px-4 pb-4'
         style={{ width }}
       >
-        <div className='mb-2 flex items-center gap-1'>
+        <div className='mb-2 flex items-center gap-1 pt-4'>
           <SidebarTrigger />
           {openPath === undefined ? (
             <span className='text-sm text-muted-foreground'>
