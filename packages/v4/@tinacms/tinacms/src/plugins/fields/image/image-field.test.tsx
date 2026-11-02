@@ -181,7 +181,7 @@ describe('ImageField rendering', () => {
     expect(within(group).queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('says there is no image when the media provider is read-only', async () => {
+  it('still offers Choose from Media when the media provider is read-only', async () => {
     renderField(undefined, createMedia({ features: { readOnly: true } }));
     const group = await fieldGroup('Hero');
     expect(
@@ -640,7 +640,7 @@ describe('ImageField gallery', () => {
     ).toHaveFocus();
   });
 
-  it('shows no gallery tools for a read-only provider drop', async () => {
+  it('still offers Add images when the media provider is read-only', async () => {
     renderGallery(['a/one.jpg'], createMedia({ features: { readOnly: true } }));
     const group = await gallery();
     expect(
