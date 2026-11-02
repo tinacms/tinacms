@@ -42,6 +42,7 @@ export {
   type DocumentSave,
   type SaveDocumentInput,
   useCollectionDocuments,
+  useCurrentBranch,
   useDocument,
   useInvalidateContent,
   useSaveDocument,

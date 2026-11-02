@@ -2,16 +2,18 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
-import { setColumnWidth, toolbar } from './form-column';
+import { formColumn, setColumnWidth, toolbar } from './form-column';
 
 const body = (page: import('@playwright/test').Page) =>
   page.getByRole('textbox', { name: 'body' });
 
 const saveButton = (page: import('@playwright/test').Page) =>
-  page.locator('aside').getByRole('button', { name: 'Save', exact: true });
+  formColumn(page).getByRole('button', { name: 'Save', exact: true });
 
 const status = (page: import('@playwright/test').Page) =>
-  page.locator('aside header').getByText(/^(No changes|Unsaved|Saved)$/);
+  formColumn(page)
+    .locator('header')
+    .getByText(/^(No changes|Unsaved|Saved)$/);
 
 const openDocument = async (
   page: import('@playwright/test').Page,
@@ -53,7 +55,7 @@ test.describe('rich-text layout', () => {
     await openDocument(page, 'second-post.mdx');
     await expect(body(page)).toContainText('bullet point');
 
-    const overflow = await page.locator('aside').evaluate((aside) => ({
+    const overflow = await formColumn(page).evaluate((aside) => ({
       client: aside.clientWidth,
       scroll: aside.scrollWidth,
     }));

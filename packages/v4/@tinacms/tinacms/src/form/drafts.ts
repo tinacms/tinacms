@@ -16,10 +16,20 @@ export interface StoredDraft {
   readonly baseline: TinaDocument;
 }
 
-export const draftKey = (formId: FormId, userId?: UserId) =>
-  userId === undefined
-    ? `${DRAFT_KEY_PREFIX}${formId}`
-    : `${USER_DRAFT_KEY_PREFIX}${encodeURIComponent(userId)}:${formId}`;
+// A draft belongs to the branch it was typed on, so it never reappears on
+// another branch. No branch (the default) keeps the original key.
+let draftBranch: string | undefined;
+
+export const setDraftBranch = (branch: string | undefined) => {
+  draftBranch = branch;
+};
+
+export const draftKey = (formId: FormId, userId?: UserId) => {
+  const branch = draftBranch ? `@@${encodeURIComponent(draftBranch)}` : '';
+  return userId === undefined
+    ? `${DRAFT_KEY_PREFIX}${formId}${branch}`
+    : `${USER_DRAFT_KEY_PREFIX}${encodeURIComponent(userId)}:${formId}${branch}`;
+};
 
 const hasBlankName = (fields: Record<string, unknown>) =>
   Object.keys(fields).some((name) => name.length === 0);

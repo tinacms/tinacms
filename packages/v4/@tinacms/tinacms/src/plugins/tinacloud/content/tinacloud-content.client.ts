@@ -2,6 +2,7 @@ import type {
   ContentProvider,
   DocumentSummary,
 } from '../../../core/content/contract';
+import { currentBranchOf } from '../../../core/branch/contract';
 import type { SliceSet, TinaStoreState } from '../../../core/plugin';
 import { type TinaCloudClientOptions, createTinaCloudClient } from '../client';
 import { toContentError } from './errors';
@@ -19,8 +20,8 @@ export const createTinaCloudContentSlice =
   (_set: SliceSet, get: () => TinaStoreState) => {
     const client = createTinaCloudClient(options);
     const branch = async (): Promise<string> => {
-      const name = get().branch?.name;
-      if (typeof name === 'string' && name) return name;
+      const current = currentBranchOf(get());
+      if (current) return current;
       const { defaultBranch } = await client.getProject();
       if (!defaultBranch) {
         throw new Error('The TinaCloud project has no default branch.');
@@ -28,6 +29,10 @@ export const createTinaCloudContentSlice =
       return defaultBranch;
     };
     const content = {
+      branches: {
+        list: () => client.listBranches(),
+        defaultBranch: async () => (await client.getProject()).defaultBranch,
+      },
       get: async (collection, path) => {
         try {
           const document = await fetchDocument(

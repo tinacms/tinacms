@@ -878,7 +878,10 @@ describe('TinaAdmin after a save that changes the document', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(await screen.findByDisplayValue('HELLO!')).toBeInTheDocument();
-    expect(await screen.findByRole('alert')).toHaveTextContent(
+    const form = await screen.findByRole('complementary', {
+      name: 'Document form',
+    });
+    expect(await within(form).findByRole('alert')).toHaveTextContent(
       'The document was saved, but an afterSave hook failed.'
     );
     vi.restoreAllMocks();

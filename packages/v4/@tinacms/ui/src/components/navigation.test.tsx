@@ -369,24 +369,23 @@ describe('StatusBar', () => {
     expect(screen.getByText('Local files')).toBeVisible();
   });
 
-  it('announces a failed save without its action', async () => {
-    const user = userEvent.setup();
-    const onRetry = vi.fn();
+  it('announces a failed save and has no actions', () => {
     render(
-      <StatusBar
-        branch='docs/v4-launch'
-        state='failed'
-        action={{ label: 'Retry', onClick: onRetry }}
-      >
+      <StatusBar branch='docs/v4-launch' state='failed'>
         Save failed
       </StatusBar>
     );
-    const live = screen.getByText('Save failed');
-    expect(live).toHaveAttribute('aria-live', 'polite');
-    const retry = screen.getByRole('button', { name: 'Retry' });
-    expect(live).not.toContainElement(retry);
-    await user.click(retry);
-    expect(onRetry).toHaveBeenCalledOnce();
+    expect(screen.getByText('Save failed')).toHaveAttribute(
+      'aria-live',
+      'polite'
+    );
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  it('omits the location when the provider has no branches', () => {
+    render(<StatusBar state='idle'>Nothing to save</StatusBar>);
+    expect(screen.queryByText('Local files')).toBeNull();
+    expect(screen.getByText('Nothing to save')).toBeVisible();
   });
 });
 

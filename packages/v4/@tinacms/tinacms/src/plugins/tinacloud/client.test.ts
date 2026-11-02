@@ -111,6 +111,28 @@ describe('waitForRequest', () => {
   });
 });
 
+describe('listBranches', () => {
+  it('reads the branches and their protected flag from the content API', async () => {
+    const fetchMock = stubFetch(
+      json([{ name: 'main', protected: true }, { name: 'feature/news' }])
+    );
+    expect(await client().listBranches()).toEqual([
+      { name: 'main', protected: true },
+      { name: 'feature/news', protected: undefined },
+    ]);
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      `${TINACLOUD_CONTENT_URL}/github/abc/list_branches`
+    );
+  });
+
+  it('rejects a list in an unknown shape', async () => {
+    stubFetch(json({ branches: [] }));
+    await expect(client().listBranches()).rejects.toBeInstanceOf(
+      TinaCloudError
+    );
+  });
+});
+
 describe('getProject', () => {
   it('fetches the project once and shares the result', async () => {
     const fetchMock = stubFetch(

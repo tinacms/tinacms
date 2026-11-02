@@ -41,7 +41,13 @@ The store has a core **branch slice** (provided by Tina core, not a plugin):
 useTinaStore((s) => s.branch.current)        // 'cms/new-blog-post'
 useTinaStore((s) => s.branch.list)           // ['main', 'cms/new-post', ...]
 useTinaStore((s) => s.branch.dirty)          // true if there are unsaved/uncommitted changes
+useTinaStore((s) => s.branch.mode)           // 'local' | 'branches' (unset: the provider has no branches)
+useTinaStore((s) => s.branch.protected)      // names of the protected branches
 ```
+
+The content provider fills the slice. A provider that reads from branches adds `branches: { list, defaultBranch }` to its content slice, and core sets `mode: 'branches'`, `list` and `protected`. A provider that reads local files adds `local: true`, and core sets `mode: 'local'`. A provider with neither leaves `mode` unset, and the shell shows no branch spot. Only `current` persists across reloads. Core rebuilds the rest on each boot.
+
+The Branch switcher blocks a switch while any form has unsaved edits. A form is dirty when the form store says so, so `branch.dirty` is not a store field yet.
 
 Actions are slice methods that call the Data Layer:
 

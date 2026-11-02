@@ -5,6 +5,7 @@ import { useAdminRoute } from '../../../admin/use-admin-route';
 import {
   CONTENT_STALE_TIME,
   contentKeys,
+  useCurrentBranch,
   useContentSlice,
   useFieldActivation,
   useFieldAddress,
@@ -32,9 +33,10 @@ interface ReferenceLists {
 // stays stable.
 const useReferenceLists = (collections: string[]): ReferenceLists => {
   const content = useContentSlice();
+  const branch = useCurrentBranch();
   return useQueries({
     queries: collections.map((collection) => ({
-      queryKey: contentKeys.list(collection),
+      queryKey: contentKeys.list(collection, branch),
       queryFn: () => content.list(collection),
       staleTime: CONTENT_STALE_TIME,
     })),
