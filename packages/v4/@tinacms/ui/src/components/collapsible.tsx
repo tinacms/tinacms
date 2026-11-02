@@ -80,7 +80,7 @@ function Collapsible({
           <Icon glyph='chevron-right' size={16} />
         </span>
         <span className='flex min-w-0 flex-1 items-baseline gap-1.5'>
-          <span id={labelId} className='flex-none text-base font-medium'>
+          <span id={labelId} className='min-w-0 truncate text-base font-medium'>
             {label}
           </span>
           {!open && summary ? (

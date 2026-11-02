@@ -193,6 +193,7 @@ const assertObjectDisplays = (collections: CollectionSchema[]): void => {
   for (const collection of collections) {
     for (const node of nodesIn(collection.fields)) {
       if (node.type !== OBJECT_FIELD_TYPE || !('display' in node)) continue;
+      if (node.display === undefined) continue;
       invariant(
         OBJECT_DISPLAYS.includes(node.display as ObjectDisplay),
         'schema-object-display-invalid',

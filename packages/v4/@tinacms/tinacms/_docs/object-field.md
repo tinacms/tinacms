@@ -150,7 +150,8 @@ shows its own.
 
 ## The component
 
-`ObjectField` (`object-field.ui.tsx`) renders every nested field, always. An
+`ObjectField` (`object-field.ui.tsx`) renders every nested field while the
+object is open or in place. A closed collapsible renders no nested field. An
 absent stored value does not hide the nested fields — each nested field
 resolves its own absent value and shows an empty control.
 

@@ -69,9 +69,9 @@ export const isRevealed = (
 };
 
 // Array positions are not levels.
-export const DRILL_DEPTH = 3;
+const DRILL_DEPTH = 3;
 
-export const fieldDepth = (address: string): number =>
+const fieldDepth = (address: string): number =>
   address.split('.').filter((part) => !/^\d+$/.test(part)).length;
 
 // The one place that decides whether a field drills in: the plugin's own

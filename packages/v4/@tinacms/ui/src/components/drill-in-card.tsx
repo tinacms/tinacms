@@ -55,7 +55,7 @@ function DrillInCard({
       {...props}
     >
       <span className='flex min-w-0 flex-1 items-baseline gap-1.5'>
-        <span className='flex-none text-base font-medium'>{label}</span>
+        <span className='min-w-0 truncate text-base font-medium'>{label}</span>
         {summary ? (
           <span className='min-w-0 flex-1 truncate text-sm leading-4.5 text-muted-foreground'>
             {summary}

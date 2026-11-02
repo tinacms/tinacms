@@ -56,7 +56,10 @@ export type { BooleanFieldSchema } from './boolean/boolean-field.schema';
 export type { DatetimeFieldSchema } from './datetime/datetime-field.schema';
 export type { ImageFieldSchema } from './image/image-field.schema';
 export type { NumberFieldSchema } from './number/number-field.schema';
-export type { ObjectFieldSchema } from './object/object-field.schema';
+export type {
+  ObjectDisplay,
+  ObjectFieldSchema,
+} from './object/object-field.schema';
 export type {
   RichTextFieldSchema,
   RichTextTemplate,

@@ -569,6 +569,27 @@ describe('compileSchema array options', () => {
     }
   });
 
+  it('treats an omitted or undefined object display as unset', () => {
+    const objectPlugins = [...plugins, fieldPlugin('object', 1)];
+    for (const extra of [{}, { display: undefined }] satisfies object[]) {
+      expect(() =>
+        compileSchema(
+          configWith(
+            [
+              {
+                name: 'seo',
+                type: 'object',
+                fields: [],
+                ...extra,
+              } as unknown as FieldSchema,
+            ],
+            objectPlugins
+          )
+        )
+      ).not.toThrow();
+    }
+  });
+
   it('leaves picker and of to a non-array field that defines them', () => {
     expect(() =>
       compileSchema(
