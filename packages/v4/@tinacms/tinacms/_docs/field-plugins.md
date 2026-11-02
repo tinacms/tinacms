@@ -257,7 +257,7 @@ error names the field and the collection, and says what to use instead:
 
 | Option | Use instead |
 |---|---|
-| `ui` | Top-level `description`, `defaultValue`, `hidden`, `itemLabel`, `picker`. |
+| `ui` | Top-level `description`, `defaultValue`, `hidden`, `itemLabel`, `picker`, `display`. |
 | `component` | A field plugin for the widget. |
 | `parse` | `parse` on the field plugin, or a collection hook. |
 | `format` | `serialize` on the field plugin, or a collection hook. |
@@ -266,7 +266,8 @@ error names the field and the collection, and says what to use instead:
 
 A templates array that sets `defaultItem` fails the build too. Set it on each
 template. A `picker` value other than `'list'` or `'grid'`, or a `picker` on an
-array without `templates`, fails the build.
+array without `templates`, fails the build. So does an object `display` other
+than `'fieldset'`, `'collapsible'` or `'drillIn'`.
 
 ## Validation in two layers
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createStore, type StoreApi } from 'zustand';
 import type { FieldAddress } from '../core/field/address';
+import type { FieldDescriptor } from '../core/field/contract';
 import { fieldsetOf, fieldsOf, scalarItemOf } from '../core/schema/children';
 import type { FieldSchema } from '../core/schema/types';
 import type { FormId } from '../form/form-store';
@@ -73,6 +74,18 @@ export const DRILL_DEPTH = 3;
 export const fieldDepth = (address: string): number =>
   address.split('.').filter((part) => !/^\d+$/.test(part)).length;
 
+// The one place that decides whether a field drills in: the plugin's own
+// answer first, then the depth rule.
+export const drillsInAt = (
+  descriptor: FieldDescriptor | undefined,
+  node: FieldSchema,
+  address: string
+): boolean => {
+  const metadata = descriptor?.metadata;
+  if (metadata?.drillable !== true) return false;
+  return metadata.drillsIn?.(node) ?? fieldDepth(address) >= DRILL_DEPTH;
+};
+
 export const holdsRevealedError = (
   view: Pick<FormViewState, 'touched' | 'saveAttempted'>,
   errorAddresses: readonly string[],
@@ -89,6 +102,20 @@ export const holdsRevealedError = (
       isRevealed(view, key)
   );
 };
+
+// How many fields under `address` hold a revealed error. Counts each failing
+// field once, however many messages it has.
+export const countRevealedErrors = (
+  view: Pick<FormViewState, 'touched' | 'saveAttempted'>,
+  errorAddresses: readonly string[],
+  address: string
+): number =>
+  errorAddresses.filter(
+    (key) =>
+      (key === address || key.startsWith(`${address}.`)) &&
+      !errorAddresses.some((other) => other.startsWith(`${key}.`)) &&
+      isRevealed(view, key)
+  ).length;
 
 // Every named field on the way to `address`, the field itself last.
 export const fieldsAlong = (
@@ -126,11 +153,8 @@ export const levelsFor = (
   address: string,
   fields: readonly FieldSchema[],
   valueAt: (address: string) => unknown,
-  isDrillable: (node: FieldSchema) => boolean
+  drillsIn: (step: OpenLevel) => boolean
 ): OpenLevel[] =>
   fieldsAlong(address, fields, valueAt).filter(
-    (step) =>
-      step.address !== address &&
-      isDrillable(step.node) &&
-      fieldDepth(step.address) >= DRILL_DEPTH
+    (step) => step.address !== address && drillsIn(step)
   );
