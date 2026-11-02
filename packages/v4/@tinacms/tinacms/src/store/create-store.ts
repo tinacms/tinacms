@@ -104,7 +104,12 @@ export const createTinaStore = (resolved: ResolvedSegment[]) => {
             protected: [],
             switchTo: (name) =>
               (set as RootSet)(
-                (store) => ({ branch: { ...store.branch, current: name } }),
+                (store) => ({
+                  branch: {
+                    ...store.branch,
+                    current: name === store.branch?.fallback ? undefined : name,
+                  },
+                }),
                 false,
                 'branch/switchTo'
               ),

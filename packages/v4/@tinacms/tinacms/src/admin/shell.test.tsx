@@ -34,6 +34,7 @@ let holdUpdates: boolean;
 let searchEnabled: boolean;
 let failGet: boolean;
 let failAfterSave: boolean;
+let heldDefault: Promise<void> | undefined;
 
 const contentPlugin = () =>
   definePlugin({
@@ -49,7 +50,10 @@ const contentPlugin = () =>
               ? {
                   branches: {
                     list: async () => BRANCHES,
-                    defaultBranch: async () => 'main',
+                    defaultBranch: async () => {
+                      await heldDefault;
+                      return 'main';
+                    },
                   },
                 }
               : {}),
@@ -179,6 +183,7 @@ beforeEach(() => {
   searchEnabled = false;
   failGet = false;
   failAfterSave = false;
+  heldDefault = undefined;
   window.location.hash = '';
 });
 
@@ -410,24 +415,48 @@ describe('branches', () => {
     ).toBeVisible();
   });
 
-  it('finds a draft typed on the default branch after the default is picked by name', async () => {
+  it('stores no branch when the default is picked by name, so its drafts use the default key', async () => {
+    localStorage.setItem(
+      'tina-store',
+      JSON.stringify({
+        state: { branch: { current: 'feature/news' } },
+        version: 0,
+      })
+    );
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     const user = userEvent.setup();
-    const first = renderAdmin();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+    await user.click(await screen.findByText('main', { selector: 'span' }));
+    await waitFor(() =>
+      expect(
+        JSON.parse(localStorage.getItem('tina-store') ?? '{}').state.branch
+      ).not.toHaveProperty('current')
+    );
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await waitFor(() =>
       expect(
         Object.keys(localStorage).filter((key) => key.startsWith('tina-drafts'))
-      ).toHaveLength(1)
+      ).toEqual(['tina-drafts:content/posts/hello.mdx'])
     );
-    first.unmount();
+  });
 
-    localStorage.setItem(
-      'tina-store',
-      JSON.stringify({ state: { branch: { current: 'main' } }, version: 0 })
-    );
+  it('keeps text typed before the default branch is known, and its draft', async () => {
+    let release: () => void = () => {};
+    heldDefault = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
     renderAdmin();
-    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello!');
+    const input = await screen.findByLabelText(/^Title\b/);
+    await user.type(input, '!');
+    act(() => release());
+    await screen.findByRole('button', { name: /^Branch: main/ });
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello!');
+    expect(
+      Object.keys(localStorage).filter((key) => key.startsWith('tina-drafts'))
+    ).toEqual(['tina-drafts:content/posts/hello.mdx']);
   });
 
   it('keeps a draft typed on one branch off another branch', async () => {

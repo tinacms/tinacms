@@ -56,12 +56,11 @@ export const branchSliceOf = (
 };
 
 /**
- * The branch edits read from and write to, or undefined for the default. Picking
- * the default branch by name gives undefined too, so the default has one cache
- * key and one draft key.
+ * The branch edits read from and write to, or undefined for the default.
+ * `switchTo` stores undefined when the pick is the default branch, so the
+ * default has one cache key and one draft key.
  */
 export const currentBranchOf = (state: TinaStoreState): string | undefined => {
-  const { current, fallback } = state.branch ?? {};
-  if (typeof current !== 'string' || !current) return undefined;
-  return current === fallback ? undefined : current;
+  const { current } = state.branch ?? {};
+  return typeof current === 'string' && current ? current : undefined;
 };

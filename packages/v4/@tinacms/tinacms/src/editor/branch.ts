@@ -37,7 +37,12 @@ export function useBranchSync(): void {
             .map((branch) => branch.name),
         });
         const current = currentBranchOf(store.getState());
-        if (current && !branches.some((branch) => branch.name === current)) {
+        if (current && current === fallback) {
+          branchSliceOf(store.getState())?.switchTo(undefined);
+        } else if (
+          current &&
+          !branches.some((branch) => branch.name === current)
+        ) {
           branchSliceOf(store.getState())?.switchTo(undefined);
           toast({
             tone: 'warning',
