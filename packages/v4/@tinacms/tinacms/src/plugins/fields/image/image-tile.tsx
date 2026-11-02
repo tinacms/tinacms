@@ -80,7 +80,7 @@ export function ImageTile({
       data-slot='image-tile'
       data-lifted={lifted ? 'true' : undefined}
       className={cn(
-        'm-0 flex w-full min-w-0 flex-col gap-1 transition',
+        'm-0 flex w-full min-w-0 flex-col gap-1 transition select-none',
         tileCap[look],
         lifted && 'opacity-60'
       )}
@@ -101,6 +101,7 @@ export function ImageTile({
           <img
             src={preview.src ?? undefined}
             alt={name}
+            draggable={false}
             hidden={!preview.loaded}
             className='size-full object-cover'
             onLoad={preview.onLoad}
@@ -108,7 +109,7 @@ export function ImageTile({
           />
         )}
         {handle ? (
-          <div data-handle='' className='absolute top-2 left-2'>
+          <div data-handle='' className='absolute bottom-2 left-2'>
             {handle}
           </div>
         ) : null}
@@ -121,7 +122,10 @@ export function ImageTile({
                 size='sm'
                 icon={ReplaceIcon}
                 disabled={busy}
-                className='bg-card shadow-xs'
+                className={cn(
+                  'bg-card shadow-xs',
+                  look === 'square' && 'size-6'
+                )}
                 onClick={onReplace}
               >
                 {`Replace ${name}`}
@@ -133,7 +137,10 @@ export function ImageTile({
                 size='sm'
                 destructive
                 disabled={busy}
-                className='bg-card shadow-xs'
+                className={cn(
+                  'bg-card shadow-xs',
+                  look === 'square' && 'size-6'
+                )}
                 onClick={onRemove}
               >
                 {`Remove ${name}`}
@@ -168,7 +175,7 @@ export function MoveHandle({
       size='sm'
       icon={GripVerticalIcon}
       aria-label={label}
-      className='cursor-grab touch-none bg-card shadow-xs'
+      className='size-6 cursor-grab touch-none bg-card shadow-xs'
       onKeyDown={onKeyDown}
     />
   );
