@@ -208,6 +208,28 @@ Hooks:
 | `useFieldValue<T>(address)` | Gives `[value, setValue]` from the react-hook-form controller |
 | `useFieldErrors(address)` | Gives every validation message at `address` or under it |
 | `useFieldActivation(handler)` | Runs `handler` when this field becomes the active field, for visual editing |
+| `useFieldFrame(options?)` | Gives the label, `htmlFor`, errors and help for `FieldWrapper`. `{ ownErrorsOnly: true }` keeps only the errors on this field's own address. |
+| `useOpenLevel()` | Gives a function that opens this field as the next form level |
+| `useInvalidFieldCount()` | Gives how many fields under this field show an error. It counts fields, not messages. |
+| `useIsOpenLevel()` | Gives `true` when this field is the open form level |
+
+A field that supplies a `DrillInComponent` builds it from these hooks and
+`@tinacms/ui` only:
+
+```tsx
+function SettingsCard() {
+  const open = useOpenLevel();
+  const count = useInvalidFieldCount();
+  const { label } = useFieldFrame({ ownErrorsOnly: true });
+  return (
+    <DrillInCard
+      label={String(label)}
+      invalidCount={count}
+      onOpen={open}
+    />
+  );
+}
+```
 
 ## Options every field takes
 

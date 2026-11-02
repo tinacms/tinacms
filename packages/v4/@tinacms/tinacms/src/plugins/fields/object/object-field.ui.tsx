@@ -1,23 +1,15 @@
-import { use, useEffect, useState } from 'react';
-import { get, useFormState, useWatch } from 'react-hook-form';
-import { useShallow } from 'zustand/react/shallow';
-import { useStore } from 'zustand';
-import { invariant } from '../../../core/invariant';
-import { FormScopeContext } from '../../../editor/context';
-import { ownFieldErrors } from '../../../editor/field-errors';
-import {
-  countRevealedErrors,
-  isRevealed,
-} from '../../../editor/form-view-state';
+import { useEffect, useState } from 'react';
+import { useWatch } from 'react-hook-form';
 import {
   NestedFieldRow,
+  useActivation,
   useFieldAddress,
   useFieldFrame,
   useFieldSchema,
   useFieldValue,
-  useFormErrors,
-  useFormId,
-  useActivation,
+  useInvalidFieldCount,
+  useIsOpenLevel,
+  useOpenLevel,
 } from '../../../editor';
 import { UneditableValue } from '../uneditable-value';
 import {
@@ -37,16 +29,6 @@ export function ObjectField() {
       cleared={null}
     />
   );
-}
-
-function useScope() {
-  const scope = use(FormScopeContext);
-  invariant(
-    scope,
-    'object-field-outside-provider',
-    'The object field must be used within a FormProvider'
-  );
-  return scope;
 }
 
 // The first visible text field that has something typed in it. It watches the
@@ -72,38 +54,17 @@ function useSummary(
 function useObjectSummary() {
   const address = useFieldAddress();
   const field = asObjectFieldSchema(useFieldSchema());
-  const frame = useFieldFrame();
-  const { view } = useScope();
+  const frame = useFieldFrame({ ownErrorsOnly: true });
   const summary = useSummary(address, field.fields);
-  const { errors } = useFormState({ name: address });
-  const flat = useFormErrors(useFormId());
-  const ownMessages = ownFieldErrors(get(errors, address), address)[address];
-  const ownRevealed = useStore(
-    view,
-    (state) => ownMessages !== undefined && isRevealed(state, address)
-  );
-  const invalidCount = useStore(
-    view,
-    useShallow((state) =>
-      countRevealedErrors(state, Object.keys(flat), address)
-    )
-  );
-  return {
-    address,
-    field,
-    frame: { ...frame, errors: ownRevealed ? (ownMessages ?? []) : [] },
-    invalidCount,
-    summary,
-  };
+  const invalidCount = useInvalidFieldCount();
+  return { address, field, frame, invalidCount, summary };
 }
 
 function FieldGroup() {
   const { address, field, frame, invalidCount, summary } = useObjectSummary();
-  const { view } = useScope();
   const activation = useActivation();
   const [open, setOpen] = useState(false);
-  const isOpenLevel =
-    useStore(view, (state) => state.openLevels.at(-1)?.address) === address;
+  const isOpenLevel = useIsOpenLevel();
 
   useEffect(() => {
     const target = activation?.address;
@@ -134,9 +95,8 @@ function FieldGroup() {
 
 // Drawn in place of the field where it drills in.
 export function ObjectDrillIn() {
-  const { address, field, frame, invalidCount, summary } = useObjectSummary();
-  const { view } = useScope();
-  const node = useFieldSchema();
+  const { field, frame, invalidCount, summary } = useObjectSummary();
+  const openLevel = useOpenLevel();
   return (
     <ObjectFieldView
       {...frame}
@@ -144,13 +104,7 @@ export function ObjectDrillIn() {
       name={field.name}
       summary={summary}
       invalidCount={invalidCount}
-      onDrillIn={() =>
-        view.getState().openLevel({
-          address,
-          label: field.label ?? field.name,
-          node,
-        })
-      }
+      onDrillIn={openLevel}
     />
   );
 }
