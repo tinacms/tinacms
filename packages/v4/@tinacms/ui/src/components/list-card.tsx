@@ -107,7 +107,7 @@ type GroupKindProps = {
   open?: boolean;
   onToggle?: () => void;
   /** The fields always show under a head that does not fold. */
-  fixed?: boolean;
+  alwaysOpen?: boolean;
   /** A short amber note at the end of the head, such as "No alt text". */
   hint?: string;
   /** The count of invalid fields inside. It shows while the card is closed; open cards carry none. */
@@ -173,6 +173,29 @@ type GroupHeadProps = Pick<
 > &
   Omit<GroupKindProps, 'kind' | 'children'>;
 
+type HeadTextProps = Pick<
+  GroupHeadProps,
+  'name' | 'placeholder' | 'title' | 'summary'
+>;
+
+/** The words of a group head: the screen reader name, then the title and summary. */
+function HeadText({ name, title, summary, placeholder }: HeadTextProps) {
+  return (
+    <>
+      <span className='sr-only'>{name}: </span>
+      {title ? <span className='font-medium'>{title}</span> : null}
+      {title && summary ? (
+        <span className='text-muted-foreground'> · {summary}</span>
+      ) : null}
+      {title ? null : (
+        <span className={cn(!summary && 'text-muted-foreground')}>
+          {summary || placeholder}
+        </span>
+      )}
+    </>
+  );
+}
+
 function GroupHead({
   name,
   placeholder,
@@ -185,23 +208,19 @@ function GroupHead({
   onToggle,
   hint,
   errorCount = 0,
-  fixed = false,
+  alwaysOpen = false,
 }: GroupHeadProps) {
   const inPlace = opens === 'in-place';
-  if (fixed) {
+  if (alwaysOpen) {
     return (
       <div className='flex h-8 min-w-0 flex-1 items-center px-2 font-sans text-base text-foreground'>
         <span className='min-w-0 flex-1 truncate'>
-          <span className='sr-only'>{name}: </span>
-          {title ? <span className='font-medium'>{title}</span> : null}
-          {title && summary ? (
-            <span className='text-muted-foreground'> · {summary}</span>
-          ) : null}
-          {title ? null : (
-            <span className={cn(!summary && 'text-muted-foreground')}>
-              {summary || placeholder}
-            </span>
-          )}
+          <HeadText
+            name={name}
+            title={title}
+            summary={summary}
+            placeholder={placeholder}
+          />
         </span>
       </div>
     );
@@ -234,16 +253,12 @@ function GroupHead({
         </span>
       ) : null}
       <span className='min-w-0 flex-1 truncate px-1.5'>
-        <span className='sr-only'>{name}: </span>
-        {title ? <span className='font-medium'>{title}</span> : null}
-        {title && summary ? (
-          <span className='text-muted-foreground'> · {summary}</span>
-        ) : null}
-        {title ? null : (
-          <span className={cn(!summary && 'text-muted-foreground')}>
-            {summary || placeholder}
-          </span>
-        )}
+        <HeadText
+          name={name}
+          title={title}
+          summary={summary}
+          placeholder={placeholder}
+        />
       </span>
       {hint ? (
         <span className='flex-none text-xs whitespace-nowrap text-unsaved'>
@@ -301,7 +316,7 @@ function ListCard(props: ListCardProps) {
     onToggle,
     hint,
     errorCount = 0,
-    fixed = false,
+    alwaysOpen = false,
     children,
     ...rest
   }: ListCardCommonProps & EveryKindProps = props;
@@ -318,7 +333,7 @@ function ListCard(props: ListCardProps) {
   const showFields =
     kind === 'group' &&
     opens === 'in-place' &&
-    (open || fixed) &&
+    (open || alwaysOpen) &&
     Boolean(children);
   const pinDepth = use(PinDepthContext);
   const pinned = showFields && pinDepth !== null && pinDepth < MAX_PINNED;
@@ -383,7 +398,7 @@ function ListCard(props: ListCardProps) {
               onToggle={onToggle}
               hint={hint}
               errorCount={errorCount}
-              fixed={fixed}
+              alwaysOpen={alwaysOpen}
             />
           ) : (
             <ValueBody

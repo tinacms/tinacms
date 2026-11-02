@@ -5,7 +5,7 @@ import { NumberField } from './number-field.ui';
 export default defineClientPlugin({
   field: {
     Component: NumberField,
-    metadata: { layout: 'inline' },
+    metadata: { layout: 'inline', inlineBox: () => 'number' },
     schema: numberSchema,
     // The editor holds a string, so a blank or whitespace input is empty.
     isEmpty: (value) => toNumber(value) === undefined,

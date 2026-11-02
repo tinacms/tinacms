@@ -31,7 +31,15 @@ export const arrayFieldStates = [
     name: 'item open',
     props: {
       ...base,
-      items: [{ ...closed[0], open: true }, closed[1], closed[2]],
+      items: [
+        {
+          ...closed[0],
+          open: true,
+          children: <input aria-label='Name' defaultValue='Ivan' />,
+        },
+        closed[1],
+        closed[2],
+      ],
     },
   },
   {

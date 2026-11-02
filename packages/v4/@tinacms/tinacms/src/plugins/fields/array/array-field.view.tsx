@@ -43,12 +43,13 @@ export interface ArrayItemView {
   open?: boolean;
   onToggle?: () => void;
   /** The item's fields show under a head that cannot fold. */
-  fixed?: boolean;
+  alwaysOpen?: boolean;
   /** Invalid fields inside a closed card. */
   errorCount?: number;
   /** The message under the card. */
   error?: string;
   onBlur?: () => void;
+  onFocus?: () => void;
   children?: ReactNode;
 }
 
@@ -171,10 +172,12 @@ function Card({
     onGripPointerDown: (event: PointerEvent<HTMLButtonElement>) =>
       listeners?.onPointerDown?.(event),
     onBlur: item.onBlur,
+    onFocus: item.onFocus,
   };
   return (
     <div
       ref={setNodeRef}
+      data-array-item=''
       style={{ transform: CSS.Translate.toString(transform), transition }}
     >
       {item.kind === 'value' ? (
@@ -192,7 +195,7 @@ function Card({
           summary={item.summary}
           opens={item.opens}
           open={item.open}
-          fixed={item.fixed}
+          alwaysOpen={item.alwaysOpen}
           errorCount={item.errorCount}
           onToggle={item.onToggle}
         >
@@ -384,7 +387,7 @@ export interface ArrayDrillInViewProps
   onDrillIn?: () => void;
 }
 
-export const countWords = (count: number): string => {
+const countWords = (count: number): string => {
   if (count === 0) return 'No items';
   return `${count} ${count === 1 ? 'item' : 'items'}`;
 };

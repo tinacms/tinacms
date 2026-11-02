@@ -17,7 +17,7 @@ The files are in `plugins/fields/array/`:
 | `array-field.client.tsx` | The descriptor, which takes the `array` key |
 | `array-field.ui.tsx` | The connected `ArrayField` and `ArrayDrillIn`: the form array, the keys, the headings, the error counts |
 | `array-field.view.tsx` | `ArrayFieldView` and `ArrayDrillInView`: plain props in, List cards out. It reads no store |
-| `array-field.states.ts` | `arrayFieldStates`: one entry for each look, used by the design sign-off and the render test |
+| `array-field.states.tsx` | `arrayFieldStates`: one entry for each look, used by the design sign-off and the render test |
 | `array-field.plugin.ts` | The manifest, `tina:field:array` |
 
 ## Authoring
@@ -236,7 +236,7 @@ sets the field to an empty list.
 
 `ArrayField` (`array-field.ui.tsx`) owns the data. `ArrayFieldView`
 (`array-field.view.tsx`) draws it. The view takes plain props, so every look
-is a story in `array-field.states.ts` and a case in one render test.
+is a story in `array-field.states.tsx` and a case in one render test.
 
 The list uses react-hook-form's `useFieldArray({ control, name: address })`
 for add, insert, remove and reorder. It has stable item keys, so React does

@@ -48,6 +48,38 @@ describe('array field states', () => {
     expect(onAdd).not.toHaveBeenCalled();
   });
 
+  it('shows the fields of an open card', () => {
+    const props = states.find((state) => state.name === 'item open')?.props;
+    if (!props) throw new Error('missing state');
+    render(<ArrayFieldView {...props} />);
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Ivan');
+    expect(screen.getByRole('button', { name: /^Item 1:/ })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
+  });
+
+  it('shows the error of a card that holds a widget', () => {
+    render(
+      <ArrayFieldView
+        label='Flags'
+        labelId='flags-label'
+        items={[
+          {
+            id: '1',
+            name: 'Item 1',
+            kind: 'group',
+            alwaysOpen: true,
+            summary: 'Item 1',
+            error: 'Flag is required',
+            children: <input aria-label='Flag' />,
+          },
+        ]}
+      />
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Flag is required');
+  });
+
   it('says so when a list is empty', () => {
     const [empty, readOnlyEmpty] = ['empty', 'read-only empty'].map(
       (name) => states.find((state) => state.name === name)?.props

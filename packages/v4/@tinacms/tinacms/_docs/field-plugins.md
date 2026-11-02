@@ -123,6 +123,11 @@ The properties of the descriptor:
 - `metadata.drillsIn(node)` — Overrides the depth rule for one node. `true`
   drills in, `false` opens in place, `undefined` keeps the depth rule. The
   `object` field returns it from `display`.
+- `metadata.inlineBox(node)` — For a single-value field. It returns `'text'` or
+  `'number'` when a list card can hold the value in its own box, and
+  `undefined` to keep the field's widget. The `string` field returns `'text'`
+  unless the node sets `multiline` or `mono`. The `number` field returns
+  `'number'`. The `array` field reads it for the items of an `of` list.
 - `DrillInComponent` — Draws the field in place of the drill-in button when the
   field drills in. Without it, the editor draws its generic button. The `object`
   and `array` fields supply a card. The items of an `array` also open as a form

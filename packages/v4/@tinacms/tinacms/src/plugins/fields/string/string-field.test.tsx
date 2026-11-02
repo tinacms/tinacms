@@ -292,7 +292,18 @@ describe('StringField metadata wrapping', () => {
   it('registers the string descriptor with its declared metadata', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('string');
-    expect(descriptor?.metadata).toEqual({ layout: 'inline' });
+    expect(descriptor?.metadata).toEqual({
+      layout: 'inline',
+      inlineBox: expect.any(Function),
+    });
+    expect(descriptor?.metadata?.inlineBox?.(t.string({ name: 'a' }))).toBe(
+      'text'
+    );
+    expect(
+      descriptor?.metadata?.inlineBox?.(
+        t.string({ name: 'a', multiline: true })
+      )
+    ).toBeUndefined();
     expect(descriptor?.defaultValue).toBe('');
   });
 });

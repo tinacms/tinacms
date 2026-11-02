@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../../config';
@@ -7,7 +7,12 @@ import type {
   CollectionSchema,
   TinaDocument,
 } from '../../../core/schema/types';
-import { FormProvider, TinaProvider, useFormSave } from '../../../editor';
+import {
+  FormProvider,
+  TinaProvider,
+  useActiveField,
+  useFormSave,
+} from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
 import { max } from '../../../plugins/fields';
@@ -50,6 +55,31 @@ const collection: CollectionSchema = {
       name: 'flags',
       label: 'Flags',
       of: t.boolean({ name: 'flag', label: 'Flag' }),
+    }),
+    t.array({
+      name: 'groups',
+      label: 'Groups',
+      fields: [
+        t.string({ name: 'label', label: 'Label' }),
+        t.array({
+          name: 'steps',
+          label: 'Steps',
+          fields: [t.string({ name: 'text', label: 'Text' })],
+        }),
+      ],
+    }),
+    t.array({
+      name: 'tiles',
+      label: 'Tiles',
+      picker: 'grid',
+      templates: [
+        {
+          name: 'hero',
+          label: 'Hero',
+          previewImage: 'https://example.com/hero.png',
+          fields: [t.string({ name: 'headline', label: 'Headline' })],
+        },
+      ],
     }),
     t.array({
       name: 'capped',
@@ -122,6 +152,12 @@ const chooseAction = async (list: string, item: number, action: string) => {
   );
 };
 
+// The cards that belong to the list itself, not to a list nested in a card.
+const ownCards = (group: HTMLElement) =>
+  Array.from(group.children).filter((child) =>
+    child.hasAttribute('data-array-item')
+  );
+
 const linkHeads = async () =>
   (await screen.findAllByRole('button', { name: /^Item \d+:/ })).map(
     (head) => head.textContent
@@ -150,14 +186,16 @@ describe('ArrayField item actions', () => {
   it('opens a newly inserted item', async () => {
     renderPage({ links: [{ label: 'A' }] });
     await chooseAction('Links', 1, 'Insert below');
-    expect(await screen.findAllByLabelText(/^Label\b/)).toHaveLength(1);
+    expect(
+      await screen.findAllByRole('textbox', { name: /^Label\b/ })
+    ).toHaveLength(1);
   });
 
   it('duplicates an item into an independent copy', async () => {
     renderPage({ links: [{ label: 'A' }] });
     await chooseAction('Links', 1, 'Duplicate');
     await waitFor(() => expect(valueOf('links')).toHaveLength(2));
-    const copy = await screen.findByLabelText(/^Label\b/);
+    const copy = await screen.findByRole('textbox', { name: /^Label\b/ });
     await userEvent.type(copy, '!');
     expect((valueOf('links') as TinaDocument[]).map((l) => l.label)).toEqual([
       'A',
@@ -177,7 +215,10 @@ describe('ArrayField item actions', () => {
   it('inserts a block of the template picked at that index', async () => {
     renderPage({ blocks: [{ _template: 'cta', text: 'Go' }] });
     await chooseAction('Blocks', 1, 'Insert above');
-    const buttons = await screen.findAllByRole('button', { name: 'Add Hero' });
+    const blocks = await screen.findByRole('group', { name: 'Blocks' });
+    const buttons = await within(blocks).findAllByRole('button', {
+      name: 'Add Hero',
+    });
     await userEvent.click(buttons[0]);
     await waitFor(() => expect(valueOf('blocks')).toHaveLength(2));
     expect(
@@ -294,5 +335,79 @@ describe('ArrayField scalar items', () => {
     expect(saved.tags).toEqual(['a', 'b']);
     expect(saved.links).toEqual([{ label: 'A' }]);
     expect(await linkHeads()).toBeTruthy();
+  });
+});
+
+function Activate({ address }: { address: string }) {
+  const { setActive } = useActiveField();
+  return (
+    <button type='button' onClick={() => setActive(toFieldAddress(address))}>
+      activate
+    </button>
+  );
+}
+
+describe('ArrayField focus and activation', () => {
+  it('keeps focus in the list that changed when a card holds a nested list', async () => {
+    renderPage({
+      groups: [
+        { label: 'A', steps: [{ text: 'x' }, { text: 'y' }] },
+        { label: 'B', steps: [] },
+        { label: 'C', steps: [] },
+      ],
+    });
+    const groups = await screen.findByRole('group', { name: 'Groups' });
+    await userEvent.click(
+      await screen.findByRole('button', { name: /^Item 1: A/ })
+    );
+    await screen.findByRole('group', { name: 'Steps' });
+    const menu = ownCards(groups)[1]?.querySelector(
+      '[aria-label^="Actions for"]'
+    );
+    if (!menu) throw new Error('no menu');
+    await userEvent.click(menu);
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: 'Remove' })
+    );
+    await waitFor(() => expect(valueOf('groups')).toHaveLength(2));
+    await waitFor(() => {
+      const focused = document.activeElement;
+      expect(focused).toHaveAttribute('data-grip');
+      expect(focused?.closest('[data-array-item]')?.parentElement).toBe(groups);
+      expect(ownCards(groups)[1]).toContainElement(focused as HTMLElement);
+    });
+  });
+
+  it('focuses the grid picker after the last block is removed', async () => {
+    renderPage({ tiles: [{ _template: 'hero', headline: 'Hi' }] });
+    await chooseAction('Tiles', 1, 'Remove');
+    const tiles = await screen.findByRole('group', { name: 'Tiles' });
+    const add = await within(tiles).findByRole('button', { name: 'Add Hero' });
+    await waitFor(() => expect(add).toHaveFocus());
+  });
+
+  it('focuses a list box when its field is activated', async () => {
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: PLUGINS,
+          schema: { collections: [] },
+        })}
+      >
+        <FormProvider
+          collection={collection}
+          path={PATH}
+          document={{ tags: ['a', 'b'] }}
+        >
+          <LabelledFields />
+          <Activate address='tags.1' />
+        </FormProvider>
+      </TinaProvider>
+    );
+    await screen.findByRole('textbox', { name: 'Item 2' });
+    await userEvent.click(screen.getByText('activate'));
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: 'Item 2' })).toHaveFocus()
+    );
   });
 });

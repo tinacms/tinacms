@@ -15,6 +15,11 @@ export interface FieldMetadata {
    * `undefined` leaves it to the depth rule.
    */
   drillsIn?: (node: FieldSchema) => boolean | undefined;
+  /**
+   * For a single-value field: the kind of inline box a list card can hold in
+   * place of the field's own widget. `undefined` keeps the widget.
+   */
+  inlineBox?: (node: FieldSchema) => 'text' | 'number' | undefined;
 }
 
 export interface FieldTransformContext {

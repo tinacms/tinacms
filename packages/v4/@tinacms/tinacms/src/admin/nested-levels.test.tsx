@@ -317,9 +317,11 @@ describe('array items as form levels', () => {
   it('opens an item of a list at level 2 as the next form level, with its own trail step', async () => {
     const user = userEvent.setup();
     renderRows();
-    expect(screen.queryByLabelText(/^Note\b/)).toBeNull();
+    expect(screen.queryByRole('textbox', { name: /^Note\b/ })).toBeNull();
     await user.click(await screen.findByRole('button', { name: /^Item 1:/ }));
-    expect(await screen.findByLabelText(/^Note\b/)).toHaveValue('n1');
+    expect(await screen.findByRole('textbox', { name: /^Note\b/ })).toHaveValue(
+      'n1'
+    );
     const trail = screen.getByRole('navigation', { name: 'Field path' });
     expect(within(trail).getByText('First')).toBeVisible();
   });
@@ -328,10 +330,10 @@ describe('array items as form levels', () => {
     const user = userEvent.setup();
     renderRows();
     await user.click(await screen.findByRole('button', { name: /^Item 1:/ }));
-    const note = await screen.findByLabelText(/^Note\b/);
+    const note = await screen.findByRole('textbox', { name: /^Note\b/ });
     await user.click(note);
     await user.type(note, '!');
-    expect(screen.getByLabelText(/^Note\b/)).toHaveValue('n1!');
+    expect(screen.getByRole('textbox', { name: /^Note\b/ })).toHaveValue('n1!');
     expect(
       screen.getByRole('navigation', { name: 'Field path' })
     ).toBeVisible();
@@ -342,7 +344,9 @@ describe('array items as form levels', () => {
     renderRows(<Activate address='wrap.rows.0.note' name='preview' />);
     await screen.findByRole('button', { name: /^Item 1:/ });
     await user.click(screen.getByRole('button', { name: 'preview' }));
-    expect(await screen.findByLabelText(/^Note\b/)).toHaveFocus();
+    expect(
+      await screen.findByRole('textbox', { name: /^Note\b/ })
+    ).toHaveFocus();
   });
 
   it('goes back up from the item level to the list', async () => {
@@ -351,9 +355,21 @@ describe('array items as form levels', () => {
     await user.click(await screen.findByRole('button', { name: /^Item 1:/ }));
     const trail = await screen.findByRole('navigation', { name: 'Field path' });
     await user.click(within(trail).getByRole('button', { name: 'Rows' }));
-    expect(screen.queryByLabelText(/^Note\b/)).toBeNull();
+    expect(screen.queryByRole('textbox', { name: /^Note\b/ })).toBeNull();
     expect(
       await screen.findByRole('button', { name: /^Item 1:/ })
+    ).toBeVisible();
+  });
+
+  it('opens an item added at level 3 as its own form level', async () => {
+    const user = userEvent.setup();
+    renderRows();
+    await user.click(await screen.findByRole('button', { name: 'Add item' }));
+    expect(await screen.findByRole('textbox', { name: /^Note\b/ })).toHaveValue(
+      ''
+    );
+    expect(
+      screen.getByRole('navigation', { name: 'Field path' })
     ).toBeVisible();
   });
 });

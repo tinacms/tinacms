@@ -29,6 +29,7 @@ import {
 import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
 import {
   NestedFieldRow,
+  useActiveField,
   useActivation,
   useDocumentPath,
   useFieldAddress,
@@ -138,16 +139,27 @@ function useAfterChange(
     if (!todo || changed === undefined) return;
     pending.current = undefined;
     if (todo.open !== undefined) open(todo.open);
+    // Only this list's own cards count: a list nested in an open card has
+    // grips and an Add control of its own.
     const list = listRef.current;
-    if (todo.focus === 'add') {
-      list
-        ?.querySelector<HTMLElement>(
-          '[data-slot=add-button], [data-slot=add-input] input'
-        )
-        ?.focus();
-    } else {
-      list?.querySelectorAll<HTMLElement>('[data-grip]')[todo.focus]?.focus();
-    }
+    const own = Array.from(list?.children ?? []);
+    const cards = own.filter((child) => child.hasAttribute('data-array-item'));
+    const add = own
+      .flatMap((child) =>
+        child.matches('[data-add-picker]')
+          ? [...child.querySelectorAll('[data-slot=add-button]')]
+          : [child]
+      )
+      .find((child) =>
+        child.matches('[data-slot=add-button], [data-slot=add-input]')
+      );
+    const target =
+      todo.focus === 'add'
+        ? add?.matches('input')
+          ? add
+          : (add?.querySelector('input') ?? add)
+        : cards[todo.focus]?.querySelector('[data-grip]');
+    if (target instanceof HTMLElement) target.focus();
   }, [changed]);
   return {
     listRef,
@@ -157,7 +169,6 @@ function useAfterChange(
   };
 }
 
-// Where focus goes after item `index` leaves a list that now holds `left` items.
 const focusAfterRemove = (index: number, left: number): Pending['focus'] =>
   left === 0 ? 'add' : Math.min(index, left - 1);
 
@@ -178,15 +189,14 @@ function ObjectItems({
     remove,
     move,
   } = useFieldArray({ control, name: address });
-  // Subscribes the headings to edits, so an `itemLabel` follows typing.
-  const watched: unknown = useWatch({ control, name: address });
+  // Re-renders the headings on typing, so an `itemLabel` follows it.
+  useWatch({ control, name: address });
   const flat = useFormErrors(useFormId());
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
   const [picking, setPicking] = useState<number | null>(null);
-  const { listRef, afterChange } = useAfterChange(items, (index) => {
-    const id = items[index]?.id;
-    if (id) setOpen((held) => new Set(held).add(id));
-  });
+  const { listRef, afterChange } = useAfterChange(items, (index) =>
+    showItem(index)
+  );
   const max = limitOf(field, 'max');
   const full = max !== undefined && items.length >= max;
 
@@ -199,6 +209,19 @@ function ObjectItems({
     )
   );
 
+  // Opens an item where its depth says: in place, or as the next form level.
+  function showItem(index: number) {
+    const itemAddress = `${address}.${index}`;
+    const stored: unknown = getValues(itemAddress);
+    const fields = isItem(stored) ? itemFieldsOf(field, stored) : undefined;
+    if (fields && itemOpensNextLevel(itemAddress)) {
+      const heading = itemHeadingOf(field, stored, index);
+      scope.view.getState().openLevel(itemLevel(itemAddress, heading, fields));
+      return;
+    }
+    const id = items[index]?.id;
+    if (id) setOpen((held) => new Set(held).add(id));
+  }
   const openOnActivation = useEffectEvent((target: string) => {
     items.forEach((item, index) => {
       if (target.startsWith(`${address}.${index}.`)) {
@@ -241,21 +264,14 @@ function ObjectItems({
   const views: ArrayItemView[] = items.map((item, index) => {
     const itemAddress = `${address}.${index}`;
     const stored: unknown = getValues(itemAddress);
-    // The watched copy only re-renders the heading; it can lag a move.
-    const watchedItem: unknown = Array.isArray(watched)
-      ? watched[index]
-      : stored;
-    const current = isItem(watchedItem)
-      ? watchedItem
-      : isItem(stored)
-        ? stored
-        : undefined;
+    // `watched` only triggers the render; it can lag a move, so read `stored`.
+    const current = isItem(stored) ? stored : undefined;
     const fields = isItem(stored) ? itemFieldsOf(field, stored) : undefined;
     const template =
       isTemplatesArray(field) && current
         ? templateFor(field.templates, current)
         : undefined;
-    const heading = itemHeadingOf(field, current ?? watchedItem, index);
+    const heading = itemHeadingOf(field, stored, index);
 
     let title: string | undefined;
     let summary: string | undefined = heading;
@@ -280,10 +296,8 @@ function ObjectItems({
       open: open.has(item.id),
       errorCount: counts[index],
       onToggle: () => {
-        if (opens === 'next-level' && fields) {
-          scope.view
-            .getState()
-            .openLevel(itemLevel(itemAddress, heading, fields));
+        if (opens === 'next-level') {
+          showItem(index);
           return;
         }
         setOpen((held) => {
@@ -383,7 +397,7 @@ function TemplatePicker({
   ) : null;
   if (pickerOf(field) === 'list') {
     return (
-      <div className='flex flex-col gap-1'>
+      <div data-add-picker='' className='flex flex-col gap-1'>
         {field.templates.map((template) => (
           <AddButton
             key={template.name}
@@ -399,12 +413,13 @@ function TemplatePicker({
     );
   }
   return (
-    <div className='flex flex-col gap-2'>
+    <div data-add-picker='' className='flex flex-col gap-2'>
       <div className='grid w-full grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2'>
         {field.templates.map((template) => (
           <button
             key={template.name}
             type='button'
+            data-slot='add-button'
             disabled={full}
             aria-label={`Add ${templateTitle(template)}`}
             className='flex flex-col gap-2 rounded-sm border bg-card p-2 text-left text-sm hover:border-input focus-visible:shadow-focus-ring disabled:opacity-60'
@@ -448,16 +463,6 @@ function ResolvedPreview({
   );
 }
 
-// A string without a box shape, or a number, edits in the card's own box.
-// Every other type keeps its widget.
-const boxTypeOf = (of: FieldSchema): 'text' | 'number' | undefined => {
-  if (of.type === 'number') return 'number';
-  const shape = of as FieldSchema & { multiline?: boolean; mono?: boolean };
-  return of.type === 'string' && !shape.multiline && !shape.mono
-    ? 'text'
-    : undefined;
-};
-
 function ScalarItems({
   address,
   field,
@@ -466,14 +471,28 @@ function ScalarItems({
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
   const scope = useScope();
+  const activation = useActivation();
+  const { setActive } = useActiveField();
   const { getValues, setValue } = useFormContext();
   const [value, setList] = useFieldValue<unknown[] | undefined>(address);
   const live: unknown = useWatch({ name: address });
   const { errors } = useFormState({ name: address });
   const shown = Array.isArray(live) ? live : (value ?? []);
   const items = value ?? [];
+  const box = registry.get(field.of.type)?.metadata?.inlineBox?.(field.of);
   const { listRef, afterChange } = useAfterChange(value ?? []);
-  const box = boxTypeOf(field.of);
+  const focusActivated = useEffectEvent((target: string) => {
+    const index = items.findIndex(
+      (_, position) => target === `${address}.${position}`
+    );
+    const cards = Array.from(listRef.current?.children ?? []).filter((child) =>
+      child.hasAttribute('data-array-item')
+    );
+    cards[index]?.querySelector('input')?.focus();
+  });
+  useEffect(() => {
+    if (activation && box) focusActivated(activation.address);
+  }, [activation, box]);
   const max = limitOf(field, 'max');
   const full = max !== undefined && items.length >= max;
 
@@ -524,26 +543,29 @@ function ScalarItems({
       id: keys.current[index] ?? itemAddress,
       name: `Item ${index + 1}`,
     };
-    if (!box) {
-      return {
-        ...base,
-        kind: 'group',
-        fixed: true,
-        summary: base.name,
-        children: <NestedFieldRow address={itemAddress} node={field.of} />,
-      };
-    }
     const messages = ownFieldErrors(get(errors, itemAddress), itemAddress)[
       itemAddress
     ];
     const revealed = isRevealed(scope.view.getState(), itemAddress);
+    const error = revealed ? messages?.[0] : undefined;
+    if (!box) {
+      return {
+        ...base,
+        kind: 'group',
+        alwaysOpen: true,
+        summary: base.name,
+        error,
+        children: <NestedFieldRow address={itemAddress} node={field.of} />,
+      };
+    }
     const entry = shown[index];
     return {
       ...base,
       kind: 'value',
       inputType: box,
       value: entry == null ? '' : String(entry),
-      error: revealed ? messages?.[0] : undefined,
+      error,
+      onFocus: () => setActive(toFieldAddress(itemAddress)),
       onValueChange: (text) =>
         setValue(itemAddress, text, {
           shouldDirty: true,
@@ -581,7 +603,6 @@ function ScalarItems({
   );
 }
 
-// Drawn in place of the field where it drills in.
 export function ArrayDrillIn() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
