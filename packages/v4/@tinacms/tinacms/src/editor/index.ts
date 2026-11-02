@@ -68,5 +68,6 @@ export {
   useFormSave,
   useFormSeedKey,
   useRpcClient,
+  useSchemaCollections,
   useTinaStore,
 } from './hooks';

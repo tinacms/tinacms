@@ -1,6 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { type ComponentType, Fragment, type ReactNode } from 'react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
+import { formatAdminRoute } from '../../../admin/routing';
 import { asResolvedConfig } from '../../../config';
 import type {
   ContentProvider,
@@ -18,7 +21,8 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
-import { FormProvider, TinaProvider } from '../../../editor';
+import { QueryClient } from '@tanstack/react-query';
+import { FormProvider, TinaProvider, contentKeys } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
 import { required } from '../../../plugins/fields';
@@ -31,11 +35,17 @@ const DOCUMENT_PATH = 'content/posts/featured.mdx';
 const ABOUT = 'content/pages/about.mdx';
 const CONTACT = 'content/pages/contact.mdx';
 const ADA = 'content/authors/ada.mdx';
+const NEWEST = 'content/pages/newest.mdx';
 
 const SUMMARIES: Record<string, DocumentSummary[]> = {
   page: [{ path: ABOUT }, { path: CONTACT }],
   author: [{ path: ADA }],
 };
+
+// An option's name is its path followed by `<Collection> · <path>`.
+const option = (path: string) => ({
+  name: new RegExp(`^${path.replaceAll('.', '\\.')}\\s`),
+});
 
 const valueOf = (name: string) =>
   useFormStore.getState().forms[toFormId(DOCUMENT_PATH)]?.values[
@@ -86,22 +96,30 @@ const contentPlugin = (
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins([referenceFieldPlugin]);
 
-const renderField = (document?: TinaDocument, content = contentPlugin()) =>
+const renderField = (
+  document?: TinaDocument,
+  content = contentPlugin(),
+  Wrapper: ComponentType<{ children: ReactNode }> = Fragment,
+  queryClient?: QueryClient
+) =>
   render(
-    <TinaProvider
-      config={asResolvedConfig({
-        plugins: [referenceFieldPlugin, content, coreValidatorsPlugin],
-        schema: { collections: [collection] },
-      })}
-    >
-      <FormProvider
-        collection={collection}
-        path={DOCUMENT_PATH}
-        document={document}
+    <Wrapper>
+      <TinaProvider
+        queryClient={queryClient}
+        config={asResolvedConfig({
+          plugins: [referenceFieldPlugin, content, coreValidatorsPlugin],
+          schema: { collections: [collection] },
+        })}
       >
-        <LabelledFields />
-      </FormProvider>
-    </TinaProvider>
+        <FormProvider
+          collection={collection}
+          path={DOCUMENT_PATH}
+          document={document}
+        >
+          <LabelledFields />
+        </FormProvider>
+      </TinaProvider>
+    </Wrapper>
   );
 
 describe('ReferenceField rendering', () => {
@@ -123,10 +141,8 @@ describe('ReferenceField searching', () => {
   it('narrows the options to what was typed', async () => {
     renderField();
     await userEvent.type(await screen.findByLabelText(/^Page\b/), 'contact');
-    expect(await screen.findByRole('option', { name: CONTACT })).toBeVisible();
-    expect(
-      screen.queryByRole('option', { name: ABOUT })
-    ).not.toBeInTheDocument();
+    expect(await screen.findByRole('option', option(CONTACT))).toBeVisible();
+    expect(screen.queryByRole('option', option(ABOUT))).not.toBeInTheDocument();
   });
 
   it('says so when nothing matches', async () => {
@@ -140,22 +156,22 @@ describe('ReferenceField lookup', () => {
   it('offers every document of the collection it names', async () => {
     renderField();
     await userEvent.click(await screen.findByLabelText(/^Page\b/));
-    expect(await screen.findByRole('option', { name: ABOUT })).toBeVisible();
-    expect(await screen.findByRole('option', { name: CONTACT })).toBeVisible();
+    expect(await screen.findByRole('option', option(ABOUT))).toBeVisible();
+    expect(await screen.findByRole('option', option(CONTACT))).toBeVisible();
   });
 
   it('draws candidates from every collection a field names', async () => {
     renderField();
     await userEvent.click(await screen.findByLabelText(/^Related\b/));
-    expect(await screen.findByRole('option', { name: ABOUT })).toBeVisible();
-    expect(await screen.findByRole('option', { name: ADA })).toBeVisible();
+    expect(await screen.findByRole('option', option(ABOUT))).toBeVisible();
+    expect(await screen.findByRole('option', option(ADA))).toBeVisible();
   });
 
   it('asks the content capability for each collection a field names', async () => {
     const list = vi.fn(async (name: string) => SUMMARIES[name] ?? []);
     renderField(undefined, contentPlugin({ list }));
     await userEvent.click(await screen.findByLabelText(/^Related\b/));
-    await screen.findByRole('option', { name: ADA });
+    await screen.findByRole('option', option(ADA));
     expect(list.mock.calls.map(([name]) => name).sort()).toEqual([
       'author',
       'page',
@@ -167,7 +183,7 @@ describe('ReferenceField value updates', () => {
   it('stores the path of the chosen document', async () => {
     renderField();
     await userEvent.click(await screen.findByLabelText(/^Page\b/));
-    await userEvent.click(await screen.findByRole('option', { name: ABOUT }));
+    await userEvent.click(await screen.findByRole('option', option(ABOUT)));
     expect(valueOf('page')).toBe(ABOUT);
   });
 
@@ -188,23 +204,247 @@ describe('ReferenceField value updates', () => {
   });
 });
 
+const DELETED = 'content/pages/deleted.mdx';
+
 describe('ReferenceField missing references', () => {
-  it('marks a stored path that no document answers', async () => {
-    renderField({ page: 'content/pages/deleted.mdx' });
-    expect(await screen.findByLabelText(/^Page\b/)).toHaveValue(
-      'content/pages/deleted.mdx (missing)'
+  it('keeps the stored path in the box and warns without blocking', async () => {
+    renderField({ page: DELETED });
+    expect(await screen.findByLabelText(/^Page\b/)).toHaveValue(DELETED);
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'This document no longer exists.'
+    );
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(valueOf('page')).toBe(DELETED);
+  });
+
+  it('does not offer the missing path as an option', async () => {
+    renderField({ page: DELETED });
+    await userEvent.click(await screen.findByLabelText(/^Page\b/));
+    await screen.findByRole('option', option(ABOUT));
+    expect(screen.queryByRole('option', option(DELETED))).toBeNull();
+  });
+
+  it('lets a required field clear a missing reference, then shows the required error', async () => {
+    renderField({ author: 'content/authors/gone.mdx' });
+    await screen.findByRole('status');
+    await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+    expect(valueOf('author')).toBeNull();
+    const input = screen.getByLabelText(/^Author\b/);
+    await userEvent.click(input);
+    await userEvent.tab();
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Author is required'
     );
   });
 
-  it('keeps a missing reference selectable so it is not silently dropped', async () => {
-    renderField({ page: 'content/pages/deleted.mdx' });
-    await userEvent.click(await screen.findByLabelText(/^Page\b/));
-    expect(
-      await screen.findByRole('option', {
-        name: 'content/pages/deleted.mdx (missing)',
+  it('shows no warning while a list is still loading', async () => {
+    renderField(
+      { page: DELETED },
+      contentPlugin({ list: () => new Promise(() => {}) })
+    );
+    const input = await screen.findByLabelText(/^Page\b/);
+    expect(input).toHaveValue(DELETED);
+    expect(input).toBeDisabled();
+    expect(input).toHaveAttribute('placeholder', 'Loading documents…');
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('keeps the warning and the box while a background refetch runs', async () => {
+    let refetching = false;
+    const refetchStarted = vi.fn();
+    const queryClient = new QueryClient();
+    renderField(
+      { page: DELETED },
+      contentPlugin({
+        list: async (name: string) => {
+          if (refetching) {
+            refetchStarted();
+            return new Promise(() => {});
+          }
+          return SUMMARIES[name] ?? [];
+        },
+      }),
+      Fragment,
+      queryClient
+    );
+    const input = await screen.findByLabelText(/^Page\b/);
+    await screen.findByRole('status');
+    refetching = true;
+    void queryClient.refetchQueries({ queryKey: contentKeys.list('page') });
+    await waitFor(() => expect(refetchStarted).toHaveBeenCalled());
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'This document no longer exists.'
+    );
+    expect(input).toBeEnabled();
+    expect(input).toHaveAttribute('placeholder', 'Search documents…');
+  });
+
+  it('keeps what is typed when a background refetch brings new documents', async () => {
+    let refetched = false;
+    const queryClient = new QueryClient();
+    renderField(
+      { page: ABOUT },
+      contentPlugin({
+        list: async (name: string) => [
+          ...(SUMMARIES[name] ?? []),
+          ...(refetched && name === 'page' ? [{ path: NEWEST }] : []),
+        ],
+      }),
+      Fragment,
+      queryClient
+    );
+    const input = await screen.findByLabelText(/^Page\b/);
+    await waitFor(() => expect(input).toBeEnabled());
+    await userEvent.clear(input);
+    await userEvent.type(input, 'cont');
+    refetched = true;
+    await queryClient.refetchQueries({ queryKey: contentKeys.list('page') });
+    expect(await screen.findByRole('option', option(NEWEST))).toBeVisible();
+    expect(input).toHaveValue('cont');
+  });
+
+  it('treats a stored value that is not a path as no value', async () => {
+    renderField({ page: 42 } as unknown as TinaDocument);
+    const input = await screen.findByLabelText(/^Page\b/);
+    expect(input).toHaveValue('');
+    expect(screen.queryByRole('status')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull();
+  });
+});
+
+describe('ReferenceField failed lists', () => {
+  it('disables the field and reports the load error', async () => {
+    renderField(
+      { page: ABOUT },
+      contentPlugin({
+        list: async () => {
+          throw new Error('Network down');
+        },
       })
-    ).toBeVisible();
-    expect(valueOf('page')).toBe('content/pages/deleted.mdx');
+    );
+    const input = await screen.findByLabelText(/^Page\b/);
+    const alerts = await screen.findAllByRole('alert');
+    expect(alerts.length).toBeGreaterThan(0);
+    for (const alert of alerts) expect(alert).toHaveTextContent('Network down');
+    expect(input).toBeDisabled();
+    expect(input).toHaveAttribute('placeholder', 'Could not load documents');
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('disables the whole field when one of several lists fails', async () => {
+    renderField(
+      undefined,
+      contentPlugin({
+        list: async (name: string) => {
+          if (name === 'author') throw new Error('Authors failed');
+          return SUMMARIES[name] ?? [];
+        },
+      })
+    );
+    const input = await screen.findByLabelText(/^Related\b/);
+    await screen.findAllByText('Authors failed');
+    expect(input).toBeDisabled();
+    await userEvent.click(input);
+    expect(screen.queryByRole('option')).toBeNull();
+  });
+});
+
+describe('ReferenceField document labels', () => {
+  it('puts the collection under each path, falling back to its name', async () => {
+    renderField();
+    await userEvent.click(await screen.findByLabelText(/^Page\b/));
+    const row = await screen.findByRole('option', option(ABOUT));
+    expect(row).toHaveTextContent(`page · ${ABOUT}`);
+  });
+
+  it('groups by collection in the order the field names them', async () => {
+    renderField();
+    await userEvent.click(await screen.findByLabelText(/^Related\b/));
+    await screen.findByRole('option', option(ADA));
+    const headings = screen
+      .getAllByRole('group')
+      .filter((group) => group.dataset.slot === 'combobox-group')
+      .map(
+        (group) => within(group).getAllByText(/^(page|author)$/)[0]?.textContent
+      );
+    expect(headings).toEqual(['page', 'author']);
+  });
+
+  it('shows no group heading for a single collection', async () => {
+    renderField();
+    await userEvent.click(await screen.findByLabelText(/^Page\b/));
+    await screen.findByRole('option', option(ABOUT));
+    expect(
+      screen
+        .queryAllByRole('group')
+        .filter((group) => group.dataset.slot === 'combobox-group')
+    ).toHaveLength(0);
+  });
+
+  it('lists a path named by two collections once, under the first', async () => {
+    const shared = contentPlugin({
+      list: async () => [{ path: ABOUT }],
+    });
+    renderField(undefined, shared);
+    await userEvent.click(await screen.findByLabelText(/^Related\b/));
+    const rows = await screen.findAllByRole('option', option(ABOUT));
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toHaveTextContent(`page · ${ABOUT}`);
+  });
+});
+
+describe('ReferenceField opening a document', () => {
+  const Location = () => (
+    <output data-testid='location'>{useLocation().pathname}</output>
+  );
+  const InRouter = ({ children }: { children: ReactNode }) => (
+    <MemoryRouter>
+      {children}
+      <Location />
+    </MemoryRouter>
+  );
+
+  it('navigates to the document in the collection that listed it', async () => {
+    renderField({ page: ABOUT }, contentPlugin(), InRouter);
+    await userEvent.click(
+      await screen.findByRole('button', { name: `Open ${ABOUT}` })
+    );
+    expect(screen.getByTestId('location')).toHaveTextContent(
+      formatAdminRoute({
+        view: 'document',
+        collection: 'page',
+        path: ABOUT,
+      }).slice(1)
+    );
+  });
+
+  it('hides Open while another collection of the field is still loading', async () => {
+    renderField(
+      { related: ABOUT },
+      contentPlugin({
+        list: (name: string) =>
+          name === 'author'
+            ? new Promise(() => {})
+            : Promise.resolve(SUMMARIES[name] ?? []),
+      }),
+      InRouter
+    );
+    const input = await screen.findByLabelText(/^Related\b/);
+    expect(input).toHaveValue(ABOUT);
+    expect(input).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /^Open/ })).toBeNull();
+  });
+
+  it('hides Open for a missing document', async () => {
+    renderField({ page: DELETED }, contentPlugin(), InRouter);
+    await screen.findByRole('status');
+    expect(screen.queryByRole('button', { name: /^Open/ })).toBeNull();
+  });
+
+  it('still renders without a Router, with no Open button', async () => {
+    renderField({ page: ABOUT });
+    expect(await screen.findByLabelText(/^Page\b/)).toHaveValue(ABOUT);
+    expect(screen.queryByRole('button', { name: /^Open/ })).toBeNull();
   });
 });
 

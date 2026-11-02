@@ -12,13 +12,15 @@ the time an author opens the field.
 
 ## Files
 
-The four files are in `plugins/fields/reference/`:
+The files are in `plugins/fields/reference/`:
 
 | File | Role |
 |---|---|
 | `reference-field.schema.ts` | The `t.reference()` helper function, and the `referenceSchema` validator |
 | `reference-field.client.tsx` | The descriptor, which takes the `reference` key |
-| `reference-field.ui.tsx` | The `ReferenceField` component |
+| `reference-field.ui.tsx` | The `ReferenceField` component. It reads the form and the content lists, then feeds the view |
+| `reference-field.view.tsx` | `ReferenceFieldView`, the search box, list and Open button, with no editor state |
+| `reference-field.states.ts` | The state catalogue: every look of the view, for design sign-off and the render test |
 | `reference-field.plugin.ts` | The manifest, `tina:field:reference` |
 
 ## Authoring
@@ -127,7 +129,23 @@ sets no `defaultValue`. A cleared reference digests as absent, not as `null`.
 
 `ReferenceField` (`reference-field.ui.tsx`) has no props. It reads its address
 and its resolved schema node from the context, and it gets the value and the
-errors from hooks that use the address.
+errors from hooks that use the address. It passes everything to
+`ReferenceFieldView` (`reference-field.view.tsx`), which has no editor state.
+
+The view derives nothing about loading or a missing document. `ReferenceField`
+passes `missing`, `placeholder` and `disabled`:
+
+- While a list loads, the field is disabled and says "Loading documents…".
+- When a list fails, the field is disabled and says "Could not load documents".
+  The error message shows under the field.
+- `missing` is true only when every list has loaded without error and none
+  lists the stored path.
+
+### The state catalogue
+
+`reference-field.states.ts` lists every look of the view as `{ name, props }`.
+`reference-field.states.test.tsx` renders each state in one `it.each`. The
+catalogue is the checklist for the design sign-off.
 
 ### The options
 
@@ -164,7 +182,12 @@ The queries use the same keys as `useCollectionDocuments`
 one cache.
 
 `content.list` returns a `DocumentSummary`, which holds a path and no content.
-Each option therefore shows its path. See
+Each option therefore shows its path as the label, and the label of its
+collection under it (`Authors · content/authors/ada.md`). The label comes from
+the schema, and the collection name is the fallback. When the field names more
+than one collection, the list has a heading for each collection, in the order of
+`collections`. When two collections list the same path, the first one wins.
+Search matches the path only. See
 [`core/content/contract.ts`](../src/core/content/contract.ts) for why `list`
 carries no bodies.
 
@@ -178,10 +201,21 @@ An optional field shows a clear button. A required field does not.
 
 ### Missing references
 
-A stored path whose document is gone stays in the list, with `(missing)` after
-it. The field does not drop the value, and it does not silently show an empty
-control. An author sees what the reference points at, and can choose another
-document.
+A stored path that no collection lists stays in the box, as saved. The field
+shows an amber "This document no longer exists." message under the box. The
+message does not block saving. The clear button shows even on a required field,
+so an author can recover. The field reports a missing path only after every list
+has loaded without error.
+
+### The Open button
+
+An icon button beside the box opens the chosen document in the same tab. Its
+name is `Open <path>`. It shows only when the chosen document exists, and it
+also shows on a read-only field. The slot stays reserved, so the box does not
+change width.
+
+`ReferenceField` supplies `onOpen` from `useAdminRoute()` only inside a Router
+(`useInRouterContext()`). Outside a Router, the view hides the button.
 
 ### A failed lookup
 
@@ -224,8 +258,10 @@ not arrived yet keeps its path for a frame.
 - It stores the path of the chosen document.
 - It clears an optional reference, and it shows no clear button on a required
   one.
-- It marks a stored path that no document answers, and keeps that path
-  selectable.
+- It keeps a missing path in the box with an amber warning, and shows no
+  warning while a list loads.
+- It disables the field when a list fails.
+- It opens a document in the collection that listed it.
 - It rejects a missing value on a required field, and passes an empty value on
   an optional field.
 - It passes a stored path through ingest and digest without a change, and
