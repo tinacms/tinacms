@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { DocumentForm } from '../admin/document-form';
@@ -82,7 +82,6 @@ const collection: CollectionSchema = {
   fields: [
     t.object({
       name: 'box',
-      label: 'Box',
       fields: [
         t.string({ name: 'a', label: 'A', validators: [required()] }),
         t.string({ name: 'b', label: 'B', validators: [required()] }),
@@ -114,6 +113,11 @@ describe('field plugin hooks', () => {
     renderForm();
     await userEvent.click(await screen.findByRole('button', { name: 'card' }));
     expect(await screen.findByText('open')).toBeVisible();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Field path' })).getByText(
+        'box'
+      )
+    ).toBeVisible();
     expect(screen.getByLabelText('open count')).toHaveTextContent('0');
 
     const a = screen.getByLabelText(/^A\b/);
