@@ -156,9 +156,10 @@ a call to `useCollectionDocuments` for each name in a loop. The component uses
 ```tsx
 const useReferenceOptions = (collections: string[]): ReferenceOptions => {
   const content = useContentSlice();
+  const branch = useCurrentBranch();
   return useQueries({
     queries: collections.map((collection) => ({
-      queryKey: contentKeys.list(collection),
+      queryKey: contentKeys.list(collection, branch),
       queryFn: () => content.list(collection),
       staleTime: CONTENT_STALE_TIME,
     })),
@@ -178,7 +179,7 @@ const useReferenceOptions = (collections: string[]): ReferenceOptions => {
 ```
 
 The queries use the same keys as `useCollectionDocuments`
-(`contentKeys.list(collection)`), so the field and the rest of the editor share
+(`contentKeys.list(collection, branch)`), so the field and the rest of the editor share
 one cache.
 
 `content.list` returns a `DocumentSummary`, which holds a path and no content.

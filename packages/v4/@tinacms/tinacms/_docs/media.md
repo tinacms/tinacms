@@ -70,7 +70,7 @@ import config from '../tina/config';
 | `localMediaPlugin()` | `/uploads/posts/hero.jpg` (no transforms, so `options` is ignored) |
 | `tinaCloud({ clientId })` | `https://assets.tina.io/{clientId}/posts/hero.jpg?fit=crop&max-w=400` |
 
-The site has no store and no branch, so `tinaCloud()` gives URLs on the media branch of the project. The editor uses the branch in `store.branch.name`.
+The site has no store and no branch, so `tinaCloud()` gives URLs on the media branch of the project. The editor uses the branch in `store.branch.current`.
 
 ### The Media UI - The Media Manager
 

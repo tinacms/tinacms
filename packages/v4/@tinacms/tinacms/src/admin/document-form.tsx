@@ -7,6 +7,7 @@ import {
   AlertDialogTitle,
 } from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
+import { toast } from '@tinacms/ui/components/toast';
 import { FormLevel } from '@tinacms/ui/components/form-level';
 import {
   type ReactNode,
@@ -63,11 +64,12 @@ function SaveButton() {
           save()
             .catch((cause) => {
               console.error('[tinacms] Save failed:', cause);
+              let message = 'Save failed.';
               if (cause instanceof Error && cause.message) {
-                setFailure(cause.message);
-              } else {
-                setFailure('Save failed.');
+                message = cause.message;
               }
+              setFailure(message);
+              toast({ tone: 'error', title: 'Save failed', text: message });
             })
             .finally(() => setPending(false));
         }}
