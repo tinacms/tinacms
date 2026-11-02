@@ -2,7 +2,7 @@
 
 The `image` field is one of the field plugins that v4 supplies. It attaches one
 image to a document. The document stores the media path of the image, and the
-editor shows a preview, a picker and an upload control.
+editor shows a picture tile, a picker and a drop area.
 
 The field needs a media plugin. Its manifest declares `dependsOn: ['media']`,
 and `defineConfig` installs it only when a plugin provides the `media`
@@ -11,13 +11,18 @@ capability. A schema that uses `t.image` without a media plugin fails in
 
 ## Files
 
-The four files are in `plugins/fields/image/`:
+The files are in `plugins/fields/image/`:
 
 | File | Role |
 |---|---|
 | `image-field.schema.ts` | The `t.image()` helper function, and the `imageSchema` validator |
 | `image-field.client.tsx` | The descriptor, which takes the `image` key |
-| `image-field.ui.tsx` | The `ImageField` component |
+| `image-field.ui.tsx` | The `ImageField` container |
+| `image-field.view.tsx` | The presentational view |
+| `image-tile.tsx` | The tile of the single image, the cover and each gallery item |
+| `image-gallery.view.tsx`, `image-gallery.ui.tsx` | The gallery view and its container |
+| `image-preview.ts` | The preview URL with retry-then-missing |
+| `image-field.states.ts` | Every look, for sign-off and tests |
 | `image-field.plugin.ts` | The manifest, `tina:field:image` |
 
 ## Authoring
@@ -49,7 +54,21 @@ export default defineConfig({
 });
 ```
 
-`ImageFieldSchema` extends `BaseFieldSchema`, and it adds no properties.
+`ImageFieldSchema` extends `BaseFieldSchema` and adds one property:
+
+| Property | Type | Effect |
+|---|---|---|
+| `cover` | `'wide' \| 'tall'` | Shows the picture larger: `wide` is 16:9, `tall` is 4:3. The empty drop area keeps the same shape. Any other value fails schema validation. |
+
+`cover` has no effect on the image of a list of images (`of: t.image(...)`).
+Gallery tiles are always square. Other field types reject `cover` in the type
+checker.
+
+A list of images is a `t.array` whose `of` is an image field:
+
+```ts
+t.array({ name: 'gallery', label: 'Gallery', of: t.image({ name: 'image' }) })
+```
 
 > `required` is not a config key. It is a validator that a core plugin
 > registers, and a collection attaches it with `validators`. Refer to
@@ -127,56 +146,82 @@ schema node from the context, and it reads the media provider with
 
 ### Empty and filled
 
-An empty field shows a drop zone hint above a "Choose image" button. A filled
-field shows a thumbnail and the file name above a "Replace" button and a
-"Clear" button. The buttons wrap in a narrow form column.
+The view (`image-field.view.tsx`) takes props only. The container
+(`image-field.ui.tsx`) reads the form and the media provider and feeds it.
 
-The thumbnail comes from `resolveUrl(path, { width: 400, height: 400 })`, on
-the checkerboard background of the Media Manager. A provider without image
-transforms ignores the size. The `<img>` stays hidden until it loads, so a
-slow or missing file never shows the broken-image icon of the browser.
+An empty field shows a dashed drop area with a "Choose from Media" button. A
+read-only empty field says "No image.". A filled field shows one tile
+(`image-tile.tsx`): the picture, capped in width, with Replace and Remove icon
+buttons on its top right corner at rest, and the file name small and muted
+under it. The buttons are named "Replace {file}" and "Remove {file}", and each
+shows that name in a tooltip. Remove writes an absent value at once, with no
+confirm. Neither button deletes the media file.
 
-A required field shows no "Clear" button.
+The thumbnail comes from `resolveUrl(path, { width: 400, height: 400 })`. The
+`<img>` stays hidden until it loads. A required field shows no Remove button.
+
+`image-field.states.ts` lists every look (single, cover, gallery) for the
+design sign-off and the render test.
 
 ### Picking
 
-"Choose image" and "Replace" open a dialog with
+"Choose from Media" and "Replace" open a dialog with
 `<MediaBrowser mode='pick' accept='image' />`. When the author clicks
-"Insert", the field stores `item.path` and closes the dialog. Refer to
+"Insert", the field stores `item.path` and closes the dialog. A cancelled
+Replace keeps the old value. Refer to
 [Pick mode](./media-manager.md#pick-mode).
 
 ### Uploading
 
-An author drops a file on the field, or selects one with "Upload". The field
-checks the file with `uploadRulesOf(extensionsForCategory('image'))` and the
-`features.maxSize` of the provider. It then calls `media.upload(file)` and
-stores the path that the provider returns.
+An author drops a file on the field. The field checks the file with
+`uploadRulesOf(extensionsForCategory('image'))` and the `features.maxSize` of
+the provider. It then calls `media.upload(file)` and stores the path that the
+provider returns. The picker dialog has its own upload button.
 
-During the upload, the buttons are disabled and the upload control shows
-"Uploading…". A rejected file or a failed upload shows its message through
+During the upload, the drop area shows a busy state and further drops are
+ignored. A rejected file or a failed upload shows its message through
 `FieldWrapper`. For a `MediaError`, the message is the sentence for the
 author, not the technical `detail`.
 
-When `features.readOnly` is set, the field shows no upload control and accepts
-no drop. An author can still pick an existing image.
+When `features.readOnly` is set, the drop area shows no prompt and ignores
+drops. An author can still choose, replace and remove.
 
 ### Missing images
 
 A just-uploaded file can return a 404 until the dev server or the CDN sees it,
 and the browser caches that 404 for the URL. When the thumbnail does not load,
 the field tries again after 500, 1000 and 2000 ms, each time with a new
-`retry` query on the URL. After the last failure, the field shows
-`path (missing)` in place of the file name. It keeps the stored value, so a missing file does not silently
-empty the field. The author can replace or clear it.
+`retry` query on the URL (`image-preview.ts`). After the last failure, the tile
+turns muted and the wrapper shows an amber warning, not an error. The stored
+value stays, so a missing file does not silently empty the field. The author
+can replace or remove it, and the form still saves.
 
 A hand-edited file can hold a value that is not a string, such as
 `heroImage: 2024`. The field shows `Not a media path` and keeps the value
-until the author replaces or clears it.
+until the author replaces or removes it.
+
+### The gallery
+
+A list of images renders `ImageGallery` (`image-gallery.ui.tsx`) in place of
+the generic scalar list: square tiles three across and an "Add images" tile at
+the end. It has one wrapper and one picker. "Add images" appends only after a
+pick, and each pick adds one image. Remove splices the item out, so the saved
+list has no `null` holes. The same image can appear twice.
+
+A tile reorders by dragging it (a 4px threshold; Escape or releasing outside
+the gallery cancels), or by arrow keys on its handle "Move Image N: {file}".
+Focus stays on the moved tile, and a polite live region says "Moved {file} to
+position N of M". The generic "Move item" and "Remove item" row buttons do not
+apply to the gallery.
+
+The gallery keys on `of.type === 'image'`, so a site that overrides the stock
+`image` plugin still gets the stock gallery inside arrays.
 
 ### Activation
 
-`useFieldActivation` focuses the main button: "Choose image" when the field is
-empty, "Replace" when it is filled.
+`useFieldActivation` focuses "Choose from Media" when the field is empty and
+"Replace" when it is filled. On a gallery, activating `<address>.<i>` focuses
+the Replace button of tile i.
 
 ## Rendering on the site
 
