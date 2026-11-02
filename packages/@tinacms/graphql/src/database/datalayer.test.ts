@@ -550,6 +550,21 @@ describe('makeFilterSuffixes', () => {
       ],
     };
 
+    const twoFieldWithListIdx: IndexDefinition = {
+      fields: [
+        { name: 'tags', type: 'string', list: true },
+        { name: 'title', type: 'string', list: false },
+      ],
+    };
+
+    it('falls back to full scan when leading field of a partial index is a list', () => {
+      const result = makeFilterSuffixes(
+        [binary('tags', 'string', OP.EQ, 'tech')],
+        twoFieldWithListIdx
+      );
+      expect(result).toEqual({ left: undefined, right: undefined });
+    });
+
     it('builds left/right when EQ filter covers only the first field of a two-field index', () => {
       const result = makeFilterSuffixes(
         [binary('category', 'string', OP.EQ, 'tech')],
