@@ -16,19 +16,13 @@ export interface StoredDraft {
   readonly baseline: TinaDocument;
 }
 
-// A draft belongs to the branch it was typed on, so it never reappears on
-// another branch. No branch (the default) keeps the original key.
-let draftBranch: string | undefined;
-
-export const setDraftBranch = (branch: string | undefined) => {
-  draftBranch = branch;
-};
-
-export const draftKey = (formId: FormId, userId?: UserId) => {
-  const branch = draftBranch ? `@@${encodeURIComponent(draftBranch)}` : '';
+// A draft belongs to the branch it was typed on. The default branch has no
+// branch part, so its key never changes.
+export const draftKey = (formId: FormId, userId?: UserId, branch?: string) => {
+  const suffix = branch ? `@@${encodeURIComponent(branch)}` : '';
   return userId === undefined
-    ? `${DRAFT_KEY_PREFIX}${formId}${branch}`
-    : `${USER_DRAFT_KEY_PREFIX}${encodeURIComponent(userId)}:${formId}${branch}`;
+    ? `${DRAFT_KEY_PREFIX}${formId}${suffix}`
+    : `${USER_DRAFT_KEY_PREFIX}${encodeURIComponent(userId)}:${formId}${suffix}`;
 };
 
 const hasBlankName = (fields: Record<string, unknown>) =>
@@ -48,10 +42,11 @@ const storage = (): Storage | undefined => {
 // treated as no draft.
 export const readDraft = (
   formId: FormId,
-  userId?: DraftUserScope
+  userId?: DraftUserScope,
+  branch?: string
 ): StoredDraft | undefined => {
   if (userId === null) return undefined;
-  const raw = storage()?.getItem(draftKey(formId, userId));
+  const raw = storage()?.getItem(draftKey(formId, userId, branch));
   if (raw == null) return undefined;
   let entry: unknown;
   try {
@@ -71,12 +66,13 @@ export const readDraft = (
 export const writeDraft = (
   formId: FormId,
   draft: StoredDraft,
-  userId?: DraftUserScope
+  userId?: DraftUserScope,
+  branch?: string
 ) => {
   if (userId === null) return;
   try {
     storage()?.setItem(
-      draftKey(formId, userId),
+      draftKey(formId, userId, branch),
       JSON.stringify({ version: DRAFT_VERSION, ...draft })
     );
   } catch (cause) {
@@ -84,7 +80,11 @@ export const writeDraft = (
   }
 };
 
-export const removeDraft = (formId: FormId, userId?: DraftUserScope) => {
+export const removeDraft = (
+  formId: FormId,
+  userId?: DraftUserScope,
+  branch?: string
+) => {
   if (userId === null) return;
-  storage()?.removeItem(draftKey(formId, userId));
+  storage()?.removeItem(draftKey(formId, userId, branch));
 };

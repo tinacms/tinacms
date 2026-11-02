@@ -194,8 +194,8 @@ export const useSaveDocument = (): DocumentSave => {
       hasServerHooks(input.collection)
         ? saveThroughServer(input)
         : content.update(input.collection, input.path, input.value),
-    onSuccess: ({ path, document }, { collection }) => {
-      const branch = currentBranchOf(runtime.store.getState());
+    onMutate: () => currentBranchOf(runtime.store.getState()),
+    onSuccess: ({ path, document }, { collection }, branch) => {
       queryClient.setQueryData<DocumentSummary[]>(
         contentKeys.list(collection, branch),
         (cached) => (cached ? upsertByPath(cached, { path }) : undefined)

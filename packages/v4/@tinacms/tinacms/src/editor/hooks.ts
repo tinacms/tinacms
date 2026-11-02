@@ -263,8 +263,6 @@ const adoptSavedValues = (
   return written;
 };
 
-// Records the save on the form store so the Status bar and Top bar read one
-// answer, including a validation or after-save hook failure.
 async function recordSavePhase(
   formId: FormId,
   run: () => Promise<void>

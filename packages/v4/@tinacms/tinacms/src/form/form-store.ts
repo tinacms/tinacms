@@ -14,7 +14,6 @@ import type { TinaDocument } from '../core/schema/types';
 import {
   type DraftUserScope,
   readDraft,
-  setDraftBranch,
   removeDraft,
   type StoredDraft,
   writeDraft,
@@ -147,10 +146,11 @@ const openingScope = (
   formId: FormId,
   incoming: FormValues,
   equal: FieldEquality,
-  userId: DraftUserScope
+  userId: DraftUserScope,
+  branch: string | undefined
 ): EditedForm | undefined => {
   if (keepsValues(scope, incoming)) return scope;
-  const draft = readDraft(formId, userId);
+  const draft = readDraft(formId, userId, branch);
   if (!draft) return undefined;
   const baseline = toFormValues(draft.baseline);
   if (!valuesEqual(baseline, incoming, equal)) return undefined;
@@ -211,7 +211,6 @@ export const useFormStore = create<FormStore>()(
         setBranch: (branch) =>
           apply((state) => {
             if (state.branch === branch) return state;
-            setDraftBranch(branch);
             return { branch, forms: {}, saves: {}, active: null };
           }, DEVTOOLS_ACTION.setBranch),
 
@@ -240,7 +239,8 @@ export const useFormStore = create<FormStore>()(
               formId,
               values,
               equal,
-              state.userId
+              state.userId,
+              state.branch
             );
             if (opening) {
               if (opening === scope) return state;
@@ -385,8 +385,8 @@ export const readOpeningScope = (
   incoming: FormValues,
   equal: FieldEquality = STRUCTURAL_EQUALITY
 ): EditedForm | undefined => {
-  const { forms, userId } = readFormStore();
-  return openingScope(forms[formId], formId, incoming, equal, userId);
+  const { forms, userId, branch } = readFormStore();
+  return openingScope(forms[formId], formId, incoming, equal, userId, branch);
 };
 
 // A stored draft the form did not open on because its document changed since.
@@ -396,7 +396,8 @@ export const staleDraft = (
   equal: FieldEquality = STRUCTURAL_EQUALITY
 ): StoredDraft | undefined => {
   if (readOpeningScope(formId, incoming, equal)) return undefined;
-  return readDraft(formId, readFormStore().userId);
+  const { userId, branch } = readFormStore();
+  return readDraft(formId, userId, branch);
 };
 
 // Mirrors this tab's edits into storage. Only forms whose scope changed in an
@@ -417,10 +418,11 @@ export const syncDrafts = () =>
             values: toDocument(scope.values),
             baseline: toDocument(scope.baseline),
           },
-          next.userId
+          next.userId,
+          next.branch
         );
       } else if (formStatus(before) === 'dirty') {
-        removeDraft(formId, next.userId);
+        removeDraft(formId, next.userId, next.branch);
       }
     }
   });
@@ -440,7 +442,7 @@ export interface SaveSummary {
  * One answer for the whole shell: a running save wins, then the newest
  * failure, then unsaved edits, then the newest success, else idle.
  */
-export const summarizeSaves = (state: FormStore): SaveSummary => {
+const summarizeSaves = (state: FormStore): SaveSummary => {
   const saves = Object.values(state.saves).filter(
     (save): save is NonNullable<typeof save> => save !== undefined
   );
@@ -453,7 +455,7 @@ export const summarizeSaves = (state: FormStore): SaveSummary => {
   return { state: newest?.phase === 'saved' ? 'saved' : 'idle' };
 };
 
-export const anyFormDirty = (state: FormStore): boolean =>
+const anyFormDirty = (state: FormStore): boolean =>
   Object.values(state.forms).some((scope) => formStatus(scope) === 'dirty');
 
 export const useIsFormDirty = (formId: FormId): boolean =>

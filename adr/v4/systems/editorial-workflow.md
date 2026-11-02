@@ -49,15 +49,16 @@ The content provider fills the slice. A provider that reads from branches adds `
 
 The Branch switcher blocks a switch while any form has unsaved edits. A form is dirty when the form store says so, so `branch.dirty` is not a store field yet.
 
-Actions are slice methods that call the Data Layer:
+`switchTo(name)` is a plain setter on the slice. It sets `branch.current`, and every content and media read, query key and draft key follows it. Picking the default branch by name stores the same keys as picking nothing. The other actions call the Data Layer, and none exists yet:
 
 ```ts
-const { create, switchTo, requestPublish, discard } = useTinaStore((s) => s.branch)
+const { create, requestPublish, discard } = useTinaStore((s) => s.branch)
 
 await create('cms/new-post')
-await switchTo('main')
 await requestPublish()        // calls into the content capability or the workflow plugin
 ```
+
+`switchTo` takes no Data Layer call because switching branches reads a different branch. It does not change files.
 
 ## Authoring the workflow as a plugin
 

@@ -15,7 +15,7 @@ import { AccountMenu } from './account-menu';
 import { SearchControl } from './search';
 
 // A save shorter than this finishes before the card would flash.
-export const SAVE_PROGRESS_DELAY_MS = 1000;
+const SAVE_PROGRESS_DELAY_MS = 1000;
 
 const STATUS_WORDS: Record<SaveSummary['state'], string> = {
   idle: 'No changes',

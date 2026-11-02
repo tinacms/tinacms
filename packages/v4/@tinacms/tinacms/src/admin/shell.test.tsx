@@ -410,6 +410,26 @@ describe('branches', () => {
     ).toBeVisible();
   });
 
+  it('finds a draft typed on the default branch after the default is picked by name', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    const first = renderAdmin();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await waitFor(() =>
+      expect(
+        Object.keys(localStorage).filter((key) => key.startsWith('tina-drafts'))
+      ).toHaveLength(1)
+    );
+    first.unmount();
+
+    localStorage.setItem(
+      'tina-store',
+      JSON.stringify({ state: { branch: { current: 'main' } }, version: 0 })
+    );
+    renderAdmin();
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello!');
+  });
+
   it('keeps a draft typed on one branch off another branch', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     const user = userEvent.setup();

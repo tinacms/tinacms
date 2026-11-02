@@ -6,24 +6,14 @@ import {
 import { Button } from '@tinacms/ui/components/button';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { useEffect, useState } from 'react';
-import type { SliceState } from '../core/plugin';
+import {
+  type SearchHit,
+  type SearchProvider,
+  isSearchProvider,
+} from '../core/search/contract';
 import { useTinaStore } from '../editor/hooks';
 
-export interface SearchHit {
-  ref: string;
-  snippet?: string;
-}
-
-interface SearchProvider {
-  search: (query: string) => Promise<SearchHit[]>;
-}
-
-const isSearchProvider = (
-  slice: SliceState | undefined
-): slice is SliceState & SearchProvider =>
-  slice !== undefined && typeof slice.search === 'function';
-
-export function useSearchProvider(): SearchProvider | null {
+function useSearchProvider(): SearchProvider | null {
   const slice = useTinaStore((state) => state.search);
   return isSearchProvider(slice) ? slice : null;
 }

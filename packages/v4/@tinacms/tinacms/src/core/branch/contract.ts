@@ -31,19 +31,37 @@ export interface BranchSlice {
   switchTo: (name: string | undefined) => void;
 }
 
+const isNames = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every((name) => typeof name === 'string');
+
+const optionalString = (value: unknown): string | undefined =>
+  typeof value === 'string' && value ? value : undefined;
+
 export const branchSliceOf = (
   state: TinaStoreState
 ): BranchSlice | undefined => {
   const slice: SliceState | undefined = state.branch;
   if (!slice) return undefined;
-  const { switchTo, list, protected: protectedNames } = slice;
+  const { switchTo, list, protected: protectedNames, mode } = slice;
   if (typeof switchTo !== 'function') return undefined;
-  if (!Array.isArray(list) || !Array.isArray(protectedNames)) return undefined;
-  return slice as unknown as BranchSlice;
+  if (!isNames(list) || !isNames(protectedNames)) return undefined;
+  return {
+    mode: mode === 'local' || mode === 'branches' ? mode : undefined,
+    current: optionalString(slice.current),
+    fallback: optionalString(slice.fallback),
+    list,
+    protected: protectedNames,
+    switchTo: (name) => switchTo(name),
+  };
 };
 
-/** The branch edits read from and write to, or undefined for the default. */
+/**
+ * The branch edits read from and write to, or undefined for the default. Picking
+ * the default branch by name gives undefined too, so the default has one cache
+ * key and one draft key.
+ */
 export const currentBranchOf = (state: TinaStoreState): string | undefined => {
-  const current = state.branch?.current;
-  return typeof current === 'string' && current ? current : undefined;
+  const { current, fallback } = state.branch ?? {};
+  if (typeof current !== 'string' || !current) return undefined;
+  return current === fallback ? undefined : current;
 };

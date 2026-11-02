@@ -269,14 +269,14 @@ const buildStaleDraftActions = (
       });
       const resumed = readFormStore().forms[formId];
       if (formStatus(resumed) !== 'dirty') {
-        removeDraft(formId, readFormStore().userId);
+        removeDraft(formId, readFormStore().userId, readFormStore().branch);
       }
       resetForm(toDocument(resumed?.values ?? {}));
       advanceSeedKey(formId);
       bumpDraftRevision();
     },
     discard: () => {
-      removeDraft(formId, readFormStore().userId);
+      removeDraft(formId, readFormStore().userId, readFormStore().branch);
       bumpDraftRevision();
     },
   };

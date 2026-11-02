@@ -10,6 +10,7 @@ import {
   type SliceSet,
   type TinaStoreState,
 } from '../core/plugin';
+import { isRecord } from '../utils/is-record';
 import { composePluginSlices } from './compose-slices';
 
 const CORE_NAMESPACES = ['ui', 'branch', 'documents'] as const;
@@ -31,6 +32,14 @@ export const pickPersistableNamespaces = (
   }
   if (state.branch) durable.branch = durableBranch(state.branch);
   return durable;
+};
+
+const pickRecords = (value: Record<string, unknown>): TinaStoreState => {
+  const slices: TinaStoreState = {};
+  for (const [namespace, slice] of Object.entries(value)) {
+    if (isRecord(slice)) slices[namespace] = slice;
+  }
+  return slices;
 };
 
 const createCoreSlices = (): TinaStoreState =>
@@ -109,11 +118,15 @@ export const createTinaStore = (resolved: ResolvedSegment[]) => {
           name: PERSIST_STORAGE_KEY,
           partialize: pickPersistableNamespaces,
           merge: (persisted, current) => {
-            const stored = (persisted ?? {}) as Partial<TinaStoreState>;
+            if (!isRecord(persisted)) return current;
+            const { branch, ...rest } = persisted;
             return {
               ...current,
-              ...stored,
-              branch: { ...current.branch, ...stored.branch },
+              ...pickRecords(rest),
+              branch: {
+                ...current.branch,
+                ...(isRecord(branch) ? durableBranch(branch) : {}),
+              },
             };
           },
         }

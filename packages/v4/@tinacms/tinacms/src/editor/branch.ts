@@ -1,27 +1,22 @@
 import { toast } from '@tinacms/ui/components/toast';
-import { use, useEffect } from 'react';
+import { use, useEffect, useMemo } from 'react';
 import {
   type BranchMode,
+  type BranchSlice,
   branchSliceOf,
   currentBranchOf,
 } from '../core/branch/contract';
 import { TinaRuntimeContext } from './context';
 import { useOptionalContentSlice, useTinaStore } from './hooks';
 
-/**
- * Fills the core `branch` slice from the content provider: `local` gives
- * mode `local`, `branches` gives mode `branches` with the list and the
- * protected names. A provider with neither leaves the mode unset, so the shell
- * shows no branch spot. A saved branch that no longer exists falls back to the
- * default branch with a toast.
- */
+// A saved branch the provider no longer lists falls back to the default with a toast.
 export function useBranchSync(): void {
   const runtime = use(TinaRuntimeContext);
   const content = useOptionalContentSlice();
   useEffect(() => {
     if (!runtime || !content) return;
     const { store } = runtime;
-    const fill = (patch: Record<string, unknown>) =>
+    const fill = (patch: Partial<BranchSlice>) =>
       store.setState((state) => ({ branch: { ...state.branch, ...patch } }));
     if (content.local) {
       fill({ mode: 'local' });
@@ -70,7 +65,11 @@ export interface BranchView {
 }
 
 export function useBranchView(): BranchView | null {
-  const slice = useTinaStore(branchSliceOf);
+  const raw = useTinaStore((state) => state.branch);
+  const slice = useMemo(
+    () => (raw ? branchSliceOf({ branch: raw }) : undefined),
+    [raw]
+  );
   if (!slice) return null;
   return {
     mode: slice.mode,
