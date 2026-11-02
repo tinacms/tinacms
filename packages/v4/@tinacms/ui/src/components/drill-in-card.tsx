@@ -47,19 +47,17 @@ function DrillInCard({
         if (!inert) onOpen();
       }}
       className={cn(
-        'box-border flex w-full min-w-0 items-center gap-2 rounded-sm border border-input bg-card px-3 py-2 text-left font-sans shadow-xs outline-none focus-visible:border-ring focus-visible:shadow-focus-field',
-        inert ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-muted',
-        disabled && 'opacity-45 shadow-none',
+        'relative box-border flex min-h-10 w-full cursor-pointer items-center gap-2 rounded-sm border border-border bg-card py-1.5 pr-2 pl-3 text-left font-sans text-foreground outline-none focus-visible:border-ring focus-visible:shadow-focus-ring',
+        inert ? 'cursor-not-allowed' : 'hover:bg-muted-hover',
+        disabled && 'opacity-45',
         className
       )}
       {...props}
     >
-      <span className='flex min-w-0 flex-1 flex-col'>
-        <span className='truncate text-base font-medium text-foreground'>
-          {label}
-        </span>
+      <span className='flex min-w-0 flex-1 items-baseline gap-1.5'>
+        <span className='flex-none text-base font-medium'>{label}</span>
         {summary ? (
-          <span className='truncate text-sm text-muted-foreground'>
+          <span className='min-w-0 flex-1 truncate text-sm leading-4.5 text-muted-foreground'>
             {summary}
           </span>
         ) : null}
@@ -72,7 +70,7 @@ function DrillInCard({
       ) : null}
       <Icon
         glyph='chevron-right'
-        size={14}
+        size={16}
         className='flex-none text-muted-foreground'
       />
     </button>

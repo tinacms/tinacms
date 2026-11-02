@@ -66,25 +66,25 @@ function Collapsible({
           if (!inert) onOpenChange(!open);
         }}
         className={cn(
-          'box-border flex w-full min-w-0 items-center gap-2 rounded-sm border-0 bg-transparent px-1 py-1.5 text-left font-sans outline-none focus-visible:shadow-focus-ring',
-          inert ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-muted',
+          'relative -mx-1 box-border flex cursor-pointer items-center gap-1.5 self-stretch rounded-sm border-0 bg-transparent p-1 text-left font-sans text-foreground outline-none focus-visible:shadow-focus-ring',
+          inert ? 'cursor-not-allowed' : 'hover:bg-muted-hover',
           disabled && 'opacity-45'
         )}
       >
-        <Icon
-          glyph={open ? 'chevron-down' : 'chevron-right'}
-          size={14}
-          className='flex-none text-muted-foreground'
-        />
-        <span className='flex min-w-0 flex-1 flex-col'>
-          <span
-            id={labelId}
-            className='truncate text-base font-medium text-foreground'
-          >
+        <span
+          className={cn(
+            'flex flex-none text-muted-foreground transition-transform',
+            open && 'rotate-90'
+          )}
+        >
+          <Icon glyph='chevron-right' size={16} />
+        </span>
+        <span className='flex min-w-0 flex-1 items-baseline gap-1.5'>
+          <span id={labelId} className='flex-none text-base font-medium'>
             {label}
           </span>
           {!open && summary ? (
-            <span className='truncate text-sm text-muted-foreground'>
+            <span className='min-w-0 flex-1 truncate text-sm leading-4.5 text-muted-foreground'>
               {summary}
             </span>
           ) : null}
@@ -100,8 +100,12 @@ function Collapsible({
       </button>
       <div id={contentId} hidden={!open}>
         {open ? (
-          <div className='ml-2.5 border-l-2 border-border pt-1.5 pl-3'>
-            {children}
+          <div className='relative'>
+            <span
+              aria-hidden='true'
+              className='absolute inset-y-0 left-2 w-px bg-border-subtle'
+            />
+            <div className='flex flex-col gap-4 py-2.5 pl-5.25'>{children}</div>
           </div>
         ) : null}
       </div>
