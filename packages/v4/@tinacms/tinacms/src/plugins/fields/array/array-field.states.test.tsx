@@ -6,6 +6,7 @@ import {
   ArrayDrillInView,
   ArrayFieldView,
   type ArrayFieldViewProps,
+  moveOnDrop,
   FULL_HINT,
 } from './array-field.view';
 
@@ -348,5 +349,125 @@ describe('blocks states', () => {
     const panel = screen.getByRole('dialog', { name: 'Choose a block' });
     expect(panel.querySelectorAll('.aspect-video')).toHaveLength(4);
     expect(panel.querySelector('.grid-cols-2')).not.toBeNull();
+  });
+});
+
+describe('moveOnDrop', () => {
+  const drop = (active: string, over?: string) => ({
+    active: { id: active },
+    over: over === undefined ? null : { id: over },
+  });
+
+  it('moves from the dragged item to the item it lands on', () => {
+    const onMove = vi.fn();
+    const onDrop = moveOnDrop(['a', 'b', 'c'], onMove);
+    onDrop(drop('a', 'c'));
+    onDrop(drop('c', 'b'));
+    expect(onMove.mock.calls).toEqual([
+      [0, 2],
+      [2, 1],
+    ]);
+  });
+
+  it('moves nothing without a target, onto itself, for an unknown id or without a handler', () => {
+    const onMove = vi.fn();
+    const onDrop = moveOnDrop(['a', 'b'], onMove);
+    onDrop(drop('a'));
+    onDrop(drop('b', 'b'));
+    onDrop(drop('gone', 'a'));
+    onDrop(drop('a', 'gone'));
+    moveOnDrop(['a', 'b'])(drop('a', 'b'));
+    expect(onMove).not.toHaveBeenCalled();
+  });
+});
+
+describe('array field view rerendered', () => {
+  it('shows each state in turn on one mounted view', () => {
+    const [first, ...rest] = states;
+    const { rerender } = render(<ArrayFieldView {...first.props} />);
+    for (const { props } of [...rest, first]) {
+      rerender(<ArrayFieldView {...props} />);
+      expect(
+        screen.getByRole('group', { name: /^(Authors|Tags)/ })
+      ).toBeVisible();
+    }
+  });
+
+  it('follows new props on a drill-in card', () => {
+    const { rerender } = render(
+      <ArrayDrillInView label='Profiles' count={0} />
+    );
+    rerender(
+      <ArrayDrillInView
+        label='Links'
+        count={2}
+        required
+        invalidCount={1}
+        errors={['Links is required']}
+        onDrillIn={vi.fn()}
+      />
+    );
+    expect(
+      screen.getByRole('button', { name: /^Open Links/ })
+    ).toHaveTextContent('2 items');
+  });
+
+  it('follows new props while an item menu is open', async () => {
+    const props = states.find((state) => state.name === 'filled')?.props;
+    if (!props) throw new Error('missing state');
+    const { rerender } = render(<ArrayFieldView {...props} />);
+    await openMenu(2);
+    rerender(<ArrayFieldView {...props} />);
+    rerender(<ArrayFieldView {...props} full />);
+    rerender(
+      <ArrayFieldView
+        {...props}
+        full
+        onMove={vi.fn()}
+        onInsert={vi.fn()}
+        onDuplicate={vi.fn()}
+        onRemove={vi.fn()}
+      />
+    );
+    expect(
+      screen.getByRole('menuitem', { name: /^Duplicate/ })
+    ).toHaveAttribute('aria-disabled', 'true');
+    rerender(<ArrayFieldView {...props} items={props.items.slice(1)} />);
+    expect(screen.getAllByRole('button', { name: /^Move Item/ })).toHaveLength(
+      2
+    );
+  });
+});
+
+describe('array field view without handlers', () => {
+  it('does nothing when an action has no handler', async () => {
+    const props = states.find((state) => state.name === 'filled')?.props;
+    if (!props) throw new Error('missing state');
+    render(<ArrayFieldView {...props} label={<span>Authors</span>} />);
+    expect(screen.getByRole('group', { name: 'Authors' })).toBeVisible();
+    for (const action of [
+      'Move up',
+      'Move down',
+      'Insert above',
+      'Insert below',
+      'Duplicate',
+      'Remove',
+    ]) {
+      await openMenu(2);
+      await userEvent.click(screen.getByRole('menuitem', { name: action }));
+    }
+    await userEvent.click(screen.getByRole('button', { name: 'Add item' }));
+    screen.getByRole('button', { name: 'Move Item 2' }).focus();
+    await userEvent.keyboard('{ArrowUp}');
+    expect(screen.getAllByRole('button', { name: /^Move Item/ })).toHaveLength(
+      3
+    );
+  });
+
+  it('opens nothing from a drill-in card without a handler or a text label', async () => {
+    render(<ArrayDrillInView label={<span>Profiles</span>} count={1} />);
+    const card = screen.getByRole('button', { name: /^Open/ });
+    await userEvent.click(card);
+    expect(card).toHaveTextContent('1 item');
   });
 });

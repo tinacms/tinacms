@@ -1,7 +1,7 @@
 import {
   closestCenter,
   DndContext,
-  type DragEndEvent,
+  type UniqueIdentifier,
   PointerSensor,
   useSensor,
   useSensors,
@@ -253,6 +253,24 @@ function AddControl({
   );
 }
 
+interface Drop {
+  active: { id: UniqueIdentifier };
+  over: { id: UniqueIdentifier } | null;
+}
+
+/** The drop handler: it moves the dragged item to the item it lands on. */
+export const moveOnDrop =
+  (
+    ids: readonly UniqueIdentifier[],
+    onMove?: (from: number, to: number) => void
+  ) =>
+  ({ active, over }: Drop) => {
+    if (!over || active.id === over.id) return;
+    const from = ids.indexOf(active.id);
+    const to = ids.indexOf(over.id);
+    if (from >= 0 && to >= 0) onMove?.(from, to);
+  };
+
 /** The editor of an array field. It reads no store; the connected field feeds it. */
 export function ArrayFieldView({
   label,
@@ -285,12 +303,10 @@ export function ArrayFieldView({
   );
   const draggable = !disabled && !readOnly;
 
-  const onDragEnd = ({ active, over }: DragEndEvent) => {
-    if (!over || active.id === over.id) return;
-    const from = items.findIndex((item) => item.id === active.id);
-    const to = items.findIndex((item) => item.id === over.id);
-    if (from >= 0 && to >= 0) onMove?.(from, to);
-  };
+  const onDragEnd = moveOnDrop(
+    items.map((item) => item.id),
+    onMove
+  );
 
   const cards = items.flatMap((item, index) => {
     const card = (
