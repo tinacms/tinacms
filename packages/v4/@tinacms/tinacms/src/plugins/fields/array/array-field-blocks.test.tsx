@@ -265,6 +265,30 @@ describe('Blocks field picker', () => {
     );
   });
 
+  it('closes the insert picker with Cancel, inserts nothing and returns focus to the card grip', async () => {
+    renderPage({ blocks: [{ _template: 'hero', headline: 'Hi' }] });
+    const blocks = await list('Blocks');
+    await userEvent.click(
+      within(blocks).getByRole('button', { name: 'Actions for Item 1' })
+    );
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: /^Insert below/ })
+    );
+    const inline = await within(blocks).findByRole('region', {
+      name: 'Choose a block',
+    });
+    await userEvent.click(
+      within(inline).getByRole('button', { name: 'Cancel' })
+    );
+    await waitFor(() =>
+      expect(within(blocks).queryByRole('region')).toBeNull()
+    );
+    expect(valueOf('blocks')).toHaveLength(1);
+    await waitFor(() =>
+      expect(document.activeElement).toHaveAttribute('data-grip')
+    );
+  });
+
   it('shows the name alone when the preview image is missing, and still adds', async () => {
     renderPage({ broken: [] });
     const panel = await openBlockPicker(await list('Broken'));
