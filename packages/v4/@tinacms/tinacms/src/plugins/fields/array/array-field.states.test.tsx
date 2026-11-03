@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { arrayFieldStates } from './array-field.states';
 import {
+  ArrayDrillInView,
   ArrayFieldView,
   type ArrayFieldViewProps,
   FULL_HINT,
@@ -184,5 +185,121 @@ describe('array field states', () => {
       />
     );
     expect(head()).not.toHaveAccessibleName(/error/);
+  });
+});
+
+describe('array field view', () => {
+  const filled = () => {
+    const props = states.find((state) => state.name === 'filled')?.props;
+    if (!props) throw new Error('missing state');
+    return props;
+  };
+
+  it('calls the handler of each item action with the item index', async () => {
+    const onMove = vi.fn();
+    const onInsert = vi.fn();
+    const onDuplicate = vi.fn();
+    render(
+      <ArrayFieldView
+        {...filled()}
+        onMove={onMove}
+        onInsert={onInsert}
+        onDuplicate={onDuplicate}
+      />
+    );
+    for (const action of [
+      'Move up',
+      'Move down',
+      'Insert above',
+      'Insert below',
+      'Duplicate',
+    ]) {
+      await openMenu(2);
+      await userEvent.click(screen.getByRole('menuitem', { name: action }));
+    }
+    expect(onMove.mock.calls).toEqual([
+      [1, 0],
+      [1, 2],
+    ]);
+    expect(onInsert.mock.calls).toEqual([
+      [1, 'above'],
+      [1, 'below'],
+    ]);
+    expect(onDuplicate).toHaveBeenCalledWith(1);
+  });
+
+  it('adds a typed value on Enter', async () => {
+    const onAdd = vi.fn();
+    render(
+      <ArrayFieldView
+        label='Tags'
+        labelId='tags-label'
+        items={[]}
+        add='input'
+        addLabel='Add a tag'
+        onAdd={onAdd}
+      />
+    );
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Add a tag' }),
+      ' news {Enter}'
+    );
+    expect(onAdd).toHaveBeenCalledWith('news');
+  });
+
+  it('draws the insert control before its item, or after the last one', () => {
+    const props = filled();
+    const { rerender } = render(
+      <ArrayFieldView
+        {...props}
+        inserting={{ index: 1, content: <p>Picker</p> }}
+      />
+    );
+    const picker = screen.getByText('Picker');
+    const second = screen.getByRole('button', { name: 'Move Item 2' });
+    expect(
+      picker.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+    rerender(
+      <ArrayFieldView
+        {...props}
+        inserting={{ index: props.items.length, content: <p>Picker</p> }}
+      />
+    );
+    const last = screen.getByRole('button', { name: 'Move Item 3' });
+    expect(
+      screen.getByText('Picker').compareDocumentPosition(last) &
+        Node.DOCUMENT_POSITION_PRECEDING
+    ).toBeTruthy();
+  });
+});
+
+describe('array drill-in card', () => {
+  it.each([
+    [0, 'No items'],
+    [1, '1 item'],
+    [3, '3 items'],
+  ])('summarises %i items as "%s" and opens the list', async (count, words) => {
+    const onDrillIn = vi.fn();
+    render(
+      <ArrayDrillInView label='Profiles' count={count} onDrillIn={onDrillIn} />
+    );
+    const card = screen.getByRole('button', { name: /^Open Profiles/ });
+    expect(card).toHaveTextContent(words);
+    await userEvent.click(card);
+    expect(onDrillIn).toHaveBeenCalledOnce();
+  });
+
+  it('names the card after the field when the label is not text', () => {
+    render(
+      <ArrayDrillInView
+        label={<span>Profiles</span>}
+        name='profiles'
+        count={2}
+      />
+    );
+    expect(
+      screen.getByRole('button', { name: /^Open profiles/ })
+    ).toBeVisible();
   });
 });
