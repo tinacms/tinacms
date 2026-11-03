@@ -1,6 +1,7 @@
 import { NodeApi } from '@udecode/plate';
 import { getListItemEntry } from '@udecode/plate-list';
 import { type PlateEditor } from '@udecode/plate/react';
+import type { RichTextNode } from '../../../value';
 import { ELEMENT_IMG } from '../create-img-plugin';
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
 import { HANDLES_MDX } from './formatting';
@@ -98,25 +99,21 @@ const currentNodeSupportsMDX = (editor: PlateEditor) =>
     match: { type: HANDLES_MDX },
   });
 
-export function normalizeLinksInCodeBlocks(node) {
-  if (node.type === 'code_line' && node.children) {
+export function normalizeLinksInCodeBlocks(node: RichTextNode): RichTextNode {
+  if (!Array.isArray(node.children)) return node;
+  const children: RichTextNode[] = node.children;
+  if (node.type === 'code_line') {
     return {
       ...node,
-      children: node.children.flatMap((child) => {
+      children: children.flatMap((child) => {
         if (child.type === 'a') {
-          return child.children || [];
+          return Array.isArray(child.children) ? child.children : [];
         }
         return [normalizeLinksInCodeBlocks(child)];
       }),
     };
   }
-  if (node.children) {
-    return {
-      ...node,
-      children: node.children.map(normalizeLinksInCodeBlocks),
-    };
-  }
-  return node;
+  return { ...node, children: children.map(normalizeLinksInCodeBlocks) };
 }
 
 export const helpers = {

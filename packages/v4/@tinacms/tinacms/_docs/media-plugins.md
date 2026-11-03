@@ -178,11 +178,11 @@ a crop: `?fit=crop&max-w=400&max-h=400`.
 
 ### Branch
 
-Each operation reads the branch from `store.branch.name` when it runs. If
-`name` is not set, the operation uses the default branch of the TinaCloud
+Each operation reads the branch from `store.branch.current` when it runs. If
+`current` is not set, the operation uses the default branch of the TinaCloud
 project. The branch is not a config option: it is operational data that the
-Data Layer owns (ADR-019, ADR-024). No plugin writes `store.branch.name` yet,
-so all operations use the default branch.
+Data Layer owns (ADR-019, ADR-024). The Branch switcher writes `store.branch.current`; until an editor
+switches, all operations use the default branch.
 
 `media.resolveUrl` on the manifest runs on the site, which has no store, so it
 always gives the URL on the media branch.

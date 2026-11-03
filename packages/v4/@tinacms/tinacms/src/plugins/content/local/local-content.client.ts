@@ -54,6 +54,7 @@ export const createContentSlice =
   (url: string): ClientSlice =>
   (_set, get) => {
     const slice: ContentProvider = {
+      local: true,
       list: (collection) =>
         postContentRequest<DocumentSummary[]>(url, get(), {
           op: 'list',

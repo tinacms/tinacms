@@ -131,18 +131,21 @@ describe('normalizeLinksInCodeBlocks', () => {
     const node = {
       type: 'code_line',
       children: [
-        { text: 'see ' },
+        { type: 'text', text: 'see ' },
         {
           type: 'a',
           url: 'https://x.test',
-          children: [{ text: 'https://x.test' }],
+          children: [{ type: 'text', text: 'https://x.test' }],
         },
       ],
     };
 
     expect(normalizeLinksInCodeBlocks(node)).toEqual({
       type: 'code_line',
-      children: [{ text: 'see ' }, { text: 'https://x.test' }],
+      children: [
+        { type: 'text', text: 'see ' },
+        { type: 'text', text: 'https://x.test' },
+      ],
     });
   });
 
@@ -165,7 +168,11 @@ describe('normalizeLinksInCodeBlocks', () => {
         {
           type: 'code_line',
           children: [
-            { type: 'a', url: 'https://x.test', children: [{ text: 'x' }] },
+            {
+              type: 'a',
+              url: 'https://x.test',
+              children: [{ type: 'text', text: 'x' }],
+            },
           ],
         },
       ],
@@ -173,7 +180,9 @@ describe('normalizeLinksInCodeBlocks', () => {
 
     expect(normalizeLinksInCodeBlocks(node)).toEqual({
       type: 'code_block',
-      children: [{ type: 'code_line', children: [{ text: 'x' }] }],
+      children: [
+        { type: 'code_line', children: [{ type: 'text', text: 'x' }] },
+      ],
     });
   });
 
@@ -181,7 +190,11 @@ describe('normalizeLinksInCodeBlocks', () => {
     const node = {
       type: 'p',
       children: [
-        { type: 'a', url: 'https://x.test', children: [{ text: 'x' }] },
+        {
+          type: 'a',
+          url: 'https://x.test',
+          children: [{ type: 'text', text: 'x' }],
+        },
       ],
     };
 

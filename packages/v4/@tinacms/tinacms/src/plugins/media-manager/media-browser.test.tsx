@@ -18,7 +18,7 @@ import {
   type MediaUrlOptions,
 } from '../../core/media/contract';
 import { definePlugin } from '../../core/plugin';
-import { TinaProvider } from '../../editor';
+import { TinaProvider, useTinaStore } from '../../editor';
 import { MediaBrowser } from './media-browser';
 
 let files: MediaItem[];
@@ -126,6 +126,58 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+});
+
+describe('MediaBrowser branches', () => {
+  it("lists the new branch's files after a switch, not the cached ones", async () => {
+    const byBranch: Record<string, MediaItem[]> = {
+      main: [{ path: 'main-only.png', kind: 'file' }],
+      other: [{ path: 'other-only.png', kind: 'file' }],
+    };
+    const mediaPlugin = definePlugin({
+      name: 'test:media',
+      provides: ['media'],
+      client: async () => ({
+        default: {
+          slice: (_set, get) => ({
+            ...createProvider(),
+            list: async (): Promise<MediaPage> => ({
+              items: byBranch[String(get().branch?.current ?? 'main')],
+            }),
+          }),
+        },
+      }),
+    });
+    function SwitchToOther() {
+      const switchTo = useTinaStore((state) => state.branch.switchTo) as (
+        name: string
+      ) => void;
+      return (
+        <button type='button' onClick={() => switchTo('other')}>
+          Use other
+        </button>
+      );
+    }
+    const user = userEvent.setup();
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [mediaPlugin],
+          schema: { collections: [] },
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      >
+        <SwitchToOther />
+        <MediaBrowser mode='manage' />
+      </TinaProvider>
+    );
+    expect(await fileTile('main-only.png')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Use other' }));
+    expect(await fileTile('other-only.png')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'main-only.png' })).toBeNull();
+  });
 });
 
 describe('MediaBrowser views', () => {

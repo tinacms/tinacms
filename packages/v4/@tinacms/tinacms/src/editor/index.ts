@@ -42,6 +42,7 @@ export {
   type DocumentSave,
   type SaveDocumentInput,
   useCollectionDocuments,
+  useCurrentBranch,
   useDocument,
   useInvalidateContent,
   useSaveDocument,
@@ -73,5 +74,6 @@ export {
   useFormSave,
   useFormSeedKey,
   useRpcClient,
+  useSchemaCollections,
   useTinaStore,
 } from './hooks';

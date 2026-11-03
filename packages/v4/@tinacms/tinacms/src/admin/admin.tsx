@@ -1,21 +1,20 @@
 import type { QueryClient } from '@tanstack/react-query';
+import { Icon } from '@tinacms/ui/components/icon';
+import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarTrigger,
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
-import tinaLogo from '@tinacms/ui/assets/tinacms-logo.svg';
 import {
   type CSSProperties,
   type ReactNode,
@@ -40,19 +39,34 @@ import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
 import { TinaProvider } from '../editor/provider';
 import { toFormId } from '../form/form-store';
-import { AccountMenu } from './account-menu';
 import { AuthGate } from './auth-gate';
 import { DocumentForm } from './document-form';
 import { DocumentScope } from './document-scope';
-import { FormStatusBadge } from './document-status';
+import { NavDocumentStatus } from './nav-document-status';
 import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 import { type AdminRoute, COLLECTIONS_ROUTE } from './routing';
+import { useBranchSync } from '../editor/branch';
+import {
+  ShellSaveProgress,
+  ShellStatusBar,
+  ShellTopBar,
+  useLongSave,
+} from './shell-bars';
 import { useAdminRoute } from './use-admin-route';
 import { useFormColumnWidth } from './use-form-column-width';
 import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
 
 const SHELL_WIDTH = { '--sidebar-width': '18rem' } as CSSProperties;
+
+const DOCS_URL = 'https://tina.io/docs';
+
+// The open entry: pressed grey, semibold words, orange icon, never an orange fill.
+const ENTRY_CLASS =
+  'data-active:bg-pressed data-active:font-semibold data-active:text-foreground data-active:[&_svg]:text-primary';
+
+// Sits between the Top bar and the Status bar instead of the full viewport.
+const BETWEEN_BARS = 'top-11 bottom-7 h-auto';
 
 const documentName = (path: string) => path.split('/').at(-1) ?? path;
 
@@ -75,11 +89,14 @@ function CollectionMenu({
         <SidebarMenuItem key={collection.name}>
           <SidebarMenuButton
             isActive={collection.name === activeName}
+            aria-label={collection.label ?? collection.name}
+            className={ENTRY_CLASS}
             onClick={() =>
               navigate({ view: 'collection', collection: collection.name })
             }
           >
-            {collection.label ?? collection.name}
+            <Icon glyph='folder' size={16} />
+            <span>{collection.label ?? collection.name}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
@@ -126,12 +143,14 @@ function DocumentMenu({
           <SidebarMenuButton
             isActive={path === activePath}
             aria-label={documentName(path)}
+            className={ENTRY_CLASS}
             onClick={() =>
               navigate({ view: 'document', collection: collection.name, path })
             }
           >
+            <Icon glyph='doc' size={16} />
             <span className='flex-1 truncate'>{documentName(path)}</span>
-            <FormStatusBadge formId={toFormId(path)} />
+            <NavDocumentStatus formId={toFormId(path)} />
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
@@ -161,12 +180,13 @@ function GlobalNavMenu({
   };
   return (
     <SidebarMenu aria-label={label} aria-labelledby={labelledBy}>
-      {entries.map(({ label, icon: Icon, target }, index) => (
+      {entries.map(({ label, icon: NavIcon, target }, index) => (
         <SidebarMenuItem key={`${index}:${label}`}>
           <SidebarMenuButton
             isActive={
               target.kind === 'screen' && target.screen === activeScreen
             }
+            className={ENTRY_CLASS}
             render={
               target.kind === 'url' ? (
                 <a
@@ -178,7 +198,7 @@ function GlobalNavMenu({
             }
             onClick={() => open(target)}
           >
-            <Icon className='size-4' />
+            <NavIcon className='size-4' />
             <span>{label}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -221,16 +241,20 @@ function ScreenOutlet({
   name,
   screen,
   segments,
+  onClose,
 }: {
   name: string;
   screen: AdminScreen | undefined;
   segments: string[];
+  onClose: () => void;
 }) {
   return (
-    <SidebarInset>
-      <div className='flex items-center gap-1 p-4 pb-2'>
-        <SidebarTrigger />
-      </div>
+    <SidebarInset className='min-w-0'>
+      <PanelHeader
+        heading={screen?.label ?? name}
+        closeLabel='Close'
+        onClose={onClose}
+      />
       <div className='min-h-0 flex-1 overflow-y-auto'>
         {screen ? (
           <screen.component key={screen.name} segments={segments} />
@@ -274,7 +298,15 @@ function FormColumnSkeleton() {
   );
 }
 
-function FormColumn({ openPath }: { openPath?: string }) {
+function FormColumn({
+  openPath,
+  collection,
+  onBack,
+}: {
+  openPath?: string;
+  collection?: CollectionSchema;
+  onBack: () => void;
+}) {
   const { width, isResizing, handleProps } = useFormColumnWidth();
   const scope = use(FormScopeContext);
   const seedKey = scope?.seedKey;
@@ -291,22 +323,30 @@ function FormColumn({ openPath }: { openPath?: string }) {
     <>
       <aside
         aria-label='Document form'
-        className='sticky top-0 flex h-svh min-w-0 shrink-0 flex-col overflow-y-auto border-r border-border px-4 pb-4'
+        className='flex min-w-0 shrink-0 flex-col overflow-y-auto border-r border-border'
         style={{ width }}
       >
-        <div className='mb-2 flex items-center gap-1 pt-4'>
-          <SidebarTrigger />
-          {openPath === undefined ? (
-            <span className='text-sm text-muted-foreground'>
-              Select a document to edit
-            </span>
-          ) : null}
-        </div>
-        {mountedSeedKey === seedKey ? (
-          <DocumentForm key={seedKey} />
+        {collection ? (
+          <PanelHeader
+            backLabel={collection.label ?? collection.name}
+            backTitle='Back to the collection'
+            onBack={onBack}
+          />
         ) : (
-          <FormColumnSkeleton />
+          <PanelHeader heading='Document' />
         )}
+        <div className='p-4'>
+          {openPath === undefined ? (
+            <p className='mb-2 text-sm text-muted-foreground'>
+              Select a document to edit
+            </p>
+          ) : null}
+          {mountedSeedKey === seedKey ? (
+            <DocumentForm key={seedKey} />
+          ) : (
+            <FormColumnSkeleton />
+          )}
+        </div>
       </aside>
 
       <div
@@ -333,17 +373,51 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
       <TinaProvider config={config} queryClient={queryClient}>
         <HashRouter>
           <AuthGate>
-            <AdminShell preview={preview} />
+            <AdminShell preview={preview} projectName={config.projectName} />
           </AuthGate>
         </HashRouter>
-        <Toaster />
+        <ShellToaster />
       </TinaProvider>
     </AdminErrorBoundary>
   );
 }
 
-function AdminShell({ preview }: { preview?: ReactNode }) {
+// Toasts sit above the Save progress card while it shows.
+const TOAST_OFFSET_ABOVE_CARD = { bottom: '8rem' };
+
+function ShellToaster() {
+  const cardShowing = useLongSave();
+  return <Toaster offset={cardShowing ? TOAST_OFFSET_ABOVE_CARD : undefined} />;
+}
+
+function MissingPanel({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <SidebarInset className='min-w-0'>
+      <PanelHeader heading={title} closeLabel='Close' onClose={onClose} />
+      <div className='min-h-0 flex-1 overflow-y-auto'>
+        <Placeholder>{children}</Placeholder>
+      </div>
+    </SidebarInset>
+  );
+}
+
+function AdminShell({
+  preview,
+  projectName,
+}: {
+  preview?: ReactNode;
+  projectName?: string;
+}) {
   useUnsavedChangesGuard();
+  useBranchSync();
   const schema = useTinaSchema();
   const screens = useAdminScreens();
   const globalNav = useGlobalNav();
@@ -375,101 +449,123 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
     openDocumentError === null &&
     openEntry === null;
 
+  const goToCollections = () => navigate(COLLECTIONS_ROUTE);
+
   return (
-    <SidebarProvider style={SHELL_WIDTH}>
-      <Sidebar aria-label='Content' role='navigation'>
-        <SidebarHeader>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => navigate(COLLECTIONS_ROUTE)}>
-                <img src={tinaLogo} alt='TinaCMS' className='h-5 w-auto' />
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarHeader>
+    <SidebarProvider
+      style={SHELL_WIDTH}
+      className='h-svh min-h-0 flex-col overflow-hidden'
+    >
+      <ShellTopBar projectName={projectName} />
 
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>Collections</SidebarGroupLabel>
-            <CollectionMenu
-              collections={schema.collections}
-              activeName={collection?.name}
-              navigate={navigate}
-            />
-          </SidebarGroup>
-
-          {isStaleCollectionRoute ? (
-            <Placeholder>
-              No collection named “{activeCollectionName}”.
-            </Placeholder>
-          ) : null}
-
-          {collection ? (
+      <div className='flex min-h-0 flex-1'>
+        <Sidebar
+          aria-label='Content'
+          role='navigation'
+          collapsible='icon'
+          className={BETWEEN_BARS}
+        >
+          <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>
-                {collection.label ?? collection.name}
-              </SidebarGroupLabel>
-              <DocumentMenu
-                collection={collection}
-                activePath={openPath}
+              <SidebarGroupLabel>Collections</SidebarGroupLabel>
+              <CollectionMenu
+                collections={schema.collections}
+                activeName={collection?.name}
                 navigate={navigate}
               />
             </SidebarGroup>
-          ) : null}
 
-          <GlobalNav
-            sections={globalNav}
-            activeScreen={activeScreen?.screen}
-            navigate={navigate}
+            {isStaleCollectionRoute ? (
+              <Placeholder>
+                No collection named “{activeCollectionName}”.
+              </Placeholder>
+            ) : null}
+
+            {collection ? (
+              <SidebarGroup>
+                <SidebarGroupLabel>
+                  {collection.label ?? collection.name}
+                </SidebarGroupLabel>
+                <DocumentMenu
+                  collection={collection}
+                  activePath={openPath}
+                  navigate={navigate}
+                />
+              </SidebarGroup>
+            ) : null}
+
+            <GlobalNav
+              sections={globalNav}
+              activeScreen={activeScreen?.screen}
+              navigate={navigate}
+            />
+          </SidebarContent>
+
+          <SidebarFooter>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  render={
+                    <a
+                      href={DOCS_URL}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    />
+                  }
+                >
+                  <Icon glyph='info' size={16} />
+                  <span>Help &amp; docs</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
+        </Sidebar>
+
+        {activeScreen ? (
+          <ScreenOutlet
+            name={activeScreen.screen}
+            screen={screens.find(
+              (candidate) => candidate.name === activeScreen.screen
+            )}
+            segments={activeScreen.segments}
+            onClose={goToCollections}
           />
-        </SidebarContent>
+        ) : isStaleDocumentRoute ? (
+          <MissingPanel title='Document not found' onClose={goToCollections}>
+            No document named “{openPath}”.
+          </MissingPanel>
+        ) : openPath !== undefined && openDocumentError !== null ? (
+          <MissingPanel title='Cannot open document' onClose={goToCollections}>
+            <span role='alert'>
+              Cannot read “{openPath}”. {openDocumentError.message}
+            </span>
+          </MissingPanel>
+        ) : (
+          <DocumentScope collection={collection} path={openPath}>
+            <SidebarInset className='min-w-0 flex-row'>
+              <FormColumn
+                openPath={openPath}
+                collection={collection}
+                onBack={() =>
+                  collection
+                    ? navigate({
+                        view: 'collection',
+                        collection: collection.name,
+                      })
+                    : goToCollections()
+                }
+              />
 
-        <SidebarFooter>
-          <AccountMenu />
-        </SidebarFooter>
-      </Sidebar>
+              <div className='min-w-0 flex-1'>
+                <PreviewSlot preview={preview} />
+              </div>
+            </SidebarInset>
+          </DocumentScope>
+        )}
+      </div>
 
-      {activeScreen ? (
-        <ScreenOutlet
-          name={activeScreen.screen}
-          screen={screens.find(
-            (candidate) => candidate.name === activeScreen.screen
-          )}
-          segments={activeScreen.segments}
-        />
-      ) : isStaleDocumentRoute ? (
-        <SidebarInset>
-          <div className='flex items-center gap-1 p-4 pb-2'>
-            <SidebarTrigger />
-          </div>
-          <div className='min-h-0 flex-1 overflow-y-auto'>
-            <Placeholder>No document named “{openPath}”.</Placeholder>
-          </div>
-        </SidebarInset>
-      ) : openPath !== undefined && openDocumentError !== null ? (
-        <SidebarInset>
-          <div className='flex items-center gap-1 p-4 pb-2'>
-            <SidebarTrigger />
-          </div>
-          <div className='min-h-0 flex-1 overflow-y-auto'>
-            <Placeholder>
-              <span role='alert'>
-                Cannot read “{openPath}”. {openDocumentError.message}
-              </span>
-            </Placeholder>
-          </div>
-        </SidebarInset>
-      ) : (
-        <DocumentScope collection={collection} path={openPath}>
-          <SidebarInset className='flex-row'>
-            <FormColumn openPath={openPath} />
-
-            <div className='min-w-0 flex-1'>
-              <PreviewSlot preview={preview} />
-            </div>
-          </SidebarInset>
-        </DocumentScope>
-      )}
+      <ShellStatusBar />
+      <ShellSaveProgress />
     </SidebarProvider>
   );
 }

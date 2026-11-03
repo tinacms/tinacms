@@ -244,6 +244,31 @@ Then each `forwardRef` component fails the `ElementType` check, and the
 compilation gives approximately 94 errors. To prevent this, `tsconfig.json`
 points `react` and `react-dom` to the types in this package.
 
+## The frame and the state catalogue
+
+`rich-text-field.view.tsx` is the props-only view: it draws the frame and renders
+`RichEditor` itself. `rich-text-field.ui.tsx` feeds it from the form.
+`rich-text-field.states.ts` is the state catalogue, and
+`rich-text-field.states.test.tsx` renders every state in one `it.each`.
+
+| File | Role |
+|---|---|
+| `rich-text-field.view.tsx` | Label, border, hover, focus ring, invalid, read-only and body layout. |
+| `rich-text-field.states.ts` | Empty, filled, too long, required, invalid, disabled, read-only, embed and body states. |
+| `rich-text-field.states.test.tsx` | Renders each state and checks the structure, not pixels. |
+
+- **Framed** (the live layout, also for `isBody`): the text stops growing at
+  `max-h-60` and scrolls beneath a toolbar that stays put.
+- **Read-only**: the toolbar is hidden, the fill is muted, and the text, the
+  embed menu, the embed label and the Enter hotkey do nothing.
+- **Disabled**: read-only plus `inert` and `aria-disabled`, so the toolbar is
+  still drawn but takes no focus, pointer or tooltip.
+- **Body** (catalogue only): no frame, the label is `sr-only`, errors and
+  warnings sit above, and the minimum height is `min-h-56`. The live field keeps
+  the framed layout for `isBody` because v4 has no editor pane yet.
+
+No live field is disabled or read-only yet; the catalogue is the only source.
+
 ## Tests
 
 `rich-text-field.test.tsx` does these tests:
