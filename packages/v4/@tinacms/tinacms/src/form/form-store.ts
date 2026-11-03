@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { useShallow } from 'zustand/react/shallow';
 import type { Brand } from '../core/brand';
 import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import {
@@ -43,6 +44,12 @@ export const toDocument = (values: FormValues): TinaDocument => ({ ...values });
 
 export type FormStatus = 'pristine' | 'dirty' | 'clean';
 
+/** One form's last save, written by `useFormSave` and read by the shell. */
+export type SavePhase =
+  | { readonly phase: 'saving' }
+  | { readonly phase: 'saved' }
+  | { readonly phase: 'failed'; readonly message: string };
+
 export type FieldErrors = Partial<Record<FieldAddress, string[]>>;
 
 type OpenForm =
@@ -67,6 +74,11 @@ export const isEdited = (
 export interface FormStore {
   userId: DraftUserScope;
   forms: Partial<Record<FormId, OpenForm>>;
+  /** The latest save of each form, with a counter so the newest wins. */
+  saves: Partial<Record<FormId, SavePhase & { readonly at: number }>>;
+  branch: string | undefined;
+  setBranch: (branch: string | undefined) => void;
+  setSavePhase: (formId: FormId, phase: SavePhase) => void;
   active: { formId: FormId; address: FieldAddress } | null;
   setUserId: (userId: DraftUserScope) => void;
   registerForm: (
@@ -134,10 +146,11 @@ const openingScope = (
   formId: FormId,
   incoming: FormValues,
   equal: FieldEquality,
-  userId: DraftUserScope
+  userId: DraftUserScope,
+  branch: string | undefined
 ): EditedForm | undefined => {
   if (keepsValues(scope, incoming)) return scope;
-  const draft = readDraft(formId, userId);
+  const draft = readDraft(formId, userId, branch);
   if (!draft) return undefined;
   const baseline = toFormValues(draft.baseline);
   if (!valuesEqual(baseline, incoming, equal)) return undefined;
@@ -164,6 +177,8 @@ const errorsEqual = (current: FieldErrors, next: FieldErrors): boolean =>
 const DEVTOOLS_STORE_NAME = 'TinaFormStore';
 const DEVTOOLS_ACTION = {
   setUserId: 'form/setUserId',
+  setBranch: 'form/setBranch',
+  setSavePhase: 'form/setSavePhase',
   register: 'form/register',
   setFieldValue: 'form/setFieldValue',
   setFieldErrors: 'form/setFieldErrors',
@@ -176,6 +191,8 @@ const DEVTOOLS_ACTION = {
 type DevtoolsActionLabel =
   (typeof DEVTOOLS_ACTION)[keyof typeof DEVTOOLS_ACTION];
 
+let savePhaseClock = 0;
+
 export const useFormStore = create<FormStore>()(
   devtools(
     (set) => {
@@ -187,12 +204,31 @@ export const useFormStore = create<FormStore>()(
       return {
         userId: undefined,
         forms: {},
+        saves: {},
+        branch: undefined,
         active: null,
+
+        setBranch: (branch) =>
+          apply((state) => {
+            if (state.branch === branch) return state;
+            return { branch, forms: {}, saves: {}, active: null };
+          }, DEVTOOLS_ACTION.setBranch),
+
+        setSavePhase: (formId, phase) =>
+          apply(
+            (state) => ({
+              saves: {
+                ...state.saves,
+                [formId]: { ...phase, at: ++savePhaseClock },
+              },
+            }),
+            DEVTOOLS_ACTION.setSavePhase
+          ),
 
         setUserId: (userId) =>
           apply((state) => {
             if (state.userId === userId) return state;
-            return { userId, forms: {}, active: null };
+            return { userId, forms: {}, saves: {}, active: null };
           }, DEVTOOLS_ACTION.setUserId),
 
         registerForm: (formId, values, equal = STRUCTURAL_EQUALITY) =>
@@ -203,7 +239,8 @@ export const useFormStore = create<FormStore>()(
               formId,
               values,
               equal,
-              state.userId
+              state.userId,
+              state.branch
             );
             if (opening) {
               if (opening === scope) return state;
@@ -348,8 +385,8 @@ export const readOpeningScope = (
   incoming: FormValues,
   equal: FieldEquality = STRUCTURAL_EQUALITY
 ): EditedForm | undefined => {
-  const { forms, userId } = readFormStore();
-  return openingScope(forms[formId], formId, incoming, equal, userId);
+  const { forms, userId, branch } = readFormStore();
+  return openingScope(forms[formId], formId, incoming, equal, userId, branch);
 };
 
 // A stored draft the form did not open on because its document changed since.
@@ -359,7 +396,8 @@ export const staleDraft = (
   equal: FieldEquality = STRUCTURAL_EQUALITY
 ): StoredDraft | undefined => {
   if (readOpeningScope(formId, incoming, equal)) return undefined;
-  return readDraft(formId, readFormStore().userId);
+  const { userId, branch } = readFormStore();
+  return readDraft(formId, userId, branch);
 };
 
 // Mirrors this tab's edits into storage. Only forms whose scope changed in an
@@ -380,16 +418,45 @@ export const syncDrafts = () =>
             values: toDocument(scope.values),
             baseline: toDocument(scope.baseline),
           },
-          next.userId
+          next.userId,
+          next.branch
         );
       } else if (formStatus(before) === 'dirty') {
-        removeDraft(formId, next.userId);
+        removeDraft(formId, next.userId, next.branch);
       }
     }
   });
 
 export const useFormStatus = (formId: FormId): FormStatus =>
   useFormStore((state) => formStatus(state.forms[formId]));
+
+export type SaveState = 'idle' | 'unsaved' | 'saving' | 'saved' | 'failed';
+
+export interface SaveSummary {
+  state: SaveState;
+  /** The newest failed save's message, when `state` is `failed`. */
+  message?: string;
+}
+
+/**
+ * One answer for the whole shell: a running save wins, then the newest
+ * failure, then unsaved edits, then the newest success, else idle.
+ */
+const summarizeSaves = (state: FormStore): SaveSummary => {
+  const saves = Object.values(state.saves).filter(
+    (save): save is NonNullable<typeof save> => save !== undefined
+  );
+  if (saves.some((save) => save.phase === 'saving')) return { state: 'saving' };
+  const newest = saves.sort((a, b) => b.at - a.at)[0];
+  if (newest?.phase === 'failed') {
+    return { state: 'failed', message: newest.message };
+  }
+  if (anyFormDirty(state)) return { state: 'unsaved' };
+  return { state: newest?.phase === 'saved' ? 'saved' : 'idle' };
+};
+
+const anyFormDirty = (state: FormStore): boolean =>
+  Object.values(state.forms).some((scope) => formStatus(scope) === 'dirty');
 
 export const useIsFormDirty = (formId: FormId): boolean =>
   useFormStore((state) => formStatus(state.forms[formId]) === 'dirty');
@@ -411,3 +478,8 @@ export const useFormErrors = (formId: FormId): FieldErrors =>
     const scope = state.forms[formId];
     return isEdited(scope) ? scope.errors : NO_FIELD_ERRORS;
   });
+
+export const useSaveSummary = (): SaveSummary =>
+  useFormStore(useShallow(summarizeSaves));
+
+export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);

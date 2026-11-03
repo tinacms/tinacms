@@ -272,11 +272,28 @@ const adoptSavedValues = (
   return written;
 };
 
+async function recordSavePhase(
+  formId: FormId,
+  run: () => Promise<void>
+): Promise<void> {
+  const { setSavePhase } = useFormStore.getState();
+  setSavePhase(formId, { phase: 'saving' });
+  try {
+    await run();
+  } catch (cause) {
+    let message = 'Save failed.';
+    if (cause instanceof Error && cause.message) message = cause.message;
+    setSavePhase(formId, { phase: 'failed', message });
+    throw cause;
+  }
+  setSavePhase(formId, { phase: 'saved' });
+}
+
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
   const { getValues, trigger, setValue } = useFormContext<TinaDocument>();
-  return useCallback(async () => {
+  const runSave = useCallback(async () => {
     const { formId, path, collection, onSave, hooks, reseedFields } = scope;
     // Validate every field, not only the edited ones, so a required field the
     // editor never touched surfaces its message at submit.
@@ -313,6 +330,10 @@ export function useFormSave(): () => Promise<void> {
       throw new AfterSaveHookError(new Error(warnings.join(' ')));
     }
   }, [scope, getValues, trigger, setValue, registry]);
+  return useCallback(
+    () => recordSavePhase(scope.formId, runSave),
+    [scope.formId, runSave]
+  );
 }
 
 export function useFieldAddress(): FieldAddress {

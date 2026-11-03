@@ -41,17 +41,24 @@ The store has a core **branch slice** (provided by Tina core, not a plugin):
 useTinaStore((s) => s.branch.current)        // 'cms/new-blog-post'
 useTinaStore((s) => s.branch.list)           // ['main', 'cms/new-post', ...]
 useTinaStore((s) => s.branch.dirty)          // true if there are unsaved/uncommitted changes
+useTinaStore((s) => s.branch.mode)           // 'local' | 'branches' (unset: the provider has no branches)
+useTinaStore((s) => s.branch.protected)      // names of the protected branches
 ```
 
-Actions are slice methods that call the Data Layer:
+The content provider fills the slice. A provider that reads from branches adds `branches: { list, defaultBranch }` to its content slice, and core sets `mode: 'branches'`, `list` and `protected`. A provider that reads local files adds `local: true`, and core sets `mode: 'local'`. A provider with neither leaves `mode` unset, and the shell shows no branch spot. Only `current` persists across reloads. Core rebuilds the rest on each boot.
+
+The Branch switcher blocks a switch while any form has unsaved edits. A form is dirty when the form store says so, so `branch.dirty` is not a store field yet.
+
+`switchTo(name)` is a plain setter on the slice. It sets `branch.current`, and every content and media read, query key and draft key follows it. Picking the default branch by name stores the same keys as picking nothing. The other actions call the Data Layer, and none exists yet:
 
 ```ts
-const { create, switchTo, requestPublish, discard } = useTinaStore((s) => s.branch)
+const { create, requestPublish, discard } = useTinaStore((s) => s.branch)
 
 await create('cms/new-post')
-await switchTo('main')
 await requestPublish()        // calls into the content capability or the workflow plugin
 ```
+
+`switchTo` takes no Data Layer call because switching branches reads a different branch. It does not change files.
 
 ## Authoring the workflow as a plugin
 

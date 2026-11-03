@@ -2,6 +2,7 @@ import { ElementApi } from '@udecode/plate';
 import {
   ParagraphPlugin,
   PlateEditor,
+  useReadOnly,
   useSelected,
 } from '@udecode/plate/react';
 import React from 'react';
@@ -216,6 +217,8 @@ const DotMenu = ({
   onRemove: () => void;
   showEdit: boolean;
 }) => {
+  const readOnly = useReadOnly();
+  if (readOnly) return null;
   return (
     <Popover>
       <span className='-ml-px relative block'>
