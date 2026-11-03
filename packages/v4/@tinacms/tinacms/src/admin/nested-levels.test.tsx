@@ -387,3 +387,65 @@ describe('array items as form levels', () => {
     ).toHaveFocus();
   });
 });
+
+describe('a list at level 3', () => {
+  const deepCollection: CollectionSchema = {
+    name: 'page',
+    label: 'Pages',
+    format: 'mdx',
+    fields: [
+      t.object({
+        name: 'one',
+        label: 'One',
+        fields: [
+          t.object({
+            name: 'two',
+            label: 'Two',
+            fields: [
+              t.array({
+                name: 'links',
+                fields: [t.string({ name: 'url', label: 'URL' })],
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  };
+
+  it('shows a card named by the field, counts a missing list as empty, and counts what is added', async () => {
+    const user = userEvent.setup();
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [objectFieldPlugin, arrayFieldPlugin, stringFieldPlugin],
+          schema: { collections: [] },
+        })}
+      >
+        <FormProvider
+          collection={deepCollection}
+          path='content/pages/deep.mdx'
+          document={{ one: { two: {} } }}
+        >
+          <DocumentForm />
+        </FormProvider>
+      </TinaProvider>
+    );
+    const card = await screen.findByRole('button', { name: /^Open links/ });
+    expect(card).toHaveTextContent('No items');
+    await user.click(card);
+    expect(
+      await screen.findByRole('button', { name: 'Add item' })
+    ).toBeVisible();
+    const trail = screen.getByRole('navigation', { name: 'Field path' });
+    expect(within(trail).getByText('links')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Add item' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Up to links' })
+    );
+    await user.click(await screen.findByRole('button', { name: /^Up / }));
+    expect(
+      await screen.findByRole('button', { name: /^Open links/ })
+    ).toHaveTextContent('1 item');
+  });
+});

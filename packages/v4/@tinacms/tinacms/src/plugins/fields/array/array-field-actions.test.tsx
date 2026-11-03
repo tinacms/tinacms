@@ -265,6 +265,31 @@ describe('ArrayField item actions', () => {
     );
   });
 
+  it('moves nothing past either end of the list', async () => {
+    renderPage({ links: [{ label: 'A' }, { label: 'B' }] });
+    (await screen.findByRole('button', { name: 'Move Item 1' })).focus();
+    await userEvent.keyboard('{ArrowUp}');
+    screen.getByRole('button', { name: 'Move Item 2' }).focus();
+    await userEvent.keyboard('{ArrowDown}');
+    expect((valueOf('links') as TinaDocument[]).map((l) => l.label)).toEqual([
+      'A',
+      'B',
+    ]);
+  });
+
+  it('closes an open card when its head is clicked again', async () => {
+    renderPage({ links: [{ label: 'A' }] });
+    const head = await screen.findByRole('button', { name: /^Item 1:/ });
+    await userEvent.click(head);
+    expect(
+      await screen.findByRole('textbox', { name: /^Label\b/ })
+    ).toHaveValue('A');
+    await userEvent.click(screen.getByRole('button', { name: /^Item 1:/ }));
+    await waitFor(() =>
+      expect(screen.queryByRole('textbox', { name: /^Label\b/ })).toBeNull()
+    );
+  });
+
   it('removes at once and focuses the next grip, then the previous, then Add', async () => {
     renderPage({ links: [{ label: 'A' }, { label: 'B' }, { label: 'C' }] });
     await chooseAction('Links', 2, 'Remove');
@@ -313,6 +338,25 @@ describe('ArrayField scalar items', () => {
     await userEvent.type(boxes[1], '!');
     await chooseAction('Tags', 1, 'Insert below');
     await waitFor(() => expect(valueOf('tags')).toEqual(['a', '', 'b!', 'a']));
+  });
+
+  it('moves no value past either end, and shows an empty value as an empty box', async () => {
+    renderPage({ tags: ['a', null] });
+    (await screen.findByRole('button', { name: 'Move Item 1' })).focus();
+    await userEvent.keyboard('{ArrowUp}');
+    screen.getByRole('button', { name: 'Move Item 2' }).focus();
+    await userEvent.keyboard('{ArrowDown}');
+    expect(valueOf('tags')).toEqual(['a', null]);
+    expect(screen.getByRole('textbox', { name: /^Item 2/ })).toHaveValue('');
+  });
+
+  it('focuses the Add box once the last value is removed', async () => {
+    renderPage({ tags: ['a'] });
+    await chooseAction('Tags', 1, 'Remove');
+    await waitFor(() => expect(valueOf('tags')).toEqual([]));
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: 'Add item' })).toHaveFocus()
+    );
   });
 
   it('adds a typed value on Enter and nothing on an empty Enter', async () => {
