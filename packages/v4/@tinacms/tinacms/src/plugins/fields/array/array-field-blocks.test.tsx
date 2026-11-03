@@ -301,6 +301,36 @@ describe('Blocks field picker', () => {
     );
   });
 
+  it('closes the insert picker when "Add a block" opens, and the add panel when Insert opens', async () => {
+    renderPage({ blocks: [{ _template: 'hero', headline: 'Hi' }] });
+    const blocks = await list('Blocks');
+    const insertAbove = async () => {
+      await userEvent.click(
+        within(blocks).getByRole('button', { name: 'Actions for Item 1' })
+      );
+      await userEvent.click(
+        await screen.findByRole('menuitem', { name: /^Insert above/ })
+      );
+    };
+    await insertAbove();
+    await within(blocks).findByRole('region', { name: 'Choose a block' });
+    await openBlockPicker(blocks);
+    expect(within(blocks).queryByRole('region')).toBeNull();
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    await insertAbove();
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(
+      within(blocks).getByRole('region', { name: 'Choose a block' })
+    ).toBeInTheDocument();
+  });
+
+  it('closes one field panel when a second Blocks field button is pressed', async () => {
+    renderPage();
+    await openBlockPicker(await list('Blocks'));
+    await openBlockPicker(await list('Broken'));
+    await waitFor(() => expect(screen.getAllByRole('dialog')).toHaveLength(1));
+  });
+
   it('loads and holds saved blocks unchanged', async () => {
     const saved = [
       { _template: 'hero', headline: 'Hi' },

@@ -388,7 +388,7 @@ describe('array field view rerendered', () => {
     for (const { props } of [...rest, first]) {
       rerender(<ArrayFieldView {...props} />);
       expect(
-        screen.getByRole('group', { name: /^(Authors|Tags)/ })
+        screen.getByRole('group', { name: /^(Authors|Tags|Blocks)/ })
       ).toBeVisible();
     }
   });
