@@ -167,4 +167,22 @@ describe('object field states', () => {
       unmount();
     }
   });
+
+  it('draws a collapsible closed and a card unnamed when the caller gives no handlers or name', async () => {
+    const { unmount } = render(
+      <ObjectFieldView display='collapsible' label='SEO'>
+        <input aria-label='Title' />
+      </ObjectFieldView>
+    );
+    const header = screen.getByRole('button', { name: /SEO/ });
+    expect(header).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.click(header);
+    expect(header).toHaveAttribute('aria-expanded', 'false');
+    unmount();
+
+    render(<ObjectFieldView display='drillIn' label={<em>SEO</em>} />);
+    const card = screen.getByRole('button', { name: 'Open' });
+    await userEvent.click(card);
+    expect(card).toBeVisible();
+  });
 });
