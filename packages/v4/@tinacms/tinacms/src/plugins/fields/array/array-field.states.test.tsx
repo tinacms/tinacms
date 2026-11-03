@@ -24,7 +24,7 @@ describe('array field states', () => {
     render(<ArrayFieldView {...props} />);
     expect(screen.queryByText(/unsaved/i)).toBeNull();
     expect(
-      screen.getByRole('group', { name: /^(Authors|Tags)/ })
+      screen.getByRole('group', { name: /^(Authors|Tags|Blocks)/ })
     ).toBeVisible();
     expect(screen.queryByText('(required)') !== null).toBe(!!props.required);
     expect(screen.queryAllByRole('alert').length > 0).toBe(
@@ -301,5 +301,52 @@ describe('array drill-in card', () => {
     expect(
       screen.getByRole('button', { name: /^Open profiles/ })
     ).toBeVisible();
+  });
+});
+
+describe('blocks states', () => {
+  const state = (name: string) => {
+    const found = states.find((entry) => entry.name === name)?.props;
+    if (!found) throw new Error(`missing state ${name}`);
+    return found;
+  };
+
+  it('says "No blocks." for an empty editable and an empty read-only list', () => {
+    const { unmount } = render(<ArrayFieldView {...state('blocks empty')} />);
+    expect(screen.getByText('No blocks.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Add a block' })).toBeEnabled();
+    unmount();
+    render(<ArrayFieldView {...state('blocks read-only empty')} />);
+    expect(screen.getByText('No blocks.')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Add a block' })).toBeNull();
+  });
+
+  it('keeps the picker shut in the disabled state and turns "Add a block" off', () => {
+    render(<ArrayFieldView {...state('blocks disabled')} />);
+    expect(screen.getByRole('button', { name: 'Add a block' })).toBeDisabled();
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('turns "Add a block" off in the full state and says why', () => {
+    render(<ArrayFieldView {...state('blocks full')} />);
+    const add = screen.getByRole('button', { name: 'Add a block' });
+    expect(add).toBeDisabled();
+    expect(add).toHaveAccessibleDescription(/This list is full/);
+  });
+
+  it('shows grouped blocks in the open plain picker', () => {
+    render(<ArrayFieldView {...state('blocks plain picker open')} />);
+    const panel = screen.getByRole('dialog', { name: 'Choose a block' });
+    for (const name of ['Layout', 'Content']) {
+      expect(within(panel).getByRole('group', { name })).toBeInTheDocument();
+    }
+    expect(panel.querySelector('img')).toBeNull();
+  });
+
+  it('shows two columns of previews in the open visual picker', () => {
+    render(<ArrayFieldView {...state('blocks visual picker open')} />);
+    const panel = screen.getByRole('dialog', { name: 'Choose a block' });
+    expect(panel.querySelectorAll('.aspect-video')).toHaveLength(4);
+    expect(panel.querySelector('.grid-cols-2')).not.toBeNull();
   });
 });

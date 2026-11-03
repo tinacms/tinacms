@@ -283,7 +283,7 @@ t.richText({ name: 'body', defaultValue: 'Write something here.\n\n- First point
 Widgets, `parse`, `format` and validation belong to the field plugin and to
 validators. To show a value with another widget, register a field plugin for
 it. For a one-off transform on one field, use a collection hook. Array-only
-options (`defaultItem`, `itemLabel`, `picker`, `previewImage`) are in
+options (`defaultItem`, `itemLabel`, `picker`, `previewImage`, `category`) are in
 [array-field.md](./array-field.md).
 
 ### Dropped options fail the build

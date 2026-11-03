@@ -70,8 +70,13 @@ export interface ArrayFieldViewProps
   addLabel?: string;
   addInputType?: 'text' | 'number';
   onAdd?: (value?: string) => void;
-  /** Replaces the add control, such as the block picker. */
-  addSlot?: ReactNode;
+  /**
+   * Replaces the add control, such as the block picker. A function receives
+   * `disabled`, so the slot turns off with the field.
+   */
+  addSlot?: ReactNode | ((state: { disabled: boolean }) => ReactNode);
+  /** Replaces the words shown for an empty list. */
+  emptyText?: string;
   /** A control drawn where a new item will go, such as the block picker. */
   inserting?: { index: number; content: ReactNode };
   onMove?: (from: number, to: number) => void;
@@ -266,6 +271,7 @@ export function ArrayFieldView({
   addInputType,
   onAdd,
   addSlot,
+  emptyText,
   inserting,
   onMove,
   onInsert,
@@ -337,9 +343,10 @@ export function ArrayFieldView({
       >
         {items.length === 0 ? (
           <p className='px-1 py-1.5 text-sm text-muted-foreground'>
-            {readOnly
-              ? 'This list is empty.'
-              : 'This list is empty. Add the first item below.'}
+            {emptyText ??
+              (readOnly
+                ? 'This list is empty.'
+                : 'This list is empty. Add the first item below.')}
           </p>
         ) : null}
         <DndContext
@@ -356,7 +363,9 @@ export function ArrayFieldView({
         </DndContext>
         {readOnly
           ? null
-          : (addSlot ?? (
+          : ((typeof addSlot === 'function'
+              ? addSlot({ disabled: disabled ?? false })
+              : addSlot) ?? (
               <AddControl
                 add={add}
                 addLabel={addLabel}

@@ -554,6 +554,27 @@ describe('compileSchema array options', () => {
     ).toThrow(/"picker" takes/);
   });
 
+  it('keeps a template category in the lock, and rejects an empty or non-string one', () => {
+    const withCategory = (category: unknown): FieldSchema[] => [
+      {
+        name: 'blocks',
+        type: 'array',
+        templates: [{ name: 'hero', fields: [], category }],
+      } as unknown as FieldSchema,
+    ];
+    const lock = JSON.parse(
+      JSON.stringify(compileSchema(configWith(withCategory('Layout'), plugins)))
+    );
+    expect(lock.schema.collections[0].fields[0].templates[0].category).toBe(
+      'Layout'
+    );
+    for (const bad of ['', '  ', 7]) {
+      expect(() =>
+        compileSchema(configWith(withCategory(bad), plugins))
+      ).toThrow(/"category" takes a non-empty string/);
+    }
+  });
+
   it('rejects an object display it does not know, naming the object', () => {
     const objectPlugins = [...plugins, fieldPlugin('object', 1)];
     const object = (extra: object) => [

@@ -61,7 +61,7 @@ const collection = {
 | `of` | `ScalarFieldSchema` | single values; an object or array here is rejected (ADR-017 §4) | `['news', 'release']` |
 
 A template of a templates array has `name`, `label?`, `fields`, `defaultItem?`,
-`itemLabel?` and `previewImage?`. A rich-text embed template takes only `name`,
+`itemLabel?`, `previewImage?` and `category?`. A rich-text embed template takes only `name`,
 `label?`, `fields` and `defaultItem?`.
 
 ### Array options
@@ -72,6 +72,7 @@ A template of a templates array has `name`, `label?`, `fields`, `defaultItem?`,
 | `itemLabel` | a `fields` array, a template | `(item) => string`. The row heading. |
 | `picker` | a `templates` array | `'list'` or `'grid'`. How an editor picks a block to add. |
 | `previewImage` | a template | The image the grid picker shows. |
+| `category` | a template | A heading in the block picker. Templates with the same `category` share a heading. |
 
 - `defaultItem` takes a scalar on a scalar array (it wins over `of.defaultValue`)
   and a document on a `fields` array. A templates array takes no `defaultItem`
@@ -86,6 +87,11 @@ A template of a templates array has `name`, `label?`, `fields`, `defaultItem?`,
   `'list'` otherwise. It replaces the v3 `visualSelector`.
 - `previewImage` is a path relative to the media root, with no URL scheme. It
   replaces the v3 `previewSrc`.
+- `category` is a non-empty string. Templates with no `category` come first,
+  under no heading. The headings follow the order in which each `category` first
+  appears. A value that is empty or not a string fails `tinacms codegen` with
+  `schema-category-invalid`. It keeps the v3 name (ADR-029, open question on
+  `category`).
 
 ```ts
 t.array({
@@ -257,9 +263,28 @@ Each item is a List card in a card list.
   its fields show their own errors.
 - The Add control ends the list. A list of strings or numbers with no
   `defaultItem` uses a box: type a value, press Enter. Any other list uses a
-  button. A block array shows the `list` or `grid` picker.
-- An empty list says so. A read-only list has no container, no Add control and
-  no menu. A disabled list has no hover and no menu.
+  button. A block array shows "Add a block".
+- An empty list says so: "No blocks." for a block array, "This list is empty."
+  for any other array. A read-only list has no container, no Add control and no
+  menu. A disabled list has no hover and no menu.
+
+### Block picker
+
+"Add a block" opens a floating panel named "Choose a block". It holds a search
+box ("Search blocks") and the templates under their `category` headings.
+
+- Search matches the template label, without regard to case. A heading with no
+  match is not shown. When nothing matches, the panel says "No blocks match."
+  The search box is empty each time the panel opens.
+- The look follows `picker`: `list` shows the label in a row, `grid` shows the
+  preview image over the label, two to a row. A missing, broken or non-media
+  `previewImage` shows the label alone.
+- Focus goes to the search box when the panel opens. Escape, a press outside the
+  panel or a pick closes it. After Escape or an outside press, focus returns to
+  "Add a block".
+- A pick adds the block and closes the panel. The block opens by the depth rule
+  below, and focus moves to it.
+- The panel does not open when the list is full or the field is disabled.
 
 ### Opening an item
 
@@ -285,15 +310,18 @@ and Remove. Remove acts at once, with no dialog and no Undo bar. Drag the grip
 to reorder, or press the up and down arrow keys while the grip has focus.
 
 After Remove, focus goes to the grip of the next item, else the previous item,
-else the Add control. After Insert, Duplicate or a move, focus goes to the grip
+else the Add control ("Add a block" for a block array). After Insert, Duplicate or a move, focus goes to the grip
 of the item. A new object item opens.
 
 A `max` validator on the array sets the full state. When the list is full, the
 Add control is off and says why, and Insert above, Insert below and Duplicate
 are off with the hint "List is full".
 
-For a block array, Insert above and Insert below open the template picker at
-that place, and the chosen template goes in there.
+For a block array, Insert above and Insert below open the same picker in the
+list at that place, with a Cancel button. The chosen template goes in there.
+Focus goes to the search box. Escape or Cancel closes the picker, inserts
+nothing and returns focus to the grip of the card whose menu opened it. Opening
+the Add panel closes the insert picker, and the other way round.
 
 ### Item fields
 

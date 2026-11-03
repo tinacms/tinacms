@@ -215,6 +215,17 @@ const assertTemplatesArrayOptions = (collections: CollectionSchema[]): void => {
           `${where} sets "defaultItem" on the array. Set "defaultItem" on each template instead.`
         );
       }
+      if (Array.isArray(node.templates)) {
+        for (const template of node.templates) {
+          if (!isRecord(template) || !('category' in template)) continue;
+          invariant(
+            typeof template.category === 'string' &&
+              template.category.trim() !== '',
+            'schema-category-invalid',
+            `${where} sets "category" to ${JSON.stringify(template.category)} on the template "${String(template.name)}". "category" takes a non-empty string.`
+          );
+        }
+      }
       if ('picker' in node) {
         invariant(
           Array.isArray(node.templates) &&

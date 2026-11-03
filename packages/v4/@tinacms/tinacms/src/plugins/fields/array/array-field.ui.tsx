@@ -1,5 +1,3 @@
-import { AddButton } from '@tinacms/ui/components/add-button';
-import { Button } from '@tinacms/ui/components/button';
 import {
   use,
   useEffect,
@@ -66,6 +64,11 @@ import {
   pickerOf,
 } from './array-field.schema';
 import { seedItem } from './seed-item';
+import {
+  BlockAddView,
+  type BlockOption,
+  InlineBlockPicker,
+} from './block-picker.view';
 import {
   ArrayDrillInView,
   ArrayFieldView,
@@ -196,6 +199,8 @@ function ObjectItems({
   const flat = useFormErrors(useFormId());
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
   const [picking, setPicking] = useState<number | null>(null);
+  const [adding, setAdding] = useState(false);
+  const insertOrigin = useRef<number | null>(null);
   const { listRef, afterChange } = useAfterChange(items, (index) =>
     showItem(index)
   );
@@ -240,6 +245,18 @@ function ObjectItems({
     if (activation) openOnActivation(activation.address);
   }, [activation]);
 
+  // Cancelling an insert-at picker returns focus to the card whose menu opened it.
+  useEffect(() => {
+    const origin = insertOrigin.current;
+    if (picking !== null || origin === null) return;
+    insertOrigin.current = null;
+    const cards = Array.from(listRef.current?.children ?? []).filter((child) =>
+      child.hasAttribute('data-array-item')
+    );
+    const grip = cards[origin]?.querySelector('[data-grip]');
+    if (grip instanceof HTMLElement) grip.focus();
+  }, [picking, listRef]);
+
   const seed = (defaultItem: TinaDocument | undefined, fields: FieldSchema[]) =>
     seedItem(defaultItem, fields, { documentPath, registry });
   const seedFor = (template?: ArrayTemplateSchema): TinaDocument =>
@@ -259,6 +276,7 @@ function ObjectItems({
     return max !== undefined && Array.isArray(list) && list.length >= max;
   };
   const insertAt = (index: number, template?: ArrayTemplateSchema) => {
+    insertOrigin.current = null;
     if (atMax()) {
       setPicking(null);
       return;
@@ -271,6 +289,7 @@ function ObjectItems({
     if (atMax()) return;
     afterChange({ open: items.length, focus: items.length });
     append(seedFor(template));
+    setAdding(false);
   };
   const moveTo = (from: number, to: number) => {
     if (to < 0 || to >= items.length) return;
@@ -356,10 +375,26 @@ function ObjectItems({
       add='button'
       addLabel='Add item'
       onAdd={() => add()}
+      emptyText={isTemplatesArray(field) ? 'No blocks.' : undefined}
       addSlot={
-        isTemplatesArray(field) ? (
-          <TemplatePicker field={field} full={full} onPick={add} />
-        ) : undefined
+        isTemplatesArray(field)
+          ? ({ disabled }) => (
+              <TemplatePicker
+                field={field}
+                full={full}
+                disabled={disabled}
+                open={adding}
+                onOpenChange={(next) => {
+                  setAdding(next);
+                  if (next) {
+                    insertOrigin.current = null;
+                    setPicking(null);
+                  }
+                }}
+                onPick={add}
+              />
+            )
+          : undefined
       }
       inserting={
         picking !== null && isTemplatesArray(field)
@@ -368,7 +403,7 @@ function ObjectItems({
               content: (
                 <TemplatePicker
                   field={field}
-                  full={full}
+                  inline
                   onPick={(template) => insertAt(picking, template)}
                   onCancel={() => setPicking(null)}
                 />
@@ -379,8 +414,11 @@ function ObjectItems({
       onMove={moveTo}
       onInsert={(index, where) => {
         const at = insertTarget(index, where);
-        if (isTemplatesArray(field)) setPicking(at);
-        else insertAt(at);
+        if (isTemplatesArray(field)) {
+          setAdding(false);
+          setPicking(at);
+          insertOrigin.current = index;
+        } else insertAt(at);
       }}
       onDuplicate={(index) => {
         if (atMax()) return;
@@ -395,65 +433,59 @@ function ObjectItems({
   );
 }
 
+interface TemplatePickerProps {
+  field: TemplatesArrayFieldSchema;
+  onPick: (template: ArrayTemplateSchema) => void;
+  full?: boolean;
+  disabled?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Draw the picker in the list at the insertion point, not as a panel. */
+  inline?: boolean;
+  onCancel?: () => void;
+}
+
+// Maps templates to plain options for the view part, which reads no store.
 function TemplatePicker({
   field,
-  full = false,
   onPick,
+  full = false,
+  disabled,
+  open,
+  onOpenChange,
+  inline,
   onCancel,
-}: {
-  field: TemplatesArrayFieldSchema;
-  full?: boolean;
-  onPick: (template: ArrayTemplateSchema) => void;
-  onCancel?: () => void;
-}) {
-  const cancel = onCancel ? (
-    <Button type='button' variant='outline' size='sm' onClick={onCancel}>
-      Cancel
-    </Button>
-  ) : null;
-  const reason = full ? (
-    <p className='px-1 text-sm text-muted-foreground'>{FULL_REASON}</p>
-  ) : null;
-  if (pickerOf(field) === 'list') {
-    return (
-      <div data-add-picker='' className='flex flex-col gap-1'>
-        {field.templates.map((template) => (
-          <AddButton
-            key={template.name}
-            disabled={full}
-            onClick={() => onPick(template)}
-          >
-            {`Add ${templateTitle(template)}`}
-          </AddButton>
-        ))}
-        {reason}
-        {cancel}
-      </div>
-    );
-  }
-  return (
-    <div data-add-picker='' className='flex flex-col gap-2'>
-      <div className='grid w-full grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2'>
-        {field.templates.map((template) => (
-          <button
-            key={template.name}
-            type='button'
-            data-slot='add-button'
-            disabled={full}
-            aria-label={`Add ${templateTitle(template)}`}
-            className='flex flex-col gap-2 rounded-sm border bg-card p-2 text-left text-sm hover:border-input focus-visible:shadow-focus-ring disabled:opacity-60'
-            onClick={() => onPick(template)}
-          >
-            {template.previewImage ? (
-              <PreviewImage path={template.previewImage} />
-            ) : null}
-            <span className='font-medium'>{templateTitle(template)}</span>
-          </button>
-        ))}
-      </div>
-      {reason}
-      {cancel}
-    </div>
+}: TemplatePickerProps) {
+  const look = pickerOf(field) === 'grid' ? 'grid' : 'list';
+  const options: BlockOption[] = field.templates.map((template) => ({
+    name: template.name,
+    label: templateTitle(template),
+    category: template.category,
+    preview: template.previewImage ? (
+      <PreviewImage path={template.previewImage} />
+    ) : undefined,
+  }));
+  const pick = (name: string) => {
+    const template = field.templates.find((entry) => entry.name === name);
+    if (template) onPick(template);
+  };
+  return inline ? (
+    <InlineBlockPicker
+      options={options}
+      look={look}
+      onPick={pick}
+      onCancel={() => onCancel?.()}
+    />
+  ) : (
+    <BlockAddView
+      options={options}
+      look={look}
+      onPick={pick}
+      disabled={disabled}
+      reason={full ? FULL_REASON : undefined}
+      open={open}
+      onOpenChange={onOpenChange}
+    />
   );
 }
 

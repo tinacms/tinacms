@@ -23,6 +23,8 @@ export type ItemLabel = (item: TinaDocument) => unknown;
 export interface ArrayTemplateSchema extends TemplateSchema {
   itemLabel?: ItemLabel;
   previewImage?: string;
+  /** Templates with the same category share a heading in the block picker. */
+  category?: string;
 }
 
 export interface FieldsArrayFieldSchema extends ArrayFieldBase {
