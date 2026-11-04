@@ -629,6 +629,71 @@ describe('ImageField gallery', () => {
     ).toBeInTheDocument();
   });
 
+  describe('dragging a tile', () => {
+    const placeTiles = (group: HTMLElement) => {
+      const tiles = [
+        ...group.querySelectorAll<HTMLElement>('[data-tile-index]'),
+      ];
+      tiles.forEach((tile, index) => {
+        tile.getBoundingClientRect = () =>
+          ({
+            left: index * 100,
+            right: index * 100 + 90,
+            top: 0,
+            bottom: 90,
+          }) as DOMRect;
+      });
+      return tiles;
+    };
+    const at = (x: number) => ({
+      clientX: x,
+      clientY: 10,
+      button: 0,
+      pointerId: 1,
+    });
+
+    it('moves a tile to the tile it is released over', async () => {
+      renderGallery(['a/one.jpg', 'b/two.jpg', 'c/three.jpg']);
+      const [first] = placeTiles(await gallery());
+      fireEvent.pointerDown(first, at(10));
+      fireEvent.pointerMove(first, at(210));
+      fireEvent.pointerUp(first, at(210));
+      expect(valueOf('images')).toEqual([
+        'b/two.jpg',
+        'c/three.jpg',
+        'a/one.jpg',
+      ]);
+    });
+
+    it('ignores a press that moves less than the drag distance', async () => {
+      renderGallery(['a/one.jpg', 'b/two.jpg']);
+      const [first] = placeTiles(await gallery());
+      fireEvent.pointerDown(first, at(10));
+      fireEvent.pointerMove(first, at(12));
+      fireEvent.pointerUp(first, at(112));
+      expect(valueOf('images')).toEqual(['a/one.jpg', 'b/two.jpg']);
+    });
+
+    it('cancels on Escape', async () => {
+      renderGallery(['a/one.jpg', 'b/two.jpg']);
+      const [first] = placeTiles(await gallery());
+      fireEvent.pointerDown(first, at(10));
+      fireEvent.pointerMove(first, at(110));
+      await userEvent.keyboard('{Escape}');
+      fireEvent.pointerUp(first, at(110));
+      expect(valueOf('images')).toEqual(['a/one.jpg', 'b/two.jpg']);
+    });
+
+    it('cancels when released outside every tile', async () => {
+      renderGallery(['a/one.jpg', 'b/two.jpg']);
+      const [first] = placeTiles(await gallery());
+      fireEvent.pointerDown(first, at(10));
+      fireEvent.pointerMove(first, at(500));
+      fireEvent.pointerUp(first, at(500));
+      expect(valueOf('images')).toEqual(['a/one.jpg', 'b/two.jpg']);
+    });
+  });
+
   it('gives a stored value that is not a path a tile that can be removed', async () => {
     renderGallery(['a/one.jpg', 2024, null]);
     const group = await gallery();
