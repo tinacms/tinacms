@@ -417,6 +417,20 @@ describe('array field view without handlers', () => {
     );
   });
 
+  it('shows the list placeholder in an empty value box', () => {
+    render(
+      <ArrayFieldView
+        label='Tags'
+        itemPlaceholder='Empty tag'
+        items={[{ id: 'a', name: 'Item 1', kind: 'value', value: '' }]}
+      />
+    );
+    expect(screen.getByRole('textbox', { name: 'Item 1' })).toHaveAttribute(
+      'placeholder',
+      'Empty tag'
+    );
+  });
+
   it('opens nothing from a drill-in card without a handler or a text label', async () => {
     render(<ArrayDrillInView label={<span>Profiles</span>} count={1} />);
     const card = screen.getByRole('button', { name: /^Open/ });

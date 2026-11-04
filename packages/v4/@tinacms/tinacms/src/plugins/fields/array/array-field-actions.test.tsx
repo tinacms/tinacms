@@ -406,6 +406,11 @@ describe('ArrayField scalar items', () => {
     expect(
       within(scores).getByRole('button', { name: 'Increase Item 1' })
     ).toBeDisabled();
+    within(scores).getByRole('spinbutton', { name: 'Item 1' }).focus();
+    await userEvent.keyboard('{ArrowUp}');
+    expect(valueOf('scores')).toEqual(['10']);
+    await chooseAction('Scores', 1, 'Insert above');
+    await waitFor(() => expect(valueOf('scores')).toEqual([null, '10']));
     const tags = screen.getByRole('group', { name: 'Tags' });
     expect(
       within(tags).getByRole('textbox', { name: 'Item 1' })
