@@ -121,7 +121,7 @@ function CollapsibleSection({
         className={cn(
           'relative -mx-1 box-border flex cursor-pointer items-center gap-1.5 self-stretch rounded-sm border-0 bg-transparent p-1 text-left font-sans text-foreground outline-none focus-visible:shadow-focus-ring',
           inert ? 'cursor-not-allowed' : 'hover:bg-muted-hover',
-          disabled && 'opacity-45'
+          disabled && 'opacity-60'
         )}
       >
         <span

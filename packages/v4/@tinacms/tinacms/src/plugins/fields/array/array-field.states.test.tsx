@@ -82,13 +82,13 @@ describe('array field states', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Flag is required');
   });
 
-  it('says so when a list is empty', () => {
+  it('shows only the Add control when an editable list is empty, and says so when a read-only list is', () => {
     const [empty, readOnlyEmpty] = ['empty', 'read-only empty'].map(
       (name) => states.find((state) => state.name === name)?.props
     );
     if (!empty || !readOnlyEmpty) throw new Error('missing state');
     const { unmount } = render(<ArrayFieldView {...empty} />);
-    expect(screen.getByText(/This list is empty\. Add/)).toBeVisible();
+    expect(screen.queryByText(/This list is empty/)).toBeNull();
     unmount();
     render(<ArrayFieldView {...readOnlyEmpty} />);
     expect(screen.getByText('This list is empty.')).toBeVisible();
