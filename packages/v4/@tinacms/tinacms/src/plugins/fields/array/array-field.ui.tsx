@@ -43,7 +43,7 @@ export function ArrayField() {
     <ItemList />
   ) : (
     <UneditableValue
-      problem=\'This value is not a list of items, so it cannot be edited here.\'
+      problem='This value is not a list of items, so it cannot be edited here.'
       cleared={[]}
     />
   );
@@ -161,12 +161,12 @@ function ObjectItems({
   return (
     <>
       <div
-        role=\'group\'
-        aria-labelledby={\-label}
-        className=\'flex flex-col gap-3\'
+        role='group'
+        aria-labelledby={`${address}-label`}
+        className='flex flex-col gap-3'
       >
         {items.map((_, index) => {
-          const stored: unknown = getValues(\.\);
+          const stored: unknown = getValues(`${address}.${index}`);
           // The watched copy only re-renders the heading; it can lag a move.
           const shown: unknown = Array.isArray(watched)
             ? watched[index]
@@ -185,6 +185,10 @@ function ObjectItems({
             >
               {fields ? (
                 fields.map((subfield) => (
+                  <NestedFieldRow
+                    key={subfield.name}
+                    address={`${address}.${index}.${subfield.name}`}
+                    node={subfield}
                   />
                 ))
               ) : (
