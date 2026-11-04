@@ -110,6 +110,8 @@ export interface ValidationScope {
 
 export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
   Component: ComponentType;
+  /** Draws a list of this field type in place of one row per item. */
+  ListView?: ComponentType;
   /** Draws a drillable field where it drills in. Without it, the generic button shows. */
   DrillInComponent?: ComponentType;
   defaultValue?: TValue;

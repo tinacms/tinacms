@@ -58,6 +58,11 @@ const collection: CollectionSchema = {
       }),
     }),
     t.array({
+      name: 'levels',
+      label: 'Levels',
+      of: t.number({ name: 'level', label: 'Level', validators: [min(0)] }),
+    }),
+    t.array({
       name: 'flags',
       label: 'Flags',
       of: t.boolean({ name: 'flag', label: 'Flag' }),
@@ -377,7 +382,8 @@ describe('ArrayField scalar items', () => {
   it('saves a number list as numbers', async () => {
     const onSave = vi.fn();
     renderPage({ scores: [3, 5] }, onSave);
-    const add = await screen.findByRole('spinbutton', { name: 'Add item' });
+    const scores = await screen.findByRole('group', { name: 'Scores' });
+    const add = within(scores).getByRole('spinbutton', { name: 'Add item' });
     await userEvent.type(add, '7{Enter}');
     await waitFor(() => expect(valueOf('scores')).toEqual(['3', '5', '7']));
     await userEvent.click(screen.getByText('save'));
@@ -401,6 +407,11 @@ describe('ArrayField scalar items', () => {
     expect(
       within(scores).getByRole('button', { name: 'Increase Item 1' })
     ).toBeDisabled();
+    within(scores).getByRole('spinbutton', { name: 'Item 1' }).focus();
+    await userEvent.keyboard('{ArrowUp}');
+    expect(valueOf('scores')).toEqual(['10']);
+    await chooseAction('Scores', 1, 'Insert above');
+    await waitFor(() => expect(valueOf('scores')).toEqual([null, '10']));
     const tags = screen.getByRole('group', { name: 'Tags' });
     expect(
       within(tags).getByRole('textbox', { name: 'Item 1' })
@@ -413,6 +424,33 @@ describe('ArrayField scalar items', () => {
     expect(
       within(scores).getByRole('spinbutton', { name: 'Item 1' })
     ).toHaveAttribute('placeholder', 'Empty item');
+  });
+
+  it('steps a number box down, and an empty box from nothing', async () => {
+    renderPage({ scores: [3, ''] });
+    const scores = await screen.findByRole('group', { name: 'Scores' });
+    await userEvent.click(
+      within(scores).getByRole('button', { name: 'Decrease Item 1' })
+    );
+    await waitFor(() => expect(valueOf('scores')[0]).toBe('-2'));
+    await userEvent.click(
+      within(scores).getByRole('button', { name: 'Increase Item 2' })
+    );
+    await waitFor(() => expect(valueOf('scores')[1]).not.toBe(''));
+    expect(
+      within(scores).getByRole('button', { name: 'Decrease Item 1' })
+    ).toBeEnabled();
+  });
+
+  it('turns the decrease button off at the min', async () => {
+    renderPage({ levels: [0] });
+    const levels = await screen.findByRole('group', { name: 'Levels' });
+    expect(
+      within(levels).getByRole('button', { name: 'Decrease Item 1' })
+    ).toBeDisabled();
+    expect(
+      within(levels).getByRole('button', { name: 'Increase Item 1' })
+    ).toBeEnabled();
   });
 
   it('keeps the widget of a type that has no card box', async () => {
@@ -561,6 +599,25 @@ describe('ArrayField focus and activation', () => {
     });
     expect(add).toBeDisabled();
     expect(add).toHaveAccessibleDescription(/This list is full/);
+  });
+
+  it('closes a grid Insert picker with Cancel and adds nothing', async () => {
+    renderPage({ tiles: [{ _template: 'hero', headline: 'Hi' }] });
+    await chooseAction('Tiles', 1, 'Insert above');
+    const tiles = await screen.findByRole('group', { name: 'Tiles' });
+    await userEvent.click(
+      await within(tiles).findByRole('button', { name: 'Cancel' })
+    );
+    expect(within(tiles).queryByRole('button', { name: 'Cancel' })).toBeNull();
+    expect(valueOf('tiles')).toHaveLength(1);
+  });
+
+  it('leaves a value that is not a list alone and says so', async () => {
+    renderPage({ tags: 'oops' });
+    expect(
+      await screen.findByText(/not a list of items, so it cannot be edited/)
+    ).toBeVisible();
+    expect(valueOf('tags')).toBe('oops');
   });
 
   it('shows the error of a list item that keeps its widget once', async () => {
