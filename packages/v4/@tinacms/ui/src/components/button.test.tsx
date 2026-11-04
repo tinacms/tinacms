@@ -41,6 +41,7 @@ describe('Button', () => {
   });
 
   it('exposes a single-press shortcut as aria-keyshortcuts', () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue('Macintosh');
     render(<Button shortcut='⌘K'>Search</Button>);
     expect(screen.getByRole('button', { name: 'Search' })).toHaveAttribute(
       'aria-keyshortcuts',
@@ -155,8 +156,37 @@ describe('Button disabled', () => {
   });
 });
 
+describe('Button, platform and sizes', () => {
+  it('shows Ctrl in place of ⌘ off Apple platforms, and names it Control', () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue(
+      'Mozilla/5.0 (Windows NT 10.0)'
+    );
+    render(<Button shortcut='⌘K'>Search</Button>);
+    const button = screen.getByRole('button', { name: 'Search' });
+    expect(button).toHaveAttribute('aria-keyshortcuts', 'Control+K');
+    expect(button).toHaveTextContent('Ctrl K');
+    vi.restoreAllMocks();
+  });
+
+  it.each([
+    ['regular', 'md'],
+    ['compact', 'sm'],
+  ] as const)('takes the design name %s as the %s size', (name, old) => {
+    render(
+      <>
+        <Button size={name}>New</Button>
+        <Button size={old}>Old</Button>
+      </>
+    );
+    expect(screen.getByRole('button', { name: 'New' }).className).toBe(
+      screen.getByRole('button', { name: 'Old' }).className
+    );
+  });
+});
+
 describe('Icon button tooltip', () => {
   it('shows the name and shortcut on keyboard focus', async () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue('Macintosh');
     render(
       <Button variant='icon' icon='search' shortcut='⌘K'>
         Search

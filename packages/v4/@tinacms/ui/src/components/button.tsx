@@ -14,11 +14,16 @@ import {
 import { cn } from '@tinacms/ui/lib/utils';
 
 type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'destructive' | 'icon';
-type ButtonSize = 'md' | 'sm';
+/** `regular` and `compact` are the design's names. `md` and `sm` keep working. */
+type ButtonSize = 'regular' | 'compact' | 'md' | 'sm';
+type ButtonHeightSize = 'md' | 'sm';
+
+const heightSizeOf = (size: ButtonSize): ButtonHeightSize =>
+  size === 'compact' || size === 'sm' ? 'sm' : 'md';
 
 /** One height per size, shared by every variant so mixed buttons line up. */
 const buttonHeight = { md: 'h-9', sm: 'h-8' } as const satisfies Record<
-  ButtonSize,
+  ButtonHeightSize,
   string
 >;
 
@@ -187,7 +192,7 @@ function Button(buttonProps: ButtonProps) {
   const all: AnyButtonProps = buttonProps;
   const {
     variant = 'outline',
-    size = 'md',
+    size: sizeProp = 'md',
     children,
     icon: iconProp,
     iconEnd,
@@ -205,6 +210,7 @@ function Button(buttonProps: ButtonProps) {
     disabled,
     ...props
   } = all;
+  const size = heightSizeOf(sizeProp);
   const iconOnly = variant === 'icon';
   const redIcon = iconOnly && destructive;
   const textName =

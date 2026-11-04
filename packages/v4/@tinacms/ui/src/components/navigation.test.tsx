@@ -101,6 +101,24 @@ describe('Tabs, disabled', () => {
 describe('Breadcrumb', () => {
   const path = ['Posts', '2026', 'October', 'Launch', 'Hello world'];
 
+  it('folds after `max` steps and links a step with `href`', () => {
+    render(
+      <Breadcrumb
+        max={5}
+        items={path.map((label, index) => ({
+          label,
+          href: index < path.length - 1 ? `/${label}` : undefined,
+        }))}
+      />
+    );
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(within(nav).getByText('2026')).toBeVisible();
+    expect(within(nav).getByRole('link', { name: 'Posts' })).toHaveAttribute(
+      'href',
+      '/Posts'
+    );
+  });
+
   it('folds the middle of a long path into a menu', async () => {
     const user = userEvent.setup();
     const onOpen = vi.fn();
@@ -345,6 +363,13 @@ describe('NavRow, section', () => {
   });
 });
 
+describe('PanelHeader, height', () => {
+  it('is a fixed 44px bar even when the title wraps', () => {
+    const { container } = render(<PanelHeader heading='A long title' />);
+    expect(container.firstElementChild).toHaveClass('h-11');
+  });
+});
+
 describe('PanelHeader', () => {
   it('tabs through back, the action, the menu and close', async () => {
     const user = userEvent.setup();
@@ -419,7 +444,7 @@ describe('Pagination', () => {
   ])('folds a long run of pages around page %i', (page, run) => {
     const { container } = render(<Pagination total={130} page={page} />);
     const shown = [...container.querySelectorAll('li')].map((item) =>
-      item.getAttribute('aria-hidden') ? '…' : item.textContent
+      item.textContent === 'More pages' ? '…' : item.textContent
     );
     expect(shown.slice(1, -1).join(' ')).toBe(run);
   });
@@ -428,7 +453,7 @@ describe('Pagination', () => {
     const user = userEvent.setup();
     const onPageChange = vi.fn();
     render(<Pagination total={48} page={2} onPageChange={onPageChange} />);
-    expect(screen.getByText('Showing 11 to 20 of 48')).toBeVisible();
+    expect(screen.getByText('Showing 11–20 of 48')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Page 2' })).toHaveAttribute(
       'aria-current',
       'page'
@@ -463,6 +488,6 @@ describe('Pagination', () => {
       'aria-disabled',
       'true'
     );
-    expect(screen.getByText('Showing 41 to 48 of 48')).toBeVisible();
+    expect(screen.getByText('Showing 41–48 of 48')).toBeVisible();
   });
 });
