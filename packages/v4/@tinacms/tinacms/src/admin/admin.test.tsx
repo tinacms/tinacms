@@ -962,11 +962,8 @@ describe('TinaAdmin rail', () => {
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    await user.click(
-      within(
-        screen.getByRole('complementary', { name: 'Document form' })
-      ).getByRole('button', { name: /Posts/ })
-    );
+    await user.click(screen.getByRole('button', { name: 'Collections' }));
+    await screen.findByRole('complementary', { name: 'Navigator' });
     await user.click(screen.getByRole('button', { name: 'Collections menu' }));
     await user.click(
       await screen.findByRole('menuitem', { name: 'Show unsaved only' })
