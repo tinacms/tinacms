@@ -34,7 +34,7 @@ type CollapsibleSectionProps = Omit<
 };
 
 const invalidWords = (count: number) =>
-  `${count} invalid ${count === 1 ? 'field' : 'fields'}`;
+  `${count} ${count === 1 ? 'error' : 'errors'}`;
 
 function RequiredMark() {
   return (

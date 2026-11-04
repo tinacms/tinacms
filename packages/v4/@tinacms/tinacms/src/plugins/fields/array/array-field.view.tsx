@@ -378,7 +378,8 @@ export function ArrayFieldView({
       >
         {items.length === 0 && (emptyText ?? readOnly) ? (
           <p className='px-1 py-1.5 text-sm text-muted-foreground'>
-            {emptyText ?? 'This list is empty.'}
+            {emptyText ??
+              `No ${typeof label === 'string' ? label.toLowerCase() : 'items'}.`}
           </p>
         ) : null}
         <DndContext

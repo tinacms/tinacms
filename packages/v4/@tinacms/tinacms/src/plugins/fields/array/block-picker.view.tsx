@@ -7,7 +7,7 @@ import {
 } from '@tinacms/ui/components/popover';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { cn } from '@tinacms/ui/lib/utils';
-import { type ReactNode, useId, useRef, useState } from 'react';
+import { Fragment, type ReactNode, useId, useRef, useState } from 'react';
 
 const BLOCK_PICKER_TITLE = 'Choose a block';
 const NO_BLOCKS_MATCH = 'No blocks match.';
@@ -17,6 +17,10 @@ export interface BlockOption {
   label: string;
   /** The image over the label in the visual look. */
   preview?: ReactNode;
+  /** The heading the option sits under. Options without one come first. */
+  group?: string;
+  /** One line under the label. */
+  description?: string;
 }
 
 /** `list` shows names in rows; `grid` shows a preview over each name. */
@@ -24,6 +28,21 @@ export type BlockLook = 'list' | 'grid';
 
 const matches = (option: BlockOption, query: string): boolean =>
   option.label.toLowerCase().includes(query.trim().toLowerCase());
+
+/** The options under their headings in the order the headings first appear; ungrouped options lead. */
+const groupsOf = (
+  options: BlockOption[]
+): { heading: string | undefined; options: BlockOption[] }[] => {
+  const groups: { heading: string | undefined; options: BlockOption[] }[] = [];
+  for (const option of options) {
+    const found = groups.find((group) => group.heading === option.group);
+    if (found) found.options.push(option);
+    else groups.push({ heading: option.group, options: [option] });
+  }
+  return groups.sort(
+    (a, b) => Number(a.heading !== undefined) - Number(b.heading !== undefined)
+  );
+};
 
 const OPTION_FOCUS = 'outline-none focus-visible:shadow-focus-ring';
 
@@ -63,10 +82,12 @@ function BlockOptionButton({
   look: BlockLook;
   onPick: (name: string) => void;
 }) {
+  const descriptionId = useId();
   return (
     <button
       type='button'
       aria-label={`Add ${option.label}`}
+      aria-describedby={option.description ? descriptionId : undefined}
       onClick={() => onPick(option.name)}
       className={cn(
         OPTION_FOCUS,
@@ -76,8 +97,18 @@ function BlockOptionButton({
       )}
     >
       {look === 'grid' ? option.preview : null}
-      <span className='min-w-0 font-medium wrap-break-word'>
-        {option.label}
+      <span className='flex min-w-0 flex-col'>
+        <span className='min-w-0 font-medium wrap-break-word'>
+          {option.label}
+        </span>
+        {option.description ? (
+          <span
+            id={descriptionId}
+            className='min-w-0 text-sm text-muted-foreground wrap-break-word'
+          >
+            {option.description}
+          </span>
+        ) : null}
       </span>
     </button>
   );
@@ -141,13 +172,22 @@ function BlockPickerView({
               look === 'grid' ? 'grid grid-cols-2 gap-2' : 'flex flex-col'
             }
           >
-            {shown.map((option) => (
-              <BlockOptionButton
-                key={option.name}
-                option={option}
-                look={look}
-                onPick={onPick}
-              />
+            {groupsOf(shown).map(({ heading, options: members }) => (
+              <Fragment key={heading ?? ''}>
+                {heading ? (
+                  <h3 className='col-span-full m-0 px-2.5 pt-2 text-xs font-medium text-muted-foreground-strong'>
+                    {heading}
+                  </h3>
+                ) : null}
+                {members.map((option) => (
+                  <BlockOptionButton
+                    key={option.name}
+                    option={option}
+                    look={look}
+                    onPick={onPick}
+                  />
+                ))}
+              </Fragment>
             ))}
           </div>
         )}

@@ -55,7 +55,7 @@ export const useEmbedHandles = (
   element: TElement,
   baseFieldName: string
 ) => {
-  const { onActivateField } = useEditorContext();
+  const { onActivateField, errorCount } = useEditorContext();
   const readOnly = useReadOnly();
   const [isExpanded, setIsExpanded] = React.useState(false);
   const deferredSelect = React.useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -84,5 +84,11 @@ export const useEmbedHandles = (
     handleRemoveBase(editor, element);
   };
 
-  return { isExpanded, handleClose, handleRemove, handleSelect };
+  return {
+    isExpanded,
+    handleClose,
+    handleRemove,
+    handleSelect,
+    errorCount: errorCount?.(fieldName) ?? 0,
+  };
 };

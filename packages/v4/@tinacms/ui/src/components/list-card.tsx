@@ -56,7 +56,7 @@ const listCardVariants = cva(
 const MAX_PINNED = 2;
 
 /** Where a pinned head sticks, by how many pinned heads sit above it. */
-const PIN_TOP = ['top-0', 'top-10'] as const;
+const PIN_TOP = ['top-0', 'top-(--item-header-height)'] as const;
 
 /** `null` means the surrounding form level does not pin heads. */
 const PinDepthContext = createContext<number | null>(null);
@@ -441,7 +441,7 @@ function ListCard(props: ListCardProps) {
           data-slot='list-card-head'
           data-pinned={pinned || undefined}
           className={cn(
-            'group/head flex min-h-10 min-w-0 items-center gap-0.5 pr-1 pl-0.5 transition-colors',
+            'group/head flex min-h-(--item-header-height) min-w-0 items-center gap-0.5 pr-1 pl-0.5 transition-colors',
             showFields ? 'rounded-t-sm' : 'rounded-sm',
             pinned && ['sticky z-10 bg-card', PIN_TOP[pinDepth ?? 0]],
             !readOnly && !disabled && !dragging && HEAD_HOVER
