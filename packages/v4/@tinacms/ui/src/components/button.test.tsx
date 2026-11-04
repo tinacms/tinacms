@@ -60,10 +60,24 @@ describe('Button', () => {
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 
-  it('is always a button: links style an <a> with buttonVariants instead', () => {
-    // @ts-expect-error Button has no href; a link would get role="button"
+  it('draws a link when it has an href', () => {
     render(<Button href='/docs'>Docs</Button>);
-    expect(screen.queryByRole('link')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
+      'href',
+      '/docs'
+    );
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  it('takes the design names chip and chipSrLabel, and a minimum width', () => {
+    render(
+      <Button chip={3} chipSrLabel=', 3 errors' minWidth={160}>
+        Save
+      </Button>
+    );
+    const button = screen.getByRole('button', { name: 'Save , 3 errors' });
+    expect(button).toHaveTextContent('3');
+    expect(button).toHaveStyle({ minWidth: '160px' });
   });
 
   it('keeps the name and icon when a dialog renders it as its close button', () => {
