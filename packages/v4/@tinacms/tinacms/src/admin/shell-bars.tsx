@@ -33,7 +33,7 @@ export function statusWords(summary: SaveSummary, local: boolean): string {
     case 'saving':
       return 'Saving…';
     case 'saved':
-      return 'Saved';
+      return summary.document ? `Saved: “${summary.document}”` : 'Saved';
     case 'failed':
       return summary.reason ? FAILURE_WORDS[summary.reason] : 'Save failed';
   }

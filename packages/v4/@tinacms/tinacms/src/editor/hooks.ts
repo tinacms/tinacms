@@ -17,7 +17,7 @@ import { useShallow } from 'zustand/react/shallow';
 import type { FieldWrapperProps } from '@tinacms/ui/components/field-wrapper';
 import type { AuthSlice } from '../core/auth/contract';
 import { authSliceOf, siteAuthTokenOf } from '../core/auth/slice';
-import type { ContentSlice } from '../core/content/contract';
+import { ContentError, type ContentSlice } from '../core/content/contract';
 import type { MediaSlice } from '../core/media/contract';
 import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
@@ -283,7 +283,13 @@ async function recordSavePhase(
   } catch (cause) {
     let message = 'Save failed.';
     if (cause instanceof Error && cause.message) message = cause.message;
-    setSavePhase(formId, { phase: 'failed', message });
+    setSavePhase(formId, {
+      phase: 'failed',
+      message,
+      ...(cause instanceof ContentError && cause.code === 'branch-not-found'
+        ? { reason: 'branch-gone' as const }
+        : {}),
+    });
     throw cause;
   }
   setSavePhase(formId, { phase: 'saved' });

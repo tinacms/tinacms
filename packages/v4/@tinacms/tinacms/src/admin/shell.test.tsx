@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { BranchInfo } from '../core/branch/contract';
 import { currentBranchOf } from '../core/branch/contract';
-import type { DocumentEntry } from '../core/content/contract';
+import { ContentError, type DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
 import { required } from '../plugins/fields';
@@ -34,6 +34,7 @@ let holdUpdates: boolean;
 let searchEnabled: boolean;
 let failGet: boolean;
 let failAfterSave: boolean;
+let updateError: Error | undefined;
 let heldDefault: Promise<void> | undefined;
 
 const contentPlugin = () =>
@@ -71,6 +72,7 @@ const contentPlugin = () =>
               path: string,
               value: TinaDocument
             ) => {
+              if (updateError) throw updateError;
               if (holdUpdates) {
                 await new Promise<void>((resolve) => {
                   releaseUpdate = resolve;
@@ -183,6 +185,7 @@ beforeEach(() => {
   searchEnabled = false;
   failGet = false;
   failAfterSave = false;
+  updateError = undefined;
   heldDefault = undefined;
   window.location.hash = '';
 });
@@ -540,7 +543,7 @@ describe('save state', () => {
 
     act(() => releaseUpdate?.());
     await waitFor(() =>
-      expect(within(statusBar()).getByText('Saved')).toBeVisible()
+      expect(within(statusBar()).getByText(/^Saved/)).toBeVisible()
     );
     expect(updates).toHaveLength(1);
     expect(screen.getByRole('button', { name: /^Branch:/ })).toBeEnabled();
@@ -579,6 +582,28 @@ describe('save state', () => {
       expect(within(statusBar()).getByText('Save failed')).toBeVisible()
     );
     expect(updates).toHaveLength(1);
+  });
+
+  it('says the branch no longer exists when the save is refused for a missing branch', async () => {
+    updateError = new ContentError('branch-not-found');
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: branch no longer exists')
+      ).toBeVisible()
+    );
+    expect(input).toHaveValue('Hello!');
+  });
+
+  it('names the document the last save wrote', async () => {
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Saved: “hello.mdx”')).toBeVisible()
+    );
   });
 
   it('says the save failed when validation fails, with the inline alert kept', async () => {
