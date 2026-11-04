@@ -24,16 +24,30 @@ const listCardVariants = cva(
   {
     variants: {
       state: {
-        rest: 'border-input has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
-        invalid:
-          'border-destructive has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
-        readOnly:
-          'border-border-subtle bg-muted shadow-none has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
+        rest: 'border-input',
+        invalid: 'border-destructive',
+        readOnly: 'border-border-subtle bg-muted shadow-none',
         disabled: 'border-border shadow-none',
         dragging: 'z-10 border-input shadow-lifted',
       },
+      kind: { value: '', group: '' },
     },
-    defaultVariants: { state: 'rest' },
+    // The inline box of a value card has no ring of its own, so the card draws it. The grip, head and
+    // menu buttons carry their own ring, and the card stays still for them.
+    compoundVariants: [
+      {
+        kind: 'value',
+        state: 'rest',
+        className:
+          'has-[input:focus-visible]:border-ring has-[input:focus-visible]:shadow-focus-field',
+      },
+      {
+        kind: 'value',
+        state: 'invalid',
+        className: 'has-[input:focus-visible]:shadow-focus-field',
+      },
+    ],
+    defaultVariants: { state: 'rest', kind: 'value' },
   }
 );
 
@@ -353,7 +367,7 @@ function ListCard(props: ListCardProps) {
     >
       <div
         data-slot='list-card'
-        className={cn(listCardVariants({ state }), className)}
+        className={cn(listCardVariants({ state, kind }), className)}
       >
         <div
           data-slot='list-card-head'
