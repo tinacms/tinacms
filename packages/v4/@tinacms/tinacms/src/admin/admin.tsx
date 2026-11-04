@@ -27,12 +27,16 @@ import { TinaProvider } from '../editor/provider';
 import { AuthGate } from './auth-gate';
 import { DocumentForm } from './document-form';
 import { DocumentScope } from './document-scope';
-import { CollectionsNavigator, MediaPanel } from './navigator';
-import { useDirtyFormCount } from '../form/form-store';
-import { AdminRail, MEDIA_SCREEN } from './rail';
+import {
+  CollectionsNavigator,
+  MediaPanel,
+  SettingsPane,
+  ToolsPane,
+} from './navigator';
+import { AdminRail, MEDIA_SCREEN, toolsEntries } from './rail';
 import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
-import { COLLECTIONS_ROUTE } from './routing';
+import { COLLECTIONS_ROUTE, HOME_ROUTE } from './routing';
 import { useBranchSync } from '../editor/branch';
 import {
   ShellSaveProgress,
@@ -266,7 +270,14 @@ function AdminShell({
     openEntry === null;
 
   const goToCollections = () => navigate(COLLECTIONS_ROUTE);
-  const changes = useDirtyFormCount();
+  const goHome = () => navigate(HOME_ROUTE);
+  const tools = toolsEntries(globalNav);
+  const toolsScreenOpen =
+    activeScreen !== undefined &&
+    tools.some(
+      ({ target }) =>
+        target.kind === 'screen' && target.screen === activeScreen.screen
+    );
   const hasMediaScreen = screens.some(({ name }) => name === MEDIA_SCREEN);
   const showMediaPanel =
     route.view === 'media' ||
@@ -311,6 +322,7 @@ function AdminShell({
             navigate={navigate}
             sections={globalNav}
             hasMediaScreen={hasMediaScreen}
+            toolsScreenOpen={toolsScreenOpen}
           />
         </Sidebar>
 
@@ -319,7 +331,7 @@ function AdminShell({
             hasLibrary={hasMediaScreen}
             open={route.view === 'screen'}
             navigate={navigate}
-            onClose={() => navigate({ view: 'home' })}
+            onClose={goHome}
           />
         ) : null}
 
@@ -332,9 +344,20 @@ function AdminShell({
             missingCollection={
               isStaleCollectionRoute ? activeCollectionName : undefined
             }
-            onClose={() => navigate({ view: 'home' })}
+            onClose={goHome}
           />
         ) : null}
+
+        {route.view === 'tools' || toolsScreenOpen ? (
+          <ToolsPane
+            entries={tools}
+            activeScreen={activeScreen?.screen}
+            navigate={navigate}
+            onClose={goHome}
+          />
+        ) : null}
+
+        {route.view === 'settings' ? <SettingsPane onClose={goHome} /> : null}
 
         {activeScreen ? (
           <ScreenOutlet
@@ -343,28 +366,28 @@ function AdminShell({
               (candidate) => candidate.name === activeScreen.screen
             )}
             segments={activeScreen.segments}
-            onClose={goToCollections}
+            onClose={
+              toolsScreenOpen ? () => navigate({ view: 'tools' }) : goHome
+            }
           />
         ) : route.view === 'home' ? (
-          <MissingPanel title='Home' onClose={goToCollections}>
+          <MissingPanel title='Home' onClose={goHome}>
             Pick a collection to start editing.
           </MissingPanel>
         ) : route.view === 'media' ? (
-          <MissingPanel title='Media' onClose={goToCollections}>
+          <MissingPanel title='Media' onClose={goHome}>
             Pick a file from the Media panel.
           </MissingPanel>
-        ) : route.view === 'changes' ? (
-          <MissingPanel title='Changes' onClose={goToCollections}>
-            {changes === 0
-              ? 'No unsaved changes.'
-              : 'Open the Collections navigator to find the documents with an Unsaved tag.'}
-          </MissingPanel>
+        ) : route.view === 'tools' || route.view === 'settings' ? (
+          <SidebarInset className='min-w-0'>
+            <Placeholder>Pick an entry to open it.</Placeholder>
+          </SidebarInset>
         ) : isStaleDocumentRoute ? (
-          <MissingPanel title='Document not found' onClose={goToCollections}>
+          <MissingPanel title='Document not found' onClose={goHome}>
             No document named “{openPath}”.
           </MissingPanel>
         ) : openPath !== undefined && openDocumentError !== null ? (
-          <MissingPanel title='Cannot open document' onClose={goToCollections}>
+          <MissingPanel title='Cannot open document' onClose={goHome}>
             <span role='alert'>
               Cannot read “{openPath}”. {openDocumentError.message}
             </span>

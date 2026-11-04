@@ -484,6 +484,16 @@ export const useSaveSummary = (): SaveSummary =>
 
 export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
 
+/** The ids of the open documents that hold unsaved edits. */
+export const useDirtyFormIds = (): FormId[] =>
+  useFormStore(
+    useShallow((state) =>
+      (Object.keys(state.forms) as FormId[]).filter(
+        (id) => formStatus(state.forms[id]) === 'dirty'
+      )
+    )
+  );
+
 /** How many open documents hold unsaved edits. */
 export const useDirtyFormCount = (): number =>
   useFormStore(

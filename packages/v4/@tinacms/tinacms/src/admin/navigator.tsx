@@ -4,7 +4,10 @@ import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { useEffect, useState } from 'react';
 import type { CollectionSchema } from '../core/schema/types';
 import { useCollectionDocuments } from '../editor/content-queries';
-import { toFormId, useIsFormDirty } from '../form/form-store';
+import { toFormId, useDirtyFormIds, useIsFormDirty } from '../form/form-store';
+import type { GlobalNavEntry } from '../core/slot/contract';
+import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
+import { openNavTarget } from './rail';
 import type { AdminRoute } from './routing';
 
 const documentName = (path: string) => path.split('/').at(-1) ?? path;
@@ -86,6 +89,42 @@ function CollectionDocuments({
   );
 }
 
+// Review N unsaved: only the open documents that hold edits, grouped by collection.
+function UnsavedCollection({
+  collection,
+  navigate,
+}: {
+  collection: CollectionSchema;
+  navigate: (route: AdminRoute) => void;
+}) {
+  const { documents } = useCollectionDocuments(collection.name);
+  const dirty = new Set<string>(useDirtyFormIds());
+  const unsaved = documents.filter(({ path }) => dirty.has(path));
+  if (unsaved.length === 0) return null;
+  const label = collection.label ?? collection.name;
+  return (
+    <li>
+      <NavRow kind='group' open>
+        {label}
+      </NavRow>
+      <ul
+        aria-label={`${label} unsaved documents`}
+        className='m-0 list-none p-0 pl-4.5'
+      >
+        {unsaved.map(({ path }) => (
+          <DocumentRow
+            key={path}
+            collection={collection.name}
+            path={path}
+            selected={false}
+            navigate={navigate}
+          />
+        ))}
+      </ul>
+    </li>
+  );
+}
+
 function CollectionNode({
   collection,
   active,
@@ -154,12 +193,29 @@ export function CollectionsNavigator({
       ? route.collection
       : undefined;
   const activePath = route.view === 'document' ? route.path : selectedPath;
+  const unsavedOnly =
+    route.view === 'collections' && route.unsavedOnly === true;
+  const hasUnsaved = useDirtyFormIds().length > 0;
   return (
     <aside
       aria-label='Navigator'
       className='flex w-110 min-w-0 shrink-0 flex-col border-r border-border'
     >
-      <PanelHeader heading='Collections' closeLabel='Close' onClose={onClose} />
+      <PanelHeader
+        heading='Collections'
+        closeLabel='Close'
+        onClose={onClose}
+        menuLabel='Collections menu'
+        menu={
+          <DropdownMenuItem
+            onClick={() =>
+              navigate({ view: 'collections', unsavedOnly: !unsavedOnly })
+            }
+          >
+            {unsavedOnly ? 'Show all documents' : 'Show unsaved only'}
+          </DropdownMenuItem>
+        }
+      />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
         {missingCollection ? (
           <p className='px-2 py-1.5 text-sm text-muted-foreground'>
@@ -168,6 +224,18 @@ export function CollectionsNavigator({
         ) : null}
         {collections.length === 0 ? (
           <EmptyState text='No collections yet.' />
+        ) : unsavedOnly && !hasUnsaved ? (
+          <EmptyState text='No unsaved documents.' />
+        ) : unsavedOnly ? (
+          <ul aria-label='Unsaved documents' className='m-0 list-none p-0'>
+            {collections.map((collection) => (
+              <UnsavedCollection
+                key={collection.name}
+                collection={collection}
+                navigate={navigate}
+              />
+            ))}
+          </ul>
         ) : (
           <ul aria-label='Collections' className='m-0 list-none p-0'>
             {collections.map((collection) => (
@@ -220,6 +288,78 @@ export function MediaPanel({
         ) : (
           <EmptyState text='No media library is installed.' />
         )}
+      </div>
+    </aside>
+  );
+}
+
+/** The panel the Tools entry opens beside the rail: every plugin entry that has no group. */
+export function ToolsPane({
+  entries,
+  activeScreen,
+  navigate,
+  onClose,
+}: {
+  entries: GlobalNavEntry[];
+  activeScreen?: string;
+  navigate: (route: AdminRoute) => void;
+  onClose: () => void;
+}) {
+  return (
+    <aside
+      aria-label='Tools panel'
+      className='flex w-110 min-w-0 shrink-0 flex-col border-r border-border'
+    >
+      <PanelHeader heading='Tools' closeLabel='Close' onClose={onClose} />
+      <div className='min-h-0 flex-1 overflow-y-auto p-2'>
+        {entries.length === 0 ? (
+          <EmptyState text='No tools installed.' />
+        ) : (
+          <ul aria-label='Tools' className='m-0 list-none p-0'>
+            {entries.map(({ label, icon, target }, index) => {
+              const selected =
+                target.kind === 'screen' && target.screen === activeScreen;
+              return (
+                <li key={`${index}:${label}`}>
+                  <NavRow
+                    kind='doc'
+                    icon={icon}
+                    external={target.kind === 'url'}
+                    selected={selected}
+                    aria-current={selected ? 'page' : undefined}
+                    render={
+                      target.kind === 'url' ? (
+                        <a
+                          href={target.href}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                        />
+                      ) : undefined
+                    }
+                    onClick={() => openNavTarget(target, navigate)}
+                  >
+                    {label}
+                  </NavRow>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </aside>
+  );
+}
+
+/** The panel the Settings entry opens beside the rail. Plugins have no way to add to it yet. */
+export function SettingsPane({ onClose }: { onClose: () => void }) {
+  return (
+    <aside
+      aria-label='Settings panel'
+      className='flex w-110 min-w-0 shrink-0 flex-col border-r border-border'
+    >
+      <PanelHeader heading='Settings' closeLabel='Close' onClose={onClose} />
+      <div className='min-h-0 flex-1 overflow-y-auto p-2'>
+        <EmptyState text='No settings yet.' />
       </div>
     </aside>
   );

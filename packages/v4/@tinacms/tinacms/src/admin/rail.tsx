@@ -16,8 +16,11 @@ import {
   useSidebar,
 } from '@tinacms/ui/components/sidebar';
 import { type KeyboardEvent, type ReactElement, useId } from 'react';
-import type { GlobalNavSection, NavTarget } from '../core/slot/contract';
-import { useDirtyFormCount } from '../form/form-store';
+import type {
+  GlobalNavEntry,
+  GlobalNavSection,
+  NavTarget,
+} from '../core/slot/contract';
 import type { AdminRoute } from './routing';
 
 const DOCS_URL = 'https://tina.io/docs';
@@ -34,18 +37,10 @@ interface RailEntryProps {
   glyph: Glyph;
   selected: boolean;
   opens?: boolean;
-  count?: number;
   onOpen: () => void;
 }
 
-function RailEntry({
-  label,
-  glyph,
-  selected,
-  opens,
-  count = 0,
-  onOpen,
-}: RailEntryProps) {
+function RailEntry({ label, glyph, selected, opens, onOpen }: RailEntryProps) {
   return (
     <SidebarMenuItem>
       <RailTooltip label={label}>
@@ -54,8 +49,7 @@ function RailEntry({
           icon={glyph}
           selected={selected}
           opens={opens}
-          count={count}
-          aria-label={count > 0 ? `${label}, ${count} unsaved` : label}
+          aria-label={label}
           aria-current={selected ? 'page' : undefined}
           className={RAIL_ROW}
           onClick={onOpen}
@@ -109,6 +103,37 @@ function moveWithArrows(event: KeyboardEvent<HTMLElement>) {
   rows[next]?.focus();
 }
 
+const withoutMedia = (entries: GlobalNavEntry[]) =>
+  entries.filter(
+    ({ target }) =>
+      !(target.kind === 'screen' && target.screen === MEDIA_SCREEN)
+  );
+
+/** The entries plugins add to the Tools pane: every one that has no group. */
+export const toolsEntries = (sections: GlobalNavSection[]): GlobalNavEntry[] =>
+  sections.flatMap(({ group, entries }) =>
+    group ? [] : withoutMedia(entries)
+  );
+
+// A group keeps its own heading in the rail, as the Cloud group does.
+const groupedEntries = (sections: GlobalNavSection[]) =>
+  sections.flatMap(({ group, entries }) => {
+    const visible = withoutMedia(entries);
+    return group && visible.length > 0 ? [{ group, entries: visible }] : [];
+  });
+
+/** Where a nav entry leads, as one function for the rail and the Tools pane. */
+export function openNavTarget(
+  target: NavTarget,
+  navigate: (route: AdminRoute) => void
+) {
+  if (target.kind === 'screen') {
+    navigate({ view: 'screen', screen: target.screen, segments: [] });
+  } else if (target.kind === 'action') {
+    target.run();
+  }
+}
+
 function PluginEntries({
   sections,
   activeScreen,
@@ -119,38 +144,13 @@ function PluginEntries({
   navigate: (route: AdminRoute) => void;
 }) {
   const labelPrefix = useId();
-  const open = (target: NavTarget) => {
-    if (target.kind === 'screen') {
-      navigate({ view: 'screen', screen: target.screen, segments: [] });
-    } else if (target.kind === 'action') {
-      target.run();
-    }
-  };
-  const visible = sections
-    .map(({ group, entries }) => ({
-      group,
-      entries: entries.filter(
-        ({ target }) =>
-          !(target.kind === 'screen' && target.screen === MEDIA_SCREEN)
-      ),
-    }))
-    .filter(({ entries }) => entries.length > 0);
-  const firstUngrouped = visible.findIndex(({ group }) => !group);
+  const visible = groupedEntries(sections);
   return visible.map(({ group, entries }, index) => {
     const labelId = `${labelPrefix}-${index}`;
-    const heading =
-      group?.label ?? (index === firstUngrouped ? 'Tools' : undefined);
     return (
-      <SidebarGroup key={group ? `group:${group.id}` : `entries:${index}`}>
-        {heading ? (
-          <SidebarGroupLabel id={labelId}>{heading}</SidebarGroupLabel>
-        ) : null}
-        <SidebarMenu
-          aria-label={
-            index === firstUngrouped ? 'Global navigation' : undefined
-          }
-          aria-labelledby={group ? labelId : undefined}
-        >
+      <SidebarGroup key={group.id}>
+        <SidebarGroupLabel id={labelId}>{group.label}</SidebarGroupLabel>
+        <SidebarMenu aria-labelledby={labelId}>
           {entries.map(({ label, icon, target }, entryIndex) => (
             <SidebarMenuItem key={`${entryIndex}:${label}`}>
               <NavRow
@@ -176,7 +176,7 @@ function PluginEntries({
                     />
                   ) : undefined
                 }
-                onClick={() => open(target)}
+                onClick={() => openNavTarget(target, navigate)}
               >
                 {label}
               </NavRow>
@@ -189,21 +189,23 @@ function PluginEntries({
 }
 
 /**
- * The side nav: Home, Collections, Media and Changes, then the entries plugins
- * add. An entry that ends in an arrow opens its panel beside the rail.
+ * The side nav: Home, Collections and Media, then Tools and Settings, then the
+ * grouped entries plugins add. An entry that ends in an arrow opens its panel beside the rail.
  */
 export function AdminRail({
   route,
   navigate,
   sections,
   hasMediaScreen,
+  toolsScreenOpen,
 }: {
   route: AdminRoute;
   navigate: (route: AdminRoute) => void;
   sections: GlobalNavSection[];
   hasMediaScreen: boolean;
+  /** A screen from the Tools pane is open beside it. */
+  toolsScreenOpen: boolean;
 }) {
-  const changes = useDirtyFormCount();
   const inCollections =
     route.view === 'collections' ||
     route.view === 'collection' ||
@@ -242,17 +244,29 @@ export function AdminRail({
                 )
               }
             />
-            <RailEntry
-              label='Changes'
-              glyph='branch'
-              selected={route.view === 'changes'}
-              count={changes}
-              onOpen={() => navigate({ view: 'changes' })}
-            />
           </SidebarMenu>
         </SidebarGroup>
 
-        {sections.length > 0 ? <SidebarSeparator /> : null}
+        <SidebarSeparator />
+
+        <SidebarGroup>
+          <SidebarMenu aria-label='Tools and settings'>
+            <RailEntry
+              label='Tools'
+              glyph='tools'
+              opens
+              selected={route.view === 'tools' || toolsScreenOpen}
+              onOpen={() => navigate({ view: 'tools' })}
+            />
+            <RailEntry
+              label='Settings'
+              glyph='settings'
+              opens
+              selected={route.view === 'settings'}
+              onOpen={() => navigate({ view: 'settings' })}
+            />
+          </SidebarMenu>
+        </SidebarGroup>
 
         <PluginEntries
           sections={sections}

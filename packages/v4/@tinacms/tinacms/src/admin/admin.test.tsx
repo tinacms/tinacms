@@ -215,7 +215,7 @@ beforeEach(() => {
   saved.length = 0;
   listCalls.length = 0;
   getCalls.length = 0;
-  window.location.hash = '';
+  window.location.hash = '#/collections';
   useFormStore.setState({ forms: {} });
   for (const [collection, entries] of Object.entries(FIXTURES)) {
     store[collection] = entries.map((entry) => ({ ...entry }));
@@ -576,17 +576,34 @@ describe('TinaAdmin content reads', () => {
 });
 
 describe('TinaAdmin global nav', () => {
-  it('lists the entries plugins contribute, in order, skipping unmet dependencies', async () => {
+  const openTools = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(await screen.findByRole('button', { name: 'Tools' }));
+    return screen.findByRole('complementary', { name: 'Tools panel' });
+  };
+
+  it('lists the ungrouped entries plugins contribute in the Tools pane, in order, skipping unmet dependencies', async () => {
+    const user = userEvent.setup();
     renderAdmin();
-    const menu = await screen.findByRole('list', { name: 'Global navigation' });
+    const pane = await openTools(user);
     expect(
-      within(menu)
+      within(within(pane).getByRole('list', { name: 'Tools' }))
         .getAllByRole('listitem')
         .map((item) => item.textContent)
-    ).toEqual(['Switch branch', 'Docs (opens in a new tab)']);
+    ).toEqual([
+      'Switch branch',
+      'Docs (opens in a new tab)',
+      'Changelog (opens in a new tab)',
+    ]);
   });
 
-  it('lists the entries of a group under its heading', async () => {
+  it('keeps ungrouped entries out of the rail', async () => {
+    renderAdmin();
+    const rail = await screen.findByRole('navigation', { name: 'Content' });
+    expect(within(rail).queryByText('Docs')).toBeNull();
+    expect(within(rail).queryByText('Switch branch')).toBeNull();
+  });
+
+  it('lists the entries of a group under its heading in the rail', async () => {
     renderAdmin();
     const menu = await screen.findByRole('list', { name: 'Help' });
     expect(
@@ -596,31 +613,18 @@ describe('TinaAdmin global nav', () => {
     ).toEqual(['Guides (opens in a new tab)']);
   });
 
-  it('places a group between the ungrouped entries by its order', async () => {
-    renderAdmin();
-    const [first, ...rest] = await screen.findAllByRole('list', {
-      name: 'Global navigation',
-    });
-    expect(rest).toHaveLength(0);
-    const heading = screen.getByText('Help');
-    expect(
-      first.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy();
-    expect(
-      heading.compareDocumentPosition(screen.getByText('Changelog')) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy();
-  });
-
   it('does not link a screen that no entry targets', async () => {
+    const user = userEvent.setup();
     renderAdmin();
-    const menu = await screen.findByRole('list', { name: 'Global navigation' });
-    expect(within(menu).queryByText('Unlinked')).not.toBeInTheDocument();
+    const pane = await openTools(user);
+    expect(within(pane).queryByText('Unlinked')).not.toBeInTheDocument();
   });
 
   it('opens a url entry in a new tab', async () => {
+    const user = userEvent.setup();
     renderAdmin();
-    const link = await screen.findByRole('link', { name: 'Docs' });
+    await openTools(user);
+    const link = await screen.findByRole('link', { name: /^Docs/ });
     expect(link).toHaveAttribute('href', 'https://tina.io/docs');
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
@@ -630,10 +634,40 @@ describe('TinaAdmin global nav', () => {
     const user = userEvent.setup();
     navAction.mockClear();
     renderAdmin();
+    await openTools(user);
     await user.click(
       await screen.findByRole('button', { name: 'Switch branch' })
     );
     expect(navAction).toHaveBeenCalledOnce();
+  });
+
+  it('shows an empty Tools pane when no plugin adds an entry', async () => {
+    const user = userEvent.setup();
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          plugins: config.plugins.filter((plugin) => plugin !== screenPlugin),
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    const pane = await openTools(user);
+    expect(within(pane).getByText('No tools installed.')).toBeVisible();
+  });
+
+  it('opens a Settings pane beside the rail', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Settings' }));
+    const pane = await screen.findByRole('complementary', {
+      name: 'Settings panel',
+    });
+    expect(within(pane).getByText('No settings yet.')).toBeVisible();
+    await user.click(within(pane).getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
   });
 });
 
@@ -887,18 +921,88 @@ describe('TinaAdmin rail', () => {
     ).getAllByRole('button');
   };
 
-  it('lists Home, Collections, Media and Changes, and no collection or document', async () => {
+  it('lists Home, Collections, Media, Tools and Settings, and no collection or document', async () => {
     renderAdmin();
     const buttons = await railButtons();
     expect(buttons.map((button) => button.getAttribute('aria-label'))).toEqual([
       'Home',
       'Collections',
       'Media',
-      'Changes',
     ]);
     const rail = screen.getByRole('navigation', { name: 'Content' });
+    expect(
+      within(within(rail).getByRole('list', { name: 'Tools and settings' }))
+        .getAllByRole('button')
+        .map((button) => button.getAttribute('aria-label'))
+    ).toEqual(['Tools', 'Settings']);
     expect(within(rail).queryByText('Posts')).toBeNull();
   });
+
+  it('lands on Home, with Home marked and no navigator open', async () => {
+    window.location.hash = '';
+    renderAdmin();
+    expect(await screen.findByRole('button', { name: 'Home' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(
+      screen.queryByRole('complementary', { name: 'Navigator' })
+    ).toBeNull();
+  });
+
+  it('says so when the filtered navigator has no unsaved documents', async () => {
+    window.location.hash = '#/collections?unsaved';
+    renderAdmin();
+    expect(await screen.findByText('No unsaved documents.')).toBeVisible();
+  });
+
+  it('shows only the documents with unsaved edits when the navigator is filtered', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(
+      within(
+        screen.getByRole('complementary', { name: 'Document form' })
+      ).getByRole('button', { name: /Posts/ })
+    );
+    await user.click(screen.getByRole('button', { name: 'Collections menu' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Show unsaved only' })
+    );
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/collections?unsaved')
+    );
+    const list = await screen.findByRole('list', { name: 'Unsaved documents' });
+    expect(
+      within(list).getByRole('button', { name: /hello\.mdx/ })
+    ).toBeVisible();
+    expect(
+      within(list).queryByRole('button', { name: /second\.mdx/ })
+    ).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Collections menu' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Show all documents' })
+    );
+    await waitFor(() => expect(window.location.hash).toBe('#/collections'));
+  });
+
+  it.each([
+    ['tools', 'Tools'],
+    ['settings', 'Settings'],
+  ])(
+    'marks %s selected on a deep link and asks for an entry',
+    async (hash, name) => {
+      window.location.hash = `#/${hash}`;
+      renderAdmin();
+      expect(await screen.findByRole('button', { name })).toHaveAttribute(
+        'aria-current',
+        'page'
+      );
+      expect(screen.getByText('Pick an entry to open it.')).toBeVisible();
+    }
+  );
 
   it('opens the collections beside the rail, not inside it', async () => {
     const user = userEvent.setup();
@@ -915,69 +1019,6 @@ describe('TinaAdmin rail', () => {
         'Posts'
       )
     ).toBeNull();
-  });
-
-  it('counts unsaved documents on Changes, and nowhere else in the rail', async () => {
-    const user = userEvent.setup();
-    renderAdmin();
-    expect(
-      await screen.findByRole('button', { name: 'Changes' })
-    ).toBeVisible();
-
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
-    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText(/^Title\b/), '!');
-
-    const changes = await screen.findByRole('button', {
-      name: 'Changes, 1 unsaved',
-    });
-    expect(changes).toHaveTextContent('1');
-    expect(
-      within(screen.getByRole('navigation', { name: 'Content' })).queryByText(
-        'Unsaved'
-      )
-    ).toBeNull();
-  });
-
-  it.each([
-    ['home', 'Pick a collection to start editing.'],
-    ['changes', 'No unsaved changes.'],
-    ['media', 'Pick a file from the Media panel.'],
-  ])('shows a placeholder for a deep link to %s', async (view, text) => {
-    window.location.hash = `#/${view}`;
-    render(
-      <TinaAdmin
-        config={asResolvedConfig({
-          ...config,
-          plugins: config.plugins.filter((plugin) => plugin !== screenPlugin),
-        })}
-        queryClient={
-          new QueryClient({ defaultOptions: { queries: { retry: false } } })
-        }
-      />
-    );
-    expect(await screen.findByText(text)).toBeInTheDocument();
-  });
-
-  it('draws no Tools heading when no plugin adds an entry', async () => {
-    render(
-      <TinaAdmin
-        config={asResolvedConfig({
-          ...config,
-          plugins: config.plugins.filter((plugin) => plugin !== screenPlugin),
-        })}
-        queryClient={
-          new QueryClient({ defaultOptions: { queries: { retry: false } } })
-        }
-      />
-    );
-    await railButtons();
-    expect(screen.queryByText('Tools')).toBeNull();
-  });
-
-  it('groups ungrouped plugin entries under Tools', async () => {
-    renderAdmin();
-    expect(await screen.findByText('Tools')).toBeVisible();
   });
 
   it('shows the empty collections state', async () => {
@@ -1025,9 +1066,6 @@ describe('TinaAdmin rail', () => {
 
     await user.click(screen.getByRole('button', { name: /^Home/ }));
     expect(reloadIsBlocked()).toBe(true);
-    expect(
-      screen.getByRole('button', { name: 'Changes, 1 unsaved' })
-    ).toBeVisible();
   });
 
   it('marks the last opened document in the navigator after Back', async () => {
@@ -1073,7 +1111,7 @@ describe('TinaAdmin rail', () => {
     await user.click(screen.getByRole('button', { name: 'Posts' }));
     expect(screen.queryByRole('button', { name: /hello\.mdx/ })).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Close' }));
-    await waitFor(() => expect(window.location.hash).toBe('#/home'));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
   });
 
   it('names a rail row in a tooltip once the rail is collapsed', async () => {
@@ -1090,7 +1128,7 @@ describe('TinaAdmin rail', () => {
     );
   });
 
-  it('opens Home, Changes and Media from their rows and writes the hash', async () => {
+  it('opens Home and Media from their rows and writes the hash', async () => {
     const user = userEvent.setup();
     render(
       <TinaAdmin
@@ -1104,9 +1142,7 @@ describe('TinaAdmin rail', () => {
       />
     );
     await user.click(await screen.findByRole('button', { name: 'Home' }));
-    await waitFor(() => expect(window.location.hash).toBe('#/home'));
-    await user.click(screen.getByRole('button', { name: 'Changes' }));
-    await waitFor(() => expect(window.location.hash).toBe('#/changes'));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
     await user.click(screen.getByRole('button', { name: 'Media' }));
     await waitFor(() => expect(window.location.hash).toBe('#/media'));
     expect(
@@ -1185,6 +1221,7 @@ describe('TinaAdmin rail', () => {
         }
       />
     );
+    await user.click(await screen.findByRole('button', { name: 'Tools' }));
     const row = await screen.findByRole('button', { name: 'Reports' });
     expect(row).not.toHaveAttribute('aria-current');
     await user.click(row);
@@ -1195,5 +1232,10 @@ describe('TinaAdmin rail', () => {
       'aria-current',
       'page'
     );
+    expect(
+      screen.getByRole('complementary', { name: 'Tools panel' })
+    ).toBeVisible();
+    await user.click(screen.getAllByRole('button', { name: 'Close' }).at(-1)!);
+    await waitFor(() => expect(window.location.hash).toBe('#/tools'));
   });
 });
