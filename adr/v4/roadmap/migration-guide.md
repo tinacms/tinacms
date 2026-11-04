@@ -195,6 +195,7 @@ Kept, now top level:
 - `ui.defaultValue` is `defaultValue`. It is a stored-form value. It fills the field in a new array item only, and never changes a loaded document.
 - `ui.hidden` is `hidden`. The value is kept and Save is never blocked by it.
 - `defaultItem` stays on arrays and templates. A templates array takes it per template only.
+- `category` stays on templates. It is a heading in the block picker.
 
 Dropped, with a replacement:
 - `ui.component`: the field type picks the plugin. Register a field plugin for another widget.
@@ -214,7 +215,7 @@ Pending (not built, no replacement yet):
 - `toolbarOverride`: v3 deprecates it for `overrides.toolbar`, which v4 rich-text supports. Needs a maintainer ruling.
 - Reference `collectionFilter`: the v4 content contract lists `{ path }` only. Needs a contract change.
 - `dateFormat` and `timeFormat`: the v4 datetime field uses the native `datetime-local` input, which has no token grammar. Needs a widget and grammar decision.
-- `category` and `optionComponent`: undecided open questions in ADR-029.
+- `optionComponent`: an undecided open question in ADR-029.
 
 ## What this guide *can't* cover yet
 

@@ -90,8 +90,7 @@ A template of a templates array has `name`, `label?`, `fields`, `defaultItem?`,
 - `category` is a non-empty string. Templates with no `category` come first,
   under no heading. The headings follow the order in which each `category` first
   appears. A value that is empty or not a string fails `tinacms codegen` with
-  `schema-category-invalid`. It keeps the v3 name (ADR-029, open question on
-  `category`).
+  `schema-category-invalid`. It keeps the v3 name (ADR-029, decision 8).
 
 ```ts
 t.array({
