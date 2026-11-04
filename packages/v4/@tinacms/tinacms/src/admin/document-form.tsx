@@ -1,5 +1,6 @@
 import {
   AlertDialog,
+  AlertDialogClose,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -7,13 +8,21 @@ import {
   AlertDialogTitle,
 } from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
-import { toast } from '@tinacms/ui/components/toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@tinacms/ui/components/dropdown-menu';
 import { FormLevel } from '@tinacms/ui/components/form-level';
+import { toast } from '@tinacms/ui/components/toast';
 import {
   type ReactNode,
+  type RefObject,
   use,
   useEffect,
   useEffectEvent,
+  useRef,
   useState,
 } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -51,10 +60,11 @@ function SaveButton() {
   const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
   const [pending, setPending] = useState(false);
   return (
-    <div className='flex flex-col items-start gap-2'>
+    <div className='flex flex-col items-stretch gap-2'>
       <Button
         variant='primary'
         type='button'
+        className='min-w-40'
         disabled={!dirty && !pending}
         busy={pending}
         count={errorCount}
@@ -86,45 +96,124 @@ function SaveButton() {
   );
 }
 
-function DiscardButton() {
-  const dirty = useIsFormDirty(useFormId());
-  const discard = useDiscardEdits();
+// Discarding cannot be undone, so it asks first. Cancel and Escape keep the edits.
+function DiscardConfirm({
+  open,
+  onOpenChange,
+  onConfirm,
+  returnFocusTo,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  returnFocusTo?: RefObject<HTMLElement | null>;
+}) {
   return (
-    <Button
-      type='button'
-      variant='destructive'
-      disabled={!dirty}
-      onClick={discard}
-    >
-      Discard
-    </Button>
-  );
-}
-
-// A modal, so no keystroke can overwrite the stored draft before the editor
-// decides what happens to it.
-function StaleDraftDialog() {
-  const stale = useStaleDraft();
-  return (
-    <AlertDialog open={stale !== null}>
-      <AlertDialogContent>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent finalFocus={returnFocusTo}>
         <AlertDialogHeader>
-          <AlertDialogTitle>Resume your unsaved edits?</AlertDialogTitle>
+          <AlertDialogTitle>Discard unsaved edits?</AlertDialogTitle>
           <AlertDialogDescription>
-            This document changed after you made these edits. Resume them on top
-            of the current version, or discard them.
+            Discarding can’t be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <Button type='button' variant='destructive' onClick={stale?.discard}>
-            Discard draft
-          </Button>
-          <Button variant='primary' type='button' onClick={stale?.resume}>
-            Resume edits
+          <AlertDialogClose render={<Button variant='outline' />}>
+            Cancel
+          </AlertDialogClose>
+          <Button
+            type='button'
+            variant='destructive'
+            onClick={() => {
+              onConfirm();
+              onOpenChange(false);
+            }}
+          >
+            Discard
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  );
+}
+
+// The Unsaved tag, the Document actions menu and Save, fixed at the foot of the form.
+function FormBar() {
+  const formId = useFormId();
+  const dirty = useIsFormDirty(formId);
+  const discard = useDiscardEdits();
+  const [confirming, setConfirming] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  return (
+    <div
+      data-slot='form-bar'
+      className='flex flex-none items-start gap-2 border-t border-border bg-card px-4 py-3'
+    >
+      <div className='mt-1 min-w-0 flex-1'>
+        <DocumentStatus />
+      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              ref={menuButton}
+              variant='icon'
+              icon='more'
+              aria-label='Document actions'
+            />
+          }
+        />
+        <DropdownMenuContent align='end' aria-label='Document actions'>
+          <DropdownMenuItem
+            variant='destructive'
+            disabled={!dirty}
+            onClick={() => setConfirming(true)}
+          >
+            Discard unsaved edits
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <SaveButton />
+      <DiscardConfirm
+        open={confirming}
+        onOpenChange={setConfirming}
+        onConfirm={discard}
+        returnFocusTo={menuButton}
+      />
+    </div>
+  );
+}
+
+// The prompt is a bottom-right toast, so the form stays editable behind it.
+function ResumeDraftToast() {
+  const stale = useStaleDraft();
+  const [confirming, setConfirming] = useState(false);
+  useEffect(() => {
+    if (!stale) return;
+    const id = toast({
+      tone: 'warning',
+      actionsInline: true,
+      title: 'Resume your unsaved edits?',
+      text: 'The document changed since. Resume puts your edits on top.',
+      dismissible: false,
+      duration: Number.POSITIVE_INFINITY,
+      action: { label: 'Resume', onClick: stale.resume },
+      secondaryAction: {
+        label: 'Discard',
+        destructive: true,
+        onClick: () => setConfirming(true),
+      },
+    });
+    return () => {
+      toast.dismiss(id);
+    };
+  }, [stale]);
+  return (
+    <DiscardConfirm
+      open={confirming}
+      onOpenChange={setConfirming}
+      onConfirm={() => stale?.discard()}
+    />
   );
 }
 
@@ -226,19 +315,12 @@ export function DocumentForm() {
 
   return (
     <>
-      <header className='mb-4 flex items-center justify-between gap-2'>
-        <h2 className='truncate text-sm font-semibold' title={scope.path}>
-          {scope.path.split('/').at(-1)}
-        </h2>
-        <DocumentStatus />
-      </header>
-      <StaleDraftDialog />
+      <ResumeDraftToast />
       <ActiveFieldLevels scope={scope} />
-      <FormFields scope={scope} />
-      <div className='flex items-start gap-2'>
-        <SaveButton />
-        <DiscardButton />
+      <div className='min-h-0 flex-1 overflow-y-auto'>
+        <FormFields scope={scope} />
       </div>
+      <FormBar />
     </>
   );
 }
