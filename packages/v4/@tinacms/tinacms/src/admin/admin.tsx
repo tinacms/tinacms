@@ -1,5 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
+import { TooltipProvider } from '@tinacms/ui/components/tooltip';
 import {
   Sidebar,
   SidebarInset,
@@ -191,11 +192,13 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
   return (
     <AdminErrorBoundary>
       <TinaProvider config={config} queryClient={queryClient}>
-        <HashRouter>
-          <AuthGate>
-            <AdminShell preview={preview} projectName={config.projectName} />
-          </AuthGate>
-        </HashRouter>
+        <TooltipProvider>
+          <HashRouter>
+            <AuthGate>
+              <AdminShell preview={preview} projectName={config.projectName} />
+            </AuthGate>
+          </HashRouter>
+        </TooltipProvider>
         <ShellToaster />
       </TinaProvider>
     </AdminErrorBoundary>
