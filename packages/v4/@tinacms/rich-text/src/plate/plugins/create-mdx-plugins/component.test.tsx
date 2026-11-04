@@ -239,3 +239,34 @@ describe('embed dot menu', () => {
     });
   });
 });
+
+describe('an embed with an error', () => {
+  it.each([
+    ['inline', inlineValue],
+    ['block', blockValue],
+  ] as const)(
+    'draws a red count on a %s embed whose props fail',
+    async (_kind, value) => {
+      const asked: string[] = [];
+      renderEmbedEditor({
+        value,
+        templates: [ctaTemplate, bannerTemplate],
+        errorCount: (address) => {
+          asked.push(address);
+          return address.endsWith('.props') ? 1 : 0;
+        },
+      });
+      expect(await screen.findByText(', 1 error')).toBeInTheDocument();
+      expect(asked.some((address) => address.endsWith('.props'))).toBe(true);
+    }
+  );
+
+  it('draws no count when nothing fails', async () => {
+    renderEmbedEditor({
+      value: inlineValue,
+      templates: [ctaTemplate, bannerTemplate],
+    });
+    await screen.findByText(/Sign up/);
+    expect(screen.queryByText(/error/)).toBeNull();
+  });
+});

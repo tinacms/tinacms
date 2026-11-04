@@ -18,6 +18,8 @@ export interface OpenLevel {
   node: FieldSchema;
   /** An item of a list: `node` is a stand-in object built from the item's fields. */
   item?: boolean;
+  /** A block of a Blocks field. It opens as its own level at any depth. */
+  block?: boolean;
 }
 
 export interface FormViewState {
@@ -114,7 +116,7 @@ export const levelDrillsIn = (
   level: OpenLevel
 ): boolean =>
   level.item
-    ? itemOpensNextLevel(level.address)
+    ? level.block === true || itemOpensNextLevel(level.address)
     : drillsInAt(descriptor, level.node, level.address);
 
 // The stand-in node an open item level draws: an object of the item's fields.
@@ -122,7 +124,8 @@ export const levelDrillsIn = (
 export const itemLevel = (
   address: string,
   label: string,
-  fields: readonly FieldSchema[]
+  fields: readonly FieldSchema[],
+  block = false
 ): OpenLevel => {
   const node: FieldSchema & { fields: FieldSchema[] } = {
     type: OBJECT_FIELD_TYPE,
@@ -130,7 +133,13 @@ export const itemLevel = (
     label,
     fields: [...fields],
   };
-  return { address: toFieldAddress(address), label, node, item: true };
+  return {
+    address: toFieldAddress(address),
+    label,
+    node,
+    item: true,
+    ...(block ? { block } : {}),
+  };
 };
 
 // The failing fields that show an error, innermost only: a parent whose
@@ -185,7 +194,12 @@ export const fieldsAlong = (
         node && !scalarItemOf(node) ? fieldsetOf(node, item) : undefined;
       if (node && siblings) {
         along.push(
-          itemLevel(path, itemHeadingOf(node, item, Number(segment)), siblings)
+          itemLevel(
+            path,
+            itemHeadingOf(node, item, Number(segment)),
+            siblings,
+            node.templates !== undefined
+          )
         );
       }
       continue;

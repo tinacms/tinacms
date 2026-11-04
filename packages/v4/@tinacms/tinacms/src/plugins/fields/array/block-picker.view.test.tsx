@@ -86,3 +86,53 @@ describe('Block picker panel placement and size', () => {
     expect(results?.style.minHeight).toBe('');
   });
 });
+
+describe('Block picker headings and descriptions', () => {
+  const options = [
+    { name: 'text', label: 'Text' },
+    {
+      name: 'hero',
+      label: 'Hero',
+      group: 'Layout',
+      description: 'A big opening',
+    },
+    { name: 'grid', label: 'Feature grid', group: 'Layout' },
+    { name: 'quote', label: 'Quote', group: 'Content' },
+  ];
+
+  it('puts ungrouped options first, then each group under its heading in first-seen order', () => {
+    render(
+      <InlineBlockPicker
+        options={options}
+        look='list'
+        onPick={() => {}}
+        onCancel={() => {}}
+      />
+    );
+    const picker = screen.getByRole('region', { name: 'Choose a block' });
+    expect(
+      within(picker)
+        .getAllByRole('button', { name: /^Add / })
+        .map((button) => button.getAttribute('aria-label'))
+    ).toEqual(['Add Text', 'Add Hero', 'Add Feature grid', 'Add Quote']);
+    expect(
+      within(picker)
+        .getAllByRole('heading')
+        .map((heading) => heading.textContent)
+    ).toEqual(['Layout', 'Content']);
+  });
+
+  it('shows a description under the label and links it to the option', () => {
+    render(
+      <InlineBlockPicker
+        options={options}
+        look='list'
+        onPick={() => {}}
+        onCancel={() => {}}
+      />
+    );
+    expect(
+      screen.getByRole('button', { name: 'Add Hero' })
+    ).toHaveAccessibleDescription('A big opening');
+  });
+});

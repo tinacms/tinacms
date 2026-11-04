@@ -91,7 +91,7 @@ describe('array field states', () => {
     expect(screen.queryByText(/This list is empty/)).toBeNull();
     unmount();
     render(<ArrayFieldView {...readOnlyEmpty} />);
-    expect(screen.getByText('This list is empty.')).toBeVisible();
+    expect(screen.getByText('No authors.')).toBeVisible();
   });
 
   it('turns adding off in the full state and says why', async () => {

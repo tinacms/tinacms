@@ -169,6 +169,7 @@
   --leading-control: 1.45; /* Line height of the label on a button */
   --shadow-segment:
     var(--shadow-xs), 0 0 0 1px rgba(15, 23, 42, 0.04); /* The picked choice of a segmented control: a soft drop and a faint outline */
+  --item-header-height: 2rem; /* One pinned item header: a head row is this tall, and each pin sits one row lower */
   --tracking-format: -0.03em; /* Letter spacing for the file type (MDX, MD) that stands in for an icon on a nav row */
   --leading-title: 1.3; /* Line height of a panel title in a panel header */
   --leading-tip: 1.4; /* Line height of the words in a tooltip, which may wrap to two lines */
