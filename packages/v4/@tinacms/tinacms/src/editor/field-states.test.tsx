@@ -158,7 +158,7 @@ const CASES: Case[] = [
     document: {},
     control: async () => {
       await screen.findByText('Field');
-      return screen.queryByRole('button', { name: 'Choose image' });
+      return screen.queryByRole('button', { name: 'Choose from Media' });
     },
   },
   {
