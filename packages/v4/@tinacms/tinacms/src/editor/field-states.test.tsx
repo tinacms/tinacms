@@ -260,3 +260,14 @@ describe('a real field in the form', () => {
     });
   });
 });
+
+describe('a field frame warning', () => {
+  it('shows an amber message for a reference to a document that is gone', async () => {
+    const entry = CASES.find((candidate) => candidate.type === 'reference');
+    if (!entry) throw new Error('missing reference case');
+    renderField({ ...entry, document: { f: 'content/pages/gone.mdx' } }, {});
+    expect(
+      await screen.findByText('This document no longer exists.')
+    ).toBeVisible();
+  });
+});
