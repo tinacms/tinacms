@@ -7,7 +7,7 @@ import {
 } from '@tinacms/ui/components/popover';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { cn } from '@tinacms/ui/lib/utils';
-import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
+import { type ReactNode, useId, useRef, useState } from 'react';
 
 const BLOCK_PICKER_TITLE = 'Choose a block';
 const NO_BLOCKS_MATCH = 'No blocks match.';
@@ -31,6 +31,7 @@ const OPTION_FOCUS = 'outline-none focus-visible:shadow-focus-ring';
 function sideWithRoom(button: HTMLElement | null): 'bottom' | 'top' {
   if (!button) return 'bottom';
   const { top, bottom } = button.getBoundingClientRect();
+  // The keyboard on a phone shrinks the visual viewport, not `innerHeight`.
   const below = (window.visualViewport?.height ?? window.innerHeight) - bottom;
   // A missing token reads as 0, so the panel opens below the button.
   const tallest =
@@ -83,7 +84,7 @@ function BlockOptionButton({
 }
 
 /**
- * The search box and the options under their group headings. It reads no
+ * The search box and the flat list of options. It reads no
  * store: the connected picker maps templates to `options`. The search text
  * starts empty each time the view mounts.
  */
@@ -224,14 +225,6 @@ export function BlockAddView({
   const [held, setHeld] = useState(defaultOpen ?? false);
   const off = disabled || reason !== undefined;
   const shown = !off && (open ?? held);
-  // The on-screen keyboard shrinks the viewport while the panel is open: pick the side with more room again.
-  useEffect(() => {
-    if (!shown) return;
-    const viewport = window.visualViewport ?? window;
-    const place = () => setSide(sideWithRoom(triggerRef.current));
-    viewport.addEventListener('resize', place);
-    return () => viewport.removeEventListener('resize', place);
-  }, [shown]);
   const setOpen = (next: boolean) => {
     if (next) {
       picked.current = false;
@@ -250,12 +243,12 @@ export function BlockAddView({
           aria-describedby={reason ? reasonId : undefined}
           render={<AddButton>Add a block</AddButton>}
         />
-        {/* The side is picked once on open, so the panel stays put while the search narrows it. */}
+        {/* The side is picked once on open. When the keyboard leaves less room, `shift` slides the panel over the button to stay on screen. */}
         <PopoverContent
           aria-label={BLOCK_PICKER_TITLE}
-          className='max-h-[max(var(--picker-min-height),min(var(--picker-max-height),var(--available-height)))] overflow-hidden'
+          className='max-h-[min(var(--picker-max-height),var(--available-height))] overflow-hidden'
           side={side}
-          collisionAvoidance={{ side: 'none' }}
+          collisionAvoidance={{ side: 'shift' }}
           finalFocus={() => !picked.current}
         >
           <p className='px-2.5 pt-1 text-sm font-medium'>

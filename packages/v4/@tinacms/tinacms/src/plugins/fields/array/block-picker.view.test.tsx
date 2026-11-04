@@ -17,7 +17,10 @@ const options: BlockOption[] = ['Hero', 'Quote', 'Call to action'].map(
   (label) => ({ name: label.toLowerCase(), label })
 );
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe('Block picker panel placement and size', () => {
   it('opens above the button when there is no room below it', async () => {
@@ -32,7 +35,6 @@ describe('Block picker panel placement and size', () => {
     await userEvent.click(trigger);
     const panel = await screen.findByRole('dialog', { name: 'Choose a block' });
     expect(panel).toHaveAttribute('data-side', 'top');
-    vi.unstubAllGlobals();
   });
 
   it('opens below the button when there is room', async () => {
@@ -47,28 +49,9 @@ describe('Block picker panel placement and size', () => {
     await userEvent.click(trigger);
     const panel = await screen.findByRole('dialog', { name: 'Choose a block' });
     expect(panel).toHaveAttribute('data-side', 'bottom');
-    vi.unstubAllGlobals();
   });
 
-  it('moves the open panel above the button when the viewport shrinks', async () => {
-    vi.stubGlobal('innerHeight', 800);
-    render(<BlockAddView options={options} look='list' onPick={() => {}} />);
-    const trigger = screen.getByRole('button', { name: 'Add a block' });
-    trigger.style.setProperty('--picker-max-height', '320px');
-    vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue({
-      top: 300,
-      bottom: 340,
-    } as DOMRect);
-    await userEvent.click(trigger);
-    const panel = await screen.findByRole('dialog', { name: 'Choose a block' });
-    expect(panel).toHaveAttribute('data-side', 'bottom');
-    vi.stubGlobal('innerHeight', 450);
-    fireEvent(window, new Event('resize'));
-    await waitFor(() => expect(panel).toHaveAttribute('data-side', 'top'));
-    vi.unstubAllGlobals();
-  });
-
-  it('keeps the floating panel at its opened height while a search narrows the list, and the inline list does not', async () => {
+  it('keeps the floating panel at its opened height while a search narrows the list', async () => {
     vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(200);
     render(<BlockAddView options={options} look='list' onPick={() => {}} />);
     await userEvent.click(screen.getByRole('button', { name: 'Add a block' }));

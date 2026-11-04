@@ -143,7 +143,6 @@
   --radius-tip: 6px; /* Corners of the dark tooltip bubble */
 
   /* @group Sizes */
-  --picker-min-height: 240px; /* Shortest a floating block picker gets when space shrinks (on-screen keyboard); the results keep room and scroll */
   --picker-max-height: 320px; /* Tallest a floating block picker gets; the options scroll inside it */
 
   /* @group Type */

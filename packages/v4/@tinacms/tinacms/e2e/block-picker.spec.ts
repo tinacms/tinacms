@@ -4,7 +4,6 @@ const PAGE = `/#/collections/page/${encodeURIComponent('content/pages/home.mdx')
 const OPTION = /^Add Template/;
 const LAST = /^Add Template number 10 /;
 const PANEL_MAX_HEIGHT = 320;
-const PANEL_MIN_HEIGHT = 240;
 const OPTION_ROW = 36;
 const KEYBOARD_VIEWPORT_HEIGHT = 420;
 const RING = 5;
@@ -60,6 +59,20 @@ async function inside(inner: Locator, outer: Locator) {
     a.x >= b.x - 0.5 &&
     a.x + a.width <= b.x + b.width + 0.5
   );
+}
+
+/** Scrolls the form column so `button` sits `top` pixels below the viewport top. */
+async function placeAt(button: Locator, top: number) {
+  await button.scrollIntoViewIfNeeded();
+  await button.evaluate((el, wanted) => {
+    const scroller = el.closest('aside');
+    if (!scroller) throw new Error('no scrolling form column');
+    const spacer = document.createElement('div');
+    spacer.style.cssText = 'height:1200px;flex:none';
+    scroller.append(spacer);
+    scroller.scrollTop += el.getBoundingClientRect().top - wanted;
+  }, top);
+  expect((await boxOf(button)).y).toBeCloseTo(top, -1);
 }
 
 /** Room between an option and the edges of the scrolling results. */
@@ -197,9 +210,6 @@ for (const viewport of viewports) {
         });
         await settled(panel);
         const results = panel.locator('[data-slot=block-picker-results]');
-        expect((await boxOf(panel)).height).toBeGreaterThanOrEqual(
-          PANEL_MIN_HEIGHT - 1
-        );
         expect((await boxOf(results)).height).toBeGreaterThan(OPTION_ROW);
         const first = panel.getByRole('button', { name: OPTION }).first();
         expect(await inside(first, results)).toBe(true);
@@ -250,3 +260,123 @@ for (const viewport of viewports) {
     });
   }
 }
+
+/**
+ * A phone's on-screen keyboard shrinks the visual viewport and leaves the
+ * layout viewport alone. This test fakes exactly that: the page keeps its
+ * 844px layout while `visualViewport` reports a shorter height.
+ */
+test.describe('the keyboard shrinks only the visual viewport at 390px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+  });
+  const TRIGGER_TOP = 200;
+
+  for (const { look, trigger } of looks) {
+    for (const when of [
+      'while the panel is open',
+      'before it opens',
+    ] as const) {
+      test(`${look} look, shrunk ${when}: title, search and results stay on screen`, async ({
+        page,
+      }) => {
+        await page.addInitScript(() => {
+          const fake = Object.assign(new EventTarget(), {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            offsetLeft: 0,
+            offsetTop: 0,
+            pageLeft: 0,
+            pageTop: 0,
+            scale: 1,
+          });
+          Object.defineProperty(window, 'visualViewport', { get: () => fake });
+          Object.defineProperty(window, '__shrinkVisualViewport', {
+            value: (height: number) => {
+              fake.height = height;
+              fake.dispatchEvent(new Event('resize'));
+            },
+          });
+        });
+        await page.goto(PAGE);
+        const button = page
+          .getByRole('button', { name: 'Add a block' })
+          .nth(trigger);
+        await placeAt(button, TRIGGER_TOP);
+        const shrink = () =>
+          page.evaluate((height) => {
+            const keyboard = Reflect.get(window, '__shrinkVisualViewport');
+            if (typeof keyboard !== 'function')
+              throw new Error('no fake keyboard');
+            keyboard(height);
+          }, KEYBOARD_VIEWPORT_HEIGHT);
+        const panel = page.getByRole('dialog', { name: 'Choose a block' });
+        if (when === 'before it opens') await shrink();
+        await button.click();
+        await expect(panel).toBeVisible();
+        await settled(panel);
+        if (when === 'while the panel is open') await shrink();
+        await settled(panel);
+
+        const onScreen = async (locator: Locator) => {
+          const box = await boxOf(locator);
+          return (
+            box.y >= -0.5 &&
+            box.y + box.height <= KEYBOARD_VIEWPORT_HEIGHT + 0.5
+          );
+        };
+        const results = panel.locator('[data-slot=block-picker-results]');
+        expect(await onScreen(panel)).toBe(true);
+        expect(await onScreen(panel.getByText('Choose a block'))).toBe(true);
+        expect(
+          await onScreen(
+            panel.getByRole('searchbox', { name: 'Search blocks' })
+          )
+        ).toBe(true);
+        expect((await boxOf(results)).height).toBeGreaterThan(OPTION_ROW);
+        expect(
+          await onScreen(panel.getByRole('button', { name: OPTION }).first())
+        ).toBe(true);
+        if (when === 'before it opens') {
+          await expect(panel).toHaveAttribute('data-side', 'top');
+        }
+      });
+    }
+  }
+});
+
+test.describe('the layout viewport is very short at 390px', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  const SHORT_VIEWPORT_HEIGHT = 300;
+
+  for (const { look, trigger } of looks) {
+    test(`${look} look: the panel stays on screen with room for results`, async ({
+      page,
+    }) => {
+      await page.goto(PAGE);
+      const button = page
+        .getByRole('button', { name: 'Add a block' })
+        .nth(trigger);
+      await placeAt(button, 150);
+      await button.click();
+      const panel = page.getByRole('dialog', { name: 'Choose a block' });
+      await expect(panel).toBeVisible();
+      await settled(panel);
+      await page.setViewportSize({
+        width: 390,
+        height: SHORT_VIEWPORT_HEIGHT,
+      });
+      await settled(panel);
+      const box = await boxOf(panel);
+      expect(box.y).toBeGreaterThanOrEqual(-0.5);
+      expect(box.y + box.height).toBeLessThanOrEqual(
+        SHORT_VIEWPORT_HEIGHT + 0.5
+      );
+      const search = panel.getByRole('searchbox', { name: 'Search blocks' });
+      expect((await boxOf(search)).y).toBeGreaterThanOrEqual(0);
+      const results = panel.locator('[data-slot=block-picker-results]');
+      expect((await boxOf(results)).height).toBeGreaterThan(2 * OPTION_ROW);
+    });
+  }
+});
