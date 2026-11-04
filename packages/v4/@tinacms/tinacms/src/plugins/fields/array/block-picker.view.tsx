@@ -9,8 +9,8 @@ import { SearchBox } from '@tinacms/ui/components/search-box';
 import { cn } from '@tinacms/ui/lib/utils';
 import { type ReactNode, useId, useRef, useState } from 'react';
 
-export const BLOCK_PICKER_TITLE = 'Choose a block';
-export const NO_BLOCKS_MATCH = 'No blocks match.';
+const BLOCK_PICKER_TITLE = 'Choose a block';
+const NO_BLOCKS_MATCH = 'No blocks match.';
 
 export interface BlockOption {
   name: string;
@@ -30,7 +30,7 @@ interface BlockGroup {
 }
 
 /** Ungrouped options first, then each category in the order it first appears. */
-export function groupBlocks(options: BlockOption[]): BlockGroup[] {
+function groupBlocks(options: BlockOption[]): BlockGroup[] {
   const groups: BlockGroup[] = [{ options: [] }];
   for (const option of options) {
     if (option.category === undefined) {
@@ -81,7 +81,7 @@ function BlockOptionButton({
  * store: the connected picker maps templates to `options`. The search text
  * starts empty each time the view mounts.
  */
-export function BlockPickerView({
+function BlockPickerView({
   options,
   look,
   onPick,
@@ -91,6 +91,7 @@ export function BlockPickerView({
   onPick: (name: string) => void;
 }) {
   const [query, setQuery] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
   const headingId = useId();
   const groups = groupBlocks(
     options.filter((option) => matches(option, query))
@@ -100,10 +101,14 @@ export function BlockPickerView({
       <SearchBox
         label='Search blocks'
         size='sm'
+        ref={searchRef}
         autoFocus
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        onClear={() => setQuery('')}
+        onClear={() => {
+          setQuery('');
+          searchRef.current?.focus();
+        }}
       />
       {groups.length === 0 ? (
         <p

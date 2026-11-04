@@ -347,8 +347,9 @@ describe('blocks states', () => {
   it('shows two columns of previews in the open visual picker', () => {
     render(<ArrayFieldView {...state('blocks visual picker open')} />);
     const panel = screen.getByRole('dialog', { name: 'Choose a block' });
-    expect(panel.querySelectorAll('.aspect-video')).toHaveLength(4);
-    expect(panel.querySelector('.grid-cols-2')).not.toBeNull();
+    expect(
+      within(panel).getAllByRole('button', { name: /^Add / })
+    ).toHaveLength(4);
   });
 });
 

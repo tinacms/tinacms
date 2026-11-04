@@ -265,6 +265,65 @@ describe('Blocks field picker', () => {
     );
   });
 
+  it('reopens the insert picker with an empty search and focus in it when Insert is chosen on a second card', async () => {
+    renderPage({
+      blocks: [
+        { _template: 'hero', headline: 'A' },
+        { _template: 'hero', headline: 'B' },
+      ],
+    });
+    const blocks = await list('Blocks');
+    const insertFrom = async (item: number, where: RegExp) => {
+      await userEvent.click(
+        within(blocks).getByRole('button', { name: `Actions for Item ${item}` })
+      );
+      await userEvent.click(
+        await screen.findByRole('menuitem', { name: where })
+      );
+    };
+    await insertFrom(1, /^Insert above/);
+    const first = await within(blocks).findByRole('region', {
+      name: 'Choose a block',
+    });
+    await userEvent.type(within(first).getByRole('searchbox'), 'call');
+    await insertFrom(2, /^Insert below/);
+    const second = await within(blocks).findByRole('region', {
+      name: 'Choose a block',
+    });
+    const search = within(second).getByRole('searchbox');
+    expect(search).toHaveValue('');
+    await waitFor(() => expect(search).toHaveFocus());
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(within(blocks).queryByRole('region')).toBeNull()
+    );
+  });
+
+  it('keeps focus in the insert picker search box after Clear search', async () => {
+    renderPage({ blocks: [{ _template: 'hero', headline: 'A' }] });
+    const blocks = await list('Blocks');
+    await userEvent.click(
+      within(blocks).getByRole('button', { name: 'Actions for Item 1' })
+    );
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: /^Insert above/ })
+    );
+    const inline = await within(blocks).findByRole('region', {
+      name: 'Choose a block',
+    });
+    const search = within(inline).getByRole('searchbox');
+    await userEvent.type(search, 'x');
+    await userEvent.click(
+      within(inline).getByRole('button', { name: 'Clear search' })
+    );
+    expect(search).toHaveValue('');
+    expect(search).toHaveFocus();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(within(blocks).queryByRole('region')).toBeNull()
+    );
+  });
+
   it('closes the insert picker with Cancel, inserts nothing and returns focus to the card grip', async () => {
     renderPage({ blocks: [{ _template: 'hero', headline: 'Hi' }] });
     const blocks = await list('Blocks');

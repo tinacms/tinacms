@@ -264,8 +264,8 @@ Each item is a List card in a card list.
 - The Add control ends the list. A list of strings or numbers with no
   `defaultItem` uses a box: type a value, press Enter. Any other list uses a
   button. A block array shows "Add a block".
-- An empty list says so: "No blocks." for a block array, "This list is empty."
-  for any other array. A read-only list has no container, no Add control and no
+- An empty list says so: "No blocks." for a block array, "This list is empty. Add the first item below." for any other editable array
+  and "This list is empty." when it is read-only. A read-only list has no container, no Add control and no
   menu. A disabled list has no hover and no menu.
 
 ### Block picker

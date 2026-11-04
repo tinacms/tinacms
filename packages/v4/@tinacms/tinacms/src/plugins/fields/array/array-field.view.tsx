@@ -332,11 +332,16 @@ export function ArrayFieldView({
       />
     );
     return inserting?.index === index
-      ? [<div key='inserting'>{inserting.content}</div>, card]
+      ? [
+          <div key={`inserting-${inserting.index}`}>{inserting.content}</div>,
+          card,
+        ]
       : [card];
   });
   if (inserting && inserting.index >= items.length) {
-    cards.push(<div key='inserting'>{inserting.content}</div>);
+    cards.push(
+      <div key={`inserting-${inserting.index}`}>{inserting.content}</div>
+    );
   }
 
   return (
