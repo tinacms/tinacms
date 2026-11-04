@@ -15,34 +15,12 @@ const NO_BLOCKS_MATCH = 'No blocks match.';
 export interface BlockOption {
   name: string;
   label: string;
-  /** Options with the same category share a heading. */
-  category?: string;
   /** The image over the label in the visual look. */
   preview?: ReactNode;
 }
 
 /** `list` shows names in rows; `grid` shows a preview over each name. */
 export type BlockLook = 'list' | 'grid';
-
-interface BlockGroup {
-  heading?: string;
-  options: BlockOption[];
-}
-
-/** Ungrouped options first, then each category in the order it first appears. */
-function groupBlocks(options: BlockOption[]): BlockGroup[] {
-  const groups: BlockGroup[] = [{ options: [] }];
-  for (const option of options) {
-    if (option.category === undefined) {
-      groups[0].options.push(option);
-      continue;
-    }
-    const existing = groups.find((group) => group.heading === option.category);
-    if (existing) existing.options.push(option);
-    else groups.push({ heading: option.category, options: [option] });
-  }
-  return groups.filter((group) => group.options.length > 0);
-}
 
 const matches = (option: BlockOption, query: string): boolean =>
   option.label.toLowerCase().includes(query.trim().toLowerCase());
@@ -54,6 +32,7 @@ function sideWithRoom(button: HTMLElement | null): 'bottom' | 'top' {
   if (!button) return 'bottom';
   const { top, bottom } = button.getBoundingClientRect();
   const below = window.innerHeight - bottom;
+  // A missing token reads as 0, so the panel opens below the button.
   const tallest =
     Number.parseFloat(
       getComputedStyle(button).getPropertyValue('--picker-max-height')
@@ -64,7 +43,8 @@ function sideWithRoom(button: HTMLElement | null): 'bottom' | 'top' {
 /**
  * The results' minimum height once the panel is open and positioned, so the
  * panel keeps its size while a search narrows the list. It never exceeds the
- * room the panel has. Empty for the inline picker, which has no panel.
+ * room the panel has. Empty for the inline picker, which has no panel; the
+ * caller keeps that empty string, so the inline list never holds a height.
  */
 function holdHeight(results: HTMLElement | null): string {
   const panel = results?.closest<HTMLElement>('[data-slot=popover-content]');
@@ -118,16 +98,13 @@ function BlockPickerView({
 }) {
   const [query, setQuery] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
-  const headingId = useId();
   const resultsRef = useRef<HTMLDivElement>(null);
   const [held, setHeld] = useState<string>();
   const search = (value: string) => {
     setHeld((height) => height ?? holdHeight(resultsRef.current));
     setQuery(value);
   };
-  const groups = groupBlocks(
-    options.filter((option) => matches(option, query))
-  );
+  const shown = options.filter((option) => matches(option, query));
   return (
     <div className='flex min-h-0 min-w-0 flex-1 flex-col gap-2'>
       <SearchBox
@@ -144,10 +121,11 @@ function BlockPickerView({
       />
       <div
         ref={resultsRef}
+        data-slot='block-picker-results'
         style={{ minHeight: held || undefined }}
-        className='-m-1.5 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-1.5'
+        className='-m-1.5 flex min-h-0 flex-1 flex-col gap-2 scroll-py-1.5 overflow-y-auto p-1.5'
       >
-        {groups.length === 0 ? (
+        {shown.length === 0 ? (
           <p
             role='status'
             className='px-2.5 py-1.5 text-sm text-muted-foreground'
@@ -155,41 +133,22 @@ function BlockPickerView({
             {NO_BLOCKS_MATCH}
           </p>
         ) : (
-          groups.map((group, index) => {
-            const id = `${headingId}-${index}`;
-            return (
-              <div
-                key={group.heading ?? ''}
-                role='group'
-                aria-labelledby={group.heading ? id : undefined}
-                aria-label={group.heading ? undefined : BLOCK_PICKER_TITLE}
-                className='flex flex-col gap-1'
-              >
-                {group.heading ? (
-                  <p
-                    id={id}
-                    className='px-2.5 py-1 text-xs font-medium text-muted-foreground'
-                  >
-                    {group.heading}
-                  </p>
-                ) : null}
-                <div
-                  className={
-                    look === 'grid' ? 'grid grid-cols-2 gap-2' : 'flex flex-col'
-                  }
-                >
-                  {group.options.map((option) => (
-                    <BlockOptionButton
-                      key={option.name}
-                      option={option}
-                      look={look}
-                      onPick={onPick}
-                    />
-                  ))}
-                </div>
-              </div>
-            );
-          })
+          <div
+            role='group'
+            aria-label={BLOCK_PICKER_TITLE}
+            className={
+              look === 'grid' ? 'grid grid-cols-2 gap-2' : 'flex flex-col'
+            }
+          >
+            {shown.map((option) => (
+              <BlockOptionButton
+                key={option.name}
+                option={option}
+                look={look}
+                onPick={onPick}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>

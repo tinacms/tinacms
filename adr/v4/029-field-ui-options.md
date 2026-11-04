@@ -1,7 +1,7 @@
 # ADR-029: Field Options Live at the Top Level, Not Under `ui`
 
 ## Status
-**Accepted** (2026-10-29). Decisions 1 to 7 were approved by the team. Decision 8 was confirmed in the review of [#7995](https://github.com/tinacms/tinacms/pull/7995). Collection options (`router`, `filename`, `allowedActions`, `global`, `beforeSubmit`) are out of scope and need their own ADR. Resolves the field-level half of Field Type Implementation: Decide which v3 ui options stay and where they live ([#7850](https://github.com/tinacms/tinacms/issues/7850)). Builds on [ADR-009](./009-field-plugins.md) and [ADR-017](./017-content-model.md).
+**Accepted** (2026-10-29). Decisions 1 to 7 were approved by the team. Collection options (`router`, `filename`, `allowedActions`, `global`, `beforeSubmit`) are out of scope and need their own ADR. Resolves the field-level half of Field Type Implementation: Decide which v3 ui options stay and where they live ([#7850](https://github.com/tinacms/tinacms/issues/7850)). Builds on [ADR-009](./009-field-plugins.md) and [ADR-017](./017-content-model.md).
 
 ## Context
 v3 configured fields through a `ui` object: `ui.component`, `ui.hidden`, `ui.defaultValue`, `ui.itemProps` and more. v4 has no decision on them. No ADR covers `ui`, and the v4 docs use only `ui.component` and `ui.hidden`, in passing.
@@ -86,9 +86,6 @@ t.array({
 })
 ```
 
-### 8. `category` stays on templates
-A template takes an optional `category` string, the v3 name. The block picker shows templates with the same `category` under one heading, in both looks, and puts templates with none first. Confirmed by the maintainers in the review of [#7995](https://github.com/tinacms/tinacms/pull/7995). See `packages/v4/@tinacms/tinacms/_docs/array-field.md`.
-
 ## Consequences
 
 ### Positive
@@ -105,6 +102,7 @@ A template takes an optional `category` string, the v3 name. The block picker sh
 - These docs use `ui` or the dropped options and must change: `adr/v4/api/public-api.md` (lines 53, 105, 117), `adr/v4/systems/graphql-server.md:72`, `adr/v4/systems/code-generation.md:29`, `adr/v4/plugins/field-plugins.md:390` and `adr/v4/CONTEXT.md:88`. The `min` and `max` props in `public-api.md:105` are already stale.
 
 ## Open questions
+- **`category`.** It groups templates in the visual picker. Decision 7 does not mention it, and v3 reads it only in that picker (`block-selector-big.tsx:72`).
 - **`optionComponent`** (reference field). It is a component, like `component`. This ADR does not decide it.
 - **Array naming.** These decisions say "array", as the v4 code does (`array-field.schema.ts:28`). The ADRs call the type `list` (`adr/v4/CONTEXT.md:120`).
 

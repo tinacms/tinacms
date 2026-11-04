@@ -44,19 +44,16 @@ const templates = [
   {
     name: 'columns',
     label: 'Columns',
-    category: 'Layout',
     fields: [t.string({ name: 'count', label: 'Count' })],
   },
   {
     name: 'quote',
     label: 'Quote',
-    category: 'Layout',
     fields: [t.string({ name: 'text', label: 'Text' })],
   },
   {
     name: 'cta',
     label: 'Call to action',
-    category: 'Content',
     fields: [t.string({ name: 'link', label: 'Link' })],
   },
 ];
@@ -168,23 +165,18 @@ describe('Blocks field picker', () => {
     expect(search).toHaveFocus();
   });
 
-  it('puts ungrouped blocks first, groups the rest, and drops an empty group while searching', async () => {
+  it('lists every template once in schema order with no headings, and search narrows the same list', async () => {
     renderPage();
     const panel = await openBlockPicker(await list('Blocks'));
-    const ungrouped = within(panel).getByRole('group', {
-      name: 'Choose a block',
-    });
-    const layout = within(panel).getByRole('group', { name: 'Layout' });
-    expect(optionNames(ungrouped)).toEqual(['Add Hero']);
-    expect(optionNames(layout)).toEqual(['Add Columns', 'Add Quote']);
-    expect(
-      within(panel).getByRole('group', { name: 'Content' })
-    ).toBeInTheDocument();
+    expect(optionNames(panel)).toEqual([
+      'Add Hero',
+      'Add Columns',
+      'Add Quote',
+      'Add Call to action',
+    ]);
+    expect(within(panel).queryByText(/^(Layout|Content)$/)).toBeNull();
     await userEvent.type(within(panel).getByRole('searchbox'), 'quote');
-    expect(within(panel).queryByRole('group', { name: 'Content' })).toBeNull();
-    expect(
-      within(panel).getByRole('group', { name: 'Layout' })
-    ).toBeInTheDocument();
+    expect(optionNames(panel)).toEqual(['Add Quote']);
   });
 
   it('closes on Escape with text typed, adds nothing, and returns focus to "Add a block"', async () => {

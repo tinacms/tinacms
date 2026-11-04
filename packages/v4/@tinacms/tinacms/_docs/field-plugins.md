@@ -123,11 +123,12 @@ The properties of the descriptor:
 - `metadata.drillsIn(node)` — Overrides the depth rule for one node. `true`
   drills in, `false` opens in place, `undefined` keeps the depth rule. The
   `object` field returns it from `display`.
-- `metadata.inlineBox(node)` — For a single-value field. It returns `'text'` or
-  `'number'` when a list card can hold the value in its own box, and
-  `undefined` to keep the field's widget. The `string` field returns `'text'`
-  unless the node sets `multiline` or `mono`. The `number` field returns
-  `'number'`. The `array` field reads it for the items of an `of` list.
+- `metadata.inlineBox(node)` — For a single-value field. It returns the box a
+  list card holds in place of the field's widget, with the settings of that
+  widget, or `undefined` to keep the widget. The `string` field returns
+  `{ type: 'text', placeholder }` unless the node sets `multiline` or `mono`.
+  The `number` field returns `{ type: 'number', min, max, step }`, and the card
+  shows step buttons. The `array` field reads it for the items of an `of` list.
 - `DrillInComponent` — Draws the field in place of the drill-in button when the
   field drills in. Without it, the editor draws its generic button. The `object`
   and `array` fields supply a card. The items of an `array` also open as a form
@@ -218,6 +219,8 @@ Hooks:
 | `useOpenLevel()` | Gives a function that opens this field as the next form level |
 | `useInvalidFieldCount()` | Gives how many fields under this field show an error. It counts fields, not messages. |
 | `useIsOpenLevel()` | Gives `true` when this field is the open form level |
+| `useInvalidFieldCounts(addresses)` | Gives the `useInvalidFieldCount()` value for each address, in the same order. A list field reads it for its items. |
+| `useListItems()` | Gives `openLevel`, `isRevealed` and `touch` for the items of a list field, by item address |
 
 A field that supplies a `DrillInComponent` builds it from these hooks and
 `@tinacms/ui` only:
@@ -283,7 +286,7 @@ t.richText({ name: 'body', defaultValue: 'Write something here.\n\n- First point
 Widgets, `parse`, `format` and validation belong to the field plugin and to
 validators. To show a value with another widget, register a field plugin for
 it. For a one-off transform on one field, use a collection hook. Array-only
-options (`defaultItem`, `itemLabel`, `picker`, `previewImage`, `category`) are in
+options (`defaultItem`, `itemLabel`, `picker`, `previewImage`) are in
 [array-field.md](./array-field.md).
 
 ### Dropped options fail the build

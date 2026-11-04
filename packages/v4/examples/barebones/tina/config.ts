@@ -113,7 +113,6 @@ const heroTemplate = {
   label: 'Hero',
   defaultItem: { headline: 'A new hero' },
   itemLabel: (item) => item.headline,
-  category: 'Layout',
   // Shown as a tile in the block picker, so `blocks` below gets the grid.
   previewImage: 'posts/llama.avif',
   fields: [
@@ -125,7 +124,6 @@ const heroTemplate = {
 const ctaTemplate = {
   name: 'cta',
   label: 'Call to action',
-  category: 'Content',
   fields: [
     t.string({ name: 'label', label: 'Label', validators: [required()] }),
     t.string({ name: 'link', label: 'Link', defaultValue: '/docs' }),

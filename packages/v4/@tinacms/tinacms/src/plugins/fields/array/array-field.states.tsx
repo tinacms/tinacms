@@ -56,9 +56,9 @@ const blocksFilled = [
 
 const blockOptions: BlockOption[] = [
   { name: 'hero', label: 'Hero' },
-  { name: 'columns', label: 'Columns', category: 'Layout' },
-  { name: 'quote', label: 'Quote', category: 'Layout' },
-  { name: 'cta', label: 'Call to action', category: 'Content' },
+  { name: 'columns', label: 'Columns' },
+  { name: 'quote', label: 'Quote' },
+  { name: 'cta', label: 'Call to action' },
 ];
 
 const withPreview = (options: BlockOption[]): BlockOption[] =>

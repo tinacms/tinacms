@@ -199,7 +199,6 @@
                 "defaultItem": {
                   "headline": "A new hero"
                 },
-                "category": "Layout",
                 "previewImage": "posts/llama.avif",
                 "fields": [
                   {
@@ -222,7 +221,6 @@
               {
                 "name": "cta",
                 "label": "Call to action",
-                "category": "Content",
                 "fields": [
                   {
                     "name": "label",

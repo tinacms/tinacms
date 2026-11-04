@@ -335,12 +335,14 @@ describe('blocks states', () => {
     expect(add).toHaveAccessibleDescription(/This list is full/);
   });
 
-  it('shows grouped blocks in the open plain picker', () => {
+  it('lists the blocks in schema order in the open plain picker', () => {
     render(<ArrayFieldView {...state('blocks plain picker open')} />);
     const panel = screen.getByRole('dialog', { name: 'Choose a block' });
-    for (const name of ['Layout', 'Content']) {
-      expect(within(panel).getByRole('group', { name })).toBeInTheDocument();
-    }
+    expect(
+      within(panel)
+        .getAllByRole('button', { name: /^Add / })
+        .map((option) => option.getAttribute('aria-label'))
+    ).toEqual(['Add Hero', 'Add Columns', 'Add Quote', 'Add Call to action']);
     expect(panel.querySelector('img')).toBeNull();
   });
 

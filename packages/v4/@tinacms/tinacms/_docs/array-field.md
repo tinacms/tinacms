@@ -61,7 +61,7 @@ const collection = {
 | `of` | `ScalarFieldSchema` | single values; an object or array here is rejected (ADR-017 §4) | `['news', 'release']` |
 
 A template of a templates array has `name`, `label?`, `fields`, `defaultItem?`,
-`itemLabel?`, `previewImage?` and `category?`. A rich-text embed template takes only `name`,
+`itemLabel?` and `previewImage?`. A rich-text embed template takes only `name`,
 `label?`, `fields` and `defaultItem?`.
 
 ### Array options
@@ -72,7 +72,6 @@ A template of a templates array has `name`, `label?`, `fields`, `defaultItem?`,
 | `itemLabel` | a `fields` array, a template | `(item) => string`. The row heading. |
 | `picker` | a `templates` array | `'list'` or `'grid'`. How an editor picks a block to add. |
 | `previewImage` | a template | The image the grid picker shows. |
-| `category` | a template | A heading in the block picker. Templates with the same `category` share a heading. |
 
 - `defaultItem` takes a scalar on a scalar array (it wins over `of.defaultValue`)
   and a document on a `fields` array. A templates array takes no `defaultItem`
@@ -87,10 +86,6 @@ A template of a templates array has `name`, `label?`, `fields`, `defaultItem?`,
   `'list'` otherwise. It replaces the v3 `visualSelector`.
 - `previewImage` is a path relative to the media root, with no URL scheme. It
   replaces the v3 `previewSrc`.
-- `category` is a non-empty string. Templates with no `category` come first,
-  under no heading. The headings follow the order in which each `category` first
-  appears. A value that is empty or not a string fails `tinacms codegen` with
-  `schema-category-invalid`. It keeps the v3 name (ADR-029, decision 8).
 
 ```ts
 t.array({
@@ -272,11 +267,15 @@ Each item is a List card in a card list.
 ### Block picker
 
 "Add a block" opens a floating panel named "Choose a block". It holds a search
-box ("Search blocks") and the templates under their `category` headings.
+box ("Search blocks") and a flat list of the templates in schema order. The list
+has no group headings.
 
-- Search matches the template label, without regard to case. A heading with no
-  match is not shown. When nothing matches, the panel says "No blocks match."
+- Search matches the template label, without regard to case. When nothing matches, the panel says "No blocks match."
   The search box is empty each time the panel opens.
+- The panel is at most `--picker-max-height` (320px) tall, and less when the
+  window has less room. The title and the search box stay in place, and the
+  list scrolls inside the panel. While a search narrows the list, the panel keeps
+  its top and height.
 - The look follows `picker`: `list` shows the label in a row, `grid` shows the
   preview image over the label, two to a row. A missing, broken or non-media
   `previewImage` shows the label alone.

@@ -488,7 +488,6 @@ function TemplatePicker({
   const options: BlockOption[] = field.templates.map((template) => ({
     name: template.name,
     label: templateTitle(template),
-    category: template.category,
     preview: template.previewImage ? (
       <PreviewImage path={template.previewImage} />
     ) : undefined,
