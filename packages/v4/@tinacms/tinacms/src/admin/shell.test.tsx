@@ -301,7 +301,9 @@ describe('side nav entries', () => {
 
     await user.click(row);
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
     const back = await screen.findByRole('button', { name: /hello\.mdx/ });
     expect(back).toHaveTextContent('Unsaved');
     expect(
@@ -636,6 +638,29 @@ describe('read-error and screen views', () => {
   });
 });
 
+describe('document form panel', () => {
+  it('has Back and a menu in its header, no Close and no second title, then tabs and a form bar', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+    await screen.findByLabelText(/^Title\b/);
+    const panel = screen.getByRole('complementary', { name: 'Document form' });
+    expect(
+      within(panel).getByRole('button', { name: 'Return to navigator' })
+    ).toBeVisible();
+    expect(
+      within(panel).getByRole('button', { name: 'Document menu' })
+    ).toBeVisible();
+    expect(within(panel).queryByRole('button', { name: 'Close' })).toBeNull();
+    expect(within(panel).queryByRole('heading')).toBeNull();
+    expect(within(panel).getByRole('tab', { name: 'Fields' })).toBeVisible();
+    expect(within(panel).queryByRole('tab', { name: 'History' })).toBeNull();
+    expect(
+      within(panel).getByRole('button', { name: 'Document actions' })
+    ).toBeVisible();
+    expect(within(panel).getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+});
+
 describe('panel headers', () => {
   it('gives the form column Back to its collection, and the missing views a title and Close', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
@@ -645,7 +670,7 @@ describe('panel headers', () => {
     await user.click(
       within(
         screen.getByRole('complementary', { name: 'Document form' })
-      ).getByRole('button', { name: /Posts/ })
+      ).getByRole('button', { name: 'Return to navigator' })
     );
     await waitFor(() =>
       expect(window.location.hash).toBe('#/collections/post')
