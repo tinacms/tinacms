@@ -23,7 +23,7 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
-import { FormProvider, TinaProvider, useActiveField } from '../../../editor';
+import { FormProvider, TinaProvider } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
 import { required } from '../../../plugins/fields';
@@ -463,6 +463,35 @@ describe('ImageField inside an array', () => {
       { name: 'Brook', avatar: null },
     ]);
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+});
+
+describe('ImageField as the item of a list', () => {
+  const images: CollectionSchema = {
+    name: 'post',
+    format: 'mdx',
+    fields: [
+      t.array({
+        name: 'images',
+        label: 'Images',
+        of: t.image({ name: 'image', label: 'Image' }),
+      }),
+    ],
+  };
+
+  it('draws one row per image and removes one from the item menu', async () => {
+    renderField({ images: [HERO, 'posts/other.jpg'] }, createMedia(), images);
+    const list = await screen.findByRole('group', { name: 'Images' });
+    expect(
+      within(list).getAllByRole('button', { name: /^Actions for Item/ })
+    ).toHaveLength(2);
+    await userEvent.click(
+      within(list).getByRole('button', { name: 'Actions for Item 1' })
+    );
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: 'Remove' })
+    );
+    expect(valueOf('images')).toEqual(['posts/other.jpg']);
   });
 });
 

@@ -10,7 +10,7 @@ export type ImageCoverLook = (typeof IMAGE_COVER_LOOKS)[number];
 
 export interface ImageFieldSchema extends BaseFieldSchema {
   type: typeof IMAGE_FIELD_TYPE;
-  /** Shows the picture larger: `wide` is 16:9, `tall` is 4:3. Has no effect on the items of a list of images. */
+  /** Shows the picture larger: `wide` is 16:9, `tall` is 4:3. Applies to each image in a list of images too. */
   cover?: ImageCoverLook;
 }
 

@@ -1,27 +1,25 @@
 import { Button } from '@tinacms/ui/components/button';
 import { Icon } from '@tinacms/ui/components/icon';
 import { cn } from '@tinacms/ui/lib/utils';
-import { GripVerticalIcon, ReplaceIcon } from 'lucide-react';
-import { type KeyboardEvent, type ReactNode, type Ref, useEffect } from 'react';
+import { ReplaceIcon } from 'lucide-react';
+import { type Ref, useEffect } from 'react';
 import { mediaNameOf } from '../../media-manager/media-types';
 import type { ImageCoverLook } from './image-field.schema';
 import { PREVIEW_SIZE, useImagePreview } from './image-preview';
 
-export type ImageTileLook = ImageCoverLook | 'default' | 'square';
+export type ImageTileLook = ImageCoverLook | 'default';
 
 export const tileShape = {
   default: 'aspect-3/2',
   wide: 'aspect-video',
   tall: 'aspect-4/3',
-  square: 'aspect-square',
 } as const satisfies Record<ImageTileLook, string>;
 
 export const tileCap = {
   default: 'max-w-xs',
   wide: 'max-w-2xl',
   tall: 'max-w-xl',
-  square: undefined,
-} as const satisfies Record<ImageTileLook, string | undefined>;
+} as const satisfies Record<ImageTileLook, string>;
 
 export type ResolveImageUrl = (
   path: string,
@@ -43,9 +41,7 @@ export interface ImageTileProps {
   onReplace?: () => void;
   onRemove?: () => void;
   replaceRef?: Ref<HTMLButtonElement>;
-  lifted?: boolean;
   dropTarget?: boolean;
-  handle?: ReactNode;
 }
 
 export function ImageTile({
@@ -63,9 +59,7 @@ export function ImageTile({
   onReplace,
   onRemove,
   replaceRef,
-  lifted,
   dropTarget,
-  handle,
 }: ImageTileProps) {
   const preview = useImagePreview(path, resolveUrl, previewKey);
   const missing = path === null || forcedMissing || preview.missing;
@@ -78,11 +72,9 @@ export function ImageTile({
   return (
     <figure
       data-slot='image-tile'
-      data-lifted={lifted ? 'true' : undefined}
       className={cn(
         'm-0 flex w-full min-w-0 flex-col gap-1 transition select-none',
-        tileCap[look],
-        lifted && 'opacity-60'
+        tileCap[look]
       )}
     >
       <div
@@ -108,11 +100,6 @@ export function ImageTile({
             onError={preview.onError}
           />
         )}
-        {handle ? (
-          <div data-handle='' className='absolute bottom-2 left-2'>
-            {handle}
-          </div>
-        ) : null}
         {inert ? null : (
           <div className='absolute top-2 right-2 flex gap-1'>
             {onReplace ? (
@@ -122,10 +109,7 @@ export function ImageTile({
                 size='sm'
                 icon={ReplaceIcon}
                 disabled={busy}
-                className={cn(
-                  'bg-card shadow-xs',
-                  look === 'square' && 'size-6'
-                )}
+                className='bg-card shadow-xs'
                 onClick={onReplace}
               >
                 {`Replace ${name}`}
@@ -137,10 +121,7 @@ export function ImageTile({
                 size='sm'
                 destructive
                 disabled={busy}
-                className={cn(
-                  'bg-card shadow-xs',
-                  look === 'square' && 'size-6'
-                )}
+                className='bg-card shadow-xs'
                 onClick={onRemove}
               >
                 {`Remove ${name}`}
