@@ -346,17 +346,30 @@ describe('branches', () => {
     ).toBeVisible();
   });
 
-  it('lists one line per branch with protected branches in one Protected group', async () => {
+  it('titles the pop-up Branches, lists the current branch first and searches by name', async () => {
     const user = userEvent.setup();
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
-    const dialog = await screen.findByRole('dialog', { name: 'Switch branch' });
-    const protectedGroup = within(dialog).getByRole('region', {
-      name: 'Protected',
-    });
-    expect(within(protectedGroup).getAllByRole('listitem')).toHaveLength(1);
-    expect(within(protectedGroup).getByText('main')).toBeVisible();
-    expect(within(dialog).getByText('feature/news')).toBeVisible();
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    const lines = within(dialog).getAllByRole('listitem');
+    expect(lines.map((line) => line.textContent)).toEqual([
+      'main',
+      'feature/news',
+    ]);
+    expect(within(lines[0]).getByRole('button')).toHaveAttribute(
+      'aria-current',
+      'true'
+    );
+
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'Search branches' }),
+      'news'
+    );
+    expect(
+      within(dialog)
+        .getAllByRole('listitem')
+        .map((line) => line.textContent)
+    ).toEqual(['feature/news']);
     await user.click(
       within(dialog).getByRole('button', { name: 'Full screen' })
     );
@@ -408,7 +421,7 @@ describe('branches', () => {
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
     await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
-    const dialog = await screen.findByRole('dialog', { name: 'Switch branch' });
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
     expect(within(dialog).getByRole('status')).toHaveTextContent(
       'Save or discard your changes first'
     );

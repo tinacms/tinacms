@@ -75,10 +75,9 @@ describe('Branch switcher states', () => {
 describe('Save progress states', () => {
   it.each(saveProgressStates)('renders $name', ({ props }) => {
     render(<SaveProgress {...props} />);
-    expect(screen.getByRole('status')).toHaveAttribute(
-      'data-placement',
-      props.placement
-    );
+    expect(
+      screen.getByRole('region', { name: 'Save progress' })
+    ).toHaveAttribute('data-placement', props.placement);
   });
 });
 
