@@ -96,8 +96,9 @@ const fieldDepth = (address: string): number =>
 export const itemOpensNextLevel = (itemAddress: string): boolean =>
   fieldDepth(itemAddress) + 1 >= DRILL_DEPTH;
 
-// The one place that decides whether a field drills in: the plugin's own
-// answer first, then the depth rule.
+// The one place that decides whether a field drills in. From level 3 down every
+// drillable field drills in, whatever its own answer. Above that, the plugin's
+// answer wins.
 export const drillsInAt = (
   descriptor: FieldDescriptor | undefined,
   node: FieldSchema,
@@ -105,7 +106,8 @@ export const drillsInAt = (
 ): boolean => {
   const metadata = descriptor?.metadata;
   if (metadata?.drillable !== true) return false;
-  return metadata.drillsIn?.(node) ?? fieldDepth(address) >= DRILL_DEPTH;
+  if (fieldDepth(address) >= DRILL_DEPTH) return true;
+  return metadata.drillsIn?.(node) ?? false;
 };
 
 export const levelDrillsIn = (
