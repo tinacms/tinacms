@@ -51,6 +51,12 @@ function ItemList() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
   const frame = useFieldFrame();
+  const registry = useFieldRegistry();
+  const ListView = isScalarArray(field)
+    ? registry.get(field.of.type)?.ListView
+    : undefined;
+
+  if (ListView) return <ListView />;
 
   return (
     <FieldWrapper {...frame}>

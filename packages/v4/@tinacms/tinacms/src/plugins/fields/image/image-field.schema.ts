@@ -1,10 +1,17 @@
 import { type ZodType, z } from 'zod';
+import { invariant } from '../../../core/invariant';
 import type { BaseFieldSchema, FieldSchema } from '../../../core/schema/types';
 
 export const IMAGE_FIELD_TYPE = 'image';
 
+export const IMAGE_COVER_LOOKS = ['wide', 'tall'] as const;
+
+export type ImageCoverLook = (typeof IMAGE_COVER_LOOKS)[number];
+
 export interface ImageFieldSchema extends BaseFieldSchema {
   type: typeof IMAGE_FIELD_TYPE;
+  /** Shows the picture larger: `wide` is 16:9, `tall` is 4:3. Has no effect on the items of a list of images. */
+  cover?: ImageCoverLook;
 }
 
 export const image = (
@@ -25,6 +32,12 @@ export const isMediaPath = (value: string): boolean =>
 // The shape of the value only. `required` is a validator the collection
 // attaches.
 export const imageSchema = (node: FieldSchema): ZodType => {
+  const { cover } = node as ImageFieldSchema;
+  invariant(
+    cover === undefined || IMAGE_COVER_LOOKS.includes(cover),
+    'image-field-schema-invalid',
+    `The image field "${node.name}" needs "cover" to be "wide" or "tall".`
+  );
   const message = `${labelOf(node)} must be a media path, like posts/hero.jpg`;
   return z.preprocess(
     (value) => (value === '' || value == null ? undefined : value),

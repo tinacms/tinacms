@@ -58,7 +58,17 @@
           {
             "name": "heroImage",
             "label": "Hero image",
+            "cover": "wide",
             "type": "image"
+          },
+          {
+            "name": "gallery",
+            "label": "Gallery",
+            "of": {
+              "name": "image",
+              "type": "image"
+            },
+            "type": "array"
           },
           {
             "name": "stars",
