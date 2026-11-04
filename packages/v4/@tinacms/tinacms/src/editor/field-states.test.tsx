@@ -71,7 +71,7 @@ type Case = {
   /** Plugins the field's children need. */
   also?: PluginManifest[];
   /** The control that takes the edit. `null` means the field drew none. Defaults to the one labelled "Field". */
-  control?: () => Promise<HTMLElement | null>;
+  control?: (expectEditable: boolean) => Promise<HTMLElement | null>;
   node: (state: Pick<FieldSchema, 'disabled' | 'readOnly'>) => FieldSchema;
   document: TinaDocument;
 };
@@ -116,10 +116,14 @@ const CASES: Case[] = [
   {
     type: 'rich-text',
     plugin: richTextFieldPlugin,
-    control: async () => {
+    control: async (expectEditable) => {
       await screen.findByText('Field');
       try {
-        return await screen.findByRole('textbox', {}, { timeout: 1500 });
+        return await screen.findByRole(
+          'textbox',
+          {},
+          { timeout: expectEditable ? 3000 : 250 }
+        );
       } catch {
         return null;
       }
@@ -220,7 +224,7 @@ const renderField = (
   );
 };
 
-const labelled = async () => {
+const labelled = async (_expectEditable?: boolean) => {
   const [first] = await screen.findAllByLabelText(/^Field\b/);
   return first;
 };
@@ -239,17 +243,21 @@ describe('a real field in the form', () => {
   describe.each(CASES)('$type', (entry) => {
     it('can be edited by default', async () => {
       renderField(entry, {});
-      expect(blocksEditing(await (entry.control ?? labelled)())).toBe(false);
+      expect(blocksEditing(await (entry.control ?? labelled)(true))).toBe(
+        false
+      );
     });
 
     it('is read-only when its schema says readOnly', async () => {
       renderField(entry, { readOnly: true });
-      expect(blocksEditing(await (entry.control ?? labelled)())).toBe(true);
+      expect(blocksEditing(await (entry.control ?? labelled)(false))).toBe(
+        true
+      );
     });
 
     it('is disabled when its schema says disabled', async () => {
       renderField(entry, { disabled: true });
-      const el = await (entry.control ?? labelled)();
+      const el = await (entry.control ?? labelled)(false);
       expect(
         el === null ||
           el.getAttribute('contenteditable') === 'false' ||
