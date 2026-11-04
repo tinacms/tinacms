@@ -5,7 +5,7 @@ import type { FieldSchema } from '../core/schema/types';
 import { useStore } from 'zustand';
 import { useFormStore } from '../form/form-store';
 import { DrillInField } from './drill-in-field';
-import { DRILL_DEPTH, fieldDepth } from './form-view-state';
+import { drillsInAt } from './form-view-state';
 import {
   FieldAddressContext,
   FieldSchemaContext,
@@ -48,9 +48,7 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     (state) => state.openLevels.at(-1)?.address
   );
   const drills =
-    descriptor.metadata?.drillable === true &&
-    fieldDepth(address) >= DRILL_DEPTH &&
-    openAddress !== address;
+    drillsInAt(descriptor, node, address) && openAddress !== address;
   // Widgets own their input, so the help text is linked from here: the input
   // is the element with the field's id, or the group named by the field label.
   const frame = useRef<HTMLDivElement>(null);
@@ -62,7 +60,9 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     target?.setAttribute('aria-describedby', `${address}-help`);
   }, [address, node.description]);
 
-  const Component = drills ? DrillInField : descriptor.Component;
+  const Component = drills
+    ? (descriptor.DrillInComponent ?? DrillInField)
+    : descriptor.Component;
   return (
     <FieldAddressContext value={address}>
       <FieldSchemaContext value={node}>

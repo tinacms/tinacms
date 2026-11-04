@@ -554,6 +554,42 @@ describe('compileSchema array options', () => {
     ).toThrow(/"picker" takes/);
   });
 
+  it('rejects an object display it does not know, naming the object', () => {
+    const objectPlugins = [...plugins, fieldPlugin('object', 1)];
+    const object = (extra: object) => [
+      { name: 'seo', type: 'object', fields: [], ...extra } as FieldSchema,
+    ];
+    expect(() =>
+      compileSchema(configWith(object({ display: 'tabs' }), objectPlugins))
+    ).toThrow(/object "seo".*"display" to "tabs"/);
+    for (const display of ['fieldset', 'collapsible', 'drillIn']) {
+      expect(() =>
+        compileSchema(configWith(object({ display }), objectPlugins))
+      ).not.toThrow();
+    }
+  });
+
+  it('treats an omitted or undefined object display as unset', () => {
+    const objectPlugins = [...plugins, fieldPlugin('object', 1)];
+    for (const extra of [{}, { display: undefined }] satisfies object[]) {
+      expect(() =>
+        compileSchema(
+          configWith(
+            [
+              {
+                name: 'seo',
+                type: 'object',
+                fields: [],
+                ...extra,
+              } as unknown as FieldSchema,
+            ],
+            objectPlugins
+          )
+        )
+      ).not.toThrow();
+    }
+  });
+
   it('leaves picker and of to a non-array field that defines them', () => {
     expect(() =>
       compileSchema(

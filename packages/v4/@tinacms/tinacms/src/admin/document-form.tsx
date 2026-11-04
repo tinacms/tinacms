@@ -21,6 +21,7 @@ import { useStore } from 'zustand';
 import { type FormScope, FormScopeContext } from '../editor/context';
 import { Field, FieldNode } from '../editor/field';
 import {
+  drillsInAt,
   fieldsAlong,
   holdsRevealedError,
   levelsFor,
@@ -138,7 +139,8 @@ function ActiveFieldLevels({ scope }: { scope: FormScope }) {
       address,
       collection.fields,
       (path) => getValues(path),
-      (node) => registry.get(node.type)?.metadata?.drillable === true
+      (step) =>
+        drillsInAt(registry.get(step.node.type), step.node, step.address)
     );
     const top = openLevels.at(-1)?.address;
     const sameLevels =

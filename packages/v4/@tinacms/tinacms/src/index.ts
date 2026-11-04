@@ -92,6 +92,7 @@ export type {
   BooleanFieldSchema,
   DatetimeFieldSchema,
   NumberFieldSchema,
+  ObjectDisplay,
   RichTextFieldSchema,
   RichTextTemplate,
   StringFieldSchema,
