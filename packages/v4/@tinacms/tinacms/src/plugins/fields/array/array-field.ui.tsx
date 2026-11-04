@@ -176,6 +176,14 @@ function useAfterChange(
 const focusAfterRemove = (index: number, left: number): Pending['focus'] =>
   left === 0 ? 'add' : Math.min(index, left - 1);
 
+interface InsertPicker {
+  /** The card whose menu opened the picker. */
+  openerId: string;
+  where: 'above' | 'below';
+  /** Changes on every open, so reopening remounts the picker. */
+  run: number;
+}
+
 function ObjectItems({
   address,
   field,
@@ -198,10 +206,10 @@ function ObjectItems({
   useWatch({ control, name: address });
   const flat = useFormErrors(useFormId());
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
-  const [picking, setPicking] = useState<number | null>(null);
+  const [inserting, setInserting] = useState<InsertPicker | null>(null);
   const [adding, setAdding] = useState(false);
-  const [insertRun, setInsertRun] = useState(0);
-  const insertOrigin = useRef<number | null>(null);
+  const insertRuns = useRef(0);
+  const refocusOpener = useRef<string | null>(null);
   const { listRef, afterChange } = useAfterChange(items, (index) =>
     showItem(index)
   );
@@ -246,17 +254,30 @@ function ObjectItems({
     if (activation) openOnActivation(activation.address);
   }, [activation]);
 
-  // Cancelling an insert-at picker returns focus to the card whose menu opened it.
+  // The insert picker follows its opener card by id, so a move or remove while it is open cannot shift it.
+  const openerIndex = inserting
+    ? items.findIndex((item) => item.id === inserting.openerId)
+    : -1;
+  const pickAt =
+    inserting && openerIndex >= 0
+      ? openerIndex + (inserting.where === 'below' ? 1 : 0)
+      : null;
   useEffect(() => {
-    const origin = insertOrigin.current;
-    if (picking !== null || origin === null) return;
-    insertOrigin.current = null;
+    if (inserting && openerIndex < 0) setInserting(null);
+  }, [inserting, openerIndex]);
+
+  // Cancel, Escape and a refused pick return focus to the card whose menu opened the picker.
+  useEffect(() => {
+    const openerId = refocusOpener.current;
+    if (inserting || openerId === null) return;
+    refocusOpener.current = null;
+    const index = items.findIndex((item) => item.id === openerId);
     const cards = Array.from(listRef.current?.children ?? []).filter((child) =>
       child.hasAttribute('data-array-item')
     );
-    const grip = cards[origin]?.querySelector('[data-grip]');
+    const grip = cards[index]?.querySelector('[data-grip]');
     if (grip instanceof HTMLElement) grip.focus();
-  }, [picking, listRef]);
+  }, [inserting, items, listRef]);
 
   const seed = (defaultItem: TinaDocument | undefined, fields: FieldSchema[]) =>
     seedItem(defaultItem, fields, { documentPath, registry });
@@ -276,15 +297,19 @@ function ObjectItems({
     const list: unknown = getValues(address);
     return max !== undefined && Array.isArray(list) && list.length >= max;
   };
+  const cancelInsert = () => {
+    refocusOpener.current = inserting?.openerId ?? null;
+    setInserting(null);
+  };
   const insertAt = (index: number, template?: ArrayTemplateSchema) => {
-    insertOrigin.current = null;
     if (atMax()) {
-      setPicking(null);
+      cancelInsert();
       return;
     }
+    refocusOpener.current = null;
     afterChange({ open: index, focus: index });
     insert(index, seedFor(template));
-    setPicking(null);
+    setInserting(null);
   };
   const add = (template?: ArrayTemplateSchema) => {
     if (atMax()) return;
@@ -388,8 +413,8 @@ function ObjectItems({
                 onOpenChange={(next) => {
                   setAdding(next);
                   if (next) {
-                    insertOrigin.current = null;
-                    setPicking(null);
+                    refocusOpener.current = null;
+                    setInserting(null);
                   }
                 }}
                 onPick={add}
@@ -398,16 +423,16 @@ function ObjectItems({
           : undefined
       }
       inserting={
-        picking !== null && isTemplatesArray(field)
+        inserting && pickAt !== null && isTemplatesArray(field)
           ? {
-              index: picking,
-              openId: insertRun,
+              index: pickAt,
+              openId: inserting.run,
               content: (
                 <TemplatePicker
                   field={field}
                   inline
-                  onPick={(template) => insertAt(picking, template)}
-                  onCancel={() => setPicking(null)}
+                  onPick={(template) => insertAt(pickAt, template)}
+                  onCancel={cancelInsert}
                 />
               ),
             }
@@ -415,13 +440,14 @@ function ObjectItems({
       }
       onMove={moveTo}
       onInsert={(index, where) => {
-        const at = insertTarget(index, where);
         if (isTemplatesArray(field)) {
+          const openerId = items[index]?.id;
+          if (!openerId) return;
           setAdding(false);
-          setPicking(at);
-          setInsertRun((run) => run + 1);
-          insertOrigin.current = index;
-        } else insertAt(at);
+          refocusOpener.current = null;
+          insertRuns.current += 1;
+          setInserting({ openerId, where, run: insertRuns.current });
+        } else insertAt(insertTarget(index, where));
       }}
       onDuplicate={(index) => {
         if (atMax()) return;
@@ -448,7 +474,6 @@ interface TemplatePickerProps {
   onCancel?: () => void;
 }
 
-// Maps templates to plain options for the view part, which reads no store.
 function TemplatePicker({
   field,
   onPick,
@@ -459,7 +484,7 @@ function TemplatePicker({
   inline,
   onCancel,
 }: TemplatePickerProps) {
-  const look = pickerOf(field) === 'grid' ? 'grid' : 'list';
+  const look = pickerOf(field);
   const options: BlockOption[] = field.templates.map((template) => ({
     name: template.name,
     label: templateTitle(template),

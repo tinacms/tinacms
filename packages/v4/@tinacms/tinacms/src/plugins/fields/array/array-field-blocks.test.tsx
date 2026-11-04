@@ -319,6 +319,96 @@ describe('Blocks field picker', () => {
     }
   );
 
+  describe('insert picker while the list changes', () => {
+    const twoHeroes = {
+      blocks: [
+        { _template: 'hero', headline: 'A' },
+        { _template: 'hero', headline: 'B' },
+      ],
+    };
+    const headlines = () =>
+      (valueOf('blocks') as TinaDocument[]).map(
+        (block) => block.headline ?? block._template
+      );
+    const act = async (blocks: HTMLElement, item: number, action: RegExp) => {
+      await userEvent.click(
+        within(blocks).getByRole('button', { name: `Actions for Item ${item}` })
+      );
+      await userEvent.click(
+        await screen.findByRole('menuitem', { name: action })
+      );
+    };
+    const openInsert = async (item: number, action: RegExp) => {
+      const blocks = await list('Blocks');
+      await act(blocks, item, action);
+      const inline = await within(blocks).findByRole('region', {
+        name: 'Choose a block',
+      });
+      return { blocks, inline };
+    };
+    const gripOf = (blocks: HTMLElement, item: number) =>
+      within(blocks).getByRole('button', { name: `Move Item ${item}` });
+    // The picker remounts when its gap changes, so look it up again each time.
+    const picker = (blocks: HTMLElement) =>
+      within(blocks).findByRole('region', { name: 'Choose a block' });
+
+    it('Cancel after Move up focuses the grip of the card that opened the picker', async () => {
+      renderPage(twoHeroes);
+      const { blocks } = await openInsert(2, /^Insert above/);
+      await act(blocks, 2, /^Move up/);
+      await waitFor(() => expect(headlines()).toEqual(['B', 'A']));
+      await userEvent.click(
+        within(await picker(blocks)).getByRole('button', { name: 'Cancel' })
+      );
+      await waitFor(() => expect(gripOf(blocks, 1)).toHaveFocus());
+      expect(within(blocks).queryByRole('region')).toBeNull();
+    });
+
+    it('Cancel after another card is removed focuses the opener grip at its new position', async () => {
+      renderPage(twoHeroes);
+      const { blocks } = await openInsert(2, /^Insert above/);
+      await act(blocks, 1, /^Remove/);
+      await waitFor(() => expect(headlines()).toEqual(['B']));
+      await userEvent.click(
+        within(await picker(blocks)).getByRole('button', { name: 'Cancel' })
+      );
+      await waitFor(() => expect(gripOf(blocks, 1)).toHaveFocus());
+    });
+
+    it('closes the picker when its opener card is removed, with focus on a card, never the body', async () => {
+      renderPage(twoHeroes);
+      const { blocks } = await openInsert(2, /^Insert above/);
+      await act(blocks, 2, /^Remove/);
+      await waitFor(() =>
+        expect(within(blocks).queryByRole('region')).toBeNull()
+      );
+      await waitFor(() => expect(gripOf(blocks, 1)).toHaveFocus());
+    });
+
+    it('a pick after another card is removed lands in the opener gap and focuses the new block', async () => {
+      renderPage(twoHeroes);
+      const { blocks } = await openInsert(2, /^Insert below/);
+      await act(blocks, 1, /^Remove/);
+      await waitFor(() => expect(headlines()).toEqual(['B']));
+      await userEvent.click(
+        within(await picker(blocks)).getByRole('button', { name: 'Add Quote' })
+      );
+      await waitFor(() => expect(headlines()).toEqual(['B', 'quote']));
+      await waitFor(() => expect(gripOf(blocks, 2)).toHaveFocus());
+    });
+
+    it('a pick after Move up lands in the gap next to the moved opener', async () => {
+      renderPage(twoHeroes);
+      const { blocks } = await openInsert(2, /^Insert below/);
+      await act(blocks, 2, /^Move up/);
+      await waitFor(() => expect(headlines()).toEqual(['B', 'A']));
+      await userEvent.click(
+        within(await picker(blocks)).getByRole('button', { name: 'Add Quote' })
+      );
+      await waitFor(() => expect(headlines()).toEqual(['B', 'quote', 'A']));
+    });
+  });
+
   it('keeps focus in the insert picker search box after Clear search', async () => {
     renderPage({ blocks: [{ _template: 'hero', headline: 'A' }] });
     const blocks = await list('Blocks');

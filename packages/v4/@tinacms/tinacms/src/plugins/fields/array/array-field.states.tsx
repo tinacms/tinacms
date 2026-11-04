@@ -64,7 +64,12 @@ const blockOptions: BlockOption[] = [
 const withPreview = (options: BlockOption[]): BlockOption[] =>
   options.map((option) => ({
     ...option,
-    preview: <span className='aspect-video w-full rounded-sm bg-muted' />,
+    preview: (
+      <span
+        data-preview=''
+        className='aspect-video w-full rounded-sm bg-muted'
+      />
+    ),
   }));
 
 const blocksBase = {

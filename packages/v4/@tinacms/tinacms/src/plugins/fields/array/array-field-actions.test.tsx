@@ -494,6 +494,25 @@ describe('ArrayField focus and activation', () => {
     expect(valueOf('cappedBlocks')).toHaveLength(2);
   });
 
+  it('a pick refused at max closes the insert picker and returns focus to the opener grip', async () => {
+    renderPage({ cappedBlocks: [{ _template: 'hero', headline: 'One' }] });
+    await chooseAction('Capped blocks', 1, 'Insert above');
+    const group = await screen.findByRole('group', { name: 'Capped blocks' });
+    const inline = await within(group).findByRole('button', {
+      name: 'Add Hero',
+    });
+    await chooseAction('Capped blocks', 1, 'Duplicate');
+    await waitFor(() => expect(valueOf('cappedBlocks')).toHaveLength(2));
+    await userEvent.click(inline);
+    expect(valueOf('cappedBlocks')).toHaveLength(2);
+    await waitFor(() =>
+      expect(
+        within(group).getByRole('button', { name: 'Move Item 1' })
+      ).toHaveFocus()
+    );
+    expect(within(group).queryByRole('region')).toBeNull();
+  });
+
   it('turns the add button off with a reason when the list is full', async () => {
     renderPage({
       cappedBlocks: [

@@ -77,8 +77,10 @@ export interface ArrayFieldViewProps
   addSlot?: ReactNode | ((state: { disabled: boolean }) => ReactNode);
   /** Replaces the words shown for an empty list. */
   emptyText?: string;
-  /** A control drawn where a new item will go, such as the block picker. */
-  /** `openId` changes on every open, so reopening at the same index remounts `content`. */
+  /**
+   * A control drawn where a new item will go, such as the block picker.
+   * `openId` changes on every open, so reopening at the same index remounts `content`.
+   */
   inserting?: { index: number; openId?: number; content: ReactNode };
   onMove?: (from: number, to: number) => void;
   onInsert?: (index: number, where: 'above' | 'below') => void;
@@ -309,6 +311,7 @@ export function ArrayFieldView({
     onMove
   );
 
+  const insertKey = `inserting-${inserting?.index}-${inserting?.openId ?? 0}`;
   const cards = items.flatMap((item, index) => {
     const card = (
       <Card
@@ -333,20 +336,11 @@ export function ArrayFieldView({
       />
     );
     return inserting?.index === index
-      ? [
-          <div key={`inserting-${inserting.index}-${inserting.openId ?? 0}`}>
-            {inserting.content}
-          </div>,
-          card,
-        ]
+      ? [<div key={insertKey}>{inserting.content}</div>, card]
       : [card];
   });
   if (inserting && inserting.index >= items.length) {
-    cards.push(
-      <div key={`inserting-${inserting.index}-${inserting.openId ?? 0}`}>
-        {inserting.content}
-      </div>
-    );
+    cards.push(<div key={insertKey}>{inserting.content}</div>);
   }
 
   return (

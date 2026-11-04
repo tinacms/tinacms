@@ -25,8 +25,7 @@ const listCardVariants = cva(
     variants: {
       state: {
         rest: 'border-input has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
-        invalid:
-          'border-destructive has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
+        invalid: 'border-destructive has-focus-visible:shadow-focus-field',
         readOnly:
           'border-border-subtle bg-muted shadow-none has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
         disabled: 'border-border shadow-none',

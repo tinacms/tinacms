@@ -264,9 +264,11 @@ Each item is a List card in a card list.
 - The Add control ends the list. A list of strings or numbers with no
   `defaultItem` uses a box: type a value, press Enter. Any other list uses a
   button. A block array shows "Add a block".
-- An empty list says so: "No blocks." for a block array, "This list is empty. Add the first item below." for any other editable array
-  and "This list is empty." when it is read-only. A read-only list has no container, no Add control and no
-  menu. A disabled list has no hover and no menu.
+- An empty list says so. A block array says "No blocks.". Any other editable
+  array says "This list is empty. Add the first item below.". A read-only array
+  says "This list is empty.".
+- A read-only list has no container, no Add control and no menu. A disabled
+  list has no hover and no menu.
 
 ### Block picker
 
@@ -321,7 +323,9 @@ For a block array, Insert above and Insert below open the same picker in the
 list at that place, with a Cancel button. The chosen template goes in there.
 Focus goes to the search box. Escape or Cancel closes the picker, inserts
 nothing and returns focus to the grip of the card whose menu opened it. Opening
-the Add panel closes the insert picker, and the other way round.
+the Add panel closes the insert picker, and the other way round. The picker
+follows the card that opened it: Move up, Move down and Remove on other cards
+keep the gap next to that card. Removing that card closes the picker.
 
 ### Item fields
 

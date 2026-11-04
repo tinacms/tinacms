@@ -344,12 +344,14 @@ describe('blocks states', () => {
     expect(panel.querySelector('img')).toBeNull();
   });
 
-  it('shows two columns of previews in the open visual picker', () => {
+  it('shows a preview and a name in each option of the open visual picker', () => {
     render(<ArrayFieldView {...state('blocks visual picker open')} />);
     const panel = screen.getByRole('dialog', { name: 'Choose a block' });
-    expect(
-      within(panel).getAllByRole('button', { name: /^Add / })
-    ).toHaveLength(4);
+    const options = within(panel).getAllByRole('button', { name: /^Add / });
+    expect(options).toHaveLength(4);
+    for (const option of options) {
+      expect(option.querySelector('[data-preview]')).not.toBeNull();
+    }
   });
 });
 
