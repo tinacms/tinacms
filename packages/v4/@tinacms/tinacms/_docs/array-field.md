@@ -273,7 +273,9 @@ has no group headings.
 - Search matches the template label, without regard to case. When nothing matches, the panel says "No blocks match."
   The search box is empty each time the panel opens.
 - The panel is at most `--picker-max-height` (320px) tall, and less when the
-  window has less room. The title and the search box stay in place, and the
+  window has less room, but never less than `--picker-min-height` (240px), so
+  the results keep room when the on-screen keyboard shrinks the viewport. The
+  panel moves above or below the button when the viewport resizes. The title and the search box stay in place, and the
   list scrolls inside the panel. While a search narrows the list, the panel keeps
   its top and height.
 - The look follows `picker`: `list` shows the label in a row, `grid` shows the

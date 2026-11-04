@@ -4,6 +4,9 @@ const PAGE = `/#/collections/page/${encodeURIComponent('content/pages/home.mdx')
 const OPTION = /^Add Template/;
 const LAST = /^Add Template number 10 /;
 const PANEL_MAX_HEIGHT = 320;
+const PANEL_MIN_HEIGHT = 240;
+const OPTION_ROW = 36;
+const KEYBOARD_VIEWPORT_HEIGHT = 420;
 const RING = 5;
 
 const looks = [
@@ -182,6 +185,38 @@ for (const viewport of viewports) {
         const after = await boxOf(panel);
         expect(after.y).toBeCloseTo(before.y, 0);
         expect(after.height).toBeCloseTo(before.height, 0);
+      });
+
+      test('the results stay visible and usable when the viewport shrinks to keyboard size while the panel is open', async ({
+        page,
+      }) => {
+        const panel = await openPicker(page, trigger);
+        await page.setViewportSize({
+          width: viewport.width,
+          height: KEYBOARD_VIEWPORT_HEIGHT,
+        });
+        await settled(panel);
+        const results = panel.locator('[data-slot=block-picker-results]');
+        expect((await boxOf(panel)).height).toBeGreaterThanOrEqual(
+          PANEL_MIN_HEIGHT - 1
+        );
+        expect((await boxOf(results)).height).toBeGreaterThan(OPTION_ROW);
+        const first = panel.getByRole('button', { name: OPTION }).first();
+        expect(await inside(first, results)).toBe(true);
+        const hit = await first.evaluate((el) => {
+          const r = el.getBoundingClientRect();
+          return el.contains(
+            document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)
+          );
+        });
+        expect(hit).toBe(true);
+        const last = panel.getByRole('button', { name: LAST });
+        const box = await boxOf(panel);
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height - 30);
+        await page.mouse.wheel(0, 5000);
+        await expect.poll(() => inside(last, results)).toBe(true);
+        await last.click();
+        await expect(panel).toBeHidden();
       });
 
       if (look === 'visual') {
