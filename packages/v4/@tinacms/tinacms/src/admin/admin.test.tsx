@@ -942,7 +942,7 @@ describe('TinaAdmin rail', () => {
   it.each([
     ['home', 'Pick a collection to start editing.'],
     ['changes', 'No unsaved changes.'],
-    ['media', 'No media library is installed.'],
+    ['media', 'Pick a file from the Media panel.'],
   ])('shows a placeholder for a deep link to %s', async (view, text) => {
     window.location.hash = `#/${view}`;
     render(
@@ -997,5 +997,63 @@ describe('TinaAdmin rail', () => {
       await screen.findByRole('button', { name: 'Collections' })
     );
     expect(await screen.findByText('No collections yet.')).toBeVisible();
+  });
+
+  it('moves between the rows with the arrow keys, Home and End', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    const [home] = await railButtons();
+    home.focus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('button', { name: 'Collections' })).toHaveFocus();
+    await user.keyboard('{End}');
+    expect(
+      screen.getByRole('link', { name: /Help & docs/ })
+    ).toBeInTheDocument();
+    await user.keyboard('{Home}');
+    expect(home).toHaveFocus();
+    await user.keyboard('{ArrowUp}');
+    expect(home).toHaveFocus();
+  });
+
+  it('keeps unsaved edits when a rail row is clicked, and still blocks a reload', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+
+    await user.click(screen.getByRole('button', { name: /^Home/ }));
+    expect(reloadIsBlocked()).toBe(true);
+    expect(
+      screen.getByRole('button', { name: 'Changes, 1 unsaved' })
+    ).toBeVisible();
+  });
+
+  it('marks the last opened document in the navigator after Back', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    const [back] = within(
+      await screen.findByRole('complementary', { name: 'Document form' })
+    ).getAllByRole('button');
+    await user.click(back);
+    expect(
+      await screen.findByRole('button', { name: /hello\.mdx/ })
+    ).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('opens the Media panel beside the rail, with the library in the main area', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Media' }));
+    const panel = await screen.findByRole('complementary', {
+      name: 'Media panel',
+    });
+    expect(
+      within(panel).getByRole('button', { name: 'Media library' })
+    ).toHaveAttribute('aria-current', 'page');
+    expect(await screen.findByText(/media library at/)).toBeInTheDocument();
   });
 });

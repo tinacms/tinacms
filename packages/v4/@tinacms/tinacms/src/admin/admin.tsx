@@ -27,7 +27,7 @@ import { TinaProvider } from '../editor/provider';
 import { AuthGate } from './auth-gate';
 import { DocumentForm } from './document-form';
 import { DocumentScope } from './document-scope';
-import { CollectionsNavigator } from './navigator';
+import { CollectionsNavigator, MediaPanel } from './navigator';
 import { useDirtyFormCount } from '../form/form-store';
 import { AdminRail, MEDIA_SCREEN } from './rail';
 import { AdminErrorBoundary } from './error-boundary';
@@ -267,6 +267,26 @@ function AdminShell({
 
   const goToCollections = () => navigate(COLLECTIONS_ROUTE);
   const changes = useDirtyFormCount();
+  const hasMediaScreen = screens.some(({ name }) => name === MEDIA_SCREEN);
+  const showMediaPanel =
+    route.view === 'media' ||
+    (route.view === 'screen' && route.screen === MEDIA_SCREEN);
+
+  // The navigator keeps the last opened document selected after Back.
+  const [lastOpen, setLastOpen] = useState<{
+    collection: string;
+    path: string;
+  } | null>(null);
+  useEffect(() => {
+    if (route.view === 'document') {
+      setLastOpen({ collection: route.collection, path: route.path });
+    }
+  }, [route]);
+  const selectedPath =
+    openPath ??
+    (lastOpen && lastOpen.collection === activeCollectionName
+      ? lastOpen.path
+      : undefined);
   const showNavigator =
     route.view === 'collections' ||
     route.view === 'collection' ||
@@ -290,13 +310,23 @@ function AdminShell({
             route={route}
             navigate={navigate}
             sections={globalNav}
-            hasMediaScreen={screens.some(({ name }) => name === MEDIA_SCREEN)}
+            hasMediaScreen={hasMediaScreen}
           />
         </Sidebar>
+
+        {showMediaPanel ? (
+          <MediaPanel
+            hasLibrary={hasMediaScreen}
+            open={route.view === 'screen'}
+            navigate={navigate}
+            onClose={() => navigate({ view: 'home' })}
+          />
+        ) : null}
 
         {showNavigator ? (
           <CollectionsNavigator
             collections={schema.collections}
+            selectedPath={selectedPath}
             route={route}
             navigate={navigate}
             missingCollection={
@@ -321,7 +351,7 @@ function AdminShell({
           </MissingPanel>
         ) : route.view === 'media' ? (
           <MissingPanel title='Media' onClose={goToCollections}>
-            No media library is installed.
+            Pick a file from the Media panel.
           </MissingPanel>
         ) : route.view === 'changes' ? (
           <MissingPanel title='Changes' onClose={goToCollections}>
