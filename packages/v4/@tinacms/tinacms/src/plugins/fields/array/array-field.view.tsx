@@ -78,7 +78,8 @@ export interface ArrayFieldViewProps
   /** Replaces the words shown for an empty list. */
   emptyText?: string;
   /** A control drawn where a new item will go, such as the block picker. */
-  inserting?: { index: number; content: ReactNode };
+  /** `openId` changes on every open, so reopening at the same index remounts `content`. */
+  inserting?: { index: number; openId?: number; content: ReactNode };
   onMove?: (from: number, to: number) => void;
   onInsert?: (index: number, where: 'above' | 'below') => void;
   onDuplicate?: (index: number) => void;
@@ -333,14 +334,18 @@ export function ArrayFieldView({
     );
     return inserting?.index === index
       ? [
-          <div key={`inserting-${inserting.index}`}>{inserting.content}</div>,
+          <div key={`inserting-${inserting.index}-${inserting.openId ?? 0}`}>
+            {inserting.content}
+          </div>,
           card,
         ]
       : [card];
   });
   if (inserting && inserting.index >= items.length) {
     cards.push(
-      <div key={`inserting-${inserting.index}`}>{inserting.content}</div>
+      <div key={`inserting-${inserting.index}-${inserting.openId ?? 0}`}>
+        {inserting.content}
+      </div>
     );
   }
 

@@ -265,39 +265,59 @@ describe('Blocks field picker', () => {
     );
   });
 
-  it('reopens the insert picker with an empty search and focus in it when Insert is chosen on a second card', async () => {
-    renderPage({
-      blocks: [
-        { _template: 'hero', headline: 'A' },
-        { _template: 'hero', headline: 'B' },
-      ],
-    });
-    const blocks = await list('Blocks');
-    const insertFrom = async (item: number, where: RegExp) => {
-      await userEvent.click(
-        within(blocks).getByRole('button', { name: `Actions for Item ${item}` })
+  it.each([
+    [
+      'Item 1 below, then Item 2 above (same position)',
+      1,
+      /^Insert below/,
+      2,
+      /^Insert above/,
+    ],
+    [
+      'Item 1 above twice (same action)',
+      1,
+      /^Insert above/,
+      1,
+      /^Insert above/,
+    ],
+  ])(
+    'reopens the insert picker with an empty search and focus in it: %s',
+    async (_name, firstItem, firstWhere, secondItem, secondWhere) => {
+      renderPage({
+        blocks: [
+          { _template: 'hero', headline: 'A' },
+          { _template: 'hero', headline: 'B' },
+        ],
+      });
+      const blocks = await list('Blocks');
+      const insertFrom = async (item: number, where: RegExp) => {
+        await userEvent.click(
+          within(blocks).getByRole('button', {
+            name: `Actions for Item ${item}`,
+          })
+        );
+        await userEvent.click(
+          await screen.findByRole('menuitem', { name: where })
+        );
+      };
+      await insertFrom(firstItem, firstWhere);
+      const first = await within(blocks).findByRole('region', {
+        name: 'Choose a block',
+      });
+      await userEvent.type(within(first).getByRole('searchbox'), 'call');
+      await insertFrom(secondItem, secondWhere);
+      const second = await within(blocks).findByRole('region', {
+        name: 'Choose a block',
+      });
+      const search = within(second).getByRole('searchbox');
+      expect(search).toHaveValue('');
+      await waitFor(() => expect(search).toHaveFocus());
+      await userEvent.keyboard('{Escape}');
+      await waitFor(() =>
+        expect(within(blocks).queryByRole('region')).toBeNull()
       );
-      await userEvent.click(
-        await screen.findByRole('menuitem', { name: where })
-      );
-    };
-    await insertFrom(1, /^Insert above/);
-    const first = await within(blocks).findByRole('region', {
-      name: 'Choose a block',
-    });
-    await userEvent.type(within(first).getByRole('searchbox'), 'call');
-    await insertFrom(2, /^Insert below/);
-    const second = await within(blocks).findByRole('region', {
-      name: 'Choose a block',
-    });
-    const search = within(second).getByRole('searchbox');
-    expect(search).toHaveValue('');
-    await waitFor(() => expect(search).toHaveFocus());
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() =>
-      expect(within(blocks).queryByRole('region')).toBeNull()
-    );
-  });
+    }
+  );
 
   it('keeps focus in the insert picker search box after Clear search', async () => {
     renderPage({ blocks: [{ _template: 'hero', headline: 'A' }] });

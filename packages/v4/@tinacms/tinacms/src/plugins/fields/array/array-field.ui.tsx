@@ -200,6 +200,7 @@ function ObjectItems({
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
   const [picking, setPicking] = useState<number | null>(null);
   const [adding, setAdding] = useState(false);
+  const [insertRun, setInsertRun] = useState(0);
   const insertOrigin = useRef<number | null>(null);
   const { listRef, afterChange } = useAfterChange(items, (index) =>
     showItem(index)
@@ -400,6 +401,7 @@ function ObjectItems({
         picking !== null && isTemplatesArray(field)
           ? {
               index: picking,
+              openId: insertRun,
               content: (
                 <TemplatePicker
                   field={field}
@@ -417,6 +419,7 @@ function ObjectItems({
         if (isTemplatesArray(field)) {
           setAdding(false);
           setPicking(at);
+          setInsertRun((run) => run + 1);
           insertOrigin.current = index;
         } else insertAt(at);
       }}
