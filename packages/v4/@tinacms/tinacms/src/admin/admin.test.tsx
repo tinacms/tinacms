@@ -1056,4 +1056,23 @@ describe('TinaAdmin rail', () => {
     ).toHaveAttribute('aria-current', 'page');
     expect(await screen.findByText(/media library at/)).toBeInTheDocument();
   });
+
+  it('says so when a collection has no documents', async () => {
+    store.page = [];
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Pages' }));
+    expect(await screen.findByText('No documents yet.')).toBeVisible();
+  });
+
+  it('closes an open collection when its row is clicked again, and the panel closes to Home', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await screen.findByRole('button', { name: /hello\.mdx/ });
+    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    expect(screen.queryByRole('button', { name: /hello\.mdx/ })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/home'));
+  });
 });
