@@ -205,6 +205,16 @@ const reloadIsBlocked = (): boolean => {
   return unload.defaultPrevented;
 };
 
+type User = ReturnType<typeof userEvent.setup>;
+
+const openDiscardConfirm = async (user: User) => {
+  await user.click(screen.getByRole('button', { name: 'Document actions' }));
+  await user.click(
+    await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+  );
+  return screen.findByRole('alertdialog', { name: 'Discard unsaved edits?' });
+};
+
 const FIXTURES: Record<string, DocumentEntry[]> = {
   post: [
     {
@@ -345,13 +355,17 @@ describe('TinaAdmin', () => {
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
-    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
     expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Second');
 
-    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
     const helloEntry = await screen.findByRole('button', {
       name: /hello\.mdx/,
     });
@@ -371,7 +385,10 @@ describe('TinaAdmin Save button', () => {
     renderAdmin();
     await openHello(user);
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Discard' })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    expect(
+      await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+    ).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('is busy while saving: one save, and it keeps focus', async () => {
@@ -444,7 +461,9 @@ describe('TinaAdmin unsaved changes', () => {
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
-    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
@@ -476,13 +495,33 @@ describe('TinaAdmin unsaved changes', () => {
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
 
-    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    const dialog = await openDiscardConfirm(user);
+    await user.click(within(dialog).getByRole('button', { name: 'Discard' }));
 
     await waitFor(() =>
       expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello')
     );
     expect(screen.getByRole('status')).toHaveTextContent('No changes');
     expect(reloadIsBlocked()).toBe(false);
+  });
+
+  it('opens the discard confirm on Cancel, and Cancel keeps the edits and returns focus to the menu button', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+
+    const dialog = await openDiscardConfirm(user);
+    expect(
+      within(dialog).getByRole('button', { name: 'Cancel' })
+    ).toHaveFocus();
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello!');
+    expect(
+      screen.getByRole('button', { name: 'Document actions' })
+    ).toHaveFocus();
   });
 });
 
@@ -810,26 +849,40 @@ describe('TinaAdmin stale drafts', () => {
   it('asks to resume or discard before the form can be edited', async () => {
     storeStaleDraft();
     const user = await openHello();
-    const dialog = await screen.findByRole('alertdialog', {
-      name: 'Resume your unsaved edits?',
-    });
+    const card = (
+      await screen.findByText('Resume your unsaved edits?')
+    ).closest<HTMLElement>('[data-slot="toast"]');
+    if (!card) throw new Error('The Resume prompt is not a toast');
+    expect(card).toBeVisible();
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(within(card).queryByRole('button', { name: 'Dismiss' })).toBeNull();
 
-    await user.click(
-      within(dialog).getByRole('button', { name: 'Resume edits' })
+    await user.click(screen.getByRole('button', { name: 'Resume' }));
+    await waitFor(() =>
+      expect(screen.queryByText('Resume your unsaved edits?')).toBeNull()
     );
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
       'Mine'
     );
   });
 
-  it('discards the stale draft from the dialog', async () => {
+  it('asks again before it discards the stale draft', async () => {
     storeStaleDraft();
     const user = await openHello();
-    const dialog = await screen.findByRole('alertdialog');
+    await screen.findByText('Resume your unsaved edits?');
 
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    const dialog = await screen.findByRole('alertdialog', {
+      name: 'Discard unsaved edits?',
+    });
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    expect(readDraft(helloFormId)).toBeDefined();
+
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
     await user.click(
-      within(dialog).getByRole('button', { name: 'Discard draft' })
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Discard',
+      })
     );
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello');

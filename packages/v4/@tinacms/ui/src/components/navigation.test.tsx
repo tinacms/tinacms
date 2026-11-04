@@ -15,6 +15,7 @@ const tools = [
   { value: 'fields', label: 'Fields' },
   { value: 'history', label: 'History' },
   { value: 'references', label: 'References' },
+  { value: 'translations', label: 'Translations' },
 ] as const;
 
 describe('Tabs', () => {
@@ -46,12 +47,12 @@ describe('Tabs', () => {
     );
     expect(screen.getByText('History panel')).toBeVisible();
     await user.keyboard('{End}');
-    expect(screen.getByRole('tab', { name: 'References' })).toHaveFocus();
+    expect(screen.getByRole('tab', { name: 'Translations' })).toHaveFocus();
     await user.keyboard('{Home}');
     expect(screen.getByRole('tab', { name: 'Fields' })).toHaveFocus();
     expect(onValueChange.mock.calls).toEqual([
       ['history'],
-      ['references'],
+      ['translations'],
       ['fields'],
     ]);
   });

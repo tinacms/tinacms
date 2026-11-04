@@ -215,7 +215,15 @@ describe('nested form levels', () => {
       screen.getByRole('navigation', { name: 'Field path' })
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+    );
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Discard',
+      })
+    );
     expect(screen.queryByRole('navigation', { name: 'Field path' })).toBeNull();
     expect(
       await screen.findByRole('button', { name: 'Open Three' })
