@@ -282,13 +282,11 @@ async function recordSavePhase(
   } catch (cause) {
     let message = 'Save failed.';
     if (cause instanceof Error && cause.message) message = cause.message;
-    setSavePhase(formId, {
-      phase: 'failed',
-      message,
-      ...(cause instanceof ContentError && cause.code === 'branch-not-found'
-        ? { reason: 'branch-gone' as const }
-        : {}),
-    });
+    if (cause instanceof ContentError && cause.code === 'branch-not-found') {
+      setSavePhase(formId, { phase: 'failed', message, reason: 'branch-gone' });
+    } else {
+      setSavePhase(formId, { phase: 'failed', message });
+    }
     throw cause;
   }
   setSavePhase(formId, { phase: 'saved' });
