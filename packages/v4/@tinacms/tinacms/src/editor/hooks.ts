@@ -45,6 +45,7 @@ import {
 } from '../rpc/proxy';
 import {
   FieldAddressContext,
+  FieldLockContext,
   FieldSchemaContext,
   type FormScope,
   FormScopeContext,
@@ -383,13 +384,14 @@ export function useFieldFrame({
 }: FieldFrameOptions = {}): Pick<
   FieldWrapperProps,
   'label' | 'htmlFor' | 'labelId' | 'required' | 'errors' | 'help' | 'helpId'
-> {
+> & { disabled: boolean; readOnly: boolean } {
   const address = useFieldAddress();
   const node = useFieldSchema();
   const { view } = useFormScope(
     'field-frame-outside-provider',
     'useFieldFrame'
   );
+  const lock = use(FieldLockContext);
   const labelable =
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
   const { errors } = useFormState({ name: address });
@@ -412,6 +414,8 @@ export function useFieldFrame({
     errors: [...shown],
     help: node.description,
     helpId: node.description ? `${address}-help` : undefined,
+    disabled: lock.disabled,
+    readOnly: lock.readOnly,
   };
 }
 

@@ -72,3 +72,14 @@ export const FormScopeContext = createContext<FormScope | null>(null);
 export const FieldAddressContext = createContext<FieldAddress | null>(null);
 
 export const FieldSchemaContext = createContext<FieldSchema | null>(null);
+
+/** Whether an enclosing field is disabled or read-only. The fields inside it are too. */
+export interface FieldLock {
+  readonly disabled: boolean;
+  readonly readOnly: boolean;
+}
+
+export const FieldLockContext = createContext<FieldLock>({
+  disabled: false,
+  readOnly: false,
+});
