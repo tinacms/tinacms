@@ -36,15 +36,18 @@ The config (`RichTextFieldSchema`, which extends `BaseFieldSchema`):
 | `templates` | `MdxTemplate[]` | The MDX components that an author can embed in the text. |
 | `overrides` | `ToolbarOverrides` | The toolbar buttons and the heading levels that the editor shows. |
 
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
+
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with
 > `validators`. Refer to
 > [Validation in two layers](./field-plugins.md#validation-in-two-layers).
 
 
-v3 also took a bare list of buttons under `toolbarOverride`. v4 drops it:
-`overrides.toolbar` takes the same list, and it is the only shape the editor
-reads. A v3 schema with `toolbarOverride: ['bold', 'italic']` becomes
+v3 also took a bare list of buttons under `toolbarOverride`. v4 has no
+`toolbarOverride` yet (pending a ruling in ADR-029). `overrides.toolbar` takes
+the same list: `toolbarOverride: ['bold', 'italic']` is
 `overrides: { toolbar: ['bold', 'italic'] }`.
 
 There is no `parser` option. Both of v3's values lose content through this
@@ -54,6 +57,13 @@ that as an empty body. `markdown` uses a stringifier that has no
 unset value — the only value — takes the path that both round-trips markdown
 and returns the original source for a body it could not parse. Add the option
 again, behind tests, if a real collection needs it.
+
+A rich-text `defaultValue` is written in stored form, which is the codec's source
+string. With the default codec, that is markdown:
+
+```ts
+t.richText({ name: 'body', defaultValue: 'Write something here.\n\n- First point' })
+```
 
 ## The codec: what the file holds, and what the editor edits
 
@@ -233,6 +243,31 @@ React 19. A compilation with those dependencies finds two React type identities.
 Then each `forwardRef` component fails the `ElementType` check, and the
 compilation gives approximately 94 errors. To prevent this, `tsconfig.json`
 points `react` and `react-dom` to the types in this package.
+
+## The frame and the state catalogue
+
+`rich-text-field.view.tsx` is the props-only view: it draws the frame and renders
+`RichEditor` itself. `rich-text-field.ui.tsx` feeds it from the form.
+`rich-text-field.states.ts` is the state catalogue, and
+`rich-text-field.states.test.tsx` renders every state in one `it.each`.
+
+| File | Role |
+|---|---|
+| `rich-text-field.view.tsx` | Label, border, hover, focus ring, invalid, read-only and body layout. |
+| `rich-text-field.states.ts` | Empty, filled, too long, required, invalid, disabled, read-only, embed and body states. |
+| `rich-text-field.states.test.tsx` | Renders each state and checks the structure, not pixels. |
+
+- **Framed** (the live layout, also for `isBody`): the text stops growing at
+  `max-h-60` and scrolls beneath a toolbar that stays put.
+- **Read-only**: the toolbar is hidden, the fill is muted, and the text, the
+  embed menu, the embed label and the Enter hotkey do nothing.
+- **Disabled**: read-only plus `inert` and `aria-disabled`, so the toolbar is
+  still drawn but takes no focus, pointer or tooltip.
+- **Body** (catalogue only): no frame, the label is `sr-only`, errors and
+  warnings sit above, and the minimum height is `min-h-56`. The live field keeps
+  the framed layout for `isBody` because v4 has no editor pane yet.
+
+No live field is disabled or read-only yet; the catalogue is the only source.
 
 ## Tests
 

@@ -8,8 +8,6 @@ import {
   CopyIcon,
   FileIcon,
   TextCursorInputIcon,
-  Trash2Icon,
-  XIcon,
 } from 'lucide-react';
 import { absoluteUrlOf, isImage, isVideo, mediaNameOf } from './media-types';
 
@@ -99,11 +97,10 @@ export function MediaPreview({
           type='button'
           variant='icon'
           size='sm'
+          icon='close'
           aria-label='Close details'
           onClick={onClose}
-        >
-          <XIcon className='size-4' />
-        </Button>
+        />
       </div>
       {isImage(name) ? (
         <img
@@ -130,14 +127,13 @@ export function MediaPreview({
           </Button>
         ) : null}
         {onRename ? (
-          <Button type='button' variant='secondary' onClick={onRename}>
+          <Button type='button' variant='outline' onClick={onRename}>
             <TextCursorInputIcon className='size-4' />
             Rename
           </Button>
         ) : null}
         {onDelete ? (
           <Button type='button' variant='destructive' onClick={onDelete}>
-            <Trash2Icon className='size-4' />
             Delete
           </Button>
         ) : null}

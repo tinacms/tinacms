@@ -21,7 +21,7 @@ Every field option that stays sits at the top level of the field, template or ar
 All three stay, at the top level of the field.
 
 - `description` is help text under the field label. v4 has no field `description` today.
-- `defaultValue` is the starting value for the field in a new document. The plugin's own default (`defaultValue` on the plugin declaration) still applies when the field sets none.
+- `defaultValue` is the starting value for the field in a new item, for example when an editor adds an object to a list. A loaded document never gets it, so a cleared field stays cleared. The plugin's own default (`defaultValue` on the plugin declaration) still applies when the field sets none.
 - `hidden` keeps the value and renders no editor. The docs define a hidden field with `ui: { hidden: true }` (`adr/v4/CONTEXT.md:88`).
 
 ```ts
@@ -49,6 +49,7 @@ An option that only applies to one field type sits on that type's builder, and t
 
 - datetime: `dateFormat`, `timeFormat`
 - color: `colorFormat`, `widget`, `width`, `colors`
+- object: `display`
 - reference: `collectionFilter`
 - rich-text: `toolbarOverride`, `overrides`
 

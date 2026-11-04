@@ -69,6 +69,14 @@ export const flattenFieldErrors = (
   return out;
 };
 
+// Counts failing fields once. `flattenFieldErrors` also lists every parent
+// address of a failing field, so only addresses with no failing descendant
+// count.
+export const countFailingFields = (addresses: readonly string[]): number =>
+  addresses.filter(
+    (address) => !addresses.some((other) => other.startsWith(`${address}.`))
+  ).length;
+
 // The inverse of `flattenFieldErrors`. `set` on a single-segment path is a
 // plain assignment, not a merge, so a shallow address written after a deeper
 // one wipes it out. Sorting shallowest first keeps a compound field's own
@@ -85,4 +93,22 @@ export const nestFieldErrors = (
     if (messages?.length) set(tree, address, toFieldErrorEntry(messages));
   }
   return tree;
+};
+
+export const ownFieldErrors = (
+  node: unknown,
+  prefix: string,
+  out: Record<string, string[]> = {}
+): Record<string, string[]> => {
+  if (isFieldErrorEntry(node)) {
+    const messages = fieldErrorMessages(node);
+    if (messages.length > 0) out[prefix] = messages;
+  }
+  if (node && typeof node === 'object') {
+    for (const [key, child] of Object.entries(node)) {
+      if (ENTRY_KEYS.has(key)) continue;
+      ownFieldErrors(child, `${prefix}.${key}`, out);
+    }
+  }
+  return out;
 };

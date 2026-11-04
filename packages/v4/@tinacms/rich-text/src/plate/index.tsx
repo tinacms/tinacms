@@ -1,3 +1,4 @@
+import type { Value } from '@udecode/plate';
 import { Plate } from '@udecode/plate/react';
 import React from 'react';
 import type { RichTextValue } from '../value';
@@ -19,12 +20,31 @@ export interface RichEditorProps {
   };
   field: RichEditorField;
   ariaLabelledBy?: string;
+  ariaInvalid?: boolean;
+  ariaDescribedBy?: string;
+  readOnly?: boolean;
+  /** Stops edits and all pointer and keyboard input, toolbar included. */
+  disabled?: boolean;
+  placeholder?: string;
+  /** `framed` stops growing at a fixed height and scrolls; `body` has a minimum height and grows. */
+  layout?: 'framed' | 'body';
 }
+
+const layoutClass = {
+  framed: 'max-h-60',
+  body: 'min-h-56',
+} as const;
 
 export const RichEditor = ({
   input,
   field,
   ariaLabelledBy,
+  ariaInvalid,
+  ariaDescribedBy,
+  readOnly = false,
+  disabled = false,
+  placeholder,
+  layout = 'framed',
 }: RichEditorProps) => {
   const [initialValue] = React.useState(() => {
     if (input.value?.children?.length) {
@@ -53,13 +73,12 @@ export const RichEditor = ({
   });
 
   return (
-    <div>
+    <div inert={disabled || undefined} aria-disabled={disabled || undefined}>
       <Plate
         editor={editor}
-        onChange={(value) => {
-          const normalized = (value.value as any[]).map(
-            normalizeLinksInCodeBlocks
-          );
+        readOnly={readOnly || disabled}
+        onValueChange={({ value }) => {
+          const normalized = (value as Value).map(normalizeLinksInCodeBlocks);
 
           input.onChange({
             type: 'root',
@@ -73,10 +92,18 @@ export const RichEditor = ({
               templates={field.templates ?? []}
               overrides={field?.overrides}
             >
-              <FixedToolbar>
-                <FixedToolbarButtons />
-              </FixedToolbar>
-              <Editor aria-labelledby={ariaLabelledBy} />
+              {readOnly ? null : (
+                <FixedToolbar>
+                  <FixedToolbarButtons />
+                </FixedToolbar>
+              )}
+              <Editor
+                aria-labelledby={ariaLabelledBy}
+                aria-invalid={ariaInvalid || undefined}
+                aria-describedby={ariaDescribedBy}
+                placeholder={placeholder}
+                className={layoutClass[layout]}
+              />
             </ToolbarProvider>
           </TooltipProvider>
         </EditorContainer>

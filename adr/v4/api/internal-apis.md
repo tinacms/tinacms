@@ -183,6 +183,7 @@ Address-keyed Form hooks — *only* available inside field plugin Components, wh
 useFieldAddress(): FieldAddress
 useFieldValue<T>(address: FieldAddress): [T, (v: T) => void]
 useFieldErrors(address: FieldAddress): string[]
+useFieldFrame(): Pick<FieldWrapperProps, 'label' | 'htmlFor' | 'labelId' | 'required' | 'errors'>
 useFieldActivation(handler: () => void): void
 useSiblingValue<T>(address: FieldAddress, siblingName: string): T
 useChildKeys(address: FieldAddress): string[]

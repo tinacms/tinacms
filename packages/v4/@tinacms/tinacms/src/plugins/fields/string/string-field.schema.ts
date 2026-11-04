@@ -5,6 +5,11 @@ export const STRING_FIELD_TYPE = 'string';
 
 export interface StringFieldSchema extends BaseFieldSchema {
   type: typeof STRING_FIELD_TYPE;
+  /** A taller box for plain paragraphs. */
+  multiline?: boolean;
+  /** Shows the value in the code font. */
+  mono?: boolean;
+  placeholder?: string;
 }
 
 export const string = (

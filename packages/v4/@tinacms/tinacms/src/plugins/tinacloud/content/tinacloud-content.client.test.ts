@@ -148,7 +148,7 @@ describe('TinaCloud content slice', () => {
     });
   });
 
-  it('reads the branch from store.branch.name at call time', async () => {
+  it('reads the branch from store.branch.current at call time', async () => {
     const fetchMock = stubTinaCloud(
       page([], null),
       { data: { document: hello } },
@@ -156,7 +156,7 @@ describe('TinaCloud content slice', () => {
     );
     const slice = content();
     await slice.list('post');
-    state.branch = { name: 'feat/x' };
+    state.branch = { current: 'feat/x' };
     await slice.get('post', 'content/posts/hello.mdx');
     await slice.update('post', 'content/posts/hello.mdx', {});
     expect(contentCalls(fetchMock).map(({ url }) => url)).toEqual([

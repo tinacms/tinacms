@@ -1,16 +1,19 @@
 # The `datetime` field
 
-One of the field plugins v4 ships: an `<input type="datetime-local">` element.
+One of the field plugins v4 ships: the browser's own `<input type="datetime-local">`, at a fixed width of 240px, laid out as the Design reference shows.
 
 ## Files
 
-All four live in `plugins/fields/datetime/`:
+All seven live in `plugins/fields/datetime/`:
 
 | File | Role |
 |---|---|
 | `datetime-field.schema.ts` | the `t.datetime()` helper + the `datetimeSchema` validator |
 | `datetime-field.client.tsx` | the descriptor — claims the `datetime` key |
-| `datetime-field.ui.tsx` | the `DatetimeField` component |
+| `datetime-field.ui.tsx` | the `DatetimeField` component: reads the form and does the zone work |
+| `datetime-field.view.tsx` | `DatetimeFieldView`, the props-only box inside the Field Wrapper |
+| `datetime-field.states.ts` | `datetimeFieldStates`, the state catalogue, with `datetimeFieldState(name)` |
+| `datetime-field.states.test.tsx` | renders every catalogue state |
 | `datetime-field.plugin.ts` | the manifest — `tina:field:datetime` |
 
 ## Authoring
@@ -32,6 +35,12 @@ const collection = {
 `DatetimeFieldSchema` extends `BaseFieldSchema` — `name`, `label`, and
 `required`. There's no `min`/`max`/`pattern`; a date has nothing else to
 constrain.
+
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
+
+There is no `dateFormat` or `timeFormat` option. The field uses the native
+`datetime-local` input, which has no format tokens.
 
 ## Descriptor
 
@@ -114,31 +123,35 @@ This runs through the shared path (`validateField`). Refer to
 
 ## Component
 
-`DatetimeField` (`datetime-field.ui.tsx`) takes no props — it reads its
-address from context and pulls value/errors through address-keyed hooks:
+`DatetimeField` (`datetime-field.ui.tsx`) takes no props. It reads its
+address, value and frame from the editor hooks, converts with `toInputValue` /
+`fromInputValue`, and renders `DatetimeFieldView`:
 
 ```tsx
 export function DatetimeField() {
   const address = useFieldAddress();
   const [value, setValue] = useFieldValue<string | null>(address);
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus());
 
   return (
-    <FieldWrapper errors={errors}>
-      <Input
-        ref={inputRef}
-        type='datetime-local'
-        id={address}
-        value={toInputValue(value)}
-        onChange={(event) => setValue(fromInputValue(event.target.value, value))}
-      />
-    </FieldWrapper>
+    <DatetimeFieldView
+      {...frame}
+      ref={inputRef}
+      id={address}
+      value={toInputValue(value)}
+      onChange={(wallClock) => setValue(fromInputValue(wallClock, value))}
+    />
   );
 }
 ```
+
+`DatetimeFieldView` holds no editor state. Its `value` is the input string
+(`YYYY-MM-DDTHH:mm`, or `''` when empty). It calls `onChange` only when the
+field is editable (not disabled, not read-only). `disabled` and `readOnly` are
+props only the catalogue sets today; no schema option feeds them yet.
 
 `toInputValue` makes a stored value into what `datetime-local` accepts
 (`YYYY-MM-DDTHH:mm`). A zone-qualified value becomes the local wall clock of
@@ -152,9 +165,27 @@ The input has minute granularity, so a stored value that carries seconds or
 milliseconds loses them on edit. The field writes the precision the editor can
 see.
 
-Unlike `string`, `boolean`, and `number`, `DatetimeField` renders through the
-shared `@tinacms/ui` `FieldWrapper`/`Input` components instead of a bare
-`<div>`/`<input>` pair.
+Typing only some parts of the date reads as empty, and that clears the stored
+value. A stored plain date shows as midnight, and once touched it saves as
+`YYYY-MM-DDTHH:mm` (or a UTC instant, if the form carries a zone).
+
+## Design behaviours
+
+- The box is 240px wide (`w-60 max-w-full`) and never stretches with the form.
+- Empty shows the browser's pattern in muted text (`data-empty` on the input).
+- A pick from the calendar counts as a change at once.
+- Read-only hides the calendar button. Disabled and read-only stay still: no
+  hover change, no calendar, no `onChange`, no tooltip.
+- Required, error, help and warning come from the Field Wrapper. There is no
+  unsaved marker on the field.
+- There is no date-only variant: no schema option makes a field date-only, and
+  the value helpers cannot serve a `date` input.
+
+## State catalogue
+
+`datetimeFieldStates` lists every look: empty, filled, required, invalid,
+disabled, read-only, long label, and help and warning. The states test renders
+each one.
 
 ## Where it's wired
 
@@ -164,6 +195,11 @@ shared `@tinacms/ui` `FieldWrapper`/`Input` components instead of a bare
   `t.datetime`.
 
 ## Tests
+
+`datetime-field.states.test.tsx` renders every catalogue state and checks the
+label, required marker, error, warning, help, `data-empty` and value. It also
+checks that disabled and read-only never call `onChange`, and that a change on
+an editable state does.
 
 `datetime-field.test.tsx` covers rendering a stored instant as the local wall
 clock, rendering a value with no zone as the wall clock it spells, rendering a

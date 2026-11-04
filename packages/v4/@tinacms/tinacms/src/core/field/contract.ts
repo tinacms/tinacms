@@ -9,6 +9,12 @@ export type FieldLayout = 'inline' | 'block';
 export interface FieldMetadata {
   layout?: FieldLayout;
   labelable?: boolean;
+  drillable?: boolean;
+  /**
+   * For a drillable field: `true` drills in, `false` opens in place, and
+   * `undefined` leaves it to the depth rule.
+   */
+  drillsIn?: (node: FieldSchema) => boolean | undefined;
 }
 
 export interface FieldTransformContext {
@@ -94,6 +100,10 @@ export interface ValidationScope {
 
 export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
   Component: ComponentType;
+  /** Draws a list of this field type in place of one row per item. */
+  ListView?: ComponentType;
+  /** Draws a drillable field where it drills in. Without it, the generic button shows. */
+  DrillInComponent?: ComponentType;
   defaultValue?: TValue;
   metadata?: FieldMetadata;
   schema?: (node: FieldSchema) => ZodType;

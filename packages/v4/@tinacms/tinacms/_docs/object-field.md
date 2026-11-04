@@ -49,6 +49,9 @@ const collection = {
 |---|---|---|
 | `fields` | `FieldSchema[]` (required) | the nested fields, keyed by each field's own `name` |
 
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
+
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with
 > `validators`. Refer to
@@ -129,9 +132,26 @@ The schema rejects it with `<label> must be a group of fields`, and
 read-only (`plugins/fields/uneditable-value.tsx`), with a Clear button that
 sets the field to `null`.
 
+## Display
+
+`display` sits at the top level of `t.object` and picks the look:
+
+| `display` | Look |
+|---|---|
+| `'fieldset'` (default) | A heading with the fields under it. |
+| `'collapsible'` | A header that folds. Closed, it shows the first non-empty visible string subfield, or "Not set", and a red count of invalid fields. Open, the fields sit beside a guide rail. |
+| `'drillIn'` | A card that opens the object as the next Form level. |
+
+With no `display`, levels 1 and 2 open in place and level 3 and deeper drill
+in. An explicit `display` wins at every depth. The collapsible's open state is
+local: it starts closed and opens when the active field is the object or sits
+inside it. The object's own frame shows only errors on the object; each child
+shows its own.
+
 ## The component
 
-`ObjectField` (`object-field.ui.tsx`) renders every nested field, always. An
+`ObjectField` (`object-field.ui.tsx`) renders every nested field while the
+object is open or in place. A closed collapsible renders no nested field. An
 absent stored value does not hide the nested fields — each nested field
 resolves its own absent value and shows an empty control.
 

@@ -20,6 +20,10 @@ const requestStatusSchema = z.object({
   message: z.string().optional(),
 });
 
+const branchListSchema = z.array(
+  z.object({ name: z.string(), protected: z.boolean().optional() })
+);
+
 const projectSchema = z.object({
   defaultBranch: z.string().optional(),
   mediaBranch: z.string().optional(),
@@ -167,10 +171,30 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     return project;
   };
 
+  const listBranches = async (): Promise<
+    { name: string; protected: boolean | undefined }[]
+  > => {
+    const body = await authedFetch(
+      `${TINACLOUD_CONTENT_URL}/github/${options.clientId}/list_branches`
+    );
+    const parsed = branchListSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new TinaCloudError(
+        'TinaCloud returned the branch list in an unknown format.',
+        { body }
+      );
+    }
+    return parsed.data.map(({ name, protected: isProtected }) => ({
+      name,
+      protected: isProtected,
+    }));
+  };
+
   return {
     clientId: options.clientId,
     authedFetch,
     waitForRequest,
     getProject,
+    listBranches,
   };
 };

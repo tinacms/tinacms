@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../../config';
 import type { ContentProvider } from '../../../core/content/contract';
@@ -22,7 +23,7 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
-import { FormProvider, TinaProvider } from '../../../editor';
+import { FormProvider, TinaProvider, useActiveField } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
 import { required } from '../../../plugins/fields';
@@ -99,7 +100,9 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 const renderField = (
   document?: TinaDocument,
   media: MediaProvider = createMedia(),
-  schema: CollectionSchema = collection
+  schema: CollectionSchema = collection,
+  extra?: ReactNode,
+  morePlugins: PluginManifest[] = []
 ) =>
   render(
     <TinaProvider
@@ -111,6 +114,7 @@ const renderField = (
           contentPlugin(),
           mediaPlugin(media),
           coreValidatorsPlugin,
+          ...morePlugins,
         ],
         schema: { collections: [schema] },
       })}
@@ -124,11 +128,13 @@ const renderField = (
         document={document}
       >
         <LabelledFields />
+        {extra}
       </FormProvider>
     </TinaProvider>
   );
 
-const fieldGroup = (name: string) => screen.findByRole('group', { name });
+const fieldGroup = (name: string) =>
+  screen.findByRole('group', { name: new RegExp(`^${name}\\b`) });
 
 const imageFile = (name = 'new.png') =>
   new File(['image'], name, { type: 'image/png' });
@@ -172,32 +178,41 @@ describe('ImageField rendering', () => {
     renderField();
     const group = await fieldGroup('Hero');
     expect(
-      within(group).getByRole('button', { name: 'Choose image' })
+      within(group).getByRole('button', { name: 'Choose from Media' })
     ).toBeVisible();
     expect(within(group).queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('still offers Choose from Media when the media provider is read-only', async () => {
+    renderField(undefined, createMedia({ features: { readOnly: true } }));
+    const group = await fieldGroup('Hero');
+    expect(
+      within(group).getByRole('button', { name: 'Choose from Media' })
+    ).toBeVisible();
+    expect(within(group).queryByText(/Drop an image/)).not.toBeInTheDocument();
   });
 });
 
 describe('ImageField picking', () => {
   it('stores the media path of the picked image', async () => {
     renderField();
-    await pickFromLibrary(await fieldGroup('Hero'), 'Choose image');
+    await pickFromLibrary(await fieldGroup('Hero'), 'Choose from Media');
     expect(valueOf('hero')).toBe('photo.jpg');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('replaces a stored image with the picked one', async () => {
     renderField({ hero: HERO });
-    await pickFromLibrary(await fieldGroup('Hero'), 'Replace');
+    await pickFromLibrary(await fieldGroup('Hero'), 'Replace hero.jpg');
     expect(valueOf('hero')).toBe('photo.jpg');
   });
 
   it('returns focus to the main button after a pick', async () => {
     renderField();
     const group = await fieldGroup('Hero');
-    await pickFromLibrary(group, 'Choose image');
+    await pickFromLibrary(group, 'Choose from Media');
     expect(
-      await within(group).findByRole('button', { name: 'Replace' })
+      await within(group).findByRole('button', { name: 'Replace photo.jpg' })
     ).toHaveFocus();
   });
 });
@@ -207,7 +222,8 @@ describe('ImageField uploading', () => {
     const media = createMedia();
     renderField(undefined, media);
     const group = await fieldGroup('Hero');
-    await userEvent.upload(within(group).getByLabelText('Upload'), imageFile());
+    fireEvent.drop(group, { dataTransfer: { files: [imageFile()] } });
+    await screen.findByRole('button', { name: 'Replace new.png' });
     expect(media.upload).toHaveBeenCalledOnce();
     expect(valueOf('hero')).toBe('uploads-dir/new.png');
   });
@@ -238,30 +254,73 @@ describe('ImageField uploading', () => {
       })
     );
     const group = await fieldGroup('Hero');
-    await userEvent.upload(within(group).getByLabelText('Upload'), imageFile());
+    fireEvent.drop(group, { dataTransfer: { files: [imageFile()] } });
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'That file is too large to upload.'
     );
     expect(valueOf('hero')).toBeNull();
   });
 
-  it('offers no upload when the provider is read-only', async () => {
+  it('ignores a dropped file when the provider is read-only, and still picks', async () => {
     const features: MediaFeatures = { readOnly: true };
-    renderField(undefined, createMedia({ features }));
+    const media = createMedia({ features });
+    renderField(undefined, media);
     const group = await fieldGroup('Hero');
-    expect(within(group).queryByLabelText('Upload')).not.toBeInTheDocument();
+    fireEvent.drop(group, { dataTransfer: { files: [imageFile()] } });
+    expect(media.upload).not.toHaveBeenCalled();
+    expect(valueOf('hero')).toBeNull();
+    await pickFromLibrary(group, 'Choose from Media');
+    expect(valueOf('hero')).toBe('photo.jpg');
+  });
+
+  it('ignores a second drop while an upload runs', async () => {
+    let finish: (path: string) => void = () => {};
+    const media = createMedia({
+      upload: vi.fn(
+        () =>
+          new Promise<string>((resolve) => {
+            finish = resolve;
+          })
+      ),
+    });
+    renderField(undefined, media);
+    const group = await fieldGroup('Hero');
+    fireEvent.drop(group, { dataTransfer: { files: [imageFile('one.png')] } });
+    fireEvent.drop(group, { dataTransfer: { files: [imageFile('two.png')] } });
+    expect(media.upload).toHaveBeenCalledOnce();
+    await act(async () => finish('uploads-dir/one.png'));
+    expect(valueOf('hero')).toBe('uploads-dir/one.png');
   });
 });
 
-describe('ImageField clearing', () => {
-  it('clears an optional image', async () => {
+describe('ImageField removing', () => {
+  it('removes an optional image at once, never deleting the media file', async () => {
+    const media = createMedia();
+    renderField({ hero: HERO }, media);
+    const group = await fieldGroup('Hero');
+    await userEvent.click(
+      within(group).getByRole('button', { name: 'Remove hero.jpg' })
+    );
+    expect(valueOf('hero')).toBeNull();
+    const choose = within(group).getByRole('button', {
+      name: 'Choose from Media',
+    });
+    expect(choose).toHaveFocus();
+    expect(media.delete).not.toHaveBeenCalled();
+  });
+
+  it('keeps the old image when Replace is cancelled', async () => {
     renderField({ hero: HERO });
     const group = await fieldGroup('Hero');
-    await userEvent.click(within(group).getByRole('button', { name: 'Clear' }));
-    expect(valueOf('hero')).toBeNull();
+    await userEvent.click(
+      within(group).getByRole('button', { name: 'Replace hero.jpg' })
+    );
+    await screen.findByRole('dialog', { name: 'Choose an image' });
+    await userEvent.keyboard('{Escape}');
+    expect(valueOf('hero')).toBe(HERO);
     expect(
-      within(group).getByRole('button', { name: 'Choose image' })
-    ).toBeVisible();
+      await within(group).findByRole('button', { name: 'Replace hero.jpg' })
+    ).toHaveFocus();
   });
 
   it('drops an upload error when the image is cleared', async () => {
@@ -271,15 +330,17 @@ describe('ImageField clearing', () => {
       dataTransfer: { files: [new File(['%PDF'], 'notes.pdf')] },
     });
     expect(await screen.findByRole('alert')).toBeVisible();
-    await userEvent.click(within(group).getByRole('button', { name: 'Clear' }));
+    await userEvent.click(
+      within(group).getByRole('button', { name: 'Remove hero.jpg' })
+    );
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('offers no clear button on a required image', async () => {
+  it('offers no remove button on a required image', async () => {
     renderField({ cover: HERO });
     const group = await fieldGroup('Cover');
     expect(
-      within(group).queryByRole('button', { name: 'Clear' })
+      within(group).queryByRole('button', { name: /^Remove/ })
     ).not.toBeInTheDocument();
   });
 });
@@ -305,7 +366,7 @@ describe('ImageField missing images', () => {
       `/uploads/${HERO}?w=400&h=400&retry=1`
     );
     fireEvent.load(image);
-    expect(within(group).queryByText(/\(missing\)/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('marks a stored path whose image never loads, and keeps it', async () => {
@@ -314,11 +375,18 @@ describe('ImageField missing images', () => {
     vi.useFakeTimers();
     for (let attempt = 0; attempt < 3; attempt++) {
       await failToLoad(group, 'deleted.jpg');
-      expect(within(group).queryByText(/\(missing\)/)).not.toBeInTheDocument();
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
     }
     fireEvent.error(within(group).getByAltText('deleted.jpg'));
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'deleted.jpg is missing from Media'
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(
-      within(group).getByText('posts/deleted.jpg (missing)')
+      within(group).getByRole('button', { name: 'Replace deleted.jpg' })
+    ).toBeVisible();
+    expect(
+      within(group).getByRole('button', { name: 'Remove deleted.jpg' })
     ).toBeVisible();
     expect(valueOf('hero')).toBe('posts/deleted.jpg');
   });
@@ -327,7 +395,7 @@ describe('ImageField missing images', () => {
     renderField({ hero: 2024 });
     const group = await fieldGroup('Hero');
     expect(within(group).getByText('Not a media path')).toBeVisible();
-    await pickFromLibrary(group, 'Replace');
+    await pickFromLibrary(group, 'Replace this value');
     expect(valueOf('hero')).toBe('photo.jpg');
   });
 
@@ -339,13 +407,15 @@ describe('ImageField missing images', () => {
       await failToLoad(group, 'photo.jpg');
     }
     fireEvent.error(within(group).getByAltText('photo.jpg'));
-    expect(within(group).getByText('photo.jpg (missing)')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'photo.jpg is missing from Media'
+    );
     vi.useRealTimers();
-    await pickFromLibrary(group, 'Replace');
+    await pickFromLibrary(group, 'Replace photo.jpg');
     const image = within(group).getByAltText('photo.jpg');
     fireEvent.load(image);
     expect(image).toBeVisible();
-    expect(within(group).queryByText(/\(missing\)/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 });
 
@@ -385,6 +455,290 @@ describe('ImageField inside an array', () => {
       { name: 'Brook', avatar: null },
     ]);
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+});
+
+describe('ImageField cover', () => {
+  const coverCollection = (cover: 'wide' | 'tall'): CollectionSchema => ({
+    name: 'post',
+    format: 'mdx',
+    fields: [t.image({ name: 'hero', label: 'Hero', cover })],
+  });
+
+  it.each([
+    { cover: 'wide' as const, shape: 'aspect-video' },
+    { cover: 'tall' as const, shape: 'aspect-4/3' },
+  ])(
+    'keeps the $cover shape from the empty area to the picture',
+    async ({ cover, shape }) => {
+      const empty = renderField(
+        undefined,
+        createMedia(),
+        coverCollection(cover)
+      );
+      const emptyGroup = await fieldGroup('Hero');
+      expect(emptyGroup.querySelector(`.${CSS.escape(shape)}`)).not.toBeNull();
+      empty.unmount();
+      renderField({ hero: HERO }, createMedia(), coverCollection(cover));
+      const filledGroup = await fieldGroup('Hero');
+      expect(filledGroup.querySelector(`.${CSS.escape(shape)}`)).not.toBeNull();
+    }
+  );
+
+  it('rejects a cover that is not wide or tall', async () => {
+    const field = t.image({ name: 'hero' });
+    const descriptor = (await resolveRegistry()).get('image');
+    expect(() =>
+      descriptor?.schema?.({ ...field, cover: 'square' } as never)
+    ).toThrow(/"cover" to be "wide" or "tall"/);
+  });
+
+  it('is a type error on a field that is not an image', () => {
+    t.string({
+      name: 'x',
+      // @ts-expect-error cover only exists on image fields
+      cover: 'wide',
+    });
+  });
+});
+
+describe('ImageField gallery', () => {
+  const galleryCollection: CollectionSchema = {
+    name: 'post',
+    format: 'mdx',
+    fields: [
+      t.array({
+        name: 'images',
+        label: 'Images',
+        of: t.image({ name: 'image' }),
+      }),
+    ],
+  };
+
+  const renderGallery = (images?: unknown[], media = createMedia()) =>
+    renderField(images ? { images } : undefined, media, galleryCollection);
+
+  const gallery = () => fieldGroup('Images');
+
+  it('draws the list view of an overriding image plugin', async () => {
+    const override = definePlugin({
+      name: 'custom:image',
+      provides: ['field'],
+      overrides: [{ capability: 'field', key: 'image' }],
+      field: { type: 'image', contractVersion: 1 },
+      client: async () => ({
+        default: {
+          field: {
+            Component: () => null,
+            ListView: () => <p>Custom image list</p>,
+          },
+        },
+      }),
+    });
+    renderField(
+      { images: ['a/one.jpg'] },
+      createMedia(),
+      galleryCollection,
+      undefined,
+      [override]
+    );
+    expect(await screen.findByText('Custom image list')).toBeVisible();
+    expect(screen.queryByRole('figure')).not.toBeInTheDocument();
+  });
+
+  it('shows a tile for each image and an Add images tile', async () => {
+    renderGallery(['a/one.jpg', 'b/two.jpg']);
+    const group = await gallery();
+    expect(within(group).getAllByRole('figure')).toHaveLength(2);
+    expect(
+      within(group).getByRole('button', { name: 'Add images' })
+    ).toBeVisible();
+  });
+
+  it('appends an image only after a pick', async () => {
+    renderGallery(['a/one.jpg']);
+    const group = await gallery();
+    await userEvent.click(
+      within(group).getByRole('button', { name: 'Add images' })
+    );
+    await screen.findByRole('dialog', { name: 'Choose an image' });
+    await userEvent.keyboard('{Escape}');
+    expect(valueOf('images')).toEqual(['a/one.jpg']);
+    await pickFromLibrary(group, 'Add images');
+    expect(valueOf('images')).toEqual(['a/one.jpg', 'photo.jpg']);
+  });
+
+  it('replaces one tile and keeps the rest', async () => {
+    renderGallery(['a/one.jpg', 'b/two.jpg']);
+    await pickFromLibrary(await gallery(), 'Replace one.jpg');
+    expect(valueOf('images')).toEqual(['photo.jpg', 'b/two.jpg']);
+  });
+
+  it('removes a tile without leaving a hole', async () => {
+    const media = createMedia();
+    renderGallery(['a/one.jpg', 'b/two.jpg', 'c/three.jpg'], media);
+    const group = await gallery();
+    await userEvent.click(
+      within(group).getByRole('button', { name: 'Remove two.jpg' })
+    );
+    expect(valueOf('images')).toEqual(['a/one.jpg', 'c/three.jpg']);
+    expect(
+      within(group).getByRole('button', { name: 'Replace three.jpg' })
+    ).toHaveFocus();
+    expect(media.delete).not.toHaveBeenCalled();
+  });
+
+  it('sends focus to Add images after the last tile is removed', async () => {
+    renderGallery(['a/one.jpg']);
+    const group = await gallery();
+    await userEvent.click(
+      within(group).getByRole('button', { name: 'Remove one.jpg' })
+    );
+    expect(valueOf('images')).toEqual([]);
+    expect(
+      within(group).getByRole('button', { name: 'Add images' })
+    ).toHaveFocus();
+  });
+
+  it('allows the same image twice', async () => {
+    renderGallery(['a/one.jpg']);
+    const group = await gallery();
+    await pickFromLibrary(group, 'Add images');
+    await pickFromLibrary(group, 'Replace one.jpg');
+    expect(valueOf('images')).toEqual(['photo.jpg', 'photo.jpg']);
+    expect(within(group).getAllByRole('figure')).toHaveLength(2);
+  });
+
+  it('moves a tile by arrow key, keeps focus on it and announces it', async () => {
+    renderGallery(['a/one.jpg', 'b/two.jpg', 'c/three.jpg']);
+    const group = await gallery();
+    within(group)
+      .getByRole('button', { name: 'Move Image 3: three.jpg' })
+      .focus();
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(valueOf('images')).toEqual([
+      'a/one.jpg',
+      'c/three.jpg',
+      'b/two.jpg',
+    ]);
+    expect(
+      within(group).getByRole('button', { name: 'Move Image 2: three.jpg' })
+    ).toHaveFocus();
+    expect(
+      within(group).getByText('Moved three.jpg to position 2 of 3')
+    ).toBeInTheDocument();
+  });
+
+  describe('dragging a tile', () => {
+    const placeTiles = (group: HTMLElement) => {
+      const tiles = [
+        ...group.querySelectorAll<HTMLElement>('[data-tile-index]'),
+      ];
+      tiles.forEach((tile, index) => {
+        tile.getBoundingClientRect = () =>
+          ({
+            left: index * 100,
+            right: index * 100 + 90,
+            top: 0,
+            bottom: 90,
+          }) as DOMRect;
+      });
+      return tiles;
+    };
+    const at = (x: number) => ({
+      clientX: x,
+      clientY: 10,
+      button: 0,
+      pointerId: 1,
+    });
+
+    it('moves a tile to the tile it is released over', async () => {
+      renderGallery(['a/one.jpg', 'b/two.jpg', 'c/three.jpg']);
+      const [first] = placeTiles(await gallery());
+      fireEvent.pointerDown(first, at(10));
+      fireEvent.pointerMove(first, at(210));
+      fireEvent.pointerUp(first, at(210));
+      expect(valueOf('images')).toEqual([
+        'b/two.jpg',
+        'c/three.jpg',
+        'a/one.jpg',
+      ]);
+    });
+
+    it('ignores a press that moves less than the drag distance', async () => {
+      renderGallery(['a/one.jpg', 'b/two.jpg']);
+      const [first] = placeTiles(await gallery());
+      fireEvent.pointerDown(first, at(10));
+      fireEvent.pointerMove(first, at(12));
+      fireEvent.pointerUp(first, at(112));
+      expect(valueOf('images')).toEqual(['a/one.jpg', 'b/two.jpg']);
+    });
+
+    it('cancels on Escape', async () => {
+      renderGallery(['a/one.jpg', 'b/two.jpg']);
+      const [first] = placeTiles(await gallery());
+      fireEvent.pointerDown(first, at(10));
+      fireEvent.pointerMove(first, at(110));
+      await userEvent.keyboard('{Escape}');
+      fireEvent.pointerUp(first, at(110));
+      expect(valueOf('images')).toEqual(['a/one.jpg', 'b/two.jpg']);
+    });
+
+    it('cancels when released outside every tile', async () => {
+      renderGallery(['a/one.jpg', 'b/two.jpg']);
+      const [first] = placeTiles(await gallery());
+      fireEvent.pointerDown(first, at(10));
+      fireEvent.pointerMove(first, at(500));
+      fireEvent.pointerUp(first, at(500));
+      expect(valueOf('images')).toEqual(['a/one.jpg', 'b/two.jpg']);
+    });
+  });
+
+  it('gives a stored value that is not a path a tile that can be removed', async () => {
+    renderGallery(['a/one.jpg', 2024, null]);
+    const group = await gallery();
+    expect(within(group).getByText('Not a media path')).toBeVisible();
+    expect(within(group).getByText('Empty image')).toBeVisible();
+    await userEvent.click(
+      within(group).getByRole('button', { name: 'Remove Image 3' })
+    );
+    await userEvent.click(
+      within(group).getByRole('button', { name: 'Remove Image 2' })
+    );
+    expect(valueOf('images')).toEqual(['a/one.jpg']);
+  });
+
+  it('focuses a tile when the preview activates its address', async () => {
+    function Activate() {
+      const { setActive } = useActiveField();
+      return (
+        <button
+          type='button'
+          onClick={() => setActive(toFieldAddress('images.1'))}
+        >
+          activate images.1
+        </button>
+      );
+    }
+    renderField(
+      { images: ['a/one.jpg', 'b/two.jpg'] },
+      createMedia(),
+      galleryCollection,
+      <Activate />
+    );
+    const group = await gallery();
+    await userEvent.click(screen.getByText('activate images.1'));
+    expect(
+      within(group).getByRole('button', { name: 'Replace two.jpg' })
+    ).toHaveFocus();
+  });
+
+  it('still offers Add images when the media provider is read-only', async () => {
+    renderGallery(['a/one.jpg'], createMedia({ features: { readOnly: true } }));
+    const group = await gallery();
+    expect(
+      within(group).getByRole('button', { name: 'Add images' })
+    ).toBeVisible();
   });
 });
 

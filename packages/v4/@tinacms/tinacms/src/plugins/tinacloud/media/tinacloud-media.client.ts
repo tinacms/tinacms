@@ -1,3 +1,4 @@
+import { currentBranchOf } from '../../../core/branch/contract';
 import type { MediaProvider } from '../../../core/media/contract';
 import type { ClientSlice, TinaStoreState } from '../../../core/plugin';
 import {
@@ -13,10 +14,8 @@ import { uploadMedia } from './upload';
 
 const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
 
-const storeBranch = (state: TinaStoreState): MediaBranch => {
-  const name = state.branch?.name;
-  return typeof name === 'string' && name ? name : undefined;
-};
+const storeBranch = (state: TinaStoreState): MediaBranch =>
+  currentBranchOf(state);
 
 // Branch is operational data the Data Layer owns (ADR-019, ADR-024), so with
 // no branch in the store the slice uses the project's default branch.

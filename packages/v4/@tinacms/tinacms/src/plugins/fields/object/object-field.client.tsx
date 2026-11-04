@@ -7,12 +7,22 @@ import {
   isPlainObject,
   objectSchema,
 } from './object-field.schema';
-import { ObjectField } from './object-field.ui';
+import { ObjectDrillIn, ObjectField } from './object-field.ui';
 
 export default defineClientPlugin({
   field: {
     Component: ObjectField,
-    metadata: { layout: 'block', labelable: false },
+    DrillInComponent: ObjectDrillIn,
+    metadata: {
+      layout: 'block',
+      labelable: false,
+      drillable: true,
+      // An explicit `display` wins at every depth; unset leaves the depth rule.
+      drillsIn: (node) => {
+        const { display } = asObjectFieldSchema(node);
+        return display === undefined ? undefined : display === 'drillIn';
+      },
+    },
     schema: objectSchema,
     // A stored value that is not an object stays as it is, so a save writes it
     // back unchanged (ADR-012: never throw on open).

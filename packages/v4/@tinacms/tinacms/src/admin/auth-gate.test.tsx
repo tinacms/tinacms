@@ -57,13 +57,25 @@ const renderAdmin = (plugins: PluginManifest[]) =>
     />
   );
 
+type User = ReturnType<typeof userEvent.setup>;
+
+const openAccount = async (user: User) => {
+  await user.click(await screen.findByRole('button', { name: 'Account' }));
+  return screen.findByRole('menu', { name: 'Account' });
+};
+
+const signOut = async (user: User) => {
+  await openAccount(user);
+  await user.click(await screen.findByRole('menuitem', { name: 'Sign out' }));
+};
+
 describe('AuthGate', () => {
   it('shows the admin with no sign-in screen when no plugin provides auth', async () => {
     renderAdmin([]);
     expect(
       await screen.findByRole('list', { name: 'Collections' })
     ).toBeInTheDocument();
-    expect(screen.queryByRole('list', { name: 'Account' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Account' })).toBeNull();
   });
 
   it('signs the editor in, shows who they are, and signs them out', async () => {
@@ -73,13 +85,14 @@ describe('AuthGate', () => {
     ]);
 
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
-    const account = await screen.findByRole('list', { name: 'Account' });
+    const account = await openAccount(user);
     expect(account).toHaveTextContent('Ada');
+    await user.keyboard('{Escape}');
     expect(
       screen.getByRole('list', { name: 'Collections' })
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Sign out' }));
+    await signOut(user);
     expect(
       await screen.findByRole('button', { name: 'Sign in' })
     ).toBeInTheDocument();
@@ -149,12 +162,13 @@ describe('AuthGate', () => {
     });
     renderAdmin([formAuthPlugin]);
 
-    await user.type(await screen.findByLabelText('Email'), 'ada@example.com');
+    await user.type(
+      await screen.findByLabelText(/^Email\b/),
+      'ada@example.com'
+    );
     expect(screen.queryByRole('button', { name: 'Sign in' })).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Continue' }));
-    expect(
-      await screen.findByRole('list', { name: 'Account' })
-    ).toHaveTextContent('ada@example.com');
+    expect(await openAccount(user)).toHaveTextContent('ada@example.com');
   });
 
   it('shows who is signed in, keeps the admin closed, and signs out when the account has no access', async () => {
@@ -243,14 +257,14 @@ describe('AuthGate', () => {
     const graceInput = await screen.findByRole('textbox', { name: /^Title/ });
     expect(graceInput).toHaveValue('Hello');
     expect(screen.getByRole('status')).toHaveTextContent('No changes');
-    await user.click(screen.getByRole('button', { name: 'Sign out' }));
+    await signOut(user);
 
     nextUser = ada;
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
     const adaRestored = await screen.findByRole('textbox', { name: /^Title/ });
     expect(adaRestored).toHaveValue('Hello from Ada');
     expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
-    await user.click(screen.getByRole('button', { name: 'Sign out' }));
+    await signOut(user);
 
     firstTab.unmount();
     simulateReload();

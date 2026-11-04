@@ -102,21 +102,21 @@ describe('DocumentScope on a document that changed after it opened', () => {
   it('takes the newer content into a form with no edits', async () => {
     const queryClient = makeQueryClient();
     render(host(queryClient));
-    expect(await screen.findByLabelText('Title')).toHaveValue('Hello');
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello');
 
     writeDiskChange(queryClient);
     await waitFor(() =>
       expect(screen.getByTestId('cached')).toHaveTextContent('Changed on disk')
     );
 
-    expect(screen.getByLabelText('Title')).toHaveValue('Changed on disk');
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Changed on disk');
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
   });
 
   it('keeps the unsaved edits of a dirty form', async () => {
     const queryClient = makeQueryClient();
     render(host(queryClient));
-    await userEvent.type(await screen.findByLabelText('Title'), '!');
+    await userEvent.type(await screen.findByLabelText(/^Title\b/), '!');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
 
     writeDiskChange(queryClient);
@@ -143,7 +143,7 @@ describe('DocumentScope on a document the data layer cannot give', () => {
     await waitFor(() =>
       expect(screen.getByTestId('cached')).toBeEmptyDOMElement()
     );
-    expect(screen.queryByLabelText('Title')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Title\b/)).not.toBeInTheDocument();
   });
 
   it('opens no form when the read fails', async () => {
@@ -160,7 +160,7 @@ describe('DocumentScope on a document the data layer cannot give', () => {
     await waitFor(() =>
       expect(screen.getByTestId('cached')).toBeEmptyDOMElement()
     );
-    expect(screen.queryByLabelText('Title')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Title\b/)).not.toBeInTheDocument();
   });
 });
 
@@ -215,7 +215,7 @@ describe('DocumentScope on a collection with a server hook', () => {
           <StatusProbe />
         </TinaProvider>
       );
-      await userEvent.type(await screen.findByLabelText('Title'), '!');
+      await userEvent.type(await screen.findByLabelText(/^Title\b/), '!');
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
       expect(await screen.findByRole('alert')).toHaveTextContent(message);
