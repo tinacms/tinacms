@@ -296,9 +296,11 @@ describe('StringField metadata wrapping', () => {
       layout: 'inline',
       inlineBox: expect.any(Function),
     });
-    expect(descriptor?.metadata?.inlineBox?.(t.string({ name: 'a' }))).toBe(
-      'text'
-    );
+    expect(
+      descriptor?.metadata?.inlineBox?.(
+        t.string({ name: 'a', placeholder: 'Empty' })
+      )
+    ).toEqual({ type: 'text', placeholder: 'Empty' });
     expect(
       descriptor?.metadata?.inlineBox?.(
         t.string({ name: 'a', multiline: true })

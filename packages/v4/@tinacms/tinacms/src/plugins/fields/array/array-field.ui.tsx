@@ -1,5 +1,4 @@
 import {
-  use,
   useEffect,
   useEffectEvent,
   useRef,
@@ -13,10 +12,8 @@ import {
   useFormState,
   useWatch,
 } from 'react-hook-form';
-import { useShallow } from 'zustand/react/shallow';
-import { useStore } from 'zustand';
 import { type FieldAddress, toFieldAddress } from '../../../core/field/address';
-import { invariant } from '../../../core/invariant';
+import type { InlineBox } from '../../../core/field/contract';
 import {
   customItemLabel,
   itemHeadingOf,
@@ -26,7 +23,9 @@ import {
 } from '../../../core/schema/children';
 import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
 import {
+  itemOpensNextLevel,
   NestedFieldRow,
+  ownFieldErrors,
   useActiveField,
   useActivation,
   useDocumentPath,
@@ -35,20 +34,14 @@ import {
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
-  useFormErrors,
-  useFormId,
+  useInvalidFieldCount,
+  useInvalidFieldCounts,
+  useListItems,
   useMediaSlice,
+  useOpenLevel,
 } from '../../../editor';
-import { FormScopeContext } from '../../../editor/context';
-import { ownFieldErrors } from '../../../editor/field-errors';
-import {
-  countRevealedErrors,
-  isRevealed,
-  itemLevel,
-  itemOpensNextLevel,
-} from '../../../editor/form-view-state';
 import { isMediaPath } from '../image/image-field.schema';
-import { limitOf } from '../number/number-field.step';
+import { atLimit, limitOf, stepValue } from '../number/number-field.step';
 import { firstText, summaryFieldsOf } from '../object/object-field.schema';
 import { StoredValue, UneditableValue } from '../uneditable-value';
 import {
@@ -87,16 +80,6 @@ export function ArrayField() {
       cleared={[]}
     />
   );
-}
-
-function useScope() {
-  const scope = use(FormScopeContext);
-  invariant(
-    scope,
-    'array-field-outside-provider',
-    'The array field must be used within a FormProvider'
-  );
-  return scope;
 }
 
 function ItemList() {
@@ -191,7 +174,7 @@ function ObjectItems({
 }: ItemListProps & { field: ObjectArrayFieldSchema }) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
-  const scope = useScope();
+  const listItems = useListItems();
   const activation = useActivation();
   const { setActive } = useActiveField();
   const { control, getValues } = useFormContext();
@@ -204,7 +187,6 @@ function ObjectItems({
   } = useFieldArray({ control, name: address });
   // Re-renders the headings on typing, so an `itemLabel` follows it.
   useWatch({ control, name: address });
-  const flat = useFormErrors(useFormId());
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
   const [inserting, setInserting] = useState<InsertPicker | null>(null);
   const [adding, setAdding] = useState(false);
@@ -216,13 +198,8 @@ function ObjectItems({
   const max = limitOf(field, 'max');
   const full = max !== undefined && items.length >= max;
 
-  const counts = useStore(
-    scope.view,
-    useShallow((state) =>
-      items.map((_, index) =>
-        countRevealedErrors(state, Object.keys(flat), `${address}.${index}`)
-      )
-    )
+  const counts = useInvalidFieldCounts(
+    items.map((_, index) => `${address}.${index}`)
   );
 
   // Opens an item where its depth says: in place, or as the next form level.
@@ -233,7 +210,7 @@ function ObjectItems({
     const fields = isItem(stored) ? itemFieldsOf(field, stored) : undefined;
     if (fields && itemOpensNextLevel(itemAddress)) {
       const heading = itemHeadingOf(field, stored, index);
-      scope.view.getState().openLevel(itemLevel(itemAddress, heading, fields));
+      listItems.openLevel(itemAddress, heading, fields);
       // The level replaced the list, so focus moves to its first field.
       const first = fields.find((subfield) => !subfield.hidden);
       if (first) setActive(toFieldAddress(`${itemAddress}.${first.name}`));
@@ -548,7 +525,7 @@ function ScalarItems({
 }: ItemListProps & { field: ScalarArrayFieldSchema }) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
-  const scope = useScope();
+  const listItems = useListItems();
   const activation = useActivation();
   const { setActive } = useActiveField();
   const { getValues, setValue } = useFormContext();
@@ -626,7 +603,7 @@ function ScalarItems({
     const messages = ownFieldErrors(get(errors, itemAddress), itemAddress)[
       itemAddress
     ];
-    const revealed = isRevealed(scope.view.getState(), itemAddress);
+    const revealed = listItems.isRevealed(itemAddress);
     const error = revealed ? messages?.[0] : undefined;
     if (!box) {
       return {
@@ -638,19 +615,20 @@ function ScalarItems({
       };
     }
     const entry = shown[index];
+    const text = entry == null ? '' : String(entry);
+    const write = (next: string) =>
+      setValue(itemAddress, next, { shouldDirty: true, shouldValidate: true });
     return {
       ...base,
+      ...(box.type === 'number' ? numberBox(box, text, write) : undefined),
       kind: 'value',
-      inputType: box,
-      value: entry == null ? '' : String(entry),
+      inputType: box.type,
+      placeholder: box.type === 'text' ? box.placeholder : undefined,
+      value: text,
       error,
       onFocus: () => setActive(toFieldAddress(itemAddress)),
-      onValueChange: (text) =>
-        setValue(itemAddress, text, {
-          shouldDirty: true,
-          shouldValidate: true,
-        }),
-      onBlur: () => scope.view.getState().touch(toFieldAddress(itemAddress)),
+      onValueChange: write,
+      onBlur: () => listItems.touch(toFieldAddress(itemAddress)),
     };
   });
 
@@ -662,7 +640,7 @@ function ScalarItems({
       items={views}
       full={full}
       add={typed ? 'input' : 'button'}
-      addInputType={box === 'number' ? 'number' : 'text'}
+      addInputType={box?.type ?? 'text'}
       addLabel='Add item'
       onAdd={(text) => {
         if (atMax()) return;
@@ -686,33 +664,38 @@ function ScalarItems({
 export function ArrayDrillIn() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
-  const node = useFieldSchema();
   const frame = useFieldFrame();
-  const scope = useScope();
   const [value] = useFieldValue<unknown>(address);
-  const flat = useFormErrors(useFormId());
-  const invalidCount = useStore(
-    scope.view,
-    useShallow((state) =>
-      countRevealedErrors(state, Object.keys(flat), address)
-    )
-  );
+  const invalidCount = useInvalidFieldCount();
+  const openLevel = useOpenLevel();
   return (
     <ArrayDrillInView
       {...frame}
       name={field.name}
       count={Array.isArray(value) ? value.length : 0}
       invalidCount={invalidCount}
-      onDrillIn={() =>
-        scope.view.getState().openLevel({
-          address,
-          label: field.label ?? field.name,
-          node,
-        })
-      }
+      onDrillIn={openLevel}
     />
   );
 }
+
+const numberBox = (
+  { min, max, step }: Extract<InlineBox, { type: 'number' }>,
+  text: string,
+  write: (next: string) => void
+): Pick<ArrayItemView, 'min' | 'max' | 'step' | 'onStep' | 'atLimit'> => ({
+  min,
+  max,
+  step,
+  onStep: (direction) => {
+    const next = stepValue(text, direction, step, { min, max });
+    if (next !== null) write(next);
+  },
+  atLimit: {
+    up: atLimit(text, 'up', { min, max }),
+    down: atLimit(text, 'down', { min, max }),
+  },
+});
 
 let scalarKeyCount = 0;
 const nextScalarKey = (): string => `scalar-item-${scalarKeyCount++}`;

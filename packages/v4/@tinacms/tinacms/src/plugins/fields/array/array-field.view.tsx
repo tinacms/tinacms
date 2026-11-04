@@ -1,6 +1,7 @@
 import {
   closestCenter,
   DndContext,
+  type Modifier,
   type UniqueIdentifier,
   PointerSensor,
   useSensor,
@@ -23,6 +24,8 @@ import { CardList, ListCard } from '@tinacms/ui/components/list-card';
 import { ArrowDown, ArrowUp, Copy } from 'lucide-react';
 import { type PointerEvent, type ReactNode, type Ref, useId } from 'react';
 
+const verticalOnly: Modifier = ({ transform }) => ({ ...transform, x: 0 });
+
 export const FULL_HINT = 'List is full';
 export const FULL_REASON = 'This list is full. Remove an item to add another.';
 
@@ -36,6 +39,12 @@ export interface ArrayItemView {
   value?: string;
   inputType?: 'text' | 'number';
   onValueChange?: (value: string) => void;
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  onStep?: (direction: 'up' | 'down') => void;
+  atLimit?: { up: boolean; down: boolean };
   /** Group cards only. */
   title?: string;
   summary?: string;
@@ -194,6 +203,12 @@ function Card({
           value={item.value}
           inputType={item.inputType}
           onValueChange={item.onValueChange}
+          placeholder={item.placeholder ?? itemPlaceholder}
+          min={item.min}
+          max={item.max}
+          step={item.step}
+          onStep={item.onStep}
+          atLimit={item.atLimit}
         />
       ) : (
         <ListCard
@@ -372,6 +387,7 @@ export function ArrayFieldView({
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          modifiers={[verticalOnly]}
           onDragEnd={onDragEnd}
         >
           <SortableContext

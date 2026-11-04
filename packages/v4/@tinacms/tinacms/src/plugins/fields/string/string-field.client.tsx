@@ -9,8 +9,8 @@ export default defineClientPlugin({
     metadata: {
       layout: 'inline',
       inlineBox: (node) => {
-        const { multiline, mono } = node as StringFieldSchema;
-        return multiline || mono ? undefined : 'text';
+        const { multiline, mono, placeholder } = node as StringFieldSchema;
+        return multiline || mono ? undefined : { type: 'text', placeholder };
       },
     },
     schema: stringSchema,
