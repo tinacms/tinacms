@@ -260,7 +260,7 @@ Each item is a List card in a card list.
   button. A block array shows "Add a block".
 - An empty list says so only when it has no Add control. A block array says
   "No blocks.". An editable array shows only its Add control. A read-only array
-  says "This list is empty.".
+  says "No tags." for a field labelled "Tags".
 - A read-only list has no container, no Add control and no menu. A disabled
   list has no hover and no menu.
 

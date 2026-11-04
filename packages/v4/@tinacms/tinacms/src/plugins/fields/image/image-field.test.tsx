@@ -312,7 +312,7 @@ describe('ImageField missing images', () => {
       `/uploads/${HERO}?w=400&h=400&retry=1`
     );
     fireEvent.load(image);
-    expect(within(group).queryByText(/\(missing\)/)).not.toBeInTheDocument();
+    expect(within(group).queryByText('File not found')).not.toBeInTheDocument();
   });
 
   it('marks a stored path whose image never loads, and keeps it', async () => {
@@ -321,11 +321,17 @@ describe('ImageField missing images', () => {
     vi.useFakeTimers();
     for (let attempt = 0; attempt < 3; attempt++) {
       await failToLoad(group, 'deleted.jpg');
-      expect(within(group).queryByText(/\(missing\)/)).not.toBeInTheDocument();
+      expect(
+        within(group).queryByText('File not found')
+      ).not.toBeInTheDocument();
     }
     fireEvent.error(within(group).getByAltText('deleted.jpg'));
+    expect(within(group).getByText('File not found')).toBeVisible();
+    expect(within(group).getByText('deleted.jpg')).toBeVisible();
     expect(
-      within(group).getByText('posts/deleted.jpg (missing)')
+      screen.getByText(
+        'This image is no longer in Media. Replace it, or remove it.'
+      )
     ).toBeVisible();
     expect(valueOf('hero')).toBe('posts/deleted.jpg');
   });
@@ -346,13 +352,13 @@ describe('ImageField missing images', () => {
       await failToLoad(group, 'photo.jpg');
     }
     fireEvent.error(within(group).getByAltText('photo.jpg'));
-    expect(within(group).getByText('photo.jpg (missing)')).toBeVisible();
+    expect(within(group).getByText('File not found')).toBeVisible();
     vi.useRealTimers();
     await pickFromLibrary(group, 'Replace');
     const image = within(group).getByAltText('photo.jpg');
     fireEvent.load(image);
     expect(image).toBeVisible();
-    expect(within(group).queryByText(/\(missing\)/)).not.toBeInTheDocument();
+    expect(within(group).queryByText('File not found')).not.toBeInTheDocument();
   });
 });
 

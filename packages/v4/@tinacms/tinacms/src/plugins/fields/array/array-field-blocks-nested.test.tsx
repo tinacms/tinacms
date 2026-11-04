@@ -94,18 +94,13 @@ const pick = async (list: HTMLElement, name: string) => {
 };
 
 describe('Blocks field: where a picked block opens', () => {
-  it('opens a top-level block in place, with focus on its grip', async () => {
+  it('opens a top-level block as its own form level, with focus on its first field', async () => {
     renderForm({});
     const blocks = await screen.findByRole('group', { name: 'Blocks' });
     await pick(blocks, 'Add Quote');
-    const card = await within(blocks).findByRole('button', {
-      name: /^Item 1/,
-    });
-    expect(card).toHaveAttribute('aria-expanded', 'true');
-    await waitFor(() => {
-      expect(document.activeElement).toHaveAttribute('data-grip');
-      expect(blocks).toContainElement(document.activeElement as HTMLElement);
-    });
+    const text = await screen.findByRole('textbox', { name: /^Text\b/ });
+    await waitFor(() => expect(text).toHaveFocus());
+    expect(screen.queryByRole('group', { name: 'Blocks' })).toBeNull();
   });
 
   it('opens a block at depth 3 as the next form level, with focus on its first field', async () => {

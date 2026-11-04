@@ -67,6 +67,7 @@ interface HarnessProps {
   value: Value;
   templates: MdxTemplate[];
   onActivateField: (address: string) => void;
+  errorCount?: (address: string) => number;
   onEditorReady: (editor: HarnessEditor) => void;
 }
 
@@ -74,6 +75,7 @@ const Harness = ({
   value,
   templates,
   onActivateField,
+  errorCount,
   onEditorReady,
 }: HarnessProps) => {
   const editor = usePlateEditor({
@@ -89,6 +91,7 @@ const Harness = ({
     rawMode: false,
     setRawMode: () => {},
     onActivateField,
+    errorCount,
     embedEditAvailable: false,
   };
 
@@ -109,9 +112,11 @@ const Harness = ({
 export const renderEmbedEditor = ({
   value,
   templates,
+  errorCount,
 }: {
   value: Value;
   templates: MdxTemplate[];
+  errorCount?: (address: string) => number;
 }): { editor: HarnessEditor; onActivateField: Mock } => {
   const onActivateField = vi.fn();
   let editor: HarnessEditor | undefined;
@@ -121,6 +126,7 @@ export const renderEmbedEditor = ({
       value={value}
       templates={templates}
       onActivateField={onActivateField}
+      errorCount={errorCount}
       onEditorReady={(next) => {
         editor = next;
       }}

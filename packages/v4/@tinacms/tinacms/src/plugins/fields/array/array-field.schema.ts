@@ -16,6 +16,8 @@ const COMPOUND_TYPES: string[] = [ARRAY_FIELD_TYPE, OBJECT_FIELD_TYPE];
 
 interface ArrayFieldBase extends BaseFieldSchema {
   type: typeof ARRAY_FIELD_TYPE;
+  /** The words on the Add button, such as "Add a tag". Defaults to "Add item". */
+  addLabel?: string;
 }
 
 export type ItemLabel = (item: TinaDocument) => unknown;
@@ -23,6 +25,10 @@ export type ItemLabel = (item: TinaDocument) => unknown;
 export interface ArrayTemplateSchema extends TemplateSchema {
   itemLabel?: ItemLabel;
   previewImage?: string;
+  /** The heading this template sits under in the block picker. Templates without one come first. */
+  group?: string;
+  /** One line under the template's name in the block picker. */
+  description?: string;
 }
 
 export interface FieldsArrayFieldSchema extends ArrayFieldBase {

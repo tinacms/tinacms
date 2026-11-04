@@ -202,15 +202,24 @@ function ObjectItems({
     items.map((_, index) => `${address}.${index}`)
   );
 
+  // A block always opens as its own form level. Any other item opens there from level 3.
+  const opensNextLevel = (itemAddress: string) =>
+    isTemplatesArray(field) || itemOpensNextLevel(itemAddress);
+
   // Opens an item where its depth says: in place, or as the next form level.
   // Returns whether it opened a form level.
   function showItem(index: number): boolean {
     const itemAddress = `${address}.${index}`;
     const stored: unknown = getValues(itemAddress);
     const fields = isItem(stored) ? itemFieldsOf(field, stored) : undefined;
-    if (fields && itemOpensNextLevel(itemAddress)) {
+    if (fields && opensNextLevel(itemAddress)) {
       const heading = itemHeadingOf(field, stored, index);
-      listItems.openLevel(itemAddress, heading, fields);
+      listItems.openLevel(
+        itemAddress,
+        heading,
+        fields,
+        isTemplatesArray(field)
+      );
       // The level replaced the list, so focus moves to its first field.
       const first = fields.find((subfield) => !subfield.hidden);
       if (first) setActive(toFieldAddress(`${itemAddress}.${first.name}`));
@@ -324,7 +333,7 @@ function ObjectItems({
     }
 
     const opens =
-      fields && itemOpensNextLevel(itemAddress) ? 'next-level' : 'in-place';
+      fields && opensNextLevel(itemAddress) ? 'next-level' : 'in-place';
     return {
       id: item.id,
       name: `Item ${index + 1}`,
@@ -376,7 +385,7 @@ function ObjectItems({
       items={views}
       full={full}
       add='button'
-      addLabel='Add item'
+      addLabel={field.addLabel ?? 'Add item'}
       onAdd={() => add()}
       emptyText={isTemplatesArray(field) ? 'No blocks.' : undefined}
       addSlot={
@@ -465,6 +474,8 @@ function TemplatePicker({
   const options: BlockOption[] = field.templates.map((template) => ({
     name: template.name,
     label: templateTitle(template),
+    group: template.group,
+    description: template.description,
     preview: template.previewImage ? (
       <PreviewImage path={template.previewImage} />
     ) : undefined,
@@ -641,7 +652,7 @@ function ScalarItems({
       full={full}
       add={typed ? 'input' : 'button'}
       addInputType={box?.type ?? 'text'}
-      addLabel='Add item'
+      addLabel={field.addLabel ?? 'Add item'}
       onAdd={(text) => {
         if (atMax()) return;
         const entry = text === undefined ? seedScalar() : text;

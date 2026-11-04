@@ -54,7 +54,6 @@ export function ImageField() {
   const [value, setValue] = useFieldValue<unknown>(address);
   const path = typeof value === 'string' ? value : null;
   const notAPath = value != null && path === null;
-  const frame = useFieldFrame();
   const media = useMediaSlice();
   const mainButtonRef = useRef<HTMLButtonElement>(null);
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -72,10 +71,16 @@ export function ImageField() {
   useEffect(() => () => clearTimeout(retryTimer.current), []);
 
   const features = media.features ?? {};
-  const locked = frame.disabled || frame.readOnly;
-  const canUpload = features.readOnly !== true && !locked;
   const failures = path !== null && failure?.path === path ? failure.count : 0;
   const missing = notAPath || failures > RETRY_DELAYS_MS.length;
+  const frame = useFieldFrame({
+    warnings:
+      missing && path !== null
+        ? ['This image is no longer in Media. Replace it, or remove it.']
+        : [],
+  });
+  const locked = frame.disabled || frame.readOnly;
+  const canUpload = features.readOnly !== true && !locked;
   const thumbnailSrc =
     path === null
       ? null
@@ -201,14 +206,17 @@ export function ImageField() {
                 </span>
               )}
               <span
-                className='min-w-0 flex-1 truncate text-sm'
+                className='flex min-w-0 flex-1 flex-col text-sm'
                 title={path ?? undefined}
               >
-                {path === null
-                  ? 'Not a media path'
-                  : missing
-                    ? `${path} (missing)`
-                    : mediaNameOf(path)}
+                {missing && path !== null ? (
+                  <span className='text-xs text-muted-foreground'>
+                    File not found
+                  </span>
+                ) : null}
+                <span className='truncate'>
+                  {path === null ? 'Not a media path' : mediaNameOf(path)}
+                </span>
               </span>
             </>
           )}
