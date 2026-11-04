@@ -29,6 +29,29 @@ function DropdownMenuTrigger({ ...props }: MenuPrimitive.Trigger.Props) {
 }
 
 /** Give it an `aria-label`: screen readers name the menu by it. */
+// The arrow keys, Home and End skip a greyed item. Base UI keeps it focusable, so this
+// moves focus itself, before Base UI sees the key.
+function skipDisabledItems(event: React.KeyboardEvent<HTMLElement>) {
+  if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+  const items = [
+    ...event.currentTarget.querySelectorAll<HTMLElement>(
+      '[role^="menuitem"]:not([aria-disabled="true"])'
+    ),
+  ];
+  if (items.length === 0) return;
+  const at = items.findIndex((item) => item === document.activeElement);
+  const last = items.length - 1;
+  let next = 0;
+  if (event.key === 'End') next = last;
+  else if (event.key === 'ArrowDown')
+    next = at === -1 ? 0 : (at + 1) % items.length;
+  else if (event.key === 'ArrowUp')
+    next = at === -1 ? last : (at - 1 + items.length) % items.length;
+  event.preventDefault();
+  event.stopPropagation();
+  items[next]?.focus();
+}
+
 function DropdownMenuContent({
   align = 'start',
   alignOffset = 0,
@@ -52,6 +75,7 @@ function DropdownMenuContent({
       >
         <MenuPrimitive.Popup
           data-slot='dropdown-menu-content'
+          onKeyDownCapture={skipDisabledItems}
           className={cn(
             'z-50 box-border max-h-(--available-height) w-66 max-w-(--available-width) min-w-60 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md bg-popover p-1 font-sans text-base leading-control text-foreground shadow-popover outline-none',
             'transition-[opacity,scale] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0',
