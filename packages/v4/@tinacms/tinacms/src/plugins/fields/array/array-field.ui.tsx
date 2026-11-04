@@ -83,6 +83,13 @@ function ItemList() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
   const frame = useFieldFrame();
+  const registry = useFieldRegistry();
+  const ListView = isScalarArray(field)
+    ? registry.get(field.of.type)?.ListView
+    : undefined;
+
+  if (ListView) return <ListView />;
+
   const { htmlFor: _htmlFor, ...shown } = frame;
   return isScalarArray(field) ? (
     <ScalarItems address={address} field={field} frame={shown} />
