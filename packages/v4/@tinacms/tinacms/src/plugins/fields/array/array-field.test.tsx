@@ -286,8 +286,8 @@ describe('ArrayField add, remove, and reorder', () => {
       authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: 'Ada' }],
       tags: [{ value: 'one' }, { value: 'two' }],
     });
-    const authors = await screen.findByRole('group', { name: 'Authors' });
-    const tags = screen.getByRole('group', { name: 'Tags' });
+    const authors = await screen.findByRole('group', { name: /^Authors\b/ });
+    const tags = screen.getByRole('group', { name: /^Tags\b/ });
     const moveDown = within(authors).getByRole('button', {
       name: 'Move item 1 down',
     });
@@ -301,7 +301,7 @@ describe('ArrayField add, remove, and reorder', () => {
     await waitFor(() => {
       expect(
         within(authors)
-          .getAllByLabelText('Name')
+          .getAllByLabelText(/^Name\b/)
           .map((input) => (input as HTMLInputElement).value)
       ).toEqual(['Brook', 'Ivan', 'Ada']);
     });
@@ -316,8 +316,8 @@ describe('ArrayField add, remove, and reorder', () => {
       authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: 'Ada' }],
       tags: [{ value: 'one' }],
     });
-    const authors = await screen.findByRole('group', { name: 'Authors' });
-    const tags = screen.getByRole('group', { name: 'Tags' });
+    const authors = await screen.findByRole('group', { name: /^Authors\b/ });
+    const tags = screen.getByRole('group', { name: /^Tags\b/ });
     const removeIvan = within(authors).getByRole('button', {
       name: 'Remove item 1',
     });
@@ -334,7 +334,7 @@ describe('ArrayField add, remove, and reorder', () => {
     await waitFor(() => {
       expect(
         within(authors)
-          .getAllByLabelText('Name')
+          .getAllByLabelText(/^Name\b/)
           .map((input) => (input as HTMLInputElement).value)
       ).toEqual(['Ivan', 'Ada']);
     });
@@ -420,7 +420,7 @@ describe('ArrayField remove with stored objects', () => {
   it('keeps a list item that is not an object unchanged when another item is removed', async () => {
     const onSave = vi.fn();
     renderPeople({ people: ['oops', { name: 'A' }, { name: 'B' }] }, onSave);
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 3' })
     );
@@ -437,7 +437,7 @@ describe('ArrayField remove with stored objects', () => {
       { people: [{ name: 'A', profile: { bio: 'x' } }, { name: 'B' }] },
       onSave
     );
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 1' })
     );
@@ -452,7 +452,7 @@ describe('ArrayField remove with stored objects', () => {
       { people: [{ name: 'A' }, { name: 'Brook', profile: { bio: '' } }] },
       onSave
     );
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 1' })
     );
@@ -502,7 +502,7 @@ describe('ArrayField remove with stored objects', () => {
         </FormProvider>
       </TinaProvider>
     );
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 1' })
     );
@@ -522,7 +522,7 @@ describe('ArrayField remove with stored objects', () => {
       },
       onSave
     );
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Move item 2 up' })
     );
@@ -539,7 +539,7 @@ describe('ArrayField remove with stored objects', () => {
       { people: [{ name: 'A' }, { name: 'Brook', profile: {} }] },
       onSave
     );
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 1' })
     );
@@ -589,7 +589,7 @@ describe('ArrayField remove with stored objects', () => {
         </FormProvider>
       </TinaProvider>
     );
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 1' })
     );
@@ -604,7 +604,7 @@ describe('ArrayField remove with stored objects', () => {
       onSave,
       true
     );
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 1' })
     );
@@ -874,7 +874,7 @@ describe('ArrayField validation', () => {
         <SetNameError onSet={(errors) => (seen.errors = errors)} />
       </>
     );
-    await screen.findByLabelText('Name');
+    await screen.findByLabelText(/^Name\b/);
     const settled = ticks.count;
     expect(settled).toBeGreaterThan(0);
     await userEvent.click(
@@ -899,7 +899,7 @@ describe('ArrayField validation', () => {
 
   it('drops a validation error when the invalid item is removed', async () => {
     renderField({ authors: [{ name: 'Ivan' }, { name: 'Brook' }] });
-    const names = await screen.findAllByLabelText('Name');
+    const names = await screen.findAllByLabelText(/^Name\b/);
     await userEvent.clear(names[0]);
     await waitFor(() =>
       expect(screen.getAllByRole('alert').length).toBeGreaterThan(0)
@@ -910,7 +910,7 @@ describe('ArrayField validation', () => {
     await waitFor(() =>
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     );
-    expect((screen.getByLabelText('Name') as HTMLInputElement).value).toBe(
+    expect((screen.getByLabelText(/^Name\b/) as HTMLInputElement).value).toBe(
       'Brook'
     );
   });
@@ -919,7 +919,7 @@ describe('ArrayField validation', () => {
     renderField({
       authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: 'Ada' }],
     });
-    const names = await screen.findAllByLabelText('Name');
+    const names = await screen.findAllByLabelText(/^Name\b/);
     await userEvent.clear(names[1]);
     await waitFor(() =>
       expect(screen.getAllByRole('alert').length).toBeGreaterThan(0)
@@ -928,7 +928,7 @@ describe('ArrayField validation', () => {
       screen.getByRole('button', { name: 'Remove item 1' })
     );
     await waitFor(() => {
-      const remaining = screen.getAllByLabelText('Name') as HTMLInputElement[];
+      const remaining = screen.getAllByLabelText(/^Name\b/) as HTMLInputElement[];
       expect(remaining.map((input) => input.value)).toEqual(['', 'Ada']);
       const wrapperOf = (input: HTMLElement) =>
         input.closest('[data-slot="field-wrapper"]');
@@ -949,7 +949,7 @@ describe('ArrayField validation', () => {
     renderField({
       authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: 'Cara' }],
     });
-    const names = await screen.findAllByLabelText('Name');
+    const names = await screen.findAllByLabelText(/^Name\b/);
     await userEvent.clear(names[2]);
     await waitFor(() =>
       expect(screen.getAllByRole('alert').length).toBeGreaterThan(0)
@@ -958,7 +958,7 @@ describe('ArrayField validation', () => {
       screen.getByRole('button', { name: 'Remove item 1' })
     );
     await waitFor(() =>
-      expect(screen.getAllByLabelText('Name')).toHaveLength(2)
+      expect(screen.getAllByLabelText(/^Name\b/)).toHaveLength(2)
     );
     const keys = errorKeys();
     expect(keys).toContain('authors.1.name');
@@ -970,13 +970,13 @@ describe('ArrayField validation', () => {
     renderField({
       authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: '' }],
     });
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 1' })
     );
     await waitFor(() =>
-      expect(screen.getAllByLabelText('Name')).toHaveLength(2)
+      expect(screen.getAllByLabelText(/^Name\b/)).toHaveLength(2)
     );
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
   });
@@ -985,7 +985,7 @@ describe('ArrayField validation', () => {
     renderField({
       groups: [{ members: [{ name: 'Ivan' }, { name: 'Brook' }] }],
     });
-    await screen.findAllByLabelText('Name');
+    await screen.findAllByLabelText(/^Name\b/);
     await userEvent.click(
       screen.getByRole('button', { name: 'Remove item 2' })
     );
@@ -1001,7 +1001,7 @@ describe('ArrayField validation', () => {
 
   it('keeps an existing validation error when another item is removed', async () => {
     renderField({ authors: [{ name: 'Ivan' }, { name: 'Brook' }] });
-    const names = await screen.findAllByLabelText('Name');
+    const names = await screen.findAllByLabelText(/^Name\b/);
     await userEvent.clear(names[0]);
     await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2));
     await userEvent.click(
