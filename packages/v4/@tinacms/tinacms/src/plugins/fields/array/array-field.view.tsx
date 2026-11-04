@@ -195,7 +195,7 @@ function Card({
           value={item.value}
           inputType={item.inputType}
           onValueChange={item.onValueChange}
-          placeholder={item.placeholder}
+          placeholder={item.placeholder ?? itemPlaceholder}
           min={item.min}
           max={item.max}
           step={item.step}

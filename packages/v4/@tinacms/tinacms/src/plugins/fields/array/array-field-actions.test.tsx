@@ -406,6 +406,14 @@ describe('ArrayField scalar items', () => {
     ).toHaveAttribute('placeholder', 'Empty tag');
   });
 
+  it('shows the default placeholder in an empty number item', async () => {
+    renderPage({ scores: [''] });
+    const scores = await screen.findByRole('group', { name: 'Scores' });
+    expect(
+      within(scores).getByRole('spinbutton', { name: 'Item 1' })
+    ).toHaveAttribute('placeholder', 'Empty item');
+  });
+
   it('keeps the widget of a type that has no card box', async () => {
     renderPage({ flags: [true, false] });
     expect(
