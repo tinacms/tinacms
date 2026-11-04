@@ -45,10 +45,16 @@ export const toDocument = (values: FormValues): TinaDocument => ({ ...values });
 export type FormStatus = 'pristine' | 'dirty' | 'clean';
 
 /** One form's last save, written by `useFormSave` and read by the shell. */
+export type SaveFailureReason = 'conflict' | 'branch-gone';
+
 export type SavePhase =
   | { readonly phase: 'saving' }
   | { readonly phase: 'saved' }
-  | { readonly phase: 'failed'; readonly message: string };
+  | {
+      readonly phase: 'failed';
+      readonly message: string;
+      readonly reason?: SaveFailureReason;
+    };
 
 export type FieldErrors = Partial<Record<FieldAddress, string[]>>;
 
@@ -436,6 +442,8 @@ export interface SaveSummary {
   state: SaveState;
   /** The newest failed save's message, when `state` is `failed`. */
   message?: string;
+  /** Why the newest save failed, when the provider says. The Status bar words it. */
+  reason?: SaveFailureReason;
 }
 
 /**
@@ -449,7 +457,7 @@ const summarizeSaves = (state: FormStore): SaveSummary => {
   if (saves.some((save) => save.phase === 'saving')) return { state: 'saving' };
   const newest = saves.sort((a, b) => b.at - a.at)[0];
   if (newest?.phase === 'failed') {
-    return { state: 'failed', message: newest.message };
+    return { state: 'failed', message: newest.message, reason: newest.reason };
   }
   if (anyFormDirty(state)) return { state: 'unsaved' };
   return { state: newest?.phase === 'saved' ? 'saved' : 'idle' };

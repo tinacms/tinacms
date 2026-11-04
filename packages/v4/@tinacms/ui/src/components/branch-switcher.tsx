@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from '@tinacms/ui/components/dialog';
 import { Icon } from '@tinacms/ui/components/icon';
+import { SearchBox } from '@tinacms/ui/components/search-box';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type BranchEntry = { name: string; protected?: boolean };
@@ -85,12 +86,14 @@ function BranchLine({
 
 function BranchGroup({
   heading,
+  description,
   branches,
   current,
   blocked,
   onSwitch,
 }: {
-  heading: string;
+  heading?: string;
+  description?: string;
   branches: BranchEntry[];
   current: string;
   blocked: boolean;
@@ -98,10 +101,17 @@ function BranchGroup({
 }) {
   if (branches.length === 0) return null;
   return (
-    <section aria-label={heading} className='flex flex-col gap-1'>
-      <h3 className='m-0 px-2.5 text-xs font-medium text-muted-foreground-strong'>
-        {heading}
-      </h3>
+    <section aria-label={heading ?? 'Branches'} className='flex flex-col gap-1'>
+      {heading ? (
+        <div className='px-2.5'>
+          <h3 className='m-0 text-xs font-medium text-muted-foreground-strong'>
+            {heading}
+          </h3>
+          {description ? (
+            <p className='m-0 text-xs text-muted-foreground'>{description}</p>
+          ) : null}
+        </div>
+      ) : null}
       <ul className='m-0 flex list-none flex-col p-0'>
         {branches.map((branch) => (
           <BranchLine
@@ -118,8 +128,8 @@ function BranchGroup({
 }
 
 /**
- * The branch button and the pop-up it opens: one line per branch, protected
- * branches in one Protected group, and a full screen toggle.
+ * The branch button and the pop-up it opens: a search box, the current branch first,
+ * then the others, protected branches in one Protected group, and a full screen toggle.
  */
 function BranchSwitcher({
   current,
@@ -136,8 +146,19 @@ function BranchSwitcher({
     (branch) => branch.name === current && branch.protected
   );
   const blocked = blockedMessage !== undefined;
-  const protectedBranches = branches.filter((branch) => branch.protected);
-  const otherBranches = branches.filter((branch) => !branch.protected);
+  const [query, setQuery] = useState('');
+  const matching = branches.filter((branch) =>
+    branch.name.toLowerCase().includes(query.trim().toLowerCase())
+  );
+  const currentFirst = [
+    ...matching.filter((branch) => branch.name === current),
+    ...matching.filter(
+      (branch) => branch.name !== current && !branch.protected
+    ),
+  ];
+  const protectedBranches = matching.filter(
+    (branch) => branch.protected && branch.name !== current
+  );
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
@@ -162,8 +183,8 @@ function BranchSwitcher({
       >
         <DialogHeader className='flex-row items-start justify-between gap-2'>
           <div className='flex min-w-0 flex-col gap-1'>
-            <DialogTitle>Switch branch</DialogTitle>
-            <DialogDescription>
+            <DialogTitle>Branches</DialogTitle>
+            <DialogDescription className='sr-only'>
               Edits save to the branch you choose.
             </DialogDescription>
           </div>
@@ -189,9 +210,20 @@ function BranchSwitcher({
             {blockedMessage}
           </p>
         ) : null}
+        <SearchBox
+          label='Search branches'
+          placeholder='Name or pull request number'
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onClear={() => setQuery('')}
+        />
+        {matching.length === 0 ? (
+          <p className='m-0 text-sm text-muted-foreground'>
+            No branch matches “{query.trim()}”.
+          </p>
+        ) : null}
         <BranchGroup
-          heading='Protected'
-          branches={protectedBranches}
+          branches={currentFirst}
           current={current}
           blocked={blocked}
           onSwitch={(name) => {
@@ -200,8 +232,9 @@ function BranchSwitcher({
           }}
         />
         <BranchGroup
-          heading='Branches'
-          branches={otherBranches}
+          heading='Protected'
+          description='Saving on these makes a new branch.'
+          branches={protectedBranches}
           current={current}
           blocked={blocked}
           onSwitch={(name) => {

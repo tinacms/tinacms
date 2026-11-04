@@ -13,8 +13,8 @@ type SaveProgressProps = Omit<ComponentProps<'div'>, 'children'> & {
 };
 
 /**
- * The card that shows a long save while the editor keeps working. Screen
- * readers hear it appear.
+ * The card that shows a long save while the editor keeps working. It is a named
+ * region with nothing live inside: the Status bar announces the save.
  */
 function SaveProgress({
   placement = 'corner',
@@ -24,13 +24,14 @@ function SaveProgress({
 }: SaveProgressProps) {
   return (
     <div
-      role='status'
+      role='region'
+      aria-label='Save progress'
       data-slot='save-progress'
       data-placement={placement}
       className={cn(
         'box-border flex items-center gap-2.5 rounded-md bg-card py-3 pr-4 pl-3.5 font-sans text-sm leading-control text-foreground shadow-toast',
         placement === 'corner'
-          ? 'fixed right-4 bottom-11 z-40 w-80 max-w-[calc(100vw-2rem)]'
+          ? 'fixed right-4 bottom-11 z-40 w-90 max-w-[calc(100vw-2rem)]'
           : 'w-full',
         className
       )}
