@@ -148,7 +148,7 @@ function renderMenu(onDiscard = vi.fn()) {
 }
 
 describe('DropdownMenu', () => {
-  it('moves with the arrow keys, wraps round, and a greyed item does nothing', async () => {
+  it('moves with the arrow keys, wraps round, and skips a greyed item', async () => {
     const user = userEvent.setup();
     renderMenu();
     screen.getByRole('button', { name: 'Document actions' }).focus();
@@ -158,17 +158,25 @@ describe('DropdownMenu', () => {
       expect(screen.getByRole('menuitem', { name: /Duplicate/ })).toHaveFocus()
     );
     await user.keyboard('{ArrowDown}');
-    const rename = screen.getByRole('menuitem', { name: /Rename/ });
-    expect(rename).toHaveFocus();
-    expect(rename).toHaveAttribute('aria-disabled', 'true');
-    await user.keyboard('{Enter}');
-    expect(screen.getByRole('menu')).toBeInTheDocument();
+    expect(
+      screen.getByRole('menuitemcheckbox', { name: /Show uncommitted only/ })
+    ).toHaveFocus();
+    expect(screen.getByRole('menuitem', { name: /Rename/ })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+    await user.keyboard('{ArrowUp}');
+    expect(screen.getByRole('menuitem', { name: /Duplicate/ })).toHaveFocus();
     await user.keyboard('{End}');
     expect(
       screen.getByRole('menuitem', { name: 'Discard unsaved edits' })
     ).toHaveFocus();
     await user.keyboard('{ArrowDown}');
     expect(screen.getByRole('menuitem', { name: /Duplicate/ })).toHaveFocus();
+    await user.keyboard('{ArrowUp}');
+    expect(
+      screen.getByRole('menuitem', { name: 'Discard unsaved edits' })
+    ).toHaveFocus();
   });
 
   it('picks with Enter and closes', async () => {
