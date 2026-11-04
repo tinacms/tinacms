@@ -1,4 +1,7 @@
 export type AdminRoute =
+  | { view: 'home' }
+  | { view: 'media' }
+  | { view: 'changes' }
   | { view: 'collections' }
   | { view: 'collection'; collection: string }
   | { view: 'document'; collection: string; path: string }
@@ -8,9 +11,16 @@ export const COLLECTIONS_ROUTE: AdminRoute = { view: 'collections' };
 
 const COLLECTIONS_PREFIX = 'collections';
 const SCREENS_PREFIX = 'screens';
+const ROOMS = ['home', 'media', 'changes'] as const;
 
 export const formatAdminRoute = (route: AdminRoute): string => {
   if (route.view === 'collections') return '#/';
+  if (
+    route.view === 'home' ||
+    route.view === 'media' ||
+    route.view === 'changes'
+  )
+    return `#/${route.view}`;
   if (route.view === 'screen') {
     const parts = [route.screen, ...route.segments].map(encodeURIComponent);
     return `#/${SCREENS_PREFIX}/${parts.join('/')}`;
@@ -34,6 +44,8 @@ export const parseAdminRoute = (hash: string): AdminRoute => {
   const decoded = raw.map(decodeSegment);
   if (decoded.some((segment) => segment === null)) return COLLECTIONS_ROUTE;
   const [prefix, head, ...rest] = decoded as string[];
+  const room = ROOMS.find((candidate) => candidate === prefix);
+  if (room && !head) return { view: room };
   if (!head) return COLLECTIONS_ROUTE;
   if (prefix === SCREENS_PREFIX)
     return { view: 'screen', screen: head, segments: rest };

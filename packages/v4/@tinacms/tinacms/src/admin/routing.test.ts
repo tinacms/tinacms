@@ -9,6 +9,9 @@ import {
 describe('admin routing', () => {
   const routes: AdminRoute[] = [
     { view: 'collections' },
+    { view: 'home' },
+    { view: 'media' },
+    { view: 'changes' },
     { view: 'collection', collection: 'post' },
     { view: 'document', collection: 'post', path: 'content/posts/hello.mdx' },
     { view: 'screen', screen: 'media', segments: [] },

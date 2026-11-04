@@ -483,3 +483,12 @@ export const useSaveSummary = (): SaveSummary =>
   useFormStore(useShallow(summarizeSaves));
 
 export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
+
+/** How many open documents hold unsaved edits. */
+export const useDirtyFormCount = (): number =>
+  useFormStore(
+    (state) =>
+      Object.values(state.forms).filter(
+        (scope) => formStatus(scope) === 'dirty'
+      ).length
+  );
