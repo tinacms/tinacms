@@ -424,3 +424,26 @@ describe('array field view without handlers', () => {
     expect(card).toHaveTextContent('1 item');
   });
 });
+
+describe('array field inserting slot', () => {
+  const filled = arrayFieldStates.find((state) => state.name === 'filled');
+
+  it.each([
+    [0, 'before the first card'],
+    [99, 'after the last card'],
+  ])('draws the slot at index %i %s', (index) => {
+    if (!filled) throw new Error('No filled state');
+    render(
+      <ArrayFieldView
+        {...filled.props}
+        inserting={{ index, content: <p>Pick a block</p> }}
+      />
+    );
+    const slot = screen.getByText('Pick a block');
+    const cards = document.querySelectorAll('[data-array-item]');
+    const position = slot.compareDocumentPosition(cards[0]);
+    expect(Boolean(position & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(
+      index === 0
+    );
+  });
+});
