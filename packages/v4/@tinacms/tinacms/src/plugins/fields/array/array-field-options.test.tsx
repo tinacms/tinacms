@@ -146,7 +146,7 @@ describe('defaultItem', () => {
       )
     );
     await user.click(await screen.findByRole('button', { name: 'Add item' }));
-    expect(screen.getByLabelText('Tag')).toHaveValue('new');
+    expect(screen.getByRole('textbox', { name: 'Item 1' })).toHaveValue('new');
   });
 
   it('is a type error on the templates array itself', () => {
@@ -176,7 +176,7 @@ describe('itemLabel', () => {
       links((item) => item.label),
       { links: [{ label: 'Docs' }] }
     );
-    expect(await screen.findByText('Docs')).toBeInTheDocument();
+    await user.click(await screen.findByRole('button', { name: /Docs/ }));
     await user.type(screen.getByLabelText('Label'), '!');
     expect(screen.getByText('Docs!')).toBeInTheDocument();
   });
@@ -190,10 +190,13 @@ describe('itemLabel', () => {
         throw new Error('boom');
       },
     ],
-  ])('falls back to "Item N" for an %s result', async (_name, itemLabel) => {
-    renderCollection(links(itemLabel), { links: [{ label: 'Docs' }] });
-    expect(await screen.findByText('Item 1')).toBeInTheDocument();
-  });
+  ])(
+    'falls back to the first text field for an %s result',
+    async (_name, itemLabel) => {
+      renderCollection(links(itemLabel), { links: [{ label: 'Docs' }] });
+      expect(await screen.findByText('Docs')).toBeInTheDocument();
+    }
+  );
 
   it('heads a block by its template itemLabel', async () => {
     renderCollection(

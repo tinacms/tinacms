@@ -118,6 +118,21 @@ The properties of the descriptor:
 - `metadata.layout` — The layout hint: `inline` or `block`.
 - `metadata.labelable` — Set it to `false` to hide the outer field label. The
   `rich-text` field sets it to `false` because it renders its own label area.
+- `metadata.drillable` — Set it to `true` when the field can open as its own form
+  level. The editor drills in at nesting depth 3 and deeper.
+- `metadata.drillsIn(node)` — Overrides the depth rule for one node. `true`
+  drills in, `false` opens in place, `undefined` keeps the depth rule. The
+  `object` field returns it from `display`.
+- `metadata.inlineBox(node)` — For a single-value field. It returns the box a
+  list card holds in place of the field's widget, with the settings of that
+  widget, or `undefined` to keep the widget. The `string` field returns
+  `{ type: 'text', placeholder }` unless the node sets `multiline` or `mono`.
+  The `number` field returns `{ type: 'number', min, max, step }`, and the card
+  shows step buttons. The `array` field reads it for the items of an `of` list.
+- `DrillInComponent` — Draws the field in place of the drill-in button when the
+  field drills in. Without it, the editor draws its generic button. The `object`
+  and `array` fields supply a card. The items of an `array` also open as a form
+  level, one level below the array (see [the array field](./array-field.md#opening-an-item)).
 - `schema(node)` — It returns a Zod schema for the validation in layer 1.
 - `isEmpty(value)` — What the built-in `required` validator asks of this field
   type. Declare it when the generic check is wrong.
@@ -200,6 +215,30 @@ Hooks:
 | `useFieldValue<T>(address)` | Gives `[value, setValue]` from the react-hook-form controller |
 | `useFieldErrors(address)` | Gives every validation message at `address` or under it |
 | `useFieldActivation(handler)` | Runs `handler` when this field becomes the active field, for visual editing |
+| `useFieldFrame(options?)` | Gives the label, `htmlFor`, errors and help for `FieldWrapper`. `{ ownErrorsOnly: true }` keeps only the errors on this field's own address. |
+| `useOpenLevel()` | Gives a function that opens this field as the next form level |
+| `useInvalidFieldCount()` | Gives how many fields under this field show an error. It counts fields, not messages. |
+| `useIsOpenLevel()` | Gives `true` when this field is the open form level |
+| `useInvalidFieldCounts(addresses)` | Gives the `useInvalidFieldCount()` value for each address, in the same order. A list field reads it for its items. |
+| `useListItems()` | Gives `openLevel`, `isRevealed` and `touch` for the items of a list field, by item address |
+
+A field that supplies a `DrillInComponent` builds it from these hooks and
+`@tinacms/ui` only:
+
+```tsx
+function SettingsCard() {
+  const open = useOpenLevel();
+  const count = useInvalidFieldCount();
+  const { label } = useFieldFrame({ ownErrorsOnly: true });
+  return (
+    <DrillInCard
+      label={String(label)}
+      invalidCount={count}
+      onOpen={open}
+    />
+  );
+}
+```
 
 ## Options every field takes
 
@@ -257,7 +296,7 @@ error names the field and the collection, and says what to use instead:
 
 | Option | Use instead |
 |---|---|
-| `ui` | Top-level `description`, `defaultValue`, `hidden`, `itemLabel`, `picker`. |
+| `ui` | Top-level `description`, `defaultValue`, `hidden`, `itemLabel`, `picker`, `display`. |
 | `component` | A field plugin for the widget. |
 | `parse` | `parse` on the field plugin, or a collection hook. |
 | `format` | `serialize` on the field plugin, or a collection hook. |
@@ -266,7 +305,8 @@ error names the field and the collection, and says what to use instead:
 
 A templates array that sets `defaultItem` fails the build too. Set it on each
 template. A `picker` value other than `'list'` or `'grid'`, or a `picker` on an
-array without `templates`, fails the build.
+array without `templates`, fails the build. So does an object `display` other
+than `'fieldset'`, `'collapsible'` or `'drillIn'`.
 
 ## Validation in two layers
 

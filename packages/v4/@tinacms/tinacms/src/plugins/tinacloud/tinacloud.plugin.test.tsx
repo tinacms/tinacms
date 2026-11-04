@@ -252,10 +252,10 @@ describe('tinaCloud()', () => {
     );
   });
 
-  it('reads the branch from store.branch.name at call time', async () => {
+  it('reads the branch from store.branch.current at call time', async () => {
     const fetchMock = stubTinaCloud();
     const { store, media } = await bootSignedIn();
-    store.setState({ branch: { name: 'feat/x' } });
+    store.setState({ branch: { current: 'feat/x' } });
     await media.list('');
     expect(listUrls(fetchMock)).toEqual([
       `${TINACLOUD_ASSETS_URL}/v2/abc/list/?limit=20&branch=feat%2Fx`,
@@ -302,8 +302,9 @@ describe('tinaCloud()', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
     act(() => complete());
+    await user.click(await screen.findByRole('button', { name: 'Account' }));
     expect(
-      await screen.findByRole('list', { name: 'Account' })
+      await screen.findByRole('menu', { name: 'Account' })
     ).toHaveTextContent('Ada Lovelace');
     expect(screen.getByRole('list', { name: 'Collections' })).toBeVisible();
   });

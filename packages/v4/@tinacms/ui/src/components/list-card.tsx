@@ -1,10 +1,13 @@
 import { cva } from 'class-variance-authority';
 import { GripVertical } from 'lucide-react';
-import type {
-  ComponentProps,
-  KeyboardEvent,
-  PointerEvent,
-  ReactNode,
+import {
+  type ComponentProps,
+  createContext,
+  type KeyboardEvent,
+  type PointerEvent,
+  type ReactNode,
+  use,
+  useRef,
 } from 'react';
 
 import { Badge } from '@tinacms/ui/components/badge';
@@ -22,18 +25,46 @@ const listCardVariants = cva(
   {
     variants: {
       state: {
-        rest: 'border-input has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
-        invalid:
-          'border-destructive has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
-        readOnly:
-          'border-border-subtle bg-muted shadow-none has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
+        rest: 'border-input',
+        invalid: 'border-destructive',
+        readOnly: 'border-border-subtle bg-muted shadow-none',
         disabled: 'border-border shadow-none',
         dragging: 'z-10 border-input shadow-lifted',
       },
+      kind: { value: '', group: '' },
     },
-    defaultVariants: { state: 'rest' },
+    // The inline box of a value card has no ring of its own, so the card draws it. The grip, head and
+    // menu buttons carry their own ring, and the card stays still for them.
+    compoundVariants: [
+      {
+        kind: 'value',
+        state: 'rest',
+        className:
+          'has-[input:focus-visible]:border-ring has-[input:focus-visible]:shadow-focus-field',
+      },
+      {
+        kind: 'value',
+        state: 'invalid',
+        className: 'has-[input:focus-visible]:shadow-focus-field',
+      },
+    ],
+    defaultVariants: { state: 'rest', kind: 'value' },
   }
 );
+
+/** How many open heads stick while their fields scroll. */
+const MAX_PINNED = 2;
+
+/** Where a pinned head sticks, by how many pinned heads sit above it. */
+const PIN_TOP = ['top-0', 'top-10'] as const;
+
+/** `null` means the surrounding form level does not pin heads. */
+const PinDepthContext = createContext<number | null>(null);
+
+/** Turns on pinning for the cards inside: the head of an open card sticks, two deep at most. */
+function PinHeads({ children }: { children: ReactNode }) {
+  return <PinDepthContext value={0}>{children}</PinDepthContext>;
+}
 
 const HEAD_HOVER =
   'hover:bg-muted *:data-grip:group-hover/head:text-foreground **:data-more:group-hover/head:text-foreground';
@@ -74,6 +105,14 @@ type ValueKindProps = {
   onValueChange?: (value: string) => void;
   /** `number` for a list of numbers. */
   inputType?: 'text' | 'number';
+  /** Number boxes only: the limits and step of the item's own field. */
+  min?: number;
+  max?: number;
+  step?: number;
+  /** Number boxes only: steps the value. The step buttons and the up and down arrows call it. */
+  onStep?: (direction: 'up' | 'down') => void;
+  /** Number boxes only: the step buttons that are at a limit. */
+  atLimit?: { up: boolean; down: boolean };
 };
 
 type GroupKindProps = {
@@ -90,6 +129,8 @@ type GroupKindProps = {
   /** With `in-place`: whether the fields show. */
   open?: boolean;
   onToggle?: () => void;
+  /** The fields always show under a head that does not fold. */
+  alwaysOpen?: boolean;
   /** A short amber note at the end of the head, such as "No alt text". */
   hint?: string;
   /** The count of invalid fields inside. It shows while the card is closed; open cards carry none. */
@@ -109,12 +150,19 @@ type EveryKindProps = { kind?: 'value' | 'group' } & Partial<
 type ValueBodyProps = Pick<
   ListCardCommonProps,
   'name' | 'placeholder' | 'readOnly' | 'disabled'
-> & {
-  error: boolean;
-  value?: string;
-  onValueChange?: (value: string) => void;
-  inputType: 'text' | 'number';
-};
+> &
+  Omit<ValueKindProps, 'kind' | 'inputType'> & {
+    error: boolean;
+    inputType: 'text' | 'number';
+  };
+
+const STEPS = [
+  { direction: 'up', name: 'Increase', glyph: 'chevron-up' },
+  { direction: 'down', name: 'Decrease', glyph: 'chevron-down' },
+] as const;
+
+const STEP_BUTTON =
+  'flex h-1/2 w-6 cursor-pointer items-center justify-center rounded-xs border-0 bg-transparent p-0 text-muted-foreground outline-none hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-45';
 
 function ValueBody({
   name,
@@ -125,7 +173,17 @@ function ValueBody({
   value,
   onValueChange,
   inputType,
+  min,
+  max,
+  step,
+  onStep,
+  atLimit,
 }: ValueBodyProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const stepper =
+    inputType === 'number' && onStep && !readOnly && !disabled
+      ? onStep
+      : undefined;
   return (
     <>
       {readOnly ? null : (
@@ -135,7 +193,11 @@ function ValueBody({
         />
       )}
       <input
+        ref={inputRef}
         type={inputType}
+        min={min}
+        max={max}
+        step={inputType === 'number' ? (step ?? 'any') : undefined}
         aria-label={name}
         aria-invalid={error || undefined}
         value={value ?? ''}
@@ -143,8 +205,41 @@ function ValueBody({
         readOnly={readOnly}
         disabled={disabled}
         onChange={(event) => onValueChange?.(event.target.value)}
+        onWheel={
+          inputType === 'number'
+            ? (event) => event.currentTarget.blur()
+            : undefined
+        }
+        onKeyDown={(event) => {
+          if (!stepper) return;
+          if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            event.preventDefault();
+            stepper(event.key === 'ArrowUp' ? 'up' : 'down');
+          }
+        }}
         className='h-8 min-w-0 flex-1 appearance-none border-0 bg-transparent px-1.5 font-sans text-base text-ellipsis text-foreground tabular-nums outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
       />
+      {stepper ? (
+        <span className='flex h-8 flex-none flex-col justify-center'>
+          {STEPS.map(({ direction, name: stepName, glyph }) => (
+            <button
+              key={direction}
+              type='button'
+              tabIndex={-1}
+              aria-label={`${stepName} ${name}`}
+              disabled={atLimit?.[direction]}
+              className={STEP_BUTTON}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                inputRef.current?.focus();
+                stepper(direction);
+              }}
+            >
+              <Icon glyph={glyph} size={14} />
+            </button>
+          ))}
+        </span>
+      ) : null}
     </>
   );
 }
@@ -154,6 +249,29 @@ type GroupHeadProps = Pick<
   'name' | 'placeholder' | 'disabled'
 > &
   Omit<GroupKindProps, 'kind' | 'children'>;
+
+type HeadTextProps = Pick<
+  GroupHeadProps,
+  'name' | 'placeholder' | 'title' | 'summary'
+>;
+
+/** The words of a group head: the screen reader name, then the title and summary. */
+function HeadText({ name, title, summary, placeholder }: HeadTextProps) {
+  return (
+    <>
+      <span className='sr-only'>{name}: </span>
+      {title ? <span className='font-medium'>{title}</span> : null}
+      {title && summary ? (
+        <span className='text-muted-foreground'> · {summary}</span>
+      ) : null}
+      {title ? null : (
+        <span className={cn(!summary && 'text-muted-foreground')}>
+          {summary || placeholder}
+        </span>
+      )}
+    </>
+  );
+}
 
 function GroupHead({
   name,
@@ -167,8 +285,23 @@ function GroupHead({
   onToggle,
   hint,
   errorCount = 0,
+  alwaysOpen = false,
 }: GroupHeadProps) {
   const inPlace = opens === 'in-place';
+  if (alwaysOpen) {
+    return (
+      <div className='flex h-8 min-w-0 flex-1 items-center px-2 font-sans text-base text-foreground'>
+        <span className='min-w-0 flex-1 truncate'>
+          <HeadText
+            name={name}
+            title={title}
+            summary={summary}
+            placeholder={placeholder}
+          />
+        </span>
+      </div>
+    );
+  }
   return (
     <button
       type='button'
@@ -197,16 +330,12 @@ function GroupHead({
         </span>
       ) : null}
       <span className='min-w-0 flex-1 truncate px-1.5'>
-        <span className='sr-only'>{name}: </span>
-        {title ? <span className='font-medium'>{title}</span> : null}
-        {title && summary ? (
-          <span className='text-muted-foreground'> · {summary}</span>
-        ) : null}
-        {title ? null : (
-          <span className={cn(!summary && 'text-muted-foreground')}>
-            {summary || placeholder}
-          </span>
-        )}
+        <HeadText
+          name={name}
+          title={title}
+          summary={summary}
+          placeholder={placeholder}
+        />
       </span>
       {hint ? (
         <span className='flex-none text-xs whitespace-nowrap text-unsaved'>
@@ -215,7 +344,8 @@ function GroupHead({
       ) : null}
       {errorCount > 0 && !(inPlace && open) ? (
         <Badge
-          kind='errors'
+          kind='count'
+          tone='error'
           count={errorCount}
           srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
         />
@@ -255,6 +385,11 @@ function ListCard(props: ListCardProps) {
     value,
     onValueChange,
     inputType = 'text',
+    min,
+    max,
+    step,
+    onStep,
+    atLimit,
     title,
     summary,
     thumbnail,
@@ -263,6 +398,7 @@ function ListCard(props: ListCardProps) {
     onToggle,
     hint,
     errorCount = 0,
+    alwaysOpen = false,
     children,
     ...rest
   }: ListCardCommonProps & EveryKindProps = props;
@@ -277,7 +413,12 @@ function ListCard(props: ListCardProps) {
           ? 'invalid'
           : 'rest';
   const showFields =
-    kind === 'group' && opens === 'in-place' && open && Boolean(children);
+    kind === 'group' &&
+    opens === 'in-place' &&
+    (open || alwaysOpen) &&
+    Boolean(children);
+  const pinDepth = use(PinDepthContext);
+  const pinned = showFields && pinDepth !== null && pinDepth < MAX_PINNED;
 
   const onGripKey = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -294,13 +435,15 @@ function ListCard(props: ListCardProps) {
     >
       <div
         data-slot='list-card'
-        className={cn(listCardVariants({ state }), className)}
+        className={cn(listCardVariants({ state, kind }), className)}
       >
         <div
           data-slot='list-card-head'
+          data-pinned={pinned || undefined}
           className={cn(
             'group/head flex min-h-10 min-w-0 items-center gap-0.5 pr-1 pl-0.5 transition-colors',
             showFields ? 'rounded-t-sm' : 'rounded-sm',
+            pinned && ['sticky z-10 bg-card', PIN_TOP[pinDepth ?? 0]],
             !readOnly && !disabled && !dragging && HEAD_HOVER
           )}
         >
@@ -337,6 +480,7 @@ function ListCard(props: ListCardProps) {
               onToggle={onToggle}
               hint={hint}
               errorCount={errorCount}
+              alwaysOpen={alwaysOpen}
             />
           ) : (
             <ValueBody
@@ -348,6 +492,11 @@ function ListCard(props: ListCardProps) {
               value={value}
               onValueChange={onValueChange}
               inputType={inputType}
+              min={min}
+              max={max}
+              step={step}
+              onStep={onStep}
+              atLimit={atLimit}
             />
           )}
           {!readOnly && actions ? (
@@ -359,7 +508,7 @@ function ListCard(props: ListCardProps) {
                     size='sm'
                     icon='more'
                     data-more=''
-                    className='flex-none opacity-0 not-disabled:hover:bg-transparent disabled:opacity-0 group-focus-within/list-card:opacity-100 group-hover/list-card:opacity-100 data-popup-open:opacity-100'
+                    className='flex-none opacity-0 not-disabled:hover:bg-transparent disabled:opacity-0 group-focus-within/list-card:opacity-100 group-hover/list-card:opacity-100 data-popup-open:opacity-100 pointer-coarse:not-disabled:opacity-100'
                   />
                 }
                 disabled={disabled}
@@ -376,7 +525,11 @@ function ListCard(props: ListCardProps) {
         </div>
         {showFields ? (
           <div className='flex flex-col gap-4 border-t border-border-subtle pt-1.5 pr-3 pb-3.5 pl-8.5'>
-            {children}
+            {pinDepth === null ? (
+              children
+            ) : (
+              <PinDepthContext value={pinDepth + 1}>{children}</PinDepthContext>
+            )}
           </div>
         ) : null}
       </div>
@@ -423,4 +576,4 @@ function CardList({
 }
 
 export type { CardListProps, ListCardProps };
-export { CardList, ListCard, listCardVariants };
+export { CardList, ListCard, listCardVariants, PinHeads };

@@ -6,10 +6,25 @@ import type { FieldRegistry } from './registry';
 
 export type FieldLayout = 'inline' | 'block';
 
+/** The inline box a list card holds for one value, with the settings of the field's own widget. */
+export type InlineBox =
+  | { type: 'text'; placeholder?: string }
+  | { type: 'number'; min?: number; max?: number; step?: number };
+
 export interface FieldMetadata {
   layout?: FieldLayout;
   labelable?: boolean;
   drillable?: boolean;
+  /**
+   * For a drillable field: `true` drills in, `false` opens in place, and
+   * `undefined` leaves it to the depth rule.
+   */
+  drillsIn?: (node: FieldSchema) => boolean | undefined;
+  /**
+   * For a single-value field: the kind of inline box a list card can hold in
+   * place of the field's own widget. `undefined` keeps the widget.
+   */
+  inlineBox?: (node: FieldSchema) => InlineBox | undefined;
 }
 
 export interface FieldTransformContext {
@@ -95,6 +110,10 @@ export interface ValidationScope {
 
 export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
   Component: ComponentType;
+  /** Draws a list of this field type in place of one row per item. */
+  ListView?: ComponentType;
+  /** Draws a drillable field where it drills in. Without it, the generic button shows. */
+  DrillInComponent?: ComponentType;
   defaultValue?: TValue;
   metadata?: FieldMetadata;
   schema?: (node: FieldSchema) => ZodType;

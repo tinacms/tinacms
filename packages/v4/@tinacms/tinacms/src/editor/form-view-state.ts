@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { createStore, type StoreApi } from 'zustand';
-import type { FieldAddress } from '../core/field/address';
-import { fieldsetOf, fieldsOf, scalarItemOf } from '../core/schema/children';
+import { type FieldAddress, toFieldAddress } from '../core/field/address';
+import type { FieldDescriptor } from '../core/field/contract';
+import {
+  fieldsetOf,
+  fieldsOf,
+  itemHeadingOf,
+  scalarItemOf,
+} from '../core/schema/children';
+import { OBJECT_FIELD_TYPE } from '../plugins/fields/object/object-field.schema';
 import type { FieldSchema } from '../core/schema/types';
 import type { FormId } from '../form/form-store';
 
@@ -9,6 +16,8 @@ export interface OpenLevel {
   address: FieldAddress;
   label: string;
   node: FieldSchema;
+  /** An item of a list: `node` is a stand-in object built from the item's fields. */
+  item?: boolean;
 }
 
 export interface FormViewState {
@@ -68,29 +77,87 @@ export const isRevealed = (
 };
 
 // Array positions are not levels.
-export const DRILL_DEPTH = 3;
+const DRILL_DEPTH = 3;
 
-export const fieldDepth = (address: string): number =>
+const fieldDepth = (address: string): number =>
   address.split('.').filter((part) => !/^\d+$/.test(part)).length;
+
+// An item's fields sit one level below the list, so an item opens as the next
+// form level where its fields would be at the drill depth.
+export const itemOpensNextLevel = (itemAddress: string): boolean =>
+  fieldDepth(itemAddress) + 1 >= DRILL_DEPTH;
+
+// The one place that decides whether a field drills in: the plugin's own
+// answer first, then the depth rule.
+export const drillsInAt = (
+  descriptor: FieldDescriptor | undefined,
+  node: FieldSchema,
+  address: string
+): boolean => {
+  const metadata = descriptor?.metadata;
+  if (metadata?.drillable !== true) return false;
+  return metadata.drillsIn?.(node) ?? fieldDepth(address) >= DRILL_DEPTH;
+};
+
+export const levelDrillsIn = (
+  descriptor: FieldDescriptor | undefined,
+  level: OpenLevel
+): boolean =>
+  level.item
+    ? itemOpensNextLevel(level.address)
+    : drillsInAt(descriptor, level.node, level.address);
+
+// The stand-in node an open item level draws: an object of the item's fields.
+// It sets no `display`, so the object field's depth rule does not apply.
+export const itemLevel = (
+  address: string,
+  label: string,
+  fields: readonly FieldSchema[]
+): OpenLevel => {
+  const node: FieldSchema & { fields: FieldSchema[] } = {
+    type: OBJECT_FIELD_TYPE,
+    name: address.split('.').at(-1) ?? address,
+    label,
+    fields: [...fields],
+  };
+  return { address: toFieldAddress(address), label, node, item: true };
+};
+
+// The failing fields that show an error, innermost only: a parent whose
+// deeper error is also revealed counts through that deeper error.
+const revealedLeaves = (
+  view: Pick<FormViewState, 'touched' | 'saveAttempted'>,
+  errorAddresses: readonly string[]
+): string[] => {
+  const revealed = errorAddresses.filter((key) => isRevealed(view, key));
+  return revealed.filter(
+    (key) => !revealed.some((other) => other.startsWith(`${key}.`))
+  );
+};
+
+const isWithin = (key: string, address: string): boolean =>
+  key === address || key.startsWith(`${address}.`);
 
 export const holdsRevealedError = (
   view: Pick<FormViewState, 'touched' | 'saveAttempted'>,
   errorAddresses: readonly string[],
   address?: string
-): boolean => {
-  const own = errorAddresses.filter(
-    (key) => !errorAddresses.some((other) => other.startsWith(`${key}.`))
+): boolean =>
+  revealedLeaves(view, errorAddresses).some(
+    (key) => address === undefined || isWithin(key, address)
   );
-  return own.some(
-    (key) =>
-      (address === undefined ||
-        key === address ||
-        key.startsWith(`${address}.`)) &&
-      isRevealed(view, key)
-  );
-};
 
-// Every named field on the way to `address`, the field itself last.
+// How many fields under `address` hold a revealed error. Counts each failing
+// field once, however many messages it has.
+export const countRevealedErrors = (
+  view: Pick<FormViewState, 'touched' | 'saveAttempted'>,
+  errorAddresses: readonly string[],
+  address: string
+): number =>
+  revealedLeaves(view, errorAddresses).filter((key) => isWithin(key, address))
+    .length;
+
+// Every named field and list item on the way to `address`, the field itself last.
 export const fieldsAlong = (
   address: string,
   fields: readonly FieldSchema[],
@@ -103,10 +170,14 @@ export const fieldsAlong = (
   for (const segment of address.split('.')) {
     path = path ? `${path}.${segment}` : segment;
     if (/^\d+$/.test(segment)) {
+      const item = valueAt(path);
       siblings =
-        node && !scalarItemOf(node)
-          ? fieldsetOf(node, valueAt(path))
-          : undefined;
+        node && !scalarItemOf(node) ? fieldsetOf(node, item) : undefined;
+      if (node && siblings) {
+        along.push(
+          itemLevel(path, itemHeadingOf(node, item, Number(segment)), siblings)
+        );
+      }
       continue;
     }
     node = siblings?.find((field) => field.name === segment);
@@ -126,11 +197,8 @@ export const levelsFor = (
   address: string,
   fields: readonly FieldSchema[],
   valueAt: (address: string) => unknown,
-  isDrillable: (node: FieldSchema) => boolean
+  drillsIn: (step: OpenLevel) => boolean
 ): OpenLevel[] =>
   fieldsAlong(address, fields, valueAt).filter(
-    (step) =>
-      step.address !== address &&
-      isDrillable(step.node) &&
-      fieldDepth(step.address) >= DRILL_DEPTH
+    (step) => step.address !== address && drillsIn(step)
   );

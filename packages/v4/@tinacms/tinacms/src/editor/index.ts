@@ -24,6 +24,8 @@ export {
   NestedFieldRow,
   type NestedFieldRowProps,
 } from './field';
+export { ownFieldErrors } from './field-errors';
+export { itemOpensNextLevel } from './form-view-state';
 export {
   FormProvider,
   type FormProviderProps,
@@ -42,6 +44,7 @@ export {
   type DocumentSave,
   type SaveDocumentInput,
   useCollectionDocuments,
+  useCurrentBranch,
   useDocument,
   useInvalidateContent,
   useSaveDocument,
@@ -51,6 +54,13 @@ export {
   AfterSaveHookError,
   FormValidationError,
   useActiveField,
+  useActivation,
+  useInvalidFieldCount,
+  useInvalidFieldCounts,
+  useIsOpenLevel,
+  useListItems,
+  useOpenLevel,
+  type FieldFrameOptions,
   useContentSlice,
   useMediaSlice,
   useOptionalAuthSlice,
@@ -68,5 +78,6 @@ export {
   useFormSave,
   useFormSeedKey,
   useRpcClient,
+  useSchemaCollections,
   useTinaStore,
 } from './hooks';

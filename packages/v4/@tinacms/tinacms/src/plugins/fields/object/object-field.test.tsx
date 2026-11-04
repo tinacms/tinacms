@@ -245,15 +245,13 @@ describe('ObjectField validation', () => {
     expect(errors).toEqual({ 'meta.social.handle': ['Handle is required'] });
   });
 
-  it('surfaces a nested field error at its own address, and rolls it up onto the object', async () => {
+  it('shows a nested field error once, on the field and not repeated on the object frame', async () => {
     renderField({ seo: { title: 'Home' } });
     const title = await screen.findByLabelText(/^Title\b/);
     await userEvent.clear(title);
     await userEvent.tab();
-    await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2));
-    for (const alert of screen.getAllByRole('alert')) {
-      expect(alert).toHaveTextContent('Title is required');
-    }
+    await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(1));
+    expect(screen.getByRole('alert')).toHaveTextContent('Title is required');
   });
 });
 
@@ -380,6 +378,7 @@ describe('ObjectField metadata', () => {
       layout: 'block',
       labelable: false,
       drillable: true,
+      drillsIn: expect.any(Function),
     });
     expect(descriptor?.defaultValue).toBeUndefined();
   });

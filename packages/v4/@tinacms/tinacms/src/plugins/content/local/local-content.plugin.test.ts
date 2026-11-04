@@ -135,7 +135,12 @@ describe('content slice', () => {
   it('writes no store state, because it holds no cache', async () => {
     const harness = await createSliceHarness(ENTRIES);
     await harness.slice().list('post');
-    expect(Object.keys(harness.slice())).toEqual(['list', 'get', 'update']);
+    expect(Object.keys(harness.slice())).toEqual([
+      'local',
+      'list',
+      'get',
+      'update',
+    ]);
   });
 });
 

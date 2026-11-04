@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test';
 
-export const formColumn = (page: Page) => page.locator('aside').last();
+export const formColumn = (page: Page) =>
+  page.getByRole('complementary', { name: 'Document form' });
 
 export const resizeHandle = (page: Page) =>
   page.getByRole('separator', { name: 'Resize the form column' });
