@@ -19,7 +19,8 @@ The files are in `plugins/fields/image/`:
 | `image-field.client.tsx` | The descriptor, which takes the `image` key |
 | `image-field.ui.tsx` | The `ImageField` container |
 | `image-field.view.tsx` | The presentational view |
-| `image-tile.tsx` | The tile of the single image and the cover |
+| `image-tile.tsx` | The tile of the single image, the cover and each gallery item |
+| `image-gallery.view.tsx`, `image-gallery.ui.tsx` | The gallery view and its container |
 | `image-preview.ts` | The preview URL with retry-then-missing |
 | `image-field.states.ts` | Every look, for sign-off and tests |
 | `image-field.plugin.ts` | The manifest, `tina:field:image` |
@@ -59,10 +60,11 @@ export default defineConfig({
 |---|---|---|
 | `cover` | `'wide' \| 'tall'` | Shows the picture larger: `wide` is 16:9, `tall` is 4:3. The empty drop area keeps the same shape. Any other value fails schema validation. |
 
-Other field types reject `cover` in the type checker.
+`cover` has no effect on the image of a list of images (`of: t.image(...)`).
+Gallery tiles are always square. Other field types reject `cover` in the type
+checker.
 
-A list of images is a `t.array` whose `of` is an image field. The Array field
-draws it, one row per image:
+A list of images is a `t.array` whose `of` is an image field:
 
 ```ts
 t.array({ name: 'gallery', label: 'Gallery', of: t.image({ name: 'image' }) })
@@ -158,7 +160,7 @@ confirm. Neither button deletes the media file.
 The thumbnail comes from `resolveUrl(path, { width: 400, height: 400 })`. The
 `<img>` stays hidden until it loads. A required field shows no Remove button.
 
-`image-field.states.ts` lists every look (single and cover) for the
+`image-field.states.ts` lists every look (single, cover, gallery) for the
 design sign-off and the render test.
 
 ### Picking
@@ -198,10 +200,30 @@ A hand-edited file can hold a value that is not a string, such as
 `heroImage: 2024`. The field shows `Not a media path` and keeps the value
 until the author replaces or removes it.
 
+### The gallery
+
+A list of images renders `ImageGallery` (`image-gallery.ui.tsx`, the image descriptor's `ListView`) in place of
+the generic scalar list: square tiles three across and an "Add images" tile at
+the end. It has one wrapper and one picker. "Add images" appends only after a
+pick, and each pick adds one image. Remove splices the item out, so the saved
+list has no `null` holes. The same image can appear twice.
+
+A tile reorders by dragging it (a 4px threshold; Escape or releasing outside
+the gallery cancels), or by arrow keys on its handle "Move Image N: {file}".
+Focus stays on the moved tile, and a polite live region says "Moved {file} to
+position N of M". The generic "Move item" and "Remove item" row buttons do not
+apply to the gallery.
+
+The gallery is the `ListView` of the image descriptor. The array field asks the
+registry for `ListView` on `of.type`, so a site that overrides the stock `image`
+plugin replaces the gallery too. An override without a `ListView` gets one
+row per item.
+
 ### Activation
 
 `useFieldActivation` focuses "Choose from Media" when the field is empty and
-"Replace" when it is filled.
+"Replace" when it is filled. On a gallery, activating `<address>.<i>` focuses
+the Replace button of tile i.
 
 ## Rendering on the site
 
