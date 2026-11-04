@@ -100,6 +100,12 @@ type ButtonBaseProps = Omit<ButtonPrimitive.Props, 'children'> & {
    * stays in the Tab order. `disabled` wins over `busy`.
    */
   busy?: boolean;
+  /** Draws a link to this address instead of a button. It opens in the same tab. */
+  href?: string;
+  /** A floor for the width, in pixels or any CSS length. */
+  minWidth?: number | string;
+  /** Which side an icon button's tooltip opens on. */
+  tooltipSide?: 'top' | 'right' | 'bottom' | 'left';
 };
 
 type CountOnWords =
@@ -121,6 +127,10 @@ type WithWords = ButtonBaseProps & {
   mono?: boolean;
   /** Keyboard keys after the words, such as `⌘K`. */
   shortcut?: string;
+  /** The design's name for `count`: a red chip after the words, shown from 1. */
+  chip?: number;
+  /** The design's name for `srLabel`. */
+  chipSrLabel?: string;
 } & CountOnWords;
 
 type IconOnly = ButtonBaseProps & {
@@ -180,6 +190,8 @@ type AnyButtonProps = ButtonBaseProps & {
   count?: number;
   countTone?: CountTone;
   srLabel?: string;
+  chip?: number;
+  chipSrLabel?: string;
 };
 
 /**
@@ -202,14 +214,22 @@ function Button(buttonProps: ButtonProps) {
     destructive = false,
     mono = false,
     shortcut,
-    count,
+    count: countProp,
     countTone,
-    srLabel,
+    srLabel: srLabelProp,
+    chip,
+    chipSrLabel,
+    href,
+    minWidth,
+    tooltipSide,
+    style,
     className,
     type,
     disabled,
     ...props
   } = all;
+  const count = countProp ?? chip;
+  const srLabel = srLabelProp ?? chipSrLabel;
   const size = heightSizeOf(sizeProp);
   const iconOnly = variant === 'icon';
   const redIcon = iconOnly && destructive;
@@ -232,7 +252,11 @@ function Button(buttonProps: ButtonProps) {
   const button = (
     <ButtonPrimitive
       data-slot='button'
-      type={type ?? 'button'}
+      {...(href === undefined
+        ? {}
+        : { render: <a href={href} />, nativeButton: false, role: 'link' })}
+      style={minWidth === undefined ? style : { ...style, minWidth }}
+      type={href === undefined ? (type ?? 'button') : undefined}
       aria-keyshortcuts={keys ? keyShortcuts(keys) : undefined}
       {...props}
       disabled={disabled || busy}
@@ -296,7 +320,7 @@ function Button(buttonProps: ButtonProps) {
   return (
     <Tooltip disabled={expanded}>
       <TooltipTrigger render={button} />
-      <TooltipContent>
+      <TooltipContent side={tooltipSide}>
         {name}
         {keys ? <KbdShortcut keys={keys} size='sm' /> : null}
       </TooltipContent>
