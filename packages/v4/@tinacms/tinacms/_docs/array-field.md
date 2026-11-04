@@ -133,10 +133,6 @@ defineClientPlugin({
 });
 ```
 
-A scalar list asks the registry for the `ListView` of its `of.type`. A field
-descriptor that sets `ListView` draws the whole list itself, as the image field
-does with its gallery. Without one, the list draws one row per item.
-
 `metadata.labelable: false` because the field has no single input for a row's
 `htmlFor` to reach. The component carries its own accessible name with
 `aria-labelledby` instead — see

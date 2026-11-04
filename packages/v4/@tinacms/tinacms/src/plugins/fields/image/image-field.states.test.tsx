@@ -1,22 +1,11 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  imageFieldState,
-  imageFieldStates,
-  imageGalleryState,
-  imageGalleryStates,
-} from './image-field.states';
+import { imageFieldState, imageFieldStates } from './image-field.states';
 import { ImageFieldView, type ImageFieldViewProps } from './image-field.view';
-import {
-  ImageGalleryView,
-  type ImageGalleryViewProps,
-} from './image-gallery.view';
 
 const singles: { name: string; props: ImageFieldViewProps }[] =
   imageFieldStates;
-const galleries: { name: string; props: ImageGalleryViewProps }[] =
-  imageGalleryStates;
 
 const inert = ({
   props,
@@ -152,104 +141,5 @@ describe('image field states', () => {
     expect(
       screen.getByRole('button', { name: 'Choose from Media' })
     ).toBeVisible();
-  });
-});
-
-describe('image gallery states', () => {
-  it.each(galleries)('renders $name', ({ props }) => {
-    render(<ImageGalleryView {...props} />);
-    const group = screen.getByRole('group', {
-      name: new RegExp(`^${props.label}`),
-    });
-    expect(screen.queryByText(/unsaved/i)).toBeNull();
-    expect(screen.queryByRole('alert') !== null).toBe(!!props.errors?.length);
-    const warned = props.items.some((item) => item.missing);
-    expect(screen.queryByRole('status') !== null).toBe(warned);
-
-    const editable = !props.disabled && !props.readOnly;
-    const tools = within(group).queryAllByRole('button', {
-      name: /^(Replace|Remove|Move Image)/,
-    });
-    expect(tools.length).toBe(editable ? props.items.length * 3 : 0);
-    expect(
-      within(group).queryByRole('button', { name: 'Add images' }) !== null
-    ).toBe(editable);
-    if (!editable && props.items.length === 0) {
-      expect(within(group).getByText('No images.')).toBeVisible();
-    }
-  });
-
-  it('names each move handle with its place and file', () => {
-    render(
-      <ImageGalleryView {...imageGalleryState('gallery same image twice')} />
-    );
-    expect(
-      screen.getByRole('button', { name: 'Move Image 1: about.png' })
-    ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Move Image 2: about.png' })
-    ).toBeVisible();
-  });
-
-  it('gives a stored value that is not a path a tile that can be removed', async () => {
-    const onRemove = vi.fn();
-    render(
-      <ImageGalleryView
-        {...imageGalleryState('gallery unreadable items')}
-        onRemove={onRemove}
-      />
-    );
-    expect(screen.getByText('Not a media path')).toBeVisible();
-    expect(screen.getByText('Empty image')).toBeVisible();
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Remove Image 2' })
-    );
-    expect(onRemove).toHaveBeenCalledWith(1);
-  });
-
-  it('moves a tile with the arrow keys and announces it', async () => {
-    const onMove = vi.fn();
-    render(
-      <ImageGalleryView
-        {...imageGalleryState('gallery filled')}
-        onMove={onMove}
-      />
-    );
-    screen.getByRole('button', { name: 'Move Image 2: team.jpg' }).focus();
-    await userEvent.keyboard('{ArrowLeft}');
-    expect(onMove).toHaveBeenLastCalledWith(1, 0);
-    expect(
-      screen.getByText('Moved team.jpg to position 1 of 4')
-    ).toBeInTheDocument();
-  });
-
-  it('stops at the ends', async () => {
-    const onMove = vi.fn();
-    render(
-      <ImageGalleryView
-        {...imageGalleryState('gallery filled')}
-        onMove={onMove}
-      />
-    );
-    screen.getByRole('button', { name: 'Move Image 1: about.png' }).focus();
-    await userEvent.keyboard('{ArrowUp}{ArrowLeft}');
-    screen.getByRole('button', { name: 'Move Image 4: launch.png' }).focus();
-    await userEvent.keyboard('{ArrowDown}{ArrowRight}');
-    expect(onMove).not.toHaveBeenCalled();
-  });
-
-  it('ignores keys and clicks on a read-only gallery', async () => {
-    const onMove = vi.fn();
-    const onAdd = vi.fn();
-    render(
-      <ImageGalleryView
-        {...imageGalleryState('gallery read-only')}
-        onMove={onMove}
-        onAdd={onAdd}
-      />
-    );
-    await userEvent.keyboard('{Tab}{ArrowLeft}{Enter}');
-    expect(onMove).not.toHaveBeenCalled();
-    expect(onAdd).not.toHaveBeenCalled();
   });
 });

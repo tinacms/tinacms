@@ -158,25 +158,3 @@ export function ImageTile({
     </figure>
   );
 }
-
-export function MoveHandle({
-  label,
-  ref,
-  onKeyDown,
-}: {
-  label: string;
-  ref?: Ref<HTMLButtonElement>;
-  onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
-}) {
-  return (
-    <Button
-      ref={ref}
-      variant='icon'
-      size='sm'
-      icon={GripVerticalIcon}
-      aria-label={label}
-      className='size-6 cursor-grab touch-none bg-card shadow-xs'
-      onKeyDown={onKeyDown}
-    />
-  );
-}
