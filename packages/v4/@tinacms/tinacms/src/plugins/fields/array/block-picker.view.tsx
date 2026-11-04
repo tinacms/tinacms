@@ -7,13 +7,7 @@ import {
 } from '@tinacms/ui/components/popover';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { cn } from '@tinacms/ui/lib/utils';
-import {
-  type ReactNode,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import { type ReactNode, useId, useRef, useState } from 'react';
 
 const BLOCK_PICKER_TITLE = 'Choose a block';
 const NO_BLOCKS_MATCH = 'No blocks match.';
@@ -55,15 +49,28 @@ const matches = (option: BlockOption, query: string): boolean =>
 
 const OPTION_FOCUS = 'outline-none focus-visible:shadow-focus-ring';
 
-/** The tallest the floating panel gets; past it, the options scroll. */
-const PANEL_MAX_HEIGHT = 320;
-
 /** Below the button when the panel fits there or there is more room below, else above. */
 function sideWithRoom(button: HTMLElement | null): 'bottom' | 'top' {
   if (!button) return 'bottom';
   const { top, bottom } = button.getBoundingClientRect();
   const below = window.innerHeight - bottom;
-  return below >= PANEL_MAX_HEIGHT || below >= top ? 'bottom' : 'top';
+  const tallest =
+    Number.parseFloat(
+      getComputedStyle(button).getPropertyValue('--picker-max-height')
+    ) || 0;
+  return below >= tallest || below >= top ? 'bottom' : 'top';
+}
+
+/**
+ * The results' minimum height once the panel is open and positioned, so the
+ * panel keeps its size while a search narrows the list. It never exceeds the
+ * room the panel has. Empty for the inline picker, which has no panel.
+ */
+function holdHeight(results: HTMLElement | null): string {
+  const panel = results?.closest<HTMLElement>('[data-slot=popover-content]');
+  if (!results || !panel) return '';
+  const chrome = panel.offsetHeight - results.offsetHeight;
+  return `min(${results.offsetHeight}px, calc(var(--available-height) - ${chrome}px))`;
 }
 
 function BlockOptionButton({
@@ -113,10 +120,11 @@ function BlockPickerView({
   const searchRef = useRef<HTMLInputElement>(null);
   const headingId = useId();
   const resultsRef = useRef<HTMLDivElement>(null);
-  const [resultsHeight, setResultsHeight] = useState<number>();
-  useLayoutEffect(() => {
-    setResultsHeight(resultsRef.current?.offsetHeight);
-  }, []);
+  const [held, setHeld] = useState<string>();
+  const search = (value: string) => {
+    setHeld((height) => height ?? holdHeight(resultsRef.current));
+    setQuery(value);
+  };
   const groups = groupBlocks(
     options.filter((option) => matches(option, query))
   );
@@ -128,7 +136,7 @@ function BlockPickerView({
         ref={searchRef}
         autoFocus
         value={query}
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={(event) => search(event.target.value)}
         onClear={() => {
           setQuery('');
           searchRef.current?.focus();
@@ -136,8 +144,8 @@ function BlockPickerView({
       />
       <div
         ref={resultsRef}
-        style={{ minHeight: resultsHeight }}
-        className='flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto'
+        style={{ minHeight: held || undefined }}
+        className='-m-1.5 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-1.5'
       >
         {groups.length === 0 ? (
           <p
@@ -278,12 +286,9 @@ export function BlockAddView({
         {/* The side is picked once on open, so the panel stays put while the search narrows it. */}
         <PopoverContent
           aria-label={BLOCK_PICKER_TITLE}
-          className='overflow-hidden'
+          className='max-h-[min(var(--picker-max-height),var(--available-height))] overflow-hidden'
           side={side}
           collisionAvoidance={{ side: 'none' }}
-          style={{
-            maxHeight: `min(${PANEL_MAX_HEIGHT}px, var(--available-height))`,
-          }}
           finalFocus={() => !picked.current}
         >
           <p className='px-2.5 pt-1 text-sm font-medium'>

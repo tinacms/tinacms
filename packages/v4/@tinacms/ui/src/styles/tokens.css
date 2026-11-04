@@ -142,6 +142,9 @@
   --radius-lg: 20px; /* Dialogs only */
   --radius-tip: 6px; /* Corners of the dark tooltip bubble */
 
+  /* @group Sizes */
+  --picker-max-height: 320px; /* Tallest a floating block picker gets; the options scroll inside it */
+
   /* @group Type */
   --font-sans:
     "Inter Variable", Inter, ui-sans-serif, system-ui, sans-serif; /* Labels, values and everything else */

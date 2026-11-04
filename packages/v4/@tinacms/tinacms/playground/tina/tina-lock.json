@@ -36,6 +36,275 @@
             "type": "rich-text"
           }
         ]
+      },
+      {
+        "name": "page",
+        "label": "Pages",
+        "path": "content/pages",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "type": "string"
+          },
+          {
+            "name": "visual",
+            "label": "Visual blocks",
+            "picker": "grid",
+            "templates": [
+              {
+                "name": "block1",
+                "label": "Template number 1 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block2",
+                "label": "Template number 2 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block3",
+                "label": "Template number 3 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block4",
+                "label": "Template number 4 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block5",
+                "label": "Template number 5 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block6",
+                "label": "Template number 6 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block7",
+                "label": "Template number 7 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block8",
+                "label": "Template number 8 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block9",
+                "label": "Template number 9 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block10",
+                "label": "Template number 10 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              }
+            ],
+            "type": "array"
+          },
+          {
+            "name": "plain",
+            "label": "Plain blocks",
+            "picker": "list",
+            "templates": [
+              {
+                "name": "block1",
+                "label": "Template number 1 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block2",
+                "label": "Template number 2 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block3",
+                "label": "Template number 3 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block4",
+                "label": "Template number 4 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block5",
+                "label": "Template number 5 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block6",
+                "label": "Template number 6 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block7",
+                "label": "Template number 7 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block8",
+                "label": "Template number 8 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block9",
+                "label": "Template number 9 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "block10",
+                "label": "Template number 10 with a rather long name that must wrap",
+                "previewImage": "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%209'%3E%3Crect%20width%3D'16'%20height%3D'9'%20fill%3D'%23ddd'%2F%3E%3C%2Fsvg%3E",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              }
+            ],
+            "type": "array"
+          }
+        ]
       }
     ],
     "version": {
@@ -46,6 +315,7 @@
     }
   },
   "primitives": {
+    "array": 1,
     "boolean": 1,
     "rich-text": 1,
     "string": 1
