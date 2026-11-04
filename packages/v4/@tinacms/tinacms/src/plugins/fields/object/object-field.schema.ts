@@ -8,10 +8,25 @@ import type {
 
 export const OBJECT_FIELD_TYPE = 'object';
 
+export type ObjectDisplay = 'fieldset' | 'collapsible' | 'drillIn';
+
+export const OBJECT_DISPLAYS: readonly ObjectDisplay[] = [
+  'fieldset',
+  'collapsible',
+  'drillIn',
+];
+
+export const isObjectDisplay = (value: unknown): value is ObjectDisplay =>
+  OBJECT_DISPLAYS.some((display) => display === value);
+
 export interface ObjectFieldSchema extends BaseFieldSchema {
   type: typeof OBJECT_FIELD_TYPE;
   fields: FieldSchema[];
+  display?: ObjectDisplay;
 }
+
+export const displayOf = (field: ObjectFieldSchema): ObjectDisplay =>
+  field.display ?? 'fieldset';
 
 export const object = (
   config: Omit<ObjectFieldSchema, 'type'>

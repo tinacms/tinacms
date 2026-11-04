@@ -12,7 +12,8 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
-import { FormProvider, TinaProvider } from '../../../editor';
+import { FormProvider, TinaProvider, useActiveField } from '../../../editor';
+import { toFieldAddress } from '../../../core/field/address';
 import { t } from '../../../index';
 import { required } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
@@ -61,19 +62,19 @@ const renderFeatured = (document?: TinaDocument) =>
 describe('BooleanField rendering', () => {
   it('renders a stored true value as a checked box', async () => {
     renderFeatured({ featured: true });
-    const input = await screen.findByRole('checkbox', { name: 'Featured' });
+    const input = await screen.findByRole('checkbox', { name: /^Featured\b/ });
     expect(input).toBeChecked();
   });
 
   it('renders a stored false value as an unchecked box', async () => {
     renderFeatured({ featured: false });
-    const input = await screen.findByRole('checkbox', { name: 'Featured' });
+    const input = await screen.findByRole('checkbox', { name: /^Featured\b/ });
     expect(input).not.toBeChecked();
   });
 
   it('falls back to the descriptor default (false) when absent', async () => {
     renderFeatured();
-    const input = await screen.findByRole('checkbox', { name: 'Featured' });
+    const input = await screen.findByRole('checkbox', { name: /^Featured\b/ });
     expect(input).not.toBeChecked();
   });
 });
@@ -81,13 +82,45 @@ describe('BooleanField rendering', () => {
 describe('BooleanField value updates', () => {
   it('toggles the value back through the form store', async () => {
     renderFeatured({ featured: false });
-    const input = await screen.findByRole('checkbox', { name: 'Featured' });
+    const input = await screen.findByRole('checkbox', { name: /^Featured\b/ });
 
     await userEvent.click(input);
     expect(input).toBeChecked();
 
     await userEvent.click(input);
     expect(input).not.toBeChecked();
+  });
+});
+
+describe('BooleanField activation', () => {
+  it('focuses the checkbox when the field is activated', async () => {
+    function Activate() {
+      const { setActive } = useActiveField();
+      return (
+        <button
+          type='button'
+          onClick={() => setActive(toFieldAddress('featured'))}
+        >
+          activate featured
+        </button>
+      );
+    }
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [booleanFieldPlugin, coreValidatorsPlugin],
+          schema: NO_COLLECTIONS,
+        })}
+      >
+        <FormProvider collection={collection} path='content/posts/featured.mdx'>
+          <LabelledFields />
+          <Activate />
+        </FormProvider>
+      </TinaProvider>
+    );
+    const box = await screen.findByRole('checkbox', { name: /^Featured\b/ });
+    await userEvent.click(screen.getByText('activate featured'));
+    expect(box).toHaveFocus();
   });
 });
 

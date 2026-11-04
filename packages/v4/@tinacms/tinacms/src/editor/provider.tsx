@@ -17,6 +17,7 @@ import {
 } from 'react-hook-form';
 import type { ResolvedConfig } from '../config';
 import { authSliceOf } from '../core/auth/slice';
+import { currentBranchOf } from '../core/branch/contract';
 import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { fieldEqualityFor } from '../core/form/compare';
@@ -64,6 +65,7 @@ import {
   TinaRuntimeContext,
 } from './context';
 import { flattenFieldErrors, nestFieldErrors } from './field-errors';
+import { useFormViewStore } from './form-view-state';
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
@@ -167,9 +169,13 @@ export function TinaProvider({
         useFormStore
           .getState()
           .setUserId(draftUserOf(runtime.store.getState()));
-        unsubscribeAuth = runtime.store.subscribe((state) =>
-          useFormStore.getState().setUserId(draftUserOf(state))
-        );
+        useFormStore
+          .getState()
+          .setBranch(currentBranchOf(runtime.store.getState()));
+        unsubscribeAuth = runtime.store.subscribe((state) => {
+          useFormStore.getState().setUserId(draftUserOf(state));
+          useFormStore.getState().setBranch(currentBranchOf(state));
+        });
         setBooted(runtime);
       }
       return destroyPlugins;
@@ -302,14 +308,14 @@ const buildStaleDraftActions = (
       });
       const resumed = readFormStore().forms[formId];
       if (formStatus(resumed) !== 'dirty') {
-        removeDraft(formId, readFormStore().userId);
+        removeDraft(formId, readFormStore().userId, readFormStore().branch);
       }
       resetForm(toDocument(resumed?.values ?? {}));
       advanceSeedKey(formId);
       bumpDraftRevision();
     },
     discard: () => {
-      removeDraft(formId, readFormStore().userId);
+      removeDraft(formId, readFormStore().userId, readFormStore().branch);
       bumpDraftRevision();
     },
   };
@@ -434,12 +440,15 @@ function useSeededFormSync(
     advanceSeedKey,
   ]);
 
-  const discardEdits = useCallback(
-    () => discardFormEdits(formId, resetForm, advanceSeedKey),
-    [formId, resetForm, advanceSeedKey]
-  );
+  const view = useFormViewStore(formId);
+  const discardEdits = useCallback(() => {
+    const { closeLevelsAbove, resetReveal } = view.getState();
+    closeLevelsAbove(0);
+    resetReveal();
+    discardFormEdits(formId, resetForm, advanceSeedKey);
+  }, [formId, resetForm, advanceSeedKey, view]);
 
-  return { seedKey, advanceSeedKey, discardEdits };
+  return { seedKey, advanceSeedKey, discardEdits, view };
 }
 
 function useFormMethodSubscriptions(
@@ -533,7 +542,7 @@ export function FormProvider({
     shouldFocusError: false,
   });
 
-  const { seedKey, advanceSeedKey, discardEdits } = useSeededFormSync(
+  const { seedKey, advanceSeedKey, discardEdits, view } = useSeededFormSync(
     formId,
     userId,
     ingested,
@@ -565,6 +574,9 @@ export function FormProvider({
     []
   );
   const fieldSeedKey = `${seedKey}~${fieldReseeds}`;
+  useEffect(() => {
+    view.getState().closeLevelsAbove(0);
+  }, [fieldSeedKey, view]);
   const [failure, setFailure] = useState<{
     formId: FormId;
     message: string;
@@ -662,6 +674,7 @@ export function FormProvider({
       reseedFields,
       saveFailure,
       setSaveFailure,
+      view,
       discardEdits,
       hooks: formHooks,
       staleDraft: staleDraftActions,
@@ -678,6 +691,7 @@ export function FormProvider({
       reseedFields,
       saveFailure,
       setSaveFailure,
+      view,
       discardEdits,
       formHooks,
       staleDraftActions,

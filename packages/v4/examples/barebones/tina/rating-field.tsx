@@ -1,8 +1,9 @@
 import { type ValidatorRef, definePlugin } from '@tinacms/tinacms';
 import { defineClientPlugin } from '@tinacms/tinacms/client';
 import {
+  FieldWrapper,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldValue,
 } from '@tinacms/tinacms/react';
 
@@ -26,14 +27,14 @@ export const ratingFieldPlugin = definePlugin({
         Component: function RatingField() {
           const address = useFieldAddress();
           const [value, setValue] = useFieldValue<number>(address);
-          const errors = useFieldErrors(address);
+          const frame = useFieldFrame();
           const current = value ?? 0;
 
           return (
-            <div className='grid gap-1.5'>
+            <FieldWrapper {...frame}>
               <div
                 role='radiogroup'
-                aria-label={address}
+                aria-labelledby={frame.labelId}
                 className='flex gap-0.5'
               >
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -50,20 +51,11 @@ export const ratingFieldPlugin = definePlugin({
                   </button>
                 ))}
               </div>
-              {errors.map((error) => (
-                <span
-                  key={error}
-                  role='alert'
-                  className='text-sm text-destructive'
-                >
-                  {error}
-                </span>
-              ))}
-            </div>
+            </FieldWrapper>
           );
         },
         defaultValue: 0,
-        metadata: { layout: 'inline' },
+        metadata: { layout: 'inline', labelable: false },
         validate: (value) => {
           const stars = value as number | undefined;
           if (stars === undefined) return null;

@@ -10,7 +10,7 @@ import { cn } from '@tinacms/ui/lib/utils';
  * the timers and the pause on hover.
  */
 function Toaster({
-  position = 'bottom-center',
+  position = 'bottom-right',
   toastOptions,
   ...props
 }: ToasterProps) {

@@ -1,3 +1,4 @@
+export { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 export { type FieldAddress, toFieldAddress } from '../core/field/address';
 export {
   type FieldErrors,
@@ -36,16 +37,45 @@ export {
   type NestedFieldRowProps,
 } from './field';
 export {
+  FormProvider,
+  type FormProviderProps,
+  TinaProvider,
+  type TinaProviderProps,
+} from './provider';
+export {
+  type PreviewConnectionOptions,
+  usePreviewConnection,
+} from './preview-connection';
+export {
+  type CollectionDocuments,
+  CONTENT_STALE_TIME,
+  contentKeys,
+  type DocumentRead,
+  type DocumentSave,
+  type SaveDocumentInput,
+  useCollectionDocuments,
+  useCurrentBranch,
+  useDocument,
+  useInvalidateContent,
+  useSaveDocument,
+} from './content-queries';
+export {
   type ActiveField,
   AfterSaveHookError,
   FormValidationError,
   useActiveField,
+  useActivation,
+  useInvalidFieldCount,
+  useIsOpenLevel,
+  useOpenLevel,
+  type FieldFrameOptions,
   useContentSlice,
   useDiscardEdits,
   useDocumentPath,
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,
+  useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
@@ -57,16 +87,7 @@ export {
   useOptionalAuthSlice,
   useRemoveListItem,
   useRpcClient,
+  useSchemaCollections,
   useStaleDraft,
   useTinaStore,
 } from './hooks';
-export {
-  type PreviewConnectionOptions,
-  usePreviewConnection,
-} from './preview-connection';
-export {
-  FormProvider,
-  type FormProviderProps,
-  TinaProvider,
-  type TinaProviderProps,
-} from './provider';

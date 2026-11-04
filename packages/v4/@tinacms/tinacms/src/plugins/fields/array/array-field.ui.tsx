@@ -1,33 +1,39 @@
 import { AddButton } from '@tinacms/ui/components/add-button';
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { type ReactNode, useRef } from 'react';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import { type ReactNode, useRef, useState } from 'react';
+import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import type { FieldAddress } from '../../../core/field/address';
-import { ingestDocument } from '../../../core/form/ingest';
+import { seedItem } from './seed-item';
 import { TEMPLATE_KEY, templateFor } from '../../../core/schema/children';
-import type { FieldSchema, TemplateSchema } from '../../../core/schema/types';
+import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
 import {
   NestedFieldRow,
   useDocumentPath,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
+  useMediaSlice,
   useMoveListItem,
   useRemoveListItem,
 } from '../../../editor';
 import { StoredValue, UneditableValue } from '../uneditable-value';
 import {
+  type ArrayTemplateSchema,
+  type ItemLabel,
+  type ObjectArrayFieldSchema,
+  type ScalarArrayFieldSchema,
+  type TemplatesArrayFieldSchema,
   asArrayFieldSchema,
   isItem,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
-  type ObjectArrayFieldSchema,
-  type ScalarArrayFieldSchema,
+  pickerOf,
 } from './array-field.schema';
+import { isMediaPath } from '../image/image-field.schema';
 
 export function ArrayField() {
   const address = useFieldAddress();
@@ -37,7 +43,7 @@ export function ArrayField() {
     <ItemList />
   ) : (
     <UneditableValue
-      problem='This value is not a list of items, so it cannot be edited here.'
+      problem=\'This value is not a list of items, so it cannot be edited here.\'
       cleared={[]}
     />
   );
@@ -46,10 +52,16 @@ export function ArrayField() {
 function ItemList() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
-  const errors = useFieldErrors(address);
+  const frame = useFieldFrame();
+  const registry = useFieldRegistry();
+  const ListView = isScalarArray(field)
+    ? registry.get(field.of.type)?.ListView
+    : undefined;
+
+  if (ListView) return <ListView />;
 
   return (
-    <FieldWrapper errors={errors}>
+    <FieldWrapper {...frame}>
       {isScalarArray(field) ? (
         <ScalarItems address={address} field={field} />
       ) : (
@@ -78,10 +90,12 @@ function ObjectItems({
     control,
     name: address,
   });
-  // Reset gives every useFieldArray new ids, so keying rows by `item.id`
+  // Subscribes the headings to edits, so an itemLabel follows typing.
+  const watched: unknown = useWatch({ control, name: address });
+  // Reset gives every useFieldArray new ids, so keying rows by item.id
   // remounts every row of every list and the pressed button loses focus.
   // These keys stay with the rows that remain, and follow a move or remove.
-  // `keysHeld` skips one length check while a click has already shifted the
+  // keysHeld skips one length check while a click has already shifted the
   // keys and the field array has not rendered the new length yet.
   const keys = useRef<string[]>([]);
   const keysHeld = useRef(false);
@@ -123,43 +137,47 @@ function ObjectItems({
     moveListItem(address, from, to);
   };
 
-  const seed = (template: TemplateSchema | undefined, fields: FieldSchema[]) =>
-    ingestDocument(template?.defaultItem ?? {}, fields, {
-      documentPath,
-      registry,
-    });
+  const seed = (defaultItem: TinaDocument | undefined, fields: FieldSchema[]) =>
+    seedItem(defaultItem, fields, { documentPath, registry });
   const trackAddedRow = () => {
     keys.current = [...keys.current, nextObjectKey()];
     keysHeld.current = true;
   };
-  const addFieldsItem = (fields: FieldSchema[]) => {
+  const addFieldsItem = (
+    fields: FieldSchema[],
+    defaultItem: TinaDocument | undefined
+  ) => {
     trackAddedRow();
-    append(seed(undefined, fields));
+    append(seed(defaultItem, fields));
   };
-  const addTemplateItem = (template: TemplateSchema) => {
+  const addTemplateItem = (template: ArrayTemplateSchema) => {
     trackAddedRow();
     append({
       [TEMPLATE_KEY]: template.name,
-      ...seed(template, template.fields),
+      ...seed(template.defaultItem, template.fields),
     });
   };
 
   return (
     <>
       <div
-        role='group'
-        aria-labelledby={`${address}-label`}
-        className='flex flex-col gap-3'
+        role=\'group\'
+        aria-labelledby={\-label}
+        className=\'flex flex-col gap-3\'
       >
         {items.map((_, index) => {
-          const stored: unknown = getValues(`${address}.${index}`);
+          const stored: unknown = getValues(\.\);
+          // The watched copy only re-renders the heading; it can lag a move.
+          const shown: unknown = Array.isArray(watched)
+            ? watched[index]
+            : stored;
           const fields = isItem(stored)
             ? itemFieldsOf(field, stored)
             : undefined;
           return (
             <ItemRow
               key={keys.current[index]}
-              heading={headingOf(field, stored, index)}
+              heading={headingOf(field, shown, index)}
               index={index}
               count={items.length}
               onMove={moveItem}
@@ -167,10 +185,6 @@ function ObjectItems({
             >
               {fields ? (
                 fields.map((subfield) => (
-                  <NestedFieldRow
-                    key={subfield.name}
-                    address={`${address}.${index}.${subfield.name}`}
-                    node={subfield}
                   />
                 ))
               ) : (
@@ -189,16 +203,11 @@ function ObjectItems({
       </div>
       <div className='mt-3 flex flex-wrap gap-2'>
         {isTemplatesArray(field) ? (
-          field.templates.map((template) => (
-            <AddButton
-              key={template.name}
-              onClick={() => addTemplateItem(template)}
-            >
-              {`Add ${labelOf(template)}`}
-            </AddButton>
-          ))
+          <TemplatePicker field={field} onAdd={addTemplateItem} />
         ) : (
-          <AddButton onClick={() => addFieldsItem(field.fields)}>
+          <AddButton
+            onClick={() => addFieldsItem(field.fields, field.defaultItem)}
+          >
             Add item
           </AddButton>
         )}
@@ -207,11 +216,71 @@ function ObjectItems({
   );
 }
 
+function TemplatePicker({
+  field,
+  onAdd,
+}: {
+  field: TemplatesArrayFieldSchema;
+  onAdd: (template: ArrayTemplateSchema) => void;
+}) {
+  if (pickerOf(field) === 'list') {
+    return field.templates.map((template) => (
+      <AddButton key={template.name} onClick={() => onAdd(template)}>
+        {`Add ${labelOf(template)}`}
+      </AddButton>
+    ));
+  }
+  return (
+    <div className='grid w-full grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2'>
+      {field.templates.map((template) => (
+        <button
+          key={template.name}
+          type='button'
+          aria-label={`Add ${labelOf(template)}`}
+          className='flex flex-col gap-2 rounded-sm border p-2 text-left text-sm hover:border-input focus-visible:shadow-focus-ring'
+          onClick={() => onAdd(template)}
+        >
+          {template.previewImage ? (
+            <PreviewImage path={template.previewImage} />
+          ) : null}
+          <span className='font-medium'>{labelOf(template)}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// A bad path or a broken image shows the template label alone.
+function PreviewImage({ path }: { path: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!isMediaPath(path) || failed) return null;
+  return <ResolvedPreview path={path} onError={() => setFailed(true)} />;
+}
+
+function ResolvedPreview({
+  path,
+  onError,
+}: {
+  path: string;
+  onError: () => void;
+}) {
+  const media = useMediaSlice();
+  return (
+    <img
+      src={media.resolveUrl(path, { width: 256, height: 160 })}
+      alt=''
+      className='aspect-video w-full rounded-sm object-cover'
+      onError={onError}
+    />
+  );
+}
+
 function ScalarItems({
   address,
   field,
 }: ItemListProps & { field: ScalarArrayFieldSchema }) {
   const registry = useFieldRegistry();
+  const documentPath = useDocumentPath();
   const { getValues } = useFormContext();
   const [value, setValue] = useFieldValue<unknown[] | undefined>(address);
   const items = value ?? [];
@@ -238,10 +307,16 @@ function ScalarItems({
   };
   const addItem = () => {
     keys.current = [...keys.current, nextScalarKey()];
-    setValue([
-      ...liveItems(),
-      registry.get(field.of.type)?.defaultValue ?? null,
-    ]);
+    setValue([...liveItems(), seedScalar()]);
+  };
+  // `defaultItem`, then `of.defaultValue`, then the item type's own default.
+  const seedScalar = (): unknown => {
+    const descriptor = registry.get(field.of.type);
+    const stored = field.defaultItem ?? field.of.defaultValue;
+    if (stored === undefined) return descriptor?.defaultValue ?? null;
+    return descriptor?.parse
+      ? descriptor.parse(stored, field.of, { documentPath, registry })
+      : stored;
   };
 
   return (
@@ -298,7 +373,7 @@ function ItemRow({
         <div className='flex items-center gap-1'>
           <Button
             type='button'
-            variant='toolbar'
+            variant='outline'
             size='sm'
             aria-label={`Move item ${position} up`}
             disabled={index === 0}
@@ -308,7 +383,7 @@ function ItemRow({
           </Button>
           <Button
             type='button'
-            variant='toolbar'
+            variant='outline'
             size='sm'
             aria-label={`Move item ${position} down`}
             disabled={index === count - 1}
@@ -318,7 +393,7 @@ function ItemRow({
           </Button>
           <Button
             type='button'
-            variant='toolbar'
+            variant='outline'
             size='sm'
             aria-label={`Remove item ${position}`}
             onClick={() => onRemove(index)}
@@ -332,8 +407,21 @@ function ItemRow({
   );
 }
 
-const labelOf = (template: TemplateSchema): string =>
+const labelOf = (template: ArrayTemplateSchema): string =>
   template.label ?? template.name;
+
+// A throw or a result that is not a non-empty string is no heading.
+const customHeading = (
+  itemLabel: ItemLabel | undefined,
+  item: TinaDocument
+): string | undefined => {
+  try {
+    const label = itemLabel?.(item);
+    return typeof label === 'string' && label !== '' ? label : undefined;
+  } catch {
+    return undefined;
+  }
+};
 
 const headingOf = (
   field: ObjectArrayFieldSchema,
@@ -341,9 +429,13 @@ const headingOf = (
   index: number
 ): string => {
   if (!isItem(item)) return `Item ${index + 1} is not an object`;
-  if (!isTemplatesArray(field)) return `Item ${index + 1}`;
+  if (!isTemplatesArray(field)) {
+    return customHeading(field.itemLabel, item) ?? `Item ${index + 1}`;
+  }
   const template = templateFor(field.templates, item);
-  if (template) return labelOf(template);
+  if (template) {
+    return customHeading(template.itemLabel, item) ?? labelOf(template);
+  }
   const name = item[TEMPLATE_KEY];
   return name === undefined
     ? 'Block with no template'
