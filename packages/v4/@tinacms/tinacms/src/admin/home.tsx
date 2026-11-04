@@ -1,0 +1,120 @@
+import { Badge } from '@tinacms/ui/components/badge';
+import { Button } from '@tinacms/ui/components/button';
+import { Card } from '@tinacms/ui/components/card';
+import { EmptyState } from '@tinacms/ui/components/empty-state';
+import { SidebarInset } from '@tinacms/ui/components/sidebar';
+import type { CollectionSchema } from '../core/schema/types';
+import { useBranchView } from '../editor/branch';
+import { useCollectionDocuments } from '../editor/content-queries';
+import { useDirtyFormCount } from '../form/form-store';
+import type { AdminRoute } from './routing';
+
+// The branch the edits save to, or the plain-file note in local mode. Nothing is guessed:
+// a missing branch name leaves the line out.
+function useHomeLine(): string | null {
+  const branch = useBranchView();
+  if (branch?.mode === 'local') {
+    return 'Local files: Tina writes edits straight to disk.';
+  }
+  return branch?.name ? `Branch ${branch.name}` : null;
+}
+
+function CollectionCard({
+  collection,
+  navigate,
+}: {
+  collection: CollectionSchema;
+  navigate: (route: AdminRoute) => void;
+}) {
+  const { documents, isLoading, error } = useCollectionDocuments(
+    collection.name
+  );
+  const label = collection.label ?? collection.name;
+  const count = isLoading || error ? null : documents.length;
+  return (
+    <Card className='gap-3 p-4'>
+      <button
+        type='button'
+        className='cursor-pointer text-left'
+        onClick={() =>
+          navigate({ view: 'collection', collection: collection.name })
+        }
+      >
+        <span className='block text-base font-semibold'>{label}</span>
+        {count === null ? null : (
+          <span className='block text-sm text-muted-foreground'>
+            {count === 1 ? '1 document' : `${count} documents`}
+          </span>
+        )}
+      </button>
+      <Button
+        variant='outline'
+        size='compact'
+        disabled
+        aria-label={`New ${label} document`}
+        className='self-start'
+      >
+        + New
+      </Button>
+    </Card>
+  );
+}
+
+/** The landing screen: where the project stands, the unsaved documents, and every collection. */
+export function HomePanel({
+  collections,
+  navigate,
+}: {
+  collections: CollectionSchema[];
+  navigate: (route: AdminRoute) => void;
+}) {
+  const line = useHomeLine();
+  const unsaved = useDirtyFormCount();
+  return (
+    <SidebarInset className='min-w-0'>
+      <div className='min-h-0 flex-1 overflow-y-auto p-6'>
+        <div className='mb-6 flex items-start justify-between gap-4'>
+          <div>
+            <h2 className='text-xl font-semibold'>Home</h2>
+            {line ? (
+              <p className='text-sm text-muted-foreground'>{line}</p>
+            ) : null}
+          </div>
+          {unsaved > 0 ? (
+            <Button
+              variant='outline'
+              onClick={() =>
+                navigate({ view: 'collections', unsavedOnly: true })
+              }
+            >
+              <Badge kind='dot' />
+              Review {unsaved} unsaved
+            </Button>
+          ) : null}
+        </div>
+        {collections.length === 0 ? (
+          <EmptyState text='No collections yet.' />
+        ) : (
+          <section aria-labelledby='home-collections'>
+            <h3
+              id='home-collections'
+              className='mb-3 text-sm font-semibold text-muted-foreground'
+            >
+              Collections
+            </h3>
+            <ul
+              aria-label='Collection cards'
+              className='m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] gap-4 p-0'
+            >
+              {collections.map((collection) => (
+                <li key={collection.name}>
+                  <CollectionCard collection={collection} navigate={navigate} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    </SidebarInset>
+  );
+}

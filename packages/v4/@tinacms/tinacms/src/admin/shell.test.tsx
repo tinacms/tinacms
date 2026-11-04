@@ -289,6 +289,58 @@ describe('Kept edits notice', () => {
   });
 });
 
+describe('Home', () => {
+  it('lands on Home with the branch line and a card per collection', async () => {
+    renderAdmin();
+    expect(await screen.findByText('Branch main')).toBeVisible();
+    const list = screen.getByRole('list', { name: 'Collection cards' });
+    expect(within(list).getByText('Posts')).toBeVisible();
+    expect(await within(list).findByText('1 document')).toBeVisible();
+    expect(
+      within(list).getByRole('button', { name: 'New Posts document' })
+    ).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /^Review/ })).toBeNull();
+  });
+
+  it('says Local files in local mode and leaves the branch out', async () => {
+    mode = 'local';
+    renderAdmin();
+    expect(
+      await screen.findByText(
+        'Local files: Tina writes edits straight to disk.'
+      )
+    ).toBeVisible();
+    expect(screen.queryByText(/^Branch /)).toBeNull();
+  });
+
+  it('opens the collection from its card', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /^Posts/ }));
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/collections/post')
+    );
+  });
+
+  it('offers Review N unsaved only while documents are unsaved, and opens them', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Review 1 unsaved' })
+    );
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/collections?unsaved')
+    );
+    const list = await screen.findByRole('list', { name: 'Unsaved documents' });
+    expect(
+      within(list).getByRole('button', { name: /hello\.mdx/ })
+    ).toBeVisible();
+  });
+});
+
 describe('Top bar', () => {
   it('shows the one toggle, the logo, the project name and the branch', async () => {
     renderAdmin('Acme site');
