@@ -21,4 +21,11 @@ describe('statusWords', () => {
       'Save failed'
     );
   });
+
+  it('names the document a save wrote', () => {
+    expect(statusWords({ state: 'saved', document: 'about.mdx' }, false)).toBe(
+      'Saved: “about.mdx”'
+    );
+    expect(statusWords({ state: 'saved' }, false)).toBe('Saved');
+  });
 });

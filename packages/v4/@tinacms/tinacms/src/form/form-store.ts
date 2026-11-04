@@ -736,6 +736,8 @@ export interface SaveSummary {
   kept?: boolean;
   /** Why the newest save failed, when the provider says. The Status bar words it. */
   reason?: SaveFailureReason;
+  /** The file name of the document the newest save wrote, when `state` is `saved`. */
+  document?: string;
 }
 
 /**
@@ -743,16 +745,20 @@ export interface SaveSummary {
  * failure, then unsaved edits, then the newest success, else idle.
  */
 const summarizeSaves = (state: FormStore): SaveSummary => {
-  const saves = Object.values(state.saves).filter(
-    (save): save is NonNullable<typeof save> => save !== undefined
+  const entries = Object.entries(state.saves).flatMap(([formId, save]) =>
+    save === undefined ? [] : [{ formId, ...save }]
   );
-  if (saves.some((save) => save.phase === 'saving')) return { state: 'saving' };
-  const newest = saves.sort((a, b) => b.at - a.at)[0];
+  if (entries.some((save) => save.phase === 'saving')) {
+    return { state: 'saving' };
+  }
+  const newest = entries.sort((a, b) => b.at - a.at)[0];
   if (newest?.phase === 'failed') {
     return { state: 'failed', message: newest.message, reason: newest.reason };
   }
   if (anyFormDirty(state)) return { state: 'unsaved' };
-  if (newest?.phase === 'saved') return { state: 'saved' };
+  if (newest?.phase === 'saved') {
+    return { state: 'saved', document: newest.formId.split('/').at(-1) };
+  }
   if (keptEdits(state)) return { state: 'idle', kept: true };
   return { state: 'idle' };
 };
