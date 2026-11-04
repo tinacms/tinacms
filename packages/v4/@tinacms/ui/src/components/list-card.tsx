@@ -7,6 +7,7 @@ import {
   type PointerEvent,
   type ReactNode,
   use,
+  useRef,
 } from 'react';
 
 import { Badge } from '@tinacms/ui/components/badge';
@@ -104,6 +105,14 @@ type ValueKindProps = {
   onValueChange?: (value: string) => void;
   /** `number` for a list of numbers. */
   inputType?: 'text' | 'number';
+  /** Number boxes only: the limits and step of the item's own field. */
+  min?: number;
+  max?: number;
+  step?: number;
+  /** Number boxes only: steps the value. The step buttons and the up and down arrows call it. */
+  onStep?: (direction: 'up' | 'down') => void;
+  /** Number boxes only: the step buttons that are at a limit. */
+  atLimit?: { up: boolean; down: boolean };
 };
 
 type GroupKindProps = {
@@ -141,12 +150,19 @@ type EveryKindProps = { kind?: 'value' | 'group' } & Partial<
 type ValueBodyProps = Pick<
   ListCardCommonProps,
   'name' | 'placeholder' | 'readOnly' | 'disabled'
-> & {
-  error: boolean;
-  value?: string;
-  onValueChange?: (value: string) => void;
-  inputType: 'text' | 'number';
-};
+> &
+  Omit<ValueKindProps, 'kind' | 'inputType'> & {
+    error: boolean;
+    inputType: 'text' | 'number';
+  };
+
+const STEPS = [
+  { direction: 'up', name: 'Increase', glyph: 'chevron-up' },
+  { direction: 'down', name: 'Decrease', glyph: 'chevron-down' },
+] as const;
+
+const STEP_BUTTON =
+  'flex h-1/2 w-6 cursor-pointer items-center justify-center rounded-xs border-0 bg-transparent p-0 text-muted-foreground outline-none hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-45';
 
 function ValueBody({
   name,
@@ -157,7 +173,17 @@ function ValueBody({
   value,
   onValueChange,
   inputType,
+  min,
+  max,
+  step,
+  onStep,
+  atLimit,
 }: ValueBodyProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const stepper =
+    inputType === 'number' && onStep && !readOnly && !disabled
+      ? onStep
+      : undefined;
   return (
     <>
       {readOnly ? null : (
@@ -167,7 +193,11 @@ function ValueBody({
         />
       )}
       <input
+        ref={inputRef}
         type={inputType}
+        min={min}
+        max={max}
+        step={inputType === 'number' ? (step ?? 'any') : undefined}
         aria-label={name}
         aria-invalid={error || undefined}
         value={value ?? ''}
@@ -175,8 +205,41 @@ function ValueBody({
         readOnly={readOnly}
         disabled={disabled}
         onChange={(event) => onValueChange?.(event.target.value)}
+        onWheel={
+          inputType === 'number'
+            ? (event) => event.currentTarget.blur()
+            : undefined
+        }
+        onKeyDown={(event) => {
+          if (!stepper) return;
+          if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            event.preventDefault();
+            stepper(event.key === 'ArrowUp' ? 'up' : 'down');
+          }
+        }}
         className='h-8 min-w-0 flex-1 appearance-none border-0 bg-transparent px-1.5 font-sans text-base text-ellipsis text-foreground tabular-nums outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
       />
+      {stepper ? (
+        <span className='flex h-8 flex-none flex-col justify-center'>
+          {STEPS.map(({ direction, name: stepName, glyph }) => (
+            <button
+              key={direction}
+              type='button'
+              tabIndex={-1}
+              aria-label={`${stepName} ${name}`}
+              disabled={atLimit?.[direction]}
+              className={STEP_BUTTON}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                inputRef.current?.focus();
+                stepper(direction);
+              }}
+            >
+              <Icon glyph={glyph} size={14} />
+            </button>
+          ))}
+        </span>
+      ) : null}
     </>
   );
 }
@@ -322,6 +385,11 @@ function ListCard(props: ListCardProps) {
     value,
     onValueChange,
     inputType = 'text',
+    min,
+    max,
+    step,
+    onStep,
+    atLimit,
     title,
     summary,
     thumbnail,
@@ -424,6 +492,11 @@ function ListCard(props: ListCardProps) {
               value={value}
               onValueChange={onValueChange}
               inputType={inputType}
+              min={min}
+              max={max}
+              step={step}
+              onStep={onStep}
+              atLimit={atLimit}
             />
           )}
           {!readOnly && actions ? (
@@ -435,7 +508,7 @@ function ListCard(props: ListCardProps) {
                     size='sm'
                     icon='more'
                     data-more=''
-                    className='flex-none opacity-0 not-disabled:hover:bg-transparent disabled:opacity-0 group-focus-within/list-card:opacity-100 group-hover/list-card:opacity-100 data-popup-open:opacity-100'
+                    className='flex-none opacity-0 not-disabled:hover:bg-transparent disabled:opacity-0 group-focus-within/list-card:opacity-100 group-hover/list-card:opacity-100 data-popup-open:opacity-100 pointer-coarse:not-disabled:opacity-100'
                   />
                 }
                 disabled={disabled}

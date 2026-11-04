@@ -44,12 +44,17 @@ const collection: CollectionSchema = {
     t.array({
       name: 'tags',
       label: 'Tags',
-      of: t.string({ name: 'tag', label: 'Tag' }),
+      of: t.string({ name: 'tag', label: 'Tag', placeholder: 'Empty tag' }),
     }),
     t.array({
       name: 'scores',
       label: 'Scores',
-      of: t.number({ name: 'score', label: 'Score' }),
+      of: t.number({
+        name: 'score',
+        label: 'Score',
+        step: 5,
+        validators: [max(10)],
+      }),
     }),
     t.array({
       name: 'flags',
@@ -377,6 +382,28 @@ describe('ArrayField scalar items', () => {
     await userEvent.click(screen.getByText('save'));
     await waitFor(() => expect(onSave).toHaveBeenCalled());
     expect(onSave.mock.calls[0][0].scores).toEqual([3, 5, 7]);
+  });
+
+  it("keeps the item field's step, max and placeholder in its box", async () => {
+    renderPage({ scores: [3], tags: [''] });
+    const scores = await screen.findByRole('group', { name: 'Scores' });
+    const box = within(scores).getByRole('spinbutton', { name: 'Item 1' });
+    expect(box).toHaveAttribute('step', '5');
+    expect(box).toHaveAttribute('max', '10');
+    box.focus();
+    await userEvent.keyboard('{ArrowUp}');
+    await waitFor(() => expect(valueOf('scores')).toEqual(['8']));
+    await userEvent.click(
+      within(scores).getByRole('button', { name: 'Increase Item 1' })
+    );
+    await waitFor(() => expect(valueOf('scores')).toEqual(['10']));
+    expect(
+      within(scores).getByRole('button', { name: 'Increase Item 1' })
+    ).toBeDisabled();
+    const tags = screen.getByRole('group', { name: 'Tags' });
+    expect(
+      within(tags).getByRole('textbox', { name: 'Item 1' })
+    ).toHaveAttribute('placeholder', 'Empty tag');
   });
 
   it('keeps the widget of a type that has no card box', async () => {
