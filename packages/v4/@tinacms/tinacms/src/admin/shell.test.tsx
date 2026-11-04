@@ -659,6 +659,19 @@ describe('document form panel', () => {
     ).toBeVisible();
     expect(within(panel).getByRole('button', { name: 'Save' })).toBeDisabled();
   });
+
+  it('opens the Document actions above the bar, with a note that more come later', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    renderAdmin();
+    await screen.findByLabelText(/^Title\b/);
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    const menu = await screen.findByRole('menu', { name: 'Document actions' });
+    expect(
+      within(menu).getByText('More document actions come later.')
+    ).toBeVisible();
+    expect(menu.closest('[data-side]')).toHaveAttribute('data-side', 'top');
+  });
 });
 
 describe('panel headers', () => {

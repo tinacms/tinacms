@@ -12,6 +12,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuNote,
   DropdownMenuTrigger,
 } from '@tinacms/ui/components/dropdown-menu';
 import { FormLevel } from '@tinacms/ui/components/form-level';
@@ -163,7 +164,11 @@ function FormBar() {
             />
           }
         />
-        <DropdownMenuContent align='end' aria-label='Document actions'>
+        <DropdownMenuContent
+          side='top'
+          align='end'
+          aria-label='Document actions'
+        >
           <DropdownMenuItem
             variant='destructive'
             disabled={!dirty}
@@ -171,6 +176,7 @@ function FormBar() {
           >
             Discard unsaved edits
           </DropdownMenuItem>
+          <DropdownMenuNote>More document actions come later.</DropdownMenuNote>
         </DropdownMenuContent>
       </DropdownMenu>
       <SaveButton />
