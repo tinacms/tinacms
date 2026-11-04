@@ -35,6 +35,7 @@ import {
   type FormId,
   type FormValues,
   toFormValues,
+  useFormErrors,
   useFormStore,
 } from '../form/form-store';
 import {
@@ -51,7 +52,7 @@ import {
   TinaRuntimeContext,
 } from './context';
 import { collectFieldErrorMessages, ownFieldErrors } from './field-errors';
-import { isRevealed } from './form-view-state';
+import { countRevealedErrors, isRevealed } from './form-view-state';
 
 export function useFieldRegistry(): FieldRegistry {
   const runtime = use(TinaRuntimeContext);
@@ -200,6 +201,14 @@ export function useStaleDraft(): StaleDraftActions | null {
     .staleDraft;
 }
 
+/** The current activation. Each `setActive` call makes a new one, even for the same address. */
+export function useActivation() {
+  const formId = useFormId();
+  return useFormStore((state) =>
+    state.active?.formId === formId ? state.active : null
+  );
+}
+
 export interface ActiveField {
   active: FieldAddress | null;
   setActive: (address: FieldAddress | null) => void;
@@ -263,11 +272,28 @@ const adoptSavedValues = (
   return written;
 };
 
+async function recordSavePhase(
+  formId: FormId,
+  run: () => Promise<void>
+): Promise<void> {
+  const { setSavePhase } = useFormStore.getState();
+  setSavePhase(formId, { phase: 'saving' });
+  try {
+    await run();
+  } catch (cause) {
+    let message = 'Save failed.';
+    if (cause instanceof Error && cause.message) message = cause.message;
+    setSavePhase(formId, { phase: 'failed', message });
+    throw cause;
+  }
+  setSavePhase(formId, { phase: 'saved' });
+}
+
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
   const { getValues, trigger, setValue } = useFormContext<TinaDocument>();
-  return useCallback(async () => {
+  const runSave = useCallback(async () => {
     const { formId, path, collection, onSave, hooks, reseedFields } = scope;
     // Validate every field, not only the edited ones, so a required field the
     // editor never touched surfaces its message at submit.
@@ -304,6 +330,10 @@ export function useFormSave(): () => Promise<void> {
       throw new AfterSaveHookError(new Error(warnings.join(' ')));
     }
   }, [scope, getValues, trigger, setValue, registry]);
+  return useCallback(
+    () => recordSavePhase(scope.formId, runSave),
+    [scope.formId, runSave]
+  );
 }
 
 export function useFieldAddress(): FieldAddress {
@@ -340,7 +370,14 @@ export function useFieldErrors(address: FieldAddress): string[] {
   return collectFieldErrorMessages(get(errors, address));
 }
 
-export function useFieldFrame(): Pick<
+export interface FieldFrameOptions {
+  /** Show only errors on the field's own address, not those of fields under it. */
+  ownErrorsOnly?: boolean;
+}
+
+export function useFieldFrame({
+  ownErrorsOnly = false,
+}: FieldFrameOptions = {}): Pick<
   FieldWrapperProps,
   'label' | 'htmlFor' | 'labelId' | 'required' | 'errors' | 'help' | 'helpId'
 > {
@@ -354,7 +391,9 @@ export function useFieldFrame(): Pick<
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
   const { errors } = useFormState({ name: address });
   const own = ownFieldErrors(get(errors, address), address);
-  const keys = Object.keys(own);
+  const keys = Object.keys(own).filter(
+    (key) => !ownErrorsOnly || key === address
+  );
   const revealed = useStore(
     view,
     useShallow((state) => keys.filter((key) => isRevealed(state, key)))
@@ -371,6 +410,46 @@ export function useFieldFrame(): Pick<
     help: node.description,
     helpId: node.description ? `${address}-help` : undefined,
   };
+}
+
+/** Opens the current field as the next form level. For a field that draws its own drill-in card. */
+export function useOpenLevel(): () => void {
+  const address = useFieldAddress();
+  const node = useFieldSchema();
+  const { view } = useFormScope('open-level-outside-provider', 'useOpenLevel');
+  return () =>
+    view.getState().openLevel({
+      address,
+      label: node.label ?? node.name,
+      node,
+    });
+}
+
+/** How many fields under the current field show an error. Counts fields, not messages. */
+export function useInvalidFieldCount(): number {
+  const address = useFieldAddress();
+  const { view, formId } = useFormScope(
+    'invalid-field-count-outside-provider',
+    'useInvalidFieldCount'
+  );
+  const errorAddresses = Object.keys(useFormErrors(formId));
+  return useStore(
+    view,
+    useShallow((state) => countRevealedErrors(state, errorAddresses, address))
+  );
+}
+
+/** Whether the current field is the open form level, so it shows its fields in place. */
+export function useIsOpenLevel(): boolean {
+  const address = useFieldAddress();
+  const { view } = useFormScope(
+    'is-open-level-outside-provider',
+    'useIsOpenLevel'
+  );
+  return useStore(
+    view,
+    (state) => state.openLevels.at(-1)?.address === address
+  );
 }
 
 export function useFieldActivation(handler: () => void): void {
