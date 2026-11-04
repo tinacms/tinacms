@@ -122,7 +122,7 @@ export function ReferenceField() {
     value,
     missing,
     placeholder,
-    disabled: isLoading || error !== null,
+    disabled: frame.disabled || isLoading || error !== null,
     onChange: setValue,
     ref: inputRef,
   };

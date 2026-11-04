@@ -72,7 +72,8 @@ export function ImageField() {
   useEffect(() => () => clearTimeout(retryTimer.current), []);
 
   const features = media.features ?? {};
-  const canUpload = features.readOnly !== true;
+  const locked = frame.disabled || frame.readOnly;
+  const canUpload = features.readOnly !== true && !locked;
   const failures = path !== null && failure?.path === path ? failure.count : 0;
   const missing = notAPath || failures > RETRY_DELAYS_MS.length;
   const thumbnailSrc =
@@ -218,7 +219,7 @@ export function ImageField() {
             type='button'
             variant='outline'
             size='sm'
-            disabled={uploading}
+            disabled={uploading || locked}
             onClick={choose}
           >
             {value == null ? 'Choose image' : 'Replace'}
@@ -252,7 +253,7 @@ export function ImageField() {
               type='button'
               variant='ghost'
               size='sm'
-              disabled={uploading}
+              disabled={uploading || locked}
               onClick={() => {
                 setUploadError(null);
                 setValue(null);
