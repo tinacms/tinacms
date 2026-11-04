@@ -377,14 +377,17 @@ export function useFieldErrors(address: FieldAddress): string[] {
 export interface FieldFrameOptions {
   /** Show only errors on the field's own address, not those of fields under it. */
   ownErrorsOnly?: boolean;
+  /** Amber messages that do not block Save, such as a reference to a document that is gone. */
+  warnings?: readonly string[];
 }
 
 export function useFieldFrame({
   ownErrorsOnly = false,
+  warnings,
 }: FieldFrameOptions = {}): Pick<
   FieldWrapperProps,
   'label' | 'htmlFor' | 'labelId' | 'required' | 'errors' | 'help' | 'helpId'
-> & { disabled: boolean; readOnly: boolean } {
+> & { warnings: string[]; disabled: boolean; readOnly: boolean } {
   const address = useFieldAddress();
   const node = useFieldSchema();
   const { view } = useFormScope(
@@ -412,6 +415,7 @@ export function useFieldFrame({
     labelId: `${address}-label`,
     required: hasValidator(node, 'required'),
     errors: [...shown],
+    warnings: [...(warnings ?? [])],
     help: node.description,
     helpId: node.description ? `${address}-help` : undefined,
     disabled: lock.disabled,

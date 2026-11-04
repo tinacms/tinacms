@@ -88,7 +88,6 @@ export function ReferenceField() {
   const address = useFieldAddress();
   const field = useFieldSchema<ReferenceFieldSchema>();
   const [stored, setValue] = useFieldValue<string | null>(address);
-  const frame = useFieldFrame();
   const inputRef = useRef<HTMLInputElement>(null);
   const inRouter = useInRouterContext();
   const schemaCollections = useSchemaCollections();
@@ -109,6 +108,10 @@ export function ReferenceField() {
     !error &&
     !documents.some((document) => document.value === value);
 
+  const frame = useFieldFrame({
+    warnings: missing ? ['This document no longer exists.'] : [],
+  });
+
   let placeholder = 'Search documents…';
   if (isLoading) placeholder = 'Loading documents…';
   else if (error) placeholder = 'Could not load documents';
@@ -116,7 +119,6 @@ export function ReferenceField() {
   const props: ReferenceFieldViewProps = {
     ...frame,
     errors: error ? [...frame.errors, error.message] : frame.errors,
-    warnings: missing ? ['This document no longer exists.'] : undefined,
     id: address,
     documents,
     value,
