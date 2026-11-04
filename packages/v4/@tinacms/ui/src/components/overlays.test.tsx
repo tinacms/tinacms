@@ -39,6 +39,7 @@ import { Toast, toast } from '@tinacms/ui/components/toast';
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from '@tinacms/ui/components/tooltip';
 
@@ -226,6 +227,43 @@ describe('Tooltip', () => {
   });
 });
 
+describe('Tooltip, light', () => {
+  const bubble = () => document.querySelector('[data-slot="tooltip-content"]');
+
+  it('draws the bubble on the light popover fill', async () => {
+    const user = userEvent.setup();
+    render(
+      <Tooltip>
+        <TooltipTrigger
+          render={<Button variant='icon' icon='search' aria-label='Search' />}
+        />
+        <TooltipContent>Search</TooltipContent>
+      </Tooltip>
+    );
+    await user.tab();
+    await waitFor(() => expect(bubble()).not.toBeNull());
+    expect(bubble()).toHaveClass('bg-popover');
+    expect(bubble()?.className).not.toContain('inv-');
+  });
+
+  it('waits half a second on hover before it shows', async () => {
+    const user = userEvent.setup();
+    render(
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger
+            render={<Button variant='icon' icon='search' aria-label='Search' />}
+          />
+          <TooltipContent>Search</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+    await user.hover(screen.getByRole('button', { name: 'Search' }));
+    expect(bubble()).toBeNull();
+    await waitFor(() => expect(bubble()).not.toBeNull(), { timeout: 1500 });
+  });
+});
+
 describe('Toast', () => {
   afterEach(() => {
     vi.useRealTimers();
@@ -238,6 +276,13 @@ describe('Toast', () => {
   ] as const)('$title is announced as $role', ({ title, tone, role }) => {
     render(<Toast tone={tone} title={title} />);
     expect(screen.getByRole(role)).toHaveTextContent(title);
+  });
+
+  it('stays light when the deprecated dark theme is asked for', () => {
+    render(<Toast theme='dark' title='Changes saved' />);
+    const card = screen.getByRole('status');
+    expect(card).toHaveClass('bg-card');
+    expect(card.className).not.toContain('inv-');
   });
 
   it('names its actions and its dismiss button', async () => {

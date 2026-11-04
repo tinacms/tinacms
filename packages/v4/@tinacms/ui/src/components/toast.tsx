@@ -18,63 +18,32 @@ type ToastAction = {
   'aria-label'?: string;
 };
 
-/** Buttons on the dark toast: light words that lift to white on hover. */
-const ON_DARK =
-  'text-inv-ink not-disabled:not-aria-disabled:hover:bg-inv-hover not-disabled:not-aria-disabled:hover:text-white';
-
 const toastVariants = cva(
-  'box-border flex w-full max-w-full items-start gap-2.5 rounded-md py-3 pr-2 pl-3.5 font-sans text-sm leading-control',
+  'box-border flex w-full max-w-full items-start gap-2.5 rounded-md bg-card py-3 pr-2 pl-3.5 font-sans text-sm leading-control text-foreground shadow-toast',
   {
     variants: {
-      theme: {
-        light: 'bg-card text-foreground shadow-toast',
-        dark: 'bg-inv-bg text-white shadow-toast-dark',
-      },
       oneLine: { true: 'items-center py-1.5', false: '' },
     },
-    defaultVariants: { theme: 'light', oneLine: false },
+    defaultVariants: { oneLine: false },
   }
 );
 
-const TONE_ICON: Record<
-  ToastTone,
-  { glyph: Glyph; light: string; dark: string }
-> = {
-  success: {
-    glyph: 'success',
-    light: 'text-status-published',
-    dark: 'text-tone-success-on-dark',
-  },
-  error: {
-    glyph: 'error',
-    light: 'text-destructive',
-    dark: 'text-tone-danger-on-dark',
-  },
-  warning: {
-    glyph: 'warning',
-    light: 'text-unsaved-edge',
-    dark: 'text-tone-warning-on-dark',
-  },
-  info: {
-    glyph: 'info',
-    light: 'text-tone-info',
-    dark: 'text-tone-info-on-dark',
-  },
-  neutral: {
-    glyph: 'info',
-    light: 'text-muted-foreground',
-    dark: 'text-inv-muted',
-  },
+const TONE_ICON: Record<ToastTone, { glyph: Glyph; color: string }> = {
+  success: { glyph: 'success', color: 'text-status-published' },
+  error: { glyph: 'error', color: 'text-destructive' },
+  warning: { glyph: 'warning', color: 'text-unsaved-edge' },
+  info: { glyph: 'info', color: 'text-tone-info' },
+  neutral: { glyph: 'info', color: 'text-muted-foreground' },
 };
 
 type ToastProps = Omit<ComponentProps<'div'>, 'title' | 'children'> & {
   /** Sets the icon and its colour. Each tone has its own icon shape, so colour is never the only signal. */
   tone?: ToastTone;
+  /** @deprecated Every toast is light. Accepted and ignored for one release. */
   theme?: ToastTheme;
   title: string;
   text?: string;
   action?: ToastAction;
-  /** `destructive` applies on the light theme only. */
   secondaryAction?: ToastAction & { destructive?: boolean };
   dismissible?: boolean;
   dismissLabel?: string;
@@ -88,7 +57,7 @@ type ToastProps = Omit<ComponentProps<'div'>, 'title' | 'children'> & {
  */
 function Toast({
   tone = 'success',
-  theme = 'light',
+  theme: _theme,
   title,
   text,
   action,
@@ -99,11 +68,10 @@ function Toast({
   className,
   ...props
 }: ToastProps) {
-  const dark = theme === 'dark';
   const hasActions = action !== undefined || secondaryAction !== undefined;
   const oneLine = !text && !hasActions;
   const urgent = tone === 'error' || tone === 'warning';
-  const destructive = Boolean(secondaryAction?.destructive) && !dark;
+  const destructive = Boolean(secondaryAction?.destructive);
 
   return (
     <div
@@ -111,13 +79,13 @@ function Toast({
       data-tone={tone}
       role={urgent ? 'alert' : 'status'}
       aria-live={urgent ? 'assertive' : 'polite'}
-      className={cn(toastVariants({ theme, oneLine }), className)}
+      className={cn(toastVariants({ oneLine }), className)}
       {...props}
     >
       <span
         className={cn(
           'inline-flex flex-none',
-          TONE_ICON[tone][theme],
+          TONE_ICON[tone].color,
           !oneLine && 'mt-px'
         )}
       >
@@ -137,34 +105,18 @@ function Toast({
         >
           {title}
         </span>
-        {text ? (
-          <span className={dark ? 'text-inv-muted' : 'text-muted-foreground'}>
-            {text}
-          </span>
-        ) : null}
+        {text ? <span className='text-muted-foreground'>{text}</span> : null}
         {hasActions ? (
           <div className='flex flex-wrap gap-1.5 pt-2'>
             {action ? (
-              dark ? (
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  aria-label={action['aria-label']}
-                  className={ON_DARK}
-                  onClick={action.onClick}
-                >
-                  {action.label}
-                </Button>
-              ) : (
-                <Button
-                  variant='outline'
-                  size='sm'
-                  aria-label={action['aria-label']}
-                  onClick={action.onClick}
-                >
-                  {action.label}
-                </Button>
-              )
+              <Button
+                variant='outline'
+                size='sm'
+                aria-label={action['aria-label']}
+                onClick={action.onClick}
+              >
+                {action.label}
+              </Button>
             ) : null}
             {secondaryAction ? (
               destructive ? (
@@ -181,7 +133,6 @@ function Toast({
                   variant='ghost'
                   size='sm'
                   aria-label={secondaryAction['aria-label']}
-                  className={dark ? ON_DARK : undefined}
                   onClick={secondaryAction.onClick}
                 >
                   {secondaryAction.label}
@@ -198,7 +149,6 @@ function Toast({
             size='sm'
             icon='close'
             aria-label={dismissLabel}
-            className={dark ? ON_DARK : undefined}
             onClick={onDismiss}
           />
         </span>
