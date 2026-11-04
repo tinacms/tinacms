@@ -271,10 +271,29 @@ describe('Top bar', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('renders no Search control without a search provider', async () => {
+  it('shows Search without a provider and says full-text search needs one', async () => {
+    const user = userEvent.setup();
     renderAdmin();
-    await screen.findByRole('banner', { name: 'Top bar' });
-    expect(screen.queryByRole('button', { name: /Search/ })).toBeNull();
+    await user.click(await screen.findByRole('button', { name: /Search/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Search' });
+    expect(
+      within(dialog).getByText('Full-text search needs a search provider.')
+    ).toBeVisible();
+    expect(within(dialog).queryByText('Content search')).toBeNull();
+  });
+
+  it('narrows the Navigation results by the query and opens the one picked', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /Search/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Search' });
+    await user.type(within(dialog).getByRole('searchbox'), 'sett');
+    const list = within(dialog).getByRole('list', {
+      name: 'Navigation results',
+    });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(1);
+    await user.click(within(list).getByRole('button', { name: 'Settings' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/settings'));
   });
 
   it('opens Search with ⌘K, even from a focused field, when a search provider exists', async () => {
