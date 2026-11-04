@@ -1075,4 +1075,125 @@ describe('TinaAdmin rail', () => {
     await user.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() => expect(window.location.hash).toBe('#/home'));
   });
+
+  it('names a rail row in a tooltip once the rail is collapsed', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(
+      await screen.findByRole('button', { name: 'Toggle Sidebar' })
+    );
+    await user.hover(screen.getByRole('button', { name: 'Home' }));
+    await waitFor(() =>
+      expect(
+        document.querySelector('[data-slot="tooltip-content"]')
+      ).toHaveTextContent('Home')
+    );
+  });
+
+  it('opens Home, Changes and Media from their rows and writes the hash', async () => {
+    const user = userEvent.setup();
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          plugins: config.plugins.filter((plugin) => plugin !== screenPlugin),
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    await user.click(await screen.findByRole('button', { name: 'Home' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/home'));
+    await user.click(screen.getByRole('button', { name: 'Changes' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/changes'));
+    await user.click(screen.getByRole('button', { name: 'Media' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/media'));
+    expect(
+      within(
+        await screen.findByRole('complementary', { name: 'Media panel' })
+      ).getByText('No media library is installed.')
+    ).toBeVisible();
+  });
+
+  it('lists the navigator with a message when a document link names a collection that does not exist', async () => {
+    window.location.hash = '#/collections/ghost/content%2Fposts%2Fx.mdx';
+    renderAdmin();
+    const navigator = await screen.findByRole('complementary', {
+      name: 'Navigator',
+    });
+    expect(within(navigator).getByText(/No collection named/)).toBeVisible();
+  });
+
+  it('marks no document in another collection after Back', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    const [back] = within(
+      await screen.findByRole('complementary', { name: 'Document form' })
+    ).getAllByRole('button');
+    await user.click(back);
+    await user.click(await screen.findByRole('button', { name: 'Pages' }));
+    const about = await screen.findByRole('button', { name: /about\.mdx/ });
+    expect(about).not.toHaveAttribute('aria-current');
+  });
+
+  it('shows Loading while a collection reads, then its documents', async () => {
+    let finish: (list: { path: string }[]) => void = () => {};
+    const pending = new Promise<{ path: string }[]>((resolve) => {
+      finish = resolve;
+    });
+    const reading = vi.spyOn(provider, 'list').mockReturnValueOnce(pending);
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    expect(await screen.findByText('Loading…')).toBeVisible();
+    finish([{ path: 'content/posts/hello.mdx' }]);
+    expect(
+      await screen.findByRole('button', { name: /hello\.mdx/ })
+    ).toBeVisible();
+    reading.mockRestore();
+  });
+
+  it('marks a plugin entry that targets the open screen, and opens a screen from its row', async () => {
+    const linked = definePlugin({
+      name: 'test:linked-screen',
+      client: async () => ({
+        default: {
+          slots: {
+            globalNav: [
+              {
+                label: 'Reports',
+                icon: NavIcon,
+                target: { kind: 'screen', screen: 'unlinked' },
+              },
+            ],
+          },
+        },
+      }),
+    });
+    const user = userEvent.setup();
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          plugins: [...config.plugins, linked],
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    const row = await screen.findByRole('button', { name: 'Reports' });
+    expect(row).not.toHaveAttribute('aria-current');
+    await user.click(row);
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/screens/unlinked')
+    );
+    expect(screen.getByRole('button', { name: 'Reports' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+  });
 });
