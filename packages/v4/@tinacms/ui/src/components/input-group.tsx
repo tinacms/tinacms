@@ -41,7 +41,7 @@ function InputGroup({ className, size = 'md', ...props }: InputGroupProps) {
 }
 
 const inputGroupAddonVariants = cva(
-  "flex h-auto cursor-text items-center justify-center gap-1.5 font-sans text-base font-normal text-muted-foreground select-none group-focus-within/input-group:*:data-[slot=icon]:text-foreground [&>svg:not([class*='size-'])]:size-4",
+  "flex h-auto cursor-text group-has-disabled/input-group:cursor-not-allowed items-center justify-center gap-1.5 font-sans text-base font-normal text-muted-foreground select-none group-focus-within/input-group:*:data-[slot=icon]:text-foreground [&>svg:not([class*='size-'])]:size-4",
   {
     variants: {
       align: {
@@ -83,7 +83,7 @@ function InputGroupAddon({
 }
 
 const inputGroupButtonVariants = cva(
-  'rounded-xs font-sans text-sm font-medium text-muted-foreground-strong shadow-none hover:bg-muted hover:text-foreground',
+  'rounded-xs font-sans text-sm font-medium text-muted-foreground-strong shadow-none hover:bg-muted hover:text-foreground group-has-disabled/input-group:hover:bg-transparent group-has-[[data-readonly]]/input-group:hover:bg-transparent',
   {
     variants: {
       size: {

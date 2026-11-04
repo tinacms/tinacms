@@ -20,6 +20,8 @@ import { cn } from '@tinacms/ui/lib/utils';
 type BreadcrumbStep = {
   label: string;
   onClick?: () => void;
+  /** A link to the step, for a step that is a page of its own. `onClick` wins when both are set. */
+  href?: string;
   /** Marks this step as the current page. Otherwise the last step is, unless it has `onClick`. */
   current?: boolean;
   /** The open document's file, shown on hover. */
@@ -138,6 +140,13 @@ function Step({
       </span>
     );
   }
+  if (!onClick && step.href) {
+    return (
+      <a href={step.href} className={stepVariants({ size })}>
+        {step.label}
+      </a>
+    );
+  }
   if (!onClick) {
     return (
       <span
@@ -161,6 +170,8 @@ type BreadcrumbProps = Omit<ComponentProps<'nav'>, 'children'> & {
   /** Top first. The separators are drawn for you. */
   items: readonly BreadcrumbStep[];
   size?: BreadcrumbSize;
+  /** A path with more steps keeps the first and the last two, and folds the rest. Defaults to 3. */
+  max?: number;
 };
 
 /**
@@ -170,11 +181,12 @@ type BreadcrumbProps = Omit<ComponentProps<'nav'>, 'children'> & {
 function Breadcrumb({
   items,
   size = 'md',
+  max,
   'aria-label': label = 'Breadcrumb',
   className,
   ...props
 }: BreadcrumbProps) {
-  const { shown, hidden } = foldPath(items);
+  const { shown, hidden } = foldPath(items, max);
   const pinned = items.some((step) => step.current === true);
 
   // A pressed step often turns into the current page, a span, so its button and focus go away.
