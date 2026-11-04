@@ -83,7 +83,7 @@ function InputGroupAddon({
 }
 
 const inputGroupButtonVariants = cva(
-  'rounded-xs font-sans text-sm font-medium text-muted-foreground-strong shadow-none hover:bg-muted hover:text-foreground group-has-disabled/input-group:hover:bg-transparent group-has-[[data-readonly]]/input-group:hover:bg-transparent',
+  'rounded-xs font-sans text-sm font-medium text-muted-foreground-strong shadow-none hover:bg-muted hover:text-foreground group-has-disabled/input-group:hover:bg-transparent! group-has-[[data-readonly]]/input-group:hover:bg-transparent! group-has-disabled/input-group:hover:text-muted-foreground-strong! group-has-[[data-readonly]]/input-group:hover:text-muted-foreground-strong!',
   {
     variants: {
       size: {

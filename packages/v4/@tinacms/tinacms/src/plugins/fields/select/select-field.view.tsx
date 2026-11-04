@@ -88,9 +88,13 @@ export function SelectFieldView({
               key={row.value}
               value={row.value}
               disabled={row.disabled}
-              title={row.hint}
             >
               {row.label}
+              {row.hint ? (
+                <span className='ml-auto text-xs text-muted-foreground'>
+                  {row.hint}
+                </span>
+              ) : null}
             </SelectItem>
           ))}
         </SelectContent>
