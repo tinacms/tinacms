@@ -1,4 +1,9 @@
 import { NavRow } from '@tinacms/ui/components/nav-row';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@tinacms/ui/components/tooltip';
 import { type Glyph } from '@tinacms/ui/components/icon';
 import {
   SidebarContent,
@@ -8,8 +13,9 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarSeparator,
+  useSidebar,
 } from '@tinacms/ui/components/sidebar';
-import { useId } from 'react';
+import { type KeyboardEvent, type ReactElement, useId } from 'react';
 import type { GlobalNavSection, NavTarget } from '../core/slot/contract';
 import { useDirtyFormCount } from '../form/form-store';
 import type { AdminRoute } from './routing';
@@ -42,21 +48,65 @@ function RailEntry({
 }: RailEntryProps) {
   return (
     <SidebarMenuItem>
-      <NavRow
-        kind='section'
-        icon={glyph}
-        selected={selected}
-        opens={opens}
-        count={count}
-        aria-label={count > 0 ? `${label}, ${count} unsaved` : label}
-        aria-current={selected ? 'page' : undefined}
-        className={RAIL_ROW}
-        onClick={onOpen}
-      >
-        {label}
-      </NavRow>
+      <RailTooltip label={label}>
+        <NavRow
+          kind='section'
+          icon={glyph}
+          selected={selected}
+          opens={opens}
+          count={count}
+          aria-label={count > 0 ? `${label}, ${count} unsaved` : label}
+          aria-current={selected ? 'page' : undefined}
+          className={RAIL_ROW}
+          onClick={onOpen}
+        >
+          {label}
+        </NavRow>
+      </RailTooltip>
     </SidebarMenuItem>
   );
+}
+
+// A collapsed rail shows only icons, so each row names itself in a tooltip.
+function RailTooltip({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactElement;
+}) {
+  const { state } = useSidebar();
+  if (state !== 'collapsed') return children;
+  return (
+    <Tooltip>
+      <TooltipTrigger render={children} />
+      <TooltipContent side='right'>{label}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+// Up and Down move between the rail's rows, Home and End jump to the ends.
+function moveWithArrows(event: KeyboardEvent<HTMLElement>) {
+  const keys = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
+  if (!keys.includes(event.key)) return;
+  const rows = [
+    ...event.currentTarget.querySelectorAll<HTMLElement>(
+      '[data-slot="nav-row"]:not(:disabled)'
+    ),
+  ];
+  const at = rows.findIndex((row) => row === document.activeElement);
+  if (at === -1) return;
+  event.preventDefault();
+  const next =
+    event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? rows.length - 1
+        : Math.min(
+            Math.max(at + (event.key === 'ArrowDown' ? 1 : -1), 0),
+            rows.length - 1
+          );
+  rows[next]?.focus();
 }
 
 function PluginEntries({
@@ -163,7 +213,7 @@ export function AdminRail({
     (route.view === 'screen' && route.screen === MEDIA_SCREEN);
   return (
     <>
-      <SidebarContent>
+      <SidebarContent onKeyDown={moveWithArrows}>
         <SidebarGroup>
           <SidebarMenu aria-label='Navigation'>
             <RailEntry
