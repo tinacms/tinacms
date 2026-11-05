@@ -26,17 +26,38 @@ type BranchEntry = {
 };
 
 const BRANCH_NAME_RULE = /^[A-Za-z0-9._/-]+$/;
+const BRANCH_NAME_HINT =
+  'Letters, numbers, dashes, dots and slashes. No spaces.';
+
+/** Why a branch name cannot be used, in the story's words, or undefined when it can. */
+const branchNameError = (
+  name: string,
+  taken: readonly BranchEntry[],
+  revealEmpty: boolean
+): string | undefined => {
+  if (name === '') return revealEmpty ? 'Enter a branch name.' : undefined;
+  if (/\s/.test(name)) {
+    return 'Branch names can’t have spaces. Use dashes instead, such as docs/new-page.';
+  }
+  if (!BRANCH_NAME_RULE.test(name) || /[/.]$/.test(name)) {
+    return 'Use letters, numbers, dashes, dots and slashes only, and don’t end with a slash or a dot.';
+  }
+  if (taken.some((branch) => branch.name === name)) {
+    return `A branch called ${name} already exists. Pick another name.`;
+  }
+  return undefined;
+};
 
 type BranchSwitcherProps = {
-  /** The branch edits save to. */
-  current: string;
+  /** The branch edits save to. Left out while it is not known yet, as when the list failed to load. */
+  current?: string;
   branches: BranchEntry[];
   /** Disables the button, for example while a save runs. It has no tooltip: the Status bar gives the reason. */
   disabled?: boolean;
   /** Stops a switch and shows these words, such as "Save or discard your changes first". */
   blockedMessage?: string;
   onSwitch: (name: string) => void;
-  /** Without it there is no New branch button. */
+  /** Without it the New branch form checks the name but Create branch stays off. */
   onCreate?: (name: string) => void;
   /** `loading` shows a skeleton and `failed` shows the problem with Retry, both in place. */
   status?: 'ready' | 'loading' | 'failed';
@@ -50,9 +71,10 @@ function BranchButtonLabel({
   current,
   isProtected,
 }: {
-  current: string;
+  current: string | undefined;
   isProtected: boolean;
 }): ReactNode {
+  if (current === undefined) return <span>Branches</span>;
   return (
     <>
       {isProtected ? <Icon glyph='lock' size={14} /> : null}
@@ -206,14 +228,9 @@ function BranchSwitcher({
       (branch.pullRequest !== undefined &&
         String(branch.pullRequest).includes(wanted))
   );
-  const nameTaken = branches.some((branch) => branch.name === newName.trim());
-  const nameInvalid =
-    newName.trim() !== '' && !BRANCH_NAME_RULE.test(newName.trim());
-  const nameError = nameTaken
-    ? `A branch called ${newName.trim()} already exists. Pick another.`
-    : nameInvalid
-      ? 'Use letters, numbers, dashes, dots and slashes. No spaces.'
-      : undefined;
+  const [submitted, setSubmitted] = useState(false);
+  const typed = newName.trim();
+  const nameError = branchNameError(typed, branches, submitted);
   const move = (event: KeyboardEvent<HTMLElement>) => {
     const keys = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
     if (!keys.includes(event.key)) return;
@@ -257,7 +274,11 @@ function BranchSwitcher({
             icon='branch'
             iconEnd='chevron-down'
             disabled={disabled}
-            aria-label={`Branch: ${current}${isProtected ? ', protected' : ''}`}
+            aria-label={
+              current === undefined
+                ? 'Branches'
+                : `Branch: ${current}${isProtected ? ', protected' : ''}`
+            }
             className='max-w-full'
           />
         }
@@ -316,6 +337,9 @@ function BranchSwitcher({
             role='group'
             className='flex flex-col gap-2'
           >
+            <span className='text-sm text-muted-foreground'>
+              Loading branches
+            </span>
             {[0, 1, 2].map((row) => (
               <span
                 key={row}
@@ -326,7 +350,10 @@ function BranchSwitcher({
         ) : status === 'failed' ? (
           <div role='alert' className='flex items-center gap-2 text-sm'>
             <span className='min-w-0 flex-1 text-destructive'>
-              Couldn’t load the branches.
+              Couldn't load branches.
+              {current === undefined
+                ? ' You can keep editing.'
+                : ` You're still on ${current} and can keep editing.`}
             </span>
             {onRetry ? (
               <Button size='sm' onClick={onRetry}>
@@ -343,7 +370,7 @@ function BranchSwitcher({
             ) : null}
             <BranchGroup
               branches={currentFirst}
-              current={current}
+              current={current ?? ''}
               blocked={blocked}
               onSwitch={(name) => {
                 onSwitch(name);
@@ -354,7 +381,7 @@ function BranchSwitcher({
               heading='Protected'
               description='Saving on these makes a new branch.'
               branches={protectedBranches}
-              current={current}
+              current={current ?? ''}
               blocked={blocked}
               onSwitch={(name) => {
                 onSwitch(name);
@@ -363,56 +390,77 @@ function BranchSwitcher({
             />
           </>
         )}
-        {onCreate ? (
-          creating ? (
-            <form
-              className='flex flex-col gap-2 border-t border-border-subtle pt-3'
-              onSubmit={(event) => {
-                event.preventDefault();
-                const name = newName.trim();
-                if (!name || nameError) return;
-                onCreate(name);
-                setOpen(false);
+        {creating ? (
+          <form
+            aria-label='New branch form'
+            className='flex flex-col gap-2 border-t border-border-subtle pt-3'
+            onSubmit={(event) => {
+              event.preventDefault();
+              setSubmitted(true);
+              if (typed === '' || branchNameError(typed, branches, true))
+                return;
+              if (!onCreate) return;
+              onCreate(typed);
+              setOpen(false);
+            }}
+          >
+            <h3 className='m-0 text-base font-semibold'>New branch</h3>
+            <p className='m-0 text-sm text-muted-foreground'>
+              It starts with no unsaved edits. Yours stay on the branch they
+              were made on.
+            </p>
+            <SearchBox
+              label='New branch name'
+              placeholder='Branch name'
+              icon='branch'
+              value={newName}
+              onChange={(event) => {
+                setNewName(event.target.value);
+                if (event.target.value.trim() === '' && newName !== '') {
+                  setSubmitted(true);
+                }
               }}
-            >
-              <SearchBox
-                label='New branch name'
-                placeholder='New branch name'
-                icon='branch'
-                value={newName}
-                onChange={(event) => setNewName(event.target.value)}
-                onClear={() => setNewName('')}
-                aria-invalid={nameError ? true : undefined}
-              />
-              {nameError ? (
-                <p role='alert' className='m-0 text-sm text-destructive'>
-                  {nameError}
-                </p>
-              ) : null}
-              <div className='flex justify-end gap-2'>
-                <Button onClick={() => setCreating(false)}>Cancel</Button>
-                <Button
-                  variant='primary'
-                  type='submit'
-                  disabled={newName.trim() === '' || nameError !== undefined}
-                >
-                  Create branch
-                </Button>
-              </div>
-            </form>
-          ) : (
-            <div className='border-t border-border-subtle pt-2'>
+              onClear={() => {
+                setNewName('');
+                setSubmitted(true);
+              }}
+              aria-invalid={nameError ? true : undefined}
+            />
+            <p className='m-0 text-xs text-muted-foreground'>
+              {BRANCH_NAME_HINT}
+            </p>
+            {nameError ? (
+              <p role='alert' className='m-0 text-sm text-destructive'>
+                {nameError}
+              </p>
+            ) : null}
+            <div className='flex justify-end gap-2'>
+              <Button onClick={() => setCreating(false)}>
+                Back to branches
+              </Button>
               <Button
-                variant='ghost'
-                size='sm'
-                icon='plus'
-                onClick={() => setCreating(true)}
+                variant='primary'
+                type='submit'
+                disabled={
+                  !onCreate || (typed !== '' && nameError !== undefined)
+                }
               >
-                New branch
+                Create branch
               </Button>
             </div>
-          )
-        ) : null}
+          </form>
+        ) : (
+          <div className='border-t border-border-subtle pt-2'>
+            <Button
+              variant='ghost'
+              size='sm'
+              icon='plus'
+              onClick={() => setCreating(true)}
+            >
+              New branch
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

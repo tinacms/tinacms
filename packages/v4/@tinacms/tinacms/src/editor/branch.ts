@@ -1,6 +1,7 @@
 import { toast } from '@tinacms/ui/components/toast';
 import { use, useEffect, useMemo } from 'react';
 import {
+  type BranchListState,
   type BranchMode,
   type BranchSlice,
   branchSliceOf,
@@ -13,6 +14,7 @@ import { useOptionalContentSlice, useTinaStore } from './hooks';
 export function useBranchSync(): void {
   const runtime = use(TinaRuntimeContext);
   const content = useOptionalContentSlice();
+  const attempt = useTinaStore((state) => Number(state.branch?.attempt ?? 0));
   useEffect(() => {
     if (!runtime || !content) return;
     const { store } = runtime;
@@ -25,11 +27,13 @@ export function useBranchSync(): void {
     const source = content.branches;
     if (!source) return;
     let cancelled = false;
+    fill({ mode: 'branches', listState: 'loading' });
     Promise.all([source.list(), source.defaultBranch()]).then(
       ([branches, fallback]) => {
         if (cancelled) return;
         fill({
           mode: 'branches',
+          listState: 'ready',
           fallback,
           list: branches.map((branch) => branch.name),
           protected: branches
@@ -52,13 +56,15 @@ export function useBranchSync(): void {
         }
       },
       (cause: unknown) => {
+        if (cancelled) return;
         console.warn('[tinacms] could not list branches:', cause);
+        fill({ listState: 'failed' });
       }
     );
     return () => {
       cancelled = true;
     };
-  }, [runtime, content]);
+  }, [runtime, content, attempt]);
 }
 
 export interface BranchView {
@@ -66,10 +72,15 @@ export interface BranchView {
   /** The branch edits save to: the chosen one, else the default. */
   name: string | undefined;
   branches: { name: string; protected: boolean }[];
+  /** Whether the list is being read, read, or failed. */
+  listState: BranchListState | undefined;
+  /** Reads the branch list again after a failure. */
+  retryList: () => void;
   switchTo: (name: string) => void;
 }
 
 export function useBranchView(): BranchView | null {
+  const runtime = use(TinaRuntimeContext);
   const raw = useTinaStore((state) => state.branch);
   const slice = useMemo(
     () => (raw ? branchSliceOf({ branch: raw }) : undefined),
@@ -83,6 +94,14 @@ export function useBranchView(): BranchView | null {
       name,
       protected: slice.protected.includes(name),
     })),
+    listState: slice.listState,
+    retryList: () =>
+      runtime?.store.setState((state) => ({
+        branch: {
+          ...state.branch,
+          attempt: Number(state.branch?.attempt ?? 0) + 1,
+        },
+      })),
     switchTo: slice.switchTo,
   };
 }

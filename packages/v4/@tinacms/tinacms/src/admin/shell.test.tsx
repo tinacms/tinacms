@@ -33,6 +33,8 @@ let releaseUpdate: (() => void) | undefined;
 let holdUpdates: boolean;
 let searchEnabled: boolean;
 let failGet: boolean;
+let listError: boolean;
+let listCalls: number;
 let failAfterSave: boolean;
 let updateError: Error | undefined;
 let heldDefault: Promise<void> | undefined;
@@ -50,7 +52,11 @@ const contentPlugin = () =>
             ...(mode === 'branches'
               ? {
                   branches: {
-                    list: async () => BRANCHES,
+                    list: async () => {
+                      listCalls += 1;
+                      if (listError) throw new Error('offline');
+                      return BRANCHES;
+                    },
                     defaultBranch: async () => {
                       await heldDefault;
                       return 'main';
@@ -184,6 +190,8 @@ beforeEach(() => {
   releaseUpdate = undefined;
   searchEnabled = false;
   failGet = false;
+  listError = false;
+  listCalls = 0;
   failAfterSave = false;
   updateError = undefined;
   heldDefault = undefined;
@@ -192,6 +200,62 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+});
+
+describe('Branch list states', () => {
+  it('says the list is loading while it is read', async () => {
+    let release: () => void = () => {};
+    heldDefault = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Branches' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(within(dialog).getByText('Loading branches')).toBeVisible();
+    release();
+    expect(
+      await within(dialog).findByRole('button', { name: /^main/ })
+    ).toBeVisible();
+  });
+
+  it('shows a failed read in place, keeps the admin working and retries', async () => {
+    listError = true;
+    const user = userEvent.setup();
+    renderAdmin();
+    expect(
+      await screen.findByRole('button', { name: 'Collections' })
+    ).toBeEnabled();
+    await user.click(await screen.findByRole('button', { name: 'Branches' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(
+      await within(dialog).findByText(/Couldn't load branches/)
+    ).toBeVisible();
+    listError = false;
+    await user.click(within(dialog).getByRole('button', { name: 'Retry' }));
+    expect(
+      await within(dialog).findByRole('button', { name: /^main/ })
+    ).toBeVisible();
+    expect(listCalls).toBe(2);
+    expect(within(dialog).queryByText(/Couldn't load branches/)).toBeNull();
+  });
+
+  it('checks a new branch name against the list', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      within(dialog).getByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      'feature/news'
+    );
+    expect(within(dialog).getByRole('alert')).toHaveTextContent(
+      'A branch called feature/news already exists. Pick another name.'
+    );
+  });
 });
 
 describe('Kept edits notice', () => {
