@@ -75,6 +75,8 @@ const foldVariants = cva(
 type FoldItem = {
   label: string;
   onClick?: () => void;
+  /** A link for a folded step that is a page of its own. `onClick` wins when both are set. */
+  href?: string;
   /** Shown after the label, such as an error dot. */
   marks?: ReactNode;
 };
@@ -107,7 +109,14 @@ function BreadcrumbFold({
       <DropdownMenuContent aria-label={label} className='w-60'>
         {items.map((item, index) => (
           // Two levels can share a name, so the position is the key.
-          <DropdownMenuItem key={index} icon='folder' onClick={item.onClick}>
+          <DropdownMenuItem
+            key={index}
+            icon='folder'
+            onClick={item.onClick}
+            render={
+              item.href && !item.onClick ? <a href={item.href} /> : undefined
+            }
+          >
             {item.label}
             {item.marks}
           </DropdownMenuItem>
@@ -244,6 +253,7 @@ function Breadcrumb({
                   size={size}
                   items={hidden.map((item) => ({
                     label: item.label,
+                    href: item.href,
                     onClick: press(item.onClick),
                   }))}
                 />
