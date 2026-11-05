@@ -9,13 +9,15 @@ mechanism it uses.
 
 ## Files
 
-The four files are in `plugins/fields/array/`:
+The files are in `plugins/fields/array/`:
 
 | File | Role |
 |---|---|
 | `array-field.schema.ts` | The `t.array()` helper function, and the `arraySchema` validator |
 | `array-field.client.tsx` | The descriptor, which takes the `array` key |
-| `array-field.ui.tsx` | The `ArrayField` component, and its item row |
+| `array-field.ui.tsx` | The connected `ArrayField` and `ArrayDrillIn`: the form array, the keys, the headings, the error counts |
+| `array-field.view.tsx` | `ArrayFieldView` and `ArrayDrillInView`: plain props in, List cards out. It reads no store |
+| `array-field.states.tsx` | `arrayFieldStates`: one entry for each look, used by the design sign-off and the render test |
 | `array-field.plugin.ts` | The manifest, `tina:field:array` |
 
 ## Authoring
@@ -77,7 +79,7 @@ A template of a templates array has `name`, `label?`, `fields`, `defaultItem?`,
   to field and plugin defaults.
 - `itemLabel` receives the item's current form value, so the heading follows
   what the editor types. When the result is empty or not a string, or when the
-  function throws, the row shows the default heading. A scalar array and a
+  function throws, the card shows the first text field of the item instead. A scalar array and a
   rich-text template take no `itemLabel`. It is a function, so it is never
   written to `tina-lock.json`.
 - `picker` defaults to `'grid'` when any template has a `previewImage`, and to
@@ -121,8 +123,9 @@ The client segment (`array-field.client.tsx`) takes the `array` key:
 defineClientPlugin({
   field: {
     Component: ArrayField,
+    DrillInComponent: ArrayDrillIn,
     // No defaultValue — an absent list starts as null and is not saved.
-    metadata: { layout: 'block', labelable: false },
+    metadata: { layout: 'block', labelable: false, drillable: true },
     schema: arraySchema,
     parse, serialize,       // recurse into item fields — see below
     validateChildren,       // recurse into item fields, at any depth — see below
@@ -235,38 +238,83 @@ sets the field to an empty list.
 
 ## The component
 
-`ArrayField` (`array-field.ui.tsx`) uses react-hook-form's own
-`useFieldArray({ control, name: address })` to add an object item and to keep
-stable item keys. Remove and move go through `useRemoveListItem` and
-`useMoveListItem`. Those rewrite the list at its nested address, such as
+`ArrayField` (`array-field.ui.tsx`) owns the data. `ArrayFieldView`
+(`array-field.view.tsx`) draws it. Remove and move go through `useRemoveListItem`
+and `useMoveListItem`. Those rewrite the list at its nested address, such as
 `groups.0.members`, so the defaults and the item errors move with the items.
-A scalar `of` list still adds, removes, and reorders through `useFieldValue`.
+The view takes plain props, so every look is a story in `array-field.states.tsx`
+and a case in one render test.
 
-For each item, for each item field, it renders `<NestedFieldRow address node>`
-(`editor/field.tsx`) — a `<Label>` pointing at the item field's own nested
-address (unless that field's descriptor sets `labelable: false` too), then
-`<FieldNode address node>`. `object` renders the same row, so the row is
-shared, not copied per field.
+The list uses react-hook-form's `useFieldArray({ control, name: address })`
+for add, insert, remove and reorder. It has stable item keys, so React does
+not misalign inputs across a reorder. A scalar (`of`) list keeps its own keys.
 
-`<FieldNode>` (`editor/field.tsx`) is the part of `<Field>` that resolves a
-descriptor and supplies `FieldAddressContext`/`FieldSchemaContext` — it does
-not look the node up by name, so it accepts a node that lives outside the
-collection schema. This is also why an item field's own `useFieldActivation`
-already works for visual editing: `<FieldNode>` marks its address active on
-focus, exactly as `<Field>` does for a top-level field, and the address it
-uses happens to be a nested one.
+### Cards
 
-For `templates`, the component shows one "Add <label>" button for each
-template, and the label of the template at the top of each item. For `of`,
-`useFieldArray` does not apply, because it needs objects. The component keeps
-the value as a plain array, and it adds, removes, and reorders items with
-`useFieldValue`. Each item renders the `of` field at `<address>.<index>`.
+Each item is a List card in a card list.
+
+- An item of `fields` or `templates` is a group card. The head shows the
+  `itemLabel` result, or the template label for a block, then the first text
+  field of the item. A card with nothing to show says "Empty item".
+- A scalar string or number item is a value box in the card. A number box holds
+  text in the form, and `serialize` turns it into a number on save.
+- Any other `of` type (boolean, datetime, select, image, and so on) keeps its
+  own widget inside a card whose head does not fold.
+- A closed card with errors shows a red count. An open card shows none, because
+  its fields show their own errors.
+- The Add control ends the list. A list of strings or numbers with no
+  `defaultItem` uses a box: type a value, press Enter. Any other list uses a
+  button. A block array shows the `list` or `grid` picker.
+- An empty list says so. A read-only list has no container, no Add control and
+  no menu. A disabled list has no hover and no menu.
+
+### Opening an item
+
+The depth of an item is the depth of its fields: the depth of the array plus
+one (`itemOpensNextLevel` in `editor/form-view-state.ts`). Array positions are
+not levels.
+
+- At depth 1 and 2, the card opens in place. Its head sticks to the top while
+  its fields scroll, two deep at most (`FormLevel` `pinHeaders`).
+- At depth 3 and deeper, the card opens as the next form level. The level
+  holds a stand-in `object` node built from the fields of the item
+  (`itemLevel`), and the Field trail shows the item as a step.
+- Focus on a field inside an open item level keeps the level open. A deep link
+  or an error jump opens it.
+- An array at depth 3 or deeper first drills in as a whole, with the
+  `ArrayDrillIn` card (item count, invalid count). Its items then follow the
+  item rule.
+
+### Item actions
+
+The item menu holds Move up, Move down, Insert above, Insert below, Duplicate
+and Remove. Remove acts at once, with no dialog and no Undo bar. Drag the grip
+to reorder, or press the up and down arrow keys while the grip has focus.
+
+After Remove, focus goes to the grip of the next item, else the previous item,
+else the Add control. After Insert, Duplicate or a move, focus goes to the grip
+of the item. A new object item opens.
+
+A `max` validator on the array sets the full state. When the list is full, the
+Add control is off and says why, and Insert above, Insert below and Duplicate
+are off with the hint "List is full".
+
+For a block array, Insert above and Insert below open the template picker at
+that place, and the chosen template goes in there.
+
+### Item fields
+
+For each item field the card renders `<NestedFieldRow address node>`
+(`editor/field.tsx`). `<FieldNode>` supplies `FieldAddressContext` and
+`FieldSchemaContext`, so an item field's own `useFieldActivation` works for
+visual editing at its nested address.
 
 A new `fields` item starts from `ingestDocument({}, field.fields, …)`, the
 same seeding that a new top-level form gets. A new template item starts from
 the `defaultItem` of its template. A new `of` item starts from the
-`defaultValue` of the `of` field type, or `null`. For `of`, an empty item
-(`null` or `undefined`) skips `parse` and `serialize`, and it saves as `null`.
+`defaultItem`, then the `defaultValue` of the `of` field, then the default of
+its type, or `null`. For `of`, an empty item (`null` or `undefined`) skips
+`parse` and `serialize`, and it saves as `null`.
 
 ## The connections
 
@@ -276,6 +324,12 @@ the `defaultItem` of its template. A new `of` item starts from the
   to `corePlugins`, and it supplies `t.array`.
 
 ## Tests
+
+`array-field.states.test.tsx` renders every entry of `arrayFieldStates`. It
+checks the roles, the names, the inert states, the item menu, the full state and
+the error count. `array-field-actions.test.tsx` covers Insert, Duplicate, the
+arrow keys on the grip, Remove with its focus, the full state, and the scalar
+lists. `admin/nested-levels.test.tsx` covers the item level.
 
 `array-field.test.tsx` does these tests:
 

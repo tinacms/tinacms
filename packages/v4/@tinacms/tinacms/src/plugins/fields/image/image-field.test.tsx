@@ -446,9 +446,17 @@ describe('ImageField inside an array', () => {
       createMedia(),
       authors
     );
+    for (const head of await screen.findAllByRole('button', {
+      name: /^Item \d:/,
+    })) {
+      await userEvent.click(head);
+    }
     await screen.findAllByRole('group', { name: 'Avatar' });
     await userEvent.click(
-      screen.getByRole('button', { name: 'Remove item 2' })
+      screen.getByRole('button', { name: 'Actions for Item 2' })
+    );
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: 'Remove' })
     );
     expect(valueOf('authors')).toEqual([
       { name: 'Ivan', avatar: null },

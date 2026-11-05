@@ -52,7 +52,7 @@ import {
   TinaRuntimeContext,
 } from './context';
 import { collectFieldErrorMessages, ownFieldErrors } from './field-errors';
-import { countRevealedErrors, isRevealed } from './form-view-state';
+import { countRevealedErrors, isRevealed, itemLevel } from './form-view-state';
 
 export function useFieldRegistry(): FieldRegistry {
   const runtime = use(TinaRuntimeContext);
@@ -444,16 +444,39 @@ export function useOpenLevel(): () => void {
 
 /** How many fields under the current field show an error. Counts fields, not messages. */
 export function useInvalidFieldCount(): number {
-  const address = useFieldAddress();
+  return useInvalidFieldCounts([useFieldAddress()])[0] ?? 0;
+}
+
+/** How many fields under each address show an error, in the same order. */
+export function useInvalidFieldCounts(addresses: readonly string[]): number[] {
   const { view, formId } = useFormScope(
     'invalid-field-count-outside-provider',
-    'useInvalidFieldCount'
+    'useInvalidFieldCounts'
   );
   const errorAddresses = Object.keys(useFormErrors(formId));
   return useStore(
     view,
-    useShallow((state) => countRevealedErrors(state, errorAddresses, address))
+    useShallow((state) =>
+      addresses.map((address) =>
+        countRevealedErrors(state, errorAddresses, address)
+      )
+    )
   );
+}
+
+/** Opens, reveals and touches the items of a list field by their address. */
+export function useListItems() {
+  const { view } = useFormScope('list-items-outside-provider', 'useListItems');
+  return {
+    openLevel: (
+      itemAddress: string,
+      label: string,
+      fields: readonly FieldSchema[]
+    ) => view.getState().openLevel(itemLevel(itemAddress, label, fields)),
+    isRevealed: (itemAddress: string) =>
+      isRevealed(view.getState(), itemAddress),
+    touch: (itemAddress: FieldAddress) => view.getState().touch(itemAddress),
+  };
 }
 
 /** Whether the current field is the open form level, so it shows its fields in place. */
