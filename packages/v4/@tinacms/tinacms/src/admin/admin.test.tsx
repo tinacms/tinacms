@@ -9,7 +9,7 @@ import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
 import { useFormId } from '../editor/hooks';
-import { draftKey, readDraft, readStaleDraft } from '../form/drafts';
+import { draftKey, readDraft, readWaitingDrafts } from '../form/drafts';
 import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -896,7 +896,7 @@ describe('TinaAdmin stale drafts', () => {
       );
     expect(shown.length).toBeGreaterThan(0);
     expect(new Set(shown.map(([options]) => options.id))).toEqual(
-      new Set(['resume-draft'])
+      new Set([`resume-draft:${helloFormId}`])
     );
   });
 
@@ -907,10 +907,14 @@ describe('TinaAdmin stale drafts', () => {
 
     await user.click(screen.getByRole('button', { name: 'Discard' }));
     const dialog = await screen.findByRole('alertdialog', {
-      name: 'Discard unsaved edits?',
+      name: 'Discard earlier unsaved edits to “Hello”?',
     });
+    expect(dialog).toHaveTextContent(
+      'Discarded edits can’t be brought back. What you typed since stays.'
+    );
     await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-    expect(readStaleDraft(helloFormId)).toBeDefined();
+    expect(readWaitingDrafts(helloFormId)).toHaveLength(1);
+    expect(screen.getByText('Resume your unsaved edits?')).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: 'Discard' }));
     await user.click(
@@ -920,8 +924,153 @@ describe('TinaAdmin stale drafts', () => {
     );
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello');
-    expect(readStaleDraft(helloFormId)).toBeUndefined();
+    expect(readWaitingDrafts(helloFormId)).toEqual([]);
     expect(readDraft(helloFormId)).toBeUndefined();
+  });
+});
+
+describe('TinaAdmin draft recovery contract', () => {
+  const hello = toFormId('content/posts/hello.mdx');
+  const second = toFormId('content/posts/second.mdx');
+  const store = (id: typeof hello, values: object, baseline: object) =>
+    localStorage.setItem(
+      draftKey(id),
+      JSON.stringify({ version: 2, values, baseline })
+    );
+  const openDoc = async (name: RegExp) => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: name }));
+    return user;
+  };
+
+  it('row 2: a draft on the same file version waits, with the kept words and the Status bar line', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    await openDoc(/hello\.mdx/);
+    expect(
+      await screen.findByText('Kept in this browser since your last visit.')
+    ).toBeVisible();
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello');
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+    expect(
+      within(screen.getByRole('contentinfo')).getByText(
+        'Unsaved edits kept in this browser'
+      )
+    ).toBeVisible();
+  });
+
+  it('row 3: a draft of an older file says the document changed', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Old' });
+    await openDoc(/hello\.mdx/);
+    expect(
+      await screen.findByText(
+        'The document changed since. Resume puts your edits on top.'
+      )
+    ).toBeVisible();
+  });
+
+  it('row 9: a collision re-shows the toast with the leftover words', async () => {
+    store(hello, { title: 'Earlier' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    await user.type(screen.getByLabelText(/^Title\b/), ' now');
+    await user.click(screen.getByRole('button', { name: 'Resume' }));
+    expect(
+      await screen.findByText('Your earlier edit to Title is still kept.')
+    ).toBeVisible();
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello now');
+    await user.click(screen.getByRole('button', { name: 'Resume' }));
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Earlier');
+  });
+
+  it('rows 11 and 12: Cancel returns focus to the toast Discard and the toast does nothing while the confirm is open', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    const discard = screen.getByRole('button', { name: 'Discard' });
+    await user.click(discard);
+    const dialog = await screen.findByRole('alertdialog');
+    discard.click();
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(discard).toHaveFocus();
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
+  });
+
+  it('row 13: Discard unsaved edits leaves the waiting copy and the toast', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    const dialog = await openDiscardConfirm(user);
+    await user.click(within(dialog).getByRole('button', { name: 'Discard' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
+    expect(screen.getByText('Resume your unsaved edits?')).toBeVisible();
+  });
+
+  it('row 14: Save keeps the waiting copy, the toast and the Review count', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+    );
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
+    await waitFor(() =>
+      expect(screen.getByText('Resume your unsaved edits?')).toBeVisible()
+    );
+  });
+
+  it('row 16: a direct move to another document shows that document toast', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    store(second, { title: 'Theirs' }, { title: 'Second' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /second\.mdx/ })
+    );
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Second');
+    await waitFor(() =>
+      expect(screen.getByText('Resume your unsaved edits?')).toBeVisible()
+    );
+    const ids = vi
+      .mocked(toast)
+      .mock.calls.map(([options]) => options.id)
+      .filter((id) => String(id).startsWith('resume-draft:'));
+    expect(new Set(ids)).toEqual(
+      new Set([`resume-draft:${hello}`, `resume-draft:${second}`])
+    );
+  });
+
+  it('rows 22 and 26: with the move-aside write failing, the warning shows and no screen says kept', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const real = localStorage.setItem.bind(localStorage);
+    const spy = vi
+      .spyOn(localStorage, 'setItem')
+      .mockImplementation((key, value) => {
+        if (key.endsWith('#waiting')) throw new DOMException('full');
+        real(key, value);
+      });
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await openDoc(/hello\.mdx/);
+    await waitFor(() =>
+      expect(
+        screen.getByText('Edits can’t be stored in this browser')
+      ).toBeVisible()
+    );
+    expect(readDraft(hello)?.values).toEqual({ title: 'Mine' });
+    expect(
+      within(screen.getByRole('contentinfo')).queryByText(
+        'Unsaved edits kept in this browser'
+      )
+    ).toBeNull();
+    spy.mockRestore();
   });
 });
 
@@ -1330,6 +1479,22 @@ describe('TinaAdmin rail', () => {
     expect(await screen.findByText(/Its file was not found/)).toBeVisible();
     await user.click(
       screen.getByRole('button', { name: 'Discard edits to deleted.mdx' })
+    );
+    const dialog = await screen.findByRole('alertdialog', {
+      name: 'Discard unsaved edits to “content/posts/deleted.mdx”?',
+    });
+    expect(dialog).toHaveTextContent(
+      'The file is gone, so these edits are the only copy.'
+    );
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    expect(readDraft(gone)).toBeDefined();
+    await user.click(
+      screen.getByRole('button', { name: 'Discard edits to deleted.mdx' })
+    );
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Discard',
+      })
     );
     expect(await screen.findByText('No unsaved documents.')).toBeVisible();
     expect(readDraft(gone)).toBeUndefined();

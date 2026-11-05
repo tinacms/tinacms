@@ -53,8 +53,15 @@ export interface FormScope extends FormHookScope {
   staleDraft: StaleDraftActions | null;
 }
 
+/** Why a draft waits: kept since the last visit, the file changed since, or a leftover of an earlier Resume. */
+export type WaitingCause = 'kept' | 'changed' | 'leftover';
+
 export interface StaleDraftActions {
+  cause: WaitingCause;
+  /** Labels of the fields held in the newest leftover copy. */
+  leftoverFields: string[];
   resume: () => void;
+  /** Removes every waiting copy. The caller confirms first. */
   discard: () => void;
 }
 export const FormScopeContext = createContext<FormScope | null>(null);

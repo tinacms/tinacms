@@ -15,13 +15,16 @@ import {
   type DraftUserScope,
   listStoredDraftIds,
   readDraft,
-  readStaleDraft,
+  readWaitingDrafts,
+  removeAllDrafts,
   removeDraft,
-  removeStaleDraft,
   setDraftAside,
   type StoredDraft,
+  type StoreResult,
   writeDraft,
+  writeWaitingDrafts,
 } from './drafts';
+import { resumeWaiting } from './resume';
 
 export type FormId = Brand<string, 'FormId'>;
 
@@ -83,7 +86,16 @@ export interface FormStore {
   branch: string | undefined;
   /** Counts changes to stored drafts, so lists of them refresh. */
   draftsVersion: number;
+  /** The copies that wait for Resume or Discard, oldest first, per open form. */
+  waiting: Partial<Record<FormId, readonly StoredDraft[]>>;
+  /** Forms whose draft could not be moved aside: it still sits in the live slot. */
+  held: Partial<Record<FormId, true>>;
+  /** Forms whose newest edits are not confirmed written to storage. */
+  unstored: Partial<Record<FormId, true>>;
+  /** Removes the live copy, every waiting copy and the in-memory edits. */
   discardStoredDraft: (formId: FormId) => void;
+  /** Removes every waiting copy, and the live copy only when it is held. */
+  discardWaiting: (formId: FormId) => void;
   setBranch: (branch: string | undefined) => void;
   setSavePhase: (formId: FormId, phase: SavePhase) => void;
   active: { formId: FormId; address: FieldAddress } | null;
@@ -102,7 +114,8 @@ export interface FormStore {
   setActive: (formId: FormId, address: FieldAddress | null) => void;
   markSaved: (formId: FormId, savedValues?: FormValues) => void;
   discardEdits: (formId: FormId) => void;
-  resumeDraft: (formId: FormId, draft: FormDraft) => void;
+  /** Puts the waiting copies in the form. Returns the form's new values. */
+  resumeWaiting: (formId: FormId) => FormValues | undefined;
   removeForm: (formId: FormId) => void;
 }
 
@@ -140,37 +153,58 @@ export const keepsValues = (
 
 type EditedForm = Extract<OpenForm, { status: 'edited' }>;
 
-export interface FormDraft {
-  readonly values: FormValues;
-  readonly baseline: FormValues;
-}
-
-// The scope a form opens on: this tab's own edits first, then a stored draft whose
-// baseline still matches the document. A draft of an older document is stale and
-// never merged; the editor decides whether to resume it.
+// A form opens on this tab's own edits when they still match the document. A stored
+// draft never applies on open: it waits for Resume.
 const openingScope = (
   scope: OpenForm | undefined,
+  incoming: FormValues
+): EditedForm | undefined => (keepsValues(scope, incoming) ? scope : undefined);
+
+const storeFailed = (...results: StoreResult[]) =>
+  results.some((result) => result === 'failed');
+
+// Moves a draft found on open out of the live slot, so new edits cannot overwrite
+// it. A copy equal to the file holds nothing unsaved and goes. A copy that cannot
+// be written aside stays where it is and the form holds its edits in memory.
+const settleStoredDrafts = (
   formId: FormId,
   incoming: FormValues,
   equal: FieldEquality,
   userId: DraftUserScope,
-  branch: string | undefined
-): EditedForm | undefined => {
-  if (keepsValues(scope, incoming)) return scope;
-  const draft = readDraft(formId, userId, branch);
-  if (!draft) return undefined;
-  const baseline = toFormValues(draft.baseline);
-  if (!valuesEqual(baseline, incoming, equal)) {
-    setDraftAside(formId, draft, userId, branch);
-    return undefined;
+  branch: string | undefined,
+  alreadyHeld: boolean
+): { held: boolean; failed: boolean } => {
+  const saved = (copy: StoredDraft) =>
+    valuesEqual(toFormValues(copy.values), incoming, equal);
+  let held = alreadyHeld;
+  let failed = false;
+  const live = readDraft(formId, userId, branch);
+  if (live && !alreadyHeld) {
+    if (saved(live)) {
+      removeDraft(formId, userId, branch);
+    } else if (setDraftAside(formId, live, userId, branch) === 'failed') {
+      held = true;
+      failed = true;
+    }
   }
-  return {
-    status: 'edited',
-    values: toFormValues(draft.values),
-    baseline,
-    errors: {},
-    equal,
-  };
+  const waiting = readWaitingDrafts(formId, userId, branch);
+  const remaining = waiting.filter((copy) => !saved(copy));
+  if (remaining.length !== waiting.length) {
+    const result = writeWaitingDrafts(formId, remaining, userId, branch);
+    failed = failed || storeFailed(result);
+  }
+  return { held, failed };
+};
+
+const waitingOf = (
+  formId: FormId,
+  userId: DraftUserScope,
+  branch: string | undefined,
+  held: boolean
+): readonly StoredDraft[] => {
+  const live = held ? readDraft(formId, userId, branch) : undefined;
+  const waiting = readWaitingDrafts(formId, userId, branch);
+  return live ? [...waiting, live] : waiting;
 };
 
 export const fieldDirty = (
@@ -189,6 +223,8 @@ const DEVTOOLS_ACTION = {
   setUserId: 'form/setUserId',
   setBranch: 'form/setBranch',
   discardStoredDraft: 'form/discardStoredDraft',
+  discardWaiting: 'form/discardWaiting',
+  storage: 'form/storage',
   setSavePhase: 'form/setSavePhase',
   register: 'form/register',
   setFieldValue: 'form/setFieldValue',
@@ -196,7 +232,7 @@ const DEVTOOLS_ACTION = {
   setActive: 'form/setActive',
   markSaved: 'form/markSaved',
   discardEdits: 'form/discardEdits',
-  resumeDraft: 'form/resumeDraft',
+  resumeWaiting: 'form/resumeWaiting',
   removeForm: 'form/removeForm',
 } as const;
 type DevtoolsActionLabel =
@@ -218,22 +254,76 @@ export const useFormStore = create<FormStore>()(
         saves: {},
         branch: undefined,
         draftsVersion: 0,
+        waiting: {},
+        held: {},
+        unstored: {},
         active: null,
 
         discardStoredDraft: (formId) => {
           const { userId, branch } = readFormStore();
-          removeDraft(formId, userId, branch);
-          removeStaleDraft(formId, userId, branch);
-          apply(
-            (state) => ({ draftsVersion: state.draftsVersion + 1 }),
-            DEVTOOLS_ACTION.discardStoredDraft
-          );
+          removeAllDrafts(formId, userId, branch);
+          apply((state) => {
+            const { [formId]: _form, ...forms } = state.forms;
+            const { [formId]: _waiting, ...waiting } = state.waiting;
+            const { [formId]: _held, ...held } = state.held;
+            const { [formId]: _unstored, ...unstored } = state.unstored;
+            return {
+              forms,
+              waiting,
+              held,
+              unstored,
+              draftsVersion: state.draftsVersion + 1,
+            };
+          }, DEVTOOLS_ACTION.discardStoredDraft);
+        },
+
+        discardWaiting: (formId) => {
+          const { userId, branch, held, forms } = readFormStore();
+          writeWaitingDrafts(formId, [], userId, branch);
+          // A held copy leaves the live slot, so what the editor typed since can
+          // take its place at once.
+          let stored = true;
+          if (held[formId]) {
+            removeDraft(formId, userId, branch);
+            const scope = forms[formId];
+            if (isEdited(scope) && formStatus(scope) === 'dirty') {
+              stored =
+                writeDraft(
+                  formId,
+                  {
+                    values: toDocument(scope.values),
+                    baseline: toDocument(scope.baseline),
+                  },
+                  userId,
+                  branch
+                ) !== 'failed';
+            }
+          }
+          apply((state) => {
+            const { [formId]: _waiting, ...waiting } = state.waiting;
+            const { [formId]: _held, ...rest } = state.held;
+            const { [formId]: _unstored, ...unstored } = state.unstored;
+            return {
+              waiting,
+              held: rest,
+              unstored: stored ? unstored : { ...unstored, [formId]: true },
+              draftsVersion: state.draftsVersion + 1,
+            };
+          }, DEVTOOLS_ACTION.discardWaiting);
         },
 
         setBranch: (branch) =>
           apply((state) => {
             if (state.branch === branch) return state;
-            return { branch, forms: {}, saves: {}, active: null };
+            return {
+              branch,
+              forms: {},
+              saves: {},
+              waiting: {},
+              held: {},
+              unstored: {},
+              active: null,
+            };
           }, DEVTOOLS_ACTION.setBranch),
 
         setSavePhase: (formId, phase) =>
@@ -250,25 +340,63 @@ export const useFormStore = create<FormStore>()(
         setUserId: (userId) =>
           apply((state) => {
             if (state.userId === userId) return state;
-            return { userId, forms: {}, saves: {}, active: null };
+            return {
+              userId,
+              forms: {},
+              saves: {},
+              waiting: {},
+              held: {},
+              unstored: {},
+              active: null,
+            };
           }, DEVTOOLS_ACTION.setUserId),
 
         registerForm: (formId, values, equal = STRUCTURAL_EQUALITY) =>
           apply((state) => {
             const scope = state.forms[formId];
-            const opening = openingScope(
-              scope,
+            const opening = openingScope(scope, values);
+            const settled = opening
+              ? { held: state.held[formId] === true, failed: false }
+              : settleStoredDrafts(
+                  formId,
+                  values,
+                  equal,
+                  state.userId,
+                  state.branch,
+                  state.held[formId] === true
+                );
+            const copies = waitingOf(
               formId,
-              values,
-              equal,
               state.userId,
-              state.branch
+              state.branch,
+              settled.held
             );
+            const sameCopies =
+              JSON.stringify(copies) ===
+              JSON.stringify(state.waiting[formId] ?? []);
+            const storage = {
+              waiting: sameCopies
+                ? state.waiting
+                : { ...state.waiting, [formId]: copies },
+              held: settled.held
+                ? { ...state.held, [formId]: true as const }
+                : state.held,
+              unstored: settled.failed
+                ? { ...state.unstored, [formId]: true as const }
+                : state.unstored,
+              draftsVersion: sameCopies
+                ? state.draftsVersion
+                : state.draftsVersion + 1,
+            };
             if (opening) {
-              if (opening === scope) return state;
-              return { forms: { ...state.forms, [formId]: opening } };
+              if (opening === scope && sameCopies) return state;
+              return {
+                ...storage,
+                forms: { ...state.forms, [formId]: opening },
+              };
             }
             return {
+              ...storage,
               forms: {
                 ...state.forms,
                 [formId]: { status: 'pristine', values: { ...values }, equal },
@@ -315,9 +443,7 @@ export const useFormStore = create<FormStore>()(
             DEVTOOLS_ACTION.setActive
           ),
 
-        markSaved: (formId, savedValues) => {
-          const { userId, branch } = readFormStore();
-          removeStaleDraft(formId, userId, branch);
+        markSaved: (formId, savedValues) =>
           apply((state) => {
             const scope = state.forms[formId];
             if (!scope) return state;
@@ -336,8 +462,7 @@ export const useFormStore = create<FormStore>()(
                 },
               },
             };
-          }, DEVTOOLS_ACTION.markSaved);
-        },
+          }, DEVTOOLS_ACTION.markSaved),
 
         discardEdits: (formId) =>
           apply((state) => {
@@ -355,46 +480,99 @@ export const useFormStore = create<FormStore>()(
             };
           }, DEVTOOLS_ACTION.discardEdits),
 
-        resumeDraft: (formId, draft) => {
-          const { userId, branch } = readFormStore();
-          removeStaleDraft(formId, userId, branch);
-          apply((state) => {
-            const scope = state.forms[formId];
-            if (!scope) return state;
-            const document = isEdited(scope) ? scope.baseline : scope.values;
-            const current = scope.values;
-            // The draft's changed fields go onto the current document. A field the
-            // editor changed since the form opened keeps the editor's value, so
-            // nothing typed under the prompt is lost.
-            const values = { ...document };
-            const addresses = new Set([
-              ...Object.keys(draft.values),
-              ...Object.keys(draft.baseline),
-            ]) as Set<FieldAddress>;
-            for (const address of addresses) {
-              const edited = draft.values[address];
-              if (!scope.equal(address, edited, draft.baseline[address])) {
-                values[address] = edited;
-              }
+        resumeWaiting: (formId) => {
+          const state = readFormStore();
+          const scope = state.forms[formId];
+          if (!scope) return undefined;
+          const { userId, branch } = state;
+          const document = isEdited(scope) ? scope.baseline : scope.values;
+          const copies = (state.waiting[formId] ?? []).map((copy) => ({
+            values: toFormValues(copy.values),
+            baseline: toFormValues(copy.baseline),
+            leftover: copy.leftover,
+          }));
+          const { values, leftovers } = resumeWaiting({
+            document,
+            current: scope.values,
+            copies,
+            equal: scope.equal,
+          });
+          const dirty = !valuesEqual(values, document, scope.equal);
+          const leftoverCopies: StoredDraft[] = leftovers.map((copy) => ({
+            values: toDocument(copy.values),
+            baseline: toDocument(copy.baseline),
+            leftover: true,
+          }));
+          // Each step runs only when the one before is confirmed, and the old copies
+          // go last, so a failed write at any point leaves every value stored.
+          const old = waitingOf(
+            formId,
+            userId,
+            branch,
+            state.held[formId] === true
+          );
+          let failed = storeFailed(
+            writeWaitingDrafts(
+              formId,
+              [...old, ...leftoverCopies],
+              userId,
+              branch
+            )
+          );
+          if (!failed) {
+            if (dirty) {
+              failed = storeFailed(
+                writeDraft(
+                  formId,
+                  {
+                    values: toDocument(values),
+                    baseline: toDocument(document),
+                  },
+                  userId,
+                  branch
+                )
+              );
+            } else {
+              removeDraft(formId, userId, branch);
             }
-            for (const address of Object.keys(current) as FieldAddress[]) {
-              if (!scope.equal(address, current[address], document[address])) {
-                values[address] = current[address];
-              }
-            }
+          }
+          if (!failed) {
+            failed = storeFailed(
+              writeWaitingDrafts(formId, leftoverCopies, userId, branch)
+            );
+          }
+          apply((next) => {
+            const { [formId]: _held, ...held } = next.held;
+            const { [formId]: _unstored, ...unstored } = next.unstored;
             return {
               forms: {
-                ...state.forms,
-                [formId]: {
-                  status: 'edited',
-                  values,
-                  baseline: document,
-                  errors: {},
-                  equal: scope.equal,
-                },
+                ...next.forms,
+                [formId]: dirty
+                  ? {
+                      status: 'edited',
+                      values,
+                      baseline: document,
+                      errors: {},
+                      equal: scope.equal,
+                    }
+                  : {
+                      status: 'pristine',
+                      values: document,
+                      equal: scope.equal,
+                    },
               },
+              waiting: {
+                ...next.waiting,
+                [formId]: failed ? old : leftoverCopies,
+              },
+              held: failed && next.held[formId] ? next.held : held,
+              unstored: failed
+                ? { ...next.unstored, [formId]: true }
+                : unstored,
+              draftsVersion: next.draftsVersion + 1,
             };
-          }, DEVTOOLS_ACTION.resumeDraft);
+          }, DEVTOOLS_ACTION.resumeWaiting);
+          return values;
         },
 
         removeForm: (formId) =>
@@ -416,24 +594,9 @@ export const readFormStore = (): FormStore => useFormStore.getState();
 
 export const readOpeningScope = (
   formId: FormId,
-  incoming: FormValues,
-  equal: FieldEquality = STRUCTURAL_EQUALITY
-): EditedForm | undefined => {
-  const { forms, userId, branch } = readFormStore();
-  return openingScope(forms[formId], formId, incoming, equal, userId, branch);
-};
-
-// The stored draft of an older version of the document, waiting for Resume or
-// Discard. Opening a form moves such a draft out of the edit slot.
-export const staleDraft = (
-  formId: FormId,
-  incoming: FormValues,
-  equal: FieldEquality = STRUCTURAL_EQUALITY
-): StoredDraft | undefined => {
-  readOpeningScope(formId, incoming, equal);
-  const { userId, branch } = readFormStore();
-  return readStaleDraft(formId, userId, branch);
-};
+  incoming: FormValues
+): EditedForm | undefined =>
+  openingScope(readFormStore().forms[formId], incoming);
 
 // Mirrors this tab's edits into storage. Only forms whose scope changed in an
 // update are touched, so another tab's drafts are never rewritten. A form that
@@ -446,8 +609,11 @@ export const syncDrafts = () =>
       const scope = next.forms[formId];
       const before = prev.forms[formId];
       if (scope === before) continue;
+      // A held draft still owns the live slot: edits stay in memory until the
+      // editor resumes or discards it.
+      if (next.held[formId]) continue;
       if (isEdited(scope) && formStatus(scope) === 'dirty') {
-        writeDraft(
+        const result = writeDraft(
           formId,
           {
             values: toDocument(scope.values),
@@ -456,11 +622,28 @@ export const syncDrafts = () =>
           next.userId,
           next.branch
         );
+        markStorage(formId, result === 'failed');
       } else if (formStatus(before) === 'dirty') {
         removeDraft(formId, next.userId, next.branch);
+        markStorage(formId, false);
       }
     }
   });
+
+// Records whether the newest edits of a form are confirmed stored. Only a change
+// updates the store, so the subscriber does not loop.
+const markStorage = (formId: FormId, failed: boolean) => {
+  const { unstored } = readFormStore();
+  if ((unstored[formId] === true) === failed) return;
+  useFormStore.setState(
+    (state) => {
+      const { [formId]: _gone, ...rest } = state.unstored;
+      return { unstored: failed ? { ...rest, [formId]: true } : rest };
+    },
+    false,
+    DEVTOOLS_ACTION.storage
+  );
+};
 
 export const useFormStatus = (formId: FormId): FormStatus =>
   useFormStore((state) => formStatus(state.forms[formId]));
@@ -471,6 +654,8 @@ export interface SaveSummary {
   state: SaveState;
   /** The newest failed save's message, when `state` is `failed`. */
   message?: string;
+  /** True when no form is dirty but confirmed stored edits wait for Resume or Discard. */
+  kept?: boolean;
 }
 
 /**
@@ -487,8 +672,15 @@ const summarizeSaves = (state: FormStore): SaveSummary => {
     return { state: 'failed', message: newest.message };
   }
   if (anyFormDirty(state)) return { state: 'unsaved' };
-  return { state: newest?.phase === 'saved' ? 'saved' : 'idle' };
+  if (newest?.phase === 'saved') return { state: 'saved' };
+  if (keptEdits(state)) return { state: 'idle', kept: true };
+  return { state: 'idle' };
 };
+
+const keptEdits = (state: FormStore): boolean =>
+  (Object.entries(state.waiting) as [FormId, readonly StoredDraft[]][]).some(
+    ([formId, copies]) => copies.length > 0 && !state.unstored[formId]
+  );
 
 const anyFormDirty = (state: FormStore): boolean =>
   Object.values(state.forms).some((scope) => formStatus(scope) === 'dirty');

@@ -264,7 +264,10 @@ describe('AuthGate', () => {
 
     nextUser = ada;
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
-    const adaRestored = await screen.findByRole('textbox', { name: /^Title/ });
+    const adaBack = await screen.findByRole('textbox', { name: /^Title/ });
+    expect(adaBack).toHaveValue('Hello');
+    await user.click(await screen.findByRole('button', { name: 'Resume' }));
+    const adaRestored = screen.getByRole('textbox', { name: /^Title/ });
     expect(adaRestored).toHaveValue('Hello from Ada');
     expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
     await signOut(user);
@@ -286,6 +289,11 @@ describe('AuthGate', () => {
     renderAdmin([sharedBrowserAuth]);
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
     expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
+      'Hello'
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('No changes');
+    await user.click(await screen.findByRole('button', { name: 'Resume' }));
+    expect(screen.getByRole('textbox', { name: /^Title/ })).toHaveValue(
       'Hello from Ada'
     );
     expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
