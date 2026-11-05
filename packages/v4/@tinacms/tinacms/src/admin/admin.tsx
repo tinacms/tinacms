@@ -59,7 +59,7 @@ import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
 const SHELL_WIDTH = { '--sidebar-width': '15rem' } as CSSProperties;
 
 // Sits between the Top bar and the Status bar instead of the full viewport.
-const BETWEEN_BARS = 'top-11 bottom-7 h-auto';
+const BETWEEN_BARS = 'top-14 bottom-7 h-auto';
 
 // A refused or missing clipboard says so, because the menu row promises a copy.
 function copyFilePath(path: string) {

@@ -21,3 +21,13 @@ for (const pane of ['collections', 'media', 'tools', 'settings']) {
     expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(390);
   });
 }
+
+test('the rail starts where the Top bar ends', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/#/');
+  const bar = await page.getByRole('banner', { name: 'Top bar' }).boundingBox();
+  const rail = await page
+    .getByRole('navigation', { name: 'Content' })
+    .boundingBox();
+  expect(rail?.y).toBeGreaterThanOrEqual((bar?.y ?? 0) + (bar?.height ?? 0));
+});
