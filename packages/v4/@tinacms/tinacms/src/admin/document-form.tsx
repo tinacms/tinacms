@@ -42,9 +42,13 @@ import {
   useIsFormDirty,
 } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
+import type { StoredDraft } from '../form/drafts';
 import { countFailingFields } from '../editor/field-errors';
 import { DiscardConfirm } from './discard-confirm';
 import { DocumentStatus } from './document-status';
+import { useNarrow } from './use-narrow';
+
+const SAVE_FAILED_TOAST = 'save-failed';
 
 function SaveButton() {
   const formId = useFormId();
@@ -67,6 +71,7 @@ function SaveButton() {
           setFailure(null);
           setPending(true);
           save()
+            .then(() => toast.dismiss(SAVE_FAILED_TOAST))
             .catch((cause) => {
               console.error('[tinacms] Save failed:', cause);
               let message = 'Save failed.';
@@ -74,7 +79,12 @@ function SaveButton() {
                 message = cause.message;
               }
               setFailure(message);
-              toast({ tone: 'error', title: 'Save failed', text: message });
+              toast({
+                id: SAVE_FAILED_TOAST,
+                tone: 'error',
+                title: 'Save failed',
+                text: message,
+              });
             })
             .finally(() => setPending(false));
         }}
@@ -161,8 +171,11 @@ const TOAST_REMOUNT_GRACE_MS = 400;
 function ResumeDraftToast({ scope }: { scope: FormScope }) {
   const stale = useStaleDraft();
   const values = useFormValues(scope.formId);
+  const narrow = useNarrow();
   const [confirming, setConfirming] = useState(false);
   const discardButton = useRef<HTMLElement | null>(null);
+  // The copies on screen when the confirm opened. Only these go on Confirm.
+  const shown = useRef<readonly StoredDraft[]>([]);
   const cause = stale?.cause;
   const fields = stale?.leftoverFields.join(', ');
   // `stale` is a new object whenever the form changes. The toast must not show
@@ -174,6 +187,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
   const askToDiscard = useEffectEvent(() => {
     if (confirming) return;
     discardButton.current = document.activeElement as HTMLElement | null;
+    shown.current = stale?.copies ?? [];
     setConfirming(true);
   });
   const toastId = `resume-draft:${scope.path}`;
@@ -185,7 +199,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
     toast({
       id: toastId,
       tone: 'warning',
-      actionsInline: true,
+      actionsInline: !narrow,
       title: 'Resume your unsaved edits?',
       text:
         cause === 'leftover'
@@ -200,7 +214,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
         onClick: askToDiscard,
       },
     });
-  }, [cause, fields, toastId]);
+  }, [cause, fields, toastId, narrow]);
   // A change of wording replaces the toast in place; only an empty list or a
   // different document takes it away.
   const present = cause !== undefined;
@@ -221,7 +235,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
     <DiscardConfirm
       open={confirming}
       onOpenChange={setConfirming}
-      onConfirm={() => stale?.discard()}
+      onConfirm={() => stale?.discard(shown.current)}
       returnFocusTo={discardButton}
       title={`Discard earlier unsaved edits to “${documentTitle(values, scope.path)}”?`}
       description='Discarded edits can’t be brought back. What you typed since stays.'
@@ -233,9 +247,9 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
 // dismissed and shows once per document in a session.
 const warnedStorage = new Set<string>();
 function StorageWarning({ scope }: { scope: FormScope }) {
-  const unstored = useFormStore((state) => state.unstored[scope.formId]);
+  const failures = useFormStore((state) => state.failures[scope.formId]);
   useEffect(() => {
-    if (!unstored || warnedStorage.has(scope.path)) return;
+    if (!failures || warnedStorage.has(scope.path)) return;
     warnedStorage.add(scope.path);
     toast({
       id: `storage-warning:${scope.path}`,
@@ -245,7 +259,7 @@ function StorageWarning({ scope }: { scope: FormScope }) {
       dismissible: true,
       duration: Number.POSITIVE_INFINITY,
     });
-  }, [unstored, scope.path]);
+  }, [failures, scope.path]);
   return null;
 }
 

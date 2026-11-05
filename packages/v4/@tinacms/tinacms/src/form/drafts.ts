@@ -192,7 +192,10 @@ export const listStoredDraftIds = (
       : `${USER_DRAFT_KEY_PREFIX}${encodeURIComponent(userId)}:`;
   const ids = new Set<FormId>();
   for (let at = 0; at < store.length; at++) {
-    const key = store.key(at)?.replace(new RegExp(`${WAITING_SUFFIX}$`), '');
+    const stored = store.key(at);
+    const key = stored?.endsWith(WAITING_SUFFIX)
+      ? stored.slice(0, -WAITING_SUFFIX.length)
+      : stored;
     if (!key?.startsWith(prefix) || !key.endsWith(suffix)) continue;
     const id = key.slice(prefix.length, key.length - suffix.length);
     if (id.length === 0 || (!branch && id.includes('@@'))) continue;

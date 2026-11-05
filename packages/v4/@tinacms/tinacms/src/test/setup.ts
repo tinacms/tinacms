@@ -39,6 +39,8 @@ beforeEach(() => {
     waiting: {},
     held: {},
     unstored: {},
+    failures: {},
+    hidden: {},
     active: null,
   });
   localStorage.clear();

@@ -1043,6 +1043,53 @@ describe('TinaAdmin draft recovery contract', () => {
     );
   });
 
+  it('row 11: the confirm takes focus when a field held it', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    await user.click(screen.getByLabelText(/^Title\b/));
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    const dialog = await screen.findByRole('alertdialog');
+    await waitFor(() =>
+      expect(
+        within(dialog).getByRole('button', { name: 'Cancel' })
+      ).toHaveFocus()
+    );
+  });
+
+  it('a Save failed toast goes when a later save lands', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const dismiss = vi.spyOn(toast, 'dismiss');
+    vi.spyOn(provider, 'update').mockRejectedValueOnce(new Error('offline'));
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(vi.mocked(toast)).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'save-failed', tone: 'error' })
+      )
+    );
+    expect(dismiss).not.toHaveBeenCalledWith('save-failed');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(dismiss).toHaveBeenCalledWith('save-failed'));
+  });
+
+  it('Expand all and Collapse all show in the form menu, disabled when no field has cards', async () => {
+    const user = await openDoc(/hello\.mdx/);
+    await user.click(
+      await screen.findByRole('button', { name: 'Document menu' })
+    );
+    expect(
+      await screen.findByRole('menuitem', { name: 'Expand all' })
+    ).toHaveAttribute('aria-disabled', 'true');
+    expect(
+      screen.getByRole('menuitem', { name: 'Collapse all' })
+    ).toHaveAttribute('aria-disabled', 'true');
+    expect(
+      screen.getByRole('menuitem', { name: 'Copy file path' })
+    ).toBeVisible();
+  });
+
   it('rows 22 and 26: with the move-aside write failing, the warning shows and no screen says kept', async () => {
     store(hello, { title: 'Mine' }, { title: 'Hello' });
     const real = localStorage.setItem.bind(localStorage);

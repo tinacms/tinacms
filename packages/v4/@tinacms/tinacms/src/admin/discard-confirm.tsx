@@ -10,6 +10,12 @@ import {
 import { Button } from '@tinacms/ui/components/button';
 import type { RefObject } from 'react';
 
+// The dialog opens on Cancel whatever held focus before, such as a field the editor
+// was typing in.
+const focusOnMount = (node: HTMLButtonElement | null) => {
+  if (node) requestAnimationFrame(() => node.focus());
+};
+
 /**
  * Discarding cannot be undone, so it asks first. Cancel and Escape keep everything
  * and return focus to `returnFocusTo`.
@@ -33,11 +39,17 @@ export function DiscardConfirm({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent finalFocus={returnFocusTo}>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogTitle className='[overflow-wrap:anywhere]'>
+            {title}
+          </AlertDialogTitle>
+          <AlertDialogDescription className='[overflow-wrap:anywhere]'>
+            {description}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant='outline' />}>
+          <AlertDialogClose
+            render={<Button ref={focusOnMount} variant='outline' />}
+          >
             Cancel
           </AlertDialogClose>
           <Button

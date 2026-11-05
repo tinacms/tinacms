@@ -10,6 +10,7 @@ import {
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
+import { useNarrow } from './use-narrow';
 import { toast } from '@tinacms/ui/components/toast';
 import { Tabs, TabsPanel } from '@tinacms/ui/components/tabs';
 import {
@@ -182,6 +183,10 @@ function FormColumn({
   const { width, isResizing, handleProps } = useFormColumnWidth();
   const scope = use(FormScopeContext);
   const seedKey = scope?.seedKey;
+  // Only objects and lists have cards to open or close.
+  const expandable = (collection?.fields ?? []).some(
+    (field) => field.type === 'object' || field.type === 'array'
+  );
 
   const [mountedSeedKey, setMountedSeedKey] = useState<string | undefined>(
     undefined
@@ -206,9 +211,23 @@ function FormColumn({
             menuLabel='Document menu'
             menu={
               openPath === undefined ? undefined : (
-                <DropdownMenuItem onClick={() => copyFilePath(openPath)}>
-                  Copy file path
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuItem onClick={() => copyFilePath(openPath)}>
+                    Copy file path
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={!expandable}
+                    onClick={() => scope?.view.getState().setExpansion(true)}
+                  >
+                    Expand all
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={!expandable}
+                    onClick={() => scope?.view.getState().setExpansion(false)}
+                  >
+                    Collapse all
+                  </DropdownMenuItem>
+                </>
               )
             }
           />
@@ -274,10 +293,18 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
 
 // Toasts sit above the Save progress card while it shows.
 const TOAST_OFFSET_ABOVE_CARD = { bottom: '8rem' };
+// On narrow screens toasts also clear the form bar and the Status bar.
+const TOAST_OFFSET_ABOVE_BAR = { bottom: '7rem' };
+// Below the dialog layer, so a Confirm dims the toasts behind it.
+const TOAST_LAYER = { zIndex: 40 };
 
 function ShellToaster() {
   const cardShowing = useLongSave();
-  return <Toaster offset={cardShowing ? TOAST_OFFSET_ABOVE_CARD : undefined} />;
+  const narrow = useNarrow();
+  let offset: { bottom: string } | undefined;
+  if (cardShowing) offset = TOAST_OFFSET_ABOVE_CARD;
+  else if (narrow) offset = TOAST_OFFSET_ABOVE_BAR;
+  return <Toaster offset={offset} mobileOffset={offset} style={TOAST_LAYER} />;
 }
 
 function MissingPanel({

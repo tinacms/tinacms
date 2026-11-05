@@ -1,3 +1,4 @@
+import type { StoredDraft } from '../form/drafts';
 import { createContext } from 'react';
 import type { StoreApi } from 'zustand';
 import type { TinaSchema } from '../config';
@@ -60,9 +61,11 @@ export interface StaleDraftActions {
   cause: WaitingCause;
   /** Labels of the fields held in the newest leftover copy. */
   leftoverFields: string[];
+  /** The waiting copies the editor sees now. Discard removes the ones it was shown. */
+  copies: readonly StoredDraft[];
   resume: () => void;
-  /** Removes every waiting copy. The caller confirms first. */
-  discard: () => void;
+  /** Removes the given copies. The caller confirms first. */
+  discard: (copies: readonly StoredDraft[]) => void;
 }
 export const FormScopeContext = createContext<FormScope | null>(null);
 

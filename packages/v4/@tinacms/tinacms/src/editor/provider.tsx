@@ -277,28 +277,38 @@ const buildStaleDraftActions = (
   const labels = new Map(
     collection.fields.map((field) => [field.name, field.label ?? field.name])
   );
-  const leftoverFields = newest.leftover
-    ? Object.keys(newest.values)
-        .filter(
-          (name) =>
-            !equal(
-              toFieldAddress(name),
-              newest.values[name],
-              newest.baseline[name]
-            )
-        )
-        .map((name) => labels.get(name) ?? name)
-    : [];
+  // The swap restores the newest leftover, so the words name every field the
+  // trailing leftover copies hold.
+  const leftoverFields: string[] = [];
+  if (newest.leftover) {
+    for (const copy of copies.toReversed()) {
+      if (!copy.leftover) break;
+      for (const name of Object.keys(copy.values)) {
+        const held = !equal(
+          toFieldAddress(name),
+          copy.values[name],
+          copy.baseline[name]
+        );
+        const label = labels.get(name) ?? name;
+        if (held && !leftoverFields.includes(label)) leftoverFields.push(label);
+      }
+    }
+  }
+  const shown =
+    leftoverFields.length > 5
+      ? [...leftoverFields.slice(0, 5), `${leftoverFields.length - 5} more`]
+      : leftoverFields;
   return {
     cause: causeOf(newest, ingested, equal),
-    leftoverFields,
+    leftoverFields: shown,
     resume: () => {
       const values = readFormStore().resumeWaiting(formId);
       if (!values) return;
       resetForm(toDocument(values));
       advanceSeedKey(formId);
     },
-    discard: () => readFormStore().discardWaiting(formId),
+    copies,
+    discard: (shown) => readFormStore().discardWaiting(formId, shown),
   };
 };
 
@@ -533,7 +543,9 @@ export function FormProvider({
     methods.reset
   );
 
-  const waiting = useFormStore((state) => state.waiting[formId]);
+  const waiting = useFormStore((state) =>
+    state.hidden[formId] ? undefined : state.waiting[formId]
+  );
   const staleDraftActions = useMemo(
     () =>
       buildStaleDraftActions(

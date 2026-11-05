@@ -11,8 +11,10 @@ export interface WaitingCopy {
 
 export interface ResumeResult {
   readonly values: FormValues;
-  /** Values that lost, each kept as a copy that holds only those fields. */
-  readonly leftovers: WaitingCopy[];
+  /** The waiting list after Resume: every value that did not go into the form. */
+  readonly copies: WaitingCopy[];
+  /** True when Resume swapped the newest leftover copy with the form. */
+  readonly swapped: boolean;
 }
 
 const addressesOf = (...sets: FormValues[]) =>
@@ -45,7 +47,8 @@ const leftoverOf = (
  * What Resume puts in the form. Highest precedence first: what the form holds now
  * (typed since opening), the newest waiting copy, older copies, then the file.
  * Every value that loses and differs from the winner stays in a leftover copy.
- * When only leftover copies wait, Resume swaps them with what the form holds.
+ * When the newest copy is a leftover, Resume swaps that one copy with what the
+ * form holds and leaves the older copies where they are.
  */
 export function resumeWaiting({
   document,
@@ -58,18 +61,22 @@ export function resumeWaiting({
   copies: readonly WaitingCopy[];
   equal: FieldEquality;
 }): ResumeResult {
-  const swap = copies.length > 0 && copies.every((copy) => copy.leftover);
-  if (swap) {
+  const newest = copies.at(-1);
+  if (newest?.leftover) {
     const values = { ...current };
     const displaced: Record<string, unknown> = {};
-    for (const copy of copies) {
-      for (const address of changed(equal, copy.values, copy.baseline)) {
-        if (equal(address, current[address], copy.values[address])) continue;
+    for (const address of changed(equal, newest.values, newest.baseline)) {
+      if (equal(address, current[address], newest.values[address])) continue;
+      values[address] = newest.values[address];
+      if (!equal(address, current[address], document[address])) {
         displaced[address] = current[address];
-        values[address] = copy.values[address];
       }
     }
-    return { values, leftovers: leftoverOf(document, displaced) };
+    return {
+      values,
+      copies: [...copies.slice(0, -1), ...leftoverOf(document, displaced)],
+      swapped: true,
+    };
   }
   const values = { ...document };
   for (const copy of copies) {
@@ -89,11 +96,5 @@ export function resumeWaiting({
     }
     return leftoverOf(document, lost);
   });
-  return { values, leftovers };
+  return { values, copies: leftovers, swapped: false };
 }
-
-/** The top-level fields a copy changed against its own baseline. */
-export const changedFields = (
-  copy: WaitingCopy,
-  equal: FieldEquality
-): FieldAddress[] => changed(equal, copy.values, copy.baseline);

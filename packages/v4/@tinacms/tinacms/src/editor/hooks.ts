@@ -194,8 +194,7 @@ export function useDiscardEdits(): () => void {
     .discardEdits;
 }
 
-// Set when the form opened on its document because a stored draft of an older
-// version of it exists; the editor resumes the draft or discards it.
+// Set while a stored copy waits for the editor to Resume or Discard it.
 export function useStaleDraft(): StaleDraftActions | null {
   return useFormScope('stale-draft-outside-provider', 'useStaleDraft')
     .staleDraft;
@@ -473,6 +472,12 @@ export function useIsOpenLevel(): boolean {
     view,
     (state) => state.openLevels.at(-1)?.address === address
   );
+}
+
+/** The newest Expand all or Collapse all of the form. `version` 0 means none was asked. */
+export function useExpansion() {
+  const { view } = useFormScope('expansion-outside-provider', 'useExpansion');
+  return useStore(view, (state) => state.expansion);
 }
 
 export function useFieldActivation(handler: () => void): void {

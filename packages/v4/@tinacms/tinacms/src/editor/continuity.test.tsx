@@ -91,7 +91,7 @@ function StaleDraftProbe() {
       <button type='button' onClick={stale.resume}>
         resume
       </button>
-      <button type='button' onClick={stale.discard}>
+      <button type='button' onClick={() => stale.discard(stale.copies)}>
         dismiss
       </button>
     </>
