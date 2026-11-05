@@ -23,6 +23,7 @@ import { Field, FieldNode } from '../editor/field';
 import {
   fieldsAlong,
   holdsRevealedError,
+  levelDrillsIn,
   levelsFor,
   type OpenLevel,
 } from '../editor/form-view-state';
@@ -138,7 +139,7 @@ function ActiveFieldLevels({ scope }: { scope: FormScope }) {
       address,
       collection.fields,
       (path) => getValues(path),
-      (node) => registry.get(node.type)?.metadata?.drillable === true
+      (step) => levelDrillsIn(registry.get(step.node.type), step)
     );
     const top = openLevels.at(-1)?.address;
     const sameLevels =
@@ -195,7 +196,7 @@ function OpenLevelFrame({
     ),
   ];
   return (
-    <FormLevel steps={steps} onUp={steps.at(-2)?.onClick}>
+    <FormLevel pinHeaders steps={steps} onUp={steps.at(-2)?.onClick}>
       {children}
     </FormLevel>
   );
@@ -205,7 +206,7 @@ function FormFields({ scope }: { scope: FormScope }) {
   const current = useStore(scope.view, (state) => state.openLevels.at(-1));
   if (!current) {
     return (
-      <FormLevel>
+      <FormLevel pinHeaders>
         {scope.collection.fields.map((node) => (
           <Field key={node.name} address={node.name} />
         ))}
