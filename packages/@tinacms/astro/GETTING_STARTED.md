@@ -117,7 +117,7 @@ export const ALL: APIRoute = experimental_createIslandRoute(islands);
 
 That's the only file the bridge needs. Adding a new editable region from here on is one entry in the registry.
 
-Registry keys must be URL path segments (a letter, then letters, digits or hyphens) and each `wrapper.tag` must be an element that can hold content (not `img`, `br`, `input`, …); `experimental_createIslandRoute` throws at startup otherwise. The endpoint only answers the bridge's own requests: a same-origin `POST` with Tina's preview content type and a JSON body of at most 1 MB. Anything else gets a 4xx, an unregistered name gets `Not Found`, and a loader or render error gets a bare 500.
+Registry keys must be URL path segments (not empty, `.` or `..`, and without `/`, `\`, `?`, `#`, `%` or whitespace) and each `wrapper.tag` must be an element that can hold content (not `img`, `br`, `input`, …); `experimental_createIslandRoute` throws at startup otherwise. The endpoint only answers the bridge's own requests: a same-origin `POST` with Tina's preview content type and a JSON body of at most 1 MB. Anything else gets a 4xx, an unregistered name gets `Not Found`, and a loader or render error gets a bare 500.
 
 ## 7. Use editable regions in pages
 

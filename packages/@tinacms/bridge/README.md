@@ -18,7 +18,7 @@ Most projects install an adapter rather than using this package directly.
 | `@tinacms/bridge/quick-edit-css` | Anywhere | `QUICK_EDIT_CSS` and its class/id names |
 | `@tinacms/bridge/edit-mode` | Server | `isEditMode`, `readCookie`, `EDIT_COOKIE`, `EDIT_COOKIE_HEADER` |
 | `@tinacms/bridge/form-payload` | Server | `CollectedForm`, `addForm`, `sortByPriority`, `renderFormPayload`, `renderPageFormPayloads` |
-| `@tinacms/bridge/island` | Server | `handleIslandRequest`, `assertValidIslands`, `IslandWrapper`, `IslandRender`, `IslandRequest` |
+| `@tinacms/bridge/island` | Server | `handleIslandRequest`, `assertValidIslands`, `isIslandName`, `IslandWrapper`, `IslandRender`, `IslandRequest` |
 | `@tinacms/bridge/sanitize` | Anywhere | `sanitizeHref`, `sanitizeImageSrc`, `sanitizeCssColor` |
 | `@tinacms/bridge/dev-server` | Node only | `BRIDGE_ROUTE`, `bridgeBundlePath`, `readBridgeBundle`, `serveBridge` |
 

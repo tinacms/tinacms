@@ -32,7 +32,8 @@ export interface IslandRequest<TIsland extends { wrapper: IslandWrapper }> {
   render: (island: TIsland) => Promise<IslandRender>;
 }
 
-const NAME_PATTERN = /^[A-Za-z][A-Za-z0-9-]*$/;
+const TAG_PATTERN = /^[A-Za-z][A-Za-z0-9-]*$/;
+const NON_SEGMENT_CHARACTER = /[\s\p{Cc}/\\?#%]/u;
 const MAX_BODY_BYTES = 1_000_000;
 const VOID_ELEMENTS = new Set([
   'area',
@@ -51,16 +52,30 @@ const VOID_ELEMENTS = new Set([
   'wbr',
 ]);
 
+/**
+ * Whether `name` can be the `[name]` segment of `/tina-island/[name]` as is:
+ * not empty, `.` or `..`, and without a character that would end or reshape
+ * the segment (`/`, `\`, `?`, `#`, `%`, whitespace, control characters).
+ */
+export function isIslandName(name: string): boolean {
+  return (
+    name !== '' &&
+    name !== '.' &&
+    name !== '..' &&
+    !NON_SEGMENT_CHARACTER.test(name)
+  );
+}
+
 /** Throws when an island name isn't a URL path segment or a wrapper is a void tag. */
 export function assertValidIslands(
   islands: Readonly<Record<string, { wrapper: IslandWrapper }>>
 ): void {
   for (const [name, island] of Object.entries(islands)) {
-    if (!NAME_PATTERN.test(name)) {
+    if (!isIslandName(name)) {
       throw new TypeError('Tina island names must be valid URL path segments');
     }
     const { tag } = island.wrapper;
-    if (!NAME_PATTERN.test(tag) || VOID_ELEMENTS.has(tag.toLowerCase())) {
+    if (!TAG_PATTERN.test(tag) || VOID_ELEMENTS.has(tag.toLowerCase())) {
       throw new TypeError('Tina island wrapper must be a non-void HTML tag');
     }
   }

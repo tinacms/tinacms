@@ -79,14 +79,32 @@ describe('assertValidIslands', () => {
     expect(() => assertValidIslands(islands)).not.toThrow();
   });
 
-  it.each(['', '1post', 'post/x', 'po st', '../x'])(
-    'rejects the island name %j',
+  it.each(['post_body', '2col', 'hero.v2', 'Post-Body', 'café'])(
+    'accepts the island name %j',
     (name) => {
       expect(() =>
         assertValidIslands({ [name]: { wrapper: { tag: 'div' } } })
-      ).toThrow(TypeError);
+      ).not.toThrow();
     }
   );
+
+  it.each([
+    '',
+    '.',
+    '..',
+    'post/x',
+    '../x',
+    'post\\x',
+    'po st',
+    'post?x',
+    'post#x',
+    '50%',
+    'post\n',
+  ])('rejects the island name %j', (name) => {
+    expect(() =>
+      assertValidIslands({ [name]: { wrapper: { tag: 'div' } } })
+    ).toThrow(TypeError);
+  });
 
   it.each(['img', 'IMG', 'br', 'div onclick', 'x>'])(
     'rejects the wrapper tag %j',

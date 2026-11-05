@@ -5,6 +5,7 @@ import { render } from 'svelte/server';
 import { describe, expect, it } from 'vitest';
 import { requestWithMetadata } from '../data';
 import { experimental_createIslandHandler } from '../experimental/island';
+import TinaIsland from '../TinaIsland.svelte';
 import CalloutOverride from './fixtures/CalloutOverride.svelte';
 import TinaIslandFixture from './fixtures/TinaIslandFixture.svelte';
 
@@ -186,5 +187,17 @@ describe('experimental_createIslandHandler', () => {
     );
     expect(body).toContain('data-tina-island-primary');
     expect(body).toContain('<p>Island content</p>');
+  });
+
+  it('accepts any island name that fits one path segment', () => {
+    const wrapper = { tag: 'section' };
+    const { body } = render(TinaIsland, {
+      props: { name: 'post_body', wrapper },
+    });
+
+    expect(body).toContain('data-tina-island="/tina-island/post_body"');
+    expect(
+      () => render(TinaIsland, { props: { name: 'post/body', wrapper } }).body
+    ).toThrow(TypeError);
   });
 });
