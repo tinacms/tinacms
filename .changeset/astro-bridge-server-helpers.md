@@ -6,7 +6,6 @@ Use the shared server helpers from `@tinacms/bridge` for edit-mode detection, fo
 
 `experimental_createIslandRoute` now validates more strictly. The bridge already sends conforming requests, so editing is unaffected:
 
-- It accepts only same-origin requests: `Sec-Fetch-Site: same-origin`, or without that header an `Origin` matching the request URL. A `same-site` request is now rejected.
 - The body must be a JSON object of at most 1 MB.
 - An unregistered island, including names inherited from `Object.prototype` such as `constructor`, gets a plain `Not Found`.
 - A loader or render error gets a 500 without detail.

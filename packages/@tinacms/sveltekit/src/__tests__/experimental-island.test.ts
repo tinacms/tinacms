@@ -93,13 +93,14 @@ describe('experimental_createIslandHandler', () => {
     expect(response.status).toBe(404);
   });
 
-  it('rejects requests from another origin', async () => {
+  it('rejects cross-site requests', async () => {
     const handler = experimental_createIslandHandler({});
     const request = new Request('http://localhost/tina-island/post', {
       method: 'POST',
       headers: {
         'content-type': PREVIEW_CONTENT_TYPE,
         origin: 'https://other.example',
+        'sec-fetch-site': 'cross-site',
       },
       body: '{}',
     });

@@ -135,17 +135,11 @@ function rejectUnsafeRequest(request: Request): Response | null {
   ) {
     return textResponse('Not Found', 404);
   }
-  const origin = request.headers.get('origin');
-  if (!origin) return textResponse('Forbidden', 403);
-  // Trust the browser's Fetch Metadata when present: behind a proxy (or on
-  // adapters that only trust configured hosts) the server's view of its own
-  // URL can differ from the origin the browser used. Without it, fall back
-  // to comparing Origin with the request URL.
-  const fetchSite = request.headers.get('sec-fetch-site');
-  const sameOrigin = fetchSite
-    ? fetchSite === 'same-origin'
-    : origin === new URL(request.url).origin;
-  if (!sameOrigin) return textResponse('Forbidden', 403);
+  // The published Astro rule. The preview content type already makes another
+  // origin's request fail its CORS preflight; this refuses it outright.
+  if (request.headers.get('sec-fetch-site') === 'cross-site') {
+    return textResponse('Forbidden', 403);
+  }
   return null;
 }
 

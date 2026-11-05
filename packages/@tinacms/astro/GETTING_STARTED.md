@@ -117,7 +117,7 @@ export const ALL: APIRoute = experimental_createIslandRoute(islands);
 
 That's the only file the bridge needs. Adding a new editable region from here on is one entry in the registry.
 
-Registry keys must be URL path segments (not empty, `.` or `..`, and without `/`, `\`, `?`, `#`, `%` or whitespace) and each `wrapper.tag` must be an element that can hold content (not `img`, `br`, `input`, …); `experimental_createIslandRoute` throws at startup otherwise. The endpoint only answers the bridge's own requests: a same-origin `POST` with Tina's preview content type and a JSON body of at most 1 MB. Anything else gets a 4xx, an unregistered name gets `Not Found`, and a loader or render error gets a bare 500.
+Registry keys must be URL path segments (not empty, `.` or `..`, and without `/`, `\`, `?`, `#`, `%` or whitespace) and each `wrapper.tag` must be an element that can hold content (not `img`, `br`, `input`, …); `experimental_createIslandRoute` throws at startup otherwise. The endpoint only answers the bridge's own requests: a `POST` with Tina's preview content type that the browser doesn't mark as cross-site, and a JSON body of at most 1 MB. Anything else gets a 4xx, an unregistered name gets `Not Found`, and a loader or render error gets a bare 500.
 
 ## 7. Use editable regions in pages
 
@@ -230,7 +230,7 @@ For the cleanest type-check experience:
 | "Tina Dev server is already in use. Datalayer server is busy on port 9000" | Another `pnpm dev` is running | Kill it, or set a different datalayer port |
 | Admin URL bar updates but new page's forms don't appear | Bridge isn't loading on the new page | Inspect the new page's `<head>` in DevTools — should contain `<div data-tina-form="…" hidden>` and a `<script type="module">` importing `/admin/bridge.js`. If they're missing, edit-mode detection failed (check the Referer header on the request). |
 | Visual editing dead on a deployed site, no `data-tina-form` / `bridge.js` in the HTML | Pages are statically built (`output: 'static'`) so the middleware never runs at request time | Either set `output: 'server'`, or wrap editable regions in `<TinaIsland>` (steps 5–7) — see [Static-site editing](#static-site-editing). Without an `<TinaIsland>` somewhere on the page there's nothing to inject the bridge on a static build. |
-| Island requests to `/tina-island/…` fail with 403 | The endpoint accepts only same-origin requests. Modern browsers say so with `Sec-Fetch-Site: same-origin`; without that header it compares the `Origin` header with the URL the server sees, which behind a proxy may differ (e.g. `http://localhost:4321` instead of `https://your-site`) | Use a current browser. For other clients, make the server see the public URL (for `@astrojs/node`, set `security.allowedDomains` and forward `X-Forwarded-Proto`/`X-Forwarded-Host`) |
+| Island requests to `/tina-island/…` fail with 403 | The browser marked the request `Sec-Fetch-Site: cross-site`: the page and the island endpoint are on different sites | Serve the island route from the same site as the page; `<TinaIsland>` builds a path on the page's own origin |
 | `Type 'X' is not assignable to type 'never'` on `<TinaMarkdown>` | Imported from bare `@tinacms/astro` (which resolves to the placeholder type) | Import from `@tinacms/astro/TinaMarkdown.astro` instead |
 
 ## Static-site editing

@@ -70,7 +70,7 @@ export function POST(request: Request, name: string) {
 |---|---|
 | Not a `POST` | 405 |
 | Content type isn't the preview type | 404 |
-| `Origin` missing; `Sec-Fetch-Site` present and not `same-origin`; or, without `Sec-Fetch-Site`, `Origin` not the request URL's origin | 403 |
+| `Sec-Fetch-Site: cross-site` | 403 |
 | Body over 1 MB (declared or streamed) | 413 |
 | Body missing or not a JSON object | 400 |
 | Island name not registered (own properties only) | 404 |
@@ -78,7 +78,7 @@ export function POST(request: Request, name: string) {
 
 A successful response is `text/html` with `Cache-Control: no-store` and `X-Content-Type-Options: nosniff`. It contains the rendered HTML inside the island's wrapper element (escaped `class`, the request path as `data-tina-island`, and the ids of the forms `render` returned as `data-tina-island-forms`). On a prime request, the form payloads come first, and only a form recorded with `priority: 'primary'` gets `data-tina-primary`.
 
-The origin check trusts the browser's `Sec-Fetch-Site` header when it's present, because behind a proxy (or on an adapter that only trusts configured hosts) the URL the server sees can differ from the one the browser used. Only requests without it are compared against the request URL.
+The origin check is the one `@tinacms/astro` has always had: refuse what the browser marks as cross-site. Another site can't send the preview content type without a CORS preflight, which the endpoint never answers. Requests without fetch metadata (non-browser clients, older browsers) aren't compared against the request URL, which behind a proxy can differ from the one the browser used.
 
 Never choose a component from request input: the registry is the allow-list.
 

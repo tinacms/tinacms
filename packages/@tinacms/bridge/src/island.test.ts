@@ -252,48 +252,42 @@ describe('handleIslandRequest', () => {
     expect(response.status).toBe(200);
   });
 
-  it('rejects a missing Origin, even with same-origin fetch metadata', async () => {
-    const missing = new Request('http://site.test/tina-island/post', {
-      method: 'POST',
-      body: '{}',
-      headers: {
-        'content-type': PREVIEW_CONTENT_TYPE,
-        'sec-fetch-site': 'same-origin',
-      },
-    });
-    expect((await handle(missing)).status).toBe(403);
-  });
-
-  it('without fetch metadata, requires Origin to match the request URL', async () => {
-    const foreign = islandRequest(undefined, {
-      headers: { origin: 'https://other.test' },
-    });
-    expect((await handle(foreign)).status).toBe(403);
-  });
-
-  it('trusts same-origin fetch metadata when the server sees another URL', async () => {
-    // e.g. a TLS-terminating proxy: the browser used https://site.test, the
-    // server was handed http://localhost:4321.
+  it('rejects cross-site fetch metadata, even when Origin matches', async () => {
     const response = await handle(
-      islandRequest('http://localhost:4321/tina-island/post', {
-        headers: {
-          origin: 'https://site.test',
-          'sec-fetch-site': 'same-origin',
-        },
-      })
+      islandRequest(undefined, { headers: { 'sec-fetch-site': 'cross-site' } })
     );
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(403);
   });
 
-  it.each(['cross-site', 'same-site', 'none', 'bogus'])(
-    'rejects fetch metadata %j, even when Origin matches',
+  it.each(['same-origin', 'same-site', 'none'])(
+    'accepts fetch metadata %j',
     async (fetchSite) => {
       const response = await handle(
         islandRequest(undefined, { headers: { 'sec-fetch-site': fetchSite } })
       );
-      expect(response.status).toBe(403);
+      expect(response.status).toBe(200);
     }
   );
+
+  it('accepts a request without Origin or fetch metadata (non-browser clients)', async () => {
+    const bare = new Request('http://site.test/tina-island/post', {
+      method: 'POST',
+      body: '{}',
+      headers: { 'content-type': PREVIEW_CONTENT_TYPE },
+    });
+    expect((await handle(bare)).status).toBe(200);
+  });
+
+  it('accepts an Origin that differs from the URL the server sees', async () => {
+    // e.g. a TLS-terminating proxy: the browser used https://site.test, the
+    // server was handed http://localhost:4321.
+    const response = await handle(
+      islandRequest('http://localhost:4321/tina-island/post', {
+        headers: { origin: 'https://site.test' },
+      })
+    );
+    expect(response.status).toBe(200);
+  });
 
   it.each(['[]', 'null', '"text"', '42', '{not json', ''])(
     'rejects the body %j',

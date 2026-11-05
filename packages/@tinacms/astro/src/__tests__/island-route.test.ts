@@ -126,8 +126,11 @@ describe('experimental_createIslandRoute', () => {
     }
   });
 
-  it('rejects a request from another origin', async () => {
-    const res = await call({ origin: 'https://evil.example' });
+  it('rejects a cross-site request', async () => {
+    const res = await call({
+      origin: 'https://evil.example',
+      'sec-fetch-site': 'cross-site',
+    });
     expect(res.status).toBe(403);
   });
 

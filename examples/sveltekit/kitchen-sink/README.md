@@ -156,13 +156,5 @@ component has a scoped `<style>` block.
    update through `useTina` (the post island is `managed`) without further
    island requests.
 
-**`pnpm start` over plain HTTP.** adapter-node 6 assumes `https` unless
-`PROTOCOL_HEADER` names a header your proxy sets (e.g. `x-forwarded-proto`),
-so over plain `http://localhost` the server's view of its own origin differs
-from the browser's. The island endpoint trusts the browser's
-`Sec-Fetch-Site: same-origin` header, so editing in a current browser still
-works. Clients that don't send that header fall back to an `Origin` check and
-get 403 there; set `PROTOCOL_HEADER` (or serve over HTTPS) if you need them.
-
 `pnpm check` also lists errors from `tina/__generated__/` and the core
 `tinacms` sources. Those come from the tsconfig scope, not this app's code.
