@@ -62,3 +62,13 @@ test('the media route hides its empty main area below 1024px', async ({
     page.getByRole('complementary', { name: 'Media panel' })
   ).toBeVisible();
 });
+
+test('the rail starts where the Top bar ends', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/#/');
+  const bar = await page.getByRole('banner', { name: 'Top bar' }).boundingBox();
+  const rail = await page
+    .getByRole('navigation', { name: 'Content' })
+    .boundingBox();
+  expect(rail?.y).toBeGreaterThanOrEqual((bar?.y ?? 0) + (bar?.height ?? 0));
+});
