@@ -150,6 +150,17 @@ const screenPlugin = definePlugin({
   }),
 });
 
+vi.mock('@tinacms/ui/components/toast', async (importOriginal) => {
+  const original =
+    await importOriginal<typeof import('@tinacms/ui/components/toast')>();
+  return {
+    ...original,
+    toast: Object.assign(vi.fn(original.toast), {
+      dismiss: original.toast.dismiss,
+    }),
+  };
+});
+
 const config = asResolvedConfig({
   plugins: [
     contentPlugin,
@@ -863,6 +874,24 @@ describe('TinaAdmin stale drafts', () => {
     );
     expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
       'Mine'
+    );
+  });
+
+  it('keeps one Resume prompt while the editor types under it', async () => {
+    storeStaleDraft();
+    const user = await openHello();
+    await screen.findByText('Resume your unsaved edits?');
+    await user.type(screen.getByLabelText(/^Title\b/), 'abc');
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(screen.getAllByRole('button', { name: 'Resume' })).toHaveLength(1);
+    const shown = vi
+      .mocked(toast)
+      .mock.calls.filter(
+        ([options]) => options.title === 'Resume your unsaved edits?'
+      );
+    expect(shown.length).toBeGreaterThan(0);
+    expect(new Set(shown.map(([options]) => options.id))).toEqual(
+      new Set(['resume-draft'])
     );
   });
 

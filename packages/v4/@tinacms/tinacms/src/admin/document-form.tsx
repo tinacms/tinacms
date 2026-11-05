@@ -194,16 +194,22 @@ function FormBar() {
 function ResumeDraftToast() {
   const stale = useStaleDraft();
   const [confirming, setConfirming] = useState(false);
+  const waiting = stale !== null;
+  // `stale` is a new object whenever the form changes. The toast must not show
+  // again for that, so the effect keys on whether a draft waits, and the buttons
+  // read the latest actions.
+  const resume = useEffectEvent(() => stale?.resume());
   useEffect(() => {
-    if (!stale) return;
+    if (!waiting) return;
     const id = toast({
+      id: 'resume-draft',
       tone: 'warning',
       actionsInline: true,
       title: 'Resume your unsaved edits?',
       text: 'The document changed since. Resume puts your edits on top.',
       dismissible: false,
       duration: Number.POSITIVE_INFINITY,
-      action: { label: 'Resume', onClick: stale.resume },
+      action: { label: 'Resume', onClick: resume },
       secondaryAction: {
         label: 'Discard',
         destructive: true,
@@ -213,7 +219,7 @@ function ResumeDraftToast() {
     return () => {
       toast.dismiss(id);
     };
-  }, [stale]);
+  }, [waiting]);
   return (
     <DiscardConfirm
       open={confirming}
