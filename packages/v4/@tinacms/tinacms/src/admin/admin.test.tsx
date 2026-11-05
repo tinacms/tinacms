@@ -980,7 +980,7 @@ describe('TinaAdmin rail', () => {
     );
     const list = await screen.findByRole('list', { name: 'Unsaved documents' });
     expect(
-      within(list).getByRole('button', { name: /hello\.mdx/ })
+      await within(list).findByRole('button', { name: /hello\.mdx/ })
     ).toBeVisible();
     expect(
       within(list).queryByRole('button', { name: /second\.mdx/ })
@@ -1178,7 +1178,7 @@ describe('TinaAdmin rail', () => {
     renderAdmin();
     const list = await screen.findByRole('list', { name: 'Unsaved documents' });
     expect(
-      within(list).getByRole('button', { name: /hello\.mdx/ })
+      await within(list).findByRole('button', { name: /hello\.mdx/ })
     ).toBeVisible();
     expect(screen.queryByText('No unsaved documents.')).toBeNull();
   });
