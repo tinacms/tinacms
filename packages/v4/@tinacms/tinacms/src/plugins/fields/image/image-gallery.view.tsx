@@ -238,7 +238,7 @@ export function ImageGalleryView({
         {items.length === 0 && !editable ? (
           <p className='m-0 text-sm text-muted-foreground'>No images.</p>
         ) : (
-          <div ref={gridRef} className='grid grid-cols-3 gap-2'>
+          <div ref={gridRef} className='grid max-w-120 grid-cols-3 gap-2'>
             {items.map((item, index) => {
               const { path, label: name } = itemName(item.value);
               return (
