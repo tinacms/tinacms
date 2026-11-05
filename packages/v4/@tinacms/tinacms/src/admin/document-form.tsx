@@ -1,12 +1,3 @@
-import {
-  AlertDialog,
-  AlertDialogClose,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
 import {
   DropdownMenu,
@@ -19,7 +10,6 @@ import { FormLevel } from '@tinacms/ui/components/form-level';
 import { toast } from '@tinacms/ui/components/toast';
 import {
   type ReactNode,
-  type RefObject,
   use,
   useEffect,
   useEffectEvent,
@@ -48,9 +38,12 @@ import {
 import {
   useFormErrors,
   useFormStore,
+  useFormValues,
   useIsFormDirty,
 } from '../form/form-store';
+import type { TinaDocument } from '../core/schema/types';
 import { countFailingFields } from '../editor/field-errors';
+import { DiscardConfirm } from './discard-confirm';
 import { DocumentStatus } from './document-status';
 
 function SaveButton() {
@@ -94,47 +87,6 @@ function SaveButton() {
         </p>
       ) : null}
     </div>
-  );
-}
-
-// Discarding cannot be undone, so it asks first. Cancel and Escape keep the edits.
-function DiscardConfirm({
-  open,
-  onOpenChange,
-  onConfirm,
-  returnFocusTo,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
-  returnFocusTo?: RefObject<HTMLElement | null>;
-}) {
-  return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent finalFocus={returnFocusTo}>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Discard unsaved edits?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Discarding can’t be undone.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant='outline' />}>
-            Cancel
-          </AlertDialogClose>
-          <Button
-            type='button'
-            variant='destructive'
-            onClick={() => {
-              onConfirm();
-              onOpenChange(false);
-            }}
-          >
-            Discard
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
   );
 }
 
@@ -190,43 +142,111 @@ function FormBar() {
   );
 }
 
-// The prompt is a bottom-right toast, so the form stays editable behind it.
-function ResumeDraftToast() {
+const RESUME_TEXT = {
+  kept: 'Kept in this browser since your last visit.',
+  changed: 'The document changed since. Resume puts your edits on top.',
+} as const;
+
+const documentTitle = (values: TinaDocument | undefined, path: string) => {
+  const named = values?.title;
+  if (typeof named === 'string' && named.trim() !== '') return named;
+  return path.split('/').at(-1) ?? path;
+};
+
+const toastOwners = new Map<string, number>();
+const TOAST_REMOUNT_GRACE_MS = 400;
+
+// The prompt is a bottom-right toast, so the form stays editable behind it. One
+// toast per document: its id holds the path, and leaving the document removes it.
+function ResumeDraftToast({ scope }: { scope: FormScope }) {
   const stale = useStaleDraft();
+  const values = useFormValues(scope.formId);
   const [confirming, setConfirming] = useState(false);
-  const waiting = stale !== null;
+  const discardButton = useRef<HTMLElement | null>(null);
+  const cause = stale?.cause;
+  const fields = stale?.leftoverFields.join(', ');
   // `stale` is a new object whenever the form changes. The toast must not show
-  // again for that, so the effect keys on whether a draft waits, and the buttons
-  // read the latest actions.
-  const resume = useEffectEvent(() => stale?.resume());
+  // again for that, so the effect keys on what the toast says, and the buttons
+  // read the latest actions. While the confirm is open the buttons do nothing.
+  const resume = useEffectEvent(() => {
+    if (!confirming) stale?.resume();
+  });
+  const askToDiscard = useEffectEvent(() => {
+    if (confirming) return;
+    discardButton.current = document.activeElement as HTMLElement | null;
+    setConfirming(true);
+  });
+  const toastId = `resume-draft:${scope.path}`;
   useEffect(() => {
-    if (!waiting) return;
-    const id = toast({
-      id: 'resume-draft',
+    if (!cause) {
+      toast.dismiss(toastId);
+      return;
+    }
+    toast({
+      id: toastId,
       tone: 'warning',
       actionsInline: true,
       title: 'Resume your unsaved edits?',
-      text: 'The document changed since. Resume puts your edits on top.',
+      text:
+        cause === 'leftover'
+          ? `Your earlier edit to ${fields} is still kept.`
+          : RESUME_TEXT[cause],
       dismissible: false,
       duration: Number.POSITIVE_INFINITY,
       action: { label: 'Resume', onClick: resume },
       secondaryAction: {
         label: 'Discard',
         destructive: true,
-        onClick: () => setConfirming(true),
+        onClick: askToDiscard,
       },
     });
+  }, [cause, fields, toastId]);
+  // A change of wording replaces the toast in place; only an empty list or a
+  // different document takes it away.
+  const present = cause !== undefined;
+  useEffect(() => {
+    if (!present) return;
+    toastOwners.set(toastId, (toastOwners.get(toastId) ?? 0) + 1);
     return () => {
-      toast.dismiss(id);
+      toastOwners.set(toastId, (toastOwners.get(toastId) ?? 1) - 1);
+      // The form unmounts while a save reloads its document. A form that comes
+      // back soon keeps the toast, because Sonner drops a toast that is dismissed
+      // and shown again under one id.
+      setTimeout(() => {
+        if (!toastOwners.get(toastId)) toast.dismiss(toastId);
+      }, TOAST_REMOUNT_GRACE_MS);
     };
-  }, [waiting]);
+  }, [present, toastId]);
   return (
     <DiscardConfirm
       open={confirming}
       onOpenChange={setConfirming}
       onConfirm={() => stale?.discard()}
+      returnFocusTo={discardButton}
+      title={`Discard earlier unsaved edits to “${documentTitle(values, scope.path)}”?`}
+      description='Discarded edits can’t be brought back. What you typed since stays.'
     />
   );
+}
+
+// Edits that cannot be written to storage are not kept. The warning stays until
+// dismissed and shows once per document in a session.
+const warnedStorage = new Set<string>();
+function StorageWarning({ scope }: { scope: FormScope }) {
+  const unstored = useFormStore((state) => state.unstored[scope.formId]);
+  useEffect(() => {
+    if (!unstored || warnedStorage.has(scope.path)) return;
+    warnedStorage.add(scope.path);
+    toast({
+      id: `storage-warning:${scope.path}`,
+      tone: 'warning',
+      title: 'Edits can’t be stored in this browser',
+      text: 'The browser’s storage is full or blocked. Free space, then reload.',
+      dismissible: true,
+      duration: Number.POSITIVE_INFINITY,
+    });
+  }, [unstored, scope.path]);
+  return null;
 }
 
 function ActiveFieldLevels({ scope }: { scope: FormScope }) {
@@ -327,7 +347,8 @@ export function DocumentForm() {
 
   return (
     <>
-      <ResumeDraftToast />
+      <ResumeDraftToast scope={scope} />
+      <StorageWarning scope={scope} />
       <ActiveFieldLevels scope={scope} />
       <div className='min-h-0 flex-1 overflow-y-auto'>
         <FormFields scope={scope} />

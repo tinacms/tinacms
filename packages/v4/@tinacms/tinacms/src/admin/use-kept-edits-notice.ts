@@ -32,6 +32,7 @@ export function useKeptEditsNotice(
     }
     const scope = readFormStore().forms[toFormId(left.path)];
     if (formStatus(scope) !== 'dirty') return;
+    if (readFormStore().unstored[toFormId(left.path)]) return;
     const named =
       scope?.status === 'edited' ? scope.values[toFieldAddress('title')] : null;
     const title =

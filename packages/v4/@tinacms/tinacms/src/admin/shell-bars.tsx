@@ -73,8 +73,11 @@ export function ShellTopBar({ projectName }: { projectName?: string }) {
 
 export function ShellStatusBar() {
   const branch = useBranchView();
-  const { state } = useSaveSummary();
-  const words = STATUS_WORDS[state];
+  const summary = useSaveSummary();
+  const { state } = summary;
+  const words = summary.kept
+    ? 'Unsaved edits kept in this browser'
+    : STATUS_WORDS[state];
   if (branch?.mode === 'local') {
     return (
       <StatusBar local state={state}>

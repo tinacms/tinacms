@@ -36,6 +36,9 @@ beforeEach(() => {
     userId: undefined,
     forms: {},
     saves: {},
+    waiting: {},
+    held: {},
+    unstored: {},
     active: null,
   });
   localStorage.clear();

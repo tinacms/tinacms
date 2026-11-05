@@ -11,6 +11,7 @@ import {
 import { useFormStore, useUnsavedFormIds } from '../form/form-store';
 import type { GlobalNavEntry } from '../core/slot/contract';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
+import { DiscardConfirm } from './discard-confirm';
 import { openNavTarget } from './rail';
 import type { AdminRoute } from './routing';
 
@@ -158,6 +159,7 @@ function MissingDocumentEdits({
     collections.map(({ name }) => name)
   );
   const discard = useFormStore((state) => state.discardStoredDraft);
+  const [confirming, setConfirming] = useState<string | null>(null);
   const missing = useUnsavedFormIds().filter((id) => !paths.has(id));
   if (!settled || missing.length === 0) return null;
   return (
@@ -179,12 +181,24 @@ function MissingDocumentEdits({
             size='sm'
             variant='destructive'
             aria-label={`Discard edits to ${documentName(id)}`}
-            onClick={() => discard(id)}
+            onClick={() => setConfirming(id)}
           >
             Discard
           </Button>
         </li>
       ))}
+      <DiscardConfirm
+        open={confirming !== null}
+        onOpenChange={(open) => {
+          if (!open) setConfirming(null);
+        }}
+        onConfirm={() => {
+          const id = missing.find((entry) => entry === confirming);
+          if (id) discard(id);
+        }}
+        title={`Discard unsaved edits to “${confirming}”?`}
+        description='The file is gone, so these edits are the only copy. Discarded edits can’t be brought back.'
+      />
     </ul>
   );
 }

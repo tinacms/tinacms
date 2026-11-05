@@ -14,6 +14,8 @@ export type DraftUserScope = UserId | null | undefined;
 export interface StoredDraft {
   readonly values: TinaDocument;
   readonly baseline: TinaDocument;
+  /** Holds only values that lost to another copy when Resume ran. */
+  readonly leftover?: boolean;
 }
 
 // A draft belongs to the branch it was typed on. The default branch has no
@@ -25,11 +27,11 @@ export const draftKey = (formId: FormId, userId?: UserId, branch?: string) => {
     : `${USER_DRAFT_KEY_PREFIX}${encodeURIComponent(userId)}:${formId}${suffix}`;
 };
 
-// A draft of an older version of its document waits in a second slot until the
-// editor picks Resume or Discard. The first slot stays free for new edits.
-const STALE_SUFFIX = '#stale';
-const staleKey = (formId: FormId, userId?: DraftUserScope, branch?: string) =>
-  `${draftKey(formId, userId ?? undefined, branch)}${STALE_SUFFIX}`;
+// The live copy holds what the form holds now. Waiting copies sit in a second
+// key, oldest first, until the editor picks Resume or a confirmed Discard.
+const WAITING_SUFFIX = '#waiting';
+const waitingKey = (formId: FormId, userId?: DraftUserScope, branch?: string) =>
+  `${draftKey(formId, userId ?? undefined, branch)}${WAITING_SUFFIX}`;
 
 const hasBlankName = (fields: Record<string, unknown>) =>
   Object.keys(fields).some((name) => name.length === 0);
@@ -44,9 +46,25 @@ const storage = (): Storage | undefined => {
   }
 };
 
+/** `off` means the browser has no storage, so nothing is stored and nothing warns. */
+export type StoreResult = 'ok' | 'failed' | 'off';
+
+const asDraft = (entry: unknown): StoredDraft | undefined => {
+  if (!isRecord(entry)) return undefined;
+  if (!isRecord(entry.values) || !isRecord(entry.baseline)) return undefined;
+  if (hasBlankName(entry.values) || hasBlankName(entry.baseline)) {
+    return undefined;
+  }
+  return {
+    values: entry.values,
+    baseline: entry.baseline,
+    ...(entry.leftover === true ? { leftover: true } : {}),
+  };
+};
+
 // Storage is untrusted: an entry from another version or in an unknown shape is
 // treated as no draft.
-const readSlot = (key: string): StoredDraft | undefined => {
+const readJson = (key: string): Record<string, unknown> | undefined => {
   const raw = storage()?.getItem(key);
   if (raw == null) return undefined;
   let entry: unknown;
@@ -56,37 +74,42 @@ const readSlot = (key: string): StoredDraft | undefined => {
     return undefined;
   }
   if (!isRecord(entry) || entry.version !== DRAFT_VERSION) return undefined;
-  if (!isRecord(entry.values) || !isRecord(entry.baseline)) return undefined;
-  if (hasBlankName(entry.values) || hasBlankName(entry.baseline)) {
-    return undefined;
-  }
-  return { values: entry.values, baseline: entry.baseline };
+  return entry;
 };
 
 export const readDraft = (
   formId: FormId,
   userId?: DraftUserScope,
   branch?: string
-): StoredDraft | undefined =>
-  userId === null ? undefined : readSlot(draftKey(formId, userId, branch));
+): StoredDraft | undefined => {
+  if (userId === null) return undefined;
+  const entry = readJson(draftKey(formId, userId, branch));
+  return entry ? asDraft(entry) : undefined;
+};
 
-/** The draft of an older version of the document that waits for Resume or Discard. */
-export const readStaleDraft = (
+/** The copies that wait for Resume or Discard, oldest first. */
+export const readWaitingDrafts = (
   formId: FormId,
   userId?: DraftUserScope,
   branch?: string
-): StoredDraft | undefined =>
-  userId === null ? undefined : readSlot(staleKey(formId, userId, branch));
+): StoredDraft[] => {
+  if (userId === null) return [];
+  const entry = readJson(waitingKey(formId, userId, branch));
+  if (!entry || !Array.isArray(entry.copies)) return [];
+  return entry.copies.flatMap((copy) => asDraft(copy) ?? []);
+};
 
-// A failed write (quota, private mode) must never break editing, so it only warns.
-const writeSlot = (key: string, draft: StoredDraft) => {
+// A failed write (quota, private mode) must never break editing. The caller
+// decides what a failure means, so this only reports it.
+const writeJson = (key: string, body: Record<string, unknown>): StoreResult => {
+  const store = storage();
+  if (!store) return 'off';
   try {
-    storage()?.setItem(
-      key,
-      JSON.stringify({ version: DRAFT_VERSION, ...draft })
-    );
+    store.setItem(key, JSON.stringify({ version: DRAFT_VERSION, ...body }));
+    return 'ok';
   } catch (cause) {
     console.warn('[tinacms] could not store the draft:', cause);
+    return 'failed';
   }
 };
 
@@ -95,10 +118,10 @@ export const writeDraft = (
   draft: StoredDraft,
   userId?: DraftUserScope,
   branch?: string
-) => {
-  if (userId === null) return;
-  writeSlot(draftKey(formId, userId, branch), draft);
-};
+): StoreResult =>
+  userId === null
+    ? 'off'
+    : writeJson(draftKey(formId, userId, branch), { ...draft });
 
 export const removeDraft = (
   formId: FormId,
@@ -109,28 +132,52 @@ export const removeDraft = (
   storage()?.removeItem(draftKey(formId, userId, branch));
 };
 
-export const removeStaleDraft = (
+/** Replaces the whole waiting list. An empty list removes the key. */
+export const writeWaitingDrafts = (
   formId: FormId,
+  copies: readonly StoredDraft[],
   userId?: DraftUserScope,
   branch?: string
-) => {
-  if (userId === null) return;
-  storage()?.removeItem(staleKey(formId, userId, branch));
+): StoreResult => {
+  if (userId === null) return 'off';
+  if (copies.length === 0) {
+    storage()?.removeItem(waitingKey(formId, userId, branch));
+    return storage() ? 'ok' : 'off';
+  }
+  return writeJson(waitingKey(formId, userId, branch), { copies });
 };
 
-/** Moves the draft out of the edit slot, so the editor's new edits cannot overwrite it. */
+/**
+ * Appends the live copy to the waiting list, then frees the live slot. The live
+ * copy stays where it is until the waiting write is confirmed.
+ */
 export const setDraftAside = (
   formId: FormId,
   draft: StoredDraft,
   userId?: DraftUserScope,
   branch?: string
-) => {
-  if (userId === null) return;
-  writeSlot(staleKey(formId, userId, branch), draft);
-  removeDraft(formId, userId, branch);
+): StoreResult => {
+  const result = writeWaitingDrafts(
+    formId,
+    [...readWaitingDrafts(formId, userId, branch), draft],
+    userId,
+    branch
+  );
+  if (result === 'ok') removeDraft(formId, userId, branch);
+  return result;
 };
 
-/** The forms with a valid stored draft, in either slot, for this editor on this branch. */
+/** Removes the live copy and every waiting copy. Only a confirmed Discard calls this. */
+export const removeAllDrafts = (
+  formId: FormId,
+  userId?: DraftUserScope,
+  branch?: string
+) => {
+  removeDraft(formId, userId, branch);
+  writeWaitingDrafts(formId, [], userId, branch);
+};
+
+/** The forms with a valid stored copy, live or waiting, for this editor on this branch. */
 export const listStoredDraftIds = (
   userId?: DraftUserScope,
   branch?: string
@@ -145,14 +192,14 @@ export const listStoredDraftIds = (
       : `${USER_DRAFT_KEY_PREFIX}${encodeURIComponent(userId)}:`;
   const ids = new Set<FormId>();
   for (let at = 0; at < store.length; at++) {
-    const key = store.key(at)?.replace(new RegExp(`${STALE_SUFFIX}$`), '');
+    const key = store.key(at)?.replace(new RegExp(`${WAITING_SUFFIX}$`), '');
     if (!key?.startsWith(prefix) || !key.endsWith(suffix)) continue;
     const id = key.slice(prefix.length, key.length - suffix.length);
     if (id.length === 0 || (!branch && id.includes('@@'))) continue;
     const formId = id as FormId;
     if (
       readDraft(formId, userId, branch) ||
-      readStaleDraft(formId, userId, branch)
+      readWaitingDrafts(formId, userId, branch).length > 0
     ) {
       ids.add(formId);
     }
