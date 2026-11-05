@@ -452,6 +452,7 @@ describe('form drafts', () => {
       'Earlier',
     ]);
     expect(store.getState().failures[postA]).toBeGreaterThan(0);
+    expect(store.getState().hidden[postA]).toBeUndefined();
   });
 
   it('row 24: a failed Resume hides the prompt until the next open, and keeps every copy', () => {
