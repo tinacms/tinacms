@@ -278,7 +278,8 @@ has no group headings.
   The search box is empty each time the panel opens.
 - The panel is at most `--picker-max-height` (320px) tall, and less when the
   window has less room. When the on-screen keyboard shrinks the viewport, the
-  panel slides over the button to stay on screen. The title and the search box stay in place, and the
+  panel stays inside the area the editor can see, over its button if it
+  must, wherever the button is on the page. The title and the search box stay in place, and the
   list scrolls inside the panel. While a search narrows the list, the panel keeps
   its top and height.
 - The look follows `picker`: `list` shows the label in a row, `grid` shows the

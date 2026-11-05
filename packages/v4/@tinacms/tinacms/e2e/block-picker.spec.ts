@@ -61,16 +61,24 @@ async function inside(inner: Locator, outer: Locator) {
   );
 }
 
-/** Scrolls the form column so `button` sits `top` pixels below the viewport top. */
+/** Puts `button` `top` pixels below the viewport top: scrolls the form column up, or pads it above to push the button down. */
 async function placeAt(button: Locator, top: number) {
   await button.scrollIntoViewIfNeeded();
   await button.evaluate((el, wanted) => {
     const scroller = el.closest('aside');
     if (!scroller) throw new Error('no scrolling form column');
     const spacer = document.createElement('div');
-    spacer.style.cssText = 'height:1200px;flex:none';
-    scroller.append(spacer);
-    scroller.scrollTop += el.getBoundingClientRect().top - wanted;
+    spacer.style.flex = 'none';
+    const gap = el.getBoundingClientRect().top - wanted;
+    if (gap > 0) {
+      spacer.style.height = `${gap + 1200}px`;
+      scroller.append(spacer);
+      scroller.scrollTop += gap;
+    } else {
+      spacer.style.height = `${-gap}px`;
+      scroller.prepend(spacer);
+      scroller.scrollTop = 0;
+    }
   }, top);
   expect((await boxOf(button)).y).toBeCloseTo(top, -1);
 }
@@ -377,6 +385,75 @@ test.describe('the layout viewport is very short at 390px', () => {
       expect((await boxOf(search)).y).toBeGreaterThanOrEqual(0);
       const results = panel.locator('[data-slot=block-picker-results]');
       expect((await boxOf(results)).height).toBeGreaterThan(2 * OPTION_ROW);
+    });
+  }
+});
+
+test.describe('the keyboard-sized visual viewport at 390px, the button anywhere on the screen', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  const BUTTON_TOPS = [60, 140, 220, 300, 380, 460, 540, 620, 700, 780];
+
+  for (const { look, trigger } of looks) {
+    test(`${look} look: the panel fits the visible area and shows results at every button position`, async ({
+      page,
+    }) => {
+      await page.addInitScript(() => {
+        const fake = Object.assign(new EventTarget(), {
+          width: window.innerWidth,
+          height: window.innerHeight,
+          offsetLeft: 0,
+          offsetTop: 0,
+          pageLeft: 0,
+          pageTop: 0,
+          scale: 1,
+        });
+        Object.defineProperty(window, 'visualViewport', { get: () => fake });
+        Object.defineProperty(window, '__setKeyboard', {
+          value: (height: number) => {
+            fake.height = height;
+            fake.dispatchEvent(new Event('resize'));
+          },
+        });
+      });
+      const misfits: string[] = [];
+      for (const top of BUTTON_TOPS) {
+        await page.goto('about:blank');
+        await page.goto(PAGE);
+        await page.evaluate((height) => {
+          const keyboard = Reflect.get(window, '__setKeyboard');
+          if (typeof keyboard !== 'function')
+            throw new Error('no fake keyboard');
+          keyboard(height);
+        }, KEYBOARD_VIEWPORT_HEIGHT);
+        const button = page
+          .getByRole('button', { name: 'Add a block' })
+          .nth(trigger);
+        await placeAt(button, top);
+        await button.click();
+        const panel = page.getByRole('dialog', { name: 'Choose a block' });
+        await expect(panel).toBeVisible();
+        await settled(panel);
+        const box = await boxOf(panel);
+        const title = await boxOf(panel.getByText('Choose a block'));
+        const search = await boxOf(
+          panel.getByRole('searchbox', { name: 'Search blocks' })
+        );
+        const results = await boxOf(
+          panel.locator('[data-slot=block-picker-results]')
+        );
+        const fits =
+          box.y >= -0.5 &&
+          box.y + box.height <= KEYBOARD_VIEWPORT_HEIGHT + 0.5 &&
+          title.y >= 0 &&
+          search.y + search.height <= KEYBOARD_VIEWPORT_HEIGHT &&
+          results.height >= 2 * OPTION_ROW;
+        if (!fits) {
+          misfits.push(
+            `button at ${top}: panel ${Math.round(box.y)}..${Math.round(box.y + box.height)}, results ${Math.round(results.height)}px`
+          );
+        }
+      }
+      expect(misfits).toEqual([]);
     });
   }
 });

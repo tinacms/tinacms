@@ -243,12 +243,13 @@ export function BlockAddView({
           aria-describedby={reason ? reasonId : undefined}
           render={<AddButton>Add a block</AddButton>}
         />
-        {/* The side is picked once on open. When the keyboard leaves less room, `shift` slides the panel over the button to stay on screen. */}
+        {/* The side is picked once on open. `sticky` keeps the panel inside the visible area, over its button if it must, when the keyboard shrinks the viewport. */}
         <PopoverContent
           aria-label={BLOCK_PICKER_TITLE}
           className='max-h-[min(var(--picker-max-height),var(--available-height))] overflow-hidden'
           side={side}
-          collisionAvoidance={{ side: 'shift' }}
+          collisionAvoidance={{ side: 'none' }}
+          sticky
           finalFocus={() => !picked.current}
         >
           <p className='px-2.5 pt-1 text-sm font-medium'>
