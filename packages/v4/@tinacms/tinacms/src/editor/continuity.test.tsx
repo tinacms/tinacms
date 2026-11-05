@@ -613,14 +613,17 @@ describe('form drafts across a reload', () => {
     expect(readDraft(toFormId(pathA))).toBeUndefined();
   });
 
-  it('hides the stale draft prompt once the editor starts typing', async () => {
+  it('keeps the stale draft and its prompt while the editor types', async () => {
     await typeAndReload();
+    const stored = readDraft(toFormId(pathA));
     render(host(pathA, { title: 'Changed' }));
     await screen.findByText('resume');
     await userEvent.type(screen.getByLabelText(/^Title\b/), '?');
-    expect(screen.queryByText('resume')).toBeNull();
+    expect(screen.getByText('resume')).toBeVisible();
+    expect(readDraft(toFormId(pathA))).toEqual(stored);
     await userEvent.type(screen.getByLabelText(/^Title\b/), '{Backspace}');
-    expect(screen.queryByText('resume')).toBeNull();
+    expect(screen.getByText('resume')).toBeVisible();
+    expect(readDraft(toFormId(pathA))).toEqual(stored);
   });
 
   it('deletes a resumed draft that no longer changes anything', async () => {

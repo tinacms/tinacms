@@ -25,6 +25,27 @@ export const draftKey = (formId: FormId, userId?: UserId, branch?: string) => {
     : `${USER_DRAFT_KEY_PREFIX}${encodeURIComponent(userId)}:${formId}${suffix}`;
 };
 
+// Drafts of an older version of their document that wait for Resume or Discard.
+// While one waits, nothing may overwrite or delete it. A reload clears this set,
+// and the next open finds the stale draft again.
+const waiting = new Set<string>();
+
+export const holdDraft = (
+  formId: FormId,
+  userId?: DraftUserScope,
+  branch?: string
+) => {
+  waiting.add(draftKey(formId, userId ?? undefined, branch));
+};
+
+export const clearHeldDrafts = () => waiting.clear();
+
+export const isDraftHeld = (
+  formId: FormId,
+  userId?: DraftUserScope,
+  branch?: string
+) => waiting.has(draftKey(formId, userId ?? undefined, branch));
+
 const hasBlankName = (fields: Record<string, unknown>) =>
   Object.keys(fields).some((name) => name.length === 0);
 
@@ -86,6 +107,7 @@ export const removeDraft = (
   branch?: string
 ) => {
   if (userId === null) return;
+  waiting.delete(draftKey(formId, userId, branch));
   storage()?.removeItem(draftKey(formId, userId, branch));
 };
 
