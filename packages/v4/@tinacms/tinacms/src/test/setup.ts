@@ -14,9 +14,10 @@ vi.mock('../editor/provider', (importOriginal) => {
 
 // TinaProvider renders null until its client() thunks resolve. Warm them before any
 // test body, in files that load the provider, so the import stays out of findBy* budgets.
+// The first file on a worker pays the cold transform, which passed 30 s on CI.
 beforeAll(async () => {
   if (gate.providerLoaded) await resolveClientSegments(corePlugins);
-}, 30_000);
+}, 120_000);
 
 // Backstop. No test that renders <TinaProvider> should need the headroom.
 configure({ asyncUtilTimeout: 5000 });
