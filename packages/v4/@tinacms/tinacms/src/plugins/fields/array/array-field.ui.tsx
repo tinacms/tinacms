@@ -256,7 +256,7 @@ function ObjectItems({
       new Set(
         openAll
           ? items
-              .filter((_, index) => !itemOpensNextLevel(`${address}.${index}`))
+              .filter((_, index) => !opensNextLevel(`${address}.${index}`))
               .map((item) => item.id)
           : []
       )
