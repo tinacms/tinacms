@@ -1,5 +1,7 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { type ReactNode } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../../config';
 import { toFieldAddress } from '../../../core/field/address';
@@ -21,13 +23,20 @@ import {
   useFormSave,
   useFormStatus,
 } from '../../../editor';
-import { formStatus, toFormId, useFormStore } from '../../../form/form-store';
+import {
+  formStatus,
+  isEdited,
+  toFormId,
+  useFormStore,
+} from '../../../form/form-store';
 import { t } from '../../../index';
 import { max, min, required } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
 import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
+import booleanFieldPlugin from '../boolean/boolean-field.plugin';
 import numberFieldPlugin from '../number/number-field.plugin';
+import objectFieldPlugin from '../object/object-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import arrayFieldPlugin from './array-field.plugin';
 import {
@@ -52,6 +61,11 @@ const valueOf = (name: string) =>
 
 const status = () =>
   formStatus(useFormStore.getState().forms[toFormId(DOCUMENT_PATH)]);
+
+const errorKeys = () => {
+  const scope = useFormStore.getState().forms[toFormId(DOCUMENT_PATH)];
+  return Object.keys(isEdited(scope) ? scope.errors : {});
+};
 
 const collection: CollectionSchema = {
   name: 'post',
@@ -94,7 +108,7 @@ const [authorsNode, tagsNode, groupsNode] = collection.fields;
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins(PLUGINS);
 
-const renderField = (document?: TinaDocument) =>
+const renderField = (document?: TinaDocument, children?: ReactNode) =>
   render(
     <TinaProvider
       config={asResolvedConfig({ plugins: PLUGINS, schema: NO_COLLECTIONS })}
@@ -105,9 +119,38 @@ const renderField = (document?: TinaDocument) =>
         document={document}
       >
         <LabelledFields />
+        {children}
       </FormProvider>
     </TinaProvider>
   );
+
+function FormContextProbe({ ticks }: { ticks: { count: number } }) {
+  useFormContext();
+  ticks.count += 1;
+  return null;
+}
+
+function SetNameError({
+  onSet,
+}: {
+  onSet: (errors: unknown) => void;
+}) {
+  const { setError, control } = useFormContext();
+  return (
+    <button
+      type='button'
+      onClick={() => {
+        setError('authors.0.name', {
+          type: 'required',
+          message: 'Name is required',
+        });
+        onSet(control._formState.errors);
+      }}
+    >
+      Set name error
+    </button>
+  );
+}
 
 function SaveProbe() {
   const save = useFormSave();
@@ -255,6 +298,69 @@ describe('ArrayField add, remove, and reorder', () => {
     );
   });
 
+  it('keeps focus on the move button and leaves other rows mounted', async () => {
+    renderField({
+      authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: 'Ada' }],
+      tags: [{ value: 'one' }, { value: 'two' }],
+    });
+    const authors = await screen.findByRole('group', { name: /^Authors\b/ });
+    const tags = screen.getByRole('group', { name: /^Tags\b/ });
+    const moveDown = within(authors).getByRole('button', {
+      name: 'Move item 1 down',
+    });
+    const brookRemove = within(authors).getByRole('button', {
+      name: 'Remove item 2',
+    });
+    const tagRemove = within(tags).getByRole('button', {
+      name: 'Remove item 1',
+    });
+    await userEvent.click(moveDown);
+    await waitFor(() => {
+      expect(
+        within(authors)
+          .getAllByLabelText(/^Name\b/)
+          .map((input) => (input as HTMLInputElement).value)
+      ).toEqual(['Brook', 'Ivan', 'Ada']);
+    });
+    expect(moveDown.isConnected).toBe(true);
+    expect(document.activeElement).toBe(moveDown);
+    expect(brookRemove.isConnected).toBe(true);
+    expect(tagRemove.isConnected).toBe(true);
+  });
+
+  it('keeps surviving rows mounted when an item is removed', async () => {
+    renderField({
+      authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: 'Ada' }],
+      tags: [{ value: 'one' }],
+    });
+    const authors = await screen.findByRole('group', { name: /^Authors\b/ });
+    const tags = screen.getByRole('group', { name: /^Tags\b/ });
+    const removeIvan = within(authors).getByRole('button', {
+      name: 'Remove item 1',
+    });
+    const removeBrook = within(authors).getByRole('button', {
+      name: 'Remove item 2',
+    });
+    const removeAda = within(authors).getByRole('button', {
+      name: 'Remove item 3',
+    });
+    const tagRemove = within(tags).getByRole('button', {
+      name: 'Remove item 1',
+    });
+    await userEvent.click(removeBrook);
+    await waitFor(() => {
+      expect(
+        within(authors)
+          .getAllByLabelText(/^Name\b/)
+          .map((input) => (input as HTMLInputElement).value)
+      ).toEqual(['Ivan', 'Ada']);
+    });
+    expect(removeBrook.isConnected).toBe(false);
+    expect(removeIvan.isConnected).toBe(true);
+    expect(removeAda.isConnected).toBe(true);
+    expect(tagRemove.isConnected).toBe(true);
+  });
+
   it("keeps a moved item's value with that item", async () => {
     renderField({ authors: [{ name: 'Ivan', age: 30 }, { name: 'Brook' }] });
     await openItems();
@@ -264,6 +370,266 @@ describe('ArrayField add, remove, and reorder', () => {
       { name: 'Brook', age: null },
       { name: 'Ivan', age: '30' },
     ]);
+  });
+});
+
+describe('ArrayField remove with stored objects', () => {
+  const OBJECT_PLUGINS = [...PLUGINS, objectFieldPlugin];
+  const peopleCollection = (profileRequired = false): CollectionSchema => ({
+    name: 'person',
+    label: 'People',
+    format: 'mdx',
+    fields: [
+      t.array({
+        name: 'people',
+        label: 'People',
+        fields: [
+          t.string({ name: 'name', label: 'Name' }),
+          t.object({
+            name: 'profile',
+            label: 'Profile',
+            fields: [
+              t.string({
+                name: 'bio',
+                label: 'Bio',
+                validators: profileRequired ? [required()] : [],
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+
+  const renderPeople = (
+    document: TinaDocument,
+    onSave: (saved: TinaDocument) => void,
+    profileRequired = false
+  ) =>
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: OBJECT_PLUGINS,
+          schema: NO_COLLECTIONS,
+        })}
+      >
+        <FormProvider
+          collection={peopleCollection(profileRequired)}
+          path={DOCUMENT_PATH}
+          document={document}
+          onSave={onSave}
+        >
+          <LabelledFields />
+          <SaveProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+
+  const saved = async (onSave: ReturnType<typeof vi.fn>) => {
+    await userEvent.click(screen.getByText('save'));
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1), {
+      timeout: 5000,
+    });
+    return onSave.mock.calls[0][0] as TinaDocument;
+  };
+
+  it('keeps a list item that is not an object unchanged when another item is removed', async () => {
+    const onSave = vi.fn();
+    renderPeople({ people: ['oops', { name: 'A' }, { name: 'B' }] }, onSave);
+    await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 3' })
+    );
+    await waitFor(() => expect(valueOf('people')).toHaveLength(2));
+    const people = valueOf('people') as unknown[];
+    expect(people[0]).toBe('oops');
+    expect(people[1]).toMatchObject({ name: 'A' });
+    expect(screen.getByText('"oops"')).toBeInTheDocument();
+  });
+
+  it('leaves an object the document does not have out of the saved document', async () => {
+    const onSave = vi.fn();
+    renderPeople(
+      { people: [{ name: 'A', profile: { bio: 'x' } }, { name: 'B' }] },
+      onSave
+    );
+    await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    const document = await saved(onSave);
+    expect(document).toEqual({ people: [{ name: 'B' }] });
+    expect('profile' in (document.people as TinaDocument[])[0]).toBe(false);
+  });
+
+  it('keeps an object the document states, with default values, through a save', async () => {
+    const onSave = vi.fn();
+    renderPeople(
+      { people: [{ name: 'A' }, { name: 'Brook', profile: { bio: '' } }] },
+      onSave
+    );
+    await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    expect(await saved(onSave)).toEqual({
+      people: [{ name: 'Brook', profile: { bio: '' } }],
+    });
+  });
+
+  it('keeps a stated object with no field defaults through a save', async () => {
+    const onSave = vi.fn();
+    const statsCollection: CollectionSchema = {
+      name: 'person',
+      label: 'People',
+      format: 'mdx',
+      fields: [
+        t.array({
+          name: 'people',
+          label: 'People',
+          fields: [
+            t.string({ name: 'name', label: 'Name' }),
+            t.object({
+              name: 'stats',
+              label: 'Stats',
+              fields: [t.number({ name: 'score', label: 'Score' })],
+            }),
+          ],
+        }),
+      ],
+    };
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: OBJECT_PLUGINS,
+          schema: NO_COLLECTIONS,
+        })}
+      >
+        <FormProvider
+          collection={statsCollection}
+          path={DOCUMENT_PATH}
+          document={{
+            people: [{ name: 'A' }, { name: 'Brook', stats: {} }],
+          }}
+          onSave={onSave}
+        >
+          <LabelledFields />
+          <SaveProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+    await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    expect(await saved(onSave)).toEqual({
+      people: [{ name: 'Brook', stats: {} }],
+    });
+  });
+
+  it('keeps a stated object with the item that moves', async () => {
+    const onSave = vi.fn();
+    renderPeople(
+      {
+        people: [
+          { name: 'Josh', profile: { bio: 'Editor' } },
+          { name: 'Brook' },
+        ],
+      },
+      onSave
+    );
+    await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Move item 2 up' })
+    );
+    const bios = screen.getAllByLabelText('Bio') as HTMLInputElement[];
+    expect(bios.map((input) => input.value)).toEqual(['', 'Editor']);
+    expect(await saved(onSave)).toEqual({
+      people: [{ name: 'Brook' }, { name: 'Josh', profile: { bio: 'Editor' } }],
+    });
+  });
+
+  it('keeps an empty object the document states, with its field defaults', async () => {
+    const onSave = vi.fn();
+    renderPeople(
+      { people: [{ name: 'A' }, { name: 'Brook', profile: {} }] },
+      onSave
+    );
+    await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    expect(await saved(onSave)).toEqual({
+      people: [{ name: 'Brook', profile: { bio: '' } }],
+    });
+  });
+
+  it('leaves an absent object with a boolean subfield out of the saved document', async () => {
+    const onSave = vi.fn();
+    const flagsCollection: CollectionSchema = {
+      name: 'person',
+      label: 'People',
+      format: 'mdx',
+      fields: [
+        t.array({
+          name: 'people',
+          label: 'People',
+          fields: [
+            t.string({ name: 'name', label: 'Name' }),
+            t.object({
+              name: 'profile',
+              label: 'Profile',
+              fields: [t.boolean({ name: 'active', label: 'Active' })],
+            }),
+          ],
+        }),
+      ],
+    };
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [...OBJECT_PLUGINS, booleanFieldPlugin],
+          schema: NO_COLLECTIONS,
+        })}
+      >
+        <FormProvider
+          collection={flagsCollection}
+          path={DOCUMENT_PATH}
+          document={{
+            people: [{ name: 'A', profile: { active: true } }, { name: 'B' }],
+          }}
+          onSave={onSave}
+        >
+          <LabelledFields />
+          <SaveProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+    await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    const document = await saved(onSave);
+    expect(document).toEqual({ people: [{ name: 'B' }] });
+  });
+
+  it('still fails validation when a required object is absent after a removal', async () => {
+    const onSave = vi.fn();
+    renderPeople(
+      { people: [{ name: 'A', profile: { bio: 'x' } }, { name: 'B' }] },
+      onSave,
+      true
+    );
+    await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await userEvent.click(screen.getByText('save'));
+    const alerts = await screen.findAllByRole('alert', {}, { timeout: 5000 });
+    expect(
+      alerts.some((alert) => alert.textContent?.includes('Bio is required'))
+    ).toBe(true);
+    expect(onSave).not.toHaveBeenCalled();
   });
 });
 
@@ -515,12 +881,150 @@ describe('ArrayField validation', () => {
     expect(errors).toEqual({ 'authors.0.name': ['Name is required'] });
   });
 
+  it('does not re-render the form when an error changes on one field', async () => {
+    const ticks = { count: 0 };
+    const seen: { errors: unknown } = { errors: null };
+    renderField(
+      { authors: [{ name: 'Ivan' }] },
+      <>
+        <FormContextProbe ticks={ticks} />
+        <SetNameError onSet={(errors) => (seen.errors = errors)} />
+      </>
+    );
+    await screen.findByLabelText(/^Name\b/);
+    const settled = ticks.count;
+    expect(settled).toBeGreaterThan(0);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Set name error' })
+    );
+    expect(seen.errors).toMatchObject({
+      authors: [{ name: { message: 'Name is required' } }],
+    });
+    expect(ticks.count).toBe(settled);
+  });
+
   it('surfaces an item field error at its own address, and rolls it up onto the array itself', async () => {
     renderField({ authors: [{ name: 'Ivan' }] });
     await openItems();
     const name = await screen.findByLabelText(/^Name\b/);
     await userEvent.clear(name);
     await userEvent.tab();
+    await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2));
+    for (const alert of screen.getAllByRole('alert')) {
+      expect(alert).toHaveTextContent('Name is required');
+    }
+  });
+
+  it('drops a validation error when the invalid item is removed', async () => {
+    renderField({ authors: [{ name: 'Ivan' }, { name: 'Brook' }] });
+    const names = await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.clear(names[0]);
+    await waitFor(() =>
+      expect(screen.getAllByRole('alert').length).toBeGreaterThan(0)
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await waitFor(() =>
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    );
+    expect((screen.getByLabelText(/^Name\b/) as HTMLInputElement).value).toBe(
+      'Brook'
+    );
+  });
+
+  it('moves a later item error down with that item', async () => {
+    renderField({
+      authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: 'Ada' }],
+    });
+    const names = await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.clear(names[1]);
+    await waitFor(() =>
+      expect(screen.getAllByRole('alert').length).toBeGreaterThan(0)
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await waitFor(() => {
+      const remaining = screen.getAllByLabelText(/^Name\b/) as HTMLInputElement[];
+      expect(remaining.map((input) => input.value)).toEqual(['', 'Ada']);
+      const wrapperOf = (input: HTMLElement) =>
+        input.closest('[data-slot="field-wrapper"]');
+      expect(wrapperOf(remaining[0])?.textContent).toContain(
+        'Name is required'
+      );
+      expect(wrapperOf(remaining[1])?.textContent ?? '').not.toContain(
+        'Name is required'
+      );
+    });
+    const keys = errorKeys();
+    expect(keys).toContain('authors.0.name');
+    expect(keys).not.toContain('authors.1.name');
+    expect(keys).not.toContain('authors.2.name');
+  });
+
+  it('moves a later item error to the index that item takes', async () => {
+    renderField({
+      authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: 'Cara' }],
+    });
+    const names = await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.clear(names[2]);
+    await waitFor(() =>
+      expect(screen.getAllByRole('alert').length).toBeGreaterThan(0)
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await waitFor(() =>
+      expect(screen.getAllByLabelText(/^Name\b/)).toHaveLength(2)
+    );
+    const keys = errorKeys();
+    expect(keys).toContain('authors.1.name');
+    expect(keys).not.toContain('authors.0.name');
+    expect(keys).not.toContain('authors.2.name');
+  });
+
+  it('does not surface an error on an untouched item when another is removed', async () => {
+    renderField({
+      authors: [{ name: 'Ivan' }, { name: 'Brook' }, { name: '' }],
+    });
+    await screen.findAllByLabelText(/^Name\b/);
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 1' })
+    );
+    await waitFor(() =>
+      expect(screen.getAllByLabelText(/^Name\b/)).toHaveLength(2)
+    );
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
+  });
+
+  it('removes an item from a list nested in another list', async () => {
+    renderField({
+      groups: [{ members: [{ name: 'Ivan' }, { name: 'Brook' }] }],
+    });
+    await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 2' })
+    );
+    await waitFor(() =>
+      expect(valueOf('groups')).toEqual([{ members: [{ name: 'Ivan' }] }])
+    );
+    expect(
+      Object.keys(
+        useFormStore.getState().forms[toFormId(DOCUMENT_PATH)]?.values ?? {}
+      )
+    ).not.toContain('groups.0.members');
+  });
+
+  it('keeps an existing validation error when another item is removed', async () => {
+    renderField({ authors: [{ name: 'Ivan' }, { name: 'Brook' }] });
+    const names = await screen.findAllByLabelText(/^Name\b/);
+    await userEvent.clear(names[0]);
+    await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove item 2' })
+    );
     await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2));
     for (const alert of screen.getAllByRole('alert')) {
       expect(alert).toHaveTextContent('Name is required');

@@ -40,7 +40,9 @@ import {
   useInvalidFieldCounts,
   useListItems,
   useMediaSlice,
+  useMoveListItem,
   useOpenLevel,
+  useRemoveListItem,
 } from '../../../editor';
 import { isMediaPath } from '../image/image-field.schema';
 import { atLimit, limitOf, stepValue } from '../number/number-field.step';
@@ -170,7 +172,9 @@ function ObjectItems({
 }: ItemListProps & { field: ObjectArrayFieldSchema }) {
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
-  const listItems = useListItems();
+const listItems = useListItems();
+  const removeListItem = useRemoveListItem();
+  const moveListItem = useMoveListItem();
   const activation = useActivation();
   const { setActive } = useActiveField();
   const { control, getValues } = useFormContext();
@@ -259,7 +263,7 @@ function ObjectItems({
   const moveTo = (from: number, to: number) => {
     if (to < 0 || to >= items.length) return;
     afterChange({ focus: to });
-    move(from, to);
+    moveListItem(address, from, to);
   };
 
   const views: ArrayItemView[] = items.map((item, index) => {
@@ -373,7 +377,7 @@ function ObjectItems({
       }}
       onRemove={(index) => {
         afterChange({ focus: focusAfterRemove(index, items.length - 1) });
-        remove(index);
+        removeListItem(address, index);
       }}
     />
   );
@@ -647,3 +651,6 @@ const numberBox = (
 
 let scalarKeyCount = 0;
 const nextScalarKey = (): string => `scalar-item-${scalarKeyCount++}`;
+
+let objectKeyCount = 0;
+const nextObjectKey = (): string => `object-item-${objectKeyCount++}`;
