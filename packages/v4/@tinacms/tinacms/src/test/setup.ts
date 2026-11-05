@@ -3,7 +3,6 @@ import { configure } from '@testing-library/dom';
 import { toast } from '@tinacms/ui/components/toast';
 import { beforeEach } from 'vitest';
 import { resolveClientSegments } from '../core/plugin';
-import { clearHeldDrafts } from '../form/drafts';
 import { useFormStore } from '../form/form-store';
 import { corePlugins } from '../plugins/fields';
 
@@ -40,6 +39,5 @@ beforeEach(() => {
     active: null,
   });
   localStorage.clear();
-  clearHeldDrafts();
   toast.dismiss();
 });

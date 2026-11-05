@@ -13,11 +13,12 @@ import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
 import {
   type DraftUserScope,
-  holdDraft,
-  isDraftHeld,
   listStoredDraftIds,
   readDraft,
+  readStaleDraft,
   removeDraft,
+  removeStaleDraft,
+  setDraftAside,
   type StoredDraft,
   writeDraft,
 } from './drafts';
@@ -157,7 +158,7 @@ const openingScope = (
   if (!draft) return undefined;
   const baseline = toFormValues(draft.baseline);
   if (!valuesEqual(baseline, incoming, equal)) {
-    holdDraft(formId, userId, branch);
+    setDraftAside(formId, draft, userId, branch);
     return undefined;
   }
   return {
@@ -299,7 +300,9 @@ export const useFormStore = create<FormStore>()(
             DEVTOOLS_ACTION.setActive
           ),
 
-        markSaved: (formId, savedValues) =>
+        markSaved: (formId, savedValues) => {
+          const { userId, branch } = readFormStore();
+          removeStaleDraft(formId, userId, branch);
           apply((state) => {
             const scope = state.forms[formId];
             if (!scope) return state;
@@ -318,7 +321,8 @@ export const useFormStore = create<FormStore>()(
                 },
               },
             };
-          }, DEVTOOLS_ACTION.markSaved),
+          }, DEVTOOLS_ACTION.markSaved);
+        },
 
         discardEdits: (formId) =>
           apply((state) => {
@@ -338,14 +342,15 @@ export const useFormStore = create<FormStore>()(
 
         resumeDraft: (formId, draft) => {
           const { userId, branch } = readFormStore();
-          removeDraft(formId, userId, branch);
+          removeStaleDraft(formId, userId, branch);
           apply((state) => {
             const scope = state.forms[formId];
             if (!scope) return state;
             const document = isEdited(scope) ? scope.baseline : scope.values;
-            // Resume applies only the fields that the draft changed. The other
-            // fields keep the value of the current document. A field that the
-            // draft and another writer both changed takes the draft value.
+            const current = scope.values;
+            // The draft's changed fields go onto the current document. A field the
+            // editor changed since the form opened keeps the editor's value, so
+            // nothing typed under the prompt is lost.
             const values = { ...document };
             const addresses = new Set([
               ...Object.keys(draft.values),
@@ -355,6 +360,11 @@ export const useFormStore = create<FormStore>()(
               const edited = draft.values[address];
               if (!scope.equal(address, edited, draft.baseline[address])) {
                 values[address] = edited;
+              }
+            }
+            for (const address of Object.keys(current) as FieldAddress[]) {
+              if (!scope.equal(address, current[address], document[address])) {
+                values[address] = current[address];
               }
             }
             return {
@@ -398,21 +408,18 @@ export const readOpeningScope = (
   return openingScope(forms[formId], formId, incoming, equal, userId, branch);
 };
 
-// A stored draft the form did not open on because its document changed since.
+// The stored draft of an older version of the document, waiting for Resume or
+// Discard. Opening a form moves such a draft out of the edit slot.
 export const staleDraft = (
   formId: FormId,
   incoming: FormValues,
   equal: FieldEquality = STRUCTURAL_EQUALITY
 ): StoredDraft | undefined => {
+  readOpeningScope(formId, incoming, equal);
   const { userId, branch } = readFormStore();
-  const draft = readDraft(formId, userId, branch);
-  if (!readOpeningScope(formId, incoming, equal)) return draft;
-  // The editor typed before choosing: the draft still waits for Resume or Discard.
-  return draft && isDraftHeld(formId, userId, branch) ? draft : undefined;
+  return readStaleDraft(formId, userId, branch);
 };
 
-// A stored draft of an older version of the document waits for Resume or Discard,
-// so typing never overwrites it. Resume removes it first; Discard removes it.
 // Mirrors this tab's edits into storage. Only forms whose scope changed in an
 // update are touched, so another tab's drafts are never rewritten. A form that
 // stops being dirty (saved, discarded, edited back) drops its draft; a form that
@@ -425,7 +432,6 @@ export const syncDrafts = () =>
       const before = prev.forms[formId];
       if (scope === before) continue;
       if (isEdited(scope) && formStatus(scope) === 'dirty') {
-        if (isDraftHeld(formId, next.userId, next.branch)) continue;
         writeDraft(
           formId,
           {
@@ -436,8 +442,7 @@ export const syncDrafts = () =>
           next.branch
         );
       } else if (formStatus(before) === 'dirty') {
-        const held = isDraftHeld(formId, next.userId, next.branch);
-        if (!held) removeDraft(formId, next.userId, next.branch);
+        removeDraft(formId, next.userId, next.branch);
       }
     }
   });

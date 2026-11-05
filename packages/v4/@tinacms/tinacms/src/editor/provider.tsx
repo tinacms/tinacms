@@ -33,7 +33,11 @@ import { createScreenRegistry } from '../core/screen/registry';
 import { createGlobalNav } from '../core/slot/global-nav';
 import { addressesWithValidators } from '../core/validation';
 import { createValidatorRegistry } from '../core/validator/registry';
-import { type DraftUserScope, removeDraft } from '../form/drafts';
+import {
+  type DraftUserScope,
+  removeDraft,
+  removeStaleDraft,
+} from '../form/drafts';
 import {
   type FieldErrors,
   type FormId,
@@ -276,7 +280,7 @@ const buildStaleDraftActions = (
       bumpDraftRevision();
     },
     discard: () => {
-      removeDraft(formId, readFormStore().userId, readFormStore().branch);
+      removeStaleDraft(formId, readFormStore().userId, readFormStore().branch);
       bumpDraftRevision();
     },
   };
