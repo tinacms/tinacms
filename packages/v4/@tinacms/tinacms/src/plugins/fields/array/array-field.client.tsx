@@ -13,7 +13,7 @@ import {
   isTemplatesArray,
   itemFieldsOf,
 } from './array-field.schema';
-import { ArrayField } from './array-field.ui';
+import { ArrayDrillIn, ArrayField } from './array-field.ui';
 
 // Ingest and digest drop `_template`, so put it back first to keep the stored
 // key order.
@@ -60,6 +60,7 @@ const warnKeptItems = (field: ObjectArrayFieldSchema, items: unknown[]) => {
 export default defineClientPlugin({
   field: {
     Component: ArrayField,
+    DrillInComponent: ArrayDrillIn,
     metadata: { layout: 'block', labelable: false, drillable: true },
     schema: arraySchema,
     // A stored value of the wrong shape stays as it is, so a save writes it

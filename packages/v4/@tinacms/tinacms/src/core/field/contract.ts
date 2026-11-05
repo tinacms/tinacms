@@ -6,6 +6,11 @@ import type { FieldRegistry } from './registry';
 
 export type FieldLayout = 'inline' | 'block';
 
+/** The inline box a list card holds for one value, with the settings of the field's own widget. */
+export type InlineBox =
+  | { type: 'text'; placeholder?: string }
+  | { type: 'number'; min?: number; max?: number; step?: number };
+
 export interface FieldMetadata {
   layout?: FieldLayout;
   labelable?: boolean;
@@ -15,6 +20,11 @@ export interface FieldMetadata {
    * `undefined` leaves it to the depth rule.
    */
   drillsIn?: (node: FieldSchema) => boolean | undefined;
+  /**
+   * For a single-value field: the kind of inline box a list card can hold in
+   * place of the field's own widget. `undefined` keeps the widget.
+   */
+  inlineBox?: (node: FieldSchema) => InlineBox | undefined;
 }
 
 export interface FieldTransformContext {

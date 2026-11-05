@@ -1,11 +1,24 @@
 import { defineClientPlugin } from '../../../client';
-import { numberSchema, toNumber } from './number-field.schema';
+import {
+  type NumberFieldSchema,
+  numberSchema,
+  toNumber,
+} from './number-field.schema';
+import { limitOf } from './number-field.step';
 import { NumberField } from './number-field.ui';
 
 export default defineClientPlugin({
   field: {
     Component: NumberField,
-    metadata: { layout: 'inline' },
+    metadata: {
+      layout: 'inline',
+      inlineBox: (node) => ({
+        type: 'number',
+        min: limitOf(node, 'min'),
+        max: limitOf(node, 'max'),
+        step: (node as NumberFieldSchema).step,
+      }),
+    },
     schema: numberSchema,
     // The editor holds a string, so a blank or whitespace input is empty.
     isEmpty: (value) => toNumber(value) === undefined,

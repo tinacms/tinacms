@@ -149,6 +149,7 @@ const getFilename = (optionSets: OptionSet[], value: string): string | null => {
 
 const Combobox: React.FC<ReferenceSelectProps> = ({ cms, input, field }) => {
   const [open, setOpen] = React.useState<boolean>(false);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
   const [value, setValue] = React.useState<string | null>(input.value);
   //Store display text for selected option
   const [displayText, setDisplayText] = React.useState<string | null>(null);
@@ -176,6 +177,13 @@ const Combobox: React.FC<ReferenceSelectProps> = ({ cms, input, field }) => {
     }
   }, [optionSets, field.experimental___filter]);
 
+  React.useEffect(() => {
+    if (loading) return;
+    if (triggerRef.current && field.experimental_focusIntent) {
+      triggerRef.current.focus();
+    }
+  }, [field.experimental_focusIntent, loading]);
+
   if (loading === true) {
     return <LoadingDots color='var(--tina-color-primary)' />;
   }
@@ -184,6 +192,7 @@ const Combobox: React.FC<ReferenceSelectProps> = ({ cms, input, field }) => {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          ref={triggerRef}
           variant='outline'
           role='combobox'
           aria-expanded={open}
