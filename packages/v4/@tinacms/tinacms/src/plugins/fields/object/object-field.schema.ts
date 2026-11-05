@@ -56,3 +56,15 @@ export const objectSchema = (node: FieldSchema): ZodType =>
       message: `${node.label ?? node.name} must be a group of fields`,
     })
   );
+
+/** The fields whose text can summarise an object: visible text fields. */
+export const summaryFieldsOf = (
+  fields: readonly FieldSchema[]
+): FieldSchema[] =>
+  fields.filter((field) => !field.hidden && field.type === 'string');
+
+/** The first value that has something typed in it. */
+export const firstText = (values: readonly unknown[]): string | undefined =>
+  values.find(
+    (entry): entry is string => typeof entry === 'string' && entry.trim() !== ''
+  );
