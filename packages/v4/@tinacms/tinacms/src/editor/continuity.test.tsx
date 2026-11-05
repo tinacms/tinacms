@@ -10,7 +10,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
-import { readDraft } from '../form/drafts';
+import { readDraft, readStaleDraft } from '../form/drafts';
 import {
   type FormId,
   type FormStore,
@@ -620,10 +620,22 @@ describe('form drafts across a reload', () => {
     await screen.findByText('resume');
     await userEvent.type(screen.getByLabelText(/^Title\b/), '?');
     expect(screen.getByText('resume')).toBeVisible();
-    expect(readDraft(toFormId(pathA))).toEqual(stored);
+    expect(readStaleDraft(toFormId(pathA))).toEqual(stored);
+    expect(readDraft(toFormId(pathA))?.values).toEqual({ title: 'Changed?' });
     await userEvent.type(screen.getByLabelText(/^Title\b/), '{Backspace}');
     expect(screen.getByText('resume')).toBeVisible();
-    expect(readDraft(toFormId(pathA))).toEqual(stored);
+    expect(readStaleDraft(toFormId(pathA))).toEqual(stored);
+  });
+
+  it('resumes without dropping what was typed under the prompt', async () => {
+    await typeAndReload();
+    render(host(pathA, { title: 'Changed' }));
+    await screen.findByText('resume');
+    await userEvent.type(screen.getByLabelText(/^Title\b/), '?');
+    await userEvent.click(screen.getByText('resume'));
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Changed?');
+    expect(readStaleDraft(toFormId(pathA))).toBeUndefined();
+    expect(readDraft(toFormId(pathA))?.values).toEqual({ title: 'Changed?' });
   });
 
   it('deletes a resumed draft that no longer changes anything', async () => {

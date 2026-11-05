@@ -16,7 +16,7 @@ import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
 import { useFormId } from '../editor/hooks';
-import { draftKey, readDraft } from '../form/drafts';
+import { draftKey, readDraft, readStaleDraft } from '../form/drafts';
 import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -876,7 +876,7 @@ describe('TinaAdmin stale drafts', () => {
       name: 'Discard unsaved edits?',
     });
     await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-    expect(readDraft(helloFormId)).toBeDefined();
+    expect(readStaleDraft(helloFormId)).toBeDefined();
 
     await user.click(screen.getByRole('button', { name: 'Discard' }));
     await user.click(
@@ -886,6 +886,7 @@ describe('TinaAdmin stale drafts', () => {
     );
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello');
+    expect(readStaleDraft(helloFormId)).toBeUndefined();
     expect(readDraft(helloFormId)).toBeUndefined();
   });
 });
@@ -991,6 +992,36 @@ describe('TinaAdmin leaving a document with unsaved edits', () => {
         '#/collections/post/content%2Fposts%2Fhello.mdx'
       )
     );
+  });
+
+  it('names a document by its file when the title is cleared', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+    const title = await screen.findByLabelText(/^Title\b/);
+    await user.clear(title);
+    await user.type(title, ' ');
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    expect(
+      await screen.findByText('Edits to “hello.mdx” are kept in this browser')
+    ).toBeVisible();
+  });
+
+  it('shows one notice per document and closes it when the document opens again', async () => {
+    const user = userEvent.setup();
+    await editHello(user);
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    await screen.findByText('Edits to “Hello!” are kept in this browser');
+    await user.click(screen.getByRole('button', { name: 'Open' }));
+    await screen.findByLabelText(/^Title\b/);
+    await waitFor(() =>
+      expect(screen.queryByText(/are kept in this browser/)).toBeNull()
+    );
+    await user.click(
+      screen.getAllByRole('button', { name: 'Home' }).at(0) as HTMLElement
+    );
+    await screen.findByText('Edits to “Hello!” are kept in this browser');
+    expect(screen.getAllByText(/are kept in this browser/)).toHaveLength(1);
   });
 
   it('stays quiet when the document has no unsaved edits', async () => {

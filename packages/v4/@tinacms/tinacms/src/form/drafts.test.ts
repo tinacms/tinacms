@@ -2,7 +2,15 @@ import { describe, expect, it, onTestFinished, vi } from 'vitest';
 import { toUserId } from '../core/auth/contract';
 import { toFieldAddress } from '../core/field/address';
 import { simulateReload } from '../test/simulate-reload';
-import { draftKey, readDraft, removeDraft, writeDraft } from './drafts';
+import {
+  draftKey,
+  listStoredDraftIds,
+  readDraft,
+  readStaleDraft,
+  removeDraft,
+  removeStaleDraft,
+  writeDraft,
+} from './drafts';
 import {
   type FormId,
   formStatus,
@@ -133,20 +141,96 @@ describe('form drafts', () => {
     expect(staleDraft(postA, changed)?.values).toEqual({ title: 'Mine' });
   });
 
-  it('keeps a stale draft while the editor types, until they resume or discard it', () => {
+  // An older draft waits in its own slot, so what the editor types is stored in the
+  // edit slot at once and neither survives only in memory.
+  const typeOverStaleDraft = () => {
     syncing();
     editA('Mine');
     simulateReload();
-    const changed = { [title]: 'Changed elsewhere' };
+    const changed = { [title]: 'Changed elsewhere', [summary]: 'Same' };
     store.getState().registerForm(postA, changed);
+    return changed;
+  };
 
-    store.getState().setFieldValue(postA, title, 'Typed over the prompt');
+  it('keeps a stale draft in its own slot while the editor types, and stores the typing', () => {
+    const changed = typeOverStaleDraft();
+    store.getState().setFieldValue(postA, summary, 'Typed under the prompt');
 
-    expect(readDraft(postA)).toEqual({
+    expect(readStaleDraft(postA)).toEqual({
       values: { title: 'Mine' },
       baseline: { title: 'Hello' },
     });
+    expect(readDraft(postA)).toEqual({
+      values: { title: 'Changed elsewhere', summary: 'Typed under the prompt' },
+      baseline: changed,
+    });
     expect(staleDraft(postA, changed)?.values).toEqual({ title: 'Mine' });
+  });
+
+  it('resumes the stale draft without dropping what was typed under the prompt', () => {
+    const changed = typeOverStaleDraft();
+    store.getState().setFieldValue(postA, summary, 'Typed under the prompt');
+    const stale = readStaleDraft(postA);
+    if (!stale) throw new Error('no stale draft');
+
+    store.getState().resumeDraft(postA, {
+      values: { [title]: stale.values.title },
+      baseline: { [title]: stale.baseline.title },
+    });
+
+    expect(store.getState().forms[postA]?.values).toEqual({
+      [title]: 'Mine',
+      [summary]: 'Typed under the prompt',
+    });
+    expect(readStaleDraft(postA)).toBeUndefined();
+    expect(readDraft(postA)?.values).toEqual({
+      title: 'Mine',
+      summary: 'Typed under the prompt',
+    });
+    expect(staleDraft(postA, changed)).toBeUndefined();
+  });
+
+  it('keeps what was typed in a field the stale draft also changed', () => {
+    typeOverStaleDraft();
+    store.getState().setFieldValue(postA, title, 'Typed over the draft field');
+    store.getState().resumeDraft(postA, {
+      values: { [title]: 'Mine' },
+      baseline: { [title]: 'Hello' },
+    });
+    expect(store.getState().forms[postA]?.values[title]).toBe(
+      'Typed over the draft field'
+    );
+  });
+
+  it('keeps the typed edits in storage when the stale draft is discarded', () => {
+    typeOverStaleDraft();
+    store.getState().setFieldValue(postA, summary, 'Typed under the prompt');
+    removeStaleDraft(postA);
+
+    expect(readDraft(postA)?.values).toEqual({
+      title: 'Changed elsewhere',
+      summary: 'Typed under the prompt',
+    });
+    simulateReload();
+    store
+      .getState()
+      .registerForm(postA, { [title]: 'Changed elsewhere', [summary]: 'Same' });
+    expect(store.getState().forms[postA]?.values[summary]).toBe(
+      'Typed under the prompt'
+    );
+  });
+
+  it('removes the stale draft when the document is saved', () => {
+    typeOverStaleDraft();
+    store.getState().setFieldValue(postA, summary, 'Typed under the prompt');
+    store.getState().markSaved(postA);
+    expect(readStaleDraft(postA)).toBeUndefined();
+    expect(readDraft(postA)).toBeUndefined();
+  });
+
+  it('lists a document that has only a stale draft', () => {
+    typeOverStaleDraft();
+    expect(listStoredDraftIds()).toEqual([postA]);
   });
 
   it('resumes a stale draft over the file, with the file as its baseline', () => {

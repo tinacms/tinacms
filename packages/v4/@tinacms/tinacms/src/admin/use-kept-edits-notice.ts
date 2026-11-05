@@ -6,6 +6,7 @@ import { formStatus, readFormStore, toFormId } from '../form/form-store';
 import type { AdminRoute } from './routing';
 
 const fileName = (path: string) => path.split('/').at(-1) ?? path;
+const noticeId = (path: string) => `kept-edits:${path}`;
 
 /**
  * Leaving a document that holds unsaved edits never asks and never blocks. A
@@ -20,6 +21,7 @@ export function useKeptEditsNotice(
   useEffect(() => {
     const left = previous.current;
     previous.current = route;
+    if (route.view === 'document') toast.dismiss(noticeId(route.path));
     if (left.view !== 'document') return;
     if (
       route.view === 'document' &&
@@ -32,8 +34,12 @@ export function useKeptEditsNotice(
     if (formStatus(scope) !== 'dirty') return;
     const named =
       scope?.status === 'edited' ? scope.values[toFieldAddress('title')] : null;
-    const title = typeof named === 'string' ? named : fileName(left.path);
+    const title =
+      typeof named === 'string' && named.trim() !== ''
+        ? named
+        : fileName(left.path);
     toast({
+      id: noticeId(left.path),
       tone: 'info',
       title: `Edits to “${title}” are kept in this browser`,
       text: branch ? `Still unsaved on ${branch}.` : undefined,
