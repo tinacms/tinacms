@@ -1,0 +1,151 @@
+{
+  "number": 126,
+  "details": {
+    "startDate": "2026-09-29T00:00:00.000Z",
+    "endDate": "2026-10-06T00:00:00.000Z",
+    "durationLabel": "1 week",
+    "productOwner": "Matt W",
+    "attendees": "Adam, Matt, Eli, Kaha, Harley, Josh, Hark, Anton, Alex",
+    "recordingUrl": "https://youtu.be/MhpElQdmows",
+    "recordingMinutes": 36
+  },
+  "email": {
+    "subject": "TinaCloud/TinaCMS Sprint 126 Forecast",
+    "to": "MattWicks@ssw.com.au",
+    "cc": "SSWSprintReviews@ssw.com.au; AdamCogan@ssw.com.au; SSWTinaCloud@ssw.com.au; Calum@ssw.com.au"
+  },
+  "goals": [
+    {
+      "text": "Complete 1 TinaCMS v4  PBI"
+    },
+    {
+      "text": "Complete 1 WorkOS Migration PBI"
+    }
+  ],
+  "scopeNote": "The Team will do its best to deliver this set of features (Scope), to a defined quality standard (Definition of Done) by the end of the sprint. Ideally, the team will deliver what they forecast, or even a bit more, but this can't be guaranteed.",
+  "sections": [
+    {
+      "heading": "Forecast Backlog",
+      "items": [
+        {
+          "title": "🔑 Auth | Align TinaCloud and WorkOS email policy",
+          "url": "https://github.com/tinacms/tinacloud/issues/4142",
+          "assignees": "KahaMason",
+          "estimate": 4,
+          "status": "inReview",
+          "bold": true
+        },
+        {
+          "title": "📊 Auth | Keep Cognito's analytics events firing on the WorkOS path",
+          "url": "https://github.com/tinacms/tinacloud/issues/4272",
+          "assignees": "harley-j",
+          "estimate": 2,
+          "status": "inReview",
+          "bold": true
+        },
+        {
+          "title": "🔐 Auth | Add \"Sign out of all other sessions\" to the Security tab",
+          "url": "https://github.com/tinacms/tinacloud/issues/4276",
+          "assignees": "harley-j",
+          "estimate": 2,
+          "status": "inReview",
+          "bold": true
+        },
+        {
+          "title": "Generate blog OG and Instagram images on demand to reduce build times",
+          "url": "https://github.com/tinacms/tina.io/issues/4761",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "inReview"
+        },
+        {
+          "title": "🚚 Migration | Account migration scripts, runbook and Dry-Run (Cognito → WorkOS)",
+          "url": "https://github.com/tinacms/tinacloud/issues/4138",
+          "assignees": "KahaMason",
+          "estimate": 16,
+          "status": "inProgress",
+          "bold": true
+        },
+        {
+          "title": "ci(windows): setup a process for signing windows binaries",
+          "url": "https://github.com/tinacms/tinacloud-cli/issues/67",
+          "assignees": "harley-j",
+          "estimate": 8,
+          "status": "inProgress"
+        },
+        {
+          "title": "Support - Monitor Discord Chat - Sprint 126",
+          "url": "https://github.com/tinacms/tinacloud/issues/4318",
+          "assignees": "kulesy, brookjeynes-ssw",
+          "estimate": 4,
+          "status": "inProgress"
+        },
+        {
+          "title": "Support - Tech Debt Payback - Sprint 126",
+          "url": "https://github.com/tinacms/tinacloud/issues/4319",
+          "assignees": "kulesy",
+          "estimate": 4,
+          "status": "inProgress"
+        },
+        {
+          "title": "Social media - Monitor Tina socials - Sprint 126",
+          "url": "https://github.com/tinacms/tinacloud/issues/4320",
+          "assignees": "ianhoffmanx",
+          "estimate": 4,
+          "status": "inProgress"
+        },
+        {
+          "title": "Draft the password change email and schedule it to be sent when we enable WorkOS",
+          "url": "https://github.com/tinacms/tinacloud/issues/4126",
+          "assignees": "kulesy",
+          "estimate": 2,
+          "status": "inProgress"
+        },
+        {
+          "title": "🧑‍💻 Onboarding - Alex (design)",
+          "url": "https://github.com/tinacms/tinacloud/issues/4321",
+          "assignees": "kulesy",
+          "estimate": 1,
+          "status": "inProgress"
+        },
+        {
+          "title": "UI/UX Review - Branding Baseline",
+          "url": "https://github.com/tinacms/tinacms/issues/7669",
+          "assignees": "designbyalex",
+          "estimate": 8,
+          "status": "backlog",
+          "bold": true
+        },
+        {
+          "title": "UI/UX Review - Layout & Navigation",
+          "url": "https://github.com/tinacms/tinacms/issues/7670",
+          "assignees": "designbyalex",
+          "estimate": 8,
+          "status": "backlog",
+          "bold": true
+        },
+        {
+          "title": "UI/UX Review - Flow Map",
+          "url": "https://github.com/tinacms/tinacms/issues/7668",
+          "assignees": "designbyalex",
+          "estimate": 4,
+          "status": "backlog",
+          "bold": true
+        }
+      ],
+      "note": "",
+      "_template": "backlog"
+    },
+    {
+      "heading": "AI Stats - Copilot",
+      "body": "![](</uploads/sprint-125/image (3).png>)\n\n✅ Correct one of the Sprint Goal was working on the WorkOS migration\n",
+      "placeholder": "Copilot stats pasted at Planning",
+      "_template": "figures"
+    },
+    {
+      "body": "This is as per the rule [Do you create a Sprint Forecast?](https://www.ssw.com.au/rules/do-you-create-a-sprint-forecast-aka-the-functionality-that-will-be-developed-during-the-sprint)",
+      "small": true,
+      "_template": "text"
+    }
+  ]
+}

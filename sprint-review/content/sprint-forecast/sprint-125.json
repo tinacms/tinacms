@@ -1,0 +1,122 @@
+{
+  "number": 125,
+  "details": {
+    "startDate": "2026-09-22T00:00:00.000Z",
+    "endDate": "2026-09-29T00:00:00.000Z",
+    "durationLabel": "1 week",
+    "productOwner": "Matt W",
+    "attendees": "Matt, Eli, Brook, Kaha, Harley, Isaac",
+    "recordingUrl": "https://youtu.be/tqIMN-zDaSQ",
+    "recordingMinutes": 36
+  },
+  "email": {
+    "subject": "TinaCloud/TinaCMS Sprint 125 Forecast",
+    "to": "MattWicks@ssw.com.au",
+    "cc": "SSWSprintReviews@ssw.com.au; AdamCogan@ssw.com.au; SSWTinaCloud@ssw.com.au; Calum@ssw.com.au"
+  },
+  "goals": [
+    {
+      "text": "Complete at least 1 TinaCMS v4 PBI"
+    },
+    {
+      "text": "Complete at least 1 WorkOS migration PBI"
+    }
+  ],
+  "scopeNote": "The Team will do its best to deliver this set of features (Scope), to a defined quality standard (Definition of Done) by the end of the sprint. Ideally, the team will deliver what they forecast, or even a bit more, but this can't be guaranteed.",
+  "sections": [
+    {
+      "heading": "Forecast Backlog",
+      "items": [
+        {
+          "title": "Forms System Rebuild - Form Hooks",
+          "url": "https://github.com/tinacms/tinacms/issues/6912",
+          "assignees": "joshbermanssw",
+          "estimate": 16,
+          "status": "backlog"
+        },
+        {
+          "title": "Support - Monitor Discord Chat - Sprint 125",
+          "url": "https://github.com/tinacms/tinacloud/issues/4230",
+          "assignees": "kulesy, brookjeynes-ssw",
+          "estimate": 4,
+          "status": "inProgress"
+        },
+        {
+          "title": "Support - Tech Debt Payback - Sprint 125",
+          "url": "https://github.com/tinacms/tinacloud/issues/4231",
+          "assignees": "kulesy",
+          "estimate": 4,
+          "status": "inProgress"
+        },
+        {
+          "title": "Social media - Monitor Tina socials - Sprint 125",
+          "url": "https://github.com/tinacms/tinacloud/issues/4232",
+          "assignees": "ianhoffmanx",
+          "estimate": 4,
+          "status": "inProgress"
+        },
+        {
+          "title": "🚚 Migration | Dry-run the Cognito → WorkOS account migration",
+          "url": "https://github.com/tinacms/tinacloud/issues/4138",
+          "assignees": "KahaMason",
+          "estimate": 12,
+          "status": "inProgress"
+        },
+        {
+          "title": "Add e2e coverage across the TinaCMS to TinaCloud boundary",
+          "url": "https://github.com/tinacms/tinacloud/issues/4128",
+          "assignees": "isaaclombardssw",
+          "estimate": 8,
+          "status": "inProgress"
+        },
+        {
+          "title": "🎥 Video - Demo TinaDocs",
+          "url": "https://github.com/tinacms/tina-docs/issues/353",
+          "assignees": "joshbermanssw",
+          "estimate": 8,
+          "status": "inReview"
+        },
+        {
+          "title": "Send out an email detailing the upcoming auth changes",
+          "url": "https://github.com/tinacms/tinacloud/issues/4124",
+          "assignees": "ianhoffmanx, brookjeynes-ssw",
+          "estimate": 4,
+          "status": "inReview"
+        },
+        {
+          "title": "Draft the password change email and schedule it to be sent when we enable WorkOS",
+          "url": "https://github.com/tinacms/tinacloud/issues/4126",
+          "assignees": "harley-j",
+          "estimate": 4,
+          "status": "inProgress"
+        },
+        {
+          "title": "⚙️ Identity | Self-heal a stale Verified flag on the WorkOS path",
+          "url": "https://github.com/tinacms/tinacloud/issues/4143",
+          "assignees": "harley-j",
+          "estimate": 4,
+          "status": "backlog"
+        },
+        {
+          "title": "👩‍💼 Follow up with Ethan and Larry on partner outreach",
+          "url": "https://github.com/tinacms/tinacloud/issues/4193",
+          "assignees": "isaaclombardssw",
+          "estimate": 1,
+          "status": "inProgress"
+        }
+      ],
+      "note": "",
+      "_template": "backlog"
+    },
+    {
+      "heading": "AI Stats - Copilot",
+      "placeholder": "Copilot stats pasted at Planning",
+      "_template": "figures"
+    },
+    {
+      "body": "This is as per the rule [Do you create a Sprint Forecast?](https://www.ssw.com.au/rules/do-you-create-a-sprint-forecast-aka-the-functionality-that-will-be-developed-during-the-sprint)",
+      "small": true,
+      "_template": "text"
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "number": 129,
+  "details": {
+    "startDate": "2026-10-20T00:00:00.000Z",
+    "endDate": "2026-10-27T00:00:00.000Z",
+    "durationLabel": "1 week",
+    "productOwner": "Matt W",
+    "attendees": "Adam, Matt, Eli, Kaha, Harley, Josh, Hark, Brook",
+    "recordingUrl": ""
+  },
+  "email": {
+    "subject": "TinaCloud/TinaCMS Sprint 129 Forecast",
+    "to": "MattWicks@ssw.com.au",
+    "cc": "SSWSprintReviews@ssw.com.au; AdamCogan@ssw.com.au; SSWTinaCloud@ssw.com.au; Calum@ssw.com.au"
+  },
+  "goals": [
+    {
+      "title": "WorkOS Migration ",
+      "text": "Finalise the migration scripts (carryover) & Perform a full E2E test of migration process on staging"
+    },
+    {
+      "title": "TinaCloud Pricing",
+      "text": "Squash Teams and Team Plus plans into one on Stripe and TinaCloud. Bring Editorial Workflow to Teams plans. "
+    }
+  ],
+  "scopeNote": "The Team will do its best to deliver this set of features (Scope), to a defined quality standard (Definition of Done) by the end of the sprint. Ideally, the team will deliver what they forecast, or even a bit more, but this can't be guaranteed.",
+  "sections": [
+    {
+      "heading": "Forecast Backlog",
+      "items": [
+        {
+          "title": "🧹 Identity | Move the support CLIs off Cognito",
+          "url": "https://github.com/tinacms/tinacloud/issues/4404",
+          "assignees": "harley-j",
+          "estimate": 2,
+          "status": "inReview",
+          "origin": "carryOver"
+        },
+        {
+          "title": "✨ Plugin System - Content - TinaCloud",
+          "url": "https://github.com/tinacms/tinacms/issues/7849",
+          "assignees": "joshbermanssw",
+          "estimate": 4,
+          "status": "inReview",
+          "origin": "carryOver"
+        },
+        {
+          "title": "Support - Monitor Discord Chat - Sprint 129",
+          "url": "https://github.com/tinacms/tinacloud/issues/4506",
+          "assignees": "kulesy, brookjeynes-ssw",
+          "estimate": 4,
+          "status": "inProgress",
+          "origin": "new"
+        },
+        {
+          "title": "Support - Tech Debt Payback - Sprint 129",
+          "url": "https://github.com/tinacms/tinacloud/issues/4507",
+          "assignees": "kulesy",
+          "estimate": 4,
+          "status": "inProgress",
+          "origin": "new"
+        },
+        {
+          "title": "Social media - Monitor Tina socials - Sprint 129",
+          "url": "https://github.com/tinacms/tinacloud/issues/4508",
+          "assignees": "ianhoffmanx",
+          "estimate": 4,
+          "status": "inProgress",
+          "origin": "new"
+        },
+        {
+          "title": "Field Type Implementation - Decide which v3 ui options stay and where they live",
+          "url": "https://github.com/tinacms/tinacms/issues/7850",
+          "assignees": "Josh",
+          "estimate": 8,
+          "status": "inProgress",
+          "origin": "new"
+        },
+        {
+          "title": "🛂 Migration | Dispatch the cutover password resets and track who completes them",
+          "url": "https://github.com/tinacms/tinacloud/issues/4249",
+          "assignees": "Kaha & Brook",
+          "estimate": 4,
+          "status": "ready",
+          "origin": "new",
+          "bold": true
+        },
+        {
+          "title": "🔭 UI/UX Review - Editor State",
+          "url": "https://github.com/tinacms/tinacms/issues/7671",
+          "assignees": "Alex",
+          "estimate": 8,
+          "status": "ready",
+          "origin": "new"
+        },
+        {
+          "title": "🔭 UI/UX Review - Collection & Document Lists",
+          "url": "https://github.com/tinacms/tinacms/issues/7672",
+          "assignees": "Alex",
+          "estimate": 4,
+          "status": "ready",
+          "origin": "new"
+        },
+        {
+          "title": "🔭 UI/UX Review - Media Manager",
+          "url": "https://github.com/tinacms/tinacms/issues/7675",
+          "assignees": "Alex",
+          "estimate": 4,
+          "status": "ready",
+          "origin": "new"
+        },
+        {
+          "title": "🛂 Migration | Prepare the duplicate-account merge",
+          "url": "https://github.com/tinacms/tinacloud/issues/4392",
+          "assignees": "Kaha & Brook",
+          "estimate": 4,
+          "status": "ready",
+          "origin": "new",
+          "bold": true
+        },
+        {
+          "title": "🛂 Migration | Build the WorkOS import and run the full migration end to end",
+          "url": "https://github.com/tinacms/tinacloud/issues/4394",
+          "assignees": "Kaha & Brook",
+          "estimate": 4,
+          "status": "ready",
+          "origin": "new",
+          "bold": true
+        },
+        {
+          "title": "✨ Billing | Merge Team and Team Plus into one Team plan",
+          "url": "https://github.com/tinacms/tinacloud/issues/4423",
+          "assignees": "joshbermanssw",
+          "estimate": 8,
+          "status": "ready",
+          "origin": "new",
+          "bold": true
+        },
+        {
+          "title": "✨ Billing | Editorial Workflow on the Team plan",
+          "url": "https://github.com/tinacms/tinacloud/issues/4425",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "ready",
+          "origin": "new",
+          "bold": true
+        },
+        {
+          "title": "✨ Dashboard | Plan cards match the new pricing page",
+          "url": "https://github.com/tinacms/tinacloud/issues/4426",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "ready",
+          "origin": "new",
+          "bold": true
+        }
+      ],
+      "note": "",
+      "_template": "backlog"
+    },
+    {
+      "heading": "AI Stats - Copilot",
+      "body": "![](/uploads/sprint-128/Screenshot-2026-10-20-at-11.08.07-am.png)\n\n✅ AI was correct with the main item to do next\n",
+      "placeholder": "Copilot stats pasted at Planning",
+      "_template": "figures"
+    },
+    {
+      "body": "This is as per the rule [Do you create a Sprint Forecast?](https://www.ssw.com.au/rules/do-you-create-a-sprint-forecast-aka-the-functionality-that-will-be-developed-during-the-sprint)\n",
+      "small": true,
+      "_template": "text"
+    }
+  ]
+}

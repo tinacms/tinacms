@@ -1,0 +1,122 @@
+{
+  "number": 127,
+  "details": {
+    "startDate": "2026-10-06T00:00:00.000Z",
+    "endDate": "2026-10-13T00:00:00.000Z",
+    "durationLabel": "1 week",
+    "productOwner": "Matt W",
+    "attendees": "Adam, Matt, Eli, Kaha, Harley, Josh, Hark, Anton, Alex",
+    "recordingUrl": ""
+  },
+  "email": {
+    "subject": "TinaCloud/TinaCMS Sprint 127 Forecast",
+    "to": "MattWicks@ssw.com.au",
+    "cc": "SSWSprintReviews@ssw.com.au; AdamCogan@ssw.com.au; SSWTinaCloud@ssw.com.au; Calum@ssw.com.au"
+  },
+  "goals": [
+    {
+      "text": "Complete 1 TinaCMS v4 PBI"
+    },
+    {
+      "text": "Complete 1 WorkOS Migration PBI"
+    }
+  ],
+  "scopeNote": "The Team will do its best to deliver this set of features (Scope), to a defined quality standard (Definition of Done) by the end of the sprint. Ideally, the team will deliver what they forecast, or even a bit more, but this can't be guaranteed.",
+  "sections": [
+    {
+      "heading": "Forecast Backlog",
+      "items": [
+        {
+          "title": "✨ Enable Markdown content negotiation across Tina web properties",
+          "url": "https://github.com/tinacms/tina.io/issues/4896",
+          "assignees": "isaaclombardssw",
+          "estimate": 4,
+          "status": "inReview"
+        },
+        {
+          "title": "Plugin System - Screen - Media Manager",
+          "url": "https://github.com/tinacms/tinacms/issues/6891",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "inReview"
+        },
+        {
+          "title": "Support - Monitor Discord Chat - Sprint 127",
+          "url": "https://github.com/tinacms/tinacloud/issues/4419",
+          "assignees": "kulesy, brookjeynes-ssw",
+          "estimate": 4,
+          "status": "inProgress"
+        },
+        {
+          "title": "Support - Tech Debt Payback - Sprint 127",
+          "url": "https://github.com/tinacms/tinacloud/issues/4420",
+          "assignees": "kulesy",
+          "estimate": 4,
+          "status": "inProgress"
+        },
+        {
+          "title": "Social media - Monitor Tina socials - Sprint 127",
+          "url": "https://github.com/tinacms/tinacloud/issues/4421",
+          "assignees": "ianhoffmanx",
+          "estimate": 4,
+          "status": "inProgress"
+        },
+        {
+          "title": "🚚 Migration | Cognito → WorkOS account migration: export, scan and account rules",
+          "url": "https://github.com/tinacms/tinacloud/issues/4138",
+          "assignees": "KahaMason",
+          "estimate": 4,
+          "status": "inProgress"
+        },
+        {
+          "title": "💄 Nav bar gives no scroll cue when items overflow",
+          "url": "https://github.com/tinacms/tinacloud/issues/4307",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "inProgress"
+        },
+        {
+          "title": "✨ Text Colors - Add selectable text color options in TinaCMS rich text editor",
+          "url": "https://github.com/tinacms/tinacms/issues/7667",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "inProgress"
+        },
+        {
+          "title": "💄 UI/UX Review - Branding Baseline",
+          "url": "https://github.com/tinacms/tinacms/issues/7669",
+          "assignees": "designbyalex",
+          "estimate": 8,
+          "status": "backlog"
+        },
+        {
+          "title": "✨ Plugin System - Media Backend - TinaCloud",
+          "url": "https://github.com/tinacms/tinacms/issues/6886",
+          "assignees": "joshbermanssw",
+          "estimate": 8,
+          "status": "backlog"
+        },
+        {
+          "title": "🚚 Migration | Decide how GitHub accounts migrate",
+          "url": "https://github.com/tinacms/tinacloud/issues/4393",
+          "assignees": "KahaMason",
+          "estimate": 4,
+          "status": "backlog"
+        }
+      ],
+      "note": "",
+      "_template": "backlog"
+    },
+    {
+      "heading": "AI Stats - Copilot",
+      "body": "![](/uploads/sprint-126/copilot-2.png)\n\nFigure: ✅ AI got the main issue right\n",
+      "placeholder": "Copilot stats pasted at Planning",
+      "_template": "figures"
+    },
+    {
+      "body": "This is as per the rule [Do you create a Sprint Forecast?](https://www.ssw.com.au/rules/do-you-create-a-sprint-forecast-aka-the-functionality-that-will-be-developed-during-the-sprint)",
+      "small": true,
+      "_template": "text"
+    }
+  ]
+}

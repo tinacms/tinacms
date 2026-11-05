@@ -1,0 +1,166 @@
+{
+  "number": 128,
+  "details": {
+    "startDate": "2026-10-13T00:00:00.000Z",
+    "endDate": "2026-10-20T00:00:00.000Z",
+    "durationLabel": "1 week",
+    "productOwner": "Matt W",
+    "attendees": "Adam, Matt, Eli, Kaha, Harley, Josh, Hark, Brook",
+    "recordingUrl": "https://youtu.be/zm-mHFozSrU",
+    "recordingMinutes": 39
+  },
+  "email": {
+    "subject": "TinaCloud/TinaCMS Sprint 128 Forecast",
+    "to": "MattWicks@ssw.com.au",
+    "cc": "SSWSprintReviews@ssw.com.au; AdamCogan@ssw.com.au; SSWTinaCloud@ssw.com.au; Calum@ssw.com.au"
+  },
+  "goals": [
+    {
+      "text": "Complete 1 TinaCMS v4 PBI - Field Type Implementation - Image (tinacms#6925) is the closest"
+    },
+    {
+      "text": "Complete WorkOS Migration Scripts"
+    }
+  ],
+  "scopeNote": "The Team will do its best to deliver this set of features (Scope), to a defined quality standard (Definition of Done) by the end of the sprint. Ideally, the team will deliver what they forecast, or even a bit more, but this can't be guaranteed.",
+  "sections": [
+    {
+      "heading": "Forecast Backlog",
+      "items": [
+        {
+          "title": "✨ Field Type Implementation - Image",
+          "url": "https://github.com/tinacms/tinacms/issues/6925",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "inReview",
+          "bold": true
+        },
+        {
+          "title": "🔭 Migration | Decide how GitHub accounts migrate",
+          "url": "https://github.com/tinacms/tinacloud/issues/4393",
+          "assignees": "KahaMason",
+          "estimate": 2,
+          "status": "inReview",
+          "bold": false
+        },
+        {
+          "title": "✨ Text Colors - Add selectable text color options in TinaCMS rich text editor",
+          "url": "https://github.com/tinacms/tinacms/issues/7667",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "inReview",
+          "bold": false
+        },
+        {
+          "title": "🐛 Identity | Don't let WorkOS sync erase a user's name or verified status",
+          "url": "https://github.com/tinacms/tinacloud/issues/4395",
+          "assignees": "KahaMason",
+          "estimate": 2,
+          "status": "inReview",
+          "bold": true
+        },
+        {
+          "title": "Field Type Implementation - Array templates and of",
+          "url": "https://github.com/tinacms/tinacms/issues/7799",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "inReview",
+          "bold": false
+        },
+        {
+          "title": "chore: validate CLI against clig.dev",
+          "url": "https://github.com/tinacms/tinacloud-cli/issues/54",
+          "assignees": "harley-j, brookjeynes-ssw",
+          "estimate": 8,
+          "status": "inProgress",
+          "bold": false
+        },
+        {
+          "title": "💄 UI/UX Review - Field Types",
+          "url": "https://github.com/tinacms/tinacms/issues/7793",
+          "assignees": "designbyalex",
+          "estimate": 4,
+          "status": "inProgress",
+          "bold": true
+        },
+        {
+          "title": "💄 UI/UX Review - Branding Baseline",
+          "url": "https://github.com/tinacms/tinacms/issues/7669",
+          "assignees": "designbyalex",
+          "estimate": 4,
+          "status": "inProgress",
+          "bold": true
+        },
+        {
+          "title": "🧹 Identity | Move the support CLIs off Cognito",
+          "url": "https://github.com/tinacms/tinacloud/issues/4404",
+          "assignees": "harley-j",
+          "estimate": 4,
+          "status": "inProgress",
+          "bold": false
+        },
+        {
+          "title": "Support - Monitor Discord Chat - Sprint 128",
+          "url": "https://github.com/tinacms/tinacloud/issues/4471",
+          "assignees": "kulesy, brookjeynes-ssw",
+          "estimate": 4,
+          "status": "inProgress",
+          "bold": false
+        },
+        {
+          "title": "Support - Tech Debt Payback - Sprint 128",
+          "url": "https://github.com/tinacms/tinacloud/issues/4472",
+          "assignees": "kulesy",
+          "estimate": 4,
+          "status": "inProgress",
+          "bold": false
+        },
+        {
+          "title": "Social media - Monitor Tina socials - Sprint 128",
+          "url": "https://github.com/tinacms/tinacloud/issues/4473",
+          "assignees": "ianhoffmanx",
+          "estimate": 4,
+          "status": "inProgress",
+          "bold": false
+        },
+        {
+          "title": "🔭 UI/UX Review - Layout & Navigation",
+          "url": "https://github.com/tinacms/tinacms/issues/7670",
+          "assignees": "designbyalex",
+          "estimate": 4,
+          "status": "backlog",
+          "bold": false
+        },
+        {
+          "title": "🐛 Auth | Editor sign-in errors name the cause on both sign-in paths",
+          "url": "https://github.com/tinacms/tinacloud/issues/2164",
+          "assignees": "harley-j",
+          "estimate": 4,
+          "status": "backlog",
+          "bold": false
+        },
+        {
+          "title": "🛂 Auth | Own the /login route: TinaCloud page, signed-in users and reset links",
+          "url": "https://github.com/tinacms/tinacloud/issues/4358",
+          "assignees": "harley-j",
+          "estimate": 2,
+          "status": "backlog",
+          "bold": false
+        }
+      ],
+      "note": "Capacity: 69 points (3-Sprint average of 76, less a 10% buffer).",
+      "_template": "backlog"
+    },
+    {
+      "heading": "AI Stats - Copilot",
+      "body": "![](/uploads/sprint-127/image-\\(5\\).png)\n\nFigure: ✅ Copilot stats were correct\n",
+      "placeholder": "Copilot stats pasted at Planning",
+      "_template": "figures"
+    },
+    {
+      "body": "This is as per the rule [Do you create a Sprint Forecast?](https://www.ssw.com.au/rules/do-you-create-a-sprint-forecast-aka-the-functionality-that-will-be-developed-during-the-sprint)\n",
+      "small": true,
+      "_template": "text"
+    }
+  ]
+}

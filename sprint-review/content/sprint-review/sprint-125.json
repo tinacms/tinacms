@@ -1,0 +1,533 @@
+{
+  "number": 125,
+  "details": {
+    "startDate": "2026-09-22T00:00:00.000Z",
+    "endDate": "2026-09-29T00:00:00.000Z",
+    "durationLabel": "1 week",
+    "productOwner": "Matt W",
+    "attendees": "Adam, Matt, Eli, Kaha, Harley, Josh, Hark, Anton, Alex",
+    "recordingUrl": "https://youtu.be/MhpElQdmows",
+    "recordingMinutes": 36
+  },
+  "email": {
+    "subject": "TinaCloud/TinaCMS Sprint 125 Review + Retro",
+    "to": "MattWicks@ssw.com.au",
+    "cc": "SSWSprintReviews@ssw.com.au; AdamCogan@ssw.com.au; SSWTinaCloud@ssw.com.au; Calum@ssw.com.au"
+  },
+  "goals": [
+    {
+      "status": "done",
+      "text": "Complete at least 1 TinaCMS v4 PBI - Forms System Rebuild - Form Hooks (tinacms#6912) and Persistent Zustand Stores/Events (tinacms#6913) both closed, taking the v4 Forms System Rebuild epic from 3/6 to 5/6"
+    },
+    {
+      "status": "done",
+      "text": "Complete at least 1 WorkOS migration PBI - Self-heal a stale Verified flag on the WorkOS path (tinacloud#4143) closed and the upcoming auth changes email (tinacloud#4124) went out, the Auth Migration epic moved from 24/36 to 26/35, and the Cognito to WorkOS dry-run (tinacloud#4138) is still under way"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Hours worked",
+      "items": [
+        {
+          "team": "TinaCloud",
+          "hours": 80,
+          "previousHours": 100,
+          "body": "![](/uploads/sprint-125/hours-tinacloud.png)\n\nHours worked this Sprint for TinaCloud - 80 hours, down from 100 hours last Sprint. Covers Tue 22 Sep to Mon 28 Sep - [PowerBI](https://app.powerbi.com/groups/3fe9ebc5-63d6-4385-820b-adbe178ccfa0/reports/d09cff56-de7f-4387-b863-6208adcd28ae/ReportSection3)"
+        },
+        {
+          "team": "TinaCMS",
+          "hours": 52,
+          "previousHours": 69,
+          "body": "![](/uploads/sprint-125/hours-tinacms.png)\n\nHours worked this Sprint for TinaCMS - 52 hours, down from 69 hours last Sprint. Covers Tue 22 Sep to Mon 28 Sep - [PowerBI](https://app.powerbi.com/groups/3fe9ebc5-63d6-4385-820b-adbe178ccfa0/reports/d09cff56-de7f-4387-b863-6208adcd28ae/ReportSection3)"
+        }
+      ],
+      "_template": "hours"
+    },
+    {
+      "heading": "1. Sprint Backlog",
+      "items": [
+        {
+          "title": "Forms System Rebuild - Form Hooks",
+          "url": "https://github.com/tinacms/tinacms/issues/6912",
+          "assignees": "joshbermanssw",
+          "estimate": 16,
+          "status": "done",
+          "bonus": false,
+          "bold": true
+        },
+        {
+          "title": "Support - Monitor Discord Chat - Sprint 125",
+          "url": "https://github.com/tinacms/tinacloud/issues/4230",
+          "assignees": "kulesy, brookjeynes-ssw",
+          "estimate": 4,
+          "status": "done",
+          "bonus": false
+        },
+        {
+          "title": "Send out an email detailing the upcoming auth changes",
+          "url": "https://github.com/tinacms/tinacloud/issues/4124",
+          "assignees": "kulesy",
+          "estimate": 4,
+          "status": "done",
+          "bonus": false,
+          "bold": true
+        },
+        {
+          "title": "Support - Tech Debt Payback - Sprint 125",
+          "url": "https://github.com/tinacms/tinacloud/issues/4231",
+          "assignees": "kulesy",
+          "estimate": 4,
+          "status": "done",
+          "bonus": false
+        },
+        {
+          "title": "Social media - Monitor Tina socials - Sprint 125",
+          "url": "https://github.com/tinacms/tinacloud/issues/4232",
+          "assignees": "ianhoffmanx",
+          "estimate": 4,
+          "status": "done",
+          "bonus": false
+        },
+        {
+          "title": "⚙️ Identity | Self-heal a stale Verified flag on the WorkOS path",
+          "url": "https://github.com/tinacms/tinacloud/issues/4143",
+          "assignees": "harley-j",
+          "estimate": 2,
+          "status": "done",
+          "bonus": false
+        },
+        {
+          "title": "UI/UX Overhaul - 👀 Spike",
+          "url": "https://github.com/tinacms/tinacms/issues/6960",
+          "assignees": "designbyalex",
+          "estimate": 4,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "Forms System Rebuild - Persistent Zustand Stores/Events",
+          "url": "https://github.com/tinacms/tinacms/issues/6913",
+          "assignees": "joshbermanssw",
+          "estimate": 16,
+          "status": "done",
+          "bonus": true,
+          "bold": true
+        },
+        {
+          "title": "🩸 Missing media branch stages edits but deletes production assets",
+          "url": "https://github.com/tinacms/tinacloud/issues/4205",
+          "assignees": "joshbermanssw",
+          "estimate": 8,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "🐛 Billing | Re-subscribing leaves a second subscription row and the read picks the dead one",
+          "url": "https://github.com/tinacms/tinacloud/issues/4204",
+          "assignees": "kulesy",
+          "estimate": 4,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "♻️ Tech debt - Replace deprecated 'RichTextType'",
+          "url": "https://github.com/tinacms/tinacms/issues/7634",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "Harden the TinaCMS auto-bump: it races the npm publish and fails silently",
+          "url": "https://github.com/tinacms/tinacloud/issues/4206",
+          "assignees": "kulesy",
+          "estimate": 2,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "🐛 Login modal redirects to portal instead of returning to visual editor",
+          "url": "https://github.com/tinacms/tinacloud/issues/4237",
+          "assignees": "isaaclombardssw",
+          "estimate": 2,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "🐛 Image field - an unknown accept value silently disables the filter",
+          "url": "https://github.com/tinacms/tinacms/issues/7557",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "Bump the stale axios copies onto patched releases",
+          "url": "https://github.com/tinacms/tinacloud/issues/4262",
+          "assignees": "kulesy",
+          "estimate": 2,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "♻️ Remove unused lock files in create-tina-app",
+          "url": "https://github.com/tinacms/tinacms/issues/7635",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "Wait for npm to serve a new TinaCMS version before the auto-bump installs it",
+          "url": "https://github.com/tinacms/tinacloud/issues/4293",
+          "assignees": "kulesy",
+          "estimate": 2,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "🐛 Content failure alarm has been stuck in ALARM since Oct 2025, so new failures email nobody",
+          "url": "https://github.com/tinacms/tinacloud/issues/4310",
+          "assignees": "kulesy",
+          "estimate": 2,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "📝 E2E | Name the deployed suite's staging fixture and fix its zstd note",
+          "url": "https://github.com/tinacms/tinacloud/issues/4315",
+          "assignees": "kulesy",
+          "estimate": 2,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "✨ Sidebar - Add a See latest Releases link beside the version",
+          "url": "https://github.com/tinacms/tinacms/issues/7636",
+          "assignees": "joshbermanssw",
+          "estimate": 1,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "Clicking a number value in visual editing does not focus its input",
+          "url": "https://github.com/tinacms/tinacms/issues/7631",
+          "assignees": "joshbermanssw",
+          "estimate": 1,
+          "status": "done",
+          "bonus": true
+        },
+        {
+          "title": "✨ Enable Markdown content negotiation across Tina web properties",
+          "url": "https://github.com/tinacms/tina.io/issues/4896",
+          "assignees": "isaaclombardssw",
+          "estimate": 8,
+          "status": "inReview",
+          "bonus": true
+        },
+        {
+          "title": "🔐 Auth | Add \"Sign out of all other sessions\" to the Security tab",
+          "url": "https://github.com/tinacms/tinacloud/issues/4276",
+          "assignees": "harley-j",
+          "estimate": 8,
+          "status": "inReview",
+          "bonus": true
+        },
+        {
+          "title": "🔑 Auth | Align TinaCloud and WorkOS email policy",
+          "url": "https://github.com/tinacms/tinacloud/issues/4142",
+          "assignees": "harley-j",
+          "estimate": 4,
+          "status": "inReview",
+          "bonus": true
+        },
+        {
+          "title": "📊 Auth | Keep Cognito's analytics events firing on the WorkOS path",
+          "url": "https://github.com/tinacms/tinacloud/issues/4272",
+          "assignees": "harley-j",
+          "estimate": 2,
+          "status": "inReview",
+          "bonus": true
+        },
+        {
+          "title": "Generate blog OG and Instagram images on demand to reduce build times",
+          "url": "https://github.com/tinacms/tina.io/issues/4761",
+          "assignees": "isaaclombardssw",
+          "estimate": 2,
+          "status": "inReview",
+          "bonus": true
+        },
+        {
+          "title": "🚚 Migration | Dry-run the Cognito → WorkOS account migration",
+          "url": "https://github.com/tinacms/tinacloud/issues/4138",
+          "assignees": "KahaMason",
+          "estimate": 16,
+          "status": "inProgress",
+          "bonus": false
+        },
+        {
+          "title": "Draft the password change email and schedule it to be sent when we enable WorkOS",
+          "url": "https://github.com/tinacms/tinacloud/issues/4126",
+          "assignees": "kulesy",
+          "estimate": 4,
+          "status": "inProgress",
+          "bonus": false
+        },
+        {
+          "title": "ci(windows): setup a process for signing windows binaries",
+          "url": "https://github.com/tinacms/tinacloud-cli/issues/67",
+          "assignees": "harley-j",
+          "estimate": 8,
+          "status": "inProgress",
+          "bonus": true
+        },
+        {
+          "title": "chore: validate CLI against clig.dev",
+          "url": "https://github.com/tinacms/tinacloud-cli/issues/54",
+          "assignees": "brookjeynes-ssw",
+          "estimate": 8,
+          "status": "inProgress",
+          "bonus": true
+        },
+        {
+          "title": "👩‍💼 Follow up on partner outreach and onboarding",
+          "url": "https://github.com/tinacms/tinacloud/issues/4252",
+          "assignees": "isaaclombardssw",
+          "estimate": 1,
+          "status": "inProgress",
+          "bonus": true
+        },
+        {
+          "title": "✨ Editorial Workflow: Show save progress in a non-blocking corner widget",
+          "url": "https://github.com/tinacms/tinacms/issues/7630",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "wontDo",
+          "bonus": true
+        }
+      ],
+      "note": "",
+      "_template": "backlog"
+    },
+    {
+      "heading": "2. Sprint Burnup",
+      "body": "![](/uploads/sprint-125/SCR-20260929-jyio.png)\n\nSprint Burnup - 86 of 153 points closed, with the work landing in two bursts on 23 Sep and 27 to 28 Sep - [Sprint Burnup · TinaCloud](https://github.com/orgs/tinacms/projects/38/insights/4)\n",
+      "_template": "figures"
+    },
+    {
+      "heading": "3. Production Deployments",
+      "items": [
+        {
+          "product": "TinaCloud",
+          "count": 1,
+          "versions": "2026.09.4"
+        },
+        {
+          "product": "TinaCMS",
+          "count": 1,
+          "versions": "tinacms 3.14.1, 5 packages published"
+        },
+        {
+          "product": "tinacloud-cli",
+          "count": 0,
+          "versions": "Waiting on WorkOS migration to release"
+        }
+      ],
+      "_template": "deployments"
+    },
+    {
+      "heading": "4. Application Health",
+      "body": "![](/uploads/sprint-125/health.png)\n\nApplication Health Dashboard Overview - Identity API HTTP 500s increased from 20 to 339. Content API HTTP 500s dropped from 733 to 263 - [TinaCloud CloudWatch Dashboard](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards/dashboard/tinacloud-overview)\n",
+      "_template": "figures"
+    },
+    {
+      "heading": "5. TinaCloud PostHog Metrics",
+      "body": "![](/uploads/sprint-125/commits.png)\n\nTotal Commits processed by TinaCloud over the last 6 months, total commits (aka spits) over the last month was 39,667 (up 10% on the previous period) - [PostHog Dashboard](https://us.posthog.com/project/237683/dashboard/615466)\n\n![](/uploads/sprint-125/onboarding.png)\n\nUser onboarding over the last 7 days - our conversion metric is the share who go on to commit. New accounts were 13% last Sprint and are now 8% (10 of 131). Invited collaborators were 22% and are now 26% (29 of 113) - [PostHog Dashboard](https://us.posthog.com/project/237683/dashboard/615466)\n\n![](/uploads/sprint-125/projects.png)\n\nOrganisation and project creation over the last 7 days - 133 new organisations, up from 128 last Sprint - [PostHog Dashboard](https://us.posthog.com/project/237683/dashboard/615466)\n",
+      "_template": "figures"
+    },
+    {
+      "heading": "6. TinaCMS PostHog Metrics",
+      "body": "![](/uploads/sprint-125/dau.png)\n\nDaily active users this month - peaking at 668 on 22 Sep (dips are weekends) - [PostHog Dashboard](https://us.posthog.com/project/237683/dashboard/1284436)\n\n![](/uploads/sprint-125/geo.png)\n\nDistribution of unique TinaCMS users over the past 30 days - US is our top country based on user-base with 1,749, ahead of Germany on 598 and the UK on 475 - [PostHog Dashboard](https://us.posthog.com/project/237683/dashboard/1284436)\n",
+      "_template": "figures"
+    },
+    {
+      "heading": "7. Cloners of Starter Templates",
+      "labelHeading": "Repo",
+      "items": [
+        {
+          "label": "tinacms/tina-astro-starter",
+          "url": "https://github.com/tinacms/tina-astro-starter/graphs/traffic",
+          "previous": 31,
+          "current": 48
+        },
+        {
+          "label": "tinacms/tina-nextjs-starter",
+          "url": "https://github.com/tinacms/tina-nextjs-starter/graphs/traffic",
+          "previous": 41,
+          "current": 43
+        },
+        {
+          "label": "tinacms/tina-react-starter",
+          "url": "https://github.com/tinacms/tina-react-starter/graphs/traffic",
+          "previous": 44,
+          "current": 39
+        },
+        {
+          "label": "tinacms/tina-self-hosted-demo",
+          "url": "https://github.com/tinacms/tina-self-hosted-demo/graphs/traffic",
+          "previous": 37,
+          "current": 29
+        }
+      ],
+      "note": "Current Sprint counts cover Tue 22 Sep to Wed 23 Sep only - GitHub’s traffic API had not published any later day when this was built.",
+      "_template": "metrics"
+    },
+    {
+      "heading": "8. TinaCMS NPM Version Distribution",
+      "body": "![](/uploads/sprint-125/npm.png)\n\nTinaCMS version downloads over the last week, the most popular version is v3.14.x with 11k total downloads over the last 7 days (up 77%), ahead of v3.12.x on 8k - [Tina Tracker](https://tina-dashboard-nine.vercel.app/downloads)\n",
+      "_template": "figures"
+    },
+    {
+      "heading": "Epics - Progress",
+      "items": [
+        {
+          "name": "TinaCMS v4 Field Type Implementation",
+          "url": "https://github.com/tinacms/tinacms/issues/6835",
+          "group": "In Progress",
+          "done": 9,
+          "total": 10,
+          "previousPercent": 90
+        },
+        {
+          "name": "TinaCMS v4 Forms System Rebuild",
+          "url": "https://github.com/tinacms/tinacms/issues/6834",
+          "group": "In Progress",
+          "done": 5,
+          "total": 6,
+          "previousPercent": 50
+        },
+        {
+          "name": "TinaCloud - ✨ Auth Migration - Cognito to WorkOS",
+          "url": "https://github.com/tinacms/tinacloud/issues/3097",
+          "group": "In Progress",
+          "done": 26,
+          "total": 35,
+          "previousPercent": 67
+        },
+        {
+          "name": "TinaCMS - ⬆️ v4 (umbrella)",
+          "url": "https://github.com/tinacms/tinacms/issues/6830",
+          "group": "TinaCMS v4",
+          "done": 0,
+          "total": 7,
+          "previousPercent": 0
+        },
+        {
+          "name": "TinaCMS v4 General/Foundation",
+          "url": "https://github.com/tinacms/tinacms/issues/6837",
+          "group": "TinaCMS v4",
+          "done": 1,
+          "total": 7,
+          "previousPercent": 14
+        },
+        {
+          "name": "TinaCMS v4 Plugin-Based Architecture",
+          "url": "https://github.com/tinacms/tinacms/issues/6831",
+          "group": "TinaCMS v4",
+          "done": 0,
+          "total": 14,
+          "previousPercent": 0
+        },
+        {
+          "name": "TinaCMS v4 Editorial Workflow",
+          "url": "https://github.com/tinacms/tinacms/issues/6832",
+          "group": "TinaCMS v4",
+          "done": 0,
+          "total": 4,
+          "previousPercent": 0
+        },
+        {
+          "name": "TinaCMS v4 UI/UX Overhaul",
+          "url": "https://github.com/tinacms/tinacms/issues/6833",
+          "group": "TinaCMS v4",
+          "done": 0,
+          "total": 3,
+          "previousPercent": 0
+        },
+        {
+          "name": "TinaCMS v4 Live Testing",
+          "url": "https://github.com/tinacms/tinacms/issues/6836",
+          "group": "TinaCMS v4",
+          "done": 0,
+          "total": 2,
+          "previousPercent": 0
+        }
+      ],
+      "sourceLabel": "Epics · TinaCloud",
+      "sourceUrl": "https://github.com/orgs/tinacms/projects/38/views/12",
+      "_template": "progress"
+    },
+    {
+      "heading": "R&D",
+      "entries": [
+        "Josh - v4 form persistence and hooks",
+        "Josh - Jev Github Actions"
+      ],
+      "placeholder": "Added at the review",
+      "_template": "list"
+    },
+    {
+      "heading": "AI Tools",
+      "subsection": true,
+      "items": [
+        {
+          "person": "Isaac",
+          "tools": "Codex (5.6 Sol, 6 Astra), YakShaver",
+          "limits": "No Limits"
+        },
+        {
+          "person": "Kaha",
+          "tools": "Claude Code (Opus 5.5)",
+          "limits": "No Limits"
+        },
+        {
+          "person": "Josh",
+          "tools": "Claude Code (Fable 5.1, Opus 5.5), Codex (GPT 5.6)",
+          "limits": "No Limits"
+        },
+        {
+          "person": "Brook",
+          "tools": "Claude Code (Sonnet 5)",
+          "limits": "No Limits"
+        },
+        {
+          "person": "Matt",
+          "tools": "Claude Code (Fable 5.1, Opus 5.5, Sonnet 5), YakShaver, Raycast AI (GPT 5.6 Luna)",
+          "limits": "No Limits"
+        },
+        {
+          "person": "Eli",
+          "tools": "Claude Code (Fable 5.1, Opus 5.5)",
+          "limits": "No Limits (51%)"
+        },
+        {
+          "person": "Harley",
+          "tools": "Codex (5.6 Sol)",
+          "limits": "No Limits"
+        }
+      ],
+      "_template": "teamAiTools"
+    },
+    {
+      "heading": "AI Stats",
+      "subsection": true,
+      "body": "![](</uploads/sprint-125/image (2).png>)\n\n✅ Correct the Sprint Goal was completing a TinaCMS v4 PBI\n\n![](/uploads/sprint-125/SCR-20260929-kuzu.png)\n\n[SSW Tiger meeting dashboards](https://dashboards.sswtiger.com/tinacloud-tinacms)\n",
+      "_template": "figures"
+    }
+  ],
+  "retro": {
+    "wentWell": "* Kaha - Been a big help with Harley on the WorkOS PBIs\n* Harley - v4 is going well, knocking out a few PBIs and completed our Sprint Goal\n* Eli - Auth announcement email looked good, and was sent out without any issues\n* Josh - Two community PRs merged into this Sprint\n* Hark - Liked seeing TinaCMS for the Sprint Email\n",
+    "didntGoWell": "* Harley, Eli - A lot of us were on client work so people were picking up PBIs when we shouldn't\n",
+    "improvements": "* Josh - Jev classifier for PBI labels\n* Anton - Put ADR section on the Sprint Review\n"
+  }
+}

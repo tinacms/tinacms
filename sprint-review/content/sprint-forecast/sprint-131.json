@@ -1,0 +1,143 @@
+{
+  "number": 131,
+  "details": {
+    "startDate": "2026-11-03T00:00:00.000Z",
+    "endDate": "2026-11-10T00:00:00.000Z",
+    "durationLabel": "1 week",
+    "productOwner": "Matt W",
+    "attendees": "Adam, Matt, Eli, Harley, Josh, Hark, Brook, Ethan",
+    "recordingUrl": ""
+  },
+  "email": {
+    "subject": "TinaCloud/TinaCMS Sprint 131 Forecast",
+    "to": "MattWicks@ssw.com.au",
+    "cc": "SSWSprintReviews@ssw.com.au; AdamCogan@ssw.com.au; SSWTinaCloud@ssw.com.au; Calum@ssw.com.au"
+  },
+  "goals": [
+    {
+      "status": "suggested",
+      "title": "WorkOS Migration",
+      "text": "Finalise the migration scripts (carryover) & Perform a full E2E test of migration process on staging"
+    }
+  ],
+  "scopeNote": "The Team will do its best to deliver this set of features (Scope), to a defined quality standard (Definition of Done) by the end of the sprint. Ideally, the team will deliver what they forecast, or even a bit more, but this can't be guaranteed.",
+  "sections": [
+    {
+      "heading": "Forecast Backlog",
+      "items": [
+        {
+          "title": "✨ TinaCloud - Deploy new projects from a starter to Cloudflare Workers",
+          "url": "https://github.com/tinacms/tinacloud/issues/4606",
+          "assignees": "joshbermanssw",
+          "estimate": 4,
+          "status": "inReview",
+          "origin": "carryOver",
+          "bold": false
+        },
+        {
+          "title": "Audit TinaCloud accounts and spend (Segment, MailChimp, AWS) and propose optimisations",
+          "url": "https://github.com/tinacms/tinacloud/issues/4592",
+          "assignees": "joshbermanssw",
+          "estimate": 4,
+          "status": "inReview",
+          "origin": "carryOver",
+          "bold": false
+        },
+        {
+          "title": "🔒 Identity | Only issue editor sign-in tokens to people with access to the project",
+          "url": "https://github.com/tinacms/tinacloud/issues/4584",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "inReview",
+          "origin": "carryOver",
+          "bold": false
+        },
+        {
+          "title": "Astro TinaDocs template (tina-docs-astro)",
+          "url": "https://github.com/tinacms/tinacms/issues/7984",
+          "assignees": "joshbermanssw",
+          "estimate": 2,
+          "status": "inReview",
+          "origin": "carryOver",
+          "bold": false
+        },
+        {
+          "title": "UI | Array Field",
+          "url": "https://github.com/tinacms/tinacms/issues/7916",
+          "assignees": "joshbermanssw",
+          "estimate": 1,
+          "status": "inReview",
+          "origin": "carryOver",
+          "bold": false
+        },
+        {
+          "title": "UI | Image Field",
+          "url": "https://github.com/tinacms/tinacms/issues/7914",
+          "assignees": "joshbermanssw",
+          "estimate": 1,
+          "status": "inReview",
+          "origin": "carryOver",
+          "bold": false
+        },
+        {
+          "title": "UI | Object Field",
+          "url": "https://github.com/tinacms/tinacms/issues/7915",
+          "assignees": "joshbermanssw",
+          "estimate": 1,
+          "status": "inReview",
+          "origin": "carryOver",
+          "bold": false
+        },
+        {
+          "title": "🛂 Migration | Build the WorkOS import and run the full migration end to end",
+          "url": "https://github.com/tinacms/tinacloud/issues/4394",
+          "assignees": "brookjeynes-ssw",
+          "estimate": 8,
+          "status": "inProgress",
+          "origin": "carryOver",
+          "bold": true
+        },
+        {
+          "title": "Support - Monitor Discord Chat - Sprint 131",
+          "url": "https://github.com/tinacms/tinacloud/issues/4610",
+          "assignees": "kulesy, brookjeynes-ssw",
+          "estimate": 4,
+          "status": "inProgress",
+          "origin": "new",
+          "bold": false
+        },
+        {
+          "title": "Support - Tech Debt Payback - Sprint 131",
+          "url": "https://github.com/tinacms/tinacloud/issues/4611",
+          "assignees": "kulesy",
+          "estimate": 4,
+          "status": "inProgress",
+          "origin": "new",
+          "bold": false
+        },
+        {
+          "title": "Social media - Monitor Tina socials - Sprint 131",
+          "url": "https://github.com/tinacms/tinacloud/issues/4612",
+          "assignees": "ianhoffmanx",
+          "estimate": 4,
+          "status": "inProgress",
+          "origin": "new",
+          "bold": false
+        }
+      ],
+      "note": "",
+      "_template": "backlog"
+    },
+    {
+      "heading": "AI Stats - Copilot",
+      "body": "![](/uploads/sprint-131/sprint-131-ai-forcast.png)\n",
+      "placeholder": "Copilot stats pasted at Planning",
+      "_template": "figures"
+    },
+    {
+      "body": "This is as per the rule [Do you create a Sprint Forecast?](https://www.ssw.com.au/rules/do-you-create-a-sprint-forecast-aka-the-functionality-that-will-be-developed-during-the-sprint)\n",
+      "small": true,
+      "_template": "text"
+    }
+  ]
+}
