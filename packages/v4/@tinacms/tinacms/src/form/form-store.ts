@@ -13,6 +13,8 @@ import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
 import {
   type DraftUserScope,
+  holdDraft,
+  isDraftHeld,
   listStoredDraftIds,
   readDraft,
   removeDraft,
@@ -154,7 +156,10 @@ const openingScope = (
   const draft = readDraft(formId, userId, branch);
   if (!draft) return undefined;
   const baseline = toFormValues(draft.baseline);
-  if (!valuesEqual(baseline, incoming, equal)) return undefined;
+  if (!valuesEqual(baseline, incoming, equal)) {
+    holdDraft(formId, userId, branch);
+    return undefined;
+  }
   return {
     status: 'edited',
     values: toFormValues(draft.values),
@@ -331,7 +336,9 @@ export const useFormStore = create<FormStore>()(
             };
           }, DEVTOOLS_ACTION.discardEdits),
 
-        resumeDraft: (formId, draft) =>
+        resumeDraft: (formId, draft) => {
+          const { userId, branch } = readFormStore();
+          removeDraft(formId, userId, branch);
           apply((state) => {
             const scope = state.forms[formId];
             if (!scope) return state;
@@ -362,7 +369,8 @@ export const useFormStore = create<FormStore>()(
                 },
               },
             };
-          }, DEVTOOLS_ACTION.resumeDraft),
+          }, DEVTOOLS_ACTION.resumeDraft);
+        },
 
         removeForm: (formId) =>
           apply((state) => {
@@ -396,11 +404,15 @@ export const staleDraft = (
   incoming: FormValues,
   equal: FieldEquality = STRUCTURAL_EQUALITY
 ): StoredDraft | undefined => {
-  if (readOpeningScope(formId, incoming, equal)) return undefined;
   const { userId, branch } = readFormStore();
-  return readDraft(formId, userId, branch);
+  const draft = readDraft(formId, userId, branch);
+  if (!readOpeningScope(formId, incoming, equal)) return draft;
+  // The editor typed before choosing: the draft still waits for Resume or Discard.
+  return draft && isDraftHeld(formId, userId, branch) ? draft : undefined;
 };
 
+// A stored draft of an older version of the document waits for Resume or Discard,
+// so typing never overwrites it. Resume removes it first; Discard removes it.
 // Mirrors this tab's edits into storage. Only forms whose scope changed in an
 // update are touched, so another tab's drafts are never rewritten. A form that
 // stops being dirty (saved, discarded, edited back) drops its draft; a form that
@@ -413,6 +425,7 @@ export const syncDrafts = () =>
       const before = prev.forms[formId];
       if (scope === before) continue;
       if (isEdited(scope) && formStatus(scope) === 'dirty') {
+        if (isDraftHeld(formId, next.userId, next.branch)) continue;
         writeDraft(
           formId,
           {
@@ -423,7 +436,8 @@ export const syncDrafts = () =>
           next.branch
         );
       } else if (formStatus(before) === 'dirty') {
-        removeDraft(formId, next.userId, next.branch);
+        const held = isDraftHeld(formId, next.userId, next.branch);
+        if (!held) removeDraft(formId, next.userId, next.branch);
       }
     }
   });

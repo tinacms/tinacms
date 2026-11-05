@@ -133,6 +133,22 @@ describe('form drafts', () => {
     expect(staleDraft(postA, changed)?.values).toEqual({ title: 'Mine' });
   });
 
+  it('keeps a stale draft while the editor types, until they resume or discard it', () => {
+    syncing();
+    editA('Mine');
+    simulateReload();
+    const changed = { [title]: 'Changed elsewhere' };
+    store.getState().registerForm(postA, changed);
+
+    store.getState().setFieldValue(postA, title, 'Typed over the prompt');
+
+    expect(readDraft(postA)).toEqual({
+      values: { title: 'Mine' },
+      baseline: { title: 'Hello' },
+    });
+    expect(staleDraft(postA, changed)?.values).toEqual({ title: 'Mine' });
+  });
+
   it('resumes a stale draft over the file, with the file as its baseline', () => {
     syncing();
     editA('Mine');
