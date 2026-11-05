@@ -10,6 +10,7 @@ import {
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
+import { toast } from '@tinacms/ui/components/toast';
 import { Tabs, TabsPanel } from '@tinacms/ui/components/tabs';
 import {
   type CSSProperties,
@@ -48,6 +49,7 @@ import {
   ShellTopBar,
   useLongSave,
 } from './shell-bars';
+import { copyPath } from './copy-path';
 import { useKeptEditsNotice } from './use-kept-edits-notice';
 import { useAdminRoute } from './use-admin-route';
 import { useFormColumnWidth } from './use-form-column-width';
@@ -57,6 +59,13 @@ const SHELL_WIDTH = { '--sidebar-width': '15rem' } as CSSProperties;
 
 // Sits between the Top bar and the Status bar instead of the full viewport.
 const BETWEEN_BARS = 'top-11 bottom-7 h-auto';
+
+// A refused or missing clipboard says so, because the menu row promises a copy.
+function copyFilePath(path: string) {
+  void copyPath(path).then((copied) => {
+    if (!copied) toast({ tone: 'error', title: 'Couldn’t copy the file path' });
+  });
+}
 
 function Placeholder({ children }: { children: ReactNode }) {
   return <p className='p-4 text-sm text-muted-foreground'>{children}</p>;
@@ -197,9 +206,7 @@ function FormColumn({
             menuLabel='Document menu'
             menu={
               openPath === undefined ? undefined : (
-                <DropdownMenuItem
-                  onClick={() => void navigator.clipboard?.writeText(openPath)}
-                >
+                <DropdownMenuItem onClick={() => copyFilePath(openPath)}>
                   Copy file path
                 </DropdownMenuItem>
               )

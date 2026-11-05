@@ -1329,6 +1329,27 @@ describe('TinaAdmin rail', () => {
     ).toBeVisible();
   });
 
+  it('lets the editor discard edits kept for a document whose file is gone', async () => {
+    const gone = toFormId('content/posts/deleted.mdx');
+    localStorage.setItem(
+      draftKey(gone),
+      JSON.stringify({
+        version: 2,
+        values: { title: 'Kept' },
+        baseline: { title: 'Deleted' },
+      })
+    );
+    const user = userEvent.setup();
+    window.location.hash = '#/collections?unsaved';
+    renderAdmin();
+    expect(await screen.findByText(/Its file was not found/)).toBeVisible();
+    await user.click(
+      screen.getByRole('button', { name: 'Discard edits to deleted.mdx' })
+    );
+    expect(await screen.findByText('No unsaved documents.')).toBeVisible();
+    expect(readDraft(gone)).toBeUndefined();
+  });
+
   it('lists a document whose edits wait in a stored draft after a reload', async () => {
     localStorage.setItem(
       draftKey(toFormId('content/posts/hello.mdx')),
