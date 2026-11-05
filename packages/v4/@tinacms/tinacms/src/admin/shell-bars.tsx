@@ -59,10 +59,14 @@ function BranchControl() {
   const branch = useBranchView();
   const saving = useSaveSummary().state === 'saving';
   const dirty = useAnyFormDirty();
-  if (branch?.mode !== 'branches' || !branch.name) return null;
+  if (branch?.mode !== 'branches') return null;
+  const loading = branch.listState === 'loading';
+  if (!branch.name && !loading && branch.listState !== 'failed') return null;
   return (
     <BranchSwitcher
       current={branch.name}
+      status={branch.listState ?? 'ready'}
+      onRetry={branch.retryList}
       branches={branch.branches}
       disabled={saving}
       blockedMessage={dirty ? 'Save or discard your changes first' : undefined}

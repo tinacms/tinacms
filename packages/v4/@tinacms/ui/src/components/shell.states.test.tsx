@@ -248,18 +248,25 @@ describe('Branch switcher, the full design', () => {
     expect(rows[0]).toHaveFocus();
   });
 
+  const openForm = async (props: Parameters<typeof open>[0] = {}) => {
+    const opened = await open(props);
+    await opened.user.click(
+      within(opened.dialog).getByRole('button', { name: 'New branch' })
+    );
+    return {
+      ...opened,
+      box: within(opened.dialog).getByRole('searchbox', {
+        name: 'New branch name',
+      }),
+    };
+  };
+
   it('creates a branch, and refuses a name that is taken', async () => {
     const onCreate = vi.fn();
-    const { user, dialog } = await open({ onCreate });
-    await user.click(
-      within(dialog).getByRole('button', { name: 'New branch' })
-    );
-    const box = within(dialog).getByRole('searchbox', {
-      name: 'New branch name',
-    });
+    const { user, dialog, box } = await openForm({ onCreate });
     await user.type(box, 'main');
     expect(within(dialog).getByRole('alert')).toHaveTextContent(
-      'A branch called main already exists. Pick another.'
+      'A branch called main already exists. Pick another name.'
     );
     expect(
       within(dialog).getByRole('button', { name: 'Create branch' })
@@ -272,11 +279,47 @@ describe('Branch switcher, the full design', () => {
     expect(onCreate).toHaveBeenCalledWith('docs/astro-guide');
   });
 
-  it('has no New branch button without onCreate', async () => {
-    const { dialog } = await open();
+  it.each([
+    [
+      'has spaces',
+      'my branch',
+      'Branch names can’t have spaces. Use dashes instead, such as docs/new-page.',
+    ],
+    [
+      'ends in a slash',
+      'docs/',
+      'Use letters, numbers, dashes, dots and slashes only, and don’t end with a slash or a dot.',
+    ],
+    [
+      'has a character that is not allowed',
+      'a?b',
+      'Use letters, numbers, dashes, dots and slashes only, and don’t end with a slash or a dot.',
+    ],
+  ])(
+    'refuses a name that %s, and keeps what was typed',
+    async (_why, name, message) => {
+      const { user, dialog, box } = await openForm({ onCreate: vi.fn() });
+      await user.type(box, name);
+      expect(within(dialog).getByRole('alert')).toHaveTextContent(message);
+      expect(box).toHaveValue(name);
+    }
+  );
+
+  it('asks for a name once the typed one is cleared', async () => {
+    const { user, dialog, box } = await openForm({ onCreate: vi.fn() });
+    expect(within(dialog).queryByRole('alert')).toBeNull();
+    await user.type(box, 'x');
+    await user.clear(box);
+    expect(within(dialog).getByRole('alert')).toHaveTextContent(
+      'Enter a branch name.'
+    );
+  });
+
+  it('shows the New branch form without a create operation, but cannot create', async () => {
+    const { dialog } = await openForm();
     expect(
-      within(dialog).queryByRole('button', { name: 'New branch' })
-    ).toBeNull();
+      within(dialog).getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
   });
 
   it('shows loading in place, and a failed load with Retry', async () => {
@@ -284,13 +327,14 @@ describe('Branch switcher, the full design', () => {
     expect(
       within(first.dialog).getByRole('group', { name: 'Loading branches' })
     ).toBeVisible();
+    expect(within(first.dialog).getByText('Loading branches')).toBeVisible();
   });
 
   it('retries a failed load', async () => {
     const onRetry = vi.fn();
     const { user, dialog } = await open({ status: 'failed', onRetry });
     expect(within(dialog).getByRole('alert')).toHaveTextContent(
-      'Couldn’t load the branches.'
+      "Couldn't load branches. You're still on docs/v4-launch and can keep editing."
     );
     await user.click(within(dialog).getByRole('button', { name: 'Retry' }));
     expect(onRetry).toHaveBeenCalledOnce();
