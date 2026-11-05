@@ -48,6 +48,7 @@ import {
   ShellTopBar,
   useLongSave,
 } from './shell-bars';
+import { useKeptEditsNotice } from './kept-edits-notice';
 import { useAdminRoute } from './use-admin-route';
 import { useFormColumnWidth } from './use-form-column-width';
 import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
@@ -306,6 +307,7 @@ function AdminShell({
   const screens = useAdminScreens();
   const globalNav = useGlobalNav();
   const { route, navigate } = useAdminRoute();
+  useKeptEditsNotice(route, navigate);
 
   const activeCollectionName =
     route.view === 'collection' || route.view === 'document'
