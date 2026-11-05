@@ -333,7 +333,7 @@ describe('Home', () => {
     );
     const list = await screen.findByRole('list', { name: 'Unsaved documents' });
     expect(
-      within(list).getByRole('button', { name: /hello\.mdx/ })
+      await within(list).findByRole('button', { name: /hello\.mdx/ })
     ).toBeVisible();
   });
 });
