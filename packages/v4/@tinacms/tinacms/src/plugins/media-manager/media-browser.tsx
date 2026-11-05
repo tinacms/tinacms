@@ -12,6 +12,7 @@ import type {
   MediaPageRequest,
   MediaStatus,
 } from '../../core/media/contract';
+import { useCurrentBranch } from '../../editor/content-queries';
 import { useMediaSlice } from '../../editor/hooks';
 import { MediaBreadcrumb } from './media-breadcrumb';
 import { DeleteDialog, NewFolderDialog, RenameDialog } from './media-dialogs';
@@ -112,7 +113,7 @@ function SetupBanner({
             href={status.actionUrl}
             target='_blank'
             rel='noreferrer noopener'
-            className={buttonVariants({ variant: 'toolbar', size: 'sm' })}
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
           >
             {status.actionLabel}
             <ExternalLinkIcon className='size-3.5' />
@@ -125,6 +126,7 @@ function SetupBanner({
 
 export function MediaBrowser(props: MediaBrowserProps) {
   const media = useMediaSlice();
+  const branch = useCurrentBranch() ?? '';
   const queryClient = useQueryClient();
   const [localFolder, setLocalFolder] = useState('');
   const folder = props.folder ?? localFolder;
@@ -203,7 +205,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
   };
 
   const listing = useInfiniteQuery({
-    queryKey: [...LIST_KEY, folder, request.search ?? '', extensions],
+    queryKey: [...LIST_KEY, branch, folder, request.search ?? '', extensions],
     queryFn: ({ pageParam }) =>
       media.list(folder, { ...request, cursor: pageParam }),
     initialPageParam: undefined as string | undefined,
@@ -211,7 +213,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
   });
 
   const status = useQuery({
-    queryKey: ['tina', 'media', 'status'],
+    queryKey: ['tina', 'media', 'status', branch],
     queryFn: () => (media.status ? media.status() : Promise.resolve(READY)),
   });
 
@@ -244,7 +246,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
   }, [showSentinel, isFetchingNextPage, fetchNextPage]);
 
   const refreshListing = () =>
-    queryClient.invalidateQueries({ queryKey: [...LIST_KEY, folder] });
+    queryClient.invalidateQueries({ queryKey: [...LIST_KEY, branch, folder] });
 
   const refresh = () => {
     setActivePath(null);
@@ -391,13 +393,13 @@ export function MediaBrowser(props: MediaBrowserProps) {
         </div>
         {readOnly ? null : (
           <div className='flex flex-wrap items-center gap-2'>
-            <Button type='button' variant='toolbar' onClick={refresh}>
+            <Button type='button' variant='outline' onClick={refresh}>
               Refresh
               <RefreshCwIcon className='size-4' />
             </Button>
             <Button
               type='button'
-              variant='toolbar'
+              variant='outline'
               onClick={() => setDialog('new-folder')}
             >
               New Folder
@@ -475,7 +477,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
               <p>Could not load media: {messageOf(listing.error)}</p>
               <Button
                 type='button'
-                variant='toolbar'
+                variant='outline'
                 size='sm'
                 onClick={() => listing.refetch()}
               >

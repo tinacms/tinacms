@@ -17,7 +17,7 @@ export function DrillInField() {
   return (
     <FieldWrapper {...frame}>
       <Button
-        variant='secondary'
+        variant='outline'
         iconEnd='chevron-right'
         onClick={() =>
           scope.view.getState().openLevel({

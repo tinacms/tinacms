@@ -11,6 +11,7 @@ import {
 import { get, FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
 import type { ResolvedConfig } from '../config';
 import { authSliceOf } from '../core/auth/slice';
+import { currentBranchOf } from '../core/branch/contract';
 import { toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { fieldEqualityFor } from '../core/form/compare';
@@ -129,9 +130,13 @@ export function TinaProvider({
         useFormStore
           .getState()
           .setUserId(draftUserOf(runtime.store.getState()));
-        unsubscribeAuth = runtime.store.subscribe((state) =>
-          useFormStore.getState().setUserId(draftUserOf(state))
-        );
+        useFormStore
+          .getState()
+          .setBranch(currentBranchOf(runtime.store.getState()));
+        unsubscribeAuth = runtime.store.subscribe((state) => {
+          useFormStore.getState().setUserId(draftUserOf(state));
+          useFormStore.getState().setBranch(currentBranchOf(state));
+        });
         setBooted(runtime);
       }
       return destroyPlugins;
@@ -264,14 +269,14 @@ const buildStaleDraftActions = (
       });
       const resumed = readFormStore().forms[formId];
       if (formStatus(resumed) !== 'dirty') {
-        removeDraft(formId, readFormStore().userId);
+        removeDraft(formId, readFormStore().userId, readFormStore().branch);
       }
       resetForm(toDocument(resumed?.values ?? {}));
       advanceSeedKey(formId);
       bumpDraftRevision();
     },
     discard: () => {
-      removeDraft(formId, readFormStore().userId);
+      removeDraft(formId, readFormStore().userId, readFormStore().branch);
       bumpDraftRevision();
     },
   };

@@ -5,6 +5,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { use } from 'react';
+import { currentBranchOf } from '../core/branch/contract';
 import {
   ContentError,
   type ContentSaveInput,
@@ -19,18 +20,29 @@ import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
 import { RpcError } from '../rpc/proxy';
 import { type SavedDocument, TinaRuntimeContext } from './context';
-import { useContentSlice, useRpcClient } from './hooks';
+import { useContentSlice, useRpcClient, useTinaStore } from './hooks';
 
+// The branch is the last element, so `all()` still prefixes every key. A key
+// built without a branch names the default branch.
 export const contentKeys = {
   all: () => ['tina', 'content'] as const,
-  list: (collection: string) => [...contentKeys.all(), 'list', collection],
-  document: (collection: string, path: string) => [
+  list: (collection: string, branch?: string) => [
+    ...contentKeys.all(),
+    'list',
+    collection,
+    branch ?? '',
+  ],
+  document: (collection: string, path: string, branch?: string) => [
     ...contentKeys.all(),
     'document',
     collection,
     path,
+    branch ?? '',
   ],
 };
+
+export const useCurrentBranch = (): string | undefined =>
+  useTinaStore(currentBranchOf);
 
 export const CONTENT_STALE_TIME = 30_000;
 
@@ -46,8 +58,9 @@ export const useCollectionDocuments = (
   collection: string | undefined
 ): CollectionDocuments => {
   const content = useContentSlice();
+  const branch = useCurrentBranch();
   const query = useQuery({
-    queryKey: contentKeys.list(collection ?? ''),
+    queryKey: contentKeys.list(collection ?? '', branch),
     queryFn: collection ? () => content.list(collection) : skipToken,
     staleTime: CONTENT_STALE_TIME,
   });
@@ -69,8 +82,9 @@ export const useDocument = (
   path: string | undefined
 ): DocumentRead => {
   const content = useContentSlice();
+  const branch = useCurrentBranch();
   const query = useQuery({
-    queryKey: contentKeys.document(collection ?? '', path ?? ''),
+    queryKey: contentKeys.document(collection ?? '', path ?? '', branch),
     queryFn:
       collection && path ? () => content.get(collection, path) : skipToken,
     staleTime: CONTENT_STALE_TIME,
@@ -164,7 +178,7 @@ export const useSaveDocument = (): DocumentSave => {
   const saveThroughServer = async (
     input: SaveDocumentInput
   ): Promise<SavedEntry> => {
-    const branch = runtime.store.getState().branch?.name;
+    const branch = currentBranchOf(runtime.store.getState());
     try {
       const { entry, hookWarnings } = await server.content.update({
         ...input,
@@ -180,13 +194,14 @@ export const useSaveDocument = (): DocumentSave => {
       hasServerHooks(input.collection)
         ? saveThroughServer(input)
         : content.update(input.collection, input.path, input.value),
-    onSuccess: ({ path, document }, { collection }) => {
+    onMutate: () => currentBranchOf(runtime.store.getState()),
+    onSuccess: ({ path, document }, { collection }, branch) => {
       queryClient.setQueryData<DocumentSummary[]>(
-        contentKeys.list(collection),
+        contentKeys.list(collection, branch),
         (cached) => (cached ? upsertByPath(cached, { path }) : undefined)
       );
       queryClient.setQueryData<DocumentEntry>(
-        contentKeys.document(collection, path),
+        contentKeys.document(collection, path, branch),
         { path, document }
       );
     },
