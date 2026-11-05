@@ -191,6 +191,17 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+describe('Kept edits notice', () => {
+  it('names the branch the edits are still unsaved on', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    expect(await screen.findByText('Still unsaved on main.')).toBeVisible();
+  });
+});
+
 describe('Top bar', () => {
   it('shows the one toggle, the logo, the project name and the branch', async () => {
     renderAdmin('Acme site');

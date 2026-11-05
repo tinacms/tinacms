@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { configure } from '@testing-library/dom';
+import { toast } from '@tinacms/ui/components/toast';
 import { beforeEach } from 'vitest';
 import { resolveClientSegments } from '../core/plugin';
 import { clearHeldDrafts } from '../form/drafts';
@@ -40,4 +41,5 @@ beforeEach(() => {
   });
   localStorage.clear();
   clearHeldDrafts();
+  toast.dismiss();
 });

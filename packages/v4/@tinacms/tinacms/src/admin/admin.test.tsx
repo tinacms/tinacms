@@ -973,6 +973,41 @@ describe('TinaAdmin after a save that changes the document', () => {
   });
 });
 
+describe('TinaAdmin leaving a document with unsaved edits', () => {
+  const editHello = async (user: ReturnType<typeof userEvent.setup>) => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+  };
+
+  it('leaves at once, then says the edits are kept in this browser and offers Open', async () => {
+    const user = userEvent.setup();
+    await editHello(user);
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
+    expect(
+      await screen.findByText('Edits to “Hello!” are kept in this browser')
+    ).toBeVisible();
+    expect(screen.queryByText(/^Still unsaved on/)).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Open' }));
+    await waitFor(() =>
+      expect(window.location.hash).toBe(
+        '#/collections/post/content%2Fposts%2Fhello.mdx'
+      )
+    );
+  });
+
+  it('stays quiet when the document has no unsaved edits', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+    await screen.findByLabelText(/^Title\b/);
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
+    expect(screen.queryByText(/are kept in this browser/)).toBeNull();
+  });
+});
+
 describe('TinaAdmin rail', () => {
   const railButtons = async () => {
     const rail = await screen.findByRole('navigation', { name: 'Content' });
