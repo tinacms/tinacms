@@ -1,13 +1,13 @@
 import type { ComponentProps, ReactNode } from 'react';
 
 import { Badge } from '@tinacms/ui/components/badge';
-import { Button } from '@tinacms/ui/components/button';
 import { type Glyph, Icon } from '@tinacms/ui/components/icon';
 import { cn } from '@tinacms/ui/lib/utils';
 
-type StatusBarState = 'unsaved' | 'saving' | 'saved' | 'failed';
+type StatusBarState = 'idle' | 'unsaved' | 'saving' | 'saved' | 'failed';
 
 const STATE_GLYPH: Record<StatusBarState, Glyph | undefined> = {
+  idle: undefined,
   unsaved: undefined,
   saving: 'spinner',
   saved: 'check',
@@ -19,7 +19,8 @@ type StatusBarWhere =
   | { local: true; branch?: never; protectedBranch?: never }
   | {
       local?: false;
-      branch: string;
+      /** Leave it out when the provider has no branches: the bar then omits the location. */
+      branch?: string;
       protectedBranch?: boolean;
     };
 
@@ -29,8 +30,6 @@ type StatusBarProps = Omit<ComponentProps<'footer'>, 'children'> &
     state?: StatusBarState;
     /** The state in words. Screen readers hear each change. */
     children?: ReactNode;
-    /** Screen readers do not hear it with the words. */
-    action?: { label: string; onClick: () => void };
   };
 
 /**
@@ -43,7 +42,6 @@ function StatusBar({
   protectedBranch = false,
   state,
   children,
-  action,
   className,
   ...props
 }: StatusBarProps) {
@@ -59,14 +57,16 @@ function StatusBar({
       )}
       {...props}
     >
-      <span className='inline-flex flex-none items-center gap-1.5 font-mono tracking-code'>
-        <Icon glyph={local ? 'folder' : 'branch'} size={14} />
-        {local
-          ? 'Local files'
-          : protectedBranch
-            ? `${branch} (protected)`
-            : branch}
-      </span>
+      {local || branch ? (
+        <span className='inline-flex flex-none items-center gap-1.5 font-mono tracking-code'>
+          <Icon glyph={local ? 'folder' : 'branch'} size={14} />
+          {local
+            ? 'Local files'
+            : protectedBranch
+              ? `${branch} (protected)`
+              : branch}
+        </span>
+      ) : null}
       <span
         data-slot='status-bar-state'
         className='inline-flex min-w-0 items-center gap-1.5'
@@ -91,16 +91,6 @@ function StatusBar({
         >
           {children}
         </span>
-        {action ? (
-          <Button
-            variant='toolbar'
-            size='sm'
-            onClick={action.onClick}
-            className='h-5 px-1.5 text-xs'
-          >
-            {action.label}
-          </Button>
-        ) : null}
       </span>
     </footer>
   );

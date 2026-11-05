@@ -30,6 +30,12 @@ const keepFocusAssignable = () => {
 
 beforeEach(() => {
   keepFocusAssignable();
-  useFormStore.setState({ userId: undefined, forms: {}, active: null });
+  useFormStore.getState().setBranch(undefined);
+  useFormStore.setState({
+    userId: undefined,
+    forms: {},
+    saves: {},
+    active: null,
+  });
   localStorage.clear();
 });

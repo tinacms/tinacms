@@ -1,4 +1,5 @@
 import { hasErrorBrand } from '../error-brand';
+import type { BranchSource } from '../branch/contract';
 import type { FieldAddress } from '../field/address';
 import type { TinaDocument } from '../schema/types';
 
@@ -85,6 +86,10 @@ export interface ContentProvider {
     path: string,
     value: TinaDocument
   ): Promise<DocumentEntry>;
+  /** Present when the provider reads from branches. */
+  branches?: BranchSource;
+  /** True when the provider reads files on this computer. */
+  local?: true;
 }
 
 export type ContentSlice = ContentProvider;

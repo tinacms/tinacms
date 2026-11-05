@@ -52,7 +52,12 @@ export const postCollection = {
     // Hidden: no editor, but the stored value is kept on every save.
     t.string({ name: 'legacyId', hidden: true }),
     t.boolean({ name: 'featured', label: 'Featured' }),
-    t.image({ name: 'heroImage', label: 'Hero image' }),
+    t.image({ name: 'heroImage', label: 'Hero image', cover: 'wide' }),
+    t.array({
+      name: 'gallery',
+      label: 'Gallery',
+      of: t.image({ name: 'image' }),
+    }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
     rating({
       name: 'stars',

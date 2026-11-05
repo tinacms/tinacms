@@ -361,3 +361,19 @@ Two overrides of one screen throw an error at boot
 - [Auth plugins](./auth-plugins.md): how a plugin verifies a request and signs the editor in
 - [UI slots](./ui-slots.md) — how a plugin adds entries to the admin sidebar
 - [Architecture](./architecture.md) — how a plugin gets to the screen
+
+## The admin shell
+
+`defineConfig` takes an optional `projectName`. The Top bar shows it after the
+logo and omits it when unset.
+
+A content provider tells the shell where it reads from:
+
+- `branches: { list, defaultBranch }` on the content slice gives the Branch
+  switcher its branches. `list` returns `{ name, protected? }` for each branch.
+- `local: true` on the content slice makes the Status bar read "Local files"
+  and removes the branch button.
+
+A provider with neither shows no branch spot. A `search` slice with a
+`search(query)` method adds the Search control and the ⌘K shortcut. Without one,
+neither renders.

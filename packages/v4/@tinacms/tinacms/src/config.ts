@@ -33,6 +33,8 @@ export interface TinaConfig {
   build?: TinaBuildConfig;
   /** Where the site mounts its RPC handler. `/api/tina` by default. */
   rpcUrl?: string;
+  /** Shown in the Top bar after the logo. The Top bar omits it when unset. */
+  projectName?: string;
 }
 
 export interface ComposedConfig {
@@ -40,6 +42,7 @@ export interface ComposedConfig {
   schema: TinaSchema;
   build?: Required<TinaBuildConfig>;
   rpcUrl?: string;
+  projectName?: string;
 }
 
 export type ResolvedConfig = Brand<ComposedConfig, 'ResolvedConfig'>;
@@ -146,6 +149,7 @@ export const composeConfig = (
     schema: config.schema,
     build: resolveBuild(config.build),
     ...(config.rpcUrl ? { rpcUrl: config.rpcUrl } : {}),
+    ...(config.projectName ? { projectName: config.projectName } : {}),
   });
 };
 
