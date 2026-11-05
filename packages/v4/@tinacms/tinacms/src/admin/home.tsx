@@ -6,7 +6,7 @@ import { SidebarInset } from '@tinacms/ui/components/sidebar';
 import type { CollectionSchema } from '../core/schema/types';
 import { useBranchView } from '../editor/branch';
 import { useCollectionDocuments } from '../editor/content-queries';
-import { useDirtyFormCount } from '../form/form-store';
+import { useUnsavedFormIds } from '../form/form-store';
 import type { AdminRoute } from './routing';
 
 // The branch the edits save to, or the plain-file note in local mode. Nothing is guessed:
@@ -18,6 +18,11 @@ function useHomeLine(): string | null {
   }
   return branch?.name ? `Branch ${branch.name}` : null;
 }
+
+const countLabel = (count: number | null): string | null => {
+  if (count === null) return null;
+  return count === 1 ? '1 document' : `${count} documents`;
+};
 
 function CollectionCard({
   collection,
@@ -44,11 +49,7 @@ function CollectionCard({
       </button>
       <div className='flex items-end justify-between gap-2'>
         <span className='text-sm text-muted-foreground'>
-          {count === null
-            ? null
-            : count === 1
-              ? '1 document'
-              : `${count} documents`}
+          {countLabel(count)}
         </span>
         <Button
           variant='outline'
@@ -72,11 +73,11 @@ export function HomePanel({
   navigate: (route: AdminRoute) => void;
 }) {
   const line = useHomeLine();
-  const unsaved = useDirtyFormCount();
+  const unsaved = useUnsavedFormIds().length;
   return (
     <SidebarInset className='min-w-0'>
       <div className='min-h-0 flex-1 overflow-y-auto'>
-        <div className='mx-auto w-full max-w-260 py-10'>
+        <div className='mx-auto w-full max-w-260 px-4 py-10'>
           <div className='mb-8 flex items-start justify-between gap-4'>
             <div>
               <h2 className='text-2xl font-semibold'>Home</h2>
