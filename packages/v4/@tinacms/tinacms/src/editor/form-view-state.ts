@@ -226,3 +226,18 @@ export const levelsFor = (
   fieldsAlong(address, fields, valueAt).filter(
     (step) => step.address !== address && drillsIn(step)
   );
+
+/** Whether a field above an open level is disabled or read-only. The level's own fields are too. */
+export const lockAbove = (
+  address: string,
+  fields: readonly FieldSchema[],
+  valueAt: (address: string) => unknown
+): { disabled: boolean; readOnly: boolean } => {
+  const above = fieldsAlong(address, fields, valueAt).filter(
+    (step) => step.address !== address && !step.item
+  );
+  return {
+    disabled: above.some(({ node }) => node.disabled === true),
+    readOnly: above.some(({ node }) => node.readOnly === true),
+  };
+};
