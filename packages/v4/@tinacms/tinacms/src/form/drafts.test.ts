@@ -371,6 +371,121 @@ describe('form drafts', () => {
     expect(store.getState().unstored[postA]).toBeUndefined();
   });
 
+  // Two copies on one field plus typing: every Resume keeps every value somewhere.
+  const threeValues = () => {
+    syncing();
+    open();
+    typeTitle('DRAFT A');
+    simulateReload();
+    open({ [title]: 'File 2', [summary]: 'Same' });
+    typeTitle('DRAFT B');
+    simulateReload();
+    open({ [title]: 'File 3', [summary]: 'Same' });
+    typeTitle('TYPED C');
+    return { [title]: 'File 3', [summary]: 'Same' };
+  };
+  const allTitles = () =>
+    [
+      form()?.values[title],
+      readDraft(postA)?.values.title,
+      ...readWaitingDrafts(postA).map((copy) => copy.values.title),
+    ].filter(Boolean);
+
+  const otherTabAddsCopy = (text: string) => {
+    const key = `${draftKey(postA)}#waiting`;
+    const list = JSON.parse(localStorage.getItem(key) ?? '{"copies":[]}');
+    list.version = 2;
+    list.copies.push({
+      values: { title: text, summary: 'Same' },
+      baseline: FILE,
+    });
+    localStorage.setItem(key, JSON.stringify(list));
+  };
+
+  it('row 11: Confirm removes the copies shown, and a copy another tab added since stays', () => {
+    reloadWithEdit('Mine');
+    open();
+    const shown = waitingOf();
+    otherTabAddsCopy('Other tab');
+    store.getState().discardWaiting(postA, shown);
+    expect(readWaitingDrafts(postA).map((copy) => copy.values.title)).toEqual([
+      'Other tab',
+    ]);
+  });
+
+  it('row 8: Resume reads the list from storage at the click, so a copy another tab added is applied', () => {
+    reloadWithEdit('Mine');
+    open();
+    syncing();
+    otherTabAddsCopy('Other tab');
+    store.getState().resumeWaiting(postA);
+    expect([
+      form()?.values[title],
+      ...waitingOf().map((copy) => copy.values.title),
+    ]).toEqual(expect.arrayContaining(['Mine', 'Other tab']));
+  });
+
+  it('row 9: a second Resume keeps every earlier collision value', () => {
+    threeValues();
+    const resume = () => store.getState().resumeWaiting(postA);
+    resume();
+    expect(form()?.values[title]).toBe('TYPED C');
+    for (let at = 0; at < 4; at++) {
+      resume();
+      expect(allTitles()).toEqual(
+        expect.arrayContaining(['DRAFT A', 'DRAFT B', 'TYPED C'])
+      );
+    }
+  });
+
+  it('row 9: a swap that cannot be stored changes nothing and warns', () => {
+    syncing();
+    reloadWithEdit('Earlier');
+    open();
+    typeTitle('Typed now');
+    store.getState().resumeWaiting(postA);
+    failWrites((key) => key.endsWith('#waiting'));
+    store.getState().resumeWaiting(postA);
+    expect(form()?.values[title]).toBe('Typed now');
+    expect(readDraft(postA)?.values.title).toBe('Typed now');
+    expect(readWaitingDrafts(postA).map((copy) => copy.values.title)).toEqual([
+      'Earlier',
+    ]);
+    expect(store.getState().failures[postA]).toBeGreaterThan(0);
+  });
+
+  it('row 24: a failed Resume hides the prompt until the next open, and keeps every copy', () => {
+    reloadWithEdit();
+    open();
+    syncing();
+    failWrites((key) => key === draftKey(postA));
+    store.getState().resumeWaiting(postA);
+    expect(store.getState().hidden[postA]).toBe(true);
+    expect(readWaitingDrafts(postA)).toHaveLength(1);
+    simulateReload();
+    open();
+    expect(store.getState().hidden[postA]).toBeUndefined();
+    expect(waitingOf().length).toBeGreaterThan(0);
+  });
+
+  it('row 9: a displaced value equal to the file leaves no empty leftover', () => {
+    reloadWithEdit('Earlier');
+    open();
+    syncing();
+    typeTitle('Typed now');
+    store.getState().resumeWaiting(postA);
+    store.getState().markSaved(postA);
+    store.getState().resumeWaiting(postA);
+    expect(
+      waitingOf().every((copy) => Object.keys(copy.values).length > 0)
+    ).toBe(true);
+    expect(
+      waitingOf().filter(
+        (copy) => copy.leftover && copy.values.title === 'Typed now'
+      )
+    ).toEqual([]);
+  });
+
   it('row 28: discarding a document with no file removes the live copy, waiting copies and in-memory edits', () => {
     reloadWithEdit();
     open();

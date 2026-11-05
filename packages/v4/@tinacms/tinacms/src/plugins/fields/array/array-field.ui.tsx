@@ -38,6 +38,7 @@ import {
   useInvalidFieldCounts,
   useListItems,
   useMediaSlice,
+  useExpansion,
   useOpenLevel,
 } from '../../../editor';
 import { isMediaPath } from '../image/image-field.schema';
@@ -237,6 +238,24 @@ function ObjectItems({
   useEffect(() => {
     if (activation) openOnActivation(activation.address);
   }, [activation]);
+
+  // Expand all opens the cards that open in place; an item that opens as a form
+  // level stays closed.
+  const expansion = useExpansion();
+  const applyExpansion = useEffectEvent((openAll: boolean) =>
+    setOpen(
+      new Set(
+        openAll
+          ? items
+              .filter((_, index) => !itemOpensNextLevel(`${address}.${index}`))
+              .map((item) => item.id)
+          : []
+      )
+    )
+  );
+  useEffect(() => {
+    if (expansion.version > 0) applyExpansion(expansion.open);
+  }, [expansion]);
 
   // The insert picker follows its opener card by id, so a move or remove while it is open cannot shift it.
   const openerIndex = inserting
