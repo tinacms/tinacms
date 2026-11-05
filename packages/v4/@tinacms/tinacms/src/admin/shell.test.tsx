@@ -7,6 +7,8 @@ import type { BranchInfo } from '../core/branch/contract';
 import { currentBranchOf } from '../core/branch/contract';
 import { ContentError, type DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
+import { draftKey } from '../form/drafts';
+import { toFormId } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -291,6 +293,21 @@ describe('Home', () => {
       )
     ).toBeVisible();
     expect(screen.queryByText(/^Branch /)).toBeNull();
+  });
+
+  it('offers Review N unsaved for edits kept in a stored draft after a reload', async () => {
+    localStorage.setItem(
+      draftKey(toFormId('content/posts/hello.mdx')),
+      JSON.stringify({
+        version: 2,
+        values: { title: 'Kept' },
+        baseline: { title: 'Hello' },
+      })
+    );
+    renderAdmin();
+    expect(
+      await screen.findByRole('button', { name: 'Review 1 unsaved' })
+    ).toBeVisible();
   });
 
   it('opens the collection from its card', async () => {
