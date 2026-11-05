@@ -119,6 +119,24 @@ describe('Breadcrumb', () => {
     );
   });
 
+  it('keeps the link of a folded step', async () => {
+    const user = userEvent.setup();
+    render(
+      <Breadcrumb
+        items={path.map((label, index) => ({
+          label,
+          href: index < path.length - 1 ? `/${label}` : undefined,
+        }))}
+      />
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Show 2 more levels' })
+    );
+    expect(
+      await screen.findByRole('menuitem', { name: '2026' })
+    ).toHaveAttribute('href', '/2026');
+  });
+
   it('folds the middle of a long path into a menu', async () => {
     const user = userEvent.setup();
     const onOpen = vi.fn();
