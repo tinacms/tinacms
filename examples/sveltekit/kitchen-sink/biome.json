@@ -1,0 +1,27 @@
+{
+  "root": false,
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "extends": "//",
+  "files": {
+    "includes": [
+      "**",
+      "!**/.svelte-kit/**",
+      "!**/build/**",
+      "!**/build-static/**",
+      "!**/static/admin/**",
+      "!**/tina/__generated__/**"
+    ]
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.svelte"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "useHookAtTopLevel": "off"
+          }
+        }
+      }
+    }
+  ]
+}
