@@ -7,12 +7,26 @@ import {
   AlertDialogTitle,
 } from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
-import { Label } from '@tinacms/ui/components/label';
-import { use } from 'react';
-import { toFieldAddress } from '../core/field/address';
-import type { FieldSchema } from '../core/schema/types';
-import { FormScopeContext } from '../editor/context';
-import { Field } from '../editor/field';
+import { toast } from '@tinacms/ui/components/toast';
+import { FormLevel } from '@tinacms/ui/components/form-level';
+import {
+  type ReactNode,
+  use,
+  useEffect,
+  useEffectEvent,
+  useState,
+} from 'react';
+import { useFormContext } from 'react-hook-form';
+import { useStore } from 'zustand';
+import { type FormScope, FormScopeContext } from '../editor/context';
+import { Field, FieldNode } from '../editor/field';
+import {
+  fieldsAlong,
+  holdsRevealedError,
+  levelDrillsIn,
+  levelsFor,
+  type OpenLevel,
+} from '../editor/form-view-state';
 import {
   useDiscardEdits,
   useFieldRegistry,
@@ -23,64 +37,42 @@ import {
 } from '../editor/hooks';
 import {
   useFormErrors,
-  useIsFieldDirty,
+  useFormStore,
   useIsFormDirty,
 } from '../form/form-store';
+import { countFailingFields } from '../editor/field-errors';
 import { DocumentStatus } from './document-status';
-
-function FieldRow({ node }: { node: FieldSchema }) {
-  const name = node.name;
-  const dirty = useIsFieldDirty(useFormId(), toFieldAddress(name));
-  const labelable =
-    useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
-  return (
-    <div className='mb-4 min-w-0'>
-      <Label
-        className='mb-1'
-        id={`${name}-label`}
-        htmlFor={labelable ? name : undefined}
-      >
-        {node.label ?? name}
-        {dirty ? (
-          <>
-            <span
-              aria-hidden='true'
-              className='ml-1 size-1.5 rounded-full bg-primary'
-            />
-            <span className='sr-only'>(unsaved)</span>
-          </>
-        ) : null}
-      </Label>
-      <Field address={name} />
-    </div>
-  );
-}
 
 function SaveButton() {
   const formId = useFormId();
   const dirty = useIsFormDirty(formId);
-  const invalid = Object.keys(useFormErrors(formId)).length > 0;
   const save = useFormSave();
   const [failure, setFailure] = useSaveFailure();
-  const canSave = dirty && !invalid;
+  const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
+  const [pending, setPending] = useState(false);
   return (
     <div className='flex flex-col items-start gap-2'>
       <Button
         variant='primary'
         type='button'
-        className='aria-disabled:pointer-events-none aria-disabled:opacity-50'
-        aria-disabled={!canSave}
+        disabled={!dirty && !pending}
+        busy={pending}
+        count={errorCount}
+        srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
         onClick={() => {
-          if (!canSave) return;
           setFailure(null);
-          save().catch((cause) => {
-            console.error('[tinacms] Save failed:', cause);
-            if (cause instanceof Error && cause.message) {
-              setFailure(cause.message);
-            } else {
-              setFailure('Save failed.');
-            }
-          });
+          setPending(true);
+          save()
+            .catch((cause) => {
+              console.error('[tinacms] Save failed:', cause);
+              let message = 'Save failed.';
+              if (cause instanceof Error && cause.message) {
+                message = cause.message;
+              }
+              setFailure(message);
+              toast({ tone: 'error', title: 'Save failed', text: message });
+            })
+            .finally(() => setPending(false));
         }}
       >
         Save
@@ -100,13 +92,9 @@ function DiscardButton() {
   return (
     <Button
       type='button'
-      variant='secondary'
-      className='aria-disabled:pointer-events-none aria-disabled:opacity-50'
-      aria-disabled={!dirty}
-      onClick={() => {
-        if (!dirty) return;
-        discard();
-      }}
+      variant='destructive'
+      disabled={!dirty}
+      onClick={discard}
     >
       Discard
     </Button>
@@ -128,7 +116,7 @@ function StaleDraftDialog() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <Button type='button' variant='secondary' onClick={stale?.discard}>
+          <Button type='button' variant='destructive' onClick={stale?.discard}>
             Discard draft
           </Button>
           <Button variant='primary' type='button' onClick={stale?.resume}>
@@ -137,6 +125,98 @@ function StaleDraftDialog() {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  );
+}
+
+function ActiveFieldLevels({ scope }: { scope: FormScope }) {
+  const registry = useFieldRegistry();
+  const { getValues } = useFormContext();
+  const active = useFormStore((state) => state.active);
+  const showLevelsFor = useEffectEvent((address: string) => {
+    const { view, collection } = scope;
+    const { openLevels } = view.getState();
+    const levels = levelsFor(
+      address,
+      collection.fields,
+      (path) => getValues(path),
+      (step) => levelDrillsIn(registry.get(step.node.type), step)
+    );
+    const top = openLevels.at(-1)?.address;
+    const sameLevels =
+      levels.length === openLevels.length &&
+      levels.every(
+        (level, index) => level.address === openLevels[index]?.address
+      );
+    if (sameLevels || top === address || top?.startsWith(`${address}.`)) return;
+    view.getState().showLevels(levels);
+  });
+  useEffect(() => {
+    if (active && active.formId === scope.formId) showLevelsFor(active.address);
+  }, [active, scope.formId]);
+  return null;
+}
+
+// Reads the whole view and every error for the trail. `children` keeps its
+// element identity, so a re-render here does not reach the fields.
+function OpenLevelFrame({
+  scope,
+  current,
+  children,
+}: {
+  scope: FormScope;
+  current: OpenLevel;
+  children: ReactNode;
+}) {
+  const errors = useFormErrors(useFormId());
+  const { getValues } = useFormContext();
+  const view = useStore(scope.view);
+  const { collection, path } = scope;
+  const { closeLevelsAbove } = scope.view.getState();
+
+  const errorAddresses = Object.keys(errors);
+  const steps = [
+    {
+      label: path.split('/').at(-1) ?? path,
+      onClick: () => closeLevelsAbove(0),
+      invalid: holdsRevealedError(view, errorAddresses),
+    },
+    ...fieldsAlong(current.address, collection.fields, getValues).map(
+      (step) => {
+        const keep = view.openLevels.filter(
+          (level) =>
+            level.address === step.address ||
+            step.address.startsWith(`${level.address}.`)
+        ).length;
+        return {
+          label: step.label,
+          onClick: () => closeLevelsAbove(keep),
+          invalid: holdsRevealedError(view, errorAddresses, step.address),
+        };
+      }
+    ),
+  ];
+  return (
+    <FormLevel pinHeaders steps={steps} onUp={steps.at(-2)?.onClick}>
+      {children}
+    </FormLevel>
+  );
+}
+
+function FormFields({ scope }: { scope: FormScope }) {
+  const current = useStore(scope.view, (state) => state.openLevels.at(-1));
+  if (!current) {
+    return (
+      <FormLevel pinHeaders>
+        {scope.collection.fields.map((node) => (
+          <Field key={node.name} address={node.name} />
+        ))}
+      </FormLevel>
+    );
+  }
+  return (
+    <OpenLevelFrame scope={scope} current={current}>
+      <FieldNode address={current.address} node={current.node} />
+    </OpenLevelFrame>
   );
 }
 
@@ -153,9 +233,8 @@ export function DocumentForm() {
         <DocumentStatus />
       </header>
       <StaleDraftDialog />
-      {scope.collection.fields.map((node) => (
-        <FieldRow key={node.name} node={node} />
-      ))}
+      <ActiveFieldLevels scope={scope} />
+      <FormFields scope={scope} />
       <div className='flex items-start gap-2'>
         <SaveButton />
         <DiscardButton />

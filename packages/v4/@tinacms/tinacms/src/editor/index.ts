@@ -1,3 +1,4 @@
+export { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 export { type FieldAddress, toFieldAddress } from '../core/field/address';
 export {
   type FieldErrors,
@@ -23,6 +24,8 @@ export {
   NestedFieldRow,
   type NestedFieldRowProps,
 } from './field';
+export { ownFieldErrors } from './field-errors';
+export { itemOpensNextLevel } from './form-view-state';
 export {
   FormProvider,
   type FormProviderProps,
@@ -41,6 +44,7 @@ export {
   type DocumentSave,
   type SaveDocumentInput,
   useCollectionDocuments,
+  useCurrentBranch,
   useDocument,
   useInvalidateContent,
   useSaveDocument,
@@ -50,6 +54,13 @@ export {
   AfterSaveHookError,
   FormValidationError,
   useActiveField,
+  useActivation,
+  useInvalidFieldCount,
+  useInvalidFieldCounts,
+  useIsOpenLevel,
+  useListItems,
+  useOpenLevel,
+  type FieldFrameOptions,
   useContentSlice,
   useMediaSlice,
   useOptionalAuthSlice,
@@ -59,6 +70,7 @@ export {
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,
+  useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
@@ -66,5 +78,6 @@ export {
   useFormSave,
   useFormSeedKey,
   useRpcClient,
+  useSchemaCollections,
   useTinaStore,
 } from './hooks';

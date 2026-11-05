@@ -6,12 +6,15 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   ChevronsDownUp,
   ChevronsUpDown,
+  Circle,
   CircleAlert,
   CircleCheck,
   CircleHelp,
   Ellipsis,
+  Eye,
   ExternalLink,
   File,
   FileText,
@@ -22,10 +25,12 @@ import {
   Globe,
   House,
   Image,
+  ImageOff,
   Info,
   Layers2,
   LayoutGrid,
   LoaderCircle,
+  Lock,
   type LucideIcon,
   type LucideProps,
   Maximize2,
@@ -35,19 +40,26 @@ import {
   PanelLeftOpen,
   PanelsTopLeft,
   Pencil,
+  Pin,
   Plus,
   Search,
   Settings,
   SlidersHorizontal,
   Trash2,
   TriangleAlert,
+  Upload,
   User,
   X,
 } from 'lucide-react';
 
 import { cn } from '@tinacms/ui/lib/utils';
 
-type GlyphEntry = { icon: LucideIcon; weight: number; filled?: boolean };
+type GlyphEntry = {
+  icon: LucideIcon;
+  weight: number;
+  filled?: boolean;
+  spin?: boolean;
+};
 
 /**
  * The named icons of the TinaCMS design, each mapped to its lucide icon and stroke weight:
@@ -95,16 +107,26 @@ const glyphs = {
   bookmark: { icon: Bookmark, weight: 1.75, filled: true },
   error: { icon: CircleAlert, weight: 2.25 },
   trash: { icon: Trash2, weight: 1.75 },
-  spinner: { icon: LoaderCircle, weight: 2 },
+  spinner: { icon: LoaderCircle, weight: 2.25, spin: true },
+  lock: { icon: Lock, weight: 2 },
+  upload: { icon: Upload, weight: 1.75 },
+  eye: { icon: Eye, weight: 1.75 },
+  pin: { icon: Pin, weight: 1.75 },
+  circle: { icon: Circle, weight: 2 },
+  'chevron-up': { icon: ChevronUp, weight: 2.25 },
+  'image-missing': { icon: ImageOff, weight: 1.75 },
 } satisfies Record<string, GlyphEntry>;
 
 type Glyph = keyof typeof glyphs;
 
-type IconProps = Omit<LucideProps, 'ref'> & {
+const ICON_SIZE = { 14: 'size-3.5', 16: 'size-4', 20: 'size-5' } as const;
+type IconSize = keyof typeof ICON_SIZE;
+
+type IconProps = Omit<LucideProps, 'ref' | 'size'> & {
   /** A named glyph such as `doc` or `chevron-right`, or any lucide icon. */
   glyph: Glyph | LucideIcon;
-  /** Width and height in pixels. */
-  size?: number;
+  /** 14 beside small words, 16 beside body words, 20 alone. */
+  size?: IconSize;
   /** Stroke width. Defaults to the glyph's weight, or 2 for a lucide icon. */
   weight?: number;
 };
@@ -113,7 +135,7 @@ type IconProps = Omit<LucideProps, 'ref'> & {
  * An icon in the colour of the text around it. Screen readers skip it unless it has an
  * `aria-label`; the button or row around it carries the name.
  */
-function Icon({ glyph, size = 24, weight, className, ...props }: IconProps) {
+function Icon({ glyph, size = 20, weight, className, ...props }: IconProps) {
   const entry: GlyphEntry =
     typeof glyph === 'string' ? glyphs[glyph] : { icon: glyph, weight: 2 };
   const Lucide = entry.icon;
@@ -127,11 +149,16 @@ function Icon({ glyph, size = 24, weight, className, ...props }: IconProps) {
       aria-hidden={labelled ? undefined : true}
       role={labelled ? 'img' : undefined}
       focusable='false'
-      className={cn('block flex-none', className)}
+      className={cn(
+        'block flex-none',
+        ICON_SIZE[size],
+        entry.spin && 'motion-safe:animate-spin',
+        className
+      )}
       {...props}
     />
   );
 }
 
-export type { Glyph, IconProps };
+export type { Glyph, IconProps, IconSize };
 export { Icon, glyphs };

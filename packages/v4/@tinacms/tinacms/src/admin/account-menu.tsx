@@ -1,14 +1,19 @@
+import { Button } from '@tinacms/ui/components/button';
 import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from '@tinacms/ui/components/sidebar';
-import { LogOutIcon } from 'lucide-react';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPerson,
+  DropdownMenuTrigger,
+} from '@tinacms/ui/components/dropdown-menu';
+import { toast } from '@tinacms/ui/components/toast';
+import { UserIcon } from 'lucide-react';
+import { useEffect } from 'react';
 import type { AuthUser } from '../core/auth/contract';
 import { useOptionalAuthSlice } from '../editor/hooks';
 import { useAuthAction } from './use-auth-action';
 
-function SignOut({
+function Account({
   user,
   logout,
 }: {
@@ -16,32 +21,35 @@ function SignOut({
   logout: () => Promise<void>;
 }) {
   const signOut = useAuthAction(logout, 'Sign-out failed. Please try again.');
+  const failure = signOut.error;
+  useEffect(() => {
+    if (failure) toast({ tone: 'error', title: failure });
+  }, [failure]);
+  const name = user.name ?? user.email ?? user.id;
   return (
-    <SidebarMenu aria-label='Account'>
-      <SidebarMenuItem>
-        <p className='truncate px-2 py-1.5 text-sm'>
-          {user.name ?? user.email ?? user.id}
-        </p>
-      </SidebarMenuItem>
-      <SidebarMenuItem>
-        <SidebarMenuButton onClick={signOut.run} disabled={signOut.pending}>
-          <LogOutIcon className='size-4' aria-hidden='true' />
-          <span>Sign out</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      {signOut.error ? (
-        <SidebarMenuItem>
-          <p role='alert' className='px-2 text-sm text-destructive'>
-            {signOut.error}
-          </p>
-        </SidebarMenuItem>
-      ) : null}
-    </SidebarMenu>
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            variant='icon'
+            size='sm'
+            icon={UserIcon}
+            aria-label='Account'
+          />
+        }
+      />
+      <DropdownMenuContent align='end' aria-label='Account'>
+        <DropdownMenuPerson name={name} sub={user.email} />
+        <DropdownMenuItem onClick={signOut.run} disabled={signOut.pending}>
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
 export function AccountMenu() {
   const auth = useOptionalAuthSlice();
   if (auth?.status !== 'signed-in') return null;
-  return <SignOut user={auth.user} logout={auth.logout} />;
+  return <Account user={auth.user} logout={auth.logout} />;
 }

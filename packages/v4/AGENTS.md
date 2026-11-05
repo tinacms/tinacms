@@ -159,9 +159,11 @@ Comment policy (a prior cleanup pass established this):
 
 ## Accessibility
 
-- **The row of a field gives the field its name.** `admin/document-form.tsx`
-  renders the label and points it at the control with `htmlFor`. A field widget
-  renders `id={address}`, and no label of its own.
+- **A field's frame gives the field its name.** A field widget wraps its
+  control in `FieldWrapper` with `{...useFieldFrame()}`, which draws the label
+  and points it at the control with `htmlFor`. The control renders
+  `id={address}`. A widget that isn't labelable (`metadata.labelable: false`)
+  points `aria-labelledby` at `frame.labelId` instead.
 
 - **Never put `aria-label` on a field widget.** `aria-label` outranks a
   `<label>` element. It replaces the label that an author wrote with the name of

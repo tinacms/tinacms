@@ -6,15 +6,22 @@ import { capabilityProvider } from '../core/mount';
 import {
   AUTH_CAPABILITY,
   type ResolvedSegment,
+  type SliceState,
   type SliceSet,
   type TinaStoreState,
 } from '../core/plugin';
+import { isRecord } from '../utils/is-record';
 import { composePluginSlices } from './compose-slices';
 
 const CORE_NAMESPACES = ['ui', 'branch', 'documents'] as const;
 type CoreNamespace = (typeof CORE_NAMESPACES)[number];
 
 const PERSISTED_NAMESPACES: readonly CoreNamespace[] = ['ui', 'branch'];
+
+// Only `current` survives a reload. `switchTo` is a function and `list` goes
+// stale, so the content provider rebuilds both.
+const durableBranch = (branch: SliceState): SliceState =>
+  typeof branch.current === 'string' ? { current: branch.current } : {};
 
 export const pickPersistableNamespaces = (
   state: TinaStoreState
@@ -23,7 +30,16 @@ export const pickPersistableNamespaces = (
   for (const namespace of PERSISTED_NAMESPACES) {
     if (namespace in state) durable[namespace] = state[namespace];
   }
+  if (state.branch) durable.branch = durableBranch(state.branch);
   return durable;
+};
+
+const pickRecords = (value: Record<string, unknown>): TinaStoreState => {
+  const slices: TinaStoreState = {};
+  for (const [namespace, slice] of Object.entries(value)) {
+    if (isRecord(slice)) slices[namespace] = slice;
+  }
+  return slices;
 };
 
 const createCoreSlices = (): TinaStoreState =>
@@ -83,12 +99,42 @@ export const createTinaStore = (resolved: ResolvedSegment[]) => {
             const scopedSet = createNamespacedSet(namespace, set as RootSet);
             state[namespace] = slice(scopedSet, get);
           }
+          state.branch = {
+            list: [],
+            protected: [],
+            switchTo: (name) =>
+              (set as RootSet)(
+                (store) => ({
+                  branch: {
+                    ...store.branch,
+                    current: name === store.branch?.fallback ? undefined : name,
+                  },
+                }),
+                false,
+                'branch/switchTo'
+              ),
+          };
           if (state.auth) {
             state.auth = { ...state.auth, [SITE_TOKEN_FLAG]: sendsTokenToSite };
           }
           return state;
         },
-        { name: PERSIST_STORAGE_KEY, partialize: pickPersistableNamespaces }
+        {
+          name: PERSIST_STORAGE_KEY,
+          partialize: pickPersistableNamespaces,
+          merge: (persisted, current) => {
+            if (!isRecord(persisted)) return current;
+            const { branch, ...rest } = persisted;
+            return {
+              ...current,
+              ...pickRecords(rest),
+              branch: {
+                ...current.branch,
+                ...(isRecord(branch) ? durableBranch(branch) : {}),
+              },
+            };
+          },
+        }
       ),
       { name: DEVTOOLS_STORE_NAME }
     )

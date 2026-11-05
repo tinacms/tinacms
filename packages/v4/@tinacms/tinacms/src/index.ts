@@ -88,9 +88,11 @@ export {
   v,
 } from './plugins/fields';
 export type {
+  ArrayTemplateSchema,
   BooleanFieldSchema,
   DatetimeFieldSchema,
   NumberFieldSchema,
+  ObjectDisplay,
   RichTextFieldSchema,
   RichTextTemplate,
   StringFieldSchema,
