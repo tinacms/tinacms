@@ -81,6 +81,9 @@ export interface FormStore {
   /** The latest save of each form, with a counter so the newest wins. */
   saves: Partial<Record<FormId, SavePhase & { readonly at: number }>>;
   branch: string | undefined;
+  /** Counts changes to stored drafts, so lists of them refresh. */
+  draftsVersion: number;
+  discardStoredDraft: (formId: FormId) => void;
   setBranch: (branch: string | undefined) => void;
   setSavePhase: (formId: FormId, phase: SavePhase) => void;
   active: { formId: FormId; address: FieldAddress } | null;
@@ -185,6 +188,7 @@ const DEVTOOLS_STORE_NAME = 'TinaFormStore';
 const DEVTOOLS_ACTION = {
   setUserId: 'form/setUserId',
   setBranch: 'form/setBranch',
+  discardStoredDraft: 'form/discardStoredDraft',
   setSavePhase: 'form/setSavePhase',
   register: 'form/register',
   setFieldValue: 'form/setFieldValue',
@@ -213,7 +217,18 @@ export const useFormStore = create<FormStore>()(
         forms: {},
         saves: {},
         branch: undefined,
+        draftsVersion: 0,
         active: null,
+
+        discardStoredDraft: (formId) => {
+          const { userId, branch } = readFormStore();
+          removeDraft(formId, userId, branch);
+          removeStaleDraft(formId, userId, branch);
+          apply(
+            (state) => ({ draftsVersion: state.draftsVersion + 1 }),
+            DEVTOOLS_ACTION.discardStoredDraft
+          );
+        },
 
         setBranch: (branch) =>
           apply((state) => {
@@ -504,35 +519,18 @@ export const useSaveSummary = (): SaveSummary =>
 
 export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
 
-/** The ids of the open documents that hold unsaved edits. */
-export const useDirtyFormIds = (): FormId[] =>
-  useFormStore(
-    useShallow((state) =>
-      (Object.keys(state.forms) as FormId[]).filter(
-        (id) => formStatus(state.forms[id]) === 'dirty'
-      )
-    )
-  );
-
 /**
  * The documents with unsaved edits: the open forms that are dirty, and the
- * documents whose edits wait in a stored draft after a reload.
+ * documents whose edits wait in a stored draft after a reload. A change to
+ * `draftsVersion` makes the list read storage again.
  */
-export const useUnsavedFormIds = (): FormId[] => {
-  const dirty = useDirtyFormIds();
-  const userId = useFormStore((state) => state.userId);
-  const branch = useFormStore((state) => state.branch);
-  return useMemo(
-    () => [...new Set([...dirty, ...listStoredDraftIds(userId, branch)])],
-    [dirty, userId, branch]
-  );
-};
-
-/** How many open documents hold unsaved edits. */
-export const useDirtyFormCount = (): number =>
+export const useUnsavedFormIds = (): FormId[] =>
   useFormStore(
-    (state) =>
-      Object.values(state.forms).filter(
-        (scope) => formStatus(scope) === 'dirty'
-      ).length
+    useShallow((state) => {
+      const dirty = (Object.keys(state.forms) as FormId[]).filter(
+        (id) => formStatus(state.forms[id]) === 'dirty'
+      );
+      const stored = listStoredDraftIds(state.userId, state.branch);
+      return [...new Set([...dirty, ...stored])];
+    })
   );

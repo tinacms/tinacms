@@ -1,10 +1,14 @@
 import { EmptyState } from '@tinacms/ui/components/empty-state';
+import { Button } from '@tinacms/ui/components/button';
 import { NavRow } from '@tinacms/ui/components/nav-row';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { useEffect, useState } from 'react';
 import type { CollectionSchema } from '../core/schema/types';
-import { useCollectionDocuments } from '../editor/content-queries';
-import { toFormId, useUnsavedFormIds } from '../form/form-store';
+import {
+  useCollectionDocuments,
+  useCollectionsDocumentPaths,
+} from '../editor/content-queries';
+import { useFormStore, useUnsavedFormIds } from '../form/form-store';
 import type { GlobalNavEntry } from '../core/slot/contract';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { openNavTarget } from './rail';
@@ -16,14 +20,15 @@ function DocumentRow({
   collection,
   path,
   selected,
+  unsaved,
   navigate,
 }: {
   collection: string;
   path: string;
   selected: boolean;
+  unsaved: boolean;
   navigate: (route: AdminRoute) => void;
 }) {
-  const unsaved = useUnsavedFormIds().includes(toFormId(path));
   return (
     <li>
       <NavRow
@@ -45,10 +50,12 @@ function DocumentRow({
 function CollectionDocuments({
   collection,
   activePath,
+  unsavedIds,
   navigate,
 }: {
   collection: CollectionSchema;
   activePath?: string;
+  unsavedIds: ReadonlySet<string>;
   navigate: (route: AdminRoute) => void;
 }) {
   const { documents, isLoading, error } = useCollectionDocuments(
@@ -82,6 +89,7 @@ function CollectionDocuments({
           collection={collection.name}
           path={path}
           selected={path === activePath}
+          unsaved={unsavedIds.has(path)}
           navigate={navigate}
         />
       ))}
@@ -92,14 +100,15 @@ function CollectionDocuments({
 // Review N unsaved: only the documents that hold edits, open or kept in a stored draft, grouped by collection.
 function UnsavedCollection({
   collection,
+  unsavedIds,
   navigate,
 }: {
   collection: CollectionSchema;
+  unsavedIds: ReadonlySet<string>;
   navigate: (route: AdminRoute) => void;
 }) {
   const { documents, error } = useCollectionDocuments(collection.name);
-  const dirty = new Set<string>(useUnsavedFormIds());
-  const unsaved = documents.filter(({ path }) => dirty.has(path));
+  const unsaved = documents.filter(({ path }) => unsavedIds.has(path));
   const label = collection.label ?? collection.name;
   if (error) {
     return (
@@ -126,6 +135,7 @@ function UnsavedCollection({
             collection={collection.name}
             path={path}
             selected={false}
+            unsaved
             navigate={navigate}
           />
         ))}
@@ -134,15 +144,59 @@ function UnsavedCollection({
   );
 }
 
+// Edits kept in the browser for a file that is no longer listed have no row to open.
+// Each gets a line that says so and a way to throw the edits away.
+function MissingDocumentEdits({
+  collections,
+}: {
+  collections: CollectionSchema[];
+}) {
+  const { paths, settled } = useCollectionsDocumentPaths(
+    collections.map(({ name }) => name)
+  );
+  const discard = useFormStore((state) => state.discardStoredDraft);
+  const missing = useUnsavedFormIds().filter((id) => !paths.has(id));
+  if (!settled || missing.length === 0) return null;
+  return (
+    <ul
+      aria-label='Edits for documents that are gone'
+      className='m-0 mt-2 list-none p-0'
+    >
+      {missing.map((id) => (
+        <li key={id} className='flex items-center gap-2 px-2 py-1.5 text-sm'>
+          <span className='min-w-0 flex-1'>
+            <span className='block truncate' title={id}>
+              {documentName(id)}
+            </span>
+            <span className='text-muted-foreground'>
+              Its file was not found. The edits are still kept here.
+            </span>
+          </span>
+          <Button
+            size='sm'
+            variant='destructive'
+            aria-label={`Discard edits to ${documentName(id)}`}
+            onClick={() => discard(id)}
+          >
+            Discard
+          </Button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function CollectionNode({
   collection,
   active,
   activePath,
+  unsavedIds,
   navigate,
 }: {
   collection: CollectionSchema;
   active: boolean;
   activePath?: string;
+  unsavedIds: ReadonlySet<string>;
   navigate: (route: AdminRoute) => void;
 }) {
   const [open, setOpen] = useState(active);
@@ -170,6 +224,7 @@ function CollectionNode({
         <CollectionDocuments
           collection={collection}
           activePath={activePath}
+          unsavedIds={unsavedIds}
           navigate={navigate}
         />
       ) : null}
@@ -202,7 +257,8 @@ export function CollectionsNavigator({
   const activePath = route.view === 'document' ? route.path : selectedPath;
   const unsavedOnly =
     route.view === 'collections' && route.unsavedOnly === true;
-  const hasUnsaved = useUnsavedFormIds().length > 0;
+  const unsavedIds = new Set<string>(useUnsavedFormIds());
+  const hasUnsaved = unsavedIds.size > 0;
   return (
     <aside
       aria-label='Navigator'
@@ -229,21 +285,26 @@ export function CollectionsNavigator({
         ) : unsavedOnly && !hasUnsaved ? (
           <EmptyState text='No unsaved documents.' />
         ) : unsavedOnly ? (
-          <ul aria-label='Unsaved documents' className='m-0 list-none p-0'>
-            {collections.map((collection) => (
-              <UnsavedCollection
-                key={collection.name}
-                collection={collection}
-                navigate={navigate}
-              />
-            ))}
-          </ul>
+          <>
+            <ul aria-label='Unsaved documents' className='m-0 list-none p-0'>
+              {collections.map((collection) => (
+                <UnsavedCollection
+                  key={collection.name}
+                  collection={collection}
+                  unsavedIds={unsavedIds}
+                  navigate={navigate}
+                />
+              ))}
+            </ul>
+            <MissingDocumentEdits collections={collections} />
+          </>
         ) : (
           <ul aria-label='Collections' className='m-0 list-none p-0'>
             {collections.map((collection) => (
               <CollectionNode
                 key={collection.name}
                 collection={collection}
+                unsavedIds={unsavedIds}
                 active={collection.name === activeCollection}
                 activePath={activePath}
                 navigate={navigate}
