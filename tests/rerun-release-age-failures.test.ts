@@ -8,6 +8,7 @@ import {
   newestFlaggedPublishTime,
   readMinimumReleaseAgeMinutes,
   readyAt,
+  rerunnableFailedRuns,
 } from '../.github/scripts/rerun-release-age-failures.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -112,6 +113,21 @@ describe('latestPullRequestRuns', () => {
     expect(latestPullRequestRuns([fork, pushed], 'tinacms/tinacms')).toEqual(
       []
     );
+  });
+});
+
+describe('rerunnableFailedRuns', () => {
+  const run = (path: string, conclusion: string) => ({ path, conclusion });
+
+  it('keeps failed runs and drops passing ones', () => {
+    const failed = run('.github/workflows/main.yml', 'failure');
+    const passed = run('.github/workflows/e2e.yml', 'success');
+    expect(rerunnableFailedRuns([failed, passed])).toEqual([failed]);
+  });
+
+  it('never re-runs the publish workflow', () => {
+    const publish = run('.github/workflows/publish.yml', 'failure');
+    expect(rerunnableFailedRuns([publish])).toEqual([]);
   });
 });
 

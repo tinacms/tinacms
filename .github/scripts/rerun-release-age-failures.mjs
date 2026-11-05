@@ -64,6 +64,15 @@ export const latestPullRequestRuns = (runs, repository) => {
   return [...latest.values()];
 };
 
+// The failed runs this workflow may re-run. Publish runs are left for a person to re-run.
+// See https://github.com/tinacms/tinacms/pull/7964.
+export const rerunnableFailedRuns = (runs) =>
+  runs.filter(
+    (run) =>
+      FAILED_CONCLUSIONS.has(run.conclusion) &&
+      run.path !== '.github/workflows/publish.yml'
+  );
+
 // Epoch ms from which a re-run clears the gate, or null when any failed job failed for
 // another reason (or no log could be read), so the PR must be left alone.
 export const readyAt = (failedJobLogs, minimumReleaseAgeMinutes) => {
@@ -133,7 +142,7 @@ const runsToRerun = async (pr, minutes, now) => {
     console.log(`${label}: CI still running, skipping`);
     return [];
   }
-  const failed = runs.filter((run) => FAILED_CONCLUSIONS.has(run.conclusion));
+  const failed = rerunnableFailedRuns(runs);
   if (failed.length === 0) return [];
 
   if (failed.some((run) => run.run_attempt > 1)) {
