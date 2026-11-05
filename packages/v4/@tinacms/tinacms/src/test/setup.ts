@@ -7,6 +7,8 @@ import { corePlugins } from '../plugins/fields';
 
 const gate = vi.hoisted(() => ({ providerLoaded: false }));
 
+// NOTE: [5 Nov 2026] EK - This pass-through mock tells setup that a test file loaded the
+// provider. Removing it, or reading the flag before collection, silently stops the warm-up.
 vi.mock('../editor/provider', (importOriginal) => {
   gate.providerLoaded = true;
   return importOriginal();
@@ -14,7 +16,7 @@ vi.mock('../editor/provider', (importOriginal) => {
 
 // TinaProvider renders null until its client() thunks resolve. Warm them before any
 // test body, in files that load the provider, so the import stays out of findBy* budgets.
-// The first file on a worker pays the cold transform, which passed 30 s on CI.
+// A cold warm-up passed 30 s on a CI runner.
 beforeAll(async () => {
   if (gate.providerLoaded) await resolveClientSegments(corePlugins);
 }, 120_000);
