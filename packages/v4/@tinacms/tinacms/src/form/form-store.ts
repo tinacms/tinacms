@@ -626,9 +626,11 @@ export const useFormStore = create<FormStore>()(
               failures: failed
                 ? withFailure(current.failures, formId)
                 : current.failures,
-              hidden: failed
-                ? { ...current.hidden, [formId]: true }
-                : withoutKey(current.hidden, formId),
+              // A swap that failed changed nothing, so its prompt stays.
+              hidden:
+                failed && !swapped
+                  ? { ...current.hidden, [formId]: true }
+                  : withoutKey(current.hidden, formId),
               draftsVersion: current.draftsVersion + 1,
             };
           }, DEVTOOLS_ACTION.resumeWaiting);
