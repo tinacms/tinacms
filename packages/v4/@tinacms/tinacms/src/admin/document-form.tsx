@@ -30,6 +30,7 @@ import {
   holdsRevealedError,
   levelDrillsIn,
   levelsFor,
+  lockAbove,
   type OpenLevel,
 } from '../editor/form-view-state';
 import {
@@ -410,7 +411,9 @@ function FormFields({ scope }: { scope: FormScope }) {
   return (
     <OpenLevelFrame scope={scope} current={current}>
       <FieldLockContext
-        value={lockAbove(current.address, scope.collection.fields, getValues)}
+        value={lockAbove(current.address, scope.collection.fields, (path) =>
+          getValues(path)
+        )}
       >
         <FieldNode address={current.address} node={current.node} />
       </FieldLockContext>
