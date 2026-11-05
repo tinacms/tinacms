@@ -341,9 +341,6 @@ function AdminShell({
             selectedPath={selectedPath}
             route={route}
             navigate={navigate}
-            missingCollection={
-              isStaleCollectionRoute ? activeCollectionName : undefined
-            }
             onClose={goHome}
           />
         ) : null}
@@ -382,6 +379,10 @@ function AdminShell({
           <SidebarInset className='min-w-0'>
             <Placeholder>Pick an entry to open it.</Placeholder>
           </SidebarInset>
+        ) : isStaleCollectionRoute ? (
+          <MissingPanel title='Collection not found' onClose={goHome}>
+            No collection named “{activeCollectionName}”.
+          </MissingPanel>
         ) : isStaleDocumentRoute ? (
           <MissingPanel title='Document not found' onClose={goHome}>
             No document named “{openPath}”.

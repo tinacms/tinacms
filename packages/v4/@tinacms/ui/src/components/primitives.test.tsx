@@ -6,6 +6,7 @@ import { Badge } from '@tinacms/ui/components/badge';
 import { DiffStat } from '@tinacms/ui/components/diff-stat';
 import { Icon } from '@tinacms/ui/components/icon';
 import { KbdShortcut, keyShortcuts } from '@tinacms/ui/components/kbd';
+import { Separator } from '@tinacms/ui/components/separator';
 
 describe('Badge', () => {
   it('renders nothing for a count of 0', () => {
@@ -126,5 +127,14 @@ describe('KbdShortcut', () => {
     expect(keyShortcuts('⌘⇧P')).toBe('Meta+Shift+P');
     expect(keyShortcuts('⎋')).toBe('Escape');
     expect(keyShortcuts('G H')).toBeUndefined();
+  });
+});
+
+describe('Separator', () => {
+  it('sizes itself from the orientation attribute that Base UI renders', () => {
+    const { container } = render(<Separator />);
+    const line = container.querySelector('[data-slot=separator]');
+    expect(line).toHaveAttribute('data-orientation', 'horizontal');
+    expect(line).toHaveClass('data-[orientation=horizontal]:h-px');
   });
 });

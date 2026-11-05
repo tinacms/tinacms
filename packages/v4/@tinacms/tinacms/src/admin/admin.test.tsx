@@ -290,7 +290,14 @@ describe('TinaAdmin', () => {
   it('reports a collection the schema does not have', async () => {
     window.location.hash = '#/collections/ghost';
     renderAdmin();
-    expect(await screen.findByText(/No collection named/)).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Collection not found' })
+    ).toBeVisible();
+    expect(screen.getByText(/No collection named/)).toBeInTheDocument();
+    await userEvent.click(
+      screen.getAllByRole('button', { name: 'Close' }).at(-1) as HTMLElement
+    );
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
   });
 
   it('reports a document a deep link names that does not exist', async () => {
@@ -1149,13 +1156,31 @@ describe('TinaAdmin rail', () => {
     ).toBeVisible();
   });
 
-  it('lists the navigator with a message when a document link names a collection that does not exist', async () => {
+  it('lists the navigator beside the not-found panel when a document link names a collection that does not exist', async () => {
     window.location.hash = '#/collections/ghost/content%2Fposts%2Fx.mdx';
     renderAdmin();
-    const navigator = await screen.findByRole('complementary', {
-      name: 'Navigator',
-    });
-    expect(within(navigator).getByText(/No collection named/)).toBeVisible();
+    await screen.findByRole('heading', { name: 'Collection not found' });
+    expect(
+      screen.getByRole('complementary', { name: 'Navigator' })
+    ).toBeVisible();
+  });
+
+  it('lists a document whose edits wait in a stored draft after a reload', async () => {
+    localStorage.setItem(
+      draftKey(toFormId('content/posts/hello.mdx')),
+      JSON.stringify({
+        version: 2,
+        values: { title: 'Kept' },
+        baseline: { title: 'Hello' },
+      })
+    );
+    window.location.hash = '#/collections?unsaved';
+    renderAdmin();
+    const list = await screen.findByRole('list', { name: 'Unsaved documents' });
+    expect(
+      within(list).getByRole('button', { name: /hello\.mdx/ })
+    ).toBeVisible();
+    expect(screen.queryByText('No unsaved documents.')).toBeNull();
   });
 
   it('marks no document in another collection after Back', async () => {

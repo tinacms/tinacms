@@ -13,6 +13,7 @@ import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
 import {
   type DraftUserScope,
+  listStoredDraftIds,
   readDraft,
   removeDraft,
   type StoredDraft,
@@ -493,6 +494,20 @@ export const useDirtyFormIds = (): FormId[] =>
       )
     )
   );
+
+/**
+ * The documents with unsaved edits: the open forms that are dirty, and the
+ * documents whose edits wait in a stored draft after a reload.
+ */
+export const useUnsavedFormIds = (): FormId[] => {
+  const dirty = useDirtyFormIds();
+  const userId = useFormStore((state) => state.userId);
+  const branch = useFormStore((state) => state.branch);
+  return useMemo(
+    () => [...new Set([...dirty, ...listStoredDraftIds(userId, branch)])],
+    [dirty, userId, branch]
+  );
+};
 
 /** How many open documents hold unsaved edits. */
 export const useDirtyFormCount = (): number =>

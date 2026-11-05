@@ -4,7 +4,7 @@ import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { useEffect, useState } from 'react';
 import type { CollectionSchema } from '../core/schema/types';
 import { useCollectionDocuments } from '../editor/content-queries';
-import { toFormId, useDirtyFormIds, useIsFormDirty } from '../form/form-store';
+import { toFormId, useUnsavedFormIds } from '../form/form-store';
 import type { GlobalNavEntry } from '../core/slot/contract';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { openNavTarget } from './rail';
@@ -23,7 +23,7 @@ function DocumentRow({
   selected: boolean;
   navigate: (route: AdminRoute) => void;
 }) {
-  const unsaved = useIsFormDirty(toFormId(path));
+  const unsaved = useUnsavedFormIds().includes(toFormId(path));
   return (
     <li>
       <NavRow
@@ -89,7 +89,7 @@ function CollectionDocuments({
   );
 }
 
-// Review N unsaved: only the open documents that hold edits, grouped by collection.
+// Review N unsaved: only the documents that hold edits, open or kept in a stored draft, grouped by collection.
 function UnsavedCollection({
   collection,
   navigate,
@@ -97,11 +97,20 @@ function UnsavedCollection({
   collection: CollectionSchema;
   navigate: (route: AdminRoute) => void;
 }) {
-  const { documents } = useCollectionDocuments(collection.name);
-  const dirty = new Set<string>(useDirtyFormIds());
+  const { documents, error } = useCollectionDocuments(collection.name);
+  const dirty = new Set<string>(useUnsavedFormIds());
   const unsaved = documents.filter(({ path }) => dirty.has(path));
-  if (unsaved.length === 0) return null;
   const label = collection.label ?? collection.name;
+  if (error) {
+    return (
+      <li>
+        <p role='alert' className='px-2 py-1.5 text-sm text-destructive'>
+          Could not load {label}. {error.message}
+        </p>
+      </li>
+    );
+  }
+  if (unsaved.length === 0) return null;
   return (
     <li>
       <NavRow kind='group' open>
@@ -177,7 +186,6 @@ export function CollectionsNavigator({
   selectedPath,
   route,
   navigate,
-  missingCollection,
   onClose,
 }: {
   collections: CollectionSchema[];
@@ -185,7 +193,6 @@ export function CollectionsNavigator({
   selectedPath?: string;
   route: AdminRoute;
   navigate: (route: AdminRoute) => void;
-  missingCollection?: string;
   onClose: () => void;
 }) {
   const activeCollection =
@@ -195,11 +202,11 @@ export function CollectionsNavigator({
   const activePath = route.view === 'document' ? route.path : selectedPath;
   const unsavedOnly =
     route.view === 'collections' && route.unsavedOnly === true;
-  const hasUnsaved = useDirtyFormIds().length > 0;
+  const hasUnsaved = useUnsavedFormIds().length > 0;
   return (
     <aside
       aria-label='Navigator'
-      className='flex w-110 min-w-0 shrink-0 flex-col border-r border-border'
+      className='flex w-110 min-w-0 flex-col border-r border-border'
     >
       <PanelHeader
         heading='Collections'
@@ -217,11 +224,6 @@ export function CollectionsNavigator({
         }
       />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
-        {missingCollection ? (
-          <p className='px-2 py-1.5 text-sm text-muted-foreground'>
-            No collection named “{missingCollection}”.
-          </p>
-        ) : null}
         {collections.length === 0 ? (
           <EmptyState text='No collections yet.' />
         ) : unsavedOnly && !hasUnsaved ? (
@@ -269,7 +271,7 @@ export function MediaPanel({
   return (
     <aside
       aria-label='Media panel'
-      className='flex w-110 min-w-0 shrink-0 flex-col border-r border-border'
+      className='flex w-110 min-w-0 flex-col border-r border-border'
     >
       <PanelHeader heading='Media' closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
@@ -308,7 +310,7 @@ export function ToolsPane({
   return (
     <aside
       aria-label='Tools panel'
-      className='flex w-110 min-w-0 shrink-0 flex-col border-r border-border'
+      className='flex w-110 min-w-0 flex-col border-r border-border'
     >
       <PanelHeader heading='Tools' closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
@@ -355,7 +357,7 @@ export function SettingsPane({ onClose }: { onClose: () => void }) {
   return (
     <aside
       aria-label='Settings panel'
-      className='flex w-110 min-w-0 shrink-0 flex-col border-r border-border'
+      className='flex w-110 min-w-0 flex-col border-r border-border'
     >
       <PanelHeader heading='Settings' closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
