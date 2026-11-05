@@ -173,6 +173,8 @@ function ObjectItems({
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
 const listItems = useListItems();
+  const removeListItem = useRemoveListItem();
+  const moveListItem = useMoveListItem();
   const activation = useActivation();
   const { setActive } = useActiveField();
   const { control, getValues } = useFormContext();
