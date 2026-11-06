@@ -10,7 +10,7 @@ import {
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
-import { useNarrow } from './use-narrow';
+import { useShortScreen } from './use-narrow';
 import { toast } from '@tinacms/ui/components/toast';
 import { Tabs, TabsPanel } from '@tinacms/ui/components/tabs';
 import {
@@ -293,18 +293,24 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
 
 // Toasts sit above the Save progress card while it shows.
 const TOAST_OFFSET_ABOVE_CARD = { bottom: '8rem' };
-// On narrow screens toasts also clear the form bar and the Status bar.
+// Toasts clear the form bar and the Status bar at every form column width.
 const TOAST_OFFSET_ABOVE_BAR = { bottom: '7rem' };
 // Below the dialog layer, so a Confirm dims the toasts behind it.
 const TOAST_LAYER = { zIndex: 40 };
+// With the on-screen keyboard open the toast would cover the field being typed in.
+const TOAST_HIDDEN = { ...TOAST_LAYER, visibility: 'hidden' } as const;
 
 function ShellToaster() {
   const cardShowing = useLongSave();
-  const narrow = useNarrow();
-  let offset: { bottom: string } | undefined;
-  if (cardShowing) offset = TOAST_OFFSET_ABOVE_CARD;
-  else if (narrow) offset = TOAST_OFFSET_ABOVE_BAR;
-  return <Toaster offset={offset} mobileOffset={offset} style={TOAST_LAYER} />;
+  const short = useShortScreen();
+  const offset = cardShowing ? TOAST_OFFSET_ABOVE_CARD : TOAST_OFFSET_ABOVE_BAR;
+  return (
+    <Toaster
+      offset={offset}
+      mobileOffset={offset}
+      style={short ? TOAST_HIDDEN : TOAST_LAYER}
+    />
+  );
 }
 
 function MissingPanel({

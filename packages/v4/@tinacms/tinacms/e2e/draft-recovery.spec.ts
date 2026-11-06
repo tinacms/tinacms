@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
+import { setColumnWidth } from './form-column';
 
 const DOCUMENT = '/#/collections/post/content%2Fposts%2Fhello-world.mdx';
 const WIDTHS = [
@@ -174,3 +175,79 @@ for (const { name, width, height } of WIDTHS) {
     });
   });
 }
+
+const clearOf = async (page: Page, selector: string) => {
+  const toast = await page.locator('[data-sonner-toast]').first().boundingBox();
+  const other = await page.locator(selector).first().boundingBox();
+  if (!toast || !other) return true;
+  return !(
+    toast.x < other.x + other.width &&
+    toast.x + toast.width > other.x &&
+    toast.y < other.y + other.height &&
+    toast.y + toast.height > other.y
+  );
+};
+
+const waitForPrompt = async (page: Page) => {
+  await typeTitle(page, ' EDIT');
+  await reload(page);
+  await expect(prompt(page)).toBeVisible();
+};
+
+test.describe('the Resume toast keeps the form usable', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(DOCUMENT);
+    await expect(title(page)).toBeVisible();
+    await page.evaluate(() => {
+      for (const key of Object.keys(localStorage)) {
+        if (key.startsWith('tina-drafts')) localStorage.removeItem(key);
+      }
+    });
+  });
+
+  for (const width of [1024, 1094, 1440]) {
+    test(`Save and Document actions stay clickable at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await waitForPrompt(page);
+      await typeTitle(page, '!');
+      await expect.poll(() => clearOf(page, '[data-slot=form-bar]')).toBe(true);
+    });
+  }
+
+  test('Save stays clickable with the form column dragged to its widest', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(DOCUMENT);
+    await setColumnWidth(page, 1040);
+    await waitForPrompt(page);
+    await typeTitle(page, '!');
+    await expect.poll(() => clearOf(page, '[data-slot=form-bar]')).toBe(true);
+  });
+
+  for (const height of [440, 460, 480]) {
+    test(`Resume can be tapped over the rich-text toolbar at ${height}px high`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 390, height });
+      await waitForPrompt(page);
+      await page
+        .getByRole('button', { name: 'Resume' })
+        .hover({ timeout: 4000 });
+    });
+  }
+
+  test('the toast steps aside while the keyboard shrinks the screen, and Title stays tappable', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 664 });
+    await waitForPrompt(page);
+    await page.setViewportSize({ width: 390, height: 332 });
+    await expect(prompt(page)).toBeHidden();
+    await title(page).click({ timeout: 4000 });
+    await page.setViewportSize({ width: 390, height: 664 });
+    await expect(prompt(page)).toBeVisible();
+  });
+});
