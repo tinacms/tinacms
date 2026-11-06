@@ -1,4 +1,10 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -39,6 +45,7 @@ import { Toast, toast } from '@tinacms/ui/components/toast';
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from '@tinacms/ui/components/tooltip';
 
@@ -223,6 +230,55 @@ describe('Tooltip', () => {
     await waitFor(() => expect(bubble()).toHaveTextContent('Search'));
     await user.keyboard('{Escape}');
     await waitFor(() => expect(bubble()).toBeNull());
+  });
+});
+
+describe('Tooltip, light', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const bubble = () => document.querySelector('[data-slot="tooltip-content"]');
+
+  it('draws the bubble on the light popover fill', async () => {
+    const user = userEvent.setup();
+    render(
+      <Tooltip>
+        <TooltipTrigger
+          render={<Button variant='icon' icon='search' aria-label='Search' />}
+        />
+        <TooltipContent>Search</TooltipContent>
+      </Tooltip>
+    );
+    await user.tab();
+    await waitFor(() => expect(bubble()).not.toBeNull());
+    expect(bubble()).toHaveClass('bg-popover');
+    expect(bubble()?.className).not.toContain('inv-');
+  });
+
+  it('waits half a second on hover before it shows', async () => {
+    render(
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger
+            render={<Button variant='icon' icon='search' aria-label='Search' />}
+          />
+          <TooltipContent>Search</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+    vi.useFakeTimers();
+    const trigger = screen.getByRole('button', { name: 'Search' });
+    act(() => {
+      fireEvent.pointerEnter(trigger);
+      fireEvent.pointerMove(trigger);
+      fireEvent.mouseEnter(trigger);
+      fireEvent.mouseMove(trigger);
+    });
+    await act(() => vi.advanceTimersByTimeAsync(499));
+    expect(bubble()).toBeNull();
+    await act(() => vi.advanceTimersByTimeAsync(1));
+    expect(bubble()).not.toBeNull();
   });
 });
 
