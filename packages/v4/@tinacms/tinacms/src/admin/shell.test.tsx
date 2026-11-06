@@ -1,3 +1,4 @@
+import { ImageIcon } from 'lucide-react';
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -38,6 +39,7 @@ let listCalls: number;
 let failAfterSave: boolean;
 let updateError: Error | undefined;
 let heldDefault: Promise<void> | undefined;
+let duplicateLabels: boolean;
 
 const contentPlugin = () =>
   definePlugin({
@@ -133,6 +135,22 @@ const screenPlugin = definePlugin({
   }),
 });
 
+const duplicateScreenPlugin = definePlugin({
+  name: 'test:duplicates',
+  client: async () => ({
+    default: {
+      screens: [{ name: 'prefs', label: 'Prefs', component: NotesScreen }],
+      slots: {
+        globalNav: ['Settings', 'Notes', 'Notes'].map((label) => ({
+          label,
+          icon: ImageIcon,
+          target: { kind: 'screen' as const, screen: 'prefs' },
+        })),
+      },
+    },
+  }),
+});
+
 const renderAdmin = (projectName?: string) =>
   render(
     <TinaAdmin
@@ -141,6 +159,7 @@ const renderAdmin = (projectName?: string) =>
           contentPlugin(),
           auditPlugin,
           screenPlugin,
+          ...(duplicateLabels ? [duplicateScreenPlugin] : []),
           ...(searchEnabled ? [searchPlugin] : []),
           stringFieldPlugin,
           coreValidatorsPlugin,
@@ -195,6 +214,7 @@ beforeEach(() => {
   failAfterSave = false;
   updateError = undefined;
   heldDefault = undefined;
+  duplicateLabels = false;
   window.location.hash = '';
 });
 
@@ -358,6 +378,39 @@ describe('Top bar', () => {
     expect(within(list).getAllByRole('listitem')).toHaveLength(1);
     await user.click(within(list).getByRole('button', { name: 'Settings' }));
     await waitFor(() => expect(window.location.hash).toBe('#/settings'));
+  });
+
+  it('keeps every Search row when two entries share a label', async () => {
+    duplicateLabels = true;
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /Search/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Search' });
+    const list = within(dialog).getByRole('list', {
+      name: 'Navigation results',
+    });
+    const all = within(list).getAllByRole('listitem').length;
+    const box = within(dialog).getByRole('searchbox');
+    await user.type(box, 'Set');
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((row) => row.textContent)
+    ).toEqual(['Settings', 'Settings']);
+    await user.clear(box);
+    await user.type(box, 'Not');
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((row) => row.textContent)
+    ).toEqual(['Notes', 'Notes']);
+    await user.clear(box);
+    expect(within(list).getAllByRole('listitem')).toHaveLength(all);
+    expect(
+      error.mock.calls.some(([message]) => String(message).includes('same key'))
+    ).toBe(false);
+    error.mockRestore();
   });
 
   it('opens Search with ⌘K, even from a focused field, when a search provider exists', async () => {

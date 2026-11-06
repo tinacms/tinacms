@@ -11,6 +11,7 @@ import {
 import { OBJECT_FIELD_TYPE } from '../plugins/fields/object/object-field.schema';
 import type { FieldSchema } from '../core/schema/types';
 import type { FormId } from '../form/form-store';
+import type { FieldLock } from './context';
 
 export interface OpenLevel {
   address: FieldAddress;
@@ -227,6 +228,20 @@ export const fieldsAlong = (
   return along;
 };
 
+// The lock an open level inherits from the fields above it. The level's own
+// field, the last step, locks itself.
+export const lockAbove = (
+  address: string,
+  fields: readonly FieldSchema[],
+  valueAt: (address: string) => unknown
+): FieldLock => {
+  const above = fieldsAlong(address, fields, valueAt).slice(0, -1);
+  return {
+    disabled: above.some((step) => step.node.disabled === true),
+    readOnly: above.some((step) => step.node.readOnly === true),
+  };
+};
+
 // The levels that must be open for the field at `address` to be on screen.
 export const levelsFor = (
   address: string,
@@ -237,18 +252,3 @@ export const levelsFor = (
   fieldsAlong(address, fields, valueAt).filter(
     (step) => step.address !== address && drillsIn(step)
   );
-
-/** Whether a field above an open level is disabled or read-only. The level's own fields are too. */
-export const lockAbove = (
-  address: string,
-  fields: readonly FieldSchema[],
-  valueAt: (address: string) => unknown
-): { disabled: boolean; readOnly: boolean } => {
-  const above = fieldsAlong(address, fields, valueAt).filter(
-    (step) => step.address !== address && !step.item
-  );
-  return {
-    disabled: above.some(({ node }) => node.disabled === true),
-    readOnly: above.some(({ node }) => node.readOnly === true),
-  };
-};
