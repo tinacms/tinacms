@@ -10,7 +10,7 @@ import {
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
-import { useShortScreen } from './use-narrow';
+import { useKeyboardOpen } from './use-narrow';
 import { toast } from '@tinacms/ui/components/toast';
 import { Tabs, TabsPanel } from '@tinacms/ui/components/tabs';
 import {
@@ -302,13 +302,13 @@ const TOAST_HIDDEN = { ...TOAST_LAYER, visibility: 'hidden' } as const;
 
 function ShellToaster() {
   const cardShowing = useLongSave();
-  const short = useShortScreen();
+  const keyboardOpen = useKeyboardOpen();
   const offset = cardShowing ? TOAST_OFFSET_ABOVE_CARD : TOAST_OFFSET_ABOVE_BAR;
   return (
     <Toaster
       offset={offset}
       mobileOffset={offset}
-      style={short ? TOAST_HIDDEN : TOAST_LAYER}
+      style={keyboardOpen ? TOAST_HIDDEN : TOAST_LAYER}
     />
   );
 }

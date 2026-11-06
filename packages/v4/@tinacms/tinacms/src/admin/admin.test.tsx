@@ -1072,10 +1072,10 @@ describe('TinaAdmin draft recovery contract', () => {
         })
       )
     );
-    dismiss.mockClear();
     expect(dismiss).not.toHaveBeenCalledWith(
       expect.stringMatching(/^save-failed:/)
     );
+    dismiss.mockClear();
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() =>
       expect(dismiss).toHaveBeenCalledWith(
@@ -1175,6 +1175,75 @@ describe('TinaAdmin draft recovery contract', () => {
     expect(update).toHaveBeenCalledTimes(1);
     expect(readDraft(hello)?.values).toMatchObject({
       title: expect.stringMatching(/!$/),
+    });
+  });
+
+  it('Retry clicked right after leaving does nothing to the store or the disk', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const update = vi
+      .spyOn(provider, 'update')
+      .mockRejectedValueOnce(new Error('offline'));
+    update.mockClear();
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const retry = within(await screen.findByRole('alert')).getByRole('button', {
+      name: 'Retry',
+    });
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(retry);
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(readDraft(hello)?.values).toMatchObject({
+      title: expect.stringMatching(/!$/),
+    });
+  });
+
+  it('Retry clicked on another document never writes the first one into it', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const update = vi
+      .spyOn(provider, 'update')
+      .mockRejectedValueOnce(new Error('offline'));
+    update.mockClear();
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const retry = within(await screen.findByRole('alert')).getByRole('button', {
+      name: 'Retry',
+    });
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /second\.mdx/ })
+    );
+    await screen.findByLabelText(/^Title\b/);
+    await user.click(retry);
+    expect(update).toHaveBeenCalledTimes(1);
+  });
+
+  it('Retry after leaving and coming back saves what is typed now', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const update = vi
+      .spyOn(provider, 'update')
+      .mockRejectedValueOnce(new Error('offline'));
+    update.mockClear();
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const retry = within(await screen.findByRole('alert')).getByRole('button', {
+      name: 'Retry',
+    });
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText(/^Title\b/), '?');
+    await user.click(retry);
+    await waitFor(() => expect(update).toHaveBeenCalledTimes(2));
+    expect(update.mock.calls[1][2]).toMatchObject({
+      title: expect.stringMatching(/\?$/),
     });
   });
 

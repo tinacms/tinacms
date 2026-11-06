@@ -284,11 +284,10 @@ const buildStaleDraftActions = (
     for (const copy of copies.toReversed()) {
       if (!copy.leftover) break;
       for (const name of Object.keys(copy.values)) {
-        const held = !equal(
-          toFieldAddress(name),
-          copy.values[name],
-          copy.baseline[name]
-        );
+        const address = toFieldAddress(name);
+        const held =
+          !equal(address, copy.values[name], copy.baseline[name]) &&
+          !equal(address, copy.values[name], ingested[name]);
         const label = labels.get(name) ?? name;
         if (held && !leftoverFields.includes(label)) leftoverFields.push(label);
       }

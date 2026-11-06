@@ -239,15 +239,25 @@ test.describe('the Resume toast keeps the form usable', () => {
     });
   }
 
-  test('the toast steps aside while the keyboard shrinks the screen, and Title stays tappable', async ({
+  test('the toast steps aside while a field has focus on a shrunk screen, and returns after', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 390, height: 664 });
     await waitForPrompt(page);
     await page.setViewportSize({ width: 390, height: 332 });
-    await expect(prompt(page)).toBeHidden();
-    await title(page).click({ timeout: 4000 });
-    await page.setViewportSize({ width: 390, height: 664 });
     await expect(prompt(page)).toBeVisible();
+    await title(page).focus();
+    await expect(prompt(page)).toBeHidden();
+    await title(page).blur();
+    await expect(prompt(page)).toBeVisible();
+  });
+
+  test('Resume stays reachable on a landscape phone with no keyboard open', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 750, height: 342 });
+    await waitForPrompt(page);
+    await page.getByRole('button', { name: 'Resume' }).hover({ timeout: 4000 });
+    await page.getByRole('button', { name: 'Resume' }).click();
   });
 });
