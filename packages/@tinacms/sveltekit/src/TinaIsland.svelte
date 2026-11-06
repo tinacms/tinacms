@@ -1,4 +1,5 @@
 <script lang="ts">
+import { isIslandName } from '@tinacms/bridge/island';
 import type { Snippet } from 'svelte';
 
 interface Props {
@@ -6,6 +7,7 @@ interface Props {
   wrapper: { tag: string; className?: string };
   params?: Record<string, string | number>;
   primary?: boolean;
+  /** Content updates through `useTina`: the bridge primes the island but never replaces its HTML. */
   managed?: boolean;
   basePath?: string;
   children?: Snippet;
@@ -48,7 +50,7 @@ function buildIslandMarker(
   islandParams: Props['params'],
   pathBase: string
 ): string {
-  if (!/^[A-Za-z][A-Za-z0-9-]*$/.test(islandName)) {
+  if (!isIslandName(islandName)) {
     throw new TypeError('Tina island name must be a valid URL path segment');
   }
   if (

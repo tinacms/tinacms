@@ -1,3 +1,4 @@
+import { hashFromQuery } from '@tinacms/bridge/metadata';
 import { PREVIEW_CONTENT_TYPE, PRIME_HEADER } from '@tinacms/bridge/preview';
 import type { APIContext } from 'astro';
 import { describe, expect, it } from 'vitest';
@@ -42,7 +43,11 @@ function call(
   const url = new URL(`http://localhost/tina-island/${name}`);
   const request = new Request(url, {
     method: 'POST',
-    headers: { 'content-type': PREVIEW_CONTENT_TYPE, ...headers },
+    headers: {
+      'content-type': PREVIEW_CONTENT_TYPE,
+      origin: url.origin,
+      ...headers,
+    },
     body: '{}',
   });
   return Promise.resolve(
@@ -55,8 +60,14 @@ describe('experimental_createIslandRoute', () => {
     const res = await call({});
     expect(res.status).toBe(200);
     const html = await res.text();
+    const id = hashFromQuery(
+      JSON.stringify({
+        query: 'query Post',
+        variables: { relativePath: 'hello.md' },
+      })
+    );
     expect(html).toContain(
-      '<article class="prose" data-tina-island="/tina-island/post">'
+      `<article class="prose" data-tina-island="/tina-island/post" data-tina-island-forms="${id}">`
     );
     expect(html).toContain('stub');
     expect(html).not.toContain('data-tina-form=');
@@ -104,16 +115,83 @@ describe('experimental_createIslandRoute', () => {
   });
 
   it('404s an unknown island', async () => {
-    const url = new URL('http://localhost/tina-island/nope');
+    const res = await call({}, 'nope');
+    expect(res.status).toBe(404);
+    expect(await res.text()).toBe('Not Found');
+  });
+
+  it('404s names inherited from Object.prototype', async () => {
+    for (const name of ['constructor', 'toString', '__proto__']) {
+      expect((await call({}, name)).status).toBe(404);
+    }
+  });
+
+  it('rejects a cross-site request', async () => {
+    const res = await call({
+      origin: 'https://evil.example',
+      'sec-fetch-site': 'cross-site',
+    });
+    expect(res.status).toBe(403);
+  });
+
+  it('rejects a body that is not a JSON object', async () => {
+    const url = new URL('http://localhost/tina-island/post');
     const res = (await route({
-      params: { name: 'nope' },
+      params: { name: 'post' },
       request: new Request(url, {
         method: 'POST',
-        headers: { 'content-type': PREVIEW_CONTENT_TYPE },
+        headers: {
+          'content-type': PREVIEW_CONTENT_TYPE,
+          origin: url.origin,
+        },
+        body: '[]',
+      }),
+      url,
+    } as unknown as APIContext)) as Response;
+    expect(res.status).toBe(400);
+  });
+
+  it('answers a failing loader with a generic 500', async () => {
+    const failing = experimental_createIslandRoute({
+      post: {
+        fetch: () => Promise.reject(new Error('backend down')),
+        component: IslandStub,
+        wrapper: { tag: 'article' },
+        propsFromData: () => ({}),
+      },
+    });
+    const url = new URL('http://localhost/tina-island/post');
+    const res = (await failing({
+      params: { name: 'post' },
+      request: new Request(url, {
+        method: 'POST',
+        headers: {
+          'content-type': PREVIEW_CONTENT_TYPE,
+          origin: url.origin,
+        },
         body: '{}',
       }),
       url,
     } as unknown as APIContext)) as Response;
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(500);
+    expect(await res.text()).toBe('Island render failed');
+  });
+
+  it('throws on an invalid registry', () => {
+    const island = {
+      fetch: async () => ({}),
+      component: IslandStub,
+      propsFromData: () => ({}),
+    };
+    expect(() =>
+      experimental_createIslandRoute({
+        'not/a/segment': { ...island, wrapper: { tag: 'div' } },
+      })
+    ).toThrow(TypeError);
+    expect(() =>
+      experimental_createIslandRoute({
+        post: { ...island, wrapper: { tag: 'img' } },
+      })
+    ).toThrow(TypeError);
   });
 });

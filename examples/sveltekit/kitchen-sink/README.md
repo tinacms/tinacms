@@ -139,15 +139,22 @@ component has a scoped `<style>` block.
    `data-tina-form` and should not load `/admin/bridge.js`.
 3. After `pnpm build:static`: `build-static/index.html` exists and
    `build-static/admin/` does not.
-4. After `pnpm build && pnpm preview`: in the admin, the preview POSTs to
-   `/tina-island/post?slug=…`, gets 200, and updates as you edit.
+4. After `pnpm build && pnpm preview`: `/posts/large-file` is prerendered, so
+   its HTML has no `data-tina-form`. The island endpoint supplies the form
+   instead; this should print one `data-tina-form` followed by the
+   `<article … data-tina-island=…>` wrapper:
 
-**`pnpm start` over plain HTTP.** adapter-node 6 assumes `https` unless
-`PROTOCOL_HEADER` names a header your proxy sets (e.g. `x-forwarded-proto`).
-Over plain `http://localhost` the island endpoint then sees a different origin
-than the browser sends and answers 403, so live editing fails. Use
-`pnpm preview` locally; in production, serve over HTTPS or set
-`PROTOCOL_HEADER`.
+   ```sh
+   curl -s -X POST 'http://localhost:4173/tina-island/post?slug=large-file' \
+     -H 'content-type: application/x-tina-preview+json' \
+     -H 'origin: http://localhost:4173' -H 'x-tina-prime: 1' -d '{}'
+   ```
+
+   `pnpm build` builds the production admin, which signs in to TinaCloud, so
+   `/admin` on the preview server only works with `TINA_CLIENT_ID` and
+   `TINA_TOKEN` set. There, opening a post primes the island once and edits
+   update through `useTina` (the post island is `managed`) without further
+   island requests.
 
 `pnpm check` also lists errors from `tina/__generated__/` and the core
 `tinacms` sources. Those come from the tsconfig scope, not this app's code.
