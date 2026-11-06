@@ -202,13 +202,15 @@ export const fieldsAlong = (
 };
 
 // The lock an open level inherits from the fields above it. The level's own
-// field, the last step, locks itself.
+// field locks itself.
 export const lockAbove = (
   address: string,
   fields: readonly FieldSchema[],
   valueAt: (address: string) => unknown
 ): FieldLock => {
-  const above = fieldsAlong(address, fields, valueAt).slice(0, -1);
+  const above = fieldsAlong(address, fields, valueAt).filter(
+    (step) => step.address !== address
+  );
   return {
     disabled: above.some((step) => step.node.disabled === true),
     readOnly: above.some((step) => step.node.readOnly === true),

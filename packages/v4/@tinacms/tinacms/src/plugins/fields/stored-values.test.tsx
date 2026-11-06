@@ -2,6 +2,8 @@ import { QueryClient } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../config';
+import { resolveFieldPlugins } from '../../core/field/registry';
+import { digestDocument, ingestDocument } from '../../core/form/ingest';
 import type { ContentProvider } from '../../core/content/contract';
 import type { MediaProvider } from '../../core/media/contract';
 import { type PluginManifest, definePlugin } from '../../core/plugin';
@@ -66,6 +68,9 @@ const STORED_VALUES: [string, unknown][] = [
   ['a string', 'hello'],
   ['a list', ['a', 'b']],
   ['an object', { a: 1 }],
+  ['a number list', [1, 2]],
+  ['false', false],
+  ['infinity', Number.POSITIVE_INFINITY],
 ];
 
 const CASES = FIELDS.flatMap((field) =>
@@ -183,5 +188,33 @@ describe('Clear on a stored value of the wrong shape', () => {
     const clear = await screen.findByRole('button', { name: 'Clear' });
     if (/read-only|disabled/.test(kind)) expect(clear).toBeDisabled();
     else expect(clear).toBeEnabled();
+  });
+});
+
+describe('Save on a locked field holding a value of the wrong type', () => {
+  const LOCKED = ['number', 'datetime'].flatMap((type) =>
+    (['readOnly', 'disabled'] as const).map((state) => ({
+      type,
+      state,
+      field:
+        type === 'number'
+          ? t.number({ name: 'field', label: 'Field', [state]: true })
+          : t.datetime({ name: 'field', label: 'Field', [state]: true }),
+    }))
+  );
+  const WRONG_TYPE = STORED_VALUES.filter(
+    ([, value]) => typeof value !== 'string'
+  );
+
+  it.each(
+    LOCKED.flatMap((entry) =>
+      WRONG_TYPE.map(([kind, value]) => ({ ...entry, kind, value }))
+    )
+  )('$state $type keeps $kind as it was stored', async ({ field, value }) => {
+    const registry = await resolveFieldPlugins(corePlugins);
+    const ingested = ingestDocument({ field: value }, [field], { registry });
+    expect(digestDocument(ingested, [field], { registry })).toEqual({
+      field: value,
+    });
   });
 });
