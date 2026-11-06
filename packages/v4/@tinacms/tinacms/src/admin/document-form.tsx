@@ -18,10 +18,15 @@ import {
 } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useStore } from 'zustand';
-import { type FormScope, FormScopeContext } from '../editor/context';
+import {
+  FieldLockContext,
+  type FormScope,
+  FormScopeContext,
+} from '../editor/context';
 import { Field, FieldNode } from '../editor/field';
 import {
   fieldsAlong,
+  lockAbove,
   holdsRevealedError,
   levelDrillsIn,
   levelsFor,
@@ -392,6 +397,7 @@ function OpenLevelFrame({
 
 function FormFields({ scope }: { scope: FormScope }) {
   const current = useStore(scope.view, (state) => state.openLevels.at(-1));
+  const { getValues } = useFormContext();
   if (!current) {
     return (
       <FormLevel pinHeaders>
@@ -403,7 +409,11 @@ function FormFields({ scope }: { scope: FormScope }) {
   }
   return (
     <OpenLevelFrame scope={scope} current={current}>
-      <FieldNode address={current.address} node={current.node} />
+      <FieldLockContext
+        value={lockAbove(current.address, scope.collection.fields, getValues)}
+      >
+        <FieldNode address={current.address} node={current.node} />
+      </FieldLockContext>
     </OpenLevelFrame>
   );
 }
