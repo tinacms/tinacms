@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
@@ -11,6 +11,7 @@ import type {
 import { FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import { LabelledFields } from '../../../test/labelled-fields';
+import { openBlockPicker } from '../../../test/open-block-picker';
 import numberFieldPlugin from '../number/number-field.plugin';
 import objectFieldPlugin from '../object/object-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
@@ -129,7 +130,8 @@ describe('defaultItem', () => {
         })
       )
     );
-    await user.click(await screen.findByRole('button', { name: 'Add hero' }));
+    const panel = await openBlockPicker();
+    await user.click(within(panel).getByRole('button', { name: 'Add hero' }));
     expect(screen.getByLabelText('Headline')).toHaveValue('New hero');
   });
 
@@ -261,8 +263,9 @@ describe('picker and previewImage', () => {
 
   it('lists Add buttons when no template has a previewImage', async () => {
     renderCollection(blocks());
+    const panel = await openBlockPicker();
     expect(
-      await screen.findByRole('button', { name: 'Add Hero' })
+      within(panel).getByRole('button', { name: 'Add Hero' })
     ).toBeInTheDocument();
     expect(tiles()).toHaveLength(0);
   });
@@ -270,7 +273,8 @@ describe('picker and previewImage', () => {
   it('shows a grid with each preview and label when a template has a previewImage', async () => {
     const user = userEvent.setup();
     renderCollection(blocks(undefined, 'blocks/hero.png'));
-    const tile = await screen.findByRole('button', { name: 'Add Hero' });
+    const panel = await openBlockPicker();
+    const tile = within(panel).getByRole('button', { name: 'Add Hero' });
     expect(tile).toHaveTextContent('Hero');
     expect(tiles()[0]).toHaveAttribute('src', '/uploads/blocks/hero.png');
     await user.click(tile);
@@ -279,14 +283,16 @@ describe('picker and previewImage', () => {
 
   it('honours an explicit list over a previewImage', async () => {
     renderCollection(blocks('list', 'blocks/hero.png'));
-    await screen.findByRole('button', { name: 'Add Hero' });
+    const panel = await openBlockPicker();
+    within(panel).getByRole('button', { name: 'Add Hero' });
     expect(tiles()).toHaveLength(0);
   });
 
   it('shows the label alone for a URL previewImage', async () => {
     renderCollection(blocks('grid', 'https://example.com/hero.png'));
+    const panel = await openBlockPicker();
     expect(
-      await screen.findByRole('button', { name: 'Add Hero' })
+      within(panel).getByRole('button', { name: 'Add Hero' })
     ).toHaveTextContent('Hero');
     expect(tiles()).toHaveLength(0);
   });
