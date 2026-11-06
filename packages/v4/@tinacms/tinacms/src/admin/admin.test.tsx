@@ -1052,9 +1052,12 @@ describe('TinaAdmin rail', () => {
     await user.keyboard('{ArrowDown}');
     expect(screen.getByRole('button', { name: 'Collections' })).toHaveFocus();
     await user.keyboard('{End}');
-    expect(
-      screen.getByRole('link', { name: /Help & docs/ })
-    ).toBeInTheDocument();
+    const help = screen.getByRole('link', { name: /Help & docs/ });
+    expect(help).toHaveFocus();
+    await user.keyboard('{ArrowUp}');
+    expect(help).not.toHaveFocus();
+    await user.keyboard('{ArrowDown}');
+    expect(help).toHaveFocus();
     await user.keyboard('{Home}');
     expect(home).toHaveFocus();
     await user.keyboard('{ArrowUp}');
@@ -1076,7 +1079,35 @@ describe('TinaAdmin rail', () => {
     await user.keyboard('{ArrowUp}{Home}');
     expect(home).toHaveFocus();
     await user.keyboard('{End}');
-    expect(home).not.toHaveFocus();
+    expect(screen.getByRole('link', { name: /Help & docs/ })).toHaveFocus();
+  });
+
+  it('closes the phone rail sheet when a row is chosen', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+    try {
+      const user = userEvent.setup();
+      renderAdmin();
+      await user.click(
+        await screen.findByRole('button', { name: 'Toggle Sidebar' })
+      );
+      const sheet = await waitFor(() => {
+        const found = document.querySelector<HTMLElement>('[data-mobile=true]');
+        if (!found) throw new Error('The rail sheet is not open');
+        return found;
+      });
+      await user.click(
+        within(sheet).getByRole('button', { name: 'Collections' })
+      );
+      await waitFor(() => expect(sheet).not.toBeInTheDocument());
+      expect(window.location.hash).toBe('#/collections');
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('keeps unsaved edits when a rail row is clicked, and still blocks a reload', async () => {
@@ -1277,5 +1308,53 @@ describe('TinaAdmin rail', () => {
     ).toBeVisible();
     await user.click(screen.getAllByRole('button', { name: 'Close' }).at(-1)!);
     await waitFor(() => expect(window.location.hash).toBe('#/tools'));
+  });
+
+  it('hides the Tools panel below lg while one of its screens is open', async () => {
+    const linked = definePlugin({
+      name: 'test:tools-screen',
+      client: async () => ({
+        default: {
+          slots: {
+            globalNav: [
+              {
+                label: 'Reports',
+                icon: NavIcon,
+                target: { kind: 'screen', screen: 'unlinked' },
+              },
+            ],
+          },
+        },
+      }),
+    });
+    window.location.hash = '#/tools';
+    const user = userEvent.setup();
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          plugins: [...config.plugins, linked],
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    const panel = await screen.findByRole('complementary', {
+      name: 'Tools panel',
+    });
+    expect(panel).not.toHaveClass('max-lg:hidden');
+    await user.click(await screen.findByRole('button', { name: 'Reports' }));
+    await waitFor(() => expect(panel).toHaveClass('max-lg:hidden'));
+  });
+
+  it('hides the empty Media main area below lg', async () => {
+    window.location.hash = '#/media';
+    renderAdmin();
+    const heading = await screen.findAllByRole('heading', { name: 'Media' });
+    const main = heading
+      .map((node) => node.closest('[data-slot=sidebar-inset]'))
+      .find(Boolean);
+    expect(main).toHaveClass('max-lg:hidden');
   });
 });

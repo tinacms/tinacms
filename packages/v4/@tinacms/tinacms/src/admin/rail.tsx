@@ -144,6 +144,7 @@ function PluginEntries({
   activeScreen?: string;
   navigate: (route: AdminRoute) => void;
 }) {
+  const { setOpenMobile } = useSidebar();
   const labelPrefix = useId();
   const visible = groupedEntries(sections);
   return visible.map(({ group, entries }, index) => {
@@ -178,7 +179,10 @@ function PluginEntries({
                     />
                   ) : undefined
                 }
-                onClick={() => openNavTarget(target, navigate)}
+                onClick={() => {
+                  setOpenMobile(false);
+                  openNavTarget(target, navigate);
+                }}
               >
                 {label}
               </NavRow>
@@ -215,23 +219,28 @@ export function AdminRail({
   const onMedia =
     route.view === 'media' ||
     (route.view === 'screen' && route.screen === MEDIA_SCREEN);
+  const { setOpenMobile } = useSidebar();
+  const go = (next: AdminRoute) => {
+    setOpenMobile(false);
+    navigate(next);
+  };
   return (
-    <>
-      <SidebarContent onKeyDown={moveWithArrows}>
+    <div className='contents' onKeyDown={moveWithArrows}>
+      <SidebarContent>
         <SidebarGroup>
           <SidebarMenu aria-label='Navigation'>
             <RailEntry
               label='Home'
               glyph='home'
               selected={route.view === 'home'}
-              onOpen={() => navigate({ view: 'home' })}
+              onOpen={() => go({ view: 'home' })}
             />
             <RailEntry
               label='Collections'
               glyph='collection'
               opens
               selected={inCollections}
-              onOpen={() => navigate({ view: 'collections' })}
+              onOpen={() => go({ view: 'collections' })}
             />
             <RailEntry
               label='Media'
@@ -239,7 +248,7 @@ export function AdminRail({
               opens
               selected={onMedia}
               onOpen={() =>
-                navigate(
+                go(
                   hasMediaScreen
                     ? { view: 'screen', screen: MEDIA_SCREEN, segments: [] }
                     : { view: 'media' }
@@ -258,14 +267,14 @@ export function AdminRail({
               glyph='tools'
               opens
               selected={route.view === 'tools' || toolsScreenOpen}
-              onOpen={() => navigate({ view: 'tools' })}
+              onOpen={() => go({ view: 'tools' })}
             />
             <RailEntry
               label='Settings'
               glyph='settings'
               opens
               selected={route.view === 'settings'}
-              onOpen={() => navigate({ view: 'settings' })}
+              onOpen={() => go({ view: 'settings' })}
             />
           </SidebarMenu>
         </SidebarGroup>
@@ -300,6 +309,6 @@ export function AdminRail({
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-    </>
+    </div>
   );
 }

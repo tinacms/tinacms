@@ -38,7 +38,10 @@ for (const viewport of NARROW_VIEWPORTS) {
       const main = page.locator('[data-slot=sidebar-inset]');
       await expect(main).toBeVisible();
       const box = await main.boundingBox();
-      expect(box?.width).toBeGreaterThanOrEqual(viewport.width - 240);
+      const railInline = viewport.width >= 768;
+      expect(box?.width).toBeGreaterThanOrEqual(
+        railInline ? viewport.width - 240 : viewport.width
+      );
       const close = main.getByRole('button', { name: 'Close' });
       await expect(close).toBeVisible();
       const closeBox = await close.boundingBox();
@@ -48,3 +51,14 @@ for (const viewport of NARROW_VIEWPORTS) {
     });
   }
 }
+
+test('the media route hides its empty main area below 1024px', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.goto('/#/media');
+  await expect(page.locator('[data-slot=sidebar-inset]')).toBeHidden();
+  await expect(
+    page.getByRole('complementary', { name: 'Media panel' })
+  ).toBeVisible();
+});

@@ -213,14 +213,16 @@ function ShellToaster() {
 function MissingPanel({
   title,
   onClose,
+  hideBelowLg = false,
   children,
 }: {
   title: string;
   onClose: () => void;
+  hideBelowLg?: boolean;
   children: ReactNode;
 }) {
   return (
-    <SidebarInset className='min-w-0'>
+    <SidebarInset className={hideBelowLg ? 'min-w-0 max-lg:hidden' : 'min-w-0'}>
       <PanelHeader heading={title} closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto'>
         <Placeholder>{children}</Placeholder>
@@ -375,8 +377,10 @@ function AdminShell({
             Pick a collection to start editing.
           </MissingPanel>
         ) : route.view === 'media' ? (
-          <MissingPanel title='Media' onClose={goHome}>
-            Pick a file from the Media panel.
+          <MissingPanel title='Media' onClose={goHome} hideBelowLg>
+            {hasMediaScreen
+              ? 'Pick a file from the Media panel.'
+              : 'Nothing to show here yet.'}
           </MissingPanel>
         ) : route.view === 'tools' || route.view === 'settings' ? (
           <SidebarInset className='min-w-0'>
