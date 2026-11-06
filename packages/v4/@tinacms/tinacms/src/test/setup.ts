@@ -1,14 +1,25 @@
 import '@testing-library/jest-dom';
 import { configure } from '@testing-library/dom';
-import { beforeEach } from 'vitest';
+import { beforeAll, beforeEach, vi } from 'vitest';
 import { resolveClientSegments } from '../core/plugin';
 import { useFormStore } from '../form/form-store';
 import { corePlugins } from '../plugins/fields';
 
-// TinaProvider renders null until its boot resolves each plugin's client() thunk —
-// a dynamic import Vite transforms on demand. Load the core segments up front so
-// that cost never lands in a test's findBy* budget, where a loaded runner blows it.
-await resolveClientSegments(corePlugins);
+const gate = vi.hoisted(() => ({ providerLoaded: false }));
+
+// NOTE: [5 Nov 2026] EK - This pass-through mock tells setup that a test file loaded the
+// provider. Removing it, or reading the flag before collection, silently stops the warm-up.
+vi.mock('../editor/provider', (importOriginal) => {
+  gate.providerLoaded = true;
+  return importOriginal();
+});
+
+// TinaProvider renders null until its client() thunks resolve. Warm them before any
+// test body, in files that load the provider, so the import stays out of findBy* budgets.
+// The warm-up has taken over 30 s on a CI runner.
+beforeAll(async () => {
+  if (gate.providerLoaded) await resolveClientSegments(corePlugins);
+}, 120_000);
 
 // Backstop. No test that renders <TinaProvider> should need the headroom.
 configure({ asyncUtilTimeout: 5000 });
