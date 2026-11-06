@@ -1,8 +1,14 @@
 import { QueryClient } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toast } from '@tinacms/ui/components/toast';
-import { act } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { ContentProvider, DocumentEntry } from '../core/content/contract';
@@ -212,6 +218,10 @@ const FIXTURES: Record<string, DocumentEntry[]> = {
   ],
   page: [{ path: 'content/pages/about.mdx', document: { title: 'About' } }],
 };
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 beforeEach(() => {
   saved.length = 0;
@@ -1284,19 +1294,26 @@ describe('TinaAdmin rail', () => {
 
 describe('Toast tooltips', () => {
   it('opens the Dismiss tooltip after the half second the rest of the admin uses, not the 600ms default', async () => {
-    const user = userEvent.setup();
     renderAdmin();
     await screen.findByRole('button', { name: 'Toggle Sidebar' });
     act(() => {
       toast({ title: 'Heads up' });
     });
-    const dismiss = await screen.findByRole('button', { name: 'Dismiss' });
+    const card = (await screen.findByText('Heads up')).closest(
+      '[data-slot="toast"]'
+    ) as HTMLElement;
+    const dismiss = within(card).getByRole('button', { name: 'Dismiss' });
+    vi.useFakeTimers();
     const tip = () => document.querySelector('[data-slot="tooltip-content"]');
-    const start = performance.now();
-    await user.hover(dismiss);
-    await waitFor(() => expect(tip()).toHaveTextContent('Dismiss'));
-    const waited = performance.now() - start;
-    expect(waited).toBeGreaterThanOrEqual(450);
-    expect(waited).toBeLessThan(580);
+    act(() => {
+      fireEvent.pointerEnter(dismiss);
+      fireEvent.pointerMove(dismiss);
+      fireEvent.mouseEnter(dismiss);
+      fireEvent.mouseMove(dismiss);
+    });
+    await act(() => vi.advanceTimersByTimeAsync(499));
+    expect(tip()).toBeNull();
+    await act(() => vi.advanceTimersByTimeAsync(1));
+    expect(tip()).toHaveTextContent('Dismiss');
   });
 });

@@ -9,7 +9,6 @@ import { type Glyph, Icon } from '@tinacms/ui/components/icon';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type ToastTone = 'success' | 'error' | 'warning' | 'info' | 'neutral';
-type ToastTheme = 'light' | 'dark';
 
 type ToastAction = {
   label: string;
@@ -39,8 +38,6 @@ const TONE_ICON: Record<ToastTone, { glyph: Glyph; color: string }> = {
 type ToastProps = Omit<ComponentProps<'div'>, 'title' | 'children'> & {
   /** Sets the icon and its colour. Each tone has its own icon shape, so colour is never the only signal. */
   tone?: ToastTone;
-  /** @deprecated Every toast is light. Accepted and ignored for one release. */
-  theme?: ToastTheme;
   title: string;
   text?: string;
   action?: ToastAction;
@@ -57,7 +54,6 @@ type ToastProps = Omit<ComponentProps<'div'>, 'title' | 'children'> & {
  */
 function Toast({
   tone = 'success',
-  theme: _theme,
   title,
   text,
   action,
@@ -181,5 +177,5 @@ function toast({ duration, onDismiss, id, ...props }: ToastOptions) {
 }
 toast.dismiss = sonner.dismiss;
 
-export type { ToastAction, ToastOptions, ToastProps, ToastTheme, ToastTone };
+export type { ToastAction, ToastOptions, ToastProps, ToastTone };
 export { Toast, toast, toastVariants };
