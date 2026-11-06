@@ -261,9 +261,36 @@ Each item is a List card in a card list.
   its fields show their own errors.
 - The Add control ends the list. A list of strings or numbers with no
   `defaultItem` uses a box: type a value, press Enter. Any other list uses a
-  button. A block array shows the `list` or `grid` picker.
-- An empty list says so. A read-only list has no container, no Add control and
-  no menu. A disabled list has no hover and no menu.
+  button. A block array shows "Add a block".
+- An empty list says so. A block array says "No blocks.". Any other editable
+  array says "This list is empty. Add the first item below.". A read-only array
+  says "This list is empty.".
+- A read-only list has no container, no Add control and no menu. A disabled
+  list has no hover and no menu.
+
+### Block picker
+
+"Add a block" opens a floating panel named "Choose a block". It holds a search
+box ("Search blocks") and a flat list of the templates in schema order. The list
+has no group headings.
+
+- Search matches the template label, without regard to case. When nothing matches, the panel says "No blocks match."
+  The search box is empty each time the panel opens.
+- The panel is at most `--picker-max-height` (320px) tall, and less when the
+  window has less room. When the on-screen keyboard shrinks the viewport, the
+  panel stays inside the area the editor can see, over its button if it
+  must, wherever the button is on the page. The title and the search box stay in place, and the
+  list scrolls inside the panel. While a search narrows the list, the panel keeps
+  its top and height.
+- The look follows `picker`: `list` shows the label in a row, `grid` shows the
+  preview image over the label, two to a row. A missing, broken or non-media
+  `previewImage` shows the label alone.
+- Focus goes to the search box when the panel opens. Escape, a press outside the
+  panel or a pick closes it. After Escape or an outside press, focus returns to
+  "Add a block".
+- A pick adds the block and closes the panel. The block opens by the depth rule
+  below, and focus moves to it.
+- The panel does not open when the list is full or the field is disabled.
 
 ### Opening an item
 
@@ -289,15 +316,20 @@ and Remove. Remove acts at once, with no dialog and no Undo bar. Drag the grip
 to reorder, or press the up and down arrow keys while the grip has focus.
 
 After Remove, focus goes to the grip of the next item, else the previous item,
-else the Add control. After Insert, Duplicate or a move, focus goes to the grip
+else the Add control ("Add a block" for a block array). After Insert, Duplicate or a move, focus goes to the grip
 of the item. A new object item opens.
 
 A `max` validator on the array sets the full state. When the list is full, the
 Add control is off and says why, and Insert above, Insert below and Duplicate
 are off with the hint "List is full".
 
-For a block array, Insert above and Insert below open the template picker at
-that place, and the chosen template goes in there.
+For a block array, Insert above and Insert below open the same picker in the
+list at that place, with a Cancel button. The chosen template goes in there.
+Focus goes to the search box. Escape or Cancel closes the picker, inserts
+nothing and returns focus to the grip of the card whose menu opened it. Opening
+the Add panel closes the insert picker, and the other way round. The picker
+follows the card that opened it: Move up, Move down and Remove on other cards
+keep the gap next to that card. Removing that card closes the picker.
 
 ### Item fields
 
