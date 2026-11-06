@@ -11,14 +11,24 @@ type TopBarProps = Omit<ComponentProps<'header'>, 'children'> & {
   projectName?: string;
   /** The branch button. Leave it out when there are no branches. */
   branch?: ReactNode;
-  /** The Search control. Leave it out when no search provider exists. */
+  /** Dev controls: a dashed button before Search. Leave it out outside development. */
+  devControls?: ReactNode;
+  /** The Search control. */
   search?: ReactNode;
   /** The account button. */
   account?: ReactNode;
 };
 
+function Slash() {
+  return (
+    <span aria-hidden='true' className='flex-none text-muted-foreground'>
+      /
+    </span>
+  );
+}
+
 /**
- * The 44px bar along the top of the admin: toggle, logo, project name and
+ * The 56px bar along the top of the admin: toggle, logo, project name and
  * branch at the start; Search and the account button at the end. Below 768px
  * the project name and branch truncate, so nothing overflows at 375px.
  */
@@ -27,6 +37,7 @@ function TopBar({
   logo,
   projectName,
   branch,
+  devControls,
   search,
   account,
   className,
@@ -37,7 +48,7 @@ function TopBar({
       aria-label='Top bar'
       data-slot='top-bar'
       className={cn(
-        'box-border flex h-11 w-full min-w-0 flex-none items-center gap-2 border-b border-border-subtle bg-card px-2 font-sans text-base leading-control text-foreground',
+        'box-border flex h-14 w-full min-w-0 flex-none items-center gap-2 border-b border-border-subtle bg-card px-2 font-sans text-base leading-control text-foreground',
         className
       )}
       {...props}
@@ -46,17 +57,25 @@ function TopBar({
         {toggle}
         {logo}
         {projectName ? (
-          <span
-            data-slot='top-bar-project'
-            className='min-w-0 truncate font-semibold'
-            title={projectName}
-          >
-            {projectName}
-          </span>
+          <>
+            <Slash />
+            <span
+              data-slot='top-bar-project'
+              className='min-w-0 shrink-[4] truncate font-semibold'
+              title={projectName}
+            >
+              {projectName}
+            </span>
+          </>
         ) : null}
-        {branch ? <div className='min-w-0 flex-initial'>{branch}</div> : null}
+        {branch ? (
+          <div className='flex min-w-0 flex-initial items-center gap-2 before:flex-none before:text-muted-foreground before:[content:"/"_/_""] empty:hidden'>
+            {branch}
+          </div>
+        ) : null}
       </div>
       <div className='flex flex-none items-center gap-1'>
+        {devControls}
         {search}
         {account}
       </div>

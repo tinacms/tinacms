@@ -6,6 +6,7 @@ import { TopBar } from '@tinacms/ui/components/top-bar';
 import tinaLogo from '@tinacms/ui/assets/tinacms-logo.svg';
 import { useEffect, useState } from 'react';
 import {
+  type SaveFailureReason,
   type SaveSummary,
   useAnyFormDirty,
   useSaveSummary,
@@ -17,13 +18,27 @@ import { SearchControl } from './search';
 // A save shorter than this finishes before the card would flash.
 const SAVE_PROGRESS_DELAY_MS = 1000;
 
-const STATUS_WORDS: Record<SaveSummary['state'], string> = {
-  idle: 'No changes',
-  unsaved: 'Unsaved changes',
-  saving: 'Saving…',
-  saved: 'Saved',
-  failed: 'Save failed',
+const FAILURE_WORDS: Record<SaveFailureReason, string> = {
+  conflict: 'Save failed: someone else saved first',
+  'branch-gone': 'Save failed: branch no longer exists',
 };
+
+/** The Status bar's words for a save summary. Local files say so when nothing has saved. */
+export function statusWords(summary: SaveSummary, local: boolean): string {
+  switch (summary.state) {
+    case 'idle':
+      if (summary.kept) return 'Unsaved edits kept in this browser';
+      return local ? 'No saves yet this session' : 'No changes';
+    case 'unsaved':
+      return 'Unsaved changes';
+    case 'saving':
+      return 'Saving…';
+    case 'saved':
+      return summary.document ? `Saved: “${summary.document}”` : 'Saved';
+    case 'failed':
+      return summary.reason ? FAILURE_WORDS[summary.reason] : 'Save failed';
+  }
+}
 
 /** True once a save has run for longer than the delay. */
 export function useLongSave(): boolean {
@@ -44,10 +59,14 @@ function BranchControl() {
   const branch = useBranchView();
   const saving = useSaveSummary().state === 'saving';
   const dirty = useAnyFormDirty();
-  if (branch?.mode !== 'branches' || !branch.name) return null;
+  if (branch?.mode !== 'branches') return null;
+  const loading = branch.listState === 'loading';
+  if (!branch.name && !loading && branch.listState !== 'failed') return null;
   return (
     <BranchSwitcher
       current={branch.name}
+      status={branch.listState ?? 'ready'}
+      onRetry={branch.retryList}
       branches={branch.branches}
       disabled={saving}
       blockedMessage={dirty ? 'Save or discard your changes first' : undefined}
@@ -75,9 +94,7 @@ export function ShellStatusBar() {
   const branch = useBranchView();
   const summary = useSaveSummary();
   const { state } = summary;
-  const words = summary.kept
-    ? 'Unsaved edits kept in this browser'
-    : STATUS_WORDS[state];
+  const words = statusWords(summary, branch?.mode === 'local');
   if (branch?.mode === 'local') {
     return (
       <StatusBar local state={state}>

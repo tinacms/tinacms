@@ -1,3 +1,4 @@
+import { ImageIcon } from 'lucide-react';
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -5,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { BranchInfo } from '../core/branch/contract';
 import { currentBranchOf } from '../core/branch/contract';
-import type { DocumentEntry } from '../core/content/contract';
+import { ContentError, type DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
 import { required } from '../plugins/fields';
@@ -33,8 +34,12 @@ let releaseUpdate: (() => void) | undefined;
 let holdUpdates: boolean;
 let searchEnabled: boolean;
 let failGet: boolean;
+let listError: boolean;
+let listCalls: number;
 let failAfterSave: boolean;
+let updateError: Error | undefined;
 let heldDefault: Promise<void> | undefined;
+let duplicateLabels: boolean;
 
 const contentPlugin = () =>
   definePlugin({
@@ -49,7 +54,11 @@ const contentPlugin = () =>
             ...(mode === 'branches'
               ? {
                   branches: {
-                    list: async () => BRANCHES,
+                    list: async () => {
+                      listCalls += 1;
+                      if (listError) throw new Error('offline');
+                      return BRANCHES;
+                    },
                     defaultBranch: async () => {
                       await heldDefault;
                       return 'main';
@@ -71,6 +80,7 @@ const contentPlugin = () =>
               path: string,
               value: TinaDocument
             ) => {
+              if (updateError) throw updateError;
               if (holdUpdates) {
                 await new Promise<void>((resolve) => {
                   releaseUpdate = resolve;
@@ -125,6 +135,22 @@ const screenPlugin = definePlugin({
   }),
 });
 
+const duplicateScreenPlugin = definePlugin({
+  name: 'test:duplicates',
+  client: async () => ({
+    default: {
+      screens: [{ name: 'prefs', label: 'Prefs', component: NotesScreen }],
+      slots: {
+        globalNav: ['Settings', 'Notes', 'Notes'].map((label) => ({
+          label,
+          icon: ImageIcon,
+          target: { kind: 'screen' as const, screen: 'prefs' },
+        })),
+      },
+    },
+  }),
+});
+
 const renderAdmin = (projectName?: string) =>
   render(
     <TinaAdmin
@@ -133,6 +159,7 @@ const renderAdmin = (projectName?: string) =>
           contentPlugin(),
           auditPlugin,
           screenPlugin,
+          ...(duplicateLabels ? [duplicateScreenPlugin] : []),
           ...(searchEnabled ? [searchPlugin] : []),
           stringFieldPlugin,
           coreValidatorsPlugin,
@@ -182,13 +209,73 @@ beforeEach(() => {
   releaseUpdate = undefined;
   searchEnabled = false;
   failGet = false;
+  listError = false;
+  listCalls = 0;
   failAfterSave = false;
+  updateError = undefined;
   heldDefault = undefined;
+  duplicateLabels = false;
   window.location.hash = '';
 });
 
 afterEach(() => {
   vi.unstubAllGlobals();
+});
+
+describe('Branch list states', () => {
+  it('says the list is loading while it is read', async () => {
+    let release: () => void = () => {};
+    heldDefault = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Branches' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(within(dialog).getByText('Loading branches')).toBeVisible();
+    release();
+    expect(
+      await within(dialog).findByRole('button', { name: /^main/ })
+    ).toBeVisible();
+  });
+
+  it('shows a failed read in place, keeps the admin working and retries', async () => {
+    listError = true;
+    const user = userEvent.setup();
+    renderAdmin();
+    expect(
+      await screen.findByRole('button', { name: 'Collections' })
+    ).toBeEnabled();
+    await user.click(await screen.findByRole('button', { name: 'Branches' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(
+      await within(dialog).findByText(/Couldn't load branches/)
+    ).toBeVisible();
+    listError = false;
+    await user.click(within(dialog).getByRole('button', { name: 'Retry' }));
+    expect(
+      await within(dialog).findByRole('button', { name: /^main/ })
+    ).toBeVisible();
+    expect(listCalls).toBe(2);
+    expect(within(dialog).queryByText(/Couldn't load branches/)).toBeNull();
+  });
+
+  it('checks a new branch name against the list', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      within(dialog).getByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      'feature/news'
+    );
+    expect(within(dialog).getByRole('alert')).toHaveTextContent(
+      'A branch called feature/news already exists. Pick another name.'
+    );
+  });
 });
 
 describe('Kept edits notice', () => {
@@ -268,10 +355,62 @@ describe('Top bar', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('renders no Search control without a search provider', async () => {
+  it('shows Search without a provider and says full-text search needs one', async () => {
+    const user = userEvent.setup();
     renderAdmin();
-    await screen.findByRole('banner', { name: 'Top bar' });
-    expect(screen.queryByRole('button', { name: /Search/ })).toBeNull();
+    await user.click(await screen.findByRole('button', { name: /Search/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Search' });
+    expect(
+      within(dialog).getByText('Full-text search needs a search provider.')
+    ).toBeVisible();
+    expect(within(dialog).queryByText('Content search')).toBeNull();
+  });
+
+  it('narrows the Navigation results by the query and opens the one picked', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /Search/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Search' });
+    await user.type(within(dialog).getByRole('searchbox'), 'sett');
+    const list = within(dialog).getByRole('list', {
+      name: 'Navigation results',
+    });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(1);
+    await user.click(within(list).getByRole('button', { name: 'Settings' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/settings'));
+  });
+
+  it('keeps every Search row when two entries share a label', async () => {
+    duplicateLabels = true;
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /Search/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Search' });
+    const list = within(dialog).getByRole('list', {
+      name: 'Navigation results',
+    });
+    const all = within(list).getAllByRole('listitem').length;
+    const box = within(dialog).getByRole('searchbox');
+    await user.type(box, 'Set');
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((row) => row.textContent)
+    ).toEqual(['Settings', 'Settings']);
+    await user.clear(box);
+    await user.type(box, 'Not');
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((row) => row.textContent)
+    ).toEqual(['Notes', 'Notes']);
+    await user.clear(box);
+    expect(within(list).getAllByRole('listitem')).toHaveLength(all);
+    expect(
+      error.mock.calls.some(([message]) => String(message).includes('same key'))
+    ).toBe(false);
+    error.mockRestore();
   });
 
   it('opens Search with ⌘K, even from a focused field, when a search provider exists', async () => {
@@ -346,17 +485,30 @@ describe('branches', () => {
     ).toBeVisible();
   });
 
-  it('lists one line per branch with protected branches in one Protected group', async () => {
+  it('titles the pop-up Branches, lists the current branch first and searches by name', async () => {
     const user = userEvent.setup();
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
-    const dialog = await screen.findByRole('dialog', { name: 'Switch branch' });
-    const protectedGroup = within(dialog).getByRole('region', {
-      name: 'Protected',
-    });
-    expect(within(protectedGroup).getAllByRole('listitem')).toHaveLength(1);
-    expect(within(protectedGroup).getByText('main')).toBeVisible();
-    expect(within(dialog).getByText('feature/news')).toBeVisible();
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    const lines = within(dialog).getAllByRole('listitem');
+    expect(lines.map((line) => line.textContent)).toEqual([
+      'main',
+      'feature/news',
+    ]);
+    expect(within(lines[0]).getByRole('button')).toHaveAttribute(
+      'aria-current',
+      'true'
+    );
+
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'Search branches' }),
+      'news'
+    );
+    expect(
+      within(dialog)
+        .getAllByRole('listitem')
+        .map((line) => line.textContent)
+    ).toEqual(['feature/news']);
     await user.click(
       within(dialog).getByRole('button', { name: 'Full screen' })
     );
@@ -408,7 +560,7 @@ describe('branches', () => {
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
     await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
-    const dialog = await screen.findByRole('dialog', { name: 'Switch branch' });
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
     expect(within(dialog).getByRole('status')).toHaveTextContent(
       'Save or discard your changes first'
     );
@@ -538,7 +690,7 @@ describe('save state', () => {
 
     act(() => releaseUpdate?.());
     await waitFor(() =>
-      expect(within(statusBar()).getByText('Saved')).toBeVisible()
+      expect(within(statusBar()).getByText(/^Saved/)).toBeVisible()
     );
     expect(updates).toHaveLength(1);
     expect(screen.getByRole('button', { name: /^Branch:/ })).toBeEnabled();
@@ -577,6 +729,28 @@ describe('save state', () => {
       expect(within(statusBar()).getByText('Save failed')).toBeVisible()
     );
     expect(updates).toHaveLength(1);
+  });
+
+  it('says the branch no longer exists when the save is refused for a missing branch', async () => {
+    updateError = new ContentError('branch-not-found');
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: branch no longer exists')
+      ).toBeVisible()
+    );
+    expect(input).toHaveValue('Hello!');
+  });
+
+  it('names the document the last save wrote', async () => {
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Saved: “hello.mdx”')).toBeVisible()
+    );
   });
 
   it('says the save failed when validation fails, in the toast and the Status bar, and leaves the form bar alone', async () => {
