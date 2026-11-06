@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { foldPath } from '@tinacms/ui/components/breadcrumb';
+import { CollapsibleSection } from '@tinacms/ui/components/collapsible-section';
 import { FieldTrail } from '@tinacms/ui/components/field-trail';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { FormLevel } from '@tinacms/ui/components/form-level';
@@ -188,5 +189,25 @@ describe('FormLevel pinHeaders', () => {
     expect(heads().some((head) => head.hasAttribute('data-pinned'))).toBe(
       false
     );
+  });
+});
+
+describe('CollapsibleSection error words', () => {
+  it.each([
+    [1, ', 1 error'],
+    [3, ', 3 errors'],
+  ])('says %i invalid fields as "%s" for screen readers', (count, words) => {
+    render(
+      <CollapsibleSection
+        label='SEO'
+        labelId='seo'
+        open={false}
+        onOpenChange={() => {}}
+        invalidCount={count}
+      >
+        <span>inside</span>
+      </CollapsibleSection>
+    );
+    expect(screen.getByText(words)).toBeInTheDocument();
   });
 });

@@ -60,6 +60,21 @@ describe('datetime field states', () => {
     expect(onChange).toHaveBeenCalledWith('2025-01-02T03:04');
   });
 
+  it('passes placeholder and blur through to the box', () => {
+    const onBlur = vi.fn();
+    render(
+      <DatetimeFieldView
+        {...datetimeFieldState('empty')}
+        placeholder='Pick a date'
+        onBlur={onBlur}
+      />
+    );
+    const box = screen.getByLabelText(/^Published/);
+    expect(box).toHaveAttribute('placeholder', 'Pick a date');
+    fireEvent.blur(box);
+    expect(onBlur).toHaveBeenCalledOnce();
+  });
+
   it('looks a state up by name', () => {
     expect(datetimeFieldState('filled').value).toBe('2024-05-01T09:30');
     expect(() => datetimeFieldState('missing' as never)).toThrow(

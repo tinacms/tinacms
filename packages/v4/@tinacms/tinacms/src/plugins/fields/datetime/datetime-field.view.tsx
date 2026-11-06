@@ -20,6 +20,9 @@ export type DatetimeFieldViewProps = Pick<
   /** The input string, `YYYY-MM-DDTHH:mm`; `''` when empty or partly typed. */
   value: string;
   onChange?: (value: string) => void;
+  onBlur?: () => void;
+  /** The earliest and latest value the box takes, as `YYYY-MM-DDTHH:mm`. */
+  placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
   ref?: Ref<HTMLInputElement>;
@@ -34,6 +37,8 @@ export function DatetimeFieldView({
   id,
   value,
   onChange,
+  onBlur,
+  placeholder,
   disabled = false,
   readOnly = false,
   ref,
@@ -49,6 +54,8 @@ export function DatetimeFieldView({
           id={id}
           type='datetime-local'
           value={value}
+          placeholder={placeholder}
+          onBlur={onBlur}
           required={frame.required}
           disabled={disabled}
           readOnly={readOnly}

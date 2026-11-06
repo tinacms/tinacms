@@ -26,7 +26,7 @@ const ofLook = (display: ObjectFieldViewProps['display']) =>
   states.filter(({ props }) => props.display === display);
 
 const countWords = (count: number) =>
-  `${count} invalid ${count === 1 ? 'field' : 'fields'}`;
+  `${count} ${count === 1 ? 'error' : 'errors'}`;
 
 function expectDrillInCard(props: ObjectFieldViewProps) {
   const card = screen.getByRole('button', {

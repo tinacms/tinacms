@@ -433,8 +433,8 @@ function useSeededFormSync(
 
   const view = useFormViewStore(formId);
   const discardEdits = useCallback(() => {
-    const { closeLevelsAbove, resetReveal } = view.getState();
-    closeLevelsAbove(0);
+    const { showLevels, resetReveal } = view.getState();
+    showLevels([]);
     resetReveal();
     discardFormEdits(formId, resetForm, advanceSeedKey);
   }, [formId, resetForm, advanceSeedKey, view]);
@@ -569,7 +569,7 @@ export function FormProvider({
   );
   const fieldSeedKey = `${seedKey}~${fieldReseeds}`;
   useEffect(() => {
-    view.getState().closeLevelsAbove(0);
+    view.getState().showLevels([]);
   }, [fieldSeedKey, view]);
   const [failure, setFailure] = useState<{
     formId: FormId;

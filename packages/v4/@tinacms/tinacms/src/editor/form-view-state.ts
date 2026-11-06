@@ -19,12 +19,16 @@ export interface OpenLevel {
   node: FieldSchema;
   /** An item of a list: `node` is a stand-in object built from the item's fields. */
   item?: boolean;
+  /** A block of a Blocks field. It opens as its own level at any depth. */
+  block?: boolean;
 }
 
 export interface FormViewState {
   touched: ReadonlySet<string>;
   saveAttempted: boolean;
   openLevels: readonly OpenLevel[];
+  /** The address of the level the editor just left by going up, until a list takes it back. */
+  returnedFrom: string | null;
   /** Expand all and Collapse all: cards and objects that open in place follow the newest one. */
   expansion: { readonly version: number; readonly open: boolean };
   setExpansion: (open: boolean) => void;
@@ -34,6 +38,7 @@ export interface FormViewState {
   openLevel: (level: OpenLevel) => void;
   showLevels: (levels: readonly OpenLevel[]) => void;
   closeLevelsAbove: (keep: number) => void;
+  clearReturn: () => void;
 }
 
 export type FormViewStore = StoreApi<FormViewState>;
@@ -43,6 +48,7 @@ export const createFormViewStore = (): FormViewStore =>
     touched: new Set(),
     saveAttempted: false,
     openLevels: [],
+    returnedFrom: null,
     expansion: { version: 0, open: false },
     setExpansion: (open) =>
       set((state) => ({
@@ -57,10 +63,17 @@ export const createFormViewStore = (): FormViewStore =>
     attemptSave: () => set({ saveAttempted: true }),
     resetReveal: () => set({ touched: new Set(), saveAttempted: false }),
     openLevel: (level) =>
-      set((state) => ({ openLevels: [...state.openLevels, level] })),
-    showLevels: (levels) => set({ openLevels: levels }),
+      set((state) => ({
+        openLevels: [...state.openLevels, level],
+        returnedFrom: null,
+      })),
+    showLevels: (levels) => set({ openLevels: levels, returnedFrom: null }),
     closeLevelsAbove: (keep) =>
-      set((state) => ({ openLevels: state.openLevels.slice(0, keep) })),
+      set((state) => ({
+        openLevels: state.openLevels.slice(0, keep),
+        returnedFrom: state.openLevels[keep]?.address ?? null,
+      })),
+    clearReturn: () => set({ returnedFrom: null }),
   }));
 
 export function useFormViewStore(formId: FormId): FormViewStore {
@@ -96,8 +109,9 @@ const fieldDepth = (address: string): number =>
 export const itemOpensNextLevel = (itemAddress: string): boolean =>
   fieldDepth(itemAddress) + 1 >= DRILL_DEPTH;
 
-// The one place that decides whether a field drills in: the plugin's own
-// answer first, then the depth rule.
+// The one place that decides whether a field drills in. From level 3 down every
+// drillable field drills in, whatever its own answer. Above that, the plugin's
+// answer wins.
 export const drillsInAt = (
   descriptor: FieldDescriptor | undefined,
   node: FieldSchema,
@@ -105,7 +119,8 @@ export const drillsInAt = (
 ): boolean => {
   const metadata = descriptor?.metadata;
   if (metadata?.drillable !== true) return false;
-  return metadata.drillsIn?.(node) ?? fieldDepth(address) >= DRILL_DEPTH;
+  if (fieldDepth(address) >= DRILL_DEPTH) return true;
+  return metadata.drillsIn?.(node) ?? false;
 };
 
 export const levelDrillsIn = (
@@ -113,7 +128,7 @@ export const levelDrillsIn = (
   level: OpenLevel
 ): boolean =>
   level.item
-    ? itemOpensNextLevel(level.address)
+    ? level.block === true || itemOpensNextLevel(level.address)
     : drillsInAt(descriptor, level.node, level.address);
 
 // The stand-in node an open item level draws: an object of the item's fields.
@@ -121,7 +136,8 @@ export const levelDrillsIn = (
 export const itemLevel = (
   address: string,
   label: string,
-  fields: readonly FieldSchema[]
+  fields: readonly FieldSchema[],
+  block = false
 ): OpenLevel => {
   const node: FieldSchema & { fields: FieldSchema[] } = {
     type: OBJECT_FIELD_TYPE,
@@ -129,7 +145,13 @@ export const itemLevel = (
     label,
     fields: [...fields],
   };
-  return { address: toFieldAddress(address), label, node, item: true };
+  return {
+    address: toFieldAddress(address),
+    label,
+    node,
+    item: true,
+    ...(block ? { block } : {}),
+  };
 };
 
 // The failing fields that show an error, innermost only: a parent whose
@@ -184,7 +206,12 @@ export const fieldsAlong = (
         node && !scalarItemOf(node) ? fieldsetOf(node, item) : undefined;
       if (node && siblings) {
         along.push(
-          itemLevel(path, itemHeadingOf(node, item, Number(segment)), siblings)
+          itemLevel(
+            path,
+            itemHeadingOf(node, item, Number(segment)),
+            siblings,
+            node.templates !== undefined
+          )
         );
       }
       continue;

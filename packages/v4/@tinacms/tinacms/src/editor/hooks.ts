@@ -458,6 +458,17 @@ export function useInvalidFieldCounts(addresses: readonly string[]): number[] {
   );
 }
 
+/** A counter for the failing fields under any address, so a widget with its own children can show a red count. */
+export function useErrorCounter(): (address: string) => number {
+  const { view, formId } = useFormScope(
+    'error-counter-outside-provider',
+    'useErrorCounter'
+  );
+  const errors = useFormErrors(formId);
+  const state = useStore(view);
+  return (address) => countRevealedErrors(state, Object.keys(errors), address);
+}
+
 /** Opens, reveals and touches the items of a list field by their address. */
 export function useListItems() {
   const { view } = useFormScope('list-items-outside-provider', 'useListItems');
@@ -465,11 +476,22 @@ export function useListItems() {
     openLevel: (
       itemAddress: string,
       label: string,
-      fields: readonly FieldSchema[]
-    ) => view.getState().openLevel(itemLevel(itemAddress, label, fields)),
+      fields: readonly FieldSchema[],
+      block = false
+    ) =>
+      view.getState().openLevel(itemLevel(itemAddress, label, fields, block)),
     isRevealed: (itemAddress: string) =>
       isRevealed(view.getState(), itemAddress),
     touch: (itemAddress: FieldAddress) => view.getState().touch(itemAddress),
+    /** The index of the item of `listAddress` the editor just came back from, once. */
+    takeReturnedIndex: (listAddress: string): number | undefined => {
+      const { returnedFrom, clearReturn } = view.getState();
+      const prefix = `${listAddress}.`;
+      if (!returnedFrom?.startsWith(prefix)) return undefined;
+      const index = Number(returnedFrom.slice(prefix.length).split('.')[0]);
+      clearReturn();
+      return Number.isInteger(index) ? index : undefined;
+    },
   };
 }
 

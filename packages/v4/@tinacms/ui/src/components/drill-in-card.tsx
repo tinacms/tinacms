@@ -55,7 +55,7 @@ function DrillInCard({
       className={cn(
         'relative box-border flex min-h-10 w-full cursor-pointer items-center gap-2 rounded-sm border border-border bg-card py-1.5 pr-2 pl-3 text-left font-sans text-foreground outline-none focus-visible:border-ring focus-visible:shadow-focus-ring',
         inert ? 'cursor-not-allowed' : 'hover:bg-muted-hover',
-        disabled && 'opacity-45',
+        disabled && 'opacity-60',
         className
       )}
       {...props}

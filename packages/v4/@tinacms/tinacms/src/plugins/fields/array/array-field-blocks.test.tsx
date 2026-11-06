@@ -64,6 +64,12 @@ const collection: CollectionSchema = {
   fields: [
     t.array({ name: 'blocks', label: 'Blocks', templates }),
     t.array({
+      name: 'sections',
+      label: 'Sections',
+      addLabel: 'Add a section',
+      templates,
+    }),
+    t.array({
       name: 'tags',
       label: 'Tags',
       of: t.string({ name: 'tag', label: 'Tag' }),
@@ -126,6 +132,17 @@ describe('Blocks field picker', () => {
     const trigger = within(blocks).getByRole('button', { name: 'Add a block' });
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
     expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+  });
+
+  it('says "Add a section" on the picker button when the field sets addLabel', async () => {
+    renderPage();
+    const sections = await list('Sections');
+    expect(
+      within(sections).getByRole('button', { name: 'Add a section' })
+    ).toBeInTheDocument();
+    expect(
+      within(sections).queryByRole('button', { name: 'Add a block' })
+    ).toBeNull();
   });
 
   it('keeps "Add item" and no picker on a list that is not blocks', async () => {
@@ -212,10 +229,9 @@ describe('Blocks field picker', () => {
       expect(valueOf('blocks')).toEqual([{ _template: 'hero', headline: '' }])
     );
     expect(screen.queryByRole('dialog')).toBeNull();
-    await waitFor(() => {
-      expect(document.activeElement).toHaveAttribute('data-grip');
-      expect(blocks).toContainElement(document.activeElement as HTMLElement);
-    });
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: 'Headline' })).toHaveFocus()
+    );
   });
 
   it('inserts at the chosen index from the same picker, and Escape returns focus to the card grip', async () => {
@@ -386,7 +402,9 @@ describe('Blocks field picker', () => {
         within(await picker(blocks)).getByRole('button', { name: 'Add Quote' })
       );
       await waitFor(() => expect(headlines()).toEqual(['B', 'quote']));
-      await waitFor(() => expect(gripOf(blocks, 2)).toHaveFocus());
+      await waitFor(() =>
+        expect(screen.getByRole('textbox', { name: /^Text\b/ })).toHaveFocus()
+      );
     });
 
     it('a pick after Move up lands in the gap next to the moved opener', async () => {
@@ -473,7 +491,11 @@ describe('Blocks field picker', () => {
       expect(deepOf()).toEqual([{ _template: 'quote', text: '' }])
     );
     await userEvent.click(
-      within(deep).getByRole('button', { name: 'Actions for Item 1' })
+      await screen.findByRole('button', { name: 'Back to fields' })
+    );
+    const again = await list('Deep');
+    await userEvent.click(
+      within(again).getByRole('button', { name: 'Actions for Item 1' })
     );
     await userEvent.click(
       await screen.findByRole('menuitem', { name: /^Remove/ })
@@ -481,7 +503,7 @@ describe('Blocks field picker', () => {
     await waitFor(() => expect(deepOf()).toEqual([]));
     await waitFor(() =>
       expect(
-        within(deep).getByRole('button', { name: 'Add a block' })
+        within(again).getByRole('button', { name: 'Add a block' })
       ).toHaveFocus()
     );
   });
