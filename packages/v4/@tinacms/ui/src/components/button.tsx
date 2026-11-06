@@ -109,7 +109,13 @@ type ButtonBaseProps = Omit<ButtonPrimitive.Props, 'children'> & {
 };
 
 type CountOnWords =
-  | { count?: undefined; countTone?: never; srLabel?: never }
+  | {
+      count?: undefined;
+      countTone?: never;
+      srLabel?: never;
+      chip?: undefined;
+      chipSrLabel?: never;
+    }
   | {
       /** A red count of errors after the words, shown from 1. */
       count: number;
@@ -117,6 +123,17 @@ type CountOnWords =
       countTone?: CountTone;
       /** The words screen readers hear, such as ", 3 errors". */
       srLabel: string;
+      chip?: never;
+      chipSrLabel?: never;
+    }
+  | {
+      /** The design's name for `count`: a red chip after the words, shown from 1. */
+      chip: number;
+      /** The design's name for `srLabel`. */
+      chipSrLabel: string;
+      countTone?: CountTone;
+      count?: never;
+      srLabel?: never;
     };
 
 type WithWords = ButtonBaseProps & {
@@ -127,10 +144,6 @@ type WithWords = ButtonBaseProps & {
   mono?: boolean;
   /** Keyboard keys after the words, such as `⌘K`. */
   shortcut?: string;
-  /** The design's name for `count`: a red chip after the words, shown from 1. */
-  chip?: number;
-  /** The design's name for `srLabel`. */
-  chipSrLabel?: string;
 } & CountOnWords;
 
 type IconOnly = ButtonBaseProps & {
@@ -228,6 +241,7 @@ function Button(buttonProps: ButtonProps) {
     disabled,
     ...props
   } = all;
+  const inert = Boolean(disabled || busy);
   const count = countProp ?? chip;
   const srLabel = srLabelProp ?? chipSrLabel;
   const size = heightSizeOf(sizeProp);
@@ -254,7 +268,11 @@ function Button(buttonProps: ButtonProps) {
       data-slot='button'
       {...(href === undefined
         ? {}
-        : { render: <a href={href} />, nativeButton: false, role: 'link' })}
+        : {
+            render: <a href={inert ? undefined : href} />,
+            nativeButton: false,
+            role: 'link',
+          })}
       style={minWidth === undefined ? style : { ...style, minWidth }}
       type={href === undefined ? (type ?? 'button') : undefined}
       aria-keyshortcuts={keys ? keyShortcuts(keys) : undefined}
@@ -272,6 +290,7 @@ function Button(buttonProps: ButtonProps) {
           shortcut: Boolean(keys) && !iconOnly,
           busy,
         }),
+        href !== undefined && disabled && 'cursor-not-allowed opacity-45',
         className
       )}
     >

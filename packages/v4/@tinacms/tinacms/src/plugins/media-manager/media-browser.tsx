@@ -423,7 +423,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
         {features.search ? (
           <MediaSearchInput value={search} onChange={setSearch} />
         ) : null}
-        <div className='ml-auto flex items-center gap-3'>
+        <div className='ml-auto flex flex-wrap items-center justify-end gap-3'>
           {features.extensionFilter ? (
             pickExtensions.length > 0 ? (
               <LockedAcceptChip
