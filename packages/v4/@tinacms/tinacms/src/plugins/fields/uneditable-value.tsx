@@ -32,6 +32,7 @@ export function UneditableValue({
           variant='ghost'
           size='sm'
           className='self-start'
+          disabled={frame.disabled || frame.readOnly}
           onClick={() => setValue(cleared)}
         >
           Clear
