@@ -45,6 +45,7 @@ import {
 } from '../rpc/proxy';
 import {
   FieldAddressContext,
+  FieldLockContext,
   FieldSchemaContext,
   type FormScope,
   FormScopeContext,
@@ -376,20 +377,24 @@ export function useFieldErrors(address: FieldAddress): string[] {
 export interface FieldFrameOptions {
   /** Show only errors on the field's own address, not those of fields under it. */
   ownErrorsOnly?: boolean;
+  /** Amber messages that do not block Save, such as a reference to a document that is gone. */
+  warnings?: readonly string[];
 }
 
 export function useFieldFrame({
   ownErrorsOnly = false,
+  warnings,
 }: FieldFrameOptions = {}): Pick<
   FieldWrapperProps,
   'label' | 'htmlFor' | 'labelId' | 'required' | 'errors' | 'help' | 'helpId'
-> {
+> & { warnings: string[]; disabled: boolean; readOnly: boolean } {
   const address = useFieldAddress();
   const node = useFieldSchema();
   const { view } = useFormScope(
     'field-frame-outside-provider',
     'useFieldFrame'
   );
+  const lock = use(FieldLockContext);
   const labelable =
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
   const { errors } = useFormState({ name: address });
@@ -410,8 +415,11 @@ export function useFieldFrame({
     labelId: `${address}-label`,
     required: hasValidator(node, 'required'),
     errors: [...shown],
+    warnings: [...(warnings ?? [])],
     help: node.description,
     helpId: node.description ? `${address}-help` : undefined,
+    disabled: lock.disabled,
+    readOnly: lock.readOnly,
   };
 }
 
