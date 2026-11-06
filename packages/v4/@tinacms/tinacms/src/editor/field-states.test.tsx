@@ -70,7 +70,9 @@ type Case = {
   collections?: CollectionSchema[];
   /** Plugins the field's children need. */
   also?: PluginManifest[];
-  /** The control that takes the edit. `null` means the field drew none. Defaults to the one labelled "Field". */
+  /** A locked field may draw no control at all. */
+  absentWhenLocked?: boolean;
+  /** The control that takes the edit, or `null` when the field drew none. Defaults to the one labelled "Field". */
   control?: (expectEditable: boolean) => Promise<HTMLElement | null>;
   node: (state: Pick<FieldSchema, 'disabled' | 'readOnly'>) => FieldSchema;
   document: TinaDocument;
@@ -115,6 +117,7 @@ const CASES: Case[] = [
   },
   {
     type: 'rich-text',
+    absentWhenLocked: true,
     plugin: richTextFieldPlugin,
     control: async (expectEditable) => {
       await screen.findByText('Field');
@@ -124,8 +127,10 @@ const CASES: Case[] = [
           {},
           { timeout: expectEditable ? 3000 : 250 }
         );
-      } catch {
-        return null;
+      } catch (error) {
+        if (error instanceof Error && /Unable to find/.test(error.message))
+          return null;
+        throw error;
       }
     },
     node: (state) => t.richText({ name: 'f', label: 'Field', ...state }),
@@ -152,6 +157,7 @@ const CASES: Case[] = [
   },
   {
     type: 'image',
+    absentWhenLocked: true,
     plugin: imageFieldPlugin,
     also: [mediaStub],
     node: (state) => t.image({ name: 'f', label: 'Field', ...state }),
@@ -180,6 +186,7 @@ const CASES: Case[] = [
   },
   {
     type: 'array',
+    absentWhenLocked: true,
     plugin: arrayFieldPlugin,
     also: [stringFieldPlugin],
     control: async () => {
@@ -229,41 +236,44 @@ const labelled = async (_expectEditable?: boolean) => {
   return first;
 };
 
-const blocksEditing = (el: HTMLElement | null) =>
-  el === null ||
+const isReadOnly = (el: HTMLElement) =>
   el.getAttribute('contenteditable') === 'false' ||
   el.hasAttribute('readonly') ||
   el.getAttribute('aria-readonly') === 'true' ||
-  el.hasAttribute('data-readonly') ||
+  el.hasAttribute('data-readonly');
+
+const isDisabled = (el: HTMLElement) =>
+  el.getAttribute('contenteditable') === 'false' ||
   el.hasAttribute('disabled') ||
   el.getAttribute('aria-disabled') === 'true' ||
   el.hasAttribute('data-disabled');
 
+const blocksEditing = (el: HTMLElement | null, absentWhenLocked?: boolean) =>
+  el === null ? absentWhenLocked === true : isReadOnly(el) || isDisabled(el);
+
 describe('a real field in the form', () => {
   describe.each(CASES)('$type', (entry) => {
+    const control = entry.control ?? labelled;
+
     it('can be edited by default', async () => {
       renderField(entry, {});
-      expect(blocksEditing(await (entry.control ?? labelled)(true))).toBe(
-        false
-      );
+      const el = await control(true);
+      expect(el).not.toBeNull();
+      expect(blocksEditing(el)).toBe(false);
     });
 
     it('is read-only when its schema says readOnly', async () => {
       renderField(entry, { readOnly: true });
-      expect(blocksEditing(await (entry.control ?? labelled)(false))).toBe(
+      expect(blocksEditing(await control(false), entry.absentWhenLocked)).toBe(
         true
       );
     });
 
     it('is disabled when its schema says disabled', async () => {
       renderField(entry, { disabled: true });
-      const el = await (entry.control ?? labelled)(false);
+      const el = await control(false);
       expect(
-        el === null ||
-          el.getAttribute('contenteditable') === 'false' ||
-          el.hasAttribute('disabled') ||
-          el.getAttribute('aria-disabled') === 'true' ||
-          el.hasAttribute('data-disabled')
+        el === null ? entry.absentWhenLocked === true : isDisabled(el)
       ).toBe(true);
     });
   });

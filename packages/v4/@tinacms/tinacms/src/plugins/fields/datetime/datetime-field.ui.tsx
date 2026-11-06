@@ -22,8 +22,8 @@ const toLocalWallClock = (instant: Date): string =>
  * instant, so the input shows the local wall clock of that instant. A stored
  * value with no zone already spells a wall clock, so it passes through.
  */
-const toInputValue = (stored: string | null): string => {
-  if (!stored) return '';
+const toInputValue = (stored: unknown): string => {
+  if (typeof stored !== 'string' || !stored) return '';
   if (!stored.includes('T')) return `${stored}T00:00`;
   if (!CARRIES_A_ZONE.test(stored)) return stored.slice(0, 16);
   const instant = new Date(stored);
