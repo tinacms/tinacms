@@ -82,7 +82,9 @@ function BranchButtonLabel({
         {current}
       </span>
       {isProtected ? (
-        <span className='text-xs text-muted-foreground-strong'>protected</span>
+        <span className='text-xs text-muted-foreground-strong max-md:hidden'>
+          protected
+        </span>
       ) : null}
     </>
   );
@@ -279,7 +281,7 @@ function BranchSwitcher({
                 ? 'Branches'
                 : `Branch: ${current}${isProtected ? ', protected' : ''}`
             }
-            className='max-w-full'
+            className='max-w-full shrink'
           />
         }
       >
