@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Toaster } from '@tinacms/ui/components/sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { ContentProvider, DocumentEntry } from '../core/content/contract';
@@ -176,23 +177,25 @@ describe('DocumentScope on a collection with a server hook', () => {
       422,
       'hook-rejected',
       'Only admins can publish',
+      "Couldn't save. A save hook rejected this save.",
     ],
     [
       'the Data Layer refuses a write with',
       400,
       'write-refused',
       'Repair the file, then save again.',
+      "Couldn't save. The file couldn't be written to disk.",
     ],
   ])(
-    'shows the message %s, and keeps the form dirty',
-    async (_, status, code, message) => {
+    'shows fixed words, not the text %s, and keeps the form dirty',
+    async (_, status, code, message, words) => {
       vi.stubGlobal(
         'fetch',
         vi.fn(async () =>
           Response.json({ error: { code, message } }, { status })
         )
       );
-      vi.spyOn(console, 'error').mockImplementation(() => {});
+      const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
       const guard = defineHook('guard', {
         server: async () => ({ default: defineServerHook(() => ({})) }),
       });
@@ -213,12 +216,21 @@ describe('DocumentScope on a collection with a server hook', () => {
             <DocumentForm />
           </DocumentScope>
           <StatusProbe />
+          <Toaster />
         </TinaProvider>
       );
       await userEvent.type(await screen.findByLabelText(/^Title\b/), '!');
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-      expect(await screen.findByRole('alert')).toHaveTextContent(message);
+      const alert = await screen.findByRole('alert');
+      expect(alert).toHaveTextContent(words);
+      expect(alert).not.toHaveTextContent(message);
+      expect(
+        JSON.stringify(logged.mock.calls, (_, v) => {
+          if (v instanceof Error) return v.message;
+          return v;
+        })
+      ).toContain(message);
       expect(screen.getByTestId('status')).toHaveTextContent('dirty');
       expect(update).not.toHaveBeenCalled();
     }

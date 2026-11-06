@@ -94,6 +94,8 @@ export interface FormStore {
   unstored: Partial<Record<FormId, true>>;
   /** Counts failed writes per form, so the warning shows even when a later write succeeds. */
   failures: Partial<Record<FormId, number>>;
+  /** Counts failed swaps per form. A swap that does nothing must say so every time. */
+  swapFailures: Partial<Record<FormId, number>>;
   /** Forms whose Resume prompt is hidden until the document opens again, after a failed Resume. */
   hidden: Partial<Record<FormId, true>>;
   /** Removes the live copy, every waiting copy and the in-memory edits. */
@@ -294,6 +296,7 @@ export const useFormStore = create<FormStore>()(
         held: {},
         unstored: {},
         failures: {},
+        swapFailures: {},
         hidden: {},
         active: null,
 
@@ -343,11 +346,9 @@ export const useFormStore = create<FormStore>()(
           } else if (held[formId]) {
             removeDraft(formId, userId, branch);
           }
-          const remaining = discarded
-            ? readWaitingDrafts(formId, userId, branch).filter(
-                (copy) => !discarded.some((gone) => sameDraft(gone, copy))
-              )
-            : [];
+          const remaining = readWaitingDrafts(formId, userId, branch).filter(
+            (copy) => !discarded.some((gone) => sameDraft(gone, copy))
+          );
           writeWaitingDrafts(formId, remaining, userId, branch);
           apply((state) => {
             const { [formId]: _waiting, ...waiting } = state.waiting;
@@ -376,6 +377,7 @@ export const useFormStore = create<FormStore>()(
               held: {},
               unstored: {},
               failures: {},
+              swapFailures: {},
               hidden: {},
               active: null,
             };
@@ -403,6 +405,7 @@ export const useFormStore = create<FormStore>()(
               held: {},
               unstored: {},
               failures: {},
+              swapFailures: {},
               hidden: {},
               active: null,
             };
@@ -530,6 +533,7 @@ export const useFormStore = create<FormStore>()(
             const scope = state.forms[formId];
             if (!isEdited(scope)) return state;
             return {
+              hidden: withoutKey(state.hidden, formId),
               forms: {
                 ...state.forms,
                 [formId]: {
@@ -626,6 +630,9 @@ export const useFormStore = create<FormStore>()(
               failures: failed
                 ? withFailure(current.failures, formId)
                 : current.failures,
+              swapFailures: keep
+                ? withFailure(current.swapFailures, formId)
+                : current.swapFailures,
               // A swap that failed changed nothing, so its prompt stays.
               hidden:
                 failed && !swapped
