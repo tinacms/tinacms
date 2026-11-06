@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 4.0.5
+
+### Patch Changes
+
+- [#7966](https://github.com/tinacms/tinacms/pull/7966) [`96196d6`](https://github.com/tinacms/tinacms/commit/96196d6056bb61571088a3ca63680b4c2e2d12e8) Thanks [@Spence1115](https://github.com/Spence1115)! - Move `@graphql-tools/load` to 8.1.21 and `@graphql-tools/graphql-file-loader` to 8.1.24, so the CLI no longer pulls in `@graphql-tools/utils` 9.2.1, which is affected by GHSA-7mx3-vvmw-hjmv (prototype pollution in `mergeDeep`).
+
+- Updated dependencies [[`c91c528`](https://github.com/tinacms/tinacms/commit/c91c528f51171ee8a5955831738c2ece5ef8bed2)]:
+  - tinacms@3.15.2
+
 ## 4.0.4
 
 ### Patch Changes
