@@ -1071,12 +1071,22 @@ describe('TinaAdmin draft recovery contract', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() =>
       expect(vi.mocked(toast)).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'save-failed', tone: 'error' })
+        expect.objectContaining({
+          id: expect.stringMatching(/^save-failed:/),
+          tone: 'error',
+        })
       )
     );
-    expect(dismiss).not.toHaveBeenCalledWith('save-failed');
+    dismiss.mockClear();
+    expect(dismiss).not.toHaveBeenCalledWith(
+      expect.stringMatching(/^save-failed:/)
+    );
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    await waitFor(() => expect(dismiss).toHaveBeenCalledWith('save-failed'));
+    await waitFor(() =>
+      expect(dismiss).toHaveBeenCalledWith(
+        expect.stringMatching(/^save-failed:/)
+      )
+    );
   });
 
   it('Expand all and Collapse all show in the form menu, disabled when no field has cards', async () => {
@@ -1147,6 +1157,30 @@ describe('TinaAdmin draft recovery contract', () => {
     const alert = await screen.findByRole('alert');
     await user.click(within(alert).getByRole('button', { name: 'Retry' }));
     await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+  });
+
+  it('Retry is gone once the editor leaves the document, so it cannot write elsewhere', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const update = vi
+      .spyOn(provider, 'update')
+      .mockRejectedValueOnce(new Error('offline'));
+    update.mockClear();
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await screen.findByRole('alert');
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /second\.mdx/ })
+    );
+    await screen.findByLabelText(/^Title\b/);
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(readDraft(hello)?.values).toMatchObject({
+      title: expect.stringMatching(/!$/),
+    });
   });
 
   it('rows 22 and 26: with the move-aside write failing, the warning shows and no screen says kept', async () => {
