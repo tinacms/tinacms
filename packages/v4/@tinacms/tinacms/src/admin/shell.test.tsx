@@ -191,6 +191,17 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+describe('Kept edits notice', () => {
+  it('names the branch the edits are still unsaved on', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    expect(await screen.findByText('Still unsaved on main.')).toBeVisible();
+  });
+});
+
 describe('Top bar', () => {
   it('shows the one toggle, the logo, the project name and the branch', async () => {
     renderAdmin('Acme site');
@@ -301,7 +312,9 @@ describe('side nav entries', () => {
 
     await user.click(row);
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
     const back = await screen.findByRole('button', { name: /hello\.mdx/ });
     expect(back).toHaveTextContent('Unsaved');
     expect(
@@ -566,7 +579,7 @@ describe('save state', () => {
     expect(updates).toHaveLength(1);
   });
 
-  it('says the save failed when validation fails, with the inline alert kept', async () => {
+  it('says the save failed when validation fails, in the toast and the Status bar, and leaves the form bar alone', async () => {
     const { user, input } = await openHello();
     await user.clear(input);
     await user.click(screen.getByRole('button', { name: /^Save/ }));
@@ -574,16 +587,13 @@ describe('save state', () => {
       expect(within(statusBar()).getByText('Save failed')).toBeVisible()
     );
     expect(updates).toHaveLength(0);
-    expect(
-      (await screen.findAllByRole('alert')).some((alert) =>
-        /validation errors/.test(alert.textContent ?? '')
-      )
-    ).toBe(true);
+    const form = screen.getByRole('complementary', { name: 'Document form' });
+    expect(form.querySelector('[data-slot=form-bar] [role=alert]')).toBeNull();
   });
 });
 
 describe('toasts', () => {
-  it('shows a failed save at bottom right and keeps the inline alert', async () => {
+  it('shows a failed save at bottom right with fixed words and Retry, and nothing in the form bar', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     const user = userEvent.setup();
     renderAdmin();
@@ -596,12 +606,17 @@ describe('toasts', () => {
       expect(found).not.toBeNull();
       return found;
     });
-    expect(toast).toHaveTextContent('Save failed');
+    expect(toast).toHaveTextContent(
+      "Couldn't save. Some fields are not valid."
+    );
+    expect(
+      within(toast as HTMLElement).getByRole('button', { name: 'Retry' })
+    ).toBeVisible();
     const toaster = toast?.closest('[data-sonner-toaster]');
     expect(toaster).toHaveAttribute('data-x-position', 'right');
     expect(toaster).toHaveAttribute('data-y-position', 'bottom');
     const form = screen.getByRole('complementary', { name: 'Document form' });
-    expect(within(form).getAllByRole('alert').length).toBeGreaterThan(0);
+    expect(form.querySelector('[data-slot=form-bar] [role=alert]')).toBeNull();
   });
 });
 
@@ -636,6 +651,42 @@ describe('read-error and screen views', () => {
   });
 });
 
+describe('document form panel', () => {
+  it('has Back and a menu in its header, no Close and no second title, then tabs and a form bar', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+    await screen.findByLabelText(/^Title\b/);
+    const panel = screen.getByRole('complementary', { name: 'Document form' });
+    expect(
+      within(panel).getByRole('button', { name: 'Return to navigator' })
+    ).toBeVisible();
+    expect(
+      within(panel).getByRole('button', { name: 'Document menu' })
+    ).toBeVisible();
+    expect(within(panel).queryByRole('button', { name: 'Close' })).toBeNull();
+    expect(within(panel).queryByRole('heading')).toBeNull();
+    expect(within(panel).getByRole('tab', { name: 'Fields' })).toBeVisible();
+    expect(within(panel).queryByRole('tab', { name: 'History' })).toBeNull();
+    expect(
+      within(panel).getByRole('button', { name: 'Document actions' })
+    ).toBeVisible();
+    expect(within(panel).getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+
+  it('opens the Document actions above the bar, with a note that more come later', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    renderAdmin();
+    await screen.findByLabelText(/^Title\b/);
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    const menu = await screen.findByRole('menu', { name: 'Document actions' });
+    expect(
+      within(menu).getByText('More document actions come later.')
+    ).toBeVisible();
+    expect(menu.closest('[data-side]')).toHaveAttribute('data-side', 'top');
+  });
+});
+
 describe('panel headers', () => {
   it('gives the form column Back to its collection, and the missing views a title and Close', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
@@ -645,7 +696,7 @@ describe('panel headers', () => {
     await user.click(
       within(
         screen.getByRole('complementary', { name: 'Document form' })
-      ).getByRole('button', { name: /Posts/ })
+      ).getByRole('button', { name: 'Return to navigator' })
     );
     await waitFor(() =>
       expect(window.location.hash).toBe('#/collections/post')

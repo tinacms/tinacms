@@ -1,3 +1,4 @@
+import type { StoredDraft } from '../form/drafts';
 import { createContext } from 'react';
 import type { StoreApi } from 'zustand';
 import type { TinaSchema } from '../config';
@@ -53,9 +54,18 @@ export interface FormScope extends FormHookScope {
   staleDraft: StaleDraftActions | null;
 }
 
+/** Why a draft waits: kept since the last visit, the file changed since, or a leftover of an earlier Resume. */
+export type WaitingCause = 'kept' | 'changed' | 'leftover';
+
 export interface StaleDraftActions {
+  cause: WaitingCause;
+  /** Labels of the fields held in the newest leftover copy. */
+  leftoverFields: string[];
+  /** The waiting copies the editor sees now. Discard removes the ones it was shown. */
+  copies: readonly StoredDraft[];
   resume: () => void;
-  discard: () => void;
+  /** Removes the given copies. The caller confirms first. */
+  discard: (copies: readonly StoredDraft[]) => void;
 }
 export const FormScopeContext = createContext<FormScope | null>(null);
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { cva } from 'class-variance-authority';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, CSSProperties } from 'react';
 import { toast as sonner } from 'sonner';
 
 import { Button } from '@tinacms/ui/components/button';
@@ -42,6 +42,8 @@ type ToastProps = Omit<ComponentProps<'div'>, 'title' | 'children'> & {
   text?: string;
   action?: ToastAction;
   secondaryAction?: ToastAction & { destructive?: boolean };
+  /** The actions sit at the end of the row beside the words, instead of under them. */
+  actionsInline?: boolean;
   dismissible?: boolean;
   dismissLabel?: string;
   onDismiss?: () => void;
@@ -58,6 +60,7 @@ function Toast({
   text,
   action,
   secondaryAction,
+  actionsInline = false,
   dismissible = true,
   dismissLabel = 'Dismiss',
   onDismiss,
@@ -68,6 +71,47 @@ function Toast({
   const oneLine = !text && !hasActions;
   const urgent = tone === 'error' || tone === 'warning';
   const destructive = Boolean(secondaryAction?.destructive);
+
+  const actions = hasActions ? (
+    <div
+      className={cn(
+        'flex flex-wrap gap-1.5',
+        actionsInline ? 'flex-none items-center' : 'pt-2'
+      )}
+    >
+      {action ? (
+        <Button
+          variant='outline'
+          size='sm'
+          aria-label={action['aria-label']}
+          onClick={action.onClick}
+        >
+          {action.label}
+        </Button>
+      ) : null}
+      {secondaryAction ? (
+        destructive ? (
+          <Button
+            variant='destructive'
+            size='sm'
+            aria-label={secondaryAction['aria-label']}
+            onClick={secondaryAction.onClick}
+          >
+            {secondaryAction.label}
+          </Button>
+        ) : (
+          <Button
+            variant='ghost'
+            size='sm'
+            aria-label={secondaryAction['aria-label']}
+            onClick={secondaryAction.onClick}
+          >
+            {secondaryAction.label}
+          </Button>
+        )
+      ) : null}
+    </div>
+  ) : null;
 
   return (
     <div
@@ -102,42 +146,9 @@ function Toast({
           {title}
         </span>
         {text ? <span className='text-muted-foreground'>{text}</span> : null}
-        {hasActions ? (
-          <div className='flex flex-wrap gap-1.5 pt-2'>
-            {action ? (
-              <Button
-                variant='outline'
-                size='sm'
-                aria-label={action['aria-label']}
-                onClick={action.onClick}
-              >
-                {action.label}
-              </Button>
-            ) : null}
-            {secondaryAction ? (
-              destructive ? (
-                <Button
-                  variant='destructive'
-                  size='sm'
-                  aria-label={secondaryAction['aria-label']}
-                  onClick={secondaryAction.onClick}
-                >
-                  {secondaryAction.label}
-                </Button>
-              ) : (
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  aria-label={secondaryAction['aria-label']}
-                  onClick={secondaryAction.onClick}
-                >
-                  {secondaryAction.label}
-                </Button>
-              )
-            ) : null}
-          </div>
-        ) : null}
+        {actionsInline ? null : actions}
       </div>
+      {actionsInline ? actions : null}
       {dismissible ? (
         <span className={cn('ml-auto flex-none', !oneLine && '-my-1')}>
           <Button
@@ -152,6 +163,9 @@ function Toast({
     </div>
   );
 }
+
+// Words and actions share one row, so the card is wider than the Toaster default.
+const INLINE_ACTIONS_WIDTH = { '--width': '30rem' } as CSSProperties;
 
 type ToastOptions = Omit<ToastProps, 'id'> & {
   /** Milliseconds, or `Infinity` to stay until the person acts. Errors and warnings stay by default. */
@@ -169,6 +183,7 @@ function toast({ duration, onDismiss, id, ...props }: ToastOptions) {
     (toastId) => <Toast {...props} onDismiss={() => sonner.dismiss(toastId)} />,
     {
       duration: duration ?? (urgent ? Number.POSITIVE_INFINITY : undefined),
+      style: props.actionsInline ? INLINE_ACTIONS_WIDTH : undefined,
       id,
       onDismiss,
       onAutoClose: onDismiss,
