@@ -16,6 +16,11 @@ import {
   validatorConflictError,
 } from '../core/validator/registry';
 import { ARRAY_FIELD_TYPE } from '../plugins/fields/array/array-field.schema';
+import {
+  isObjectDisplay,
+  OBJECT_DISPLAYS,
+  OBJECT_FIELD_TYPE,
+} from '../plugins/fields/object/object-field.schema';
 import { type PackageVersion, packageVersion } from './package-version';
 
 export const LOCK_VERSION = 5;
@@ -107,7 +112,7 @@ const usedHooks = (collections: CollectionSchema[]): string[] => [
 
 // v3 field options that v4 does not have, with what replaces each (ADR-029).
 const DROPPED_OPTIONS: Record<string, string> = {
-  ui: 'v4 has no `ui` wrapper: put description, defaultValue, hidden, itemLabel and picker at the top level of the field',
+  ui: 'v4 has no `ui` wrapper: put description, defaultValue, hidden, itemLabel, picker and display at the top level of the field',
   component:
     'register a field plugin for the widget; the field type picks the plugin that renders it',
   parse:
@@ -184,6 +189,20 @@ const assertScalarItemsAreVisible = (collections: CollectionSchema[]): void => {
 
 const PICKERS = ['list', 'grid'];
 
+const assertObjectDisplays = (collections: CollectionSchema[]): void => {
+  for (const collection of collections) {
+    for (const node of nodesIn(collection.fields)) {
+      if (node.type !== OBJECT_FIELD_TYPE || !('display' in node)) continue;
+      if (node.display === undefined) continue;
+      invariant(
+        isObjectDisplay(node.display),
+        'schema-object-display-invalid',
+        `The object "${String(node.name)}" in collection "${collection.name}" sets "display" to ${JSON.stringify(node.display)}. "display" takes ${OBJECT_DISPLAYS.map((display) => `"${display}"`).join(', ')}.`
+      );
+    }
+  }
+};
+
 const assertTemplatesArrayOptions = (collections: CollectionSchema[]): void => {
   for (const collection of collections) {
     for (const node of nodesIn(collection.fields)) {
@@ -212,6 +231,7 @@ export const compileSchema = (config: ResolvedConfig): TinaLock => {
   assertNoDroppedOptions(config.schema.collections);
   assertScalarItemsAreVisible(config.schema.collections);
   assertTemplatesArrayOptions(config.schema.collections);
+  assertObjectDisplays(config.schema.collections);
   const provisions = fieldProvisionsOf(config.plugins);
   const primitives: Record<string, number> = {};
   for (const type of usedFieldTypes(config.schema.collections).sort()) {

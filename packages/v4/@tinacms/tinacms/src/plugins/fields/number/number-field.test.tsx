@@ -387,7 +387,10 @@ describe('NumberField metadata wrapping', () => {
   it('registers the number descriptor with its declared metadata', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('number');
-    expect(descriptor?.metadata).toEqual({ layout: 'inline' });
+    expect(descriptor?.metadata).toEqual({
+      layout: 'inline',
+      inlineBox: expect.any(Function),
+    });
     expect(descriptor?.defaultValue).toBeUndefined();
   });
 });

@@ -7,6 +7,8 @@ import { FieldTrail } from '@tinacms/ui/components/field-trail';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { FormLevel } from '@tinacms/ui/components/form-level';
 import { Input } from '@tinacms/ui/components/input';
+import { ListCard } from '@tinacms/ui/components/list-card';
+import type { ReactNode } from 'react';
 
 describe('FieldWrapper', () => {
   it('names the control, marks it required for screen readers and points help at it', () => {
@@ -156,5 +158,35 @@ describe('FormLevel', () => {
     expect(
       screen.getByRole('navigation', { name: 'Field path' })
     ).toBeInTheDocument();
+  });
+});
+
+describe('FormLevel pinHeaders', () => {
+  const card = (name: string, children?: ReactNode) => (
+    <ListCard name={name} kind='group' summary={name} open>
+      {children}
+    </ListCard>
+  );
+  const heads = () =>
+    Array.from(document.querySelectorAll('[data-slot=list-card-head]'));
+
+  it('pins the head of an open card, two deep at most', () => {
+    render(
+      <FormLevel pinHeaders>
+        {card('A', card('B', card('C', <p>fields</p>)))}
+      </FormLevel>
+    );
+    expect(heads().map((head) => head.hasAttribute('data-pinned'))).toEqual([
+      true,
+      true,
+      false,
+    ]);
+  });
+
+  it('pins nothing unless the level asks', () => {
+    render(<FormLevel>{card('A', <p>fields</p>)}</FormLevel>);
+    expect(heads().some((head) => head.hasAttribute('data-pinned'))).toBe(
+      false
+    );
   });
 });

@@ -49,6 +49,7 @@ An option that only applies to one field type sits on that type's builder, and t
 
 - datetime: `dateFormat`, `timeFormat`
 - color: `colorFormat`, `widget`, `width`, `colors`
+- object: `display`
 - reference: `collectionFilter`
 - rich-text: `toolbarOverride`, `overrides`
 
