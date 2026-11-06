@@ -284,8 +284,8 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
               <AdminShell preview={preview} projectName={config.projectName} />
             </AuthGate>
           </HashRouter>
+          <ShellToaster />
         </TooltipProvider>
-        <ShellToaster />
       </TinaProvider>
     </AdminErrorBoundary>
   );
@@ -436,6 +436,7 @@ function AdminShell({
             open={route.view === 'screen'}
             navigate={navigate}
             onClose={goHome}
+            hideBelowLg={route.view === 'screen'}
           />
         ) : null}
 
@@ -446,6 +447,7 @@ function AdminShell({
             route={route}
             navigate={navigate}
             onClose={goHome}
+            hideBelowLg={isStaleCollectionRoute}
           />
         ) : null}
 
@@ -455,6 +457,7 @@ function AdminShell({
             activeScreen={activeScreen?.screen}
             navigate={navigate}
             onClose={goHome}
+            hideBelowLg={toolsScreenOpen}
           />
         ) : null}
 
