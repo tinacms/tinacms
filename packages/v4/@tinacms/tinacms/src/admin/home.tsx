@@ -79,7 +79,7 @@ export function HomePanel({
       <div className='min-h-0 flex-1 overflow-y-auto'>
         <div className='mx-auto w-full max-w-260 px-4 py-10'>
           <div className='mb-8 flex items-start justify-between gap-4'>
-            <div>
+            <div className='min-w-0 break-words'>
               <h2 className='text-2xl font-semibold'>Home</h2>
               {line ? (
                 <p className='text-base text-muted-foreground'>{line}</p>
