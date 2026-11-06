@@ -483,6 +483,15 @@ export function useListItems() {
     isRevealed: (itemAddress: string) =>
       isRevealed(view.getState(), itemAddress),
     touch: (itemAddress: FieldAddress) => view.getState().touch(itemAddress),
+    /** The index of the item of `listAddress` the editor just came back from, once. */
+    takeReturnedIndex: (listAddress: string): number | undefined => {
+      const { returnedFrom, clearReturn } = view.getState();
+      const prefix = `${listAddress}.`;
+      if (!returnedFrom?.startsWith(prefix)) return undefined;
+      const index = Number(returnedFrom.slice(prefix.length).split('.')[0]);
+      clearReturn();
+      return Number.isInteger(index) ? index : undefined;
+    },
   };
 }
 

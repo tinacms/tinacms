@@ -15,6 +15,9 @@ import { DiscardConfirm } from './discard-confirm';
 import { openNavTarget } from './rail';
 import type { AdminRoute } from './routing';
 
+const paneClass = (hideBelowLg: boolean) =>
+  `flex w-110 min-w-0 flex-col border-r border-border${hideBelowLg ? ' max-lg:hidden' : ''}`;
+
 const documentName = (path: string) => path.split('/').at(-1) ?? path;
 
 function DocumentRow({
@@ -256,6 +259,7 @@ export function CollectionsNavigator({
   route,
   navigate,
   onClose,
+  hideBelowLg = false,
 }: {
   collections: CollectionSchema[];
   /** The document row to mark, when no document is open. */
@@ -263,6 +267,7 @@ export function CollectionsNavigator({
   route: AdminRoute;
   navigate: (route: AdminRoute) => void;
   onClose: () => void;
+  hideBelowLg?: boolean;
 }) {
   const activeCollection =
     route.view === 'collection' || route.view === 'document'
@@ -274,10 +279,7 @@ export function CollectionsNavigator({
   const unsavedIds = new Set<string>(useUnsavedFormIds());
   const hasUnsaved = unsavedIds.size > 0;
   return (
-    <aside
-      aria-label='Navigator'
-      className='flex w-110 min-w-0 flex-col border-r border-border'
-    >
+    <aside aria-label='Navigator' className={paneClass(hideBelowLg)}>
       <PanelHeader
         heading='Collections'
         closeLabel='Close'
@@ -337,17 +339,16 @@ export function MediaPanel({
   open,
   navigate,
   onClose,
+  hideBelowLg = false,
 }: {
   hasLibrary: boolean;
   open: boolean;
   navigate: (route: AdminRoute) => void;
   onClose: () => void;
+  hideBelowLg?: boolean;
 }) {
   return (
-    <aside
-      aria-label='Media panel'
-      className='flex w-110 min-w-0 flex-col border-r border-border'
-    >
+    <aside aria-label='Media panel' className={paneClass(hideBelowLg)}>
       <PanelHeader heading='Media' closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
         {hasLibrary ? (
@@ -376,17 +377,16 @@ export function ToolsPane({
   activeScreen,
   navigate,
   onClose,
+  hideBelowLg = false,
 }: {
   entries: GlobalNavEntry[];
   activeScreen?: string;
   navigate: (route: AdminRoute) => void;
   onClose: () => void;
+  hideBelowLg?: boolean;
 }) {
   return (
-    <aside
-      aria-label='Tools panel'
-      className='flex w-110 min-w-0 flex-col border-r border-border'
-    >
+    <aside aria-label='Tools panel' className={paneClass(hideBelowLg)}>
       <PanelHeader heading='Tools' closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
         {entries.length === 0 ? (

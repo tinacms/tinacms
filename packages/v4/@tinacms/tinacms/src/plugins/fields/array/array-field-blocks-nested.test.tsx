@@ -1,6 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DocumentForm } from '../../../admin/document-form';
 import { asResolvedConfig } from '../../../config';
 import type {
@@ -195,4 +195,35 @@ describe('Blocks field: nested', () => {
     await waitFor(() => expect(cards[0]).toHaveAccessibleName(/1 error/));
     expect(cards[1]).not.toHaveAccessibleName(/error/);
   });
+});
+
+describe('Blocks field: coming back from a block', () => {
+  const blocks = [
+    { _template: 'quote', text: 'one' },
+    { _template: 'quote', text: 'two' },
+    { _template: 'quote', text: 'three' },
+  ];
+  const gripOf = (list: HTMLElement, index: number) =>
+    list
+      .querySelectorAll('[data-array-item]')
+      [index].querySelector<HTMLElement>('[data-grip]');
+
+  it.each([0, 1, 2])(
+    'puts focus on block %i and scrolls it into view when Up returns to the list',
+    async (index) => {
+      const scrollIntoView = vi.fn();
+      Element.prototype.scrollIntoView = scrollIntoView;
+      renderForm({ blocks });
+      const list = await screen.findByRole('group', { name: 'Blocks' });
+      await userEvent.click(
+        within(list).getAllByRole('button', { name: /^Item \d/ })[index]
+      );
+      await userEvent.click(
+        await screen.findByRole('button', { name: 'Up to Blocks' })
+      );
+      const back = await screen.findByRole('group', { name: 'Blocks' });
+      await waitFor(() => expect(gripOf(back, index)).toHaveFocus());
+      expect(scrollIntoView).toHaveBeenCalled();
+    }
+  );
 });

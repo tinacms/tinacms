@@ -11,6 +11,7 @@ import {
 import { OBJECT_FIELD_TYPE } from '../plugins/fields/object/object-field.schema';
 import type { FieldSchema } from '../core/schema/types';
 import type { FormId } from '../form/form-store';
+import type { FieldLock } from './context';
 
 export interface OpenLevel {
   address: FieldAddress;
@@ -26,6 +27,8 @@ export interface FormViewState {
   touched: ReadonlySet<string>;
   saveAttempted: boolean;
   openLevels: readonly OpenLevel[];
+  /** The address of the level the editor just left by going up, until a list takes it back. */
+  returnedFrom: string | null;
   /** Expand all and Collapse all: cards and objects that open in place follow the newest one. */
   expansion: { readonly version: number; readonly open: boolean };
   setExpansion: (open: boolean) => void;
@@ -35,6 +38,7 @@ export interface FormViewState {
   openLevel: (level: OpenLevel) => void;
   showLevels: (levels: readonly OpenLevel[]) => void;
   closeLevelsAbove: (keep: number) => void;
+  clearReturn: () => void;
 }
 
 export type FormViewStore = StoreApi<FormViewState>;
@@ -44,6 +48,7 @@ export const createFormViewStore = (): FormViewStore =>
     touched: new Set(),
     saveAttempted: false,
     openLevels: [],
+    returnedFrom: null,
     expansion: { version: 0, open: false },
     setExpansion: (open) =>
       set((state) => ({
@@ -58,10 +63,17 @@ export const createFormViewStore = (): FormViewStore =>
     attemptSave: () => set({ saveAttempted: true }),
     resetReveal: () => set({ touched: new Set(), saveAttempted: false }),
     openLevel: (level) =>
-      set((state) => ({ openLevels: [...state.openLevels, level] })),
-    showLevels: (levels) => set({ openLevels: levels }),
+      set((state) => ({
+        openLevels: [...state.openLevels, level],
+        returnedFrom: null,
+      })),
+    showLevels: (levels) => set({ openLevels: levels, returnedFrom: null }),
     closeLevelsAbove: (keep) =>
-      set((state) => ({ openLevels: state.openLevels.slice(0, keep) })),
+      set((state) => ({
+        openLevels: state.openLevels.slice(0, keep),
+        returnedFrom: state.openLevels[keep]?.address ?? null,
+      })),
+    clearReturn: () => set({ returnedFrom: null }),
   }));
 
 export function useFormViewStore(formId: FormId): FormViewStore {
@@ -216,6 +228,20 @@ export const fieldsAlong = (
   return along;
 };
 
+// The lock an open level inherits from the fields above it. The level's own
+// field, the last step, locks itself.
+export const lockAbove = (
+  address: string,
+  fields: readonly FieldSchema[],
+  valueAt: (address: string) => unknown
+): FieldLock => {
+  const above = fieldsAlong(address, fields, valueAt).slice(0, -1);
+  return {
+    disabled: above.some((step) => step.node.disabled === true),
+    readOnly: above.some((step) => step.node.readOnly === true),
+  };
+};
+
 // The levels that must be open for the field at `address` to be on screen.
 export const levelsFor = (
   address: string,
@@ -226,18 +252,3 @@ export const levelsFor = (
   fieldsAlong(address, fields, valueAt).filter(
     (step) => step.address !== address && drillsIn(step)
   );
-
-/** Whether a field above an open level is disabled or read-only. The level's own fields are too. */
-export const lockAbove = (
-  address: string,
-  fields: readonly FieldSchema[],
-  valueAt: (address: string) => unknown
-): { disabled: boolean; readOnly: boolean } => {
-  const above = fieldsAlong(address, fields, valueAt).filter(
-    (step) => step.address !== address && !step.item
-  );
-  return {
-    disabled: above.some(({ node }) => node.disabled === true),
-    readOnly: above.some(({ node }) => node.readOnly === true),
-  };
-};

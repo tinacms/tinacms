@@ -13,6 +13,7 @@ import {
   useState,
 } from 'react';
 import { mediaNameOf } from '../../media-manager/media-types';
+import { MISSING_IMAGE_WARNING } from './image-field.view';
 import { ImageTile, MoveHandle, type ResolveImageUrl } from './image-tile';
 
 export interface ImageGalleryItem {
@@ -212,16 +213,11 @@ export function ImageGalleryView({
     if (item && over >= 0) moveTo(current.index, over, item.key);
   };
 
-  const missingWarnings = [
-    ...new Set(
-      items
-        .filter((item) => item.missing || missingKeys.has(item.key))
-        .map(
-          (item) =>
-            `${itemName(item.value).label} is missing from Media. Replace or remove it.`
-        )
-    ),
-  ];
+  const missingWarnings = items.some(
+    (item) => item.missing || missingKeys.has(item.key)
+  )
+    ? [MISSING_IMAGE_WARNING]
+    : [];
 
   return (
     <FieldWrapper

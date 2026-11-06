@@ -9,6 +9,9 @@ import type { CollectionSchema, FieldSchema } from '../../core/schema/types';
 import { FormProvider, TinaProvider } from '../../editor';
 import { LabelledFields } from '../../test/labelled-fields';
 import { corePlugins, t } from '.';
+import arrayFieldPlugin from './array/array-field.plugin';
+import objectFieldPlugin from './object/object-field.plugin';
+import stringFieldPlugin from './string/string-field.plugin';
 
 const stubPlugin = (
   capability: 'content' | 'media',
@@ -109,5 +112,76 @@ describe('field plugins with a stored value of the wrong type', () => {
     expect(await screen.findByText('Field')).toBeInTheDocument();
     expect(errors).not.toHaveBeenCalled();
     errors.mockRestore();
+  });
+});
+
+describe('Clear on a stored value of the wrong shape', () => {
+  const list = (state: object) =>
+    t.array({
+      name: 'field',
+      label: 'Field',
+      fields: [t.string({ name: 'name', label: 'Name' })],
+      ...state,
+    });
+  const group = (state: object) =>
+    t.object({
+      name: 'field',
+      label: 'Field',
+      fields: [t.string({ name: 'name', label: 'Name' })],
+      ...state,
+    });
+  const inside = (child: FieldSchema, state: object) =>
+    t.object({
+      name: 'field',
+      label: 'Field',
+      fields: [{ ...child, name: 'inner' }],
+      ...state,
+    });
+
+  const CLEAR_CASES: [string, FieldSchema, unknown][] = [
+    ['an array', list({}), 'bad'],
+    ['an object', group({}), 'bad'],
+    ['a read-only array', list({ readOnly: true }), 'bad'],
+    ['a disabled array', list({ disabled: true }), 'bad'],
+    ['a read-only object', group({ readOnly: true }), 'bad'],
+    ['a disabled object', group({ disabled: true }), 'bad'],
+    [
+      'an array in a read-only object',
+      inside(list({}), { readOnly: true }),
+      { inner: 'bad' },
+    ],
+    [
+      'an object in a disabled object',
+      inside(group({}), { disabled: true }),
+      { inner: 'bad' },
+    ],
+  ];
+
+  it.each(CLEAR_CASES)('%s', async (kind, field, value) => {
+    const collection: CollectionSchema = {
+      name: 'post',
+      label: 'Posts',
+      format: 'mdx',
+      fields: [field],
+    };
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [arrayFieldPlugin, objectFieldPlugin, stringFieldPlugin],
+          schema: { collections: [collection] },
+        })}
+      >
+        <FormProvider
+          collection={collection}
+          path='content/posts/hello.mdx'
+          document={{ field: value }}
+        >
+          <LabelledFields />
+        </FormProvider>
+      </TinaProvider>
+    );
+    const clear = await screen.findByRole('button', { name: 'Clear' });
+    if (/read-only|disabled/.test(kind)) expect(clear).toBeDisabled();
+    else expect(clear).toBeEnabled();
   });
 });
