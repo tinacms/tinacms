@@ -46,9 +46,11 @@ import { countFailingFields } from '../editor/field-errors';
 import { DiscardConfirm } from './discard-confirm';
 import { DocumentStatus } from './document-status';
 import { saveFailureWords } from './save-failure';
+import { leftoverText } from './leftover-text';
 import { useNarrow } from './use-narrow';
 
 const toastOwners = new Map<string, number>();
+const liveRetries = new Map<string, () => void>();
 const TOAST_REMOUNT_GRACE_MS = 400;
 
 const dismissIfUnowned = (toastId: string) =>
@@ -78,6 +80,16 @@ function SaveButton() {
   const [pending, setPending] = useState(false);
   const failedToastId = `save-failed:${formId}`;
   useToastOwner(failedToastId, true);
+  const retry = useEffectEvent(() => run());
+  useEffect(() => {
+    const live = () => retry();
+    liveRetries.set(failedToastId, live);
+    return () => {
+      if (liveRetries.get(failedToastId) === live) {
+        liveRetries.delete(failedToastId);
+      }
+    };
+  }, [failedToastId]);
   const run = useEffectEvent(() => {
     setPending(true);
     save()
@@ -92,7 +104,14 @@ function SaveButton() {
           title,
           text,
           dismissible: !disk,
-          action: { label: 'Retry', onClick: run },
+          action: {
+            label: 'Retry',
+            onClick: () => {
+              const live = liveRetries.get(failedToastId);
+              if (live) live();
+              else toast.dismiss(failedToastId);
+            },
+          },
           secondaryAction: disk
             ? {
                 label: 'Dismiss',
@@ -196,6 +215,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
   const shown = useRef<readonly StoredDraft[]>([]);
   const cause = stale?.cause;
   const fields = stale?.leftoverFields.join(', ');
+  const fieldCount = stale?.leftoverFields.length ?? 0;
   // `stale` is a new object whenever the form changes. The toast must not show
   // again for that, so the effect keys on what the toast says, and the buttons
   // read the latest actions. While the confirm is open the buttons do nothing.
@@ -221,7 +241,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
       title: 'Resume your unsaved edits?',
       text:
         cause === 'leftover'
-          ? `Your earlier edit to ${fields} is still kept.`
+          ? leftoverText(fields ?? '', fieldCount)
           : RESUME_TEXT[cause],
       dismissible: false,
       duration: Number.POSITIVE_INFINITY,
@@ -232,7 +252,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
         onClick: askToDiscard,
       },
     });
-  }, [cause, fields, toastId, narrow]);
+  }, [cause, fields, fieldCount, toastId, narrow]);
   // A change of wording replaces the toast in place; only an empty list or a
   // different document takes it away.
   useToastOwner(toastId, cause !== undefined);
