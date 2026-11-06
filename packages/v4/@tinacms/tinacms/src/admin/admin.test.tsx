@@ -1,7 +1,9 @@
 import { QueryClient } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { toast } from '@tinacms/ui/components/toast';
+import { act } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { ContentProvider, DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
@@ -1259,5 +1261,24 @@ describe('TinaAdmin rail', () => {
     ).toBeVisible();
     await user.click(screen.getAllByRole('button', { name: 'Close' }).at(-1)!);
     await waitFor(() => expect(window.location.hash).toBe('#/tools'));
+  });
+});
+
+describe('Toast tooltips', () => {
+  it('opens the Dismiss tooltip after the half second the rest of the admin uses, not the 600ms default', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await screen.findByRole('button', { name: 'Toggle Sidebar' });
+    act(() => {
+      toast({ title: 'Heads up' });
+    });
+    const dismiss = await screen.findByRole('button', { name: 'Dismiss' });
+    const tip = () => document.querySelector('[data-slot="tooltip-content"]');
+    const start = performance.now();
+    await user.hover(dismiss);
+    await waitFor(() => expect(tip()).toHaveTextContent('Dismiss'));
+    const waited = performance.now() - start;
+    expect(waited).toBeGreaterThanOrEqual(450);
+    expect(waited).toBeLessThan(580);
   });
 });
