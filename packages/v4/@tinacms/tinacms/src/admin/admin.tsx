@@ -198,8 +198,8 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
               <AdminShell preview={preview} projectName={config.projectName} />
             </AuthGate>
           </HashRouter>
+          <ShellToaster />
         </TooltipProvider>
-        <ShellToaster />
       </TinaProvider>
     </AdminErrorBoundary>
   );
