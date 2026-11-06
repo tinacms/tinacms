@@ -5,9 +5,6 @@ export const DATETIME_FIELD_TYPE = 'datetime';
 
 export interface DatetimeFieldSchema extends BaseFieldSchema {
   type: typeof DATETIME_FIELD_TYPE;
-  /** The earliest and latest value the box takes, as `YYYY-MM-DDTHH:mm`. */
-  min?: string;
-  max?: string;
   placeholder?: string;
 }
 

@@ -238,6 +238,7 @@ export interface BlockAddViewProps {
   disabled?: boolean;
   /** The list is full: the button is off and `reason` says why. */
   reason?: string;
+  addLabel?: string;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -254,6 +255,7 @@ export function BlockAddView({
   onPick,
   disabled,
   reason,
+  addLabel = 'Add a block',
   open,
   defaultOpen,
   onOpenChange,
@@ -281,7 +283,7 @@ export function BlockAddView({
           data-slot='add-button'
           disabled={off}
           aria-describedby={reason ? reasonId : undefined}
-          render={<AddButton>Add a block</AddButton>}
+          render={<AddButton>{addLabel}</AddButton>}
         />
         {/* The side is picked once on open. `sticky` keeps the panel inside the visible area, over its button if it must, when the keyboard shrinks the viewport. */}
         <PopoverContent

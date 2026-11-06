@@ -64,6 +64,12 @@ const collection: CollectionSchema = {
   fields: [
     t.array({ name: 'blocks', label: 'Blocks', templates }),
     t.array({
+      name: 'sections',
+      label: 'Sections',
+      addLabel: 'Add a section',
+      templates,
+    }),
+    t.array({
       name: 'tags',
       label: 'Tags',
       of: t.string({ name: 'tag', label: 'Tag' }),
@@ -126,6 +132,17 @@ describe('Blocks field picker', () => {
     const trigger = within(blocks).getByRole('button', { name: 'Add a block' });
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
     expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+  });
+
+  it('says "Add a section" on the picker button when the field sets addLabel', async () => {
+    renderPage();
+    const sections = await list('Sections');
+    expect(
+      within(sections).getByRole('button', { name: 'Add a section' })
+    ).toBeInTheDocument();
+    expect(
+      within(sections).queryByRole('button', { name: 'Add a block' })
+    ).toBeNull();
   });
 
   it('keeps "Add item" and no picker on a list that is not blocks', async () => {

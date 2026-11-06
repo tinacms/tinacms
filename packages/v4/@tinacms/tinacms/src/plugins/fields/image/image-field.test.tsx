@@ -403,7 +403,7 @@ describe('ImageField missing images', () => {
     }
     fireEvent.error(within(group).getByAltText('deleted.jpg'));
     expect(screen.getByRole('status')).toHaveTextContent(
-      'deleted.jpg is missing from Media'
+      'This image is no longer in Media'
     );
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(
@@ -432,7 +432,7 @@ describe('ImageField missing images', () => {
     }
     fireEvent.error(within(group).getByAltText('photo.jpg'));
     expect(screen.getByRole('status')).toHaveTextContent(
-      'photo.jpg is missing from Media'
+      'This image is no longer in Media'
     );
     vi.useRealTimers();
     await pickFromLibrary(group, 'Replace photo.jpg');

@@ -291,6 +291,21 @@ function ObjectItems({
     if (grip instanceof HTMLElement) grip.focus();
   }, [inserting, items, listRef]);
 
+  // Coming back from an item's form level remounts the list: put focus and the viewport on its card.
+  useEffect(() => {
+    const returned = listItems.takeReturnedIndex(address);
+    if (returned === undefined) return;
+    const cards = Array.from(listRef.current?.children ?? []).filter((child) =>
+      child.hasAttribute('data-array-item')
+    );
+    const card = cards[Math.min(returned, cards.length - 1)];
+    const target = card?.querySelector('[data-grip]');
+    if (target instanceof HTMLElement) {
+      target.focus();
+      target.scrollIntoView({ block: 'center' });
+    }
+  }, []);
+
   const seed = (defaultItem: TinaDocument | undefined, fields: FieldSchema[]) =>
     seedItem(defaultItem, fields, { documentPath, registry });
   const seedFor = (template?: ArrayTemplateSchema): TinaDocument =>
@@ -413,7 +428,6 @@ function ObjectItems({
       add='button'
       addLabel={field.addLabel ?? 'Add item'}
       onAdd={() => add()}
-      emptyText={isTemplatesArray(field) ? 'No blocks.' : undefined}
       addSlot={
         isTemplatesArray(field)
           ? ({ disabled }) => (
@@ -524,6 +538,7 @@ function TemplatePicker({
       onPick={pick}
       disabled={disabled}
       reason={full ? FULL_REASON : undefined}
+      addLabel={field.addLabel}
       open={open}
       onOpenChange={onOpenChange}
     />

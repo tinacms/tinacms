@@ -106,6 +106,11 @@ t.array({
 `hidden` and `description` on the `of` field of a scalar array fail the build.
 Set them on the array.
 
+An array takes `addLabel`, the words on its Add control: "Add item" by default,
+and "Add a block" on a Blocks field. A template takes `group`, the heading it
+sits under in the block picker (templates without one come first), and
+`description`, one line under its name in the picker.
+
 Every field also takes `description`, `defaultValue` and `hidden`. Refer to
 [Options every field takes](./field-plugins.md#options-every-field-takes).
 
@@ -271,8 +276,8 @@ Each item is a List card in a card list.
 ### Block picker
 
 "Add a block" opens a floating panel named "Choose a block". It holds a search
-box ("Search blocks") and a flat list of the templates in schema order. The list
-has no group headings.
+box ("Search blocks") and the templates in schema order, under the heading each
+sets with `group`. Templates without a `group` come first.
 
 - Search matches the template label, without regard to case. When nothing matches, the panel says "No blocks match."
   The search box is empty each time the panel opens.
@@ -288,8 +293,8 @@ has no group headings.
 - Focus goes to the search box when the panel opens. Escape, a press outside the
   panel or a pick closes it. After Escape or an outside press, focus returns to
   "Add a block".
-- A pick adds the block and closes the panel. The block opens by the depth rule
-  below, and focus moves to it.
+- A pick adds the block and closes the panel. The block opens as its own form
+  level at any depth, and focus moves to its first field.
 - The panel does not open when the list is full or the field is disabled.
 
 ### Opening an item
@@ -298,7 +303,9 @@ The depth of an item is the depth of its fields: the depth of the array plus
 one (`itemOpensNextLevel` in `editor/form-view-state.ts`). Array positions are
 not levels.
 
-- At depth 1 and 2, the card opens in place. Its head sticks to the top while
+- A block always opens as the next form level, at any depth. Going Up returns
+  focus to its card and scrolls it into view.
+- At depth 1 and 2, any other card opens in place. Its head sticks to the top while
   its fields scroll, two deep at most (`FormLevel` `pinHeaders`).
 - At depth 3 and deeper, the card opens as the next form level. The level
   holds a stand-in `object` node built from the fields of the item

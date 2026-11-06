@@ -22,8 +22,6 @@ export type DatetimeFieldViewProps = Pick<
   onChange?: (value: string) => void;
   onBlur?: () => void;
   /** The earliest and latest value the box takes, as `YYYY-MM-DDTHH:mm`. */
-  min?: string;
-  max?: string;
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
@@ -40,8 +38,6 @@ export function DatetimeFieldView({
   value,
   onChange,
   onBlur,
-  min,
-  max,
   placeholder,
   disabled = false,
   readOnly = false,
@@ -58,8 +54,6 @@ export function DatetimeFieldView({
           id={id}
           type='datetime-local'
           value={value}
-          min={min}
-          max={max}
           placeholder={placeholder}
           onBlur={onBlur}
           required={frame.required}

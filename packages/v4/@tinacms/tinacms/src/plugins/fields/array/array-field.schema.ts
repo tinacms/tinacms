@@ -16,7 +16,7 @@ const COMPOUND_TYPES: string[] = [ARRAY_FIELD_TYPE, OBJECT_FIELD_TYPE];
 
 interface ArrayFieldBase extends BaseFieldSchema {
   type: typeof ARRAY_FIELD_TYPE;
-  /** The words on the Add button, such as "Add a tag". Defaults to "Add item". */
+  /** The words on the Add button, such as "Add a tag". Defaults to "Add item", or "Add a block" on a Blocks field. */
   addLabel?: string;
 }
 
