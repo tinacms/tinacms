@@ -335,6 +335,7 @@ function AdminShell({
             open={route.view === 'screen'}
             navigate={navigate}
             onClose={goHome}
+            hideBelowLg={route.view === 'screen'}
           />
         ) : null}
 
@@ -345,6 +346,7 @@ function AdminShell({
             route={route}
             navigate={navigate}
             onClose={goHome}
+            hideBelowLg={isStaleCollectionRoute}
           />
         ) : null}
 
@@ -354,6 +356,7 @@ function AdminShell({
             activeScreen={activeScreen?.screen}
             navigate={navigate}
             onClose={goHome}
+            hideBelowLg={toolsScreenOpen}
           />
         ) : null}
 

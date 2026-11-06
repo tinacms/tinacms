@@ -1063,6 +1063,24 @@ describe('TinaAdmin rail', () => {
     expect(home).toHaveFocus();
   });
 
+  it('moves between the rows with the arrow keys once the rail is collapsed', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(
+      await screen.findByRole('button', { name: 'Toggle Sidebar' })
+    );
+    const [home] = await railButtons();
+    home.focus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('button', { name: 'Collections' })).toHaveFocus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('button', { name: 'Media' })).toHaveFocus();
+    await user.keyboard('{ArrowUp}{Home}');
+    expect(home).toHaveFocus();
+    await user.keyboard('{End}');
+    expect(home).not.toHaveFocus();
+  });
+
   it('keeps unsaved edits when a rail row is clicked, and still blocks a reload', async () => {
     const user = userEvent.setup();
     renderAdmin();
