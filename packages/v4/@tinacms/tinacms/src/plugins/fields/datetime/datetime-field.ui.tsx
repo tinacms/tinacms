@@ -52,7 +52,7 @@ const fromInputValue = (
 
 export function DatetimeField() {
   const address = useFieldAddress();
-  const { min, max, placeholder } = useFieldSchema<DatetimeFieldSchema>();
+  const { placeholder } = useFieldSchema<DatetimeFieldSchema>();
   const [value, setValue] = useFieldValue<string | null>(address);
   const frame = useFieldFrame();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -64,8 +64,6 @@ export function DatetimeField() {
       {...frame}
       ref={inputRef}
       id={address}
-      min={min}
-      max={max}
       placeholder={placeholder}
       value={toInputValue(value)}
       onChange={(wallClock) => setValue(fromInputValue(wallClock, value))}

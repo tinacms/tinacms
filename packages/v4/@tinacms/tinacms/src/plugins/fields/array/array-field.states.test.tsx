@@ -312,9 +312,9 @@ describe('blocks states', () => {
     return found;
   };
 
-  it('says "No blocks." for an empty editable and an empty read-only list', () => {
+  it('shows only Add on an empty editable list, and "No blocks." on a read-only one', () => {
     const { unmount } = render(<ArrayFieldView {...state('blocks empty')} />);
-    expect(screen.getByText('No blocks.')).toBeVisible();
+    expect(screen.queryByText('No blocks.')).toBeNull();
     expect(screen.getByRole('button', { name: 'Add a block' })).toBeEnabled();
     unmount();
     render(<ArrayFieldView {...state('blocks read-only empty')} />);

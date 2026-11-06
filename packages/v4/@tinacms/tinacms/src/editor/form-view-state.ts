@@ -27,6 +27,8 @@ export interface FormViewState {
   touched: ReadonlySet<string>;
   saveAttempted: boolean;
   openLevels: readonly OpenLevel[];
+  /** The address of the level the editor just left by going up, until a list takes it back. */
+  returnedFrom: string | null;
   /** Expand all and Collapse all: cards and objects that open in place follow the newest one. */
   expansion: { readonly version: number; readonly open: boolean };
   setExpansion: (open: boolean) => void;
@@ -36,6 +38,7 @@ export interface FormViewState {
   openLevel: (level: OpenLevel) => void;
   showLevels: (levels: readonly OpenLevel[]) => void;
   closeLevelsAbove: (keep: number) => void;
+  clearReturn: () => void;
 }
 
 export type FormViewStore = StoreApi<FormViewState>;
@@ -45,6 +48,7 @@ export const createFormViewStore = (): FormViewStore =>
     touched: new Set(),
     saveAttempted: false,
     openLevels: [],
+    returnedFrom: null,
     expansion: { version: 0, open: false },
     setExpansion: (open) =>
       set((state) => ({
@@ -59,10 +63,17 @@ export const createFormViewStore = (): FormViewStore =>
     attemptSave: () => set({ saveAttempted: true }),
     resetReveal: () => set({ touched: new Set(), saveAttempted: false }),
     openLevel: (level) =>
-      set((state) => ({ openLevels: [...state.openLevels, level] })),
-    showLevels: (levels) => set({ openLevels: levels }),
+      set((state) => ({
+        openLevels: [...state.openLevels, level],
+        returnedFrom: null,
+      })),
+    showLevels: (levels) => set({ openLevels: levels, returnedFrom: null }),
     closeLevelsAbove: (keep) =>
-      set((state) => ({ openLevels: state.openLevels.slice(0, keep) })),
+      set((state) => ({
+        openLevels: state.openLevels.slice(0, keep),
+        returnedFrom: state.openLevels[keep]?.address ?? null,
+      })),
+    clearReturn: () => set({ returnedFrom: null }),
   }));
 
 export function useFormViewStore(formId: FormId): FormViewStore {
