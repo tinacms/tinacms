@@ -301,7 +301,14 @@ describe('side nav entries', () => {
 
     await user.click(row);
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    await waitFor(() => expect(row).toHaveTextContent('Unsaved'));
+    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    const back = await screen.findByRole('button', { name: /hello\.mdx/ });
+    expect(back).toHaveTextContent('Unsaved');
+    expect(
+      within(screen.getByRole('navigation', { name: 'Content' })).queryByText(
+        'Unsaved'
+      )
+    ).toBeNull();
   });
 
   it('puts Help & docs at the foot and opens it in a new tab', async () => {
