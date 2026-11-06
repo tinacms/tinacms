@@ -13,7 +13,7 @@ type TopBarProps = Omit<ComponentProps<'header'>, 'children'> & {
   branch?: ReactNode;
   /** Dev controls: a dashed button before Search. Leave it out outside development. */
   devControls?: ReactNode;
-  /** The Search control. Leave it out when no search provider exists. */
+  /** The Search control. */
   search?: ReactNode;
   /** The account button. */
   account?: ReactNode;
@@ -61,7 +61,7 @@ function TopBar({
             <Slash />
             <span
               data-slot='top-bar-project'
-              className='min-w-0 truncate font-semibold'
+              className='min-w-0 shrink-[4] truncate font-semibold'
               title={projectName}
             >
               {projectName}

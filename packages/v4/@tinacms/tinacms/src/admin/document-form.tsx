@@ -53,7 +53,27 @@ import { DocumentStatus } from './document-status';
 import { saveFailureWords } from './save-failure';
 import { useNarrow } from './use-narrow';
 
-const SAVE_FAILED_TOAST = 'save-failed';
+const toastOwners = new Map<string, number>();
+const TOAST_REMOUNT_GRACE_MS = 400;
+
+const dismissIfUnowned = (toastId: string) =>
+  setTimeout(() => {
+    if (!toastOwners.get(toastId)) toast.dismiss(toastId);
+  }, TOAST_REMOUNT_GRACE_MS);
+
+// Removes the toast once no form owns it. The form unmounts while a save reloads
+// its document; one that comes back soon keeps the toast, because Sonner drops a
+// toast that is dismissed and shown again under one id.
+function useToastOwner(toastId: string, present: boolean) {
+  useEffect(() => {
+    if (!present) return;
+    toastOwners.set(toastId, (toastOwners.get(toastId) ?? 0) + 1);
+    return () => {
+      toastOwners.set(toastId, (toastOwners.get(toastId) ?? 1) - 1);
+      dismissIfUnowned(toastId);
+    };
+  }, [present, toastId]);
+}
 
 function SaveButton() {
   const formId = useFormId();
@@ -61,17 +81,18 @@ function SaveButton() {
   const save = useFormSave();
   const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
   const [pending, setPending] = useState(false);
-  // The toast's Retry runs the newest save, so it reads the form as it is then.
+  const failedToastId = `save-failed:${formId}`;
+  useToastOwner(failedToastId, true);
   const run = useEffectEvent(() => {
     setPending(true);
     save()
-      .then(() => toast.dismiss(SAVE_FAILED_TOAST))
+      .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
         // The raw reason is for the console. The editor reads fixed words.
         console.error('[tinacms] Save failed:', cause);
         const { title, text, disk } = saveFailureWords(cause);
         toast({
-          id: SAVE_FAILED_TOAST,
+          id: failedToastId,
           tone: 'error',
           title,
           text,
@@ -80,10 +101,11 @@ function SaveButton() {
           secondaryAction: disk
             ? {
                 label: 'Dismiss',
-                onClick: () => toast.dismiss(SAVE_FAILED_TOAST),
+                onClick: () => toast.dismiss(failedToastId),
               }
             : undefined,
         });
+        dismissIfUnowned(failedToastId);
       })
       .finally(() => setPending(false));
   });
@@ -167,9 +189,6 @@ const documentTitle = (values: TinaDocument | undefined, path: string) => {
   return path.split('/').at(-1) ?? path;
 };
 
-const toastOwners = new Map<string, number>();
-const TOAST_REMOUNT_GRACE_MS = 400;
-
 // The prompt is a bottom-right toast, so the form stays editable behind it. One
 // toast per document: its id holds the path, and leaving the document removes it.
 function ResumeDraftToast({ scope }: { scope: FormScope }) {
@@ -221,20 +240,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
   }, [cause, fields, toastId, narrow]);
   // A change of wording replaces the toast in place; only an empty list or a
   // different document takes it away.
-  const present = cause !== undefined;
-  useEffect(() => {
-    if (!present) return;
-    toastOwners.set(toastId, (toastOwners.get(toastId) ?? 0) + 1);
-    return () => {
-      toastOwners.set(toastId, (toastOwners.get(toastId) ?? 1) - 1);
-      // The form unmounts while a save reloads its document. A form that comes
-      // back soon keeps the toast, because Sonner drops a toast that is dismissed
-      // and shown again under one id.
-      setTimeout(() => {
-        if (!toastOwners.get(toastId)) toast.dismiss(toastId);
-      }, TOAST_REMOUNT_GRACE_MS);
-    };
-  }, [present, toastId]);
+  useToastOwner(toastId, cause !== undefined);
   return (
     <DiscardConfirm
       open={confirming}

@@ -1,8 +1,9 @@
 import { QueryClient } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { toast } from '@tinacms/ui/components/toast';
+import { act } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { ContentProvider, DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
@@ -1071,12 +1072,22 @@ describe('TinaAdmin draft recovery contract', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() =>
       expect(vi.mocked(toast)).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'save-failed', tone: 'error' })
+        expect.objectContaining({
+          id: expect.stringMatching(/^save-failed:/),
+          tone: 'error',
+        })
       )
     );
-    expect(dismiss).not.toHaveBeenCalledWith('save-failed');
+    dismiss.mockClear();
+    expect(dismiss).not.toHaveBeenCalledWith(
+      expect.stringMatching(/^save-failed:/)
+    );
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    await waitFor(() => expect(dismiss).toHaveBeenCalledWith('save-failed'));
+    await waitFor(() =>
+      expect(dismiss).toHaveBeenCalledWith(
+        expect.stringMatching(/^save-failed:/)
+      )
+    );
   });
 
   it('Expand all and Collapse all show in the form menu, disabled when no field has cards', async () => {
@@ -1147,6 +1158,30 @@ describe('TinaAdmin draft recovery contract', () => {
     const alert = await screen.findByRole('alert');
     await user.click(within(alert).getByRole('button', { name: 'Retry' }));
     await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+  });
+
+  it('Retry is gone once the editor leaves the document, so it cannot write elsewhere', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const update = vi
+      .spyOn(provider, 'update')
+      .mockRejectedValueOnce(new Error('offline'));
+    update.mockClear();
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await screen.findByRole('alert');
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /second\.mdx/ })
+    );
+    await screen.findByLabelText(/^Title\b/);
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(readDraft(hello)?.values).toMatchObject({
+      title: expect.stringMatching(/!$/),
+    });
   });
 
   it('rows 22 and 26: with the move-aside write failing, the warning shows and no screen says kept', async () => {
@@ -1457,6 +1492,24 @@ describe('TinaAdmin rail', () => {
     expect(home).toHaveFocus();
   });
 
+  it('moves between the rows with the arrow keys once the rail is collapsed', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(
+      await screen.findByRole('button', { name: 'Toggle Sidebar' })
+    );
+    const [home] = await railButtons();
+    home.focus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('button', { name: 'Collections' })).toHaveFocus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('button', { name: 'Media' })).toHaveFocus();
+    await user.keyboard('{ArrowUp}{Home}');
+    expect(home).toHaveFocus();
+    await user.keyboard('{End}');
+    expect(home).not.toHaveFocus();
+  });
+
   it('keeps unsaved edits when a rail row is clicked, and still blocks a reload', async () => {
     const user = userEvent.setup();
     renderAdmin();
@@ -1692,5 +1745,24 @@ describe('TinaAdmin rail', () => {
     ).toBeVisible();
     await user.click(screen.getAllByRole('button', { name: 'Close' }).at(-1)!);
     await waitFor(() => expect(window.location.hash).toBe('#/tools'));
+  });
+});
+
+describe('Toast tooltips', () => {
+  it('opens the Dismiss tooltip after the half second the rest of the admin uses, not the 600ms default', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await screen.findByRole('button', { name: 'Toggle Sidebar' });
+    act(() => {
+      toast({ title: 'Heads up' });
+    });
+    const dismiss = await screen.findByRole('button', { name: 'Dismiss' });
+    const tip = () => document.querySelector('[data-slot="tooltip-content"]');
+    const start = performance.now();
+    await user.hover(dismiss);
+    await waitFor(() => expect(tip()).toHaveTextContent('Dismiss'));
+    const waited = performance.now() - start;
+    expect(waited).toBeGreaterThanOrEqual(450);
+    expect(waited).toBeLessThan(580);
   });
 });

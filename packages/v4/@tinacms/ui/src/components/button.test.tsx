@@ -80,6 +80,60 @@ describe('Button', () => {
     expect(button).toHaveStyle({ minWidth: '160px' });
   });
 
+  it('needs a chipSrLabel with chip, and draws nothing for a chip of 0', () => {
+    // @ts-expect-error chip without chipSrLabel is a type error, as count without srLabel is
+    const bare = <Button chip={3}>Bare</Button>;
+    const { rerender } = render(
+      <Button chip={0} chipSrLabel=', 0 errors'>
+        Save
+      </Button>
+    );
+    expect(screen.getByRole('button', { name: 'Save' })).not.toHaveTextContent(
+      '0'
+    );
+    rerender(bare);
+    expect(screen.getByRole('button', { name: 'Bare' })).toBeVisible();
+  });
+
+  it.each([
+    ['disabled', { disabled: true }],
+    ['busy', { busy: true }],
+  ])('leaves out the address of a %s link', async (_, state) => {
+    const onClick = vi.fn();
+    render(
+      <>
+        <Button href='/docs' onClick={onClick} {...state}>
+          Docs
+        </Button>
+        <Button
+          href='/docs'
+          variant='icon'
+          icon='doc'
+          aria-label='Docs icon'
+          onClick={onClick}
+          {...state}
+        />
+      </>
+    );
+    for (const link of screen.getAllByRole('link')) {
+      expect(link).not.toHaveAttribute('href');
+      await userEvent.click(link);
+    }
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('fades and blocks a disabled link', () => {
+    render(
+      <Button href='/docs' disabled>
+        Docs
+      </Button>
+    );
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveClass(
+      'cursor-not-allowed',
+      'opacity-45'
+    );
+  });
+
   it('keeps the name and icon when a dialog renders it as its close button', () => {
     render(
       <Dialog open>

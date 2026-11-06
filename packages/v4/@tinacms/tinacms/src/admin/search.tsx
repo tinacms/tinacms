@@ -27,6 +27,7 @@ const inRichText = (target: EventTarget | null): boolean =>
   target instanceof Element && target.closest('[data-slate-editor]') !== null;
 
 interface NavigationResult {
+  id: string;
   label: string;
   run: () => void;
 }
@@ -38,7 +39,7 @@ function useNavigationResults(): NavigationResult[] {
   const screens = useAdminScreens();
   return useMemo(() => {
     const hasMedia = screens.some(({ name }) => name === MEDIA_SCREEN);
-    const places: NavigationResult[] = [
+    const places: Omit<NavigationResult, 'id'>[] = [
       { label: 'Home', run: () => navigate({ view: 'home' }) },
       { label: 'Collections', run: () => navigate({ view: 'collections' }) },
       {
@@ -62,7 +63,10 @@ function useNavigationResults(): NavigationResult[] {
         label,
         run: () => openNavTarget(target, navigate),
       }));
-    return [...places, ...plugins];
+    return [...places, ...plugins].map((result, index) => ({
+      ...result,
+      id: `${index}`,
+    }));
   }, [navigate, globalNav, screens]);
 }
 
@@ -114,8 +118,8 @@ function SearchDialog({
           Navigation
         </h3>
         <ul aria-label='Navigation results' className='m-0 list-none p-0'>
-          {matching.map(({ label, run }) => (
-            <li key={label}>
+          {matching.map(({ id, label, run }) => (
+            <li key={id}>
               <button
                 type='button'
                 className='w-full cursor-pointer rounded-sm px-2 py-1.5 text-left text-base hover:bg-muted'
@@ -179,9 +183,10 @@ export function SearchControl() {
         icon='search'
         shortcut='⌘K'
         aria-keyshortcuts='Meta+K Control+K'
+        className='max-md:px-2 max-md:[&_[data-slot=kbd-shortcut]]:hidden'
         onClick={() => setOpen(true)}
       >
-        Search
+        <span className='max-md:sr-only'>Search</span>
       </Button>
       <SearchDialog provider={provider} open={open} onOpenChange={setOpen} />
     </>
