@@ -323,6 +323,27 @@ describe('NavRow', () => {
   });
 });
 
+describe('NavRow, section', () => {
+  it('shows an amber count from 1 and nothing at 0', () => {
+    const { rerender } = render(
+      <NavRow kind='section' count={2} countLabel='2 unsaved'>
+        Changes
+      </NavRow>
+    );
+    expect(
+      screen.getByRole('button', { name: 'Changes 2 unsaved' })
+    ).toHaveTextContent('Changes2');
+    rerender(
+      <NavRow kind='section' count={0}>
+        Changes
+      </NavRow>
+    );
+    expect(screen.getByRole('button', { name: 'Changes' })).toHaveTextContent(
+      /^Changes$/
+    );
+  });
+});
+
 describe('PanelHeader', () => {
   it('tabs through back, the action, the menu and close', async () => {
     const user = userEvent.setup();

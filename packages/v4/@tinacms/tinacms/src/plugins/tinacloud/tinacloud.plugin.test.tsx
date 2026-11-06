@@ -278,6 +278,7 @@ describe('tinaCloud()', () => {
     stubTinaCloud();
     const user = userEvent.setup();
     const { complete } = stubLoginPopup();
+    window.location.hash = '#/collections';
     render(
       <TinaAdmin
         config={asResolvedConfig({
