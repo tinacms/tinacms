@@ -1,4 +1,5 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { RichTextValue } from '../value';
 import { RichEditor, type RichEditorProps } from './index';
@@ -65,5 +66,21 @@ describe('RichEditor frame props', () => {
     framed.unmount();
     mount({ layout: 'body' });
     expect((await editor()).className).toContain('min-h-56');
+  });
+});
+
+describe('RichEditor toolbar tooltips', () => {
+  it('opens after the half second the rest of the admin uses, not Radix’s 700ms default', async () => {
+    const user = userEvent.setup();
+    mount();
+    await editor();
+    const button = screen.getByRole('radio', { name: 'Bold (⌘+B)' });
+    const tip = () => document.querySelector('[role="tooltip"]');
+    const start = performance.now();
+    await user.hover(button);
+    await waitFor(() => expect(tip()).not.toBeNull());
+    const waited = performance.now() - start;
+    expect(waited).toBeGreaterThanOrEqual(450);
+    expect(waited).toBeLessThan(650);
   });
 });

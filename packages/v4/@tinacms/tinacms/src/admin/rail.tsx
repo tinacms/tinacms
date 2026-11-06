@@ -51,6 +51,7 @@ function RailEntry({ label, glyph, selected, opens, onOpen }: RailEntryProps) {
           opens={opens}
           aria-label={label}
           aria-current={selected ? 'page' : undefined}
+          data-rail-row=''
           className={RAIL_ROW}
           onClick={onOpen}
         >
@@ -85,7 +86,7 @@ function moveWithArrows(event: KeyboardEvent<HTMLElement>) {
   if (!keys.includes(event.key)) return;
   const rows = [
     ...event.currentTarget.querySelectorAll<HTMLElement>(
-      '[data-slot="nav-row"]:not(:disabled)'
+      '[data-rail-row]:not(:disabled)'
     ),
   ];
   const at = rows.findIndex((row) => row === document.activeElement);
@@ -166,6 +167,7 @@ function PluginEntries({
                     : undefined
                 }
                 aria-label={label}
+                data-rail-row=''
                 className={RAIL_ROW}
                 render={
                   target.kind === 'url' ? (
@@ -287,6 +289,7 @@ export function AdminRail({
               icon='help'
               external
               aria-label='Help & docs'
+              data-rail-row=''
               className={RAIL_ROW}
               render={
                 <a href={DOCS_URL} target='_blank' rel='noopener noreferrer' />
