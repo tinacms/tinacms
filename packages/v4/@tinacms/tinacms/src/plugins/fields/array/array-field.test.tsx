@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../../config';
@@ -27,6 +27,7 @@ import { max, min, required } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
 import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
+import { openBlockPicker } from '../../../test/open-block-picker';
 import numberFieldPlugin from '../number/number-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import arrayFieldPlugin from './array-field.plugin';
@@ -126,7 +127,11 @@ function SaveProbe() {
 const openItems = async () => {
   await screen.findAllByRole('group');
   for (const head of screen.queryAllByRole('button', { expanded: false })) {
-    if (!/^(Actions for|Move)/.test(head.getAttribute('aria-label') ?? '')) {
+    if (
+      !/^(Actions for|Move|Add a block)/.test(
+        head.getAttribute('aria-label') ?? head.textContent ?? ''
+      )
+    ) {
       await userEvent.click(head);
     }
   }
@@ -932,8 +937,9 @@ describe('ArrayField templates', () => {
   it('adds an item of the chosen template, seeded from its defaultItem', async () => {
     renderPage({ blocks: [] });
     await openItems();
+    const panel = await openBlockPicker();
     await userEvent.click(
-      await screen.findByRole('button', { name: 'Add Hero' })
+      await within(panel).findByRole('button', { name: 'Add Hero' })
     );
     expect(
       (

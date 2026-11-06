@@ -18,6 +18,7 @@ import { t } from '../../../index';
 import { max, min } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
 import { LabelledFields } from '../../../test/labelled-fields';
+import { openBlockPicker } from '../../../test/open-block-picker';
 import booleanFieldPlugin from '../boolean/boolean-field.plugin';
 import numberFieldPlugin from '../number/number-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
@@ -518,11 +519,13 @@ describe('ArrayField focus and activation', () => {
     });
   });
 
-  it('focuses the grid picker after the last block is removed', async () => {
+  it('focuses "Add a block" after the last block is removed', async () => {
     renderPage({ tiles: [{ _template: 'hero', headline: 'Hi' }] });
     await chooseAction('Tiles', 1, 'Remove');
     const tiles = await screen.findByRole('group', { name: 'Tiles' });
-    const add = await within(tiles).findByRole('button', { name: 'Add Hero' });
+    const add = await within(tiles).findByRole('button', {
+      name: 'Add a block',
+    });
     await waitFor(() => expect(add).toHaveFocus());
   });
 
@@ -555,18 +558,47 @@ describe('ArrayField focus and activation', () => {
     renderPage({ cappedBlocks: [{ _template: 'hero', headline: 'One' }] });
     await chooseAction('Capped blocks', 1, 'Insert above');
     const group = await screen.findByRole('group', { name: 'Capped blocks' });
-    const pickers = await within(group).findAllByRole('button', {
+    const inline = await within(group).findByRole('button', {
       name: 'Add Hero',
     });
-    expect(pickers).toHaveLength(2);
-    await userEvent.click(pickers[1]);
+    await chooseAction('Capped blocks', 1, 'Duplicate');
     await waitFor(() => expect(valueOf('cappedBlocks')).toHaveLength(2));
-    const pending = await within(group).findAllByRole('button', {
+    await userEvent.click(inline);
+    expect(valueOf('cappedBlocks')).toHaveLength(2);
+  });
+
+  it('a pick refused at max closes the insert picker and returns focus to the opener grip', async () => {
+    renderPage({ cappedBlocks: [{ _template: 'hero', headline: 'One' }] });
+    await chooseAction('Capped blocks', 1, 'Insert above');
+    const group = await screen.findByRole('group', { name: 'Capped blocks' });
+    const inline = await within(group).findByRole('button', {
       name: 'Add Hero',
     });
-    for (const button of pending) expect(button).toBeDisabled();
-    await userEvent.click(pending[0]);
+    await chooseAction('Capped blocks', 1, 'Duplicate');
+    await waitFor(() => expect(valueOf('cappedBlocks')).toHaveLength(2));
+    await userEvent.click(inline);
     expect(valueOf('cappedBlocks')).toHaveLength(2);
+    await waitFor(() =>
+      expect(
+        within(group).getByRole('button', { name: 'Move Item 1' })
+      ).toHaveFocus()
+    );
+    expect(within(group).queryByRole('region')).toBeNull();
+  });
+
+  it('turns the add button off with a reason when the list is full', async () => {
+    renderPage({
+      cappedBlocks: [
+        { _template: 'hero', headline: 'One' },
+        { _template: 'hero', headline: 'Two' },
+      ],
+    });
+    const group = await screen.findByRole('group', { name: 'Capped blocks' });
+    const add = await within(group).findByRole('button', {
+      name: 'Add a block',
+    });
+    expect(add).toBeDisabled();
+    expect(add).toHaveAccessibleDescription(/This list is full/);
   });
 
   it('closes a grid Insert picker with Cancel and adds nothing', async () => {
