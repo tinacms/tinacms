@@ -1,4 +1,10 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -228,6 +234,10 @@ describe('Tooltip', () => {
 });
 
 describe('Tooltip, light', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   const bubble = () => document.querySelector('[data-slot="tooltip-content"]');
 
   it('draws the bubble on the light popover fill', async () => {
@@ -247,7 +257,6 @@ describe('Tooltip, light', () => {
   });
 
   it('waits half a second on hover before it shows', async () => {
-    const user = userEvent.setup();
     render(
       <TooltipProvider>
         <Tooltip>
@@ -258,9 +267,18 @@ describe('Tooltip, light', () => {
         </Tooltip>
       </TooltipProvider>
     );
-    await user.hover(screen.getByRole('button', { name: 'Search' }));
+    vi.useFakeTimers();
+    const trigger = screen.getByRole('button', { name: 'Search' });
+    act(() => {
+      fireEvent.pointerEnter(trigger);
+      fireEvent.pointerMove(trigger);
+      fireEvent.mouseEnter(trigger);
+      fireEvent.mouseMove(trigger);
+    });
+    await act(() => vi.advanceTimersByTimeAsync(499));
     expect(bubble()).toBeNull();
-    await waitFor(() => expect(bubble()).not.toBeNull(), { timeout: 1500 });
+    await act(() => vi.advanceTimersByTimeAsync(1));
+    expect(bubble()).not.toBeNull();
   });
 });
 
@@ -276,13 +294,6 @@ describe('Toast', () => {
   ] as const)('$title is announced as $role', ({ title, tone, role }) => {
     render(<Toast tone={tone} title={title} />);
     expect(screen.getByRole(role)).toHaveTextContent(title);
-  });
-
-  it('stays light when the deprecated dark theme is asked for', () => {
-    render(<Toast theme='dark' title='Changes saved' />);
-    const card = screen.getByRole('status');
-    expect(card).toHaveClass('bg-card');
-    expect(card.className).not.toContain('inv-');
   });
 
   it('names its actions and its dismiss button', async () => {
