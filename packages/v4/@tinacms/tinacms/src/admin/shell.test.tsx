@@ -330,6 +330,13 @@ describe('Home', () => {
     ).toBeVisible();
   });
 
+  it('lets a long branch name wrap in its column instead of pushing Review off screen', async () => {
+    renderAdmin();
+    const line = await screen.findByText('Branch main');
+    const column = line.parentElement;
+    expect(column).toHaveClass('min-w-0', 'break-words');
+  });
+
   it('opens the collection from its card', async () => {
     const user = userEvent.setup();
     renderAdmin();
