@@ -235,7 +235,7 @@ describe('form drafts', () => {
     open();
     syncing();
     store.getState().setFieldValue(postA, summary, 'Typed');
-    store.getState().discardWaiting(postA);
+    store.getState().discardWaiting(postA, waitingOf());
     expect(waitingOf()).toEqual([]);
     expect(readWaitingDrafts(postA)).toEqual([]);
     expect(form()?.values[summary]).toBe('Typed');
@@ -326,7 +326,7 @@ describe('form drafts', () => {
     open();
     syncing();
     store.getState().setFieldValue(postA, summary, 'Typed');
-    store.getState().discardWaiting(postA);
+    store.getState().discardWaiting(postA, waitingOf());
     expect(store.getState().held[postA]).toBeUndefined();
     expect(readDraft(postA)?.values).toEqual({
       title: 'Hello',
@@ -453,6 +453,8 @@ describe('form drafts', () => {
     ]);
     expect(store.getState().failures[postA]).toBeGreaterThan(0);
     expect(store.getState().hidden[postA]).toBeUndefined();
+    store.getState().resumeWaiting(postA);
+    expect(store.getState().swapFailures[postA]).toBe(2);
   });
 
   it('row 24: a failed Resume hides the prompt until the next open, and keeps every copy', () => {
@@ -467,6 +469,17 @@ describe('form drafts', () => {
     open();
     expect(store.getState().hidden[postA]).toBeUndefined();
     expect(waitingOf().length).toBeGreaterThan(0);
+  });
+
+  it('row 13: Discard unsaved edits shows a hidden prompt again at once', () => {
+    reloadWithEdit();
+    open();
+    syncing();
+    failWrites((key) => key === draftKey(postA));
+    store.getState().resumeWaiting(postA);
+    expect(store.getState().hidden[postA]).toBe(true);
+    store.getState().discardEdits(postA);
+    expect(store.getState().hidden[postA]).toBeUndefined();
   });
 
   it('row 9: a displaced value equal to the file leaves no empty leftover', () => {

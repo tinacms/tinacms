@@ -40,6 +40,7 @@ beforeEach(() => {
     held: {},
     unstored: {},
     failures: {},
+    swapFailures: {},
     hidden: {},
     active: null,
   });

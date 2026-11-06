@@ -579,7 +579,7 @@ describe('save state', () => {
     expect(updates).toHaveLength(1);
   });
 
-  it('says the save failed when validation fails, with the inline alert kept', async () => {
+  it('says the save failed when validation fails, in the toast and the Status bar, and leaves the form bar alone', async () => {
     const { user, input } = await openHello();
     await user.clear(input);
     await user.click(screen.getByRole('button', { name: /^Save/ }));
@@ -587,16 +587,13 @@ describe('save state', () => {
       expect(within(statusBar()).getByText('Save failed')).toBeVisible()
     );
     expect(updates).toHaveLength(0);
-    expect(
-      (await screen.findAllByRole('alert')).some((alert) =>
-        /validation errors/.test(alert.textContent ?? '')
-      )
-    ).toBe(true);
+    const form = screen.getByRole('complementary', { name: 'Document form' });
+    expect(form.querySelector('[data-slot=form-bar] [role=alert]')).toBeNull();
   });
 });
 
 describe('toasts', () => {
-  it('shows a failed save at bottom right and keeps the inline alert', async () => {
+  it('shows a failed save at bottom right with fixed words and Retry, and nothing in the form bar', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     const user = userEvent.setup();
     renderAdmin();
@@ -609,12 +606,17 @@ describe('toasts', () => {
       expect(found).not.toBeNull();
       return found;
     });
-    expect(toast).toHaveTextContent('Save failed');
+    expect(toast).toHaveTextContent(
+      "Couldn't save. Some fields are not valid."
+    );
+    expect(
+      within(toast as HTMLElement).getByRole('button', { name: 'Retry' })
+    ).toBeVisible();
     const toaster = toast?.closest('[data-sonner-toaster]');
     expect(toaster).toHaveAttribute('data-x-position', 'right');
     expect(toaster).toHaveAttribute('data-y-position', 'bottom');
     const form = screen.getByRole('complementary', { name: 'Document form' });
-    expect(within(form).getAllByRole('alert').length).toBeGreaterThan(0);
+    expect(form.querySelector('[data-slot=form-bar] [role=alert]')).toBeNull();
   });
 });
 

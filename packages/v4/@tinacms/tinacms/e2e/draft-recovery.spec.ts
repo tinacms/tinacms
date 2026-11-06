@@ -142,6 +142,23 @@ for (const { name, width, height } of WIDTHS) {
       for (const name of ['Save', 'Document actions']) {
         await page.getByRole('button', { name }).hover({ timeout: 4000 });
       }
+      // Whatever the toast does, its rectangle must clear the form bar's.
+      await expect
+        .poll(async () => {
+          const toast = await page
+            .locator('[data-sonner-toast]')
+            .first()
+            .boundingBox();
+          const bar = await page.locator('[data-slot=form-bar]').boundingBox();
+          if (!toast || !bar) return true;
+          return (
+            toast.x < bar.x + bar.width &&
+            toast.x + toast.width > bar.x &&
+            toast.y < bar.y + bar.height &&
+            toast.y + toast.height > bar.y
+          );
+        })
+        .toBe(false);
     });
 
     test('row 11: the confirm takes focus even when a field held it', async ({

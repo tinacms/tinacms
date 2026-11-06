@@ -1090,6 +1090,60 @@ describe('TinaAdmin draft recovery contract', () => {
     ).toBeVisible();
   });
 
+  it.each([
+    [
+      'a provider response',
+      new Error(
+        'Content request update failed (500): {"error":{"code":"op-failed","message":"Operation failed."}}'
+      ),
+    ],
+    [
+      'an error with a stack',
+      Object.assign(new Error('boom at tina/hooks.ts:21'), {
+        stack: 'Error: boom\n    at slug (tina/hooks.ts:21:9)',
+      }),
+    ],
+    ['a plain string', 'op-failed {"x":500}'],
+  ])(
+    'a save that rejects with %s shows fixed words and Retry, and logs the text',
+    async (_, rejection) => {
+      const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+      vi.spyOn(provider, 'update').mockRejectedValueOnce(rejection);
+      const user = await openDoc(/hello\.mdx/);
+      await user.type(await screen.findByLabelText(/^Title\b/), '!');
+      await user.click(screen.getByRole('button', { name: 'Save' }));
+      const alert = await screen.findByRole('alert');
+      expect(alert).toHaveTextContent("Couldn't save. Something went wrong.");
+      expect(alert).toHaveTextContent(
+        'Your edits are kept. Try again in a few seconds.'
+      );
+      expect(alert).not.toHaveTextContent(/500|\{|op-failed|hooks\.ts/);
+      expect(
+        within(alert).getByRole('button', { name: 'Retry' })
+      ).toBeVisible();
+      expect(
+        document.querySelector('[data-slot=form-bar] [role=alert]')
+      ).toBeNull();
+      expect(
+        JSON.stringify(logged.mock.calls, (_k, v) => {
+          if (v instanceof Error) return v.message;
+          return v;
+        })
+      ).toMatch(/op-failed|boom/);
+    }
+  );
+
+  it('Retry saves again and a good retry clears the toast', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(provider, 'update').mockRejectedValueOnce(new Error('offline'));
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const alert = await screen.findByRole('alert');
+    await user.click(within(alert).getByRole('button', { name: 'Retry' }));
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+  });
+
   it('rows 22 and 26: with the move-aside write failing, the warning shows and no screen says kept', async () => {
     store(hello, { title: 'Mine' }, { title: 'Hello' });
     const real = localStorage.setItem.bind(localStorage);
@@ -1117,7 +1171,7 @@ describe('TinaAdmin draft recovery contract', () => {
 });
 
 describe('TinaAdmin after a save that changes the document', () => {
-  it('keeps the afterSave failure message visible', async () => {
+  it('keeps the afterSave failure toast visible', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const storing = definePlugin({
       name: 'test:content',
@@ -1185,11 +1239,8 @@ describe('TinaAdmin after a save that changes the document', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(await screen.findByDisplayValue('HELLO!')).toBeInTheDocument();
-    const form = await screen.findByRole('complementary', {
-      name: 'Document form',
-    });
-    expect(await within(form).findByRole('alert')).toHaveTextContent(
-      'The document was saved, but an afterSave hook failed.'
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The document was saved. An afterSave hook failed.'
     );
     vi.restoreAllMocks();
   });

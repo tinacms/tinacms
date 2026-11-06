@@ -142,7 +142,9 @@ describe('draft recovery invariant', () => {
             for (const copy of store.getState().waiting[post] ?? []) {
               for (const value of stringsIn(copy.values)) gone.add(value);
             }
-            store.getState().discardWaiting(post);
+            store
+              .getState()
+              .discardWaiting(post, store.getState().waiting[post] ?? []);
             break;
           case 'cancel-discard':
             break;

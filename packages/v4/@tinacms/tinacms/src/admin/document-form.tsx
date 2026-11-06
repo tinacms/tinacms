@@ -32,7 +32,6 @@ import {
   useFieldRegistry,
   useFormId,
   useFormSave,
-  useSaveFailure,
   useStaleDraft,
 } from '../editor/hooks';
 import {
@@ -46,6 +45,7 @@ import type { StoredDraft } from '../form/drafts';
 import { countFailingFields } from '../editor/field-errors';
 import { DiscardConfirm } from './discard-confirm';
 import { DocumentStatus } from './document-status';
+import { saveFailureWords } from './save-failure';
 import { useNarrow } from './use-narrow';
 
 const SAVE_FAILED_TOAST = 'save-failed';
@@ -54,49 +54,47 @@ function SaveButton() {
   const formId = useFormId();
   const dirty = useIsFormDirty(formId);
   const save = useFormSave();
-  const [failure, setFailure] = useSaveFailure();
   const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
   const [pending, setPending] = useState(false);
-  return (
-    <div className='flex flex-col items-stretch gap-2'>
-      <Button
-        variant='primary'
-        type='button'
-        className='min-w-40'
-        disabled={!dirty && !pending}
-        busy={pending}
-        count={errorCount}
-        srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
-        onClick={() => {
-          setFailure(null);
-          setPending(true);
-          save()
-            .then(() => toast.dismiss(SAVE_FAILED_TOAST))
-            .catch((cause) => {
-              console.error('[tinacms] Save failed:', cause);
-              let message = 'Save failed.';
-              if (cause instanceof Error && cause.message) {
-                message = cause.message;
+  // The toast's Retry runs the newest save, so it reads the form as it is then.
+  const run = useEffectEvent(() => {
+    setPending(true);
+    save()
+      .then(() => toast.dismiss(SAVE_FAILED_TOAST))
+      .catch((cause) => {
+        // The raw reason is for the console. The editor reads fixed words.
+        console.error('[tinacms] Save failed:', cause);
+        const { title, text, disk } = saveFailureWords(cause);
+        toast({
+          id: SAVE_FAILED_TOAST,
+          tone: 'error',
+          title,
+          text,
+          dismissible: !disk,
+          action: { label: 'Retry', onClick: run },
+          secondaryAction: disk
+            ? {
+                label: 'Dismiss',
+                onClick: () => toast.dismiss(SAVE_FAILED_TOAST),
               }
-              setFailure(message);
-              toast({
-                id: SAVE_FAILED_TOAST,
-                tone: 'error',
-                title: 'Save failed',
-                text: message,
-              });
-            })
-            .finally(() => setPending(false));
-        }}
-      >
-        Save
-      </Button>
-      {failure ? (
-        <p role='alert' className='text-sm text-destructive'>
-          {failure}
-        </p>
-      ) : null}
-    </div>
+            : undefined,
+        });
+      })
+      .finally(() => setPending(false));
+  });
+  return (
+    <Button
+      variant='primary'
+      type='button'
+      className='w-40 shrink-0'
+      disabled={!dirty && !pending}
+      busy={pending}
+      count={errorCount}
+      srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
+      onClick={run}
+    >
+      Save
+    </Button>
   );
 }
 
@@ -110,9 +108,9 @@ function FormBar() {
   return (
     <div
       data-slot='form-bar'
-      className='flex flex-none items-start gap-2 border-t border-border bg-card px-4 py-3'
+      className='flex h-14 flex-none items-center gap-2 border-t border-border bg-card px-3'
     >
-      <div className='mt-1 min-w-0 flex-1'>
+      <div className='min-w-0 flex-1'>
         <DocumentStatus />
       </div>
       <DropdownMenu>
@@ -121,6 +119,7 @@ function FormBar() {
             <Button
               ref={menuButton}
               variant='icon'
+              size='sm'
               icon='more'
               aria-label='Document actions'
             />
@@ -248,8 +247,16 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
 const warnedStorage = new Set<string>();
 function StorageWarning({ scope }: { scope: FormScope }) {
   const failures = useFormStore((state) => state.failures[scope.formId]);
+  const swapFailures = useFormStore(
+    (state) => state.swapFailures[scope.formId]
+  );
+  const lastSwap = useRef(swapFailures);
   useEffect(() => {
-    if (!failures || warnedStorage.has(scope.path)) return;
+    // A swap that did nothing warns every time, so Resume never looks dead.
+    const swapped = swapFailures !== lastSwap.current;
+    lastSwap.current = swapFailures;
+    if (!failures) return;
+    if (warnedStorage.has(scope.path) && !swapped) return;
     warnedStorage.add(scope.path);
     toast({
       id: `storage-warning:${scope.path}`,
@@ -259,7 +266,7 @@ function StorageWarning({ scope }: { scope: FormScope }) {
       dismissible: true,
       duration: Number.POSITIVE_INFINITY,
     });
-  }, [failures, scope.path]);
+  }, [failures, swapFailures, scope.path]);
   return null;
 }
 
