@@ -33,6 +33,9 @@ export const BranchSwitcherLegacy = ({
   const isLocalMode = cms.api?.tina?.isLocalMode;
   const [listState, setListState] = React.useState<ListState>('loading');
   const [branchList, setBranchList] = React.useState([] as Branch[]);
+  // Held here so a failed creation, which unmounts BranchSelector while
+  // loading, leaves the name in place to correct
+  const [newBranchName, setNewBranchName] = React.useState('');
   const { currentBranch } = useBranchData();
   const initialBranch = React.useMemo(() => currentBranch, []);
   // when modal closes, refresh page is currentBranch has changed
@@ -49,21 +52,26 @@ export const BranchSwitcherLegacy = ({
     createBranch({
       branchName: normalizeBranchName(formatBranchName(value)),
       baseBranch: currentBranch,
-    }).then(async (createdBranchName) => {
-      // @ts-ignore
-      cms.alerts.success('Branch created.');
-      // add the newly created branch to the list
-      setBranchList((oldBranchList) => {
-        return [
+    })
+      .then((createdBranchName) => {
+        cms.alerts.success('Branch created.');
+        setBranchList((oldBranchList) => [
           ...oldBranchList,
           {
             indexStatus: { status: 'unknown' },
             name: createdBranchName,
           },
-        ];
-      });
-      setListState('ready');
-    });
+        ]);
+        setNewBranchName('');
+      })
+      .catch((error: unknown) => {
+        if (error instanceof Error) {
+          cms.alerts.error(error.message);
+        } else {
+          cms.alerts.error('There was an error creating a new branch.');
+        }
+      })
+      .finally(() => setListState('ready'));
   }, []);
 
   const refreshBranchList = React.useCallback(async () => {
@@ -165,6 +173,8 @@ export const BranchSwitcherLegacy = ({
               <BranchSelector
                 currentBranch={currentBranch}
                 branchList={branchList}
+                newBranchName={newBranchName}
+                setNewBranchName={setNewBranchName}
                 onCreateBranch={(newBranch) => {
                   handleCreateBranch(newBranch);
                 }}
@@ -218,15 +228,18 @@ export const getFilteredBranchList = (
 const BranchSelector = ({
   branchList,
   currentBranch,
+  newBranchName,
+  setNewBranchName,
   onCreateBranch,
   onChange,
 }: {
   branchList: Branch[];
   currentBranch: string;
+  newBranchName: string;
+  setNewBranchName: (branchName: string) => void;
   onCreateBranch: (branchName: string) => void;
   onChange: (branchName: string) => void;
 }) => {
-  const [newBranchName, setNewBranchName] = React.useState('');
   const [filter, setFilter] = React.useState('');
   const filteredBranchList = getFilteredBranchList(
     branchList,
