@@ -38,6 +38,8 @@ export class AuditCommand extends Command {
     logger.error('Error occurred during tinacms audit');
     if (this.verbose) {
       console.error(error);
+    } else {
+      logger.error(error.message);
     }
     process.exit(1);
   }
@@ -57,7 +59,7 @@ export class AuditCommand extends Command {
     }
 
     // Initialize the host TCP server
-    createDBServer(Number(this.datalayerPort));
+    await createDBServer(Number(this.datalayerPort));
     const database = await createAndInitializeDatabase(
       configManager,
       Number(this.datalayerPort),
