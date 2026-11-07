@@ -97,6 +97,10 @@ const parseDatetimeUTC = (value: unknown): string => {
   return Number.isNaN(d.getTime()) ? String(value) : d.toISOString();
 };
 
+// YAML and TOML parse an unquoted date into a Date, whatever the field's type.
+const dateToISOString = (value: unknown): unknown =>
+  value instanceof Date ? value.toISOString() : value;
+
 const padValue = (val: any, pad: PadDefinition): string => {
   if (pad.decimalPrecision !== undefined) {
     const n = Number(val);
@@ -180,7 +184,10 @@ const makeKeyForField = <T extends object>(
         resolvedValue = parseDatetimeUTC(rawValue);
       } else {
         if (field.type === 'string') {
-          const escapedString = stringEscaper(rawValue as string | string[]);
+          const stringValue = Array.isArray(rawValue)
+            ? rawValue.map(dateToISOString)
+            : dateToISOString(rawValue);
+          const escapedString = stringEscaper(stringValue as string | string[]);
           if (Array.isArray(escapedString)) {
             resolvedValue = escapedString
               .sort()

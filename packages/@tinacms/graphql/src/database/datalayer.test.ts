@@ -616,6 +616,36 @@ describe('makeIndexOpsForDocument', () => {
     expect(ops).toEqual([]);
   });
 
+  it('indexes a Date in a string field by its ISO string', () => {
+    const ops = makeIndexOpsForDocument(
+      'posts/hello.md',
+      'post',
+      indexDefs,
+      { title: new Date('2026-10-08') },
+      'put',
+      level
+    );
+    expect(ops.map((op) => op.key)).toContain(
+      `2026-10-08T00:00:00.000Z${INDEX_KEY_FIELD_SEPARATOR}posts/hello.md`
+    );
+  });
+
+  it('indexes Dates in a string list field by their ISO strings', () => {
+    const ops = makeIndexOpsForDocument(
+      'posts/hello.md',
+      'post',
+      {
+        tags: { fields: [{ name: 'tags', type: 'string', list: true }] },
+      },
+      { tags: [new Date('2026-10-08'), 'draft'] },
+      'put',
+      level
+    );
+    const keys = ops.map((op) => op.key).join();
+    expect(keys).toContain('2026-10-08T00:00:00.000Z');
+    expect(keys).toContain('draft');
+  });
+
   it('produces a put op for the default sort key using the filepath as key', () => {
     const ops = makeIndexOpsForDocument(
       'posts/hello.md',
