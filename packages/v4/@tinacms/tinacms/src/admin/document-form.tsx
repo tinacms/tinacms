@@ -53,10 +53,29 @@ const toastOwners = new Map<string, number>();
 const liveRetries = new Map<string, () => void>();
 const TOAST_REMOUNT_GRACE_MS = 400;
 
-const dismissIfUnowned = (toastId: string) =>
-  setTimeout(() => {
-    if (!toastOwners.get(toastId)) toast.dismiss(toastId);
-  }, TOAST_REMOUNT_GRACE_MS);
+const dismissTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+const clearDismissTimer = (toastId: string) => {
+  clearTimeout(dismissTimers.get(toastId));
+  dismissTimers.delete(toastId);
+};
+
+const dismissNowIfUnowned = (toastId: string) => {
+  clearDismissTimer(toastId);
+  if (!toastOwners.get(toastId)) toast.dismiss(toastId);
+};
+
+const dismissIfUnowned = (toastId: string) => {
+  clearDismissTimer(toastId);
+  dismissTimers.set(
+    toastId,
+    setTimeout(() => dismissNowIfUnowned(toastId), TOAST_REMOUNT_GRACE_MS)
+  );
+};
+
+export function flushPendingToastDismissals() {
+  for (const toastId of [...dismissTimers.keys()]) dismissNowIfUnowned(toastId);
+}
 
 // Removes the toast once no form owns it. The form unmounts while a save reloads
 // its document; one that comes back soon keeps the toast, because Sonner drops a
@@ -64,6 +83,7 @@ const dismissIfUnowned = (toastId: string) =>
 function useToastOwner(toastId: string, present: boolean) {
   useEffect(() => {
     if (!present) return;
+    clearDismissTimer(toastId);
     toastOwners.set(toastId, (toastOwners.get(toastId) ?? 0) + 1);
     return () => {
       toastOwners.set(toastId, (toastOwners.get(toastId) ?? 1) - 1);
