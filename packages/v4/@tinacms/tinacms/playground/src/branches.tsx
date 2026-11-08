@@ -7,6 +7,25 @@ import './index.css';
 const params = new URLSearchParams(location.search);
 const protectedBranch = params.get('protected') === '1';
 const branchName = params.get('branch') ?? 'feature/news';
+const signedIn = params.get('account') === '1';
+
+const auth = definePlugin({
+  name: 'playground:branch-auth',
+  provides: ['auth'],
+  server: async () => ({ default: {} }),
+  client: async () => ({
+    default: {
+      slice: () => ({
+        status: 'signed-in' as const,
+        user: { id: 'editor', name: 'Editor', email: 'editor@example.com' },
+        roles: ['editor'],
+        getToken: async () => undefined,
+        login: async () => {},
+        logout: async () => {},
+      }),
+    },
+  }),
+});
 
 const content = definePlugin({
   name: 'playground:branch-content',
@@ -34,7 +53,7 @@ const content = definePlugin({
 
 const config = defineConfig({
   projectName: params.get('project') ?? 'Acme site',
-  plugins: [content, localMediaPlugin()],
+  plugins: [content, localMediaPlugin(), ...(signedIn ? [auth] : [])],
   schema: { collections: [postCollection] },
 });
 

@@ -80,7 +80,11 @@ export function ShellTopBar({ projectName }: { projectName?: string }) {
     <TopBar
       toggle={<SidebarTrigger />}
       logo={
-        <img src={tinaLogo} alt='TinaCMS' className='h-5 w-auto flex-none' />
+        <img
+          src={tinaLogo}
+          alt='TinaCMS'
+          className='h-5 w-auto flex-none max-[359px]:hidden'
+        />
       }
       projectName={projectName}
       branch={<BranchControl />}

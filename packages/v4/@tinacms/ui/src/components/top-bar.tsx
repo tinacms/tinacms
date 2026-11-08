@@ -19,9 +19,12 @@ type TopBarProps = Omit<ComponentProps<'header'>, 'children'> & {
   account?: ReactNode;
 };
 
-function Slash() {
+function Slash({ className }: { className?: string }) {
   return (
-    <span aria-hidden='true' className='flex-none text-muted-foreground'>
+    <span
+      aria-hidden='true'
+      className={cn('flex-none text-muted-foreground', className)}
+    >
       /
     </span>
   );
@@ -30,7 +33,7 @@ function Slash() {
 /**
  * The 56px bar along the top of the admin: toggle, logo, project name and
  * branch at the start; Search and the account button at the end. Below 768px
- * the project name and branch truncate, so nothing overflows at 375px.
+ * the project name and branch truncate, so nothing overflows at 375px. Below 480px the project name and its slash are hidden so the branch name stays readable.
  */
 function TopBar({
   toggle,
@@ -58,10 +61,10 @@ function TopBar({
         {logo}
         {projectName ? (
           <>
-            <Slash />
+            <Slash className='max-[479px]:hidden' />
             <span
               data-slot='top-bar-project'
-              className='min-w-0 shrink-[4] truncate font-semibold'
+              className='min-w-0 shrink-[4] truncate font-semibold max-[479px]:hidden'
               title={projectName}
             >
               {projectName}
