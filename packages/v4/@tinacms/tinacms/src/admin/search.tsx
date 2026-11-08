@@ -13,7 +13,7 @@ import {
 } from '../core/search/contract';
 import { useTinaStore } from '../editor/hooks';
 import { useAdminScreens, useGlobalNav } from './hooks';
-import { MEDIA_SCREEN, openNavTarget, toolsEntries } from './rail';
+import { MEDIA_SCREEN, openNavTarget } from './rail';
 import { useAdminRoute } from './use-admin-route';
 
 function useSearchProvider(): SearchProvider | null {
@@ -54,10 +54,8 @@ function useNavigationResults(): NavigationResult[] {
       { label: 'Tools', run: () => navigate({ view: 'tools' }) },
       { label: 'Settings', run: () => navigate({ view: 'settings' }) },
     ];
-    const plugins = [
-      ...toolsEntries(globalNav),
-      ...globalNav.flatMap(({ group, entries }) => (group ? entries : [])),
-    ]
+    const plugins = globalNav
+      .flatMap(({ entries }) => entries)
       .filter(({ target }) => target.kind !== 'url')
       .map(({ label, target }) => ({
         label,
