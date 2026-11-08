@@ -11,6 +11,7 @@ import type { CollectionSchema, FieldSchema } from '../../core/schema/types';
 import { FormProvider, TinaProvider } from '../../editor';
 import { LabelledFields } from '../../test/labelled-fields';
 import { corePlugins, t } from '.';
+import { numberSchema } from './number/number-field.schema';
 import arrayFieldPlugin from './array/array-field.plugin';
 import objectFieldPlugin from './object/object-field.plugin';
 import stringFieldPlugin from './string/string-field.plugin';
@@ -191,7 +192,7 @@ describe('Clear on a stored value of the wrong shape', () => {
   });
 });
 
-describe('Save on a locked field holding a value of the wrong type', () => {
+describe('Save on a number or datetime field holding a value of the wrong type', () => {
   const LOCKED = ['number', 'datetime'].flatMap((type) =>
     (['readOnly', 'disabled'] as const).map((state) => ({
       type,
@@ -203,7 +204,7 @@ describe('Save on a locked field holding a value of the wrong type', () => {
     }))
   );
   const WRONG_TYPE = STORED_VALUES.filter(
-    ([, value]) => typeof value !== 'string'
+    ([, value]) => typeof value !== 'string' || Number.isNaN(Number(value))
   );
 
   it.each(
@@ -216,5 +217,17 @@ describe('Save on a locked field holding a value of the wrong type', () => {
     expect(digestDocument(ingested, [field], { registry })).toEqual({
       field: value,
     });
+  });
+});
+
+describe('Validation of an editable number field holding a non-number', () => {
+  it.each([
+    ['true', true],
+    ['false', false],
+    ['a Date', new Date('2026-01-01')],
+    ['a list', [5]],
+  ])('rejects %s', (_kind, value) => {
+    const schema = numberSchema(t.number({ name: 'rating', label: 'Rating' }));
+    expect(schema.safeParse(value).success).toBe(false);
   });
 });
