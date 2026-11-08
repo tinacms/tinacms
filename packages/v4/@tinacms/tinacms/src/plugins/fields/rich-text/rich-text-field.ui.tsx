@@ -6,7 +6,6 @@ import {
   useDocumentPath,
   useFieldActivation,
   useFieldAddress,
-  useErrorCounter,
   useFieldFrame,
   useFieldSchema,
   useFieldValue,
@@ -22,7 +21,6 @@ export function RichTextField() {
   const field = useFieldSchema<RichTextFieldSchema>();
   const [value, setValue] = useFieldValue<RichTextValue>(address);
   const frame = useFieldFrame();
-  const errorCount = useErrorCounter();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { setActive } = useActiveField();
@@ -67,7 +65,6 @@ export function RichTextField() {
         onChange={setBody}
         field={field}
         onActivateEmbed={activateEmbed}
-        errorCount={errorCount}
       />
     </div>
   );

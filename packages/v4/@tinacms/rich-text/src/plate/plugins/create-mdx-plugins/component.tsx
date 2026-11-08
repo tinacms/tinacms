@@ -1,4 +1,3 @@
-import { Badge } from '@tinacms/ui/components/badge';
 import { ElementApi } from '@udecode/plate';
 import {
   ParagraphPlugin,
@@ -49,7 +48,7 @@ export const InlineEmbed = ({
 }: InlineEmbedProps) => {
   const selected = useSelected();
   const { templates, fieldName, embedEditAvailable } = useTemplates();
-  const { handleClose, handleRemove, handleSelect, isExpanded, errorCount } =
+  const { handleClose, handleRemove, handleSelect, isExpanded } =
     useEmbedHandles(editor, element, fieldName);
   useHotkey('enter', () => {
     editor.tf.insertNodes([
@@ -101,16 +100,6 @@ export const InlineEmbed = ({
             onMouseDown={handleSelect}
           >
             {label}
-            {errorCount > 0 ? (
-              <span className='ml-1.5'>
-                <Badge
-                  kind='count'
-                  tone='error'
-                  count={errorCount}
-                  srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
-                />
-              </span>
-            ) : null}
           </span>
           <DotMenu
             onOpen={handleSelect}
@@ -133,7 +122,7 @@ export const BlockEmbed = ({
 }) => {
   const selected = useSelected();
   const { templates, fieldName, embedEditAvailable } = useTemplates();
-  const { handleClose, handleRemove, handleSelect, isExpanded, errorCount } =
+  const { handleClose, handleRemove, handleSelect, isExpanded } =
     useEmbedHandles(editor, element, fieldName);
 
   useHotkey('enter', () => {
@@ -172,16 +161,6 @@ export const BlockEmbed = ({
             className='truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l-sm border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
           >
             {label}
-            {errorCount > 0 ? (
-              <span className='ml-1.5'>
-                <Badge
-                  kind='count'
-                  tone='error'
-                  count={errorCount}
-                  srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
-                />
-              </span>
-            ) : null}
           </span>
           <DotMenu
             onOpen={handleSelect}

@@ -7,8 +7,6 @@ export interface EditorContextValue {
   rawMode: boolean;
   setRawMode: (mode: boolean) => void;
   onActivateField: (address: string) => void;
-  /** How many fields under `address` show an error. An embed draws it as a red count. */
-  errorCount?: (address: string) => number;
   /**
    * The object field that would show embed props (ADR pending) does not
    * exist yet, so the Edit control has nothing to open. Optional so an
@@ -24,7 +22,6 @@ export const EditorContext = React.createContext<EditorContextValue>({
   setRawMode: () => {},
   templates: [],
   onActivateField: () => {},
-  errorCount: () => 0,
   embedEditAvailable: false,
 });
 

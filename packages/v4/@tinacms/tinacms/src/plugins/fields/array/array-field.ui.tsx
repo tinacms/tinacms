@@ -70,6 +70,22 @@ import {
   FULL_REASON,
 } from './array-field.view';
 
+/** Centres `el` in its nearest scrollable ancestor. Unlike `scrollIntoView`, it never scrolls an `overflow-hidden` ancestor such as the admin wrapper. */
+function centerInScroller(el: Element) {
+  for (let node = el.parentElement; node; node = node.parentElement) {
+    const { overflowY } = getComputedStyle(node);
+    if (
+      (overflowY === 'auto' || overflowY === 'scroll') &&
+      node.scrollHeight > node.clientHeight
+    ) {
+      const box = node.getBoundingClientRect();
+      const rect = el.getBoundingClientRect();
+      node.scrollTop += rect.top + rect.height / 2 - (box.top + box.height / 2);
+      return;
+    }
+  }
+}
+
 export function ArrayField() {
   const address = useFieldAddress();
   const [value] = useFieldValue<unknown>(address);
@@ -299,10 +315,12 @@ function ObjectItems({
       child.hasAttribute('data-array-item')
     );
     const card = cards[Math.min(returned, cards.length - 1)];
-    const target = card?.querySelector('[data-grip]');
-    if (target instanceof HTMLElement) {
-      target.focus();
-      target.scrollIntoView({ block: 'center' });
+    const target = card?.querySelector<HTMLElement>(
+      '[data-grip], [data-slot="list-card-head"] button'
+    );
+    if (card && target) {
+      target.focus({ preventScroll: true });
+      centerInScroller(card);
     }
   }, []);
 

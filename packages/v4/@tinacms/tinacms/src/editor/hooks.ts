@@ -458,17 +458,6 @@ export function useInvalidFieldCounts(addresses: readonly string[]): number[] {
   );
 }
 
-/** A counter for the failing fields under any address, so a widget with its own children can show a red count. */
-export function useErrorCounter(): (address: string) => number {
-  const { view, formId } = useFormScope(
-    'error-counter-outside-provider',
-    'useErrorCounter'
-  );
-  const errors = useFormErrors(formId);
-  const state = useStore(view);
-  return (address) => countRevealedErrors(state, Object.keys(errors), address);
-}
-
 /** Opens, reveals and touches the items of a list field by their address. */
 export function useListItems() {
   const { view } = useFormScope('list-items-outside-provider', 'useListItems');
@@ -488,9 +477,10 @@ export function useListItems() {
       const { returnedFrom, clearReturn } = view.getState();
       const prefix = `${listAddress}.`;
       if (!returnedFrom?.startsWith(prefix)) return undefined;
-      const index = Number(returnedFrom.slice(prefix.length).split('.')[0]);
+      const index = Number(returnedFrom.slice(prefix.length));
+      if (!Number.isInteger(index)) return undefined;
       clearReturn();
-      return Number.isInteger(index) ? index : undefined;
+      return index;
     },
   };
 }

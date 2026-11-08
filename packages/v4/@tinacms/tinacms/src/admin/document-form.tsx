@@ -26,7 +26,6 @@ import {
 import { Field, FieldNode } from '../editor/field';
 import {
   fieldsAlong,
-  lockAbove,
   holdsRevealedError,
   levelDrillsIn,
   levelsFor,
@@ -411,9 +410,7 @@ function FormFields({ scope }: { scope: FormScope }) {
   return (
     <OpenLevelFrame scope={scope} current={current}>
       <FieldLockContext
-        value={lockAbove(current.address, scope.collection.fields, (path) =>
-          getValues(path)
-        )}
+        value={lockAbove(current.address, scope.collection.fields, getValues)}
       >
         <FieldNode address={current.address} node={current.node} />
       </FieldLockContext>

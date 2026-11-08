@@ -21,7 +21,6 @@ export type DatetimeFieldViewProps = Pick<
   value: string;
   onChange?: (value: string) => void;
   onBlur?: () => void;
-  /** The earliest and latest value the box takes, as `YYYY-MM-DDTHH:mm`. */
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;

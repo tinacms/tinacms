@@ -24,8 +24,6 @@ export type RichTextFieldViewProps = Pick<
   onChange?: (value: RichTextValue) => void;
   field: Pick<RichTextFieldSchema, 'templates' | 'overrides'>;
   onActivateEmbed?: (address: string) => void;
-  /** How many fields under an address show an error. An embed draws it as a red count. */
-  errorCount?: (address: string) => number;
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
@@ -41,7 +39,6 @@ export function RichTextFieldView({
   onChange = noop,
   field,
   onActivateEmbed = noop,
-  errorCount,
   placeholder = 'Start writing…',
   disabled = false,
   readOnly = false,
@@ -72,7 +69,6 @@ export function RichTextFieldView({
           rawMode: false,
           setRawMode: noop,
           onActivateField: onActivateEmbed,
-          errorCount,
         }}
       >
         <RichEditor
