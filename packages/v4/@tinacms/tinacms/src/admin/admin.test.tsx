@@ -1058,6 +1058,7 @@ describe('TinaAdmin draft recovery contract', () => {
   });
 
   it('a Save failed toast goes when a later save lands', async () => {
+    await new Promise((resolve) => setTimeout(resolve, 450));
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const dismiss = vi.spyOn(toast, 'dismiss');
     vi.spyOn(provider, 'update').mockRejectedValueOnce(new Error('offline'));
