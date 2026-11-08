@@ -35,7 +35,7 @@ type PaginationProps = Omit<ComponentProps<'nav'>, 'children'> & {
 };
 
 /**
- * Moves through a long list a page at a time. Screen readers hear "Showing 11 to 20 of 48"
+ * Moves through a long list a page at a time. Screen readers hear "Showing 11–20 of 48"
  * when it changes. A button with nowhere to go is disabled, not hidden, so nothing jumps.
  */
 function Pagination({

@@ -207,11 +207,15 @@ type AnyButtonProps = ButtonBaseProps & {
   chipSrLabel?: string;
 };
 
+function blockNavigation(event: { preventDefault(): void }) {
+  event.preventDefault();
+}
+
 /**
  * Every button in the admin, in five variants and two sizes. Keyboard focus draws the orange ring with a
  * soft glow; a click draws nothing. An icon button needs a name (its string children or `aria-label`),
  * shown in a tooltip with its `shortcut` on hover and keyboard focus, and not while disabled.
- * For a link, style an `<a>` with `buttonVariants({ variant })`.
+ * Give it an `href` and it draws a link; a disabled link has no address, and a busy one keeps it but blocks presses.
  */
 function Button(buttonProps: ButtonProps) {
   const all: AnyButtonProps = buttonProps;
@@ -269,7 +273,7 @@ function Button(buttonProps: ButtonProps) {
       {...(href === undefined
         ? {}
         : {
-            render: <a href={inert ? undefined : href} />,
+            render: <a href={disabled ? undefined : href} />,
             nativeButton: false,
             role: 'link',
           })}
@@ -277,6 +281,12 @@ function Button(buttonProps: ButtonProps) {
       type={href === undefined ? (type ?? 'button') : undefined}
       aria-keyshortcuts={keys ? keyShortcuts(keys) : undefined}
       {...props}
+      {...(href !== undefined && busy
+        ? {
+            onClickCapture: blockNavigation,
+            onAuxClickCapture: blockNavigation,
+          }
+        : {})}
       disabled={disabled || busy}
       focusableWhenDisabled={busy ? !disabled : props.focusableWhenDisabled}
       aria-label={name}

@@ -478,7 +478,7 @@ describe('MediaBrowser search and type filter', () => {
     expect(screen.queryByRole('button', { name: 'logo.png' })).toBeNull();
   });
 
-  it('lets the type filter and kind toggle wrap instead of overflowing', async () => {
+  it('puts the type filter and kind toggle in a wrapping row', async () => {
     const provider = createProvider({ features: { extensionFilter: true } });
     renderBrowser(provider);
     await fileTile('logo.png');

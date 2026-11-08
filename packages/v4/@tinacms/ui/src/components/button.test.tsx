@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -80,7 +81,7 @@ describe('Button', () => {
     expect(button).toHaveStyle({ minWidth: '160px' });
   });
 
-  it('needs a chipSrLabel with chip, and draws nothing for a chip of 0', () => {
+  it('draws nothing for a chip of 0 and rejects a chip without chipSrLabel', () => {
     // @ts-expect-error chip without chipSrLabel is a type error, as count without srLabel is
     const bare = <Button chip={3}>Bare</Button>;
     const { rerender } = render(
@@ -92,12 +93,14 @@ describe('Button', () => {
       '0'
     );
     rerender(bare);
-    expect(screen.getByRole('button', { name: 'Bare' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Bare' })).not.toHaveTextContent(
+      '3'
+    );
   });
 
   it.each([
     ['disabled', { disabled: true }],
-    ['busy', { busy: true }],
+    ['disabled and busy', { disabled: true, busy: true }],
   ])('leaves out the address of a %s link', async (_, state) => {
     const onClick = vi.fn();
     render(
@@ -121,6 +124,62 @@ describe('Button', () => {
     }
     expect(onClick).not.toHaveBeenCalled();
   });
+
+  it('follows a link whose click sets busy, then blocks presses while busy', () => {
+    function Saving() {
+      const [busy, setBusy] = useState(false);
+      return (
+        <Button href='/next' busy={busy} onClick={() => setBusy(true)}>
+          Go
+        </Button>
+      );
+    }
+    render(<Saving />);
+    const link = screen.getByRole('link', { name: 'Go' });
+    expect(fireEvent.click(link)).toBe(true);
+    expect(screen.getByRole('link', { name: 'Go' })).toHaveAttribute(
+      'href',
+      '/next'
+    );
+    expect(fireEvent.click(link)).toBe(false);
+    expect(
+      fireEvent(
+        link,
+        new MouseEvent('auxclick', {
+          bubbles: true,
+          cancelable: true,
+          button: 1,
+        })
+      )
+    ).toBe(false);
+  });
+
+  it.each(['text', 'icon'] as const)(
+    'keeps the address of a busy %s link but runs no onClick',
+    (kind) => {
+      const onClick = vi.fn();
+      render(
+        kind === 'icon' ? (
+          <Button
+            href='/docs'
+            variant='icon'
+            icon='doc'
+            aria-label='Docs'
+            busy
+            onClick={onClick}
+          />
+        ) : (
+          <Button href='/docs#top' busy onClick={onClick}>
+            Docs
+          </Button>
+        )
+      );
+      const link = screen.getByRole('link');
+      expect(link).toHaveAttribute('href');
+      expect(fireEvent.click(link)).toBe(false);
+      expect(onClick).not.toHaveBeenCalled();
+    }
+  );
 
   it('fades and blocks a disabled link', () => {
     render(

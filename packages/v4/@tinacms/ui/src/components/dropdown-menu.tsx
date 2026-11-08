@@ -28,7 +28,6 @@ function DropdownMenuTrigger({ ...props }: MenuPrimitive.Trigger.Props) {
   return <MenuPrimitive.Trigger data-slot='dropdown-menu-trigger' {...props} />;
 }
 
-/** Give it an `aria-label`: screen readers name the menu by it. */
 // The arrow keys, Home and End skip a greyed item. Base UI keeps it focusable, so this
 // moves focus itself, before Base UI sees the key.
 function skipDisabledItems(event: React.KeyboardEvent<HTMLElement>) {
@@ -52,6 +51,7 @@ function skipDisabledItems(event: React.KeyboardEvent<HTMLElement>) {
   items[next]?.focus();
 }
 
+/** Give it an `aria-label`: screen readers name the menu by it. */
 function DropdownMenuContent({
   align = 'start',
   alignOffset = 0,
@@ -132,8 +132,8 @@ function RowHint({ hint }: { hint?: string }) {
 }
 
 /**
- * A `destructive` item shows the trash icon unless `icon` gives another. A greyed item keeps
- * focus with `aria-disabled`, so the arrow keys reach it, but picking it does nothing.
+ * A `destructive` item shows the trash icon unless `icon` gives another. A greyed item stays
+ * in the menu with `aria-disabled`; the arrow keys skip it and picking it does nothing.
  */
 function DropdownMenuItem({
   className,

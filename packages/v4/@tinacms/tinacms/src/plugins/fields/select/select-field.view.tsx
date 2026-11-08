@@ -16,7 +16,7 @@ export interface SelectFieldViewItem {
   label: string;
   /** Greyed and not pickable. */
   disabled?: boolean;
-  /** Shown as the option's tooltip. */
+  /** Shown beside the option's label in the list. */
   hint?: string;
 }
 
