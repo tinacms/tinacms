@@ -110,17 +110,11 @@ const withoutMedia = (entries: GlobalNavEntry[]) =>
       !(target.kind === 'screen' && target.screen === MEDIA_SCREEN)
   );
 
-/** The entries plugins add to the Tools pane: every one that has no group. */
-export const toolsEntries = (sections: GlobalNavSection[]): GlobalNavEntry[] =>
-  sections.flatMap(({ group, entries }) =>
-    group ? [] : withoutMedia(entries)
-  );
-
-// A group keeps its own heading in the rail, as the Cloud group does.
-const groupedEntries = (sections: GlobalNavSection[]) =>
+// ADR-027 §2: ungrouped entries and groups share one list, already sorted by `order`.
+const railSections = (sections: GlobalNavSection[]) =>
   sections.flatMap(({ group, entries }) => {
     const visible = withoutMedia(entries);
-    return group && visible.length > 0 ? [{ group, entries: visible }] : [];
+    return visible.length > 0 ? [{ group, entries: visible }] : [];
   });
 
 /** Where a nav entry leads, as one function for the rail and the Tools pane. */
@@ -146,49 +140,46 @@ function PluginEntries({
 }) {
   const { setOpenMobile } = useSidebar();
   const labelPrefix = useId();
-  const visible = groupedEntries(sections);
+  const visible = railSections(sections);
   return visible.map(({ group, entries }, index) => {
     const labelId = `${labelPrefix}-${index}`;
-    return (
-      <SidebarGroup key={group.id}>
+    const rows = entries.map(({ label, icon, target }, entryIndex) => (
+      <SidebarMenuItem key={`${entryIndex}:${label}`}>
+        <NavRow
+          kind='section'
+          icon={icon}
+          external={target.kind === 'url'}
+          selected={target.kind === 'screen' && target.screen === activeScreen}
+          aria-current={
+            target.kind === 'screen' && target.screen === activeScreen
+              ? 'page'
+              : undefined
+          }
+          aria-label={label}
+          data-rail-row=''
+          className={RAIL_ROW}
+          render={
+            target.kind === 'url' ? (
+              <a href={target.href} target='_blank' rel='noopener noreferrer' />
+            ) : undefined
+          }
+          onClick={() => {
+            setOpenMobile(false);
+            openNavTarget(target, navigate);
+          }}
+        >
+          {label}
+        </NavRow>
+      </SidebarMenuItem>
+    ));
+    return group ? (
+      <SidebarGroup key={`group:${group.id}`}>
         <SidebarGroupLabel id={labelId}>{group.label}</SidebarGroupLabel>
-        <SidebarMenu aria-labelledby={labelId}>
-          {entries.map(({ label, icon, target }, entryIndex) => (
-            <SidebarMenuItem key={`${entryIndex}:${label}`}>
-              <NavRow
-                kind='section'
-                icon={icon}
-                external={target.kind === 'url'}
-                selected={
-                  target.kind === 'screen' && target.screen === activeScreen
-                }
-                aria-current={
-                  target.kind === 'screen' && target.screen === activeScreen
-                    ? 'page'
-                    : undefined
-                }
-                aria-label={label}
-                data-rail-row=''
-                className={RAIL_ROW}
-                render={
-                  target.kind === 'url' ? (
-                    <a
-                      href={target.href}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                    />
-                  ) : undefined
-                }
-                onClick={() => {
-                  setOpenMobile(false);
-                  openNavTarget(target, navigate);
-                }}
-              >
-                {label}
-              </NavRow>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+        <SidebarMenu aria-labelledby={labelId}>{rows}</SidebarMenu>
+      </SidebarGroup>
+    ) : (
+      <SidebarGroup key={`entries:${index}`}>
+        <SidebarMenu>{rows}</SidebarMenu>
       </SidebarGroup>
     );
   });
@@ -196,21 +187,18 @@ function PluginEntries({
 
 /**
  * The side nav: Home, Collections and Media, then Tools and Settings, then the
- * grouped entries plugins add. An entry that ends in an arrow opens its panel beside the rail.
+ * entries plugins add, grouped or not, in ADR-027 order. An entry that ends in an arrow opens its panel beside the rail.
  */
 export function AdminRail({
   route,
   navigate,
   sections,
   hasMediaScreen,
-  toolsScreenOpen,
 }: {
   route: AdminRoute;
   navigate: (route: AdminRoute) => void;
   sections: GlobalNavSection[];
   hasMediaScreen: boolean;
-  /** A screen from the Tools pane is open beside it. */
-  toolsScreenOpen: boolean;
 }) {
   const inCollections =
     route.view === 'collections' ||
@@ -266,7 +254,7 @@ export function AdminRail({
               label='Tools'
               glyph='tools'
               opens
-              selected={route.view === 'tools' || toolsScreenOpen}
+              selected={route.view === 'tools'}
               onOpen={() => go({ view: 'tools' })}
             />
             <RailEntry

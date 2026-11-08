@@ -296,57 +296,13 @@ export function MediaPanel({
   );
 }
 
-/** The panel the Tools entry opens beside the rail: every plugin entry that has no group. */
-export function ToolsPane({
-  entries,
-  activeScreen,
-  navigate,
-  onClose,
-  hideBelowLg = false,
-}: {
-  entries: GlobalNavEntry[];
-  activeScreen?: string;
-  navigate: (route: AdminRoute) => void;
-  onClose: () => void;
-  hideBelowLg?: boolean;
-}) {
+/** The panel the Tools entry opens beside the rail. Plugin entries sit in the rail (ADR-027), so it has none yet. */
+export function ToolsPane({ onClose }: { onClose: () => void }) {
   return (
-    <aside aria-label='Tools panel' className={paneClass(hideBelowLg)}>
+    <aside aria-label='Tools panel' className={paneClass(false)}>
       <PanelHeader heading='Tools' closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
-        {entries.length === 0 ? (
-          <EmptyState text='No tools installed.' />
-        ) : (
-          <ul aria-label='Tools' className='m-0 list-none p-0'>
-            {entries.map(({ label, icon, target }, index) => {
-              const selected =
-                target.kind === 'screen' && target.screen === activeScreen;
-              return (
-                <li key={`${index}:${label}`}>
-                  <NavRow
-                    kind='doc'
-                    icon={icon}
-                    external={target.kind === 'url'}
-                    selected={selected}
-                    aria-current={selected ? 'page' : undefined}
-                    render={
-                      target.kind === 'url' ? (
-                        <a
-                          href={target.href}
-                          target='_blank'
-                          rel='noopener noreferrer'
-                        />
-                      ) : undefined
-                    }
-                    onClick={() => openNavTarget(target, navigate)}
-                  >
-                    {label}
-                  </NavRow>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        <EmptyState text='No tools installed.' />
       </div>
     </aside>
   );

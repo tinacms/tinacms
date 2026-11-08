@@ -33,7 +33,7 @@ import {
   SettingsPane,
   ToolsPane,
 } from './navigator';
-import { AdminRail, MEDIA_SCREEN, toolsEntries } from './rail';
+import { AdminRail, MEDIA_SCREEN } from './rail';
 import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 import { COLLECTIONS_ROUTE, HOME_ROUTE } from './routing';
@@ -273,13 +273,6 @@ function AdminShell({
 
   const goToCollections = () => navigate(COLLECTIONS_ROUTE);
   const goHome = () => navigate(HOME_ROUTE);
-  const tools = toolsEntries(globalNav);
-  const toolsScreenOpen =
-    activeScreen !== undefined &&
-    tools.some(
-      ({ target }) =>
-        target.kind === 'screen' && target.screen === activeScreen.screen
-    );
   const hasMediaScreen = screens.some(({ name }) => name === MEDIA_SCREEN);
   const showMediaPanel =
     route.view === 'media' ||
@@ -324,7 +317,6 @@ function AdminShell({
             navigate={navigate}
             sections={globalNav}
             hasMediaScreen={hasMediaScreen}
-            toolsScreenOpen={toolsScreenOpen}
           />
         </Sidebar>
 
@@ -349,15 +341,7 @@ function AdminShell({
           />
         ) : null}
 
-        {route.view === 'tools' || toolsScreenOpen ? (
-          <ToolsPane
-            entries={tools}
-            activeScreen={activeScreen?.screen}
-            navigate={navigate}
-            onClose={goHome}
-            hideBelowLg={toolsScreenOpen}
-          />
-        ) : null}
+        {route.view === 'tools' ? <ToolsPane onClose={goHome} /> : null}
 
         {route.view === 'settings' ? <SettingsPane onClose={goHome} /> : null}
 
@@ -368,9 +352,7 @@ function AdminShell({
               (candidate) => candidate.name === activeScreen.screen
             )}
             segments={activeScreen.segments}
-            onClose={
-              toolsScreenOpen ? () => navigate({ view: 'tools' }) : goHome
-            }
+            onClose={goHome}
           />
         ) : route.view === 'home' ? (
           <MissingPanel title='Home' onClose={goHome}>

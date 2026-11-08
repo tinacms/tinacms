@@ -583,31 +583,16 @@ describe('TinaAdmin content reads', () => {
 });
 
 describe('TinaAdmin global nav', () => {
-  const openTools = async (user: ReturnType<typeof userEvent.setup>) => {
-    await user.click(await screen.findByRole('button', { name: 'Tools' }));
-    return screen.findByRole('complementary', { name: 'Tools panel' });
-  };
-
-  it('lists the ungrouped entries plugins contribute in the Tools pane, in order, skipping unmet dependencies', async () => {
-    const user = userEvent.setup();
-    renderAdmin();
-    const pane = await openTools(user);
-    expect(
-      within(within(pane).getByRole('list', { name: 'Tools' }))
-        .getAllByRole('listitem')
-        .map((item) => item.textContent)
-    ).toEqual([
-      'Switch branch',
-      'Docs (opens in a new tab)',
-      'Changelog (opens in a new tab)',
-    ]);
-  });
-
-  it('keeps ungrouped entries out of the rail', async () => {
+  it('sorts ungrouped entries and groups together by order in the rail, skipping unmet dependencies (ADR-027)', async () => {
     renderAdmin();
     const rail = await screen.findByRole('navigation', { name: 'Content' });
-    expect(within(rail).queryByText('Docs')).toBeNull();
-    expect(within(rail).queryByText('Switch branch')).toBeNull();
+    await screen.findByRole('list', { name: 'Help' });
+    const shown = ['Switch branch', 'Docs', 'Guides', 'Changelog'];
+    expect(
+      [...rail.querySelectorAll('[data-rail-row]')]
+        .map((row) => row.getAttribute('aria-label') ?? '')
+        .filter((label) => shown.includes(label))
+    ).toEqual(shown);
   });
 
   it('lists the entries of a group under its heading in the rail', async () => {
@@ -621,16 +606,13 @@ describe('TinaAdmin global nav', () => {
   });
 
   it('does not link a screen that no entry targets', async () => {
-    const user = userEvent.setup();
     renderAdmin();
-    const pane = await openTools(user);
-    expect(within(pane).queryByText('Unlinked')).not.toBeInTheDocument();
+    const rail = await screen.findByRole('navigation', { name: 'Content' });
+    expect(within(rail).queryByText('Unlinked')).not.toBeInTheDocument();
   });
 
   it('opens a url entry in a new tab', async () => {
-    const user = userEvent.setup();
     renderAdmin();
-    await openTools(user);
     const link = await screen.findByRole('link', { name: /^Docs/ });
     expect(link).toHaveAttribute('href', 'https://tina.io/docs');
     expect(link).toHaveAttribute('target', '_blank');
@@ -641,7 +623,6 @@ describe('TinaAdmin global nav', () => {
     const user = userEvent.setup();
     navAction.mockClear();
     renderAdmin();
-    await openTools(user);
     await user.click(
       await screen.findByRole('button', { name: 'Switch branch' })
     );
@@ -661,7 +642,10 @@ describe('TinaAdmin global nav', () => {
         }
       />
     );
-    const pane = await openTools(user);
+    await user.click(await screen.findByRole('button', { name: 'Tools' }));
+    const pane = await screen.findByRole('complementary', {
+      name: 'Tools panel',
+    });
     expect(within(pane).getByText('No tools installed.')).toBeVisible();
   });
 
@@ -1292,7 +1276,6 @@ describe('TinaAdmin rail', () => {
         }
       />
     );
-    await user.click(await screen.findByRole('button', { name: 'Tools' }));
     const row = await screen.findByRole('button', { name: 'Reports' });
     expect(row).not.toHaveAttribute('aria-current');
     await user.click(row);
@@ -1303,49 +1286,6 @@ describe('TinaAdmin rail', () => {
       'aria-current',
       'page'
     );
-    expect(
-      screen.getByRole('complementary', { name: 'Tools panel' })
-    ).toBeVisible();
-    await user.click(screen.getAllByRole('button', { name: 'Close' }).at(-1)!);
-    await waitFor(() => expect(window.location.hash).toBe('#/tools'));
-  });
-
-  it('hides the Tools panel below lg while one of its screens is open', async () => {
-    const linked = definePlugin({
-      name: 'test:tools-screen',
-      client: async () => ({
-        default: {
-          slots: {
-            globalNav: [
-              {
-                label: 'Reports',
-                icon: NavIcon,
-                target: { kind: 'screen', screen: 'unlinked' },
-              },
-            ],
-          },
-        },
-      }),
-    });
-    window.location.hash = '#/tools';
-    const user = userEvent.setup();
-    render(
-      <TinaAdmin
-        config={asResolvedConfig({
-          ...config,
-          plugins: [...config.plugins, linked],
-        })}
-        queryClient={
-          new QueryClient({ defaultOptions: { queries: { retry: false } } })
-        }
-      />
-    );
-    const panel = await screen.findByRole('complementary', {
-      name: 'Tools panel',
-    });
-    expect(panel).not.toHaveClass('max-lg:hidden');
-    await user.click(await screen.findByRole('button', { name: 'Reports' }));
-    await waitFor(() => expect(panel).toHaveClass('max-lg:hidden'));
   });
 
   it('hides the empty Media main area below lg', async () => {
