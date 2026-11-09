@@ -1,12 +1,20 @@
 import { QueryClient } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import {
+  configure,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
-import { useFormStore } from '../form/form-store';
+import { draftKey } from '../form/drafts';
+import { toFormId, useFormStore } from '../form/form-store';
 import { t } from '../index';
 import { required } from '../plugins/fields';
 import arrayFieldPlugin from '../plugins/fields/array/array-field.plugin';
@@ -15,9 +23,19 @@ import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 
+// Each test drives the whole admin, so a loaded machine needs longer than the defaults.
+configure({ asyncUtilTimeout: 4000 });
+vi.setConfig({ testTimeout: 20_000 });
+
 const PATH = 'content/notes/one.mdx';
+const OTHER = 'content/notes/two.mdx';
 const saved: TinaDocument[] = [];
 let document: TinaDocument;
+const OTHER_DOCUMENT: TinaDocument = {
+  title: 'Two',
+  seo: { metaTitle: 'Meta' },
+  items: [{ heading: 'A' }],
+};
 
 const contentPlugin = definePlugin({
   name: 'test:content',
@@ -26,8 +44,14 @@ const contentPlugin = definePlugin({
     default: {
       slice: () => ({
         local: true,
-        list: async () => [{ path: PATH }],
-        get: async (): Promise<DocumentEntry> => ({ path: PATH, document }),
+        list: async () => [{ path: PATH }, { path: OTHER }],
+        get: async (
+          _collection: string,
+          path: string
+        ): Promise<DocumentEntry> => ({
+          path,
+          document: path === OTHER ? OTHER_DOCUMENT : document,
+        }),
         update: async (
           _collection: string,
           path: string,
@@ -80,19 +104,70 @@ const config = asResolvedConfig({
               }),
             ],
           }),
+          t.object({
+            name: 'outer',
+            label: 'Outer',
+            fields: [
+              t.object({
+                name: 'inner',
+                label: 'Inner',
+                fields: [
+                  t.string({
+                    name: 'leaf',
+                    label: 'Leaf',
+                    validators: [required()],
+                  }),
+                ],
+              }),
+            ],
+          }),
+          t.array({
+            name: 'blocks',
+            label: 'Blocks',
+            templates: [
+              {
+                name: 'hero',
+                label: 'Hero',
+                fields: [
+                  t.string({
+                    name: 'headline',
+                    label: 'Headline',
+                    validators: [required()],
+                  }),
+                ],
+              },
+            ],
+          }),
+          t.array({
+            name: 'cards',
+            label: 'Cards',
+            fields: ['a', 'b', 'c'].map((name) =>
+              t.string({
+                name,
+                label: `Part ${name}`,
+                validators: [required()],
+              })
+            ),
+          }),
+          t.string({
+            name: 'quiet',
+            label: 'Quiet',
+            validators: [required(' ')],
+          }),
         ],
       },
     ],
   },
 });
 
-const renderAdmin = () =>
+const renderAdmin = (preview?: React.ReactNode) =>
   render(
     <TinaAdmin
       config={config}
       queryClient={
         new QueryClient({ defaultOptions: { queries: { retry: false } } })
       }
+      preview={preview}
     />
   );
 
@@ -102,6 +177,10 @@ beforeEach(() => {
     title: 'Hello',
     seo: { metaTitle: 'Meta' },
     items: [{ heading: 'A' }, { heading: 'B' }, { heading: 'C' }],
+    outer: { inner: { leaf: 'x' } },
+    blocks: [],
+    cards: [{ a: 'x', b: 'x', c: 'x' }],
+    quiet: 'x',
   };
   window.location.hash = `#/collections/note/${encodeURIComponent(PATH)}`;
   useFormStore.setState({ forms: {} });
@@ -384,6 +463,367 @@ describe('a Save that finds invalid fields', () => {
     await user.click(await screen.findByRole('button', { name: /^Discard/ }));
     const save = await screen.findByRole('button', { name: 'Save' });
     expect(save).toBeDisabled();
+    expect(screen.queryByRole('complementary', { name: /^Errors/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Show errors/ })).toBeNull();
+  });
+});
+
+const rowNamed = async (name: RegExp) =>
+  within(await errorsPane()).getByRole('button', { name });
+const focusedName = () => globalThis.document.activeElement;
+
+// A stand-in for the Web Animations API that never finishes, so a hold lasts as long as the test needs.
+const holdAnimations = () => {
+  const original = Element.prototype.animate;
+  Element.prototype.animate = (() => ({
+    addEventListener: () => {},
+    cancel: () => {},
+    pause: () => {},
+    play: () => {},
+  })) as unknown as typeof Element.prototype.animate;
+  return () => {
+    Element.prototype.animate = original;
+  };
+};
+
+// Every text a live region held, in order.
+const watchRegion = (slot: string) => {
+  const texts: string[] = [];
+  const region = globalThis.document.querySelector(`[data-slot=${slot}]`);
+  const observer = new MutationObserver((records) => {
+    for (const record of records) {
+      if (record.type === 'characterData') {
+        texts.push(record.target.textContent ?? '');
+      } else if (record.addedNodes.length > 0) {
+        texts.push(
+          Array.from(record.addedNodes, (node) => node.textContent ?? '').join(
+            ''
+          )
+        );
+      } else {
+        texts.push('');
+      }
+    }
+  });
+  if (region) {
+    observer.observe(region, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+  }
+  return { texts, stop: () => observer.disconnect() };
+};
+
+describe('where the pane goes and what it keeps', () => {
+  it('lists a required field inside an object inside an object, and opens both to reach it', async () => {
+    document = { ...document, outer: { inner: { leaf: '' } } };
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    const row = await rowNamed(/^Leaf, in Outer › Inner\. /);
+    await user.click(row);
+    await waitFor(() => expect(focusedName()).toHaveAccessibleName(/^Leaf\b/));
+  });
+
+  it('lists a required field inside a block that opens as its own level', async () => {
+    document = { ...document, blocks: [{ _template: 'hero', headline: '' }] };
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    const row = await rowNamed(/^Headline, in Blocks › /);
+    await user.click(row);
+    await waitFor(() =>
+      expect(focusedName()).toHaveAccessibleName(/^Headline\b/)
+    );
+  });
+
+  it('reads "Check this field." when a rule gives no words', async () => {
+    document = { ...document, quiet: '' };
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    expect(await rowNamed(/^Quiet\. Check this field\.$/)).toBeVisible();
+  });
+
+  it('follows the Tab order: Document actions, Resolve, Pin, Close, rows, then the preview', async () => {
+    const user = userEvent.setup();
+    document = {
+      ...document,
+      seo: { metaTitle: '' },
+      items: [{ heading: '' }, { heading: 'B' }, { heading: 'C' }],
+    };
+    renderAdmin(<button type='button'>preview control</button>);
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    await errorsPane();
+    screen.getByRole('button', { name: 'Document actions' }).focus();
+    await user.tab();
+    expect(screen.getByRole('button', { name: /^Resolve/ })).toHaveFocus();
+    await user.tab();
+    expect(
+      screen.getByRole('separator', { name: 'Resize the form column' })
+    ).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Pin' })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Close errors' })).toHaveFocus();
+    await user.tab();
+    expect(focusedName()).toHaveAccessibleName(/^Meta title/);
+    await user.tab();
+    expect(focusedName()).toHaveAccessibleName(/^Heading/);
+    await user.tab();
+    expect(
+      screen.getByRole('button', { name: 'preview control' })
+    ).toHaveFocus();
+  });
+
+  it('closes from the Close button and gives focus back to Resolve', async () => {
+    const user = await blockOnTwoFields();
+    const pane = await errorsPane();
+    await user.click(
+      within(pane).getByRole('button', { name: 'Close errors' })
+    );
+    expect(
+      await screen.findByRole('button', { name: 'Show errors, 2' })
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: /^Resolve/ })).toHaveFocus();
+  });
+
+  it('tucks a floating pane on a click in the preview, but not a pinned one', async () => {
+    document = { ...document, seo: { metaTitle: '' } };
+    const user = userEvent.setup();
+    renderAdmin(<p>preview area</p>);
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    const pane = await errorsPane();
+    await user.click(within(pane).getByRole('button', { name: 'Pin' }));
+    await user.click(screen.getByText('preview area'));
+    expect(await errorsPane()).toBeVisible();
+    await user.click(within(pane).getByRole('button', { name: 'Pinned' }));
+    await user.click(screen.getByText('preview area'));
+    expect(
+      await screen.findByRole('button', { name: 'Show errors, 1' })
+    ).toBeVisible();
+  });
+
+  it('keeps a row gone once fixed, even when its field breaks again', async () => {
+    const user = await blockOnTwoFields();
+    await fixFieldOf(user, /^Meta title/);
+    await waitFor(async () =>
+      expect(rowsOf(await errorsPane())).toHaveLength(1)
+    );
+    await user.clear(screen.getByLabelText(/^Meta title\b/));
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    expect(rowsOf(await errorsPane())).toHaveLength(1);
+  });
+
+  it('leaves the blocked state when the editor opens another document', async () => {
+    const user = await blockOnTwoFields();
+    await errorsPane();
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(await screen.findByRole('button', { name: /two\.mdx/ }));
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: /^Resolve/ })).toBeNull()
+    );
+    expect(screen.queryByRole('complementary', { name: /^Errors/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Show errors/ })).toBeNull();
+    expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
+      'Two'
+    );
+  });
+});
+
+describe('the All fixed endings', () => {
+  it('moves focus to Save when the last error is fixed while a row has focus', async () => {
+    const user = await blockOnTwoFields();
+    await fixFieldOf(user, /^Meta title/);
+    const row = await rowNamed(/^Heading/);
+    await user.click(row);
+    const input = (await waitFor(() => {
+      const found = focusedName();
+      expect(found).toHaveAccessibleName(/^Heading\b/);
+      return found;
+    })) as HTMLInputElement;
+    row.focus();
+    fireEvent.change(input, { target: { value: 'Fixed' } });
+    const save = await screen.findByRole('button', { name: 'Save' });
+    await waitFor(() => expect(save).toHaveFocus());
+  });
+
+  it('starts a fresh blocked state and says the same words again when a Save blocks during the hold', async () => {
+    const release = holdAnimations();
+    try {
+      const user = await blockOnTwoFields();
+      await errorsPane();
+      const spoken = watchRegion('error-blocked-announcement');
+      await fixFieldOf(user, /^Meta title/);
+      await fixFieldOf(user, /^Heading/);
+      expect(await screen.findByText('All fixed.')).toBeVisible();
+      await user.clear(await titleInput());
+      await user.clear(screen.getByLabelText(/^Meta title\b/));
+      await user.click(await screen.findByRole('button', { name: 'Save' }));
+      expect(
+        await screen.findByRole('button', { name: 'Resolve 2 errors' })
+      ).toBeVisible();
+      expect(screen.queryByText('All fixed.')).toBeNull();
+      const pane = await errorsPane();
+      expect(
+        within(pane)
+          .getAllByRole('button', { name: /\. / })
+          .some((row) => row.hasAttribute('aria-current'))
+      ).toBe(false);
+      await waitFor(() => {
+        const words = spoken.texts.filter((text) => text !== '');
+        expect(words).toHaveLength(1);
+      });
+      spoken.stop();
+    } finally {
+      release();
+    }
+  });
+
+  it('announces a repeated blocked Save twice, emptying the region between', async () => {
+    const user = userEvent.setup();
+    document = { ...document, seo: { metaTitle: '' } };
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    const spoken = watchRegion('error-blocked-announcement');
+    await user.click(await saveButton());
+    await fixFieldOf(user, /^Meta title/);
+    await user.click(await screen.findByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(saved).toHaveLength(1));
+    await user.clear(await titleInput());
+    await user.click(await screen.findByRole('button', { name: /^Save/ }));
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    const words = (text: string) => text.includes('Resolve 1 error');
+    await waitFor(() => expect(spoken.texts.filter(words)).toHaveLength(2));
+    expect(spoken.texts).toContain('');
+    spoken.stop();
+  });
+});
+
+describe('list changes while blocked', () => {
+  const chooseAction = async (list: string, item: number, action: RegExp) => {
+    const group = await screen.findByRole('group', { name: list });
+    const trigger = Array.from(
+      group.querySelectorAll<HTMLElement>('[aria-label^="Actions for"]')
+    )[item - 1] as HTMLElement;
+    await userEvent.click(trigger);
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: action })
+    );
+  };
+  const viewItemThree = async () => {
+    document = {
+      ...document,
+      items: [{ heading: 'A' }, { heading: 'B' }, { heading: '' }],
+    };
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    await user.click(await rowNamed(/^Heading, in Items › Item 3/));
+    await waitFor(() =>
+      expect(focusedName()).toHaveAccessibleName(/^Heading\b/)
+    );
+    return user;
+  };
+
+  it('keeps the viewed row on its item when an item is duplicated above it', async () => {
+    await viewItemThree();
+    await chooseAction('Items', 1, /^Duplicate/);
+    const row = await rowNamed(/^Heading, in Items › Item 4/);
+    expect(row).toHaveAttribute('aria-current', 'true');
+    expect(
+      screen.getByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+  });
+
+  it('keeps the viewed row on its item when an item is inserted above it', async () => {
+    await viewItemThree();
+    await chooseAction('Items', 1, /^Insert above/);
+    expect(await rowNamed(/^Heading, in Items › Item 4/)).toHaveAttribute(
+      'aria-current',
+      'true'
+    );
+  });
+
+  it('keeps the row when an unrelated item is removed', async () => {
+    await viewItemThree();
+    await chooseAction('Items', 1, /^Remove/);
+    expect(await rowNamed(/^Heading, in Items › Item 2/)).toHaveAttribute(
+      'aria-current',
+      'true'
+    );
+    expect(
+      screen.getByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+  });
+
+  it('announces once when a removed item held three listed errors', async () => {
+    document = {
+      ...document,
+      seo: { metaTitle: '' },
+      cards: [{ a: '', b: '', c: '' }],
+    };
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 4 errors' })
+    ).toBeVisible();
+    const spoken = watchRegion('error-announcement');
+    await user.click(await rowNamed(/^Part a, in Cards/));
+    await chooseAction('Cards', 1, /^Remove/);
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    const heard = () => [
+      ...new Set(spoken.texts.filter((text) => text !== '')),
+    ];
+    await waitFor(() => expect(heard()).toContain('1 error left.'));
+    expect(heard()).toEqual(['1 error left.']);
+    spoken.stop();
+  });
+});
+
+describe('a stored draft that is resumed while blocked', () => {
+  it('ends the blocked state without an All fixed face', async () => {
+    localStorage.setItem(
+      draftKey(toFormId(PATH)),
+      JSON.stringify({
+        version: 2,
+        values: {
+          title: 'Mine',
+          seo: { metaTitle: 'Meta' },
+          items: [{ heading: 'A' }],
+          outer: { inner: { leaf: 'x' } },
+          blocks: [],
+          cards: [{ a: 'x', b: 'x', c: 'x' }],
+          quiet: 'x',
+        },
+        baseline: { title: 'Old' },
+      })
+    );
+    document = { ...document, seo: { metaTitle: '' } };
+    const user = userEvent.setup();
+    renderAdmin();
+    await screen.findByText('Resume your unsaved edits?');
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    await user.click(screen.getByRole('button', { name: 'Resume' }));
+    expect(await screen.findByRole('button', { name: 'Save' })).toBeEnabled();
+    expect(screen.queryByText('All fixed.')).toBeNull();
     expect(screen.queryByRole('complementary', { name: /^Errors/ })).toBeNull();
     expect(screen.queryByRole('button', { name: /^Show errors/ })).toBeNull();
   });

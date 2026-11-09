@@ -9,7 +9,7 @@ import { currentBranchOf } from '../core/branch/contract';
 import { ContentError, type DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
 import { draftKey } from '../form/drafts';
-import { toFormId } from '../form/form-store';
+import { toFormId, useFormStore } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -827,6 +827,50 @@ describe('save state', () => {
     await waitFor(() =>
       expect(within(statusBar()).getByText('Saved: “hello.mdx”')).toBeVisible()
     );
+  });
+
+  it('logs no "Save failed" line for a blocked save', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { user, input } = await openHello();
+    await user.clear(input);
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    expect(
+      log.mock.calls.some(([first]) => String(first).includes('Save failed'))
+    ).toBe(false);
+    log.mockRestore();
+  });
+
+  it('reads Save failed after a later network failure, once the blocked save is fixed', async () => {
+    const { user, input } = await openHello();
+    await user.clear(input);
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    await user.type(input, 'Hello!');
+    updateError = new ContentError('network');
+    await user.click(await screen.findByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Save failed')).toBeVisible()
+    );
+  });
+
+  it('keeps the earlier save entry of the document when its save blocks, so a newer save of another document stays the newest', async () => {
+    const { user, input } = await openHello();
+    useFormStore.getState().setSavePhase(toFormId('content/posts/hello.mdx'), {
+      phase: 'failed',
+      message: 'earlier failure',
+    });
+    useFormStore
+      .getState()
+      .setSavePhase(toFormId('content/posts/other.mdx'), { phase: 'saved' });
+    await user.clear(input);
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    expect(within(statusBar()).queryByText('Save failed')).toBeNull();
+    expect(within(statusBar()).getByText('Unsaved changes')).toBeVisible();
+    expect(
+      useFormStore.getState().saves[toFormId('content/posts/hello.mdx')]
+    ).toMatchObject({ phase: 'failed', message: 'earlier failure' });
   });
 
   it('does not call a blocked save a failed save in the Status bar', async () => {

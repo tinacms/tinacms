@@ -76,7 +76,7 @@ function useErrorRows(): Row[] {
           address: entry.address,
           label: field?.label ?? entry.address,
           trail: steps.slice(0, -1).map((step) => step.label),
-          message: message || 'Check this field.',
+          message: message?.trim() || 'Check this field.',
         };
       }
     );
