@@ -65,7 +65,7 @@ const failWrites = (page: Page, message: string) =>
 test.describe('form bar at 1440px', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test('measures like the Storybook form bar (AC50)', async ({ page }) => {
+  test('measures like the Storybook form bar (AC50), Save at its 164px minimum', async ({ page }) => {
     await dirty(page);
     const { bar, menu, save } = await settled(page);
     if (!bar || !menu || !save) throw new Error('the form bar has no boxes');
@@ -73,7 +73,7 @@ test.describe('form bar at 1440px', () => {
     expect(bar.height).toBeLessThanOrEqual(57);
     expect(menu.width).toBe(32);
     expect(menu.height).toBe(32);
-    expect(save.width).toBe(160);
+    expect(save.width).toBe(164);
     expect(save.height).toBe(36);
     // 12px of padding on each side.
     expect(bar.x + bar.width - (save.x + save.width)).toBe(12);
