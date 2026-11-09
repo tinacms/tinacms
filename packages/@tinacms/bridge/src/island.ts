@@ -111,7 +111,7 @@ export async function handleIslandRequest<
       ? renderIslandFormPayloads(forms)
       : '';
     return new Response(
-      payloads + wrapIsland(html, island.wrapper, new URL(request.url), forms),
+      payloads + wrapIsland(html, island.wrapper, new URL(request.url)),
       {
         headers: {
           'Content-Type': 'text/html; charset=utf-8',
@@ -195,24 +195,12 @@ function renderIslandFormPayloads(forms: readonly CollectedForm[]): string {
     .join('');
 }
 
-// `data-tina-island-forms` lets the bridge refresh this island only when
-// one of these forms changes. Omitted without forms, so the bridge keeps
-// refreshing it on every pass.
-function wrapIsland(
-  html: string,
-  wrapper: IslandWrapper,
-  url: URL,
-  forms: readonly CollectedForm[]
-): string {
+function wrapIsland(html: string, wrapper: IslandWrapper, url: URL): string {
   const className = wrapper.className
     ? ` class="${escapeAttr(wrapper.className)}"`
     : '';
   const marker = escapeAttr(`${url.pathname}${url.search}`);
-  const formIds = [...new Set(forms.map((form) => form.id))].join(' ');
-  const formsAttr = formIds
-    ? ` data-tina-island-forms="${escapeAttr(formIds)}"`
-    : '';
-  return `<${wrapper.tag}${className} data-tina-island="${marker}"${formsAttr}>${html}</${wrapper.tag}>`;
+  return `<${wrapper.tag}${className} data-tina-island="${marker}">${html}</${wrapper.tag}>`;
 }
 
 function textResponse(body: string, status: number): Response {

@@ -9,3 +9,5 @@ Add server-side entry points so framework adapters share one implementation inst
 - `@tinacms/bridge/island`: `handleIslandRequest`, `assertValidIslands`, `isIslandName`, and the `IslandWrapper`, `IslandRender` and `IslandRequest` types. Adapters pass a `render` callback; the request checks, form payloads and response live here.
 - `@tinacms/bridge/sanitize`: `sanitizeHref`, `sanitizeImageSrc`, `sanitizeCssColor`.
 - `@tinacms/bridge/dev-server` (Node only): `BRIDGE_ROUTE`, `bridgeBundlePath`, `readBridgeBundle`, `serveBridge`.
+
+The client bundle (`/admin/bridge.js`) is unchanged.

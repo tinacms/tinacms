@@ -223,10 +223,8 @@ Renders Tina rich-text and lets you override any node through `components`:
 
 `adapter-static` has no runtime server, so it can't refresh content. With a
 server-capable adapter (e.g. `adapter-node`), pages can be prerendered and
-still edit live: `TinaIsland` marks a region, and on load the bridge asks the
-island endpoint for the forms the region uses (prerendered HTML carries none).
-After that, a `managed` island updates through `useTina`; any other island is
-re-rendered through the endpoint with the unsaved overlay on each edit.
+still edit live: `TinaIsland` marks a region, and the bridge re-renders it
+through an endpoint with the unsaved overlay.
 
 ```ts
 // src/routes/tina-island/[name]/+server.ts
@@ -255,18 +253,13 @@ export const POST = experimental_createIslandHandler({
 
 ```svelte
 <TinaIsland name="post" wrapper={{ tag: 'article', className: 'prose' }}
-  params={{ slug: data.slug }} primary managed>
+  params={{ slug: data.slug }} primary>
   <PostView post={data.post} />
 </TinaIsland>
 ```
 
 - The registry key, `name`, and `wrapper` must match. Pass `basePath` if the
   app uses a SvelteKit base path.
-- Pass `managed` when everything inside the island updates through `useTina`
-  (as `PostView` does here). Without it, each edit replaces the island's
-  content with the endpoint's server render, which detaches Svelte's DOM
-  nodes: event handlers, `bind:` and effects inside the island stop working.
-  A managed island still needs the endpoint, for its forms.
 - The endpoint is `handleIslandRequest` from `@tinacms/bridge/island`; the
   [bridge README](../bridge/README.md#islands) lists the requests it accepts.
   Never choose components from request input.

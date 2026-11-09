@@ -7,7 +7,6 @@ interface Props {
   wrapper: { tag: string; className?: string };
   params?: Record<string, string | number>;
   primary?: boolean;
-  /** Content updates through `useTina`: the bridge primes the island but never replaces its HTML. */
   managed?: boolean;
   basePath?: string;
   children?: Snippet;

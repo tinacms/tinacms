@@ -152,9 +152,8 @@ component has a scoped `<style>` block.
 
    `pnpm build` builds the production admin, which signs in to TinaCloud, so
    `/admin` on the preview server only works with `TINA_CLIENT_ID` and
-   `TINA_TOKEN` set. There, opening a post primes the island once and edits
-   update through `useTina` (the post island is `managed`) without further
-   island requests.
+   `TINA_TOKEN` set. There, opening a post primes the island once and its form
+   opens.
 
 `pnpm check` also lists errors from `tina/__generated__/` and the core
 `tinacms` sources. Those come from the tsconfig scope, not this app's code.
