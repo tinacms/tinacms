@@ -458,3 +458,54 @@ describe('a list at level 3', () => {
     ).toHaveTextContent('1 item');
   });
 });
+
+describe('an open level inside a locked field', () => {
+  const lockedCollection: CollectionSchema = {
+    name: 'page',
+    label: 'Pages',
+    format: 'mdx',
+    fields: [
+      t.array({
+        name: 'blocks',
+        label: 'Blocks',
+        readOnly: true,
+        templates: [
+          {
+            name: 'hero',
+            label: 'Hero',
+            fields: [t.string({ name: 'text', label: 'Text' })],
+          },
+        ],
+      }),
+    ],
+  };
+
+  it('keeps the fields of an opened block read-only', async () => {
+    const user = userEvent.setup();
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [
+            objectFieldPlugin,
+            arrayFieldPlugin,
+            stringFieldPlugin,
+            coreValidatorsPlugin,
+          ],
+          schema: { collections: [] },
+        })}
+      >
+        <FormProvider
+          collection={lockedCollection}
+          path='content/pages/locked.mdx'
+          document={{ blocks: [{ _template: 'hero', text: 'first' }] }}
+        >
+          <DocumentForm />
+        </FormProvider>
+      </TinaProvider>
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /^Item 1: Hero/ })
+    );
+    expect(await screen.findByLabelText(/^Text\b/)).toHaveAttribute('readonly');
+  });
+});

@@ -465,11 +465,23 @@ export function useListItems() {
     openLevel: (
       itemAddress: string,
       label: string,
-      fields: readonly FieldSchema[]
-    ) => view.getState().openLevel(itemLevel(itemAddress, label, fields)),
+      fields: readonly FieldSchema[],
+      block = false
+    ) =>
+      view.getState().openLevel(itemLevel(itemAddress, label, fields, block)),
     isRevealed: (itemAddress: string) =>
       isRevealed(view.getState(), itemAddress),
     touch: (itemAddress: FieldAddress) => view.getState().touch(itemAddress),
+    /** The index of the item of `listAddress` the editor just came back from, once. */
+    takeReturnedIndex: (listAddress: string): number | undefined => {
+      const { returnedFrom, clearReturn } = view.getState();
+      const prefix = `${listAddress}.`;
+      if (!returnedFrom?.startsWith(prefix)) return undefined;
+      const index = Number(returnedFrom.slice(prefix.length));
+      if (!Number.isInteger(index)) return undefined;
+      clearReturn();
+      return index;
+    },
   };
 }
 

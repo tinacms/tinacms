@@ -26,10 +26,10 @@ import {
 import { Field, FieldNode } from '../editor/field';
 import {
   fieldsAlong,
-  lockAbove,
   holdsRevealedError,
   levelDrillsIn,
   levelsFor,
+  lockAbove,
   type OpenLevel,
 } from '../editor/form-view-state';
 import {

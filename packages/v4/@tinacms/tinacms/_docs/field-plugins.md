@@ -120,8 +120,9 @@ The properties of the descriptor:
   `rich-text` field sets it to `false` because it renders its own label area.
 - `metadata.drillable` — Set it to `true` when the field can open as its own form
   level. The editor drills in at nesting depth 3 and deeper.
-- `metadata.drillsIn(node)` — Overrides the depth rule for one node. `true`
-  drills in, `false` opens in place, `undefined` keeps the depth rule. The
+- `metadata.drillsIn(node)` — Answers for one node above level 3: `true`
+  drills in, `false` opens in place, `undefined` leaves it to the field. Level 3
+  and deeper drill in whatever it returns. The
   `object` field returns it from `display`.
 - `metadata.inlineBox(node)` — For a single-value field. It returns the box a
   list card holds in place of the field's widget, with the settings of that

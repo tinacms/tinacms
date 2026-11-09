@@ -48,7 +48,9 @@ function Menu() {
   );
 }
 
-const renderForm = () =>
+const renderForm = (
+  document = { seo: { title: 'Home' }, rows: [{ label: 'One' }] }
+) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
@@ -64,7 +66,7 @@ const renderForm = () =>
       <FormProvider
         collection={collection}
         path='content/pages/home.mdx'
-        document={{ seo: { title: 'Home' }, rows: [{ label: 'One' }] }}
+        document={document}
       >
         <Menu />
         <LabelledFields />

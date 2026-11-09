@@ -34,7 +34,7 @@ type CollapsibleSectionProps = Omit<
 };
 
 const invalidWords = (count: number) =>
-  `${count} invalid ${count === 1 ? 'field' : 'fields'}`;
+  `${count} ${count === 1 ? 'error' : 'errors'}`;
 
 function RequiredMark() {
   return (
@@ -115,7 +115,7 @@ function CollapsibleSection({
         onFocus={onHeaderFocus}
         className={cn(
           'relative -mx-1 box-border flex cursor-pointer items-center gap-1.5 self-stretch rounded-sm border-0 bg-transparent p-1 text-left font-sans text-foreground outline-none focus-visible:shadow-focus-ring',
-          disabled ? 'cursor-not-allowed opacity-45' : 'hover:bg-muted-hover'
+          disabled ? 'cursor-not-allowed opacity-60' : 'hover:bg-muted-hover'
         )}
       >
         <span

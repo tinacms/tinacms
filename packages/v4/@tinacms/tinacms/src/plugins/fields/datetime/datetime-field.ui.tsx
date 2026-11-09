@@ -3,8 +3,10 @@ import {
   useFieldActivation,
   useFieldAddress,
   useFieldFrame,
+  useFieldSchema,
   useFieldValue,
 } from '../../../editor';
+import type { DatetimeFieldSchema } from './datetime-field.schema';
 import { DatetimeFieldView } from './datetime-field.view';
 
 const CARRIES_A_ZONE = /(?:Z|[+-]\d{2}:\d{2})$/;
@@ -50,6 +52,7 @@ const fromInputValue = (
 
 export function DatetimeField() {
   const address = useFieldAddress();
+  const { placeholder } = useFieldSchema<DatetimeFieldSchema>();
   const [value, setValue] = useFieldValue<string | null>(address);
   const frame = useFieldFrame();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -61,6 +64,7 @@ export function DatetimeField() {
       {...frame}
       ref={inputRef}
       id={address}
+      placeholder={placeholder}
       value={toInputValue(value)}
       onChange={(wallClock) => setValue(fromInputValue(wallClock, value))}
     />
