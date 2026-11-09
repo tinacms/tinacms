@@ -114,6 +114,15 @@ type DialogState = {
   defaultName: string;
 };
 
+// Failed toasts whose action means "save to a new branch" rather than Retry.
+const goneToasts = new Set<string>();
+
+const isBranchGoneError = (cause: unknown) =>
+  cause instanceof ContentError && cause.code === 'branch-not-found';
+
+const isBranchGone = (save: { phase: string; reason?: string } | undefined) =>
+  save?.phase === 'failed' && save.reason === 'branch-gone';
+
 const DEFAULT_LABEL = 'Save';
 const NEW_BRANCH_LABEL = 'Save to new branch';
 
@@ -178,9 +187,19 @@ function SaveButton() {
     setDialog({ reason, branch, defaultName });
   };
 
+  const branchGone = useFormStore((state) => isBranchGone(state.saves[formId]));
+  // Discard and a branch switch clear the failure. The toast that named it goes too.
+  useEffect(() => {
+    if (!branchGone && goneToasts.delete(failedToastId)) {
+      toast.dismiss(failedToastId);
+    }
+  }, [branchGone, failedToastId]);
+
   const showFailure = (cause: unknown) => {
     // The raw reason is for the console. The editor reads fixed words.
     console.error('[tinacms] Save failed:', cause);
+    if (isBranchGoneError(cause)) goneToasts.add(failedToastId);
+    else goneToasts.delete(failedToastId);
     const { title, text, disk, action } = saveFailureWords(
       cause,
       view?.defaultBranch
@@ -196,7 +215,12 @@ function SaveButton() {
         label: action,
         onClick: () => {
           const live = liveRetries.get(failedToastId);
-          if (live) live();
+          if (
+            goneToasts.has(failedToastId) &&
+            !isBranchGone(useFormStore.getState().saves[formId])
+          ) {
+            toast.dismiss(failedToastId);
+          } else if (live) live();
           else toast.dismiss(failedToastId);
         },
       },
@@ -208,9 +232,9 @@ function SaveButton() {
   };
 
   const run = useEffectEvent(() => {
-    if (dialog) return;
+    if (dialog || pending) return;
     const last = useFormStore.getState().saves[formId];
-    if (last?.phase === 'failed' && last.reason === 'branch-gone') {
+    if (isBranchGone(last)) {
       openDialog('deleted', branchName ?? '');
       return;
     }
@@ -218,8 +242,10 @@ function SaveButton() {
     if (isProtected && branchName !== undefined) {
       check()
         .then((valid) => {
-          if (valid) openDialog('protected', branchName);
-          else showFailure(new FormValidationError());
+          if (valid) {
+            toast.dismiss(failedToastId);
+            openDialog('protected', branchName);
+          } else showFailure(new FormValidationError());
         })
         .finally(() => setPending(false));
       return;
@@ -228,10 +254,7 @@ function SaveButton() {
       .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
         showFailure(cause);
-        if (
-          cause instanceof ContentError &&
-          cause.code === 'branch-not-found'
-        ) {
+        if (isBranchGoneError(cause)) {
           openDialog('deleted', branchName ?? '');
         }
       })
@@ -239,16 +262,17 @@ function SaveButton() {
   });
 
   const confirm = (typed: string) => {
-    if (!dialog || !handler) return;
+    if (!dialog) return;
     const chosen = typed.trim();
     setRevealed(true);
-    if (branchNameError(chosen, taken, true)) return;
+    if (!handler || branchNameError(chosen, taken, true)) return;
     const request = { name: chosen, reason: dialog.reason, formId };
     if (dialog.reason === 'protected') {
       setDialog(null);
-      handler(request).catch((cause) => {
-        showFailure(cause);
-      });
+      setPending(true);
+      handler(request)
+        .catch((cause) => showFailure(cause))
+        .finally(() => setPending(false));
       return;
     }
     setSaving(true);
@@ -293,6 +317,7 @@ function SaveButton() {
         name={name}
         onNameChange={(next) => {
           setName(next);
+          setRevealed(true);
           setConfirmError(undefined);
         }}
         error={nameError}

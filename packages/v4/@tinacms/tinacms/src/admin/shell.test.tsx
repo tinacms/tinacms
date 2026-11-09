@@ -25,6 +25,7 @@ type Mode = 'branches' | 'local' | 'none';
 const BRANCHES: BranchInfo[] = [
   { name: 'main', protected: true },
   { name: 'feature/news' },
+  { name: 'other' },
 ];
 
 const DATA: Record<string, DocumentEntry[]> = {
@@ -33,6 +34,7 @@ const DATA: Record<string, DocumentEntry[]> = {
     { path: 'content/posts/breaking.mdx', document: { title: 'Breaking' } },
     { path: 'content/posts/hello.mdx', document: { title: 'Hello' } },
   ],
+  other: [{ path: 'content/posts/hello.mdx', document: { title: 'Hello' } }],
 };
 
 let mode: Mode;
@@ -591,6 +593,7 @@ describe('branches', () => {
     expect(lines.map((line) => line.textContent)).toEqual([
       'main',
       'feature/news',
+      'other',
     ]);
     expect(within(lines[0]).getByRole('button')).toHaveAttribute(
       'aria-current',
@@ -1137,6 +1140,88 @@ describe('Save to new branch', () => {
     errors.mockRestore();
   });
 
+  it('names the empty-name reason on Enter and on the main action, with a handler', async () => {
+    saveHandler = vi.fn().mockResolvedValue(undefined);
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    );
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Save to a new branch',
+    });
+    await user.clear(nameField(dialog));
+    await user.keyboard('{Enter}');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'Enter a branch name.'
+    );
+    expect(nameField(dialog)).toHaveAttribute('aria-invalid', 'true');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    expect(within(dialog).getByRole('alert')).toHaveTextContent(
+      'Enter a branch name.'
+    );
+    expect(saveHandler).not.toHaveBeenCalled();
+  });
+
+  it('names the empty-name reason with no handler, where the main action is off', async () => {
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    );
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Save to a new branch',
+    });
+    await user.clear(nameField(dialog));
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'Enter a branch name.'
+    );
+    expect(nameField(dialog)).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('clears Save failed once the fields are fixed and the dialog opens', async () => {
+    const { user, input } = await openHello();
+    await user.clear(input);
+    await user.click(
+      await screen.findByRole('button', { name: /^Save to new branch/ })
+    );
+    await screen.findByText(/Couldn.t save\. Some fields are not valid/);
+    await user.type(input, 'Fixed');
+    await user.click(
+      await screen.findByRole('button', { name: /^Save to new branch/ })
+    );
+    await screen.findByRole('dialog', { name: 'Save to a new branch' });
+    await waitFor(() =>
+      expect(document.querySelector('[data-slot=toast]')).toBeNull()
+    );
+    const bar = document.querySelector('[data-slot=form-bar]') as HTMLElement;
+    expect(bar).not.toHaveTextContent('Save failed');
+  });
+
+  it('holds Save while the handler runs, so it runs once', async () => {
+    let finish: () => void = () => {};
+    saveHandler = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        })
+    );
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    );
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Save to a new branch',
+    });
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await pressSave(user);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(saveHandler).toHaveBeenCalledOnce();
+    act(() => finish());
+  });
+
   describe('when the branch was deleted', () => {
     const failOnce = async () => {
       useUnprotectedBranch();
@@ -1152,6 +1237,47 @@ describe('Save to new branch', () => {
     };
 
     afterEach(() => vi.restoreAllMocks());
+
+    const discardEdits = async (user: ReturnType<typeof userEvent.setup>) => {
+      await user.click(
+        screen.getByRole('button', { name: 'Document actions' })
+      );
+      await user.click(
+        await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+      );
+      await user.click(await screen.findByRole('button', { name: 'Discard' }));
+    };
+    const toastShown = () => document.querySelector('[data-slot=toast]');
+
+    it('removes the branch-gone toast after Discard, and its action never writes', async () => {
+      const { user, dialog } = await failOnce();
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await discardEdits(user);
+      await waitFor(() => expect(toastShown()).toBeNull());
+      expect(updates).toHaveLength(0);
+    });
+
+    it.each(['other', 'main'])(
+      'removes the branch-gone toast after switching to %s',
+      async (target) => {
+        const { user, dialog } = await failOnce();
+        await user.click(
+          within(dialog).getByRole('button', { name: 'Cancel' })
+        );
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+        await discardEdits(user);
+        await user.click(
+          await screen.findByRole('button', { name: /^Branch:/ })
+        );
+        const branches = await screen.findByRole('dialog', {
+          name: 'Branches',
+        });
+        await user.click(within(branches).getByText(target));
+        await waitFor(() => expect(toastShown()).toBeNull());
+        expect(updates).toHaveLength(0);
+      }
+    );
 
     it('reopens the dialog from Save without writing again', async () => {
       const { user, dialog } = await failOnce();

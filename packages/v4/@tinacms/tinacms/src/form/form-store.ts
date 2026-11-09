@@ -547,7 +547,9 @@ export const useFormStore = create<FormStore>()(
           apply((state) => {
             const scope = state.forms[formId];
             if (!isEdited(scope)) return state;
+            const { [formId]: _failed, ...saves } = state.saves;
             return {
+              saves,
               hidden: withoutKey(state.hidden, formId),
               forms: {
                 ...state.forms,

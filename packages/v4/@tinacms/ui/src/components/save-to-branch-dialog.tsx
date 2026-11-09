@@ -71,7 +71,7 @@ function SaveToBranchDialog({
   };
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    if (saving || !canSave) return;
+    if (saving) return;
     onSave(name);
   };
 
@@ -89,7 +89,7 @@ function SaveToBranchDialog({
         finalFocus={returnFocusTo}
         aria-busy={saving || undefined}
       >
-        <form className='flex flex-col gap-4' onSubmit={submit}>
+        <form className='flex flex-col gap-4' noValidate onSubmit={submit}>
           <DialogHeader>
             <DialogTitle className='[overflow-wrap:anywhere]'>
               {deleted ? `${branch} was deleted` : 'Save to a new branch'}
@@ -108,7 +108,7 @@ function SaveToBranchDialog({
             <Input
               ref={input}
               id={`${errorId}-name`}
-              required
+              aria-required
               autoComplete='off'
               spellCheck={false}
               value={name}

@@ -302,11 +302,17 @@ export function useFormCheck(): () => Promise<boolean> {
   return useCallback(async () => {
     scope.view.getState().attemptSave();
     const valid = await trigger();
+    const store = useFormStore.getState();
     if (!valid) {
-      useFormStore.getState().setSavePhase(scope.formId, {
+      store.setSavePhase(scope.formId, {
         phase: 'failed',
         message: new FormValidationError().message,
       });
+    } else {
+      const last = store.saves[scope.formId];
+      if (last?.phase === 'failed' && last.reason !== 'branch-gone') {
+        store.clearSavePhase(scope.formId);
+      }
     }
     return valid;
   }, [scope, trigger]);
