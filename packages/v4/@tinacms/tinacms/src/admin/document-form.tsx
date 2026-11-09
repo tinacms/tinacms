@@ -169,7 +169,11 @@ function FormBar() {
   const formId = useFormId();
   const dirty = useIsFormDirty(formId);
   const discard = useDiscardEdits();
+  const values = useFormValues(formId);
+  const scope = use(FormScopeContext);
   const [confirming, setConfirming] = useState(false);
+  // Read when the confirm opens, so typing in the title does not change it.
+  const [documentName, setDocumentName] = useState('');
   const menuButton = useRef<HTMLButtonElement>(null);
   return (
     <div
@@ -199,7 +203,10 @@ function FormBar() {
           <DropdownMenuItem
             variant='destructive'
             disabled={!dirty}
-            onClick={() => setConfirming(true)}
+            onClick={() => {
+              setDocumentName(documentTitle(values, scope?.path ?? ''));
+              setConfirming(true);
+            }}
           >
             Discard unsaved edits
           </DropdownMenuItem>
@@ -212,6 +219,7 @@ function FormBar() {
         onOpenChange={setConfirming}
         onConfirm={discard}
         returnFocusTo={menuButton}
+        title={`Discard unsaved edits to “${documentName}”?`}
       />
     </div>
   );
