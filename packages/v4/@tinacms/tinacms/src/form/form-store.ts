@@ -113,6 +113,7 @@ export interface FormStore {
   discardWaiting: (formId: FormId, discarded?: readonly StoredDraft[]) => void;
   setBranch: (branch: string | undefined) => void;
   setSavePhase: (formId: FormId, phase: SavePhase) => void;
+  clearSavePhase: (formId: FormId) => void;
   active: { formId: FormId; address: FieldAddress } | null;
   setUserId: (userId: DraftUserScope) => void;
   registerForm: (
@@ -270,6 +271,7 @@ const DEVTOOLS_ACTION = {
   discardWaiting: 'form/discardWaiting',
   storage: 'form/storage',
   setSavePhase: 'form/setSavePhase',
+  clearSavePhase: 'form/clearSavePhase',
   register: 'form/register',
   setFieldValue: 'form/setFieldValue',
   setFieldErrors: 'form/setFieldErrors',
@@ -399,6 +401,13 @@ export const useFormStore = create<FormStore>()(
             }),
             DEVTOOLS_ACTION.setSavePhase
           ),
+
+        clearSavePhase: (formId) =>
+          apply((state) => {
+            if (!state.saves[formId]) return state;
+            const { [formId]: _cleared, ...saves } = state.saves;
+            return { saves };
+          }, DEVTOOLS_ACTION.clearSavePhase),
 
         setUserId: (userId) =>
           apply((state) => {

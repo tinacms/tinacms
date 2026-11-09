@@ -293,17 +293,33 @@ async function recordSavePhase(
   setSavePhase(formId, { phase: 'saved' });
 }
 
+// Checks every field, not only the edited ones, so a required field the editor
+// never touched surfaces its message at submit. Resolves false, and records the
+// save as failed, when the form is invalid.
+export function useFormCheck(): () => Promise<boolean> {
+  const scope = useFormScope('form-check-outside-provider', 'useFormCheck');
+  const { trigger } = useFormContext<TinaDocument>();
+  return useCallback(async () => {
+    scope.view.getState().attemptSave();
+    const valid = await trigger();
+    if (!valid) {
+      useFormStore.getState().setSavePhase(scope.formId, {
+        phase: 'failed',
+        message: new FormValidationError().message,
+      });
+    }
+    return valid;
+  }, [scope, trigger]);
+}
+
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
-  const { getValues, trigger, setValue } = useFormContext<TinaDocument>();
+  const { getValues, setValue } = useFormContext<TinaDocument>();
+  const check = useFormCheck();
   const runSave = useCallback(async () => {
     const { formId, path, collection, onSave, hooks, reseedFields } = scope;
-    // Validate every field, not only the edited ones, so a required field the
-    // editor never touched surfaces its message at submit.
-    scope.view.getState().attemptSave();
-    const valid = await trigger();
-    if (!valid) throw new FormValidationError();
+    if (!(await check())) throw new FormValidationError();
     const values = getValues();
     const submitted = structuredClone(toFormValues(values));
     const context = { documentPath: path, registry };
@@ -333,7 +349,7 @@ export function useFormSave(): () => Promise<void> {
     if (warnings.length > 0) {
       throw new AfterSaveHookError(new Error(warnings.join(' ')));
     }
-  }, [scope, getValues, trigger, setValue, registry]);
+  }, [scope, check, getValues, setValue, registry]);
   return useCallback(
     () => recordSavePhase(scope.formId, runSave),
     [scope.formId, runSave]

@@ -72,6 +72,8 @@ export interface BranchView {
   /** The branch edits save to: the chosen one, else the default. */
   name: string | undefined;
   branches: { name: string; protected: boolean }[];
+  /** The provider's default branch, once the list has been read. */
+  defaultBranch: string | undefined;
   /** Whether the list is being read, read, or failed. */
   listState: BranchListState | undefined;
   /** Reads the branch list again after a failure. */
@@ -90,6 +92,7 @@ export function useBranchView(): BranchView | null {
   return {
     mode: slice.mode,
     name: slice.current ?? slice.fallback,
+    defaultBranch: slice.fallback,
     branches: slice.list.map((name) => ({
       name,
       protected: slice.protected.includes(name),

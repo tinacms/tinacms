@@ -7,7 +7,13 @@ import {
   DropdownMenuTrigger,
 } from '@tinacms/ui/components/dropdown-menu';
 import { FormLevel } from '@tinacms/ui/components/form-level';
+import { SaveToBranchDialog } from '@tinacms/ui/components/save-to-branch-dialog';
 import { toast } from '@tinacms/ui/components/toast';
+import {
+  branchNameError,
+  branchNameFromPath,
+  freeName,
+} from '@tinacms/ui/lib/branch-name';
 import {
   type ReactNode,
   use,
@@ -32,9 +38,12 @@ import {
   lockAbove,
   type OpenLevel,
 } from '../editor/form-view-state';
+import { useBranchView } from '../editor/branch';
 import {
+  FormValidationError,
   useDiscardEdits,
   useFieldRegistry,
+  useFormCheck,
   useFormId,
   useFormSave,
   useStaleDraft,
@@ -50,7 +59,9 @@ import type { StoredDraft } from '../form/drafts';
 import { countFailingFields } from '../editor/field-errors';
 import { DiscardConfirm } from './discard-confirm';
 import { DocumentStatus } from './document-status';
+import { ContentError } from '../core/content/contract';
 import { saveFailureWords } from './save-failure';
+import { SaveToNewBranchContext } from './save-to-new-branch';
 import { leftoverText } from './leftover-text';
 import { useNarrow } from './use-narrow';
 
@@ -97,13 +108,48 @@ function useToastOwner(toastId: string, present: boolean) {
   }, [present, toastId]);
 }
 
+type DialogState = {
+  reason: 'protected' | 'deleted';
+  branch: string;
+  defaultName: string;
+};
+
+const DEFAULT_LABEL = 'Save';
+const NEW_BRANCH_LABEL = 'Save to new branch';
+
+// Save, or Save to new branch on a protected branch. `run` is the one gate:
+// Save, the toast's action and Retry all come through it.
 function SaveButton() {
+  const scope = use(FormScopeContext);
   const formId = useFormId();
   const dirty = useIsFormDirty(formId);
+  const values = useFormValues(formId);
   const save = useFormSave();
+  const check = useFormCheck();
+  const handler = use(SaveToNewBranchContext);
+  const view = useBranchView();
   const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
   const [pending, setPending] = useState(false);
+  const [dialog, setDialog] = useState<DialogState | null>(null);
+  const [name, setName] = useState('');
+  const [revealed, setRevealed] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [confirmError, setConfirmError] = useState<string>();
+  const saveButton = useRef<HTMLButtonElement>(null);
   const failedToastId = `save-failed:${formId}`;
+  const branchName = view?.name;
+  const isProtected =
+    view?.mode === 'branches' &&
+    view.listState === 'ready' &&
+    branchName !== undefined &&
+    view.branches.some((entry) => entry.name === branchName && entry.protected);
+  const listed = view?.branches.map((entry) => entry.name) ?? [];
+  const taken =
+    dialog?.reason === 'deleted'
+      ? listed.filter((entry) => entry !== dialog.branch)
+      : listed;
+  const nameError =
+    confirmError ?? branchNameError(name.trim(), taken, revealed);
   useToastOwner(failedToastId, true);
   const retry = useEffectEvent(() => run());
   useEffect(() => {
@@ -115,52 +161,145 @@ function SaveButton() {
       }
     };
   }, [failedToastId]);
+
+  const openDialog = (reason: DialogState['reason'], branch: string) => {
+    const defaultName =
+      reason === 'deleted'
+        ? freeName(
+            branch,
+            listed.filter((entry) => entry !== branch),
+            { suffixed: true }
+          )
+        : freeName(branchNameFromPath(scope?.path ?? ''), listed);
+    setName(defaultName);
+    setRevealed(false);
+    setConfirmError(undefined);
+    setDialog({ reason, branch, defaultName });
+  };
+
+  const showFailure = (cause: unknown) => {
+    // The raw reason is for the console. The editor reads fixed words.
+    console.error('[tinacms] Save failed:', cause);
+    const { title, text, disk, action } = saveFailureWords(
+      cause,
+      view?.defaultBranch
+    );
+    toast({
+      id: failedToastId,
+      tone: 'error',
+      title,
+      text,
+      dismissible: !disk,
+      action: {
+        label: action,
+        onClick: () => {
+          const live = liveRetries.get(failedToastId);
+          if (live) live();
+          else toast.dismiss(failedToastId);
+        },
+      },
+      secondaryAction: disk
+        ? { label: 'Dismiss', onClick: () => toast.dismiss(failedToastId) }
+        : undefined,
+    });
+    dismissIfUnowned(failedToastId);
+  };
+
   const run = useEffectEvent(() => {
+    if (dialog) return;
+    const last = useFormStore.getState().saves[formId];
+    if (last?.phase === 'failed' && last.reason === 'branch-gone') {
+      openDialog('deleted', branchName ?? '');
+      return;
+    }
     setPending(true);
+    if (isProtected && branchName !== undefined) {
+      check()
+        .then((valid) => {
+          if (valid) openDialog('protected', branchName);
+          else showFailure(new FormValidationError());
+        })
+        .finally(() => setPending(false));
+      return;
+    }
     save()
       .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
-        // The raw reason is for the console. The editor reads fixed words.
-        console.error('[tinacms] Save failed:', cause);
-        const { title, text, disk } = saveFailureWords(cause);
-        toast({
-          id: failedToastId,
-          tone: 'error',
-          title,
-          text,
-          dismissible: !disk,
-          action: {
-            label: 'Retry',
-            onClick: () => {
-              const live = liveRetries.get(failedToastId);
-              if (live) live();
-              else toast.dismiss(failedToastId);
-            },
-          },
-          secondaryAction: disk
-            ? {
-                label: 'Dismiss',
-                onClick: () => toast.dismiss(failedToastId),
-              }
-            : undefined,
-        });
-        dismissIfUnowned(failedToastId);
+        showFailure(cause);
+        if (
+          cause instanceof ContentError &&
+          cause.code === 'branch-not-found'
+        ) {
+          openDialog('deleted', branchName ?? '');
+        }
       })
       .finally(() => setPending(false));
   });
+
+  const confirm = (typed: string) => {
+    if (!dialog || !handler) return;
+    const chosen = typed.trim();
+    setRevealed(true);
+    if (branchNameError(chosen, taken, true)) return;
+    const request = { name: chosen, reason: dialog.reason, formId };
+    if (dialog.reason === 'protected') {
+      setDialog(null);
+      handler(request).catch((cause) => {
+        showFailure(cause);
+      });
+      return;
+    }
+    setSaving(true);
+    handler(request).then(
+      () => {
+        setSaving(false);
+        setDialog(null);
+        toast.dismiss(failedToastId);
+        useFormStore.getState().clearSavePhase(formId);
+      },
+      (cause) => {
+        console.error('[tinacms] Could not make the branch:', cause);
+        setSaving(false);
+        setConfirmError('Couldn’t make the branch. Try again.');
+      }
+    );
+  };
+
   return (
-    <Button
-      variant='primary'
-      type='button'
-      className='w-40 shrink-0'
-      disabled={!dirty && !pending}
-      busy={pending}
-      count={errorCount}
-      srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
-      onClick={run}
-    >
-      Save
-    </Button>
+    <>
+      <Button
+        ref={saveButton}
+        variant='primary'
+        type='button'
+        className='min-w-41 shrink-0'
+        disabled={!dirty && !pending}
+        busy={pending}
+        count={errorCount}
+        srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
+        onClick={run}
+      >
+        {isProtected ? NEW_BRANCH_LABEL : DEFAULT_LABEL}
+      </Button>
+      <SaveToBranchDialog
+        open={dialog !== null}
+        onOpenChange={(open) => {
+          if (!open) setDialog(null);
+        }}
+        reason={dialog?.reason}
+        branch={dialog?.branch ?? ''}
+        document={documentTitle(values, scope?.path ?? '')}
+        name={name}
+        onNameChange={(next) => {
+          setName(next);
+          setConfirmError(undefined);
+        }}
+        error={nameError}
+        saving={saving}
+        canSave={handler !== undefined}
+        onSave={confirm}
+        returnFocusTo={saveButton}
+      />
+    </>
   );
 }
 

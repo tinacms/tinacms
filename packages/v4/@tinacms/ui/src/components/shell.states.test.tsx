@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -9,6 +9,8 @@ import {
   SaveProgress,
   SaveProgressCard,
 } from '@tinacms/ui/components/save-progress';
+import { SaveToBranchDialog } from '@tinacms/ui/components/save-to-branch-dialog';
+import { saveToBranchDialogStates } from './save-to-branch-dialog.states';
 import { saveProgressStates } from './save-progress.states';
 import { statusBarStates } from './status-bar.states';
 import { StatusBar } from '@tinacms/ui/components/status-bar';
@@ -73,6 +75,76 @@ describe('Branch switcher states', () => {
     expect(screen.queryByRole('dialog') !== null).toBe(
       props.defaultOpen === true
     );
+  });
+});
+
+describe('Save to branch dialog states', () => {
+  it.each(saveToBranchDialogStates)(
+    'renders $name',
+    async ({ name, props, title, action, error }) => {
+      render(<SaveToBranchDialog {...props} />);
+      const dialog = screen.getByRole('dialog', { name: title });
+      const main = within(dialog).getByRole('button', { name: action });
+      expect(main.hasAttribute('disabled')).toBe(name === 'no handler');
+      const field = within(dialog).getByRole('textbox', {
+        name: /New branch name/,
+      });
+      await waitFor(() => expect(field).toHaveFocus());
+      expect(field.getAttribute('aria-invalid') === 'true').toBe(
+        error !== undefined
+      );
+      if (error)
+        expect(within(dialog).getByRole('alert')).toHaveTextContent(error);
+      if (name === 'saving') {
+        expect(
+          within(dialog).getByRole('button', { name: 'Cancel' })
+        ).toBeDisabled();
+      }
+    }
+  );
+
+  it('ignores Enter and Escape while saving and when nothing can save', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+    const onOpenChange = vi.fn();
+    const { rerender } = render(
+      <SaveToBranchDialog
+        {...saveToBranchDialogStates[0].props}
+        saving
+        onSave={onSave}
+        onOpenChange={onOpenChange}
+      />
+    );
+    await user.keyboard('{Enter}{Escape}');
+    expect(onSave).not.toHaveBeenCalled();
+    expect(onOpenChange).not.toHaveBeenCalled();
+    rerender(
+      <SaveToBranchDialog
+        {...saveToBranchDialogStates[0].props}
+        canSave={false}
+        onSave={onSave}
+        onOpenChange={onOpenChange}
+      />
+    );
+    await user.keyboard('{Enter}');
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it('submits the typed name on Enter and closes on Cancel', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+    const onCancel = vi.fn();
+    render(
+      <SaveToBranchDialog
+        {...saveToBranchDialogStates[0].props}
+        onSave={onSave}
+        onCancel={onCancel}
+      />
+    );
+    await user.keyboard('-x{Enter}');
+    expect(onSave).toHaveBeenCalledWith('docs/hello-edits-x');
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(onCancel).toHaveBeenCalledOnce();
   });
 });
 

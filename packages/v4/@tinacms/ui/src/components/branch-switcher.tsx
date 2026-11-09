@@ -12,6 +12,7 @@ import {
 import { Badge } from '@tinacms/ui/components/badge';
 import { Icon } from '@tinacms/ui/components/icon';
 import { SearchBox } from '@tinacms/ui/components/search-box';
+import { BRANCH_NAME_HINT, branchNameError } from '@tinacms/ui/lib/branch-name';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type BranchEntry = {
@@ -23,29 +24,6 @@ type BranchEntry = {
   unsaved?: number;
   /** `false` while the branch is still being made: its row is greyed and cannot be picked. */
   ready?: boolean;
-};
-
-const BRANCH_NAME_RULE = /^[A-Za-z0-9._/-]+$/;
-const BRANCH_NAME_HINT =
-  'Letters, numbers, dashes, dots and slashes. No spaces.';
-
-/** Why a branch name cannot be used, in the story's words, or undefined when it can. */
-const branchNameError = (
-  name: string,
-  taken: readonly BranchEntry[],
-  revealEmpty: boolean
-): string | undefined => {
-  if (name === '') return revealEmpty ? 'Enter a branch name.' : undefined;
-  if (/\s/.test(name)) {
-    return 'Branch names can’t have spaces. Use dashes instead, such as docs/new-page.';
-  }
-  if (!BRANCH_NAME_RULE.test(name) || /[/.]$/.test(name)) {
-    return 'Use letters, numbers, dashes, dots and slashes only, and don’t end with a slash or a dot.';
-  }
-  if (taken.some((branch) => branch.name === name)) {
-    return `A branch called ${name} already exists. Pick another name.`;
-  }
-  return undefined;
 };
 
 type BranchSwitcherProps = {
@@ -232,7 +210,8 @@ function BranchSwitcher({
   );
   const [submitted, setSubmitted] = useState(false);
   const typed = newName.trim();
-  const nameError = branchNameError(typed, branches, submitted);
+  const takenNames = branches.map((branch) => branch.name);
+  const nameError = branchNameError(typed, takenNames, submitted);
   const move = (event: KeyboardEvent<HTMLElement>) => {
     const keys = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
     if (!keys.includes(event.key)) return;
@@ -399,7 +378,7 @@ function BranchSwitcher({
             onSubmit={(event) => {
               event.preventDefault();
               setSubmitted(true);
-              if (typed === '' || branchNameError(typed, branches, true))
+              if (typed === '' || branchNameError(typed, takenNames, true))
                 return;
               if (!onCreate) return;
               onCreate(typed);
