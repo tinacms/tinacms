@@ -977,6 +977,18 @@ describe('TinaAdmin draft recovery contract', () => {
     );
   });
 
+  it('shows Unsaved while typing under the prompt and Saved after Save', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent('Saved')
+    );
+  });
+
   it('row 3: a draft of an older file says the document changed', async () => {
     store(hello, { title: 'Mine' }, { title: 'Old' });
     await openDoc(/hello\.mdx/);

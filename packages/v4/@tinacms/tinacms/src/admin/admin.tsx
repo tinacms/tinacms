@@ -320,13 +320,20 @@ function useFormBarUnderToast(): boolean {
       );
     };
     const observer = new ResizeObserver(measure);
-    let watched: Element | null = null;
+    // Collapsing the sidebar moves the form bar without resizing it, so the
+    // sidebar's gap is watched too.
+    let watched: (Element | null)[] = [];
     const watch = () => {
-      const bar = document.querySelector('[data-slot=form-bar]');
-      if (bar === watched) return;
+      const next = [
+        document.querySelector('[data-slot=form-bar]'),
+        document.querySelector('[data-slot=sidebar-gap]'),
+      ];
+      if (next.every((element, index) => element === watched[index])) return;
       observer.disconnect();
-      watched = bar;
-      if (bar) observer.observe(bar);
+      watched = next;
+      for (const element of next) {
+        if (element) observer.observe(element);
+      }
       measure();
     };
     watch();
