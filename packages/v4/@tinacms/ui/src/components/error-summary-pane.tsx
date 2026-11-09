@@ -17,45 +17,22 @@ import { Icon } from '@tinacms/ui/components/icon';
 import { Kbd } from '@tinacms/ui/components/kbd';
 import { cn } from '@tinacms/ui/lib/utils';
 
-/** One invalid field in the list, in document order. */
 type ErrorSummaryItem = {
-  /** A stable field path, such as `seo.metaTitle`. Go to the field by it, not by the row’s place in the list. */
   id: string;
-  /**
-   * The field’s name, such as “Meta title”. A long name wraps to two lines, then ends in an ellipsis, with the full
-   * name in the row’s name and, while it is cut short, its tooltip.
-   */
   label: string;
-  /**
-   * Where the field sits, outermost first, such as `["Feature grid", "Feature 3"]`. A top-level field gives its form
-   * section. It keeps to one line: past three steps it folds its middle, as the Field trail does, to the first step
-   * and the last two (“Comparison › … › Card 3 › Call to action”), and a long step ends in an ellipsis. The full
-   * location is in the row’s name and, while it is cut short, its tooltip.
-   */
   trail?: string[];
-  /** What to do, from the field’s rule, such as “Enter a meta title.” It wraps in full. */
   message: string;
 };
 
 type ErrorSummaryStatus = 'list' | 'success';
 type ErrorSummaryLayout = 'floating' | 'docked' | 'overlay';
 
-/**
- * The narrowest window a pinned pane docks on, 1400 CSS pixels: the `--error-pane-dock-width` token as a number, for
- * code that needs one. The pane reads the token itself; a hidden check keeps the two equal.
- */
 const TINA_ERROR_PANE_DOCK_WIDTH = 1400;
 
-/** The Resolve words for the Save button: “Resolve 1 error”, “Resolve 3 errors”, up to “Resolve 99+ errors”. */
 function tinaResolveLabel(count: number) {
   return `Resolve ${count > 99 ? '99+' : count} ${count === 1 ? 'error' : 'errors'}`;
 }
 
-/*
- * Floating and overlay sit over the preview, 12px in from the edges of the box the host gives them (the area between
- * the top bar and the status bar, `position: relative`). Docked is an ordinary flex item beside the preview, so the
- * preview narrows by its 360px.
- */
 const tinaErrorSummaryPaneVariants = cva(
   'box-border flex w-90 max-w-full flex-col overflow-hidden bg-card font-sans text-foreground',
   {
@@ -86,7 +63,6 @@ const rowVariants = cva(
   }
 );
 
-/** A duration token, such as `--dur-slide-in`, in milliseconds. */
 function readDuration(el: Element, token: string, fallback: number) {
   const raw = getComputedStyle(el).getPropertyValue(token).trim();
   const value = Number.parseFloat(raw);
@@ -105,10 +81,6 @@ function reducedMotion() {
   );
 }
 
-/**
- * Moves run on the Web Animations API, so they read the motion tokens and keep their own timing with reduced motion
- * (a fade over `--dur-reduced`), which the shell's reduced-motion rule would otherwise cut to nothing.
- */
 function play(
   el: HTMLElement,
   frames: Keyframe[],
@@ -125,7 +97,6 @@ function play(
   return animation;
 }
 
-/** `(min-width: 87.5rem)`, from the `--error-pane-dock-width` token on `:root`. Null without a window or the stylesheet. */
 function dockQuery() {
   if (typeof window === 'undefined' || !window.matchMedia) return null;
   const value = getComputedStyle(document.documentElement)
@@ -134,7 +105,6 @@ function dockQuery() {
   return value ? `(min-width: ${value})` : null;
 }
 
-/** Whether the window is `--error-pane-dock-width` or wider, followed live as it resizes. Without a query, wide. */
 function useWideWindow(enabled: boolean) {
   const [wide, setWide] = useState(() => {
     const query = dockQuery();
@@ -152,15 +122,10 @@ function useWideWindow(enabled: boolean) {
   return wide;
 }
 
-/** A deep location keeps its first step and its last two, as the Field trail folds: "Comparison › … › Card 3 › Call to action". */
 function shortTrail(trail: string[]) {
   return foldPath(trail).shown.map((step) => step ?? '…');
 }
 
-/**
- * Gives an element `text` as its tooltip (`title`) while it, or one of its parts, is cut short, so pointing at it
- * reads it in full. `folded` says it is always cut short, as a folded location is.
- */
 function useFullTitle<T extends HTMLElement>(text: string, folded = false) {
   const ref = useRef<T>(null);
   const [cut, setCut] = useState(folded);
@@ -181,7 +146,6 @@ function useFullTitle<T extends HTMLElement>(text: string, folded = false) {
     const observer = new ResizeObserver(measure);
     observer.observe(el);
     return () => observer.disconnect();
-    // Measured after every drawing, as new words can cut it short without changing its size.
   });
   return { ref, title: cut ? text : undefined };
 }
@@ -193,11 +157,6 @@ type ErrorRowProps = {
   onSelect?: (error: ErrorSummaryItem) => void;
 };
 
-/*
- * Hover and keyboard focus change colours only: the fill, and the trailing "Go to field ›" fading in. The trailing
- * slot always holds both "Viewing" and "Go to field ›", one over the other, so it is as wide on every row in every
- * state and nothing in the row rewraps or moves.
- */
 function ErrorRow({ error, selected, stillHover, onSelect }: ErrorRowProps) {
   const trail = error.trail ?? [];
   const where = trail.join(' › ');
@@ -286,7 +245,6 @@ function ErrorRow({ error, selected, stillHover, onSelect }: ErrorRowProps) {
   );
 }
 
-/** A row that was fixed: it collapses and fades, then goes. Out of the tab order and hidden from screen readers. */
 function LeavingRow({
   error,
   onGone,
@@ -327,74 +285,26 @@ type TinaErrorSummaryPaneProps = Omit<
   ComponentProps<'aside'>,
   'children' | 'onSelect'
 > & {
-  /**
-   * The invalid fields the last Save found, in document order. The header chip counts them. A long list scrolls inside
-   * the pane; the header and the subline stay put.
-   */
   errors: ErrorSummaryItem[];
-  /** Shown, or tucked away. A tucked pane stays in the page, hidden, so Resolve’s `aria-controls` still finds it. */
   open?: boolean;
-  /**
-   * The selected row, the one last gone to: a light fill with a 1px inset ring, a semibold name and the eye with
-   * “Viewing”. It carries `aria-current`.
-   */
   selectedId?: string;
-  /**
-   * Pinned: docks beside the preview on a wide window (full height, no radius or shadow, a line on its left only), or
-   * floats over it on a narrower window, with a subline that says why it floats. Pin then reads “Pinned” and carries
-   * `aria-pressed`.
-   */
   pinned?: boolean;
-  /**
-   * The window is wide enough to dock: `--error-pane-dock-width` (1400px) or wider. Left out, the pane follows the
-   * window itself, live. Set it to draw one layout whatever the window, as the stories do.
-   */
+  /** Forces the dock layout on or off. Left out, the pane follows the window. */
   wide?: boolean;
-  /**
-   * `list` (default), or `success`: “All fixed.” over a timer bar that empties over `--dur-hold-success`, then calls
-   * `onSuccessEnd`. The timer waits while the pane is pointed at or holds focus.
-   */
   status?: ErrorSummaryStatus;
-  /** A row was pressed (click, Enter or Space), with its item: go to that field. The pane stays open. */
   onSelect?: (error: ErrorSummaryItem) => void;
-  /** Pin or Pinned was pressed, with the new setting. */
   onPin?: (pinned: boolean) => void;
-  /** Close, or Esc inside the pane: set `open` to false and hand focus back to Resolve. */
   onClose?: () => void;
-  /** The success timer bar has emptied: tuck the pane and return to Save. */
   onSuccessEnd?: () => void;
-  /** When the pane opens, focus moves to its first row. Set it when Resolve or the edge tab opens a tucked pane. */
+  /** Focuses the first row when the pane opens. */
   autoFocusRow?: boolean;
-  /**
-   * Draws the hover look on that row, as in a still picture of it: a flat muted fill and “Go to field ›”, no shadow.
-   * Hover and keyboard focus draw it live; keyboard focus adds the focus ring, and a press a darker fill. Each changes
-   * the row’s colours only, and keeps its size and layout. For stories and screenshots: the admin leaves it out.
-   */
+  /** For stories and screenshots: draws the hover look on that row. */
   stillHoverId?: string;
-  /**
-   * Success: the timer bar stands still and full, and `onSuccessEnd` waits, as in a still picture of it. For stories
-   * and screenshots: the admin leaves it out.
-   */
+  /** For stories and screenshots: holds the success timer full. */
   stillSuccess?: boolean;
-  /**
-   * Words for screen readers to hear politely, such as “Meta title fixed. 1 error left.” or “All fixed. You’re ready
-   * to save.” Pass new words to have them read. The pane keeps them in a status region beside it that stays in the
-   * page while it is tucked away, so keep the pane drawn, tucked, until they have been read. Left out, there is no
-   * region and the announcements are the host’s.
-   */
   announcement?: string;
 };
 
-/**
- * The error summary pane: the invalid fields that block Save, in document order, so the editor can go to each one.
- * An `aside` named “Errors” and its count, with no focus trap; it sits after Save in the tab order (Pin, Close, then
- * the rows). Esc inside it calls `onClose`, unless something inside took Esc first.
- *
- * It draws each state. The host decides when it opens, what it lists, the selected row and the words it announces
- * (`announcement`), and the pane reads them out. It slides in when `open` turns on (a pane first drawn open shows at
- * once) and out when it turns off, and a fixed row collapses and fades; with reduced motion, each is a fade over
- * `--dur-reduced`.
- */
 function TinaErrorSummaryPane({
   errors,
   open = true,
@@ -623,7 +533,6 @@ function TinaErrorSummaryPane({
   );
 }
 
-/** “All fixed.”: a check in a green circle, and a timer bar along the bottom edge that empties over the hold. */
 function SuccessFace({
   still,
   onEnd,
@@ -699,19 +608,11 @@ function SuccessFace({
 }
 
 type TinaErrorEdgeTabProps = Omit<ComponentProps<'button'>, 'children'> & {
-  /** How many errors remain, in its chip and its name (“Show errors, 2”), up to 99+. */
   count: number;
-  /** The tab was pressed: open the pane with `autoFocusRow`, so focus lands on the first row. */
   onOpen?: () => void;
-  /** Shows at once, without sliding in: when the editor opens already tucked, and in a still picture of it. */
   still?: boolean;
 };
 
-/**
- * The tab on the right edge while the pane is tucked away and errors remain: the count chip, “Errors” set vertically
- * and a left chevron. It sits `--edge-tab-top` down the box the host gives it (`position: relative`), and slides in
- * 8px as it fades in, unless `still`.
- */
 function TinaErrorEdgeTab({
   count,
   onOpen,
@@ -771,20 +672,10 @@ function TinaErrorEdgeTab({
 }
 
 type TinaErrorSuccessBubbleProps = Omit<ComponentProps<'div'>, 'children'> & {
-  /** It has faded away after its hold: remove it. */
   onDone?: () => void;
-  /**
-   * Shows at once and stays, without fading in or away, as in a still picture of it. For stories and screenshots: the
-   * admin leaves it out.
-   */
   still?: boolean;
 };
 
-/**
- * The small card above Save when the last error is fixed while the pane is tucked away: a check and “All fixed.
- * You’re ready to save.” It fades in, holds for `--dur-hold-bubble` and fades out. The host places it 8px above Save
- * and announces its words, through the tucked pane’s `announcement` or its own live region.
- */
 function TinaErrorSuccessBubble({
   onDone,
   still = false,

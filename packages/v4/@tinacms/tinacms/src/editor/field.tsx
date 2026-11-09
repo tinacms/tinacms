@@ -63,8 +63,7 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     target?.setAttribute('aria-describedby', `${address}-help`);
   }, [address, node.description]);
 
-  // A control that cannot take focus (disabled, or no focusable part) leaves the
-  // field where it is, so the frame scrolls itself to the middle.
+  // A control that cannot take focus leaves the field off screen, so the frame centres itself.
   useEffect(() => {
     let pending = 0;
     const unsubscribe = useFormStore.subscribe((state, previous) => {

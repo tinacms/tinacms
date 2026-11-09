@@ -19,12 +19,12 @@ import { FormScopeContext } from '../editor/context';
 import { failingLeaves, inDocumentOrder } from '../editor/field-errors';
 import { fieldsAlong, REMOVED } from '../editor/form-view-state';
 import { useFormErrors, useFormStore } from '../form/form-store';
+import { useNarrow } from './use-narrow';
 
 const PIN_KEY = 'tina.errorPane.pinned';
 const HOVER_DWELL_MS = 300;
 const ERROR_PANE_ID = 'error-pane';
 
-// Only the string 'true' means pinned. A blocked storage keeps the pane unpinned.
 const readPinned = (): boolean => {
   try {
     return localStorage.getItem(PIN_KEY) === 'true';
@@ -37,7 +37,7 @@ const writePinned = (pinned: boolean) => {
   try {
     localStorage.setItem(PIN_KEY, String(pinned));
   } catch {
-    // The choice holds for this session only.
+    // Storage can be blocked; the pin then lasts for the session only.
   }
 };
 
@@ -54,7 +54,6 @@ interface Row extends TinaErrorSummaryItem {
   address: string;
 }
 
-/** The rows the pane lists: the snapshot fields in document order of their current addresses. */
 function useErrorRows(): Row[] {
   const scope = useScope();
   const { getValues } = useFormContext();
@@ -83,21 +82,18 @@ function useErrorRows(): Row[] {
   }, [blocked, errors, scope.collection.fields, getValues]);
 }
 
-/** Moves the editor to a row's field through the form's one activation seam. */
 function useGoTo() {
   const scope = useScope();
+  const narrow = useNarrow();
   return (key: string) => {
     const address = scope.view.getState().goTo(key);
-    if (address) {
-      useFormStore.getState().setActive(scope.formId, toFieldAddress(address));
-    }
+    if (!address) return;
+    useFormStore.getState().setActive(scope.formId, toFieldAddress(address));
+    // Below lg the pane covers the form, so it clears the way for the field.
+    if (narrow) scope.view.getState().tuckPane();
   };
 }
 
-/**
- * What the Save button does when the document is invalid, and what it does next.
- * `block` takes the snapshot from the errors the failed Save just found.
- */
 export function useErrorSummary() {
   const scope = useScope();
   const { getValues } = useFormContext();
@@ -147,7 +143,7 @@ const blockedWords = (count: number) => {
   return `Can't save. ${errors}. Error summary pane opened. Save is now Resolve ${errors}.`;
 };
 
-/** Says the blocked Save out loud. The region empties first, so identical words still read twice. */
+// The region empties first, so identical words are read again.
 function BlockedAnnouncement({ count }: { count: number }) {
   const scope = useScope();
   const blockedSaves = useStore(scope.view, (state) => state.blockedSaves);
@@ -174,7 +170,6 @@ function BlockedAnnouncement({ count }: { count: number }) {
   );
 }
 
-/** Follows the fixes: a row goes once its field stops failing. Never adds a row. */
 function useFollowFixes(rows: readonly Row[]) {
   const scope = useScope();
   const errors = useFormErrors(scope.formId);
@@ -196,7 +191,6 @@ function useFollowFixes(rows: readonly Row[]) {
   }, [errors, scope, getValues]);
 }
 
-/** Esc anywhere, or a click on the preview, tucks a floating pane. */
 function useTuckOutside(active: boolean, tuck: () => void) {
   useEffect(() => {
     if (!active) return;
@@ -224,7 +218,6 @@ function useTuckOutside(active: boolean, tuck: () => void) {
   }, [active, tuck]);
 }
 
-/** The strip on the right edge that reopens a tucked pane after a short dwell. */
 function EdgeHoverZone({ onDwell }: { onDwell: () => void }) {
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
@@ -241,11 +234,7 @@ function EdgeHoverZone({ onDwell }: { onDwell: () => void }) {
   );
 }
 
-/**
- * The error summary pane, its edge tab and its live regions, for the open document.
- * The pane stays in the page while idle so Resolve's `aria-controls` and the
- * live regions always exist.
- */
+// The pane stays in the page while idle, so `aria-controls` and the live regions always exist.
 export function DocumentErrorPane() {
   if (!use(FormScopeContext)) return null;
   return <ErrorPaneHost />;
@@ -274,7 +263,7 @@ function ErrorPaneHost() {
 
   useTuckOutside(open && !pinned && listed, tuck);
 
-  // The rows vanish with "All fixed", so a focus that sat in one has fallen to the page.
+  // The rows vanish with "All fixed", so a focus that sat in one falls to the page.
   useLayoutEffect(() => {
     if (done !== 'pane') return;
     if (document.activeElement === document.body) resolveButton()?.focus();
@@ -329,7 +318,6 @@ function ErrorPaneHost() {
   );
 }
 
-/** "All fixed. You're ready to save." above Save, when the last fix came with the pane tucked. */
 export function ErrorSuccessBubble() {
   const scope = useScope();
   const done = useStore(scope.view, (state) => state.errorSummary.done);

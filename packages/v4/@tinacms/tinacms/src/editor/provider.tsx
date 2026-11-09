@@ -402,7 +402,6 @@ function useSeededFormSync(
   const reseeds = useRef(0);
   const [seedKey, setSeedKey] = useState(() => `${formId}#${reseeds.current}`);
   const view = useFormViewStore(formId);
-  // A reseed puts new values in the form, so a blocked Save no longer applies.
   const advanceSeedKey = useCallback(
     (seededFormId: FormId) => {
       reseeds.current += 1;

@@ -81,8 +81,6 @@ export const failingLeaves = (addresses: readonly string[]): string[] =>
 export const countFailingFields = (addresses: readonly string[]): number =>
   failingLeaves(addresses).length;
 
-// The position of each step of `address`: the field's place among its
-// siblings, or the item's index. Two addresses compare step by step.
 const orderKey = (
   address: string,
   fields: readonly FieldSchema[],
@@ -110,8 +108,6 @@ const orderKey = (
   return key;
 };
 
-// Sorts by the form's own order: schema order for fields, index order for list
-// items. The order of keys in the error map says nothing about it.
 export const inDocumentOrder = <T extends { address: string }>(
   entries: readonly T[],
   fields: readonly FieldSchema[],
@@ -134,9 +130,6 @@ export type ListChange =
   | { remove: number }
   | { move: readonly [from: number, to: number] };
 
-// Follows the list items of `listAddress` through a change: every address under
-// the list shifts the way its item shifts. An address under a removed item is
-// dropped.
 export const rekeyAddresses = (
   addresses: readonly string[],
   listAddress: string,

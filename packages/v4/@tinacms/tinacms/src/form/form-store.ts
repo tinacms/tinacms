@@ -113,7 +113,6 @@ export interface FormStore {
   discardWaiting: (formId: FormId, discarded?: readonly StoredDraft[]) => void;
   setBranch: (branch: string | undefined) => void;
   setSavePhase: (formId: FormId, phase: SavePhase) => void;
-  /** Writes an earlier entry back verbatim, or removes the entry when there was none. */
   restoreSavePhase: (
     formId: FormId,
     previous: FormStore['saves'][FormId]

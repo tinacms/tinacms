@@ -18,6 +18,7 @@ import { toFormId, useFormStore } from '../form/form-store';
 import { t } from '../index';
 import { required } from '../plugins/fields';
 import arrayFieldPlugin from '../plugins/fields/array/array-field.plugin';
+import numberFieldPlugin from '../plugins/fields/number/number-field.plugin';
 import objectFieldPlugin from '../plugins/fields/object/object-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
@@ -71,6 +72,7 @@ const config = asResolvedConfig({
     stringFieldPlugin,
     objectFieldPlugin,
     arrayFieldPlugin,
+    numberFieldPlugin,
     coreValidatorsPlugin,
   ],
   schema: {
@@ -149,6 +151,15 @@ const config = asResolvedConfig({
               })
             ),
           }),
+          t.array({
+            name: 'scores',
+            label: 'Scores',
+            of: t.number({
+              name: 'score',
+              label: 'Score',
+              validators: [required()],
+            }),
+          }),
           t.string({
             name: 'quiet',
             label: 'Quiet',
@@ -180,6 +191,7 @@ beforeEach(() => {
     outer: { inner: { leaf: 'x' } },
     blocks: [],
     cards: [{ a: 'x', b: 'x', c: 'x' }],
+    scores: [1, 2],
     quiet: 'x',
   };
   window.location.hash = `#/collections/note/${encodeURIComponent(PATH)}`;
@@ -796,6 +808,122 @@ describe('list changes while blocked', () => {
   });
 });
 
+describe('removing a listed item', () => {
+  it('does not name an item that nobody fixed', async () => {
+    document = {
+      ...document,
+      items: [{ heading: 'A' }, { heading: '' }, { heading: 'C' }],
+      seo: { metaTitle: '' },
+    };
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    await screen.findByRole('button', { name: 'Resolve 2 errors' });
+    const spoken = watchRegion('error-announcement');
+    const group = await screen.findByRole('group', { name: 'Items' });
+    const trigger = Array.from(
+      group.querySelectorAll<HTMLElement>('[aria-label^="Actions for"]')
+    )[1] as HTMLElement;
+    await user.click(trigger);
+    await user.click(await screen.findByRole('menuitem', { name: /^Remove/ }));
+    await waitFor(() => expect(spoken.texts).toContain('1 error left.'));
+    expect(spoken.texts.some((text) => /fixed\./.test(text))).toBe(false);
+    spoken.stop();
+  });
+});
+
+describe('a scalar list while blocked', () => {
+  const blockWithBadThirdScore = async () => {
+    document = { ...document, scores: [1, 2, null] };
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    return user;
+  };
+  const chooseScoreAction = async (item: number, action: RegExp) => {
+    const group = await screen.findByRole('group', { name: 'Scores' });
+    const trigger = Array.from(
+      group.querySelectorAll<HTMLElement>('[aria-label^="Actions for"]')
+    )[item - 1] as HTMLElement;
+    await userEvent.click(trigger);
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: action })
+    );
+  };
+
+  it('keeps the row on its score when the score moves up', async () => {
+    await blockWithBadThirdScore();
+    await chooseScoreAction(3, /^Move up/);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Resolve 1 error' })
+      ).toBeVisible()
+    );
+    expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
+  });
+
+  it('keeps the row when a score above it is removed', async () => {
+    await blockWithBadThirdScore();
+    await chooseScoreAction(1, /^Remove/);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Resolve 1 error' })
+      ).toBeVisible()
+    );
+    expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
+  });
+
+  it('keeps the row when a score is inserted above it', async () => {
+    await blockWithBadThirdScore();
+    await chooseScoreAction(1, /^Insert above/);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Resolve 1 error' })
+      ).toBeVisible()
+    );
+    expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
+  });
+});
+
+describe('a phone-width window', () => {
+  it('tucks the pane when a row is pressed, so the field shows', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: query === '(max-width: 1023px)',
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+    try {
+      const user = await blockOnTwoFields();
+      await user.click(await rowNamed(/^Meta title/));
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('complementary', { name: /^Errors/ })
+        ).toBeNull()
+      );
+      expect(
+        screen.getByRole('button', { name: 'Show errors, 2' })
+      ).toBeVisible();
+      await waitFor(() =>
+        expect(focusedName()).toHaveAccessibleName(/^Meta title\b/)
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('keeps the pane open on a wide window', async () => {
+    const user = await blockOnTwoFields();
+    await user.click(await rowNamed(/^Meta title/));
+    expect(await errorsPane()).toBeVisible();
+  });
+});
+
 describe('a stored draft that is resumed while blocked', () => {
   it('ends the blocked state without an All fixed face', async () => {
     localStorage.setItem(
@@ -809,6 +937,7 @@ describe('a stored draft that is resumed while blocked', () => {
           outer: { inner: { leaf: 'x' } },
           blocks: [],
           cards: [{ a: 'x', b: 'x', c: 'x' }],
+          scores: [1, 2],
           quiet: 'x',
         },
         baseline: { title: 'Old' },

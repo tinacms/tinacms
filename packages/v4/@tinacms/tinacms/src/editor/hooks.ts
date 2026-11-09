@@ -481,7 +481,6 @@ export function useListItems() {
     isRevealed: (itemAddress: string) =>
       isRevealed(view.getState(), itemAddress),
     touch: (itemAddress: FieldAddress) => view.getState().touch(itemAddress),
-    /** Tells the error summary the items of `listAddress` moved, so its rows follow their fields. */
     rekey: (listAddress: string, change: ListChange) =>
       view.getState().rekey(listAddress, change),
     /** The index of the item of `listAddress` the editor just came back from, once. */

@@ -310,6 +310,13 @@ describe('error summary', () => {
     expect(addresses(store)).toEqual(['items.1.a']);
   });
 
+  it('names no field when a removed item is the one that went', () => {
+    const store = blocked('items.1.heading', 'x');
+    store.getState().rekey('items', { remove: 1 });
+    store.getState().fix(new Set(['x']), labelOf, null);
+    expect(store.getState().errorSummary.announcement).toBe('1 error left.');
+  });
+
   it('starts over when a Save blocks again during All fixed', () => {
     const store = blocked('a');
     store.getState().fix(new Set(), labelOf, null);
