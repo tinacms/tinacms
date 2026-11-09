@@ -108,7 +108,6 @@ function SaveToBranchDialog({
             <Input
               ref={input}
               id={`${errorId}-name`}
-              mono
               required
               autoComplete='off'
               spellCheck={false}

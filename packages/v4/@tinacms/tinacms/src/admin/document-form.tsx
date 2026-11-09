@@ -127,6 +127,7 @@ function SaveButton() {
   const save = useFormSave();
   const check = useFormCheck();
   const handler = use(SaveToNewBranchContext);
+  const narrow = useNarrow();
   const view = useBranchView();
   const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
   const [pending, setPending] = useState(false);
@@ -190,6 +191,7 @@ function SaveButton() {
       title,
       text,
       dismissible: !disk,
+      actionsInline: !narrow && !disk,
       action: {
         label: action,
         onClick: () => {
