@@ -1,4 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
+import { Breadcrumb } from '@tinacms/ui/components/breadcrumb';
+import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { TooltipProvider } from '@tinacms/ui/components/tooltip';
 import {
@@ -8,6 +10,9 @@ import {
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
+import { useKeyboardOpen } from './use-narrow';
+import { toast } from '@tinacms/ui/components/toast';
+import { Tabs, TabsPanel } from '@tinacms/ui/components/tabs';
 import {
   type CSSProperties,
   type ReactNode,
@@ -45,6 +50,8 @@ import {
   ShellTopBar,
   useLongSave,
 } from './shell-bars';
+import { copyPath } from './copy-path';
+import { useKeptEditsNotice } from './use-kept-edits-notice';
 import { useAdminRoute } from './use-admin-route';
 import { useFormColumnWidth } from './use-form-column-width';
 import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
@@ -53,6 +60,13 @@ const SHELL_WIDTH = { '--sidebar-width': '15rem' } as CSSProperties;
 
 // Sits between the Top bar and the Status bar instead of the full viewport.
 const BETWEEN_BARS = 'top-11 bottom-7 h-auto';
+
+// A refused or missing clipboard says so, because the menu row promises a copy.
+function copyFilePath(path: string) {
+  void copyPath(path).then((copied) => {
+    if (!copied) toast({ tone: 'error', title: 'Couldn’t copy the file path' });
+  });
+}
 
 function Placeholder({ children }: { children: ReactNode }) {
   return <p className='p-4 text-sm text-muted-foreground'>{children}</p>;
@@ -100,13 +114,51 @@ function PreviewFrame({ src }: { src: string }) {
   );
 }
 
+// The page being previewed: the document's place and, for a preview URL, the URL.
+function PreviewHeader({ url }: { url?: string }) {
+  const scope = use(FormScopeContext);
+  if (!scope) return null;
+  const collectionLabel = scope.collection.label ?? scope.collection.name;
+  return (
+    <div className='flex h-11 flex-none items-center gap-3 border-b border-border-subtle bg-card pr-4 pl-2'>
+      <Breadcrumb
+        size='sm'
+        aria-label='Preview location'
+        items={[
+          { label: collectionLabel },
+          { label: scope.path.split('/').at(-1) ?? scope.path },
+        ]}
+      />
+      {url ? (
+        <span className='ml-auto min-w-0 truncate font-mono text-xs text-muted-foreground'>
+          {url}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 function PreviewSlot({ preview }: { preview?: ReactNode }) {
   if (!use(FormScopeContext)) {
     return <Placeholder>Select a document to edit.</Placeholder>;
   }
-  if (typeof preview === 'string') return <PreviewFrame src={preview} />;
-  return <>{preview ?? <Placeholder>No preview configured.</Placeholder>}</>;
+  const url = typeof preview === 'string' ? preview : undefined;
+  return (
+    <div className='flex size-full min-h-0 flex-col'>
+      <PreviewHeader url={url} />
+      <div className='min-h-0 flex-1'>
+        {url !== undefined ? (
+          <PreviewFrame src={url} />
+        ) : (
+          (preview ?? <Placeholder>No preview configured.</Placeholder>)
+        )}
+      </div>
+    </div>
+  );
 }
+
+// Only the views that have content show. Fields is the one view today.
+const FORM_TABS = [{ value: 'fields', label: 'Fields' }] as const;
 
 function FormColumnSkeleton() {
   return (
@@ -131,6 +183,10 @@ function FormColumn({
   const { width, isResizing, handleProps } = useFormColumnWidth();
   const scope = use(FormScopeContext);
   const seedKey = scope?.seedKey;
+  // Only objects and lists have cards to open or close.
+  const expandable = (collection?.fields ?? []).some(
+    (field) => field.type === 'object' || field.type === 'array'
+  );
 
   const [mountedSeedKey, setMountedSeedKey] = useState<string | undefined>(
     undefined
@@ -144,30 +200,60 @@ function FormColumn({
     <>
       <aside
         aria-label='Document form'
-        className='flex min-w-0 shrink-0 flex-col overflow-y-auto border-r border-border'
+        className='flex min-w-0 shrink-0 flex-col overflow-hidden border-r border-border'
         style={{ width }}
       >
         {collection ? (
           <PanelHeader
-            backLabel={collection.label ?? collection.name}
-            backTitle='Back to the collection'
+            backLabel='Return to navigator'
+            backTitle={`Back to ${collection.label ?? collection.name}`}
             onBack={onBack}
+            menuLabel='Document menu'
+            menu={
+              openPath === undefined ? undefined : (
+                <>
+                  <DropdownMenuItem onClick={() => copyFilePath(openPath)}>
+                    Copy file path
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={!expandable}
+                    onClick={() => scope?.view.getState().setExpansion(true)}
+                  >
+                    Expand all
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={!expandable}
+                    onClick={() => scope?.view.getState().setExpansion(false)}
+                  >
+                    Collapse all
+                  </DropdownMenuItem>
+                </>
+              )
+            }
           />
         ) : (
           <PanelHeader heading='Document' />
         )}
-        <div className='p-4'>
-          {openPath === undefined ? (
-            <p className='mb-2 text-sm text-muted-foreground'>
-              Select a document to edit
-            </p>
-          ) : null}
-          {mountedSeedKey === seedKey ? (
-            <DocumentForm key={seedKey} />
-          ) : (
-            <FormColumnSkeleton />
-          )}
-        </div>
+        <Tabs
+          tabs={FORM_TABS}
+          aria-label='Document views'
+          className='min-h-0 flex-1'
+        >
+          <TabsPanel value='fields' className='flex min-h-0 flex-1 flex-col'>
+            {openPath === undefined ? (
+              <p className='p-4 text-sm text-muted-foreground'>
+                Select a document to edit
+              </p>
+            ) : null}
+            {mountedSeedKey === seedKey ? (
+              <DocumentForm key={seedKey} />
+            ) : (
+              <div className='p-4'>
+                <FormColumnSkeleton />
+              </div>
+            )}
+          </TabsPanel>
+        </Tabs>
       </aside>
 
       <div
@@ -207,10 +293,24 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
 
 // Toasts sit above the Save progress card while it shows.
 const TOAST_OFFSET_ABOVE_CARD = { bottom: '8rem' };
+// Toasts clear the form bar and the Status bar at every form column width.
+const TOAST_OFFSET_ABOVE_BAR = { bottom: '7rem' };
+// Below the dialog layer, so a Confirm dims the toasts behind it.
+const TOAST_LAYER = { zIndex: 40 };
+// With the on-screen keyboard open the toast would cover the field being typed in.
+const TOAST_HIDDEN = { ...TOAST_LAYER, visibility: 'hidden' } as const;
 
 function ShellToaster() {
   const cardShowing = useLongSave();
-  return <Toaster offset={cardShowing ? TOAST_OFFSET_ABOVE_CARD : undefined} />;
+  const keyboardOpen = useKeyboardOpen();
+  const offset = cardShowing ? TOAST_OFFSET_ABOVE_CARD : TOAST_OFFSET_ABOVE_BAR;
+  return (
+    <Toaster
+      offset={offset}
+      mobileOffset={offset}
+      style={keyboardOpen ? TOAST_HIDDEN : TOAST_LAYER}
+    />
+  );
 }
 
 function MissingPanel({
@@ -247,6 +347,7 @@ function AdminShell({
   const screens = useAdminScreens();
   const globalNav = useGlobalNav();
   const { route, navigate } = useAdminRoute();
+  useKeptEditsNotice(route, navigate);
 
   const activeCollectionName =
     route.view === 'collection' || route.view === 'document'

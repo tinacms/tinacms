@@ -24,6 +24,9 @@ export interface FormViewState {
   touched: ReadonlySet<string>;
   saveAttempted: boolean;
   openLevels: readonly OpenLevel[];
+  /** Expand all and Collapse all: cards and objects that open in place follow the newest one. */
+  expansion: { readonly version: number; readonly open: boolean };
+  setExpansion: (open: boolean) => void;
   touch: (address: FieldAddress) => void;
   attemptSave: () => void;
   resetReveal: () => void;
@@ -39,6 +42,11 @@ export const createFormViewStore = (): FormViewStore =>
     touched: new Set(),
     saveAttempted: false,
     openLevels: [],
+    expansion: { version: 0, open: false },
+    setExpansion: (open) =>
+      set((state) => ({
+        expansion: { version: state.expansion.version + 1, open },
+      })),
     touch: (address) =>
       set((state) =>
         state.touched.has(address)

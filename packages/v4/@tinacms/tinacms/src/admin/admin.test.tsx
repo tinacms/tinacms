@@ -16,7 +16,7 @@ import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
 import { useFormId } from '../editor/hooks';
-import { draftKey, readDraft } from '../form/drafts';
+import { draftKey, readDraft, readWaitingDrafts } from '../form/drafts';
 import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -150,6 +150,17 @@ const screenPlugin = definePlugin({
   }),
 });
 
+vi.mock('@tinacms/ui/components/toast', async (importOriginal) => {
+  const original =
+    await importOriginal<typeof import('@tinacms/ui/components/toast')>();
+  return {
+    ...original,
+    toast: Object.assign(vi.fn(original.toast), {
+      dismiss: original.toast.dismiss,
+    }),
+  };
+});
+
 const config = asResolvedConfig({
   plugins: [
     contentPlugin,
@@ -203,6 +214,16 @@ const reloadIsBlocked = (): boolean => {
   const unload = new Event('beforeunload', { cancelable: true });
   window.dispatchEvent(unload);
   return unload.defaultPrevented;
+};
+
+type User = ReturnType<typeof userEvent.setup>;
+
+const openDiscardConfirm = async (user: User) => {
+  await user.click(screen.getByRole('button', { name: 'Document actions' }));
+  await user.click(
+    await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+  );
+  return screen.findByRole('alertdialog', { name: 'Discard unsaved edits?' });
 };
 
 const FIXTURES: Record<string, DocumentEntry[]> = {
@@ -345,13 +366,17 @@ describe('TinaAdmin', () => {
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
-    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
     expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Second');
 
-    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
     const helloEntry = await screen.findByRole('button', {
       name: /hello\.mdx/,
     });
@@ -371,7 +396,10 @@ describe('TinaAdmin Save button', () => {
     renderAdmin();
     await openHello(user);
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Discard' })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    expect(
+      await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+    ).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('is busy while saving: one save, and it keeps focus', async () => {
@@ -444,7 +472,9 @@ describe('TinaAdmin unsaved changes', () => {
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
-    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
@@ -476,13 +506,33 @@ describe('TinaAdmin unsaved changes', () => {
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
 
-    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    const dialog = await openDiscardConfirm(user);
+    await user.click(within(dialog).getByRole('button', { name: 'Discard' }));
 
     await waitFor(() =>
       expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello')
     );
     expect(screen.getByRole('status')).toHaveTextContent('No changes');
     expect(reloadIsBlocked()).toBe(false);
+  });
+
+  it('opens the discard confirm on Cancel, and Cancel keeps the edits and returns focus to the menu button', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+
+    const dialog = await openDiscardConfirm(user);
+    expect(
+      within(dialog).getByRole('button', { name: 'Cancel' })
+    ).toHaveFocus();
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello!');
+    expect(
+      screen.getByRole('button', { name: 'Document actions' })
+    ).toHaveFocus();
   });
 });
 
@@ -810,35 +860,421 @@ describe('TinaAdmin stale drafts', () => {
   it('asks to resume or discard before the form can be edited', async () => {
     storeStaleDraft();
     const user = await openHello();
-    const dialog = await screen.findByRole('alertdialog', {
-      name: 'Resume your unsaved edits?',
-    });
+    const card = (
+      await screen.findByText('Resume your unsaved edits?')
+    ).closest<HTMLElement>('[data-slot="toast"]');
+    if (!card) throw new Error('The Resume prompt is not a toast');
+    expect(card).toBeVisible();
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(within(card).queryByRole('button', { name: 'Dismiss' })).toBeNull();
 
-    await user.click(
-      within(dialog).getByRole('button', { name: 'Resume edits' })
+    await user.click(screen.getByRole('button', { name: 'Resume' }));
+    await waitFor(() =>
+      expect(screen.queryByText('Resume your unsaved edits?')).toBeNull()
     );
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
       'Mine'
     );
   });
 
-  it('discards the stale draft from the dialog', async () => {
+  it('keeps one Resume prompt while the editor types under it', async () => {
     storeStaleDraft();
     const user = await openHello();
-    const dialog = await screen.findByRole('alertdialog');
+    await screen.findByText('Resume your unsaved edits?');
+    await user.type(screen.getByLabelText(/^Title\b/), 'abc');
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(screen.getAllByRole('button', { name: 'Resume' })).toHaveLength(1);
+    const shown = vi
+      .mocked(toast)
+      .mock.calls.filter(
+        ([options]) => options.title === 'Resume your unsaved edits?'
+      );
+    expect(shown.length).toBeGreaterThan(0);
+    expect(new Set(shown.map(([options]) => options.id))).toEqual(
+      new Set([`resume-draft:${helloFormId}`])
+    );
+  });
 
+  it('asks again before it discards the stale draft', async () => {
+    storeStaleDraft();
+    const user = await openHello();
+    await screen.findByText('Resume your unsaved edits?');
+
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    const dialog = await screen.findByRole('alertdialog', {
+      name: 'Discard earlier unsaved edits to “Hello”?',
+    });
+    expect(dialog).toHaveTextContent(
+      'Discarded edits can’t be brought back. What you typed since stays.'
+    );
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    expect(readWaitingDrafts(helloFormId)).toHaveLength(1);
+    expect(screen.getByText('Resume your unsaved edits?')).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
     await user.click(
-      within(dialog).getByRole('button', { name: 'Discard draft' })
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Discard',
+      })
     );
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello');
+    expect(readWaitingDrafts(helloFormId)).toEqual([]);
     expect(readDraft(helloFormId)).toBeUndefined();
   });
 });
 
+describe('TinaAdmin draft recovery contract', () => {
+  const hello = toFormId('content/posts/hello.mdx');
+  const second = toFormId('content/posts/second.mdx');
+  const store = (id: typeof hello, values: object, baseline: object) =>
+    localStorage.setItem(
+      draftKey(id),
+      JSON.stringify({ version: 2, values, baseline })
+    );
+  const openDoc = async (name: RegExp) => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: name }));
+    return user;
+  };
+
+  it('row 2: a draft on the same file version waits, with the kept words and the Status bar line', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    await openDoc(/hello\.mdx/);
+    expect(
+      await screen.findByText('Kept in this browser since your last visit.')
+    ).toBeVisible();
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello');
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+    expect(
+      within(screen.getByRole('contentinfo')).getByText(
+        'Unsaved edits kept in this browser'
+      )
+    ).toBeVisible();
+  });
+
+  it('row 3: a draft of an older file says the document changed', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Old' });
+    await openDoc(/hello\.mdx/);
+    expect(
+      await screen.findByText(
+        'The document changed since. Resume puts your edits on top.'
+      )
+    ).toBeVisible();
+  });
+
+  it('row 9: a collision re-shows the toast with the leftover words', async () => {
+    store(hello, { title: 'Earlier' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    await user.type(screen.getByLabelText(/^Title\b/), ' now');
+    await user.click(screen.getByRole('button', { name: 'Resume' }));
+    expect(
+      await screen.findByText('Your earlier edit to Title is still kept.')
+    ).toBeVisible();
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello now');
+    await user.click(screen.getByRole('button', { name: 'Resume' }));
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Earlier');
+  });
+
+  it('rows 11 and 12: Cancel returns focus to the toast Discard and the toast does nothing while the confirm is open', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    const discard = screen.getByRole('button', { name: 'Discard' });
+    await user.click(discard);
+    const dialog = await screen.findByRole('alertdialog');
+    discard.click();
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(discard).toHaveFocus();
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
+  });
+
+  it('row 13: Discard unsaved edits leaves the waiting copy and the toast', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    const dialog = await openDiscardConfirm(user);
+    await user.click(within(dialog).getByRole('button', { name: 'Discard' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
+    expect(screen.getByText('Resume your unsaved edits?')).toBeVisible();
+  });
+
+  it('row 14: Save keeps the waiting copy, the toast and the Review count', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+    );
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
+    await waitFor(() =>
+      expect(screen.getByText('Resume your unsaved edits?')).toBeVisible()
+    );
+  });
+
+  it('row 16: a direct move to another document shows that document toast', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    store(second, { title: 'Theirs' }, { title: 'Second' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /second\.mdx/ })
+    );
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Second');
+    await waitFor(() =>
+      expect(screen.getByText('Resume your unsaved edits?')).toBeVisible()
+    );
+    const ids = vi
+      .mocked(toast)
+      .mock.calls.map(([options]) => options.id)
+      .filter((id) => String(id).startsWith('resume-draft:'));
+    expect(new Set(ids)).toEqual(
+      new Set([`resume-draft:${hello}`, `resume-draft:${second}`])
+    );
+  });
+
+  it('row 11: the confirm takes focus when a field held it', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    await user.click(screen.getByLabelText(/^Title\b/));
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    const dialog = await screen.findByRole('alertdialog');
+    await waitFor(() =>
+      expect(
+        within(dialog).getByRole('button', { name: 'Cancel' })
+      ).toHaveFocus()
+    );
+  });
+
+  it('a Save failed toast goes when a later save lands', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const dismiss = vi.spyOn(toast, 'dismiss');
+    vi.spyOn(provider, 'update').mockRejectedValueOnce(new Error('offline'));
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(vi.mocked(toast)).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: expect.stringMatching(/^save-failed:/),
+          tone: 'error',
+        })
+      )
+    );
+    expect(dismiss).not.toHaveBeenCalledWith(
+      expect.stringMatching(/^save-failed:/)
+    );
+    dismiss.mockClear();
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(dismiss).toHaveBeenCalledWith(
+        expect.stringMatching(/^save-failed:/)
+      )
+    );
+  });
+
+  it('Expand all and Collapse all show in the form menu, disabled when no field has cards', async () => {
+    const user = await openDoc(/hello\.mdx/);
+    await user.click(
+      await screen.findByRole('button', { name: 'Document menu' })
+    );
+    expect(
+      await screen.findByRole('menuitem', { name: 'Expand all' })
+    ).toHaveAttribute('aria-disabled', 'true');
+    expect(
+      screen.getByRole('menuitem', { name: 'Collapse all' })
+    ).toHaveAttribute('aria-disabled', 'true');
+    expect(
+      screen.getByRole('menuitem', { name: 'Copy file path' })
+    ).toBeVisible();
+  });
+
+  it.each([
+    [
+      'a provider response',
+      new Error(
+        'Content request update failed (500): {"error":{"code":"op-failed","message":"Operation failed."}}'
+      ),
+    ],
+    [
+      'an error with a stack',
+      Object.assign(new Error('boom at tina/hooks.ts:21'), {
+        stack: 'Error: boom\n    at slug (tina/hooks.ts:21:9)',
+      }),
+    ],
+    ['a plain string', 'op-failed {"x":500}'],
+  ])(
+    'a save that rejects with %s shows fixed words and Retry, and logs the text',
+    async (_, rejection) => {
+      const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+      vi.spyOn(provider, 'update').mockRejectedValueOnce(rejection);
+      const user = await openDoc(/hello\.mdx/);
+      await user.type(await screen.findByLabelText(/^Title\b/), '!');
+      await user.click(screen.getByRole('button', { name: 'Save' }));
+      const alert = await screen.findByRole('alert');
+      expect(alert).toHaveTextContent("Couldn't save. Something went wrong.");
+      expect(alert).toHaveTextContent(
+        'Your edits are kept. Try again in a few seconds.'
+      );
+      expect(alert).not.toHaveTextContent(/500|\{|op-failed|hooks\.ts/);
+      expect(
+        within(alert).getByRole('button', { name: 'Retry' })
+      ).toBeVisible();
+      expect(
+        document.querySelector('[data-slot=form-bar] [role=alert]')
+      ).toBeNull();
+      expect(
+        JSON.stringify(logged.mock.calls, (_k, v) => {
+          if (v instanceof Error) return v.message;
+          return v;
+        })
+      ).toMatch(/op-failed|boom/);
+    }
+  );
+
+  it('Retry saves again and a good retry clears the toast', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(provider, 'update').mockRejectedValueOnce(new Error('offline'));
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const alert = await screen.findByRole('alert');
+    await user.click(within(alert).getByRole('button', { name: 'Retry' }));
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+  });
+
+  it('Retry is gone once the editor leaves the document, so it cannot write elsewhere', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const update = vi
+      .spyOn(provider, 'update')
+      .mockRejectedValueOnce(new Error('offline'));
+    update.mockClear();
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await screen.findByRole('alert');
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /second\.mdx/ })
+    );
+    await screen.findByLabelText(/^Title\b/);
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(readDraft(hello)?.values).toMatchObject({
+      title: expect.stringMatching(/!$/),
+    });
+  });
+
+  it('Retry clicked right after leaving does nothing to the store or the disk', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const update = vi
+      .spyOn(provider, 'update')
+      .mockRejectedValueOnce(new Error('offline'));
+    update.mockClear();
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const retry = within(await screen.findByRole('alert')).getByRole('button', {
+      name: 'Retry',
+    });
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(retry);
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(readDraft(hello)?.values).toMatchObject({
+      title: expect.stringMatching(/!$/),
+    });
+  });
+
+  it('Retry clicked on another document never writes the first one into it', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const update = vi
+      .spyOn(provider, 'update')
+      .mockRejectedValueOnce(new Error('offline'));
+    update.mockClear();
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const retry = within(await screen.findByRole('alert')).getByRole('button', {
+      name: 'Retry',
+    });
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /second\.mdx/ })
+    );
+    await screen.findByLabelText(/^Title\b/);
+    await user.click(retry);
+    expect(update).toHaveBeenCalledTimes(1);
+  });
+
+  it('Retry after leaving and coming back saves what is typed now', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const update = vi
+      .spyOn(provider, 'update')
+      .mockRejectedValueOnce(new Error('offline'));
+    update.mockClear();
+    const user = await openDoc(/hello\.mdx/);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const retry = within(await screen.findByRole('alert')).getByRole('button', {
+      name: 'Retry',
+    });
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText(/^Title\b/), '?');
+    await user.click(retry);
+    await waitFor(() => expect(update).toHaveBeenCalledTimes(2));
+    expect(update.mock.calls[1][2]).toMatchObject({
+      title: expect.stringMatching(/\?$/),
+    });
+  });
+
+  it('rows 22 and 26: with the move-aside write failing, the warning shows and no screen says kept', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const real = localStorage.setItem.bind(localStorage);
+    const spy = vi
+      .spyOn(localStorage, 'setItem')
+      .mockImplementation((key, value) => {
+        if (key.endsWith('#waiting')) throw new DOMException('full');
+        real(key, value);
+      });
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await openDoc(/hello\.mdx/);
+    await waitFor(() =>
+      expect(
+        screen.getByText('Edits can’t be stored in this browser')
+      ).toBeVisible()
+    );
+    expect(readDraft(hello)?.values).toEqual({ title: 'Mine' });
+    expect(
+      within(screen.getByRole('contentinfo')).queryByText(
+        'Unsaved edits kept in this browser'
+      )
+    ).toBeNull();
+    spy.mockRestore();
+  });
+});
+
 describe('TinaAdmin after a save that changes the document', () => {
-  it('keeps the afterSave failure message visible', async () => {
+  it('keeps the afterSave failure toast visible', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const storing = definePlugin({
       name: 'test:content',
@@ -906,13 +1342,75 @@ describe('TinaAdmin after a save that changes the document', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(await screen.findByDisplayValue('HELLO!')).toBeInTheDocument();
-    const form = await screen.findByRole('complementary', {
-      name: 'Document form',
-    });
-    expect(await within(form).findByRole('alert')).toHaveTextContent(
-      'The document was saved, but an afterSave hook failed.'
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The document was saved. An afterSave hook failed.'
     );
     vi.restoreAllMocks();
+  });
+});
+
+describe('TinaAdmin leaving a document with unsaved edits', () => {
+  const editHello = async (user: ReturnType<typeof userEvent.setup>) => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+  };
+
+  it('leaves at once, then says the edits are kept in this browser and offers Open', async () => {
+    const user = userEvent.setup();
+    await editHello(user);
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
+    expect(
+      await screen.findByText('Edits to “Hello!” are kept in this browser')
+    ).toBeVisible();
+    expect(screen.queryByText(/^Still unsaved on/)).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Open' }));
+    await waitFor(() =>
+      expect(window.location.hash).toBe(
+        '#/collections/post/content%2Fposts%2Fhello.mdx'
+      )
+    );
+  });
+
+  it('names a document by its file when the title is cleared', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+    const title = await screen.findByLabelText(/^Title\b/);
+    await user.clear(title);
+    await user.type(title, ' ');
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    expect(
+      await screen.findByText('Edits to “hello.mdx” are kept in this browser')
+    ).toBeVisible();
+  });
+
+  it('shows one notice per document and closes it when the document opens again', async () => {
+    const user = userEvent.setup();
+    await editHello(user);
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    await screen.findByText('Edits to “Hello!” are kept in this browser');
+    await user.click(screen.getByRole('button', { name: 'Open' }));
+    await screen.findByLabelText(/^Title\b/);
+    await waitFor(() =>
+      expect(screen.queryByText(/are kept in this browser/)).toBeNull()
+    );
+    await user.click(
+      screen.getAllByRole('button', { name: 'Home' }).at(0) as HTMLElement
+    );
+    await screen.findByText('Edits to “Hello!” are kept in this browser');
+    expect(screen.getAllByText(/are kept in this browser/)).toHaveLength(1);
+  });
+
+  it('stays quiet when the document has no unsaved edits', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+    await screen.findByLabelText(/^Title\b/);
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
+    expect(screen.queryByText(/are kept in this browser/)).toBeNull();
   });
 });
 
@@ -1208,6 +1706,43 @@ describe('TinaAdmin rail', () => {
     expect(
       screen.getByRole('complementary', { name: 'Navigator' })
     ).toBeVisible();
+  });
+
+  it('lets the editor discard edits kept for a document whose file is gone', async () => {
+    const gone = toFormId('content/posts/deleted.mdx');
+    localStorage.setItem(
+      draftKey(gone),
+      JSON.stringify({
+        version: 2,
+        values: { title: 'Kept' },
+        baseline: { title: 'Deleted' },
+      })
+    );
+    const user = userEvent.setup();
+    window.location.hash = '#/collections?unsaved';
+    renderAdmin();
+    expect(await screen.findByText(/Its file was not found/)).toBeVisible();
+    await user.click(
+      screen.getByRole('button', { name: 'Discard edits to deleted.mdx' })
+    );
+    const dialog = await screen.findByRole('alertdialog', {
+      name: 'Discard unsaved edits to “content/posts/deleted.mdx”?',
+    });
+    expect(dialog).toHaveTextContent(
+      'The file is gone, so these edits are the only copy.'
+    );
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    expect(readDraft(gone)).toBeDefined();
+    await user.click(
+      screen.getByRole('button', { name: 'Discard edits to deleted.mdx' })
+    );
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Discard',
+      })
+    );
+    expect(await screen.findByText('No unsaved documents.')).toBeVisible();
+    expect(readDraft(gone)).toBeUndefined();
   });
 
   it('lists a document whose edits wait in a stored draft after a reload', async () => {
