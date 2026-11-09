@@ -33,6 +33,7 @@ import { TinaProvider } from '../editor/provider';
 import { HomePanel } from './home';
 import { AuthGate } from './auth-gate';
 import { DocumentForm } from './document-form';
+import { DocumentErrorPane } from './error-summary';
 import { DocumentScope } from './document-scope';
 import {
   CollectionsNavigator,
@@ -493,7 +494,7 @@ function AdminShell({
           </DocumentScope>
         ) : (
           <DocumentScope collection={collection} path={openPath}>
-            <SidebarInset className='min-w-0 flex-row'>
+            <SidebarInset className='relative min-w-0 flex-row'>
               <FormColumn
                 openPath={openPath}
                 collection={collection}
@@ -507,7 +508,9 @@ function AdminShell({
                 }
               />
 
-              <div className='min-w-0 flex-1'>
+              <DocumentErrorPane />
+
+              <div data-preview-slot='' className='min-w-0 flex-1'>
                 <PreviewSlot preview={preview} />
               </div>
             </SidebarInset>

@@ -829,13 +829,14 @@ describe('save state', () => {
     );
   });
 
-  it('says the save failed when validation fails, in the toast and the Status bar, and leaves the form bar alone', async () => {
+  it('does not call a blocked save a failed save in the Status bar', async () => {
     const { user, input } = await openHello();
     await user.clear(input);
     await user.click(screen.getByRole('button', { name: /^Save/ }));
-    await waitFor(() =>
-      expect(within(statusBar()).getByText('Save failed')).toBeVisible()
-    );
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    expect(within(statusBar()).queryByText('Save failed')).toBeNull();
     expect(updates).toHaveLength(0);
     const form = screen.getByRole('complementary', { name: 'Document form' });
     expect(form.querySelector('[data-slot=form-bar] [role=alert]')).toBeNull();
@@ -845,10 +846,11 @@ describe('save state', () => {
 describe('toasts', () => {
   it('shows a failed save at bottom right with fixed words and Retry, and nothing in the form bar', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    updateError = new ContentError('forbidden');
     const user = userEvent.setup();
     renderAdmin();
     const input = await screen.findByLabelText(/^Title\b/);
-    await user.clear(input);
+    await user.type(input, '!');
     await user.click(screen.getByRole('button', { name: /^Save/ }));
 
     const toast = await waitFor(() => {
@@ -857,11 +859,12 @@ describe('toasts', () => {
       return found;
     });
     expect(toast).toHaveTextContent(
-      "Couldn't save. Some fields are not valid."
+      "Couldn't save. You don't have permission to save."
     );
     expect(
       within(toast as HTMLElement).getByRole('button', { name: 'Retry' })
     ).toBeVisible();
+    expect(screen.queryByRole('complementary', { name: 'Errors' })).toBeNull();
     const toaster = toast?.closest('[data-sonner-toaster]');
     expect(toaster).toHaveAttribute('data-x-position', 'right');
     expect(toaster).toHaveAttribute('data-y-position', 'bottom');

@@ -52,7 +52,11 @@ import {
   type StaleDraftActions,
   TinaRuntimeContext,
 } from './context';
-import { collectFieldErrorMessages, ownFieldErrors } from './field-errors';
+import {
+  collectFieldErrorMessages,
+  type ListChange,
+  ownFieldErrors,
+} from './field-errors';
 import { countRevealedErrors, isRevealed, itemLevel } from './form-view-state';
 
 export function useFieldRegistry(): FieldRegistry {
@@ -276,11 +280,16 @@ async function recordSavePhase(
   formId: FormId,
   run: () => Promise<void>
 ): Promise<void> {
-  const { setSavePhase } = useFormStore.getState();
+  const { setSavePhase, restoreSavePhase, saves } = useFormStore.getState();
+  const previous = saves[formId];
   setSavePhase(formId, { phase: 'saving' });
   try {
     await run();
   } catch (cause) {
+    if (cause instanceof FormValidationError) {
+      restoreSavePhase(formId, previous);
+      throw cause;
+    }
     let message = 'Save failed.';
     if (cause instanceof Error && cause.message) message = cause.message;
     if (cause instanceof ContentError && cause.code === 'branch-not-found') {
@@ -472,6 +481,9 @@ export function useListItems() {
     isRevealed: (itemAddress: string) =>
       isRevealed(view.getState(), itemAddress),
     touch: (itemAddress: FieldAddress) => view.getState().touch(itemAddress),
+    /** Tells the error summary the items of `listAddress` moved, so its rows follow their fields. */
+    rekey: (listAddress: string, change: ListChange) =>
+      view.getState().rekey(listAddress, change),
     /** The index of the item of `listAddress` the editor just came back from, once. */
     takeReturnedIndex: (listAddress: string): number | undefined => {
       const { returnedFrom, clearReturn } = view.getState();
