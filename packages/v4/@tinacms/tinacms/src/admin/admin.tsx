@@ -30,6 +30,7 @@ import { useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
 import { TinaProvider } from '../editor/provider';
+import { HomePanel } from './home';
 import { AuthGate } from './auth-gate';
 import { DocumentForm } from './document-form';
 import { DocumentScope } from './document-scope';
@@ -459,9 +460,7 @@ function AdminShell({
             onClose={goHome}
           />
         ) : route.view === 'home' ? (
-          <MissingPanel title='Home' onClose={goHome}>
-            Pick a collection to start editing.
-          </MissingPanel>
+          <HomePanel collections={schema.collections} navigate={navigate} />
         ) : route.view === 'media' ? (
           <MissingPanel title='Media' onClose={goHome} hideBelowLg>
             {hasMediaScreen
