@@ -160,6 +160,7 @@ describe('a Save that finds invalid fields', () => {
     expect(resolve).toBeEnabled();
     expect(resolve).toHaveFocus();
     expect(saved).toHaveLength(0);
+    expect(globalThis.document.querySelector('[data-slot=toast]')).toBeNull();
     await waitFor(() =>
       expect(assertive()).toHaveTextContent(
         "Can't save. 2 errors. Error summary pane opened. Save is now Resolve 2 errors."
@@ -342,6 +343,35 @@ describe('a Save that finds invalid fields', () => {
     expect(
       screen.getByRole('button', { name: 'Resolve 1 error' })
     ).toBeVisible();
+  });
+
+  it('counts a row as fixed when the list item that held its error is removed', async () => {
+    const user = await blockOnTwoFields();
+    await errorsPane();
+    await user.click(
+      within(await errorsPane()).getByRole('button', { name: /^Heading/ })
+    );
+    const group = await screen.findByRole('group', { name: 'Items' });
+    const trigger = group.querySelector<HTMLElement>(
+      '[aria-label^="Actions for"]'
+    ) as HTMLElement;
+    await user.click(trigger);
+    await user.click(await screen.findByRole('menuitem', { name: /^Remove/ }));
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    expect(rowsOf(await errorsPane())).toHaveLength(1);
+  });
+
+  it('shows no Resolve on another screen', async () => {
+    const user = await blockOnTwoFields();
+    await errorsPane();
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: /^Resolve/ })).toBeNull()
+    );
+    expect(screen.queryByRole('complementary', { name: /^Errors/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Show errors/ })).toBeNull();
   });
 
   it('shows no error summary after discarding the edits', async () => {
