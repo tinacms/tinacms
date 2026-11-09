@@ -27,8 +27,6 @@ type CollapsibleSectionProps = Omit<
   onOpenChange: (open: boolean) => void;
   /** Does not fold, and shows no hover. */
   disabled?: boolean;
-  /** Does not fold, and shows no hover. */
-  readOnly?: boolean;
   /** Runs when the header takes focus. */
   onHeaderFocus?: ComponentProps<'button'>['onFocus'];
   /** Drawn only while open, beside the guide rail. */
@@ -98,30 +96,26 @@ function CollapsibleSection({
   open,
   onOpenChange,
   disabled = false,
-  readOnly = false,
   onHeaderFocus,
   children,
   className,
   ...props
 }: CollapsibleSectionProps) {
-  const inert = disabled || readOnly;
   return (
     <Collapsible
       open={open}
       onOpenChange={(next) => {
-        if (!inert) onOpenChange(next);
+        if (!disabled) onOpenChange(next);
       }}
       disabled={disabled}
       className={cn('flex min-w-0 flex-col font-sans', className)}
       {...props}
     >
       <CollapsibleTrigger
-        aria-disabled={readOnly || undefined}
         onFocus={onHeaderFocus}
         className={cn(
           'relative -mx-1 box-border flex cursor-pointer items-center gap-1.5 self-stretch rounded-sm border-0 bg-transparent p-1 text-left font-sans text-foreground outline-none focus-visible:shadow-focus-ring',
-          inert ? 'cursor-not-allowed' : 'hover:bg-muted-hover',
-          disabled && 'opacity-45'
+          disabled ? 'cursor-not-allowed opacity-45' : 'hover:bg-muted-hover'
         )}
       >
         <span

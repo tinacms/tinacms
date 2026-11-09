@@ -21,9 +21,11 @@ type HarnessEditor = ReturnType<typeof usePlateEditor>;
 
 const Harness = ({
   value,
+  readOnly,
   onEditorReady,
 }: {
   value: Value;
+  readOnly?: boolean;
   onEditorReady: (editor: HarnessEditor) => void;
 }) => {
   const editor = usePlateEditor({
@@ -36,17 +38,21 @@ const Harness = ({
 
   return (
     <Plate editor={editor}>
-      <PlateContent />
+      <PlateContent readOnly={readOnly} />
     </Plate>
   );
 };
 
-const renderList = (value: Value): { editor: HarnessEditor } => {
+const renderList = (
+  value: Value,
+  readOnly = false
+): { editor: HarnessEditor } => {
   let editor: HarnessEditor | undefined;
 
   render(
     <Harness
       value={value}
+      readOnly={readOnly}
       onEditorReady={(next) => {
         editor = next;
       }}
@@ -94,6 +100,15 @@ describe('a task list item', () => {
     await user.click(screen.getByRole('checkbox', { name: 'call mum' }));
 
     await waitFor(() => expect(firstItem(editor).checked).toBe(false));
+  });
+
+  it('keeps a box unticked while the editor is read-only', async () => {
+    const user = userEvent.setup();
+    const { editor } = renderList(list(item('call mum', false)), true);
+
+    await user.click(screen.getByRole('checkbox', { name: 'call mum' }));
+
+    expect(firstItem(editor).checked).toBe(false);
   });
 });
 
