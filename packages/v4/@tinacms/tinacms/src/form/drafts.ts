@@ -88,3 +88,28 @@ export const removeDraft = (
   if (userId === null) return;
   storage()?.removeItem(draftKey(formId, userId, branch));
 };
+
+/** The forms with a valid stored draft for this editor on this branch. */
+export const listStoredDraftIds = (
+  userId?: DraftUserScope,
+  branch?: string
+): FormId[] => {
+  if (userId === null) return [];
+  const store = storage();
+  if (!store) return [];
+  const suffix = branch ? `@@${encodeURIComponent(branch)}` : '';
+  const prefix =
+    userId === undefined
+      ? DRAFT_KEY_PREFIX
+      : `${USER_DRAFT_KEY_PREFIX}${encodeURIComponent(userId)}:`;
+  const ids: FormId[] = [];
+  for (let at = 0; at < store.length; at++) {
+    const key = store.key(at);
+    if (!key?.startsWith(prefix) || !key.endsWith(suffix)) continue;
+    const id = key.slice(prefix.length, key.length - suffix.length);
+    if (id.length === 0 || (!branch && id.includes('@@'))) continue;
+    const formId = id as FormId;
+    if (readDraft(formId, userId, branch)) ids.push(formId);
+  }
+  return ids;
+};

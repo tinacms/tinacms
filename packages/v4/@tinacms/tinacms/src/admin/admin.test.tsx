@@ -215,7 +215,7 @@ beforeEach(() => {
   saved.length = 0;
   listCalls.length = 0;
   getCalls.length = 0;
-  window.location.hash = '';
+  window.location.hash = '#/collections';
   useFormStore.setState({ forms: {} });
   for (const [collection, entries] of Object.entries(FIXTURES)) {
     store[collection] = entries.map((entry) => ({ ...entry }));
@@ -290,7 +290,14 @@ describe('TinaAdmin', () => {
   it('reports a collection the schema does not have', async () => {
     window.location.hash = '#/collections/ghost';
     renderAdmin();
-    expect(await screen.findByText(/No collection named/)).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Collection not found' })
+    ).toBeVisible();
+    expect(screen.getByText(/No collection named/)).toBeInTheDocument();
+    await userEvent.click(
+      screen.getAllByRole('button', { name: 'Close' }).at(-1) as HTMLElement
+    );
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
   });
 
   it('reports a document a deep link names that does not exist', async () => {
@@ -326,11 +333,13 @@ describe('TinaAdmin', () => {
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
+    await user.click(screen.getByRole('button', { name: 'Posts' }));
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
     expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Second');
 
+    await user.click(screen.getByRole('button', { name: 'Posts' }));
     const helloEntry = await screen.findByRole('button', {
       name: /hello\.mdx/,
     });
@@ -423,6 +432,7 @@ describe('TinaAdmin unsaved changes', () => {
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
+    await user.click(screen.getByRole('button', { name: 'Posts' }));
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
@@ -475,7 +485,7 @@ describe('TinaAdmin content reads', () => {
     expect(
       within(menu)
         .getAllByRole('button')
-        .map((button) => button.getAttribute('aria-label'))
+        .map((button) => button.textContent)
     ).toEqual(['hello.mdx', 'second.mdx']);
     expect(getCalls).toEqual([]);
   });
@@ -524,7 +534,7 @@ describe('TinaAdmin content reads', () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fghost.mdx';
     renderAdmin();
 
-    await screen.findByRole('list', { name: 'Posts documents' });
+    await waitFor(() => expect(reading).toHaveBeenCalled());
     expect(screen.queryByText(/No document named/)).not.toBeInTheDocument();
 
     resolveGet(null);
@@ -573,51 +583,37 @@ describe('TinaAdmin content reads', () => {
 });
 
 describe('TinaAdmin global nav', () => {
-  it('lists the entries plugins contribute, in order, skipping unmet dependencies', async () => {
+  it('sorts ungrouped entries and groups together by order in the rail, skipping unmet dependencies (ADR-027)', async () => {
     renderAdmin();
-    const menu = await screen.findByRole('list', { name: 'Global navigation' });
+    const rail = await screen.findByRole('navigation', { name: 'Content' });
+    await screen.findByRole('list', { name: 'Help' });
+    const shown = ['Switch branch', 'Docs', 'Guides', 'Changelog'];
     expect(
-      within(menu)
-        .getAllByRole('listitem')
-        .map((item) => item.textContent)
-    ).toEqual(['Media', 'Switch branch', 'Docs']);
+      [...rail.querySelectorAll('[data-rail-row]')]
+        .map((row) => row.getAttribute('aria-label') ?? '')
+        .filter((label) => shown.includes(label))
+    ).toEqual(shown);
   });
 
-  it('lists the entries of a group under its heading', async () => {
+  it('lists the entries of a group under its heading in the rail', async () => {
     renderAdmin();
     const menu = await screen.findByRole('list', { name: 'Help' });
     expect(
       within(menu)
         .getAllByRole('listitem')
         .map((item) => item.textContent)
-    ).toEqual(['Guides']);
-  });
-
-  it('places a group between the ungrouped entries by its order', async () => {
-    renderAdmin();
-    const [first, ...rest] = await screen.findAllByRole('list', {
-      name: 'Global navigation',
-    });
-    expect(rest).toHaveLength(0);
-    const heading = screen.getByText('Help');
-    expect(
-      first.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy();
-    expect(
-      heading.compareDocumentPosition(screen.getByText('Changelog')) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy();
+    ).toEqual(['Guides (opens in a new tab)']);
   });
 
   it('does not link a screen that no entry targets', async () => {
     renderAdmin();
-    const menu = await screen.findByRole('list', { name: 'Global navigation' });
-    expect(within(menu).queryByText('Unlinked')).not.toBeInTheDocument();
+    const rail = await screen.findByRole('navigation', { name: 'Content' });
+    expect(within(rail).queryByText('Unlinked')).not.toBeInTheDocument();
   });
 
   it('opens a url entry in a new tab', async () => {
     renderAdmin();
-    const link = await screen.findByRole('link', { name: 'Docs' });
+    const link = await screen.findByRole('link', { name: /^Docs/ });
     expect(link).toHaveAttribute('href', 'https://tina.io/docs');
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
@@ -631,6 +627,38 @@ describe('TinaAdmin global nav', () => {
       await screen.findByRole('button', { name: 'Switch branch' })
     );
     expect(navAction).toHaveBeenCalledOnce();
+  });
+
+  it('shows an empty Tools pane when no plugin adds an entry', async () => {
+    const user = userEvent.setup();
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          plugins: config.plugins.filter((plugin) => plugin !== screenPlugin),
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    await user.click(await screen.findByRole('button', { name: 'Tools' }));
+    const pane = await screen.findByRole('complementary', {
+      name: 'Tools panel',
+    });
+    expect(within(pane).getByText('No tools installed.')).toBeVisible();
+  });
+
+  it('opens a Settings pane beside the rail', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Settings' }));
+    const pane = await screen.findByRole('complementary', {
+      name: 'Settings panel',
+    });
+    expect(within(pane).getByText('No settings yet.')).toBeVisible();
+    await user.click(within(pane).getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
   });
 });
 
@@ -736,26 +764,14 @@ describe('TinaAdmin screens', () => {
     await user.click(await screen.findByRole('button', { name: 'Media' }));
     await screen.findByText(/media library at/);
 
+    await user.click(
+      await screen.findByRole('button', { name: 'Collections' })
+    );
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
 
     // The label of a dirty field also carries its unsaved marker.
     expect(await screen.findByLabelText(/^Title/)).toHaveValue('Hello!');
-  });
-});
-
-describe('TinaAdmin form continuity', () => {
-  it('keeps the collection list mounted across opening a document', async () => {
-    const user = userEvent.setup();
-    renderAdmin();
-
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
-    const before = await screen.findByRole('list', { name: 'Posts documents' });
-
-    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await screen.findByLabelText(/^Title\b/);
-
-    expect(screen.getByRole('list', { name: 'Posts documents' })).toBe(before);
   });
 });
 
@@ -885,5 +901,400 @@ describe('TinaAdmin after a save that changes the document', () => {
       'The document was saved, but an afterSave hook failed.'
     );
     vi.restoreAllMocks();
+  });
+});
+
+describe('TinaAdmin rail', () => {
+  const railButtons = async () => {
+    const rail = await screen.findByRole('navigation', { name: 'Content' });
+    return within(
+      within(rail).getByRole('list', { name: 'Navigation' })
+    ).getAllByRole('button');
+  };
+
+  it('lists Home, Collections, Media, Tools and Settings, and no collection or document', async () => {
+    renderAdmin();
+    const buttons = await railButtons();
+    expect(buttons.map((button) => button.getAttribute('aria-label'))).toEqual([
+      'Home',
+      'Collections',
+      'Media',
+    ]);
+    const rail = screen.getByRole('navigation', { name: 'Content' });
+    expect(
+      within(within(rail).getByRole('list', { name: 'Tools and settings' }))
+        .getAllByRole('button')
+        .map((button) => button.getAttribute('aria-label'))
+    ).toEqual(['Tools', 'Settings']);
+    expect(within(rail).queryByText('Posts')).toBeNull();
+  });
+
+  it('lands on Home, with Home marked and no navigator open', async () => {
+    window.location.hash = '';
+    renderAdmin();
+    expect(await screen.findByRole('button', { name: 'Home' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(
+      screen.queryByRole('complementary', { name: 'Navigator' })
+    ).toBeNull();
+  });
+
+  it('says so when the filtered navigator has no unsaved documents', async () => {
+    window.location.hash = '#/collections?unsaved';
+    renderAdmin();
+    expect(await screen.findByText('No unsaved documents.')).toBeVisible();
+  });
+
+  it('shows only the documents with unsaved edits when the navigator is filtered', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Collections' }));
+    await screen.findByRole('complementary', { name: 'Navigator' });
+    await user.click(screen.getByRole('button', { name: 'Collections menu' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Show unsaved only' })
+    );
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/collections?unsaved')
+    );
+    const list = await screen.findByRole('list', { name: 'Unsaved documents' });
+    expect(
+      await within(list).findByRole('button', { name: /hello\.mdx/ })
+    ).toBeVisible();
+    expect(
+      within(list).queryByRole('button', { name: /second\.mdx/ })
+    ).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Collections menu' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Show all documents' })
+    );
+    await waitFor(() => expect(window.location.hash).toBe('#/collections'));
+  });
+
+  it.each([
+    ['tools', 'Tools'],
+    ['settings', 'Settings'],
+  ])(
+    'marks %s selected on a deep link and asks for an entry',
+    async (hash, name) => {
+      window.location.hash = `#/${hash}`;
+      renderAdmin();
+      expect(await screen.findByRole('button', { name })).toHaveAttribute(
+        'aria-current',
+        'page'
+      );
+      expect(screen.getByText('Pick an entry to open it.')).toBeVisible();
+    }
+  );
+
+  it('opens the collections beside the rail, not inside it', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(
+      await screen.findByRole('button', { name: 'Collections' })
+    );
+    const navigator = await screen.findByRole('complementary', {
+      name: 'Navigator',
+    });
+    expect(within(navigator).getByText('Posts')).toBeVisible();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Content' })).queryByText(
+        'Posts'
+      )
+    ).toBeNull();
+  });
+
+  it('shows the empty collections state', async () => {
+    const user = userEvent.setup();
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          schema: { collections: [] },
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    await user.click(
+      await screen.findByRole('button', { name: 'Collections' })
+    );
+    expect(await screen.findByText('No collections yet.')).toBeVisible();
+  });
+
+  it('moves between the rows with the arrow keys, Home and End', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    const [home] = await railButtons();
+    home.focus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('button', { name: 'Collections' })).toHaveFocus();
+    await user.keyboard('{End}');
+    const help = screen.getByRole('link', { name: /Help & docs/ });
+    expect(help).toHaveFocus();
+    await user.keyboard('{ArrowUp}');
+    expect(help).not.toHaveFocus();
+    await user.keyboard('{ArrowDown}');
+    expect(help).toHaveFocus();
+    await user.keyboard('{Home}');
+    expect(home).toHaveFocus();
+    await user.keyboard('{ArrowUp}');
+    expect(home).toHaveFocus();
+  });
+
+  it('moves between the rows with the arrow keys once the rail is collapsed', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(
+      await screen.findByRole('button', { name: 'Toggle Sidebar' })
+    );
+    const [home] = await railButtons();
+    home.focus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('button', { name: 'Collections' })).toHaveFocus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('button', { name: 'Media' })).toHaveFocus();
+    await user.keyboard('{ArrowUp}{Home}');
+    expect(home).toHaveFocus();
+    await user.keyboard('{End}');
+    expect(screen.getByRole('link', { name: /Help & docs/ })).toHaveFocus();
+  });
+
+  it('closes the phone rail sheet when a row is chosen', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+    try {
+      const user = userEvent.setup();
+      renderAdmin();
+      await user.click(
+        await screen.findByRole('button', { name: 'Toggle Sidebar' })
+      );
+      const sheet = await waitFor(() => {
+        const found = document.querySelector<HTMLElement>('[data-mobile=true]');
+        if (!found) throw new Error('The rail sheet is not open');
+        return found;
+      });
+      await user.click(
+        within(sheet).getByRole('button', { name: 'Collections' })
+      );
+      await waitFor(() => expect(sheet).not.toBeInTheDocument());
+      expect(window.location.hash).toBe('#/collections');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('keeps unsaved edits when a rail row is clicked, and still blocks a reload', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+
+    await user.click(screen.getByRole('button', { name: /^Home/ }));
+    expect(reloadIsBlocked()).toBe(true);
+  });
+
+  it('marks the last opened document in the navigator after Back', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    const [back] = within(
+      await screen.findByRole('complementary', { name: 'Document form' })
+    ).getAllByRole('button');
+    await user.click(back);
+    expect(
+      await screen.findByRole('button', { name: /hello\.mdx/ })
+    ).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('opens the Media panel beside the rail, with the library in the main area', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Media' }));
+    const panel = await screen.findByRole('complementary', {
+      name: 'Media panel',
+    });
+    expect(
+      within(panel).getByRole('button', { name: 'Media library' })
+    ).toHaveAttribute('aria-current', 'page');
+    expect(await screen.findByText(/media library at/)).toBeInTheDocument();
+  });
+
+  it('says so when a collection has no documents', async () => {
+    store.page = [];
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Pages' }));
+    expect(await screen.findByText('No documents yet.')).toBeVisible();
+  });
+
+  it('closes an open collection when its row is clicked again, and the panel closes to Home', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await screen.findByRole('button', { name: /hello\.mdx/ });
+    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    expect(screen.queryByRole('button', { name: /hello\.mdx/ })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
+  });
+
+  it('names a rail row in a tooltip once the rail is collapsed', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(
+      await screen.findByRole('button', { name: 'Toggle Sidebar' })
+    );
+    await user.hover(screen.getByRole('button', { name: 'Home' }));
+    await waitFor(() =>
+      expect(
+        document.querySelector('[data-slot="tooltip-content"]')
+      ).toHaveTextContent('Home')
+    );
+  });
+
+  it('opens Home and Media from their rows and writes the hash', async () => {
+    const user = userEvent.setup();
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          plugins: config.plugins.filter((plugin) => plugin !== screenPlugin),
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    await user.click(await screen.findByRole('button', { name: 'Home' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
+    await user.click(screen.getByRole('button', { name: 'Media' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/media'));
+    expect(
+      within(
+        await screen.findByRole('complementary', { name: 'Media panel' })
+      ).getByText('No media library is installed.')
+    ).toBeVisible();
+  });
+
+  it('lists the navigator beside the not-found panel when a document link names a collection that does not exist', async () => {
+    window.location.hash = '#/collections/ghost/content%2Fposts%2Fx.mdx';
+    renderAdmin();
+    await screen.findByRole('heading', { name: 'Collection not found' });
+    expect(
+      screen.getByRole('complementary', { name: 'Navigator' })
+    ).toBeVisible();
+  });
+
+  it('lists a document whose edits wait in a stored draft after a reload', async () => {
+    localStorage.setItem(
+      draftKey(toFormId('content/posts/hello.mdx')),
+      JSON.stringify({
+        version: 2,
+        values: { title: 'Kept' },
+        baseline: { title: 'Hello' },
+      })
+    );
+    window.location.hash = '#/collections?unsaved';
+    renderAdmin();
+    const list = await screen.findByRole('list', { name: 'Unsaved documents' });
+    expect(
+      await within(list).findByRole('button', { name: /hello\.mdx/ })
+    ).toBeVisible();
+    expect(screen.queryByText('No unsaved documents.')).toBeNull();
+  });
+
+  it('marks no document in another collection after Back', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    const [back] = within(
+      await screen.findByRole('complementary', { name: 'Document form' })
+    ).getAllByRole('button');
+    await user.click(back);
+    await user.click(await screen.findByRole('button', { name: 'Pages' }));
+    const about = await screen.findByRole('button', { name: /about\.mdx/ });
+    expect(about).not.toHaveAttribute('aria-current');
+  });
+
+  it('shows Loading while a collection reads, then its documents', async () => {
+    let finish: (list: { path: string }[]) => void = () => {};
+    const pending = new Promise<{ path: string }[]>((resolve) => {
+      finish = resolve;
+    });
+    const reading = vi.spyOn(provider, 'list').mockReturnValueOnce(pending);
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    expect(await screen.findByText('Loading…')).toBeVisible();
+    finish([{ path: 'content/posts/hello.mdx' }]);
+    expect(
+      await screen.findByRole('button', { name: /hello\.mdx/ })
+    ).toBeVisible();
+    reading.mockRestore();
+  });
+
+  it('marks a plugin entry that targets the open screen, and opens a screen from its row', async () => {
+    const linked = definePlugin({
+      name: 'test:linked-screen',
+      client: async () => ({
+        default: {
+          slots: {
+            globalNav: [
+              {
+                label: 'Reports',
+                icon: NavIcon,
+                target: { kind: 'screen', screen: 'unlinked' },
+              },
+            ],
+          },
+        },
+      }),
+    });
+    const user = userEvent.setup();
+    render(
+      <TinaAdmin
+        config={asResolvedConfig({
+          ...config,
+          plugins: [...config.plugins, linked],
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      />
+    );
+    const row = await screen.findByRole('button', { name: 'Reports' });
+    expect(row).not.toHaveAttribute('aria-current');
+    await user.click(row);
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/screens/unlinked')
+    );
+    expect(screen.getByRole('button', { name: 'Reports' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+  });
+
+  it('hides the empty Media main area below lg', async () => {
+    window.location.hash = '#/media';
+    renderAdmin();
+    const heading = await screen.findAllByRole('heading', { name: 'Media' });
+    const main = heading
+      .map((node) => node.closest('[data-slot=sidebar-inset]'))
+      .find(Boolean);
+    expect(main).toHaveClass('max-lg:hidden');
   });
 });

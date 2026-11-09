@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../config';
 import {
   AuthError,
@@ -68,6 +68,10 @@ const signOut = async (user: User) => {
   await openAccount(user);
   await user.click(await screen.findByRole('menuitem', { name: 'Sign out' }));
 };
+
+beforeEach(() => {
+  window.location.hash = '#/collections';
+});
 
 describe('AuthGate', () => {
   it('shows the admin with no sign-in screen when no plugin provides auth', async () => {
@@ -204,7 +208,6 @@ describe('AuthGate', () => {
   });
 
   it('isolates unsaved edits per editor in the same tab, across session expiry, and across a reload', async () => {
-    window.location.hash = '';
     const ada: AuthUser = { id: toUserId('ada'), name: 'Ada' };
     const grace: AuthUser = { id: toUserId('grace'), name: 'Grace' };
     let nextUser: AuthUser = ada;

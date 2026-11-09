@@ -13,6 +13,7 @@ import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
 import {
   type DraftUserScope,
+  listStoredDraftIds,
   readDraft,
   removeDraft,
   type StoredDraft,
@@ -483,3 +484,27 @@ export const useSaveSummary = (): SaveSummary =>
   useFormStore(useShallow(summarizeSaves));
 
 export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
+
+/** The ids of the open documents that hold unsaved edits. */
+export const useDirtyFormIds = (): FormId[] =>
+  useFormStore(
+    useShallow((state) =>
+      (Object.keys(state.forms) as FormId[]).filter(
+        (id) => formStatus(state.forms[id]) === 'dirty'
+      )
+    )
+  );
+
+/**
+ * The documents with unsaved edits: the open forms that are dirty, and the
+ * documents whose edits wait in a stored draft after a reload.
+ */
+export const useUnsavedFormIds = (): FormId[] => {
+  const dirty = useDirtyFormIds();
+  const userId = useFormStore((state) => state.userId);
+  const branch = useFormStore((state) => state.branch);
+  return useMemo(
+    () => [...new Set([...dirty, ...listStoredDraftIds(userId, branch)])],
+    [dirty, userId, branch]
+  );
+};
