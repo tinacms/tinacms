@@ -459,7 +459,6 @@ export function ArrayDrillInView({
         summary={countWords(count)}
         invalidCount={invalidCount}
         disabled={disabled}
-        readOnly={readOnly}
         onOpen={onDrillIn ?? (() => {})}
       />
     </FieldWrapper>

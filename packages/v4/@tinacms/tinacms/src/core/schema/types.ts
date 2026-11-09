@@ -37,6 +37,10 @@ export interface BaseFieldSchema {
   description?: string;
   defaultValue?: Exclude<JsonValue, null>;
   hidden?: boolean;
+  /** The field shows its value and cannot be edited. It also drops out of the Tab order. */
+  disabled?: boolean;
+  /** The field shows its value, takes focus and cannot be edited. */
+  readOnly?: boolean;
   validators?: ValidatorRef[];
 }
 

@@ -30,7 +30,14 @@ export default defineClientPlugin({
         ? { amount: parsed }
         : null;
     },
-    parse: (stored) => (stored == null ? undefined : String(stored)),
-    serialize: (value) => Number(value),
+    parse: (stored) =>
+      typeof stored === 'number' && Number.isFinite(stored)
+        ? String(stored)
+        : (stored ?? undefined),
+    serialize: (value) => {
+      if (typeof value !== 'string') return value;
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : value;
+    },
   },
 });
