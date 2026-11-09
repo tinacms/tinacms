@@ -11,11 +11,11 @@
   --slate-50: #f8fafc; /* Page ground, read through --background */
   --slate-100: #f1f5f9; /* Muted and secondary fills */
   --slate-200: #e2e8f0; /* Secondary hover and the preview page ground */
-  --slate-300: #cbd5e1; /* Disabled borders and muted lines on the dark bar */
+  --slate-300: #cbd5e1; /* Disabled borders and muted lines */
   --slate-600: #475569; /* Muted text, read through --muted-foreground */
   --slate-700: #334155; /* Secondary text, such as a neutral badge */
   --slate-800: #1e293b; /* Body text, read through --foreground */
-  --slate-900: #0f172a; /* The dark bar, read through --inv-bg */
+  --slate-900: #0f172a;
   --green-50: #f0fdf4; /* Published fill */
   --green-700: #15803d; /* Published text */
   --amber-50: #fffbeb; /* Unsaved fill */
@@ -105,16 +105,6 @@
   ); /* Info text, such as a New tag or a branch name */
   --tone-info-subtle: var(--blue-50); /* Info fill */
 
-  /* @group Dark surfaces: the dark toast, notice and Undo bar */
-  --inv-bg: var(--slate-900); /* Dark bar, such as Undo */
-  --inv-ink: var(--slate-100); /* Text on the dark bar */
-  --inv-muted: var(--slate-300); /* Muted text on the dark bar */
-  --inv-hover: var(--slate-800); /* Hover on the dark bar */
-  --tone-success-on-dark: #86efac; /* Success icon on a dark toast */
-  --tone-danger-on-dark: #fca5a5; /* Danger icon on a dark toast */
-  --tone-warning-on-dark: #fcd34d; /* Warning icon on a dark toast */
-  --tone-info-on-dark: #93c5fd; /* Info icon on a dark toast */
-
   /* @group Overlays and shadows */
   --scrim: rgba(20, 20, 22, 0.32); /* Behind a dialog */
   --scrim-light: rgba(
@@ -140,7 +130,7 @@
   --radius-sm: 8px; /* Inputs, buttons and list cards */
   --radius-md: 12px; /* Cards, menus and list containers */
   --radius-lg: 20px; /* Dialogs only */
-  --radius-tip: 6px; /* Corners of the dark tooltip bubble */
+  --radius-tip: 6px; /* Corners of the tooltip bubble */
 
   /* @group Sizes */
   --picker-max-height: 320px; /* Tallest a floating block picker gets; the options scroll inside it */
@@ -184,6 +174,4 @@
   --leading-tip: 1.4; /* Line height of the words in a tooltip, which may wrap to two lines */
   --leading-field-message: 1.125rem; /* Line height of the help and the messages under a field */
   --leading-code: 1.55; /* Line height of the code lines in a diff view */
-  --shadow-toast-dark:
-    0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 40px -8px rgba(15, 23, 42, 0.45); /* A dark toast: a faint light edge and a deeper drop */
 }

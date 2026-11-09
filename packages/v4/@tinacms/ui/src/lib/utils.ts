@@ -9,7 +9,6 @@ const twMerge = extendTailwindMerge({
       shadow: [
         'popover',
         'toast',
-        'toast-dark',
         'lifted',
         'dialog',
         'focus-ring',
