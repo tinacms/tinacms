@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -41,6 +42,7 @@ describe('Button', () => {
   });
 
   it('exposes a single-press shortcut as aria-keyshortcuts', () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue('Macintosh');
     render(<Button shortcut='⌘K'>Search</Button>);
     expect(screen.getByRole('button', { name: 'Search' })).toHaveAttribute(
       'aria-keyshortcuts',
@@ -59,10 +61,136 @@ describe('Button', () => {
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 
-  it('is always a button: links style an <a> with buttonVariants instead', () => {
-    // @ts-expect-error Button has no href; a link would get role="button"
+  it('draws a link when it has an href', () => {
     render(<Button href='/docs'>Docs</Button>);
-    expect(screen.queryByRole('link')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
+      'href',
+      '/docs'
+    );
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  it('takes the design names chip and chipSrLabel, and a minimum width', () => {
+    render(
+      <Button chip={3} chipSrLabel=', 3 errors' minWidth={160}>
+        Save
+      </Button>
+    );
+    const button = screen.getByRole('button', { name: 'Save , 3 errors' });
+    expect(button).toHaveTextContent('3');
+    expect(button).toHaveStyle({ minWidth: '160px' });
+  });
+
+  it('draws nothing for a chip of 0 and rejects a chip without chipSrLabel', () => {
+    // @ts-expect-error chip without chipSrLabel is a type error, as count without srLabel is
+    const bare = <Button chip={3}>Bare</Button>;
+    const { rerender } = render(
+      <Button chip={0} chipSrLabel=', 0 errors'>
+        Save
+      </Button>
+    );
+    expect(screen.getByRole('button', { name: 'Save' })).not.toHaveTextContent(
+      '0'
+    );
+    rerender(bare);
+    expect(screen.getByRole('button', { name: 'Bare' })).not.toHaveTextContent(
+      '3'
+    );
+  });
+
+  it.each([
+    ['disabled', { disabled: true }],
+    ['disabled and busy', { disabled: true, busy: true }],
+  ])('leaves out the address of a %s link', async (_, state) => {
+    const onClick = vi.fn();
+    render(
+      <>
+        <Button href='/docs' onClick={onClick} {...state}>
+          Docs
+        </Button>
+        <Button
+          href='/docs'
+          variant='icon'
+          icon='doc'
+          aria-label='Docs icon'
+          onClick={onClick}
+          {...state}
+        />
+      </>
+    );
+    for (const link of screen.getAllByRole('link')) {
+      expect(link).not.toHaveAttribute('href');
+      await userEvent.click(link);
+    }
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('follows a link whose click sets busy, then blocks presses while busy', () => {
+    function Saving() {
+      const [busy, setBusy] = useState(false);
+      return (
+        <Button href='/next' busy={busy} onClick={() => setBusy(true)}>
+          Go
+        </Button>
+      );
+    }
+    render(<Saving />);
+    const link = screen.getByRole('link', { name: 'Go' });
+    expect(fireEvent.click(link)).toBe(true);
+    expect(screen.getByRole('link', { name: 'Go' })).toHaveAttribute(
+      'href',
+      '/next'
+    );
+    expect(fireEvent.click(link)).toBe(false);
+    expect(
+      fireEvent(
+        link,
+        new MouseEvent('auxclick', {
+          bubbles: true,
+          cancelable: true,
+          button: 1,
+        })
+      )
+    ).toBe(false);
+  });
+
+  it.each(['text', 'icon'] as const)(
+    'keeps the address of a busy %s link but runs no onClick',
+    (kind) => {
+      const onClick = vi.fn();
+      render(
+        kind === 'icon' ? (
+          <Button
+            href='/docs'
+            variant='icon'
+            icon='doc'
+            aria-label='Docs'
+            busy
+            onClick={onClick}
+          />
+        ) : (
+          <Button href='/docs#top' busy onClick={onClick}>
+            Docs
+          </Button>
+        )
+      );
+      const link = screen.getByRole('link');
+      expect(link).toHaveAttribute('href');
+      expect(fireEvent.click(link)).toBe(false);
+      expect(onClick).not.toHaveBeenCalled();
+    }
+  );
+
+  it('fades and blocks a disabled link', () => {
+    render(
+      <Button href='/docs' disabled>
+        Docs
+      </Button>
+    );
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveClass(
+      'cursor-not-allowed',
+      'opacity-45'
+    );
   });
 
   it('keeps the name and icon when a dialog renders it as its close button', () => {
@@ -155,8 +283,37 @@ describe('Button disabled', () => {
   });
 });
 
+describe('Button, platform and sizes', () => {
+  it('shows Ctrl in place of ⌘ off Apple platforms, and names it Control', () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue(
+      'Mozilla/5.0 (Windows NT 10.0)'
+    );
+    render(<Button shortcut='⌘K'>Search</Button>);
+    const button = screen.getByRole('button', { name: 'Search' });
+    expect(button).toHaveAttribute('aria-keyshortcuts', 'Control+K');
+    expect(button).toHaveTextContent('Ctrl K');
+    vi.restoreAllMocks();
+  });
+
+  it.each([
+    ['regular', 'md'],
+    ['compact', 'sm'],
+  ] as const)('takes the design name %s as the %s size', (name, old) => {
+    render(
+      <>
+        <Button size={name}>New</Button>
+        <Button size={old}>Old</Button>
+      </>
+    );
+    expect(screen.getByRole('button', { name: 'New' }).className).toBe(
+      screen.getByRole('button', { name: 'Old' }).className
+    );
+  });
+});
+
 describe('Icon button tooltip', () => {
   it('shows the name and shortcut on keyboard focus', async () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue('Macintosh');
     render(
       <Button variant='icon' icon='search' shortcut='⌘K'>
         Search

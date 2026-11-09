@@ -12,8 +12,7 @@ import {
 const states: { name: string; props: ObjectFieldViewProps }[] =
   objectFieldStates;
 
-const inert = ({ props }: { props: ObjectFieldViewProps }) =>
-  !!props.disabled || !!props.readOnly;
+const inert = ({ props }: { props: ObjectFieldViewProps }) => !!props.disabled;
 
 const renderView = (props: ObjectFieldViewProps) =>
   render(
@@ -26,7 +25,7 @@ const ofLook = (display: ObjectFieldViewProps['display']) =>
   states.filter(({ props }) => props.display === display);
 
 const countWords = (count: number) =>
-  `${count} invalid ${count === 1 ? 'field' : 'fields'}`;
+  `${count} ${count === 1 ? 'error' : 'errors'}`;
 
 function expectDrillInCard(props: ObjectFieldViewProps) {
   const card = screen.getByRole('button', {
@@ -119,6 +118,27 @@ describe('object field states', () => {
     expect(onOpenChange).not.toHaveBeenCalled();
     expect(onDrillIn).not.toHaveBeenCalled();
   });
+
+  it.each(['drillIn', 'collapsible'] as const)(
+    'still opens a read-only %s object',
+    async (display) => {
+      const onOpenChange = vi.fn();
+      const onDrillIn = vi.fn();
+      renderView({
+        display,
+        label: 'SEO',
+        readOnly: true,
+        open: false,
+        onOpenChange,
+        onDrillIn,
+      });
+      await userEvent.click(screen.getByRole('button'));
+      expect(onOpenChange).toHaveBeenCalledTimes(
+        display === 'collapsible' ? 1 : 0
+      );
+      expect(onDrillIn).toHaveBeenCalledTimes(display === 'drillIn' ? 1 : 0);
+    }
+  );
 
   it('folds a collapsible with Enter and Space', async () => {
     function Harness() {

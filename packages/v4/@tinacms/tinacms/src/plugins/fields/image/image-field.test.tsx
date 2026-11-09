@@ -183,6 +183,19 @@ describe('ImageField rendering', () => {
     expect(within(group).queryByRole('img')).not.toBeInTheDocument();
   });
 
+  it('says uploads wait while a save runs', async () => {
+    renderField({});
+    const group = await fieldGroup('Hero');
+    act(() =>
+      useFormStore
+        .getState()
+        .setSavePhase(toFormId(DOCUMENT_PATH), { phase: 'saving' })
+    );
+    expect(
+      within(group).getByText('Saving. You can upload once it finishes.')
+    ).toBeVisible();
+  });
+
   it('still offers Choose from Media when the media provider is read-only', async () => {
     renderField(undefined, createMedia({ features: { readOnly: true } }));
     const group = await fieldGroup('Hero');
@@ -369,6 +382,17 @@ describe('ImageField missing images', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
+  it('captions a missing image "File not found", not its name', async () => {
+    renderField({ hero: 'posts/deleted.jpg' });
+    const group = await fieldGroup('Hero');
+    vi.useFakeTimers();
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await failToLoad(group, 'deleted.jpg');
+    }
+    fireEvent.error(within(group).getByAltText('deleted.jpg'));
+    expect(within(group).getByText('File not found')).toBeVisible();
+  });
+
   it('marks a stored path whose image never loads, and keeps it', async () => {
     renderField({ hero: 'posts/deleted.jpg' });
     const group = await fieldGroup('Hero');
@@ -379,7 +403,7 @@ describe('ImageField missing images', () => {
     }
     fireEvent.error(within(group).getByAltText('deleted.jpg'));
     expect(screen.getByRole('status')).toHaveTextContent(
-      'deleted.jpg is missing from Media'
+      'This image is no longer in Media'
     );
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(
@@ -408,7 +432,7 @@ describe('ImageField missing images', () => {
     }
     fireEvent.error(within(group).getByAltText('photo.jpg'));
     expect(screen.getByRole('status')).toHaveTextContent(
-      'photo.jpg is missing from Media'
+      'This image is no longer in Media'
     );
     vi.useRealTimers();
     await pickFromLibrary(group, 'Replace photo.jpg');

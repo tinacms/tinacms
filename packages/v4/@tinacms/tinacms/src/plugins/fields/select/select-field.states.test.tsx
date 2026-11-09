@@ -112,9 +112,10 @@ describe('select field states', () => {
       />
     );
     await userEvent.click(screen.getByRole('combobox'));
-    const option = await screen.findByRole('option', { name: 'Published' });
+    const option = await screen.findByRole('option', { name: /^Published/ });
     expect(option).toHaveAttribute('aria-disabled', 'true');
-    expect(option).toHaveAttribute('title', 'Needs an approver');
+    expect(option).toHaveTextContent('Needs an approver');
+    expect(option).not.toHaveAttribute('title');
     await userEvent.click(option);
     expect(onChange).not.toHaveBeenCalled();
   });

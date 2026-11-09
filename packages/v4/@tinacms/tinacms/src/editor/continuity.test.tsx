@@ -10,7 +10,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
-import { readDraft } from '../form/drafts';
+import { readDraft, readWaitingDrafts } from '../form/drafts';
 import {
   type FormId,
   type FormStore,
@@ -91,7 +91,7 @@ function StaleDraftProbe() {
       <button type='button' onClick={stale.resume}>
         resume
       </button>
-      <button type='button' onClick={stale.discard}>
+      <button type='button' onClick={() => stale.discard(stale.copies)}>
         dismiss
       </button>
     </>
@@ -577,15 +577,17 @@ describe('form drafts across a reload', () => {
     act(simulateReload);
   };
 
-  it('restores unsaved edits, still dirty', async () => {
+  it('opens on the file after a reload and waits for Resume, never applying the draft', async () => {
     await typeAndReload();
     render(host(pathA, { title: 'Hello' }));
-    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello!');
-    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
-    expect(screen.queryByText('resume')).toBeNull();
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello');
+    expect(screen.getByTestId('status')).toHaveTextContent('pristine');
+    expect(screen.getByText('resume')).toBeVisible();
+    expect(readDraft(toFormId(pathA))).toBeUndefined();
+    expect(readWaitingDrafts(toFormId(pathA))).toHaveLength(1);
   });
 
-  it('opens a stale draft on the file and offers to resume it', async () => {
+  it('opens a draft of an older file on the file and offers to resume it', async () => {
     await typeAndReload();
     let stored: TinaDocument = { title: 'Changed' };
     const onSave: SaveHandler = (document) => {
@@ -604,35 +606,54 @@ describe('form drafts across a reload', () => {
     await waitFor(() => expect(stored).toEqual({ title: 'Hello!' }));
   });
 
-  it('dismisses a stale draft and deletes it', async () => {
+  it('removes every waiting copy when the editor discards, and keeps what was typed since', async () => {
     await typeAndReload();
     render(host(pathA, { title: 'Changed' }));
+    await userEvent.type(await screen.findByLabelText(/^Title\b/), '?');
     await userEvent.click(await screen.findByText('dismiss'));
     expect(screen.queryByText('resume')).toBeNull();
-    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Changed');
-    expect(readDraft(toFormId(pathA))).toBeUndefined();
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Changed?');
+    expect(readWaitingDrafts(toFormId(pathA))).toEqual([]);
+    expect(readDraft(toFormId(pathA))?.values).toEqual({ title: 'Changed?' });
   });
 
-  it('hides the stale draft prompt once the editor starts typing', async () => {
+  it('keeps the waiting copy and its prompt while the editor types', async () => {
+    await typeAndReload();
+    const waiting = readDraft(toFormId(pathA));
+    render(host(pathA, { title: 'Changed' }));
+    await screen.findByText('resume');
+    await userEvent.type(screen.getByLabelText(/^Title\b/), '?');
+    expect(screen.getByText('resume')).toBeVisible();
+    expect(readWaitingDrafts(toFormId(pathA))).toEqual([waiting]);
+    expect(readDraft(toFormId(pathA))?.values).toEqual({ title: 'Changed?' });
+    await userEvent.type(screen.getByLabelText(/^Title\b/), '{Backspace}');
+    expect(screen.getByText('resume')).toBeVisible();
+    expect(readWaitingDrafts(toFormId(pathA))).toEqual([waiting]);
+  });
+
+  it('keeps what was typed under the prompt and stores the draft value as a leftover copy', async () => {
     await typeAndReload();
     render(host(pathA, { title: 'Changed' }));
     await screen.findByText('resume');
     await userEvent.type(screen.getByLabelText(/^Title\b/), '?');
-    expect(screen.queryByText('resume')).toBeNull();
-    await userEvent.type(screen.getByLabelText(/^Title\b/), '{Backspace}');
-    expect(screen.queryByText('resume')).toBeNull();
+    await userEvent.click(screen.getByText('resume'));
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Changed?');
+    expect(readDraft(toFormId(pathA))?.values).toEqual({ title: 'Changed?' });
+    expect(readWaitingDrafts(toFormId(pathA))).toEqual([
+      {
+        values: { title: 'Hello!' },
+        baseline: { title: 'Changed' },
+        leftover: true,
+      },
+    ]);
   });
 
-  it('deletes a resumed draft that no longer changes anything', async () => {
+  it('removes a copy that equals the file, with no prompt', async () => {
     await typeAndReload();
-    const { unmount } = render(host(pathA, { title: 'Hello!' }));
-    await userEvent.click(await screen.findByText('resume'));
-    expect(screen.getByTestId('status')).not.toHaveTextContent('dirty');
-    expect(readDraft(toFormId(pathA))).toBeUndefined();
-    unmount();
-
     render(host(pathA, { title: 'Hello!' }));
     await screen.findByLabelText(/^Title\b/);
     expect(screen.queryByText('resume')).toBeNull();
+    expect(readWaitingDrafts(toFormId(pathA))).toEqual([]);
+    expect(readDraft(toFormId(pathA))).toBeUndefined();
   });
 });
