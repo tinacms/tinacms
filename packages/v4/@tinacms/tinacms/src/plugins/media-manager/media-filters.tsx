@@ -5,6 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@tinacms/ui/components/select';
+import { Icon } from '@tinacms/ui/components/icon';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import {
   Segmented,
@@ -166,7 +167,7 @@ export function LockedAcceptChip({
         render={<span />}
         className='flex items-center gap-1.5 rounded-sm border border-dashed bg-muted px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground'
       >
-        <LockIcon className='size-3.5' />
+        <Icon glyph={LockIcon} size={14} />
         {label}
         <span className='sr-only'>{description}</span>
       </TooltipTrigger>

@@ -1,6 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DocumentForm } from '../../../admin/document-form';
 import { asResolvedConfig } from '../../../config';
 import type {
@@ -38,6 +38,7 @@ const collection: CollectionSchema = {
   fields: [
     t.string({ name: 'title', label: 'Title' }),
     t.array({ name: 'blocks', label: 'Blocks', templates }),
+    t.array({ name: 'locked', label: 'Locked', templates, readOnly: true }),
     t.object({
       name: 'outer',
       label: 'Outer',
@@ -94,18 +95,13 @@ const pick = async (list: HTMLElement, name: string) => {
 };
 
 describe('Blocks field: where a picked block opens', () => {
-  it('opens a top-level block in place, with focus on its grip', async () => {
+  it('opens a top-level block as its own form level, with focus on its first field', async () => {
     renderForm({});
     const blocks = await screen.findByRole('group', { name: 'Blocks' });
     await pick(blocks, 'Add Quote');
-    const card = await within(blocks).findByRole('button', {
-      name: /^Item 1/,
-    });
-    expect(card).toHaveAttribute('aria-expanded', 'true');
-    await waitFor(() => {
-      expect(document.activeElement).toHaveAttribute('data-grip');
-      expect(blocks).toContainElement(document.activeElement as HTMLElement);
-    });
+    const text = await screen.findByRole('textbox', { name: /^Text\b/ });
+    await waitFor(() => expect(text).toHaveFocus());
+    expect(screen.queryByRole('group', { name: 'Blocks' })).toBeNull();
   });
 
   it('opens a block at depth 3 as the next form level, with focus on its first field', async () => {
@@ -199,5 +195,105 @@ describe('Blocks field: nested', () => {
     const cards = within(rows).getAllByRole('button', { name: /^Item \d/ });
     await waitFor(() => expect(cards[0]).toHaveAccessibleName(/1 error/));
     expect(cards[1]).not.toHaveAccessibleName(/error/);
+  });
+});
+
+describe('Blocks field: coming back from a block', () => {
+  const blocks = [
+    { _template: 'quote', text: 'one' },
+    { _template: 'quote', text: 'two' },
+    { _template: 'quote', text: 'three' },
+  ];
+  const gripOf = (list: HTMLElement, index: number) =>
+    list
+      .querySelectorAll('[data-array-item]')
+      [index].querySelector<HTMLElement>('[data-grip]');
+
+  it.each([0, 1, 2])(
+    'puts focus on block %i when Up returns to the list',
+    async (index) => {
+      renderForm({ blocks });
+      const list = await screen.findByRole('group', { name: 'Blocks' });
+      await userEvent.click(
+        within(list).getAllByRole('button', { name: /^Item \d/ })[index]
+      );
+      await userEvent.click(
+        await screen.findByRole('button', { name: 'Up to Blocks' })
+      );
+      const back = await screen.findByRole('group', { name: 'Blocks' });
+      await waitFor(() => expect(gripOf(back, index)).toHaveFocus());
+    }
+  );
+
+  it('centres the card in the form scroller and never calls scrollIntoView', async () => {
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    const { container: scroller } = renderForm({ blocks });
+    const list = await screen.findByRole('group', { name: 'Blocks' });
+    scroller.style.overflowY = 'auto';
+    let scrollTop = 0;
+    Object.defineProperties(scroller, {
+      scrollHeight: { value: 5000 },
+      clientHeight: { value: 500 },
+      scrollTop: { get: () => scrollTop, set: (v) => (scrollTop = v) },
+    });
+    scroller.getBoundingClientRect = () => new DOMRect(0, 0, 800, 500);
+    await userEvent.click(
+      within(list).getAllByRole('button', { name: /^Item \d/ })[1]
+    );
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Up to Blocks' })
+    );
+    const back = await screen.findByRole('group', { name: 'Blocks' });
+    await waitFor(() => expect(gripOf(back, 1)).toHaveFocus());
+    expect(scrollTop).toBe(-250);
+    expect(scrollIntoView).not.toHaveBeenCalled();
+  });
+
+  it.each([0, 2])(
+    'puts focus on read-only block %i, which has no grip, when Up returns',
+    async (index) => {
+      renderForm({ locked: blocks });
+      const list = await screen.findByRole('group', { name: 'Locked' });
+      await userEvent.click(
+        within(list).getAllByRole('button', { name: /^Item \d/ })[index]
+      );
+      await userEvent.click(
+        await screen.findByRole('button', { name: 'Up to Locked' })
+      );
+      const back = await screen.findByRole('group', { name: 'Locked' });
+      await waitFor(() =>
+        expect(
+          within(back).getAllByRole('button', { name: /^Item \d/ })[index]
+        ).toHaveFocus()
+      );
+    }
+  );
+
+  it('puts focus on the block, not its row, when Up leaves a block inside an open list item', async () => {
+    renderForm({
+      rows: [
+        {
+          label: 'Row one',
+          inner: [
+            { _template: 'quote', text: 'one' },
+            { _template: 'quote', text: 'two' },
+          ],
+        },
+      ],
+    });
+    const rows = await screen.findByRole('group', { name: 'Rows' });
+    await userEvent.click(
+      within(rows).getByRole('button', { name: /^Item 1/ })
+    );
+    const inner = await screen.findByRole('group', { name: 'Inner' });
+    await userEvent.click(
+      within(inner).getAllByRole('button', { name: /^Item \d/ })[1]
+    );
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Up to Inner' })
+    );
+    const back = await screen.findByRole('group', { name: 'Inner' });
+    await waitFor(() => expect(gripOf(back, 1)).toHaveFocus());
   });
 });

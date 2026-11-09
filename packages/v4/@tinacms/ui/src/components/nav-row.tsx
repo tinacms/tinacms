@@ -1,13 +1,15 @@
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
 import { cva } from 'class-variance-authority';
-import type { LucideIcon } from 'lucide-react';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps, ComponentType, ReactNode } from 'react';
 
 import { Badge } from '@tinacms/ui/components/badge';
 import { type Glyph, Icon } from '@tinacms/ui/components/icon';
 import { quietControl } from '@tinacms/ui/lib/nav-styles';
 import { cn } from '@tinacms/ui/lib/utils';
+
+/** A named glyph, or any component that takes a `className`, such as a lucide icon. */
+type NavRowIcon = Glyph | ComponentType<{ className?: string }>;
 
 type NavRowKind = 'group' | 'folder' | 'doc' | 'more' | 'section';
 
@@ -27,12 +29,22 @@ const navRowVariants = cva(
         section: 'gap-2.5 px-2.5 hover:text-slate-600',
       },
       selected: {
-        true: 'bg-selected font-semibold text-foreground hover:bg-selected hover:text-foreground',
+        true: 'font-semibold text-foreground hover:text-foreground',
         false: '',
       },
       nested: { true: '', false: '' },
     },
     compoundVariants: [
+      {
+        kind: ['group', 'folder', 'doc', 'more'],
+        selected: true,
+        className: 'bg-selected hover:bg-selected',
+      },
+      {
+        kind: 'section',
+        selected: true,
+        className: 'bg-pressed hover:bg-pressed',
+      },
       {
         selected: true,
         nested: true,
@@ -68,13 +80,17 @@ type NavRowKindProps =
       kind: 'section';
       /** It opens a panel beside the side nav. */
       opens?: boolean;
+      /** Amber, shown from 1. */
+      count?: number;
+      /** Defaults to "N unsaved". */
+      countLabel?: string;
     };
 
 type NavRowCommonProps = {
   /** Long words end in an ellipsis. Put the full name in `title`. */
   children?: ReactNode;
   /** Groups, folders and documents have one by default. */
-  icon?: Glyph | LucideIcon;
+  icon?: NavRowIcon;
   selected?: boolean;
   /** A grey outlined label. */
   badge?: string;
@@ -93,9 +109,10 @@ function Lead({
   glyph,
   selected,
 }: {
-  glyph: Glyph | LucideIcon | undefined;
+  glyph: NavRowIcon | undefined;
   selected: boolean;
 }) {
+  const Custom = typeof glyph === 'string' ? undefined : glyph;
   return glyph ? (
     <span
       data-slot='nav-row-icon'
@@ -104,7 +121,11 @@ function Lead({
         selected && 'text-primary'
       )}
     >
-      <Icon glyph={glyph} size={16} />
+      {Custom ? (
+        <Custom className='size-4' />
+      ) : typeof glyph === 'string' ? (
+        <Icon glyph={glyph} size={16} />
+      ) : null}
     </span>
   ) : null;
 }
@@ -223,6 +244,8 @@ function DocParts({
 
 function SectionParts({
   opens = false,
+  count = 0,
+  countLabel = `${count} unsaved`,
   children,
   icon,
   badge,
@@ -233,6 +256,7 @@ function SectionParts({
       <Lead glyph={icon} selected={selected} />
       <Label>{children}</Label>
       <LabelBadge badge={badge} />
+      <Badge kind='count' tone='change' count={count} srLabel={countLabel} />
       {opens ? <Chevron end /> : null}
     </>
   );
@@ -300,8 +324,8 @@ function splitKindProps(
       ];
     }
     case 'section': {
-      const { kind, opens, ...dom } = props;
-      return [{ kind, opens }, dom];
+      const { kind, opens, count, countLabel, ...dom } = props;
+      return [{ kind, opens, count, countLabel }, dom];
     }
     case 'more': {
       const { kind, ...dom } = props;

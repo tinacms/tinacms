@@ -9,6 +9,7 @@ import {
   itemOpensNextLevel,
   levelDrillsIn,
   levelsFor,
+  lockAbove,
   useFormViewStore,
 } from './form-view-state';
 
@@ -123,6 +124,24 @@ const fields = [
   }),
   t.array({ name: 'tags', label: 'Tags', of: t.string({ name: 'tag' }) }),
 ];
+
+describe('lockAbove', () => {
+  const drillable = [
+    t.array({
+      name: 'items',
+      label: 'Items',
+      readOnly: true,
+      of: t.string({ name: 'item' }),
+    }),
+  ];
+
+  it('keeps the lock of a list whose item has no fieldset', () => {
+    expect(lockAbove('items.0', drillable, () => undefined)).toEqual({
+      disabled: false,
+      readOnly: true,
+    });
+  });
+});
 
 describe('fieldsAlong and levelsFor', () => {
   const none = () => undefined;

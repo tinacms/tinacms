@@ -5,7 +5,6 @@ import {
 } from '@tinacms/ui/components/field-wrapper';
 import { cn } from '@tinacms/ui/lib/utils';
 import { type DragEvent, type Ref, useState } from 'react';
-import { mediaNameOf } from '../../media-manager/media-types';
 import type { ImageCoverLook } from './image-field.schema';
 import {
   ImageTile,
@@ -36,8 +35,8 @@ export interface ImageFieldViewProps
   primaryRef?: Ref<HTMLButtonElement>;
 }
 
-const missingWarning = (path: string): string =>
-  `${mediaNameOf(path)} is missing from Media. Replace or remove it.`;
+export const MISSING_IMAGE_WARNING =
+  'This image is no longer in Media. Replace it, or remove it.';
 
 export function ImageFieldView({
   label,
@@ -96,7 +95,7 @@ export function ImageFieldView({
   const shown = look ?? 'default';
   const allWarnings =
     path !== null && (missing || tileMissing)
-      ? [...warnings, missingWarning(path)]
+      ? [...warnings, MISSING_IMAGE_WARNING]
       : warnings;
 
   return (

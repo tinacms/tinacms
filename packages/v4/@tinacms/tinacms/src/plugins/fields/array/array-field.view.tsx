@@ -376,12 +376,10 @@ export function ArrayFieldView({
         readOnly={readOnly}
         disabled={disabled}
       >
-        {items.length === 0 ? (
+        {items.length === 0 && (emptyText ?? readOnly) ? (
           <p className='px-1 py-1.5 text-sm text-muted-foreground'>
             {emptyText ??
-              (readOnly
-                ? 'This list is empty.'
-                : 'This list is empty. Add the first item below.')}
+              `No ${typeof label === 'string' ? label.toLowerCase() : 'items'}.`}
           </p>
         ) : null}
         <DndContext
@@ -459,7 +457,6 @@ export function ArrayDrillInView({
         summary={countWords(count)}
         invalidCount={invalidCount}
         disabled={disabled}
-        readOnly={readOnly}
         onOpen={onDrillIn ?? (() => {})}
       />
     </FieldWrapper>

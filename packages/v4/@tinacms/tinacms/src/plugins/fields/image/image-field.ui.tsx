@@ -14,6 +14,7 @@ import {
   useFieldValue,
   useMediaSlice,
 } from '../../../editor';
+import { useSaveSummary } from '../../../form/form-store';
 import { MediaBrowser } from '../../media-manager/media-browser';
 import { useImageUpload } from './image-upload';
 import type { ImageFieldSchema } from './image-field.schema';
@@ -26,6 +27,7 @@ export function ImageField() {
   const path = typeof value === 'string' ? value : null;
   const frame = useFieldFrame();
   const media = useMediaSlice();
+  const saving = useSaveSummary().state === 'saving';
   const primaryRef = useRef<HTMLButtonElement>(null);
   const focusAfterRemove = useRef(false);
   const [picking, setPicking] = useState(false);
@@ -63,6 +65,9 @@ export function ImageField() {
         resolveUrl={media.resolveUrl}
         primaryRef={primaryRef}
         busy={uploading}
+        holdReason={
+          saving ? 'Saving. You can upload once it finishes.' : undefined
+        }
         previewKey={stored}
         onChoose={choose}
         onReplace={choose}

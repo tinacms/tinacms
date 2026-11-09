@@ -81,6 +81,14 @@ const STATUS: Record<BadgeStatus, { text: string; tone: BadgeTone }> = {
 
 type CountTone = 'error' | 'change';
 
+/** What a count counts. It sets the tone and, without `srLabel`, the words screen readers hear. */
+type CountOf = 'errors' | 'changes';
+
+const COUNT_OF: Record<CountOf, CountTone> = {
+  errors: 'error',
+  changes: 'change',
+};
+
 type SpanProps = Omit<ComponentProps<'span'>, 'children'> & {
   /** Pushes the badge to the end of its row. */
   end?: boolean;
@@ -115,6 +123,16 @@ type BadgeProps = SpanProps &
         tone?: CountTone;
         corner?: false;
         srLabel: string;
+        of?: CountOf;
+      }
+    /** `of` words the count for screen readers, such as ", 3 errors", and sets the tone. */
+    | {
+        kind: 'count';
+        count?: number;
+        tone?: never;
+        corner?: false;
+        srLabel?: never;
+        of: CountOf;
       }
     /** `tone='error'` is the red dot on a step or card that holds an error. */
     | { kind: 'dot'; tone?: CountTone; srLabel?: string }
@@ -220,11 +238,16 @@ function Badge(props: BadgeProps) {
       const {
         kind,
         count: _count,
-        tone = 'change',
+        tone: toneProp,
         corner: _corner,
-        srLabel,
+        srLabel: srLabelProp,
+        of,
         ...rest
       } = props;
+      const tone = toneProp ?? (of ? COUNT_OF[of] : 'change');
+      const noun = of && props.count === 1 ? of.slice(0, -1) : of;
+      const srLabel =
+        srLabelProp ?? (of ? `, ${props.count} ${noun}` : undefined);
       return (
         <Pill
           variant={{ kind, countTone: tone }}
@@ -255,5 +278,12 @@ function Badge(props: BadgeProps) {
 
 type BadgeKind = NonNullable<BadgeProps['kind']>;
 
-export type { BadgeKind, BadgeProps, BadgeStatus, BadgeTone, CountTone };
+export type {
+  BadgeKind,
+  BadgeProps,
+  BadgeStatus,
+  BadgeTone,
+  CountOf,
+  CountTone,
+};
 export { Badge };

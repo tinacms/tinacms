@@ -153,7 +153,7 @@ export function ImageTile({
         title={path ?? placeholder}
         className='truncate text-xs text-muted-foreground'
       >
-        {path === null ? placeholder : missing ? `${name} is missing` : name}
+        {path === null ? placeholder : missing ? 'File not found' : name}
       </figcaption>
     </figure>
   );

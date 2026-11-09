@@ -20,6 +20,8 @@ import { cn } from '@tinacms/ui/lib/utils';
 type BreadcrumbStep = {
   label: string;
   onClick?: () => void;
+  /** A link to the step, for a step that is a page of its own. `onClick` wins when both are set. */
+  href?: string;
   /** Marks this step as the current page. Otherwise the last step is, unless it has `onClick`. */
   current?: boolean;
   /** The open document's file, shown on hover. */
@@ -73,6 +75,8 @@ const foldVariants = cva(
 type FoldItem = {
   label: string;
   onClick?: () => void;
+  /** A link for a folded step that is a page of its own. `onClick` wins when both are set. */
+  href?: string;
   /** Shown after the label, such as an error dot. */
   marks?: ReactNode;
 };
@@ -105,7 +109,14 @@ function BreadcrumbFold({
       <DropdownMenuContent aria-label={label} className='w-60'>
         {items.map((item, index) => (
           // Two levels can share a name, so the position is the key.
-          <DropdownMenuItem key={index} icon='folder' onClick={item.onClick}>
+          <DropdownMenuItem
+            key={index}
+            icon='folder'
+            onClick={item.onClick}
+            render={
+              item.href && !item.onClick ? <a href={item.href} /> : undefined
+            }
+          >
             {item.label}
             {item.marks}
           </DropdownMenuItem>
@@ -138,6 +149,13 @@ function Step({
       </span>
     );
   }
+  if (!onClick && step.href) {
+    return (
+      <a href={step.href} className={stepVariants({ size })}>
+        {step.label}
+      </a>
+    );
+  }
   if (!onClick) {
     return (
       <span
@@ -161,6 +179,8 @@ type BreadcrumbProps = Omit<ComponentProps<'nav'>, 'children'> & {
   /** Top first. The separators are drawn for you. */
   items: readonly BreadcrumbStep[];
   size?: BreadcrumbSize;
+  /** A path with more steps keeps the first and the last two, and folds the rest. Defaults to 3. */
+  max?: number;
 };
 
 /**
@@ -170,11 +190,12 @@ type BreadcrumbProps = Omit<ComponentProps<'nav'>, 'children'> & {
 function Breadcrumb({
   items,
   size = 'md',
+  max,
   'aria-label': label = 'Breadcrumb',
   className,
   ...props
 }: BreadcrumbProps) {
-  const { shown, hidden } = foldPath(items);
+  const { shown, hidden } = foldPath(items, max);
   const pinned = items.some((step) => step.current === true);
 
   // A pressed step often turns into the current page, a span, so its button and focus go away.
@@ -232,6 +253,7 @@ function Breadcrumb({
                   size={size}
                   items={hidden.map((item) => ({
                     label: item.label,
+                    href: item.href,
                     onClick: press(item.onClick),
                   }))}
                 />

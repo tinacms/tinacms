@@ -302,3 +302,12 @@ const validateFieldWithCore: typeof validateField = (
     validators: coreValidatorRegistry,
     ...options,
   });
+
+describe('datetime schema', () => {
+  it('does not take min or max, which v4 leaves to validators', () => {
+    // @ts-expect-error min is not an option of t.datetime
+    t.datetime({ name: 'when', min: '2025-01-01T00:00' });
+    // @ts-expect-error max is not an option of t.datetime
+    t.datetime({ name: 'when', max: '2025-12-31T23:59' });
+  });
+});

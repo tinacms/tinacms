@@ -8,6 +8,7 @@ import { DrillInField } from './drill-in-field';
 import { drillsInAt } from './form-view-state';
 import {
   FieldAddressContext,
+  FieldLockContext,
   FieldSchemaContext,
   FormScopeContext,
   TinaRuntimeContext,
@@ -24,6 +25,7 @@ export interface FieldNodeProps {
 export function FieldNode({ address, node }: FieldNodeProps) {
   const runtime = use(TinaRuntimeContext);
   const scope = use(FormScopeContext);
+  const parentLock = use(FieldLockContext);
   if (!runtime || !scope) {
     throw new Error(
       '<FieldNode> must be used within a TinaProvider and FormProvider'
@@ -63,21 +65,27 @@ export function FieldNode({ address, node }: FieldNodeProps) {
   const Component = drills
     ? (descriptor.DrillInComponent ?? DrillInField)
     : descriptor.Component;
+  const lock = {
+    disabled: parentLock.disabled || node.disabled === true,
+    readOnly: parentLock.readOnly || node.readOnly === true,
+  };
   return (
     <FieldAddressContext value={address}>
       <FieldSchemaContext value={node}>
-        <div
-          ref={frame}
-          style={{ display: 'contents' }}
-          onFocus={markActive}
-          onBlur={(event) => {
-            if (!event.currentTarget.contains(event.relatedTarget)) {
-              scope.view.getState().touch(address);
-            }
-          }}
-        >
-          <Component />
-        </div>
+        <FieldLockContext value={lock}>
+          <div
+            ref={frame}
+            style={{ display: 'contents' }}
+            onFocus={markActive}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) {
+                scope.view.getState().touch(address);
+              }
+            }}
+          >
+            <Component />
+          </div>
+        </FieldLockContext>
       </FieldSchemaContext>
     </FieldAddressContext>
   );
