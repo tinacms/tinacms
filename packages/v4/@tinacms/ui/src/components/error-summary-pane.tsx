@@ -339,6 +339,8 @@ function TinaErrorSummaryPane({
   const ref = useRef<HTMLElement>(null);
   const [shown, setShown] = useState(open);
   const wasOpen = useRef(open);
+  const layoutRef = useRef(layout);
+  layoutRef.current = layout;
 
   // Slide in when `open` turns on, out when it turns off; the pane is hidden only once it has slid out.
   useLayoutEffect(() => {
@@ -350,7 +352,7 @@ function TinaErrorSummaryPane({
     wasOpen.current = open;
     const reduced = reducedMotion();
     const away =
-      layout === 'docked'
+      layoutRef.current === 'docked'
         ? 'translateX(100%)'
         : 'translateX(calc(100% + 0.75rem))';
     const frames: Keyframe[] = reduced
@@ -381,7 +383,7 @@ function TinaErrorSummaryPane({
       () => setShown(false)
     );
     return () => animation?.cancel();
-  }, [open, layout]);
+  }, [open]);
 
   useEffect(() => {
     if (!open || !shown || !autoFocusRow) return;
@@ -559,10 +561,12 @@ function SuccessFace({
     if (!animation || !host) return;
     // The hold waits while the editor points at or works inside the pane.
     const pause = () => animation.pause();
+    const inside = () =>
+      host.matches(':hover') || host.contains(document.activeElement);
     const resume = () => {
-      if (!host.matches(':hover') && !host.contains(document.activeElement))
-        animation.play();
+      if (!inside()) animation.play();
     };
+    if (inside()) pause();
     // Focus moving between two controls in the pane leaves it for a moment; look once it has landed.
     const resumeAfterFocus = () => requestAnimationFrame(resume);
     host.addEventListener('pointerenter', pause);

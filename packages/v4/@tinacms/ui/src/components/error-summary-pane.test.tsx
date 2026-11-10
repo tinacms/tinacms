@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -146,6 +146,60 @@ describe('the All fixed endings', () => {
     ).toBeVisible();
     finish();
     expect(onDone).toHaveBeenCalled();
+  });
+});
+
+describe('the pane timer and exit animation', () => {
+  const originalAnimate = Element.prototype.animate;
+  afterEach(() => {
+    Element.prototype.animate = originalAnimate;
+  });
+
+  const trackAnimations = () => {
+    const made: {
+      cancel: ReturnType<typeof vi.fn>;
+      pause: ReturnType<typeof vi.fn>;
+      finish: () => void;
+    }[] = [];
+    Element.prototype.animate = (() => {
+      let onFinish = () => {};
+      const animation = {
+        addEventListener: (_event: string, handler: () => void) => {
+          onFinish = handler;
+        },
+        cancel: vi.fn(),
+        pause: vi.fn(),
+        play: vi.fn(),
+      };
+      made.push({ ...animation, finish: () => onFinish() });
+      return animation;
+    }) as unknown as typeof Element.prototype.animate;
+    return made;
+  };
+
+  it('holds the success timer when focus is already inside the pane', () => {
+    const made = trackAnimations();
+    const { rerender } = render(<TinaErrorSummaryPane errors={ERRORS} wide />);
+    act(() => screen.getByRole('button', { name: 'Pin' }).focus());
+    made.length = 0;
+    rerender(<TinaErrorSummaryPane errors={[]} status='success' wide />);
+    const timer = made.find((m) => m.pause.mock.calls.length > 0);
+    expect(timer).toBeDefined();
+  });
+
+  it('finishes hiding the pane when the layout changes while it slides out', () => {
+    const made = trackAnimations();
+    const { rerender } = render(
+      <TinaErrorSummaryPane errors={ERRORS} pinned wide />
+    );
+    rerender(<TinaErrorSummaryPane errors={ERRORS} pinned wide open={false} />);
+    const exit = made[made.length - 1];
+    rerender(
+      <TinaErrorSummaryPane errors={ERRORS} pinned wide={false} open={false} />
+    );
+    expect(exit.cancel).not.toHaveBeenCalled();
+    act(() => exit.finish());
+    expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
   });
 });
 
