@@ -52,7 +52,13 @@ export function DiscardConfirm({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogClose
-            render={<Button ref={focusOnMount} variant='outline' />}
+            render={
+              <Button
+                ref={focusOnMount}
+                variant='outline'
+                className='focus:shadow-focus-ring'
+              />
+            }
           >
             Cancel
           </AlertDialogClose>
