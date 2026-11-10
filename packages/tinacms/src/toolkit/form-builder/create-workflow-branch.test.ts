@@ -89,26 +89,58 @@ describe('createWorkflowBranch', () => {
     expect(options.create).toHaveBeenCalledTimes(1);
   });
 
-  it('falls back to eight UUID characters after five word collisions', async () => {
+  it('falls back to an incrementing number after five word collisions', async () => {
     const options = setup(true);
-    options.branchExists
-      .mockResolvedValue(true)
-      .mockImplementation(async (name) => !/-[0-9a-f]{8}$/.test(name));
+    options.branchExists.mockImplementation(
+      async (name) => name !== `${branchName}-1`
+    );
     const result = await createWorkflowBranch(options);
-    expect(result.branchName).toMatch(/^tina\/rules\/example-[0-9a-f]{8}$/);
+    expect(result.branchName).toBe(`${branchName}-1`);
     expect(options.branchExists).toHaveBeenCalledTimes(6);
     expect(options.create).toHaveBeenCalledTimes(1);
   });
 
-  it('stops after the shortened UUID also collides during creation', async () => {
+  it('skips existing numeric suffixes in order', async () => {
+    const options = setup(true);
+    options.branchExists.mockImplementation(
+      async (name) => name !== `${branchName}-3`
+    );
+    expect(await createWorkflowBranch(options)).toEqual({
+      branchName: `${branchName}-3`,
+    });
+    expect(options.branchExists.mock.calls.slice(5)).toEqual([
+      [`${branchName}-1`],
+      [`${branchName}-2`],
+      [`${branchName}-3`],
+    ]);
+    expect(options.create).toHaveBeenCalledExactlyOnceWith(`${branchName}-3`);
+  });
+
+  it('increments again when a numbered branch is created concurrently', async () => {
+    const options = setup(true);
+    options.branchExists.mockImplementation(
+      async (name) => !/-\d+$/.test(name)
+    );
+    options.create.mockRejectedValueOnce(collision());
+    expect(await createWorkflowBranch(options)).toEqual({
+      branchName: `${branchName}-2`,
+    });
+    expect(options.create.mock.calls).toEqual([
+      [`${branchName}-1`],
+      [`${branchName}-2`],
+    ]);
+  });
+
+  it('stops after twenty numeric creation collisions', async () => {
     const options = setup();
     options.create.mockRejectedValue(collision());
     await expect(createWorkflowBranch(options)).rejects.toMatchObject({
       errorCode: 'BRANCH_EXISTS',
     });
-    expect(options.create).toHaveBeenCalledTimes(7);
+    expect(options.create).toHaveBeenCalledTimes(26);
+    expect(options.create).toHaveBeenLastCalledWith(`${branchName}-20`);
     expect(new Set(options.create.mock.calls.map(([name]) => name)).size).toBe(
-      7
+      26
     );
   });
 
@@ -118,7 +150,8 @@ describe('createWorkflowBranch', () => {
     await expect(createWorkflowBranch(options)).rejects.toMatchObject({
       errorCode: 'BRANCH_EXISTS',
     });
-    expect(options.branchExists).toHaveBeenCalledTimes(6);
+    expect(options.branchExists).toHaveBeenCalledTimes(25);
+    expect(options.branchExists).toHaveBeenLastCalledWith(`${branchName}-20`);
     expect(options.create).not.toHaveBeenCalled();
   });
 

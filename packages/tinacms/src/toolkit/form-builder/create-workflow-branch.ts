@@ -24,6 +24,10 @@ const BRANCH_WORDS = [
   'willow',
 ];
 
+const WORD_ATTEMPTS = 5;
+const NUMBER_ATTEMPTS = 20;
+const MAX_RENAMES = WORD_ATTEMPTS + NUMBER_ATTEMPTS;
+
 export async function createWorkflowBranch<T>({
   branchName,
   targetBranchExists,
@@ -40,7 +44,7 @@ export async function createWorkflowBranch<T>({
   const words = [...BRANCH_WORDS];
   let candidate = branchName;
 
-  for (let attempt = 0; attempt <= 6; attempt++) {
+  for (let attempt = 0; attempt <= MAX_RENAMES; attempt++) {
     signal?.throwIfAborted();
     const exists =
       attempt === 0 ? targetBranchExists : await branchExists(candidate);
@@ -57,18 +61,18 @@ export async function createWorkflowBranch<T>({
           error === null ||
           !('errorCode' in error) ||
           error.errorCode !== EDITORIAL_WORKFLOW_ERROR.BRANCH_EXISTS ||
-          attempt === 6
+          attempt === MAX_RENAMES
         ) {
           throw error;
         }
       }
     }
 
-    if (attempt === 6) break;
+    if (attempt === MAX_RENAMES) break;
     const suffix =
-      attempt < 5
+      attempt < WORD_ATTEMPTS
         ? words.splice(Math.floor(Math.random() * words.length), 1)[0]
-        : crypto.randomUUID().slice(0, 8);
+        : attempt - WORD_ATTEMPTS + 1;
     candidate = `${branchName}-${suffix}`;
   }
 
