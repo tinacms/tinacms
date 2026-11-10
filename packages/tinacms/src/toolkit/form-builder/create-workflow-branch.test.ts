@@ -136,11 +136,35 @@ describe('createWorkflowBranch', () => {
     );
   });
 
-  it('does not create anything if the branch list cannot be loaded', async () => {
+  it('still creates a branch if the branch list cannot be loaded', async () => {
     const options = setup();
-    const error = new Error('Unavailable');
-    options.listBranchNames.mockRejectedValue(error);
-    await expect(createWorkflowBranch(options)).rejects.toBe(error);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    options.listBranchNames.mockRejectedValue(new Error('Unavailable'));
+    expect(await createWorkflowBranch(options)).toEqual({ branchName });
+    expect(options.create).toHaveBeenCalledExactlyOnceWith(branchName);
+  });
+
+  it('retries a collision when the branch list cannot be loaded', async () => {
+    const options = setup(true);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    options.listBranchNames.mockRejectedValue(new Error('Unavailable'));
+    options.create.mockRejectedValueOnce(collision());
+    expect(await createWorkflowBranch(options)).toEqual({
+      branchName: `${branchName}-llama`,
+    });
+    expect(options.create).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not create a branch if a failed lookup was cancelled', async () => {
+    const options = setup();
+    const controller = new AbortController();
+    options.listBranchNames.mockImplementation(async () => {
+      controller.abort();
+      throw new Error('Aborted');
+    });
+    await expect(
+      createWorkflowBranch({ ...options, signal: controller.signal })
+    ).rejects.toMatchObject({ name: 'AbortError' });
     expect(options.create).not.toHaveBeenCalled();
   });
 

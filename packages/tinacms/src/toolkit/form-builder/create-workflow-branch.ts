@@ -1,4 +1,7 @@
-import { EDITORIAL_WORKFLOW_ERROR } from './editorial-workflow-constants';
+import {
+  EDITORIAL_WORKFLOW_ERROR,
+  type EditorialWorkflowErrorDetails,
+} from './editorial-workflow-constants';
 
 export const BRANCH_WORDS = [
   'tina',
@@ -62,7 +65,15 @@ export async function createWorkflowBranch<T extends { branchName: string }>({
   signal?: AbortSignal;
 }): Promise<T> {
   signal?.throwIfAborted();
-  const existing = new Set(await listBranchNames());
+  let branchNames: string[] = [];
+  try {
+    branchNames = await listBranchNames();
+  } catch (error) {
+    if (!signal?.aborted) {
+      console.error('Could not list branches before creating a branch:', error);
+    }
+  }
+  const existing = new Set(branchNames);
   signal?.throwIfAborted();
   if (targetBranchExists) existing.add(branchName);
 
@@ -74,14 +85,10 @@ export async function createWorkflowBranch<T extends { branchName: string }>({
     } catch (error) {
       // Only a confirmed creation collision is safe to retry: other failures
       // may have already written content or opened a pull request.
-      if (
-        typeof error !== 'object' ||
-        error === null ||
-        !('errorCode' in error) ||
-        error.errorCode !== EDITORIAL_WORKFLOW_ERROR.BRANCH_EXISTS ||
-        attempt === MAX_CREATION_ATTEMPTS - 1
-      )
-        throw error;
+      if (!(error instanceof Error)) throw error;
+      const { errorCode } = error as EditorialWorkflowErrorDetails;
+      if (errorCode !== EDITORIAL_WORKFLOW_ERROR.BRANCH_EXISTS) throw error;
+      if (attempt === MAX_CREATION_ATTEMPTS - 1) throw error;
       existing.add(candidate);
     }
   }
