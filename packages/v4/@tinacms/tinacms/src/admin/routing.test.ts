@@ -3,12 +3,18 @@ import {
   type AdminRoute,
   COLLECTIONS_ROUTE,
   formatAdminRoute,
+  HOME_ROUTE,
   parseAdminRoute,
 } from './routing';
 
 describe('admin routing', () => {
   const routes: AdminRoute[] = [
     { view: 'collections' },
+    { view: 'home' },
+    { view: 'media' },
+    { view: 'tools' },
+    { view: 'settings' },
+    { view: 'collections', unsavedOnly: true },
     { view: 'collection', collection: 'post' },
     { view: 'document', collection: 'post', path: 'content/posts/hello.mdx' },
     { view: 'screen', screen: 'media', segments: [] },
@@ -38,12 +44,23 @@ describe('admin routing', () => {
     expect(parseAdminRoute(formatAdminRoute(route))).toEqual(route);
   });
 
-  it.each(['', '#', '#/', '#/nonsense', '#/collections', '#/collections/'])(
-    'falls back to the collection list for %j',
+  it.each(['', '#', '#/', '#/nonsense', '#/home', '#/changes'])(
+    'opens Home for %j',
+    (hash) => {
+      expect(parseAdminRoute(hash)).toEqual(HOME_ROUTE);
+    }
+  );
+
+  it.each(['#/collections', '#/collections/'])(
+    'opens the collection list for %j',
     (hash) => {
       expect(parseAdminRoute(hash)).toEqual(COLLECTIONS_ROUTE);
     }
   );
+
+  it('writes Home as the landing hash', () => {
+    expect(formatAdminRoute(HOME_ROUTE)).toBe('#/');
+  });
 
   it('reads a hash written without the leading slash', () => {
     expect(parseAdminRoute('#collections/post')).toEqual({
@@ -85,7 +102,7 @@ describe('admin routing for plugin screens', () => {
   });
 
   it.each(['#/screens', '#/screens/'])('falls back for %j', (hash) => {
-    expect(parseAdminRoute(hash)).toEqual(COLLECTIONS_ROUTE);
+    expect(parseAdminRoute(hash)).toEqual(HOME_ROUTE);
   });
 });
 
@@ -96,6 +113,6 @@ describe('parseAdminRoute on input a user can type', () => {
     '#/collections/%',
   ])('falls back rather than throwing on %j', (hash) => {
     expect(() => parseAdminRoute(hash)).not.toThrow();
-    expect(parseAdminRoute(hash)).toEqual(COLLECTIONS_ROUTE);
+    expect(parseAdminRoute(hash)).toEqual(HOME_ROUTE);
   });
 });

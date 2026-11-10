@@ -17,7 +17,7 @@ export default defineClientPlugin({
       layout: 'block',
       labelable: false,
       drillable: true,
-      // An explicit `display` wins at every depth; unset leaves the depth rule.
+      // An explicit `display` wins above level 3. From level 3 an object always drills in.
       drillsIn: (node) => {
         const { display } = asObjectFieldSchema(node);
         return display === undefined ? undefined : display === 'drillIn';

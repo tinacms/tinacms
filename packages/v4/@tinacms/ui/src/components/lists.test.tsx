@@ -380,6 +380,6 @@ describe('DataTable', () => {
     expect(
       screen.getByRole('textbox', { name: 'Search titles' })
     ).toBeVisible();
-    expect(screen.getByText(/Showing 11 to 20 of 48/)).toBeInTheDocument();
+    expect(screen.getByText(/Showing 11–20 of 48/)).toBeInTheDocument();
   });
 });

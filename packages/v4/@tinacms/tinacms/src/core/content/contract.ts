@@ -8,6 +8,8 @@ import type { TinaDocument } from '../schema/types';
 // document comes from `get`.
 export interface DocumentSummary {
   path: string;
+  /** The document's name for people, such as its title. Pickers show it above the path. */
+  title?: string;
 }
 
 export interface DocumentEntry extends DocumentSummary {

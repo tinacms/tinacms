@@ -65,7 +65,7 @@ describe('image field states', () => {
   it('shows a missing image as a status, not an alert', () => {
     render(<ImageFieldView {...imageFieldState('missing image')} />);
     expect(screen.getByRole('status')).toHaveTextContent(
-      'deleted.png is missing from Media'
+      'This image is no longer in Media'
     );
     expect(screen.queryByRole('alert')).toBeNull();
     expect(

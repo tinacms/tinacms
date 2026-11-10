@@ -57,6 +57,7 @@ export {
   useActivation,
   useInvalidFieldCount,
   useInvalidFieldCounts,
+  useExpansion,
   useIsOpenLevel,
   useListItems,
   useOpenLevel,

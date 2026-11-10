@@ -9,6 +9,7 @@ import {
   itemOpensNextLevel,
   levelDrillsIn,
   levelsFor,
+  lockAbove,
   useFormViewStore,
 } from './form-view-state';
 
@@ -124,6 +125,24 @@ const fields = [
   t.array({ name: 'tags', label: 'Tags', of: t.string({ name: 'tag' }) }),
 ];
 
+describe('lockAbove', () => {
+  const drillable = [
+    t.array({
+      name: 'items',
+      label: 'Items',
+      readOnly: true,
+      of: t.string({ name: 'item' }),
+    }),
+  ];
+
+  it('keeps the lock of a list whose item has no fieldset', () => {
+    expect(lockAbove('items.0', drillable, () => undefined)).toEqual({
+      disabled: false,
+      readOnly: true,
+    });
+  });
+});
+
 describe('fieldsAlong and levelsFor', () => {
   const none = () => undefined;
 
@@ -176,5 +195,22 @@ describe('useFormViewStore', () => {
     expect(result.current).toBe(first);
     rerender({ id: 'b' });
     expect(result.current).not.toBe(first);
+  });
+
+  it('shifts touched addresses when an item is removed', () => {
+    const { result } = renderHook(() => useFormViewStore(toFormId('form-1')));
+    result.current.getState().touch('authors.0.name');
+    result.current.getState().touch('authors.2.name');
+    result.current.getState().removeListItem('authors', 0);
+    expect(result.current.getState().touched.has('authors.0.name')).toBe(false);
+    expect(result.current.getState().touched.has('authors.1.name')).toBe(true);
+  });
+
+  it('shifts touched addresses when an item is moved', () => {
+    const { result } = renderHook(() => useFormViewStore(toFormId('form-2')));
+    result.current.getState().touch('authors.0.name');
+    result.current.getState().moveListItem('authors', 0, 2);
+    expect(result.current.getState().touched.has('authors.0.name')).toBe(false);
+    expect(result.current.getState().touched.has('authors.2.name')).toBe(true);
   });
 });

@@ -127,6 +127,29 @@ const renderField = (
     </TinaProvider>
   );
 
+const openItems = async () => {
+  await screen.findAllByRole('group');
+  for (const head of screen.queryAllByRole('button', { expanded: false })) {
+    if (
+      !/^(Actions for|Move|Add a block)/.test(
+        head.getAttribute('aria-label') ?? head.textContent ?? ''
+      )
+    ) {
+      await userEvent.click(head);
+    }
+  }
+};
+
+const chooseAction = async (item: number, action: string) => {
+  const trigger = await screen.findByRole('button', {
+    name: `Actions for Item ${item}`,
+  });
+  await userEvent.click(trigger);
+  await userEvent.click(
+    await screen.findByRole('menuitem', { name: new RegExp(`^${action}`) })
+  );
+};
+
 describe('ObjectField rendering', () => {
   it('renders each nested field with its own label and value', async () => {
     renderField({ seo: { title: 'Home', views: 10 } });
@@ -343,10 +366,9 @@ describe('ObjectField composed with array', () => {
       },
       postCollection
     );
+    await openItems();
     await screen.findAllByLabelText('Bio');
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Remove item 2' })
-    );
+    await chooseAction(2, 'Remove');
     // Nested controls remount under a null object and may register empty
     // children. The removed item's values must not appear on the survivors.
     await waitFor(() => {

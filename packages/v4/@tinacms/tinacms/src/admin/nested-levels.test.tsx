@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import userEvent from '@testing-library/user-event';
+import { Toaster } from '@tinacms/ui/components/sonner';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
@@ -196,7 +197,7 @@ describe('nested form levels', () => {
 
   it('keeps showing the error of an edited field after a save is tried', async () => {
     const user = userEvent.setup();
-    renderForm();
+    renderForm(<Toaster />);
     await user.click(await screen.findByRole('button', { name: 'Open Three' }));
     await user.clear(await screen.findByLabelText(/^Handle\b/));
     await user.click(await screen.findByRole('button', { name: /Up to Two/ }));
@@ -215,7 +216,15 @@ describe('nested form levels', () => {
       screen.getByRole('navigation', { name: 'Field path' })
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+    );
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Discard',
+      })
+    );
     expect(screen.queryByRole('navigation', { name: 'Field path' })).toBeNull();
     expect(
       await screen.findByRole('button', { name: 'Open Three' })
@@ -447,5 +456,56 @@ describe('a list at level 3', () => {
     expect(
       await screen.findByRole('button', { name: /^Open links/ })
     ).toHaveTextContent('1 item');
+  });
+});
+
+describe('an open level inside a locked field', () => {
+  const lockedCollection: CollectionSchema = {
+    name: 'page',
+    label: 'Pages',
+    format: 'mdx',
+    fields: [
+      t.array({
+        name: 'blocks',
+        label: 'Blocks',
+        readOnly: true,
+        templates: [
+          {
+            name: 'hero',
+            label: 'Hero',
+            fields: [t.string({ name: 'text', label: 'Text' })],
+          },
+        ],
+      }),
+    ],
+  };
+
+  it('keeps the fields of an opened block read-only', async () => {
+    const user = userEvent.setup();
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [
+            objectFieldPlugin,
+            arrayFieldPlugin,
+            stringFieldPlugin,
+            coreValidatorsPlugin,
+          ],
+          schema: { collections: [] },
+        })}
+      >
+        <FormProvider
+          collection={lockedCollection}
+          path='content/pages/locked.mdx'
+          document={{ blocks: [{ _template: 'hero', text: 'first' }] }}
+        >
+          <DocumentForm />
+        </FormProvider>
+      </TinaProvider>
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /^Item 1: Hero/ })
+    );
+    expect(await screen.findByLabelText(/^Text\b/)).toHaveAttribute('readonly');
   });
 });

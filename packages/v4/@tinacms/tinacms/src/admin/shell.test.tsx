@@ -1,3 +1,4 @@
+import { ImageIcon } from 'lucide-react';
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -5,8 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { BranchInfo } from '../core/branch/contract';
 import { currentBranchOf } from '../core/branch/contract';
-import type { DocumentEntry } from '../core/content/contract';
+import { ContentError, type DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
+import { draftKey } from '../form/drafts';
+import { toFormId } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -33,8 +36,12 @@ let releaseUpdate: (() => void) | undefined;
 let holdUpdates: boolean;
 let searchEnabled: boolean;
 let failGet: boolean;
+let listError: boolean;
+let listCalls: number;
 let failAfterSave: boolean;
+let updateError: Error | undefined;
 let heldDefault: Promise<void> | undefined;
+let duplicateLabels: boolean;
 
 const contentPlugin = () =>
   definePlugin({
@@ -49,7 +56,11 @@ const contentPlugin = () =>
             ...(mode === 'branches'
               ? {
                   branches: {
-                    list: async () => BRANCHES,
+                    list: async () => {
+                      listCalls += 1;
+                      if (listError) throw new Error('offline');
+                      return BRANCHES;
+                    },
                     defaultBranch: async () => {
                       await heldDefault;
                       return 'main';
@@ -71,6 +82,7 @@ const contentPlugin = () =>
               path: string,
               value: TinaDocument
             ) => {
+              if (updateError) throw updateError;
               if (holdUpdates) {
                 await new Promise<void>((resolve) => {
                   releaseUpdate = resolve;
@@ -125,6 +137,22 @@ const screenPlugin = definePlugin({
   }),
 });
 
+const duplicateScreenPlugin = definePlugin({
+  name: 'test:duplicates',
+  client: async () => ({
+    default: {
+      screens: [{ name: 'prefs', label: 'Prefs', component: NotesScreen }],
+      slots: {
+        globalNav: ['Settings', 'Notes', 'Notes'].map((label) => ({
+          label,
+          icon: ImageIcon,
+          target: { kind: 'screen' as const, screen: 'prefs' },
+        })),
+      },
+    },
+  }),
+});
+
 const renderAdmin = (projectName?: string) =>
   render(
     <TinaAdmin
@@ -133,6 +161,7 @@ const renderAdmin = (projectName?: string) =>
           contentPlugin(),
           auditPlugin,
           screenPlugin,
+          ...(duplicateLabels ? [duplicateScreenPlugin] : []),
           ...(searchEnabled ? [searchPlugin] : []),
           stringFieldPlugin,
           coreValidatorsPlugin,
@@ -182,13 +211,158 @@ beforeEach(() => {
   releaseUpdate = undefined;
   searchEnabled = false;
   failGet = false;
+  listError = false;
+  listCalls = 0;
   failAfterSave = false;
+  updateError = undefined;
   heldDefault = undefined;
+  duplicateLabels = false;
   window.location.hash = '';
 });
 
 afterEach(() => {
   vi.unstubAllGlobals();
+});
+
+describe('Branch list states', () => {
+  it('says the list is loading while it is read', async () => {
+    let release: () => void = () => {};
+    heldDefault = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Branches' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(within(dialog).getByText('Loading branches')).toBeVisible();
+    release();
+    expect(
+      await within(dialog).findByRole('button', { name: /^main/ })
+    ).toBeVisible();
+  });
+
+  it('shows a failed read in place, keeps the admin working and retries', async () => {
+    listError = true;
+    const user = userEvent.setup();
+    renderAdmin();
+    expect(
+      await screen.findByRole('button', { name: 'Collections' })
+    ).toBeEnabled();
+    await user.click(await screen.findByRole('button', { name: 'Branches' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(
+      await within(dialog).findByText(/Couldn't load branches/)
+    ).toBeVisible();
+    listError = false;
+    await user.click(within(dialog).getByRole('button', { name: 'Retry' }));
+    expect(
+      await within(dialog).findByRole('button', { name: /^main/ })
+    ).toBeVisible();
+    expect(listCalls).toBe(2);
+    expect(within(dialog).queryByText(/Couldn't load branches/)).toBeNull();
+  });
+
+  it('checks a new branch name against the list', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      within(dialog).getByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      'feature/news'
+    );
+    expect(within(dialog).getByRole('alert')).toHaveTextContent(
+      'A branch called feature/news already exists. Pick another name.'
+    );
+  });
+});
+
+describe('Kept edits notice', () => {
+  it('names the branch the edits are still unsaved on', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    expect(await screen.findByText('Still unsaved on main.')).toBeVisible();
+  });
+});
+
+describe('Home', () => {
+  it('lands on Home with the branch line and a card per collection', async () => {
+    renderAdmin();
+    expect(await screen.findByText('Branch main')).toBeVisible();
+    const list = screen.getByRole('list', { name: 'Collection cards' });
+    expect(within(list).getByText('Posts')).toBeVisible();
+    expect(await within(list).findByText('1 document')).toBeVisible();
+    expect(
+      within(list).getByRole('button', { name: 'New Posts document' })
+    ).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /^Review/ })).toBeNull();
+  });
+
+  it('says Local files in local mode and leaves the branch out', async () => {
+    mode = 'local';
+    renderAdmin();
+    expect(
+      await screen.findByText(
+        'Local files: Tina writes edits straight to disk.'
+      )
+    ).toBeVisible();
+    expect(screen.queryByText(/^Branch /)).toBeNull();
+  });
+
+  it('offers Review N unsaved for edits kept in a stored draft after a reload', async () => {
+    localStorage.setItem(
+      draftKey(toFormId('content/posts/hello.mdx')),
+      JSON.stringify({
+        version: 2,
+        values: { title: 'Kept' },
+        baseline: { title: 'Hello' },
+      })
+    );
+    renderAdmin();
+    expect(
+      await screen.findByRole('button', { name: 'Review 1 unsaved' })
+    ).toBeVisible();
+  });
+
+  it('lets a long branch name wrap in its column instead of pushing Review off screen', async () => {
+    renderAdmin();
+    const line = await screen.findByText('Branch main');
+    const column = line.parentElement;
+    expect(column).toHaveClass('min-w-0', 'break-words');
+  });
+
+  it('opens the collection from its card', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /^Posts/ }));
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/collections/post')
+    );
+  });
+
+  it('offers Review N unsaved only while documents are unsaved, and opens them', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Review 1 unsaved' })
+    );
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/collections?unsaved')
+    );
+    const list = await screen.findByRole('list', { name: 'Unsaved documents' });
+    expect(
+      await within(list).findByRole('button', { name: /hello\.mdx/ })
+    ).toBeVisible();
+  });
 });
 
 describe('Top bar', () => {
@@ -257,10 +431,62 @@ describe('Top bar', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('renders no Search control without a search provider', async () => {
+  it('shows Search without a provider and says full-text search needs one', async () => {
+    const user = userEvent.setup();
     renderAdmin();
-    await screen.findByRole('banner', { name: 'Top bar' });
-    expect(screen.queryByRole('button', { name: /Search/ })).toBeNull();
+    await user.click(await screen.findByRole('button', { name: /Search/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Search' });
+    expect(
+      within(dialog).getByText('Full-text search needs a search provider.')
+    ).toBeVisible();
+    expect(within(dialog).queryByText('Content search')).toBeNull();
+  });
+
+  it('narrows the Navigation results by the query and opens the one picked', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /Search/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Search' });
+    await user.type(within(dialog).getByRole('searchbox'), 'sett');
+    const list = within(dialog).getByRole('list', {
+      name: 'Navigation results',
+    });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(1);
+    await user.click(within(list).getByRole('button', { name: 'Settings' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/settings'));
+  });
+
+  it('keeps every Search row when two entries share a label', async () => {
+    duplicateLabels = true;
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /Search/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Search' });
+    const list = within(dialog).getByRole('list', {
+      name: 'Navigation results',
+    });
+    const all = within(list).getAllByRole('listitem').length;
+    const box = within(dialog).getByRole('searchbox');
+    await user.type(box, 'Set');
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((row) => row.textContent)
+    ).toEqual(['Settings', 'Settings']);
+    await user.clear(box);
+    await user.type(box, 'Not');
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((row) => row.textContent)
+    ).toEqual(['Notes', 'Notes']);
+    await user.clear(box);
+    expect(within(list).getAllByRole('listitem')).toHaveLength(all);
+    expect(
+      error.mock.calls.some(([message]) => String(message).includes('same key'))
+    ).toBe(false);
+    error.mockRestore();
   });
 
   it('opens Search with ⌘K, even from a focused field, when a search provider exists', async () => {
@@ -301,7 +527,16 @@ describe('side nav entries', () => {
 
     await user.click(row);
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    await waitFor(() => expect(row).toHaveTextContent('Unsaved'));
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    const back = await screen.findByRole('button', { name: /hello\.mdx/ });
+    expect(back).toHaveTextContent('Unsaved');
+    expect(
+      within(screen.getByRole('navigation', { name: 'Content' })).queryByText(
+        'Unsaved'
+      )
+    ).toBeNull();
   });
 
   it('puts Help & docs at the foot and opens it in a new tab', async () => {
@@ -326,17 +561,30 @@ describe('branches', () => {
     ).toBeVisible();
   });
 
-  it('lists one line per branch with protected branches in one Protected group', async () => {
+  it('titles the pop-up Branches, lists the current branch first and searches by name', async () => {
     const user = userEvent.setup();
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
-    const dialog = await screen.findByRole('dialog', { name: 'Switch branch' });
-    const protectedGroup = within(dialog).getByRole('region', {
-      name: 'Protected',
-    });
-    expect(within(protectedGroup).getAllByRole('listitem')).toHaveLength(1);
-    expect(within(protectedGroup).getByText('main')).toBeVisible();
-    expect(within(dialog).getByText('feature/news')).toBeVisible();
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    const lines = within(dialog).getAllByRole('listitem');
+    expect(lines.map((line) => line.textContent)).toEqual([
+      'main',
+      'feature/news',
+    ]);
+    expect(within(lines[0]).getByRole('button')).toHaveAttribute(
+      'aria-current',
+      'true'
+    );
+
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'Search branches' }),
+      'news'
+    );
+    expect(
+      within(dialog)
+        .getAllByRole('listitem')
+        .map((line) => line.textContent)
+    ).toEqual(['feature/news']);
     await user.click(
       within(dialog).getByRole('button', { name: 'Full screen' })
     );
@@ -388,7 +636,7 @@ describe('branches', () => {
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
     await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
-    const dialog = await screen.findByRole('dialog', { name: 'Switch branch' });
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
     expect(within(dialog).getByRole('status')).toHaveTextContent(
       'Save or discard your changes first'
     );
@@ -518,7 +766,7 @@ describe('save state', () => {
 
     act(() => releaseUpdate?.());
     await waitFor(() =>
-      expect(within(statusBar()).getByText('Saved')).toBeVisible()
+      expect(within(statusBar()).getByText(/^Saved/)).toBeVisible()
     );
     expect(updates).toHaveLength(1);
     expect(screen.getByRole('button', { name: /^Branch:/ })).toBeEnabled();
@@ -559,7 +807,29 @@ describe('save state', () => {
     expect(updates).toHaveLength(1);
   });
 
-  it('says the save failed when validation fails, with the inline alert kept', async () => {
+  it('says the branch no longer exists when the save is refused for a missing branch', async () => {
+    updateError = new ContentError('branch-not-found');
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: branch no longer exists')
+      ).toBeVisible()
+    );
+    expect(input).toHaveValue('Hello!');
+  });
+
+  it('names the document the last save wrote', async () => {
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Saved: “hello.mdx”')).toBeVisible()
+    );
+  });
+
+  it('says the save failed when validation fails, in the toast and the Status bar, and leaves the form bar alone', async () => {
     const { user, input } = await openHello();
     await user.clear(input);
     await user.click(screen.getByRole('button', { name: /^Save/ }));
@@ -567,16 +837,13 @@ describe('save state', () => {
       expect(within(statusBar()).getByText('Save failed')).toBeVisible()
     );
     expect(updates).toHaveLength(0);
-    expect(
-      (await screen.findAllByRole('alert')).some((alert) =>
-        /validation errors/.test(alert.textContent ?? '')
-      )
-    ).toBe(true);
+    const form = screen.getByRole('complementary', { name: 'Document form' });
+    expect(form.querySelector('[data-slot=form-bar] [role=alert]')).toBeNull();
   });
 });
 
 describe('toasts', () => {
-  it('shows a failed save at bottom right and keeps the inline alert', async () => {
+  it('shows a failed save at bottom right with fixed words and Retry, and nothing in the form bar', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     const user = userEvent.setup();
     renderAdmin();
@@ -589,12 +856,17 @@ describe('toasts', () => {
       expect(found).not.toBeNull();
       return found;
     });
-    expect(toast).toHaveTextContent('Save failed');
+    expect(toast).toHaveTextContent(
+      "Couldn't save. Some fields are not valid."
+    );
+    expect(
+      within(toast as HTMLElement).getByRole('button', { name: 'Retry' })
+    ).toBeVisible();
     const toaster = toast?.closest('[data-sonner-toaster]');
     expect(toaster).toHaveAttribute('data-x-position', 'right');
     expect(toaster).toHaveAttribute('data-y-position', 'bottom');
     const form = screen.getByRole('complementary', { name: 'Document form' });
-    expect(within(form).getAllByRole('alert').length).toBeGreaterThan(0);
+    expect(form.querySelector('[data-slot=form-bar] [role=alert]')).toBeNull();
   });
 });
 
@@ -629,6 +901,42 @@ describe('read-error and screen views', () => {
   });
 });
 
+describe('document form panel', () => {
+  it('has Back and a menu in its header, no Close and no second title, then tabs and a form bar', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+    await screen.findByLabelText(/^Title\b/);
+    const panel = screen.getByRole('complementary', { name: 'Document form' });
+    expect(
+      within(panel).getByRole('button', { name: 'Return to navigator' })
+    ).toBeVisible();
+    expect(
+      within(panel).getByRole('button', { name: 'Document menu' })
+    ).toBeVisible();
+    expect(within(panel).queryByRole('button', { name: 'Close' })).toBeNull();
+    expect(within(panel).queryByRole('heading')).toBeNull();
+    expect(within(panel).getByRole('tab', { name: 'Fields' })).toBeVisible();
+    expect(within(panel).queryByRole('tab', { name: 'History' })).toBeNull();
+    expect(
+      within(panel).getByRole('button', { name: 'Document actions' })
+    ).toBeVisible();
+    expect(within(panel).getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+
+  it('opens the Document actions above the bar, with a note that more come later', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    renderAdmin();
+    await screen.findByLabelText(/^Title\b/);
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    const menu = await screen.findByRole('menu', { name: 'Document actions' });
+    expect(
+      within(menu).getByText('More document actions come later.')
+    ).toBeVisible();
+    expect(menu.closest('[data-side]')).toHaveAttribute('data-side', 'top');
+  });
+});
+
 describe('panel headers', () => {
   it('gives the form column Back to its collection, and the missing views a title and Close', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
@@ -638,7 +946,7 @@ describe('panel headers', () => {
     await user.click(
       within(
         screen.getByRole('complementary', { name: 'Document form' })
-      ).getByRole('button', { name: /Posts/ })
+      ).getByRole('button', { name: 'Return to navigator' })
     );
     await waitFor(() =>
       expect(window.location.hash).toBe('#/collections/post')
