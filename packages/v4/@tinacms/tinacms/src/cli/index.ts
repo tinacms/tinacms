@@ -16,10 +16,11 @@ const USAGE = `tinacms <command> [options]
 Commands:
   init        Write the starter tina/config.ts and a first document
   codegen     Compile the schema in tina/config.ts to tina/tina-lock.json
+  search reindex  Replace the search index with every document of the searchable collections
 
 Options:
   --root <dir>      Project root (default: the working directory)
-  --config <path>   Path to the config, when it is not under tina/ (codegen)
+  --config <path>   Path to the config, when it is not under tina/ (codegen, search reindex)
   --check           Write nothing; exit 1 when the committed lock is stale (codegen)
   -h, --help        Show this message
 `;
@@ -80,6 +81,31 @@ const initCommand = async (
   return 0;
 };
 
+const searchCommand = async (
+  subcommand: string | undefined,
+  values: { root?: string; config?: string },
+  context: Required<Pick<CliContext, 'cwd' | 'log' | 'logError'>> & CliContext
+): Promise<number> => {
+  if (subcommand !== 'reindex') {
+    context.logError(
+      `Unknown search command "${subcommand ?? ''}".\n\n${USAGE}`
+    );
+    return 1;
+  }
+  // Loaded on demand: reindex reads files through the Local Data Layer, which
+  // `init` and `codegen` have no need to load.
+  const { runSearchReindex } = await import('./commands/search');
+  await runSearchReindex({
+    rootDir: values.root ? resolveFrom(context.cwd, values.root) : context.cwd,
+    configPath: values.config
+      ? resolveFrom(context.cwd, values.config)
+      : undefined,
+    load: { loader: context.loader },
+    log: context.log,
+  });
+  return 0;
+};
+
 const resolveFrom = (cwd: string, target: string): string =>
   path.resolve(cwd, target);
 
@@ -99,7 +125,8 @@ export const runCli = async (
   }
 
   try {
-    const { values } = parseArgs({
+    const { values, positionals } = parseArgs({
+      allowPositionals: true,
       args: rest,
       options: {
         root: { type: 'string' },
@@ -108,13 +135,25 @@ export const runCli = async (
         help: { type: 'boolean', short: 'h' },
       },
     });
-    if (command !== 'codegen' && command !== 'init') {
+    if (command !== 'codegen' && command !== 'init' && command !== 'search') {
       logError(`Unknown command "${command}".\n\n${USAGE}`);
       return 1;
     }
     if (values.help) {
       log(USAGE);
       return 0;
+    }
+    if (command === 'search') {
+      return await searchCommand(positionals[0], values, {
+        ...context,
+        cwd,
+        log,
+        logError,
+      });
+    }
+    if (positionals.length > 0) {
+      logError(`Unexpected argument "${positionals[0]}".\n\n${USAGE}`);
+      return 1;
     }
     if (command === 'init') {
       return await initCommand(values, { cwd, log });

@@ -24,6 +24,10 @@ export {
   type ServerHookScope,
 } from '../core/form/hooks';
 export type {
+  SearchIndexProvider,
+  SearchRecord,
+} from '../core/search/index-contract';
+export type {
   AuthTransportHooks,
   ResolvedServerSegment,
   ServerOp,

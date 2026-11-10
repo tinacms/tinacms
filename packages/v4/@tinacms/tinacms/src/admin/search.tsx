@@ -6,12 +6,14 @@ import {
 import { Button } from '@tinacms/ui/components/button';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { useEffect, useMemo, useState } from 'react';
+import { ContentError, type ContentProvider } from '../core/content/contract';
 import {
-  type SearchHit,
   type SearchProvider,
+  type SearchRef,
+  isSearchError,
   isSearchProvider,
 } from '../core/search/contract';
-import { useTinaStore } from '../editor/hooks';
+import { useContentSlice, useTinaStore } from '../editor/hooks';
 import { useAdminScreens, useGlobalNav } from './hooks';
 import { MEDIA_SCREEN, openNavTarget } from './rail';
 import { useAdminRoute } from './use-admin-route';
@@ -25,6 +27,66 @@ function useSearchProvider(): SearchProvider | null {
 // the chord from inside it.
 const inRichText = (target: EventTarget | null): boolean =>
   target instanceof Element && target.closest('[data-slate-editor]') !== null;
+
+export const SEARCH_DEBOUNCE_MS = 250;
+const SEARCH_LIMIT = 10;
+const GENERIC_FAILURE = 'Something went wrong. Please try again.';
+
+interface ContentResult {
+  ref: SearchRef;
+  title: string;
+  snippet: string;
+}
+
+interface ContentSearchOutcome {
+  results: ContentResult[];
+  message: string | null;
+}
+
+const NO_OUTCOME: ContentSearchOutcome = { results: [], message: null };
+
+const messageOf = (cause: unknown): string => {
+  if (cause instanceof ContentError || isSearchError(cause)) {
+    return cause.message;
+  }
+  return GENERIC_FAILURE;
+};
+
+const isGone = (reason: unknown): boolean => {
+  if (reason instanceof ContentError) return reason.code === 'not-found';
+  return false;
+};
+
+// ADR-021 §2: a hit is a hint. Each one is read back from `content`, and a
+// hit whose document is gone is dropped.
+const searchContent = async (
+  provider: SearchProvider,
+  content: ContentProvider,
+  query: string
+): Promise<ContentSearchOutcome> => {
+  let hits: Awaited<ReturnType<SearchProvider['search']>>;
+  try {
+    hits = await provider.search(query, { limit: SEARCH_LIMIT });
+  } catch (cause) {
+    return { results: [], message: messageOf(cause) };
+  }
+  const results: ContentResult[] = [];
+  let message: string | null = null;
+  const settled = await Promise.allSettled(
+    hits.map(({ ref }) => content.get(ref.collection, ref.path))
+  );
+  settled.forEach((read, index) => {
+    const { ref, snippet } = hits[index];
+    if (read.status === 'fulfilled') {
+      if (read.value) {
+        results.push({ ref, snippet, title: read.value.title ?? ref.path });
+      }
+      return;
+    }
+    if (!isGone(read.reason)) message ??= messageOf(read.reason);
+  });
+  return { results, message };
+};
 
 interface NavigationResult {
   id: string;
@@ -78,29 +140,29 @@ function SearchDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const [query, setQuery] = useState('');
-  const [hits, setHits] = useState<SearchHit[]>([]);
+  const content = useContentSlice();
+  const [outcome, setOutcome] = useState<ContentSearchOutcome>(NO_OUTCOME);
   const navigation = useNavigationResults();
   const matching = navigation.filter(({ label }) =>
     label.toLowerCase().includes(query.trim().toLowerCase())
   );
   useEffect(() => {
-    if (!query || !provider) {
-      setHits([]);
+    const text = query.trim();
+    if (!text || !provider) {
+      setOutcome(NO_OUTCOME);
       return;
     }
     let current = true;
-    provider.search(query).then(
-      (found) => {
-        if (current) setHits(found);
-      },
-      () => {
-        if (current) setHits([]);
-      }
-    );
+    const timer = setTimeout(() => {
+      searchContent(provider, content, text).then((found) => {
+        if (current) setOutcome(found);
+      });
+    }, SEARCH_DEBOUNCE_MS);
     return () => {
       current = false;
+      clearTimeout(timer);
     };
-  }, [provider, query]);
+  }, [provider, content, query]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size='lg' showCloseButton>
@@ -136,13 +198,21 @@ function SearchDialog({
             <h3 className='text-sm font-semibold text-muted-foreground'>
               Content search
             </h3>
+            {outcome.message ? (
+              <p role='alert' className='text-sm text-destructive'>
+                {outcome.message}
+              </p>
+            ) : null}
             <ul aria-label='Search results' className='m-0 list-none p-0'>
-              {hits.map((hit) => (
-                <li key={hit.ref} className='py-1.5 text-base'>
-                  <span className='font-medium'>{hit.ref}</span>
-                  {hit.snippet ? (
+              {outcome.results.map(({ ref, title, snippet }) => (
+                <li
+                  key={`${ref.collection}:${ref.path}`}
+                  className='py-1.5 text-base'
+                >
+                  <span className='font-medium'>{title}</span>
+                  {snippet ? (
                     <span className='block text-sm text-muted-foreground'>
-                      {hit.snippet}
+                      {snippet}
                     </span>
                   ) : null}
                 </li>

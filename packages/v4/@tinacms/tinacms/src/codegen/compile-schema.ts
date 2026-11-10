@@ -2,7 +2,9 @@ import type { ResolvedConfig, TinaSchema } from '../config';
 import { fieldConflictError, overridesFieldKey } from '../core/field/registry';
 import { hookProvidersOf } from '../core/form/hooks';
 import { invariant } from '../core/invariant';
+import { capabilityProvider } from '../core/mount';
 import { composeOverridableRegistry } from '../core/overridable-registry';
+import { SEARCH_INDEX_HOOK } from '../core/search/index-contract';
 import { isRecord } from '../utils/is-record';
 import { scalarItemOf } from '../core/schema/children';
 import type { FieldProvision, PluginManifest } from '../core/plugin';
@@ -15,6 +17,8 @@ import {
   overridesValidatorKey,
   validatorConflictError,
 } from '../core/validator/registry';
+import { RICH_TEXT_FIELD_TYPE } from '../plugins/fields/rich-text/rich-text-field.schema';
+import { STRING_FIELD_TYPE } from '../plugins/fields/string/string-field.schema';
 import { ARRAY_FIELD_TYPE } from '../plugins/fields/array/array-field.schema';
 import {
   isObjectDisplay,
@@ -227,7 +231,60 @@ const assertTemplatesArrayOptions = (collections: CollectionSchema[]): void => {
   }
 };
 
+const SEARCHABLE_FIELD_TYPES: readonly string[] = [
+  STRING_FIELD_TYPE,
+  RICH_TEXT_FIELD_TYPE,
+];
+
+// Checks the `fields` of the plugin that wins `search`, so a typo fails here and
+// not as a silent gap in the index (ADR-021 §5).
+const assertSearchFields = (config: ResolvedConfig): void => {
+  const provider = capabilityProvider(config.plugins, 'search');
+  if (!provider?.search) return;
+  const { fields } = provider.search;
+  for (const [collectionName, weights] of Object.entries(fields)) {
+    const collection = config.schema.collections.find(
+      ({ name }) => name === collectionName
+    );
+    invariant(
+      collection,
+      'search-unknown-collection',
+      `The search plugin "${provider.name}" lists the collection "${collectionName}" in \`fields\`, but the schema has no such collection.`
+    );
+    for (const [fieldName, weight] of Object.entries(weights)) {
+      const where = `The search plugin "${provider.name}" lists the field "${fieldName}" of collection "${collectionName}"`;
+      const field = collection.fields.find(({ name }) => name === fieldName);
+      invariant(
+        field,
+        'search-unknown-field',
+        `${where}, but the collection has no top-level field with that name.`
+      );
+      invariant(
+        SEARCHABLE_FIELD_TYPES.includes(field.type),
+        'search-field-type',
+        `${where}, but its type is "${field.type}". Search reads "string" and "rich-text" fields only.`
+      );
+      invariant(
+        Number.isFinite(weight) && weight > 0,
+        'search-field-weight',
+        `${where} with the weight ${String(weight)}. A weight is a finite number above 0.`
+      );
+    }
+  }
+  for (const collection of config.schema.collections) {
+    const listsIndexHook = (collection.hooks ?? []).some(
+      ({ name }) => name === SEARCH_INDEX_HOOK
+    );
+    invariant(
+      !listsIndexHook || Object.hasOwn(fields, collection.name),
+      'search-collection-not-configured',
+      `The collection "${collection.name}" lists \`searchIndex()\` in \`hooks\`, but the search plugin "${provider.name}" has no \`fields\` for it.`
+    );
+  }
+};
+
 export const compileSchema = (config: ResolvedConfig): TinaLock => {
+  assertSearchFields(config);
   assertNoDroppedOptions(config.schema.collections);
   assertScalarItemsAreVisible(config.schema.collections);
   assertTemplatesArrayOptions(config.schema.collections);
