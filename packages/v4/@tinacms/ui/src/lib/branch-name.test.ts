@@ -18,11 +18,37 @@ describe('branchNameFromPath', () => {
     );
   });
 
+  it('never suggests a name Git refuses', () => {
+    expect(branchNameFromPath('docs/a..b.md')).toBe('docs/a.b-edits');
+    expect(branchNameFromPath('docs/a...b.md')).toBe('docs/a.b-edits');
+  });
+
   it('always passes the shared check', () => {
-    for (const path of ['a/b/ü ö.md', 'x/.hidden', 'x/a..b.md', 'x/--a--.md']) {
+    for (const path of [
+      'a/b/ü ö.md',
+      'x/.hidden',
+      'x/a..b.md',
+      'x/--a--.md',
+      'x/a.lock.md',
+    ]) {
       expect(
         branchNameError(branchNameFromPath(path), [], true)
       ).toBeUndefined();
+    }
+  });
+});
+
+describe('branchNameError', () => {
+  it.each(['a..b', 'docs//a', '-a', 'docs/a.lock', 'a.lock/b'])(
+    'rejects the Git-refused name %s',
+    (name) => {
+      expect(branchNameError(name, [], true)).toMatch(/^Use letters/);
+    }
+  );
+
+  it('accepts names that only look similar', () => {
+    for (const name of ['a.b', 'a-b', 'a.locked', 'docs/a-.lock-x']) {
+      expect(branchNameError(name, [], true)).toBeUndefined();
     }
   });
 });

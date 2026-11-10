@@ -1,4 +1,5 @@
 const BRANCH_NAME_RULE = /^[A-Za-z0-9._/-]+$/;
+const GIT_REFUSED = /\.\.|\/\/|^-|\.lock(\/|$)/;
 
 export const BRANCH_NAME_HINT =
   'Letters, numbers, dashes, dots and slashes. No spaces.';
@@ -13,7 +14,11 @@ export const branchNameError = (
   if (/\s/.test(name)) {
     return 'Branch names can’t have spaces. Use dashes instead, such as docs/new-page.';
   }
-  if (!BRANCH_NAME_RULE.test(name) || /[/.]$/.test(name)) {
+  if (
+    !BRANCH_NAME_RULE.test(name) ||
+    /[/.]$/.test(name) ||
+    GIT_REFUSED.test(name)
+  ) {
     return 'Use letters, numbers, dashes, dots and slashes only, and don’t end with a slash or a dot.';
   }
   if (taken.includes(name)) {
@@ -30,6 +35,7 @@ export const branchNameFromPath = (path: string): string => {
   const clean = stem
     .replace(/[^A-Za-z0-9._-]/g, '-')
     .replace(/-{2,}/g, '-')
+    .replace(/\.{2,}/g, '.')
     .replace(/^[-.]+|[-.]+$/g, '');
   return `docs/${clean === '' ? 'document' : clean}-edits`;
 };
