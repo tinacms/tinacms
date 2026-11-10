@@ -47,6 +47,7 @@ let listError: boolean;
 let listCalls: number;
 let failAfterSave: boolean;
 let updateError: Error | undefined;
+let listOmits: string | undefined;
 let heldDefault: Promise<void> | undefined;
 let duplicateLabels: boolean;
 let saveHandler:
@@ -69,7 +70,9 @@ const contentPlugin = () =>
                     list: async () => {
                       listCalls += 1;
                       if (listError) throw new Error('offline');
-                      return BRANCHES;
+                      return BRANCHES.filter(
+                        (entry) => entry.name !== listOmits
+                      );
                     },
                     defaultBranch: async () => {
                       await heldDefault;
@@ -237,6 +240,7 @@ beforeEach(() => {
   listCalls = 0;
   failAfterSave = false;
   updateError = undefined;
+  listOmits = undefined;
   heldDefault = undefined;
   duplicateLabels = false;
   saveHandler = undefined;
@@ -1233,6 +1237,7 @@ describe('Save to new branch', () => {
       const dialog = await screen.findByRole('dialog', {
         name: 'feature/news was deleted',
       });
+      listOmits = 'feature/news';
       return { user, dialog };
     };
 
@@ -1289,6 +1294,34 @@ describe('Save to new branch', () => {
         await screen.findByRole('dialog', { name: 'feature/news was deleted' })
       ).toBeVisible();
       expect(updates).toHaveLength(0);
+    });
+
+    it('saves on the current branch with no dialog once the branch is back', async () => {
+      const { user, dialog } = await failOnce();
+      listOmits = undefined;
+      updateError = undefined;
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await pressSave(user);
+      await waitFor(() => expect(updates).toHaveLength(1));
+      expect(updates[0]?.branch).toBe('feature/news');
+      expect(screen.queryByRole('dialog')).toBeNull();
+      await waitFor(() => expect(toastShown()).toBeNull());
+    });
+
+    it('saves on the current branch from the toast action once the branch is back', async () => {
+      const { user, dialog } = await failOnce();
+      listOmits = undefined;
+      updateError = undefined;
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await user.click(
+        within(toastShown() as HTMLElement).getByRole('button', {
+          name: 'Save to new branch',
+        })
+      );
+      await waitFor(() => expect(updates).toHaveLength(1));
+      expect(screen.queryByRole('dialog')).toBeNull();
     });
 
     it('forgets the failure after a switch: Save takes its normal route on the new branch', async () => {

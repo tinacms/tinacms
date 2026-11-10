@@ -46,6 +46,7 @@ import {
   useFormCheck,
   useFormId,
   useFormSave,
+  useOptionalContentSlice,
   useStaleDraft,
 } from '../editor/hooks';
 import {
@@ -140,6 +141,7 @@ function SaveButton() {
   const save = useFormSave();
   const check = useFormCheck();
   const handler = use(SaveToNewBranchContext);
+  const content = useOptionalContentSlice();
   const narrow = useNarrow();
   const view = useBranchView();
   const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
@@ -235,13 +237,14 @@ function SaveButton() {
     dismissIfUnowned(failedToastId);
   };
 
-  const run = useEffectEvent(() => {
-    if (dialog || pending) return;
-    const last = useFormStore.getState().saves[formId];
-    if (isBranchGone(last)) {
-      openDialog('deleted', branchName ?? '');
-      return;
-    }
+  // Reads the provider's branch list again, so a branch put back is noticed.
+  const branchIsBack = () =>
+    content?.branches?.list().then(
+      (list) => list.some((entry) => entry.name === branchName),
+      () => false
+    ) ?? Promise.resolve(false);
+
+  const saveHere = () => {
     setPending(true);
     if (isProtected && branchName !== undefined) {
       check()
@@ -263,6 +266,24 @@ function SaveButton() {
         }
       })
       .finally(() => setPending(false));
+  };
+
+  const run = useEffectEvent(() => {
+    if (dialog || pending) return;
+    if (isBranchGone(useFormStore.getState().saves[formId])) {
+      setPending(true);
+      branchIsBack().then((back) => {
+        if (back) {
+          useFormStore.getState().clearSavePhase(formId);
+          saveHere();
+        } else {
+          setPending(false);
+          openDialog('deleted', branchName ?? '');
+        }
+      });
+      return;
+    }
+    saveHere();
   });
 
   const confirm = (typed: string) => {
