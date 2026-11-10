@@ -33,7 +33,7 @@ describe('createWorkflowBranch', () => {
     const options = setup(true);
     options.listBranchNames.mockResolvedValue(tierNames().slice(0, 3));
     expect(await createWorkflowBranch(options)).toEqual({
-      branchName: `${branchName}-alpaca`,
+      branchName: `${branchName}-napoleon`,
     });
     expect(options.listBranchNames).toHaveBeenCalledTimes(1);
   });
@@ -48,10 +48,10 @@ describe('createWorkflowBranch', () => {
   it('uses the last available name before advancing tiers', async () => {
     const options = setup(true);
     options.listBranchNames.mockResolvedValue(
-      tierNames().filter((name) => name !== `${branchName}-alpaca`)
+      tierNames().filter((name) => name !== `${branchName}-napoleon`)
     );
     expect(await createWorkflowBranch(options)).toEqual({
-      branchName: `${branchName}-alpaca`,
+      branchName: `${branchName}-napoleon`,
     });
   });
 
