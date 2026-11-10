@@ -1,21 +1,21 @@
 import { currentServerRuntime } from '../../server/runtime-access';
 import { publicOp } from '../../server/op-meta';
 import { DEFAULT_RPC_URL } from '../../rpc/proxy';
-import { defineServerHook } from '../form/hooks';
+import { defineServerHook } from '../../core/form/hooks';
 import {
   type CapabilityOverride,
   type PluginManifest,
   type ServerSegment,
   definePlugin,
-} from '../plugin';
-import type { HookRef } from '../schema/types';
-import { createSearchClient } from './client';
+} from '../../core/plugin';
+import type { HookRef } from '../../core/schema/types';
+import { createSearchClient } from './search.client';
 import {
   SEARCH_INDEX_HOOK,
   type SearchFields,
   type SearchIndexProvider,
-} from './index-contract';
-import { validateSearchRequest } from './validate';
+} from '../../core/search/index-contract';
+import { validateSearchRequest } from '../../core/search/validate';
 
 /** Lists on a collection's `hooks` to index its saves on the default branch. */
 export const searchIndex = (): HookRef => ({ name: SEARCH_INDEX_HOOK });
@@ -50,7 +50,7 @@ const serverSegmentOf = (
       const defaultBranch = await runtime.resolveBranch(undefined);
       if (defaultBranch !== scope.branch) return;
       // Loaded on demand: the rich-text codec is large, and only a save needs it.
-      const { buildSearchRecord } = await import('./record');
+      const { buildSearchRecord } = await import('../../core/search/record');
       await runtime.searchIndex.upsert([
         buildSearchRecord(scope.collection, scope.path, document, fields),
       ]);

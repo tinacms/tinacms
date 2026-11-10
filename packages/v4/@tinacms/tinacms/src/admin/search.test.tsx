@@ -8,7 +8,7 @@ import { ContentError, type DocumentEntry } from '../core/content/contract';
 import { type PluginManifest, definePlugin } from '../core/plugin';
 import type { SearchHit } from '../core/search/contract';
 import { SearchError } from '../core/search/contract';
-import { defineSearchPlugin } from '../core/search/define-search-plugin';
+import { defineSearchPlugin } from '../plugins/search/search.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import { TinaProvider } from '../editor/provider';
 import { TinaAdmin } from './admin';

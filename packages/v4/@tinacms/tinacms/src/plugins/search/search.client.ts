@@ -4,8 +4,8 @@ import {
   type SearchHit,
   SearchError,
   isSearchErrorCode,
-} from './contract';
-import { validateSearchRequest } from './validate';
+} from '../../core/search/contract';
+import { validateSearchRequest } from '../../core/search/validate';
 
 export interface SearchClientConfig {
   /** Where the site mounts its RPC handler. `/api/tina` for browser code. */

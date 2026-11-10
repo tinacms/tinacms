@@ -56,7 +56,7 @@ export {
 export {
   defineSearchPlugin,
   searchIndex,
-} from './core/search/define-search-plugin';
+} from './plugins/search/search.plugin';
 export type { AdminScreen, AdminScreenProps } from './core/screen/contract';
 export {
   type Capability,

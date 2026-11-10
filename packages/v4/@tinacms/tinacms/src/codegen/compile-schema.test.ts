@@ -9,7 +9,7 @@ import { definePlugin } from '../core/plugin';
 import {
   defineSearchPlugin,
   searchIndex,
-} from '../core/search/define-search-plugin';
+} from '../plugins/search/search.plugin';
 import type { SearchFields } from '../core/search/index-contract';
 import type { FieldSchema } from '../core/schema/types';
 import { LOCK_VERSION, checkLock, compileSchema } from './compile-schema';

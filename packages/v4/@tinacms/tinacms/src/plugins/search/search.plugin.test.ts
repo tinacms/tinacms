@@ -8,17 +8,17 @@ import {
 import { type Session, defineServerPlugin, toUserId } from '../../server';
 import type { SearchRecord } from '../../server';
 import { createTinaStore } from '../../store/create-store';
-import type { ContentSaveInput } from '../content/contract';
-import { definePlugin, resolveClientSegments } from '../plugin';
-import type { CollectionSchema } from '../schema/types';
-import { createSearchClient } from './client';
+import type { ContentSaveInput } from '../../core/content/contract';
+import { definePlugin, resolveClientSegments } from '../../core/plugin';
+import type { CollectionSchema } from '../../core/schema/types';
+import { createSearchClient } from './search.client';
 import {
   type SearchProvider,
   SearchError,
   isSearchError,
   isSearchErrorCode,
-} from './contract';
-import { defineSearchPlugin, searchIndex } from './define-search-plugin';
+} from '../../core/search/contract';
+import { defineSearchPlugin, searchIndex } from './search.plugin';
 
 const sessions: Record<string, Session> = {
   'admin-token': { identity: { id: toUserId('ada') }, roles: ['admin'] },

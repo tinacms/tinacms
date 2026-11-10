@@ -26,7 +26,7 @@ import {
 import {
   defineSearchPlugin,
   searchIndex,
-} from '../../../../core/search/define-search-plugin';
+} from '../../../../plugins/search/search.plugin';
 import { inMemorySearchProvider } from '../../../../test/in-memory-search.server';
 import { localMediaPlugin } from '../../../media/local/local-media.plugin';
 import { tinaCloud } from '../../../tinacloud/tinacloud.plugin';

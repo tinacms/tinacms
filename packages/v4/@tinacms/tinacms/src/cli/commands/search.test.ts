@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type ResolvedConfig, asResolvedConfig } from '../../config';
 import { definePlugin } from '../../core/plugin';
 import { SearchError } from '../../core/search/contract';
-import { defineSearchPlugin } from '../../core/search/define-search-plugin';
+import { defineSearchPlugin } from '../../plugins/search/search.plugin';
 import type { SearchIndexProvider } from '../../core/search/index-contract';
 import type { CollectionSchema } from '../../core/schema/types';
 import { createLocalDataLayer } from '../../plugins/content/local/server/local-data-layer';
@@ -414,7 +414,7 @@ export default {
     );
     await writeFile(
       path.join(rootDir, 'tina', 'config.ts'),
-      `import { defineSearchPlugin } from ${JSON.stringify(`${src}/core/search/define-search-plugin`)};
+      `import { defineSearchPlugin } from ${JSON.stringify(`${src}/plugins/search/search.plugin`)};
 export default {
   plugins: [
     defineSearchPlugin({

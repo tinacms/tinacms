@@ -54,7 +54,7 @@ export {
   type SearchQuery,
   type SearchRef,
 } from '../core/search/contract';
-export { createSearchClient } from '../core/search/client';
+export { createSearchClient } from '../plugins/search/search.client';
 export type { ClientSegment };
 export {
   createRpcClient,
