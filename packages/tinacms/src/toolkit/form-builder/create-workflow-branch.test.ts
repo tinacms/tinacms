@@ -31,14 +31,11 @@ describe('createWorkflowBranch', () => {
     expect(options.create).toHaveBeenCalledExactlyOnceWith(branchName);
   });
 
-  it('selects randomly from unused themed names including harley', async () => {
+  it('selects randomly from unused themed names', async () => {
     const options = setup(true);
-    options.listBranchNames.mockResolvedValue([
-      `${branchName}-tina`,
-      `${branchName}-llama`,
-    ]);
+    options.listBranchNames.mockResolvedValue(tierNames().slice(0, 3));
     expect(await createWorkflowBranch(options)).toEqual({
-      branchName: `${branchName}-harley`,
+      branchName: `${branchName}-alpaca`,
     });
     expect(options.listBranchNames).toHaveBeenCalledTimes(1);
   });
@@ -53,10 +50,10 @@ describe('createWorkflowBranch', () => {
   it('uses the last available name before advancing tiers', async () => {
     const options = setup(true);
     options.listBranchNames.mockResolvedValue(
-      tierNames().filter((name) => name !== `${branchName}-harley`)
+      tierNames().filter((name) => name !== `${branchName}-alpaca`)
     );
     expect(await createWorkflowBranch(options)).toEqual({
-      branchName: `${branchName}-harley`,
+      branchName: `${branchName}-alpaca`,
     });
   });
 
