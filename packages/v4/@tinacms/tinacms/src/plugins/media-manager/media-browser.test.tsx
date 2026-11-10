@@ -87,7 +87,7 @@ const createProvider = (overrides: Partial<MediaProvider> = {}) => {
 
 const renderBrowser = (
   provider: MediaProvider,
-  ui: ReactElement = <MediaBrowser mode='manage' />
+  ui: ReactElement = <MediaBrowser mode='pick' onSelect={() => {}} />
 ) => {
   const mediaPlugin = definePlugin({
     name: 'test:media',
@@ -170,7 +170,7 @@ describe('MediaBrowser branches', () => {
         }
       >
         <SwitchToOther />
-        <MediaBrowser mode='manage' />
+        <MediaBrowser mode='pick' onSelect={() => {}} />
       </TinaProvider>
     );
     expect(await fileTile('main-only.png')).toBeVisible();
@@ -517,120 +517,8 @@ describe('MediaBrowser infinite scroll', () => {
   });
 });
 
-describe('MediaBrowser rename', () => {
-  it('offers no Rename without provider support', async () => {
-    const user = userEvent.setup();
-    renderBrowser(createProvider());
-    await user.click(await fileTile('logo.png'));
-    expect(screen.queryByRole('button', { name: 'Rename' })).toBeNull();
-  });
-
-  it('renames the base name and keeps the extension', async () => {
-    const user = userEvent.setup();
-    const rename = vi.fn(async (from: string, to: string) => {
-      files = files.map((item) =>
-        item.path === from ? { ...item, path: to } : item
-      );
-      return to;
-    });
-    renderBrowser(createProvider({ rename }));
-    await user.click(await fileTile('logo.png'));
-    await user.click(screen.getByRole('button', { name: 'Rename' }));
-    const dialog = await screen.findByRole('alertdialog');
-    expect(
-      within(dialog).getByText(/does not update existing content/)
-    ).toBeVisible();
-    const input = within(dialog).getByRole('textbox', { name: 'File name' });
-    await user.clear(input);
-    await user.type(input, 'my logo');
-    expect(dialog).toHaveTextContent('Will be saved as my-logo.png');
-    await user.click(within(dialog).getByRole('button', { name: 'Rename' }));
-    expect(rename).toHaveBeenCalledWith('logo.png', 'my-logo.png');
-    expect(
-      await screen.findByRole('complementary', {
-        name: 'Details of my-logo.png',
-      })
-    ).toBeVisible();
-    expect(screen.queryByRole('alertdialog')).toBeNull();
-  });
-
-  it('shows the message for a rename error code', async () => {
-    const user = userEvent.setup();
-    const rename = vi.fn(async () => {
-      throw new MediaError('name-taken', 'exists');
-    });
-    renderBrowser(createProvider({ rename }));
-    await user.click(await fileTile('logo.png'));
-    await user.click(screen.getByRole('button', { name: 'Rename' }));
-    const dialog = await screen.findByRole('alertdialog');
-    const input = within(dialog).getByRole('textbox', { name: 'File name' });
-    await user.clear(input);
-    await user.type(input, 'photo');
-    await user.click(within(dialog).getByRole('button', { name: 'Rename' }));
-    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
-      'A file with that name already exists in this folder.'
-    );
-  });
-});
-
-describe('MediaBrowser delete', () => {
-  it('deletes the active file after confirmation', async () => {
-    const user = userEvent.setup();
-    const provider = createProvider();
-    renderBrowser(provider);
-    await user.click(await fileTile('logo.png'));
-    await user.click(screen.getByRole('button', { name: 'Delete' }));
-    const dialog = await screen.findByRole('alertdialog');
-    expect(dialog).toHaveTextContent(
-      'Are you sure you want to delete logo.png?'
-    );
-    expect(provider.delete).not.toHaveBeenCalled();
-    await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
-    expect(provider.delete).toHaveBeenCalledWith('logo.png');
-    await waitFor(() =>
-      expect(screen.queryByRole('button', { name: 'logo.png' })).toBeNull()
-    );
-  });
-
-  it('keeps the file when the delete is cancelled', async () => {
-    const user = userEvent.setup();
-    const provider = createProvider();
-    renderBrowser(provider);
-    await user.click(await fileTile('logo.png'));
-    await user.click(screen.getByRole('button', { name: 'Delete' }));
-    await user.click(
-      within(await screen.findByRole('alertdialog')).getByRole('button', {
-        name: 'Cancel',
-      })
-    );
-    expect(provider.delete).not.toHaveBeenCalled();
-    expect(await fileTile('logo.png')).toBeVisible();
-  });
-
-  it('shows a delete failure', async () => {
-    const user = userEvent.setup();
-    renderBrowser(
-      createProvider({
-        delete: vi.fn(async () => {
-          throw new Error('locked');
-        }),
-      })
-    );
-    await user.click(await fileTile('logo.png'));
-    await user.click(screen.getByRole('button', { name: 'Delete' }));
-    await user.click(
-      within(await screen.findByRole('alertdialog')).getByRole('button', {
-        name: 'Delete',
-      })
-    );
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Could not delete logo.png.locked'
-    );
-  });
-});
-
 describe('MediaBrowser provider features', () => {
-  it('hides the toolbar, rename and delete when read-only', async () => {
+  it('hides the toolbar when read-only', async () => {
     const user = userEvent.setup();
     renderBrowser(
       createProvider({
@@ -639,13 +527,7 @@ describe('MediaBrowser provider features', () => {
       })
     );
     await user.click(await fileTile('logo.png'));
-    for (const name of [
-      'Refresh',
-      'New Folder',
-      'Upload',
-      'Rename',
-      'Delete',
-    ]) {
+    for (const name of ['Refresh', 'New Folder', 'Upload']) {
       expect(screen.queryByRole('button', { name })).toBeNull();
     }
   });
@@ -684,11 +566,18 @@ describe('MediaBrowser pick mode', () => {
     expect(onSelect).toHaveBeenCalledWith({ path: 'logo.png', kind: 'file' });
   });
 
-  it('offers no Insert in manage mode', async () => {
+  it('offers no Rename and no Delete, with a provider that can rename', async () => {
     const user = userEvent.setup();
-    renderBrowser(createProvider());
+    renderBrowser(
+      createProvider({
+        rename: vi.fn(async (_from: string, to: string) => to),
+      })
+    );
     await user.click(await fileTile('logo.png'));
-    expect(screen.queryByRole('button', { name: 'Insert' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Insert' })).toBeVisible();
+    for (const name of ['Rename', 'Delete']) {
+      expect(screen.queryByRole('button', { name })).toBeNull();
+    }
   });
 
   it('locks the type filter to accept and lists only those files', async () => {

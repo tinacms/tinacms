@@ -1629,17 +1629,12 @@ describe('TinaAdmin rail', () => {
     ).toHaveAttribute('aria-current', 'page');
   });
 
-  it('opens the Media panel beside the rail, with the library in the main area', async () => {
+  it('opens Media as a pane beside the rail, and the main area keeps its route', async () => {
     const user = userEvent.setup();
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: 'Media' }));
-    const panel = await screen.findByRole('complementary', {
-      name: 'Media panel',
-    });
-    expect(
-      within(panel).getByRole('button', { name: 'Media library' })
-    ).toHaveAttribute('aria-current', 'page');
     expect(await screen.findByText(/media library at/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Media library' })).toBeNull();
   });
 
   it('says so when a collection has no documents', async () => {
@@ -1694,7 +1689,7 @@ describe('TinaAdmin rail', () => {
     await waitFor(() => expect(window.location.hash).toBe('#/media'));
     expect(
       within(
-        await screen.findByRole('complementary', { name: 'Media panel' })
+        await screen.findByRole('complementary', { name: 'Media' })
       ).getByText('No media library is installed.')
     ).toBeVisible();
   });
@@ -1833,16 +1828,6 @@ describe('TinaAdmin rail', () => {
       'aria-current',
       'page'
     );
-  });
-
-  it('hides the empty Media main area below lg', async () => {
-    window.location.hash = '#/media';
-    renderAdmin();
-    const heading = await screen.findAllByRole('heading', { name: 'Media' });
-    const main = heading
-      .map((node) => node.closest('[data-slot=sidebar-inset]'))
-      .find(Boolean);
-    expect(main).toHaveClass('max-lg:hidden');
   });
 });
 

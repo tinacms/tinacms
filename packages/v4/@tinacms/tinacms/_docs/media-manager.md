@@ -1,9 +1,9 @@
 # The Media Manager
 
-`mediaManagerPlugin()` adds the Media Manager: an admin screen to browse,
-upload, rename and delete media. It holds no media itself. It uses the media
-plugin that the project installs, through `useMediaSlice()`. Refer to
-[media-plugins.md](./media-plugins.md) for the media contract.
+`mediaManagerPlugin()` adds the Media pane: a pane beside the side nav to
+browse, upload, move, download and delete media. It holds no media itself. It
+uses the media plugin that the project installs, through `useMediaSlice()`.
+Refer to [media-plugins.md](./media-plugins.md) for the media contract.
 
 ```ts
 import {
@@ -26,71 +26,86 @@ throws an error at boot.
 
 | Part | Value |
 |---|---|
-| Screen | `media`, at `#/screens/media` |
-| Sidebar | A "Media" `globalNav` entry that opens the screen |
+| Screen | `media`, at `#/screens/media`. The admin shows it as a pane beside the side nav. |
+| Sidebar | A "Media" `globalNav` entry that opens the pane |
 
-The URL holds the open folder. `#/screens/media/posts/2026` opens the folder
-`posts/2026`, so a folder link can be shared and Back works.
+The main area keeps showing the page that was open before. Close returns to
+that page. A link to `#/screens/media/posts/2026` opens the pane at the folder
+`posts/2026` with Home in the main area, so a folder link can be shared. Back
+steps out through the folders before it leaves Media.
 
-## What the screen does
+## What the pane does
 
-The screen shows a `MediaBrowser` in `manage` mode.
+- **Layout.** On a desktop, the Maximise button in the header widens the pane
+  over the main area, and Restore returns it. On a tablet the pane opens
+  maximised. On a phone it fills the screen.
+- **Browse.** The pane lists folders first, then files, in Grid or List. The
+  folder trail shows the path above the files. A line at the foot counts
+  the folders and files. The next page loads when you scroll near the end.
+- **Search.** The search box shows when `features.search` is `true`. It
+  filters the open folder by file name and shows the number of hits.
+- **New folder.** The dialog refuses a name with spaces or bad characters, and a
+  name that exists. A folder that has no file disappears when you leave it.
+- **Details.** A click on a file opens its details: the whole picture, the
+  folder, the type, and how many documents use the file. Copy URL copies the
+  absolute URL. Delete asks first. With a wide pane the details sit beside the
+  files. With a narrow pane they replace the files, and Back returns.
+- **Select mode.** Select lets you choose several files. The bar offers
+  Download, Copy URLs, Move and Delete.
+- **Delete.** Delete always asks first. The dialog lists the documents that use
+  the file, including your own unsaved edits. Saved documents come from the
+  `search` capability. Without it, only your unsaved edits show, and the dialog
+  says that it could not check. The list warns and never blocks. Open on a
+  document cancels the delete and opens the document.
+- **Move.** Move puts the selected files in a folder that you choose. The
+  provider needs `rename`. Move warns the same way as Delete: documents that
+  store the old path show a missing file afterward.
+- **Download.** Download saves each selected file under its own name. If the
+  media store refuses the download, a message names how many files failed.
+- **Protected branch.** The first delete or move on a protected branch asks for
+  a new branch, as Save does. Without a handler for the dialog, the action is
+  off and nothing changes.
+- **Upload.** "Upload" and drag and drop work as before. The browser rejects a
+  file that has the wrong type or is too large.
+- **States.** The pane shows a loading look, an empty look, a no-results look, a
+  can't-load look with "Try again", and a not-set-up look with the provider's
+  link.
 
-- **Views.** A toggle changes between a grid and a list. The grid is the
-  default. The grid shows folders and files in different sections.
-- **Tiles.** An image shows a thumbnail on a checkerboard. A video shows a
-  dark tile with a play icon. Other files show a file icon. Each file shows a
-  badge with its type, and `jpg` shows as `JPEG`.
-- **Details.** A click on a file opens the details panel. A second click on
-  the same file closes it. The panel shows a large preview and the full URL.
-  A click on the URL copies it. The panel has Rename and Delete buttons.
-- **Folders.** A click on a folder opens it. The breadcrumb starts at "Media",
-  and each folder in it opens on a click. The arrow opens the parent folder.
-- **Toolbar.** "Refresh" loads the folder again. "New Folder" opens a folder
-  that does not exist yet. The folder disappears if you leave it before you
-  upload a file to it. "Upload" uploads files to the open folder.
-- **Drag and drop.** Files dropped on the media area upload to the open
-  folder. The area shows an orange border during the drag.
-- **Upload checks.** The browser rejects a file that has the wrong type or is
-  too large. An alert names each rejected file and the reason. New files show
-  a "NEW" badge, go to the top of the list, and the first one opens in the
-  details panel.
-- **All, Folders, Files.** A toggle shows all items, folders only or files
-  only.
-- **Infinite scroll.** The next page loads when you scroll to the end.
-- **Rename.** You can change the base name. The extension does not change.
-  The dialog shows the safe file name that the provider gets. Renaming does
-  not update content that uses the old path.
-- **Delete.** Delete asks for confirmation first.
-- **States.** The browser shows a loading state, an error state with
-  "Try again", and an empty state.
+The pane has no Rename and no filters for kind or type. Pick mode keeps its
+filters.
 
 ## What depends on the provider
 
-The browser shows some controls only when the media provider supports them.
+The pane shows some controls only when the media provider supports them.
 
 | Control | Shows when |
 |---|---|
 | Search box | `features.search` is `true` |
-| "Any type" filter | `features.extensionFilter` is `true` |
-| Rename | The provider has `rename`, and `features.readOnly` is not `true` |
-| Toolbar, upload, drag and drop, Delete | `features.readOnly` is not `true` |
-| Setup banner, in place of the browser | `status()` returns `needs-setup` |
+| Move | The provider has `rename`, and `features.readOnly` is not `true` |
+| New folder, Delete, Move | `features.readOnly` is not `true` |
+| Upload, drag and drop | `features.readOnly` is not `true` |
+| Not-set-up look, in place of the library | `status()` returns `needs-setup` |
+
+A delete or move that the storage refuses with `unauthorized` turns Delete and
+Move off with "You don't have permission to delete." The lock lasts until the
+branch changes, the editor signs in again or the page reloads. If the editor is
+not signed in, the pane says "Your session has expired. Sign in again." and
+locks nothing.
 
 The upload checks use `features.acceptedMimeTypes`,
 `features.acceptedExtensions` and `features.maxSize`. A file passes the type
 check if it matches one MIME type or one extension. If the provider sets
-neither list, the browser accepts the default v3 list: text, images, video,
-PDF, office documents and some 3D formats.
+neither list, the pane accepts the default v3 list: text, images, video, PDF,
+office documents and some 3D formats.
 
-`resolveUrl` gets a size for each image: 400x400 for the grid, 75x75 for the
-list and 1000x1000 for the details panel. A provider without image transforms
-ignores the size.
+`resolveUrl` gets a size for each image: 400x400 for the grid, 80x80 for the
+list. A provider without image transforms ignores the size.
 
 ## Pick mode
 
-`MediaBrowser` (`@tinacms/tinacms/react`) also has a `pick` mode, for a field
-that selects media. In `pick` mode the details panel has an "Insert" button.
+`MediaBrowser` (`@tinacms/tinacms/react`) is the browser for a field that
+selects media. It has one mode, `pick`. The details panel has an "Insert"
+button, and no Rename or Delete.
 The browser keeps the open folder in its own state, not in the URL.
 The [`image` field](./image-field.md) uses `pick` mode in a dialog.
 
@@ -106,9 +121,9 @@ import { MediaBrowser } from '@tinacms/tinacms/react';
 
 | Prop | Role |
 |---|---|
-| `mode` | `'manage'` or `'pick'`. |
-| `onSelect(item)` | `pick` only. Gets the file when the user clicks "Insert". |
-| `accept` | `pick` only. A category (`image`, `video`, `audio`, `document`), an extension, or a list of them. |
+| `mode` | `'pick'`. |
+| `onSelect(item)` | Gets the file when the user clicks "Insert". |
+| `accept` | A category (`image`, `video`, `audio`, `document`), an extension, or a list of them. |
 | `folder`, `onFolderChange` | Optional. Give both to control the open folder. |
 
 `accept` replaces `features.acceptedMimeTypes` and
@@ -120,5 +135,6 @@ chip such as "Images only" shows in place of the type filter.
 
 - A folder is not a real object. "New Folder" does not create it on the
   provider.
-- `localMediaPlugin()` supplies no optional additions. With it, the screen
-  has no search, no type filter and no Rename.
+- `localMediaPlugin()` supplies `rename`, so Move works. It supplies no search.
+- `tinaCloud()` has no Move, because its rename endpoint does not move a file to
+  another folder.

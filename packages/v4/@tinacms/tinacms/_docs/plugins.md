@@ -357,7 +357,7 @@ Two overrides of one screen throw an error at boot
   - [The `rich-text` field](./rich-text-field.md) — the Plate editor that v4
     supplies, and the markdown body that it controls
 - [Media plugins](./media-plugins.md) — how a plugin stores media, and the local media plugin
-  - [The Media Manager](./media-manager.md) — the screen to browse, upload, rename and delete media, and the `MediaBrowser` component
+  - [The Media Manager](./media-manager.md) — the pane to browse, upload, move, download and delete media, and the `MediaBrowser` component
 - [Auth plugins](./auth-plugins.md): how a plugin verifies a request and signs the editor in
 - [UI slots](./ui-slots.md) — how a plugin adds entries to the admin sidebar
 - [Architecture](./architecture.md) — how a plugin gets to the screen

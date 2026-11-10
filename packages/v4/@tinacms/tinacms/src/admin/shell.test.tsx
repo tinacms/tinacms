@@ -1119,6 +1119,7 @@ describe('Save to new branch', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(saveHandler).toHaveBeenCalledOnce();
     expect(saveHandler).toHaveBeenCalledWith({
+      kind: 'form',
       name: 'docs/hello-edits',
       reason: 'protected',
       formId: toFormId('content/posts/hello.mdx'),

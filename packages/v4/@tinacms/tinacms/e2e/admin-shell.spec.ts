@@ -26,7 +26,7 @@ const NARROW_VIEWPORTS = [
   { width: 375, height: 812 },
   { width: 768, height: 1024 },
 ];
-const SCREEN_ROUTES = ['/#/screens/media', '/#/collections/nope'];
+const SCREEN_ROUTES = ['/#/collections/nope'];
 
 for (const viewport of NARROW_VIEWPORTS) {
   for (const route of SCREEN_ROUTES) {
@@ -52,15 +52,58 @@ for (const viewport of NARROW_VIEWPORTS) {
   }
 }
 
-test('the media route hides its empty main area below 1024px', async ({
+test('the Media pane fills the screen below 1024px and hides the main area', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 768, height: 1024 });
   await page.goto('/#/media');
-  await expect(page.locator('[data-slot=sidebar-inset]')).toBeHidden();
   await expect(
-    page.getByRole('complementary', { name: 'Media panel' })
+    page.getByRole('complementary', { name: 'Media' })
   ).toBeVisible();
+  await expect(page.locator('[data-slot=sidebar-inset]')).toBeHidden();
+});
+
+for (const viewport of [
+  { width: 390, height: 844 },
+  { width: 1280, height: 800 },
+]) {
+  test(`the Media pane does not scroll the page sideways at ${viewport.width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto('/#/screens/media');
+    const pane = page.getByRole('complementary', { name: 'Media' });
+    await expect(pane).toBeVisible();
+    await expect(
+      pane.getByRole('button', { name: 'preview.svg' })
+    ).toBeVisible();
+    for (const view of ['List view', 'Grid view']) {
+      await pane.getByRole('button', { name: view }).click();
+      const overflow = await page.evaluate(() => {
+        const root = document.scrollingElement;
+        return root ? root.scrollWidth - root.clientWidth : 0;
+      });
+      expect(overflow).toBeLessThanOrEqual(0);
+    }
+    await pane.getByRole('button', { name: 'Select' }).click();
+    const overflow = await page.evaluate(() => {
+      const root = document.scrollingElement;
+      return root ? root.scrollWidth - root.clientWidth : 0;
+    });
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}
+
+test('on a desktop the Media pane maximises over the main area and restores', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/#/screens/media');
+  const pane = page.getByRole('complementary', { name: 'Media' });
+  await pane.getByRole('button', { name: 'Maximise' }).click();
+  await expect(page.locator('[data-slot=sidebar-inset]')).toBeHidden();
+  await pane.getByRole('button', { name: 'Restore' }).click();
+  await expect(page.locator('[data-slot=sidebar-inset]')).toBeVisible();
 });
 
 test('the rail starts where the Top bar ends', async ({ page }) => {

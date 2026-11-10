@@ -302,7 +302,12 @@ function SaveButton() {
     const chosen = typed.trim();
     setRevealed(true);
     if (!handler || branchNameError(chosen, taken, true)) return;
-    const request = { name: chosen, reason: dialog.reason, formId };
+    const request = {
+      kind: 'form' as const,
+      name: chosen,
+      reason: dialog.reason,
+      formId,
+    };
     if (dialog.reason === 'protected') {
       setDialog(null);
       setPending(true);
