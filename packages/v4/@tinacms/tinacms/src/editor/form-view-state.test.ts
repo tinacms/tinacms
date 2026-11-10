@@ -364,6 +364,8 @@ describe('error summary', () => {
         .getState()
         .fix(new Set(['heading', 'seo', 'seo.title']), labelOf, null);
       expect(rows(store)).toEqual(['heading', 'seo']);
+      store.getState().fix(new Set(['seo', 'seo.title']), labelOf, null);
+      expect(rows(store)).toEqual(['seo']);
     });
 
     it('keeps the parent hidden while it is not a leaf', () => {

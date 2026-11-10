@@ -9,6 +9,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { defineClientPlugin } from '../client';
 import { asResolvedConfig } from '../config';
 import type { DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
@@ -37,6 +38,25 @@ const OTHER_DOCUMENT: TinaDocument = {
   seo: { metaTitle: 'Meta' },
   items: [{ heading: 'A' }],
 };
+
+const codeIsOk = definePlugin({
+  name: 'test:code-is-ok',
+  provides: ['validator'],
+  validators: ['codeIsOk'],
+  client: async () => ({
+    default: defineClientPlugin({
+      validators: {
+        codeIsOk: () => (value) =>
+          typeof value === 'object' &&
+          value !== null &&
+          'code' in value &&
+          value.code === 'ok'
+            ? null
+            : 'Code must be ok.',
+      },
+    }),
+  }),
+});
 
 const contentPlugin = definePlugin({
   name: 'test:content',
@@ -69,6 +89,7 @@ const contentPlugin = definePlugin({
 const config = asResolvedConfig({
   plugins: [
     contentPlugin,
+    codeIsOk,
     stringFieldPlugin,
     objectFieldPlugin,
     arrayFieldPlugin,
@@ -172,6 +193,19 @@ const config = asResolvedConfig({
               }),
             ],
           }),
+          t.object({
+            name: 'profile',
+            label: 'Profile',
+            validators: [{ name: 'codeIsOk', args: [] }],
+            fields: [
+              t.string({
+                name: 'handle',
+                label: 'Handle',
+                validators: [required()],
+              }),
+              t.string({ name: 'code', label: 'Code' }),
+            ],
+          }),
           t.string({
             name: 'quiet',
             label: 'Quiet',
@@ -205,6 +239,7 @@ beforeEach(() => {
     cards: [{ a: 'x', b: 'x', c: 'x' }],
     scores: [1, 2],
     panel: [{ title: 'x' }, { title: 'y' }],
+    profile: { handle: 'h', code: 'ok' },
     quiet: 'x',
   };
   window.location.hash = `#/collections/note/${encodeURIComponent(PATH)}`;
@@ -374,6 +409,42 @@ describe('a Save that finds invalid fields', () => {
       globalThis.document.querySelector('[data-slot=error-announcement]')
         ?.textContent
     ).toBe('Panel title fixed. 1 error left.');
+  });
+
+  it('lists an object’s own error once its failing child is fixed, then plays All fixed when the object is fixed', async () => {
+    const release = holdAnimations();
+    try {
+      document = { ...document, profile: { handle: '', code: 'bad' } };
+      const user = userEvent.setup();
+      renderAdmin();
+      await user.type(await titleInput(), '!');
+      await user.click(await saveButton());
+      expect(
+        await screen.findByRole('button', { name: 'Resolve 1 error' })
+      ).toBeVisible();
+      await fixFieldOf(user, /^Handle/);
+      const pane = await errorsPane();
+      await waitFor(() =>
+        expect(
+          within(pane).getByRole('button', { name: /^Profile\b/ })
+        ).toBeVisible()
+      );
+      expect(within(pane).getByText('Code must be ok.')).toBeVisible();
+      expect(
+        screen.getByRole('button', { name: 'Resolve 1 error' })
+      ).toBeVisible();
+      expect(
+        globalThis.document.querySelector('[data-slot=error-announcement]')
+          ?.textContent
+      ).toBe('Handle fixed. 1 error left.');
+      const code = await screen.findByLabelText(/^Code\b/);
+      await user.clear(code);
+      await user.type(code, 'ok');
+      expect(await screen.findByText('All fixed.')).toBeVisible();
+      expect(await screen.findByRole('button', { name: 'Save' })).toBeEnabled();
+    } finally {
+      release();
+    }
   });
 
   it('tucks the pane on Esc, shows an edge tab and brings the pane back from it', async () => {
