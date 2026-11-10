@@ -197,8 +197,13 @@ const startOnFeatureBranch = () =>
     })
   );
 
+let paneClient = new QueryClient();
+
 const renderPane = (hash = '#/screens/media') => {
   window.location.hash = hash;
+  paneClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   return render(
     <SaveToNewBranchContext value={world.saveHandler}>
       <TinaAdmin
@@ -223,9 +228,7 @@ const renderPane = (hash = '#/screens/media') => {
           },
           build: { publicFolder: 'public', outputFolder: 'admin' },
         })}
-        queryClient={
-          new QueryClient({ defaultOptions: { queries: { retry: false } } })
-        }
+        queryClient={paneClient}
       />
     </SaveToNewBranchContext>
   );
@@ -1418,6 +1421,86 @@ describe('runs are bound to their branch', () => {
     ).toBeVisible();
     expect(calls).toBe(1);
     expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
+  });
+
+  it('closes the open confirm when the branch changes, so nothing runs on the old paths', async () => {
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await file('logo.png'));
+    await user.click(
+      within(
+        await screen.findByRole('region', { name: 'Details of logo.png' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    expect(await screen.findByRole('alertdialog')).toBeVisible();
+    act(() => world.switchBranch?.('other'));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(world.deleted).toEqual([]);
+  });
+
+  it('keeps a Retry run stopped when the branch changes during it', async () => {
+    world.files.push({ path: 'third.png', kind: 'file' });
+    world.failDelete = () => new MediaError('backend-failure');
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await screen.findByRole('button', { name: 'Select' }));
+    await user.click(screen.getByRole('button', { name: 'Select all' }));
+    await user.click(screen.getByRole('button', { name: 'Delete 3' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Delete 3 files' })
+    );
+    const retry = await screen.findByRole('button', { name: 'Retry' });
+    let release: () => void = () => {};
+    let calls = 0;
+    world.failDelete = () => undefined;
+    world.deleteGate = async () => {
+      calls += 1;
+      if (calls === 1) {
+        await new Promise<void>((resolve) => {
+          release = resolve;
+        });
+      }
+    };
+    await user.click(retry);
+    await waitFor(() => expect(calls).toBe(1));
+    act(() => world.switchBranch?.('other'));
+    await act(async () => release());
+    expect(
+      await screen.findByText(/The branch changed, so this stopped/)
+    ).toBeVisible();
+    expect(calls).toBe(1);
+  });
+
+  it('refreshes the usage cache once the run ends even if the pane closed mid-run', async () => {
+    let release: () => void = () => {};
+    world.deleteGate = () =>
+      new Promise<void>((resolve) => {
+        release = resolve;
+      });
+    const user = userEvent.setup();
+    const view = renderPane();
+    await user.click(await file('logo.png'));
+    await user.click(
+      within(
+        await screen.findByRole('region', { name: 'Details of logo.png' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    await user.click(
+      await within(await screen.findByRole('alertdialog')).findByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+    await waitFor(() => expect(world.deleteGate).not.toBeNull());
+    const invalidate = vi.spyOn(paneClient, 'invalidateQueries');
+    view.unmount();
+    await act(async () => release());
+    await waitFor(() =>
+      expect(invalidate).toHaveBeenCalledWith({
+        queryKey: ['tina', 'media', 'usage'],
+      })
+    );
+    expect(invalidate).toHaveBeenCalledTimes(2);
   });
 
   it('drops a failure and its Retry when the branch changes, and a fresh Delete on a protected branch asks for a new branch', async () => {

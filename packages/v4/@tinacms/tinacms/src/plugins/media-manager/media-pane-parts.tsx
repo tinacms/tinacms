@@ -473,24 +473,32 @@ export function SelectBar({
     <div
       role='toolbar'
       aria-label='Selected files'
-      className='flex flex-wrap items-center gap-2 border-b border-border-subtle px-3 py-2'
+      className='flex flex-col gap-2 border-b border-border-subtle px-3 py-2'
     >
-      <button
-        type='button'
-        aria-label={count > 0 ? 'Clear selection' : 'Select all'}
-        disabled={loadedCount === 0}
-        onClick={count > 0 ? onClear : onSelectAll}
-        className='flex size-5 items-center justify-center rounded-full border bg-card outline-none focus-visible:shadow-focus-ring'
-      >
-        {count > 0 ? <Icon glyph={CheckIcon} size={14} /> : null}
-      </button>
-      <span role='status' className='text-sm'>
-        {count} selected
-      </span>
-      <div className='ml-auto flex flex-wrap items-center justify-end gap-2'>
-        <Button type='button' variant='ghost' size='sm' onClick={onCancel}>
+      <div className='flex items-center gap-2'>
+        <button
+          type='button'
+          aria-label={count > 0 ? 'Clear selection' : 'Select all'}
+          disabled={loadedCount === 0}
+          onClick={count > 0 ? onClear : onSelectAll}
+          className='flex size-5 items-center justify-center rounded-full border bg-card outline-none focus-visible:shadow-focus-ring'
+        >
+          {count > 0 ? <Icon glyph={CheckIcon} size={14} /> : null}
+        </button>
+        <span role='status' className='text-sm'>
+          {count} selected
+        </span>
+        <Button
+          type='button'
+          variant='ghost'
+          size='sm'
+          className='ml-auto'
+          onClick={onCancel}
+        >
           Cancel
         </Button>
+      </div>
+      <div className='flex items-center gap-2'>
         <Button
           type='button'
           variant='outline'

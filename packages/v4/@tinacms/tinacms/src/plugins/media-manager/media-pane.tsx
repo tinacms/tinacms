@@ -181,7 +181,10 @@ export function MediaPane({ segments }: AdminScreenProps) {
           null;
       }
     },
-    () => setSelected(new Set())
+    () => {
+      setSelected(new Set());
+      setConfirm(null);
+    }
   );
   useEffect(() => {
     if (pendingFocus.current === undefined) return;

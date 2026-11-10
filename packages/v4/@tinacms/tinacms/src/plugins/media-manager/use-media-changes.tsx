@@ -97,6 +97,14 @@ export function useMediaChanges(
     return () => clearTimeout(timer);
   }, [status]);
 
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
   const refreshMedia = (on: string) => {
     void queryClient.invalidateQueries({ queryKey: [...MEDIA_LIST_KEY, on] });
     void queryClient.invalidateQueries({
@@ -104,7 +112,6 @@ export function useMediaChanges(
     });
   };
 
-  // A listing mounted after the run began misses the direct refresh, so refresh again after the render.
   const [settledOn, setSettledOn] = useState({ branch: '', count: 0 });
   useEffect(() => {
     if (settledOn.count > 0) refreshMedia(settledOn.branch);
@@ -128,6 +135,7 @@ export function useMediaChanges(
     lastBranch.current = branch;
     if (expectedBranch.current === branch) return;
     cancelled.current = true;
+    setPending(null);
     onBranchDrift();
     setStatus((current) => (current?.tone === 'error' ? null : current));
   }, [branch]);
@@ -172,8 +180,11 @@ export function useMediaChanges(
         failed.push({ path, cause });
       }
     }
-    refreshMedia(bound);
-    setSettledOn((current) => ({ branch: bound, count: current.count + 1 }));
+    if (mounted.current) {
+      setSettledOn((current) => ({ branch: bound, count: current.count + 1 }));
+    } else {
+      refreshMedia(bound);
+    }
     onSettled({ change: { ...change, paths }, succeeded });
 
     if (refused) {
