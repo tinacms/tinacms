@@ -67,7 +67,10 @@ interface PendingBranch {
  * Runs Delete and Move for the Media pane: one file at a time, the protected-branch
  * dialog first, and the permission lock learned from a refused call.
  */
-export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
+export function useMediaChanges(
+  onSettled: (result: ChangeResult) => void,
+  onBranchDrift: () => void
+) {
   const media = useMediaSlice();
   const runtime = use(TinaRuntimeContext);
   const handler = use(SaveToNewBranchContext);
@@ -79,7 +82,6 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
   const [lock, setLock] = useState<{ branch: string; who: string } | null>(
     null
   );
-  const [refresh, setRefresh] = useState({ branch: '', count: 0 });
   const [pending, setPending] = useState<PendingBranch | null>(null);
   const [name, setName] = useState('');
   const [revealed, setRevealed] = useState(false);
@@ -95,15 +97,18 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
     return () => clearTimeout(timer);
   }, [status]);
 
-  useEffect(() => {
-    if (refresh.count === 0) return;
-    void queryClient.invalidateQueries({
-      queryKey: [...MEDIA_LIST_KEY, refresh.branch],
-    });
+  const refreshMedia = (on: string) => {
+    void queryClient.invalidateQueries({ queryKey: [...MEDIA_LIST_KEY, on] });
     void queryClient.invalidateQueries({
       queryKey: ['tina', 'media', 'usage'],
     });
-  }, [refresh, queryClient]);
+  };
+
+  // A listing mounted after the run began misses the direct refresh, so refresh again after the render.
+  const [settledOn, setSettledOn] = useState({ branch: '', count: 0 });
+  useEffect(() => {
+    if (settledOn.count > 0) refreshMedia(settledOn.branch);
+  }, [settledOn]);
 
   const isProtected =
     view?.mode === 'branches' &&
@@ -117,10 +122,13 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
 
   const expectedBranch = useRef<string | null>(null);
   const lastBranch = useRef(branch);
+  const cancelled = useRef(false);
   useEffect(() => {
     if (lastBranch.current === branch) return;
     lastBranch.current = branch;
     if (expectedBranch.current === branch) return;
+    cancelled.current = true;
+    onBranchDrift();
     setStatus((current) => (current?.tone === 'error' ? null : current));
   }, [branch]);
 
@@ -130,6 +138,7 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
     documents: number,
     bound: string
   ) => {
+    cancelled.current = false;
     setStatus({
       tone: 'busy',
       text: `${change.kind === 'delete' ? 'Deleting' : 'Moving'} ${subjectOf(paths)}`,
@@ -140,7 +149,7 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
     let refused = false;
     let stopped = false;
     for (const [index, path] of paths.entries()) {
-      if (liveBranch() !== bound) {
+      if (cancelled.current || liveBranch() !== bound) {
         stopped = true;
         break;
       }
@@ -163,7 +172,8 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
         failed.push({ path, cause });
       }
     }
-    setRefresh((current) => ({ branch: bound, count: current.count + 1 }));
+    refreshMedia(bound);
+    setSettledOn((current) => ({ branch: bound, count: current.count + 1 }));
     onSettled({ change: { ...change, paths }, succeeded });
 
     if (refused) {

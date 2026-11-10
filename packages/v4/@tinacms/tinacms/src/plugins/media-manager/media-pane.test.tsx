@@ -1387,6 +1387,39 @@ describe('runs are bound to their branch', () => {
     expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
   });
 
+  it('keeps a delete stopped after the editor switches away and back during a call', async () => {
+    world.files.push({ path: 'third.png', kind: 'file' });
+    let release: () => void = () => {};
+    let calls = 0;
+    world.deleteGate = async () => {
+      calls += 1;
+      if (calls === 1) {
+        await new Promise<void>((resolve) => {
+          release = resolve;
+        });
+      }
+    };
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await screen.findByRole('button', { name: 'Select' }));
+    await user.click(screen.getByRole('button', { name: 'Select all' }));
+    await user.click(screen.getByRole('button', { name: 'Delete 3' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Delete 3 files' })
+    );
+    await waitFor(() => expect(calls).toBe(1));
+    act(() => world.switchBranch?.('other'));
+    act(() => world.switchBranch?.('feature/news'));
+    await act(async () => release());
+    expect(
+      await screen.findByText(
+        'The branch changed, so this stopped. Deleted 1 of 3 files.'
+      )
+    ).toBeVisible();
+    expect(calls).toBe(1);
+    expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
+  });
+
   it('drops a failure and its Retry when the branch changes, and a fresh Delete on a protected branch asks for a new branch', async () => {
     world.failDelete = () => new MediaError('backend-failure');
     const user = userEvent.setup();

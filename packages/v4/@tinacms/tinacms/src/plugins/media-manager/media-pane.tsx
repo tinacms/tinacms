@@ -164,19 +164,25 @@ export function MediaPane({ segments }: AdminScreenProps) {
   const filePaths = files.map((item) => item.path);
   const { fetchNextPage, hasNextPage, isFetchingNextPage } = listing;
 
-  const changes = useMediaChanges((result: ChangeResult) => {
-    const gone = new Set(result.succeeded);
-    setSelected((current) => new Set([...current].filter((p) => !gone.has(p))));
-    if (result.succeeded.length === result.change.paths.length) {
-      setSelecting(false);
-    }
-    if (activePath !== null && gone.has(activePath)) setActivePath(null);
-    if (result.change.kind === 'delete' && result.succeeded.length > 0) {
-      const lastIndex = filePaths.findLastIndex((path) => gone.has(path));
-      pendingFocus.current =
-        filePaths.slice(lastIndex + 1).find((path) => !gone.has(path)) ?? null;
-    }
-  });
+  const changes = useMediaChanges(
+    (result: ChangeResult) => {
+      const gone = new Set(result.succeeded);
+      setSelected(
+        (current) => new Set([...current].filter((p) => !gone.has(p)))
+      );
+      if (result.succeeded.length === result.change.paths.length) {
+        setSelecting(false);
+      }
+      if (activePath !== null && gone.has(activePath)) setActivePath(null);
+      if (result.change.kind === 'delete' && result.succeeded.length > 0) {
+        const lastIndex = filePaths.findLastIndex((path) => gone.has(path));
+        pendingFocus.current =
+          filePaths.slice(lastIndex + 1).find((path) => !gone.has(path)) ??
+          null;
+      }
+    },
+    () => setSelected(new Set())
+  );
   useEffect(() => {
     if (pendingFocus.current === undefined) return;
     const target = pendingFocus.current;

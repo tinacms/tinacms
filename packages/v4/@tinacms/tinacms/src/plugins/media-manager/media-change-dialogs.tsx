@@ -53,7 +53,7 @@ function UseCard({
   return (
     <li className='flex items-center gap-2 rounded-sm border border-border-subtle px-2.5 py-1.5'>
       <div className='min-w-0 flex-1'>
-        <p className='m-0 truncate text-sm font-medium'>{titleOf(use)}</p>
+        <p className='m-0 text-sm font-medium break-words'>{titleOf(use)}</p>
         <p className='m-0 truncate text-xs text-muted-foreground'>
           {documentPath}
         </p>

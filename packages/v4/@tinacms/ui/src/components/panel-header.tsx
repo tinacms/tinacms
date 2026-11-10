@@ -67,7 +67,7 @@ function PanelHeader({
           {backLabel}
         </Button>
       ) : heading ? (
-        <h2 className='m-0 min-w-0 flex-initial truncate pl-1.5 text-base leading-title font-semibold text-foreground'>
+        <h2 className='m-0 mr-1.5 min-w-0 flex-initial truncate pl-1.5 text-base leading-title font-semibold text-foreground'>
           {heading}
         </h2>
       ) : null}

@@ -487,45 +487,46 @@ export function SelectBar({
       <span role='status' className='text-sm'>
         {count} selected
       </span>
-      <span className='flex-1' />
-      <Button type='button' variant='ghost' size='sm' onClick={onCancel}>
-        Cancel
-      </Button>
-      <Button
-        type='button'
-        variant='outline'
-        size='sm'
-        disabled={none}
-        onClick={onDownload}
-      >
-        Download
-      </Button>
-      <CopyButton
-        label='Copy URLs'
-        announce='URLs copied'
-        getText={getUrls}
-        disabled={none}
-      />
-      {hasMove ? (
+      <div className='ml-auto flex flex-wrap items-center justify-end gap-2'>
+        <Button type='button' variant='ghost' size='sm' onClick={onCancel}>
+          Cancel
+        </Button>
         <Button
           type='button'
           variant='outline'
           size='sm'
-          disabled={none || locked}
-          onClick={onMove}
+          disabled={none}
+          onClick={onDownload}
         >
-          Move
+          Download
         </Button>
-      ) : null}
-      <Button
-        type='button'
-        variant='destructive'
-        size='sm'
-        disabled={none || locked}
-        onClick={onDelete}
-      >
-        {none ? 'Delete' : `Delete ${count}`}
-      </Button>
+        <CopyButton
+          label='Copy URLs'
+          announce='URLs copied'
+          getText={getUrls}
+          disabled={none}
+        />
+        {hasMove ? (
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            disabled={none || locked}
+            onClick={onMove}
+          >
+            Move
+          </Button>
+        ) : null}
+        <Button
+          type='button'
+          variant='destructive'
+          size='sm'
+          disabled={none || locked}
+          onClick={onDelete}
+        >
+          {none ? 'Delete' : `Delete ${count}`}
+        </Button>
+      </div>
     </div>
   );
 }
