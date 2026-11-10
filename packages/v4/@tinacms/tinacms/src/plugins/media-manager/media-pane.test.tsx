@@ -1435,6 +1435,11 @@ describe('runs are bound to their branch', () => {
     expect(await screen.findByRole('alertdialog')).toBeVisible();
     act(() => world.switchBranch?.('other'));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => {
+      expect(['Media', 'Files in Media']).toContain(
+        document.activeElement?.getAttribute('aria-label')
+      );
+    });
     expect(world.deleted).toEqual([]);
   });
 

@@ -124,6 +124,7 @@ export function MediaPane({ segments }: AdminScreenProps) {
   const [selecting, setSelecting] = useState(false);
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
   const [confirm, setConfirm] = useState<Confirm | null>(null);
+  const [driftFocus, setDriftFocus] = useState(0);
   const [newFolder, setNewFolder] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -184,6 +185,7 @@ export function MediaPane({ segments }: AdminScreenProps) {
     () => {
       setSelected(new Set());
       setConfirm(null);
+      setDriftFocus((count) => count + 1);
     }
   );
   useEffect(() => {
@@ -198,6 +200,14 @@ export function MediaPane({ segments }: AdminScreenProps) {
           );
     (button ?? library.current)?.focus();
   }, [items.length]);
+
+  useEffect(() => {
+    if (driftFocus === 0) return;
+    const frame = requestAnimationFrame(() =>
+      (library.current ?? root.current)?.focus()
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [driftFocus]);
 
   const loadMore = () => {
     if (hasNextPage && !isFetchingNextPage) void fetchNextPage();
@@ -661,9 +671,10 @@ function MediaPaneRoot({
   return (
     <aside
       ref={rootRef}
+      tabIndex={-1}
       aria-label='Media'
       className={cn(
-        'flex min-h-0 min-w-0 flex-col border-r border-border',
+        'outline-none flex min-h-0 min-w-0 flex-col border-r border-border',
         maximised ? 'flex-1' : 'w-110 max-lg:flex-1'
       )}
     >
