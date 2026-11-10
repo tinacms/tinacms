@@ -58,7 +58,6 @@ const options = {
 describe('editorial workflow branch naming', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    window.localStorage.clear();
     mocks.listBranches.mockResolvedValue([]);
     vi.spyOn(Math, 'random').mockReturnValue(0);
     mocks.branchExists.mockResolvedValue(false);

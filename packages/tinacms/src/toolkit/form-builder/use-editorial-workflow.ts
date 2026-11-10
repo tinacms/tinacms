@@ -223,10 +223,6 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
         ? await createWorkflowBranch({
             branchName,
             targetBranchExists,
-            historyScope: JSON.stringify([
-              tinaApi.contentApiBase,
-              tinaApi.clientId,
-            ]),
             listBranchNames: async () => {
               const branches = await tinaApi.listBranches({
                 includeIndexStatus: false,

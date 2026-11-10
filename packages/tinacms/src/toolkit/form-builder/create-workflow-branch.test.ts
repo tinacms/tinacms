@@ -13,14 +13,12 @@ const tierNames = (tier = 1) =>
 const setup = (targetBranchExists = false) => ({
   branchName,
   targetBranchExists,
-  historyScope: 'test-app',
   listBranchNames: vi.fn(async (): Promise<string[]> => []),
   create: vi.fn(async (name: string) => ({ branchName: name })),
 });
 
 describe('createWorkflowBranch', () => {
   beforeEach(() => {
-    window.localStorage.clear();
     vi.spyOn(Math, 'random').mockReturnValue(0);
   });
   afterEach(() => vi.restoreAllMocks());
@@ -76,36 +74,12 @@ describe('createWorkflowBranch', () => {
     });
   });
 
-  it('keeps a deleted generated name retired across separate saves', async () => {
-    await createWorkflowBranch(setup(true));
-    const next = setup();
-    expect(await createWorkflowBranch(next)).toEqual({
-      branchName: `${branchName}-llama`,
+  it('can reuse a name after its branch is deleted', async () => {
+    expect(await createWorkflowBranch(setup(true))).toEqual({
+      branchName: `${branchName}-tina`,
     });
-  });
-
-  it('remembers observed existing names even after they are deleted', async () => {
-    const options = setup(true);
-    options.listBranchNames.mockResolvedValue(tierNames());
-    await createWorkflowBranch(options);
-    expect(await createWorkflowBranch(setup())).toEqual({
-      branchName: `${branchName}-llama-2`,
-    });
-  });
-
-  it('keeps history isolated between apps', async () => {
-    await createWorkflowBranch(setup());
-    expect(
-      await createWorkflowBranch({ ...setup(), historyScope: 'other-app' })
-    ).toEqual({ branchName });
-  });
-
-  it('remembers the canonical branch name returned by the server', async () => {
-    const options = setup();
-    options.create.mockResolvedValueOnce({ branchName: `${branchName}-tina` });
-    await createWorkflowBranch(options);
-    expect(await createWorkflowBranch(setup())).toEqual({
-      branchName: `${branchName}-llama`,
+    expect(await createWorkflowBranch(setup(true))).toEqual({
+      branchName: `${branchName}-tina`,
     });
   });
 
@@ -140,9 +114,6 @@ describe('createWorkflowBranch', () => {
     options.create.mockRejectedValue(error);
     await expect(createWorkflowBranch(options)).rejects.toBe(error);
     expect(options.create).toHaveBeenCalledTimes(1);
-    expect(await createWorkflowBranch(setup())).toEqual({
-      branchName: `${branchName}-tina`,
-    });
   });
 
   it('does not retry ambiguous failures', async () => {
@@ -173,17 +144,6 @@ describe('createWorkflowBranch', () => {
     expect(options.create).not.toHaveBeenCalled();
   });
 
-  it('does not create anything if browser history cannot be persisted', async () => {
-    const options = setup();
-    vi.spyOn(window.localStorage, 'setItem').mockImplementation(() => {
-      throw new Error('Storage full');
-    });
-    await expect(createWorkflowBranch(options)).rejects.toMatchObject({
-      errorCode: 'VALIDATION_FAILED',
-    });
-    expect(options.create).not.toHaveBeenCalled();
-  });
-
   it('does not start after cancellation', async () => {
     const options = setup();
     const controller = new AbortController();
@@ -195,7 +155,7 @@ describe('createWorkflowBranch', () => {
     expect(options.create).not.toHaveBeenCalled();
   });
 
-  it('does not reserve or create a branch if cancelled while loading names', async () => {
+  it('does not create a branch if cancelled while loading names', async () => {
     const options = setup(true);
     const controller = new AbortController();
     options.listBranchNames.mockImplementation(async () => {
@@ -206,6 +166,5 @@ describe('createWorkflowBranch', () => {
       createWorkflowBranch({ ...options, signal: controller.signal })
     ).rejects.toMatchObject({ name: 'AbortError' });
     expect(options.create).not.toHaveBeenCalled();
-    expect(window.localStorage.length).toBe(0);
   });
 });
