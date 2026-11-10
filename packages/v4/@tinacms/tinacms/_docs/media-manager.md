@@ -81,8 +81,8 @@ The pane shows some controls only when the media provider supports them.
 | Control | Shows when |
 |---|---|
 | Search box | `features.search` is `true` |
-| Move | The provider has `rename`, and `features.readOnly` is not `true` |
-| New folder, Delete, Move | `features.readOnly` is not `true` |
+| Move | The provider has `rename`. It is off, with the lock note, when `features.readOnly` is `true` |
+| New folder, Delete | `features.readOnly` is not `true` |
 | Upload, drag and drop | `features.readOnly` is not `true` |
 | Not-set-up look, in place of the library | `status()` returns `needs-setup` |
 

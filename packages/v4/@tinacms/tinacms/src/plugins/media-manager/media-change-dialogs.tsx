@@ -29,10 +29,12 @@ export interface OpenableUse extends MediaUse {
   documentPath: string;
 }
 
-const nameOf = (title: string) => title.split('/').at(-1) ?? title;
+const nameOf = (path: string) => path.split('/').at(-1) ?? path;
 
-const titleOf = (use: MediaUse) =>
-  use.mine ? `${nameOf(use.title)} (your unsaved edits)` : nameOf(use.title);
+const titleOf = (use: MediaUse) => {
+  const shown = use.title === use.documentPath ? nameOf(use.title) : use.title;
+  return use.mine ? `${shown} (your unsaved edits)` : shown;
+};
 
 function UseCard({
   use,
@@ -271,7 +273,10 @@ export function MoveDialog({
   onOpen: (use: OpenableUse) => void;
 }) {
   const [browsing, setBrowsing] = useState(currentFolder);
-  const [documents, setDocuments] = useState(0);
+  const [{ documents, checking }, setCount] = useState({
+    documents: 0,
+    checking: true,
+  });
   const listing = useMediaListing(browsing);
   const folders = (
     listing.data?.pages.flatMap((page) => page.items) ?? []
@@ -300,7 +305,9 @@ export function MoveDialog({
             <UsageSummary
               paths={paths}
               onOpen={onOpen}
-              onCount={(next) => setDocuments(next)}
+              onCount={(next, busy) =>
+                setCount({ documents: next, checking: busy })
+              }
             />
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -377,7 +384,7 @@ export function MoveDialog({
           <Button
             type='button'
             variant='primary'
-            disabled={here}
+            disabled={here || checking}
             onClick={() => onConfirm(browsing, documents)}
           >
             Move here

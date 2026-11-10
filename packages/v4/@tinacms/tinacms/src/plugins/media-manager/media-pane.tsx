@@ -195,6 +195,7 @@ export function MediaPane({ segments }: AdminScreenProps) {
   };
 
   const locked = readOnly || changes.locked;
+  const actionsOff = locked || changes.busy;
   const lockNote = readOnly
     ? READ_ONLY_NOTE
     : changes.locked
@@ -364,7 +365,7 @@ export function MediaPane({ segments }: AdminScreenProps) {
               count={selectedPaths.length}
               loadedCount={filePaths.length}
               hasMove={hasMove}
-              locked={locked}
+              locked={actionsOff}
               getUrls={() => absoluteUrlsOf(selectedPaths, resolveUrl)}
               onSelectAll={() => setSelected(new Set(filePaths))}
               onClear={() => setSelected(new Set())}
@@ -390,7 +391,13 @@ export function MediaPane({ segments }: AdminScreenProps) {
                     label={`Search ${folderName} by file name`}
                     size='sm'
                     value={search}
-                    results={search !== '' ? hits : undefined}
+                    results={
+                      searching &&
+                      search.trim() === debouncedSearch &&
+                      !listing.isPending
+                        ? hits
+                        : undefined
+                    }
                     onChange={(event) => setSearch(event.target.value)}
                     onClear={() => {
                       setSearch('');
@@ -571,7 +578,7 @@ export function MediaPane({ segments }: AdminScreenProps) {
                 key={activePath}
                 path={activePath}
                 resolveUrl={resolveUrl}
-                canDelete={!locked}
+                canDelete={!actionsOff}
                 wide={wide}
                 onClose={closeDetails}
                 onDelete={() => openConfirm('delete', [activePath])}

@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { SaveToBranchDialog } from '@tinacms/ui/components/save-to-branch-dialog';
 import { branchNameError, freeName } from '@tinacms/ui/lib/branch-name';
-import { use, useEffect, useState } from 'react';
+import { use, useEffect, useRef, useState } from 'react';
 import { SaveToNewBranchContext } from '../../admin/save-to-new-branch';
 import { authSliceOf } from '../../core/auth/slice';
 import { currentBranchOf } from '../../core/branch/contract';
@@ -79,6 +79,7 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
   const [lock, setLock] = useState<{ branch: string; who: string } | null>(
     null
   );
+  const [refresh, setRefresh] = useState({ branch: '', count: 0 });
   const [pending, setPending] = useState<PendingBranch | null>(null);
   const [name, setName] = useState('');
   const [revealed, setRevealed] = useState(false);
@@ -94,6 +95,16 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
     return () => clearTimeout(timer);
   }, [status]);
 
+  useEffect(() => {
+    if (refresh.count === 0) return;
+    void queryClient.invalidateQueries({
+      queryKey: [...MEDIA_LIST_KEY, refresh.branch],
+    });
+    void queryClient.invalidateQueries({
+      queryKey: ['tina', 'media', 'usage'],
+    });
+  }, [refresh, queryClient]);
+
   const isProtected =
     view?.mode === 'branches' &&
     view.listState === 'ready' &&
@@ -101,10 +112,23 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
     view.branches.some((entry) => entry.name === view.name && entry.protected);
   const listed = view?.branches.map((entry) => entry.name) ?? [];
 
+  const liveBranch = (): string =>
+    runtime ? (currentBranchOf(runtime.store.getState()) ?? '') : branch;
+
+  const expectedBranch = useRef<string | null>(null);
+  const lastBranch = useRef(branch);
+  useEffect(() => {
+    if (lastBranch.current === branch) return;
+    lastBranch.current = branch;
+    if (expectedBranch.current === branch) return;
+    setStatus((current) => (current?.tone === 'error' ? null : current));
+  }, [branch]);
+
   const run = async (
     change: MediaChange,
     paths: readonly string[],
-    documents: number
+    documents: number,
+    bound: string
   ) => {
     setStatus({
       tone: 'busy',
@@ -114,7 +138,12 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
     const failed: { path: string; cause: unknown }[] = [];
     let left = 0;
     let refused = false;
+    let stopped = false;
     for (const [index, path] of paths.entries()) {
+      if (liveBranch() !== bound) {
+        stopped = true;
+        break;
+      }
       try {
         if (change.kind === 'delete') {
           await media.delete(path);
@@ -134,18 +163,13 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
         failed.push({ path, cause });
       }
     }
-    void queryClient.invalidateQueries({
-      queryKey: [...MEDIA_LIST_KEY, branch],
-    });
-    void queryClient.invalidateQueries({
-      queryKey: ['tina', 'media', 'usage'],
-    });
-    onSettled({ change, succeeded });
+    setRefresh((current) => ({ branch: bound, count: current.count + 1 }));
+    onSettled({ change: { ...change, paths }, succeeded });
 
     if (refused) {
       const live = runtime ? authSliceOf(runtime.store.getState()) : null;
       if (live === null || live.status === 'signed-in') {
-        setLock({ branch, who });
+        setLock({ branch: bound, who });
         setStatus({
           tone: 'error',
           text: `${NO_PERMISSION_NOTE} ${succeeded.length} done, ${left} left.`,
@@ -157,11 +181,16 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
       }
       return;
     }
-    if (failed.length > 0) {
+    if (failed.length > 0 || stopped) {
       const verb = change.kind === 'delete' ? 'delete' : 'move';
       const taken = failed.filter(({ cause }) => isNameTaken(cause));
       const others = failed.filter((entry) => !taken.includes(entry));
       const lines = [
+        ...(stopped
+          ? [
+              `The branch changed, so this stopped. ${change.kind === 'delete' ? 'Deleted' : 'Moved'} ${succeeded.length} of ${filesOf(paths.length)}.`,
+            ]
+          : []),
         ...taken.map(
           ({ path }) =>
             `${mediaNameOf(path)} is already in ${folderLabel(change.kind === 'move' ? change.folder : '')}. It wasn't moved.`
@@ -175,8 +204,8 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
         tone: 'error',
         text: lines.join(' '),
         retry:
-          retryPaths.length > 0
-            ? () => void run(change, retryPaths, documents)
+          retryPaths.length > 0 && !stopped
+            ? () => void run(change, retryPaths, documents, bound)
             : undefined,
       });
       return;
@@ -200,6 +229,7 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
     chosen: string
   ) => {
     setStatus({ tone: 'busy', text: 'Making the branch' });
+    expectedBranch.current = chosen;
     try {
       await handler?.({ kind: 'media', name: chosen, reason: 'protected' });
     } catch (cause) {
@@ -209,24 +239,24 @@ export function useMediaChanges(onSettled: (result: ChangeResult) => void) {
         text: "Couldn't make the branch. Try again.",
         retry: () => void continueOnNewBranch(change, documents, chosen),
       });
+      expectedBranch.current = null;
       return;
     }
-    const current = runtime
-      ? currentBranchOf(runtime.store.getState())
-      : undefined;
-    if (current !== chosen) {
+    if (liveBranch() !== chosen) {
       setStatus({
         tone: 'error',
         text: `Couldn't switch to the new branch. Nothing was ${change.kind === 'delete' ? 'deleted' : 'moved'}.`,
       });
+      expectedBranch.current = null;
       return;
     }
-    await run(change, change.paths, documents);
+    await run(change, change.paths, documents, chosen);
+    expectedBranch.current = null;
   };
 
   const request = (change: MediaChange, documents: number) => {
     if (!isProtected) {
-      void run(change, change.paths, documents);
+      void run(change, change.paths, documents, liveBranch());
       return;
     }
     const defaultName = freeName(defaultBranchName(change), listed);

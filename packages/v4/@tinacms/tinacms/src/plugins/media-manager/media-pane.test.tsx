@@ -38,6 +38,7 @@ import { mediaManagerPlugin } from './media-manager.plugin';
 const BRANCHES: BranchInfo[] = [
   { name: 'main', protected: true },
   { name: 'feature/news' },
+  { name: 'other' },
 ];
 
 const POST = { path: 'content/posts/hello.mdx', title: 'Hello' };
@@ -56,6 +57,8 @@ interface World {
   pageSize: number | undefined;
   failNextPage: boolean;
   listGate: Promise<void>;
+  searchGate: Promise<void>;
+  deleteGate: (() => Promise<void>) | null;
   saveHandler: ((request: SaveToNewBranchRequest) => Promise<void>) | undefined;
   switchBranch: ((name: string) => void) | undefined;
   currentBranch: () => string;
@@ -105,10 +108,12 @@ const mediaPlugin = () =>
               }
             ),
             delete: vi.fn(async (path: string) => {
+              const sentOn = currentBranchOf(get()) ?? 'main';
+              await world.deleteGate?.();
               const failure = world.failDelete(path);
               if (failure) throw failure;
               world.deleted.push({
-                branch: currentBranchOf(get()) ?? 'main',
+                branch: sentOn,
                 path,
               });
               world.files = world.files.filter((item) => item.path !== path);
@@ -172,7 +177,14 @@ const searchPlugin = definePlugin({
   name: 'test:search',
   provides: ['search'],
   client: async () => ({
-    default: { slice: () => ({ search: async () => [{ ref: POST.path }] }) },
+    default: {
+      slice: () => ({
+        search: async () => {
+          await world.searchGate;
+          return [{ ref: POST.path }];
+        },
+      }),
+    },
   }),
 });
 
@@ -245,6 +257,8 @@ beforeEach(() => {
     pageSize: undefined,
     failNextPage: false,
     listGate: Promise.resolve(),
+    searchGate: Promise.resolve(),
+    deleteGate: null,
     saveHandler: undefined,
     switchBranch: undefined,
     currentBranch: () => 'main',
@@ -377,7 +391,9 @@ describe('browsing', () => {
     await waitFor(() =>
       expect(screen.queryByRole('button', { name: 'banner.png' })).toBeNull()
     );
-    expect(screen.getByRole('status', { name: '' })).toHaveTextContent('1');
+    expect(
+      await screen.findByText('1', { selector: '[role=status]' })
+    ).toBeVisible();
   });
 
   it('has no search box without features.search, and no Rename or filters', async () => {
@@ -1200,5 +1216,278 @@ describe('permission lock and the signed-in state', () => {
       )
     ).toBeVisible();
     expect(screen.queryByText(/session has expired/)).toBeNull();
+  });
+});
+
+describe('after the protected-branch switch', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    world.saveHandler = vi.fn(async (request) => {
+      world.switchBranch?.(request.name);
+    });
+  });
+
+  const selectAllThenDelete = async (
+    user: ReturnType<typeof userEvent.setup>
+  ) => {
+    await user.click(await screen.findByRole('button', { name: 'Select' }));
+    await user.click(screen.getByRole('button', { name: 'Select all' }));
+    await user.click(screen.getByRole('button', { name: 'Delete 2' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Delete 2 files' })
+    );
+    await user.click(
+      within(
+        await screen.findByRole('dialog', { name: 'Save to a new branch' })
+      ).getByRole('button', { name: 'Continue' })
+    );
+  };
+
+  it('removes a deleted file from the new branch’s listing', async () => {
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await file('logo.png'));
+    await user.click(
+      within(
+        await screen.findByRole('region', { name: 'Details of logo.png' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    await user.click(
+      await within(await screen.findByRole('alertdialog')).findByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+    await user.click(
+      within(
+        await screen.findByRole('dialog', { name: 'Save to a new branch' })
+      ).getByRole('button', { name: 'Continue' })
+    );
+    expect(await screen.findByText('Deleted logo.png.')).toBeVisible();
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'logo.png' })).toBeNull()
+    );
+  });
+
+  it('removes several deleted files from the new branch’s listing', async () => {
+    const user = userEvent.setup();
+    renderPane();
+    await selectAllThenDelete(user);
+    expect(await screen.findByText('Deleted 2 files.')).toBeVisible();
+    await waitFor(() => {
+      expect(screen.queryByRole('checkbox', { name: 'logo.png' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'logo.png' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'banner.png' })).toBeNull();
+    });
+  });
+
+  it('removes a moved file from the folder it left', async () => {
+    world.hasRename = true;
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await screen.findByRole('button', { name: 'Select' }));
+    await user.click(await screen.findByRole('checkbox', { name: 'logo.png' }));
+    await user.click(screen.getByRole('button', { name: 'Move' }));
+    const move = await screen.findByRole('alertdialog');
+    await user.click(
+      await within(move).findByRole('button', { name: 'posts' })
+    );
+    await user.click(within(move).getByRole('button', { name: 'Move here' }));
+    await user.click(
+      within(
+        await screen.findByRole('dialog', { name: 'Save to a new branch' })
+      ).getByRole('button', { name: 'Continue' })
+    );
+    expect(await screen.findByText('Moved logo.png to posts.')).toBeVisible();
+    await waitFor(() =>
+      expect(screen.queryByRole('checkbox', { name: 'logo.png' })).toBeNull()
+    );
+    expect(
+      await screen.findByRole('button', { name: 'banner.png' })
+    ).toBeVisible();
+  });
+
+  it('Retry after a partial failure deletes on the new branch, refreshes it and leaves Select mode', async () => {
+    world.failDelete = (path) =>
+      path === 'banner.png' ? new MediaError('backend-failure') : null;
+    const user = userEvent.setup();
+    renderPane();
+    await selectAllThenDelete(user);
+    expect(
+      await screen.findByText("Couldn't delete 1 of 2 files.")
+    ).toBeVisible();
+    world.failDelete = () => null;
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    await waitFor(() =>
+      expect(world.deleted.map(({ path }) => path)).toEqual([
+        'logo.png',
+        'banner.png',
+      ])
+    );
+    expect(
+      world.deleted.every(({ branch }) => branch.startsWith('media/'))
+    ).toBe(true);
+    await waitFor(() => {
+      expect(screen.queryByRole('checkbox', { name: 'banner.png' })).toBeNull();
+      expect(
+        screen.queryByRole('toolbar', { name: 'Selected files' })
+      ).toBeNull();
+    });
+  });
+
+  it('locks Delete and Move on the new branch after a refusal there', async () => {
+    world.hasRename = true;
+    world.failDelete = () => new MediaError('unauthorized');
+    const user = userEvent.setup();
+    renderPane();
+    await selectAllThenDelete(user);
+    expect(await screen.findByText(/0 done, 2 left\./)).toBeVisible();
+    expect(
+      screen.getByText("You don't have permission to delete.")
+    ).toBeVisible();
+    const bar = screen.getByRole('toolbar', { name: 'Selected files' });
+    expect(
+      within(bar).getByRole('button', { name: 'Delete 2' })
+    ).toBeDisabled();
+    expect(within(bar).getByRole('button', { name: 'Move' })).toBeDisabled();
+  });
+});
+
+describe('runs are bound to their branch', () => {
+  it('stops a run when the branch changes, sends nothing after the switch, and offers no Retry', async () => {
+    world.files.push({ path: 'third.png', kind: 'file' });
+    let release: () => void = () => {};
+    let calls = 0;
+    world.deleteGate = async () => {
+      calls += 1;
+      if (calls === 1) {
+        await new Promise<void>((resolve) => {
+          release = resolve;
+        });
+      }
+    };
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await screen.findByRole('button', { name: 'Select' }));
+    await user.click(screen.getByRole('button', { name: 'Select all' }));
+    await user.click(screen.getByRole('button', { name: 'Delete 3' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Delete 3 files' })
+    );
+    await waitFor(() => expect(calls).toBe(1));
+    act(() => world.switchBranch?.('other'));
+    await act(async () => release());
+    expect(
+      await screen.findByText(
+        'The branch changed, so this stopped. Deleted 1 of 3 files.'
+      )
+    ).toBeVisible();
+    expect(world.deleted).toHaveLength(1);
+    expect(world.deleted[0]?.branch).toBe('feature/news');
+    expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
+  });
+
+  it('drops a failure and its Retry when the branch changes, and a fresh Delete on a protected branch asks for a new branch', async () => {
+    world.failDelete = () => new MediaError('backend-failure');
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await file('logo.png'));
+    await user.click(
+      within(
+        await screen.findByRole('region', { name: 'Details of logo.png' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    await user.click(
+      await within(await screen.findByRole('alertdialog')).findByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+    expect(await screen.findByRole('button', { name: 'Retry' })).toBeVisible();
+    act(() => world.switchBranch?.('main'));
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull()
+    );
+    expect(world.deleted).toEqual([]);
+    await user.click(
+      within(
+        await screen.findByRole('region', { name: 'Details of logo.png' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    await user.click(
+      await within(await screen.findByRole('alertdialog')).findByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+    expect(
+      await screen.findByRole('dialog', { name: 'Save to a new branch' })
+    ).toBeVisible();
+  });
+
+  it('turns Delete off while a run is in progress', async () => {
+    let release: () => void = () => {};
+    world.deleteGate = () =>
+      new Promise<void>((resolve) => {
+        release = resolve;
+      });
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await file('logo.png'));
+    await user.click(
+      within(
+        await screen.findByRole('region', { name: 'Details of logo.png' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    await user.click(
+      await within(await screen.findByRole('alertdialog')).findByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+    expect(
+      within(
+        await screen.findByRole('region', { name: 'Details of logo.png' })
+      ).getByRole('button', { name: 'Delete' })
+    ).toBeDisabled();
+    await act(async () => release());
+    expect(await screen.findByText('Deleted logo.png.')).toBeVisible();
+  });
+});
+
+describe('Move waits for the usage lookup', () => {
+  it('keeps Move here off while usage is checked, then turns it on', async () => {
+    world.hasRename = true;
+    world.searchHits = true;
+    let release: () => void = () => {};
+    world.searchGate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await screen.findByRole('button', { name: 'Select' }));
+    await user.click(await screen.findByRole('checkbox', { name: 'logo.png' }));
+    await user.click(screen.getByRole('button', { name: 'Move' }));
+    const dialog = await screen.findByRole('alertdialog');
+    await user.click(
+      await within(dialog).findByRole('button', { name: 'posts' })
+    );
+    expect(
+      within(dialog).getByText('Checking where this file is used')
+    ).toBeVisible();
+    expect(
+      within(dialog).getByRole('button', { name: 'Move here' })
+    ).toBeDisabled();
+    await act(async () => release());
+    await waitFor(() =>
+      expect(
+        within(dialog).getByRole('button', { name: 'Move here' })
+      ).toBeEnabled()
+    );
+    expect(
+      within(dialog).getByText(
+        'Used in 1 document, which will show a missing image:'
+      )
+    ).toBeVisible();
   });
 });
