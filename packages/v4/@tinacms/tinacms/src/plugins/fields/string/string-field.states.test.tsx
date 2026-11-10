@@ -63,4 +63,17 @@ describe('String field states', () => {
     );
     expect(screen.getByRole('textbox')).toHaveValue('First lineSecond line');
   });
+
+  it('shows an error from outside the form and marks the box invalid', () => {
+    render(
+      <StringFieldView
+        {...stringFieldState('filled')}
+        error='A branch called main already exists.'
+      />
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'A branch called main already exists.'
+    );
+    expect(screen.getByRole('textbox', { name: /^Title\b/ })).toBeInvalid();
+  });
 });

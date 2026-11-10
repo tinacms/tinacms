@@ -38,6 +38,7 @@ import {
   useInvalidFieldCounts,
   useListItems,
   useMediaSlice,
+  useExpansion,
   useOpenLevel,
 } from '../../../editor';
 import { isMediaPath } from '../image/image-field.schema';
@@ -68,6 +69,22 @@ import {
   type ArrayItemView,
   FULL_REASON,
 } from './array-field.view';
+
+/** Centres `el` in its nearest scrollable ancestor. Unlike `scrollIntoView`, it never scrolls an `overflow-hidden` ancestor such as the admin wrapper. */
+function centerInScroller(el: Element) {
+  for (let node = el.parentElement; node; node = node.parentElement) {
+    const { overflowY } = getComputedStyle(node);
+    if (
+      (overflowY === 'auto' || overflowY === 'scroll') &&
+      node.scrollHeight > node.clientHeight
+    ) {
+      const box = node.getBoundingClientRect();
+      const rect = el.getBoundingClientRect();
+      node.scrollTop += rect.top + rect.height / 2 - (box.top + box.height / 2);
+      return;
+    }
+  }
+}
 
 export function ArrayField() {
   const address = useFieldAddress();
@@ -209,15 +226,24 @@ function ObjectItems({
     items.map((_, index) => `${address}.${index}`)
   );
 
+  // A block always opens as its own form level. Any other item opens there from level 3.
+  const opensNextLevel = (itemAddress: string) =>
+    isTemplatesArray(field) || itemOpensNextLevel(itemAddress);
+
   // Opens an item where its depth says: in place, or as the next form level.
   // Returns whether it opened a form level.
   function showItem(index: number): boolean {
     const itemAddress = `${address}.${index}`;
     const stored: unknown = getValues(itemAddress);
     const fields = isItem(stored) ? itemFieldsOf(field, stored) : undefined;
-    if (fields && itemOpensNextLevel(itemAddress)) {
+    if (fields && opensNextLevel(itemAddress)) {
       const heading = itemHeadingOf(field, stored, index);
-      listItems.openLevel(itemAddress, heading, fields);
+      listItems.openLevel(
+        itemAddress,
+        heading,
+        fields,
+        isTemplatesArray(field)
+      );
       // The level replaced the list, so focus moves to its first field.
       const first = fields.find((subfield) => !subfield.hidden);
       if (first) setActive(toFieldAddress(`${itemAddress}.${first.name}`));
@@ -237,6 +263,24 @@ function ObjectItems({
   useEffect(() => {
     if (activation) openOnActivation(activation.address);
   }, [activation]);
+
+  // Expand all opens the cards that open in place; an item that opens as a form
+  // level stays closed.
+  const expansion = useExpansion();
+  const applyExpansion = useEffectEvent((openAll: boolean) =>
+    setOpen(
+      new Set(
+        openAll
+          ? items
+              .filter((_, index) => !opensNextLevel(`${address}.${index}`))
+              .map((item) => item.id)
+          : []
+      )
+    )
+  );
+  useEffect(() => {
+    if (expansion.version > 0) applyExpansion(expansion.open);
+  }, [expansion]);
 
   // The insert picker follows its opener card by id, so a move or remove while it is open cannot shift it.
   const openerIndex = inserting
@@ -262,6 +306,23 @@ function ObjectItems({
     const grip = cards[index]?.querySelector('[data-grip]');
     if (grip instanceof HTMLElement) grip.focus();
   }, [inserting, items, listRef]);
+
+  // Coming back from an item's form level remounts the list: put focus and the viewport on its card.
+  useEffect(() => {
+    const returned = listItems.takeReturnedIndex(address);
+    if (returned === undefined) return;
+    const cards = Array.from(listRef.current?.children ?? []).filter((child) =>
+      child.hasAttribute('data-array-item')
+    );
+    const card = cards[Math.min(returned, cards.length - 1)];
+    const target = card?.querySelector<HTMLElement>(
+      '[data-grip], [data-slot="list-card-head"] button'
+    );
+    if (card && target) {
+      target.focus({ preventScroll: true });
+      centerInScroller(card);
+    }
+  }, []);
 
   const seed = (defaultItem: TinaDocument | undefined, fields: FieldSchema[]) =>
     seedItem(defaultItem, fields, { documentPath, registry });
@@ -331,7 +392,7 @@ function ObjectItems({
     }
 
     const opens =
-      fields && itemOpensNextLevel(itemAddress) ? 'next-level' : 'in-place';
+      fields && opensNextLevel(itemAddress) ? 'next-level' : 'in-place';
     return {
       id: item.id,
       name: `Item ${index + 1}`,
@@ -383,9 +444,8 @@ function ObjectItems({
       items={views}
       full={full}
       add='button'
-      addLabel='Add item'
+      addLabel={field.addLabel ?? 'Add item'}
       onAdd={() => add()}
-      emptyText={isTemplatesArray(field) ? 'No blocks.' : undefined}
       addSlot={
         isTemplatesArray(field)
           ? ({ disabled }) => (
@@ -472,6 +532,8 @@ function TemplatePicker({
   const options: BlockOption[] = field.templates.map((template) => ({
     name: template.name,
     label: templateTitle(template),
+    group: template.group,
+    description: template.description,
     preview: template.previewImage ? (
       <PreviewImage path={template.previewImage} />
     ) : undefined,
@@ -494,6 +556,7 @@ function TemplatePicker({
       onPick={pick}
       disabled={disabled}
       reason={full ? FULL_REASON : undefined}
+      addLabel={field.addLabel}
       open={open}
       onOpenChange={onOpenChange}
     />
@@ -648,7 +711,7 @@ function ScalarItems({
       full={full}
       add={typed ? 'input' : 'button'}
       addInputType={box?.type ?? 'text'}
-      addLabel='Add item'
+      addLabel={field.addLabel ?? 'Add item'}
       onAdd={(text) => {
         if (atMax()) return;
         const entry = text === undefined ? seedScalar() : text;

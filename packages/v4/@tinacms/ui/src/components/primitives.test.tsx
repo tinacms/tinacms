@@ -1,11 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { Avatar } from '@tinacms/ui/components/avatar';
 import { Badge } from '@tinacms/ui/components/badge';
 import { DiffStat } from '@tinacms/ui/components/diff-stat';
 import { Icon } from '@tinacms/ui/components/icon';
 import { KbdShortcut, keyShortcuts } from '@tinacms/ui/components/kbd';
+import { Separator } from '@tinacms/ui/components/separator';
 
 describe('Badge', () => {
   it('renders nothing for a count of 0', () => {
@@ -13,6 +14,15 @@ describe('Badge', () => {
       <Badge kind='count' count={0} srLabel='No changes' />
     );
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it.each([
+    ['errors', 3, ', 3 errors'],
+    ['errors', 1, ', 1 error'],
+    ['changes', 2, ', 2 changes'],
+  ] as const)('words a count of %s for screen readers', (of, count, words) => {
+    render(<Badge kind='count' of={of} count={count} />);
+    expect(screen.getByText(words)).toBeInTheDocument();
   });
 
   it('gives a status its word', () => {
@@ -116,6 +126,7 @@ describe('Icon sizes', () => {
 
 describe('KbdShortcut', () => {
   it('speaks a labelled shortcut', () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue('Macintosh');
     render(<KbdShortcut keys='⌘K' label='Search' />);
     expect(
       screen.getByRole('img', { name: 'Search: Command K' })
@@ -123,8 +134,18 @@ describe('KbdShortcut', () => {
   });
 
   it('maps one press to aria-keyshortcuts and skips sequences', () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue('Macintosh');
     expect(keyShortcuts('⌘⇧P')).toBe('Meta+Shift+P');
     expect(keyShortcuts('⎋')).toBe('Escape');
     expect(keyShortcuts('G H')).toBeUndefined();
+  });
+});
+
+describe('Separator', () => {
+  it('sizes itself from the orientation attribute that Base UI renders', () => {
+    const { container } = render(<Separator />);
+    const line = container.querySelector('[data-slot=separator]');
+    expect(line).toHaveAttribute('data-orientation', 'horizontal');
+    expect(line).toHaveClass('data-[orientation=horizontal]:h-px');
   });
 });

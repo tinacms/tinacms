@@ -33,20 +33,17 @@ import { createScreenRegistry } from '../core/screen/registry';
 import { createGlobalNav } from '../core/slot/global-nav';
 import { addressesWithValidators } from '../core/validation';
 import { createValidatorRegistry } from '../core/validator/registry';
-import { type DraftUserScope, removeDraft } from '../form/drafts';
+import type { DraftUserScope, StoredDraft } from '../form/drafts';
 import {
   type FieldErrors,
   type FormId,
-  formStatus,
   isEdited,
   readFormStore,
   readOpeningScope,
-  staleDraft,
   syncDrafts,
   toDocument,
   toFormId,
   toFormValues,
-  useFormStatus,
   useFormStore,
 } from '../form/form-store';
 import { SELF_CONTAINED_VALIDATORS } from '../plugins/validators/core-validators.schema';
@@ -57,6 +54,8 @@ import {
   type SaveHandler,
   type TinaRuntime,
   TinaRuntimeContext,
+  type StaleDraftActions,
+  type WaitingCause,
 } from './context';
 import { flattenFieldErrors, nestFieldErrors } from './field-errors';
 import { useFormViewStore } from './form-view-state';
@@ -206,7 +205,7 @@ const readKeptSeed = (
   ingested: TinaDocument,
   equal: ReturnType<typeof fieldEqualityFor>
 ) => {
-  const scope = readOpeningScope(formId, toFormValues(ingested), equal);
+  const scope = readOpeningScope(formId, toFormValues(ingested));
   if (!scope) return { seed: null, errors: {} };
   return {
     seed: toDocument(scope.values),
@@ -252,33 +251,63 @@ const discardFormEdits = (
   advanceSeedKey(formId);
 };
 
+const causeOf = (
+  newest: StoredDraft,
+  ingested: TinaDocument,
+  equal: ReturnType<typeof fieldEqualityFor>
+): WaitingCause => {
+  if (newest.leftover) return 'leftover';
+  const same = Object.keys({ ...newest.baseline, ...ingested }).every((name) =>
+    equal(toFieldAddress(name), newest.baseline[name], ingested[name])
+  );
+  return same ? 'kept' : 'changed';
+};
+
 const buildStaleDraftActions = (
-  stale: ReturnType<typeof staleDraft>,
+  copies: readonly StoredDraft[] | undefined,
   formId: FormId,
+  ingested: TinaDocument,
+  collection: CollectionSchema,
+  equal: ReturnType<typeof fieldEqualityFor>,
   resetForm: (values: TinaDocument) => void,
-  advanceSeedKey: (formId: FormId) => void,
-  bumpDraftRevision: () => void
-) => {
-  if (!stale) return null;
-  return {
-    resume: () => {
-      const store = readFormStore();
-      store.resumeDraft(formId, {
-        values: toFormValues(stale.values),
-        baseline: toFormValues(stale.baseline),
-      });
-      const resumed = readFormStore().forms[formId];
-      if (formStatus(resumed) !== 'dirty') {
-        removeDraft(formId, readFormStore().userId, readFormStore().branch);
+  advanceSeedKey: (formId: FormId) => void
+): StaleDraftActions | null => {
+  const newest = copies?.at(-1);
+  if (!copies || !newest) return null;
+  const labels = new Map(
+    collection.fields.map((field) => [field.name, field.label ?? field.name])
+  );
+  // The swap restores the newest leftover, so the words name every field the
+  // trailing leftover copies hold.
+  const leftoverFields: string[] = [];
+  if (newest.leftover) {
+    for (const copy of copies.toReversed()) {
+      if (!copy.leftover) break;
+      for (const name of Object.keys(copy.values)) {
+        const address = toFieldAddress(name);
+        const held =
+          !equal(address, copy.values[name], copy.baseline[name]) &&
+          !equal(address, copy.values[name], ingested[name]);
+        const label = labels.get(name) ?? name;
+        if (held && !leftoverFields.includes(label)) leftoverFields.push(label);
       }
-      resetForm(toDocument(resumed?.values ?? {}));
+    }
+  }
+  const shown =
+    leftoverFields.length > 5
+      ? [...leftoverFields.slice(0, 5), `${leftoverFields.length - 5} more`]
+      : leftoverFields;
+  return {
+    cause: causeOf(newest, ingested, equal),
+    leftoverFields: shown,
+    resume: () => {
+      const values = readFormStore().resumeWaiting(formId);
+      if (!values) return;
+      resetForm(toDocument(values));
       advanceSeedKey(formId);
-      bumpDraftRevision();
     },
-    discard: () => {
-      removeDraft(formId, readFormStore().userId, readFormStore().branch);
-      bumpDraftRevision();
-    },
+    copies,
+    discard: (shown) => readFormStore().discardWaiting(formId, shown),
   };
 };
 
@@ -403,8 +432,8 @@ function useSeededFormSync(
 
   const view = useFormViewStore(formId);
   const discardEdits = useCallback(() => {
-    const { closeLevelsAbove, resetReveal } = view.getState();
-    closeLevelsAbove(0);
+    const { showLevels, resetReveal } = view.getState();
+    showLevels([]);
     resetReveal();
     discardFormEdits(formId, resetForm, advanceSeedKey);
   }, [formId, resetForm, advanceSeedKey, view]);
@@ -490,7 +519,7 @@ export function FormProvider({
   // clean scope stops keeping them when another writer changes the file, so the test
   // must follow the document, not only the form id.
   const keepsIncoming = useMemo(
-    () => readOpeningScope(formId, toFormValues(ingested), equal) !== undefined,
+    () => readOpeningScope(formId, toFormValues(ingested)) !== undefined,
     [formId, userId, ingested, equal]
   );
   const seedValues = resolveSeedValues(keepsIncoming, kept.seed, ingested);
@@ -513,18 +542,21 @@ export function FormProvider({
     methods.reset
   );
 
-  const [draftRevision, setDraftRevision] = useState(0);
-  const status = useFormStatus(formId);
-  const stale = useMemo(
-    () => staleDraft(formId, toFormValues(ingested), equal),
-    [formId, userId, ingested, equal, draftRevision, status]
+  const waiting = useFormStore((state) =>
+    state.hidden[formId] ? undefined : state.waiting[formId]
   );
   const staleDraftActions = useMemo(
     () =>
-      buildStaleDraftActions(stale, formId, methods.reset, advanceSeedKey, () =>
-        setDraftRevision((revision) => revision + 1)
+      buildStaleDraftActions(
+        waiting,
+        formId,
+        ingested,
+        collection,
+        equal,
+        methods.reset,
+        advanceSeedKey
       ),
-    [stale, formId, methods, advanceSeedKey]
+    [waiting, formId, ingested, collection, equal, methods, advanceSeedKey]
   );
 
   useFormMethodSubscriptions(formId, path, collection, formHooks, methods);
@@ -536,7 +568,7 @@ export function FormProvider({
   );
   const fieldSeedKey = `${seedKey}~${fieldReseeds}`;
   useEffect(() => {
-    view.getState().closeLevelsAbove(0);
+    view.getState().showLevels([]);
   }, [fieldSeedKey, view]);
   const [failure, setFailure] = useState<{
     formId: FormId;

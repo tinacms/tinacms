@@ -14,11 +14,16 @@ import {
 import { cn } from '@tinacms/ui/lib/utils';
 
 type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'destructive' | 'icon';
-type ButtonSize = 'md' | 'sm';
+/** `regular` and `compact` are the design's names. `md` and `sm` keep working. */
+type ButtonSize = 'regular' | 'compact' | 'md' | 'sm';
+type ButtonHeightSize = 'md' | 'sm';
+
+const heightSizeOf = (size: ButtonSize): ButtonHeightSize =>
+  size === 'compact' || size === 'sm' ? 'sm' : 'md';
 
 /** One height per size, shared by every variant so mixed buttons line up. */
 const buttonHeight = { md: 'h-9', sm: 'h-8' } as const satisfies Record<
-  ButtonSize,
+  ButtonHeightSize,
   string
 >;
 
@@ -95,10 +100,22 @@ type ButtonBaseProps = Omit<ButtonPrimitive.Props, 'children'> & {
    * stays in the Tab order. `disabled` wins over `busy`.
    */
   busy?: boolean;
+  /** Draws a link to this address instead of a button. It opens in the same tab. */
+  href?: string;
+  /** A floor for the width, in pixels or any CSS length. */
+  minWidth?: number | string;
+  /** Which side an icon button's tooltip opens on. */
+  tooltipSide?: 'top' | 'right' | 'bottom' | 'left';
 };
 
 type CountOnWords =
-  | { count?: undefined; countTone?: never; srLabel?: never }
+  | {
+      count?: undefined;
+      countTone?: never;
+      srLabel?: never;
+      chip?: undefined;
+      chipSrLabel?: never;
+    }
   | {
       /** A red count of errors after the words, shown from 1. */
       count: number;
@@ -106,6 +123,17 @@ type CountOnWords =
       countTone?: CountTone;
       /** The words screen readers hear, such as ", 3 errors". */
       srLabel: string;
+      chip?: never;
+      chipSrLabel?: never;
+    }
+  | {
+      /** The design's name for `count`: a red chip after the words, shown from 1. */
+      chip: number;
+      /** The design's name for `srLabel`. */
+      chipSrLabel: string;
+      countTone?: CountTone;
+      count?: never;
+      srLabel?: never;
     };
 
 type WithWords = ButtonBaseProps & {
@@ -175,19 +203,25 @@ type AnyButtonProps = ButtonBaseProps & {
   count?: number;
   countTone?: CountTone;
   srLabel?: string;
+  chip?: number;
+  chipSrLabel?: string;
 };
+
+function blockNavigation(event: { preventDefault(): void }) {
+  event.preventDefault();
+}
 
 /**
  * Every button in the admin, in five variants and two sizes. Keyboard focus draws the orange ring with a
  * soft glow; a click draws nothing. An icon button needs a name (its string children or `aria-label`),
  * shown in a tooltip with its `shortcut` on hover and keyboard focus, and not while disabled.
- * For a link, style an `<a>` with `buttonVariants({ variant })`.
+ * Give it an `href` and it draws a link; a disabled link has no address, and a busy one keeps it but blocks presses.
  */
 function Button(buttonProps: ButtonProps) {
   const all: AnyButtonProps = buttonProps;
   const {
     variant = 'outline',
-    size = 'md',
+    size: sizeProp = 'md',
     children,
     icon: iconProp,
     iconEnd,
@@ -197,14 +231,24 @@ function Button(buttonProps: ButtonProps) {
     destructive = false,
     mono = false,
     shortcut,
-    count,
+    count: countProp,
     countTone,
-    srLabel,
+    srLabel: srLabelProp,
+    chip,
+    chipSrLabel,
+    href,
+    minWidth,
+    tooltipSide,
+    style,
     className,
     type,
     disabled,
     ...props
   } = all;
+  const inert = Boolean(disabled || busy);
+  const count = countProp ?? chip;
+  const srLabel = srLabelProp ?? chipSrLabel;
+  const size = heightSizeOf(sizeProp);
   const iconOnly = variant === 'icon';
   const redIcon = iconOnly && destructive;
   const textName =
@@ -226,9 +270,23 @@ function Button(buttonProps: ButtonProps) {
   const button = (
     <ButtonPrimitive
       data-slot='button'
-      type={type ?? 'button'}
+      {...(href === undefined
+        ? {}
+        : {
+            render: <a href={disabled ? undefined : href} />,
+            nativeButton: false,
+            role: 'link',
+          })}
+      style={minWidth === undefined ? style : { ...style, minWidth }}
+      type={href === undefined ? (type ?? 'button') : undefined}
       aria-keyshortcuts={keys ? keyShortcuts(keys) : undefined}
       {...props}
+      {...(href !== undefined && busy
+        ? {
+            onClickCapture: blockNavigation,
+            onAuxClickCapture: blockNavigation,
+          }
+        : {})}
       disabled={disabled || busy}
       focusableWhenDisabled={busy ? !disabled : props.focusableWhenDisabled}
       aria-label={name}
@@ -242,6 +300,7 @@ function Button(buttonProps: ButtonProps) {
           shortcut: Boolean(keys) && !iconOnly,
           busy,
         }),
+        href !== undefined && disabled && 'cursor-not-allowed opacity-45',
         className
       )}
     >
@@ -290,7 +349,7 @@ function Button(buttonProps: ButtonProps) {
   return (
     <Tooltip disabled={expanded}>
       <TooltipTrigger render={button} />
-      <TooltipContent>
+      <TooltipContent side={tooltipSide}>
         {name}
         {keys ? <KbdShortcut keys={keys} size='sm' /> : null}
       </TooltipContent>
