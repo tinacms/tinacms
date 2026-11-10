@@ -467,9 +467,21 @@ export function useInvalidFieldCounts(addresses: readonly string[]): number[] {
   );
 }
 
-/** Opens, reveals and touches the items of a list field by their address. */
+/**
+ * Opens, reveals and touches the items of a list field by their address.
+ * `insert`, `move` and `remove` re-key the error summary, then run `apply`
+ * (the actual list change); a list field uses them for every such change.
+ */
 export function useListItems() {
   const { view } = useFormScope('list-items-outside-provider', 'useListItems');
+  const rekeyThen = (
+    listAddress: string,
+    change: ListChange,
+    apply: () => void
+  ) => {
+    view.getState().rekey(listAddress, change);
+    apply();
+  };
   return {
     openLevel: (
       itemAddress: string,
@@ -481,8 +493,12 @@ export function useListItems() {
     isRevealed: (itemAddress: string) =>
       isRevealed(view.getState(), itemAddress),
     touch: (itemAddress: FieldAddress) => view.getState().touch(itemAddress),
-    rekey: (listAddress: string, change: ListChange) =>
-      view.getState().rekey(listAddress, change),
+    insert: (listAddress: string, index: number, apply: () => void) =>
+      rekeyThen(listAddress, { insert: index }, apply),
+    move: (listAddress: string, from: number, to: number, apply: () => void) =>
+      rekeyThen(listAddress, { move: [from, to] }, apply),
+    remove: (listAddress: string, index: number, apply: () => void) =>
+      rekeyThen(listAddress, { remove: index }, apply),
     /** The index of the item of `listAddress` the editor just came back from, once. */
     takeReturnedIndex: (listAddress: string): number | undefined => {
       const { returnedFrom, clearReturn } = view.getState();

@@ -88,15 +88,15 @@ export function ImageGallery() {
           keys.current = keys.current.filter(
             (_, position) => position !== index
           );
-          listItems.rekey(address, { remove: index });
-          setValue(liveItems().filter((_, position) => position !== index));
+          listItems.remove(address, index, () =>
+            setValue(liveItems().filter((_, position) => position !== index))
+          );
         }}
         onMove={(from, to) => {
           const next = [...liveItems()];
           next.splice(to, 0, ...next.splice(from, 1));
           keys.current.splice(to, 0, ...keys.current.splice(from, 1));
-          listItems.rekey(address, { move: [from, to] });
-          setValue(next);
+          listItems.move(address, from, to, () => setValue(next));
         }}
       />
       <Dialog open={picking} onOpenChange={setPicking}>
