@@ -12,8 +12,12 @@ import type { RefObject } from 'react';
 
 // The dialog opens on Cancel whatever held focus before, such as a field the editor
 // was typing in.
+// `focusVisible` makes the ring show after a click; TypeScript's FocusOptions lacks it.
+const FOCUS_WITH_RING: FocusOptions & { focusVisible: boolean } = {
+  focusVisible: true,
+};
 const focusOnMount = (node: HTMLButtonElement | null) => {
-  if (node) requestAnimationFrame(() => node.focus());
+  if (node) requestAnimationFrame(() => node.focus(FOCUS_WITH_RING));
 };
 
 /**
@@ -26,7 +30,7 @@ export function DiscardConfirm({
   onConfirm,
   returnFocusTo,
   title = 'Discard unsaved edits?',
-  description = 'Discarding can’t be undone.',
+  description = 'The document goes back to its last saved version. Discarded edits can’t be brought back.',
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -48,7 +52,13 @@ export function DiscardConfirm({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogClose
-            render={<Button ref={focusOnMount} variant='outline' />}
+            render={
+              <Button
+                ref={focusOnMount}
+                variant='outline'
+                className='focus:shadow-focus-ring'
+              />
+            }
           >
             Cancel
           </AlertDialogClose>

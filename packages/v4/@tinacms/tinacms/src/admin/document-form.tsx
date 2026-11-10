@@ -6,6 +6,7 @@ import {
   DropdownMenuNote,
   DropdownMenuTrigger,
 } from '@tinacms/ui/components/dropdown-menu';
+import { tinaResolveLabel } from '@tinacms/ui/components/error-summary-pane';
 import { FormLevel } from '@tinacms/ui/components/form-level';
 import { SaveToBranchDialog } from '@tinacms/ui/components/save-to-branch-dialog';
 import { toast } from '@tinacms/ui/components/toast';
@@ -57,10 +58,10 @@ import {
 } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import type { StoredDraft } from '../form/drafts';
-import { countFailingFields } from '../editor/field-errors';
 import { DiscardConfirm } from './discard-confirm';
 import { DocumentStatus } from './document-status';
 import { ContentError } from '../core/content/contract';
+import { ErrorSuccessBubble, useErrorSummary } from './error-summary';
 import { saveFailureWords } from './save-failure';
 import { SaveToNewBranchContext } from './save-to-new-branch';
 import { leftoverText } from './leftover-text';
@@ -144,7 +145,7 @@ function SaveButton() {
   const content = useOptionalContentSlice();
   const narrow = useNarrow();
   const view = useBranchView();
-  const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
+  const summary = useErrorSummary();
   const [pending, setPending] = useState(false);
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [name, setName] = useState('');
@@ -264,6 +265,10 @@ function SaveButton() {
     save()
       .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
+        if (cause instanceof FormValidationError && summary.block()) {
+          toast.dismiss(failedToastId);
+          return;
+        }
         showFailure(cause);
         if (isBranchGoneError(cause)) {
           openDialog('deleted', branchName ?? '');
@@ -327,6 +332,7 @@ function SaveButton() {
     );
   };
 
+  const { blocked } = summary;
   return (
     <>
       <Button
@@ -334,13 +340,19 @@ function SaveButton() {
         variant='primary'
         type='button'
         className='min-w-41 shrink-0'
-        disabled={!dirty && !pending}
+        disabled={!(blocked || dirty || pending)}
         busy={pending}
-        count={errorCount}
-        srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
-        onClick={run}
+        data-resolve=''
+        icon={blocked ? 'error' : undefined}
+        aria-expanded={blocked ? summary.paneOpen : undefined}
+        aria-controls={blocked ? 'error-pane' : undefined}
+        onClick={blocked ? summary.resolve : run}
       >
-        {isProtected ? NEW_BRANCH_LABEL : DEFAULT_LABEL}
+        {blocked
+          ? tinaResolveLabel(summary.count)
+          : isProtected
+            ? NEW_BRANCH_LABEL
+            : DEFAULT_LABEL}
       </Button>
       <SaveToBranchDialog
         open={dialog !== null}
@@ -371,13 +383,18 @@ function FormBar() {
   const formId = useFormId();
   const dirty = useIsFormDirty(formId);
   const discard = useDiscardEdits();
+  const values = useFormValues(formId);
+  const scope = use(FormScopeContext);
   const [confirming, setConfirming] = useState(false);
+  // Read when the confirm opens, so typing in the title does not change it.
+  const [documentName, setDocumentName] = useState('');
   const menuButton = useRef<HTMLButtonElement>(null);
   return (
     <div
       data-slot='form-bar'
-      className='flex h-14 flex-none items-center gap-2 border-t border-border bg-card px-3'
+      className='relative flex h-14 flex-none items-center gap-2 border-t border-border bg-card px-3'
     >
+      <ErrorSuccessBubble />
       <div className='min-w-0 flex-1'>
         <DocumentStatus />
       </div>
@@ -401,7 +418,10 @@ function FormBar() {
           <DropdownMenuItem
             variant='destructive'
             disabled={!dirty}
-            onClick={() => setConfirming(true)}
+            onClick={() => {
+              setDocumentName(documentTitle(values, scope?.path ?? ''));
+              setConfirming(true);
+            }}
           >
             Discard unsaved edits
           </DropdownMenuItem>
@@ -414,6 +434,7 @@ function FormBar() {
         onOpenChange={setConfirming}
         onConfirm={discard}
         returnFocusTo={menuButton}
+        title={`Discard unsaved edits to “${documentName}”?`}
       />
     </div>
   );
