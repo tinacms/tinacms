@@ -71,6 +71,7 @@ describe('editorial workflow branch naming', () => {
   afterEach(() => vi.restoreAllMocks());
 
   it('renames a generated default and displays and selects the resulting branch', async () => {
+    mocks.listBranches.mockResolvedValue([{ protected: false }]);
     const { result } = renderHook(() => useEditorialWorkflow());
     await act(async () => {
       expect(

@@ -228,7 +228,9 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
                 includeIndexStatus: false,
                 signal,
               });
-              return branches.map(({ name }) => name);
+              return branches
+                .map((branch: { name?: string }) => branch.name)
+                .filter((name): name is string => typeof name === 'string');
             },
             create: (name) => {
               setCurrentStep(1);
