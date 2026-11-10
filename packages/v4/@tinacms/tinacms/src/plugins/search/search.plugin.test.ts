@@ -581,6 +581,63 @@ describe('save-time indexing', () => {
     expect(text).toBe('Some bold html & more');
   });
 
+  it.each([
+    [
+      'md',
+      '<div>Tom &amp; Jerry &lt;3 &#169; a&nbsp;b &copy;</div>',
+      'Tom & Jerry <3 © a b &copy;',
+    ],
+    ['md', '<script>var x = 1;</script>\n\nafter', 'after'],
+    ['md', '<style>.c{color:red}</style>\n\nafter', 'after'],
+    ['md', '<a title="x>y" href="/u">link</a>', 'link'],
+    ['md', 'H<sub>2</sub>O is water', 'H2O is water'],
+    ['md', '<p>H<sub>2</sub>O is water</p>', 'H2O is water'],
+    ['md', '<DIV>Up</DIV>', 'Up'],
+    ['md', 'Start <b>bold</b> end', 'Start bold end'],
+    ['md', '<b>lead</b> text', 'lead text'],
+    ['md', 'text <b>trail</b>', 'text trail'],
+    ['md', '- one <i>two</i>\n- <b>three</b>', 'one two\nthree'],
+    ['md', '| a |\n|---|\n| <b>c</b> |', 'a\nc'],
+    ['mdx', 'H<sub>2</sub>O is water', 'H2O is water'],
+    ['mdx', 'Price <b>a &lt; b</b> ok', 'Price a < b ok'],
+    ['mdx', '<p>Fish &lt;3 chips</p>', 'Fish <3 chips'],
+    ['mdx', '<a title="x>y" href="/u">link</a>', 'link'],
+    ['mdx', 'Start <b>bold</b> end', 'Start bold end'],
+    ['mdx', '- one <i>two</i>\n- <b>three</b>', 'one two\nthree'],
+  ])(
+    'indexes the visible text of raw HTML in a %s body: %s',
+    async (format, body, expected) => {
+      const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
+      const markdown = format === 'md';
+      await save(handlerWith(), {
+        branch: 'main',
+        collection: markdown ? 'note' : 'post',
+        path: markdown ? 'content/notes/a.md' : 'content/posts/a.mdx',
+        value: { title: 'T', body },
+      });
+      const text = upsert.mock.calls[0][0][0].fields.find(
+        ({ name }) => name === 'body'
+      )?.text;
+      expect(text?.split('\n').filter(Boolean).join('\n')).toBe(expected);
+    }
+  );
+
+  it('finds H2O through the provider after saving H<sub>2</sub>O', async () => {
+    const handler = handlerWith();
+    await save(handler, {
+      branch: 'main',
+      collection: 'note',
+      path: 'content/notes/a.md',
+      value: { title: 'T', body: 'H<sub>2</sub>O is water' },
+    });
+    const response = await handler(
+      post('/search/query', { query: 'H2O', options: { limit: 5 } })
+    );
+    const hits = await response.json();
+    expect(hits).toHaveLength(1);
+    expect(hits[0].ref.path).toBe('content/notes/a.md');
+  });
+
   it('leaves an empty source body out of the record', async () => {
     const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
     await save(handlerWith(), {

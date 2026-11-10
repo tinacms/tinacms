@@ -5,7 +5,6 @@ import {
   definePlugin,
 } from '../../core/plugin';
 import type { HookRef } from '../../core/schema/types';
-import { serverSegmentOf } from './server/search-segment';
 import {
   SEARCH_INDEX_HOOK,
   type SearchFields,
@@ -47,7 +46,11 @@ export const defineSearchPlugin = (
       const { createSearchSlice } = await import('./search.client');
       return { default: { slice: createSearchSlice } };
     },
-    server: async () => ({
-      default: serverSegmentOf(config, (await config.server()).default),
-    }),
+    server: async () => {
+      const [{ serverSegmentOf }, { default: provider }] = await Promise.all([
+        import('./server/search-segment'),
+        config.server(),
+      ]);
+      return { default: serverSegmentOf(config, provider) };
+    },
   });

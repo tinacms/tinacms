@@ -133,9 +133,15 @@ A provider gets records, never raw documents. A `SearchRecord` is
   arrives as source text (MDX or markdown), or as a rich-text tree. Core reads
   the source with the codec of the collection format, then flattens the text
   leaves in document order, with a newline after each block. The text of a
-  component's `children` prop and the visible text of raw HTML are included.
-  Other component props, image alt text, link URLs, HTML tags, attribute values
-  and markdown syntax are left out. A rich-text field
+  component's `children` prop is included. Other component props, image alt
+  text, link URLs and markdown syntax are left out. Raw HTML adds its visible
+  text: comments and `<script>` and `<style>` elements go with their contents,
+  and every other tag goes with its attribute values. A block tag such as `<p>`
+  or `<td>` leaves a space, and any other tag leaves nothing, so `H<sub>2</sub>O`
+  reads `H2O`. Then `&amp;`, `&lt;`, `&gt;`, `&quot;`, `&#39;`, `&apos;`,
+  `&nbsp;` and numeric entities decode. Other entities, such as `&copy;`, stay
+  as written. A `<` that starts no tag stays as visible text. Runs of spaces
+  collapse to one space. A rich-text field
   that does not parse fails the save hook (one after-save warning) and the
   reindex (exit 1, naming the file). Core never indexes its raw source.
 - An empty field is left out of `fields`. A record is always sent for a saved

@@ -32,9 +32,54 @@ const isRoot = (value: unknown): value is Record<string, unknown> =>
 
 const HTML_NODE_TYPES: ReadonlySet<string> = new Set(['html', 'html_inline']);
 
-// Visible text of raw HTML: comments and tags drop out, attribute values with them.
+// Block tags separate words (CommonMark HTML block type 6, plus br and pre);
+// any other tag joins the text around it, so `H<sub>2</sub>O` reads `H2O`.
+const BLOCK_TAGS: ReadonlySet<string> = new Set(
+  `address article aside base basefont blockquote body caption center col colgroup
+  dd details dialog dir div dl dt fieldset figcaption figure footer form frame
+  frameset h1 h2 h3 h4 h5 h6 head header hr html iframe legend li link main menu
+  menuitem nav noframes ol optgroup option p param search section summary table
+  tbody td tfoot th thead title tr track ul br pre script style`.split(/\s+/)
+);
+
+// A tag runs to the first `>` outside a quoted attribute value. With no such
+// `>`, the `<` is visible text and stays.
+const TAG_BODY = `(?:[^>"']|"[^"]*"|'[^']*')*`;
+const HIDDEN_CONTENT = new RegExp(
+  `<!--[\\s\\S]*?(?:-->|$)|<(script|style)(?![\\w-])${TAG_BODY}>[\\s\\S]*?(?:<\\/\\1(?![\\w-])${TAG_BODY}>|$)`,
+  'gi'
+);
+const TAG = new RegExp(`<(?:(\\/?[a-z][\\w-]*)|!)${TAG_BODY}>`, 'gi');
+
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  nbsp: ' ',
+};
+
+const decodeEntities = (text: string): string =>
+  text.replace(
+    /&(?:#(\d+)|#x([\da-f]+)|(amp|lt|gt|quot|apos|nbsp));/gi,
+    (entity, decimal, hex, name) => {
+      if (name) return NAMED_ENTITIES[name.toLowerCase()];
+      const code = decimal ? Number(decimal) : Number.parseInt(hex, 16);
+      return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : entity;
+    }
+  );
+
+// Visible text of raw HTML: comments, scripts and styles drop out with their
+// contents, tags drop out with their attribute values, then entities decode.
 const htmlText = (source: string): string =>
-  source.replace(/<!--[\s\S]*?-->/g, ' ').replace(/<[^>]*>/g, ' ');
+  decodeEntities(
+    source
+      .replace(HIDDEN_CONTENT, '')
+      .replace(TAG, (_tag, name: string | undefined) =>
+        name && BLOCK_TAGS.has(name.replace('/', '').toLowerCase()) ? ' ' : ''
+      )
+  );
 
 // A component's visible text is its `children` prop. Its other props, image alt
 // text and link URLs sit outside the text leaves, so they stay out.
@@ -71,7 +116,7 @@ const collectText = (node: unknown, out: string[]): void => {
 const tidy = (text: string): string =>
   text
     .split('\n')
-    .map((line) => line.replace(/[ \t]+/g, ' ').trim())
+    .map((line) => line.replace(/[ \t\u00a0]+/g, ' ').trim())
     .join('\n');
 
 const treeOf = (
