@@ -65,7 +65,9 @@ const failWrites = (page: Page, message: string) =>
 test.describe('form bar at 1440px', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test('measures like the Storybook form bar (AC50), Save at its 164px minimum', async ({ page }) => {
+  test('measures like the Storybook form bar (AC50), Save at its 164px minimum', async ({
+    page,
+  }) => {
     await dirty(page);
     const { bar, menu, save } = await settled(page);
     if (!bar || !menu || !save) throw new Error('the form bar has no boxes');

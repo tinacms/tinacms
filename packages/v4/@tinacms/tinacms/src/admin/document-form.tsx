@@ -117,8 +117,12 @@ type DialogState = {
 // Failed toasts whose action means "save to a new branch" rather than Retry.
 const goneToasts = new Set<string>();
 
-const isBranchGoneError = (cause: unknown) =>
-  cause instanceof ContentError && cause.code === 'branch-not-found';
+const isBranchGoneError = (cause: unknown) => {
+  if (cause instanceof ContentError) {
+    return cause.code === 'branch-not-found';
+  }
+  return false;
+};
 
 const isBranchGone = (save: { phase: string; reason?: string } | undefined) =>
   save?.phase === 'failed' && save.reason === 'branch-gone';
