@@ -221,7 +221,7 @@ Hooks:
 | `useInvalidFieldCount()` | Gives how many fields under this field show an error. It counts fields, not messages. |
 | `useIsOpenLevel()` | Gives `true` when this field is the open form level |
 | `useInvalidFieldCounts(addresses)` | Gives the `useInvalidFieldCount()` value for each address, in the same order. A list field reads it for its items. |
-| `useListItems()` | Gives `openLevel`, `isRevealed` and `touch` for the items of a list field, by item address |
+| `useListItems()` | Gives `openLevel`, `isRevealed` and `touch` for the items of a list field, by item address, plus `insert`, `move` and `remove`, which a list field uses for every insert, move or remove (append and replace need none) so the error summary follows the items |
 
 A field that supplies a `DrillInComponent` builds it from these hooks and
 `@tinacms/ui` only:

@@ -34,6 +34,7 @@ import { TinaProvider } from '../editor/provider';
 import { HomePanel } from './home';
 import { AuthGate } from './auth-gate';
 import { DocumentForm } from './document-form';
+import { DocumentErrorPane } from './error-summary';
 import { DocumentScope } from './document-scope';
 import {
   CollectionsNavigator,
@@ -306,17 +307,71 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
 
 // Toasts sit above the Save progress card while it shows.
 const TOAST_OFFSET_ABOVE_CARD = { bottom: '8rem' };
-// Toasts clear the form bar and the Status bar at every form column width.
+// Toasts clear the form bar when one would sit under them.
 const TOAST_OFFSET_ABOVE_BAR = { bottom: '7rem' };
+// Elsewhere toasts sit 16px above the 28px Status bar.
+const TOAST_OFFSET_LOW = { bottom: '44px' };
+// The widest toast (the Resume prompt with its buttons inline) and the Toaster's
+// right inset decide whether a toast can reach the form bar.
+const TOAST_WIDEST_PX = 480;
+const TOAST_RIGHT_PX = 24;
 // Below the dialog layer, so a Confirm dims the toasts behind it.
 const TOAST_LAYER = { zIndex: 40 };
 // With the on-screen keyboard open the toast would cover the field being typed in.
 const TOAST_HIDDEN = { ...TOAST_LAYER, visibility: 'hidden' } as const;
 
+// The Toaster renders outside the shell, so it reads the form bar from the page.
+function useFormBarUnderToast(): boolean {
+  const [under, setUnder] = useState(false);
+  useEffect(() => {
+    const measure = () => {
+      const bar = document.querySelector('[data-slot=form-bar]');
+      setUnder(
+        bar !== null &&
+          bar.getBoundingClientRect().right >
+            window.innerWidth - TOAST_RIGHT_PX - TOAST_WIDEST_PX
+      );
+    };
+    const observer = new ResizeObserver(measure);
+    // Collapsing the sidebar moves the form bar without resizing it, so the
+    // sidebar's gap is watched too.
+    let watched: (Element | null)[] = [];
+    const watch = () => {
+      const next = [
+        document.querySelector('[data-slot=form-bar]'),
+        document.querySelector('[data-slot=sidebar-gap]'),
+      ];
+      if (next.every((element, index) => element === watched[index])) return;
+      observer.disconnect();
+      watched = next;
+      for (const element of next) {
+        if (element) observer.observe(element);
+      }
+      measure();
+    };
+    watch();
+    // The form bar mounts and unmounts with the open document.
+    const mutations = new MutationObserver(watch);
+    mutations.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      mutations.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+  return under;
+}
+
 function ShellToaster() {
   const cardShowing = useLongSave();
   const keyboardOpen = useKeyboardOpen();
-  const offset = cardShowing ? TOAST_OFFSET_ABOVE_CARD : TOAST_OFFSET_ABOVE_BAR;
+  const barUnder = useFormBarUnderToast();
+  const offset = cardShowing
+    ? TOAST_OFFSET_ABOVE_CARD
+    : barUnder
+      ? TOAST_OFFSET_ABOVE_BAR
+      : TOAST_OFFSET_LOW;
   return (
     <Toaster
       offset={offset}
@@ -531,7 +586,7 @@ function AdminShell({
             </DocumentScope>
           ) : (
             <DocumentScope collection={collection} path={openPath}>
-              <SidebarInset className='min-w-0 flex-row'>
+              <SidebarInset className='relative min-w-0 flex-row'>
                 <FormColumn
                   openPath={openPath}
                   collection={collection}
@@ -545,7 +600,9 @@ function AdminShell({
                   }
                 />
 
-                <div className='min-w-0 flex-1'>
+                <DocumentErrorPane />
+
+                <div data-preview-slot='' className='min-w-0 flex-1'>
                   <PreviewSlot preview={preview} />
                 </div>
               </SidebarInset>
