@@ -498,7 +498,7 @@ export function SelectBar({
           Cancel
         </Button>
       </div>
-      <div className='flex flex-wrap items-center gap-2'>
+      <div className='flex flex-wrap items-center gap-2 max-sm:grid max-sm:grid-cols-2 max-sm:[&>button]:w-full'>
         <Button
           type='button'
           variant='outline'

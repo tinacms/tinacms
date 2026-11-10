@@ -785,6 +785,21 @@ describe('Delete on a protected branch', () => {
     return screen.findByRole('dialog', { name: 'Save to a new branch' });
   };
 
+  it('closes the Save to a new branch dialog when the branch changes and focuses the pane', async () => {
+    const user = userEvent.setup();
+    await reachDialog(user);
+    act(() => world.switchBranch?.('other'));
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('dialog', { name: 'Save to a new branch' })
+      ).toBeNull()
+    );
+    await waitFor(async () =>
+      expect((await pane()).contains(document.activeElement)).toBe(true)
+    );
+    expect(world.deleted).toEqual([]);
+  });
+
   it('with no handler, Continue is off and nothing is deleted', async () => {
     const user = userEvent.setup();
     const dialog = await reachDialog(user);
@@ -1573,6 +1588,107 @@ describe('runs are bound to their branch', () => {
     ).toBeDisabled();
     await act(async () => release());
     expect(await screen.findByText('Deleted logo.png.')).toBeVisible();
+  });
+});
+
+describe('focus after a branch change', () => {
+  const frames = () =>
+    act(async () => {
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+      );
+    });
+
+  const insidePane = async () =>
+    (await pane()).contains(document.activeElement);
+
+  it('leaves focus on the header Search button when nothing in the pane was open', async () => {
+    const user = userEvent.setup();
+    renderPane();
+    await file('logo.png');
+    const search = screen.getByRole('button', { name: /^Search/ });
+    search.focus();
+    act(() => world.switchBranch?.('other'));
+    await frames();
+    expect(search).toHaveFocus();
+    expect(await insidePane()).toBe(false);
+    await user.keyboard('{Escape}');
+  });
+
+  it('leaves focus on Copy URL when the details are open', async () => {
+    renderPane();
+    await userEvent.setup().click(await file('logo.png'));
+    const copy = await within(
+      await screen.findByRole('region', { name: 'Details of logo.png' })
+    ).findByRole('button', { name: 'Copy URL' });
+    copy.focus();
+    act(() => world.switchBranch?.('other'));
+    await frames();
+    expect(copy).toHaveFocus();
+  });
+
+  it('keeps typing into an open New folder dialog', async () => {
+    const user = userEvent.setup();
+    renderPane();
+    await file('logo.png');
+    await user.click(screen.getByRole('button', { name: 'New folder' }));
+    const field = await within(
+      await screen.findByRole('alertdialog')
+    ).findByRole('textbox', { name: 'Folder name' });
+    await user.type(field, 'ab');
+    act(() => world.switchBranch?.('other'));
+    await frames();
+    await user.keyboard('cd');
+    expect(field).toHaveValue('abcd');
+  });
+
+  it('keeps typing into the open Search palette', async () => {
+    const user = userEvent.setup();
+    renderPane();
+    await file('logo.png');
+    await user.click(screen.getByRole('button', { name: /^Search/ }));
+    const field = await screen.findByRole('searchbox', { name: 'Search' });
+    await user.type(field, 'ab');
+    act(() => world.switchBranch?.('other'));
+    await frames();
+    await user.keyboard('cd');
+    expect(field).toHaveValue('abcd');
+  });
+
+  it('does not pull focus in when the page falls back to the default branch on load', async () => {
+    localStorage.setItem(
+      'tina-store',
+      JSON.stringify({
+        state: { branch: { current: 'deleted/branch' } },
+        version: 0,
+      })
+    );
+    renderPane();
+    await file('logo.png');
+    const search = screen.getByRole('button', { name: /^Search/ });
+    search.focus();
+    await waitFor(() => expect(world.currentBranch?.()).toBe('main'));
+    await frames();
+    expect(search).toHaveFocus();
+  });
+
+  it('moves focus into the pane when the branch change closed the Delete confirm', async () => {
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await file('logo.png'));
+    await user.click(
+      within(
+        await screen.findByRole('region', { name: 'Details of logo.png' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    expect(await screen.findByRole('alertdialog')).toBeVisible();
+    act(() => world.switchBranch?.('other'));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await frames();
+    expect(await insidePane()).toBe(true);
+    expect(['Media', 'Files in Media']).toContain(
+      document.activeElement?.getAttribute('aria-label')
+    );
   });
 });
 

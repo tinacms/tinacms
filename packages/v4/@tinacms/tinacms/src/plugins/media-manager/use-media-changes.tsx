@@ -69,7 +69,7 @@ interface PendingBranch {
  */
 export function useMediaChanges(
   onSettled: (result: ChangeResult) => void,
-  onBranchDrift: () => void
+  onBranchDrift: (closedDialog: boolean) => void
 ) {
   const media = useMediaSlice();
   const runtime = use(TinaRuntimeContext);
@@ -136,7 +136,7 @@ export function useMediaChanges(
     if (expectedBranch.current === branch) return;
     cancelled.current = true;
     setPending(null);
-    onBranchDrift();
+    onBranchDrift(pending !== null);
     setStatus((current) => (current?.tone === 'error' ? null : current));
   }, [branch]);
 

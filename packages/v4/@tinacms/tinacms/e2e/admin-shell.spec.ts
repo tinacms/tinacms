@@ -94,39 +94,44 @@ for (const viewport of [
   });
 }
 
-for (const width of [320, 360, 375, 390]) {
-  test(`the Select bar keeps every action inside the Media pane at ${width}px`, async ({
+for (const width of [320, 360, 375, 390, 1280]) {
+  test(`the Select bar keeps one height and every action inside the Media pane at ${width}px as the count grows past 10`, async ({
     page,
   }) => {
-    await page.setViewportSize({ width, height: 700 });
+    await page.setViewportSize({ width, height: 800 });
     await page.goto('/#/screens/media');
     const pane = page.getByRole('complementary', { name: 'Media' });
     await pane.getByRole('button', { name: 'Select', exact: true }).click();
-    await pane.getByRole('button', { name: 'Select all' }).click();
-    const paneBox = await pane.boundingBox();
     const bar = pane.getByRole('toolbar', { name: 'Selected files' });
-    for (const button of await bar.getByRole('button').all()) {
-      const box = await button.boundingBox();
-      expect(box).not.toBeNull();
-      expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(
-        (paneBox?.x ?? 0) + (paneBox?.width ?? 0)
-      );
+    const boxes = pane.getByRole('checkbox');
+    expect(await boxes.count()).toBeGreaterThanOrEqual(12);
+    const heights: number[] = [];
+    for (const count of [0, 1, 10, 12]) {
+      while (
+        (await pane.getByText(/^\d+ selected$/).innerText()) !==
+        `${count} selected`
+      ) {
+        const selected = Number(
+          (await pane.getByText(/^\d+ selected$/).innerText()).split(' ')[0]
+        );
+        await boxes.nth(selected).click();
+      }
+      heights.push((await bar.boundingBox())?.height ?? 0);
+      const paneBox = await pane.boundingBox();
+      for (const button of await bar.getByRole('button').all()) {
+        const box = await button.boundingBox();
+        expect(box).not.toBeNull();
+        expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(
+          (paneBox?.x ?? 0) + (paneBox?.width ?? 0)
+        );
+        expect(
+          await button.evaluate((el) => el.scrollWidth - el.clientWidth)
+        ).toBeLessThanOrEqual(0);
+      }
     }
+    expect(new Set(heights).size).toBe(1);
   });
 }
-
-test('the Select bar keeps one height at the default pane width as the count changes', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto('/#/screens/media');
-  const pane = page.getByRole('complementary', { name: 'Media' });
-  await pane.getByRole('button', { name: 'Select', exact: true }).click();
-  const bar = pane.getByRole('toolbar', { name: 'Selected files' });
-  const empty = (await bar.boundingBox())?.height;
-  await pane.getByRole('button', { name: 'Select all' }).click();
-  expect((await bar.boundingBox())?.height).toBe(empty);
-});
 
 test('on a desktop the Media pane maximises over the main area and restores', async ({
   page,

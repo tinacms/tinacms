@@ -182,10 +182,12 @@ export function MediaPane({ segments }: AdminScreenProps) {
           null;
       }
     },
-    () => {
+    (closedHookDialog) => {
       setSelected(new Set());
       setConfirm(null);
-      setDriftFocus((count) => count + 1);
+      if (confirm !== null || closedHookDialog) {
+        setDriftFocus((count) => count + 1);
+      }
     }
   );
   useEffect(() => {
