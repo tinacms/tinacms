@@ -127,6 +127,18 @@ function FileItem({
   onFocus: () => void;
 }) {
   const name = mediaNameOf(item.path);
+  const disc = selecting ? (
+    <span
+      aria-hidden='true'
+      className={cn(
+        'flex size-5 shrink-0 items-center justify-center rounded-full border bg-card',
+        mode === 'grid' && 'absolute top-1.5 left-1.5',
+        selected && 'border-primary bg-primary text-primary-foreground'
+      )}
+    >
+      {selected ? <Icon glyph={CheckIcon} size={14} /> : null}
+    </span>
+  ) : null;
   const checkable = selecting
     ? ({ role: 'checkbox', 'aria-checked': selected } as const)
     : ({ 'aria-pressed': active } as const);
@@ -146,9 +158,13 @@ function FileItem({
           mode === 'grid'
             ? 'flex-col overflow-hidden rounded-md border bg-card'
             : 'items-center gap-3 px-2 py-1.5 hover:bg-muted/50',
-          (active || selected) && 'border-primary ring-2 ring-primary/20'
+          (active || selected) &&
+            (mode === 'grid'
+              ? 'border-primary ring-2 ring-primary/20'
+              : 'bg-primary/10')
         )}
       >
+        {mode === 'list' ? disc : null}
         <span
           className={cn(
             'relative block overflow-hidden',
@@ -162,17 +178,7 @@ function FileItem({
             resolveUrl={resolveUrl}
             size={mode === 'grid' ? 400 : 80}
           />
-          {selecting ? (
-            <span
-              aria-hidden='true'
-              className={cn(
-                'absolute top-1.5 left-1.5 flex size-5 items-center justify-center rounded-full border bg-card',
-                selected && 'border-primary bg-primary text-primary-foreground'
-              )}
-            >
-              {selected ? <Icon glyph={CheckIcon} size={14} /> : null}
-            </span>
-          ) : null}
+          {mode === 'grid' ? disc : null}
         </span>
         <span
           title={name}

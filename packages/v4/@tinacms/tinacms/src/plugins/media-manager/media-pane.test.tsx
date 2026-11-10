@@ -9,12 +9,15 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { HashRouter } from 'react-router-dom';
 import { TinaAdmin } from '../../admin/admin';
 import {
   SaveToNewBranchContext,
   type SaveToNewBranchRequest,
 } from '../../admin/save-to-new-branch';
 import { asResolvedConfig } from '../../config';
+import type { AuthSlice } from '../../core/auth/contract';
+import { toUserId } from '../../core/auth/contract';
 import { branchSliceOf, currentBranchOf } from '../../core/branch/contract';
 import type { BranchInfo } from '../../core/branch/contract';
 import {
@@ -28,6 +31,8 @@ import {
 import { definePlugin } from '../../core/plugin';
 import { validateCapabilityGraph } from '../../core/resolve';
 import stringFieldPlugin from '../fields/string/string-field.plugin';
+import { TinaProvider } from '../../editor';
+import { MediaPane } from './media-pane';
 import { mediaManagerPlugin } from './media-manager.plugin';
 
 const BRANCHES: BranchInfo[] = [
@@ -147,7 +152,11 @@ const contentPlugin = definePlugin({
             path === POST.path
               ? {
                   path,
-                  document: { title: POST.title, cover: 'posts/hero.jpg' },
+                  document: {
+                    title: POST.title,
+                    cover: 'posts/hero.jpg',
+                    extra: 'logo.png',
+                  },
                 }
               : null,
           update: async () => {
@@ -655,7 +664,7 @@ describe('Delete', () => {
     world.searchHits = true;
     const user = userEvent.setup();
     renderPane();
-    const dialog = await openDelete(user);
+    const dialog = await openDelete(user, 'banner.png');
     expect(
       await within(dialog).findByText(
         "Search found no saved document using this file. A document search can't see may still use it, and would show a missing image."
@@ -910,5 +919,286 @@ describe('act hygiene', () => {
     await file('logo.png');
     await act(async () => {});
     expect(error).not.toHaveBeenCalled();
+  });
+});
+
+describe('usage lines and cards', () => {
+  it('says how many documents use the open file', async () => {
+    world.searchHits = true;
+    const user = userEvent.setup();
+    renderPane('#/screens/media/posts');
+    await user.click(await file('hero.jpg'));
+    expect(await screen.findByText('Used in 1 document')).toBeVisible();
+  });
+
+  it('groups documents by file for several files and counts the unused', async () => {
+    world.searchHits = true;
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await screen.findByRole('button', { name: 'Select' }));
+    await user.click(screen.getByRole('button', { name: 'Select all' }));
+    await user.click(screen.getByRole('button', { name: 'Delete 2' }));
+    const dialog = await screen.findByRole('alertdialog');
+    expect(
+      await within(dialog).findByText(
+        '1 of 2 files are used in documents, which will show a missing image:'
+      )
+    ).toBeVisible();
+    const group = within(dialog).getByRole('region', { name: 'logo.png' });
+    expect(within(group).getByText('content/posts/hello.mdx')).toBeVisible();
+    expect(
+      within(dialog).getByText('No use was found for the other 1.')
+    ).toBeVisible();
+  });
+
+  it('lists the editor’s own unsaved edit as a card marked as theirs', async () => {
+    const user = userEvent.setup();
+    renderPane('#/collections/post/content%2Fposts%2Fhello.mdx');
+    const title = await screen.findByRole('textbox', { name: 'Title' });
+    await user.clear(title);
+    await user.type(title, 'banner.png');
+    await user.click(screen.getByRole('button', { name: 'Media' }));
+    await user.click(await file('banner.png'));
+    await user.click(
+      within(
+        await screen.findByRole('region', { name: 'Details of banner.png' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    const dialog = await screen.findByRole('alertdialog');
+    expect(
+      await within(dialog).findByText('hello.mdx (your unsaved edits)', {
+        selector: 'p',
+      })
+    ).toBeVisible();
+    expect(
+      within(dialog).getByRole('button', { name: 'Delete' })
+    ).toBeEnabled();
+  });
+});
+
+describe('Delete: focus and messages', () => {
+  it('moves focus to the next file, and clears the done message after 6 seconds', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      renderPane();
+      await user.click(await file('logo.png'));
+      await user.click(
+        within(
+          await screen.findByRole('region', { name: 'Details of logo.png' })
+        ).getByRole('button', { name: 'Delete' })
+      );
+      await user.click(
+        await within(await screen.findByRole('alertdialog')).findByRole(
+          'button',
+          { name: 'Delete' }
+        )
+      );
+      expect(await screen.findByText('Deleted logo.png.')).toBeVisible();
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'banner.png' })).toHaveFocus()
+      );
+      await act(() => vi.advanceTimersByTimeAsync(6000));
+      expect(screen.queryByText('Deleted logo.png.')).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe('Move on a protected branch', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    world.hasRename = true;
+  });
+
+  const reachDialog = async (user: ReturnType<typeof userEvent.setup>) => {
+    renderPane();
+    await user.click(await screen.findByRole('button', { name: 'Select' }));
+    await user.click(await screen.findByRole('checkbox', { name: 'logo.png' }));
+    await user.click(screen.getByRole('button', { name: 'Move' }));
+    const move = await screen.findByRole('alertdialog');
+    await user.click(
+      await within(move).findByRole('button', { name: 'posts' })
+    );
+    await user.click(within(move).getByRole('button', { name: 'Move here' }));
+    return screen.findByRole('dialog', { name: 'Save to a new branch' });
+  };
+
+  it('with no handler, Continue is off and nothing moves', async () => {
+    const user = userEvent.setup();
+    const dialog = await reachDialog(user);
+    expect(
+      within(dialog).getByText(
+        'main is protected, so moving logo.png happens on a new branch with a pull request. You carry on there.'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByRole('textbox', { name: /New branch name/ })
+    ).toHaveValue('media/move-logo');
+    expect(
+      within(dialog).getByRole('button', { name: 'Continue' })
+    ).toBeDisabled();
+    expect(world.moved).toEqual([]);
+  });
+
+  it('makes the branch through the handler, then moves on it', async () => {
+    world.saveHandler = vi.fn(async (request) => {
+      world.switchBranch?.(request.name);
+    });
+    const user = userEvent.setup();
+    const dialog = await reachDialog(user);
+    await user.click(within(dialog).getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Moved logo.png to posts.')).toBeVisible();
+    expect(world.saveHandler).toHaveBeenCalledWith({
+      kind: 'media',
+      name: 'media/move-logo',
+      reason: 'protected',
+    });
+    expect(world.moved).toEqual([{ from: 'logo.png', to: 'posts/logo.png' }]);
+  });
+});
+
+describe('header Back and loading on focus', () => {
+  it('Back closes the details that fill the pane and returns to the files', async () => {
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await file('logo.png'));
+    await screen.findByRole('region', { name: 'Details of logo.png' });
+    expect(screen.queryByRole('region', { name: 'Files in Media' })).toBeNull();
+    await user.click(
+      within(await pane()).getByRole('button', { name: 'Back' })
+    );
+    expect(
+      screen.queryByRole('region', { name: 'Details of logo.png' })
+    ).toBeNull();
+    expect(await library()).toBeVisible();
+  });
+
+  it('loads the next page when focus reaches the last loaded item', async () => {
+    world.pageSize = 2;
+    renderPane();
+    const last = await file('logo.png');
+    expect(screen.queryByRole('button', { name: 'banner.png' })).toBeNull();
+    act(() => last.focus());
+    expect(await file('banner.png')).toBeVisible();
+  });
+});
+
+describe('permission lock and the signed-in state', () => {
+  const alice = { id: toUserId('alice'), name: 'Alice' };
+  const bob = { id: toUserId('bob'), name: 'Bob' };
+  let setAuth: ((patch: Partial<AuthSlice>) => void) | undefined;
+
+  const authPlugin = (status: AuthSlice['status']) =>
+    definePlugin({
+      name: 'test:auth',
+      provides: ['auth'],
+      server: async () => ({ default: {} }),
+      client: async () => ({
+        default: {
+          slice: (set) => {
+            setAuth = (patch) => set(patch);
+            return {
+              status,
+              user: status === 'signed-out' ? null : alice,
+              roles: ['editor'],
+              getToken: async () => undefined,
+              login: async () => {},
+              logout: async () => {},
+            };
+          },
+        },
+      }),
+    });
+
+  const renderBare = (status: AuthSlice['status']) =>
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [authPlugin(status), mediaPlugin(), stringFieldPlugin],
+          schema: { collections: [] },
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      >
+        <HashRouter>
+          <MediaPane segments={[]} />
+        </HashRouter>
+      </TinaProvider>
+    );
+
+  const refuseDelete = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(await file('logo.png'));
+    await user.click(
+      within(
+        await screen.findByRole('region', { name: 'Details of logo.png' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    await user.click(
+      await within(await screen.findByRole('alertdialog')).findByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+  };
+
+  const detailsDelete = () =>
+    within(
+      screen.getByRole('region', { name: 'Details of logo.png' })
+    ).getByRole('button', { name: 'Delete' });
+
+  it('locks Delete when signed in, and a new sign-in clears the lock', async () => {
+    world.failDelete = () => new MediaError('unauthorized');
+    const user = userEvent.setup();
+    renderBare('signed-in');
+    await refuseDelete(user);
+    expect(
+      await screen.findByText(/You don't have permission to delete\. 0 done/)
+    ).toBeVisible();
+    expect(detailsDelete()).toBeDisabled();
+    act(() => setAuth?.({ status: 'signed-in', user: bob }));
+    await waitFor(() => expect(detailsDelete()).toBeEnabled());
+  });
+
+  it('says the session expired, and locks nothing, when the editor is signed out', async () => {
+    world.failDelete = () => new MediaError('unauthorized');
+    const user = userEvent.setup();
+    renderBare('signed-in');
+    await user.click(await file('logo.png'));
+    act(() => setAuth?.({ status: 'signed-out', user: null }));
+    await user.click(detailsDelete());
+    await user.click(
+      await within(await screen.findByRole('alertdialog')).findByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+    expect(
+      await screen.findByText('Your session has expired. Sign in again.')
+    ).toBeVisible();
+    expect(detailsDelete()).toBeEnabled();
+  });
+
+  it('does not call a forbidden account an expired session', async () => {
+    world.failDelete = () => new MediaError('unauthorized');
+    const user = userEvent.setup();
+    renderBare('signed-in');
+    await user.click(await file('logo.png'));
+    act(() => setAuth?.({ status: 'forbidden', user: alice }));
+    await user.click(detailsDelete());
+    await user.click(
+      await within(await screen.findByRole('alertdialog')).findByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+    expect(
+      await screen.findByText(
+        "Your account doesn't have access to this project."
+      )
+    ).toBeVisible();
+    expect(screen.queryByText(/session has expired/)).toBeNull();
   });
 });
