@@ -9,7 +9,6 @@ import {
 import { deleteMedia } from './delete';
 import { listMedia, mediaUrl } from './read';
 import { type MediaBranch, toMediaError } from './shared';
-import { renameMedia } from './rename';
 import { uploadMedia } from './upload';
 
 const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
@@ -38,7 +37,6 @@ export const createTinaCloudMediaSlice =
       list: async (folder, page) =>
         listMedia(client, await branch(), folder, page),
       delete: async (path) => deleteMedia(client, await branch(), path),
-      rename: async (from, to) => renameMedia(client, await branch(), from, to),
       resolveUrl: (path, size) => {
         const target = storeBranch(get()) ?? project?.defaultBranch;
         const staged = target === project?.mediaBranch ? undefined : target;

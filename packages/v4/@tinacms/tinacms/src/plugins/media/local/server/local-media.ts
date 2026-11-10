@@ -21,6 +21,7 @@ export interface LocalMedia {
   list(folder: string, page?: MediaPageRequest): Promise<MediaPage>;
   save(file: File, folder?: string): Promise<string>;
   delete(mediaPath: string): Promise<void>;
+  rename(from: string, to: string): Promise<string>;
 }
 
 export const DEFAULT_MEDIA_PAGE_SIZE = 50;
@@ -31,6 +32,18 @@ const toMediaPath = (mediaDir: string, absolute: string): string =>
 const byKindThenName = (left: MediaItem, right: MediaItem): number => {
   if (left.kind !== right.kind) return left.kind === 'directory' ? -1 : 1;
   return left.path.localeCompare(right.path);
+};
+
+const isValidFileName = (name: string): boolean =>
+  name.length > 0 &&
+  name !== '.' &&
+  name !== '..' &&
+  path.basename(name) === name &&
+  !name.includes('\\');
+
+const hasErrorCode = (cause: unknown, code: string): boolean => {
+  if (cause instanceof Error) return 'code' in cause && cause.code === code;
+  return false;
 };
 
 export const createLocalMedia = (options: LocalMediaOptions): LocalMedia => {
@@ -102,13 +115,7 @@ export const createLocalMedia = (options: LocalMediaOptions): LocalMedia => {
 
     async save(file, folder = '') {
       const name = file.name;
-      const isValidName =
-        name.length > 0 &&
-        name !== '.' &&
-        name !== '..' &&
-        path.basename(name) === name &&
-        !name.includes('\\');
-      if (!isValidName) {
+      if (!isValidFileName(name)) {
         throw new MediaError(
           'invalid-name',
           `"${name}" is not a valid file name.`
@@ -134,6 +141,51 @@ export const createLocalMedia = (options: LocalMediaOptions): LocalMedia => {
         throw new MediaError('unsupported', `"${mediaPath}" is not a file.`);
       }
       await fs.unlink(absolute);
+    },
+
+    async rename(from, to) {
+      const [fromAbsolute, toAbsolute] = await Promise.all([
+        resolveInside(from, { allowRoot: false }),
+        resolveInside(to, { allowRoot: false }),
+      ]);
+      const name = path.posix.basename(to);
+      if (!isValidFileName(name)) {
+        throw new MediaError(
+          'invalid-name',
+          `"${name}" is not a valid file name.`
+        );
+      }
+      const stats = await fs.lstat(fromAbsolute).catch((cause: unknown) => {
+        if (isMissingFileError(cause)) {
+          throw new MediaError('not-found', `"${from}" does not exist.`);
+        }
+        throw cause;
+      });
+      if (!stats.isFile()) {
+        throw new MediaError('unsupported', `"${from}" is not a file.`);
+      }
+      const targetFolder = await fs
+        .stat(path.dirname(toAbsolute))
+        .catch((cause: unknown) => {
+          if (isMissingFileError(cause)) return undefined;
+          throw cause;
+        });
+      if (!targetFolder?.isDirectory()) {
+        throw new MediaError(
+          'not-found',
+          `The folder for "${to}" does not exist.`
+        );
+      }
+      try {
+        await fs.link(fromAbsolute, toAbsolute);
+      } catch (cause) {
+        if (hasErrorCode(cause, 'EEXIST')) {
+          throw new MediaError('name-taken', `"${to}" already exists.`);
+        }
+        throw cause;
+      }
+      await fs.unlink(fromAbsolute);
+      return toMediaPath(mediaDir, toAbsolute);
     },
   };
 };

@@ -291,4 +291,76 @@ describe('local media endpoint', () => {
     expect(res.statusCode).toBe(400);
     expect(res.headers[MEDIA_ERROR_HEADER]).toBe('invalid-path');
   });
+
+  it('renames a file, returns its new path and serves it before Vite notices', async () => {
+    await upload();
+    await fs.mkdir(path.join(rootDir, 'public/uploads/moved'));
+    const routes = mountedRoutes();
+    const handler = routes.get(DEFAULT_MEDIA_URL);
+    if (!handler) throw new Error('The plugin mounted no media middleware.');
+    const res = responseDouble();
+    await handler(
+      requestDouble(
+        '/',
+        { ...SAME_ORIGIN, 'content-type': 'application/json' },
+        [
+          JSON.stringify({
+            op: 'rename',
+            from: 'posts/hero.jpg',
+            to: 'moved/hero.jpg',
+          }),
+        ]
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toEqual({ path: 'moved/hero.jpg' });
+    const served = responseDouble();
+    for (const [route, serve] of routes) {
+      if (!route.startsWith('*')) continue;
+      let passed = false;
+      await serve(
+        requestDouble('/uploads/moved/hero.jpg', SAME_ORIGIN, [], 'GET'),
+        served,
+        () => {
+          passed = true;
+        }
+      );
+      if (!passed) break;
+    }
+    expect(served.body).toBe('jpeg');
+  });
+
+  it('400s a rename onto an existing file', async () => {
+    await fs.mkdir(path.join(rootDir, 'public/uploads'), { recursive: true });
+    await fs.writeFile(path.join(rootDir, 'public/uploads/a.png'), 'a');
+    await fs.writeFile(path.join(rootDir, 'public/uploads/b.png'), 'b');
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble(
+        '/',
+        { ...SAME_ORIGIN, 'content-type': 'application/json' },
+        [JSON.stringify({ op: 'rename', from: 'a.png', to: 'b.png' })]
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.headers[MEDIA_ERROR_HEADER]).toBe('name-taken');
+  });
+
+  it('400s a rename outside the media folder', async () => {
+    await fs.mkdir(path.join(rootDir, 'public/uploads'), { recursive: true });
+    await fs.writeFile(path.join(rootDir, 'public/uploads/a.png'), 'a');
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble(
+        '/',
+        { ...SAME_ORIGIN, 'content-type': 'application/json' },
+        [JSON.stringify({ op: 'rename', from: 'a.png', to: '../../b.png' })]
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.headers[MEDIA_ERROR_HEADER]).toBe('invalid-path');
+  });
 });

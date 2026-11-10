@@ -96,7 +96,11 @@ export interface MediaProvider {
   // ADR-022 §5: a provider without transforms ignores `options` and returns
   // the original URL.
   resolveUrl(path: string, options?: MediaUrlOptions): string;
-  /** Resolves to the new media path. */
+  /**
+   * Renames or moves a file. `to` is a full media path and may be in another
+   * folder, which moves the file. Resolves to the new media path. Rejects with
+   * `name-taken` when `to` exists; never overwrites.
+   */
   rename?(from: string, to: string): Promise<string>;
   features?: MediaFeatures;
   status?(): Promise<MediaStatus>;

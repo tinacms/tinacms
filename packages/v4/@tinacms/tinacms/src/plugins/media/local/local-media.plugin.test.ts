@@ -73,11 +73,12 @@ describe('local media plugin', () => {
     expect(localMediaPlugin().provides).toEqual(['media']);
   });
 
-  it('mounts a slice with the four media operations', async () => {
+  it('mounts a slice with the five media operations', async () => {
     const harness = await createSliceHarness(null);
     expect(Object.keys(harness.slice()).sort()).toEqual([
       'delete',
       'list',
+      'rename',
       'resolveUrl',
       'upload',
     ]);
@@ -109,6 +110,18 @@ describe('media slice', () => {
     const harness = await createSliceHarness(null);
     await harness.slice().delete('old.png');
     expect(harness.requests[0].body).toEqual({ op: 'delete', path: 'old.png' });
+  });
+
+  it('posts a rename op and returns the new path', async () => {
+    const harness = await createSliceHarness({ path: 'posts/new.png' });
+    expect(await harness.slice().rename?.('old.png', 'posts/new.png')).toBe(
+      'posts/new.png'
+    );
+    expect(harness.requests[0].body).toEqual({
+      op: 'rename',
+      from: 'old.png',
+      to: 'posts/new.png',
+    });
   });
 
   it('resolves a media path to a URL under the media root', async () => {
