@@ -22,7 +22,8 @@ document through `content`.
 | `filters` | Optional. Field name to a string, number or boolean. At most 10 keys. A provider that cannot apply a filter throws `SearchError('unsupported')`. It never ignores the filter. |
 | `cursor` | Optional. `JSON.stringify(lastHit.ref)` of the previous page. |
 
-A `SearchHit` is `{ ref, score, snippet }`.
+A `SearchHit` is `{ ref, score, snippet }`. A filter key reaches the provider
+as it was sent, including `__proto__`, so a provider checks the keys it accepts.
 
 - `ref` is `{ collection, path }`. `path` is the path that
   `content.get(collection, path)` takes, so the caller re-fetches the document
@@ -128,9 +129,13 @@ import no node module that a browser build could reach.
 A provider gets records, never raw documents. A `SearchRecord` is
 `{ ref, fields: { name, weight, text }[] }`.
 
-- `text` is plain text. A string field is used as it is. A rich-text field is
-  flattened to the text of its text leaves, in document order. A newline follows
-  each block. Component props, image alt text and link URLs are left out.
+- `text` is plain text. A string field is used as it is. A rich-text field
+  arrives as source text (MDX or markdown), or as a rich-text tree. Core reads
+  the source with the codec of the collection format, then flattens the text
+  leaves in document order, with a newline after each block. Component props,
+  image alt text, link URLs and markdown syntax are left out. A rich-text field
+  that does not parse fails the save hook (one after-save warning) and the
+  reindex (exit 1, naming the file). Core never indexes its raw source.
 - An empty field is left out of `fields`. A record is always sent for a saved
   document, even with no fields, so the provider replaces the old entry.
 
@@ -274,13 +279,19 @@ collection, then the total.
 - It exits 1, and never calls `replace`, when no plugin provides `search`, the
   plugin has no index provider, a document does not parse, a searchable
   collection has no `path`, or no collection has a document.
+- It reads each file as the collection that owns it for `content.list`: the
+  collection with the deepest matching `path`. A folder nested inside a
+  searchable collection, which belongs to another collection, is not indexed
+  as part of the parent.
+- It accepts `--root`, `--config` and `--help`. Any other flag, including
+  `--check`, exits 1: reindex always writes the index.
 
 ## In the admin
 
 The Search dialog calls `search(query, { limit: 10 })` 250 ms after the last
 keystroke. It re-fetches each hit through `content` on the current branch. It
-drops a hit whose document is gone, and shows the title (or the path) and the
-snippet of the others. A hit does not open the document. Without a search
+drops a hit whose document is gone, and shows the title and the
+snippet of the others. The title is the `title` of the entry, else the `title` value of the document, else the path. A hit does not open the document. Without a search
 plugin, the dialog still finds screens.
 
 ## A plugin without the helper

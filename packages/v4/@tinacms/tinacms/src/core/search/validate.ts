@@ -86,14 +86,18 @@ export const validateSearchRequest = (
     if (entries.length > MAX_FILTERS) {
       return invalid(`\`filters\` has more than ${MAX_FILTERS} keys.`);
     }
-    const checked: Record<string, string | number | boolean> = {};
     for (const [key, value] of entries) {
       if (!isScalar(value)) {
         return invalid(`Filter "${key}" must be a string, number or boolean.`);
       }
-      checked[key] = value;
     }
-    valid.filters = checked;
+    // fromEntries defines each key as an own property; `checked[key] = value`
+    // would run the `__proto__` setter and drop that key.
+    valid.filters = Object.fromEntries(
+      entries.filter((entry): entry is [string, string | number | boolean] =>
+        isScalar(entry[1])
+      )
+    );
   }
   if (cursor !== undefined) {
     if (typeof cursor !== 'string')

@@ -8,6 +8,7 @@ import { SearchError } from '../../core/search/contract';
 import { defineSearchPlugin } from '../../core/search/define-search-plugin';
 import type { SearchIndexProvider } from '../../core/search/index-contract';
 import type { CollectionSchema } from '../../core/schema/types';
+import { createLocalDataLayer } from '../../plugins/content/local/server/local-data-layer';
 import { runCli } from '../index';
 
 let rootDir: string;
@@ -183,6 +184,215 @@ describe('tinacms search reindex', () => {
     const { code, err } = await reindex(configWith(provider));
     expect(code).toBe(1);
     expect(err.join()).toContain('connect ECONNREFUSED');
+  });
+});
+
+describe('tinacms search reindex and the schema', () => {
+  const site = (withPath = true): CollectionSchema => ({
+    name: 'site',
+    ...(withPath ? { path: 'content' } : {}),
+    format: 'json',
+    fields: [{ name: 'title', type: 'string' }],
+  });
+  const seedNested = async () => {
+    await writeDoc('content/home.json', '{"title":"Home"}');
+    await writeDoc('content/about.json', '{"title":"About"}');
+    await writeDoc('content/posts/a.json', '{"title":"Post A"}');
+  };
+  const listed = async (
+    collection: CollectionSchema,
+    schema: CollectionSchema[]
+  ) => {
+    const layer = createLocalDataLayer({
+      rootDir: rootDir,
+      collections: schema.filter(({ path: folder }) => folder),
+    });
+    return (await layer.list(collection.name)).map(({ path: p }) => ({
+      collection: collection.name,
+      path: p,
+    }));
+  };
+
+  it('indexes only the documents the collection owns, with the refs content.list gives', async () => {
+    await seedNested();
+    const schema = [site(), collection('post'), collection('author', false)];
+    schema[1] = { ...collection('post'), path: 'content/posts' };
+    const provider = providerWith();
+    const { code } = await reindex(
+      configWith(provider, {
+        fields: { site: { title: 1 } },
+        collections: schema,
+      })
+    );
+    expect(code).toBe(0);
+    const refs = provider.replace.mock.calls[0][0].map(({ ref }) => ref);
+    expect(refs).toEqual(await listed(site(), schema));
+    expect(refs.some(({ path: p }) => p.startsWith('content/posts/'))).toBe(
+      false
+    );
+  });
+
+  it('sends the nested files as post records, never as site, when post is searchable too', async () => {
+    await seedNested();
+    const schema = [site(), { ...collection('post'), path: 'content/posts' }];
+    const provider = providerWith();
+    await reindex(
+      configWith(provider, {
+        fields: { site: { title: 1 }, post: { title: 1 } },
+        collections: schema,
+      })
+    );
+    const refs = provider.replace.mock.calls[0][0].map(({ ref }) => ref);
+    expect(refs).toContainEqual({
+      collection: 'post',
+      path: 'content/posts/a.json',
+    });
+    expect(refs).not.toContainEqual({
+      collection: 'site',
+      path: 'content/posts/a.json',
+    });
+  });
+
+  it('still exits 1 for a searchable collection with no path', async () => {
+    const provider = providerWith();
+    const { code, err } = await reindex(
+      configWith(provider, {
+        fields: { site: { title: 1 } },
+        collections: [site(false)],
+      })
+    );
+    expect(code).toBe(1);
+    expect(err.join()).toContain('content-collection-no-path');
+  });
+});
+
+describe('tinacms search reindex source documents', () => {
+  const article = (name: string, format: 'mdx' | 'md'): CollectionSchema => ({
+    name,
+    path: `content/${name}`,
+    format,
+    fields: [
+      { name: 'title', type: 'string' },
+      { name: 'intro', type: 'rich-text' },
+      { name: 'body', type: 'rich-text', isBody: true },
+    ],
+  });
+  const leaked = [
+    'secret prop',
+    'alt words',
+    '/x.png',
+    'u.example',
+    '**',
+    '<Cta',
+  ];
+
+  it.each([
+    ['mdx', '<Cta label="secret prop" />\n\n'],
+    ['md', ''],
+  ] as const)(
+    'indexes the text of %s bodies, not props, alt text or URLs',
+    async (format, jsx) => {
+      await writeDoc(
+        `content/doc/a.${format}`,
+        `---\ntitle: T\n---\n\nHello **bold** world.\n\n${jsx}![alt words](/x.png)\n\n[link text](https://u.example)\n`
+      );
+      const provider = providerWith();
+      const { code } = await reindex(
+        configWith(provider, {
+          fields: { doc: { title: 1, body: 1 } },
+          collections: [article('doc', format)],
+        })
+      );
+      expect(code).toBe(0);
+      const [record] = provider.replace.mock.calls[0][0];
+      const body =
+        record.fields.find(({ name }) => name === 'body')?.text ?? '';
+      expect(body).toContain('Hello bold world.');
+      expect(body).toContain('link text');
+      for (const fragment of leaked) expect(body).not.toContain(fragment);
+    }
+  );
+
+  it('reads a rich-text field that is not the body', async () => {
+    await writeDoc(
+      'content/doc/a.mdx',
+      '---\ntitle: T\nintro: "Intro **bold** [l](https://u.example)"\n---\n\nbody\n'
+    );
+    const provider = providerWith();
+    await reindex(
+      configWith(provider, {
+        fields: { doc: { intro: 1 } },
+        collections: [article('doc', 'mdx')],
+      })
+    );
+    const intro = provider.replace.mock.calls[0][0][0].fields[0]?.text ?? '';
+    expect(intro).toContain('Intro bold');
+    expect(intro).not.toContain('u.example');
+  });
+
+  it('leaves an empty body out', async () => {
+    await writeDoc('content/doc/a.mdx', '---\ntitle: T\n---\n');
+    const provider = providerWith();
+    await reindex(
+      configWith(provider, {
+        fields: { doc: { title: 1, body: 1 } },
+        collections: [article('doc', 'mdx')],
+      })
+    );
+    expect(
+      provider.replace.mock.calls[0][0][0].fields.map(({ name }) => name)
+    ).toEqual(['title']);
+  });
+
+  it('exits 1 naming the file for a body that does not parse, and replaces nothing', async () => {
+    await writeDoc(
+      'content/doc/a.mdx',
+      '---\ntitle: T\n---\n\n<Cta label="secret prop"\n'
+    );
+    const provider = providerWith();
+    const { code, err } = await reindex(
+      configWith(provider, {
+        fields: { doc: { body: 1 } },
+        collections: [article('doc', 'mdx')],
+      })
+    );
+    expect(code).toBe(1);
+    expect(err.join()).toContain('content/doc/a.mdx');
+    expect(provider.replace).not.toHaveBeenCalled();
+  });
+});
+
+describe('tinacms search reindex flags', () => {
+  it('refuses --check before loading the config, and never replaces', async () => {
+    const provider = providerWith();
+    const ssrLoadModule = vi.fn(async () => ({
+      default: configWith(provider),
+    }));
+    const err: string[] = [];
+    const code = await runCli(
+      ['search', 'reindex', '--check', '--root', rootDir],
+      {
+        cwd: rootDir,
+        log: () => {},
+        logError: (message) => err.push(message),
+        loader: { ssrLoadModule },
+      }
+    );
+    expect(code).toBe(1);
+    expect(err.join()).toContain('--check');
+    expect(ssrLoadModule).not.toHaveBeenCalled();
+    expect(provider.replace).not.toHaveBeenCalled();
+  });
+
+  it('refuses a flag it does not know', async () => {
+    const err: string[] = [];
+    const code = await runCli(['search', 'reindex', '--dry-run'], {
+      cwd: rootDir,
+      log: () => {},
+      logError: (message) => err.push(message),
+    });
+    expect(code).toBe(1);
+    expect(err.join()).toContain('--dry-run');
   });
 });
 

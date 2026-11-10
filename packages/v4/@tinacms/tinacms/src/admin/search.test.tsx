@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { HashRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import { ContentError, type DocumentEntry } from '../core/content/contract';
@@ -9,7 +10,9 @@ import type { SearchHit } from '../core/search/contract';
 import { SearchError } from '../core/search/contract';
 import { defineSearchPlugin } from '../core/search/define-search-plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import { TinaProvider } from '../editor/provider';
 import { TinaAdmin } from './admin';
+import { SearchControl } from './search';
 
 const hit = (path: string, snippet = ''): SearchHit => ({
   ref: { collection: 'post', path },
@@ -18,14 +21,33 @@ const hit = (path: string, snippet = ''): SearchHit => ({
 });
 
 const DOCUMENTS: Record<string, DocumentEntry | Error | null> = {
+  // The title only a document value holds, as the local and TinaCloud providers return it.
   'content/posts/hello.mdx': {
     path: 'content/posts/hello.mdx',
-    title: 'Hello post',
-    document: { title: 'Hello' },
+    document: { title: 'Hello post' },
+  },
+  'content/posts/both.mdx': {
+    path: 'content/posts/both.mdx',
+    title: 'Entry title',
+    document: { title: 'Document title' },
+  },
+  'content/posts/blank-entry.mdx': {
+    path: 'content/posts/blank-entry.mdx',
+    title: '  ',
+    document: { title: 'Document title' },
+  },
+  'content/posts/blank-both.mdx': {
+    path: 'content/posts/blank-both.mdx',
+    title: '',
+    document: { title: '   ' },
   },
   'content/posts/untitled.mdx': {
     path: 'content/posts/untitled.mdx',
     document: {},
+  },
+  'content/posts/number-title.mdx': {
+    path: 'content/posts/number-title.mdx',
+    document: { title: 7 },
   },
   'content/posts/gone.mdx': null,
   'content/posts/missing.mdx': new ContentError('not-found'),
@@ -84,6 +106,25 @@ const renderAdmin = (search: PluginManifest, rpcUrl?: string) =>
     />
   );
 
+// The rest of the admin shell reads content too, so only the Search control is
+// rendered here: it must not be the part that throws `content-capability-missing`.
+const renderWithoutContent = (search: PluginManifest) =>
+  render(
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [search, stringFieldPlugin],
+        schema: { collections: [] },
+      })}
+      queryClient={
+        new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      }
+    >
+      <HashRouter>
+        <SearchControl />
+      </HashRouter>
+    </TinaProvider>
+  );
+
 const openSearch = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.click(await screen.findByRole('button', { name: /Search/ }));
   return screen.findByRole('dialog', { name: 'Search' });
@@ -94,6 +135,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  window.location.hash = '';
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -120,6 +162,73 @@ describe('the Search dialog content results', () => {
     expect(first).toHaveTextContent('a snippet');
     expect(second).toHaveTextContent('content/posts/untitled.mdx');
     expect(within(results).queryByRole('button')).toBeNull();
+  });
+
+  it.each([
+    [
+      'the document title when the entry has none',
+      'content/posts/hello.mdx',
+      'Hello post',
+    ],
+    [
+      'the entry title over the document title',
+      'content/posts/both.mdx',
+      'Entry title',
+    ],
+    [
+      'the document title when the entry title is blank',
+      'content/posts/blank-entry.mdx',
+      'Document title',
+    ],
+    [
+      'the path when both titles are blank',
+      'content/posts/blank-both.mdx',
+      'content/posts/blank-both.mdx',
+    ],
+    [
+      'the path when there is no title',
+      'content/posts/untitled.mdx',
+      'content/posts/untitled.mdx',
+    ],
+    [
+      'the path when the title is not a string',
+      'content/posts/number-title.mdx',
+      'content/posts/number-title.mdx',
+    ],
+  ])('shows %s', async (_name, path, expected) => {
+    const search = vi.fn(async () => [hit(path)]);
+    const user = userEvent.setup();
+    renderAdmin(searchProviderPlugin(search));
+    const dialog = await openSearch(user);
+    await user.type(within(dialog).getByRole('searchbox'), 'x');
+    const results = within(dialog).getByRole('list', {
+      name: 'Search results',
+    });
+    await waitFor(() =>
+      expect(within(results).getAllByRole('listitem')).toHaveLength(1)
+    );
+    expect(
+      within(results).getByRole('listitem').firstElementChild
+    ).toHaveTextContent(
+      new RegExp(`^${expected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`)
+    );
+  });
+
+  it('renders the Search control and its dialog with no content plugin, and never searches', async () => {
+    const search = vi.fn(async () => [hit('content/posts/hello.mdx')]);
+    const user = userEvent.setup();
+    renderWithoutContent(searchProviderPlugin(search));
+    const dialog = await openSearch(user);
+    await user.type(within(dialog).getByRole('searchbox'), 'sett');
+    expect(
+      within(dialog).getByRole('list', { name: 'Navigation results' })
+    ).toBeVisible();
+    expect(
+      within(dialog).getByText('Full-text search needs a search provider.')
+    ).toBeVisible();
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    expect(search).not.toHaveBeenCalled();
+    expect(within(dialog).queryByRole('alert')).toBeNull();
   });
 
   it('drops hits whose document is gone and shows another read error once', async () => {

@@ -64,11 +64,21 @@ export const runSearchReindex = async (
           'search-unknown-collection',
           `The search plugin lists the collection "${name}", but the schema has no such collection.`
         );
+        invariant(
+          collection.path,
+          'content-collection-no-path',
+          `Collection "${name}" has no \`path\`: reindex needs one to locate its files.`
+        );
         return collection;
       });
+      // Every collection with a `path` goes to the reader, so a file belongs to
+      // the same collection here as it does for `content.list` (the deepest
+      // match). Only the collections in `fields` are read and indexed.
       const reader = createLocalDataLayer({
         rootDir: path.resolve(options.rootDir),
-        collections,
+        collections: config.schema.collections.filter(
+          ({ path: folder }) => folder
+        ),
       });
       const records: SearchRecord[] = [];
       try {

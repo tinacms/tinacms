@@ -37,6 +37,16 @@ const collections: CollectionSchema[] = [
     ],
   },
   { name: 'page', format: 'mdx', fields: [{ name: 'title', type: 'string' }] },
+  {
+    name: 'note',
+    format: 'md',
+    hooks: [searchIndex()],
+    fields: [
+      { name: 'title', type: 'string' },
+      { name: 'intro', type: 'rich-text' },
+      { name: 'body', type: 'rich-text', isBody: true },
+    ],
+  },
 ];
 
 const searchPlugin = defineSearchPlugin({
@@ -44,6 +54,7 @@ const searchPlugin = defineSearchPlugin({
   fields: {
     post: { title: 3, excerpt: 2, body: 1 },
     page: { title: 3 },
+    note: { title: 3, intro: 2, body: 1 },
   },
   server: () => import('../../test/in-memory-search.server'),
 });
@@ -400,14 +411,19 @@ describe('who can reach what', () => {
 describe('save-time indexing', () => {
   const save = (
     handler: ReturnType<typeof handlerWith>,
-    extra: { branch?: string; value?: Record<string, unknown> } = {}
+    extra: {
+      branch?: string;
+      value?: Record<string, unknown>;
+      collection?: string;
+      path?: string;
+    } = {}
   ) =>
     handler(
       post(
         '/content/update',
         {
-          collection: 'post',
-          path: 'content/posts/a.mdx',
+          collection: extra.collection ?? 'post',
+          path: extra.path ?? 'content/posts/a.mdx',
           value: extra.value ?? { title: 'Hello' },
           branch: extra.branch,
         },
@@ -453,6 +469,84 @@ describe('save-time indexing', () => {
     expect(
       content.stored.get(`${record.ref.collection}:${record.ref.path}`)
     ).toBeDefined();
+  });
+
+  // What the admin sends: rich text already serialized to source text.
+  const SOURCE_BODY = [
+    'Hello **bold** world.',
+    '<Cta label="secret prop" />',
+    '![alt words](/x.png)',
+    '[link text](https://u.example)',
+  ].join('\n\n');
+
+  const leaked = [
+    'secret prop',
+    'label',
+    'alt words',
+    '/x.png',
+    'u.example',
+    '**',
+    '<Cta',
+  ];
+
+  it.each([
+    ['an MDX body', 'post', 'content/posts/a.mdx', 'body'],
+    ['a markdown body', 'note', 'content/notes/a.md', 'body'],
+    [
+      'a rich-text field that is not the body',
+      'note',
+      'content/notes/a.md',
+      'intro',
+    ],
+  ])(
+    'indexes the text of %s sent as source, not its props, alt text or URLs',
+    async (_name, collection, path, field) => {
+      const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
+      const markdown = collection === 'note';
+      const source = markdown
+        ? SOURCE_BODY.replace('<Cta label="secret prop" />\n\n', '')
+        : SOURCE_BODY;
+      const response = await save(handlerWith(), {
+        branch: 'main',
+        collection,
+        path,
+        value: { title: 'T', [field]: source },
+      });
+      expect((await response.json()).hookWarnings).toEqual([]);
+      const [record] = upsert.mock.calls[0][0];
+      const text = record.fields.find(({ name }) => name === field)?.text ?? '';
+      expect(text).toContain('Hello bold world.');
+      expect(text).toContain('link text');
+      for (const fragment of leaked.filter(
+        (piece) => piece !== 'label' || !markdown
+      )) {
+        expect(text).not.toContain(fragment);
+      }
+    }
+  );
+
+  it('leaves an empty source body out of the record', async () => {
+    const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
+    await save(handlerWith(), {
+      branch: 'main',
+      value: { title: 'T', body: '' },
+    });
+    expect(upsert.mock.calls[0][0][0].fields.map(({ name }) => name)).toEqual([
+      'title',
+    ]);
+  });
+
+  it('warns and indexes nothing for a body that does not parse, never its raw text', async () => {
+    const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
+    const response = await save(handlerWith(), {
+      branch: 'main',
+      value: { title: 'T', body: '<Cta label="secret prop"' },
+    });
+    expect(response.status).toBe(200);
+    expect((await response.json()).hookWarnings).toEqual([
+      'The afterSave hook "searchIndex" failed.',
+    ]);
+    expect(upsert).not.toHaveBeenCalled();
   });
 
   it('indexes the default branch when the caller names none', async () => {
@@ -533,5 +627,49 @@ describe('provider shape checks', () => {
     expect(() => createTinaStore(resolved)).toThrow(
       /search-provider-shape.*test:hand-written.*`search`/
     );
+  });
+});
+
+describe('filter keys', () => {
+  const rawQuery = (filters: string) =>
+    new Request('http://tina.local/api/tina/search/query', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: `{"query":"x","options":{"limit":5,"filters":${filters}}}`,
+    });
+
+  it('passes a __proto__ key to the provider as an own key with its value', async () => {
+    const query = vi
+      .spyOn(inMemorySearchProvider, 'query')
+      .mockResolvedValue([]);
+    const response = await handlerWith()(
+      rawQuery('{"__proto__":"x","tag":"a"}')
+    );
+    expect(response.status).toBe(200);
+    const filters = query.mock.calls[0][0].filters;
+    expect(Object.keys(filters ?? {})).toEqual(['__proto__', 'tag']);
+    expect(Object.getOwnPropertyDescriptor(filters, '__proto__')?.value).toBe(
+      'x'
+    );
+  });
+
+  it('answers 422 unsupported when the provider cannot apply a __proto__ filter', async () => {
+    const response = await handlerWith()(rawQuery('{"__proto__":"x"}'));
+    expect(response.status).toBe(422);
+    expect((await response.json()).error.code).toBe('unsupported');
+  });
+
+  it('keeps the key through createSearchClient', async () => {
+    const query = vi
+      .spyOn(inMemorySearchProvider, 'query')
+      .mockResolvedValue([]);
+    const { search } = createSearchClient({
+      rpcUrl: '/api/tina',
+      fetch: routeFetchTo(handlerWith()),
+    });
+    await search('x', { limit: 5, filters: JSON.parse('{"__proto__":"x"}') });
+    expect(Object.keys(query.mock.calls[0][0].filters ?? {})).toEqual([
+      '__proto__',
+    ]);
   });
 });

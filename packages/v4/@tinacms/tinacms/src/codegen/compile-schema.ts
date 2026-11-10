@@ -17,7 +17,7 @@ import {
   overridesValidatorKey,
   validatorConflictError,
 } from '../core/validator/registry';
-import { RICH_TEXT_FIELD_TYPE } from '../plugins/fields/rich-text/rich-text-field.schema';
+import { RICH_TEXT_FIELD_TYPE } from '../plugins/fields/rich-text/rich-text-field.type';
 import { STRING_FIELD_TYPE } from '../plugins/fields/string/string-field.schema';
 import { ARRAY_FIELD_TYPE } from '../plugins/fields/array/array-field.schema';
 import {

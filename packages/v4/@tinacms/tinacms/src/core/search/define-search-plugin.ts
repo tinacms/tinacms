@@ -1,5 +1,5 @@
 import { currentServerRuntime } from '../../server/runtime-access';
-import { tagOp } from '../../server/op-meta';
+import { publicOp } from '../../server/op-meta';
 import { DEFAULT_RPC_URL } from '../../rpc/proxy';
 import { defineServerHook } from '../form/hooks';
 import {
@@ -15,7 +15,6 @@ import {
   type SearchFields,
   type SearchIndexProvider,
 } from './index-contract';
-import { buildSearchRecord } from './record';
 import { validateSearchRequest } from './validate';
 
 /** Lists on a collection's `hooks` to index its saves on the default branch. */
@@ -38,13 +37,10 @@ const serverSegmentOf = (
   provider: SearchIndexProvider
 ): ServerSegment => {
   const searchable = Object.keys(config.fields);
-  const query = tagOp(
-    async (input: unknown) => {
-      const { query: text, options } = validateSearchRequest(input, searchable);
-      return provider.query({ query: text, ...options });
-    },
-    { public: true, permissions: [] }
-  );
+  const query = publicOp(async (input: unknown) => {
+    const { query: text, options } = validateSearchRequest(input, searchable);
+    return provider.query({ query: text, ...options });
+  });
   const hook = defineServerHook(() => ({
     afterSave: async (document, scope) => {
       if (scope.branch === undefined) return;
@@ -53,6 +49,8 @@ const serverSegmentOf = (
       if (!fields || !runtime.resolveBranch || !runtime.searchIndex) return;
       const defaultBranch = await runtime.resolveBranch(undefined);
       if (defaultBranch !== scope.branch) return;
+      // Loaded on demand: the rich-text codec is large, and only a save needs it.
+      const { buildSearchRecord } = await import('./record');
       await runtime.searchIndex.upsert([
         buildSearchRecord(scope.collection, scope.path, document, fields),
       ]);

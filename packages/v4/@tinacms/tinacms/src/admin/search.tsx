@@ -6,14 +6,18 @@ import {
 import { Button } from '@tinacms/ui/components/button';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { useEffect, useMemo, useState } from 'react';
-import { ContentError, type ContentProvider } from '../core/content/contract';
+import {
+  ContentError,
+  type ContentProvider,
+  type DocumentEntry,
+} from '../core/content/contract';
 import {
   type SearchProvider,
   type SearchRef,
   isSearchError,
   isSearchProvider,
 } from '../core/search/contract';
-import { useContentSlice, useTinaStore } from '../editor/hooks';
+import { useOptionalContentSlice, useTinaStore } from '../editor/hooks';
 import { useAdminScreens, useGlobalNav } from './hooks';
 import { MEDIA_SCREEN, openNavTarget } from './rail';
 import { useAdminRoute } from './use-admin-route';
@@ -52,6 +56,16 @@ const messageOf = (cause: unknown): string => {
   return GENERIC_FAILURE;
 };
 
+const isNamed = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim() !== '';
+
+// The entry's own title, then the document's `title` value, then the path.
+const titleOf = (entry: DocumentEntry, path: string): string => {
+  if (isNamed(entry.title)) return entry.title;
+  const named = entry.document.title;
+  return isNamed(named) ? named : path;
+};
+
 const isGone = (reason: unknown): boolean => {
   if (reason instanceof ContentError) return reason.code === 'not-found';
   return false;
@@ -79,7 +93,7 @@ const searchContent = async (
     const { ref, snippet } = hits[index];
     if (read.status === 'fulfilled') {
       if (read.value) {
-        results.push({ ref, snippet, title: read.value.title ?? ref.path });
+        results.push({ ref, snippet, title: titleOf(read.value, ref.path) });
       }
       return;
     }
@@ -132,15 +146,16 @@ function useNavigationResults(): NavigationResult[] {
 
 function SearchDialog({
   provider,
+  content,
   open,
   onOpenChange,
 }: {
   provider: SearchProvider | null;
+  content: ContentProvider | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
   const [query, setQuery] = useState('');
-  const content = useContentSlice();
   const [outcome, setOutcome] = useState<ContentSearchOutcome>(NO_OUTCOME);
   const navigation = useNavigationResults();
   const matching = navigation.filter(({ label }) =>
@@ -148,7 +163,7 @@ function SearchDialog({
   );
   useEffect(() => {
     const text = query.trim();
-    if (!text || !provider) {
+    if (!text || !provider || !content) {
       setOutcome(NO_OUTCOME);
       return;
     }
@@ -193,7 +208,7 @@ function SearchDialog({
             </li>
           ))}
         </ul>
-        {provider ? (
+        {provider && content ? (
           <>
             <h3 className='text-sm font-semibold text-muted-foreground'>
               Content search
@@ -232,6 +247,7 @@ function SearchDialog({
 /** The Top bar's Search control. It always shows; content search joins it when a provider is mounted. */
 export function SearchControl() {
   const provider = useSearchProvider();
+  const content = useOptionalContentSlice();
   const [open, setOpen] = useState(false);
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -256,7 +272,12 @@ export function SearchControl() {
       >
         <span className='max-md:sr-only'>Search</span>
       </Button>
-      <SearchDialog provider={provider} open={open} onOpenChange={setOpen} />
+      <SearchDialog
+        provider={provider}
+        content={content}
+        open={open}
+        onOpenChange={setOpen}
+      />
     </>
   );
 }

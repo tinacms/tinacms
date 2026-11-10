@@ -83,9 +83,15 @@ const initCommand = async (
 
 const searchCommand = async (
   subcommand: string | undefined,
-  values: { root?: string; config?: string },
+  values: { root?: string; config?: string; check?: boolean },
   context: Required<Pick<CliContext, 'cwd' | 'log' | 'logError'>> & CliContext
 ): Promise<number> => {
+  if (subcommand === 'reindex' && values.check) {
+    context.logError(
+      '`--check` is not an option of `search reindex`: reindex always writes the index.'
+    );
+    return 1;
+  }
   if (subcommand !== 'reindex') {
     context.logError(
       `Unknown search command "${subcommand ?? ''}".\n\n${USAGE}`

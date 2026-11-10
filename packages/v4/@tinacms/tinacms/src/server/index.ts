@@ -5,7 +5,7 @@
 import type { AuthTransportHooks, Session } from '../core/auth/contract';
 import { CONTENT_SAVE_PERMISSION } from '../core/content/contract';
 import { invariant } from '../core/invariant';
-import { tagOp } from './op-meta';
+import { publicOp, tagOp } from './op-meta';
 import { serverRuntimeStorage } from './runtime-storage';
 import type {
   ResolvedServerSegment,
@@ -14,6 +14,7 @@ import type {
 } from '../core/plugin';
 
 export { toUserId, type UserId } from '../core/auth/contract';
+export { publicOp };
 export { type RequestContext, requestContext } from './request-context';
 export {
   defineServerHook,
@@ -55,9 +56,6 @@ export const DEFAULT_ROLE_PERMISSIONS: Readonly<
     editor: Object.freeze([CONTENT_SAVE_PERMISSION]),
   })
 );
-
-export const publicOp = <TOp extends ServerOp>(handler: TOp): TOp =>
-  tagOp(handler, { public: true, permissions: [] });
 
 export const protectedOp = <TOp extends ServerOp>(
   opts: { permission: string },
