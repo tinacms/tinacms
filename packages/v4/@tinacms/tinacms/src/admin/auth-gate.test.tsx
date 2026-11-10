@@ -291,7 +291,7 @@ describe('AuthGate', () => {
     expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
       'Hello'
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No changes');
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
     await user.click(await screen.findByRole('button', { name: 'Resume' }));
     expect(screen.getByRole('textbox', { name: /^Title/ })).toHaveValue(
       'Hello from Ada'
