@@ -48,6 +48,7 @@ let listCalls: number;
 let failAfterSave: boolean;
 let updateError: Error | undefined;
 let listOmits: string | undefined;
+let holdNextList: Promise<void> | undefined;
 let heldDefault: Promise<void> | undefined;
 let duplicateLabels: boolean;
 let saveHandler:
@@ -69,6 +70,9 @@ const contentPlugin = () =>
                   branches: {
                     list: async () => {
                       listCalls += 1;
+                      const held = holdNextList;
+                      holdNextList = undefined;
+                      await held;
                       if (listError) throw new Error('offline');
                       return BRANCHES.filter(
                         (entry) => entry.name !== listOmits
@@ -241,6 +245,7 @@ beforeEach(() => {
   failAfterSave = false;
   updateError = undefined;
   listOmits = undefined;
+  holdNextList = undefined;
   heldDefault = undefined;
   duplicateLabels = false;
   saveHandler = undefined;
@@ -1321,6 +1326,30 @@ describe('Save to new branch', () => {
         })
       );
       await waitFor(() => expect(updates).toHaveLength(1));
+      expect(updates[0]?.branch).toBe('feature/news');
+      expect(screen.queryByRole('dialog')).toBeNull();
+      await waitFor(() => expect(toastShown()).toBeNull());
+    });
+
+    it('does not resume a held restore check after Discard and a switch to a protected branch', async () => {
+      const { user, dialog } = await failOnce();
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      listOmits = undefined;
+      updateError = undefined;
+      let release: () => void = () => {};
+      holdNextList = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      await pressSave(user);
+      await discardEdits(user);
+      await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+      const branches = await screen.findByRole('dialog', { name: 'Branches' });
+      await user.click(within(branches).getByText('main'));
+      await waitFor(() => expect(toastShown()).toBeNull());
+      act(() => release());
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(updates).toHaveLength(0);
       expect(screen.queryByRole('dialog')).toBeNull();
     });
 

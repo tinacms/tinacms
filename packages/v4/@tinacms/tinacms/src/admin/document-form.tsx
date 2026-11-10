@@ -167,6 +167,10 @@ function SaveButton() {
   const nameError =
     confirmError ?? branchNameError(name.trim(), taken, revealed);
   useToastOwner(failedToastId, true);
+  const currentBranch = useRef(branchName);
+  useEffect(() => {
+    currentBranch.current = branchName;
+  }, [branchName]);
   const retry = useEffectEvent(() => run());
   useEffect(() => {
     const live = () => retry();
@@ -237,7 +241,7 @@ function SaveButton() {
     dismissIfUnowned(failedToastId);
   };
 
-  // Reads the provider's branch list again, so a branch put back is noticed.
+  // Query the provider again. The cached branch list can be out of date.
   const branchIsBack = () =>
     content?.branches?.list().then(
       (list) => list.some((entry) => entry.name === branchName),
@@ -272,8 +276,15 @@ function SaveButton() {
     if (dialog || pending) return;
     if (isBranchGone(useFormStore.getState().saves[formId])) {
       setPending(true);
+      const failure = useFormStore.getState().saves[formId];
+      const startedOn = branchName;
       branchIsBack().then((back) => {
-        if (back) {
+        const stale =
+          useFormStore.getState().saves[formId] !== failure ||
+          currentBranch.current !== startedOn;
+        if (stale) {
+          setPending(false);
+        } else if (back) {
           useFormStore.getState().clearSavePhase(formId);
           saveHere();
         } else {
