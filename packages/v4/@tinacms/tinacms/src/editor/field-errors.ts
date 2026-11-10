@@ -72,7 +72,9 @@ export const flattenFieldErrors = (
 };
 
 // `flattenFieldErrors` also lists every parent address of a failing field, so
-// only addresses with no failing descendant are failing fields themselves.
+// only addresses with no failing descendant are failing fields themselves. A
+// compound field's own error is hidden here; the error summary promotes it once
+// its children are fixed.
 export const failingLeaves = (addresses: readonly string[]): string[] =>
   addresses.filter(
     (address) => !addresses.some((other) => other.startsWith(`${address}.`))

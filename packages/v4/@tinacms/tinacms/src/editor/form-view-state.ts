@@ -31,6 +31,8 @@ export interface BlockedField {
 
 export interface ErrorSummary {
   readonly blocked: readonly BlockedField[];
+  /** Failing addresses the leaf filter dropped at Save time; one becomes a row once it is a leaf. */
+  readonly hiddenParents: readonly string[];
   readonly paneOpen: boolean;
   readonly current: string | null;
   /** Where the viewed row stood when its field was fixed, so Resolve carries on from there. */
@@ -42,6 +44,7 @@ export interface ErrorSummary {
 
 const IDLE_SUMMARY: ErrorSummary = {
   blocked: [],
+  hiddenParents: [],
   paneOpen: false,
   current: null,
   resumeAt: null,
@@ -61,7 +64,10 @@ const errorCountWords = (count: number) =>
 export interface FormViewState {
   errorSummary: ErrorSummary;
   blockedSaves: number;
-  block: (addresses: readonly string[]) => void;
+  block: (
+    addresses: readonly string[],
+    hiddenParents?: readonly string[]
+  ) => void;
   fix: (
     remaining: ReadonlySet<string>,
     labelOf: (address: string) => string,
@@ -97,7 +103,7 @@ export const createFormViewStore = (): FormViewStore => {
   return createStore<FormViewState>()((set, get) => ({
     errorSummary: IDLE_SUMMARY,
     blockedSaves: 0,
-    block: (addresses) =>
+    block: (addresses, hiddenParents = []) =>
       set((state) => ({
         blockedSaves: state.blockedSaves + 1,
         errorSummary: {
@@ -106,14 +112,33 @@ export const createFormViewStore = (): FormViewStore => {
             key: `e${++keys}`,
             address,
           })),
+          hiddenParents: [...hiddenParents],
           paneOpen: true,
         },
       })),
     fix: (remaining, labelOf, currentIndex) =>
       set((state) => {
         const summary = state.errorSummary;
-        const kept = summary.blocked.filter((entry) =>
+        const stillListed = summary.blocked.filter((entry) =>
           remaining.has(entry.address)
+        );
+        const failing = [...remaining];
+        const promoted = summary.hiddenParents.filter(
+          (parent) =>
+            remaining.has(parent) &&
+            !failing.some((address) => address.startsWith(`${parent}.`))
+        );
+        const kept = [
+          ...stillListed,
+          ...promoted.map(
+            (address): BlockedField => ({
+              key: `e${++keys}`,
+              address,
+            })
+          ),
+        ];
+        const hiddenParents = summary.hiddenParents.filter(
+          (parent) => remaining.has(parent) && !promoted.includes(parent)
         );
         const fixed = summary.blocked.filter(
           (entry) => !remaining.has(entry.address)
@@ -124,6 +149,7 @@ export const createFormViewStore = (): FormViewStore => {
             errorSummary: {
               ...summary,
               blocked: [],
+              hiddenParents: [],
               current: null,
               resumeAt: null,
               done: summary.paneOpen ? 'pane' : 'button',
@@ -142,6 +168,7 @@ export const createFormViewStore = (): FormViewStore => {
           errorSummary: {
             ...summary,
             blocked: kept,
+            hiddenParents,
             current: currentFixed ? null : summary.current,
             resumeAt: currentFixed ? currentIndex : summary.resumeAt,
             announcement:
@@ -196,7 +223,17 @@ export const createFormViewStore = (): FormViewStore => {
             address: address ?? `${entry.address}${REMOVED}`,
           };
         });
-        return { errorSummary: { ...state.errorSummary, blocked: next } };
+        return {
+          errorSummary: {
+            ...state.errorSummary,
+            blocked: next,
+            hiddenParents: rekeyAddresses(
+              state.errorSummary.hiddenParents,
+              listAddress,
+              change
+            ),
+          },
+        };
       }),
     reset: () => set({ errorSummary: IDLE_SUMMARY }),
     touched: new Set(),

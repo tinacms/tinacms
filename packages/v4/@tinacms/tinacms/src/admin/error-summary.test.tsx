@@ -16,7 +16,7 @@ import type { TinaDocument } from '../core/schema/types';
 import { draftKey } from '../form/drafts';
 import { toFormId, useFormStore } from '../form/form-store';
 import { t } from '../index';
-import { required } from '../plugins/fields';
+import { min, required } from '../plugins/fields';
 import arrayFieldPlugin from '../plugins/fields/array/array-field.plugin';
 import numberFieldPlugin from '../plugins/fields/number/number-field.plugin';
 import objectFieldPlugin from '../plugins/fields/object/object-field.plugin';
@@ -160,6 +160,18 @@ const config = asResolvedConfig({
               validators: [required()],
             }),
           }),
+          t.array({
+            name: 'panel',
+            label: 'Panel',
+            validators: [min(2, 'Add at least 2 panels.')],
+            fields: [
+              t.string({
+                name: 'title',
+                label: 'Panel title',
+                validators: [required()],
+              }),
+            ],
+          }),
           t.string({
             name: 'quiet',
             label: 'Quiet',
@@ -192,6 +204,7 @@ beforeEach(() => {
     blocks: [],
     cards: [{ a: 'x', b: 'x', c: 'x' }],
     scores: [1, 2],
+    panel: [{ title: 'x' }, { title: 'y' }],
     quiet: 'x',
   };
   window.location.hash = `#/collections/note/${encodeURIComponent(PATH)}`;
@@ -335,6 +348,32 @@ describe('a Save that finds invalid fields', () => {
     );
     await user.click(save);
     await waitFor(() => expect(saved).toHaveLength(1));
+  });
+
+  it('lists a list’s own error once its failing item is fixed, instead of saying all fixed', async () => {
+    document = { ...document, panel: [{ title: '' }] };
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    await fixFieldOf(user, /^Panel title/);
+    const pane = await errorsPane();
+    await waitFor(() =>
+      expect(
+        within(pane).getByRole('button', { name: /^Panel\b/ })
+      ).toBeVisible()
+    );
+    expect(within(pane).getByText('Add at least 2 panels.')).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    expect(
+      globalThis.document.querySelector('[data-slot=error-announcement]')
+        ?.textContent
+    ).toBe('Panel title fixed. 1 error left.');
   });
 
   it('tucks the pane on Esc, shows an edge tab and brings the pane back from it', async () => {

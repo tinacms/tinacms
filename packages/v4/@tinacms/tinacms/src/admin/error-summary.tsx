@@ -105,12 +105,16 @@ export function useErrorSummary() {
   const block = (): boolean => {
     const form = useFormStore.getState().forms[scope.formId];
     const errors = form?.status === 'edited' ? form.errors : {};
-    const leaves = failingLeaves(Object.keys(errors)).map((address) => ({
-      address,
-    }));
+    const failing = Object.keys(errors);
+    const leaves = failingLeaves(failing).map((address) => ({ address }));
     if (leaves.length === 0) return false;
     const ordered = inDocumentOrder(leaves, scope.collection.fields, getValues);
-    scope.view.getState().block(ordered.map((leaf) => leaf.address));
+    scope.view.getState().block(
+      ordered.map((leaf) => leaf.address),
+      failing.filter(
+        (address) => !leaves.some((leaf) => leaf.address === address)
+      )
+    );
     return true;
   };
 

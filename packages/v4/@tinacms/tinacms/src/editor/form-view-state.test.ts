@@ -329,6 +329,65 @@ describe('error summary', () => {
     expect(store.getState().blockedSaves).toBe(2);
   });
 
+  describe('a parent that failed with its children', () => {
+    const rows = (store: ReturnType<typeof createFormViewStore>) =>
+      store.getState().errorSummary.blocked.map((entry) => entry.address);
+    const blockedWith = (leaves: string[], hidden: string[]) => {
+      const store = createFormViewStore();
+      store.getState().block(leaves, hidden);
+      return store;
+    };
+
+    it('lists the parent once its only listed child is fixed', () => {
+      const store = blockedWith(['seo.title'], ['seo']);
+      store.getState().fix(new Set(['seo']), labelOf, null);
+      expect(rows(store)).toEqual(['seo']);
+      expect(store.getState().errorSummary.done).toBeNull();
+    });
+
+    it('plays All fixed when the parent no longer fails or another child still does', () => {
+      const still = blockedWith(['seo.title'], ['seo']);
+      still.getState().fix(new Set(['seo', 'seo.desc']), labelOf, null);
+      expect(rows(still)).toEqual([]);
+      expect(still.getState().errorSummary.done).toBe('pane');
+      const gone = blockedWith(['seo.title'], ['seo']);
+      gone.getState().fix(new Set(), labelOf, null);
+      expect(gone.getState().errorSummary.done).toBe('pane');
+    });
+
+    it('promotes the parent once and never brings a fixed child back', () => {
+      const store = blockedWith(['heading', 'seo.title'], ['seo']);
+      store.getState().fix(new Set(['heading', 'seo']), labelOf, null);
+      expect(rows(store)).toEqual(['heading', 'seo']);
+      expect(store.getState().errorSummary.hiddenParents).toEqual([]);
+      store
+        .getState()
+        .fix(new Set(['heading', 'seo', 'seo.title']), labelOf, null);
+      expect(rows(store)).toEqual(['heading', 'seo']);
+    });
+
+    it('keeps the parent hidden while it is not a leaf', () => {
+      const store = blockedWith(['heading', 'seo.title'], ['seo']);
+      store.getState().fix(new Set(['seo', 'seo.title']), labelOf, null);
+      expect(rows(store)).toEqual(['seo.title']);
+    });
+
+    it('counts the promoted row in the announcement', () => {
+      const store = blockedWith(['seo.title'], ['seo']);
+      store.getState().fix(new Set(['seo']), labelOf, null);
+      expect(store.getState().errorSummary.announcement).toBe(
+        'SEO.TITLE fixed. 1 error left.'
+      );
+    });
+
+    it('moves the hidden parent with its list item', () => {
+      const store = blockedWith(['items.0.a.b'], ['items.0.a']);
+      store.getState().rekey('items', { move: [0, 1] });
+      store.getState().fix(new Set(['items.1.a']), labelOf, null);
+      expect(rows(store)).toEqual(['items.1.a']);
+    });
+  });
+
   it('resets silently', () => {
     const store = blocked('a');
     store.getState().fix(new Set(), labelOf, null);
