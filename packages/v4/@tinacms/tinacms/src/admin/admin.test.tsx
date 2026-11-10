@@ -223,7 +223,9 @@ const openDiscardConfirm = async (user: User) => {
   await user.click(
     await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
   );
-  return screen.findByRole('alertdialog', { name: 'Discard unsaved edits?' });
+  return screen.findByRole('alertdialog', {
+    name: /^Discard unsaved edits to /,
+  });
 };
 
 const FIXTURES: Record<string, DocumentEntry[]> = {
@@ -507,6 +509,10 @@ describe('TinaAdmin unsaved changes', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
 
     const dialog = await openDiscardConfirm(user);
+    expect(dialog).toHaveAccessibleName('Discard unsaved edits to “Hello!”?');
+    expect(dialog).toHaveTextContent(
+      'The document goes back to its last saved version. Discarded edits can’t be brought back.'
+    );
     await user.click(within(dialog).getByRole('button', { name: 'Discard' }));
 
     await waitFor(() =>
@@ -953,6 +959,34 @@ describe('TinaAdmin draft recovery contract', () => {
         'Unsaved edits kept in this browser'
       )
     ).toBeVisible();
+  });
+
+  it('shows no No-changes chip while the prompt waits, and brings it back after Discard', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    expect(screen.getByRole('status')).not.toHaveTextContent('No changes');
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Discard',
+      })
+    );
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent('No changes')
+    );
+  });
+
+  it('shows Unsaved while typing under the prompt and Saved after Save', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent('Saved')
+    );
   });
 
   it('row 3: a draft of an older file says the document changed', async () => {
