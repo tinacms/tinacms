@@ -19,7 +19,13 @@ type SaveToBranchDialogProps = {
   reason?: 'protected' | 'deleted';
   branch: string;
   /** The document's title, or its file name when it has none. */
-  document: string;
+  document?: string;
+  /**
+   * A change that is not a document edit, in the words of the sentence, such as
+   * "deleting hero.jpg". The dialog then says the change happens on a new branch and
+   * its main action reads "Continue".
+   */
+  change?: string;
   /** The name the field starts with when `name` is not controlled. */
   defaultName?: string;
   name?: string;
@@ -47,7 +53,8 @@ function SaveToBranchDialog({
   onOpenChange,
   reason = 'protected',
   branch,
-  document,
+  document = '',
+  change,
   defaultName = '',
   name: controlledName,
   onNameChange,
@@ -95,9 +102,11 @@ function SaveToBranchDialog({
               {deleted ? `${branch} was deleted` : 'Save to a new branch'}
             </DialogTitle>
             <DialogDescription className='[overflow-wrap:anywhere]'>
-              {deleted
-                ? `“${document}” wasn’t saved. Your edits are kept: save them to a new branch.`
-                : `${branch} is protected. Your edits to “${document}” go to a new branch with a pull request.`}
+              {change !== undefined
+                ? `${branch} is protected, so ${change} happens on a new branch with a pull request. You carry on there.`
+                : deleted
+                  ? `“${document}” wasn’t saved. Your edits are kept: save them to a new branch.`
+                  : `${branch} is protected. Your edits to “${document}” go to a new branch with a pull request.`}
             </DialogDescription>
           </DialogHeader>
           <FieldWrapper
@@ -145,7 +154,11 @@ function SaveToBranchDialog({
               busy={saving}
               disabled={!canSave}
             >
-              {saving ? 'Saving' : WORDS[reason].action}
+              {saving
+                ? 'Saving'
+                : change !== undefined
+                  ? 'Continue'
+                  : WORDS[reason].action}
             </Button>
           </DialogFooter>
         </form>

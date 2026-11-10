@@ -61,6 +61,16 @@ export const saveToBranchDialogStates: {
       'Branch names can’t have spaces. Use dashes instead, such as docs/new-page.',
   },
   {
+    name: 'media change',
+    props: {
+      ...base,
+      change: 'deleting hero.jpg',
+      defaultName: 'media/remove-hero',
+    },
+    title: 'Save to a new branch',
+    action: 'Continue',
+  },
+  {
     name: 'saving',
     props: { ...base, reason: 'deleted', saving: true },
     title: 'main was deleted',

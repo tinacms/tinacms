@@ -23,11 +23,14 @@ type PanelHeaderProps = Omit<ComponentProps<'div'>, 'children'> & {
   /** Shows close, with these words for screen readers. */
   closeLabel?: string;
   onClose?: () => void;
+  /** Shows a Maximise button before close ("Restore" while true). Without `onMaximise` there is none. */
+  maximised?: boolean;
+  onMaximise?: () => void;
 };
 
 /**
  * The 44px bar at the top of every panel: a title or a back button, at most one
- * action, then the ⋯ menu and close at the end. Tab goes back, action, ⋯, close.
+ * action, then the ⋯ menu and close at the end. Tab goes back, action, ⋯, maximise, close.
  */
 function PanelHeader({
   heading,
@@ -39,6 +42,8 @@ function PanelHeader({
   menuLabel = heading ? `${heading} actions` : 'More actions',
   closeLabel,
   onClose,
+  maximised = false,
+  onMaximise,
   className,
   ...props
 }: PanelHeaderProps) {
@@ -78,6 +83,16 @@ function PanelHeader({
             {menu}
           </DropdownMenuContent>
         </DropdownMenu>
+      ) : null}
+      {onMaximise ? (
+        <Button
+          variant='icon'
+          size='sm'
+          icon={maximised ? 'restore' : 'maximise'}
+          aria-label={maximised ? 'Restore' : 'Maximise'}
+          aria-pressed={maximised}
+          onClick={onMaximise}
+        />
       ) : null}
       {closeLabel ? (
         <Button
