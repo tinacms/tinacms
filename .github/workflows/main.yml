@@ -66,14 +66,16 @@ jobs:
         run: pnpm types
 
       - name: Test
+        if: matrix.os != 'ubuntu-latest'
         run: pnpm test
+
+      # The coverage job runs these two suites on ubuntu.
+      - name: Test
+        if: matrix.os == 'ubuntu-latest'
+        run: pnpm test --filter='!@tinacms/tinacms' --filter='!@tinacms/rich-text'
 
       - name: Test Packages
         run: pnpm run test:packages
-
-      - name: Coverage (v4)
-        if: matrix.os == 'ubuntu-latest'
-        run: pnpm coverage
 
       - name: Lint
         if: matrix.os == 'ubuntu-latest'
@@ -87,6 +89,52 @@ jobs:
 
       - name: Check Tina lock changes
         run: pnpm diff-tina-lock
+
+  coverage:
+    name: Coverage (v4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          package_json_file: package.json
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Coverage (v4)
+        run: pnpm coverage
 
   # Gate adapter-matrix on whether the push / PR actually touched code that
   # can affect it. workflow_dispatch falls through unconditionally so a manual
