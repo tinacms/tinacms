@@ -384,6 +384,40 @@ describe('tinacms search reindex flags', () => {
     expect(provider.replace).not.toHaveBeenCalled();
   });
 
+  it('refuses an argument after reindex before loading the config, and never replaces', async () => {
+    const provider = providerWith();
+    const ssrLoadModule = vi.fn(async () => ({
+      default: configWith(provider),
+    }));
+    const err: string[] = [];
+    const code = await runCli(
+      ['search', 'reindex', 'extra', '--root', rootDir],
+      {
+        cwd: rootDir,
+        log: () => {},
+        logError: (message) => err.push(message),
+        loader: { ssrLoadModule },
+      }
+    );
+    expect(code).toBe(1);
+    expect(err.join()).toContain('Unexpected argument "extra".');
+    expect(err.join()).toContain('tinacms <command>');
+    expect(ssrLoadModule).not.toHaveBeenCalled();
+    expect(provider.replace).not.toHaveBeenCalled();
+  });
+
+  it('gives the flag message when both a flag and an argument are wrong', async () => {
+    const err: string[] = [];
+    const code = await runCli(['search', 'reindex', '--check', 'extra'], {
+      cwd: rootDir,
+      log: () => {},
+      logError: (message) => err.push(message),
+    });
+    expect(code).toBe(1);
+    expect(err.join()).toContain('--check');
+    expect(err.join()).not.toContain('Unexpected argument');
+  });
+
   it('refuses a flag it does not know', async () => {
     const err: string[] = [];
     const code = await runCli(['search', 'reindex', '--dry-run'], {

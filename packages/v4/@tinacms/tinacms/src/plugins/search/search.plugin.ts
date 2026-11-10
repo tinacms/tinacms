@@ -1,7 +1,3 @@
-import { currentServerRuntime } from '../../server/runtime-access';
-import { publicOp } from '../../server/op-meta';
-import { DEFAULT_RPC_URL } from '../../rpc/proxy';
-import { defineServerHook } from '../../core/form/hooks';
 import {
   type CapabilityOverride,
   type PluginManifest,
@@ -9,13 +5,12 @@ import {
   definePlugin,
 } from '../../core/plugin';
 import type { HookRef } from '../../core/schema/types';
-import { createSearchClient } from './search.client';
+import { serverSegmentOf } from './server/search-segment';
 import {
   SEARCH_INDEX_HOOK,
   type SearchFields,
   type SearchIndexProvider,
 } from '../../core/search/index-contract';
-import { validateSearchRequest } from '../../core/search/validate';
 
 /** Lists on a collection's `hooks` to index its saves on the default branch. */
 export const searchIndex = (): HookRef => ({ name: SEARCH_INDEX_HOOK });
@@ -30,34 +25,6 @@ export interface SearchPluginConfig {
   onInit?: () => void | Promise<void>;
   onDestroy?: () => void | Promise<void>;
 }
-
-// Everything below the `server` loader must import no node module (ADR-028 §4).
-const serverSegmentOf = (
-  config: SearchPluginConfig,
-  provider: SearchIndexProvider
-): ServerSegment => {
-  const searchable = Object.keys(config.fields);
-  const query = publicOp(async (input: unknown) => {
-    const { query: text, options } = validateSearchRequest(input, searchable);
-    return provider.query({ query: text, ...options });
-  });
-  const hook = defineServerHook(() => ({
-    afterSave: async (document, scope) => {
-      if (scope.branch === undefined) return;
-      const runtime = currentServerRuntime();
-      const fields = config.fields[scope.collection.name];
-      if (!fields || !runtime.resolveBranch || !runtime.searchIndex) return;
-      const defaultBranch = await runtime.resolveBranch(undefined);
-      if (defaultBranch !== scope.branch) return;
-      // Loaded on demand: the rich-text codec is large, and only a save needs it.
-      const { buildSearchRecord } = await import('../../core/search/record');
-      await runtime.searchIndex.upsert([
-        buildSearchRecord(scope.collection, scope.path, document, fields),
-      ]);
-    },
-  }));
-  return { query, hooks: { [SEARCH_INDEX_HOOK]: hook }, searchIndex: provider };
-};
 
 /**
  * Turns a provider's server module and its searchable fields into a `search`
@@ -76,14 +43,10 @@ export const defineSearchPlugin = (
     overrides: config.overrides,
     onInit: config.onInit,
     onDestroy: config.onDestroy,
-    client: async () => ({
-      default: {
-        slice: (_set, _get, sliceConfig) =>
-          createSearchClient({
-            rpcUrl: sliceConfig?.rpcUrl ?? DEFAULT_RPC_URL,
-          }),
-      },
-    }),
+    client: async () => {
+      const { createSearchSlice } = await import('./search.client');
+      return { default: { slice: createSearchSlice } };
+    },
     server: async () => ({
       default: serverSegmentOf(config, (await config.server()).default),
     }),

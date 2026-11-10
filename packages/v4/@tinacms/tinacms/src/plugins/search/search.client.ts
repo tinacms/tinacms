@@ -1,4 +1,5 @@
-import { RpcError, createRpcClient } from '../../rpc/proxy';
+import { DEFAULT_RPC_URL, RpcError, createRpcClient } from '../../rpc/proxy';
+import type { ClientSlice } from '../../core/plugin';
 import {
   type Search,
   type SearchHit,
@@ -65,3 +66,6 @@ export const createSearchClient = (
     },
   };
 };
+
+export const createSearchSlice: ClientSlice = (_set, _get, sliceConfig) =>
+  createSearchClient({ rpcUrl: sliceConfig?.rpcUrl ?? DEFAULT_RPC_URL });

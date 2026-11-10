@@ -33,7 +33,19 @@ const collections: CollectionSchema[] = [
     fields: [
       { name: 'title', type: 'string' },
       { name: 'excerpt', type: 'string' },
-      { name: 'body', type: 'rich-text' },
+      {
+        name: 'body',
+        type: 'rich-text',
+        templates: [
+          { name: 'Cta', fields: [{ name: 'label', type: 'string' }] },
+          { name: 'Note', fields: [{ name: 'label', type: 'string' }] },
+          {
+            name: 'Callout',
+            fields: [{ name: 'children', type: 'rich-text' }],
+          },
+          { name: 'Badge', fields: [{ name: 'children', type: 'rich-text' }] },
+        ],
+      },
     ],
   },
   { name: 'page', format: 'mdx', fields: [{ name: 'title', type: 'string' }] },
@@ -524,6 +536,50 @@ describe('save-time indexing', () => {
       }
     }
   );
+
+  it('indexes component children and the visible text of raw HTML, nothing else', async () => {
+    const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
+    const body = [
+      'Intro',
+      '<Callout>Read this</Callout>',
+      '<Note label="hidden" />',
+      'Click <Badge>new</Badge> now',
+      'Some <b>bold html</b> &amp; more',
+      '<table><tr><td>a</td><td>b</td></tr></table>',
+    ].join('\n\n');
+    await save(handlerWith(), {
+      branch: 'main',
+      value: { title: 'T', body },
+    });
+    const text = upsert.mock.calls[0][0][0].fields.find(
+      ({ name }) => name === 'body'
+    )?.text;
+    expect(text?.split('\n').filter(Boolean)).toEqual([
+      'Intro',
+      'Read this',
+      'Click new now',
+      'Some bold html & more',
+      'a b',
+    ]);
+    expect(text).not.toMatch(/hidden|<|>/);
+  });
+
+  it('drops an HTML comment from a markdown body', async () => {
+    const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
+    await save(handlerWith(), {
+      branch: 'main',
+      collection: 'note',
+      path: 'content/notes/a.md',
+      value: {
+        title: 'T',
+        body: 'Some <b>bold html</b> &amp; <!-- c -->more',
+      },
+    });
+    const text = upsert.mock.calls[0][0][0].fields.find(
+      ({ name }) => name === 'body'
+    )?.text;
+    expect(text).toBe('Some bold html & more');
+  });
 
   it('leaves an empty source body out of the record', async () => {
     const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');

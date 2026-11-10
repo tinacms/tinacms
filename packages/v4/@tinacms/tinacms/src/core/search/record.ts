@@ -27,10 +27,37 @@ const BLOCK_PARENTS: ReadonlySet<string> = new Set([
 const isElement = (node: unknown): node is Record<string, unknown> =>
   isRecord(node) && Array.isArray(node.children);
 
-// Component props, image alt text and link URLs sit outside `children`, so
-// reading only the text leaves leaves them out.
+const isRoot = (value: unknown): value is Record<string, unknown> =>
+  isRecord(value) && value.type === 'root';
+
+const HTML_NODE_TYPES: ReadonlySet<string> = new Set(['html', 'html_inline']);
+
+// Visible text of raw HTML: comments and tags drop out, attribute values with them.
+const htmlText = (source: string): string =>
+  source.replace(/<!--[\s\S]*?-->/g, ' ').replace(/<[^>]*>/g, ' ');
+
+// A component's visible text is its `children` prop. Its other props, image alt
+// text and link URLs sit outside the text leaves, so they stay out.
 const collectText = (node: unknown, out: string[]): void => {
   if (isElement(node)) {
+    if (
+      typeof node.value === 'string' &&
+      HTML_NODE_TYPES.has(String(node.type))
+    ) {
+      out.push(htmlText(node.value));
+      return;
+    }
+    const slot = isRecord(node.props) ? node.props.children : undefined;
+    if (isRoot(slot)) {
+      const inner: string[] = [];
+      collectText(slot, inner);
+      const text = inner.join('');
+      out.push(
+        node.type === 'mdxJsxTextElement'
+          ? text.replace(/\s*\n\s*/g, ' ')
+          : text
+      );
+    }
     const breaksBlocks = BLOCK_PARENTS.has(String(node.type));
     for (const child of node.children as unknown[]) {
       collectText(child, out);
@@ -41,8 +68,11 @@ const collectText = (node: unknown, out: string[]): void => {
   if (isRecord(node) && typeof node.text === 'string') out.push(node.text);
 };
 
-const isRoot = (value: unknown): value is Record<string, unknown> =>
-  isRecord(value) && value.type === 'root';
+const tidy = (text: string): string =>
+  text
+    .split('\n')
+    .map((line) => line.replace(/[ \t]+/g, ' ').trim())
+    .join('\n');
 
 const treeOf = (
   value: unknown,
@@ -71,7 +101,7 @@ const textOf = (
     if (!isRoot(tree)) return '';
     const out: string[] = [];
     collectText(tree, out);
-    return out.join('');
+    return tidy(out.join(''));
   }
   return typeof value === 'string' ? value : '';
 };

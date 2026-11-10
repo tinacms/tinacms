@@ -82,7 +82,7 @@ const initCommand = async (
 };
 
 const searchCommand = async (
-  subcommand: string | undefined,
+  [subcommand, ...extra]: string[],
   values: { root?: string; config?: string; check?: boolean },
   context: Required<Pick<CliContext, 'cwd' | 'log' | 'logError'>> & CliContext
 ): Promise<number> => {
@@ -96,6 +96,10 @@ const searchCommand = async (
     context.logError(
       `Unknown search command "${subcommand ?? ''}".\n\n${USAGE}`
     );
+    return 1;
+  }
+  if (extra.length > 0) {
+    context.logError(`Unexpected argument "${extra[0]}".\n\n${USAGE}`);
     return 1;
   }
   // Loaded on demand: reindex reads files through the Local Data Layer, which
@@ -150,7 +154,7 @@ export const runCli = async (
       return 0;
     }
     if (command === 'search') {
-      return await searchCommand(positionals[0], values, {
+      return await searchCommand(positionals, values, {
         ...context,
         cwd,
         log,

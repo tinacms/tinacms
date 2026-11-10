@@ -132,8 +132,10 @@ A provider gets records, never raw documents. A `SearchRecord` is
 - `text` is plain text. A string field is used as it is. A rich-text field
   arrives as source text (MDX or markdown), or as a rich-text tree. Core reads
   the source with the codec of the collection format, then flattens the text
-  leaves in document order, with a newline after each block. Component props,
-  image alt text, link URLs and markdown syntax are left out. A rich-text field
+  leaves in document order, with a newline after each block. The text of a
+  component's `children` prop and the visible text of raw HTML are included.
+  Other component props, image alt text, link URLs, HTML tags, attribute values
+  and markdown syntax are left out. A rich-text field
   that does not parse fails the save hook (one after-save warning) and the
   reindex (exit 1, naming the file). Core never indexes its raw source.
 - An empty field is left out of `fields`. A record is always sent for a saved
@@ -284,7 +286,9 @@ collection, then the total.
   searchable collection, which belongs to another collection, is not indexed
   as part of the parent.
 - It accepts `--root`, `--config` and `--help`. Any other flag, including
-  `--check`, exits 1: reindex always writes the index.
+  `--check`, exits 1: reindex always writes the index. An argument after
+  `reindex`, such as `tinacms search reindex extra`, exits 1 with
+  `Unexpected argument "extra".`
 
 ## In the admin
 

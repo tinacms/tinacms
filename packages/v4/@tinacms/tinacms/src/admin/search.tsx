@@ -224,9 +224,11 @@ function SearchDialog({
                   key={`${ref.collection}:${ref.path}`}
                   className='py-1.5 text-base'
                 >
-                  <span className='font-medium'>{title}</span>
+                  <span className='block [overflow-wrap:anywhere] font-medium'>
+                    {title}
+                  </span>
                   {snippet ? (
-                    <span className='block text-sm text-muted-foreground'>
+                    <span className='block [overflow-wrap:anywhere] text-sm text-muted-foreground'>
                       {snippet}
                     </span>
                   ) : null}
