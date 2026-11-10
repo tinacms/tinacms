@@ -1,72 +1,136 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createWorkflowBranch } from './create-workflow-branch';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { BRANCH_WORDS, createWorkflowBranch } from './create-workflow-branch';
 
 const branchName = 'tina/rules/example';
 const collision = () =>
   Object.assign(new Error('Already exists'), {
     errorCode: 'BRANCH_EXISTS',
   });
-
+const tierNames = (tier = 1) =>
+  BRANCH_WORDS.map(
+    (word) => `${branchName}-${word}${tier === 1 ? '' : `-${tier}`}`
+  );
 const setup = (targetBranchExists = false) => ({
   branchName,
   targetBranchExists,
-  branchExists: vi.fn(async (_name: string) => false),
+  historyScope: 'test-app',
+  listBranchNames: vi.fn(async (): Promise<string[]> => []),
   create: vi.fn(async (name: string) => ({ branchName: name })),
 });
 
 describe('createWorkflowBranch', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+  });
   afterEach(() => vi.restoreAllMocks());
 
-  it('keeps an available default and avoids another existence check', async () => {
+  it('keeps an available default', async () => {
     const options = setup();
     expect(await createWorkflowBranch(options)).toEqual({ branchName });
-    expect(options.branchExists).not.toHaveBeenCalled();
     expect(options.create).toHaveBeenCalledExactlyOnceWith(branchName);
   });
 
-  it('adds a random word when the default exists', async () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
+  it('selects randomly from unused themed names including harley', async () => {
     const options = setup(true);
-    expect(await createWorkflowBranch(options)).toEqual({
-      branchName: `${branchName}-alpha`,
-    });
-    expect(options.create).toHaveBeenCalledExactlyOnceWith(
-      `${branchName}-alpha`
-    );
-  });
-
-  it('tries a different word without stacking suffixes when a word is taken', async () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    const options = setup(true);
-    options.branchExists.mockResolvedValueOnce(true);
-    await createWorkflowBranch(options);
-    expect(options.branchExists.mock.calls.map(([name]) => name)).toEqual([
-      `${branchName}-alpha`,
-      `${branchName}-birch`,
+    options.listBranchNames.mockResolvedValue([
+      `${branchName}-tina`,
+      `${branchName}-llama`,
     ]);
-    expect(options.create).toHaveBeenCalledExactlyOnceWith(
-      `${branchName}-birch`
-    );
+    expect(await createWorkflowBranch(options)).toEqual({
+      branchName: `${branchName}-harley`,
+    });
+    expect(options.listBranchNames).toHaveBeenCalledTimes(1);
   });
 
-  it('retries a creation collision after a successful existence check', async () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
+  it('uses Math.random to choose among the remaining names', async () => {
+    vi.mocked(Math.random).mockReturnValue(0.999);
+    expect(await createWorkflowBranch(setup(true))).toEqual({
+      branchName: `${branchName}-${BRANCH_WORDS.at(-1)}`,
+    });
+  });
+
+  it('uses the last available name before advancing tiers', async () => {
+    const options = setup(true);
+    options.listBranchNames.mockResolvedValue(
+      tierNames().filter((name) => name !== `${branchName}-harley`)
+    );
+    expect(await createWorkflowBranch(options)).toEqual({
+      branchName: `${branchName}-harley`,
+    });
+  });
+
+  it('advances to tier two only after the first tier is exhausted', async () => {
+    const options = setup(true);
+    options.listBranchNames.mockResolvedValue(tierNames());
+    expect(await createWorkflowBranch(options)).toEqual({
+      branchName: `${branchName}-tina-2`,
+    });
+  });
+
+  it('advances past fully occupied numbered tiers', async () => {
+    const options = setup(true);
+    options.listBranchNames.mockResolvedValue([
+      ...tierNames(),
+      ...tierNames(2),
+    ]);
+    expect(await createWorkflowBranch(options)).toEqual({
+      branchName: `${branchName}-tina-3`,
+    });
+  });
+
+  it('keeps a deleted generated name retired across separate saves', async () => {
+    await createWorkflowBranch(setup(true));
+    const next = setup();
+    expect(await createWorkflowBranch(next)).toEqual({
+      branchName: `${branchName}-llama`,
+    });
+  });
+
+  it('remembers observed existing names even after they are deleted', async () => {
+    const options = setup(true);
+    options.listBranchNames.mockResolvedValue(tierNames());
+    await createWorkflowBranch(options);
+    expect(await createWorkflowBranch(setup())).toEqual({
+      branchName: `${branchName}-llama-2`,
+    });
+  });
+
+  it('keeps history isolated between apps', async () => {
+    await createWorkflowBranch(setup());
+    expect(
+      await createWorkflowBranch({ ...setup(), historyScope: 'other-app' })
+    ).toEqual({ branchName });
+  });
+
+  it('remembers the canonical branch name returned by the server', async () => {
+    const options = setup();
+    options.create.mockResolvedValueOnce({ branchName: `${branchName}-tina` });
+    await createWorkflowBranch(options);
+    expect(await createWorkflowBranch(setup())).toEqual({
+      branchName: `${branchName}-llama`,
+    });
+  });
+
+  it('retries concurrent creation collisions using a different available name', async () => {
     const options = setup(true);
     options.create.mockRejectedValueOnce(collision());
     expect(await createWorkflowBranch(options)).toEqual({
-      branchName: `${branchName}-birch`,
+      branchName: `${branchName}-llama`,
     });
-    expect(options.create).toHaveBeenCalledTimes(2);
+    expect(options.create.mock.calls).toEqual([
+      [`${branchName}-tina`],
+      [`${branchName}-llama`],
+    ]);
   });
 
-  it('retries when the default is created concurrently', async () => {
-    const options = setup();
+  it('retries within a numbered tier after a concurrent creation collision', async () => {
+    const options = setup(true);
+    options.listBranchNames.mockResolvedValue(tierNames());
     options.create.mockRejectedValueOnce(collision());
-    await createWorkflowBranch(options);
-    expect(options.create).toHaveBeenCalledTimes(2);
-    expect(options.create.mock.calls[1][0]).toMatch(
-      /^tina\/rules\/example-[a-z]+$/
-    );
+    expect(await createWorkflowBranch(options)).toEqual({
+      branchName: `${branchName}-llama-2`,
+    });
   });
 
   it.each([
@@ -79,9 +143,12 @@ describe('createWorkflowBranch', () => {
     options.create.mockRejectedValue(error);
     await expect(createWorkflowBranch(options)).rejects.toBe(error);
     expect(options.create).toHaveBeenCalledTimes(1);
+    expect(await createWorkflowBranch(setup())).toEqual({
+      branchName: `${branchName}-tina`,
+    });
   });
 
-  it('does not retry an ambiguous error mentioning an existing branch', async () => {
+  it('does not retry ambiguous failures', async () => {
     const options = setup();
     const error = new Error('Branch already exists');
     options.create.mockRejectedValue(error);
@@ -89,69 +156,34 @@ describe('createWorkflowBranch', () => {
     expect(options.create).toHaveBeenCalledTimes(1);
   });
 
-  it('falls back to an incrementing number after five word collisions', async () => {
-    const options = setup(true);
-    options.branchExists.mockImplementation(
-      async (name) => name !== `${branchName}-1`
-    );
-    const result = await createWorkflowBranch(options);
-    expect(result.branchName).toBe(`${branchName}-1`);
-    expect(options.branchExists).toHaveBeenCalledTimes(6);
-    expect(options.create).toHaveBeenCalledTimes(1);
-  });
-
-  it('skips existing numeric suffixes in order', async () => {
-    const options = setup(true);
-    options.branchExists.mockImplementation(
-      async (name) => name !== `${branchName}-3`
-    );
-    expect(await createWorkflowBranch(options)).toEqual({
-      branchName: `${branchName}-3`,
-    });
-    expect(options.branchExists.mock.calls.slice(5)).toEqual([
-      [`${branchName}-1`],
-      [`${branchName}-2`],
-      [`${branchName}-3`],
-    ]);
-    expect(options.create).toHaveBeenCalledExactlyOnceWith(`${branchName}-3`);
-  });
-
-  it('increments again when a numbered branch is created concurrently', async () => {
-    const options = setup(true);
-    options.branchExists.mockImplementation(
-      async (name) => !/-\d+$/.test(name)
-    );
-    options.create.mockRejectedValueOnce(collision());
-    expect(await createWorkflowBranch(options)).toEqual({
-      branchName: `${branchName}-2`,
-    });
-    expect(options.create.mock.calls).toEqual([
-      [`${branchName}-1`],
-      [`${branchName}-2`],
-    ]);
-  });
-
-  it('stops after twenty numeric creation collisions', async () => {
+  it('bounds retries when every creation reports a collision', async () => {
     const options = setup();
     options.create.mockRejectedValue(collision());
     await expect(createWorkflowBranch(options)).rejects.toMatchObject({
       errorCode: 'BRANCH_EXISTS',
     });
-    expect(options.create).toHaveBeenCalledTimes(26);
-    expect(options.create).toHaveBeenLastCalledWith(`${branchName}-20`);
+    expect(options.create).toHaveBeenCalledTimes(20);
     expect(new Set(options.create.mock.calls.map(([name]) => name)).size).toBe(
-      26
+      20
     );
   });
 
-  it('stops when every candidate already exists', async () => {
-    const options = setup(true);
-    options.branchExists.mockResolvedValue(true);
-    await expect(createWorkflowBranch(options)).rejects.toMatchObject({
-      errorCode: 'BRANCH_EXISTS',
+  it('does not create anything if the branch list cannot be loaded', async () => {
+    const options = setup();
+    const error = new Error('Unavailable');
+    options.listBranchNames.mockRejectedValue(error);
+    await expect(createWorkflowBranch(options)).rejects.toBe(error);
+    expect(options.create).not.toHaveBeenCalled();
+  });
+
+  it('does not create anything if browser history cannot be persisted', async () => {
+    const options = setup();
+    vi.spyOn(window.localStorage, 'setItem').mockImplementation(() => {
+      throw new Error('Storage full');
     });
-    expect(options.branchExists).toHaveBeenCalledTimes(25);
-    expect(options.branchExists).toHaveBeenLastCalledWith(`${branchName}-20`);
+    await expect(createWorkflowBranch(options)).rejects.toMatchObject({
+      errorCode: 'VALIDATION_FAILED',
+    });
     expect(options.create).not.toHaveBeenCalled();
   });
 
@@ -162,19 +194,21 @@ describe('createWorkflowBranch', () => {
     await expect(
       createWorkflowBranch({ ...options, signal: controller.signal })
     ).rejects.toMatchObject({ name: 'AbortError' });
+    expect(options.listBranchNames).not.toHaveBeenCalled();
     expect(options.create).not.toHaveBeenCalled();
   });
 
-  it('does not create a branch if cancelled during an existence check', async () => {
+  it('does not reserve or create a branch if cancelled while loading names', async () => {
     const options = setup(true);
     const controller = new AbortController();
-    options.branchExists.mockImplementation(async () => {
+    options.listBranchNames.mockImplementation(async () => {
       controller.abort();
-      return false;
+      return [];
     });
     await expect(
       createWorkflowBranch({ ...options, signal: controller.signal })
     ).rejects.toMatchObject({ name: 'AbortError' });
     expect(options.create).not.toHaveBeenCalled();
+    expect(window.localStorage.length).toBe(0);
   });
 });

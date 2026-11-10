@@ -223,13 +223,17 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
         ? await createWorkflowBranch({
             branchName,
             targetBranchExists,
-            branchExists: (name) =>
-              checkTargetBranchExists(
-                tinaApi,
-                name,
-                'executeEditorialWorkflow',
-                signal
-              ),
+            historyScope: JSON.stringify([
+              tinaApi.contentApiBase,
+              tinaApi.clientId,
+            ]),
+            listBranchNames: async () => {
+              const branches = await tinaApi.listBranches({
+                includeIndexStatus: false,
+                signal,
+              });
+              return branches.map(({ name }) => name);
+            },
             create: (name) => {
               setCurrentStep(1);
               return create(name);

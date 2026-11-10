@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   beforeSubmit: vi.fn(async ({ values }) => values),
   executeEditorialWorkflow: vi.fn(),
   branchExists: vi.fn(),
+  listBranches: vi.fn(),
   success: vi.fn(),
 }));
 
@@ -17,6 +18,9 @@ vi.mock('../react-core', () => ({
       tina: {
         executeEditorialWorkflow: mocks.executeEditorialWorkflow,
         branchExists: mocks.branchExists,
+        listBranches: mocks.listBranches,
+        clientId: 'test-app',
+        contentApiBase: 'https://example.com',
         schema: {
           getCollectionByFullPath: () => ({
             name: 'rules',
@@ -54,6 +58,8 @@ const options = {
 describe('editorial workflow branch naming', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.localStorage.clear();
+    mocks.listBranches.mockResolvedValue([]);
     vi.spyOn(Math, 'random').mockReturnValue(0);
     mocks.branchExists.mockResolvedValue(false);
     mocks.executeEditorialWorkflow.mockImplementation(
@@ -78,8 +84,8 @@ describe('editorial workflow branch naming', () => {
     });
     expect(mocks.executeEditorialWorkflow).toHaveBeenCalledWith(
       expect.objectContaining({
-        branchName: 'tina/rules/example-alpha',
-        prTitle: 'rules/example alpha (PR from TinaCMS)',
+        branchName: 'tina/rules/example-tina',
+        prTitle: 'rules/example tina (PR from TinaCMS)',
         isDraft: true,
         graphQLContentOp: {
           query: 'update',
@@ -92,10 +98,10 @@ describe('editorial workflow branch naming', () => {
       })
     );
     expect(mocks.setCurrentBranch).toHaveBeenCalledWith(
-      'tina/rules/example-alpha'
+      'tina/rules/example-tina'
     );
     expect(mocks.success).toHaveBeenCalledWith(
-      expect.stringContaining('tina/rules/example-alpha'),
+      expect.stringContaining('tina/rules/example-tina'),
       0
     );
   });
