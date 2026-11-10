@@ -1,5 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 import {
+  act,
   configure,
   fireEvent,
   render,
@@ -609,11 +610,16 @@ const holdAnimations = () => {
 };
 
 // Every text a live region held, in order.
+// Watches the body, not the node: a form remount replaces the region and would leave a node-bound observer silent.
 const watchRegion = (slot: string) => {
   const texts: string[] = [];
-  const region = globalThis.document.querySelector(`[data-slot=${slot}]`);
+  const inRegion = (node: Node) => {
+    const element = node instanceof Element ? node : node.parentElement;
+    return element?.closest(`[data-slot=${slot}]`) != null;
+  };
   const observer = new MutationObserver((records) => {
     for (const record of records) {
+      if (!inRegion(record.target)) continue;
       if (record.type === 'characterData') {
         texts.push(record.target.textContent ?? '');
       } else if (record.addedNodes.length > 0) {
@@ -627,14 +633,32 @@ const watchRegion = (slot: string) => {
       }
     }
   });
-  if (region) {
-    observer.observe(region, {
-      childList: true,
-      characterData: true,
-      subtree: true,
-    });
-  }
+  observer.observe(globalThis.document.body, {
+    childList: true,
+    characterData: true,
+    subtree: true,
+  });
   return { texts, stop: () => observer.disconnect() };
+};
+
+const holdFrames = () => {
+  const queue = new Map<number, FrameRequestCallback>();
+  let next = 0;
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+    next += 1;
+    queue.set(next, callback);
+    return next;
+  });
+  vi.stubGlobal('cancelAnimationFrame', (id: number) => {
+    queue.delete(id);
+  });
+  const flush = () =>
+    act(async () => {
+      const due = Array.from(queue.values());
+      queue.clear();
+      for (const callback of due) callback(0);
+    });
+  return { flush, release: () => vi.unstubAllGlobals() };
 };
 
 describe('where the pane goes and what it keeps', () => {
@@ -782,9 +806,11 @@ describe('the All fixed endings', () => {
 
   it('starts a fresh blocked state and says the same words again when a Save blocks during the hold', async () => {
     const release = holdAnimations();
+    const frames = holdFrames();
     try {
       const user = await blockOnTwoFields();
       await errorsPane();
+      await frames.flush();
       const spoken = watchRegion('error-blocked-announcement');
       await fixFieldOf(user, /^Meta title/);
       await fixFieldOf(user, /^Heading/);
@@ -802,12 +828,13 @@ describe('the All fixed endings', () => {
           .getAllByRole('button', { name: /\. / })
           .some((row) => row.hasAttribute('aria-current'))
       ).toBe(false);
-      await waitFor(() => {
-        const words = spoken.texts.filter((text) => text !== '');
-        expect(words).toHaveLength(1);
+      await waitFor(async () => {
+        await frames.flush();
+        expect(spoken.texts.filter((text) => text !== '')).toHaveLength(1);
       });
       spoken.stop();
     } finally {
+      frames.release();
       release();
     }
   });
