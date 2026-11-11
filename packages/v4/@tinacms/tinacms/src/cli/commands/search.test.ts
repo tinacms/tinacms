@@ -352,6 +352,36 @@ describe('tinacms search reindex source documents', () => {
     }
   );
 
+  it('leaves out a configured field named like an Object.prototype member when the file lacks it, and keeps it when present', async () => {
+    await writeDoc('content/doc/a.mdx', '---\ntitle: T\n---\n\nbody\n');
+    await writeDoc(
+      'content/doc/b.mdx',
+      '---\ntitle: T\nconstructor: own\n---\n\nbody\n'
+    );
+    const provider = providerWith();
+    const withProto: CollectionSchema = {
+      ...article('doc', 'mdx'),
+      fields: [
+        { name: 'title', type: 'string' },
+        { name: 'constructor', type: 'string' },
+        { name: 'valueOf', type: 'string' },
+        { name: 'body', type: 'rich-text', isBody: true },
+      ],
+    };
+    await reindex(
+      configWith(provider, {
+        fields: { doc: { title: 3, constructor: 1, valueOf: 1 } },
+        collections: [withProto],
+      })
+    );
+    const [a, b] = provider.replace.mock.calls[0][0];
+    expect(a.fields).toEqual([{ name: 'title', weight: 3, value: 'T' }]);
+    expect(b.fields).toEqual([
+      { name: 'title', weight: 3, value: 'T' },
+      { name: 'constructor', weight: 1, value: 'own' },
+    ]);
+  });
+
   it('indexes a body the rich-text codec would refuse, as read', async () => {
     await writeDoc(
       'content/doc/a.mdx',

@@ -10,7 +10,7 @@ const hasValue = (value: unknown): boolean =>
 
 /**
  * The record a provider indexes for one saved or read document: each configured
- * field's value as saved, in the order of `fields`. Turning a value into
+ * field's own value as saved, in the order of `fields`. Turning a value into
  * searchable text is the provider's job. It is always built, even with no
  * values, so a provider replaces a stale entry.
  */
@@ -22,6 +22,7 @@ export const buildSearchRecord = (
 ): SearchRecord => {
   const searchable: SearchRecordField[] = [];
   for (const [name, weight] of Object.entries(fields)) {
+    if (!Object.hasOwn(document, name)) continue;
     const value = document[name];
     if (hasValue(value)) searchable.push({ name, weight, value });
   }

@@ -77,8 +77,9 @@ gone. Do not render the index text as content.
 - In local development, the site's mounted RPC handler serves `search/query`.
   The Local Data Layer's Vite plugin serves only `content/update`. Mount the
   handler route, or local search fails with `unavailable`.
-- `search/query` is a `publicOp`: it needs no session. Every field in `fields`
-  becomes searchable by anyone. Rate limiting the route is the job of the host.
+- `search/query` is a `publicOp`: it needs no session, and what a provider
+  indexes is public (see [Records](#records)). Rate limiting the route is the
+  job of the host.
 
 ## Write a provider
 
@@ -143,6 +144,22 @@ job.
 - A field whose value is `undefined`, `null` or `''` is left out of `fields`.
   A record is always sent for a saved document, even with no fields, so the
   provider replaces the old entry.
+
+What a provider must do with a value:
+
+- **Anything you index from a configured field is searchable by anyone.**
+  `search/query` needs no session, so the provider decides what becomes public.
+- Everything in the field is in your hands, including markup, component props,
+  image alt text, link URLs and comments in a rich-text body. Strip or skip
+  what should not be public.
+- Handle a source string and a tree for rich text, and narrow `value` before
+  you use it, since it is typed `unknown`.
+- Return a `snippet` as plain text, never as markup.
+- The value is editor-written input. Its size and shape are not under your
+  control, so validate it before you hand it to an index.
+- The in-memory provider below is a test fixture, not a model for turning
+  values into text. It matches the raw value, and `JSON.stringify` of a
+  rich-text tree matches on keys such as `children`.
 
 ### Searchable fields
 

@@ -509,6 +509,30 @@ describe('save-time indexing', () => {
     ]);
   });
 
+  it('leaves out a configured field named like an Object.prototype member when the document lacks it, and keeps it when present', async () => {
+    const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
+    const protoSearch = defineSearchPlugin({
+      name: 'test:proto-search',
+      fields: { post: { title: 3, constructor: 1, valueOf: 1 } },
+      server: () => import('../../test/in-memory-search.server'),
+    });
+    await save(handlerWith(contentPlugin(), [protoSearch]), {
+      branch: 'main',
+      value: { title: 'T' },
+    });
+    expect(upsert.mock.calls[0][0][0].fields).toEqual([
+      { name: 'title', weight: 3, value: 'T' },
+    ]);
+    await save(handlerWith(contentPlugin(), [protoSearch]), {
+      branch: 'main',
+      value: { title: 'T', constructor: 'own' },
+    });
+    expect(upsert.mock.calls[1][0][0].fields).toEqual([
+      { name: 'title', weight: 3, value: 'T' },
+      { name: 'constructor', weight: 1, value: 'own' },
+    ]);
+  });
+
   it('indexes a body the rich-text codec would refuse, as saved', async () => {
     const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
     const response = await save(handlerWith(), {
