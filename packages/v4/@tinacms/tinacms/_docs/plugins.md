@@ -358,6 +358,7 @@ Two overrides of one screen throw an error at boot
     supplies, and the markdown body that it controls
 - [Media plugins](./media-plugins.md) — how a plugin stores media, and the local media plugin
   - [The Media Manager](./media-manager.md) — the screen to browse, upload, rename and delete media, and the `MediaBrowser` component
+- [Search plugins](./search-plugins.md) — how a plugin gives a site full-text search
 - [Auth plugins](./auth-plugins.md): how a plugin verifies a request and signs the editor in
 - [UI slots](./ui-slots.md) — how a plugin adds entries to the admin sidebar
 - [Architecture](./architecture.md) — how a plugin gets to the screen
@@ -375,5 +376,7 @@ A content provider tells the shell where it reads from:
   and removes the branch button.
 
 A provider with neither shows no branch spot. A `search` slice with a
-`search(query)` method adds the Search control and the ⌘K shortcut. Without one,
-neither renders.
+`search(query, { limit, collections?, filters?, cursor? })` method adds content
+results to the Search dialog. The Search control and the ⌘K shortcut always
+show, because the dialog also finds screens. Refer to
+[Search plugins](./search-plugins.md) for the contract.
