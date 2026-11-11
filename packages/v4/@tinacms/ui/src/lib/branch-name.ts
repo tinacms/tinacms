@@ -27,16 +27,20 @@ export const branchNameError = (
   return undefined;
 };
 
+/** A file stem cut down to branch-safe characters. Empty when nothing safe is left. */
+export const branchSlug = (stem: string): string =>
+  stem
+    .replace(/[^A-Za-z0-9._-]/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/\.{2,}/g, '.')
+    .replace(/^[-.]+|[-.]+$/g, '');
+
 /** The suggested name for a document's edits: `docs/<file stem>-edits`. */
 export const branchNameFromPath = (path: string): string => {
   const file = path.split('/').at(-1) ?? '';
   const dot = file.lastIndexOf('.');
   const stem = dot >= 0 ? file.slice(0, dot) : file;
-  const clean = stem
-    .replace(/[^A-Za-z0-9._-]/g, '-')
-    .replace(/-{2,}/g, '-')
-    .replace(/\.{2,}/g, '.')
-    .replace(/^[-.]+|[-.]+$/g, '');
+  const clean = branchSlug(stem);
   return `docs/${clean === '' ? 'document' : clean}-edits`;
 };
 

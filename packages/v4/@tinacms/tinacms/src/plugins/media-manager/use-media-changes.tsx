@@ -1,6 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { SaveToBranchDialog } from '@tinacms/ui/components/save-to-branch-dialog';
-import { branchNameError, freeName } from '@tinacms/ui/lib/branch-name';
+import {
+  branchNameError,
+  branchSlug,
+  freeName,
+} from '@tinacms/ui/lib/branch-name';
 import { use, useEffect, useRef, useState } from 'react';
 import { SaveToNewBranchContext } from '../../admin/save-to-new-branch';
 import { authSliceOf } from '../../core/auth/slice';
@@ -49,9 +53,14 @@ const folderLabel = (folder: string) => folder.split('/').at(-1) || 'Media';
 const defaultBranchName = (change: MediaChange) => {
   const verb = change.kind === 'delete' ? 'remove' : 'move';
   const [only] = change.paths;
-  return change.paths.length === 1 && only !== undefined
-    ? `media/${verb}-${splitFilename(mediaNameOf(only)).base}`
-    : `media/${verb}-${change.paths.length}-files`;
+  if (change.paths.length !== 1 || only === undefined) {
+    return `media/${verb}-${change.paths.length}-files`;
+  }
+  const slug = branchSlug(splitFilename(mediaNameOf(only)).base);
+  const named = `media/${verb}-${slug || 'file'}`;
+  return branchNameError(named, [], false) === undefined
+    ? named
+    : `media/${verb}-file`;
 };
 
 const changeWords = (change: MediaChange) =>

@@ -415,7 +415,6 @@ function AdminShell({
   const screens = useAdminScreens();
   const globalNav = useGlobalNav();
   const { route, navigate } = useAdminRoute();
-  useKeptEditsNotice(route, navigate);
 
   const isMediaRoute =
     route.view === 'media' ||
@@ -427,6 +426,7 @@ function AdminShell({
     if (!isMediaRoute) setLastMain(route);
   }, [route, isMediaRoute]);
   const mainRoute = isMediaRoute ? lastMain : route;
+  useKeptEditsNotice(mainRoute, navigate);
 
   const [maximised, setMaximised] = useState(false);
   useEffect(() => {

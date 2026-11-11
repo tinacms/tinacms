@@ -800,6 +800,39 @@ describe('Delete on a protected branch', () => {
     expect(world.deleted).toEqual([]);
   });
 
+  it.each([
+    ['my photo.png', 'media/remove-my-photo'],
+    ['Team Photo.PNG', 'media/remove-Team-Photo'],
+    ['a.b..c.png', 'media/remove-a.b.c'],
+    ['café menu.png', 'media/remove-caf-menu'],
+    ['日本語.png', 'media/remove-file'],
+    ['notes.lock.png', 'media/remove-file'],
+  ])('suggests a valid branch name for %s', async (name, expected) => {
+    world.files = [{ path: name, kind: 'file' }];
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await file(name));
+    await user.click(
+      within(
+        await screen.findByRole('region', { name: `Details of ${name}` })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    await user.click(
+      await within(await screen.findByRole('alertdialog')).findByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Save to a new branch',
+    });
+    const field = within(dialog).getByRole('textbox', {
+      name: /New branch name/,
+    });
+    expect(field).toHaveValue(expected);
+    expect(within(dialog).queryByRole('alert')).toBeNull();
+  });
+
   it('with no handler, Continue is off and nothing is deleted', async () => {
     const user = userEvent.setup();
     const dialog = await reachDialog(user);

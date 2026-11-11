@@ -1407,6 +1407,19 @@ describe('TinaAdmin leaving a document with unsaved edits', () => {
     );
   });
 
+  it('stays quiet when Media opens beside the document, and speaks when the editor leaves for Home', async () => {
+    const user = userEvent.setup();
+    await editHello(user);
+    await user.click(screen.getByRole('button', { name: 'Media' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/screens/media'));
+    expect(await screen.findByLabelText(/^Title\b/)).toBeVisible();
+    expect(screen.queryByText(/are kept in this browser/)).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    expect(
+      await screen.findByText('Edits to “Hello!” are kept in this browser')
+    ).toBeVisible();
+  });
+
   it('names a document by its file when the title is cleared', async () => {
     const user = userEvent.setup();
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
