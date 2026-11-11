@@ -82,8 +82,6 @@ function PullRequestRow({ url }: { url: string | undefined }) {
 
 const NO_PULL_REQUEST = 'No pull request yet';
 
-// The branch list decides this row alone: the name and the unsaved footer
-// show in every state of the list.
 function PullRequestState({
   branch,
   isPending,
@@ -131,7 +129,8 @@ function BranchPanelBody({ branch }: { branch: BranchView }) {
   const [back, setBack] = useState({ words: '', tries: 0 });
   const readWords =
     pullRequestOf(branch.pullRequestUrl)?.label ?? NO_PULL_REQUEST;
-  // The tray keeps its own region ref, so the panel finds its region from inside.
+  // A ref on the tray replaces the tray's own ref. Thus the panel finds the
+  // tray's region from an element inside it.
   useEffect(() => {
     // A Retry that failed is over: a later read from elsewhere must not move focus here.
     if (branch.listState === 'failed') retried.current = false;

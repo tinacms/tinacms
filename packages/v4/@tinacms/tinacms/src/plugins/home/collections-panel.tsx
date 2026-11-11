@@ -36,7 +36,7 @@ export function CollectionsPanel({ tier }: { tier: Tier }) {
         `${collection.label ?? collection.name}, ${countOf(lists[index]) ?? ''}`
     )
     .join('. ');
-  // Retry takes its own line away, so focus moves to the panel once the counts are in.
+  // Retry removes the failure line and its button. Focus then goes to the panel.
   useEffect(() => {
     if (hasFailed) retried.current = false;
     if (!retried.current || hasFailed || isLoading) return;

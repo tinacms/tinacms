@@ -21,7 +21,8 @@ import {
 const SCROLL_PAGE = 20;
 const NARROW_PAGE = 5;
 const ROW = '[data-slot=list-row-main]';
-// A second click of a double click on Show more lands on a row that the first click added.
+// The first click of a double click on Show more adds rows.
+// The second click then lands on one of the new rows.
 const DOUBLE_CLICK_MS = 500;
 
 // A phone has no room for the name, so the avatar carries it for a screen reader.
