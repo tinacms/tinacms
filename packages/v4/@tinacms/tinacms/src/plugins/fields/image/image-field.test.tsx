@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { ReactNode } from 'react';
+import { type ReactNode, use } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../../config';
 import type { ContentProvider } from '../../../core/content/contract';
@@ -23,6 +23,8 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
+import { FormScopeContext } from '../../../editor/context';
+import type { FormViewStore } from '../../../editor/form-view-state';
 import { FormProvider, TinaProvider, useActiveField } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
@@ -659,6 +661,47 @@ describe('ImageField gallery', () => {
     expect(
       within(group).getByText('Moved three.jpg to position 2 of 3')
     ).toBeInTheDocument();
+  });
+
+  describe('while the error summary lists a tile', () => {
+    let view: FormViewStore | undefined;
+    const Probe = () => {
+      view = use(FormScopeContext)?.view;
+      return null;
+    };
+    const blockedAddresses = () =>
+      view?.getState().errorSummary.blocked.map((entry) => entry.address);
+
+    it('follows a tile that moves', async () => {
+      renderField(
+        { images: ['a/one.jpg', 'b/two.jpg', 'c/three.jpg'] },
+        createMedia(),
+        galleryCollection,
+        <Probe />
+      );
+      const group = await gallery();
+      view?.getState().block(['images.2']);
+      within(group)
+        .getByRole('button', { name: 'Move Image 3: three.jpg' })
+        .focus();
+      await userEvent.keyboard('{ArrowLeft}');
+      expect(blockedAddresses()).toEqual(['images.1']);
+    });
+
+    it('shifts for a removed tile before it', async () => {
+      renderField(
+        { images: ['a/one.jpg', 'b/two.jpg', 'c/three.jpg'] },
+        createMedia(),
+        galleryCollection,
+        <Probe />
+      );
+      const group = await gallery();
+      view?.getState().block(['images.2']);
+      await userEvent.click(
+        within(group).getByRole('button', { name: 'Remove one.jpg' })
+      );
+      expect(blockedAddresses()).toEqual(['images.1']);
+    });
   });
 
   describe('dragging a tile', () => {

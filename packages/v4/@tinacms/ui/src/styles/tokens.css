@@ -157,6 +157,24 @@
     1
   ); /* The one easing for colour, border and shadow changes */
   --dur: 0.14s; /* The one duration for colour, border and shadow changes */
+  --error-pane-dock-width: 87.5rem; /* The narrowest window a pinned error summary pane docks on, 1400px; narrower, it floats */
+  --row-current: var(
+    --slate-50
+  ); /* The current row in a list, the one last gone to, Slate 50 */
+  --dur-slide-in: 240ms; /* A side pane sliding in, such as the error summary pane */
+  --dur-slide-out: 200ms; /* A side pane sliding out, and a small card fading away */
+  --dur-collapse: 160ms; /* A row collapsing and fading as it leaves a list, such as a fixed error */
+  --dur-appear: 150ms; /* A small part coming or going, such as the errors edge tab or the success bubble */
+  --dur-reduced: 100ms; /* Every move above with reduced motion: a fade only, no slide or collapse */
+  --dur-hold-success: 1.5s; /* How long "All fixed." holds in the error summary pane while its timer bar empties */
+  --dur-hold-bubble: 2.5s; /* How long the "All fixed" bubble above Save holds before it fades */
+  --ease-exit: cubic-bezier(
+    0.4,
+    0,
+    1,
+    1
+  ); /* Easing for something leaving, such as a pane sliding out */
+  --edge-tab-top: 32%; /* Where the errors edge tab sits on the right edge, down from the top */
 
   /* @group Details: letter spacing, line heights and extra shadows */
   --tracking-code: -0.01em; /* Letter spacing for the code font in badges, such as file types and branch names */
