@@ -23,17 +23,24 @@ import { useMediaUsage } from './use-media-usage';
 
 type ResolveUrl = (path: string, options?: MediaUrlOptions) => string;
 
-/** "Copy URL" and "Copy URLs": shows "Copied" with a tick for two seconds. */
+/**
+ * "Copy URL" and "Copy URLs": shows "Copied" with a tick for two seconds after a
+ * successful write. `onResult` gets null when a copy starts and the failure notice when it fails.
+ */
 export function CopyButton({
   label,
   getText,
   disabled,
   announce,
+  failure,
+  onResult,
 }: {
   label: string;
   getText: () => string;
   disabled?: boolean;
   announce: string;
+  failure: string;
+  onResult: (notice: string | null) => void;
 }) {
   const [copied, setCopied] = useState(false);
   useEffect(() => {
@@ -49,7 +56,11 @@ export function CopyButton({
         size='sm'
         disabled={disabled}
         onClick={() => {
-          void copyText(getText()).then(() => setCopied(true));
+          onResult(null);
+          void copyText(getText()).then((ok) => {
+            setCopied(ok);
+            if (!ok) onResult(failure);
+          });
         }}
       >
         {copied ? (
@@ -354,6 +365,7 @@ export function MediaDetails({
   onClose,
   onDelete,
   getUrl,
+  onCopyResult,
 }: {
   path: string;
   resolveUrl: ResolveUrl;
@@ -362,6 +374,7 @@ export function MediaDetails({
   onClose: () => void;
   onDelete: () => void;
   getUrl: () => string;
+  onCopyResult: (notice: string | null) => void;
 }) {
   const name = mediaNameOf(path);
   const folder = path.split('/').slice(0, -1).join('/');
@@ -428,7 +441,13 @@ export function MediaDetails({
         </dl>
       </div>
       <div className='flex items-center gap-2 border-t border-border-subtle p-2'>
-        <CopyButton label='Copy URL' announce='URL copied' getText={getUrl} />
+        <CopyButton
+          label='Copy URL'
+          announce='URL copied'
+          failure="Couldn't copy the URL."
+          onResult={onCopyResult}
+          getText={getUrl}
+        />
         <Button
           type='button'
           variant='destructive'
@@ -449,6 +468,7 @@ export function SelectBar({
   hasMove,
   locked,
   getUrls,
+  onCopyResult,
   onSelectAll,
   onClear,
   onCancel,
@@ -461,6 +481,7 @@ export function SelectBar({
   hasMove: boolean;
   locked: boolean;
   getUrls: () => string;
+  onCopyResult: (notice: string | null) => void;
   onSelectAll: () => void;
   onClear: () => void;
   onCancel: () => void;
@@ -511,6 +532,8 @@ export function SelectBar({
         <CopyButton
           label='Copy URLs'
           announce='URLs copied'
+          failure="Couldn't copy the URLs."
+          onResult={onCopyResult}
           getText={getUrls}
           disabled={none}
         />

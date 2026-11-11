@@ -2,12 +2,13 @@ import { absoluteUrlOf, mediaNameOf } from './media-types';
 
 type ResolveUrl = (path: string) => string;
 
-/** Writes the text to the clipboard. A refusal still counts as copied, as the design shows it. */
-export async function copyText(text: string): Promise<void> {
+/** Writes the text to the clipboard. Resolves false when the clipboard is missing or refuses. */
+export async function copyText(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
+    return true;
   } catch {
-    return;
+    return false;
   }
 }
 

@@ -388,6 +388,7 @@ export function MediaPane({ segments }: AdminScreenProps) {
               hasMove={hasMove}
               locked={actionsOff}
               getUrls={() => absoluteUrlsOf(selectedPaths, resolveUrl)}
+              onCopyResult={setNotice}
               onSelectAll={() => setSelected(new Set(filePaths))}
               onClear={() => setSelected(new Set())}
               onCancel={leaveSelecting}
@@ -604,6 +605,7 @@ export function MediaPane({ segments }: AdminScreenProps) {
                 onClose={closeDetails}
                 onDelete={() => openConfirm('delete', [activePath])}
                 getUrl={() => absoluteUrlsOf([activePath], resolveUrl)}
+                onCopyResult={setNotice}
               />
             ) : null}
           </div>

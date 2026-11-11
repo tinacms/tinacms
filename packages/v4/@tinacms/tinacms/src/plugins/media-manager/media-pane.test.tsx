@@ -561,6 +561,92 @@ describe('details', () => {
   });
 });
 
+describe('copy failures', () => {
+  const copyFails: Array<[string, () => void]> = [
+    [
+      'writeText rejects',
+      () => {
+        vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(
+          new Error('denied')
+        );
+      },
+    ],
+    [
+      'navigator.clipboard is missing',
+      () => {
+        Object.defineProperty(navigator, 'clipboard', {
+          value: undefined,
+          configurable: true,
+        });
+      },
+    ],
+  ];
+
+  it.each(copyFails)(
+    'Copy URL reports a failure and never shows Copied when %s',
+    async (_name, breakClipboard) => {
+      const user = userEvent.setup();
+      breakClipboard();
+      renderPane('#/screens/media/posts');
+      await user.click(await file('hero.jpg'));
+      const details = await screen.findByRole('region', {
+        name: 'Details of hero.jpg',
+      });
+      await user.click(
+        within(details).getByRole('button', { name: 'Copy URL' })
+      );
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        "Couldn't copy the URL."
+      );
+      expect(screen.queryByRole('button', { name: 'Copied' })).toBeNull();
+      expect(screen.queryByText('URL copied')).toBeNull();
+    }
+  );
+
+  it.each(copyFails)(
+    'Copy URLs reports a failure, keeps the selection and never shows Copied when %s',
+    async (_name, breakClipboard) => {
+      const user = userEvent.setup();
+      breakClipboard();
+      renderPane();
+      await user.click(await screen.findByRole('button', { name: 'Select' }));
+      const bar = screen.getByRole('toolbar', { name: 'Selected files' });
+      await user.click(within(bar).getByRole('button', { name: 'Select all' }));
+      await user.click(within(bar).getByRole('button', { name: 'Copy URLs' }));
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        "Couldn't copy the URLs."
+      );
+      expect(screen.queryByRole('button', { name: 'Copied' })).toBeNull();
+      expect(within(bar).getByText('2 selected')).toBeVisible();
+    }
+  );
+
+  it('a failed copy removes the Copied of an earlier success, and a retry clears the notice', async () => {
+    const user = userEvent.setup();
+    const writeText = vi.spyOn(navigator.clipboard, 'writeText');
+    renderPane('#/screens/media/posts');
+    await user.click(await file('hero.jpg'));
+    const details = await screen.findByRole('region', {
+      name: 'Details of hero.jpg',
+    });
+    await user.click(within(details).getByRole('button', { name: 'Copy URL' }));
+    const copied = await within(details).findByRole('button', {
+      name: 'Copied',
+    });
+    writeText.mockRejectedValueOnce(new Error('denied'));
+    await user.click(copied);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      "Couldn't copy the URL."
+    );
+    expect(screen.queryByRole('button', { name: 'Copied' })).toBeNull();
+    await user.click(within(details).getByRole('button', { name: 'Copy URL' }));
+    expect(
+      await within(details).findByRole('button', { name: 'Copied' })
+    ).toBeVisible();
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+});
+
 describe('Select mode', () => {
   it('selects all, shows the count, copies URLs line by line, and Escape leaves', async () => {
     const user = userEvent.setup();
@@ -1040,6 +1126,32 @@ describe('usage lines and cards', () => {
     expect(
       within(dialog).getByRole('button', { name: 'Delete' })
     ).toBeEnabled();
+  });
+});
+
+describe('Delete: unsaved edits that change while the pane is open', () => {
+  it('lists a reference the editor adds to an already-dirty document', async () => {
+    const user = userEvent.setup();
+    renderPane('#/collections/post/content%2Fposts%2Fhello.mdx');
+    const title = await screen.findByRole('textbox', { name: 'Title' });
+    await user.clear(title);
+    await user.type(title, 'draft');
+    await user.click(screen.getByRole('button', { name: 'Media' }));
+    await user.click(await file('banner.png'));
+    await screen.findByRole('region', { name: 'Details of banner.png' });
+    await user.clear(title);
+    await user.type(title, 'banner.png');
+    await user.click(
+      within(
+        screen.getByRole('region', { name: 'Details of banner.png' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    const dialog = await screen.findByRole('alertdialog');
+    expect(
+      await within(dialog).findByText('hello.mdx (your unsaved edits)', {
+        selector: 'p',
+      })
+    ).toBeVisible();
   });
 });
 

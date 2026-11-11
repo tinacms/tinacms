@@ -12,6 +12,7 @@ import {
   type FormId,
   readFormStore,
   toDocument,
+  useFormStore,
   useUnsavedFormIds,
 } from '../../form/form-store';
 import {
@@ -26,7 +27,8 @@ export const MEDIA_USAGE_STALE_MS = 30_000;
 export const mediaUsageKey = (
   branch: string,
   paths: readonly string[],
-  unsavedIds: readonly string[]
+  unsavedIds: readonly string[],
+  unsavedValues: string
 ) => [
   'tina',
   'media',
@@ -34,6 +36,7 @@ export const mediaUsageKey = (
   branch,
   [...paths].sort(),
   [...unsavedIds].sort(),
+  unsavedValues,
 ];
 
 /** The open forms' live values, or the stored draft of a reloaded document. */
@@ -61,8 +64,12 @@ export function useMediaUsage(paths: readonly string[], enabled: boolean) {
   const collections = useSchemaCollections();
   const branch = useCurrentBranch() ?? '';
   const unsavedIds = useUnsavedFormIds();
+  // A dirty form keeps its id as it gains a reference, so the key must follow its values.
+  const unsavedValues = useFormStore(() =>
+    JSON.stringify(readUnsavedDocuments(unsavedIds).map(({ values }) => values))
+  );
   return useQuery<MediaUsage>({
-    queryKey: mediaUsageKey(branch, paths, unsavedIds),
+    queryKey: mediaUsageKey(branch, paths, unsavedIds, unsavedValues),
     enabled: enabled && paths.length > 0,
     staleTime: MEDIA_USAGE_STALE_MS,
     queryFn: ({ signal }) => {
