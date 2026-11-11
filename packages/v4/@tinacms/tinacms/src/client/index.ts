@@ -46,6 +46,15 @@ export {
   type MediaStatus,
   type MediaUrlOptions,
 } from '../core/media/contract';
+export {
+  SearchError,
+  type SearchErrorCode,
+  type SearchHit,
+  type SearchProvider,
+  type SearchQuery,
+  type SearchRef,
+} from '../core/search/contract';
+export { createSearchClient } from '../plugins/search/search.client';
 export type { ClientSegment };
 export {
   createRpcClient,

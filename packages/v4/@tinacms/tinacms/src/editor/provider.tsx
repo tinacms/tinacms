@@ -159,7 +159,9 @@ export function TinaProvider({
         validators: createValidatorRegistry(resolved),
         hooks: createFormHookRegistry(resolved),
         serverHooks: serverHookNamesOf(composedPlugins),
-        store: createTinaStore(resolved),
+        store: createTinaStore(resolved, {
+          rpcUrl: config.rpcUrl ?? DEFAULT_RPC_URL,
+        }),
         screens,
         globalNav: createGlobalNav(resolved, composedPlugins, screens),
       };
@@ -440,10 +442,15 @@ function useSeededFormSync(
 ) {
   const reseeds = useRef(0);
   const [seedKey, setSeedKey] = useState(() => `${formId}#${reseeds.current}`);
-  const advanceSeedKey = useCallback((seededFormId: FormId) => {
-    reseeds.current += 1;
-    setSeedKey(`${seededFormId}#${reseeds.current}`);
-  }, []);
+  const view = useFormViewStore(formId);
+  const advanceSeedKey = useCallback(
+    (seededFormId: FormId) => {
+      reseeds.current += 1;
+      view.getState().reset();
+      setSeedKey(`${seededFormId}#${reseeds.current}`);
+    },
+    [view]
+  );
 
   const seededSignature = useRef<string | null>(null);
   useEffect(() => {
@@ -469,7 +476,6 @@ function useSeededFormSync(
     advanceSeedKey,
   ]);
 
-  const view = useFormViewStore(formId);
   const discardEdits = useCallback(() => {
     const { showLevels, resetReveal } = view.getState();
     showLevels([]);
