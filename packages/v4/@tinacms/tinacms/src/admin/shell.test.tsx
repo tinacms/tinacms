@@ -103,7 +103,13 @@ const searchPlugin = definePlugin({
   client: async () => ({
     default: {
       slice: () => ({
-        search: async () => [{ ref: 'content/posts/hello.mdx' }],
+        search: async () => [
+          {
+            ref: { collection: 'post', path: 'content/posts/hello.mdx' },
+            score: 1,
+            snippet: '',
+          },
+        ],
       }),
     },
   }),

@@ -121,7 +121,9 @@ export function TinaProvider({
         validators: createValidatorRegistry(resolved),
         hooks: createFormHookRegistry(resolved),
         serverHooks: serverHookNamesOf(composedPlugins),
-        store: createTinaStore(resolved),
+        store: createTinaStore(resolved, {
+          rpcUrl: config.rpcUrl ?? DEFAULT_RPC_URL,
+        }),
         screens,
         globalNav: createGlobalNav(resolved, composedPlugins, screens),
         homePanels: createHomePanels(resolved, composedPlugins),
