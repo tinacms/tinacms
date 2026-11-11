@@ -12,23 +12,22 @@ import {
   TinaProvider,
   useLocalStorage,
 } from '@tinacms/toolkit';
-import React, { useEffect, useState } from 'react';
-import { ModalBuilder } from './AuthModal';
-import loginLlama from './tina-login.png';
-
 import { isErrorNamed } from '@toolkit/core/errors';
+import React, { useEffect, useState } from 'react';
 import { TinaAdminApi } from '../admin/api';
 import {
   Client,
   LocalSearchClient,
-  TinaCMSSearchClient,
   TinaCloudAuthProvider,
+  TinaCMSSearchClient,
   TinaIOConfig,
 } from '../internalClient';
 import { BranchSwitchedEvent } from '../lib/posthog/posthog';
 import { captureEvent } from '../lib/posthog/posthogProvider';
 import { CreateClientProps, createClient } from '../utils';
+import { ModalBuilder } from './AuthModal';
 import { AuthenticationCancelledError } from './authenticate';
+import loginLlama from './tina-login.png';
 import {
   type AuthRedirectParams,
   useTinaAuthRedirect,
@@ -489,8 +488,10 @@ export const TinaCloudProvider = (
   const SessionProvider = client.authProvider.getSessionProvider();
 
   const handleListBranches = async (): Promise<Branch[]> => {
+    // Index statuses are fetched lazily by the branch switcher for the rows
+    // it displays, instead of one request per branch when the list opens.
     const branches = await cms.api.tina.listBranches({
-      includeIndexStatus: true,
+      includeIndexStatus: false,
     });
 
     if (!Array.isArray(branches)) {
