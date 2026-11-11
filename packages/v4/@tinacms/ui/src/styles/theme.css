@@ -83,6 +83,7 @@
   --color-unsaved-subtle: var(--unsaved-subtle);
   --color-unsaved-edge: var(--unsaved-edge);
   --color-unsaved-dot: var(--unsaved-dot);
+  --color-row-current: var(--row-current);
   --color-status-published: var(--status-published);
   --color-status-published-subtle: var(--status-published-subtle);
   --color-status-failed: var(--status-failed);
@@ -103,22 +104,12 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --color-inv-bg: var(--inv-bg);
-  --color-inv-ink: var(--inv-ink);
-  --color-inv-muted: var(--inv-muted);
-  --color-inv-hover: var(--inv-hover);
-  --color-tone-success-on-dark: var(--tone-success-on-dark);
-  --color-tone-danger-on-dark: var(--tone-danger-on-dark);
-  --color-tone-warning-on-dark: var(--tone-warning-on-dark);
-  --color-tone-info-on-dark: var(--tone-info-on-dark);
-
   --color-scrim: var(--scrim);
   --color-scrim-light: var(--scrim-light);
 
   --shadow-xs: var(--shadow-xs);
   --shadow-popover: var(--shadow-popover);
   --shadow-toast: var(--shadow-toast);
-  --shadow-toast-dark: var(--shadow-toast-dark);
   --shadow-lifted: var(--shadow-lifted);
   --shadow-dialog: var(--shadow-dialog);
   --shadow-focus-ring: var(--focus-ring);
@@ -163,6 +154,7 @@
   --leading-code: var(--leading-code);
 
   --ease-standard: var(--ease);
+  --ease-exit: var(--ease-exit);
   --default-transition-timing-function: var(--ease);
   --default-transition-duration: var(--dur);
 }

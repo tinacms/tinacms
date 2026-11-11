@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../../config';
@@ -27,7 +27,9 @@ import { max, min, required } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
 import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
+import { openBlockPicker } from '../../../test/open-block-picker';
 import numberFieldPlugin from '../number/number-field.plugin';
+import objectFieldPlugin from '../object/object-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import arrayFieldPlugin from './array-field.plugin';
 import {
@@ -40,6 +42,7 @@ const NO_COLLECTIONS = { collections: [] };
 const DOCUMENT_PATH = 'content/posts/featured.mdx';
 const PLUGINS = [
   arrayFieldPlugin,
+  objectFieldPlugin,
   stringFieldPlugin,
   numberFieldPlugin,
   coreValidatorsPlugin,
@@ -126,10 +129,25 @@ function SaveProbe() {
 const openItems = async () => {
   await screen.findAllByRole('group');
   for (const head of screen.queryAllByRole('button', { expanded: false })) {
-    if (!/^(Actions for|Move)/.test(head.getAttribute('aria-label') ?? '')) {
+    if (
+      !/^(Actions for|Move|Add a block)/.test(
+        head.getAttribute('aria-label') ?? head.textContent ?? ''
+      )
+    ) {
       await userEvent.click(head);
     }
   }
+};
+
+// A block opens as its own level and hides the list; this returns to the list.
+const backToFields = async () => {
+  const back = screen.queryByRole('button', { name: 'Back to fields' });
+  if (back) await userEvent.click(back);
+};
+
+const openBlock = async (name: RegExp) => {
+  await backToFields();
+  await userEvent.click(await screen.findByRole('button', { name }));
 };
 
 const chooseAction = async (item: number, action: string) => {
@@ -888,15 +906,21 @@ describe('ArrayField templates', () => {
         { _template: 'cta', link: '/docs' },
       ],
     });
-    await openItems();
+    await screen.findAllByRole('group');
+    await userEvent.click(
+      screen.getAllByRole('button', { expanded: false })[0]
+    );
     expect(
       await screen.findByText('Unknown block "gallery"')
     ).toBeInTheDocument();
     expect(screen.getByText(/"images"/)).toBeInTheDocument();
+    await openBlock(/Call to action/);
     expect(
-      (screen.getByRole('textbox', { name: /^Link\b/ }) as HTMLInputElement)
-        .value
-    ).toBe('/docs');
+      (await screen.findByRole('textbox', { name: /^Link\b/ })).getAttribute(
+        'id'
+      )
+    ).toBe('blocks.1.link');
+    await backToFields();
     await chooseAction(1, 'Remove');
     await waitFor(() =>
       expect(pageValueOf('blocks')).toEqual([
@@ -913,7 +937,10 @@ describe('ArrayField templates', () => {
         { _template: 'cta', link: '/docs' },
       ],
     });
-    await openItems();
+    await screen.findAllByRole('group');
+    expect(screen.getByText('Hero')).toBeInTheDocument();
+    expect(screen.getByText('Call to action')).toBeInTheDocument();
+    await openBlock(/Hero/);
     expect(
       (
         (await screen.findByRole('textbox', {
@@ -921,19 +948,22 @@ describe('ArrayField templates', () => {
         })) as HTMLInputElement
       ).value
     ).toBe('Hi');
+    await openBlock(/Call to action/);
     expect(
-      (screen.getByRole('textbox', { name: /^Link\b/ }) as HTMLInputElement)
-        .value
+      (
+        (await screen.findByRole('textbox', {
+          name: /^Link\b/,
+        })) as HTMLInputElement
+      ).value
     ).toBe('/docs');
-    expect(screen.getByText('Hero')).toBeInTheDocument();
-    expect(screen.getByText('Call to action')).toBeInTheDocument();
   });
 
   it('adds an item of the chosen template, seeded from its defaultItem', async () => {
     renderPage({ blocks: [] });
     await openItems();
+    const panel = await openBlockPicker();
     await userEvent.click(
-      await screen.findByRole('button', { name: 'Add Hero' })
+      await within(panel).findByRole('button', { name: 'Add Hero' })
     );
     expect(
       (
@@ -956,8 +986,7 @@ describe('ArrayField templates', () => {
         { _template: 'cta', link: '/docs' },
       ],
     });
-    await openItems();
-    await screen.findByRole('textbox', { name: 'Headline' });
+    await screen.findAllByRole('group');
     await chooseAction(2, 'Move up');
     await waitFor(() =>
       expect(pageValueOf('blocks')).toEqual([
@@ -969,7 +998,8 @@ describe('ArrayField templates', () => {
 
   it('edits a field of a template item and writes it back', async () => {
     renderPage({ blocks: [{ _template: 'cta', link: '/docs' }] });
-    await openItems();
+    await screen.findAllByRole('group');
+    await openBlock(/Call to action/);
     const link = await screen.findByRole('textbox', { name: /^Link\b/ });
     await userEvent.type(link, '/v4');
     await waitFor(() =>
@@ -986,20 +1016,21 @@ describe('ArrayField templates', () => {
         { _template: 'cta', link: '/docs' },
       ],
     });
-    await openItems();
-    await screen.findByRole('textbox', { name: 'Headline' });
+    await screen.findAllByRole('group');
     await chooseAction(1, 'Remove');
     await waitFor(() =>
       expect(pageValueOf('blocks')).toEqual([
         { _template: 'cta', link: '/docs', weight: null },
       ])
     );
+    expect(screen.queryByText('Hero')).not.toBeInTheDocument();
+    await openBlock(/Call to action/);
     expect(
-      screen.queryByRole('textbox', { name: 'Headline' })
-    ).not.toBeInTheDocument();
-    expect(
-      (screen.getByRole('textbox', { name: /^Link\b/ }) as HTMLInputElement)
-        .value
+      (
+        (await screen.findByRole('textbox', {
+          name: /^Link\b/,
+        })) as HTMLInputElement
+      ).value
     ).toBe('/docs');
   });
 
@@ -1050,15 +1081,23 @@ describe('ArrayField templates', () => {
       validateFieldWithCore(blocksNode, registry.get('array'), stored.blocks)
     ).toEqual(['Blocks must be a list of items']);
     renderPage(stored);
-    await openItems();
+    await screen.findAllByRole('group');
+    await userEvent.click(
+      screen.getAllByRole('button', { expanded: false })[0]
+    );
     expect(
       await screen.findByText('Item 1 is not an object')
     ).toBeInTheDocument();
     expect(screen.getByText('"hello"')).toBeInTheDocument();
+    await openBlock(/Call to action/);
     expect(
-      (screen.getByRole('textbox', { name: /^Link\b/ }) as HTMLInputElement)
-        .value
+      (
+        (await screen.findByRole('textbox', {
+          name: /^Link\b/,
+        })) as HTMLInputElement
+      ).value
     ).toBe('/docs');
+    await backToFields();
     await chooseAction(1, 'Remove');
     await waitFor(() =>
       expect(pageValueOf('blocks')).toEqual([
@@ -1234,5 +1273,36 @@ describe('ArrayField of', () => {
         validators: coreValidatorRegistry,
       });
     expect(errors).toEqual({ 'scores.1': ['Score is required'] });
+  });
+});
+
+describe('ArrayField add label', () => {
+  it('takes the words on the Add button from the field', async () => {
+    render(
+      <TinaProvider
+        config={asResolvedConfig({ plugins: PLUGINS, schema: NO_COLLECTIONS })}
+      >
+        <FormProvider
+          collection={{
+            name: 'post',
+            format: 'mdx',
+            fields: [
+              t.array({
+                name: 'notes',
+                label: 'Notes',
+                addLabel: 'Add a note',
+                fields: [t.string({ name: 'text', label: 'Text' })],
+              }),
+            ],
+          }}
+          path={DOCUMENT_PATH}
+        >
+          <LabelledFields />
+        </FormProvider>
+      </TinaProvider>
+    );
+    expect(
+      await screen.findByRole('button', { name: 'Add a note' })
+    ).toBeVisible();
   });
 });

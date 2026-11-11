@@ -24,7 +24,7 @@ export function NumberField() {
       {...frame}
       ref={inputRef}
       id={address}
-      value={value ?? null}
+      value={typeof value === 'string' ? value : null}
       onChange={setValue}
       min={limitOf(field, 'min')}
       max={limitOf(field, 'max')}

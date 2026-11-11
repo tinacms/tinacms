@@ -15,6 +15,7 @@ const tools = [
   { value: 'fields', label: 'Fields' },
   { value: 'history', label: 'History' },
   { value: 'references', label: 'References' },
+  { value: 'translations', label: 'Translations' },
 ] as const;
 
 describe('Tabs', () => {
@@ -46,12 +47,12 @@ describe('Tabs', () => {
     );
     expect(screen.getByText('History panel')).toBeVisible();
     await user.keyboard('{End}');
-    expect(screen.getByRole('tab', { name: 'References' })).toHaveFocus();
+    expect(screen.getByRole('tab', { name: 'Translations' })).toHaveFocus();
     await user.keyboard('{Home}');
     expect(screen.getByRole('tab', { name: 'Fields' })).toHaveFocus();
     expect(onValueChange.mock.calls).toEqual([
       ['history'],
-      ['references'],
+      ['translations'],
       ['fields'],
     ]);
   });
@@ -99,6 +100,42 @@ describe('Tabs, disabled', () => {
 
 describe('Breadcrumb', () => {
   const path = ['Posts', '2026', 'October', 'Launch', 'Hello world'];
+
+  it('folds after `max` steps and links a step with `href`', () => {
+    render(
+      <Breadcrumb
+        max={5}
+        items={path.map((label, index) => ({
+          label,
+          href: index < path.length - 1 ? `/${label}` : undefined,
+        }))}
+      />
+    );
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(within(nav).getByText('2026')).toBeVisible();
+    expect(within(nav).getByRole('link', { name: 'Posts' })).toHaveAttribute(
+      'href',
+      '/Posts'
+    );
+  });
+
+  it('keeps the link of a folded step', async () => {
+    const user = userEvent.setup();
+    render(
+      <Breadcrumb
+        items={path.map((label, index) => ({
+          label,
+          href: index < path.length - 1 ? `/${label}` : undefined,
+        }))}
+      />
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Show 2 more levels' })
+    );
+    expect(
+      await screen.findByRole('menuitem', { name: '2026' })
+    ).toHaveAttribute('href', '/2026');
+  });
 
   it('folds the middle of a long path into a menu', async () => {
     const user = userEvent.setup();
@@ -323,6 +360,34 @@ describe('NavRow', () => {
   });
 });
 
+describe('NavRow, section', () => {
+  it('shows an amber count from 1 and nothing at 0', () => {
+    const { rerender } = render(
+      <NavRow kind='section' count={2} countLabel='2 unsaved'>
+        Changes
+      </NavRow>
+    );
+    expect(
+      screen.getByRole('button', { name: 'Changes 2 unsaved' })
+    ).toHaveTextContent('Changes2');
+    rerender(
+      <NavRow kind='section' count={0}>
+        Changes
+      </NavRow>
+    );
+    expect(screen.getByRole('button', { name: 'Changes' })).toHaveTextContent(
+      /^Changes$/
+    );
+  });
+});
+
+describe('PanelHeader, height', () => {
+  it('is a fixed 44px bar even when the title wraps', () => {
+    const { container } = render(<PanelHeader heading='A long title' />);
+    expect(container.firstElementChild).toHaveClass('h-11');
+  });
+});
+
 describe('PanelHeader', () => {
   it('tabs through back, the action, the menu and close', async () => {
     const user = userEvent.setup();
@@ -397,7 +462,7 @@ describe('Pagination', () => {
   ])('folds a long run of pages around page %i', (page, run) => {
     const { container } = render(<Pagination total={130} page={page} />);
     const shown = [...container.querySelectorAll('li')].map((item) =>
-      item.getAttribute('aria-hidden') ? '…' : item.textContent
+      item.textContent === 'More pages' ? '…' : item.textContent
     );
     expect(shown.slice(1, -1).join(' ')).toBe(run);
   });
@@ -406,7 +471,7 @@ describe('Pagination', () => {
     const user = userEvent.setup();
     const onPageChange = vi.fn();
     render(<Pagination total={48} page={2} onPageChange={onPageChange} />);
-    expect(screen.getByText('Showing 11 to 20 of 48')).toBeVisible();
+    expect(screen.getByText('Showing 11–20 of 48')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Page 2' })).toHaveAttribute(
       'aria-current',
       'page'
@@ -441,6 +506,6 @@ describe('Pagination', () => {
       'aria-disabled',
       'true'
     );
-    expect(screen.getByText('Showing 41 to 48 of 48')).toBeVisible();
+    expect(screen.getByText('Showing 41–48 of 48')).toBeVisible();
   });
 });

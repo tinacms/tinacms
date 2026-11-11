@@ -17,7 +17,7 @@ import { useShallow } from 'zustand/react/shallow';
 import type { FieldWrapperProps } from '@tinacms/ui/components/field-wrapper';
 import type { AuthSlice } from '../core/auth/contract';
 import { authSliceOf, siteAuthTokenOf } from '../core/auth/slice';
-import type { ContentSlice } from '../core/content/contract';
+import { ContentError, type ContentSlice } from '../core/content/contract';
 import type { MediaSlice } from '../core/media/contract';
 import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
@@ -45,13 +45,18 @@ import {
 } from '../rpc/proxy';
 import {
   FieldAddressContext,
+  FieldLockContext,
   FieldSchemaContext,
   type FormScope,
   FormScopeContext,
   type StaleDraftActions,
   TinaRuntimeContext,
 } from './context';
-import { collectFieldErrorMessages, ownFieldErrors } from './field-errors';
+import {
+  collectFieldErrorMessages,
+  type ListChange,
+  ownFieldErrors,
+} from './field-errors';
 import { countRevealedErrors, isRevealed, itemLevel } from './form-view-state';
 
 export function useFieldRegistry(): FieldRegistry {
@@ -194,8 +199,7 @@ export function useDiscardEdits(): () => void {
     .discardEdits;
 }
 
-// Set when the form opened on its document because a stored draft of an older
-// version of it exists; the editor resumes the draft or discards it.
+// Set while a stored copy waits for the editor to Resume or Discard it.
 export function useStaleDraft(): StaleDraftActions | null {
   return useFormScope('stale-draft-outside-provider', 'useStaleDraft')
     .staleDraft;
@@ -276,14 +280,23 @@ async function recordSavePhase(
   formId: FormId,
   run: () => Promise<void>
 ): Promise<void> {
-  const { setSavePhase } = useFormStore.getState();
+  const { setSavePhase, restoreSavePhase, saves } = useFormStore.getState();
+  const previous = saves[formId];
   setSavePhase(formId, { phase: 'saving' });
   try {
     await run();
   } catch (cause) {
+    if (cause instanceof FormValidationError) {
+      restoreSavePhase(formId, previous);
+      throw cause;
+    }
     let message = 'Save failed.';
     if (cause instanceof Error && cause.message) message = cause.message;
-    setSavePhase(formId, { phase: 'failed', message });
+    if (cause instanceof ContentError && cause.code === 'branch-not-found') {
+      setSavePhase(formId, { phase: 'failed', message, reason: 'branch-gone' });
+    } else {
+      setSavePhase(formId, { phase: 'failed', message });
+    }
     throw cause;
   }
   setSavePhase(formId, { phase: 'saved' });
@@ -373,20 +386,24 @@ export function useFieldErrors(address: FieldAddress): string[] {
 export interface FieldFrameOptions {
   /** Show only errors on the field's own address, not those of fields under it. */
   ownErrorsOnly?: boolean;
+  /** Amber messages that do not block Save, such as a reference to a document that is gone. */
+  warnings?: readonly string[];
 }
 
 export function useFieldFrame({
   ownErrorsOnly = false,
+  warnings,
 }: FieldFrameOptions = {}): Pick<
   FieldWrapperProps,
   'label' | 'htmlFor' | 'labelId' | 'required' | 'errors' | 'help' | 'helpId'
-> {
+> & { warnings: string[]; disabled: boolean; readOnly: boolean } {
   const address = useFieldAddress();
   const node = useFieldSchema();
   const { view } = useFormScope(
     'field-frame-outside-provider',
     'useFieldFrame'
   );
+  const lock = use(FieldLockContext);
   const labelable =
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
   const { errors } = useFormState({ name: address });
@@ -407,8 +424,11 @@ export function useFieldFrame({
     labelId: `${address}-label`,
     required: hasValidator(node, 'required'),
     errors: [...shown],
+    warnings: [...(warnings ?? [])],
     help: node.description,
     helpId: node.description ? `${address}-help` : undefined,
+    disabled: lock.disabled,
+    readOnly: lock.readOnly,
   };
 }
 
@@ -447,18 +467,48 @@ export function useInvalidFieldCounts(addresses: readonly string[]): number[] {
   );
 }
 
-/** Opens, reveals and touches the items of a list field by their address. */
+/**
+ * Opens, reveals and touches the items of a list field by their address.
+ * `insert`, `move` and `remove` re-key the error summary, then run `apply`
+ * (the actual list change); a list field uses them for every such change.
+ */
 export function useListItems() {
   const { view } = useFormScope('list-items-outside-provider', 'useListItems');
+  const rekeyThen = (
+    listAddress: string,
+    change: ListChange,
+    apply: () => void
+  ) => {
+    view.getState().rekey(listAddress, change);
+    apply();
+  };
   return {
     openLevel: (
       itemAddress: string,
       label: string,
-      fields: readonly FieldSchema[]
-    ) => view.getState().openLevel(itemLevel(itemAddress, label, fields)),
+      fields: readonly FieldSchema[],
+      block = false
+    ) =>
+      view.getState().openLevel(itemLevel(itemAddress, label, fields, block)),
     isRevealed: (itemAddress: string) =>
       isRevealed(view.getState(), itemAddress),
     touch: (itemAddress: FieldAddress) => view.getState().touch(itemAddress),
+    insert: (listAddress: string, index: number, apply: () => void) =>
+      rekeyThen(listAddress, { insert: index }, apply),
+    move: (listAddress: string, from: number, to: number, apply: () => void) =>
+      rekeyThen(listAddress, { move: [from, to] }, apply),
+    remove: (listAddress: string, index: number, apply: () => void) =>
+      rekeyThen(listAddress, { remove: index }, apply),
+    /** The index of the item of `listAddress` the editor just came back from, once. */
+    takeReturnedIndex: (listAddress: string): number | undefined => {
+      const { returnedFrom, clearReturn } = view.getState();
+      const prefix = `${listAddress}.`;
+      if (!returnedFrom?.startsWith(prefix)) return undefined;
+      const index = Number(returnedFrom.slice(prefix.length));
+      if (!Number.isInteger(index)) return undefined;
+      clearReturn();
+      return index;
+    },
   };
 }
 
@@ -473,6 +523,12 @@ export function useIsOpenLevel(): boolean {
     view,
     (state) => state.openLevels.at(-1)?.address === address
   );
+}
+
+/** The newest Expand all or Collapse all of the form. `version` 0 means none was asked. */
+export function useExpansion() {
+  const { view } = useFormScope('expansion-outside-provider', 'useExpansion');
+  return useStore(view, (state) => state.expansion);
 }
 
 export function useFieldActivation(handler: () => void): void {

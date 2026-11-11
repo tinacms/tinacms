@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { configure } from '@testing-library/dom';
-import { beforeEach } from 'vitest';
+import { toast } from '@tinacms/ui/components/toast';
+import { afterEach, beforeEach } from 'vitest';
 import { resolveClientSegments } from '../core/plugin';
 import { useFormStore } from '../form/form-store';
 import { corePlugins } from '../plugins/fields';
@@ -35,7 +36,21 @@ beforeEach(() => {
     userId: undefined,
     forms: {},
     saves: {},
+    waiting: {},
+    held: {},
+    unstored: {},
+    failures: {},
+    swapFailures: {},
+    hidden: {},
     active: null,
   });
   localStorage.clear();
+  toast.dismiss();
+});
+
+afterEach(async () => {
+  const { flushPendingToastDismissals } = await import(
+    '../admin/document-form'
+  );
+  flushPendingToastDismissals();
 });

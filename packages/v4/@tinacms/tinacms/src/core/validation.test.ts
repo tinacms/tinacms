@@ -217,6 +217,70 @@ describe('validateFieldTree field-level validators', () => {
   });
 });
 
+describe('validateFieldTree on a locked field', () => {
+  const filled: ValidatorFactory = () => (value) => (value ? null : 'Required');
+  const validators: ValidatorRegistry = new Map([['filled', filled]]);
+  const needsValue = [{ name: 'filled' }];
+
+  it.each([
+    ['disabled', { disabled: true }],
+    ['read-only', { readOnly: true }],
+  ])(
+    'does not fail an empty required field that is %s',
+    async (_state, lock) => {
+      const registry = await resolveFieldPlugins(corePlugins);
+      const title = t.string({
+        name: 'title',
+        validators: needsValue,
+        ...lock,
+      });
+      expect(
+        validateFieldTree(
+          title,
+          registry.get('string'),
+          '',
+          'title',
+          registry,
+          {
+            validators,
+          }
+        )
+      ).toEqual({});
+    }
+  );
+
+  it('does not fail an empty required field inside a locked object', async () => {
+    const registry = await resolveFieldPlugins(corePlugins);
+    const seo = t.object({
+      name: 'seo',
+      readOnly: true,
+      fields: [t.string({ name: 'title', validators: needsValue })],
+    });
+    expect(
+      validateFieldTree(
+        seo,
+        registry.get('object'),
+        { title: '' },
+        'seo',
+        registry,
+        {
+          validators,
+        }
+      )
+    ).toEqual({});
+  });
+
+  it('still fails the same field when nothing locks it', async () => {
+    const registry = await resolveFieldPlugins(corePlugins);
+    const title = t.string({ name: 'title', validators: needsValue });
+    expect(
+      validateFieldTree(title, registry.get('string'), '', 'title', registry, {
+        validators,
+      })
+    ).toEqual({ title: ['Required'] });
+  });
+});
+
 describe('addressesWithValidators', () => {
   const ref = { name: 'sameAs', args: ['name'] };
 

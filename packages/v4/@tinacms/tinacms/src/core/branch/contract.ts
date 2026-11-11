@@ -28,8 +28,12 @@ export interface BranchSlice {
   fallback?: string;
   list: string[];
   protected: string[];
+  /** Whether the branch list is being read, read, or failed to read. Absent until the first read starts. */
+  listState?: BranchListState;
   switchTo: (name: string | undefined) => void;
 }
+
+export type BranchListState = 'loading' | 'ready' | 'failed';
 
 const isNames = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((name) => typeof name === 'string');
@@ -51,6 +55,12 @@ export const branchSliceOf = (
     fallback: optionalString(slice.fallback),
     list,
     protected: protectedNames,
+    listState:
+      slice.listState === 'loading' ||
+      slice.listState === 'ready' ||
+      slice.listState === 'failed'
+        ? slice.listState
+        : undefined,
     switchTo: (name) => switchTo(name),
   };
 };

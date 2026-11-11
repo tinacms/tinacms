@@ -477,6 +477,17 @@ describe('MediaBrowser search and type filter', () => {
     expect(await fileTile('clip.mp4')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'logo.png' })).toBeNull();
   });
+
+  it('puts the type filter and kind toggle in a wrapping row', async () => {
+    const provider = createProvider({ features: { extensionFilter: true } });
+    renderBrowser(provider);
+    await fileTile('logo.png');
+    const row = screen
+      .getByRole('combobox', { name: 'File type' })
+      .closest('.ml-auto');
+    expect(row).toHaveClass('flex-wrap');
+    expect(row).toContainElement(screen.getByRole('group', { name: 'Show' }));
+  });
 });
 
 describe('MediaBrowser infinite scroll', () => {

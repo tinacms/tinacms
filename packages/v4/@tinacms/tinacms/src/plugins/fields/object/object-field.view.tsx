@@ -59,8 +59,7 @@ function InPlaceLook(props: LookProps) {
 }
 
 function DrillInLook(props: LookProps) {
-  const { label, name, required, summary, invalidCount, disabled, readOnly } =
-    props;
+  const { label, name, required, summary, invalidCount, disabled } = props;
   return (
     <Frame {...props}>
       <DrillInCard
@@ -69,7 +68,6 @@ function DrillInLook(props: LookProps) {
         summary={summary ?? NOT_SET}
         invalidCount={invalidCount}
         disabled={disabled}
-        readOnly={readOnly}
         onOpen={props.onDrillIn ?? noop}
       />
     </Frame>
@@ -77,15 +75,7 @@ function DrillInLook(props: LookProps) {
 }
 
 function CollapsibleLook(props: LookProps) {
-  const {
-    label,
-    labelId,
-    required,
-    summary,
-    invalidCount,
-    disabled,
-    readOnly,
-  } = props;
+  const { label, labelId, required, summary, invalidCount, disabled } = props;
   return (
     <Frame {...props}>
       <CollapsibleSection
@@ -97,7 +87,6 @@ function CollapsibleLook(props: LookProps) {
         open={props.open ?? false}
         onOpenChange={props.onOpenChange ?? noop}
         disabled={disabled}
-        readOnly={readOnly}
         onHeaderFocus={props.onHeaderFocus}
       >
         <div role='group' aria-labelledby={labelId}>

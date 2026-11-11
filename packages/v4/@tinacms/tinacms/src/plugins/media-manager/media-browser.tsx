@@ -24,6 +24,7 @@ import {
   ViewModeToggle,
 } from './media-filters';
 import { MediaGrid } from './media-grid';
+import { Icon } from '@tinacms/ui/components/icon';
 import {
   CircleAlertIcon,
   ExternalLinkIcon,
@@ -106,7 +107,11 @@ function SetupBanner({
   return (
     <div className='flex h-full items-center justify-center p-6'>
       <div className='flex items-start gap-2 rounded-sm border border-yellow-200 bg-yellow-50 px-4 py-3 text-yellow-800'>
-        <CircleAlertIcon className='mt-0.5 size-5 shrink-0 text-yellow-500' />
+        <Icon
+          glyph={CircleAlertIcon}
+          size={20}
+          className='mt-0.5 text-yellow-500'
+        />
         <div className='flex flex-col items-start gap-2'>
           <p>{status.message}</p>
           <a
@@ -116,7 +121,7 @@ function SetupBanner({
             className={buttonVariants({ variant: 'outline', size: 'sm' })}
           >
             {status.actionLabel}
-            <ExternalLinkIcon className='size-3.5' />
+            <Icon glyph={ExternalLinkIcon} size={14} />
           </a>
         </div>
       </div>
@@ -395,7 +400,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
           <div className='flex flex-wrap items-center gap-2'>
             <Button type='button' variant='outline' onClick={refresh}>
               Refresh
-              <RefreshCwIcon className='size-4' />
+              <Icon glyph={RefreshCwIcon} size={16} />
             </Button>
             <Button
               type='button'
@@ -403,7 +408,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
               onClick={() => setDialog('new-folder')}
             >
               New Folder
-              <FolderPlusIcon className='size-4' />
+              <Icon glyph={FolderPlusIcon} size={16} />
             </Button>
             <MediaUploadButton
               uploading={uploading}
@@ -418,7 +423,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
         {features.search ? (
           <MediaSearchInput value={search} onChange={setSearch} />
         ) : null}
-        <div className='ml-auto flex items-center gap-3'>
+        <div className='ml-auto flex flex-wrap items-center justify-end gap-3'>
           {features.extensionFilter ? (
             pickExtensions.length > 0 ? (
               <LockedAcceptChip

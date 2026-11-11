@@ -203,6 +203,9 @@ describe('nested form levels', () => {
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.tab();
     await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    );
     expect((await screen.findAllByRole('alert')).length).toBeGreaterThan(0);
   });
 
@@ -215,7 +218,15 @@ describe('nested form levels', () => {
       screen.getByRole('navigation', { name: 'Field path' })
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+    );
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Discard',
+      })
+    );
     expect(screen.queryByRole('navigation', { name: 'Field path' })).toBeNull();
     expect(
       await screen.findByRole('button', { name: 'Open Three' })
@@ -447,5 +458,56 @@ describe('a list at level 3', () => {
     expect(
       await screen.findByRole('button', { name: /^Open links/ })
     ).toHaveTextContent('1 item');
+  });
+});
+
+describe('an open level inside a locked field', () => {
+  const lockedCollection: CollectionSchema = {
+    name: 'page',
+    label: 'Pages',
+    format: 'mdx',
+    fields: [
+      t.array({
+        name: 'blocks',
+        label: 'Blocks',
+        readOnly: true,
+        templates: [
+          {
+            name: 'hero',
+            label: 'Hero',
+            fields: [t.string({ name: 'text', label: 'Text' })],
+          },
+        ],
+      }),
+    ],
+  };
+
+  it('keeps the fields of an opened block read-only', async () => {
+    const user = userEvent.setup();
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [
+            objectFieldPlugin,
+            arrayFieldPlugin,
+            stringFieldPlugin,
+            coreValidatorsPlugin,
+          ],
+          schema: { collections: [] },
+        })}
+      >
+        <FormProvider
+          collection={lockedCollection}
+          path='content/pages/locked.mdx'
+          document={{ blocks: [{ _template: 'hero', text: 'first' }] }}
+        >
+          <DocumentForm />
+        </FormProvider>
+      </TinaProvider>
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /^Item 1: Hero/ })
+    );
+    expect(await screen.findByLabelText(/^Text\b/)).toHaveAttribute('readonly');
   });
 });

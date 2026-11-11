@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { ReactNode } from 'react';
+import { type ReactNode, use } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../../config';
 import type { ContentProvider } from '../../../core/content/contract';
@@ -23,6 +23,8 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
+import { FormScopeContext } from '../../../editor/context';
+import type { FormViewStore } from '../../../editor/form-view-state';
 import { FormProvider, TinaProvider, useActiveField } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
@@ -181,6 +183,19 @@ describe('ImageField rendering', () => {
       within(group).getByRole('button', { name: 'Choose from Media' })
     ).toBeVisible();
     expect(within(group).queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('says uploads wait while a save runs', async () => {
+    renderField({});
+    const group = await fieldGroup('Hero');
+    act(() =>
+      useFormStore
+        .getState()
+        .setSavePhase(toFormId(DOCUMENT_PATH), { phase: 'saving' })
+    );
+    expect(
+      within(group).getByText('Saving. You can upload once it finishes.')
+    ).toBeVisible();
   });
 
   it('still offers Choose from Media when the media provider is read-only', async () => {
@@ -369,6 +384,17 @@ describe('ImageField missing images', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
+  it('captions a missing image "File not found", not its name', async () => {
+    renderField({ hero: 'posts/deleted.jpg' });
+    const group = await fieldGroup('Hero');
+    vi.useFakeTimers();
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await failToLoad(group, 'deleted.jpg');
+    }
+    fireEvent.error(within(group).getByAltText('deleted.jpg'));
+    expect(within(group).getByText('File not found')).toBeVisible();
+  });
+
   it('marks a stored path whose image never loads, and keeps it', async () => {
     renderField({ hero: 'posts/deleted.jpg' });
     const group = await fieldGroup('Hero');
@@ -379,7 +405,7 @@ describe('ImageField missing images', () => {
     }
     fireEvent.error(within(group).getByAltText('deleted.jpg'));
     expect(screen.getByRole('status')).toHaveTextContent(
-      'deleted.jpg is missing from Media'
+      'This image is no longer in Media'
     );
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(
@@ -408,7 +434,7 @@ describe('ImageField missing images', () => {
     }
     fireEvent.error(within(group).getByAltText('photo.jpg'));
     expect(screen.getByRole('status')).toHaveTextContent(
-      'photo.jpg is missing from Media'
+      'This image is no longer in Media'
     );
     vi.useRealTimers();
     await pickFromLibrary(group, 'Replace photo.jpg');
@@ -635,6 +661,47 @@ describe('ImageField gallery', () => {
     expect(
       within(group).getByText('Moved three.jpg to position 2 of 3')
     ).toBeInTheDocument();
+  });
+
+  describe('while the error summary lists a tile', () => {
+    let view: FormViewStore | undefined;
+    const Probe = () => {
+      view = use(FormScopeContext)?.view;
+      return null;
+    };
+    const blockedAddresses = () =>
+      view?.getState().errorSummary.blocked.map((entry) => entry.address);
+
+    it('follows a tile that moves', async () => {
+      renderField(
+        { images: ['a/one.jpg', 'b/two.jpg', 'c/three.jpg'] },
+        createMedia(),
+        galleryCollection,
+        <Probe />
+      );
+      const group = await gallery();
+      view?.getState().block(['images.2']);
+      within(group)
+        .getByRole('button', { name: 'Move Image 3: three.jpg' })
+        .focus();
+      await userEvent.keyboard('{ArrowLeft}');
+      expect(blockedAddresses()).toEqual(['images.1']);
+    });
+
+    it('shifts for a removed tile before it', async () => {
+      renderField(
+        { images: ['a/one.jpg', 'b/two.jpg', 'c/three.jpg'] },
+        createMedia(),
+        galleryCollection,
+        <Probe />
+      );
+      const group = await gallery();
+      view?.getState().block(['images.2']);
+      await userEvent.click(
+        within(group).getByRole('button', { name: 'Remove one.jpg' })
+      );
+      expect(blockedAddresses()).toEqual(['images.1']);
+    });
   });
 
   describe('dragging a tile', () => {

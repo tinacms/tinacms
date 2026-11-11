@@ -5,7 +5,7 @@ import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip';
 import { cn } from '@tinacms/ui/lib/utils';
 
 function TooltipProvider({
-  delay = 0,
+  delay = 500,
   ...props
 }: TooltipPrimitive.Provider.Props) {
   return (
@@ -51,8 +51,8 @@ function TooltipContent({
         <TooltipPrimitive.Popup
           data-slot='tooltip-content'
           className={cn(
-            'z-50 inline-flex w-fit max-w-60 origin-(--transform-origin) items-center gap-1.5 rounded-tip bg-inv-bg px-2 py-1.5 text-left font-sans text-xs leading-tip font-medium text-white shadow-popover transition-[opacity,scale] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0',
-            'has-data-[slot=kbd]:pr-1 **:data-[slot=kbd]:text-foreground',
+            'z-50 inline-flex w-fit max-w-60 origin-(--transform-origin) items-center gap-1.5 rounded-tip bg-popover px-2 py-1.5 text-left font-sans text-xs leading-tip font-medium text-popover-foreground inset-ring inset-ring-border shadow-popover transition-[opacity,scale] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0',
+            'has-data-[slot=kbd]:pr-1',
             className
           )}
           {...props}

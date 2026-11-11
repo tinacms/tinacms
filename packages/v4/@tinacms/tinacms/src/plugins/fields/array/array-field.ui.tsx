@@ -1,5 +1,3 @@
-import { AddButton } from '@tinacms/ui/components/add-button';
-import { Button } from '@tinacms/ui/components/button';
 import {
   useEffect,
   useEffectEvent,
@@ -40,6 +38,7 @@ import {
   useInvalidFieldCounts,
   useListItems,
   useMediaSlice,
+  useExpansion,
   useOpenLevel,
 } from '../../../editor';
 import { isMediaPath } from '../image/image-field.schema';
@@ -58,7 +57,13 @@ import {
   itemFieldsOf,
   pickerOf,
 } from './array-field.schema';
+import { centerInScroller } from '../../../utils/center-in-scroller';
 import { seedItem } from './seed-item';
+import {
+  BlockAddView,
+  type BlockOption,
+  InlineBlockPicker,
+} from './block-picker.view';
 import {
   ArrayDrillInView,
   ArrayFieldView,
@@ -163,6 +168,14 @@ function useAfterChange(
 const focusAfterRemove = (index: number, left: number): Pending['focus'] =>
   left === 0 ? 'add' : Math.min(index, left - 1);
 
+interface InsertPicker {
+  /** The card whose menu opened the picker. */
+  openerId: string;
+  where: 'above' | 'below';
+  /** Changes on every open, so reopening remounts the picker. */
+  run: number;
+}
+
 function ObjectItems({
   address,
   field,
@@ -184,7 +197,10 @@ function ObjectItems({
   // Re-renders the headings on typing, so an `itemLabel` follows it.
   useWatch({ control, name: address });
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
-  const [picking, setPicking] = useState<number | null>(null);
+  const [inserting, setInserting] = useState<InsertPicker | null>(null);
+  const [adding, setAdding] = useState(false);
+  const insertRuns = useRef(0);
+  const refocusOpener = useRef<string | null>(null);
   const { listRef, afterChange } = useAfterChange(items, (index) =>
     showItem(index)
   );
@@ -195,15 +211,24 @@ function ObjectItems({
     items.map((_, index) => `${address}.${index}`)
   );
 
+  // A block always opens as its own form level. Any other item opens there from level 3.
+  const opensNextLevel = (itemAddress: string) =>
+    isTemplatesArray(field) || itemOpensNextLevel(itemAddress);
+
   // Opens an item where its depth says: in place, or as the next form level.
   // Returns whether it opened a form level.
   function showItem(index: number): boolean {
     const itemAddress = `${address}.${index}`;
     const stored: unknown = getValues(itemAddress);
     const fields = isItem(stored) ? itemFieldsOf(field, stored) : undefined;
-    if (fields && itemOpensNextLevel(itemAddress)) {
+    if (fields && opensNextLevel(itemAddress)) {
       const heading = itemHeadingOf(field, stored, index);
-      listItems.openLevel(itemAddress, heading, fields);
+      listItems.openLevel(
+        itemAddress,
+        heading,
+        fields,
+        isTemplatesArray(field)
+      );
       // The level replaced the list, so focus moves to its first field.
       const first = fields.find((subfield) => !subfield.hidden);
       if (first) setActive(toFieldAddress(`${itemAddress}.${first.name}`));
@@ -224,6 +249,66 @@ function ObjectItems({
     if (activation) openOnActivation(activation.address);
   }, [activation]);
 
+  // Expand all opens the cards that open in place; an item that opens as a form
+  // level stays closed.
+  const expansion = useExpansion();
+  const applyExpansion = useEffectEvent((openAll: boolean) =>
+    setOpen(
+      new Set(
+        openAll
+          ? items
+              .filter((_, index) => !opensNextLevel(`${address}.${index}`))
+              .map((item) => item.id)
+          : []
+      )
+    )
+  );
+  useEffect(() => {
+    if (expansion.version > 0) applyExpansion(expansion.open);
+  }, [expansion]);
+
+  // The insert picker follows its opener card by id, so a move or remove while it is open cannot shift it.
+  const openerIndex = inserting
+    ? items.findIndex((item) => item.id === inserting.openerId)
+    : -1;
+  const pickAt =
+    inserting && openerIndex >= 0
+      ? openerIndex + (inserting.where === 'below' ? 1 : 0)
+      : null;
+  useEffect(() => {
+    if (inserting && openerIndex < 0) setInserting(null);
+  }, [inserting, openerIndex]);
+
+  // Cancel, Escape and a refused pick return focus to the card whose menu opened the picker.
+  useEffect(() => {
+    const openerId = refocusOpener.current;
+    if (inserting || openerId === null) return;
+    refocusOpener.current = null;
+    const index = items.findIndex((item) => item.id === openerId);
+    const cards = Array.from(listRef.current?.children ?? []).filter((child) =>
+      child.hasAttribute('data-array-item')
+    );
+    const grip = cards[index]?.querySelector('[data-grip]');
+    if (grip instanceof HTMLElement) grip.focus();
+  }, [inserting, items, listRef]);
+
+  // Coming back from an item's form level remounts the list: put focus and the viewport on its card.
+  useEffect(() => {
+    const returned = listItems.takeReturnedIndex(address);
+    if (returned === undefined) return;
+    const cards = Array.from(listRef.current?.children ?? []).filter((child) =>
+      child.hasAttribute('data-array-item')
+    );
+    const card = cards[Math.min(returned, cards.length - 1)];
+    const target = card?.querySelector<HTMLElement>(
+      '[data-grip], [data-slot="list-card-head"] button'
+    );
+    if (card && target) {
+      target.focus({ preventScroll: true });
+      centerInScroller(card);
+    }
+  }, []);
+
   const seed = (defaultItem: TinaDocument | undefined, fields: FieldSchema[]) =>
     seedItem(defaultItem, fields, { documentPath, registry });
   const seedFor = (template?: ArrayTemplateSchema): TinaDocument =>
@@ -242,24 +327,30 @@ function ObjectItems({
     const list: unknown = getValues(address);
     return max !== undefined && Array.isArray(list) && list.length >= max;
   };
+  const cancelInsert = () => {
+    refocusOpener.current = inserting?.openerId ?? null;
+    setInserting(null);
+  };
   const insertAt = (index: number, template?: ArrayTemplateSchema) => {
     if (atMax()) {
-      setPicking(null);
+      cancelInsert();
       return;
     }
+    refocusOpener.current = null;
     afterChange({ open: index, focus: index });
-    insert(index, seedFor(template));
-    setPicking(null);
+    listItems.insert(address, index, () => insert(index, seedFor(template)));
+    setInserting(null);
   };
   const add = (template?: ArrayTemplateSchema) => {
     if (atMax()) return;
     afterChange({ open: items.length, focus: items.length });
     append(seedFor(template));
+    setAdding(false);
   };
   const moveTo = (from: number, to: number) => {
     if (to < 0 || to >= items.length) return;
     afterChange({ focus: to });
-    move(from, to);
+    listItems.move(address, from, to, () => move(from, to));
   };
 
   const views: ArrayItemView[] = items.map((item, index) => {
@@ -286,7 +377,7 @@ function ObjectItems({
     }
 
     const opens =
-      fields && itemOpensNextLevel(itemAddress) ? 'next-level' : 'in-place';
+      fields && opensNextLevel(itemAddress) ? 'next-level' : 'in-place';
     return {
       id: item.id,
       name: `Item ${index + 1}`,
@@ -338,23 +429,39 @@ function ObjectItems({
       items={views}
       full={full}
       add='button'
-      addLabel='Add item'
+      addLabel={field.addLabel ?? 'Add item'}
       onAdd={() => add()}
       addSlot={
-        isTemplatesArray(field) ? (
-          <TemplatePicker field={field} full={full} onPick={add} />
-        ) : undefined
+        isTemplatesArray(field)
+          ? ({ disabled }) => (
+              <TemplatePicker
+                field={field}
+                full={full}
+                disabled={disabled}
+                open={adding}
+                onOpenChange={(next) => {
+                  setAdding(next);
+                  if (next) {
+                    refocusOpener.current = null;
+                    setInserting(null);
+                  }
+                }}
+                onPick={add}
+              />
+            )
+          : undefined
       }
       inserting={
-        picking !== null && isTemplatesArray(field)
+        inserting && pickAt !== null && isTemplatesArray(field)
           ? {
-              index: picking,
+              index: pickAt,
+              openId: inserting.run,
               content: (
                 <TemplatePicker
                   field={field}
-                  full={full}
-                  onPick={(template) => insertAt(picking, template)}
-                  onCancel={() => setPicking(null)}
+                  inline
+                  onPick={(template) => insertAt(pickAt, template)}
+                  onCancel={cancelInsert}
                 />
               ),
             }
@@ -362,82 +469,84 @@ function ObjectItems({
       }
       onMove={moveTo}
       onInsert={(index, where) => {
-        const at = insertTarget(index, where);
-        if (isTemplatesArray(field)) setPicking(at);
-        else insertAt(at);
+        if (isTemplatesArray(field)) {
+          const openerId = items[index]?.id;
+          if (!openerId) return;
+          setAdding(false);
+          refocusOpener.current = null;
+          insertRuns.current += 1;
+          setInserting({ openerId, where, run: insertRuns.current });
+        } else insertAt(insertTarget(index, where));
       }}
       onDuplicate={(index) => {
         if (atMax()) return;
         afterChange({ open: index + 1, focus: index + 1 });
-        insert(index + 1, structuredClone(getValues(`${address}.${index}`)));
+        listItems.insert(address, index + 1, () =>
+          insert(index + 1, structuredClone(getValues(`${address}.${index}`)))
+        );
       }}
       onRemove={(index) => {
         afterChange({ focus: focusAfterRemove(index, items.length - 1) });
-        remove(index);
+        listItems.remove(address, index, () => remove(index));
       }}
     />
   );
 }
 
+interface TemplatePickerProps {
+  field: TemplatesArrayFieldSchema;
+  onPick: (template: ArrayTemplateSchema) => void;
+  full?: boolean;
+  disabled?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Draw the picker in the list at the insertion point, not as a panel. */
+  inline?: boolean;
+  onCancel?: () => void;
+}
+
 function TemplatePicker({
   field,
-  full = false,
   onPick,
+  full = false,
+  disabled,
+  open,
+  onOpenChange,
+  inline,
   onCancel,
-}: {
-  field: TemplatesArrayFieldSchema;
-  full?: boolean;
-  onPick: (template: ArrayTemplateSchema) => void;
-  onCancel?: () => void;
-}) {
-  const cancel = onCancel ? (
-    <Button type='button' variant='outline' size='sm' onClick={onCancel}>
-      Cancel
-    </Button>
-  ) : null;
-  const reason = full ? (
-    <p className='px-1 text-sm text-muted-foreground'>{FULL_REASON}</p>
-  ) : null;
-  if (pickerOf(field) === 'list') {
-    return (
-      <div data-add-picker='' className='flex flex-col gap-1'>
-        {field.templates.map((template) => (
-          <AddButton
-            key={template.name}
-            disabled={full}
-            onClick={() => onPick(template)}
-          >
-            {`Add ${templateTitle(template)}`}
-          </AddButton>
-        ))}
-        {reason}
-        {cancel}
-      </div>
-    );
-  }
-  return (
-    <div data-add-picker='' className='flex flex-col gap-2'>
-      <div className='grid w-full grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2'>
-        {field.templates.map((template) => (
-          <button
-            key={template.name}
-            type='button'
-            data-slot='add-button'
-            disabled={full}
-            aria-label={`Add ${templateTitle(template)}`}
-            className='flex flex-col gap-2 rounded-sm border bg-card p-2 text-left text-sm hover:border-input focus-visible:shadow-focus-ring disabled:opacity-60'
-            onClick={() => onPick(template)}
-          >
-            {template.previewImage ? (
-              <PreviewImage path={template.previewImage} />
-            ) : null}
-            <span className='font-medium'>{templateTitle(template)}</span>
-          </button>
-        ))}
-      </div>
-      {reason}
-      {cancel}
-    </div>
+}: TemplatePickerProps) {
+  const look = pickerOf(field);
+  const options: BlockOption[] = field.templates.map((template) => ({
+    name: template.name,
+    label: templateTitle(template),
+    group: template.group,
+    description: template.description,
+    preview: template.previewImage ? (
+      <PreviewImage path={template.previewImage} />
+    ) : undefined,
+  }));
+  const pick = (name: string) => {
+    const template = field.templates.find((entry) => entry.name === name);
+    if (template) onPick(template);
+  };
+  return inline ? (
+    <InlineBlockPicker
+      options={options}
+      look={look}
+      onPick={pick}
+      onCancel={() => onCancel?.()}
+    />
+  ) : (
+    <BlockAddView
+      options={options}
+      look={look}
+      onPick={pick}
+      disabled={disabled}
+      reason={full ? FULL_REASON : undefined}
+      addLabel={field.addLabel}
+      open={open}
+      onOpenChange={onOpenChange}
+    />
   );
 }
 
@@ -516,12 +625,14 @@ function ScalarItems({
     next.splice(to, 0, ...next.splice(from, 1));
     keys.current.splice(to, 0, ...keys.current.splice(from, 1));
     afterChange({ focus: to });
-    setList(next);
+    listItems.move(address, from, to, () => setList(next));
   };
   const remove = (index: number) => {
     keys.current = keys.current.filter((_, position) => position !== index);
     afterChange({ focus: focusAfterRemove(index, items.length - 1) });
-    setList(liveItems().filter((_, position) => position !== index));
+    listItems.remove(address, index, () =>
+      setList(liveItems().filter((_, position) => position !== index))
+    );
   };
   const atMax = () => max !== undefined && liveItems().length >= max;
   const insertValue = (index: number, entry: unknown) => {
@@ -530,7 +641,7 @@ function ScalarItems({
     const next = [...liveItems()];
     next.splice(index, 0, entry);
     afterChange({ focus: index });
-    setList(next);
+    listItems.insert(address, index, () => setList(next));
   };
   // `defaultItem`, then `of.defaultValue`, then the item type's own default.
   const seedScalar = (): unknown => {
@@ -589,7 +700,7 @@ function ScalarItems({
       full={full}
       add={typed ? 'input' : 'button'}
       addInputType={box?.type ?? 'text'}
-      addLabel='Add item'
+      addLabel={field.addLabel ?? 'Add item'}
       onAdd={(text) => {
         if (atMax()) return;
         const entry = text === undefined ? seedScalar() : text;

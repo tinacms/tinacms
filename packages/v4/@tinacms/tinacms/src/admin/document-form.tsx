@@ -1,131 +1,342 @@
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
-import { toast } from '@tinacms/ui/components/toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuNote,
+  DropdownMenuTrigger,
+} from '@tinacms/ui/components/dropdown-menu';
+import { tinaResolveLabel } from '@tinacms/ui/components/error-summary-pane';
 import { FormLevel } from '@tinacms/ui/components/form-level';
+import { toast } from '@tinacms/ui/components/toast';
 import {
   type ReactNode,
   use,
   useEffect,
   useEffectEvent,
+  useRef,
   useState,
 } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useStore } from 'zustand';
-import { type FormScope, FormScopeContext } from '../editor/context';
+import {
+  FieldLockContext,
+  type FormScope,
+  FormScopeContext,
+} from '../editor/context';
 import { Field, FieldNode } from '../editor/field';
 import {
   fieldsAlong,
   holdsRevealedError,
   levelDrillsIn,
   levelsFor,
+  lockAbove,
   type OpenLevel,
 } from '../editor/form-view-state';
 import {
+  FormValidationError,
   useDiscardEdits,
   useFieldRegistry,
   useFormId,
   useFormSave,
-  useSaveFailure,
   useStaleDraft,
 } from '../editor/hooks';
 import {
   useFormErrors,
   useFormStore,
+  useFormValues,
   useIsFormDirty,
 } from '../form/form-store';
-import { countFailingFields } from '../editor/field-errors';
+import type { TinaDocument } from '../core/schema/types';
+import type { StoredDraft } from '../form/drafts';
+import { DiscardConfirm } from './discard-confirm';
 import { DocumentStatus } from './document-status';
+import { ErrorSuccessBubble, useErrorSummary } from './error-summary';
+import { saveFailureWords } from './save-failure';
+import { leftoverText } from './leftover-text';
+import { useNarrow } from './use-narrow';
+
+const toastOwners = new Map<string, number>();
+const liveRetries = new Map<string, () => void>();
+const TOAST_REMOUNT_GRACE_MS = 400;
+
+const dismissTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+const clearDismissTimer = (toastId: string) => {
+  clearTimeout(dismissTimers.get(toastId));
+  dismissTimers.delete(toastId);
+};
+
+const dismissNowIfUnowned = (toastId: string) => {
+  clearDismissTimer(toastId);
+  if (!toastOwners.get(toastId)) toast.dismiss(toastId);
+};
+
+const dismissIfUnowned = (toastId: string) => {
+  clearDismissTimer(toastId);
+  dismissTimers.set(
+    toastId,
+    setTimeout(() => dismissNowIfUnowned(toastId), TOAST_REMOUNT_GRACE_MS)
+  );
+};
+
+export function flushPendingToastDismissals() {
+  for (const toastId of [...dismissTimers.keys()]) dismissNowIfUnowned(toastId);
+}
+
+// Removes the toast once no form owns it. The form unmounts while a save reloads
+// its document; one that comes back soon keeps the toast, because Sonner drops a
+// toast that is dismissed and shown again under one id.
+function useToastOwner(toastId: string, present: boolean) {
+  useEffect(() => {
+    if (!present) return;
+    clearDismissTimer(toastId);
+    toastOwners.set(toastId, (toastOwners.get(toastId) ?? 0) + 1);
+    return () => {
+      toastOwners.set(toastId, (toastOwners.get(toastId) ?? 1) - 1);
+      dismissIfUnowned(toastId);
+    };
+  }, [present, toastId]);
+}
 
 function SaveButton() {
   const formId = useFormId();
   const dirty = useIsFormDirty(formId);
   const save = useFormSave();
-  const [failure, setFailure] = useSaveFailure();
-  const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
+  const summary = useErrorSummary();
   const [pending, setPending] = useState(false);
-  return (
-    <div className='flex flex-col items-start gap-2'>
-      <Button
-        variant='primary'
-        type='button'
-        disabled={!dirty && !pending}
-        busy={pending}
-        count={errorCount}
-        srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
-        onClick={() => {
-          setFailure(null);
-          setPending(true);
-          save()
-            .catch((cause) => {
-              console.error('[tinacms] Save failed:', cause);
-              let message = 'Save failed.';
-              if (cause instanceof Error && cause.message) {
-                message = cause.message;
+  const failedToastId = `save-failed:${formId}`;
+  useToastOwner(failedToastId, true);
+  const retry = useEffectEvent(() => run());
+  useEffect(() => {
+    const live = () => retry();
+    liveRetries.set(failedToastId, live);
+    return () => {
+      if (liveRetries.get(failedToastId) === live) {
+        liveRetries.delete(failedToastId);
+      }
+    };
+  }, [failedToastId]);
+  const run = useEffectEvent(() => {
+    setPending(true);
+    save()
+      .then(() => toast.dismiss(failedToastId))
+      .catch((cause) => {
+        if (cause instanceof FormValidationError && summary.block()) {
+          toast.dismiss(failedToastId);
+          return;
+        }
+        // The raw reason is for the console. The editor reads fixed words.
+        console.error('[tinacms] Save failed:', cause);
+        const { title, text, disk } = saveFailureWords(cause);
+        toast({
+          id: failedToastId,
+          tone: 'error',
+          title,
+          text,
+          dismissible: !disk,
+          action: {
+            label: 'Retry',
+            onClick: () => {
+              const live = liveRetries.get(failedToastId);
+              if (live) live();
+              else toast.dismiss(failedToastId);
+            },
+          },
+          secondaryAction: disk
+            ? {
+                label: 'Dismiss',
+                onClick: () => toast.dismiss(failedToastId),
               }
-              setFailure(message);
-              toast({ tone: 'error', title: 'Save failed', text: message });
-            })
-            .finally(() => setPending(false));
-        }}
-      >
-        Save
-      </Button>
-      {failure ? (
-        <p role='alert' className='text-sm text-destructive'>
-          {failure}
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-function DiscardButton() {
-  const dirty = useIsFormDirty(useFormId());
-  const discard = useDiscardEdits();
+            : undefined,
+        });
+        dismissIfUnowned(failedToastId);
+      })
+      .finally(() => setPending(false));
+  });
+  const { blocked } = summary;
   return (
     <Button
+      variant='primary'
       type='button'
-      variant='destructive'
-      disabled={!dirty}
-      onClick={discard}
+      data-resolve=''
+      className='min-w-40 shrink-0'
+      icon={blocked ? 'error' : undefined}
+      aria-expanded={blocked ? summary.paneOpen : undefined}
+      aria-controls={blocked ? 'error-pane' : undefined}
+      disabled={!(blocked || dirty || pending)}
+      busy={pending}
+      onClick={blocked ? summary.resolve : run}
     >
-      Discard
+      {blocked ? tinaResolveLabel(summary.count) : 'Save'}
     </Button>
   );
 }
 
-// A modal, so no keystroke can overwrite the stored draft before the editor
-// decides what happens to it.
-function StaleDraftDialog() {
-  const stale = useStaleDraft();
+// The Unsaved tag, the Document actions menu and Save, fixed at the foot of the form.
+function FormBar() {
+  const formId = useFormId();
+  const dirty = useIsFormDirty(formId);
+  const discard = useDiscardEdits();
+  const values = useFormValues(formId);
+  const scope = use(FormScopeContext);
+  const [confirming, setConfirming] = useState(false);
+  // Read when the confirm opens, so typing in the title does not change it.
+  const [documentName, setDocumentName] = useState('');
+  const menuButton = useRef<HTMLButtonElement>(null);
   return (
-    <AlertDialog open={stale !== null}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Resume your unsaved edits?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This document changed after you made these edits. Resume them on top
-            of the current version, or discard them.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <Button type='button' variant='destructive' onClick={stale?.discard}>
-            Discard draft
-          </Button>
-          <Button variant='primary' type='button' onClick={stale?.resume}>
-            Resume edits
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <div
+      data-slot='form-bar'
+      className='relative flex h-14 flex-none items-center gap-2 border-t border-border bg-card px-3'
+    >
+      <ErrorSuccessBubble />
+      <div className='min-w-0 flex-1'>
+        <DocumentStatus />
+      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              ref={menuButton}
+              variant='icon'
+              size='sm'
+              icon='more'
+              aria-label='Document actions'
+            />
+          }
+        />
+        <DropdownMenuContent
+          side='top'
+          align='end'
+          aria-label='Document actions'
+        >
+          <DropdownMenuItem
+            variant='destructive'
+            disabled={!dirty}
+            onClick={() => {
+              setDocumentName(documentTitle(values, scope?.path ?? ''));
+              setConfirming(true);
+            }}
+          >
+            Discard unsaved edits
+          </DropdownMenuItem>
+          <DropdownMenuNote>More document actions come later.</DropdownMenuNote>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <SaveButton />
+      <DiscardConfirm
+        open={confirming}
+        onOpenChange={setConfirming}
+        onConfirm={discard}
+        returnFocusTo={menuButton}
+        title={`Discard unsaved edits to “${documentName}”?`}
+      />
+    </div>
   );
+}
+
+const RESUME_TEXT = {
+  kept: 'Kept in this browser since your last visit.',
+  changed: 'The document changed since. Resume puts your edits on top.',
+} as const;
+
+const documentTitle = (values: TinaDocument | undefined, path: string) => {
+  const named = values?.title;
+  if (typeof named === 'string' && named.trim() !== '') return named;
+  return path.split('/').at(-1) ?? path;
+};
+
+// The prompt is a bottom-right toast, so the form stays editable behind it. One
+// toast per document: its id holds the path, and leaving the document removes it.
+function ResumeDraftToast({ scope }: { scope: FormScope }) {
+  const stale = useStaleDraft();
+  const values = useFormValues(scope.formId);
+  const narrow = useNarrow();
+  const [confirming, setConfirming] = useState(false);
+  const discardButton = useRef<HTMLElement | null>(null);
+  // The copies on screen when the confirm opened. Only these go on Confirm.
+  const shown = useRef<readonly StoredDraft[]>([]);
+  const cause = stale?.cause;
+  const fields = stale?.leftoverFields.join(', ');
+  const fieldCount = stale?.leftoverFields.length ?? 0;
+  // `stale` is a new object whenever the form changes. The toast must not show
+  // again for that, so the effect keys on what the toast says, and the buttons
+  // read the latest actions. While the confirm is open the buttons do nothing.
+  const resume = useEffectEvent(() => {
+    if (!confirming) stale?.resume();
+  });
+  const askToDiscard = useEffectEvent(() => {
+    if (confirming) return;
+    discardButton.current = document.activeElement as HTMLElement | null;
+    shown.current = stale?.copies ?? [];
+    setConfirming(true);
+  });
+  const toastId = `resume-draft:${scope.path}`;
+  useEffect(() => {
+    if (!cause) {
+      toast.dismiss(toastId);
+      return;
+    }
+    toast({
+      id: toastId,
+      tone: 'warning',
+      actionsInline: !narrow,
+      title: 'Resume your unsaved edits?',
+      text:
+        cause === 'leftover'
+          ? leftoverText(fields ?? '', fieldCount)
+          : RESUME_TEXT[cause],
+      dismissible: false,
+      duration: Number.POSITIVE_INFINITY,
+      action: { label: 'Resume', onClick: resume },
+      secondaryAction: {
+        label: 'Discard',
+        destructive: true,
+        onClick: askToDiscard,
+      },
+    });
+  }, [cause, fields, fieldCount, toastId, narrow]);
+  // A change of wording replaces the toast in place; only an empty list or a
+  // different document takes it away.
+  useToastOwner(toastId, cause !== undefined);
+  return (
+    <DiscardConfirm
+      open={confirming}
+      onOpenChange={setConfirming}
+      onConfirm={() => stale?.discard(shown.current)}
+      returnFocusTo={discardButton}
+      title={`Discard earlier unsaved edits to “${documentTitle(values, scope.path)}”?`}
+      description='Discarded edits can’t be brought back. What you typed since stays.'
+    />
+  );
+}
+
+// Edits that cannot be written to storage are not kept. The warning stays until
+// dismissed and shows once per document in a session.
+const warnedStorage = new Set<string>();
+function StorageWarning({ scope }: { scope: FormScope }) {
+  const failures = useFormStore((state) => state.failures[scope.formId]);
+  const swapFailures = useFormStore(
+    (state) => state.swapFailures[scope.formId]
+  );
+  const lastSwap = useRef(swapFailures);
+  useEffect(() => {
+    // A swap that did nothing warns every time, so Resume never looks dead.
+    const swapped = swapFailures !== lastSwap.current;
+    lastSwap.current = swapFailures;
+    if (!failures) return;
+    if (warnedStorage.has(scope.path) && !swapped) return;
+    warnedStorage.add(scope.path);
+    toast({
+      id: `storage-warning:${scope.path}`,
+      tone: 'warning',
+      title: 'Edits can’t be stored in this browser',
+      text: 'The browser’s storage is full or blocked. Free space, then reload.',
+      dismissible: true,
+      duration: Number.POSITIVE_INFINITY,
+    });
+  }, [failures, swapFailures, scope.path]);
+  return null;
 }
 
 function ActiveFieldLevels({ scope }: { scope: FormScope }) {
@@ -204,6 +415,7 @@ function OpenLevelFrame({
 
 function FormFields({ scope }: { scope: FormScope }) {
   const current = useStore(scope.view, (state) => state.openLevels.at(-1));
+  const { getValues } = useFormContext();
   if (!current) {
     return (
       <FormLevel pinHeaders>
@@ -215,7 +427,11 @@ function FormFields({ scope }: { scope: FormScope }) {
   }
   return (
     <OpenLevelFrame scope={scope} current={current}>
-      <FieldNode address={current.address} node={current.node} />
+      <FieldLockContext
+        value={lockAbove(current.address, scope.collection.fields, getValues)}
+      >
+        <FieldNode address={current.address} node={current.node} />
+      </FieldLockContext>
     </OpenLevelFrame>
   );
 }
@@ -226,19 +442,13 @@ export function DocumentForm() {
 
   return (
     <>
-      <header className='mb-4 flex items-center justify-between gap-2'>
-        <h2 className='truncate text-sm font-semibold' title={scope.path}>
-          {scope.path.split('/').at(-1)}
-        </h2>
-        <DocumentStatus />
-      </header>
-      <StaleDraftDialog />
+      <ResumeDraftToast scope={scope} />
+      <StorageWarning scope={scope} />
       <ActiveFieldLevels scope={scope} />
-      <FormFields scope={scope} />
-      <div className='flex items-start gap-2'>
-        <SaveButton />
-        <DiscardButton />
+      <div className='min-h-0 flex-1 overflow-y-auto'>
+        <FormFields scope={scope} />
       </div>
+      <FormBar />
     </>
   );
 }

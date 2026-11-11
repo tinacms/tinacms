@@ -56,8 +56,8 @@ catalog:
     "@graphql-codegen/typescript": ^6.1.0
     "@graphql-codegen/typescript-operations": ^6.1.0
     "@graphql-codegen/visitor-plugin-common": ^7.2.0
-    "@graphql-tools/graphql-file-loader": ^7.5.17
-    "@graphql-tools/load": ^7.8.14
+    "@graphql-tools/graphql-file-loader": ^8.1.24
+    "@graphql-tools/load": ^8.1.21
     "@headlessui/react": 2.2.10
     "@iarna/toml": ^2.2.5
     "@monaco-editor/loader": ^1.7.0
