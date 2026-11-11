@@ -880,3 +880,211 @@ describe('Recent documents panel', () => {
     ).toBeNull();
   });
 });
+
+describe('Branch panel', () => {
+  beforeEach(() => {
+    world.mode = 'branches';
+    world.summaries['feature/news'] = {
+      post: [{ path: 'content/posts/breaking.mdx', updatedAt: ago(HOUR) }],
+    };
+  });
+
+  it('shows the default branch and Protected, and leaves the head as just Home', async () => {
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(await within(branch).findByText('main')).toBeVisible();
+    expect(within(branch).getByText('Protected')).toBeVisible();
+    expect(
+      within(branch).queryByRole('button', { name: /^Review/ })
+    ).toBeNull();
+    expect(within(branch).queryByText(/not saved yet/)).toBeNull();
+    const main = screen.getByRole('main');
+    expect(within(main).getByRole('heading', { name: 'Home' })).toBeVisible();
+    expect(within(main).queryByText(/^Local files/)).toBeNull();
+    expect(
+      await within(await panel('Recent documents')).findByText(
+        'Not available on this setup'
+      )
+    ).toBeVisible();
+  });
+
+  it('shows a chosen branch with no Protected line when it is not protected', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+    await user.click(await screen.findByText('feature/news'));
+    const branch = await panel('Branch');
+    expect(await within(branch).findByText('feature/news')).toBeVisible();
+    expect(within(branch).queryByText('Protected')).toBeNull();
+  });
+
+  it('holds Review N unsaved, and the head does not', async () => {
+    keepDraft('content/posts/hello.mdx');
+    keepDraft('content/posts/second.mdx');
+    const user = userEvent.setup();
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(
+      await within(branch).findByText('2 documents not saved yet')
+    ).toBeVisible();
+    expect(screen.getAllByRole('button', { name: /^Review/ })).toHaveLength(1);
+    await user.click(
+      within(branch).getByRole('button', { name: 'Review 2 unsaved' })
+    );
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/collections?unsaved')
+    );
+  });
+
+  it('says 1 document not saved yet for one', async () => {
+    keepDraft('content/posts/hello.mdx');
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(
+      await within(branch).findByText('1 document not saved yet')
+    ).toBeVisible();
+    expect(
+      within(branch).getByRole('button', { name: 'Review 1 unsaved' })
+    ).toBeVisible();
+  });
+
+  it('holds placeholder rows while the branch list is read', async () => {
+    let release: (branches: BranchInfo[]) => void = () => {};
+    world.listBranches = () =>
+      new Promise((resolve) => {
+        release = resolve;
+      });
+    renderAdmin();
+    const branch = await panel('Branch');
+    const sheet = branch.querySelector('[data-slot=home-panel-sheet]');
+    expect(sheet).toHaveAttribute('aria-busy', 'true');
+    expect(within(branch).queryByText('main')).toBeNull();
+    release(world.branches);
+    expect(await within(branch).findByText('main')).toBeVisible();
+    expect(sheet).not.toHaveAttribute('aria-busy');
+  });
+
+  it('says it could not load when the branch list fails, leaves the other panels alone, and Retry reads it again', async () => {
+    consoleGuard.expect(/could not list branches/);
+    let offline = true;
+    let reads = 0;
+    world.listBranches = async () => {
+      reads += 1;
+      if (offline) throw new Error('offline');
+      return world.branches;
+    };
+    const user = userEvent.setup();
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(
+      await within(branch).findByText("Couldn't load this branch.")
+    ).toBeVisible();
+    expect(
+      await within(await panel(/^Collections/)).findByText('2 documents')
+    ).toBeVisible();
+
+    await user.click(within(branch).getByRole('button', { name: 'Retry' }));
+    expect(
+      await within(branch).findByText("Couldn't load this branch.")
+    ).toBeVisible();
+    expect(reads).toBe(2);
+
+    offline = false;
+    await user.click(within(branch).getByRole('button', { name: 'Retry' }));
+    expect(await within(branch).findByText('main')).toBeVisible();
+    expect(within(branch).queryByText("Couldn't load this branch.")).toBeNull();
+    await waitFor(() => expect(branch).toHaveFocus());
+  });
+
+  it('puts Recent documents then Branch in the side column on a desktop', async () => {
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(panelTitles()).toEqual([
+      expect.stringMatching(/^Collections/),
+      'Recent documents',
+      'Branch',
+    ]);
+    expect(columnOf(branch)).toBe('side');
+    expect(columnOf(await panel('Recent documents'))).toBe('side');
+  });
+
+  it.each([
+    ['tablet', 1024],
+    ['phone', 390],
+  ])('starts the one column at Branch on a %s', async (_tier, width) => {
+    setWidth(width);
+    renderAdmin();
+    await panel('Branch');
+    expect(panelTitles()).toEqual([
+      'Branch',
+      'Recent documents',
+      expect.stringMatching(/^Collections/),
+    ]);
+  });
+
+  it("shows the new branch's documents and unsaved count after a switch", async () => {
+    world.summaries.main = {
+      post: [{ path: 'content/posts/hello.mdx', updatedAt: ago(DAY) }],
+    };
+    localStorage.setItem(
+      draftKey(
+        toFormId('content/posts/breaking.mdx'),
+        undefined,
+        'feature/news'
+      ),
+      JSON.stringify({
+        version: 2,
+        values: { title: 'Kept' },
+        baseline: { title: 'content/posts/breaking.mdx' },
+      })
+    );
+    const user = userEvent.setup();
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    expect(
+      await within(recent).findByRole('button', { name: /^hello/ })
+    ).toBeVisible();
+    expect(screen.queryByRole('button', { name: /^Review/ })).toBeNull();
+
+    await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+    await user.click(await screen.findByText('feature/news'));
+
+    expect(
+      await within(recent).findByRole('button', { name: /^breaking/ })
+    ).toBeVisible();
+    expect(recentRows(recent)).toEqual(['breakingUnsaved']);
+    expect(
+      await within(await panel('Branch')).findByRole('button', {
+        name: 'Review 1 unsaved',
+      })
+    ).toBeVisible();
+  });
+
+  it('says Nothing edited on this branch yet. when the branch has no documents', async () => {
+    world.summaries = {};
+    renderAdmin();
+    expect(
+      await within(await panel('Recent documents')).findByText(
+        'Nothing edited on this branch yet.'
+      )
+    ).toBeVisible();
+  });
+});
+
+describe('Home in local files', () => {
+  it.each([
+    ['desktop', 1440],
+    ['tablet', 1024],
+    ['phone', 390],
+  ])('has no Branch panel on a %s', async (_tier, width) => {
+    setWidth(width);
+    renderAdmin();
+    await panel('Recent documents');
+    expect(panelTitles()).toEqual(
+      width >= 1280
+        ? [expect.stringMatching(/^Collections/), 'Recent documents']
+        : ['Recent documents', expect.stringMatching(/^Collections/)]
+    );
+    expect(screen.queryByText('Branch')).toBeNull();
+  });
+});

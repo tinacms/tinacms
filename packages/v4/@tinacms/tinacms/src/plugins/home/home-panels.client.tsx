@@ -1,4 +1,5 @@
 import { defineClientPlugin } from '../../client';
+import { BranchPanel } from './branch-panel';
 import { CollectionsPanel } from './collections-panel';
 import { RecentDocumentsPanel } from './recent-documents-panel';
 
@@ -18,6 +19,13 @@ export default defineClientPlugin({
         column: 'side',
         order: 10,
         narrowOrder: 20,
+      },
+      {
+        id: 'branch',
+        component: BranchPanel,
+        column: 'side',
+        order: 20,
+        narrowOrder: 10,
       },
     ],
   },
