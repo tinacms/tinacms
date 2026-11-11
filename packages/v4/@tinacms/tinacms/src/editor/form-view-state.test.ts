@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import type { FieldSchema } from '../core/schema/types';
+import { toFieldAddress } from '../core/field/address';
 import { toFormId } from '../form/form-store';
 import { t } from '../index';
 import {
@@ -199,8 +200,8 @@ describe('useFormViewStore', () => {
 
   it('shifts touched addresses when an item is removed', () => {
     const { result } = renderHook(() => useFormViewStore(toFormId('form-1')));
-    result.current.getState().touch('authors.0.name');
-    result.current.getState().touch('authors.2.name');
+    result.current.getState().touch(toFieldAddress('authors.0.name'));
+    result.current.getState().touch(toFieldAddress('authors.2.name'));
     result.current.getState().removeListItem('authors', 0);
     expect(result.current.getState().touched.has('authors.0.name')).toBe(false);
     expect(result.current.getState().touched.has('authors.1.name')).toBe(true);
@@ -208,7 +209,7 @@ describe('useFormViewStore', () => {
 
   it('shifts touched addresses when an item is moved', () => {
     const { result } = renderHook(() => useFormViewStore(toFormId('form-2')));
-    result.current.getState().touch('authors.0.name');
+    result.current.getState().touch(toFieldAddress('authors.0.name'));
     result.current.getState().moveListItem('authors', 0, 2);
     expect(result.current.getState().touched.has('authors.0.name')).toBe(false);
     expect(result.current.getState().touched.has('authors.2.name')).toBe(true);
