@@ -19,6 +19,13 @@ import {
   isSearchErrorCode,
 } from '../../core/search/contract';
 import { defineSearchPlugin, searchIndex } from './search.plugin';
+import { codecFor } from '../fields/rich-text/rich-text-codecs';
+
+vi.mock('../fields/rich-text/rich-text-codecs', async (importActual) => {
+  const actual =
+    await importActual<typeof import('../fields/rich-text/rich-text-codecs')>();
+  return { ...actual, codecFor: vi.fn(actual.codecFor) };
+});
 
 const sessions: Record<string, Session> = {
   'admin-token': { identity: { id: toUserId('ada') }, roles: ['admin'] },
@@ -130,7 +137,7 @@ const record = (
   weight = 3
 ): SearchRecord => ({
   ref: { collection, path },
-  fields: [{ name: 'title', weight, text: title }],
+  fields: [{ name: 'title', weight, value: title }],
 });
 
 const seed = () =>
@@ -443,29 +450,18 @@ describe('save-time indexing', () => {
       )
     );
 
-  it('upserts one record when an editor saves to the default branch', async () => {
+  it('upserts one record with the saved values when an editor saves to the default branch', async () => {
     const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
     const content = contentPlugin();
-    const handler = handlerWith(content);
-    const response = await save(handler, {
+    const body = [
+      'Intro',
+      '<Callout>Read this</Callout>',
+      '<Note label="hidden" />',
+      'Some <b>bold html</b> &amp; more',
+    ].join('\n\n');
+    const response = await save(handlerWith(content), {
       branch: 'main',
-      value: {
-        title: 'Hello',
-        excerpt: '',
-        body: {
-          type: 'root',
-          children: [
-            { type: 'p', children: [{ text: 'First ' }, { text: 'block' }] },
-            {
-              type: 'mdxJsxFlowElement',
-              name: 'Cta',
-              props: { label: 'hidden prop' },
-              children: [{ text: '' }],
-            },
-            { type: 'p', children: [{ text: 'Second' }] },
-          ],
-        },
-      },
+      value: { title: 'Hello', excerpt: '', body },
     });
 
     expect((await response.json()).hookWarnings).toEqual([]);
@@ -474,164 +470,70 @@ describe('save-time indexing', () => {
     expect(record).toEqual({
       ref: { collection: 'post', path: 'content/posts/a.mdx' },
       fields: [
-        { name: 'title', weight: 3, text: 'Hello' },
-        { name: 'body', weight: 1, text: 'First block\n\nSecond' },
+        { name: 'title', weight: 3, value: 'Hello' },
+        { name: 'body', weight: 1, value: body },
       ],
     });
-    expect(
-      content.stored.get(`${record.ref.collection}:${record.ref.path}`)
-    ).toBeDefined();
+    const stored = content.stored.get(
+      `${record.ref.collection}:${record.ref.path}`
+    );
+    for (const { name, value } of record.fields) {
+      expect(value).toEqual(stored?.[name]);
+    }
   });
 
-  // What the admin sends: rich text already serialized to source text.
-  const SOURCE_BODY = [
-    'Hello **bold** world.',
-    '<Cta label="secret prop" />',
-    '![alt words](/x.png)',
-    '[link text](https://u.example)',
-  ].join('\n\n');
-
-  const leaked = [
-    'secret prop',
-    'label',
-    'alt words',
-    '/x.png',
-    'u.example',
-    '**',
-    '<Cta',
-  ];
-
-  it.each([
-    ['an MDX body', 'post', 'content/posts/a.mdx', 'body'],
-    ['a markdown body', 'note', 'content/notes/a.md', 'body'],
-    [
-      'a rich-text field that is not the body',
-      'note',
-      'content/notes/a.md',
-      'intro',
-    ],
-  ])(
-    'indexes the text of %s sent as source, not its props, alt text or URLs',
-    async (_name, collection, path, field) => {
-      const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
-      const markdown = collection === 'note';
-      const source = markdown
-        ? SOURCE_BODY.replace('<Cta label="secret prop" />\n\n', '')
-        : SOURCE_BODY;
-      const response = await save(handlerWith(), {
-        branch: 'main',
-        collection,
-        path,
-        value: { title: 'T', [field]: source },
-      });
-      expect((await response.json()).hookWarnings).toEqual([]);
-      const [record] = upsert.mock.calls[0][0];
-      const text = record.fields.find(({ name }) => name === field)?.text ?? '';
-      expect(text).toContain('Hello bold world.');
-      expect(text).toContain('link text');
-      for (const fragment of leaked.filter(
-        (piece) => piece !== 'label' || !markdown
-      )) {
-        expect(text).not.toContain(fragment);
-      }
-    }
-  );
-
-  it('indexes component children and the visible text of raw HTML, nothing else', async () => {
+  it('hands over a non-string value as the content provider returned it', async () => {
     const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
-    const body = [
-      'Intro',
-      '<Callout>Read this</Callout>',
-      '<Note label="hidden" />',
-      'Click <Badge>new</Badge> now',
-      'Some <b>bold html</b> &amp; more',
-      '<table><tr><td>a</td><td>b</td></tr></table>',
-    ].join('\n\n');
+    const body = {
+      type: 'root',
+      children: [{ type: 'p', children: [{ text: 'First block' }] }],
+    };
     await save(handlerWith(), {
       branch: 'main',
-      value: { title: 'T', body },
+      value: { title: 'Hello', body },
     });
-    const text = upsert.mock.calls[0][0][0].fields.find(
+    const field = upsert.mock.calls[0][0][0].fields.find(
       ({ name }) => name === 'body'
-    )?.text;
-    expect(text?.split('\n').filter(Boolean)).toEqual([
-      'Intro',
-      'Read this',
-      'Click new now',
-      'Some bold html & more',
-      'a b',
+    );
+    expect(field?.value).toEqual(body);
+  });
+
+  it('keeps a whitespace-only value and leaves out a missing, null or empty one', async () => {
+    const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
+    await save(handlerWith(), {
+      branch: 'main',
+      value: { title: '   ', excerpt: null },
+    });
+    expect(upsert.mock.calls[0][0][0].fields).toEqual([
+      { name: 'title', weight: 3, value: '   ' },
     ]);
-    expect(text).not.toMatch(/hidden|<|>/);
   });
 
-  it('drops an HTML comment from a markdown body', async () => {
+  it('indexes a body the rich-text codec would refuse, as saved', async () => {
     const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
-    await save(handlerWith(), {
+    const response = await save(handlerWith(), {
       branch: 'main',
-      collection: 'note',
-      path: 'content/notes/a.md',
-      value: {
-        title: 'T',
-        body: 'Some <b>bold html</b> &amp; <!-- c -->more',
-      },
+      value: { title: 'T', body: '<Callout>unclosed' },
     });
-    const text = upsert.mock.calls[0][0][0].fields.find(
-      ({ name }) => name === 'body'
-    )?.text;
-    expect(text).toBe('Some bold html & more');
+    expect((await response.json()).hookWarnings).toEqual([]);
+    expect(upsert.mock.calls[0][0][0].fields).toContainEqual({
+      name: 'body',
+      weight: 1,
+      value: '<Callout>unclosed',
+    });
+    expect(codecFor).not.toHaveBeenCalled();
   });
 
-  it.each([
-    [
-      'md',
-      '<div>Tom &amp; Jerry &lt;3 &#169; a&nbsp;b &copy;</div>',
-      'Tom & Jerry <3 © a b &copy;',
-    ],
-    ['md', '<script>var x = 1;</script>\n\nafter', 'after'],
-    ['md', '<style>.c{color:red}</style>\n\nafter', 'after'],
-    ['md', '<a title="x>y" href="/u">link</a>', 'link'],
-    ['md', 'H<sub>2</sub>O is water', 'H2O is water'],
-    ['md', '<p>H<sub>2</sub>O is water</p>', 'H2O is water'],
-    ['md', '<DIV>Up</DIV>', 'Up'],
-    ['md', 'Start <b>bold</b> end', 'Start bold end'],
-    ['md', '<b>lead</b> text', 'lead text'],
-    ['md', 'text <b>trail</b>', 'text trail'],
-    ['md', '- one <i>two</i>\n- <b>three</b>', 'one two\nthree'],
-    ['md', '| a |\n|---|\n| <b>c</b> |', 'a\nc'],
-    ['mdx', 'H<sub>2</sub>O is water', 'H2O is water'],
-    ['mdx', 'Price <b>a &lt; b</b> ok', 'Price a < b ok'],
-    ['mdx', '<p>Fish &lt;3 chips</p>', 'Fish <3 chips'],
-    ['mdx', '<a title="x>y" href="/u">link</a>', 'link'],
-    ['mdx', 'Start <b>bold</b> end', 'Start bold end'],
-    ['mdx', '- one <i>two</i>\n- <b>three</b>', 'one two\nthree'],
-  ])(
-    'indexes the visible text of raw HTML in a %s body: %s',
-    async (format, body, expected) => {
-      const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
-      const markdown = format === 'md';
-      await save(handlerWith(), {
-        branch: 'main',
-        collection: markdown ? 'note' : 'post',
-        path: markdown ? 'content/notes/a.md' : 'content/posts/a.mdx',
-        value: { title: 'T', body },
-      });
-      const text = upsert.mock.calls[0][0][0].fields.find(
-        ({ name }) => name === 'body'
-      )?.text;
-      expect(text?.split('\n').filter(Boolean).join('\n')).toBe(expected);
-    }
-  );
-
-  it('finds H2O through the provider after saving H<sub>2</sub>O', async () => {
+  it('finds saved text through the provider', async () => {
     const handler = handlerWith();
     await save(handler, {
       branch: 'main',
       collection: 'note',
       path: 'content/notes/a.md',
-      value: { title: 'T', body: 'H<sub>2</sub>O is water' },
+      value: { title: 'T', body: 'Water is wet' },
     });
     const response = await handler(
-      post('/search/query', { query: 'H2O', options: { limit: 5 } })
+      post('/search/query', { query: 'water', options: { limit: 5 } })
     );
     const hits = await response.json();
     expect(hits).toHaveLength(1);
@@ -647,19 +549,6 @@ describe('save-time indexing', () => {
     expect(upsert.mock.calls[0][0][0].fields.map(({ name }) => name)).toEqual([
       'title',
     ]);
-  });
-
-  it('warns and indexes nothing for a body that does not parse, never its raw text', async () => {
-    const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
-    const response = await save(handlerWith(), {
-      branch: 'main',
-      value: { title: 'T', body: '<Cta label="secret prop"' },
-    });
-    expect(response.status).toBe(200);
-    expect((await response.json()).hookWarnings).toEqual([
-      'The afterSave hook "searchIndex" failed.',
-    ]);
-    expect(upsert).not.toHaveBeenCalled();
   });
 
   it('indexes the default branch when the caller names none', async () => {

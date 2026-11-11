@@ -4,12 +4,25 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type ResolvedConfig, asResolvedConfig } from '../../config';
 import { definePlugin } from '../../core/plugin';
+import { buildSearchRecord } from '../../core/search/record';
 import { SearchError } from '../../core/search/contract';
 import { defineSearchPlugin } from '../../plugins/search/search.plugin';
 import type { SearchIndexProvider } from '../../core/search/index-contract';
 import type { CollectionSchema } from '../../core/schema/types';
 import { createLocalDataLayer } from '../../plugins/content/local/server/local-data-layer';
 import { runCli } from '../index';
+import { codecFor } from '../../plugins/fields/rich-text/rich-text-codecs';
+
+vi.mock(
+  '../../plugins/fields/rich-text/rich-text-codecs',
+  async (importActual) => {
+    const actual =
+      await importActual<
+        typeof import('../../plugins/fields/rich-text/rich-text-codecs')
+      >();
+    return { ...actual, codecFor: vi.fn(actual.codecFor) };
+  }
+);
 
 let rootDir: string;
 
@@ -101,11 +114,11 @@ describe('tinacms search reindex', () => {
     expect(provider.replace.mock.calls[0][0]).toEqual([
       {
         ref: { collection: 'post', path: 'content/post/a.json' },
-        fields: [{ name: 'title', weight: 3, text: 'Alpha' }],
+        fields: [{ name: 'title', weight: 3, value: 'Alpha' }],
       },
       {
         ref: { collection: 'post', path: 'content/post/b.json' },
-        fields: [{ name: 'title', weight: 3, text: 'Beta' }],
+        fields: [{ name: 'title', weight: 3, value: 'Beta' }],
       },
     ]);
     expect(out).toEqual([
@@ -277,20 +290,11 @@ describe('tinacms search reindex source documents', () => {
       { name: 'body', type: 'rich-text', isBody: true },
     ],
   });
-  const leaked = [
-    'secret prop',
-    'alt words',
-    '/x.png',
-    'u.example',
-    '**',
-    '<Cta',
-  ];
-
   it.each([
     ['mdx', '<Cta label="secret prop" />\n\n'],
     ['md', ''],
   ] as const)(
-    'indexes the text of %s bodies, not props, alt text or URLs',
+    'hands over the source text of %s bodies as read, markup included',
     async (format, jsx) => {
       await writeDoc(
         `content/doc/a.${format}`,
@@ -305,29 +309,66 @@ describe('tinacms search reindex source documents', () => {
       );
       expect(code).toBe(0);
       const [record] = provider.replace.mock.calls[0][0];
-      const body =
-        record.fields.find(({ name }) => name === 'body')?.text ?? '';
-      expect(body).toContain('Hello bold world.');
-      expect(body).toContain('link text');
-      for (const fragment of leaked) expect(body).not.toContain(fragment);
+      expect(record.fields).toEqual([
+        { name: 'title', weight: 1, value: 'T' },
+        {
+          name: 'body',
+          weight: 1,
+          value: `Hello **bold** world.\n\n${jsx}![alt words](/x.png)\n\n[link text](https://u.example)\n`,
+        },
+      ]);
     }
   );
 
-  it('reads a rich-text field that is not the body', async () => {
+  it.each(['mdx', 'md'] as const)(
+    'hands over the same record as a save through the local data layer, in %s',
+    async (format) => {
+      const layer = createLocalDataLayer({
+        rootDir,
+        collections: [article('doc', format)],
+      });
+      const saved = await layer.update('doc', `content/doc/a.${format}`, {
+        title: 'T',
+        body: 'Hello <b>bold</b> &amp; more\n\nSecond',
+      });
+      await layer.close();
+      const provider = providerWith();
+      await reindex(
+        configWith(provider, {
+          fields: { doc: { title: 2, intro: 1, body: 1 } },
+          collections: [article('doc', format)],
+        })
+      );
+      const [record] = provider.replace.mock.calls[0][0];
+      expect(record).toEqual(
+        buildSearchRecord(
+          article('doc', format),
+          record.ref.path,
+          saved.document,
+          { title: 2, intro: 1, body: 1 }
+        )
+      );
+      expect(record.fields.map(({ name }) => name)).toEqual(['title', 'body']);
+    }
+  );
+
+  it('indexes a body the rich-text codec would refuse, as read', async () => {
     await writeDoc(
       'content/doc/a.mdx',
-      '---\ntitle: T\nintro: "Intro **bold** [l](https://u.example)"\n---\n\nbody\n'
+      '---\ntitle: T\n---\n\n<Callout>unclosed\n'
     );
     const provider = providerWith();
-    await reindex(
+    const { code } = await reindex(
       configWith(provider, {
-        fields: { doc: { intro: 1 } },
+        fields: { doc: { body: 1 } },
         collections: [article('doc', 'mdx')],
       })
     );
-    const intro = provider.replace.mock.calls[0][0][0].fields[0]?.text ?? '';
-    expect(intro).toContain('Intro bold');
-    expect(intro).not.toContain('u.example');
+    expect(code).toBe(0);
+    expect(provider.replace.mock.calls[0][0][0].fields).toEqual([
+      { name: 'body', weight: 1, value: '<Callout>unclosed\n' },
+    ]);
+    expect(codecFor).not.toHaveBeenCalled();
   });
 
   it('leaves an empty body out', async () => {
@@ -342,23 +383,6 @@ describe('tinacms search reindex source documents', () => {
     expect(
       provider.replace.mock.calls[0][0][0].fields.map(({ name }) => name)
     ).toEqual(['title']);
-  });
-
-  it('exits 1 naming the file for a body that does not parse, and replaces nothing', async () => {
-    await writeDoc(
-      'content/doc/a.mdx',
-      '---\ntitle: T\n---\n\n<Cta label="secret prop"\n'
-    );
-    const provider = providerWith();
-    const { code, err } = await reindex(
-      configWith(provider, {
-        fields: { doc: { body: 1 } },
-        collections: [article('doc', 'mdx')],
-      })
-    );
-    expect(code).toBe(1);
-    expect(err.join()).toContain('content/doc/a.mdx');
-    expect(provider.replace).not.toHaveBeenCalled();
   });
 });
 

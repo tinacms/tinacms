@@ -12,7 +12,8 @@ const keyOf = ({ ref }: SearchRecord): string =>
 const scoreOf = (record: SearchRecord, terms: string[]) => {
   let score = 0;
   let snippet = '';
-  for (const { text, weight } of record.fields) {
+  for (const { value, weight } of record.fields) {
+    const text = typeof value === 'string' ? value : JSON.stringify(value);
     const lower = text.toLowerCase();
     for (const term of terms) {
       const at = lower.indexOf(term);

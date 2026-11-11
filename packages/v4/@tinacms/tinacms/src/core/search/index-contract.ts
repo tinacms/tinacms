@@ -1,10 +1,10 @@
 import type { SearchHit, SearchQuery, SearchRef } from './contract';
 
-/** One searchable field of a document, as plain text with the weight from `fields`. */
+/** One searchable field of a document: its value as saved, with the weight from `fields`. */
 export interface SearchRecordField {
   name: string;
   weight: number;
-  text: string;
+  value: unknown;
 }
 
 /** What a provider indexes for one document. Empty fields are left out. */

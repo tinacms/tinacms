@@ -2,6 +2,7 @@ import { defineServerHook } from '../../../core/form/hooks';
 import type { ServerSegment } from '../../../core/plugin';
 import type { SearchIndexProvider } from '../../../core/search/index-contract';
 import { SEARCH_INDEX_HOOK } from '../../../core/search/index-contract';
+import { buildSearchRecord } from '../../../core/search/record';
 import { validateSearchRequest } from '../../../core/search/validate';
 import { publicOp } from '../../../server/op-meta';
 import { currentServerRuntime } from '../../../server/runtime-access';
@@ -25,8 +26,6 @@ export const serverSegmentOf = (
       if (!fields || !runtime.resolveBranch || !runtime.searchIndex) return;
       const defaultBranch = await runtime.resolveBranch(undefined);
       if (defaultBranch !== scope.branch) return;
-      // Loaded on demand: the rich-text codec is large, and only a save needs it.
-      const { buildSearchRecord } = await import('../../../core/search/record');
       await runtime.searchIndex.upsert([
         buildSearchRecord(scope.collection, scope.path, document, fields),
       ]);

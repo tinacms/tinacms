@@ -127,25 +127,22 @@ import no node module that a browser build could reach.
 ### Records
 
 A provider gets records, never raw documents. A `SearchRecord` is
-`{ ref, fields: { name, weight, text }[] }`.
+`{ ref, fields: { name, weight, value }[] }`. Core hands over each configured
+field's value as saved. Turning a value into searchable text is the provider's
+job.
 
-- `text` is plain text. A string field is used as it is. A rich-text field
-  arrives as source text (MDX or markdown), or as a rich-text tree. Core reads
-  the source with the codec of the collection format, then flattens the text
-  leaves in document order, with a newline after each block. The text of a
-  component's `children` prop is included. Other component props, image alt
-  text, link URLs and markdown syntax are left out. Raw HTML adds its visible
-  text: comments and `<script>` and `<style>` elements go with their contents,
-  and every other tag goes with its attribute values. A block tag such as `<p>`
-  or `<td>` leaves a space, and any other tag leaves nothing, so `H<sub>2</sub>O`
-  reads `H2O`. Then `&amp;`, `&lt;`, `&gt;`, `&quot;`, `&#39;`, `&apos;`,
-  `&nbsp;` and numeric entities decode. Other entities, such as `&copy;`, stay
-  as written. A `<` that starts no tag stays as visible text. Runs of spaces
-  collapse to one space. A rich-text field
-  that does not parse fails the save hook (one after-save warning) and the
-  reindex (exit 1, naming the file). Core never indexes its raw source.
-- An empty field is left out of `fields`. A record is always sent for a saved
-  document, even with no fields, so the provider replaces the old entry.
+- `value` is the document's own value for that field, untouched. It is what
+  `content.get(ref.collection, ref.path)` returns for that field.
+- A string field is the saved string. A rich-text field in a file-backed
+  document is its source text (MDX or markdown), with markup, component props
+  and entities still in it.
+- On TinaCloud content a save hands over what TinaCloud's `updateDocument`
+  returns for the field, which for rich text is a tree, while `tinacms search
+  reindex` hands over source text. A provider that indexes rich text handles
+  both.
+- A field whose value is `undefined`, `null` or `''` is left out of `fields`.
+  A record is always sent for a saved document, even with no fields, so the
+  provider replaces the old entry.
 
 ### Searchable fields
 
@@ -184,7 +181,8 @@ const keyOf = ({ ref }: SearchRecord): string =>
 const scoreOf = (record: SearchRecord, terms: string[]) => {
   let score = 0;
   let snippet = '';
-  for (const { text, weight } of record.fields) {
+  for (const { value, weight } of record.fields) {
+    const text = typeof value === 'string' ? value : JSON.stringify(value);
     const lower = text.toLowerCase();
     for (const term of terms) {
       const at = lower.indexOf(term);
