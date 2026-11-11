@@ -53,10 +53,7 @@ function Column({
   );
 }
 
-/**
- * Home, the landing screen: a dashboard of panels in a fixed order. Review N
- * unsaved is in the head only when there is no Branch panel to hold it.
- */
+// Review N unsaved is in the head only when there is no Branch panel to hold it.
 export function HomeScreen(_props: AdminScreenProps) {
   const tier = useTier();
   const mode = useContentMode();

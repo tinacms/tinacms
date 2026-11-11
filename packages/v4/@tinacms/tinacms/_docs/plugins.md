@@ -372,7 +372,9 @@ After a replace:
 - The panels and the page head of the default Home do not show. They are parts
   of the screen that the plugin replaced. To get the same look, use
   `HomePanelTray` from `@tinacms/ui/components/home-panel-tray`.
-- The sidebar keeps the Home row, and Search keeps the Home entry.
+- The sidebar keeps the Home row, and Search keeps the Home entry. They stay
+  because the core plugin `tina:home:core` still contributes the `globalNav`
+  entry that targets `home`. The replacement plugin does not contribute one.
 
 To remove Home, override the key `home` and contribute no screen with that
 name. After a remove:
