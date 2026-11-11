@@ -338,6 +338,49 @@ screen. A `globalNav` entry that targets a removed screen does not render.
 Two overrides of one screen throw an error at boot
 (`core/screen/registry.ts`).
 
+### Home
+
+Home is the screen with the name `home`. The core plugin
+(`plugins/home/home.plugin.ts`) contributes it, with a `globalNav` entry that
+targets it. The admin shows Home at `#/`, with no panel header and no Close
+button. `#/screens/home` shows the same screen.
+
+To replace Home, override the key `home` and contribute a screen with that
+name:
+
+```ts
+definePlugin({
+  name: 'my:home',
+  provides: ['screen'],
+  overrides: [{ capability: 'screen', key: 'home' }],
+  client: async () => ({
+    default: defineClientPlugin({
+      screens: [{ name: 'home', label: 'Home', component: MyHome }],
+    }),
+  }),
+});
+```
+
+After a replace:
+
+- `#/` shows `MyHome` with `segments: []`. `#/screens/home/a/b` shows it with
+  `segments: ['a', 'b']`.
+- The panels and the page head of the default Home do not show. They are parts
+  of the screen that the plugin replaced. To get the same look, use
+  `HomePanelTray` from `@tinacms/ui`.
+- The sidebar keeps the Home row, and Search keeps the Home entry.
+
+To remove Home, override the key `home` and contribute no screen with that
+name. After a remove:
+
+- `#/` shows the sentence "Pick a place from the sidebar."
+- The sidebar has no Home row, and Search has no Home entry.
+- A Close button still opens `#/`.
+- `#/screens/home` shows "No screen named “home”."
+
+A second screen with the name `home` and no override throws an error at boot.
+A plugin cannot add, remove or move one panel of the default Home.
+
 ## More data
 
 - [Field plugins](./field-plugins.md) — how to write a field plugin
@@ -360,7 +403,7 @@ Two overrides of one screen throw an error at boot
   - [The Media Manager](./media-manager.md) — the screen to browse, upload, rename and delete media, and the `MediaBrowser` component
 - [Search plugins](./search-plugins.md) — how a plugin gives a site full-text search
 - [Auth plugins](./auth-plugins.md): how a plugin verifies a request and signs the editor in
-- [UI slots](./ui-slots.md) — how a plugin adds entries to the admin sidebar and panels to Home
+- [UI slots](./ui-slots.md) — how a plugin adds entries to the admin sidebar
 - [Architecture](./architecture.md) — how a plugin gets to the screen
 
 ## The admin shell
