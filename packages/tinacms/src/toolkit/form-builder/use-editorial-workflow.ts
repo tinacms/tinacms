@@ -240,8 +240,6 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
           })
         : await create(branchName);
 
-      if (signal?.aborted) return { success: false };
-
       if (!result.branchName) {
         throw new Error('Branch creation failed.');
       }
