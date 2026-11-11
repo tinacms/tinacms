@@ -641,6 +641,12 @@ describe('Collections panel', () => {
     expect(
       within(collections).queryByText("Couldn't load every document count.")
     ).toBeNull();
+    await waitFor(() => expect(collections).toHaveFocus());
+    await waitFor(() =>
+      expect(
+        collections.querySelector('[data-slot=announcement]')
+      ).toHaveTextContent('Posts, 1 document. page, 0 documents')
+    );
     expect(
       within(collections).queryByRole('button', { name: 'Retry' })
     ).toBeNull();
@@ -1287,6 +1293,30 @@ describe('Branch panel', () => {
         branch.querySelector('[data-slot=announcement]')
       ).toHaveTextContent('Pull request #12')
     );
+  });
+
+  it('moves no focus to the Branch panel when a later read from the branch switcher works after a panel Retry that failed', async () => {
+    consoleGuard.expect(/could not list branches/);
+    const read = failBranchList();
+    const user = userEvent.setup();
+    renderAdmin();
+    const branch = await panel('Branch');
+    await user.click(
+      await within(branch).findByRole('button', { name: 'Retry' })
+    );
+    await waitFor(() => expect(read.count).toBe(2));
+    await within(branch).findByRole('button', { name: 'Retry' });
+
+    await user.click(await screen.findByRole('button', { name: 'Branches' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    read.offline = false;
+    await user.click(within(dialog).getByRole('button', { name: 'Retry' }));
+    expect(
+      await within(dialog).findByRole('button', { name: /^main/ })
+    ).toBeVisible();
+    expect(await within(branch).findByText('main')).toBeInTheDocument();
+    expect(branch).not.toHaveFocus();
+    expect(branch.querySelector('[data-slot=announcement]')).toBeNull();
   });
 
   it('leaves the name out when the default branch read fails, and shows it after a Retry that works', async () => {

@@ -133,6 +133,8 @@ function BranchPanelBody({ branch }: { branch: BranchView }) {
     pullRequestOf(branch.pullRequestUrl)?.label ?? NO_PULL_REQUEST;
   // The tray keeps its own region ref, so the panel finds its region from inside.
   useEffect(() => {
+    // A Retry that failed is over: a later read from elsewhere must not move focus here.
+    if (branch.listState === 'failed') retried.current = false;
     if (!retried.current || branch.listState !== 'ready') return;
     retried.current = false;
     body.current?.closest('section')?.focus({ preventScroll: true });

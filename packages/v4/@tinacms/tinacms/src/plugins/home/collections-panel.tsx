@@ -1,9 +1,11 @@
+import { Announcement } from '@tinacms/ui/components/announcement';
 import { EmptyState } from '@tinacms/ui/components/empty-state';
 import { HomePanelTray } from '@tinacms/ui/components/home-panel-tray';
 import { ListRow } from '@tinacms/ui/components/list-row';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { TileGrid } from '@tinacms/ui/components/tile';
 import type { Tier } from '@tinacms/ui/hooks/use-tier';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useTinaSchema } from '../../admin/hooks';
 import { useAdminRoute } from '../../admin/use-admin-route';
 import {
@@ -24,6 +26,24 @@ export function CollectionsPanel({ tier }: { tier: Tier }) {
     collections.map(({ name }) => name)
   );
   const hasFailed = lists.some(({ status }) => status === 'failed');
+  const isLoading = lists.some(({ status }) => status === 'loading');
+  const panelId = useId();
+  const retried = useRef(false);
+  const [back, setBack] = useState({ words: '', tries: 0 });
+  const countWords = collections
+    .map(
+      (collection, index) =>
+        `${collection.label ?? collection.name}, ${countOf(lists[index]) ?? ''}`
+    )
+    .join('. ');
+  // Retry takes its own line away, so focus moves to the panel once the counts are in.
+  useEffect(() => {
+    if (hasFailed) retried.current = false;
+    if (!retried.current || hasFailed || isLoading) return;
+    retried.current = false;
+    document.getElementById(panelId)?.focus({ preventScroll: true });
+    setBack((was) => ({ words: countWords, tries: was.tries + 1 }));
+  }, [hasFailed, isLoading, panelId, countWords]);
   const entries = collections.map((collection, index) => ({
     name: collection.name,
     label: collection.label ?? collection.name,
@@ -32,7 +52,14 @@ export function CollectionsPanel({ tier }: { tier: Tier }) {
     open: () => navigate({ view: 'collection', collection: collection.name }),
   }));
   return (
-    <HomePanelTray title='Collections' count={String(entries.length)}>
+    <HomePanelTray
+      id={panelId}
+      title='Collections'
+      count={String(entries.length)}
+    >
+      {back.tries ? (
+        <Announcement words={back.words} sayAgain={back.tries} />
+      ) : null}
       {hasFailed ? (
         <EmptyState
           variant='plain'
@@ -41,7 +68,10 @@ export function CollectionsPanel({ tier }: { tier: Tier }) {
           className='px-4 pt-1 pb-3'
           text="Couldn't load every document count."
           actionLabel='Retry'
-          onAction={retryFailed}
+          onAction={() => {
+            retried.current = true;
+            retryFailed();
+          }}
         />
       ) : null}
       {entries.length === 0 ? (
