@@ -9,7 +9,14 @@ import { type Session, defineServerPlugin, toUserId } from '../../server';
 import type { SearchRecord } from '../../server';
 import { createTinaStore } from '../../store/create-store';
 import type { ContentSaveInput } from '../../core/content/contract';
-import { definePlugin, resolveClientSegments } from '../../core/plugin';
+import { defineServerHook } from '../../core/form/hooks';
+import { validateCapabilityGraph } from '../../core/resolve';
+import {
+  type CapabilityOverride,
+  definePlugin,
+  resolveClientSegments,
+} from '../../core/plugin';
+import type { SearchIndexProvider } from '../../core/search/index-contract';
 import type { CollectionSchema } from '../../core/schema/types';
 import { createSearchClient } from './search.client';
 import {
@@ -697,5 +704,155 @@ describe('filter keys', () => {
     expect(Object.keys(query.mock.calls[0][0].filters ?? {})).toEqual([
       '__proto__',
     ]);
+  });
+});
+
+describe('a second search plugin', () => {
+  const providerWith = () => ({
+    query: vi.fn<SearchIndexProvider['query']>(async () => []),
+    upsert: vi.fn<SearchIndexProvider['upsert']>(async () => {}),
+    replace: vi.fn<SearchIndexProvider['replace']>(async () => {}),
+  });
+  const searchOver = (
+    name: string,
+    provider: ReturnType<typeof providerWith>,
+    field: string,
+    overrides?: CapabilityOverride[]
+  ) =>
+    defineSearchPlugin({
+      name,
+      fields: { post: { [field]: 1 } },
+      server: async () => ({ default: provider }),
+      overrides,
+    });
+  const saveTo = (handler: ReturnType<typeof handlerWith>) =>
+    handler(
+      post(
+        '/content/update',
+        {
+          collection: 'post',
+          path: 'content/posts/a.mdx',
+          value: { title: 'Hello', excerpt: 'Short' },
+          branch: 'main',
+        },
+        'editor-token'
+      )
+    );
+  const search = (handler: ReturnType<typeof handlerWith>) =>
+    handler(post('/search/query', { query: 'x', options: { limit: 5 } }));
+  const handlerFor = (...plugins: ReturnType<typeof defineSearchPlugin>[]) =>
+    handlerWith(contentPlugin(), plugins);
+
+  const pair = (overrides?: CapabilityOverride[]) => {
+    const a = providerWith();
+    const b = providerWith();
+    return {
+      a,
+      b,
+      first: searchOver('test:a', a, 'title'),
+      second: searchOver('test:b', b, 'excerpt', overrides),
+    };
+  };
+
+  it.each([
+    ['search override only', [{ capability: 'search' } as const]],
+    [
+      'also listing the searchIndex hook',
+      [
+        { capability: 'search' } as const,
+        { capability: 'hooks', key: 'searchIndex' } as const,
+      ],
+    ],
+  ])(
+    'lets the plugin with overrides win search and its hook (%s)',
+    async (_n, overrides) => {
+      for (const order of ['ab', 'ba']) {
+        const { a, b, first, second } = pair(overrides);
+        const plugins = order === 'ab' ? [first, second] : [second, first];
+        const handler = handlerFor(...plugins);
+
+        expect((await search(handler)).status).toBe(200);
+        const resolved = await resolveClientSegments(plugins);
+        expect(() => createTinaStore(resolved)).not.toThrow();
+
+        const response = await saveTo(handler);
+        expect((await response.json()).hookWarnings).toEqual([]);
+        expect(b.query).toHaveBeenCalledTimes(1);
+        expect(a.query).not.toHaveBeenCalled();
+        expect(a.upsert).not.toHaveBeenCalled();
+        expect(b.upsert).toHaveBeenCalledTimes(1);
+        expect(b.upsert.mock.calls[0][0]).toEqual([
+          {
+            ref: { collection: 'post', path: 'content/posts/a.mdx' },
+            fields: [{ name: 'excerpt', weight: 1, value: 'Short' }],
+          },
+        ]);
+      }
+    }
+  );
+
+  it('fails at boot when neither declares overrides', () => {
+    const { first, second } = pair();
+    expect(() => validateCapabilityGraph([first, second])).toThrow(
+      /searchIndex|search/
+    );
+  });
+
+  it('wins over a hand-written search plugin that has no hook', async () => {
+    const b = providerWith();
+    const handWritten = definePlugin({
+      name: 'test:hand-written',
+      provides: ['search'],
+      server: async () => ({ default: { query: async () => [] } }),
+    });
+    const handler = handlerWith(contentPlugin(), [
+      handWritten,
+      searchOver('test:b', b, 'excerpt', [{ capability: 'search' }]),
+    ]);
+    await saveTo(handler);
+    expect(b.upsert).toHaveBeenCalledTimes(1);
+  });
+
+  it('writes no record when a hand-written winner has no index provider', async () => {
+    const a = providerWith();
+    const handWritten = definePlugin({
+      name: 'test:hand-written',
+      provides: ['search'],
+      overrides: [{ capability: 'search' }],
+      server: async () => ({ default: { query: async () => [] } }),
+    });
+    const handler = handlerWith(contentPlugin(), [
+      searchOver('test:a', a, 'title'),
+      handWritten,
+    ]);
+    const response = await saveTo(handler);
+    expect(response.status).toBe(200);
+    expect((await response.json()).hookWarnings).toEqual([]);
+    expect(a.upsert).not.toHaveBeenCalled();
+  });
+
+  it('takes the searchIndex hook from a non-search hooks plugin', async () => {
+    const b = providerWith();
+    const other = vi.fn();
+    const hooksPlugin = definePlugin({
+      name: 'test:hooks',
+      provides: ['hooks'],
+      hooks: ['searchIndex'],
+      serverHooks: ['searchIndex'],
+      server: async () => ({
+        default: {
+          hooks: {
+            searchIndex: defineServerHook(() => ({ afterSave: other })),
+          },
+        },
+      }),
+    });
+    const handler = handlerWith(contentPlugin(), [
+      hooksPlugin,
+      searchOver('test:b', b, 'excerpt', [{ capability: 'search' }]),
+    ]);
+    await saveTo(handler);
+    expect(other).not.toHaveBeenCalled();
+    expect(b.upsert).toHaveBeenCalledTimes(1);
   });
 });

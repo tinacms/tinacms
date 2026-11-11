@@ -3,7 +3,13 @@
 A search plugin supplies the `search` capability. `search` is a singleton
 capability, and it is optional: a project installs one plugin that provides
 `search`, or none. A second one throws an error at boot, unless it declares
-`overrides`. Refer to [plugins.md](./plugins.md#capabilities). Refer to
+`overrides: [{ capability: 'search' }]`. With `defineSearchPlugin`, that one
+override also replaces the first plugin's `searchIndex` hook, so saves and
+`tinacms search reindex` feed only the winner's provider with the winner's
+`fields`. Without it, the admin and server fail at boot with a conflict error
+(which may name the `searchIndex` hook and suggest a `hooks` override: the fix
+is the `search` override). The implied hook override counts as declared, so a
+third plugin that overrides `searchIndex` conflicts with it. Refer to [plugins.md](./plugins.md#capabilities). Refer to
 [ADR-021](../../../../../adr/v4/021-search-capability-contract.md) for the
 decision.
 

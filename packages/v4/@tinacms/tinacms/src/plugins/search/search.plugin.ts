@@ -1,5 +1,6 @@
 import {
   type CapabilityOverride,
+  HOOKS_CAPABILITY,
   type PluginManifest,
   type ServerSegment,
   definePlugin,
@@ -25,21 +26,39 @@ export interface SearchPluginConfig {
   onDestroy?: () => void | Promise<void>;
 }
 
+const withHookOverride = (
+  overrides: CapabilityOverride[] | undefined
+): CapabilityOverride[] | undefined => {
+  if (!overrides?.some(({ capability }) => capability === 'search')) {
+    return overrides;
+  }
+  const hasHook = overrides.some(
+    (override) =>
+      override.capability === HOOKS_CAPABILITY &&
+      override.key === SEARCH_INDEX_HOOK
+  );
+  return hasHook
+    ? overrides
+    : [...overrides, { capability: HOOKS_CAPABILITY, key: SEARCH_INDEX_HOOK }];
+};
+
 /**
  * Turns a provider's server module and its searchable fields into a `search`
  * plugin: the client slice, the public `search/query` op, the save-time
- * indexing hook and the index writes core calls in-process (ADR-021).
+ * indexing hook and the index writes core calls in-process (ADR-021). The hook
+ * is part of the plugin's own wiring, so overriding `search` also overrides the
+ * `searchIndex` hook of the plugin it replaces.
  */
 export const defineSearchPlugin = (
   config: SearchPluginConfig
 ): PluginManifest =>
   definePlugin({
     name: config.name,
-    provides: ['search'],
+    provides: ['search', 'hooks'],
     search: { fields: config.fields },
     hooks: [SEARCH_INDEX_HOOK],
     serverHooks: [SEARCH_INDEX_HOOK],
-    overrides: config.overrides,
+    overrides: withHookOverride(config.overrides),
     onInit: config.onInit,
     onDestroy: config.onDestroy,
     client: async () => {

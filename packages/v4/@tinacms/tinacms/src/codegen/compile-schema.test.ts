@@ -723,6 +723,33 @@ describe('compileSchema search fields', () => {
     ).toBe(JSON.stringify(compileSchema(plain)));
   });
 
+  it('checks only the fields of a defineSearchPlugin that overrides another', () => {
+    const base = withSearch({});
+    const plugins = (winnerFields: SearchFields) => [
+      ...fieldTypes.map((type) => fieldPlugin(type, 1)),
+      searchable({ missing: { title: 1 } }),
+      defineSearchPlugin({
+        name: 'test:winner',
+        fields: winnerFields,
+        server: () => import('../test/in-memory-search.server'),
+        overrides: [{ capability: 'search' }],
+      }),
+    ];
+    expect(() =>
+      compileSchema(
+        asResolvedConfig({
+          ...base,
+          plugins: plugins({ post: { stringField: 1 } }),
+        })
+      )
+    ).not.toThrow();
+    expect(() =>
+      compileSchema(
+        asResolvedConfig({ ...base, plugins: plugins({ post: { nope: 1 } }) })
+      )
+    ).toThrow(/test:winner.*"nope"/);
+  });
+
   it('does not check the fields of a plugin that lost search to an override', () => {
     const config = asResolvedConfig({
       ...withSearch({}),
