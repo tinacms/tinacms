@@ -252,11 +252,15 @@ function SaveButton() {
   const saveHere = () => {
     setPending(true);
     if (isProtected && branchName !== undefined) {
+      const previous = useFormStore.getState().saves[formId];
       check()
         .then((valid) => {
           if (valid) {
             toast.dismiss(failedToastId);
             openDialog('protected', branchName);
+          } else if (summary.block()) {
+            useFormStore.getState().restoreSavePhase(formId, previous);
+            toast.dismiss(failedToastId);
           } else showFailure(new FormValidationError());
         })
         .finally(() => setPending(false));
