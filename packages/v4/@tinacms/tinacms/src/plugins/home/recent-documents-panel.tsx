@@ -21,16 +21,28 @@ const SCROLL_PAGE = 20;
 const NARROW_PAGE = 5;
 const ROW = '[data-slot=list-row-main]';
 
-function When({ row, now }: { row: RecentRow; now: number }) {
+// A phone has no room for the name, so the avatar carries it for a screen reader.
+function When({
+  row,
+  now,
+  compact,
+}: {
+  row: RecentRow;
+  now: number;
+  compact: boolean;
+}) {
   if (!row.updatedAt) return null;
   return (
     <span className='inline-flex items-center gap-1.5 whitespace-nowrap'>
       {row.author ? (
-        <>
-          <Avatar as='static' size='sm' name={row.author} />
-          <span>{row.author}</span>
-        </>
+        <Avatar
+          as='static'
+          size='sm'
+          name={row.author}
+          label={compact ? row.author : undefined}
+        />
       ) : null}
+      {row.author && !compact ? <span>{row.author}</span> : null}
       <time
         dateTime={row.updatedAt.toISOString()}
         title={exactTimeOf(row.updatedAt)}
@@ -44,10 +56,12 @@ function When({ row, now }: { row: RecentRow; now: number }) {
 function Rows({
   rows,
   paged,
+  compact,
   panelId,
 }: {
   rows: RecentRow[];
   paged: boolean;
+  compact: boolean;
   panelId: string;
 }) {
   const { navigate } = useAdminRoute();
@@ -105,7 +119,11 @@ function Rows({
               title={row.title}
               wrap
               unsaved={row.unsaved}
-              aside={row.updatedAt ? <When row={row} now={now} /> : undefined}
+              aside={
+                row.updatedAt ? (
+                  <When row={row} now={now} compact={compact} />
+                ) : undefined
+              }
               onClick={() =>
                 navigate({
                   view: 'document',
@@ -183,6 +201,7 @@ export function RecentDocumentsPanel({ tier }: HomePanelContext) {
           key={tier === 'desktop' ? 'scroll' : 'paged'}
           rows={rows}
           paged={tier !== 'desktop'}
+          compact={tier === 'phone'}
           panelId={panelId}
         />
       )}

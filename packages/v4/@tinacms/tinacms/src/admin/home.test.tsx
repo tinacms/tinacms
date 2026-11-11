@@ -868,6 +868,26 @@ describe('Recent documents panel', () => {
     }
   );
 
+  it('shows the avatar with the name for a screen reader, and no name text, on a phone', async () => {
+    setWidth(390);
+    world.summaries.main = {
+      post: [
+        {
+          path: 'content/posts/hello.mdx',
+          updatedAt: ago(HOUR),
+          lastAuthor: { name: 'Ada Lovelace' },
+        },
+      ],
+    };
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    const row = await within(recent).findByRole('button', { name: /^hello/ });
+    expect(
+      within(row).getByRole('img', { name: 'Ada Lovelace' })
+    ).toBeVisible();
+    expect(within(row).queryByText('Ada Lovelace')).toBeNull();
+  });
+
   it('shows no Show more for five rows or fewer', async () => {
     setWidth(390);
     world.summaries.main = { post: manyPosts(5) };
