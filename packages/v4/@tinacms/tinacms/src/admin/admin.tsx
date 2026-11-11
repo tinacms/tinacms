@@ -102,7 +102,8 @@ function ScreenOutlet({
   );
 }
 
-// Home has no panel header and no Close: there is nowhere to close to.
+// Home has no panel header and no Close: there is nowhere to close to. The
+// frame scrolls the screen and adds no padding, as the general outlet does.
 function HomeOutlet({
   screen,
   segments,
@@ -113,7 +114,9 @@ function HomeOutlet({
   return (
     <SidebarInset className='min-w-0'>
       {screen ? (
-        <screen.component segments={segments} />
+        <div data-slot='home-frame' className='min-h-0 flex-1 overflow-y-auto'>
+          <screen.component segments={segments} />
+        </div>
       ) : (
         <Placeholder>Pick a place from the sidebar.</Placeholder>
       )}

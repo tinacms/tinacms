@@ -79,48 +79,44 @@ export function HomeScreen(_props: AdminScreenProps) {
     </PanelBoundary>
   );
   return (
-    <div className='h-full min-h-0 overflow-y-auto'>
+    <div
+      className={cn(
+        'mx-auto flex w-full max-w-360 flex-col gap-6 px-4 pt-7 pb-24',
+        tier === 'tablet' && 'px-6',
+        tier === 'desktop' && 'px-10'
+      )}
+    >
       <div
         className={cn(
-          'mx-auto flex w-full max-w-360 flex-col gap-6 px-4 pt-7 pb-24',
-          tier === 'tablet' && 'px-6',
-          tier === 'desktop' && 'px-10'
+          'flex gap-3',
+          isPhone ? 'flex-col' : 'flex-wrap items-end justify-between gap-4'
         )}
       >
-        <div
-          className={cn(
-            'flex gap-3',
-            isPhone ? 'flex-col' : 'flex-wrap items-end justify-between gap-4'
-          )}
-        >
-          <div className='flex min-w-0 flex-col gap-1 wrap-anywhere'>
-            <h2 className='m-0 text-2xl font-semibold'>Home</h2>
-            {mode === 'local' ? (
-              <p className='m-0 text-base text-muted-foreground'>
-                {LOCAL_LINE}
-              </p>
-            ) : null}
-          </div>
-          {showReview ? (
-            <ReviewUnsavedButton count={unsaved} full={isPhone} />
+        <div className='flex min-w-0 flex-col gap-1 wrap-anywhere'>
+          <h2 className='m-0 text-2xl font-semibold'>Home</h2>
+          {mode === 'local' ? (
+            <p className='m-0 text-base text-muted-foreground'>{LOCAL_LINE}</p>
           ) : null}
         </div>
-        {tier === 'desktop' ? (
-          <div className='grid grid-cols-[minmax(0,1fr)_25rem] items-start gap-4'>
-            <Column name='main'>{collections}</Column>
-            <Column name='side'>
-              {recent}
-              {branch}
-            </Column>
-          </div>
-        ) : (
-          <Column name='narrow'>
-            {branch}
-            {recent}
-            {collections}
-          </Column>
-        )}
+        {showReview ? (
+          <ReviewUnsavedButton count={unsaved} full={isPhone} />
+        ) : null}
       </div>
+      {tier === 'desktop' ? (
+        <div className='grid grid-cols-[minmax(0,1fr)_25rem] items-start gap-4'>
+          <Column name='main'>{collections}</Column>
+          <Column name='side'>
+            {recent}
+            {branch}
+          </Column>
+        </div>
+      ) : (
+        <Column name='narrow'>
+          {branch}
+          {recent}
+          {collections}
+        </Column>
+      )}
     </div>
   );
 }

@@ -36,6 +36,29 @@ const posts = Array.from({ length: documentCount }, (_, index) => ({
     : {}),
 }));
 
+// `home=long` replaces Home with 120 plain paragraphs and registers the same
+// component as the ordinary screen `plain`. `home=short` renders one paragraph.
+const customHome = params.get('home');
+
+const PlainScreen = () =>
+  Array.from({ length: customHome === 'short' ? 1 : 120 }, (_, index) => (
+    <p key={index}>Paragraph {index + 1}</p>
+  ));
+
+const homeOverride = definePlugin({
+  name: 'playground:custom-home',
+  provides: ['screen'],
+  overrides: [{ capability: 'screen', key: 'home' }],
+  client: async () => ({
+    default: {
+      screens: [
+        { name: 'home', label: 'Home', component: PlainScreen },
+        { name: 'plain', label: 'Plain', component: PlainScreen },
+      ],
+    },
+  }),
+});
+
 const collections = longNames
   ? [
       {
@@ -102,7 +125,12 @@ const content = definePlugin({
 
 const config = defineConfig({
   projectName: params.get('project') ?? 'Acme site',
-  plugins: [content, localMediaPlugin(), ...(signedIn ? [auth] : [])],
+  plugins: [
+    content,
+    localMediaPlugin(),
+    ...(signedIn ? [auth] : []),
+    ...(customHome ? [homeOverride] : []),
+  ],
   schema: { collections },
 });
 

@@ -200,6 +200,7 @@ test('Review N unsaved is full width under the local-files line on a phone, and 
   await expectNoSidewaysScroll(page);
 
   await page.setViewportSize({ width: 1440, height: 900 });
+  await expect.poll(async () => (await boxOf(review)).width).toBeLessThan(300);
   const [wideReview, heading] = await Promise.all([
     boxOf(review),
     boxOf(main.getByRole('heading', { name: 'Home' })),
@@ -300,3 +301,177 @@ test('Home reaches every tile, row and button by Tab, and Enter opens a collecti
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/#\/collections\/post$/);
 });
+
+const SIZES = [
+  { width: 1440, height: 900 },
+  { width: 390, height: 844 },
+];
+
+const frameOf = (page: Page) => page.locator('[data-slot=home-frame]');
+
+const fixedBoxes = async (page: Page) =>
+  Promise.all([
+    boxOf(page.getByRole('banner', { name: 'Top bar' })),
+    boxOf(page.locator('[data-slot=status-bar]')),
+  ]);
+
+for (const size of SIZES) {
+  for (const route of ['#/', '#/screens/home']) {
+    test(`a replacement Home taller than the window scrolls at ${route}, ${size.width}x${size.height}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(size);
+      await page.goto(`/branches.html?home=long${route}`);
+      const frame = frameOf(page);
+      const first = page.getByText('Paragraph 1', { exact: true });
+      const last = page.getByText('Paragraph 120', { exact: true });
+      await expect(first).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Close' })).toHaveCount(0);
+      const [topBar, statusBar] = await fixedBoxes(page);
+      const frameBox = await boxOf(frame);
+      expect(frameBox.y).toBeGreaterThanOrEqual(topBar.y + topBar.height);
+      expect(frameBox.y + frameBox.height).toBeLessThanOrEqual(statusBar.y);
+      expect((await boxOf(first)).y).toBeGreaterThanOrEqual(
+        topBar.y + topBar.height
+      );
+      await expect(last).not.toBeInViewport();
+
+      await frame.hover();
+      await page.mouse.wheel(0, 600);
+      await expect
+        .poll(() => frame.evaluate((node) => node.scrollTop))
+        .toBeGreaterThan(0);
+      await frame.evaluate((node) => {
+        node.scrollTop = node.scrollHeight;
+      });
+      await expect(last).toBeInViewport({ ratio: 1 });
+      const lastBox = await boxOf(last);
+      expect(lastBox.y + lastBox.height).toBeLessThanOrEqual(statusBar.y);
+
+      expect(await fixedBoxes(page)).toEqual([topBar, statusBar]);
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollHeight - window.innerHeight
+        )
+      ).toBeLessThanOrEqual(0);
+      await expectNoSidewaysScroll(page);
+    });
+  }
+
+  test(`a replacement Home scrolls by swipe at ${size.width}x${size.height}`, async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({
+      viewport: size,
+      hasTouch: true,
+    });
+    const page = await context.newPage();
+    await page.goto('/branches.html?home=long#/');
+    const frame = frameOf(page);
+    await expect(page.getByText('Paragraph 1', { exact: true })).toBeVisible();
+    const box = await boxOf(frame);
+    const x = box.x + box.width / 2;
+    const session = await context.newCDPSession(page);
+    await session.send('Input.synthesizeScrollGesture', {
+      x,
+      y: box.y + box.height / 2,
+      yDistance: -300,
+      gestureSourceType: 'touch',
+    });
+    await expect
+      .poll(() => frame.evaluate((node) => node.scrollTop))
+      .toBeGreaterThan(0);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    await context.close();
+  });
+
+  test(`a replacement Home starts at the same left edge as an ordinary screen, ${size.width}x${size.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(size);
+    await page.goto('/branches.html?home=long#/');
+    const first = page.getByText('Paragraph 1', { exact: true });
+    const atHome = await boxOf(first);
+    const homeFrame = await boxOf(page.locator('[data-slot=sidebar-inset]'));
+    await page.goto('/branches.html?home=long#/screens/plain');
+    await expect(page.getByRole('button', { name: 'Close' })).toBeVisible();
+    const atScreen = await boxOf(first);
+    expect(atHome.x).toBe(atScreen.x);
+    expect(atHome.x).toBe(homeFrame.x);
+  });
+
+  test(`a short replacement Home does not scroll, ${size.width}x${size.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(size);
+    await page.goto('/branches.html?home=short#/');
+    const frame = frameOf(page);
+    await expect(page.getByText('Paragraph 1', { exact: true })).toBeVisible();
+    expect(
+      await frame.evaluate((node) => node.scrollHeight === node.clientHeight)
+    ).toBe(true);
+    await frame.hover();
+    await page.mouse.wheel(0, 600);
+    await page.waitForTimeout(200);
+    expect(await frame.evaluate((node) => node.scrollTop)).toBe(0);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  });
+
+  test(`the built-in Home has one page scroller, the frame's, at ${size.width}x${size.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(size);
+    // Without an unsaved document the Branch panel is short, and Home fits a 900px window.
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'tina-drafts:content/posts/post-03.mdx',
+        JSON.stringify({
+          version: 2,
+          values: { title: 'Edited' },
+          baseline: { title: 'Before' },
+        })
+      );
+    });
+    await page.goto(`/branches.html?docs=65&pr=${PR}#/`);
+    const frame = frameOf(page);
+    await expect(
+      panel(page, 'Branch').getByRole('button', { name: 'Review 1 unsaved' })
+    ).toBeVisible();
+    await expect(
+      panel(page, 'Recent documents').getByRole('list').getByRole('button')
+    ).not.toHaveCount(0);
+    expect(
+      await frame.evaluate((node) => node.scrollHeight > node.clientHeight)
+    ).toBe(true);
+
+    const heading = await boxOf(
+      page.getByRole('main').getByRole('heading', { name: 'Home' })
+    );
+    const inset = await boxOf(page.locator('[data-slot=sidebar-inset]'));
+    // Measured at PR head 424384c06, before the frame took the scroll.
+    expect({ left: heading.x - inset.x, top: heading.y - inset.y }).toEqual({
+      left: size.width >= 1280 ? 40 : 16,
+      top: 28,
+    });
+
+    const scrollers = await frame.evaluate((node) =>
+      [...node.querySelectorAll('*')]
+        .filter((element) =>
+          ['auto', 'scroll'].includes(getComputedStyle(element).overflowY)
+        )
+        .map((element) => element.getAttribute('aria-label') ?? element.tagName)
+    );
+    expect(scrollers).toEqual(size.width >= 1280 ? ['Recent documents'] : []);
+
+    await frame.evaluate((node) => {
+      node.scrollTop = node.scrollHeight;
+    });
+    const lastPanel = page.getByRole('main').getByRole('region').last();
+    const [, statusBar] = await fixedBoxes(page);
+    const lastBox = await boxOf(lastPanel);
+    expect(lastBox.y + lastBox.height).toBeLessThanOrEqual(statusBar.y);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    await expectNoSidewaysScroll(page);
+  });
+}
