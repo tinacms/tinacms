@@ -2,6 +2,9 @@ import { act, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useTier } from '@tinacms/ui/hooks/use-tier';
+import { guardConsole } from '../test/console-guard';
+
+guardConsole();
 
 const listeners = new Set<() => void>();
 let width = 1440;

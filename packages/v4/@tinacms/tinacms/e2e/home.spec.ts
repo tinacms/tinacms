@@ -136,6 +136,26 @@ for (const width of [1024, 390]) {
   });
 }
 
+for (const width of [1024, 390]) {
+  test(`a double click on Show more adds rows and opens no document at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/branches.html?docs=12#/');
+    const recent = panel(page, 'Recent documents');
+    const rows = recent.getByRole('list').getByRole('button');
+    const more = recent.getByRole('button', { name: 'Show more' });
+    await expect(rows).toHaveCount(5);
+    const box = await boxOf(more);
+    await page.mouse.dblclick(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(rows).toHaveCount(10);
+    await expect(page).toHaveURL(/#\/$/);
+    await page.waitForTimeout(600);
+    await rows.nth(5).click();
+    await expect(page).toHaveURL(/post-06\.mdx$/);
+  });
+}
+
 test('Recent documents has no Show more for five rows', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/branches.html?docs=5#/');
@@ -372,12 +392,24 @@ for (const size of SIZES) {
     await expect(page.getByText('Paragraph 1', { exact: true })).toBeVisible();
     const box = await boxOf(frame);
     const x = box.x + box.width / 2;
+    // A finger drag as real touch events. A synthesized scroll gesture does
+    // nothing in headless Chromium on Linux, where a wheel turn still scrolls.
     const session = await context.newCDPSession(page);
-    await session.send('Input.synthesizeScrollGesture', {
-      x,
-      y: box.y + box.height / 2,
-      yDistance: -300,
-      gestureSourceType: 'touch',
+    const touchAt = (y: number) => [{ x, y }];
+    const startY = box.y + box.height * 0.75;
+    await session.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: touchAt(startY),
+    });
+    for (let step = 1; step <= 10; step += 1) {
+      await session.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: touchAt(startY - step * 30),
+      });
+    }
+    await session.send('Input.dispatchTouchEvent', {
+      type: 'touchEnd',
+      touchPoints: [],
     });
     await expect
       .poll(() => frame.evaluate((node) => node.scrollTop))

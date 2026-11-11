@@ -5,6 +5,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { HomePanelTray } from '@tinacms/ui/components/home-panel-tray';
 import { TileGrid } from '@tinacms/ui/components/tile';
+import { guardConsole } from '../test/console-guard';
+
+guardConsole();
 
 function Flaky() {
   const [state, setState] = useState<'failed' | 'loading' | 'ready'>('failed');
