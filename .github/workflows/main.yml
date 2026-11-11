@@ -65,13 +65,8 @@ jobs:
       - name: Build Types
         run: pnpm types
 
+      # The coverage job runs these two suites.
       - name: Test
-        if: matrix.os != 'ubuntu-latest'
-        run: pnpm test
-
-      # The coverage job runs these two suites on ubuntu.
-      - name: Test
-        if: matrix.os == 'ubuntu-latest'
         run: pnpm test --filter='!@tinacms/tinacms' --filter='!@tinacms/rich-text'
 
       - name: Test Packages
