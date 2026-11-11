@@ -14,7 +14,7 @@ import type { TinaStoreState } from '../core/plugin';
 import type { FieldSchema, TinaDocument } from '../core/schema/types';
 import type { FormViewStore } from './form-view-state';
 import type { ScreenRegistry } from '../core/screen/registry';
-import type { GlobalNavSection } from '../core/slot/contract';
+import type { GlobalNavSection, HomePanels } from '../core/slot/contract';
 
 export interface SavedDocument {
   document: TinaDocument;
@@ -35,6 +35,7 @@ export interface TinaRuntime {
   schema: TinaSchema;
   screens: ScreenRegistry;
   globalNav: GlobalNavSection[];
+  homePanels: HomePanels;
 }
 export const TinaRuntimeContext = createContext<TinaRuntime | null>(null);
 

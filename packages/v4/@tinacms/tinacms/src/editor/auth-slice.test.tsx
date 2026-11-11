@@ -11,6 +11,7 @@ import {
 } from '../core/plugin';
 import { createScreenRegistry } from '../core/screen/registry';
 import { createGlobalNav } from '../core/slot/global-nav';
+import { createHomePanels } from '../core/slot/home-panel';
 import { createValidatorRegistry } from '../core/validator/registry';
 import { createTinaStore } from '../store/create-store';
 import { testAuthPlugin } from '../test/test-auth-plugin';
@@ -32,6 +33,7 @@ const bootRuntime = async (plugins: PluginManifest[]): Promise<TinaRuntime> => {
     schema: { collections: [] },
     screens,
     globalNav: createGlobalNav(resolved, plugins, screens),
+    homePanels: createHomePanels(resolved, plugins),
   };
 };
 
