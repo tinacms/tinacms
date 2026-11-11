@@ -17,11 +17,13 @@ const countOf = (list: CollectionList | undefined): string | undefined => {
   return count === 1 ? '1 document' : `${count} documents`;
 };
 
-/** One tile per collection, in schema order. On a phone, one-line rows. */
 export function CollectionsPanel({ tier }: { tier: Tier }) {
   const { collections } = useTinaSchema();
   const { navigate } = useAdminRoute();
-  const { lists } = useCollectionLists(collections.map(({ name }) => name));
+  const { lists, retryFailed } = useCollectionLists(
+    collections.map(({ name }) => name)
+  );
+  const hasFailed = lists.some(({ status }) => status === 'failed');
   const entries = collections.map((collection, index) => ({
     name: collection.name,
     label: collection.label ?? collection.name,
@@ -31,6 +33,17 @@ export function CollectionsPanel({ tier }: { tier: Tier }) {
   }));
   return (
     <HomePanelTray title='Collections' count={String(entries.length)}>
+      {hasFailed ? (
+        <EmptyState
+          variant='plain'
+          align='left'
+          live
+          className='px-4 pt-1 pb-3'
+          text="Couldn't load every document count."
+          actionLabel='Retry'
+          onAction={retryFailed}
+        />
+      ) : null}
       {entries.length === 0 ? (
         <EmptyState variant='plain' text='No collections yet.' />
       ) : tier === 'phone' ? (

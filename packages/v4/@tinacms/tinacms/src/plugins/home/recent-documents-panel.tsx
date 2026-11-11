@@ -8,6 +8,7 @@ import type { Tier } from '@tinacms/ui/hooks/use-tier';
 import { useTinaSchema } from '../../admin/hooks';
 import { useAdminRoute } from '../../admin/use-admin-route';
 import { useCollectionLists } from '../../editor/collection-lists';
+import { useCurrentBranch } from '../../editor/content-queries';
 import { useContentMode } from '../../editor/content-mode';
 import { useUnsavedFormIds } from '../../form/form-store';
 import {
@@ -20,6 +21,8 @@ import {
 const SCROLL_PAGE = 20;
 const NARROW_PAGE = 5;
 const ROW = '[data-slot=list-row-main]';
+// A second click of a double click on Show more lands on a row that the first click added.
+const DOUBLE_CLICK_MS = 500;
 
 // A phone has no room for the name, so the avatar carries it for a screen reader.
 function When({
@@ -72,6 +75,7 @@ function Rows({
   const list = useRef<HTMLUListElement>(null);
   const end = useRef<HTMLLIElement>(null);
   const pressedAt = useRef<number | null>(null);
+  const expandedAt = useRef(Number.NEGATIVE_INFINITY);
   const now = Date.now();
 
   useEffect(() => {
@@ -124,13 +128,16 @@ function Rows({
                   <When row={row} now={now} compact={compact} />
                 ) : undefined
               }
-              onClick={() =>
+              onClick={() => {
+                if (performance.now() - expandedAt.current < DOUBLE_CLICK_MS) {
+                  return;
+                }
                 navigate({
                   view: 'document',
                   collection: row.collection,
                   path: row.path,
-                })
-              }
+                });
+              }}
             />
           </li>
         ))}
@@ -145,6 +152,7 @@ function Rows({
             full
             onClick={() => {
               pressedAt.current = visible.length;
+              expandedAt.current = performance.now();
               setShown((count) => count + NARROW_PAGE);
             }}
           >
@@ -168,6 +176,7 @@ export function RecentDocumentsPanel({ tier }: { tier: Tier }) {
   );
   const unsavedIds = new Set<string>(useUnsavedFormIds());
   const mode = useContentMode();
+  const branch = useCurrentBranch();
   const panelId = useId();
   const isLoading = lists.some(({ status }) => status === 'loading');
   const hasFailed = lists.some(({ status }) => status === 'failed');
@@ -198,7 +207,7 @@ export function RecentDocumentsPanel({ tier }: { tier: Tier }) {
         />
       ) : (
         <Rows
-          key={tier === 'desktop' ? 'scroll' : 'paged'}
+          key={`${tier === 'desktop' ? 'scroll' : 'paged'}:${branch ?? ''}`}
           rows={rows}
           paged={tier !== 'desktop'}
           compact={tier === 'phone'}

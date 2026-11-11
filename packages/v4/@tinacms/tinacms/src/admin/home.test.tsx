@@ -603,24 +603,61 @@ describe('Collections panel', () => {
     expect(posts.querySelector('[data-slot=skeleton]')).toBeNull();
   });
 
-  it('shows the name and no count when a list fails, and still opens the collection', async () => {
+  it('shows the name and no count when a list fails, says so with Retry, and still opens the collection', async () => {
+    let offline = true;
     world.list = async (name) => {
-      if (name === 'post') throw new Error('offline');
-      return [];
+      if (name === 'post' && offline) throw new Error('offline');
+      return name === 'post' ? [{ path: 'content/posts/hello.mdx' }] : [];
     };
     const user = userEvent.setup();
     renderAdmin();
     const collections = await panel(/^Collections/);
     const [posts, pages] = within(collections).getAllByRole('listitem');
     expect(await within(pages).findByText('0 documents')).toBeVisible();
-    await waitFor(() =>
-      expect(posts.querySelector('[data-slot=skeleton]')).toBeNull()
-    );
+    expect(
+      await within(collections).findByText(
+        "Couldn't load every document count."
+      )
+    ).toBeVisible();
+    expect(posts.querySelector('[data-slot=skeleton]')).toBeNull();
     expect(within(posts).queryByText(/documents?$/)).toBeNull();
+
+    listCalls = [];
+    await user.click(
+      within(collections).getByRole('button', { name: 'Retry' })
+    );
+    expect(
+      await within(collections).findByText(
+        "Couldn't load every document count."
+      )
+    ).toBeVisible();
+    expect(listCalls).toEqual(['post']);
+
+    offline = false;
+    await user.click(
+      within(collections).getByRole('button', { name: 'Retry' })
+    );
+    expect(await within(posts).findByText('1 document')).toBeVisible();
+    expect(
+      within(collections).queryByText("Couldn't load every document count.")
+    ).toBeNull();
+    expect(
+      within(collections).queryByRole('button', { name: 'Retry' })
+    ).toBeNull();
+
     await user.click(within(posts).getByRole('button', { name: 'Posts' }));
     await waitFor(() =>
       expect(window.location.hash).toBe('#/collections/post')
     );
+  });
+
+  it('shows no failure line while every list loads or is read', async () => {
+    renderAdmin();
+    const collections = await panel(/^Collections/);
+    expect(await within(collections).findByText('2 documents')).toBeVisible();
+    expect(
+      within(collections).queryByRole('button', { name: 'Retry' })
+    ).toBeNull();
   });
 
   it('shows one-line rows with the count and no New on a phone', async () => {
@@ -974,6 +1011,65 @@ describe('Recent documents panel', () => {
     expect(within(row).queryByText('Ada Lovelace')).toBeNull();
   });
 
+  it('starts again at five rows, and moves no focus, when a branch switch changes the rows', async () => {
+    setWidth(1024);
+    world.mode = 'branches';
+    world.summaries.main = { post: manyPosts(12) };
+    world.summaries['feature/news'] = { post: manyPosts(7) };
+    const user = userEvent.setup();
+    const switchTo = async (name: string) => {
+      await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+      await user.click(
+        await within(await screen.findByRole('dialog')).findByText(name)
+      );
+      await within(await panel('Branch')).findByText(name);
+    };
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    await within(recent).findByRole('list', { name: 'Recent documents' });
+    expect(recentRows(recent)).toHaveLength(5);
+
+    await switchTo('feature/news');
+    await waitFor(() =>
+      expect(
+        within(recent).getByRole('button', { name: 'Show more' })
+      ).toBeVisible()
+    );
+    await user.click(within(recent).getByRole('button', { name: 'Show more' }));
+    expect(recentRows(recent)).toHaveLength(7);
+
+    // The lists of `main` are in the cache, so the rows change with no loading state between.
+    listCalls = [];
+    await switchTo('main');
+    expect(listCalls).toEqual([]);
+    expect(recentRows(recent)).toHaveLength(5);
+    expect(
+      within(recent).getByRole('button', { name: 'Show more' })
+    ).toBeVisible();
+    expect(recent.contains(document.activeElement)).toBe(false);
+  });
+
+  it('does not open a row from the second click of a double click on Show more', async () => {
+    setWidth(1024);
+    world.summaries.main = { post: manyPosts(12) };
+    const user = userEvent.setup();
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    await within(recent).findByRole('list', { name: 'Recent documents' });
+    await user.click(within(recent).getByRole('button', { name: 'Show more' }));
+    await user.click(within(recent).getByRole('button', { name: /^post-05/ }));
+    expect(window.location.hash).toBe('');
+    expect(recentRows(recent)).toHaveLength(10);
+
+    await new Promise((resolve) => setTimeout(resolve, 550));
+    await user.click(within(recent).getByRole('button', { name: /^post-05/ }));
+    await waitFor(() =>
+      expect(window.location.hash).toBe(
+        '#/collections/post/content%2Fposts%2Fpost-05.mdx'
+      )
+    );
+  });
+
   it('shows no Show more for five rows or fewer', async () => {
     setWidth(390);
     world.summaries.main = { post: manyPosts(5) };
@@ -1054,31 +1150,104 @@ describe('Branch panel', () => {
     ).toBeVisible();
   });
 
-  it('holds placeholder rows while the branch list is read', async () => {
+  const chooseBranch = (name: string) =>
+    localStorage.setItem(
+      'tina-store',
+      JSON.stringify({ state: { branch: { current: name } }, version: 0 })
+    );
+
+  const keepBranchDraft = (path: string, branch: string) =>
+    localStorage.setItem(
+      draftKey(toFormId(path), undefined, branch),
+      JSON.stringify({
+        version: 2,
+        values: { title: 'Kept' },
+        baseline: { title: path },
+      })
+    );
+
+  const holdBranchList = () => {
     let release: (branches: BranchInfo[]) => void = () => {};
     world.listBranches = () =>
       new Promise((resolve) => {
         release = resolve;
       });
-    renderAdmin();
-    const branch = await panel('Branch');
-    const sheet = branch.querySelector('[data-slot=home-panel-sheet]');
-    expect(sheet).toHaveAttribute('aria-busy', 'true');
-    expect(within(branch).queryByText('main')).toBeNull();
-    release(world.branches);
-    expect(await within(branch).findByText('main')).toBeVisible();
-    expect(sheet).not.toHaveAttribute('aria-busy');
-  });
+    return () => release(world.branches);
+  };
 
-  it('says it could not load when the branch list fails, leaves the other panels alone, and Retry reads it again', async () => {
-    consoleGuard.expect(/could not list branches/);
-    let offline = true;
-    let reads = 0;
+  const failBranchList = () => {
+    const read = { offline: true, count: 0 };
     world.listBranches = async () => {
-      reads += 1;
-      if (offline) throw new Error('offline');
+      read.count += 1;
+      if (read.offline) throw new Error('offline');
       return world.branches;
     };
+    return read;
+  };
+
+  const busyParts = (branch: HTMLElement) =>
+    [...branch.querySelectorAll('[aria-busy=true]')].map((part) =>
+      part.getAttribute('data-slot')
+    );
+
+  it('shows a chosen branch and a busy pull request row while the branch list is read', async () => {
+    world.branches = [
+      { name: 'main', protected: true },
+      {
+        name: 'feature/news',
+        protected: true,
+        pullRequestUrl: 'https://github.com/acme/site/pull/12',
+      },
+    ];
+    chooseBranch('feature/news');
+    const release = holdBranchList();
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(within(branch).getByText('feature/news')).toBeVisible();
+    expect(busyParts(branch)).toEqual(['pull-request-row']);
+    expect(
+      await within(branch).findAllByText('Loading pull request')
+    ).toHaveLength(1);
+    expect(within(branch).queryByText('Loading Branch')).toBeNull();
+    expect(within(branch).queryByText('Protected')).toBeNull();
+    expect(within(branch).queryByRole('link')).toBeNull();
+    release();
+    expect(
+      await within(branch).findByRole('link', { name: /^Pull request #12/ })
+    ).toBeVisible();
+    expect(within(branch).getByText('Protected')).toBeVisible();
+    expect(busyParts(branch)).toEqual([]);
+    expect(within(branch).queryByText('Loading pull request')).toBeNull();
+  });
+
+  it('holds a hidden placeholder for the name while the default branch is not known yet', async () => {
+    const release = holdBranchList();
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(within(branch).queryByText('main')).toBeNull();
+    expect(busyParts(branch)).toEqual(['pull-request-row']);
+    const hidden = branch.querySelector(
+      '[data-slot=home-panel-sheet] [aria-hidden=true]:not([data-slot])'
+    );
+    expect(hidden).not.toBeNull();
+    expect(hidden).not.toHaveAttribute('aria-busy');
+    release();
+    expect(await within(branch).findByText('main')).toBeVisible();
+    expect(within(branch).getByText('No pull request yet')).toBeVisible();
+  });
+
+  it('keeps the branch name and puts the failure, with Retry, in the pull request row', async () => {
+    consoleGuard.expect(/could not list branches/);
+    world.branches = [
+      { name: 'main' },
+      {
+        name: 'feature/news',
+        protected: true,
+        pullRequestUrl: 'https://github.com/acme/site/pull/12',
+      },
+    ];
+    chooseBranch('feature/news');
+    const read = failBranchList();
     const user = userEvent.setup();
     renderAdmin();
     const branch = await panel('Branch');
@@ -1087,8 +1256,10 @@ describe('Branch panel', () => {
         "Couldn't load this branch's pull request."
       )
     ).toBeVisible();
+    expect(within(branch).getByText('feature/news')).toBeVisible();
+    expect(busyParts(branch)).toEqual([]);
     expect(
-      await within(await panel(/^Collections/)).findByText('2 documents')
+      await within(await panel(/^Collections/)).findByText('1 document')
     ).toBeVisible();
 
     await user.click(within(branch).getByRole('button', { name: 'Retry' }));
@@ -1097,15 +1268,132 @@ describe('Branch panel', () => {
         "Couldn't load this branch's pull request."
       )
     ).toBeVisible();
-    expect(reads).toBe(2);
+    expect(within(branch).getByRole('button', { name: 'Retry' })).toBeVisible();
+    expect(within(branch).getByText('feature/news')).toBeVisible();
+    expect(read.count).toBe(2);
 
-    offline = false;
+    read.offline = false;
     await user.click(within(branch).getByRole('button', { name: 'Retry' }));
-    expect(await within(branch).findByText('main')).toBeVisible();
+    expect(
+      await within(branch).findByRole('link', { name: /^Pull request #12/ })
+    ).toBeVisible();
+    expect(within(branch).getByText('Protected')).toBeVisible();
     expect(
       within(branch).queryByText("Couldn't load this branch's pull request.")
     ).toBeNull();
     await waitFor(() => expect(branch).toHaveFocus());
+    await waitFor(() =>
+      expect(
+        branch.querySelector('[data-slot=announcement]')
+      ).toHaveTextContent('Pull request #12')
+    );
+  });
+
+  it('leaves the name out when the default branch read fails, and shows it after a Retry that works', async () => {
+    consoleGuard.expect(/could not list branches/);
+    const read = failBranchList();
+    const user = userEvent.setup();
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(
+      await within(branch).findByText(
+        "Couldn't load this branch's pull request."
+      )
+    ).toBeVisible();
+    expect(within(branch).queryByText('main')).toBeNull();
+    read.offline = false;
+    await user.click(within(branch).getByRole('button', { name: 'Retry' }));
+    expect(await within(branch).findByText('main')).toBeVisible();
+    expect(within(branch).getByText('No pull request yet')).toBeVisible();
+    await waitFor(() => expect(branch).toHaveFocus());
+  });
+
+  it('still shows the branch name and Review N unsaved when the branch list fails', async () => {
+    consoleGuard.expect(/could not list branches/);
+    chooseBranch('feature/news');
+    keepBranchDraft('content/posts/breaking.mdx', 'feature/news');
+    failBranchList();
+    const user = userEvent.setup();
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(
+      await within(branch).findByText(
+        "Couldn't load this branch's pull request."
+      )
+    ).toBeVisible();
+    expect(within(branch).getByRole('button', { name: 'Retry' })).toBeVisible();
+    expect(within(branch).getByText('feature/news')).toBeVisible();
+    expect(within(branch).getByText('1 document not saved yet')).toBeVisible();
+    const main = screen.getByRole('main');
+    expect(
+      within(main).getAllByRole('button', { name: /^Review/ })
+    ).toHaveLength(1);
+    expect(within(main).queryByText(/^Local files/)).toBeNull();
+    await user.click(
+      within(branch).getByRole('button', { name: 'Review 1 unsaved' })
+    );
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/collections?unsaved')
+    );
+  });
+
+  it('still shows the branch name and Review N unsaved while the branch list is read', async () => {
+    chooseBranch('feature/news');
+    keepBranchDraft('content/posts/breaking.mdx', 'feature/news');
+    holdBranchList();
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(within(branch).getByText('feature/news')).toBeVisible();
+    expect(
+      await within(branch).findByText('1 document not saved yet')
+    ).toBeVisible();
+    expect(
+      within(branch).getByRole('button', { name: 'Review 1 unsaved' })
+    ).toBeVisible();
+    expect(busyParts(branch)).toEqual(['pull-request-row']);
+    expect(
+      within(screen.getByRole('main')).getAllByRole('button', {
+        name: /^Review/,
+      })
+    ).toHaveLength(1);
+  });
+
+  it('still shows Review N unsaved when no branch is chosen and the branch list fails', async () => {
+    consoleGuard.expect(/could not list branches/);
+    keepDraft('content/posts/hello.mdx');
+    failBranchList();
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(
+      await within(branch).findByText(
+        "Couldn't load this branch's pull request."
+      )
+    ).toBeVisible();
+    expect(within(branch).getByText('1 document not saved yet')).toBeVisible();
+    expect(
+      within(branch).getByRole('button', { name: 'Review 1 unsaved' })
+    ).toBeVisible();
+    expect(
+      within(screen.getByRole('main')).getAllByRole('button', {
+        name: /^Review/,
+      })
+    ).toHaveLength(1);
+  });
+
+  it('shows no unsaved footer when the branch list fails and nothing is unsaved', async () => {
+    consoleGuard.expect(/could not list branches/);
+    chooseBranch('feature/news');
+    failBranchList();
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(
+      await within(branch).findByText(
+        "Couldn't load this branch's pull request."
+      )
+    ).toBeVisible();
+    expect(within(branch).getByText('feature/news')).toBeVisible();
+    expect(within(branch).queryByText(/not saved yet/)).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Review/ })).toBeNull();
   });
 
   it('links the pull request of the current branch by its number, in a new tab', async () => {
