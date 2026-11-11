@@ -129,12 +129,16 @@ describe('tinacms search reindex', () => {
     expect(events).toEqual(['init', 'replace', 'destroy']);
   });
 
-  it('reindexes only the provider of the plugin that overrides search', async () => {
-    await writeDoc('content/post/a.json', '{"title":"Alpha"}');
-    const loser = providerWith();
-    const winner = providerWith();
-    const config = asResolvedConfig({
-      plugins: [
+  it.each([
+    ['a then b', false],
+    ['b then a', true],
+  ])(
+    'reindexes only the provider of the plugin that overrides search (%s)',
+    async (_order, reversed) => {
+      await writeDoc('content/post/a.json', '{"title":"Alpha"}');
+      const loser = providerWith();
+      const winner = providerWith();
+      const plugins = [
         defineSearchPlugin({
           name: 'test:a',
           fields: { page: { title: 1 } },
@@ -146,22 +150,25 @@ describe('tinacms search reindex', () => {
           server: async () => ({ default: winner }),
           overrides: [{ capability: 'search' }],
         }),
-      ],
-      schema: { collections: [collection('post'), collection('page')] },
-    });
+      ];
+      const config = asResolvedConfig({
+        plugins: reversed ? plugins.reverse() : plugins,
+        schema: { collections: [collection('post'), collection('page')] },
+      });
 
-    const { code } = await reindex(config);
+      const { code } = await reindex(config);
 
-    expect(code).toBe(0);
-    expect(loser.replace).not.toHaveBeenCalled();
-    expect(winner.replace).toHaveBeenCalledTimes(1);
-    expect(winner.replace.mock.calls[0][0]).toEqual([
-      {
-        ref: { collection: 'post', path: 'content/post/a.json' },
-        fields: [{ name: 'title', weight: 3, value: 'Alpha' }],
-      },
-    ]);
-  });
+      expect(code).toBe(0);
+      expect(loser.replace).not.toHaveBeenCalled();
+      expect(winner.replace).toHaveBeenCalledTimes(1);
+      expect(winner.replace.mock.calls[0][0]).toEqual([
+        {
+          ref: { collection: 'post', path: 'content/post/a.json' },
+          fields: [{ name: 'title', weight: 3, value: 'Alpha' }],
+        },
+      ]);
+    }
+  );
 
   it('exits 1 when no plugin provides search', async () => {
     const config = asResolvedConfig({

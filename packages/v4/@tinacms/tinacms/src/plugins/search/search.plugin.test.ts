@@ -794,7 +794,7 @@ describe('a second search plugin', () => {
   it('fails at boot when neither declares overrides', () => {
     const { first, second } = pair();
     expect(() => validateCapabilityGraph([first, second])).toThrow(
-      /searchIndex|search/
+      'Two plugins both register the form hook "searchIndex". Declare `overrides: [{ capability: "hooks", key }]` to replace it.'
     );
   });
 

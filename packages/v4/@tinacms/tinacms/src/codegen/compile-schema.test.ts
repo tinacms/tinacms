@@ -723,32 +723,43 @@ describe('compileSchema search fields', () => {
     ).toBe(JSON.stringify(compileSchema(plain)));
   });
 
-  it('checks only the fields of a defineSearchPlugin that overrides another', () => {
-    const base = withSearch({});
-    const plugins = (winnerFields: SearchFields) => [
-      ...fieldTypes.map((type) => fieldPlugin(type, 1)),
-      searchable({ missing: { title: 1 } }),
-      defineSearchPlugin({
-        name: 'test:winner',
-        fields: winnerFields,
-        server: () => import('../test/in-memory-search.server'),
-        overrides: [{ capability: 'search' }],
-      }),
-    ];
-    expect(() =>
-      compileSchema(
-        asResolvedConfig({
-          ...base,
-          plugins: plugins({ post: { stringField: 1 } }),
-        })
-      )
-    ).not.toThrow();
-    expect(() =>
-      compileSchema(
-        asResolvedConfig({ ...base, plugins: plugins({ post: { nope: 1 } }) })
-      )
-    ).toThrow(/test:winner.*"nope"/);
-  });
+  it.each([
+    ['loser then winner', false],
+    ['winner then loser', true],
+  ])(
+    'checks only the fields of a defineSearchPlugin that overrides another (%s)',
+    (_order, reversed) => {
+      const base = withSearch({});
+      const plugins = (winnerFields: SearchFields) => {
+        const search = [
+          searchable({ missing: { title: 1 } }),
+          defineSearchPlugin({
+            name: 'test:winner',
+            fields: winnerFields,
+            server: () => import('../test/in-memory-search.server'),
+            overrides: [{ capability: 'search' }],
+          }),
+        ];
+        return [
+          ...fieldTypes.map((type) => fieldPlugin(type, 1)),
+          ...(reversed ? search.reverse() : search),
+        ];
+      };
+      expect(() =>
+        compileSchema(
+          asResolvedConfig({
+            ...base,
+            plugins: plugins({ post: { stringField: 1 } }),
+          })
+        )
+      ).not.toThrow();
+      expect(() =>
+        compileSchema(
+          asResolvedConfig({ ...base, plugins: plugins({ post: { nope: 1 } }) })
+        )
+      ).toThrow(/test:winner.*"nope"/);
+    }
+  );
 
   it('does not check the fields of a plugin that lost search to an override', () => {
     const config = asResolvedConfig({
