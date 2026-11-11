@@ -359,7 +359,7 @@ Two overrides of one screen throw an error at boot
 - [Media plugins](./media-plugins.md) — how a plugin stores media, and the local media plugin
   - [The Media Manager](./media-manager.md) — the screen to browse, upload, rename and delete media, and the `MediaBrowser` component
 - [Auth plugins](./auth-plugins.md): how a plugin verifies a request and signs the editor in
-- [UI slots](./ui-slots.md) — how a plugin adds entries to the admin sidebar
+- [UI slots](./ui-slots.md) — how a plugin adds entries to the admin sidebar and panels to Home
 - [Architecture](./architecture.md) — how a plugin gets to the screen
 
 ## The admin shell
@@ -370,9 +370,28 @@ logo and omits it when unset.
 A content provider tells the shell where it reads from:
 
 - `branches: { list, defaultBranch }` on the content slice gives the Branch
-  switcher its branches. `list` returns `{ name, protected? }` for each branch.
+  switcher its branches. `list` returns `{ name, protected?, pullRequestUrl? }`
+  for each branch. `pullRequestUrl` is the address of the pull request of the
+  branch. The Branch panel on Home links to it. A branch without a pull request
+  omits the property.
 - `local: true` on the content slice makes the Status bar read "Local files"
   and removes the branch button.
+
+`list` on the content slice returns a `DocumentSummary` for each document
+(`core/content/contract.ts`). `path` is the only required property. Three
+properties are optional, and a provider supplies only the ones it knows:
+
+| Property | Type | Role |
+|---|---|---|
+| `title` | `string` | The name of the document for people. Pickers and Home show it instead of the file name. |
+| `updatedAt` | `string` | The time of the last change, as an ISO 8601 string in UTC. Recent documents on Home sorts by it. A string that is not a date counts as no time. |
+| `lastAuthor` | `{ name: string }` | The person who made the last change. Recent documents shows the name. |
+
+`get` and `update` return a `DocumentEntry`, which can hold the same
+properties. The local content plugin sets `updatedAt` from the modified time
+of the file. It does not set `lastAuthor`, because it does not read git.
+Do not set `updatedAt` from a time that is not the time of the last change,
+such as the time of an index.
 
 A provider with neither shows no branch spot. A `search` slice with a
 `search(query)` method adds the Search control and the ⌘K shortcut. Without one,
