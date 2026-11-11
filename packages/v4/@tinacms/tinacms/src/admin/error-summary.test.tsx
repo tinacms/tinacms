@@ -23,6 +23,7 @@ import arrayFieldPlugin from '../plugins/fields/array/array-field.plugin';
 import numberFieldPlugin from '../plugins/fields/number/number-field.plugin';
 import objectFieldPlugin from '../plugins/fields/object/object-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 
@@ -96,6 +97,7 @@ const config = asResolvedConfig({
     arrayFieldPlugin,
     numberFieldPlugin,
     coreValidatorsPlugin,
+    homePlugin,
   ],
   schema: {
     collections: [

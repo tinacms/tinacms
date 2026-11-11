@@ -11,8 +11,8 @@ provider for each key, and a second provider is a conflict. A slot has no
 `overrides`. A contribution to `globalNav` has no key. A group in `navGroups`
 has an `id` only so that entries can refer to it.
 
-The core owns the list of slots. A plugin cannot define a new slot. v4 has
-three slots now: `globalNav`, `navGroups` and `home.panel`.
+The core owns the list of slots. A plugin cannot define a new slot. v4 has two
+slots now: `globalNav` and `navGroups`.
 
 ## Contribute to a slot
 
@@ -117,136 +117,6 @@ slots: {
   `global-nav-duplicate-group`.
 - **Empty groups:** a group with no entry to show does not render.
 
-## `home.panel`
-
-`home.panel` is the list of panels on Home, the landing screen of the admin.
-Each panel is a `HomePanelContribution` (`core/slot/contract.ts`):
-
-| Property | Type | Role |
-|---|---|---|
-| `id` | `string` | The identity of the panel. It must not be empty, and it must be unique across all plugins. |
-| `component` | `ComponentType<HomePanelContext>` | The panel. Home renders it and gives it the width tier. |
-| `column` | `'main' \| 'side'` | The column of the panel on a desktop. |
-| `order` | `number` | The position in the column on a desktop. A lower number comes first. The default is `0`. |
-| `narrowOrder` | `number` | The position in the one column of a tablet and a phone. The default is the value of `order`. |
-| `dependsOn` | `Capability[]` | The capabilities the panel needs. If no installed plugin provides one of them, Home does not mount the panel. |
-
-`HomePanelContext` is `{ tier }`. `tier` is `'desktop'`, `'tablet'` or
-`'phone'`. It follows the width of the window: a phone is less than 768px, a
-tablet is from 768px to 1279px, and a desktop is 1280px or more.
-
-On a desktop, Home has two columns: `main`, and a `side` column with a fixed
-width. On a tablet and a phone, Home has one column, and `narrowOrder` sets
-the position of each panel in it.
-
-The core plugin `tina:home:core` contributes the default panels:
-
-| `id` | Panel | `column` | `order` | `narrowOrder` |
-|---|---|---|---|---|
-| `collections` | Collections | `main` | `10` | `30` |
-| `recent-documents` | Recent documents | `side` | `10` | `20` |
-| `branch` | Branch | `side` | `20` | `10` |
-
-The Branch panel renders nothing unless the content provider has `branches`.
-The id `globals` is reserved for a default panel that v4 does not supply yet.
-
-### A custom panel
-
-A panel is a React component. It gets its own data and shows its own states.
-Use `HomePanelTray` from `@tinacms/ui` for the frame, so the panel looks like
-the default panels. The tray shows placeholder rows for `loading`. It shows
-the sentence in `problem` in place of the content, with a Retry button when
-you set `onRetry`. To navigate, use `useAdminRoute` from
-`@tinacms/tinacms/admin`.
-
-```tsx
-import { HomePanelTray } from '@tinacms/ui/components/home-panel-tray';
-import { definePlugin } from '@tinacms/tinacms';
-import { useAdminRoute } from '@tinacms/tinacms/admin';
-import {
-  type HomePanelContext,
-  defineClientPlugin,
-} from '@tinacms/tinacms/client';
-
-function BuildsPanel({ tier }: HomePanelContext) {
-  const { builds, isLoading, error, retry } = useBuilds();
-  const { navigate } = useAdminRoute();
-  return (
-    <HomePanelTray
-      title='Builds'
-      count={builds ? String(builds.length) : undefined}
-      loading={isLoading}
-      problem={error ? "Couldn't load the builds." : undefined}
-      onRetry={retry}
-    >
-      <ul>
-        {(builds ?? []).slice(0, tier === 'desktop' ? 8 : 3).map((build) => (
-          <li key={build.id}>
-            <button
-              type='button'
-              onClick={() => navigate({ view: 'screen', screen: 'builds', segments: [build.id] })}
-            >
-              {build.title}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </HomePanelTray>
-  );
-}
-
-export const buildsPlugin = definePlugin({
-  name: 'example:builds',
-  client: async () => ({
-    default: defineClientPlugin({
-      slots: {
-        'home.panel': [
-          {
-            id: 'example.builds',
-            component: BuildsPanel,
-            column: 'side',
-            order: 15,
-            narrowOrder: 25,
-          },
-        ],
-      },
-    }),
-  }),
-});
-```
-
-With `order: 15`, the panel is between Recent documents and Branch in the
-side column. With `narrowOrder: 25`, it is between Recent documents and
-Collections in the one column.
-
-For data that the setup does not have, set `problem` and omit `onRetry`. The
-tray then shows the sentence with no Retry button.
-
-### Rules
-
-- **Order:** Home sorts the panels of a column by `order`, and the one column
-  by `narrowOrder`. Panels with the same value keep the order of the plugins
-  in `defineConfig`, then the order in the `home.panel` array.
-- **Ids:** an empty `id` throws `home-panel-no-id` at boot. An `id` that a
-  different panel has throws `home-panel-duplicate-id`, and the message names
-  the two plugins. This includes the ids of the default panels. Give a
-  third-party id a prefix (`acme.builds`).
-- **Columns:** a `column` that is not `main` or `side` throws
-  `home-panel-unknown-column`.
-- **Numbers:** an `order` that is not a finite number throws
-  `home-panel-order-not-finite`. A `narrowOrder` that is not a finite number
-  throws `home-panel-narrow-order-not-finite`.
-- **Each error names the plugin** that contributes the panel.
-- **Dependencies:** Home does not mount a panel with a `dependsOn` capability
-  that no installed plugin provides. The panel leaves no empty frame. Boot
-  still does the id, column and number checks on it.
-- **Titles:** the title of a tray is the name of its region for a screen
-  reader. Give each panel a different title.
-- **Failures:** if a panel throws while it renders, Home shows "Couldn't show
-  this panel." with a Retry button in its place. The other panels continue to
-  operate.
-- **Add and order only:** a plugin cannot remove or replace a default panel.
-
 ## Read the nav
 
 `useGlobalNav()` (`@tinacms/tinacms/admin`) gives a list of
@@ -258,4 +128,4 @@ with its entries, or a run of entries without a group (`group` is
 
 - **Permissions:** ADR-013 gates a contribution with
   `requires: { permission }`. v4 has no permission system yet (ADR-008). Thus
-  every entry and every panel renders for every user.
+  every entry renders for every user.

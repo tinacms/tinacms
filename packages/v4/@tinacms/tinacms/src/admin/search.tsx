@@ -19,7 +19,13 @@ import {
 } from '../core/search/contract';
 import { useOptionalContentSlice, useTinaStore } from '../editor/hooks';
 import { useAdminScreens, useGlobalNav } from './hooks';
-import { MEDIA_SCREEN, openNavTarget } from './rail';
+import {
+  HOME_SCREEN,
+  MEDIA_SCREEN,
+  hasHomeEntry,
+  openNavTarget,
+  targetsScreen,
+} from './rail';
 import { useAdminRoute } from './use-admin-route';
 
 function useSearchProvider(): SearchProvider | null {
@@ -116,7 +122,9 @@ function useNavigationResults(): NavigationResult[] {
   return useMemo(() => {
     const hasMedia = screens.some(({ name }) => name === MEDIA_SCREEN);
     const places: Omit<NavigationResult, 'id'>[] = [
-      { label: 'Home', run: () => navigate({ view: 'home' }) },
+      ...(hasHomeEntry(globalNav)
+        ? [{ label: 'Home', run: () => navigate({ view: 'home' }) }]
+        : []),
       { label: 'Collections', run: () => navigate({ view: 'collections' }) },
       {
         label: 'Media',
@@ -132,7 +140,10 @@ function useNavigationResults(): NavigationResult[] {
     ];
     const plugins = globalNav
       .flatMap(({ entries }) => entries)
-      .filter(({ target }) => target.kind !== 'url')
+      .filter(
+        ({ target }) =>
+          target.kind !== 'url' && !targetsScreen(target, HOME_SCREEN)
+      )
       .map(({ label, target }) => ({
         label,
         run: () => openNavTarget(target, navigate),

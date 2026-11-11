@@ -31,7 +31,6 @@ import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { createScreenRegistry } from '../core/screen/registry';
 import { createGlobalNav } from '../core/slot/global-nav';
-import { createHomePanels } from '../core/slot/home-panel';
 import { addressesWithValidators } from '../core/validation';
 import { createValidatorRegistry } from '../core/validator/registry';
 import type { DraftUserScope, StoredDraft } from '../form/drafts';
@@ -126,7 +125,6 @@ export function TinaProvider({
         }),
         screens,
         globalNav: createGlobalNav(resolved, composedPlugins, screens),
-        homePanels: createHomePanels(resolved, composedPlugins),
       };
       const destroyPlugins = await initializePlugins(composedPlugins);
       if (mounted) {

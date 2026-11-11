@@ -4,9 +4,9 @@ import { EmptyState } from '@tinacms/ui/components/empty-state';
 import { HomePanelTray } from '@tinacms/ui/components/home-panel-tray';
 import { ListRow } from '@tinacms/ui/components/list-row';
 import { useEffect, useId, useRef, useState } from 'react';
+import type { Tier } from '@tinacms/ui/hooks/use-tier';
 import { useTinaSchema } from '../../admin/hooks';
 import { useAdminRoute } from '../../admin/use-admin-route';
-import type { HomePanelContext } from '../../core/slot/contract';
 import { useCollectionLists } from '../../editor/collection-lists';
 import { useContentMode } from '../../editor/content-mode';
 import { useUnsavedFormIds } from '../../form/form-store';
@@ -161,7 +161,7 @@ function Rows({
  * collection. A desktop scrolls inside the panel; a tablet and a phone show
  * five rows and Show more.
  */
-export function RecentDocumentsPanel({ tier }: HomePanelContext) {
+export function RecentDocumentsPanel({ tier }: { tier: Tier }) {
   const { collections } = useTinaSchema();
   const { lists, retryFailed } = useCollectionLists(
     collections.map(({ name }) => name)

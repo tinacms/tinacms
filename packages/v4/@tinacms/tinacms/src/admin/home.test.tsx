@@ -1,22 +1,19 @@
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { HomePanelTray } from '@tinacms/ui/components/home-panel-tray';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { asResolvedConfig } from '../config';
+import { asResolvedConfig, defineConfig } from '../config';
 import type { BranchInfo } from '../core/branch/contract';
 import { currentBranchOf } from '../core/branch/contract';
 import type { DocumentEntry, DocumentSummary } from '../core/content/contract';
 import { type PluginManifest, definePlugin } from '../core/plugin';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
-import type {
-  HomePanelContext,
-  HomePanelContribution,
-} from '../core/slot/contract';
+import type { AdminScreenProps } from '../core/screen/contract';
 import { draftKey } from '../form/drafts';
 import { toFormId } from '../form/form-store';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
-import homePanelsPlugin from '../plugins/home/home-panels.plugin';
+import { corePlugins } from '../plugins/fields';
+import homePlugin from '../plugins/home/home.plugin';
 import { guardConsole } from '../test/console-guard';
 import { TinaAdmin } from './admin';
 
@@ -47,6 +44,7 @@ interface World {
     value: TinaDocument
   ) => Promise<DocumentEntry>;
   plugins: PluginManifest[];
+  withHome: boolean;
 }
 
 let world: World;
@@ -86,20 +84,6 @@ const contentPlugin = () =>
     }),
   });
 
-const panelPlugin = (name: string, panels: HomePanelContribution[]) =>
-  definePlugin({
-    name,
-    client: async () => ({ default: { slots: { 'home.panel': panels } } }),
-  });
-
-const searchPlugin = definePlugin({
-  name: 'test:search',
-  provides: ['search'],
-  client: async () => ({
-    default: { slice: () => ({ search: async () => [] }) },
-  }),
-});
-
 const setWidth = (width: number) =>
   vi.stubGlobal('matchMedia', (query: string) => {
     const min = /min-width: (\d+)px/.exec(query);
@@ -114,6 +98,9 @@ const setWidth = (width: number) =>
     };
   });
 
+const queryClient = () =>
+  new QueryClient({ defaultOptions: { queries: { retry: false } } });
+
 const renderAdmin = () =>
   render(
     <TinaAdmin
@@ -121,21 +108,17 @@ const renderAdmin = () =>
         plugins: [
           contentPlugin(),
           stringFieldPlugin,
-          homePanelsPlugin,
+          ...(world.withHome ? [homePlugin] : []),
           ...world.plugins,
         ],
         schema: { collections: world.collections },
       })}
-      queryClient={
-        new QueryClient({ defaultOptions: { queries: { retry: false } } })
-      }
+      queryClient={queryClient()}
     />
   );
 
-const home = () => within(screen.getByRole('main'));
-
 const panelTitles = () =>
-  home()
+  within(screen.getByRole('main'))
     .getAllByRole('region')
     .map((region) => within(region).getByRole('heading').textContent);
 
@@ -166,6 +149,7 @@ beforeEach(() => {
     list: async (name, branch) => world.summaries[branch]?.[name] ?? [],
     update: async (_name, path, value) => ({ path, document: value }),
     plugins: [],
+    withHome: true,
   };
   window.location.hash = '';
   setWidth(1440);
@@ -226,171 +210,267 @@ const manyPosts = (count: number): DocumentSummary[] =>
     updatedAt: ago((index + 1) * HOUR),
   }));
 
-const Stats = ({ tier }: HomePanelContext) => (
-  <HomePanelTray title='Stats'>
-    <p>stats on a {tier}</p>
-  </HomePanelTray>
-);
+const rail = () => screen.findByRole('navigation', { name: 'Content' });
 
-const Notes = () => (
-  <HomePanelTray title='Notes'>
-    <p>notes</p>
-  </HomePanelTray>
-);
+const railRow = async (name: string) =>
+  within(await rail()).queryByRole('button', { name });
 
-describe('Home panel slot', () => {
-  it('renders a panel that a plugin contributes, and passes it the width tier', async () => {
-    world.plugins = [
-      panelPlugin('acme:stats', [
-        { id: 'stats', component: Stats, column: 'side' },
-      ]),
-    ];
-    renderAdmin();
-    const stats = await panel('Stats');
-    expect(within(stats).getByText('stats on a desktop')).toBeVisible();
+const navigationResults = async (user: ReturnType<typeof userEvent.setup>) => {
+  await user.click(await screen.findByRole('button', { name: 'Search' }));
+  return within(
+    await screen.findByRole('list', { name: 'Navigation results' })
+  );
+};
+
+let seenSegments: string[][] = [];
+
+const CustomHome = ({ segments }: AdminScreenProps) => {
+  seenSegments.push(segments);
+  return <p>custom home</p>;
+};
+
+const customHomePlugin = (overrides: boolean) =>
+  definePlugin({
+    name: 'acme:home',
+    provides: ['screen'],
+    ...(overrides
+      ? { overrides: [{ capability: 'screen' as const, key: 'home' }] }
+      : {}),
+    client: async () => ({
+      default: {
+        screens: [{ name: 'home', label: 'Home', component: CustomHome }],
+      },
+    }),
   });
 
-  it('refuses to start when two plugins contribute the same panel id, and names both', async () => {
-    consoleGuard.expect(/home-panel-duplicate-id/);
-    world.plugins = [
-      panelPlugin('acme:stats', [
-        { id: 'stats', component: Stats, column: 'side' },
-      ]),
-      panelPlugin('acme:other', [
-        { id: 'stats', component: Notes, column: 'main' },
-      ]),
-    ];
-    renderAdmin();
-    const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent(
-      'Plugin "acme:other" contributes the Home panel "stats", but plugin "acme:stats" already contributes a panel with that id.'
-    );
+const removeHomePlugin = definePlugin({
+  name: 'acme:no-home',
+  provides: ['screen'],
+  overrides: [{ capability: 'screen', key: 'home' }],
+});
+
+describe('Home screen', () => {
+  beforeEach(() => {
+    seenSegments = [];
   });
 
-  it('refuses a project panel that reuses a built-in id', async () => {
-    consoleGuard.expect(/home-panel-duplicate-id/);
-    world.plugins = [
-      panelPlugin('acme:mine', [
-        { id: 'collections', component: Notes, column: 'main' },
-      ]),
-    ];
-    renderAdmin();
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      /"acme:mine" .* "collections", but plugin "tina:home:core"/
-    );
-  });
-
-  it('puts main and side panels in their desktop columns by order', async () => {
-    world.plugins = [
-      panelPlugin('acme:panels', [
-        { id: 'notes', component: Notes, column: 'main', order: 5 },
-        { id: 'stats', component: Stats, column: 'side', order: 5 },
-      ]),
-    ];
-    renderAdmin();
-    await panel('Stats');
-    expect(panelTitles()).toEqual([
-      'Notes',
-      expect.stringMatching(/^Collections/),
-      'Stats',
-      'Recent documents',
-    ]);
-    expect(columnOf(await panel('Notes'))).toBe('main');
-    expect(columnOf(await panel(/^Collections/))).toBe('main');
-    expect(columnOf(await panel('Stats'))).toBe('side');
+  it('is a screen named home that a core plugin contributes by default', async () => {
+    expect(corePlugins).toContain(homePlugin);
+    const { default: segment } = (await homePlugin.client?.()) ?? {};
+    expect(segment?.screens?.map(({ name }) => name)).toEqual(['home']);
+    expect(segment?.slots).toEqual({
+      globalNav: [
+        expect.objectContaining({
+          label: 'Home',
+          target: { kind: 'screen', screen: 'home' },
+        }),
+      ],
+    });
+    const { plugins } = defineConfig({
+      plugins: [contentPlugin()],
+      schema: { collections: [] },
+    });
+    expect(plugins).toContain(homePlugin);
   });
 
   it.each([
-    ['tablet', 1024],
-    ['phone', 390],
+    ['#/', '#/'],
+    ['an empty hash', ''],
+    ['an unknown hash', '#/nowhere'],
+    ['#/screens/home', '#/screens/home'],
   ])(
-    'stacks every panel in one column by narrowOrder on a %s',
-    async (tier, width) => {
-      setWidth(width);
-      world.plugins = [
-        panelPlugin('acme:panels', [
-          { id: 'notes', component: Notes, column: 'main', order: 35 },
-          {
-            id: 'stats',
-            component: Stats,
-            column: 'side',
-            order: 99,
-            narrowOrder: 1,
-          },
-        ]),
-      ];
+    'shows Home bare, with no panel header and no Close, at %s',
+    async (_case, hash) => {
+      window.location.hash = hash;
       renderAdmin();
-      const stats = await panel('Stats');
-      expect(within(stats).getByText(`stats on a ${tier}`)).toBeVisible();
-      expect(panelTitles()).toEqual([
-        'Stats',
-        'Recent documents',
-        expect.stringMatching(/^Collections/),
-        'Notes',
-      ]);
-      expect(columnOf(stats)).toBe('narrow');
+      const main = await screen.findByRole('main');
+      expect(
+        await within(main).findByRole('region', { name: /^Collections/ })
+      ).toBeVisible();
+      expect(
+        within(main).getAllByRole('heading', { name: 'Home' })
+      ).toHaveLength(1);
+      expect(within(main).queryByRole('button', { name: 'Close' })).toBeNull();
+      expect(await railRow('Home')).toHaveAttribute('aria-current', 'page');
     }
   );
 
-  it('leaves out a panel whose capability no plugin provides, with no tray', async () => {
-    world.plugins = [
-      panelPlugin('acme:panels', [
-        {
-          id: 'stats',
-          component: Stats,
-          column: 'side',
-          dependsOn: ['search'],
-        },
-      ]),
-    ];
+  it('shows a plugin screen that overrides home at #/, with none of the built-in Home', async () => {
+    keepDraft('content/posts/hello.mdx');
+    world.plugins = [customHomePlugin(true)];
     renderAdmin();
-    await panel(/^Collections/);
-    expect(panelTitles()).toEqual([
-      expect.stringMatching(/^Collections/),
-      'Recent documents',
-    ]);
+    const main = await screen.findByRole('main');
+    expect(await within(main).findByText('custom home')).toBeVisible();
+    expect(seenSegments.at(-1)).toEqual([]);
+    expect(within(main).queryByRole('region')).toBeNull();
+    expect(within(main).queryByRole('heading', { name: 'Home' })).toBeNull();
+    expect(within(main).queryByRole('button', { name: 'Close' })).toBeNull();
+    expect(screen.queryByText(/^Local files:/)).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Review/ })).toBeNull();
+    expect(await railRow('Home')).toHaveAttribute('aria-current', 'page');
   });
 
-  it('mounts a panel once a plugin provides its capability', async () => {
-    world.plugins = [
-      searchPlugin,
-      panelPlugin('acme:panels', [
-        {
-          id: 'stats',
-          component: Stats,
-          column: 'side',
-          dependsOn: ['search'],
-        },
-      ]),
-    ];
+  it('passes the rest of #/screens/home/a/b to a replacement Home as segments', async () => {
+    world.plugins = [customHomePlugin(true)];
+    window.location.hash = '#/screens/home/a/b';
     renderAdmin();
-    expect(await panel('Stats')).toBeVisible();
+    const main = await screen.findByRole('main');
+    expect(await within(main).findByText('custom home')).toBeVisible();
+    expect(seenSegments.at(-1)).toEqual(['a', 'b']);
+    expect(within(main).queryByRole('button', { name: 'Close' })).toBeNull();
   });
 
-  it('replaces a panel that throws with a sentence and Retry, and keeps the others working', async () => {
-    consoleGuard.expect(/stats exploded/);
-    let broken = true;
-    const Flaky = () => {
-      if (broken) throw new Error('stats exploded');
-      return (
-        <HomePanelTray title='Stats'>
-          <p>stats are back</p>
-        </HomePanelTray>
+  it('refuses to start when a second screen named home has no override', async () => {
+    consoleGuard.expect(/admin screen named "home"/);
+    world.plugins = [customHomePlugin(false)];
+    renderAdmin();
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Two plugins both contribute an admin screen named "home"'
+    );
+  });
+
+  const renderWithoutHome = {
+    'an override that contributes no home screen': () => {
+      world.plugins = [removeHomePlugin];
+      return renderAdmin();
+    },
+    "a project plugin with the core Home plugin's name": () =>
+      render(
+        <TinaAdmin
+          config={defineConfig({
+            plugins: [contentPlugin(), definePlugin({ name: homePlugin.name })],
+            schema: { collections: world.collections },
+          })}
+          queryClient={queryClient()}
+        />
+      ),
+  };
+
+  it.each(Object.entries(renderWithoutHome))(
+    'shows a placeholder at #/ and no Home row or search entry after %s',
+    async (_case, renderIt) => {
+      const user = userEvent.setup();
+      renderIt();
+      const main = await screen.findByRole('main');
+      expect(
+        within(main).getByText('Pick a place from the sidebar.')
+      ).toBeVisible();
+      expect(within(main).queryByRole('region')).toBeNull();
+      expect(screen.queryByRole('alert')).toBeNull();
+      expect(await railRow('Home')).toBeNull();
+
+      const results = await navigationResults(user);
+      expect(results.queryByRole('button', { name: 'Home' })).toBeNull();
+      await user.click(results.getByRole('button', { name: 'Collections' }));
+      await waitFor(() => expect(window.location.hash).toBe('#/collections'));
+
+      await user.click(
+        (await screen.findAllByRole('button', { name: 'Close' }))[0]
       );
-    };
-    world.plugins = [
-      panelPlugin('acme:panels', [
-        { id: 'stats', component: Flaky, column: 'side' },
-      ]),
+      await waitFor(() => expect(window.location.hash).toBe('#/'));
+      expect(
+        await screen.findByText('Pick a place from the sidebar.')
+      ).toBeVisible();
+
+      await user.click(
+        within(await rail()).getByRole('button', { name: 'Collections' })
+      );
+      await waitFor(() => expect(window.location.hash).toBe('#/collections'));
+    }
+  );
+
+  it('says that no screen is named home at #/screens/home once Home is removed', async () => {
+    world.plugins = [removeHomePlugin];
+    window.location.hash = '#/screens/home';
+    renderAdmin();
+    expect(await screen.findByText('No screen named “home”.')).toBeVisible();
+    expect(await railRow('Home')).toBeNull();
+  });
+
+  it('has no Home row and no Home at #/ for a config with no Home plugin', async () => {
+    world.withHome = false;
+    const user = userEvent.setup();
+    renderAdmin();
+    expect(
+      await screen.findByText('Pick a place from the sidebar.')
+    ).toBeVisible();
+    expect(await railRow('Home')).toBeNull();
+    const results = await navigationResults(user);
+    expect(results.queryByRole('button', { name: 'Home' })).toBeNull();
+  });
+
+  it('keeps Home as the first sidebar row, once, selected only on Home', async () => {
+    window.location.hash = '#/collections';
+    const user = userEvent.setup();
+    renderAdmin();
+    const rows = within(await rail()).getAllByRole('button');
+    expect(rows[0]).toHaveAccessibleName('Home');
+    expect(
+      within(await rail()).getAllByRole('button', { name: 'Home' })
+    ).toHaveLength(1);
+    expect(rows[0]).not.toHaveAttribute('aria-current');
+    const places = within(await rail()).getByRole('list', {
+      name: 'Navigation',
+    });
+    expect(
+      within(await rail())
+        .getAllByRole('list')
+        .filter((list) => list !== places)
+        .flatMap((list) =>
+          within(list).queryAllByRole('button', { name: 'Home' })
+        )
+    ).toEqual([]);
+
+    await user.click(rows[0]);
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
+    expect(await railRow('Home')).toHaveAttribute('aria-current', 'page');
+    for (const name of ['Tools', 'Settings']) {
+      await user.click(within(await rail()).getByRole('button', { name }));
+      expect(await railRow('Home')).not.toHaveAttribute('aria-current');
+    }
+  });
+
+  it('lists Home once in Search and opens #/ from it', async () => {
+    window.location.hash = '#/collections';
+    const user = userEvent.setup();
+    renderAdmin();
+    const results = await navigationResults(user);
+    expect(results.getAllByRole('button', { name: 'Home' })).toHaveLength(1);
+    await user.click(results.getByRole('button', { name: 'Home' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
+    expect(
+      await within(await screen.findByRole('main')).findByRole('heading', {
+        name: 'Home',
+      })
+    ).toBeVisible();
+  });
+
+  it('replaces a built-in panel that throws with a sentence and Retry, and keeps the others working', async () => {
+    consoleGuard.expect(/collections exploded/);
+    // The Collections panel is the only panel that reads a collection's label.
+    let broken = true;
+    world.collections = [
+      Object.defineProperty(collection('post'), 'label', {
+        get: () => {
+          if (broken) throw new Error('collections exploded');
+          return 'Posts';
+        },
+      }),
     ];
+    world.summaries.main = {
+      post: [{ path: 'content/posts/hello.mdx', updatedAt: ago(HOUR) }],
+    };
     const user = userEvent.setup();
     renderAdmin();
     const fallback = await panel('Panel');
     expect(
       within(fallback).getByText("Couldn't show this panel.")
     ).toBeVisible();
-    const collections = await panel(/^Collections/);
-    expect(await within(collections).findByText('2 documents')).toBeVisible();
+    expect(columnOf(fallback)).toBe('main');
+    const recent = await panel('Recent documents');
+    expect(
+      await within(recent).findByRole('button', { name: /^hello/ })
+    ).toBeVisible();
 
     await user.click(within(fallback).getByRole('button', { name: 'Retry' }));
     expect(
@@ -402,15 +482,15 @@ describe('Home panel slot', () => {
       within(await panel('Panel')).getByRole('button', { name: 'Retry' })
     );
     expect(
-      within(await panel('Stats')).getByText('stats are back')
+      await within(await panel(/^Collections/)).findByText('1 document')
     ).toBeVisible();
-    expect(home().queryByText("Couldn't show this panel.")).toBeNull();
+    expect(screen.queryByText("Couldn't show this panel.")).toBeNull();
 
-    await user.click(
-      within(collections).getByRole('button', { name: 'Posts' })
-    );
+    await user.click(within(recent).getByRole('button', { name: /^hello/ }));
     await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections/post')
+      expect(window.location.hash).toBe(
+        '#/collections/post/content%2Fposts%2Fhello.mdx'
+      )
     );
   });
 });
@@ -423,7 +503,9 @@ describe('Home head', () => {
         'Local files: Tina writes edits straight to disk.'
       )
     ).toBeVisible();
-    expect(home().getByRole('heading', { name: 'Home' })).toBeVisible();
+    expect(
+      within(screen.getByRole('main')).getByRole('heading', { name: 'Home' })
+    ).toBeVisible();
     expect(screen.queryByRole('button', { name: /^Review/ })).toBeNull();
   });
 
@@ -454,8 +536,12 @@ describe('Home head', () => {
     expect(
       await screen.findByRole('button', { name: 'Review 1 unsaved' })
     ).toBeVisible();
-    expect(home().queryByText(/^Local files/)).toBeNull();
-    expect(home().queryByRole('region', { name: 'Branch' })).toBeNull();
+    expect(
+      within(screen.getByRole('main')).queryByText(/^Local files/)
+    ).toBeNull();
+    expect(
+      within(screen.getByRole('main')).queryByRole('region', { name: 'Branch' })
+    ).toBeNull();
   });
 });
 

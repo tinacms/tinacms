@@ -3,9 +3,9 @@ import { HomePanelTray } from '@tinacms/ui/components/home-panel-tray';
 import { ListRow } from '@tinacms/ui/components/list-row';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { TileGrid } from '@tinacms/ui/components/tile';
+import type { Tier } from '@tinacms/ui/hooks/use-tier';
 import { useTinaSchema } from '../../admin/hooks';
 import { useAdminRoute } from '../../admin/use-admin-route';
-import type { HomePanelContext } from '../../core/slot/contract';
 import {
   type CollectionList,
   useCollectionLists,
@@ -18,7 +18,7 @@ const countOf = (list: CollectionList | undefined): string | undefined => {
 };
 
 /** One tile per collection, in schema order. On a phone, one-line rows. */
-export function CollectionsPanel({ tier }: HomePanelContext) {
+export function CollectionsPanel({ tier }: { tier: Tier }) {
   const { collections } = useTinaSchema();
   const { navigate } = useAdminRoute();
   const { lists } = useCollectionLists(collections.map(({ name }) => name));

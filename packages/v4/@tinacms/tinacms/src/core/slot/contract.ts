@@ -29,43 +29,10 @@ export interface GlobalNavSection {
   entries: GlobalNavEntry[];
 }
 
-export type HomeTier = 'desktop' | 'tablet' | 'phone';
-
-/** What Home passes to each panel: the width tier of the window. */
-export interface HomePanelContext {
-  tier: HomeTier;
-}
-
-export type HomePanelColumn = 'main' | 'side';
-
-/** One panel on Home. A panel loads its own data and draws its own states. */
-export interface HomePanelContribution {
-  /** Unique across plugins. A duplicate throws at boot. */
-  id: string;
-  component: ComponentType<HomePanelContext>;
-  /** The column on a desktop. */
-  column: HomePanelColumn;
-  /** The position in its column on a desktop. Lower is first. 0 by default. */
-  order?: number;
-  /** The position in the one-column layout of a tablet and a phone. `order` by default. */
-  narrowOrder?: number;
-  // The panel mounts only when an installed plugin provides each of these.
-  dependsOn?: Capability[];
-}
-
-/** The panels of Home, sorted for each layout. */
-export interface HomePanels {
-  main: HomePanelContribution[];
-  side: HomePanelContribution[];
-  narrow: HomePanelContribution[];
-}
-
+// Definitions for global navigation slot options
 export interface SlotContributions {
   globalNav?: GlobalNavEntry[];
   navGroups?: NavGroup[];
-  'home.panel'?: HomePanelContribution[];
 }
 
 export const DEFAULT_NAV_ORDER = 0;
-
-export const DEFAULT_HOME_PANEL_ORDER = 0;

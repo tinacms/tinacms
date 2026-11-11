@@ -13,6 +13,7 @@ import { toFormId, useFormStore } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 
@@ -171,6 +172,7 @@ const renderAdmin = (projectName?: string) =>
           ...(searchEnabled ? [searchPlugin] : []),
           stringFieldPlugin,
           coreValidatorsPlugin,
+          homePlugin,
         ],
         ...(projectName ? { projectName } : {}),
         schema: {

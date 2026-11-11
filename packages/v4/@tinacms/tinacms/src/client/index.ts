@@ -28,8 +28,6 @@ export type {
   ActionTarget,
   GlobalNavEntry,
   GlobalNavSection,
-  HomePanelContext,
-  HomePanelContribution,
   NavGroup,
   NavTarget,
   ScreenTarget,
