@@ -1,5 +1,6 @@
 import { HomePanelTray } from '@tinacms/ui/components/home-panel-tray';
 import { Icon } from '@tinacms/ui/components/icon';
+import { cn } from '@tinacms/ui/lib/utils';
 import { ReviewUnsavedButton } from '../../admin/review-unsaved';
 import { type BranchView, useBranchView } from '../../editor/branch';
 import { useContentMode } from '../../editor/content-mode';
@@ -29,6 +30,52 @@ function BranchName({ branch }: { branch: BranchView }) {
   );
 }
 
+// Only an http(s) address is a link. A last path segment that is a whole number is the pull request's number.
+const pullRequestOf = (
+  url: string | undefined
+): { href: string; label: string } | null => {
+  if (!url || !URL.canParse(url)) return null;
+  const { protocol, pathname, href } = new URL(url);
+  if (protocol !== 'https:' && protocol !== 'http:') return null;
+  const last = pathname.split('/').filter(Boolean).at(-1) ?? '';
+  return {
+    href,
+    label: /^\d+$/.test(last) ? `Pull request #${last}` : 'Pull request',
+  };
+};
+
+function PullRequestRow({ url }: { url: string | undefined }) {
+  const pullRequest = pullRequestOf(url);
+  const icon = (
+    <span className='inline-flex flex-none text-muted-foreground'>
+      <Icon glyph='changes' size={16} />
+    </span>
+  );
+  if (!pullRequest) {
+    return (
+      <div className={ROW}>
+        {icon}
+        <span className='text-muted-foreground'>No pull request yet</span>
+      </div>
+    );
+  }
+  return (
+    <a
+      href={pullRequest.href}
+      target='_blank'
+      rel='noreferrer'
+      className={cn(
+        ROW,
+        'rounded-sm text-foreground no-underline outline-none hover:bg-muted focus-visible:shadow-focus-inset'
+      )}
+    >
+      {icon}
+      <span className='min-w-0 wrap-anywhere'>{pullRequest.label}</span>
+      <span className='sr-only'>(opens in a new tab)</span>
+    </a>
+  );
+}
+
 function BranchPanelBody({ branch }: { branch: BranchView }) {
   const unsaved = useUnsavedFormIds().length;
   const isLoading =
@@ -38,12 +85,15 @@ function BranchPanelBody({ branch }: { branch: BranchView }) {
       title='Branch'
       loading={isLoading ? 2 : false}
       problem={
-        branch.listState === 'failed' ? "Couldn't load this branch." : undefined
+        branch.listState === 'failed'
+          ? "Couldn't load this branch's pull request."
+          : undefined
       }
       onRetry={branch.retryList}
     >
       <div className='flex flex-col'>
         <BranchName branch={branch} />
+        <PullRequestRow url={branch.pullRequestUrl} />
         {unsaved > 0 ? (
           <div className='mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-border px-2 pt-3 pb-1'>
             <span className='text-sm text-muted-foreground'>

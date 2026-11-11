@@ -977,7 +977,9 @@ describe('Branch panel', () => {
     renderAdmin();
     const branch = await panel('Branch');
     expect(
-      await within(branch).findByText("Couldn't load this branch.")
+      await within(branch).findByText(
+        "Couldn't load this branch's pull request."
+      )
     ).toBeVisible();
     expect(
       await within(await panel(/^Collections/)).findByText('2 documents')
@@ -985,15 +987,97 @@ describe('Branch panel', () => {
 
     await user.click(within(branch).getByRole('button', { name: 'Retry' }));
     expect(
-      await within(branch).findByText("Couldn't load this branch.")
+      await within(branch).findByText(
+        "Couldn't load this branch's pull request."
+      )
     ).toBeVisible();
     expect(reads).toBe(2);
 
     offline = false;
     await user.click(within(branch).getByRole('button', { name: 'Retry' }));
     expect(await within(branch).findByText('main')).toBeVisible();
-    expect(within(branch).queryByText("Couldn't load this branch.")).toBeNull();
+    expect(
+      within(branch).queryByText("Couldn't load this branch's pull request.")
+    ).toBeNull();
     await waitFor(() => expect(branch).toHaveFocus());
+  });
+
+  it('links the pull request of the current branch by its number, in a new tab', async () => {
+    world.branches = [
+      {
+        name: 'main',
+        protected: true,
+        pullRequestUrl: 'https://github.com/acme/site/pull/12',
+      },
+    ];
+    renderAdmin();
+    const link = await within(await panel('Branch')).findByRole('link', {
+      name: /^Pull request #12/,
+    });
+    expect(link).toHaveAttribute(
+      'href',
+      'https://github.com/acme/site/pull/12'
+    );
+    expect(link).toHaveAttribute('target', '_blank');
+  });
+
+  it('says Pull request, and still links, when the address has no number', async () => {
+    world.branches = [
+      { name: 'main', pullRequestUrl: 'https://git.example.com/review/abc' },
+    ];
+    renderAdmin();
+    const link = await within(await panel('Branch')).findByRole('link', {
+      name: /^Pull request(?! #)/,
+    });
+    expect(link).toHaveAttribute('href', 'https://git.example.com/review/abc');
+  });
+
+  it.each([
+    ['missing', undefined],
+    ['an empty string', ''],
+    ['not a web address', 'javascript:alert(1)'],
+  ])(
+    'says No pull request yet, with no link, when the address is %s',
+    async (_case, pullRequestUrl) => {
+      world.branches = [{ name: 'main', pullRequestUrl }];
+      renderAdmin();
+      const branch = await panel('Branch');
+      expect(
+        await within(branch).findByText('No pull request yet')
+      ).toBeVisible();
+      expect(within(branch).queryByRole('link')).toBeNull();
+    }
+  );
+
+  it("shows the new branch's pull request after a switch, never the previous one's", async () => {
+    world.branches = [
+      { name: 'main', pullRequestUrl: 'https://github.com/acme/site/pull/1' },
+      { name: 'feature/news' },
+      {
+        name: 'feature/docs',
+        pullRequestUrl: 'https://github.com/acme/site/pull/7',
+      },
+    ];
+    const user = userEvent.setup();
+    renderAdmin();
+    const branch = await panel('Branch');
+    expect(
+      await within(branch).findByRole('link', { name: /^Pull request #1\b/ })
+    ).toBeVisible();
+
+    await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+    await user.click(await screen.findByText('feature/news'));
+    expect(
+      await within(branch).findByText('No pull request yet')
+    ).toBeVisible();
+    expect(within(branch).queryByRole('link')).toBeNull();
+
+    await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+    await user.click(await screen.findByText('feature/docs'));
+    expect(
+      await within(branch).findByRole('link', { name: /^Pull request #7\b/ })
+    ).toBeVisible();
+    expect(within(branch).getAllByRole('link')).toHaveLength(1);
   });
 
   it('puts Recent documents then Branch in the side column on a desktop', async () => {
