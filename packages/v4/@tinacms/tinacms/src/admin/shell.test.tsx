@@ -1105,23 +1105,24 @@ describe('Save to new branch', () => {
     expect(updates).toHaveLength(0);
   });
 
-  it('shows field errors and no dialog when the form is invalid, and Retry checks again', async () => {
+  it('turns an invalid Save to new branch into Resolve, with no toast or dialog, then opens the dialog once fixed', async () => {
     const { user, input } = await openHello();
     await user.clear(input);
     await user.click(
       await screen.findByRole('button', { name: /^Save to new branch/ })
     );
-    const toast = await waitFor(() => {
-      const found = document.querySelector('[data-slot=toast]');
-      expect(found).not.toBeNull();
-      return found as HTMLElement;
-    });
-    expect(toast).toHaveTextContent(
-      "Couldn't save. Some fields are not valid."
-    );
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    expect(document.querySelector('[data-slot=toast]')).toBeNull();
     expect(screen.queryByRole('dialog')).toBeNull();
+    const status = screen.getByRole('contentinfo', { name: 'Status bar' });
+    expect(within(status).queryByText('Save failed')).toBeNull();
+    expect(within(status).getByText('Unsaved changes')).toBeVisible();
     await user.type(input, 'Fixed');
-    await user.click(within(toast).getByRole('button', { name: 'Retry' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    );
     expect(
       await screen.findByRole('dialog', { name: 'Save to a new branch' })
     ).toBeVisible();
@@ -1235,21 +1236,19 @@ describe('Save to new branch', () => {
     expect(nameField(dialog)).toHaveAttribute('aria-invalid', 'true');
   });
 
-  it('clears Save failed once the fields are fixed and the dialog opens', async () => {
+  it('leaves no Save failed once the fields are fixed and the dialog opens', async () => {
     const { user, input } = await openHello();
     await user.clear(input);
     await user.click(
       await screen.findByRole('button', { name: /^Save to new branch/ })
     );
-    await screen.findByText(/Couldn.t save\. Some fields are not valid/);
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
     await user.type(input, 'Fixed');
     await user.click(
-      await screen.findByRole('button', { name: /^Save to new branch/ })
+      await screen.findByRole('button', { name: 'Save to new branch' })
     );
     await screen.findByRole('dialog', { name: 'Save to a new branch' });
-    await waitFor(() =>
-      expect(document.querySelector('[data-slot=toast]')).toBeNull()
-    );
+    expect(document.querySelector('[data-slot=toast]')).toBeNull();
     const bar = document.querySelector('[data-slot=form-bar]') as HTMLElement;
     expect(bar).not.toHaveTextContent('Save failed');
   });
