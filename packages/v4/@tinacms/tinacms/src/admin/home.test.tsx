@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HomePanelTray } from '@tinacms/ui/components/home-panel-tray';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -13,6 +13,8 @@ import type {
   HomePanelContext,
   HomePanelContribution,
 } from '../core/slot/contract';
+import { draftKey } from '../form/drafts';
+import { toFormId } from '../form/form-store';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import homePanelsPlugin from '../plugins/home/home-panels.plugin';
 import { guardConsole } from '../test/console-guard';
@@ -171,7 +173,58 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
+
+const NOW = Date.parse('2026-11-11T12:00:00.000Z');
+const ago = (ms: number) => new Date(NOW - ms).toISOString();
+const MINUTE = 60_000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+
+const fixClock = () => vi.useFakeTimers({ toFake: ['Date'], now: NOW });
+
+const keepDraft = (path: string) =>
+  localStorage.setItem(
+    draftKey(toFormId(path)),
+    JSON.stringify({
+      version: 2,
+      values: { title: 'Kept' },
+      baseline: { title: path },
+    })
+  );
+
+const recentRows = (recent: HTMLElement) =>
+  within(within(recent).getByRole('list', { name: 'Recent documents' }))
+    .getAllByRole('button')
+    .map((row) => row.textContent);
+
+let observers: FakeIntersectionObserver[] = [];
+
+class FakeIntersectionObserver {
+  constructor(
+    private readonly callback: (entries: { isIntersecting: boolean }[]) => void
+  ) {
+    observers.push(this);
+  }
+  observe() {}
+  unobserve() {}
+  disconnect() {
+    observers = observers.filter((observer) => observer !== this);
+  }
+  takeRecords() {
+    return [];
+  }
+  intersect() {
+    this.callback([{ isIntersecting: true }]);
+  }
+}
+
+const manyPosts = (count: number): DocumentSummary[] =>
+  Array.from({ length: count }, (_, index) => ({
+    path: `content/posts/post-${String(index).padStart(2, '0')}.mdx`,
+    updatedAt: ago((index + 1) * HOUR),
+  }));
 
 const Stats = ({ tier }: HomePanelContext) => (
   <HomePanelTray title='Stats'>
@@ -240,6 +293,7 @@ describe('Home panel slot', () => {
       'Notes',
       expect.stringMatching(/^Collections/),
       'Stats',
+      'Recent documents',
     ]);
     expect(columnOf(await panel('Notes'))).toBe('main');
     expect(columnOf(await panel(/^Collections/))).toBe('main');
@@ -270,6 +324,7 @@ describe('Home panel slot', () => {
       expect(within(stats).getByText(`stats on a ${tier}`)).toBeVisible();
       expect(panelTitles()).toEqual([
         'Stats',
+        'Recent documents',
         expect.stringMatching(/^Collections/),
         'Notes',
       ]);
@@ -290,7 +345,10 @@ describe('Home panel slot', () => {
     ];
     renderAdmin();
     await panel(/^Collections/);
-    expect(panelTitles()).toEqual([expect.stringMatching(/^Collections/)]);
+    expect(panelTitles()).toEqual([
+      expect.stringMatching(/^Collections/),
+      'Recent documents',
+    ]);
   });
 
   it('mounts a panel once a plugin provides its capability', async () => {
@@ -492,5 +550,333 @@ describe('Collections panel', () => {
       within(collections).queryByRole('button', { name: /^New/ })
     ).toBeNull();
     expect(collections.querySelector('[data-slot=tile]')).toBeNull();
+  });
+});
+
+describe('Recent documents panel', () => {
+  it('lists unsaved documents first in path order, then dated documents newest first, across collections', async () => {
+    fixClock();
+    world.summaries.main = {
+      post: [
+        { path: 'content/posts/old.mdx', updatedAt: ago(3 * DAY) },
+        { path: 'content/posts/tie-b.mdx', updatedAt: ago(2 * HOUR) },
+        { path: 'content/posts/mine-b.mdx', updatedAt: ago(MINUTE) },
+        { path: 'content/posts/undated.mdx' },
+        { path: 'content/posts/bad-date.mdx', updatedAt: 'last tuesday' },
+      ],
+      page: [
+        { path: 'content/pages/tie-a.mdx', updatedAt: ago(2 * HOUR) },
+        { path: 'content/pages/newest.mdx', updatedAt: ago(5 * MINUTE) },
+        { path: 'content/pages/mine-a.mdx' },
+        { path: 'content/posts/old.mdx', updatedAt: ago(3 * DAY) },
+      ],
+    };
+    keepDraft('content/posts/mine-b.mdx');
+    keepDraft('content/pages/mine-a.mdx');
+    keepDraft('content/posts/deleted.mdx');
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    await within(recent).findByRole('list', { name: 'Recent documents' });
+    expect(recentRows(recent)).toEqual([
+      'mine-aUnsaved',
+      'mine-bUnsaved',
+      'newest5 minutes ago',
+      'tie-a2 hours ago',
+      'tie-b2 hours ago',
+      'old3 days ago',
+    ]);
+  });
+
+  it('shows who and when where the provider knows them, the title where it sets one, and opens the document', async () => {
+    fixClock();
+    world.summaries.main = {
+      post: [
+        {
+          path: 'content/posts/hello.mdx',
+          title: 'Hello world',
+          updatedAt: ago(30_000),
+          lastAuthor: { name: 'Ada Lovelace' },
+        },
+        { path: 'content/posts/second.mdx', updatedAt: ago(30 * DAY) },
+      ],
+    };
+    const user = userEvent.setup();
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    const hello = await within(recent).findByRole('button', {
+      name: /^Hello world/,
+    });
+    expect(within(hello).getByText('Ada Lovelace')).toBeVisible();
+    expect(within(hello).getByText('just now')).toHaveAttribute(
+      'datetime',
+      ago(30_000)
+    );
+    expect(hello.closest('li')).toHaveAttribute(
+      'title',
+      'content/posts/hello.mdx'
+    );
+    const second = within(recent).getByRole('button', { name: /^second/ });
+    expect(second.querySelector('[data-slot=avatar]')).toBeNull();
+    expect(within(second).getByText(/2026/)).toHaveAttribute(
+      'title',
+      expect.stringMatching(/2026/)
+    );
+    await user.click(hello);
+    await waitFor(() =>
+      expect(window.location.hash).toBe(
+        '#/collections/post/content%2Fposts%2Fhello.mdx'
+      )
+    );
+  });
+
+  it('holds placeholder rows until every list settles', async () => {
+    let release: (summaries: DocumentSummary[]) => void = () => {};
+    world.list = (name) =>
+      name === 'page'
+        ? new Promise((resolve) => {
+            release = resolve;
+          })
+        : Promise.resolve([
+            { path: 'content/posts/hello.mdx', updatedAt: ago(HOUR) },
+          ]);
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    const sheet = recent.querySelector('[data-slot=home-panel-sheet]');
+    expect(sheet).toHaveAttribute('aria-busy', 'true');
+    expect(
+      await within(recent).findAllByText('Loading Recent documents')
+    ).toHaveLength(1);
+    expect(within(recent).queryByRole('button', { name: /^hello/ })).toBeNull();
+    release([]);
+    expect(
+      await within(recent).findByRole('button', { name: /^hello/ })
+    ).toBeVisible();
+    expect(sheet).not.toHaveAttribute('aria-busy');
+  });
+
+  it('says it could not load when one list fails, keeps the other panels, and Retry reads the failed list again', async () => {
+    let offline = true;
+    world.list = async (name) => {
+      if (name === 'post' && offline) throw new Error('offline');
+      return [{ path: `content/${name}s/hello.mdx`, updatedAt: ago(HOUR) }];
+    };
+    const user = userEvent.setup();
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    expect(
+      await within(recent).findByText("Couldn't load recent documents.")
+    ).toBeVisible();
+    const collections = await panel(/^Collections/);
+    expect(within(collections).getByText('1 document')).toBeVisible();
+
+    listCalls = [];
+    await user.click(within(recent).getByRole('button', { name: 'Retry' }));
+    expect(
+      await within(recent).findByText("Couldn't load recent documents.")
+    ).toBeVisible();
+    expect(listCalls).toEqual(['post']);
+
+    offline = false;
+    await user.click(within(recent).getByRole('button', { name: 'Retry' }));
+    expect(
+      await within(recent).findAllByRole('button', { name: /^hello/ })
+    ).toHaveLength(2);
+    await waitFor(() => expect(recent).toHaveFocus());
+    await waitFor(() =>
+      expect(
+        recent.querySelector('[data-slot=announcement]')
+      ).toHaveTextContent(/hello/)
+    );
+  });
+
+  it('says Not available on this setup, with no Retry, for a provider that lists only paths', async () => {
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    expect(
+      await within(recent).findByText('Not available on this setup')
+    ).toBeVisible();
+    expect(within(recent).queryByRole('button', { name: 'Retry' })).toBeNull();
+    const collections = await panel(/^Collections/);
+    expect(within(collections).getByText('2 documents')).toBeVisible();
+  });
+
+  it('shows only the unsaved documents when the provider has no dates', async () => {
+    keepDraft('content/posts/second.mdx');
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    await within(recent).findByRole('list', { name: 'Recent documents' });
+    expect(recentRows(recent)).toEqual(['secondUnsaved']);
+  });
+
+  it('stays and says Nothing edited yet. when no document is listed', async () => {
+    world.summaries = {};
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    expect(
+      await within(recent).findByText('Nothing edited yet.')
+    ).toBeVisible();
+    expect(within(recent).queryByRole('button', { name: 'Retry' })).toBeNull();
+  });
+
+  it('moves a saved document from the unsaved rows to the top of the dated rows, without a reload', async () => {
+    world.summaries.main = {
+      post: [
+        { path: 'content/posts/hello.mdx', updatedAt: ago(2 * DAY) },
+        { path: 'content/posts/second.mdx', updatedAt: ago(DAY) },
+      ],
+    };
+    world.update = async (_name, path, value) => ({
+      path,
+      document: value,
+      updatedAt: new Date(NOW + MINUTE).toISOString(),
+    });
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    const recent = await panel('Recent documents');
+    await within(recent).findByRole('list', { name: 'Recent documents' });
+    expect(recentRows(recent)[0]).toBe('helloUnsaved');
+
+    await user.click(within(recent).getByRole('button', { name: /^hello/ }));
+    await user.click(await screen.findByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+    );
+    listCalls = [];
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    const after = await panel('Recent documents');
+    await within(after).findByRole('list', { name: 'Recent documents' });
+    const rows = recentRows(after);
+    expect(rows[0]).toMatch(/^hello(?!Unsaved)/);
+    expect(rows[1]).toMatch(/^second/);
+    expect(rows).toHaveLength(2);
+    expect(listCalls).toEqual([]);
+  });
+
+  it('puts a document saved through a server hook at the top of the dated rows, without a reload', async () => {
+    const stampPlugin = definePlugin({
+      name: 'test:stamp',
+      provides: ['hooks'],
+      hooks: ['stamp'],
+      serverHooks: ['stamp'],
+      client: async () => ({ default: { hooks: { stamp: () => ({}) } } }),
+    });
+    world.plugins = [stampPlugin];
+    world.collections = [
+      collection('post', { label: 'Posts', hooks: [{ name: 'stamp' }] }),
+    ];
+    world.summaries.main = {
+      post: [
+        { path: 'content/posts/hello.mdx', updatedAt: ago(2 * DAY) },
+        { path: 'content/posts/second.mdx', updatedAt: ago(DAY) },
+      ],
+    };
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      const { path, value } = JSON.parse(String(init?.body));
+      return Response.json({
+        entry: {
+          path,
+          document: value,
+          updatedAt: new Date(NOW + MINUTE).toISOString(),
+        },
+        hookWarnings: [],
+      });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const user = userEvent.setup();
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    await user.click(
+      await within(recent).findByRole('button', { name: /^hello/ })
+    );
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+    );
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      '/api/tina/content/update',
+    ]);
+    listCalls = [];
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    const after = await panel('Recent documents');
+    await within(after).findByRole('list', { name: 'Recent documents' });
+    const rows = recentRows(after);
+    expect(rows[0]).toMatch(/^hello(?!Unsaved)/);
+    expect(rows[1]).toMatch(/^second/);
+    expect(listCalls).toEqual([]);
+  });
+
+  it('scrolls inside the panel on a desktop: 20 rows, then more as the end comes into view, with no new request', async () => {
+    observers = [];
+    vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver);
+    world.summaries.main = { post: manyPosts(45) };
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    await within(recent).findByRole('list', { name: 'Recent documents' });
+    expect(recentRows(recent)).toHaveLength(20);
+    expect(
+      within(recent).queryByRole('button', { name: 'Show more' })
+    ).toBeNull();
+    listCalls = [];
+    act(() => observers.at(-1)?.intersect());
+    expect(recentRows(recent)).toHaveLength(40);
+    act(() => observers.at(-1)?.intersect());
+    expect(recentRows(recent)).toHaveLength(45);
+    expect(observers).toHaveLength(0);
+    expect(listCalls).toEqual([]);
+  });
+
+  it.each([
+    ['tablet', 1024],
+    ['phone', 390],
+  ])(
+    'shows five rows on a %s and adds five per Show more, then moves focus to the first new row',
+    async (_tier, width) => {
+      setWidth(width);
+      world.summaries.main = { post: manyPosts(12) };
+      const user = userEvent.setup();
+      renderAdmin();
+      const recent = await panel('Recent documents');
+      await within(recent).findByRole('list', { name: 'Recent documents' });
+      expect(recentRows(recent)).toHaveLength(5);
+
+      listCalls = [];
+      await user.click(
+        within(recent).getByRole('button', { name: 'Show more' })
+      );
+      expect(recentRows(recent)).toHaveLength(10);
+      expect(
+        within(recent).getByRole('button', { name: 'Show more' })
+      ).toHaveFocus();
+
+      await user.click(
+        within(recent).getByRole('button', { name: 'Show more' })
+      );
+      expect(recentRows(recent)).toHaveLength(12);
+      expect(
+        within(recent).queryByRole('button', { name: 'Show more' })
+      ).toBeNull();
+      await waitFor(() =>
+        expect(
+          within(recent).getByRole('button', { name: /^post-10/ })
+        ).toHaveFocus()
+      );
+      expect(listCalls).toEqual([]);
+    }
+  );
+
+  it('shows no Show more for five rows or fewer', async () => {
+    setWidth(390);
+    world.summaries.main = { post: manyPosts(5) };
+    renderAdmin();
+    const recent = await panel('Recent documents');
+    await within(recent).findByRole('list', { name: 'Recent documents' });
+    expect(recentRows(recent)).toHaveLength(5);
+    expect(
+      within(recent).queryByRole('button', { name: 'Show more' })
+    ).toBeNull();
   });
 });
