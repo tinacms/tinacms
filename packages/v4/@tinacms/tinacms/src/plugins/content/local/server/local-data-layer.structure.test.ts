@@ -694,6 +694,8 @@ describe('Windows-safe names', () => {
     'COM1',
     'lpt9.tar',
     'COM²',
+    'con .x',
+    'aux .md',
   ];
   const accepted = ['console', 'com10', 'com0', 'nullable'];
 

@@ -481,6 +481,25 @@ describe('row actions', () => {
     );
   });
 
+  it('refuses a name whose file name with its extension is over 255 bytes, as the server does', async () => {
+    const user = userEvent.setup();
+    renderTable();
+    await openMenu(user, 'Beta');
+    await user.click(await screen.findByRole('menuitem', { name: 'Rename' }));
+    const dialog = await screen.findByRole('dialog');
+    const box = within(dialog).getByRole('textbox', { name: 'File name' });
+    await user.clear(box);
+    await user.click(box);
+    await user.paste('a'.repeat(253));
+    await user.click(within(dialog).getByRole('button', { name: 'Rename' }));
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'That name is not allowed.'
+    );
+    expect(world.summaries.some((s) => s.path.includes('aaaaaaaa'))).toBe(
+      false
+    );
+  });
+
   it('returns focus to the row menu after Cancel', async () => {
     const user = userEvent.setup();
     renderTable();

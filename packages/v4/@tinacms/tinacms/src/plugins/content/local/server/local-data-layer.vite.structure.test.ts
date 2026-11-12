@@ -721,6 +721,8 @@ describe('Windows-safe names through the content endpoint', () => {
     'COM1',
     'lpt9.tar',
     'COM²',
+    'con .x',
+    'aux .md',
   ];
 
   it('refuses each name with invalid-path on create, update, rename, createFolder and renameFolder', async () => {

@@ -23,6 +23,9 @@ describe('isValidName', () => {
     'lpt9.tar',
     'COM²',
     'com1.tar.md',
+    'con .x',
+    'aux .md',
+    'nul  .tar.md',
     '',
     '  ',
     '.hidden',
@@ -35,12 +38,17 @@ describe('isValidName', () => {
     expect(isValidName(name)).toBe(false);
   });
 
-  it.each(['console', 'com10', 'com0', 'nullable', 'hello-world', 'Ünï'])(
-    'accepts %j',
-    (name) => {
-      expect(isValidName(name)).toBe(true);
-    }
-  );
+  it.each([
+    'console',
+    'com10',
+    'com0',
+    'nullable',
+    'hello-world',
+    'Ünï',
+    'con x.md',
+  ])('accepts %j', (name) => {
+    expect(isValidName(name)).toBe(true);
+  });
 
   it('refuses a name of more than 255 bytes', () => {
     expect(isValidName('a'.repeat(256))).toBe(false);

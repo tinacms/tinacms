@@ -24,7 +24,7 @@ import {
   ContentError,
   type DocumentReferrer,
 } from '../../core/content/contract';
-import { isValidName, nameOf } from '../../core/content/names';
+import { isValidFileName, isValidName, nameOf } from '../../core/content/names';
 import { UnsavedReferrersError } from '../../editor/collection-documents';
 import { formatAdminRoute } from '../routing';
 
@@ -143,7 +143,10 @@ function NameForm({
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (busy) return;
-    if (!isValidName(name)) {
+    const valid = extension
+      ? isValidFileName(`${name}${extension}`, extension)
+      : isValidName(name);
+    if (!valid) {
       setRefusal({
         message:
           name.trim() === ''

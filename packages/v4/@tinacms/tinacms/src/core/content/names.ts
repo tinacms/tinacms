@@ -47,7 +47,7 @@ export const isValidName = (name: string): boolean => {
   if (name.startsWith('.') || name.endsWith(' ') || name.endsWith('.')) {
     return false;
   }
-  const stem = name.split('.')[0] ?? name;
+  const stem = (name.split('.')[0] ?? name).trimEnd();
   return !RESERVED_STEMS.has(stem.toLowerCase());
 };
 
