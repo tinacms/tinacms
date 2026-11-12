@@ -117,6 +117,18 @@ describe('form drafts', () => {
     expect(readDraft(postA)).toBeUndefined();
   });
 
+  it('keeps a left prompt down on reopen until a new copy joins the waiting list', () => {
+    reloadWithEdit();
+    open();
+    store.getState().markLeftWithWaiting(postA);
+    open();
+    expect(store.getState().leftWithWaiting[postA]).toBe(true);
+    otherTabWrites(postA, 'Theirs');
+    open();
+    expect(waitingOf()).toHaveLength(2);
+    expect(store.getState().leftWithWaiting[postA]).toBeUndefined();
+  });
+
   it('drops the waiting copies once the form holds the same values', () => {
     reloadWithEdit();
     open();

@@ -495,6 +495,9 @@ export const useFormStore = create<FormStore>()(
                 ? withFailure(state.failures, formId)
                 : state.failures,
               hidden: opening ? state.hidden : withoutKey(state.hidden, formId),
+              leftWithWaiting: sameCopies
+                ? state.leftWithWaiting
+                : withoutKey(state.leftWithWaiting, formId),
               draftsVersion: sameCopies
                 ? state.draftsVersion
                 : state.draftsVersion + 1,
