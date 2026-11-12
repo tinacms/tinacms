@@ -1,3 +1,4 @@
+import { protectedBranchWords } from '../../editor/uploads/upload-words';
 import { extensionOf, mediaNameOf } from './media-types';
 
 export const MEDIA_COPIED_MS = 2000;
@@ -5,8 +6,7 @@ export const MEDIA_DONE_MS = 6000;
 
 export const READ_ONLY_NOTE =
   "This storage is read-only. Files can't be uploaded or deleted here.";
-export const protectedNote = (branch: string) =>
-  `${branch} is protected. Switch to another branch to delete or move files.`;
+export const protectedNote = protectedBranchWords;
 export const NO_PERMISSION_NOTE = "You don't have permission to delete.";
 export const NO_ACCESS = "Your account doesn't have access to this project.";
 export const SESSION_EXPIRED = 'Your session has expired. Sign in again.';

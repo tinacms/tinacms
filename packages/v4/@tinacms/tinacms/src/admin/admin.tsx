@@ -47,6 +47,7 @@ import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 import { COLLECTIONS_ROUTE, HOME_ROUTE } from './routing';
 import { useBranchSync } from '../editor/branch';
+import { UploadHost } from '../editor/uploads/upload-host';
 import {
   ShellSaveProgress,
   ShellStatusBar,
@@ -528,6 +529,7 @@ function AdminShell({
       className='h-svh min-h-0 flex-col overflow-hidden'
     >
       <ShellTopBar projectName={projectName} />
+      <UploadHost primary />
 
       <div className='flex min-h-0 flex-1'>
         <Sidebar

@@ -3,8 +3,9 @@ import { Icon } from '@tinacms/ui/components/icon';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { cn } from '@tinacms/ui/lib/utils';
 import { CheckIcon, FileIcon, FolderIcon, PlayIcon } from 'lucide-react';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
 import type { MediaItem, MediaUrlOptions } from '../../core/media/contract';
+import { NEW_BADGE } from '../../editor/uploads/upload-words';
 import { checkerboardStyle } from './media-grid';
 import { copyText } from './media-actions';
 import {
@@ -122,6 +123,7 @@ function FileItem({
   active,
   selecting,
   selected,
+  fresh,
   resolveUrl,
   onChoose,
   onToggle,
@@ -132,12 +134,25 @@ function FileItem({
   active: boolean;
   selecting: boolean;
   selected: boolean;
+  fresh: boolean;
   resolveUrl: ResolveUrl;
   onChoose: (path: string) => void;
   onToggle: (path: string) => void;
   onFocus: () => void;
 }) {
   const name = mediaNameOf(item.path);
+  const badgeId = useId();
+  const badge = fresh ? (
+    <span
+      id={badgeId}
+      className={cn(
+        'shrink-0 rounded-xs bg-primary px-1 text-[10px] font-medium text-primary-foreground',
+        mode === 'grid' && 'absolute top-1.5 right-1.5'
+      )}
+    >
+      {NEW_BADGE}
+    </span>
+  ) : null;
   const disc = selecting ? (
     <span
       aria-hidden='true'
@@ -161,6 +176,7 @@ function FileItem({
         type='button'
         aria-label={name}
         data-path={item.path}
+        aria-describedby={fresh ? badgeId : undefined}
         {...checkable}
         onFocus={onFocus}
         onClick={() => (selecting ? onToggle(item.path) : onChoose(item.path))}
@@ -190,6 +206,7 @@ function FileItem({
             size={mode === 'grid' ? 400 : 80}
           />
           {mode === 'grid' ? disc : null}
+          {mode === 'grid' ? badge : null}
         </span>
         <span
           title={name}
@@ -200,6 +217,7 @@ function FileItem({
         >
           {name}
         </span>
+        {mode === 'list' ? badge : null}
       </button>
     </li>
   );
@@ -238,13 +256,17 @@ function FolderItem({
   );
 }
 
-/** Folders first, then files, as tiles or rows. Folders are never checkable. */
+/**
+ * Folders first, then files in the order given, as tiles or rows. Folders are
+ * never checkable. A file in `fresh` carries the New badge.
+ */
 export function MediaItems({
   items,
   mode,
   activePath,
   selecting,
   selected,
+  fresh,
   resolveUrl,
   loadingMore,
   onOpenFolder,
@@ -257,6 +279,7 @@ export function MediaItems({
   activePath: string | null;
   selecting: boolean;
   selected: ReadonlySet<string>;
+  fresh: ReadonlySet<string>;
   resolveUrl: ResolveUrl;
   loadingMore: boolean;
   onOpenFolder: (path: string) => void;
@@ -295,6 +318,7 @@ export function MediaItems({
             active={item.path === activePath}
             selecting={selecting}
             selected={selected.has(item.path)}
+            fresh={fresh.has(item.path)}
             resolveUrl={resolveUrl}
             onChoose={onChoose}
             onToggle={onToggle}

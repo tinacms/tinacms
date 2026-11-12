@@ -117,3 +117,17 @@ export const currentBranchOf = (state: TinaStoreState): string | undefined => {
   const { current } = state.branch ?? {};
   return typeof current === 'string' && current ? current : undefined;
 };
+
+/** The branch edits go to when it is protected and the branch list is ready, else undefined. */
+export const protectedBranchOf = (
+  state: TinaStoreState
+): string | undefined => {
+  const slice = branchSliceOf(state);
+  if (slice?.mode !== 'branches' || slice.listState !== 'ready') {
+    return undefined;
+  }
+  const name = slice.current ?? slice.fallback;
+  return name !== undefined && slice.protected.includes(name)
+    ? name
+    : undefined;
+};

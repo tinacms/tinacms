@@ -68,6 +68,9 @@ export class TinaCloudError extends Error {
   }
 }
 
+/** TinaCloud answered that a background request failed. */
+export class TinaCloudRequestFailedError extends TinaCloudError {}
+
 const parseBody = (text: string): unknown => {
   if (!text) return null;
   try {
@@ -136,7 +139,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       const status = requestStatusSchema.safeParse(body);
       if (status.success) {
         if (!status.data.error) return;
-        throw new TinaCloudError(
+        throw new TinaCloudRequestFailedError(
           status.data.message ?? 'TinaCloud reported that the request failed.',
           { body }
         );

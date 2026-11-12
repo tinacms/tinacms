@@ -22,7 +22,7 @@ A media plugin mounts a slice at `store.media`. The slice is a `MediaProvider`
 
 | Operation | Role |
 |---|---|
-| `upload(file, folder?)` | Saves the file in `folder`, and returns its media path. |
+| `upload(file, folder?, { onProgress, signal }?)` | Saves the file in `folder`, and returns its media path. It never overwrites a file. |
 | `list(folder, { cursor, limit, search, extensions }?)` | Returns one page of the items in `folder`: folders first, then files. `cursor` in the result gives the next page. |
 | `delete(path)` | Deletes one file. It does not delete a folder. |
 | `resolveUrl(path, { width, height }?)` | Returns the URL that a page loads for the media path. |
@@ -30,6 +30,27 @@ A media plugin mounts a slice at `store.media`. The slice is a `MediaProvider`
 `useMediaSlice()` (`@tinacms/tinacms/react`) gives the slice. If no plugin
 mounts a slice with all four operations, it throws
 `media-capability-missing`.
+
+### Upload rules
+
+`upload` never overwrites. When the name exists in the folder, it rejects with
+`name-taken`, the same rule and the same code as `rename`. The admin then
+sends the file again as `name-1.ext`, then `name-2.ext`, up to 20 names. Thus a
+provider that always answers `name-taken` makes the admin try 20 names.
+
+The third argument is optional, and so is each of its fields:
+
+| Option | Role |
+|---|---|
+| `onProgress(fraction)` | The provider calls it with the fraction of the bytes sent so far, from 0 to 1. The admin shows it as the progress of the file. A provider that does not call it gets a row with no percentage. |
+| `signal` | An `AbortSignal`. The admin aborts it when the editor cancels the upload. |
+
+Two rules apply to `signal`:
+
+- An aborted upload rejects with a `DOMException` named `AbortError`, not with
+  a `MediaError`.
+- After the provider sends the last byte, it ignores the signal. The upload
+  then settles with its real outcome.
 
 ### On the site
 
@@ -75,10 +96,11 @@ a `message` to show the user, and an optional `detail` for logs:
 | `invalid-path` | The media path is not valid. |
 | `too-large` | The file is larger than the provider accepts. |
 | `unauthorized` | The user cannot do the operation. |
-| `unsupported` | The media store cannot do the operation. |
+| `unsupported` | The media store cannot do the operation, or it does not accept the file type. |
 | `backend-failure` | The media store failed. |
 
-`localMediaPlugin()` supplies none of the optional additions.
+`localMediaPlugin()` supplies `rename`, a `features.maxSize` of 24 MB and a
+`features.acceptedExtensions` list.
 
 ## `localMediaPlugin()`
 
@@ -112,11 +134,35 @@ The browser sends the file as `multipart/form-data` to `{url}/upload`, with a
 `{ op: 'delete', path }` and `{ op: 'rename', from, to }`. `rename` moves a file
 to a path in an existing folder, returns `{ path }`, and never overwrites.
 
-The dev server accepts files up to 25 MB (`MAX_MEDIA_UPLOAD_BYTES`). This
-limit applies to `localMediaPlugin()` only. Other media plugins, such as
-TinaCloud, have their own limits. `localMediaPlugin()` does not set
-`features.maxSize`, so the Media Manager does not check the size first. A
-larger file fails at upload with a `too-large` error.
+An upload never overwrites. The dev server writes the bytes to a hidden
+temporary file in the target folder, then gives that file its name only if the
+name is free. A name that a file or a folder has gives a `name-taken` error,
+and the existing file does not change. `list` never shows the temporary file.
+
+Local media stores only the file types of the media type table: `jpg`, `jpeg`,
+`png`, `gif`, `webp`, `svg`, `avif`, `ico`, `mp4`, `webm`, `mov`, `mp3`, `wav`,
+`ogg`, `pdf`, `json`, `csv` and `txt`. The slice reports these extensions as
+`features.acceptedExtensions`, so the Media Manager refuses another type
+before it sends a byte. The dev server reads the extension from the file name
+and does not read the type that the request reports. A name with another
+extension, or with no extension, gives an `unsupported` error and the dev
+server writes nothing. `rename` keeps the file type: a target with another
+extension gives an `unsupported` error. A file of another type that is
+already in the media folder still lists, moves, renames with its extension,
+and deletes.
+
+The browser sends the file with `XMLHttpRequest`, so the slice reports
+progress. When the signal aborts before the last byte, the browser stops the
+request and the dev server writes no file.
+
+The dev server accepts a request body up to 25 MB (`MAX_MEDIA_UPLOAD_BYTES`).
+The body holds the file and the form around it. Thus `localMediaPlugin()` sets
+a `features.maxSize` of 24 MB, and the Media Manager refuses a larger file
+before it sends a byte. A body over 25 MB still fails at upload with a
+`too-large` error. If the browser sees only a closed connection, the upload
+fails, and the editor can try again. These limits apply to
+`localMediaPlugin()` only. Other media plugins, such as TinaCloud, have
+their own limits.
 
 A multipart request does not get a CORS preflight. Thus a page on a different
 site can send one. The endpoint rejects a request that is not from a loopback
@@ -173,6 +219,10 @@ The media and content slices send the TinaCloud token from `tinaCloud()`'s own
 sign-in. Before the editor signs in, each operation fails with
 `unauthorized`. With `auth` overridden, each operation fails. Refer to
 [auth-plugins.md](./auth-plugins.md#swap-a-provider).
+
+`upload` sends the file to a signed URL with `XMLHttpRequest`, so the slice
+reports progress. When TinaCloud answers 412 to the request for that URL, the
+file exists: the upload rejects with `name-taken` and sends no bytes.
 
 The slice supplies `features.search`, `features.extensionFilter` and
 a `features.maxSize` of 100 MB. It has no `rename`, because the TinaCloud rename

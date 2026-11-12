@@ -430,6 +430,41 @@ describe('PanelHeader', () => {
     expect(screen.queryByRole('button')).toBeNull();
   });
 
+  it('puts the action right after the title by default, and before the menu, Maximise and close with actionAt end', async () => {
+    const user = userEvent.setup();
+    const header = (actionAt?: 'start' | 'end') => (
+      <PanelHeader
+        heading='Media'
+        action={<button type='button'>Upload</button>}
+        actionAt={actionAt}
+        menu={<DropdownMenuItem>Sort</DropdownMenuItem>}
+        menuLabel='Media actions'
+        onMaximise={() => {}}
+        closeLabel='Close'
+      />
+    );
+    const { rerender } = render(header());
+    const title = screen.getByRole('heading', { name: 'Media' });
+    const menu = screen.getByRole('button', { name: 'Media actions' });
+    expect(title.nextElementSibling).toBe(
+      screen.getByRole('button', { name: 'Upload' })
+    );
+    expect(menu.previousElementSibling).not.toBe(
+      screen.getByRole('button', { name: 'Upload' })
+    );
+
+    rerender(header('end'));
+    const action = screen.getByRole('button', { name: 'Upload' });
+    expect(title.nextElementSibling).not.toBe(action);
+    expect(action.nextElementSibling).toBe(
+      screen.getByRole('button', { name: 'Media actions' })
+    );
+    for (const name of ['Upload', 'Media actions', 'Maximise', 'Close']) {
+      await user.tab();
+      expect(screen.getByRole('button', { name })).toHaveFocus();
+    }
+  });
+
   it('has no menu button without menu items', () => {
     render(<PanelHeader heading='Collections' />);
     expect(screen.getByRole('heading', { name: 'Collections' })).toBeVisible();

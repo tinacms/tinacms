@@ -52,6 +52,7 @@ export const pageCollection = {
       picker: 'list',
       templates: longTemplates,
     }),
+    t.image({ name: 'hero', label: 'Hero image' }),
   ],
 } satisfies CollectionSchema;
 

@@ -139,7 +139,7 @@ export interface FormStore {
   removeForm: (formId: FormId) => void;
 }
 
-const valuesEqual = (
+export const valuesEqual = (
   current: FormValues,
   baseline: FormValues,
   equal: FieldEquality

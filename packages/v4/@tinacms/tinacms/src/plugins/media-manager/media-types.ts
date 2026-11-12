@@ -46,11 +46,14 @@ export type MediaTypeFilterValue = MediaCategory | 'all';
 
 export type MediaViewMode = 'grid' | 'list';
 
-const EXTENSIONS = Object.keys(MEDIA) as MediaExtension[];
+/** Every extension of the table, for code that must agree with it. Not a public export. */
+export const MEDIA_EXTENSIONS: readonly MediaExtension[] = Object.keys(
+  MEDIA
+) as MediaExtension[];
 
 const extensionsWhere = (
   match: (entry: MediaTypeEntry) => boolean
-): MediaExtension[] => EXTENSIONS.filter((ext) => match(MEDIA[ext]));
+): MediaExtension[] => MEDIA_EXTENSIONS.filter((ext) => match(MEDIA[ext]));
 
 export const extensionsForCategory = (
   category: MediaCategory
@@ -80,8 +83,8 @@ export const DEFAULT_MEDIA_UPLOAD_TYPES = [
   'video/*',
 ];
 
-const isMediaExtension = (value: string): value is MediaExtension =>
-  value in MEDIA;
+export const isMediaExtension = (value: string): value is MediaExtension =>
+  Object.hasOwn(MEDIA, value);
 
 export const extensionOf = (value: string): string => {
   const path = value.split(/[?#]/)[0] ?? '';
@@ -136,20 +139,30 @@ export const mimeTypeOfPath = (path: string): string => {
   return isMediaExtension(ext) ? MEDIA[ext].mime : '';
 };
 
-const mimeTypeOf = (file: File): string =>
-  file.type || mimeTypeOfPath(file.name);
+// Rules that name extensions judge a known extension by the table's type for
+// it. Rules of MIME types alone go by the type the browser reports, as before.
+const mimeTypeOf = (file: File, rules: UploadRules): string => {
+  const extension = extensionOf(file.name);
+  if (rules.extensions.length > 0 && isMediaExtension(extension)) {
+    return MEDIA[extension].mime;
+  }
+  return (file.type || mimeTypeOfPath(file.name)).toLowerCase();
+};
 
-const matchesMimeType = (file: File, mimeType: string): boolean => {
+const matchesMimeType = (type: string, mimeType: string): boolean => {
   const rule = mimeType.trim().toLowerCase();
   if (rule === '*/*') return true;
-  const type = mimeTypeOf(file).toLowerCase();
   if (rule.endsWith('/*')) return type.startsWith(rule.slice(0, -1));
   return type === rule;
 };
 
-const isAccepted = (file: File, rules: UploadRules): boolean =>
-  rules.mimeTypes.some((mimeType) => matchesMimeType(file, mimeType)) ||
-  rules.extensions.includes(extensionOf(file.name));
+const isAccepted = (file: File, rules: UploadRules): boolean => {
+  const type = mimeTypeOf(file, rules);
+  return (
+    rules.mimeTypes.some((mimeType) => matchesMimeType(type, mimeType)) ||
+    rules.extensions.includes(extensionOf(file.name))
+  );
+};
 
 export const uploadRejectionOf = (
   file: File,

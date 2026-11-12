@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { Button, buttonVariants } from '@tinacms/ui/components/button';
 import { Icon } from '@tinacms/ui/components/icon';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
@@ -18,7 +17,23 @@ import { HOME_ROUTE } from '../../admin/routing';
 import { useAdminRoute } from '../../admin/use-admin-route';
 import { useNarrow } from '../../admin/use-narrow';
 import type { AdminScreenProps } from '../../core/screen/contract';
+import { useCurrentBranch } from '../../editor/content-queries';
 import { useMediaSlice } from '../../editor/hooks';
+import {
+  UPLOAD_LIST_ATTR,
+  type UploadOrigin,
+} from '../../editor/uploads/upload-list';
+import {
+  FOLDER_DROPPED,
+  dropVeilWords,
+} from '../../editor/uploads/upload-words';
+import {
+  uploadCheckOf,
+  useFreshPaths,
+  useMediaOpenMark,
+  useUploadHold,
+  useUploadList,
+} from '../../editor/uploads/use-uploads';
 import { absoluteUrlsOf, downloadFiles } from './media-actions';
 import {
   DeleteConfirm,
@@ -53,17 +68,76 @@ import {
 } from './media-types';
 import { MediaUploadButton } from './media-upload';
 import { type ChangeResult, useMediaChanges } from './use-media-changes';
-import {
-  MEDIA_LIST_KEY,
-  useMediaListing,
-  useMediaStatus,
-} from './use-media-listing';
+import { useMediaListing, useMediaStatus } from './use-media-listing';
 
 const SEARCH_DEBOUNCE_MS = 300;
 const NEAR_END_PX = 120;
 const DETAILS_BESIDE_MIN_PX = 640;
 
+const PANE_ORIGIN: UploadOrigin = { kind: 'pane' };
+
 type Confirm = { kind: 'delete' | 'move'; paths: readonly string[] };
+
+const carriesFiles = (event: DragEvent<HTMLElement>): boolean =>
+  event.dataTransfer.types.includes('Files');
+
+/**
+ * The files of a drop, and whether it held a folder. Where the browser has no
+ * entry API, an entry with no type and no bytes reads as a folder.
+ */
+const droppedOf = (
+  transfer: DataTransfer
+): { files: File[]; hadFolder: boolean } => {
+  const items = Array.from(transfer.items ?? []).filter(
+    (item) => item.kind === 'file'
+  );
+  const hasEntries =
+    items.length > 0 &&
+    items.every((item) => typeof item.webkitGetAsEntry === 'function');
+  if (hasEntries) {
+    const files: File[] = [];
+    let hadFolder = false;
+    for (const item of items) {
+      if (item.webkitGetAsEntry()?.isDirectory) {
+        hadFolder = true;
+      } else {
+        const file = item.getAsFile();
+        if (file) files.push(file);
+      }
+    }
+    return { files, hadFolder };
+  }
+  const all = [...transfer.files];
+  const files = all.filter((file) => file.type !== '' || file.size > 0);
+  return { files, hadFolder: files.length < all.length };
+};
+
+function StatusLine({
+  tone,
+  text,
+  onRetry,
+}: {
+  tone: 'busy' | 'done' | 'error';
+  text: string;
+  onRetry?: () => void;
+}) {
+  return (
+    <div
+      role={tone === 'error' ? 'alert' : 'status'}
+      className={cn(
+        'flex items-center gap-2 border-b px-3 py-2 text-sm',
+        tone === 'error' && 'bg-destructive/10 text-destructive'
+      )}
+    >
+      <span className='min-w-0 flex-1'>{text}</span>
+      {onRetry ? (
+        <Button type='button' size='sm' variant='outline' onClick={onRetry}>
+          Retry
+        </Button>
+      ) : null}
+    </div>
+  );
+}
 
 const messageOf = (cause: unknown): string => {
   if (cause instanceof Error) {
@@ -96,7 +170,10 @@ export function MediaPane({ segments }: AdminScreenProps) {
   const media = useMediaSlice();
   const { navigate } = useAdminRoute();
   const shell = use(MediaPaneShellContext);
-  const queryClient = useQueryClient();
+  const uploads = useUploadList();
+  const uploadHold = useUploadHold();
+  const branch = useCurrentBranch() ?? '';
+  useMediaOpenMark();
   const narrow = useNarrow();
   const root = useRef<HTMLElement>(null);
   const library = useRef<HTMLDivElement>(null);
@@ -128,8 +205,12 @@ export function MediaPane({ segments }: AdminScreenProps) {
   const [driftFocus, setDriftFocus] = useState(0);
   const [newFolder, setNewFolder] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const dragDepth = useRef(0);
+  const [refused, setRefused] = useState<{
+    count: number;
+    words: string;
+  } | null>(null);
   const trigger = useRef<HTMLElement | null>(null);
   const pendingFocus = useRef<string | null | undefined>(undefined);
 
@@ -162,13 +243,28 @@ export function MediaPane({ segments }: AdminScreenProps) {
   const loadFailed = listing.isError && listing.data === undefined;
   const items = listing.data?.pages.flatMap((page) => page.items) ?? [];
   const folders = items.filter((item) => item.kind === 'directory');
-  const files = items.filter((item) => item.kind === 'file');
+  const freshPaths = useFreshPaths(folder);
+  const needle = searching ? debouncedSearch.toLowerCase() : '';
+  const fresh = new Set(
+    freshPaths.filter((path) =>
+      mediaNameOf(path).toLowerCase().includes(needle)
+    )
+  );
+  const files = [
+    ...[...fresh].map((path) => ({ path, kind: 'file' as const })),
+    ...items.filter((item) => item.kind === 'file' && !fresh.has(item.path)),
+  ];
+  const shown = [...folders, ...files];
   const filePaths = files.map((item) => item.path);
+
+  // The New marks last until the editor leaves the folder or changes branch.
+  useEffect(() => () => uploads.leaveFolder(folder), [uploads, folder, branch]);
   const { fetchNextPage, hasNextPage, isFetchingNextPage } = listing;
 
   const changes = useMediaChanges(
     (result: ChangeResult) => {
       const gone = new Set(result.succeeded);
+      uploads.forgetFresh(result.succeeded);
       setSelected(
         (current) => new Set([...current].filter((p) => !gone.has(p)))
       );
@@ -202,7 +298,7 @@ export function MediaPane({ segments }: AdminScreenProps) {
             `[data-path="${CSS.escape(target)}"]`
           );
     (button ?? library.current)?.focus();
-  }, [items.length]);
+  }, [shown.length]);
 
   useEffect(() => {
     if (driftFocus === 0) return;
@@ -219,15 +315,30 @@ export function MediaPane({ segments }: AdminScreenProps) {
   const { protectedBranch } = changes;
   const locked = readOnly || protectedBranch !== undefined || changes.locked;
   const actionsOff = locked || changes.busy;
-  const lockNote = readOnly
-    ? READ_ONLY_NOTE
-    : protectedBranch !== undefined
-      ? protectedNote(protectedBranch)
-      : changes.locked
-        ? NO_PERMISSION_NOTE
-        : null;
   const detailsFill = activePath !== null && !wide;
   const needsSetup = status.data?.kind === 'needs-setup' ? status.data : null;
+  const canUpload = !readOnly && !needsSetup;
+  const lockNotes = [
+    ...new Set(
+      [
+        readOnly ? READ_ONLY_NOTE : null,
+        !readOnly && protectedBranch !== undefined
+          ? protectedNote(protectedBranch)
+          : null,
+        !readOnly && changes.locked ? NO_PERMISSION_NOTE : null,
+        canUpload ? uploadHold : null,
+      ].filter((note) => note !== null)
+    ),
+  ];
+  const refusalWords = needsSetup ? needsSetup.message : lockNotes.join(' ');
+  const refusedNow = refused !== null && refused.words === refusalWords;
+  const refuse = () => {
+    if (refusalWords === '') return;
+    setRefused((current) => ({
+      count: (current?.count ?? 0) + 1,
+      words: refusalWords,
+    }));
+  };
 
   const uploadRules: UploadRules =
     features.acceptedMimeTypes !== undefined ||
@@ -238,38 +349,49 @@ export function MediaPane({ segments }: AdminScreenProps) {
         }
       : DEFAULT_UPLOAD_RULES;
 
-  const upload = async (picked: File[]) => {
-    const failures: string[] = [];
+  const check = uploadCheckOf(
+    (file) => uploadRejectionOf(file, uploadRules, undefined) === null,
+    features.maxSize
+  );
+  const send = (picked: File[]) => {
     setNotice(null);
-    setUploading(true);
-    for (const file of picked) {
-      const rejection = uploadRejectionOf(file, uploadRules, features.maxSize);
-      if (rejection) {
-        failures.push(`${file.name}: ${rejection}`);
-        continue;
-      }
-      try {
-        await media.upload(file, folder);
-      } catch (cause) {
-        failures.push(`${file.name}: ${messageOf(cause)}`);
-      }
-    }
-    setUploading(false);
-    if (failures.length > 0) setNotice(`Upload failed. ${failures.join(' ')}`);
-    void queryClient.invalidateQueries({ queryKey: [...MEDIA_LIST_KEY] });
+    const outcome = uploads.submit({
+      files: picked,
+      folder,
+      origin: PANE_ORIGIN,
+      check,
+    });
+    if (outcome === 'held') refuse();
   };
 
-  const dragOver = (event: DragEvent<HTMLDivElement>) => {
-    if (readOnly) return;
+  const dragEnter = (event: DragEvent<HTMLDivElement>) => {
+    if (!carriesFiles(event)) return;
     event.preventDefault();
+    dragDepth.current += 1;
     setDragging(true);
   };
+  const dragOver = (event: DragEvent<HTMLDivElement>) => {
+    if (carriesFiles(event)) event.preventDefault();
+  };
+  const dragLeave = (event: DragEvent<HTMLDivElement>) => {
+    if (!carriesFiles(event)) return;
+    dragDepth.current = Math.max(0, dragDepth.current - 1);
+    if (dragDepth.current === 0) setDragging(false);
+  };
   const drop = (event: DragEvent<HTMLDivElement>) => {
-    if (readOnly) return;
+    if (!carriesFiles(event)) return;
     event.preventDefault();
+    dragDepth.current = 0;
     setDragging(false);
-    const dropped = [...event.dataTransfer.files];
-    if (dropped.length > 0) void upload(dropped);
+    if (!canUpload || uploadHold !== null) {
+      refuse();
+      return;
+    }
+    const dropped = droppedOf(event.dataTransfer);
+    if (dropped.files.length > 0) {
+      send(dropped.files);
+    }
+    if (dropped.hadFolder) setNotice(FOLDER_DROPPED);
   };
 
   const openConfirm = (kind: Confirm['kind'], paths: readonly string[]) => {
@@ -320,6 +442,7 @@ export function MediaPane({ segments }: AdminScreenProps) {
   const escape = useEffectEvent((event: globalThis.KeyboardEvent) => {
     if (event.key !== 'Escape' || event.defaultPrevented) return;
     if (confirm || newFolder) return;
+    if (document.querySelector(`[${UPLOAD_LIST_ATTR}]`)) return;
     if (activePath !== null) {
       closeDetails();
     } else if (selecting) {
@@ -338,14 +461,13 @@ export function MediaPane({ segments }: AdminScreenProps) {
       ? () => openFolder(parentOf(folder))
       : undefined;
 
-  const uploadAction =
-    readOnly || needsSetup ? undefined : (
-      <MediaUploadButton
-        uploading={uploading}
-        accept={inputAcceptOf(uploadRules)}
-        onUpload={(picked) => void upload(picked)}
-      />
-    );
+  const uploadAction = canUpload ? (
+    <MediaUploadButton
+      accept={inputAcceptOf(uploadRules)}
+      holdReason={uploadHold}
+      onPick={send}
+    />
+  ) : undefined;
 
   const count = countLine(folders.length, files.length, hasNextPage);
   const hits = `${files.length}${hasNextPage ? '+' : ''}`;
@@ -358,21 +480,40 @@ export function MediaPane({ segments }: AdminScreenProps) {
         backTitle={detailsFill ? 'Back to files' : 'Back to the folder above'}
         onBack={back}
         action={uploadAction}
+        actionAt='end'
         closeLabel='Close'
         onClose={() => (shell ? shell.close() : navigate(HOME_ROUTE))}
         maximised={shell?.maximised ?? false}
         onMaximise={shell && !narrow ? shell.toggleMaximise : undefined}
       />
 
-      {lockNote ? (
-        <p className='m-0 border-b border-border-subtle bg-muted/50 px-3 py-2 text-sm'>
-          {lockNote}
-        </p>
+      {lockNotes.length > 0 ? (
+        <div
+          key={needsSetup || !refusedNow ? 0 : refused.count}
+          role={!needsSetup && refusedNow ? 'alert' : undefined}
+          className='flex flex-col gap-1 border-b border-border-subtle bg-muted/50 px-3 py-2 text-sm'
+        >
+          {lockNotes.map((note) => (
+            <p key={note} className='m-0'>
+              {note}
+            </p>
+          ))}
+        </div>
       ) : null}
 
       {needsSetup ? (
-        <div className='flex flex-col items-start gap-2 p-4 text-sm'>
-          <p className='m-0'>{needsSetup.message}</p>
+        <div
+          className='flex flex-1 flex-col items-start gap-2 p-4 text-sm'
+          onDragOver={dragOver}
+          onDrop={drop}
+        >
+          <p
+            key={refusedNow ? refused.count : 0}
+            role={refusedNow ? 'alert' : undefined}
+            className='m-0'
+          >
+            {needsSetup.message}
+          </p>
           <a
             href={needsSetup.actionUrl}
             target='_blank'
@@ -467,135 +608,124 @@ export function MediaPane({ segments }: AdminScreenProps) {
             </p>
           ) : null}
           {changes.status ? (
-            <div
-              role={changes.status.tone === 'error' ? 'alert' : 'status'}
-              className={cn(
-                'flex items-center gap-2 border-b px-3 py-2 text-sm',
-                changes.status.tone === 'error' &&
-                  'bg-destructive/10 text-destructive'
-              )}
-            >
-              <span className='min-w-0 flex-1'>{changes.status.text}</span>
-              {changes.status.retry ? (
-                <Button
-                  type='button'
-                  size='sm'
-                  variant='outline'
-                  onClick={changes.status.retry}
-                >
-                  Retry
-                </Button>
-              ) : null}
-            </div>
+            <StatusLine
+              tone={changes.status.tone}
+              text={changes.status.text}
+              onRetry={changes.status.retry}
+            />
           ) : null}
 
           <div className='flex min-h-0 flex-1'>
             {detailsFill ? null : (
-              <div
-                ref={library}
-                tabIndex={-1}
-                role='region'
-                aria-label={`Files in ${folderName}`}
-                aria-busy={listing.isPending}
-                data-dragging={dragging ? 'true' : undefined}
-                className={cn(
-                  'min-w-0 flex-1 overflow-y-auto p-3 outline-none',
-                  dragging && 'ring-2 ring-primary'
-                )}
-                onScroll={(event) => {
-                  const area = event.currentTarget;
-                  if (
-                    area.scrollHeight - area.scrollTop - area.clientHeight <
-                    NEAR_END_PX
-                  ) {
-                    loadMore();
-                  }
-                }}
-                onDragEnter={dragOver}
-                onDragOver={dragOver}
-                onDragLeave={() => setDragging(false)}
-                onDrop={drop}
-              >
-                {folder ? (
-                  <div className='mb-3'>
-                    <MediaBreadcrumb folder={folder} onOpen={openFolder} />
-                  </div>
-                ) : null}
-                {listing.isPending ? (
-                  <LoadingLook
-                    label={`Loading ${folderName}`}
-                    mode={viewMode}
-                  />
-                ) : loadFailed ? (
-                  <StateLook
-                    title={`Couldn't load files: ${messageOf(listing.error)}`}
-                  >
-                    <Button
-                      type='button'
-                      size='sm'
-                      variant='outline'
-                      onClick={() => void listing.refetch()}
+              <div className='relative flex min-w-0 flex-1'>
+                <div
+                  ref={library}
+                  tabIndex={-1}
+                  role='region'
+                  aria-label={`Files in ${folderName}`}
+                  aria-busy={listing.isPending}
+                  className='min-w-0 flex-1 overflow-y-auto p-3 outline-none'
+                  onScroll={(event) => {
+                    const area = event.currentTarget;
+                    if (
+                      area.scrollHeight - area.scrollTop - area.clientHeight <
+                      NEAR_END_PX
+                    ) {
+                      loadMore();
+                    }
+                  }}
+                  onDragEnter={dragEnter}
+                  onDragOver={dragOver}
+                  onDragLeave={dragLeave}
+                  onDrop={drop}
+                >
+                  {folder ? (
+                    <div className='mb-3'>
+                      <MediaBreadcrumb folder={folder} onOpen={openFolder} />
+                    </div>
+                  ) : null}
+                  {listing.isPending ? (
+                    <LoadingLook
+                      label={`Loading ${folderName}`}
+                      mode={viewMode}
+                    />
+                  ) : loadFailed ? (
+                    <StateLook
+                      title={`Couldn't load files: ${messageOf(listing.error)}`}
                     >
-                      Try again
-                    </Button>
-                  </StateLook>
-                ) : items.length === 0 ? (
-                  searching ? (
-                    <StateLook title={`No files match “${debouncedSearch}”`}>
                       <Button
                         type='button'
                         size='sm'
                         variant='outline'
-                        onClick={() => {
-                          setSearch('');
-                          setDebouncedSearch('');
-                        }}
+                        onClick={() => void listing.refetch()}
                       >
-                        Clear search
+                        Try again
                       </Button>
                     </StateLook>
-                  ) : folder ? (
-                    <StateLook title='This folder is empty.' />
-                  ) : (
-                    <StateLook title='The media library is empty.' />
-                  )
-                ) : (
-                  <>
-                    <MediaItems
-                      items={items}
-                      mode={viewMode}
-                      activePath={activePath}
-                      selecting={selecting}
-                      selected={selected}
-                      resolveUrl={resolveUrl}
-                      loadingMore={isFetchingNextPage}
-                      onOpenFolder={openFolder}
-                      onChoose={(path) =>
-                        setActivePath((current) =>
-                          current === path ? null : path
-                        )
-                      }
-                      onToggle={toggle}
-                      onFocusLast={loadMore}
-                    />
-                    {listing.isFetchNextPageError ? (
-                      <div
-                        role='alert'
-                        className='mt-3 flex items-center gap-2 text-sm'
-                      >
-                        Couldn't load more files.
+                  ) : shown.length === 0 ? (
+                    searching ? (
+                      <StateLook title={`No files match “${debouncedSearch}”`}>
                         <Button
                           type='button'
                           size='sm'
                           variant='outline'
-                          onClick={() => void fetchNextPage()}
+                          onClick={() => {
+                            setSearch('');
+                            setDebouncedSearch('');
+                          }}
                         >
-                          Try again
+                          Clear search
                         </Button>
-                      </div>
-                    ) : null}
-                  </>
-                )}
+                      </StateLook>
+                    ) : folder ? (
+                      <StateLook title='This folder is empty.' />
+                    ) : (
+                      <StateLook title='The media library is empty.' />
+                    )
+                  ) : (
+                    <>
+                      <MediaItems
+                        items={shown}
+                        mode={viewMode}
+                        activePath={activePath}
+                        selecting={selecting}
+                        selected={selected}
+                        fresh={fresh}
+                        resolveUrl={resolveUrl}
+                        loadingMore={isFetchingNextPage}
+                        onOpenFolder={openFolder}
+                        onChoose={(path) =>
+                          setActivePath((current) =>
+                            current === path ? null : path
+                          )
+                        }
+                        onToggle={toggle}
+                        onFocusLast={loadMore}
+                      />
+                      {listing.isFetchNextPageError ? (
+                        <div
+                          role='alert'
+                          className='mt-3 flex items-center gap-2 text-sm'
+                        >
+                          Couldn't load more files.
+                          <Button
+                            type='button'
+                            size='sm'
+                            variant='outline'
+                            onClick={() => void fetchNextPage()}
+                          >
+                            Try again
+                          </Button>
+                        </div>
+                      ) : null}
+                    </>
+                  )}
+                </div>
+                {dragging && canUpload && uploadHold === null ? (
+                  <div className='pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-background/85 p-4 text-center text-sm font-medium text-foreground inset-ring-2 inset-ring-primary'>
+                    {dropVeilWords(folder)}
+                  </div>
+                ) : null}
               </div>
             )}
 
