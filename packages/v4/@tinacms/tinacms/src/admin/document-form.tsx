@@ -131,6 +131,18 @@ const isBranchGoneError = (cause: unknown) => {
   return false;
 };
 
+// Sonner puts focus back where it was when focus leaves the toasts. A dialog a
+// toast action opens would lose its focus to that, so focus leaves first.
+const leaveToaster = () => {
+  const active = document.activeElement;
+  if (
+    active instanceof HTMLElement &&
+    active.closest('[data-sonner-toaster]')
+  ) {
+    active.blur();
+  }
+};
+
 const isBranchGone = (save: { phase: string; reason?: string } | undefined) =>
   save?.phase === 'failed' && save.reason === 'branch-gone';
 
@@ -247,6 +259,7 @@ function SaveButton() {
       action: {
         label: action,
         onClick: () => {
+          leaveToaster();
           const live = liveRetries.get(failedToastId);
           if (
             goneToasts.has(failedToastId) &&
