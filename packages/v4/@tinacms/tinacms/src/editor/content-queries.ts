@@ -222,9 +222,10 @@ export const useSaveDocument = (): DocumentSave => {
       { collection },
       branch
     ) => {
+      const listKey = contentKeys.list(collection, branch);
       await Promise.all([
         queryClient.cancelQueries({
-          queryKey: contentKeys.list(collection, branch),
+          queryKey: listKey,
           exact: true,
         }),
         queryClient.cancelQueries({
@@ -232,8 +233,18 @@ export const useSaveDocument = (): DocumentSave => {
           exact: true,
         }),
       ]);
+      if (!queryClient.getQueryData<DocumentSummary[]>(listKey)) {
+        // Cancelling the first read leaves an active query pending with no data.
+        // Restart it before applying the save summary so the navigator is not
+        // stranded in an empty state while preserving the confirmed metadata.
+        await queryClient.refetchQueries({
+          queryKey: listKey,
+          exact: true,
+          type: 'active',
+        });
+      }
       queryClient.setQueryData<DocumentSummary[]>(
-        contentKeys.list(collection, branch),
+        listKey,
         (cached) => (cached ? upsertByPath(cached, summary) : undefined)
       );
       queryClient.setQueryData<DocumentEntry>(

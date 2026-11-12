@@ -190,6 +190,48 @@ describe('useDocument', () => {
 });
 
 describe('useSaveDocument', () => {
+  it('restarts an initial collection read cancelled by a save', async () => {
+    let finishInitialList: (value: DocumentSummary[]) => void = () => {};
+    const summary: DocumentSummary = {
+      ...SUMMARIES[0],
+      updatedAt: '2026-11-12T00:00:00.000Z',
+      lastAuthor: { name: 'Ada' },
+    };
+    const provider = stubProvider({
+      list: vi
+        .fn()
+        .mockImplementationOnce(
+          () =>
+            new Promise<DocumentSummary[]>((resolve) => {
+              finishInitialList = resolve;
+            })
+        )
+        .mockResolvedValueOnce(SUMMARIES),
+      update: vi.fn(async () => ({ ...summary, document: { title: 'Saved' } })),
+    });
+    const { wrapper } = renderWithContent(provider);
+    const { result } = renderHook(
+      () => ({
+        list: useCollectionDocuments('post'),
+        saving: useSaveDocument(),
+      }),
+      { wrapper }
+    );
+
+    await waitFor(() => expect(provider.list).toHaveBeenCalledTimes(1));
+    await result.current.saving.save({
+      collection: 'post',
+      path: summary.path,
+      value: { title: 'Saved' },
+    });
+
+    await waitFor(() =>
+      expect(result.current.list.documents).toEqual([summary, SUMMARIES[1]])
+    );
+    expect(provider.list).toHaveBeenCalledTimes(2);
+    finishInitialList(SUMMARIES);
+  });
+
   it('keeps confirmed save metadata when an older list response arrives later', async () => {
     let finishList: (value: DocumentSummary[]) => void = () => {};
     const summary = {
