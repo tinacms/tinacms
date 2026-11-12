@@ -20,6 +20,10 @@ import {
 } from '../core/overridable-registry';
 import { AUTH_CAPABILITY, type PluginManifest } from '../core/plugin';
 import {
+  SEARCH_INDEX_MEMBERS,
+  type SearchIndexProvider,
+} from '../core/search/index-contract';
+import {
   initializePlugins,
   resolveServerSegments,
   validateCapabilityGraph,
@@ -138,12 +142,7 @@ export const createRpcHandler = ({
 
 const composeServerSegments = async (
   plugins: PluginManifest[]
-): Promise<
-  Omit<ServerRuntime, 'destroy'> & {
-    hooks: ServerHookRegistry;
-    resolveBranch: ServerSegment['resolveBranch'];
-  }
-> => {
+): Promise<Omit<ServerRuntime, 'destroy'> & { hooks: ServerHookRegistry }> => {
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
   const hooks = createServerHookRegistry(plugins, resolved);
@@ -160,6 +159,10 @@ const composeServerSegments = async (
   claimServerHookFactories(segmentsByNamespace);
   return {
     hooks,
+    searchIndex: claimSearchIndexProvider(
+      segmentsByNamespace,
+      capabilityProvider(plugins, 'search')
+    ),
     resolveBranch: claimBranchResolver(
       segmentsByNamespace,
       capabilityProvider(plugins, 'content')
@@ -177,8 +180,8 @@ const composeServerRuntime = async (
   plugins: PluginManifest[],
   schema: TinaSchema | undefined
 ): Promise<ServerRuntime> => {
-  const { hooks, resolveBranch, ...composed } =
-    await composeServerSegments(plugins);
+  const { hooks, ...composed } = await composeServerSegments(plugins);
+  const { resolveBranch } = composed;
   invariant(
     hooks.size === 0 || schema,
     'rpc-server-hooks-no-schema',
@@ -211,6 +214,21 @@ const lazyRuntimeOf = (plugins: PluginManifest[]) => {
     );
     return composing;
   };
+};
+
+// Runs `run` inside a composed runtime with every `onInit` done, then tears it down.
+// The CLI uses it, so a provider that calls `use()` works there too.
+export const runInServerRuntime = async <T>(
+  plugins: PluginManifest[],
+  schema: TinaSchema | undefined,
+  run: (runtime: ServerRuntime) => Promise<T>
+): Promise<T> => {
+  const runtime = await composeServerRuntime(plugins, schema);
+  try {
+    return await serverRuntimeStorage.run(runtime, () => run(runtime));
+  } finally {
+    await runtime.destroy();
+  }
 };
 
 // The local Data Layer checks its requests through this.
@@ -268,6 +286,36 @@ const claimBranchResolver = (
     const { resolveBranch, ...routableOps } = segment.ops;
     if (segment.manifest === contentProvider && resolveBranch) {
       claimed = resolveBranch;
+    }
+    segmentsByNamespace.set(namespace, { ...segment, ops: routableOps });
+  }
+  return claimed;
+};
+
+// Read the reserved `searchIndex` provider from the search plugin's segment, and
+// remove it from the routable ops of every segment, so no HTTP route reaches
+// `upsert` or `replace`. A segment of a `defineSearchPlugin` plugin (the ones with
+// a `search` manifest key) must hold all three members.
+const claimSearchIndexProvider = (
+  segmentsByNamespace: Map<string, ResolvedServerSegment>,
+  searchProvider: PluginManifest | undefined
+): SearchIndexProvider | undefined => {
+  let claimed: SearchIndexProvider | undefined;
+  for (const [namespace, segment] of segmentsByNamespace) {
+    const { searchIndex, ...routableOps } = segment.ops;
+    if (segment.manifest.search) {
+      const provider = searchIndex as Partial<SearchIndexProvider> | undefined;
+      const missing = SEARCH_INDEX_MEMBERS.filter(
+        (member) => typeof provider?.[member] !== 'function'
+      );
+      invariant(
+        missing.length === 0,
+        'search-provider-shape',
+        `Plugin "${segment.manifest.name}" provides \`search\` but its server module's default export has no function for ${missing.map((member) => `\`${member}\``).join(', ')}.`
+      );
+    }
+    if (segment.manifest === searchProvider && searchIndex) {
+      claimed = searchIndex as SearchIndexProvider;
     }
     segmentsByNamespace.set(namespace, { ...segment, ops: routableOps });
   }

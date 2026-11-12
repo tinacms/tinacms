@@ -6,6 +6,11 @@ import {
   defineServerHook,
 } from '../core/form/hooks';
 import { definePlugin } from '../core/plugin';
+import {
+  defineSearchPlugin,
+  searchIndex,
+} from '../plugins/search/search.plugin';
+import type { SearchFields } from '../core/search/index-contract';
 import type { FieldSchema } from '../core/schema/types';
 import { LOCK_VERSION, checkLock, compileSchema } from './compile-schema';
 
@@ -615,5 +620,160 @@ describe('compileSchema array options', () => {
     const [template] = lock.schema.collections[0].fields[0].templates;
     expect(template).not.toHaveProperty('itemLabel');
     expect(lock.schema.collections[0].fields[0]).not.toHaveProperty('picker');
+  });
+});
+
+describe('compileSchema search fields', () => {
+  const searchable = (fields: SearchFields) =>
+    defineSearchPlugin({
+      name: 'test:search',
+      fields,
+      server: () => import('../test/in-memory-search.server'),
+    });
+  const fieldTypes = [
+    'string',
+    'rich-text',
+    'boolean',
+    'image',
+    'reference',
+    'object',
+    'select',
+    'datetime',
+    'number',
+    'array',
+  ];
+  const withSearch = (
+    fields: SearchFields,
+    hooks: { name: string }[] = []
+  ): ResolvedConfig =>
+    asResolvedConfig({
+      plugins: [
+        ...fieldTypes.map((type) => fieldPlugin(type, 1)),
+        searchable(fields),
+      ],
+      schema: {
+        collections: [
+          {
+            name: 'post',
+            path: 'content/posts',
+            format: 'md',
+            hooks,
+            fields: fieldTypes.map((type) => ({ name: `${type}Field`, type })),
+          },
+        ],
+      },
+    });
+
+  it('accepts string and rich-text fields', () => {
+    expect(() =>
+      compileSchema(
+        withSearch({ post: { stringField: 3, ['rich-textField']: 1 } })
+      )
+    ).not.toThrow();
+  });
+
+  it('names the plugin and the collection for an unknown collection', () => {
+    expect(() => compileSchema(withSearch({ blog: { title: 1 } }))).toThrow(
+      /test:search.*"blog"/
+    );
+  });
+
+  it('names the field for an unknown field', () => {
+    expect(() => compileSchema(withSearch({ post: { nope: 1 } }))).toThrow(
+      /test:search.*"nope".*"post"/
+    );
+  });
+
+  it.each(
+    fieldTypes.filter((type) => type !== 'string' && type !== 'rich-text')
+  )('refuses a %s field', (type) => {
+    expect(() =>
+      compileSchema(withSearch({ post: { [`${type}Field`]: 1 } }))
+    ).toThrow(new RegExp(`"${type}Field".*"post".*"${type}"`));
+  });
+
+  it.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY])(
+    'refuses the weight %s',
+    (weight) => {
+      expect(() =>
+        compileSchema(withSearch({ post: { stringField: weight } }))
+      ).toThrow(/"stringField".*"post"/);
+    }
+  );
+
+  it('refuses a collection that lists searchIndex() without fields', () => {
+    expect(() => compileSchema(withSearch({}, [searchIndex()]))).toThrow(
+      /"post".*searchIndex/
+    );
+  });
+
+  it('allows fields for a collection that does not list searchIndex()', () => {
+    expect(() =>
+      compileSchema(withSearch({ post: { stringField: 1 } }))
+    ).not.toThrow();
+  });
+
+  it('writes a lock identical to the same project without the search plugin', () => {
+    const plain = asResolvedConfig({
+      ...withSearch({ post: { stringField: 1 } }),
+      plugins: fieldTypes.map((type) => fieldPlugin(type, 1)),
+    });
+    expect(
+      JSON.stringify(compileSchema(withSearch({ post: { stringField: 1 } })))
+    ).toBe(JSON.stringify(compileSchema(plain)));
+  });
+
+  it.each([
+    ['loser then winner', false],
+    ['winner then loser', true],
+  ])(
+    'checks only the fields of a defineSearchPlugin that overrides another (%s)',
+    (_order, reversed) => {
+      const base = withSearch({});
+      const plugins = (winnerFields: SearchFields) => {
+        const search = [
+          searchable({ missing: { title: 1 } }),
+          defineSearchPlugin({
+            name: 'test:winner',
+            fields: winnerFields,
+            server: () => import('../test/in-memory-search.server'),
+            overrides: [{ capability: 'search' }],
+          }),
+        ];
+        return [
+          ...fieldTypes.map((type) => fieldPlugin(type, 1)),
+          ...(reversed ? search.reverse() : search),
+        ];
+      };
+      expect(() =>
+        compileSchema(
+          asResolvedConfig({
+            ...base,
+            plugins: plugins({ post: { stringField: 1 } }),
+          })
+        )
+      ).not.toThrow();
+      expect(() =>
+        compileSchema(
+          asResolvedConfig({ ...base, plugins: plugins({ post: { nope: 1 } }) })
+        )
+      ).toThrow(/test:winner.*"nope"/);
+    }
+  );
+
+  it('does not check the fields of a plugin that lost search to an override', () => {
+    const config = asResolvedConfig({
+      ...withSearch({}),
+      plugins: [
+        ...fieldTypes.map((type) => fieldPlugin(type, 1)),
+        searchable({ missing: { title: 1 } }),
+        definePlugin({
+          name: 'test:winner',
+          provides: ['search'],
+          overrides: [{ capability: 'search' }],
+        }),
+      ],
+    });
+    expect(() => compileSchema(config)).not.toThrow();
   });
 });

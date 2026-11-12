@@ -1,3 +1,4 @@
+import homePlugin from '../home/home.plugin';
 import coreValidatorsPlugin from '../validators/core-validators.plugin';
 import arrayFieldPlugin from './array/array-field.plugin';
 import { array } from './array/array-field.schema';
@@ -32,6 +33,7 @@ export const corePlugins = [
   referenceFieldPlugin,
   imageFieldPlugin,
   coreValidatorsPlugin,
+  homePlugin,
 ];
 
 // TODO: build `t` from the configured plugin set when defineConfig arrives

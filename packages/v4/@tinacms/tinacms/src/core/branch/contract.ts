@@ -1,3 +1,4 @@
+import { isRecord } from '../../utils/is-record';
 import type { DocumentEntry } from '../content/contract';
 import type { SliceState, TinaStoreState } from '../plugin';
 import type { TinaDocument } from '../schema/types';
@@ -5,6 +6,8 @@ import type { TinaDocument } from '../schema/types';
 export interface BranchInfo {
   name: string;
   protected?: boolean;
+  /** The branch's pull request, when the provider knows of one. */
+  pullRequestUrl?: string;
 }
 
 /**
@@ -30,6 +33,8 @@ export interface BranchSlice {
   fallback?: string;
   list: string[];
   protected: string[];
+  /** Branch name to pull request URL, for the branches that have one. */
+  pullRequests: Record<string, string>;
   /** Whether the branch list is being read, read, or failed to read. Absent until the first read starts. */
   listState?: BranchListState;
   switchTo: (name: string | undefined) => void;
@@ -60,6 +65,15 @@ const isNames = (value: unknown): value is string[] =>
 const optionalString = (value: unknown): string | undefined =>
   typeof value === 'string' && value ? value : undefined;
 
+const pullRequestsOf = (value: unknown): Record<string, string> => {
+  if (!isRecord(value)) return {};
+  const urls: Record<string, string> = {};
+  for (const [name, url] of Object.entries(value)) {
+    if (typeof url === 'string' && url) urls[name] = url;
+  }
+  return urls;
+};
+
 export const branchSliceOf = (
   state: TinaStoreState
 ): BranchSlice | undefined => {
@@ -80,6 +94,7 @@ export const branchSliceOf = (
     fallback: optionalString(slice.fallback),
     list,
     protected: protectedNames,
+    pullRequests: pullRequestsOf(slice.pullRequests),
     listState:
       slice.listState === 'loading' ||
       slice.listState === 'ready' ||

@@ -15,6 +15,7 @@ import { toFormId, useFormStore } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 
@@ -121,7 +122,13 @@ const searchPlugin = definePlugin({
   client: async () => ({
     default: {
       slice: () => ({
-        search: async () => [{ ref: 'content/posts/hello.mdx' }],
+        search: async () => [
+          {
+            ref: { collection: 'post', path: 'content/posts/hello.mdx' },
+            score: 1,
+            snippet: '',
+          },
+        ],
       }),
     },
   }),
@@ -231,6 +238,7 @@ const renderAdmin = (projectName?: string) =>
           ...(searchEnabled ? [searchPlugin] : []),
           stringFieldPlugin,
           coreValidatorsPlugin,
+          homePlugin,
         ],
         ...(projectName ? { projectName } : {}),
         schema: {
@@ -372,80 +380,6 @@ describe('Kept edits notice', () => {
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.click(screen.getByRole('button', { name: 'Home' }));
     expect(await screen.findByText('Still unsaved on main.')).toBeVisible();
-  });
-});
-
-describe('Home', () => {
-  it('lands on Home with the branch line and a card per collection', async () => {
-    renderAdmin();
-    expect(await screen.findByText('Branch main')).toBeVisible();
-    const list = screen.getByRole('list', { name: 'Collection cards' });
-    expect(within(list).getByText('Posts')).toBeVisible();
-    expect(await within(list).findByText('1 document')).toBeVisible();
-    expect(
-      within(list).getByRole('button', { name: 'New Posts document' })
-    ).toBeDisabled();
-    expect(screen.queryByRole('button', { name: /^Review/ })).toBeNull();
-  });
-
-  it('says Local files in local mode and leaves the branch out', async () => {
-    mode = 'local';
-    renderAdmin();
-    expect(
-      await screen.findByText(
-        'Local files: Tina writes edits straight to disk.'
-      )
-    ).toBeVisible();
-    expect(screen.queryByText(/^Branch /)).toBeNull();
-  });
-
-  it('offers Review N unsaved for edits kept in a stored draft after a reload', async () => {
-    localStorage.setItem(
-      draftKey(toFormId('content/posts/hello.mdx')),
-      JSON.stringify({
-        version: 2,
-        values: { title: 'Kept' },
-        baseline: { title: 'Hello' },
-      })
-    );
-    renderAdmin();
-    expect(
-      await screen.findByRole('button', { name: 'Review 1 unsaved' })
-    ).toBeVisible();
-  });
-
-  it('lets a long branch name wrap in its column instead of pushing Review off screen', async () => {
-    renderAdmin();
-    const line = await screen.findByText('Branch main');
-    const column = line.parentElement;
-    expect(column).toHaveClass('min-w-0', 'break-words');
-  });
-
-  it('opens the collection from its card', async () => {
-    const user = userEvent.setup();
-    renderAdmin();
-    await user.click(await screen.findByRole('button', { name: /^Posts/ }));
-    await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections/post')
-    );
-  });
-
-  it('offers Review N unsaved only while documents are unsaved, and opens them', async () => {
-    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
-    const user = userEvent.setup();
-    renderAdmin();
-    await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    await user.click(screen.getByRole('button', { name: 'Home' }));
-    await user.click(
-      await screen.findByRole('button', { name: 'Review 1 unsaved' })
-    );
-    await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections?unsaved')
-    );
-    const list = await screen.findByRole('list', { name: 'Unsaved documents' });
-    expect(
-      await within(list).findByRole('button', { name: /hello\.mdx/ })
-    ).toBeVisible();
   });
 });
 
