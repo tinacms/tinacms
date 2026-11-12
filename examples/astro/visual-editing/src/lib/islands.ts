@@ -61,11 +61,16 @@ export const islands: IslandRegistry = {
     fetch: () => getGlobal(),
     component: Header,
     wrapper: { tag: 'div' },
-    propsFromData: (data, params) => ({
-      data: (data as { data?: { global?: { header?: unknown } } }).data?.global
-        ?.header,
-      pathname: params.get('path') ?? '/',
-    }),
+    propsFromData: (data, params) => {
+      const global = (
+        data as { data?: { global?: { header?: unknown; theme?: unknown } } }
+      ).data?.global;
+      return {
+        data: global?.header,
+        theme: global?.theme,
+        pathname: params.get('path') ?? '/',
+      };
+    },
   },
   'global-footer': {
     fetch: () => getGlobal(),

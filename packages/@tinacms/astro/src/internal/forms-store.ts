@@ -1,13 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { escapeAttr } from './escape';
+import { type CollectedForm, addForm } from '@tinacms/bridge/form-payload';
 
-export interface CollectedForm {
-  id: string;
-  query: string;
-  variables: object;
-  data: object;
-  priority?: 'primary';
-}
+export type { CollectedForm };
 
 // Symbol slot on globalThis so bundle copies (esbuild inlines this module
 // into each entry that imports it) share one ALS instance.
@@ -22,29 +16,5 @@ export const formsStore: AsyncLocalStorage<CollectedForm[]> = (slot[
 
 export function recordForm(form: CollectedForm): void {
   const list = formsStore.getStore();
-  if (!list) return;
-  // Same id can appear twice (layout + page both fetch the global). Dedup
-  // and upgrade to `primary` if a later call asserts it.
-  const existing = list.find((entry) => entry.id === form.id);
-  if (existing) {
-    if (form.priority === 'primary') existing.priority = 'primary';
-    return;
-  }
-  list.push(form);
-}
-
-export function sortByPriority(forms: CollectedForm[]): CollectedForm[] {
-  return [...forms].sort(
-    (a, b) =>
-      (a.priority === 'primary' ? 0 : 1) - (b.priority === 'primary' ? 0 : 1)
-  );
-}
-
-export function renderFormPayloadDiv(
-  form: CollectedForm,
-  primary: boolean
-): string {
-  return `<div data-tina-form="${escapeAttr(JSON.stringify(form))}"${
-    primary ? ' data-tina-primary' : ''
-  } hidden></div>`;
+  if (list) addForm(list, form);
 }

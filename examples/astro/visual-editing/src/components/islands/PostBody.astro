@@ -22,8 +22,12 @@ const avatarSrc = author?.avatar ? sanitizeImageSrc(author.avatar) : '';
   </h1>
 )}
 <div class="flex items-center gap-3 mb-8">
-  {avatarSrc && <img src={avatarSrc} alt={author?.name ?? ''} width="40" height="40" class="rounded-full object-cover" />}
-  {author?.name && <span class="font-medium text-gray-700 dark:text-gray-200">{author.name}</span>}
+  {author && (
+    <span data-tina-field={tinaField(data, 'author')} class="flex items-center gap-3">
+      {avatarSrc && <img src={avatarSrc} alt={author.name ?? ''} width="40" height="40" class="rounded-full object-cover" />}
+      {author.name && <span class="font-medium text-gray-700 dark:text-gray-200">{author.name}</span>}
+    </span>
+  )}
   {formattedDate && <span class="text-gray-300">·</span>}
   {formattedDate && <span data-tina-field={tinaField(data, 'date')} class="text-gray-500">{formattedDate}</span>}
 </div>

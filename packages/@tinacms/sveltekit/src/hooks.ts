@@ -1,10 +1,6 @@
 import type { Handle } from '@sveltejs/kit/hooks';
-import {
-  renderFormPayloadDiv,
-  sortByPriority,
-  TINA_FORMS,
-  type TinaLocals,
-} from './internal/forms-store';
+import { renderPageFormPayloads } from '@tinacms/bridge/form-payload';
+import { TINA_FORMS, type TinaLocals } from './internal/forms-store';
 import { EDIT_COOKIE_HEADER, isEditMode } from './is-edit-mode';
 
 const HEAD_CLOSE = '</head>';
@@ -67,13 +63,11 @@ export const tinaHandle: Handle = async ({ event, resolve }) => {
   });
 };
 
+// No bridge <script> here: TinaBridge starts it after hydration. Starting it from <head>
+// lets it change the DOM before Svelte hydrates, which causes a hydration mismatch.
+// `template`, not `div`: a <div> in <head> ends the head early and breaks head hydration.
 function renderInjection(locals: TinaLocals): string {
-  const forms = sortByPriority(locals[TINA_FORMS] ?? [])
-    .map((form, index) => renderFormPayloadDiv(form, index === 0, 'template'))
-    .join('');
-  // No bridge <script> here: TinaBridge starts it after hydration. Starting it from <head>
-  // lets it change the DOM before Svelte hydrates, which causes a hydration mismatch.
-  return forms;
+  return renderPageFormPayloads(locals[TINA_FORMS] ?? [], 'template');
 }
 
 export default tinaHandle;
