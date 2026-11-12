@@ -113,6 +113,7 @@ export interface FormStore {
   discardWaiting: (formId: FormId, discarded?: readonly StoredDraft[]) => void;
   setBranch: (branch: string | undefined) => void;
   setSavePhase: (formId: FormId, phase: SavePhase) => void;
+  clearSavePhase: (formId: FormId) => void;
   restoreSavePhase: (
     formId: FormId,
     previous: FormStore['saves'][FormId]
@@ -274,6 +275,7 @@ const DEVTOOLS_ACTION = {
   discardWaiting: 'form/discardWaiting',
   storage: 'form/storage',
   setSavePhase: 'form/setSavePhase',
+  clearSavePhase: 'form/clearSavePhase',
   restoreSavePhase: 'form/restoreSavePhase',
   register: 'form/register',
   setFieldValue: 'form/setFieldValue',
@@ -405,6 +407,12 @@ export const useFormStore = create<FormStore>()(
             DEVTOOLS_ACTION.setSavePhase
           ),
 
+        clearSavePhase: (formId) =>
+          apply((state) => {
+            if (!state.saves[formId]) return state;
+            const { [formId]: _cleared, ...saves } = state.saves;
+            return { saves };
+          }, DEVTOOLS_ACTION.clearSavePhase),
         restoreSavePhase: (formId, previous) =>
           apply((state) => {
             const { [formId]: _current, ...others } = state.saves;
@@ -551,7 +559,9 @@ export const useFormStore = create<FormStore>()(
           apply((state) => {
             const scope = state.forms[formId];
             if (!isEdited(scope)) return state;
+            const { [formId]: _failed, ...saves } = state.saves;
             return {
+              saves,
               hidden: withoutKey(state.hidden, formId),
               forms: {
                 ...state.forms,

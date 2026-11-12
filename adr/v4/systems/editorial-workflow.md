@@ -52,9 +52,12 @@ The Branch switcher blocks a switch while any form has unsaved edits. A form is 
 `switchTo(name)` is a plain setter on the slice. It sets `branch.current`, and every content and media read, query key and draft key follows it. Picking the default branch by name stores the same keys as picking nothing. The other actions call the Data Layer, and none exists yet:
 
 ```ts
-const { create, requestPublish, discard } = useTinaStore((s) => s.branch)
+const { saveToNewBranch, switchTo, requestPublish, discard } = useTinaStore((s) => s.branch)
 
-await create('cms/new-post')
+// All or nothing: one request makes the branch from `from` and writes the change.
+// When it rejects, no branch exists and the editor stays on their branch.
+await saveToNewBranch({ name: 'cms/new-post', from: 'main', collection, path, value })
+switchTo('cms/new-post')      // only after the save resolves
 await requestPublish()        // calls into the content capability or the workflow plugin
 ```
 
