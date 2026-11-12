@@ -1,0 +1,26 @@
+name: CLA status for the merge queue
+
+# cla-assistant cannot receive merge_group events. The real CLA check already
+# passed on the pull request before it could join the queue.
+on:
+  merge_group:
+    types: [checks_requested]
+
+permissions:
+  statuses: write
+
+jobs:
+  license-cla:
+    name: Post license/cla on the merge group commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Post license/cla success
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.merge_group.head_sha }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA" \
+            -f state=success \
+            -f context=license/cla \
+            -f description="Signed on the pull request before it joined the queue"
