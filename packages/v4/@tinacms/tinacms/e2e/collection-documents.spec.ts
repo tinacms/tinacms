@@ -231,6 +231,18 @@ const openBulk = async (page: Page) => {
   await expect(page.getByText('Page 1 of 3')).toBeVisible();
 };
 
+// Two raw mouse clicks `gap` ms apart on the spot where the button is now, as a double click lands.
+// No actionability wait runs between them, so a loaded runner cannot stretch the gap.
+const clickTwiceAt = async (page: Page, target: Locator, gap: number) => {
+  const box = await target.boundingBox();
+  expect(box).not.toBeNull();
+  const x = (box?.x ?? 0) + (box?.width ?? 0) / 2;
+  const y = (box?.y ?? 0) + (box?.height ?? 0) / 2;
+  await page.mouse.click(x, y);
+  await page.waitForTimeout(gap);
+  await page.mouse.click(x, y);
+};
+
 const nextPage = async (page: Page, label: string) => {
   await page.getByRole('button', { name: 'Next' }).click();
   await expect(page.getByText(label)).toBeVisible();
@@ -279,10 +291,11 @@ for (const width of [1440, 390]) {
           await nextPage(page, 'Page 2 of 3');
           await nextPage(page, 'Page 3 of 3');
           slow.on = mode === 'slow';
-          const previous = page.getByRole('button', { name: 'Previous' });
-          await previous.click();
-          await page.waitForTimeout(gap);
-          await previous.click({ force: true }).catch(() => {});
+          await clickTwiceAt(
+            page,
+            page.getByRole('button', { name: 'Previous' }),
+            gap
+          );
           await page.waitForTimeout(2000);
           expect(page.url()).toContain(BULK_HASH);
           // A slow list takes 1.5 s here and longer on a loaded runner.
@@ -306,10 +319,11 @@ for (const width of [1440, 390]) {
       await expect(page.getByText('Page 1 of 3')).toBeVisible();
       await page.waitForTimeout(HOLD_MS);
       for (const gap of [60, 120, 250]) {
-        const next = page.getByRole('button', { name: 'Next' });
-        await next.click();
-        await page.waitForTimeout(gap);
-        await next.click({ force: true }).catch(() => {});
+        await clickTwiceAt(
+          page,
+          page.getByRole('button', { name: 'Next' }),
+          gap
+        );
         await page.waitForTimeout(800);
         expect(page.url()).toContain(BULK_HASH);
         await expect(page.getByText('Page 2 of 3')).toBeVisible({

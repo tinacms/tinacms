@@ -1,11 +1,26 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Toaster } from '@tinacms/ui/components/sonner';
 import { TooltipProvider } from '@tinacms/ui/components/tooltip';
 import type { ReactNode } from 'react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import { createStore } from 'zustand';
 import {
   ContentError,
@@ -686,4 +701,10 @@ describe('narrow screens', () => {
       screen.getByRole('combobox', { name: 'Filter by status' })
     ).toBeInTheDocument();
   });
+});
+
+// A toast still on screen at the end of a file leaves a removal timer that fires after the test environment is gone.
+afterAll(async () => {
+  cleanup();
+  await new Promise((resolve) => setTimeout(resolve, 300));
 });

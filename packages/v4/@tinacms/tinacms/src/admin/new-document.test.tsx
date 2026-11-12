@@ -1,7 +1,22 @@
 import { QueryClient } from '@tanstack/react-query';
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import { asResolvedConfig } from '../config';
 import {
   ContentError,
@@ -364,4 +379,10 @@ describe('the table after a save and after Duplicate', () => {
     expect(create).not.toHaveBeenCalled();
     expect(files.has('content/posts/fresh.mdx')).toBe(false);
   });
+});
+
+// A toast still on screen at the end of a file leaves a removal timer that fires after the test environment is gone.
+afterAll(async () => {
+  cleanup();
+  await new Promise((resolve) => setTimeout(resolve, 300));
 });
