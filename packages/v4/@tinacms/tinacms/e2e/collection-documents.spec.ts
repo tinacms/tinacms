@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { type Locator, expect, test } from '@playwright/test';
+import { type Locator, type Page, expect, test } from '@playwright/test';
 
 const POSTS = path.resolve('playground/content/posts');
 const LINKED = path.join(POSTS, 'guides/getting-started.mdx');
@@ -189,3 +189,131 @@ test('the Deleted toast stays when deleting the last row of the last page', asyn
     await fs.rm(folder, { recursive: true, force: true });
   }
 });
+
+const BULK = path.join(POSTS, 'bulk');
+
+const withBulkFolder = async (run: () => Promise<void>) => {
+  await fs.mkdir(BULK, { recursive: true });
+  await Promise.all(
+    Array.from({ length: 120 }, (_, index) =>
+      fs.writeFile(
+        path.join(BULK, `b${String(index).padStart(3, '0')}.mdx`),
+        `---\ntitle: Bulk ${String(index).padStart(3, '0')}\n---\n\nBody.\n`
+      )
+    )
+  );
+  try {
+    await run();
+  } finally {
+    await fs.rm(BULK, { recursive: true, force: true });
+  }
+};
+
+const BULK_HASH = '#/collections/post/folder/bulk';
+const HOLD_MS = 450;
+
+// Delays every list request after `slow.on` is set, so a refetch is observable in a real browser.
+const slowLists = async (page: Page) => {
+  const slow = { on: false };
+  await page.route('**/api/tina/content', async (route) => {
+    const body = route.request().postDataJSON() as { op?: string } | null;
+    if (slow.on && body?.op === 'list') {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+    }
+    await route.continue();
+  });
+  return slow;
+};
+
+const openBulk = async (page: Page) => {
+  await page.goto(`/${BULK_HASH}`);
+  await page.reload();
+  await expect(page.getByText('Page 1 of 3')).toBeVisible();
+};
+
+const nextPage = async (page: Page, label: string) => {
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.getByText(label)).toBeVisible();
+  await page.waitForTimeout(HOLD_MS);
+};
+
+test('a filter refetch keeps the old rows live, so a click on one opens it', async ({
+  page,
+}) => {
+  await withBulkFolder(async () => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const slow = await slowLists(page);
+    await openBulk(page);
+    slow.on = true;
+    await page.getByPlaceholder(/Filter by title/).fill('Bulk');
+    await expect(page.locator('[aria-busy="true"]')).toBeVisible();
+    expect(await page.locator('[data-rows-locked]').count()).toBe(0);
+    const box = await page
+      .getByRole('button', { name: /^Bulk \d+$/ })
+      .first()
+      .boundingBox();
+    expect(box).not.toBeNull();
+    await page.mouse.click(
+      (box?.x ?? 0) + (box?.width ?? 0) / 2,
+      (box?.y ?? 0) + (box?.height ?? 0) / 2
+    );
+    // Well inside the 1.5 s the held list takes, so the click went to the old row.
+    await expect(page).toHaveURL(/collections\/post\/content/, {
+      timeout: 700,
+    });
+  });
+});
+
+for (const width of [1440, 390]) {
+  test(`a double click on Previous never reaches a row at ${width}px`, async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    await withBulkFolder(async () => {
+      await page.setViewportSize({ width, height: 844 });
+      const slow = await slowLists(page);
+      for (const mode of ['cached', 'slow'] as const) {
+        for (const gap of [60, 120, 250]) {
+          slow.on = false;
+          await openBulk(page);
+          await nextPage(page, 'Page 2 of 3');
+          await nextPage(page, 'Page 3 of 3');
+          slow.on = mode === 'slow';
+          const previous = page.getByRole('button', { name: 'Previous' });
+          await previous.click();
+          await page.waitForTimeout(gap);
+          await previous.click({ force: true }).catch(() => {});
+          await page.waitForTimeout(2000);
+          expect(page.url()).toContain(BULK_HASH);
+          await expect(page.getByText('Page 2 of 3')).toBeVisible();
+        }
+      }
+    });
+  });
+
+  test(`a double click on Next from page 1 with page 2 cached lands on page 2 at ${width}px`, async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    await withBulkFolder(async () => {
+      await page.setViewportSize({ width, height: 844 });
+      await openBulk(page);
+      await nextPage(page, 'Page 2 of 3');
+      await page.getByRole('button', { name: 'Previous' }).click();
+      await expect(page.getByText('Page 1 of 3')).toBeVisible();
+      await page.waitForTimeout(HOLD_MS);
+      for (const gap of [60, 120, 250]) {
+        const next = page.getByRole('button', { name: 'Next' });
+        await next.click();
+        await page.waitForTimeout(gap);
+        await next.click({ force: true }).catch(() => {});
+        await page.waitForTimeout(800);
+        expect(page.url()).toContain(BULK_HASH);
+        await expect(page.getByText('Page 2 of 3')).toBeVisible();
+        await page.getByRole('button', { name: 'Previous' }).click();
+        await expect(page.getByText('Page 1 of 3')).toBeVisible();
+        await page.waitForTimeout(HOLD_MS);
+      }
+    });
+  });
+}

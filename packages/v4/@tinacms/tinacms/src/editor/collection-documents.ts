@@ -46,6 +46,7 @@ import {
   useCurrentBranch,
 } from './content-queries';
 import { useContentSlice, useOptionalAuthSlice } from './hooks';
+import { type PermissionsState, permissionsStateOf } from './permissions';
 import {
   extensionOf,
   folderPartsInside,
@@ -134,6 +135,10 @@ export const useDocumentsPage = (collection: string, query: ListQuery) => {
     placeholderData: keepPreviousData,
   });
 };
+
+/** The state of the permissions question, or null when no auth plugin is mounted. */
+export const usePermissionsState = (): PermissionsState | null =>
+  permissionsStateOf(useOptionalAuthSlice());
 
 // With no auth plugin there is no slice and every action shows (the server checks nothing).
 const userMay = (auth: AuthSlice | null, permission: string): boolean => {

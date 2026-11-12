@@ -17,15 +17,27 @@ const isSignedIn = (
 
 const PERMISSIONS_STALE_TIME = 30_000;
 
+export interface PermissionsState {
+  status: 'pending' | 'ready' | 'failed';
+  retry: () => void;
+}
+
+const permissionStates = new WeakMap<AuthSlice, PermissionsState>();
+
+/** How the question for the signed-in user's permissions stands. `null` for a slice without `can`. */
+export const permissionsStateOf = (
+  auth: AuthSlice | null
+): PermissionsState | null =>
+  auth ? (permissionStates.get(auth) ?? null) : null;
+
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === 'string');
 
 /**
  * Adds `can` to the signed-in slice. It answers from the Backend's `session/permissions`,
  * keyed by user, roles and branch so another user never reads the previous answer. `null`
- * from the query means the Backend has no such route, so the default role map applies. A query
- * that failed after its retries applies the same map, so the table stays usable; the server
- * still refuses what the role may not do.
+ * from the query means the Backend has no such route, so the default role map applies. While the
+ * answer is pending or after it failed, `can` is false for every permission (ADR-008 §3).
  */
 export const useAuthSliceWithCan = (
   slice: AuthPluginSlice | null,
@@ -33,7 +45,7 @@ export const useAuthSliceWithCan = (
   branch: string | undefined
 ): AuthSlice | null => {
   const signedIn = isSignedIn(slice) ? slice : null;
-  const { data, isError } = useQuery<string[] | null>({
+  const { data, isError, refetch } = useQuery<string[] | null>({
     queryKey: [
       'tina',
       'permissions',
@@ -61,12 +73,18 @@ export const useAuthSliceWithCan = (
   return useMemo(() => {
     if (!isSignedIn(slice)) return slice;
     const can = (permission: string): boolean => {
-      if (data === undefined) {
-        return isError && defaultRolesGrant(slice.roles, permission);
-      }
+      if (data === undefined) return false;
       if (data === null) return defaultRolesGrant(slice.roles, permission);
       return data.includes('*') || data.includes(permission);
     };
-    return { ...slice, can };
-  }, [slice, data, isError]);
+    const withCan: AuthSlice = { ...slice, can };
+    let status: PermissionsState['status'] = 'pending';
+    if (data !== undefined) status = 'ready';
+    else if (isError) status = 'failed';
+    permissionStates.set(withCan, {
+      status,
+      retry: () => void refetch(),
+    });
+    return withCan;
+  }, [slice, data, isError, refetch]);
 };

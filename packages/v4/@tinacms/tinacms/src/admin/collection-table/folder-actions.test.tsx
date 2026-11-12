@@ -580,6 +580,46 @@ describe('allowedActions in the menus', () => {
   });
 });
 
+describe('a failed permissions answer', () => {
+  it('says so with a Retry, shows no action, and shows the actions once Retry succeeds', async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Response.json(
+          { error: { code: 'boom', message: 'Server error' } },
+          { status: 500 }
+        )
+      )
+    );
+    renderTable({ auth: signedIn(['editor']) });
+    expect(
+      await screen.findByText("Couldn't check your permissions.")
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Actions for/ })).toBeNull();
+    answerPermissions(EDITOR_PERMISSIONS);
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    await waitFor(() =>
+      expect(
+        screen.queryByText("Couldn't check your permissions.")
+      ).not.toBeInTheDocument()
+    );
+    await openMenu(user, 'Beta');
+    expect(menuItems()).toEqual(['Rename', 'Duplicate', 'Delete']);
+  });
+
+  it('shows no notice and no action while the answer is pending', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => {}))
+    );
+    renderTable({ auth: signedIn(['editor']) });
+    await screen.findByRole('button', { name: 'Beta' });
+    expect(screen.queryByText("Couldn't check your permissions.")).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Actions for/ })).toBeNull();
+  });
+});
+
 describe('roles in the menus', () => {
   it('shows Rename, Duplicate and Delete for content:save, create, rename and delete', async () => {
     const user = userEvent.setup();

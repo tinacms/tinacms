@@ -25,6 +25,7 @@ import {
   UnsavedReferrersError,
   useCollectionActions,
   useCollectionCapabilities,
+  usePermissionsState,
   useDocumentsPage,
   useDraftCounts,
   useNewDocumentDrafts,
@@ -273,32 +274,65 @@ describe('useCollectionCapabilities', () => {
       expect(hook.result.current).toEqual(NONE);
     });
 
-    it('shows no action while the answer is pending', async () => {
+    const bothOf = (auth: AuthSlice) => {
+      const { wrapper } = setup(provider(), { auth });
+      return renderHook(
+        () => ({
+          capabilities: useCollectionCapabilities('post', ''),
+          state: usePermissionsState(),
+        }),
+        { wrapper }
+      );
+    };
+
+    it.each([
+      [
+        'a 500',
+        () =>
+          Response.json(
+            { error: { code: 'boom', message: 'Server error' } },
+            { status: 500 }
+          ),
+      ],
+      [
+        'a network error',
+        () => Promise.reject(new TypeError('Failed to fetch')),
+      ],
+    ])(
+      'shows no action after %s, for an editor and for a custom role, and offers a retry',
+      async (_name, respond) => {
+        const failing = answer(respond);
+        for (const role of ['editor', 'custom-author']) {
+          const hook = bothOf(signedIn([role], role));
+          await waitFor(() =>
+            expect(hook.result.current.state?.status).toBe('failed')
+          );
+          expect(hook.result.current.capabilities).toEqual(NONE);
+          vi.stubGlobal(
+            'fetch',
+            vi.fn(async () => Response.json(['content:delete']))
+          );
+          await act(async () => hook.result.current.state?.retry());
+          await waitFor(() =>
+            expect(hook.result.current.capabilities.canDelete).toBe(true)
+          );
+          expect(hook.result.current.state?.status).toBe('ready');
+          hook.unmount();
+          vi.stubGlobal('fetch', failing);
+        }
+      }
+    );
+
+    it('shows no action while the answer is pending, for an editor and for a custom role', async () => {
       const pending = answer(() => new Promise<Response>(() => {}));
-      const waiting = capabilitiesOf(signedIn(['editor']));
-      await waitFor(() => expect(pending).toHaveBeenCalled());
-      expect(waiting.hook.result.current).toEqual(NONE);
-    });
-
-    it('falls back to the default role map after the question failed, so the table stays usable', async () => {
-      const failing = answer(() =>
-        Response.json(
-          { error: { code: 'boom', message: 'Server error' } },
-          { status: 500 }
-        )
-      );
-      const editor = capabilitiesOf(signedIn(['editor']));
-      await waitFor(() => expect(failing).toHaveBeenCalled());
-      await waitFor(() =>
-        expect(editor.hook.result.current.canDelete).toBe(true)
-      );
-      expect(editor.hook.result.current.canRename).toBe(true);
-      editor.hook.unmount();
-
-      const guest = capabilitiesOf(signedIn(['guest']));
-      await waitFor(() => expect(failing).toHaveBeenCalledTimes(2));
-      await act(async () => {});
-      expect(guest.hook.result.current).toEqual(NONE);
+      for (const roles of [['editor'], ['custom-author']]) {
+        const hook = bothOf(signedIn(roles, roles[0]));
+        await waitFor(() => expect(pending).toHaveBeenCalled());
+        await act(async () => {});
+        expect(hook.result.current.capabilities).toEqual(NONE);
+        expect(hook.result.current.state?.status).toBe('pending');
+        hook.unmount();
+      }
     });
 
     it.each([

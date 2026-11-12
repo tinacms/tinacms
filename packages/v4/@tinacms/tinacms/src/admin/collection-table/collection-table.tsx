@@ -47,6 +47,7 @@ import {
   useDocumentsPage,
   useDraftCounts,
   useNewDocumentDrafts,
+  usePermissionsState,
 } from '../../editor/collection-documents';
 import { useUnsavedFormIds } from '../../form/form-store';
 import { exactTimeOf, relativeTimeOf } from '../../plugins/home/recent-rows';
@@ -96,6 +97,9 @@ const TITLE_COLUMN = 'max-w-0 [overflow-wrap:anywhere]';
 // would never reach the reason. It has no handler, so activating it does nothing.
 const newDocumentNote = `New document is not available yet. It arrives with ${NEW_DOCUMENT_PBI}.`;
 // `focusableWhenDisabled` sets aria-disabled, which the Button's own disabled styles do not match.
+// A second click of a double-click on the pager lands on whatever the first click moved into its place.
+const PAGER_HOLD_MS = 400;
+
 const PAGER_DISABLED =
   'aria-disabled:cursor-not-allowed aria-disabled:opacity-45 aria-disabled:shadow-none';
 
@@ -269,6 +273,7 @@ function CollectionTableBody({
     schema.collections.find((candidate) => candidate.name === collection)
       ?.label ?? collection;
   const caps = useCollectionCapabilities(collection, folder);
+  const permissions = usePermissionsState();
   const actions = useCollectionActions(collection);
   const drafts = useDraftCounts(collection);
   const copies = useNewDocumentDrafts(collection, folder);
@@ -306,6 +311,32 @@ function CollectionTableBody({
   if (!isStale && connection) shownDepth.current = after.length;
   const depthShown = isStale ? shownDepth.current : after.length;
   const isFirstPage = depthShown === 0;
+  // Only a change of the page cursor locks the rows. A sort switch or a filter refetch keeps them live.
+  const pageIsChanging = isStale && depthShown !== after.length;
+  const pagerHold = useRef<number | null>(null);
+  const [rowsHeld, setRowsHeld] = useState(false);
+  const rowsLocked = pageIsChanging || rowsHeld;
+  const tableBox = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    tableBox.current
+      ?.querySelector('tbody')
+      ?.toggleAttribute('inert', rowsLocked);
+  }, [rowsLocked, connection]);
+  useEffect(
+    () => () => {
+      if (pagerHold.current !== null) window.clearTimeout(pagerHold.current);
+    },
+    []
+  );
+  const movePager = (next: string[]) => {
+    if (pagerHold.current !== null) return;
+    setRowsHeld(true);
+    pagerHold.current = window.setTimeout(() => {
+      pagerHold.current = null;
+      setRowsHeld(false);
+    }, PAGER_HOLD_MS);
+    setAfter(next);
+  };
 
   useEffect(() => {
     if (!connection || connection.edges.length === 0) return;
@@ -938,6 +969,17 @@ function CollectionTableBody({
           <div className='min-w-0'>{breadcrumb}</div>
           {newMenu}
         </div>
+        {permissions?.status === 'failed' ? (
+          <div
+            role='alert'
+            className='flex flex-wrap items-center gap-2 text-sm text-muted-foreground'
+          >
+            <span>Couldn't check your permissions.</span>
+            <Button size='sm' onClick={permissions.retry}>
+              Retry
+            </Button>
+          </div>
+        ) : null}
         {folderMissing ? (
           <div className='flex flex-col items-start gap-2 rounded-md border border-border p-4'>
             <EmptyState variant='plain' text='Folder not found.' />
@@ -952,10 +994,12 @@ function CollectionTableBody({
         ) : (
           <>
             <div
+              ref={tableBox}
               aria-busy={isLoading || isStale}
+              data-rows-locked={rowsLocked ? '' : undefined}
               className={
-                isStale
-                  ? '[&_tbody]:pointer-events-none [&_tbody]:opacity-60'
+                rowsLocked
+                  ? `[&_tbody]:pointer-events-none${pageIsChanging ? ' [&_tbody]:opacity-60' : ''}`
                   : undefined
               }
             >
@@ -986,7 +1030,7 @@ function CollectionTableBody({
                   className={PAGER_DISABLED}
                   disabled={isStale || after.length === 0}
                   focusableWhenDisabled
-                  onClick={() => setAfter(after.slice(0, -1))}
+                  onClick={() => movePager(after.slice(0, -1))}
                 >
                   Previous
                 </Button>
@@ -1005,7 +1049,7 @@ function CollectionTableBody({
                   focusableWhenDisabled
                   onClick={() => {
                     const cursor = connection?.pageInfo.endCursor;
-                    if (cursor) setAfter([...after, cursor]);
+                    if (cursor) movePager([...after, cursor]);
                   }}
                 >
                   Next

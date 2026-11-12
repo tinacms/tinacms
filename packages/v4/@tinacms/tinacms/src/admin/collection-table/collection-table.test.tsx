@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Toaster } from '@tinacms/ui/components/sonner';
 import { TooltipProvider } from '@tinacms/ui/components/tooltip';
@@ -162,6 +162,10 @@ const renderTable = (folder = '', children?: ReactNode) => {
 
 const consoleGuard = guardConsole();
 
+// The pager ignores a second click for a moment, so a test that pages twice waits it out.
+const pastPagerHold = () =>
+  act(() => new Promise((resolve) => setTimeout(resolve, 450)));
+
 const rowNamed = (name: string | RegExp) =>
   screen.findByRole('button', { name });
 
@@ -295,8 +299,10 @@ describe('CollectionTable', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Next' }));
     expect(await screen.findByText('Page 2 of 3')).toBeInTheDocument();
+    await pastPagerHold();
     await user.click(screen.getByRole('button', { name: 'Next' }));
     expect(await screen.findByText('Page 3 of 3')).toBeInTheDocument();
+    await pastPagerHold();
     expect(screen.getByRole('button', { name: 'Next' })).toHaveAttribute(
       'aria-disabled',
       'true'
@@ -414,6 +420,10 @@ describe('CollectionTable', () => {
     await waitFor(() => expect(world.listCalls).toBe(2));
     expect(screen.getByRole('button', { name: 'Ant' })).toBe(first);
     expect(first.closest('[aria-busy]')).toHaveAttribute('aria-busy', 'true');
+    expect(first.closest('[aria-busy]')).not.toHaveAttribute(
+      'data-rows-locked'
+    );
+    expect(first.closest('tbody')).not.toHaveAttribute('inert');
     release();
     await waitFor(() =>
       expect(first.closest('[aria-busy]')).toHaveAttribute('aria-busy', 'false')
@@ -437,7 +447,9 @@ describe('CollectionTable', () => {
     expect(screen.getByText('Page 1 of 3')).toBeInTheDocument();
     expect(screen.queryByText('Page 3 of 3')).toBeNull();
     expect(next).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.getByRole('button', { name: 'p000.md' })).toBeInTheDocument();
+    const row = screen.getByRole('button', { name: 'p000.md' });
+    expect(row.closest('[aria-busy]')).toHaveAttribute('data-rows-locked');
+    expect(row.closest('tbody')).toHaveAttribute('inert');
     release();
     expect(await screen.findByText('Page 2 of 3')).toBeInTheDocument();
     expect(
