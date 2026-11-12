@@ -1,4 +1,6 @@
 import { type FieldValues, set } from 'react-hook-form';
+import { fieldsetOf, fieldsOf, scalarItemOf } from '../core/schema/children';
+import type { FieldSchema } from '../core/schema/types';
 
 export interface FieldErrorEntry {
   type: string;
@@ -69,13 +71,103 @@ export const flattenFieldErrors = (
   return out;
 };
 
-// Counts failing fields once. `flattenFieldErrors` also lists every parent
-// address of a failing field, so only addresses with no failing descendant
-// count.
-export const countFailingFields = (addresses: readonly string[]): number =>
+// `flattenFieldErrors` also lists every parent address of a failing field, so
+// only addresses with no failing descendant are failing fields themselves. A
+// compound field's own error is hidden here; the error summary promotes it once
+// its children are fixed.
+export const failingLeaves = (addresses: readonly string[]): string[] =>
   addresses.filter(
     (address) => !addresses.some((other) => other.startsWith(`${address}.`))
-  ).length;
+  );
+
+export const countFailingFields = (addresses: readonly string[]): number =>
+  failingLeaves(addresses).length;
+
+const orderKey = (
+  address: string,
+  fields: readonly FieldSchema[],
+  valueAt: (address: string) => unknown
+): number[] => {
+  const key: number[] = [];
+  let siblings: readonly FieldSchema[] | undefined = fields;
+  let node: FieldSchema | undefined;
+  let path = '';
+  for (const segment of address.split('.')) {
+    path = path ? `${path}.${segment}` : segment;
+    if (/^\d+$/.test(segment)) {
+      key.push(Number(segment));
+      siblings =
+        node && !scalarItemOf(node)
+          ? fieldsetOf(node, valueAt(path))
+          : undefined;
+      continue;
+    }
+    const index = siblings?.findIndex((field) => field.name === segment) ?? -1;
+    key.push(index);
+    node = index >= 0 ? siblings?.[index] : undefined;
+    siblings = node ? fieldsOf(node) : undefined;
+  }
+  return key;
+};
+
+export const inDocumentOrder = <T extends { address: string }>(
+  entries: readonly T[],
+  fields: readonly FieldSchema[],
+  valueAt: (address: string) => unknown
+): T[] =>
+  entries
+    .map((entry) => ({ entry, key: orderKey(entry.address, fields, valueAt) }))
+    .sort((a, b) => {
+      const length = Math.min(a.key.length, b.key.length);
+      for (let i = 0; i < length; i++) {
+        const difference = (a.key[i] ?? 0) - (b.key[i] ?? 0);
+        if (difference !== 0) return difference;
+      }
+      return a.key.length - b.key.length;
+    })
+    .map(({ entry }) => entry);
+
+export type ListChange =
+  | { insert: number }
+  | { remove: number }
+  | { move: readonly [from: number, to: number] };
+
+export const rekeyAddresses = (
+  addresses: readonly string[],
+  listAddress: string,
+  change: ListChange
+): string[] => {
+  const prefix = `${listAddress}.`;
+  const out: string[] = [];
+  for (const address of addresses) {
+    if (!address.startsWith(prefix)) {
+      out.push(address);
+      continue;
+    }
+    const rest = address.slice(prefix.length);
+    const dot = rest.indexOf('.');
+    const index = Number(dot === -1 ? rest : rest.slice(0, dot));
+    const tail = dot === -1 ? '' : rest.slice(dot);
+    if (!Number.isInteger(index)) {
+      out.push(address);
+      continue;
+    }
+    let next: number | null = index;
+    if ('insert' in change) {
+      if (index >= change.insert) next = index + 1;
+    } else if ('remove' in change) {
+      if (index === change.remove) next = null;
+      else if (index > change.remove) next = index - 1;
+    } else {
+      const [from, to] = change.move;
+      if (index === from) next = to;
+      else if (from < to && index > from && index <= to) next = index - 1;
+      else if (from > to && index >= to && index < from) next = index + 1;
+    }
+    if (next !== null) out.push(`${prefix}${next}${tail}`);
+  }
+  return out;
+};
 
 // The inverse of `flattenFieldErrors`. `set` on a single-segment path is a
 // plain assignment, not a merge, so a shallow address written after a deeper

@@ -11,6 +11,7 @@ import {
   useFieldFrame,
   useFieldValue,
   useFormId,
+  useListItems,
   useMediaSlice,
 } from '../../../editor';
 import { useFormStore } from '../../../form/form-store';
@@ -26,6 +27,7 @@ export function ImageGallery() {
   const address = useFieldAddress();
   const frame = useFieldFrame();
   const media = useMediaSlice();
+  const listItems = useListItems();
   const formId = useFormId();
   const active = useFormStore((state) => state.active);
   const { getValues } = useFormContext();
@@ -86,13 +88,15 @@ export function ImageGallery() {
           keys.current = keys.current.filter(
             (_, position) => position !== index
           );
-          setValue(liveItems().filter((_, position) => position !== index));
+          listItems.remove(address, index, () =>
+            setValue(liveItems().filter((_, position) => position !== index))
+          );
         }}
         onMove={(from, to) => {
           const next = [...liveItems()];
           next.splice(to, 0, ...next.splice(from, 1));
           keys.current.splice(to, 0, ...keys.current.splice(from, 1));
-          setValue(next);
+          listItems.move(address, from, to, () => setValue(next));
         }}
       />
       <Dialog open={picking} onOpenChange={setPicking}>

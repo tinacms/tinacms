@@ -7,6 +7,7 @@ import {
   UPDATE_DOCUMENT_GQL,
 } from '../../admin/api';
 import { useCMS } from '../react-core';
+import { createWorkflowBranch } from './create-workflow-branch';
 import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
 import {
   type EditorialWorkflowErrorCopy,
@@ -78,6 +79,7 @@ export interface ExecuteWorkflowOptions {
   // When false, opens a ready-for-review PR. Omitted keeps the server's draft-first default.
   isDraft?: boolean;
   targetBranchExists?: boolean;
+  autoRenameBranch?: boolean;
 }
 
 export interface UseEditorialWorkflowResult {
@@ -135,6 +137,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
     signal,
     isDraft,
     targetBranchExists: precomputedTargetBranchExists,
+    autoRenameBranch = false,
   }: ExecuteWorkflowOptions): Promise<{ success: boolean; error?: string }> => {
     try {
       if (signal?.aborted) return { success: false };
@@ -150,7 +153,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
 
       if (signal?.aborted) return { success: false };
 
-      if (targetBranchExists) {
+      if (targetBranchExists && !autoRenameBranch) {
         setError({ messageParts: plainMessage(TARGET_BRANCH_EXISTS_ERROR) });
         setIsExecuting(false);
         setCurrentStep(0);
@@ -182,38 +185,60 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       );
       const relativePath = pathRelativeToCollection(collection.path, path);
 
-      const result = await tinaApi.executeEditorialWorkflow({
-        branchName,
-        baseBranch,
-        prTitle: getEditorialWorkflowPrTitle(branchName),
-        isDraft,
-        graphQLContentOp: {
-          query: graphql,
-          variables: {
-            collection: collection.name,
-            relativePath,
-            params,
+      const create = (resolvedBranchName: string) =>
+        tinaApi.executeEditorialWorkflow({
+          branchName: resolvedBranchName,
+          baseBranch,
+          prTitle: getEditorialWorkflowPrTitle(resolvedBranchName),
+          isDraft,
+          graphQLContentOp: {
+            query: graphql,
+            variables: {
+              collection: collection.name,
+              relativePath,
+              params,
+            },
           },
-        },
-        onStatusUpdate: (status) => {
-          switch (status.status) {
-            case EDITORIAL_WORKFLOW_STATUS.SETTING_UP:
-            case EDITORIAL_WORKFLOW_STATUS.CREATING_BRANCH:
+          onStatusUpdate: (status) => {
+            switch (status.status) {
+              case EDITORIAL_WORKFLOW_STATUS.SETTING_UP:
+              case EDITORIAL_WORKFLOW_STATUS.CREATING_BRANCH:
+                setCurrentStep(1);
+                break;
+              case EDITORIAL_WORKFLOW_STATUS.INDEXING:
+                setCurrentStep(2);
+                break;
+              case EDITORIAL_WORKFLOW_STATUS.CONTENT_GENERATION:
+              case EDITORIAL_WORKFLOW_STATUS.CREATING_PR:
+                setCurrentStep(3);
+                break;
+              case EDITORIAL_WORKFLOW_STATUS.COMPLETE:
+                setCurrentStep(4);
+                break;
+            }
+          },
+        });
+
+      const result = autoRenameBranch
+        ? await createWorkflowBranch({
+            branchName,
+            targetBranchExists,
+            listBranchNames: async () => {
+              const branches = await tinaApi.listBranches({
+                includeIndexStatus: false,
+                signal,
+              });
+              return branches
+                .map((branch: { name?: string }) => branch.name)
+                .filter((name): name is string => typeof name === 'string');
+            },
+            create: (name) => {
               setCurrentStep(1);
-              break;
-            case EDITORIAL_WORKFLOW_STATUS.INDEXING:
-              setCurrentStep(2);
-              break;
-            case EDITORIAL_WORKFLOW_STATUS.CONTENT_GENERATION:
-            case EDITORIAL_WORKFLOW_STATUS.CREATING_PR:
-              setCurrentStep(3);
-              break;
-            case EDITORIAL_WORKFLOW_STATUS.COMPLETE:
-              setCurrentStep(4);
-              break;
-          }
-        },
-      });
+              return create(name);
+            },
+            signal,
+          })
+        : await create(branchName);
 
       if (!result.branchName) {
         throw new Error('Branch creation failed.');
@@ -229,7 +254,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       }
 
       cms.alerts.success(
-        `Branch created successfully - Pull Request at ${result.pullRequestUrl}`,
+        `Branch ${result.branchName} created successfully - Pull Request at ${result.pullRequestUrl}`,
         0
       );
 
@@ -244,6 +269,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
 
       return { success: true };
     } catch (e: unknown) {
+      if (signal?.aborted) return { success: false };
       console.error(e);
       const copy = getEditorialWorkflowError(
         e,

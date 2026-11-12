@@ -20,6 +20,7 @@ import { draftKey, readDraft, readWaitingDrafts } from '../form/drafts';
 import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 import { useAdminRoute } from './use-admin-route';
@@ -167,6 +168,7 @@ const config = asResolvedConfig({
     screenPlugin,
     stringFieldPlugin,
     coreValidatorsPlugin,
+    homePlugin,
   ],
   schema: {
     collections: [
@@ -443,7 +445,7 @@ describe('TinaAdmin Save button', () => {
     await user.clear(input);
     await user.click(screen.getByRole('button', { name: /^Save/ }));
     expect(
-      await screen.findByRole('button', { name: /^Save\s?, 1 error$/ })
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
     ).toBeVisible();
   });
 });

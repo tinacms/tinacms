@@ -735,6 +735,21 @@ describe('createRpcHandler content saves with server hooks', () => {
     });
   });
 
+  it('keeps the summary fields the provider returned with the saved entry', async () => {
+    const { save, update } = saving([{ name: 'stamp', args: ['a'] }]);
+    const written = {
+      path: 'content/posts/a.mdx',
+      title: 'Hi',
+      updatedAt: '2026-01-02T03:04:05.000Z',
+      lastAuthor: { name: 'Ada' },
+      document: { title: 'Hi', trail: 'a' },
+    };
+    update.mockResolvedValueOnce(written);
+    const response = await save({ title: 'Hi' });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ entry: written, hookWarnings: [] });
+  });
+
   it('answers 422 hook-rejected with the message of reject(), and never writes', async () => {
     const { save, update } = saving([{ name: 'guard' }]);
     const response = await save({ published: true });

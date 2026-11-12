@@ -23,6 +23,11 @@ import {
   toUserId,
   use,
 } from '../../../../server';
+import {
+  defineSearchPlugin,
+  searchIndex,
+} from '../../../../plugins/search/search.plugin';
+import { inMemorySearchProvider } from '../../../../test/in-memory-search.server';
 import { localMediaPlugin } from '../../../media/local/local-media.plugin';
 import { tinaCloud } from '../../../tinacloud/tinacloud.plugin';
 import { localContentPlugin } from '../local-content.plugin';
@@ -711,5 +716,47 @@ describe('local Data Layer in TinaCloud mode', () => {
     );
     expect(next).toHaveBeenCalledTimes(1);
     expect(res.body).toBe('');
+  });
+});
+
+describe('the local save route and search indexing', () => {
+  it('runs the afterSave hooks with no branch and indexes nothing', async () => {
+    const upsert = vi.spyOn(inMemorySearchProvider, 'upsert');
+    const seenBranches = vi.fn();
+    const probe = defineHook('branchProbe', {
+      server: async () => ({
+        default: defineServerHook(() => ({
+          afterSave: (_document, { branch }) => seenBranches(branch),
+        })),
+      }),
+    });
+    const search = defineSearchPlugin({
+      name: 'test:search',
+      fields: { posts: { title: 1 } },
+      server: () => import('../../../../test/in-memory-search.server'),
+    });
+    const routes = mountedRoutes(
+      [localContentPlugin(), search, defineHooksPlugin('test:probe', [probe])],
+      [searchIndex(), probe()]
+    );
+    const res = responseDouble();
+    await routes.get('/api/tina/content/update')?.(
+      requestDouble(
+        '/',
+        'POST',
+        jsonHeaders({}),
+        JSON.stringify({
+          collection: 'posts',
+          path: 'content/posts/a.mdx',
+          value: { title: 'Indexed?' },
+        })
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body).hookWarnings).toEqual([]);
+    expect(seenBranches).toHaveBeenCalledWith(undefined);
+    expect(upsert).not.toHaveBeenCalled();
+    upsert.mockRestore();
   });
 });

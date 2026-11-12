@@ -225,6 +225,49 @@ describe('useSaveDocument', () => {
     expect(provider.list).toHaveBeenCalledTimes(1);
   });
 
+  it('keeps the summary fields the save returned in the cached list and the document', async () => {
+    const summary: DocumentSummary = {
+      path: 'content/posts/hello.mdx',
+      title: 'Renamed',
+      updatedAt: '2026-01-02T03:04:05.000Z',
+      lastAuthor: { name: 'Ada' },
+    };
+    const persisted: DocumentEntry = {
+      ...summary,
+      document: { title: 'Renamed' },
+    };
+    const provider = stubProvider({ update: vi.fn(async () => persisted) });
+    const { wrapper, queryClient } = renderWithContent(provider);
+    const { result } = renderHook(
+      () => ({
+        list: useCollectionDocuments('post'),
+        saving: useSaveDocument(),
+      }),
+      { wrapper }
+    );
+
+    await waitFor(() =>
+      expect(result.current.list.documents).toEqual(SUMMARIES)
+    );
+    await result.current.saving.save({
+      collection: 'post',
+      path: 'content/posts/hello.mdx',
+      value: { title: 'Renamed' },
+    });
+
+    await waitFor(() =>
+      expect(result.current.list.documents).toStrictEqual([
+        summary,
+        SUMMARIES[1],
+      ])
+    );
+    expect(
+      queryClient.getQueryData(
+        contentKeys.document('post', 'content/posts/hello.mdx')
+      )
+    ).toEqual(persisted);
+  });
+
   it('appends the path when it is not in the cached list', async () => {
     const persisted: DocumentEntry = {
       path: 'content/posts/new.mdx',

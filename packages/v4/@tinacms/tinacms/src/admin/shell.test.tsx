@@ -9,10 +9,11 @@ import { currentBranchOf } from '../core/branch/contract';
 import { ContentError, type DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
 import { draftKey } from '../form/drafts';
-import { toFormId } from '../form/form-store';
+import { toFormId, useFormStore } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 
@@ -103,7 +104,13 @@ const searchPlugin = definePlugin({
   client: async () => ({
     default: {
       slice: () => ({
-        search: async () => [{ ref: 'content/posts/hello.mdx' }],
+        search: async () => [
+          {
+            ref: { collection: 'post', path: 'content/posts/hello.mdx' },
+            score: 1,
+            snippet: '',
+          },
+        ],
       }),
     },
   }),
@@ -165,6 +172,7 @@ const renderAdmin = (projectName?: string) =>
           ...(searchEnabled ? [searchPlugin] : []),
           stringFieldPlugin,
           coreValidatorsPlugin,
+          homePlugin,
         ],
         ...(projectName ? { projectName } : {}),
         schema: {
@@ -288,80 +296,6 @@ describe('Kept edits notice', () => {
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.click(screen.getByRole('button', { name: 'Home' }));
     expect(await screen.findByText('Still unsaved on main.')).toBeVisible();
-  });
-});
-
-describe('Home', () => {
-  it('lands on Home with the branch line and a card per collection', async () => {
-    renderAdmin();
-    expect(await screen.findByText('Branch main')).toBeVisible();
-    const list = screen.getByRole('list', { name: 'Collection cards' });
-    expect(within(list).getByText('Posts')).toBeVisible();
-    expect(await within(list).findByText('1 document')).toBeVisible();
-    expect(
-      within(list).getByRole('button', { name: 'New Posts document' })
-    ).toBeDisabled();
-    expect(screen.queryByRole('button', { name: /^Review/ })).toBeNull();
-  });
-
-  it('says Local files in local mode and leaves the branch out', async () => {
-    mode = 'local';
-    renderAdmin();
-    expect(
-      await screen.findByText(
-        'Local files: Tina writes edits straight to disk.'
-      )
-    ).toBeVisible();
-    expect(screen.queryByText(/^Branch /)).toBeNull();
-  });
-
-  it('offers Review N unsaved for edits kept in a stored draft after a reload', async () => {
-    localStorage.setItem(
-      draftKey(toFormId('content/posts/hello.mdx')),
-      JSON.stringify({
-        version: 2,
-        values: { title: 'Kept' },
-        baseline: { title: 'Hello' },
-      })
-    );
-    renderAdmin();
-    expect(
-      await screen.findByRole('button', { name: 'Review 1 unsaved' })
-    ).toBeVisible();
-  });
-
-  it('lets a long branch name wrap in its column instead of pushing Review off screen', async () => {
-    renderAdmin();
-    const line = await screen.findByText('Branch main');
-    const column = line.parentElement;
-    expect(column).toHaveClass('min-w-0', 'break-words');
-  });
-
-  it('opens the collection from its card', async () => {
-    const user = userEvent.setup();
-    renderAdmin();
-    await user.click(await screen.findByRole('button', { name: /^Posts/ }));
-    await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections/post')
-    );
-  });
-
-  it('offers Review N unsaved only while documents are unsaved, and opens them', async () => {
-    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
-    const user = userEvent.setup();
-    renderAdmin();
-    await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    await user.click(screen.getByRole('button', { name: 'Home' }));
-    await user.click(
-      await screen.findByRole('button', { name: 'Review 1 unsaved' })
-    );
-    await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections?unsaved')
-    );
-    const list = await screen.findByRole('list', { name: 'Unsaved documents' });
-    expect(
-      await within(list).findByRole('button', { name: /hello\.mdx/ })
-    ).toBeVisible();
   });
 });
 
@@ -829,13 +763,58 @@ describe('save state', () => {
     );
   });
 
-  it('says the save failed when validation fails, in the toast and the Status bar, and leaves the form bar alone', async () => {
+  it('logs no "Save failed" line for a blocked save', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     const { user, input } = await openHello();
     await user.clear(input);
     await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    expect(
+      log.mock.calls.some(([first]) => String(first).includes('Save failed'))
+    ).toBe(false);
+    log.mockRestore();
+  });
+
+  it('reads Save failed after a later network failure, once the blocked save is fixed', async () => {
+    const { user, input } = await openHello();
+    await user.clear(input);
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    await user.type(input, 'Hello!');
+    updateError = new ContentError('network');
+    await user.click(await screen.findByRole('button', { name: 'Save' }));
     await waitFor(() =>
       expect(within(statusBar()).getByText('Save failed')).toBeVisible()
     );
+  });
+
+  it('keeps the earlier save entry of the document when its save blocks, so a newer save of another document stays the newest', async () => {
+    const { user, input } = await openHello();
+    useFormStore.getState().setSavePhase(toFormId('content/posts/hello.mdx'), {
+      phase: 'failed',
+      message: 'earlier failure',
+    });
+    useFormStore
+      .getState()
+      .setSavePhase(toFormId('content/posts/other.mdx'), { phase: 'saved' });
+    await user.clear(input);
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    expect(within(statusBar()).queryByText('Save failed')).toBeNull();
+    expect(within(statusBar()).getByText('Unsaved changes')).toBeVisible();
+    expect(
+      useFormStore.getState().saves[toFormId('content/posts/hello.mdx')]
+    ).toMatchObject({ phase: 'failed', message: 'earlier failure' });
+  });
+
+  it('does not call a blocked save a failed save in the Status bar', async () => {
+    const { user, input } = await openHello();
+    await user.clear(input);
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    expect(within(statusBar()).queryByText('Save failed')).toBeNull();
     expect(updates).toHaveLength(0);
     const form = screen.getByRole('complementary', { name: 'Document form' });
     expect(form.querySelector('[data-slot=form-bar] [role=alert]')).toBeNull();
@@ -845,10 +824,11 @@ describe('save state', () => {
 describe('toasts', () => {
   it('shows a failed save at bottom right with fixed words and Retry, and nothing in the form bar', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    updateError = new ContentError('forbidden');
     const user = userEvent.setup();
     renderAdmin();
     const input = await screen.findByLabelText(/^Title\b/);
-    await user.clear(input);
+    await user.type(input, '!');
     await user.click(screen.getByRole('button', { name: /^Save/ }));
 
     const toast = await waitFor(() => {
@@ -857,11 +837,12 @@ describe('toasts', () => {
       return found;
     });
     expect(toast).toHaveTextContent(
-      "Couldn't save. Some fields are not valid."
+      "Couldn't save. You don't have permission to save."
     );
     expect(
       within(toast as HTMLElement).getByRole('button', { name: 'Retry' })
     ).toBeVisible();
+    expect(screen.queryByRole('complementary', { name: 'Errors' })).toBeNull();
     const toaster = toast?.closest('[data-sonner-toaster]');
     expect(toaster).toHaveAttribute('data-x-position', 'right');
     expect(toaster).toHaveAttribute('data-y-position', 'bottom');

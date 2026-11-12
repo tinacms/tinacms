@@ -30,9 +30,9 @@ import { useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
 import { TinaProvider } from '../editor/provider';
-import { HomePanel } from './home';
 import { AuthGate } from './auth-gate';
 import { DocumentForm } from './document-form';
+import { DocumentErrorPane } from './error-summary';
 import { DocumentScope } from './document-scope';
 import {
   CollectionsNavigator,
@@ -40,7 +40,7 @@ import {
   SettingsPane,
   ToolsPane,
 } from './navigator';
-import { AdminRail, MEDIA_SCREEN } from './rail';
+import { AdminRail, HOME_SCREEN, MEDIA_SCREEN } from './rail';
 import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 import { COLLECTIONS_ROUTE, HOME_ROUTE } from './routing';
@@ -98,6 +98,28 @@ function ScreenOutlet({
           <Placeholder>No screen named “{name}”.</Placeholder>
         )}
       </div>
+    </SidebarInset>
+  );
+}
+
+// Home has no panel header and no Close: there is nowhere to close to. The
+// frame scrolls the screen and adds no padding, as the general outlet does.
+function HomeOutlet({
+  screen,
+  segments,
+}: {
+  screen: AdminScreen | undefined;
+  segments: string[];
+}) {
+  return (
+    <SidebarInset className='min-w-0'>
+      {screen ? (
+        <div data-slot='home-frame' className='min-h-0 flex-1 overflow-y-auto'>
+          <screen.component segments={segments} />
+        </div>
+      ) : (
+        <Placeholder>Pick a place from the sidebar.</Placeholder>
+      )}
     </SidebarInset>
   );
 }
@@ -412,7 +434,17 @@ function AdminShell({
     (candidate) => candidate.name === activeCollectionName
   );
   const openPath = route.view === 'document' ? route.path : undefined;
-  const activeScreen = route.view === 'screen' ? route : undefined;
+  const homeScreen = screens.find(({ name }) => name === HOME_SCREEN);
+  // `#/screens/home` draws Home as `#/` does. With Home removed, it falls to
+  // the general outlet, which says that no screen has that name.
+  const homeSegments =
+    route.view === 'home'
+      ? []
+      : route.view === 'screen' && route.screen === HOME_SCREEN && homeScreen
+        ? route.segments
+        : undefined;
+  const activeScreen =
+    route.view === 'screen' && homeSegments === undefined ? route : undefined;
   const isStaleCollectionRoute =
     activeCollectionName !== undefined && collection === undefined;
 
@@ -513,8 +545,8 @@ function AdminShell({
             segments={activeScreen.segments}
             onClose={goHome}
           />
-        ) : route.view === 'home' ? (
-          <HomePanel collections={schema.collections} navigate={navigate} />
+        ) : homeSegments ? (
+          <HomeOutlet screen={homeScreen} segments={homeSegments} />
         ) : route.view === 'media' ? (
           <MissingPanel title='Media' onClose={goHome} hideBelowLg>
             {hasMediaScreen
@@ -547,7 +579,7 @@ function AdminShell({
           </DocumentScope>
         ) : (
           <DocumentScope collection={collection} path={openPath}>
-            <SidebarInset className='min-w-0 flex-row'>
+            <SidebarInset className='relative min-w-0 flex-row'>
               <FormColumn
                 openPath={openPath}
                 collection={collection}
@@ -561,7 +593,9 @@ function AdminShell({
                 }
               />
 
-              <div className='min-w-0 flex-1'>
+              <DocumentErrorPane />
+
+              <div data-preview-slot='' className='min-w-0 flex-1'>
                 <PreviewSlot preview={preview} />
               </div>
             </SidebarInset>

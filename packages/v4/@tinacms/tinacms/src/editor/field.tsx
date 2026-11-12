@@ -1,8 +1,9 @@
-import { use, useLayoutEffect, useRef } from 'react';
+import { use, useEffect, useLayoutEffect, useRef } from 'react';
 import type { FieldAddress } from '../core/field/address';
 import { toFieldAddress } from '../core/field/address';
 import type { FieldSchema } from '../core/schema/types';
 import { useStore } from 'zustand';
+import { centerInScroller } from '../utils/center-in-scroller';
 import { useFormStore } from '../form/form-store';
 import { DrillInField } from './drill-in-field';
 import { drillsInAt } from './form-view-state';
@@ -61,6 +62,26 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     );
     target?.setAttribute('aria-describedby', `${address}-help`);
   }, [address, node.description]);
+
+  // A control that cannot take focus leaves the field off screen, so the frame centres itself.
+  useEffect(() => {
+    let pending = 0;
+    const unsubscribe = useFormStore.subscribe((state, previous) => {
+      const { active } = state;
+      if (active === previous.active) return;
+      if (active?.formId !== scope.formId || active.address !== address) return;
+      cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(() => {
+        const target = frame.current?.firstElementChild;
+        if (!target || frame.current?.contains(document.activeElement)) return;
+        centerInScroller(target);
+      });
+    });
+    return () => {
+      unsubscribe();
+      cancelAnimationFrame(pending);
+    };
+  }, [scope.formId, address]);
 
   const Component = drills
     ? (descriptor.DrillInComponent ?? DrillInField)

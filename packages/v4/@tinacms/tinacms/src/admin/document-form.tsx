@@ -6,6 +6,7 @@ import {
   DropdownMenuNote,
   DropdownMenuTrigger,
 } from '@tinacms/ui/components/dropdown-menu';
+import { tinaResolveLabel } from '@tinacms/ui/components/error-summary-pane';
 import { FormLevel } from '@tinacms/ui/components/form-level';
 import { toast } from '@tinacms/ui/components/toast';
 import {
@@ -33,6 +34,7 @@ import {
   type OpenLevel,
 } from '../editor/form-view-state';
 import {
+  FormValidationError,
   useDiscardEdits,
   useFieldRegistry,
   useFormId,
@@ -47,9 +49,9 @@ import {
 } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import type { StoredDraft } from '../form/drafts';
-import { countFailingFields } from '../editor/field-errors';
 import { DiscardConfirm } from './discard-confirm';
 import { DocumentStatus } from './document-status';
+import { ErrorSuccessBubble, useErrorSummary } from './error-summary';
 import { saveFailureWords } from './save-failure';
 import { leftoverText } from './leftover-text';
 import { useNarrow } from './use-narrow';
@@ -101,7 +103,7 @@ function SaveButton() {
   const formId = useFormId();
   const dirty = useIsFormDirty(formId);
   const save = useFormSave();
-  const errorCount = countFailingFields(Object.keys(useFormErrors(formId)));
+  const summary = useErrorSummary();
   const [pending, setPending] = useState(false);
   const failedToastId = `save-failed:${formId}`;
   useToastOwner(failedToastId, true);
@@ -120,6 +122,10 @@ function SaveButton() {
     save()
       .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
+        if (cause instanceof FormValidationError && summary.block()) {
+          toast.dismiss(failedToastId);
+          return;
+        }
         // The raw reason is for the console. The editor reads fixed words.
         console.error('[tinacms] Save failed:', cause);
         const { title, text, disk } = saveFailureWords(cause);
@@ -148,18 +154,21 @@ function SaveButton() {
       })
       .finally(() => setPending(false));
   });
+  const { blocked } = summary;
   return (
     <Button
       variant='primary'
       type='button'
-      className='w-40 shrink-0'
-      disabled={!dirty && !pending}
+      data-resolve=''
+      className='min-w-40 shrink-0'
+      icon={blocked ? 'error' : undefined}
+      aria-expanded={blocked ? summary.paneOpen : undefined}
+      aria-controls={blocked ? 'error-pane' : undefined}
+      disabled={!(blocked || dirty || pending)}
       busy={pending}
-      count={errorCount}
-      srLabel={`, ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`}
-      onClick={run}
+      onClick={blocked ? summary.resolve : run}
     >
-      Save
+      {blocked ? tinaResolveLabel(summary.count) : 'Save'}
     </Button>
   );
 }
@@ -178,8 +187,9 @@ function FormBar() {
   return (
     <div
       data-slot='form-bar'
-      className='flex h-14 flex-none items-center gap-2 border-t border-border bg-card px-3'
+      className='relative flex h-14 flex-none items-center gap-2 border-t border-border bg-card px-3'
     >
+      <ErrorSuccessBubble />
       <div className='min-w-0 flex-1'>
         <DocumentStatus />
       </div>
