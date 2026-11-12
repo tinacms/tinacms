@@ -33,6 +33,10 @@ const CONTENT_ERROR_MESSAGES = {
   'server-route-missing':
     "This collection has server hooks, so it needs the site's server route.",
   'write-refused': 'The content server refused this save.',
+  'name-taken': 'A document or folder with that name already exists.',
+  'invalid-path': 'That name is not allowed.',
+  'folder-not-owned':
+    'This folder holds files that this collection does not manage, so it cannot be renamed or deleted here.',
 } satisfies Record<string, string>;
 
 // The refusals whose message the server writes for the editor.
@@ -83,15 +87,102 @@ export class ContentError extends Error {
   }
 }
 
-/** Each operation reports a known failure as a `ContentError`. */
+/**
+ * A folder of a collection. `path` is relative to the collection's `path`, with
+ * `/` between parts and no leading or trailing `/`. `documentCount` counts the
+ * documents the collection owns under the folder, at every depth.
+ */
+export interface FolderSummary {
+  path: string;
+  name: string;
+  documentCount: number;
+}
+
+export type ListSort = {
+  by: 'title' | 'updatedAt';
+  direction: 'asc' | 'desc';
+};
+
+export interface ListQuery {
+  /** Folder path form. Omitted: every document at every depth, and no folders. */
+  folder?: string;
+  /** A substring of the shown name or file name. */
+  filter?: string;
+  sort?: ListSort;
+  /** 1 to 200. Omitted: every match. */
+  first?: number;
+  after?: string;
+}
+
+export interface DocumentConnection {
+  edges: { node: DocumentSummary; cursor: string }[];
+  pageInfo: { hasNextPage: boolean; endCursor: string | null };
+  /** The matching documents of the scope, not folders. */
+  totalCount: number;
+  /** The same on every page of a scope. */
+  folders: FolderSummary[];
+}
+
+/** A document that holds a reference to another document. */
+export interface DocumentReferrer {
+  collection: string;
+  path: string;
+  title?: string;
+}
+
+export interface RenameResult {
+  entry: DocumentSummary;
+  /** The paths of the documents whose references the rename rewrote. */
+  referrers: string[];
+}
+
+export interface RenameFolderResult {
+  folder: FolderSummary;
+  moved: { from: string; to: string }[];
+  referrers: string[];
+}
+
+/**
+ * Each operation reports a known failure as a `ContentError`. The write
+ * operations after `update` are optional: a provider without one still mounts,
+ * and the UI hides the action.
+ */
 export interface ContentProvider {
   get(collection: string, path: string): Promise<DocumentEntry | null>;
-  list(collection: string): Promise<DocumentSummary[]>;
+  list(collection: string, query?: ListQuery): Promise<DocumentConnection>;
   update(
     collection: string,
     path: string,
     value: TinaDocument
   ): Promise<DocumentEntry>;
+  /** Writes a new document. A path that exists is `name-taken`. */
+  create?(
+    collection: string,
+    path: string,
+    value: TinaDocument,
+    template?: string
+  ): Promise<DocumentEntry>;
+  /** Moves one document within its folder and rewrites every reference to it. */
+  rename?(
+    collection: string,
+    from: string,
+    to: string
+  ): Promise<RenameResult>;
+  /** Deletes one document. Its referrers stay as they are. */
+  delete?(collection: string, path: string): Promise<void>;
+  /** The documents, in any collection, that reference the document. */
+  referrers?(collection: string, path: string): Promise<DocumentReferrer[]>;
+  createFolder?(collection: string, folder: string): Promise<FolderSummary>;
+  renameFolder?(
+    collection: string,
+    from: string,
+    to: string
+  ): Promise<RenameFolderResult>;
+  /** Returns the paths of the documents it removed. */
+  deleteFolder?(
+    collection: string,
+    folder: string
+  ): Promise<{ deleted: string[] }>;
   /** Present when the provider reads from branches. */
   branches?: BranchSource;
   /** True when the provider reads files on this computer. */
@@ -101,6 +192,13 @@ export interface ContentProvider {
 export type ContentSlice = ContentProvider;
 
 export const CONTENT_SAVE_PERMISSION = 'content:save';
+export const CONTENT_CREATE_PERMISSION = 'content:create';
+export const CONTENT_RENAME_PERMISSION = 'content:rename';
+export const CONTENT_DELETE_PERMISSION = 'content:delete';
+
+/** The documents of a connection, in its order. */
+export const nodesOf = (connection: DocumentConnection): DocumentSummary[] =>
+  connection.edges.map(({ node }) => node);
 
 export interface ContentSaveInput {
   collection: string;
@@ -157,6 +255,9 @@ const PROVIDER_REFUSAL_CODES = [
   'not-indexed',
   'validation',
   'network',
+  'name-taken',
+  'invalid-path',
+  'folder-not-owned',
 ] as const satisfies readonly ContentErrorCode[];
 
 export type ProviderRefusalCode = (typeof PROVIDER_REFUSAL_CODES)[number];

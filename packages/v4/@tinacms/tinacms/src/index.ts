@@ -27,8 +27,15 @@ export {
   type ContentFieldErrors,
   type ContentProvider,
   type ContentSlice,
+  type DocumentConnection,
   type DocumentEntry,
+  type DocumentReferrer,
   type DocumentSummary,
+  type FolderSummary,
+  type ListQuery,
+  type ListSort,
+  type RenameFolderResult,
+  type RenameResult,
 } from './core/content/contract';
 export {
   type MediaFeatures,

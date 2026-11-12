@@ -14,6 +14,7 @@ import {
   type DocumentEntry,
   type DocumentSummary,
   type ContentErrorCode,
+  nodesOf,
   isContentRefusalCode,
   isProviderRefusalCode,
 } from '../core/content/contract';
@@ -62,7 +63,7 @@ export const useCollectionDocuments = (
   const branch = useCurrentBranch();
   const query = useQuery({
     queryKey: contentKeys.list(collection ?? '', branch),
-    queryFn: collection ? () => content.list(collection) : skipToken,
+    queryFn: collection ? async () => nodesOf(await content.list(collection)) : skipToken,
     staleTime: CONTENT_STALE_TIME,
   });
   return {
@@ -81,7 +82,7 @@ export const useCollectionsDocumentPaths = (
   const results = useQueries({
     queries: collections.map((collection) => ({
       queryKey: contentKeys.list(collection, branch),
-      queryFn: () => content.list(collection),
+      queryFn: async () => nodesOf(await content.list(collection)),
       staleTime: CONTENT_STALE_TIME,
     })),
   });
