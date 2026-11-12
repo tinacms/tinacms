@@ -1,6 +1,7 @@
 import { PREVIEW_CONTENT_TYPE, PRIME_HEADER } from '@tinacms/bridge/preview';
 import type { APIContext } from 'astro';
-import { describe, expect, it } from 'vitest';
+import { experimental_AstroContainer as AstroContainer } from 'astro/container';
+import { describe, expect, it, vi } from 'vitest';
 import { requestWithMetadata } from '../data';
 import { experimental_createIslandRoute } from '../island-route';
 import IslandStub from './IslandStub.astro';
@@ -91,6 +92,46 @@ describe('experimental_createIslandRoute', () => {
     ).text();
     expect(globalHtml).toContain('data-tina-form=');
     expect(globalHtml).not.toContain('data-tina-primary');
+  });
+
+  it('forwards containerOptions to AstroContainer.create', async () => {
+    const spy = vi.spyOn(AstroContainer, 'create');
+    // Renderers is the motivating use: framework islands (React, etc.) need
+    // renderers registered on the container, which is otherwise created empty.
+    const containerOptions = { renderers: [] };
+    const routeWithOptions = experimental_createIslandRoute(
+      {
+        post: {
+          fetch: () =>
+            requestWithMetadata(
+              Promise.resolve({
+                data: { post: { title: 'Hi' } },
+                query: 'query Post',
+                variables: { relativePath: 'hello.md' },
+              })
+            ),
+          component: IslandStub,
+          wrapper: { tag: 'article' },
+          propsFromData: (data) => ({ value: data }),
+        },
+      },
+      { containerOptions }
+    );
+
+    const url = new URL('http://localhost/tina-island/post');
+    const res = (await routeWithOptions({
+      params: { name: 'post' },
+      request: new Request(url, {
+        method: 'POST',
+        headers: { 'content-type': PREVIEW_CONTENT_TYPE },
+        body: '{}',
+      }),
+      url,
+    } as unknown as APIContext)) as Response;
+
+    expect(res.status).toBe(200);
+    expect(spy).toHaveBeenCalledWith(containerOptions);
+    spy.mockRestore();
   });
 
   it('rejects non-preview requests', async () => {
