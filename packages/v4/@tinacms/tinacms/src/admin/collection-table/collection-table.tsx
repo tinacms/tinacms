@@ -235,12 +235,14 @@ interface TableBodyProps {
   collection: string;
   folder: string;
   headerAction?: ReactElement;
+  onClose?: () => void;
 }
 
 function CollectionTableBody({
   collection,
   folder,
   headerAction,
+  onClose,
 }: TableBodyProps) {
   const tier = useTier();
   const { navigate } = useAdminRoute();
@@ -667,7 +669,13 @@ function CollectionTableBody({
         value={filterText}
         onChange={(event) => setFilterText(event.target.value)}
         onClear={() => setFilterText('')}
-        className={tier === 'desktop' ? 'w-70 max-w-full' : 'min-w-0 flex-1'}
+        className={
+          tier === 'desktop'
+            ? 'w-70 max-w-full'
+            : tier === 'phone'
+              ? 'min-w-0 basis-full'
+              : 'min-w-0 flex-1'
+        }
       />
       {tier === 'phone' ? (
         <SelectChoice<StatusView>
@@ -817,7 +825,13 @@ function CollectionTableBody({
       aria-label={`${label} documents`}
       className='flex h-full min-h-0 flex-col bg-card'
     >
-      <PanelHeader ref={headerRef} heading={label} action={headerAction} />
+      <PanelHeader
+        ref={headerRef}
+        heading={label}
+        action={headerAction}
+        closeLabel={onClose ? 'Close' : undefined}
+        onClose={onClose}
+      />
       <div className='flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4'>
         <div className='flex flex-wrap items-center justify-between gap-2'>
           <div className='min-w-0'>{breadcrumb}</div>
@@ -903,6 +917,7 @@ export function CollectionTable({
   collection,
   folder,
   headerAction,
+  onClose,
 }: TableBodyProps) {
   return (
     <CollectionTableBody
@@ -910,6 +925,7 @@ export function CollectionTable({
       collection={collection}
       folder={folder}
       headerAction={headerAction}
+      onClose={onClose}
     />
   );
 }

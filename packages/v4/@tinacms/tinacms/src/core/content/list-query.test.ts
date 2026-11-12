@@ -8,8 +8,14 @@ const doc = (
 ): DocumentSummary => ({ path, ...extra });
 
 const summaries = [
-  doc('content/posts/b.md', { title: 'Beta', updatedAt: '2026-01-02T00:00:00Z' }),
-  doc('content/posts/a.md', { title: 'Álpha', updatedAt: '2026-01-03T00:00:00Z' }),
+  doc('content/posts/b.md', {
+    title: 'Beta',
+    updatedAt: '2026-01-02T00:00:00Z',
+  }),
+  doc('content/posts/a.md', {
+    title: 'Álpha',
+    updatedAt: '2026-01-03T00:00:00Z',
+  }),
   doc('content/posts/undated.md'),
   doc('content/posts/2026/c.md', { updatedAt: '2026-01-01T00:00:00Z' }),
   doc('content/posts/2026/d/e.md'),
@@ -44,7 +50,11 @@ describe('queryDocuments', () => {
     expect(top.folders).toEqual([
       { path: '2026', name: '2026', documentCount: 2 },
     ]);
-    const nested = queryDocuments({ summaries, root, query: { folder: '2026' } });
+    const nested = queryDocuments({
+      summaries,
+      root,
+      query: { folder: '2026' },
+    });
     expect(paths(nested)).toEqual(['content/posts/2026/c.md']);
     expect(nested.folders).toEqual([
       { path: '2026/d', name: 'd', documentCount: 1 },
@@ -66,11 +76,17 @@ describe('queryDocuments', () => {
   });
 
   it('filters by shown name or file name after NFKC and lower-casing, literally', () => {
-    const accent = queryDocuments({ summaries, root, query: { filter: 'ÁLPHA' } });
+    const accent = queryDocuments({
+      summaries,
+      root,
+      query: { filter: 'ÁLPHA' },
+    });
     expect(paths(accent)).toEqual(['content/posts/a.md']);
     const file = queryDocuments({ summaries, root, query: { filter: '.md' } });
     expect(file.totalCount).toBe(5);
-    expect(queryDocuments({ summaries, root, query: { filter: '(' } }).totalCount).toBe(0);
+    expect(
+      queryDocuments({ summaries, root, query: { filter: '(' } }).totalCount
+    ).toBe(0);
   });
 
   it('sorts undated documents last in both directions, ties by path', () => {
@@ -114,8 +130,14 @@ describe('queryDocuments', () => {
   });
 
   it('does not skip a row when the last row of page 1 is deleted between reads', () => {
-    const many = Array.from({ length: 6 }, (_, i) => doc(`content/posts/p${i}.md`));
-    const first = queryDocuments({ summaries: many, root, query: { first: 3 } });
+    const many = Array.from({ length: 6 }, (_, i) =>
+      doc(`content/posts/p${i}.md`)
+    );
+    const first = queryDocuments({
+      summaries: many,
+      root,
+      query: { first: 3 },
+    });
     const cursor = first.pageInfo.endCursor ?? undefined;
     const without = many.filter(({ path }) => path !== 'content/posts/p2.md');
     const second = queryDocuments({

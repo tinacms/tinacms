@@ -163,11 +163,7 @@ export interface ContentProvider {
     template?: string
   ): Promise<DocumentEntry>;
   /** Moves one document within its folder and rewrites every reference to it. */
-  rename?(
-    collection: string,
-    from: string,
-    to: string
-  ): Promise<RenameResult>;
+  rename?(collection: string, from: string, to: string): Promise<RenameResult>;
   /** Deletes one document. Its referrers stay as they are. */
   delete?(collection: string, path: string): Promise<void>;
   /** The documents, in any collection, that reference the document. */

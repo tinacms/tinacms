@@ -17,7 +17,8 @@ export const nameOf = (path: string): string => path.split('/').at(-1) ?? path;
 export const shownNameOf = (summary: DocumentSummary): string =>
   summary.title ? summary.title : nameOf(summary.path);
 
-const normalise = (text: string): string => text.normalize('NFKC').toLowerCase();
+const normalise = (text: string): string =>
+  text.normalize('NFKC').toLowerCase();
 
 interface Ordered {
   key: string | null;
@@ -51,9 +52,7 @@ const encodeCursor = (ordered: Ordered): string =>
 
 const decodeCursor = (cursor: string): Ordered => {
   try {
-    const parsed: unknown = JSON.parse(
-      decodeURIComponent(atob(cursor))
-    );
+    const parsed: unknown = JSON.parse(decodeURIComponent(atob(cursor)));
     if (
       typeof parsed === 'object' &&
       parsed !== null &&
@@ -82,7 +81,10 @@ export interface QueryDocumentsInput {
 }
 
 const folderPartsOf = (path: string, root: string): string[] =>
-  path.slice(root.length + 1).split('/').slice(0, -1);
+  path
+    .slice(root.length + 1)
+    .split('/')
+    .slice(0, -1);
 
 /**
  * Applies folder scope, filter, sort and paging to a list of summaries. The local
@@ -113,7 +115,8 @@ export const queryDocuments = ({
   const matches = (name: string) => normalise(name).includes(needle);
 
   const scope = query.folder;
-  const scopeParts = scope === undefined || scope === '' ? [] : scope.split('/');
+  const scopeParts =
+    scope === undefined || scope === '' ? [] : scope.split('/');
   const inScope = (parts: string[]): boolean =>
     parts.length === scopeParts.length &&
     scopeParts.every((part, index) => parts[index] === part);
@@ -194,8 +197,7 @@ export const queryDocuments = ({
     }
     if (start === -1) start = ordered.length;
   }
-  const end =
-    query.first === undefined ? ordered.length : start + query.first;
+  const end = query.first === undefined ? ordered.length : start + query.first;
   const page = ordered.slice(start, end);
   const last = page.at(-1);
 

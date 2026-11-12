@@ -590,32 +590,28 @@ function AdminShell({
           </MissingPanel>
         ) : showTable ? (
           <SidebarInset className='min-w-0'>
-            <PanelHeader
-              heading={collection.label ?? collection.name}
-              action={
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  className='max-lg:hidden'
-                  onClick={() =>
-                    navigate({
-                      view: 'collection',
-                      collection: collection.name,
-                      side: true,
-                    })
-                  }
-                >
-                  Restore
-                </Button>
-              }
-              closeLabel='Close'
-              onClose={goHome}
-            />
             <div className='min-h-0 flex-1 overflow-y-auto'>
               <CollectionTable
                 key={`${collection.name}/${tableFolder}`}
                 collection={collection.name}
                 folder={tableFolder}
+                onClose={goHome}
+                headerAction={
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    className='max-lg:hidden'
+                    onClick={() =>
+                      navigate({
+                        view: 'collection',
+                        collection: collection.name,
+                        side: true,
+                      })
+                    }
+                  >
+                    Restore
+                  </Button>
+                }
               />
             </div>
           </SidebarInset>

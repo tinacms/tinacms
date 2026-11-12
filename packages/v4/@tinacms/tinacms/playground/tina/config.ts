@@ -58,6 +58,7 @@ export const pageCollection = {
       templates: longTemplates,
     }),
   ],
+  allowedActions: { canDelete: false, canDuplicate: false },
 } satisfies CollectionSchema;
 
 export default defineConfig({

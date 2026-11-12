@@ -315,7 +315,11 @@
             ],
             "type": "array"
           }
-        ]
+        ],
+        "allowedActions": {
+          "canDelete": false,
+          "canDuplicate": false
+        }
       }
     ],
     "version": {
