@@ -20,8 +20,13 @@ upload(file, folder?) → path
 list(folder, { cursor, limit })      // cursor-paginated; powers the picker
 delete(path)
 resolveUrl(path, transform?) → URL   // declarative; runs anywhere
+rename?(from, to) → path   // optional; `to` may be in another folder, which moves the file; never overwrites
 ```
 Folders for organization.
+
+> Download is not an operation. The editor's browser downloads the file to their computer from wherever the media provider serves it, using the URL `resolveUrl(path)` gives and the file's own name. Tina adds no Backend step. If a provider's URLs can't be read from the admin's site, that file's download fails with a message; nothing else breaks.
+
+> A provider without `rename` offers neither Rename nor Move; the UI hides Move. Moving a file does not rewrite documents that store its old path: they show a missing file, as after a delete, and Move warns the same way Delete does.
 
 ### 4. Binary upload: presigned-direct preferred, multipart fallback — binary is scoped to media
 Capability RPC is typed **JSON** request/response; a file is binary. Resolution:

@@ -156,7 +156,7 @@ export interface FormStore {
   storeNewDocumentDraft: (formId: FormId, values: TinaDocument) => StoreResult;
 }
 
-const valuesEqual = (
+export const valuesEqual = (
   current: FormValues,
   baseline: FormValues,
   equal: FieldEquality

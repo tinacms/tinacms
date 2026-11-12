@@ -45,6 +45,7 @@ export {
   type MediaErrorCode,
   type MediaSlice,
   type MediaStatus,
+  type MediaUploadOptions,
   type MediaUrlOptions,
 } from '../core/media/contract';
 export {

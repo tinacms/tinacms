@@ -60,6 +60,8 @@ import {
   ownFieldErrors,
 } from './field-errors';
 import { type PermissionSegments, useAuthSliceWithCan } from './permissions';
+import { UploadFormContext } from './uploads/upload-context';
+import { uploadListOf } from './uploads/upload-list';
 import { countRevealedErrors, isRevealed, itemLevel } from './form-view-state';
 
 export function useFieldRegistry(): FieldRegistry {
@@ -527,12 +529,17 @@ export function useInvalidFieldCounts(addresses: readonly string[]): number[] {
  */
 export function useListItems() {
   const { view } = useFormScope('list-items-outside-provider', 'useListItems');
+  const runtime = use(TinaRuntimeContext);
+  const uploadForm = use(UploadFormContext);
   const rekeyThen = (
     listAddress: string,
     change: ListChange,
     apply: () => void
   ) => {
     view.getState().rekey(listAddress, change);
+    if (runtime && uploadForm) {
+      uploadListOf(runtime.store).rekeyFields(uploadForm, listAddress, change);
+    }
     apply();
   };
   return {

@@ -30,7 +30,7 @@ export default defineConfig({
     tailwindcss(),
     tinaLocalDataLayerVitePlugin({
       rootDir: fileURLToPath(new URL('.', import.meta.url)),
-      collections: tina.schema.collections,
+      config: tina,
     }),
     restartOnTinaConfigChange(),
   ],

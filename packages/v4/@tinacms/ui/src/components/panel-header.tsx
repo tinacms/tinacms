@@ -17,17 +17,26 @@ type PanelHeaderProps = Omit<ComponentProps<'div'>, 'children'> & {
   onBack?: () => void;
   /** At most one action, as a ghost `Button size='sm'`. */
   action?: ReactElement;
+  /**
+   * Where the action sits. `end` puts it before the ⋯ menu, Maximise and close, for
+   * an action whose words change and must not move. Tab order follows the screen.
+   */
+  actionAt?: 'start' | 'end';
   /** `DropdownMenuItem`s. Without them there is no ⋯ button. */
   menu?: ReactNode;
   menuLabel?: string;
   /** Shows close, with these words for screen readers. */
   closeLabel?: string;
   onClose?: () => void;
+  /** Shows a Maximise button before close ("Restore" while true). Without `onMaximise` there is none. */
+  maximised?: boolean;
+  onMaximise?: () => void;
 };
 
 /**
  * The 44px bar at the top of every panel: a title or a back button, at most one
- * action, then the ⋯ menu and close at the end. Tab goes back, action, ⋯, close.
+ * action (after the title, or at the end with `actionAt`), then the ⋯ menu and close
+ * at the end. Tab goes back, action, ⋯, maximise, close.
  */
 function PanelHeader({
   heading,
@@ -35,10 +44,13 @@ function PanelHeader({
   backTitle,
   onBack,
   action,
+  actionAt = 'start',
   menu,
   menuLabel = heading ? `${heading} actions` : 'More actions',
   closeLabel,
   onClose,
+  maximised = false,
+  onMaximise,
   className,
   ...props
 }: PanelHeaderProps) {
@@ -62,12 +74,13 @@ function PanelHeader({
           {backLabel}
         </Button>
       ) : heading ? (
-        <h2 className='m-0 min-w-0 flex-initial truncate pl-1.5 text-base leading-title font-semibold text-foreground'>
+        <h2 className='m-0 mr-1.5 min-w-0 flex-initial truncate pl-1.5 text-base leading-title font-semibold text-foreground'>
           {heading}
         </h2>
       ) : null}
-      {action}
+      {actionAt === 'start' ? action : null}
       <span aria-hidden='true' className='flex-1' />
+      {actionAt === 'end' ? action : null}
       {menu ? (
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -78,6 +91,16 @@ function PanelHeader({
             {menu}
           </DropdownMenuContent>
         </DropdownMenu>
+      ) : null}
+      {onMaximise ? (
+        <Button
+          variant='icon'
+          size='sm'
+          icon={maximised ? 'restore' : 'maximise'}
+          aria-label={maximised ? 'Restore' : 'Maximise'}
+          aria-pressed={maximised}
+          onClick={onMaximise}
+        />
       ) : null}
       {closeLabel ? (
         <Button

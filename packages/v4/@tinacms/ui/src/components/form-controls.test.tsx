@@ -169,6 +169,30 @@ describe('SearchBox', () => {
   });
 });
 
+describe('SearchBox results', () => {
+  it('announces the hit count next to Clear, and shows none without it', () => {
+    const { rerender } = render(
+      <SearchBox
+        label='Search'
+        value='logo'
+        onChange={() => {}}
+        onClear={() => {}}
+      />
+    );
+    expect(screen.queryByRole('status')).toBeNull();
+    rerender(
+      <SearchBox
+        label='Search'
+        value='logo'
+        results='50+'
+        onChange={() => {}}
+        onClear={() => {}}
+      />
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('50+');
+  });
+});
+
 describe('Segmented icons', () => {
   it('names an icon-only choice by its label', () => {
     render(

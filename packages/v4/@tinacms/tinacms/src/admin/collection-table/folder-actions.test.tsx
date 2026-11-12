@@ -215,8 +215,23 @@ const PATHS = {
   copy: `${ROOT}/guides/copy.md`,
 };
 
+const EDITOR_PERMISSIONS = [
+  'content:save',
+  'content:create',
+  'content:rename',
+  'content:delete',
+];
+
+// The table asks the Backend for the signed-in user's permissions; answer it here so no test needs a server.
+const answerPermissions = (permissions: string[]) =>
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => Response.json(permissions))
+  );
+
 beforeEach(() => {
   setWidth(1400);
+  answerPermissions(EDITOR_PERMISSIONS);
   world = {
     summaries: [
       doc('alpha.md', 'Alpha'),
@@ -575,6 +590,7 @@ describe('roles in the menus', () => {
 
   it('gives a role the default map does not know no row actions and no New > Folder', async () => {
     const user = userEvent.setup();
+    answerPermissions([]);
     renderTable({ auth: signedIn(['guest']) });
     await screen.findByRole('button', { name: 'Beta' });
     expect(screen.queryByRole('button', { name: /^Actions for/ })).toBeNull();

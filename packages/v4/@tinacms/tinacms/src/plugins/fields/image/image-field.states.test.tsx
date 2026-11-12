@@ -26,6 +26,8 @@ const inert = ({
 
 const droppedFile = () => new File(['image'], 'new.png', { type: 'image/png' });
 
+const draggedFiles = { dataTransfer: { types: ['Files'], files: [] } };
+
 describe('image field states', () => {
   it.each(singles)('renders $name', ({ props }) => {
     render(<ImageFieldView {...props} />);
@@ -36,7 +38,7 @@ describe('image field states', () => {
     expect(screen.queryByRole('alert') !== null).toBe(!!props.errors?.length);
     const warned = !!props.warnings?.length || !!props.missing;
     expect(screen.queryByRole('status') !== null).toBe(
-      warned || !!props.holdReason
+      warned || (!!props.holdReason && !props.holdQuiet)
     );
     expect(screen.queryByRole('alert')).toBe(
       props.errors?.length ? screen.getByRole('alert') : null
@@ -56,7 +58,10 @@ describe('image field states', () => {
     const choose = within(group).queryByRole('button', {
       name: 'Choose from Media',
     });
-    expect(choose !== null).toBe(editable && !hasValue);
+    expect(choose !== null).toBe(editable && !hasValue && !props.busy);
+    const retry = within(group).queryByRole('button', { name: /^Retry/ });
+    expect(retry !== null).toBe(editable && !!props.onRetry && !props.busy);
+    if (props.note) expect(within(group).getByText(props.note)).toBeVisible();
     if (!editable && !hasValue) {
       expect(within(group).getByText('No image.')).toBeVisible();
     }
@@ -107,6 +112,99 @@ describe('image field states', () => {
     expect(onDropFile).not.toHaveBeenCalled();
   });
 
+  it('shows the percent on the picture while a file uploads, and no percent when none is reported', () => {
+    const { rerender } = render(
+      <ImageFieldView {...imageFieldState('uploading with a percent')} />
+    );
+    const group = screen.getByRole('group');
+    expect(within(group).getByText('Uploading 40%')).toBeVisible();
+    expect(within(group).getByText('new.png')).toBeVisible();
+    rerender(<ImageFieldView {...imageFieldState('busy')} />);
+    expect(within(group).getByText('Uploading')).toBeVisible();
+    expect(within(group).queryByText(/%/)).toBeNull();
+  });
+
+  it('keeps the old picture and turns its buttons off while a replacement uploads', () => {
+    render(<ImageFieldView {...imageFieldState('uploading over an image')} />);
+    expect(screen.getByAltText('about.png')).toBeInTheDocument();
+    expect(screen.getByText('Uploading 40%')).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Replace about.png' })
+    ).toBeDisabled();
+  });
+
+  it('names Retry with the failed file and runs it', async () => {
+    const onRetry = vi.fn();
+    render(
+      <ImageFieldView
+        {...imageFieldState('upload failed with Retry')}
+        onRetry={onRetry}
+      />
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      "new.png: Couldn't upload."
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Retry uploading new.png' })
+    );
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
+  it('reads "Drop to replace" only while files are dragged over a filled field', () => {
+    render(<ImageFieldView {...imageFieldState('filled')} />);
+    const group = screen.getByRole('group');
+    fireEvent.dragOver(group, { dataTransfer: { types: ['text/plain'] } });
+    expect(screen.queryByText('Drop to replace')).toBeNull();
+    fireEvent.dragOver(group, draggedFiles);
+    expect(screen.getByText('Drop to replace')).toBeVisible();
+    fireEvent.dragLeave(group);
+    expect(screen.queryByText('Drop to replace')).toBeNull();
+  });
+
+  it('keeps the invalid look under the drag look', () => {
+    const { unmount } = render(
+      <ImageFieldView {...imageFieldState('invalid and filled')} />
+    );
+    fireEvent.dragOver(screen.getByRole('group'), draggedFiles);
+    const tile =
+      screen.getByText('Drop to replace').parentElement?.parentElement;
+    expect(tile).toHaveClass('border-destructive');
+    expect(tile).not.toHaveClass('border-primary');
+    expect(screen.getByRole('alert')).toBeVisible();
+    unmount();
+    render(<ImageFieldView {...imageFieldState('invalid')} />);
+    const group = screen.getByRole('group');
+    fireEvent.dragOver(group, draggedFiles);
+    const area = within(group).getByRole('button', {
+      name: 'Choose from Media',
+    }).parentElement?.parentElement;
+    expect(area).toHaveClass('border-destructive', 'bg-selected');
+    expect(area).not.toHaveClass('border-primary');
+  });
+
+  it('says a quiet hold reason only when a file is dragged over or dropped', () => {
+    const onDropFile = vi.fn();
+    render(
+      <ImageFieldView
+        {...imageFieldState('uploads on hold, said on a drop')}
+        onDropFile={onDropFile}
+      />
+    );
+    const group = screen.getByRole('group');
+    expect(screen.queryByRole('status')).toBeNull();
+    fireEvent.dragOver(group, draggedFiles);
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'This storage is read-only.'
+    );
+    fireEvent.dragLeave(group);
+    expect(screen.queryByRole('status')).toBeNull();
+    fireEvent.drop(group, { dataTransfer: { files: [droppedFile()] } });
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'This storage is read-only.'
+    );
+    expect(onDropFile).not.toHaveBeenCalled();
+  });
+
   it.each(singles.filter(inert))(
     'ignores clicks, keys and drops when $name',
     async ({ props }) => {
@@ -121,11 +219,15 @@ describe('image field states', () => {
           onReplace={onReplace}
           onRemove={onRemove}
           onDropFile={onDropFile}
+          onRetry={vi.fn()}
         />
       );
       const group = screen.getByRole('group');
+      expect(screen.queryByRole('button', { name: /^Retry/ })).toBeNull();
       await userEvent.click(group);
       await userEvent.keyboard('{Tab}{Enter} ');
+      fireEvent.dragOver(group, draggedFiles);
+      expect(screen.queryByText('Drop to replace')).toBeNull();
       fireEvent.drop(group, { dataTransfer: { files: [droppedFile()] } });
       expect(onChoose).not.toHaveBeenCalled();
       expect(onReplace).not.toHaveBeenCalled();
