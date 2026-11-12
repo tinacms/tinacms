@@ -10,6 +10,7 @@ import {
   TinaCloudGraphQLError,
   fetchDocument,
   fetchDocumentPage,
+  summaryOf,
   updateDocument,
 } from './request';
 
@@ -42,7 +43,7 @@ export const createTinaCloudContentSlice =
             path
           );
           if (!document) return null;
-          return { path: document._sys.path, document: document._values };
+          return { ...summaryOf(document._sys), document: document._values };
         } catch (cause) {
           const error = toContentError(cause);
           if (
@@ -59,17 +60,20 @@ export const createTinaCloudContentSlice =
           const target = await branch();
           const summaries: DocumentSummary[] = [];
           let after: string | null = null;
+          let historyRevision: string | null = null;
           while (true) {
             const page = await fetchDocumentPage(
               client,
               target,
               collection,
-              after
+              after,
+              historyRevision
             );
             for (const { node } of page.edges) {
-              summaries.push({ path: node._sys.path });
+              summaries.push(summaryOf(node._sys));
             }
             const { hasNextPage, endCursor } = page.pageInfo;
+            historyRevision = page.pageInfo.historyRevision ?? historyRevision;
             if (!hasNextPage || !endCursor || endCursor === after) {
               return summaries;
             }
@@ -88,7 +92,7 @@ export const createTinaCloudContentSlice =
             path,
             value
           );
-          return { path: document._sys.path, document: document._values };
+          return { ...summaryOf(document._sys), document: document._values };
         } catch (cause) {
           throw toContentError(cause);
         }

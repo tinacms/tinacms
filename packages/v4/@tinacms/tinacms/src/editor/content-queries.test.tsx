@@ -190,6 +190,52 @@ describe('useDocument', () => {
 });
 
 describe('useSaveDocument', () => {
+  it('keeps confirmed save metadata when an older list response arrives later', async () => {
+    let finishList: (value: DocumentSummary[]) => void = () => {};
+    const summary = {
+      ...SUMMARIES[0],
+      updatedAt: '2026-11-12T00:00:00.000Z',
+      lastAuthor: { name: 'Ada' },
+    };
+    const provider = stubProvider({
+      list: vi
+        .fn()
+        .mockResolvedValueOnce(SUMMARIES)
+        .mockImplementationOnce(
+          () =>
+            new Promise<DocumentSummary[]>((resolve) => {
+              finishList = resolve;
+            })
+        ),
+      update: vi.fn(async () => ({ ...summary, document: { title: 'Saved' } })),
+    });
+    const { wrapper, queryClient } = renderWithContent(provider);
+    const { result } = renderHook(
+      () => ({
+        list: useCollectionDocuments('post'),
+        saving: useSaveDocument(),
+      }),
+      { wrapper }
+    );
+    await waitFor(() =>
+      expect(result.current.list.documents).toEqual(SUMMARIES)
+    );
+    const olderRead = queryClient.refetchQueries({
+      queryKey: contentKeys.list('post'),
+    });
+    await waitFor(() => expect(provider.list).toHaveBeenCalledTimes(2));
+    await result.current.saving.save({
+      collection: 'post',
+      path: summary.path,
+      value: { title: 'Saved' },
+    });
+    finishList(SUMMARIES);
+    await olderRead;
+    await waitFor(() =>
+      expect(result.current.list.documents[0]).toEqual(summary)
+    );
+  });
+
   it('keeps the stored content out of the cached list, and in the document', async () => {
     const persisted: DocumentEntry = {
       path: 'content/posts/hello.mdx',

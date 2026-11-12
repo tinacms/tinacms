@@ -2,6 +2,8 @@ import { TinaAdmin } from '@tinacms/tinacms/admin';
 import { defineConfig, definePlugin, localMediaPlugin } from '@tinacms/tinacms';
 import { createRoot } from 'react-dom/client';
 import { pageCollection, postCollection } from '../tina/config';
+import type { SliceSet, TinaStoreState } from '../../src/core/plugin';
+import { createTinaCloudContentSlice } from '../../src/plugins/tinacloud/content/tinacloud-content.client';
 import './index.css';
 
 const params = new URLSearchParams(location.search);
@@ -95,32 +97,46 @@ const content = definePlugin({
   provides: ['content'],
   client: async () => ({
     default: {
-      slice: () => ({
-        branches: {
-          list: async () => {
-            if (slowBranches) return never;
-            if (failing === 'branches') throw new Error('offline');
-            return [
-              { name: 'main', protected: true },
-              { name: branchName, protected: protectedBranch, pullRequestUrl },
-            ];
+      slice: (set: SliceSet, get: () => TinaStoreState) => {
+        const fixture = {
+          branches: {
+            list: async () => {
+              if (slowBranches) return never;
+              if (failing === 'branches') throw new Error('offline');
+              return [
+                { name: 'main', protected: true },
+                {
+                  name: branchName,
+                  protected: protectedBranch,
+                  pullRequestUrl,
+                },
+              ];
+            },
+            defaultBranch: async () => branchName,
           },
-          defaultBranch: async () => branchName,
-        },
-        list: async (collection: string) => {
-          if (slow) return never;
-          if (failing === 'lists') throw new Error('offline');
-          return collection === 'post' ? posts : [];
-        },
-        get: async (_collection: string, path: string) => {
-          if (!posts.some((post) => post.path === path)) return null;
-          return { path, document: { title: path } };
-        },
-        update: async (_collection: string, path: string, value: never) => ({
-          path,
-          document: value,
-        }),
-      }),
+          list: async (collection: string) => {
+            if (slow) return never;
+            if (failing === 'lists') throw new Error('offline');
+            return collection === 'post' ? posts : [];
+          },
+          get: async (_collection: string, path: string) => {
+            if (!posts.some((post) => post.path === path)) return null;
+            return { path, document: { title: path } };
+          },
+          update: async (_collection: string, path: string, value: never) => ({
+            path,
+            document: value,
+          }),
+        };
+        if (params.get('cloud') !== '1') return fixture;
+        return {
+          ...createTinaCloudContentSlice({
+            clientId: 'history-fixture',
+            getToken: async () => 'fixture-token',
+          })(set, get),
+          branches: fixture.branches,
+        };
+      },
     },
   }),
 });

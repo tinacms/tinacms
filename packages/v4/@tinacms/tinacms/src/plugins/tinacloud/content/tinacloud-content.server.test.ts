@@ -77,6 +77,32 @@ const saveRequest = (value: Record<string, unknown>) =>
 afterEach(() => vi.unstubAllGlobals());
 
 describe('tinaCloud() content/update on the site server', () => {
+  it('preserves the confirmed edit metadata through the server hook route', async () => {
+    stubTinaCloud(() =>
+      Response.json({
+        data: {
+          updateDocument: {
+            _sys: {
+              path: 'content/posts/a.mdx',
+              updatedAt: '2026-11-12T00:00:00Z',
+              lastAuthor: { name: 'Ada' },
+            },
+            _values: { title: 'HI' },
+          },
+        },
+      })
+    );
+    const response = await handler(saveRequest({ title: 'hi' }));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      entry: {
+        path: 'content/posts/a.mdx',
+        updatedAt: '2026-11-12T00:00:00.000Z',
+        lastAuthor: { name: 'Ada' },
+      },
+    });
+  });
+
   it('verifies the session, runs the server hook, then writes the result with the editor token', async () => {
     const fetchMock = stubTinaCloud();
     const response = await handler(saveRequest({ title: 'hi' }));

@@ -59,6 +59,98 @@ afterEach(() => {
 });
 
 describe('TinaCloud content slice', () => {
+  it('maps edit metadata on list, get and update and requests the v4 contract', async () => {
+    const metadata = {
+      updatedAt: '2026-11-12T10:00:00+10:00',
+      lastAuthor: { name: 'Ada' },
+    };
+    const document = { ...hello, _sys: { ...hello._sys, ...metadata } };
+    const listPage = page(['content/posts/hello.mdx'], null);
+    listPage.data.collection.documents.edges[0].node = document;
+    const fetchMock = stubTinaCloud(
+      listPage,
+      { data: { document } },
+      { data: { updateDocument: document } }
+    );
+    const slice = content();
+    const expected = {
+      path: hello._sys.path,
+      updatedAt: '2026-11-12T00:00:00.000Z',
+      lastAuthor: { name: 'Ada' },
+    };
+    expect(await slice.list('post')).toEqual([expected]);
+    expect(await slice.get('post', hello._sys.path)).toEqual({
+      ...expected,
+      document: hello._values,
+    });
+    expect(await slice.update('post', hello._sys.path, hello._values)).toEqual({
+      ...expected,
+      document: hello._values,
+    });
+    const [, init] = fetchMock.mock.calls.at(-1) ?? [];
+    expect(new Headers(init?.headers).get('x-tina-content-contract')).toBe('4');
+  });
+
+  it('pins one history revision while following collection pages', async () => {
+    const revision = 'a'.repeat(40);
+    const first = {
+      data: {
+        collection: {
+          documents: {
+            edges: [{ node: { _sys: { path: 'a.mdx' } } }],
+            pageInfo: {
+              hasNextPage: true,
+              endCursor: 'c1',
+              historyRevision: revision,
+            },
+          },
+        },
+      },
+    };
+    const fetchMock = stubTinaCloud(first, page(['b.mdx'], null));
+    expect(await content().list('post')).toEqual([
+      { path: 'a.mdx' },
+      { path: 'b.mdx' },
+    ]);
+    expect(
+      contentCalls(fetchMock).map(({ variables }) => variables.historyRevision)
+    ).toEqual([null, revision]);
+  });
+
+  it('lists valid documents when edit metadata is missing, null or malformed', async () => {
+    stubTinaCloud({
+      data: {
+        collection: {
+          documents: {
+            edges: [
+              {
+                node: {
+                  _sys: { path: 'a.mdx', updatedAt: null, lastAuthor: null },
+                },
+              },
+              {
+                node: {
+                  _sys: {
+                    path: 'b.mdx',
+                    updatedAt: 'not a date',
+                    lastAuthor: { name: '' },
+                  },
+                },
+              },
+              { node: { _sys: { path: 'c.mdx' } } },
+            ],
+            pageInfo: { hasNextPage: false, endCursor: null },
+          },
+        },
+      },
+    });
+    expect(await content().list('post')).toEqual([
+      { path: 'a.mdx' },
+      { path: 'b.mdx' },
+      { path: 'c.mdx' },
+    ]);
+  });
+
   it("gets a document from the project's default branch", async () => {
     const fetchMock = stubTinaCloud({ data: { document: hello } });
     expect(await content().get('post', 'content/posts/hello.mdx')).toEqual({

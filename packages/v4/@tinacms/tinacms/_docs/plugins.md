@@ -443,6 +443,22 @@ of the file. It does not set `lastAuthor`, because it does not read git.
 Do not set `updatedAt` from a time that is not the time of the last change,
 such as the time of an index.
 
+The TinaCloud provider gets these values from git history on the selected branch.
+`updatedAt` is the committer time of the last commit that changes the current file path.
+`lastAuthor.name` is that commit's author name. It can differ from the committer's name.
+A save returns the confirmed commit metadata through both direct and server-hook routes.
+Recent documents then updates without a reload.
+
+TinaCloud builds missing history in the background and reuses it across collection pages.
+Until history is available, the document stays in the collection with metadata absent.
+A later content refetch can include the completed history.
+Re-indexing does not change a document's edit time.
+These values are system metadata, independent of any content field with the same name.
+
+The v4 provider sends `x-tina-content-contract: 4` with content requests.
+Deploy the hosted v4 contract before using this provider version.
+The list response returns a history revision that the provider reuses across its pages.
+
 A provider with neither shows no branch spot. A `search` slice with a
 `search(query, { limit, collections?, filters?, cursor? })` method adds content
 results to the Search dialog. The Search control and the ⌘K shortcut always

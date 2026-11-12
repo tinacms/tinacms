@@ -217,11 +217,21 @@ export const useSaveDocument = (): DocumentSave => {
         ? saveThroughServer(input)
         : content.update(input.collection, input.path, input.value),
     onMutate: () => currentBranchOf(runtime.store.getState()),
-    onSuccess: (
+    onSuccess: async (
       { document, hookWarnings, ...summary },
       { collection },
       branch
     ) => {
+      await Promise.all([
+        queryClient.cancelQueries({
+          queryKey: contentKeys.list(collection, branch),
+          exact: true,
+        }),
+        queryClient.cancelQueries({
+          queryKey: contentKeys.document(collection, summary.path, branch),
+          exact: true,
+        }),
+      ]);
       queryClient.setQueryData<DocumentSummary[]>(
         contentKeys.list(collection, branch),
         (cached) => (cached ? upsertByPath(cached, summary) : undefined)

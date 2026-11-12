@@ -10,7 +10,7 @@ import { bearerTokenOf } from '../auth/tinacloud-auth.server';
 import { type TinaCloudOptions, createTinaCloudClient } from '../client';
 import { TINACLOUD_PLUGIN_NAME } from '../name';
 import { toContentError } from './errors';
-import { updateDocument } from './request';
+import { summaryOf, updateDocument } from './request';
 
 const asProviderRefusal = (cause: unknown): unknown => {
   const error = toContentError(cause);
@@ -59,7 +59,7 @@ export const createTinaCloudContentServer = (options: TinaCloudOptions) => {
       const document = await refusingKnownFailures(() =>
         updateDocument(editorClient(), target, collection, path, value)
       );
-      return { path: document._sys.path, document: document._values };
+      return { ...summaryOf(document._sys), document: document._values };
     },
   } satisfies ServerSegment;
 };

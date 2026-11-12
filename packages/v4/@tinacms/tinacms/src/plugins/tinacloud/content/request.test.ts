@@ -113,6 +113,7 @@ describe('fetchDocumentPage', () => {
       collection: 'post',
       first: LIST_PAGE_SIZE,
       after: 'c1',
+      historyRevision: null,
     });
   });
 });

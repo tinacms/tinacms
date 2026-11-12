@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { DocumentSummary } from '../../../core/content/contract';
 import {
   TINACLOUD_CONTENT_URL,
   type TinaCloudClient,
@@ -41,13 +42,16 @@ export const contentUrl = (clientId: string, branch: string): string =>
 const requestGraphQL = async <Data>(
   client: TinaCloudClient,
   branch: string,
-  schema: z.ZodType<Data>,
+  schema: z.ZodType<Data, z.ZodTypeDef, unknown>,
   query: string,
   variables: Record<string, unknown>
 ): Promise<Data> => {
   const body = await client.authedFetch(contentUrl(client.clientId, branch), {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: {
+      'content-type': 'application/json',
+      'x-tina-content-contract': '4',
+    },
     body: JSON.stringify({ query, variables }),
   });
   const response = responseSchema.safeParse(body);
@@ -71,13 +75,39 @@ const requestGraphQL = async <Data>(
   return data.data;
 };
 
+const systemInfoSchema = z.object({
+  path: z.string(),
+  title: z.string().nullish(),
+  updatedAt: z
+    .string()
+    .datetime({ offset: true })
+    .transform((time) => new Date(time).toISOString())
+    .optional()
+    .catch(undefined),
+  lastAuthor: z
+    .object({ name: z.string().trim().min(1) })
+    .optional()
+    .catch(undefined),
+});
+
+export const summaryOf = (
+  system: z.infer<typeof systemInfoSchema>
+): DocumentSummary => ({
+  path: system.path,
+  ...(system.title ? { title: system.title } : {}),
+  ...(system.updatedAt ? { updatedAt: system.updatedAt } : {}),
+  ...(system.lastAuthor
+    ? { lastAuthor: { name: system.lastAuthor.name } }
+    : {}),
+});
+
 const documentSchema = z.object({
-  _sys: z.object({ path: z.string() }),
+  _sys: systemInfoSchema,
   _values: z.record(z.unknown()),
 });
 
 const DOCUMENT_QUERY = `query($collection: String!, $path: String!) {
-  document(collection: $collection, path: $path) { _sys { path } _values }
+  document(collection: $collection, path: $path) { _sys { path title updatedAt lastAuthor { name } } _values }
 }`;
 
 export const fetchDocument = async (
@@ -99,22 +129,21 @@ export const fetchDocument = async (
 const listPageSchema = z.object({
   collection: z.object({
     documents: z.object({
-      edges: z.array(
-        z.object({ node: z.object({ _sys: z.object({ path: z.string() }) }) })
-      ),
+      edges: z.array(z.object({ node: z.object({ _sys: systemInfoSchema }) })),
       pageInfo: z.object({
         hasNextPage: z.boolean(),
         endCursor: z.string().nullable(),
+        historyRevision: z.string().nullable().optional(),
       }),
     }),
   }),
 });
 
-const LIST_QUERY = `query($collection: String!, $first: Float!, $after: String) {
+const LIST_QUERY = `query($collection: String!, $first: Float!, $after: String, $historyRevision: String) {
   collection(collection: $collection) {
-    documents(first: $first, after: $after) {
-      edges { node { ... on Document { _sys { path } } } }
-      pageInfo { hasNextPage endCursor }
+    documents(first: $first, after: $after, historyRevision: $historyRevision) {
+      edges { node { ... on Document { _sys { path title updatedAt lastAuthor { name } } } } }
+      pageInfo { hasNextPage endCursor historyRevision }
     }
   }
 }`;
@@ -123,18 +152,20 @@ export const fetchDocumentPage = async (
   client: TinaCloudClient,
   branch: string,
   collection: string,
-  after: string | null
+  after: string | null,
+  historyRevision: string | null = null
 ) =>
   (
     await requestGraphQL(client, branch, listPageSchema, LIST_QUERY, {
       collection,
       first: LIST_PAGE_SIZE,
       after,
+      historyRevision,
     })
   ).collection.documents;
 
 const UPDATE_MUTATION = `mutation($collection: String!, $path: String!, $params: JSON!) {
-  updateDocument(collection: $collection, path: $path, params: $params) { _sys { path } _values }
+  updateDocument(collection: $collection, path: $path, params: $params) { _sys { path title updatedAt lastAuthor { name } } _values }
 }`;
 
 export const updateDocument = async (
