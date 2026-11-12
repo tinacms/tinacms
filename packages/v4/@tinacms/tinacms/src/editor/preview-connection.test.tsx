@@ -379,6 +379,7 @@ describe('usePreviewConnection', () => {
           hooks: [],
           staleDraft: null,
           removeListItem: () => {},
+          insertListItem: () => {},
           moveListItem: () => {},
         }}
       >

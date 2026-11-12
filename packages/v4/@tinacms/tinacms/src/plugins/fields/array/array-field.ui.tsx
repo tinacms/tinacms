@@ -36,6 +36,7 @@ import {
   useFieldValue,
   useInvalidFieldCount,
   useInvalidFieldCounts,
+  useInsertListItem,
   useListItems,
   useMediaSlice,
   useExpansion,
@@ -187,15 +188,12 @@ function ObjectItems({
   const documentPath = useDocumentPath();
   const listItems = useListItems();
   const removeListItem = useRemoveListItem();
+  const insertListItem = useInsertListItem();
   const moveListItem = useMoveListItem();
   const activation = useActivation();
   const { setActive } = useActiveField();
   const { control, getValues } = useFormContext();
-  const {
-    fields: items,
-    append,
-    insert,
-  } = useFieldArray({ control, name: address });
+  const { fields: items } = useFieldArray({ control, name: address });
   // Re-renders the headings on typing, so an `itemLabel` follows it.
   useWatch({ control, name: address });
   // Reset gives every useFieldArray new ids, so keying rows by `item.id`
@@ -364,14 +362,18 @@ function ObjectItems({
     keysHeld.current = true;
     refocusOpener.current = null;
     afterChange({ open: index, focus: index });
-    listItems.insert(address, index, () => insert(index, seedFor(template)));
+    listItems.insert(address, index, () =>
+      insertListItem(address, index, seedFor(template))
+    );
     setInserting(null);
   };
   const add = (template?: ArrayTemplateSchema) => {
     if (atMax()) return;
     trackAddedRow();
     afterChange({ open: items.length, focus: items.length });
-    append(seedFor(template));
+    listItems.insert(address, items.length, () =>
+      insertListItem(address, items.length, seedFor(template))
+    );
     setAdding(false);
   };
   const moveTo = (from: number, to: number) => {
@@ -518,7 +520,11 @@ function ObjectItems({
         keysHeld.current = true;
         afterChange({ open: index + 1, focus: index + 1 });
         listItems.insert(address, index + 1, () =>
-          insert(index + 1, structuredClone(getValues(`${address}.${index}`)))
+          insertListItem(
+            address,
+            index + 1,
+            structuredClone(getValues(`${address}.${index}`))
+          )
         );
       }}
       onRemove={(index) => {

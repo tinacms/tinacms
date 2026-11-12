@@ -207,6 +207,15 @@ export function useRemoveListItem(): (
     .removeListItem;
 }
 
+export function useInsertListItem(): (
+  address: FieldAddress,
+  index: number,
+  item: unknown
+) => void {
+  return useFormScope('insert-list-item-outside-provider', 'useInsertListItem')
+    .insertListItem;
+}
+
 export function useMoveListItem(): (
   address: FieldAddress,
   from: number,

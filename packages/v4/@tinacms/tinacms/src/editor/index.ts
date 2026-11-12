@@ -76,6 +76,7 @@ export {
   useFormSave,
   useFormSeedKey,
   useMediaSlice,
+  useInsertListItem,
   useMoveListItem,
   useOptionalAuthSlice,
   useRemoveListItem,

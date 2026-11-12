@@ -53,6 +53,11 @@ export interface FormScope extends FormHookScope {
   hooks: readonly FormHooks[];
   staleDraft: StaleDraftActions | null;
   removeListItem: (address: FieldAddress, index: number) => void;
+  insertListItem: (
+    address: FieldAddress,
+    index: number,
+    item: unknown
+  ) => void;
   moveListItem: (address: FieldAddress, from: number, to: number) => void;
 }
 

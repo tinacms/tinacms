@@ -10,6 +10,7 @@ import {
 } from 'react';
 import {
   type FieldError,
+  type FieldValues,
   get,
   FormProvider as RhfFormProvider,
   set,
@@ -63,7 +64,12 @@ import {
   type StaleDraftActions,
   type WaitingCause,
 } from './context';
-import { flattenFieldErrors, nestFieldErrors } from './field-errors';
+import {
+  flattenFieldErrors,
+  type ListChange,
+  nestFieldErrors,
+  rekeyAddresses,
+} from './field-errors';
 import { useFormViewStore } from './form-view-state';
 import { buildFormResolver } from './resolver';
 
@@ -108,6 +114,45 @@ const dropAt = (items: unknown[], index: number): unknown[] => {
 // without that subscription.
 const liveErrors = (methods: ReturnType<typeof useForm<TinaDocument>>) =>
   methods.control._formState.errors;
+
+const rekeyFormErrors = (
+  methods: ReturnType<typeof useForm<TinaDocument>>,
+  listAddress: FieldAddress,
+  change: ListChange
+) => {
+  const flat = flattenFieldErrors(liveErrors(methods));
+  const addresses = Object.keys(flat);
+  if (addresses.length === 0) return;
+  const rekeyed = rekeyAddresses(addresses, listAddress, change);
+  const nextFlat: Record<string, string[] | undefined> = {};
+  for (let i = 0; i < addresses.length; i++) {
+    const nextAddr = rekeyed[i];
+    if (nextAddr) nextFlat[nextAddr] = flat[addresses[i]];
+  }
+  methods.clearErrors();
+  const tree = nestFieldErrors(nextFlat);
+  restoreListErrors(
+    (address, error) => methods.setError(address, error),
+    tree,
+    ''
+  );
+};
+
+const reseedListAt = (
+  methods: ReturnType<typeof useForm<TinaDocument>>,
+  listAddress: FieldAddress,
+  next: unknown[]
+) => {
+  methods.setValue(listAddress, next, {
+    shouldDirty: true,
+    shouldTouch: false,
+    shouldValidate: false,
+  });
+  const defaults = methods.control._defaultValues;
+  if (defaults && typeof defaults === 'object') {
+    set(defaults as FieldValues, listAddress, structuredClone(next));
+  }
+};
 
 type BootedRuntime = Omit<TinaRuntime, 'schema' | 'rpcUrl'>;
 
@@ -631,28 +676,14 @@ export function FormProvider({
   // the other item's defaults. Re-seeding the list at its nested address rewrites
   // values and defaults together, and leaves every other field as it is.
   const commitList = useCallback(
-    (
-      listAddress: FieldAddress,
-      next: unknown[],
-      nextErrors: unknown[] | null
-    ) => {
-      const values = structuredClone(methods.getValues());
-      set(values, listAddress, next);
-      const errors = structuredClone(liveErrors(methods));
-      if (nextErrors) set(errors, listAddress, nextErrors);
-      // Keep the errors, then write back the tree without the removed item's
-      // entry. reset alone drops every error in the form.
-      methods.reset(values, { keepErrors: true });
-      methods.clearErrors();
-      restoreListErrors(
-        (address, error) => methods.setError(address, error),
-        errors,
-        ''
-      );
+    (listAddress: FieldAddress, next: unknown[], change: ListChange) => {
+      reseedListAt(methods, listAddress, next);
+      rekeyFormErrors(methods, listAddress, change);
+      void methods.trigger(listAddress);
       const [topLevel] = listAddress.split('.');
       useFormStore
         .getState()
-        .setFieldValue(formId, toFieldAddress(topLevel), values[topLevel]);
+        .setFieldValue(formId, toFieldAddress(topLevel), methods.getValues(topLevel));
     },
     [formId, methods]
   );
@@ -664,12 +695,21 @@ export function FormProvider({
         return;
       }
       view.getState().removeListItem(listAddress, index);
-      const listErrors = get(liveErrors(methods), listAddress);
-      commitList(
-        listAddress,
-        dropAt(current, index),
-        Array.isArray(listErrors) ? dropAt(listErrors, index) : null
-      );
+      commitList(listAddress, dropAt(current, index), { remove: index });
+    },
+    [commitList, methods, view]
+  );
+
+  const insertListItem = useCallback(
+    (listAddress: FieldAddress, index: number, item: unknown) => {
+      const current = methods.getValues(listAddress);
+      if (!Array.isArray(current) || index < 0 || index > current.length) {
+        return;
+      }
+      const next = [...current];
+      next.splice(index, 0, item);
+      view.getState().insertListItem(listAddress, index);
+      commitList(listAddress, next, { insert: index });
     },
     [commitList, methods, view]
   );
@@ -691,14 +731,7 @@ export function FormProvider({
       const next = [...current];
       const [item] = next.splice(from, 1);
       next.splice(to, 0, item);
-      const listErrors = get(liveErrors(methods), listAddress);
-      let nextErrors: unknown[] | null = null;
-      if (Array.isArray(listErrors)) {
-        nextErrors = [...listErrors];
-        const [error] = nextErrors.splice(from, 1);
-        nextErrors.splice(to, 0, error);
-      }
-      commitList(listAddress, next, nextErrors);
+      commitList(listAddress, next, { move: [from, to] });
     },
     [commitList, methods, view]
   );
@@ -719,6 +752,7 @@ export function FormProvider({
       hooks: formHooks,
       staleDraft: staleDraftActions,
       removeListItem,
+      insertListItem,
       moveListItem,
     }),
     [
@@ -736,6 +770,7 @@ export function FormProvider({
       formHooks,
       staleDraftActions,
       removeListItem,
+      insertListItem,
       moveListItem,
     ]
   );

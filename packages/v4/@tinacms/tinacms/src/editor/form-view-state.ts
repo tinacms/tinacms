@@ -89,6 +89,7 @@ export interface FormViewState {
   setExpansion: (open: boolean) => void;
   touch: (address: FieldAddress) => void;
   removeListItem: (listAddress: string, index: number) => void;
+  insertListItem: (listAddress: string, index: number) => void;
   moveListItem: (listAddress: string, from: number, to: number) => void;
   attemptSave: () => void;
   resetReveal: () => void;
@@ -315,6 +316,25 @@ export const createFormViewStore = (): FormViewStore => {
             );
           }
         }
+        return { touched: nextTouched, openLevels: nextLevels };
+      }),
+    insertListItem: (listAddress, index) =>
+      set((state) => {
+        const nextTouched = new Set<string>();
+        for (const address of state.touched) {
+          const [shifted] = rekeyAddresses([address], listAddress, {
+            insert: index,
+          });
+          if (shifted) nextTouched.add(shifted);
+        }
+        const nextLevels = state.openLevels.map((level) => {
+          const [shifted] = rekeyAddresses([level.address], listAddress, {
+            insert: index,
+          });
+          return shifted && shifted !== level.address
+            ? { ...level, address: toFieldAddress(shifted) }
+            : level;
+        });
         return { touched: nextTouched, openLevels: nextLevels };
       }),
     moveListItem: (listAddress, from, to) =>

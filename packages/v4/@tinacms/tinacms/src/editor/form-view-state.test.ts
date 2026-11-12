@@ -217,6 +217,14 @@ describe('useFormViewStore', () => {
     expect(result.current.getState().touched.has('authors.0.name')).toBe(false);
     expect(result.current.getState().touched.has('authors.2.name')).toBe(true);
   });
+
+  it('shifts touched addresses when an item is inserted', () => {
+    const { result } = renderHook(() => useFormViewStore(toFormId('form-3')));
+    result.current.getState().touch(toFieldAddress('authors.1.name'));
+    result.current.getState().insertListItem('authors', 0);
+    expect(result.current.getState().touched.has('authors.1.name')).toBe(false);
+    expect(result.current.getState().touched.has('authors.2.name')).toBe(true);
+  });
 });
 
 describe('error summary', () => {
