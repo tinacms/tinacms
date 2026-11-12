@@ -588,7 +588,7 @@ const documentTitle = (values: TinaDocument | undefined, path: string) => {
 
 // The prompt is a bottom-right toast, so the form stays editable behind it. One
 // toast per document: its id holds the path, and leaving the document removes it
-// until reload (ADR-026 §2).
+// until reload or until a new copy joins the waiting list (ADR-026 §2).
 function ResumeDraftToast({ scope }: { scope: FormScope }) {
   const stale = useStaleDraft();
   const values = useFormValues(scope.formId);

@@ -129,6 +129,19 @@ describe('form drafts', () => {
     expect(store.getState().leftWithWaiting[postA]).toBeUndefined();
   });
 
+  it('keeps a left prompt down when a waiting copy only leaves the list', () => {
+    reloadWithEdit('Older');
+    open();
+    typeTitle('Newer');
+    simulateReload();
+    open();
+    expect(waitingOf()).toHaveLength(2);
+    store.getState().markLeftWithWaiting(postA);
+    open({ [title]: 'Older', [summary]: 'Same' });
+    expect(waitingOf()).toHaveLength(1);
+    expect(store.getState().leftWithWaiting[postA]).toBe(true);
+  });
+
   it('drops the waiting copies once the form holds the same values', () => {
     reloadWithEdit();
     open();

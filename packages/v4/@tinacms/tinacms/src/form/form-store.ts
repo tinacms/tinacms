@@ -104,7 +104,7 @@ export interface FormStore {
   swapFailures: Partial<Record<FormId, number>>;
   /** Forms whose Resume prompt is hidden until the document opens again, after a failed Resume. */
   hidden: Partial<Record<FormId, true>>;
-  /** Forms the editor left while copies waited. Their Resume prompt stays down until reload (ADR-026 §2). */
+  /** Forms the editor left while copies waited. Their Resume prompt stays down until reload or until a new copy joins the waiting list (ADR-026 §2). */
   leftWithWaiting: Partial<Record<FormId, true>>;
   markLeftWithWaiting: (formId: FormId) => void;
   /** Removes the live copy, every waiting copy and the in-memory edits. */
@@ -478,9 +478,12 @@ export const useFormStore = create<FormStore>()(
               state.branch,
               settled.held
             );
+            const before = state.waiting[formId] ?? [];
             const sameCopies =
-              JSON.stringify(copies) ===
-              JSON.stringify(state.waiting[formId] ?? []);
+              JSON.stringify(copies) === JSON.stringify(before);
+            const newCopy = copies.some(
+              (copy) => !before.some((seen) => sameDraft(seen, copy))
+            );
             const storage = {
               waiting: sameCopies
                 ? state.waiting
@@ -495,9 +498,9 @@ export const useFormStore = create<FormStore>()(
                 ? withFailure(state.failures, formId)
                 : state.failures,
               hidden: opening ? state.hidden : withoutKey(state.hidden, formId),
-              leftWithWaiting: sameCopies
-                ? state.leftWithWaiting
-                : withoutKey(state.leftWithWaiting, formId),
+              leftWithWaiting: newCopy
+                ? withoutKey(state.leftWithWaiting, formId)
+                : state.leftWithWaiting,
               draftsVersion: sameCopies
                 ? state.draftsVersion
                 : state.draftsVersion + 1,
