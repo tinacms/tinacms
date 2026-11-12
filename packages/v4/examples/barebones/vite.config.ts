@@ -15,12 +15,13 @@ import { defineConfig } from 'vite';
 // lands, these become:
 //   import { loadTinaConfig } from '@tinacms/tinacms/...';
 //   import { tinaLocalDataLayerVitePlugin } from '@tinacms/tinacms/local-data-layer/vite';
-import { loadTinaConfig } from '../../@tinacms/tinacms/src/codegen/load-config';
+import { openTinaConfig } from '../../@tinacms/tinacms/src/codegen/load-config';
 import { tinaLocalDataLayerVitePlugin } from '../../@tinacms/tinacms/src/plugins/content/local/server/local-data-layer.vite';
 
-const tina = await loadTinaConfig(
+const opened = await openTinaConfig(
   fileURLToPath(new URL('./tina/config.ts', import.meta.url))
 );
+const tina = opened.config;
 
 export default defineConfig({
   envPrefix: ['VITE_', 'TINA_PUBLIC_'],
