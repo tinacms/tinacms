@@ -11,6 +11,8 @@ const noticeId = (path: string) => `kept-edits:${path}`;
 /**
  * Leaving a document that holds unsaved edits never asks and never blocks. A
  * notice says the edits stay in this browser and offers a way back to them.
+ * Waiting copies the editor leaves keep their Resume prompt down until reload
+ * or until a new copy joins the waiting list (ADR-026 §2).
  */
 export function useKeptEditsNotice(
   route: AdminRoute,
@@ -30,6 +32,7 @@ export function useKeptEditsNotice(
     ) {
       return;
     }
+    readFormStore().markLeftWithWaiting(toFormId(left.path));
     const scope = readFormStore().forms[toFormId(left.path)];
     if (formStatus(scope) !== 'dirty') return;
     if (readFormStore().unstored[toFormId(left.path)]) return;

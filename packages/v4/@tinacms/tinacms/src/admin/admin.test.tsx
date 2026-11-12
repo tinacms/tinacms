@@ -1080,6 +1080,47 @@ describe('TinaAdmin draft recovery contract', () => {
     );
   });
 
+  it('does not show the toast again on a document the editor left', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /second\.mdx/ })
+    );
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Second');
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello');
+    await waitFor(() =>
+      expect(screen.queryByText('Resume your unsaved edits?')).toBeNull()
+    );
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
+    expect(
+      within(screen.getByRole('contentinfo')).getByText(
+        'Unsaved edits kept in this browser'
+      )
+    ).toBeVisible();
+  });
+
+  it('drops the waiting copy once the form holds the same values', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    const title = screen.getByLabelText(/^Title\b/);
+    await user.clear(title);
+    await user.type(title, 'Mine');
+    await waitFor(() =>
+      expect(screen.queryByText('Resume your unsaved edits?')).toBeNull()
+    );
+    expect(readWaitingDrafts(hello)).toHaveLength(0);
+    expect(readDraft(hello)?.values).toMatchObject({ title: 'Mine' });
+  });
+
   it('row 11: the confirm takes focus when a field held it', async () => {
     store(hello, { title: 'Mine' }, { title: 'Hello' });
     const user = await openDoc(/hello\.mdx/);
