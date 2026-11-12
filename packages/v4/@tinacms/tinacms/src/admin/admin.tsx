@@ -29,7 +29,7 @@ import type { AdminRoute } from './routing';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
 import { folderOfDocument } from '../editor/collection-documents';
-import { useDocument } from '../editor/content-queries';
+import { useCurrentBranch, useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
 import { TinaProvider } from '../editor/provider';
@@ -441,6 +441,7 @@ function AdminShell({
   const screens = useAdminScreens();
   const globalNav = useGlobalNav();
   const { route, navigate } = useAdminRoute();
+  const branch = useCurrentBranch();
 
   const isMediaRoute =
     route.view === 'media' ||
@@ -636,7 +637,7 @@ function AdminShell({
             <SidebarInset className='min-w-0'>
               <div className='min-h-0 flex-1 overflow-y-auto'>
                 <CollectionTable
-                  key={`${collection.name}/${tableFolder}`}
+                  key={`${branch ?? ''}/${collection.name}/${tableFolder}`}
                   collection={collection.name}
                   folder={tableFolder}
                   onClose={goHome}

@@ -36,7 +36,7 @@ interface World {
   emptyFolders: string[];
   referrers: DocumentReferrer[] | 'fail';
   failList: boolean;
-  slowRefetch: boolean;
+  holdList: Promise<void> | null;
   listCalls: number;
   renameFails: ContentError | null;
   operations: boolean;
@@ -54,9 +54,7 @@ const provider = (): ContentProvider => {
     list: async (_collection, query) => {
       if (world.failList) throw new ContentError('network');
       world.listCalls += 1;
-      if (world.slowRefetch && world.listCalls > 1) {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-      }
+      if (world.holdList && world.listCalls > 1) await world.holdList;
       const folder = query?.folder ?? '';
       const known = [
         ...world.emptyFolders,
@@ -197,7 +195,7 @@ beforeEach(() => {
       doc('guides/more.md', { title: 'More' }),
     ],
     emptyFolders: [],
-    slowRefetch: false,
+    holdList: null,
     listCalls: 0,
     referrers: [],
     failList: false,
@@ -402,20 +400,50 @@ describe('CollectionTable', () => {
     );
   });
 
-  it('keeps the same rows on screen while the default sort switches to title', async () => {
+  it('keeps the same rows on screen, marked busy, while the default sort switches to title', async () => {
     world.summaries = [
       doc('b.md', { title: 'Bee' }),
       doc('a.md', { title: 'Ant' }),
     ];
-    world.slowRefetch = true;
+    let release = () => {};
+    world.holdList = new Promise<void>((resolve) => {
+      release = resolve;
+    });
     renderTable();
     const first = await rowNamed('Ant');
-    await waitFor(() =>
-      expect(
-        screen.queryByRole('columnheader', { name: /Last edited/ })
-      ).toBeNull()
-    );
+    await waitFor(() => expect(world.listCalls).toBe(2));
     expect(screen.getByRole('button', { name: 'Ant' })).toBe(first);
+    expect(first.closest('[aria-busy]')).toHaveAttribute('aria-busy', 'true');
+    release();
+    await waitFor(() =>
+      expect(first.closest('[aria-busy]')).toHaveAttribute('aria-busy', 'false')
+    );
+    expect(titles()).toEqual(['Ant', 'Bee']);
+  });
+
+  it('ignores a second click on Next while the next page loads and lands on page 2 with its rows', async () => {
+    const user = userEvent.setup();
+    world.summaries = Array.from({ length: 120 }, (_, index) =>
+      doc(`p${String(index).padStart(3, '0')}.md`)
+    );
+    renderTable();
+    await screen.findByText('Page 1 of 3');
+    let release = () => {};
+    world.holdList = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const next = screen.getByRole('button', { name: 'Next' });
+    await user.dblClick(next);
+    expect(screen.getByText('Page 1 of 3')).toBeInTheDocument();
+    expect(screen.queryByText('Page 3 of 3')).toBeNull();
+    expect(next).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'p000.md' })).toBeInTheDocument();
+    release();
+    expect(await screen.findByText('Page 2 of 3')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: 'p050.md' })
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'p100.md' })).toBeNull();
   });
 
   it('keeps the title column from widening the table', async () => {

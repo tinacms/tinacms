@@ -23,7 +23,9 @@ const isStringArray = (value: unknown): value is string[] =>
 /**
  * Adds `can` to the signed-in slice. It answers from the Backend's `session/permissions`,
  * keyed by user, roles and branch so another user never reads the previous answer. `null`
- * from the query means the Backend has no such route, so the default role map applies.
+ * from the query means the Backend has no such route, so the default role map applies. A query
+ * that failed after its retries applies the same map, so the table stays usable; the server
+ * still refuses what the role may not do.
  */
 export const useAuthSliceWithCan = (
   slice: AuthPluginSlice | null,
@@ -31,7 +33,7 @@ export const useAuthSliceWithCan = (
   branch: string | undefined
 ): AuthSlice | null => {
   const signedIn = isSignedIn(slice) ? slice : null;
-  const { data } = useQuery<string[] | null>({
+  const { data, isError } = useQuery<string[] | null>({
     queryKey: [
       'tina',
       'permissions',
@@ -59,10 +61,12 @@ export const useAuthSliceWithCan = (
   return useMemo(() => {
     if (!isSignedIn(slice)) return slice;
     const can = (permission: string): boolean => {
-      if (data === undefined) return false;
+      if (data === undefined) {
+        return isError && defaultRolesGrant(slice.roles, permission);
+      }
       if (data === null) return defaultRolesGrant(slice.roles, permission);
       return data.includes('*') || data.includes(permission);
     };
     return { ...slice, can };
-  }, [slice, data]);
+  }, [slice, data, isError]);
 };

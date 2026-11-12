@@ -300,7 +300,12 @@ function CollectionTableBody({
   };
   const page = useDocumentsPage(collection, query);
   const connection = page.data;
-  const isFirstPage = after.length === 0;
+  const isStale = page.isPlaceholderData;
+  // The rows, count and page label stay those of the page on screen until the next page arrives.
+  const shownDepth = useRef(0);
+  if (!isStale && connection) shownDepth.current = after.length;
+  const depthShown = isStale ? shownDepth.current : after.length;
+  const isFirstPage = depthShown === 0;
 
   useEffect(() => {
     if (!connection || connection.edges.length === 0) return;
@@ -378,7 +383,7 @@ function CollectionTableBody({
     1,
     Math.ceil((connection?.totalCount ?? 0) / PAGE_SIZE)
   );
-  const pageNumber = after.length + 1;
+  const pageNumber = depthShown + 1;
   const now = Date.now();
 
   const open = (pending: Pending) => {
@@ -946,22 +951,30 @@ function CollectionTableBody({
           </div>
         ) : (
           <>
-            <DataTable
-              caption={`${label} documents`}
-              columns={columns}
-              rows={
-                isLoading
-                  ? skeletonRows
-                  : error
-                    ? []
-                    : rows.map(wide ? wideRow : listRow)
+            <div
+              aria-busy={isLoading || isStale}
+              className={
+                isStale
+                  ? '[&_tbody]:pointer-events-none [&_tbody]:opacity-60'
+                  : undefined
               }
-              emptyText={emptyText}
-              emptyActionLabel={error ? 'Retry' : undefined}
-              onEmptyAction={error ? () => void page.refetch() : undefined}
-              filter={filterControls}
-              aria-busy={isLoading}
-            />
+            >
+              <DataTable
+                caption={`${label} documents`}
+                columns={columns}
+                rows={
+                  isLoading
+                    ? skeletonRows
+                    : error
+                      ? []
+                      : rows.map(wide ? wideRow : listRow)
+                }
+                emptyText={emptyText}
+                emptyActionLabel={error ? 'Retry' : undefined}
+                onEmptyAction={error ? () => void page.refetch() : undefined}
+                filter={filterControls}
+              />
+            </div>
             {showPager ? (
               <nav
                 aria-label='Pages'
@@ -971,7 +984,7 @@ function CollectionTableBody({
                   size='sm'
                   icon='chevron-left'
                   className={PAGER_DISABLED}
-                  disabled={after.length === 0}
+                  disabled={isStale || after.length === 0}
                   focusableWhenDisabled
                   onClick={() => setAfter(after.slice(0, -1))}
                 >
@@ -985,6 +998,7 @@ function CollectionTableBody({
                   iconEnd='chevron-right'
                   className={PAGER_DISABLED}
                   disabled={
+                    isStale ||
                     !connection?.pageInfo.hasNextPage ||
                     !connection.pageInfo.endCursor
                   }

@@ -273,23 +273,32 @@ describe('useCollectionCapabilities', () => {
       expect(hook.result.current).toEqual(NONE);
     });
 
-    it('shows no action while the answer is pending or after it failed', async () => {
+    it('shows no action while the answer is pending', async () => {
       const pending = answer(() => new Promise<Response>(() => {}));
       const waiting = capabilitiesOf(signedIn(['editor']));
       await waitFor(() => expect(pending).toHaveBeenCalled());
       expect(waiting.hook.result.current).toEqual(NONE);
-      waiting.hook.unmount();
+    });
 
+    it('falls back to the default role map after the question failed, so the table stays usable', async () => {
       const failing = answer(() =>
         Response.json(
           { error: { code: 'boom', message: 'Server error' } },
           { status: 500 }
         )
       );
-      const failed = capabilitiesOf(signedIn(['editor']));
+      const editor = capabilitiesOf(signedIn(['editor']));
       await waitFor(() => expect(failing).toHaveBeenCalled());
+      await waitFor(() =>
+        expect(editor.hook.result.current.canDelete).toBe(true)
+      );
+      expect(editor.hook.result.current.canRename).toBe(true);
+      editor.hook.unmount();
+
+      const guest = capabilitiesOf(signedIn(['guest']));
+      await waitFor(() => expect(failing).toHaveBeenCalledTimes(2));
       await act(async () => {});
-      expect(failed.hook.result.current).toEqual(NONE);
+      expect(guest.hook.result.current).toEqual(NONE);
     });
 
     it.each([

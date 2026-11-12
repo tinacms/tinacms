@@ -222,7 +222,7 @@ const EDITOR_PERMISSIONS = [
   'content:delete',
 ];
 
-// The table asks the Backend for the signed-in user's permissions; answer it here so no test needs a server.
+// A test with no stubbed `fetch` sends this request to a real server on localhost:3000.
 const answerPermissions = (permissions: string[]) =>
   vi.stubGlobal(
     'fetch',
@@ -581,14 +581,14 @@ describe('allowedActions in the menus', () => {
 });
 
 describe('roles in the menus', () => {
-  it('gives an editor every action', async () => {
+  it('shows Rename, Duplicate and Delete for content:save, create, rename and delete', async () => {
     const user = userEvent.setup();
     renderTable({ auth: signedIn(['editor']) });
     await openMenu(user, 'Beta');
     expect(menuItems()).toEqual(['Rename', 'Duplicate', 'Delete']);
   });
 
-  it('gives a role the default map does not know no row actions and no New > Folder', async () => {
+  it('shows no row action and no New for an empty permission list', async () => {
     const user = userEvent.setup();
     answerPermissions([]);
     renderTable({ auth: signedIn(['guest']) });
