@@ -2,7 +2,15 @@ import { Button, buttonVariants } from '@tinacms/ui/components/button';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { cn } from '@tinacms/ui/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { type DragEvent, useEffect, useRef, useState } from 'react';
+import {
+  type DragEvent,
+  useEffect,
+  useEffectEvent,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type {
   MediaItem,
   MediaPageRequest,
@@ -15,6 +23,22 @@ import {
 } from './use-media-listing';
 import { useCurrentBranch } from '../../editor/content-queries';
 import { useMediaSlice } from '../../editor/hooks';
+import { UploadHost } from '../../editor/uploads/upload-host';
+import {
+  type UploadOrigin,
+  isSameOrigin,
+} from '../../editor/uploads/upload-list';
+import {
+  FOLDER_DROPPED,
+  READ_ONLY_UPLOAD,
+} from '../../editor/uploads/upload-words';
+import {
+  uploadCheckOf,
+  useFreshPaths,
+  useMediaOpenMark,
+  useUploadHold,
+  useUploadList,
+} from '../../editor/uploads/use-uploads';
 import { MediaBreadcrumb } from './media-breadcrumb';
 import { NewFolderDialog } from './media-dialogs';
 import {
@@ -64,11 +88,6 @@ type FolderProps =
 
 export type MediaBrowserProps = ModeProps & FolderProps;
 
-interface MediaAlert {
-  title: string;
-  lines: string[];
-}
-
 const messageOf = (cause: unknown): string => {
   if (cause instanceof Error) {
     return cause.message;
@@ -79,6 +98,15 @@ const messageOf = (cause: unknown): string => {
 
 const parentOf = (path: string): string =>
   path.split('/').slice(0, -1).join('/');
+
+const carriesFiles = (transfer: DataTransfer): boolean =>
+  transfer.types.includes('Files');
+
+// A dropped folder arrives as a file with no bytes, so the entry is what tells them apart.
+const holdsFolder = (transfer: DataTransfer): boolean =>
+  Array.from(transfer.items ?? []).some(
+    (item) => item.webkitGetAsEntry()?.isDirectory === true
+  );
 
 function LoadingGrid({ label }: { label: string }) {
   return (
@@ -128,6 +156,14 @@ export function MediaBrowser(props: MediaBrowserProps) {
   const media = useMediaSlice();
   const branch = useCurrentBranch() ?? '';
   const queryClient = useQueryClient();
+  const uploads = useUploadList();
+  const hold = useUploadHold();
+  const pickerId = useId();
+  const origin = useMemo<UploadOrigin>(
+    () => ({ kind: 'picker', id: pickerId }),
+    [pickerId]
+  );
+  useMediaOpenMark();
   const [localFolder, setLocalFolder] = useState('');
   const folder = props.folder ?? localFolder;
   const openFolder = props.onFolderChange ?? setLocalFolder;
@@ -157,14 +193,10 @@ export function MediaBrowser(props: MediaBrowserProps) {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [activePath, setActivePath] = useState<string | null>(null);
-  const [uploaded, setUploaded] = useState<{
-    folder: string;
-    items: MediaItem[];
-  }>({ folder, items: [] });
   const [dialog, setDialog] = useState<'new-folder' | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const [notice, setNotice] = useState<MediaAlert | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const library = useRef<HTMLDivElement>(null);
 
   const [shownFolder, setShownFolder] = useState(folder);
   if (shownFolder !== folder) {
@@ -173,8 +205,20 @@ export function MediaBrowser(props: MediaBrowserProps) {
     setDebouncedSearch('');
     setActivePath(null);
     setNotice(null);
-    setUploaded({ folder, items: [] });
   }
+
+  const [shownHold, setShownHold] = useState(hold);
+  if (shownHold !== hold) {
+    setShownHold(hold);
+    setNotice(null);
+  }
+
+  const leftFolder = useRef(folder);
+  useEffect(() => {
+    if (leftFolder.current === folder) return;
+    uploads.leaveFolder(leftFolder.current);
+    leftFolder.current = folder;
+  }, [uploads, folder]);
 
   useEffect(() => {
     const next = search.trim();
@@ -201,7 +245,18 @@ export function MediaBrowser(props: MediaBrowserProps) {
   const listing = useMediaListing(folder, request);
   const status = useMediaStatus();
 
-  const uploadedItems = uploaded.folder === folder ? uploaded.items : [];
+  const freshPaths = useFreshPaths(folder);
+  const uploadedItems: MediaItem[] = freshPaths
+    .filter((path) => {
+      const name = mediaNameOf(path).toLowerCase();
+      return (
+        (request.search === undefined ||
+          name.includes(request.search.toLowerCase())) &&
+        (request.extensions === undefined ||
+          request.extensions.some((ext) => name.endsWith(`.${ext}`)))
+      );
+    })
+    .map((path) => ({ path, kind: 'file' }));
   const uploadedPaths = new Set(uploadedItems.map((item) => item.path));
   const listedItems = (
     listing.data?.pages.flatMap((page) => page.items) ?? []
@@ -237,55 +292,34 @@ export function MediaBrowser(props: MediaBrowserProps) {
   const refresh = () => {
     setActivePath(null);
     setNotice(null);
-    setUploaded({ folder, items: [] });
     void refreshListing();
   };
 
-  const upload = async (files: File[]) => {
-    const failures: string[] = [];
-    const accepted: File[] = [];
-    for (const file of files) {
-      const rejection = uploadRejectionOf(file, uploadRules, features.maxSize);
-      if (rejection) {
-        failures.push(`${file.name}: ${rejection}`);
-      } else {
-        accepted.push(file);
-      }
+  const selectLanded = useEffectEvent(
+    (landed: { branch: string; folder: string; path: string }) => {
+      if (landed.branch !== branch || landed.folder !== folder) return;
+      setActivePath(landed.path);
+      if (kindFilter === 'folders') setKindFilter('all');
+      setSearch('');
+      setDebouncedSearch('');
     }
+  );
+  useEffect(
+    () =>
+      uploads.onLanded((landed) => {
+        if (isSameOrigin(landed.origin, origin)) selectLanded(landed);
+      }),
+    [uploads, origin]
+  );
+
+  const check = uploadCheckOf(
+    (file) => uploadRejectionOf(file, uploadRules, undefined) === null,
+    features.maxSize
+  );
+
+  const upload = (files: File[]) => {
     setNotice(null);
-    const target = folder;
-    const added: MediaItem[] = [];
-    if (accepted.length > 0) {
-      setUploading(true);
-      for (const file of accepted) {
-        try {
-          added.push({ path: await media.upload(file, target), kind: 'file' });
-        } catch (cause) {
-          failures.push(`${file.name}: ${messageOf(cause)}`);
-        }
-      }
-      setUploading(false);
-    }
-    if (failures.length > 0) {
-      setNotice({ title: 'Upload failed.', lines: failures });
-    }
-    if (added.length === 0) return;
-    setUploaded((previous) => {
-      if (previous.folder !== target) return previous;
-      const addedPaths = new Set(added.map((item) => item.path));
-      return {
-        folder: target,
-        items: [
-          ...added,
-          ...previous.items.filter((item) => !addedPaths.has(item.path)),
-        ],
-      };
-    });
-    setActivePath(added[0]?.path ?? null);
-    if (kindFilter === 'folders') setKindFilter('all');
-    setSearch('');
-    setDebouncedSearch('');
-    void refreshListing();
+    uploads.submit({ files, folder, origin, check });
   };
 
   const clickItem = (item: MediaItem) => {
@@ -297,9 +331,9 @@ export function MediaBrowser(props: MediaBrowserProps) {
   };
 
   const dragOver = (event: DragEvent<HTMLDivElement>) => {
-    if (readOnly) return;
+    if (!carriesFiles(event.dataTransfer)) return;
     event.preventDefault();
-    setDragging(true);
+    if (!readOnly && hold === null) setDragging(true);
   };
 
   const dragLeave = (event: DragEvent<HTMLDivElement>) => {
@@ -309,11 +343,18 @@ export function MediaBrowser(props: MediaBrowserProps) {
   };
 
   const drop = (event: DragEvent<HTMLDivElement>) => {
-    if (readOnly) return;
+    if (!carriesFiles(event.dataTransfer)) return;
     event.preventDefault();
     setDragging(false);
-    const files = [...event.dataTransfer.files];
-    if (files.length > 0) void upload(files);
+    if (readOnly) {
+      setNotice(READ_ONLY_UPLOAD);
+    } else if (hold !== null) {
+      setNotice(hold);
+    } else if (holdsFolder(event.dataTransfer)) {
+      setNotice(FOLDER_DROPPED);
+    } else {
+      upload([...event.dataTransfer.files]);
+    }
   };
 
   if (status.data?.kind === 'needs-setup') {
@@ -354,9 +395,10 @@ export function MediaBrowser(props: MediaBrowserProps) {
               <Icon glyph={FolderPlusIcon} size={16} />
             </Button>
             <MediaUploadButton
-              uploading={uploading}
               accept={inputAcceptOf(uploadRules)}
-              onUpload={(files) => void upload(files)}
+              holdReason={hold}
+              size='md'
+              onPick={upload}
             />
           </div>
         )}
@@ -388,23 +430,20 @@ export function MediaBrowser(props: MediaBrowserProps) {
       </div>
 
       {notice ? (
-        <div
+        <p
           role='alert'
           className='border-b bg-destructive/10 px-4 py-2 text-sm text-destructive'
         >
-          <p className='font-medium'>{notice.title}</p>
-          <ul>
-            {notice.lines.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        </div>
+          {notice}
+        </p>
       ) : null}
 
       <div className='flex min-h-0 flex-1'>
         <div
+          ref={library}
           role='region'
           aria-label='Media library'
+          tabIndex={-1}
           data-dragging={dragging ? 'true' : undefined}
           className={cn(
             'min-w-0 flex-1 overflow-y-auto border-2 border-transparent p-4 transition',
@@ -473,6 +512,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
           onClose={() => setDialog(null)}
         />
       ) : null}
+      <UploadHost />
     </div>
   );
 }

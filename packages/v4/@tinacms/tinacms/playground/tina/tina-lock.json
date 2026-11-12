@@ -303,6 +303,11 @@
               }
             ],
             "type": "array"
+          },
+          {
+            "name": "hero",
+            "label": "Hero image",
+            "type": "image"
           }
         ]
       }
@@ -317,6 +322,7 @@
   "primitives": {
     "array": 1,
     "boolean": 1,
+    "image": 1,
     "rich-text": 1,
     "string": 1
   }

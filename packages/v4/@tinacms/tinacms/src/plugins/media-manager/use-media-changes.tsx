@@ -83,7 +83,12 @@ export function useMediaChanges(
   }, []);
 
   const refreshMedia = (on: string) => {
-    void queryClient.invalidateQueries({ queryKey: [...MEDIA_LIST_KEY, on] });
+    const listKey = [...MEDIA_LIST_KEY, on];
+    // Invalidation does not restart a first load that is still on its way, and
+    // that load may have read the folder before the change.
+    void queryClient
+      .cancelQueries({ queryKey: listKey })
+      .then(() => queryClient.invalidateQueries({ queryKey: listKey }));
     void queryClient.invalidateQueries({
       queryKey: ['tina', 'media', 'usage'],
     });

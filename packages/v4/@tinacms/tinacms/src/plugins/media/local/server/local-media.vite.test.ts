@@ -1,5 +1,7 @@
 import { EventEmitter } from 'node:events';
 import { promises as fs } from 'node:fs';
+import http from 'node:http';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -241,6 +243,114 @@ describe('local media endpoint', () => {
       res
     );
     expect(res.statusCode).toBe(413);
+  });
+
+  it('400s an upload onto an existing name and keeps the first file', async () => {
+    const handler = mediaMiddleware();
+    expect((await upload(SAME_ORIGIN, handler)).statusCode).toBe(200);
+    const folder = path.join(rootDir, 'public/uploads/posts');
+    await fs.writeFile(path.join(folder, 'hero.jpg'), 'first');
+    const res = await upload(SAME_ORIGIN, handler);
+    expect(res.statusCode).toBe(400);
+    expect(res.headers[MEDIA_ERROR_HEADER]).toBe('name-taken');
+    expect(await fs.readFile(path.join(folder, 'hero.jpg'), 'utf8')).toBe(
+      'first'
+    );
+    expect(await fs.readdir(folder)).toEqual(['hero.jpg']);
+  });
+
+  it.each([
+    ['tool.exe', 'image/png'],
+    ['notes.docx', ''],
+    ['README', 'image/png'],
+    ['photo.png.zip', 'image/png'],
+  ])(
+    '400s an upload of "%s" as unsupported and writes nothing',
+    async (name, type) => {
+      const form = new FormData();
+      form.append('folder', 'posts');
+      form.append('file', new File(['bytes'], name, { type }));
+      const { contentType, body } = await multipartOf(form);
+      const res = responseDouble();
+      await mediaMiddleware()(
+        requestDouble(
+          '/upload',
+          { ...SAME_ORIGIN, 'content-type': contentType },
+          [body]
+        ),
+        res
+      );
+      expect(res.statusCode).toBe(400);
+      expect(res.headers[MEDIA_ERROR_HEADER]).toBe('unsupported');
+      await expect(
+        fs.access(path.join(rootDir, 'public/uploads'))
+      ).rejects.toThrow();
+    }
+  );
+
+  it('stores an accepted extension whatever type the request reports', async () => {
+    const form = new FormData();
+    form.append('folder', '');
+    form.append(
+      'file',
+      new File(['bytes'], 'hero.png', { type: 'application/octet-stream' })
+    );
+    const { contentType, body } = await multipartOf(form);
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble(
+        '/upload',
+        { ...SAME_ORIGIN, 'content-type': contentType },
+        [body]
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toEqual({ path: 'hero.png' });
+  });
+
+  it('writes nothing when the browser drops the request mid-body', async () => {
+    const handler = mediaMiddleware();
+    let requestClosed = () => {};
+    const closed = new Promise<void>((resolve) => {
+      requestClosed = resolve;
+    });
+    const server = http.createServer((req, res) => {
+      req.url = '/upload';
+      req.on('close', requestClosed);
+      res.on('error', () => {});
+      void handler(req, res);
+    });
+    await new Promise<void>((resolve) =>
+      server.listen(0, '127.0.0.1', resolve)
+    );
+    const { port } = server.address() as AddressInfo;
+    const form = new FormData();
+    form.append('folder', 'posts');
+    form.append('file', new File(['x'.repeat(4096)], 'hero.jpg'));
+    const { contentType, body } = await multipartOf(form);
+    const request = http.request({
+      host: '127.0.0.1',
+      port,
+      method: 'POST',
+      path: '/upload',
+      headers: {
+        host: `localhost:${port}`,
+        origin: `http://localhost:${port}`,
+        'content-type': contentType,
+        'content-length': body.length,
+      },
+    });
+    request.on('error', () => {});
+    await new Promise<void>((resolve) =>
+      request.write(body.subarray(0, body.length - 100), () => resolve())
+    );
+    request.destroy();
+    await closed;
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await expect(
+      fs.readdir(path.join(rootDir, 'public/uploads'), { recursive: true })
+    ).rejects.toMatchObject({ code: 'ENOENT' });
   });
 
   it('lists a folder on GET', async () => {

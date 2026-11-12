@@ -259,6 +259,11 @@ beforeEach(() => {
   }
 });
 
+const documentStatus = () =>
+  within(
+    screen.getByRole('complementary', { name: 'Document form' })
+  ).getByRole('status');
+
 describe('TinaAdmin', () => {
   it('lists every collection the schema declares, and nothing else', async () => {
     renderAdmin();
@@ -288,9 +293,7 @@ describe('TinaAdmin', () => {
       path: 'content/posts/hello.mdx',
       value: { title: 'Hello!' },
     });
-    await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('Saved')
-    );
+    await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
     expect(input).toHaveValue('Hello!');
   });
 
@@ -508,7 +511,7 @@ describe('TinaAdmin unsaved changes', () => {
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    expect(documentStatus()).toHaveTextContent('Unsaved');
 
     const dialog = await openDiscardConfirm(user);
     expect(dialog).toHaveAccessibleName('Discard unsaved edits to “Hello!”?');
@@ -520,7 +523,7 @@ describe('TinaAdmin unsaved changes', () => {
     await waitFor(() =>
       expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello')
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No changes');
+    expect(documentStatus()).toHaveTextContent('No changes');
     expect(reloadIsBlocked()).toBe(false);
   });
 
@@ -967,7 +970,7 @@ describe('TinaAdmin draft recovery contract', () => {
     store(hello, { title: 'Mine' }, { title: 'Hello' });
     const user = await openDoc(/hello\.mdx/);
     await screen.findByText('Resume your unsaved edits?');
-    expect(screen.getByRole('status')).not.toHaveTextContent('No changes');
+    expect(documentStatus()).not.toHaveTextContent('No changes');
     await user.click(screen.getByRole('button', { name: 'Discard' }));
     await user.click(
       within(await screen.findByRole('alertdialog')).getByRole('button', {
@@ -975,7 +978,7 @@ describe('TinaAdmin draft recovery contract', () => {
       })
     );
     await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('No changes')
+      expect(documentStatus()).toHaveTextContent('No changes')
     );
   });
 
@@ -984,11 +987,9 @@ describe('TinaAdmin draft recovery contract', () => {
     const user = await openDoc(/hello\.mdx/);
     await screen.findByText('Resume your unsaved edits?');
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    expect(documentStatus()).toHaveTextContent('Unsaved');
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('Saved')
-    );
+    await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
   });
 
   it('row 3: a draft of an older file says the document changed', async () => {

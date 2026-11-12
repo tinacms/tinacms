@@ -3,7 +3,9 @@ import type { MediaPageRequest, MediaStatus } from '../../core/media/contract';
 import { useCurrentBranch } from '../../editor/content-queries';
 import { useMediaSlice } from '../../editor/hooks';
 
-export const MEDIA_LIST_KEY = ['tina', 'media', 'list'] as const;
+import { MEDIA_LIST_KEY } from '../../editor/uploads/media-list-key';
+
+export { MEDIA_LIST_KEY };
 
 const READY: MediaStatus = { kind: 'ready' };
 

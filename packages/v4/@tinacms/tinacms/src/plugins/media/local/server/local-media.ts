@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type { Dirent } from 'node:fs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -9,6 +10,7 @@ import {
   type MediaPageRequest,
 } from '../../../../core/media/contract';
 import { isMissingFileError, realPathOf } from '../../../../server/real-path';
+import { isMediaExtension } from '../../../media-manager/media-types';
 
 export interface LocalMediaOptions {
   rootDir: string;
@@ -41,9 +43,46 @@ const isValidFileName = (name: string): boolean =>
   path.basename(name) === name &&
   !name.includes('\\');
 
+// The whole name is read, as Node reads it: `.png` and `hero.png.` have none.
+const extensionOfName = (name: string): string =>
+  path.extname(name).slice(1).toLowerCase();
+
 const hasErrorCode = (cause: unknown, code: string): boolean => {
   if (cause instanceof Error) return 'code' in cause && cause.code === code;
   return false;
+};
+
+const NO_HARD_LINK_CODES = [
+  'EPERM',
+  'ENOTSUP',
+  'EOPNOTSUPP',
+  'ENOSYS',
+  'EXDEV',
+];
+
+// Never replaces a file: it rejects with `EEXIST` when the name exists.
+const placeUnderNewName = async (
+  temporary: string,
+  absolute: string
+): Promise<void> => {
+  try {
+    await fs.link(temporary, absolute);
+    return;
+  } catch (cause) {
+    if (!NO_HARD_LINK_CODES.some((code) => hasErrorCode(cause, code))) {
+      throw cause;
+    }
+  }
+  // Only a file this call made is removed, so a failed create removes nothing.
+  const target = await fs.open(absolute, 'wx');
+  try {
+    await target.writeFile(await fs.readFile(temporary));
+  } catch (cause) {
+    await target.close();
+    await fs.rm(absolute, { force: true });
+    throw cause;
+  }
+  await target.close();
 };
 
 export const createLocalMedia = (options: LocalMediaOptions): LocalMedia => {
@@ -124,8 +163,32 @@ export const createLocalMedia = (options: LocalMediaOptions): LocalMedia => {
       const absolute = await resolveInside(path.posix.join(folder, name), {
         allowRoot: false,
       });
-      await fs.mkdir(path.dirname(absolute), { recursive: true });
-      await fs.writeFile(absolute, Buffer.from(await file.arrayBuffer()));
+      if (!isMediaExtension(extensionOfName(name))) {
+        throw new MediaError(
+          'unsupported',
+          `"${name}" is not a file type that local media stores.`
+        );
+      }
+      const targetFolder = path.dirname(absolute);
+      await fs.mkdir(targetFolder, { recursive: true });
+      // `list` hides a name that starts with a dot, so a half-written file
+      // never shows.
+      const temporary = path.join(targetFolder, `.${randomUUID()}.upload`);
+      try {
+        await fs.writeFile(temporary, Buffer.from(await file.arrayBuffer()), {
+          flag: 'wx',
+        });
+        try {
+          await placeUnderNewName(temporary, absolute);
+        } catch (cause) {
+          if (hasErrorCode(cause, 'EEXIST')) {
+            throw new MediaError('name-taken', `"${name}" already exists.`);
+          }
+          throw cause;
+        }
+      } finally {
+        await fs.rm(temporary, { force: true });
+      }
       return toMediaPath(mediaDir, absolute);
     },
 
@@ -153,6 +216,14 @@ export const createLocalMedia = (options: LocalMediaOptions): LocalMedia => {
         throw new MediaError(
           'invalid-name',
           `"${name}" is not a valid file name.`
+        );
+      }
+      if (
+        extensionOfName(name) !== extensionOfName(path.posix.basename(from))
+      ) {
+        throw new MediaError(
+          'unsupported',
+          `"${to}" does not keep the file type of "${from}".`
         );
       }
       const stats = await fs.lstat(fromAbsolute).catch((cause: unknown) => {

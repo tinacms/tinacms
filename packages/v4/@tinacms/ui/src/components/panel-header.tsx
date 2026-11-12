@@ -17,6 +17,11 @@ type PanelHeaderProps = Omit<ComponentProps<'div'>, 'children'> & {
   onBack?: () => void;
   /** At most one action, as a ghost `Button size='sm'`. */
   action?: ReactElement;
+  /**
+   * Where the action sits. `end` puts it before the ⋯ menu, Maximise and close, for
+   * an action whose words change and must not move. Tab order follows the screen.
+   */
+  actionAt?: 'start' | 'end';
   /** `DropdownMenuItem`s. Without them there is no ⋯ button. */
   menu?: ReactNode;
   menuLabel?: string;
@@ -30,7 +35,8 @@ type PanelHeaderProps = Omit<ComponentProps<'div'>, 'children'> & {
 
 /**
  * The 44px bar at the top of every panel: a title or a back button, at most one
- * action, then the ⋯ menu and close at the end. Tab goes back, action, ⋯, maximise, close.
+ * action (after the title, or at the end with `actionAt`), then the ⋯ menu and close
+ * at the end. Tab goes back, action, ⋯, maximise, close.
  */
 function PanelHeader({
   heading,
@@ -38,6 +44,7 @@ function PanelHeader({
   backTitle,
   onBack,
   action,
+  actionAt = 'start',
   menu,
   menuLabel = heading ? `${heading} actions` : 'More actions',
   closeLabel,
@@ -71,8 +78,9 @@ function PanelHeader({
           {heading}
         </h2>
       ) : null}
-      {action}
+      {actionAt === 'start' ? action : null}
       <span aria-hidden='true' className='flex-1' />
+      {actionAt === 'end' ? action : null}
       {menu ? (
         <DropdownMenu>
           <DropdownMenuTrigger
