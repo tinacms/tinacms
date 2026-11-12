@@ -235,13 +235,27 @@ export const useSaveDocument = (): DocumentSave => {
       ]);
       if (!queryClient.getQueryData<DocumentSummary[]>(listKey)) {
         // Cancelling the first read leaves an active query pending with no data.
-        // Restart it before applying the save summary so the navigator is not
-        // stranded in an empty state while preserving the confirmed metadata.
-        await queryClient.refetchQueries({
-          queryKey: listKey,
-          exact: true,
-          type: 'active',
-        });
+        // Restart it in the background; saving should not wait for every page.
+        queryClient.setQueryData<DocumentEntry>(
+          contentKeys.document(collection, summary.path, branch),
+          { ...summary, document }
+        );
+        void queryClient
+          .refetchQueries({
+            queryKey: listKey,
+            exact: true,
+            type: 'active',
+          })
+          .then(() => {
+            queryClient.setQueryData<DocumentSummary[]>(
+              listKey,
+              (cached) => (cached ? upsertByPath(cached, summary) : undefined)
+            );
+          })
+          .catch(() => {
+            // The query records its own error; a failed list must not fail a save.
+          });
+        return;
       }
       queryClient.setQueryData<DocumentSummary[]>(
         listKey,

@@ -192,6 +192,7 @@ describe('useDocument', () => {
 describe('useSaveDocument', () => {
   it('restarts an initial collection read cancelled by a save', async () => {
     let finishInitialList: (value: DocumentSummary[]) => void = () => {};
+    let finishRestartedList: (value: DocumentSummary[]) => void = () => {};
     const summary: DocumentSummary = {
       ...SUMMARIES[0],
       updatedAt: '2026-11-12T00:00:00.000Z',
@@ -206,10 +207,15 @@ describe('useSaveDocument', () => {
               finishInitialList = resolve;
             })
         )
-        .mockResolvedValueOnce(SUMMARIES),
+        .mockImplementationOnce(
+          () =>
+            new Promise<DocumentSummary[]>((resolve) => {
+              finishRestartedList = resolve;
+            })
+        ),
       update: vi.fn(async () => ({ ...summary, document: { title: 'Saved' } })),
     });
-    const { wrapper } = renderWithContent(provider);
+    const { wrapper, queryClient } = renderWithContent(provider);
     const { result } = renderHook(
       () => ({
         list: useCollectionDocuments('post'),
@@ -225,6 +231,14 @@ describe('useSaveDocument', () => {
       value: { title: 'Saved' },
     });
 
+    await waitFor(() => expect(provider.list).toHaveBeenCalledTimes(2));
+    expect(result.current.saving.isSaving).toBe(false);
+    expect(
+      queryClient.getQueryData(
+        contentKeys.document('post', summary.path)
+      )
+    ).toEqual({ ...summary, document: { title: 'Saved' } });
+    finishRestartedList(SUMMARIES);
     await waitFor(() =>
       expect(result.current.list.documents).toEqual([summary, SUMMARIES[1]])
     );
