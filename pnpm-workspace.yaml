@@ -143,7 +143,7 @@ catalog:
     "@vitejs/plugin-react": ^4.7.0
     abstract-level: ^1.0.4
     acorn: ^8.16.0
-    altair-express-middleware: ^7.3.6
+    altair-express-middleware: ^8.5.8
     auto-bind: ^4.0.0
     autoprefixer: ^10.4.20
     axios: 1.20.0
