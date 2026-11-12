@@ -67,7 +67,7 @@ export const saveToBranchDialogStates: {
     action: 'Saving',
   },
   {
-    name: 'no handler',
+    name: 'no action',
     props: { ...base, canSave: false },
     title: 'Save to a new branch',
     action: 'Save',

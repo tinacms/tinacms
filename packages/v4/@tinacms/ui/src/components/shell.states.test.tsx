@@ -85,7 +85,7 @@ describe('Save to branch dialog states', () => {
       render(<SaveToBranchDialog {...props} />);
       const dialog = screen.getByRole('dialog', { name: title });
       const main = within(dialog).getByRole('button', { name: action });
-      expect(main.hasAttribute('disabled')).toBe(name === 'no handler');
+      expect(main.hasAttribute('disabled')).toBe(name === 'no action');
       const field = within(dialog).getByRole('textbox', {
         name: /New branch name/,
       });

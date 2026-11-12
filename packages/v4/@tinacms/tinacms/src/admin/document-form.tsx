@@ -41,20 +41,24 @@ import {
 } from '../editor/form-view-state';
 import { useBranchView } from '../editor/branch';
 import {
+  AfterSaveHookError,
   FormValidationError,
   useDiscardEdits,
   useFieldRegistry,
   useFormCheck,
   useFormId,
   useFormSave,
+  useFormSaveWith,
   useOptionalContentSlice,
   useStaleDraft,
 } from '../editor/hooks';
 import {
+  type FormId,
   useFormErrors,
   useFormStore,
   useFormValues,
   useIsFormDirty,
+  type FormStore,
 } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import type { StoredDraft } from '../form/drafts';
@@ -63,7 +67,6 @@ import { DocumentStatus } from './document-status';
 import { ContentError } from '../core/content/contract';
 import { ErrorSuccessBubble, useErrorSummary } from './error-summary';
 import { saveFailureWords } from './save-failure';
-import { SaveToNewBranchContext } from './save-to-new-branch';
 import { leftoverText } from './leftover-text';
 import { useNarrow } from './use-narrow';
 
@@ -116,6 +119,8 @@ type DialogState = {
   defaultName: string;
 };
 
+type NewBranchRequest = { name: string; from: string | undefined };
+
 // Failed toasts whose action means "save to a new branch" rather than Retry.
 const goneToasts = new Set<string>();
 
@@ -140,8 +145,8 @@ function SaveButton() {
   const dirty = useIsFormDirty(formId);
   const values = useFormValues(formId);
   const save = useFormSave();
+  const saveWith = useFormSaveWith();
   const check = useFormCheck();
-  const handler = use(SaveToNewBranchContext);
   const content = useOptionalContentSlice();
   const narrow = useNarrow();
   const view = useBranchView();
@@ -153,6 +158,14 @@ function SaveButton() {
   const [saving, setSaving] = useState(false);
   const [confirmError, setConfirmError] = useState<string>();
   const saveButton = useRef<HTMLButtonElement>(null);
+  // A failed protected save to a new branch. Retry sends it again while the
+  // form's save phase is still the failure it recorded (ADR-018 §2).
+  const remembered = useRef<{
+    request: NewBranchRequest;
+    failure: FormStore['saves'][FormId];
+  } | null>(null);
+  // Set while the deleted dialog saves: the phase leaves branch-gone, but the toast stays.
+  const keepGoneToast = useRef(false);
   const failedToastId = `save-failed:${formId}`;
   const branchName = view?.name;
   const isProtected =
@@ -198,13 +211,22 @@ function SaveButton() {
     setDialog({ reason, branch, defaultName });
   };
 
-  const branchGone = useFormStore((state) => isBranchGone(state.saves[formId]));
-  // Discard and a branch switch clear the failure. The toast that named it goes too.
+  const savePhase = useFormStore((state) => state.saves[formId]);
+  // Discard and a branch switch clear the failure. The toast that named it goes
+  // too, and Retry no longer sends the remembered request.
   useEffect(() => {
-    if (!branchGone && goneToasts.delete(failedToastId)) {
+    const live = useFormStore.getState().saves[formId];
+    if (remembered.current && live !== remembered.current.failure) {
+      remembered.current = null;
+    }
+    if (
+      !isBranchGone(savePhase) &&
+      !keepGoneToast.current &&
+      goneToasts.delete(failedToastId)
+    ) {
       toast.dismiss(failedToastId);
     }
-  }, [branchGone, failedToastId]);
+  }, [savePhase, formId, failedToastId]);
 
   const showFailure = (cause: unknown) => {
     // The raw reason is for the console. The editor reads fixed words.
@@ -281,8 +303,84 @@ function SaveButton() {
       .finally(() => setPending(false));
   };
 
+  // An `AfterSaveHookError` means the branch exists and the editor is on it.
+  const sendToNewBranch = async (request: NewBranchRequest) => {
+    const action = view?.saveToNewBranch;
+    if (!action || !scope) return;
+    await saveWith({
+      write: (value) =>
+        action({
+          ...request,
+          collection: scope.collection.name,
+          path: scope.path,
+          value,
+        }),
+      afterWrite: () => {
+        remembered.current = null;
+        view.switchTo(request.name);
+      },
+    });
+  };
+
+  const saveToProtected = (request: NewBranchRequest) => {
+    setPending(true);
+    sendToNewBranch(request)
+      .then(() => toast.dismiss(failedToastId))
+      .catch((cause) => {
+        if (cause instanceof FormValidationError && summary.block()) {
+          toast.dismiss(failedToastId);
+          return;
+        }
+        if (!(cause instanceof AfterSaveHookError)) {
+          remembered.current = {
+            request,
+            failure: useFormStore.getState().saves[formId],
+          };
+        }
+        showFailure(cause);
+      })
+      .finally(() => setPending(false));
+  };
+
+  const saveFromDeleted = (request: NewBranchRequest) => {
+    const previous = useFormStore.getState().saves[formId];
+    setSaving(true);
+    keepGoneToast.current = true;
+    const done = () => {
+      keepGoneToast.current = false;
+      setSaving(false);
+    };
+    sendToNewBranch(request).then(
+      () => {
+        done();
+        setDialog(null);
+        goneToasts.delete(failedToastId);
+        toast.dismiss(failedToastId);
+      },
+      (cause) => {
+        done();
+        if (cause instanceof AfterSaveHookError) {
+          setDialog(null);
+          showFailure(cause);
+          return;
+        }
+        useFormStore.getState().restoreSavePhase(formId, previous);
+        if (cause instanceof FormValidationError && summary.block()) {
+          setDialog(null);
+          return;
+        }
+        console.error('[tinacms] Could not make the branch:', cause);
+        setConfirmError('Couldn’t make the branch. Try again.');
+      }
+    );
+  };
+
   const run = useEffectEvent(() => {
     if (dialog || pending) return;
+    if (remembered.current) {
+      saveToProtected(remembered.current.request);
+      return;
+    }
     if (isBranchGone(useFormStore.getState().saves[formId])) {
       setPending(true);
       const failure = useFormStore.getState().saves[formId];
@@ -310,30 +408,13 @@ function SaveButton() {
     if (!dialog) return;
     const chosen = typed.trim();
     setRevealed(true);
-    if (!handler || branchNameError(chosen, taken, true)) return;
-    const request = { name: chosen, reason: dialog.reason, formId };
+    if (!view?.saveToNewBranch || branchNameError(chosen, taken, true)) return;
     if (dialog.reason === 'protected') {
       setDialog(null);
-      setPending(true);
-      handler(request)
-        .catch((cause) => showFailure(cause))
-        .finally(() => setPending(false));
+      saveToProtected({ name: chosen, from: dialog.branch });
       return;
     }
-    setSaving(true);
-    handler(request).then(
-      () => {
-        setSaving(false);
-        setDialog(null);
-        toast.dismiss(failedToastId);
-        useFormStore.getState().clearSavePhase(formId);
-      },
-      (cause) => {
-        console.error('[tinacms] Could not make the branch:', cause);
-        setSaving(false);
-        setConfirmError('Couldn’t make the branch. Try again.');
-      }
-    );
+    saveFromDeleted({ name: chosen, from: undefined });
   };
 
   const { blocked } = summary;
@@ -361,7 +442,9 @@ function SaveButton() {
       <SaveToBranchDialog
         open={dialog !== null}
         onOpenChange={(open) => {
-          if (!open) setDialog(null);
+          if (open) return;
+          setDialog(null);
+          remembered.current = null;
         }}
         reason={dialog?.reason}
         branch={dialog?.branch ?? ''}
@@ -374,7 +457,7 @@ function SaveButton() {
         }}
         error={nameError}
         saving={saving}
-        canSave={handler !== undefined}
+        canSave={view?.saveToNewBranch !== undefined}
         onSave={confirm}
         returnFocusTo={saveButton}
       />

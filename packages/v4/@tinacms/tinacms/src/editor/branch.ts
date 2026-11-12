@@ -79,6 +79,7 @@ export interface BranchView {
   /** Reads the branch list again after a failure. */
   retryList: () => void;
   switchTo: (name: string) => void;
+  saveToNewBranch: BranchSlice['saveToNewBranch'];
 }
 
 export function useBranchView(): BranchView | null {
@@ -106,5 +107,6 @@ export function useBranchView(): BranchView | null {
         },
       })),
     switchTo: slice.switchTo,
+    saveToNewBranch: slice.saveToNewBranch,
   };
 }
