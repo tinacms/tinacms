@@ -6,19 +6,30 @@ export interface SaveFailureWords {
   text: string;
   /** A local disk failure offers Retry and Dismiss, and has no close button. */
   disk: boolean;
+  /** The toast's main action. */
+  action: string;
 }
 
 const TRY_AGAIN = 'Your edits are kept. Try again in a few seconds.';
 
-const failure = (reason: string, text = TRY_AGAIN, disk = false) => ({
+const failure = (
+  reason: string,
+  text = TRY_AGAIN,
+  disk = false,
+  action = 'Retry'
+) => ({
   title: `Couldn't save. ${reason}`,
   text,
   disk,
+  action,
 });
 
 // The words the editor reads, from a fixed set keyed by the reason. Text the
 // server or a provider wrote never reaches the screen; the caller logs it.
-export function saveFailureWords(cause: unknown): SaveFailureWords {
+export function saveFailureWords(
+  cause: unknown,
+  defaultBranch?: string
+): SaveFailureWords {
   if (cause instanceof FormValidationError) {
     return failure(
       'Some fields are not valid.',
@@ -30,6 +41,7 @@ export function saveFailureWords(cause: unknown): SaveFailureWords {
       title: 'The document was saved. An afterSave hook failed.',
       text: 'Check the browser console for the reason.',
       disk: false,
+      action: 'Retry',
     };
   }
   if (cause instanceof ContentError) {
@@ -41,7 +53,12 @@ export function saveFailureWords(cause: unknown): SaveFailureWords {
           true
         );
       case 'branch-not-found':
-        return failure('The branch no longer exists.');
+        return failure(
+          'This branch no longer exists.',
+          `Your edits are kept. Save them to a new branch made from ${defaultBranch ?? 'the default branch'}.`,
+          false,
+          'Save to new branch'
+        );
       case 'not-indexed':
         return failure("This branch isn't ready yet.");
       case 'unauthorized':

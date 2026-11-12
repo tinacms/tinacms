@@ -6,6 +6,8 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+  merge_group:
+    types: [checks_requested]
   workflow_dispatch:
 
 permissions:
