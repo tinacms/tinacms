@@ -104,10 +104,9 @@ export interface FormStore {
   swapFailures: Partial<Record<FormId, number>>;
   /** Forms whose Resume prompt is hidden until the document opens again, after a failed Resume. */
   hidden: Partial<Record<FormId, true>>;
-  /** Forms whose Resume prompt showed and that the editor left. The prompt stays down until reload. */
-  offered: Partial<Record<FormId, true>>;
-  /** Records that the editor left a form while its Resume prompt showed. */
-  markOffered: (formId: FormId) => void;
+  /** Forms the editor left while copies waited. Their Resume prompt stays down until reload (ADR-026 §2). */
+  leftWithWaiting: Partial<Record<FormId, true>>;
+  markLeftWithWaiting: (formId: FormId) => void;
   /** Removes the live copy, every waiting copy and the in-memory edits. */
   discardStoredDraft: (formId: FormId) => void;
   /**
@@ -289,7 +288,7 @@ const DEVTOOLS_ACTION = {
   discardEdits: 'form/discardEdits',
   resumeWaiting: 'form/resumeWaiting',
   removeForm: 'form/removeForm',
-  markOffered: 'form/markOffered',
+  markLeftWithWaiting: 'form/markLeftWithWaiting',
 } as const;
 type DevtoolsActionLabel =
   (typeof DEVTOOLS_ACTION)[keyof typeof DEVTOOLS_ACTION];
@@ -316,16 +315,21 @@ export const useFormStore = create<FormStore>()(
         failures: {},
         swapFailures: {},
         hidden: {},
-        offered: {},
+        leftWithWaiting: {},
         active: null,
 
-        markOffered: (formId) =>
+        markLeftWithWaiting: (formId) =>
           apply((state) => {
-            if (state.offered[formId] || !state.waiting[formId]?.length) {
+            if (
+              state.leftWithWaiting[formId] ||
+              !state.waiting[formId]?.length
+            ) {
               return state;
             }
-            return { offered: { ...state.offered, [formId]: true } };
-          }, DEVTOOLS_ACTION.markOffered),
+            return {
+              leftWithWaiting: { ...state.leftWithWaiting, [formId]: true },
+            };
+          }, DEVTOOLS_ACTION.markLeftWithWaiting),
 
         discardStoredDraft: (formId) => {
           const { userId, branch } = readFormStore();
@@ -406,7 +410,7 @@ export const useFormStore = create<FormStore>()(
               failures: {},
               swapFailures: {},
               hidden: {},
-              offered: {},
+              leftWithWaiting: {},
               active: null,
             };
           }, DEVTOOLS_ACTION.setBranch),
@@ -449,7 +453,7 @@ export const useFormStore = create<FormStore>()(
               failures: {},
               swapFailures: {},
               hidden: {},
-              offered: {},
+              leftWithWaiting: {},
               active: null,
             };
           }, DEVTOOLS_ACTION.setUserId),
@@ -747,8 +751,9 @@ export const syncDrafts = () =>
     }
   });
 
-// A waiting copy equal to what the form holds offers nothing to Resume. The live
-// copy holds the same values, so removing the waiting copy loses nothing.
+// When every waiting copy equals what the form holds, Resume has nothing to add and
+// the live copy holds the same values. Dropping only some copies would let an older
+// copy outrank a newer one on Resume, so the copies go all together or not at all.
 const dropHeldWaiting = (
   formId: FormId,
   scope: EditedForm,
@@ -756,19 +761,14 @@ const dropHeldWaiting = (
   branch: string | undefined
 ) => {
   const waiting = readWaitingDrafts(formId, userId, branch);
-  const remaining = waiting.filter(
-    (copy) => !valuesEqual(toFormValues(copy.values), scope.values, scope.equal)
+  const held = waiting.every((copy) =>
+    valuesEqual(toFormValues(copy.values), scope.values, scope.equal)
   );
-  if (remaining.length === waiting.length) return;
-  if (storeFailed(writeWaitingDrafts(formId, remaining, userId, branch))) {
-    return;
-  }
+  if (waiting.length === 0 || !held) return;
+  if (storeFailed(writeWaitingDrafts(formId, [], userId, branch))) return;
   useFormStore.setState(
     (state) => ({
-      waiting:
-        remaining.length > 0
-          ? { ...state.waiting, [formId]: remaining }
-          : withoutKey(state.waiting, formId),
+      waiting: withoutKey(state.waiting, formId),
       draftsVersion: state.draftsVersion + 1,
     }),
     false,

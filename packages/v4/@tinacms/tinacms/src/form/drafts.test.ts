@@ -117,6 +117,32 @@ describe('form drafts', () => {
     expect(readDraft(postA)).toBeUndefined();
   });
 
+  it('drops the waiting copies once the form holds the same values', () => {
+    reloadWithEdit();
+    open();
+    typeTitle('Mine');
+    expect(waitingOf()).toEqual([]);
+    expect(readWaitingDrafts(postA)).toEqual([]);
+    expect(readDraft(postA)?.values).toEqual({
+      title: 'Mine',
+      summary: 'Same',
+    });
+  });
+
+  it('keeps every waiting copy when only the newest matches the form', () => {
+    reloadWithEdit('Older');
+    open();
+    typeTitle('Newer');
+    store.getState().setFieldValue(postA, summary, 'Changed');
+    simulateReload();
+    open();
+    expect(waitingOf()).toHaveLength(2);
+    typeTitle('Newer');
+    store.getState().setFieldValue(postA, summary, 'Changed');
+    expect(waitingOf()).toHaveLength(2);
+    expect(readWaitingDrafts(postA)).toHaveLength(2);
+  });
+
   it('row 3: a draft typed on an older file waits too', () => {
     reloadWithEdit();
     open({ [title]: 'Changed elsewhere', [summary]: 'Same' });
