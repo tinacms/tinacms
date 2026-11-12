@@ -302,6 +302,7 @@ function CollectionTableBody({
     open: boolean;
   } | null>(null);
   const afterDelete = useRef<string | null>(null);
+  const deleted = useRef(false);
   const headerRef = useRef<HTMLDivElement>(null);
   const newButton = useRef<HTMLButtonElement>(null);
 
@@ -341,12 +342,15 @@ function CollectionTableBody({
     (key: string): FocusTarget =>
     () =>
       triggerOfRow(key) ?? headingTarget();
-  const afterDeleteTarget: FocusTarget = () => {
-    const key = afterDelete.current;
-    if (key === null) return headingTarget();
-    const next = triggerOfRow(key)?.closest('tr')?.querySelector('button');
-    return next ?? headingTarget();
-  };
+  const afterDeleteTarget =
+    (rowKey: string): FocusTarget =>
+    () => {
+      if (!deleted.current) return afterRowAction(rowKey)();
+      const key = afterDelete.current;
+      if (key === null) return headingTarget();
+      const next = triggerOfRow(key)?.closest('tr')?.querySelector('button');
+      return next ?? headingTarget();
+    };
 
   const openDocument = (path: string) =>
     navigate({ view: 'document', collection, path });
@@ -389,6 +393,7 @@ function CollectionTableBody({
                 (candidate) => candidate.key === row.key
               );
               afterDelete.current = rows[index + 1]?.key ?? null;
+              deleted.current = false;
               open({ kind: 'delete', row });
             }}
           >
@@ -422,6 +427,7 @@ function CollectionTableBody({
               (candidate) => candidate.key === row.key
             );
             afterDelete.current = rows[index + 1]?.key ?? null;
+            deleted.current = false;
             open({ kind: 'delete-folder', row });
           }}
         >
@@ -778,9 +784,11 @@ function CollectionTableBody({
           referrersOf={actions.referrersOf}
           deleteDocument={actions.deleteDocument}
           onGone={() => void page.refetch()}
-          onDeleted={() => {}}
+          onDeleted={() => {
+            deleted.current = true;
+          }}
           onClose={close}
-          focusAfter={afterDeleteTarget}
+          focusAfter={afterDeleteTarget(row.key)}
         />
       );
     }
@@ -813,9 +821,11 @@ function CollectionTableBody({
         documentCount={row.folder.documentCount}
         draftCount={drafts.draftsUnder(row.folder.path)}
         deleteFolder={actions.deleteFolder}
-        onDeleted={() => {}}
+        onDeleted={() => {
+          deleted.current = true;
+        }}
         onClose={close}
-        focusAfter={afterDeleteTarget}
+        focusAfter={afterDeleteTarget(row.key)}
       />
     );
   }

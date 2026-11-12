@@ -163,6 +163,60 @@ describe('TinaCloud content slice', () => {
     ]);
   });
 
+  it('lists a folder scope filtered, sorted and paged, never a placeholder', async () => {
+    const paths = [
+      'content/posts/2024/.gitkeep.mdx',
+      'content/posts/2024/delta.mdx',
+      'content/posts/2024/alpha.mdx',
+      'content/posts/2024/charlie.mdx',
+      'content/posts/2024/bravo.mdx',
+      'content/posts/2024/skip.mdx',
+      'content/posts/root.mdx',
+    ];
+    const query = {
+      folder: '2024',
+      filter: 'a',
+      sort: { by: 'title', direction: 'asc' },
+      first: 2,
+    } as const;
+    stubTinaCloud(page(paths, null), page(paths, null));
+    const slice = content();
+    const first = await slice.list('post', query);
+    expect(nodesOf(first).map(({ path }) => path)).toEqual([
+      'content/posts/2024/alpha.mdx',
+      'content/posts/2024/bravo.mdx',
+    ]);
+    expect(first.totalCount).toBe(4);
+    expect(first.pageInfo.hasNextPage).toBe(true);
+    expect(first.folders).toEqual([]);
+    expect(JSON.stringify(first)).not.toContain('.gitkeep');
+
+    const second = await slice.list('post', {
+      ...query,
+      after: first.pageInfo.endCursor ?? undefined,
+    });
+    expect(nodesOf(second).map(({ path }) => path)).toEqual([
+      'content/posts/2024/charlie.mdx',
+      'content/posts/2024/delta.mdx',
+    ]);
+    expect(second.pageInfo.hasNextPage).toBe(false);
+  });
+
+  it('offers no structural operations, because TinaCloud has no such API', () => {
+    const slice = content();
+    for (const op of [
+      'create',
+      'rename',
+      'delete',
+      'referrers',
+      'createFolder',
+      'renameFolder',
+      'deleteFolder',
+    ]) {
+      expect(slice).not.toHaveProperty(op);
+    }
+  });
+
   it('refuses a page size above 200 as a ContentError', async () => {
     stubTinaCloud(page(['a.mdx'], null));
     await expect(content().list('post', { first: 500 })).rejects.toMatchObject({

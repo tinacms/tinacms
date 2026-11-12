@@ -11,6 +11,7 @@ import { SearchError } from '../core/search/contract';
 import { defineSearchPlugin } from '../plugins/search/search.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import { TinaProvider } from '../editor/provider';
+import { toFormId, useFormStore } from '../form/form-store';
 import { TinaAdmin } from './admin';
 import { SearchControl } from './search';
 import { connectionOf } from '../test/connection';
@@ -213,6 +214,31 @@ describe('the Search dialog content results', () => {
     ).toHaveTextContent(
       new RegExp(`^${expected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`)
     );
+  });
+
+  it('marks a hit whose document holds unsaved edits and no other', async () => {
+    useFormStore
+      .getState()
+      .storeNewDocumentDraft(toFormId('content/posts/hello.mdx'), {
+        title: 'Hello post',
+      });
+    const search = vi.fn(async () => [
+      hit('content/posts/hello.mdx'),
+      hit('content/posts/both.mdx'),
+    ]);
+    const user = userEvent.setup();
+    renderAdmin(searchProviderPlugin(search));
+    const dialog = await openSearch(user);
+    await user.type(within(dialog).getByRole('searchbox'), 'x');
+    const results = within(dialog).getByRole('list', {
+      name: 'Search results',
+    });
+    await waitFor(() =>
+      expect(within(results).getAllByRole('listitem')).toHaveLength(2)
+    );
+    const [edited, clean] = within(results).getAllByRole('listitem');
+    expect(within(edited).getByText('Unsaved')).toBeVisible();
+    expect(within(clean).queryByText('Unsaved')).toBeNull();
   });
 
   it('renders the Search control and its dialog with no content plugin, and never searches', async () => {

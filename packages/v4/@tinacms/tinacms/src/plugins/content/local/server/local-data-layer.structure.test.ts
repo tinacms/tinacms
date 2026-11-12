@@ -380,6 +380,36 @@ describe('folders', () => {
     expect(await exists('content/posts/series')).toBe(false);
   });
 
+  it.skipIf(isRoot)(
+    'leaves every file byte-identical when a referrer write fails during a folder rename',
+    async () => {
+      const refersToSeries = `---\ntitle: R\nrelated:\n  - content/posts/series/one.md\n---\n`;
+      await write('content/posts/refers.md', refersToSeries);
+      const snapshot = async () => {
+        const files = (await fs.readdir(rootDir, { recursive: true })).sort();
+        const out: Record<string, string> = {};
+        for (const file of files) {
+          const full = path.join(rootDir, file);
+          if ((await fs.stat(full)).isFile()) {
+            out[file] = await fs.readFile(full, 'utf8');
+          }
+        }
+        return out;
+      };
+      const before = await snapshot();
+      const referrer = path.join(rootDir, 'content/posts/refers.md');
+      await fs.chmod(referrer, 0o444);
+      try {
+        await expect(
+          layerWith().renameFolder('post', 'series', 'saga')
+        ).rejects.toThrow();
+      } finally {
+        await fs.chmod(referrer, 0o644);
+      }
+      expect(await snapshot()).toEqual(before);
+    }
+  );
+
   it('refuses a folder rename to another parent or a taken name', async () => {
     const layer = layerWith();
     await layer.createFolder('post', 'other');

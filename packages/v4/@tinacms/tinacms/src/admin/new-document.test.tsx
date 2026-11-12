@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import {
   ContentError,
@@ -10,7 +10,7 @@ import {
 } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
 import { toFormId, useFormStore } from '../form/form-store';
-import { readDraft } from '../form/drafts';
+import { readDraft, writeDraft } from '../form/drafts';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { connectionOf } from '../test/connection';
@@ -25,7 +25,9 @@ const update = vi.fn<ContentProvider['update']>();
 
 const provider: ContentProvider = {
   list: async () =>
-    connectionOf([...files.values()].map(({ path }) => ({ path }))),
+    connectionOf(
+      [...files.values()].map(({ document: _document, ...summary }) => summary)
+    ),
   get: async (_collection, path) => files.get(path) ?? null,
   update,
   create,
@@ -216,5 +218,117 @@ describe('the collection views', () => {
       name: 'Collections',
     });
     expect(collections).toHaveAttribute('aria-current', 'page');
+  });
+});
+
+describe('the table after a save and after Duplicate', () => {
+  beforeEach(() => {
+    vi.stubGlobal('matchMedia', (query: string) => {
+      const min = /min-width: (\d+)px/.exec(query);
+      return {
+        matches: min ? 1400 >= Number(min[1]) : false,
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      };
+    });
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('shows the new Last edited and Saved on the row after Back, without a reload', async () => {
+    const user = userEvent.setup();
+    files.set('content/posts/top.mdx', {
+      path: 'content/posts/top.mdx',
+      updatedAt: '2020-01-01T00:00:00Z',
+      document: { title: 'Top' },
+    });
+    update.mockImplementation(async (_collection, path, value) => {
+      const entry = {
+        path,
+        updatedAt: new Date().toISOString(),
+        document: value,
+      };
+      files.set(path, entry);
+      return entry;
+    });
+    window.location.hash = `#/collections/post/${encodeURIComponent('content/posts/top.mdx')}`;
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(update).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent('Saved')
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    const row = (
+      await screen.findByRole('button', { name: 'top.mdx' })
+    ).closest('tr');
+    if (!row) throw new Error('the document has no row');
+    await waitFor(() =>
+      expect(within(row).getByText('just now')).toBeVisible()
+    );
+    expect(within(row).getByText('Saved')).toBeVisible();
+    expect(within(row).queryByText('Unsaved')).toBeNull();
+  });
+
+  it('duplicates the saved original under a checked name and opens the copy unsaved', async () => {
+    const user = userEvent.setup();
+    files.set('content/posts/hello.mdx', {
+      path: 'content/posts/hello.mdx',
+      document: { title: 'Hello' },
+    });
+    files.set('content/posts/taken.mdx', {
+      path: 'content/posts/taken.mdx',
+      document: { title: 'Taken' },
+    });
+    writeDraft(toFormId('content/posts/hello.mdx'), {
+      values: { title: 'Unsaved edit' },
+      baseline: { title: 'Hello' },
+    });
+    window.location.hash = '#/collections/post';
+    renderAdmin();
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for hello.mdx' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Duplicate' })
+    );
+    const dialog = await screen.findByRole('dialog', { name: /Duplicate/ });
+    const box = within(dialog).getByRole('textbox', {
+      name: 'File name for the copy',
+    });
+    expect(box).toHaveValue('hello-copy');
+
+    await user.clear(box);
+    await user.type(box, 'taken');
+    await user.click(within(dialog).getByRole('button', { name: 'Duplicate' }));
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'A document or folder with that name already exists.'
+    );
+
+    await user.clear(box);
+    await user.type(box, '.hidden');
+    await user.click(within(dialog).getByRole('button', { name: 'Duplicate' }));
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'That name is not allowed.'
+    );
+    expect(window.location.hash).toBe('#/collections/post');
+
+    await user.clear(box);
+    await user.type(box, 'fresh');
+    await user.click(within(dialog).getByRole('button', { name: 'Duplicate' }));
+    await waitFor(() =>
+      expect(window.location.hash).toBe(
+        `#/collections/post/${encodeURIComponent('content/posts/fresh.mdx')}`
+      )
+    );
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello');
+    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    expect(create).not.toHaveBeenCalled();
+    expect(files.has('content/posts/fresh.mdx')).toBe(false);
   });
 });

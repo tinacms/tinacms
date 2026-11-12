@@ -150,7 +150,7 @@ const userMay = (auth: AuthSlice | null, permission: string): boolean => {
 
 export interface CollectionCapabilities {
   canCreateFolder: boolean;
-  /** The collection's switch only. New > Document stays disabled until its own change. */
+  /** The switch and the permission. New > Document stays disabled until its own change. */
   canCreateDocument: boolean;
   canRename: boolean;
   canDuplicate: boolean;
@@ -188,7 +188,8 @@ export const useCollectionCapabilities = (
       may(CONTENT_CREATE_PERMISSION) &&
       switches?.canCreateFolder !== false &&
       (folder === '' || switches?.canCreateNestedFolder !== false),
-    canCreateDocument: switches?.canCreate !== false,
+    canCreateDocument:
+      may(CONTENT_CREATE_PERMISSION) && switches?.canCreate !== false,
     canRename: content.rename !== undefined && may(CONTENT_RENAME_PERMISSION),
     canDuplicate:
       content.create !== undefined &&

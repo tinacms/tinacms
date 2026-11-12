@@ -159,23 +159,29 @@ describe('content slice', () => {
     });
   });
 
-  it('reads a refusal of a structural write into a ContentError with its code', async () => {
-    const harness = await createSliceHarness(null);
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () =>
-        Response.json(
-          { error: { code: 'name-taken', message: 'Taken.' } },
-          { status: 422 }
+  it.each(['name-taken', 'invalid-path', 'folder-not-owned', 'forbidden'])(
+    'reads a %s refusal of a structural write into a ContentError with that code',
+    async (code) => {
+      const harness = await createSliceHarness(null);
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () =>
+          Response.json(
+            { error: { code, message: 'Refused.' } },
+            { status: 422 }
+          )
         )
-      )
-    );
-    await expect(
-      harness
-        .slice()
-        .rename?.('post', 'content/posts/a.mdx', 'content/posts/b.mdx')
-    ).rejects.toMatchObject({ name: 'ContentError', code: 'name-taken' });
-  });
+      );
+      await expect(
+        harness
+          .slice()
+          .rename?.('post', 'content/posts/a.mdx', 'content/posts/b.mdx')
+      ).rejects.toMatchObject({
+        name: 'ContentError',
+        code,
+      });
+    }
+  );
 
   it('posts a delete op and resolves with nothing', async () => {
     const harness = await createSliceHarness(null);

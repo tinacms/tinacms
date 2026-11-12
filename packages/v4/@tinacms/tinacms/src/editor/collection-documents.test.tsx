@@ -193,8 +193,7 @@ describe('useCollectionCapabilities', () => {
       capabilities(provider(), { auth: signedIn(['editor']) }).canDelete
     ).toBe(true);
     const unknown = capabilities(provider(), { auth: signedIn(['guest']) });
-    expect(Object.values(unknown).filter(Boolean)).toEqual([true]);
-    expect(unknown.canCreateDocument).toBe(true);
+    expect(Object.values(unknown).filter(Boolean)).toEqual([]);
   });
 
   it('follows the allowedActions switches', () => {
