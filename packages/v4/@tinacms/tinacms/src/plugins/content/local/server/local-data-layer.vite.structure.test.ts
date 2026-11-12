@@ -338,6 +338,71 @@ describe('an update to a path with no file', () => {
     expect(onDisk('content/posts/new.mdx')).toBe(false);
   });
 
+  const routesOf = (path: string, value: object) =>
+    [
+      [
+        'the content endpoint',
+        DEFAULT_CONTENT_URL,
+        { op: 'update', collection: 'posts', path, value },
+      ],
+      [
+        'the content/update route',
+        '/api/tina/content/update',
+        { collection: 'posts', path, value },
+      ],
+    ] as const;
+
+  it.each(routesOf('content/posts/new.mdx', { title: 'New' }))(
+    'refuses %s with forbidden for admin when both create switches are off',
+    async (_name, route, body) => {
+      const routes = mount(
+        [authPlugin(false)],
+        [
+          {
+            ...POSTS,
+            allowedActions: { canCreate: false, canDuplicate: false },
+          },
+        ]
+      );
+      const res = await post(routes, route, body, 'admin');
+      expect(res.status).toBe(403);
+      expect(res.body.error.code).toBe('forbidden');
+      expect(onDisk('content/posts/new.mdx')).toBe(false);
+    }
+  );
+
+  it.each(routesOf('content/posts/.gitkeep.mdx', {}))(
+    'refuses %s with invalid-path for a missing name the rules refuse',
+    async (_name, route, body) => {
+      const routes = mount([authPlugin(true)]);
+      const res = await post(routes, route, body, 'creator');
+      expect(res.status).toBe(422);
+      expect(res.body.error.code).toBe('invalid-path');
+      expect(onDisk('content/posts/.gitkeep.mdx')).toBe(false);
+    }
+  );
+
+  it.each(routesOf('content/posts/deep/new.mdx', { title: 'New' }))(
+    'refuses %s when it would make a folder the switch forbids, writing nothing',
+    async (_name, route, body) => {
+      const routes = mount(
+        [authPlugin(true)],
+        [{ ...POSTS, allowedActions: { canCreateFolder: false } }]
+      );
+      const res = await post(routes, route, body, 'creator');
+      expect(res.status).toBe(403);
+      expect(onDisk('content/posts/deep/new.mdx')).toBe(false);
+    }
+  );
+
+  it.each(routesOf('content/posts/a.mdx', { title: 'Changed' }))(
+    'saves an existing file through %s for a role with content:save only',
+    async (_name, route, body) => {
+      const routes = mount([authPlugin(true)]);
+      expect((await post(routes, route, body, 'saver')).status).toBe(200);
+    }
+  );
+
   it('refuses a missing name the rules refuse with invalid-path', async () => {
     const routes = mount([]);
     const res = await content(routes, {
