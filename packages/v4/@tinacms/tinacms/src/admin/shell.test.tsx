@@ -1,18 +1,21 @@
 import { ImageIcon } from 'lucide-react';
+import { use, useEffect } from 'react';
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
-import type { BranchInfo } from '../core/branch/contract';
+import type { BranchInfo, BranchSlice } from '../core/branch/contract';
 import { currentBranchOf } from '../core/branch/contract';
 import { ContentError, type DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
+import { TinaRuntimeContext } from '../editor/context';
 import { draftKey } from '../form/drafts';
-import { toFormId } from '../form/form-store';
+import { toFormId, useFormStore } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 
@@ -21,13 +24,16 @@ type Mode = 'branches' | 'local' | 'none';
 const BRANCHES: BranchInfo[] = [
   { name: 'main', protected: true },
   { name: 'feature/news' },
+  { name: 'other' },
 ];
 
 const DATA: Record<string, DocumentEntry[]> = {
   main: [{ path: 'content/posts/hello.mdx', document: { title: 'Hello' } }],
   'feature/news': [
     { path: 'content/posts/breaking.mdx', document: { title: 'Breaking' } },
+    { path: 'content/posts/hello.mdx', document: { title: 'Hello' } },
   ],
+  other: [{ path: 'content/posts/hello.mdx', document: { title: 'Hello' } }],
 };
 
 let mode: Mode;
@@ -40,8 +46,19 @@ let listError: boolean;
 let listCalls: number;
 let failAfterSave: boolean;
 let updateError: Error | undefined;
+let listOmits: string | undefined;
+let holdNextList: Promise<void> | undefined;
 let heldDefault: Promise<void> | undefined;
 let duplicateLabels: boolean;
+let saveToNewBranch:
+  | ReturnType<typeof vi.fn<NonNullable<BranchSlice['saveToNewBranch']>>>
+  | undefined;
+let created: Record<string, DocumentEntry[]>;
+let switchCalls: string[];
+let beforeSaveCalls: number;
+let failBeforeSave: boolean;
+let stampBeforeSave: boolean;
+let dropAction: () => void;
 
 const contentPlugin = () =>
   definePlugin({
@@ -51,6 +68,7 @@ const contentPlugin = () =>
       default: {
         slice: (_set, get) => {
           const branch = () => currentBranchOf(get()) ?? 'main';
+          const entries = () => DATA[branch()] ?? created[branch()] ?? [];
           return {
             ...(mode === 'local' ? { local: true } : {}),
             ...(mode === 'branches'
@@ -58,8 +76,13 @@ const contentPlugin = () =>
                   branches: {
                     list: async () => {
                       listCalls += 1;
+                      const held = holdNextList;
+                      holdNextList = undefined;
+                      await held;
                       if (listError) throw new Error('offline');
-                      return BRANCHES;
+                      return BRANCHES.filter(
+                        (entry) => entry.name !== listOmits
+                      );
                     },
                     defaultBranch: async () => {
                       await heldDefault;
@@ -68,14 +91,10 @@ const contentPlugin = () =>
                   },
                 }
               : {}),
-            list: async () =>
-              (DATA[branch()] ?? []).map(({ path }) => ({ path })),
+            list: async () => entries().map(({ path }) => ({ path })),
             get: async (_collection: string, path: string) => {
               if (failGet) throw new Error('disk unreadable');
-              return (
-                (DATA[branch()] ?? []).find((entry) => entry.path === path) ??
-                null
-              );
+              return entries().find((entry) => entry.path === path) ?? null;
             },
             update: async (
               _collection: string,
@@ -103,7 +122,13 @@ const searchPlugin = definePlugin({
   client: async () => ({
     default: {
       slice: () => ({
-        search: async () => [{ ref: 'content/posts/hello.mdx' }],
+        search: async () => [
+          {
+            ref: { collection: 'post', path: 'content/posts/hello.mdx' },
+            score: 1,
+            snippet: '',
+          },
+        ],
       }),
     },
   }),
@@ -117,6 +142,11 @@ const auditPlugin = definePlugin({
     default: {
       hooks: {
         audit: () => ({
+          beforeSave: (document: TinaDocument) => {
+            beforeSaveCalls += 1;
+            if (failBeforeSave) throw new Error('audit refused');
+            return stampBeforeSave ? { ...document, audited: 'yes' } : document;
+          },
           afterSave: () => {
             if (failAfterSave) throw new Error('audit endpoint down');
           },
@@ -127,6 +157,48 @@ const auditPlugin = definePlugin({
 });
 
 const NotesScreen = () => <p>notes screen</p>;
+
+// Puts the fake `saveToNewBranch` on the core branch slice, and records `switchTo`.
+function BranchActionScreen() {
+  const runtime = use(TinaRuntimeContext);
+  useEffect(() => {
+    const action = saveToNewBranch;
+    if (!runtime || !action) return;
+    dropAction = () =>
+      runtime.store.setState((state) => ({
+        branch: { ...state.branch, saveToNewBranch: undefined },
+      }));
+    runtime.store.setState((state) => {
+      const original = state.branch?.switchTo;
+      return {
+        branch: {
+          ...state.branch,
+          saveToNewBranch: action,
+          switchTo: (name: string | undefined) => {
+            if (name) switchCalls.push(name);
+            if (typeof original === 'function') original(name);
+          },
+        },
+      };
+    });
+  }, [runtime]);
+  return <p>branch action screen</p>;
+}
+
+const branchActionPlugin = definePlugin({
+  name: 'test:branch-action',
+  client: async () => ({
+    default: {
+      screens: [
+        {
+          name: 'branch-action',
+          label: 'Branch action',
+          component: BranchActionScreen,
+        },
+      ],
+    },
+  }),
+});
 
 const screenPlugin = definePlugin({
   name: 'test:notes',
@@ -161,10 +233,12 @@ const renderAdmin = (projectName?: string) =>
           contentPlugin(),
           auditPlugin,
           screenPlugin,
+          branchActionPlugin,
           ...(duplicateLabels ? [duplicateScreenPlugin] : []),
           ...(searchEnabled ? [searchPlugin] : []),
           stringFieldPlugin,
           coreValidatorsPlugin,
+          homePlugin,
         ],
         ...(projectName ? { projectName } : {}),
         schema: {
@@ -193,6 +267,16 @@ const renderAdmin = (projectName?: string) =>
     />
   );
 
+// The default `main` is protected. Saves that should write straight through run on this one.
+const useUnprotectedBranch = () =>
+  localStorage.setItem(
+    'tina-store',
+    JSON.stringify({
+      state: { branch: { current: 'feature/news' } },
+      version: 0,
+    })
+  );
+
 const sidebarState = () =>
   document
     .querySelector('[data-slot=sidebar-wrapper] [data-slot=sidebar]')
@@ -215,8 +299,16 @@ beforeEach(() => {
   listCalls = 0;
   failAfterSave = false;
   updateError = undefined;
+  listOmits = undefined;
+  holdNextList = undefined;
   heldDefault = undefined;
   duplicateLabels = false;
+  saveToNewBranch = undefined;
+  created = {};
+  switchCalls = [];
+  beforeSaveCalls = 0;
+  failBeforeSave = false;
+  stampBeforeSave = false;
   window.location.hash = '';
 });
 
@@ -288,80 +380,6 @@ describe('Kept edits notice', () => {
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.click(screen.getByRole('button', { name: 'Home' }));
     expect(await screen.findByText('Still unsaved on main.')).toBeVisible();
-  });
-});
-
-describe('Home', () => {
-  it('lands on Home with the branch line and a card per collection', async () => {
-    renderAdmin();
-    expect(await screen.findByText('Branch main')).toBeVisible();
-    const list = screen.getByRole('list', { name: 'Collection cards' });
-    expect(within(list).getByText('Posts')).toBeVisible();
-    expect(await within(list).findByText('1 document')).toBeVisible();
-    expect(
-      within(list).getByRole('button', { name: 'New Posts document' })
-    ).toBeDisabled();
-    expect(screen.queryByRole('button', { name: /^Review/ })).toBeNull();
-  });
-
-  it('says Local files in local mode and leaves the branch out', async () => {
-    mode = 'local';
-    renderAdmin();
-    expect(
-      await screen.findByText(
-        'Local files: Tina writes edits straight to disk.'
-      )
-    ).toBeVisible();
-    expect(screen.queryByText(/^Branch /)).toBeNull();
-  });
-
-  it('offers Review N unsaved for edits kept in a stored draft after a reload', async () => {
-    localStorage.setItem(
-      draftKey(toFormId('content/posts/hello.mdx')),
-      JSON.stringify({
-        version: 2,
-        values: { title: 'Kept' },
-        baseline: { title: 'Hello' },
-      })
-    );
-    renderAdmin();
-    expect(
-      await screen.findByRole('button', { name: 'Review 1 unsaved' })
-    ).toBeVisible();
-  });
-
-  it('lets a long branch name wrap in its column instead of pushing Review off screen', async () => {
-    renderAdmin();
-    const line = await screen.findByText('Branch main');
-    const column = line.parentElement;
-    expect(column).toHaveClass('min-w-0', 'break-words');
-  });
-
-  it('opens the collection from its card', async () => {
-    const user = userEvent.setup();
-    renderAdmin();
-    await user.click(await screen.findByRole('button', { name: /^Posts/ }));
-    await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections/post')
-    );
-  });
-
-  it('offers Review N unsaved only while documents are unsaved, and opens them', async () => {
-    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
-    const user = userEvent.setup();
-    renderAdmin();
-    await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    await user.click(screen.getByRole('button', { name: 'Home' }));
-    await user.click(
-      await screen.findByRole('button', { name: 'Review 1 unsaved' })
-    );
-    await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections?unsaved')
-    );
-    const list = await screen.findByRole('list', { name: 'Unsaved documents' });
-    expect(
-      await within(list).findByRole('button', { name: /hello\.mdx/ })
-    ).toBeVisible();
   });
 });
 
@@ -570,6 +588,7 @@ describe('branches', () => {
     expect(lines.map((line) => line.textContent)).toEqual([
       'main',
       'feature/news',
+      'other',
     ]);
     expect(within(lines[0]).getByRole('button')).toHaveAttribute(
       'aria-current',
@@ -616,6 +635,7 @@ describe('branches', () => {
     expect(
       await screen.findByRole('button', { name: /hello\.mdx/ })
     ).toBeVisible();
+    expect(screen.queryByRole('button', { name: /breaking\.mdx/ })).toBeNull();
 
     await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
     await user.click(await screen.findByText('feature/news'));
@@ -623,7 +643,6 @@ describe('branches', () => {
     expect(
       await screen.findByRole('button', { name: /breaking\.mdx/ })
     ).toBeVisible();
-    expect(screen.queryByRole('button', { name: /hello\.mdx/ })).toBeNull();
     expect(
       await screen.findByRole('button', { name: /^Branch: feature\/news/ })
     ).toBeVisible();
@@ -726,18 +745,14 @@ describe('branches', () => {
         version: 0,
       })
     );
-    DATA['feature/news'].push({
-      path: 'content/posts/hello.mdx',
-      document: { title: 'Hello' },
-    });
     renderAdmin();
     expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello');
-    DATA['feature/news'].pop();
   });
 });
 
 describe('save state', () => {
   const openHello = async () => {
+    useUnprotectedBranch();
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     const user = userEvent.setup();
     renderAdmin();
@@ -807,8 +822,9 @@ describe('save state', () => {
     expect(updates).toHaveLength(1);
   });
 
-  it('says the branch no longer exists when the save is refused for a missing branch', async () => {
+  it('says the branch no longer exists, keeps the edits and offers a new branch instead of Retry', async () => {
     updateError = new ContentError('branch-not-found');
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
     const { user, input } = await openHello();
     await user.type(input, '!');
     await user.click(screen.getByRole('button', { name: 'Save' }));
@@ -818,6 +834,24 @@ describe('save state', () => {
       ).toBeVisible()
     );
     expect(input).toHaveValue('Hello!');
+    const dialog = await screen.findByRole('dialog', {
+      name: 'feature/news was deleted',
+    });
+    expect(
+      within(dialog).getByRole('textbox', { name: /New branch name/ })
+    ).toHaveValue('feature/news-2');
+    const toast = document.querySelector('[data-slot=toast]') as HTMLElement;
+    expect(toast).toHaveTextContent(
+      "Couldn't save. This branch no longer exists."
+    );
+    expect(toast).toHaveTextContent(
+      'Your edits are kept. Save them to a new branch made from main.'
+    );
+    expect(
+      within(toast).getByRole('button', { name: 'Save to new branch' })
+    ).toBeVisible();
+    expect(within(toast).queryByRole('button', { name: 'Retry' })).toBeNull();
+    errors.mockRestore();
   });
 
   it('names the document the last save wrote', async () => {
@@ -829,13 +863,58 @@ describe('save state', () => {
     );
   });
 
-  it('says the save failed when validation fails, in the toast and the Status bar, and leaves the form bar alone', async () => {
+  it('logs no "Save failed" line for a blocked save', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     const { user, input } = await openHello();
     await user.clear(input);
     await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    expect(
+      log.mock.calls.some(([first]) => String(first).includes('Save failed'))
+    ).toBe(false);
+    log.mockRestore();
+  });
+
+  it('reads Save failed after a later network failure, once the blocked save is fixed', async () => {
+    const { user, input } = await openHello();
+    await user.clear(input);
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    await user.type(input, 'Hello!');
+    updateError = new ContentError('network');
+    await user.click(await screen.findByRole('button', { name: 'Save' }));
     await waitFor(() =>
       expect(within(statusBar()).getByText('Save failed')).toBeVisible()
     );
+  });
+
+  it('keeps the earlier save entry of the document when its save blocks, so a newer save of another document stays the newest', async () => {
+    const { user, input } = await openHello();
+    useFormStore.getState().setSavePhase(toFormId('content/posts/hello.mdx'), {
+      phase: 'failed',
+      message: 'earlier failure',
+    });
+    useFormStore
+      .getState()
+      .setSavePhase(toFormId('content/posts/other.mdx'), { phase: 'saved' });
+    await user.clear(input);
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    expect(within(statusBar()).queryByText('Save failed')).toBeNull();
+    expect(within(statusBar()).getByText('Unsaved changes')).toBeVisible();
+    expect(
+      useFormStore.getState().saves[toFormId('content/posts/hello.mdx')]
+    ).toMatchObject({ phase: 'failed', message: 'earlier failure' });
+  });
+
+  it('does not call a blocked save a failed save in the Status bar', async () => {
+    const { user, input } = await openHello();
+    await user.clear(input);
+    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    expect(within(statusBar()).queryByText('Save failed')).toBeNull();
     expect(updates).toHaveLength(0);
     const form = screen.getByRole('complementary', { name: 'Document form' });
     expect(form.querySelector('[data-slot=form-bar] [role=alert]')).toBeNull();
@@ -844,11 +923,13 @@ describe('save state', () => {
 
 describe('toasts', () => {
   it('shows a failed save at bottom right with fixed words and Retry, and nothing in the form bar', async () => {
+    useUnprotectedBranch();
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    updateError = new ContentError('forbidden');
     const user = userEvent.setup();
     renderAdmin();
     const input = await screen.findByLabelText(/^Title\b/);
-    await user.clear(input);
+    await user.type(input, '!');
     await user.click(screen.getByRole('button', { name: /^Save/ }));
 
     const toast = await waitFor(() => {
@@ -857,11 +938,12 @@ describe('toasts', () => {
       return found;
     });
     expect(toast).toHaveTextContent(
-      "Couldn't save. Some fields are not valid."
+      "Couldn't save. You don't have permission to save."
     );
     expect(
       within(toast as HTMLElement).getByRole('button', { name: 'Retry' })
     ).toBeVisible();
+    expect(screen.queryByRole('complementary', { name: 'Errors' })).toBeNull();
     const toaster = toast?.closest('[data-sonner-toaster]');
     expect(toaster).toHaveAttribute('data-x-position', 'right');
     expect(toaster).toHaveAttribute('data-y-position', 'bottom');
@@ -920,7 +1002,7 @@ describe('document form panel', () => {
     expect(
       within(panel).getByRole('button', { name: 'Document actions' })
     ).toBeVisible();
-    expect(within(panel).getByRole('button', { name: 'Save' })).toBeDisabled();
+    expect(within(panel).getByRole('button', { name: /^Save/ })).toBeDisabled();
   });
 
   it('opens the Document actions above the bar, with a note that more come later', async () => {
@@ -960,5 +1042,624 @@ describe('panel headers', () => {
     ).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() => expect(window.location.hash).toBe('#/'));
+  });
+});
+
+describe('Save to new branch', () => {
+  const helloHash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+  const openHello = async () => {
+    const user = userEvent.setup();
+    if (saveToNewBranch) {
+      window.location.hash = '#/screens/branch-action';
+      renderAdmin();
+      await screen.findByText('branch action screen');
+      act(() => {
+        window.location.hash = helloHash;
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+    } else {
+      window.location.hash = helloHash;
+      renderAdmin();
+    }
+    const input = await screen.findByLabelText(/^Title\b/);
+    return { user, input };
+  };
+  // Resolves like a provider that makes the branch and writes the document in one request.
+  const withAction = () => {
+    saveToNewBranch = vi.fn(async ({ name, path, value }) => {
+      created[name] = [{ path, document: value }];
+      return { path, document: value };
+    });
+    return saveToNewBranch;
+  };
+  const statusBar = () =>
+    screen.getByRole('contentinfo', { name: 'Status bar' });
+  const toastShown = () => document.querySelector('[data-slot=toast]');
+  const openProtectedDialog = async () => {
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await pressSave(user);
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Save to a new branch',
+    });
+    return { user, input, dialog };
+  };
+  const discardEdits = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+    );
+    await user.click(await screen.findByRole('button', { name: 'Discard' }));
+  };
+  const pressSave = (user: ReturnType<typeof userEvent.setup>) =>
+    user.click(
+      within(
+        document.querySelector('[data-slot=form-bar]') as HTMLElement
+      ).getByRole('button', { name: /^Save/ })
+    );
+  const nameField = (dialog: HTMLElement) =>
+    within(dialog).getByRole('textbox', { name: /New branch name/ });
+
+  it('reads Save to new branch on a protected branch, even when clean, and Save elsewhere', async () => {
+    await openHello();
+    expect(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    ).toBeDisabled();
+  });
+
+  it('reads Save in Local files', async () => {
+    mode = 'local';
+    await openHello();
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+
+  it('opens the dialog with a name from the document and writes nothing', async () => {
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    );
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Save to a new branch',
+    });
+    expect(nameField(dialog)).toHaveValue('docs/hello-edits');
+    await waitFor(() => expect(nameField(dialog)).toHaveFocus());
+    expect(dialog).toHaveTextContent('main is protected');
+    expect(dialog).toHaveTextContent('“Hello!”');
+    expect(updates).toHaveLength(0);
+  });
+
+  it('turns an invalid Save to new branch into Resolve, with no toast or dialog, then opens the dialog once fixed', async () => {
+    const { user, input } = await openHello();
+    await user.clear(input);
+    await user.click(
+      await screen.findByRole('button', { name: /^Save to new branch/ })
+    );
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    expect(document.querySelector('[data-slot=toast]')).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    const status = screen.getByRole('contentinfo', { name: 'Status bar' });
+    expect(within(status).queryByText('Save failed')).toBeNull();
+    expect(within(status).getByText('Unsaved changes')).toBeVisible();
+    await user.type(input, 'Fixed');
+    await user.click(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    );
+    expect(
+      await screen.findByRole('dialog', { name: 'Save to a new branch' })
+    ).toBeVisible();
+    expect(updates).toHaveLength(0);
+  });
+
+  it('flags a taken name at the field and, with no action, keeps the main action off; Cancel changes nothing', async () => {
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    );
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Save to a new branch',
+    });
+    await user.clear(nameField(dialog));
+    await user.type(nameField(dialog), 'feature/news');
+    expect(within(dialog).getByRole('alert')).toHaveTextContent(
+      'A branch called feature/news already exists. Pick another name.'
+    );
+    expect(nameField(dialog)).toHaveAttribute('aria-invalid', 'true');
+    expect(within(dialog).getByRole('button', { name: 'Save' })).toBeDisabled();
+    await user.clear(nameField(dialog));
+    await user.type(nameField(dialog), 'docs/free{Enter}');
+    expect(screen.getByRole('dialog')).toBeVisible();
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(input).toHaveValue('Hello!');
+    expect(beforeSaveCalls).toBe(0);
+    expect(updates).toHaveLength(0);
+    expect(switchCalls).toHaveLength(0);
+    expect(
+      screen.getByRole('button', { name: 'Save to new branch' })
+    ).toHaveFocus();
+  });
+
+  it('saves to the new branch in one call with the beforeSave change, then switches to it', async () => {
+    stampBeforeSave = true;
+    let finish: () => void = () => {};
+    const action = withAction();
+    const resolved = action.getMockImplementation();
+    action.mockImplementationOnce(async (request) => {
+      await new Promise<void>((resolve) => {
+        finish = resolve;
+      });
+      return (
+        resolved?.(request) ?? { path: request.path, document: request.value }
+      );
+    });
+    const { user, dialog } = await openProtectedDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Save to new branch' })
+      ).toHaveFocus()
+    );
+    expect(action).toHaveBeenCalledOnce();
+    expect(action).toHaveBeenCalledWith({
+      name: 'docs/hello-edits',
+      from: 'main',
+      collection: 'post',
+      path: 'content/posts/hello.mdx',
+      value: expect.objectContaining({ title: 'Hello!', audited: 'yes' }),
+    });
+    await act(async () => finish());
+    await waitFor(() => expect(switchCalls).toEqual(['docs/hello-edits']));
+    expect(
+      await screen.findByRole('button', { name: /^Branch: docs\/hello-edits/ })
+    ).toBeVisible();
+    expect(await screen.findByRole('button', { name: 'Save' })).toBeDisabled();
+    expect(updates).toHaveLength(0);
+  });
+
+  it('keeps the editor on the protected branch with the edits when the action rejects, and Retry sends the same call', async () => {
+    const action = withAction();
+    action.mockRejectedValueOnce(new Error('pr failed'));
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { user, input, dialog } = await openProtectedDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(toastShown()).not.toBeNull());
+    const toast = toastShown() as HTMLElement;
+    expect(toast).toHaveTextContent("Couldn't save. Something went wrong.");
+    expect(errors).toHaveBeenCalled();
+    expect(switchCalls).toHaveLength(0);
+    expect(screen.getByRole('button', { name: /^Branch: main/ })).toBeVisible();
+    expect(input).toHaveValue('Hello!');
+    expect(within(statusBar()).getByText('Save failed')).toBeVisible();
+    await user.click(within(toast).getByRole('button', { name: 'Retry' }));
+    await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(action.mock.calls[1]?.[0]).toMatchObject({
+      name: 'docs/hello-edits',
+      from: 'main',
+    });
+    await waitFor(() => expect(switchCalls).toEqual(['docs/hello-edits']));
+    await waitFor(() => expect(toastShown()).toBeNull());
+    expect(updates).toHaveLength(0);
+    errors.mockRestore();
+  });
+
+  it.each([
+    ['docs/hello-edits', 'A branch called docs/hello-edits already exists.'],
+    [
+      'docs',
+      'A branch called docs already exists, so docs/hello-edits can’t be used.',
+    ],
+  ])(
+    'reopens the dialog from Retry when %s was made since, instead of resending the name',
+    async (made, reason) => {
+      const action = withAction();
+      action.mockRejectedValueOnce(new Error('name taken'));
+      const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const { user, input, dialog } = await openProtectedDialog();
+      await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+      await waitFor(() => expect(toastShown()).not.toBeNull());
+      BRANCHES.push({ name: made });
+      try {
+        await user.click(
+          within(toastShown() as HTMLElement).getByRole('button', {
+            name: 'Retry',
+          })
+        );
+        const reopened = await screen.findByRole('dialog', {
+          name: 'Save to a new branch',
+        });
+        expect(nameField(reopened)).toHaveValue('docs/hello-edits');
+        expect(within(reopened).getByRole('alert')).toHaveTextContent(reason);
+        expect(action).toHaveBeenCalledTimes(1);
+        await waitFor(() => expect(toastShown()).toBeNull());
+        await user.clear(nameField(reopened));
+        await user.type(nameField(reopened), 'hello-fix');
+        await user.click(
+          within(reopened).getByRole('button', { name: 'Save' })
+        );
+        await waitFor(() => expect(switchCalls).toEqual(['hello-fix']));
+        expect(action.mock.calls[1]?.[0]).toMatchObject({
+          name: 'hello-fix',
+          from: 'main',
+        });
+        expect(input).toHaveValue('Hello!');
+      } finally {
+        BRANCHES.pop();
+        errors.mockRestore();
+      }
+    }
+  );
+
+  it('opens the dialog from Retry once the action is gone, instead of a silent success', async () => {
+    const action = withAction();
+    action.mockRejectedValueOnce(new Error('pr failed'));
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { user, dialog } = await openProtectedDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(toastShown()).not.toBeNull());
+    act(() => dropAction());
+    await user.click(
+      within(toastShown() as HTMLElement).getByRole('button', { name: 'Retry' })
+    );
+    expect(
+      await screen.findByRole('dialog', { name: 'Save to a new branch' })
+    ).toBeVisible();
+    expect(action).toHaveBeenCalledOnce();
+    expect(updates).toHaveLength(0);
+    errors.mockRestore();
+  });
+
+  it('never calls the action when a beforeSave hook rejects, and keeps the form dirty', async () => {
+    const action = withAction();
+    failBeforeSave = true;
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { user, input, dialog } = await openProtectedDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(toastShown()).not.toBeNull());
+    expect(action).not.toHaveBeenCalled();
+    expect(switchCalls).toHaveLength(0);
+    expect(input).toHaveValue('Hello!');
+    expect(
+      screen.getByRole('button', { name: 'Save to new branch' })
+    ).toBeEnabled();
+    errors.mockRestore();
+  });
+
+  it('opens the dialog again after Discard, instead of resending a failed call', async () => {
+    const action = withAction();
+    action.mockRejectedValueOnce(new Error('pr failed'));
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { user, input, dialog } = await openProtectedDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(toastShown()).not.toBeNull());
+    await discardEdits(user);
+    await user.type(input, '?');
+    await pressSave(user);
+    expect(
+      await screen.findByRole('dialog', { name: 'Save to a new branch' })
+    ).toBeVisible();
+    expect(action).toHaveBeenCalledOnce();
+    errors.mockRestore();
+  });
+
+  it('shows the after-save failure on the new branch, and its Retry saves there without the action', async () => {
+    const action = withAction();
+    failAfterSave = true;
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { user, dialog } = await openProtectedDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(switchCalls).toEqual(['docs/hello-edits']));
+    await waitFor(() =>
+      expect(toastShown()).toHaveTextContent(
+        'The document was saved. An afterSave hook failed.'
+      )
+    );
+    failAfterSave = false;
+    await user.type(await screen.findByLabelText(/^Title\b/), '?');
+    await user.click(
+      within(toastShown() as HTMLElement).getByRole('button', { name: 'Retry' })
+    );
+    await waitFor(() => expect(updates).toHaveLength(1));
+    expect(updates[0]?.branch).toBe('docs/hello-edits');
+    expect(action).toHaveBeenCalledOnce();
+    errors.mockRestore();
+  });
+
+  it('names the empty-name reason on Enter and on the main action, with an action', async () => {
+    const action = withAction();
+    const { user, dialog } = await openProtectedDialog();
+    await user.clear(nameField(dialog));
+    await user.keyboard('{Enter}');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'Enter a branch name.'
+    );
+    expect(nameField(dialog)).toHaveAttribute('aria-invalid', 'true');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    expect(within(dialog).getByRole('alert')).toHaveTextContent(
+      'Enter a branch name.'
+    );
+    expect(action).not.toHaveBeenCalled();
+  });
+
+  it('names the empty-name reason with no action, where the main action is off', async () => {
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    );
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Save to a new branch',
+    });
+    await user.clear(nameField(dialog));
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'Enter a branch name.'
+    );
+    expect(nameField(dialog)).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('leaves no Save failed once the fields are fixed and the dialog opens', async () => {
+    const { user, input } = await openHello();
+    await user.clear(input);
+    await user.click(
+      await screen.findByRole('button', { name: /^Save to new branch/ })
+    );
+    await screen.findByRole('button', { name: 'Resolve 1 error' });
+    await user.type(input, 'Fixed');
+    await user.click(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    );
+    await screen.findByRole('dialog', { name: 'Save to a new branch' });
+    expect(document.querySelector('[data-slot=toast]')).toBeNull();
+    const bar = document.querySelector('[data-slot=form-bar]') as HTMLElement;
+    expect(bar).not.toHaveTextContent('Save failed');
+  });
+
+  it('holds Save while the action runs, so it runs once', async () => {
+    let finish: () => void = () => {};
+    const action = withAction();
+    action.mockImplementationOnce(async ({ path, value }) => {
+      await new Promise<void>((resolve) => {
+        finish = resolve;
+      });
+      return { path, document: value };
+    });
+    const { user, input } = await openHello();
+    await user.type(input, '!');
+    await user.click(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    );
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Save to a new branch',
+    });
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await pressSave(user);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(action).toHaveBeenCalledOnce();
+    await act(async () => finish());
+  });
+
+  describe('when the branch was deleted', () => {
+    const failOnce = async () => {
+      useUnprotectedBranch();
+      updateError = new ContentError('branch-not-found');
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      const { user, input } = await openHello();
+      await user.type(input, '!');
+      await pressSave(user);
+      const dialog = await screen.findByRole('dialog', {
+        name: 'feature/news was deleted',
+      });
+      listOmits = 'feature/news';
+      return { user, dialog };
+    };
+
+    afterEach(() => vi.restoreAllMocks());
+
+    it('removes the branch-gone toast after Discard, and its action never writes', async () => {
+      const { user, dialog } = await failOnce();
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await discardEdits(user);
+      await waitFor(() => expect(toastShown()).toBeNull());
+      expect(updates).toHaveLength(0);
+    });
+
+    it.each(['other', 'main'])(
+      'removes the branch-gone toast after switching to %s',
+      async (target) => {
+        const { user, dialog } = await failOnce();
+        await user.click(
+          within(dialog).getByRole('button', { name: 'Cancel' })
+        );
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+        await discardEdits(user);
+        await user.click(
+          await screen.findByRole('button', { name: /^Branch:/ })
+        );
+        const branches = await screen.findByRole('dialog', {
+          name: 'Branches',
+        });
+        await user.click(within(branches).getByText(target));
+        await waitFor(() => expect(toastShown()).toBeNull());
+        expect(updates).toHaveLength(0);
+      }
+    );
+
+    it('reopens the dialog from Save without writing again', async () => {
+      const { user, dialog } = await failOnce();
+      updateError = undefined;
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await pressSave(user);
+      expect(
+        await screen.findByRole('dialog', { name: 'feature/news was deleted' })
+      ).toBeVisible();
+      expect(updates).toHaveLength(0);
+    });
+
+    it('saves on the current branch with no dialog once the branch is back', async () => {
+      const { user, dialog } = await failOnce();
+      listOmits = undefined;
+      updateError = undefined;
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await pressSave(user);
+      await waitFor(() => expect(updates).toHaveLength(1));
+      expect(updates[0]?.branch).toBe('feature/news');
+      expect(screen.queryByRole('dialog')).toBeNull();
+      await waitFor(() => expect(toastShown()).toBeNull());
+    });
+
+    it('saves on the current branch from the toast action once the branch is back', async () => {
+      const { user, dialog } = await failOnce();
+      listOmits = undefined;
+      updateError = undefined;
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await user.click(
+        within(toastShown() as HTMLElement).getByRole('button', {
+          name: 'Save to new branch',
+        })
+      );
+      await waitFor(() => expect(updates).toHaveLength(1));
+      expect(updates[0]?.branch).toBe('feature/news');
+      expect(screen.queryByRole('dialog')).toBeNull();
+      await waitFor(() => expect(toastShown()).toBeNull());
+    });
+
+    it('does not resume a held restore check after Discard and a switch to a protected branch', async () => {
+      const { user, dialog } = await failOnce();
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      listOmits = undefined;
+      updateError = undefined;
+      let release: () => void = () => {};
+      holdNextList = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      await pressSave(user);
+      await discardEdits(user);
+      await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+      const branches = await screen.findByRole('dialog', { name: 'Branches' });
+      await user.click(within(branches).getByText('main'));
+      await waitFor(() => expect(toastShown()).toBeNull());
+      act(() => release());
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(updates).toHaveLength(0);
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
+    it('forgets the failure after a switch: Save takes its normal route on the new branch', async () => {
+      const { user, dialog } = await failOnce();
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await user.click(
+        screen.getByRole('button', { name: 'Document actions' })
+      );
+      await user.click(
+        await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+      );
+      await user.click(await screen.findByRole('button', { name: 'Discard' }));
+      await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+      const branches = await screen.findByRole('dialog', { name: 'Branches' });
+      await user.click(within(branches).getByText('main'));
+      await user.type(await screen.findByLabelText(/^Title\b/), '!');
+      const bar = document.querySelector('[data-slot=form-bar]') as HTMLElement;
+      await user.click(
+        await within(bar).findByRole('button', { name: 'Save to new branch' })
+      );
+      expect(
+        await screen.findByRole('dialog', { name: 'Save to a new branch' })
+      ).toBeVisible();
+      expect(screen.queryByRole('dialog', { name: /was deleted/ })).toBeNull();
+      expect(updates).toHaveLength(0);
+    });
+
+    it('shows Saving and ignores Cancel while the action runs, then closes the dialog and the toast on the new branch', async () => {
+      let finish: () => void = () => {};
+      const action = withAction();
+      action.mockImplementationOnce(async ({ name, path, value }) => {
+        await new Promise<void>((resolve) => {
+          finish = resolve;
+        });
+        created[name] = [{ path, document: value }];
+        return { path, document: value };
+      });
+      const { user, dialog } = await failOnce();
+      await user.click(
+        within(dialog).getByRole('button', { name: 'Save to new branch' })
+      );
+      expect(
+        await within(dialog).findByRole('button', { name: 'Saving' })
+      ).toBeVisible();
+      expect(
+        within(dialog).getByRole('button', { name: 'Cancel' })
+      ).toBeDisabled();
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('dialog')).toBeVisible();
+      expect(toastShown()).not.toBeNull();
+      expect(action).toHaveBeenCalledOnce();
+      expect(action.mock.calls[0]?.[0]).toMatchObject({
+        name: 'feature/news-2',
+        from: undefined,
+        path: 'content/posts/hello.mdx',
+      });
+      await act(async () => finish());
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(toastShown()).toBeNull());
+      expect(switchCalls).toEqual(['feature/news-2']);
+      expect(
+        await screen.findByRole('button', { name: /^Branch: feature\/news-2/ })
+      ).toBeVisible();
+      expect(
+        await screen.findByRole('button', { name: 'Save' })
+      ).toBeDisabled();
+      expect(updates).toHaveLength(0);
+    });
+
+    it('keeps the dialog, the toast and branch-gone when the action rejects, and resends the same call', async () => {
+      const action = withAction();
+      action.mockRejectedValueOnce(new Error('nope'));
+      action.mockRejectedValueOnce(new Error('nope again'));
+      const { user, dialog } = await failOnce();
+      await user.click(
+        within(dialog).getByRole('button', { name: 'Save to new branch' })
+      );
+      expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+        'Couldn’t make the branch. Try again.'
+      );
+      // Outlasts the toast's exit animation, so a dismissed toast is gone.
+      await act(() => new Promise((resolve) => setTimeout(resolve, 500)));
+      expect(toastShown()).toHaveTextContent(
+        "Couldn't save. This branch no longer exists."
+      );
+      expect(
+        within(statusBar()).getByText('Save failed: branch no longer exists')
+      ).toBeVisible();
+      expect(switchCalls).toHaveLength(0);
+      await user.click(
+        within(dialog).getByRole('button', { name: 'Save to new branch' })
+      );
+      await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
+      expect(action.mock.calls[1]?.[0]).toMatchObject({
+        name: 'feature/news-2',
+        from: undefined,
+      });
+      await within(dialog).findByRole('alert');
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await pressSave(user);
+      expect(
+        await screen.findByRole('dialog', { name: 'feature/news was deleted' })
+      ).toBeVisible();
+      expect(updates).toHaveLength(0);
+      expect(switchCalls).toHaveLength(0);
+    });
   });
 });

@@ -83,6 +83,9 @@ const contentSaveInputSchema = z.object({
 
 const documentEntrySchema = z.object({
   path: z.string(),
+  title: z.string().optional(),
+  updatedAt: z.string().optional(),
+  lastAuthor: z.object({ name: z.string() }).optional(),
   document: z.record(z.string(), z.unknown()),
 });
 
@@ -158,6 +161,11 @@ export const createServerSave =
     );
     const entry: DocumentEntry = {
       path: written.path,
+      title: written.title,
+      updatedAt: written.updatedAt,
+      lastAuthor: written.lastAuthor
+        ? { name: written.lastAuthor.name }
+        : undefined,
       document: written.document,
     };
     const hookWarnings: string[] = [];

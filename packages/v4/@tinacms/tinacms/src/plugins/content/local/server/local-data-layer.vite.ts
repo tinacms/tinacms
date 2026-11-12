@@ -330,6 +330,7 @@ const createMediaHandler = (
       }
       const body = await readRequestBody(req);
       const result = await dispatchMediaRequest(media, JSON.parse(body));
+      if (result) onUpload(result.path);
       res.setHeader('content-type', 'application/json');
       res.end(JSON.stringify(result));
     } catch (cause) {
@@ -574,7 +575,7 @@ export const tinaLocalDataLayerVitePlugin = (
       if (media) {
         // Vite serves a new public/ file only once its file watcher reports it,
         // so a site that loads an image straight after its upload gets a 404.
-        // Serve the files this server uploaded until then.
+        // Serve the files this server uploaded or moved until then.
         const uploaded = new Set<string>();
         const uploadsRoute = `/${options.mediaRoot ?? DEFAULT_MEDIA_ROOT}/`;
         server.middlewares.use(async (req, res, next) => {

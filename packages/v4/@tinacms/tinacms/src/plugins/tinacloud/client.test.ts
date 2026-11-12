@@ -117,12 +117,32 @@ describe('listBranches', () => {
       json([{ name: 'main', protected: true }, { name: 'feature/news' }])
     );
     expect(await client().listBranches()).toEqual([
-      { name: 'main', protected: true },
-      { name: 'feature/news', protected: undefined },
+      { name: 'main', protected: true, pullRequestUrl: undefined },
+      { name: 'feature/news', protected: undefined, pullRequestUrl: undefined },
     ]);
     expect(fetchMock.mock.calls[0][0]).toBe(
       `${TINACLOUD_CONTENT_URL}/github/abc/list_branches`
     );
+  });
+
+  it("keeps a branch's pull request URL and treats an empty one as none", async () => {
+    stubFetch(
+      json([
+        {
+          name: 'feature/news',
+          githubPullRequestUrl: 'https://github.com/acme/site/pull/12',
+        },
+        { name: 'main', githubPullRequestUrl: '' },
+      ])
+    );
+    expect(await client().listBranches()).toEqual([
+      {
+        name: 'feature/news',
+        protected: undefined,
+        pullRequestUrl: 'https://github.com/acme/site/pull/12',
+      },
+      { name: 'main', protected: undefined, pullRequestUrl: undefined },
+    ]);
   });
 
   it('rejects a list in an unknown shape', async () => {

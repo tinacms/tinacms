@@ -22,6 +22,7 @@ The files are in `plugins/fields/image/`:
 | `image-tile.tsx` | The tile of the single image, the cover and each gallery item |
 | `image-gallery.view.tsx`, `image-gallery.ui.tsx` | The gallery view and its container |
 | `image-preview.ts` | The preview URL with retry-then-missing |
+| `image-upload.ts` | `useImageUpload`: the upload state of the field, read from the upload list |
 | `image-field.states.ts` | Every look, for sign-off and tests |
 | `image-field.plugin.ts` | The manifest, `tina:field:image` |
 
@@ -173,18 +174,102 @@ Replace keeps the old value. Refer to
 
 ### Uploading
 
-An author drops a file on the field. The field checks the file with
-`uploadRulesOf(extensionsForCategory('image'))` and the `features.maxSize` of
-the provider. It then calls `media.upload(file)` and stores the path that the
-provider returns. The picker dialog has its own upload button.
+An author drops a file on the field. The field sends the first file of the
+drop to the upload list of the admin, and the file goes to the media root.
+The upload list is the same list that the Media pane and the picker use, so
+the file also shows under the Upload button. Refer to
+[Upload](./media-manager.md). The picker dialog has its own upload button.
 
-During the upload, the drop area shows a busy state and further drops are
-ignored. A rejected file or a failed upload shows its message through
-`FieldWrapper`. For a `MediaError`, the message is the sentence for the
-author, not the technical `detail`.
+The field reads its upload state from the upload list by form and by field
+address (`useImageUpload` in `image-upload.ts`). It does not keep this state
+in the component. A form level that closes and opens again shows the same
+state.
 
-When `features.readOnly` is set, the drop area shows no prompt and ignores
-drops. An author can still choose, replace and remove.
+The document's form writes the value when the file lands. The field does not
+write it. The field fills when the author is in another field, or when the
+form level is closed. The document then reads as edited. When the document
+closes, or the author discards or resumes edits, before the file lands, the
+form gets no value. The file is still in Media.
+
+The drop states:
+
+| State | What the field shows |
+|---|---|
+| Uploading | The picture area with a veil, a spinner and "Uploading 40%". The number is at most 99. A provider that reports no progress shows "Uploading". The field ignores a second drop. |
+| Failed | The name of the file and the reason under the field as an error. A Retry button sits beside "Choose from Media". The field stays empty. |
+| Failed, no Retry | A file that is not an image, a file over `features.maxSize`, an upload that the storage did not confirm and a missing permission show the name of the file and the reason, and no Retry. The field reads the type of a file from its extension when the media type table knows the extension, and from the type that the browser reports for any other extension. A file type that the storage does not accept also shows the reason and no Retry. |
+| Name was taken | The field holds the numbered path. A muted note under the file name says "hero.jpg was taken, saved as hero-1.jpg". |
+
+An error about a file starts with the name of that file: "hero.jpg: Couldn't
+upload. Check your connection, then retry." For a `MediaError`, the reason is
+the sentence for the author, not the technical `detail`.
+
+Choose from Media, a new drop and Remove clear a failure.
+
+The note goes when another image takes the field, when the field is cleared,
+and when a new upload for the field starts. A new upload starts on a drop on
+the empty field, and on Replace in the confirm. The note does not come back
+when that upload fails or is cancelled.
+
+When the branch changes, the field stops showing its upload. A file that was
+sending bytes lands in Media on the branch it started on. No form gets a
+value.
+
+### Replacing by a drop
+
+When an author drags a file over a field that has an image, the tile says
+"Drop to replace". On the drop, a confirm asks "Replace hero.jpg?".
+
+- Cancel keeps the value and sends nothing. Focus returns to the field.
+- Replace uploads the file. The old image stays under the veil until the new
+  file lands. Then the field takes the new path. A taken-name note about the
+  old image goes at once.
+- When the upload fails, the field keeps the old image. The name of the file
+  that failed, the reason and Retry show under the field.
+
+The field never deletes the old file from Media.
+
+Focus stays in the confirm while it is open. The confirm, the picker dialog
+and the Save to new branch dialog are portals, and React sends their focus
+events through the row of the field. The first focus event activates the
+field. The field does not take focus on that activation while focus is in a
+dialog that the field is not in.
+
+### When the field turns a drop away
+
+The field refuses a drop and says why in words. It sends no request.
+
+| Cause | Words |
+|---|---|
+| A save runs | "Saving. You can upload once it finishes." The drop area shows this for the length of the save. |
+| The storage is read-only (`features.readOnly`) | "This storage is read-only. Files can't be uploaded here." |
+| An upload was refused for this branch and this user | "You don't have permission to upload." |
+
+The field shows the last two reasons only while a file is dragged over it, or
+after a refused drop. An author can still choose, replace and remove.
+
+A disabled or read-only field takes no drop. It shows no "Drop to replace"
+and no Retry, and it still shows its value. An invalid field keeps its red
+border while a file is dragged over it.
+
+### Protected branch
+
+On a protected branch, a drop opens the Save to new branch dialog, the same
+dialog that the Media pane uses for an upload. The field sends nothing before
+Continue. Cancel returns focus to the field.
+
+The outcome of the branch step shows under the field as its error:
+
+- "Couldn't make the branch. Try again." has a Retry button. Retry runs the
+  branch step again.
+- "Couldn't switch to the new branch. Nothing was uploaded." has no Retry.
+
+When the switch to the new branch replaces the form of the document, the file
+goes to Media and no form gets a value.
+
+The field renders `<UploadHost />`. The host draws the dialog and one polite
+status for the page. A form with no `TinaAdmin` above it has both, one time
+only.
 
 ### Missing images
 
@@ -264,7 +349,7 @@ with a crop. Refer to [media.md](./media.md#rendering-media-on-the-site).
 - It stores the path of a picked image, and replaces a stored image.
 - It stores the path that an upload returns, rejects a file that is not an
   image, and shows the message of a failed upload.
-- It shows no upload control when the provider is read-only.
+- It shows no drop prompt when the provider is read-only.
 - It clears an optional image, and shows no clear button on a required one.
 - It retries an image that fails to load with a new URL, marks an image that
   never loads as missing, and keeps the value.
@@ -275,5 +360,28 @@ with a crop. Refer to [media.md](./media.md#rendering-media-on-the-site).
 - It passes a stored path through ingest and digest without a change, and
   digests a cleared image as absent.
 - It examines the metadata of the descriptor and the `media` dependency.
+
+`image-field.uploads.test.tsx` runs the field in the real form provider with
+a media stub whose uploads the test controls. It does these tests:
+
+- It shows the progress, fills the field when the file lands, and refuses a
+  file that is not an image or that is too large.
+- It fills the field after the author moves to another field or closes the
+  form level, and writes nothing after a close, a discard or a resume.
+- It shows a failure with the name of the file and Retry, and clears it on a
+  pick, a drop or a remove.
+- It shows the taken-name note, and keeps it across a closed form level. The
+  note goes when Replace is confirmed, and it does not come back.
+- It asks before a drop replaces an image, and keeps the old image on Cancel
+  and on a failed upload.
+- It keeps focus in the replace confirm, in the picker and in the Save to new
+  branch dialog.
+- It writes no field when the branch changes while the file is sending.
+- It turns a drop away during a save, on read-only storage and after a refused
+  upload.
+- It fills the correct item of an object and of a list, also after an insert,
+  a move or a remove.
+- It opens the Save to new branch dialog on a protected branch, and shows the
+  outcome of the branch step under the field.
 
 `admin/field-labels.test.tsx` checks that the row label names the group.

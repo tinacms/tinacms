@@ -41,10 +41,23 @@ export {
   type MediaErrorCode,
   type MediaSlice,
   type MediaStatus,
+  type MediaUploadOptions,
   type MediaUrlOptions,
   type ResolveMediaUrl,
 } from './core/media/contract';
 export { resolveMediaUrl } from './core/media/resolve-media-url';
+export {
+  SearchError,
+  type SearchErrorCode,
+  type SearchHit,
+  type SearchProvider,
+  type SearchQuery,
+  type SearchRef,
+} from './core/search/contract';
+export {
+  defineSearchPlugin,
+  searchIndex,
+} from './plugins/search/search.plugin';
 export type { AdminScreen, AdminScreenProps } from './core/screen/contract';
 export {
   type Capability,

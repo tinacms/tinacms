@@ -3,6 +3,10 @@ import type { FieldDescriptor, ValidatorFactory } from './field/contract';
 import type { FormHookFactory, ServerHookFactory } from './form/hooks';
 import { invariant } from './invariant';
 import type { MediaManifest } from './media/contract';
+import type {
+  SearchFields,
+  SearchIndexProvider,
+} from './search/index-contract';
 import type { AdminScreen } from './screen/contract';
 import type { SlotContributions } from './slot/contract';
 
@@ -64,9 +68,15 @@ export type SliceSet = (
   action?: string
 ) => void;
 
+/** What the store passes a slice from the config. A slice that needs none ignores it. */
+export interface SliceConfig {
+  rpcUrl: string;
+}
+
 export type ClientSlice = (
   set: SliceSet,
-  get: StoreApi<TinaStoreState>['getState']
+  get: StoreApi<TinaStoreState>['getState'],
+  config?: SliceConfig
 ) => SliceState;
 
 export interface ClientSegment {
@@ -96,7 +106,10 @@ export interface ClientSegment {
 export type ServerOp = (input: never) => Promise<unknown>;
 
 export interface ServerSegment {
-  [op: string]: ServerOp | Record<string, ServerHookFactory>;
+  [op: string]:
+    | ServerOp
+    | Record<string, ServerHookFactory>
+    | SearchIndexProvider;
   /**
    * One `ServerHookFactory` for each name the manifest declares in
    * `serverHooks`. Reserved: it is never routed as an op.
@@ -107,6 +120,11 @@ export interface ServerSegment {
    * caller sent. Reserved: it is never routed as an op.
    */
   resolveBranch?: (branch: string | undefined) => Promise<string | undefined>;
+  /**
+   * On a `search` provider built with `defineSearchPlugin`: the index writes
+   * core calls in-process. Reserved: it is never routed as an op.
+   */
+  searchIndex?: SearchIndexProvider;
 }
 
 export interface ResolvedServerSegment {
@@ -155,6 +173,10 @@ export const resolveClientSegments = async (
   return resolved;
 };
 
+export interface SearchManifest {
+  fields: SearchFields;
+}
+
 export interface PluginManifestInput {
   name: string;
   provides?: Capability[];
@@ -180,6 +202,8 @@ export interface PluginManifestInput {
   serverHooks?: string[];
   /** Set by a plugin that provides `media`. */
   media?: MediaManifest;
+  /** Set by `defineSearchPlugin`, so codegen checks the fields without loading plugin code. */
+  search?: SearchManifest;
   client?: () => Promise<{ default: ClientSegment }>;
   server?: () => Promise<{ default: ServerSegment }>;
   // TODO(ADR-008 §3): type `permissions` against codegen's Permission union once it lands.
