@@ -4,7 +4,22 @@ const GIT_REFUSED = /\.\.|\/\/|^[-/]|(^|\/)\.|\.lock(\/|$)|^HEAD$/;
 export const BRANCH_NAME_HINT =
   'Letters, numbers, dashes, dots and slashes. No spaces.';
 
-/** Why a branch name cannot be used, or undefined when it can. The match against `taken` is exact. */
+/**
+ * The branch in `taken` that blocks `name`, or undefined. Git keeps a branch as a file under its
+ * path, so `docs` and `docs/foo` can't both exist. The match is case-sensitive.
+ */
+export const takenBy = (
+  name: string,
+  taken: readonly string[]
+): string | undefined =>
+  taken.find(
+    (branch) =>
+      branch === name ||
+      branch.startsWith(`${name}/`) ||
+      name.startsWith(`${branch}/`)
+  );
+
+/** Why a branch name cannot be used, or undefined when it can. */
 export const branchNameError = (
   name: string,
   taken: readonly string[],
@@ -21,8 +36,12 @@ export const branchNameError = (
   ) {
     return 'Use letters, numbers, dashes, dots and slashes only, and don’t end with a slash or a dot.';
   }
-  if (taken.includes(name)) {
+  const blocker = takenBy(name, taken);
+  if (blocker === name) {
     return `A branch called ${name} already exists. Pick another name.`;
+  }
+  if (blocker !== undefined) {
+    return `A branch called ${blocker} already exists, so ${name} can’t be used. Pick another name.`;
   }
   return undefined;
 };
@@ -42,15 +61,19 @@ export const branchNameFromPath = (path: string): string => {
 
 /**
  * `base` when it is free, else the first free `base-2`, `base-3`... With `suffixed`, `base`
- * itself is never returned, so `x` with `x-2` taken gives `x-3`.
+ * itself is never returned, so `x` with `x-2` taken gives `x-3`. When a branch at a parent path
+ * of `base` exists, no suffix is free, so the first candidate comes back and the name check flags it.
  */
 export const freeName = (
   base: string,
   taken: readonly string[],
   { suffixed = false }: { suffixed?: boolean } = {}
 ): string => {
-  if (!suffixed && !taken.includes(base)) return base;
+  if (!suffixed && takenBy(base, taken) === undefined) return base;
+  if (taken.some((branch) => base.startsWith(`${branch}/`))) {
+    return suffixed ? `${base}-2` : base;
+  }
   let number = 2;
-  while (taken.includes(`${base}-${number}`)) number += 1;
+  while (takenBy(`${base}-${number}`, taken) !== undefined) number += 1;
   return `${base}-${number}`;
 };

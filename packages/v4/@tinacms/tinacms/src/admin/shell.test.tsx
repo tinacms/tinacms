@@ -1248,6 +1248,53 @@ describe('Save to new branch', () => {
     errors.mockRestore();
   });
 
+  it.each([
+    ['docs/hello-edits', 'A branch called docs/hello-edits already exists.'],
+    [
+      'docs',
+      'A branch called docs already exists, so docs/hello-edits can’t be used.',
+    ],
+  ])(
+    'reopens the dialog from Retry when %s was made since, instead of resending the name',
+    async (made, reason) => {
+      const action = withAction();
+      action.mockRejectedValueOnce(new Error('name taken'));
+      const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const { user, input, dialog } = await openProtectedDialog();
+      await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+      await waitFor(() => expect(toastShown()).not.toBeNull());
+      BRANCHES.push({ name: made });
+      try {
+        await user.click(
+          within(toastShown() as HTMLElement).getByRole('button', {
+            name: 'Retry',
+          })
+        );
+        const reopened = await screen.findByRole('dialog', {
+          name: 'Save to a new branch',
+        });
+        expect(nameField(reopened)).toHaveValue('docs/hello-edits');
+        expect(within(reopened).getByRole('alert')).toHaveTextContent(reason);
+        expect(action).toHaveBeenCalledTimes(1);
+        await waitFor(() => expect(toastShown()).toBeNull());
+        await user.clear(nameField(reopened));
+        await user.type(nameField(reopened), 'hello-fix');
+        await user.click(
+          within(reopened).getByRole('button', { name: 'Save' })
+        );
+        await waitFor(() => expect(switchCalls).toEqual(['hello-fix']));
+        expect(action.mock.calls[1]?.[0]).toMatchObject({
+          name: 'hello-fix',
+          from: 'main',
+        });
+        expect(input).toHaveValue('Hello!');
+      } finally {
+        BRANCHES.pop();
+        errors.mockRestore();
+      }
+    }
+  );
+
   it('opens the dialog from Retry once the action is gone, instead of a silent success', async () => {
     const action = withAction();
     action.mockRejectedValueOnce(new Error('pr failed'));

@@ -14,6 +14,7 @@ import {
   branchNameError,
   branchNameFromPath,
   freeName,
+  takenBy,
 } from '@tinacms/ui/lib/branch-name';
 import {
   type ReactNode,
@@ -169,6 +170,7 @@ function SaveButton() {
   const [revealed, setRevealed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [confirmError, setConfirmError] = useState<string>();
+  const [reread, setReread] = useState<readonly string[]>([]);
   const saveButton = useRef<HTMLButtonElement>(null);
   // A failed protected save to a new branch. Retry sends it again while the
   // form's save phase is still the failure it recorded (ADR-018 §2).
@@ -185,7 +187,10 @@ function SaveButton() {
     view.listState === 'ready' &&
     branchName !== undefined &&
     view.branches.some((entry) => entry.name === branchName && entry.protected);
-  const listed = view?.branches.map((entry) => entry.name) ?? [];
+  const listed = [
+    ...(view?.branches.map((entry) => entry.name) ?? []),
+    ...reread,
+  ];
   const taken =
     dialog?.reason === 'deleted'
       ? listed.filter((entry) => entry !== dialog.branch)
@@ -208,15 +213,21 @@ function SaveButton() {
     };
   }, [failedToastId]);
 
-  const openDialog = (reason: DialogState['reason'], branch: string) => {
+  const openDialog = (
+    reason: DialogState['reason'],
+    branch: string,
+    refused?: string
+  ) => {
     const defaultName =
-      reason === 'deleted'
-        ? freeName(
-            branch,
-            listed.filter((entry) => entry !== branch),
-            { suffixed: true }
-          )
-        : freeName(branchNameFromPath(scope?.path ?? ''), listed);
+      refused !== undefined
+        ? refused
+        : reason === 'deleted'
+          ? freeName(
+              branch,
+              listed.filter((entry) => entry !== branch),
+              { suffixed: true }
+            )
+          : freeName(branchNameFromPath(scope?.path ?? ''), listed);
     setName(defaultName);
     setRevealed(false);
     setConfirmError(undefined);
@@ -278,11 +289,17 @@ function SaveButton() {
   };
 
   // Query the provider again. The cached branch list can be out of date.
-  const branchIsBack = () =>
+  const readBranchNames = (): Promise<string[] | undefined> =>
     content?.branches?.list().then(
-      (list) => list.some((entry) => entry.name === branchName),
-      () => false
-    ) ?? Promise.resolve(false);
+      (list) => list.map((entry) => entry.name),
+      () => undefined
+    ) ?? Promise.resolve(undefined);
+
+  const branchIsBack = () =>
+    readBranchNames().then(
+      (names) =>
+        branchName !== undefined && names?.includes(branchName) === true
+    );
 
   const saveHere = () => {
     setPending(true);
@@ -392,7 +409,23 @@ function SaveButton() {
   const run = useEffectEvent(() => {
     if (dialog || pending) return;
     if (remembered.current && view?.saveToNewBranch) {
-      saveToProtected(remembered.current.request);
+      const { request, failure } = remembered.current;
+      const startedOn = branchName;
+      setPending(true);
+      readBranchNames().then((names) => {
+        const stale =
+          remembered.current?.request !== request ||
+          useFormStore.getState().saves[formId] !== failure ||
+          currentBranch.current !== startedOn;
+        if (stale) {
+          setPending(false);
+        } else if (names && takenBy(request.name, names) !== undefined) {
+          setPending(false);
+          setReread(names);
+          toast.dismiss(failedToastId);
+          openDialog('protected', startedOn ?? '', request.name);
+        } else saveToProtected(request);
+      });
       return;
     }
     remembered.current = null;
