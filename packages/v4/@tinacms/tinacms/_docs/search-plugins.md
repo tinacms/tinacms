@@ -331,6 +331,50 @@ drops a hit whose document is gone, and shows the title and the
 snippet of the others. The title is the `title` of the entry, else the `title` value of the document, else the path. A hit does not open the document. Without a search
 plugin, the dialog still finds screens.
 
+## TinaCloud
+
+Two limits come first:
+
+- TinaCloud does not index v4 projects yet. A v4 project's TinaCloud index
+  stays empty until TinaCloud indexes v4 content.
+- There is no anonymous search. TinaCloud search needs the token of a signed-in
+  editor. A website visitor has no token, so the search fails with
+  `unavailable`.
+
+`tinaCloud()` provides `search` when you pass the `search` option. Without the
+option, `tinaCloud()` provides no search and a search box does not show.
+
+```ts
+tinaCloud({
+  clientId,
+  search: { fields: { post: { title: 1, body: 1 } } },
+});
+```
+
+`fields` has the same shape as in `defineSearchPlugin`, and codegen checks it
+the same way. The keys decide which collections a request can name and which
+hits the provider keeps. List every collection that TinaCloud indexes. A hit
+for a collection that is not in `fields` is dropped. The weights are unused.
+
+- The provider reads TinaCloud's index of the default branch only.
+- TinaCloud indexes itself. `tinaCloud()` registers no `searchIndex` hook, and
+  a collection that lists `searchIndex()` fails codegen.
+- `tinacms search reindex` writes nothing for TinaCloud.
+- Every `snippet` is empty. TinaCloud returns no snippet.
+- A request for two or more collections, or with `filters`, fails with
+  `unsupported`. One collection, or all collections, works.
+- A page with a `cursor` reads the first 1,000 results of TinaCloud. You
+  cannot page past the 1,000th result.
+- A hit for a collection with no `path` is dropped.
+- The first page can hold fewer than `limit` hits when TinaCloud returns hits
+  that the provider drops. Paging with the cursor of the last hit still
+  reaches the end.
+- Another plugin that overrides `auth` gets no search: the provider never
+  sends another provider's token to TinaCloud.
+- The RPC handler needs the `schema`, or the search fails with
+  `backend-failure`.
+- To use another search plugin, give it `overrides: [{ capability: 'search' }]`.
+
 ## A plugin without the helper
 
 A plugin can provide `search` with a hand-written slice that has a `search`

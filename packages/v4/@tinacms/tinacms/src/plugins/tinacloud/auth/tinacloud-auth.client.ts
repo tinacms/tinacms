@@ -257,6 +257,11 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     return (await freshTokens(tokens))?.bearer;
   };
 
+  // For search: another plugin's auth, or a signed-out editor, sends no token
+  // and the server refuses the query, instead of the invariant content and media throw.
+  const tinaCloudTokenIfMounted = async (): Promise<string | undefined> =>
+    mounted ? tinaCloudToken() : undefined;
+
   const signInWith = async (next: TinaCloudTokens, signOutsAtStart: number) => {
     const identity = await fetchProjectIdentity(clientId, next.bearer);
     if (signOuts !== signOutsAtStart) return;
@@ -338,5 +343,5 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     };
   };
 
-  return { slice, tinaCloudToken };
+  return { slice, tinaCloudToken, tinaCloudTokenIfMounted };
 };

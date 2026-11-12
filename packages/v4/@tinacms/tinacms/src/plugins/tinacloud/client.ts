@@ -28,7 +28,7 @@ const branchListSchema = z.array(
   })
 );
 
-const projectSchema = z.object({
+export const projectSchema = z.object({
   defaultBranch: z.string().optional(),
   mediaBranch: z.string().optional(),
 });

@@ -142,7 +142,9 @@ export const createRpcHandler = ({
 
 const composeServerSegments = async (
   plugins: PluginManifest[]
-): Promise<Omit<ServerRuntime, 'destroy'> & { hooks: ServerHookRegistry }> => {
+): Promise<
+  Omit<ServerRuntime, 'destroy' | 'collections'> & { hooks: ServerHookRegistry }
+> => {
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
   const hooks = createServerHookRegistry(plugins, resolved);
@@ -198,7 +200,7 @@ const composeServerRuntime = async (
   // replaced rather than ending with the process — a dev server re-evaluating its
   // route module — would otherwise run every onInit again with no matching onDestroy.
   const destroy = await initializePlugins(plugins);
-  return { ...composed, destroy };
+  return { ...composed, collections: schema?.collections ?? [], destroy };
 };
 
 // Runs no onInit, so a getSession must not depend on state that onInit sets.
@@ -206,7 +208,11 @@ const lazyRuntimeOf = (plugins: PluginManifest[]) => {
   let composing: Promise<ServerRuntime> | null = null;
   return (): Promise<ServerRuntime> => {
     composing ??= composeServerSegments(plugins).then(
-      (composed) => ({ ...composed, destroy: async () => {} }),
+      (composed) => ({
+        ...composed,
+        collections: [],
+        destroy: async () => {},
+      }),
       (cause) => {
         composing = null;
         throw cause;
