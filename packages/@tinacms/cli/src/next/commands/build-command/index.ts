@@ -216,7 +216,7 @@ export class BuildCommand extends BaseCommand {
     }
     let server: ViteDevServer | undefined;
     // Initialize the host TCP server
-    createDBServer(Number(this.datalayerPort));
+    await createDBServer(Number(this.datalayerPort));
     const database = await createAndInitializeDatabase(
       configManager,
       Number(this.datalayerPort)

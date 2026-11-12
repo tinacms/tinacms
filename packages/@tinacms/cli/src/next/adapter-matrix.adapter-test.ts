@@ -8,7 +8,6 @@
 // normal Node module lookup.
 
 import * as path from 'path';
-import { once } from 'events';
 import type { Server } from 'net';
 import { fileURLToPath } from 'url';
 import fs from 'fs-extra';
@@ -78,8 +77,7 @@ describe.each(adaptersToRun)(
       await fs.ensureDir(cacheDir);
 
       if (adapter.kind === 'tina-client') {
-        server = createDBServer(0);
-        await once(server, 'listening');
+        server = await createDBServer(0);
         const address = server.address();
         if (typeof address !== 'object' || address === null) {
           throw new Error(

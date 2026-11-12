@@ -17,13 +17,11 @@ export class TinaLevelClient extends ManyLevelGuest<
   }
   public openConnection() {
     if (this._connected) return;
-    // The datalayer server may not be listening yet when this runs — the CLI
-    // calls `createServer().listen()` and connects this client without
-    // waiting for `listen()` to complete. If the connection fails,
-    // ManyLevelGuest silently queues every operation forever, which presents
-    // as an indefinite "Indexing local files" hang. Retry the connection,
-    // and if it truly can't be established, destroy the RPC stream so queued
-    // operations reject (LEVEL_CONNECTION_LOST) instead of hanging.
+    // The datalayer server may not be reachable yet when this runs. If the
+    // connection fails, ManyLevelGuest silently queues every operation forever,
+    // which presents as an indefinite "Indexing local files" hang. Retry the
+    // connection, and if it truly can't be established, destroy the RPC stream
+    // so queued operations reject (LEVEL_CONNECTION_LOST) instead of hanging.
     const rpcStream = this.createRpcStream();
     const tryConnect = (attempt: number) => {
       const socket = connect(this.port);
