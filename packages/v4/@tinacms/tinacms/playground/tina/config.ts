@@ -6,6 +6,7 @@ import {
   definePlugin,
   localContentPlugin,
   localMediaPlugin,
+  mediaManagerPlugin,
   t,
 } from '@tinacms/tinacms';
 
@@ -55,6 +56,6 @@ export const pageCollection = {
 } satisfies CollectionSchema;
 
 export default defineConfig({
-  plugins: [localContentPlugin(), localMediaPlugin()],
+  plugins: [localContentPlugin(), localMediaPlugin(), mediaManagerPlugin()],
   schema: { collections: [postCollection, pageCollection] },
 });

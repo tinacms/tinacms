@@ -7,7 +7,6 @@ import {
   ClapperboardIcon,
   CopyIcon,
   FileIcon,
-  TextCursorInputIcon,
 } from 'lucide-react';
 import { absoluteUrlOf, isImage, isVideo, mediaNameOf } from './media-types';
 
@@ -72,15 +71,11 @@ export function MediaPreview({
   resolveUrl,
   onClose,
   onInsert,
-  onRename,
-  onDelete,
 }: {
   item: MediaItem;
   resolveUrl: (path: string, options?: MediaUrlOptions) => string;
   onClose: () => void;
-  onInsert: ((item: MediaItem) => void) | null;
-  onRename: (() => void) | null;
-  onDelete: (() => void) | null;
+  onInsert: (item: MediaItem) => void;
 }) {
   const name = mediaNameOf(item.path);
   const Icon = isVideo(name) ? ClapperboardIcon : FileIcon;
@@ -116,27 +111,10 @@ export function MediaPreview({
       )}
       <CopyField value={absoluteUrlOf(resolveUrl(item.path))} />
       <div className='mt-auto flex w-full flex-wrap gap-2'>
-        {onInsert ? (
-          <Button
-            variant='primary'
-            type='button'
-            onClick={() => onInsert(item)}
-          >
-            <ArrowDownToLineIcon className='size-4' />
-            Insert
-          </Button>
-        ) : null}
-        {onRename ? (
-          <Button type='button' variant='outline' onClick={onRename}>
-            <TextCursorInputIcon className='size-4' />
-            Rename
-          </Button>
-        ) : null}
-        {onDelete ? (
-          <Button type='button' variant='destructive' onClick={onDelete}>
-            Delete
-          </Button>
-        ) : null}
+        <Button variant='primary' type='button' onClick={() => onInsert(item)}>
+          <ArrowDownToLineIcon className='size-4' />
+          Insert
+        </Button>
       </div>
     </aside>
   );

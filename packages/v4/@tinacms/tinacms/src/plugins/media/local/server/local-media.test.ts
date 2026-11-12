@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createLocalMedia, type LocalMedia } from './local-media';
 
 let rootDir: string;
@@ -147,5 +147,132 @@ describe('local media delete', () => {
     await expect(media.delete('../../secret.txt')).rejects.toMatchObject({
       code: 'invalid-path',
     });
+  });
+});
+
+describe('local media rename', () => {
+  const seed = async (name: string, text = 'bytes') => {
+    await media.save(fileOf(name, text));
+  };
+
+  it('moves a file into another folder and returns the new path', async () => {
+    await seed('a.png', 'one');
+    await fs.mkdir(uploads('posts'), { recursive: true });
+    expect(await media.rename('a.png', 'posts/b.png')).toBe('posts/b.png');
+    expect(await fs.readFile(uploads('posts/b.png'), 'utf8')).toBe('one');
+    await expect(fs.access(uploads('a.png'))).rejects.toThrow();
+  });
+
+  it('reports a missing source as not-found', async () => {
+    await fs.mkdir(uploads(), { recursive: true });
+    await expect(media.rename('missing.png', 'b.png')).rejects.toMatchObject({
+      code: 'not-found',
+    });
+  });
+
+  it('reports a missing target folder as not-found and creates none', async () => {
+    await seed('a.png');
+    await expect(media.rename('a.png', 'new/b.png')).rejects.toMatchObject({
+      code: 'not-found',
+    });
+    await expect(fs.access(uploads('new'))).rejects.toThrow();
+    expect(await fs.readFile(uploads('a.png'), 'utf8')).toBe('bytes');
+  });
+
+  it('refuses to move a folder', async () => {
+    await fs.mkdir(uploads('posts'), { recursive: true });
+    await expect(media.rename('posts', 'other')).rejects.toMatchObject({
+      code: 'unsupported',
+    });
+  });
+
+  it('refuses to move a symlink', async () => {
+    await seed('a.png');
+    await fs.symlink(uploads('a.png'), uploads('link.png'));
+    await expect(media.rename('link.png', 'b.png')).rejects.toMatchObject({
+      code: 'unsupported',
+    });
+  });
+
+  it('refuses a target file name that save would refuse', async () => {
+    await seed('a.png');
+    await expect(media.rename('a.png', 'a\\b.png')).rejects.toMatchObject({
+      code: 'invalid-name',
+    });
+    await expect(fs.access(uploads('a.png'))).resolves.toBeUndefined();
+  });
+
+  it('refuses a target that is a file, and leaves it untouched', async () => {
+    await seed('a.png', 'one');
+    await seed('b.png', 'two');
+    await expect(media.rename('a.png', 'b.png')).rejects.toMatchObject({
+      code: 'name-taken',
+    });
+    expect(await fs.readFile(uploads('b.png'), 'utf8')).toBe('two');
+    expect(await fs.readFile(uploads('a.png'), 'utf8')).toBe('one');
+  });
+
+  it('refuses a target that is a folder', async () => {
+    await seed('a.png');
+    await fs.mkdir(uploads('posts'), { recursive: true });
+    await expect(media.rename('a.png', 'posts')).rejects.toMatchObject({
+      code: 'name-taken',
+    });
+  });
+
+  it('refuses a target that is a symlink, even a dangling one', async () => {
+    await seed('a.png');
+    await fs.symlink(uploads('nowhere'), uploads('dangling'));
+    await expect(media.rename('a.png', 'dangling')).rejects.toMatchObject({
+      code: 'name-taken',
+    });
+    expect((await fs.lstat(uploads('dangling'))).isSymbolicLink()).toBe(true);
+  });
+
+  it('refuses a target that appears after the checks', async () => {
+    await seed('a.png', 'one');
+    const link = fs.link.bind(fs);
+    const spy = vi.spyOn(fs, 'link').mockImplementation(async (from, to) => {
+      await fs.writeFile(to, 'raced');
+      return link(from, to);
+    });
+    await expect(media.rename('a.png', 'b.png')).rejects.toMatchObject({
+      code: 'name-taken',
+    });
+    spy.mockRestore();
+    expect(await fs.readFile(uploads('b.png'), 'utf8')).toBe('raced');
+    expect(await fs.readFile(uploads('a.png'), 'utf8')).toBe('one');
+  });
+
+  it.each(['../../secret.txt', '/etc/passwd', '%2e%2e/%2e%2e/secret.txt'])(
+    'refuses the path %j as source and as target',
+    async (outside) => {
+      await seed('a.png');
+      await fs.writeFile(path.join(rootDir, 'secret.txt'), 'secret');
+      const source = outside.startsWith('%')
+        ? decodeURIComponent(outside)
+        : outside;
+      await expect(media.rename(source, 'b.png')).rejects.toMatchObject({
+        code: 'invalid-path',
+      });
+      await expect(media.rename('a.png', source)).rejects.toMatchObject({
+        code: 'invalid-path',
+      });
+    }
+  );
+
+  it('refuses a source or target inside a symlinked folder', async () => {
+    await seed('a.png');
+    const outside = path.join(rootDir, 'outside');
+    await fs.mkdir(outside);
+    await fs.writeFile(path.join(outside, 'x.png'), 'x');
+    await fs.symlink(outside, uploads('linked'));
+    await expect(media.rename('linked/x.png', 'b.png')).rejects.toMatchObject({
+      code: 'invalid-path',
+    });
+    await expect(media.rename('a.png', 'linked/b.png')).rejects.toMatchObject({
+      code: 'invalid-path',
+    });
+    await expect(fs.access(path.join(outside, 'b.png'))).rejects.toThrow();
   });
 });

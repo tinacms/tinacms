@@ -51,7 +51,7 @@ supplies the addition for it.
 | `list(..., { search })` | Returns only the items whose name matches `search`. Set `features.search` when `list` uses it. |
 | `list(..., { extensions })` | Returns only the files with one of the extensions, for example `['jpg', 'png']`. Extensions are lowercase and have no dot. Set `features.extensionFilter` when `list` uses it. |
 | `resolveUrl(path, { width, height })` | Returns a URL for an image at that size. A provider without image transforms ignores the options and returns the original URL ([ADR-022](../../../../../adr/v4/022-media-capability-contract.md) §5). |
-| `rename(from, to)` | Moves a file to a new media path in the same media root, and returns the new path. On failure it throws `MediaError`. |
+| `rename(from, to)` | Optional. Moves a file to a new media path, which can be in another folder, and returns the new path. It never overwrites a file. A provider with `rename` lets the Media pane move files. On failure it throws `MediaError`. |
 | `features` | Tells the UI what the provider supports. Refer to the next table. |
 | `status()` | Returns `{ kind: 'ready' }`, or `{ kind: 'needs-setup', message, actionLabel, actionUrl }` when the media store needs setup before use. |
 
@@ -62,7 +62,7 @@ supplies the addition for it.
 | `acceptedMimeTypes` | The MIME types that `upload` accepts, such as `application/pdf`, or a wildcard such as `image/*`. |
 | `acceptedExtensions` | The extensions that `upload` accepts, lowercase and without the dot, such as `svg`. |
 | `maxSize` | The largest file that `upload` accepts, in bytes. Each media plugin sets its own limit. If it is not set, the Media Manager does not check the size before an upload. |
-| `readOnly` | The provider does not upload, rename or delete. |
+| `readOnly` | The provider does not upload, move or delete. |
 
 Each operation reports a known failure as a `MediaError`. It has a `code`,
 a `message` to show the user, and an optional `detail` for logs:
@@ -108,7 +108,9 @@ you change them.
 
 The browser sends the file as `multipart/form-data` to `{url}/upload`, with a
 `file` field and an optional `folder` field. `list` is a `GET` request to
-`{url}?folder=posts`. `delete` is a JSON request to `{url}`.
+`{url}?folder=posts`. `delete` and `rename` are JSON requests to `{url}`:
+`{ op: 'delete', path }` and `{ op: 'rename', from, to }`. `rename` moves a file
+to a path in an existing folder, returns `{ path }`, and never overwrites.
 
 The dev server accepts files up to 25 MB (`MAX_MEDIA_UPLOAD_BYTES`). This
 limit applies to `localMediaPlugin()` only. Other media plugins, such as
@@ -172,8 +174,10 @@ sign-in. Before the editor signs in, each operation fails with
 `unauthorized`. With `auth` overridden, each operation fails. Refer to
 [auth-plugins.md](./auth-plugins.md#swap-a-provider).
 
-The slice supplies `rename`, `features.search`, `features.extensionFilter` and
-a `features.maxSize` of 100 MB. `resolveUrl` gives a CDN URL, and a size adds
+The slice supplies `features.search`, `features.extensionFilter` and
+a `features.maxSize` of 100 MB. It has no `rename`, because the TinaCloud rename
+endpoint does not move a file to another folder, so the Media pane hides Move.
+`resolveUrl` gives a CDN URL, and a size adds
 a crop: `?fit=crop&max-w=400&max-h=400`.
 
 ### Branch

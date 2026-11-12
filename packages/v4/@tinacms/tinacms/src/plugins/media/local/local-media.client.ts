@@ -67,6 +67,14 @@ export const createMediaSlice =
       delete: async (path) => {
         await postMediaRequest<null>(url, get(), { op: 'delete', path });
       },
+      rename: async (from, to) => {
+        const { path } = await postMediaRequest<{ path: string }>(url, get(), {
+          op: 'rename',
+          from,
+          to,
+        });
+        return path;
+      },
       resolveUrl,
     };
     return { ...slice };

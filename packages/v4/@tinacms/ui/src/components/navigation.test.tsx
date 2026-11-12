@@ -416,6 +416,20 @@ describe('PanelHeader', () => {
     ).toHaveFocus();
   });
 
+  it('shows Maximise, then Restore, only when given onMaximise', async () => {
+    const user = userEvent.setup();
+    const onMaximise = vi.fn();
+    const { rerender } = render(
+      <PanelHeader heading='Media' onMaximise={onMaximise} />
+    );
+    await user.click(screen.getByRole('button', { name: 'Maximise' }));
+    expect(onMaximise).toHaveBeenCalledOnce();
+    rerender(<PanelHeader heading='Media' maximised onMaximise={onMaximise} />);
+    expect(screen.getByRole('button', { name: 'Restore' })).toBeVisible();
+    rerender(<PanelHeader heading='Media' />);
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
   it('has no menu button without menu items', () => {
     render(<PanelHeader heading='Collections' />);
     expect(screen.getByRole('heading', { name: 'Collections' })).toBeVisible();

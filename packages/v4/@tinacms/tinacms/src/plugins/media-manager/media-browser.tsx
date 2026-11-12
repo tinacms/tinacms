@@ -1,21 +1,22 @@
 import { Button, buttonVariants } from '@tinacms/ui/components/button';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { cn } from '@tinacms/ui/lib/utils';
-import {
-  useInfiniteQuery,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { type DragEvent, useEffect, useRef, useState } from 'react';
 import type {
   MediaItem,
   MediaPageRequest,
   MediaStatus,
 } from '../../core/media/contract';
+import {
+  MEDIA_LIST_KEY,
+  useMediaListing,
+  useMediaStatus,
+} from './use-media-listing';
 import { useCurrentBranch } from '../../editor/content-queries';
 import { useMediaSlice } from '../../editor/hooks';
 import { MediaBreadcrumb } from './media-breadcrumb';
-import { DeleteDialog, NewFolderDialog, RenameDialog } from './media-dialogs';
+import { NewFolderDialog } from './media-dialogs';
 import {
   LockedAcceptChip,
   MediaKindToggle,
@@ -51,17 +52,11 @@ import { MediaUploadButton } from './media-upload';
 
 const SEARCH_DEBOUNCE_MS = 300;
 
-const LIST_KEY = ['tina', 'media', 'list'] as const;
-
-const READY: MediaStatus = { kind: 'ready' };
-
-type ModeProps =
-  | { mode: 'manage' }
-  | {
-      mode: 'pick';
-      onSelect: (item: MediaItem) => void;
-      accept?: MediaAccept | MediaAccept[];
-    };
+type ModeProps = {
+  mode: 'pick';
+  onSelect: (item: MediaItem) => void;
+  accept?: MediaAccept | MediaAccept[];
+};
 
 type FolderProps =
   | { folder: string; onFolderChange: (folder: string) => void }
@@ -141,11 +136,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
     media.resolveUrl(path, options);
   const features = media.features ?? {};
   const readOnly = features.readOnly === true;
-  const canRename = !readOnly && typeof media.rename === 'function';
-  const pickAccept =
-    props.mode === 'pick' && props.accept !== undefined
-      ? [props.accept].flat()
-      : [];
+  const pickAccept = props.accept !== undefined ? [props.accept].flat() : [];
   const pickExtensions = resolveMediaAccept(pickAccept);
   const providerRestrictsTypes =
     features.acceptedMimeTypes !== undefined ||
@@ -170,9 +161,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
     folder: string;
     items: MediaItem[];
   }>({ folder, items: [] });
-  const [dialog, setDialog] = useState<
-    'new-folder' | 'rename' | 'delete' | null
-  >(null);
+  const [dialog, setDialog] = useState<'new-folder' | null>(null);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [notice, setNotice] = useState<MediaAlert | null>(null);
@@ -209,18 +198,8 @@ export function MediaBrowser(props: MediaBrowserProps) {
     extensions: extensions.length > 0 ? extensions : undefined,
   };
 
-  const listing = useInfiniteQuery({
-    queryKey: [...LIST_KEY, branch, folder, request.search ?? '', extensions],
-    queryFn: ({ pageParam }) =>
-      media.list(folder, { ...request, cursor: pageParam }),
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (page) => page.cursor,
-  });
-
-  const status = useQuery({
-    queryKey: ['tina', 'media', 'status', branch],
-    queryFn: () => (media.status ? media.status() : Promise.resolve(READY)),
-  });
+  const listing = useMediaListing(folder, request);
+  const status = useMediaStatus();
 
   const uploadedItems = uploaded.folder === folder ? uploaded.items : [];
   const uploadedPaths = new Set(uploadedItems.map((item) => item.path));
@@ -251,7 +230,9 @@ export function MediaBrowser(props: MediaBrowserProps) {
   }, [showSentinel, isFetchingNextPage, fetchNextPage]);
 
   const refreshListing = () =>
-    queryClient.invalidateQueries({ queryKey: [...LIST_KEY, branch, folder] });
+    queryClient.invalidateQueries({
+      queryKey: [...MEDIA_LIST_KEY, branch, folder],
+    });
 
   const refresh = () => {
     setActivePath(null);
@@ -305,44 +286,6 @@ export function MediaBrowser(props: MediaBrowserProps) {
     setSearch('');
     setDebouncedSearch('');
     void refreshListing();
-  };
-
-  const confirmDelete = async () => {
-    setDialog(null);
-    if (!activeItem) return;
-    const { path } = activeItem;
-    setNotice(null);
-    try {
-      await media.delete(path);
-      setActivePath(null);
-      setUploaded((previous) => ({
-        ...previous,
-        items: previous.items.filter((item) => item.path !== path),
-      }));
-    } catch (cause) {
-      setNotice({
-        title: `Could not delete ${mediaNameOf(path)}.`,
-        lines: [messageOf(cause)],
-      });
-    }
-    await refreshListing();
-  };
-
-  const renameActive = async (nextName: string) => {
-    if (!activeItem || !media.rename) return;
-    const from = activeItem.path;
-    const renamed = await media.rename(
-      from,
-      joinMediaPath(parentOf(from), nextName)
-    );
-    await refreshListing();
-    setUploaded((previous) => ({
-      ...previous,
-      items: previous.items.map((item) =>
-        item.path === from ? { ...item, path: renamed } : item
-      ),
-    }));
-    setActivePath(renamed);
   };
 
   const clickItem = (item: MediaItem) => {
@@ -519,9 +462,7 @@ export function MediaBrowser(props: MediaBrowserProps) {
             item={activeItem}
             resolveUrl={resolveUrl}
             onClose={() => setActivePath(null)}
-            onInsert={props.mode === 'pick' ? props.onSelect : null}
-            onRename={canRename ? () => setDialog('rename') : null}
-            onDelete={readOnly ? null : () => setDialog('delete')}
+            onInsert={props.onSelect}
           />
         ) : null}
       </div>
@@ -529,20 +470,6 @@ export function MediaBrowser(props: MediaBrowserProps) {
       {dialog === 'new-folder' ? (
         <NewFolderDialog
           onCreate={(name) => openFolder(joinMediaPath(folder, name))}
-          onClose={() => setDialog(null)}
-        />
-      ) : null}
-      {dialog === 'rename' && activeItem ? (
-        <RenameDialog
-          filename={mediaNameOf(activeItem.path)}
-          onRename={renameActive}
-          onClose={() => setDialog(null)}
-        />
-      ) : null}
-      {dialog === 'delete' && activeItem ? (
-        <DeleteDialog
-          filename={mediaNameOf(activeItem.path)}
-          onConfirm={() => void confirmDelete()}
           onClose={() => setDialog(null)}
         />
       ) : null}
