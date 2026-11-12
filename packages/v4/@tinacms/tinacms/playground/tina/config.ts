@@ -21,8 +21,14 @@ export const postCollection = {
       validators: [required(), min(3)],
     }),
     t.boolean({ name: 'featured', label: 'Featured' }),
+    t.reference({
+      name: 'related',
+      label: 'Related post',
+      collections: ['post'],
+    }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
   ],
+  allowedActions: { canCreateNestedFolder: true },
 } satisfies CollectionSchema;
 
 const longTemplates = Array.from({ length: 10 }, (_, index) => ({

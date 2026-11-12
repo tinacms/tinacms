@@ -4,7 +4,8 @@ export type AdminRoute =
   | { view: 'tools' }
   | { view: 'settings' }
   | { view: 'collections'; unsavedOnly?: boolean }
-  | { view: 'collection'; collection: string }
+  | { view: 'collection'; collection: string; side?: true }
+  | { view: 'folder'; collection: string; folder: string }
   | { view: 'document'; collection: string; path: string }
   | { view: 'screen'; screen: string; segments: string[] };
 
@@ -14,6 +15,8 @@ export const HOME_ROUTE: AdminRoute = { view: 'home' };
 const COLLECTIONS_PREFIX = 'collections';
 const SCREENS_PREFIX = 'screens';
 const UNSAVED_ONLY = '?unsaved';
+const SIDE = '?side';
+const FOLDER_SEGMENT = 'folder';
 
 export const formatAdminRoute = (route: AdminRoute): string => {
   if (route.view === 'home') return '#/';
@@ -31,7 +34,12 @@ export const formatAdminRoute = (route: AdminRoute): string => {
   }
   const collection = encodeURIComponent(route.collection);
   if (route.view === 'collection')
-    return `#/${COLLECTIONS_PREFIX}/${collection}`;
+    return `#/${COLLECTIONS_PREFIX}/${collection}${route.side ? SIDE : ''}`;
+  if (route.view === 'folder') {
+    if (route.folder === '') return `#/${COLLECTIONS_PREFIX}/${collection}`;
+    const parts = route.folder.split('/').map(encodeURIComponent);
+    return `#/${COLLECTIONS_PREFIX}/${collection}/${FOLDER_SEGMENT}/${parts.join('/')}`;
+  }
   return `#/${COLLECTIONS_PREFIX}/${collection}/${encodeURIComponent(route.path)}`;
 };
 
@@ -64,7 +72,16 @@ export const parseAdminRoute = (hash: string): AdminRoute => {
   if (prefix === SCREENS_PREFIX)
     return { view: 'screen', screen: head, segments: rest };
   if (prefix !== COLLECTIONS_PREFIX) return HOME_ROUTE;
-  const [docPath] = rest;
-  if (!docPath) return { view: 'collection', collection: head };
+  const [docPath, ...folderParts] = rest;
+  if (!docPath) {
+    return query === 'side'
+      ? { view: 'collection', collection: head, side: true }
+      : { view: 'collection', collection: head };
+  }
+  if (docPath === FOLDER_SEGMENT) {
+    return folderParts.length === 0
+      ? { view: 'collection', collection: head }
+      : { view: 'folder', collection: head, folder: folderParts.join('/') };
+  }
   return { view: 'document', collection: head, path: docPath };
 };

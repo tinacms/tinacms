@@ -5,6 +5,7 @@ import type { BranchInfo } from '../core/branch/contract';
 import { createTinaStore } from '../store/create-store';
 import { useBranchSync, useBranchView } from './branch';
 import { type TinaRuntime, TinaRuntimeContext } from './context';
+import { connectionOf } from '../test/connection';
 
 const NEWS_PR = 'https://github.com/acme/site/pull/12';
 
@@ -13,7 +14,7 @@ const renderBranchView = (branches: BranchInfo[]) => {
   store.setState({
     content: {
       get: async () => undefined,
-      list: async () => [],
+      list: async () => connectionOf([]),
       update: async () => undefined,
       branches: {
         list: async () => branches,

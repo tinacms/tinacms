@@ -29,6 +29,8 @@ export interface GraphQLPipelineOptions {
 export interface GraphQLPipeline {
   execute(query: string, variables?: GraphQLVariables): Promise<GraphQLResult>;
   reindexPaths(paths: string[]): Promise<void>;
+  /** Drops removed documents from the index, with their sort-index entries. */
+  removePaths(paths: string[]): Promise<void>;
   close(): Promise<void>;
 }
 
@@ -131,6 +133,16 @@ export const createGraphQLPipeline = async (
       const run = indexing
         .catch(() => {})
         .then(() => database.indexContentByPaths(paths));
+      indexing = run;
+      await run;
+    },
+    removePaths: async (paths) => {
+      const run = indexing
+        .catch(() => {})
+        .then(async () => {
+          await database.deleteContentByPaths(paths);
+          await database.deleteIndexEntriesForPaths(paths);
+        });
       indexing = run;
       await run;
     },

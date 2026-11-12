@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ContentError } from '../../../core/content/contract';
+import { ContentError, nodesOf } from '../../../core/content/contract';
 import type { TinaStoreState } from '../../../core/plugin';
 import { TINACLOUD_IDENTITY_URL } from '../client';
 import { contentUrl } from './request';
@@ -102,7 +102,7 @@ describe('TinaCloud content slice', () => {
       page(['a.mdx'], 'c1'),
       page(['b.mdx'], 'c1')
     );
-    expect(await content().list('post')).toEqual([
+    expect(nodesOf(await content().list('post'))).toEqual([
       { path: 'a.mdx' },
       { path: 'b.mdx' },
     ]);
@@ -115,7 +115,7 @@ describe('TinaCloud content slice', () => {
       page(['c.mdx'], 'c2'),
       page(['d.mdx'], null)
     );
-    expect(await content().list('post')).toEqual([
+    expect(nodesOf(await content().list('post'))).toEqual([
       { path: 'a.mdx' },
       { path: 'b.mdx' },
       { path: 'c.mdx' },
@@ -128,7 +128,46 @@ describe('TinaCloud content slice', () => {
 
   it('lists an empty collection', async () => {
     stubTinaCloud(page([], null));
-    expect(await content().list('post')).toEqual([]);
+    expect(await content().list('post')).toMatchObject({
+      edges: [],
+      totalCount: 0,
+      folders: [],
+    });
+  });
+
+  it('answers a list query over the full path list, without placeholders', async () => {
+    stubTinaCloud(
+      page(
+        [
+          'content/posts/zebra.mdx',
+          'content/posts/apple.mdx',
+          'content/posts/.gitkeep.mdx',
+          'content/posts/2024/jan.mdx',
+          'content/posts/2024/.gitkeep.mdx',
+          'content/posts/empty/.gitkeep.mdx',
+        ],
+        null
+      )
+    );
+    const connection = await content().list('post', {
+      folder: '',
+      sort: { by: 'title', direction: 'asc' },
+    });
+    expect(nodesOf(connection).map(({ path }) => path)).toEqual([
+      'content/posts/apple.mdx',
+      'content/posts/zebra.mdx',
+    ]);
+    expect(connection.totalCount).toBe(2);
+    expect(connection.folders).toEqual([
+      { path: '2024', name: '2024', documentCount: 1 },
+    ]);
+  });
+
+  it('refuses a page size above 200 as a ContentError', async () => {
+    stubTinaCloud(page(['a.mdx'], null));
+    await expect(content().list('post', { first: 500 })).rejects.toMatchObject({
+      code: 'validation',
+    });
   });
 
   it('updates a document and returns the saved values', async () => {

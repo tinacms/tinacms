@@ -30,6 +30,7 @@ import coreValidatorsPlugin from '../../../plugins/validators/core-validators.pl
 import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
 import referenceFieldPlugin from './reference-field.plugin';
+import { connectionOf } from '../../../test/connection';
 
 const DOCUMENT_PATH = 'content/posts/featured.mdx';
 const ABOUT = 'content/pages/about.mdx';
@@ -78,7 +79,7 @@ const contentPlugin = (
   overrides: Partial<ContentProvider> = {}
 ): PluginManifest => {
   const provider: ContentProvider = {
-    list: vi.fn(async (name: string) => SUMMARIES[name] ?? []),
+    list: vi.fn(async (name: string) => connectionOf(SUMMARIES[name] ?? [])),
     get: vi.fn(async () => null),
     update: vi.fn(async (_collection, path, value) => ({
       path,
@@ -168,7 +169,9 @@ describe('ReferenceField lookup', () => {
   });
 
   it('asks the content capability for each collection a field names', async () => {
-    const list = vi.fn(async (name: string) => SUMMARIES[name] ?? []);
+    const list = vi.fn(async (name: string) =>
+      connectionOf(SUMMARIES[name] ?? [])
+    );
     renderField(undefined, contentPlugin({ list }));
     await userEvent.click(await screen.findByLabelText(/^Related\b/));
     await screen.findByRole('option', option(ADA));
@@ -261,7 +264,7 @@ describe('ReferenceField missing references', () => {
             refetchStarted();
             return new Promise(() => {});
           }
-          return SUMMARIES[name] ?? [];
+          return connectionOf(SUMMARIES[name] ?? []);
         },
       }),
       Fragment,
@@ -285,10 +288,11 @@ describe('ReferenceField missing references', () => {
     renderField(
       { page: ABOUT },
       contentPlugin({
-        list: async (name: string) => [
-          ...(SUMMARIES[name] ?? []),
-          ...(refetched && name === 'page' ? [{ path: NEWEST }] : []),
-        ],
+        list: async (name: string) =>
+          connectionOf([
+            ...(SUMMARIES[name] ?? []),
+            ...(refetched && name === 'page' ? [{ path: NEWEST }] : []),
+          ]),
       }),
       Fragment,
       queryClient
@@ -308,9 +312,11 @@ describe('ReferenceField missing references', () => {
       {},
       contentPlugin({
         list: async (name: string) =>
-          name === 'page'
-            ? [{ path: ABOUT, title: 'About us' }, { path: CONTACT }]
-            : [],
+          connectionOf(
+            name === 'page'
+              ? [{ path: ABOUT, title: 'About us' }, { path: CONTACT }]
+              : []
+          ),
       })
     );
     const input = await screen.findByLabelText(/^Page\b/);
@@ -355,7 +361,7 @@ describe('ReferenceField failed lists', () => {
       contentPlugin({
         list: async (name: string) => {
           if (name === 'author') throw new Error('Authors failed');
-          return SUMMARIES[name] ?? [];
+          return connectionOf(SUMMARIES[name] ?? []);
         },
       })
     );
@@ -401,7 +407,7 @@ describe('ReferenceField document labels', () => {
 
   it('lists a path named by two collections once, under the first', async () => {
     const shared = contentPlugin({
-      list: async () => [{ path: ABOUT }],
+      list: async () => connectionOf([{ path: ABOUT }]),
     });
     renderField(undefined, shared);
     await userEvent.click(await screen.findByLabelText(/^Related\b/));
@@ -443,7 +449,7 @@ describe('ReferenceField opening a document', () => {
         list: (name: string) =>
           name === 'author'
             ? new Promise(() => {})
-            : Promise.resolve(SUMMARIES[name] ?? []),
+            : Promise.resolve(connectionOf(SUMMARIES[name] ?? [])),
       }),
       InRouter
     );

@@ -214,7 +214,7 @@ test('Review N unsaved is full width under the local-files line on a phone, and 
   expect(reviewBox.width).toBe(recentBox.width);
   await expect(
     panel(page, 'Recent documents').getByRole('button', {
-      name: /^hello-world.*Unsaved/,
+      name: /^Hello World!.*Unsaved/,
     })
   ).toBeVisible();
   await expectNoSidewaysScroll(page);

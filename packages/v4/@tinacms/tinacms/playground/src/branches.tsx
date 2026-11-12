@@ -110,7 +110,13 @@ const content = definePlugin({
         list: async (collection: string) => {
           if (slow) return never;
           if (failing === 'lists') throw new Error('offline');
-          return collection === 'post' ? posts : [];
+          const documents = collection === 'post' ? posts : [];
+          return {
+            edges: documents.map((node) => ({ node, cursor: node.path })),
+            pageInfo: { hasNextPage: false, endCursor: null },
+            totalCount: documents.length,
+            folders: [],
+          };
         },
         get: async (_collection: string, path: string) => {
           if (!posts.some((post) => post.path === path)) return null;

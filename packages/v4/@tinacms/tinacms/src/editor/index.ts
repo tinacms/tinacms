@@ -37,6 +37,19 @@ export {
   usePreviewConnection,
 } from './preview-connection';
 export {
+  type CollectionActions,
+  type CollectionCapabilities,
+  type DraftCounts,
+  documentsPageKey,
+  isValidFileName,
+  isValidName,
+  useCollectionActions,
+  useCollectionCapabilities,
+  useDocumentsPage,
+  useDraftCounts,
+  useNewDocumentDrafts,
+} from './collection-documents';
+export {
   type CollectionDocuments,
   CONTENT_STALE_TIME,
   contentKeys,

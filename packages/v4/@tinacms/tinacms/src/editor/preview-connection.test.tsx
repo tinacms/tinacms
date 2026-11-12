@@ -28,6 +28,7 @@ import { FormScopeContext } from './context';
 import { createFormViewStore } from './form-view-state';
 import { FormProvider, TinaProvider } from './index';
 import { usePreviewConnection } from './preview-connection';
+import { connectionOf } from '../test/connection';
 
 const NO_COLLECTIONS = { collections: [] };
 
@@ -121,7 +122,7 @@ const renderWithReference = (
       default: {
         slice: () => ({
           get,
-          list: async () => [],
+          list: async () => connectionOf([]),
           update: async (_c: string, p: string, value: TinaDocument) => ({
             path: p,
             document: value,

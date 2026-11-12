@@ -14,6 +14,8 @@ import { stringFieldPlugin } from '../plugins/fields/string/string-field.plugin'
 import { simulateReload } from '../test/simulate-reload';
 import { testAuthPlugin } from '../test/test-auth-plugin';
 import { TinaAdmin } from './admin';
+import { connectionOf } from '../test/connection';
+import { openCollectionTree } from '../test/collection-tree';
 
 const contentPlugin = definePlugin({
   name: 'test:content',
@@ -21,7 +23,7 @@ const contentPlugin = definePlugin({
   client: async () => ({
     default: {
       slice: () => ({
-        list: async () => [{ path: 'content/posts/hello.mdx' }],
+        list: async () => connectionOf([{ path: 'content/posts/hello.mdx' }]),
         get: async () => ({
           path: 'content/posts/hello.mdx',
           document: { title: 'Hello' },
@@ -241,7 +243,7 @@ describe('AuthGate', () => {
     const firstTab = renderAdmin([sharedBrowserAuth]);
 
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     const adaInput = await screen.findByRole('textbox', { name: /^Title/ });
     expect(adaInput).toHaveValue('Hello');

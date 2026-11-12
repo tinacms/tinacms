@@ -136,6 +136,66 @@ describe('graphql (the v3 pipeline)', () => {
   });
 });
 
+describe('structural writes through the v3 pipeline', () => {
+  const titles = async () =>
+    (
+      await dataLayer.graphql(
+        'query { postConnection { edges { node { _sys { relativePath } title } } } }'
+      )
+    ).data?.postConnection;
+
+  it('serves the new state after create, rename, delete and the folder operations', async () => {
+    await dataLayer.graphql('query { postConnection { totalCount } }');
+
+    await dataLayer.create('post', 'content/posts/fresh.mdx', {
+      title: 'Fresh',
+    });
+    await dataLayer.createFolder('post', 'series');
+    expect(await titles()).toMatchObject({
+      edges: [
+        { node: { _sys: { relativePath: 'fresh.mdx' } } },
+        { node: { _sys: { relativePath: 'hello.mdx' } } },
+      ],
+    });
+
+    await dataLayer.rename(
+      'post',
+      'content/posts/fresh.mdx',
+      'content/posts/renamed.mdx'
+    );
+    await dataLayer.create('post', 'content/posts/series/one.mdx', {
+      title: 'One',
+    });
+    await dataLayer.renameFolder('post', 'series', 'saga');
+    const afterRename = JSON.stringify(await titles());
+    expect(afterRename).toContain('renamed.mdx');
+    expect(afterRename).toContain('saga/one.mdx');
+    expect(afterRename).not.toContain('fresh.mdx');
+    expect(afterRename).not.toContain('series/one.mdx');
+    expect(afterRename).not.toContain('gitkeep');
+
+    await dataLayer.delete('post', 'content/posts/renamed.mdx');
+    await dataLayer.deleteFolder('post', 'saga');
+    const afterDelete = JSON.stringify(await titles());
+    expect(afterDelete).not.toContain('renamed.mdx');
+    expect(afterDelete).not.toContain('one.mdx');
+    expect(afterDelete).toContain('hello.mdx');
+  });
+
+  it('follows a rename of a referenced document into the reference', async () => {
+    await dataLayer.graphql('query { postConnection { totalCount } }');
+    await dataLayer.rename(
+      'author',
+      'content/authors/ada.md',
+      'content/authors/ada-l.md'
+    );
+    const result = await dataLayer.graphql(
+      'query { post(relativePath: "hello.mdx") { author { ... on Author { name } } } }'
+    );
+    expect(result.data?.post).toMatchObject({ author: { name: 'Ada' } });
+  });
+});
+
 describe('a mixed-format collection through the v3 pipeline', () => {
   let mixed: LocalDataLayer;
   let warn: ReturnType<typeof vi.spyOn>;

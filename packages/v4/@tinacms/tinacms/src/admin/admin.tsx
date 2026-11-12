@@ -1,5 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { Breadcrumb } from '@tinacms/ui/components/breadcrumb';
+import { Button } from '@tinacms/ui/components/button';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { TooltipProvider } from '@tinacms/ui/components/tooltip';
@@ -26,6 +27,7 @@ import { HashRouter } from 'react-router-dom';
 import type { ResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
+import { folderOfDocument } from '../editor/collection-documents';
 import { useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
@@ -40,11 +42,13 @@ import {
   SettingsPane,
   ToolsPane,
 } from './navigator';
+import { CollectionTable } from './collection-table/collection-table';
 import { AdminRail, HOME_SCREEN, MEDIA_SCREEN } from './rail';
 import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 import { COLLECTIONS_ROUTE, HOME_ROUTE } from './routing';
 import { useBranchSync } from '../editor/branch';
+import { toFormId, useHasNewDocument } from '../form/form-store';
 import {
   ShellSaveProgress,
   ShellStatusBar,
@@ -427,7 +431,9 @@ function AdminShell({
   useKeptEditsNotice(route, navigate);
 
   const activeCollectionName =
-    route.view === 'collection' || route.view === 'document'
+    route.view === 'collection' ||
+    route.view === 'folder' ||
+    route.view === 'document'
       ? route.collection
       : undefined;
   const collection = schema.collections.find(
@@ -455,12 +461,16 @@ function AdminShell({
     isLoading: isLoadingOpenDocument,
     error: openDocumentError,
   } = useDocument(collection?.name, openPath);
+  const holdsNewDocument = useHasNewDocument(
+    openPath ? toFormId(openPath) : undefined
+  );
   const isStaleDocumentRoute =
     collection !== undefined &&
     openPath !== undefined &&
     !isLoadingOpenDocument &&
     openDocumentError === null &&
-    openEntry === null;
+    openEntry === null &&
+    !holdsNewDocument;
 
   const goToCollections = () => navigate(COLLECTIONS_ROUTE);
   const goHome = () => navigate(HOME_ROUTE);
@@ -484,10 +494,27 @@ function AdminShell({
     (lastOpen && lastOpen.collection === activeCollectionName
       ? lastOpen.path
       : undefined);
+  const tableFolder =
+    route.view === 'folder'
+      ? route.folder
+      : route.view === 'collection' && !route.side
+        ? ''
+        : undefined;
+  const showTable = collection !== undefined && tableFolder !== undefined;
   const showNavigator =
     route.view === 'collections' ||
-    route.view === 'collection' ||
+    (route.view === 'collection' && !showTable) ||
+    (route.view === 'folder' && !showTable) ||
     (route.view === 'document' && collection === undefined);
+  const goToFolderOf = (documentPath: string) => {
+    if (!collection) return goToCollections();
+    const folder = folderOfDocument(collection, documentPath);
+    navigate(
+      folder === ''
+        ? { view: 'collection', collection: collection.name }
+        : { view: 'folder', collection: collection.name, folder }
+    );
+  };
 
   return (
     <SidebarProvider
@@ -561,6 +588,37 @@ function AdminShell({
           <MissingPanel title='Collection not found' onClose={goHome}>
             No collection named “{activeCollectionName}”.
           </MissingPanel>
+        ) : showTable ? (
+          <SidebarInset className='min-w-0'>
+            <PanelHeader
+              heading={collection.label ?? collection.name}
+              action={
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='max-lg:hidden'
+                  onClick={() =>
+                    navigate({
+                      view: 'collection',
+                      collection: collection.name,
+                      side: true,
+                    })
+                  }
+                >
+                  Restore
+                </Button>
+              }
+              closeLabel='Close'
+              onClose={goHome}
+            />
+            <div className='min-h-0 flex-1 overflow-y-auto'>
+              <CollectionTable
+                key={`${collection.name}/${tableFolder}`}
+                collection={collection.name}
+                folder={tableFolder}
+              />
+            </div>
+          </SidebarInset>
         ) : isStaleDocumentRoute ? (
           <MissingPanel title='Document not found' onClose={goHome}>
             No document named “{openPath}”.
@@ -578,18 +636,17 @@ function AdminShell({
             </SidebarInset>
           </DocumentScope>
         ) : (
-          <DocumentScope collection={collection} path={openPath}>
+          <DocumentScope
+            collection={collection}
+            path={openPath}
+            onDiscardNew={() => (openPath ? goToFolderOf(openPath) : undefined)}
+          >
             <SidebarInset className='relative min-w-0 flex-row'>
               <FormColumn
                 openPath={openPath}
                 collection={collection}
                 onBack={() =>
-                  collection
-                    ? navigate({
-                        view: 'collection',
-                        collection: collection.name,
-                      })
-                    : goToCollections()
+                  openPath ? goToFolderOf(openPath) : goToCollections()
                 }
               />
 

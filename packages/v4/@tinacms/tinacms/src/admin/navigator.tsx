@@ -8,7 +8,12 @@ import {
   useCollectionDocuments,
   useCollectionsDocumentPaths,
 } from '../editor/content-queries';
-import { useFormStore, useUnsavedFormIds } from '../form/form-store';
+import {
+  useFormStore,
+  useNewDocumentIds,
+  useUnsavedFormIds,
+} from '../form/form-store';
+import { directoryOf, isUnder } from '../editor/collection-documents';
 import type { GlobalNavEntry } from '../core/slot/contract';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { DiscardConfirm } from './discard-confirm';
@@ -112,7 +117,14 @@ function UnsavedCollection({
   navigate: (route: AdminRoute) => void;
 }) {
   const { documents, error } = useCollectionDocuments(collection.name);
-  const unsaved = documents.filter(({ path }) => unsavedIds.has(path));
+  const directory = directoryOf(collection, '');
+  const created = useNewDocumentIds().filter((id) => isUnder(id, directory));
+  const unsaved = [
+    ...documents.filter(({ path }) => unsavedIds.has(path)),
+    ...created
+      .filter((id) => !documents.some(({ path }) => path === id))
+      .map((id) => ({ path: id })),
+  ];
   const label = collection.label ?? collection.name;
   if (error) {
     return (
@@ -160,7 +172,10 @@ function MissingDocumentEdits({
   );
   const discard = useFormStore((state) => state.discardStoredDraft);
   const [confirming, setConfirming] = useState<string | null>(null);
-  const missing = useUnsavedFormIds().filter((id) => !paths.has(id));
+  const created = new Set<string>(useNewDocumentIds());
+  const missing = useUnsavedFormIds().filter(
+    (id) => !paths.has(id) && !created.has(id)
+  );
   if (!settled || missing.length === 0) return null;
   return (
     <ul
@@ -270,7 +285,9 @@ export function CollectionsNavigator({
   hideBelowLg?: boolean;
 }) {
   const activeCollection =
-    route.view === 'collection' || route.view === 'document'
+    route.view === 'collection' ||
+    route.view === 'folder' ||
+    route.view === 'document'
       ? route.collection
       : undefined;
   const activePath = route.view === 'document' ? route.path : selectedPath;

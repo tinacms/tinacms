@@ -43,6 +43,9 @@ export const contentKeys = {
   ],
 };
 
+// Table pages sit under the collection's list key, after this part.
+export const PAGE_KEY_PART = 'page';
+
 export const useCurrentBranch = (): string | undefined =>
   useTinaStore(currentBranchOf);
 
@@ -63,7 +66,9 @@ export const useCollectionDocuments = (
   const branch = useCurrentBranch();
   const query = useQuery({
     queryKey: contentKeys.list(collection ?? '', branch),
-    queryFn: collection ? async () => nodesOf(await content.list(collection)) : skipToken,
+    queryFn: collection
+      ? async () => nodesOf(await content.list(collection))
+      : skipToken,
     staleTime: CONTENT_STALE_TIME,
   });
   return {
@@ -134,6 +139,8 @@ export interface SaveDocumentInput {
   collection: string;
   path: string;
   value: TinaDocument;
+  /** The document has no file yet, so Save creates it. */
+  isNew?: boolean;
 }
 
 export type SavedEntry = DocumentEntry & SavedDocument;
@@ -146,6 +153,7 @@ export interface DocumentSave {
 interface ContentSaveSegments {
   content: {
     update: (input: ContentSaveInput) => Promise<ContentSaveResult>;
+    create: (input: ContentSaveInput) => Promise<ContentSaveResult>;
   };
 }
 
@@ -198,12 +206,14 @@ export const useSaveDocument = (): DocumentSave => {
     runtime.schema.collections
       .find(({ name }) => name === collection)
       ?.hooks?.some(({ name }) => runtime.serverHooks.has(name)) ?? false;
-  const saveThroughServer = async (
-    input: SaveDocumentInput
-  ): Promise<SavedEntry> => {
+  const saveThroughServer = async ({
+    isNew,
+    ...input
+  }: SaveDocumentInput): Promise<SavedEntry> => {
     const branch = currentBranchOf(runtime.store.getState());
+    const write = isNew ? server.content.create : server.content.update;
     try {
-      const { entry, hookWarnings } = await server.content.update({
+      const { entry, hookWarnings } = await write({
         ...input,
         ...(typeof branch === 'string' && branch ? { branch } : {}),
       });
@@ -213,10 +223,18 @@ export const useSaveDocument = (): DocumentSave => {
     }
   };
   const mutation = useMutation({
-    mutationFn: (input: SaveDocumentInput): Promise<SavedEntry> =>
-      hasServerHooks(input.collection)
-        ? saveThroughServer(input)
-        : content.update(input.collection, input.path, input.value),
+    mutationFn: (input: SaveDocumentInput): Promise<SavedEntry> => {
+      if (hasServerHooks(input.collection)) return saveThroughServer(input);
+      if (input.isNew) {
+        invariant(
+          content.create,
+          'content-create-missing',
+          'This content provider cannot create documents'
+        );
+        return content.create(input.collection, input.path, input.value);
+      }
+      return content.update(input.collection, input.path, input.value);
+    },
     onMutate: () => currentBranchOf(runtime.store.getState()),
     onSuccess: (
       { document, hookWarnings, ...summary },
@@ -231,6 +249,9 @@ export const useSaveDocument = (): DocumentSave => {
         contentKeys.document(collection, summary.path, branch),
         { ...summary, document }
       );
+      void queryClient.invalidateQueries({
+        queryKey: [...contentKeys.list(collection, branch), PAGE_KEY_PART],
+      });
     },
   });
   return { save: mutation.mutateAsync, isSaving: mutation.isPending };

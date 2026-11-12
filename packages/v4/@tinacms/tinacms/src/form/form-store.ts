@@ -14,6 +14,7 @@ import type { TinaDocument } from '../core/schema/types';
 import {
   type DraftUserScope,
   listStoredDraftIds,
+  moveDrafts,
   readDraft,
   readWaitingDrafts,
   removeAllDrafts,
@@ -77,6 +78,8 @@ type OpenForm =
       readonly baseline: FormValues;
       readonly errors: FieldErrors;
       readonly equal: FieldEquality;
+      /** The document has no file yet: its baseline is empty and Save creates it. */
+      readonly isNew?: true;
     };
 
 export const isEdited = (
@@ -136,6 +139,16 @@ export interface FormStore {
   /** Puts the waiting copies in the form. Returns the form's new values. */
   resumeWaiting: (formId: FormId) => FormValues | undefined;
   removeForm: (formId: FormId) => void;
+  /** Re-keys a form, its save state and every stored copy to a new path. */
+  moveForm: (from: FormId, to: FormId) => void;
+  /** Opens a form on a document that has no file yet. Values are the form's own. */
+  seedNewDocument: (
+    formId: FormId,
+    values: FormValues,
+    equal?: FieldEquality
+  ) => void;
+  /** Stores a copy for a document that has no file yet. */
+  storeNewDocumentDraft: (formId: FormId, values: TinaDocument) => StoreResult;
 }
 
 const valuesEqual = (
@@ -178,6 +191,15 @@ const openingScope = (
   scope: OpenForm | undefined,
   incoming: FormValues
 ): EditedForm | undefined => (keepsValues(scope, incoming) ? scope : undefined);
+
+const withoutNew = ({ isNew: _created, ...rest }: EditedForm): EditedForm =>
+  rest;
+
+const draftOfScope = (scope: EditedForm): StoredDraft => ({
+  values: toDocument(scope.values),
+  baseline: toDocument(scope.baseline),
+  ...(scope.isNew ? { new: true } : {}),
+});
 
 const toWaitingCopy = (copy: StoredDraft) => ({
   values: toFormValues(copy.values),
@@ -283,6 +305,9 @@ const DEVTOOLS_ACTION = {
   discardEdits: 'form/discardEdits',
   resumeWaiting: 'form/resumeWaiting',
   removeForm: 'form/removeForm',
+  moveForm: 'form/moveForm',
+  seedNewDocument: 'form/seedNewDocument',
+  storeNewDocumentDraft: 'form/storeNewDocumentDraft',
 } as const;
 type DevtoolsActionLabel =
   (typeof DEVTOOLS_ACTION)[keyof typeof DEVTOOLS_ACTION];
@@ -337,10 +362,7 @@ export const useFormStore = create<FormStore>()(
           if (isEdited(scope) && formStatus(scope) === 'dirty') {
             const result = writeDraft(
               formId,
-              {
-                values: toDocument(scope.values),
-                baseline: toDocument(scope.baseline),
-              },
+              draftOfScope(scope),
               userId,
               branch
             );
@@ -530,11 +552,12 @@ export const useFormStore = create<FormStore>()(
           apply((state) => {
             const scope = state.forms[formId];
             if (!scope) return state;
+            const saved = isEdited(scope) ? withoutNew(scope) : scope;
             return {
               forms: {
                 ...state.forms,
                 [formId]: {
-                  ...scope,
+                  ...saved,
                   status: 'edited',
                   // A caller passes the form library's own value tree, which it
                   // keeps mutating in place. The baseline must be a private
@@ -663,6 +686,66 @@ export const useFormStore = create<FormStore>()(
           return keep ? scope.values : values;
         },
 
+        moveForm: (from, to) => {
+          const { userId, branch } = readFormStore();
+          moveDrafts(from, to, userId, branch);
+          apply((state) => {
+            const rekey = <T>(record: Partial<Record<FormId, T>>) => {
+              const { [from]: moved, ...rest } = record;
+              return moved === undefined ? record : { ...rest, [to]: moved };
+            };
+            return {
+              forms: rekey(state.forms),
+              saves: rekey(state.saves),
+              waiting: rekey(state.waiting),
+              held: rekey(state.held),
+              unstored: rekey(state.unstored),
+              failures: rekey(state.failures),
+              swapFailures: rekey(state.swapFailures),
+              hidden: rekey(state.hidden),
+              active:
+                state.active?.formId === from
+                  ? { ...state.active, formId: to }
+                  : state.active,
+              draftsVersion: state.draftsVersion + 1,
+            };
+          }, DEVTOOLS_ACTION.moveForm);
+        },
+
+        seedNewDocument: (formId, values, equal = STRUCTURAL_EQUALITY) =>
+          apply((state) => {
+            const scope = state.forms[formId];
+            if (isEdited(scope) && scope.isNew) return state;
+            return {
+              forms: {
+                ...state.forms,
+                [formId]: {
+                  status: 'edited',
+                  values,
+                  baseline: {},
+                  errors: {},
+                  equal,
+                  isNew: true,
+                },
+              },
+            };
+          }, DEVTOOLS_ACTION.seedNewDocument),
+
+        storeNewDocumentDraft: (formId, values) => {
+          const { userId, branch } = readFormStore();
+          const result = writeDraft(
+            formId,
+            { values, baseline: {}, new: true },
+            userId,
+            branch
+          );
+          apply(
+            (state) => ({ draftsVersion: state.draftsVersion + 1 }),
+            DEVTOOLS_ACTION.storeNewDocumentDraft
+          );
+          return result;
+        },
+
         removeForm: (formId) =>
           apply((state) => {
             if (!state.forms[formId]) return state;
@@ -703,10 +786,7 @@ export const syncDrafts = () =>
       if (isEdited(scope) && formStatus(scope) === 'dirty') {
         const result = writeDraft(
           formId,
-          {
-            values: toDocument(scope.values),
-            baseline: toDocument(scope.baseline),
-          },
+          draftOfScope(scope),
           next.userId,
           next.branch
         );
@@ -825,3 +905,30 @@ export const useUnsavedFormIds = (): FormId[] =>
       return [...new Set([...dirty, ...stored])];
     })
   );
+
+/**
+ * The documents that have no file yet, for this editor on this branch: the open
+ * forms marked new, and the stored copies marked new.
+ */
+export const useNewDocumentIds = (): FormId[] =>
+  useFormStore(
+    useShallow((state) => {
+      const open = (Object.keys(state.forms) as FormId[]).filter((id) => {
+        const scope = state.forms[id];
+        return isEdited(scope) && scope.isNew === true;
+      });
+      const stored = listStoredDraftIds(state.userId, state.branch).filter(
+        (id) => readDraft(id, state.userId, state.branch)?.new === true
+      );
+      return [...new Set([...open, ...stored])].sort();
+    })
+  );
+
+/** Whether this editor holds a copy of a document that has no file yet. */
+export const useHasNewDocument = (formId: FormId | undefined): boolean =>
+  useFormStore((state) => {
+    if (!formId) return false;
+    const scope = state.forms[formId];
+    if (isEdited(scope) && scope.isNew) return true;
+    return readDraft(formId, state.userId, state.branch)?.new === true;
+  });

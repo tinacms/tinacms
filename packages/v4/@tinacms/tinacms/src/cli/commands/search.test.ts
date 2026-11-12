@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type ResolvedConfig, asResolvedConfig } from '../../config';
+import { nodesOf } from '../../core/content/contract';
 import { definePlugin } from '../../core/plugin';
 import { buildSearchRecord } from '../../core/search/record';
 import { SearchError } from '../../core/search/contract';
@@ -261,7 +262,7 @@ describe('tinacms search reindex and the schema', () => {
       rootDir: rootDir,
       collections: schema.filter(({ path: folder }) => folder),
     });
-    return (await layer.list(collection.name)).map(({ path: p }) => ({
+    return nodesOf(await layer.list(collection.name)).map(({ path: p }) => ({
       collection: collection.name,
       path: p,
     }));
@@ -368,10 +369,12 @@ describe('tinacms search reindex source documents', () => {
         rootDir,
         collections: [article('doc', format)],
       });
-      const saved = await layer.update('doc', `content/doc/a.${format}`, {
-        title: 'T',
-        body: 'Hello <b>bold</b> &amp; more\n\nSecond',
-      });
+      const saved = await layer.update(
+        'doc',
+        `content/doc/a.${format}`,
+        { title: 'T', body: 'Hello <b>bold</b> &amp; more\n\nSecond' },
+        { mayCreate: true }
+      );
       await layer.close();
       const provider = providerWith();
       await reindex(

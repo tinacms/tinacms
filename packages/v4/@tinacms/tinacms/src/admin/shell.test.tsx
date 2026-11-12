@@ -16,6 +16,8 @@ import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
+import { connectionOf } from '../test/connection';
+import { returnToTree } from '../test/collection-tree';
 
 type Mode = 'branches' | 'local' | 'none';
 
@@ -70,7 +72,9 @@ const contentPlugin = () =>
                 }
               : {}),
             list: async () =>
-              (DATA[branch()] ?? []).map(({ path }) => ({ path })),
+              connectionOf(
+                (DATA[branch()] ?? []).map(({ path }) => ({ path }))
+              ),
             get: async (_collection: string, path: string) => {
               if (failGet) throw new Error('disk unreadable');
               return (
@@ -461,9 +465,7 @@ describe('side nav entries', () => {
 
     await user.click(row);
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await returnToTree(user);
     const back = await screen.findByRole('button', { name: /hello\.mdx/ });
     expect(back).toHaveTextContent('Unsaved');
     expect(

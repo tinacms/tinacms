@@ -30,12 +30,23 @@
             "type": "boolean"
           },
           {
+            "type": "reference",
+            "name": "related",
+            "label": "Related post",
+            "collections": [
+              "post"
+            ]
+          },
+          {
             "name": "body",
             "label": "Body",
             "isBody": true,
             "type": "rich-text"
           }
-        ]
+        ],
+        "allowedActions": {
+          "canCreateNestedFolder": true
+        }
       },
       {
         "name": "page",
@@ -317,6 +328,7 @@
   "primitives": {
     "array": 1,
     "boolean": 1,
+    "reference": 1,
     "rich-text": 1,
     "string": 1
   }

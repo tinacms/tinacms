@@ -16,6 +16,11 @@ describe('admin routing', () => {
     { view: 'settings' },
     { view: 'collections', unsavedOnly: true },
     { view: 'collection', collection: 'post' },
+    { view: 'collection', collection: 'post', side: true },
+    { view: 'folder', collection: 'post', folder: 'a' },
+    { view: 'folder', collection: 'post', folder: 'a/b' },
+    { view: 'folder', collection: 'post', folder: 'folder' },
+    { view: 'folder', collection: 'post', folder: 'v1.2/folder/x y' },
     { view: 'document', collection: 'post', path: 'content/posts/hello.mdx' },
     { view: 'screen', screen: 'media', segments: [] },
     { view: 'screen', screen: 'media', segments: ['photos', '2026'] },
@@ -114,5 +119,32 @@ describe('parseAdminRoute on input a user can type', () => {
   ])('falls back rather than throwing on %j', (hash) => {
     expect(() => parseAdminRoute(hash)).not.toThrow();
     expect(parseAdminRoute(hash)).toEqual(HOME_ROUTE);
+  });
+
+  it('writes each folder part as its own encoded segment', () => {
+    expect(
+      formatAdminRoute({ view: 'folder', collection: 'post', folder: 'a/b c' })
+    ).toBe('#/collections/post/folder/a/b%20c');
+    expect(
+      formatAdminRoute({ view: 'collection', collection: 'post', side: true })
+    ).toBe('#/collections/post?side');
+  });
+
+  it('reads a folder address with no parts as the collection', () => {
+    expect(parseAdminRoute('#/collections/post/folder')).toEqual({
+      view: 'collection',
+      collection: 'post',
+    });
+    expect(
+      formatAdminRoute({ view: 'folder', collection: 'post', folder: '' })
+    ).toBe('#/collections/post');
+  });
+
+  it('still reads a document address as a document', () => {
+    expect(parseAdminRoute('#/collections/post/folder.mdx')).toEqual({
+      view: 'document',
+      collection: 'post',
+      path: 'folder.mdx',
+    });
   });
 });

@@ -13,6 +13,7 @@ import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import { TinaProvider } from '../editor/provider';
 import { TinaAdmin } from './admin';
 import { SearchControl } from './search';
+import { connectionOf } from '../test/connection';
 
 const hit = (path: string, snippet = ''): SearchHit => ({
   ref: { collection: 'post', path },
@@ -60,7 +61,7 @@ const contentPlugin = definePlugin({
   client: async () => ({
     default: {
       slice: () => ({
-        list: async () => [],
+        list: async () => connectionOf([]),
         get: async (_collection: string, path: string) => {
           const found = DOCUMENTS[path];
           if (found instanceof Error) throw found;
