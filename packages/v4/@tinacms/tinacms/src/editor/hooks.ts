@@ -49,6 +49,7 @@ import {
   FieldSchemaContext,
   type FormScope,
   FormScopeContext,
+  type SaveHandler,
   type StaleDraftActions,
   TinaRuntimeContext,
 } from './context';
@@ -57,6 +58,8 @@ import {
   type ListChange,
   ownFieldErrors,
 } from './field-errors';
+import { UploadFormContext } from './uploads/upload-context';
+import { uploadListOf } from './uploads/upload-list';
 import { countRevealedErrors, isRevealed, itemLevel } from './form-view-state';
 
 export function useFieldRegistry(): FieldRegistry {
@@ -328,51 +331,90 @@ async function recordSavePhase(
   setSavePhase(formId, { phase: 'saved' });
 }
 
-export function useFormSave(): () => Promise<void> {
-  const registry = useFieldRegistry();
-  const scope = useFormScope('form-save-outside-provider', 'useFormSave');
-  const { getValues, trigger, setValue } = useFormContext<TinaDocument>();
-  const runSave = useCallback(async () => {
-    const { formId, path, collection, onSave, hooks, reseedFields } = scope;
-    // Validate every field, not only the edited ones, so a required field the
-    // editor never touched surfaces its message at submit.
+// Checks every field, not only the edited ones, so a required field the editor
+// never touched surfaces its message at submit. Resolves false, and records the
+// save as failed, when the form is invalid.
+export function useFormCheck(): () => Promise<boolean> {
+  const scope = useFormScope('form-check-outside-provider', 'useFormCheck');
+  const { trigger } = useFormContext<TinaDocument>();
+  return useCallback(async () => {
     scope.view.getState().attemptSave();
     const valid = await trigger();
-    if (!valid) throw new FormValidationError();
-    const values = getValues();
-    const submitted = structuredClone(toFormValues(values));
-    const context = { documentPath: path, registry };
-    const hookScope = { formId, path, collection };
-    const digested = await runBeforeSave(
-      hooks,
-      digestDocument(values, collection.fields, context),
-      hookScope
-    );
-    const saved = await onSave?.(digested);
-    const savedDocument = saved ? saved.document : digested;
-    const written = adoptSavedValues(
-      formId,
-      submitted,
-      toFormValues(ingestDocument(savedDocument, collection.fields, context)),
-      (address, value) => setValue(address, value)
-    );
-    if (!written) useFormStore.getState().markSaved(formId, submitted);
-    if (written && written.length > 0) reseedFields();
-    try {
-      await runAfterSave(hooks, savedDocument, hookScope);
-    } catch (cause) {
-      throw new AfterSaveHookError(cause);
+    const store = useFormStore.getState();
+    if (!valid) {
+      store.setSavePhase(scope.formId, {
+        phase: 'failed',
+        message: new FormValidationError().message,
+      });
+    } else {
+      const last = store.saves[scope.formId];
+      if (last?.phase === 'failed' && last.reason !== 'branch-gone') {
+        store.clearSavePhase(scope.formId);
+      }
     }
-    scope.view.getState().resetReveal();
-    const warnings = saved ? (saved.hookWarnings ?? []) : [];
-    if (warnings.length > 0) {
-      throw new AfterSaveHookError(new Error(warnings.join(' ')));
-    }
-  }, [scope, getValues, trigger, setValue, registry]);
+    return valid;
+  }, [scope, trigger]);
+}
+
+export interface SaveSteps {
+  /** Writes the document after `beforeSave`. The form's `onSave` when absent. */
+  write?: SaveHandler;
+  /** Runs once the write resolves and the form is marked saved, before `afterSave`. */
+  afterWrite?: () => void;
+}
+
+// The admin's Save to new branch swaps the write step. Not exported from `editor/index.ts`.
+export function useFormSaveWith(): (steps?: SaveSteps) => Promise<void> {
+  const registry = useFieldRegistry();
+  const scope = useFormScope('form-save-outside-provider', 'useFormSave');
+  const { getValues, setValue } = useFormContext<TinaDocument>();
+  const check = useFormCheck();
+  const runSave = useCallback(
+    async ({ write, afterWrite }: SaveSteps) => {
+      const { formId, path, collection, onSave, hooks, reseedFields } = scope;
+      if (!(await check())) throw new FormValidationError();
+      const values = getValues();
+      const submitted = structuredClone(toFormValues(values));
+      const context = { documentPath: path, registry };
+      const hookScope = { formId, path, collection };
+      const digested = await runBeforeSave(
+        hooks,
+        digestDocument(values, collection.fields, context),
+        hookScope
+      );
+      const saved = await (write ?? onSave)?.(digested);
+      const savedDocument = saved ? saved.document : digested;
+      const written = adoptSavedValues(
+        formId,
+        submitted,
+        toFormValues(ingestDocument(savedDocument, collection.fields, context)),
+        (address, value) => setValue(address, value)
+      );
+      if (!written) useFormStore.getState().markSaved(formId, submitted);
+      if (written && written.length > 0) reseedFields();
+      afterWrite?.();
+      try {
+        await runAfterSave(hooks, savedDocument, hookScope);
+      } catch (cause) {
+        throw new AfterSaveHookError(cause);
+      }
+      scope.view.getState().resetReveal();
+      const warnings = saved ? (saved.hookWarnings ?? []) : [];
+      if (warnings.length > 0) {
+        throw new AfterSaveHookError(new Error(warnings.join(' ')));
+      }
+    },
+    [scope, check, getValues, setValue, registry]
+  );
   return useCallback(
-    () => recordSavePhase(scope.formId, runSave),
+    (steps = {}) => recordSavePhase(scope.formId, () => runSave(steps)),
     [scope.formId, runSave]
   );
+}
+
+export function useFormSave(): () => Promise<void> {
+  const saveWith = useFormSaveWith();
+  return useCallback(() => saveWith(), [saveWith]);
 }
 
 export function useFieldAddress(): FieldAddress {
@@ -500,12 +542,17 @@ export function useInvalidFieldCounts(addresses: readonly string[]): number[] {
  */
 export function useListItems() {
   const { view } = useFormScope('list-items-outside-provider', 'useListItems');
+  const runtime = use(TinaRuntimeContext);
+  const uploadForm = use(UploadFormContext);
   const rekeyThen = (
     listAddress: string,
     change: ListChange,
     apply: () => void
   ) => {
     view.getState().rekey(listAddress, change);
+    if (runtime && uploadForm) {
+      uploadListOf(runtime.store).rekeyFields(uploadForm, listAddress, change);
+    }
     apply();
   };
   return {

@@ -20,6 +20,7 @@ import { draftKey, readDraft, readWaitingDrafts } from '../form/drafts';
 import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 import { useAdminRoute } from './use-admin-route';
@@ -167,6 +168,7 @@ const config = asResolvedConfig({
     screenPlugin,
     stringFieldPlugin,
     coreValidatorsPlugin,
+    homePlugin,
   ],
   schema: {
     collections: [
@@ -257,6 +259,11 @@ beforeEach(() => {
   }
 });
 
+const documentStatus = () =>
+  within(
+    screen.getByRole('complementary', { name: 'Document form' })
+  ).getByRole('status');
+
 describe('TinaAdmin', () => {
   it('lists every collection the schema declares, and nothing else', async () => {
     renderAdmin();
@@ -286,9 +293,7 @@ describe('TinaAdmin', () => {
       path: 'content/posts/hello.mdx',
       value: { title: 'Hello!' },
     });
-    await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('Saved')
-    );
+    await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
     expect(input).toHaveValue('Hello!');
   });
 
@@ -506,7 +511,7 @@ describe('TinaAdmin unsaved changes', () => {
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    expect(documentStatus()).toHaveTextContent('Unsaved');
 
     const dialog = await openDiscardConfirm(user);
     expect(dialog).toHaveAccessibleName('Discard unsaved edits to “Hello!”?');
@@ -518,7 +523,7 @@ describe('TinaAdmin unsaved changes', () => {
     await waitFor(() =>
       expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello')
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No changes');
+    expect(documentStatus()).toHaveTextContent('No changes');
     expect(reloadIsBlocked()).toBe(false);
   });
 
@@ -965,7 +970,7 @@ describe('TinaAdmin draft recovery contract', () => {
     store(hello, { title: 'Mine' }, { title: 'Hello' });
     const user = await openDoc(/hello\.mdx/);
     await screen.findByText('Resume your unsaved edits?');
-    expect(screen.getByRole('status')).not.toHaveTextContent('No changes');
+    expect(documentStatus()).not.toHaveTextContent('No changes');
     await user.click(screen.getByRole('button', { name: 'Discard' }));
     await user.click(
       within(await screen.findByRole('alertdialog')).getByRole('button', {
@@ -973,7 +978,7 @@ describe('TinaAdmin draft recovery contract', () => {
       })
     );
     await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('No changes')
+      expect(documentStatus()).toHaveTextContent('No changes')
     );
   });
 
@@ -982,11 +987,9 @@ describe('TinaAdmin draft recovery contract', () => {
     const user = await openDoc(/hello\.mdx/);
     await screen.findByText('Resume your unsaved edits?');
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    expect(documentStatus()).toHaveTextContent('Unsaved');
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('Saved')
-    );
+    await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
   });
 
   it('row 3: a draft of an older file says the document changed', async () => {
@@ -1407,6 +1410,19 @@ describe('TinaAdmin leaving a document with unsaved edits', () => {
     );
   });
 
+  it('stays quiet when Media opens beside the document, and speaks when the editor leaves for Home', async () => {
+    const user = userEvent.setup();
+    await editHello(user);
+    await user.click(screen.getByRole('button', { name: 'Media' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/screens/media'));
+    expect(await screen.findByLabelText(/^Title\b/)).toBeVisible();
+    expect(screen.queryByText(/are kept in this browser/)).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    expect(
+      await screen.findByText('Edits to “Hello!” are kept in this browser')
+    ).toBeVisible();
+  });
+
   it('names a document by its file when the title is cleared', async () => {
     const user = userEvent.setup();
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
@@ -1663,17 +1679,12 @@ describe('TinaAdmin rail', () => {
     ).toHaveAttribute('aria-current', 'page');
   });
 
-  it('opens the Media panel beside the rail, with the library in the main area', async () => {
+  it('opens Media as a pane beside the rail, and the main area keeps its route', async () => {
     const user = userEvent.setup();
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: 'Media' }));
-    const panel = await screen.findByRole('complementary', {
-      name: 'Media panel',
-    });
-    expect(
-      within(panel).getByRole('button', { name: 'Media library' })
-    ).toHaveAttribute('aria-current', 'page');
     expect(await screen.findByText(/media library at/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Media library' })).toBeNull();
   });
 
   it('says so when a collection has no documents', async () => {
@@ -1728,7 +1739,7 @@ describe('TinaAdmin rail', () => {
     await waitFor(() => expect(window.location.hash).toBe('#/media'));
     expect(
       within(
-        await screen.findByRole('complementary', { name: 'Media panel' })
+        await screen.findByRole('complementary', { name: 'Media' })
       ).getByText('No media library is installed.')
     ).toBeVisible();
   });
@@ -1867,16 +1878,6 @@ describe('TinaAdmin rail', () => {
       'aria-current',
       'page'
     );
-  });
-
-  it('hides the empty Media main area below lg', async () => {
-    window.location.hash = '#/media';
-    renderAdmin();
-    const heading = await screen.findAllByRole('heading', { name: 'Media' });
-    const main = heading
-      .map((node) => node.closest('[data-slot=sidebar-inset]'))
-      .find(Boolean);
-    expect(main).toHaveClass('max-lg:hidden');
   });
 });
 

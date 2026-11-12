@@ -138,6 +138,14 @@ const renderField = (
 const fieldGroup = (name: string) =>
   screen.findByRole('group', { name: new RegExp(`^${name}\\b`) });
 
+// The field's messages sit beside its group, inside the field's row. The page
+// also holds the upload list's polite status, so a warning is read from the row.
+const rowOf = (group: HTMLElement) => {
+  const row = group.closest<HTMLElement>('[data-slot="field-wrapper"]');
+  if (!row) throw new Error('The group is not inside a field row');
+  return within(row);
+};
+
 const imageFile = (name = 'new.png') =>
   new File(['image'], name, { type: 'image/png' });
 
@@ -253,7 +261,7 @@ describe('ImageField uploading', () => {
       },
     });
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'notes.pdf: Invalid file type'
+      'Only images can go in this field.'
     );
     expect(media.upload).not.toHaveBeenCalled();
     expect(valueOf('hero')).toBeNull();
@@ -344,6 +352,11 @@ describe('ImageField removing', () => {
     fireEvent.drop(group, {
       dataTransfer: { files: [new File(['%PDF'], 'notes.pdf')] },
     });
+    await userEvent.click(
+      within(
+        await screen.findByRole('alertdialog', { name: 'Replace hero.jpg?' })
+      ).getByRole('button', { name: 'Replace' })
+    );
     expect(await screen.findByRole('alert')).toBeVisible();
     await userEvent.click(
       within(group).getByRole('button', { name: 'Remove hero.jpg' })
@@ -381,7 +394,7 @@ describe('ImageField missing images', () => {
       `/uploads/${HERO}?w=400&h=400&retry=1`
     );
     fireEvent.load(image);
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(rowOf(group).queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('captions a missing image "File not found", not its name', async () => {
@@ -401,10 +414,10 @@ describe('ImageField missing images', () => {
     vi.useFakeTimers();
     for (let attempt = 0; attempt < 3; attempt++) {
       await failToLoad(group, 'deleted.jpg');
-      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+      expect(rowOf(group).queryByRole('status')).not.toBeInTheDocument();
     }
     fireEvent.error(within(group).getByAltText('deleted.jpg'));
-    expect(screen.getByRole('status')).toHaveTextContent(
+    expect(rowOf(group).getByRole('status')).toHaveTextContent(
       'This image is no longer in Media'
     );
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
@@ -433,7 +446,7 @@ describe('ImageField missing images', () => {
       await failToLoad(group, 'photo.jpg');
     }
     fireEvent.error(within(group).getByAltText('photo.jpg'));
-    expect(screen.getByRole('status')).toHaveTextContent(
+    expect(rowOf(group).getByRole('status')).toHaveTextContent(
       'This image is no longer in Media'
     );
     vi.useRealTimers();
@@ -441,7 +454,7 @@ describe('ImageField missing images', () => {
     const image = within(group).getByAltText('photo.jpg');
     fireEvent.load(image);
     expect(image).toBeVisible();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(rowOf(group).queryByRole('status')).not.toBeInTheDocument();
   });
 });
 

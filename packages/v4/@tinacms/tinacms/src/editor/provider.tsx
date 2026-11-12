@@ -52,7 +52,10 @@ import {
   toFormId,
   toFormValues,
   useFormStore,
+  valuesEqual,
 } from '../form/form-store';
+import { UploadFormContext } from './uploads/upload-context';
+import { uploadListOf } from './uploads/upload-list';
 import { SELF_CONTAINED_VALIDATORS } from '../plugins/validators/core-validators.schema';
 import { DEFAULT_RPC_URL } from '../rpc/proxy';
 import { createTinaStore } from '../store/create-store';
@@ -301,6 +304,7 @@ const readKeptSeed = (
 
 const syncSeededForm = (
   seededSignature: { current: string | null },
+  seededFormId: { current: FormId },
   formId: FormId,
   userId: DraftUserScope,
   ingested: TinaDocument,
@@ -308,9 +312,17 @@ const syncSeededForm = (
   seedValues: TinaDocument,
   keptSeed: TinaDocument | null,
   resetForm: (values: TinaDocument, options?: { keepErrors?: boolean }) => void,
-  advanceSeedKey: (formId: FormId) => void
+  advanceSeedKey: (formId: FormId) => void,
+  dropFieldTargets: () => void
 ) => {
-  useFormStore.getState().registerForm(formId, toFormValues(ingested), equal);
+  const incoming = toFormValues(ingested);
+  const before = useFormStore.getState().forms[formId];
+  const savedHere =
+    seededFormId.current === formId &&
+    isEdited(before) &&
+    valuesEqual(incoming, before.baseline, equal);
+  seededFormId.current = formId;
+  useFormStore.getState().registerForm(formId, incoming, equal);
   const signature = seedSignatureOf(formId, userId, seedValues);
   if (seededSignature.current === null) {
     seededSignature.current = signature;
@@ -320,13 +332,15 @@ const syncSeededForm = (
     seededSignature.current = signature;
     resetForm(seedValues, { keepErrors: seedValues === keptSeed });
     advanceSeedKey(formId);
+    if (!savedHere) dropFieldTargets();
   }
 };
 
 const discardFormEdits = (
   formId: FormId,
   resetForm: (values: TinaDocument) => void,
-  advanceSeedKey: (formId: FormId) => void
+  advanceSeedKey: (formId: FormId) => void,
+  dropFieldTargets: () => void
 ) => {
   const store = readFormStore();
   const scope = store.forms[formId];
@@ -335,6 +349,7 @@ const discardFormEdits = (
   store.discardEdits(formId);
   resetForm(baseline);
   advanceSeedKey(formId);
+  dropFieldTargets();
 };
 
 const causeOf = (
@@ -356,7 +371,8 @@ const buildStaleDraftActions = (
   collection: CollectionSchema,
   equal: ReturnType<typeof fieldEqualityFor>,
   resetForm: (values: TinaDocument) => void,
-  advanceSeedKey: (formId: FormId) => void
+  advanceSeedKey: (formId: FormId) => void,
+  dropFieldTargets: () => void
 ): StaleDraftActions | null => {
   const newest = copies?.at(-1);
   if (!copies || !newest) return null;
@@ -391,6 +407,7 @@ const buildStaleDraftActions = (
       if (!values) return;
       resetForm(toDocument(values));
       advanceSeedKey(formId);
+      dropFieldTargets();
     },
     copies,
     discard: (shown) => readFormStore().discardWaiting(formId, shown),
@@ -483,7 +500,8 @@ function useSeededFormSync(
   equal: ReturnType<typeof fieldEqualityFor>,
   seedValues: TinaDocument,
   keptSeed: TinaDocument | null,
-  resetForm: (values: TinaDocument, options?: { keepErrors?: boolean }) => void
+  resetForm: (values: TinaDocument, options?: { keepErrors?: boolean }) => void,
+  dropFieldTargets: () => void
 ) {
   const reseeds = useRef(0);
   const [seedKey, setSeedKey] = useState(() => `${formId}#${reseeds.current}`);
@@ -498,9 +516,11 @@ function useSeededFormSync(
   );
 
   const seededSignature = useRef<string | null>(null);
+  const seededFormId = useRef(formId);
   useEffect(() => {
     syncSeededForm(
       seededSignature,
+      seededFormId,
       formId,
       userId,
       ingested,
@@ -508,7 +528,8 @@ function useSeededFormSync(
       seedValues,
       keptSeed,
       resetForm,
-      advanceSeedKey
+      advanceSeedKey,
+      dropFieldTargets
     );
   }, [
     formId,
@@ -519,14 +540,15 @@ function useSeededFormSync(
     resetForm,
     equal,
     advanceSeedKey,
+    dropFieldTargets,
   ]);
 
   const discardEdits = useCallback(() => {
     const { showLevels, resetReveal } = view.getState();
     showLevels([]);
     resetReveal();
-    discardFormEdits(formId, resetForm, advanceSeedKey);
-  }, [formId, resetForm, advanceSeedKey, view]);
+    discardFormEdits(formId, resetForm, advanceSeedKey, dropFieldTargets);
+  }, [formId, resetForm, advanceSeedKey, dropFieldTargets, view]);
 
   return { seedKey, advanceSeedKey, discardEdits, view };
 }
@@ -622,6 +644,13 @@ export function FormProvider({
     shouldFocusError: false,
   });
 
+  const [uploadForm] = useState(() => ({}));
+  const uploads = uploadListOf(runtime.store);
+  const dropFieldTargets = useCallback(
+    () => uploads.dropFieldTargets(uploadForm),
+    [uploads, uploadForm]
+  );
+
   const { seedKey, advanceSeedKey, discardEdits, view } = useSeededFormSync(
     formId,
     userId,
@@ -629,7 +658,8 @@ export function FormProvider({
     equal,
     seedValues,
     kept.seed,
-    methods.reset
+    methods.reset,
+    dropFieldTargets
   );
 
   const waiting = useFormStore((state) =>
@@ -644,13 +674,34 @@ export function FormProvider({
         collection,
         equal,
         methods.reset,
-        advanceSeedKey
+        advanceSeedKey,
+        dropFieldTargets
       ),
-    [waiting, formId, ingested, collection, equal, methods, advanceSeedKey]
+    [
+      waiting,
+      formId,
+      ingested,
+      collection,
+      equal,
+      methods,
+      advanceSeedKey,
+      dropFieldTargets,
+    ]
   );
 
   useFormMethodSubscriptions(formId, path, collection, formHooks, methods);
 
+  useEffect(
+    () =>
+      uploads.registerForm(uploadForm, (address, mediaPath) =>
+        methods.setValue(address, mediaPath, {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        })
+      ),
+    [uploads, uploadForm, methods]
+  );
   const [fieldReseeds, setFieldReseeds] = useState(0);
   const reseedFields = useCallback(
     () => setFieldReseeds((count) => count + 1),
@@ -777,9 +828,11 @@ export function FormProvider({
 
   return (
     <FormScopeContext value={formScope}>
-      <RhfFormProvider {...methods}>
-        <>{children}</>
-      </RhfFormProvider>
+      <UploadFormContext value={uploadForm}>
+        <RhfFormProvider {...methods}>
+          <>{children}</>
+        </RhfFormProvider>
+      </UploadFormContext>
     </FormScopeContext>
   );
 }
