@@ -13,7 +13,8 @@ import {
   useNewDocumentIds,
   useUnsavedFormIds,
 } from '../form/form-store';
-import { directoryOf, isUnder } from '../editor/collection-documents';
+import { isUnder } from '../core/content/names';
+import { directoryOf } from '../editor/collection-documents';
 import type { GlobalNavEntry } from '../core/slot/contract';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { DiscardConfirm } from './discard-confirm';

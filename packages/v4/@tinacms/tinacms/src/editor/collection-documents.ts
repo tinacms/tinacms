@@ -38,43 +38,16 @@ import {
   useCurrentBranch,
 } from './content-queries';
 import { useContentSlice, useOptionalAuthSlice } from './hooks';
-
-const NAME_MAX_BYTES = 255;
-
-const hasControlCharacter = (name: string): boolean =>
-  [...name].some((char) => {
-    const code = char.charCodeAt(0);
-    return code < 0x20 || code === 0x7f;
-  });
-
-/** The server's name rules, checked early so a dialog can answer without a round trip. */
-export const isValidName = (name: string): boolean =>
-  new TextEncoder().encode(name).length >= 1 &&
-  new TextEncoder().encode(name).length <= NAME_MAX_BYTES &&
-  !name.includes('/') &&
-  !name.includes('\\') &&
-  !hasControlCharacter(name) &&
-  name !== '.' &&
-  name !== '..' &&
-  !name.startsWith('.') &&
-  !name.endsWith(' ') &&
-  !name.endsWith('.') &&
-  name.trim() !== '';
-
-/** A file name is valid when the name and the name without its extension are. */
-export const isValidFileName = (name: string, extension: string): boolean =>
-  isValidName(name) &&
-  isValidName(name.slice(0, name.length - extension.length));
-
-const parentOf = (path: string): string =>
-  path.split('/').slice(0, -1).join('/');
-const nameOf = (path: string): string => path.split('/').at(-1) ?? path;
-const extensionOf = (name: string): string => {
-  const dot = name.lastIndexOf('.');
-  return dot <= 0 ? '' : name.slice(dot);
-};
-
-const trimSlashes = (path: string): string => path.replace(/^\/+|\/+$/g, '');
+import {
+  extensionOf,
+  folderPartsInside,
+  isUnder,
+  isValidFileName,
+  isValidName,
+  nameOf,
+  parentOf,
+  trimSlashes,
+} from '../core/content/names';
 
 /** The repo-relative directory of a folder of the collection. */
 export const directoryOf = (
@@ -95,9 +68,6 @@ export const folderOfDocument = (
   if (!isUnder(parent, root) || parent === root) return '';
   return parent.slice(root.length === 0 ? 0 : root.length + 1);
 };
-
-export const isUnder = (path: string, directory: string): boolean =>
-  directory === '' || path.startsWith(`${directory}/`);
 
 const toContentError = (cause: unknown): ContentError => {
   if (cause instanceof ContentError) return cause;

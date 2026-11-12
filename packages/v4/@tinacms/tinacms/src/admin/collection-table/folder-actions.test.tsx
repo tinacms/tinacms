@@ -12,7 +12,8 @@ import {
   type ContentProvider,
   type DocumentSummary,
 } from '../../core/content/contract';
-import { nameOf, queryDocuments } from '../../core/content/list-query';
+import { queryDocuments } from '../../core/content/list-query';
+import { nameOf } from '../../core/content/names';
 import type { TinaStoreState } from '../../core/plugin';
 import type { AllowedActions, CollectionSchema } from '../../core/schema/types';
 import { type TinaRuntime, TinaRuntimeContext } from '../../editor/context';

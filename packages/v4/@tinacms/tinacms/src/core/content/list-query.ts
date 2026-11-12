@@ -5,13 +5,11 @@ import {
   type ListQuery,
   ProviderRefusalError,
 } from './contract';
+import { folderPartsInside, nameOf } from './names';
 
-export const MAX_LIST_PAGE = 200;
+const MAX_LIST_PAGE = 200;
 
 const PLACEHOLDER = /^\.gitkeep\./;
-
-/** The last part of a path. */
-export const nameOf = (path: string): string => path.split('/').at(-1) ?? path;
 
 /** The name the table shows: the title, else the file name. */
 export const shownNameOf = (summary: DocumentSummary): string =>
@@ -125,7 +123,7 @@ export const queryDocuments = ({
     scope === undefined
       ? documents
       : documents.filter((summary) =>
-          inScope(folderPartsOf(summary.path, root))
+          inScope(folderPartsInside(summary.path, root))
         );
   const matching = scoped.filter(
     (summary) =>
@@ -141,7 +139,7 @@ export const queryDocuments = ({
       if (!counts.has(name)) counts.set(name, 0);
     };
     for (const summary of documents) {
-      const parts = folderPartsOf(summary.path, root);
+      const parts = folderPartsInside(summary.path, root);
       const startsWithScope = scopeParts.every(
         (part, index) => parts[index] === part
       );

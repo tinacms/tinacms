@@ -4,7 +4,8 @@ import {
   type FolderSummary,
   type ListSort,
 } from '../../core/content/contract';
-import { nameOf, shownNameOf } from '../../core/content/list-query';
+import { shownNameOf } from '../../core/content/list-query';
+import { nameOf } from '../../core/content/names';
 
 export const PAGE_SIZE = 50;
 export const FILTER_DELAY_MS = 250;

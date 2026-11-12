@@ -39,7 +39,11 @@ import {
   type GraphQLVariables,
   createGraphQLPipeline,
 } from '../graphql/graphql-pipeline';
-import { folderPartsOf, isValidFileName, isValidName } from './names';
+import {
+  folderPartsOf,
+  isValidFileName,
+  isValidName,
+} from '../../../../core/content/names';
 import { referencesCollection, rewriteReferences } from './reference-rewrite';
 import { createWriteLock } from './write-lock';
 

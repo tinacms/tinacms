@@ -41,8 +41,6 @@ export {
   type CollectionCapabilities,
   type DraftCounts,
   documentsPageKey,
-  isValidFileName,
-  isValidName,
   useCollectionActions,
   useCollectionCapabilities,
   useDocumentsPage,

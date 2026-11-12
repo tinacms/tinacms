@@ -24,8 +24,7 @@ import {
   ContentError,
   type DocumentReferrer,
 } from '../../core/content/contract';
-import { nameOf } from '../../core/content/list-query';
-import { isValidName } from '../../editor';
+import { isValidName, nameOf } from '../../core/content/names';
 
 const GENERIC_FAILURE = 'Something went wrong. Please try again.';
 const REFERRER_LIMIT = 10;
