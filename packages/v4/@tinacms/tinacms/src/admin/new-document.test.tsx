@@ -16,6 +16,15 @@ import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { connectionOf } from '../test/connection';
 import { TinaAdmin } from './admin';
 
+// The shell also draws an upload status region, so pick the document's own.
+const documentStatus = (): HTMLElement => {
+  const status = screen
+    .getAllByRole('status')
+    .find((element) => !element.hasAttribute('data-upload-status'));
+  if (!status) throw new Error('The document status is not on screen.');
+  return status;
+};
+
 const FOLDER_PATH = 'content/posts/a/hello-copy.mdx';
 const TOP_PATH = 'content/posts/top-copy.mdx';
 
@@ -92,7 +101,7 @@ describe('a document with no file yet', () => {
     openCopy(FOLDER_PATH);
     renderAdmin();
     expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello copy');
-    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    expect(documentStatus()).toHaveTextContent('Unsaved');
     expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled();
   });
 
@@ -114,9 +123,7 @@ describe('a document with no file yet', () => {
       title: 'Hello copy',
     });
     expect(update).not.toHaveBeenCalled();
-    await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('Saved')
-    );
+    await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
     expect(readDraft(toFormId(FOLDER_PATH))).toBeUndefined();
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
   });
@@ -286,9 +293,7 @@ describe('the table after a save and after Duplicate', () => {
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(update).toHaveBeenCalledTimes(1));
-    await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('Saved')
-    );
+    await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
     await user.click(
       screen.getByRole('button', { name: 'Return to navigator' })
     );
@@ -355,7 +360,7 @@ describe('the table after a save and after Duplicate', () => {
       )
     );
     expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello');
-    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    expect(documentStatus()).toHaveTextContent('Unsaved');
     expect(create).not.toHaveBeenCalled();
     expect(files.has('content/posts/fresh.mdx')).toBe(false);
   });
