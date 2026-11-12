@@ -126,3 +126,66 @@ test('deleting a document discards its stored unsaved edit although its editor i
     await fs.writeFile(LINKED, original);
   }
 });
+
+test('one long unbroken title keeps every row menu on screen', async ({
+  page,
+}) => {
+  const long = path.join(POSTS, 'guides/long-title.mdx');
+  await fs.writeFile(long, `---\ntitle: ${'X'.repeat(300)}\n---\n\nBody.\n`);
+  try {
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto('/#/collections/post/folder/guides');
+      await page.reload();
+      await expect(
+        page.getByRole('button', { name: /^Actions for X/ })
+      ).toBeVisible();
+      for (const menu of await page
+        .getByRole('button', { name: /^Actions for/ })
+        .all()) {
+        const box = await menu.boundingBox();
+        expect(box).not.toBeNull();
+        expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(width);
+      }
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth - window.innerWidth
+        )
+      ).toBeLessThanOrEqual(0);
+    }
+  } finally {
+    await fs.rm(long, { force: true });
+  }
+});
+
+test('the Deleted toast stays when deleting the last row of the last page', async ({
+  page,
+}) => {
+  const folder = path.join(POSTS, 'many');
+  await fs.mkdir(folder, { recursive: true });
+  await Promise.all(
+    Array.from({ length: 51 }, (_, index) =>
+      fs.writeFile(
+        path.join(folder, `p${String(index).padStart(2, '0')}.mdx`),
+        `---\ntitle: Many ${String(index).padStart(2, '0')}\n---\n\nBody.\n`
+      )
+    )
+  );
+  try {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/#/collections/post/folder/many');
+    await page.reload();
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByText('Page 2 of 2')).toBeVisible();
+    await page.getByRole('button', { name: /^Actions for/ }).click();
+    await page.getByRole('menuitem', { name: 'Delete' }).click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
+    await expect(page.getByText('Many 00')).toBeVisible();
+    const toast = page.getByText(/^Deleted /);
+    await expect(toast).toBeVisible();
+    await page.waitForTimeout(2500);
+    await expect(toast).toBeVisible();
+  } finally {
+    await fs.rm(folder, { recursive: true, force: true });
+  }
+});
