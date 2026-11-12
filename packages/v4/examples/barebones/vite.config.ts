@@ -13,7 +13,7 @@ import { defineConfig } from 'vite';
 // extension, and Vite externalizes every bare import of this file to node. A relative
 // import is bundled by esbuild instead, which follows those imports. When the dist build
 // lands, these become:
-//   import { loadTinaConfig } from '@tinacms/tinacms/...';
+//   import { openTinaConfig } from '@tinacms/tinacms/...';
 //   import { tinaLocalDataLayerVitePlugin } from '@tinacms/tinacms/local-data-layer/vite';
 import { openTinaConfig } from '../../@tinacms/tinacms/src/codegen/load-config';
 import { tinaLocalDataLayerVitePlugin } from '../../@tinacms/tinacms/src/plugins/content/local/server/local-data-layer.vite';
