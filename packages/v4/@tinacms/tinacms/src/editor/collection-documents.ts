@@ -1,5 +1,6 @@
 import {
   type QueryClient,
+  keepPreviousData,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
@@ -130,6 +131,7 @@ export const useDocumentsPage = (collection: string, query: ListQuery) => {
     queryKey: documentsPageKey(collection, query, branch),
     queryFn: () => attempt(() => content.list(collection, query)),
     staleTime: CONTENT_STALE_TIME,
+    placeholderData: keepPreviousData,
   });
 };
 

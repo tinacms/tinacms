@@ -36,6 +36,8 @@ interface World {
   emptyFolders: string[];
   referrers: DocumentReferrer[] | 'fail';
   failList: boolean;
+  slowRefetch: boolean;
+  listCalls: number;
   renameFails: ContentError | null;
   operations: boolean;
 }
@@ -51,6 +53,10 @@ const provider = (): ContentProvider => {
   const base: ContentProvider = {
     list: async (_collection, query) => {
       if (world.failList) throw new ContentError('network');
+      world.listCalls += 1;
+      if (world.slowRefetch && world.listCalls > 1) {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
       const folder = query?.folder ?? '';
       const known = [
         ...world.emptyFolders,
@@ -191,6 +197,8 @@ beforeEach(() => {
       doc('guides/more.md', { title: 'More' }),
     ],
     emptyFolders: [],
+    slowRefetch: false,
+    listCalls: 0,
     referrers: [],
     failList: false,
     renameFails: null,
@@ -392,6 +400,22 @@ describe('CollectionTable', () => {
       'aria-sort',
       'ascending'
     );
+  });
+
+  it('keeps the same rows on screen while the default sort switches to title', async () => {
+    world.summaries = [
+      doc('b.md', { title: 'Bee' }),
+      doc('a.md', { title: 'Ant' }),
+    ];
+    world.slowRefetch = true;
+    renderTable();
+    const first = await rowNamed('Ant');
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('columnheader', { name: /Last edited/ })
+      ).toBeNull()
+    );
+    expect(screen.getByRole('button', { name: 'Ant' })).toBe(first);
   });
 
   it('keeps the title column from widening the table', async () => {
