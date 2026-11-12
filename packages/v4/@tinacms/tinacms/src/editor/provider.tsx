@@ -579,7 +579,9 @@ export function FormProvider({
   );
 
   const waiting = useFormStore((state) =>
-    state.hidden[formId] ? undefined : state.waiting[formId]
+    state.hidden[formId] || state.offered[formId]
+      ? undefined
+      : state.waiting[formId]
   );
   const staleDraftActions = useMemo(
     () =>

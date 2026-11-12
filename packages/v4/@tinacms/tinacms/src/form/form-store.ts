@@ -104,6 +104,10 @@ export interface FormStore {
   swapFailures: Partial<Record<FormId, number>>;
   /** Forms whose Resume prompt is hidden until the document opens again, after a failed Resume. */
   hidden: Partial<Record<FormId, true>>;
+  /** Forms whose Resume prompt showed and that the editor left. The prompt stays down until reload. */
+  offered: Partial<Record<FormId, true>>;
+  /** Records that the editor left a form while its Resume prompt showed. */
+  markOffered: (formId: FormId) => void;
   /** Removes the live copy, every waiting copy and the in-memory edits. */
   discardStoredDraft: (formId: FormId) => void;
   /**
@@ -285,6 +289,7 @@ const DEVTOOLS_ACTION = {
   discardEdits: 'form/discardEdits',
   resumeWaiting: 'form/resumeWaiting',
   removeForm: 'form/removeForm',
+  markOffered: 'form/markOffered',
 } as const;
 type DevtoolsActionLabel =
   (typeof DEVTOOLS_ACTION)[keyof typeof DEVTOOLS_ACTION];
@@ -311,7 +316,16 @@ export const useFormStore = create<FormStore>()(
         failures: {},
         swapFailures: {},
         hidden: {},
+        offered: {},
         active: null,
+
+        markOffered: (formId) =>
+          apply((state) => {
+            if (state.offered[formId] || !state.waiting[formId]?.length) {
+              return state;
+            }
+            return { offered: { ...state.offered, [formId]: true } };
+          }, DEVTOOLS_ACTION.markOffered),
 
         discardStoredDraft: (formId) => {
           const { userId, branch } = readFormStore();
@@ -392,6 +406,7 @@ export const useFormStore = create<FormStore>()(
               failures: {},
               swapFailures: {},
               hidden: {},
+              offered: {},
               active: null,
             };
           }, DEVTOOLS_ACTION.setBranch),
@@ -434,6 +449,7 @@ export const useFormStore = create<FormStore>()(
               failures: {},
               swapFailures: {},
               hidden: {},
+              offered: {},
               active: null,
             };
           }, DEVTOOLS_ACTION.setUserId),
@@ -721,12 +737,44 @@ export const syncDrafts = () =>
           next.branch
         );
         markStorage(formId, result === 'failed');
+        if (result === 'ok') {
+          dropHeldWaiting(formId, scope, next.userId, next.branch);
+        }
       } else if (formStatus(before) === 'dirty') {
         removeDraft(formId, next.userId, next.branch);
         markStorage(formId, false);
       }
     }
   });
+
+// A waiting copy equal to what the form holds offers nothing to Resume. The live
+// copy holds the same values, so removing the waiting copy loses nothing.
+const dropHeldWaiting = (
+  formId: FormId,
+  scope: EditedForm,
+  userId: DraftUserScope,
+  branch: string | undefined
+) => {
+  const waiting = readWaitingDrafts(formId, userId, branch);
+  const remaining = waiting.filter(
+    (copy) => !valuesEqual(toFormValues(copy.values), scope.values, scope.equal)
+  );
+  if (remaining.length === waiting.length) return;
+  if (storeFailed(writeWaitingDrafts(formId, remaining, userId, branch))) {
+    return;
+  }
+  useFormStore.setState(
+    (state) => ({
+      waiting:
+        remaining.length > 0
+          ? { ...state.waiting, [formId]: remaining }
+          : withoutKey(state.waiting, formId),
+      draftsVersion: state.draftsVersion + 1,
+    }),
+    false,
+    DEVTOOLS_ACTION.storage
+  );
+};
 
 // Records whether the newest edits of a form are confirmed stored. Only a change
 // updates the store, so the subscriber does not loop.

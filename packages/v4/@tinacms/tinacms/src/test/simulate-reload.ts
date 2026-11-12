@@ -10,6 +10,7 @@ export const simulateReload = () => {
     failures: {},
     swapFailures: {},
     hidden: {},
+    offered: {},
     active: null,
   });
 };

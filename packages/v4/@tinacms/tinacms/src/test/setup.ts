@@ -42,6 +42,7 @@ beforeEach(() => {
     failures: {},
     swapFailures: {},
     hidden: {},
+    offered: {},
     active: null,
   });
   localStorage.clear();

@@ -11,6 +11,7 @@ const noticeId = (path: string) => `kept-edits:${path}`;
 /**
  * Leaving a document that holds unsaved edits never asks and never blocks. A
  * notice says the edits stay in this browser and offers a way back to them.
+ * A Resume prompt the editor left without an answer does not show again until reload.
  */
 export function useKeptEditsNotice(
   route: AdminRoute,
@@ -30,6 +31,7 @@ export function useKeptEditsNotice(
     ) {
       return;
     }
+    readFormStore().markOffered(toFormId(left.path));
     const scope = readFormStore().forms[toFormId(left.path)];
     if (formStatus(scope) !== 'dirty') return;
     if (readFormStore().unstored[toFormId(left.path)]) return;
