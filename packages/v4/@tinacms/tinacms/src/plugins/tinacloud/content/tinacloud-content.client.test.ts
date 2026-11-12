@@ -166,6 +166,24 @@ describe('TinaCloud content slice', () => {
     ]);
   });
 
+  it('lists each branch with its pull request URL', async () => {
+    stubTinaCloud([
+      {
+        name: 'feat/x',
+        githubPullRequestUrl: 'https://github.com/acme/site/pull/12',
+      },
+      { name: 'main', protected: true, githubPullRequestUrl: '' },
+    ]);
+    expect(await content().branches?.list()).toEqual([
+      {
+        name: 'feat/x',
+        protected: undefined,
+        pullRequestUrl: 'https://github.com/acme/site/pull/12',
+      },
+      { name: 'main', protected: true, pullRequestUrl: undefined },
+    ]);
+  });
+
   it('reports a failed save as a ContentError', async () => {
     stubTinaCloud({
       errors: [

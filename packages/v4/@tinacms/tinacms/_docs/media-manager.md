@@ -62,9 +62,9 @@ steps out through the folders before it leaves Media.
   store the old path show a missing file afterward.
 - **Download.** Download saves each selected file under its own name. If the
   media store refuses the download, a message names how many files failed.
-- **Protected branch.** The first delete or move on a protected branch asks for
-  a new branch, as Save does. Without a handler for the dialog, the action is
-  off and nothing changes.
+- **Protected branch.** On a protected branch, Delete and Move are off. A note
+  under the header says to switch to another branch. Select mode, Download and
+  Copy URLs still work.
 - **Upload.** "Upload" and drag and drop work as before. The browser rejects a
   file that has the wrong type or is too large.
 - **States.** The pane shows a loading look, an empty look, a no-results look, a

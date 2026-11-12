@@ -490,8 +490,8 @@ catalogs:
       specifier: 4.0.8
       version: 4.0.8
     minimatch:
-      specifier: ^5.1.6
-      version: 5.1.6
+      specifier: ^5.1.9
+      version: 5.1.9
     monaco-editor:
       specifier: 0.31.0
       version: 0.31.0
@@ -1505,7 +1505,7 @@ importers:
         version: 1.0.0
       minimatch:
         specifier: 'catalog:'
-        version: 5.1.6
+        version: 5.1.9
       normalize-path:
         specifier: 'catalog:'
         version: 3.0.0
@@ -12870,8 +12870,8 @@ packages:
   minimatch@3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
 
-  minimatch@5.1.6:
-    resolution: {integrity: sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==}
+  minimatch@5.1.9:
+    resolution: {integrity: sha512-7o1wEA2RyMP7Iu7GNba9vc0RWWGACJOCZBJX2GJWip0ikV+wcOsgVuY9uE8CPiyQhkGFSlhuSkZPavN7u1c2Fw==}
     engines: {node: '>=10'}
 
   minimatch@9.0.5:
@@ -29907,7 +29907,7 @@ snapshots:
     dependencies:
       brace-expansion: 1.1.12
 
-  minimatch@5.1.6:
+  minimatch@5.1.9:
     dependencies:
       brace-expansion: 2.0.2
 

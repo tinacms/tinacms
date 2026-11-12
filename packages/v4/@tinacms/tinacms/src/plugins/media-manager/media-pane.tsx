@@ -39,6 +39,7 @@ import {
 import {
   READ_ONLY_NOTE,
   NO_PERMISSION_NOTE,
+  protectedNote,
   countLine,
   downloadFailureMessage,
 } from './media-pane-words';
@@ -182,10 +183,10 @@ export function MediaPane({ segments }: AdminScreenProps) {
           null;
       }
     },
-    (closedHookDialog) => {
+    () => {
       setSelected(new Set());
       setConfirm(null);
-      if (confirm !== null || closedHookDialog) {
+      if (confirm !== null) {
         setDriftFocus((count) => count + 1);
       }
     }
@@ -215,13 +216,16 @@ export function MediaPane({ segments }: AdminScreenProps) {
     if (hasNextPage && !isFetchingNextPage) void fetchNextPage();
   };
 
-  const locked = readOnly || changes.locked;
+  const { protectedBranch } = changes;
+  const locked = readOnly || protectedBranch !== undefined || changes.locked;
   const actionsOff = locked || changes.busy;
   const lockNote = readOnly
     ? READ_ONLY_NOTE
-    : changes.locked
-      ? NO_PERMISSION_NOTE
-      : null;
+    : protectedBranch !== undefined
+      ? protectedNote(protectedBranch)
+      : changes.locked
+        ? NO_PERMISSION_NOTE
+        : null;
   const detailsFill = activePath !== null && !wide;
   const needsSetup = status.data?.kind === 'needs-setup' ? status.data : null;
 
@@ -315,7 +319,7 @@ export function MediaPane({ segments }: AdminScreenProps) {
 
   const escape = useEffectEvent((event: globalThis.KeyboardEvent) => {
     if (event.key !== 'Escape' || event.defaultPrevented) return;
-    if (confirm || newFolder || changes.dialog) return;
+    if (confirm || newFolder) return;
     if (activePath !== null) {
       closeDetails();
     } else if (selecting) {
@@ -658,7 +662,6 @@ export function MediaPane({ segments }: AdminScreenProps) {
           }}
         />
       ) : null}
-      {changes.dialog}
     </MediaPaneRoot>
   );
 }

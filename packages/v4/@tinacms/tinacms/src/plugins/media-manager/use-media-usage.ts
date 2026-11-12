@@ -4,7 +4,6 @@ import { useCurrentBranch } from '../../editor/content-queries';
 import {
   useMediaSlice,
   useOptionalContentSlice,
-  useSchemaCollections,
   useTinaStore,
 } from '../../editor/hooks';
 import { readDraft } from '../../form/drafts';
@@ -61,7 +60,6 @@ export function useMediaUsage(paths: readonly string[], enabled: boolean) {
   const media = useMediaSlice();
   const content = useOptionalContentSlice();
   const search = useTinaStore((state) => state.search);
-  const collections = useSchemaCollections();
   const branch = useCurrentBranch() ?? '';
   const unsavedIds = useUnsavedFormIds();
   // A dirty form keeps its id as it gains a reference, so the key must follow its values.
@@ -77,7 +75,6 @@ export function useMediaUsage(paths: readonly string[], enabled: boolean) {
         resolveUrl: (path) => media.resolveUrl(path),
         search: isSearchProvider(search) ? search : null,
         content,
-        collections: collections.map(({ name }) => name),
         unsaved: readUnsavedDocuments(unsavedIds),
       };
       return findMediaUsage(deps, paths, signal);

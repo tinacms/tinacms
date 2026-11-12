@@ -1,6 +1,7 @@
-import type {
-  ContentProvider,
-  DocumentSummary,
+import {
+  ContentError,
+  type ContentProvider,
+  type DocumentEntry,
 } from '../../core/content/contract';
 import type { SearchProvider } from '../../core/search/contract';
 import type { TinaDocument } from '../../core/schema/types';
@@ -29,8 +30,7 @@ export interface UnsavedDocument {
 export interface MediaUsageDeps {
   resolveUrl: (path: string) => string;
   search: SearchProvider | null;
-  content: Pick<ContentProvider, 'get' | 'list'> | null;
-  collections: readonly string[];
+  content: Pick<ContentProvider, 'get'> | null;
   unsaved: readonly UnsavedDocument[];
 }
 
@@ -51,10 +51,30 @@ const mentionsAny = (value: unknown, needles: readonly string[]): boolean => {
 
 const fileName = (path: string) => path.slice(path.lastIndexOf('/') + 1);
 
-interface KnownDocument {
-  collection: string;
-  summary: DocumentSummary;
-}
+const isNamed = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim() !== '';
+
+const titleOf = (entry: DocumentEntry, path: string): string => {
+  if (isNamed(entry.title)) return entry.title;
+  const named = entry.document.title;
+  return isNamed(named) ? named : path;
+};
+
+// ADR-021 §2: the index lags, so a hit whose document is gone is dropped.
+const readHit = async (
+  content: Pick<ContentProvider, 'get'>,
+  collection: string,
+  path: string
+): Promise<DocumentEntry | null> => {
+  try {
+    return await content.get(collection, path);
+  } catch (cause) {
+    if (cause instanceof ContentError && cause.code === 'not-found') {
+      return null;
+    }
+    throw cause;
+  }
+};
 
 const unsavedUses = (
   deps: MediaUsageDeps,
@@ -125,39 +145,28 @@ export async function findMediaUsage(
   const saved = new Map<string, MediaUse[]>();
   const run = async (): Promise<'done' | 'failed'> => {
     try {
-      const known = new Map<string, KnownDocument>();
-      const lists = await Promise.all(
-        deps.collections.map(async (collection) => ({
-          collection,
-          summaries: await content.list(collection),
-        }))
-      );
-      for (const { collection, summaries } of lists) {
-        for (const summary of summaries) {
-          known.set(summary.path, { collection, summary });
-        }
-      }
-
       let next = 0;
       const worker = async () => {
         while (next < paths.length && !inner.signal.aborted) {
           const path = paths[next++];
           const needles = [path, deps.resolveUrl(path)];
-          const hits = await search.search(fileName(path));
+          const hits = await search.search(fileName(path), {
+            limit: MAX_HITS_PER_FILE,
+          });
           const seen = new Set<string>();
-          for (const hit of hits.slice(0, MAX_HITS_PER_FILE)) {
-            const doc = known.get(hit.ref);
-            if (!doc || seen.has(hit.ref)) continue;
-            seen.add(hit.ref);
+          for (const { ref } of hits.slice(0, MAX_HITS_PER_FILE)) {
+            const key = JSON.stringify([ref.collection, ref.path]);
+            if (seen.has(key)) continue;
+            seen.add(key);
             if (inner.signal.aborted) return;
-            const entry = await content.get(doc.collection, hit.ref);
+            const entry = await readHit(content, ref.collection, ref.path);
             if (!entry || !mentionsAny(entry.document, needles)) continue;
             saved.set(path, [
               ...(saved.get(path) ?? []),
               {
-                title: doc.summary.title ?? doc.summary.path,
-                collection: doc.collection,
-                documentPath: doc.summary.path,
+                title: titleOf(entry, ref.path),
+                collection: ref.collection,
+                documentPath: ref.path,
                 mine: false,
               },
             ]);

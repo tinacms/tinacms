@@ -11,10 +11,6 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HashRouter } from 'react-router-dom';
 import { TinaAdmin } from '../../admin/admin';
-import {
-  SaveToNewBranchContext,
-  type SaveToNewBranchRequest,
-} from '../../admin/save-to-new-branch';
 import { asResolvedConfig } from '../../config';
 import type { AuthSlice } from '../../core/auth/contract';
 import { toUserId } from '../../core/auth/contract';
@@ -31,6 +27,7 @@ import {
 import { definePlugin } from '../../core/plugin';
 import { validateCapabilityGraph } from '../../core/resolve';
 import stringFieldPlugin from '../fields/string/string-field.plugin';
+import homePlugin from '../home/home.plugin';
 import { TinaProvider } from '../../editor';
 import { MediaPane } from './media-pane';
 import { mediaManagerPlugin } from './media-manager.plugin';
@@ -59,7 +56,6 @@ interface World {
   listGate: Promise<void>;
   searchGate: Promise<void>;
   deleteGate: (() => Promise<void>) | null;
-  saveHandler: ((request: SaveToNewBranchRequest) => Promise<void>) | undefined;
   switchBranch: ((name: string) => void) | undefined;
   currentBranch: () => string;
 }
@@ -181,7 +177,13 @@ const searchPlugin = definePlugin({
       slice: () => ({
         search: async () => {
           await world.searchGate;
-          return [{ ref: POST.path }];
+          return [
+            {
+              ref: { collection: 'post', path: POST.path },
+              score: 1,
+              snippet: '',
+            },
+          ];
         },
       }),
     },
@@ -205,32 +207,31 @@ const renderPane = (hash = '#/screens/media') => {
     defaultOptions: { queries: { retry: false } },
   });
   return render(
-    <SaveToNewBranchContext value={world.saveHandler}>
-      <TinaAdmin
-        config={asResolvedConfig({
-          plugins: [
-            contentPlugin,
-            mediaPlugin(),
-            mediaManagerPlugin(),
-            stringFieldPlugin,
-            ...(world.searchHits ? [searchPlugin] : []),
+    <TinaAdmin
+      config={asResolvedConfig({
+        plugins: [
+          contentPlugin,
+          homePlugin,
+          mediaPlugin(),
+          mediaManagerPlugin(),
+          stringFieldPlugin,
+          ...(world.searchHits ? [searchPlugin] : []),
+        ],
+        schema: {
+          collections: [
+            {
+              name: 'post',
+              label: 'Posts',
+              path: 'content/posts',
+              format: 'mdx',
+              fields: [{ name: 'title', label: 'Title', type: 'string' }],
+            },
           ],
-          schema: {
-            collections: [
-              {
-                name: 'post',
-                label: 'Posts',
-                path: 'content/posts',
-                format: 'mdx',
-                fields: [{ name: 'title', label: 'Title', type: 'string' }],
-              },
-            ],
-          },
-          build: { publicFolder: 'public', outputFolder: 'admin' },
-        })}
-        queryClient={paneClient}
-      />
-    </SaveToNewBranchContext>
+        },
+        build: { publicFolder: 'public', outputFolder: 'admin' },
+      })}
+      queryClient={paneClient}
+    />
   );
 };
 
@@ -262,7 +263,6 @@ beforeEach(() => {
     listGate: Promise.resolve(),
     searchGate: Promise.resolve(),
     deleteGate: null,
-    saveHandler: undefined,
     switchBranch: undefined,
     currentBranch: () => 'main',
   };
@@ -849,142 +849,73 @@ describe('Delete', () => {
   });
 });
 
-describe('Delete on a protected branch', () => {
+describe('on a protected branch', () => {
+  const NOTE =
+    'main is protected. Switch to another branch to delete or move files.';
+
   beforeEach(() => {
     localStorage.clear();
+    world.hasRename = true;
   });
 
-  const reachDialog = async (user: ReturnType<typeof userEvent.setup>) => {
-    renderPane();
-    await user.click(await file('logo.png'));
-    await user.click(
-      within(
-        await screen.findByRole('region', { name: 'Details of logo.png' })
-      ).getByRole('button', { name: 'Delete' })
-    );
-    await user.click(
-      await within(await screen.findByRole('alertdialog')).findByRole(
-        'button',
-        { name: 'Delete' }
-      )
-    );
-    return screen.findByRole('dialog', { name: 'Save to a new branch' });
-  };
-
-  it('closes the Save to a new branch dialog when the branch changes and focuses the pane', async () => {
-    const user = userEvent.setup();
-    await reachDialog(user);
-    act(() => world.switchBranch?.('other'));
-    await waitFor(() =>
-      expect(
-        screen.queryByRole('dialog', { name: 'Save to a new branch' })
-      ).toBeNull()
-    );
-    await waitFor(async () =>
-      expect((await pane()).contains(document.activeElement)).toBe(true)
-    );
-    expect(world.deleted).toEqual([]);
-  });
-
-  it.each([
-    ['my photo.png', 'media/remove-my-photo'],
-    ['Team Photo.PNG', 'media/remove-Team-Photo'],
-    ['a.b..c.png', 'media/remove-a.b.c'],
-    ['café menu.png', 'media/remove-caf-menu'],
-    ['日本語.png', 'media/remove-file'],
-    ['notes.lock.png', 'media/remove-file'],
-  ])('suggests a valid branch name for %s', async (name, expected) => {
-    world.files = [{ path: name, kind: 'file' }];
+  it('disables Delete and Move with the lock note, and sends nothing', async () => {
     const user = userEvent.setup();
     renderPane();
-    await user.click(await file(name));
-    await user.click(
-      within(
-        await screen.findByRole('region', { name: `Details of ${name}` })
-      ).getByRole('button', { name: 'Delete' })
-    );
-    await user.click(
-      await within(await screen.findByRole('alertdialog')).findByRole(
-        'button',
-        { name: 'Delete' }
-      )
-    );
-    const dialog = await screen.findByRole('dialog', {
-      name: 'Save to a new branch',
-    });
-    const field = within(dialog).getByRole('textbox', {
-      name: /New branch name/,
-    });
-    expect(field).toHaveValue(expected);
-    expect(within(dialog).queryByRole('alert')).toBeNull();
-  });
-
-  it('with no handler, Continue is off and nothing is deleted', async () => {
-    const user = userEvent.setup();
-    const dialog = await reachDialog(user);
+    expect(await screen.findByText(NOTE)).toBeVisible();
+    await user.click(await screen.findByRole('button', { name: 'Select' }));
+    await user.click(await screen.findByRole('checkbox', { name: 'logo.png' }));
+    const bar = screen.getByRole('toolbar', { name: 'Selected files' });
     expect(
-      within(dialog).getByText(
-        'main is protected, so deleting logo.png happens on a new branch with a pull request. You carry on there.'
-      )
-    ).toBeVisible();
-    expect(
-      within(dialog).getByRole('textbox', { name: /New branch name/ })
-    ).toHaveValue('media/remove-logo');
-    expect(
-      within(dialog).getByRole('button', { name: 'Continue' })
+      within(bar).getByRole('button', { name: 'Delete 1' })
     ).toBeDisabled();
+    expect(within(bar).getByRole('button', { name: 'Move' })).toBeDisabled();
+    expect(within(bar).getByRole('button', { name: 'Download' })).toBeEnabled();
+    expect(
+      within(bar).getByRole('button', { name: 'Copy URLs' })
+    ).toBeEnabled();
+    await user.keyboard('{Escape}');
+    await user.click(await file('logo.png'));
+    const details = await screen.findByRole('region', {
+      name: 'Details of logo.png',
+    });
+    expect(
+      within(details).getByRole('button', { name: 'Delete' })
+    ).toBeDisabled();
+    await user.click(within(details).getByRole('button', { name: 'Delete' }));
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
     expect(world.deleted).toEqual([]);
+    expect(world.moved).toEqual([]);
   });
 
-  it('makes the branch through the handler, then deletes on the new branch only', async () => {
-    world.saveHandler = vi.fn(async (request) => {
-      world.switchBranch?.(request.name);
-    });
-    const user = userEvent.setup();
-    const dialog = await reachDialog(user);
-    await user.click(within(dialog).getByRole('button', { name: 'Continue' }));
-    expect(await screen.findByText('Deleted logo.png.')).toBeVisible();
-    expect(world.saveHandler).toHaveBeenCalledWith({
-      kind: 'media',
-      name: 'media/remove-logo',
-      reason: 'protected',
-    });
-    expect(world.deleted).toEqual([
-      { branch: 'media/remove-logo', path: 'logo.png' },
-    ]);
+  it('counts the default branch as protected while no branch is chosen', async () => {
+    renderPane();
+    expect(await screen.findByText(NOTE)).toBeVisible();
+    expect(world.currentBranch()).toBe('main');
   });
 
-  it('deletes nothing when the handler resolves without switching branch', async () => {
-    world.saveHandler = vi.fn(async () => {});
+  it('enables Delete and Move again on an unprotected branch', async () => {
     const user = userEvent.setup();
-    const dialog = await reachDialog(user);
-    await user.click(within(dialog).getByRole('button', { name: 'Continue' }));
+    renderPane();
+    await screen.findByText(NOTE);
+    act(() => world.switchBranch?.('other'));
+    await waitFor(() => expect(screen.queryByText(NOTE)).toBeNull());
+    await user.click(await screen.findByRole('button', { name: 'Select' }));
+    await user.click(await screen.findByRole('checkbox', { name: 'logo.png' }));
+    const bar = screen.getByRole('toolbar', { name: 'Selected files' });
+    expect(within(bar).getByRole('button', { name: 'Delete 1' })).toBeEnabled();
+    expect(within(bar).getByRole('button', { name: 'Move' })).toBeEnabled();
+  });
+
+  it('puts read-only first in the lock order', async () => {
+    world.features = { ...world.features, readOnly: true };
+    renderPane();
     expect(
       await screen.findByText(
-        "Couldn't switch to the new branch. Nothing was deleted."
+        "This storage is read-only. Files can't be uploaded or deleted here."
       )
     ).toBeVisible();
-    expect(world.deleted).toEqual([]);
-  });
-
-  it('says the branch could not be made when the handler rejects, and Retry asks again', async () => {
-    const handler = vi
-      .fn<(request: SaveToNewBranchRequest) => Promise<void>>()
-      .mockRejectedValueOnce(new Error('boom'))
-      .mockImplementation(async (request) => {
-        world.switchBranch?.(request.name);
-      });
-    world.saveHandler = handler;
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    const user = userEvent.setup();
-    const dialog = await reachDialog(user);
-    await user.click(within(dialog).getByRole('button', { name: 'Continue' }));
-    expect(
-      await screen.findByText("Couldn't make the branch. Try again.")
-    ).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Retry' }));
-    expect(await screen.findByText('Deleted logo.png.')).toBeVisible();
-    expect(handler).toHaveBeenCalledTimes(2);
+    expect(screen.queryByText(NOTE)).toBeNull();
   });
 });
 
@@ -1185,59 +1116,6 @@ describe('Delete: focus and messages', () => {
   });
 });
 
-describe('Move on a protected branch', () => {
-  beforeEach(() => {
-    localStorage.clear();
-    world.hasRename = true;
-  });
-
-  const reachDialog = async (user: ReturnType<typeof userEvent.setup>) => {
-    renderPane();
-    await user.click(await screen.findByRole('button', { name: 'Select' }));
-    await user.click(await screen.findByRole('checkbox', { name: 'logo.png' }));
-    await user.click(screen.getByRole('button', { name: 'Move' }));
-    const move = await screen.findByRole('alertdialog');
-    await user.click(
-      await within(move).findByRole('button', { name: 'posts' })
-    );
-    await user.click(within(move).getByRole('button', { name: 'Move here' }));
-    return screen.findByRole('dialog', { name: 'Save to a new branch' });
-  };
-
-  it('with no handler, Continue is off and nothing moves', async () => {
-    const user = userEvent.setup();
-    const dialog = await reachDialog(user);
-    expect(
-      within(dialog).getByText(
-        'main is protected, so moving logo.png happens on a new branch with a pull request. You carry on there.'
-      )
-    ).toBeVisible();
-    expect(
-      within(dialog).getByRole('textbox', { name: /New branch name/ })
-    ).toHaveValue('media/move-logo');
-    expect(
-      within(dialog).getByRole('button', { name: 'Continue' })
-    ).toBeDisabled();
-    expect(world.moved).toEqual([]);
-  });
-
-  it('makes the branch through the handler, then moves on it', async () => {
-    world.saveHandler = vi.fn(async (request) => {
-      world.switchBranch?.(request.name);
-    });
-    const user = userEvent.setup();
-    const dialog = await reachDialog(user);
-    await user.click(within(dialog).getByRole('button', { name: 'Continue' }));
-    expect(await screen.findByText('Moved logo.png to posts.')).toBeVisible();
-    expect(world.saveHandler).toHaveBeenCalledWith({
-      kind: 'media',
-      name: 'media/move-logo',
-      reason: 'protected',
-    });
-    expect(world.moved).toEqual([{ from: 'logo.png', to: 'posts/logo.png' }]);
-  });
-});
-
 describe('header Back and loading on focus', () => {
   it('Back closes the details that fill the pane and returns to the files', async () => {
     const user = userEvent.setup();
@@ -1382,14 +1260,7 @@ describe('permission lock and the signed-in state', () => {
   });
 });
 
-describe('after the protected-branch switch', () => {
-  beforeEach(() => {
-    localStorage.clear();
-    world.saveHandler = vi.fn(async (request) => {
-      world.switchBranch?.(request.name);
-    });
-  });
-
+describe('changes on a feature branch', () => {
   const selectAllThenDelete = async (
     user: ReturnType<typeof userEvent.setup>
   ) => {
@@ -1399,14 +1270,9 @@ describe('after the protected-branch switch', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Delete 2 files' })
     );
-    await user.click(
-      within(
-        await screen.findByRole('dialog', { name: 'Save to a new branch' })
-      ).getByRole('button', { name: 'Continue' })
-    );
   };
 
-  it('removes a deleted file from the new branch’s listing', async () => {
+  it('removes a deleted file from the feature branch’s listing', async () => {
     const user = userEvent.setup();
     renderPane();
     await user.click(await file('logo.png'));
@@ -1421,18 +1287,13 @@ describe('after the protected-branch switch', () => {
         { name: 'Delete' }
       )
     );
-    await user.click(
-      within(
-        await screen.findByRole('dialog', { name: 'Save to a new branch' })
-      ).getByRole('button', { name: 'Continue' })
-    );
     expect(await screen.findByText('Deleted logo.png.')).toBeVisible();
     await waitFor(() =>
       expect(screen.queryByRole('button', { name: 'logo.png' })).toBeNull()
     );
   });
 
-  it('removes several deleted files from the new branch’s listing', async () => {
+  it('removes several deleted files from the feature branch’s listing', async () => {
     const user = userEvent.setup();
     renderPane();
     await selectAllThenDelete(user);
@@ -1456,11 +1317,6 @@ describe('after the protected-branch switch', () => {
       await within(move).findByRole('button', { name: 'posts' })
     );
     await user.click(within(move).getByRole('button', { name: 'Move here' }));
-    await user.click(
-      within(
-        await screen.findByRole('dialog', { name: 'Save to a new branch' })
-      ).getByRole('button', { name: 'Continue' })
-    );
     expect(await screen.findByText('Moved logo.png to posts.')).toBeVisible();
     await waitFor(() =>
       expect(screen.queryByRole('checkbox', { name: 'logo.png' })).toBeNull()
@@ -1470,7 +1326,7 @@ describe('after the protected-branch switch', () => {
     ).toBeVisible();
   });
 
-  it('Retry after a partial failure deletes on the new branch, refreshes it and leaves Select mode', async () => {
+  it('Retry after a partial failure deletes on the feature branch, refreshes it and leaves Select mode', async () => {
     world.failDelete = (path) =>
       path === 'banner.png' ? new MediaError('backend-failure') : null;
     const user = userEvent.setup();
@@ -1487,9 +1343,9 @@ describe('after the protected-branch switch', () => {
         'banner.png',
       ])
     );
-    expect(
-      world.deleted.every(({ branch }) => branch.startsWith('media/'))
-    ).toBe(true);
+    expect(world.deleted.every(({ branch }) => branch === 'feature/news')).toBe(
+      true
+    );
     await waitFor(() => {
       expect(screen.queryByRole('checkbox', { name: 'banner.png' })).toBeNull();
       expect(
@@ -1498,7 +1354,7 @@ describe('after the protected-branch switch', () => {
     });
   });
 
-  it('locks Delete and Move on the new branch after a refusal there', async () => {
+  it('locks Delete and Move on the feature branch after a refusal there, and refreshes its listing', async () => {
     world.hasRename = true;
     world.failDelete = () => new MediaError('unauthorized');
     const user = userEvent.setup();
@@ -1668,7 +1524,7 @@ describe('runs are bound to their branch', () => {
     expect(invalidate).toHaveBeenCalledTimes(2);
   });
 
-  it('drops a failure and its Retry when the branch changes, and a fresh Delete on a protected branch asks for a new branch', async () => {
+  it('drops a failure and its Retry when the branch changes to a protected main, where Delete is disabled', async () => {
     world.failDelete = () => new MediaError('backend-failure');
     const user = userEvent.setup();
     renderPane();
@@ -1689,21 +1545,17 @@ describe('runs are bound to their branch', () => {
     await waitFor(() =>
       expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull()
     );
-    expect(world.deleted).toEqual([]);
-    await user.click(
+    expect(
+      await screen.findByText(
+        'main is protected. Switch to another branch to delete or move files.'
+      )
+    ).toBeVisible();
+    expect(
       within(
         await screen.findByRole('region', { name: 'Details of logo.png' })
       ).getByRole('button', { name: 'Delete' })
-    );
-    await user.click(
-      await within(await screen.findByRole('alertdialog')).findByRole(
-        'button',
-        { name: 'Delete' }
-      )
-    );
-    expect(
-      await screen.findByRole('dialog', { name: 'Save to a new branch' })
-    ).toBeVisible();
+    ).toBeDisabled();
+    expect(world.deleted).toEqual([]);
   });
 
   it('turns Delete off while a run is in progress', async () => {
@@ -1834,6 +1686,21 @@ describe('focus after a branch change', () => {
     expect(['Media', 'Files in Media']).toContain(
       document.activeElement?.getAttribute('aria-label')
     );
+  });
+
+  it('moves focus into the pane when the branch change closed the Move dialog', async () => {
+    world.hasRename = true;
+    const user = userEvent.setup();
+    renderPane();
+    await user.click(await screen.findByRole('button', { name: 'Select' }));
+    await user.click(await screen.findByRole('checkbox', { name: 'logo.png' }));
+    await user.click(screen.getByRole('button', { name: 'Move' }));
+    expect(await screen.findByRole('alertdialog')).toBeVisible();
+    act(() => world.switchBranch?.('other'));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await frames();
+    expect(await insidePane()).toBe(true);
+    expect(world.moved).toEqual([]);
   });
 });
 

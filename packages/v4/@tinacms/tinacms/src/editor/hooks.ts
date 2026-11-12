@@ -49,6 +49,7 @@ import {
   FieldSchemaContext,
   type FormScope,
   FormScopeContext,
+  type SaveHandler,
   type StaleDraftActions,
   TinaRuntimeContext,
 } from './context';
@@ -327,48 +328,65 @@ export function useFormCheck(): () => Promise<boolean> {
   }, [scope, trigger]);
 }
 
-export function useFormSave(): () => Promise<void> {
+export interface SaveSteps {
+  /** Writes the document after `beforeSave`. The form's `onSave` when absent. */
+  write?: SaveHandler;
+  /** Runs once the write resolves and the form is marked saved, before `afterSave`. */
+  afterWrite?: () => void;
+}
+
+// The admin's Save to new branch swaps the write step. Not exported from `editor/index.ts`.
+export function useFormSaveWith(): (steps?: SaveSteps) => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
   const { getValues, setValue } = useFormContext<TinaDocument>();
   const check = useFormCheck();
-  const runSave = useCallback(async () => {
-    const { formId, path, collection, onSave, hooks, reseedFields } = scope;
-    if (!(await check())) throw new FormValidationError();
-    const values = getValues();
-    const submitted = structuredClone(toFormValues(values));
-    const context = { documentPath: path, registry };
-    const hookScope = { formId, path, collection };
-    const digested = await runBeforeSave(
-      hooks,
-      digestDocument(values, collection.fields, context),
-      hookScope
-    );
-    const saved = await onSave?.(digested);
-    const savedDocument = saved ? saved.document : digested;
-    const written = adoptSavedValues(
-      formId,
-      submitted,
-      toFormValues(ingestDocument(savedDocument, collection.fields, context)),
-      (address, value) => setValue(address, value)
-    );
-    if (!written) useFormStore.getState().markSaved(formId, submitted);
-    if (written && written.length > 0) reseedFields();
-    try {
-      await runAfterSave(hooks, savedDocument, hookScope);
-    } catch (cause) {
-      throw new AfterSaveHookError(cause);
-    }
-    scope.view.getState().resetReveal();
-    const warnings = saved ? (saved.hookWarnings ?? []) : [];
-    if (warnings.length > 0) {
-      throw new AfterSaveHookError(new Error(warnings.join(' ')));
-    }
-  }, [scope, check, getValues, setValue, registry]);
+  const runSave = useCallback(
+    async ({ write, afterWrite }: SaveSteps) => {
+      const { formId, path, collection, onSave, hooks, reseedFields } = scope;
+      if (!(await check())) throw new FormValidationError();
+      const values = getValues();
+      const submitted = structuredClone(toFormValues(values));
+      const context = { documentPath: path, registry };
+      const hookScope = { formId, path, collection };
+      const digested = await runBeforeSave(
+        hooks,
+        digestDocument(values, collection.fields, context),
+        hookScope
+      );
+      const saved = await (write ?? onSave)?.(digested);
+      const savedDocument = saved ? saved.document : digested;
+      const written = adoptSavedValues(
+        formId,
+        submitted,
+        toFormValues(ingestDocument(savedDocument, collection.fields, context)),
+        (address, value) => setValue(address, value)
+      );
+      if (!written) useFormStore.getState().markSaved(formId, submitted);
+      if (written && written.length > 0) reseedFields();
+      afterWrite?.();
+      try {
+        await runAfterSave(hooks, savedDocument, hookScope);
+      } catch (cause) {
+        throw new AfterSaveHookError(cause);
+      }
+      scope.view.getState().resetReveal();
+      const warnings = saved ? (saved.hookWarnings ?? []) : [];
+      if (warnings.length > 0) {
+        throw new AfterSaveHookError(new Error(warnings.join(' ')));
+      }
+    },
+    [scope, check, getValues, setValue, registry]
+  );
   return useCallback(
-    () => recordSavePhase(scope.formId, runSave),
+    (steps = {}) => recordSavePhase(scope.formId, () => runSave(steps)),
     [scope.formId, runSave]
   );
+}
+
+export function useFormSave(): () => Promise<void> {
+  const saveWith = useFormSaveWith();
+  return useCallback(() => saveWith(), [saveWith]);
 }
 
 export function useFieldAddress(): FieldAddress {

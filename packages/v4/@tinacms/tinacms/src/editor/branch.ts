@@ -39,6 +39,11 @@ export function useBranchSync(): void {
           protected: branches
             .filter((branch) => branch.protected)
             .map((branch) => branch.name),
+          pullRequests: Object.fromEntries(
+            branches.flatMap(({ name, pullRequestUrl }) =>
+              pullRequestUrl ? [[name, pullRequestUrl]] : []
+            )
+          ),
         });
         const current = currentBranchOf(store.getState());
         if (current && current === fallback) {
@@ -71,6 +76,8 @@ export interface BranchView {
   mode: BranchMode | undefined;
   /** The branch edits save to: the chosen one, else the default. */
   name: string | undefined;
+  /** The pull request of the branch `name`, when it has one. */
+  pullRequestUrl: string | undefined;
   branches: { name: string; protected: boolean }[];
   /** The provider's default branch, once the list has been read. */
   defaultBranch: string | undefined;
@@ -79,6 +86,7 @@ export interface BranchView {
   /** Reads the branch list again after a failure. */
   retryList: () => void;
   switchTo: (name: string) => void;
+  saveToNewBranch: BranchSlice['saveToNewBranch'];
 }
 
 export function useBranchView(): BranchView | null {
@@ -89,9 +97,11 @@ export function useBranchView(): BranchView | null {
     [raw]
   );
   if (!slice) return null;
+  const name = slice.current ?? slice.fallback;
   return {
     mode: slice.mode,
-    name: slice.current ?? slice.fallback,
+    name,
+    pullRequestUrl: name ? slice.pullRequests[name] : undefined,
     defaultBranch: slice.fallback,
     branches: slice.list.map((name) => ({
       name,
@@ -106,5 +116,6 @@ export function useBranchView(): BranchView | null {
         },
       })),
     switchTo: slice.switchTo,
+    saveToNewBranch: slice.saveToNewBranch,
   };
 }

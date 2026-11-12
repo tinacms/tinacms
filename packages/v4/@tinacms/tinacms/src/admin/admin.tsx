@@ -31,7 +31,6 @@ import { useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
 import { TinaProvider } from '../editor/provider';
-import { HomePanel } from './home';
 import { AuthGate } from './auth-gate';
 import { DocumentForm } from './document-form';
 import { DocumentErrorPane } from './error-summary';
@@ -42,7 +41,7 @@ import {
   SettingsPane,
   ToolsPane,
 } from './navigator';
-import { AdminRail, MEDIA_SCREEN } from './rail';
+import { AdminRail, HOME_SCREEN, MEDIA_SCREEN } from './rail';
 import { MediaPaneShellContext } from './media-pane-shell';
 import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
@@ -111,6 +110,28 @@ function ScreenOutlet({
           <Placeholder>No screen named “{name}”.</Placeholder>
         )}
       </div>
+    </SidebarInset>
+  );
+}
+
+// Home has no panel header and no Close: there is nowhere to close to. The
+// frame scrolls the screen and adds no padding, as the general outlet does.
+function HomeOutlet({
+  screen,
+  segments,
+}: {
+  screen: AdminScreen | undefined;
+  segments: string[];
+}) {
+  return (
+    <SidebarInset className='min-w-0'>
+      {screen ? (
+        <div data-slot='home-frame' className='min-h-0 flex-1 overflow-y-auto'>
+          <screen.component segments={segments} />
+        </div>
+      ) : (
+        <Placeholder>Pick a place from the sidebar.</Placeholder>
+      )}
     </SidebarInset>
   );
 }
@@ -441,7 +462,21 @@ function AdminShell({
     (candidate) => candidate.name === activeCollectionName
   );
   const openPath = mainRoute.view === 'document' ? mainRoute.path : undefined;
-  const activeScreen = mainRoute.view === 'screen' ? mainRoute : undefined;
+  const homeScreen = screens.find(({ name }) => name === HOME_SCREEN);
+  // `#/screens/home` draws Home as `#/` does. With Home removed, it falls to
+  // the general outlet, which says that no screen has that name.
+  const homeSegments =
+    mainRoute.view === 'home'
+      ? []
+      : mainRoute.view === 'screen' &&
+          mainRoute.screen === HOME_SCREEN &&
+          homeScreen
+        ? mainRoute.segments
+        : undefined;
+  const activeScreen =
+    mainRoute.view === 'screen' && homeSegments === undefined
+      ? mainRoute
+      : undefined;
   const isStaleCollectionRoute =
     activeCollectionName !== undefined && collection === undefined;
 
@@ -558,8 +593,8 @@ function AdminShell({
               segments={activeScreen.segments}
               onClose={goHome}
             />
-          ) : mainRoute.view === 'home' ? (
-            <HomePanel collections={schema.collections} navigate={navigate} />
+          ) : homeSegments ? (
+            <HomeOutlet screen={homeScreen} segments={homeSegments} />
           ) : mainRoute.view === 'tools' || mainRoute.view === 'settings' ? (
             <SidebarInset className='min-w-0'>
               <Placeholder>Pick an entry to open it.</Placeholder>

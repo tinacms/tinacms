@@ -1,8 +1,16 @@
 import { execFileSync } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { branchNameError, branchNameFromPath, freeName } from './branch-name';
+import {
+  branchNameError,
+  branchNameFromPath,
+  freeName,
+  takenBy,
+} from './branch-name';
 
 describe('branchNameFromPath', () => {
   it('turns the file stem into a docs branch name', () => {
@@ -131,5 +139,82 @@ describe('freeName', () => {
   it('never returns the bare base when suffixed', () => {
     expect(freeName('x', [], { suffixed: true })).toBe('x-2');
     expect(freeName('x', ['x-2'], { suffixed: true })).toBe('x-3');
+  });
+});
+
+const gitMakes = (existing: string, name: string): boolean => {
+  const repo = mkdtempSync(join(tmpdir(), 'branch-name-'));
+  const git = (...args: string[]) =>
+    execFileSync('git', ['-C', repo, ...args], { stdio: 'ignore' });
+  try {
+    git('init', '-q');
+    git(
+      '-c',
+      'user.name=t',
+      '-c',
+      'user.email=t@t',
+      'commit',
+      '-q',
+      '--allow-empty',
+      '-m',
+      'x'
+    );
+    git('branch', existing);
+    try {
+      git('branch', name);
+      return true;
+    } catch {
+      return false;
+    }
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
+};
+
+describe('takenBy', () => {
+  it.each([
+    ['docs/foo', 'docs'],
+    ['docs', 'docs/x-edits'],
+    ['a/b/c', 'a'],
+    ['a', 'a/b/c'],
+    ['docs', 'docs'],
+    ['docs', 'docs-2'],
+    ['docs', 'docsx/a'],
+    ['docs/a', 'docs/b'],
+    ['docs/foo', 'docs/fo'],
+  ])('agrees with git when %s exists and %s is made', (existing, name) => {
+    expect(takenBy(name, [existing]) === undefined).toBe(
+      gitMakes(existing, name)
+    );
+  });
+});
+
+describe('branchNameError with a path clash', () => {
+  it('names the branch that blocks a parent or child path', () => {
+    expect(branchNameError('docs', ['docs/foo'], false)).toBe(
+      'A branch called docs/foo already exists, so docs can’t be used. Pick another name.'
+    );
+    expect(branchNameError('docs/x-edits', ['docs'], false)).toBe(
+      'A branch called docs already exists, so docs/x-edits can’t be used. Pick another name.'
+    );
+    expect(branchNameError('docs', ['docs'], false)).toBe(
+      'A branch called docs already exists. Pick another name.'
+    );
+  });
+});
+
+describe('freeName with a path clash', () => {
+  it('skips a suffix whose child path is taken', () => {
+    expect(freeName('x', ['x/a'])).toBe('x-2');
+    expect(freeName('x', ['x/a', 'x-2/b'])).toBe('x-3');
+  });
+
+  it('returns the first candidate when a parent path is taken, so the check flags it', () => {
+    const suggested = freeName(branchNameFromPath('posts/x.md'), ['docs']);
+    expect(suggested).toBe('docs/x-edits');
+    expect(branchNameError(suggested, ['docs'], false)).toMatch(
+      /^A branch called docs already exists/
+    );
+    expect(freeName('docs/x', ['docs'], { suffixed: true })).toBe('docs/x-2');
   });
 });

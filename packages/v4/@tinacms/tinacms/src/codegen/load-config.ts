@@ -41,24 +41,60 @@ const startLoadingServer = async (
   });
 };
 
+export interface OpenTinaConfig {
+  config: ResolvedConfig;
+  /** Loads another module through the loader that read the config. */
+  loader: ModuleLoader;
+  /** Ends the loader. Call it in a `finally`, after the last import. */
+  close: () => Promise<void>;
+}
+
+const readConfig = async (
+  loader: ModuleLoader,
+  configPath: string
+): Promise<ResolvedConfig> => {
+  const loaded = await loader.ssrLoadModule(configPath);
+  const config = loaded.default as ResolvedConfig | undefined;
+  invariant(
+    config?.plugins && config.schema,
+    'config-not-default-exported',
+    `${configPath} must \`export default defineConfig({ ... })\`.`
+  );
+  return config;
+};
+
+/**
+ * Reads the config and keeps the loader open, for a command that imports
+ * plugin server code after the config. A loader passed in stays the caller's.
+ */
+export const openTinaConfig = async (
+  configPath: string,
+  options: LoadTinaConfigOptions = {}
+): Promise<OpenTinaConfig> => {
+  const ownServer = options.loader
+    ? undefined
+    : await startLoadingServer(configPath, options.alias);
+  const loader = options.loader ?? ownServer;
+  const close = async () => {
+    await ownServer?.close().catch(() => {});
+  };
+  try {
+    return {
+      config: await readConfig(loader!, configPath),
+      loader: loader!,
+      close,
+    };
+  } catch (cause) {
+    await close();
+    throw cause;
+  }
+};
+
 export const loadTinaConfig = async (
   configPath: string,
   options: LoadTinaConfigOptions = {}
 ): Promise<ResolvedConfig> => {
-  const ownServer = options.loader
-    ? undefined
-    : await startLoadingServer(configPath, options.alias);
-  const server = options.loader ?? ownServer;
-  try {
-    const loaded = await server!.ssrLoadModule(configPath);
-    const config = loaded.default as ResolvedConfig | undefined;
-    invariant(
-      config?.plugins && config.schema,
-      'config-not-default-exported',
-      `${configPath} must \`export default defineConfig({ ... })\`.`
-    );
-    return config;
-  } finally {
-    await ownServer?.close().catch(() => {});
-  }
+  const opened = await openTinaConfig(configPath, options);
+  await opened.close();
+  return opened.config;
 };

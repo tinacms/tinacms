@@ -1,8 +1,13 @@
+import { isRecord } from '../../utils/is-record';
+import type { DocumentEntry } from '../content/contract';
 import type { SliceState, TinaStoreState } from '../plugin';
+import type { TinaDocument } from '../schema/types';
 
 export interface BranchInfo {
   name: string;
   protected?: boolean;
+  /** The branch's pull request, when the provider knows of one. */
+  pullRequestUrl?: string;
 }
 
 /**
@@ -28,10 +33,29 @@ export interface BranchSlice {
   fallback?: string;
   list: string[];
   protected: string[];
+  /** Branch name to pull request URL, for the branches that have one. */
+  pullRequests: Record<string, string>;
   /** Whether the branch list is being read, read, or failed to read. Absent until the first read starts. */
   listState?: BranchListState;
   switchTo: (name: string | undefined) => void;
+  /**
+   * Makes branch `name` from `from` (the default branch when undefined) and
+   * writes `value` to it in one request. All or nothing: when it rejects, no
+   * branch exists. Absent until a provider offers it.
+   */
+  saveToNewBranch?: (request: {
+    name: string;
+    from: string | undefined;
+    collection: string;
+    path: string;
+    value: TinaDocument;
+  }) => Promise<DocumentEntry & { hookWarnings?: string[] }>;
 }
+
+type SaveToNewBranch = NonNullable<BranchSlice['saveToNewBranch']>;
+
+const isSaveToNewBranch = (value: unknown): value is SaveToNewBranch =>
+  typeof value === 'function';
 
 export type BranchListState = 'loading' | 'ready' | 'failed';
 
@@ -41,12 +65,27 @@ const isNames = (value: unknown): value is string[] =>
 const optionalString = (value: unknown): string | undefined =>
   typeof value === 'string' && value ? value : undefined;
 
+const pullRequestsOf = (value: unknown): Record<string, string> => {
+  if (!isRecord(value)) return {};
+  const urls: Record<string, string> = {};
+  for (const [name, url] of Object.entries(value)) {
+    if (typeof url === 'string' && url) urls[name] = url;
+  }
+  return urls;
+};
+
 export const branchSliceOf = (
   state: TinaStoreState
 ): BranchSlice | undefined => {
   const slice: SliceState | undefined = state.branch;
   if (!slice) return undefined;
-  const { switchTo, list, protected: protectedNames, mode } = slice;
+  const {
+    switchTo,
+    list,
+    protected: protectedNames,
+    mode,
+    saveToNewBranch,
+  } = slice;
   if (typeof switchTo !== 'function') return undefined;
   if (!isNames(list) || !isNames(protectedNames)) return undefined;
   return {
@@ -55,6 +94,7 @@ export const branchSliceOf = (
     fallback: optionalString(slice.fallback),
     list,
     protected: protectedNames,
+    pullRequests: pullRequestsOf(slice.pullRequests),
     listState:
       slice.listState === 'loading' ||
       slice.listState === 'ready' ||
@@ -62,6 +102,9 @@ export const branchSliceOf = (
         ? slice.listState
         : undefined,
     switchTo: (name) => switchTo(name),
+    saveToNewBranch: isSaveToNewBranch(saveToNewBranch)
+      ? (request) => saveToNewBranch(request)
+      : undefined,
   };
 };
 

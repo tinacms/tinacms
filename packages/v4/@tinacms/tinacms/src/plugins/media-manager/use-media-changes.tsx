@@ -1,12 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { SaveToBranchDialog } from '@tinacms/ui/components/save-to-branch-dialog';
-import {
-  branchNameError,
-  branchSlug,
-  freeName,
-} from '@tinacms/ui/lib/branch-name';
 import { use, useEffect, useRef, useState } from 'react';
-import { SaveToNewBranchContext } from '../../admin/save-to-new-branch';
 import { authSliceOf } from '../../core/auth/slice';
 import { currentBranchOf } from '../../core/branch/contract';
 import { MediaError } from '../../core/media/contract';
@@ -14,7 +7,7 @@ import { useBranchView } from '../../editor/branch';
 import { useCurrentBranch } from '../../editor/content-queries';
 import { TinaRuntimeContext } from '../../editor/context';
 import { useMediaSlice, useOptionalAuthSlice } from '../../editor/hooks';
-import { joinMediaPath, mediaNameOf, splitFilename } from './media-types';
+import { joinMediaPath, mediaNameOf } from './media-types';
 import {
   MEDIA_DONE_MS,
   NO_ACCESS,
@@ -50,39 +43,18 @@ const isNameTaken = (cause: unknown): boolean => {
 
 const folderLabel = (folder: string) => folder.split('/').at(-1) || 'Media';
 
-const defaultBranchName = (change: MediaChange) => {
-  const verb = change.kind === 'delete' ? 'remove' : 'move';
-  const [only] = change.paths;
-  if (change.paths.length !== 1 || only === undefined) {
-    return `media/${verb}-${change.paths.length}-files`;
-  }
-  const slug = branchSlug(splitFilename(mediaNameOf(only)).base);
-  const named = `media/${verb}-${slug || 'file'}`;
-  return branchNameError(named, [], false) === undefined
-    ? named
-    : `media/${verb}-file`;
-};
-
-const changeWords = (change: MediaChange) =>
-  `${change.kind === 'delete' ? 'deleting' : 'moving'} ${subjectOf(change.paths)}`;
-
-interface PendingBranch {
-  change: MediaChange;
-  documents: number;
-  defaultName: string;
-}
-
 /**
- * Runs Delete and Move for the Media pane: one file at a time, the protected-branch
- * dialog first, and the permission lock learned from a refused call.
+ * Runs Delete and Move for the Media pane: one file at a time, bound to the branch
+ * it was confirmed on, with the permission lock learned from a refused call.
+ * `protectedBranch` names the shown branch when it is protected, so the pane
+ * disables Delete and Move there.
  */
 export function useMediaChanges(
   onSettled: (result: ChangeResult) => void,
-  onBranchDrift: (closedDialog: boolean) => void
+  onBranchDrift: () => void
 ) {
   const media = useMediaSlice();
   const runtime = use(TinaRuntimeContext);
-  const handler = use(SaveToNewBranchContext);
   const view = useBranchView();
   const branch = useCurrentBranch() ?? '';
   const auth = useOptionalAuthSlice();
@@ -91,10 +63,6 @@ export function useMediaChanges(
   const [lock, setLock] = useState<{ branch: string; who: string } | null>(
     null
   );
-  const [pending, setPending] = useState<PendingBranch | null>(null);
-  const [name, setName] = useState('');
-  const [revealed, setRevealed] = useState(false);
-  const [confirmError, setConfirmError] = useState<string>();
 
   const who = `${auth?.status ?? 'none'}:${auth?.user?.id ?? ''}`;
   const locked = lock !== null && lock.branch === branch && lock.who === who;
@@ -126,26 +94,23 @@ export function useMediaChanges(
     if (settledOn.count > 0) refreshMedia(settledOn.branch);
   }, [settledOn]);
 
-  const isProtected =
+  const protectedBranch =
     view?.mode === 'branches' &&
     view.listState === 'ready' &&
-    view.name !== undefined &&
-    view.branches.some((entry) => entry.name === view.name && entry.protected);
-  const listed = view?.branches.map((entry) => entry.name) ?? [];
+    view.branches.some((entry) => entry.name === view.name && entry.protected)
+      ? view.name
+      : undefined;
 
   const liveBranch = (): string =>
     runtime ? (currentBranchOf(runtime.store.getState()) ?? '') : branch;
 
-  const expectedBranch = useRef<string | null>(null);
   const lastBranch = useRef(branch);
   const cancelled = useRef(false);
   useEffect(() => {
     if (lastBranch.current === branch) return;
     lastBranch.current = branch;
-    if (expectedBranch.current === branch) return;
     cancelled.current = true;
-    setPending(null);
-    onBranchDrift(pending !== null);
+    onBranchDrift();
     setStatus((current) => (current?.tone === 'error' ? null : current));
   }, [branch]);
 
@@ -253,85 +218,17 @@ export function useMediaChanges(
     });
   };
 
-  const continueOnNewBranch = async (
-    change: MediaChange,
-    documents: number,
-    chosen: string
-  ) => {
-    setStatus({ tone: 'busy', text: 'Making the branch' });
-    expectedBranch.current = chosen;
-    try {
-      await handler?.({ kind: 'media', name: chosen, reason: 'protected' });
-    } catch (cause) {
-      console.error('[tinacms] Could not make the branch:', cause);
-      setStatus({
-        tone: 'error',
-        text: "Couldn't make the branch. Try again.",
-        retry: () => void continueOnNewBranch(change, documents, chosen),
-      });
-      expectedBranch.current = null;
-      return;
-    }
-    if (liveBranch() !== chosen) {
-      setStatus({
-        tone: 'error',
-        text: `Couldn't switch to the new branch. Nothing was ${change.kind === 'delete' ? 'deleted' : 'moved'}.`,
-      });
-      expectedBranch.current = null;
-      return;
-    }
-    await run(change, change.paths, documents, chosen);
-    expectedBranch.current = null;
-  };
-
   const request = (change: MediaChange, documents: number) => {
-    if (!isProtected) {
-      void run(change, change.paths, documents, liveBranch());
-      return;
-    }
-    const defaultName = freeName(defaultBranchName(change), listed);
-    setName(defaultName);
-    setRevealed(false);
-    setConfirmError(undefined);
-    setPending({ change, documents, defaultName });
+    if (protectedBranch !== undefined) return;
+    void run(change, change.paths, documents, liveBranch());
   };
-
-  const confirmBranch = (typed: string) => {
-    if (!pending) return;
-    const chosen = typed.trim();
-    setRevealed(true);
-    if (!handler || branchNameError(chosen, listed, true)) return;
-    const { change, documents } = pending;
-    setPending(null);
-    void continueOnNewBranch(change, documents, chosen);
-  };
-
-  const dialog = pending ? (
-    <SaveToBranchDialog
-      open
-      onOpenChange={(open) => {
-        if (!open) setPending(null);
-      }}
-      branch={view?.name ?? ''}
-      change={changeWords(pending.change)}
-      name={name}
-      onNameChange={(next) => {
-        setName(next);
-        setRevealed(true);
-        setConfirmError(undefined);
-      }}
-      error={confirmError ?? branchNameError(name.trim(), listed, revealed)}
-      canSave={handler !== undefined}
-      onSave={confirmBranch}
-    />
-  ) : null;
 
   return {
     status,
     busy,
     locked,
+    protectedBranch,
     request,
-    dialog,
     dismissStatus: () => setStatus(null),
   };
 }
