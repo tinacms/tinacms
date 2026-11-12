@@ -133,7 +133,8 @@ describe('rename', () => {
     const result = await layerWith().rename(
       'author',
       'content/authors/ada.md',
-      'content/authors/ada-l.md'
+      'content/authors/ada-l.md',
+      { maySave: true }
     );
     expect(result.entry.path).toBe('content/authors/ada-l.md');
     expect(result.referrers).toEqual(['content/posts/refers.md']);
@@ -168,7 +169,8 @@ describe('rename', () => {
     await layer.rename(
       'author',
       'content/authors/ada.md',
-      'content/authors/ada-l.md'
+      'content/authors/ada-l.md',
+      { maySave: true }
     );
     expect(await read('content/posts/refers.md')).toBe(
       await read('content/posts/twin.md')
@@ -257,7 +259,8 @@ describe('rename', () => {
         layerWith().rename(
           'author',
           'content/authors/ada.md',
-          'content/authors/ada-l.md'
+          'content/authors/ada-l.md',
+          { maySave: true }
         )
       ).rejects.toThrow(/Nothing was changed/);
       await fs.chmod(referrer, 0o644);
@@ -272,7 +275,8 @@ describe('rename', () => {
     const rename = layer.rename(
       'author',
       'content/authors/ada.md',
-      'content/authors/ada-l.md'
+      'content/authors/ada-l.md',
+      { maySave: true }
     );
     const saved = layer.update(
       'post',
@@ -324,10 +328,7 @@ describe('delete and referrers', () => {
 describe('folders', () => {
   beforeEach(async () => {
     await write('content/authors/ada.md', ADA);
-    await write(
-      'content/posts/refers.md',
-      REFERRER.replaceAll('authors/ada.md', 'authors/ada.md')
-    );
+    await write('content/posts/refers.md', REFERRER);
     await write('content/posts/series/one.md', '---\ntitle: One\n---\n');
     await write('content/posts/series/two.md', '---\ntitle: Two\n---\n');
     await write('content/authors/fan.md', '---\nname: Fan\n---\n');
@@ -466,6 +467,8 @@ describe('folders', () => {
     });
     await expect(layer.deleteFolder('post', 'mixed')).rejects.toMatchObject({
       code: 'folder-not-owned',
+      message:
+        'This folder holds files that this collection does not manage, so it cannot be renamed or deleted here.',
     });
     expect(await exists('content/posts/mixed/photo.png')).toBe(true);
     await layer.deleteFolder('post', 'series');
@@ -657,7 +660,8 @@ describe('GraphQL index', () => {
     await layer.rename(
       'author',
       'content/authors/ada.md',
-      'content/authors/ada-l.md'
+      'content/authors/ada-l.md',
+      { maySave: true }
     );
     expect(pipeline.removePaths).toHaveBeenLastCalledWith([
       'content/authors/ada.md',
@@ -671,5 +675,188 @@ describe('GraphQL index', () => {
     expect(pipeline.removePaths).toHaveBeenLastCalledWith([
       'content/posts/series/one.md',
     ]);
+  });
+});
+
+describe('Windows-safe names', () => {
+  const refused = [
+    'what?',
+    'a:b',
+    'a*b',
+    'a"b',
+    'a<b',
+    'a>b',
+    'a|b',
+    'CON',
+    'con',
+    'Nul',
+    'aux',
+    'COM1',
+    'lpt9.tar',
+    'COM²',
+  ];
+  const accepted = ['console', 'com10', 'com0', 'nullable'];
+
+  beforeEach(async () => {
+    await write('content/posts/seed.md', '---\ntitle: Seed\n---\n');
+    await write('content/posts/series/one.md');
+  });
+
+  it('refuses each name on create and on an update that would make the file', async () => {
+    const layer = layerWith();
+    for (const name of refused) {
+      const target = `content/posts/${name}.md`;
+      await expect(layer.create('post', target, {})).rejects.toMatchObject({
+        code: 'invalid-path',
+      });
+      await expect(
+        layer.update('post', target, {}, { mayCreate: true })
+      ).rejects.toMatchObject({ code: 'invalid-path' });
+    }
+    expect(await fs.readdir(path.join(rootDir, 'content/posts'))).toEqual([
+      'seed.md',
+      'series',
+    ]);
+  });
+
+  it('refuses each name on rename and renameFolder, leaving the source', async () => {
+    const layer = layerWith();
+    for (const name of refused) {
+      await expect(
+        layer.rename(
+          'post',
+          'content/posts/seed.md',
+          `content/posts/${name}.md`
+        )
+      ).rejects.toMatchObject({ code: 'invalid-path' });
+      await expect(
+        layer.renameFolder('post', 'series', name)
+      ).rejects.toMatchObject({ code: 'invalid-path' });
+    }
+    expect(await exists('content/posts/seed.md')).toBe(true);
+    expect(await exists('content/posts/series/one.md')).toBe(true);
+  });
+
+  it('refuses each name on createFolder', async () => {
+    const layer = layerWith();
+    for (const name of refused) {
+      await expect(layer.createFolder('post', name)).rejects.toMatchObject({
+        code: 'invalid-path',
+      });
+    }
+    expect(await fs.readdir(path.join(rootDir, 'content/posts'))).toEqual([
+      'seed.md',
+      'series',
+    ]);
+  });
+
+  it('refuses a folder part it would make as a side effect, writing nothing', async () => {
+    const layer = layerWith();
+    await expect(
+      layer.create('post', 'content/posts/CON/new.md', {})
+    ).rejects.toMatchObject({ code: 'invalid-path' });
+    await expect(
+      layer.update(
+        'post',
+        'content/posts/a/aux/new.md',
+        {},
+        { mayCreate: true }
+      )
+    ).rejects.toMatchObject({ code: 'invalid-path' });
+    expect(await exists('content/posts/CON')).toBe(false);
+    expect(await exists('content/posts/a')).toBe(false);
+  });
+
+  it('accepts names that only look reserved', async () => {
+    const layer = layerWith();
+    for (const name of accepted) {
+      await layer.create('post', `content/posts/${name}.md`, {});
+      await layer.createFolder('post', name);
+    }
+    await layer.rename(
+      'post',
+      'content/posts/seed.md',
+      'content/posts/console2.md'
+    );
+    await layer.renameFolder('post', 'series', 'com0x');
+    expect(await exists('content/posts/console2.md')).toBe(true);
+    expect(await exists('content/posts/com0x/one.md')).toBe(true);
+  });
+});
+
+describe('a rename that rewrites other collections', () => {
+  beforeEach(async () => {
+    await write('content/authors/ada.md', ADA);
+    await write('content/authors/team/bob.md', '---\nname: Bob\n---\n');
+    await write('content/posts/refers.md', REFERRER);
+    await write(
+      'content/posts/by-bob.md',
+      '---\ntitle: By Bob\nauthor: content/authors/team/bob.md\n---\n'
+    );
+  });
+
+  it('refuses a document rename without save permission, before writing anything', async () => {
+    await expect(
+      layerWith().rename(
+        'author',
+        'content/authors/ada.md',
+        'content/authors/ada-l.md'
+      )
+    ).rejects.toMatchObject({
+      code: 'forbidden',
+      message: expect.stringContaining('content:save'),
+    });
+    expect(await exists('content/authors/ada.md')).toBe(true);
+    expect(await exists('content/authors/ada-l.md')).toBe(false);
+    expect(await read('content/posts/refers.md')).toBe(REFERRER);
+  });
+
+  it('refuses a folder rename without save permission, and allows it with', async () => {
+    const layer = layerWith();
+    await expect(
+      layer.renameFolder('author', 'team', 'crew')
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    expect(await exists('content/authors/team/bob.md')).toBe(true);
+    await layer.renameFolder('author', 'team', 'crew', { maySave: true });
+    expect(await read('content/posts/by-bob.md')).toContain(
+      'content/authors/crew/bob.md'
+    );
+  });
+
+  it('renames with no save permission when every referrer is in the same collection', async () => {
+    const result = await layerWith().rename(
+      'post',
+      'content/posts/refers.md',
+      'content/posts/refers2.md'
+    );
+    expect(result.referrers).toEqual(['content/posts/refers2.md']);
+  });
+
+  it('renames with no save permission when nothing refers to the document', async () => {
+    await layerWith().rename(
+      'post',
+      'content/posts/by-bob.md',
+      'content/posts/by-bob2.md'
+    );
+    expect(await exists('content/posts/by-bob2.md')).toBe(true);
+  });
+});
+
+describe('a failed folder delete', () => {
+  it('does not claim nothing changed once the removal started, and reports what is left', async () => {
+    await write('content/posts/series/one.md');
+    await write('content/posts/series/two.md');
+    vi.spyOn(fs, 'rm').mockImplementationOnce(async (target) => {
+      await fs.unlink(path.join(String(target), 'one.md'));
+      throw Object.assign(new Error('denied'), { code: 'EACCES' });
+    });
+    const failure = await layerWith()
+      .deleteFolder('post', 'series')
+      .catch((cause: unknown) => cause);
+    expect(failure).toBeInstanceOf(Error);
+    expect((failure as Error).message).toContain('may have been removed');
+    expect((failure as Error).message).not.toContain('Nothing was changed');
+    expect(await exists('content/posts/series/two.md')).toBe(true);
+    expect(await exists('content/posts/series/one.md')).toBe(false);
   });
 });

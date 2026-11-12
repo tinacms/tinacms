@@ -35,17 +35,19 @@ import {
   type ReactElement,
   type ReactNode,
   useEffect,
+  useId,
   useRef,
   useState,
 } from 'react';
 import { ContentError, type ListQuery } from '../../core/content/contract';
+import { parentOf } from '../../core/content/names';
 import {
   useCollectionActions,
   useCollectionCapabilities,
   useDocumentsPage,
   useDraftCounts,
   useNewDocumentDrafts,
-} from '../../editor';
+} from '../../editor/collection-documents';
 import { useUnsavedFormIds } from '../../form/form-store';
 import { exactTimeOf, relativeTimeOf } from '../../plugins/home/recent-rows';
 import { useTinaSchema } from '../hooks';
@@ -71,10 +73,10 @@ import {
   type TableRow,
   buildRows,
   countsOf,
+  hasEditTimes,
   joinFolder,
   namePartsOf,
   nextSort,
-  parentFolderOf,
   serverSortOf,
 } from './table-model';
 
@@ -88,6 +90,14 @@ type Pending =
 
 const GENERIC_FAILURE = 'Something went wrong. Please try again.';
 const SKELETON_ROWS = 6;
+// `max-w-0` keeps one long unbroken title from stretching the table; the other columns have fixed widths.
+const TITLE_COLUMN = 'max-w-0 [overflow-wrap:anywhere]';
+// The item is not `disabled`: a disabled menu item leaves the arrow-key order, and the keyboard
+// would never reach the reason. It has no handler, so activating it does nothing.
+const newDocumentNote = `New document is not available yet. It arrives with ${NEW_DOCUMENT_PBI}.`;
+// `focusableWhenDisabled` sets aria-disabled, which the Button's own disabled styles do not match.
+const PAGER_DISABLED =
+  'aria-disabled:cursor-not-allowed aria-disabled:opacity-45 aria-disabled:shadow-none';
 
 const plural = (count: number, one: string, many: string): string =>
   `${count} ${count === 1 ? one : many}`;
@@ -131,12 +141,12 @@ const SORT_OPTIONS: { value: string; label: string; sort: SortState }[] = [
   },
   {
     value: 'status:asc',
-    label: 'Status, saved first',
+    label: 'Status, saved first (this page)',
     sort: { key: 'status', direction: 'asc' },
   },
   {
     value: 'status:desc',
-    label: 'Status, unsaved first',
+    label: 'Status, unsaved first (this page)',
     sort: { key: 'status', direction: 'desc' },
   },
 ];
@@ -193,6 +203,14 @@ function RowMenu({ rowKey, label, items }: RowMenuProps) {
       </DropdownMenu>
     </div>
   );
+}
+
+/** Where the first rename of a row ends up: its menu button once the refetch shows the new row. */
+interface RenameFocus {
+  key: string;
+  /** `dataUpdatedAt` of the page when the rename began; a newer one means the refetch landed. */
+  since: number;
+  done: boolean;
 }
 
 function SelectChoice<Value extends string>({
@@ -254,6 +272,7 @@ function CollectionTableBody({
   const actions = useCollectionActions(collection);
   const drafts = useDraftCounts(collection);
   const copies = useNewDocumentDrafts(collection, folder);
+  const newDocumentNoteId = useId();
   const unsavedIds = new Set<string>(useUnsavedFormIds());
 
   const [filterText, setFilterText] = useState('');
@@ -266,8 +285,11 @@ function CollectionTableBody({
     scope,
     after: [],
   });
+  // A new filter or server sort drops the stored cursors, so clearing it later does not return to the old page.
+  if (pages.scope !== scope) setPages({ scope, after: [] });
   const after = pages.scope === scope ? pages.after : [];
   const setAfter = (next: string[]) => setPages({ scope, after: next });
+  const [withoutEditTimes, setWithoutEditTimes] = useState(false);
 
   const query: ListQuery = {
     folder,
@@ -279,6 +301,16 @@ function CollectionTableBody({
   const page = useDocumentsPage(collection, query);
   const connection = page.data;
   const isFirstPage = after.length === 0;
+
+  useEffect(() => {
+    if (!connection || connection.edges.length === 0) return;
+    if (withoutEditTimes || hasEditTimes(connection)) return;
+    setWithoutEditTimes(true);
+    if (serverSort.by === 'updatedAt') {
+      setSort({ key: 'title', direction: 'asc' });
+      setServerSort({ by: 'title', direction: 'asc' });
+    }
+  }, [connection, withoutEditTimes, serverSort.by]);
 
   useEffect(() => {
     if (!connection || page.isFetching || after.length === 0) return;
@@ -302,6 +334,26 @@ function CollectionTableBody({
     open: boolean;
   } | null>(null);
   const afterDelete = useRef<string | null>(null);
+  const renamed = useRef<RenameFocus | null>(null);
+  const dialogClosed = dialog !== null && !dialog.open;
+
+  useEffect(() => {
+    const target = renamed.current;
+    if (target === null || target.done || !dialogClosed) return;
+    const trigger = triggerOfRow(target.key);
+    if (trigger) {
+      trigger.focus();
+      target.done = true;
+      return;
+    }
+    const refetched =
+      !page.isFetching && (page.dataUpdatedAt > target.since || page.isError);
+    if (refetched) {
+      headingTarget()?.focus();
+      target.done = true;
+    }
+  });
+
   const deleted = useRef(false);
   const headerRef = useRef<HTMLDivElement>(null);
   const newButton = useRef<HTMLButtonElement>(null);
@@ -329,7 +381,10 @@ function CollectionTableBody({
   const pageNumber = after.length + 1;
   const now = Date.now();
 
-  const open = (pending: Pending) => setDialog({ pending, open: true });
+  const open = (pending: Pending) => {
+    renamed.current = null;
+    setDialog({ pending, open: true });
+  };
   const close = () =>
     setDialog((current) => (current ? { ...current, open: false } : null));
 
@@ -342,6 +397,13 @@ function CollectionTableBody({
     (key: string): FocusTarget =>
     () =>
       triggerOfRow(key) ?? headingTarget();
+  const afterRenameTarget =
+    (oldKey: string): FocusTarget =>
+    () => {
+      const target = renamed.current;
+      if (target === null) return afterRowAction(oldKey)();
+      return triggerOfRow(target.key) ?? false;
+    };
   const afterDeleteTarget =
     (rowKey: string): FocusTarget =>
     () => {
@@ -442,17 +504,32 @@ function CollectionTableBody({
 
   const wide = tier === 'desktop';
   const sortOf = (key: SortKey) => (sort.key === key ? sort.direction : 'none');
-  const press = (key: SortKey) => () => {
-    const next = nextSort(sort, key);
+  const applySort = (next: SortState) => {
     setSort(next);
     setServerSort(serverSortOf(next, serverSort));
+    if (next.key === 'status') setAfter([]);
   };
+  const press = (key: SortKey) => () => applySort(nextSort(sort, key));
 
+  const updatedColumn: DataTableColumn = {
+    key: 'updated',
+    label: 'Last edited',
+    align: 'right',
+    className: 'w-55',
+    sort: sortOf('updated'),
+    onSort: press('updated'),
+  };
+  const actionsColumn: DataTableColumn = {
+    key: 'actions',
+    label: 'Actions',
+    className: 'w-12 text-transparent',
+  };
   const columns: DataTableColumn[] = wide
     ? [
         {
           key: 'title',
           label: 'Title',
+          className: TITLE_COLUMN,
           sort: sortOf('title'),
           onSort: press('title'),
         },
@@ -463,27 +540,12 @@ function CollectionTableBody({
           sort: sortOf('status'),
           onSort: press('status'),
         },
-        {
-          key: 'updated',
-          label: 'Last edited',
-          align: 'right',
-          className: 'w-55',
-          sort: sortOf('updated'),
-          onSort: press('updated'),
-        },
-        {
-          key: 'actions',
-          label: 'Actions',
-          className: 'w-12 text-transparent',
-        },
+        ...(withoutEditTimes ? [] : [updatedColumn]),
+        actionsColumn,
       ]
     : [
-        { key: 'title', label: 'Title' },
-        {
-          key: 'actions',
-          label: 'Actions',
-          className: 'w-12 text-transparent',
-        },
+        { key: 'title', label: 'Title', className: TITLE_COLUMN },
+        actionsColumn,
       ];
 
   const menuCell = (row: TableRow): DataTableCell | undefined => {
@@ -523,7 +585,14 @@ function CollectionTableBody({
         status: row.unsaved
           ? { type: 'badge', kind: 'unsaved', text: 'Unsaved' }
           : { type: 'muted', text: 'Saved' },
-        updated: { type: 'node', node: <LastEdited row={row} now={now} /> },
+        ...(withoutEditTimes
+          ? {}
+          : {
+              updated: {
+                type: 'node' as const,
+                node: <LastEdited row={row} now={now} />,
+              },
+            }),
         actions: menuCell(row),
       },
     };
@@ -536,7 +605,7 @@ function CollectionTableBody({
       <span className='text-sm text-muted-foreground'>
         {plural(row.folder.documentCount, 'document', 'documents')}
       </span>
-    ) : (
+    ) : withoutEditTimes ? null : (
       <LastEdited row={row} now={now} />
     );
     return {
@@ -647,13 +716,22 @@ function CollectionTableBody({
           {caps.canCreateDocument ? (
             <Tooltip>
               <TooltipTrigger
-                render={<DropdownMenuItem disabled icon='doc-new' />}
+                render={
+                  <DropdownMenuItem
+                    icon='doc-new'
+                    data-disabled=''
+                    aria-describedby={newDocumentNoteId}
+                    closeOnClick={false}
+                    className='cursor-not-allowed opacity-60'
+                  />
+                }
               >
                 Document
               </TooltipTrigger>
-              <TooltipContent side='right'>
-                {`New document is not available yet. It arrives with ${NEW_DOCUMENT_PBI}.`}
-              </TooltipContent>
+              <TooltipContent side='right'>{newDocumentNote}</TooltipContent>
+              <span id={newDocumentNoteId} hidden>
+                {newDocumentNote}
+              </span>
             </Tooltip>
           ) : null}
           {caps.canCreateFolder ? (
@@ -680,7 +758,7 @@ function CollectionTableBody({
             ? 'w-70 max-w-full'
             : tier === 'phone'
               ? 'min-w-0 basis-full'
-              : 'min-w-0 flex-1'
+              : 'min-w-40 flex-1'
         }
       />
       {tier === 'phone' ? (
@@ -704,12 +782,14 @@ function CollectionTableBody({
         <SelectChoice
           label='Sort by'
           value={`${sort.key}:${sort.direction}`}
-          options={SORT_OPTIONS}
+          options={
+            withoutEditTimes
+              ? SORT_OPTIONS.filter((option) => option.sort.key !== 'updated')
+              : SORT_OPTIONS
+          }
           onChange={(next) => {
             const chosen = SORT_OPTIONS.find((option) => option.value === next);
-            if (!chosen) return;
-            setSort(chosen.sort);
-            setServerSort(serverSortOf(chosen.sort, serverSort));
+            if (chosen) applySort(chosen.sort);
           }}
         />
       )}
@@ -717,7 +797,7 @@ function CollectionTableBody({
         aria-live='polite'
         className='ml-auto text-sm whitespace-nowrap text-muted-foreground tabular-nums'
       >
-        {plural(viewCount, 'document', 'documents')}
+        {isLoading ? '' : plural(viewCount, 'document', 'documents')}
       </span>
     </>
   );
@@ -763,14 +843,19 @@ function CollectionTableBody({
           onSubmit={async (name) => {
             const to = `${parts.dir}${name}${parts.extension}`;
             if (isRename) {
-              if (to !== row.path) await actions.renameDocument(row.path, to);
+              if (to === row.path) return;
+              const since = page.dataUpdatedAt;
+              await actions.renameDocument(row.path, to);
+              renamed.current = { key: to, since, done: false };
               return;
             }
             await actions.duplicateDocument(row.path, to);
             openDocument(to);
           }}
           onClose={close}
-          focusAfter={afterRowAction(row.key)}
+          focusAfter={
+            isRename ? afterRenameTarget(row.key) : afterRowAction(row.key)
+          }
         />
       );
     }
@@ -802,13 +887,14 @@ function CollectionTableBody({
           confirmLabel='Rename'
           initialName={row.folder.name}
           onSubmit={async (name) => {
-            const to = joinFolder(parentFolderOf(row.folder.path), name);
-            if (to !== row.folder.path) {
-              await actions.renameFolder(row.folder.path, to);
-            }
+            const to = joinFolder(parentOf(row.folder.path), name);
+            if (to === row.folder.path) return;
+            const since = page.dataUpdatedAt;
+            await actions.renameFolder(row.folder.path, to);
+            renamed.current = { key: `folder:${to}`, since, done: false };
           }}
           onClose={close}
-          focusAfter={afterRowAction(row.key)}
+          focusAfter={afterRenameTarget(row.key)}
         />
       );
     }
@@ -884,6 +970,7 @@ function CollectionTableBody({
                 <Button
                   size='sm'
                   icon='chevron-left'
+                  className={PAGER_DISABLED}
                   disabled={after.length === 0}
                   focusableWhenDisabled
                   onClick={() => setAfter(after.slice(0, -1))}
@@ -896,6 +983,7 @@ function CollectionTableBody({
                 <Button
                   size='sm'
                   iconEnd='chevron-right'
+                  className={PAGER_DISABLED}
                   disabled={
                     !connection?.pageInfo.hasNextPage ||
                     !connection.pageInfo.endCursor

@@ -22,6 +22,7 @@ const sessionsByToken: Record<string, Session> = Object.assign(
   {
     'admin-token': { identity: { id: toUserId('ada') }, roles: ['admin'] },
     'editor-token': { identity: { id: toUserId('eli') }, roles: ['editor'] },
+    'author-token': { identity: { id: toUserId('ann') }, roles: ['author'] },
     'proto-token': {
       identity: { id: toUserId('mal') },
       roles: ['constructor'],
@@ -977,5 +978,58 @@ describe('createRpcHandler content saves with server hooks', () => {
       const response = await handler(post(path, { token: 'admin-token' }));
       expect(response.status).toBe(404);
     }
+  });
+});
+
+describe('createRpcHandler session/permissions', () => {
+  const ask = (h: typeof handler, token?: string) =>
+    h(post('/session/permissions', { token }));
+
+  it('answers the default permissions of the default roles', async () => {
+    const editor = await ask(handler, 'editor-token');
+    expect(editor.status).toBe(200);
+    expect(await editor.json()).toEqual([
+      'content:save',
+      'content:create',
+      'content:rename',
+      'content:delete',
+    ]);
+    expect(await (await ask(handler, 'admin-token')).json()).toEqual(['*']);
+    expect(await (await ask(handler, 'proto-token')).json()).toEqual([]);
+  });
+
+  it('answers what the provider rolePermissions grants a custom role', async () => {
+    const custom = createRpcHandler({
+      plugins: [
+        authPlugin(async (role) =>
+          role === 'author' ? ['content:delete', 'media:delete'] : []
+        ),
+        mediaPlugin,
+      ],
+    });
+    expect(await (await ask(custom, 'author-token')).json()).toEqual([
+      'content:delete',
+      'media:delete',
+    ]);
+    expect(await (await ask(custom, 'editor-token')).json()).toEqual([]);
+    const removed = await custom(
+      post('/media/remove', { token: 'author-token', body: { path: 'a.png' } })
+    );
+    expect(removed.status).toBe(200);
+  });
+
+  it('answers 401 and no list without a session', async () => {
+    const response = await ask(handler);
+    expect(response.status).toBe(401);
+    const body = await response.json();
+    expect(Array.isArray(body)).toBe(false);
+    expect(body.error.code).toBe('unauthenticated');
+  });
+
+  it('answers the wildcard where the server has no auth hooks', async () => {
+    const authless = createRpcHandler({ plugins: [mediaPlugin] });
+    const response = await ask(authless);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(['*']);
   });
 });

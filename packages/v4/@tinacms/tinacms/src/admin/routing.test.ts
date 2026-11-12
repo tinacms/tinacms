@@ -19,6 +19,7 @@ describe('admin routing', () => {
     { view: 'collection', collection: 'post', side: true },
     { view: 'folder', collection: 'post', folder: 'a' },
     { view: 'folder', collection: 'post', folder: 'a/b' },
+    { view: 'folder', collection: 'post', folder: 'a/b', side: true },
     { view: 'folder', collection: 'post', folder: 'folder' },
     { view: 'folder', collection: 'post', folder: 'v1.2/folder/x y' },
     { view: 'document', collection: 'post', path: 'content/posts/hello.mdx' },

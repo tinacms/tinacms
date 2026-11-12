@@ -5,7 +5,7 @@ import {
   type ListSort,
 } from '../../core/content/contract';
 import { shownNameOf } from '../../core/content/list-query';
-import { nameOf } from '../../core/content/names';
+import { extensionOf, nameOf } from '../../core/content/names';
 
 export const PAGE_SIZE = 50;
 export const FILTER_DELAY_MS = 250;
@@ -197,27 +197,18 @@ export interface NameParts {
 }
 
 export const namePartsOf = (path: string): NameParts => {
-  const slash = path.lastIndexOf('/');
-  const dir = path.slice(0, slash + 1);
-  const name = path.slice(slash + 1);
-  const dot = name.lastIndexOf('.');
-  if (dot <= 0) return { dir, stem: name, extension: '' };
-  return { dir, stem: name.slice(0, dot), extension: name.slice(dot) };
+  const name = nameOf(path);
+  const extension = extensionOf(name);
+  return {
+    dir: path.slice(0, path.length - name.length),
+    stem: name.slice(0, name.length - extension.length),
+    extension,
+  };
 };
 
 export const joinFolder = (parent: string, name: string): string =>
   parent === '' ? name : `${parent}/${name}`;
 
-export const parentFolderOf = (folder: string): string => {
-  const slash = folder.lastIndexOf('/');
-  return slash === -1 ? '' : folder.slice(0, slash);
-};
-
-/** The folder of a document path, relative to the collection's `path`. */
-export const folderOfDocument = (path: string, root: string): string => {
-  const inside = path.startsWith(`${root}/`)
-    ? path.slice(root.length + 1)
-    : path;
-  const slash = inside.lastIndexOf('/');
-  return slash === -1 ? '' : inside.slice(0, slash);
-};
+/** Whether the loaded page shows any document with a last-edited time. TinaCloud lists carry none. */
+export const hasEditTimes = (connection: DocumentConnection): boolean =>
+  connection.edges.some(({ node }) => dateOf(node.updatedAt) !== undefined);

@@ -14,8 +14,7 @@ export const createWriteLock = () => {
   const waiting: Waiter[] = [];
 
   const admit = () => {
-    while (waiting.length > 0) {
-      const next = waiting[0] as Waiter;
+    for (let next = waiting[0]; next; next = waiting[0]) {
       const free = next.exclusive ? saves === 0 && !structural : !structural;
       if (!free) return;
       waiting.shift();
@@ -50,5 +49,3 @@ export const createWriteLock = () => {
     exclusive: <T>(task: () => Promise<T>) => run(true, task),
   };
 };
-
-export type WriteLock = ReturnType<typeof createWriteLock>;

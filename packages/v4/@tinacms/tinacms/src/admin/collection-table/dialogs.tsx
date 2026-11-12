@@ -25,12 +25,14 @@ import {
   type DocumentReferrer,
 } from '../../core/content/contract';
 import { isValidName, nameOf } from '../../core/content/names';
+import { UnsavedReferrersError } from '../../editor/collection-documents';
+import { formatAdminRoute } from '../routing';
 
 const GENERIC_FAILURE = 'Something went wrong. Please try again.';
 const REFERRER_LIMIT = 10;
 
 /** The sentence under a dialog's box. A `ContentError` already carries the right words. */
-export const messageOf = (cause: unknown): string => {
+const messageOf = (cause: unknown): string => {
   if (cause instanceof Error) return cause.message || GENERIC_FAILURE;
   return GENERIC_FAILURE;
 };
@@ -38,8 +40,66 @@ export const messageOf = (cause: unknown): string => {
 const plural = (count: number, one: string, many: string): string =>
   `${count} ${count === 1 ? one : many}`;
 
-/** Where focus goes when a dialog closes. */
-export type FocusTarget = () => HTMLElement | null;
+/** Where focus goes when a dialog closes. `false` leaves focus alone, for a caller that moves it later. */
+export type FocusTarget = () => HTMLElement | null | false;
+
+const EMPTY_NAME_MESSAGE = 'Enter a name.';
+
+/** What the dialog shows under its box: a sentence, plus the documents that block it. */
+interface Refusal {
+  message: string;
+  blockedBy: DocumentReferrer[];
+}
+
+const refusalOf = (cause: unknown): Refusal => {
+  if (cause instanceof UnsavedReferrersError) {
+    return {
+      message: 'Save or discard your unsaved edits to these documents first:',
+      blockedBy: cause.referrers,
+    };
+  }
+  return { message: messageOf(cause), blockedBy: [] };
+};
+
+function DocumentList({
+  referrers,
+  onOpen,
+}: {
+  referrers: readonly DocumentReferrer[];
+  onOpen?: () => void;
+}) {
+  const shown = referrers.slice(0, REFERRER_LIMIT);
+  const rest = referrers.length - shown.length;
+  return (
+    <>
+      <ul className='m-0 list-disc pl-5'>
+        {shown.map((referrer) => {
+          const name = referrer.title ? referrer.title : nameOf(referrer.path);
+          return (
+            <li key={`${referrer.collection}:${referrer.path}`}>
+              {onOpen ? (
+                <a
+                  href={formatAdminRoute({
+                    view: 'document',
+                    collection: referrer.collection,
+                    path: referrer.path,
+                  })}
+                  className='underline'
+                  onClick={onOpen}
+                >
+                  {name}
+                </a>
+              ) : (
+                name
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      {rest > 0 ? <p className='m-0'>{`and ${rest} more`}</p> : null}
+    </>
+  );
+}
 
 interface NameDialogProps {
   open: boolean;
@@ -76,14 +136,21 @@ function NameForm({
   const inputId = useId();
   const errorId = useId();
   const [name, setName] = useState(initialName);
-  const [error, setError] = useState<string | null>(null);
+  const [refusal, setRefusal] = useState<Refusal | null>(null);
   const [busy, setBusy] = useState(false);
+  const error = refusal === null ? null : refusal.message;
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (busy) return;
     if (!isValidName(name)) {
-      setError(new ContentError('invalid-path').message);
+      setRefusal({
+        message:
+          name.trim() === ''
+            ? EMPTY_NAME_MESSAGE
+            : new ContentError('invalid-path').message,
+        blockedBy: [],
+      });
       return;
     }
     setBusy(true);
@@ -91,7 +158,7 @@ function NameForm({
       await onSubmit(name);
       onClose();
     } catch (cause) {
-      setError(messageOf(cause));
+      setRefusal(refusalOf(cause));
       setBusy(false);
     }
   };
@@ -110,7 +177,7 @@ function NameForm({
             aria-describedby={error === null ? undefined : errorId}
             onChange={(event) => {
               setName(event.target.value);
-              setError(null);
+              setRefusal(null);
             }}
           />
           {extension ? (
@@ -119,10 +186,17 @@ function NameForm({
             </span>
           ) : null}
         </div>
-        {error === null ? null : (
-          <p id={errorId} role='alert' className='m-0 text-sm text-destructive'>
-            {error}
-          </p>
+        {refusal === null ? null : (
+          <div
+            id={errorId}
+            role='alert'
+            className='flex flex-col gap-1 text-sm text-destructive'
+          >
+            <p className='m-0'>{refusal.message}</p>
+            {refusal.blockedBy.length === 0 ? null : (
+              <DocumentList referrers={refusal.blockedBy} onOpen={onClose} />
+            )}
+          </div>
         )}
       </div>
       <DialogFooter>
@@ -193,8 +267,6 @@ function ReferrerNote({ state }: { state: ReferrerState }) {
   if (referrers.length === 0) {
     return <p className='m-0'>No other document links to it.</p>;
   }
-  const shown = referrers.slice(0, REFERRER_LIMIT);
-  const rest = referrers.length - shown.length;
   return (
     <div className='flex flex-col gap-1'>
       <p className='m-0'>
@@ -205,14 +277,7 @@ function ReferrerNote({ state }: { state: ReferrerState }) {
         )}
         . They will show a missing reference.
       </p>
-      <ul className='m-0 list-disc pl-5'>
-        {shown.map((referrer) => (
-          <li key={`${referrer.collection}:${referrer.path}`}>
-            {referrer.title ? referrer.title : nameOf(referrer.path)}
-          </li>
-        ))}
-      </ul>
-      {rest > 0 ? <p className='m-0'>{`and ${rest} more`}</p> : null}
+      <DocumentList referrers={referrers} />
     </div>
   );
 }

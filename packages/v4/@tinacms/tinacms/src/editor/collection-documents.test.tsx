@@ -11,8 +11,8 @@ import {
 } from '../core/content/contract';
 import type { FieldRegistry } from '../core/field/registry';
 import type { TinaStoreState } from '../core/plugin';
-import type { CollectionSchema } from '../core/schema/types';
-import { readDraft } from '../form/drafts';
+import type { CollectionSchema, FieldSchema } from '../core/schema/types';
+import { readDraft, writeDraft } from '../form/drafts';
 import {
   readFormStore,
   syncDrafts,
@@ -22,6 +22,7 @@ import {
 } from '../form/form-store';
 import { connectionOf } from '../test/connection';
 import {
+  UnsavedReferrersError,
   useCollectionActions,
   useCollectionCapabilities,
   useDocumentsPage,
@@ -38,15 +39,37 @@ const POST: CollectionSchema = {
   fields: [{ name: 'title', label: 'Title', type: 'string' }],
 };
 
+const REFERENCE_TO_POST: FieldSchema = {
+  name: 'related',
+  label: 'Related',
+  type: 'reference',
+  collections: ['post'],
+};
+
+const LINKING_POST: CollectionSchema = {
+  ...POST,
+  fields: [...POST.fields, REFERENCE_TO_POST],
+};
+
+const PAGE: CollectionSchema = {
+  name: 'page',
+  path: 'content/pages',
+  format: 'mdx',
+  fields: [
+    { name: 'title', label: 'Title', type: 'string' },
+    REFERENCE_TO_POST,
+  ],
+};
+
 const ORIGINAL: DocumentEntry = {
   path: 'content/posts/a/hello.mdx',
   document: { title: 'Hello' },
 };
 
-const signedIn = (roles: string[]): AuthSlice =>
+const signedIn = (roles: string[], id = 'u1'): AuthSlice =>
   ({
     status: 'signed-in',
-    user: { id: 'u1' as UserId },
+    user: { id: id as UserId },
     roles,
     getToken: async () => undefined,
     login: async () => undefined,
@@ -93,7 +116,12 @@ const setup = (
   {
     auth,
     collection = POST,
-  }: { auth?: AuthSlice; collection?: CollectionSchema } = {}
+    collections = [collection],
+  }: {
+    auth?: AuthSlice;
+    collection?: CollectionSchema;
+    collections?: CollectionSchema[];
+  } = {}
 ) => {
   const store = createStore<TinaStoreState>()(() => ({
     content: content as unknown as Record<string, unknown>,
@@ -101,7 +129,7 @@ const setup = (
   }));
   const runtime = {
     store,
-    schema: { collections: [collection] },
+    schema: { collections },
     registry: { get: () => undefined } as unknown as FieldRegistry,
     serverHooks: new Set<string>(),
     rpcUrl: '/api/tina',
@@ -114,7 +142,7 @@ const setup = (
       <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
     </QueryClientProvider>
   );
-  return { wrapper, queryClient };
+  return { wrapper, queryClient, store };
 };
 
 const draftOf = (path: string) => readDraft(toFormId(path), undefined);
@@ -188,12 +216,138 @@ describe('useCollectionCapabilities', () => {
     expect(result.canDuplicate).toBe(true);
   });
 
-  it('gives the editor role the structural actions and an unknown role none', () => {
-    expect(
-      capabilities(provider(), { auth: signedIn(['editor']) }).canDelete
-    ).toBe(true);
-    const unknown = capabilities(provider(), { auth: signedIn(['guest']) });
-    expect(Object.values(unknown).filter(Boolean)).toEqual([]);
+  describe('with an auth plugin (session/permissions)', () => {
+    const NONE = {
+      canCreateFolder: false,
+      canCreateDocument: false,
+      canRename: false,
+      canDuplicate: false,
+      canDelete: false,
+    };
+    const ALL = {
+      canCreateFolder: true,
+      canCreateDocument: true,
+      canRename: true,
+      canDuplicate: true,
+      canDelete: true,
+    };
+    const answer = (respond: () => Promise<Response> | Response) => {
+      const fetchMock = vi.fn(async () => respond());
+      vi.stubGlobal('fetch', fetchMock);
+      return fetchMock;
+    };
+    const capabilitiesOf = (auth: AuthSlice) => {
+      const { wrapper, store } = setup(provider(), { auth });
+      const hook = renderHook(() => useCollectionCapabilities('post', ''), {
+        wrapper,
+      });
+      return { hook, store };
+    };
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('shows only Delete to an author whose server role holds only content:delete', async () => {
+      answer(() => Response.json(['content:delete']));
+      const { hook } = capabilitiesOf(signedIn(['author']));
+      await waitFor(() => expect(hook.result.current.canDelete).toBe(true));
+      expect(hook.result.current).toEqual({ ...NONE, canDelete: true });
+    });
+
+    it('shows every action when the answer grants them', async () => {
+      answer(() =>
+        Response.json([
+          'content:save',
+          'content:create',
+          'content:rename',
+          'content:delete',
+        ])
+      );
+      const { hook } = capabilitiesOf(signedIn(['editor']));
+      await waitFor(() => expect(hook.result.current).toEqual(ALL));
+    });
+
+    it('shows no action to a role with no permissions', async () => {
+      const fetchMock = answer(() => Response.json([]));
+      const { hook } = capabilitiesOf(signedIn(['viewer']));
+      await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+      await act(async () => {});
+      expect(hook.result.current).toEqual(NONE);
+    });
+
+    it('shows no action while the answer is pending or after it failed', async () => {
+      const pending = answer(() => new Promise<Response>(() => {}));
+      const waiting = capabilitiesOf(signedIn(['editor']));
+      await waitFor(() => expect(pending).toHaveBeenCalled());
+      expect(waiting.hook.result.current).toEqual(NONE);
+      waiting.hook.unmount();
+
+      const failing = answer(() =>
+        Response.json(
+          { error: { code: 'boom', message: 'Server error' } },
+          { status: 500 }
+        )
+      );
+      const failed = capabilitiesOf(signedIn(['editor']));
+      await waitFor(() => expect(failing).toHaveBeenCalled());
+      await act(async () => {});
+      expect(failed.hook.result.current).toEqual(NONE);
+    });
+
+    it.each([
+      ['404', () => new Response('', { status: 404 })],
+      ['405', () => new Response('', { status: 405 })],
+      [
+        'a non-JSON body',
+        () =>
+          new Response('<html></html>', {
+            headers: { 'content-type': 'text/html' },
+          }),
+      ],
+    ])(
+      'falls back to the default role map when the route answers %s',
+      async (_case, respond) => {
+        answer(respond);
+        const editor = capabilitiesOf(signedIn(['editor']));
+        await waitFor(() => expect(editor.hook.result.current).toEqual(ALL));
+        editor.hook.unmount();
+        const guest = capabilitiesOf(signedIn(['guest']));
+        await act(async () => {});
+        expect(guest.hook.result.current).toEqual(NONE);
+      }
+    );
+
+    it('shows every action when the server answers the wildcard', async () => {
+      answer(() => Response.json(['*']));
+      const { hook } = capabilitiesOf(signedIn(['guest']));
+      await waitFor(() => expect(hook.result.current).toEqual(ALL));
+    });
+
+    it("never shows the previous user's answer after a switch of user", async () => {
+      let release: (response: Response) => void = () => {};
+      const fetchMock = answer(() => Response.json(['*']));
+      const { hook, store } = capabilitiesOf(signedIn(['admin'], 'ada'));
+      await waitFor(() => expect(hook.result.current).toEqual(ALL));
+
+      fetchMock.mockImplementation(
+        () =>
+          new Promise<Response>((resolve) => {
+            release = resolve;
+          })
+      );
+      act(() => {
+        store.setState({
+          auth: signedIn(['admin'], 'grace') as unknown as Record<
+            string,
+            unknown
+          >,
+        });
+      });
+      expect(hook.result.current).toEqual(NONE);
+      await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+      await act(async () => release(Response.json(['content:delete'])));
+      await waitFor(() =>
+        expect(hook.result.current).toEqual({ ...NONE, canDelete: true })
+      );
+    });
   });
 
   it('follows the allowedActions switches', () => {
@@ -388,6 +542,178 @@ describe('useCollectionActions', () => {
       });
       expect(draftOf(to)).toBeUndefined();
     });
+  });
+});
+
+describe('rename guards', () => {
+  const actionsFor = (content: ContentProvider) => {
+    const { wrapper, queryClient } = setup(content, {
+      collections: [LINKING_POST, PAGE],
+    });
+    const { result } = renderHook(() => useCollectionActions('post'), {
+      wrapper,
+    });
+    return { actions: result, queryClient };
+  };
+  const target = 'content/posts/a.mdx';
+  const referrer = 'content/pages/p.mdx';
+  const keepEditsReferencing = (path: string, reference: string) => {
+    const id = toFormId(path);
+    const store = readFormStore();
+    store.registerForm(id, toFormValues({ title: 'Page' }));
+    store.setFieldValue(id, 'title' as never, 'Page, edited');
+    store.setFieldValue(id, 'related' as never, reference);
+  };
+
+  it('refuses a document rename onto an unsaved copy and moves nothing', async () => {
+    const content = provider();
+    const { actions } = actionsFor(content);
+    readFormStore().storeNewDocumentDraft(toFormId('content/posts/b.mdx'), {
+      title: 'Copy',
+    });
+    keepEditsTo('content/posts/c.mdx', 'Edited');
+    await expect(
+      act(() =>
+        actions.current.renameDocument(
+          'content/posts/c.mdx',
+          'content/posts/b.mdx'
+        )
+      )
+    ).rejects.toMatchObject({ code: 'name-taken' });
+    expect(content.rename).not.toHaveBeenCalled();
+    expect(draftOf('content/posts/c.mdx')).toBeDefined();
+    expect(draftOf('content/posts/b.mdx')?.new).toBe(true);
+  });
+
+  it('refuses a folder rename onto a path that holds an unsaved copy', async () => {
+    const content = provider();
+    const { actions } = actionsFor(content);
+    readFormStore().storeNewDocumentDraft(toFormId('content/posts/g/new.mdx'), {
+      title: 'Copy',
+    });
+    await expect(
+      act(() => actions.current.renameFolder('f', 'g'))
+    ).rejects.toMatchObject({ code: 'name-taken' });
+    expect(content.renameFolder).not.toHaveBeenCalled();
+  });
+
+  const refused = async (
+    attempt: () => Promise<unknown>
+  ): Promise<UnsavedReferrersError> => {
+    try {
+      await act(attempt);
+    } catch (cause) {
+      if (cause instanceof UnsavedReferrersError) return cause;
+      throw cause;
+    }
+    throw new Error('The rename was not refused.');
+  };
+
+  it('lists a referrer with an open dirty form and renames nothing', async () => {
+    const content = provider();
+    const { actions } = actionsFor(content);
+    keepEditsReferencing(referrer, target);
+    const error = await refused(() =>
+      actions.current.renameDocument(target, 'content/posts/b.mdx')
+    );
+    expect(error.referrers).toEqual([
+      { collection: 'page', path: referrer, title: 'Page, edited' },
+    ]);
+    expect(content.rename).not.toHaveBeenCalled();
+    expect(draftOf(referrer)).toBeDefined();
+  });
+
+  it('lists a referrer that only has a stored draft', async () => {
+    const { actions } = actionsFor(provider());
+    writeDraft(toFormId(referrer), {
+      values: { related: target },
+      baseline: {},
+    });
+    const error = await refused(() =>
+      actions.current.renameDocument(target, 'content/posts/b.mdx')
+    );
+    expect(error.referrers.map(({ path }) => path)).toEqual([referrer]);
+  });
+
+  it('lists a referrer that is itself an unsaved copy', async () => {
+    const { actions } = actionsFor(provider());
+    readFormStore().storeNewDocumentDraft(toFormId(referrer), {
+      related: target,
+    });
+    const error = await refused(() =>
+      actions.current.renameDocument(target, 'content/posts/b.mdx')
+    );
+    expect(error.referrers.map(({ path }) => path)).toEqual([referrer]);
+  });
+
+  it('blocks a document whose own unsaved edits reference itself', async () => {
+    const { actions } = actionsFor(provider());
+    keepEditsReferencing(target, target);
+    const error = await refused(() =>
+      actions.current.renameDocument(target, 'content/posts/b.mdx')
+    );
+    expect(error.referrers.map(({ path }) => path)).toEqual([target]);
+  });
+
+  it('renames when unsaved edits reference no moved path, and the drafts move', async () => {
+    const content = provider();
+    const { actions } = actionsFor(content);
+    keepEditsReferencing(referrer, 'content/posts/other.mdx');
+    keepEditsTo(target, 'Edited');
+    await act(() =>
+      actions.current.renameDocument(target, 'content/posts/b.mdx')
+    );
+    expect(content.rename).toHaveBeenCalled();
+    expect(draftOf('content/posts/b.mdx')?.values).toMatchObject({
+      title: 'Edited',
+    });
+  });
+
+  it('blocks a folder rename for a referrer outside and inside the folder', async () => {
+    const content = provider();
+    const { actions } = actionsFor(content);
+    keepEditsReferencing(referrer, 'content/posts/f/x.mdx');
+    keepEditsReferencing('content/posts/f/y.mdx', 'content/posts/f/x.mdx');
+    const error = await refused(() => actions.current.renameFolder('f', 'g'));
+    expect(error.referrers.map(({ path }) => path).sort()).toEqual([
+      referrer,
+      'content/posts/f/y.mdx',
+    ]);
+    expect(content.renameFolder).not.toHaveBeenCalled();
+  });
+
+  it('renames a folder when no unsaved document references it', async () => {
+    const content = provider();
+    const { actions } = actionsFor(content);
+    keepEditsReferencing(referrer, 'content/posts/elsewhere.mdx');
+    await act(() => actions.current.renameFolder('f', 'g'));
+    expect(content.renameFolder).toHaveBeenCalled();
+  });
+
+  it("invalidates another collection's lists when a rename rewrites its referrers", async () => {
+    const content = provider({
+      rename: vi.fn(async (_c, _from, to) => ({
+        entry: { path: to },
+        referrers: [referrer],
+      })),
+    });
+    const { actions, queryClient } = actionsFor(content);
+    const pageList = [...contentKeys.list('page', undefined), 'page', ''];
+    queryClient.setQueryData(pageList, { nodes: [] });
+    await act(() =>
+      actions.current.renameDocument(target, 'content/posts/b.mdx')
+    );
+    expect(queryClient.getQueryState(pageList)?.isInvalidated).toBe(true);
+  });
+
+  it("leaves another collection's lists alone when no referrer was rewritten", async () => {
+    const { actions, queryClient } = actionsFor(provider());
+    const pageList = [...contentKeys.list('page', undefined), 'page', ''];
+    queryClient.setQueryData(pageList, { nodes: [] });
+    await act(() =>
+      actions.current.renameDocument(target, 'content/posts/b.mdx')
+    );
+    expect(queryClient.getQueryState(pageList)?.isInvalidated).toBe(false);
   });
 });
 

@@ -17,6 +17,7 @@ import { useShallow } from 'zustand/react/shallow';
 import type { FieldWrapperProps } from '@tinacms/ui/components/field-wrapper';
 import type { AuthSlice } from '../core/auth/contract';
 import { authSliceOf, siteAuthTokenOf } from '../core/auth/slice';
+import { currentBranchOf } from '../core/branch/contract';
 import { ContentError, type ContentSlice } from '../core/content/contract';
 import type { MediaSlice } from '../core/media/contract';
 import { type FieldAddress, toFieldAddress } from '../core/field/address';
@@ -57,6 +58,7 @@ import {
   type ListChange,
   ownFieldErrors,
 } from './field-errors';
+import { type PermissionSegments, useAuthSliceWithCan } from './permissions';
 import { countRevealedErrors, isRevealed, itemLevel } from './form-view-state';
 
 export function useFieldRegistry(): FieldRegistry {
@@ -120,7 +122,18 @@ export function useMediaSlice(): MediaSlice {
 }
 
 export function useOptionalAuthSlice(): AuthSlice | null {
-  return useTinaStore(authSliceOf);
+  const runtime = use(TinaRuntimeContext);
+  invariant(
+    runtime,
+    'auth-slice-outside-provider',
+    'useOptionalAuthSlice must be used within a TinaProvider'
+  );
+  const server = useRpcClient<PermissionSegments>({ url: runtime.rpcUrl });
+  return useAuthSliceWithCan(
+    useTinaStore(authSliceOf),
+    server,
+    useTinaStore(currentBranchOf)
+  );
 }
 
 export function useRpcClient<TSegments>(

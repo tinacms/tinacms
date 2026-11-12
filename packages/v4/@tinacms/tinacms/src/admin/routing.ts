@@ -5,7 +5,7 @@ export type AdminRoute =
   | { view: 'settings' }
   | { view: 'collections'; unsavedOnly?: boolean }
   | { view: 'collection'; collection: string; side?: true }
-  | { view: 'folder'; collection: string; folder: string }
+  | { view: 'folder'; collection: string; folder: string; side?: true }
   | { view: 'document'; collection: string; path: string }
   | { view: 'screen'; screen: string; segments: string[] };
 
@@ -38,7 +38,7 @@ export const formatAdminRoute = (route: AdminRoute): string => {
   if (route.view === 'folder') {
     if (route.folder === '') return `#/${COLLECTIONS_PREFIX}/${collection}`;
     const parts = route.folder.split('/').map(encodeURIComponent);
-    return `#/${COLLECTIONS_PREFIX}/${collection}/${FOLDER_SEGMENT}/${parts.join('/')}`;
+    return `#/${COLLECTIONS_PREFIX}/${collection}/${FOLDER_SEGMENT}/${parts.join('/')}${route.side ? SIDE : ''}`;
   }
   return `#/${COLLECTIONS_PREFIX}/${collection}/${encodeURIComponent(route.path)}`;
 };
@@ -79,9 +79,12 @@ export const parseAdminRoute = (hash: string): AdminRoute => {
       : { view: 'collection', collection: head };
   }
   if (docPath === FOLDER_SEGMENT) {
-    return folderParts.length === 0
-      ? { view: 'collection', collection: head }
-      : { view: 'folder', collection: head, folder: folderParts.join('/') };
+    if (folderParts.length === 0)
+      return { view: 'collection', collection: head };
+    const folder = folderParts.join('/');
+    return query === 'side'
+      ? { view: 'folder', collection: head, folder, side: true }
+      : { view: 'folder', collection: head, folder };
   }
   return { view: 'document', collection: head, path: docPath };
 };

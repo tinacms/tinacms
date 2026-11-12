@@ -18,7 +18,7 @@ const graphQLErrorSchema = z.object({
     .optional(),
 });
 
-export type TinaCloudGraphQLErrorEntry = z.infer<typeof graphQLErrorSchema>;
+type TinaCloudGraphQLErrorEntry = z.infer<typeof graphQLErrorSchema>;
 
 const responseSchema = z.object({
   data: z.unknown().optional(),

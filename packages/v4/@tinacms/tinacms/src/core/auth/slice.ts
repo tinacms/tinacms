@@ -1,7 +1,7 @@
 import { isRecord } from '../../utils/is-record';
 import { invariant } from '../invariant';
 import type { SliceState, TinaStoreState } from '../plugin';
-import type { AuthSlice } from './contract';
+import type { AuthPluginSlice } from './contract';
 
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === 'string');
@@ -26,20 +26,22 @@ const isComponent = (value: unknown): boolean =>
     typeof value.$$typeof === 'symbol' &&
     !REACT_ELEMENT_TYPES.has(value.$$typeof));
 
-const isAuthSlice = (slice: SliceState): slice is SliceState & AuthSlice =>
+const isAuthSlice = (
+  slice: SliceState
+): slice is SliceState & AuthPluginSlice =>
   hasAuthState(slice) &&
   typeof slice.getToken === 'function' &&
   typeof slice.login === 'function' &&
   typeof slice.logout === 'function' &&
   (slice.LoginScreen === undefined || isComponent(slice.LoginScreen));
 
-export const authSliceOf = (state: TinaStoreState): AuthSlice | null => {
+export const authSliceOf = (state: TinaStoreState): AuthPluginSlice | null => {
   const slice = state.auth;
   if (!slice) return null;
   invariant(
     isAuthSlice(slice),
     'auth-capability-malformed',
-    'The auth capability is mounted, but its slice lacks a valid status, user, roles, getToken, login, logout or LoginScreen. Fix the auth plugin so its slice is an AuthSlice.'
+    'The auth capability is mounted, but its slice lacks a valid status, user, roles, getToken, login, logout or LoginScreen. Fix the auth plugin so its slice is an AuthPluginSlice.'
   );
   return slice;
 };

@@ -16,6 +16,7 @@ export {
 export {
   AuthError,
   type AuthErrorCode,
+  type AuthPluginSlice,
   type AuthSlice,
   type AuthUser,
   toUserId,

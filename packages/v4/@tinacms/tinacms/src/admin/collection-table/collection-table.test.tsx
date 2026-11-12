@@ -299,6 +299,109 @@ describe('CollectionTable', () => {
     expect(await screen.findByText('Page 2 of 3')).toBeInTheDocument();
   });
 
+  it('stays on page 1 after the filter is typed and cleared from page 2', async () => {
+    const user = userEvent.setup();
+    world.summaries = Array.from({ length: 120 }, (_, index) =>
+      doc(`p${String(index).padStart(3, '0')}.md`)
+    );
+    renderTable();
+    await user.click(await screen.findByRole('button', { name: 'Next' }));
+    expect(await screen.findByText('Page 2 of 3')).toBeInTheDocument();
+    const box = screen.getByRole('searchbox', {
+      name: 'Filter by title or filename',
+    });
+    await user.type(box, 'p01');
+    await waitFor(() => expect(screen.queryByText('Page 2 of 3')).toBeNull());
+    await screen.findByRole('button', { name: 'p010.md' });
+    await user.clear(box);
+    expect(await screen.findByText('Page 1 of 3')).toBeInTheDocument();
+  });
+
+  it('returns to page 1 when Sort by Status is chosen and says it sorts the loaded page', async () => {
+    const user = userEvent.setup();
+    setWidth(600);
+    world.summaries = Array.from({ length: 120 }, (_, index) =>
+      doc(`p${String(index).padStart(3, '0')}.md`)
+    );
+    renderTable();
+    await user.click(await screen.findByRole('button', { name: 'Next' }));
+    expect(await screen.findByText('Page 2 of 3')).toBeInTheDocument();
+    await user.click(screen.getByRole('combobox', { name: 'Sort by' }));
+    await user.click(
+      await screen.findByRole('option', {
+        name: /Status, unsaved first.*this page/,
+      })
+    );
+    expect(await screen.findByText('Page 1 of 3')).toBeInTheDocument();
+  });
+
+  it('shows no count while the page loads, then the count', async () => {
+    let release: () => void = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const content = provider();
+    const list = content.list;
+    world.summaries = [doc('beta.md', { title: 'Beta' })];
+    const store = createStore<TinaStoreState>()(() => ({
+      content: {
+        ...content,
+        list: async (...args: Parameters<typeof list>) => {
+          await gate;
+          return list(...args);
+        },
+      } as unknown as Record<string, unknown>,
+    }));
+    const runtime = {
+      store,
+      schema: { collections: [POST] },
+      serverHooks: new Set<string>(),
+      rpcUrl: '/api/tina',
+    } as unknown as TinaRuntime;
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <TinaRuntimeContext value={runtime}>
+          <TooltipProvider>
+            <MemoryRouter>
+              <CollectionTable collection='post' folder='' />
+            </MemoryRouter>
+          </TooltipProvider>
+        </TinaRuntimeContext>
+      </QueryClientProvider>
+    );
+    await screen.findByRole('searchbox', {
+      name: 'Filter by title or filename',
+    });
+    expect(screen.queryByText('0 documents')).toBeNull();
+    release();
+    expect(await screen.findByText('1 document')).toBeInTheDocument();
+  });
+
+  it('hides Last edited and sorts by title when no row has an edit time', async () => {
+    world.summaries = [
+      doc('b.md', { title: 'Bee' }),
+      doc('a.md', { title: 'Ant' }),
+    ];
+    renderTable();
+    await rowNamed('Ant');
+    expect(titles()).toEqual(['Ant', 'Bee']);
+    expect(
+      screen.queryByRole('columnheader', { name: /Last edited/ })
+    ).toBeNull();
+    expect(screen.getByRole('columnheader', { name: /Title/ })).toHaveAttribute(
+      'aria-sort',
+      'ascending'
+    );
+  });
+
+  it('keeps the title column from widening the table', async () => {
+    renderTable();
+    await rowNamed('Beta');
+    expect(screen.getByRole('columnheader', { name: /Title/ })).toHaveClass(
+      'max-w-0'
+    );
+  });
+
   it('shows the empty sentence and an error with Retry', async () => {
     world.summaries = [];
     const { unmount } = renderTable();
@@ -416,6 +519,24 @@ describe('row actions', () => {
     await waitFor(() => expect(screen.queryByText('Beta')).toBeNull());
   });
 
+  it('keeps the Deleted toast when deleting the last row of the last page drops the table back a page', async () => {
+    const user = userEvent.setup();
+    world.summaries = Array.from({ length: 51 }, (_, index) =>
+      doc(`p${String(index).padStart(3, '0')}.md`)
+    );
+    renderTable();
+    await user.click(await screen.findByRole('button', { name: 'Next' }));
+    await openMenu(user, 'p050.md');
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Delete',
+      })
+    );
+    await waitFor(() => expect(screen.queryByText('Page 2 of 2')).toBeNull());
+    expect(await screen.findByText('Deleted p050.md')).toBeVisible();
+  });
+
   it('says links could not be checked and still allows Delete', async () => {
     const user = userEvent.setup();
     world.referrers = 'fail';
@@ -436,8 +557,9 @@ describe('row actions', () => {
     renderTable();
     await rowNamed('Beta');
     await user.click(screen.getByRole('button', { name: 'New' }));
-    const disabled = await screen.findByRole('menuitem', { name: 'Document' });
-    expect(disabled).toHaveAttribute('aria-disabled', 'true');
+    expect(
+      await screen.findByRole('menuitem', { name: 'Document' })
+    ).toHaveAccessibleDescription(/not available yet/);
     await user.click(screen.getByRole('menuitem', { name: 'Folder' }));
     const dialog = await screen.findByRole('dialog', { name: 'New folder' });
     await user.type(

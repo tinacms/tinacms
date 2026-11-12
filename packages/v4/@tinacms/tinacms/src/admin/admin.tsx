@@ -495,7 +495,7 @@ function AdminShell({
       ? lastOpen.path
       : undefined);
   const tableFolder =
-    route.view === 'folder'
+    route.view === 'folder' && !route.side
       ? route.folder
       : route.view === 'collection' && !route.side
         ? ''
@@ -602,11 +602,20 @@ function AdminShell({
                     size='sm'
                     className='max-lg:hidden'
                     onClick={() =>
-                      navigate({
-                        view: 'collection',
-                        collection: collection.name,
-                        side: true,
-                      })
+                      navigate(
+                        tableFolder === ''
+                          ? {
+                              view: 'collection',
+                              collection: collection.name,
+                              side: true,
+                            }
+                          : {
+                              view: 'folder',
+                              collection: collection.name,
+                              folder: tableFolder,
+                              side: true,
+                            }
+                      )
                     }
                   >
                     Restore

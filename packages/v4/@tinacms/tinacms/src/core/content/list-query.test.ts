@@ -160,4 +160,38 @@ describe('queryDocuments', () => {
       queryDocuments({ summaries, root, query: { first: 201 } })
     ).toThrow(/first/);
   });
+
+  it('keeps folder names whole when the collection root is empty', () => {
+    const atRoot = [doc('a.md'), doc('docs/b.md'), doc('docs/deep/c.md')];
+    const top = queryDocuments({
+      summaries: atRoot,
+      root: '',
+      query: { folder: '' },
+    });
+    expect(paths(top)).toEqual(['a.md']);
+    expect(top.folders).toEqual([
+      { path: 'docs', name: 'docs', documentCount: 2 },
+    ]);
+    const docs = queryDocuments({
+      summaries: atRoot,
+      root: '',
+      query: { folder: 'docs' },
+    });
+    expect(paths(docs)).toEqual(['docs/b.md']);
+    expect(docs.folders).toEqual([
+      { path: 'docs/deep', name: 'deep', documentCount: 1 },
+    ]);
+  });
+
+  it('sorts rows with no date by path for an updatedAt sort, in both directions', () => {
+    const undated = [doc('x/c.md'), doc('x/a.md'), doc('x/b.md')];
+    for (const direction of ['asc', 'desc'] as const) {
+      const result = queryDocuments({
+        summaries: undated,
+        root: 'x',
+        query: { sort: { by: 'updatedAt', direction } },
+      });
+      expect(paths(result)).toEqual(['x/a.md', 'x/b.md', 'x/c.md']);
+    }
+  });
 });

@@ -187,7 +187,8 @@ describe('structural writes through the v3 pipeline', () => {
     await dataLayer.rename(
       'author',
       'content/authors/ada.md',
-      'content/authors/ada-l.md'
+      'content/authors/ada-l.md',
+      { maySave: true }
     );
     const result = await dataLayer.graphql(
       'query { post(relativePath: "hello.mdx") { author { ... on Author { name } } } }'

@@ -36,8 +36,13 @@ import { errorResponse, toErrorResponse } from '../../../../rpc/error-response';
 import {
   createOpContextRunner,
   createRequestAuthorizer,
+  createSessionPermissionsResponder,
 } from '../../../../rpc/handler';
 import { DEFAULT_RPC_URL } from '../../../../rpc/proxy';
+import {
+  SESSION_NAMESPACE,
+  SESSION_PERMISSIONS_OP,
+} from '../../../../rpc/session-permissions';
 import {
   LOCAL_MEDIA_PLUGIN_NAME,
   MEDIA_ERROR_HEADER,
@@ -322,6 +327,49 @@ const isServerModuleIn = (tinaDir: string, id: string): boolean => {
   return !relative.startsWith('..') && !path.isAbsolute(relative);
 };
 
+// The local route of the RPC `session/permissions` op. With no gate the server
+// checks nothing, so the answer is the wildcard.
+const createSessionPermissionsHandler =
+  (
+    answer: ((request: Request) => Promise<Response>) | null
+  ): Connect.NextHandleFunction =>
+  async (req, res) => {
+    if (isCrossOriginRequest(req)) {
+      res.statusCode = 403;
+      res.end('Cross-origin request rejected');
+      return;
+    }
+    if (req.method !== 'POST') {
+      await sendResponse(
+        res,
+        errorResponse(405, 'method-not-allowed', 'RPC operations are POST.')
+      );
+      return;
+    }
+    if (coreContentTypeOfRequest(req) !== 'application/json') {
+      await sendResponse(
+        res,
+        errorResponse(
+          415,
+          'unsupported-media-type',
+          'RPC requests must be application/json.'
+        )
+      );
+      return;
+    }
+    try {
+      await sendResponse(
+        res,
+        answer ? await answer(sessionRequestOf(req)) : Response.json(['*'])
+      );
+    } catch (cause) {
+      await sendResponse(
+        res,
+        toErrorResponse(cause, 'Local session/permissions')
+      );
+    }
+  };
+
 const createMediaHandler = (
   media: LocalMedia,
   sessionGate: SessionGate | null,
@@ -571,7 +619,13 @@ export const tinaLocalDataLayerVitePlugin = (
       return;
     }
     try {
-      const result = await dispatchContentRequest(dataLayer, request);
+      const maySave =
+        (parsed.op === 'rename' || parsed.op === 'renameFolder') && contentGate
+          ? await contentGate.allows(req, CONTENT_SAVE_PERMISSION)
+          : true;
+      const result = await dispatchContentRequest(dataLayer, request, {
+        maySave,
+      });
       res.setHeader('content-type', 'application/json');
       res.end(JSON.stringify(result));
     } catch (cause) {
@@ -691,6 +745,12 @@ export const tinaLocalDataLayerVitePlugin = (
           );
         }
       }
+      server.middlewares.use(
+        `${options.config?.rpcUrl ?? DEFAULT_RPC_URL}/${SESSION_NAMESPACE}/${SESSION_PERMISSIONS_OP}`,
+        createSessionPermissionsHandler(
+          contentGate ? createSessionPermissionsResponder(plugins) : null
+        )
+      );
       server.middlewares.use(
         options.url ?? DEFAULT_CONTENT_URL,
         serveContentRequest

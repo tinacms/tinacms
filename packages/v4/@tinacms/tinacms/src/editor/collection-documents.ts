@@ -5,7 +5,6 @@ import {
 } from '@tanstack/react-query';
 import { use, useMemo } from 'react';
 import type { AuthSlice } from '../core/auth/contract';
-import { defaultRolesGrant } from '../core/auth/default-roles';
 import {
   CONTENT_CREATE_PERMISSION,
   CONTENT_DELETE_PERMISSION,
@@ -25,12 +24,20 @@ import type { CollectionSchema } from '../core/schema/types';
 import { listStoredDraftIds, readDraft } from '../form/drafts';
 import {
   type FormId,
+  openFormIds,
   readFormStore,
+  readUnsavedDocuments,
   toFormId,
   useNewDocumentIds,
   useUnsavedFormIds,
 } from '../form/form-store';
 import { TinaRuntimeContext } from './context';
+import {
+  findUnsavedReferrers,
+  type UnsavedReferrer,
+} from './unsaved-referrers';
+
+export type { UnsavedReferrer };
 import {
   contentKeys,
   CONTENT_STALE_TIME,
@@ -69,6 +76,20 @@ export const folderOfDocument = (
   return parent.slice(root.length === 0 ? 0 : root.length + 1);
 };
 
+/**
+ * A rename was refused because unsaved edits hold a reference to a path it moves.
+ * Nothing was renamed and no draft moved; the dialogs list `referrers`.
+ */
+export class UnsavedReferrersError extends Error {
+  readonly referrers: UnsavedReferrer[];
+
+  constructor(referrers: UnsavedReferrer[]) {
+    super('Save or discard your unsaved edits to these documents first.');
+    this.name = 'UnsavedReferrersError';
+    this.referrers = referrers;
+  }
+}
+
 const toContentError = (cause: unknown): ContentError => {
   if (cause instanceof ContentError) return cause;
   if (cause instanceof TypeError)
@@ -88,7 +109,7 @@ const attempt = async <Result>(run: () => Promise<Result>): Promise<Result> => {
 };
 
 /** One table page of a collection. The key sits under the collection's list key. */
-export const documentsPageKey = (
+const documentsPageKey = (
   collection: string,
   query: ListQuery,
   branch?: string
@@ -112,10 +133,10 @@ export const useDocumentsPage = (collection: string, query: ListQuery) => {
   });
 };
 
+// With no auth plugin there is no slice and every action shows (the server checks nothing).
 const userMay = (auth: AuthSlice | null, permission: string): boolean => {
   if (!auth) return true;
-  if (auth.status !== 'signed-in') return false;
-  return defaultRolesGrant(auth.roles, permission);
+  return auth.status === 'signed-in' && auth.can(permission);
 };
 
 export interface CollectionCapabilities {
@@ -141,7 +162,7 @@ const useCollectionSchema = (name: string): CollectionSchema | undefined => {
 
 /**
  * What the signed-in user may do in a collection. The result is false when the
- * provider lacks the operation, the default roles lack the permission, or the
+ * provider lacks the operation, `can` denies the permission, or the
  * collection's `allowedActions` switch is off. The server stays the boundary.
  */
 export const useCollectionCapabilities = (
@@ -241,19 +262,19 @@ const invalidateCollection = (
   void queryClient.invalidateQueries({ queryKey: listPrefix });
   void queryClient.invalidateQueries({
     predicate: ({ queryKey }) => {
-      const [scope, kind, type, , path, queryBranch] = queryKey;
+      const [scope, kind, type, , pathOrBranch, documentBranch] = queryKey;
       if (scope !== 'tina' || kind !== 'content') return false;
       if (type === 'document') {
         return (
-          typeof path === 'string' &&
-          touchedPaths.has(path) &&
-          queryBranch === (branch ?? '')
+          typeof pathOrBranch === 'string' &&
+          touchedPaths.has(pathOrBranch) &&
+          documentBranch === (branch ?? '')
         );
       }
       return (
         otherCollectionsChanged &&
         type === 'list' &&
-        queryBranch === (branch ?? '')
+        pathOrBranch === (branch ?? '')
       );
     },
   });
@@ -275,7 +296,7 @@ const draftIdsUnder = (directory: string): FormId[] => {
 
 const newDraftIdsUnder = (directory: string): FormId[] => {
   const { userId, branch, forms } = readFormStore();
-  const open = (Object.keys(forms) as FormId[]).filter((id) => {
+  const open = openFormIds(forms).filter((id) => {
     const scope = forms[id];
     return scope?.status === 'edited' && scope.isNew === true;
   });
@@ -299,12 +320,23 @@ export const useCollectionActions = (collection: string): CollectionActions => {
   const queryClient = useQueryClient();
   const branch = useCurrentBranch();
 
+  const refuseUnsavedReferrers = (isMoved: (path: string) => boolean) => {
+    const referrers = findUnsavedReferrers(
+      runtime.schema.collections,
+      readUnsavedDocuments(),
+      isMoved
+    );
+    if (referrers.length > 0) throw new UnsavedReferrersError(referrers);
+  };
+
   const invalidate = (touched: readonly string[], rewrote: boolean) =>
     invalidateCollection(queryClient, collection, branch, touched, rewrote);
 
   return {
-    renameDocument: (from, to) =>
-      attempt(async () => {
+    renameDocument: async (from, to) => {
+      if (holdsNewDraft(to)) throw new ContentError('name-taken');
+      refuseUnsavedReferrers((path) => path === from);
+      return attempt(async () => {
         const result = await requireOperation(content.rename)(
           collection,
           from,
@@ -316,7 +348,8 @@ export const useCollectionActions = (collection: string): CollectionActions => {
           result.referrers.length > 0
         );
         return result;
-      }),
+      });
+    },
 
     deleteDocument: (path) =>
       attempt(async () => {
@@ -338,16 +371,20 @@ export const useCollectionActions = (collection: string): CollectionActions => {
         return created;
       }),
 
-    renameFolder: (from, to) =>
-      attempt(async () => {
+    renameFolder: async (from, to) => {
+      const fromDirectory = schema ? directoryOf(schema, from) : from;
+      const toDirectory = schema ? directoryOf(schema, to) : to;
+      if (newDraftIdsUnder(toDirectory).length > 0) {
+        throw new ContentError('name-taken');
+      }
+      refuseUnsavedReferrers((path) => isUnder(path, fromDirectory));
+      return attempt(async () => {
         const result = await requireOperation(content.renameFolder)(
           collection,
           from,
           to
         );
         const store = readFormStore();
-        const fromDirectory = schema ? directoryOf(schema, from) : from;
-        const toDirectory = schema ? directoryOf(schema, to) : to;
         const copies = newDraftIdsUnder(fromDirectory).map((path) => ({
           from: path,
           to: `${toDirectory}${path.slice(fromDirectory.length)}`,
@@ -364,7 +401,8 @@ export const useCollectionActions = (collection: string): CollectionActions => {
           result.referrers.length > 0
         );
         return result;
-      }),
+      });
+    },
 
     deleteFolder: (folder) =>
       attempt(async () => {

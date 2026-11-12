@@ -201,9 +201,10 @@ export const parseContentRequest = (request: unknown): ContentRequest => {
 export interface DispatchOptions {
   /** Whether an `update` to a path with no file may create it. */
   mayCreate?: boolean;
+  /** Whether the session holds `content:save`; a cross-collection rename needs it. */
+  maySave?: boolean;
 }
 
-/** Runs a request against the Data Layer. Void operations answer `null`. */
 export const dispatchContentRequest = async (
   provider: LocalDataLayer,
   request: unknown,
@@ -227,7 +228,9 @@ export const dispatchContentRequest = async (
         parsed.template
       );
     case 'rename':
-      return provider.rename(parsed.collection, parsed.from, parsed.to);
+      return provider.rename(parsed.collection, parsed.from, parsed.to, {
+        maySave: dispatchOptions.maySave,
+      });
     case 'delete':
       await provider.delete(parsed.collection, parsed.path);
       return null;
@@ -236,7 +239,9 @@ export const dispatchContentRequest = async (
     case 'createFolder':
       return provider.createFolder(parsed.collection, parsed.folder);
     case 'renameFolder':
-      return provider.renameFolder(parsed.collection, parsed.from, parsed.to);
+      return provider.renameFolder(parsed.collection, parsed.from, parsed.to, {
+        maySave: dispatchOptions.maySave,
+      });
     case 'deleteFolder':
       return provider.deleteFolder(parsed.collection, parsed.folder);
     case 'graphql':

@@ -3,6 +3,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import {
+  CONTENT_ERROR_MESSAGES,
   type ContentProvider,
   ContentWriteError,
   type DocumentConnection,
@@ -67,6 +68,14 @@ export interface UpdateOptions {
   mayCreate?: boolean;
 }
 
+export interface RenameOptions {
+  /**
+   * Whether the caller holds `content:save`. A rename that rewrites a referrer in
+   * another collection is refused without it (ADR-008 §2).
+   */
+  maySave?: boolean;
+}
+
 export interface LocalDataLayer extends ContentProvider {
   update(
     collection: string,
@@ -80,14 +89,20 @@ export interface LocalDataLayer extends ContentProvider {
     value: TinaDocument,
     template?: string
   ): Promise<DocumentEntry>;
-  rename(collection: string, from: string, to: string): Promise<RenameResult>;
+  rename(
+    collection: string,
+    from: string,
+    to: string,
+    options?: RenameOptions
+  ): Promise<RenameResult>;
   delete(collection: string, path: string): Promise<void>;
   referrers(collection: string, path: string): Promise<DocumentReferrer[]>;
   createFolder(collection: string, folder: string): Promise<FolderSummary>;
   renameFolder(
     collection: string,
     from: string,
-    to: string
+    to: string,
+    options?: RenameOptions
   ): Promise<RenameFolderResult>;
   deleteFolder(
     collection: string,
@@ -185,10 +200,9 @@ const isPlaceholderName = (name: string): boolean =>
   name.startsWith(PLACEHOLDER_PREFIX);
 
 const REFUSAL_MESSAGES = {
-  nameTaken: 'A document or folder with that name already exists.',
-  invalidName: 'That name is not allowed.',
-  folderNotOwned:
-    'This folder holds files that this collection does not manage.',
+  nameTaken: CONTENT_ERROR_MESSAGES['name-taken'],
+  invalidName: CONTENT_ERROR_MESSAGES['invalid-path'],
+  folderNotOwned: CONTENT_ERROR_MESSAGES['folder-not-owned'],
 } as const;
 
 const refusal = (code: ProviderRefusalCode, message: string) =>
@@ -357,7 +371,6 @@ export const createLocalDataLayer = (
     return { ...resolved, canonicalPath };
   };
 
-  // The path checks of the new operations. A failing path is `invalid-path`.
   const checkedDocument = async (
     collection: ResolvedCollection,
     documentPath: string
@@ -378,8 +391,6 @@ export const createLocalDataLayer = (
   const folderIdFor = (collection: ResolvedCollection, parts: string[]) =>
     documentIdFor(path.join(collection.absoluteFolder, ...parts));
 
-  // A directory that is another collection's folder, or lies inside one, is not
-  // a folder of this collection.
   const isForeignDirectory = async (
     collection: ResolvedCollection,
     realDirectory: string,
@@ -394,7 +405,6 @@ export const createLocalDataLayer = (
     );
   };
 
-  // The real path of a folder the collection may name, or a refusal.
   const checkedFolder = async (
     collection: ResolvedCollection,
     folder: string
@@ -530,8 +540,6 @@ export const createLocalDataLayer = (
     }
   };
 
-  // The checks that a write of a new file passes: the name rules, and the
-  // folder switches for each directory the write would make.
   const assertNewFileAllowed = async (
     collection: ResolvedCollection,
     target: { realAbsolute: string; realFolder: string; adapter: FormatAdapter }
@@ -601,8 +609,6 @@ export const createLocalDataLayer = (
     }
   };
 
-  // The GraphQL index follows every write. A failure keeps the write and
-  // logs, as a save does.
   const syncIndex = async ({
     removed = [],
     changed = [],
@@ -623,9 +629,6 @@ export const createLocalDataLayer = (
     }
   };
 
-  // Every file a rename changes is computed first. A referrer rewrite goes
-  // through the adapter call that a save uses, with only the matching values
-  // changed, so the file equals what a save of that change writes.
   const planRewrites = async (
     target: ResolvedCollection,
     moved: ReadonlyMap<string, string>
@@ -675,8 +678,18 @@ export const createLocalDataLayer = (
     return rewrites;
   };
 
-  // Puts back what `undo` changed, newest first. Names the files that stay
-  // changed when a restore fails too.
+  const assertMaySaveReferrers = (
+    collection: ResolvedCollection,
+    rewrites: Rewrite[],
+    options: RenameOptions | undefined
+  ) => {
+    if (options?.maySave === true) return;
+    if (rewrites.every((rewrite) => rewrite.collection === collection)) return;
+    throw forbid(
+      'This rename also updates documents in other collections, which needs the "content:save" permission.'
+    );
+  };
+
   const rollBack = async (undo: Undo[]): Promise<string[]> => {
     const stuck: string[] = [];
     for (const step of [...undo].reverse()) {
@@ -705,8 +718,6 @@ export const createLocalDataLayer = (
     );
   };
 
-  // The move, then each referrer write. A write to a file the move carried
-  // goes to its new path. A failure puts every change back.
   const applyMove = async (
     action: string,
     move: { from: string; to: string },
@@ -794,9 +805,6 @@ export const createLocalDataLayer = (
     return found.sort((a, b) => (a.path < b.path ? -1 : 1));
   };
 
-  // Whether a folder holds anything but the documents of the collection, its
-  // placeholders and system files, or has another collection's folder at or
-  // below it.
   const holdsForeignContent = async (
     collection: ResolvedCollection,
     realDirectory: string
@@ -1057,7 +1065,7 @@ export const createLocalDataLayer = (
       });
     },
 
-    async rename(collectionName, from, to) {
+    async rename(collectionName, from, to, renameOptions) {
       const collection = collectionFor(collectionName);
       const source = await checkedDocument(collection, from);
       const checkedTarget = await checkedDocument(collection, to);
@@ -1098,6 +1106,7 @@ export const createLocalDataLayer = (
           collection,
           new Map([[source.canonicalPath, target.canonicalPath]])
         );
+        assertMaySaveReferrers(collection, rewrites, renameOptions);
         await applyMove(
           `rename "${source.canonicalPath}"`,
           { from: source.realAbsolute, to: target.realAbsolute },
@@ -1186,7 +1195,7 @@ export const createLocalDataLayer = (
       });
     },
 
-    async renameFolder(collectionName, from, to) {
+    async renameFolder(collectionName, from, to, renameOptions) {
       const collection = collectionFor(collectionName);
       const source = await existingFolder(collection, from);
       const targetParts = folderPartsOf(to);
@@ -1227,6 +1236,7 @@ export const createLocalDataLayer = (
           collection,
           new Map(moved.map(({ from: oldId, to: newId }) => [oldId, newId]))
         );
+        assertMaySaveReferrers(collection, rewrites, renameOptions);
         const newIdOf = (id: string): string =>
           id.startsWith(fromPrefix)
             ? toPrefix + id.slice(fromPrefix.length)
@@ -1284,10 +1294,16 @@ export const createLocalDataLayer = (
               restore: () => fs.rename(aside, source.real),
             },
           ]);
-          throw failedStructuralWrite(
-            `delete folder "${folder}"`,
-            cause,
-            stuck
+          const gone: string[] = [];
+          for (const document of documents) {
+            if (!(await exists(document.absolute))) gone.push(document.id);
+          }
+          await syncIndex({ removed: gone });
+          const base = `Cannot delete folder "${folder}": ${fileSystemReasonOf(cause)}. Some of its files may have been removed`;
+          throw new ContentWriteError(
+            stuck.length === 0
+              ? `${base}.`
+              : `${base}, and the rest could not be put back under its name: look for "${path.basename(aside)}" next to it.`
           );
         }
         const deleted = documents.map(({ id }) => id);

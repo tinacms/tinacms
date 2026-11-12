@@ -7,7 +7,7 @@ import type { FieldSchema, TinaDocument } from '../../../../core/schema/types';
 import { isRecord } from '../../../../utils/is-record';
 
 /** The new stored value for a reference value, or undefined to keep it. */
-export type ReferenceMapper = (value: string) => string | undefined;
+type ReferenceMapper = (value: string) => string | undefined;
 
 /**
  * Whether any field of the fields names `collection` in `collections`, which

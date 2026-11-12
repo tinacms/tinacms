@@ -68,7 +68,7 @@ const decodeCursor = (cursor: string): Ordered => {
   throw new ProviderRefusalError('validation', 'The page cursor is not valid.');
 };
 
-export interface QueryDocumentsInput {
+interface QueryDocumentsInput {
   /** Every document the collection owns, at every depth. Placeholders are dropped here. */
   summaries: readonly DocumentSummary[];
   /** The collection's `path`, without a trailing `/`. */
@@ -77,12 +77,6 @@ export interface QueryDocumentsInput {
   emptyFolders?: readonly string[];
   query?: ListQuery;
 }
-
-const folderPartsOf = (path: string, root: string): string[] =>
-  path
-    .slice(root.length + 1)
-    .split('/')
-    .slice(0, -1);
 
 /**
  * Applies folder scope, filter, sort and paging to a list of summaries. The local

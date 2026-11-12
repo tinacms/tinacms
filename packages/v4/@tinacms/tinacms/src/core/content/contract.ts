@@ -20,7 +20,7 @@ export interface DocumentEntry extends DocumentSummary {
   document: TinaDocument;
 }
 
-const CONTENT_ERROR_MESSAGES = {
+export const CONTENT_ERROR_MESSAGES = {
   unauthorized: 'Your session has ended. Sign in again.',
   forbidden: "You don't have permission to do that.",
   'not-found': 'This document no longer exists. Refresh and try again.',

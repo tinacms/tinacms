@@ -40,6 +40,10 @@ export const toFormId = (path: string): FormId => {
 
 export type FormValues = Record<FieldAddress, unknown>;
 
+/** The ids of the open forms, typed. */
+export const openFormIds = (forms: object): FormId[] =>
+  Object.keys(forms).map(toFormId);
+
 export const toFormValues = (document: TinaDocument): FormValues => {
   const values: FormValues = {};
   for (const [name, value] of Object.entries(document)) {
@@ -776,7 +780,7 @@ export const readOpeningScope = (
 export const syncDrafts = () =>
   useFormStore.subscribe((next, prev) => {
     if (next.userId !== prev.userId || next.userId === null) return;
-    for (const formId of Object.keys(next.forms) as FormId[]) {
+    for (const formId of openFormIds(next.forms)) {
       const scope = next.forms[formId];
       const before = prev.forms[formId];
       if (scope === before) continue;
@@ -898,7 +902,7 @@ export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
 export const useUnsavedFormIds = (): FormId[] =>
   useFormStore(
     useShallow((state) => {
-      const dirty = (Object.keys(state.forms) as FormId[]).filter(
+      const dirty = openFormIds(state.forms).filter(
         (id) => formStatus(state.forms[id]) === 'dirty'
       );
       const stored = listStoredDraftIds(state.userId, state.branch);
@@ -913,7 +917,7 @@ export const useUnsavedFormIds = (): FormId[] =>
 export const useNewDocumentIds = (): FormId[] =>
   useFormStore(
     useShallow((state) => {
-      const open = (Object.keys(state.forms) as FormId[]).filter((id) => {
+      const open = openFormIds(state.forms).filter((id) => {
         const scope = state.forms[id];
         return isEdited(scope) && scope.isNew === true;
       });
@@ -923,6 +927,38 @@ export const useNewDocumentIds = (): FormId[] =>
       return [...new Set([...open, ...stored])].sort();
     })
   );
+
+export interface UnsavedDocument {
+  path: string;
+  values: TinaDocument;
+}
+
+/**
+ * Every unsaved copy this editor holds on this branch: dirty open forms, open new
+ * documents, and stored live and waiting drafts. A document with several copies
+ * appears once per copy.
+ */
+export const readUnsavedDocuments = (): UnsavedDocument[] => {
+  const { userId, branch, forms } = readFormStore();
+  const documents: UnsavedDocument[] = [];
+  for (const id of openFormIds(forms)) {
+    const scope = forms[id];
+    if (
+      isEdited(scope) &&
+      (scope.isNew === true || formStatus(scope) === 'dirty')
+    ) {
+      documents.push({ path: id, values: toDocument(scope.values) });
+    }
+  }
+  for (const id of listStoredDraftIds(userId, branch)) {
+    const live = readDraft(id, userId, branch);
+    if (live) documents.push({ path: id, values: live.values });
+    for (const copy of readWaitingDrafts(id, userId, branch)) {
+      documents.push({ path: id, values: copy.values });
+    }
+  }
+  return documents;
+};
 
 /** Whether this editor holds a copy of a document that has no file yet. */
 export const useHasNewDocument = (formId: FormId | undefined): boolean =>

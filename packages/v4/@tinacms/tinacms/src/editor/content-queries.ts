@@ -22,6 +22,7 @@ import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
 import { RpcError } from '../rpc/proxy';
 import { type SavedDocument, TinaRuntimeContext } from './context';
+import { isMissingRouteError } from './rpc-errors';
 import { useContentSlice, useRpcClient, useTinaStore } from './hooks';
 
 // The branch is the last element, so `all()` still prefixes every key. A key
@@ -176,11 +177,7 @@ const toServerSaveError = (cause: unknown): ContentError => {
   if (isContentRefusalCode(cause.code)) {
     return new ContentError(cause.code, cause.message);
   }
-  if (
-    cause.status === 404 ||
-    cause.status === 405 ||
-    cause.code === 'rpc-not-json'
-  ) {
+  if (isMissingRouteError(cause)) {
     return new ContentError('server-route-missing', cause.message);
   }
   if (isProviderRefusalCode(cause.code)) {

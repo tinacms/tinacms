@@ -163,6 +163,23 @@ describe('a document with no file yet', () => {
   );
 });
 
+describe('discarding an unsaved copy', () => {
+  it('says the copy is removed, not that it goes back to a saved version', async () => {
+    const user = userEvent.setup();
+    keepCopy(TOP_PATH);
+    openCopy(TOP_PATH);
+    renderAdmin();
+    await screen.findByLabelText(/^Title\b/);
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+    );
+    const dialog = await screen.findByRole('alertdialog');
+    expect(dialog).toHaveTextContent('The unsaved copy is removed.');
+    expect(dialog).not.toHaveTextContent('last saved version');
+  });
+});
+
 describe('the collection views', () => {
   beforeEach(() => {
     files.set('content/posts/a/hello.mdx', {
@@ -181,6 +198,17 @@ describe('the collection views', () => {
       await screen.findByRole('list', { name: 'Posts documents' })
     ).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Restore' })).toBeNull();
+  });
+
+  it('keeps the folder when Restore returns to the tree from a folder table', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/collections/post/folder/a';
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Restore' }));
+    expect(window.location.hash).toBe('#/collections/post/folder/a?side');
+    expect(
+      await screen.findByRole('list', { name: 'Posts documents' })
+    ).toBeVisible();
   });
 
   it('goes Back from a nested document to its folder, and from a top-level one to the collection', async () => {

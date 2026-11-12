@@ -30,6 +30,10 @@ interface World {
   emptyFolders: string[];
   /** Thrown by the next folder rename, folder delete, document delete or new folder. */
   fails: ContentError | null;
+  /** Thrown by the next document rename only. */
+  renameFails: ContentError | null;
+  /** How many times the server was asked to rename a document or folder. */
+  renameCalls: number;
 }
 
 let world: World;
@@ -52,10 +56,14 @@ const provider = (): ContentProvider => ({
   get: async () => null,
   update: async (_collection, path, document) => ({ path, document }),
   create: async (_collection, path, document) => ({ path, document }),
-  rename: async (_collection, from, to) => ({
-    entry: { path: to },
-    referrers: [],
-  }),
+  rename: async (_collection, from, to) => {
+    world.renameCalls += 1;
+    if (world.renameFails) throw world.renameFails;
+    world.summaries = world.summaries.map((entry) =>
+      entry.path === from ? { ...entry, path: to } : entry
+    );
+    return { entry: { path: to }, referrers: [] };
+  },
   delete: async (_collection, path) => {
     if (world.fails) throw world.fails;
     world.summaries = world.summaries.filter((entry) => entry.path !== path);
@@ -67,6 +75,7 @@ const provider = (): ContentProvider => ({
     return { path: folder, name: nameOf(folder), documentCount: 0 };
   },
   renameFolder: async (_collection, from, to) => {
+    world.renameCalls += 1;
     if (world.fails) throw world.fails;
     const moved = world.summaries
       .filter((entry) => folderOf(entry.path).startsWith(`${from}/`))
@@ -138,7 +147,15 @@ const renderTable = ({
     label: 'Posts',
     path: ROOT,
     format: 'md',
-    fields: [{ name: 'title', label: 'Title', type: 'string' }],
+    fields: [
+      { name: 'title', label: 'Title', type: 'string' },
+      {
+        name: 'related',
+        label: 'Related',
+        type: 'reference',
+        collections: ['post'],
+      },
+    ],
     ...(allowedActions ? { allowedActions } : {}),
   };
   const store = createStore<TinaStoreState>()(() => ({
@@ -211,6 +228,8 @@ beforeEach(() => {
     ],
     emptyFolders: [],
     fails: null,
+    renameFails: null,
+    renameCalls: 0,
   };
 });
 
@@ -456,21 +475,41 @@ describe('the keyboard', () => {
     expect(await screen.findByRole('dialog', { name: /Rename/ })).toBeVisible();
   });
 
-  it('shows New > Document disabled, never activates it and names the PBI in its tooltip', async () => {
+  it('names the PBI in the New > Document tooltip and never activates the item', async () => {
     const user = userEvent.setup();
     renderTable();
     await openNewMenu(user);
     const item = screen.getByRole('menuitem', { name: 'Document' });
-    expect(item).toHaveAttribute('aria-disabled', 'true');
+    await user.hover(item);
+    await waitFor(() =>
+      expect(
+        screen
+          .getAllByText(
+            new RegExp(`New document is not available yet.*${NEW_DOCUMENT_PBI}`)
+          )
+          .some((note) => !note.hidden)
+      ).toBe(true)
+    );
     await user.click(item);
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getByLabelText('location')).toHaveTextContent('/');
-    await user.hover(item);
-    expect(
-      await screen.findByText(
-        new RegExp(`New document is not available yet.*${NEW_DOCUMENT_PBI}`)
-      )
-    ).toBeVisible();
+  });
+
+  it('lets a keyboard user reach the disabled New > Document item, hear why and not activate it', async () => {
+    const user = userEvent.setup();
+    renderTable();
+    await openNewMenu(user);
+    const item = screen.getByRole('menuitem', { name: 'Document' });
+    for (let presses = 0; presses < 4; presses += 1) {
+      if (document.activeElement === item) break;
+      await user.keyboard('{ArrowDown}');
+    }
+    expect(item).toHaveFocus();
+    expect(item).toHaveAccessibleDescription(
+      new RegExp(`New document is not available yet.*${NEW_DOCUMENT_PBI}`)
+    );
+    await user.keyboard('{Enter}');
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 });
 
@@ -540,5 +579,181 @@ describe('roles in the menus', () => {
     await screen.findByRole('button', { name: 'Beta' });
     expect(screen.queryByRole('button', { name: /^Actions for/ })).toBeNull();
     expect(screen.queryByRole('button', { name: 'New' })).toBeNull();
+  });
+});
+
+const renameDialogFor = async (user: User, row: string) => {
+  await openMenu(user, row);
+  await pick(user, 'Rename');
+  return screen.findByRole('dialog', { name: /Rename/ });
+};
+
+const submitRename = async (
+  user: User,
+  dialog: HTMLElement,
+  boxName: string,
+  name: string
+) => {
+  const box = within(dialog).getByRole('textbox', { name: boxName });
+  await user.clear(box);
+  if (name !== '') await user.type(box, name);
+  await user.click(within(dialog).getByRole('button', { name: 'Rename' }));
+};
+
+describe('rename refusals from unsaved edits', () => {
+  it('keeps the Rename dialog open and asks the server nothing when an unsaved copy holds the target', async () => {
+    const user = userEvent.setup();
+    useFormStore
+      .getState()
+      .storeNewDocumentDraft(toFormId(`${ROOT}/taken.md`), { title: 'Copy' });
+    renderTable();
+    const dialog = await renameDialogFor(user, 'Beta');
+    await submitRename(user, dialog, 'File name', 'taken');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      new ContentError('name-taken').message
+    );
+    expect(world.renameCalls).toBe(0);
+    expect(screen.getByRole('dialog')).toBeVisible();
+  });
+
+  it('keeps Rename folder open and asks the server nothing when an unsaved copy lies under the target', async () => {
+    const user = userEvent.setup();
+    useFormStore
+      .getState()
+      .storeNewDocumentDraft(toFormId(`${ROOT}/target/new.md`), {
+        title: 'Copy',
+      });
+    renderTable();
+    const dialog = await renameDialogFor(user, 'guides');
+    await submitRename(user, dialog, 'Folder name', 'target');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      new ContentError('name-taken').message
+    );
+    expect(world.renameCalls).toBe(0);
+  });
+
+  it('lists the documents whose unsaved edits link to the renamed one, each as a link, and renames nothing', async () => {
+    const user = userEvent.setup();
+    writeDraft(toFormId(`${ROOT}/other/one.md`), {
+      values: { title: 'Edited one', related: `${ROOT}/alpha.md` },
+      baseline: { title: 'One' },
+    });
+    renderTable();
+    const dialog = await renameDialogFor(user, 'Alpha');
+    await submitRename(user, dialog, 'File name', 'alpha-2');
+    const alert = await within(dialog).findByRole('alert');
+    expect(alert).toHaveTextContent(
+      'Save or discard your unsaved edits to these documents first:'
+    );
+    expect(
+      within(alert).getByRole('link', { name: 'Edited one' })
+    ).toHaveAttribute(
+      'href',
+      `#/collections/post/${encodeURIComponent(`${ROOT}/other/one.md`)}`
+    );
+    expect(world.renameCalls).toBe(0);
+    expect(screen.getByRole('dialog')).toBeVisible();
+  });
+
+  it('shows the first ten blocking documents and then the count of the rest', async () => {
+    const user = userEvent.setup();
+    world.summaries = [
+      doc('alpha.md', 'Alpha'),
+      ...Array.from({ length: 12 }, (_, index) =>
+        doc(`refs/r${index}.md`, `R${index}`)
+      ),
+    ];
+    for (let index = 0; index < 12; index += 1) {
+      writeDraft(toFormId(`${ROOT}/refs/r${index}.md`), {
+        values: { title: `Draft ${index}`, related: `${ROOT}/alpha.md` },
+        baseline: { title: `R${index}` },
+      });
+    }
+    renderTable();
+    const dialog = await renameDialogFor(user, 'Alpha');
+    await submitRename(user, dialog, 'File name', 'alpha-2');
+    const alert = await within(dialog).findByRole('alert');
+    expect(within(alert).getAllByRole('link')).toHaveLength(10);
+    expect(alert).toHaveTextContent('and 2 more');
+  });
+
+  it('shows a forbidden refusal in the Rename dialog', async () => {
+    const user = userEvent.setup();
+    world.renameFails = new ContentError('forbidden');
+    renderTable();
+    const dialog = await renameDialogFor(user, 'Beta');
+    await submitRename(user, dialog, 'File name', 'beta-2');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      new ContentError('forbidden').message
+    );
+    expect(screen.getByRole('dialog')).toBeVisible();
+  });
+
+  it('tells an empty name what to do', async () => {
+    const user = userEvent.setup();
+    renderTable();
+    const dialog = await renameDialogFor(user, 'Beta');
+    await submitRename(user, dialog, 'File name', '');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'Enter a name.'
+    );
+  });
+});
+
+describe('focus after a successful rename', () => {
+  it('moves to the renamed document row, which keeps its place', async () => {
+    const user = userEvent.setup();
+    renderTable();
+    const dialog = await renameDialogFor(user, 'Beta');
+    await submitRename(user, dialog, 'File name', 'beta-2');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Actions for Beta' })
+      ).toHaveFocus()
+    );
+  });
+
+  it('moves to the renamed row where the sort puts it', async () => {
+    const user = userEvent.setup();
+    world.summaries = [doc('alpha.md'), doc('mid.md'), doc('zulu.md')];
+    renderTable();
+    const dialog = await renameDialogFor(user, 'zulu.md');
+    await submitRename(user, dialog, 'File name', 'aaa');
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Actions for aaa.md' })
+      ).toHaveFocus()
+    );
+  });
+
+  it('moves to the renamed folder row', async () => {
+    const user = userEvent.setup();
+    renderTable();
+    const dialog = await renameDialogFor(user, 'guides');
+    await submitRename(user, dialog, 'Folder name', 'handbook');
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Actions for handbook' })
+      ).toHaveFocus()
+    );
+  });
+
+  it('falls back to the heading when the filter hides the renamed row', async () => {
+    const user = userEvent.setup();
+    world.summaries = [doc('gam.md'), doc('other.md')];
+    renderTable();
+    await user.type(
+      await screen.findByRole('searchbox', {
+        name: 'Filter by title or filename',
+      }),
+      'gam'
+    );
+    await waitFor(() => expect(screen.queryByText('other.md')).toBeNull());
+    const dialog = await renameDialogFor(user, 'gam.md');
+    await submitRename(user, dialog, 'File name', 'xyz');
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Posts' })).toHaveFocus()
+    );
   });
 });

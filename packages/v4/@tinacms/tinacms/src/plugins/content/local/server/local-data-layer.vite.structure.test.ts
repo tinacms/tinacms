@@ -15,6 +15,7 @@ import {
 import { type PluginManifest, definePlugin } from '../../../../core/plugin';
 import type { CollectionSchema } from '../../../../core/schema/types';
 import { defineServerPlugin } from '../../../../server';
+import { t } from '../../../fields';
 import { localContentPlugin } from '../local-content.plugin';
 import { tinaLocalDataLayerVitePlugin } from './local-data-layer.vite';
 
@@ -37,6 +38,7 @@ const ROLES: Record<string, string[]> = {
   saver: ['content:save'],
   creator: ['content:save', 'content:create'],
   renamer: ['content:rename'],
+  renamesaver: ['content:rename', 'content:save'],
   deleter: ['content:delete'],
   viewer: [],
 };
@@ -576,5 +578,250 @@ describe('create runs the server hooks', () => {
       (await post(routes, '/api/tina/content/create', body({}), 'creator'))
         .status
     ).toBe(200);
+  });
+});
+
+describe('a rename that rewrites other collections', () => {
+  const PEOPLE: CollectionSchema = {
+    name: 'people',
+    path: 'content/people',
+    format: 'md',
+    fields: [t.string({ name: 'name' })],
+  };
+  const NOTES: CollectionSchema = {
+    name: 'notes',
+    path: 'content/notes',
+    format: 'md',
+    fields: [
+      t.string({ name: 'title' }),
+      t.reference({ name: 'author', collections: ['people'] }),
+      t.reference({ name: 'friend', collections: ['notes'] }),
+    ],
+  };
+  const NOTE = '---\ntitle: N\nauthor: content/people/ada.md\n---\n';
+  const TEAM_NOTE = '---\ntitle: T\nauthor: content/people/team/bob.md\n---\n';
+  const rename = {
+    op: 'rename',
+    collection: 'people',
+    from: 'content/people/ada.md',
+    to: 'content/people/ada-l.md',
+  };
+
+  beforeEach(async () => {
+    await fs.mkdir(path.join(rootDir, 'content/people/team'), {
+      recursive: true,
+    });
+    await fs.mkdir(path.join(rootDir, 'content/notes'), { recursive: true });
+    await fs.writeFile(
+      path.join(rootDir, 'content/people/ada.md'),
+      '---\nname: Ada\n---\n'
+    );
+    await fs.writeFile(
+      path.join(rootDir, 'content/people/team/bob.md'),
+      '---\nname: Bob\n---\n'
+    );
+    await fs.writeFile(
+      path.join(rootDir, 'content/people/solo.md'),
+      '---\nname: Solo\n---\n'
+    );
+    await fs.writeFile(path.join(rootDir, 'content/notes/n.md'), NOTE);
+    await fs.writeFile(
+      path.join(rootDir, 'content/notes/team-note.md'),
+      TEAM_NOTE
+    );
+    await fs.writeFile(
+      path.join(rootDir, 'content/notes/m.md'),
+      '---\ntitle: M\nfriend: content/notes/n.md\n---\n'
+    );
+  });
+
+  const mountBoth = () => mount([authPlugin(true)], [PEOPLE, NOTES]);
+  const noteOnDisk = (file = 'n.md') =>
+    fs.readFile(path.join(rootDir, 'content/notes', file), 'utf8');
+
+  it.each([
+    ['rename', rename],
+    [
+      'renameFolder',
+      { op: 'renameFolder', collection: 'people', from: 'team', to: 'crew' },
+    ],
+  ])(
+    'refuses %s for a role with content:rename only when a note refers across collections',
+    async (_name, body) => {
+      const res = await content(mountBoth(), body, 'renamer');
+      expect(res.status).toBe(403);
+      expect(res.body.error.code).toBe('forbidden');
+      expect(res.body.error.message).toContain('content:save');
+      expect(onDisk('content/people/ada.md')).toBe(true);
+      expect(onDisk('content/people/team/bob.md')).toBe(true);
+      expect(onDisk('content/people/ada-l.md')).toBe(false);
+      expect(onDisk('content/people/crew')).toBe(false);
+      expect(await noteOnDisk()).toBe(NOTE);
+      expect(await noteOnDisk('team-note.md')).toBe(TEAM_NOTE);
+    }
+  );
+
+  it('renames and rewrites the note for a role with content:rename and content:save', async () => {
+    const res = await content(mountBoth(), rename, 'renamesaver');
+    expect(res.status).toBe(200);
+    expect(res.body.referrers).toEqual(['content/notes/n.md']);
+    expect(await noteOnDisk()).toContain('content/people/ada-l.md');
+  });
+
+  it('renames for content:rename only when every referrer is in the same collection', async () => {
+    const res = await content(
+      mountBoth(),
+      {
+        op: 'rename',
+        collection: 'notes',
+        from: 'content/notes/n.md',
+        to: 'content/notes/n2.md',
+      },
+      'renamer'
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.referrers).toEqual(['content/notes/m.md']);
+  });
+
+  it('renames for content:rename only when nothing refers to the document', async () => {
+    const res = await content(
+      mountBoth(),
+      {
+        op: 'rename',
+        collection: 'people',
+        from: 'content/people/solo.md',
+        to: 'content/people/solo2.md',
+      },
+      'renamer'
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.referrers).toEqual([]);
+  });
+
+  it('renames across collections with no auth plugin, as the server checks nothing', async () => {
+    const res = await content(mount([], [PEOPLE, NOTES]), rename);
+    expect(res.status).toBe(200);
+    expect(await noteOnDisk()).toContain('content/people/ada-l.md');
+  });
+});
+
+describe('Windows-safe names through the content endpoint', () => {
+  const refused = [
+    'what?',
+    'a:b',
+    'a*b',
+    'a"b',
+    'a<b',
+    'a>b',
+    'a|b',
+    'CON',
+    'con',
+    'Nul',
+    'aux',
+    'COM1',
+    'lpt9.tar',
+    'COM²',
+  ];
+
+  it('refuses each name with invalid-path on create, update, rename, createFolder and renameFolder', async () => {
+    const routes = mount([]);
+    await fs.mkdir(path.join(rootDir, 'content/posts/series'));
+    await fs.writeFile(path.join(rootDir, 'content/posts/series/x.mdx'), '');
+    for (const name of refused) {
+      const file = `content/posts/${name}.mdx`;
+      const bodies = [
+        { op: 'create', collection: 'posts', path: file, value: {} },
+        { op: 'update', collection: 'posts', path: file, value: {} },
+        {
+          op: 'rename',
+          collection: 'posts',
+          from: 'content/posts/a.mdx',
+          to: file,
+        },
+        { op: 'createFolder', collection: 'posts', folder: name },
+        { op: 'renameFolder', collection: 'posts', from: 'series', to: name },
+        {
+          op: 'create',
+          collection: 'posts',
+          path: `content/posts/${name}/n.mdx`,
+          value: {},
+        },
+      ];
+      for (const body of bodies) {
+        const res = await content(routes, body);
+        expect([name, body.op, res.status, res.body.error.code]).toEqual([
+          name,
+          body.op,
+          422,
+          'invalid-path',
+        ]);
+      }
+    }
+    expect(await fs.readdir(path.join(rootDir, 'content/posts'))).toEqual([
+      'a.mdx',
+      'series',
+    ]);
+  });
+
+  it('accepts the names that only look reserved', async () => {
+    const routes = mount([]);
+    for (const name of ['console', 'com10', 'com0', 'nullable']) {
+      const res = await content(routes, {
+        op: 'create',
+        collection: 'posts',
+        path: `content/posts/${name}.mdx`,
+        value: {},
+      });
+      expect(res.status).toBe(200);
+    }
+  });
+});
+
+describe('session/permissions', () => {
+  const route = '/api/tina/session/permissions';
+  const ask = (routes: Routes, token?: string) =>
+    post(routes, route, {}, token);
+
+  it('answers what the default role map grants, as the content check does', async () => {
+    const routes = mount([authPlugin(false)]);
+    expect((await ask(routes, 'editor')).body).toEqual([
+      'content:save',
+      'content:create',
+      'content:rename',
+      'content:delete',
+    ]);
+    expect((await ask(routes, 'admin')).body).toEqual(['*']);
+    expect((await ask(routes, 'nobody')).body).toEqual([]);
+  });
+
+  it('answers what a custom rolePermissions grants a custom role', async () => {
+    const routes = mount([authPlugin(true)]);
+    expect((await ask(routes, 'creator')).body).toEqual([
+      'content:save',
+      'content:create',
+    ]);
+    expect((await ask(routes, 'viewer')).body).toEqual([]);
+    const granted = (await ask(routes, 'deleter')).body as string[];
+    const deleted = await content(
+      routes,
+      { op: 'delete', collection: 'posts', path: 'content/posts/a.mdx' },
+      'deleter'
+    );
+    expect([granted.includes('content:delete'), deleted.status]).toEqual([
+      true,
+      200,
+    ]);
+  });
+
+  it('answers 401 with no list when signed out', async () => {
+    const res = await ask(mount([authPlugin(false)]));
+    expect(res.status).toBe(401);
+    expect(Array.isArray(res.body)).toBe(false);
+    expect(res.body.error.code).toBe('unauthenticated');
+  });
+
+  it('answers the wildcard with no session where the server checks nothing', async () => {
+    const res = await ask(mount([]));
+    expect([res.status, res.body]).toEqual([200, ['*']]);
   });
 });
