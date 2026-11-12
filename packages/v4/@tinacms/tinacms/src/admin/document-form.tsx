@@ -365,8 +365,9 @@ function SaveButton() {
           return;
         }
         useFormStore.getState().restoreSavePhase(formId, previous);
-        if (cause instanceof FormValidationError && summary.block()) {
+        if (cause instanceof FormValidationError) {
           setDialog(null);
+          if (!summary.block()) showFailure(cause);
           return;
         }
         console.error('[tinacms] Could not make the branch:', cause);
@@ -377,10 +378,11 @@ function SaveButton() {
 
   const run = useEffectEvent(() => {
     if (dialog || pending) return;
-    if (remembered.current) {
+    if (remembered.current && view?.saveToNewBranch) {
       saveToProtected(remembered.current.request);
       return;
     }
+    remembered.current = null;
     if (isBranchGone(useFormStore.getState().saves[formId])) {
       setPending(true);
       const failure = useFormStore.getState().saves[formId];

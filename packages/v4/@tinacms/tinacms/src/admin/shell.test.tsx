@@ -57,6 +57,7 @@ let switchCalls: string[];
 let beforeSaveCalls: number;
 let failBeforeSave: boolean;
 let stampBeforeSave: boolean;
+let dropAction: () => void;
 
 const contentPlugin = () =>
   definePlugin({
@@ -156,6 +157,10 @@ function BranchActionScreen() {
   useEffect(() => {
     const action = saveToNewBranch;
     if (!runtime || !action) return;
+    dropAction = () =>
+      runtime.store.setState((state) => ({
+        branch: { ...state.branch, saveToNewBranch: undefined },
+      }));
     runtime.store.setState((state) => {
       const original = state.branch?.switchTo;
       return {
@@ -1305,6 +1310,25 @@ describe('Save to new branch', () => {
     });
     await waitFor(() => expect(switchCalls).toEqual(['docs/hello-edits']));
     await waitFor(() => expect(toastShown()).toBeNull());
+    expect(updates).toHaveLength(0);
+    errors.mockRestore();
+  });
+
+  it('opens the dialog from Retry once the action is gone, instead of a silent success', async () => {
+    const action = withAction();
+    action.mockRejectedValueOnce(new Error('pr failed'));
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { user, dialog } = await openProtectedDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(toastShown()).not.toBeNull());
+    act(() => dropAction());
+    await user.click(
+      within(toastShown() as HTMLElement).getByRole('button', { name: 'Retry' })
+    );
+    expect(
+      await screen.findByRole('dialog', { name: 'Save to a new branch' })
+    ).toBeVisible();
+    expect(action).toHaveBeenCalledOnce();
     expect(updates).toHaveLength(0);
     errors.mockRestore();
   });
