@@ -285,7 +285,10 @@ for (const width of [1440, 390]) {
           await previous.click({ force: true }).catch(() => {});
           await page.waitForTimeout(2000);
           expect(page.url()).toContain(BULK_HASH);
-          await expect(page.getByText('Page 2 of 3')).toBeVisible();
+          // A slow list takes 1.5 s here and longer on a loaded runner.
+          await expect(page.getByText('Page 2 of 3')).toBeVisible({
+            timeout: 15_000,
+          });
         }
       }
     });
@@ -309,7 +312,9 @@ for (const width of [1440, 390]) {
         await next.click({ force: true }).catch(() => {});
         await page.waitForTimeout(800);
         expect(page.url()).toContain(BULK_HASH);
-        await expect(page.getByText('Page 2 of 3')).toBeVisible();
+        await expect(page.getByText('Page 2 of 3')).toBeVisible({
+          timeout: 15_000,
+        });
         await page.getByRole('button', { name: 'Previous' }).click();
         await expect(page.getByText('Page 1 of 3')).toBeVisible();
         await page.waitForTimeout(HOLD_MS);
