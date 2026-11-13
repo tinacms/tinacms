@@ -1,31 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
 import {
-  ContentError,
+  type ContentError,
   type DocumentSummary,
   type FolderSummary,
 } from '../core/content/contract';
 import {
   CONTENT_STALE_TIME,
   contentKeys,
+  LEVEL_KEY_PART,
   useCurrentBranch,
 } from './content-queries';
+import { toContentError } from './collection-documents';
 import { useContentSlice } from './hooks';
-
-const LEVEL_KEY_PART = 'level';
 
 const EMPTY_DOCUMENTS: DocumentSummary[] = [];
 const EMPTY_FOLDERS: FolderSummary[] = [];
-
-const toContentError = (cause: unknown): ContentError => {
-  if (cause instanceof ContentError) return cause;
-  if (cause instanceof TypeError) {
-    return new ContentError('network', cause.message);
-  }
-  if (cause instanceof Error) {
-    return new ContentError('backend-failure', cause.message);
-  }
-  return new ContentError('backend-failure', String(cause));
-};
 
 interface LevelData {
   documents: DocumentSummary[];

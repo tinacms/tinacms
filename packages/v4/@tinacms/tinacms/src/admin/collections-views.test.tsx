@@ -220,6 +220,27 @@ describe('the maximised views', () => {
     );
   });
 
+  it('moves focus to the heading of the view it opens, not to the page', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/collections?max';
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    const table = await screen.findByRole('region', {
+      name: 'Posts documents',
+    });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        within(table).getByText('Posts', { selector: '[aria-current="page"]' })
+      )
+    );
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole('heading', { name: 'Collections' })
+      )
+    );
+  });
+
   it('says so when the schema has no collections', async () => {
     window.location.hash = '#/collections?max';
     renderAdmin({ collections: [] });

@@ -1,7 +1,7 @@
 import { HomePanelTray } from '@tinacms/ui/components/home-panel-tray';
-import { useTier } from '@tinacms/ui/hooks/use-tier';
+import { type Tier, useTier } from '@tinacms/ui/hooks/use-tier';
 import { cn } from '@tinacms/ui/lib/utils';
-import { Component, type ReactNode } from 'react';
+import { Component, type ReactNode, useEffect, useState } from 'react';
 import { ReviewUnsavedButton } from '../../admin/review-unsaved';
 import type { AdminScreenProps } from '../../core/screen/contract';
 import { useContentMode } from '../../editor/content-mode';
@@ -53,9 +53,33 @@ function Column({
   );
 }
 
+const CONTAINER_TABLET_MIN = 528;
+const CONTAINER_DESKTOP_MIN = 1040;
+
+const tierOfWidth = (width: number): Tier => {
+  if (width >= CONTAINER_DESKTOP_MIN) return 'desktop';
+  return width >= CONTAINER_TABLET_MIN ? 'tablet' : 'phone';
+};
+
+// Home can sit beside the navigator tree, so its layout follows its own width. Until it is measured, the window decides.
+const useHomeTier = () => {
+  const windowTier = useTier();
+  const [element, setElement] = useState<HTMLElement | null>(null);
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    if (!element || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setWidth(entry.borderBoxSize[0]?.inlineSize ?? 0);
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [element]);
+  return { ref: setElement, tier: width > 0 ? tierOfWidth(width) : windowTier };
+};
+
 // Review N unsaved is in the head only when there is no Branch panel to hold it.
 export function HomeScreen(_props: AdminScreenProps) {
-  const tier = useTier();
+  const { ref, tier } = useHomeTier();
   const mode = useContentMode();
   const unsaved = useUnsavedFormIds().length;
   const showReview = mode !== 'branches' && unsaved > 0;
@@ -77,6 +101,7 @@ export function HomeScreen(_props: AdminScreenProps) {
   );
   return (
     <div
+      ref={ref}
       className={cn(
         'mx-auto flex w-full max-w-360 flex-col gap-6 px-4 pt-7 pb-24',
         tier === 'tablet' && 'px-6',

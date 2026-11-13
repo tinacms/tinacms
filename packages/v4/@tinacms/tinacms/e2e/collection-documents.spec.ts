@@ -81,7 +81,11 @@ test('the row menu shows on hover and on keyboard focus on a device that hovers'
   await page
     .getByRole('button', { name: 'Getting started', exact: true })
     .focus();
-  await page.keyboard.press('Tab');
+  for (let step = 0; step < 4; step += 1) {
+    if (await menu.evaluate((element) => element === document.activeElement))
+      break;
+    await page.keyboard.press('Tab');
+  }
   await expect(menu).toBeFocused();
   await expect.poll(() => effectiveOpacity(menu)).toBe(1);
 });

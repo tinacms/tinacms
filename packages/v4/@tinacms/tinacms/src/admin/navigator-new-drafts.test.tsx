@@ -27,7 +27,7 @@ const contentPlugin = definePlugin({
   client: async () => ({ default: { slice: () => ({ ...provider }) } }),
 });
 
-const renderAdmin = () =>
+const renderAdmin = (outer = false) =>
   render(
     <TinaAdmin
       config={asResolvedConfig({
@@ -41,6 +41,23 @@ const renderAdmin = () =>
               format: 'mdx',
               fields: [{ name: 'title', label: 'Title', type: 'string' }],
             },
+            ...(outer
+              ? [
+                  {
+                    name: 'site',
+                    label: 'Site',
+                    path: 'content',
+                    format: 'md' as const,
+                    fields: [
+                      {
+                        name: 'title',
+                        label: 'Title',
+                        type: 'string' as const,
+                      },
+                    ],
+                  },
+                ]
+              : []),
           ],
         },
       })}
@@ -98,5 +115,17 @@ describe('the unsaved-only navigator and documents with no file yet', () => {
         screen.queryByRole('list', { name: 'Posts unsaved documents' })
       ).toBeNull()
     );
+  });
+
+  it('lists a new document only under the collection whose folder is the longest match', async () => {
+    useFormStore
+      .getState()
+      .storeNewDocumentDraft(toFormId(NEW_COPY), { title: 'Copy' });
+    window.location.hash = '#/collections?unsaved';
+    renderAdmin(true);
+    await screen.findByRole('list', { name: 'Posts unsaved documents' });
+    expect(
+      screen.queryByRole('list', { name: 'Site unsaved documents' })
+    ).toBeNull();
   });
 });

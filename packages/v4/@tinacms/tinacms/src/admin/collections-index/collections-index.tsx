@@ -5,13 +5,11 @@ import {
 } from '@tinacms/ui/components/data-table';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@tinacms/ui/components/tooltip';
+import { useEffect, useRef } from 'react';
 import { useDocumentsPage } from '../../editor/collection-documents';
 import type { CollectionSchema } from '../../core/schema/types';
+import { plural } from '../collection-table/table-model';
+import { RowHint } from '../row-hint';
 import { useTinaSchema } from '../hooks';
 import { useAdminRoute } from '../use-admin-route';
 
@@ -21,17 +19,20 @@ const COLUMNS = [
   { key: 'documents', label: 'Documents', align: 'right', className: 'w-40' },
 ] as const;
 
-const countText = (total: number) =>
-  total === 1 ? '1 document' : `${total} documents`;
-
-function DocumentCount({ collection }: { collection: string }) {
+function DocumentCount({
+  collection,
+  onOpen,
+}: {
+  collection: string;
+  onOpen: () => void;
+}) {
   const { data, error, isPending } = useDocumentsPage(collection, {
     first: 1,
   });
   if (data) {
     return (
       <span className='text-sm text-muted-foreground tabular-nums'>
-        {countText(data.totalCount)}
+        {plural(data.totalCount, 'document', 'documents')}
       </span>
     );
   }
@@ -49,19 +50,13 @@ function DocumentCount({ collection }: { collection: string }) {
     reason = error.message;
   }
   return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <span
-            tabIndex={0}
-            className='text-sm text-muted-foreground underline decoration-dotted underline-offset-3'
-          />
-        }
-      >
-        Can’t count
-      </TooltipTrigger>
-      <TooltipContent>{reason}</TooltipContent>
-    </Tooltip>
+    <RowHint
+      hint={reason}
+      onOpen={onOpen}
+      className='text-sm text-muted-foreground underline decoration-dotted underline-offset-3'
+    >
+      Can’t count
+    </RowHint>
   );
 }
 
@@ -72,6 +67,8 @@ function DocumentCount({ collection }: { collection: string }) {
 export function CollectionsIndex() {
   const { collections } = useTinaSchema();
   const { navigate } = useAdminRoute();
+  const openCollection = (name: string) =>
+    navigate({ view: 'collection', collection: name, maximised: true });
   const rows = collections.map(
     (collection: CollectionSchema): DataTableRow => ({
       id: collection.name,
@@ -80,25 +77,32 @@ export function CollectionsIndex() {
           type: 'link',
           icon: 'collection',
           text: collection.label ?? collection.name,
-          onClick: () =>
-            navigate({
-              view: 'collection',
-              collection: collection.name,
-              maximised: true,
-            }),
+          onClick: () => openCollection(collection.name),
         },
         description: collection.description
           ? { type: 'muted', text: collection.description }
           : undefined,
         documents: {
           type: 'node',
-          node: <DocumentCount collection={collection.name} />,
+          node: (
+            <DocumentCount
+              collection={collection.name}
+              onOpen={() => openCollection(collection.name)}
+            />
+          ),
         } satisfies DataTableCell,
       },
     })
   );
+  const section = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const heading = section.current?.querySelector('h2');
+    heading?.setAttribute('tabindex', '-1');
+    heading?.focus();
+  }, []);
   return (
     <section
+      ref={section}
       aria-label='Collections'
       className='flex h-full min-h-0 flex-col bg-card'
     >
@@ -109,8 +113,8 @@ export function CollectionsIndex() {
         closeLabel='Close'
         onClose={() => navigate({ view: 'home' })}
       />
-      <div className='min-h-0 flex-1 overflow-y-auto'>
-        <div className='mx-auto w-full max-w-280 p-4'>
+      <div className='min-h-0 flex-1 overflow-y-auto p-4 md:px-8 lg:px-20 lg:py-5'>
+        <div className='mx-auto w-full max-w-280'>
           <DataTable
             caption='Collections'
             columns={[...COLUMNS]}

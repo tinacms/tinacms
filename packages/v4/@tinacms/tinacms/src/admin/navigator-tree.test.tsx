@@ -219,6 +219,28 @@ describe('folders in the navigator tree', () => {
     expect(screen.getByRole('button', { name: 'z.md' })).toBeVisible();
   });
 
+  it('keeps open folders through a trip to the table, and opens the folder a Restore leaves', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await openTree();
+    await user.click(screen.getByRole('button', { name: 'a' }));
+    await screen.findByRole('list', { name: 'a documents' });
+    await user.click(screen.getByRole('button', { name: 'Maximise' }));
+    await user.click(await screen.findByRole('button', { name: 'Restore' }));
+    expect(await screen.findByRole('button', { name: 'a' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
+
+    goTo('#/collections/post/folder/c');
+    await user.click(await screen.findByRole('button', { name: 'Restore' }));
+    expect(await screen.findByRole('button', { name: 'c' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
+    expect(await screen.findByRole('button', { name: 'v.md' })).toBeVisible();
+  });
+
   it('shows only the folders of a collection that holds no documents', async () => {
     files = ['a/y.md'];
     renderAdmin();

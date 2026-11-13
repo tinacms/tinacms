@@ -1,4 +1,5 @@
 import { Badge } from '@tinacms/ui/components/badge';
+import { RowHint } from '../row-hint';
 import { Breadcrumb } from '@tinacms/ui/components/breadcrumb';
 import { Button } from '@tinacms/ui/components/button';
 import {
@@ -110,6 +111,8 @@ const useDebounced = <Value,>(value: Value, delay: number): Value => {
   return settled;
 };
 
+const BREADCRUMB_STEPS = 5;
+
 const isFolderRow = (row: TableRow): row is FolderRow => row.kind === 'folder';
 
 const rowTriggers = () => [
@@ -158,17 +161,24 @@ const STATUS_OPTIONS: readonly { value: StatusView; label: string }[] = [
   { value: 'saved', label: 'Saved' },
 ];
 
-function LastEdited({ row, now }: { row: DocumentRow; now: number }) {
+function LastEdited({
+  row,
+  now,
+  onOpen,
+}: {
+  row: DocumentRow;
+  now: number;
+  onOpen: () => void;
+}) {
   if (!row.updatedAt) return null;
   return (
     <span className='text-sm whitespace-nowrap text-muted-foreground'>
-      <time
-        dateTime={row.updatedAt.toISOString()}
-        title={exactTimeOf(row.updatedAt)}
-      >
-        {relativeTimeOf(row.updatedAt, now)}
-      </time>
-      {row.author ? ` · ${row.author}` : ''}
+      <RowHint hint={exactTimeOf(row.updatedAt)} onOpen={onOpen}>
+        <time dateTime={row.updatedAt.toISOString()}>
+          {relativeTimeOf(row.updatedAt, now)}
+        </time>
+        {row.author ? ` · ${row.author}` : ''}
+      </RowHint>
     </span>
   );
 }
@@ -253,9 +263,15 @@ function SelectChoice<Value extends string>({
 interface TableBodyProps {
   collection: string;
   folder: string;
+  /** Called before Restore opens the tree, so the shell can open `folder` in it. */
+  onRestore?: (folder: string) => void;
 }
 
-function CollectionTableBody({ collection, folder }: TableBodyProps) {
+function CollectionTableBody({
+  collection,
+  folder,
+  onRestore,
+}: TableBodyProps) {
   const tier = useTier();
   const { navigate } = useAdminRoute();
   const schema = useTinaSchema();
@@ -287,7 +303,6 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
   const after = pages.scope === scope ? pages.after : [];
   const setAfter = (next: string[]) => setPages({ scope, after: next });
   const [withoutEditTimes, setWithoutEditTimes] = useState(false);
-  const [unfilteredTotal, setUnfilteredTotal] = useState<number>();
 
   const query: ListQuery = {
     folder,
@@ -298,6 +313,13 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
   };
   const page = useDocumentsPage(collection, query);
   const connection = page.data;
+  const unfiltered = useDocumentsPage(
+    collection,
+    { folder, first: 1 },
+    filter !== ''
+  );
+  const unfilteredTotal =
+    filter === '' ? connection?.totalCount : unfiltered.data?.totalCount;
   const isStale = page.isPlaceholderData;
   // The rows, count and page label stay those of the page on screen until the next page arrives.
   const [shownDepth, setShownDepth] = useState(0);
@@ -332,12 +354,6 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
     }, PAGER_HOLD_MS);
     setAfter(next);
   };
-
-  useEffect(() => {
-    if (filter === '' && connection && !isStale) {
-      setUnfilteredTotal(connection.totalCount);
-    }
-  }, [filter, connection, isStale]);
 
   useEffect(() => {
     if (!connection || connection.edges.length === 0) return;
@@ -432,6 +448,10 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
     heading?.setAttribute('tabindex', '-1');
     return heading;
   };
+  // Opening a table from the index or the tree leaves nothing focused, so the heading takes focus.
+  useEffect(() => {
+    headingTarget()?.focus();
+  }, []);
   const afterRowAction =
     (key: string): FocusTarget =>
     () =>
@@ -594,15 +614,16 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
     return menu ? { type: 'node', node: menu } : undefined;
   };
 
-  const fileCell = (file: string): DataTableCell => ({
+  const fileCell = (file: string, onOpen: () => void): DataTableCell => ({
     type: 'node',
     node: (
-      <span
-        title={file}
+      <RowHint
+        hint={file}
+        onOpen={onOpen}
         className='block truncate text-sm text-muted-foreground'
       >
         {file}
-      </span>
+      </RowHint>
     ),
   });
 
@@ -617,7 +638,9 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
             text: `${row.folder.name}/`,
             onClick: () => openFolder(row.folder.path),
           },
-          file: fileCell(folderFileOf(collectionPath, row.folder.path)),
+          file: fileCell(folderFileOf(collectionPath, row.folder.path), () =>
+            openFolder(row.folder.path)
+          ),
           status: { type: 'muted', text: 'Folder' },
           updated: {
             type: 'muted',
@@ -636,7 +659,9 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
           text: row.name,
           onClick: () => openDocument(row.path),
         },
-        file: fileCell(fileOf(collectionPath, row.path)),
+        file: fileCell(fileOf(collectionPath, row.path), () =>
+          openDocument(row.path)
+        ),
         status: row.unsaved
           ? { type: 'badge', kind: 'unsaved', text: 'Unsaved' }
           : undefined,
@@ -644,7 +669,13 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
           ? {
               updated: {
                 type: 'node' as const,
-                node: <LastEdited row={row} now={now} />,
+                node: (
+                  <LastEdited
+                    row={row}
+                    now={now}
+                    onOpen={() => openDocument(row.path)}
+                  />
+                ),
               },
             }
           : {}),
@@ -661,7 +692,7 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
         {plural(row.folder.documentCount, 'document', 'documents')}
       </span>
     ) : withoutEditTimes ? null : (
-      <LastEdited row={row} now={now} />
+      <LastEdited row={row} now={now} onOpen={() => openDocument(row.path)} />
     );
     return {
       id: row.key,
@@ -746,6 +777,7 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
       />
       <Breadcrumb
         aria-label='Collection path'
+        max={BREADCRUMB_STEPS}
         items={[
           {
             label: 'Collections',
@@ -1015,7 +1047,10 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
         ref={headerRef}
         action={headerAction}
         maximised
-        onMaximise={() => navigate({ view: 'collection', collection })}
+        onMaximise={() => {
+          onRestore?.(folder);
+          navigate({ view: 'collection', collection });
+        }}
         closeLabel='Close'
         onClose={() => navigate({ view: 'home' })}
       />
@@ -1043,7 +1078,11 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
               <Button
                 variant='ghost'
                 icon='arrow-left'
-                href={formatAdminRoute({ view: 'collection', collection })}
+                href={formatAdminRoute({
+                  view: 'collection',
+                  collection,
+                  maximised: true,
+                })}
               >
                 {`Back to ${label}`}
               </Button>
@@ -1125,12 +1164,17 @@ function CollectionTableBody({ collection, folder }: TableBodyProps) {
  * The documents of a collection folder as a table: folders first, then documents, with filter,
  * status views, sorting, paging and the row actions. State resets when the folder changes.
  */
-export function CollectionTable({ collection, folder }: TableBodyProps) {
+export function CollectionTable({
+  collection,
+  folder,
+  onRestore,
+}: TableBodyProps) {
   return (
     <CollectionTableBody
       key={`${collection}/${folder}`}
       collection={collection}
       folder={folder}
+      onRestore={onRestore}
     />
   );
 }

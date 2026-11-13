@@ -46,6 +46,7 @@ export const contentKeys = {
 
 // Table pages sit under the collection's list key, after this part.
 export const PAGE_KEY_PART = 'page';
+export const LEVEL_KEY_PART = 'level';
 
 export const useCurrentBranch = (): string | undefined =>
   useTinaStore(currentBranchOf);
@@ -248,6 +249,9 @@ export const useSaveDocument = (): DocumentSave => {
       );
       void queryClient.invalidateQueries({
         queryKey: [...contentKeys.list(collection, branch), PAGE_KEY_PART],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [...contentKeys.list(collection, branch), LEVEL_KEY_PART],
       });
     },
   });

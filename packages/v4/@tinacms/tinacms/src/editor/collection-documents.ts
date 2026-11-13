@@ -92,7 +92,7 @@ export class UnsavedReferrersError extends Error {
   }
 }
 
-const toContentError = (cause: unknown): ContentError => {
+export const toContentError = (cause: unknown): ContentError => {
   if (cause instanceof ContentError) return cause;
   if (cause instanceof TypeError)
     return new ContentError('network', cause.message);
@@ -125,12 +125,17 @@ const documentsPageKey = (
   query.after ?? '',
 ];
 
-export const useDocumentsPage = (collection: string, query: ListQuery) => {
+export const useDocumentsPage = (
+  collection: string,
+  query: ListQuery,
+  enabled = true
+) => {
   const content = useContentSlice();
   const branch = useCurrentBranch();
   return useQuery<DocumentConnection>({
     queryKey: documentsPageKey(collection, query, branch),
     queryFn: () => attempt(() => content.list(collection, query)),
+    enabled,
     staleTime: CONTENT_STALE_TIME,
     placeholderData: keepPreviousData,
   });

@@ -249,10 +249,6 @@ describe('CollectionTable', () => {
     renderTable();
     await rowNamed('Beta');
     expect(screen.getByText('posts/guides/')).toBeInTheDocument();
-    expect(screen.getByText('posts/beta.md')).toHaveAttribute(
-      'title',
-      'posts/beta.md'
-    );
     const table = within(screen.getByRole('table'));
     expect(table.queryByText('Saved')).toBeNull();
     expect(table.queryByText('Unsaved')).toBeNull();
@@ -312,24 +308,38 @@ describe('CollectionTable', () => {
       within(trail)
         .getAllByText(/^(Collections|Posts|a|b)$/)
         .map((part) => part.textContent)
-    ).toEqual(['Collections', 'a', 'b']);
-    await user.click(
-      within(trail).getByRole('button', { name: 'Show 1 more level' })
-    );
-    expect(
-      await screen.findByRole('menuitem', { name: 'Posts' })
-    ).toBeInTheDocument();
-    await user.keyboard('{Escape}');
+    ).toEqual(['Collections', 'Posts', 'a', 'b']);
     await user.click(screen.getByRole('button', { name: 'Back' }));
     expect(screen.getByLabelText('location')).toHaveTextContent(
       '/collections/post/folder/a'
     );
-    await user.click(
-      within(trail).getByRole('button', { name: 'Show 1 more level' })
-    );
-    await user.click(await screen.findByRole('menuitem', { name: 'Posts' }));
+    await user.click(within(trail).getByRole('button', { name: 'Posts' }));
     expect(screen.getByLabelText('location')).toHaveTextContent(
       '/collections/post?max'
+    );
+  });
+
+  it('folds a path of more than five steps', async () => {
+    world.summaries = [doc('a/b/c/d/deep.md', { title: 'Deep' })];
+    renderTable('a/b/c/d');
+    await rowNamed('Deep');
+    const trail = screen.getByRole('navigation', { name: 'Collection path' });
+    expect(
+      within(trail).getByRole('button', { name: 'Show 3 more levels' })
+    ).toBeInTheDocument();
+  });
+
+  it('shows the file path and the exact time on hover, and a click on the file opens the row', async () => {
+    const user = userEvent.setup();
+    renderTable();
+    await rowNamed('Beta');
+    await user.hover(screen.getByText('posts/beta.md'));
+    await waitFor(() =>
+      expect(screen.getAllByText('posts/beta.md').length).toBeGreaterThan(1)
+    );
+    await user.click(screen.getAllByText('posts/beta.md')[0] as HTMLElement);
+    expect(screen.getByLabelText('location')).toHaveTextContent(
+      '/collections/post/content%2Fposts%2Fbeta.md'
     );
   });
 
@@ -651,14 +661,16 @@ describe('CollectionTable', () => {
     expect(await rowNamed('Beta')).toBeInTheDocument();
   });
 
-  it('says Folder not found for a missing folder', async () => {
-    renderTable('nope');
-    expect(await screen.findByText('Folder not found.')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Back to Posts' })).toHaveAttribute(
-      'href',
-      '#/collections/post'
-    );
-  });
+  it.each(['nope', 'a/nope', 'v1.2'])(
+    'says Folder not found for the missing folder %s and links back to the table',
+    async (folder) => {
+      renderTable(folder);
+      expect(await screen.findByText('Folder not found.')).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Back to Posts' })
+      ).toHaveAttribute('href', '#/collections/post?max');
+    }
+  );
 });
 
 describe('row actions', () => {

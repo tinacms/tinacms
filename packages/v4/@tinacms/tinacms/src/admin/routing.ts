@@ -21,7 +21,9 @@ const FOLDER_SEGMENT = 'folder';
 export const formatAdminRoute = (route: AdminRoute): string => {
   if (route.view === 'home') return '#/';
   if (route.view === 'collections') {
-    if (route.maximised) return `#/${COLLECTIONS_PREFIX}${MAXIMISED}`;
+    if (route.maximised) {
+      return `#/${COLLECTIONS_PREFIX}${MAXIMISED}${route.unsavedOnly ? '&unsaved' : ''}`;
+    }
     return `#/${COLLECTIONS_PREFIX}${route.unsavedOnly ? UNSAVED_ONLY : ''}`;
   }
   if (
@@ -68,10 +70,15 @@ export const parseAdminRoute = (hash: string): AdminRoute => {
   )
     return { view: prefix };
   if (prefix === COLLECTIONS_PREFIX && !head) {
-    if (query === 'max') return { view: 'collections', maximised: true };
-    return query === 'unsaved'
-      ? { view: 'collections', unsavedOnly: true }
-      : COLLECTIONS_ROUTE;
+    const flags = (query ?? '').split('&');
+    const unsavedOnly = flags.includes('unsaved');
+    const maximised = flags.includes('max');
+    if (!unsavedOnly && !maximised) return COLLECTIONS_ROUTE;
+    return {
+      view: 'collections',
+      ...(unsavedOnly ? { unsavedOnly: true } : {}),
+      ...(maximised ? { maximised: true as const } : {}),
+    };
   }
   if (!head) return HOME_ROUTE;
   if (prefix === SCREENS_PREFIX)

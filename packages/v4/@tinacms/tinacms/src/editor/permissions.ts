@@ -27,12 +27,14 @@ export interface PermissionsState {
 const STATE = Symbol('tina.permissionsState');
 type SliceWithState = AuthSlice & { [STATE]?: PermissionsState };
 
+const hasState = (auth: AuthSlice): auth is SliceWithState => STATE in auth;
+
 /** How the question for the signed-in user's permissions stands. `null` for a slice without `can`. */
 export const permissionsStateOf = (
   auth: AuthSlice | null
 ): PermissionsState | null => {
-  if (auth === null || !(STATE in auth)) return null;
-  return (auth as SliceWithState)[STATE] ?? null;
+  if (auth === null || !hasState(auth)) return null;
+  return auth[STATE] ?? null;
 };
 
 const isStringArray = (value: unknown): value is string[] =>

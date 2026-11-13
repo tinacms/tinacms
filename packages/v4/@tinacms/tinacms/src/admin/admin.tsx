@@ -41,6 +41,7 @@ import {
   MediaPanel,
   SettingsPane,
   ToolsPane,
+  useTreeFolders,
 } from './navigator';
 import { CollectionTable } from './collection-table/collection-table';
 import { CollectionsIndex } from './collections-index/collections-index';
@@ -456,6 +457,7 @@ function AdminShell({
   useKeptEditsNotice(mainRoute, navigate);
 
   const [maximised, setMaximised] = useState(false);
+  const treeFolders = useTreeFolders();
   useEffect(() => {
     if (!isMediaRoute) setMaximised(false);
   }, [isMediaRoute]);
@@ -605,6 +607,7 @@ function AdminShell({
             navigate={navigate}
             onClose={goHome}
             onMaximise={maximiseNavigator}
+            treeFolders={treeFolders}
             hideBelowLg={isStaleCollectionRoute}
           />
         ) : null}
@@ -651,6 +654,9 @@ function AdminShell({
                 key={`${branch ?? ''}/${collection.name}/${tableFolder}`}
                 collection={collection.name}
                 folder={tableFolder}
+                onRestore={(folder) =>
+                  treeFolders.reveal(collection.name, folder)
+                }
               />
             </SidebarInset>
           ) : isStaleDocumentRoute ? (

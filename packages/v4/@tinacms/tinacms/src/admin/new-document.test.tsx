@@ -28,6 +28,7 @@ import { toFormId, useFormStore } from '../form/form-store';
 import { readDraft, writeDraft } from '../form/drafts';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
+import { openCollectionTree } from '../test/collection-tree';
 import { connectionOf } from '../test/connection';
 import { TinaAdmin } from './admin';
 
@@ -141,6 +142,29 @@ describe('a document with no file yet', () => {
     await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
     expect(readDraft(toFormId(FOLDER_PATH))).toBeUndefined();
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+
+  it('shows the saved document in the navigator tree', async () => {
+    const user = userEvent.setup();
+    await act(async () => {
+      keepCopy(TOP_PATH);
+    });
+    renderAdmin();
+    await openCollectionTree('post');
+    const tree = await screen.findByRole('list', { name: 'Posts documents' });
+    expect(within(tree).getByText('Unsaved')).toBeVisible();
+    await user.click(within(tree).getByRole('button', { name: /top-copy/ }));
+    await screen.findByLabelText(/^Title\b/);
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
+    await user.click(
+      screen.getByRole('button', { name: 'Return to navigator' })
+    );
+    await user.click(await screen.findByRole('button', { name: 'Restore' }));
+    const after = await screen.findByRole('list', { name: 'Posts documents' });
+    expect(
+      await within(after).findByRole('button', { name: 'top-copy.mdx' })
+    ).toBeVisible();
   });
 
   it('keeps the copy when the name is taken by the time of Save', async () => {

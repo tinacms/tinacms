@@ -70,6 +70,31 @@ function DocumentRow({
 type OpenFolders = ReadonlySet<string>;
 type SetOpenFolders = (update: (open: OpenFolders) => OpenFolders) => void;
 
+const NO_FOLDERS: OpenFolders = new Set();
+
+/** Which folders are open in the tree, per collection. The shell owns it so the tree keeps them while a table replaces it. */
+export const useTreeFolders = () => {
+  const [byCollection, setByCollection] = useState<
+    Readonly<Record<string, OpenFolders>>
+  >({});
+  const setFolders = (
+    collection: string,
+    update: (open: OpenFolders) => OpenFolders
+  ) =>
+    setByCollection((current) => ({
+      ...current,
+      [collection]: update(current[collection] ?? NO_FOLDERS),
+    }));
+  const reveal = (collection: string, folder: string) =>
+    setFolders(
+      collection,
+      (open) => new Set([...open, ...foldersThrough(folder)])
+    );
+  return { byCollection, setFolders, reveal };
+};
+
+export type TreeFolders = ReturnType<typeof useTreeFolders>;
+
 interface LevelProps {
   collection: CollectionSchema;
   folder: string;
@@ -117,7 +142,10 @@ function CollectionLevel(props: LevelProps) {
   const seenFolders = useRef<FolderSummary[] | null>(null);
   const { setOpenFolders } = props;
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded) {
+      seenFolders.current = null;
+      return;
+    }
     const before = seenFolders.current;
     seenFolders.current = folders;
     if (before === null || before === folders) return;
@@ -186,16 +214,25 @@ function CollectionLevel(props: LevelProps) {
 // Review N unsaved: only the documents that hold edits, open or kept in a stored draft, grouped by collection.
 function UnsavedCollection({
   collection,
+  collections,
   unsavedIds,
   navigate,
 }: {
   collection: CollectionSchema;
+  collections: CollectionSchema[];
   unsavedIds: ReadonlySet<string>;
   navigate: (route: AdminRoute) => void;
 }) {
   const { documents, error } = useCollectionDocuments(collection.name);
   const directory = directoryOf(collection, '');
-  const created = useNewDocumentIds().filter((id) => isUnder(id, directory));
+  const created = useNewDocumentIds().filter(
+    (id) =>
+      isUnder(id, directory) &&
+      !collections.some((other) => {
+        const nested = directoryOf(other, '');
+        return nested.length > directory.length && isUnder(id, nested);
+      })
+  );
   const unsaved = [
     ...documents.filter(({ path }) => unsavedIds.has(path)),
     ...created
@@ -301,12 +338,14 @@ function CollectionNode({
   activePath,
   unsavedIds,
   navigate,
+  treeFolders,
 }: {
   collection: CollectionSchema;
   active: boolean;
   activePath?: string;
   unsavedIds: ReadonlySet<string>;
   navigate: (route: AdminRoute) => void;
+  treeFolders: TreeFolders;
 }) {
   const [open, setOpen] = useState(active);
   useEffect(() => {
@@ -317,18 +356,19 @@ function CollectionNode({
       ? foldersThrough(folderOfDocument(collection, activePath))
       : [];
   const selectedKey = selectedFolders.join('\n');
-  const [openFolders, setOpenFolders] = useState<OpenFolders>(
-    () => new Set(selectedFolders)
-  );
+  const openFolders = treeFolders.byCollection[collection.name] ?? NO_FOLDERS;
+  const { setFolders } = treeFolders;
+  const setOpenFolders: SetOpenFolders = (update) =>
+    setFolders(collection.name, update);
   useEffect(() => {
     if (selectedKey === '') return;
-    setOpenFolders((current) => {
+    setFolders(collection.name, (current) => {
       const missing = selectedKey
         .split('\n')
         .filter((path) => !current.has(path));
       return missing.length === 0 ? current : new Set([...current, ...missing]);
     });
-  }, [selectedKey]);
+  }, [selectedKey, collection.name]);
   const label = collection.label ?? collection.name;
   return (
     <li>
@@ -372,9 +412,11 @@ export function CollectionsNavigator({
   navigate,
   onClose,
   onMaximise,
+  treeFolders,
   hideBelowLg = false,
 }: {
   collections: CollectionSchema[];
+  treeFolders: TreeFolders;
   /** The document row to mark, when no document is open. */
   selectedPath?: string;
   route: AdminRoute;
@@ -424,6 +466,7 @@ export function CollectionsNavigator({
                 <UnsavedCollection
                   key={collection.name}
                   collection={collection}
+                  collections={collections}
                   unsavedIds={unsavedIds}
                   navigate={navigate}
                 />
@@ -441,6 +484,7 @@ export function CollectionsNavigator({
                 active={collection.name === activeCollection}
                 activePath={activePath}
                 navigate={navigate}
+                treeFolders={treeFolders}
               />
             ))}
           </ul>

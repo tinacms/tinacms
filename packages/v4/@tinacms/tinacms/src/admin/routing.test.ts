@@ -135,7 +135,7 @@ describe('parseAdminRoute on input a user can type', () => {
     ).toBe('#/collections/post?max');
   });
 
-  it('writes ?max alone, never with ?unsaved, and keeps the minimised addresses plain', () => {
+  it('writes ?max, keeps ?unsaved beside it in either order, and keeps the minimised addresses plain', () => {
     expect(formatAdminRoute({ view: 'collections', maximised: true })).toBe(
       '#/collections?max'
     );
@@ -145,7 +145,17 @@ describe('parseAdminRoute on input a user can type', () => {
         maximised: true,
         unsavedOnly: true,
       })
-    ).toBe('#/collections?max');
+    ).toBe('#/collections?max&unsaved');
+    for (const hash of [
+      '#/collections?unsaved&max',
+      '#/collections?max&unsaved',
+    ]) {
+      expect(parseAdminRoute(hash)).toEqual({
+        view: 'collections',
+        unsavedOnly: true,
+        maximised: true,
+      });
+    }
     expect(parseAdminRoute('#/collections?max')).toEqual({
       view: 'collections',
       maximised: true,
