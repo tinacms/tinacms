@@ -155,3 +155,63 @@ test('opening a document from Collections does not move the form to the page the
     new RegExp(encodeURIComponent(SECOND).slice(0, 20))
   );
 });
+
+test('the outline never blocks the page: hit-testing over a hovered part still reaches the site element', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  const title = frame(page).getByTestId('post-title');
+  await title.hover();
+  const hit = await title.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return (
+      element.ownerDocument.elementFromPoint(
+        box.x + box.width / 2,
+        box.y + box.height / 2
+      ) === element
+    );
+  });
+  expect(hit).toBe(true);
+});
+
+test('focusing a field whose part of the page is off-screen scrolls it into view', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 500 });
+  await openDeclared(page);
+  await page.locator('input[id="seo.social.handle"]').focus();
+  await expect
+    .poll(() =>
+      frame(page)
+        .getByTestId('social-handle')
+        .evaluate((element) => {
+          const box = element.getBoundingClientRect();
+          return box.top >= 0 && box.bottom <= window.innerHeight + 1;
+        })
+    )
+    .toBe(true);
+});
+
+test('at 390px wide the head shows the trail and title without overflowing sideways', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto(adminUrl(declared(HELLO), postHash(HELLO)));
+  await expect(location(page)).toBeVisible();
+  await expect(heading(page)).toHaveText(/^Hello World/);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth
+    )
+  ).toBe(true);
+});
+
+test.describe('on a touch screen', () => {
+  test.use({ hasTouch: true });
+
+  test('a tap on a marked part makes its field active', async ({ page }) => {
+    await openDeclared(page);
+    await frame(page).getByTestId('post-title').tap();
+    await expect(page.locator('input#title')).toBeFocused();
+  });
+});
