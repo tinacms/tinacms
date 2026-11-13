@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { BranchInfo } from '../core/branch/contract';
 import { currentBranchOf } from '../core/branch/contract';
@@ -12,13 +12,18 @@ import type { FieldSchema, TinaDocument } from '../core/schema/types';
 import { draftKey } from '../form/drafts';
 import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
+import arrayFieldPlugin from '../plugins/fields/array/array-field.plugin';
 import objectFieldPlugin from '../plugins/fields/object/object-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { guardConsole } from '../test/console-guard';
 import { simulateReload } from '../test/simulate-reload';
+import { SidebarProvider } from '@tinacms/ui/components/sidebar';
+import { HashRouter } from 'react-router-dom';
+import { TinaProvider } from '../editor/provider';
 import { TinaAdmin } from './admin';
+import { ShellTopBar } from './shell-bars';
 
 // The toast's action button captures the pointer, which happy-dom does not implement.
 Element.prototype.setPointerCapture = () => undefined;
@@ -53,34 +58,38 @@ let failAfterSave: boolean;
 let holdList: Promise<void> | undefined;
 let listFails: boolean;
 
-const auditPlugin = definePlugin({
-  name: 'test:audit',
-  provides: ['hooks'],
-  hooks: ['audit'],
-  client: async () => ({
-    default: {
-      hooks: {
-        audit: () => ({
-          beforeSave: (
-            document: TinaDocument,
-            scope: { path: string; collection: { name: string } }
-          ) => {
-            beforeSaves.push({ path: scope.path });
-            if (failBeforeSave) throw new Error('audit refused');
-            return document;
-          },
-          afterSave: (
-            _document: TinaDocument,
-            scope: { path: string; collection: { name: string } }
-          ) => {
-            afterSaves.push({ path: scope.path });
-            if (failAfterSave) throw new Error('audit endpoint down');
-          },
-        }),
+let serverAudit = false;
+
+const auditPlugin = () =>
+  definePlugin({
+    name: 'test:audit',
+    provides: ['hooks'],
+    hooks: ['audit'],
+    ...(serverAudit ? { serverHooks: ['audit'] } : {}),
+    client: async () => ({
+      default: {
+        hooks: {
+          audit: () => ({
+            beforeSave: (
+              document: TinaDocument,
+              scope: { path: string; collection: { name: string } }
+            ) => {
+              beforeSaves.push({ path: scope.path });
+              if (failBeforeSave) throw new Error('audit refused');
+              return document;
+            },
+            afterSave: (
+              _document: TinaDocument,
+              scope: { path: string; collection: { name: string } }
+            ) => {
+              afterSaves.push({ path: scope.path });
+              if (failAfterSave) throw new Error('audit endpoint down');
+            },
+          }),
+        },
       },
-    },
-  }),
-});
+    }),
+  });
 
 const contentPlugin = () =>
   definePlugin({
@@ -152,15 +161,46 @@ const seoField = {
   ],
 } as FieldSchema;
 
+const deepField = {
+  name: 'deep',
+  label: 'Deep',
+  type: 'object',
+  fields: [
+    {
+      name: 'inner',
+      label: 'Inner',
+      type: 'object',
+      fields: [
+        {
+          name: 'note',
+          label: 'Note',
+          type: 'string',
+          validators: [required()],
+        },
+      ],
+    },
+  ],
+} as FieldSchema;
+
+const linksField = {
+  name: 'links',
+  label: 'Links',
+  type: 'array',
+  fields: [
+    { name: 'url', label: 'URL', type: 'string', validators: [required()] },
+  ],
+} as FieldSchema;
+
 const renderAdmin = () =>
   render(
     <TinaAdmin
       config={asResolvedConfig({
         plugins: [
           contentPlugin(),
-          auditPlugin,
+          auditPlugin(),
           stringFieldPlugin,
           objectFieldPlugin,
+          arrayFieldPlugin,
           coreValidatorsPlugin,
           homePlugin,
         ],
@@ -179,6 +219,8 @@ const renderAdmin = () =>
                   validators: [required()],
                 },
                 seoField,
+                deepField,
+                linksField,
               ],
             },
             {
@@ -236,7 +278,12 @@ const toastShown = () => document.querySelector('[data-slot=toast]');
 beforeEach(() => {
   mode = 'local';
   files = {
-    [PAGE]: { title: 'About', seo: { heading: 'Hi' } },
+    [PAGE]: {
+      title: 'About',
+      seo: { heading: 'Hi' },
+      deep: { inner: { note: 'n' } },
+      links: [{ url: 'a' }, { url: 'b' }],
+    },
     [POST]: { title: 'Hello', slug: 'hello' },
     [POST_B]: { title: 'Second', slug: 'second' },
   };
@@ -252,6 +299,7 @@ beforeEach(() => {
   failAfterSave = false;
   holdList = undefined;
   listFails = false;
+  serverAudit = false;
   window.location.hash = '';
 });
 
@@ -889,5 +937,167 @@ describe('Waiting copies', () => {
     await waitFor(() => expect(writes).toHaveLength(1));
     expect(writes[0]?.value).toMatchObject({ slug: 'hello-y' });
     expect(useFormStore.getState().waiting[toFormId(POST)]).toHaveLength(1);
+  });
+});
+
+describe('Form-less validation matches the form', () => {
+  const breakPageThenSaveAll = async (
+    user: ReturnType<typeof userEvent.setup>,
+    field: string,
+    value: unknown
+  ) => {
+    window.location.hash = hashOf('page', PAGE);
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    act(() =>
+      useFormStore
+        .getState()
+        .setFieldValue(toFormId(PAGE), field as never, value)
+    );
+    await goTo('post', POST);
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-x');
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 1 of 2 documents')
+      ).toBeVisible()
+    );
+  };
+  const pageErrors = () => {
+    const page = useFormStore.getState().forms[toFormId(PAGE)];
+    return page?.status === 'edited' ? Object.keys(page.errors) : [];
+  };
+
+  it('fails an object inside an object with its leaf label', async () => {
+    const user = userEvent.setup();
+    await breakPageThenSaveAll(user, 'deep', { inner: { note: '' } });
+    expect(pageErrors()).toEqual(['deep.inner.note']);
+    expect(
+      within(await openResults(user)).getAllByRole('listitem')[0]
+    ).toHaveTextContent(/Failed: Note:/);
+  });
+
+  it('reports only the invalid item of a list', async () => {
+    const user = userEvent.setup();
+    await breakPageThenSaveAll(user, 'links', [{ url: 'a' }, { url: '' }]);
+    expect(pageErrors()).toEqual(['links.1.url']);
+    expect(
+      within(await openResults(user)).getAllByRole('listitem')[0]
+    ).toHaveTextContent(/Failed: URL:/);
+  });
+});
+
+describe('Save All and the branch switcher', () => {
+  beforeEach(() => {
+    mode = 'branches';
+    localStorage.setItem(
+      'tina-store',
+      JSON.stringify({
+        state: { branch: { current: 'feature/news' } },
+        version: 0,
+      })
+    );
+  });
+
+  it('disables the switcher for the whole run and again while a later Save Document runs', async () => {
+    holdPaths.add(POST);
+    const user = userEvent.setup();
+    window.location.hash = hashOf('post', POST);
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-x');
+    const branch = () => screen.getByRole('button', { name: /^Branch:/ });
+    await waitFor(() => expect(saveAll()).toBeEnabled());
+    expect(branch()).toBeEnabled();
+    await user.click(saveAll());
+    await waitFor(() => expect(held.has(POST)).toBe(true));
+    expect(branch()).toBeDisabled();
+    await release(POST);
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Saved 1 document')).toBeVisible()
+    );
+    expect(branch()).toBeEnabled();
+    held.clear();
+    await user.type(screen.getByLabelText(/^Slug\b/), '!');
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
+    await waitFor(() => expect(held.has(POST)).toBe(true));
+    expect(within(statusBar()).getByText('Saving…')).toBeVisible();
+    expect(branch()).toBeDisabled();
+    await release(POST);
+    await waitFor(() => expect(branch()).toBeEnabled());
+  });
+});
+
+describe('Discarding a failed document', () => {
+  it('removes its failed entry so the status bar leaves "Save failed"', async () => {
+    const user = userEvent.setup();
+    window.location.hash = hashOf('page', PAGE);
+    renderAdmin();
+    await user.clear(await titleInput());
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 1 of 1 documents')
+      ).toBeVisible()
+    );
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+    );
+    await user.click(await screen.findByRole('button', { name: 'Discard' }));
+    await waitFor(() =>
+      expect(within(statusBar()).queryByText(/Save failed/)).toBeNull()
+    );
+    expect(useFormStore.getState().saveAll.results).toEqual({});
+  });
+});
+
+describe('Save All without a content plugin', () => {
+  it('does not render in the top bar', async () => {
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [stringFieldPlugin, homePlugin],
+          schema: { collections: [] },
+        })}
+      >
+        <HashRouter>
+          <SidebarProvider>
+            <ShellTopBar />
+          </SidebarProvider>
+        </HashRouter>
+      </TinaProvider>
+    );
+    await screen.findByRole('banner', { name: 'Top bar' });
+    expect(screen.queryByRole('button', { name: /^Save all/ })).toBeNull();
+  });
+});
+
+describe('Save All with server hooks', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('writes each document through the server route once', async () => {
+    serverAudit = true;
+    const bodies: { path: string; value: TinaDocument }[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init?: RequestInit) => {
+        const body = JSON.parse(String(init?.body));
+        bodies.push(body);
+        files[body.path] = body.value;
+        expect(url).toBe('/api/tina/content/update');
+        return Response.json({
+          entry: { path: body.path, document: body.value },
+          hookWarnings: [],
+        });
+      })
+    );
+    const user = userEvent.setup();
+    await editSlugs(user, [POST, POST_B]);
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Saved 2 documents')).toBeVisible()
+    );
+    expect(bodies.map(({ path }) => path).sort()).toEqual([POST, POST_B]);
+    expect(writes).toHaveLength(0);
   });
 });
