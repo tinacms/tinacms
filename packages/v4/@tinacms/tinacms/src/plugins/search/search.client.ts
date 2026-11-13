@@ -1,4 +1,9 @@
-import { DEFAULT_RPC_URL, RpcError, createRpcClient } from '../../rpc/proxy';
+import {
+  DEFAULT_RPC_URL,
+  RpcError,
+  type RpcClientConfig,
+  createRpcClient,
+} from '../../rpc/proxy';
 import type { ClientSlice } from '../../core/plugin';
 import {
   type Search,
@@ -11,6 +16,11 @@ import { validateSearchRequest } from '../../core/search/validate';
 export interface SearchClientConfig {
   /** Where the site mounts its RPC handler. `/api/tina` for browser code. */
   rpcUrl: string;
+  /**
+   * The caller's bearer token. A provider that needs a signed-in user sets it;
+   * without it a request carries no credential (the website path).
+   */
+  getToken?: RpcClientConfig['getToken'];
   fetch?: typeof fetch;
 }
 
@@ -53,6 +63,7 @@ export const createSearchClient = (
 ): { search: Search } => {
   const server = createRpcClient<SearchRoutes>({
     url: config.rpcUrl,
+    getToken: config.getToken,
     fetch: config.fetch,
   });
   return {
@@ -67,5 +78,10 @@ export const createSearchClient = (
   };
 };
 
-export const createSearchSlice: ClientSlice = (_set, _get, sliceConfig) =>
-  createSearchClient({ rpcUrl: sliceConfig?.rpcUrl ?? DEFAULT_RPC_URL });
+export const searchSliceOf =
+  (getToken?: SearchClientConfig['getToken']): ClientSlice =>
+  (_set, _get, sliceConfig) =>
+    createSearchClient({
+      rpcUrl: sliceConfig?.rpcUrl ?? DEFAULT_RPC_URL,
+      getToken,
+    });

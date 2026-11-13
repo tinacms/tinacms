@@ -41,6 +41,44 @@ describe('authedFetch', () => {
     expect(headers.get('content-type')).toBe('application/json');
   });
 
+  it('sends X-API-KEY and no Authorization with credential api-key (AC27)', async () => {
+    const fetchMock = stubFetch(json({ ok: 1 }));
+    const apiKeyClient = createTinaCloudClient({
+      clientId: 'abc',
+      getToken: () => 'pub',
+      credential: 'api-key',
+    });
+    await apiKeyClient.authedFetch('https://x.test/a', {
+      headers: { Authorization: 'Bearer stray' },
+    });
+    const headers = new Headers(fetchMock.mock.calls[0][1]?.headers);
+    expect(headers.get('X-API-KEY')).toBe('pub');
+    expect(headers.has('Authorization')).toBe(false);
+
+    stubFetch(json({}));
+    await client().authedFetch('https://x.test/a');
+    const bearer = new Headers(
+      (globalThis.fetch as unknown as typeof fetchMock).mock.calls[0][1]
+        ?.headers
+    );
+    expect(bearer.has('X-API-KEY')).toBe(false);
+  });
+
+  it.each(['bearer', 'api-key'] as const)(
+    'throws a 401 TinaCloudError and sends nothing without a token (%s)',
+    async (credential) => {
+      const fetchMock = stubFetch();
+      await expect(
+        createTinaCloudClient({
+          clientId: 'abc',
+          getToken: () => undefined,
+          credential,
+        }).authedFetch('https://x.test/a')
+      ).rejects.toMatchObject({ name: 'TinaCloudError', status: 401 });
+      expect(fetchMock).not.toHaveBeenCalled();
+    }
+  );
+
   it('throws a 401 TinaCloudError without calling fetch when no token is available', async () => {
     const fetchMock = stubFetch();
     await expect(
