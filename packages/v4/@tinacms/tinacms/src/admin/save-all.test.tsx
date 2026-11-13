@@ -386,7 +386,7 @@ const editSlugs = async (
     await waitFor(() =>
       expect(screen.getByLabelText(/^Slug\b/)).toHaveValue('second')
     );
-    await user.type(screen.getByLabelText(/^Slug\b/), '-x');
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-x');
   }
 };
 
@@ -441,7 +441,7 @@ describe('Save All results', () => {
     );
     expect(writes.map(({ path }) => path).sort()).toEqual([POST, POST_B]);
     expect(saveAll()).toBeDisabled();
-    await user.type(screen.getByLabelText(/^Slug\b/), '!');
+    await user.type(await screen.findByLabelText(/^Slug\b/), '!');
     await waitFor(() =>
       expect(within(statusBar()).getByText('Unsaved changes')).toBeVisible()
     );
@@ -456,7 +456,7 @@ describe('Save All results', () => {
     await waitFor(() =>
       expect(screen.getByLabelText(/^Slug\b/)).toHaveValue('second')
     );
-    await user.clear(screen.getByLabelText(/^Title\b/, { selector: 'input' }));
+    await user.clear(await titleInput());
     await user.click(saveAll());
     await waitFor(() =>
       expect(
@@ -476,7 +476,9 @@ describe('Save All results', () => {
         'Save failed: 1 of 2 documents'
       )
     );
-    const trigger = screen.getByRole('button', { name: 'Save results' });
+    const trigger = await screen.findByRole('button', {
+      name: 'Save results',
+    });
     act(() => trigger.focus());
     await user.keyboard('{Enter}');
     const dialog = await screen.findByRole('dialog', { name: 'Save results' });
@@ -908,7 +910,7 @@ describe('One save at a time', () => {
     expect(saveAll()).toBeDisabled();
     await release(POST);
     await waitFor(() => expect(writes).toHaveLength(1));
-    await user.type(screen.getByLabelText(/^Slug\b/), '!');
+    await user.type(await screen.findByLabelText(/^Slug\b/), '!');
     await waitFor(() => expect(saveAll()).toBeEnabled());
   });
 
@@ -1042,7 +1044,7 @@ describe('Save All and the branch switcher', () => {
     );
     expect(branch()).toBeEnabled();
     held.clear();
-    await user.type(screen.getByLabelText(/^Slug\b/), '!');
+    await user.type(await screen.findByLabelText(/^Slug\b/), '!');
     await user.click(screen.getByRole('button', { name: /^Save$/ }));
     await waitFor(() => expect(held.has(POST)).toBe(true));
     expect(within(statusBar()).getByText('Saving…')).toBeVisible();
@@ -1188,7 +1190,7 @@ describe('Status bar after a run', () => {
     await waitFor(() =>
       expect(within(statusBar()).getByText('Saved 2 documents')).toBeVisible()
     );
-    await user.type(screen.getByLabelText(/^Slug\b/), '!');
+    await user.type(await screen.findByLabelText(/^Slug\b/), '!');
     await user.click(screen.getByRole('button', { name: /^Save$/ }));
     await waitFor(() =>
       expect(within(statusBar()).getByText('Saved: “second.mdx”')).toBeVisible()
@@ -1230,7 +1232,7 @@ describe('Status bar after a run', () => {
     await waitFor(() =>
       expect(screen.getByLabelText(/^Slug\b/)).toHaveValue('second')
     );
-    await user.clear(screen.getByLabelText(/^Title\b/, { selector: 'input' }));
+    await user.clear(await titleInput());
     await user.click(saveAll());
     await waitFor(() =>
       expect(
