@@ -14,6 +14,7 @@ export const postCollection = {
   name: 'post',
   label: 'Posts',
   path: 'content/posts',
+  description: 'Posts for the playground blog.',
   format: 'mdx',
   fields: [
     t.string({
@@ -43,6 +44,7 @@ export const pageCollection = {
   name: 'page',
   label: 'Pages',
   path: 'content/pages',
+  description: 'Landing pages with visual and plain blocks.',
   format: 'mdx',
   fields: [
     t.string({ name: 'title', label: 'Title' }),

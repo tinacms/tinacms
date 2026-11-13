@@ -6,6 +6,7 @@
         "name": "post",
         "label": "Posts",
         "path": "content/posts",
+        "description": "Posts for the playground blog.",
         "format": "mdx",
         "fields": [
           {
@@ -52,6 +53,7 @@
         "name": "page",
         "label": "Pages",
         "path": "content/pages",
+        "description": "Landing pages with visual and plain blocks.",
         "format": "mdx",
         "fields": [
           {
