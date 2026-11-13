@@ -1,7 +1,7 @@
 # ADR-011: Reference Fields — Select-Only in v4, Inline Edit Deferred to v4.1
 
 ## Status
-**Accepted** — builds on [ADR-009](./009-field-plugins.md) (field plugins) and [ADR-010](./010-form-state-model.md) (per-`formId` form scope). Depends on the `content` capability.
+**Accepted**, §2 clarified by [ADR-030](./030-save-scope.md) (the Save button scope) — builds on [ADR-009](./009-field-plugins.md) (field plugins) and [ADR-010](./010-form-state-model.md) (per-`formId` form scope). Depends on the `content` capability.
 
 ## Context
 A **reference field** points one document at another (a post → its author, a page → a shared CTA). It is the **only** field that crosses a document boundary, which is what makes it hard: editing the *referenced* document inline would require a second **Form** lifecycle, a cross-document save policy, and handling **reference cycles** (A → B → A → … nesting forever). The open question was whether v4 supports inline editing of the target or only selects/links it.
