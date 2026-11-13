@@ -121,8 +121,7 @@ export interface ServerSegment {
    */
   resolveBranch?: (branch: string | undefined) => Promise<string | undefined>;
   /**
-   * On a `search` provider built with `defineSearchPlugin`: the index writes
-   * core calls in-process. Reserved: it is never routed as an op.
+   * On a `search` provider: the index writes core calls in-process. Reserved: it is never routed as an op.
    */
   searchIndex?: SearchIndexProvider;
 }
@@ -202,7 +201,7 @@ export interface PluginManifestInput {
   serverHooks?: string[];
   /** Set by a plugin that provides `media`. */
   media?: MediaManifest;
-  /** Set by `defineSearchPlugin`, so codegen checks the fields without loading plugin code. */
+  /** Set by a plugin that provides `search`, so codegen checks the fields without loading plugin code. */
   search?: SearchManifest;
   client?: () => Promise<{ default: ClientSegment }>;
   server?: () => Promise<{ default: ServerSegment }>;

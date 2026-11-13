@@ -257,8 +257,7 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     return (await freshTokens(tokens))?.bearer;
   };
 
-  // For search: another plugin's auth, or a signed-out editor, sends no token
-  // and the server refuses the query, instead of the invariant content and media throw.
+  // Search sends no token, instead of throwing, when another plugin owns `auth`.
   const tinaCloudTokenIfMounted = async (): Promise<string | undefined> =>
     mounted ? tinaCloudToken() : undefined;
 

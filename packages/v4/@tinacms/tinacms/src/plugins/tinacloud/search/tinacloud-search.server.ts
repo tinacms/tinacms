@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { SearchError, type SearchHit } from '../../../core/search/contract';
-import type {
-  SearchFields,
-  SearchIndexProvider,
-} from '../../../core/search/index-contract';
+import type { SearchIndexProvider } from '../../../core/search/index-contract';
 import { requestContext } from '../../../server/request-context';
 import { currentServerRuntime } from '../../../server/runtime-access';
 import { bearerTokenOf } from '../auth/tinacloud-auth.server';
@@ -16,6 +13,7 @@ import {
   projectSchema,
 } from '../client';
 import { TINACLOUD_PLUGIN_NAME } from '../name';
+import type { TinaCloudSearchOptions } from '../tinacloud.plugin';
 
 const CALL_TIMEOUT_MS = 10_000;
 
@@ -46,7 +44,7 @@ const searchUrl = (
 };
 
 // The detail never carries TinaCloud's response body or the token.
-const searchErrorOf = (cause: unknown): SearchError => {
+const searchErrorOf = (cause: unknown, publicToken: boolean): SearchError => {
   if (cause instanceof SearchError) return cause;
   if (cause instanceof TinaCloudError) {
     if (cause.status === undefined) {
@@ -55,7 +53,9 @@ const searchErrorOf = (cause: unknown): SearchError => {
     if (cause.status === 401 || cause.status === 403) {
       return new SearchError(
         'unavailable',
-        'TinaCloud refused the token. Sign in again.'
+        publicToken
+          ? 'TinaCloud refused the Public Search token. Check TINA_PUBLIC_SEARCH_TOKEN.'
+          : 'TinaCloud refused the token. Sign in again.'
       );
     }
     if (UNAVAILABLE_STATUSES.has(cause.status)) {
@@ -78,11 +78,31 @@ const searchErrorOf = (cause: unknown): SearchError => {
 
 const trimTrailingSlashes = (path: string): string => path.replace(/\/+$/, '');
 
+// The editor path: only tinaCloud()'s own sign-in, and only the caller's own token.
+const callerToken = (): string => {
+  const context = requestContext();
+  if (context.authProvider !== TINACLOUD_PLUGIN_NAME) {
+    throw new SearchError(
+      'unavailable',
+      'TinaCloud search needs tinaCloud() as the auth provider.'
+    );
+  }
+  const token = bearerTokenOf(context.request);
+  if (!token) {
+    throw new SearchError(
+      'unavailable',
+      'TinaCloud search needs a signed-in editor or a Public Search token.'
+    );
+  }
+  return token;
+};
+
 // Never mount this module in the browser: it reads the request's bearer token.
 export const createTinaCloudSearchProvider = (
   { clientId }: TinaCloudOptions,
-  fields: SearchFields
+  { fields, publicToken, branch: configuredBranch }: TinaCloudSearchOptions
 ): SearchIndexProvider => ({
+  indexesItself: true,
   query: async ({ query, collections, filters, limit, cursor }) => {
     const { collections: schemaCollections } = currentServerRuntime();
     if (schemaCollections.length === 0) {
@@ -91,20 +111,8 @@ export const createTinaCloudSearchProvider = (
         'The RPC handler has no schema. Pass the config schema to the handler.'
       );
     }
-    const context = requestContext();
-    if (context.authProvider !== TINACLOUD_PLUGIN_NAME) {
-      throw new SearchError(
-        'unavailable',
-        'TinaCloud search needs tinaCloud() as the auth provider.'
-      );
-    }
-    const token = bearerTokenOf(context.request);
-    if (!token) {
-      throw new SearchError(
-        'unavailable',
-        'TinaCloud search needs a signed-in editor.'
-      );
-    }
+    // With a Public Search token, it is the only credential sent, for every caller.
+    const token = publicToken || callerToken();
     if (collections !== undefined && collections.length > 1) {
       throw new SearchError(
         'unsupported',
@@ -118,12 +126,17 @@ export const createTinaCloudSearchProvider = (
       );
     }
 
-    const client = createTinaCloudClient({ clientId, getToken: () => token });
+    const isPublic = Boolean(publicToken);
+    const client = createTinaCloudClient({
+      clientId,
+      getToken: () => token,
+      credential: isPublic ? 'api-key' : 'bearer',
+    });
     const call = (url: string) =>
       client.authedFetch(url, { signal: AbortSignal.timeout(CALL_TIMEOUT_MS) });
 
-    let body: unknown;
-    try {
+    const branchOf = async (): Promise<string> => {
+      if (configuredBranch) return configuredBranch;
       const project = projectSchema.safeParse(
         await call(`${TINACLOUD_IDENTITY_URL}/v2/apps/${clientId}`)
       );
@@ -139,15 +152,20 @@ export const createTinaCloudSearchProvider = (
           'The TinaCloud project has no default branch.'
         );
       }
+      return project.data.defaultBranch;
+    };
+
+    let body: unknown;
+    try {
       body = await call(
-        searchUrl(clientId, project.data.defaultBranch, {
+        searchUrl(clientId, await branchOf(), {
           query,
           limit: cursor === undefined ? limit : SCAN_WINDOW,
           collection: collections?.[0],
         })
       );
     } catch (cause) {
-      throw searchErrorOf(cause);
+      throw searchErrorOf(cause, isPublic);
     }
     const response = searchResponseSchema.safeParse(body);
     if (!response.success) {

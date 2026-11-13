@@ -69,7 +69,9 @@ Check the `code`, never the message.
 
 A website is the main user of search. `createSearchClient`
 (`@tinacms/tinacms/client`) gives the same `search` call over Capability RPC. It
-needs no session, so an anonymous visitor can search the published content.
+needs no session, so a visitor can search the published content when the
+provider allows anonymous queries. TinaCloud does so only with a
+`publicToken` (see [TinaCloud](#tinacloud)).
 
 ```ts
 import { createSearchClient } from '@tinacms/tinacms/client';
@@ -131,6 +133,7 @@ Its default export is a `SearchIndexProvider`:
 | `query({ query, collections?, filters?, limit, cursor? })` | Returns the hits. |
 | `upsert(records)` | Adds or replaces these documents. |
 | `replace(records)` | Makes the index exactly these documents. |
+| `indexesItself` | Optional. `true` when the service builds its own index, as TinaCloud does. `tinacms search reindex` then writes nothing. |
 
 Only core calls `upsert` and `replace`, in the same process. No HTTP route
 reaches them. Import the types from `@tinacms/tinacms/server` with `import type`
@@ -311,6 +314,9 @@ collection, then the total.
   gives different paths, and one document gets two index entries.
 - It runs `onInit` of every plugin before the reindex, and `onDestroy` after. A
   plugin whose `onInit` needs a browser fails the command.
+- A provider with `indexesItself: true` gets the message `This search provider
+  indexes itself; nothing to reindex.` and exit 0. The command reads no file
+  and calls no `replace`.
 - It exits 1, and never calls `replace`, when no plugin provides `search`, the
   plugin has no index provider, a document does not parse, a searchable
   collection has no `path`, or no collection has a document.
@@ -319,7 +325,7 @@ collection, then the total.
   searchable collection, which belongs to another collection, is not indexed
   as part of the parent.
 - It accepts `--root`, `--config` and `--help`. Any other flag, including
-  `--check`, exits 1: reindex always writes the index. An argument after
+  `--check`, exits 1. An argument after
   `reindex`, such as `tinacms search reindex extra`, exits 1 with
   `Unexpected argument "extra".`
 
@@ -333,21 +339,22 @@ plugin, the dialog still finds screens.
 
 ## TinaCloud
 
-Two limits come first:
-
-- TinaCloud does not index v4 projects yet. A v4 project's TinaCloud index
-  stays empty until TinaCloud indexes v4 content.
-- There is no anonymous search. TinaCloud search needs the token of a signed-in
-  editor. A website visitor has no token, so the search fails with
-  `unavailable`.
+TinaCloud does not index v4 projects yet. A v4 project's TinaCloud index stays
+empty until TinaCloud indexes v4 content.
 
 `tinaCloud()` provides `search` when you pass the `search` option. Without the
 option, `tinaCloud()` provides no search and a search box does not show.
 
 ```ts
+const publicToken: string | undefined = import.meta.env.TINA_PUBLIC_SEARCH_TOKEN;
+
 tinaCloud({
   clientId,
-  search: { fields: { post: { title: 1, body: 1 } } },
+  search: {
+    fields: { post: { title: 1, body: 1 } },
+    publicToken,
+    branch: 'main',
+  },
 });
 ```
 
@@ -356,10 +363,32 @@ the same way. The keys decide which collections a request can name and which
 hits the provider keeps. List every collection that TinaCloud indexes. A hit
 for a collection that is not in `fields` is dropped. The weights are unused.
 
-- The provider reads TinaCloud's index of the default branch only.
+### Who can search
+
+- With `publicToken`, website visitors can search. The Public Search token has
+  only `search:read` access, and it reads only the published index, so it is
+  safe in the browser bundle. TinaCloud generates it for each project. Read it
+  into a `const` annotated `string | undefined`, as above, so the type checks
+  that `branch` is set too. Refer to
+  [ADR-030](../../../../../adr/v4/030-tinacloud-public-search-token.md).
+- With `publicToken` set, the server sends only that token to TinaCloud, for
+  every caller. Editors search with it too.
+- Without `publicToken`, only signed-in editors can search. A visitor gets
+  `unavailable`.
+- `publicToken` needs `branch`. `tinaCloud()` fails when it is called if you set
+  `publicToken` and no `branch`.
+- Never put the read-only content token (`TINA_TOKEN`, access `db:read`) in
+  `publicToken`. It reads drafts, and the bundle would ship it to every
+  visitor.
+
+### Behaviour
+
+- Results cover one branch: the `branch` option, else the default branch of the
+  project. A `branch` with no TinaCloud index gives `backend-failure`.
 - TinaCloud indexes itself. `tinaCloud()` registers no `searchIndex` hook, and
   a collection that lists `searchIndex()` fails codegen.
-- `tinacms search reindex` writes nothing for TinaCloud.
+- `tinacms search reindex` says that TinaCloud indexes itself and writes
+  nothing.
 - Every `snippet` is empty. TinaCloud returns no snippet.
 - A request for two or more collections, or with `filters`, fails with
   `unsupported`. One collection, or all collections, works.
@@ -369,8 +398,8 @@ for a collection that is not in `fields` is dropped. The weights are unused.
 - The first page can hold fewer than `limit` hits when TinaCloud returns hits
   that the provider drops. Paging with the cursor of the last hit still
   reaches the end.
-- Another plugin that overrides `auth` gets no search: the provider never
-  sends another provider's token to TinaCloud.
+- Without `publicToken`, another plugin that overrides `auth` gets no search:
+  the provider never sends another provider's token to TinaCloud.
 - The RPC handler needs the `schema`, or the search fails with
   `backend-failure`.
 - To use another search plugin, give it `overrides: [{ capability: 'search' }]`.

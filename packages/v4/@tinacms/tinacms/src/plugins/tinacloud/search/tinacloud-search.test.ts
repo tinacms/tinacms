@@ -30,6 +30,19 @@ const collections: CollectionSchema[] = [
 const plugin = () =>
   tinaCloud({ clientId: 'abc', search: { fields: { post: { title: 1 } } } });
 
+const publicPlugin = () =>
+  tinaCloud({
+    clientId: 'abc',
+    search: {
+      fields: { post: { title: 1 } },
+      publicToken: 'pub-token',
+      branch: 'main',
+    },
+  });
+
+const headerOf = (init: RequestInit | undefined, name: string) =>
+  new Headers(init?.headers).get(name);
+
 const ids = (...names: string[]) => ({
   results: names.map((_id) => ({ _id })),
 });
@@ -447,7 +460,10 @@ describe('tinaCloud() search: index writes (AC16)', () => {
     const { createTinaCloudSearchProvider } = await import(
       './tinacloud-search.server'
     );
-    const provider = createTinaCloudSearchProvider({ clientId: 'abc' }, {});
+    const provider = createTinaCloudSearchProvider(
+      { clientId: 'abc' },
+      { fields: {} }
+    );
     await provider.upsert([]);
     await provider.replace([]);
     expect(searchCalls(fetchMock)).toHaveLength(0);
@@ -508,5 +524,201 @@ describe('createSearchClient token (AC14, AC15)', () => {
       code: 'unavailable',
     });
     expect(bearerOf(fetchMock.mock.calls[0][1])).toBeNull();
+  });
+});
+
+describe('tinaCloud() search: Public Search token (AC10, AC13, AC19)', () => {
+  it('searches anonymously with X-API-KEY, no lookup and no Authorization', async () => {
+    const fetchMock = stubTinaCloud({ search: ids('post:a.mdx') });
+    const response = await query(
+      handlerFor([publicPlugin()]),
+      { limit: 5 },
+      null
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toHaveLength(1);
+    expect(projectCalls(fetchMock)).toHaveLength(0);
+    expect(searchCalls(fetchMock)).toHaveLength(1);
+    expect(searchUrlOf(fetchMock).pathname).toBe('/v2/searchIndex/abc/main');
+    const [, init] = searchCalls(fetchMock)[0];
+    expect(headerOf(init, 'x-api-key')).toBe('pub-token');
+    expect(headerOf(init, 'authorization')).toBeNull();
+  });
+
+  it('sends the same request for a signed-in editor and never the bearer string', async () => {
+    const fetchMock = stubTinaCloud({ search: ids('post:a.mdx') });
+    await query(handlerFor([publicPlugin()]), { limit: 5 }, 'editor-jwt');
+    for (const [url, init] of fetchMock.mock.calls) {
+      expect(url).not.toContain('editor-jwt');
+      expect(JSON.stringify([...new Headers(init?.headers)])).not.toContain(
+        'editor-jwt'
+      );
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(headerOf(searchCalls(fetchMock)[0][1], 'x-api-key')).toBe(
+      'pub-token'
+    );
+  });
+
+  it.each([
+    ['left out', undefined],
+    ['undefined', { publicToken: undefined, branch: 'main' }],
+    ['empty', { publicToken: '', branch: 'main' }],
+  ])(
+    'answers 503 and sends nothing when publicToken is %s',
+    async (_name, extra) => {
+      const fetchMock = stubTinaCloud();
+      const manifest = tinaCloud({
+        clientId: 'abc',
+        search: { fields: { post: { title: 1 } }, ...extra },
+      });
+      const response = await query(handlerFor([manifest]), { limit: 5 }, null);
+      expect(response.status).toBe(503);
+      expect(fetchMock).not.toHaveBeenCalled();
+    }
+  );
+
+  it("uses the public token, not another auth plugin's bearer (AC19)", async () => {
+    const fetchMock = stubTinaCloud({ search: ids('post:a.mdx') });
+    const otherAuth = definePlugin({
+      name: 'test:auth',
+      provides: ['auth'],
+      overrides: [{ capability: 'auth' }],
+      server: async () => ({
+        default: {
+          getSession: async () => ({
+            identity: { id: toUserId('x') },
+            roles: ['editor'],
+          }),
+        },
+      }),
+    });
+    const response = await query(
+      handlerFor([publicPlugin(), otherAuth]),
+      { limit: 5 },
+      'foreign-token'
+    );
+    expect(response.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).not.toContain('foreign-token');
+    expect(headerOf(init, 'x-api-key')).toBe('pub-token');
+    expect(headerOf(init, 'authorization')).toBeNull();
+  });
+
+  it('never falls back to the caller token after a refusal (AC12)', async () => {
+    const fetchMock = stubTinaCloud({
+      search: () => new Response('no', { status: 403 }),
+    });
+    const response = await query(
+      handlerFor([publicPlugin()]),
+      { limit: 5 },
+      'editor-jwt'
+    );
+    const text = await response.text();
+    expect(response.status).toBe(503);
+    expect(text).not.toContain('pub-token');
+    expect(text).not.toContain('editor-jwt');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  const secret = 'SECRET-BODY-TEXT';
+  const status = (code: number) => () => new Response(secret, { status: code });
+
+  it.each([
+    ['502', status(502), 503, 'unavailable'],
+    ['503', status(503), 503, 'unavailable'],
+    ['504', status(504), 503, 'unavailable'],
+    ['401', status(401), 503, 'unavailable'],
+    ['403', status(403), 503, 'unavailable'],
+    ['400', status(400), 502, 'backend-failure'],
+    ['500', status(500), 502, 'backend-failure'],
+    ['unknown body', () => Response.json({ other: 1 }), 502, 'backend-failure'],
+    [
+      'network failure',
+      () => {
+        throw new TypeError('fetch failed');
+      },
+      503,
+      'unavailable',
+    ],
+    [
+      'abort',
+      () => {
+        throw new DOMException('aborted', 'TimeoutError');
+      },
+      503,
+      'unavailable',
+    ],
+  ])(
+    'search call: %s (AC11, AC21)',
+    async (_name, search, httpStatus, code) => {
+      const timeout = vi.spyOn(AbortSignal, 'timeout');
+      const fetchMock = stubTinaCloud({ search });
+      const response = await query(
+        handlerFor([publicPlugin()]),
+        { limit: 5 },
+        null
+      );
+      expect(response.status).toBe(httpStatus);
+      const text = await response.text();
+      expect(JSON.parse(text).error.code).toBe(code);
+      expect(text).not.toContain(secret);
+      expect(text).not.toContain('pub-token');
+      expect(timeout).toHaveBeenCalledWith(10_000);
+      expect(searchCalls(fetchMock)[0][1]?.signal).toBeInstanceOf(AbortSignal);
+    }
+  );
+});
+
+describe('tinaCloud() search: option shape and branch (AC23)', () => {
+  it('requires branch next to publicToken in the types', () => {
+    const env: string | undefined = undefined as string | undefined;
+    tinaCloud({
+      clientId: 'abc',
+      // @ts-expect-error `publicToken` needs `branch`
+      search: { fields: {}, publicToken: env },
+    });
+    tinaCloud({
+      clientId: 'abc',
+      search: { fields: {}, publicToken: env, branch: 'main' },
+    });
+    tinaCloud({
+      clientId: 'abc',
+      search: { fields: {}, publicToken: undefined, branch: 'main' },
+    });
+  });
+
+  it.each([undefined, ''])(
+    'throws when an untyped publicToken has branch %j, before any request',
+    (branch) => {
+      const fetchMock = stubTinaCloud();
+      const untyped: Record<string, unknown> = {
+        fields: {},
+        publicToken: 'pub-token',
+        branch,
+      };
+      expect(() =>
+        tinaCloud({
+          clientId: 'abc',
+          search: untyped as unknown as Parameters<
+            typeof tinaCloud
+          >[0]['search'],
+        })
+      ).toThrow(/tinacloud-search-branch-required/);
+      expect(fetchMock).not.toHaveBeenCalled();
+    }
+  );
+
+  it('searches the configured branch with the editor bearer and no lookup', async () => {
+    const fetchMock = stubTinaCloud({ search: ids('post:a.mdx') });
+    const manifest = tinaCloud({
+      clientId: 'abc',
+      search: { fields: { post: { title: 1 } }, branch: 'release' },
+    });
+    await query(handlerFor([manifest]), { limit: 5 });
+    expect(projectCalls(fetchMock)).toHaveLength(0);
+    expect(searchUrlOf(fetchMock).pathname).toBe('/v2/searchIndex/abc/release');
+    expect(bearerOf(searchCalls(fetchMock)[0][1])).toBe('Bearer editor-jwt');
   });
 });

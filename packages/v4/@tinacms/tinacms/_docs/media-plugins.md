@@ -183,9 +183,9 @@ through a symbolic link. It rejects a file name that holds a path separator.
 
 `tinaCloud()` keeps media and content in TinaCloud. It provides `media`,
 `auth` and `content`, and optionally `search`, with one slice each in
-`slices.media`, `slices.auth` and `slices.content`. Refer to
-[search-plugins.md](./search-plugins.md#tinacloud) for `search`. Refer to [auth-plugins.md](./auth-plugins.md#tinacloud) for
-the sign-in flow.
+`slices.media`, `slices.auth`, `slices.content` and `slices.search`. Refer to
+[search-plugins.md](./search-plugins.md#tinacloud) for `search`. Refer to
+[auth-plugins.md](./auth-plugins.md#tinacloud) for the sign-in flow.
 
 `tinaCloud()` provides `content`, so it cannot sit next to
 `localContentPlugin()`. Swap all of it for the local plugins in local

@@ -85,5 +85,3 @@ export const searchSliceOf =
       rpcUrl: sliceConfig?.rpcUrl ?? DEFAULT_RPC_URL,
       getToken,
     });
-
-export const createSearchSlice: ClientSlice = searchSliceOf();
