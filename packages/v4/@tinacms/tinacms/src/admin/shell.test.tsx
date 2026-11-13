@@ -546,7 +546,10 @@ describe('side nav entries', () => {
     await user.click(row);
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
+      within(screen.getByRole('navigation', { name: 'Location' })).getByRole(
+        'button',
+        { name: 'Posts' }
+      )
     );
     const back = await screen.findByRole('button', { name: /hello\.mdx/ });
     expect(back).toHaveTextContent('Unsaved');
@@ -984,21 +987,28 @@ describe('read-error and screen views', () => {
 });
 
 describe('document form panel', () => {
-  it('has Back and a menu in its header, no Close and no second title, then tabs and a form bar', async () => {
+  it('has a title-led head with a Location trail and a Form actions menu, no tabs, then a form bar', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     renderAdmin();
     await screen.findByLabelText(/^Title\b/);
     const panel = screen.getByRole('complementary', { name: 'Document form' });
+    const trail = within(panel).getByRole('navigation', { name: 'Location' });
     expect(
-      within(panel).getByRole('button', { name: 'Return to navigator' })
+      within(trail)
+        .getAllByRole('button')
+        .map((step) => step.textContent)
+    ).toEqual(['Collections', 'Posts']);
+    expect(
+      within(panel).getByRole('heading', { level: 2, name: 'Hello' })
     ).toBeVisible();
     expect(
-      within(panel).getByRole('button', { name: 'Document menu' })
+      within(panel).getByRole('button', { name: 'Form actions' })
     ).toBeVisible();
     expect(within(panel).queryByRole('button', { name: 'Close' })).toBeNull();
-    expect(within(panel).queryByRole('heading')).toBeNull();
-    expect(within(panel).getByRole('tab', { name: 'Fields' })).toBeVisible();
-    expect(within(panel).queryByRole('tab', { name: 'History' })).toBeNull();
+    expect(
+      within(panel).queryByRole('button', { name: 'Return to navigator' })
+    ).toBeNull();
+    expect(within(panel).queryByRole('tab')).toBeNull();
     expect(
       within(panel).getByRole('button', { name: 'Document actions' })
     ).toBeVisible();
@@ -1020,15 +1030,17 @@ describe('document form panel', () => {
 });
 
 describe('panel headers', () => {
-  it('gives the form column Back to its collection, and the missing views a title and Close', async () => {
+  it('gives the form column a Location step back to its collection, and the missing views a title and Close', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     const user = userEvent.setup();
     const view = renderAdmin();
     await screen.findByLabelText(/^Title\b/);
     await user.click(
       within(
-        screen.getByRole('complementary', { name: 'Document form' })
-      ).getByRole('button', { name: 'Return to navigator' })
+        within(
+          screen.getByRole('complementary', { name: 'Document form' })
+        ).getByRole('navigation', { name: 'Location' })
+      ).getByRole('button', { name: 'Posts' })
     );
     await waitFor(() =>
       expect(window.location.hash).toBe('#/collections/post')

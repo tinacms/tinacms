@@ -18,7 +18,7 @@ const isDocument = (value: unknown): value is TinaDocument =>
 // core from naming a field type. `collections` narrows the candidates, and the
 // one whose `path` contains that document owns it, because `content.get` needs
 // a collection name and not a path.
-const targetOf = (
+export const targetOf = (
   node: FieldSchema,
   value: unknown,
   collections: CollectionSchema[]

@@ -11,7 +11,10 @@ async function addBlocks(page: Page) {
       .getByRole('dialog', { name: 'Choose a block' })
       .getByRole('button', { name: /^Add Template number 1 / })
       .click();
-    await page.getByRole('button', { name: 'Up to Plain blocks' }).click();
+    await page
+      .getByRole('navigation', { name: 'Location' })
+      .getByRole('button', { name: 'Plain blocks' })
+      .click();
   }
 }
 
@@ -42,7 +45,10 @@ for (const viewport of viewports) {
     for (const index of [0, Math.floor(BLOCKS / 2), BLOCKS - 1]) {
       await cards.nth(index).scrollIntoViewIfNeeded();
       await cards.nth(index).click();
-      await page.getByRole('button', { name: 'Up to Plain blocks' }).click();
+      await page
+        .getByRole('navigation', { name: 'Location' })
+        .getByRole('button', { name: 'Plain blocks' })
+        .click();
       const grip = page.getByRole('button', {
         name: `Move Item ${index + 1}`,
         exact: true,

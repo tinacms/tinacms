@@ -5,6 +5,7 @@ import {
   useActiveField,
   useDocumentPath,
   useFieldActivation,
+  useFieldActive,
   useFieldAddress,
   useFieldFrame,
   useFieldSchema,
@@ -21,6 +22,7 @@ export function RichTextField() {
   const field = useFieldSchema<RichTextFieldSchema>();
   const [value, setValue] = useFieldValue<RichTextValue>(address);
   const frame = useFieldFrame();
+  const active = useFieldActive();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { setActive } = useActiveField();
@@ -59,6 +61,7 @@ export function RichTextField() {
     <div ref={containerRef} className='min-w-0'>
       <RichTextFieldView
         {...frame}
+        active={active}
         key={seedKey}
         id={address}
         value={value ?? EMPTY_RICH_TEXT}

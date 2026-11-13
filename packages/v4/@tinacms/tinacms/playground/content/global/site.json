@@ -1,0 +1,7 @@
+{
+  "siteName": "Playground Blog",
+  "nav": [
+    { "label": "Blog", "href": "/declared.html?view=blog" },
+    { "label": "Hello World", "href": "/declared.html?post=content/posts/hello-world.mdx" }
+  ]
+}

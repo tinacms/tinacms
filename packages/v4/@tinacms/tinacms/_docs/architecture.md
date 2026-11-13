@@ -146,3 +146,43 @@ React-hook-form renders the field values. The form-state store
 (`form/form-store.ts`) holds the status of the form: clean, dirty, or pristine.
 The read-only hooks `useFormStatus`, `useIsFormDirty`, and `useIsFieldDirty`
 give the status.
+
+## Visual editing
+
+The preview page and the admin talk through `postMessage`. The page side is
+`useTina` and `tinaField` from `@tinacms/tinacms/adapters/react`. The admin side
+is `usePreviewConnection`. The protocol is in `src/preview/protocol.ts`. Every
+field a message adds is optional, so an old page works with a new admin and the
+other way round.
+
+`useTina({ data, document?, shared?, allowedOrigin? })` returns
+`{ data, isEditing, tinaField }`. Pass `document` to say which document `data`
+comes from. Pass `shared: true` for a document that many pages draw, such as the
+site nav. The `tinaField` that the hook returns knows its `document`, so each
+mark it makes carries `data-tina-field` and `data-tina-document`. The standalone
+`tinaField(address, document?)` takes the document as a second argument.
+
+A document is named by its path, as the admin route and a reference field hold
+it. The path is relative to the repository and has the collection folder and
+the file extension: `content/posts/hello-world.mdx`. The site passes this
+string. The playground builds it from the page URL.
+
+The messages are:
+
+- `tina:ready` and `tina:documents` (page to admin). They list the documents
+  that the page declares, and the page `url`. `tina:documents` is sent again
+  when the declared set or the URL changes.
+- `tina:activate` (page to admin). The editor clicked a marked element. It
+  carries the address and, if the mark has one, the `document`.
+- `tina:values` (admin to page). It carries the values of one document. The
+  optional `document` says which. The hook takes only the values for its own
+  document.
+- `tina:outline` (admin to page). It carries the field that the editor hovers
+  or has active in the form. The page draws the outline, so the form and the
+  page show the same field.
+
+The admin follows the page. When the editor follows a link to a page that
+declares another post, the admin opens that post. A page that declares only
+shared documents counts as drawing no document. The admin shows "Nothing to
+edit on this page", and the page body gets no live edits until it declares a
+document of its own.

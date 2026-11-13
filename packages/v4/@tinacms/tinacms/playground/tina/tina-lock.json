@@ -30,6 +30,77 @@
             "type": "boolean"
           },
           {
+            "type": "reference",
+            "name": "author",
+            "label": "Author",
+            "collections": [
+              "author"
+            ]
+          },
+          {
+            "name": "seo",
+            "label": "SEO",
+            "fields": [
+              {
+                "name": "title",
+                "label": "SEO title",
+                "type": "string"
+              },
+              {
+                "name": "description",
+                "label": "SEO description",
+                "type": "string"
+              },
+              {
+                "name": "social",
+                "label": "Social",
+                "fields": [
+                  {
+                    "name": "handle",
+                    "label": "Handle",
+                    "type": "string"
+                  }
+                ],
+                "type": "object"
+              }
+            ],
+            "type": "object"
+          },
+          {
+            "name": "blocks",
+            "label": "Blocks",
+            "templates": [
+              {
+                "name": "hero",
+                "label": "Hero",
+                "fields": [
+                  {
+                    "name": "headline",
+                    "label": "Headline",
+                    "type": "string"
+                  },
+                  {
+                    "name": "tagline",
+                    "label": "Tagline",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "quote",
+                "label": "Quote",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              }
+            ],
+            "type": "array"
+          },
+          {
             "name": "body",
             "label": "Body",
             "isBody": true,
@@ -310,6 +381,59 @@
             "type": "image"
           }
         ]
+      },
+      {
+        "name": "author",
+        "label": "Authors",
+        "path": "content/authors",
+        "format": "md",
+        "fields": [
+          {
+            "name": "name",
+            "label": "Name",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "bio",
+            "label": "Bio",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "global",
+        "label": "Global",
+        "path": "content/global",
+        "format": "json",
+        "fields": [
+          {
+            "name": "siteName",
+            "label": "Site name",
+            "type": "string"
+          },
+          {
+            "name": "nav",
+            "label": "Navigation",
+            "fields": [
+              {
+                "name": "label",
+                "label": "Label",
+                "type": "string"
+              },
+              {
+                "name": "href",
+                "label": "Link",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          }
+        ]
       }
     ],
     "version": {
@@ -323,6 +447,8 @@
     "array": 1,
     "boolean": 1,
     "image": 1,
+    "object": 1,
+    "reference": 1,
     "rich-text": 1,
     "string": 1
   }

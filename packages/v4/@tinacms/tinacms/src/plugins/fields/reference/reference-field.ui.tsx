@@ -8,6 +8,7 @@ import {
   useCurrentBranch,
   useContentSlice,
   useFieldActivation,
+  useFieldActive,
   useFieldAddress,
   useFieldFrame,
   useFieldSchema,
@@ -117,12 +118,15 @@ export function ReferenceField() {
     warnings: missing ? ['This document no longer exists.'] : [],
   });
 
+  const active = useFieldActive();
+
   let placeholder = 'Search documents…';
   if (isLoading) placeholder = 'Loading documents…';
   else if (error) placeholder = 'Could not load documents';
 
   const props: ReferenceFieldViewProps = {
     ...frame,
+    active,
     errors: error ? [...frame.errors, error.message] : frame.errors,
     id: address,
     documents,

@@ -8,6 +8,9 @@ import { Label } from '@tinacms/ui/components/label';
 import { cn } from '@tinacms/ui/lib/utils';
 import type { Ref } from 'react';
 
+const ACTIVE_LOOK =
+  'data-active:border-ring data-active:shadow-focus-field data-active:data-checked:border-ring aria-invalid:data-active:border-destructive aria-invalid:data-active:data-checked:border-destructive data-disabled:data-active:border-border data-disabled:data-active:data-checked:border-border data-disabled:data-active:shadow-none data-readonly:data-active:border-border data-readonly:data-active:data-checked:border-border data-readonly:data-active:shadow-none';
+
 export interface BooleanFieldViewProps
   extends Pick<
     FieldWrapperProps,
@@ -18,6 +21,8 @@ export interface BooleanFieldViewProps
   onChange: (checked: boolean) => void;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   ref?: Ref<HTMLButtonElement>;
 }
 
@@ -38,6 +43,7 @@ export function BooleanFieldView({
   onChange,
   disabled,
   readOnly,
+  active,
   ref,
 }: BooleanFieldViewProps) {
   const editable = !disabled && !readOnly;
@@ -53,7 +59,8 @@ export function BooleanFieldView({
           readOnly={readOnly}
           aria-invalid={errors?.length ? true : undefined}
           aria-describedby={help ? helpId : undefined}
-          className='mt-0.5'
+          data-active={active ? '' : undefined}
+          className={cn('mt-0.5', ACTIVE_LOOK)}
           onCheckedChange={(next) => {
             if (editable) onChange(next === true);
           }}

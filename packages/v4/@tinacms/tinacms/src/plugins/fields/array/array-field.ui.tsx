@@ -30,6 +30,7 @@ import {
   useActivation,
   useDocumentPath,
   useFieldAddress,
+  useFieldActive,
   useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
@@ -724,12 +725,14 @@ export function ArrayDrillIn() {
   const address = useFieldAddress();
   const field = asArrayFieldSchema(useFieldSchema());
   const frame = useFieldFrame();
+  const active = useFieldActive();
   const [value] = useFieldValue<unknown>(address);
   const invalidCount = useInvalidFieldCount();
   const openLevel = useOpenLevel();
   return (
     <ArrayDrillInView
       {...frame}
+      active={active}
       name={field.name}
       count={Array.isArray(value) ? value.length : 0}
       invalidCount={invalidCount}

@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import {
   useFieldActivation,
+  useFieldActive,
   useFieldAddress,
   useFieldFrame,
   useFieldSchema,
@@ -14,6 +15,7 @@ export function StringField() {
   const { multiline, mono, placeholder } = useFieldSchema<StringFieldSchema>();
   const [value, setValue] = useFieldValue<string>(address);
   const frame = useFieldFrame();
+  const active = useFieldActive();
   const boxRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
 
   useFieldActivation(() => boxRef.current?.focus());
@@ -21,6 +23,7 @@ export function StringField() {
   return (
     <StringFieldView
       {...frame}
+      active={active}
       ref={(box) => {
         boxRef.current = box;
       }}

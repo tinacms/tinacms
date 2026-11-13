@@ -12,6 +12,7 @@ import arrayFieldPlugin from '../plugins/fields/array/array-field.plugin';
 import objectFieldPlugin from '../plugins/fields/object/object-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
+import { LevelHead } from '../test/level-head';
 import { DocumentForm } from './document-form';
 
 const collection: CollectionSchema = {
@@ -100,6 +101,7 @@ const renderGroups = () =>
           blocks: [{ meta: { deep: { note: 'n' } } }],
         }}
       >
+        <LevelHead />
         <DocumentForm />
       </FormProvider>
     </TinaProvider>
@@ -123,11 +125,21 @@ const renderForm = (extra?: ReactNode) =>
         path='content/pages/home.mdx'
         document={{ title: 'Home', one: { two: { three: { handle: 'hi' } } } }}
       >
+        <LevelHead />
         <DocumentForm />
         {extra}
       </FormProvider>
     </TinaProvider>
   );
+
+const trailStep = (name: string | RegExp) =>
+  within(screen.getByRole('navigation', { name: 'Location' })).getByRole(
+    'button',
+    { name }
+  );
+
+const heading = (name: string) =>
+  screen.getByRole('heading', { level: 2, name });
 
 function Activate({ address, name }: { address: string; name: string }) {
   const { setActive } = useActiveField();
@@ -144,15 +156,16 @@ describe('nested form levels', () => {
     renderForm();
     expect(await screen.findByText('Two')).toBeVisible();
     expect(screen.queryByLabelText(/^Handle\b/)).toBeNull();
-    expect(screen.queryByRole('navigation', { name: 'Field path' })).toBeNull();
+    expect(heading('Home')).toBeVisible();
+    expect(screen.queryByRole('button', { name: /^Up to / })).toBeNull();
 
     await user.click(screen.getByRole('button', { name: 'Open Three' }));
     expect(await screen.findByLabelText(/^Handle\b/)).toHaveValue('hi');
-    expect(
-      screen.getByRole('navigation', { name: 'Field path' })
-    ).toBeInTheDocument();
+    expect(heading('Three')).toBeVisible();
+    expect(screen.queryByRole('navigation', { name: 'Field path' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Up to / })).toBeNull();
 
-    await user.click(screen.getByRole('button', { name: 'Up to Two' }));
+    await user.click(trailStep('Two'));
     expect(
       await screen.findByRole('button', { name: 'Open Three' })
     ).toBeVisible();
@@ -162,14 +175,22 @@ describe('nested form levels', () => {
     const user = userEvent.setup();
     renderForm();
     await user.click(await screen.findByRole('button', { name: 'Open Three' }));
-    const trail = await screen.findByRole('navigation', { name: 'Field path' });
+    const trail = await screen.findByRole('navigation', { name: 'Location' });
+    expect(heading('Three')).toBeVisible();
+    await user.click(
+      within(trail).getByRole('button', { name: 'Show 2 more levels' })
+    );
+    expect(
+      (await screen.findAllByRole('menuitem')).map((item) => item.textContent)
+    ).toEqual(['Pages', 'Home']);
+    await user.keyboard('{Escape}');
     expect(
       within(trail)
-        .getAllByRole('listitem')
-        .map((item) => item.textContent)
-    ).toEqual(['home.mdx', '›One', '›Two', '›Three']);
+        .getAllByRole('button')
+        .map((step) => step.getAttribute('aria-label') ?? step.textContent)
+    ).toEqual(['Collections', 'Show 2 more levels', 'One', 'Two']);
 
-    await user.click(within(trail).getByRole('button', { name: 'One' }));
+    await user.click(trailStep('One'));
     expect(
       await screen.findByRole('button', { name: 'Open Three' })
     ).toBeVisible();
@@ -185,13 +206,14 @@ describe('nested form levels', () => {
 
     await user.tab();
     expect(await screen.findAllByRole('alert')).not.toHaveLength(0);
+    expect(trailStep(/^One.*has errors/)).toBeVisible();
+    expect(trailStep(/^Two.*has errors/)).toBeVisible();
+    await user.click(
+      screen.getByRole('button', { name: 'Show 2 more levels' })
+    );
     expect(
-      screen.getByRole('button', { name: /home\.mdx.*has errors/ })
+      await screen.findByRole('menuitem', { name: /^Home.*has errors/ })
     ).toBeVisible();
-    const trail = screen.getByRole('navigation', { name: 'Field path' });
-    expect(
-      within(trail).getByText('Three').closest('[aria-current]')
-    ).toHaveTextContent(/has errors/);
   });
 
   it('keeps showing the error of an edited field after a save is tried', async () => {
@@ -199,7 +221,7 @@ describe('nested form levels', () => {
     renderForm();
     await user.click(await screen.findByRole('button', { name: 'Open Three' }));
     await user.clear(await screen.findByLabelText(/^Handle\b/));
-    await user.click(await screen.findByRole('button', { name: /Up to Two/ }));
+    await user.click(await screen.findByRole('button', { name: 'Two' }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.tab();
     await user.click(screen.getByRole('button', { name: /^Save/ }));
@@ -214,9 +236,7 @@ describe('nested form levels', () => {
     renderForm();
     await user.click(await screen.findByRole('button', { name: 'Open Three' }));
     await user.type(await screen.findByLabelText(/^Handle\b/), '!');
-    expect(
-      screen.getByRole('navigation', { name: 'Field path' })
-    ).toBeInTheDocument();
+    expect(heading('Three')).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: 'Document actions' }));
     await user.click(
@@ -227,7 +247,7 @@ describe('nested form levels', () => {
         name: 'Discard',
       })
     );
-    expect(screen.queryByRole('navigation', { name: 'Field path' })).toBeNull();
+    expect(heading('Home')).toBeVisible();
     expect(
       await screen.findByRole('button', { name: 'Open Three' })
     ).toBeVisible();
@@ -256,8 +276,7 @@ describe('nested form levels', () => {
     await user.click(await screen.findByRole('button', { name: /^Item 1:/ }));
     await user.click(await screen.findByRole('button', { name: 'Open Deep' }));
     expect(await screen.findByLabelText(/^Note\b/)).toHaveValue('n');
-    const trail = screen.getByRole('navigation', { name: 'Field path' });
-    expect(within(trail).getByText('Deep')).toBeVisible();
+    expect(heading('Deep')).toBeVisible();
   });
 
   it('opens the levels on the way to a field activated from the preview', async () => {
@@ -318,6 +337,7 @@ const renderRows = (extra?: ReactNode) =>
         path='content/pages/rows.mdx'
         document={{ wrap: { rows: [{ label: 'First', note: 'n1' }] } }}
       >
+        <LevelHead />
         <DocumentForm />
         {extra}
       </FormProvider>
@@ -333,8 +353,8 @@ describe('array items as form levels', () => {
     expect(await screen.findByRole('textbox', { name: /^Note\b/ })).toHaveValue(
       'n1'
     );
-    const trail = screen.getByRole('navigation', { name: 'Field path' });
-    expect(within(trail).getByText('First')).toBeVisible();
+    expect(heading('First')).toBeVisible();
+    expect(trailStep('Rows')).toBeVisible();
   });
 
   it('keeps the item level open while a field inside it is focused', async () => {
@@ -345,9 +365,7 @@ describe('array items as form levels', () => {
     await user.click(note);
     await user.type(note, '!');
     expect(screen.getByRole('textbox', { name: /^Note\b/ })).toHaveValue('n1!');
-    expect(
-      screen.getByRole('navigation', { name: 'Field path' })
-    ).toBeVisible();
+    expect(heading('First')).toBeVisible();
   });
 
   it('opens the item level when a field inside it is activated from the preview', async () => {
@@ -364,8 +382,7 @@ describe('array items as form levels', () => {
     const user = userEvent.setup();
     renderRows();
     await user.click(await screen.findByRole('button', { name: /^Item 1:/ }));
-    const trail = await screen.findByRole('navigation', { name: 'Field path' });
-    await user.click(within(trail).getByRole('button', { name: 'Rows' }));
+    await user.click(await screen.findByRole('button', { name: 'Rows' }));
     expect(screen.queryByRole('textbox', { name: /^Note\b/ })).toBeNull();
     expect(
       await screen.findByRole('button', { name: /^Item 1:/ })
@@ -379,9 +396,10 @@ describe('array items as form levels', () => {
     expect(await screen.findByRole('textbox', { name: /^Note\b/ })).toHaveValue(
       ''
     );
+    expect(trailStep('Rows')).toBeVisible();
     expect(
-      screen.getByRole('navigation', { name: 'Field path' })
-    ).toBeVisible();
+      screen.queryByRole('heading', { level: 2, name: 'rows.mdx' })
+    ).toBeNull();
   });
 
   it('focuses the first field of the item level that Duplicate opens', async () => {
@@ -438,6 +456,7 @@ describe('a list at level 3', () => {
           path='content/pages/deep.mdx'
           document={{ one: { two: {} } }}
         >
+          <LevelHead />
           <DocumentForm />
         </FormProvider>
       </TinaProvider>
@@ -448,13 +467,10 @@ describe('a list at level 3', () => {
     expect(
       await screen.findByRole('button', { name: 'Add item' })
     ).toBeVisible();
-    const trail = screen.getByRole('navigation', { name: 'Field path' });
-    expect(within(trail).getByText('links')).toBeVisible();
+    expect(heading('links')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Add item' }));
-    await user.click(
-      await screen.findByRole('button', { name: 'Up to links' })
-    );
-    await user.click(await screen.findByRole('button', { name: /^Up / }));
+    await user.click(await screen.findByRole('button', { name: 'links' }));
+    await user.click(trailStep('Two'));
     expect(
       await screen.findByRole('button', { name: /^Open links/ })
     ).toHaveTextContent('1 item');
@@ -501,6 +517,7 @@ describe('an open level inside a locked field', () => {
           path='content/pages/locked.mdx'
           document={{ blocks: [{ _template: 'hero', text: 'first' }] }}
         >
+          <LevelHead />
           <DocumentForm />
         </FormProvider>
       </TinaProvider>

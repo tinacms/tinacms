@@ -1,7 +1,9 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { DocumentForm } from '../../../admin/document-form';
+import { DocumentForm, useLevelTrail } from '../../../admin/document-form';
+import { FormScopeContext, type FormScope } from '../../../editor/context';
+import { use } from 'react';
 import { asResolvedConfig } from '../../../config';
 import type {
   CollectionSchema,
@@ -15,6 +17,33 @@ import { openBlockPicker } from '../../../test/open-block-picker';
 import objectFieldPlugin from '../object/object-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import arrayFieldPlugin from './array-field.plugin';
+
+// The head holds the trail in the shell; the form alone has none, so this stands in for it.
+function LocationTrail() {
+  const scope = use(FormScopeContext);
+  if (!scope) return null;
+  return <TrailSteps scope={scope} />;
+}
+
+function TrailSteps({ scope }: { scope: FormScope }) {
+  const levels = useLevelTrail(scope);
+  return (
+    <nav aria-label='Location'>
+      {[{ label: 'Document', onClick: levels.closeAll }, ...levels.parents].map(
+        (step) => (
+          <button key={step.label} type='button' onClick={step.onClick}>
+            {step.label}
+          </button>
+        )
+      )}
+    </nav>
+  );
+}
+
+const trailStep = async (name: string) =>
+  within(
+    await screen.findByRole('navigation', { name: 'Location' })
+  ).findByRole('button', { name });
 
 const templates = [
   {
@@ -84,6 +113,7 @@ const renderForm = (document: TinaDocument) =>
         path='content/pages/home.mdx'
         document={document}
       >
+        <LocationTrail />
         <DocumentForm />
       </FormProvider>
     </TinaProvider>
@@ -140,14 +170,10 @@ describe('Blocks field: nested', () => {
     );
     let inner = await within(rows).findByRole('group', { name: 'Inner' });
     await pick(inner, 'Add Quote');
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Up to Inner' })
-    );
+    await userEvent.click(await trailStep('Inner'));
     inner = await screen.findByRole('group', { name: 'Inner' });
     await pick(inner, 'Add Call to action');
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Up to Inner' })
-    );
+    await userEvent.click(await trailStep('Inner'));
     inner = await screen.findByRole('group', { name: 'Inner' });
     const titles = () =>
       within(inner)
@@ -217,9 +243,7 @@ describe('Blocks field: coming back from a block', () => {
       await userEvent.click(
         within(list).getAllByRole('button', { name: /^Item \d/ })[index]
       );
-      await userEvent.click(
-        await screen.findByRole('button', { name: 'Up to Blocks' })
-      );
+      await userEvent.click(await trailStep('Blocks'));
       const back = await screen.findByRole('group', { name: 'Blocks' });
       await waitFor(() => expect(gripOf(back, index)).toHaveFocus());
     }
@@ -241,9 +265,7 @@ describe('Blocks field: coming back from a block', () => {
     await userEvent.click(
       within(list).getAllByRole('button', { name: /^Item \d/ })[1]
     );
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Up to Blocks' })
-    );
+    await userEvent.click(await trailStep('Blocks'));
     const back = await screen.findByRole('group', { name: 'Blocks' });
     await waitFor(() => expect(gripOf(back, 1)).toHaveFocus());
     expect(scrollTop).toBe(-250);
@@ -258,9 +280,7 @@ describe('Blocks field: coming back from a block', () => {
       await userEvent.click(
         within(list).getAllByRole('button', { name: /^Item \d/ })[index]
       );
-      await userEvent.click(
-        await screen.findByRole('button', { name: 'Up to Locked' })
-      );
+      await userEvent.click(await trailStep('Locked'));
       const back = await screen.findByRole('group', { name: 'Locked' });
       await waitFor(() =>
         expect(
@@ -290,9 +310,7 @@ describe('Blocks field: coming back from a block', () => {
     await userEvent.click(
       within(inner).getAllByRole('button', { name: /^Item \d/ })[1]
     );
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Up to Inner' })
-    );
+    await userEvent.click(await trailStep('Inner'));
     const back = await screen.findByRole('group', { name: 'Inner' });
     await waitFor(() => expect(gripOf(back, 1)).toHaveFocus());
   });

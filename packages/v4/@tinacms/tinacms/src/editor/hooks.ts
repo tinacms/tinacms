@@ -44,6 +44,7 @@ import {
   createRpcClient,
 } from '../rpc/proxy';
 import {
+  FieldActiveContext,
   FieldAddressContext,
   FieldLockContext,
   FieldSchemaContext,
@@ -232,6 +233,11 @@ export function useActiveField(): ActiveField {
     [formId]
   );
   return useMemo(() => ({ active, setActive }), [active, setActive]);
+}
+
+/** True while this field is the one the form shows as active, whether or not it has DOM focus. */
+export function useFieldActive(): boolean {
+  return use(FieldActiveContext);
 }
 
 // Save refused because the document has validation errors. The form stays

@@ -62,8 +62,11 @@ function ComboboxInput({
   triggerTabbable = true,
   clearTabbable = false,
   showClear = false,
+  'data-active': active,
   ...props
 }: ComboboxPrimitive.Input.Props & {
+  /** Draws the box like `:focus` while the field is the page's active one. */
+  'data-active'?: '' | undefined;
   showTrigger?: boolean;
   /** Set false when the input itself opens the list, so Tab skips the chevron. */
   triggerTabbable?: boolean;
@@ -72,7 +75,13 @@ function ComboboxInput({
   showClear?: boolean;
 }) {
   return (
-    <InputGroup className={cn('w-55 pr-1', className)}>
+    <InputGroup
+      data-active={active}
+      className={cn(
+        'w-55 pr-1 data-active:border-ring data-active:shadow-focus-field has-[[data-slot][aria-invalid=true]]:data-active:border-destructive has-disabled:data-active:border-border has-disabled:data-active:shadow-none has-[[data-slot=input-group-control][data-readonly]]:data-active:border-border-subtle has-[[data-slot=input-group-control][data-readonly]]:data-active:shadow-none',
+        className
+      )}
+    >
       <ComboboxPrimitive.Input
         render={<InputGroupInput disabled={disabled} />}
         {...props}
@@ -245,7 +254,7 @@ function ComboboxChips({
     <ComboboxPrimitive.Chips
       data-slot='combobox-chips'
       className={cn(
-        'flex min-h-8 flex-wrap items-center gap-1 rounded-sm border border-input bg-card px-2.5 py-1 font-sans text-base text-foreground transition-[border-color,box-shadow] hover:border-input-hover focus-within:border-ring focus-within:shadow-focus-field has-aria-invalid:border-destructive has-data-[slot=combobox-chip]:px-1',
+        'flex min-h-8 flex-wrap items-center gap-1 rounded-sm border border-input bg-card px-2.5 py-1 font-sans text-base text-foreground transition-[border-color,box-shadow] hover:border-input-hover focus-within:border-ring focus-within:shadow-focus-field data-active:border-ring data-active:shadow-focus-field has-aria-invalid:border-destructive has-aria-invalid:data-active:border-destructive has-data-[slot=combobox-chip]:px-1',
         className
       )}
       {...props}

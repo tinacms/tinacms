@@ -18,6 +18,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { hasValidator } from '../../../core/schema/types';
 import {
   useFieldActivation,
+  useFieldActive,
   useFieldAddress,
   useFieldFrame,
   useFieldSchema,
@@ -42,6 +43,7 @@ export function ImageField() {
   const path = typeof value === 'string' ? value : null;
   const hasValue = value != null;
   const frame = useFieldFrame();
+  const active = useFieldActive();
   const media = useMediaSlice();
   const upload = useImageUpload(media, address);
   const primaryRef = useRef<HTMLButtonElement>(null);
@@ -107,6 +109,7 @@ export function ImageField() {
     <>
       <ImageFieldView
         {...frame}
+        active={active}
         errors={failure ? [...frame.errors, failure.reason] : frame.errors}
         path={path}
         notAPath={hasValue && path === null}

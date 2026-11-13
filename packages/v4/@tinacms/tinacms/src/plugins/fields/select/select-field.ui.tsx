@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import {
   useFieldActivation,
+  useFieldActive,
   useFieldAddress,
   useFieldFrame,
   useFieldSchema,
@@ -14,6 +15,7 @@ export function SelectField() {
   const field = useFieldSchema<SelectFieldSchema>();
   const [value, setValue] = useFieldValue<string | null>(address);
   const frame = useFieldFrame();
+  const active = useFieldActive();
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   useFieldActivation(() => triggerRef.current?.focus());
@@ -21,6 +23,7 @@ export function SelectField() {
   return (
     <SelectFieldView
       {...frame}
+      active={active}
       ref={triggerRef}
       id={address}
       items={field.options.map((option) => ({

@@ -775,7 +775,10 @@ describe('where the pane goes and what it keeps', () => {
     const user = await blockOnTwoFields();
     await errorsPane();
     await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
+      within(screen.getByRole('navigation', { name: 'Location' })).getByRole(
+        'button',
+        { name: 'Notes' }
+      )
     );
     await user.click(await screen.findByRole('button', { name: /two\.mdx/ }));
     await waitFor(() =>

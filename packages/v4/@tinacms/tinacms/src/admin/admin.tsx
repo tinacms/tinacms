@@ -1,5 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { Breadcrumb } from '@tinacms/ui/components/breadcrumb';
+import type { BreadcrumbStep } from '@tinacms/ui/components/breadcrumb';
+import { EmptyState } from '@tinacms/ui/components/empty-state';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { TooltipProvider } from '@tinacms/ui/components/tooltip';
@@ -12,12 +13,12 @@ import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
 import { useKeyboardOpen } from './use-narrow';
 import { toast } from '@tinacms/ui/components/toast';
-import { Tabs, TabsPanel } from '@tinacms/ui/components/tabs';
 import {
   type CSSProperties,
   type ReactNode,
   startTransition,
   use,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -25,14 +26,20 @@ import {
 import { HashRouter } from 'react-router-dom';
 import type { ResolvedConfig } from '../config';
 import type { AdminRoute } from './routing';
+import { FormScopeContext, type FormScope } from '../editor/context';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
 import { useDocument } from '../editor/content-queries';
-import { FormScopeContext } from '../editor/context';
-import { usePreviewConnection } from '../editor/preview-connection';
+import {
+  type DocumentRef,
+  type ReferenceStep,
+  usePreviewConnection,
+} from '../editor/preview-connection';
+import { toFormId, useFormStore } from '../form/form-store';
+import { documentTitle } from './document-title';
 import { TinaProvider } from '../editor/provider';
 import { AuthGate } from './auth-gate';
-import { DocumentForm } from './document-form';
+import { DocumentForm, useLevelTrail } from './document-form';
 import { DocumentErrorPane } from './error-summary';
 import { DocumentScope } from './document-scope';
 import {
@@ -57,6 +64,7 @@ import {
 import { copyPath } from './copy-path';
 import { useKeptEditsNotice } from './use-kept-edits-notice';
 import { useAdminRoute } from './use-admin-route';
+import type { PreviewConnectionOptions } from '../editor/preview-connection';
 import { useFormColumnWidth } from './use-form-column-width';
 import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
 
@@ -137,9 +145,15 @@ function HomeOutlet({
   );
 }
 
-function PreviewFrame({ src }: { src: string }) {
+function PreviewFrame({
+  src,
+  connection,
+}: {
+  src: string;
+  connection: PreviewConnectionOptions;
+}) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  usePreviewConnection(iframeRef);
+  usePreviewConnection(iframeRef, connection);
   return (
     <iframe
       ref={iframeRef}
@@ -150,51 +164,23 @@ function PreviewFrame({ src }: { src: string }) {
   );
 }
 
-// The page being previewed: the document's place and, for a preview URL, the URL.
-function PreviewHeader({ url }: { url?: string }) {
-  const scope = use(FormScopeContext);
-  if (!scope) return null;
-  const collectionLabel = scope.collection.label ?? scope.collection.name;
+function PreviewSlot({
+  preview,
+  connection,
+}: {
+  preview?: ReactNode;
+  connection: PreviewConnectionOptions;
+}) {
   return (
-    <div className='flex h-11 flex-none items-center gap-3 border-b border-border-subtle bg-card pr-4 pl-2'>
-      <Breadcrumb
-        size='sm'
-        aria-label='Preview location'
-        items={[
-          { label: collectionLabel },
-          { label: scope.path.split('/').at(-1) ?? scope.path },
-        ]}
-      />
-      {url ? (
-        <span className='ml-auto min-w-0 truncate font-mono text-xs text-muted-foreground'>
-          {url}
-        </span>
-      ) : null}
+    <div data-preview-slot='' className='min-w-0 flex-1'>
+      {typeof preview === 'string' ? (
+        <PreviewFrame src={preview} connection={connection} />
+      ) : (
+        (preview ?? <Placeholder>No preview configured.</Placeholder>)
+      )}
     </div>
   );
 }
-
-function PreviewSlot({ preview }: { preview?: ReactNode }) {
-  if (!use(FormScopeContext)) {
-    return <Placeholder>Select a document to edit.</Placeholder>;
-  }
-  const url = typeof preview === 'string' ? preview : undefined;
-  return (
-    <div className='flex size-full min-h-0 flex-col'>
-      <PreviewHeader url={url} />
-      <div className='min-h-0 flex-1'>
-        {url !== undefined ? (
-          <PreviewFrame src={url} />
-        ) : (
-          (preview ?? <Placeholder>No preview configured.</Placeholder>)
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Only the views that have content show. Fields is the one view today.
-const FORM_TABS = [{ value: 'fields', label: 'Fields' }] as const;
 
 function FormColumnSkeleton() {
   return (
@@ -207,31 +193,8 @@ function FormColumnSkeleton() {
   );
 }
 
-function FormColumn({
-  openPath,
-  collection,
-  onBack,
-}: {
-  openPath?: string;
-  collection?: CollectionSchema;
-  onBack: () => void;
-}) {
+function FormColumnFrame({ children }: { children: ReactNode }) {
   const { width, isResizing, handleProps } = useFormColumnWidth();
-  const scope = use(FormScopeContext);
-  const seedKey = scope?.seedKey;
-  // Only objects and lists have cards to open or close.
-  const expandable = (collection?.fields ?? []).some(
-    (field) => field.type === 'object' || field.type === 'array'
-  );
-
-  const [mountedSeedKey, setMountedSeedKey] = useState<string | undefined>(
-    undefined
-  );
-  useEffect(() => {
-    if (mountedSeedKey === seedKey) return;
-    startTransition(() => setMountedSeedKey(seedKey));
-  }, [seedKey, mountedSeedKey]);
-
   return (
     <>
       <aside
@@ -239,57 +202,7 @@ function FormColumn({
         className='flex min-w-0 shrink-0 flex-col overflow-hidden border-r border-border'
         style={{ width }}
       >
-        {collection ? (
-          <PanelHeader
-            backLabel='Return to navigator'
-            backTitle={`Back to ${collection.label ?? collection.name}`}
-            onBack={onBack}
-            menuLabel='Document menu'
-            menu={
-              openPath === undefined ? undefined : (
-                <>
-                  <DropdownMenuItem onClick={() => copyFilePath(openPath)}>
-                    Copy file path
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    disabled={!expandable}
-                    onClick={() => scope?.view.getState().setExpansion(true)}
-                  >
-                    Expand all
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    disabled={!expandable}
-                    onClick={() => scope?.view.getState().setExpansion(false)}
-                  >
-                    Collapse all
-                  </DropdownMenuItem>
-                </>
-              )
-            }
-          />
-        ) : (
-          <PanelHeader heading='Document' />
-        )}
-        <Tabs
-          tabs={FORM_TABS}
-          aria-label='Document views'
-          className='min-h-0 flex-1'
-        >
-          <TabsPanel value='fields' className='flex min-h-0 flex-1 flex-col'>
-            {openPath === undefined ? (
-              <p className='p-4 text-sm text-muted-foreground'>
-                Select a document to edit
-              </p>
-            ) : null}
-            {mountedSeedKey === seedKey ? (
-              <DocumentForm key={seedKey} />
-            ) : (
-              <div className='p-4'>
-                <FormColumnSkeleton />
-              </div>
-            )}
-          </TabsPanel>
-        </Tabs>
+        {children}
       </aside>
 
       <div
@@ -301,6 +214,203 @@ function FormColumn({
         <div className='fixed inset-0 z-50 cursor-col-resize' />
       ) : null}
     </>
+  );
+}
+
+const collectionLabel = (collection: CollectionSchema) =>
+  collection.label ?? collection.name;
+
+function FormHead({
+  openPath,
+  collection,
+  collections,
+  step,
+  navigate,
+}: {
+  openPath: string | undefined;
+  collection: CollectionSchema;
+  collections: CollectionSchema[];
+  step: ReferenceStep | null;
+  navigate: (route: AdminRoute) => void;
+}) {
+  const scope = use(FormScopeContext);
+  const values = useFormStore((state) =>
+    scope ? state.forms[scope.formId]?.values : undefined
+  );
+  const fromValues = useFormStore((state) =>
+    step ? state.forms[toFormId(step.from.path)]?.values : undefined
+  );
+  const expandable = collection.fields.some(
+    (field) => field.type === 'object' || field.type === 'array'
+  );
+  const trailCollection =
+    (step && collections.find((c) => c.name === step.from.collection)) ||
+    collection;
+  const base: BreadcrumbStep[] = [
+    { label: 'Collections', onClick: () => navigate(COLLECTIONS_ROUTE) },
+    {
+      label: collectionLabel(trailCollection),
+      onClick: () =>
+        navigate({ view: 'collection', collection: trailCollection.name }),
+    },
+    ...(step
+      ? [
+          {
+            label: documentTitle(step.from.path, fromValues),
+            onClick: () =>
+              navigate({
+                view: 'document',
+                collection: step.from.collection,
+                path: step.from.path,
+              }),
+          },
+        ]
+      : []),
+  ];
+  return scope ? (
+    <ScopedFormHead
+      scope={scope}
+      base={base}
+      title={documentTitle(openPath ?? '', values)}
+      expandable={expandable}
+      openPath={openPath}
+    />
+  ) : (
+    <PanelHeader
+      trail={base}
+      heading={openPath ? documentTitle(openPath, undefined) : 'Document'}
+    />
+  );
+}
+
+function ScopedFormHead({
+  scope,
+  base,
+  title,
+  expandable,
+  openPath,
+}: {
+  scope: FormScope;
+  base: BreadcrumbStep[];
+  title: string;
+  expandable: boolean;
+  openPath: string | undefined;
+}) {
+  const levels = useLevelTrail(scope);
+  const trail =
+    levels.heading === null
+      ? base
+      : [
+          ...base,
+          {
+            label: title,
+            onClick: levels.closeAll,
+            invalid: levels.documentInvalid,
+          },
+          ...levels.parents,
+        ];
+  return (
+    <PanelHeader
+      trail={trail}
+      heading={levels.heading ?? title}
+      menuLabel='Form actions'
+      menu={
+        openPath === undefined ? undefined : (
+          <>
+            <DropdownMenuItem onClick={() => copyFilePath(openPath)}>
+              Copy file path
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={!expandable}
+              onClick={() => scope.view.getState().setExpansion(true)}
+            >
+              Expand all
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={!expandable}
+              onClick={() => scope.view.getState().setExpansion(false)}
+            >
+              Collapse all
+            </DropdownMenuItem>
+          </>
+        )
+      }
+    />
+  );
+}
+
+function FormColumn({
+  openPath,
+  collection,
+  collections,
+  step,
+  navigate,
+}: {
+  openPath?: string;
+  collection?: CollectionSchema;
+  collections: CollectionSchema[];
+  step: ReferenceStep | null;
+  navigate: (route: AdminRoute) => void;
+}) {
+  const scope = use(FormScopeContext);
+  const seedKey = scope?.seedKey;
+
+  const [mountedSeedKey, setMountedSeedKey] = useState<string | undefined>(
+    undefined
+  );
+  useEffect(() => {
+    if (mountedSeedKey === seedKey) return;
+    startTransition(() => setMountedSeedKey(seedKey));
+  }, [seedKey, mountedSeedKey]);
+
+  return (
+    <FormColumnFrame>
+      {collection ? (
+        <FormHead
+          openPath={openPath}
+          collection={collection}
+          collections={collections}
+          step={step}
+          navigate={navigate}
+        />
+      ) : (
+        <PanelHeader heading='Document' />
+      )}
+      <div className='flex min-h-0 flex-1 flex-col'>
+        {openPath === undefined ? (
+          <p className='p-4 text-sm text-muted-foreground'>
+            Select a document to edit
+          </p>
+        ) : null}
+        {mountedSeedKey === seedKey ? (
+          <DocumentForm key={seedKey} />
+        ) : (
+          <div className='p-4'>
+            <FormColumnSkeleton />
+          </div>
+        )}
+      </div>
+    </FormColumnFrame>
+  );
+}
+
+function NothingToEditColumn({
+  onOpenCollections,
+}: {
+  onOpenCollections: () => void;
+}) {
+  return (
+    <FormColumnFrame>
+      <PanelHeader trail={[]} heading='Nothing to edit on this page' />
+      <div className='p-4'>
+        <EmptyState
+          variant='block'
+          text='This page isn’t drawn from a document. Click a part of it that is, or find one in Collections.'
+          actionLabel='Open Collections'
+          onAction={onOpenCollections}
+        />
+      </div>
+    </FormColumnFrame>
   );
 }
 
@@ -436,7 +546,34 @@ function AdminShell({
   const schema = useTinaSchema();
   const screens = useAdminScreens();
   const globalNav = useGlobalNav();
-  const { route, navigate } = useAdminRoute();
+  const { route, navigate: navigateRoute } = useAdminRoute();
+
+  // A reference step belongs to the document it opened. Any other navigation drops it.
+  const [stepState, setStepState] = useState<{
+    step: ReferenceStep;
+    target: string;
+  } | null>(null);
+  const navigate = useCallback(
+    (next: AdminRoute) => {
+      const opensMedia =
+        next.view === 'media' ||
+        (next.view === 'screen' && next.screen === MEDIA_SCREEN);
+      if (!opensMedia) setStepState(null);
+      navigateRoute(next);
+    },
+    [navigateRoute]
+  );
+  const openDocument = useCallback(
+    (target: DocumentRef, step: ReferenceStep | null) => {
+      setStepState(step ? { step, target: target.path } : null);
+      navigateRoute({
+        view: 'document',
+        collection: target.collection,
+        path: target.path,
+      });
+    },
+    [navigateRoute]
+  );
 
   const isMediaRoute =
     route.view === 'media' ||
@@ -448,7 +585,6 @@ function AdminShell({
     if (!isMediaRoute) setLastMain(route);
   }, [route, isMediaRoute]);
   const mainRoute = isMediaRoute ? lastMain : route;
-  useKeptEditsNotice(mainRoute, navigate);
 
   const [maximised, setMaximised] = useState(false);
   useEffect(() => {
@@ -463,6 +599,9 @@ function AdminShell({
     (candidate) => candidate.name === activeCollectionName
   );
   const openPath = mainRoute.view === 'document' ? mainRoute.path : undefined;
+  const activeStep =
+    stepState && stepState.target === openPath ? stepState.step : null;
+  useKeptEditsNotice(mainRoute, navigate, activeStep);
   const homeScreen = screens.find(({ name }) => name === HOME_SCREEN);
   // `#/screens/home` draws Home as `#/` does. With Home removed, it falls to
   // the general outlet, which says that no screen has that name.
@@ -500,7 +639,7 @@ function AdminShell({
   const hasMediaScreen = screens.some(({ name }) => name === MEDIA_SCREEN);
   const mediaScreen = screens.find(({ name }) => name === MEDIA_SCREEN);
   const mediaSegments = route.view === 'screen' ? route.segments : [];
-  const closeMedia = () => navigate(lastMain);
+  const closeMedia = () => navigateRoute(lastMain);
 
   // The navigator keeps the last opened document selected after Back.
   const [lastOpen, setLastOpen] = useState<{
@@ -522,6 +661,32 @@ function AdminShell({
     mainRoute.view === 'collection' ||
     (mainRoute.view === 'document' && collection === undefined);
   const showNavigator = !isMediaRoute && mainShowsNavigator;
+  const documentFailed = openPath !== undefined && openDocumentError !== null;
+  const showsPreviewRoute =
+    !activeScreen &&
+    !homeSegments &&
+    mainRoute.view !== 'tools' &&
+    mainRoute.view !== 'settings' &&
+    !isStaleCollectionRoute &&
+    !isStaleDocumentRoute &&
+    !documentFailed;
+  const showsPreview = showsPreviewRoute && !(isMediaRoute && maximised);
+  const [previewMounted, setPreviewMounted] = useState(false);
+  useEffect(() => {
+    if (showsPreviewRoute) setPreviewMounted(true);
+  }, [showsPreviewRoute]);
+
+  const connection: PreviewConnectionOptions = {
+    open:
+      collection && openPath
+        ? { collection: collection.name, path: openPath }
+        : null,
+    step: activeStep,
+    showsPreview,
+    onPage: mainRoute.view === 'page',
+    onOpen: openDocument,
+    onNothingToEdit: () => navigate({ view: 'page' }),
+  };
 
   return (
     <SidebarProvider
@@ -615,36 +780,31 @@ function AdminShell({
                 Cannot read “{openPath}”. {openDocumentError.message}
               </span>
             </MissingPanel>
-          ) : mainShowsNavigator ? (
-            <DocumentScope collection={collection} path={undefined}>
-              <SidebarInset className='min-w-0'>
-                <PreviewSlot preview={preview} />
-              </SidebarInset>
-            </DocumentScope>
-          ) : (
-            <DocumentScope collection={collection} path={openPath}>
-              <SidebarInset className='relative min-w-0 flex-row'>
-                <FormColumn
-                  openPath={openPath}
-                  collection={collection}
-                  onBack={() =>
-                    collection
-                      ? navigate({
-                          view: 'collection',
-                          collection: collection.name,
-                        })
-                      : goToCollections()
-                  }
-                />
+          ) : null}
 
-                <DocumentErrorPane />
-
-                <div data-preview-slot='' className='min-w-0 flex-1'>
-                  <PreviewSlot preview={preview} />
-                </div>
-              </SidebarInset>
-            </DocumentScope>
-          )}
+          {showsPreviewRoute || previewMounted ? (
+            <SidebarInset
+              className={
+                showsPreviewRoute ? 'relative min-w-0 flex-row' : 'hidden'
+              }
+            >
+              {mainRoute.view === 'document' ? (
+                <DocumentScope collection={collection} path={openPath}>
+                  <FormColumn
+                    openPath={openPath}
+                    collection={collection}
+                    collections={schema.collections}
+                    step={activeStep}
+                    navigate={navigate}
+                  />
+                  <DocumentErrorPane />
+                </DocumentScope>
+              ) : mainRoute.view === 'page' ? (
+                <NothingToEditColumn onOpenCollections={goToCollections} />
+              ) : null}
+              <PreviewSlot preview={preview} connection={connection} />
+            </SidebarInset>
+          ) : null}
         </div>
       </div>
 

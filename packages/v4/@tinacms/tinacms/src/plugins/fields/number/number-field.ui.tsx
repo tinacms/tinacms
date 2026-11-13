@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import {
   useFieldActivation,
+  useFieldActive,
   useFieldAddress,
   useFieldFrame,
   useFieldSchema,
@@ -15,6 +16,7 @@ export function NumberField() {
   const field = useFieldSchema<NumberFieldSchema>();
   const [value, setValue] = useFieldValue<string | null>(address);
   const frame = useFieldFrame();
+  const active = useFieldActive();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus());
@@ -22,6 +24,7 @@ export function NumberField() {
   return (
     <NumberFieldView
       {...frame}
+      active={active}
       ref={inputRef}
       id={address}
       value={typeof value === 'string' ? value : null}

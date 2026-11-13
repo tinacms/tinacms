@@ -427,6 +427,8 @@ export interface ArrayDrillInViewProps
   invalidCount?: number;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   onDrillIn?: () => void;
 }
 
@@ -447,11 +449,14 @@ export function ArrayDrillInView({
   invalidCount,
   disabled,
   readOnly,
+  active,
   onDrillIn,
 }: ArrayDrillInViewProps) {
   return (
     <FieldWrapper errors={errors} help={help} helpId={helpId}>
       <DrillInCard
+        data-active={active ? '' : undefined}
+        className='data-active:border-ring data-active:shadow-focus-ring disabled:data-active:border-border disabled:data-active:shadow-none'
         label={typeof label === 'string' ? label : (name ?? '')}
         required={required}
         summary={countWords(count)}
