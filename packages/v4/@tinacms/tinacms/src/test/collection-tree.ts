@@ -1,20 +1,22 @@
-import { act, screen } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import type userEvent from '@testing-library/user-event';
 
-/**
- * Opens the side view of a collection: its documents in the tree, the preview
- * beside it. Choosing a collection row in the tree now opens the full table.
- */
+/** The tree in the Navigator pane. The Home screen beside it has its own Collections list. */
+export const findCollectionTree = async () =>
+  within(
+    await screen.findByRole('complementary', { name: 'Navigator' })
+  ).findByRole('list', { name: 'Collections' });
+
+/** Opens a collection in the minimised tree, with its documents under it. */
 export const openCollectionTree = async (collection: string) => {
-  await screen.findByRole('list', { name: 'Collections' });
   act(() => {
-    window.location.hash = `#/collections/${collection}?side`;
+    window.location.hash = `#/collections/${collection}`;
     window.dispatchEvent(new PopStateEvent('popstate'));
   });
-  await screen.findByRole('list', { name: 'Collections' });
+  await findCollectionTree();
 };
 
-/** Back from a document lands on the table. Restore returns to the tree. */
+/** Back from a document lands on the maximised table. Restore returns to the tree. */
 export const returnToTree = async (
   user: ReturnType<typeof userEvent.setup>
 ) => {

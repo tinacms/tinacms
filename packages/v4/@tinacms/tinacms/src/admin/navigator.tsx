@@ -2,19 +2,29 @@ import { EmptyState } from '@tinacms/ui/components/empty-state';
 import { Button } from '@tinacms/ui/components/button';
 import { NavRow } from '@tinacms/ui/components/nav-row';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CollectionSchema } from '../core/schema/types';
 import {
   useCollectionDocuments,
   useCollectionsDocumentPaths,
 } from '../editor/content-queries';
 import {
+  carryOpenFolders,
+  foldersThrough,
+  useCollectionLevel,
+} from '../editor/collection-tree';
+import type { FolderSummary } from '../core/content/contract';
+import {
   useFormStore,
   useNewDocumentIds,
   useUnsavedFormIds,
 } from '../form/form-store';
 import { isUnder } from '../core/content/names';
-import { directoryOf } from '../editor/collection-documents';
+import {
+  directoryOf,
+  folderOfDocument,
+  useNewDocumentDrafts,
+} from '../editor/collection-documents';
 import type { GlobalNavEntry } from '../core/slot/contract';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { DiscardConfirm } from './discard-confirm';
@@ -57,26 +67,74 @@ function DocumentRow({
   );
 }
 
-function CollectionDocuments({
-  collection,
-  activePath,
-  unsavedIds,
-  navigate,
-}: {
+type OpenFolders = ReadonlySet<string>;
+type SetOpenFolders = (update: (open: OpenFolders) => OpenFolders) => void;
+
+interface LevelProps {
   collection: CollectionSchema;
+  folder: string;
   activePath?: string;
   unsavedIds: ReadonlySet<string>;
   navigate: (route: AdminRoute) => void;
-}) {
-  const { documents, isLoading, error } = useCollectionDocuments(
-    collection.name
+  openFolders: OpenFolders;
+  setOpenFolders: SetOpenFolders;
+}
+
+function FolderRow({
+  folder,
+  ...level
+}: Omit<LevelProps, 'folder'> & { folder: FolderSummary }) {
+  const open = level.openFolders.has(folder.path);
+  return (
+    <li>
+      <NavRow
+        kind='folder'
+        open={open}
+        title={folder.path}
+        onClick={() =>
+          level.setOpenFolders((current) => {
+            const next = new Set(current);
+            if (open) next.delete(folder.path);
+            else next.add(folder.path);
+            return next;
+          })
+        }
+      >
+        {folder.name}
+      </NavRow>
+      {open ? <CollectionLevel {...level} folder={folder.path} /> : null}
+    </li>
   );
+}
+
+function CollectionLevel(props: LevelProps) {
+  const { collection, folder, activePath, unsavedIds, navigate } = props;
+  const { folders, documents, isLoading, error, refetch, loaded } =
+    useCollectionLevel(collection.name, folder);
+  const drafts = useNewDocumentDrafts(collection.name, folder).filter(
+    ({ path }) => !documents.some((document) => document.path === path)
+  );
+  const seenFolders = useRef<FolderSummary[] | null>(null);
+  const { setOpenFolders } = props;
+  useEffect(() => {
+    if (!loaded) return;
+    const before = seenFolders.current;
+    seenFolders.current = folders;
+    if (before === null || before === folders) return;
+    setOpenFolders((open) => carryOpenFolders(open, before, folders));
+  }, [loaded, folders, setOpenFolders]);
+
   const label = collection.label ?? collection.name;
   if (error) {
     return (
-      <p role='alert' className='py-1.5 pl-8 text-sm text-destructive'>
-        Could not load {label}. {error.message}
-      </p>
+      <div className='py-1.5 pl-8'>
+        <p role='alert' className='text-sm text-destructive'>
+          {error.message}
+        </p>
+        <Button size='sm' onClick={refetch}>
+          Retry
+        </Button>
+      </div>
     );
   }
   if (isLoading) {
@@ -84,15 +142,33 @@ function CollectionDocuments({
       <p className='py-1.5 pl-8 text-sm text-muted-foreground'>Loading…</p>
     );
   }
-  if (documents.length === 0) {
+  if (folders.length + drafts.length + documents.length === 0) {
     return (
       <p className='py-1.5 pl-8 text-sm text-muted-foreground'>
         No documents yet.
       </p>
     );
   }
+  const listLabel =
+    folder === '' ? label : (folder.split('/').at(-1) ?? folder);
   return (
-    <ul aria-label={`${label} documents`} className='m-0 list-none p-0 pl-4.5'>
+    <ul
+      aria-label={`${listLabel} documents`}
+      className='m-0 list-none p-0 pl-4.5'
+    >
+      {folders.map((entry) => (
+        <FolderRow key={entry.path} {...props} folder={entry} />
+      ))}
+      {drafts.map(({ path }) => (
+        <DocumentRow
+          key={path}
+          collection={collection.name}
+          path={path}
+          selected={path === activePath}
+          unsaved
+          navigate={navigate}
+        />
+      ))}
       {documents.map(({ path }) => (
         <DocumentRow
           key={path}
@@ -236,6 +312,23 @@ function CollectionNode({
   useEffect(() => {
     if (active) setOpen(true);
   }, [active]);
+  const selectedFolders =
+    active && activePath
+      ? foldersThrough(folderOfDocument(collection, activePath))
+      : [];
+  const selectedKey = selectedFolders.join('\n');
+  const [openFolders, setOpenFolders] = useState<OpenFolders>(
+    () => new Set(selectedFolders)
+  );
+  useEffect(() => {
+    if (selectedKey === '') return;
+    setOpenFolders((current) => {
+      const missing = selectedKey
+        .split('\n')
+        .filter((path) => !current.has(path));
+      return missing.length === 0 ? current : new Set([...current, ...missing]);
+    });
+  }, [selectedKey]);
   const label = collection.label ?? collection.name;
   return (
     <li>
@@ -254,8 +347,11 @@ function CollectionNode({
         {label}
       </NavRow>
       {open ? (
-        <CollectionDocuments
+        <CollectionLevel
           collection={collection}
+          folder=''
+          openFolders={openFolders}
+          setOpenFolders={setOpenFolders}
           activePath={activePath}
           unsavedIds={unsavedIds}
           navigate={navigate}
@@ -275,6 +371,7 @@ export function CollectionsNavigator({
   route,
   navigate,
   onClose,
+  onMaximise,
   hideBelowLg = false,
 }: {
   collections: CollectionSchema[];
@@ -283,6 +380,7 @@ export function CollectionsNavigator({
   route: AdminRoute;
   navigate: (route: AdminRoute) => void;
   onClose: () => void;
+  onMaximise: () => void;
   hideBelowLg?: boolean;
 }) {
   const activeCollection =
@@ -302,6 +400,7 @@ export function CollectionsNavigator({
         heading='Collections'
         closeLabel='Close'
         onClose={onClose}
+        onMaximise={onMaximise}
         menuLabel='Collections menu'
         menu={
           <DropdownMenuItem

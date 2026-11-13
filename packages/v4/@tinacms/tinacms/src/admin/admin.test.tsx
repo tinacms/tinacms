@@ -25,7 +25,11 @@ import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 import { useAdminRoute } from './use-admin-route';
 import { connectionOf } from '../test/connection';
-import { openCollectionTree, returnToTree } from '../test/collection-tree';
+import {
+  findCollectionTree,
+  openCollectionTree,
+  returnToTree,
+} from '../test/collection-tree';
 
 const saved: { path: string; value: TinaDocument }[] = [];
 
@@ -199,10 +203,19 @@ const config = asResolvedConfig({
   },
 });
 
-const renderAdmin = (preview?: React.ReactNode) =>
+// The Home screen reads every collection too, so a test that counts the tree's
+// own reads renders without it.
+const renderAdmin = (preview?: React.ReactNode, withHome = true) =>
   render(
     <TinaAdmin
-      config={config}
+      config={
+        withHome
+          ? config
+          : asResolvedConfig({
+              ...config,
+              plugins: config.plugins.filter((plugin) => plugin !== homePlugin),
+            })
+      }
       queryClient={
         new QueryClient({ defaultOptions: { queries: { retry: false } } })
       }
@@ -269,7 +282,7 @@ const documentStatus = () =>
 describe('TinaAdmin', () => {
   it('lists every collection the schema declares, and nothing else', async () => {
     renderAdmin();
-    const menu = await screen.findByRole('list', { name: 'Collections' });
+    const menu = await findCollectionTree();
     expect(
       within(menu)
         .getAllByRole('button')
@@ -323,7 +336,9 @@ describe('TinaAdmin', () => {
   it('navigating writes a shareable hash', async () => {
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Pages' }));
+    await user.click(
+      within(await findCollectionTree()).getByRole('button', { name: 'Pages' })
+    );
     await waitFor(() =>
       expect(window.location.hash).toBe('#/collections/page')
     );
@@ -363,7 +378,7 @@ describe('TinaAdmin', () => {
 
   it('shows no preview until a document is open', async () => {
     renderAdmin(<PreviewProbe />);
-    await screen.findByRole('list', { name: 'Collections' });
+    await findCollectionTree();
     expect(screen.queryByText(/^previewing /)).not.toBeInTheDocument();
   });
 
@@ -572,7 +587,7 @@ describe('TinaAdmin content reads', () => {
 
   it('reads a collection once when two components ask for it', async () => {
     const user = userEvent.setup();
-    renderAdmin();
+    renderAdmin(undefined, false);
 
     await openCollectionTree('post');
     await screen.findByRole('button', { name: /hello\.mdx/ });
@@ -582,7 +597,7 @@ describe('TinaAdmin content reads', () => {
 
   it('does not read a collection again on returning to it', async () => {
     const user = userEvent.setup();
-    renderAdmin();
+    renderAdmin(undefined, false);
 
     await openCollectionTree('post');
     await screen.findByRole('button', { name: /hello\.mdx/ });
@@ -616,11 +631,13 @@ describe('TinaAdmin content reads', () => {
     const failing = vi
       .spyOn(provider, 'list')
       .mockRejectedValueOnce(new Error('data layer offline'));
-    renderAdmin();
+    renderAdmin(undefined, false);
 
     await openCollectionTree('post');
 
-    expect(await screen.findByText(/data layer offline/)).toBeInTheDocument();
+    expect(
+      await screen.findByText('Something went wrong. Please try again.')
+    ).toBeInTheDocument();
     expect(screen.queryByText('No documents yet.')).not.toBeInTheDocument();
     failing.mockRestore();
   });
@@ -639,7 +656,7 @@ describe('TinaAdmin content reads', () => {
 
   it('shows a save in the document list without re-reading the collection', async () => {
     const user = userEvent.setup();
-    renderAdmin();
+    renderAdmin(undefined, false);
 
     await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
@@ -1571,7 +1588,11 @@ describe('TinaAdmin rail', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Collections' })
     );
-    expect(await screen.findByText('No collections yet.')).toBeVisible();
+    expect(
+      await within(
+        await screen.findByRole('complementary', { name: 'Navigator' })
+      ).findByText('No collections yet.')
+    ).toBeVisible();
   });
 
   it('moves between the rows with the arrow keys, Home and End', async () => {
@@ -1687,7 +1708,9 @@ describe('TinaAdmin rail', () => {
     renderAdmin();
     await openCollectionTree('post');
     await screen.findByRole('button', { name: /hello\.mdx/ });
-    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    await user.click(
+      within(await findCollectionTree()).getByRole('button', { name: 'Posts' })
+    );
     expect(screen.queryByRole('button', { name: /hello\.mdx/ })).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() => expect(window.location.hash).toBe('#/'));

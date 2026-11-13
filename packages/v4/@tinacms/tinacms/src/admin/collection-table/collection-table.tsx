@@ -31,14 +31,8 @@ import {
   TooltipTrigger,
 } from '@tinacms/ui/components/tooltip';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
-import {
-  type ReactElement,
-  type ReactNode,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from 'react';
+import { cn } from '@tinacms/ui/lib/utils';
+import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
 import { ContentError, type ListQuery } from '../../core/content/contract';
 import { parentOf } from '../../core/content/names';
 import {
@@ -73,11 +67,15 @@ import {
   type StatusView,
   type TableRow,
   buildRows,
+  countTextOf,
   countsOf,
+  fileOf,
+  folderFileOf,
   hasEditTimes,
   joinFolder,
   namePartsOf,
   nextSort,
+  plural,
   serverSortOf,
 } from './table-model';
 
@@ -96,15 +94,12 @@ const TITLE_COLUMN = 'max-w-0 [overflow-wrap:anywhere]';
 // The item is not `disabled`: a disabled menu item leaves the arrow-key order, and the keyboard
 // would never reach the reason. It has no handler, so activating it does nothing.
 const newDocumentNote = `New document is not available yet. It arrives with ${NEW_DOCUMENT_PBI}.`;
-// `focusableWhenDisabled` sets aria-disabled, which the Button's own disabled styles do not match.
 // A second click of a double-click on the pager lands on whatever the first click moved into its place.
 const PAGER_HOLD_MS = 400;
 
+// `focusableWhenDisabled` sets aria-disabled, which the Button's own disabled styles do not match.
 const PAGER_DISABLED =
   'aria-disabled:cursor-not-allowed aria-disabled:opacity-45 aria-disabled:shadow-none';
-
-const plural = (count: number, one: string, many: string): string =>
-  `${count} ${count === 1 ? one : many}`;
 
 const useDebounced = <Value,>(value: Value, delay: number): Value => {
   const [settled, setSettled] = useState(value);
@@ -114,6 +109,8 @@ const useDebounced = <Value,>(value: Value, delay: number): Value => {
   }, [value, delay]);
   return settled;
 };
+
+const isFolderRow = (row: TableRow): row is FolderRow => row.kind === 'folder';
 
 const rowTriggers = () => [
   ...document.querySelectorAll<HTMLElement>('[data-row-actions]'),
@@ -171,7 +168,7 @@ function LastEdited({ row, now }: { row: DocumentRow; now: number }) {
       >
         {relativeTimeOf(row.updatedAt, now)}
       </time>
-      {row.author ? ` by ${row.author}` : ''}
+      {row.author ? ` · ${row.author}` : ''}
     </span>
   );
 }
@@ -256,22 +253,17 @@ function SelectChoice<Value extends string>({
 interface TableBodyProps {
   collection: string;
   folder: string;
-  headerAction?: ReactElement;
-  onClose?: () => void;
 }
 
-function CollectionTableBody({
-  collection,
-  folder,
-  headerAction,
-  onClose,
-}: TableBodyProps) {
+function CollectionTableBody({ collection, folder }: TableBodyProps) {
   const tier = useTier();
   const { navigate } = useAdminRoute();
   const schema = useTinaSchema();
-  const label =
-    schema.collections.find((candidate) => candidate.name === collection)
-      ?.label ?? collection;
+  const collectionSchema = schema.collections.find(
+    (candidate) => candidate.name === collection
+  );
+  const label = collectionSchema?.label ?? collection;
+  const collectionPath = collectionSchema?.path;
   const caps = useCollectionCapabilities(collection, folder);
   const permissions = usePermissionsState();
   const actions = useCollectionActions(collection);
@@ -295,6 +287,7 @@ function CollectionTableBody({
   const after = pages.scope === scope ? pages.after : [];
   const setAfter = (next: string[]) => setPages({ scope, after: next });
   const [withoutEditTimes, setWithoutEditTimes] = useState(false);
+  const [unfilteredTotal, setUnfilteredTotal] = useState<number>();
 
   const query: ListQuery = {
     folder,
@@ -307,9 +300,11 @@ function CollectionTableBody({
   const connection = page.data;
   const isStale = page.isPlaceholderData;
   // The rows, count and page label stay those of the page on screen until the next page arrives.
-  const shownDepth = useRef(0);
-  if (!isStale && connection) shownDepth.current = after.length;
-  const depthShown = isStale ? shownDepth.current : after.length;
+  const [shownDepth, setShownDepth] = useState(0);
+  useEffect(() => {
+    if (!isStale && connection) setShownDepth(after.length);
+  }, [isStale, connection, after.length]);
+  const depthShown = isStale ? shownDepth : after.length;
   const isFirstPage = depthShown === 0;
   // Only a change of the page cursor locks the rows. A sort switch or a filter refetch keeps them live.
   const pageIsChanging = isStale && depthShown !== after.length;
@@ -337,6 +332,12 @@ function CollectionTableBody({
     }, PAGER_HOLD_MS);
     setAfter(next);
   };
+
+  useEffect(() => {
+    if (filter === '' && connection && !isStale) {
+      setUnfilteredTotal(connection.totalCount);
+    }
+  }, [filter, connection, isStale]);
 
   useEffect(() => {
     if (!connection || connection.edges.length === 0) return;
@@ -425,7 +426,9 @@ function CollectionTableBody({
     setDialog((current) => (current ? { ...current, open: false } : null));
 
   const headingTarget = (): HTMLElement | null => {
-    const heading = headerRef.current?.querySelector('h2') ?? null;
+    const heading =
+      headerRef.current?.querySelector<HTMLElement>('[aria-current="page"]') ??
+      null;
     heading?.setAttribute('tabindex', '-1');
     return heading;
   };
@@ -560,6 +563,7 @@ function CollectionTableBody({
     label: 'Actions',
     className: 'w-12 text-transparent',
   };
+  const showUpdated = !withoutEditTimes || rows.some(isFolderRow);
   const columns: DataTableColumn[] = wide
     ? [
         {
@@ -569,14 +573,15 @@ function CollectionTableBody({
           sort: sortOf('title'),
           onSort: press('title'),
         },
+        { key: 'file', label: 'File', className: 'w-56 max-w-56' },
         {
           key: 'status',
           label: 'Status',
-          className: 'w-37.5',
+          className: 'w-32',
           sort: sortOf('status'),
           onSort: press('status'),
         },
-        ...(withoutEditTimes ? [] : [updatedColumn]),
+        ...(showUpdated ? [updatedColumn] : []),
         actionsColumn,
       ]
     : [
@@ -589,6 +594,18 @@ function CollectionTableBody({
     return menu ? { type: 'node', node: menu } : undefined;
   };
 
+  const fileCell = (file: string): DataTableCell => ({
+    type: 'node',
+    node: (
+      <span
+        title={file}
+        className='block truncate text-sm text-muted-foreground'
+      >
+        {file}
+      </span>
+    ),
+  });
+
   const wideRow = (row: TableRow): DataTableRow => {
     if (row.kind === 'folder') {
       return {
@@ -598,10 +615,11 @@ function CollectionTableBody({
             type: 'link',
             icon: 'folder',
             text: `${row.folder.name}/`,
-            mono: true,
             onClick: () => openFolder(row.folder.path),
           },
-          status: {
+          file: fileCell(folderFileOf(collectionPath, row.folder.path)),
+          status: { type: 'muted', text: 'Folder' },
+          updated: {
             type: 'muted',
             text: plural(row.folder.documentCount, 'document', 'documents'),
           },
@@ -618,17 +636,18 @@ function CollectionTableBody({
           text: row.name,
           onClick: () => openDocument(row.path),
         },
+        file: fileCell(fileOf(collectionPath, row.path)),
         status: row.unsaved
           ? { type: 'badge', kind: 'unsaved', text: 'Unsaved' }
-          : { type: 'muted', text: 'Saved' },
-        ...(withoutEditTimes
-          ? {}
-          : {
+          : undefined,
+        ...(showUpdated
+          ? {
               updated: {
                 type: 'node' as const,
                 node: <LastEdited row={row} now={now} />,
               },
-            }),
+            }
+          : {}),
         actions: menuCell(row),
       },
     };
@@ -707,31 +726,57 @@ function CollectionTableBody({
     return `No documents in ${where} yet.`;
   })();
 
-  const breadcrumb =
-    folder === '' ? null : (
+  const openCollection = () =>
+    navigate({ view: 'collection', collection, maximised: true });
+  const goBack = () => {
+    if (folder === '')
+      return navigate({ view: 'collections', maximised: true });
+    const parent = parentOf(folder);
+    if (parent === '') return openCollection();
+    return navigate({ view: 'folder', collection, folder: parent });
+  };
+  const headerAction = (
+    <div className='flex min-w-0 items-center gap-1'>
+      <Button
+        variant='icon'
+        size='sm'
+        icon='chevron-left'
+        aria-label='Back'
+        onClick={goBack}
+      />
       <Breadcrumb
-        aria-label='Folder path'
+        aria-label='Collection path'
         items={[
           {
-            label,
-            onClick: () => navigate({ view: 'collection', collection }),
+            label: 'Collections',
+            onClick: () => navigate({ view: 'collections', maximised: true }),
           },
-          ...folder.split('/').map((part, index, parts) => ({
-            label: part,
-            current: index === parts.length - 1,
-            onClick:
-              index === parts.length - 1
-                ? undefined
-                : () =>
-                    navigate({
-                      view: 'folder',
-                      collection,
-                      folder: parts.slice(0, index + 1).join('/'),
-                    }),
-          })),
+          folder === ''
+            ? { label, current: true }
+            : { label, onClick: openCollection },
+          ...folder.split('/').flatMap((part, index, parts) =>
+            folder === ''
+              ? []
+              : [
+                  {
+                    label: part,
+                    current: index === parts.length - 1,
+                    onClick:
+                      index === parts.length - 1
+                        ? undefined
+                        : () =>
+                            navigate({
+                              view: 'folder',
+                              collection,
+                              folder: parts.slice(0, index + 1).join('/'),
+                            }),
+                  },
+                ]
+          ),
         ]}
       />
-    );
+    </div>
+  );
 
   const newMenu =
     caps.canCreateDocument || caps.canCreateFolder ? (
@@ -748,7 +793,7 @@ function CollectionTableBody({
         >
           New
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='start' aria-label='New'>
+        <DropdownMenuContent align='end' aria-label='New'>
           {caps.canCreateDocument ? (
             <Tooltip>
               <TooltipTrigger
@@ -781,6 +826,14 @@ function CollectionTableBody({
         </DropdownMenuContent>
       </DropdownMenu>
     ) : null;
+
+  const countText = countTextOf({
+    connection,
+    unfilteredTotal,
+    filter,
+    view,
+    viewCount,
+  });
 
   const filterControls = (
     <>
@@ -833,8 +886,9 @@ function CollectionTableBody({
         aria-live='polite'
         className='ml-auto text-sm whitespace-nowrap text-muted-foreground tabular-nums'
       >
-        {isLoading ? '' : plural(viewCount, 'document', 'documents')}
+        {isLoading ? '' : countText}
       </span>
+      {tier === 'phone' ? null : newMenu}
     </>
   );
 
@@ -959,105 +1013,108 @@ function CollectionTableBody({
     >
       <PanelHeader
         ref={headerRef}
-        heading={label}
         action={headerAction}
-        closeLabel={onClose ? 'Close' : undefined}
-        onClose={onClose}
+        maximised
+        onMaximise={() => navigate({ view: 'collection', collection })}
+        closeLabel='Close'
+        onClose={() => navigate({ view: 'home' })}
       />
-      <div className='flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4'>
-        <div className='flex flex-wrap items-center justify-between gap-2'>
-          <div className='min-w-0'>{breadcrumb}</div>
-          {newMenu}
-        </div>
-        {permissions?.status === 'failed' ? (
-          <div
-            role='alert'
-            className='flex flex-wrap items-center gap-2 text-sm text-muted-foreground'
-          >
-            <span>Couldn't check your permissions.</span>
-            <Button size='sm' onClick={permissions.retry}>
-              Retry
-            </Button>
-          </div>
-        ) : null}
-        {folderMissing ? (
-          <div className='flex flex-col items-start gap-2 rounded-md border border-border p-4'>
-            <EmptyState variant='plain' text='Folder not found.' />
-            <Button
-              variant='ghost'
-              icon='arrow-left'
-              href={formatAdminRoute({ view: 'collection', collection })}
-            >
-              {`Back to ${label}`}
-            </Button>
-          </div>
-        ) : (
-          <>
+      <div className='min-h-0 flex-1 overflow-y-auto p-4 md:px-8 lg:px-20 lg:py-5'>
+        <div className='mx-auto flex w-full max-w-280 flex-col gap-3'>
+          {tier === 'phone' ? newMenu : null}
+          {permissions?.status === 'failed' ? (
             <div
-              ref={tableBox}
-              aria-busy={isLoading || isStale}
-              data-rows-locked={rowsLocked ? '' : undefined}
-              className={
-                rowsLocked
-                  ? `[&_tbody]:pointer-events-none${pageIsChanging ? ' [&_tbody]:opacity-60' : ''}`
-                  : undefined
-              }
+              role='alert'
+              className='flex flex-wrap items-center gap-2 text-sm text-muted-foreground'
             >
-              <DataTable
-                caption={`${label} documents`}
-                columns={columns}
-                rows={
-                  isLoading
-                    ? skeletonRows
-                    : error
-                      ? []
-                      : rows.map(wide ? wideRow : listRow)
-                }
-                emptyText={emptyText}
-                emptyActionLabel={error ? 'Retry' : undefined}
-                onEmptyAction={error ? () => void page.refetch() : undefined}
-                filter={filterControls}
-              />
-            </div>
-            {showPager ? (
-              <nav
-                aria-label='Pages'
-                className='flex items-center justify-between gap-3 text-sm text-muted-foreground'
+              <span>Couldn't check your permissions.</span>
+              <Button
+                size='sm'
+                disabled={permissions.retrying}
+                onClick={permissions.retry}
               >
-                <Button
-                  size='sm'
-                  icon='chevron-left'
-                  className={PAGER_DISABLED}
-                  disabled={isStale || after.length === 0}
-                  focusableWhenDisabled
-                  onClick={() => movePager(after.slice(0, -1))}
-                >
-                  Previous
-                </Button>
-                <span aria-live='polite' className='tabular-nums'>
-                  {`Page ${pageNumber} of ${pageCount}`}
-                </span>
-                <Button
-                  size='sm'
-                  iconEnd='chevron-right'
-                  className={PAGER_DISABLED}
-                  disabled={
-                    isStale ||
-                    !connection?.pageInfo.hasNextPage ||
-                    !connection.pageInfo.endCursor
+                {permissions.retrying ? 'Retrying…' : 'Retry'}
+              </Button>
+            </div>
+          ) : null}
+          {folderMissing ? (
+            <div className='flex flex-col items-start gap-2 rounded-md border border-border p-4'>
+              <EmptyState variant='plain' text='Folder not found.' />
+              <Button
+                variant='ghost'
+                icon='arrow-left'
+                href={formatAdminRoute({ view: 'collection', collection })}
+              >
+                {`Back to ${label}`}
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div
+                ref={tableBox}
+                aria-busy={isLoading || isStale}
+                data-rows-locked={rowsLocked ? '' : undefined}
+                className={cn(
+                  rowsLocked &&
+                    '[&_tbody]:pointer-events-none [&_tbody]:opacity-60'
+                )}
+              >
+                <DataTable
+                  caption={`${label} documents`}
+                  columns={columns}
+                  rows={
+                    isLoading
+                      ? skeletonRows
+                      : error
+                        ? []
+                        : rows.map(wide ? wideRow : listRow)
                   }
-                  focusableWhenDisabled
-                  onClick={() => {
-                    const cursor = connection?.pageInfo.endCursor;
-                    if (cursor) movePager([...after, cursor]);
-                  }}
+                  emptyText={emptyText}
+                  emptyActionLabel={error ? 'Retry' : undefined}
+                  onEmptyAction={error ? () => void page.refetch() : undefined}
+                  filter={filterControls}
+                />
+              </div>
+              {showPager ? (
+                <nav
+                  aria-label='Pages'
+                  className='flex items-center justify-between gap-3 text-sm text-muted-foreground'
                 >
-                  Next
-                </Button>
-              </nav>
-            ) : null}
-          </>
-        )}
+                  <Button
+                    size='sm'
+                    icon='chevron-left'
+                    className={PAGER_DISABLED}
+                    disabled={isStale || after.length === 0}
+                    focusableWhenDisabled
+                    onClick={() => movePager(after.slice(0, -1))}
+                  >
+                    Previous
+                  </Button>
+                  <span aria-live='polite' className='tabular-nums'>
+                    {`Page ${pageNumber} of ${pageCount}`}
+                  </span>
+                  <Button
+                    size='sm'
+                    iconEnd='chevron-right'
+                    className={PAGER_DISABLED}
+                    disabled={
+                      isStale ||
+                      !connection?.pageInfo.hasNextPage ||
+                      !connection.pageInfo.endCursor
+                    }
+                    focusableWhenDisabled
+                    onClick={() => {
+                      const cursor = connection?.pageInfo.endCursor;
+                      if (cursor) movePager([...after, cursor]);
+                    }}
+                  >
+                    Next
+                  </Button>
+                </nav>
+              ) : null}
+            </>
+          )}
+        </div>
       </div>
       {dialogs}
     </section>
@@ -1067,21 +1124,13 @@ function CollectionTableBody({
 /**
  * The documents of a collection folder as a table: folders first, then documents, with filter,
  * status views, sorting, paging and the row actions. State resets when the folder changes.
- * `headerAction` takes the shell's Restore button.
  */
-export function CollectionTable({
-  collection,
-  folder,
-  headerAction,
-  onClose,
-}: TableBodyProps) {
+export function CollectionTable({ collection, folder }: TableBodyProps) {
   return (
     <CollectionTableBody
       key={`${collection}/${folder}`}
       collection={collection}
       folder={folder}
-      headerAction={headerAction}
-      onClose={onClose}
     />
   );
 }

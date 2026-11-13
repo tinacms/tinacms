@@ -162,7 +162,7 @@ describe('a document with no file yet', () => {
 
   it.each([
     [FOLDER_PATH, '#/collections/post/folder/a'],
-    [TOP_PATH, '#/collections/post'],
+    [TOP_PATH, '#/collections/post?max'],
   ])(
     'drops the copy on Discard and returns to the table of %s',
     async (path, hash) => {
@@ -210,24 +210,24 @@ describe('the collection views', () => {
     });
   });
 
-  it('fills the screen with the table and Restore returns to the tree', async () => {
+  it('Restore returns the collection table to the tree', async () => {
     const user = userEvent.setup();
-    window.location.hash = '#/collections/post';
+    window.location.hash = '#/collections/post?max';
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: 'Restore' }));
-    expect(window.location.hash).toBe('#/collections/post?side');
+    expect(window.location.hash).toBe('#/collections/post');
     expect(
       await screen.findByRole('list', { name: 'Posts documents' })
     ).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Restore' })).toBeNull();
   });
 
-  it('keeps the folder when Restore returns to the tree from a folder table', async () => {
+  it('Restore returns a folder table to its collection in the tree', async () => {
     const user = userEvent.setup();
     window.location.hash = '#/collections/post/folder/a';
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: 'Restore' }));
-    expect(window.location.hash).toBe('#/collections/post/folder/a?side');
+    expect(window.location.hash).toBe('#/collections/post');
     expect(
       await screen.findByRole('list', { name: 'Posts documents' })
     ).toBeVisible();
@@ -257,16 +257,16 @@ describe('the collection views', () => {
       screen.getByRole('button', { name: 'Return to navigator' })
     );
     await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections/post')
+      expect(window.location.hash).toBe('#/collections/post?max')
     );
   });
 
-  it('marks Collections active on the table, folder and side views', async () => {
+  it('marks Collections active on the table and folder views', async () => {
     window.location.hash = '#/collections/post/folder/a';
     renderAdmin();
-    const collections = await screen.findByRole('button', {
-      name: 'Collections',
-    });
+    const collections = within(
+      await screen.findByRole('navigation', { name: 'Content' })
+    ).getByRole('button', { name: 'Collections' });
     expect(collections).toHaveAttribute('aria-current', 'page');
   });
 });
@@ -319,7 +319,6 @@ describe('the table after a save and after Duplicate', () => {
     await waitFor(() =>
       expect(within(row).getByText('just now')).toBeVisible()
     );
-    expect(within(row).getByText('Saved')).toBeVisible();
     expect(within(row).queryByText('Unsaved')).toBeNull();
   });
 
@@ -337,7 +336,7 @@ describe('the table after a save and after Duplicate', () => {
       values: { title: 'Unsaved edit' },
       baseline: { title: 'Hello' },
     });
-    window.location.hash = '#/collections/post';
+    window.location.hash = '#/collections/post?max';
     renderAdmin();
     await user.click(
       await screen.findByRole('button', { name: 'Actions for hello.mdx' })
@@ -364,7 +363,7 @@ describe('the table after a save and after Duplicate', () => {
     expect(await within(dialog).findByRole('alert')).toHaveTextContent(
       'That name is not allowed.'
     );
-    expect(window.location.hash).toBe('#/collections/post');
+    expect(window.location.hash).toBe('#/collections/post?max');
 
     await user.clear(box);
     await user.type(box, 'fresh');

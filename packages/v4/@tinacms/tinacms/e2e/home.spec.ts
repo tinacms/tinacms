@@ -319,7 +319,7 @@ test('Home reaches every tile, row and button by Tab, and Enter opens a collecti
   expect(stops[4]).toMatch(/^Pull request #128/);
   await posts.focus();
   await page.keyboard.press('Enter');
-  await expect(page).toHaveURL(/#\/collections\/post$/);
+  await expect(page).toHaveURL(/#\/collections\/post\?max$/);
 });
 
 const SIZES = [

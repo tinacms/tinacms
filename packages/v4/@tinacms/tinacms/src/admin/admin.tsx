@@ -1,6 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { Breadcrumb } from '@tinacms/ui/components/breadcrumb';
-import { Button } from '@tinacms/ui/components/button';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { TooltipProvider } from '@tinacms/ui/components/tooltip';
@@ -44,6 +43,7 @@ import {
   ToolsPane,
 } from './navigator';
 import { CollectionTable } from './collection-table/collection-table';
+import { CollectionsIndex } from './collections-index/collections-index';
 import { AdminRail, HOME_SCREEN, MEDIA_SCREEN } from './rail';
 import { MediaPaneShellContext } from './media-pane-shell';
 import { AdminErrorBoundary } from './error-boundary';
@@ -529,24 +529,31 @@ function AdminShell({
       ? lastOpen.path
       : undefined);
   const tableFolder =
-    mainRoute.view === 'folder' && !mainRoute.side
+    mainRoute.view === 'folder'
       ? mainRoute.folder
-      : mainRoute.view === 'collection' && !mainRoute.side
+      : mainRoute.view === 'collection' && mainRoute.maximised
         ? ''
         : undefined;
   const showTable = collection !== undefined && tableFolder !== undefined;
+  const showIndex = mainRoute.view === 'collections' && !!mainRoute.maximised;
   const mainShowsNavigator =
-    mainRoute.view === 'collections' ||
+    (mainRoute.view === 'collections' && !showIndex) ||
     (mainRoute.view === 'collection' && !showTable) ||
     (mainRoute.view === 'folder' && !showTable) ||
     (mainRoute.view === 'document' && collection === undefined);
   const showNavigator = !isMediaRoute && mainShowsNavigator;
+  const maximiseNavigator = () =>
+    navigate(
+      collection
+        ? { view: 'collection', collection: collection.name, maximised: true }
+        : { view: 'collections', maximised: true }
+    );
   const goToFolderOf = (documentPath: string) => {
     if (!collection) return goToCollections();
     const folder = folderOfDocument(collection, documentPath);
     navigate(
       folder === ''
-        ? { view: 'collection', collection: collection.name }
+        ? { view: 'collection', collection: collection.name, maximised: true }
         : { view: 'folder', collection: collection.name, folder }
     );
   };
@@ -597,6 +604,7 @@ function AdminShell({
             route={route}
             navigate={navigate}
             onClose={goHome}
+            onMaximise={maximiseNavigator}
             hideBelowLg={isStaleCollectionRoute}
           />
         ) : null}
@@ -633,41 +641,17 @@ function AdminShell({
             <MissingPanel title='Collection not found' onClose={goHome}>
               No collection named “{activeCollectionName}”.
             </MissingPanel>
+          ) : showIndex ? (
+            <SidebarInset className='min-w-0'>
+              <CollectionsIndex />
+            </SidebarInset>
           ) : showTable ? (
             <SidebarInset className='min-w-0'>
-              <div className='min-h-0 flex-1 overflow-y-auto'>
-                <CollectionTable
-                  key={`${branch ?? ''}/${collection.name}/${tableFolder}`}
-                  collection={collection.name}
-                  folder={tableFolder}
-                  onClose={goHome}
-                  headerAction={
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='max-lg:hidden'
-                      onClick={() =>
-                        navigate(
-                          tableFolder === ''
-                            ? {
-                                view: 'collection',
-                                collection: collection.name,
-                                side: true,
-                              }
-                            : {
-                                view: 'folder',
-                                collection: collection.name,
-                                folder: tableFolder,
-                                side: true,
-                              }
-                        )
-                      }
-                    >
-                      Restore
-                    </Button>
-                  }
-                />
-              </div>
+              <CollectionTable
+                key={`${branch ?? ''}/${collection.name}/${tableFolder}`}
+                collection={collection.name}
+                folder={tableFolder}
+              />
             </SidebarInset>
           ) : isStaleDocumentRoute ? (
             <MissingPanel title='Document not found' onClose={goHome}>
@@ -679,6 +663,8 @@ function AdminShell({
                 Cannot read “{openPath}”. {openDocumentError.message}
               </span>
             </MissingPanel>
+          ) : mainShowsNavigator && homeScreen ? (
+            <HomeOutlet screen={homeScreen} segments={[]} />
           ) : mainShowsNavigator ? (
             <DocumentScope collection={collection} path={undefined}>
               <SidebarInset className='min-w-0'>

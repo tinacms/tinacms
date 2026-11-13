@@ -440,7 +440,11 @@ describe('focus after a dialog closes', () => {
     );
     await waitFor(() => expect(screen.queryByText('Only')).toBeNull());
     await waitFor(() =>
-      expect(screen.getByRole('heading', { name: 'Posts' })).toHaveFocus()
+      expect(
+        within(
+          screen.getByRole('navigation', { name: 'Collection path' })
+        ).getByText('Posts')
+      ).toHaveFocus()
     );
   });
 
@@ -620,6 +624,29 @@ describe('a failed permissions answer', () => {
     );
     await openMenu(user, 'Beta');
     expect(menuItems()).toEqual(['Rename', 'Duplicate', 'Delete']);
+  });
+
+  it('disables Retry and says it is retrying while the answer is loading again', async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Response.json(
+          { error: { code: 'boom', message: 'Server error' } },
+          { status: 500 }
+        )
+      )
+    );
+    renderTable({ auth: signedIn(['editor']) });
+    await screen.findByText("Couldn't check your permissions.");
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => {}))
+    );
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(
+      await screen.findByRole('button', { name: 'Retrying…' })
+    ).toBeDisabled();
   });
 
   it('shows no notice and no action while the answer is pending', async () => {
@@ -823,7 +850,11 @@ describe('focus after a successful rename', () => {
     const dialog = await renameDialogFor(user, 'gam.md');
     await submitRename(user, dialog, 'File name', 'xyz');
     await waitFor(() =>
-      expect(screen.getByRole('heading', { name: 'Posts' })).toHaveFocus()
+      expect(
+        within(
+          screen.getByRole('navigation', { name: 'Collection path' })
+        ).getByText('Posts')
+      ).toHaveFocus()
     );
   });
 });

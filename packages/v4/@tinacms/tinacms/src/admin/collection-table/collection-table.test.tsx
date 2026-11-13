@@ -143,7 +143,9 @@ const setWidth = (width: number) =>
 
 function Where() {
   const location = useLocation();
-  return <output aria-label='location'>{location.pathname}</output>;
+  return (
+    <output aria-label='location'>{location.pathname + location.search}</output>
+  );
 }
 
 const renderTable = (folder = '', children?: ReactNode) => {
@@ -232,10 +234,103 @@ describe('CollectionTable', () => {
   it('lists folders first with counts, then documents newest first', async () => {
     renderTable();
     expect(await rowNamed('guides/')).toBeInTheDocument();
-    expect(screen.getByText('2 documents')).toBeInTheDocument();
     expect(titles()).toEqual(['guides/', 'Beta', 'gamma.md', 'Alpha']);
-    expect(screen.getByText(/by Ada/)).toBeInTheDocument();
-    expect(screen.queryByText(/by undefined/)).not.toBeInTheDocument();
+    expect(screen.getByText('2 documents')).toBeInTheDocument();
+    expect(screen.getByText('Folder')).toBeInTheDocument();
+    expect(screen.getByText(/· Ada/)).toBeInTheDocument();
+    expect(screen.queryByText(/undefined/)).not.toBeInTheDocument();
+    expect(
+      screen.getByText('1 folder, 3 documents · 5 in total')
+    ).toBeInTheDocument();
+  });
+
+  it('shows the file from the collection folder, a badge only for an unsaved document, and no word for a saved one', async () => {
+    useFormStore.setState({ forms: {} });
+    renderTable();
+    await rowNamed('Beta');
+    expect(screen.getByText('posts/guides/')).toBeInTheDocument();
+    expect(screen.getByText('posts/beta.md')).toHaveAttribute(
+      'title',
+      'posts/beta.md'
+    );
+    const table = within(screen.getByRole('table'));
+    expect(table.queryByText('Saved')).toBeNull();
+    expect(table.queryByText('Unsaved')).toBeNull();
+    expect(
+      screen
+        .getAllByRole('columnheader')
+        .map((head) => head.textContent?.replace(/[↑↓↕]/g, '').trim())
+    ).toEqual(['Title', 'File', 'Status', 'Last edited', 'Actions']);
+  });
+
+  it('counts matches against the scope total with a filter, and the page rows in a status view', async () => {
+    const user = userEvent.setup();
+    renderTable();
+    await rowNamed('Beta');
+    await user.type(
+      screen.getByRole('searchbox', { name: 'Filter by title or filename' }),
+      'alp'
+    );
+    expect(await screen.findByText('1 of 3 documents')).toBeInTheDocument();
+    await user.clear(
+      screen.getByRole('searchbox', { name: 'Filter by title or filename' })
+    );
+    await screen.findByText('1 folder, 3 documents · 5 in total');
+    await user.click(screen.getByRole('button', { name: 'Unsaved' }));
+    expect(screen.getByText('0 of 3 documents')).toBeInTheDocument();
+  });
+
+  it('builds the header from Back, a breadcrumb, Restore and Close', async () => {
+    const user = userEvent.setup();
+    renderTable();
+    await rowNamed('Beta');
+    const trail = screen.getByRole('navigation', { name: 'Collection path' });
+    expect(within(trail).getByText('Posts')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+    expect(screen.getByLabelText('location')).toHaveTextContent(
+      '/collections?max'
+    );
+    await user.click(screen.getByRole('button', { name: 'Restore' }));
+    expect(screen.getByLabelText('location')).toHaveTextContent(
+      '/collections/post'
+    );
+    expect(screen.getByLabelText('location')).not.toHaveTextContent('?max');
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.getByLabelText('location')).toHaveTextContent('/');
+  });
+
+  it('shows Collections, the label and each folder in a folder, and Back goes up one level', async () => {
+    const user = userEvent.setup();
+    world.summaries = [doc('a/b/deep.md', { title: 'Deep' })];
+    renderTable('a/b');
+    await rowNamed('Deep');
+    const trail = screen.getByRole('navigation', { name: 'Collection path' });
+    expect(
+      within(trail)
+        .getAllByText(/^(Collections|Posts|a|b)$/)
+        .map((part) => part.textContent)
+    ).toEqual(['Collections', 'a', 'b']);
+    await user.click(
+      within(trail).getByRole('button', { name: 'Show 1 more level' })
+    );
+    expect(
+      await screen.findByRole('menuitem', { name: 'Posts' })
+    ).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+    expect(screen.getByLabelText('location')).toHaveTextContent(
+      '/collections/post/folder/a'
+    );
+    await user.click(
+      within(trail).getByRole('button', { name: 'Show 1 more level' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: 'Posts' }));
+    expect(screen.getByLabelText('location')).toHaveTextContent(
+      '/collections/post?max'
+    );
   });
 
   it('opens a document and a folder from their rows', async () => {
@@ -439,6 +534,9 @@ describe('CollectionTable', () => {
       'data-rows-locked'
     );
     expect(first.closest('tbody')).not.toHaveAttribute('inert');
+    expect(first.closest('[aria-busy]')?.className ?? '').not.toMatch(
+      /pointer-events-none/
+    );
     release();
     await waitFor(() =>
       expect(first.closest('[aria-busy]')).toHaveAttribute('aria-busy', 'false')
@@ -471,6 +569,47 @@ describe('CollectionTable', () => {
       await screen.findByRole('button', { name: 'p050.md' })
     ).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'p100.md' })).toBeNull();
+  });
+
+  it('dims and ignores the rows for the hold after a page change, then frees them', async () => {
+    const user = userEvent.setup();
+    world.summaries = Array.from({ length: 120 }, (_, index) =>
+      doc(`p${String(index).padStart(3, '0')}.md`)
+    );
+    renderTable();
+    await screen.findByText('Page 1 of 3');
+    await user.click(screen.getByRole('button', { name: 'Next' }));
+    const busy = (await rowNamed('p050.md')).closest('[aria-busy]');
+    expect(busy?.className).toMatch(/pointer-events-none/);
+    expect(busy?.className).toMatch(/opacity-60/);
+    await pastPagerHold();
+    expect(busy?.className ?? '').not.toMatch(/pointer-events-none/);
+  });
+
+  it('locks the rows when a filter change on page 2 drops back to page 1', async () => {
+    const user = userEvent.setup();
+    world.summaries = Array.from({ length: 120 }, (_, index) =>
+      doc(`p${String(index).padStart(3, '0')}.md`)
+    );
+    renderTable();
+    await screen.findByText('Page 1 of 3');
+    await user.click(screen.getByRole('button', { name: 'Next' }));
+    await screen.findByText('Page 2 of 3');
+    await pastPagerHold();
+    let release = () => {};
+    world.holdList = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await user.type(
+      screen.getByRole('searchbox', { name: 'Filter by title or filename' }),
+      'p01'
+    );
+    const row = await screen.findByRole('button', { name: 'p050.md' });
+    await waitFor(() =>
+      expect(row.closest('[aria-busy]')).toHaveAttribute('data-rows-locked')
+    );
+    release();
+    await screen.findByRole('button', { name: 'p010.md' });
   });
 
   it('keeps the title column from widening the table', async () => {

@@ -1032,7 +1032,7 @@ describe('panel headers', () => {
       ).getByRole('button', { name: 'Return to navigator' })
     );
     await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections/post')
+      expect(window.location.hash).toBe('#/collections/post?max')
     );
     view.unmount();
 

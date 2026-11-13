@@ -581,7 +581,7 @@ describe('Collections panel', () => {
     tile.focus();
     await user.keyboard('{Enter}');
     await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections/post')
+      expect(window.location.hash).toBe('#/collections/post?max')
     );
   });
 
@@ -654,7 +654,7 @@ describe('Collections panel', () => {
 
     await user.click(within(posts).getByRole('button', { name: 'Posts' }));
     await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections/post')
+      expect(window.location.hash).toBe('#/collections/post?max')
     );
   });
 

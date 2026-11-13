@@ -5,7 +5,7 @@ import {
   type ListSort,
 } from '../../core/content/contract';
 import { shownNameOf } from '../../core/content/list-query';
-import { extensionOf, nameOf } from '../../core/content/names';
+import { extensionOf, nameOf, trimSlashes } from '../../core/content/names';
 
 export const PAGE_SIZE = 50;
 export const FILTER_DELAY_MS = 250;
@@ -212,3 +212,73 @@ export const joinFolder = (parent: string, name: string): string =>
 /** Whether the loaded page shows any document with a last-edited time. TinaCloud lists carry none. */
 export const hasEditTimes = (connection: DocumentConnection): boolean =>
   connection.edges.some(({ node }) => dateOf(node.updatedAt) !== undefined);
+
+const lastPartOf = (path: string): string => path.split('/').at(-1) ?? path;
+
+/**
+ * The path shown in the File column: from the collection folder's last part
+ * (`docs/intro.mdx` for a collection at `content/docs`). A path outside the collection folder, or
+ * a collection with none, shows as the provider gives it.
+ */
+export const fileOf = (
+  collectionPath: string | undefined,
+  documentPath: string
+): string => {
+  const root = trimSlashes(collectionPath ?? '');
+  if (root === '' || !documentPath.startsWith(`${root}/`)) return documentPath;
+  return `${lastPartOf(root)}/${documentPath.slice(root.length + 1)}`;
+};
+
+/** The File column of a folder row: its path from the collection folder's last part, ending in `/`. */
+export const folderFileOf = (
+  collectionPath: string | undefined,
+  folderPath: string
+): string => {
+  const root = trimSlashes(collectionPath ?? '');
+  return root === '' ? `${folderPath}/` : `${lastPartOf(root)}/${folderPath}/`;
+};
+
+export const plural = (count: number, one: string, many: string): string =>
+  `${count} ${count === 1 ? one : many}`;
+
+export interface CountTextInput {
+  connection: DocumentConnection | undefined;
+  /** The scope's `totalCount` from its last read with no text filter. */
+  unfilteredTotal: number | undefined;
+  filter: string;
+  view: StatusView;
+  /** Document rows of the chosen status on the loaded page, plus unsaved copies. */
+  viewCount: number;
+}
+
+/**
+ * The count above the table. All with no filter lists the folders and the total under them; a text
+ * filter or a status view counts matches against the scope's documents.
+ */
+export const countTextOf = ({
+  connection,
+  unfilteredTotal,
+  filter,
+  view,
+  viewCount,
+}: CountTextInput): string => {
+  if (!connection) return '';
+  const documents = connection.totalCount;
+  const scopeTotal = unfilteredTotal ?? documents;
+  if (view !== 'all')
+    return `${viewCount} of ${plural(scopeTotal, 'document', 'documents')}`;
+  if (filter !== '') {
+    return `${documents} of ${plural(scopeTotal, 'document', 'documents')}`;
+  }
+  const folders = connection.folders;
+  const total =
+    documents + folders.reduce((sum, folder) => sum + folder.documentCount, 0);
+  const parts = [
+    ...(folders.length === 0
+      ? []
+      : [plural(folders.length, 'folder', 'folders')]),
+    plural(documents, 'document', 'documents'),
+  ];
+  const listed = parts.join(', ');
+  return total === documents ? listed : `${listed} · ${total} in total`;
+};
