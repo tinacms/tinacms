@@ -86,7 +86,7 @@ export const parseAdminRoute = (hash: string): AdminRoute => {
   if (prefix !== COLLECTIONS_PREFIX) return HOME_ROUTE;
   const [docPath, ...folderParts] = rest;
   if (!docPath) {
-    return query === 'max'
+    return (query ?? '').split('&').includes('max')
       ? { view: 'collection', collection: head, maximised: true }
       : { view: 'collection', collection: head };
   }

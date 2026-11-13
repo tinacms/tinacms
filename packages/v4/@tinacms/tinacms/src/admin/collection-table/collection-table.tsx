@@ -313,14 +313,18 @@ function CollectionTableBody({
   };
   const page = useDocumentsPage(collection, query);
   const connection = page.data;
+  const isStale = page.isPlaceholderData;
   const unfiltered = useDocumentsPage(
     collection,
     { folder, first: 1 },
     filter !== ''
   );
   const unfilteredTotal =
-    filter === '' ? connection?.totalCount : unfiltered.data?.totalCount;
-  const isStale = page.isPlaceholderData;
+    filter === ''
+      ? isStale
+        ? undefined
+        : connection?.totalCount
+      : unfiltered.data?.totalCount;
   // The rows, count and page label stay those of the page on screen until the next page arrives.
   const [shownDepth, setShownDepth] = useState(0);
   useEffect(() => {

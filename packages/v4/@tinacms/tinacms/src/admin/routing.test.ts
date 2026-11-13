@@ -171,6 +171,14 @@ describe('parseAdminRoute on input a user can type', () => {
     });
   });
 
+  it('reads ?max beside another flag on a collection', () => {
+    expect(parseAdminRoute('#/collections/post?unsaved&max')).toEqual({
+      view: 'collection',
+      collection: 'post',
+      maximised: true,
+    });
+  });
+
   it('reads a folder address with no parts as the collection', () => {
     expect(parseAdminRoute('#/collections/post/folder')).toEqual({
       view: 'collection',

@@ -26,8 +26,15 @@ export function RowHint({
       <TooltipTrigger
         render={
           <span
+            role='link'
             tabIndex={0}
             onClick={onOpen}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onOpen();
+              }
+            }}
             className={cn(
               'relative z-10 cursor-pointer rounded-xs outline-none focus-visible:shadow-focus-ring',
               className

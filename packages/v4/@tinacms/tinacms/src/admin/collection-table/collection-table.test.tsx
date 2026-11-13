@@ -661,6 +661,18 @@ describe('CollectionTable', () => {
     expect(await rowNamed('Beta')).toBeInTheDocument();
   });
 
+  it('opens the row from the File text with Enter', async () => {
+    const user = userEvent.setup();
+    renderTable();
+    await rowNamed('Beta');
+    const file = screen.getAllByText('posts/beta.md')[0] as HTMLElement;
+    while (document.activeElement !== file) await user.tab();
+    await user.keyboard('{Enter}');
+    expect(screen.getByLabelText('location')).toHaveTextContent(
+      '/collections/post/content%2Fposts%2Fbeta.md'
+    );
+  });
+
   it.each(['nope', 'a/nope', 'v1.2'])(
     'says Folder not found for the missing folder %s and links back to the table',
     async (folder) => {
