@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { DocumentForm } from '../admin/document-form';
+import { LevelHead } from '../test/level-head';
 import { defineClientPlugin } from '../client';
 import { asResolvedConfig } from '../config';
 import { definePlugin } from '../core/plugin';
@@ -103,6 +104,7 @@ const renderForm = () =>
         path='content/pages/x.mdx'
         document={{ box: { a: '', b: '' } }}
       >
+        <LevelHead />
         <DocumentForm />
       </FormProvider>
     </TinaProvider>
@@ -114,9 +116,7 @@ describe('field plugin hooks', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'card' }));
     expect(await screen.findByText('open')).toBeVisible();
     expect(
-      within(screen.getByRole('navigation', { name: 'Field path' })).getByText(
-        'box'
-      )
+      screen.getByRole('heading', { level: 2, name: 'box' })
     ).toBeVisible();
     expect(screen.getByLabelText('open count')).toHaveTextContent('0');
 

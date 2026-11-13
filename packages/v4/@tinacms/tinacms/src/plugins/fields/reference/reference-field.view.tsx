@@ -52,6 +52,8 @@ export type ReferenceFieldViewProps = Pick<
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   ref?: Ref<HTMLInputElement>;
 };
 
@@ -117,6 +119,7 @@ export function ReferenceFieldView({
   placeholder = 'Search documents…',
   disabled = false,
   readOnly = false,
+  active = false,
   ref,
   ...frame
 }: ReferenceFieldViewProps) {
@@ -154,6 +157,7 @@ export function ReferenceFieldView({
           <ComboboxInput
             ref={ref}
             id={id}
+            data-active={active ? '' : undefined}
             className='min-w-0 flex-1'
             disabled={disabled}
             showClear={clearable}

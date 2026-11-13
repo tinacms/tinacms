@@ -3,6 +3,7 @@ import {
   tinaField,
   useTina,
 } from '@tinacms/tinacms/adapters/react';
+import { isRecord } from '../../../src/utils/is-record';
 import { sampleDocument } from '../content';
 
 export function PostPreview() {
@@ -25,6 +26,11 @@ export function PostPreview() {
         {post.featured ? '★ Featured' : '☆ Not featured'}
       </span>
       <h1 {...tinaField('title')}>{String(post.title ?? '')}</h1>
+      {isRecord(post.author) ? (
+        <p {...tinaField('author.name')} data-testid='author-name'>
+          {String(post.author.name ?? '')}
+        </p>
+      ) : null}
       <p style={{ color: '#6b7280' }}>
         {isEditing
           ? 'This preview renders the document streamed from the editor. Click the title or the badge to focus its field in the sidebar.'

@@ -12,7 +12,7 @@ export function DrillInField() {
   const address = use(FieldAddressContext);
   const node = use(FieldSchemaContext);
   const scope = use(FormScopeContext);
-  const frame = useFieldFrame();
+  const { active: _active, ...frame } = useFieldFrame();
   if (address == null || node == null || scope == null) return null;
   return (
     <FieldWrapper {...frame}>

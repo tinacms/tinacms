@@ -1,4 +1,12 @@
-import { use, useEffect, useLayoutEffect, useRef } from 'react';
+import {
+  type FocusEvent,
+  type PointerEvent,
+  type SyntheticEvent,
+  use,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 import type { FieldAddress } from '../core/field/address';
 import { toFieldAddress } from '../core/field/address';
 import type { FieldSchema } from '../core/schema/types';
@@ -8,12 +16,17 @@ import { useFormStore } from '../form/form-store';
 import { DrillInField } from './drill-in-field';
 import { drillsInAt } from './form-view-state';
 import {
+  FieldActiveContext,
   FieldAddressContext,
   FieldLockContext,
   FieldSchemaContext,
   FormScopeContext,
   TinaRuntimeContext,
 } from './context';
+
+const isInnermostFrame = (event: SyntheticEvent<HTMLElement>) =>
+  !(event.target instanceof Element) ||
+  event.target.closest('[data-field-frame]') === event.currentTarget;
 
 export interface FieldNodeProps {
   address: FieldAddress;
@@ -38,13 +51,19 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     throw new Error(`No field plugin registered for type "${node.type}"`);
   }
 
-  const markActive = () => {
+  const markActive = (event: FocusEvent<HTMLDivElement>) => {
+    if (!isInnermostFrame(event)) return;
     const { active, setActive } = useFormStore.getState();
     if (active?.formId === scope.formId && active.address === address) {
       return;
     }
     setActive(scope.formId, address);
   };
+
+  const active = useFormStore(
+    (state) =>
+      state.active?.formId === scope.formId && state.active.address === address
+  );
 
   const openAddress = useStore(
     scope.view,
@@ -83,6 +102,21 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     };
   }, [scope.formId, address]);
 
+  const hoverOver = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === 'touch') return;
+    if (!isInnermostFrame(event)) return;
+    useFormStore.getState().setHovered(scope.formId, address);
+  };
+  const hoverOut = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === 'touch') return;
+    const next = event.relatedTarget;
+    if (next instanceof Node && event.currentTarget.contains(next)) return;
+    const { hovered, setHovered } = useFormStore.getState();
+    if (hovered?.formId === scope.formId && hovered.address === address) {
+      setHovered(scope.formId, null);
+    }
+  };
+
   const Component = drills
     ? (descriptor.DrillInComponent ?? DrillInField)
     : descriptor.Component;
@@ -94,18 +128,23 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     <FieldAddressContext value={address}>
       <FieldSchemaContext value={node}>
         <FieldLockContext value={lock}>
-          <div
-            ref={frame}
-            style={{ display: 'contents' }}
-            onFocus={markActive}
-            onBlur={(event) => {
-              if (!event.currentTarget.contains(event.relatedTarget)) {
-                scope.view.getState().touch(address);
-              }
-            }}
-          >
-            <Component />
-          </div>
+          <FieldActiveContext value={active}>
+            <div
+              ref={frame}
+              data-field-frame=''
+              style={{ display: 'contents' }}
+              onPointerOver={hoverOver}
+              onPointerOut={hoverOut}
+              onFocus={markActive}
+              onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                  scope.view.getState().touch(address);
+                }
+              }}
+            >
+              <Component />
+            </div>
+          </FieldActiveContext>
         </FieldLockContext>
       </FieldSchemaContext>
     </FieldAddressContext>

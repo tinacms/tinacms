@@ -1,4 +1,8 @@
-export { TINA_FIELD_ATTR, tinaField } from '../../preview/protocol';
+export {
+  TINA_DOCUMENT_ATTR,
+  TINA_FIELD_ATTR,
+  tinaField,
+} from '../../preview/protocol';
 export {
   type Components,
   StaticTinaMarkdown,

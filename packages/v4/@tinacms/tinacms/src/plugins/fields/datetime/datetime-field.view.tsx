@@ -24,6 +24,8 @@ export type DatetimeFieldViewProps = Pick<
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   ref?: Ref<HTMLInputElement>;
 };
 
@@ -40,6 +42,7 @@ export function DatetimeFieldView({
   placeholder,
   disabled = false,
   readOnly = false,
+  active = false,
   ref,
   ...frame
 }: DatetimeFieldViewProps) {
@@ -58,6 +61,7 @@ export function DatetimeFieldView({
           required={frame.required}
           disabled={disabled}
           readOnly={readOnly}
+          data-active={active ? '' : undefined}
           data-empty={value === '' ? '' : undefined}
           aria-invalid={frame.errors?.length ? true : undefined}
           aria-describedby={frame.help ? frame.helpId : undefined}

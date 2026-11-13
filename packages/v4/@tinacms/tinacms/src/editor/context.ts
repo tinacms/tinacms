@@ -83,3 +83,6 @@ export const FieldLockContext = createContext<FieldLock>({
   disabled: false,
   readOnly: false,
 });
+
+/** True while the field frame's address is the form's active field. */
+export const FieldActiveContext = createContext(false);

@@ -39,6 +39,8 @@ export type SelectFieldViewProps = Pick<
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   ref?: Ref<HTMLButtonElement>;
 };
 
@@ -57,6 +59,7 @@ export function SelectFieldView({
   placeholder = 'Select...',
   disabled = false,
   readOnly = false,
+  active = false,
   ref,
   ...frame
 }: SelectFieldViewProps) {
@@ -76,6 +79,7 @@ export function SelectFieldView({
         <SelectTrigger
           ref={ref}
           id={id}
+          data-active={active ? '' : undefined}
           className='w-full disabled:opacity-100'
           aria-invalid={frame.errors?.length ? true : undefined}
           aria-describedby={frame.help ? frame.helpId : undefined}

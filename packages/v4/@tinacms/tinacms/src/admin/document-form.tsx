@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@tinacms/ui/components/dropdown-menu';
 import { tinaResolveLabel } from '@tinacms/ui/components/error-summary-pane';
+import type { BreadcrumbStep } from '@tinacms/ui/components/breadcrumb';
 import { FormLevel } from '@tinacms/ui/components/form-level';
 import { SaveToBranchDialog } from '@tinacms/ui/components/save-to-branch-dialog';
 import { toast } from '@tinacms/ui/components/toast';
@@ -24,7 +25,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { get, useFormContext } from 'react-hook-form';
 import { useStore } from 'zustand';
 import {
   FieldLockContext,
@@ -707,50 +708,59 @@ function ActiveFieldLevels({ scope }: { scope: FormScope }) {
   return null;
 }
 
-// Reads the whole view and every error for the trail. `children` keeps its
-// element identity, so a re-render here does not reach the fields.
-function OpenLevelFrame({
-  scope,
-  current,
-  children,
-}: {
-  scope: FormScope;
-  current: OpenLevel;
-  children: ReactNode;
-}) {
-  const errors = useFormErrors(useFormId());
-  const { getValues } = useFormContext();
-  const view = useStore(scope.view);
-  const { collection, path } = scope;
-  const { closeLevelsAbove } = scope.view.getState();
+function OpenLevelFrame({ children }: { children: ReactNode }) {
+  return <FormLevel pinHeaders>{children}</FormLevel>;
+}
 
+/**
+ * The levels the form is drilled into, as trail steps for the head. `parents`
+ * are the levels above the open one, each returning to its level; `heading` is
+ * the open level; `closeAll` returns to the document.
+ */
+export function useLevelTrail(scope: FormScope): {
+  heading: string | null;
+  parents: BreadcrumbStep[];
+  documentInvalid: boolean;
+  closeAll: () => void;
+} {
+  const errors = useFormErrors(scope.formId);
+  const values = useFormStore((state) => state.forms[scope.formId]?.values);
+  const view = useStore(scope.view);
+  const { closeLevelsAbove } = scope.view.getState();
+  const current = view.openLevels.at(-1);
   const errorAddresses = Object.keys(errors);
-  const steps = [
-    {
-      label: path.split('/').at(-1) ?? path,
-      onClick: () => closeLevelsAbove(0),
-      invalid: holdsRevealedError(view, errorAddresses),
-    },
-    ...fieldsAlong(current.address, collection.fields, getValues).map(
-      (step) => {
-        const keep = view.openLevels.filter(
-          (level) =>
-            level.address === step.address ||
-            step.address.startsWith(`${level.address}.`)
-        ).length;
-        return {
-          label: step.label,
-          onClick: () => closeLevelsAbove(keep),
-          invalid: holdsRevealedError(view, errorAddresses, step.address),
-        };
-      }
-    ),
-  ];
-  return (
-    <FormLevel pinHeaders steps={steps} onUp={steps.at(-2)?.onClick}>
-      {children}
-    </FormLevel>
+  const documentInvalid = holdsRevealedError(view, errorAddresses);
+  if (!current) {
+    return {
+      heading: null,
+      parents: [],
+      documentInvalid,
+      closeAll: () => closeLevelsAbove(0),
+    };
+  }
+  const along = fieldsAlong(
+    current.address,
+    scope.collection.fields,
+    (address) => (values ? get(values, address) : undefined)
   );
+  const parents = along.slice(0, -1).map((step) => {
+    const keep = view.openLevels.filter(
+      (level) =>
+        level.address === step.address ||
+        step.address.startsWith(`${level.address}.`)
+    ).length;
+    return {
+      label: step.label,
+      onClick: () => closeLevelsAbove(keep),
+      invalid: holdsRevealedError(view, errorAddresses, step.address),
+    };
+  });
+  return {
+    heading: along.at(-1)?.label ?? current.address,
+    parents,
+    documentInvalid,
+    closeAll: () => closeLevelsAbove(0),
+  };
 }
 
 function FormFields({ scope }: { scope: FormScope }) {
@@ -766,7 +776,7 @@ function FormFields({ scope }: { scope: FormScope }) {
     );
   }
   return (
-    <OpenLevelFrame scope={scope} current={current}>
+    <OpenLevelFrame>
       <FieldLockContext
         value={lockAbove(current.address, scope.collection.fields, getValues)}
       >

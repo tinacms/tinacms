@@ -3,6 +3,7 @@ export type AdminRoute =
   | { view: 'media' }
   | { view: 'tools' }
   | { view: 'settings' }
+  | { view: 'page' }
   | { view: 'collections'; unsavedOnly?: boolean }
   | { view: 'collection'; collection: string }
   | { view: 'document'; collection: string; path: string }
@@ -22,7 +23,8 @@ export const formatAdminRoute = (route: AdminRoute): string => {
   if (
     route.view === 'media' ||
     route.view === 'tools' ||
-    route.view === 'settings'
+    route.view === 'settings' ||
+    route.view === 'page'
   )
     return `#/${route.view}`;
   if (route.view === 'screen') {
@@ -52,7 +54,10 @@ export const parseAdminRoute = (hash: string): AdminRoute => {
   const [prefix, head, ...rest] = decoded as string[];
   if (
     !head &&
-    (prefix === 'media' || prefix === 'tools' || prefix === 'settings')
+    (prefix === 'media' ||
+      prefix === 'tools' ||
+      prefix === 'settings' ||
+      prefix === 'page')
   )
     return { view: prefix };
   if (prefix === COLLECTIONS_PREFIX && !head) {
