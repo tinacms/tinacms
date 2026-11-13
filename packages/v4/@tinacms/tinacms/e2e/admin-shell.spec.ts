@@ -207,3 +207,48 @@ for (const width of [320, 375, 414]) {
     });
   }
 }
+
+for (const width of [320, 375, 390, 414]) {
+  test(`Save All and its result list stay on screen at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 700 });
+    await page.goto('/#/collections/post/content%2Fposts%2Fhello-world.mdx');
+    const title = page.getByRole('textbox', { name: /^Title/ });
+    await title.fill('');
+    const bar = page.getByRole('banner', { name: 'Top bar' });
+    const saveAll = bar.getByRole('button', { name: 'Save all' });
+    await expect(saveAll).toBeEnabled();
+    await saveAll.click();
+    await expect(
+      bar.getByRole('button', { name: /^Save all, 1 failed/ })
+    ).toBeVisible();
+    await bar.getByRole('button', { name: 'Save results' }).click();
+    const results = page.getByRole('dialog', { name: 'Save results' });
+    await expect(results).toBeVisible();
+    const [barBox, buttonBox, searchBox, resultsBox, overflow] =
+      await Promise.all([
+        bar.boundingBox(),
+        bar.getByRole('button', { name: /^Save all/ }).boundingBox(),
+        bar.getByRole('button', { name: 'Search' }).boundingBox(),
+        results.boundingBox(),
+        page.evaluate(
+          () =>
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth
+        ),
+      ]);
+    expect(overflow).toBeLessThanOrEqual(0);
+    expect((buttonBox?.x ?? 0) + (buttonBox?.width ?? 0)).toBeLessThanOrEqual(
+      (barBox?.x ?? 0) + (barBox?.width ?? 0)
+    );
+    expect(searchBox?.x ?? 0).toBeGreaterThanOrEqual(barBox?.x ?? 0);
+    expect(resultsBox?.x ?? -1).toBeGreaterThanOrEqual(0);
+    expect((resultsBox?.x ?? 0) + (resultsBox?.width ?? 0)).toBeLessThanOrEqual(
+      width
+    );
+    expect(
+      (resultsBox?.y ?? 0) + (resultsBox?.height ?? 0)
+    ).toBeLessThanOrEqual(700);
+  });
+}

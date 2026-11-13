@@ -256,7 +256,7 @@ afterEach(() => {
 
 const titleInput = () => screen.findByLabelText(/^Title\b/);
 const saveButton = () =>
-  screen.findByRole('button', { name: /^(Save|Resolve)/ });
+  screen.findByRole('button', { name: /^(Save$|Resolve)/ });
 const errorsPane = () =>
   screen.findByRole('complementary', { name: /^Errors/ });
 const rowsOf = (pane: HTMLElement) =>
@@ -852,7 +852,7 @@ describe('the All fixed endings', () => {
     await user.click(await screen.findByRole('button', { name: 'Save' }));
     await waitFor(() => expect(saved).toHaveLength(1));
     await user.clear(await titleInput());
-    await user.click(await screen.findByRole('button', { name: /^Save/ }));
+    await user.click(await screen.findByRole('button', { name: /^Save$/ }));
     await screen.findByRole('button', { name: 'Resolve 1 error' });
     const words = (text: string) => text.includes('Resolve 1 error');
     await waitFor(() => expect(spoken.texts.filter(words)).toHaveLength(2));

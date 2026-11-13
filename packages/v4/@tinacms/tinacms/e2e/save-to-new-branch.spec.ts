@@ -12,7 +12,7 @@ const failSaveThenClose = async (page: Page) => {
   await title.pressSequentially('!');
   await page
     .locator('[data-slot=form-bar]')
-    .getByRole('button', { name: 'Save' })
+    .getByRole('button', { name: 'Save', exact: true })
     .click();
   await expect(
     page.getByRole('dialog', { name: 'feature/news was deleted' })
