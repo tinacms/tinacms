@@ -231,16 +231,26 @@ const openBulk = async (page: Page) => {
   await expect(page.getByText('Page 1 of 3')).toBeVisible();
 };
 
-// Two raw mouse clicks `gap` ms apart on the spot where the button is now, as a double click lands.
-// No actionability wait runs between them, so a loaded runner cannot stretch the gap.
+// Two clicks `gap` ms apart on the spot where the button is now, timed inside the page so a loaded
+// runner cannot stretch the gap. Each click goes to whatever the browser hit-tests at that spot, as a
+// double click does: a locked or inert row never receives it.
 const clickTwiceAt = async (page: Page, target: Locator, gap: number) => {
   const box = await target.boundingBox();
   expect(box).not.toBeNull();
   const x = (box?.x ?? 0) + (box?.width ?? 0) / 2;
   const y = (box?.y ?? 0) + (box?.height ?? 0) / 2;
-  await page.mouse.click(x, y);
-  await page.waitForTimeout(gap);
-  await page.mouse.click(x, y);
+  await page.evaluate(
+    async ({ x, y, gap }) => {
+      const clickHit = () => {
+        const hit = document.elementFromPoint(x, y);
+        if (hit instanceof HTMLElement) hit.click();
+      };
+      clickHit();
+      await new Promise((resolve) => setTimeout(resolve, gap));
+      clickHit();
+    },
+    { x, y, gap }
+  );
 };
 
 const nextPage = async (page: Page, label: string) => {
