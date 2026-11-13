@@ -31,13 +31,10 @@ export function useKeptEditsNotice(
     previous.current = { route, step };
     if (route.view === 'document') toast.dismiss(noticeId(route.path));
     if (left.view !== 'document') return;
-    if (
+    const sameDocument =
       route.view === 'document' &&
       route.collection === left.collection &&
-      route.path === left.path
-    ) {
-      return;
-    }
+      route.path === left.path;
     const notify = (target: DocumentRoute) => {
       const scope = readFormStore().forms[toFormId(target.path)];
       if (formStatus(scope) !== 'dirty') return;
@@ -54,7 +51,7 @@ export function useKeptEditsNotice(
     };
     const enteringStepFromLeft =
       route.view === 'document' && step?.from.path === left.path;
-    if (!enteringStepFromLeft) notify(left);
+    if (!sameDocument && !enteringStepFromLeft) notify(left);
     const stillLeadsBack =
       step !== null &&
       route.view === 'document' &&

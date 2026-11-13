@@ -92,4 +92,12 @@ describe('kept-edits notice through a reference step', () => {
     rerender({ route: post, step: null });
     expect(titles()).toEqual([]);
   });
+
+  it('names the post when the page follows to the step’s own document and the step goes', () => {
+    dirty(POST);
+    const { rerender } = setup();
+    rerender({ route: author, step });
+    rerender({ route: author, step: null });
+    expect(ids()).toEqual([`kept-edits:${POST}`]);
+  });
 });

@@ -559,6 +559,8 @@ function AdminShell({
       if (step) {
         reachedStep.current = false;
         setStepState({ step, target: target.path });
+      } else if (stepState?.target === target.path) {
+        setStepState(null);
       }
       navigate({
         view: 'document',
@@ -566,7 +568,7 @@ function AdminShell({
         path: target.path,
       });
     },
-    [navigate]
+    [navigate, stepState]
   );
 
   const isMediaRoute =

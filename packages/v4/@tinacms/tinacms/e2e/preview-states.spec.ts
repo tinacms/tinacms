@@ -248,6 +248,26 @@ const leaveStep: [string, (page: Page) => Promise<void>][] = [
       await expect(heading(page)).toHaveText(/second/i);
     },
   ],
+  [
+    'following the page to the step’s own document',
+    async (page) => {
+      const preview = await page
+        .locator('iframe[title="Preview"]')
+        .elementHandle()
+        .then((handle) => handle?.contentFrame());
+      await preview?.evaluate(() => {
+        history.pushState(
+          null,
+          '',
+          '/declared.html?post=content/authors/jane-doe.md'
+        );
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+      await expect(
+        page.getByRole('navigation', { name: 'Location' })
+      ).not.toContainText('Edited before the step');
+    },
+  ],
   ['the rail’s Tools', async (page) => rail(page, 'Tools').click()],
   ['the rail’s Settings', async (page) => rail(page, 'Settings').click()],
 ];
