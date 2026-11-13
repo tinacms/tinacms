@@ -947,10 +947,11 @@ const failedIds = (state: FormStore): FormId[] =>
  * Document save running, the failures of the latest Save All, then today's
  * order: newest failure, unsaved edits, newest success, idle. A single save
  * that starts after a run ends replaces the run's words for good. A form whose
- * `afterSave` hook failed is written, so its phase does not count as a failure.
+ * `afterSave` hook failed during the run is written, so that phase does not count
+ * as a failure; a later save attempt of the same form still does.
  */
 export const summarizeSaves = (state: FormStore): SaveSummary => {
-  const { running, results, superseded, attempted } = state.saveAll;
+  const { running, results, superseded, attempted, endedAt } = state.saveAll;
   if (running)
     return {
       state: 'saving',
@@ -973,6 +974,8 @@ export const summarizeSaves = (state: FormStore): SaveSummary => {
       (save) =>
         !(
           save.phase === 'failed' &&
+          endedAt !== null &&
+          save.at < endedAt &&
           results[save.formId]?.status === 'saved-with-warning'
         )
     )

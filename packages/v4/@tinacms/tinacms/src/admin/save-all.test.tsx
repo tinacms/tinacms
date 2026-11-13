@@ -1231,6 +1231,27 @@ describe('Status bar after a run', () => {
     ).toHaveTextContent('about.mdxFailed');
   });
 
+  it('shows a later failed save of a document the run saved with an afterSave warning', async () => {
+    consoleGuard.expect(/afterSave failed/);
+    consoleGuard.expect(/Save failed/);
+    failAfterSave = true;
+    const user = userEvent.setup();
+    await editSlugs(user, [POST, POST_B]);
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Saved 2 documents with warnings')
+      ).toBeVisible()
+    );
+    failWrite.set(POST_B, new Error('disk full'));
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-x');
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Save failed')).toBeVisible()
+    );
+    expect(within(statusBar()).queryByText(/unsaved/i)).toBeNull();
+  });
+
   it('counts failures out of the documents the run tried, as they clear', async () => {
     const user = userEvent.setup();
     window.location.hash = hashOf('post', POST);
