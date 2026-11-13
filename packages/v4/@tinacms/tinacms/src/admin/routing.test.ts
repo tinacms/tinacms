@@ -16,10 +16,10 @@ describe('admin routing', () => {
     { view: 'settings' },
     { view: 'collections', unsavedOnly: true },
     { view: 'collection', collection: 'post' },
-    { view: 'collection', collection: 'post', side: true },
+    { view: 'collection', collection: 'post', maximised: true },
+    { view: 'collections', maximised: true },
     { view: 'folder', collection: 'post', folder: 'a' },
     { view: 'folder', collection: 'post', folder: 'a/b' },
-    { view: 'folder', collection: 'post', folder: 'a/b', side: true },
     { view: 'folder', collection: 'post', folder: 'folder' },
     { view: 'folder', collection: 'post', folder: 'v1.2/folder/x y' },
     { view: 'document', collection: 'post', path: 'content/posts/hello.mdx' },
@@ -127,18 +127,49 @@ describe('parseAdminRoute on input a user can type', () => {
       formatAdminRoute({ view: 'folder', collection: 'post', folder: 'a/b c' })
     ).toBe('#/collections/post/folder/a/b%20c');
     expect(
-      formatAdminRoute({ view: 'collection', collection: 'post', side: true })
-    ).toBe('#/collections/post?side');
+      formatAdminRoute({
+        view: 'collection',
+        collection: 'post',
+        maximised: true,
+      })
+    ).toBe('#/collections/post?max');
+  });
+
+  it('writes ?max alone, never with ?unsaved, and keeps the minimised addresses plain', () => {
+    expect(formatAdminRoute({ view: 'collections', maximised: true })).toBe(
+      '#/collections?max'
+    );
+    expect(
+      formatAdminRoute({
+        view: 'collections',
+        maximised: true,
+        unsavedOnly: true,
+      })
+    ).toBe('#/collections?max');
+    expect(parseAdminRoute('#/collections?max')).toEqual({
+      view: 'collections',
+      maximised: true,
+    });
+    expect(parseAdminRoute('#/collections')).toEqual({ view: 'collections' });
+    expect(parseAdminRoute('#/collections/post')).toEqual({
+      view: 'collection',
+      collection: 'post',
+    });
+    expect(parseAdminRoute('#/collections?unsaved')).toEqual({
+      view: 'collections',
+      unsavedOnly: true,
+    });
   });
 
   it('reads a folder address with no parts as the collection', () => {
     expect(parseAdminRoute('#/collections/post/folder')).toEqual({
       view: 'collection',
       collection: 'post',
+      maximised: true,
     });
     expect(
       formatAdminRoute({ view: 'folder', collection: 'post', folder: '' })
-    ).toBe('#/collections/post');
+    ).toBe('#/collections/post?max');
   });
 
   it('still reads a document address as a document', () => {

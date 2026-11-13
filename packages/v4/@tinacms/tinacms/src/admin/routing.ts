@@ -3,9 +3,9 @@ export type AdminRoute =
   | { view: 'media' }
   | { view: 'tools' }
   | { view: 'settings' }
-  | { view: 'collections'; unsavedOnly?: boolean }
-  | { view: 'collection'; collection: string; side?: true }
-  | { view: 'folder'; collection: string; folder: string; side?: true }
+  | { view: 'collections'; unsavedOnly?: boolean; maximised?: true }
+  | { view: 'collection'; collection: string; maximised?: true }
+  | { view: 'folder'; collection: string; folder: string }
   | { view: 'document'; collection: string; path: string }
   | { view: 'screen'; screen: string; segments: string[] };
 
@@ -15,13 +15,15 @@ export const HOME_ROUTE: AdminRoute = { view: 'home' };
 const COLLECTIONS_PREFIX = 'collections';
 const SCREENS_PREFIX = 'screens';
 const UNSAVED_ONLY = '?unsaved';
-const SIDE = '?side';
+const MAXIMISED = '?max';
 const FOLDER_SEGMENT = 'folder';
 
 export const formatAdminRoute = (route: AdminRoute): string => {
   if (route.view === 'home') return '#/';
-  if (route.view === 'collections')
+  if (route.view === 'collections') {
+    if (route.maximised) return `#/${COLLECTIONS_PREFIX}${MAXIMISED}`;
     return `#/${COLLECTIONS_PREFIX}${route.unsavedOnly ? UNSAVED_ONLY : ''}`;
+  }
   if (
     route.view === 'media' ||
     route.view === 'tools' ||
@@ -34,11 +36,13 @@ export const formatAdminRoute = (route: AdminRoute): string => {
   }
   const collection = encodeURIComponent(route.collection);
   if (route.view === 'collection')
-    return `#/${COLLECTIONS_PREFIX}/${collection}${route.side ? SIDE : ''}`;
+    return `#/${COLLECTIONS_PREFIX}/${collection}${route.maximised ? MAXIMISED : ''}`;
   if (route.view === 'folder') {
-    if (route.folder === '') return `#/${COLLECTIONS_PREFIX}/${collection}`;
+    if (route.folder === '') {
+      return `#/${COLLECTIONS_PREFIX}/${collection}${MAXIMISED}`;
+    }
     const parts = route.folder.split('/').map(encodeURIComponent);
-    return `#/${COLLECTIONS_PREFIX}/${collection}/${FOLDER_SEGMENT}/${parts.join('/')}${route.side ? SIDE : ''}`;
+    return `#/${COLLECTIONS_PREFIX}/${collection}/${FOLDER_SEGMENT}/${parts.join('/')}`;
   }
   return `#/${COLLECTIONS_PREFIX}/${collection}/${encodeURIComponent(route.path)}`;
 };
@@ -64,6 +68,7 @@ export const parseAdminRoute = (hash: string): AdminRoute => {
   )
     return { view: prefix };
   if (prefix === COLLECTIONS_PREFIX && !head) {
+    if (query === 'max') return { view: 'collections', maximised: true };
     return query === 'unsaved'
       ? { view: 'collections', unsavedOnly: true }
       : COLLECTIONS_ROUTE;
@@ -74,17 +79,14 @@ export const parseAdminRoute = (hash: string): AdminRoute => {
   if (prefix !== COLLECTIONS_PREFIX) return HOME_ROUTE;
   const [docPath, ...folderParts] = rest;
   if (!docPath) {
-    return query === 'side'
-      ? { view: 'collection', collection: head, side: true }
+    return query === 'max'
+      ? { view: 'collection', collection: head, maximised: true }
       : { view: 'collection', collection: head };
   }
   if (docPath === FOLDER_SEGMENT) {
     if (folderParts.length === 0)
-      return { view: 'collection', collection: head };
-    const folder = folderParts.join('/');
-    return query === 'side'
-      ? { view: 'folder', collection: head, folder, side: true }
-      : { view: 'folder', collection: head, folder };
+      return { view: 'collection', collection: head, maximised: true };
+    return { view: 'folder', collection: head, folder: folderParts.join('/') };
   }
   return { view: 'document', collection: head, path: docPath };
 };
