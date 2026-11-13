@@ -248,3 +248,35 @@ describe('useTina on a live site', () => {
     link.remove();
   });
 });
+
+describe('useTina mounting after edits started', () => {
+  it('shows the live values of a second hook for the same document from its first registration', async () => {
+    const editor = embedInEditor();
+    renderHook(() => useTina({ data: { title: 'Saved' }, document: 'a.md' }));
+    await flush();
+    valuesFromEditor(editor, { title: 'Edited' }, 'a.md');
+    const second = renderHook(() =>
+      useTina({ data: { title: 'Saved' }, document: 'a.md' })
+    );
+    await flush();
+    expect(second.result.current).toMatchObject({
+      data: { title: 'Edited' },
+      isEditing: true,
+    });
+  });
+
+  it('keeps its own data for a hook on another document', async () => {
+    const editor = embedInEditor();
+    renderHook(() => useTina({ data: { title: 'B' }, document: 'b.md' }));
+    await flush();
+    valuesFromEditor(editor, { title: 'old' });
+    const c = renderHook(() =>
+      useTina({ data: { title: 'C' }, document: 'c.md' })
+    );
+    await flush();
+    expect(c.result.current).toMatchObject({
+      data: { title: 'C' },
+      isEditing: false,
+    });
+  });
+});

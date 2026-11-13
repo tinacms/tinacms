@@ -546,33 +546,25 @@ function AdminShell({
   const schema = useTinaSchema();
   const screens = useAdminScreens();
   const globalNav = useGlobalNav();
-  const { route, navigate: navigateRoute } = useAdminRoute();
+  const { route, navigate } = useAdminRoute();
 
   // A reference step belongs to the document it opened. Any other navigation drops it.
   const [stepState, setStepState] = useState<{
     step: ReferenceStep;
     target: string;
   } | null>(null);
-  const navigate = useCallback(
-    (next: AdminRoute) => {
-      const opensMedia =
-        next.view === 'media' ||
-        (next.view === 'screen' && next.screen === MEDIA_SCREEN);
-      if (!opensMedia) setStepState(null);
-      navigateRoute(next);
-    },
-    [navigateRoute]
-  );
+  const reachedStep = useRef(false);
   const openDocument = useCallback(
     (target: DocumentRef, step: ReferenceStep | null) => {
+      reachedStep.current = false;
       setStepState(step ? { step, target: target.path } : null);
-      navigateRoute({
+      navigate({
         view: 'document',
         collection: target.collection,
         path: target.path,
       });
     },
-    [navigateRoute]
+    [navigate]
   );
 
   const isMediaRoute =
@@ -602,6 +594,17 @@ function AdminShell({
   const activeStep =
     stepState && stepState.target === openPath ? stepState.step : null;
   useKeptEditsNotice(mainRoute, navigate, activeStep);
+  // Leaving the step's document by any route drops the step. The route moves
+  // after the state that asked for it, so the step is dropped only once the
+  // document it belongs to has been shown.
+  useEffect(() => {
+    if (!stepState) return;
+    if (stepState.target === openPath) {
+      reachedStep.current = true;
+    } else if (reachedStep.current) {
+      setStepState(null);
+    }
+  }, [stepState, openPath]);
   const homeScreen = screens.find(({ name }) => name === HOME_SCREEN);
   // `#/screens/home` draws Home as `#/` does. With Home removed, it falls to
   // the general outlet, which says that no screen has that name.
@@ -639,7 +642,7 @@ function AdminShell({
   const hasMediaScreen = screens.some(({ name }) => name === MEDIA_SCREEN);
   const mediaScreen = screens.find(({ name }) => name === MEDIA_SCREEN);
   const mediaSegments = route.view === 'screen' ? route.segments : [];
-  const closeMedia = () => navigateRoute(lastMain);
+  const closeMedia = () => navigate(lastMain);
 
   // The navigator keeps the last opened document selected after Back.
   const [lastOpen, setLastOpen] = useState<{

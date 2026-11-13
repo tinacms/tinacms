@@ -58,11 +58,13 @@ export interface PreviewConnectionOptions {
 }
 
 interface Persistent {
-  follower: Follower | null;
+  follower: Follower;
   warned: Set<string>;
   click: number;
   lastOutline: string | null;
   frame: number | null;
+  /** The latest render's outline sender, so a frame that fires after a re-render reads the new step. */
+  sendOutline: (force: boolean) => void;
   /** The page has said ready, so it can tell which document each value is for. */
   heard: boolean;
 }
@@ -99,7 +101,7 @@ function createHandlers(deps: Deps) {
     if (persistent.heard) target()?.postMessage(message, targetOrigin);
   };
   const forms = () => useFormStore.getState().forms;
-  const follower = () => persistent.follower as Follower;
+  const follower = () => persistent.follower;
 
   const collectionFor = (path: string): CollectionSchema | undefined => {
     const named =
@@ -154,8 +156,9 @@ function createHandlers(deps: Deps) {
         reference.path,
         branch
       );
-      // Test the cache entry, not the document: a null is a cached answer.
-      if (queryClient.getQueryState(key)) continue;
+      // Test the cache entry, not the document: a null is a cached answer. A failed read is retried.
+      const cached = queryClient.getQueryState(key);
+      if (cached && cached.status !== 'error') continue;
       queryClient
         .fetchQuery({
           queryKey: key,
@@ -192,10 +195,11 @@ function createHandlers(deps: Deps) {
   // documents those reference.
   const shownPaths = (): Set<string> => {
     const declared = follower().declared();
+    const feed = fed();
     const paths = declared.length
       ? declared.map((d) => d.path)
-      : fed()
-        ? [(fed() as DocumentRef).path]
+      : feed
+        ? [feed.path]
         : [];
     const shown = new Set(paths);
     for (const path of paths) {
@@ -301,7 +305,7 @@ function createHandlers(deps: Deps) {
     if (persistent.frame !== null) return;
     persistent.frame = requestAnimationFrame(() => {
       persistent.frame = null;
-      sendOutline(false);
+      persistent.sendOutline(false);
     });
   };
 
@@ -434,15 +438,14 @@ function createHandlers(deps: Deps) {
       const data: unknown = event.data;
       if (isReadyMessage(data) || isDocumentsMessage(data)) {
         persistent.heard = true;
-        const ready = isReadyMessage(data);
-        if (!ready || data.documents !== undefined) {
-          follower().update(data.documents ?? [], data.url, {
-            showing,
-            onPage: options.onPage ?? false,
-          });
+        const context = { showing, onPage: options.onPage ?? false };
+        if (isDocumentsMessage(data) || data.documents !== undefined) {
+          follower().update(data.documents ?? [], data.url, context);
+        } else if (data.url !== undefined) {
+          follower().clear(data.url);
         }
         publishAll();
-        if (ready) sendOutline(true);
+        sendOutline(true);
       } else if (isActivateMessage(data)) {
         void activate(data.address, data.document);
       }
@@ -460,9 +463,12 @@ function createHandlers(deps: Deps) {
       }
     },
     resync: () => {
+      persistent.click += 1;
+      follower().cancel();
       publishAll();
-      scheduleOutline();
+      sendOutline(true);
     },
+    sendOutline,
     followOpen,
     publishAll,
   };
@@ -490,16 +496,23 @@ export function usePreviewConnection(
   const queryClient = useQueryClient();
   const branch = useCurrentBranch();
 
-  const persistent = useRef<Persistent>({
-    follower: null,
+  const handlers = useRef<Handlers | null>(null);
+  const held = useRef<Persistent | null>(null);
+  held.current ??= {
+    follower: createFollower({
+      open: (path) => void handlers.current?.followOpen(path),
+      nothingToEdit: () => latestOptions.current.onNothingToEdit?.(),
+    }),
     warned: new Set(),
     click: 0,
     lastOutline: null,
     frame: null,
     heard: false,
-  }).current;
-
-  const handlers = useRef<Handlers | null>(null);
+    sendOutline: () => {},
+  };
+  const persistent = held.current;
+  const latestOptions = useRef(options);
+  latestOptions.current = options;
   handlers.current = createHandlers({
     iframeRef,
     targetOrigin,
@@ -510,10 +523,7 @@ export function usePreviewConnection(
     options,
     persistent,
   });
-  persistent.follower ??= createFollower({
-    open: (path) => void handlers.current?.followOpen(path),
-    nothingToEdit: () => options.onNothingToEdit?.(),
-  });
+  persistent.sendOutline = handlers.current.sendOutline;
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) =>
@@ -525,7 +535,7 @@ export function usePreviewConnection(
     return () => {
       window.removeEventListener('message', onMessage);
       unsubscribe();
-      persistent.follower?.dispose();
+      persistent.follower.dispose();
       if (persistent.frame !== null) cancelAnimationFrame(persistent.frame);
       persistent.frame = null;
     };
@@ -533,7 +543,7 @@ export function usePreviewConnection(
 
   const showing = options.showsPreview ?? true;
   useLayoutEffect(() => {
-    persistent.follower?.setShowing(showing);
+    persistent.follower.setShowing(showing);
   }, [persistent, showing]);
 
   const openPath = options.open?.path;

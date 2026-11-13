@@ -136,6 +136,10 @@ const createPreviewBridge = ({
   let warnedUndeclared = false;
   let destroyed = false;
 
+  const storedValues = new Map<string, TinaDocument>();
+  let storedUndocumented: TinaDocument | null = null;
+  let lastPointer: { x: number; y: number } | null = null;
+
   let hovered: Mark | null = null;
   let active: OutlineMessage['active'] = null;
   let pointerHover: Element | null = null;
@@ -153,8 +157,21 @@ const createPreviewBridge = ({
   const mainDocument = () =>
     mergeDeclarations(registrations).find((entry) => !entry.shared)?.path;
 
+  const pageDeclares = () => [...registrations].some((entry) => entry.document);
+
+  const pruneStored = () => {
+    if (pageDeclares()) storedUndocumented = null;
+    const declared = new Set<string | undefined>(
+      [...registrations].map((entry) => entry.document)
+    );
+    for (const path of [...storedValues.keys()]) {
+      if (!declared.has(path)) storedValues.delete(path);
+    }
+  };
+
   const flush = () => {
     flushQueued = false;
+    pruneStored();
     const documents = mergeDeclarations(registrations);
     const key = JSON.stringify(documents);
     const url = previewWindow.location.href;
@@ -185,13 +202,20 @@ const createPreviewBridge = ({
   };
 
   const routeValues = (values: TinaDocument, document: string | undefined) => {
-    const pageDeclares = [...registrations].some((entry) => entry.document);
+    const declaring = pageDeclares();
+    if (document === undefined) {
+      if (!declaring) storedUndocumented = values;
+    } else if (
+      [...registrations].some((entry) => entry.document === document)
+    ) {
+      storedValues.set(document, values);
+    }
     for (const registration of [...registrations]) {
       const takes =
         document === undefined ||
         (registration.document
           ? registration.document === document
-          : !pageDeclares);
+          : !declaring);
       if (takes) registration.onValues(values);
     }
   };
@@ -278,13 +302,23 @@ const createPreviewBridge = ({
     });
   };
 
+  const becomeAnswered = () => {
+    if (answered) return;
+    answered = true;
+    if (lastPointer) {
+      const under = page.elementFromPoint(lastPointer.x, lastPointer.y);
+      pointerHover = under?.closest(MARKED_SELECTOR) ?? null;
+      if (pointerHover) scheduleDraw();
+    }
+  };
+
   const onMessage = (event: MessageEvent) => {
     if (event.origin !== allowedOrigin || event.source !== editorWindow) return;
     if (isValuesMessage(event.data)) {
-      answered = true;
+      becomeAnswered();
       routeValues(event.data.values, event.data.document);
     } else if (isOutlineMessage(event.data)) {
-      answered = true;
+      becomeAnswered();
       const activeChanged = !sameMark(active, event.data.active);
       hovered = event.data.hovered;
       active = event.data.active;
@@ -326,8 +360,9 @@ const createPreviewBridge = ({
   };
 
   const onPointerMove = (event: PointerEvent) => {
-    if (!answered) return;
     if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
+    lastPointer = { x: event.clientX, y: event.clientY };
+    if (!answered) return;
     const next = markedTarget(event);
     if (next === pointerHover) return;
     pointerHover = next;
@@ -335,6 +370,7 @@ const createPreviewBridge = ({
   };
 
   const clearPointerHover = () => {
+    lastPointer = null;
     if (!pointerHover) return;
     pointerHover = null;
     scheduleDraw();
@@ -358,6 +394,12 @@ const createPreviewBridge = ({
   return {
     register: (registration) => {
       registrations.add(registration);
+      const replay = registration.document
+        ? storedValues.get(registration.document)
+        : pageDeclares()
+          ? undefined
+          : storedUndocumented;
+      if (replay) registration.onValues(replay);
       scheduleFlush();
       scheduleDraw();
       return () => {
@@ -383,6 +425,8 @@ const createPreviewBridge = ({
       if (drawFrame !== null) previewWindow.cancelAnimationFrame(drawFrame);
       overlay?.destroy();
       registrations.clear();
+      storedValues.clear();
+      storedUndocumented = null;
     },
   };
 };

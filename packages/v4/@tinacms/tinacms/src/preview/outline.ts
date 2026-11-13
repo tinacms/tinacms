@@ -131,11 +131,11 @@ export const createOutlineOverlay = (page: Window): OutlineOverlay => {
     tab.dataset.outlineTab = '';
     tab.setAttribute('aria-hidden', 'true');
     tab.textContent = name;
-    const flipInside = rect.top < TAB_HEIGHT;
+    const flipBelow = rect.top < TAB_HEIGHT;
     Object.assign(tab.style, {
       position: 'absolute',
       left: '-2px',
-      [flipInside ? 'top' : 'bottom']: flipInside ? '0' : '100%',
+      [flipBelow ? 'top' : 'bottom']: flipBelow ? 'calc(100% + 2px)' : '100%',
       height: `${TAB_HEIGHT}px`,
       lineHeight: `${TAB_HEIGHT}px`,
       padding: '0 6px',

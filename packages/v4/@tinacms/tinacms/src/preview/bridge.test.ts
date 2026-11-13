@@ -146,16 +146,19 @@ describe('declarations', () => {
     );
   });
 
-  it('sends nothing for a register, unregister and re-register in one task', async () => {
+  it('sends nothing for a register, unregister and re-register in one task, and the remounted hook keeps the last values', async () => {
     const { editor, bridge } = start();
     bridge.register({ document: 'a.md', onValues: vi.fn() });
     await flush();
+    fromEditor(editor, valuesMessage({ title: 'Edited' }, 'a.md'));
     editor.postMessage.mockClear();
     const first = bridge.register({ document: 'a.md', onValues: vi.fn() });
     first();
-    bridge.register({ document: 'a.md', onValues: vi.fn() });
+    const remounted = vi.fn();
+    bridge.register({ document: 'a.md', onValues: remounted });
     await flush();
     expect(editor.postMessage).not.toHaveBeenCalled();
+    expect(remounted).toHaveBeenCalledWith({ title: 'Edited' });
   });
 
   it('collapses duplicate paths and keeps the entry non-shared if any is', async () => {
@@ -252,6 +255,72 @@ describe('values routing', () => {
     expect(undeclared).not.toHaveBeenCalled();
     fromEditor(editor, valuesMessage({ n: 2 }));
     expect(undeclared).toHaveBeenCalledWith({ n: 2 });
+  });
+});
+
+describe('replay to a new registration', () => {
+  it('gives a second hook for the same document the edited values with no new message to the editor', async () => {
+    const { editor, bridge } = start();
+    bridge.register({ document: 'a.md', onValues: vi.fn() });
+    await flush();
+    fromEditor(editor, valuesMessage({ title: 'Edited' }, 'a.md'));
+    editor.postMessage.mockClear();
+    const second = vi.fn();
+    bridge.register({ document: 'a.md', onValues: second });
+    await flush();
+    expect(second).toHaveBeenCalledTimes(1);
+    expect(second).toHaveBeenCalledWith({ title: 'Edited' });
+    expect(editor.postMessage).not.toHaveBeenCalled();
+  });
+
+  it('gives a hook for b.md none of the a.md values', async () => {
+    const { editor, bridge } = start();
+    bridge.register({ document: 'a.md', onValues: vi.fn() });
+    fromEditor(editor, valuesMessage({ title: 'A' }, 'a.md'));
+    const b = vi.fn();
+    bridge.register({ document: 'b.md', onValues: b });
+    await flush();
+    expect(b).not.toHaveBeenCalled();
+  });
+
+  it('drops a document values once no hook declares it at the end of a task', async () => {
+    const { editor, bridge } = start();
+    const unregister = bridge.register({ document: 'a.md', onValues: vi.fn() });
+    await flush();
+    fromEditor(editor, valuesMessage({ title: 'A' }, 'a.md'));
+    unregister();
+    await flush();
+    const later = vi.fn();
+    bridge.register({ document: 'a.md', onValues: later });
+    await flush();
+    expect(later).not.toHaveBeenCalled();
+  });
+
+  it('replays the no-document values to an undeclared hook while nothing declares', async () => {
+    const { editor, bridge } = start();
+    bridge.register({ onValues: vi.fn() });
+    await flush();
+    fromEditor(editor, valuesMessage({ t: 1 }));
+    const later = vi.fn();
+    bridge.register({ onValues: later });
+    expect(later).toHaveBeenCalledWith({ t: 1 });
+  });
+
+  it('never replays the no-document values to a hook for C, which keeps its own data until values for C arrive', async () => {
+    const { editor, bridge } = start();
+    bridge.register({ document: 'b.md', onValues: vi.fn() });
+    await flush();
+    fromEditor(editor, valuesMessage({ t: 'old' }));
+    const c = vi.fn();
+    bridge.register({ document: 'c.md', onValues: c });
+    await flush();
+    expect(c).not.toHaveBeenCalled();
+    const undeclared = vi.fn();
+    bridge.register({ onValues: undeclared });
+    await flush();
+    expect(undeclared).not.toHaveBeenCalled();
+    fromEditor(editor, valuesMessage({ t: 'C' }, 'c.md'));
+    expect(c).toHaveBeenCalledWith({ t: 'C' });
   });
 });
 
@@ -469,6 +538,11 @@ describe('off-site links', () => {
   });
 });
 
+const scrollAndDraw = () => {
+  window.dispatchEvent(new Event('resize'));
+  runFrames();
+};
+
 describe('outlines from the editor', () => {
   const rects = new Map<Element, DOMRect>();
   beforeEach(() => {
@@ -519,6 +593,22 @@ describe('outlines from the editor', () => {
     const tab = box?.querySelector('[data-outline-tab]');
     expect(tab?.textContent).toBe('Title');
     expect(tab?.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('puts the name tab above the element, and below it when there is no room above', () => {
+    const { editor } = start();
+    const title = at(marked('title'), rect(0, 100, 100, 40));
+    const tabStyle = () =>
+      (overlayRoot()?.querySelector('[data-outline-tab]') as HTMLElement).style;
+    fromEditor(editor, outlineMessage(null, { address: 'title', name: 'T' }));
+    runFrames();
+    expect(tabStyle().bottom).toBe('100%');
+    expect(tabStyle().top).toBe('');
+    at(title, rect(0, 4, 100, 16));
+    fromEditor(editor, outlineMessage(null, { address: 'title', name: 'T' }));
+    scrollAndDraw();
+    expect(tabStyle().top).not.toBe('');
+    expect(tabStyle().bottom).toBe('');
   });
 
   it('active takes the innermost element and never reads blocks.1 as holding blocks.10', () => {
@@ -698,6 +788,22 @@ describe('pointer hover', () => {
     point(inner, 'mouse', 'pointerout');
     runFrames();
     expect(drawn('hover')).toHaveLength(0);
+  });
+
+  it('outlines the element already under the pointer when the editor first answers', () => {
+    const { editor } = start();
+    const title = marked('title');
+    point(title, 'mouse');
+    Object.defineProperty(document, 'elementFromPoint', {
+      configurable: true,
+      value: () => title,
+    });
+    runFrames();
+    expect(overlayRoot()).toBeNull();
+    fromEditor(editor, outlineMessage(null, null));
+    runFrames();
+    expect(drawn('hover')).toHaveLength(1);
+    Reflect.deleteProperty(document, 'elementFromPoint');
   });
 
   it('draws no hover for touch (a tap is a click)', () => {

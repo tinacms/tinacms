@@ -5,7 +5,6 @@ import {
   useActivation,
   useExpansion,
   useFieldAddress,
-  useFieldActive,
   useFieldFrame,
   useFieldSchema,
   useFieldValue,
@@ -56,8 +55,7 @@ function useObjectSummary() {
   const frame = useFieldFrame({ ownErrorsOnly: true });
   const summary = useSummary(address, field.fields);
   const invalidCount = useInvalidFieldCount();
-  const active = useFieldActive();
-  return { address, field, frame: { ...frame, active }, invalidCount, summary };
+  return { address, field, frame, invalidCount, summary };
 }
 
 function FieldGroup() {

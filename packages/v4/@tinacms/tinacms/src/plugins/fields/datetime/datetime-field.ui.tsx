@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 import {
   useFieldActivation,
-  useFieldActive,
   useFieldAddress,
   useFieldFrame,
   useFieldSchema,
@@ -56,7 +55,6 @@ export function DatetimeField() {
   const { placeholder } = useFieldSchema<DatetimeFieldSchema>();
   const [value, setValue] = useFieldValue<string | null>(address);
   const frame = useFieldFrame();
-  const active = useFieldActive();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus());
@@ -64,7 +62,6 @@ export function DatetimeField() {
   return (
     <DatetimeFieldView
       {...frame}
-      active={active}
       ref={inputRef}
       id={address}
       placeholder={placeholder}

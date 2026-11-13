@@ -1,5 +1,5 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
-import type { RefObject } from 'react';
+import { type RefObject, useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
@@ -16,6 +16,7 @@ import {
 } from '../preview/protocol';
 import { TinaProvider } from './index';
 import {
+  type ReferenceStep,
   type PreviewConnectionOptions,
   usePreviewConnection,
 } from './preview-connection';
@@ -480,5 +481,195 @@ describe('outline', () => {
     });
     expect(onOpen).not.toHaveBeenCalled();
     expect(useFormStore.getState().active).toBeNull();
+  });
+});
+
+function Stateful({
+  iframeRef,
+  start,
+}: {
+  iframeRef: RefObject<HTMLIFrameElement | null>;
+  start: typeof POST_REF | null;
+}) {
+  const [open, setOpen] = useState<typeof POST_REF | null>(start);
+  const [step, setStep] = useState<ReferenceStep | null>(null);
+  usePreviewConnection(iframeRef, {
+    open,
+    step,
+    onOpen: (target, next) => {
+      setOpen(target);
+      setStep(next);
+    },
+  });
+  return <p>connected</p>;
+}
+
+const setupStateful = async (start: typeof POST_REF | null) => {
+  const page = frame();
+  render(
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [stringFieldPlugin, referenceFieldPlugin, contentPlugin],
+        schema: { collections: [post, author, global] },
+      })}
+    >
+      <Stateful iframeRef={page.ref} start={start} />
+    </TinaProvider>
+  );
+  await screen.findByText('connected');
+  return page;
+};
+
+const lastActive = (page: ReturnType<typeof frame>) =>
+  page.posted('tina:outline').at(-1)?.active;
+
+describe('the outline after a reference step opens', () => {
+  it.each([
+    ['declared page, first click', true, POST_REF],
+    ['declared page, click from Collections', true, null],
+    ['older page, first click', false, POST_REF],
+    ['older page, click from Collections', false, null],
+  ] as const)(
+    '%s: the last outline names the author field',
+    async (_name, isDeclared, start) => {
+      register(A);
+      register(AUTHOR);
+      const page = await setupStateful(start);
+      fromPage(
+        isDeclared ? readyMessage([{ path: A }], URL_A) : readyMessage(),
+        page.window
+      );
+      if (!isDeclared && start === null) return;
+      fromPage(
+        activateMessage('author.name', isDeclared ? A : undefined),
+        page.window
+      );
+      await waitFor(() =>
+        expect(lastActive(page)).toEqual({
+          address: 'author.name',
+          ...(isDeclared && { document: A }),
+          name: 'Name',
+        })
+      );
+      page.window.postMessage.mockClear();
+      fromPage(
+        activateMessage('author.name', isDeclared ? A : undefined),
+        page.window
+      );
+      await waitFor(() =>
+        expect(useFormStore.getState().active?.formId).toBe(toFormId(AUTHOR))
+      );
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      expect(
+        page
+          .posted('tina:outline')
+          .every((outline) => outline.active?.address !== undefined)
+      ).toBe(true);
+    }
+  );
+
+  it('redraws the active field on a reloaded page and after an in-page route, and still dedupes an unchanged outline', async () => {
+    register(A);
+    const page = await setupStateful(POST_REF);
+    fromPage(readyMessage([{ path: A }], URL_A), page.window);
+    act(() => {
+      useFormStore.getState().setActive(toFormId(A), toFieldAddress('title'));
+    });
+    await waitFor(() => expect(lastActive(page)?.address).toBe('title'));
+    page.window.postMessage.mockClear();
+    fromPage(readyMessage([{ path: A }], URL_A), page.window);
+    expect(lastActive(page)).toMatchObject({
+      address: 'title',
+      document: A,
+      name: 'Title',
+    });
+    page.window.postMessage.mockClear();
+    fromPage(documentsMessage([{ path: A }], URL_B), page.window);
+    expect(page.posted('tina:outline')).toHaveLength(1);
+    expect(lastActive(page)).toMatchObject({ address: 'title', document: A });
+    page.window.postMessage.mockClear();
+    act(() => {
+      useFormStore.getState().setHovered(toFormId(A), toFieldAddress('title'));
+      useFormStore.getState().setHovered(toFormId(A), null);
+    });
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(page.posted('tina:outline')).toHaveLength(0);
+  });
+});
+
+describe('an undeclared page after a declared one', () => {
+  it('leaves the form, never shows Nothing to edit, and sends no document tags', async () => {
+    register(A);
+    register(B);
+    const { page, onOpen, onNothingToEdit } = await setup({
+      open: { collection: 'post', path: B },
+    });
+    fromPage(readyMessage([{ path: A }], URL_A), page.window);
+    fromPage(readyMessage([{ path: B }], URL_B), page.window);
+    await waitFor(() =>
+      expect(page.posted('tina:values').at(-1)?.document).toBe(B)
+    );
+    onOpen.mockClear();
+    page.window.postMessage.mockClear();
+    vi.useFakeTimers();
+    try {
+      fromPage(readyMessage(undefined, 'http://site.test/c'), page.window);
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      expect(onOpen).not.toHaveBeenCalled();
+      expect(onNothingToEdit).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(page.posted('tina:values').at(-1)?.document).toBeUndefined();
+    expect(page.posted('tina:outline').at(-1)).toMatchObject({
+      hovered: null,
+      active: null,
+    });
+  });
+
+  it('moves nothing for a ready with no documents and no url, and clears the set for a same-url ready', async () => {
+    register(A);
+    const { page, onOpen, onNothingToEdit } = await setup({ open: POST_REF });
+    fromPage(readyMessage([{ path: A }], URL_A), page.window);
+    fromPage(readyMessage(), page.window);
+    expect(page.posted('tina:values').at(-1)?.document).toBe(A);
+    fromPage(readyMessage(undefined, URL_A), page.window);
+    expect(page.posted('tina:values').at(-1)?.document).toBeUndefined();
+    expect(onOpen).not.toHaveBeenCalled();
+    expect(onNothingToEdit).not.toHaveBeenCalled();
+  });
+
+  it('opens a post that a later documents message declares', async () => {
+    register(A);
+    const { page, onOpen } = await setup({ open: POST_REF });
+    fromPage(readyMessage([{ path: A }], URL_A), page.window);
+    fromPage(readyMessage(undefined, URL_B), page.window);
+    fromPage(documentsMessage([{ path: B }], URL_B), page.window);
+    await waitFor(() =>
+      expect(onOpen).toHaveBeenCalledExactlyOnceWith(
+        { collection: 'post', path: B },
+        null
+      )
+    );
+  });
+
+  it('keeps the page’s own data when the declared post fails to open', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    register(A);
+    const { page, onOpen } = await setup({ open: POST_REF });
+    fromPage(readyMessage([{ path: A }], URL_A), page.window);
+    fromPage(readyMessage(undefined, URL_B), page.window);
+    fromPage(
+      documentsMessage([{ path: 'elsewhere/c.md' }], URL_B),
+      page.window
+    );
+    await waitFor(() => expect(warn).toHaveBeenCalledTimes(1));
+    expect(onOpen).not.toHaveBeenCalled();
+    expect(
+      page.posted('tina:values').filter((v) => v.document === 'elsewhere/c.md')
+    ).toHaveLength(0);
   });
 });

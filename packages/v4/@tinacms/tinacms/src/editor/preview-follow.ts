@@ -17,6 +17,10 @@ export interface Follower {
     url: string | undefined,
     context: FollowContext
   ) => void;
+  /** A ready that declares nothing: an undeclared page. Follows nothing. */
+  clear: (url: string) => void;
+  /** Drops a pending Nothing to edit, because the editor moved on. */
+  cancel: () => void;
   /** The frame's route stopped or started showing the preview. */
   setShowing: (showing: boolean) => void;
   dispose: () => void;
@@ -95,13 +99,26 @@ export function createFollower(actions: {
         }
         return;
       }
-      if (openedMain === null) {
+      if (openedMain === null && declared.length > 0) {
         timer = setTimeout(() => {
           timer = undefined;
           if (main === null && openedMain === null) actions.nothingToEdit();
         }, NOTHING_TO_EDIT_DELAY_MS);
       }
     },
+    clear: (nextUrl) => {
+      cancel();
+      declared = [];
+      main = null;
+      if (!started) {
+        started = true;
+      } else if (nextUrl !== url) {
+        baseline = false;
+        openedMain = null;
+      }
+      url = nextUrl;
+    },
+    cancel,
     setShowing: (showing) => {
       cancel();
       if (showing) baseline = true;

@@ -16,7 +16,7 @@ export function UneditableValue({
 }) {
   const address = useFieldAddress();
   const [value, setValue] = useFieldValue<unknown>(address);
-  const frame = useFieldFrame();
+  const { active: _active, ...frame } = useFieldFrame();
 
   return (
     <FieldWrapper {...frame}>

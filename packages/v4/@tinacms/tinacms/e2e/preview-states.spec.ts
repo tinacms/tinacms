@@ -177,3 +177,87 @@ test('with validation errors the error pane docks beside the frame, and a click 
   await frame(page).getByTestId('plain-paragraph').click();
   await expect(pane).toBeHidden();
 });
+
+test('a click on the author draws its solid outline and name tab every time', async ({
+  page,
+}) => {
+  const orange: Rgb = [209, 63, 19];
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    await openDeclared(page);
+    await frame(page).getByTestId('author-name').click();
+    await expect(page.getByRole('textbox', { name: /^name\b/i })).toBeFocused();
+    await page.mouse.move(2, 2);
+    await expect
+      .poll(
+        async () =>
+          (await aboveTop(page, 'author-name')).filter((pixel) =>
+            near(pixel, orange, 16)
+          ).length
+      )
+      .toBeGreaterThan(50);
+  }
+});
+
+const navigator = (page: Page) =>
+  page.getByRole('complementary', { name: 'Navigator' });
+const rail = (page: Page, name: string) =>
+  page
+    .getByRole('navigation', { name: 'Content' })
+    .getByRole('button', { name });
+const openSecond = async (page: Page, expand: boolean) => {
+  if (expand)
+    await navigator(page).getByRole('button', { name: 'Posts' }).click();
+  await navigator(page)
+    .getByRole('button', { name: /second/i })
+    .first()
+    .click();
+};
+
+const leaveStep: [string, (page: Page) => Promise<void>][] = [
+  [
+    'the trail’s Collections step, then another post',
+    async (page) => {
+      await page
+        .getByRole('navigation', { name: 'Location' })
+        .getByRole('button', { name: 'Collections' })
+        .click();
+      await openSecond(page, true);
+    },
+  ],
+  [
+    'the trail’s collection step, then another post',
+    async (page) => {
+      await page
+        .getByRole('navigation', { name: 'Location' })
+        .getByRole('button', { name: 'Posts' })
+        .click();
+      await openSecond(page, false);
+    },
+  ],
+  [
+    'the rail’s Collections, then another post',
+    async (page) => {
+      await rail(page, 'Collections').click();
+      await openSecond(page, true);
+    },
+  ],
+  ['the rail’s Tools', async (page) => rail(page, 'Tools').click()],
+  ['the rail’s Settings', async (page) => rail(page, 'Settings').click()],
+];
+
+for (const [name, leave] of leaveStep) {
+  test(`leaving a reference step by ${name} keeps the dirty post's edits and says so`, async ({
+    page,
+  }) => {
+    await openDeclared(page);
+    await page.locator('input#title').fill('Edited before the step');
+    await frame(page).getByTestId('author-name').click();
+    await expect(page.getByRole('textbox', { name: /^name\b/i })).toBeFocused();
+    await leave(page);
+    await expect(
+      page.getByText(
+        'Edits to “Edited before the step” are kept in this browser'
+      )
+    ).toBeVisible();
+  });
+}

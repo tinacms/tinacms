@@ -162,6 +162,11 @@ site nav. The `tinaField` that the hook returns knows its `document`, so each
 mark it makes carries `data-tina-field` and `data-tina-document`. The standalone
 `tinaField(address, document?)` takes the document as a second argument.
 
+The page keeps the last values the admin sent for each document. A `useTina` that
+mounts later for the same document, such as a tab or a re-mounted section, shows
+those values from its first registration. When no hook declares a document any
+more, the page drops its values.
+
 A document is named by its path, as the admin route and a reference field hold
 it. The path is relative to the repository and has the collection folder and
 the file extension: `content/posts/hello-world.mdx`. The site passes this

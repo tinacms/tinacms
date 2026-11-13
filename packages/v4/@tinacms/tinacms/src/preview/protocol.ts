@@ -142,8 +142,9 @@ export const isOutlineMessage = (data: unknown): data is OutlineMessage =>
   hasMessageType(data, OUTLINE_MESSAGE_TYPE) &&
   (data.hovered === null || isMark(data.hovered)) &&
   (data.active === null ||
-    (isMark(data.active) &&
-      typeof (data.active as Record<string, unknown>).name === 'string'));
+    (isRecord(data.active) &&
+      isMark(data.active) &&
+      typeof data.active.name === 'string'));
 
 /** Spreadable marker attributes; `document` names the document the field belongs to (path). */
 export const tinaField = (
