@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
+import { toast } from '@tinacms/ui/components/toast';
 import { configure } from '@testing-library/dom';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -479,8 +480,15 @@ describe('Save All results', () => {
     const trigger = await screen.findByRole('button', {
       name: 'Save results',
     });
+    // A toast that mounts late, with its own buttons, competes for focus.
+    act(() => toast.dismiss());
+    await waitFor(() => expect(toastShown()).toBeNull());
     act(() => trigger.focus());
+    expect(trigger).toHaveFocus();
     await user.keyboard('{Enter}');
+    await waitFor(() =>
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    );
     const dialog = await screen.findByRole('dialog', { name: 'Save results' });
     await waitFor(() =>
       expect(dialog.contains(document.activeElement)).toBe(true)
