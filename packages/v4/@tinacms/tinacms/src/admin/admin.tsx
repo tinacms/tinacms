@@ -556,8 +556,10 @@ function AdminShell({
   const reachedStep = useRef(false);
   const openDocument = useCallback(
     (target: DocumentRef, step: ReferenceStep | null) => {
-      reachedStep.current = false;
-      setStepState(step ? { step, target: target.path } : null);
+      if (step) {
+        reachedStep.current = false;
+        setStepState({ step, target: target.path });
+      }
       navigate({
         view: 'document',
         collection: target.collection,

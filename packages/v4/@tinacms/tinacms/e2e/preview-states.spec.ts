@@ -241,6 +241,13 @@ const leaveStep: [string, (page: Page) => Promise<void>][] = [
       await openSecond(page, true);
     },
   ],
+  [
+    'following the page to the next post',
+    async (page) => {
+      await frame(page).getByTestId('next-post').click();
+      await expect(heading(page)).toHaveText(/second/i);
+    },
+  ],
   ['the rail’s Tools', async (page) => rail(page, 'Tools').click()],
   ['the rail’s Settings', async (page) => rail(page, 'Settings').click()],
 ];
