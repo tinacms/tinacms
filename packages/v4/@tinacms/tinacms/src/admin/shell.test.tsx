@@ -867,7 +867,7 @@ describe('save state', () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     const { user, input } = await openHello();
     await user.clear(input);
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     await screen.findByRole('button', { name: 'Resolve 1 error' });
     expect(
       log.mock.calls.some(([first]) => String(first).includes('Save failed'))
@@ -878,7 +878,7 @@ describe('save state', () => {
   it('reads Save failed after a later network failure, once the blocked save is fixed', async () => {
     const { user, input } = await openHello();
     await user.clear(input);
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     await screen.findByRole('button', { name: 'Resolve 1 error' });
     await user.type(input, 'Hello!');
     updateError = new ContentError('network');
@@ -898,7 +898,7 @@ describe('save state', () => {
       .getState()
       .setSavePhase(toFormId('content/posts/other.mdx'), { phase: 'saved' });
     await user.clear(input);
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     await screen.findByRole('button', { name: 'Resolve 1 error' });
     expect(within(statusBar()).queryByText('Save failed')).toBeNull();
     expect(within(statusBar()).getByText('Unsaved changes')).toBeVisible();
@@ -910,7 +910,7 @@ describe('save state', () => {
   it('does not call a blocked save a failed save in the Status bar', async () => {
     const { user, input } = await openHello();
     await user.clear(input);
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     expect(
       await screen.findByRole('button', { name: 'Resolve 1 error' })
     ).toBeVisible();
@@ -930,7 +930,7 @@ describe('toasts', () => {
     renderAdmin();
     const input = await screen.findByLabelText(/^Title\b/);
     await user.type(input, '!');
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
 
     const toast = await waitFor(() => {
       const found = document.querySelector('[data-slot=toast]');

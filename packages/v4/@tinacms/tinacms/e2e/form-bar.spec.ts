@@ -101,7 +101,7 @@ for (const { name, width, height } of [
       await failWrites(page, message);
       await dirty(page);
       const before = await settled(page);
-      await page.getByRole('button', { name: 'Save' }).click();
+      await page.getByRole('button', { name: 'Save', exact: true }).click();
       const toast = page.locator(
         '[data-sonner-toast][role=alert], [role=alert][data-slot=toast]'
       );
@@ -111,9 +111,13 @@ for (const { name, width, height } of [
       await expect(toast.first()).not.toContainText(/500|op-failed|xxxx/);
       expect(await rects(page)).toEqual(before);
       expect((await rects(page)).alerts).toBe(0);
-      await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled();
+      await expect(
+        page.getByRole('button', { name: 'Save', exact: true })
+      ).toBeEnabled();
       // The toast clears the bar, so Save stays reachable.
-      await page.getByRole('button', { name: 'Save' }).hover({ timeout: 4000 });
+      await page
+        .getByRole('button', { name: 'Save', exact: true })
+        .hover({ timeout: 4000 });
     });
   }
 }

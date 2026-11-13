@@ -4,6 +4,8 @@ export interface TopBarState {
   projectName?: string;
   branch?: { current: string; disabled?: boolean };
   search?: boolean;
+  /** Shows a Save All button next to Search. */
+  save?: boolean;
 }
 
 /** Every look of the Top bar, for the design sign-off and the render test. */
@@ -25,6 +27,13 @@ export const topBarStates: TopBarState[] = [
     branch: { current: 'feature/news', disabled: true },
   },
   { name: 'local mode, no branch button' },
+  {
+    name: 'save all next to search',
+    projectName: 'Acme site',
+    branch: { current: 'feature/news' },
+    search: true,
+    save: true,
+  },
   {
     name: 'long names truncate',
     projectName: 'A very long project name that has to end in an ellipsis',

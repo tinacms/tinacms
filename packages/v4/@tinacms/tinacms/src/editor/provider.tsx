@@ -47,6 +47,7 @@ import {
   useFormStore,
   valuesEqual,
 } from '../form/form-store';
+import { registerFormBindings } from './form-bindings';
 import { UploadFormContext } from './uploads/upload-context';
 import { uploadListOf } from './uploads/upload-list';
 import { SELF_CONTAINED_VALIDATORS } from '../plugins/validators/core-validators.schema';
@@ -229,7 +230,8 @@ const syncSeededForm = (
   keptSeed: TinaDocument | null,
   resetForm: (values: TinaDocument, options?: { keepErrors?: boolean }) => void,
   advanceSeedKey: (formId: FormId) => void,
-  dropFieldTargets: () => void
+  dropFieldTargets: () => void,
+  collectionName: string
 ) => {
   const incoming = toFormValues(ingested);
   const before = useFormStore.getState().forms[formId];
@@ -239,6 +241,7 @@ const syncSeededForm = (
     valuesEqual(incoming, before.baseline, equal);
   seededFormId.current = formId;
   useFormStore.getState().registerForm(formId, incoming, equal);
+  useFormStore.getState().registerCollection(formId, collectionName);
   const signature = seedSignatureOf(formId, userId, seedValues);
   if (seededSignature.current === null) {
     seededSignature.current = signature;
@@ -417,7 +420,8 @@ function useSeededFormSync(
   seedValues: TinaDocument,
   keptSeed: TinaDocument | null,
   resetForm: (values: TinaDocument, options?: { keepErrors?: boolean }) => void,
-  dropFieldTargets: () => void
+  dropFieldTargets: () => void,
+  collectionName: string
 ) {
   const reseeds = useRef(0);
   const [seedKey, setSeedKey] = useState(() => `${formId}#${reseeds.current}`);
@@ -445,7 +449,8 @@ function useSeededFormSync(
       keptSeed,
       resetForm,
       advanceSeedKey,
-      dropFieldTargets
+      dropFieldTargets,
+      collectionName
     );
   }, [
     formId,
@@ -457,6 +462,7 @@ function useSeededFormSync(
     equal,
     advanceSeedKey,
     dropFieldTargets,
+    collectionName,
   ]);
 
   const discardEdits = useCallback(() => {
@@ -575,7 +581,8 @@ export function FormProvider({
     seedValues,
     kept.seed,
     methods.reset,
-    dropFieldTargets
+    dropFieldTargets,
+    collection.name
   );
 
   const waiting = useFormStore((state) =>
@@ -624,6 +631,26 @@ export function FormProvider({
     []
   );
   const fieldSeedKey = `${seedKey}~${fieldReseeds}`;
+  useEffect(
+    () =>
+      registerFormBindings(formId, {
+        validate: () => {
+          view.getState().attemptSave();
+          return methods.trigger();
+        },
+        getValues: methods.getValues,
+        setValue: (address, value) => methods.setValue(address, value),
+        reseedFields,
+        resetReveal: () => view.getState().resetReveal(),
+      }),
+    [formId, methods, reseedFields, view]
+  );
+  useEffect(() => {
+    const store = useFormStore.getState();
+    if (!store.revealOnOpen[formId]) return;
+    view.getState().attemptSave();
+    store.clearRevealOnOpen(formId);
+  }, [formId, view]);
   useEffect(() => {
     view.getState().showLevels([]);
   }, [fieldSeedKey, view]);

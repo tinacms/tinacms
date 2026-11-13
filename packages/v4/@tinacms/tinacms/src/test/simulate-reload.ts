@@ -11,5 +11,9 @@ export const simulateReload = () => {
     swapFailures: {},
     hidden: {},
     active: null,
+    collections: {},
+    revealOnOpen: {},
+    savePending: {},
+    saveAll: { running: null, results: {} },
   });
 };

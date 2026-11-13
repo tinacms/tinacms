@@ -43,6 +43,7 @@ describe('Top bar states', () => {
           ) : undefined
         }
         search={state.search ? <Button size='sm'>Search</Button> : undefined}
+        save={state.save ? <Button size='sm'>Save all</Button> : undefined}
       />
     );
     const bar = screen.getByRole('banner', { name: 'Top bar' });
@@ -58,6 +59,9 @@ describe('Top bar states', () => {
     expect(within(bar).queryByRole('button', { name: 'Search' }) !== null).toBe(
       state.search === true
     );
+    expect(
+      within(bar).queryByRole('button', { name: 'Save all' }) !== null
+    ).toBe(state.save === true);
   });
 });
 

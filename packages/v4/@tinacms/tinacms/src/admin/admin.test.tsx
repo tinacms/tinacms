@@ -307,7 +307,7 @@ describe('TinaAdmin', () => {
     await user.clear(input);
     expect(screen.queryByRole('alert')).toBeNull();
 
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     const alerts = await screen.findAllByRole('alert');
     expect(alerts[0]).toHaveTextContent('Title is required');
   });
@@ -446,7 +446,7 @@ describe('TinaAdmin Save button', () => {
     renderAdmin();
     const input = await openHello(user);
     await user.clear(input);
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     expect(
       await screen.findByRole('button', { name: 'Resolve 1 error' })
     ).toBeVisible();

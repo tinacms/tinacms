@@ -164,7 +164,19 @@ function SaveButton() {
   const narrow = useNarrow();
   const view = useBranchView();
   const summary = useErrorSummary();
-  const [pending, setPending] = useState(false);
+  const [pending, setPendingState] = useState(false);
+  const saveAllRunning = useFormStore(
+    (state) => state.saveAll.running !== null
+  );
+  // Save All reads this mark to stay off while a Save Document is between its click and its end.
+  const setPending = (next: boolean) => {
+    setPendingState(next);
+    useFormStore.getState().setSavePending(formId, next);
+  };
+  useEffect(
+    () => () => useFormStore.getState().setSavePending(formId, false),
+    [formId]
+  );
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [name, setName] = useState('');
   const [revealed, setRevealed] = useState(false);
@@ -407,7 +419,7 @@ function SaveButton() {
   };
 
   const run = useEffectEvent(() => {
-    if (dialog || pending) return;
+    if (dialog || pending || useFormStore.getState().saveAll.running) return;
     if (remembered.current && view?.saveToNewBranch) {
       const { request, failure } = remembered.current;
       const startedOn = branchName;
@@ -473,7 +485,7 @@ function SaveButton() {
         variant='primary'
         type='button'
         className='min-w-41 shrink-0'
-        disabled={!(blocked || dirty || pending)}
+        disabled={saveAllRunning || !(blocked || dirty || pending)}
         busy={pending}
         data-resolve=''
         icon={blocked ? 'error' : undefined}

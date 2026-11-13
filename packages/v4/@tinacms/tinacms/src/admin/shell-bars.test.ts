@@ -28,4 +28,19 @@ describe('statusWords', () => {
     );
     expect(statusWords({ state: 'saved' }, false)).toBe('Saved');
   });
+
+  it('words a Save All run', () => {
+    expect(
+      statusWords({ state: 'saving', runIndex: 2, runTotal: 5 }, false)
+    ).toBe('Saving 2 of 5…');
+    expect(
+      statusWords({ state: 'failed', runFailed: 1, runTried: 2 }, false)
+    ).toBe('Save failed: 1 of 2 documents');
+    expect(statusWords({ state: 'saved', runSaved: 2 }, false)).toBe(
+      'Saved 2 documents'
+    );
+    expect(
+      statusWords({ state: 'saved', runSaved: 2, runWarnings: true }, false)
+    ).toBe('Saved 2 documents with warnings');
+  });
 });

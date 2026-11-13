@@ -5,6 +5,26 @@ import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { validateFieldTree } from '../core/validation';
 import { nestFieldErrors } from './field-errors';
 
+/** Every field's errors for a document, flat by address. Empty when the document is valid. */
+export const validateDocument = (
+  collection: CollectionSchema,
+  registry: FieldRegistry,
+  validators: ValidatorRegistry,
+  values: TinaDocument
+): Record<string, string[]> => {
+  const flatErrors: Record<string, string[]> = {};
+  const scope = { validators, siblings: values, values };
+  for (const node of collection.fields) {
+    const descriptor = registry.get(node.type);
+    const value = values[node.name];
+    Object.assign(
+      flatErrors,
+      validateFieldTree(node, descriptor, value, node.name, registry, scope)
+    );
+  }
+  return flatErrors;
+};
+
 export const buildFormResolver =
   (
     collection: CollectionSchema,
@@ -12,16 +32,12 @@ export const buildFormResolver =
     validators: ValidatorRegistry = new Map()
   ): Resolver<TinaDocument> =>
   (values) => {
-    const flatErrors: Record<string, string[]> = {};
-    const scope = { validators, siblings: values, values };
-    for (const node of collection.fields) {
-      const descriptor = registry.get(node.type);
-      const value = values[node.name];
-      Object.assign(
-        flatErrors,
-        validateFieldTree(node, descriptor, value, node.name, registry, scope)
-      );
-    }
+    const flatErrors = validateDocument(
+      collection,
+      registry,
+      validators,
+      values
+    );
     if (Object.keys(flatErrors).length === 0) return { values, errors: {} };
     return { values: {}, errors: nestFieldErrors(flatErrors) };
   };

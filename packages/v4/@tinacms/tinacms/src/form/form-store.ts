@@ -63,6 +63,22 @@ export type SavePhase =
       readonly reason?: SaveFailureReason;
     };
 
+/** How one document ended in the latest Save All run. */
+export type SaveAllResult =
+  | { readonly status: 'saved' }
+  | { readonly status: 'saved-with-warning' }
+  | { readonly status: 'failed'; readonly words: string }
+  | { readonly status: 'not-saved'; readonly words: string };
+
+export interface SaveAllState {
+  /** Set from the start of a run to its end, so nothing re-enables between documents. */
+  readonly running: { readonly index: number; readonly total: number } | null;
+  /** The documents of the latest run, in the order they were saved. */
+  readonly results: Partial<Record<FormId, SaveAllResult>>;
+}
+
+const IDLE_SAVE_ALL: SaveAllState = { running: null, results: {} };
+
 export type FieldErrors = Partial<Record<FieldAddress, string[]>>;
 
 type OpenForm =
@@ -104,6 +120,23 @@ export interface FormStore {
   swapFailures: Partial<Record<FormId, number>>;
   /** Forms whose Resume prompt is hidden until the document opens again, after a failed Resume. */
   hidden: Partial<Record<FormId, true>>;
+  /** The collection name of each open form, so Save All finds the schema of a form that is not on screen. */
+  collections: Partial<Record<FormId, string>>;
+  /** Forms that failed validation in a save without a mounted form. They show their errors once when they open. */
+  revealOnOpen: Partial<Record<FormId, true>>;
+  /** Forms whose Save Document button is between its click and the end of its save. */
+  savePending: Partial<Record<FormId, true>>;
+  saveAll: SaveAllState;
+  registerCollection: (formId: FormId, collection: string) => void;
+  setRevealOnOpen: (formId: FormId) => void;
+  clearRevealOnOpen: (formId: FormId) => void;
+  setSavePending: (formId: FormId, pending: boolean) => void;
+  startSaveAll: (total: number) => void;
+  setSaveAllIndex: (index: number) => void;
+  recordSaveAllResult: (formId: FormId, result: SaveAllResult) => void;
+  endSaveAll: () => void;
+  /** Drops a `failed` or `not-saved` result once the document saves or its edits go. */
+  clearFailedResult: (formId: FormId) => void;
   /** Removes the live copy, every waiting copy and the in-memory edits. */
   discardStoredDraft: (formId: FormId) => void;
   /**
@@ -209,6 +242,12 @@ const withoutKey = <T>(record: Partial<Record<FormId, T>>, formId: FormId) => {
   return rest;
 };
 
+const withoutFailedResult = (saveAll: SaveAllState, formId: FormId) => {
+  const status = saveAll.results[formId]?.status;
+  if (status !== 'failed' && status !== 'not-saved') return saveAll;
+  return { ...saveAll, results: withoutKey(saveAll.results, formId) };
+};
+
 const storeFailed = (...results: StoreResult[]) =>
   results.some((result) => result === 'failed');
 
@@ -285,6 +324,10 @@ const DEVTOOLS_ACTION = {
   discardEdits: 'form/discardEdits',
   resumeWaiting: 'form/resumeWaiting',
   removeForm: 'form/removeForm',
+  registerCollection: 'form/registerCollection',
+  revealOnOpen: 'form/revealOnOpen',
+  savePending: 'form/savePending',
+  saveAll: 'form/saveAll',
 } as const;
 type DevtoolsActionLabel =
   (typeof DEVTOOLS_ACTION)[keyof typeof DEVTOOLS_ACTION];
@@ -312,6 +355,88 @@ export const useFormStore = create<FormStore>()(
         swapFailures: {},
         hidden: {},
         active: null,
+        collections: {},
+        revealOnOpen: {},
+        savePending: {},
+        saveAll: IDLE_SAVE_ALL,
+
+        registerCollection: (formId, collection) =>
+          apply((state) => {
+            if (state.collections[formId] === collection) return state;
+            return {
+              collections: { ...state.collections, [formId]: collection },
+            };
+          }, DEVTOOLS_ACTION.registerCollection),
+
+        setRevealOnOpen: (formId) =>
+          apply(
+            (state) => ({
+              revealOnOpen: { ...state.revealOnOpen, [formId]: true },
+            }),
+            DEVTOOLS_ACTION.revealOnOpen
+          ),
+
+        clearRevealOnOpen: (formId) =>
+          apply((state) => {
+            if (!state.revealOnOpen[formId]) return state;
+            return { revealOnOpen: withoutKey(state.revealOnOpen, formId) };
+          }, DEVTOOLS_ACTION.revealOnOpen),
+
+        setSavePending: (formId, pending) =>
+          apply((state) => {
+            if ((state.savePending[formId] === true) === pending) return state;
+            return {
+              savePending: pending
+                ? { ...state.savePending, [formId]: true }
+                : withoutKey(state.savePending, formId),
+            };
+          }, DEVTOOLS_ACTION.savePending),
+
+        startSaveAll: (total) =>
+          apply(
+            () => ({ saveAll: { running: { index: 0, total }, results: {} } }),
+            DEVTOOLS_ACTION.saveAll
+          ),
+
+        setSaveAllIndex: (index) =>
+          apply((state) => {
+            const { running } = state.saveAll;
+            if (!running) return state;
+            return {
+              saveAll: { ...state.saveAll, running: { ...running, index } },
+            };
+          }, DEVTOOLS_ACTION.saveAll),
+
+        recordSaveAllResult: (formId, result) =>
+          apply(
+            (state) => ({
+              saveAll: {
+                ...state.saveAll,
+                results: { ...state.saveAll.results, [formId]: result },
+              },
+            }),
+            DEVTOOLS_ACTION.saveAll
+          ),
+
+        endSaveAll: () =>
+          apply(
+            (state) => ({ saveAll: { ...state.saveAll, running: null } }),
+            DEVTOOLS_ACTION.saveAll
+          ),
+
+        clearFailedResult: (formId) =>
+          apply((state) => {
+            const result = state.saveAll.results[formId];
+            if (result?.status !== 'failed' && result?.status !== 'not-saved') {
+              return state;
+            }
+            return {
+              saveAll: {
+                ...state.saveAll,
+                results: withoutKey(state.saveAll.results, formId),
+              },
+            };
+          }, DEVTOOLS_ACTION.saveAll),
 
         discardStoredDraft: (formId) => {
           const { userId, branch } = readFormStore();
@@ -326,6 +451,8 @@ export const useFormStore = create<FormStore>()(
               waiting,
               held,
               unstored,
+              revealOnOpen: withoutKey(state.revealOnOpen, formId),
+              saveAll: withoutFailedResult(state.saveAll, formId),
               draftsVersion: state.draftsVersion + 1,
             };
           }, DEVTOOLS_ACTION.discardStoredDraft);
@@ -393,6 +520,10 @@ export const useFormStore = create<FormStore>()(
               swapFailures: {},
               hidden: {},
               active: null,
+              collections: {},
+              revealOnOpen: {},
+              savePending: {},
+              saveAll: IDLE_SAVE_ALL,
             };
           }, DEVTOOLS_ACTION.setBranch),
 
@@ -435,6 +566,10 @@ export const useFormStore = create<FormStore>()(
               swapFailures: {},
               hidden: {},
               active: null,
+              collections: {},
+              revealOnOpen: {},
+              savePending: {},
+              saveAll: IDLE_SAVE_ALL,
             };
           }, DEVTOOLS_ACTION.setUserId),
 
@@ -563,6 +698,8 @@ export const useFormStore = create<FormStore>()(
             return {
               saves,
               hidden: withoutKey(state.hidden, formId),
+              revealOnOpen: withoutKey(state.revealOnOpen, formId),
+              saveAll: withoutFailedResult(state.saveAll, formId),
               forms: {
                 ...state.forms,
                 [formId]: {
@@ -761,29 +898,88 @@ export interface SaveSummary {
   reason?: SaveFailureReason;
   /** The file name of the document the newest save wrote, when `state` is `saved`. */
   document?: string;
+  // The Save All fields stay flat: `useSaveSummary` compares them shallowly.
+  /** The document Save All is on, and how many it will save, while it runs. */
+  runIndex?: number;
+  runTotal?: number;
+  /** The documents of the latest Save All that did not save, out of those it tried. */
+  runFailed?: number;
+  runTried?: number;
+  /** The documents the latest Save All saved, when nothing in it failed. */
+  runSaved?: number;
+  runWarnings?: boolean;
 }
 
+// A document the editor edited back to its saved values has nothing left to fail.
+const failedIds = (state: FormStore): FormId[] =>
+  (Object.entries(state.saveAll.results) as [FormId, SaveAllResult][])
+    .filter(
+      ([formId, result]) =>
+        (result.status === 'failed' || result.status === 'not-saved') &&
+        formStatus(state.forms[formId]) === 'dirty'
+    )
+    .map(([formId]) => formId);
+
 /**
- * One answer for the whole shell: a running save wins, then the newest
- * failure, then unsaved edits, then the newest success, else idle.
+ * One answer for the whole shell, first match wins: Save All running, a
+ * Document save running, the failures of the latest Save All, then today's
+ * order: newest failure, unsaved edits, newest success, idle. A form whose
+ * `afterSave` hook failed is written, so its phase does not count as a failure.
  */
-const summarizeSaves = (state: FormStore): SaveSummary => {
+export const summarizeSaves = (state: FormStore): SaveSummary => {
+  const { running, results } = state.saveAll;
+  if (running)
+    return {
+      state: 'saving',
+      runIndex: running.index,
+      runTotal: running.total,
+    };
   const entries = Object.entries(state.saves).flatMap(([formId, save]) =>
-    save === undefined ? [] : [{ formId, ...save }]
+    save === undefined ? [] : [{ formId: formId as FormId, ...save }]
   );
   if (entries.some((save) => save.phase === 'saving')) {
     return { state: 'saving' };
   }
-  const newest = entries.sort((a, b) => b.at - a.at)[0];
+  const tried = Object.keys(results).length;
+  const failed = failedIds(state).length;
+  if (failed > 0) {
+    return { state: 'failed', runFailed: failed, runTried: tried };
+  }
+  const newest = entries
+    .filter(
+      (save) =>
+        !(
+          save.phase === 'failed' &&
+          results[save.formId]?.status === 'saved-with-warning'
+        )
+    )
+    .sort((a, b) => b.at - a.at)[0];
   if (newest?.phase === 'failed') {
     return { state: 'failed', message: newest.message, reason: newest.reason };
   }
+  const written = Object.values(results).filter(
+    (result) =>
+      result.status === 'saved' || result.status === 'saved-with-warning'
+  );
+  const runSaved =
+    written.length > 0
+      ? {
+          runSaved: written.length,
+          runWarnings: written.some(
+            (result) => result.status === 'saved-with-warning'
+          ),
+        }
+      : {};
   if (anyFormDirty(state)) return { state: 'unsaved' };
   if (newest?.phase === 'saved') {
-    return { state: 'saved', document: newest.formId.split('/').at(-1) };
+    return {
+      state: 'saved',
+      document: newest.formId.split('/').at(-1),
+      ...runSaved,
+    };
   }
   if (keptEdits(state)) return { state: 'idle', kept: true };
-  return { state: 'idle' };
+  return { state: 'idle', ...runSaved };
 };
 
 const keptEdits = (state: FormStore): boolean =>
@@ -818,7 +1014,23 @@ export const useFormErrors = (formId: FormId): FieldErrors =>
 export const useSaveSummary = (): SaveSummary =>
   useFormStore(useShallow(summarizeSaves));
 
+/** How many documents of the latest Save All still fail: dirty and not saved. */
+export const useSaveAllFailureCount = (): number =>
+  useFormStore((state) => failedIds(state).length);
+
 export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
+
+export const useSaveAllState = (): SaveAllState =>
+  useFormStore((state) => state.saveAll);
+
+/** Whether any save, of either button, is running or about to. */
+export const useAnySaveRunning = (): boolean =>
+  useFormStore(
+    (state) =>
+      state.saveAll.running !== null ||
+      Object.keys(state.savePending).length > 0 ||
+      Object.values(state.saves).some((save) => save?.phase === 'saving')
+  );
 
 /**
  * The documents with unsaved edits: the open forms that are dirty, and the

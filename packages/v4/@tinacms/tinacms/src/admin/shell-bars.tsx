@@ -13,7 +13,9 @@ import {
 } from '../form/form-store';
 import { useBranchView } from '../editor/branch';
 import { AccountMenu } from './account-menu';
+import { SaveAllControl } from './save-all';
 import { SearchControl } from './search';
+import { useOptionalContentSlice } from '../editor/hooks';
 
 // A save shorter than this finishes before the card would flash.
 const SAVE_PROGRESS_DELAY_MS = 1000;
@@ -23,19 +25,34 @@ const FAILURE_WORDS: Record<SaveFailureReason, string> = {
   'branch-gone': 'Save failed: branch no longer exists',
 };
 
+const savedWords = (saved: number, warnings: boolean | undefined) =>
+  `Saved ${saved} ${saved === 1 ? 'document' : 'documents'}${warnings ? ' with warnings' : ''}`;
+
 /** The Status bar's words for a save summary. Local files say so when nothing has saved. */
 export function statusWords(summary: SaveSummary, local: boolean): string {
   switch (summary.state) {
     case 'idle':
+      if (summary.runSaved) {
+        return savedWords(summary.runSaved, summary.runWarnings);
+      }
       if (summary.kept) return 'Unsaved edits kept in this browser';
       return local ? 'No saves yet this session' : 'No changes';
     case 'unsaved':
       return 'Unsaved changes';
     case 'saving':
+      if (summary.runIndex !== undefined) {
+        return `Saving ${summary.runIndex} of ${summary.runTotal}…`;
+      }
       return 'Saving…';
     case 'saved':
+      if (summary.runSaved) {
+        return savedWords(summary.runSaved, summary.runWarnings);
+      }
       return summary.document ? `Saved: “${summary.document}”` : 'Saved';
     case 'failed':
+      if (summary.runFailed !== undefined) {
+        return `Save failed: ${summary.runFailed} of ${summary.runTried} documents`;
+      }
       return summary.reason ? FAILURE_WORDS[summary.reason] : 'Save failed';
   }
 }
@@ -76,6 +93,7 @@ function BranchControl() {
 }
 
 export function ShellTopBar({ projectName }: { projectName?: string }) {
+  const content = useOptionalContentSlice();
   return (
     <TopBar
       toggle={<SidebarTrigger />}
@@ -83,12 +101,13 @@ export function ShellTopBar({ projectName }: { projectName?: string }) {
         <img
           src={tinaLogo}
           alt='TinaCMS'
-          className='h-5 w-auto flex-none max-[359px]:hidden'
+          className='h-5 w-auto flex-none max-[399px]:hidden'
         />
       }
       projectName={projectName}
       branch={<BranchControl />}
       search={<SearchControl />}
+      save={content ? <SaveAllControl /> : undefined}
       account={<AccountMenu />}
     />
   );
