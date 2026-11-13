@@ -48,6 +48,7 @@ import {
   valuesEqual,
 } from '../form/form-store';
 import { registerFormBindings } from './form-bindings';
+import { checkForm } from './save-pipeline';
 import { UploadFormContext } from './uploads/upload-context';
 import { uploadListOf } from './uploads/upload-list';
 import { SELF_CONTAINED_VALIDATORS } from '../plugins/validators/core-validators.schema';
@@ -634,10 +635,7 @@ export function FormProvider({
   useEffect(
     () =>
       registerFormBindings(formId, {
-        validate: () => {
-          view.getState().attemptSave();
-          return methods.trigger();
-        },
+        validate: () => checkForm(formId, view, methods.trigger),
         getValues: methods.getValues,
         setValue: (address, value) => methods.setValue(address, value),
         reseedFields,
@@ -646,6 +644,7 @@ export function FormProvider({
     [formId, methods, reseedFields, view]
   );
   useEffect(() => {
+    view.getState().resetReveal();
     const store = useFormStore.getState();
     if (!store.revealOnOpen[formId]) return;
     view.getState().attemptSave();

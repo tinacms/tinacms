@@ -1,4 +1,4 @@
-import { useFormStore } from '../form/form-store';
+import { IDLE_SAVE_ALL, useFormStore } from '../form/form-store';
 
 export const simulateReload = () => {
   useFormStore.setState({
@@ -14,6 +14,6 @@ export const simulateReload = () => {
     collections: {},
     revealOnOpen: {},
     savePending: {},
-    saveAll: { running: null, results: {} },
+    saveAll: IDLE_SAVE_ALL,
   });
 };

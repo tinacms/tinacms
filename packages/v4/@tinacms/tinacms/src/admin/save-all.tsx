@@ -7,16 +7,13 @@ import {
 import { Save } from 'lucide-react';
 import { type ReactNode, use, useId, useState } from 'react';
 import { ContentError } from '../core/content/contract';
-import { fieldEqualityFor } from '../core/form/compare';
 import { resolveFormHooks } from '../core/form/hooks';
-import { ingestDocument } from '../core/form/ingest';
 import { fieldsOf } from '../core/schema/children';
 import type { CollectionSchema, FieldSchema } from '../core/schema/types';
 import { useBranchView } from '../editor/branch';
 import { TinaRuntimeContext } from '../editor/context';
 import { useSaveDocument } from '../editor/content-queries';
 import { readFormBindings } from '../editor/form-bindings';
-import { useContentSlice } from '../editor/hooks';
 import {
   AfterSaveHookError,
   FormValidationError,
@@ -27,26 +24,22 @@ import {
   type FormId,
   type SaveAllResult,
   formStatus,
+  formEntries,
   isEdited,
   summarizeSaves,
-  toFormValues,
   useAnyFormDirty,
   useAnySaveRunning,
   useFormStore,
   useSaveAllFailureCount,
   useSaveAllState,
-  valuesEqual,
 } from '../form/form-store';
 import { formatAdminRoute } from './routing';
 import { saveFailureWords } from './save-failure';
-import { statusWords } from './shell-bars';
+import { dismissSaveFailedToast } from './document-form';
+import { statusWords } from './status-words';
 
-const NO_LONGER_EXISTS = 'This document no longer exists';
-const CHANGED_ON_BRANCH =
-  'Changed on the branch since you edited it. Save it from its form to overwrite, or discard your edits.';
-const RUN_STOPPED = 'Not saved: the run stopped';
+const RUN_STOPPED = 'the run stopped';
 
-// A cause that will hit every remaining document ends the run.
 const STOPPING_CODES: readonly string[] = [
   'branch-not-found',
   'unauthorized',
@@ -87,7 +80,7 @@ const firstInvalidField = (
 
 const failureOf = (
   cause: unknown,
-  stage: SaveStage | 'read',
+  stage: SaveStage,
   formId: FormId,
   collection: CollectionSchema
 ): { result: SaveAllResult; stop: boolean } => {
@@ -113,6 +106,12 @@ const failureOf = (
   }
   if (cause instanceof ContentError) {
     const stop = STOPPING_CODES.includes(cause.code);
+    if (cause.code === 'not-found') {
+      return {
+        result: { status: 'failed', words: cause.message },
+        stop,
+      };
+    }
     if (cause.code === 'branch-not-found') {
       return {
         result: { status: 'failed', words: 'The branch no longer exists' },
@@ -129,18 +128,16 @@ const failureOf = (
   return { result: { status: 'failed', words: 'Save failed' }, stop: false };
 };
 
-/** Saves every dirty document, one at a time. Each one passes or fails on its own. */
 function useSaveAllRun(): () => Promise<string> {
   const runtime = use(TinaRuntimeContext);
-  const content = useContentSlice();
   const { save } = useSaveDocument();
   const branch = useBranchView();
   return async () => {
     if (!runtime) return '';
     const startStore = useFormStore.getState();
-    const snapshot = (Object.keys(startStore.forms) as FormId[]).filter(
-      (formId) => formStatus(startStore.forms[formId]) === 'dirty'
-    );
+    const snapshot = formEntries(startStore.forms)
+      .filter(([, form]) => formStatus(form) === 'dirty')
+      .map(([formId]) => formId);
     const { userId, branch: startBranch } = startStore;
     startStore.startSaveAll(snapshot.length);
     const record = (formId: FormId, result: SaveAllResult) =>
@@ -159,24 +156,9 @@ function useSaveAllRun(): () => Promise<string> {
           record(formId, { status: 'failed', words: 'Save failed' });
           continue;
         }
-        const transform = { documentPath: formId, registry: runtime.registry };
-        let stage: SaveStage | 'read' = 'read';
+        let stage: SaveStage = 'validate';
         let outcome: { result: SaveAllResult; stop: boolean };
         try {
-          const entry = await content.get(collection.name, formId);
-          const form = context().forms[formId];
-          if (!isEdited(form)) continue;
-          if (entry === null) {
-            record(formId, { status: 'failed', words: NO_LONGER_EXISTS });
-            continue;
-          }
-          const file = toFormValues(
-            ingestDocument(entry.document, collection.fields, transform)
-          );
-          if (!valuesEqual(form.baseline, file, form.equal)) {
-            record(formId, { status: 'failed', words: CHANGED_ON_BRANCH });
-            continue;
-          }
           await saveDocument(
             {
               formId,
@@ -196,9 +178,13 @@ function useSaveAllRun(): () => Promise<string> {
             }
           );
           record(formId, { status: 'saved' });
+          dismissSaveFailedToast(formId);
           continue;
         } catch (cause) {
           outcome = failureOf(cause, stage, formId, collection);
+          if (outcome.result.status === 'saved-with-warning') {
+            dismissSaveFailedToast(formId);
+          }
         }
         record(formId, outcome.result);
         if (!outcome.stop) continue;
@@ -226,18 +212,19 @@ const STATUS_WORDS = {
   'not-saved': 'Not saved',
 } as const;
 
-function SaveResults({ failed }: { failed: number }) {
+function SaveResults() {
+  const [open, setOpen] = useState(false);
   const { results } = useSaveAllState();
   const collections = useFormStore((state) => state.collections);
-  const entries = Object.entries(results) as [FormId, SaveAllResult][];
+  const entries = formEntries(results);
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
           <Button
             variant='icon'
             size='sm'
-            icon={failed > 0 ? 'error' : 'doc'}
+            icon='doc'
             aria-label='Save results'
           />
         }
@@ -270,6 +257,7 @@ function SaveResults({ failed }: { failed: number }) {
                 {result.status !== 'saved' && collection ? (
                   <a
                     className='text-primary underline'
+                    onClick={() => setOpen(false)}
                     href={formatAdminRoute({
                       view: 'document',
                       collection,
@@ -303,7 +291,6 @@ const useBlockedMessage = (): string | undefined => {
     : undefined;
 };
 
-/** The Save All button, its result list and the live region that announces a finished run. */
 export function SaveAllControl() {
   const run = useSaveAllRun();
   const running = useAnySaveRunning();
@@ -353,7 +340,7 @@ export function SaveAllControl() {
       ) : (
         button
       )}
-      {Object.keys(results).length > 0 ? <SaveResults failed={failed} /> : null}
+      {Object.keys(results).length > 0 ? <SaveResults /> : null}
       <span role='status' aria-live='polite' className='sr-only'>
         {announcement}
       </span>

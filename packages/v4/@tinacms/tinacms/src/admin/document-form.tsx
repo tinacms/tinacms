@@ -95,6 +95,12 @@ const dismissIfUnowned = (toastId: string) => {
   );
 };
 
+export function dismissSaveFailedToast(formId: FormId) {
+  const toastId = `save-failed:${formId}`;
+  goneToasts.delete(toastId);
+  toast.dismiss(toastId);
+}
+
 export function flushPendingToastDismissals() {
   for (const toastId of [...dismissTimers.keys()]) dismissNowIfUnowned(toastId);
 }
@@ -168,7 +174,6 @@ function SaveButton() {
   const saveAllRunning = useFormStore(
     (state) => state.saveAll.running !== null
   );
-  // Save All reads this mark to stay off while a Save Document is between its click and its end.
   const setPending = (next: boolean) => {
     setPendingState(next);
     useFormStore.getState().setSavePending(formId, next);

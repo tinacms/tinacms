@@ -5,7 +5,6 @@ import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { validateFieldTree } from '../core/validation';
 import { nestFieldErrors } from './field-errors';
 
-/** Every field's errors for a document, flat by address. Empty when the document is valid. */
 export const validateDocument = (
   collection: CollectionSchema,
   registry: FieldRegistry,

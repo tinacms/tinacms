@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
+import { configure } from '@testing-library/dom';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -29,6 +30,9 @@ import { ShellTopBar } from './shell-bars';
 Element.prototype.setPointerCapture = () => undefined;
 Element.prototype.releasePointerCapture = () => undefined;
 
+// CI runs these on a loaded machine: the admin takes seconds to boot.
+configure({ asyncUtilTimeout: 20_000 });
+
 const consoleGuard = guardConsole();
 
 const PAGE = 'content/pages/about.mdx';
@@ -55,6 +59,7 @@ let beforeSaves: { path: string }[];
 let afterSaves: { path: string }[];
 let failBeforeSave: boolean;
 let failAfterSave: boolean;
+let gets: string[];
 let holdList: Promise<void> | undefined;
 let listFails: boolean;
 
@@ -117,8 +122,10 @@ const contentPlugin = () =>
           get: async (
             _collection: string,
             path: string
-          ): Promise<DocumentEntry | null> =>
-            files[path] ? { path, document: files[path] } : null,
+          ): Promise<DocumentEntry | null> => {
+            gets.push(path);
+            return files[path] ? { path, document: files[path] } : null;
+          },
           update: async (
             _collection: string,
             path: string,
@@ -297,6 +304,7 @@ beforeEach(() => {
   afterSaves = [];
   failBeforeSave = false;
   failAfterSave = false;
+  gets = [];
   holdList = undefined;
   listFails = false;
   serverAudit = false;
@@ -540,10 +548,23 @@ describe('Opening a document that failed', () => {
 });
 
 describe('Save All guards', () => {
-  it('refuses a document deleted on the branch and still saves the rest', async () => {
+  it('reads nothing before a write and writes each document once', async () => {
     const user = userEvent.setup();
     await editSlugs(user, [POST, POST_B]);
-    delete files[POST];
+    gets.length = 0;
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Saved 2 documents')).toBeVisible()
+    );
+    expect(gets).toEqual([]);
+    expect(writes.map(({ path }) => path).sort()).toEqual([POST, POST_B]);
+  });
+
+  it('fails a document the provider refuses as not found and still saves the rest', async () => {
+    consoleGuard.expect(/Save failed/);
+    failWrite.set(POST, new ContentError('not-found'));
+    const user = userEvent.setup();
+    await editSlugs(user, [POST, POST_B]);
     await user.click(saveAll());
     await waitFor(() =>
       expect(
@@ -551,34 +572,36 @@ describe('Save All guards', () => {
       ).toBeVisible()
     );
     expect(writes.map(({ path }) => path)).toEqual([POST_B]);
-    expect(files[POST]).toBeUndefined();
     expect(
-      within(await openResults(user)).getByText(
-        /This document no longer exists/
-      )
-    ).toBeVisible();
+      within(await openResults(user)).getAllByRole('listitem')[0]
+    ).toHaveTextContent(
+      'Failed: This document no longer exists. Refresh and try again.'
+    );
     expect(useFormStore.getState().forms[toFormId(POST)]?.status).toBe(
       'edited'
     );
   });
 
-  it('refuses a document that changed on the branch since it was edited', async () => {
+  it('writes a file deleted from the local disk, as Save Document does', async () => {
+    const user = userEvent.setup();
+    await editSlugs(user, [POST, POST_B]);
+    delete files[POST];
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Saved 2 documents')).toBeVisible()
+    );
+    expect(files[POST]).toMatchObject({ slug: 'hello-x' });
+  });
+
+  it('writes a document that changed on the branch, as Save Document does', async () => {
     const user = userEvent.setup();
     await editSlugs(user, [POST, POST_B]);
     files[POST] = { title: 'Hello', slug: 'someone-else' };
     await user.click(saveAll());
     await waitFor(() =>
-      expect(
-        within(statusBar()).getByText('Save failed: 1 of 2 documents')
-      ).toBeVisible()
+      expect(within(statusBar()).getByText('Saved 2 documents')).toBeVisible()
     );
-    expect(writes.map(({ path }) => path)).toEqual([POST_B]);
-    expect(files[POST]).toEqual({ title: 'Hello', slug: 'someone-else' });
-    expect(
-      within(await openResults(user)).getByText(
-        /Changed on the branch since you edited it\. Save it from its form to overwrite/
-      )
-    ).toBeVisible();
+    expect(files[POST]).toMatchObject({ slug: 'hello-x' });
   });
 
   it.each([
@@ -604,9 +627,11 @@ describe('Save All guards', () => {
         screen.queryByRole('dialog', { name: 'Save to a new branch' })
       ).toBeNull();
       const results = await openResults(user);
-      expect(
-        within(results).getByText(/Not saved: the run stopped/)
-      ).toBeVisible();
+      const rows = within(results).getAllByRole('listitem');
+      expect(rows[1]).toHaveTextContent(
+        /^second\.mdxNot saved: the run stopped/
+      );
+      expect(results.textContent).not.toContain('Not saved: Not saved');
       for (const path of [POST, POST_B]) {
         expect(useFormStore.getState().forms[toFormId(path)]?.status).toBe(
           'edited'
@@ -1099,5 +1124,164 @@ describe('Save All with server hooks', () => {
     );
     expect(bodies.map(({ path }) => path).sort()).toEqual([POST, POST_B]);
     expect(writes).toHaveLength(0);
+  });
+});
+
+describe('Revealed errors show only on the first open', () => {
+  const failOffScreen = async (user: ReturnType<typeof userEvent.setup>) => {
+    window.location.hash = hashOf('post', POST);
+    const view = renderAdmin();
+    await user.clear(await titleInput());
+    await goTo('page', PAGE);
+    await user.type(await titleInput(), '!');
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 1 of 2 documents')
+      ).toBeVisible()
+    );
+    return view;
+  };
+  const alerts = () =>
+    screen
+      .queryAllByRole('alert')
+      .filter((alert) => /required/i.test(alert.textContent ?? ''));
+
+  it.each([
+    ['another collection', 'page', PAGE],
+    ['the same collection', 'post', POST_B],
+  ] as const)(
+    'does not reveal again after a round trip through %s',
+    async (_name, collection, path) => {
+      const user = userEvent.setup();
+      await failOffScreen(user);
+      await goTo('post', POST);
+      expect(await screen.findByRole('alert')).toHaveTextContent(/required/i);
+      await goTo(collection, path);
+      await waitFor(() => expect(alerts()).toHaveLength(0));
+      await goTo('post', POST);
+      await titleInput();
+      expect(alerts()).toHaveLength(0);
+      expect(useFormStore.getState().revealOnOpen).toEqual({});
+    }
+  );
+
+  it('does not reveal after a reload', async () => {
+    const user = userEvent.setup();
+    const first = await failOffScreen(user);
+    await goTo('post', POST);
+    expect(await screen.findByRole('alert')).toHaveTextContent(/required/i);
+    first.unmount();
+    simulateReload();
+    window.location.hash = hashOf('post', POST);
+    renderAdmin();
+    await titleInput();
+    expect(alerts()).toHaveLength(0);
+  });
+});
+
+describe('Status bar after a run', () => {
+  it('shows a later single save, not the finished run', async () => {
+    const user = userEvent.setup();
+    await editSlugs(user, [POST, POST_B]);
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Saved 2 documents')).toBeVisible()
+    );
+    await user.type(screen.getByLabelText(/^Slug\b/), '!');
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Saved: “second.mdx”')).toBeVisible()
+    );
+  });
+
+  it('shows the words of a later failed save, while Save All keeps the earlier failure', async () => {
+    consoleGuard.expect(/Save failed/);
+    const user = userEvent.setup();
+    await editPageThenPost(user);
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 1 of 2 documents')
+      ).toBeVisible()
+    );
+    failWrite.set(POST_B, new Error('disk full'));
+    await goTo('post', POST_B);
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-x');
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Save failed')).toBeVisible()
+    );
+    expect(within(statusBar()).queryByText(/of 2 documents/)).toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'Save all, 1 failed' })
+    ).toBeEnabled();
+    expect(
+      within(await openResults(user)).getAllByRole('listitem')[0]
+    ).toHaveTextContent('about.mdxFailed');
+  });
+
+  it('counts failures out of the documents the run tried, as they clear', async () => {
+    const user = userEvent.setup();
+    window.location.hash = hashOf('post', POST);
+    renderAdmin();
+    await user.clear(await titleInput());
+    await goTo('post', POST_B);
+    await waitFor(() =>
+      expect(screen.getByLabelText(/^Slug\b/)).toHaveValue('second')
+    );
+    await user.clear(screen.getByLabelText(/^Title\b/, { selector: 'input' }));
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 2 of 2 documents')
+      ).toBeVisible()
+    );
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+    );
+    await user.click(await screen.findByRole('button', { name: 'Discard' }));
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 1 of 2 documents')
+      ).toBeVisible()
+    );
+  });
+});
+
+describe('Save All and the failure toast', () => {
+  it('removes the failed-save toast of a document that Save All then saves', async () => {
+    consoleGuard.expect(/Save failed/);
+    failWrite.set(POST, new Error('disk full'));
+    const user = userEvent.setup();
+    window.location.hash = hashOf('post', POST);
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-x');
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
+    await waitFor(() => expect(toastShown()).not.toBeNull());
+    failWrite.delete(POST);
+    await waitFor(() => expect(saveAll()).toBeEnabled());
+    await user.click(saveAll());
+    await waitFor(() => expect(writes).toHaveLength(1));
+    await waitFor(() => expect(toastShown()).toBeNull());
+  });
+});
+
+describe('Open in the Save results list', () => {
+  it('closes the list', async () => {
+    const user = userEvent.setup();
+    await editPageThenPost(user);
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 1 of 2 documents')
+      ).toBeVisible()
+    );
+    const results = await openResults(user);
+    await user.click(within(results).getByRole('link', { name: /^Open/ }));
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: 'Save results' })).toBeNull()
+    );
   });
 });

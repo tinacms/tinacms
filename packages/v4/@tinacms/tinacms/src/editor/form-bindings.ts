@@ -2,7 +2,6 @@ import type { FieldAddress } from '../core/field/address';
 import type { TinaDocument } from '../core/schema/types';
 import type { FormId } from '../form/form-store';
 
-/** What a mounted form lends to a save that runs outside it. */
 export interface FormBindings {
   /** Reveals the form's errors in place. Resolves false when the form is invalid. */
   validate: () => Promise<boolean>;
@@ -12,9 +11,9 @@ export interface FormBindings {
   resetReveal: () => void;
 }
 
+// Bindings are read at each save step, so a form that mounts or unmounts mid-save is handled.
 const mounted = new Map<FormId, FormBindings>();
 
-/** A form registers on mount. The returned function removes it, unless a newer mount replaced it. */
 export const registerFormBindings = (
   formId: FormId,
   bindings: FormBindings

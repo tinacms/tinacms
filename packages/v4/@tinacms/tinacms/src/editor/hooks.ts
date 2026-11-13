@@ -58,10 +58,12 @@ import {
 } from './field-errors';
 import { UploadFormContext } from './uploads/upload-context';
 import { uploadListOf } from './uploads/upload-list';
+import { readFormBindings } from './form-bindings';
 import {
   AfterSaveHookError,
   FormValidationError,
   type SaveSteps,
+  checkForm,
   saveDocument,
 } from './save-pipeline';
 import { countRevealedErrors, isRevealed, itemLevel } from './form-view-state';
@@ -240,29 +242,16 @@ export function useActiveField(): ActiveField {
   return useMemo(() => ({ active, setActive }), [active, setActive]);
 }
 
-// Checks every field, not only the edited ones, so a required field the editor
-// never touched surfaces its message at submit. Resolves false, and records the
-// save as failed, when the form is invalid.
 export function useFormCheck(): () => Promise<boolean> {
-  const scope = useFormScope('form-check-outside-provider', 'useFormCheck');
+  const { formId, view } = useFormScope(
+    'form-check-outside-provider',
+    'useFormCheck'
+  );
   const { trigger } = useFormContext<TinaDocument>();
-  return useCallback(async () => {
-    scope.view.getState().attemptSave();
-    const valid = await trigger();
-    const store = useFormStore.getState();
-    if (!valid) {
-      store.setSavePhase(scope.formId, {
-        phase: 'failed',
-        message: new FormValidationError().message,
-      });
-    } else {
-      const last = store.saves[scope.formId];
-      if (last?.phase === 'failed' && last.reason !== 'branch-gone') {
-        store.clearSavePhase(scope.formId);
-      }
-    }
-    return valid;
-  }, [scope, trigger]);
+  return useCallback(
+    () => checkForm(formId, view, () => trigger()),
+    [formId, view, trigger]
+  );
 }
 
 // The admin's Save to new branch swaps the write step. Not exported from `editor/index.ts`.
@@ -270,9 +259,7 @@ export function useFormSaveWith(): (steps?: SaveSteps) => Promise<void> {
   const registry = useFieldRegistry();
   const runtime = use(TinaRuntimeContext);
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
-  const { getValues, setValue } = useFormContext<TinaDocument>();
-  const check = useFormCheck();
-  const { formId, path, collection, onSave, hooks, reseedFields, view } = scope;
+  const { formId, path, collection, onSave, hooks } = scope;
   const validators = runtime?.validators;
   return useCallback(
     (steps = {}) =>
@@ -285,29 +272,10 @@ export function useFormSaveWith(): (steps?: SaveSteps) => Promise<void> {
           registry,
           validators: validators ?? new Map(),
         },
-        () => ({
-          validate: check,
-          getValues,
-          setValue: (address, value) => setValue(address, value),
-          reseedFields,
-          resetReveal: () => view.getState().resetReveal(),
-        }),
+        () => readFormBindings(formId),
         { ...steps, write: steps.write ?? onSave }
       ),
-    [
-      formId,
-      path,
-      collection,
-      hooks,
-      registry,
-      validators,
-      check,
-      getValues,
-      setValue,
-      reseedFields,
-      view,
-      onSave,
-    ]
+    [formId, path, collection, hooks, registry, validators, onSave]
   );
 }
 

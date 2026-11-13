@@ -16,6 +16,7 @@ import {
   useFormStore,
 } from '../form/form-store';
 import type { SaveHandler } from './context';
+import type { FormViewStore } from './form-view-state';
 import { type FormBindings } from './form-bindings';
 import { validateDocument } from './resolver';
 
@@ -88,6 +89,31 @@ async function recordSavePhase(
     throw cause;
   }
   setSavePhase(formId, { phase: 'saved' });
+}
+
+// Checks every field, not only the edited ones, so a required field the editor
+// never touched surfaces its message at submit. Resolves false, and records the
+// save as failed, when the form is invalid.
+export async function checkForm(
+  formId: FormId,
+  view: FormViewStore,
+  trigger: () => Promise<boolean>
+): Promise<boolean> {
+  view.getState().attemptSave();
+  const valid = await trigger();
+  const store = useFormStore.getState();
+  if (!valid) {
+    store.setSavePhase(formId, {
+      phase: 'failed',
+      message: new FormValidationError().message,
+    });
+  } else {
+    const last = store.saves[formId];
+    if (last?.phase === 'failed' && last.reason !== 'branch-gone') {
+      store.clearSavePhase(formId);
+    }
+  }
+  return valid;
 }
 
 export type SaveStage = 'validate' | 'beforeSave' | 'write' | 'afterSave';

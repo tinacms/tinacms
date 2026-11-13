@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { statusWords } from './shell-bars';
+import { statusWords } from './status-words';
 
 describe('statusWords', () => {
   it('says no saves yet for idle local files, and no changes elsewhere', () => {

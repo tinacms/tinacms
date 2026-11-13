@@ -75,9 +75,21 @@ export interface SaveAllState {
   readonly running: { readonly index: number; readonly total: number } | null;
   /** The documents of the latest run, in the order they were saved. */
   readonly results: Partial<Record<FormId, SaveAllResult>>;
+  /** The save-phase counter when the run ended. A save phase stamped later is newer than the run. */
+  readonly endedAt: number | null;
+  /** Set once a single save starts after the run ended. The run's words then leave the Status bar. */
+  readonly superseded: boolean;
+  /** The documents the run tried, skipped ones excluded. Fixed when the run ends. */
+  readonly attempted: number;
 }
 
-const IDLE_SAVE_ALL: SaveAllState = { running: null, results: {} };
+export const IDLE_SAVE_ALL: SaveAllState = {
+  running: null,
+  results: {},
+  endedAt: null,
+  superseded: false,
+  attempted: 0,
+};
 
 export type FieldErrors = Partial<Record<FieldAddress, string[]>>;
 
@@ -135,7 +147,6 @@ export interface FormStore {
   setSaveAllIndex: (index: number) => void;
   recordSaveAllResult: (formId: FormId, result: SaveAllResult) => void;
   endSaveAll: () => void;
-  /** Drops a `failed` or `not-saved` result once the document saves or its edits go. */
   clearFailedResult: (formId: FormId) => void;
   /** Removes the live copy, every waiting copy and the in-memory edits. */
   discardStoredDraft: (formId: FormId) => void;
@@ -247,6 +258,14 @@ const withoutFailedResult = (saveAll: SaveAllState, formId: FormId) => {
   if (status !== 'failed' && status !== 'not-saved') return saveAll;
   return { ...saveAll, results: withoutKey(saveAll.results, formId) };
 };
+
+export const formEntries = <T>(
+  record: Partial<Record<FormId, T>>
+): [FormId, T][] =>
+  (Object.entries(record) as [FormId, T | undefined][]).flatMap(
+    ([formId, value]): [FormId, T][] =>
+      value === undefined ? [] : [[formId, value]]
+  );
 
 const storeFailed = (...results: StoreResult[]) =>
   results.some((result) => result === 'failed');
@@ -394,7 +413,9 @@ export const useFormStore = create<FormStore>()(
 
         startSaveAll: (total) =>
           apply(
-            () => ({ saveAll: { running: { index: 0, total }, results: {} } }),
+            () => ({
+              saveAll: { ...IDLE_SAVE_ALL, running: { index: 0, total } },
+            }),
             DEVTOOLS_ACTION.saveAll
           ),
 
@@ -420,22 +441,21 @@ export const useFormStore = create<FormStore>()(
 
         endSaveAll: () =>
           apply(
-            (state) => ({ saveAll: { ...state.saveAll, running: null } }),
+            (state) => ({
+              saveAll: {
+                ...state.saveAll,
+                running: null,
+                endedAt: ++savePhaseClock,
+                attempted: Object.keys(state.saveAll.results).length,
+              },
+            }),
             DEVTOOLS_ACTION.saveAll
           ),
 
         clearFailedResult: (formId) =>
           apply((state) => {
-            const result = state.saveAll.results[formId];
-            if (result?.status !== 'failed' && result?.status !== 'not-saved') {
-              return state;
-            }
-            return {
-              saveAll: {
-                ...state.saveAll,
-                results: withoutKey(state.saveAll.results, formId),
-              },
-            };
+            const saveAll = withoutFailedResult(state.saveAll, formId);
+            return saveAll === state.saveAll ? state : { saveAll };
           }, DEVTOOLS_ACTION.saveAll),
 
         discardStoredDraft: (formId) => {
@@ -528,15 +548,17 @@ export const useFormStore = create<FormStore>()(
           }, DEVTOOLS_ACTION.setBranch),
 
         setSavePhase: (formId, phase) =>
-          apply(
-            (state) => ({
-              saves: {
-                ...state.saves,
-                [formId]: { ...phase, at: ++savePhaseClock },
-              },
-            }),
-            DEVTOOLS_ACTION.setSavePhase
-          ),
+          apply((state) => {
+            const at = ++savePhaseClock;
+            const { endedAt, superseded } = state.saveAll;
+            const newer = endedAt !== null && at > endedAt && !superseded;
+            return {
+              saves: { ...state.saves, [formId]: { ...phase, at } },
+              ...(newer
+                ? { saveAll: { ...state.saveAll, superseded: true } }
+                : {}),
+            };
+          }, DEVTOOLS_ACTION.setSavePhase),
 
         clearSavePhase: (formId) =>
           apply((state) => {
@@ -912,7 +934,7 @@ export interface SaveSummary {
 
 // A document the editor edited back to its saved values has nothing left to fail.
 const failedIds = (state: FormStore): FormId[] =>
-  (Object.entries(state.saveAll.results) as [FormId, SaveAllResult][])
+  formEntries(state.saveAll.results)
     .filter(
       ([formId, result]) =>
         (result.status === 'failed' || result.status === 'not-saved') &&
@@ -923,27 +945,28 @@ const failedIds = (state: FormStore): FormId[] =>
 /**
  * One answer for the whole shell, first match wins: Save All running, a
  * Document save running, the failures of the latest Save All, then today's
- * order: newest failure, unsaved edits, newest success, idle. A form whose
+ * order: newest failure, unsaved edits, newest success, idle. A single save
+ * that starts after a run ends replaces the run's words for good. A form whose
  * `afterSave` hook failed is written, so its phase does not count as a failure.
  */
 export const summarizeSaves = (state: FormStore): SaveSummary => {
-  const { running, results } = state.saveAll;
+  const { running, results, superseded, attempted } = state.saveAll;
   if (running)
     return {
       state: 'saving',
       runIndex: running.index,
       runTotal: running.total,
     };
-  const entries = Object.entries(state.saves).flatMap(([formId, save]) =>
-    save === undefined ? [] : [{ formId: formId as FormId, ...save }]
-  );
+  const entries = formEntries(state.saves).map(([formId, save]) => ({
+    formId,
+    ...save,
+  }));
   if (entries.some((save) => save.phase === 'saving')) {
     return { state: 'saving' };
   }
-  const tried = Object.keys(results).length;
   const failed = failedIds(state).length;
-  if (failed > 0) {
-    return { state: 'failed', runFailed: failed, runTried: tried };
+  if (failed > 0 && !superseded) {
+    return { state: 'failed', runFailed: failed, runTried: attempted };
   }
   const newest = entries
     .filter(
@@ -962,7 +985,7 @@ export const summarizeSaves = (state: FormStore): SaveSummary => {
       result.status === 'saved' || result.status === 'saved-with-warning'
   );
   const runSaved =
-    written.length > 0
+    written.length > 0 && !superseded
       ? {
           runSaved: written.length,
           runWarnings: written.some(
@@ -1014,7 +1037,6 @@ export const useFormErrors = (formId: FormId): FieldErrors =>
 export const useSaveSummary = (): SaveSummary =>
   useFormStore(useShallow(summarizeSaves));
 
-/** How many documents of the latest Save All still fail: dirty and not saved. */
 export const useSaveAllFailureCount = (): number =>
   useFormStore((state) => failedIds(state).length);
 
@@ -1023,7 +1045,6 @@ export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
 export const useSaveAllState = (): SaveAllState =>
   useFormStore((state) => state.saveAll);
 
-/** Whether any save, of either button, is running or about to. */
 export const useAnySaveRunning = (): boolean =>
   useFormStore(
     (state) =>
