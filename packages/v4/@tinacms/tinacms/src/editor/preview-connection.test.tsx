@@ -430,3 +430,50 @@ describe('usePreviewConnection', () => {
     expect(iframe.postMessage).not.toHaveBeenCalled();
   });
 });
+
+describe('usePreviewConnection with a read-only field', () => {
+  it.each([
+    ['readOnly', 'readonly'],
+    ['disabled', 'disabled'],
+  ] as const)(
+    'makes a %s field active on a click in the page and leaves it not editable',
+    async (flag, attribute) => {
+      const readOnly: CollectionSchema = {
+        ...collection,
+        fields: [t.string({ name: 'title', label: 'Title', [flag]: true })],
+      };
+      const iframe = fakeIframe();
+      render(
+        <TinaProvider
+          config={asResolvedConfig({
+            plugins: [stringFieldPlugin, coreValidatorsPlugin],
+            schema: { collections: [readOnly] },
+          })}
+        >
+          <FormProvider
+            collection={readOnly}
+            path={path}
+            document={{ title: 'Hello' }}
+          >
+            <LabelledFields />
+            <Connection iframeRef={iframe.ref} />
+          </FormProvider>
+        </TinaProvider>
+      );
+      const input = await screen.findByLabelText(/^Title\b/);
+      hear(iframe);
+
+      messageFromPreview(
+        activateMessage('title'),
+        iframe.ref.current?.contentWindow
+      );
+      expect(useFormStore.getState().active).toEqual({
+        formId,
+        address: 'title',
+      });
+      await userEvent.type(input, '!', { skipClick: true });
+      expect(input).toHaveValue('Hello');
+      expect(input).toHaveAttribute(attribute);
+    }
+  );
+});
