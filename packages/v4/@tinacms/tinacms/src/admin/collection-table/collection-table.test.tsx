@@ -571,17 +571,25 @@ describe('CollectionTable', () => {
     expect(screen.queryByRole('button', { name: 'p100.md' })).toBeNull();
   });
 
-  it('dims and ignores the rows for the hold after a page change, then frees them', async () => {
+  it('dims and ignores the rows while the next page loads, then frees them after the hold', async () => {
     const user = userEvent.setup();
     world.summaries = Array.from({ length: 120 }, (_, index) =>
       doc(`p${String(index).padStart(3, '0')}.md`)
     );
     renderTable();
     await screen.findByText('Page 1 of 3');
+    let release = () => {};
+    world.holdList = new Promise<void>((resolve) => {
+      release = resolve;
+    });
     await user.click(screen.getByRole('button', { name: 'Next' }));
-    const busy = (await rowNamed('p050.md')).closest('[aria-busy]');
+    const busy = screen
+      .getByRole('button', { name: 'p000.md' })
+      .closest('[aria-busy]');
     expect(busy?.className).toMatch(/pointer-events-none/);
     expect(busy?.className).toMatch(/opacity-60/);
+    release();
+    await rowNamed('p050.md');
     await pastPagerHold();
     expect(busy?.className ?? '').not.toMatch(/pointer-events-none/);
   });
