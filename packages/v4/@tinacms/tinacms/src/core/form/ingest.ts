@@ -34,9 +34,13 @@ export const digestDocument = (
     const value = values?.[node.name];
     if (value == null) continue;
     const descriptor = registry.get(node.type);
-    reconstructedDocument[node.name] = descriptor?.serialize
+    const serialized = descriptor?.serialize
       ? descriptor.serialize(value, node, context)
       : value;
+    // A null return drops the key. The serializer is reporting that the field
+    // is absent, so it stays out of the saved document.
+    if (serialized == null) continue;
+    reconstructedDocument[node.name] = serialized;
   }
   return reconstructedDocument;
 };
