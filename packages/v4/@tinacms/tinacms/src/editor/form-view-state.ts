@@ -169,7 +169,12 @@ export const createFormViewStore = (): FormViewStore => {
         const promoted = summary.hiddenParents.filter(
           (parent) =>
             remaining.has(parent) &&
-            !failing.some((address) => address.startsWith(`${parent}.`))
+            !failing.some((address) => address.startsWith(`${parent}.`)) &&
+            !summary.blocked.some(
+              (entry) =>
+                entry.address.endsWith(REMOVED) &&
+                entry.address.startsWith(`${parent}.`)
+            )
         );
         const kept = [
           ...stillListed,

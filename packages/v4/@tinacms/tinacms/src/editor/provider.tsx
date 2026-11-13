@@ -734,7 +734,11 @@ export function FormProvider({
       const [topLevel] = listAddress.split('.');
       useFormStore
         .getState()
-        .setFieldValue(formId, toFieldAddress(topLevel), methods.getValues(topLevel));
+        .setFieldValue(
+          formId,
+          toFieldAddress(topLevel),
+          methods.getValues(topLevel)
+        );
     },
     [formId, methods]
   );
