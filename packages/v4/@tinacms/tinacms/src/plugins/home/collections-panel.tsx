@@ -49,7 +49,12 @@ export function CollectionsPanel({ tier }: { tier: Tier }) {
     label: collection.label ?? collection.name,
     count: countOf(lists[index]),
     isLoading: lists[index]?.status === 'loading',
-    open: () => navigate({ view: 'collection', collection: collection.name }),
+    open: () =>
+      navigate({
+        view: 'collection',
+        collection: collection.name,
+        maximised: true,
+      }),
   }));
   return (
     <HomePanelTray

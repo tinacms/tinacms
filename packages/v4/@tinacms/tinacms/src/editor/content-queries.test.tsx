@@ -18,6 +18,7 @@ import {
   useSaveDocument,
 } from './content-queries';
 import { type TinaRuntime, TinaRuntimeContext } from './context';
+import { connectionOf } from '../test/connection';
 
 const ENTRIES: DocumentEntry[] = [
   { path: 'content/posts/hello.mdx', document: { title: 'Hello' } },
@@ -55,7 +56,7 @@ const renderWithContent = (
 const stubProvider = (
   overrides: Partial<ContentProvider> = {}
 ): ContentProvider => ({
-  list: vi.fn(async () => SUMMARIES),
+  list: vi.fn(async () => connectionOf(SUMMARIES)),
   get: vi.fn(async () => ENTRIES[0]),
   update: vi.fn(async (_collection, path, value) => ({
     path,

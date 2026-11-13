@@ -30,13 +30,18 @@ export function DiscardConfirm({
   onConfirm,
   returnFocusTo,
   title = 'Discard unsaved edits?',
-  description = 'The document goes back to its last saved version. Discarded edits can’t be brought back.',
+  isNewDocument = false,
+  description = isNewDocument
+    ? 'The unsaved copy is removed. Discarded edits can’t be brought back.'
+    : 'The document goes back to its last saved version. Discarded edits can’t be brought back.',
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   returnFocusTo?: RefObject<HTMLElement | null>;
   title?: string;
+  /** The document has no saved version yet, so Discard removes it. */
+  isNewDocument?: boolean;
   description?: string;
 }) {
   return (

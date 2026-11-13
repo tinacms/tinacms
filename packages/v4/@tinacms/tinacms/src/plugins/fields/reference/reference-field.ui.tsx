@@ -14,6 +14,7 @@ import {
   useFieldValue,
   useSchemaCollections,
 } from '../../../editor';
+import { nodesOf } from '../../../core/content/contract';
 import type { ReferenceFieldSchema } from './reference-field.schema';
 import {
   ReferenceFieldView,
@@ -40,7 +41,7 @@ const useReferenceLists = (collections: string[]): ReferenceLists => {
   return useQueries({
     queries: collections.map((collection) => ({
       queryKey: contentKeys.list(collection, branch),
-      queryFn: () => content.list(collection),
+      queryFn: async () => nodesOf(await content.list(collection)),
       staleTime: CONTENT_STALE_TIME,
     })),
     combine: (results) => ({

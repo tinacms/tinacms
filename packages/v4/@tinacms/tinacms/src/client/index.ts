@@ -5,6 +5,7 @@ export type { JsonValue } from '../core/json';
 export {
   AuthError,
   type AuthErrorCode,
+  type AuthPluginSlice,
   type AuthSlice,
   type AuthUser,
   toUserId,

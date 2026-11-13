@@ -32,8 +32,9 @@ const CONTENT_DIR = path.join(
 const snapshot = new Map<string, string>();
 
 test.beforeAll(async () => {
-  for (const name of await fs.readdir(CONTENT_DIR)) {
-    const file = path.join(CONTENT_DIR, name);
+  for (const entry of await fs.readdir(CONTENT_DIR, { withFileTypes: true })) {
+    if (!entry.isFile()) continue;
+    const file = path.join(CONTENT_DIR, entry.name);
     snapshot.set(file, await fs.readFile(file, 'utf8'));
   }
 });

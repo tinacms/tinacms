@@ -160,7 +160,7 @@ const useReferenceOptions = (collections: string[]): ReferenceOptions => {
   return useQueries({
     queries: collections.map((collection) => ({
       queryKey: contentKeys.list(collection, branch),
-      queryFn: () => content.list(collection),
+      queryFn: async () => nodesOf(await content.list(collection)),
       staleTime: CONTENT_STALE_TIME,
     })),
     combine: (results) => ({

@@ -84,9 +84,9 @@ export const runSearchReindex = async (
       try {
         for (const collection of collections) {
           let count = 0;
-          for (const { path: documentPath } of await reader.list(
-            collection.name
-          )) {
+          for (const {
+            node: { path: documentPath },
+          } of (await reader.list(collection.name)).edges) {
             let document: TinaDocument | undefined;
             try {
               document = (await reader.get(collection.name, documentPath))

@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook } from '@testing-library/react';
 import { type ReactNode, memo } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -40,11 +41,16 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const wrapperFor =
-  (runtime: TinaRuntime) =>
-  ({ children }: { children: ReactNode }) => (
-    <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
+const wrapperFor = (runtime: TinaRuntime) => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
+    </QueryClientProvider>
   );
+};
 
 const boot = async (plugins: PluginManifest[]) => {
   const runtime = await bootRuntime(plugins);

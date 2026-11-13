@@ -44,6 +44,10 @@ import {
   serverRuntimeStorage,
 } from '../server/runtime-storage';
 import { errorResponse, toErrorResponse } from './error-response';
+import {
+  SESSION_NAMESPACE,
+  SESSION_PERMISSIONS_OP,
+} from './session-permissions';
 
 export type RpcHandler = ((request: Request) => Promise<Response>) & {
   // Tear the composed plugins down. A host that replaces a handler instead of ending
@@ -241,6 +245,20 @@ export const createRequestAuthorizer = (plugins: PluginManifest[]) => {
     const runtime = await runtimeOf();
     return serverRuntimeStorage.run(runtime, () =>
       authorizeRequest(runtime, request, permissions)
+    );
+  };
+};
+
+// The `session/permissions` op for a route outside the handler: the local Data
+// Layer's own server answers it with the resolution its gate uses.
+export const createSessionPermissionsResponder = (
+  plugins: PluginManifest[]
+) => {
+  const runtimeOf = lazyRuntimeOf(plugins);
+  return async (request: Request): Promise<Response> => {
+    const runtime = await runtimeOf();
+    return serverRuntimeStorage.run(runtime, () =>
+      answerSessionPermissions(runtime, request)
     );
   };
 };
@@ -472,6 +490,9 @@ const authorizeAndInvokeOp = async (
   namespace: string,
   opName: string
 ): Promise<Response> => {
+  if (namespace === SESSION_NAMESPACE && opName === SESSION_PERMISSIONS_OP) {
+    return answerSessionPermissions(runtime, request);
+  }
   const mounted = runtime.segmentsByNamespace.get(namespace);
   const op = mounted ? routedOp(mounted, opName) : undefined;
   if (!mounted || !op) {
@@ -511,6 +532,19 @@ const authorizeAndInvokeOp = async (
     () => invokeOp(op, input)
   );
   return Response.json(result ?? null);
+};
+
+// Needs a session and no permission. Where no auth hooks exist, the server checks
+// nothing and accepts every request, so the answer is the wildcard; it grants
+// nothing, because only the server's own check enforces.
+const answerSessionPermissions = async (
+  runtime: ServerRuntime,
+  request: Request
+): Promise<Response> => {
+  if (!runtime.authHooks) return Response.json(['*']);
+  const session = await runtime.authHooks.getSession(request);
+  if (!session) return errorResponse(401, 'unauthenticated', 'No CMS session.');
+  return Response.json(await permissionsOf(runtime.authHooks, session));
 };
 
 export type Authorization = { session: Session } | { refusal: Response };
@@ -565,16 +599,35 @@ const routedOp = (
 const invokeOp = (op: ServerOp, input: unknown): Promise<unknown> =>
   (op as (input: unknown) => Promise<unknown>)(input);
 
+// A provider that resolves the roles owns the whole map (ADR-008 §3 and §4).
+const permissionsOfRole = async (
+  authHooks: AuthTransportHooks,
+  role: string
+): Promise<readonly string[]> =>
+  authHooks.rolePermissions
+    ? await authHooks.rolePermissions(role)
+    : (DEFAULT_ROLE_PERMISSIONS[role] ?? []);
+
+const permissionsOf = async (
+  authHooks: AuthTransportHooks,
+  session: Session
+): Promise<string[]> => {
+  const granted = new Set<string>();
+  for (const role of session.roles) {
+    for (const permission of await permissionsOfRole(authHooks, role)) {
+      granted.add(permission);
+    }
+  }
+  return [...granted];
+};
+
 const hasPermission = async (
   authHooks: AuthTransportHooks,
   session: Session,
   permission: string
 ): Promise<boolean> => {
   for (const role of session.roles) {
-    // A provider that resolves the roles owns the whole map (ADR-008 §3 and §4).
-    const permissions = authHooks.rolePermissions
-      ? await authHooks.rolePermissions(role)
-      : (DEFAULT_ROLE_PERMISSIONS[role] ?? []);
+    const permissions = await permissionsOfRole(authHooks, role);
     if (permissions.includes('*') || permissions.includes(permission)) {
       return true;
     }

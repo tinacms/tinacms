@@ -58,6 +58,7 @@ import {
   useFormErrors,
   useFormStore,
   useFormValues,
+  useHasNewDocument,
   useIsFormDirty,
   type FormStore,
 } from '../form/form-store';
@@ -520,6 +521,7 @@ function FormBar() {
   const discard = useDiscardEdits();
   const values = useFormValues(formId);
   const scope = use(FormScopeContext);
+  const isNewDocument = useHasNewDocument(formId);
   const [confirming, setConfirming] = useState(false);
   // Read when the confirm opens, so typing in the title does not change it.
   const [documentName, setDocumentName] = useState('');
@@ -569,6 +571,7 @@ function FormBar() {
         onOpenChange={setConfirming}
         onConfirm={discard}
         returnFocusTo={menuButton}
+        isNewDocument={isNewDocument}
         title={`Discard unsaved edits to “${documentName}”?`}
       />
     </div>

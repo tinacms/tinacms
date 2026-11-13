@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, renderHook, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
@@ -72,9 +72,14 @@ const boot = async (
   ]
 ) => {
   const store = createTinaStore(await resolveClientSegments(plugins));
-  const runtime = { store } as unknown as TinaRuntime;
+  const runtime = { store, rpcUrl: '/api/tina' } as unknown as TinaRuntime;
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
+    <QueryClientProvider client={queryClient}>
+      <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
+    </QueryClientProvider>
   );
   const { result } = renderHook(
     () => ({
@@ -193,7 +198,10 @@ describe('tinaCloud()', () => {
     await expect(result.current.media.list('')).rejects.toMatchObject(
       overridden
     );
-    expect(fetchMock).not.toHaveBeenCalled();
+    const urls = fetchMock.mock.calls.map(([url]) => String(url));
+    expect(urls.filter((url) => !url.endsWith('/session/permissions'))).toEqual(
+      []
+    );
   });
 
   it('mounts a media slice and a signed-out auth slice', async () => {

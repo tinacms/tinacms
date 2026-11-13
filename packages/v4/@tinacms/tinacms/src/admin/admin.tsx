@@ -27,7 +27,8 @@ import type { ResolvedConfig } from '../config';
 import type { AdminRoute } from './routing';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
-import { useDocument } from '../editor/content-queries';
+import { folderOfDocument } from '../editor/collection-documents';
+import { useCurrentBranch, useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
 import { TinaProvider } from '../editor/provider';
@@ -40,13 +41,17 @@ import {
   MediaPanel,
   SettingsPane,
   ToolsPane,
+  useTreeFolders,
 } from './navigator';
+import { CollectionTable } from './collection-table/collection-table';
+import { CollectionsIndex } from './collections-index/collections-index';
 import { AdminRail, HOME_SCREEN, MEDIA_SCREEN } from './rail';
 import { MediaPaneShellContext } from './media-pane-shell';
 import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 import { COLLECTIONS_ROUTE, HOME_ROUTE } from './routing';
 import { useBranchSync } from '../editor/branch';
+import { toFormId, useHasNewDocument } from '../form/form-store';
 import { UploadHost } from '../editor/uploads/upload-host';
 import {
   ShellSaveProgress,
@@ -437,6 +442,7 @@ function AdminShell({
   const screens = useAdminScreens();
   const globalNav = useGlobalNav();
   const { route, navigate } = useAdminRoute();
+  const branch = useCurrentBranch();
 
   const isMediaRoute =
     route.view === 'media' ||
@@ -451,12 +457,15 @@ function AdminShell({
   useKeptEditsNotice(mainRoute, navigate);
 
   const [maximised, setMaximised] = useState(false);
+  const treeFolders = useTreeFolders();
   useEffect(() => {
     if (!isMediaRoute) setMaximised(false);
   }, [isMediaRoute]);
 
   const activeCollectionName =
-    mainRoute.view === 'collection' || mainRoute.view === 'document'
+    mainRoute.view === 'collection' ||
+    mainRoute.view === 'folder' ||
+    mainRoute.view === 'document'
       ? mainRoute.collection
       : undefined;
   const collection = schema.collections.find(
@@ -488,12 +497,16 @@ function AdminShell({
     isLoading: isLoadingOpenDocument,
     error: openDocumentError,
   } = useDocument(collection?.name, openPath);
+  const holdsNewDocument = useHasNewDocument(
+    openPath ? toFormId(openPath) : undefined
+  );
   const isStaleDocumentRoute =
     collection !== undefined &&
     openPath !== undefined &&
     !isLoadingOpenDocument &&
     openDocumentError === null &&
-    openEntry === null;
+    openEntry === null &&
+    !holdsNewDocument;
 
   const goToCollections = () => navigate(COLLECTIONS_ROUTE);
   const goHome = () => navigate(HOME_ROUTE);
@@ -517,11 +530,35 @@ function AdminShell({
     (lastOpen && lastOpen.collection === activeCollectionName
       ? lastOpen.path
       : undefined);
+  const tableFolder =
+    mainRoute.view === 'folder'
+      ? mainRoute.folder
+      : mainRoute.view === 'collection' && mainRoute.maximised
+        ? ''
+        : undefined;
+  const showTable = collection !== undefined && tableFolder !== undefined;
+  const showIndex = mainRoute.view === 'collections' && !!mainRoute.maximised;
   const mainShowsNavigator =
-    mainRoute.view === 'collections' ||
-    mainRoute.view === 'collection' ||
+    (mainRoute.view === 'collections' && !showIndex) ||
+    (mainRoute.view === 'collection' && !showTable) ||
+    (mainRoute.view === 'folder' && !showTable) ||
     (mainRoute.view === 'document' && collection === undefined);
   const showNavigator = !isMediaRoute && mainShowsNavigator;
+  const maximiseNavigator = () =>
+    navigate(
+      collection
+        ? { view: 'collection', collection: collection.name, maximised: true }
+        : { view: 'collections', maximised: true }
+    );
+  const goToFolderOf = (documentPath: string) => {
+    if (!collection) return goToCollections();
+    const folder = folderOfDocument(collection, documentPath);
+    navigate(
+      folder === ''
+        ? { view: 'collection', collection: collection.name, maximised: true }
+        : { view: 'folder', collection: collection.name, folder }
+    );
+  };
 
   return (
     <SidebarProvider
@@ -569,6 +606,8 @@ function AdminShell({
             route={route}
             navigate={navigate}
             onClose={goHome}
+            onMaximise={maximiseNavigator}
+            treeFolders={treeFolders}
             hideBelowLg={isStaleCollectionRoute}
           />
         ) : null}
@@ -605,6 +644,21 @@ function AdminShell({
             <MissingPanel title='Collection not found' onClose={goHome}>
               No collection named “{activeCollectionName}”.
             </MissingPanel>
+          ) : showIndex ? (
+            <SidebarInset className='min-w-0'>
+              <CollectionsIndex />
+            </SidebarInset>
+          ) : showTable ? (
+            <SidebarInset className='min-w-0'>
+              <CollectionTable
+                key={`${branch ?? ''}/${collection.name}/${tableFolder}`}
+                collection={collection.name}
+                folder={tableFolder}
+                onRestore={(folder) =>
+                  treeFolders.reveal(collection.name, folder)
+                }
+              />
+            </SidebarInset>
           ) : isStaleDocumentRoute ? (
             <MissingPanel title='Document not found' onClose={goHome}>
               No document named “{openPath}”.
@@ -615,6 +669,8 @@ function AdminShell({
                 Cannot read “{openPath}”. {openDocumentError.message}
               </span>
             </MissingPanel>
+          ) : mainShowsNavigator && homeScreen ? (
+            <HomeOutlet screen={homeScreen} segments={[]} />
           ) : mainShowsNavigator ? (
             <DocumentScope collection={collection} path={undefined}>
               <SidebarInset className='min-w-0'>
@@ -622,18 +678,19 @@ function AdminShell({
               </SidebarInset>
             </DocumentScope>
           ) : (
-            <DocumentScope collection={collection} path={openPath}>
+            <DocumentScope
+              collection={collection}
+              path={openPath}
+              onDiscardNew={() =>
+                openPath ? goToFolderOf(openPath) : undefined
+              }
+            >
               <SidebarInset className='relative min-w-0 flex-row'>
                 <FormColumn
                   openPath={openPath}
                   collection={collection}
                   onBack={() =>
-                    collection
-                      ? navigate({
-                          view: 'collection',
-                          collection: collection.name,
-                        })
-                      : goToCollections()
+                    openPath ? goToFolderOf(openPath) : goToCollections()
                   }
                 />
 

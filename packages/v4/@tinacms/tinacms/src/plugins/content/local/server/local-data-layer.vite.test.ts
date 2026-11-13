@@ -401,6 +401,7 @@ describe('tinaLocalDataLayerVitePlugin dev codegen', () => {
     (plugin.configureServer as (s: unknown) => void)(server);
     expect(server.logs).toEqual([]);
     expect(server.mounted.map(({ route }) => route)).toEqual([
+      '/api/tina/session/permissions',
       DEFAULT_CONTENT_URL,
     ]);
   });

@@ -6,6 +6,7 @@
         "name": "post",
         "label": "Posts",
         "path": "content/posts",
+        "description": "Posts for the playground blog.",
         "format": "mdx",
         "fields": [
           {
@@ -30,17 +31,29 @@
             "type": "boolean"
           },
           {
+            "type": "reference",
+            "name": "related",
+            "label": "Related post",
+            "collections": [
+              "post"
+            ]
+          },
+          {
             "name": "body",
             "label": "Body",
             "isBody": true,
             "type": "rich-text"
           }
-        ]
+        ],
+        "allowedActions": {
+          "canCreateNestedFolder": true
+        }
       },
       {
         "name": "page",
         "label": "Pages",
         "path": "content/pages",
+        "description": "Landing pages with visual and plain blocks.",
         "format": "mdx",
         "fields": [
           {
@@ -309,7 +322,11 @@
             "label": "Hero image",
             "type": "image"
           }
-        ]
+        ],
+        "allowedActions": {
+          "canDelete": false,
+          "canDuplicate": false
+        }
       }
     ],
     "version": {
@@ -323,6 +340,7 @@
     "array": 1,
     "boolean": 1,
     "image": 1,
+    "reference": 1,
     "rich-text": 1,
     "string": 1
   }

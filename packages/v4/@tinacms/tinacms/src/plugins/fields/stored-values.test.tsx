@@ -15,6 +15,7 @@ import { numberSchema } from './number/number-field.schema';
 import arrayFieldPlugin from './array/array-field.plugin';
 import objectFieldPlugin from './object/object-field.plugin';
 import stringFieldPlugin from './string/string-field.plugin';
+import { connectionOf } from '../../test/connection';
 
 const stubPlugin = (
   capability: 'content' | 'media',
@@ -27,7 +28,7 @@ const stubPlugin = (
   });
 
 const content: ContentProvider = {
-  list: vi.fn(async () => []),
+  list: vi.fn(async () => connectionOf([])),
   get: vi.fn(async () => null),
   update: vi.fn(async (_collection, path, value) => ({
     path,

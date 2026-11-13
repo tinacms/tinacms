@@ -68,15 +68,33 @@ export class AuthError extends Error {
 // getToken is the token for the CMS backend; undefined sends none. The site's own
 // server receives it only when the auth plugin has a server segment.
 // ADR-008: `roles` gate the UI only. The server check is the security boundary.
-export type AuthSlice = (
-  | { status: 'signed-in'; user: AuthUser; roles: string[] }
+type SignedInState = { status: 'signed-in'; user: AuthUser; roles: string[] };
+
+type OtherAuthState =
   | { status: 'forbidden'; user: AuthUser }
   | { status: 'loading'; user: null }
   // `error` is why a sign-in that did not run inside login() failed.
-  | { status: 'signed-out'; user: null; error?: AuthError }
-) & {
+  | { status: 'signed-out'; user: null; error?: AuthError };
+
+type AuthMembers = {
   getToken(): Promise<string | undefined>;
   login(): Promise<void>;
   logout(): Promise<void>;
   LoginScreen?: ComponentType;
 };
+
+// This is what an auth plugin's slice provides. Core adds `can` for consumers.
+export type AuthPluginSlice = (SignedInState | OtherAuthState) & AuthMembers;
+
+/**
+ * What consumers read: the plugin's slice, with `can` on the signed-in member. Core fills
+ * `can` from the Backend's `session/permissions` answer (the server's own resolution of
+ * the session's roles), so a custom `rolePermissions` shows the right actions. It is false
+ * for every permission while the answer is pending or failed, and after a change of user
+ * until the new answer arrives. UX only: the server check is the boundary (ADR-008 §5).
+ */
+export type AuthSlice = (
+  | (SignedInState & { can(permission: string): boolean })
+  | OtherAuthState
+) &
+  AuthMembers;

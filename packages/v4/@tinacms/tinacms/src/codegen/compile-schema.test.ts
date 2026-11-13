@@ -514,6 +514,47 @@ describe('compileSchema dropped v3 options', () => {
   });
 });
 
+describe('compileSchema collection actions', () => {
+  const configFor = (extra: object) =>
+    asResolvedConfig({
+      plugins: [fieldPlugin('string', 1)],
+      schema: {
+        collections: [
+          {
+            name: 'post',
+            path: 'content/posts',
+            format: 'md',
+            fields: [{ name: 'title', type: 'string' }],
+            ...extra,
+          },
+        ],
+      },
+    });
+
+  it('carries allowedActions and description into the lock', () => {
+    const allowedActions = {
+      canCreate: true,
+      canDelete: false,
+      canDuplicate: false,
+      canCreateFolder: true,
+      canCreateNestedFolder: false,
+    };
+    const lock = compileSchema(
+      configFor({ allowedActions, description: 'All posts.' })
+    );
+    expect(lock.schema.collections[0]).toMatchObject({
+      allowedActions,
+      description: 'All posts.',
+    });
+  });
+
+  it('refuses an allowedActions key v4 does not have', () => {
+    expect(() =>
+      compileSchema(configFor({ allowedActions: { delete: false } }))
+    ).toThrow(/allowedActions\.delete, which v4 does not have/);
+  });
+});
+
 describe('compileSchema array options', () => {
   const plugins = [fieldPlugin('string', 1), fieldPlugin('array', 1)];
   const blocks = (extra: object): FieldSchema[] => [

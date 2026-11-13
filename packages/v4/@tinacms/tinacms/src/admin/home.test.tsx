@@ -16,6 +16,7 @@ import { corePlugins } from '../plugins/fields';
 import homePlugin from '../plugins/home/home.plugin';
 import { guardConsole } from '../test/console-guard';
 import { TinaAdmin } from './admin';
+import { connectionOf } from '../test/connection';
 
 type Mode = 'local' | 'branches' | 'none';
 
@@ -68,9 +69,9 @@ const contentPlugin = () =>
                   },
                 }
               : {}),
-            list: (name: string) => {
+            list: async (name: string) => {
               listCalls.push(name);
-              return world.list(name, branch());
+              return connectionOf(await world.list(name, branch()));
             },
             get: async (_name: string, path: string) => ({
               path,
@@ -580,7 +581,7 @@ describe('Collections panel', () => {
     tile.focus();
     await user.keyboard('{Enter}');
     await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections/post')
+      expect(window.location.hash).toBe('#/collections/post?max')
     );
   });
 
@@ -653,7 +654,7 @@ describe('Collections panel', () => {
 
     await user.click(within(posts).getByRole('button', { name: 'Posts' }));
     await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections/post')
+      expect(window.location.hash).toBe('#/collections/post?max')
     );
   });
 
