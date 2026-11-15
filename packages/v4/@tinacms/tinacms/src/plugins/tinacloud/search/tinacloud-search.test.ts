@@ -57,14 +57,27 @@ const respond = (value: unknown): Response | Promise<Response> =>
     ? (value as () => Response | Promise<Response>)()
     : Response.json(value);
 
-/** A mocked TinaCloud. Nothing here has been checked against the live route. */
+const isResults = (value: unknown): value is { results: unknown[] } =>
+  typeof value === 'object' &&
+  value !== null &&
+  'results' in value &&
+  Array.isArray(value.results);
+
+/** A mocked TinaCloud, which returns at most `limit` results like the real route. Nothing here has been checked against the live route. */
 const stubTinaCloud = ({
   project = { defaultBranch: 'main' },
   search = ids(),
 }: Stub = {}) => {
   const fetchMock = vi.fn(async (url: string, _init?: RequestInit) => {
     if (url.startsWith(`${TINACLOUD_CONTENT_URL}/v2/searchIndex/`)) {
-      return respond(search);
+      const limit = Number(new URL(url).searchParams.get('limit'));
+      const response = await respond(search);
+      const json: unknown = await response
+        .clone()
+        .json()
+        .catch(() => null);
+      if (!response.ok || !isResults(json)) return response;
+      return Response.json({ results: json.results.slice(0, limit) });
     }
     if (url.endsWith('/currentUser')) return Response.json(tinaCloudUser);
     if (url.startsWith(TINACLOUD_IDENTITY_URL)) {
@@ -213,7 +226,7 @@ describe('tinaCloud() search: query', () => {
     const url = searchUrlOf(fetchMock);
     expect(url.pathname).toBe('/v2/searchIndex/abc/main');
     expect(url.searchParams.get('query')).toBe('hello');
-    expect(url.searchParams.get('limit')).toBe('10');
+    expect(url.searchParams.get('limit')).toBe('1000');
     expect(url.searchParams.has('collection')).toBe(false);
   });
 
@@ -288,6 +301,16 @@ describe('tinaCloud() search: paging', () => {
     stubTinaCloud({ search: ids(...many) });
     const hits = await (await query(handlerFor(), { limit: 3 })).json();
     expect(hits).toHaveLength(3);
+  });
+
+  it('fills the first page when the leading results are outside fields (AC6)', async () => {
+    const outside = Array.from({ length: 30 }, (_, i) => `page:x${i}.mdx`);
+    stubTinaCloud({ search: ids(...outside, 'post:a.mdx', 'post:b.mdx') });
+    const hits = await (await query(handlerFor(), { limit: 2 })).json();
+    expect(hits.map((hit: { ref: { path: string } }) => hit.ref.path)).toEqual([
+      'content/posts/a.mdx',
+      'content/posts/b.mdx',
+    ]);
   });
 
   it('pages to the end when TinaCloud also returns hits outside fields (AC6)', async () => {

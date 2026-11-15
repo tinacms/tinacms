@@ -17,7 +17,8 @@ import type { TinaCloudSearchOptions } from '../tinacloud.plugin';
 
 const CALL_TIMEOUT_MS = 10_000;
 
-// A cursor page scans this many of TinaCloud's results for the cursor's hit.
+// Every page asks for this many results: hits outside `fields` drop out after
+// the call, and a cursor page needs room to find its cursor.
 const SCAN_WINDOW = 1000;
 
 const UNAVAILABLE_STATUSES: ReadonlySet<number> = new Set([
@@ -160,7 +161,7 @@ export const createTinaCloudSearchProvider = (
       body = await call(
         searchUrl(clientId, await branchOf(), {
           query,
-          limit: cursor === undefined ? limit : SCAN_WINDOW,
+          limit: SCAN_WINDOW,
           collection: collections?.[0],
         })
       );
