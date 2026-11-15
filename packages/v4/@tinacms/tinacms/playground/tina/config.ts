@@ -7,6 +7,7 @@ import {
   localContentPlugin,
   localMediaPlugin,
   mediaManagerPlugin,
+  type RichTextFieldSchema,
   t,
 } from '@tinacms/tinacms';
 
@@ -33,6 +34,13 @@ const longTemplates = Array.from({ length: 10 }, (_, index) => ({
   fields: [t.string({ name: 'text', label: 'Text' })],
 })) satisfies ArrayTemplateSchema[];
 
+const nestedRichText = {
+  toolbar: ['heading', 'bold', 'italic', 'link', 'textColor'],
+  headingLevels: ['h2'],
+  textColors: [{ label: 'Brand', value: '#123456' }],
+  showFloatingToolbar: false,
+} satisfies NonNullable<RichTextFieldSchema['overrides']>;
+
 export const pageCollection = {
   name: 'page',
   label: 'Pages',
@@ -53,6 +61,36 @@ export const pageCollection = {
       templates: longTemplates,
     }),
     t.image({ name: 'hero', label: 'Hero image' }),
+    t.richText({ name: 'summary', label: 'Summary' }),
+    t.object({
+      name: 'section',
+      label: 'Section',
+      fields: [
+        t.object({
+          name: 'inner',
+          label: 'Inner',
+          fields: [
+            t.richText({
+              name: 'notes',
+              label: 'Notes',
+              overrides: nestedRichText,
+            }),
+          ],
+        }),
+      ],
+    }),
+    t.array({
+      name: 'items',
+      label: 'Items',
+      fields: [
+        t.string({ name: 'heading', label: 'Heading' }),
+        t.richText({
+          name: 'text',
+          label: 'Text',
+          overrides: nestedRichText,
+        }),
+      ],
+    }),
   ],
 } satisfies CollectionSchema;
 

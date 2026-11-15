@@ -1,6 +1,5 @@
 'use client';
 
-import { withRef } from '@udecode/cn';
 import {
   BoldPlugin,
   CodePlugin,
@@ -12,177 +11,128 @@ import {
   useMarkToolbarButton,
   useMarkToolbarButtonState,
 } from '@udecode/plate/react';
+import type { TRange } from '@udecode/plate';
 import React from 'react';
 import type { RichTextColorOption } from '../../toolbar/toolbar-overrides';
 import { useToolbarContext } from '../../toolbar/toolbar-provider';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@tinacms/ui/components/tooltip';
+import { KbdShortcut } from '@tinacms/ui/components/kbd';
+import { cn } from '@tinacms/ui/lib/utils';
+import {
+  DropdownMenuCheckboxItem,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-  useOpenState,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from './dropdown-menu';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 
-const MarkToolbarButton = withRef<
-  typeof ToolbarButton,
-  {
-    clear?: string | string[];
-    nodeType: string;
-  }
->(({ clear, nodeType, ...rest }, ref) => {
-  const state = useMarkToolbarButtonState({ clear, nodeType });
+type MarkButtonProps = {
+  nodeType: string;
+  tooltip: string;
+  shortcut: string;
+  disabled?: boolean;
+  children: React.ReactNode;
+};
+
+const MarkToolbarButton = ({
+  nodeType,
+  tooltip,
+  shortcut,
+  disabled,
+  children,
+}: MarkButtonProps) => {
+  const state = useMarkToolbarButtonState({ nodeType });
   const { props } = useMarkToolbarButton(state);
+  return (
+    <ToolbarButton
+      {...props}
+      tooltip={tooltip}
+      shortcut={shortcut}
+      disabled={disabled}
+    >
+      {children}
+    </ToolbarButton>
+  );
+};
 
-  return <ToolbarButton ref={ref} {...props} {...rest} />;
-});
-
-export const BoldToolbarButton = () => (
-  <MarkToolbarButton tooltip='Bold (⌘+B)' nodeType={BoldPlugin.key}>
+export const BoldToolbarButton = ({ disabled }: { disabled?: boolean }) => (
+  <MarkToolbarButton
+    tooltip='Bold'
+    shortcut='⌘B'
+    nodeType={BoldPlugin.key}
+    disabled={disabled}
+  >
     <Icons.bold />
   </MarkToolbarButton>
 );
 
-export const StrikethroughToolbarButton = () => (
-  <MarkToolbarButton tooltip='Strikethrough' nodeType={StrikethroughPlugin.key}>
-    <Icons.strikethrough />
-  </MarkToolbarButton>
-);
-
-export const ItalicToolbarButton = () => (
-  <MarkToolbarButton tooltip='Italic (⌘+I)' nodeType={ItalicPlugin.key}>
+export const ItalicToolbarButton = ({ disabled }: { disabled?: boolean }) => (
+  <MarkToolbarButton
+    tooltip='Italic'
+    shortcut='⌘I'
+    nodeType={ItalicPlugin.key}
+    disabled={disabled}
+  >
     <Icons.italic />
   </MarkToolbarButton>
 );
 
-export const CodeToolbarButton = () => (
-  <MarkToolbarButton tooltip='Code (⌘+E)' nodeType={CodePlugin.key}>
-    <Icons.code />
-  </MarkToolbarButton>
+const MarkMenuItem = ({
+  nodeType,
+  label,
+  shortcut,
+  icon,
+  disabled,
+}: {
+  nodeType: string;
+  label: string;
+  shortcut: string;
+  icon: React.ReactNode;
+  disabled?: boolean;
+}) => {
+  const state = useMarkToolbarButtonState({ nodeType });
+  const { props } = useMarkToolbarButton(state);
+  return (
+    <DropdownMenuCheckboxItem
+      checked={state.pressed}
+      disabled={disabled}
+      onSelect={() => props.onClick()}
+    >
+      {icon}
+      <span className='flex-1'>{label}</span>
+      <KbdShortcut keys={shortcut} size='sm' />
+    </DropdownMenuCheckboxItem>
+  );
+};
+
+export const StrikethroughMenuItem = ({ disabled }: { disabled?: boolean }) => (
+  <MarkMenuItem
+    nodeType={StrikethroughPlugin.key}
+    label='Strikethrough'
+    shortcut='⌘⇧X'
+    icon={<Icons.strikethrough />}
+    disabled={disabled}
+  />
 );
 
-/**
- * Leaf props a colour dropdown writes for a chosen colour. `undefined`
- * values are removed, so the same function also describes "clear".
- */
+export const CodeMenuItem = ({ disabled }: { disabled?: boolean }) => (
+  <MarkMenuItem
+    nodeType={CodePlugin.key}
+    label='Code'
+    shortcut='⌘E'
+    icon={<Icons.code />}
+    disabled={disabled}
+  />
+);
+
 type ColorMarks = Record<string, string | boolean | undefined>;
-
-/**
- * Shared behaviour for colour dropdowns: remembers the selection while the
- * menu is open (focus moves into the menu) and applies/clears marks on it.
- */
-const useColorMarkToolbar = (toMarks: (color?: string) => ColorMarks) => {
-  const editor = useEditorRef();
-  const openState = useOpenState();
-  const savedSelection = React.useRef(editor.selection);
-  const inlineCodeActive = useMarkToolbarButtonState({
-    nodeType: CodePlugin.key,
-  }).pressed;
-
-  const rememberSelection = React.useCallback(() => {
-    if (editor.selection) {
-      savedSelection.current = structuredClone(editor.selection);
-    }
-  }, [editor]);
-
-  React.useEffect(() => {
-    if (openState.open) {
-      rememberSelection();
-    }
-  }, [openState.open, rememberSelection]);
-
-  const applyColor = React.useCallback(
-    (color?: string) => {
-      if (inlineCodeActive) {
-        openState.onOpenChange(false);
-        return;
-      }
-
-      if (savedSelection.current) {
-        editor.tf.select(structuredClone(savedSelection.current));
-      }
-
-      const marks = toMarks(color);
-      for (const [key, value] of Object.entries(marks)) {
-        if (value === undefined) {
-          editor.tf.removeMark(key);
-        } else {
-          editor.tf.addMark(key, value);
-        }
-      }
-
-      editor.tf.setNodes(marks, {
-        at: editor.selection ?? undefined,
-        match: (node) => editor.api.isText(node),
-        split: true,
-      });
-
-      editor.tf.focus();
-      openState.onOpenChange(false);
-    },
-    [editor, inlineCodeActive, openState, toMarks]
-  );
-
-  return {
-    applyColor,
-    inlineCodeActive,
-    openState,
-    rememberSelection,
-  };
-};
-
-/** Toolbar dropdown offering "clear" plus one item per palette colour. */
-const ColorDropdownToolbarButton = ({
-  tooltip,
-  icon,
-  clearLabel,
-  colors,
-  toMarks,
-  renderSwatch,
-}: {
-  tooltip: string;
-  icon: React.ReactNode;
-  clearLabel: string;
-  colors: readonly RichTextColorOption[];
-  toMarks: (color?: string) => ColorMarks;
-  renderSwatch: (color: string) => React.ReactNode;
-}) => {
-  const { applyColor, inlineCodeActive, openState, rememberSelection } =
-    useColorMarkToolbar(toMarks);
-
-  return (
-    <DropdownMenu modal={false} {...openState}>
-      <DropdownMenuTrigger asChild>
-        <ToolbarButton
-          isDropdown
-          showArrow
-          pressed={openState.open}
-          tooltip={tooltip}
-          disabled={inlineCodeActive}
-          onMouseDown={rememberSelection}
-        >
-          <div className='flex items-center gap-1.5'>{icon}</div>
-        </ToolbarButton>
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent align='start' className='min-w-[180px]'>
-        <DropdownMenuItem onSelect={() => applyColor()}>
-          {clearLabel}
-        </DropdownMenuItem>
-        {colors.map((color) => (
-          <DropdownMenuItem
-            key={color.value}
-            onSelect={() => applyColor(color.value)}
-          >
-            {renderSwatch(color.value)}
-            {color.label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
 
 const toHighlightMarks = (color?: string): ColorMarks =>
   color
@@ -193,47 +143,163 @@ const toTextColorMarks = (color?: string): ColorMarks => ({
   textColor: color,
 });
 
-const highlightColors = [
+export const highlightColors = [
   { label: 'Yellow', value: '#FEF08A' },
   { label: 'Green', value: '#BBF7D0' },
   { label: 'Blue', value: '#BFDBFE' },
   { label: 'Red', value: '#CC4141' },
 ] as const;
 
-export const HighlightToolbarButton = () => (
-  <ColorDropdownToolbarButton
-    tooltip='Highlight color'
-    icon={<Icons.highlight />}
-    clearLabel='Clear highlight'
-    colors={highlightColors}
-    toMarks={toHighlightMarks}
-    renderSwatch={(color) => (
-      <span
-        className='mr-2 inline-block size-4 rounded-sm border border-gray-300'
-        style={{ backgroundColor: color }}
-      />
-    )}
-  />
+const useColorMarks = (
+  toMarks: (color?: string) => ColorMarks,
+  savedSelection: React.RefObject<TRange | null>
+) => {
+  const editor = useEditorRef();
+  return React.useCallback(
+    (color?: string) => {
+      if (savedSelection.current) {
+        editor.tf.select(structuredClone(savedSelection.current));
+      }
+      const marks = toMarks(color);
+      for (const [key, value] of Object.entries(marks)) {
+        if (value === undefined) {
+          editor.tf.removeMark(key);
+        } else {
+          editor.tf.addMark(key, value);
+        }
+      }
+      editor.tf.setNodes(marks, {
+        at: editor.selection ?? undefined,
+        match: (node) => editor.api.isText(node),
+        split: true,
+      });
+      editor.tf.focus();
+    },
+    [editor, savedSelection, toMarks]
+  );
+};
+
+const Swatch = ({
+  color,
+  current,
+  onPick,
+}: {
+  color: RichTextColorOption;
+  current: boolean;
+  onPick: () => void;
+}) => (
+  <Tooltip>
+    <TooltipTrigger
+      render={
+        <DropdownMenuItem
+          aria-label={color.label}
+          onSelect={onPick}
+          className={cn(
+            'size-6 min-h-0 w-6 justify-center rounded-full border border-border p-0',
+            current && 'ring-2 ring-ring ring-offset-1'
+          )}
+          style={{ backgroundColor: color.value }}
+        />
+      }
+    />
+    <TooltipContent>{color.label}</TooltipContent>
+  </Tooltip>
 );
 
-export const TextColorToolbarButton = () => {
-  const { textColors } = useToolbarContext();
+const SwatchSub = ({
+  label,
+  clearLabel,
+  icon,
+  colors,
+  currentValue,
+  toMarks,
+  savedSelection,
+  disabled,
+}: {
+  label: string;
+  clearLabel: string;
+  icon: React.ReactNode;
+  colors: readonly RichTextColorOption[];
+  currentValue: string | undefined;
+  toMarks: (color?: string) => ColorMarks;
+  savedSelection: React.RefObject<TRange | null>;
+  disabled?: boolean;
+}) => {
+  const apply = useColorMarks(toMarks, savedSelection);
   return (
-    <ColorDropdownToolbarButton
-      tooltip='Text color'
-      icon={<Icons.textColor />}
-      clearLabel='Clear text color'
-      colors={textColors}
-      toMarks={toTextColorMarks}
-      renderSwatch={(color) => (
-        <span
-          aria-hidden
-          className='mr-2 inline-block w-4 text-center font-bold'
-          style={{ color }}
-        >
-          A
-        </span>
-      )}
-    />
+    <DropdownMenuSub>
+      <DropdownMenuSubTrigger disabled={disabled}>
+        {icon}
+        {label}
+      </DropdownMenuSubTrigger>
+      <DropdownMenuSubContent aria-label={label} className='min-w-0 w-auto'>
+        <div className='grid grid-cols-4 gap-2 p-2'>
+          {colors.map((color) => (
+            <Swatch
+              key={color.value}
+              color={color}
+              current={currentValue === color.value}
+              onPick={() => apply(color.value)}
+            />
+          ))}
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => apply()}>
+          {clearLabel}
+        </DropdownMenuItem>
+      </DropdownMenuSubContent>
+    </DropdownMenuSub>
+  );
+};
+
+/** Highlight color and Text color rows for More formatting. They apply to the selection saved when the menu opened. */
+export const ColorSubMenus = ({
+  showHighlight,
+  showTextColor,
+  disabled,
+  savedSelection,
+}: {
+  showHighlight: boolean;
+  showTextColor: boolean;
+  disabled?: boolean;
+  savedSelection: React.RefObject<TRange | null>;
+}) => {
+  const { textColors } = useToolbarContext();
+  const editor = useEditorRef();
+  const inlineCodeActive = useMarkToolbarButtonState({
+    nodeType: CodePlugin.key,
+  }).pressed;
+  const marks = editor.api.marks() as
+    | { highlightColor?: string; textColor?: string }
+    | null
+    | undefined;
+  const off = disabled || inlineCodeActive;
+  return (
+    <>
+      {showHighlight ? (
+        <SwatchSub
+          label='Highlight color'
+          clearLabel='Clear highlight'
+          icon={<Icons.highlight className='size-4' aria-hidden />}
+          colors={highlightColors}
+          currentValue={marks?.highlightColor}
+          toMarks={toHighlightMarks}
+          savedSelection={savedSelection}
+          disabled={off}
+        />
+      ) : null}
+      {showTextColor ? (
+        <SwatchSub
+          label='Text color'
+          clearLabel='Clear text color'
+          icon={<Icons.textColor className='size-4' aria-hidden />}
+          colors={textColors}
+          currentValue={marks?.textColor}
+          toMarks={toTextColorMarks}
+          savedSelection={savedSelection}
+          disabled={off}
+        />
+      ) : null}
+    </>
   );
 };

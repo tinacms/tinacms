@@ -1,6 +1,7 @@
 'use client';
 
 import { Checkbox } from '@tinacms/ui/components/checkbox';
+import { cn } from '@tinacms/ui/lib/utils';
 import {
   PlateElement,
   type PlateElementProps,
@@ -22,13 +23,17 @@ export function ListItemElement(props: PlateElementProps) {
   }
 
   return (
-    <PlateElement as='li' {...props} className='flex list-none items-start'>
+    <PlateElement
+      as='li'
+      {...props}
+      className='flex list-none items-start gap-2'
+    >
       {/* The caret stays where the author left it: the pointer never reaches
           the default action that moves focus out of the contentEditable. */}
       <div
         contentEditable={false}
         style={{ userSelect: 'none' }}
-        className='me-2 mt-1'
+        className='mt-0.5'
         onMouseDown={(event) => event.preventDefault()}
       >
         <Checkbox
@@ -43,7 +48,13 @@ export function ListItemElement(props: PlateElementProps) {
           }}
         />
       </div>
-      <div id={labelId} className='flex-1'>
+      <div
+        id={labelId}
+        className={cn(
+          'min-w-0 flex-1',
+          element.checked && 'text-muted-foreground line-through'
+        )}
+      >
         {children}
       </div>
     </PlateElement>

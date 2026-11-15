@@ -2,6 +2,7 @@ import { expect, type Page, test } from '@playwright/test';
 import { setColumnWidth } from './form-column';
 
 const DOCUMENT = '/#/collections/post/content%2Fposts%2Fhello-world.mdx';
+const LONG_DOCUMENT = '/#/collections/post/content%2Fposts%2Flong-post.mdx';
 const WIDTHS = [
   { name: '1440px', width: 1440, height: 900 },
   { name: '768px', width: 768, height: 1024 },
@@ -278,6 +279,31 @@ test.describe('the Resume toast keeps the form usable', () => {
         .hover({ timeout: 4000 });
     });
   }
+
+  test('Resume can be tapped once the body toolbar is stuck', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 460 });
+    await page.goto(LONG_DOCUMENT);
+    await expect(title(page)).toBeVisible();
+    await page.evaluate(() => {
+      for (const key of Object.keys(localStorage)) {
+        if (key.startsWith('tina-drafts')) localStorage.removeItem(key);
+      }
+    });
+    await page.reload();
+    await waitForPrompt(page);
+
+    await page
+      .locator('div.overflow-y-auto')
+      .first()
+      .evaluate((scroller) => scroller.scrollTo(0, 600));
+    await expect(page.locator('[data-slot="toolbar-shell"]')).toHaveAttribute(
+      'data-stuck',
+      ''
+    );
+    await page.getByRole('button', { name: 'Resume' }).hover({ timeout: 4000 });
+  });
 
   test('the toast steps aside while a field has focus on a shrunk screen, and returns after', async ({
     page,

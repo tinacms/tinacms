@@ -15,9 +15,12 @@ import {
   PlateElement,
   useEditorPlugin,
   useElementSelector,
+  useReadOnly,
 } from '@udecode/plate/react';
 
 import { blockSelectionVariants } from './block-selection';
+import { useActiveTableCell } from './table-active-cell';
+import { TableHandle } from './table-handles';
 
 export const TableCellElement = withRef<
   typeof PlateElement,
@@ -32,7 +35,24 @@ export const TableCellElement = withRef<
     key: TableRowPlugin.key,
   });
   const isSelectingRow = useBlockSelected(rowId);
-  const { borders, minHeight, selected, width } = useTableCellElement();
+  const { colIndex, minHeight, rowIndex, selected, width } =
+    useTableCellElement();
+  const readOnly = useReadOnly();
+  const active = useActiveTableCell();
+  const colSpan = api.table.getColSpan(element);
+  const rowSpan = api.table.getRowSpan(element);
+  const showRowHandle =
+    !readOnly &&
+    active !== null &&
+    colIndex === 0 &&
+    active.row >= rowIndex &&
+    active.row < rowIndex + rowSpan;
+  const showColumnHandle =
+    !readOnly &&
+    active !== null &&
+    rowIndex === 0 &&
+    active.col >= colIndex &&
+    active.col < colIndex + colSpan;
 
   return (
     <PlateElement
@@ -40,14 +60,19 @@ export const TableCellElement = withRef<
       as={isHeader ? 'th' : 'td'}
       attributes={() => ({
         ...props.attributes,
-        colSpan: api.table.getColSpan(element),
-        rowSpan: api.table.getRowSpan(element),
+        'aria-selected': selected || undefined,
+        colSpan,
+        rowSpan,
       })}
       className={cn(
-        'relative h-full overflow-visible border border-gray-200 bg-background p-0',
-        element.background ? 'bg-[--cellBackground]' : 'bg-background',
+        'relative h-full overflow-visible border border-border p-0',
+        element.background
+          ? 'bg-(--cellBackground)'
+          : isHeader
+            ? 'bg-muted'
+            : 'bg-background',
         cn(
-          isHeader && 'text-left [&_>_*]:m-0',
+          isHeader && 'text-left font-medium [&_>_*]:m-0',
           'before:size-full',
           selected && 'before:z-10 before:bg-muted',
           "before:absolute before:box-border before:select-none before:content-['']"
@@ -70,6 +95,11 @@ export const TableCellElement = withRef<
       >
         {children}
       </div>
+
+      {showRowHandle && active && <TableHandle axis='row' active={active} />}
+      {showColumnHandle && active && (
+        <TableHandle axis='column' active={active} />
+      )}
 
       {isSelectingRow && (
         <div className={blockSelectionVariants()} contentEditable={false} />

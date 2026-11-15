@@ -64,6 +64,7 @@ export function RichTextField() {
         value={value ?? EMPTY_RICH_TEXT}
         onChange={setBody}
         field={field}
+        body={field.isBody}
         onActivateEmbed={activateEmbed}
       />
     </div>

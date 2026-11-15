@@ -4,283 +4,356 @@ import * as React from 'react';
 
 import { PortalBody } from '@udecode/cn';
 import {
-  type UseVirtualFloatingOptions,
   flip,
-  limitShift,
   offset,
   shift,
+  useVirtualFloating,
 } from '@udecode/plate-floating';
-import { type TLinkElement, getLinkAttributes } from '@udecode/plate-link';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import {
-  FloatingLinkUrlInput,
-  type LinkFloatingToolbarState,
-  LinkPlugin,
-  submitFloatingLink,
-  useFloatingLinkEdit,
-  useFloatingLinkEditState,
-  useFloatingLinkInsert,
-  useFloatingLinkInsertState,
-} from '@udecode/plate-link/react';
+  type TLinkElement,
+  getLinkAttributes,
+  unwrapLink,
+  upsertLink,
+} from '@udecode/plate-link';
+import { LinkPlugin } from '@udecode/plate-link/react';
 import {
-  useEditorPlugin,
+  useEditorReadOnly,
   useEditorRef,
-  useEditorSelection,
-  useFormInputProps,
+  useEditorSelector,
+  useFocused,
   usePluginOption,
 } from '@udecode/plate/react';
-import { cva } from 'class-variance-authority';
-import { CircleX, ExternalLink, Link, Text, Unlink } from 'lucide-react';
-import { buttonVariants } from './button';
-import { Separator } from './separator';
+import { Link, Text } from 'lucide-react';
 
-const popoverVariants = cva(
-  'z-[999999] w-auto rounded-sm border bg-popover p-1 text-popover-foreground shadow-md outline-hidden'
-);
+import { Button } from '@tinacms/ui/components/button';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '@tinacms/ui/components/input-group';
+import { Separator } from '@tinacms/ui/components/separator';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@tinacms/ui/components/sheet';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
+import { cn } from '@tinacms/ui/lib/utils';
+import { helpers } from '../../plugins/core/common';
 
-const inputVariants = cva(
-  'flex h-[28px] w-full rounded-sm border-none bg-transparent px-1.5 py-1 text-base placeholder:text-muted-foreground focus-visible:ring-transparent focus-visible:outline-none md:text-sm'
-);
+export const INVALID_URL_MESSAGE =
+  'Invalid URL. Please prefix link with https:// or use a relative path like /about';
 
-export function LinkFloatingToolbar({
-  state,
+export type LinkDraft = { url: string; text: string };
+
+/** Sets the address and the words together, on the link the selection is in or on the selected words. */
+export function applyLink(
+  editor: Parameters<typeof upsertLink>[0],
+  { url, text }: LinkDraft
+) {
+  return upsertLink(editor, { url, text });
+}
+
+/** "Link" and "Text to display" with Cancel and OK. A bad address stays in the box and saves nothing. */
+export function LinkBox({
+  initial,
+  onSubmit,
+  onCancel,
 }: {
-  state?: LinkFloatingToolbarState;
+  initial: LinkDraft;
+  onSubmit: (draft: LinkDraft) => void;
+  onCancel: () => void;
 }) {
-  const activeCommentId = usePluginOption({ key: 'comment' }, 'activeId');
-  const activeSuggestionId = usePluginOption({ key: 'suggestion' }, 'activeId');
-  const { api, editor } = useEditorPlugin(LinkPlugin);
+  const isUrl = usePluginOption(LinkPlugin, 'isUrl');
+  const [url, setUrl] = React.useState(initial.url);
+  const [text, setText] = React.useState(initial.text);
+  const [invalid, setInvalid] = React.useState(false);
+  const urlRef = React.useRef<HTMLInputElement>(null);
+  const errorId = React.useId();
 
-  const isUrlValidator = usePluginOption(LinkPlugin, 'isUrl');
+  React.useEffect(() => {
+    const input = urlRef.current;
+    if (!input) return;
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+  }, []);
 
-  const [currentUrl, setCurrentUrl] = React.useState('');
-  const [isValidUrl, setIsValidUrl] = React.useState(true);
+  const isValid = (value: string) =>
+    value.length > 0 && (isUrl ? isUrl(value) : true);
 
-  const handleUrlInput = React.useCallback(
-    (e: React.FormEvent<HTMLInputElement>) => {
-      const value = e.currentTarget.value;
-      setCurrentUrl(value);
-      if (value && isUrlValidator) {
-        const valid = isUrlValidator(value);
-        setIsValidUrl(valid);
-      } else {
-        setIsValidUrl(true);
-      }
-    },
-    [isUrlValidator]
-  );
+  const submit = () => {
+    const trimmed = url.trim();
+    if (!isValid(trimmed)) {
+      setInvalid(true);
+      return;
+    }
+    onSubmit({ url: trimmed, text });
+  };
 
-  const floatingOptions: UseVirtualFloatingOptions = React.useMemo(() => {
-    return {
-      middleware: [
-        offset(8),
-        flip({
-          fallbackPlacements: ['bottom-end', 'top-start', 'top-end'],
-          padding: 12,
-        }),
-        shift({ padding: 8, limiter: limitShift() }),
-      ],
-      placement:
-        activeSuggestionId || activeCommentId ? 'top-start' : 'bottom-start',
-    };
-  }, [activeCommentId, activeSuggestionId]);
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      submit();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      onCancel();
+    }
+  };
 
-  const insertState = useFloatingLinkInsertState({
-    ...state,
-    floatingOptions: {
-      ...floatingOptions,
-      ...state?.floatingOptions,
-    },
-  });
-  const {
-    hidden,
-    props: insertProps,
-    ref: insertRef,
-    textInputProps,
-  } = useFloatingLinkInsert(insertState);
-
-  const editState = useFloatingLinkEditState({
-    ...state,
-    floatingOptions: {
-      ...floatingOptions,
-      ...state?.floatingOptions,
-    },
-  });
-  const {
-    editButtonProps,
-    props: editProps,
-    ref: editRef,
-    unlinkButtonProps,
-  } = useFloatingLinkEdit(editState);
-  const inputProps = useFormInputProps({
-    preventDefaultOnEnterKeydown: true,
-  });
-
-  if (hidden) return null;
-
-  const input = (
-    <div
-      className='z-[999999] flex w-[330px] flex-col relative'
-      {...inputProps}
-    >
-      {!isValidUrl && currentUrl && (
-        <div className='absolute -top-16 left-0 right-0 z-[1000000] mb-2'>
-          <div
-            className='bg-red-50 border border-red-200 rounded-sm p-2 shadow-lg'
-            role='alert'
-            aria-live='polite'
-          >
-            <div className='flex items-center'>
-              <CircleX className='size-4 text-red-500 mr-2 flex-shrink-0' />
-              <span className='text-sm text-red-700 text-wrap'>
-                Invalid URL. Please prefix link with https:// or use a relative
-                path like /about
-              </span>
-            </div>
-            <div className='absolute -bottom-1 left-4 w-2 h-2 bg-red-50 border-r border-b border-red-200 transform rotate-45'></div>
-          </div>
-        </div>
-      )}
-
-      <div className='flex items-center'>
-        <div className='flex items-center pr-1 pl-2 text-muted-foreground'>
-          <Link className='size-4' />
-        </div>
-
-        <FloatingLinkUrlInput
-          className={inputVariants()}
+  return (
+    <div className='flex flex-col gap-2' onKeyDown={onKeyDown}>
+      <InputGroup>
+        <InputGroupAddon>
+          <Link />
+        </InputGroupAddon>
+        <InputGroupInput
+          ref={urlRef}
+          type='url'
+          inputMode='url'
+          aria-label='Link'
           placeholder='Paste link'
-          data-plate-focus
-          onInput={handleUrlInput}
+          value={url}
+          aria-invalid={invalid || undefined}
+          aria-describedby={invalid ? errorId : undefined}
+          onChange={(event) => {
+            const next = event.target.value;
+            setUrl(next);
+            setInvalid(next.length > 0 && !isValid(next.trim()));
+          }}
         />
-      </div>
-      <Separator className='my-1' />
-      <div className='flex items-center'>
-        <div className='flex items-center pr-1 pl-2 text-muted-foreground'>
-          <Text className='size-4' />
-        </div>
-        <input
-          className={inputVariants()}
+      </InputGroup>
+      {invalid ? (
+        <p id={errorId} role='alert' className='text-sm text-destructive'>
+          {INVALID_URL_MESSAGE}
+        </p>
+      ) : null}
+      <InputGroup>
+        <InputGroupAddon>
+          <Text />
+        </InputGroupAddon>
+        <InputGroupInput
+          type='text'
+          aria-label='Text to display'
           placeholder='Text to display'
-          data-plate-focus
-          {...textInputProps}
+          value={text}
+          onChange={(event) => setText(event.target.value)}
         />
-      </div>
-      <Separator className='my-1' />
-      <div className='flex items-center justify-end gap-2 px-2 py-1'>
-        <button
-          type='button'
-          className={buttonVariants({ size: 'sm', variant: 'ghost' })}
-          onClick={() => {
-            api.floatingLink.hide();
-          }}
-        >
+      </InputGroup>
+      <div className='flex items-center justify-end gap-2'>
+        <Button variant='ghost' size='sm' onClick={onCancel}>
           Cancel
-        </button>
-        <button
-          type='button'
-          className={buttonVariants({
-            size: 'sm',
-            variant: 'tinaPrimary',
-          })}
-          onClick={() => {
-            if (isValidUrl && currentUrl) {
-              submitFloatingLink(editor);
-            }
-          }}
-          disabled={!isValidUrl && !!currentUrl}
-        >
+        </Button>
+        <Button variant='primary' size='sm' onClick={submit}>
           OK
-        </button>
+        </Button>
       </div>
     </div>
   );
+}
 
-  const editContent = editState.isEditing ? (
-    input
-  ) : (
-    <div className='box-content flex items-center'>
-      <button
-        className={buttonVariants({ size: 'sm', variant: 'ghost' })}
-        type='button'
-        {...editButtonProps}
+/** The Link box as a bottom sheet, for the phone tier. */
+export function LinkSheet({
+  open,
+  onOpenChange,
+  children,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side='bottom'
+        showCloseButton={false}
+        initialFocus={false}
+        className='pb-[env(safe-area-inset-bottom)]'
       >
-        Edit link
-      </button>
-
-      <Separator orientation='vertical' />
-
-      <LinkOpenButton />
-
-      <Separator orientation='vertical' />
-
-      <button
-        className={buttonVariants({
-          size: 'icon',
-          variant: 'ghost',
-        })}
-        type='button'
-        {...unlinkButtonProps}
-      >
-        <Unlink width={18} />
-      </button>
-    </div>
+        <SheetHeader>
+          <SheetTitle>Link</SheetTitle>
+        </SheetHeader>
+        <div className='p-4'>{children}</div>
+      </SheetContent>
+    </Sheet>
   );
+}
+
+function useLinkEntry() {
+  return useEditorSelector(
+    (editor) =>
+      editor.selection
+        ? (editor.api.above<TLinkElement>({
+            match: { type: editor.getType(LinkPlugin) },
+          }) ?? null)
+        : null,
+    [],
+    { equalityFn: (a, b) => a?.[0] === b?.[0] }
+  );
+}
+
+/** The bar under a link the caret is in: the address, Open, Edit and Remove. */
+export function LinkFloatingToolbar() {
+  const editor = useEditorRef();
+  const readOnly = useEditorReadOnly();
+  const focused = useFocused();
+  const tier = useTier();
+  const entry = useLinkEntry();
+  const inCodeBlock = useEditorSelector(
+    (e) => helpers.isNodeActive(e, CodeBlockPlugin),
+    []
+  );
+  const [editing, setEditing] = React.useState<{
+    draft: LinkDraft;
+    selection: typeof editor.selection;
+  } | null>(null);
+  const [barFocused, setBarFocused] = React.useState(false);
+
+  const element = entry?.[0];
+  const path = entry?.[1];
+  const visible =
+    !readOnly &&
+    !inCodeBlock &&
+    element !== undefined &&
+    (focused || barFocused || editing !== null);
+
+  const floating = useVirtualFloating({
+    open: visible,
+    getBoundingClientRect: () => {
+      const node = element ? editor.api.toDOMNode(element) : undefined;
+      return node?.getBoundingClientRect() ?? new DOMRect();
+    },
+    placement: 'bottom-start',
+    middleware: [
+      offset(8),
+      flip({ fallbackPlacements: ['top-start', 'bottom-end', 'top-end'] }),
+      shift({ padding: 8 }),
+    ],
+  });
+
+  const { update } = floating;
+  React.useEffect(() => {
+    if (visible) update?.();
+  }, [visible, update, element]);
+
+  if (!visible || !element || !path) return null;
+
+  const href = getLinkAttributes(editor, element).href;
+
+  const closeEditing = () => {
+    setEditing(null);
+    editor.tf.focus();
+  };
+
+  const startEditing = () =>
+    setEditing({
+      draft: { url: element.url, text: editor.api.string(path) },
+      selection: editor.selection,
+    });
+
+  const submit = (draft: LinkDraft) => {
+    if (editing?.selection) editor.tf.select(editing.selection);
+    applyLink(editor, draft);
+    closeEditing();
+  };
+
+  const remove = () => {
+    unwrapLink(editor, { at: path });
+    editor.tf.focus();
+  };
+
+  const box = editing ? (
+    <LinkBox
+      initial={editing.draft}
+      onSubmit={submit}
+      onCancel={closeEditing}
+    />
+  ) : null;
+
+  if (editing && tier === 'phone') {
+    return (
+      <LinkSheet
+        open
+        onOpenChange={(open) => {
+          if (!open) closeEditing();
+        }}
+      >
+        {box}
+      </LinkSheet>
+    );
+  }
 
   return (
     <PortalBody>
       <div
-        ref={insertRef}
-        className={popoverVariants()}
-        {...insertProps}
-        style={{
-          ...(insertProps.style as React.CSSProperties),
-          zIndex: 999999,
+        ref={floating.refs.setFloating}
+        style={floating.style}
+        onFocus={() => setBarFocused(true)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setBarFocused(false);
+          }
         }}
+        onMouseDown={(event) => {
+          if (!(event.target instanceof HTMLInputElement)) {
+            event.preventDefault();
+          }
+        }}
+        className='z-50'
       >
-        {input}
-      </div>
-
-      <div
-        ref={editRef}
-        className={popoverVariants()}
-        {...editProps}
-        style={{ ...(editProps.style as React.CSSProperties), zIndex: 999999 }}
-      >
-        {editContent}
+        {box ? (
+          <div className='w-80 max-w-[calc(100vw-1rem)] rounded-md bg-popover p-2 shadow-popover inset-ring inset-ring-border'>
+            {box}
+          </div>
+        ) : (
+          <div
+            role='toolbar'
+            aria-label='Link'
+            className={cn(
+              'flex max-w-[calc(100vw-1rem)] items-center gap-1 rounded-md bg-popover p-1 font-sans shadow-popover inset-ring inset-ring-border'
+            )}
+          >
+            <span className='max-w-60 truncate px-2 text-sm text-muted-foreground'>
+              {element.url}
+            </span>
+            {href ? (
+              <Button
+                variant='icon'
+                size='sm'
+                icon='external'
+                href={href}
+                aria-label='Open link in a new tab'
+                {...{ target: '_blank', rel: 'noopener noreferrer' }}
+              />
+            ) : (
+              <Button
+                variant='icon'
+                size='sm'
+                icon='external'
+                disabled
+                aria-label='Open link in a new tab'
+              />
+            )}
+            <Button
+              variant='icon'
+              size='sm'
+              icon='edit'
+              aria-label='Edit link'
+              onClick={startEditing}
+            />
+            <Separator orientation='vertical' tone='strong' className='h-5' />
+            <Button
+              variant='icon'
+              size='sm'
+              destructive
+              aria-label='Remove link'
+              onClick={remove}
+            />
+          </div>
+        )}
       </div>
     </PortalBody>
-  );
-}
-
-function LinkOpenButton() {
-  const editor = useEditorRef();
-  const selection = useEditorSelection();
-
-  const attributes = React.useMemo(() => {
-    const entry = editor.api.node<TLinkElement>({
-      match: { type: editor.getType(LinkPlugin) },
-    });
-    if (!entry) {
-      return {};
-    }
-    const [element] = entry;
-    return getLinkAttributes(editor, element);
-  }, [editor, selection]);
-
-  return (
-    <a
-      {...attributes}
-      className={buttonVariants({
-        size: 'icon',
-        variant: 'ghost',
-      })}
-      onMouseOver={(e) => {
-        e.stopPropagation();
-      }}
-      aria-label='Open link in a new tab'
-      target='_blank'
-    >
-      <ExternalLink width={18} />
-    </a>
   );
 }

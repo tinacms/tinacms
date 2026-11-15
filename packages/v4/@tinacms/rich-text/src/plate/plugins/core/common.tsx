@@ -6,19 +6,19 @@ import { ELEMENT_IMG } from '../create-img-plugin';
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
 import { HANDLES_MDX } from './formatting';
 
-export const unsupportedItemsInTable = new Set([
-  'Code Block',
-  'Unordered List',
-  'Ordered List',
-  'Horizontal Rule',
-  'Quote',
-  'Mermaid',
-  'Heading 1',
-  'Heading 2',
-  'Heading 3',
-  'Heading 4',
-  'Heading 5',
-  'Heading 6',
+export const unsupportedItemsInTable: ReadonlySet<string> = new Set([
+  'ul',
+  'ol',
+  'quote',
+  'codeBlock',
+  'mermaid',
+  'hr',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
 ]);
 
 const isNodeActive = (editor, type) => {

@@ -2,80 +2,86 @@
 
 import React from 'react';
 
-import * as TooltipPrimitive from '@radix-ui/react-tooltip';
-import { withCn, withProps } from '@udecode/cn';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider as UiTooltipProvider,
+  TooltipTrigger,
+} from '@tinacms/ui/components/tooltip';
+import { KbdShortcut } from '@tinacms/ui/components/kbd';
+import { cn } from '@tinacms/ui/lib/utils';
 
-export const TooltipProvider = TooltipPrimitive.Provider;
+export const TooltipProvider = UiTooltipProvider;
 
-export const Tooltip = TooltipPrimitive.Root;
+/** Inside it, tooltipped buttons draw as menu rows: icon, name and keycaps, with no tooltip. */
+export const ToolRowContext = React.createContext(false);
 
-export const TooltipTrigger = TooltipPrimitive.Trigger;
+type TooltipProps = {
+  'aria-label'?: string;
+  tooltip?: string;
+  /** Keycaps shown after the name, such as `⌘B`. */
+  shortcut?: string;
+};
 
-export const TooltipPortal = TooltipPrimitive.Portal;
+/** Adds a tooltip to a button. Its text is the control's accessible name unless `aria-label` says otherwise. */
+export function withTooltip<Props extends { disabled?: boolean }>(
+  Component: React.ForwardRefExoticComponent<
+    Props & React.RefAttributes<HTMLButtonElement>
+  >
+) {
+  return React.forwardRef<HTMLButtonElement, TooltipProps & Props>(
+    function ExtendComponent(
+      { 'aria-label': ariaLabel, tooltip, shortcut, ...props },
+      ref
+    ) {
+      const name = ariaLabel ?? tooltip;
+      const inRow = React.useContext(ToolRowContext);
 
-export const TooltipContent = withCn(
-  withProps(TooltipPrimitive.Content, {
-    sideOffset: 4,
-  }),
-  'z-[9999] overflow-hidden rounded-sm border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md'
-);
+      if (inRow) {
+        const { children, className, ...rest } = props as unknown as Props & {
+          children?: React.ReactNode;
+          className?: string;
+        };
+        return (
+          <Component
+            ref={ref}
+            aria-label={name}
+            {...(rest as unknown as Props)}
+            className={cn(
+              'h-9 w-full justify-start gap-2.5 px-2.5 text-base font-normal pointer-coarse:h-10',
+              className
+            )}
+          >
+            <span className='flex size-4 shrink-0 items-center justify-center [&_svg]:size-4'>
+              {children}
+            </span>
+            <span className='min-w-0 flex-1 truncate text-left'>{tooltip}</span>
+            {shortcut ? <KbdShortcut keys={shortcut} size='sm' /> : null}
+          </Component>
+        );
+      }
 
-export function withTooltip<T extends React.ElementType>(Component: T) {
-  return React.forwardRef<
-    React.ComponentRef<T>,
-    {
-      'aria-label'?: string;
-      tooltip?: React.ReactNode;
-      tooltipContentProps?: Omit<
-        React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>,
-        'children'
-      >;
-      tooltipProps?: Omit<
-        React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root>,
-        'children'
-      >;
-    } & React.ComponentPropsWithoutRef<T>
-  >(function ExtendComponent(
-    {
-      'aria-label': ariaLabel,
-      tooltip,
-      tooltipContentProps,
-      tooltipProps,
-      ...props
-    },
-    ref
-  ) {
-    const [mounted, setMounted] = React.useState(false);
+      const component = (
+        <Component
+          ref={ref}
+          aria-label={name}
+          {...(props as unknown as Props)}
+        />
+      );
 
-    React.useEffect(() => {
-      setMounted(true);
-    }, []);
+      if (!tooltip || props.disabled) {
+        return component;
+      }
 
-    /**
-     * Radix gives the tooltip text to `aria-describedby`. A description is
-     * never a name, and the children of a tooltipped icon button are icons.
-     * The tooltip text becomes the name of the control. A caller that shows
-     * text gives its own `aria-label` that holds that text (WCAG 2.5.3).
-     */
-    const name =
-      ariaLabel ?? (typeof tooltip === 'string' ? tooltip : undefined);
-
-    const component = (
-      <Component ref={ref} aria-label={name} {...(props as any)} />
-    );
-
-    if (tooltip && mounted) {
       return (
-        <Tooltip {...tooltipProps}>
-          <TooltipTrigger asChild>{component}</TooltipTrigger>
-
-          <TooltipPortal>
-            <TooltipContent {...tooltipContentProps}>{tooltip}</TooltipContent>
-          </TooltipPortal>
+        <Tooltip>
+          <TooltipTrigger render={component} />
+          <TooltipContent>
+            {tooltip}
+            {shortcut ? <KbdShortcut keys={shortcut} size='sm' /> : null}
+          </TooltipContent>
         </Tooltip>
       );
     }
-
-    return component;
-  });
+  );
 }

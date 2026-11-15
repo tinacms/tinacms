@@ -47,7 +47,7 @@ export const MermaidElementWithRef = ({ config }) => {
   }, [config]);
 
   return (
-    <div contentEditable={false} className='border-border border-b pt-10'>
+    <div contentEditable={false} className='p-3'>
       <div className='relative'>
         {/* mermaid.run needs this node in the DOM. Hide the <pre>, do not unmount it. */}
         <div

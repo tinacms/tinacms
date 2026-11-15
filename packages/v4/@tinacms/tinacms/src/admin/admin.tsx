@@ -10,7 +10,7 @@ import {
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
-import { useKeyboardOpen } from './use-narrow';
+import { useKeyboardOpen } from '@tinacms/ui/hooks/use-keyboard-open';
 import { toast } from '@tinacms/ui/components/toast';
 import { Tabs, TabsPanel } from '@tinacms/ui/components/tabs';
 import {

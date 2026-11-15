@@ -10,7 +10,47 @@ export const columnWidth = (page: Page) =>
   formColumn(page).evaluate((column) => column.getBoundingClientRect().width);
 
 export const toolbar = (page: Page) =>
-  page.locator('div.w-full.overflow-hidden.\\@container\\/toolbar');
+  page.getByRole('toolbar', { name: 'Formatting' });
+
+export const formScroller = (page: Page) =>
+  formColumn(page).locator('div.overflow-y-auto').first();
+
+export const toolbarShell = (page: Page, field?: string | RegExp) =>
+  field
+    ? page
+        .locator('[data-slot="field-wrapper"]', {
+          has: page.getByRole('textbox', { name: field }),
+        })
+        .last()
+        .locator('[data-slot="toolbar-shell"]')
+    : page.locator('[data-slot="toolbar-shell"]').first();
+
+export const fakeVisualViewport = (page: Page) =>
+  page.addInitScript(() => {
+    const fake = Object.assign(new EventTarget(), {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      offsetLeft: 0,
+      offsetTop: 0,
+      pageLeft: 0,
+      pageTop: 0,
+      scale: 1,
+    });
+    Object.defineProperty(window, 'visualViewport', { get: () => fake });
+    Object.defineProperty(window, '__setKeyboard', {
+      value: (height: number) => {
+        fake.height = height;
+        fake.dispatchEvent(new Event('resize'));
+      },
+    });
+  });
+
+export const setKeyboardHeight = (page: Page, height: number) =>
+  page.evaluate((next) => {
+    const keyboard = Reflect.get(window, '__setKeyboard');
+    if (typeof keyboard !== 'function') throw new Error('no fake keyboard');
+    keyboard(next);
+  }, height);
 
 export const setColumnWidth = async (page: Page, target: number) => {
   const from = await columnWidth(page);
