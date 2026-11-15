@@ -330,10 +330,10 @@ describe('an update to a path with no file', () => {
     expect(onDisk('content/posts/new.mdx')).toBe(true);
   });
 
-  it('refuses with forbidden for every role when both create switches are off', async () => {
+  it('refuses with forbidden for every role when canCreate is off, even with canDuplicate on', async () => {
     const routes = mount(
       [authPlugin(false)],
-      [{ ...POSTS, allowedActions: { canCreate: false, canDuplicate: false } }]
+      [{ ...POSTS, allowedActions: { canCreate: false, canDuplicate: true } }]
     );
     const res = await content(routes, { op: 'update', ...missing }, 'admin');
     expect(res.status).toBe(403);
@@ -355,14 +355,14 @@ describe('an update to a path with no file', () => {
     ] as const;
 
   it.each(routesOf('content/posts/new.mdx', { title: 'New' }))(
-    'refuses %s with forbidden for admin when both create switches are off',
+    'refuses %s with forbidden for admin when canCreate is off, even with canDuplicate on',
     async (_name, route, body) => {
       const routes = mount(
         [authPlugin(false)],
         [
           {
             ...POSTS,
-            allowedActions: { canCreate: false, canDuplicate: false },
+            allowedActions: { canCreate: false, canDuplicate: true },
           },
         ]
       );

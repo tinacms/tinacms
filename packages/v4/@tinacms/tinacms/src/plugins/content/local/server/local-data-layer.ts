@@ -511,13 +511,10 @@ export const createLocalDataLayer = (
 
   const forbid = (message: string) => refusal('forbidden', message);
 
-  // The server cannot tell a Duplicate's first save from a new document, so it
-  // refuses a create only when both switches are off.
+  // A Duplicate's first save is a create, so `canCreate: false` refuses it too.
+  // The server cannot tell the two apart, so `canDuplicate` is a UI switch only.
   const assertMayCreateDocument = (collection: ResolvedCollection) => {
-    if (
-      !allows(collection, 'canCreate') &&
-      !allows(collection, 'canDuplicate')
-    ) {
+    if (!allows(collection, 'canCreate')) {
       throw forbid(
         `Collection "${collection.schema.name}" does not allow new documents.`
       );

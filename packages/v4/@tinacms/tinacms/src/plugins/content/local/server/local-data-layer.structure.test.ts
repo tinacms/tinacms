@@ -558,15 +558,16 @@ describe('allowedActions', () => {
     expect(await exists('content/posts/series/b.md')).toBe(true);
   });
 
-  it('refuses create only when both canCreate and canDuplicate are false', async () => {
+  it('refuses every create when canCreate is false, even with canDuplicate on', async () => {
+    const layer = layerWith({ canCreate: false, canDuplicate: true });
     await expect(
-      layerWith({ canCreate: false, canDuplicate: false }).create(
-        'post',
-        'content/posts/n.md',
-        {}
-      )
+      layer.create('post', 'content/posts/n.md', {})
     ).rejects.toMatchObject({ code: 'forbidden' });
-    await layerWith({ canCreate: false }).create(
+    await expect(
+      layer.update('post', 'content/posts/n.md', {}, { mayCreate: true })
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    expect(await exists('content/posts/n.md')).toBe(false);
+    await layerWith({ canDuplicate: false }).create(
       'post',
       'content/posts/n.md',
       {}

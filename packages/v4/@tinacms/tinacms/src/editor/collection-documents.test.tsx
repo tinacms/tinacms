@@ -217,6 +217,23 @@ describe('useCollectionCapabilities', () => {
     expect(result.canDuplicate).toBe(true);
   });
 
+  it('hides New document and Duplicate for a provider with no create, as on TinaCloud', () => {
+    const result = capabilities(provider({ create: undefined }));
+    expect(result.canCreateDocument).toBe(false);
+    expect(result.canDuplicate).toBe(false);
+  });
+
+  it('hides Duplicate when canCreate is off, even with canDuplicate on', () => {
+    const result = capabilities(provider(), {
+      collection: {
+        ...POST,
+        allowedActions: { canCreate: false, canDuplicate: true },
+      },
+    });
+    expect(result.canCreateDocument).toBe(false);
+    expect(result.canDuplicate).toBe(false);
+  });
+
   describe('with an auth plugin (session/permissions)', () => {
     const NONE = {
       canCreateFolder: false,

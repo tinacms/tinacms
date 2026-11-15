@@ -82,8 +82,10 @@ export const formatForPath = (
 
 /** Each switch defaults to true. A false switch hides the action and the server refuses it. */
 export interface AllowedActions {
+  /** False also hides Duplicate, and the server refuses every create. */
   canCreate?: boolean;
   canDelete?: boolean;
+  /** Counts only when `canCreate` is on. The server cannot tell a Duplicate from a create, so only the UI reads it. */
   canDuplicate?: boolean;
   canCreateFolder?: boolean;
   canCreateNestedFolder?: boolean;

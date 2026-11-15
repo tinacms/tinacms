@@ -571,11 +571,14 @@ describe('allowedActions in the menus', () => {
     expect(menuItems()).toEqual(['Document']);
   });
 
-  it('drops New > Document when canCreate is off', async () => {
+  it('drops New > Document and Duplicate when canCreate is off, even with canDuplicate on', async () => {
     const user = userEvent.setup();
-    renderTable({ allowedActions: { canCreate: false } });
+    renderTable({ allowedActions: { canCreate: false, canDuplicate: true } });
     await openNewMenu(user);
     expect(menuItems()).toEqual(['Folder']);
+    await user.keyboard('{Escape}');
+    await openMenu(user, 'Beta');
+    expect(menuItems()).toEqual(['Rename', 'Delete']);
   });
 
   it('hides New > Folder inside a folder but not at the top level when canCreateNestedFolder is off', async () => {
