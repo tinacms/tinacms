@@ -8,6 +8,7 @@ import {
   readDraft,
   readWaitingDrafts,
   removeDraft,
+  setDraftAside,
   writeDraft,
 } from './drafts';
 import {
@@ -140,6 +141,18 @@ describe('form drafts', () => {
     open({ [title]: 'Older', [summary]: 'Same' });
     expect(waitingOf()).toHaveLength(1);
     expect(store.getState().leftWithWaiting[postA]).toBe(true);
+  });
+
+  it('keeps a copy another tab set aside, even when the form holds the same values', () => {
+    syncing();
+    open();
+    typeTitle('Mine');
+    const mine = readDraft(postA);
+    if (!mine) throw new Error('No live copy was written');
+    setDraftAside(postA, mine);
+    typeTitle('Mine again');
+    typeTitle('Mine');
+    expect(readWaitingDrafts(postA)).toEqual([mine]);
   });
 
   it('drops the waiting copies once the form holds the same values', () => {

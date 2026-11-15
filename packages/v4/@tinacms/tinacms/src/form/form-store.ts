@@ -760,6 +760,7 @@ export const syncDrafts = () =>
 // When every waiting copy equals what the form holds, Resume has nothing to add and
 // the live copy holds the same values. Dropping only some copies would let an older
 // copy outrank a newer one on Resume, so the copies go all together or not at all.
+// A copy another tab set aside holds that tab's edits, so only known copies go.
 const dropHeldWaiting = (
   formId: FormId,
   scope: EditedForm,
@@ -767,8 +768,11 @@ const dropHeldWaiting = (
   branch: string | undefined
 ) => {
   const waiting = readWaitingDrafts(formId, userId, branch);
-  const held = waiting.every((copy) =>
-    valuesEqual(toFormValues(copy.values), scope.values, scope.equal)
+  const seen = readFormStore().waiting[formId] ?? [];
+  const held = waiting.every(
+    (copy) =>
+      seen.some((known) => sameDraft(known, copy)) &&
+      valuesEqual(toFormValues(copy.values), scope.values, scope.equal)
   );
   if (waiting.length === 0 || !held) return;
   if (storeFailed(writeWaitingDrafts(formId, [], userId, branch))) return;
