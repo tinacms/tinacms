@@ -8,11 +8,18 @@ import {
   useRef,
   useState,
 } from 'react';
-import { get, FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
+import {
+  type FieldError,
+  type FieldValues,
+  get,
+  FormProvider as RhfFormProvider,
+  set,
+  useForm,
+} from 'react-hook-form';
 import type { ResolvedConfig } from '../config';
 import { authSliceOf } from '../core/auth/slice';
 import { currentBranchOf } from '../core/branch/contract';
-import { toFieldAddress } from '../core/field/address';
+import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { fieldEqualityFor } from '../core/form/compare';
 import {
@@ -60,7 +67,12 @@ import {
   type StaleDraftActions,
   type WaitingCause,
 } from './context';
-import { flattenFieldErrors, nestFieldErrors } from './field-errors';
+import {
+  flattenFieldErrors,
+  type ListChange,
+  nestFieldErrors,
+  rekeyAddresses,
+} from './field-errors';
 import { useFormViewStore } from './form-view-state';
 import { buildFormResolver } from './resolver';
 
@@ -72,6 +84,78 @@ export interface TinaProviderProps {
 
 const createDefaultQueryClient = () =>
   new QueryClient({ defaultOptions: { queries: { retry: 1 } } });
+
+const ERROR_ENTRY_KEYS = new Set(['type', 'message', 'types', 'ref']);
+
+const restoreListErrors = (
+  setError: (address: string, error: FieldError) => void,
+  node: unknown,
+  address: string
+) => {
+  if (!node || typeof node !== 'object') return;
+  if (address && 'type' in node && typeof node.type === 'string') {
+    setError(address, node as FieldError);
+  }
+  for (const [key, child] of Object.entries(node)) {
+    if (!ERROR_ENTRY_KEYS.has(key)) {
+      restoreListErrors(setError, child, address ? `${address}.${key}` : key);
+    }
+  }
+};
+
+const dropAt = (items: unknown[], index: number): unknown[] => {
+  const next: unknown[] = [];
+  for (let position = 0; position < items.length; position += 1) {
+    if (position !== index) next.push(items[position]);
+  }
+  return next;
+};
+
+// `formState` is a proxy that subscribes the reader. Reading `errors` while
+// the provider renders subscribes it to every error, so every field re-renders
+// when any error changes. The control copy is the same tree, kept current
+// without that subscription.
+const liveErrors = (methods: ReturnType<typeof useForm<TinaDocument>>) =>
+  methods.control._formState.errors;
+
+const rekeyFormErrors = (
+  methods: ReturnType<typeof useForm<TinaDocument>>,
+  listAddress: FieldAddress,
+  change: ListChange
+) => {
+  const flat = flattenFieldErrors(liveErrors(methods));
+  const addresses = Object.keys(flat);
+  if (addresses.length === 0) return;
+  const rekeyed = rekeyAddresses(addresses, listAddress, change);
+  const nextFlat: Record<string, string[] | undefined> = {};
+  for (let i = 0; i < addresses.length; i++) {
+    const nextAddr = rekeyed[i];
+    if (nextAddr) nextFlat[nextAddr] = flat[addresses[i]];
+  }
+  methods.clearErrors();
+  const tree = nestFieldErrors(nextFlat);
+  restoreListErrors(
+    (address, error) => methods.setError(address, error),
+    tree,
+    ''
+  );
+};
+
+const reseedListAt = (
+  methods: ReturnType<typeof useForm<TinaDocument>>,
+  listAddress: FieldAddress,
+  next: unknown[]
+) => {
+  methods.setValue(listAddress, next, {
+    shouldDirty: true,
+    shouldTouch: false,
+    shouldValidate: false,
+  });
+  const defaults = methods.control._defaultValues;
+  if (defaults && typeof defaults === 'object') {
+    set(defaults as FieldValues, listAddress, structuredClone(next));
+  }
+};
 
 type BootedRuntime = Omit<TinaRuntime, 'schema' | 'rpcUrl'>;
 
@@ -638,6 +722,75 @@ export function FormProvider({
     [formId]
   );
 
+  // react-hook-form keeps its defaults by index and only shifts its values when a
+  // list item is removed or moved, so the item that takes another's place inherits
+  // the other item's defaults. Re-seeding the list at its nested address rewrites
+  // values and defaults together, and leaves every other field as it is.
+  const commitList = useCallback(
+    (listAddress: FieldAddress, next: unknown[], change: ListChange) => {
+      reseedListAt(methods, listAddress, next);
+      rekeyFormErrors(methods, listAddress, change);
+      void methods.trigger(listAddress);
+      const [topLevel] = listAddress.split('.');
+      useFormStore
+        .getState()
+        .setFieldValue(
+          formId,
+          toFieldAddress(topLevel),
+          methods.getValues(topLevel)
+        );
+    },
+    [formId, methods]
+  );
+
+  const removeListItem = useCallback(
+    (listAddress: FieldAddress, index: number) => {
+      const current = methods.getValues(listAddress);
+      if (!Array.isArray(current) || index < 0 || index >= current.length) {
+        return;
+      }
+      view.getState().removeListItem(listAddress, index);
+      commitList(listAddress, dropAt(current, index), { remove: index });
+    },
+    [commitList, methods, view]
+  );
+
+  const insertListItem = useCallback(
+    (listAddress: FieldAddress, index: number, item: unknown) => {
+      const current = methods.getValues(listAddress);
+      if (!Array.isArray(current) || index < 0 || index > current.length) {
+        return;
+      }
+      const next = [...current];
+      next.splice(index, 0, item);
+      view.getState().insertListItem(listAddress, index);
+      commitList(listAddress, next, { insert: index });
+    },
+    [commitList, methods, view]
+  );
+
+  const moveListItem = useCallback(
+    (listAddress: FieldAddress, from: number, to: number) => {
+      const current = methods.getValues(listAddress);
+      if (
+        !Array.isArray(current) ||
+        from === to ||
+        from < 0 ||
+        to < 0 ||
+        from >= current.length ||
+        to >= current.length
+      ) {
+        return;
+      }
+      view.getState().moveListItem(listAddress, from, to);
+      const next = [...current];
+      const [item] = next.splice(from, 1);
+      next.splice(to, 0, item);
+      commitList(listAddress, next, { move: [from, to] });
+    },
+    [commitList, methods, view]
+  );
+
   const formScope = useMemo(
     () => ({
       formId,
@@ -653,6 +806,9 @@ export function FormProvider({
       discardEdits,
       hooks: formHooks,
       staleDraft: staleDraftActions,
+      removeListItem,
+      insertListItem,
+      moveListItem,
     }),
     [
       formId,
@@ -668,6 +824,9 @@ export function FormProvider({
       discardEdits,
       formHooks,
       staleDraftActions,
+      removeListItem,
+      insertListItem,
+      moveListItem,
     ]
   );
 

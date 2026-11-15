@@ -113,20 +113,42 @@ const layoutNode = collection.fields[3];
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins(PLUGINS);
 
-const renderField = (document?: TinaDocument) =>
+const renderField = (
+  document?: TinaDocument,
+  coll: CollectionSchema = collection
+) =>
   render(
     <TinaProvider
       config={asResolvedConfig({ plugins: PLUGINS, schema: NO_COLLECTIONS })}
     >
-      <FormProvider
-        collection={collection}
-        path={DOCUMENT_PATH}
-        document={document}
-      >
+      <FormProvider collection={coll} path={DOCUMENT_PATH} document={document}>
         <LabelledFields />
       </FormProvider>
     </TinaProvider>
   );
+
+const openItems = async () => {
+  await screen.findAllByRole('group');
+  for (const head of screen.queryAllByRole('button', { expanded: false })) {
+    if (
+      !/^(Actions for|Move|Add a block)/.test(
+        head.getAttribute('aria-label') ?? head.textContent ?? ''
+      )
+    ) {
+      await userEvent.click(head);
+    }
+  }
+};
+
+const chooseAction = async (item: number, action: string) => {
+  const trigger = await screen.findByRole('button', {
+    name: `Actions for Item ${item}`,
+  });
+  await userEvent.click(trigger);
+  await userEvent.click(
+    await screen.findByRole('menuitem', { name: new RegExp(`^${action}`) })
+  );
+};
 
 describe('ObjectField rendering', () => {
   it('renders each nested field with its own label and value', async () => {
@@ -312,6 +334,87 @@ describe('ObjectField ingest and digest', () => {
 });
 
 describe('ObjectField composed with array', () => {
+  it("keeps a removed item's object off the item that takes its place", async () => {
+    const postCollection: CollectionSchema = {
+      name: 'post',
+      format: 'mdx',
+      fields: [
+        t.array({
+          name: 'authors',
+          label: 'Authors',
+          fields: [
+            t.string({ name: 'name', label: 'Name' }),
+            t.object({
+              name: 'profile',
+              label: 'Profile',
+              fields: [
+                t.string({ name: 'bio', label: 'Bio' }),
+                t.number({ name: 'score', label: 'Score' }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    };
+    renderField(
+      {
+        authors: [
+          { name: 'Ivan' },
+          { name: 'Josh', profile: { bio: 'Editor', score: 10 } },
+          { name: 'Brook' },
+        ],
+      },
+      postCollection
+    );
+    await openItems();
+    await screen.findAllByLabelText('Bio');
+    await chooseAction(2, 'Remove');
+    // Nested controls remount under a null object and may register empty
+    // children. The removed item's values must not appear on the survivors.
+    await waitFor(() => {
+      expect(screen.queryByDisplayValue('Editor')).not.toBeInTheDocument();
+      expect(screen.queryByDisplayValue('Josh')).not.toBeInTheDocument();
+    });
+
+    const authors = valueOf('authors') as { name: string }[];
+    expect(authors.map((author) => author.name)).toEqual(['Ivan', 'Brook']);
+    const registry = await resolveRegistry();
+    const saved = digestDocument(
+      { authors: valueOf('authors') },
+      postCollection.fields,
+      { registry }
+    );
+    for (const author of saved.authors as TinaDocument[]) {
+      expect('profile' in author).toBe(false);
+    }
+  });
+
+  it('keeps a stated object whose subfields ingested as null', async () => {
+    const registry = await resolveRegistry();
+    const statsCollection: CollectionSchema = {
+      name: 'post',
+      format: 'mdx',
+      fields: [
+        t.object({
+          name: 'stats',
+          label: 'Stats',
+          fields: [t.number({ name: 'score', label: 'Score' })],
+        }),
+      ],
+    };
+    const ingested = ingestDocument({ stats: {} }, statsCollection.fields, {
+      registry,
+    });
+    expect(ingested).toEqual({ stats: { score: null } });
+    expect(
+      digestDocument(ingested, statsCollection.fields, { registry })
+    ).toEqual({ stats: {} });
+    const absent = ingestDocument({}, statsCollection.fields, { registry });
+    expect(
+      digestDocument(absent, statsCollection.fields, { registry })
+    ).toEqual({});
+  });
+
   it('round-trips an object nested inside an array', async () => {
     const registry = await resolveRegistry();
     const stored = { blocks: [{ hero: { height: 10 } }] };

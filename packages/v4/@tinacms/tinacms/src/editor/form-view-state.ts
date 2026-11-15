@@ -88,6 +88,9 @@ export interface FormViewState {
   expansion: { readonly version: number; readonly open: boolean };
   setExpansion: (open: boolean) => void;
   touch: (address: FieldAddress) => void;
+  removeListItem: (listAddress: string, index: number) => void;
+  insertListItem: (listAddress: string, index: number) => void;
+  moveListItem: (listAddress: string, from: number, to: number) => void;
   attemptSave: () => void;
   resetReveal: () => void;
   openLevel: (level: OpenLevel) => void;
@@ -97,6 +100,46 @@ export interface FormViewState {
 }
 
 export type FormViewStore = StoreApi<FormViewState>;
+
+export const shiftAddressOnRemove = (
+  address: string,
+  listAddress: string,
+  index: number
+): string | null => {
+  const prefix = `${listAddress}.`;
+  if (!address.startsWith(prefix)) return address;
+  const rest = address.slice(prefix.length);
+  const dot = rest.indexOf('.');
+  const numStr = dot === -1 ? rest : rest.slice(0, dot);
+  const subpath = dot === -1 ? '' : rest.slice(dot);
+  const pos = Number(numStr);
+  if (!Number.isInteger(pos)) return address;
+  if (pos === index) return null;
+  if (pos > index) return `${prefix}${pos - 1}${subpath}`;
+  return address;
+};
+
+export const shiftAddressOnMove = (
+  address: string,
+  listAddress: string,
+  from: number,
+  to: number
+): string => {
+  const prefix = `${listAddress}.`;
+  if (!address.startsWith(prefix)) return address;
+  const rest = address.slice(prefix.length);
+  const dot = rest.indexOf('.');
+  const numStr = dot === -1 ? rest : rest.slice(0, dot);
+  const subpath = dot === -1 ? '' : rest.slice(dot);
+  const pos = Number(numStr);
+  if (!Number.isInteger(pos)) return address;
+  if (pos === from) return `${prefix}${to}${subpath}`;
+  if (from < to && pos > from && pos <= to)
+    return `${prefix}${pos - 1}${subpath}`;
+  if (from > to && pos >= to && pos < from)
+    return `${prefix}${pos + 1}${subpath}`;
+  return address;
+};
 
 export const createFormViewStore = (): FormViewStore => {
   let keys = 0;
@@ -126,7 +169,12 @@ export const createFormViewStore = (): FormViewStore => {
         const promoted = summary.hiddenParents.filter(
           (parent) =>
             remaining.has(parent) &&
-            !failing.some((address) => address.startsWith(`${parent}.`))
+            !failing.some((address) => address.startsWith(`${parent}.`)) &&
+            !summary.blocked.some(
+              (entry) =>
+                entry.address.endsWith(REMOVED) &&
+                entry.address.startsWith(`${parent}.`)
+            )
         );
         const kept = [
           ...stillListed,
@@ -251,6 +299,68 @@ export const createFormViewStore = (): FormViewStore => {
           ? state
           : { touched: new Set(state.touched).add(address) }
       ),
+    removeListItem: (listAddress, index) =>
+      set((state) => {
+        const nextTouched = new Set<string>();
+        for (const address of state.touched) {
+          const shifted = shiftAddressOnRemove(address, listAddress, index);
+          if (shifted !== null) nextTouched.add(shifted);
+        }
+        const nextLevels: OpenLevel[] = [];
+        for (const level of state.openLevels) {
+          const shifted = shiftAddressOnRemove(
+            level.address,
+            listAddress,
+            index
+          );
+          if (shifted !== null) {
+            nextLevels.push(
+              shifted === level.address
+                ? level
+                : { ...level, address: toFieldAddress(shifted) }
+            );
+          }
+        }
+        return { touched: nextTouched, openLevels: nextLevels };
+      }),
+    insertListItem: (listAddress, index) =>
+      set((state) => {
+        const nextTouched = new Set<string>();
+        for (const address of state.touched) {
+          const [shifted] = rekeyAddresses([address], listAddress, {
+            insert: index,
+          });
+          if (shifted) nextTouched.add(shifted);
+        }
+        const nextLevels = state.openLevels.map((level) => {
+          const [shifted] = rekeyAddresses([level.address], listAddress, {
+            insert: index,
+          });
+          return shifted && shifted !== level.address
+            ? { ...level, address: toFieldAddress(shifted) }
+            : level;
+        });
+        return { touched: nextTouched, openLevels: nextLevels };
+      }),
+    moveListItem: (listAddress, from, to) =>
+      set((state) => {
+        const nextTouched = new Set<string>();
+        for (const address of state.touched) {
+          nextTouched.add(shiftAddressOnMove(address, listAddress, from, to));
+        }
+        const nextLevels = state.openLevels.map((level) => {
+          const shifted = shiftAddressOnMove(
+            level.address,
+            listAddress,
+            from,
+            to
+          );
+          return shifted === level.address
+            ? level
+            : { ...level, address: toFieldAddress(shifted) };
+        });
+        return { touched: nextTouched, openLevels: nextLevels };
+      }),
     attemptSave: () => set({ saveAttempted: true }),
     resetReveal: () => set({ touched: new Set(), saveAttempted: false }),
     openLevel: (level) =>

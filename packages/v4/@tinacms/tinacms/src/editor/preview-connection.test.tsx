@@ -378,6 +378,9 @@ describe('usePreviewConnection', () => {
           discardEdits: () => {},
           hooks: [],
           staleDraft: null,
+          removeListItem: () => {},
+          insertListItem: () => {},
+          moveListItem: () => {},
         }}
       >
         {children}
