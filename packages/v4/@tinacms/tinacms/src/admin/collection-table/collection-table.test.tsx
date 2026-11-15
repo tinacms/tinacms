@@ -842,18 +842,14 @@ describe('row actions', () => {
     expect(screen.getByText('0 documents')).toBeInTheDocument();
   });
 
-  it('hides actions the provider cannot do', async () => {
+  it('hides row actions and New for a provider with no write operations, as on TinaCloud', async () => {
     world.operations = false;
     renderTable();
     await rowNamed('Beta');
     expect(
       screen.queryByRole('button', { name: 'Actions for Beta' })
     ).toBeNull();
-    await userEvent.click(screen.getByRole('button', { name: 'New' }));
-    expect(
-      await screen.findByRole('menuitem', { name: 'Document' })
-    ).toBeInTheDocument();
-    expect(screen.queryByRole('menuitem', { name: 'Folder' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'New' })).toBeNull();
   });
 });
 
