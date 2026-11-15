@@ -303,6 +303,24 @@ describe('ReferenceField missing references', () => {
     expect(input).toHaveValue('cont');
   });
 
+  it('shows a document by its title with the collection and path under it, and by its path when it has no title', async () => {
+    renderField(
+      {},
+      contentPlugin({
+        list: async (name: string) =>
+          name === 'page'
+            ? [{ path: ABOUT, title: 'About us' }, { path: CONTACT }]
+            : [],
+      })
+    );
+    const input = await screen.findByLabelText(/^Page\b/);
+    await waitFor(() => expect(input).toBeEnabled());
+    await userEvent.click(input);
+    const titled = await screen.findByRole('option', { name: /^About us/ });
+    expect(titled).toHaveTextContent(ABOUT);
+    expect(await screen.findByRole('option', option(CONTACT))).toBeVisible();
+  });
+
   it('treats a stored value that is not a path as no value', async () => {
     renderField({ page: 42 } as unknown as TinaDocument);
     const input = await screen.findByLabelText(/^Page\b/);

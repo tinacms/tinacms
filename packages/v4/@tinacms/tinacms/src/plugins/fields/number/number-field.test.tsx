@@ -354,6 +354,19 @@ describe('NumberField ingest and digest', () => {
     );
   });
 
+  it.each(['abc', '12px', '1,200'])(
+    'digests a stored non-number %s as it was stored',
+    async (stored) => {
+      const registry = await resolveRegistry();
+      const ingested = ingestDocument({ rating: stored }, collection.fields, {
+        registry,
+      });
+      expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
+        { rating: stored }
+      );
+    }
+  );
+
   it('holds an absent field as null and digests it as absent', async () => {
     const registry = await resolveRegistry();
     expect(ingestDocument({}, collection.fields, { registry })).toEqual({

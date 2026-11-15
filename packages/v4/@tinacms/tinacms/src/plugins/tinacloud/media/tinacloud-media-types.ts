@@ -14,11 +14,3 @@ export const uploadUrlResponseSchema = z.object({
   signedUrl: z.string(),
   requestId: z.string().optional(),
 });
-
-export const renameResponseSchema = z.object({
-  success: z.literal(true),
-  requestId: z.string().optional(),
-  path: z.string().optional(),
-});
-
-export const renameErrorBodySchema = z.object({ code: z.string() });

@@ -1,4 +1,11 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { RichTextValue } from '../value';
 import { RichEditor, type RichEditorProps } from './index';
@@ -21,7 +28,10 @@ const mount = (props: Partial<RichEditorProps> = {}) =>
 const editor = () =>
   screen.findByLabelText('', { selector: '[aria-labelledby]' });
 
-afterEach(cleanup);
+afterEach(() => {
+  vi.useRealTimers();
+  cleanup();
+});
 
 describe('RichEditor frame props', () => {
   it('shows the toolbar and an editable text box by default', async () => {
@@ -65,5 +75,25 @@ describe('RichEditor frame props', () => {
     framed.unmount();
     mount({ layout: 'body' });
     expect((await editor()).className).toContain('min-h-56');
+  });
+});
+
+describe('RichEditor toolbar tooltips', () => {
+  it('opens after the half second the rest of the admin uses, not Radix’s 700ms default', async () => {
+    mount();
+    await editor();
+    vi.useFakeTimers();
+    const button = screen.getByRole('radio', { name: 'Bold (⌘+B)' });
+    const tip = () => document.querySelector('[role="tooltip"]');
+    act(() => {
+      fireEvent.pointerEnter(button);
+      fireEvent.pointerMove(button);
+      fireEvent.mouseEnter(button);
+      fireEvent.mouseMove(button);
+    });
+    await act(() => vi.advanceTimersByTimeAsync(499));
+    expect(tip()).toBeNull();
+    await act(() => vi.advanceTimersByTimeAsync(1));
+    expect(tip()).not.toBeNull();
   });
 });

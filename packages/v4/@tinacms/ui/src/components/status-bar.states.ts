@@ -31,5 +31,10 @@ export const statusBarStates: {
     props: { branch: 'feature/news', state: 'failed' },
     words: 'Save failed',
   },
+  {
+    name: 'local, edits kept in this browser, with dot',
+    props: { local: true, state: 'unsaved' },
+    words: 'Unsaved edits kept in this browser',
+  },
   { name: 'no branches, idle', props: { state: 'idle' }, words: 'No changes' },
 ];

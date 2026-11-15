@@ -3,8 +3,10 @@ import {
   useFieldActivation,
   useFieldAddress,
   useFieldFrame,
+  useFieldSchema,
   useFieldValue,
 } from '../../../editor';
+import type { DatetimeFieldSchema } from './datetime-field.schema';
 import { DatetimeFieldView } from './datetime-field.view';
 
 const CARRIES_A_ZONE = /(?:Z|[+-]\d{2}:\d{2})$/;
@@ -22,8 +24,8 @@ const toLocalWallClock = (instant: Date): string =>
  * instant, so the input shows the local wall clock of that instant. A stored
  * value with no zone already spells a wall clock, so it passes through.
  */
-const toInputValue = (stored: string | null): string => {
-  if (!stored) return '';
+const toInputValue = (stored: unknown): string => {
+  if (typeof stored !== 'string' || !stored) return '';
   if (!stored.includes('T')) return `${stored}T00:00`;
   if (!CARRIES_A_ZONE.test(stored)) return stored.slice(0, 16);
   const instant = new Date(stored);
@@ -50,6 +52,7 @@ const fromInputValue = (
 
 export function DatetimeField() {
   const address = useFieldAddress();
+  const { placeholder } = useFieldSchema<DatetimeFieldSchema>();
   const [value, setValue] = useFieldValue<string | null>(address);
   const frame = useFieldFrame();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -61,6 +64,7 @@ export function DatetimeField() {
       {...frame}
       ref={inputRef}
       id={address}
+      placeholder={placeholder}
       value={toInputValue(value)}
       onChange={(wallClock) => setValue(fromInputValue(wallClock, value))}
     />

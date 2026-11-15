@@ -94,6 +94,17 @@ const fileSystemReasonOf = (cause: unknown): string => {
   return 'the file system refused the write';
 };
 
+const modifiedTimeOf = async (
+  absolute: string
+): Promise<Pick<DocumentSummary, 'updatedAt'>> => {
+  try {
+    const { mtime } = await fs.stat(absolute);
+    return { updatedAt: mtime.toISOString() };
+  } catch {
+    return {};
+  }
+};
+
 const isUnparsable = (
   adapter: FormatAdapter,
   raw: string | undefined,
@@ -260,6 +271,7 @@ export const createLocalDataLayer = (
       }
       return {
         path: documentIdFor(absolute),
+        ...(await modifiedTimeOf(absolute)),
         document: adapter.parse(raw, collection.bodyField),
       };
     },
@@ -283,23 +295,31 @@ export const createLocalDataLayer = (
         .filter((dirent) => !dirent.isDirectory())
         .map((dirent) => path.join(dirent.parentPath, dirent.name))
         .sort();
-      const summaries: DocumentSummary[] = [];
-      for (const absolute of files) {
-        if (!adapterForPath(collection.adapters, absolute)) continue;
-        let realAbsolute: string;
-        try {
-          ({ realAbsolute } = await resolveDocumentPath(collection, absolute));
-        } catch (cause) {
-          console.warn(
-            `Skipping document "${absolute}": it does not resolve inside collection "${collection.schema.name}".`,
-            cause
-          );
-          continue;
-        }
-        if ((await ownerOf(realAbsolute)) !== collection) continue;
-        summaries.push({ path: documentIdFor(absolute) });
-      }
-      return summaries;
+      const summaries = await Promise.all(
+        files
+          .filter((absolute) => adapterForPath(collection.adapters, absolute))
+          .map(async (absolute): Promise<DocumentSummary | null> => {
+            let realAbsolute: string;
+            try {
+              ({ realAbsolute } = await resolveDocumentPath(
+                collection,
+                absolute
+              ));
+            } catch (cause) {
+              console.warn(
+                `Skipping document "${absolute}": it does not resolve inside collection "${collection.schema.name}".`,
+                cause
+              );
+              return null;
+            }
+            if ((await ownerOf(realAbsolute)) !== collection) return null;
+            return {
+              path: documentIdFor(absolute),
+              ...(await modifiedTimeOf(realAbsolute)),
+            };
+          })
+      );
+      return summaries.filter((summary) => summary !== null);
     },
 
     async update(collectionName, documentPath, value) {
@@ -356,6 +376,7 @@ export const createLocalDataLayer = (
         }
         return {
           path: canonicalPath,
+          ...(await modifiedTimeOf(realAbsolute)),
           document: adapter.parse(raw, collection.bodyField),
         };
       });

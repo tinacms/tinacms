@@ -25,7 +25,7 @@ describe('array field states', () => {
     render(<ArrayFieldView {...props} />);
     expect(screen.queryByText(/unsaved/i)).toBeNull();
     expect(
-      screen.getByRole('group', { name: /^(Authors|Tags)/ })
+      screen.getByRole('group', { name: /^(Authors|Tags|Blocks)/ })
     ).toBeVisible();
     expect(screen.queryByText('(required)') !== null).toBe(!!props.required);
     expect(screen.queryAllByRole('alert').length > 0).toBe(
@@ -82,16 +82,16 @@ describe('array field states', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Flag is required');
   });
 
-  it('says so when a list is empty', () => {
+  it('shows only the Add control when an editable list is empty, and says so when a read-only list is', () => {
     const [empty, readOnlyEmpty] = ['empty', 'read-only empty'].map(
       (name) => states.find((state) => state.name === name)?.props
     );
     if (!empty || !readOnlyEmpty) throw new Error('missing state');
     const { unmount } = render(<ArrayFieldView {...empty} />);
-    expect(screen.getByText(/This list is empty\. Add/)).toBeVisible();
+    expect(screen.queryByText(/This list is empty/)).toBeNull();
     unmount();
     render(<ArrayFieldView {...readOnlyEmpty} />);
-    expect(screen.getByText('This list is empty.')).toBeVisible();
+    expect(screen.getByText('No authors.')).toBeVisible();
   });
 
   it('turns adding off in the full state and says why', async () => {
@@ -305,6 +305,58 @@ describe('array drill-in card', () => {
   });
 });
 
+describe('blocks states', () => {
+  const state = (name: string) => {
+    const found = states.find((entry) => entry.name === name)?.props;
+    if (!found) throw new Error(`missing state ${name}`);
+    return found;
+  };
+
+  it('shows only Add on an empty editable list, and "No blocks." on a read-only one', () => {
+    const { unmount } = render(<ArrayFieldView {...state('blocks empty')} />);
+    expect(screen.queryByText('No blocks.')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Add a block' })).toBeEnabled();
+    unmount();
+    render(<ArrayFieldView {...state('blocks read-only empty')} />);
+    expect(screen.getByText('No blocks.')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Add a block' })).toBeNull();
+  });
+
+  it('keeps the picker shut in the disabled state and turns "Add a block" off', () => {
+    render(<ArrayFieldView {...state('blocks disabled')} />);
+    expect(screen.getByRole('button', { name: 'Add a block' })).toBeDisabled();
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('turns "Add a block" off in the full state and says why', () => {
+    render(<ArrayFieldView {...state('blocks full')} />);
+    const add = screen.getByRole('button', { name: 'Add a block' });
+    expect(add).toBeDisabled();
+    expect(add).toHaveAccessibleDescription(/This list is full/);
+  });
+
+  it('lists the blocks in schema order in the open plain picker', () => {
+    render(<ArrayFieldView {...state('blocks plain picker open')} />);
+    const panel = screen.getByRole('dialog', { name: 'Choose a block' });
+    expect(
+      within(panel)
+        .getAllByRole('button', { name: /^Add / })
+        .map((option) => option.getAttribute('aria-label'))
+    ).toEqual(['Add Hero', 'Add Columns', 'Add Quote', 'Add Call to action']);
+    expect(panel.querySelector('img')).toBeNull();
+  });
+
+  it('shows a preview and a name in each option of the open visual picker', () => {
+    render(<ArrayFieldView {...state('blocks visual picker open')} />);
+    const panel = screen.getByRole('dialog', { name: 'Choose a block' });
+    const options = within(panel).getAllByRole('button', { name: /^Add / });
+    expect(options).toHaveLength(4);
+    for (const option of options) {
+      expect(option.querySelector('[data-preview]')).not.toBeNull();
+    }
+  });
+});
+
 describe('moveOnDrop', () => {
   const drop = (active: string, over?: string) => ({
     active: { id: active },
@@ -341,7 +393,7 @@ describe('array field view rerendered', () => {
     for (const { props } of [...rest, first]) {
       rerender(<ArrayFieldView {...props} />);
       expect(
-        screen.getByRole('group', { name: /^(Authors|Tags)/ })
+        screen.getByRole('group', { name: /^(Authors|Tags|Blocks)/ })
       ).toBeVisible();
     }
   });

@@ -87,7 +87,7 @@ export const RichEditor = ({
         }}
       >
         <EditorContainer>
-          <TooltipProvider>
+          <TooltipProvider delayDuration={500}>
             <ToolbarProvider
               templates={field.templates ?? []}
               overrides={field?.overrides}

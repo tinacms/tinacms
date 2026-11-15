@@ -16,8 +16,8 @@ export interface FieldMetadata {
   labelable?: boolean;
   drillable?: boolean;
   /**
-   * For a drillable field: `true` drills in, `false` opens in place, and
-   * `undefined` leaves it to the depth rule.
+   * For a drillable field above level 3: `true` drills in, `false` opens in
+   * place, and `undefined` opens in place too. Level 3 and deeper always drill in.
    */
   drillsIn?: (node: FieldSchema) => boolean | undefined;
   /**

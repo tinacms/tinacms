@@ -80,6 +80,8 @@ type ListRowProps = Omit<
   onAction?: () => void;
   /** A code-like title, such as a branch name. */
   mono?: boolean;
+  /** A long title or meta line wraps onto more lines. Without it they are cut with an ellipsis. */
+  wrap?: boolean;
   /**
    * The row can't be picked yet: put the reason in `meta` or `aside`. It stays focusable so the
    * reason is read, carries `aria-disabled`, and a press does nothing. No hover, no tooltip.
@@ -125,6 +127,7 @@ function ListRow({
   actionAria,
   onAction,
   mono = false,
+  wrap = false,
   disabled = false,
   className,
   ...props
@@ -164,7 +167,8 @@ function ListRow({
         <span className='flex min-w-0 flex-auto flex-col'>
           <span
             className={cn(
-              'min-w-0 truncate',
+              'min-w-0',
+              wrap ? 'wrap-anywhere' : 'truncate',
               meta && 'font-medium',
               isSelected && 'font-semibold',
               mono && 'font-mono tracking-code',
@@ -179,7 +183,8 @@ function ListRow({
           {meta ? (
             <span
               className={cn(
-                'min-w-0 truncate font-mono text-xs tracking-code text-muted-foreground',
+                'min-w-0 font-mono text-xs tracking-code text-muted-foreground',
+                wrap ? 'wrap-anywhere' : 'truncate',
                 mono && 'font-sans tracking-normal',
                 isSelected && 'text-muted-foreground-strong'
               )}

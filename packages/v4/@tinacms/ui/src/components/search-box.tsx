@@ -13,7 +13,7 @@ import { cn } from '@tinacms/ui/lib/utils';
 
 type SearchBoxProps = Omit<
   ComponentProps<'input'>,
-  'size' | 'type' | 'value' | 'defaultValue'
+  'size' | 'type' | 'value' | 'defaultValue' | 'results'
 > & {
   /** What the box searches, such as "Search titles". Screen readers read it; it is not shown. */
   label: string;
@@ -24,6 +24,8 @@ type SearchBoxProps = Omit<
   size?: 'md' | 'sm';
   /** Keys shown at the end, such as `/` or `⌘K`. */
   shortcut?: string;
+  /** How many hits the search found, shown at the end of the box and read by screen readers. */
+  results?: string;
 } & (
     | {
         value: string;
@@ -43,6 +45,7 @@ function SearchBox({
   icon = 'search',
   size = 'md',
   shortcut,
+  results,
   onClear,
   id,
   className,
@@ -76,6 +79,14 @@ function SearchBox({
         />
         {onClear && value ? (
           <InputGroupAddon align='inline-end'>
+            {results !== undefined ? (
+              <span
+                role='status'
+                className='text-sm text-muted-foreground tabular-nums'
+              >
+                {results}
+              </span>
+            ) : null}
             <InputGroupButton
               size='icon-xs'
               aria-label='Clear search'

@@ -131,18 +131,18 @@ describe('object display', () => {
     expect(screen.queryByLabelText(/^Note\b/)).toBeNull();
   });
 
-  it('lets an explicit fieldset or collapsible win at depth 3', async () => {
+  it('drills in at depth 3 even when display says fieldset or collapsible', async () => {
     const { unmount } = renderForm(collectionWith('fieldset'));
-    expect(await screen.findByLabelText(/^Note\b/)).toHaveValue('n');
-    expect(screen.queryByRole('button', { name: 'Open Deep' })).toBeNull();
+    expect(
+      await screen.findByRole('button', { name: 'Open Deep' })
+    ).toBeVisible();
+    expect(screen.queryByLabelText(/^Note\b/)).toBeNull();
     unmount();
 
     renderForm(collectionWith('collapsible'));
-    const header = await screen.findByRole('button', { name: /Deep/ });
-    expect(header).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByLabelText(/^Note\b/)).toBeNull();
-    await userEvent.click(header);
-    expect(await screen.findByLabelText(/^Note\b/)).toHaveValue('n');
+    expect(
+      await screen.findByRole('button', { name: 'Open Deep' })
+    ).toBeVisible();
   });
 
   it('lets an explicit drillIn win at depth 1, and shows its fields in place once open', async () => {
@@ -247,7 +247,7 @@ describe('object display', () => {
     expect(header).toHaveTextContent('(required)');
   });
 
-  it('keeps the depth rule for a plugin with no drillsIn, and lets drillsIn override it', () => {
+  it('keeps the depth rule for a plugin with no drillsIn, and lets drillsIn override it above level 3', () => {
     const node = { name: 'x', type: 'x' } as FieldSchema;
     const describe = (
       metadata: FieldDescriptor['metadata']
@@ -259,7 +259,8 @@ describe('object display', () => {
     expect(drillsInAt(plain, node, 'a.b')).toBe(false);
     expect(drillsInAt(plain, node, 'a.b.c')).toBe(true);
     const forced = describe({ drillable: true, drillsIn: () => false });
-    expect(drillsInAt(forced, node, 'a.b.c')).toBe(false);
+    expect(drillsInAt(forced, node, 'a.b')).toBe(false);
+    expect(drillsInAt(forced, node, 'a.b.c')).toBe(true);
     expect(drillsInAt(describe({}), node, 'a.b.c')).toBe(false);
   });
 });

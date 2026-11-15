@@ -19,7 +19,7 @@ type SegmentedOption<T extends string> = {
 const segmentVariants = cva(
   [
     'inline-flex h-9 min-w-20 cursor-pointer items-center justify-center gap-1.5 rounded-full border-0 bg-transparent px-3.5 font-sans text-base leading-control font-medium text-muted-foreground-strong outline-none transition-[background-color,color,box-shadow]',
-    'hover:text-foreground data-pressed:bg-card data-pressed:text-foreground data-pressed:shadow-segment',
+    'not-disabled:hover:text-foreground data-pressed:bg-card data-pressed:text-foreground data-pressed:shadow-segment',
     'focus:shadow-focus-ring data-pressed:focus:shadow-focus-ring',
     'disabled:cursor-not-allowed disabled:opacity-45',
   ],

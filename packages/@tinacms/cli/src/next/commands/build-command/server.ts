@@ -16,6 +16,9 @@ export const buildProductionSpa = async (
     apiURL,
     noWatch: true,
     rollupOptions: {
+      // Rollup defaults to 1000 parallel file operations. Hosts that cap open
+      // files at 1024 (Cloudflare Workers Builds) then fail with EMFILE.
+      maxParallelFileOps: 100,
       onwarn(warning, warn) {
         if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
           return;

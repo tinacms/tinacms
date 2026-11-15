@@ -1,240 +1,89 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { Icon } from '@tinacms/ui/components/icon';
+import { Breadcrumb } from '@tinacms/ui/components/breadcrumb';
+import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
+import { TooltipProvider } from '@tinacms/ui/components/tooltip';
 import {
   Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel,
   SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarProvider,
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
+import { useKeyboardOpen } from './use-narrow';
+import { toast } from '@tinacms/ui/components/toast';
+import { Tabs, TabsPanel } from '@tinacms/ui/components/tabs';
 import {
   type CSSProperties,
   type ReactNode,
   startTransition,
   use,
   useEffect,
-  useId,
   useRef,
   useState,
 } from 'react';
 import { HashRouter } from 'react-router-dom';
 import type { ResolvedConfig } from '../config';
+import type { AdminRoute } from './routing';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
-import type {
-  GlobalNavEntry,
-  GlobalNavSection,
-  NavTarget,
-} from '../core/slot/contract';
-import { useCollectionDocuments, useDocument } from '../editor/content-queries';
+import { useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
 import { TinaProvider } from '../editor/provider';
-import { toFormId } from '../form/form-store';
 import { AuthGate } from './auth-gate';
 import { DocumentForm } from './document-form';
+import { DocumentErrorPane } from './error-summary';
 import { DocumentScope } from './document-scope';
-import { NavDocumentStatus } from './nav-document-status';
+import {
+  CollectionsNavigator,
+  MediaPanel,
+  SettingsPane,
+  ToolsPane,
+} from './navigator';
+import { AdminRail, HOME_SCREEN, MEDIA_SCREEN } from './rail';
+import { MediaPaneShellContext } from './media-pane-shell';
 import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
-import { type AdminRoute, COLLECTIONS_ROUTE } from './routing';
+import { COLLECTIONS_ROUTE, HOME_ROUTE } from './routing';
 import { useBranchSync } from '../editor/branch';
+import { UploadHost } from '../editor/uploads/upload-host';
 import {
   ShellSaveProgress,
   ShellStatusBar,
   ShellTopBar,
   useLongSave,
 } from './shell-bars';
+import { copyPath } from './copy-path';
+import { useKeptEditsNotice } from './use-kept-edits-notice';
 import { useAdminRoute } from './use-admin-route';
 import { useFormColumnWidth } from './use-form-column-width';
 import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
 
-const SHELL_WIDTH = { '--sidebar-width': '18rem' } as CSSProperties;
-
-const DOCS_URL = 'https://tina.io/docs';
-
-// The open entry: pressed grey, semibold words, orange icon, never an orange fill.
-const ENTRY_CLASS =
-  'data-active:bg-pressed data-active:font-semibold data-active:text-foreground data-active:[&_svg]:text-primary';
+const SHELL_WIDTH = { '--sidebar-width': '15rem' } as CSSProperties;
 
 // Sits between the Top bar and the Status bar instead of the full viewport.
-const BETWEEN_BARS = 'top-11 bottom-7 h-auto';
+const BETWEEN_BARS = 'top-14 bottom-7 h-auto';
 
-const documentName = (path: string) => path.split('/').at(-1) ?? path;
+// A refused or missing clipboard says so, because the menu row promises a copy.
+function copyFilePath(path: string) {
+  void copyPath(path).then((copied) => {
+    if (!copied) toast({ tone: 'error', title: 'Couldn’t copy the file path' });
+  });
+}
 
 function Placeholder({ children }: { children: ReactNode }) {
   return <p className='p-4 text-sm text-muted-foreground'>{children}</p>;
 }
 
-function CollectionMenu({
-  collections,
-  activeName,
-  navigate,
+function MediaPaneSlot({
+  screen,
+  segments,
 }: {
-  collections: CollectionSchema[];
-  activeName?: string;
-  navigate: (route: AdminRoute) => void;
+  screen: AdminScreen;
+  segments: string[];
 }) {
-  return (
-    <SidebarMenu aria-label='Collections'>
-      {collections.map((collection) => (
-        <SidebarMenuItem key={collection.name}>
-          <SidebarMenuButton
-            isActive={collection.name === activeName}
-            aria-label={collection.label ?? collection.name}
-            className={ENTRY_CLASS}
-            onClick={() =>
-              navigate({ view: 'collection', collection: collection.name })
-            }
-          >
-            <Icon glyph='folder' size={16} />
-            <span>{collection.label ?? collection.name}</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
-  );
-}
-
-function DocumentMenu({
-  collection,
-  activePath,
-  navigate,
-}: {
-  collection: CollectionSchema;
-  activePath?: string;
-  navigate: (route: AdminRoute) => void;
-}) {
-  const { documents, isLoading, error } = useCollectionDocuments(
-    collection.name
-  );
-  const label = collection.label ?? collection.name;
-  if (error) {
-    return (
-      <p className='px-2 py-1.5 text-sm text-destructive'>
-        Could not load {label}. {error.message}
-      </p>
-    );
-  }
-  if (isLoading) {
-    return (
-      <p className='px-2 py-1.5 text-sm text-muted-foreground'>Loading…</p>
-    );
-  }
-  if (documents.length === 0) {
-    return (
-      <p className='px-2 py-1.5 text-sm text-muted-foreground'>
-        No documents yet.
-      </p>
-    );
-  }
-  return (
-    <SidebarMenu aria-label={`${label} documents`}>
-      {documents.map(({ path }) => (
-        <SidebarMenuItem key={path}>
-          <SidebarMenuButton
-            isActive={path === activePath}
-            aria-label={documentName(path)}
-            className={ENTRY_CLASS}
-            onClick={() =>
-              navigate({ view: 'document', collection: collection.name, path })
-            }
-          >
-            <Icon glyph='doc' size={16} />
-            <span className='flex-1 truncate'>{documentName(path)}</span>
-            <NavDocumentStatus formId={toFormId(path)} />
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
-  );
-}
-
-function GlobalNavMenu({
-  entries,
-  activeScreen,
-  navigate,
-  label,
-  labelledBy,
-}: {
-  entries: GlobalNavEntry[];
-  activeScreen?: string;
-  navigate: (route: AdminRoute) => void;
-  label?: string;
-  labelledBy?: string;
-}) {
-  const open = (target: NavTarget) => {
-    if (target.kind === 'screen') {
-      navigate({ view: 'screen', screen: target.screen, segments: [] });
-    } else if (target.kind === 'action') {
-      target.run();
-    }
-  };
-  return (
-    <SidebarMenu aria-label={label} aria-labelledby={labelledBy}>
-      {entries.map(({ label, icon: NavIcon, target }, index) => (
-        <SidebarMenuItem key={`${index}:${label}`}>
-          <SidebarMenuButton
-            isActive={
-              target.kind === 'screen' && target.screen === activeScreen
-            }
-            className={ENTRY_CLASS}
-            render={
-              target.kind === 'url' ? (
-                <a
-                  href={target.href}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                />
-              ) : undefined
-            }
-            onClick={() => open(target)}
-          >
-            <NavIcon className='size-4' />
-            <span>{label}</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
-  );
-}
-
-function GlobalNav({
-  sections,
-  activeScreen,
-  navigate,
-}: {
-  sections: GlobalNavSection[];
-  activeScreen?: string;
-  navigate: (route: AdminRoute) => void;
-}) {
-  const labelPrefix = useId();
-  const firstUngrouped = sections.findIndex(({ group }) => !group);
-  return sections.map(({ group, entries }, index) => {
-    const labelId = group ? `${labelPrefix}-${index}` : undefined;
-    return (
-      <SidebarGroup key={group ? `group:${group.id}` : `entries:${index}`}>
-        {group ? (
-          <SidebarGroupLabel id={labelId}>{group.label}</SidebarGroupLabel>
-        ) : null}
-        <GlobalNavMenu
-          entries={entries}
-          activeScreen={activeScreen}
-          navigate={navigate}
-          label={index === firstUngrouped ? 'Global navigation' : undefined}
-          labelledBy={labelId}
-        />
-      </SidebarGroup>
-    );
-  });
+  return <screen.component key={screen.name} segments={segments} />;
 }
 
 function ScreenOutlet({
@@ -266,6 +115,28 @@ function ScreenOutlet({
   );
 }
 
+// Home has no panel header and no Close: there is nowhere to close to. The
+// frame scrolls the screen and adds no padding, as the general outlet does.
+function HomeOutlet({
+  screen,
+  segments,
+}: {
+  screen: AdminScreen | undefined;
+  segments: string[];
+}) {
+  return (
+    <SidebarInset className='min-w-0'>
+      {screen ? (
+        <div data-slot='home-frame' className='min-h-0 flex-1 overflow-y-auto'>
+          <screen.component segments={segments} />
+        </div>
+      ) : (
+        <Placeholder>Pick a place from the sidebar.</Placeholder>
+      )}
+    </SidebarInset>
+  );
+}
+
 function PreviewFrame({ src }: { src: string }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   usePreviewConnection(iframeRef);
@@ -279,13 +150,51 @@ function PreviewFrame({ src }: { src: string }) {
   );
 }
 
+// The page being previewed: the document's place and, for a preview URL, the URL.
+function PreviewHeader({ url }: { url?: string }) {
+  const scope = use(FormScopeContext);
+  if (!scope) return null;
+  const collectionLabel = scope.collection.label ?? scope.collection.name;
+  return (
+    <div className='flex h-11 flex-none items-center gap-3 border-b border-border-subtle bg-card pr-4 pl-2'>
+      <Breadcrumb
+        size='sm'
+        aria-label='Preview location'
+        items={[
+          { label: collectionLabel },
+          { label: scope.path.split('/').at(-1) ?? scope.path },
+        ]}
+      />
+      {url ? (
+        <span className='ml-auto min-w-0 truncate font-mono text-xs text-muted-foreground'>
+          {url}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 function PreviewSlot({ preview }: { preview?: ReactNode }) {
   if (!use(FormScopeContext)) {
     return <Placeholder>Select a document to edit.</Placeholder>;
   }
-  if (typeof preview === 'string') return <PreviewFrame src={preview} />;
-  return <>{preview ?? <Placeholder>No preview configured.</Placeholder>}</>;
+  const url = typeof preview === 'string' ? preview : undefined;
+  return (
+    <div className='flex size-full min-h-0 flex-col'>
+      <PreviewHeader url={url} />
+      <div className='min-h-0 flex-1'>
+        {url !== undefined ? (
+          <PreviewFrame src={url} />
+        ) : (
+          (preview ?? <Placeholder>No preview configured.</Placeholder>)
+        )}
+      </div>
+    </div>
+  );
 }
+
+// Only the views that have content show. Fields is the one view today.
+const FORM_TABS = [{ value: 'fields', label: 'Fields' }] as const;
 
 function FormColumnSkeleton() {
   return (
@@ -310,6 +219,10 @@ function FormColumn({
   const { width, isResizing, handleProps } = useFormColumnWidth();
   const scope = use(FormScopeContext);
   const seedKey = scope?.seedKey;
+  // Only objects and lists have cards to open or close.
+  const expandable = (collection?.fields ?? []).some(
+    (field) => field.type === 'object' || field.type === 'array'
+  );
 
   const [mountedSeedKey, setMountedSeedKey] = useState<string | undefined>(
     undefined
@@ -323,30 +236,60 @@ function FormColumn({
     <>
       <aside
         aria-label='Document form'
-        className='flex min-w-0 shrink-0 flex-col overflow-y-auto border-r border-border'
+        className='flex min-w-0 shrink-0 flex-col overflow-hidden border-r border-border'
         style={{ width }}
       >
         {collection ? (
           <PanelHeader
-            backLabel={collection.label ?? collection.name}
-            backTitle='Back to the collection'
+            backLabel='Return to navigator'
+            backTitle={`Back to ${collection.label ?? collection.name}`}
             onBack={onBack}
+            menuLabel='Document menu'
+            menu={
+              openPath === undefined ? undefined : (
+                <>
+                  <DropdownMenuItem onClick={() => copyFilePath(openPath)}>
+                    Copy file path
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={!expandable}
+                    onClick={() => scope?.view.getState().setExpansion(true)}
+                  >
+                    Expand all
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={!expandable}
+                    onClick={() => scope?.view.getState().setExpansion(false)}
+                  >
+                    Collapse all
+                  </DropdownMenuItem>
+                </>
+              )
+            }
           />
         ) : (
           <PanelHeader heading='Document' />
         )}
-        <div className='p-4'>
-          {openPath === undefined ? (
-            <p className='mb-2 text-sm text-muted-foreground'>
-              Select a document to edit
-            </p>
-          ) : null}
-          {mountedSeedKey === seedKey ? (
-            <DocumentForm key={seedKey} />
-          ) : (
-            <FormColumnSkeleton />
-          )}
-        </div>
+        <Tabs
+          tabs={FORM_TABS}
+          aria-label='Document views'
+          className='min-h-0 flex-1'
+        >
+          <TabsPanel value='fields' className='flex min-h-0 flex-1 flex-col'>
+            {openPath === undefined ? (
+              <p className='p-4 text-sm text-muted-foreground'>
+                Select a document to edit
+              </p>
+            ) : null}
+            {mountedSeedKey === seedKey ? (
+              <DocumentForm key={seedKey} />
+            ) : (
+              <div className='p-4'>
+                <FormColumnSkeleton />
+              </div>
+            )}
+          </TabsPanel>
+        </Tabs>
       </aside>
 
       <div
@@ -371,12 +314,14 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
   return (
     <AdminErrorBoundary>
       <TinaProvider config={config} queryClient={queryClient}>
-        <HashRouter>
-          <AuthGate>
-            <AdminShell preview={preview} projectName={config.projectName} />
-          </AuthGate>
-        </HashRouter>
-        <ShellToaster />
+        <TooltipProvider>
+          <HashRouter>
+            <AuthGate>
+              <AdminShell preview={preview} projectName={config.projectName} />
+            </AuthGate>
+          </HashRouter>
+          <ShellToaster />
+        </TooltipProvider>
       </TinaProvider>
     </AdminErrorBoundary>
   );
@@ -384,23 +329,93 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
 
 // Toasts sit above the Save progress card while it shows.
 const TOAST_OFFSET_ABOVE_CARD = { bottom: '8rem' };
+// Toasts clear the form bar when one would sit under them.
+const TOAST_OFFSET_ABOVE_BAR = { bottom: '7rem' };
+// Elsewhere toasts sit 16px above the 28px Status bar.
+const TOAST_OFFSET_LOW = { bottom: '44px' };
+// The widest toast (the Resume prompt with its buttons inline) and the Toaster's
+// right inset decide whether a toast can reach the form bar.
+const TOAST_WIDEST_PX = 480;
+const TOAST_RIGHT_PX = 24;
+// Below the dialog layer, so a Confirm dims the toasts behind it.
+const TOAST_LAYER = { zIndex: 40 };
+// With the on-screen keyboard open the toast would cover the field being typed in.
+const TOAST_HIDDEN = { ...TOAST_LAYER, visibility: 'hidden' } as const;
+
+// The Toaster renders outside the shell, so it reads the form bar from the page.
+function useFormBarUnderToast(): boolean {
+  const [under, setUnder] = useState(false);
+  useEffect(() => {
+    const measure = () => {
+      const bar = document.querySelector('[data-slot=form-bar]');
+      setUnder(
+        bar !== null &&
+          bar.getBoundingClientRect().right >
+            window.innerWidth - TOAST_RIGHT_PX - TOAST_WIDEST_PX
+      );
+    };
+    const observer = new ResizeObserver(measure);
+    // Collapsing the sidebar moves the form bar without resizing it, so the
+    // sidebar's gap is watched too.
+    let watched: (Element | null)[] = [];
+    const watch = () => {
+      const next = [
+        document.querySelector('[data-slot=form-bar]'),
+        document.querySelector('[data-slot=sidebar-gap]'),
+      ];
+      if (next.every((element, index) => element === watched[index])) return;
+      observer.disconnect();
+      watched = next;
+      for (const element of next) {
+        if (element) observer.observe(element);
+      }
+      measure();
+    };
+    watch();
+    // The form bar mounts and unmounts with the open document.
+    const mutations = new MutationObserver(watch);
+    mutations.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      mutations.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+  return under;
+}
 
 function ShellToaster() {
   const cardShowing = useLongSave();
-  return <Toaster offset={cardShowing ? TOAST_OFFSET_ABOVE_CARD : undefined} />;
+  const keyboardOpen = useKeyboardOpen();
+  const barUnder = useFormBarUnderToast();
+  const offset = cardShowing
+    ? TOAST_OFFSET_ABOVE_CARD
+    : barUnder
+      ? TOAST_OFFSET_ABOVE_BAR
+      : TOAST_OFFSET_LOW;
+  return (
+    <Toaster
+      offset={offset}
+      mobileOffset={offset}
+      style={keyboardOpen ? TOAST_HIDDEN : TOAST_LAYER}
+    />
+  );
 }
 
 function MissingPanel({
   title,
   onClose,
+  hideBelowLg = false,
   children,
 }: {
   title: string;
   onClose: () => void;
+  hideBelowLg?: boolean;
   children: ReactNode;
 }) {
   return (
-    <SidebarInset className='min-w-0'>
+    <SidebarInset className={hideBelowLg ? 'min-w-0 max-lg:hidden' : 'min-w-0'}>
       <PanelHeader heading={title} closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto'>
         <Placeholder>{children}</Placeholder>
@@ -423,15 +438,46 @@ function AdminShell({
   const globalNav = useGlobalNav();
   const { route, navigate } = useAdminRoute();
 
+  const isMediaRoute =
+    route.view === 'media' ||
+    (route.view === 'screen' && route.screen === MEDIA_SCREEN);
+
+  // The main area keeps the last route that was not Media; a deep link to Media shows Home.
+  const [lastMain, setLastMain] = useState<AdminRoute>(HOME_ROUTE);
+  useEffect(() => {
+    if (!isMediaRoute) setLastMain(route);
+  }, [route, isMediaRoute]);
+  const mainRoute = isMediaRoute ? lastMain : route;
+  useKeptEditsNotice(mainRoute, navigate);
+
+  const [maximised, setMaximised] = useState(false);
+  useEffect(() => {
+    if (!isMediaRoute) setMaximised(false);
+  }, [isMediaRoute]);
+
   const activeCollectionName =
-    route.view === 'collection' || route.view === 'document'
-      ? route.collection
+    mainRoute.view === 'collection' || mainRoute.view === 'document'
+      ? mainRoute.collection
       : undefined;
   const collection = schema.collections.find(
     (candidate) => candidate.name === activeCollectionName
   );
-  const openPath = route.view === 'document' ? route.path : undefined;
-  const activeScreen = route.view === 'screen' ? route : undefined;
+  const openPath = mainRoute.view === 'document' ? mainRoute.path : undefined;
+  const homeScreen = screens.find(({ name }) => name === HOME_SCREEN);
+  // `#/screens/home` draws Home as `#/` does. With Home removed, it falls to
+  // the general outlet, which says that no screen has that name.
+  const homeSegments =
+    mainRoute.view === 'home'
+      ? []
+      : mainRoute.view === 'screen' &&
+          mainRoute.screen === HOME_SCREEN &&
+          homeScreen
+        ? mainRoute.segments
+        : undefined;
+  const activeScreen =
+    mainRoute.view === 'screen' && homeSegments === undefined
+      ? mainRoute
+      : undefined;
   const isStaleCollectionRoute =
     activeCollectionName !== undefined && collection === undefined;
 
@@ -450,6 +496,32 @@ function AdminShell({
     openEntry === null;
 
   const goToCollections = () => navigate(COLLECTIONS_ROUTE);
+  const goHome = () => navigate(HOME_ROUTE);
+  const hasMediaScreen = screens.some(({ name }) => name === MEDIA_SCREEN);
+  const mediaScreen = screens.find(({ name }) => name === MEDIA_SCREEN);
+  const mediaSegments = route.view === 'screen' ? route.segments : [];
+  const closeMedia = () => navigate(lastMain);
+
+  // The navigator keeps the last opened document selected after Back.
+  const [lastOpen, setLastOpen] = useState<{
+    collection: string;
+    path: string;
+  } | null>(null);
+  useEffect(() => {
+    if (route.view === 'document') {
+      setLastOpen({ collection: route.collection, path: route.path });
+    }
+  }, [route]);
+  const selectedPath =
+    openPath ??
+    (lastOpen && lastOpen.collection === activeCollectionName
+      ? lastOpen.path
+      : undefined);
+  const mainShowsNavigator =
+    mainRoute.view === 'collections' ||
+    mainRoute.view === 'collection' ||
+    (mainRoute.view === 'document' && collection === undefined);
+  const showNavigator = !isMediaRoute && mainShowsNavigator;
 
   return (
     <SidebarProvider
@@ -457,6 +529,7 @@ function AdminShell({
       className='h-svh min-h-0 flex-col overflow-hidden'
     >
       <ShellTopBar projectName={projectName} />
+      <UploadHost primary />
 
       <div className='flex min-h-0 flex-1'>
         <Sidebar
@@ -465,103 +538,114 @@ function AdminShell({
           collapsible='icon'
           className={BETWEEN_BARS}
         >
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Collections</SidebarGroupLabel>
-              <CollectionMenu
-                collections={schema.collections}
-                activeName={collection?.name}
-                navigate={navigate}
-              />
-            </SidebarGroup>
-
-            {isStaleCollectionRoute ? (
-              <Placeholder>
-                No collection named “{activeCollectionName}”.
-              </Placeholder>
-            ) : null}
-
-            {collection ? (
-              <SidebarGroup>
-                <SidebarGroupLabel>
-                  {collection.label ?? collection.name}
-                </SidebarGroupLabel>
-                <DocumentMenu
-                  collection={collection}
-                  activePath={openPath}
-                  navigate={navigate}
-                />
-              </SidebarGroup>
-            ) : null}
-
-            <GlobalNav
-              sections={globalNav}
-              activeScreen={activeScreen?.screen}
-              navigate={navigate}
-            />
-          </SidebarContent>
-
-          <SidebarFooter>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  render={
-                    <a
-                      href={DOCS_URL}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                    />
-                  }
-                >
-                  <Icon glyph='info' size={16} />
-                  <span>Help &amp; docs</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarFooter>
+          <AdminRail
+            route={route}
+            navigate={navigate}
+            sections={globalNav}
+            hasMediaScreen={hasMediaScreen}
+          />
         </Sidebar>
 
-        {activeScreen ? (
-          <ScreenOutlet
-            name={activeScreen.screen}
-            screen={screens.find(
-              (candidate) => candidate.name === activeScreen.screen
-            )}
-            segments={activeScreen.segments}
-            onClose={goToCollections}
-          />
-        ) : isStaleDocumentRoute ? (
-          <MissingPanel title='Document not found' onClose={goToCollections}>
-            No document named “{openPath}”.
-          </MissingPanel>
-        ) : openPath !== undefined && openDocumentError !== null ? (
-          <MissingPanel title='Cannot open document' onClose={goToCollections}>
-            <span role='alert'>
-              Cannot read “{openPath}”. {openDocumentError.message}
-            </span>
-          </MissingPanel>
-        ) : (
-          <DocumentScope collection={collection} path={openPath}>
-            <SidebarInset className='min-w-0 flex-row'>
-              <FormColumn
-                openPath={openPath}
-                collection={collection}
-                onBack={() =>
-                  collection
-                    ? navigate({
-                        view: 'collection',
-                        collection: collection.name,
-                      })
-                    : goToCollections()
-                }
-              />
+        {isMediaRoute ? (
+          mediaScreen ? (
+            <MediaPaneShellContext
+              value={{
+                maximised,
+                toggleMaximise: () => setMaximised((current) => !current),
+                close: closeMedia,
+              }}
+            >
+              <MediaPaneSlot screen={mediaScreen} segments={mediaSegments} />
+            </MediaPaneShellContext>
+          ) : (
+            <MediaPanel onClose={closeMedia} />
+          )
+        ) : null}
 
-              <div className='min-w-0 flex-1'>
-                <PreviewSlot preview={preview} />
-              </div>
+        {showNavigator ? (
+          <CollectionsNavigator
+            collections={schema.collections}
+            selectedPath={selectedPath}
+            route={route}
+            navigate={navigate}
+            onClose={goHome}
+            hideBelowLg={isStaleCollectionRoute}
+          />
+        ) : null}
+
+        {route.view === 'tools' ? <ToolsPane onClose={goHome} /> : null}
+
+        {route.view === 'settings' ? <SettingsPane onClose={goHome} /> : null}
+
+        <div
+          className={
+            isMediaRoute
+              ? maximised
+                ? 'hidden'
+                : 'contents max-lg:hidden'
+              : 'contents'
+          }
+        >
+          {activeScreen ? (
+            <ScreenOutlet
+              name={activeScreen.screen}
+              screen={screens.find(
+                (candidate) => candidate.name === activeScreen.screen
+              )}
+              segments={activeScreen.segments}
+              onClose={goHome}
+            />
+          ) : homeSegments ? (
+            <HomeOutlet screen={homeScreen} segments={homeSegments} />
+          ) : mainRoute.view === 'tools' || mainRoute.view === 'settings' ? (
+            <SidebarInset className='min-w-0'>
+              <Placeholder>Pick an entry to open it.</Placeholder>
             </SidebarInset>
-          </DocumentScope>
-        )}
+          ) : isStaleCollectionRoute ? (
+            <MissingPanel title='Collection not found' onClose={goHome}>
+              No collection named “{activeCollectionName}”.
+            </MissingPanel>
+          ) : isStaleDocumentRoute ? (
+            <MissingPanel title='Document not found' onClose={goHome}>
+              No document named “{openPath}”.
+            </MissingPanel>
+          ) : openPath !== undefined && openDocumentError !== null ? (
+            <MissingPanel title='Cannot open document' onClose={goHome}>
+              <span role='alert'>
+                Cannot read “{openPath}”. {openDocumentError.message}
+              </span>
+            </MissingPanel>
+          ) : mainShowsNavigator ? (
+            <DocumentScope collection={collection} path={undefined}>
+              <SidebarInset className='min-w-0'>
+                <PreviewSlot preview={preview} />
+              </SidebarInset>
+            </DocumentScope>
+          ) : (
+            <DocumentScope collection={collection} path={openPath}>
+              <SidebarInset className='relative min-w-0 flex-row'>
+                <FormColumn
+                  openPath={openPath}
+                  collection={collection}
+                  onBack={() =>
+                    collection
+                      ? navigate({
+                          view: 'collection',
+                          collection: collection.name,
+                        })
+                      : goToCollections()
+                  }
+                />
+
+                <DocumentErrorPane />
+
+                <div data-preview-slot='' className='min-w-0 flex-1'>
+                  <PreviewSlot preview={preview} />
+                </div>
+              </SidebarInset>
+            </DocumentScope>
+          )}
+        </div>
       </div>
 
       <ShellStatusBar />

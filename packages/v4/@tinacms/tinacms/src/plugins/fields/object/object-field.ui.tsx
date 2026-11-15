@@ -3,6 +3,7 @@ import { useWatch } from 'react-hook-form';
 import {
   NestedFieldRow,
   useActivation,
+  useExpansion,
   useFieldAddress,
   useFieldFrame,
   useFieldSchema,
@@ -62,6 +63,11 @@ function FieldGroup() {
   const activation = useActivation();
   const [open, setOpen] = useState(false);
   const isOpenLevel = useIsOpenLevel();
+  const expansion = useExpansion();
+
+  useEffect(() => {
+    if (expansion.version > 0) setOpen(expansion.open);
+  }, [expansion]);
 
   useEffect(() => {
     const target = activation?.address;

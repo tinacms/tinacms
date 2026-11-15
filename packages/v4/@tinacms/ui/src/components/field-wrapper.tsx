@@ -39,7 +39,7 @@ function FieldMessage({
         size={14}
         className='mt-0.5 flex-none'
       />
-      <span className='min-w-0'>{children}</span>
+      <span className='min-w-0 wrap-anywhere'>{children}</span>
     </p>
   );
 }
