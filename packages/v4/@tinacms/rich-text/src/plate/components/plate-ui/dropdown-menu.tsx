@@ -13,7 +13,7 @@ import {
 import { cva } from 'class-variance-authority';
 
 import { Icons } from './icons';
-import { useVisualViewportBoundary } from './visual-viewport-boundary';
+import { visualViewportBoundary } from './visual-viewport-boundary';
 
 export const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -58,7 +58,7 @@ export const DropdownMenuSubContent = withRef<
 >((props, ref) => (
   <DropdownMenuSubContentBase
     ref={ref}
-    collisionBoundary={useVisualViewportBoundary()}
+    collisionBoundary={visualViewportBoundary()}
     collisionPadding={8}
     {...props}
   />
@@ -78,7 +78,7 @@ export const DropdownMenuContent = withRef<
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuContentVariants
       ref={ref}
-      collisionBoundary={useVisualViewportBoundary()}
+      collisionBoundary={visualViewportBoundary()}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>

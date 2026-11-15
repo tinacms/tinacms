@@ -84,7 +84,6 @@ const InLineButton = ({
   }
 };
 
-/** The Formatting toolbar: the text style, the in-line tools, More formatting and Insert. In-line tools fold into More tools from the end as the toolbar narrows. */
 export default function FixedToolbarButtons({
   disabled = false,
 }: {
@@ -111,14 +110,19 @@ export default function FixedToolbarButtons({
   const off = disabled || inCodeBlock;
   const hasMoreFormatting = layout.moreFormatting.length > 0;
 
-  const fixed =
+  const fixedBase =
     (layout.textStyle ? (wide ? TEXT_STYLE_WIDTH : TEXT_STYLE_ICON_WIDTH) : 0) +
     (hasMoreFormatting ? MORE_FORMATTING_WIDTH : 0) +
     (layout.showInsert ? INSERT_WIDTH + SEPARATOR_WIDTH : 0) +
-    (layout.textStyle && layout.inLine.length > 0 ? SEPARATOR_WIDTH : 0) +
-    (layout.inLine.length > 0 && hasMoreFormatting ? SEPARATOR_WIDTH : 0);
-  const room = Math.max(0, Math.floor((width - fixed) / toolWidth));
+    (layout.textStyle && layout.inLine.length > 0 ? SEPARATOR_WIDTH : 0);
   const all = layout.inLine.length;
+  const roomWithoutDivider = Math.floor((width - fixedBase) / toolWidth);
+  const allFit = roomWithoutDivider >= all && !hasMoreFormatting;
+  const room = allFit
+    ? roomWithoutDivider
+    : Math.floor(
+        (width - fixedBase - (all > 0 ? SEPARATOR_WIDTH : 0)) / toolWidth
+      );
   const shown = room >= all ? all : Math.max(0, room - 1);
   const inLine = layout.inLine.slice(0, shown);
   const folded = layout.inLine.slice(shown);

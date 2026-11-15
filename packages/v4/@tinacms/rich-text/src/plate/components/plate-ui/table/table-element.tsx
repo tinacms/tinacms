@@ -47,7 +47,7 @@ const TableBody = withRef<typeof PlateElement, { table: TTableElement }>(
       >
         <div
           className={cn(
-            'group/table relative w-full',
+            'group/table relative w-fit min-w-full',
             !readOnly && 'pt-7 pr-7 pb-7 pl-7'
           )}
         >
@@ -60,7 +60,7 @@ const TableBody = withRef<typeof PlateElement, { table: TTableElement }>(
           >
             <tbody className='min-w-full'>{children}</tbody>
           </table>
-          {!readOnly && active && <TableAddButtons table={table} />}
+          {!readOnly && active ? <TableAddButtons table={table} /> : null}
         </div>
       </PlateElement>
     );

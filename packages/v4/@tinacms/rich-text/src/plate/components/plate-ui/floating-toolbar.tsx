@@ -33,7 +33,12 @@ export const FloatingToolbar = withRef<
   const focusedEditorId = useEventEditorValue('focus');
   const { overrides } = useToolbarContext();
   const inTable = useEditorSelector(
-    (e) => helpers.isNodeActive(e, TablePlugin.key),
+    (e) =>
+      helpers.isNodeActive(e, TablePlugin) ||
+      (e.selection !== null &&
+        [e.selection.anchor, e.selection.focus].some((at) =>
+          e.api.above({ at, match: { type: e.getType(TablePlugin) } })
+        )),
     []
   );
   const inLink = useEditorSelector(

@@ -31,6 +31,7 @@ import {
   DropdownMenuSubTrigger,
 } from './dropdown-menu';
 import { Icons } from './icons';
+import { MenuIcon } from './menu-icon';
 import { ToolbarButton } from './toolbar';
 
 type MarkButtonProps = {
@@ -117,7 +118,11 @@ export const StrikethroughMenuItem = ({ disabled }: { disabled?: boolean }) => (
     nodeType={StrikethroughPlugin.key}
     label='Strikethrough'
     shortcut='⌘⇧X'
-    icon={<Icons.strikethrough />}
+    icon={
+      <MenuIcon>
+        <Icons.strikethrough />
+      </MenuIcon>
+    }
     disabled={disabled}
   />
 );
@@ -127,7 +132,11 @@ export const CodeMenuItem = ({ disabled }: { disabled?: boolean }) => (
     nodeType={CodePlugin.key}
     label='Code'
     shortcut='⌘E'
-    icon={<Icons.code />}
+    icon={
+      <MenuIcon>
+        <Icons.code />
+      </MenuIcon>
+    }
     disabled={disabled}
   />
 );
@@ -252,7 +261,6 @@ const SwatchSub = ({
   );
 };
 
-/** Highlight color and Text color rows for More formatting. They apply to the selection saved when the menu opened. */
 export const ColorSubMenus = ({
   showHighlight,
   showTextColor,
@@ -280,7 +288,11 @@ export const ColorSubMenus = ({
         <SwatchSub
           label='Highlight color'
           clearLabel='Clear highlight'
-          icon={<Icons.highlight className='size-4' aria-hidden />}
+          icon={
+            <MenuIcon>
+              <Icons.highlight />
+            </MenuIcon>
+          }
           colors={highlightColors}
           currentValue={marks?.highlightColor}
           toMarks={toHighlightMarks}
@@ -292,7 +304,11 @@ export const ColorSubMenus = ({
         <SwatchSub
           label='Text color'
           clearLabel='Clear text color'
-          icon={<Icons.textColor className='size-4' aria-hidden />}
+          icon={
+            <MenuIcon>
+              <Icons.textColor />
+            </MenuIcon>
+          }
           colors={textColors}
           currentValue={marks?.textColor}
           toMarks={toTextColorMarks}

@@ -42,6 +42,15 @@ function useStuck(
   return on && stuck;
 }
 
+const focusIsOnToolbar = (shell: HTMLElement | null) => {
+  const active = document.activeElement;
+  return (
+    !!active &&
+    (!!shell?.contains(active) ||
+      !!active.closest('[role="menu"], [role="dialog"]'))
+  );
+};
+
 const editorHasFocus = (box: HTMLElement | null | undefined) => {
   const active = document.activeElement;
   return (
@@ -52,7 +61,10 @@ const editorHasFocus = (box: HTMLElement | null | undefined) => {
   );
 };
 
-function useEditorFocus(box: HTMLElement | null | undefined) {
+function useEditorFocus(
+  box: HTMLElement | null | undefined,
+  hasFocus: (box: HTMLElement | null) => boolean = editorHasFocus
+) {
   return React.useSyncExternalStore(
     (notify) => {
       document.addEventListener('focusin', notify);
@@ -62,7 +74,7 @@ function useEditorFocus(box: HTMLElement | null | undefined) {
         document.removeEventListener('focusout', notify);
       };
     },
-    () => editorHasFocus(box),
+    () => hasFocus(box ?? null),
     () => false
   );
 }
@@ -84,7 +96,13 @@ export function FixedToolbar({
   const tier = useTier();
   const keyboardOpen = useKeyboardOpen();
   const editorFocused = useEditorFocus(box);
-  const lifted = body && tier === 'phone' && keyboardOpen && editorFocused;
+  const wasLifted = React.useRef(false);
+  const toolbarFocused = useEditorFocus(shell.current, focusIsOnToolbar);
+  const phoneBody = body && tier === 'phone';
+  const lifted =
+    phoneBody &&
+    ((keyboardOpen && editorFocused) || (wasLifted.current && toolbarFocused));
+  wasLifted.current = lifted;
   const stuck = useStuck(sentinel, body);
   const inset = useKeyboardInset(lifted);
 
@@ -113,6 +131,15 @@ export function FixedToolbar({
         data-stuck={stuck || lifted ? '' : undefined}
         data-lifted={lifted ? '' : undefined}
         style={lifted ? { bottom: inset } : undefined}
+        onMouseDown={(event) => {
+          if (
+            phoneBody &&
+            event.target instanceof Element &&
+            event.target.closest('button')
+          ) {
+            event.preventDefault();
+          }
+        }}
         className={cn(
           'z-30 w-full bg-background p-1',
           body

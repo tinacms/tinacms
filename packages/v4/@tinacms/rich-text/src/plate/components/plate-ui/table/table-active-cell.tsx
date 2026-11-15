@@ -26,7 +26,6 @@ const ActiveTableCellContext = createContext<ActiveTableCell | null>(null);
 
 export const useActiveTableCell = () => useContext(ActiveTableCellContext);
 
-/** The cell holding the selection's focus, as the table's row and column handles follow it. */
 export function ActiveTableCellProvider({
   table,
   children,

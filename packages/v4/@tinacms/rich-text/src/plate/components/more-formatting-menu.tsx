@@ -17,7 +17,6 @@ import {
   StrikethroughMenuItem,
 } from './plate-ui/mark-toolbar-button';
 
-/** The More formatting trigger: Strikethrough, Code, Highlight color and Text color, limited to `tools`. */
 export function MoreFormattingMenu({
   tools,
   disabled = false,

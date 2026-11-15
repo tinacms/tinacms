@@ -95,6 +95,23 @@ export function CodeBlockCombobox({
   onLanguageChange,
 }: CodeBlockComboboxProps) {
   const [open, setOpen] = useState(false);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+
+  React.useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!open || !viewport) return;
+    const keepTriggerAboveKeyboard = () => {
+      const trigger = triggerRef.current;
+      if (!trigger || window.innerHeight - viewport.height < 120) return;
+      if (trigger.getBoundingClientRect().bottom + 240 > viewport.height) {
+        trigger.scrollIntoView({ block: 'start' });
+      }
+    };
+    keepTriggerAboveKeyboard();
+    viewport.addEventListener('resize', keepTriggerAboveKeyboard);
+    return () =>
+      viewport.removeEventListener('resize', keepTriggerAboveKeyboard);
+  }, [open]);
   const readOnly = useReadOnly();
   const element = useElement<TCodeBlockElement>();
   const value = element.lang || 'plaintext';
@@ -116,6 +133,7 @@ export function CodeBlockCombobox({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild tabIndex={-1}>
         <Button
+          ref={triggerRef}
           tabIndex={-1}
           size='none'
           variant='ghost'

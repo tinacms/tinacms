@@ -232,6 +232,24 @@ test.describe('with the keyboard up at 390px', () => {
     );
   });
 
+  test('AC21: a language list opened with the keyboard already up stays above it', async ({
+    page,
+  }) => {
+    const picker = page
+      .getByRole('combobox', { name: 'Code language' })
+      .first();
+    await body(page).getByText('Body paragraph 1 keeps').first().tap();
+    await setKeyboardHeight(page, KEYBOARD_TOP);
+    await picker.evaluate((el) => el.scrollIntoView({ block: 'end' }));
+    await picker.tap();
+    await page.keyboard.type('pyth');
+    const row = page.getByRole('option').first();
+    await expect(row).toBeVisible();
+    const box = await row.boundingBox();
+    if (!box) throw new Error('row not drawn');
+    expect(box.y + box.height).toBeLessThanOrEqual(KEYBOARD_TOP);
+  });
+
   test('AC21: the link sheet stays above the keyboard and Cancel returns focus to the text', async ({
     page,
   }) => {
@@ -296,5 +314,230 @@ test.describe('nested rich text', () => {
       target.click();
     });
     await expect(page.getByRole('textbox', { name: /^Notes/ })).toBeFocused();
+  });
+});
+
+test.describe('blocked tools in a real browser', () => {
+  const ariaOff = async (locator: ReturnType<Page['locator']>) =>
+    (await locator.getAttribute('aria-disabled')) === 'true' ||
+    (await locator.isDisabled());
+
+  test('AC28: a table cell disables lists, quote and the blocked inserts for pointer and Enter', async ({
+    page,
+  }) => {
+    await page.goto(POST('long-post.mdx'));
+    await body(page).getByText('Ada').first().scrollIntoViewIfNeeded();
+    await body(page).getByText('Ada').first().click();
+    const tb = toolbar(page);
+    await tb.getByRole('button', { name: 'More tools...' }).click();
+    for (const name of ['Bulleted list', 'Numbered list', 'Quote']) {
+      await expect(
+        page.getByRole('dialog').getByRole('button', { name })
+      ).toBeDisabled();
+    }
+    await page.keyboard.press('Escape');
+    await tb.getByRole('button', { name: 'Insert' }).click();
+    for (const name of ['Code block', 'Mermaid', 'Horizontal rule']) {
+      const row = page.getByRole('menuitem', { name });
+      expect(await ariaOff(row)).toBe(true);
+      await row.focus();
+      await page.keyboard.press('Enter');
+    }
+    await expect(page.getByRole('menu', { name: 'Insert' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(body(page).locator('blockquote')).toHaveCount(0);
+    await tb.getByRole('button', { name: /^Text style/ }).click();
+    for (const heading of ['Heading 1', 'Heading 2']) {
+      await expect(
+        page.getByRole('menuitemradio', { name: heading })
+      ).toHaveAttribute('aria-disabled', 'true');
+    }
+    await page.keyboard.press('Escape');
+    await body(page).getByText('Ada').first().dblclick();
+    await expect(page.getByRole('button', { name: /^Text style/ })).toHaveCount(
+      1
+    );
+    const from = await body(page).getByText('Ada').first().boundingBox();
+    const to = await body(page).getByText('Lin').first().boundingBox();
+    if (!from || !to) throw new Error('cells not drawn');
+    await page.mouse.move(from.x + 4, from.y + 4);
+    await page.mouse.down();
+    await page.mouse.move(to.x + 20, to.y + 4, { steps: 8 });
+    await page.mouse.up();
+    await page.waitForTimeout(400);
+    await expect(page.getByRole('button', { name: /^Text style/ })).toHaveCount(
+      1
+    );
+  });
+
+  test('AC28: a code block disables every tool and menu trigger', async ({
+    page,
+  }) => {
+    await page.goto(POST('long-post.mdx'));
+    await body(page)
+      .getByText('const greeting')
+      .first()
+      .scrollIntoViewIfNeeded();
+    await body(page).getByText('const greeting').first().click();
+    const buttons = toolbar(page).getByRole('button');
+    for (const button of await buttons.all()) {
+      await expect(button).toBeDisabled();
+    }
+  });
+});
+
+test.describe('the More tools panel', () => {
+  test('closes after Link is applied from it', async ({ page }) => {
+    await page.goto(POST('long-post.mdx'));
+    await body(page).getByText('Body paragraph 1 keeps').first().dblclick();
+    await toolbar(page).getByRole('button', { name: 'More tools...' }).click();
+    const panel = page.getByRole('dialog', { name: 'More tools' });
+    await expect(panel).toBeVisible();
+    await page.getByRole('button', { name: 'Link', exact: true }).click();
+    await page.getByRole('textbox', { name: 'Link' }).fill('https://tina.io');
+    await page.getByRole('button', { name: 'OK' }).click();
+    await expect(panel).toBeHidden();
+  });
+
+  test('closes after a list is picked from it', async ({ page }) => {
+    await page.goto(POST('long-post.mdx'));
+    await body(page).getByText('Body paragraph 1 keeps').first().click();
+    await toolbar(page).getByRole('button', { name: 'More tools...' }).click();
+    const panel = page.getByRole('dialog', { name: 'More tools' });
+    await page.getByRole('button', { name: 'Bulleted list' }).click();
+    await expect(panel).toBeHidden();
+  });
+});
+
+test.describe('the phone keyboard toolbar', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+  });
+  const KEYBOARD_TOP = 500;
+
+  test.beforeEach(async ({ page }) => {
+    await fakeVisualViewport(page);
+    await page.goto(POST('long-post.mdx'));
+    await expect(body(page)).toBeVisible();
+  });
+
+  for (const tool of ['More tools...', 'Text style', 'Insert']) {
+    test(`one tap on ${tool} opens it, on screen, with the toolbar still on the keyboard`, async ({
+      page,
+    }) => {
+      await body(page).getByText('Body paragraph 1 keeps').first().tap();
+      await setKeyboardHeight(page, KEYBOARD_TOP);
+      const shell = page.locator('[data-slot="toolbar-shell"]').first();
+      await expect(shell).toHaveAttribute('data-lifted', '');
+      await toolbar(page)
+        .getByRole('button', {
+          name: new RegExp(`^${tool.replace('.', '\\.')}`),
+        })
+        .tap();
+      const opened = page
+        .getByRole('menu')
+        .or(page.getByRole('dialog', { name: 'More tools' }))
+        .first();
+      await expect(opened).toBeVisible();
+      await expect(shell).toHaveAttribute('data-lifted', '');
+      const box = await opened.boundingBox();
+      if (!box) throw new Error('panel not drawn');
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(390);
+      expect(box.y + box.height).toBeLessThanOrEqual(KEYBOARD_TOP);
+    });
+  }
+});
+
+test.describe('table controls in a real browser', () => {
+  test('Add a column sits past the table end and covers no cell', async ({
+    page,
+  }) => {
+    await page.goto(POST('long-post.mdx'));
+    await body(page).getByText('Ada').first().scrollIntoViewIfNeeded();
+    await body(page).getByText('Ada').first().click();
+    const add = page.getByRole('button', { name: 'Add a column' });
+    await expect(add).toBeVisible();
+    const strip = await add.boundingBox();
+    const cells = await body(page).locator('td').all();
+    for (const cell of cells) {
+      const box = await cell.boundingBox();
+      if (!strip || !box) throw new Error('not drawn');
+      const overlaps =
+        strip.x < box.x + box.width - 1 &&
+        strip.x + strip.width > box.x + 1 &&
+        strip.y < box.y + box.height &&
+        strip.y + strip.height > box.y;
+      expect(overlaps).toBe(false);
+    }
+  });
+
+  test('dragging across cells marks them aria-selected', async ({ page }) => {
+    await page.goto(POST('long-post.mdx'));
+    const from = body(page).getByText('Ada').first();
+    await from.scrollIntoViewIfNeeded();
+    const a = await from.boundingBox();
+    const b = await body(page).getByText('Lin').first().boundingBox();
+    if (!a || !b) throw new Error('cells not drawn');
+    await page.mouse.move(a.x + 4, a.y + 4);
+    await page.mouse.down();
+    await page.mouse.move(b.x + 20, b.y + 4, { steps: 8 });
+    await page.mouse.up();
+    await expect(
+      body(page).locator('td[aria-selected="true"]').first()
+    ).toBeVisible();
+  });
+
+  test('Delete row is disabled when only the header and one body row are left', async ({
+    page,
+  }) => {
+    await page.goto(POST('hello-world.mdx'));
+    await body(page).click();
+    await page.keyboard.press('ControlOrMeta+End');
+    await toolbar(page).getByRole('button', { name: 'Insert' }).click();
+    await page.getByRole('menuitem', { name: 'Table', exact: true }).click();
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('Enter');
+    await body(page).locator('td').first().click();
+    await page.getByRole('button', { name: /^Row \d+ actions$/ }).click();
+    await expect(
+      page.getByRole('menuitem', { name: 'Delete row' })
+    ).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  test.describe('at 375px', () => {
+    test.use({ viewport: { width: 375, height: 800 }, hasTouch: true });
+
+    test('the table size picker and its label stay on screen', async ({
+      page,
+    }) => {
+      await page.goto(POST('hello-world.mdx'));
+      await body(page).getByText('prose').first().tap();
+      await toolbar(page).getByRole('button', { name: 'Insert' }).tap();
+      const picker = page.getByRole('menuitem', { name: /by \d+ table$/ });
+      await expect(picker).toBeVisible();
+      const pickerBox = await picker.boundingBox();
+      if (!pickerBox) throw new Error('picker not drawn');
+      expect(pickerBox.x).toBeGreaterThanOrEqual(0);
+      expect(pickerBox.x + pickerBox.width).toBeLessThanOrEqual(375);
+      for (const key of [
+        'ArrowRight',
+        'ArrowRight',
+        'ArrowRight',
+        'ArrowRight',
+        'ArrowRight',
+        'ArrowRight',
+      ]) {
+        await picker.press(key);
+      }
+      await expect(picker).toHaveAccessibleName('Insert a 2 by 8 table');
+      const label = page.getByText(/^\d+ x \d+$/);
+      const labelBox = await label.first().boundingBox();
+      expect(
+        labelBox ? labelBox.x + labelBox.width : Number.NaN
+      ).toBeLessThanOrEqual(375);
+    });
   });
 });

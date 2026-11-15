@@ -1,8 +1,9 @@
+import type React from 'react';
 import { act, cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Value } from '@udecode/plate';
 import { Plate, PlateContent, usePlateEditor } from '@udecode/plate/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createEditorPlugins } from '../../../plugins/editor-plugins';
 import { Components } from '../../../plugins/ui/components';
 import { ToolbarProvider } from '../../../toolbar/toolbar-provider';
@@ -34,7 +35,9 @@ const Harness = ({
   value,
   readOnly,
   onEditor,
+  extra,
 }: {
+  extra?: React.ReactNode;
   value: Value;
   readOnly: boolean;
   onEditor: (editor: HarnessEditor) => void;
@@ -50,18 +53,20 @@ const Harness = ({
       <ToolbarProvider templates={[]} overrides={undefined}>
         <Plate editor={editor} readOnly={readOnly}>
           <PlateContent />
+          {extra}
         </Plate>
       </ToolbarProvider>
     </TooltipProvider>
   );
 };
 
-const mount = (value: Value, readOnly = false) => {
+const mount = (value: Value, readOnly = false, extra?: React.ReactNode) => {
   const ref: { editor?: HarnessEditor } = {};
   render(
     <Harness
       value={value}
       readOnly={readOnly}
+      extra={extra}
       onEditor={(editor) => {
         ref.editor = editor;
       }}
@@ -134,6 +139,54 @@ describe('table handles', () => {
     ).toHaveAttribute('aria-disabled', 'true');
   });
 
+  it('disables Delete row when deleting would leave only the header row', async () => {
+    const user = userEvent.setup();
+    const editor = mount(grid(2, 2));
+    await caretIn(editor, [0, 1, 0, 0, 0]);
+    await user.click(
+      await screen.findByRole('button', { name: 'Row 2 actions' })
+    );
+    expect(
+      await screen.findByRole('menuitem', { name: 'Delete row' })
+    ).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('keeps Delete row enabled with two body rows', async () => {
+    const user = userEvent.setup();
+    const editor = mount(grid(3, 2));
+    await caretIn(editor, [0, 1, 0, 0, 0]);
+    await user.click(
+      await screen.findByRole('button', { name: 'Row 2 actions' })
+    );
+    expect(
+      await screen.findByRole('menuitem', { name: 'Delete row' })
+    ).not.toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('anchors Add a column to a box that wraps the table and fits it', async () => {
+    const editor = mount(grid(2, 3));
+    await caretIn(editor, [0, 0, 0, 0, 0]);
+    const add = await screen.findByRole('button', { name: 'Add a column' });
+    const anchor = add.closest('.relative');
+    expect(anchor).toContainElement(document.querySelector('table'));
+    expect(anchor).toHaveClass('w-fit', 'min-w-full');
+  });
+
+  it('marks selected cells with aria-selected, colSpan and rowSpan', async () => {
+    const editor = mount(grid(2, 2));
+    await caretIn(editor, [0, 0, 0, 0, 0]);
+    await act(async () => {
+      editor.tf.select({
+        anchor: { path: [0, 0, 0, 0, 0], offset: 0 },
+        focus: { path: [0, 1, 1, 0, 0], offset: 1 },
+      });
+    });
+    const tds = document.querySelectorAll('td');
+    expect(tds[0]).toHaveAttribute('aria-selected', 'true');
+    expect(tds[0]).toHaveAttribute('colspan', '1');
+    expect(tds[0]).toHaveAttribute('rowspan', '1');
+  });
+
   it('offers the cell actions in a submenu that Escape closes alone', async () => {
     const user = userEvent.setup();
     const editor = mount(grid(2, 2));
@@ -204,5 +257,31 @@ describe('table size grid', () => {
     await user.keyboard('{Enter}');
     expect(rowCount()).toBe(3);
     expect(colCount()).toBe(3);
+  });
+
+  it('puts the grid inside the menu on a phone instead of a side submenu', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+    try {
+      mount(
+        [{ type: 'p', children: [{ text: 'x' }] }],
+        false,
+        <DropdownMenu open modal={false}>
+          <DropdownMenuContent>
+            <TableInsertSubMenu />
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+      expect(
+        await screen.findByRole('menuitem', { name: 'Insert a 2 by 2 table' })
+      ).toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Table' })).toBeNull();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

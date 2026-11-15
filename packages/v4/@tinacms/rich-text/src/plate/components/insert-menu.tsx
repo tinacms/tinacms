@@ -16,6 +16,7 @@ import {
 } from './plate-ui/dropdown-menu';
 import { insertHorizontalRule } from './plate-ui/hr-toolbar-button';
 import { Icons } from './plate-ui/icons';
+import { MenuIcon } from './plate-ui/menu-icon';
 import { insertMermaid } from './plate-ui/mermaid-toolbar-button';
 import { TableInsertSubMenu } from './plate-ui/table/table-dropdown-menu';
 import { ToolbarButton } from './plate-ui/toolbar';
@@ -23,16 +24,6 @@ import { useToolBlocked } from './use-tool-blocked';
 
 const TEMPLATE_COUNT_NEEDING_FILTER = 10;
 
-const MenuIcon = ({ children }: { children: React.ReactNode }) => (
-  <span
-    aria-hidden
-    className='flex size-4 shrink-0 items-center justify-center text-muted-foreground [&_svg]:size-full'
-  >
-    {children}
-  </span>
-);
-
-/** The Insert trigger and menu: the field's templates first, then the inserts, with a line between. */
 export function InsertMenu({
   inserts,
   templates: showTemplates,

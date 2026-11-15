@@ -33,19 +33,25 @@ const isListActive = (editor, type) => {
   return !!res && res.list[0].type === type;
 };
 
+type SeedNode = { id?: string; type?: string; children?: unknown[] };
+
 let seededNodeIds = 0;
 const TABLE_PARTS = new Set(['table', 'tr', 'td', 'th']);
 
-const withNodeIds = (node: any): any => {
+const withNodeIds = <T extends SeedNode>(node: T): T => {
   const withId = node.id ? node : { ...node, id: `seed-${++seededNodeIds}` };
-  if (!TABLE_PARTS.has(node.type) || !Array.isArray(node.children)) {
+  if (!node.type || !TABLE_PARTS.has(node.type) || !node.children) {
     return withId;
   }
-  return { ...withId, children: node.children.map(withNodeIds) };
+  return {
+    ...withId,
+    children: node.children.map((child) => withNodeIds(child as SeedNode)),
+  };
 };
 
-/** Table cells need ids too: the table plugin keys each cell's row and column by `id`. */
-const withRootNodeIds = (nodes: any[]) => nodes.map(withNodeIds);
+// Table rows and cells need ids: the table plugin keys each cell's row and column by `id`.
+const withRootNodeIds = <T extends SeedNode>(nodes: T[]): T[] =>
+  nodes.map(withNodeIds);
 
 const normalize = (node: any) => {
   if (

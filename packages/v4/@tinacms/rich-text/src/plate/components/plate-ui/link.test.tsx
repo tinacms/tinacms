@@ -3,11 +3,12 @@ import userEvent from '@testing-library/user-event';
 import type { Value } from '@udecode/plate';
 import { Plate, PlateContent, usePlateEditor } from '@udecode/plate/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createEditorPlugins } from '../../plugins/editor-plugins';
 import { Components } from '../../plugins/ui/components';
 import { ToolbarProvider } from '../../toolbar/toolbar-provider';
 import { LinkToolbarButton } from './link-toolbar-button';
+import { ToolRowContext } from './tool-row-context';
 import { Toolbar } from './toolbar';
 import { TooltipProvider } from './tooltip';
 
@@ -29,9 +30,11 @@ const linked = (url: string): Value => [
 const Harness = ({
   value,
   onEditor,
+  onRun,
 }: {
   value: Value;
   onEditor: (editor: HarnessEditor) => void;
+  onRun?: () => void;
 }) => {
   const editor = usePlateEditor({
     plugins: createEditorPlugins(),
@@ -44,7 +47,9 @@ const Harness = ({
       <ToolbarProvider templates={[]} overrides={undefined}>
         <Plate editor={editor}>
           <Toolbar>
-            <LinkToolbarButton />
+            <ToolRowContext.Provider value={onRun ? { onRun } : null}>
+              <LinkToolbarButton />
+            </ToolRowContext.Provider>
           </Toolbar>
           <PlateContent />
         </Plate>
@@ -53,9 +58,11 @@ const Harness = ({
   );
 };
 
-const mount = (value: Value) => {
+const mount = (value: Value, onRun?: () => void) => {
   let editor: HarnessEditor | undefined;
-  render(<Harness value={value} onEditor={(e) => (editor = e)} />);
+  render(
+    <Harness value={value} onEditor={(e) => (editor = e)} onRun={onRun} />
+  );
   if (!editor) throw new Error('editor not created');
   return editor;
 };
@@ -199,5 +206,131 @@ describe('Link bar', () => {
     expect(
       screen.getByRole('textbox', { name: 'Text to display' })
     ).toHaveValue('the docs');
+  });
+});
+
+const twoLinks: Value = [
+  {
+    type: 'p',
+    children: [
+      { text: 'a ' },
+      { type: 'a', url: 'https://a.io', children: [{ text: 'first' }] },
+      { text: ' b ' },
+      { type: 'a', url: 'https://b.io', children: [{ text: 'second' }] },
+      { text: ' c' },
+    ],
+  },
+];
+
+describe('Link bar edit state', () => {
+  it('does not carry an open edit onto the next link', async () => {
+    const user = userEvent.setup();
+    const editor = mount(twoLinks);
+    select(editor, [0, 1, 0], 2, 2);
+    await user.click(await screen.findByRole('button', { name: 'Edit link' }));
+    expect(screen.getByRole('textbox', { name: 'Link' })).toHaveValue(
+      'https://a.io'
+    );
+
+    select(editor, [0, 3, 0], 2, 2);
+
+    expect(await screen.findByRole('toolbar', { name: 'Link' })).toBeVisible();
+    expect(screen.queryByRole('textbox', { name: 'Link' })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Edit link' }));
+    const input = screen.getByRole('textbox', { name: 'Link' });
+    expect(input).toHaveValue('https://b.io');
+    await user.clear(input);
+    await user.type(input, 'https://new.io');
+    await user.click(screen.getByRole('button', { name: 'OK' }));
+
+    const urls = linkNodes(editor).map(
+      ([node]) => (node as { url: string }).url
+    );
+    expect(urls).toEqual(['https://a.io', 'https://new.io']);
+  });
+});
+
+describe('Link addresses Plate refuses', () => {
+  it.each(['ftp://files.example.com', 'javascript://x'])(
+    'keeps %s in the box with the error and makes no link',
+    async (address) => {
+      const user = userEvent.setup();
+      const editor = mount(words('hello world'));
+      select(editor, [0, 0], 0, 5);
+
+      await user.click(screen.getByRole('button', { name: 'Link' }));
+      const input = screen.getByRole('textbox', { name: 'Link' });
+      await user.type(input, address);
+      await user.click(screen.getByRole('button', { name: 'OK' }));
+
+      expect(screen.getByRole('textbox', { name: 'Link' })).toBeVisible();
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+      expect(input).toHaveAttribute(
+        'aria-describedby',
+        screen.getByRole('alert').id
+      );
+      expect(linkNodes(editor)).toHaveLength(0);
+    }
+  );
+
+  it('keeps the bar edit box open for a refused address', async () => {
+    const user = userEvent.setup();
+    const editor = mount(linked('https://tina.io'));
+    select(editor, [0, 1, 0], 2, 2);
+    await user.click(await screen.findByRole('button', { name: 'Edit link' }));
+    const input = screen.getByRole('textbox', { name: 'Link' });
+    await user.clear(input);
+    await user.type(input, 'ftp://files.example.com');
+    await user.click(screen.getByRole('button', { name: 'OK' }));
+
+    expect(screen.getByRole('textbox', { name: 'Link' })).toBeVisible();
+    expect(screen.getByRole('alert')).toBeVisible();
+    const [[node]] = linkNodes(editor) as [[{ url: string }, unknown]];
+    expect(node.url).toBe('https://tina.io');
+  });
+});
+
+describe('Link box inside the More tools panel', () => {
+  it('runs onRun when OK closes the box, not when it opens', async () => {
+    const user = userEvent.setup();
+    const onRun = vi.fn();
+    const editor = mount(words('hello world'), onRun);
+    select(editor, [0, 0], 0, 5);
+
+    await user.click(screen.getByRole('button', { name: 'Link' }));
+    expect(onRun).not.toHaveBeenCalled();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Link' }),
+      'https://tina.io'
+    );
+    await user.click(screen.getByRole('button', { name: 'OK' }));
+    expect(onRun).toHaveBeenCalledTimes(1);
+  });
+
+  it('runs onRun when Cancel closes the box', async () => {
+    const user = userEvent.setup();
+    const onRun = vi.fn();
+    const editor = mount(words('hello world'), onRun);
+    select(editor, [0, 0], 0, 5);
+
+    await user.click(screen.getByRole('button', { name: 'Link' }));
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(onRun).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not run onRun for a refused address', async () => {
+    const user = userEvent.setup();
+    const onRun = vi.fn();
+    const editor = mount(words('hello world'), onRun);
+    select(editor, [0, 0], 0, 5);
+
+    await user.click(screen.getByRole('button', { name: 'Link' }));
+    await user.type(
+      screen.getByRole('textbox', { name: 'Link' }),
+      'ftp://files.example.com'
+    );
+    await user.click(screen.getByRole('button', { name: 'OK' }));
+    expect(onRun).not.toHaveBeenCalled();
   });
 });

@@ -138,7 +138,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
               }}
             />
             <div className='flex items-center gap-1'>
-              {(element.lang as string) === 'mermaid' && (
+              {(element.lang as string) === 'mermaid' ? (
                 <div
                   role='group'
                   aria-label='Diagram view'
@@ -162,8 +162,8 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
                     </Button>
                   ))}
                 </div>
-              )}
-              {isLangSupported(element.lang as string) && (
+              ) : null}
+              {isLangSupported(element.lang as string) ? (
                 <Button
                   tabIndex={-1}
                   size='none'
@@ -174,7 +174,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
                   <BracesIcon aria-hidden className='size-3.5' />
                   Format code
                 </Button>
-              )}
+              ) : null}
             </div>
           </div>
           {isEditing ? (

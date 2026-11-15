@@ -31,7 +31,6 @@ const headingTextClass: Record<string, string> = {
   h6: 'text-sm font-medium',
 };
 
-/** The block type at the caret, or Paragraph when a selection spans several. */
 function useCurrentBlockType(): string {
   return useEditorSelector((editor) => {
     const nodes = Array.from(
@@ -49,7 +48,6 @@ function useCurrentBlockType(): string {
   }, []);
 }
 
-/** The text style trigger and its menu of radio rows, limited by `headingLevels`. */
 export function TextStyleMenu({
   showLabel = true,
   disabled = false,

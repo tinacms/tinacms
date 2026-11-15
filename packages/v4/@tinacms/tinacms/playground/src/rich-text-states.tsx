@@ -3,8 +3,6 @@ import { RichTextFieldView } from '../../src/plugins/fields/rich-text/rich-text-
 import { richTextFieldStates } from '../../src/plugins/fields/rich-text/rich-text-field.states';
 import './index.css';
 
-// Every rich-text field state on one page, one `<section data-state>` each.
-// `?state=<name>` renders just that one.
 const only = new URLSearchParams(location.search).get('state');
 
 const root = document.getElementById('root');

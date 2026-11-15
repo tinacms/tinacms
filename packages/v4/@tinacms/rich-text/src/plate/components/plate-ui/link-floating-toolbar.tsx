@@ -44,27 +44,26 @@ import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { cn } from '@tinacms/ui/lib/utils';
 import { helpers } from '../../plugins/core/common';
 
-export const INVALID_URL_MESSAGE =
+const INVALID_URL_MESSAGE =
   'Invalid URL. Please prefix link with https:// or use a relative path like /about';
 
 export type LinkDraft = { url: string; text: string };
 
-/** Sets the address and the words together, on the link the selection is in or on the selected words. */
+/** False when Plate's own URL check refuses an address the box accepted, such as ftp://. */
 export function applyLink(
   editor: Parameters<typeof upsertLink>[0],
   { url, text }: LinkDraft
-) {
-  return upsertLink(editor, { url, text });
+): boolean {
+  return upsertLink(editor, { url, text }) === true;
 }
 
-/** "Link" and "Text to display" with Cancel and OK. A bad address stays in the box and saves nothing. */
 export function LinkBox({
   initial,
   onSubmit,
   onCancel,
 }: {
   initial: LinkDraft;
-  onSubmit: (draft: LinkDraft) => void;
+  onSubmit: (draft: LinkDraft) => boolean;
   onCancel: () => void;
 }) {
   const isUrl = usePluginOption(LinkPlugin, 'isUrl');
@@ -90,7 +89,7 @@ export function LinkBox({
       setInvalid(true);
       return;
     }
-    onSubmit({ url: trimmed, text });
+    if (!onSubmit({ url: trimmed, text })) setInvalid(true);
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
@@ -155,7 +154,6 @@ export function LinkBox({
   );
 }
 
-/** The Link box as a bottom sheet, for the phone tier. */
 export function LinkSheet({
   open,
   onOpenChange,
@@ -197,7 +195,6 @@ function useLinkEntry() {
   );
 }
 
-/** The bar under a link the caret is in: the address, Open, Edit and Remove. */
 export function LinkFloatingToolbar() {
   const editor = useEditorRef();
   const readOnly = useEditorReadOnly();
@@ -208,7 +205,8 @@ export function LinkFloatingToolbar() {
     (e) => helpers.isNodeActive(e, CodeBlockPlugin),
     []
   );
-  const [editing, setEditing] = React.useState<{
+  const [editingState, setEditing] = React.useState<{
+    element: TLinkElement;
     draft: LinkDraft;
     selection: typeof editor.selection;
   } | null>(null);
@@ -216,11 +214,16 @@ export function LinkFloatingToolbar() {
 
   const element = entry?.[0];
   const path = entry?.[1];
+  const editing = editingState?.element === element ? editingState : null;
   const visible =
     !readOnly &&
     !inCodeBlock &&
     element !== undefined &&
     (focused || barFocused || editing !== null);
+
+  React.useEffect(() => {
+    if (!visible || editingState?.element !== element) setEditing(null);
+  }, [visible, element, editingState]);
 
   const floating = useVirtualFloating({
     open: visible,
@@ -252,14 +255,16 @@ export function LinkFloatingToolbar() {
 
   const startEditing = () =>
     setEditing({
+      element,
       draft: { url: element.url, text: editor.api.string(path) },
       selection: editor.selection,
     });
 
   const submit = (draft: LinkDraft) => {
     if (editing?.selection) editor.tf.select(editing.selection);
-    applyLink(editor, draft);
+    if (!applyLink(editor, draft)) return false;
     closeEditing();
+    return true;
   };
 
   const remove = () => {

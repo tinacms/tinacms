@@ -178,6 +178,25 @@ describe('folding into More tools', () => {
     ).toBeInTheDocument();
   });
 
+  it('counts the divider before More tools when More formatting is off, so Insert is not clipped', () => {
+    vi.stubGlobal(
+      'ResizeObserver',
+      class extends FakeResizeObserver {
+        observe(target: Element) {
+          widths.set(target, 192);
+          super.observe(target);
+        }
+      }
+    );
+    render(
+      <Harness
+        overrides={{ toolbar: ['bold', 'italic', 'link', 'ul', 'table'] }}
+      />
+    );
+
+    expect(names()).toEqual(['Bold', 'More tools...', 'Insert']);
+  });
+
   it('shows no More tools when everything fits', () => {
     render(<Harness />);
 

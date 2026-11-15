@@ -27,7 +27,7 @@ export const TableCellElement = withRef<
   {
     isHeader?: boolean;
   }
->(({ children, className, isHeader, style, ...props }, ref) => {
+>(({ children, className, isHeader, style, attributes, ...props }, ref) => {
   const { api } = useEditorPlugin(TablePlugin);
   const element = props.element as TTableCellElement;
 
@@ -59,12 +59,12 @@ export const TableCellElement = withRef<
     <PlateElement
       ref={ref}
       as={isHeader ? 'th' : 'td'}
-      attributes={() => ({
-        ...props.attributes,
+      attributes={{
+        ...attributes,
         'aria-selected': selected || undefined,
         colSpan,
         rowSpan,
-      })}
+      }}
       className={cn(
         'relative h-full overflow-visible border border-border p-0',
         element.background
@@ -97,14 +97,16 @@ export const TableCellElement = withRef<
         {children}
       </div>
 
-      {showRowHandle && active && <TableHandle axis='row' active={active} />}
-      {showColumnHandle && active && (
+      {showRowHandle && active ? (
+        <TableHandle axis='row' active={active} />
+      ) : null}
+      {showColumnHandle && active ? (
         <TableHandle axis='column' active={active} />
-      )}
+      ) : null}
 
-      {isSelectingRow && (
+      {isSelectingRow ? (
         <div className={blockSelectionVariants()} contentEditable={false} />
-      )}
+      ) : null}
     </PlateElement>
   );
 });

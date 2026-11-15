@@ -1,13 +1,13 @@
 import type { ToolbarOverrideType } from './toolbar-overrides';
 
-export const IN_LINE = ['bold', 'italic', 'link', 'ul', 'ol', 'quote'] as const;
-export const MORE_FORMATTING = [
+const IN_LINE = ['bold', 'italic', 'link', 'ul', 'ol', 'quote'] as const;
+const MORE_FORMATTING = [
   'strikethrough',
   'code',
   'highlight',
   'textColor',
 ] as const;
-export const INSERT = ['image', 'table', 'codeBlock', 'mermaid', 'hr'] as const;
+const INSERT = ['image', 'table', 'codeBlock', 'mermaid', 'hr'] as const;
 
 export type InLineTool = (typeof IN_LINE)[number];
 export type MoreFormattingTool = (typeof MORE_FORMATTING)[number];

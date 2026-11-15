@@ -5,7 +5,7 @@ import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { cn, withRef } from '@udecode/cn';
 import { type VariantProps, cva } from 'class-variance-authority';
 
-import { useVisualViewportBoundary } from './visual-viewport-boundary';
+import { visualViewportBoundary } from './visual-viewport-boundary';
 
 export const Popover = PopoverPrimitive.Root;
 
@@ -51,7 +51,7 @@ export const PopoverContent = withRef<
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
         ref={ref}
-        collisionBoundary={useVisualViewportBoundary()}
+        collisionBoundary={visualViewportBoundary()}
         className={cn(popoverVariants({ animate, variant }), className)}
         collisionPadding={collisionPadding}
         align={align}

@@ -20,6 +20,7 @@ import {
   LinkSheet,
   applyLink,
 } from './link-floating-toolbar';
+import { ToolRowContext } from './tool-row-context';
 import { ToolbarButton } from './toolbar';
 
 type OpenBox = { draft: LinkDraft; selection: TRange | null };
@@ -31,6 +32,7 @@ export function LinkToolbarButton({
 }) {
   const editor = useEditorRef();
   const tier = useTier();
+  const row = React.useContext(ToolRowContext);
   const inCodeBlock = useEditorSelector(
     (e) => helpers.isNodeActive(e, CodeBlockPlugin),
     []
@@ -53,6 +55,7 @@ export function LinkToolbarButton({
   const close = (refocus: boolean) => {
     const selection = box?.selection;
     setBox(null);
+    row?.onRun();
     if (!refocus) return;
     if (selection) editor.tf.select(selection);
     editor.tf.focus();
@@ -60,9 +63,11 @@ export function LinkToolbarButton({
 
   const submit = (draft: LinkDraft) => {
     if (box?.selection) editor.tf.select(box.selection);
-    applyLink(editor, draft);
+    if (!applyLink(editor, draft)) return false;
     setBox(null);
+    row?.onRun();
     editor.tf.focus();
+    return true;
   };
 
   const content = box ? (

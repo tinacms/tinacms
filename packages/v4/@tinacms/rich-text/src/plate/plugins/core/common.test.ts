@@ -278,17 +278,19 @@ describe('withRootNodeIds', () => {
       type: 'td',
       children: [{ type: 'p', children: [{ text }] }],
     });
+    type Seeded = { id?: string; children?: Seeded[] };
     const [table] = helpers.withRootNodeIds([
       {
         type: 'table',
         children: [{ type: 'tr', children: [cell('a'), cell('b')] }],
       },
     ]);
+    const row = (table as Seeded | undefined)?.children?.[0];
     const ids = [
-      table.id,
-      table.children[0].id,
-      table.children[0].children[0].id,
-      table.children[0].children[1].id,
+      (table as Seeded | undefined)?.id,
+      row?.id,
+      row?.children?.[0]?.id,
+      row?.children?.[1]?.id,
     ];
 
     expect(ids.every(Boolean)).toBe(true);

@@ -1,10 +1,9 @@
 let boundary: HTMLElement | null = null;
 
-/**
- * An invisible box the size of the visual viewport. Radix menus and popovers
- * collide with it, so an on-screen keyboard shrinks the room they have.
- */
-function visualViewportBoundary(): HTMLElement[] {
+// Radix measures room against the layout viewport, which an on-screen keyboard leaves alone.
+// This box follows the visual viewport, and the resize event it re-dispatches makes open
+// menus measure again. One box and one listener serve the whole page.
+export function visualViewportBoundary(): HTMLElement[] {
   const viewport = window.visualViewport;
   if (!viewport) return [];
   if (!boundary?.isConnected) {
@@ -24,6 +23,3 @@ function visualViewportBoundary(): HTMLElement[] {
   boundary.style.height = `${viewport.height}px`;
   return [boundary];
 }
-
-/** The `collisionBoundary` for a Radix content, read when the content renders. */
-export const useVisualViewportBoundary = visualViewportBoundary;

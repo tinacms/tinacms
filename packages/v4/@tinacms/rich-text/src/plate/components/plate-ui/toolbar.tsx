@@ -4,7 +4,13 @@ import * as React from 'react';
 
 import { cn } from '@tinacms/ui/lib/utils';
 import { Icons } from './icons';
-import { withTooltip } from './tooltip';
+import { KbdShortcut } from '@tinacms/ui/components/kbd';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@tinacms/ui/components/tooltip';
+import { ToolRowContext } from './tool-row-context';
 
 const itemSelector = '[data-toolbar-item]:not(:disabled)';
 
@@ -103,58 +109,114 @@ export const ToolbarSeparator = ({ className }: { className?: string }) => (
   />
 );
 
-type ToolbarButtonOwnProps = {
-  /** On or off, as an `aria-pressed` toggle. Leave it out for a button that is not a toggle. */
+type ToolbarButtonBaseProps = Omit<
+  React.ComponentPropsWithoutRef<'button'>,
+  'type'
+> & {
   pressed?: boolean;
-  /** Draws the open look of a menu trigger. */
   open?: boolean;
-  /** A chevron after the icon, for a menu trigger. */
   showArrow?: boolean;
-  /** Kept for callers that mark a dropdown. */
-  isDropdown?: boolean;
 };
 
 const ToolbarButtonBase = React.forwardRef<
   HTMLButtonElement,
-  Omit<React.ComponentPropsWithoutRef<'button'>, 'type'> & ToolbarButtonOwnProps
+  ToolbarButtonBaseProps
+>(({ children, className, pressed, open, showArrow, ...props }, ref) => (
+  <button
+    ref={ref}
+    type='button'
+    data-toolbar-item=''
+    aria-pressed={typeof pressed === 'boolean' ? pressed : undefined}
+    data-state={open ? 'open' : undefined}
+    className={cn(
+      'inline-flex h-8 min-w-8 shrink-0 items-center justify-center gap-1 rounded-sm px-1.5 font-sans text-sm font-medium text-foreground outline-none transition-colors pointer-coarse:h-10 pointer-coarse:min-w-10',
+      'focus-visible:shadow-focus-ring disabled:cursor-not-allowed disabled:opacity-45',
+      'not-disabled:hover:bg-muted aria-pressed:bg-selected not-disabled:aria-pressed:hover:bg-selected data-[state=open]:bg-muted',
+      '[&_svg:not([data-icon])]:size-4',
+      className
+    )}
+    {...props}
+  >
+    {children}
+    {showArrow ? (
+      <Icons.arrowDown data-icon className='size-3.5 text-muted-foreground' />
+    ) : null}
+  </button>
+));
+ToolbarButtonBase.displayName = 'ToolbarButtonBase';
+
+export type ToolbarButtonProps = ToolbarButtonBaseProps & {
+  tooltip?: string;
+  shortcut?: string;
+};
+
+/** In line it shows a tooltip. Inside More tools it draws as a menu row and closes the panel after it runs. */
+export const ToolbarButton = React.forwardRef<
+  HTMLButtonElement,
+  ToolbarButtonProps
 >(
   (
     {
+      tooltip,
+      shortcut,
+      'aria-label': ariaLabel,
       children,
       className,
-      pressed,
-      open,
-      showArrow,
-      isDropdown: _isDropdown,
       ...props
     },
     ref
-  ) => (
-    <button
-      ref={ref}
-      type='button'
-      data-toolbar-item=''
-      aria-pressed={typeof pressed === 'boolean' ? pressed : undefined}
-      data-state={open ? 'open' : undefined}
-      className={cn(
-        'inline-flex h-8 min-w-8 shrink-0 items-center justify-center gap-1 rounded-sm px-1.5 font-sans text-sm font-medium text-foreground outline-none transition-colors pointer-coarse:h-10 pointer-coarse:min-w-10',
-        'focus-visible:shadow-focus-ring disabled:cursor-not-allowed disabled:opacity-45',
-        'not-disabled:hover:bg-muted aria-pressed:bg-selected not-disabled:aria-pressed:hover:bg-selected data-[state=open]:bg-muted',
-        '[&_svg:not([data-icon])]:size-4',
-        className
-      )}
-      {...props}
-    >
-      {children}
-      {showArrow ? (
-        <Icons.arrowDown data-icon className='size-3.5 text-muted-foreground' />
-      ) : null}
-    </button>
-  )
-);
-ToolbarButtonBase.displayName = 'ToolbarButtonBase';
+  ) => {
+    const row = React.useContext(ToolRowContext);
+    const name = ariaLabel ?? tooltip;
 
-export const ToolbarButton = withTooltip(ToolbarButtonBase);
+    if (row) {
+      return (
+        <ToolbarButtonBase
+          ref={ref}
+          aria-label={name}
+          {...props}
+          onClick={(event) => {
+            props.onClick?.(event);
+            if (!props['aria-haspopup']) row.onRun();
+          }}
+          className={cn(
+            'h-9 w-full justify-start gap-2.5 px-2.5 text-base font-normal pointer-coarse:h-10',
+            className
+          )}
+        >
+          <span className='flex size-4 shrink-0 items-center justify-center [&_svg]:size-4'>
+            {children}
+          </span>
+          <span className='min-w-0 flex-1 truncate text-left'>{tooltip}</span>
+          {shortcut ? <KbdShortcut keys={shortcut} size='sm' /> : null}
+        </ToolbarButtonBase>
+      );
+    }
+
+    const button = (
+      <ToolbarButtonBase
+        ref={ref}
+        aria-label={name}
+        className={className}
+        {...props}
+      >
+        {children}
+      </ToolbarButtonBase>
+    );
+
+    if (!tooltip || props.disabled) return button;
+
+    return (
+      <Tooltip>
+        <TooltipTrigger render={button} />
+        <TooltipContent>
+          {tooltip}
+          {shortcut ? <KbdShortcut keys={shortcut} size='sm' /> : null}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+);
 ToolbarButton.displayName = 'ToolbarButton';
 
 export const ToolbarGroup = ({

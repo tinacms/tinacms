@@ -36,11 +36,10 @@ import {
 } from '../dropdown-menu';
 import type { ActiveTableCell } from './table-active-cell';
 
-export const menuContentClass =
-  'max-h-(--radix-dropdown-menu-content-available-height) w-44 min-w-44 overflow-y-auto!';
-
 const subContentClass =
-  'max-h-(--radix-dropdown-menu-content-available-height) w-44 min-w-44 overflow-y-auto!';
+  'max-h-(--radix-dropdown-menu-content-available-height) w-max min-w-44 overflow-y-auto! [&_[role=menuitem]]:whitespace-nowrap [&_[role=menuitem]_svg]:size-4 [&_[role=menuitem]_svg]:shrink-0';
+
+const menuContentClass = subContentClass;
 
 const destructiveClass =
   'text-destructive focus:bg-status-failed-subtle focus:text-destructive';
@@ -89,7 +88,7 @@ export function TableActionsMenuContent({
 }) {
   const { editor, tf } = useEditorPlugin(TablePlugin);
   const isRow = axis === 'row';
-  const last = isRow ? active.rowCount <= 1 : active.colCount <= 1;
+  const last = isRow ? active.rowCount <= 2 : active.colCount <= 1;
 
   const run = (action: () => void) => () => {
     editor.tf.collapse({ edge: 'focus' });

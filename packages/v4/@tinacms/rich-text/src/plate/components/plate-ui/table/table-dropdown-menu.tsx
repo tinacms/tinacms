@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 
 import { cn } from '@tinacms/ui/lib/utils';
 import { TablePlugin } from '@udecode/plate-table/react';
@@ -9,6 +9,7 @@ import { Grid3x3Icon } from 'lucide-react';
 
 import {
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
@@ -19,21 +20,46 @@ const START = 2;
 
 const clamp = (value: number) => Math.min(GRID, Math.max(1, value));
 
+const NARROW = '(max-width: 639px)';
+
+const subscribeNarrow = (notify: () => void) => {
+  const query = window.matchMedia?.(NARROW);
+  query?.addEventListener('change', notify);
+  return () => query?.removeEventListener('change', notify);
+};
+
+const useNarrow = () =>
+  useSyncExternalStore(
+    subscribeNarrow,
+    () => window.matchMedia?.(NARROW).matches ?? false,
+    () => false
+  );
+
+// A side submenu would run off a phone screen, so the grid sits inside the Insert menu there.
 export function TableInsertSubMenu({ disabled }: { disabled?: boolean }) {
+  const narrow = useNarrow();
+  if (narrow) {
+    return (
+      <>
+        <DropdownMenuLabel>Table</DropdownMenuLabel>
+        <TableSizeGrid disabled={disabled} />
+      </>
+    );
+  }
   return (
     <DropdownMenuSub>
       <DropdownMenuSubTrigger disabled={disabled}>
         <Grid3x3Icon className='size-4' />
         <span>Table</span>
       </DropdownMenuSubTrigger>
-      <DropdownMenuSubContent collisionPadding={8} className='p-1'>
+      <DropdownMenuSubContent collisionPadding={8} className='min-w-0 p-1'>
         <TableSizeGrid />
       </DropdownMenuSubContent>
     </DropdownMenuSub>
   );
 }
 
-function TableSizeGrid() {
+function TableSizeGrid({ disabled }: { disabled?: boolean }) {
   const { editor, tf } = useEditorPlugin(TablePlugin);
   const [size, setSize] = useState({ rowCount: START, colCount: START });
 
@@ -54,6 +80,7 @@ function TableSizeGrid() {
 
   return (
     <DropdownMenuItem
+      disabled={disabled}
       aria-label={`Insert a ${size.rowCount} by ${size.colCount} table`}
       className='h-auto flex-col items-stretch gap-1 p-1'
       onKeyDown={move}
