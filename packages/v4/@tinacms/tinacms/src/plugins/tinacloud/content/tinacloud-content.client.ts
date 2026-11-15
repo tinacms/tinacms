@@ -17,22 +17,15 @@ import {
   updateDocument,
 } from './request';
 
-// TinaCloud rows carry no collection path, so the shared folders of the paths
-// stand in for it. A collection whose documents all sit in one subfolder reads
-// that subfolder as its top level.
-const commonFolderOf = (summaries: readonly DocumentSummary[]): string => {
-  const [first, ...rest] = summaries.map(({ path }) =>
-    path.split('/').slice(0, -1)
-  );
-  if (!first) return '';
-  const shared = rest.reduce((common, parts) => {
-    const length = common.findIndex((part, index) => parts[index] !== part);
-    return length === -1
-      ? common.slice(0, parts.length)
-      : common.slice(0, length);
-  }, first);
-  return shared.join('/');
-};
+// `relativePath` is the path inside the collection's configured `path`, so
+// the difference is the collection's folder.
+const collectionFolderOf = (path: string, relativePath: string): string =>
+  path === relativePath ? '' : path.slice(0, -(relativePath.length + 1));
+
+const titleOf = (values: Record<string, unknown>): string | undefined =>
+  typeof values.title === 'string' && values.title !== ''
+    ? values.title
+    : undefined;
 
 // Branch is operational data the Data Layer owns (ADR-019, ADR-024), so with
 // no branch in the store the slice uses the project's default branch.
@@ -77,6 +70,7 @@ export const createTinaCloudContentSlice =
       },
       list: async (collection, query?: ListQuery) => {
         const summaries: DocumentSummary[] = [];
+        let root = '';
         try {
           const target = await branch();
           let after: string | null = null;
@@ -88,7 +82,12 @@ export const createTinaCloudContentSlice =
               after
             );
             for (const { node } of page.edges) {
-              summaries.push({ path: node._sys.path });
+              const title = titleOf(node._values);
+              root = collectionFolderOf(node._sys.path, node._sys.relativePath);
+              summaries.push({
+                path: node._sys.path,
+                ...(title === undefined ? {} : { title }),
+              });
             }
             const { hasNextPage, endCursor } = page.pageInfo;
             if (!hasNextPage || !endCursor || endCursor === after) break;
@@ -100,7 +99,7 @@ export const createTinaCloudContentSlice =
         try {
           return queryDocuments({
             summaries,
-            root: commonFolderOf(summaries),
+            root,
             query,
           });
         } catch (cause) {

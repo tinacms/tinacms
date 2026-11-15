@@ -18,11 +18,27 @@ const content = () => {
   );
 };
 
-const page = (paths: string[], endCursor: string | null) => ({
+const POSTS_FOLDER = 'content/posts/';
+
+type Row = string | { path: string; title?: string; root?: string };
+
+const nodeOf = (row: Row) => {
+  const {
+    path,
+    title,
+    root = POSTS_FOLDER,
+  } = typeof row === 'string' ? { path: row } : row;
+  return {
+    _sys: { path, relativePath: path.slice(root.length) },
+    _values: title === undefined ? {} : { title },
+  };
+};
+
+const page = (rows: Row[], endCursor: string | null) => ({
   data: {
     collection: {
       documents: {
-        edges: paths.map((path) => ({ node: { _sys: { path } } })),
+        edges: rows.map((row) => ({ node: nodeOf(row) })),
         pageInfo: { hasNextPage: endCursor !== null, endCursor },
       },
     },
@@ -200,6 +216,68 @@ describe('TinaCloud content slice', () => {
       'content/posts/2024/delta.mdx',
     ]);
     expect(second.pageInfo.hasNextPage).toBe(false);
+  });
+
+  it("roots folders at the collection's path when every document sits in a subfolder", async () => {
+    stubTinaCloud(
+      page(['content/posts/guides/a.md'], null),
+      page(['content/posts/guides/a.md'], null)
+    );
+    const slice = content();
+    const top = await slice.list('post', { folder: '' });
+    expect(top.folders).toEqual([
+      { path: 'guides', name: 'guides', documentCount: 1 },
+    ]);
+    expect(nodesOf(top)).toEqual([]);
+    const guides = await slice.list('post', { folder: 'guides' });
+    expect(nodesOf(guides).map(({ path }) => path)).toEqual([
+      'content/posts/guides/a.md',
+    ]);
+  });
+
+  it('roots folders at the repository top for a collection with an empty path', async () => {
+    stubTinaCloud(page([{ path: 'docs/a.md', root: '' }], null));
+    const connection = await content().list('post', { folder: '' });
+    expect(connection.folders).toEqual([
+      { path: 'docs', name: 'docs', documentCount: 1 },
+    ]);
+  });
+
+  it('carries each title, and filters and sorts by it', async () => {
+    stubTinaCloud(
+      page(
+        [
+          { path: 'content/posts/a.mdx', title: 'Zebra crossing' },
+          { path: 'content/posts/b.mdx', title: 'Apple pie' },
+          { path: 'content/posts/c.mdx', title: 'Banana bread' },
+          'content/posts/d.mdx',
+        ],
+        null
+      ),
+      page(
+        [
+          { path: 'content/posts/a.mdx', title: 'Zebra crossing' },
+          { path: 'content/posts/b.mdx', title: 'Apple pie' },
+          { path: 'content/posts/c.mdx', title: 'Banana bread' },
+        ],
+        null
+      )
+    );
+    const slice = content();
+    const sorted = await slice.list('post', {
+      folder: '',
+      sort: { by: 'title', direction: 'asc' },
+    });
+    expect(nodesOf(sorted).map(({ path, title }) => [path, title])).toEqual([
+      ['content/posts/b.mdx', 'Apple pie'],
+      ['content/posts/c.mdx', 'Banana bread'],
+      ['content/posts/d.mdx', undefined],
+      ['content/posts/a.mdx', 'Zebra crossing'],
+    ]);
+    const filtered = await slice.list('post', { folder: '', filter: 'pie' });
+    expect(nodesOf(filtered).map(({ path }) => path)).toEqual([
+      'content/posts/b.mdx',
+    ]);
   });
 
   it('offers no structural operations, because TinaCloud has no such API', () => {
