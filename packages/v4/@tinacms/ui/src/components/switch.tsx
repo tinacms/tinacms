@@ -12,23 +12,32 @@ type SwitchProps = Omit<SwitchPrimitive.Root.Props, 'children'> & {
  * On or off, applied at once: for settings and controls. A boolean field in a
  * document is a Checkbox. Without words, give it `aria-label` or `aria-labelledby`.
  */
-function Switch({ className, children, disabled, ...props }: SwitchProps) {
+function Switch({
+  className,
+  children,
+  disabled,
+  readOnly,
+  ...props
+}: SwitchProps) {
   return (
     <label
       data-slot='switch-label'
       className={cn(
         'group/switch inline-flex min-h-8 cursor-pointer items-center gap-2 font-sans text-base leading-5 text-foreground select-none',
-        disabled ? 'cursor-not-allowed opacity-45' : null
+        disabled ? 'cursor-not-allowed opacity-45' : null,
+        readOnly && 'cursor-default'
       )}
     >
       <SwitchPrimitive.Root
         data-slot='switch'
         disabled={disabled}
+        readOnly={readOnly}
         className={cn(
           'relative inline-flex h-4.5 w-8 shrink-0 items-center rounded-full border-0 bg-slate-300 px-0.5 transition-colors outline-none group-hover/switch:bg-input-hover',
           'data-checked:bg-primary data-checked:group-hover/switch:bg-primary-hover',
           'focus:shadow-focus-ring',
           'data-disabled:group-hover/switch:bg-slate-300 data-disabled:data-checked:group-hover/switch:bg-primary',
+          'data-readonly:group-hover/switch:bg-slate-300 data-readonly:data-checked:group-hover/switch:bg-primary',
           className
         )}
         {...props}

@@ -202,7 +202,6 @@ describe('tinaCloud()', () => {
       'delete',
       'features',
       'list',
-      'rename',
       'resolveUrl',
       'upload',
     ]);
@@ -278,6 +277,7 @@ describe('tinaCloud()', () => {
     stubTinaCloud();
     const user = userEvent.setup();
     const { complete } = stubLoginPopup();
+    window.location.hash = '#/collections';
     render(
       <TinaAdmin
         config={asResolvedConfig({

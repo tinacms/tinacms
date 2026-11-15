@@ -29,6 +29,11 @@ function Kbd({ size = 'md', className, ...props }: KbdProps) {
   );
 }
 
+/** Apple keyboards have a Command key. Other platforms show Ctrl in its place. */
+const isApplePlatform = () =>
+  typeof navigator !== 'undefined' &&
+  /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
+
 /** How each symbol key is spoken, and its `aria-keyshortcuts` name. */
 const KEYS: Record<string, { spoken: string; aria: string }> = {
   '⌘': { spoken: 'Command', aria: 'Meta' },
@@ -40,11 +45,19 @@ const KEYS: Record<string, { spoken: string; aria: string }> = {
   '⌫': { spoken: 'Delete', aria: 'Backspace' },
 };
 
+const keyInfo = (key: string) =>
+  key === '⌘' && !isApplePlatform()
+    ? { spoken: 'Control', aria: 'Control' }
+    : KEYS[key];
+
+const keycap = (press: string) =>
+  isApplePlatform() ? press : press.replace('⌘', 'Ctrl ');
+
 const pressesOf = (keys: string) => keys.trim().split(/\s+/).filter(Boolean);
 
 const spoken = (presses: string[]) =>
   presses
-    .map((press) => [...press].map((c) => KEYS[c]?.spoken ?? c).join(' '))
+    .map((press) => [...press].map((c) => keyInfo(c)?.spoken ?? c).join(' '))
     .join(', then ');
 
 /**
@@ -54,7 +67,9 @@ const spoken = (presses: string[]) =>
 function keyShortcuts(keys: string) {
   const presses = pressesOf(keys);
   if (presses.length !== 1) return undefined;
-  return [...presses[0]].map((c) => KEYS[c]?.aria ?? c.toUpperCase()).join('+');
+  return [...presses[0]]
+    .map((c) => keyInfo(c)?.aria ?? c.toUpperCase())
+    .join('+');
 }
 
 type KbdShortcutProps = Omit<ComponentProps<'span'>, 'children'> & {
@@ -95,7 +110,7 @@ function KbdShortcut({
           {i > 0 ? (
             <span className='text-2xs text-muted-foreground'>then</span>
           ) : null}
-          <Kbd size={size}>{press}</Kbd>
+          <Kbd size={size}>{keycap(press)}</Kbd>
         </Fragment>
       ))}
     </span>

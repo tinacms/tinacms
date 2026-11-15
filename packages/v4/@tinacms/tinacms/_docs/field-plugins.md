@@ -120,8 +120,9 @@ The properties of the descriptor:
   `rich-text` field sets it to `false` because it renders its own label area.
 - `metadata.drillable` — Set it to `true` when the field can open as its own form
   level. The editor drills in at nesting depth 3 and deeper.
-- `metadata.drillsIn(node)` — Overrides the depth rule for one node. `true`
-  drills in, `false` opens in place, `undefined` keeps the depth rule. The
+- `metadata.drillsIn(node)` — Answers for one node above level 3: `true`
+  drills in, `false` opens in place, `undefined` leaves it to the field. Level 3
+  and deeper drill in whatever it returns. The
   `object` field returns it from `display`.
 - `metadata.inlineBox(node)` — For a single-value field. It returns the box a
   list card holds in place of the field's widget, with the settings of that
@@ -215,12 +216,12 @@ Hooks:
 | `useFieldValue<T>(address)` | Gives `[value, setValue]` from the react-hook-form controller |
 | `useFieldErrors(address)` | Gives every validation message at `address` or under it |
 | `useFieldActivation(handler)` | Runs `handler` when this field becomes the active field, for visual editing |
-| `useFieldFrame(options?)` | Gives the label, `htmlFor`, errors and help for `FieldWrapper`. `{ ownErrorsOnly: true }` keeps only the errors on this field's own address. |
+| `useFieldFrame(options?)` | Gives the label, `htmlFor`, errors, help, `disabled` and `readOnly` for `FieldWrapper`. `disabled` and `readOnly` come from the field's schema or from an enclosing field. `{ warnings }` adds amber messages that do not block Save. `{ ownErrorsOnly: true }` keeps only the errors on this field's own address. |
 | `useOpenLevel()` | Gives a function that opens this field as the next form level |
 | `useInvalidFieldCount()` | Gives how many fields under this field show an error. It counts fields, not messages. |
 | `useIsOpenLevel()` | Gives `true` when this field is the open form level |
 | `useInvalidFieldCounts(addresses)` | Gives the `useInvalidFieldCount()` value for each address, in the same order. A list field reads it for its items. |
-| `useListItems()` | Gives `openLevel`, `isRevealed` and `touch` for the items of a list field, by item address |
+| `useListItems()` | Gives `openLevel`, `isRevealed` and `touch` for the items of a list field, by item address, plus `insert`, `move` and `remove`, which a list field uses for every insert, move or remove (append and replace need none) so the error summary follows the items |
 
 A field that supplies a `DrillInComponent` builds it from these hooks and
 `@tinacms/ui` only:

@@ -12,7 +12,7 @@ const saveButton = (page: import('@playwright/test').Page) =>
 
 const status = (page: import('@playwright/test').Page) =>
   formColumn(page)
-    .locator('header')
+    .locator('[data-slot="form-bar"]')
     .getByText(/^(No changes|Unsaved|Saved)$/);
 
 const openDocument = async (

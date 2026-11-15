@@ -75,7 +75,6 @@ const withPreview = (options: BlockOption[]): BlockOption[] =>
 const blocksBase = {
   label: 'Blocks',
   labelId: 'blocks-label',
-  emptyText: 'No blocks.',
 } satisfies Partial<ArrayFieldViewProps>;
 
 const picker =

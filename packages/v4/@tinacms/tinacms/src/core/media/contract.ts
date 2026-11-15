@@ -88,15 +88,38 @@ export class MediaError extends Error {
   }
 }
 
+export interface MediaUploadOptions {
+  /** Called with the fraction of the bytes sent so far, from 0 to 1. */
+  onProgress?: (fraction: number) => void;
+  /**
+   * Aborting it stops the upload, which then rejects with a `DOMException` named
+   * `AbortError`. Once every byte is sent the provider ignores the signal and
+   * settles with the real outcome.
+   */
+  signal?: AbortSignal;
+}
+
 /** Each operation reports a known failure as a `MediaError`. */
 export interface MediaProvider {
-  upload(file: File, folder?: string): Promise<string>;
+  /**
+   * Resolves to the media path of the uploaded file. Never overwrites: rejects
+   * with `name-taken` when the name exists in the folder.
+   */
+  upload(
+    file: File,
+    folder?: string,
+    options?: MediaUploadOptions
+  ): Promise<string>;
   list(folder: string, page?: MediaPageRequest): Promise<MediaPage>;
   delete(path: string): Promise<void>;
   // ADR-022 §5: a provider without transforms ignores `options` and returns
   // the original URL.
   resolveUrl(path: string, options?: MediaUrlOptions): string;
-  /** Resolves to the new media path. */
+  /**
+   * Renames or moves a file. `to` is a full media path and may be in another
+   * folder, which moves the file. Resolves to the new media path. Rejects with
+   * `name-taken` when `to` exists; never overwrites.
+   */
   rename?(from: string, to: string): Promise<string>;
   features?: MediaFeatures;
   status?(): Promise<MediaStatus>;

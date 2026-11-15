@@ -38,6 +38,7 @@ import {
   useInvalidFieldCounts,
   useListItems,
   useMediaSlice,
+  useExpansion,
   useOpenLevel,
 } from '../../../editor';
 import { isMediaPath } from '../image/image-field.schema';
@@ -56,6 +57,7 @@ import {
   itemFieldsOf,
   pickerOf,
 } from './array-field.schema';
+import { centerInScroller } from '../../../utils/center-in-scroller';
 import { seedItem } from './seed-item';
 import {
   BlockAddView,
@@ -209,15 +211,24 @@ function ObjectItems({
     items.map((_, index) => `${address}.${index}`)
   );
 
+  // A block always opens as its own form level. Any other item opens there from level 3.
+  const opensNextLevel = (itemAddress: string) =>
+    isTemplatesArray(field) || itemOpensNextLevel(itemAddress);
+
   // Opens an item where its depth says: in place, or as the next form level.
   // Returns whether it opened a form level.
   function showItem(index: number): boolean {
     const itemAddress = `${address}.${index}`;
     const stored: unknown = getValues(itemAddress);
     const fields = isItem(stored) ? itemFieldsOf(field, stored) : undefined;
-    if (fields && itemOpensNextLevel(itemAddress)) {
+    if (fields && opensNextLevel(itemAddress)) {
       const heading = itemHeadingOf(field, stored, index);
-      listItems.openLevel(itemAddress, heading, fields);
+      listItems.openLevel(
+        itemAddress,
+        heading,
+        fields,
+        isTemplatesArray(field)
+      );
       // The level replaced the list, so focus moves to its first field.
       const first = fields.find((subfield) => !subfield.hidden);
       if (first) setActive(toFieldAddress(`${itemAddress}.${first.name}`));
@@ -237,6 +248,24 @@ function ObjectItems({
   useEffect(() => {
     if (activation) openOnActivation(activation.address);
   }, [activation]);
+
+  // Expand all opens the cards that open in place; an item that opens as a form
+  // level stays closed.
+  const expansion = useExpansion();
+  const applyExpansion = useEffectEvent((openAll: boolean) =>
+    setOpen(
+      new Set(
+        openAll
+          ? items
+              .filter((_, index) => !opensNextLevel(`${address}.${index}`))
+              .map((item) => item.id)
+          : []
+      )
+    )
+  );
+  useEffect(() => {
+    if (expansion.version > 0) applyExpansion(expansion.open);
+  }, [expansion]);
 
   // The insert picker follows its opener card by id, so a move or remove while it is open cannot shift it.
   const openerIndex = inserting
@@ -262,6 +291,23 @@ function ObjectItems({
     const grip = cards[index]?.querySelector('[data-grip]');
     if (grip instanceof HTMLElement) grip.focus();
   }, [inserting, items, listRef]);
+
+  // Coming back from an item's form level remounts the list: put focus and the viewport on its card.
+  useEffect(() => {
+    const returned = listItems.takeReturnedIndex(address);
+    if (returned === undefined) return;
+    const cards = Array.from(listRef.current?.children ?? []).filter((child) =>
+      child.hasAttribute('data-array-item')
+    );
+    const card = cards[Math.min(returned, cards.length - 1)];
+    const target = card?.querySelector<HTMLElement>(
+      '[data-grip], [data-slot="list-card-head"] button'
+    );
+    if (card && target) {
+      target.focus({ preventScroll: true });
+      centerInScroller(card);
+    }
+  }, []);
 
   const seed = (defaultItem: TinaDocument | undefined, fields: FieldSchema[]) =>
     seedItem(defaultItem, fields, { documentPath, registry });
@@ -292,7 +338,7 @@ function ObjectItems({
     }
     refocusOpener.current = null;
     afterChange({ open: index, focus: index });
-    insert(index, seedFor(template));
+    listItems.insert(address, index, () => insert(index, seedFor(template)));
     setInserting(null);
   };
   const add = (template?: ArrayTemplateSchema) => {
@@ -304,7 +350,7 @@ function ObjectItems({
   const moveTo = (from: number, to: number) => {
     if (to < 0 || to >= items.length) return;
     afterChange({ focus: to });
-    move(from, to);
+    listItems.move(address, from, to, () => move(from, to));
   };
 
   const views: ArrayItemView[] = items.map((item, index) => {
@@ -331,7 +377,7 @@ function ObjectItems({
     }
 
     const opens =
-      fields && itemOpensNextLevel(itemAddress) ? 'next-level' : 'in-place';
+      fields && opensNextLevel(itemAddress) ? 'next-level' : 'in-place';
     return {
       id: item.id,
       name: `Item ${index + 1}`,
@@ -383,9 +429,8 @@ function ObjectItems({
       items={views}
       full={full}
       add='button'
-      addLabel='Add item'
+      addLabel={field.addLabel ?? 'Add item'}
       onAdd={() => add()}
-      emptyText={isTemplatesArray(field) ? 'No blocks.' : undefined}
       addSlot={
         isTemplatesArray(field)
           ? ({ disabled }) => (
@@ -436,11 +481,13 @@ function ObjectItems({
       onDuplicate={(index) => {
         if (atMax()) return;
         afterChange({ open: index + 1, focus: index + 1 });
-        insert(index + 1, structuredClone(getValues(`${address}.${index}`)));
+        listItems.insert(address, index + 1, () =>
+          insert(index + 1, structuredClone(getValues(`${address}.${index}`)))
+        );
       }}
       onRemove={(index) => {
         afterChange({ focus: focusAfterRemove(index, items.length - 1) });
-        remove(index);
+        listItems.remove(address, index, () => remove(index));
       }}
     />
   );
@@ -472,6 +519,8 @@ function TemplatePicker({
   const options: BlockOption[] = field.templates.map((template) => ({
     name: template.name,
     label: templateTitle(template),
+    group: template.group,
+    description: template.description,
     preview: template.previewImage ? (
       <PreviewImage path={template.previewImage} />
     ) : undefined,
@@ -494,6 +543,7 @@ function TemplatePicker({
       onPick={pick}
       disabled={disabled}
       reason={full ? FULL_REASON : undefined}
+      addLabel={field.addLabel}
       open={open}
       onOpenChange={onOpenChange}
     />
@@ -575,12 +625,14 @@ function ScalarItems({
     next.splice(to, 0, ...next.splice(from, 1));
     keys.current.splice(to, 0, ...keys.current.splice(from, 1));
     afterChange({ focus: to });
-    setList(next);
+    listItems.move(address, from, to, () => setList(next));
   };
   const remove = (index: number) => {
     keys.current = keys.current.filter((_, position) => position !== index);
     afterChange({ focus: focusAfterRemove(index, items.length - 1) });
-    setList(liveItems().filter((_, position) => position !== index));
+    listItems.remove(address, index, () =>
+      setList(liveItems().filter((_, position) => position !== index))
+    );
   };
   const atMax = () => max !== undefined && liveItems().length >= max;
   const insertValue = (index: number, entry: unknown) => {
@@ -589,7 +641,7 @@ function ScalarItems({
     const next = [...liveItems()];
     next.splice(index, 0, entry);
     afterChange({ focus: index });
-    setList(next);
+    listItems.insert(address, index, () => setList(next));
   };
   // `defaultItem`, then `of.defaultValue`, then the item type's own default.
   const seedScalar = (): unknown => {
@@ -648,7 +700,7 @@ function ScalarItems({
       full={full}
       add={typed ? 'input' : 'button'}
       addInputType={box?.type ?? 'text'}
-      addLabel='Add item'
+      addLabel={field.addLabel ?? 'Add item'}
       onAdd={(text) => {
         if (atMax()) return;
         const entry = text === undefined ? seedScalar() : text;

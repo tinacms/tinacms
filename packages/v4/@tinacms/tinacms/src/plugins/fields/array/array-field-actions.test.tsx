@@ -21,12 +21,14 @@ import { LabelledFields } from '../../../test/labelled-fields';
 import { openBlockPicker } from '../../../test/open-block-picker';
 import booleanFieldPlugin from '../boolean/boolean-field.plugin';
 import numberFieldPlugin from '../number/number-field.plugin';
+import objectFieldPlugin from '../object/object-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import arrayFieldPlugin from './array-field.plugin';
 
 const PATH = 'content/pages/home.mdx';
 const PLUGINS = [
   arrayFieldPlugin,
+  objectFieldPlugin,
   stringFieldPlugin,
   numberFieldPlugin,
   booleanFieldPlugin,
@@ -567,23 +569,18 @@ describe('ArrayField focus and activation', () => {
     expect(valueOf('cappedBlocks')).toHaveLength(2);
   });
 
-  it('a pick refused at max closes the insert picker and returns focus to the opener grip', async () => {
+  it('does not bring the insert picker back when the list returns after a duplicate opened its block', async () => {
     renderPage({ cappedBlocks: [{ _template: 'hero', headline: 'One' }] });
     await chooseAction('Capped blocks', 1, 'Insert above');
-    const group = await screen.findByRole('group', { name: 'Capped blocks' });
-    const inline = await within(group).findByRole('button', {
-      name: 'Add Hero',
-    });
+    await screen.findByRole('group', { name: 'Capped blocks' });
     await chooseAction('Capped blocks', 1, 'Duplicate');
     await waitFor(() => expect(valueOf('cappedBlocks')).toHaveLength(2));
-    await userEvent.click(inline);
-    expect(valueOf('cappedBlocks')).toHaveLength(2);
-    await waitFor(() =>
-      expect(
-        within(group).getByRole('button', { name: 'Move Item 1' })
-      ).toHaveFocus()
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Back to fields' })
     );
+    const group = await screen.findByRole('group', { name: 'Capped blocks' });
     expect(within(group).queryByRole('region')).toBeNull();
+    expect(valueOf('cappedBlocks')).toHaveLength(2);
   });
 
   it('turns the add button off with a reason when the list is full', async () => {

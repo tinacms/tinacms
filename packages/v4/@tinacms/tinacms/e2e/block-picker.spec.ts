@@ -65,7 +65,13 @@ async function inside(inner: Locator, outer: Locator) {
 async function placeAt(button: Locator, top: number) {
   await button.scrollIntoViewIfNeeded();
   await button.evaluate((el, wanted) => {
-    const scroller = el.closest('aside');
+    let scroller = el.parentElement;
+    while (
+      scroller &&
+      !['auto', 'scroll'].includes(getComputedStyle(scroller).overflowY)
+    ) {
+      scroller = scroller.parentElement;
+    }
     if (!scroller) throw new Error('no scrolling form column');
     const spacer = document.createElement('div');
     spacer.style.flex = 'none';

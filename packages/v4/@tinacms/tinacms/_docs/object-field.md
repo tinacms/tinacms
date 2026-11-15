@@ -143,8 +143,8 @@ sets the field to `null`.
 | `'drillIn'` | A card that opens the object as the next Form level. |
 
 With no `display`, levels 1 and 2 open in place and level 3 and deeper drill
-in. An explicit `display` wins at every depth. The collapsible's open state is
-local: it starts closed and opens when the active field is the object or sits
+in whatever `display` says. An explicit `display` wins at level 1 and 2. The
+collapsible's open state is local: it starts closed and opens when the active field is the object or sits
 inside it. The object's own frame shows only errors on the object; each child
 shows its own.
 

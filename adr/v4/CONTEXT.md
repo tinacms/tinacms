@@ -97,7 +97,7 @@ The capability for reading/writing content, exposed by the **Data Layer**. Its q
 _Avoid_: "GraphQL Server" as a top-level system name
 
 **`draft` capability** (Drafting):
-The capability for retaining a user's **uncommitted, pre-save** edits to a document — **per-user and local**, distinct from committed/git history (which lives inside the **Data Layer**, ADR-004). Durable drafts persist in the core form store (ADR-026): dirty forms only, restored automatically and rebased onto the fetched document, cleared on save or discard. The storage adapter is the swap point; edit history and **collaborative editing** remain future `draft` capability work built on that storage.
+The capability for retaining a user's **uncommitted, pre-save** edits to a document — **per-user and local**, distinct from committed/git history (which lives inside the **Data Layer**, ADR-004). Durable drafts persist in the core form store (ADR-026): a live copy plus waiting copies, never applied on open, applied only by Resume, removed only by a good save or a confirmed Discard. The storage adapter is the swap point; edit history and **collaborative editing** remain future `draft` capability work built on that storage.
 _Avoid_: drafting as committed/version history — drafts are pre-save, per-user, and uncommitted
 
 **`search` capability**:

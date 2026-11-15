@@ -5,13 +5,18 @@ import { invariant } from '../core/invariant';
 import { capabilityProvider } from '../core/mount';
 import {
   AUTH_CAPABILITY,
+  type Capability,
   type ResolvedSegment,
+  type SliceConfig,
   type SliceState,
   type SliceSet,
   type TinaStoreState,
 } from '../core/plugin';
+import { isSearchProvider } from '../core/search/contract';
 import { isRecord } from '../utils/is-record';
 import { composePluginSlices } from './compose-slices';
+
+const SEARCH_CAPABILITY = 'search' as const satisfies Capability;
 
 const CORE_NAMESPACES = ['ui', 'branch', 'documents'] as const;
 type CoreNamespace = (typeof CORE_NAMESPACES)[number];
@@ -75,8 +80,15 @@ const isCoreNamespace = (namespace: string): namespace is CoreNamespace =>
 const PERSIST_STORAGE_KEY = 'tina-store';
 const DEVTOOLS_STORE_NAME = 'TinaStore';
 
-export const createTinaStore = (resolved: ResolvedSegment[]) => {
+export const createTinaStore = (
+  resolved: ResolvedSegment[],
+  sliceConfig?: SliceConfig
+) => {
   const pluginSlices = composePluginSlices(resolved);
+  const searchProviderName = capabilityProvider(
+    resolved.map(({ manifest }) => manifest),
+    SEARCH_CAPABILITY
+  )?.name;
   const sendsTokenToSite = Boolean(
     capabilityProvider(
       resolved.map(({ manifest }) => manifest),
@@ -97,7 +109,13 @@ export const createTinaStore = (resolved: ResolvedSegment[]) => {
                 'or the capability it provides.'
             );
             const scopedSet = createNamespacedSet(namespace, set as RootSet);
-            state[namespace] = slice(scopedSet, get);
+            state[namespace] = slice(scopedSet, get, sliceConfig);
+            invariant(
+              namespace !== SEARCH_CAPABILITY ||
+                isSearchProvider(state[namespace]),
+              'search-provider-shape',
+              `Plugin "${searchProviderName}" provides \`search\` but its slice has no \`search\` function.`
+            );
           }
           state.branch = {
             list: [],

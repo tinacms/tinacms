@@ -1,6 +1,7 @@
 import {
   skipToken,
   useMutation,
+  useQueries,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
@@ -68,6 +69,27 @@ export const useCollectionDocuments = (
     documents: query.data ?? EMPTY_DOCUMENTS,
     isLoading: query.isLoading,
     error: query.error,
+  };
+};
+
+/** The file paths of every listed collection, and whether every list has been read. */
+export const useCollectionsDocumentPaths = (
+  collections: readonly string[]
+): { paths: ReadonlySet<string>; settled: boolean } => {
+  const content = useContentSlice();
+  const branch = useCurrentBranch();
+  const results = useQueries({
+    queries: collections.map((collection) => ({
+      queryKey: contentKeys.list(collection, branch),
+      queryFn: () => content.list(collection),
+      staleTime: CONTENT_STALE_TIME,
+    })),
+  });
+  return {
+    paths: new Set(
+      results.flatMap((result) => (result.data ?? []).map(({ path }) => path))
+    ),
+    settled: results.every((result) => result.isSuccess),
   };
 };
 
@@ -195,14 +217,18 @@ export const useSaveDocument = (): DocumentSave => {
         ? saveThroughServer(input)
         : content.update(input.collection, input.path, input.value),
     onMutate: () => currentBranchOf(runtime.store.getState()),
-    onSuccess: ({ path, document }, { collection }, branch) => {
+    onSuccess: (
+      { document, hookWarnings, ...summary },
+      { collection },
+      branch
+    ) => {
       queryClient.setQueryData<DocumentSummary[]>(
         contentKeys.list(collection, branch),
-        (cached) => (cached ? upsertByPath(cached, { path }) : undefined)
+        (cached) => (cached ? upsertByPath(cached, summary) : undefined)
       );
       queryClient.setQueryData<DocumentEntry>(
-        contentKeys.document(collection, path, branch),
-        { path, document }
+        contentKeys.document(collection, summary.path, branch),
+        { ...summary, document }
       );
     },
   });

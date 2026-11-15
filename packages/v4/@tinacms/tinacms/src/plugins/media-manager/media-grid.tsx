@@ -2,6 +2,7 @@ import { Badge } from '@tinacms/ui/components/badge';
 import { cn } from '@tinacms/ui/lib/utils';
 import { useId } from 'react';
 import type { MediaItem, MediaUrlOptions } from '../../core/media/contract';
+import { Icon as UiIcon } from '@tinacms/ui/components/icon';
 import { ClapperboardIcon, FileIcon, FolderIcon, PlayIcon } from 'lucide-react';
 import {
   type MediaViewMode,
@@ -109,10 +110,12 @@ function GridFileTile({
               style={checkerboardStyle}
             />
           ) : video ? (
-            <span className='flex size-full items-center justify-center bg-gradient-to-br from-gray-700 to-gray-900'>
-              <span className='flex size-10 items-center justify-center rounded-full bg-white/90 shadow'>
-                <PlayIcon
-                  className='ml-0.5 size-4 text-gray-700'
+            <span className='flex size-full items-center justify-center bg-muted'>
+              <span className='flex size-10 items-center justify-center rounded-full bg-card shadow-xs ring-1 ring-border'>
+                <UiIcon
+                  glyph={PlayIcon}
+                  size={16}
+                  className='ml-0.5 text-gray-700'
                   fill='currentColor'
                 />
               </span>
@@ -123,8 +126,8 @@ function GridFileTile({
             </span>
           )}
           {badge ? (
-            <span className='absolute bottom-2 left-2 rounded-sm bg-black/65 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-white'>
-              {badge}
+            <span className='absolute bottom-2 left-2'>
+              <Badge kind='label'>{badge}</Badge>
             </span>
           ) : null}
         </span>

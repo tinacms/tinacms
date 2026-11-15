@@ -21,6 +21,8 @@ export type StringFieldViewProps = Pick<
   value: string;
   onChange?: (value: string) => void;
   onBlur?: () => void;
+  /** One message from outside the form, such as a name already taken. It shows with the field's errors. */
+  error?: string;
   placeholder?: string;
   multiline?: boolean;
   mono?: boolean;
@@ -38,6 +40,7 @@ export function StringFieldView({
   value,
   onChange,
   onBlur,
+  error,
   placeholder,
   multiline = false,
   mono = false,
@@ -46,7 +49,7 @@ export function StringFieldView({
   ref,
   ...frame
 }: StringFieldViewProps) {
-  const errors = frame.errors ?? [];
+  const errors = [...(frame.errors ?? []), ...(error ? [error] : [])];
   const control = {
     id,
     value,
@@ -63,7 +66,7 @@ export function StringFieldView({
   };
 
   return (
-    <FieldWrapper {...frame} disabled={disabled}>
+    <FieldWrapper {...frame} errors={errors} disabled={disabled}>
       {multiline ? (
         <Textarea {...control} ref={ref} className='disabled:opacity-100' />
       ) : (

@@ -82,7 +82,7 @@ function Avatar({
       aria-expanded={expanded ?? false}
       onClick={onClick}
       className={cn(
-        'group/avatar-button inline-flex cursor-pointer rounded-full border-0 bg-transparent p-0 outline-none focus:shadow-focus-ring',
+        'group/avatar-button inline-flex cursor-pointer rounded-full border-0 bg-transparent p-0 outline-none focus-visible:shadow-focus-ring',
         className
       )}
       {...props}

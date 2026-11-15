@@ -33,6 +33,20 @@ describe('Input', () => {
   });
 });
 
+describe('Switch, read-only', () => {
+  it('does not flip when read-only', async () => {
+    const user = userEvent.setup();
+    const onCheckedChange = vi.fn();
+    render(
+      <Switch readOnly onCheckedChange={onCheckedChange}>
+        Autosave
+      </Switch>
+    );
+    await user.click(screen.getByRole('switch', { name: 'Autosave' }));
+    expect(onCheckedChange).not.toHaveBeenCalled();
+  });
+});
+
 describe('Switch', () => {
   it('takes its name from its words and flips on a click on them or Space', async () => {
     const user = userEvent.setup();
@@ -120,6 +134,7 @@ describe('Segmented', () => {
 
 describe('SearchBox', () => {
   it('is a searchbox named by its label, with the shortcut announced', () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue('Macintosh');
     render(<SearchBox label='Search titles' shortcut='⌘K' />);
     const box = screen.getByRole('searchbox', { name: 'Search titles' });
     expect(box).toHaveAttribute('placeholder', 'Search titles');
@@ -151,6 +166,30 @@ describe('SearchBox', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Clear search' }));
     expect(onClear).toHaveBeenCalledOnce();
+  });
+});
+
+describe('SearchBox results', () => {
+  it('announces the hit count next to Clear, and shows none without it', () => {
+    const { rerender } = render(
+      <SearchBox
+        label='Search'
+        value='logo'
+        onChange={() => {}}
+        onClear={() => {}}
+      />
+    );
+    expect(screen.queryByRole('status')).toBeNull();
+    rerender(
+      <SearchBox
+        label='Search'
+        value='logo'
+        results='50+'
+        onChange={() => {}}
+        onClear={() => {}}
+      />
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('50+');
   });
 });
 

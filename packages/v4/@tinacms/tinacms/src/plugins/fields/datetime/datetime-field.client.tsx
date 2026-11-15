@@ -15,7 +15,7 @@ export default defineClientPlugin({
     schema: datetimeSchema,
     parse: (stored) => {
       if (stored instanceof Date) return stored.toISOString();
-      return stored == null ? undefined : String(stored);
+      return stored ?? undefined;
     },
   },
 });

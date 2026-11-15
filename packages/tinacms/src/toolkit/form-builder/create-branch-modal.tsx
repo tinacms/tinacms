@@ -62,6 +62,8 @@ export const CreateBranchModal = ({
   const [newBranchName, setNewBranchName] = React.useState(
     formatDefaultBranchName(path, crudType)
   );
+  const [isGeneratedBranchName, setIsGeneratedBranchName] =
+    React.useState(true);
   const [isBranchGuardChecking, setIsBranchGuardChecking] =
     React.useState(false);
   const normalizedBranchName = normalizeBranchName(newBranchName);
@@ -127,6 +129,7 @@ export const CreateBranchModal = ({
       tinaForm,
       signal: abortController.signal,
       targetBranchExists,
+      autoRenameBranch: isGeneratedBranchName,
       isDraft,
     });
     if (branchGuardAbortRef.current === abortController) {
@@ -170,6 +173,7 @@ export const CreateBranchModal = ({
       onBranchNameChange={(value) => {
         abortBranchGuard();
         reset();
+        setIsGeneratedBranchName(false);
         setNewBranchName(value);
       }}
       onCreateBranch={executeEditorialWorkflow}

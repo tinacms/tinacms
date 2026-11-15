@@ -338,6 +338,55 @@ screen. A `globalNav` entry that targets a removed screen does not render.
 Two overrides of one screen throw an error at boot
 (`core/screen/registry.ts`).
 
+### Home
+
+Home is the screen with the name `home`. The core plugin
+(`plugins/home/home.plugin.ts`) contributes it, with a `globalNav` entry that
+targets it. The admin shows Home at `#/`, with no panel header and no Close
+button. `#/screens/home` shows the same screen.
+
+To replace Home, override the key `home` and contribute a screen with that
+name:
+
+```ts
+definePlugin({
+  name: 'my:home',
+  provides: ['screen'],
+  overrides: [{ capability: 'screen', key: 'home' }],
+  client: async () => ({
+    default: defineClientPlugin({
+      screens: [{ name: 'home', label: 'Home', component: MyHome }],
+    }),
+  }),
+});
+```
+
+The shell scrolls a Home screen that is taller than the window and adds no
+padding, as it does for each other screen. Thus the component sets its own
+padding and needs no scroll container.
+
+After a replace:
+
+- `#/` shows `MyHome` with `segments: []`. `#/screens/home/a/b` shows it with
+  `segments: ['a', 'b']`.
+- The panels and the page head of the default Home do not show. They are parts
+  of the screen that the plugin replaced. To get the same look, use
+  `HomePanelTray` from `@tinacms/ui/components/home-panel-tray`.
+- The sidebar keeps the Home row, and Search keeps the Home entry. They stay
+  because the core plugin `tina:home:core` still contributes the `globalNav`
+  entry that targets `home`. The replacement plugin does not contribute one.
+
+To remove Home, override the key `home` and contribute no screen with that
+name. After a remove:
+
+- `#/` shows the sentence "Pick a place from the sidebar."
+- The sidebar has no Home row, and Search has no Home entry.
+- A Close button still opens `#/`.
+- `#/screens/home` shows "No screen named “home”."
+
+A second screen with the name `home` and no override throws an error at boot.
+A plugin cannot add, remove or move one panel of the default Home.
+
 ## More data
 
 - [Field plugins](./field-plugins.md) — how to write a field plugin
@@ -357,7 +406,8 @@ Two overrides of one screen throw an error at boot
   - [The `rich-text` field](./rich-text-field.md) — the Plate editor that v4
     supplies, and the markdown body that it controls
 - [Media plugins](./media-plugins.md) — how a plugin stores media, and the local media plugin
-  - [The Media Manager](./media-manager.md) — the screen to browse, upload, rename and delete media, and the `MediaBrowser` component
+  - [The Media Manager](./media-manager.md) — the pane to browse, upload, move, download and delete media, and the `MediaBrowser` component
+- [Search plugins](./search-plugins.md) — how a plugin gives a site full-text search
 - [Auth plugins](./auth-plugins.md): how a plugin verifies a request and signs the editor in
 - [UI slots](./ui-slots.md) — how a plugin adds entries to the admin sidebar
 - [Architecture](./architecture.md) — how a plugin gets to the screen
@@ -370,10 +420,31 @@ logo and omits it when unset.
 A content provider tells the shell where it reads from:
 
 - `branches: { list, defaultBranch }` on the content slice gives the Branch
-  switcher its branches. `list` returns `{ name, protected? }` for each branch.
+  switcher its branches. `list` returns `{ name, protected?, pullRequestUrl? }`
+  for each branch. `pullRequestUrl` is the address of the pull request of the
+  branch. The Branch panel on Home links to it. A branch without a pull request
+  omits the property.
 - `local: true` on the content slice makes the Status bar read "Local files"
   and removes the branch button.
 
+`list` on the content slice returns a `DocumentSummary` for each document
+(`core/content/contract.ts`). `path` is the only required property. Three
+properties are optional, and a provider supplies only the ones it knows:
+
+| Property | Type | Role |
+|---|---|---|
+| `title` | `string` | The name of the document for people. Pickers and Home show it instead of the file name. |
+| `updatedAt` | `string` | The time of the last change, as an ISO 8601 string in UTC. Recent documents on Home sorts by it. A string that is not a date counts as no time. |
+| `lastAuthor` | `{ name: string }` | The person who made the last change. Recent documents shows the name. |
+
+`get` and `update` return a `DocumentEntry`, which can hold the same
+properties. The local content plugin sets `updatedAt` from the modified time
+of the file. It does not set `lastAuthor`, because it does not read git.
+Do not set `updatedAt` from a time that is not the time of the last change,
+such as the time of an index.
+
 A provider with neither shows no branch spot. A `search` slice with a
-`search(query)` method adds the Search control and the ⌘K shortcut. Without one,
-neither renders.
+`search(query, { limit, collections?, filters?, cursor? })` method adds content
+results to the Search dialog. The Search control and the ⌘K shortcut always
+show, because the dialog also finds screens. Refer to
+[Search plugins](./search-plugins.md) for the contract.

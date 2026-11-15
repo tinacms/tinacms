@@ -1,12 +1,17 @@
 'use client';
 
 import { Checkbox } from '@tinacms/ui/components/checkbox';
-import { PlateElement, type PlateElementProps } from '@udecode/plate/react';
+import {
+  PlateElement,
+  type PlateElementProps,
+  useReadOnly,
+} from '@udecode/plate/react';
 import React from 'react';
 
 export function ListItemElement(props: PlateElementProps) {
   const { children, editor, element } = props;
   const labelId = React.useId();
+  const readOnly = useReadOnly();
 
   if (typeof element.checked !== 'boolean') {
     return (
@@ -28,6 +33,7 @@ export function ListItemElement(props: PlateElementProps) {
       >
         <Checkbox
           checked={element.checked}
+          disabled={readOnly}
           aria-labelledby={labelId}
           onCheckedChange={(checked) => {
             editor.tf.setNodes(

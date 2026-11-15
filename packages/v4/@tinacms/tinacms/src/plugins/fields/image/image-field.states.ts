@@ -53,6 +53,55 @@ export const imageFieldStates = [
   },
   { name: 'busy', props: { ...base, busy: true } },
   { name: 'busy and filled', props: { ...filled, busy: true } },
+  {
+    name: 'uploading with a percent',
+    props: { ...base, busy: true, progress: 40, uploadName: 'new.png' },
+  },
+  {
+    name: 'uploading over an image',
+    props: { ...filled, busy: true, progress: 40, uploadName: 'new.png' },
+  },
+  {
+    name: 'upload failed with Retry',
+    props: {
+      ...base,
+      errors: ["new.png: Couldn't upload. Check your connection, then retry."],
+      uploadName: 'new.png',
+      onRetry: () => {},
+    },
+  },
+  {
+    name: 'upload failed with no Retry',
+    props: {
+      ...base,
+      errors: ['notes.pdf: Only images can go in this field.'],
+    },
+  },
+  {
+    name: 'replace failed with Retry',
+    props: {
+      ...filled,
+      errors: ["new.png: Couldn't upload. Check your connection, then retry."],
+      uploadName: 'new.png',
+      onRetry: () => {},
+    },
+  },
+  {
+    name: 'saved under a numbered name',
+    props: {
+      ...filled,
+      path: 'about-1.png',
+      note: 'about.png was taken, saved as about-1.png',
+    },
+  },
+  {
+    name: 'uploads on hold, said on a drop',
+    props: {
+      ...base,
+      holdReason: "This storage is read-only. Files can't be uploaded here.",
+      holdQuiet: true,
+    },
+  },
   { name: 'no uploads', props: { ...base, onDropFile: undefined } },
   { name: 'disabled', props: { ...filled, disabled: true } },
   { name: 'disabled and empty', props: { ...base, disabled: true } },

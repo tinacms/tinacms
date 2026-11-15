@@ -5,6 +5,7 @@ export const DATETIME_FIELD_TYPE = 'datetime';
 
 export interface DatetimeFieldSchema extends BaseFieldSchema {
   type: typeof DATETIME_FIELD_TYPE;
+  placeholder?: string;
 }
 
 export const datetime = (

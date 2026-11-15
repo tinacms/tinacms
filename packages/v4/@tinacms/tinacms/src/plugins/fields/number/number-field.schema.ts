@@ -15,8 +15,11 @@ export const number = (
 const labelOf = (node: NumberFieldSchema): string => node.label ?? node.name;
 
 export const toNumber = (value: unknown): unknown => {
-  const trimmed = typeof value === 'string' ? value.trim() : value;
-  return trimmed === '' || trimmed == null ? undefined : Number(trimmed);
+  if (value == null) return undefined;
+  if (typeof value === 'number') return value;
+  if (typeof value !== 'string') return value;
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : Number(trimmed);
 };
 
 // The shape of the value only, and the coercion the editor needs: the input

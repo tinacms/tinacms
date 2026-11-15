@@ -31,6 +31,12 @@ export const tagOp = <TOp extends ServerOp>(
   return wrapped;
 };
 
+// The one way to expose an endpoint with no session (ADR-008 §1), so a search for
+// `publicOp` lists every unauthenticated route. It lives here, in a module with no
+// node import, so a plugin's lazy `server` loader can reach it (ADR-028 §4).
+export const publicOp = <TOp extends ServerOp>(handler: TOp): TOp =>
+  tagOp(handler, { public: true, permissions: [] });
+
 // Core's content save requires `content:save` and every permission the
 // provider's own `update` required.
 export const requiringPermissions = <TOp extends ServerOp>(

@@ -1,10 +1,12 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import type { AuthTransportHooks } from '../core/auth/contract';
-import type { ResolvedServerSegment } from '../core/plugin';
+import type { ResolvedServerSegment, ServerSegment } from '../core/plugin';
+import type { SearchIndexProvider } from '../core/search/index-contract';
 import {
   type RequestContext,
   bindRequestContextStore,
 } from './request-context';
+import { bindServerRuntimeReader } from './runtime-access';
 
 // The composed server runtime (built once per handler, rpc/handler.ts): segments by
 // mount namespace, plus the auth hooks claimed at compose — `null` fails closed.
@@ -12,6 +14,10 @@ export interface ServerRuntime {
   segmentsByNamespace: Map<string, ResolvedServerSegment>;
   authHooks: AuthTransportHooks | null;
   authProvider: string | undefined;
+  // Claimed at compose, so no HTTP route reaches them: the search provider's
+  // index writes, and the content provider's default-branch lookup.
+  searchIndex: SearchIndexProvider | undefined;
+  resolveBranch: ServerSegment['resolveBranch'];
   // The teardown from initializePlugins. It runs every onDestroy that its matching
   // onInit paired with, and a second call destroys nothing.
   destroy: () => Promise<void>;
@@ -23,3 +29,4 @@ export const serverRuntimeStorage = new AsyncLocalStorage<ServerRuntime>();
 
 export const requestContextStorage = new AsyncLocalStorage<RequestContext>();
 bindRequestContextStore(() => requestContextStorage.getStore());
+bindServerRuntimeReader(() => serverRuntimeStorage.getStore());

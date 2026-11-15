@@ -16,7 +16,7 @@ export interface SelectFieldViewItem {
   label: string;
   /** Greyed and not pickable. */
   disabled?: boolean;
-  /** Shown as the option's tooltip. */
+  /** Shown beside the option's label in the list. */
   hint?: string;
 }
 
@@ -88,9 +88,13 @@ export function SelectFieldView({
               key={row.value}
               value={row.value}
               disabled={row.disabled}
-              title={row.hint}
             >
               {row.label}
+              {row.hint ? (
+                <span className='ml-auto text-xs text-muted-foreground'>
+                  {row.hint}
+                </span>
+              ) : null}
             </SelectItem>
           ))}
         </SelectContent>

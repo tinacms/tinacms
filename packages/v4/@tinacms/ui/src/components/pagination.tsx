@@ -35,7 +35,7 @@ type PaginationProps = Omit<ComponentProps<'nav'>, 'children'> & {
 };
 
 /**
- * Moves through a long list a page at a time. Screen readers hear "Showing 11 to 20 of 48"
+ * Moves through a long list a page at a time. Screen readers hear "Showing 11–20 of 48"
  * when it changes. A button with nowhere to go is disabled, not hidden, so nothing jumps.
  */
 function Pagination({
@@ -66,7 +66,7 @@ function Pagination({
       {...props}
     >
       <span aria-live='polite' className='tabular-nums'>
-        Showing {from === to ? to : `${from} to ${to}`} of {total}
+        Showing {from === to ? to : `${from}–${to}`} of {total}
       </span>
       <ul className='m-0 flex list-none flex-wrap items-center gap-1 p-0'>
         <li>
@@ -84,12 +84,13 @@ function Pagination({
         {pageRun(current, pages).map((pageNumber, index) =>
           pageNumber === null ? (
             // The run has at most two ellipses, each fixed in place.
-            <li key={`gap-${index}`} aria-hidden='true'>
+            <li key={`gap-${index}`}>
               <Icon
                 glyph='more'
                 size={16}
                 className='mx-2 text-muted-foreground'
               />
+              <span className='sr-only'>More pages</span>
             </li>
           ) : (
             <li key={pageNumber}>

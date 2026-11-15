@@ -11,8 +11,8 @@ export const useAdminRoute = (): AdminNavigation => {
   const location = useLocation();
   const routerNavigate = useNavigate();
   const route = useMemo(
-    () => parseAdminRoute(`#${location.pathname}`),
-    [location.pathname]
+    () => parseAdminRoute(`#${location.pathname}${location.search}`),
+    [location.pathname, location.search]
   );
   const navigate = useCallback(
     (next: AdminRoute) => routerNavigate(formatAdminRoute(next).slice(1)),
