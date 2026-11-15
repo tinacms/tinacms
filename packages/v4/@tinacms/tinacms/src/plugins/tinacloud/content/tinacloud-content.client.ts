@@ -18,9 +18,12 @@ import {
 } from './request';
 
 // `relativePath` is the path inside the collection's configured `path`, so
-// the difference is the collection's folder.
+// the difference is the collection's folder. A `relativePath` that is not a
+// whole trailing segment of `path` gives the unrooted listing.
 const collectionFolderOf = (path: string, relativePath: string): string =>
-  path === relativePath ? '' : path.slice(0, -(relativePath.length + 1));
+  relativePath !== '' && path.endsWith(`/${relativePath}`)
+    ? path.slice(0, -(relativePath.length + 1))
+    : '';
 
 const titleOf = (values: Record<string, unknown>): string | undefined =>
   typeof values.title === 'string' && values.title !== ''

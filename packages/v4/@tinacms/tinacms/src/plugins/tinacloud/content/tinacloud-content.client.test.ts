@@ -20,16 +20,19 @@ const content = () => {
 
 const POSTS_FOLDER = 'content/posts/';
 
-type Row = string | { path: string; title?: string; root?: string };
+type Row =
+  | string
+  | { path: string; title?: string; root?: string; relativePath?: string };
 
 const nodeOf = (row: Row) => {
   const {
     path,
     title,
     root = POSTS_FOLDER,
+    relativePath = path.slice(root.length),
   } = typeof row === 'string' ? { path: row } : row;
   return {
-    _sys: { path, relativePath: path.slice(root.length) },
+    _sys: { path, relativePath },
     _values: title === undefined ? {} : { title },
   };
 };
@@ -240,6 +243,16 @@ describe('TinaCloud content slice', () => {
     const connection = await content().list('post', { folder: '' });
     expect(connection.folders).toEqual([
       { path: 'docs', name: 'docs', documentCount: 1 },
+    ]);
+  });
+
+  it('falls back to the unrooted listing when relativePath is not a trailing segment of path', async () => {
+    stubTinaCloud(
+      page([{ path: 'content/posts/a.md', relativePath: '/a.md' }], null)
+    );
+    const connection = await content().list('post', { folder: '' });
+    expect(connection.folders).toEqual([
+      { path: 'content', name: 'content', documentCount: 1 },
     ]);
   });
 
