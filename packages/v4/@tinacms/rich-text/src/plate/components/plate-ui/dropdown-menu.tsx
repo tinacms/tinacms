@@ -13,6 +13,7 @@ import {
 import { cva } from 'class-variance-authority';
 
 import { Icons } from './icons';
+import { useVisualViewportBoundary } from './visual-viewport-boundary';
 
 export const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -47,10 +48,21 @@ export const DropdownMenuSubTrigger = withRef<
   </DropdownMenuPrimitive.SubTrigger>
 ));
 
-export const DropdownMenuSubContent = withCn(
+const DropdownMenuSubContentBase = withCn(
   DropdownMenuPrimitive.SubContent,
   'z-[99999] box-border max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-60 max-w-[var(--radix-dropdown-menu-content-available-width)] origin-[var(--radix-dropdown-menu-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-md bg-popover p-1 font-sans text-base leading-control text-foreground shadow-popover outline-none'
 );
+
+export const DropdownMenuSubContent = withRef<
+  typeof DropdownMenuPrimitive.SubContent
+>((props, ref) => (
+  <DropdownMenuSubContentBase
+    ref={ref}
+    collisionBoundary={useVisualViewportBoundary()}
+    collisionPadding={8}
+    {...props}
+  />
+));
 
 const DropdownMenuContentVariants = withProps(DropdownMenuPrimitive.Content, {
   className: cn(
@@ -64,7 +76,11 @@ export const DropdownMenuContent = withRef<
   typeof DropdownMenuPrimitive.Content
 >(({ ...props }, ref) => (
   <DropdownMenuPrimitive.Portal>
-    <DropdownMenuContentVariants ref={ref} {...props} />
+    <DropdownMenuContentVariants
+      ref={ref}
+      collisionBoundary={useVisualViewportBoundary()}
+      {...props}
+    />
   </DropdownMenuPrimitive.Portal>
 ));
 

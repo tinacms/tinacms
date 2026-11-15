@@ -149,6 +149,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
                       key={editing ? 'edit' : 'preview'}
                       tabIndex={-1}
                       size='none'
+                      variant='ghost'
                       aria-pressed={isEditing === editing}
                       className={cn(
                         'h-6 rounded-xs px-2 text-xs text-muted-foreground',

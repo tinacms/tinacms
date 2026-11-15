@@ -84,7 +84,7 @@ export const FloatingToolbar = withRef<
       <Toolbar
         aria-label='Turn into'
         className={cn(
-          'absolute z-40 whitespace-nowrap rounded-md bg-popover p-1 font-sans shadow-popover inset-ring inset-ring-border print:hidden'
+          'absolute z-20 whitespace-nowrap rounded-md bg-popover p-1 font-sans shadow-popover inset-ring inset-ring-border print:hidden'
         )}
         {...props}
         {...rootProps}

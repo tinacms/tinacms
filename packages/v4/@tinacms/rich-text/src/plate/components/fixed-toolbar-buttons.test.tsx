@@ -68,6 +68,8 @@ afterEach(() => {
   widths.clear();
 });
 
+let lastEditor: ReturnType<typeof usePlateEditor> | undefined;
+
 const Harness = ({
   value = paragraphValue,
   selection,
@@ -89,6 +91,7 @@ const Harness = ({
     selection,
     components: Components(),
   });
+  lastEditor = editor;
   return (
     <TooltipProvider>
       <ToolbarProvider templates={templates} overrides={overrides}>
@@ -227,6 +230,8 @@ describe('keyboard', () => {
     expect(buttons[0]).toHaveFocus();
     await user.keyboard('{ArrowRight}');
     expect(buttons[1]).toHaveFocus();
+    await waitFor(() => expect(buttons[1].tabIndex).toBe(0));
+    expect(buttons[0].tabIndex).toBe(-1);
     await user.keyboard('{End}');
     expect(buttons.at(-1)).toHaveFocus();
     await user.keyboard('{ArrowRight}');
@@ -461,5 +466,52 @@ describe('swatches', () => {
     ).toBeInTheDocument();
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
+  });
+});
+
+describe('shortcuts and insertion', () => {
+  const select = (start: number, end: number): TRange => ({
+    anchor: { path: [0, 0], offset: start },
+    focus: { path: [0, 0], offset: end },
+  });
+
+  it.each([
+    ['{Control>}b{/Control}', 'bold'],
+    ['{Control>}i{/Control}', 'italic'],
+    ['{Control>}{Shift>}x{/Shift}{/Control}', 'strikethrough'],
+    ['{Control>}e{/Control}', 'code'],
+  ])('toggles the format on %s', async (keys, mark) => {
+    const user = userEvent.setup();
+    render(<Harness selection={select(0, 5)} />);
+    await user.click(screen.getByRole('textbox'));
+    lastEditor?.tf.select(select(0, 5));
+    await user.keyboard(keys);
+
+    expect(JSON.stringify(lastEditor?.children[0])).toContain(`"${mark}":true`);
+  });
+
+  it('inserts the Callout embed from Insert', async () => {
+    const user = userEvent.setup();
+    render(
+      <Harness templates={[template('Callout')]} selection={select(0, 0)} />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Insert' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Callout' }));
+
+    expect(JSON.stringify(lastEditor?.children)).toContain('Callout');
+  });
+
+  it('returns focus to the trigger on Escape', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    const trigger = screen.getByRole('button', { name: 'More formatting' });
+
+    trigger.focus();
+    await user.keyboard('{Enter}');
+    await screen.findByRole('menu');
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(trigger).toHaveFocus());
   });
 });

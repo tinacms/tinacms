@@ -34,10 +34,18 @@ const isListActive = (editor, type) => {
 };
 
 let seededNodeIds = 0;
-const withRootNodeIds = (nodes: any[]) =>
-  nodes.map((node) =>
-    node.id ? node : { ...node, id: `seed-${++seededNodeIds}` }
-  );
+const TABLE_PARTS = new Set(['table', 'tr', 'td', 'th']);
+
+const withNodeIds = (node: any): any => {
+  const withId = node.id ? node : { ...node, id: `seed-${++seededNodeIds}` };
+  if (!TABLE_PARTS.has(node.type) || !Array.isArray(node.children)) {
+    return withId;
+  }
+  return { ...withId, children: node.children.map(withNodeIds) };
+};
+
+/** Table cells need ids too: the table plugin keys each cell's row and column by `id`. */
+const withRootNodeIds = (nodes: any[]) => nodes.map(withNodeIds);
 
 const normalize = (node: any) => {
   if (

@@ -52,7 +52,16 @@ export function RichTextField() {
     containerRef.current?.querySelector<HTMLElement>('[role="textbox"]');
 
   useFieldActivation(() => {
-    setTimeout(() => editable()?.focus(), 0);
+    setTimeout(() => {
+      const active = document.activeElement;
+      if (
+        containerRef.current?.contains(active) ||
+        active?.closest('[role="menu"], [role="dialog"]')
+      ) {
+        return;
+      }
+      editable()?.focus();
+    }, 0);
   });
 
   return (

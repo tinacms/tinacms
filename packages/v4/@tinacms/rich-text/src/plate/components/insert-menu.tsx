@@ -1,5 +1,7 @@
 import { useEditorRef } from '@udecode/plate/react';
+import { Workflow } from 'lucide-react';
 import React from 'react';
+import { useMenuCloseFocus } from './use-menu-close-focus';
 import { insertMDX } from '../plugins/create-mdx-plugins';
 import type { InsertTool } from '../toolbar/toolbar-layout';
 import { useToolbarContext } from '../toolbar/toolbar-provider';
@@ -43,6 +45,7 @@ export function InsertMenu({
   const { templates } = useToolbarContext();
   const editor = useEditorRef();
   const { open, onOpenChange } = useOpenState();
+  const closeFocus = useMenuCloseFocus();
   const { isBlocked } = useToolBlocked();
   const [filterText, setFilterText] = React.useState('');
 
@@ -76,14 +79,7 @@ export function InsertMenu({
           Insert
         </ToolbarButton>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align='end'
-        aria-label='Insert'
-        onCloseAutoFocus={(event) => {
-          event.preventDefault();
-          editor.tf.focus();
-        }}
-      >
+      <DropdownMenuContent align='end' aria-label='Insert' {...closeFocus}>
         {hasTemplates && templates.length > TEMPLATE_COUNT_NEEDING_FILTER ? (
           <input
             type='search'

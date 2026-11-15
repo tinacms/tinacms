@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useKeyboardInset } from '../../hooks/use-keyboard-inset';
 
 import { PortalBody } from '@udecode/cn';
 import {
@@ -164,10 +165,12 @@ export function LinkSheet({
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
 }) {
+  const inset = useKeyboardInset();
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side='bottom'
+        style={{ bottom: inset }}
         showCloseButton={false}
         initialFocus={false}
         className='pb-[env(safe-area-inset-bottom)]'

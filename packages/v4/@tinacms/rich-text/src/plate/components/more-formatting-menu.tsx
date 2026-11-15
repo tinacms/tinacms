@@ -2,6 +2,7 @@ import { Type } from 'lucide-react';
 import { useEditorRef } from '@udecode/plate/react';
 import type { TRange } from '@udecode/plate';
 import React from 'react';
+import { useMenuCloseFocus } from './use-menu-close-focus';
 import type { MoreFormattingTool } from '../toolbar/toolbar-layout';
 import { ToolbarButton } from './plate-ui/toolbar';
 import {
@@ -26,6 +27,7 @@ export function MoreFormattingMenu({
 }) {
   const editor = useEditorRef();
   const openState = useOpenState();
+  const closeFocus = useMenuCloseFocus();
   const savedSelection = React.useRef<TRange | null>(null);
 
   return (
@@ -52,10 +54,7 @@ export function MoreFormattingMenu({
       <DropdownMenuContent
         align='start'
         aria-label='More formatting'
-        onCloseAutoFocus={(event) => {
-          event.preventDefault();
-          editor.tf.focus();
-        }}
+        {...closeFocus}
       >
         {tools.includes('strikethrough') ? <StrikethroughMenuItem /> : null}
         {tools.includes('code') ? <CodeMenuItem /> : null}

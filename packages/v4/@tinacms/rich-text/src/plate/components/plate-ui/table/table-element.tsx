@@ -47,13 +47,13 @@ const TableBody = withRef<typeof PlateElement, { table: TTableElement }>(
       >
         <div
           className={cn(
-            'group/table relative w-fit',
+            'group/table relative w-full',
             !readOnly && 'pt-7 pr-7 pb-7 pl-7'
           )}
         >
           <table
             className={cn(
-              'mr-0 table h-px border-collapse border border-border not-tina-prose',
+              'mr-0 table h-px w-full border-collapse border border-border not-tina-prose',
               isSelectingCell && 'selection:bg-transparent'
             )}
             {...tableProps}

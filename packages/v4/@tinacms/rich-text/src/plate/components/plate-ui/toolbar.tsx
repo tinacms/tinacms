@@ -22,19 +22,20 @@ export const Toolbar = React.forwardRef<
   React.ComponentPropsWithoutRef<'div'>
 >(({ className, onKeyDown, onFocus, children, ...props }, ref) => {
   const rootRef = React.useRef<HTMLDivElement | null>(null);
-  const [stop, setStop] = React.useState<HTMLElement | null>(null);
+  const stopRef = React.useRef<HTMLElement | null>(null);
 
   React.useImperativeHandle(ref, () => rootRef.current as HTMLDivElement);
 
-  const syncTabStops = React.useEffectEvent(() => {
+  const syncTabStops = React.useCallback(() => {
     const root = rootRef.current;
     if (!root) return;
     const items = itemsOf(root);
+    const stop = stopRef.current;
     const current = stop && items.includes(stop) ? stop : items[0];
     for (const item of items) {
       item.tabIndex = item === current ? 0 : -1;
     }
-  });
+  }, []);
 
   React.useLayoutEffect(() => {
     syncTabStops();
@@ -48,7 +49,7 @@ export const Toolbar = React.forwardRef<
       attributeFilter: ['disabled', 'data-toolbar-item'],
     });
     return () => observer.disconnect();
-  }, []);
+  }, [syncTabStops]);
 
   return (
     <div
@@ -62,7 +63,10 @@ export const Toolbar = React.forwardRef<
       onFocus={(event) => {
         onFocus?.(event);
         const target = event.target as HTMLElement;
-        if (target.matches('[data-toolbar-item]')) setStop(target);
+        if (target.matches('[data-toolbar-item]')) {
+          stopRef.current = target;
+          syncTabStops();
+        }
       }}
       onKeyDown={(event) => {
         onKeyDown?.(event);

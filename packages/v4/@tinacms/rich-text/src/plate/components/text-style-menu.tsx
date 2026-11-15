@@ -4,6 +4,7 @@ import {
   useEditorSelector,
 } from '@udecode/plate/react';
 import React from 'react';
+import { useMenuCloseFocus } from './use-menu-close-focus';
 import { useToolbarContext } from '../toolbar/toolbar-provider';
 import {
   DropdownMenu,
@@ -59,6 +60,7 @@ export function TextStyleMenu({
   const { headingLevels } = useToolbarContext();
   const editor = useEditorRef();
   const openState = useOpenState();
+  const closeFocus = useMenuCloseFocus();
   const { isBlocked } = useToolBlocked();
   const value = useCurrentBlockType();
   const items = [
@@ -85,10 +87,7 @@ export function TextStyleMenu({
       <DropdownMenuContent
         align='start'
         aria-label='Text style'
-        onCloseAutoFocus={(event) => {
-          event.preventDefault();
-          editor.tf.focus();
-        }}
+        {...closeFocus}
       >
         <DropdownMenuRadioGroup
           value={value}

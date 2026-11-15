@@ -37,10 +37,10 @@ import {
 import type { ActiveTableCell } from './table-active-cell';
 
 export const menuContentClass =
-  'max-h-(--radix-dropdown-menu-content-available-height) min-w-52 overflow-y-auto!';
+  'max-h-(--radix-dropdown-menu-content-available-height) w-44 min-w-44 overflow-y-auto!';
 
 const subContentClass =
-  'max-h-(--radix-dropdown-menu-content-available-height) min-w-52 overflow-y-auto!';
+  'max-h-(--radix-dropdown-menu-content-available-height) w-44 min-w-44 overflow-y-auto!';
 
 const destructiveClass =
   'text-destructive focus:bg-status-failed-subtle focus:text-destructive';

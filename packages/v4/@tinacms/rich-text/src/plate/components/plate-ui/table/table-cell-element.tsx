@@ -38,6 +38,7 @@ export const TableCellElement = withRef<
   const { colIndex, minHeight, rowIndex, selected, width } =
     useTableCellElement();
   const readOnly = useReadOnly();
+  const headerLook = isHeader || rowIndex === 0;
   const active = useActiveTableCell();
   const colSpan = api.table.getColSpan(element);
   const rowSpan = api.table.getRowSpan(element);
@@ -68,11 +69,11 @@ export const TableCellElement = withRef<
         'relative h-full overflow-visible border border-border p-0',
         element.background
           ? 'bg-(--cellBackground)'
-          : isHeader
+          : headerLook
             ? 'bg-muted'
             : 'bg-background',
         cn(
-          isHeader && 'text-left font-medium [&_>_*]:m-0',
+          headerLook && 'text-left font-medium [&_>_*]:m-0',
           'before:size-full',
           selected && 'before:z-10 before:bg-muted',
           "before:absolute before:box-border before:select-none before:content-['']"

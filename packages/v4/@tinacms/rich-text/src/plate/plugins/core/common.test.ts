@@ -271,3 +271,27 @@ describe('insertBlockElement', () => {
     expect(JSON.stringify(editor.children)).toBe(before);
   });
 });
+
+describe('withRootNodeIds', () => {
+  it('gives table rows and cells ids, so the table plugin can key their row and column', () => {
+    const cell = (text: string) => ({
+      type: 'td',
+      children: [{ type: 'p', children: [{ text }] }],
+    });
+    const [table] = helpers.withRootNodeIds([
+      {
+        type: 'table',
+        children: [{ type: 'tr', children: [cell('a'), cell('b')] }],
+      },
+    ]);
+    const ids = [
+      table.id,
+      table.children[0].id,
+      table.children[0].children[0].id,
+      table.children[0].children[1].id,
+    ];
+
+    expect(ids.every(Boolean)).toBe(true);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+});

@@ -2,6 +2,7 @@ import { useKeyboardOpen } from '@tinacms/ui/hooks/use-keyboard-open';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { cn } from '@tinacms/ui/lib/utils';
 import * as React from 'react';
+import { useKeyboardInset } from '../../hooks/use-keyboard-inset';
 
 type FixedToolbarProps = {
   layout?: 'framed' | 'body';
@@ -66,26 +67,6 @@ function useEditorFocus(box: HTMLElement | null | undefined) {
   );
 }
 
-function useKeyboardInset(on: boolean) {
-  const [inset, setInset] = React.useState(0);
-  React.useEffect(() => {
-    const viewport = window.visualViewport;
-    if (!on || !viewport) return;
-    const update = () =>
-      setInset(
-        Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
-      );
-    update();
-    viewport.addEventListener('resize', update);
-    viewport.addEventListener('scroll', update);
-    return () => {
-      viewport.removeEventListener('resize', update);
-      viewport.removeEventListener('scroll', update);
-    };
-  }, [on]);
-  return inset;
-}
-
 /**
  * Where the formatting toolbar sits. Flat at the top of the box in the `framed` layout. In
  * the `body` layout it sticks 8px under the top of the form's scroll area and lifts into a
@@ -137,7 +118,7 @@ export function FixedToolbar({
           body
             ? 'sticky top-2 rounded-t-sm border-b border-border transition-[margin,box-shadow] data-stuck:mx-1.5 data-stuck:w-[calc(100%-0.75rem)] data-stuck:rounded-md data-stuck:border data-stuck:border-border data-stuck:shadow-md'
             : 'relative rounded-t-sm border-b border-border',
-          lifted && 'fixed inset-x-0 mx-0! w-full! rounded-none!'
+          lifted && 'fixed inset-x-0 top-auto! mx-0! w-full! rounded-none!'
         )}
       >
         {children}
