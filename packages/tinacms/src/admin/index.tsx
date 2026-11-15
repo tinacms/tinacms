@@ -180,7 +180,7 @@ const PreviewInner = ({ preview, config }) => {
   }, [reportedURL]);
 
   React.useEffect(() => {
-    setInterval(() => {
+    const poll = setInterval(() => {
       if (ref.current) {
         const url = new URL(ref.current.contentWindow?.location.href || '');
         if (url.origin === 'null') {
@@ -190,7 +190,8 @@ const PreviewInner = ({ preview, config }) => {
         setReportedURL(href);
       }
     }, 100);
-  }, [ref.current]);
+    return () => clearInterval(poll);
+  }, []);
   const Preview = preview;
   return (
     <div className='flex flex-col h-screen'>
