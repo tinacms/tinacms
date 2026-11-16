@@ -18,6 +18,8 @@ declare module '@tinacms/graphql' {
       lookup?: object;
     }): Promise<unknown>;
     indexContentByPaths(documentPaths: string[]): Promise<void>;
+    deleteContentByPaths(documentPaths: string[]): Promise<void>;
+    deleteIndexEntriesForPaths(documentPaths: string[]): Promise<void>;
   }
 
   export function createDatabaseInternal(config: {

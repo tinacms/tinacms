@@ -2,6 +2,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import type { AuthTransportHooks } from '../core/auth/contract';
 import type { ResolvedServerSegment, ServerSegment } from '../core/plugin';
 import type { SearchIndexProvider } from '../core/search/index-contract';
+import type { CollectionSchema } from '../core/schema/types';
 import {
   type RequestContext,
   bindRequestContextStore,
@@ -18,6 +19,8 @@ export interface ServerRuntime {
   // index writes, and the content provider's default-branch lookup.
   searchIndex: SearchIndexProvider | undefined;
   resolveBranch: ServerSegment['resolveBranch'];
+  // The schema's collections, read-only. Empty when the handler got no `schema`.
+  collections: readonly CollectionSchema[];
   // The teardown from initializePlugins. It runs every onDestroy that its matching
   // onInit paired with, and a second call destroys nothing.
   destroy: () => Promise<void>;

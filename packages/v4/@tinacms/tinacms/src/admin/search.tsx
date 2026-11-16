@@ -3,6 +3,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@tinacms/ui/components/dialog';
+import { Badge } from '@tinacms/ui/components/badge';
 import { Button } from '@tinacms/ui/components/button';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { useEffect, useMemo, useState } from 'react';
@@ -18,6 +19,7 @@ import {
   isSearchProvider,
 } from '../core/search/contract';
 import { useOptionalContentSlice, useTinaStore } from '../editor/hooks';
+import { useUnsavedFormIds } from '../form/form-store';
 import { useAdminScreens, useGlobalNav } from './hooks';
 import {
   HOME_SCREEN,
@@ -169,6 +171,7 @@ function SearchDialog({
   const [query, setQuery] = useState('');
   const [outcome, setOutcome] = useState<ContentSearchOutcome>(NO_OUTCOME);
   const navigation = useNavigationResults();
+  const unsavedPaths = new Set<string>(useUnsavedFormIds());
   const matching = navigation.filter(({ label }) =>
     label.toLowerCase().includes(query.trim().toLowerCase())
   );
@@ -235,8 +238,11 @@ function SearchDialog({
                   key={`${ref.collection}:${ref.path}`}
                   className='py-1.5 text-base'
                 >
-                  <span className='block [overflow-wrap:anywhere] font-medium'>
-                    {title}
+                  <span className='flex items-center gap-2'>
+                    <span className='min-w-0 [overflow-wrap:anywhere] font-medium'>
+                      {title}
+                    </span>
+                    {unsavedPaths.has(ref.path) ? <Badge /> : null}
                   </span>
                   {snippet ? (
                     <span className='block [overflow-wrap:anywhere] text-sm text-muted-foreground'>

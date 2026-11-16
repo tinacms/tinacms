@@ -26,6 +26,8 @@ import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
+import { connectionOf } from '../test/connection';
+import { returnToTree } from '../test/collection-tree';
 
 // Each test drives the whole admin, so a loaded machine needs longer than the defaults.
 configure({ asyncUtilTimeout: 4000 });
@@ -67,7 +69,7 @@ const contentPlugin = definePlugin({
     default: {
       slice: () => ({
         local: true,
-        list: async () => [{ path: PATH }, { path: OTHER }],
+        list: async () => connectionOf([{ path: PATH }, { path: OTHER }]),
         get: async (
           _collection: string,
           path: string
@@ -774,9 +776,7 @@ describe('where the pane goes and what it keeps', () => {
   it('leaves the blocked state when the editor opens another document', async () => {
     const user = await blockOnTwoFields();
     await errorsPane();
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await returnToTree(user);
     await user.click(await screen.findByRole('button', { name: /two\.mdx/ }));
     await waitFor(() =>
       expect(screen.queryByRole('button', { name: /^Resolve/ })).toBeNull()

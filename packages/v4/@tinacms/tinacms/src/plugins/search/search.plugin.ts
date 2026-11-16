@@ -6,6 +6,7 @@ import {
   definePlugin,
 } from '../../core/plugin';
 import type { HookRef } from '../../core/schema/types';
+import type { SearchClientConfig } from './search.client';
 import {
   SEARCH_INDEX_HOOK,
   type SearchFields,
@@ -43,6 +44,26 @@ const withHookOverride = (
 };
 
 /**
+ * The parts a plugin spreads into its manifest and loaders to provide `search`.
+ * `defineSearchPlugin` uses them with the save-time hook; `tinaCloud()` leaves the
+ * hook out because TinaCloud indexes itself. Not exported from a package entry.
+ */
+export const searchWiring = (fields: SearchFields) => ({
+  search: { fields },
+  clientSlice: async (getToken?: SearchClientConfig['getToken']) => {
+    const { searchSliceOf } = await import('./search.client');
+    return searchSliceOf(getToken);
+  },
+  serverSegment: async (
+    provider: SearchIndexProvider,
+    options: { saveHook: boolean }
+  ) => {
+    const { serverSegmentOf } = await import('./server/search-segment');
+    return serverSegmentOf({ fields }, provider, options);
+  },
+});
+
+/**
  * Turns a provider's server module and its searchable fields into a `search`
  * plugin: the client slice, the public `search/query` op, the save-time
  * indexing hook and the index writes core calls in-process (ADR-021). The hook
@@ -51,25 +72,23 @@ const withHookOverride = (
  */
 export const defineSearchPlugin = (
   config: SearchPluginConfig
-): PluginManifest =>
-  definePlugin({
+): PluginManifest => {
+  const wiring = searchWiring(config.fields);
+  return definePlugin({
     name: config.name,
     provides: ['search', 'hooks'],
-    search: { fields: config.fields },
+    search: wiring.search,
     hooks: [SEARCH_INDEX_HOOK],
     serverHooks: [SEARCH_INDEX_HOOK],
     overrides: withHookOverride(config.overrides),
     onInit: config.onInit,
     onDestroy: config.onDestroy,
-    client: async () => {
-      const { createSearchSlice } = await import('./search.client');
-      return { default: { slice: createSearchSlice } };
-    },
+    client: async () => ({ default: { slice: await wiring.clientSlice() } }),
     server: async () => {
-      const [{ serverSegmentOf }, { default: provider }] = await Promise.all([
-        import('./server/search-segment'),
-        config.server(),
-      ]);
-      return { default: serverSegmentOf(config, provider) };
+      const { default: provider } = await config.server();
+      return {
+        default: await wiring.serverSegment(provider, { saveHook: true }),
+      };
     },
   });
+};
