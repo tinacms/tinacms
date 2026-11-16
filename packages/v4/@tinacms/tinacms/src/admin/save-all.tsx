@@ -309,15 +309,15 @@ export function SaveAllControl() {
       icon={failed > 0 ? 'error' : Save}
       disabled={disabled}
       aria-label={label}
-      className='max-[639px]:w-8 max-[639px]:px-0'
+      className='max-sm:w-8 max-sm:px-0'
       onClick={() => {
         setAnnouncement('');
         void run().then(setAnnouncement);
       }}
     >
-      <span className='max-[639px]:hidden'>Save all</span>
+      <span className='max-sm:hidden'>Save all</span>
       {failed > 0 ? (
-        <span className='max-[639px]:hidden'>{failed} failed</span>
+        <span className='max-sm:hidden'>{failed} failed</span>
       ) : null}
     </Button>
   );

@@ -208,7 +208,7 @@ for (const width of [320, 375, 414]) {
   }
 }
 
-for (const width of [320, 375, 390, 414, 480, 520, 640]) {
+for (const width of [320, 375, 390, 414, 480, 520, 639, 640]) {
   test(`Save All and its result list stay on screen at ${width}px`, async ({
     page,
   }) => {
