@@ -126,7 +126,8 @@ describe('createPreviewLoad', () => {
     await answer('timeout');
     await vi.advanceTimersByTimeAsync(30_000);
     load.loaded();
-    await answer('timeout');
+    expect(seen.at(-1)).toBe('failed');
+    await answer('reached').catch(() => {});
     expect(seen.at(-1)).toBe('failed');
   });
 });

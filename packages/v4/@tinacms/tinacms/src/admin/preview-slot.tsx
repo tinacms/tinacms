@@ -92,18 +92,26 @@ function PreviewPane({
   const [condition, setCondition] = useState<LoadCondition>('loading');
   const [addressError, setAddressError] = useState<string>();
 
+  // The address of the admin-started load that has not shown its page yet. The frame may still
+  // hold the document from before it, so this is the current address while it is set.
+  const pending = useRef<string | null>(null);
+  const startLoad = (
+    kind: 'loading' | 'reloading',
+    target: string,
+    first = false
+  ) => {
+    pending.current = target;
+    load.start(kind, target, first);
+  };
+
   const [load] = useState(() =>
     createPreviewLoad({
       probe,
-      frameReadable: () => {
-        try {
-          return Boolean(iframeRef.current?.contentWindow?.location.href);
-        } catch {
-          // A cross-origin page and the browser's error page throw on this read.
-          return false;
-        }
+      frameReadable: () => framePage() !== null,
+      onCondition: (next) => {
+        if (next === undefined) pending.current = null;
+        setCondition(next);
       },
-      onCondition: setCondition,
     })
   );
 
@@ -117,18 +125,20 @@ function PreviewPane({
     }
     return null;
   };
-  const liveHref = () => framePage() ?? knownHref.current;
+  const liveHref = () => pending.current ?? framePage() ?? knownHref.current;
 
   // A layout effect, so the first load starts before the iframe can fire `load`.
   useLayoutEffect(() => {
-    load.start('loading', knownHref.current, true);
+    startLoad('loading', knownHref.current, true);
     return load.dispose;
   }, [load]);
 
   const onFrameLoad = () => {
+    load.loaded();
+    // While a load is still pending, a load event may be the document from before it.
+    if (pending.current !== null) return;
     const live = liveHref();
     if (live !== knownHref.current) setHref(live);
-    load.loaded();
   };
 
   useEffect(() => {
@@ -160,13 +170,14 @@ function PreviewPane({
   };
 
   const reload = () => {
+    const awaiting = pending.current !== null;
     const page = framePage();
-    const target = page ?? knownHref.current;
+    const target = pending.current ?? page ?? knownHref.current;
     const showing = condition === undefined || condition === 'reloading';
-    load.start(showing ? 'reloading' : 'loading', target);
+    startLoad(showing ? 'reloading' : 'loading', target);
     const frame = iframeRef.current;
     if (!frame) return;
-    if (page && condition !== 'failed') {
+    if (page && !awaiting && condition !== 'failed') {
       try {
         frame.contentWindow?.location.reload();
         return;
@@ -174,8 +185,10 @@ function PreviewPane({
         // A cross-origin page throws on reload; fall back to navigating to its address.
       }
     }
-    // A fragment-only change fetches nothing, so the address goes without its hash.
-    frame.src = withoutHash(target);
+    // A fragment-only change fetches nothing, so a target on the frame's own document goes without its hash.
+    const sameDocument =
+      page !== null && withoutHash(page) === withoutHash(target);
+    frame.src = sameDocument ? withoutHash(target) : target;
   };
 
   const navigate = (typed: string) => {
@@ -192,11 +205,12 @@ function PreviewPane({
       return;
     }
     setHref(next);
-    if (condition !== 'failed' && isHashOnlyChange(current, next)) {
+    // While a load is pending or failed, any other address is a new load.
+    if (pending.current === null && isHashOnlyChange(current, next)) {
       moveFrame(next);
       return;
     }
-    load.start('loading', next);
+    startLoad('loading', next);
     moveFrame(next);
   };
 

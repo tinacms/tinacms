@@ -27,6 +27,8 @@ const restartOnTinaConfigChange = (): Plugin => ({
 // Pages the preview toolbar's tests need: a slow one, other statuses, and a site that is down.
 const previewFixtures = (): Plugin => {
   const up = new Set<string>();
+  const stalled = new Map<string, () => void>();
+  const released = new Set<string>();
   return {
     name: 'tina-playground-preview-fixtures',
     configureServer(server) {
@@ -55,6 +57,18 @@ const previewFixtures = (): Plugin => {
           } else {
             req.socket.destroy();
           }
+        } else if (url.pathname === '/hang.html') {
+          // Accepts the request and never answers.
+        } else if (url.pathname === '/stall.html') {
+          // Holds the request until /__release, then drops the connection, as a dev server that dies does.
+          const key = url.searchParams.get('key') ?? '';
+          if (released.has(key)) req.socket.destroy();
+          else stalled.set(key, () => req.socket.destroy());
+        } else if (url.pathname === '/__release') {
+          const key = url.searchParams.get('key') ?? '';
+          released.add(key);
+          stalled.get(key)?.();
+          res.end('ok');
         } else if (url.pathname === '/__up') {
           up.add(url.searchParams.get('key') ?? '');
           res.end('ok');

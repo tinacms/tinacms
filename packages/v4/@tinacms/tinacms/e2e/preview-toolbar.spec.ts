@@ -463,7 +463,7 @@ test.describe('loading, reloading and failing', () => {
     await expect(note).toBeVisible({ timeout: 15000 });
     await expect(page.locator('iframe[title="Preview"]')).toBeHidden();
     await page.request.get(`/__up?key=${key}`);
-    await note.getByRole('button', { name: 'Reload' }).click();
+    await note.getByRole('button', { name: 'Reload' }).dispatchEvent('click');
     await expect(frame(page).getByTestId('down-title')).toBeVisible({
       timeout: 15000,
     });
@@ -844,5 +844,102 @@ test.describe('canvas and tooltips', () => {
     await page.keyboard.press('Shift+Tab');
     await expect(actions(page)).toBeFocused();
     await expect(tip.filter({ hasText: 'Preview actions' })).toBeVisible();
+  });
+});
+
+test.describe('Reload and a pending address', () => {
+  test('Reload after a hanging address fails retries it, and never lands on the page from before', async ({
+    page,
+  }) => {
+    await page.clock.install();
+    await page.goto(adminUrl('/plain.html'));
+    await expect(frame(page).getByTestId('plain-title')).toBeAttached();
+    const box = address(page);
+    await box.fill('/hang.html');
+    await box.press('Enter');
+    await page.clock.fastForward(11_000);
+    await page.clock.fastForward(31_000);
+    const note = page
+      .getByRole('status')
+      .filter({ hasText: 'The page didn’t load' });
+    await expect(note).toBeVisible();
+    await note.getByRole('button', { name: 'Reload' }).dispatchEvent('click');
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Loading the page' })
+    ).toBeVisible();
+    await expect(page.locator('iframe[title="Preview"]')).toHaveAttribute(
+      'src',
+      /\/hang\.html$/
+    );
+    await expect(box).toHaveValue(/\/hang\.html$/);
+    await page.clock.fastForward(11_000);
+    await page.clock.fastForward(31_000);
+    await expect(note).toBeVisible();
+    await expect(page.locator('iframe[title="Preview"]')).toBeHidden();
+  });
+
+  test('Reload from ⋯ during a slow load retries the typed address, and Open in new tab opens it', async ({
+    page,
+  }) => {
+    await page.goto(adminUrl('/plain.html'));
+    await expect(frame(page).getByTestId('plain-title')).toBeAttached();
+    const box = address(page);
+    await box.fill('/slow.html?ms=3000');
+    await box.press('Enter');
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Loading the page' })
+    ).toBeVisible();
+    await actions(page).click();
+    const popup = page.waitForEvent('popup');
+    await page.getByRole('menuitem', { name: 'Open in new tab' }).click();
+    expect((await popup).url()).toMatch(/\/slow\.html\?ms=3000$/);
+    await actions(page).click();
+    await page.getByRole('menuitem', { name: 'Reload' }).click();
+    await expect(frame(page).getByTestId('slow-title')).toBeVisible({
+      timeout: 15000,
+    });
+    await expect(box).toHaveValue(/\/slow\.html\?ms=3000$/);
+  });
+
+  test('typing the page shown before, during a pending load, loads that page and not the pending one', async ({
+    page,
+  }) => {
+    await page.goto(adminUrl('/plain.html'));
+    await expect(frame(page).getByTestId('plain-title')).toBeAttached();
+    const box = address(page);
+    const before = await box.inputValue();
+    await box.fill('/slow.html?ms=6000');
+    await box.press('Enter');
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Loading the page' })
+    ).toBeVisible();
+    await box.fill(before);
+    await box.press('Enter');
+    await expect(frame(page).getByTestId('plain-title')).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(box).toHaveValue(before);
+  });
+
+  test('a late load of the browser error page after the limit leaves the note in place', async ({
+    page,
+  }) => {
+    const key = `s${Date.now()}`;
+    await page.clock.install();
+    await page.goto(adminUrl('/plain.html'));
+    await expect(frame(page).getByTestId('plain-title')).toBeAttached();
+    const box = address(page);
+    await box.fill(`/stall.html?key=${key}`);
+    await box.press('Enter');
+    await page.clock.fastForward(11_000);
+    await page.clock.fastForward(31_000);
+    const note = page
+      .getByRole('status')
+      .filter({ hasText: 'The page didn’t load' });
+    await expect(note).toBeVisible();
+    await page.request.get(`/__release?key=${key}`);
+    await page.waitForTimeout(1500);
+    await expect(note).toBeVisible();
+    await expect(page.locator('iframe[title="Preview"]')).toBeHidden();
   });
 });

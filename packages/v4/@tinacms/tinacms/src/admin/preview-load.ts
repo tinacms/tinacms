@@ -99,8 +99,8 @@ export function createPreviewLoad({
     loaded() {
       loaded = true;
       if (capped && result !== 'rejected') {
-        capped = false;
-        probeAgain();
+        // A late load shows the page only when the frame is readable; the browser's error page is not.
+        if (frameReadable()) finish(undefined);
         return;
       }
       evaluate();
