@@ -86,11 +86,11 @@ function useErrorRows(): Row[] {
 function useGoTo() {
   const scope = useScope();
   const narrow = useNarrow();
+  const phone = useTier() === 'phone';
   return (key: string) => {
     const address = scope.view.getState().goTo(key);
     if (!address) {
-      // A phone's row tap has closed the sheet; with no field to go to, focus goes back to Save.
-      resolveButton()?.focus();
+      if (phone) resolveButton()?.focus();
       return;
     }
     useFormStore.getState().setActive(scope.formId, toFieldAddress(address));

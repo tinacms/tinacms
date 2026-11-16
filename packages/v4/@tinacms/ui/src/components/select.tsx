@@ -8,6 +8,7 @@ import {
   selectListClassName,
   selectOptionClassName,
 } from '@tinacms/ui/lib/field-styles';
+import { usePopupEdgePadding } from '@tinacms/ui/components/foot-sheet';
 import { cn } from '@tinacms/ui/lib/utils';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
@@ -73,7 +74,7 @@ function SelectContent({
   align = 'start',
   alignOffset = 0,
   alignItemWithTrigger = false,
-  collisionPadding = 12,
+  collisionPadding,
   collisionAvoidance,
   ...props
 }: SelectPrimitive.Popup.Props &
@@ -87,6 +88,7 @@ function SelectContent({
     | 'collisionPadding'
     | 'collisionAvoidance'
   >) {
+  const edge = usePopupEdgePadding();
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner
@@ -95,7 +97,7 @@ function SelectContent({
         align={align}
         alignOffset={alignOffset}
         alignItemWithTrigger={alignItemWithTrigger}
-        collisionPadding={collisionPadding}
+        collisionPadding={collisionPadding ?? edge}
         collisionAvoidance={collisionAvoidance}
         className='isolate z-50'
       >
@@ -145,7 +147,7 @@ function SelectItem({
       className={cn(selectOptionClassName, className)}
       {...props}
     >
-      <SelectPrimitive.ItemText className='flex min-w-0 flex-1 gap-2 whitespace-nowrap'>
+      <SelectPrimitive.ItemText className='block min-w-0 flex-1 truncate'>
         {children}
       </SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator

@@ -228,6 +228,7 @@ describe('a sheet', () => {
       open(side);
       const panel = await screen.findByRole('dialog', { name: 'Panel' });
       expect(panel.className.split(' ').at(-1)).toBe('w-full');
+      expect(panel.className).not.toContain('w-(--sidebar-width)');
     }
   );
 
@@ -237,6 +238,13 @@ describe('a sheet', () => {
     const panel = await screen.findByRole('dialog', { name: 'Panel' });
     expect(panel.className.split(' ')).not.toContain('w-full');
     expect(panel.className).toContain('w-(--sidebar-width)');
+  });
+
+  it('keeps its overlay slot from 768px up', async () => {
+    stubWidth(1280);
+    open('right');
+    await screen.findByRole('dialog', { name: 'Panel' });
+    expect(document.querySelector('[data-slot=sheet-overlay]')).not.toBeNull();
   });
 
   it('is a foot sheet at the bottom on a phone, and not from 768px up', async () => {

@@ -344,12 +344,18 @@ test.describe('the Discard confirm', () => {
   });
 });
 
-test('the navigation sheet fills a 390px screen', async ({ page }) => {
+test('the navigation sheet closes at 390px without navigating', async ({
+  page,
+}) => {
   await page.setViewportSize(SIZES[0]);
   await page.goto('/#/collections/post/content%2Fposts%2Fhello-world.mdx');
+  const url = page.url();
   await page.getByRole('button', { name: 'Toggle Sidebar' }).first().click();
   const side = page.locator('[data-slot=sidebar][data-mobile=true]');
   await expect(side).toBeVisible();
   await settle(page);
   expect((await box(side)).width).toBe(390);
+  await side.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(side).toBeHidden();
+  expect(page.url()).toBe(url);
 });

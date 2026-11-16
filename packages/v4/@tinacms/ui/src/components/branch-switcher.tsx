@@ -195,7 +195,6 @@ function BranchSwitcher({
 }: BranchSwitcherProps) {
   const [open, setOpen] = useState(defaultOpen);
   const [fullScreen, setFullScreen] = useState(defaultFullScreen);
-  // The foot sheet draws its own ×.
   const phone = useTier() === 'phone';
   const isProtected = branches.some(
     (branch) => branch.name === current && branch.protected
@@ -286,13 +285,15 @@ function BranchSwitcher({
             </DialogDescription>
           </div>
           <div className='flex flex-none items-center gap-1'>
-            <Button
-              variant='icon'
-              size='sm'
-              icon={fullScreen ? 'restore' : 'maximise'}
-              aria-label={fullScreen ? 'Exit full screen' : 'Full screen'}
-              onClick={() => setFullScreen((value) => !value)}
-            />
+            {phone ? null : (
+              <Button
+                variant='icon'
+                size='sm'
+                icon={fullScreen ? 'restore' : 'maximise'}
+                aria-label={fullScreen ? 'Exit full screen' : 'Full screen'}
+                onClick={() => setFullScreen((value) => !value)}
+              />
+            )}
             {phone ? null : (
               <Button
                 variant='icon'
@@ -420,7 +421,7 @@ function BranchSwitcher({
                 {nameError}
               </p>
             ) : null}
-            <div className='flex justify-end gap-2'>
+            <div className='flex justify-end gap-2 max-md:*:min-w-0 max-md:*:flex-1'>
               <Button onClick={() => setCreating(false)}>
                 Back to branches
               </Button>

@@ -1,3 +1,9 @@
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogTitle,
+} from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
 import {
   Dialog,
@@ -31,6 +37,7 @@ function Branch() {
       <output id='calls'>{`cancel=${calls.cancel} open=${calls.open}`}</output>
       <SaveToBranchDialog
         open
+        reason={params.get('reason') === 'deleted' ? 'deleted' : 'protected'}
         branch='main'
         document='Hello'
         defaultName={params.get('name') ?? ''}
@@ -58,6 +65,27 @@ function Plain() {
   );
 }
 
+function Nested() {
+  return (
+    <Dialog open>
+      <DialogContent>
+        <DialogTitle>Parent</DialogTitle>
+        <DialogFooter>
+          <Button>Parent action</Button>
+        </DialogFooter>
+        <AlertDialog open>
+          <AlertDialogContent>
+            <AlertDialogTitle>Child</AlertDialogTitle>
+            <AlertDialogFooter>
+              <Button>Child action</Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function Panel() {
   return (
     <Sheet open>
@@ -73,13 +101,15 @@ function Panel() {
 
 const root = document.getElementById('root');
 if (!root) throw new Error('sheets.html is missing #root');
-const cases = { sheet: <Panel />, plain: <Plain />, branch: <Branch /> };
+const cases = {
+  sheet: <Panel />,
+  plain: <Plain />,
+  nested: <Nested />,
+  branch: <Branch />,
+};
+const name = params.get('case');
 createRoot(root).render(
   cases[
-    params.get('case') === 'sheet'
-      ? 'sheet'
-      : params.get('case') === 'plain'
-        ? 'plain'
-        : 'branch'
+    name === 'sheet' || name === 'plain' || name === 'nested' ? name : 'branch'
   ]
 );

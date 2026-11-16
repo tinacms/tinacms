@@ -77,6 +77,7 @@ function DialogOverlay({
   const phone = useTier() === 'phone';
   return (
     <DialogPrimitive.Backdrop
+      forceRender={phone}
       data-slot={phone ? 'foot-sheet-scrim' : 'dialog-overlay'}
       className={cn(dialogOverlayClasses, footSheetScrimClasses, className)}
       {...props}

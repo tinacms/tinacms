@@ -605,7 +605,7 @@ function ErrorSheet({
   const { rows, removeLeaving } = useRowsWithLeaving(errors, success);
 
   const pick = (error: ErrorSummaryItem) => {
-    if (picked.current) return;
+    if (!open || picked.current) return;
     picked.current = error;
     tapped.current = true;
     onClose?.();
@@ -635,6 +635,10 @@ function ErrorSheet({
         <DialogPrimitive.Popup
           ref={popup}
           id={id}
+          inert={!open}
+          onMouseDown={(event) => {
+            if (!open) event.preventDefault();
+          }}
           data-slot='foot-sheet'
           data-layout='sheet'
           data-status={status}

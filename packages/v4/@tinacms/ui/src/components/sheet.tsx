@@ -83,7 +83,9 @@ function SheetContent({
   const ride = useFootSheetRide(footSheet);
   return (
     <SheetPortal>
-      <SheetOverlay data-slot={footSheet ? 'foot-sheet-scrim' : undefined} />
+      <SheetOverlay
+        {...(footSheet ? { 'data-slot': 'foot-sheet-scrim' } : {})}
+      />
       <SheetPrimitive.Popup
         ref={popup}
         data-slot={footSheet ? 'foot-sheet' : 'sheet-content'}

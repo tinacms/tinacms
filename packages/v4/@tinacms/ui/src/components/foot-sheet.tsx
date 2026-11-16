@@ -11,6 +11,7 @@ import {
 } from 'react';
 
 import { Button } from '@tinacms/ui/components/button';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { cn } from '@tinacms/ui/lib/utils';
 
 /** What the popup of a dialog, confirm or sheet shares with its foot-sheet handle. */
@@ -268,6 +269,11 @@ function firstBodyFocus(popup: RefObject<HTMLElement | null>) {
   };
 }
 
+/** The space a menu, select or popover keeps from the screen's edge: 12px on a phone, Base UI's own below. */
+function usePopupEdgePadding(): number | undefined {
+  return useTier() === 'phone' ? 12 : undefined;
+}
+
 export type { FootSheetHandleProps };
 export {
   FootSheetCloseButton,
@@ -278,4 +284,5 @@ export {
   footSheetFooterClasses,
   footSheetScrimClasses,
   useFootSheetRide,
+  usePopupEdgePadding,
 };

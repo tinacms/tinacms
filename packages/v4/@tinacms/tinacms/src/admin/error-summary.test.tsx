@@ -1078,31 +1078,70 @@ describe('a phone', () => {
   const rowOf = async (name: RegExp) =>
     within(await errorsSheet()).getByRole('button', { name });
 
-  it.each([
-    ['a field in a closed card', /^Meta title/, /^Meta title\b/],
-    ['a field in the first item of a list', /^Heading/, /^Heading\b/],
-  ])(
-    'closes the sheet on a row tap, then focuses %s',
-    async (_, row, field) => {
-      stubPhone();
-      const user = await blockOnTwoFields();
-      await user.click(await rowOf(row));
-      await waitFor(() => expect(focusedName()).toHaveAccessibleName(field));
-      expect(
-        screen.getByRole('button', { name: 'Show errors, 2' })
-      ).toBeVisible();
-    }
-  );
+  // The row button carries the field's name too, so focus must sit in the field itself.
+  const expectFocusInField = (name: RegExp) =>
+    waitFor(() => {
+      const active = globalThis.document.activeElement;
+      expect(active?.tagName).toBe('INPUT');
+      expect(active).toHaveAccessibleName(name);
+    });
 
-  it('reaches a field inside an object inside an object', async () => {
-    stubPhone();
-    document = { ...document, outer: { inner: { leaf: '' } } };
+  const blockOnSecondItem = async () => {
+    document = {
+      ...document,
+      items: [{ heading: 'A' }, { heading: '' }],
+    };
     const user = userEvent.setup();
     renderAdmin();
     await user.type(await titleInput(), '!');
     await user.click(await saveButton());
-    await user.click(await rowOf(/^Leaf, in Outer › Inner\. /));
-    await waitFor(() => expect(focusedName()).toHaveAccessibleName(/^Leaf\b/));
+    return user;
+  };
+
+  const taps = [
+    [
+      'tap',
+      (user: ReturnType<typeof userEvent.setup>, row: HTMLElement) =>
+        user.click(row),
+    ],
+    [
+      'double tap',
+      (user: ReturnType<typeof userEvent.setup>, row: HTMLElement) =>
+        user.dblClick(row),
+    ],
+  ] as const;
+
+  describe.each(taps)('a %s on a row', (_, tap) => {
+    it.each([
+      ['a field in a closed card', /^Meta title/, /^Meta title\b/],
+      ['a field in the first item of a list', /^Heading/, /^Heading\b/],
+    ])('closes the sheet, then focuses %s', async (_, row, field) => {
+      stubPhone();
+      const user = await blockOnTwoFields();
+      await tap(user, await rowOf(row));
+      await expectFocusInField(field);
+      expect(
+        screen.getByRole('button', { name: 'Show errors, 2' })
+      ).toBeVisible();
+    });
+
+    it('focuses the field of the second list item', async () => {
+      stubPhone();
+      const user = await blockOnSecondItem();
+      await tap(user, await rowOf(/^Heading, in Items › Item 2\. /));
+      await expectFocusInField(/^Heading\b/);
+    });
+
+    it('focuses a field inside an object inside an object', async () => {
+      stubPhone();
+      document = { ...document, outer: { inner: { leaf: '' } } };
+      const user = userEvent.setup();
+      renderAdmin();
+      await user.type(await titleInput(), '!');
+      await user.click(await saveButton());
+      await tap(user, await rowOf(/^Leaf, in Outer › Inner\. /));
+      await expectFocusInField(/^Leaf\b/);
+    });
   });
 
   it('brings the sheet back from Resolve and gives focus back to it on ×', async () => {

@@ -71,6 +71,7 @@ function AlertDialogOverlay({
   const actions = use(AlertDialogActionsContext);
   return (
     <AlertDialogPrimitive.Backdrop
+      forceRender={phone}
       data-slot={phone ? 'foot-sheet-scrim' : 'alert-dialog-overlay'}
       className={cn(dialogOverlayClasses, footSheetScrimClasses, className)}
       onClick={(event) => {

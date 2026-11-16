@@ -1,6 +1,7 @@
 'use client';
 
 import { Combobox as ComboboxPrimitive } from '@base-ui/react';
+import { usePopupEdgePadding } from '@tinacms/ui/components/foot-sheet';
 import { cn } from '@tinacms/ui/lib/utils';
 import * as React from 'react';
 
@@ -111,7 +112,7 @@ function ComboboxContent({
   align = 'start',
   alignOffset = 0,
   anchor,
-  collisionPadding = 12,
+  collisionPadding,
   collisionAvoidance,
   ...props
 }: ComboboxPrimitive.Popup.Props &
@@ -125,6 +126,7 @@ function ComboboxContent({
     | 'collisionPadding'
     | 'collisionAvoidance'
   >) {
+  const edge = usePopupEdgePadding();
   return (
     <ComboboxPrimitive.Portal>
       <ComboboxPrimitive.Positioner
@@ -133,7 +135,7 @@ function ComboboxContent({
         align={align}
         alignOffset={alignOffset}
         anchor={anchor}
-        collisionPadding={collisionPadding}
+        collisionPadding={collisionPadding ?? edge}
         collisionAvoidance={collisionAvoidance}
         className='isolate z-50'
       >

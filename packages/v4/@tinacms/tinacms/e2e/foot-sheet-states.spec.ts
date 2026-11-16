@@ -564,3 +564,134 @@ test('a list card’s action menu at the right edge stays inside the screen', as
   expect(rect.x + rect.width).toBeLessThanOrEqual(390 - 11);
   expect(await noSideways(page)).toBe(true);
 });
+
+test.describe('the branch switcher on a phone', () => {
+  const openNewBranch = async (
+    page: Page,
+    size: { width: number; height: number }
+  ) => {
+    await page.setViewportSize(size);
+    await page.goto('/branches.html?docs=1#/');
+    await page
+      .getByRole('button', { name: /feature\/news/ })
+      .first()
+      .click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    await settle(page);
+  };
+
+  for (const size of [PHONE, { width: 320, height: 568 }]) {
+    test(`splits Back to branches and Create branch 50/50 at ${size.width}px`, async ({
+      page,
+    }) => {
+      await openNewBranch(page, size);
+      const back = await box(
+        page.getByRole('button', { name: 'Back to branches' })
+      );
+      const create = await box(
+        page.getByRole('button', { name: 'Create branch' })
+      );
+      expect(Math.abs(back.width - create.width)).toBeLessThanOrEqual(1);
+    });
+  }
+
+  test('shows no Full screen button, but keeps it from 768px up', async ({
+    page,
+  }) => {
+    await page.setViewportSize(PHONE);
+    await page.goto('/branches.html?docs=1#/');
+    await page
+      .getByRole('button', { name: /feature\/news/ })
+      .first()
+      .click();
+    await expect(page.locator(SHEET)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Full screen' })).toHaveCount(
+      0
+    );
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(
+      page.getByRole('button', { name: 'Full screen' })
+    ).toBeVisible();
+  });
+});
+
+test('the Save label wraps instead of truncating at 375px', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/sheets.html?case=branch&reason=deleted');
+  const save = page.getByRole('button', { name: 'Save to new branch' });
+  await expect(save).toBeVisible();
+  await settle(page);
+  expect(
+    await save.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)
+  ).toBe(true);
+});
+
+test('a nested confirm gets its own scrim over its parent sheet', async ({
+  page,
+}) => {
+  await page.setViewportSize(PHONE);
+  await page.goto('/sheets.html?case=nested');
+  await expect(page.getByRole('alertdialog')).toBeVisible();
+  await settle(page);
+  await expect(
+    page.locator('[data-slot=foot-sheet-scrim]:visible')
+  ).toHaveCount(2);
+  const parent = await box(page.getByText('Parent action'));
+  const hit = await page.evaluate(
+    ({ x, y }) =>
+      document
+        .elementFromPoint(x, y)
+        ?.closest(
+          '[role=dialog],[role=alertdialog],[data-slot=foot-sheet-scrim]'
+        )
+        ?.getAttribute('data-slot') ?? '',
+    { x: parent.x + parent.width / 2, y: parent.y + parent.height / 2 }
+  );
+  expect(hit).not.toBe('');
+});
+
+test('a long select option ends in an ellipsis', async ({ page }) => {
+  await page.setViewportSize(PHONE);
+  await page.goto(CHECKLIST);
+  await page.getByRole('combobox', { name: /^Choice/ }).click();
+  const option = page.getByRole('option', { name: /A very long option/ });
+  await expect(option).toBeVisible();
+  const text = page
+    .locator('[data-slot=select-content]')
+    .getByText(/A very long option/)
+    .first();
+  const style = await text.evaluate((el) => {
+    const css = getComputedStyle(el);
+    return [css.textOverflow, el.scrollWidth > el.clientWidth];
+  });
+  expect(style).toEqual(['ellipsis', true]);
+});
+
+test.describe('touch taps on an error row', () => {
+  test.use({ hasTouch: true });
+
+  for (const gap of [0, 60, 120]) {
+    test(`two taps ${gap}ms apart end with focus in the field`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(PHONE);
+      await page.goto(CHECKLIST);
+      await edit(page, /^Note/, 'x');
+      await save(page).click();
+      const row = page
+        .getByRole('dialog', { name: /^Errors/ })
+        .locator('[data-error-row]')
+        .first();
+      await expect(row).toBeVisible();
+      await settle(page);
+      const { x, y, width, height } = await box(row);
+      await page.touchscreen.tap(x + width / 2, y + height / 2);
+      await page.waitForTimeout(gap);
+      await page.touchscreen.tap(x + width / 2, y + height / 2);
+      await settle(page);
+      await expect(page.getByRole('textbox', { name: /^First/ })).toBeFocused();
+    });
+  }
+});
