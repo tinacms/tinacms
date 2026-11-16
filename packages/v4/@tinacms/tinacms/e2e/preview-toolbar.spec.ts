@@ -829,6 +829,43 @@ test.describe('canvas and tooltips', () => {
     expect(edge).not.toBe('none');
   });
 
+  for (const device of ['Tablet', 'Phone'] as const) {
+    test(`${device}: the pixel just outside the page edge differs from the ground`, async ({
+      page,
+    }) => {
+      await page.goto(adminUrl('/plain.html'));
+      await toolbar(page)
+        .getByRole('button', { name: new RegExp(`^${device}`) })
+        .click();
+      const box = await page.locator('[data-slot=preview-page]').boundingBox();
+      if (!box) throw new Error('The page has no box');
+      const y = Math.round(box.y + box.height / 2);
+      const sample = async (x: number) => {
+        const png = await page.screenshot({
+          clip: { x: Math.round(x), y, width: 1, height: 1 },
+        });
+        return page.evaluate(async (base64) => {
+          const bitmap = await createImageBitmap(
+            await (await fetch(`data:image/png;base64,${base64}`)).blob()
+          );
+          const canvas = new OffscreenCanvas(1, 1);
+          const context = canvas.getContext('2d');
+          if (!context) throw new Error('No 2d context');
+          context.drawImage(bitmap, 0, 0);
+          return Array.from(context.getImageData(0, 0, 1, 1).data.slice(0, 3));
+        }, png.toString('base64'));
+      };
+      const ground = await sample(box.x - 8);
+      for (const x of [box.x - 1, box.x + box.width]) {
+        const edge = await sample(x);
+        const distance = Math.max(
+          ...edge.map((c, i) => Math.abs(c - ground[i]))
+        );
+        expect(distance).toBeGreaterThanOrEqual(40);
+      }
+    });
+  }
+
   test('Preview actions shows a tooltip on hover, and again after the menu closes with Esc', async ({
     page,
   }) => {
