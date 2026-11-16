@@ -208,12 +208,14 @@ for (const width of [320, 375, 414]) {
   }
 }
 
-for (const width of [320, 375, 390, 414]) {
+for (const width of [320, 375, 390, 414, 480, 520, 640]) {
   test(`Save All and its result list stay on screen at ${width}px`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 700 });
-    await page.goto('/#/collections/post/content%2Fposts%2Fhello-world.mdx');
+    await page.goto(
+      '/branches.html?docs=1#/collections/post/content%2Fposts%2Fpost-01.mdx'
+    );
     const title = page.getByRole('textbox', { name: /^Title/ });
     await title.fill('');
     const bar = page.getByRole('banner', { name: 'Top bar' });
@@ -239,6 +241,16 @@ for (const width of [320, 375, 390, 414]) {
         ),
       ]);
     expect(overflow).toBeLessThanOrEqual(0);
+    const branch = bar.getByRole('button', { name: /^Branch:/ });
+    const label = branch.locator('span.font-mono');
+    const labelBox = await label.boundingBox();
+    const full = await label.evaluate((node) => node.scrollWidth);
+    expect(labelBox?.width).toBeGreaterThanOrEqual(Math.min(32, full) - 1);
+    const text = await bar
+      .getByRole('button', { name: /^Save all/ })
+      .innerText();
+    if (width < 640) expect(text.trim()).toBe('');
+    else expect(text).toMatch(/Save all\s*1 failed/);
     expect((buttonBox?.x ?? 0) + (buttonBox?.width ?? 0)).toBeLessThanOrEqual(
       (barBox?.x ?? 0) + (barBox?.width ?? 0)
     );
