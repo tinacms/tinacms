@@ -41,6 +41,13 @@ const subContentClass =
 
 const menuContentClass = subContentClass;
 
+// The menu renders inside the table's React tree, so a press in it would reach the table's
+// own mouse-down handler, which collapses a cell range before the action runs.
+const keepSelection = (event: React.MouseEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+};
+
 const destructiveClass =
   'text-destructive focus:bg-status-failed-subtle focus:text-destructive';
 
@@ -66,6 +73,7 @@ function MenuSub({
       </DropdownMenuSubTrigger>
       <DropdownMenuSubContent
         collisionPadding={8}
+        onMouseDown={keepSelection}
         className={subContentClass}
         onEscapeKeyDown={(event) => {
           event.preventDefault();
@@ -100,6 +108,7 @@ export function TableActionsMenuContent({
     <DropdownMenuContent
       align='start'
       collisionPadding={8}
+      onMouseDown={keepSelection}
       className={menuContentClass}
       aria-label={`${isRow ? 'Row' : 'Column'} ${(isRow ? active.row : active.col) + 1} actions`}
       onCloseAutoFocus={(event) => {

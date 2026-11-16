@@ -628,3 +628,58 @@ test.describe('focus after a tool from More tools', () => {
     });
   }
 });
+
+test.describe('closing More tools by tapping the text', () => {
+  for (const touch of [true, false]) {
+    test.describe(`375px, touch ${touch}`, () => {
+      test.use({ viewport: { width: 375, height: 800 }, hasTouch: touch });
+
+      test('leaves focus in the text so typing lands there, and Escape still returns to the button', async ({
+        page,
+      }) => {
+        await page.goto(POST('long-post.mdx'));
+        const press = (locator: ReturnType<Page['locator']>) =>
+          touch ? locator.tap() : locator.click();
+        await press(body(page).getByText('Body paragraph 1 keeps').first());
+        const more = toolbar(page).getByRole('button', {
+          name: 'More tools...',
+        });
+        await press(more);
+        await expect(
+          page.getByRole('dialog', { name: 'More tools' })
+        ).toBeVisible();
+        await press(body(page).getByText('Body paragraph 4 keeps').first());
+        await page.waitForTimeout(500);
+        await expect(body(page)).toBeFocused();
+        await page.keyboard.type('QQ');
+        await expect(body(page)).toContainText('QQ');
+
+        await press(more);
+        await expect(
+          page.getByRole('dialog', { name: 'More tools' })
+        ).toBeVisible();
+        await page.keyboard.press('Escape');
+        await expect(more).toBeFocused();
+      });
+    });
+  }
+});
+
+test('Merge cells by mouse merges a dragged range', async ({ page }) => {
+  await page.goto('/rich-text-states.html?state=with%20a%20table');
+  const cell = (text: string) => page.locator('th, td', { hasText: text });
+  await page.getByText('Before the table.').click();
+  const from = await cell('r2c1').boundingBox();
+  const to = await cell('r4c2').boundingBox();
+  if (!from || !to) throw new Error('cells not drawn');
+  await page.mouse.move(from.x + 10, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x + 20, to.y + to.height / 2, { steps: 10 });
+  await page.mouse.up();
+  await expect(page.locator('td[aria-selected="true"]')).toHaveCount(6);
+  const before = await page.locator('th, td').count();
+  await page.getByRole('button', { name: /^Row \d+ actions$/ }).click();
+  await page.getByRole('menuitem', { name: 'Cell', exact: true }).hover();
+  await page.getByRole('menuitem', { name: 'Merge cells' }).click();
+  await expect(page.locator('th, td')).toHaveCount(before - 5);
+});
