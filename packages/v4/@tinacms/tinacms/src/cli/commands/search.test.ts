@@ -10,6 +10,7 @@ import { defineSearchPlugin } from '../../plugins/search/search.plugin';
 import type { SearchIndexProvider } from '../../core/search/index-contract';
 import type { CollectionSchema } from '../../core/schema/types';
 import { createLocalDataLayer } from '../../plugins/content/local/server/local-data-layer';
+import { tinaCloud } from '../../plugins/tinacloud/tinacloud.plugin';
 import { runCli } from '../index';
 import { codecFor } from '../../plugins/fields/rich-text/rich-text-codecs';
 
@@ -238,6 +239,32 @@ describe('tinacms search reindex', () => {
     const { code, err } = await reindex(configWith(provider));
     expect(code).toBe(1);
     expect(err.join()).toContain('connect ECONNREFUSED');
+  });
+});
+
+describe('tinacms search reindex with a provider that indexes itself (AC25)', () => {
+  const selfIndexing = () =>
+    asResolvedConfig({
+      plugins: [
+        tinaCloud({
+          clientId: 'abc',
+          search: { fields: { post: { title: 1 } } },
+        }),
+      ],
+      schema: { collections: [collection('post')] },
+    });
+
+  it.each([
+    ['an empty root', false],
+    ['a root with documents', true],
+  ])('says so, exits 0 and counts nothing with %s', async (_name, withDocs) => {
+    if (withDocs) await writeDoc('content/post/a.json', '{"title":"Alpha"}');
+    const { code, out, err } = await reindex(selfIndexing());
+    expect(code).toBe(0);
+    expect(err).toEqual([]);
+    expect(out).toEqual([
+      'This search provider indexes itself; nothing to reindex.',
+    ]);
   });
 });
 

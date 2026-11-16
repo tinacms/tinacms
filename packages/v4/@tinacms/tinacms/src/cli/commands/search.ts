@@ -54,6 +54,10 @@ export const runSearchReindex = async (
         'search-no-index-provider',
         'The `search` plugin has no index provider, so there is nothing to reindex.'
       );
+      if (index.indexesItself) {
+        options.log('This search provider indexes itself; nothing to reindex.');
+        return;
+      }
       const { fields } = provider.search;
       const collections = Object.keys(fields).map((name) => {
         const collection = config.schema.collections.find(

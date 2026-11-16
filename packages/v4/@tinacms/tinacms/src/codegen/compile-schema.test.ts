@@ -12,6 +12,7 @@ import {
 } from '../plugins/search/search.plugin';
 import type { SearchFields } from '../core/search/index-contract';
 import type { FieldSchema } from '../core/schema/types';
+import { tinaCloud } from '../plugins/tinacloud/tinacloud.plugin';
 import { LOCK_VERSION, checkLock, compileSchema } from './compile-schema';
 
 const fieldPlugin = (type: string, contractVersion: number) =>
@@ -620,6 +621,48 @@ describe('compileSchema array options', () => {
     const [template] = lock.schema.collections[0].fields[0].templates;
     expect(template).not.toHaveProperty('itemLabel');
     expect(lock.schema.collections[0].fields[0]).not.toHaveProperty('picker');
+  });
+});
+
+describe('compileSchema tinaCloud() search fields', () => {
+  const withTinaCloud = (
+    fields: SearchFields,
+    hooks: { name: string }[] = []
+  ): ResolvedConfig =>
+    asResolvedConfig({
+      plugins: [
+        fieldPlugin('string', 1),
+        tinaCloud({ clientId: 'abc', search: { fields } }),
+      ],
+      schema: {
+        collections: [
+          {
+            name: 'post',
+            path: 'content/posts',
+            format: 'md',
+            hooks,
+            fields: [{ name: 'title', type: 'string' }],
+          },
+        ],
+      },
+    });
+
+  it('names tina:tinacloud for an unknown field', () => {
+    expect(() => compileSchema(withTinaCloud({ post: { nope: 1 } }))).toThrow(
+      /tina:tinacloud.*"nope".*"post"/
+    );
+  });
+
+  it('refuses searchIndex() on a collection tinaCloud() does not list', () => {
+    expect(() => compileSchema(withTinaCloud({}, [searchIndex()]))).toThrow(
+      /"post".*searchIndex/
+    );
+  });
+
+  it('refuses searchIndex() on a listed collection, as no plugin registers the hook', () => {
+    expect(() =>
+      compileSchema(withTinaCloud({ post: { title: 1 } }, [searchIndex()]))
+    ).toThrow(/form hook "searchIndex"/);
   });
 });
 

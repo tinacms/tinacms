@@ -136,7 +136,8 @@ with no login.
 ## TinaCloud
 
 `tinaCloud({ clientId })` is the reference auth plugin. It provides `auth`,
-`media` and `content` from one plugin.
+`media` and `content` from one plugin, and optionally `search`
+(see [search-plugins.md](./search-plugins.md#tinacloud)).
 
 - `login()` signs in the way `https://identity.tinajs.io/v2/auth/config`
   says, as v3 does:
