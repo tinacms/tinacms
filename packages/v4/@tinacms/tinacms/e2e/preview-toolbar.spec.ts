@@ -562,3 +562,287 @@ test('with no preview the slot shows the note, whose link opens the docs, and no
   await page.getByRole('button', { name: 'How previews are set up' }).click();
   expect((await popup).url()).toContain('tina.io/docs');
 });
+
+test.describe('narrow pane', () => {
+  const overlaps = (a: Box, b: Box) =>
+    a.x < b.x + b.width &&
+    b.x < a.x + a.width &&
+    a.y < b.y + b.height &&
+    b.y < a.y + a.height;
+  type Box = { x: number; y: number; width: number; height: number };
+
+  for (const width of [768, 800, 820, 860]) {
+    for (const device of ['Tablet', 'Phone']) {
+      for (const scale of ['fit', '50%']) {
+        test(`at ${width}px with ${device} at ${scale}, the address stays usable, nothing overlaps and ⋯ is inside the window`, async ({
+          page,
+        }) => {
+          await page.setViewportSize({ width, height: 800 });
+          await page.goto(adminUrl('/plain.html'));
+          await expect(toolbar(page)).toBeVisible();
+          await actions(page).click();
+          await page
+            .getByRole('menuitemcheckbox', { name: new RegExp(`^${device}`) })
+            .click();
+          if (scale !== 'fit') {
+            const scaleButton = toolbar(page).getByRole('button', {
+              name: /scale/,
+            });
+            if (await scaleButton.count()) {
+              await scaleButton.click();
+            } else {
+              await actions(page).click();
+            }
+            await page.getByRole('menuitemcheckbox', { name: scale }).click();
+          }
+          await page.waitForTimeout(200);
+          const names = ['Page address', 'Preview actions', 'Expand preview'];
+          const boxes: Box[] = [];
+          for (const name of names) {
+            const target = toolbar(page).getByRole(
+              name === 'Page address' ? 'textbox' : 'button',
+              { name }
+            );
+            if ((await target.count()) === 0) continue;
+            const box = await target.boundingBox();
+            if (box) boxes.push(box);
+          }
+          const scaleButton = toolbar(page).getByRole('button', {
+            name: /scale/,
+          });
+          if ((await scaleButton.count()) > 0) {
+            const scaleBox = await scaleButton.boundingBox();
+            if (scaleBox) boxes.push(scaleBox);
+          }
+          const addressBox = await address(page).boundingBox();
+          // 128px when the pane leaves room beside ⋯; otherwise whatever room is left.
+          const wide = (await ground(page).boundingBox())?.width ?? 0;
+          expect(addressBox?.width ?? 0).toBeGreaterThanOrEqual(
+            Math.min(128, wide - 60)
+          );
+          const more = await actions(page).boundingBox();
+          expect((more?.x ?? 0) + (more?.width ?? 0)).toBeLessThanOrEqual(
+            width
+          );
+          for (const [index, a] of boxes.entries()) {
+            expect(a.x + a.width).toBeLessThanOrEqual(width);
+            for (const b of boxes.slice(index + 1))
+              expect(overlaps(a, b)).toBe(false);
+          }
+          expect(
+            await page.evaluate(
+              () =>
+                document.querySelector('[data-slot=sidebar-wrapper]')
+                  ?.scrollLeft
+            )
+          ).toBe(0);
+        });
+      }
+    }
+  }
+
+  test('Expand stays reachable in ⋯ when the pane is too narrow for the button', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 768, height: 800 });
+    await page.goto(adminUrl('/plain.html'));
+    await actions(page).click();
+    await page.getByRole('menuitemcheckbox', { name: /^Tablet/ }).click();
+    await expect(
+      toolbar(page).getByRole('button', { name: 'Expand preview' })
+    ).toHaveCount(0);
+    await actions(page).click();
+    await page.getByRole('menuitem', { name: 'Expand preview' }).click();
+    await expect(
+      page.getByRole('navigation', { name: 'Content' })
+    ).toBeHidden();
+    await toolbar(page)
+      .getByRole('button', { name: 'Collapse preview' })
+      .click();
+    await expect(
+      page.getByRole('navigation', { name: 'Content' })
+    ).toBeVisible();
+  });
+});
+
+test('a form column dragged wide at desktop width moves controls into ⋯ and keeps the address usable', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(adminUrl(declared(HELLO), postHash(HELLO)));
+  await toolbar(page)
+    .getByRole('button', { name: /^Tablet/ })
+    .click();
+  await setColumnWidth(page, 1000);
+  await expect(
+    toolbar(page).getByRole('group', { name: 'Device size' })
+  ).toHaveCount(0);
+  const box = await address(page).boundingBox();
+  expect(box?.width ?? 0).toBeGreaterThanOrEqual(128);
+  const more = await actions(page).boundingBox();
+  expect((more?.x ?? 0) + (more?.width ?? 0)).toBeLessThanOrEqual(1440);
+  await actions(page).click();
+  await expect(
+    page.getByRole('menuitemcheckbox', { name: /^Phone/ })
+  ).toBeVisible();
+});
+
+test.describe('375px window', () => {
+  test.use({ viewport: { width: 375, height: 800 } });
+
+  test('⋯ then Esc, focusing the address and an address error leave the shell unscrolled', async ({
+    page,
+  }) => {
+    await page.goto(adminUrl(declared(HELLO), postHash(HELLO)));
+    await expect(toolbar(page)).toBeAttached();
+    const scrolled = () =>
+      page.evaluate(
+        () => document.querySelector('[data-slot=sidebar-wrapper]')?.scrollLeft
+      );
+    await actions(page).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('menu')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('menu')).toHaveCount(0);
+    expect(await scrolled()).toBe(0);
+    await address(page).focus();
+    expect(await scrolled()).toBe(0);
+    await address(page).fill('//other.test/');
+    await address(page).press('Enter');
+    await expect(
+      page.getByRole('alert').filter({ hasText: /Type an address/ })
+    ).toHaveCount(1);
+    expect(await scrolled()).toBe(0);
+    const title = await page
+      .getByRole('textbox', { name: /^title\b/i })
+      .boundingBox();
+    expect(title?.x ?? -1).toBeGreaterThanOrEqual(0);
+  });
+
+  test('a fast first page ends loading', async ({ page }) => {
+    await page.goto(adminUrl('/plain.html'));
+    await expect(frame(page).getByTestId('plain-title')).toBeAttached();
+    await expect(page.getByText('Loading the page')).toHaveCount(0);
+  });
+});
+
+test.describe('slow and unreachable sites', () => {
+  test('a first response slower than the probe timeout still ends with the page shown', async ({
+    page,
+  }) => {
+    await page.clock.install();
+    await page.goto(adminUrl('/plain.html'));
+    await expect(frame(page).getByTestId('plain-title')).toBeAttached();
+    const box = address(page);
+    await box.fill('/slow.html?ms=4000');
+    await box.press('Enter');
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Loading the page' })
+    ).toBeVisible();
+    await page.clock.fastForward(11_000);
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Loading the page' })
+    ).toBeVisible();
+    await expect(frame(page).getByTestId('slow-title')).toBeVisible({
+      timeout: 15000,
+    });
+    await expect(page.getByText('The page didn’t load')).toHaveCount(0);
+  });
+
+  test('a host that never answers ends on the note after 30 seconds, and the error page never shows', async ({
+    page,
+  }) => {
+    await page.clock.install();
+    await page.goto(adminUrl('/plain.html'));
+    await expect(frame(page).getByTestId('plain-title')).toBeAttached();
+    const box = address(page);
+    await box.fill('/hang.html');
+    await box.press('Enter');
+    await page.clock.fastForward(11_000);
+    await page.clock.fastForward(31_000);
+    await expect(
+      page.getByRole('status').filter({ hasText: 'The page didn’t load' })
+    ).toBeVisible();
+    await expect(page.locator('iframe[title="Preview"]')).toBeHidden();
+  });
+
+  test('a hash-only address typed while the note shows clears it', async ({
+    page,
+  }) => {
+    const key = `h${Date.now()}`;
+    await page.goto(adminUrl('/plain.html'));
+    const box = address(page);
+    await box.fill(`/down.html?key=${key}`);
+    await box.press('Enter');
+    const note = page
+      .getByRole('status')
+      .filter({ hasText: 'The page didn’t load' });
+    await expect(note).toBeVisible({ timeout: 15000 });
+    await page.request.get(`/__up?key=${key}`);
+    await box.fill(`/down.html?key=${key}#a`);
+    await box.press('Enter');
+    await expect(frame(page).getByTestId('down-title')).toBeVisible({
+      timeout: 15000,
+    });
+    await expect(note).toHaveCount(0);
+  });
+
+  test('a second Reload during a reload keeps the page under the scrim', async ({
+    page,
+  }) => {
+    await page.goto(adminUrl(declared(HELLO), postHash(HELLO)));
+    await expect(frame(page).getByTestId('post-title')).toBeVisible();
+    await page.route('**/declared.html**', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await route.continue();
+    });
+    await actions(page).click();
+    await page.getByRole('menuitem', { name: 'Reload' }).click();
+    const reloading = page
+      .getByRole('status')
+      .filter({ hasText: 'Reloading the page' });
+    await expect(reloading).toBeVisible();
+    await actions(page).click();
+    await page.getByRole('menuitem', { name: 'Reload' }).click();
+    await expect(page.locator('iframe[title="Preview"]')).toBeVisible();
+    await expect(frame(page).getByTestId('post-title')).toBeVisible({
+      timeout: 15000,
+    });
+  });
+});
+
+test.describe('canvas and tooltips', () => {
+  test.use({ viewport: { width: 1600, height: 900 } });
+
+  test('a page with no background draws on the default canvas, with an edge at Tablet', async ({
+    page,
+  }) => {
+    await page.goto(adminUrl('/plain.html'));
+    const pageBox = page.locator('[data-slot=preview-page]');
+    await expect(pageBox).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    await toolbar(page)
+      .getByRole('button', { name: /^Tablet/ })
+      .click();
+    const edge = await pageBox.evaluate(
+      (node) => getComputedStyle(node).boxShadow
+    );
+    expect(edge).not.toBe('none');
+  });
+
+  test('Preview actions shows a tooltip on hover, and again after the menu closes with Esc', async ({
+    page,
+  }) => {
+    await page.goto(adminUrl('/plain.html'));
+    const tip = page.locator('[data-slot=tooltip-content]');
+    await actions(page).hover();
+    await expect(tip).toHaveText('Preview actions');
+    await page.mouse.move(5, 400);
+    await actions(page).focus();
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Escape');
+    await toolbar(page).getByRole('button', { name: 'Expand preview' }).focus();
+    await page.keyboard.press('Shift+Tab');
+    await expect(actions(page)).toBeFocused();
+    await expect(tip.filter({ hasText: 'Preview actions' })).toBeVisible();
+  });
+});

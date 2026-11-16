@@ -144,8 +144,10 @@ function PreviewFrame({
         <div
           data-slot='preview-page'
           className={cn(
-            'relative',
-            fit ? 'min-h-0 w-full flex-1' : 'mx-auto flex-none',
+            'relative bg-[Canvas]',
+            fit
+              ? 'min-h-0 w-full flex-1'
+              : 'mx-auto flex-none shadow-xs ring-1 ring-border',
             hidden && 'invisible'
           )}
           style={

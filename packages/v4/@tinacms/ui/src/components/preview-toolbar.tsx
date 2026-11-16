@@ -1,13 +1,13 @@
 import { Monitor, RotateCw, Smartphone, Tablet } from 'lucide-react';
-import {
-  type ComponentProps,
-  type ReactNode,
-  useEffect,
-  useId,
-  useRef,
-} from 'react';
+import { type ComponentProps, useEffect, useId, useRef, useState } from 'react';
 
-import { Button } from '@tinacms/ui/components/button';
+import { Button, buttonVariants } from '@tinacms/ui/components/button';
+import { Icon } from '@tinacms/ui/components/icon';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@tinacms/ui/components/tooltip';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -65,6 +65,29 @@ type PreviewToolbarProps = Omit<ComponentProps<'div'>, 'children'> & {
 const scaleWord = (scale: PreviewScale, fitScale = 100) =>
   `${scale === 'fit' ? fitScale : scale}%`;
 
+// Widths in px of what the toolbar holds, for working out what fits in the preview pane.
+const ADDRESS_MIN = 128;
+const PAD_AND_GAPS = 28;
+const BUTTON = 36;
+const DEVICE_GROUP = 112;
+const FIT_READOUT = 64;
+const SCALE_BUTTON = 116;
+
+/**
+ * How many controls move into ⋯ for a pane `width` wide: 0 none, 1 the device sizes, 2 the scale
+ * too, 3 Expand too. The address keeps `ADDRESS_MIN` until everything else is in ⋯.
+ */
+function overflowLevel(width: number, atFit: boolean): 0 | 1 | 2 | 3 {
+  if (width <= 0) return 0;
+  const readout = atFit ? FIT_READOUT : SCALE_BUTTON;
+  const centre = DEVICE_GROUP + readout + BUTTON + PAD_AND_GAPS;
+  if (width >= 2 * ADDRESS_MIN + centre) return 0;
+  const withScale = atFit ? 0 : SCALE_BUTTON;
+  if (width >= ADDRESS_MIN + withScale + 2 * BUTTON + PAD_AND_GAPS) return 1;
+  if (width >= ADDRESS_MIN + 2 * BUTTON + PAD_AND_GAPS) return 2;
+  return 3;
+}
+
 /**
  * The bar over the preview, 44px: the page's address, the device size, the width or scale readout,
  * Preview actions (⋯) and Expand preview. A tablet-width window moves the device sizes into ⋯;
@@ -93,6 +116,18 @@ function PreviewToolbar({
   const shown = width ?? tier;
   const at = DEVICES.find((d) => d.value === device) ?? DEVICES[0];
   const errorId = useId();
+
+  const root = useRef<HTMLDivElement>(null);
+  const [paneWidth, setPaneWidth] = useState(0);
+  useEffect(() => {
+    const element = root.current;
+    if (!element) return;
+    const seen = new ResizeObserver(() => setPaneWidth(element.clientWidth));
+    seen.observe(element);
+    return () => seen.disconnect();
+  }, []);
+  const tierLevel = shown === 'desktop' ? 0 : 1;
+  const level = Math.max(tierLevel, overflowLevel(paneWidth, device === 'fit'));
 
   const addressInput = useRef<HTMLInputElement>(null);
   const typing = useRef(false);
@@ -131,18 +166,62 @@ function PreviewToolbar({
       <DropdownMenuSeparator />
     </>
   );
-  const more = (withDevices: boolean) => (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button variant='icon' icon='more' tooltipSide='bottom'>
-            Preview actions
-          </Button>
-        }
+  const scaleRows = (
+    <>
+      <DropdownMenuHeading
+        heading='Scale'
+        sub={`${at.width} · ${scaleWord(scale, fitScale)}`}
       />
+      {SCALES.map((s) => (
+        <DropdownMenuCheckboxItem
+          key={s}
+          checked={s === scale}
+          onCheckedChange={() => onScaleChange?.(s)}
+        >
+          {s === 'fit' ? 'Fit to the preview' : `${s}%`}
+        </DropdownMenuCheckboxItem>
+      ))}
+      <DropdownMenuSeparator />
+    </>
+  );
+  const expandRow = (
+    <DropdownMenuItem
+      icon={expanded ? 'restore' : 'maximise'}
+      hint={expanded ? 'Esc' : undefined}
+      onClick={() => onExpandedChange?.(!expanded)}
+    >
+      {expanded ? 'Collapse preview' : 'Expand preview'}
+    </DropdownMenuItem>
+  );
+  const more = (rows: {
+    devices: boolean;
+    scale: boolean;
+    expand: boolean;
+  }) => (
+    <DropdownMenu>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <DropdownMenuTrigger
+              aria-label='Preview actions'
+              className={buttonVariants({ variant: 'icon', size: 'md' })}
+            >
+              <Icon glyph='more' size={20} />
+            </DropdownMenuTrigger>
+          }
+        />
+        <TooltipContent side='bottom'>Preview actions</TooltipContent>
+      </Tooltip>
       <DropdownMenuContent align='end' aria-label='Preview actions'>
-        {withDevices ? deviceRows : null}
+        {rows.devices ? deviceRows : null}
+        {rows.scale && device !== 'fit' ? scaleRows : null}
         {actions}
+        {rows.expand ? (
+          <>
+            <DropdownMenuSeparator />
+            {expandRow}
+          </>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -189,14 +268,17 @@ function PreviewToolbar({
     </Button>
   );
 
+  const phone = shown === 'phone';
   return (
     <div
+      ref={root}
       role='group'
       aria-label='Preview toolbar'
       data-slot='preview-toolbar'
+      data-level={phone ? 'phone' : level}
       className={cn(
-        'relative box-border min-h-11 flex-none items-center gap-1.5 border-b border-border-subtle bg-card px-2 font-sans',
-        shown === 'desktop'
+        'relative box-border min-h-11 min-w-0 flex-none items-center gap-1.5 border-b border-border-subtle bg-card px-2 font-sans',
+        !phone && level === 0
           ? 'grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]'
           : 'flex',
         className
@@ -206,10 +288,12 @@ function PreviewToolbar({
       <div
         className={cn(
           'flex min-w-0 items-center gap-1.5',
-          shown !== 'desktop' && 'flex-1'
+          level !== 0 && 'flex-1'
         )}
       >
-        <InputGroup className='min-w-0 flex-1'>
+        <InputGroup
+          className={cn('min-w-0 flex-1', !phone && level < 3 && 'min-w-32')}
+        >
           <InputGroupInput
             ref={addressInput}
             aria-label='Page address'
@@ -241,22 +325,14 @@ function PreviewToolbar({
         <p
           id={errorId}
           role='alert'
-          className='absolute top-full left-2 z-30 m-0 rounded-sm bg-card px-2 py-1 text-xs text-destructive shadow-popover'
+          className='absolute top-full left-2 z-30 m-0 max-w-[calc(100%-1rem)] rounded-sm bg-card px-2 py-1 text-xs text-destructive shadow-popover'
         >
           {addressError}
         </p>
       ) : null}
-      {shown === 'phone' ? (
-        more(false)
-      ) : shown === 'tablet' ? (
-        <>
-          <div className='flex flex-none items-center gap-0.5'>
-            {scaleControl}
-            {more(true)}
-          </div>
-          {expand}
-        </>
-      ) : (
+      {phone ? (
+        more({ devices: false, scale: false, expand: false })
+      ) : level === 0 ? (
         <>
           <div className='flex flex-none items-center gap-0.5'>
             <div
@@ -285,9 +361,17 @@ function PreviewToolbar({
             ) : (
               scaleControl
             )}
-            {more(false)}
+            {more({ devices: false, scale: false, expand: false })}
           </div>
           <div className='flex min-w-0 items-center justify-end'>{expand}</div>
+        </>
+      ) : (
+        <>
+          <div className='flex flex-none items-center gap-0.5'>
+            {level === 1 ? scaleControl : null}
+            {more({ devices: true, scale: level >= 2, expand: level === 3 })}
+          </div>
+          {level < 3 ? expand : null}
         </>
       )}
     </div>

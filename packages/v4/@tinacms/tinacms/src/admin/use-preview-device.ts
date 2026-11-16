@@ -8,6 +8,7 @@ const readStored = (): PreviewDevice => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     return stored === 'tablet' || stored === 'phone' ? stored : 'fit';
   } catch {
+    // A browser with storage blocked starts at Fit.
     return 'fit';
   }
 };
@@ -22,7 +23,9 @@ export function usePreviewDevice(): [
     setDevice(next);
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
-    } catch {}
+    } catch {
+      // A browser with storage blocked keeps the choice for this visit only.
+    }
   }, []);
   return [device, choose];
 }

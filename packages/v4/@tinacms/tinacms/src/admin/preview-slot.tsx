@@ -4,7 +4,7 @@ import {
 } from '@tinacms/ui/components/preview-frame';
 import { PreviewToolbar } from '@tinacms/ui/components/preview-toolbar';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   type PreviewConnectionOptions,
   usePreviewConnection,
@@ -15,24 +15,44 @@ import {
   isHashOnlyChange,
   parseAddress,
 } from './preview-address';
+import {
+  type LoadCondition,
+  type ProbeResult,
+  createPreviewLoad,
+} from './preview-load';
 import { usePreviewDevice } from './use-preview-device';
 
 const PROBE_TIMEOUT_MS = 10_000;
 const HOW_PREVIEWS_ARE_SET_UP =
   'https://tina.io/docs/contextual-editing/overview';
 
-type Condition = 'loading' | 'reloading' | 'failed' | undefined;
-
 const isWebAddress = (href: string) => /^https?:\/\//i.test(href);
 
-interface LoadState {
-  token: number;
-  active: boolean;
-  loaded: boolean;
-  probe: 'pending' | 'reached' | 'failed';
-  abort: AbortController | null;
-  timer: ReturnType<typeof setTimeout> | null;
+/** Asks the site for the address, without reading the answer, so a down site is told from a slow one. */
+function probe(url: string): Promise<ProbeResult> {
+  const controller = new AbortController();
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, PROBE_TIMEOUT_MS);
+  return fetch(url, {
+    mode: 'no-cors',
+    cache: 'no-store',
+    signal: controller.signal,
+  })
+    .then(
+      () => 'reached' as const,
+      () => (timedOut ? ('timeout' as const) : ('rejected' as const))
+    )
+    .finally(() => clearTimeout(timer));
 }
+
+const withoutHash = (href: string) => {
+  const url = new URL(href);
+  url.hash = '';
+  return url.href;
+};
 
 interface PreviewPaneProps {
   src: string;
@@ -69,81 +89,46 @@ function PreviewPane({
   const [scale, setScale] = useState<PreviewScale>('fit');
   const [fitWidth, setFitWidth] = useState<number>();
   const [fitScale, setFitScale] = useState(100);
-  const [condition, setCondition] = useState<Condition>('loading');
+  const [condition, setCondition] = useState<LoadCondition>('loading');
   const [addressError, setAddressError] = useState<string>();
 
-  const load = useRef<LoadState>({
-    token: 0,
-    active: false,
-    loaded: false,
-    probe: 'pending',
-    abort: null,
-    timer: null,
-  });
+  const [load] = useState(() =>
+    createPreviewLoad({
+      probe,
+      frameReadable: () => {
+        try {
+          return Boolean(iframeRef.current?.contentWindow?.location.href);
+        } catch {
+          // A cross-origin page and the browser's error page throw on this read.
+          return false;
+        }
+      },
+      onCondition: setCondition,
+    })
+  );
 
-  const liveHref = (): string => {
+  // The frame's location when it shows a page of the site; null for the blank page before the first one.
+  const framePage = (): string | null => {
     try {
       const live = iframeRef.current?.contentWindow?.location.href;
       if (live && isWebAddress(live)) return live;
-    } catch {}
-    return knownHref.current;
+    } catch {
+      // A cross-origin page and the browser's error page throw on this read.
+    }
+    return null;
   };
+  const liveHref = () => framePage() ?? knownHref.current;
 
-  const settle = () => {
-    const state = load.current;
-    if (!state.active || !state.loaded || state.probe === 'pending') return;
-    state.active = false;
-    setCondition(state.probe === 'failed' ? 'failed' : undefined);
-  };
-
-  const endProbe = () => {
-    const state = load.current;
-    state.abort?.abort();
-    if (state.timer) clearTimeout(state.timer);
-    state.abort = null;
-    state.timer = null;
-  };
-
-  // Each admin-started load takes a token; the events of an older token are ignored.
-  const startLoad = (kind: 'loading' | 'reloading', target: string) => {
-    const state = load.current;
-    endProbe();
-    const token = ++state.token;
-    state.active = true;
-    state.loaded = false;
-    state.probe = 'pending';
-    const controller = new AbortController();
-    state.abort = controller;
-    state.timer = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
-    setCondition(kind);
-    fetch(target, {
-      mode: 'no-cors',
-      cache: 'no-store',
-      signal: controller.signal,
-    })
-      .then(
-        () => 'reached' as const,
-        () => 'failed' as const
-      )
-      .then((result) => {
-        if (token !== state.token) return;
-        if (state.timer) clearTimeout(state.timer);
-        state.probe = result;
-        settle();
-      });
-  };
-
-  useEffect(() => {
-    startLoad('loading', knownHref.current);
-    return endProbe;
-    // The first load starts once per mount; later loads start from the toolbar.
-  }, []);
+  // A layout effect, so the first load starts before the iframe can fire `load`.
+  useLayoutEffect(() => {
+    load.start('loading', knownHref.current, true);
+    return load.dispose;
+  }, [load]);
 
   const onFrameLoad = () => {
     const live = liveHref();
     if (live !== knownHref.current) setHref(live);
-    load.current.loaded = true;
-    settle();
+    load.loaded();
   };
 
   useEffect(() => {
@@ -162,7 +147,9 @@ function PreviewPane({
         if (url.origin === previewOrigin && isWebAddress(url.href)) {
           setHref(url.href);
         }
-      } catch {}
+      } catch {
+        // A message with a url that is not an address changes nothing.
+      }
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
@@ -173,17 +160,22 @@ function PreviewPane({
   };
 
   const reload = () => {
-    const target = liveHref();
-    startLoad(condition === undefined ? 'reloading' : 'loading', target);
+    const page = framePage();
+    const target = page ?? knownHref.current;
+    const showing = condition === undefined || condition === 'reloading';
+    load.start(showing ? 'reloading' : 'loading', target);
     const frame = iframeRef.current;
     if (!frame) return;
-    if (condition !== 'failed') {
+    if (page && condition !== 'failed') {
       try {
         frame.contentWindow?.location.reload();
         return;
-      } catch {}
+      } catch {
+        // A cross-origin page throws on reload; fall back to navigating to its address.
+      }
     }
-    frame.src = target;
+    // A fragment-only change fetches nothing, so the address goes without its hash.
+    frame.src = withoutHash(target);
   };
 
   const navigate = (typed: string) => {
@@ -200,11 +192,11 @@ function PreviewPane({
       return;
     }
     setHref(next);
-    if (isHashOnlyChange(current, next)) {
+    if (condition !== 'failed' && isHashOnlyChange(current, next)) {
       moveFrame(next);
       return;
     }
-    startLoad('loading', next);
+    load.start('loading', next);
     moveFrame(next);
   };
 
@@ -225,11 +217,12 @@ function PreviewPane({
     }
     if (!moveFocus) return;
     const name = expanded ? 'Collapse preview' : 'Expand preview';
-    paneRef.current
-      ?.querySelector<HTMLElement>(
-        `[data-slot=preview-toolbar] button[aria-label="${name}"]`
-      )
-      ?.focus();
+    const bar = paneRef.current?.querySelector('[data-slot=preview-toolbar]');
+    // In a narrow pane the toggle lives in the actions menu, so focus goes to its button.
+    (
+      bar?.querySelector<HTMLElement>(`button[aria-label="${name}"]`) ??
+      bar?.querySelector<HTMLElement>('button[aria-label="Preview actions"]')
+    )?.focus();
   }, [expanded, moveFocus]);
 
   return (
@@ -286,7 +279,10 @@ export interface PreviewSlotProps extends Omit<PreviewPaneProps, 'src'> {
 /** The string-URL preview beside the form: the toolbar and the frame around the iframe. */
 export function PreviewSlot(props: PreviewSlotProps) {
   return (
-    <div data-preview-slot='' className='flex min-w-0 flex-1 flex-col'>
+    <div
+      data-preview-slot=''
+      className='flex min-w-0 flex-1 flex-col overflow-clip contain-[inline-size]'
+    >
       <PreviewPane {...props} />
     </div>
   );
