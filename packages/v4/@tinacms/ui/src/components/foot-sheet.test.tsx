@@ -19,6 +19,7 @@ import {
 } from '@tinacms/ui/components/dialog';
 import { TinaErrorSummaryPane } from '@tinacms/ui/components/error-summary-pane';
 import { Input } from '@tinacms/ui/components/input';
+import { Sheet, SheetContent, SheetTitle } from '@tinacms/ui/components/sheet';
 import { guardConsole } from '../test/console-guard';
 
 guardConsole();
@@ -205,6 +206,50 @@ describe('the error list on a phone', () => {
     stubWidth(1280);
     render(<TinaErrorSummaryPane errors={ERRORS} wide />);
     expect(screen.getByRole('button', { name: 'Pin' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Close sheet' })).toBeNull();
+  });
+});
+
+describe('a sheet', () => {
+  const open = (side: 'left' | 'right' | 'bottom') =>
+    render(
+      <Sheet open>
+        <SheetContent side={side} className='w-(--sidebar-width)'>
+          <SheetTitle>Panel</SheetTitle>
+          <Input aria-label='Name' />
+        </SheetContent>
+      </Sheet>
+    );
+
+  it.each(['left', 'right'] as const)(
+    'fills the width of a phone on the %s',
+    async (side) => {
+      stubWidth(390);
+      open(side);
+      const panel = await screen.findByRole('dialog', { name: 'Panel' });
+      expect(panel.className.split(' ').at(-1)).toBe('w-full');
+    }
+  );
+
+  it('keeps the caller’s width from 768px up', async () => {
+    stubWidth(1280);
+    open('right');
+    const panel = await screen.findByRole('dialog', { name: 'Panel' });
+    expect(panel.className.split(' ')).not.toContain('w-full');
+    expect(panel.className).toContain('w-(--sidebar-width)');
+  });
+
+  it('is a foot sheet at the bottom on a phone, and not from 768px up', async () => {
+    stubWidth(390);
+    const view = open('bottom');
+    expect(
+      await screen.findByRole('button', { name: 'Close sheet' })
+    ).toBeVisible();
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveFocus();
+    view.unmount();
+    stubWidth(1280);
+    open('bottom');
+    await screen.findByRole('dialog', { name: 'Panel' });
     expect(screen.queryByRole('button', { name: 'Close sheet' })).toBeNull();
   });
 });

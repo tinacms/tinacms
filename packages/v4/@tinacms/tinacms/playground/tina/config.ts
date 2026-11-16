@@ -75,6 +75,27 @@ export const checklistCollection = {
     t.string({ name: 'first', label: 'First', validators: [required()] }),
     t.string({ name: 'second', label: 'Second', validators: [required()] }),
     t.string({ name: 'note', label: 'Note' }),
+    t.select({
+      name: 'choice',
+      label: 'Choice',
+      options: [
+        { value: 'short', label: 'Short' },
+        {
+          value: 'long',
+          label: `${'A very long option label that must wrap or truncate '.repeat(2)}end`,
+        },
+      ],
+    }),
+    t.reference({
+      name: 'related',
+      label: 'Related post',
+      collections: ['post'],
+    }),
+    t.array({
+      name: 'gallery',
+      label: 'Gallery',
+      of: t.image({ name: 'item', label: 'Image' }),
+    }),
   ],
 } satisfies CollectionSchema;
 

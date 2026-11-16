@@ -166,7 +166,7 @@ function FootSheetHandle({ close }: FootSheetHandleProps) {
     setTimeout(() => suppressNextClick.delete(button), 0);
     const far = Math.min(DRAG_CLOSE_MAX, sheet.offsetHeight / 4);
     if (!cancelled && !keepOnDismiss && drag.dy >= far) {
-      suppressNextClick.delete(button);
+      dragClose.add(button);
       button.click();
       requestAnimationFrame(() => {
         if (stillOpen(sheet)) springBack(sheet);
@@ -182,6 +182,7 @@ function FootSheetHandle({ close }: FootSheetHandleProps) {
     'aria-label': 'Close sheet',
     'data-foot-sheet-chrome': '',
     onClick: (event) => {
+      if (dragClose.delete(event.currentTarget)) return;
       if (suppressNextClick.has(event.currentTarget)) {
         suppressNextClick.delete(event.currentTarget);
         (event as unknown as BaseUiEvent).preventBaseUIHandler();
@@ -211,6 +212,7 @@ function FootSheetHandle({ close }: FootSheetHandleProps) {
 type BaseUiEvent = { preventBaseUIHandler: () => void };
 
 const suppressNextClick = new WeakSet<HTMLElement>();
+const dragClose = new WeakSet<HTMLElement>();
 
 type DragState = {
   startY: number;

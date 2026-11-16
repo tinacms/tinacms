@@ -359,6 +359,39 @@
             "name": "note",
             "label": "Note",
             "type": "string"
+          },
+          {
+            "name": "choice",
+            "label": "Choice",
+            "options": [
+              {
+                "value": "short",
+                "label": "Short"
+              },
+              {
+                "value": "long",
+                "label": "A very long option label that must wrap or truncate A very long option label that must wrap or truncate end"
+              }
+            ],
+            "type": "select"
+          },
+          {
+            "type": "reference",
+            "name": "related",
+            "label": "Related post",
+            "collections": [
+              "post"
+            ]
+          },
+          {
+            "name": "gallery",
+            "label": "Gallery",
+            "of": {
+              "name": "item",
+              "label": "Image",
+              "type": "image"
+            },
+            "type": "array"
           }
         ]
       }
@@ -376,6 +409,7 @@
     "image": 1,
     "reference": 1,
     "rich-text": 1,
+    "select": 1,
     "string": 1
   }
 }

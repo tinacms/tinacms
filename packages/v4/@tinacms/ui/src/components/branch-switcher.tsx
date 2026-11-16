@@ -13,6 +13,7 @@ import { Badge } from '@tinacms/ui/components/badge';
 import { Icon } from '@tinacms/ui/components/icon';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { BRANCH_NAME_HINT, branchNameError } from '@tinacms/ui/lib/branch-name';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type BranchEntry = {
@@ -194,6 +195,8 @@ function BranchSwitcher({
 }: BranchSwitcherProps) {
   const [open, setOpen] = useState(defaultOpen);
   const [fullScreen, setFullScreen] = useState(defaultFullScreen);
+  // The foot sheet draws its own ×.
+  const phone = useTier() === 'phone';
   const isProtected = branches.some(
     (branch) => branch.name === current && branch.protected
   );
@@ -290,13 +293,15 @@ function BranchSwitcher({
               aria-label={fullScreen ? 'Exit full screen' : 'Full screen'}
               onClick={() => setFullScreen((value) => !value)}
             />
-            <Button
-              variant='icon'
-              size='sm'
-              icon='close'
-              aria-label='Close'
-              onClick={() => setOpen(false)}
-            />
+            {phone ? null : (
+              <Button
+                variant='icon'
+                size='sm'
+                icon='close'
+                aria-label='Close'
+                onClick={() => setOpen(false)}
+              />
+            )}
           </div>
         </DialogHeader>
         {blocked ? (
