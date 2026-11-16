@@ -20,6 +20,7 @@ import referenceFieldPlugin from '../plugins/fields/reference/reference-field.pl
 import selectFieldPlugin from '../plugins/fields/select/select-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import { LabelledFields } from '../test/labelled-fields';
+import { connectionOf } from '../test/connection';
 
 const mediaStub = definePlugin({
   name: 'test:media:stub',
@@ -42,7 +43,7 @@ const contentStub = definePlugin({
   client: async () => ({
     default: {
       slice: () => ({
-        list: async () => [{ path: 'content/pages/about.mdx' }],
+        list: async () => connectionOf([{ path: 'content/pages/about.mdx' }]),
         get: async () => null,
         update: async (
           _collection: string,
