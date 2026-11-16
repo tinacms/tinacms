@@ -1,58 +1,361 @@
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
-import { type VariantProps, cva } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
+import type { LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 
+import { Badge, type CountTone } from '@tinacms/ui/components/badge';
+import { type Glyph, Icon } from '@tinacms/ui/components/icon';
+import { KbdShortcut, keyShortcuts } from '@tinacms/ui/components/kbd';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@tinacms/ui/components/tooltip';
 import { cn } from '@tinacms/ui/lib/utils';
 
+type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'destructive' | 'icon';
+/** `regular` and `compact` are the design's names. `md` and `sm` keep working. */
+type ButtonSize = 'regular' | 'compact' | 'md' | 'sm';
+type ButtonHeightSize = 'md' | 'sm';
+
+const heightSizeOf = (size: ButtonSize): ButtonHeightSize =>
+  size === 'compact' || size === 'sm' ? 'sm' : 'md';
+
+/** One height per size, shared by every variant so mixed buttons line up. */
+const buttonHeight = { md: 'h-9', sm: 'h-8' } as const satisfies Record<
+  ButtonHeightSize,
+  string
+>;
+
+/**
+ * Hover and press styles are written `not-disabled:not-aria-disabled:` so a disabled or busy button never
+ * shows them; the plain `hover:` of each variant restates its resting fill.
+ */
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  'group/button relative box-border inline-flex transition-all min-w-0 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-sm border-0 font-sans leading-control font-medium whitespace-nowrap no-underline outline-none select-none focus-visible:shadow-focus-ring disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/80',
+        primary:
+          'bg-primary text-primary-foreground shadow-button-primary hover:bg-primary not-disabled:not-aria-disabled:hover:bg-primary-hover not-disabled:not-aria-disabled:active:bg-primary-active',
         outline:
-          'border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50',
-        secondary:
-          'bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground',
+          'bg-card text-foreground shadow-xs inset-ring inset-ring-border hover:bg-card not-disabled:not-aria-disabled:hover:bg-muted',
         ghost:
-          'hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50',
+          'bg-transparent text-foreground hover:bg-transparent not-disabled:not-aria-disabled:hover:bg-muted',
         destructive:
-          'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40',
-        link: 'text-primary underline-offset-4 hover:underline',
+          'bg-card text-destructive shadow-xs inset-ring inset-ring-status-failed-border hover:bg-card not-disabled:not-aria-disabled:hover:bg-status-failed-subtle not-disabled:not-aria-disabled:hover:inset-ring-destructive',
+        icon: 'gap-0 bg-transparent px-0 text-muted-foreground hover:bg-transparent not-disabled:not-aria-disabled:hover:bg-muted not-disabled:not-aria-disabled:hover:text-foreground',
       },
       size: {
-        default:
-          'h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: 'h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
-        icon: 'size-8',
-        'icon-xs':
-          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
-        'icon-sm':
-          'size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg',
-        'icon-lg': 'size-9',
+        md: `${buttonHeight.md} px-3.75 text-base`,
+        sm: `${buttonHeight.sm} px-2.75 text-sm`,
       },
+      selected: { true: '', false: '' },
+      redIcon: { true: '', false: '' },
+      full: { true: 'w-full', false: '' },
+      shortcut: { true: '', false: '' },
+      busy: { true: 'cursor-progress', false: '' },
     },
+    compoundVariants: [
+      { variant: 'icon', size: 'md', className: 'w-9 px-0' },
+      { variant: 'icon', size: 'sm', className: 'w-8 px-0' },
+      {
+        variant: 'icon',
+        redIcon: true,
+        className:
+          'text-destructive not-disabled:not-aria-disabled:hover:bg-status-failed-subtle not-disabled:not-aria-disabled:hover:text-destructive',
+      },
+      {
+        variant: 'outline',
+        selected: true,
+        className:
+          'bg-pressed shadow-none inset-ring-0 hover:bg-pressed not-disabled:not-aria-disabled:hover:bg-pressed not-disabled:not-aria-disabled:active:bg-pressed',
+      },
+      {
+        variant: 'icon',
+        selected: true,
+        className:
+          'bg-selected text-foreground hover:bg-selected not-disabled:not-aria-disabled:hover:bg-selected not-disabled:not-aria-disabled:hover:text-foreground',
+      },
+      { shortcut: true, size: 'md', className: 'pr-1.25' },
+      { shortcut: true, size: 'sm', className: 'pr-1' },
+    ],
     defaultVariants: {
-      variant: 'default',
-      size: 'default',
+      variant: 'outline',
+      size: 'md',
+      selected: false,
+      redIcon: false,
+      full: false,
+      shortcut: false,
+      busy: false,
     },
   }
 );
 
-function Button({
-  className,
-  variant = 'default',
-  size = 'default',
-  ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
-  return (
+type ButtonBaseProps = Omit<ButtonPrimitive.Props, 'children'> & {
+  size?: ButtonSize;
+  full?: boolean;
+  /**
+   * The button's own work is running: a spinner replaces the leading icon, presses do nothing and it
+   * stays in the Tab order. `disabled` wins over `busy`.
+   */
+  busy?: boolean;
+  /** Draws a link to this address instead of a button. It opens in the same tab. */
+  href?: string;
+  /** A floor for the width, in pixels or any CSS length. */
+  minWidth?: number | string;
+  /** Which side an icon button's tooltip opens on. */
+  tooltipSide?: 'top' | 'right' | 'bottom' | 'left';
+};
+
+type CountOnWords =
+  | {
+      count?: undefined;
+      countTone?: never;
+      srLabel?: never;
+      chip?: undefined;
+      chipSrLabel?: never;
+    }
+  | {
+      /** A red count of errors after the words, shown from 1. */
+      count: number;
+      /** Red `error` by default. */
+      countTone?: CountTone;
+      /** The words screen readers hear, such as ", 3 errors". */
+      srLabel: string;
+      chip?: never;
+      chipSrLabel?: never;
+    }
+  | {
+      /** The design's name for `count`: a red chip after the words, shown from 1. */
+      chip: number;
+      /** The design's name for `srLabel`. */
+      chipSrLabel: string;
+      countTone?: CountTone;
+      count?: never;
+      srLabel?: never;
+    };
+
+type WithWords = ButtonBaseProps & {
+  children?: ReactNode;
+  /** An icon after the words. `chevron-down` stays small, for a button that opens a menu. */
+  iconEnd?: Glyph | LucideIcon;
+  /** The words in the code font, such as a branch name. */
+  mono?: boolean;
+  /** Keyboard keys after the words, such as `⌘K`. */
+  shortcut?: string;
+} & CountOnWords;
+
+type IconOnly = ButtonBaseProps & {
+  variant: 'icon';
+  /** The button's name, shown in its tooltip and heard by screen readers. Or give `aria-label`. */
+  children?: string;
+  /** Keyboard keys shown after the name in the tooltip, such as `⌘K`. */
+  shortcut?: string;
+};
+
+type ButtonProps =
+  | (WithWords & {
+      /** The one main action in a view or dialog; never two. */
+      variant: 'primary';
+      icon?: Glyph | LucideIcon;
+    })
+  | (WithWords & {
+      /** Default. Toolbars and bars, and a neutral action beside a primary. */
+      variant?: 'outline';
+      icon?: Glyph | LucideIcon;
+      /** The pressed look, for the view that is on. Pair it with `aria-pressed` or `aria-current`. */
+      selected?: boolean;
+    })
+  | (WithWords & {
+      /** Low emphasis, such as Cancel, Back or a menu trigger. */
+      variant: 'ghost';
+      icon?: Glyph | LucideIcon;
+    })
+  | (WithWords & {
+      /** Removes, deletes or discards. It always shows the bin, so it takes no `icon`. */
+      variant: 'destructive';
+    })
+  | (IconOnly & {
+      icon?: Glyph | LucideIcon;
+      destructive?: false;
+      /** The selected look, for the view that is open. Pair it with `aria-pressed` or `aria-current`. */
+      selected?: boolean;
+      /** An amber count in the top right corner, shown from 1. Put the number in the name too. */
+      count?: number;
+      countTone?: CountTone;
+    })
+  | (IconOnly & {
+      /** A remove with no room for words: the red bin alone. Name it for what it removes. */
+      destructive: true;
+    });
+
+/** Every prop any variant takes, so the body reads them in one place; `ButtonProps` says which apply. */
+type AnyButtonProps = ButtonBaseProps & {
+  variant?: ButtonVariant;
+  children?: ReactNode;
+  icon?: Glyph | LucideIcon;
+  iconEnd?: Glyph | LucideIcon;
+  selected?: boolean;
+  destructive?: boolean;
+  mono?: boolean;
+  shortcut?: string;
+  count?: number;
+  countTone?: CountTone;
+  srLabel?: string;
+  chip?: number;
+  chipSrLabel?: string;
+};
+
+function blockNavigation(event: { preventDefault(): void }) {
+  event.preventDefault();
+}
+
+/**
+ * Every button in the admin, in five variants and two sizes. Keyboard focus draws the orange ring with a
+ * soft glow; a click draws nothing. An icon button needs a name (its string children or `aria-label`),
+ * shown in a tooltip with its `shortcut` on hover and keyboard focus, and not while disabled.
+ * Give it an `href` and it draws a link; a disabled link has no address, and a busy one keeps it but blocks presses.
+ */
+function Button(buttonProps: ButtonProps) {
+  const all: AnyButtonProps = buttonProps;
+  const {
+    variant = 'outline',
+    size: sizeProp = 'md',
+    children,
+    icon: iconProp,
+    iconEnd,
+    selected = false,
+    full = false,
+    busy = false,
+    destructive = false,
+    mono = false,
+    shortcut,
+    count: countProp,
+    countTone,
+    srLabel: srLabelProp,
+    chip,
+    chipSrLabel,
+    href,
+    minWidth,
+    tooltipSide,
+    style,
+    className,
+    type,
+    disabled,
+    ...props
+  } = all;
+  const inert = Boolean(disabled || busy);
+  const count = countProp ?? chip;
+  const srLabel = srLabelProp ?? chipSrLabel;
+  const size = heightSizeOf(sizeProp);
+  const iconOnly = variant === 'icon';
+  const redIcon = iconOnly && destructive;
+  const textName =
+    iconOnly && typeof children === 'string' && children !== ''
+      ? children
+      : undefined;
+  const name = props['aria-label'] ?? textName;
+  const label = textName === undefined ? children : undefined;
+  const endIcon = iconOnly ? undefined : iconEnd;
+  const keys = shortcut || undefined;
+  const glyph = busy
+    ? 'spinner'
+    : variant === 'destructive' || redIcon
+      ? 'trash'
+      : iconProp;
+  const iconSize = iconOnly && size === 'md' ? 20 : 16;
+  const endIconSize = endIcon === 'chevron-down' ? 14 : 16;
+
+  const button = (
     <ButtonPrimitive
       data-slot='button'
-      className={cn(buttonVariants({ variant, size, className }))}
+      {...(href === undefined
+        ? {}
+        : {
+            render: <a href={disabled ? undefined : href} />,
+            nativeButton: false,
+            role: 'link',
+          })}
+      style={minWidth === undefined ? style : { ...style, minWidth }}
+      type={href === undefined ? (type ?? 'button') : undefined}
+      aria-keyshortcuts={keys ? keyShortcuts(keys) : undefined}
       {...props}
-    />
+      {...(href !== undefined && busy
+        ? {
+            onClickCapture: blockNavigation,
+            onAuxClickCapture: blockNavigation,
+          }
+        : {})}
+      disabled={disabled || busy}
+      focusableWhenDisabled={busy ? !disabled : props.focusableWhenDisabled}
+      aria-label={name}
+      className={cn(
+        buttonVariants({
+          variant,
+          size,
+          selected: (variant === 'outline' || iconOnly) && selected,
+          redIcon,
+          full,
+          shortcut: Boolean(keys) && !iconOnly,
+          busy,
+        }),
+        href !== undefined && disabled && 'cursor-not-allowed opacity-45',
+        className
+      )}
+    >
+      {glyph ? (
+        <span
+          className={cn(
+            'inline-flex',
+            iconOnly && selected && !redIcon && 'text-primary'
+          )}
+        >
+          <Icon glyph={glyph} size={iconSize} />
+        </span>
+      ) : null}
+      {typeof label === 'string' && label !== '' ? (
+        <span
+          className={cn(
+            'min-w-0 truncate',
+            mono && 'font-mono text-xs tracking-code'
+          )}
+        >
+          {label}
+        </span>
+      ) : (
+        label
+      )}
+      {keys && !iconOnly ? <KbdShortcut keys={keys} end /> : null}
+      {endIcon ? <Icon glyph={endIcon} size={endIconSize} /> : null}
+      {iconOnly && count ? (
+        <Badge kind='count' tone={countTone ?? 'change'} count={count} corner />
+      ) : null}
+      {!iconOnly && count && srLabel !== undefined ? (
+        <Badge
+          kind='count'
+          tone={countTone ?? 'error'}
+          count={count}
+          srLabel={srLabel}
+        />
+      ) : null}
+    </ButtonPrimitive>
+  );
+
+  if (!iconOnly || !name || disabled) return button;
+
+  const expanded =
+    props['aria-expanded'] === true || props['aria-expanded'] === 'true';
+  return (
+    <Tooltip disabled={expanded}>
+      <TooltipTrigger render={button} />
+      <TooltipContent side={tooltipSide}>
+        {name}
+        {keys ? <KbdShortcut keys={keys} size='sm' /> : null}
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
-export { Button, buttonVariants };
+export type { ButtonBaseProps, ButtonProps, ButtonSize, ButtonVariant };
+export { Button, buttonHeight, buttonVariants };

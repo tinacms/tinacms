@@ -102,4 +102,7 @@ export const TagsFieldPlugin = {
   name: 'tags',
   Component: TagsField,
   parse,
+  validate(value: any, values: any, meta: any, field: any) {
+    if (field.required && (!value || value.length === 0)) return 'Required';
+  },
 };

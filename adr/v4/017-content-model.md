@@ -32,7 +32,7 @@ Field **content values are JSON-native**, so the generic adapter stores them as-
 
 ### 6. Validation = two tiers
 - **Declarative rules** (`required`/`min`/`max`/`pattern`/`enum`) serialize into the lock → **enforceable everywhere, including TinaCloud**.
-- **Custom `validate` functions** (field-level *and* document-level, run via the `beforeSave` pipeline, ADR-014) → **client-UX everywhere**, **server-enforced on the Backend / self-hosted** (ADR-015), and therefore *advisory* on managed TinaCloud.
+- **Custom `validate` functions** (field-level *and* document-level, run via the `beforeSave` pipeline, ADR-014) → **client-UX everywhere**. Registered as a **server hook**, they are **server-enforced on the Backend** for every Data Layer, managed TinaCloud included ([ADR-028](./028-server-save-hooks.md)).
 
 ## Consequences
 

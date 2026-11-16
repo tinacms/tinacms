@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { type ReactNode, memo } from 'react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type AuthUser, toUserId } from '../core/auth/contract';
 import { createFieldRegistry } from '../core/field/registry';
 import { createFormHookRegistry } from '../core/form/hooks';
@@ -14,6 +14,8 @@ import { createGlobalNav } from '../core/slot/global-nav';
 import { createValidatorRegistry } from '../core/validator/registry';
 import { createTinaStore } from '../store/create-store';
 import { testAuthPlugin } from '../test/test-auth-plugin';
+import { stubLoginPopup, tinaCloudIdentity } from '../test/tinacloud-login';
+import { tinaCloud } from '../plugins/tinacloud/tinacloud.plugin';
 import { type TinaRuntime, TinaRuntimeContext } from './context';
 import { useOptionalAuthSlice, useRpcClient } from './hooks';
 
@@ -24,12 +26,19 @@ const bootRuntime = async (plugins: PluginManifest[]): Promise<TinaRuntime> => {
     registry: createFieldRegistry(resolved),
     validators: createValidatorRegistry(resolved),
     hooks: createFormHookRegistry(resolved),
+    serverHooks: new Set(),
+    rpcUrl: '/api/tina',
     store: createTinaStore(resolved),
     schema: { collections: [] },
     screens,
     globalNav: createGlobalNav(resolved, plugins, screens),
   };
 };
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 const wrapperFor =
   (runtime: TinaRuntime) =>
@@ -144,5 +153,32 @@ describe('useRpcClient', () => {
     await result.current.rpc.search.query();
     expect(result.current.auth?.user).toEqual(grace);
     expect(authorizations).toEqual(['Bearer acme:auth-token']);
+  });
+
+  it('sends no token when the auth plugin has no server segment', async () => {
+    const { result, authorizations } = await boot([
+      { ...testAuthPlugin('test:auth', ada), server: undefined },
+    ]);
+    await act(() => result.current.auth?.login());
+    await result.current.rpc.search.query();
+    expect(result.current.auth?.status).toBe('signed-in');
+    expect(authorizations).toEqual([null]);
+  });
+
+  it('sends the TinaCloud token to the site', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => tinaCloudIdentity(url))
+    );
+    const { result, authorizations } = await boot([
+      tinaCloud({ clientId: 'abc' }),
+    ]);
+    const { complete } = stubLoginPopup();
+    const login = result.current.auth?.login();
+    complete();
+    await act(() => login);
+    await result.current.rpc.search.query();
+    expect(result.current.auth?.status).toBe('signed-in');
+    expect(authorizations).toEqual(['Bearer id-token']);
   });
 });

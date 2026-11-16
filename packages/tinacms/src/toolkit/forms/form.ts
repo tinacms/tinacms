@@ -1,13 +1,13 @@
 import type { Plugin } from '@toolkit/core';
+import type { FormSubscription } from 'final-form';
 import {
   Config,
+  createForm,
   FORM_ERROR,
   FormApi,
   FormState,
-  createForm,
   getIn,
 } from 'final-form';
-import type { FormSubscription } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import setFieldData from 'final-form-set-field-data';
 import { AnyField, Field } from './field';
@@ -433,34 +433,52 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
           }
         } else {
           if (field.list) {
-            const namePathIndexForListItem = namePathIndex + 1;
-            const index = namePath[namePathIndexForListItem];
-            const listItemValue = value[index];
-            const fieldName = [
-              ...namePath.slice(0, namePathIndexForListItem),
-              index,
-            ].join('.');
-            const isLastItem = namePathIndexForListItem === namePath.length - 1;
-            if (!isLastItem) {
-              if (field.fields) {
-                return this.getFieldGroup({
-                  formOrObjectField: field,
-                  values: listItemValue,
-                  namePath,
-                  namePathIndex: namePathIndex + 2,
-                });
+            if (isLastItem) {
+              const fieldName = namePath.slice(0, namePathIndex).join('.');
+              if (!fieldName) {
+                return formOrObjectField;
               }
+              return {
+                ...formOrObjectField,
+                name: fieldName,
+                fields: formOrObjectField.fields.map((field) => {
+                  return {
+                    ...field,
+                    name: [fieldName, field.name].join('.'),
+                  };
+                }),
+              };
+            } else {
+              const namePathIndexForListItem = namePathIndex + 1;
+              const index = namePath[namePathIndexForListItem];
+              const listItemValue = value[index];
+              const fieldName = [
+                ...namePath.slice(0, namePathIndexForListItem),
+                index,
+              ].join('.');
+              const isLastItem =
+                namePathIndexForListItem === namePath.length - 1;
+              if (!isLastItem) {
+                if (field.fields) {
+                  return this.getFieldGroup({
+                    formOrObjectField: field,
+                    values: listItemValue,
+                    namePath,
+                    namePathIndex: namePathIndex + 2,
+                  });
+                }
+              }
+              return {
+                ...field,
+                name: fieldName,
+                fields: field.fields.map((field) => {
+                  return {
+                    ...field,
+                    name: [fieldName, field.name].join('.'),
+                  };
+                }),
+              };
             }
-            return {
-              ...field,
-              name: fieldName,
-              fields: field.fields.map((field) => {
-                return {
-                  ...field,
-                  name: [fieldName, field.name].join('.'),
-                };
-              }),
-            };
           } else {
             const fieldName = [...namePath.slice(0, namePathIndex + 1)].join(
               '.'

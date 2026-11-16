@@ -1,5 +1,7 @@
 import type { FormId } from '../../form/form-store';
+import type { Session } from '../auth/contract';
 import type { FieldAddress } from '../field/address';
+import { hasErrorBrand } from '../error-brand';
 import { invariant } from '../invariant';
 import type { JsonValue } from '../json';
 import {
@@ -27,8 +29,6 @@ export interface FieldEdit {
   value: unknown;
 }
 
-// TODO(ADR-014 §3): these hooks run in the browser. Enforcement needs a server
-// segment `beforeSave` in the save RPC path, which v4 does not supply yet.
 export interface FormHooks {
   beforeSave?: (
     document: TinaDocument,
@@ -45,19 +45,64 @@ export type FormHookFactory = (...args: JsonValue[]) => FormHooks;
 
 export type FormHookRegistry = ReadonlyMap<string, FormHookFactory>;
 
-export const overridesHookKey = (
-  manifest: PluginManifest,
-  key: string
-): boolean =>
+// A server hook has no form, so its scope has no `formId`. `session` is null
+// when no auth plugin verifies the request. `branch` is the branch the provider
+// writes to, or undefined on a Data Layer that has no branches.
+export interface ServerHookScope {
+  path: string;
+  collection: CollectionSchema;
+  session: Session | null;
+  branch?: string;
+}
+
+export interface SaveHooks<Scope> {
+  beforeSave?: (
+    document: TinaDocument,
+    scope: Scope
+  ) => TinaDocument | Promise<TinaDocument>;
+  afterSave?: (document: TinaDocument, scope: Scope) => void | Promise<void>;
+}
+
+export type ServerFormHooks = SaveHooks<ServerHookScope>;
+
+export type ServerHookFactory = (...args: JsonValue[]) => ServerFormHooks;
+
+export type ServerHookLoader<Args extends JsonValue[] = JsonValue[]> =
+  () => Promise<{ default: (...args: Args) => ServerFormHooks }>;
+
+export const defineServerHook = <Args extends JsonValue[]>(
+  factory: (...args: Args) => ServerFormHooks
+): ((...args: Args) => ServerFormHooks) => factory;
+
+const HOOK_REJECTED_BRAND: unique symbol = Symbol.for(
+  'tinacms.error.hook-rejected'
+);
+
+export class HookRejectedError extends Error {
+  readonly [HOOK_REJECTED_BRAND] = true;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'HookRejectedError';
+  }
+}
+
+export const isHookRejectedError = (value: unknown): value is Error =>
+  hasErrorBrand(value, HOOK_REJECTED_BRAND);
+
+// The one way a server hook's message reaches the editor. Any other throw
+// answers with a generic failure.
+export const reject = (message: string): never => {
+  throw new HookRejectedError(message);
+};
+
+const overridesHookKey = (manifest: PluginManifest, key: string): boolean =>
   manifest.overrides.some(
     (override) =>
       override.capability === HOOKS_CAPABILITY && override.key === key
   );
 
-export const hookConflictError = (
-  conflict: RegistryConflict,
-  key: string
-): Error => {
+const hookConflictError = (conflict: RegistryConflict, key: string): Error => {
   if (conflict === REGISTRY_CONFLICTS.duplicateOverride) {
     return new Error(
       `Two plugins both declare an \`overrides\` for the form hook "${key}". ` +
@@ -70,11 +115,14 @@ export const hookConflictError = (
   );
 };
 
+const NO_CLIENT_SIDE: FormHookFactory = () => ({});
+
 const hookEntriesOf = ({
   manifest,
   segment,
 }: ResolvedSegment): RegistryEntry<FormHookFactory>[] => {
   const declared = manifest.hooks ?? [];
+  const serverSides = manifest.serverHooks ?? [];
   const factories = segment.hooks ?? {};
   for (const name of Object.keys(factories)) {
     invariant(
@@ -84,7 +132,9 @@ const hookEntriesOf = ({
     );
   }
   return declared.map((name) => {
-    const factory = factories[name];
+    const factory =
+      factories[name] ??
+      (serverSides.includes(name) ? NO_CLIENT_SIDE : undefined);
     invariant(
       factory,
       'hooks-plugin-missing-factory',
@@ -97,6 +147,31 @@ const hookEntriesOf = ({
     };
   });
 };
+
+export const hookProvidersOf = (
+  plugins: PluginManifest[]
+): Map<string, PluginManifest> =>
+  composeOverridableRegistry(
+    plugins.flatMap((plugin) =>
+      (plugin.hooks ?? []).map((name) => ({
+        key: name,
+        value: plugin,
+        isOverride: overridesHookKey(plugin, name),
+      }))
+    ),
+    hookConflictError
+  );
+
+// The hook names whose winning registration has a server side. The client
+// routes a save from these without loading any server code.
+export const serverHookNamesOf = (
+  plugins: PluginManifest[]
+): ReadonlySet<string> =>
+  new Set(
+    [...hookProvidersOf(plugins)]
+      .filter(([name, plugin]) => plugin.serverHooks?.includes(name))
+      .map(([name]) => name)
+  );
 
 export const createFormHookRegistry = (
   resolved: ResolvedSegment[]
@@ -120,10 +195,10 @@ export const resolveFormHooks = (
     return factory(...(ref.args ?? []));
   });
 
-export const runBeforeSave = async (
-  hooks: readonly FormHooks[],
+export const runBeforeSave = async <Scope>(
+  hooks: readonly SaveHooks<Scope>[],
   document: TinaDocument,
-  scope: FormHookScope
+  scope: Scope
 ): Promise<TinaDocument> => {
   let current = document;
   for (const hook of hooks) {
@@ -132,10 +207,10 @@ export const runBeforeSave = async (
   return current;
 };
 
-export const runAfterSave = async (
-  hooks: readonly FormHooks[],
+export const runAfterSave = async <Scope>(
+  hooks: readonly SaveHooks<Scope>[],
   document: TinaDocument,
-  scope: FormHookScope
+  scope: Scope
 ): Promise<void> => {
   const failures: unknown[] = [];
   for (const hook of hooks) {
@@ -168,7 +243,8 @@ export const runOnChange = (
 
 export interface RegisteredHook {
   readonly hookName: string;
-  readonly factory: FormHookFactory;
+  readonly factory?: FormHookFactory;
+  readonly server?: ServerHookLoader;
 }
 
 export interface HookDefinition<Args extends JsonValue[]>
@@ -176,28 +252,69 @@ export interface HookDefinition<Args extends JsonValue[]>
   (...args: Args): HookRef;
 }
 
-export const defineHook = <Args extends JsonValue[]>(
+export interface HookSides<Args extends JsonValue[]> {
+  client?: (...args: Args) => FormHooks;
+  server?: ServerHookLoader<Args>;
+}
+
+export function defineHook<Args extends JsonValue[]>(
   name: string,
   factory: (...args: Args) => FormHooks
-): HookDefinition<Args> =>
-  Object.assign(
+): HookDefinition<Args> & { readonly factory: FormHookFactory };
+export function defineHook<Args extends JsonValue[]>(
+  name: string,
+  sides: HookSides<Args>
+): HookDefinition<Args>;
+export function defineHook<Args extends JsonValue[]>(
+  name: string,
+  sides: ((...args: Args) => FormHooks) | HookSides<Args>
+): HookDefinition<Args> {
+  // The registry stores every hook under the widest Args; the ref helper keeps Args.
+  const { client, server } = (
+    typeof sides === 'function' ? { client: sides } : sides
+  ) as HookSides<JsonValue[]>;
+  return Object.assign(
     (...args: Args): HookRef => (args.length > 0 ? { name, args } : { name }),
-    { hookName: name, factory: factory as FormHookFactory }
+    { hookName: name, factory: client, server }
   );
+}
 
 export const defineHooksPlugin = (
   name: string,
   hooks: readonly RegisteredHook[]
-): PluginManifest =>
-  definePlugin({
+): PluginManifest => {
+  const serverSides = hooks.flatMap(({ hookName, server }) =>
+    server ? [{ hookName, server }] : []
+  );
+  return definePlugin({
     name,
     provides: [HOOKS_CAPABILITY],
     hooks: hooks.map((hook) => hook.hookName),
+    serverHooks: serverSides.map((hook) => hook.hookName),
     client: async () => ({
       default: {
         hooks: Object.fromEntries(
-          hooks.map((hook) => [hook.hookName, hook.factory])
+          hooks.flatMap(({ hookName, factory }) =>
+            factory ? [[hookName, factory]] : []
+          )
         ),
       },
     }),
+    ...(serverSides.length > 0
+      ? {
+          server: async () => ({
+            default: {
+              hooks: Object.fromEntries(
+                await Promise.all(
+                  serverSides.map(async ({ hookName, server }) => [
+                    hookName,
+                    (await server()).default,
+                  ])
+                )
+              ),
+            },
+          }),
+        }
+      : {}),
   });
+};

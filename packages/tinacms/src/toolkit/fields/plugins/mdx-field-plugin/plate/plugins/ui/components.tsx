@@ -1,3 +1,4 @@
+import { isSafeCssColor } from '@tinacms/mdx/sanitize-css-color';
 import { withProps } from '@udecode/cn';
 import {
   BoldPlugin,
@@ -29,6 +30,7 @@ import {
   TableRowPlugin,
 } from '@udecode/plate-table/react';
 import { ParagraphPlugin, PlateElement, PlateLeaf } from '@udecode/plate/react';
+import colorString from 'color-string';
 import React from 'react';
 import { BlockquoteElement } from '../../components/plate-ui/blockquote-element';
 import { CodeBlockElement } from '../../components/plate-ui/code-block/code-block-element';
@@ -46,7 +48,7 @@ import {
 } from '../../components/plate-ui/table/table-cell-element';
 import { TableElement } from '../../components/plate-ui/table/table-element';
 import { TableRowElement } from '../../components/plate-ui/table/table-row-element';
-import colorString from 'color-string';
+import { TextColorPlugin } from '../text-color-plugin';
 import { classNames } from './helpers';
 
 /**
@@ -72,21 +74,49 @@ function getContrastColor(color: string): string {
   return luminance > 0.5 ? '#000000' : '#ffffff';
 }
 
+/**
+ * Reads a colour leaf prop (leaf props are untyped in Plate), dropping values
+ * that aren't a plain CSS colour so pasted/loaded content can't inject CSS.
+ */
+const leafColor = (value: unknown) =>
+  typeof value === 'string' && isSafeCssColor(value) ? value : undefined;
+
+// Bold/italic/etc. nested inside a colour leaf get their colour from the
+// editor's prose styles; make them inherit the leaf's colour instead.
+const INHERIT_NESTED_COLOR =
+  '[&_strong]:text-inherit [&_em]:text-inherit [&_s]:text-inherit [&_u]:text-inherit';
+
 const HighlightLeaf = ({
   leaf,
   ...props
 }: React.ComponentProps<typeof PlateLeaf>) => {
-  const backgroundColor = (leaf.highlightColor as string) || '#FEF08A';
+  const backgroundColor = leafColor(leaf.highlightColor) ?? '#FEF08A';
+  // An explicit text colour wins over the auto-contrast colour, so the
+  // result doesn't depend on which leaf Plate nests outermost.
+  const color = leafColor(leaf.textColor) ?? getContrastColor(backgroundColor);
   return (
     <PlateLeaf
       as='mark'
-      className='rounded-sm'
-      style={{ backgroundColor, color: getContrastColor(backgroundColor) }}
+      className={`rounded-sm ${INHERIT_NESTED_COLOR}`}
+      style={{ backgroundColor, color }}
       leaf={leaf}
       {...props}
     />
   );
 };
+
+const TextColorLeaf = ({
+  leaf,
+  ...props
+}: React.ComponentProps<typeof PlateLeaf>) => (
+  <PlateLeaf
+    as='span'
+    className={INHERIT_NESTED_COLOR}
+    style={{ color: leafColor(leaf.textColor) }}
+    leaf={leaf}
+    {...props}
+  />
+);
 
 type HeadingComponentProps = {
   attributes: React.HTMLAttributes<HTMLHeadingElement>;
@@ -258,6 +288,7 @@ export const Components = () => {
     [LinkPlugin.key]: LinkElement,
     [CodePlugin.key]: CodeLeaf,
     [HighlightPlugin.key]: HighlightLeaf,
+    [TextColorPlugin.key]: TextColorLeaf,
     [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
     [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
     [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),

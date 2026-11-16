@@ -78,6 +78,7 @@ describe('field-level validators in the editor', () => {
     const title = await screen.findByRole('textbox', { name: 'Title' });
     await userEvent.clear(title);
     await userEvent.type(title, 'hi');
+    await userEvent.tab();
     const alerts = await screen.findAllByRole('alert');
     expect(alerts.map((alert) => alert.textContent)).toEqual([
       'Title must be at least 3 characters',
@@ -89,6 +90,7 @@ describe('field-level validators in the editor', () => {
     renderForm({ title: 'Hello', slug: 'Hello' });
     const slug = await screen.findByRole('textbox', { name: 'Slug' });
     await userEvent.type(slug, '!');
+    await userEvent.tab();
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Must equal title'
     );
@@ -100,8 +102,10 @@ describe('field-level validators in the editor', () => {
   it('shows a sibling rule message at its own field, not at the sibling', async () => {
     renderForm({ title: 'Hello', slug: 'Hello' });
     const title = await screen.findByRole('textbox', { name: 'Title' });
-    await userEvent.type(title, '!');
     const slug = screen.getByRole('textbox', { name: 'Slug' });
+    await userEvent.click(slug);
+    await userEvent.tab();
+    await userEvent.type(title, '!');
     const slugWrapper = slug.closest<HTMLElement>(
       '[data-slot="field-wrapper"]'
     );
@@ -119,6 +123,7 @@ describe('field-level validators in the editor', () => {
     renderForm({ title: 'Hello', slug: 'Hello' });
     const slug = await screen.findByRole('textbox', { name: 'Slug' });
     await userEvent.type(slug, '!');
+    await userEvent.tab();
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Must equal title'
     );

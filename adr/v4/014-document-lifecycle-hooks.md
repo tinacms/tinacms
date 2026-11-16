@@ -15,7 +15,7 @@ Plugins must react to a document's **edit/save** lifecycle — the **draft** plu
 Multiple taps run in **explicit order**, async; each sees the prior's output (transform), and any may **reject** the save (veto) with a surfaced reason. Observers (`onChange`/`afterSave`) cannot change the outcome; a throwing `afterSave` is logged, not rolled back (the save already happened).
 
 ### 3. Client/server split (ADR-008)
-Authoritative `beforeSave` **enforcement** runs **server-side** (the server segment, in the save-RPC path) — a client hook is bypassable UX. Convenience transforms and `onChange` run **client-side**; a client `onChange` rides Zustand `subscribe` (the store is client-only, ADR-003). The same logical rule may therefore be authored twice — a client `beforeSave` for snappy UX and a server `beforeSave` for enforcement.
+Authoritative `beforeSave` **enforcement** runs **server-side** (a server hook, in the save-RPC path: a save to a collection with a server hook goes through the Backend, per [ADR-028](./028-server-save-hooks.md)) — a client hook is bypassable UX. Convenience transforms and `onChange` run **client-side**; a client `onChange` rides Zustand `subscribe` (the store is client-only, ADR-003). The same logical rule may therefore be authored twice — a client `beforeSave` for snappy UX and a server `beforeSave` for enforcement.
 
 ### 4. Persistence is never overridden per-form
 The save action is always "write to the `content` capability." There is **no** form-level `onSubmit` that *replaces* persistence (v3 allowed this; v4 drops it) — the v3 cases reduce to `beforeSave` (massage the payload) or `afterSave` (fire a side-effect). **"Don't persist"** has two sanctioned expressions, neither a form override:

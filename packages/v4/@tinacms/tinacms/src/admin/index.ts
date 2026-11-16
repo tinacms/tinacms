@@ -4,6 +4,7 @@ export { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 export {
   type AdminRoute,
   COLLECTIONS_ROUTE,
+  HOME_ROUTE,
   formatAdminRoute,
   parseAdminRoute,
 } from './routing';

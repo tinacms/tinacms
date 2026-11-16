@@ -150,7 +150,7 @@ export function CodeBlockCombobox({
               {items.map((language) => (
                 <CommandItem
                   key={language.label}
-                  className='cursor-pointer rounded-md'
+                  className='cursor-pointer rounded-sm'
                   value={language.value}
                   onSelect={(value) => {
                     onLanguageChange(value);

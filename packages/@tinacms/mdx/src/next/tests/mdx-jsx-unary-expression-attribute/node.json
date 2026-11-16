@@ -2,15 +2,17 @@
   "type": "root",
   "children": [
     {
-      "type": "invalid_markdown",
-      "value": "<Count number={-1} />\n",
-      "message": "Unable to parse field value for field \"number\" (type: number). Expected type to be Literal but received UnaryExpression. TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/r/what-is-markdown",
+      "type": "mdxJsxFlowElement",
+      "name": "Count",
       "children": [
         {
           "type": "text",
           "text": ""
         }
-      ]
+      ],
+      "props": {
+        "number": -1
+      }
     }
   ]
 }

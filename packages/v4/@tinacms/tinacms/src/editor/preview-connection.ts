@@ -10,7 +10,11 @@ import {
   isReadyMessage,
   valuesMessage,
 } from '../preview/protocol';
-import { CONTENT_STALE_TIME, contentKeys } from './content-queries';
+import {
+  CONTENT_STALE_TIME,
+  contentKeys,
+  useCurrentBranch,
+} from './content-queries';
 import {
   useFormCollection,
   useFormId,
@@ -38,13 +42,14 @@ export function usePreviewConnection(
   const collections = useSchemaCollections();
   const content = useOptionalContentSlice();
   const queryClient = useQueryClient();
+  const branch = useCurrentBranch();
 
   useEffect(() => {
     const target = () => iframeRef.current?.contentWindow ?? null;
 
     const cachedDocument = (collection: string, path: string) =>
       queryClient.getQueryData<DocumentEntry | null>(
-        contentKeys.document(collection, path)
+        contentKeys.document(collection, path, branch)
       )?.document;
 
     // Posting stays synchronous, so it only ever reads the cache
@@ -70,7 +75,7 @@ export function usePreviewConnection(
         fields,
         collections
       )) {
-        const key = contentKeys.document(collection, path);
+        const key = contentKeys.document(collection, path, branch);
         // Test the cache entry, not the document. `content.get` resolves null
         // for a document that is gone, and that null is a cached answer.
         if (queryClient.getQueryState(key)) continue;
@@ -137,5 +142,6 @@ export function usePreviewConnection(
     collections,
     content,
     queryClient,
+    branch,
   ]);
 }

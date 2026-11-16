@@ -77,6 +77,9 @@
     }
   },
   "dependencies": {
+    "@dnd-kit/core": "catalog:",
+    "@dnd-kit/sortable": "catalog:",
+    "@dnd-kit/utilities": "catalog:",
     "@tanstack/react-query": "^5.101.4",
     "@tinacms/graphql": "workspace:*",
     "@tinacms/mdx": "workspace:*",
@@ -125,7 +128,7 @@
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.2",
     "typescript": "^5.7.3",
-    "vite": "^5.4.0",
-    "vitest": "^2.1.9"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   }
 }

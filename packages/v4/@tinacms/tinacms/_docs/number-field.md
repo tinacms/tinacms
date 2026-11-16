@@ -1,8 +1,8 @@
 # The `number` field
 
-The `number` field is one of the field plugins that v4 supplies. It is an
-`<input type="number">` element. The document stores a number, but the editor
-holds the raw input string. The source code is in `plugins/fields/number/`.
+The `number` field is one of the field plugins that v4 supplies. Its editor is a short
+number box with step buttons inside the Field wrapper. The document stores a
+number, but the editor holds the raw input string. The source code is in `plugins/fields/number/`.
 
 ## Authoring
 
@@ -25,7 +25,10 @@ The config (`NumberFieldSchema`, which extends `BaseFieldSchema`):
 |---|---|---|
 | `name` | `string` (necessary) | The field key in the document. It is also the alternative label. |
 | `label` | `string` | The label on the screen. The validation messages use it. |
-| `step` | `number` | The `step` attribute of the input. It is a render hint, and it has no validation function. |
+| `step` | `number` | The increase of the step buttons and the arrow keys (`1` when unset or not above zero). The `step` attribute of the input stays `step ?? 'any'`. It has no validation function. |
+
+Every field also takes `description`, `defaultValue` and `hidden`. Refer to
+[Options every field takes](./field-plugins.md#options-every-field-takes).
 
 > `required`, `min`, `max` and `pattern` are no longer config keys. They are
 > validators that a core plugin registers, and a collection attaches them with
@@ -89,30 +92,39 @@ optional empty value passes as `.optional()`. These rules run on the shared path
 
 ## The component
 
-`NumberField` (`number-field.ui.tsx`) has no props. It gets the value and the
-errors from hooks that use the address. It gets its own node with
-`useFieldSchema`, and it connects `step` to the input:
+`NumberField` (`number-field.ui.tsx`) has no props. It holds the hooks
+(`useFieldAddress`, `useFieldSchema`, `useFieldValue`, `useFieldFrame`,
+`useFieldActivation`) and feeds `NumberFieldView` (`number-field.view.tsx`).
+The view holds no editor state. It draws the box (`w-28 max-w-full`) inside
+`FieldWrapper`, and two step buttons ("Increase", "Decrease") at the end of the
+box. The buttons are skipped by Tab, and they are absent when the field is
+disabled or read-only.
 
-```tsx
-export function NumberField() {
-  const address = useFieldAddress();
-  const field = useFieldSchema<NumberFieldSchema>();
-  const [value, setValue] = useFieldValue<string | null>(address);
-  const errors = useFieldErrors(address);
-  const inputRef = useRef<HTMLInputElement>(null);
+### Limits
 
-  useFieldActivation(() => inputRef.current?.focus());
+The limits come from the `min` and `max` validators. `limitOf(node, 'min' | 'max')`
+(`number-field.step.ts`) reads the first number argument of the first matching
+validator. Only the stepping uses it. The validators give the error message.
+The native `min` and `max` attributes are not set.
 
-  return (
-    <div>
-      <input ref={inputRef} type='number' step={field.step} id={address}
-        value={value ?? ''}
-        onChange={(e) => setValue(e.target.value === '' ? null : e.target.value)} />
-      {errors.map((e) => <span key={e} role='alert'>{e}</span>)}
-    </div>
-  );
-}
-```
+### Stepping
+
+`stepValue` (`number-field.step.ts`) is the one pure function behind the buttons
+and ArrowUp / ArrowDown. A step writes `String(result)`:
+
+- A number is moved by the step and clamped to the limits. It rounds to the larger
+  number of decimals of the value and the step (`0.1` + `0.2` = `0.3`).
+- An empty box steps up to `min` (else the step), and down to `max` (else minus the
+  step).
+- At or past a limit, that direction does nothing and its button is disabled.
+  The other direction clamps (`7` with `max(5)` steps down to `5`).
+- A value typed past a limit stays in the box. The validator shows the error after
+  blur.
+
+## States
+
+`number-field.states.ts` lists every look as `numberFieldStates`.
+`number-field.states.test.tsx` renders each one.
 
 ## The connections
 
@@ -126,7 +138,7 @@ export function NumberField() {
 `number-field.test.tsx` does these tests:
 
 - It renders the value, and this includes a stored zero.
-- It connects `step` to the input.
+- It connects `step` to the input, and steps with the buttons and the arrow keys.
 - It accepts decimal keystrokes and negative keystrokes.
 - It applies the `min` limit and the `max` limit.
 - It makes sure that zero is not an empty value when `required` is true.

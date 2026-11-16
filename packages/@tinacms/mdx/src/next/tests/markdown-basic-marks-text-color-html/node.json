@@ -1,0 +1,179 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "text",
+          "text": "red",
+          "textColor": "#CC4141"
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "bold red",
+          "textColor": "#CC4141",
+          "bold": true
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "red,",
+          "textColor": "#CC4141"
+        },
+        {
+          "type": "text",
+          "text": "blue",
+          "textColor": "#2563EB"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "html_inline",
+          "value": "<span class=\"x\">",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "plain span"
+        },
+        {
+          "type": "html_inline",
+          "value": "</span>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "html_inline",
+          "value": "<span style=\"color: red;position:fixed\">",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "unsafe"
+        },
+        {
+          "type": "html_inline",
+          "value": "</span>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "html_inline",
+          "value": "<mark>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "raw mark"
+        },
+        {
+          "type": "html_inline",
+          "value": "</mark>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "before"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "text",
+          "textColor": "red"
+        }
+      ]
+    }
+  ]
+}

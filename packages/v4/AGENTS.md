@@ -17,7 +17,7 @@ Instructions for agents working under `packages/v4/`.
 |---|---|---|
 | `@tinacms/tinacms` | `@tinacms/tinacms` | The v4 runtime + CLI in one package. `private: true`, `4.0.0-alpha.x`. Subpath exports for `/react`, `/client`, `/server`, `/local-data-layer`, and framework adapters (`/adapters/next`, `/express`, `/astro`, `/hono`). |
 | `@tinacms/rich-text` | `@tinacms/rich-text` | Plate rich-text editor. A value contract separates the editor from the storage format — keep that boundary (see `src/boundary.test.ts`). |
-| `@tinacms/ui` | `@tinacms/ui` | Shared UI components from shadcn/ui. |
+| `@tinacms/ui` | `@tinacms/ui` | Shared UI components, built on shadcn/ui and restyled to the TinaCMS design. |
 
 ## Commands (run inside the package directory)
 
@@ -45,9 +45,16 @@ use it to verify runtime/editor changes in a browser.
   `packages/@tinacms/*`) is in support mode: bug and security fixes only.
 - **Don't move level adapters or external integrations into this repo** —
   the README lists where they live.
-- **shadcn components:** add or update via
-  `pnpm dlx shadcn@latest add <component>` run in `@tinacms/ui/` — don't
-  hand-write new primitives that shadcn already provides.
+- **shadcn components:** add a new one via
+  `pnpm dlx shadcn@latest add <component>` run in `@tinacms/ui/`, then restyle
+  it to the TinaCMS design. Don't hand-write primitives that shadcn already
+  provides, and never re-add an existing component: that overwrites its
+  TinaCMS styling.
+- **Hand-written on Base UI:** `tabs.tsx`, `breadcrumb.tsx` and
+  `pagination.tsx` in `@tinacms/ui` do not come from shadcn. Never run
+  `shadcn add` for them, or for a registry item that depends on them. The
+  `add` command writes an `import { cn } from "cn"` and adds a `cn` npm
+  dependency, and it asks to overwrite `button.tsx`.
 
 ## Types
 
@@ -152,9 +159,11 @@ Comment policy (a prior cleanup pass established this):
 
 ## Accessibility
 
-- **The row of a field gives the field its name.** `admin/document-form.tsx`
-  renders the label and points it at the control with `htmlFor`. A field widget
-  renders `id={address}`, and no label of its own.
+- **A field's frame gives the field its name.** A field widget wraps its
+  control in `FieldWrapper` with `{...useFieldFrame()}`, which draws the label
+  and points it at the control with `htmlFor`. The control renders
+  `id={address}`. A widget that isn't labelable (`metadata.labelable: false`)
+  points `aria-labelledby` at `frame.labelId` instead.
 
 - **Never put `aria-label` on a field widget.** `aria-label` outranks a
   `<label>` element. It replaces the label that an author wrote with the name of

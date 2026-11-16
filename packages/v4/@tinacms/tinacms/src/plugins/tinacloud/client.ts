@@ -20,6 +20,14 @@ const requestStatusSchema = z.object({
   message: z.string().optional(),
 });
 
+const branchListSchema = z.array(
+  z.object({
+    name: z.string(),
+    protected: z.boolean().optional(),
+    githubPullRequestUrl: z.string().optional(),
+  })
+);
+
 const projectSchema = z.object({
   defaultBranch: z.string().optional(),
   mediaBranch: z.string().optional(),
@@ -59,6 +67,9 @@ export class TinaCloudError extends Error {
     return bodyMessage(this.body);
   }
 }
+
+/** TinaCloud answered that a background request failed. */
+export class TinaCloudRequestFailedError extends TinaCloudError {}
 
 const parseBody = (text: string): unknown => {
   if (!text) return null;
@@ -128,7 +139,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       const status = requestStatusSchema.safeParse(body);
       if (status.success) {
         if (!status.data.error) return;
-        throw new TinaCloudError(
+        throw new TinaCloudRequestFailedError(
           status.data.message ?? 'TinaCloud reported that the request failed.',
           { body }
         );
@@ -167,10 +178,37 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     return project;
   };
 
+  const listBranches = async (): Promise<
+    {
+      name: string;
+      protected: boolean | undefined;
+      pullRequestUrl: string | undefined;
+    }[]
+  > => {
+    const body = await authedFetch(
+      `${TINACLOUD_CONTENT_URL}/github/${options.clientId}/list_branches`
+    );
+    const parsed = branchListSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new TinaCloudError(
+        'TinaCloud returned the branch list in an unknown format.',
+        { body }
+      );
+    }
+    return parsed.data.map(
+      ({ name, protected: isProtected, githubPullRequestUrl }) => ({
+        name,
+        protected: isProtected,
+        pullRequestUrl: githubPullRequestUrl || undefined,
+      })
+    );
+  };
+
   return {
     clientId: options.clientId,
     authedFetch,
     waitForRequest,
     getProject,
+    listBranches,
   };
 };

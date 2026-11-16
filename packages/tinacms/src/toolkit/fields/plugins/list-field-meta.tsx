@@ -56,11 +56,7 @@ export const ListFieldMeta = ({
       <ListHeader>
         <ListMeta>
           {label !== false && <ListLabel>{label || name}</ListLabel>}
-          {description && (
-            <FieldDescription className='whitespace-nowrap text-ellipsis overflow-hidden'>
-              {description}
-            </FieldDescription>
-          )}
+          {description && <FieldDescription>{description}</FieldDescription>}
         </ListMeta>
         {actions && actions}
       </ListHeader>
@@ -84,7 +80,7 @@ export const ListHeader = ({ children }: { children?: any }) => {
 };
 
 export const ListMeta = ({ children }: { children?: any }) => {
-  return <div className='flex-1 truncate'>{children}</div>;
+  return <div className='flex-1 min-w-0'>{children}</div>;
 };
 
 export const ListLabel = ({ children }: { children?: any }) => {

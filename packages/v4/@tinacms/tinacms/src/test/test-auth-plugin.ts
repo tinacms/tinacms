@@ -10,6 +10,7 @@ export const testAuthPlugin = (
     name,
     provides: ['auth'],
     overrides,
+    server: async () => ({ default: {} }),
     client: async () => ({
       default: {
         slice: (set) => {

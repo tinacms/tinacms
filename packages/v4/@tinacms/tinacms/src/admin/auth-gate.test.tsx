@@ -1,10 +1,17 @@
 import { QueryClient } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
-import { AuthError, type AuthSlice, toUserId } from '../core/auth/contract';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../config';
-import { type PluginManifest, definePlugin } from '../core/plugin';
+import {
+  AuthError,
+  type AuthSlice,
+  type AuthUser,
+  toUserId,
+} from '../core/auth/contract';
+import { definePlugin, type PluginManifest } from '../core/plugin';
+import { stringFieldPlugin } from '../plugins/fields/string/string-field.plugin';
+import { simulateReload } from '../test/simulate-reload';
 import { testAuthPlugin } from '../test/test-auth-plugin';
 import { TinaAdmin } from './admin';
 
@@ -14,8 +21,11 @@ const contentPlugin = definePlugin({
   client: async () => ({
     default: {
       slice: () => ({
-        list: async () => [],
-        get: async () => null,
+        list: async () => [{ path: 'content/posts/hello.mdx' }],
+        get: async () => ({
+          path: 'content/posts/hello.mdx',
+          document: { title: 'Hello' },
+        }),
         update: async () => {
           throw new Error('read-only');
         },
@@ -28,7 +38,7 @@ const renderAdmin = (plugins: PluginManifest[]) =>
   render(
     <TinaAdmin
       config={asResolvedConfig({
-        plugins: [contentPlugin, ...plugins],
+        plugins: [stringFieldPlugin, contentPlugin, ...plugins],
         schema: {
           collections: [
             {
@@ -36,7 +46,7 @@ const renderAdmin = (plugins: PluginManifest[]) =>
               label: 'Posts',
               path: 'content/posts',
               format: 'mdx',
-              fields: [],
+              fields: [{ name: 'title', label: 'Title', type: 'string' }],
             },
           ],
         },
@@ -47,13 +57,34 @@ const renderAdmin = (plugins: PluginManifest[]) =>
     />
   );
 
+type User = ReturnType<typeof userEvent.setup>;
+
+const openAccount = async (user: User) => {
+  await user.click(await screen.findByRole('button', { name: 'Account' }));
+  return screen.findByRole('menu', { name: 'Account' });
+};
+
+const signOut = async (user: User) => {
+  await openAccount(user);
+  await user.click(await screen.findByRole('menuitem', { name: 'Sign out' }));
+};
+
+beforeEach(() => {
+  window.location.hash = '#/collections';
+});
+
+const documentStatus = () =>
+  within(
+    screen.getByRole('complementary', { name: 'Document form' })
+  ).getByRole('status');
+
 describe('AuthGate', () => {
   it('shows the admin with no sign-in screen when no plugin provides auth', async () => {
     renderAdmin([]);
     expect(
       await screen.findByRole('list', { name: 'Collections' })
     ).toBeInTheDocument();
-    expect(screen.queryByRole('list', { name: 'Account' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Account' })).toBeNull();
   });
 
   it('signs the editor in, shows who they are, and signs them out', async () => {
@@ -63,13 +94,14 @@ describe('AuthGate', () => {
     ]);
 
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
-    const account = await screen.findByRole('list', { name: 'Account' });
+    const account = await openAccount(user);
     expect(account).toHaveTextContent('Ada');
+    await user.keyboard('{Escape}');
     expect(
       screen.getByRole('list', { name: 'Collections' })
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Sign out' }));
+    await signOut(user);
     expect(
       await screen.findByRole('button', { name: 'Sign in' })
     ).toBeInTheDocument();
@@ -139,12 +171,13 @@ describe('AuthGate', () => {
     });
     renderAdmin([formAuthPlugin]);
 
-    await user.type(await screen.findByLabelText('Email'), 'ada@example.com');
+    await user.type(
+      await screen.findByLabelText(/^Email\b/),
+      'ada@example.com'
+    );
     expect(screen.queryByRole('button', { name: 'Sign in' })).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Continue' }));
-    expect(
-      await screen.findByRole('list', { name: 'Account' })
-    ).toHaveTextContent('ada@example.com');
+    expect(await openAccount(user)).toHaveTextContent('ada@example.com');
   });
 
   it('shows who is signed in, keeps the admin closed, and signs out when the account has no access', async () => {
@@ -177,5 +210,95 @@ describe('AuthGate', () => {
     expect(
       await screen.findByRole('button', { name: 'Sign in' })
     ).toBeInTheDocument();
+  });
+
+  it('isolates unsaved edits per editor in the same tab, across session expiry, and across a reload', async () => {
+    const ada: AuthUser = { id: toUserId('ada'), name: 'Ada' };
+    const grace: AuthUser = { id: toUserId('grace'), name: 'Grace' };
+    let nextUser: AuthUser = ada;
+    let expireSession: (() => void) | undefined;
+    const sharedBrowserAuth = definePlugin({
+      name: 'test:shared-browser-auth',
+      provides: ['auth'],
+      client: async () => ({
+        default: {
+          slice: (set) => {
+            expireSession = () =>
+              set({
+                status: 'signed-out',
+                user: null,
+                error: new AuthError('expired', 'Your session has expired.'),
+              });
+            return {
+              status: 'signed-out',
+              user: null,
+              getToken: async () => undefined,
+              login: async () =>
+                set({ status: 'signed-in', user: nextUser, roles: ['editor'] }),
+              logout: async () => set({ status: 'signed-out', user: null }),
+            } satisfies AuthSlice;
+          },
+        },
+      }),
+    });
+
+    const user = userEvent.setup();
+    const firstTab = renderAdmin([sharedBrowserAuth]);
+
+    await user.click(await screen.findByRole('button', { name: 'Sign in' }));
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    const adaInput = await screen.findByRole('textbox', { name: /^Title/ });
+    expect(adaInput).toHaveValue('Hello');
+    await user.type(adaInput, ' from Ada');
+    await waitFor(() => expect(documentStatus()).toHaveTextContent('Unsaved'));
+
+    act(() => expireSession?.());
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Your session has expired.'
+    );
+
+    nextUser = grace;
+    await user.click(await screen.findByRole('button', { name: 'Sign in' }));
+    const graceInput = await screen.findByRole('textbox', { name: /^Title/ });
+    expect(graceInput).toHaveValue('Hello');
+    expect(documentStatus()).toHaveTextContent('No changes');
+    await signOut(user);
+
+    nextUser = ada;
+    await user.click(await screen.findByRole('button', { name: 'Sign in' }));
+    const adaBack = await screen.findByRole('textbox', { name: /^Title/ });
+    expect(adaBack).toHaveValue('Hello');
+    await user.click(await screen.findByRole('button', { name: 'Resume' }));
+    const adaRestored = screen.getByRole('textbox', { name: /^Title/ });
+    expect(adaRestored).toHaveValue('Hello from Ada');
+    expect(documentStatus()).toHaveTextContent('Unsaved');
+    await signOut(user);
+
+    firstTab.unmount();
+    simulateReload();
+
+    nextUser = grace;
+    const graceReloaded = renderAdmin([sharedBrowserAuth]);
+    await user.click(await screen.findByRole('button', { name: 'Sign in' }));
+    expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
+      'Hello'
+    );
+    expect(documentStatus()).toHaveTextContent('No changes');
+    graceReloaded.unmount();
+    simulateReload();
+
+    nextUser = ada;
+    renderAdmin([sharedBrowserAuth]);
+    await user.click(await screen.findByRole('button', { name: 'Sign in' }));
+    expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
+      'Hello'
+    );
+    expect(documentStatus()).toBeEmptyDOMElement();
+    await user.click(await screen.findByRole('button', { name: 'Resume' }));
+    expect(screen.getByRole('textbox', { name: /^Title/ })).toHaveValue(
+      'Hello from Ada'
+    );
+    expect(documentStatus()).toHaveTextContent('Unsaved');
   });
 });

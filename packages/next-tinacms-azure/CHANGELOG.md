@@ -1,5 +1,18 @@
 # next-tinacms-azure
 
+## 15.2.0
+
+### Minor Changes
+
+- [#7781](https://github.com/tinacms/tinacms/pull/7781) [`4010161`](https://github.com/tinacms/tinacms/commit/4010161720c2784e6cebd9fbec7ecbbeb5c7cbb4) Thanks [@kulesy](https://github.com/kulesy)! - Bump `sharp` from `^0.33.5` to `^0.35.5`.
+
+  sharp 0.35 needs Node.js 20.9 or later. It also tunes lossy AVIF output with a new quality metric, so an AVIF served at the same `quality` setting can come out a different size. sharp 0.35 also refuses images with more than five channels, so the delivery handler now serves a TIFF like that as the original file instead of resizing it.
+
+### Patch Changes
+
+- Updated dependencies [[`53ae895`](https://github.com/tinacms/tinacms/commit/53ae8954de8668e5eeb92d817bfbf12bf39cb17d), [`787c7a9`](https://github.com/tinacms/tinacms/commit/787c7a9daf7740dbfb148d25a74367948bcbaade), [`034e88f`](https://github.com/tinacms/tinacms/commit/034e88ff9fb8035b1443397b5d981313a44fa30f), [`abb7c15`](https://github.com/tinacms/tinacms/commit/abb7c153b2db6cd9bf42da6ddfaa5d2b08029861)]:
+  - tinacms@3.15.0
+
 ## 15.1.1
 
 ### Patch Changes

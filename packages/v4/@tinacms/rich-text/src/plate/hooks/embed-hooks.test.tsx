@@ -52,7 +52,9 @@ const Harness = ({
   value,
   onActivateField,
   onEditorReady,
+  readOnly,
 }: {
+  readOnly?: boolean;
   value: Value;
   onActivateField: (address: string) => void;
   onEditorReady: (editor: HarnessEditor) => void;
@@ -71,20 +73,21 @@ const Harness = ({
 
   return (
     <EditorContext.Provider value={context}>
-      <Plate editor={editor}>
+      <Plate editor={editor} readOnly={readOnly}>
         <PlateContent />
       </Plate>
     </EditorContext.Provider>
   );
 };
 
-const renderProbe = (value: Value) => {
+const renderProbe = (value: Value, readOnly = false) => {
   const onActivateField = vi.fn();
   let editor: HarnessEditor | undefined;
 
   const view = render(
     <Harness
       value={value}
+      readOnly={readOnly}
       onActivateField={onActivateField}
       onEditorReady={(next) => {
         editor = next;
@@ -235,6 +238,21 @@ describe('useHotkey', () => {
     pressEnter();
 
     expect(hotkeyHits).toBe(0);
+  });
+
+  it('ignores the hotkey, and the embed handles, when the editor is read-only', async () => {
+    const { editor, onActivateField } = renderProbe(topLevelProbe, true);
+
+    await act(async () => {
+      editor.tf.select([1, 0]);
+    });
+    pressEnter();
+    act(() => handles?.handleSelect());
+    act(() => handles?.handleRemove());
+
+    expect(hotkeyHits).toBe(0);
+    expect(onActivateField).not.toHaveBeenCalled();
+    expect(JSON.stringify(editor.children)).toContain(PROBE);
   });
 
   it('runs the callback once when the selected embed sees the hotkey', async () => {

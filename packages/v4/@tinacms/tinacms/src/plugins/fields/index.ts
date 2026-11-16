@@ -1,3 +1,4 @@
+import homePlugin from '../home/home.plugin';
 import coreValidatorsPlugin from '../validators/core-validators.plugin';
 import arrayFieldPlugin from './array/array-field.plugin';
 import { array } from './array/array-field.schema';
@@ -32,6 +33,7 @@ export const corePlugins = [
   referenceFieldPlugin,
   imageFieldPlugin,
   coreValidatorsPlugin,
+  homePlugin,
 ];
 
 // TODO: build `t` from the configured plugin set when defineConfig arrives
@@ -48,12 +50,18 @@ export const t = {
   image,
 };
 
-export type { ArrayFieldSchema } from './array/array-field.schema';
+export type {
+  ArrayFieldSchema,
+  ArrayTemplateSchema,
+} from './array/array-field.schema';
 export type { BooleanFieldSchema } from './boolean/boolean-field.schema';
 export type { DatetimeFieldSchema } from './datetime/datetime-field.schema';
 export type { ImageFieldSchema } from './image/image-field.schema';
 export type { NumberFieldSchema } from './number/number-field.schema';
-export type { ObjectFieldSchema } from './object/object-field.schema';
+export type {
+  ObjectDisplay,
+  ObjectFieldSchema,
+} from './object/object-field.schema';
 export type {
   RichTextFieldSchema,
   RichTextTemplate,

@@ -8,10 +8,25 @@ import type {
 
 export const OBJECT_FIELD_TYPE = 'object';
 
+export type ObjectDisplay = 'fieldset' | 'collapsible' | 'drillIn';
+
+export const OBJECT_DISPLAYS: readonly ObjectDisplay[] = [
+  'fieldset',
+  'collapsible',
+  'drillIn',
+];
+
+export const isObjectDisplay = (value: unknown): value is ObjectDisplay =>
+  OBJECT_DISPLAYS.some((display) => display === value);
+
 export interface ObjectFieldSchema extends BaseFieldSchema {
   type: typeof OBJECT_FIELD_TYPE;
   fields: FieldSchema[];
+  display?: ObjectDisplay;
 }
+
+export const displayOf = (field: ObjectFieldSchema): ObjectDisplay =>
+  field.display ?? 'fieldset';
 
 export const object = (
   config: Omit<ObjectFieldSchema, 'type'>
@@ -40,4 +55,16 @@ export const objectSchema = (node: FieldSchema): ZodType =>
     z.custom<TinaDocument>(isPlainObject, {
       message: `${node.label ?? node.name} must be a group of fields`,
     })
+  );
+
+/** The fields whose text can summarise an object: visible text fields. */
+export const summaryFieldsOf = (
+  fields: readonly FieldSchema[]
+): FieldSchema[] =>
+  fields.filter((field) => !field.hidden && field.type === 'string');
+
+/** The first value that has something typed in it. */
+export const firstText = (values: readonly unknown[]): string | undefined =>
+  values.find(
+    (entry): entry is string => typeof entry === 'string' && entry.trim() !== ''
   );

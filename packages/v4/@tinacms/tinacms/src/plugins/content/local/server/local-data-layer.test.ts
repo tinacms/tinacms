@@ -49,13 +49,64 @@ beforeEach(async () => {
 
 afterEach(() => fs.rm(rootDir, { recursive: true, force: true }));
 
+const modifiedTimeOf = async (relative: string): Promise<string> =>
+  (await fs.stat(path.join(rootDir, relative))).mtime.toISOString();
+
+const setModifiedTime = (relative: string, time: string): Promise<void> =>
+  fs.utimes(path.join(rootDir, relative), new Date(time), new Date(time));
+
 describe('list', () => {
-  it('returns matching files (recursively) with root-relative paths', async () => {
+  it('returns matching files (recursively) with root-relative paths and their modified times', async () => {
+    await setModifiedTime(
+      'content/posts/hello.mdx',
+      '2026-01-02T03:04:05.000Z'
+    );
+    await setModifiedTime(
+      'content/posts/nested/deep.mdx',
+      '2025-06-07T08:09:10.000Z'
+    );
     const entries = await dataLayer.list('post');
     expect(entries).toEqual([
-      { path: 'content/posts/hello.mdx' },
-      { path: 'content/posts/nested/deep.mdx' },
+      {
+        path: 'content/posts/hello.mdx',
+        updatedAt: '2026-01-02T03:04:05.000Z',
+      },
+      {
+        path: 'content/posts/nested/deep.mdx',
+        updatedAt: '2025-06-07T08:09:10.000Z',
+      },
     ]);
+    expect(Object.keys(entries[0])).not.toContain('lastAuthor');
+  });
+
+  it('gives a linked file the modified time of the file it points to', async () => {
+    await setModifiedTime(
+      'content/posts/nested/deep.mdx',
+      '2025-06-07T08:09:10.000Z'
+    );
+    await fs.symlink(
+      path.join(rootDir, 'content/posts/nested/deep.mdx'),
+      path.join(rootDir, 'content/posts/linked.mdx')
+    );
+    const entries = await dataLayer.list('post');
+    expect(entries).toContainEqual({
+      path: 'content/posts/linked.mdx',
+      updatedAt: '2025-06-07T08:09:10.000Z',
+    });
+  });
+
+  it('lists a file whose modified time cannot be read, without `updatedAt`', async () => {
+    await fs.symlink(
+      path.join(rootDir, 'content/posts/no-target.mdx'),
+      path.join(rootDir, 'content/posts/dangling.mdx')
+    );
+    const entries = await dataLayer.list('post');
+    const dangling = entries.find(
+      (entry) => entry.path === 'content/posts/dangling.mdx'
+    );
+    expect(dangling).toBeDefined();
+    expect(Object.keys(dangling ?? {})).toEqual(['path']);
+    expect(entries).toHaveLength(3);
   });
 
   it('keeps the content of the documents out of the payload', async () => {
@@ -108,10 +159,40 @@ describe('list', () => {
   });
 });
 
+describe('list with nested collections', () => {
+  it('leaves out the files of a nested collection', async () => {
+    const nested = createLocalDataLayer({
+      rootDir,
+      collections: [
+        { name: 'site', path: 'content', format: 'mdx', fields: [] },
+        { name: 'post', path: 'content/posts', format: 'mdx', fields: [] },
+      ],
+    });
+    await fs.mkdir(path.join(rootDir, 'content'), { recursive: true });
+    await fs.writeFile(path.join(rootDir, 'content/about.mdx'), '---\n---\n');
+    expect(await nested.list('site')).toEqual([
+      {
+        path: 'content/about.mdx',
+        updatedAt: await modifiedTimeOf('content/about.mdx'),
+      },
+    ]);
+  });
+});
+
 describe('get', () => {
   it('returns the parsed document', async () => {
     const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
     expect(entry?.document).toMatchObject({ title: 'Hello World' });
+  });
+
+  it('returns the modified time of the file, and no author', async () => {
+    await setModifiedTime(
+      'content/posts/hello.mdx',
+      '2026-01-02T03:04:05.000Z'
+    );
+    const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
+    expect(entry?.updatedAt).toBe('2026-01-02T03:04:05.000Z');
+    expect(Object.keys(entry ?? {})).not.toContain('lastAuthor');
   });
 
   it('returns null for a missing file', async () => {
@@ -133,6 +214,7 @@ describe('update', () => {
     expect(raw).toContain('Body prose.');
     expect(saved).toEqual({
       path: 'content/posts/hello.mdx',
+      updatedAt: await modifiedTimeOf('content/posts/hello.mdx'),
       document: {
         title: 'Renamed',
         featured: true,
@@ -142,6 +224,21 @@ describe('update', () => {
     });
     const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
     expect(entry?.document).toEqual(saved.document);
+  });
+
+  it('returns the modified time of the file it just wrote, and no author', async () => {
+    await setModifiedTime(
+      'content/posts/hello.mdx',
+      '2020-01-02T03:04:05.000Z'
+    );
+    const saved = await dataLayer.update('post', 'content/posts/hello.mdx', {
+      title: 'Renamed',
+    });
+    expect(saved.updatedAt).toBe(
+      await modifiedTimeOf('content/posts/hello.mdx')
+    );
+    expect(saved.updatedAt).not.toBe('2020-01-02T03:04:05.000Z');
+    expect(Object.keys(saved)).not.toContain('lastAuthor');
   });
 
   it('removes a cleared schema field from the file, and keeps unknown keys', async () => {
@@ -208,6 +305,49 @@ describe('update', () => {
     expect(entry?.document).toMatchObject({ title: 'A', featured: true });
   });
 
+  it('serialises a save through a link and one through the real name on one lock', async () => {
+    await fs.symlink(
+      path.join(rootDir, 'content/posts/hello.mdx'),
+      path.join(rootDir, 'content/posts/alias.mdx')
+    );
+    const [throughLink] = await Promise.all([
+      dataLayer.update('post', 'content/posts/alias.mdx', { title: 'A' }),
+      dataLayer.update('post', 'content/posts/hello.mdx', { featured: true }),
+    ]);
+    expect(throughLink.path).toBe('content/posts/hello.mdx');
+    const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
+    expect(entry?.document).toMatchObject({ title: 'A', featured: true });
+    expect(
+      (
+        await fs.lstat(path.join(rootDir, 'content/posts/alias.mdx'))
+      ).isSymbolicLink()
+    ).toBe(true);
+  });
+
+  it('saves through a collection folder that is a link', async () => {
+    await fs.mkdir(path.join(rootDir, 'shared/posts'), { recursive: true });
+    await fs.symlink(
+      path.join(rootDir, 'shared/posts'),
+      path.join(rootDir, 'content/linked')
+    );
+    const linked = createLocalDataLayer({
+      rootDir,
+      collections: [
+        { name: 'linked', path: 'content/linked', format: 'mdx', fields: [] },
+      ],
+    });
+    const canonical = await linked.canonicalPath(
+      'linked',
+      'content/linked/a.mdx'
+    );
+    expect(canonical).toBe('content/linked/a.mdx');
+    const saved = await linked.update('linked', canonical, { title: 'A' });
+    expect(saved.path).toBe('content/linked/a.mdx');
+    expect(
+      await fs.readFile(path.join(rootDir, 'shared/posts/a.mdx'), 'utf8')
+    ).toContain('title: A');
+  });
+
   it('keeps saves of different documents parallel', async () => {
     await Promise.all([
       dataLayer.update('post', 'content/posts/hello.mdx', { title: 'A' }),
@@ -237,6 +377,41 @@ describe('update', () => {
       title: 'Fixed',
     });
     expect(saved.document.title).toBe('Fixed');
+  });
+
+  it('matches a save to the collection that owns the file', async () => {
+    const nested = createLocalDataLayer({
+      rootDir,
+      collections: [
+        { name: 'site', path: 'content', format: 'mdx', fields: [] },
+        { name: 'post', path: 'content/posts', format: 'mdx', fields: [] },
+      ],
+    });
+    const file = path.join(rootDir, 'content/posts/claimed.mdx');
+    await expect(
+      nested.update('site', 'content/posts/claimed.mdx', { title: 'x' })
+    ).rejects.toThrow(/belongs to collection "post"/);
+    await expect(fs.access(file)).rejects.toThrow();
+    await nested.update('post', 'content/posts/claimed.mdx', { title: 'x' });
+    await expect(fs.access(file)).resolves.toBeUndefined();
+  });
+
+  it('saves each format to the collection that reads it in a shared folder', async () => {
+    const shared = createLocalDataLayer({
+      rootDir,
+      collections: [
+        { name: 'pages', path: 'content', format: 'mdx', fields: [] },
+        { name: 'settings', path: 'content', format: 'json', fields: [] },
+      ],
+    });
+    await shared.update('settings', 'content/x.json', { title: 'json' });
+    await shared.update('pages', 'content/x.mdx', { title: 'mdx' });
+    expect((await shared.get('settings', 'content/x.json'))?.document).toEqual({
+      title: 'json',
+    });
+    expect((await shared.get('pages', 'content/x.mdx'))?.document).toEqual({
+      title: 'mdx',
+    });
   });
 
   it('names the document when the value itself cannot be written', async () => {

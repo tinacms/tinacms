@@ -1,5 +1,15 @@
 # @tinacms/astro
 
+## 0.8.0
+
+### Minor Changes
+
+- [#7683](https://github.com/tinacms/tinacms/pull/7683) [`034e88f`](https://github.com/tinacms/tinacms/commit/034e88ff9fb8035b1443397b5d981313a44fa30f) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Rich-text fields can now colour text. A Text Color dropdown now appears next to Highlight in the default toolbar. Fields with a custom `overrides.toolbar` need `'textColor'` added to it. Coloured text saves as a `<span>` with a `color` style, inside any bold, italic, strikethrough or highlight. The palette can be set per field under `overrides.textColors` (a list of `{ label, value }`).
+
+  Also fixes:
+  - Adjacent text with different marks no longer picks up a neighbour's mark on save (e.g. bold italic text followed by italic text saved both as bold).
+  - Renderers only apply plain CSS colours, so content can no longer inject arbitrary CSS through a highlight or text colour.
+
 ## 0.7.1
 
 ### Patch Changes
@@ -80,7 +90,6 @@
 - [#6843](https://github.com/tinacms/tinacms/pull/6843) [`0509095`](https://github.com/tinacms/tinacms/commit/0509095601fedc87f05a622e219e6414ef51a6b6) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Support TinaCMS visual editing on statically-built Astro pages.
 
   Wrap editable regions in `<TinaIsland>` and visual editing now works under `output: 'static'` (and mixed static/SSR), provided the adapter can serve the one on-demand route `/tina-island/[name]`. Highlights:
-
   - **Static page support.** `<TinaIsland>` emits a tiny in-iframe bootstrap that fetches `/admin/bridge.js`; on init the bridge "primes" any page with island markers but no server-injected form payloads by calling the island endpoints, which now return the page's form payloads alongside region HTML.
   - **Bridge served as a static asset.** Dropped the injected `/_tina/bridge.js` route (some adapters 404'd it) in favour of serving `/admin/bridge.js` from a dev-only Vite plugin and emitting the bundle into the build client output — no source-tree writes. The `@tinacms/astro/bridge-route` subpath export is removed.
   - **Re-prime on soft navigation.** `refreshForms` now re-primes when it sees island markers without server-injected payloads, so Astro `ClientRouter` swaps work without a hard reload.
@@ -143,7 +152,6 @@
   The renderer mirrors the React `TinaMarkdown` from `tinacms/dist/rich-text` — same `content` prop, same `components` map shape — but emits pure HTML with no React in the page tree. Custom MDX components register by name (`mdxJsxFlowElement` / `mdxJsxTextElement`); default tags (`p`, `h1`, `a`, etc.) can be overridden by registering them on the same map.
 
   **Peer deps**
-
   - `astro >=5.0.0` — uses Astro's container API for islands and ships `.astro` source files for the consumer's Astro pipeline to compile.
 
 ### Patch Changes

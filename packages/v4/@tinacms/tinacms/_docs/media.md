@@ -17,9 +17,13 @@ In the `plugins: [ ... ]` declaration a mediaPlugin needs to be defined.
 Note: the `media` capability is a single-provider capability; so we can only ever have 1 active  media provider. An example of how this is used in an app could be: 
 
 ```ts
+const clientId = import.meta.env.TINA_PUBLIC_CLIENT_ID;
+const isLocal = !clientId;
+
 plugins: [
-  localContentPlugin(),
-  isLocal ? localMediaPlugin() : tinaCloud({ clientId }),
+  ...(isLocal
+    ? [localContentPlugin(), localMediaPlugin()]
+    : [tinaCloud({ clientId })]),
 ]
 ```
 
@@ -66,7 +70,7 @@ import config from '../tina/config';
 | `localMediaPlugin()` | `/uploads/posts/hero.jpg` (no transforms, so `options` is ignored) |
 | `tinaCloud({ clientId })` | `https://assets.tina.io/{clientId}/posts/hero.jpg?fit=crop&max-w=400` |
 
-The site has no store and no branch, so `tinaCloud()` gives URLs on the media branch of the project. The editor uses the branch in `store.branch.name`.
+The site has no store and no branch, so `tinaCloud()` gives URLs on the media branch of the project. The editor uses the branch in `store.branch.current`.
 
 ### The Media UI - The Media Manager
 

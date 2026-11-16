@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
@@ -16,7 +16,7 @@ import { validateField } from '../../../core/validation';
 import { FormProvider, TinaProvider } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
-import { required } from '../../../plugins/fields';
+import { pattern, required } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
 import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
@@ -78,19 +78,19 @@ const renderField = (document?: TinaDocument) =>
 describe('SelectField rendering', () => {
   it('renders the label of a stored option', async () => {
     renderField({ status: 'published' });
-    const trigger = await screen.findByLabelText('Status');
+    const trigger = await screen.findByLabelText(/^Status\b/);
     expect(trigger).toHaveTextContent('Published');
   });
 
   it('falls back to the raw value when an option has no label', async () => {
     renderField({ priority: 'low' });
-    const trigger = await screen.findByLabelText('Priority');
+    const trigger = await screen.findByLabelText(/^Priority\b/);
     expect(trigger).toHaveTextContent('low');
   });
 
   it('shows the placeholder when the field is absent', async () => {
     renderField();
-    const trigger = await screen.findByLabelText('Priority');
+    const trigger = await screen.findByLabelText(/^Priority\b/);
     expect(trigger).toHaveTextContent('Select...');
   });
 });
@@ -98,7 +98,7 @@ describe('SelectField rendering', () => {
 describe('SelectField value updates', () => {
   it('writes the chosen option value back through the store', async () => {
     renderField();
-    const trigger = await screen.findByLabelText('Status');
+    const trigger = await screen.findByLabelText(/^Status\b/);
     await userEvent.click(trigger);
     await userEvent.click(await screen.findByRole('option', { name: 'Draft' }));
     expect(valueOf('status')).toBe('draft');
@@ -106,7 +106,7 @@ describe('SelectField value updates', () => {
 
   it('offers no clear option on a required field', async () => {
     renderField();
-    const trigger = await screen.findByLabelText('Status');
+    const trigger = await screen.findByLabelText(/^Status\b/);
     await userEvent.click(trigger);
     expect(
       screen.queryByRole('option', { name: 'None' })
@@ -115,7 +115,7 @@ describe('SelectField value updates', () => {
 
   it('clears an optional field back to absent through the None option', async () => {
     renderField({ priority: 'low' });
-    const trigger = await screen.findByLabelText('Priority');
+    const trigger = await screen.findByLabelText(/^Priority\b/);
     await userEvent.click(trigger);
     await userEvent.click(await screen.findByRole('option', { name: 'None' }));
     expect(valueOf('priority')).toBeNull();
@@ -193,6 +193,55 @@ describe('SelectField metadata wrapping', () => {
     const descriptor = registry.get('select');
     expect(descriptor?.metadata).toEqual({ layout: 'inline' });
     expect(descriptor?.defaultValue).toBeUndefined();
+  });
+});
+
+describe('SelectField choosing', () => {
+  const stageCollection: CollectionSchema = {
+    name: 'post',
+    label: 'Posts',
+    format: 'mdx',
+    fields: [
+      t.select({
+        name: 'stage',
+        label: 'Stage',
+        validators: [pattern('^draft$')],
+        options: [{ value: 'draft' }, { value: 'live' }],
+      }),
+    ],
+  };
+
+  const renderStage = () =>
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [selectFieldPlugin, coreValidatorsPlugin],
+          schema: NO_COLLECTIONS,
+        })}
+      >
+        <FormProvider collection={stageCollection} path={DOCUMENT_PATH}>
+          <LabelledFields />
+        </FormProvider>
+      </TinaProvider>
+    );
+
+  it('shows the error right after an invalid pick by mouse', async () => {
+    renderStage();
+    await userEvent.click(await screen.findByLabelText(/^Stage\b/));
+    await userEvent.click(await screen.findByRole('option', { name: 'live' }));
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
+  });
+
+  it('shows the error right after an invalid pick by keyboard', async () => {
+    renderStage();
+    await screen.findByLabelText(/^Stage\b/);
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowDown}');
+    await screen.findByRole('listbox');
+    await userEvent.keyboard('{ArrowDown}{ArrowDown}{Enter}');
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
   });
 });
 

@@ -23,6 +23,14 @@ const setViewportWidth = (width: number) => {
 
 const storedWidth = () => localStorage.getItem(STORAGE_KEY);
 
+// happy-dom's Storage cannot undo a vi.spyOn on its methods, so these tests swap the global.
+// The overrides are defined, not assigned, because Storage's set trap drops an assigned one.
+const stubLocalStorage = (overrides: Partial<Storage>) =>
+  vi.stubGlobal(
+    'localStorage',
+    Object.create(localStorage, Object.getOwnPropertyDescriptors(overrides))
+  );
+
 function Handle() {
   const { width, isResizing, handleProps } = useFormColumnWidth();
   return (
@@ -44,7 +52,10 @@ const renderHandle = () => {
 };
 
 beforeEach(() => setViewportWidth(WIDE_VIEWPORT));
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe('useFormColumnWidth reading the stored width', () => {
   it('starts at the default width when storage holds nothing', () => {
@@ -71,19 +82,25 @@ describe('useFormColumnWidth reading the stored width', () => {
   });
 
   it('uses the default width when storage denies a read', () => {
-    vi.spyOn(window.localStorage, 'getItem').mockImplementation(() => {
-      throw new Error('storage is not available');
+    localStorage.setItem(STORAGE_KEY, '600');
+    stubLocalStorage({
+      getItem: () => {
+        throw new Error('storage is not available');
+      },
     });
     const { result } = renderHook(() => useFormColumnWidth());
     expect(result.current.width).toBe(DEFAULT_WIDTH);
   });
 
   it('keeps the column usable when storage denies a write', () => {
-    vi.spyOn(window.localStorage, 'setItem').mockImplementation(() => {
-      throw new Error('the storage quota is full');
+    stubLocalStorage({
+      setItem: () => {
+        throw new Error('the storage quota is full');
+      },
     });
     const { result } = renderHook(() => useFormColumnWidth());
     expect(result.current.width).toBe(DEFAULT_WIDTH);
+    expect(storedWidth()).toBeNull();
   });
 });
 
@@ -284,13 +301,14 @@ describe('useFormColumnWidth stored width survival', () => {
     localStorage.setItem(STORAGE_KEY, '600');
     const writes: string[] = [];
     const write = window.localStorage.setItem.bind(window.localStorage);
-    vi.spyOn(window.localStorage, 'setItem').mockImplementation(
-      (key: string, value: string) => {
+    stubLocalStorage({
+      setItem: (key: string, value: string) => {
         writes.push(value);
         write(key, value);
-      }
-    );
+      },
+    });
     renderHook(() => useFormColumnWidth());
+    expect(writes).toContain('600');
     expect(writes).not.toContain(String(DEFAULT_WIDTH));
   });
 });

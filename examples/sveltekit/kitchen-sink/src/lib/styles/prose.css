@@ -1,0 +1,165 @@
+/*
+ * A plain-CSS stand-in for Tailwind Typography's `prose` class, with the
+ * overrides the Next.js kitchen-sink configures. The rich-text renderer emits
+ * unstyled HTML, so this styles it; swapping in @tailwindcss/typography later
+ * only means deleting this file.
+ */
+.prose {
+  color: var(--text-primary);
+  line-height: 1.75;
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose > :last-child {
+  margin-bottom: 0;
+}
+
+.prose :where(p) {
+  margin: 1.25em 0;
+}
+
+.prose :where(h1, h2, h3, h4, h5, h6) {
+  color: var(--text-primary);
+}
+
+.prose :where(h1) {
+  margin: 0 0 0.8889em;
+  font-size: 2.25em;
+  font-weight: 800;
+  line-height: 1.1111;
+}
+
+.prose :where(h2) {
+  margin: 2em 0 1em;
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1.3333;
+}
+
+.prose :where(h3) {
+  margin: 1.6em 0 0.6em;
+  font-size: 1.25em;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.prose :where(h4, h5, h6) {
+  margin: 1.5em 0 0.5em;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.prose :where(a) {
+  color: var(--text-primary);
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.prose :where(strong) {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.prose :where(ul, ol) {
+  margin: 1.25em 0;
+  padding-left: 1.625em;
+}
+
+.prose :where(ul) {
+  list-style-type: disc;
+}
+
+.prose :where(ol) {
+  list-style-type: decimal;
+}
+
+.prose :where(li) {
+  margin: 0.5em 0;
+  padding-left: 0.375em;
+}
+
+.prose :where(li)::marker {
+  color: var(--text-muted);
+}
+
+.prose :where(blockquote) {
+  margin: 1.6em 0;
+  padding-left: 1em;
+  border-left: 0.25rem solid var(--border-subtle);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.prose :where(hr) {
+  margin: 3em 0;
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.prose :where(img) {
+  max-width: 100%;
+  height: auto;
+  margin: 2em 0;
+}
+
+.prose :where(code) {
+  margin: -0.25rem 1px;
+  padding: 0.25rem;
+  border-radius: 3px;
+  background-color: var(--bg-tint);
+  font-size: 0.875em;
+  font-weight: 600;
+}
+
+.prose :where(pre) {
+  margin: 1.7143em 0;
+  padding: 0.8571em 1.1429em;
+  overflow-x: auto;
+  border-radius: 0.375rem;
+  background-color: var(--bg-tint);
+  color: var(--text-secondary);
+  font-size: 0.875em;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.prose :where(pre code) {
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background-color: transparent;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.prose :where(table) {
+  width: 100%;
+  margin: 2em 0;
+  border-collapse: collapse;
+  font-size: 0.875em;
+  line-height: 1.7143;
+  text-align: left;
+}
+
+.prose :where(thead) {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.prose :where(th) {
+  padding: 0 0.5714em 0.5714em;
+  font-weight: 600;
+  vertical-align: bottom;
+}
+
+.prose :where(tbody tr) {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.prose :where(td) {
+  padding: 0.5714em;
+  vertical-align: baseline;
+}

@@ -19,6 +19,8 @@ export type RichTextNodeFields = TinaMarkdownContent & {
   code?: boolean;
   highlight?: boolean;
   highlightColor?: string;
+  /** CSS colour of the text; its presence is the mark. */
+  textColor?: string;
 };
 
 export type RichTextTableAlign = 'left' | 'right' | 'center';
@@ -38,6 +40,7 @@ export type BaseComponents<Rendered> = {
   underline?: { children: Rendered };
   code?: { children: Rendered };
   highlight?: { children: Rendered; color?: string };
+  textColor?: { children: Rendered; color: string };
   text?: { children: string };
   ul?: { children: Rendered };
   ol?: { children: Rendered };
@@ -85,6 +88,7 @@ export type RichTextMarkKey =
   | 'strikethrough'
   | 'code'
   | 'highlight'
+  | 'textColor'
   | 'text';
 
 export type RichTextMark =

@@ -17,6 +17,7 @@ defineConfig({
 ```
 - **`plugins`** = everything-is-a-plugin for *behavior* (ADR-002): capability providers, **Field plugins**, feature plugins.
 - **`schema`** = the **content model** (Collections, ADR-016/017) — a **sibling, not a plugin**, because it's the *user's content model*, not an extension. The schema's field `type`s resolve against installed **Field plugins**.
+- **`build`** (where codegen writes the admin) and **`rpcUrl`** (where the site mounts its RPC handler, `/api/tina` by default) are the two top-level build and transport settings. They describe the host project, not one capability, so they sit beside `plugins` and `schema` rather than on a provider plugin. The admin calls the handler at `rpcUrl`, and `mountHandler(config)` pins its route to the same value.
 
 ### 2. Per-capability config lives on the provider plugin
 `tinaCloud({...})` (the cloud bundle — provides `content`+`media`+`search`+`auth`+`draft`), `s3Media({ bucket })`, `auth0({...})` — config is **co-located with the provider** in the `plugins` list, never as separate top-level keys (ADR-007).

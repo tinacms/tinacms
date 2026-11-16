@@ -1,34 +1,42 @@
 import { Badge } from '@tinacms/ui/components/badge';
-import { useFormId } from '../editor/hooks';
+import type { ReactNode } from 'react';
+import { useFormId, useStaleDraft } from '../editor/hooks';
 import {
   type FormId,
   type FormStatus,
   useFormStatus,
 } from '../form/form-store';
 
-const STATUS_VARIANTS = {
-  pristine: 'secondary',
-  dirty: 'default',
-  clean: 'outline',
-} as const satisfies Record<FormStatus, string>;
-
-const STATUS_LABELS: Record<FormStatus, string> = {
-  pristine: 'No changes',
-  dirty: 'Unsaved',
-  clean: 'Saved',
+const STATUS_BADGES: Record<FormStatus, ReactNode> = {
+  pristine: <Badge kind='label'>No changes</Badge>,
+  dirty: <Badge kind='unsaved' />,
+  clean: (
+    <Badge kind='tag' tone='success'>
+      Saved
+    </Badge>
+  ),
 };
 
-export function FormStatusBadge({ formId }: { formId: FormId }) {
+// `quiet` drops the "No changes" chip while the Resume prompt asks about waiting edits.
+export function FormStatusBadge({
+  formId,
+  quiet = false,
+}: {
+  formId: FormId;
+  quiet?: boolean;
+}) {
   const status = useFormStatus(formId);
-  return (
-    <Badge variant={STATUS_VARIANTS[status]}>{STATUS_LABELS[status]}</Badge>
-  );
+  if (quiet && status === 'pristine') return null;
+  return STATUS_BADGES[status];
 }
 
 export function DocumentStatus() {
   return (
     <span role='status'>
-      <FormStatusBadge formId={useFormId()} />
+      <FormStatusBadge
+        formId={useFormId()}
+        quiet={useStaleDraft()?.cause !== undefined}
+      />
     </span>
   );
 }

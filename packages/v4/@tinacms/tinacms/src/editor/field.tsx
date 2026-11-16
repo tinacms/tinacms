@@ -1,11 +1,15 @@
-import { Label } from '@tinacms/ui/components/label';
-import { use } from 'react';
+import { use, useEffect, useLayoutEffect, useRef } from 'react';
 import type { FieldAddress } from '../core/field/address';
 import { toFieldAddress } from '../core/field/address';
 import type { FieldSchema } from '../core/schema/types';
+import { useStore } from 'zustand';
+import { centerInScroller } from '../utils/center-in-scroller';
 import { useFormStore } from '../form/form-store';
+import { DrillInField } from './drill-in-field';
+import { drillsInAt } from './form-view-state';
 import {
   FieldAddressContext,
+  FieldLockContext,
   FieldSchemaContext,
   FormScopeContext,
   TinaRuntimeContext,
@@ -22,6 +26,7 @@ export interface FieldNodeProps {
 export function FieldNode({ address, node }: FieldNodeProps) {
   const runtime = use(TinaRuntimeContext);
   const scope = use(FormScopeContext);
+  const parentLock = use(FieldLockContext);
   if (!runtime || !scope) {
     throw new Error(
       '<FieldNode> must be used within a TinaProvider and FormProvider'
@@ -41,13 +46,67 @@ export function FieldNode({ address, node }: FieldNodeProps) {
     setActive(scope.formId, address);
   };
 
-  const Component = descriptor.Component;
+  const openAddress = useStore(
+    scope.view,
+    (state) => state.openLevels.at(-1)?.address
+  );
+  const drills =
+    drillsInAt(descriptor, node, address) && openAddress !== address;
+  // Widgets own their input, so the help text is linked from here: the input
+  // is the element with the field's id, or the group named by the field label.
+  const frame = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (!node.description) return;
+    const target = frame.current?.querySelector(
+      `[id="${address}"], [aria-labelledby="${address}-label"]`
+    );
+    target?.setAttribute('aria-describedby', `${address}-help`);
+  }, [address, node.description]);
+
+  // A control that cannot take focus leaves the field off screen, so the frame centres itself.
+  useEffect(() => {
+    let pending = 0;
+    const unsubscribe = useFormStore.subscribe((state, previous) => {
+      const { active } = state;
+      if (active === previous.active) return;
+      if (active?.formId !== scope.formId || active.address !== address) return;
+      cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(() => {
+        const target = frame.current?.firstElementChild;
+        if (!target || frame.current?.contains(document.activeElement)) return;
+        centerInScroller(target);
+      });
+    });
+    return () => {
+      unsubscribe();
+      cancelAnimationFrame(pending);
+    };
+  }, [scope.formId, address]);
+
+  const Component = drills
+    ? (descriptor.DrillInComponent ?? DrillInField)
+    : descriptor.Component;
+  const lock = {
+    disabled: parentLock.disabled || node.disabled === true,
+    readOnly: parentLock.readOnly || node.readOnly === true,
+  };
   return (
     <FieldAddressContext value={address}>
       <FieldSchemaContext value={node}>
-        <div style={{ display: 'contents' }} onFocus={markActive}>
-          <Component />
-        </div>
+        <FieldLockContext value={lock}>
+          <div
+            ref={frame}
+            style={{ display: 'contents' }}
+            onFocus={markActive}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) {
+                scope.view.getState().touch(address);
+              }
+            }}
+          >
+            <Component />
+          </div>
+        </FieldLockContext>
       </FieldSchemaContext>
     </FieldAddressContext>
   );
@@ -58,23 +117,12 @@ export interface NestedFieldRowProps {
   node: FieldSchema;
 }
 
-// The label + <FieldNode> pair a compound field (array, object) renders for
-// each of its child fields. A child whose descriptor sets `labelable: false`
-// gets no `htmlFor` — its widget reads the row's label id through
-// `aria-labelledby` instead.
+// The row a compound field (array, object) renders for each of its child
+// fields. The child's own FieldWrapper draws the label.
 export function NestedFieldRow({ address, node }: NestedFieldRowProps) {
-  const runtime = use(TinaRuntimeContext);
-  const labelable =
-    runtime?.registry.get(node.type)?.metadata?.labelable !== false;
+  if (node.hidden) return null;
   return (
     <div className='mb-3 min-w-0 last:mb-0'>
-      <Label
-        className='mb-1'
-        id={`${address}-label`}
-        htmlFor={labelable ? address : undefined}
-      >
-        {node.label ?? node.name}
-      </Label>
       <FieldNode address={toFieldAddress(address)} node={node} />
     </div>
   );
@@ -96,6 +144,7 @@ export function Field({ address }: FieldProps) {
       `No field "${address}" in collection "${scope.collection.name}"`
     );
   }
+  if (node.hidden) return null;
 
   return <FieldNode address={toFieldAddress(address)} node={node} />;
 }

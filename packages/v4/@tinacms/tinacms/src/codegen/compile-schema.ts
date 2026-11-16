@@ -1,8 +1,11 @@
 import type { ResolvedConfig, TinaSchema } from '../config';
 import { fieldConflictError, overridesFieldKey } from '../core/field/registry';
-import { hookConflictError, overridesHookKey } from '../core/form/hooks';
+import { hookProvidersOf } from '../core/form/hooks';
 import { invariant } from '../core/invariant';
+import { capabilityProvider } from '../core/mount';
 import { composeOverridableRegistry } from '../core/overridable-registry';
+import { SEARCH_INDEX_HOOK } from '../core/search/index-contract';
+import { isRecord } from '../utils/is-record';
 import { scalarItemOf } from '../core/schema/children';
 import type { FieldProvision, PluginManifest } from '../core/plugin';
 import type {
@@ -14,6 +17,14 @@ import {
   overridesValidatorKey,
   validatorConflictError,
 } from '../core/validator/registry';
+import { RICH_TEXT_FIELD_TYPE } from '../plugins/fields/rich-text/rich-text-field.type';
+import { STRING_FIELD_TYPE } from '../plugins/fields/string/string-field.schema';
+import { ARRAY_FIELD_TYPE } from '../plugins/fields/array/array-field.schema';
+import {
+  isObjectDisplay,
+  OBJECT_DISPLAYS,
+  OBJECT_FIELD_TYPE,
+} from '../plugins/fields/object/object-field.schema';
 import { type PackageVersion, packageVersion } from './package-version';
 
 export const LOCK_VERSION = 5;
@@ -93,18 +104,7 @@ const usedValidators = (collections: CollectionSchema[]): string[] => [
 ];
 
 const registeredHooksOf = (plugins: PluginManifest[]): Set<string> =>
-  new Set(
-    composeOverridableRegistry(
-      plugins.flatMap((plugin) =>
-        (plugin.hooks ?? []).map((name) => ({
-          key: name,
-          value: plugin,
-          isOverride: overridesHookKey(plugin, name),
-        }))
-      ),
-      hookConflictError
-    ).keys()
-  );
+  new Set(hookProvidersOf(plugins).keys());
 
 const usedHooks = (collections: CollectionSchema[]): string[] => [
   ...new Set(
@@ -114,7 +114,181 @@ const usedHooks = (collections: CollectionSchema[]): string[] => [
   ),
 ];
 
+// v3 field options that v4 does not have, with what replaces each (ADR-029).
+const DROPPED_OPTIONS: Record<string, string> = {
+  ui: 'v4 has no `ui` wrapper: put description, defaultValue, hidden, itemLabel, picker and display at the top level of the field',
+  component:
+    'register a field plugin for the widget; the field type picks the plugin that renders it',
+  parse:
+    'declare `parse` on the field plugin, or use a collection hook for a one-off transform',
+  format:
+    'declare `serialize` on the field plugin, or use a collection hook for a one-off transform',
+  validate: 'attach named validators with `validators`',
+  min: 'use the `min()` validator in `validators`',
+  max: 'use the `max()` validator in `validators`',
+};
+
+// Every field node under `fields`, following `fields`, `templates` and `of`.
+const nodesIn = (fields: unknown[] = []): Record<string, unknown>[] =>
+  fields.flatMap((field) => {
+    if (!isRecord(field)) return [];
+    const templates = Array.isArray(field.templates) ? field.templates : [];
+    return [
+      field,
+      ...nodesIn(Array.isArray(field.fields) ? field.fields : []),
+      ...nodesIn(
+        templates.flatMap((template) =>
+          isRecord(template) && Array.isArray(template.fields)
+            ? template.fields
+            : []
+        )
+      ),
+      ...nodesIn(isRecord(field.of) ? [field.of] : []),
+    ];
+  });
+
+const templatesOf = (
+  node: Record<string, unknown>
+): Record<string, unknown>[] =>
+  Array.isArray(node.templates) ? node.templates.filter(isRecord) : [];
+
+const assertNoDroppedOptions = (collections: CollectionSchema[]): void => {
+  for (const collection of collections) {
+    for (const node of nodesIn(collection.fields)) {
+      const owners = [
+        { kind: 'field', owner: node },
+        ...templatesOf(node).map((owner) => ({ kind: 'template', owner })),
+      ];
+      for (const { kind, owner } of owners) {
+        for (const [option, replacement] of Object.entries(DROPPED_OPTIONS)) {
+          invariant(
+            !(option in owner),
+            'schema-dropped-option',
+            `The ${kind} "${String(owner.name)}" in collection "${collection.name}" sets "${option}", which v4 does not have: ${replacement}.`
+          );
+        }
+      }
+    }
+  }
+};
+
+const isArrayNode = (node: Record<string, unknown>): boolean =>
+  node.type === ARRAY_FIELD_TYPE;
+
+// Each `of` item row would repeat the help text, or show a row with no editor.
+const assertScalarItemsAreVisible = (collections: CollectionSchema[]): void => {
+  for (const collection of collections) {
+    for (const node of nodesIn(collection.fields)) {
+      if (!isArrayNode(node) || !isRecord(node.of)) continue;
+      for (const option of ['hidden', 'description']) {
+        invariant(
+          !(option in node.of),
+          'schema-scalar-item-option',
+          `The array "${String(node.name)}" in collection "${collection.name}" sets "${option}" on its "of" field. Set it on the array itself.`
+        );
+      }
+    }
+  }
+};
+
+const PICKERS = ['list', 'grid'];
+
+const assertObjectDisplays = (collections: CollectionSchema[]): void => {
+  for (const collection of collections) {
+    for (const node of nodesIn(collection.fields)) {
+      if (node.type !== OBJECT_FIELD_TYPE || !('display' in node)) continue;
+      if (node.display === undefined) continue;
+      invariant(
+        isObjectDisplay(node.display),
+        'schema-object-display-invalid',
+        `The object "${String(node.name)}" in collection "${collection.name}" sets "display" to ${JSON.stringify(node.display)}. "display" takes ${OBJECT_DISPLAYS.map((display) => `"${display}"`).join(', ')}.`
+      );
+    }
+  }
+};
+
+const assertTemplatesArrayOptions = (collections: CollectionSchema[]): void => {
+  for (const collection of collections) {
+    for (const node of nodesIn(collection.fields)) {
+      if (!isArrayNode(node)) continue;
+      const where = `The array "${String(node.name)}" in collection "${collection.name}"`;
+      if (Array.isArray(node.templates)) {
+        invariant(
+          !('defaultItem' in node),
+          'schema-templates-default-item',
+          `${where} sets "defaultItem" on the array. Set "defaultItem" on each template instead.`
+        );
+      }
+      if ('picker' in node) {
+        invariant(
+          Array.isArray(node.templates) &&
+            PICKERS.includes(String(node.picker)),
+          'schema-picker-invalid',
+          `${where} sets "picker" to ${JSON.stringify(node.picker)}. "picker" takes ${PICKERS.map((picker) => `"${picker}"`).join(' or ')} and only applies to an array with "templates".`
+        );
+      }
+    }
+  }
+};
+
+const SEARCHABLE_FIELD_TYPES: readonly string[] = [
+  STRING_FIELD_TYPE,
+  RICH_TEXT_FIELD_TYPE,
+];
+
+// Checks the `fields` of the plugin that wins `search`, so a typo fails here and
+// not as a silent gap in the index (ADR-021 §5).
+const assertSearchFields = (config: ResolvedConfig): void => {
+  const provider = capabilityProvider(config.plugins, 'search');
+  if (!provider?.search) return;
+  const { fields } = provider.search;
+  for (const [collectionName, weights] of Object.entries(fields)) {
+    const collection = config.schema.collections.find(
+      ({ name }) => name === collectionName
+    );
+    invariant(
+      collection,
+      'search-unknown-collection',
+      `The search plugin "${provider.name}" lists the collection "${collectionName}" in \`fields\`, but the schema has no such collection.`
+    );
+    for (const [fieldName, weight] of Object.entries(weights)) {
+      const where = `The search plugin "${provider.name}" lists the field "${fieldName}" of collection "${collectionName}"`;
+      const field = collection.fields.find(({ name }) => name === fieldName);
+      invariant(
+        field,
+        'search-unknown-field',
+        `${where}, but the collection has no top-level field with that name.`
+      );
+      invariant(
+        SEARCHABLE_FIELD_TYPES.includes(field.type),
+        'search-field-type',
+        `${where}, but its type is "${field.type}". Search reads "string" and "rich-text" fields only.`
+      );
+      invariant(
+        Number.isFinite(weight) && weight > 0,
+        'search-field-weight',
+        `${where} with the weight ${String(weight)}. A weight is a finite number above 0.`
+      );
+    }
+  }
+  for (const collection of config.schema.collections) {
+    const listsIndexHook = (collection.hooks ?? []).some(
+      ({ name }) => name === SEARCH_INDEX_HOOK
+    );
+    invariant(
+      !listsIndexHook || Object.hasOwn(fields, collection.name),
+      'search-collection-not-configured',
+      `The collection "${collection.name}" lists \`searchIndex()\` in \`hooks\`, but the search plugin "${provider.name}" has no \`fields\` for it.`
+    );
+  }
+};
+
 export const compileSchema = (config: ResolvedConfig): TinaLock => {
+  assertSearchFields(config);
+  assertNoDroppedOptions(config.schema.collections);
+  assertScalarItemsAreVisible(config.schema.collections);
+  assertTemplatesArrayOptions(config.schema.collections);
+  assertObjectDisplays(config.schema.collections);
   const provisions = fieldProvisionsOf(config.plugins);
   const primitives: Record<string, number> = {};
   for (const type of usedFieldTypes(config.schema.collections).sort()) {

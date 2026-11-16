@@ -1,5 +1,40 @@
 # @tinacms/mdx
 
+## 2.4.2
+
+### Patch Changes
+
+- [#7951](https://github.com/tinacms/tinacms/pull/7951) [`80502f8`](https://github.com/tinacms/tinacms/commit/80502f86b0224fb67ec05f0644db71bf5d38fde4) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix saving a rich-text field that contains an empty bullet.
+
+- [#7958](https://github.com/tinacms/tinacms/pull/7958) [`19285c6`](https://github.com/tinacms/tinacms/commit/19285c6deeee52c380e8b2fdeafedc9530dc0618) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Rich-text component values that contain a quote, backslash or newline now save and load back unchanged. Tina writes each value in a string, datetime, reference or image list as a JSON string literal. Values without those characters stay exactly as before.
+
+  Negative numbers and image lists on rich-text components now load back. Before, a negative number turned the block into invalid markdown, and an image list failed to load.
+
+  Number and boolean values must be real numbers or booleans. If one is not, the save fails with a message that names the field. If you clear a number field, Tina saves it as `null`. Tina drops a highlight colour that contains characters a CSS colour cannot have, and the text stays highlighted.
+
+## 2.4.1
+
+### Patch Changes
+
+- [#7319](https://github.com/tinacms/tinacms/pull/7319) [`40cf662`](https://github.com/tinacms/tinacms/commit/40cf6628da02f81bd0cb5994a3ed78b71cba699a) Thanks [@Osamaali313](https://github.com/Osamaali313)! - Fix a crash when parsing rich-text containing an `image` field with `list: true`. The image-list branch called `.split(',')` on the array returned by `extractScalar`, throwing `TypeError: values.split is not a function`; the error was wrapped as a parse failure, so the block became an `invalid_markdown` node (content dropped in the editor) or failed `tinacms build`. It now maps over the array like the other list field types.
+
+- [#7861](https://github.com/tinacms/tinacms/pull/7861) [`33bb5f3`](https://github.com/tinacms/tinacms/commit/33bb5f3a1e0c178fac0d9b8c8547fd0a2e4cee9d) Thanks [@Deea222](https://github.com/Deea222)! - A rich-text field holding two lists of the same kind in a row now reopens after it is saved. The MDX serializer separated such lists with an HTML comment (`<!---->`), which MDX does not allow, so the whole document fell back to raw text on the next load. It now switches the list marker instead: `*` then `-`, `1.` then `1)`. Files already saved with the comment are not rewritten; remove the `<!---->` line by hand once. Fixes #5238.
+
+## 2.4.0
+
+### Minor Changes
+
+- [#7683](https://github.com/tinacms/tinacms/pull/7683) [`034e88f`](https://github.com/tinacms/tinacms/commit/034e88ff9fb8035b1443397b5d981313a44fa30f) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Rich-text fields can now colour text. A Text Color dropdown now appears next to Highlight in the default toolbar. Fields with a custom `overrides.toolbar` need `'textColor'` added to it. Coloured text saves as a `<span>` with a `color` style, inside any bold, italic, strikethrough or highlight. The palette can be set per field under `overrides.textColors` (a list of `{ label, value }`).
+
+  Also fixes:
+  - Adjacent text with different marks no longer picks up a neighbour's mark on save (e.g. bold italic text followed by italic text saved both as bold).
+  - Renderers only apply plain CSS colours, so content can no longer inject arbitrary CSS through a highlight or text colour.
+
+### Patch Changes
+
+- Updated dependencies [[`034e88f`](https://github.com/tinacms/tinacms/commit/034e88ff9fb8035b1443397b5d981313a44fa30f)]:
+  - @tinacms/schema-tools@2.11.0
+
 ## 2.3.0
 
 ### Minor Changes

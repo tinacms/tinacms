@@ -17,9 +17,9 @@ Single package per [ADR-001](../001-single-package-architecture.md). Per-framewo
 | Import path | Where it runs | Contains |
 |---|---|---|
 | `tinacms` | universal (config + types) | `defineConfig`, `defineCollection`, `definePlugin`, `t` schema helpers, `Permission` type |
-| `tinacms/react` | browser | `TinaProvider`, `useTinaStore`, address-keyed hooks (`useFieldValue`, `useFieldAddress`, `useFieldActivation`, `useFieldErrors`, `useChildKeys`, `useSiblingValue`, `useFormActions`, `useHasPermission`) |
+| `tinacms/react` | browser | `TinaProvider`, `useTinaStore`, address-keyed hooks (`useFieldValue`, `useFieldAddress`, `useFieldActivation`, `useFieldErrors`, `useFieldFrame`, `useChildKeys`, `useSiblingValue`, `useFormActions`, `useHasPermission`) |
 | `tinacms/client` | browser | client-segment authoring (`defineClientPlugin`), the `server` RPC proxy |
-| `tinacms/server` | server only | `defineServerPlugin`, `protectedOp`, `publicOp`, `use(...)`, `mountHandler` |
+| `tinacms/server` | server only | `defineServerPlugin`, `protectedOp`, `publicOp`, `use(...)`, `requestContext()`, `mountHandler`, `defineServerHook`, `reject`, `HookRejectedError`, `ServerHookScope`, `ServerFormHooks`, `ServerHookFactory` |
 | `tinacms/next`, `tinacms/express`, … | server only | per-framework adapters that mount the RPC handler |
 
 The client entry never imports backend code; the `server`/adapter entries never end up in the browser bundle. Type-only crossings between segments use `import type`.
@@ -50,7 +50,7 @@ export default defineConfig({
         format: 'mdx',
         fields: [
           t.string({ name: 'title', label: 'Title', required: true }),
-          t.string({ name: 'body', label: 'Body', ui: { component: 'rich-text' } }),
+          t.richText({ name: 'body', label: 'Body' }),
         ],
       }),
     ],
@@ -102,8 +102,9 @@ Schema-side helpers (unchanged in spirit from v2, but evaluated against the new 
 defineCollection({
   name, label, path, format,           // 'md' | 'mdx' | 'json' | 'yaml'
   fields: [
-    t.string({ name, label, required, min, max, pattern, ui: { component: 'rich-text' } }),
-    t.number({ name, label, min, max, step }),
+    t.string({ name, label, description, defaultValue, hidden, validators: [required(), min(3), max(80), pattern(/^[a-z]+$/)] }),
+    t.richText({ name, label }),
+    t.number({ name, label, validators: [min(0), max(10)], step }),
     t.boolean({ name, label }),
     t.datetime({ name, label }),
     t.object({ name, label, fields: [...] }),
@@ -114,7 +115,7 @@ defineCollection({
 })
 ```
 
-The `ui.component` value names the **`field` capability key** to render. Custom field types are added by registering a `field` plugin at that key — see [Field Plugins](../plugins/field-plugins.md).
+The field builder (`t.string`, `t.richText`, …) names the **`field` capability key** to render. Field options sit at the top level of the field; there is no `ui` wrapper ([ADR-029](../029-field-ui-options.md)). Custom field types are added by registering a `field` plugin at that key — see [Field Plugins](../plugins/field-plugins.md).
 
 ## React API (`tinacms/react`)
 
@@ -143,7 +144,8 @@ const current = useTinaStore((s) => s.branch.current)
 |---|---|
 | `useFieldAddress()` | identity of *this* field |
 | `useFieldValue<T>(address)` | one leaf value (stable reference) |
-| `useFieldErrors(address)` | errors at an address |
+| `useFieldErrors(address)` | every error at an address, shown at once |
+| `useFieldFrame()` | props for `FieldWrapper`: label, ids, required, and the errors to show now (after the field is left, or after a save was tried). Reads the address from context |
 | `useFieldActivation(handler)` | opt-in callback when this field becomes active |
 | `useSiblingValue(address, name)` | sibling leaf |
 | `useChildKeys(address)` | ordered child keys at a composite address |
@@ -173,7 +175,12 @@ import { defineServerPlugin, protectedOp, publicOp, use } from 'tinacms/server'
 | `protectedOp({ permission })` | Wrap an op to require a permission |
 | `publicOp()` | Greppable opt-out for unauthenticated endpoints |
 | `use('cap')` | In-process accessor for another capability's server segment |
+| `requestContext()` | The request, session and auth provider of the op that is running ([ADR-028](../028-server-save-hooks.md)) |
 | `mountHandler` | Internal — used by per-framework adapters |
+| `defineServerHook` | Type a server hook's factory, so `doc` and `session` are typed ([ADR-028](../028-server-save-hooks.md)) |
+| `reject(message)` | Stop the save from a server `beforeSave` by throwing a `HookRejectedError`. The message reaches the editor |
+| `ServerHookScope` | What a server hook receives: `{ path, collection, session, branch }` |
+| `ServerFormHooks` | A server hook's shape: `{ beforeSave?, afterSave? }` |
 
 ## Per-framework adapters
 
@@ -185,7 +192,7 @@ import config from '../../../../tina.config'
 export const { GET, POST } = mountHandler(config)
 ```
 
-The adapter mounts the runtime-composed server-segment handler (all server segments + RPC transport). Express, Hono, Remix, etc. have equivalent adapters.
+The adapter mounts the runtime-composed server-segment handler (all server segments + RPC transport). It needs the config's `schema` once a plugin registers a server hook ([ADR-028](../028-server-save-hooks.md)). Express, Hono, Remix, etc. have equivalent adapters.
 
 ## Stability
 

@@ -1,5 +1,36 @@
 # tina-graphql
 
+## 4.1.0
+
+### Minor Changes
+
+- [#7145](https://github.com/tinacms/tinacms/pull/7145) [`46f5bab`](https://github.com/tinacms/tinacms/commit/46f5babc3bcb23a0390247dfd8b715661e8c814a) Thanks [@kulesy](https://github.com/kulesy)! - Add `Database.deleteIndexEntriesForPaths(paths)`. It removes every sort-index and reference entry for the given paths, including entries left over from an earlier value of a field. Left in place, those entries make a sorted collection list fail with "Error querying file" once the document is deleted, and make deleting or renaming a document it once referenced fail. Call it after `deleteContentByPaths` with the same paths.
+
+### Patch Changes
+
+- [#7863](https://github.com/tinacms/tinacms/pull/7863) [`2811d2c`](https://github.com/tinacms/tinacms/commit/2811d2c4d353a5ff45a12862b3cd4170d7119fd3) Thanks [@Apu-Emdad](https://github.com/Apu-Emdad)! - An optional image field left empty is no longer written to frontmatter as an empty string. Clearing an existing optional image now removes the key.
+
+- Updated dependencies [[`40cf662`](https://github.com/tinacms/tinacms/commit/40cf6628da02f81bd0cb5994a3ed78b71cba699a), [`33bb5f3`](https://github.com/tinacms/tinacms/commit/33bb5f3a1e0c178fac0d9b8c8547fd0a2e4cee9d)]:
+  - @tinacms/mdx@2.4.1
+
+## 4.0.1
+
+### Patch Changes
+
+- [#7782](https://github.com/tinacms/tinacms/pull/7782) [`dc74885`](https://github.com/tinacms/tinacms/commit/dc7488576604c019bb3284401a7088777dcfbe90) Thanks [@kulesy](https://github.com/kulesy)! - Bump `js-yaml` to `^4.3.2` in `@tinacms/cli` and `^3.15.2` in `@tinacms/graphql`, which fixes a high-severity advisory in each.
+
+- [#7851](https://github.com/tinacms/tinacms/pull/7851) [`e627dc9`](https://github.com/tinacms/tinacms/commit/e627dc9c20b59d851b59a36c015f8232359448c0) Thanks [@sarahanntolsma-ff](https://github.com/sarahanntolsma-ff)! - Find a document's references by walking it against its schema rather than by evaluating schema-derived JSONPath over it. The expressions could not describe a templated list item, which is tagged `_template` rather than nested under a key of that name, and could not reach inside a `rich-text` field, which is stored as text. References in either shape were missing from the index, so `_sys.hasReferences` reported false for them and renaming or deleting such a document left those references pointing at a path that no longer existed. `findReferences` also took the default page of 50, which silently capped how many a rename or delete went on to fix.
+
+  Existing indexes keep answering lookups, but entries the old build wrote are not replaced on a single document write — reindex to pick up the references it missed and to clear stale entries.
+
+- [#7133](https://github.com/tinacms/tinacms/pull/7133) [`d828a9e`](https://github.com/tinacms/tinacms/commit/d828a9efdd40c0c554df5adc4d635e5818f96598) Thanks [@kulesy](https://github.com/kulesy)! - A collection list sorted by a field now loads when that field's sort index still lists a deleted document. The query skips the missing document instead of failing the whole list with "Error querying file ... from collection". A full reindex removes the stale entry.
+
+- [#7295](https://github.com/tinacms/tinacms/pull/7295) [`5750d3b`](https://github.com/tinacms/tinacms/commit/5750d3bc84c18d4fb6332aa5a499d33fca973b0f) Thanks [@shininglegend](https://github.com/shininglegend)! - Fix an intermittent, silent hang at "Indexing local files" in `tinacms dev`/`build`/`audit`. `TinaLevelClient.openConnection` connected to the in-process datalayer server without waiting for the server's `listen()` to complete; when the connection lost that race, `many-level` queued every database operation forever with no error. The connection is now retried (100 ms × 50), and if it ultimately fails the RPC stream is destroyed so queued operations reject with `LEVEL_CONNECTION_LOST` instead of hanging. The race is timing-sensitive: on Node 25 it was lost almost every run, on Node 22 occasionally.
+
+- Updated dependencies [[`034e88f`](https://github.com/tinacms/tinacms/commit/034e88ff9fb8035b1443397b5d981313a44fa30f)]:
+  - @tinacms/mdx@2.4.0
+  - @tinacms/schema-tools@2.11.0
+
 ## 4.0.0
 
 ### Major Changes

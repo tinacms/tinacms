@@ -1,13 +1,13 @@
 import { isRecord } from '../../utils/is-record';
-import type { FieldSchema, TemplateSchema } from './types';
+import type { FieldSchema, TemplateSchema, TinaDocument } from './types';
 
 // ADR-017 §3: an item of a `templates` position names its template here.
 export const TEMPLATE_KEY = '_template';
 
-export const templateFor = (
-  templates: TemplateSchema[],
+export const templateFor = <T extends TemplateSchema>(
+  templates: T[],
   item: Record<string, unknown>
-): TemplateSchema | undefined =>
+): T | undefined =>
   templates.find((template) => template.name === item[TEMPLATE_KEY]);
 
 export const fieldsOf = (node: FieldSchema): FieldSchema[] | undefined =>
@@ -59,4 +59,48 @@ export const nestedValuesOf = (
   if (scalar) return [];
   const fields = fieldsetOf(node, value);
   return fields ? [{ value, fields }] : [];
+};
+
+type ItemLabel = (item: TinaDocument) => unknown;
+
+const itemLabelOf = (node: object): ItemLabel | undefined =>
+  'itemLabel' in node && typeof node.itemLabel === 'function'
+    ? (node.itemLabel as ItemLabel)
+    : undefined;
+
+// A throw or a result that is not a non-empty string is no heading.
+export const customItemLabel = (
+  node: object,
+  item: TinaDocument
+): string | undefined => {
+  try {
+    const label = itemLabelOf(node)?.(item);
+    return typeof label === 'string' && label !== '' ? label : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+export const templateTitle = (template: TemplateSchema): string =>
+  template.label ?? template.name;
+
+// What an item of a list of objects is called: its `itemLabel`, else its
+// template's label, else its position.
+export const itemHeadingOf = (
+  node: FieldSchema,
+  item: unknown,
+  index: number
+): string => {
+  if (!isRecord(item)) return `Item ${index + 1} is not an object`;
+  if (!node.templates) {
+    return customItemLabel(node, item) ?? `Item ${index + 1}`;
+  }
+  const template = templateFor(node.templates, item);
+  if (template) {
+    return customItemLabel(template, item) ?? templateTitle(template);
+  }
+  const name = item[TEMPLATE_KEY];
+  return name === undefined
+    ? 'Block with no template'
+    : `Unknown block "${String(name)}"`;
 };

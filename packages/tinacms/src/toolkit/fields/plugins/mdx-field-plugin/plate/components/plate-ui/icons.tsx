@@ -372,6 +372,7 @@ export const Icons = {
   search: Search,
   settings: Settings,
   highlight: Highlighter,
+  textColor: Baseline,
   strikethrough: Strikethrough,
   subscript: Subscript,
   superscript: Superscript,

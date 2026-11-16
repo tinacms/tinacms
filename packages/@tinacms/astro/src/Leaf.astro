@@ -1,10 +1,11 @@
 ---
 /**
  * Recursive text-formatting renderer. Each formatting flag (bold, italic,
- * underline, strikethrough, code, highlight) wraps the node in its tag and
- * recurses via `Astro.self` with that flag cleared, so combinations stack
- * naturally (`<strong><em><code>...</code></em></strong>`).
+ * underline, strikethrough, code, highlight, textColor) wraps the node in its
+ * tag and recurses via `Astro.self` with that flag cleared, so combinations
+ * stack naturally (`<strong><em><code>...</code></em></strong>`).
  */
+import { sanitizeCssColor } from './sanitize';
 import type { TextElement } from './types';
 
 interface Props {
@@ -12,6 +13,9 @@ interface Props {
 }
 
 const { node } = Astro.props;
+// Colours that aren't a plain CSS colour are dropped; the text still renders.
+const highlightColor = sanitizeCssColor(node.highlightColor);
+const textColor = sanitizeCssColor(node.textColor);
 ---
 {node.bold ? (
   <strong>
@@ -34,9 +38,13 @@ const { node } = Astro.props;
     <Astro.self node={{ ...node, code: false }} />
   </code>
 ) : node.highlight ? (
-  <mark style={node.highlightColor ? `background-color:${node.highlightColor}` : undefined}>
+  <mark style={highlightColor ? `background-color:${highlightColor}` : undefined}>
     <Astro.self node={{ ...node, highlight: false, highlightColor: undefined }} />
   </mark>
+) : textColor ? (
+  <span style={`color:${textColor}`}>
+    <Astro.self node={{ ...node, textColor: undefined }} />
+  </span>
 ) : (
   <Fragment>{node.text}</Fragment>
 )}

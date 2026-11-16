@@ -1,0 +1,438 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+import { useState } from 'react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+
+import { AddInput } from '@tinacms/ui/components/add-button';
+import {
+  Button,
+  type ButtonVariant,
+  buttonHeight,
+  buttonVariants,
+} from '@tinacms/ui/components/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@tinacms/ui/components/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@tinacms/ui/components/dialog';
+
+describe('Button', () => {
+  it('names an icon button from its string children', () => {
+    render(
+      <Button variant='icon' icon='close'>
+        Close panel
+      </Button>
+    );
+    expect(screen.getByRole('button', { name: 'Close panel' })).toBeVisible();
+  });
+
+  it('activates from the keyboard', async () => {
+    const onClick = vi.fn();
+    render(<Button onClick={onClick}>Save</Button>);
+    await userEvent.tab();
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it('exposes a single-press shortcut as aria-keyshortcuts', () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue('Macintosh');
+    render(<Button shortcut='⌘K'>Search</Button>);
+    expect(screen.getByRole('button', { name: 'Search' })).toHaveAttribute(
+      'aria-keyshortcuts',
+      'Meta+K'
+    );
+  });
+
+  it('shows the corner count from 1 only', () => {
+    const { rerender } = render(
+      <Button variant='icon' icon='changes' count={0} aria-label='Changes' />
+    );
+    expect(screen.queryByText('0')).toBeNull();
+    rerender(
+      <Button variant='icon' icon='changes' count={3} aria-label='Changes, 3' />
+    );
+    expect(screen.getByText('3')).toBeInTheDocument();
+  });
+
+  it('draws a link when it has an href', () => {
+    render(<Button href='/docs'>Docs</Button>);
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
+      'href',
+      '/docs'
+    );
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  it('takes the design names chip and chipSrLabel, and a minimum width', () => {
+    render(
+      <Button chip={3} chipSrLabel=', 3 errors' minWidth={160}>
+        Save
+      </Button>
+    );
+    const button = screen.getByRole('button', { name: 'Save , 3 errors' });
+    expect(button).toHaveTextContent('3');
+    expect(button).toHaveStyle({ minWidth: '160px' });
+  });
+
+  it('draws nothing for a chip of 0 and rejects a chip without chipSrLabel', () => {
+    // @ts-expect-error chip without chipSrLabel is a type error, as count without srLabel is
+    const bare = <Button chip={3}>Bare</Button>;
+    const { rerender } = render(
+      <Button chip={0} chipSrLabel=', 0 errors'>
+        Save
+      </Button>
+    );
+    expect(screen.getByRole('button', { name: 'Save' })).not.toHaveTextContent(
+      '0'
+    );
+    rerender(bare);
+    expect(screen.getByRole('button', { name: 'Bare' })).not.toHaveTextContent(
+      '3'
+    );
+  });
+
+  it.each([
+    ['disabled', { disabled: true }],
+    ['disabled and busy', { disabled: true, busy: true }],
+  ])('leaves out the address of a %s link', async (_, state) => {
+    const onClick = vi.fn();
+    render(
+      <>
+        <Button href='/docs' onClick={onClick} {...state}>
+          Docs
+        </Button>
+        <Button
+          href='/docs'
+          variant='icon'
+          icon='doc'
+          aria-label='Docs icon'
+          onClick={onClick}
+          {...state}
+        />
+      </>
+    );
+    for (const link of screen.getAllByRole('link')) {
+      expect(link).not.toHaveAttribute('href');
+      await userEvent.click(link);
+    }
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('follows a link whose click sets busy, then blocks presses while busy', () => {
+    function Saving() {
+      const [busy, setBusy] = useState(false);
+      return (
+        <Button href='/next' busy={busy} onClick={() => setBusy(true)}>
+          Go
+        </Button>
+      );
+    }
+    render(<Saving />);
+    const link = screen.getByRole('link', { name: 'Go' });
+    expect(fireEvent.click(link)).toBe(true);
+    expect(screen.getByRole('link', { name: 'Go' })).toHaveAttribute(
+      'href',
+      '/next'
+    );
+    expect(fireEvent.click(link)).toBe(false);
+    expect(
+      fireEvent(
+        link,
+        new MouseEvent('auxclick', {
+          bubbles: true,
+          cancelable: true,
+          button: 1,
+        })
+      )
+    ).toBe(false);
+  });
+
+  it.each(['text', 'icon'] as const)(
+    'keeps the address of a busy %s link but runs no onClick',
+    (kind) => {
+      const onClick = vi.fn();
+      render(
+        kind === 'icon' ? (
+          <Button
+            href='/docs'
+            variant='icon'
+            icon='doc'
+            aria-label='Docs'
+            busy
+            onClick={onClick}
+          />
+        ) : (
+          <Button href='/docs#top' busy onClick={onClick}>
+            Docs
+          </Button>
+        )
+      );
+      const link = screen.getByRole('link');
+      expect(link).toHaveAttribute('href');
+      expect(fireEvent.click(link)).toBe(false);
+      expect(onClick).not.toHaveBeenCalled();
+    }
+  );
+
+  it('fades and blocks a disabled link', () => {
+    render(
+      <Button href='/docs' disabled>
+        Docs
+      </Button>
+    );
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveClass(
+      'cursor-not-allowed',
+      'opacity-45'
+    );
+  });
+
+  it('keeps the name and icon when a dialog renders it as its close button', () => {
+    render(
+      <Dialog open>
+        <DialogContent>
+          <DialogTitle>Rename</DialogTitle>
+        </DialogContent>
+      </Dialog>
+    );
+    const close = screen.getByRole('button', { name: 'Close' });
+    expect(close.querySelector('svg')).not.toBeNull();
+  });
+});
+
+describe('Button variants', () => {
+  it('gives every variant of one size the same height', () => {
+    const variants: ButtonVariant[] = [
+      'primary',
+      'outline',
+      'ghost',
+      'destructive',
+      'icon',
+    ];
+    for (const size of ['md', 'sm'] as const) {
+      for (const variant of variants) {
+        const classes = buttonVariants({ variant, size }).split(' ');
+        expect(classes).toContain(buttonHeight[size]);
+        expect(classes).not.toContain(
+          buttonHeight[size === 'md' ? 'sm' : 'md']
+        );
+      }
+    }
+  });
+
+  it('rejects removed variants and selected on variants that cannot be selected', () => {
+    // @ts-expect-error secondary is outline now
+    void (<Button variant='secondary'>Cancel</Button>);
+    // @ts-expect-error toolbar is outline now
+    void (<Button variant='toolbar'>Filter</Button>);
+    // @ts-expect-error inverse is gone
+    void (<Button variant='inverse'>Undo</Button>);
+    // @ts-expect-error only outline and icon can be selected
+    void (<Button variant='primary' selected />);
+    // @ts-expect-error a destructive button supplies its own bin
+    void (<Button variant='destructive' icon='doc' />);
+  });
+
+  it('is outline by default', () => {
+    render(<Button>Open</Button>);
+    expect(screen.getByRole('button', { name: 'Open' })).toHaveAttribute(
+      'data-slot',
+      'button'
+    );
+  });
+
+  it('always draws the bin on a destructive button, once', () => {
+    render(<Button variant='destructive'>Delete</Button>);
+    const button = screen.getByRole('button', { name: 'Delete' });
+    expect(button.querySelectorAll('svg')).toHaveLength(1);
+    expect(button.querySelector('.lucide-trash2')).not.toBeNull();
+  });
+
+  it('draws a red bin alone for a destructive icon button', () => {
+    render(
+      <Button variant='icon' destructive>
+        Remove beach.jpg
+      </Button>
+    );
+    const button = screen.getByRole('button', { name: 'Remove beach.jpg' });
+    expect(button.querySelectorAll('svg')).toHaveLength(1);
+    expect(button.querySelector('.lucide-trash2')).not.toBeNull();
+  });
+});
+
+describe('Button disabled', () => {
+  it('ignores presses and shows no tooltip on an icon button', async () => {
+    const onClick = vi.fn();
+    render(
+      <Button variant='icon' icon='close' disabled onClick={onClick}>
+        Close panel
+      </Button>
+    );
+    const button = screen.getByRole('button', { name: 'Close panel' });
+    expect(button).toBeDisabled();
+    await userEvent.hover(button);
+    await userEvent.click(button);
+    expect(onClick).not.toHaveBeenCalled();
+    expect(screen.queryByText('Close panel')).toBeNull();
+  });
+});
+
+describe('Button, platform and sizes', () => {
+  it('shows Ctrl in place of ⌘ off Apple platforms, and names it Control', () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue(
+      'Mozilla/5.0 (Windows NT 10.0)'
+    );
+    render(<Button shortcut='⌘K'>Search</Button>);
+    const button = screen.getByRole('button', { name: 'Search' });
+    expect(button).toHaveAttribute('aria-keyshortcuts', 'Control+K');
+    expect(button).toHaveTextContent('Ctrl K');
+    vi.restoreAllMocks();
+  });
+
+  it.each([
+    ['regular', 'md'],
+    ['compact', 'sm'],
+  ] as const)('takes the design name %s as the %s size', (name, old) => {
+    render(
+      <>
+        <Button size={name}>New</Button>
+        <Button size={old}>Old</Button>
+      </>
+    );
+    expect(screen.getByRole('button', { name: 'New' }).className).toBe(
+      screen.getByRole('button', { name: 'Old' }).className
+    );
+  });
+});
+
+describe('Icon button tooltip', () => {
+  it('shows the name and shortcut on keyboard focus', async () => {
+    vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue('Macintosh');
+    render(
+      <Button variant='icon' icon='search' shortcut='⌘K'>
+        Search
+      </Button>
+    );
+    await userEvent.tab();
+    const tip = await screen.findByText('⌘K', {
+      selector: '[data-slot=tooltip-content] kbd',
+    });
+    expect(tip.closest('[data-slot=tooltip-content]')).toHaveTextContent(
+      'Search'
+    );
+    expect(screen.getByRole('button', { name: 'Search' })).toHaveAttribute(
+      'aria-keyshortcuts',
+      'Meta+K'
+    );
+  });
+
+  it('still opens the menu when it is the render target of a menu trigger', async () => {
+    render(
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant='icon' icon='more'>
+              More actions
+            </Button>
+          }
+        />
+        <DropdownMenuContent>
+          <DropdownMenuItem>Rename</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'More actions' }));
+    expect(
+      await screen.findByRole('menuitem', { name: 'Rename' })
+    ).toBeVisible();
+    expect(screen.queryByRole('tooltip')).toBeNull();
+  });
+});
+
+describe('Button busy', () => {
+  it('shows a spinner, ignores presses and stays focusable', async () => {
+    const onClick = vi.fn();
+    render(
+      <Button variant='primary' busy icon='doc' onClick={onClick}>
+        Save
+      </Button>
+    );
+    const button = screen.getByRole('button', { name: 'Save' });
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button.querySelector('.lucide-loader-circle')).not.toBeNull();
+    expect(button.querySelectorAll('svg')).toHaveLength(1);
+    await userEvent.tab();
+    expect(button).toHaveFocus();
+    await userEvent.click(button);
+    await userEvent.keyboard('{Enter}');
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('does not submit a form while busy', async () => {
+    const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <Button variant='primary' type='submit' busy>
+          Save
+        </Button>
+      </form>
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('lets disabled win over busy', () => {
+    render(
+      <Button busy disabled>
+        Save
+      </Button>
+    );
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+});
+
+describe('Button count', () => {
+  it('reads an error count as words after the name', () => {
+    render(
+      <Button variant='primary' count={3} srLabel=', 3 errors'>
+        Save
+      </Button>
+    );
+    expect(
+      screen.getByRole('button', { name: /^Save\s?, 3 errors$/ })
+    ).toBeVisible();
+  });
+
+  it('shows nothing for a count of 0', () => {
+    render(
+      <Button variant='primary' count={0} srLabel=', 0 errors'>
+        Save
+      </Button>
+    );
+    expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
+  });
+});
+
+describe('AddInput', () => {
+  it('adds the trimmed text on Enter and clears', async () => {
+    const onAdd = vi.fn();
+    render(<AddInput label='Add a tag' onAdd={onAdd} />);
+    const input = screen.getByRole('textbox', { name: 'Add a tag' });
+    await userEvent.type(input, '  news  {Enter}');
+    expect(onAdd).toHaveBeenCalledWith('news');
+    expect(input).toHaveValue('');
+  });
+
+  it('ignores Enter on blank text', async () => {
+    const onAdd = vi.fn();
+    render(<AddInput label='Add a tag' onAdd={onAdd} />);
+    await userEvent.type(screen.getByRole('textbox'), '   {Enter}');
+    expect(onAdd).not.toHaveBeenCalled();
+  });
+});

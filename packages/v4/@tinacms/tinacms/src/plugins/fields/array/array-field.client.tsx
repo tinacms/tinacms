@@ -13,7 +13,7 @@ import {
   isTemplatesArray,
   itemFieldsOf,
 } from './array-field.schema';
-import { ArrayField } from './array-field.ui';
+import { ArrayDrillIn, ArrayField } from './array-field.ui';
 
 // Ingest and digest drop `_template`, so put it back first to keep the stored
 // key order.
@@ -43,6 +43,9 @@ const describeKeptItem = (
     : `an item with the unknown template "${String(item[TEMPLATE_KEY])}"`;
 };
 
+const isEmptyList = (value: unknown) =>
+  value == null || (Array.isArray(value) && value.length === 0);
+
 const warnKeptItems = (field: ObjectArrayFieldSchema, items: unknown[]) => {
   for (const item of items) {
     const problem = describeKeptItem(field, item);
@@ -57,7 +60,8 @@ const warnKeptItems = (field: ObjectArrayFieldSchema, items: unknown[]) => {
 export default defineClientPlugin({
   field: {
     Component: ArrayField,
-    metadata: { layout: 'block', labelable: false },
+    DrillInComponent: ArrayDrillIn,
+    metadata: { layout: 'block', labelable: false, drillable: true },
     schema: arraySchema,
     // A stored value of the wrong shape stays as it is, so a save writes it
     // back unchanged (ADR-012: never throw on open).
@@ -90,6 +94,7 @@ export default defineClientPlugin({
         digestDocument(item, fields, context)
       );
     },
+    isEqual: (a, b) => isEmptyList(a) && isEmptyList(b),
     validateChildren: (value: unknown, node, address, registry, scope) => {
       const field = asArrayFieldSchema(node);
       if (!Array.isArray(value)) return {};

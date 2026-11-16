@@ -21,7 +21,7 @@ export function LinkElement(props: PlateElementProps<TLinkElement>) {
     return (
       <code
         {...props.attributes}
-        className='rounded-md bg-muted px-[0.3em] py-[0.2em] font-mono text-sm whitespace-pre-wrap'
+        className='rounded-sm bg-muted px-[0.3em] py-[0.2em] font-mono text-sm whitespace-pre-wrap'
       >
         {props.children}
       </code>

@@ -1,269 +1,201 @@
-import { Button, buttonVariants } from '@tinacms/ui/components/button';
+import {
+  AlertDialog,
+  AlertDialogClose,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@tinacms/ui/components/alert-dialog';
+import { Button } from '@tinacms/ui/components/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@tinacms/ui/components/dialog';
-import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { cn } from '@tinacms/ui/lib/utils';
-import { CloudUploadIcon, ImageIcon, ImageOffIcon } from 'lucide-react';
-import { type DragEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { hasValidator } from '../../../core/schema/types';
 import {
   useFieldActivation,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
   useFieldSchema,
   useFieldValue,
   useMediaSlice,
 } from '../../../editor';
-import { MediaBrowser } from '../../media-manager/media-browser';
-import { checkerboardStyle } from '../../media-manager/media-grid';
+import { UploadHost } from '../../../editor/uploads/upload-host';
 import {
-  extensionsForCategory,
-  inputAcceptOf,
-  mediaNameOf,
-  uploadRejectionOf,
-  uploadRulesOf,
-} from '../../media-manager/media-types';
+  REPLACE_KEEPS_OLD_FILE,
+  replaceQuestion,
+} from '../../../editor/uploads/upload-words';
+import { MediaBrowser } from '../../media-manager/media-browser';
+import { mediaNameOf } from '../../media-manager/media-types';
 import type { ImageFieldSchema } from './image-field.schema';
-
-const IMAGE_UPLOAD_RULES = uploadRulesOf(extensionsForCategory('image'));
-
-// A just-uploaded file can 404 until the dev server or CDN sees it, and the
-// browser caches that 404 for the URL. Each retry asks for a new URL.
-const RETRY_DELAYS_MS = [500, 1000, 2000];
-
-const withRetry = (url: string, attempt: number): string =>
-  attempt === 0
-    ? url
-    : `${url}${url.includes('?') ? '&' : '?'}retry=${attempt}`;
-
-const messageOf = (cause: unknown): string => {
-  if (cause instanceof Error) {
-    return cause.message;
-  } else {
-    return String(cause);
-  }
-};
+import { ImageFieldView } from './image-field.view';
+import { useImageUpload } from './image-upload';
 
 export function ImageField() {
   const address = useFieldAddress();
   const field = useFieldSchema<ImageFieldSchema>();
   const [value, setValue] = useFieldValue<unknown>(address);
   const path = typeof value === 'string' ? value : null;
-  const notAPath = value != null && path === null;
-  const errors = useFieldErrors(address);
+  const hasValue = value != null;
+  const frame = useFieldFrame();
   const media = useMediaSlice();
-  const mainButtonRef = useRef<HTMLButtonElement>(null);
-  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const upload = useImageUpload(media, address);
+  const primaryRef = useRef<HTMLButtonElement>(null);
+  const groupRef = useRef<HTMLDivElement>(null);
+  const focusAfterRemove = useRef(false);
+  const focusAfterUpload = useRef(false);
   const [picking, setPicking] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [failure, setFailure] = useState<{
-    path: string;
-    count: number;
-  } | null>(null);
-  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const [replacement, setReplacement] = useState<File | null>(null);
+  const [stored, setStored] = useState(0);
 
-  useFieldActivation(() => mainButtonRef.current?.focus());
-  useEffect(() => () => clearTimeout(retryTimer.current), []);
+  const focusPrimary = () => primaryRef.current?.focus();
 
-  const features = media.features ?? {};
-  const canUpload = features.readOnly !== true;
-  const failures = path !== null && failure?.path === path ? failure.count : 0;
-  const missing = notAPath || failures > RETRY_DELAYS_MS.length;
-  const thumbnailSrc =
-    path === null
-      ? null
-      : withRetry(
-          media.resolveUrl(path, { width: 400, height: 400 }),
-          failures
-        );
-
-  const store = (path: string) => {
-    clearTimeout(retryTimer.current);
-    setFailure(null);
-    setValue(path);
-  };
-
-  const imageFailed = (path: string) => {
-    const next = { path, count: failures + 1 };
-    const delay = RETRY_DELAYS_MS[failures];
-    if (delay === undefined) {
-      setFailure(next);
-    } else {
-      retryTimer.current = setTimeout(() => setFailure(next), delay);
-    }
-  };
-
-  const upload = async (file: File) => {
-    const rejection = uploadRejectionOf(
-      file,
-      IMAGE_UPLOAD_RULES,
-      features.maxSize
+  // A dialog this field opens is a portal, and React sends its focus events through the
+  // field's row, which activates the field. Focus must stay in that dialog.
+  useFieldActivation(() => {
+    const dialog = document.activeElement?.closest(
+      '[role="dialog"], [role="alertdialog"]'
     );
-    if (rejection) {
-      setUploadError(`${file.name}: ${rejection}`);
-      return;
+    if (dialog && !dialog.contains(groupRef.current)) return;
+    focusPrimary();
+  });
+  useLayoutEffect(() => {
+    if (focusAfterRemove.current && value == null) {
+      focusAfterRemove.current = false;
+      primaryRef.current?.focus();
     }
-    setUploadError(null);
-    setUploading(true);
-    try {
-      store(await media.upload(file));
-    } catch (cause) {
-      setUploadError(messageOf(cause));
-    } finally {
-      setUploading(false);
+  }, [value]);
+
+  // A file that lands under the path the field already holds must still show the new picture.
+  useEffect(() => {
+    if (upload.landed !== null) setStored((count) => count + 1);
+  }, [upload.landed]);
+
+  // Retry and Replace take away the button that had focus. The group holds focus
+  // while the file uploads, and the main button takes it back when the upload ends.
+  const landedPath = upload.landedPath;
+  useLayoutEffect(() => {
+    if (!focusAfterUpload.current || upload.running) return;
+    if (landedPath !== null && landedPath !== path) return;
+    focusAfterUpload.current = false;
+    const focused = document.activeElement;
+    if (focused === groupRef.current || focused === document.body) {
+      primaryRef.current?.focus();
     }
+  }, [upload.running, landedPath, path]);
+
+  const holdFocus = () => {
+    focusAfterUpload.current = true;
+    groupRef.current?.focus();
   };
 
-  const dragOver = (event: DragEvent<HTMLDivElement>) => {
-    if (!canUpload) return;
-    event.preventDefault();
-    setDragging(true);
+  const store = (next: string) => {
+    upload.dismiss();
+    setStored((count) => count + 1);
+    setValue(next);
   };
 
-  const dragLeave = (event: DragEvent<HTMLDivElement>) => {
-    const next = event.relatedTarget;
-    if (next instanceof Node && event.currentTarget.contains(next)) return;
-    setDragging(false);
-  };
-
-  const drop = (event: DragEvent<HTMLDivElement>) => {
-    if (!canUpload) return;
-    event.preventDefault();
-    setDragging(false);
-    const [file] = event.dataTransfer.files;
-    if (file && !uploading) void upload(file);
-  };
-
-  const choose = () => {
-    setUploadError(null);
-    setPicking(true);
-  };
+  const failure = frame.disabled || frame.readOnly ? null : upload.failure;
+  const retry = failure?.retry;
+  const current = upload.current;
 
   return (
-    <FieldWrapper errors={uploadError ? [...errors, uploadError] : errors}>
-      <div
-        role='group'
-        aria-labelledby={`${address}-label`}
-        data-dragging={dragging ? 'true' : undefined}
-        className={cn(
-          'flex flex-col gap-2 rounded-md border p-2 transition',
-          value == null ? 'border-dashed' : null,
-          dragging ? 'border-orange-500' : null
-        )}
-        onDragEnter={dragOver}
-        onDragOver={dragOver}
-        onDragLeave={dragLeave}
-        onDrop={drop}
+    <>
+      <ImageFieldView
+        {...frame}
+        errors={failure ? [...frame.errors, failure.reason] : frame.errors}
+        path={path}
+        notAPath={hasValue && path === null}
+        look={field.cover}
+        resolveUrl={media.resolveUrl}
+        primaryRef={primaryRef}
+        groupRef={groupRef}
+        busy={upload.running}
+        progress={upload.percent}
+        uploadName={current?.name ?? failure?.name}
+        uploadPreview={current?.preview}
+        note={
+          upload.note && upload.note.path === path
+            ? upload.note.text
+            : undefined
+        }
+        holdReason={upload.hold?.reason}
+        holdQuiet={upload.hold?.quiet}
+        previewKey={stored}
+        onChoose={() => setPicking(true)}
+        onReplace={() => setPicking(true)}
+        onRetry={
+          retry
+            ? () => {
+                holdFocus();
+                retry();
+              }
+            : undefined
+        }
+        onRemove={
+          hasValidator(field, 'required')
+            ? undefined
+            : () => {
+                upload.dismiss();
+                focusAfterRemove.current = true;
+                setValue(null);
+              }
+        }
+        onDropFile={
+          upload.canUpload
+            ? (file) => {
+                if (hasValue) setReplacement(file);
+                else upload.send(file);
+              }
+            : undefined
+        }
+      />
+      <UploadHost />
+      <AlertDialog
+        open={replacement !== null}
+        onOpenChange={(open) => {
+          if (!open) setReplacement(null);
+        }}
       >
-        <div className='flex min-w-0 items-center gap-3'>
-          {value == null ? (
-            <>
-              <ImageIcon
-                aria-hidden='true'
-                className='size-6 shrink-0 text-muted-foreground'
-              />
-              <span className='text-sm text-muted-foreground'>
-                {canUpload ? 'Drop an image here' : 'No image'}
-              </span>
-            </>
-          ) : (
-            <>
-              {missing ? (
-                <span className='flex size-16 shrink-0 items-center justify-center rounded border bg-muted/50'>
-                  <ImageOffIcon
-                    aria-hidden='true'
-                    className='size-6 text-muted-foreground'
-                  />
-                </span>
-              ) : (
-                <span
-                  style={checkerboardStyle}
-                  className='size-16 shrink-0 overflow-hidden rounded border'
-                >
-                  <img
-                    src={thumbnailSrc ?? undefined}
-                    alt={path === null ? '' : mediaNameOf(path)}
-                    hidden={loadedSrc !== thumbnailSrc}
-                    className='size-full object-cover'
-                    onLoad={() => setLoadedSrc(thumbnailSrc)}
-                    onError={() => path !== null && imageFailed(path)}
-                  />
-                </span>
+        <AlertDialogContent finalFocus={primaryRef}>
+          <AlertDialogHeader>
+            <AlertDialogTitle className='[overflow-wrap:anywhere]'>
+              {replaceQuestion(
+                path === null ? 'this value' : mediaNameOf(path)
               )}
-              <span
-                className='min-w-0 flex-1 truncate text-sm'
-                title={path ?? undefined}
-              >
-                {path === null
-                  ? 'Not a media path'
-                  : missing
-                    ? `${path} (missing)`
-                    : mediaNameOf(path)}
-              </span>
-            </>
-          )}
-        </div>
-        <div className='flex flex-wrap items-center gap-2'>
-          <Button
-            ref={mainButtonRef}
-            type='button'
-            variant='outline'
-            size='sm'
-            disabled={uploading}
-            onClick={choose}
-          >
-            {value == null ? 'Choose image' : 'Replace'}
-          </Button>
-          {canUpload ? (
-            <label className='inline-flex cursor-pointer'>
-              <input
-                type='file'
-                className='peer sr-only'
-                accept={inputAcceptOf(IMAGE_UPLOAD_RULES)}
-                disabled={uploading}
-                onChange={(event) => {
-                  const [file] = event.target.files ?? [];
-                  event.target.value = '';
-                  if (file) void upload(file);
-                }}
-              />
-              <span
-                className={cn(
-                  buttonVariants({ variant: 'ghost', size: 'sm' }),
-                  'peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50'
-                )}
-              >
-                {uploading ? 'Uploading…' : 'Upload'}
-                <CloudUploadIcon aria-hidden='true' className='size-4' />
-              </span>
-            </label>
-          ) : null}
-          {value == null || hasValidator(field, 'required') ? null : (
+            </AlertDialogTitle>
+            <AlertDialogDescription className='[overflow-wrap:anywhere]'>
+              {REPLACE_KEEPS_OLD_FILE}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogClose render={<Button variant='outline' />}>
+              Cancel
+            </AlertDialogClose>
             <Button
               type='button'
-              variant='ghost'
-              size='sm'
-              disabled={uploading}
+              variant='primary'
               onClick={() => {
-                setUploadError(null);
-                setValue(null);
+                const file = replacement;
+                setReplacement(null);
+                if (!file) return;
+                holdFocus();
+                upload.send(file);
               }}
             >
-              Clear
+              Replace
             </Button>
-          )}
-        </div>
-      </div>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Dialog open={picking} onOpenChange={setPicking}>
         <DialogContent
-          finalFocus={mainButtonRef}
-          className='flex h-[80vh] flex-col gap-0 p-0 sm:max-w-5xl'
+          finalFocus={primaryRef}
+          className='flex h-[80vh] flex-col gap-0 p-0 max-w-5xl'
         >
           <DialogHeader className='border-b px-4 py-3'>
             <DialogTitle>Choose an image</DialogTitle>
@@ -278,6 +210,6 @@ export function ImageField() {
           />
         </DialogContent>
       </Dialog>
-    </FieldWrapper>
+    </>
   );
 }

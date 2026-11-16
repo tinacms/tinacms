@@ -17,7 +17,7 @@ function SignInScreen({
   return (
     <main className='flex min-h-svh flex-col items-center justify-center gap-4 p-4'>
       <h1 className='text-lg font-semibold'>Sign in to TinaCMS</h1>
-      <Button onClick={signIn.run} disabled={signIn.pending}>
+      <Button variant='primary' onClick={signIn.run} disabled={signIn.pending}>
         Sign in
       </Button>
       {message ? (
@@ -44,7 +44,11 @@ function ForbiddenScreen({
         You are signed in as {user.name ?? user.email ?? user.id}, but this
         account cannot edit this project.
       </p>
-      <Button onClick={signOut.run} disabled={signOut.pending}>
+      <Button
+        variant='primary'
+        onClick={signOut.run}
+        disabled={signOut.pending}
+      >
         Sign out
       </Button>
       {signOut.error ? (
@@ -66,7 +70,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
         aria-label='Checking sign-in'
         className='flex min-h-svh items-center justify-center p-4'
       >
-        <Skeleton className='h-8 w-40' />
+        <Skeleton shape='block' className='h-8 w-40' />
       </div>
     );
   }

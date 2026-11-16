@@ -34,11 +34,11 @@ import { buttonVariants } from './button';
 import { Separator } from './separator';
 
 const popoverVariants = cva(
-  'z-[999999] w-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-hidden'
+  'z-[999999] w-auto rounded-sm border bg-popover p-1 text-popover-foreground shadow-md outline-hidden'
 );
 
 const inputVariants = cva(
-  'flex h-[28px] w-full rounded-md border-none bg-transparent px-1.5 py-1 text-base placeholder:text-muted-foreground focus-visible:ring-transparent focus-visible:outline-none md:text-sm'
+  'flex h-[28px] w-full rounded-sm border-none bg-transparent px-1.5 py-1 text-base placeholder:text-muted-foreground focus-visible:ring-transparent focus-visible:outline-none md:text-sm'
 );
 
 export function LinkFloatingToolbar({
@@ -125,7 +125,7 @@ export function LinkFloatingToolbar({
       {!isValidUrl && currentUrl && (
         <div className='absolute -top-16 left-0 right-0 z-[1000000] mb-2'>
           <div
-            className='bg-red-50 border border-red-200 rounded-md p-2 shadow-lg'
+            className='bg-red-50 border border-red-200 rounded-sm p-2 shadow-lg'
             role='alert'
             aria-live='polite'
           >

@@ -12,6 +12,9 @@
             "name": "trimTitle"
           },
           {
+            "name": "slug"
+          },
+          {
             "name": "logSave",
             "args": [
               "saved"
@@ -37,6 +40,17 @@
             "type": "string"
           },
           {
+            "name": "slug",
+            "label": "Slug",
+            "description": "Filled in from the title when you save",
+            "type": "string"
+          },
+          {
+            "name": "legacyId",
+            "hidden": true,
+            "type": "string"
+          },
+          {
             "name": "featured",
             "label": "Featured",
             "type": "boolean"
@@ -44,7 +58,17 @@
           {
             "name": "heroImage",
             "label": "Hero image",
+            "cover": "wide",
             "type": "image"
+          },
+          {
+            "name": "gallery",
+            "label": "Gallery",
+            "of": {
+              "name": "image",
+              "type": "image"
+            },
+            "type": "array"
           },
           {
             "name": "stars",
@@ -70,6 +94,9 @@
           {
             "name": "authors",
             "label": "Authors",
+            "defaultItem": {
+              "name": "New author"
+            },
             "fields": [
               {
                 "name": "name",
@@ -174,6 +201,7 @@
           {
             "name": "blocks",
             "label": "Blocks",
+            "picker": "grid",
             "templates": [
               {
                 "name": "hero",
@@ -181,6 +209,7 @@
                 "defaultItem": {
                   "headline": "A new hero"
                 },
+                "previewImage": "posts/llama.avif",
                 "fields": [
                   {
                     "name": "headline",
@@ -216,6 +245,7 @@
                   {
                     "name": "link",
                     "label": "Link",
+                    "defaultValue": "/docs",
                     "type": "string"
                   }
                 ]

@@ -1,5 +1,5 @@
-import type { z } from 'zod';
 import { AuthError, type AuthSlice } from '../../../core/auth/contract';
+import { invariant } from '../../../core/invariant';
 import type { SliceSet } from '../../../core/plugin';
 import { isRecord } from '../../../utils/is-record';
 import {
@@ -12,14 +12,11 @@ import {
   type TinaCloudLoginMessage,
   authConfigSchema,
   codeResponseSchema,
-  currentUserSchema,
-  currentUserUrl,
   jwtPayloadSchema,
   loginMessageSchema,
-  projectRolesSchema,
-  projectUrl,
   refreshResponseSchema,
 } from './tinacloud-auth-types';
+import { fetchProjectIdentity, send } from './identity';
 import { openCenteredPopup, waitForPopupMessage } from './popup';
 import {
   type RedirectResult,
@@ -64,61 +61,6 @@ const toTokens = (
   refreshToken,
   expiresAt: expiryOf(accessToken),
 });
-
-const send = async (
-  url: string,
-  init: RequestInit
-): Promise<{ response: Response; body: unknown }> => {
-  let response: Response;
-  try {
-    response = await fetch(url, init);
-  } catch (cause) {
-    if (cause instanceof Error) {
-      throw new AuthError('network', cause.message);
-    }
-    throw new AuthError('network', String(cause));
-  }
-  let body: unknown = null;
-  try {
-    body = await response.json();
-  } catch {
-    body = null;
-  }
-  return { response, body };
-};
-
-const fetchIdentity = async <Output>(
-  url: string,
-  bearer: string,
-  schema: z.ZodType<Output, z.ZodTypeDef, unknown>
-): Promise<Output> => {
-  const { response, body } = await send(url, {
-    headers: { Authorization: `Bearer ${bearer}` },
-  });
-  if (response.status === 401) {
-    throw new AuthError('unauthenticated', 'TinaCloud refused the session.');
-  }
-  if (response.status === 403) {
-    throw new AuthError(
-      'no-access',
-      'TinaCloud refused access to the project.'
-    );
-  }
-  if (!response.ok) {
-    throw new AuthError(
-      'network',
-      `TinaCloud responded with ${response.status}.`
-    );
-  }
-  const parsed = schema.safeParse(body);
-  if (!parsed.success) {
-    throw new AuthError(
-      'invalid-response',
-      `TinaCloud returned ${url} in an unknown format.`
-    );
-  }
-  return parsed.data;
-};
 
 const refreshTokens = async (
   clientId: string,
@@ -272,6 +214,7 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
   let tokens: TinaCloudTokens | undefined;
   let refreshing: Promise<TinaCloudTokens> | undefined;
   let set: SliceSet | undefined;
+  let mounted = false;
   let signOuts = 0;
 
   const signOut = () => {
@@ -302,34 +245,29 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     }
   };
 
-  // The account-wide TinaCloud token, sent to TinaCloud only and never to the site.
   const tinaCloudToken = async (): Promise<string | undefined> => {
+    invariant(
+      mounted,
+      'tinacloud-auth-overridden',
+      'Another plugin overrides `auth`, so no one signs in to TinaCloud and ' +
+        "tinaCloud()'s content and media cannot reach it. Remove the override, " +
+        'or replace content and media with plugins that use your auth.'
+    );
     if (!tokens) return undefined;
     return (await freshTokens(tokens))?.bearer;
   };
 
   const signInWith = async (next: TinaCloudTokens, signOutsAtStart: number) => {
-    const { user, active } = await fetchIdentity(
-      currentUserUrl(clientId),
-      next.bearer,
-      currentUserSchema
-    );
-    const roles = active
-      ? await fetchIdentity(
-          projectUrl(clientId),
-          next.bearer,
-          projectRolesSchema
-        )
-      : [];
+    const identity = await fetchProjectIdentity(clientId, next.bearer);
     if (signOuts !== signOutsAtStart) return;
     refreshing = undefined;
-    if (!active) {
+    if (!identity.active) {
       tokens = undefined;
-      set?.({ status: 'forbidden', user });
+      set?.({ status: 'forbidden', user: identity.user });
       return;
     }
     tokens = next;
-    set?.({ status: 'signed-in', user, roles });
+    set?.({ status: 'signed-in', user: identity.user, roles: identity.roles });
   };
 
   // Fetched ahead of the click, so the popup opens within its user gesture.
@@ -387,13 +325,14 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
 
   const slice = (sliceSet: SliceSet): AuthSlice => {
     set = sliceSet;
+    mounted = true;
     void prefetchWorkosEnabled().catch(() => {});
     const redirect = redirectTokens(clientId);
     if (redirect) void finishRedirectSignIn(redirect);
     return {
       status: redirect ? 'loading' : 'signed-out',
       user: null,
-      getToken: async () => undefined,
+      getToken: tinaCloudToken,
       login,
       logout,
     };

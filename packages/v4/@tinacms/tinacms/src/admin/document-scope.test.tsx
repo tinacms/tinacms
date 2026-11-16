@@ -1,9 +1,15 @@
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { Toaster } from '@tinacms/ui/components/sonner';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { ContentProvider, DocumentEntry } from '../core/content/contract';
+import {
+  defineHook,
+  defineHooksPlugin,
+  defineServerHook,
+} from '../core/form/hooks';
 import { definePlugin } from '../core/plugin';
 import type { CollectionSchema } from '../core/schema/types';
 import { contentKeys, useDocument } from '../editor/content-queries';
@@ -35,28 +41,26 @@ const providerReading = (read: ContentProvider['get']): ContentProvider => ({
   }),
 });
 
-const configReading = (read: ContentProvider['get']) => {
-  const provider = providerReading(read);
-  return asResolvedConfig({
-    plugins: [
-      definePlugin({
-        name: 'test:content',
-        provides: ['content'],
-        client: async () => ({
-          default: {
-            slice: () => ({
-              list: provider.list,
-              get: provider.get,
-              update: provider.update,
-            }),
-          },
+const contentPlugin = (provider: ContentProvider) =>
+  definePlugin({
+    name: 'test:content',
+    provides: ['content'],
+    client: async () => ({
+      default: {
+        slice: () => ({
+          list: provider.list,
+          get: provider.get,
+          update: provider.update,
         }),
-      }),
-      stringFieldPlugin,
-    ],
+      },
+    }),
+  });
+
+const configReading = (read: ContentProvider['get']) =>
+  asResolvedConfig({
+    plugins: [contentPlugin(providerReading(read)), stringFieldPlugin],
     schema: { collections: [collection] },
   });
-};
 
 const config = configReading(async () => ON_LOAD);
 
@@ -99,21 +103,21 @@ describe('DocumentScope on a document that changed after it opened', () => {
   it('takes the newer content into a form with no edits', async () => {
     const queryClient = makeQueryClient();
     render(host(queryClient));
-    expect(await screen.findByLabelText('Title')).toHaveValue('Hello');
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello');
 
     writeDiskChange(queryClient);
     await waitFor(() =>
       expect(screen.getByTestId('cached')).toHaveTextContent('Changed on disk')
     );
 
-    expect(screen.getByLabelText('Title')).toHaveValue('Changed on disk');
+    expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Changed on disk');
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
   });
 
   it('keeps the unsaved edits of a dirty form', async () => {
     const queryClient = makeQueryClient();
     render(host(queryClient));
-    await userEvent.type(await screen.findByLabelText('Title'), '!');
+    await userEvent.type(await screen.findByLabelText(/^Title\b/), '!');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
 
     writeDiskChange(queryClient);
@@ -140,7 +144,7 @@ describe('DocumentScope on a document the data layer cannot give', () => {
     await waitFor(() =>
       expect(screen.getByTestId('cached')).toBeEmptyDOMElement()
     );
-    expect(screen.queryByLabelText('Title')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Title\b/)).not.toBeInTheDocument();
   });
 
   it('opens no form when the read fails', async () => {
@@ -157,6 +161,78 @@ describe('DocumentScope on a document the data layer cannot give', () => {
     await waitFor(() =>
       expect(screen.getByTestId('cached')).toBeEmptyDOMElement()
     );
-    expect(screen.queryByLabelText('Title')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Title\b/)).not.toBeInTheDocument();
   });
+});
+
+describe('DocumentScope on a collection with a server hook', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it.each([
+    [
+      'a server hook rejects with',
+      422,
+      'hook-rejected',
+      'Only admins can publish',
+      "Couldn't save. A save hook rejected this save.",
+    ],
+    [
+      'the Data Layer refuses a write with',
+      400,
+      'write-refused',
+      'Repair the file, then save again.',
+      "Couldn't save. The file couldn't be written to disk.",
+    ],
+  ])(
+    'shows fixed words, not the text %s, and keeps the form dirty',
+    async (_, status, code, message, words) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () =>
+          Response.json({ error: { code, message } }, { status })
+        )
+      );
+      const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const guard = defineHook('guard', {
+        server: async () => ({ default: defineServerHook(() => ({})) }),
+      });
+      const guarded: CollectionSchema = { ...collection, hooks: [guard()] };
+      const provider = providerReading(async () => ON_LOAD);
+      const update = vi.spyOn(provider, 'update');
+      const guardedConfig = asResolvedConfig({
+        plugins: [
+          contentPlugin(provider),
+          stringFieldPlugin,
+          defineHooksPlugin('test:hooks', [guard]),
+        ],
+        schema: { collections: [guarded] },
+      });
+      render(
+        <TinaProvider config={guardedConfig} queryClient={makeQueryClient()}>
+          <DocumentScope collection={guarded} path={path}>
+            <DocumentForm />
+          </DocumentScope>
+          <StatusProbe />
+          <Toaster />
+        </TinaProvider>
+      );
+      await userEvent.type(await screen.findByLabelText(/^Title\b/), '!');
+
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+      const alert = await screen.findByRole('alert');
+      expect(alert).toHaveTextContent(words);
+      expect(alert).not.toHaveTextContent(message);
+      expect(
+        JSON.stringify(logged.mock.calls, (_, v) => {
+          if (v instanceof Error) return v.message;
+          return v;
+        })
+      ).toContain(message);
+      expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+      expect(update).not.toHaveBeenCalled();
+    }
+  );
 });

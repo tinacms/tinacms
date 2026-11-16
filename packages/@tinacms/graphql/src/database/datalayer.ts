@@ -97,6 +97,10 @@ const parseDatetimeUTC = (value: unknown): string => {
   return Number.isNaN(d.getTime()) ? String(value) : d.toISOString();
 };
 
+// YAML and TOML parse an unquoted date into a Date, whatever the field's type.
+const dateToISOString = (value: unknown): unknown =>
+  value instanceof Date ? value.toISOString() : value;
+
 const padValue = (val: any, pad: PadDefinition): string => {
   if (pad.decimalPrecision !== undefined) {
     const n = Number(val);
@@ -180,7 +184,10 @@ const makeKeyForField = <T extends object>(
         resolvedValue = parseDatetimeUTC(rawValue);
       } else {
         if (field.type === 'string') {
-          const escapedString = stringEscaper(rawValue as string | string[]);
+          const stringValue = Array.isArray(rawValue)
+            ? rawValue.map(dateToISOString)
+            : dateToISOString(rawValue);
+          const escapedString = stringEscaper(stringValue as string | string[]);
           if (Array.isArray(escapedString)) {
             resolvedValue = escapedString
               .sort()
@@ -647,6 +654,19 @@ export const makeFilterSuffixes = (
       }
     }
 
+    if (
+      orderedFilterChain.length < indexFields.length &&
+      !index.fields
+        .slice(0, orderedFilterChain.length)
+        .some((field) => field.list)
+    ) {
+      const prefix = baseFragments.join(INDEX_KEY_FIELD_SEPARATOR);
+      return {
+        left: prefix,
+        right: prefix,
+      };
+    }
+
     return {
       left:
         (leftSuffix &&
@@ -746,10 +766,7 @@ export const makeFolderOpsForCollection = <T extends object>(
     let folderSortingIdx = 0;
     for (const path of Array.from(folder).sort()) {
       for (const [sort] of Object.entries(indexDefinitions)) {
-        const indexSublevel = folderCollectionSublevel.sublevel(
-          sort,
-          SUBLEVEL_OPTIONS
-        );
+        const indexSublevel = makeIndexSublevel(folderCollectionSublevel, sort);
         const subFolderKey = sha.hex(path);
         if (sort === DEFAULT_COLLECTION_SORT_KEY) {
           result.push({
@@ -794,6 +811,11 @@ export const makeFolderOpsForCollection = <T extends object>(
   return result;
 };
 
+// Every write, read and delete sweep of a sort index goes through here, so all
+// of them address the same sublevel.
+export const makeIndexSublevel = (collectionSublevel: Level, sort: string) =>
+  collectionSublevel.sublevel(sort, SUBLEVEL_OPTIONS);
+
 export const makeIndexOpsForDocument = <T extends object>(
   filepath: string,
   collection: string | undefined,
@@ -809,7 +831,7 @@ export const makeIndexOpsForDocument = <T extends object>(
     const collectionSublevel = level.sublevel(collection, SUBLEVEL_OPTIONS);
     for (const [sort, definition] of Object.entries(indexDefinitions)) {
       const indexedValue = makeKeyForField<T>(definition, data, escapeStr);
-      const indexSublevel = collectionSublevel.sublevel(sort, SUBLEVEL_OPTIONS);
+      const indexSublevel = makeIndexSublevel(collectionSublevel, sort);
       if (sort === DEFAULT_COLLECTION_SORT_KEY) {
         result.push({
           type: opType,
@@ -868,9 +890,10 @@ export const makeRefOpsForDocument = <T extends object>(
   );
 
   for (const [target, entries] of byCollection) {
-    const refSublevel = level
-      .sublevel(target, SUBLEVEL_OPTIONS)
-      .sublevel(REFS_COLLECTIONS_SORT_KEY, SUBLEVEL_OPTIONS);
+    const refSublevel = makeIndexSublevel(
+      level.sublevel(target, SUBLEVEL_OPTIONS),
+      REFS_COLLECTIONS_SORT_KEY
+    );
     for (const { ref, locator } of entries) {
       result.push({
         type: opType,

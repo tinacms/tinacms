@@ -26,7 +26,7 @@ export default defineConfig({
         format: 'mdx',
         fields: [
           t.string({ name: 'title', label: 'Title', required: true }),
-          t.string({ name: 'body', label: 'Body', ui: { component: 'rich-text' } }),
+          t.richText({ name: 'body', label: 'Body' }),
           t.string({ name: 'author' }),
         ],
       }),

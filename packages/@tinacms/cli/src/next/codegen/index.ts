@@ -303,6 +303,24 @@ import type { TinaClient } from "tinacms/dist/client";
 import { queries } from "./types.js";
 import database from "../database";
 
+function toPlain(value) {
+  if (Array.isArray(value)) {
+    return value.map(toPlain);
+  }
+  if (value === null || typeof value !== "object") {
+    return value;
+  }
+  const proto = Object.getPrototypeOf(value);
+  if (proto !== null && proto !== Object.prototype) {
+    return value;
+  }
+  const out = {};
+  for (const key of Object.keys(value)) {
+    out[key] = toPlain(value[key]);
+  }
+  return out;
+}
+
 export async function databaseRequest({ query, variables, user, isSignIn }) {
   const result = await resolve({
     config: {
@@ -316,7 +334,7 @@ export async function databaseRequest({ query, variables, user, isSignIn }) {
     isSignIn,
   });
 
-  return result;
+  return toPlain(result);
 }
 
 export async function authenticate({ username, password }) {

@@ -48,6 +48,24 @@ const row = {
   fields: [{ name: 'cols', type: 'object', list: true, templates: { column } }],
 };
 
+const hero = {
+  name: 'hero',
+  label: 'Hero',
+  fields: [
+    { name: 'title', type: 'string' },
+    {
+      name: 'actions',
+      label: 'Actions',
+      type: 'object',
+      list: true,
+      fields: [
+        { name: 'label', type: 'string' },
+        { name: 'link', type: 'string' },
+      ],
+    },
+  ],
+};
+
 const band = {
   name: 'band',
   label: 'Band',
@@ -65,7 +83,7 @@ const makeForm = () =>
         label: 'Page Blocks',
         type: 'object',
         list: true,
-        templates: { band, row, content: text, accordion },
+        templates: { band, row, content: text, accordion, hero },
       } as any,
     ],
     initialValues: {
@@ -88,11 +106,17 @@ const makeForm = () =>
             },
           ],
         },
+        {
+          _template: 'hero',
+          title: 'Get Started',
+          actions: [{ label: 'Sign Up', link: '/signup' }],
+        },
       ],
     },
   });
 
 const ACCORDION = 'blocks.2.cols.0.blocks.1';
+const HERO = 'blocks.3';
 
 describe('getActiveField within a nested list sharing the root list name', () => {
   it('names the fields of the item a path ends on', () => {
@@ -112,6 +136,25 @@ describe('getActiveField within a nested list sharing the root list name', () =>
     expect(group.fields.map((field) => field.name)).toEqual([
       `${ACCORDION}.title`,
       `${ACCORDION}.blocks`,
+    ]);
+  });
+
+  it('names the parent fields when the path ends on an object list with fields', () => {
+    const group = makeForm().getActiveField(`${HERO}.actions`);
+
+    expect(group.label).toBe('Hero');
+    expect(group.fields.map((field) => field.name)).toEqual([
+      `${HERO}.title`,
+      `${HERO}.actions`,
+    ]);
+  });
+
+  it('names item fields when targeting a specific item in an object list with fields', () => {
+    const group = makeForm().getActiveField(`${HERO}.actions.0`);
+
+    expect(group.fields.map((field) => field.name)).toEqual([
+      `${HERO}.actions.0.label`,
+      `${HERO}.actions.0.link`,
     ]);
   });
 

@@ -7,9 +7,6 @@ import {
   ClapperboardIcon,
   CopyIcon,
   FileIcon,
-  TextCursorInputIcon,
-  Trash2Icon,
-  XIcon,
 } from 'lucide-react';
 import { absoluteUrlOf, isImage, isVideo, mediaNameOf } from './media-types';
 
@@ -45,7 +42,7 @@ function CopyField({ value }: { value: string }) {
       <button
         type='button'
         disabled={copied}
-        className='relative flex w-full items-center gap-1.5 overflow-hidden rounded-lg border bg-muted/50 px-3 py-2 text-left text-sm break-all transition hover:bg-background hover:text-primary disabled:pointer-events-none'
+        className='relative flex w-full items-center gap-1.5 overflow-hidden rounded-sm border bg-muted/50 px-3 py-2 text-left text-sm break-all transition hover:bg-background hover:text-primary disabled:pointer-events-none'
         onClick={copy}
       >
         <CopyIcon className='size-4 shrink-0 text-primary' />
@@ -74,15 +71,11 @@ export function MediaPreview({
   resolveUrl,
   onClose,
   onInsert,
-  onRename,
-  onDelete,
 }: {
   item: MediaItem;
   resolveUrl: (path: string, options?: MediaUrlOptions) => string;
   onClose: () => void;
-  onInsert: ((item: MediaItem) => void) | null;
-  onRename: (() => void) | null;
-  onDelete: (() => void) | null;
+  onInsert: (item: MediaItem) => void;
 }) {
   const name = mediaNameOf(item.path);
   const Icon = isVideo(name) ? ClapperboardIcon : FileIcon;
@@ -97,46 +90,31 @@ export function MediaPreview({
         </h3>
         <Button
           type='button'
-          variant='ghost'
-          size='icon-sm'
+          variant='icon'
+          size='sm'
+          icon='close'
           aria-label='Close details'
           onClick={onClose}
-        >
-          <XIcon className='size-4' />
-        </Button>
+        />
       </div>
       {isImage(name) ? (
         <img
           src={resolveUrl(item.path, { width: 1000, height: 1000 })}
           alt={name}
           style={checkerboardStyle}
-          className='m-auto block max-h-[50vh] max-w-full rounded border object-contain shadow'
+          className='m-auto block max-h-[50vh] max-w-full rounded-sm border object-contain shadow'
         />
       ) : (
-        <span className='rounded border bg-muted/50 p-3 shadow'>
+        <span className='rounded-sm border bg-muted/50 p-3 shadow'>
           <Icon className='size-14 text-muted-foreground' />
         </span>
       )}
       <CopyField value={absoluteUrlOf(resolveUrl(item.path))} />
       <div className='mt-auto flex w-full flex-wrap gap-2'>
-        {onInsert ? (
-          <Button type='button' onClick={() => onInsert(item)}>
-            <ArrowDownToLineIcon className='size-4' />
-            Insert
-          </Button>
-        ) : null}
-        {onRename ? (
-          <Button type='button' variant='outline' onClick={onRename}>
-            <TextCursorInputIcon className='size-4' />
-            Rename
-          </Button>
-        ) : null}
-        {onDelete ? (
-          <Button type='button' variant='destructive' onClick={onDelete}>
-            <Trash2Icon className='size-4' />
-            Delete
-          </Button>
-        ) : null}
+        <Button variant='primary' type='button' onClick={() => onInsert(item)}>
+          <ArrowDownToLineIcon className='size-4' />
+          Insert
+        </Button>
       </div>
     </aside>
   );

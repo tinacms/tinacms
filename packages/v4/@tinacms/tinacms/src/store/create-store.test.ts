@@ -311,7 +311,12 @@ describe('createTinaStore persistence round-trip', () => {
 
     const rebooted = get(boot());
     expect(rebooted.ui).toEqual({ theme: 'dark' });
-    expect(rebooted.branch).toEqual({ current: 'feat' });
+    expect(rebooted.branch).toMatchObject({
+      current: 'feat',
+      list: [],
+      protected: [],
+    });
+    expect(rebooted.branch.switchTo).toBeTypeOf('function');
     expect(rebooted.documents).toEqual({});
     expect(rebooted.media).toEqual({ items: [] });
   });

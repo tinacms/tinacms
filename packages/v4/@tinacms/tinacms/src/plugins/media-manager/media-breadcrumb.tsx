@@ -1,5 +1,5 @@
+import { Breadcrumb } from '@tinacms/ui/components/breadcrumb';
 import { Button } from '@tinacms/ui/components/button';
-import { ArrowLeftIcon } from 'lucide-react';
 
 export function MediaBreadcrumb({
   folder,
@@ -9,48 +9,32 @@ export function MediaBreadcrumb({
   onOpen: (folder: string) => void;
 }) {
   const parts = folder ? folder.split('/') : [];
+  const open = (depth: number) => () => onOpen(parts.slice(0, depth).join('/'));
   return (
-    <nav
-      aria-label='Media folders'
-      className='flex min-w-0 flex-wrap items-center gap-1'
-    >
+    <div className='flex min-w-0 items-center gap-1'>
       {parts.length > 0 ? (
         <Button
-          type='button'
-          variant='ghost'
-          size='icon-sm'
+          variant='icon'
+          size='sm'
+          icon='arrow-left'
           aria-label='Parent folder'
-          onClick={() => onOpen(parts.slice(0, -1).join('/'))}
-        >
-          <ArrowLeftIcon className='size-4' />
-        </Button>
+          onClick={open(parts.length - 1)}
+        />
       ) : null}
-      <Button
-        type='button'
-        variant='ghost'
+      <Breadcrumb
+        aria-label='Media folders'
         size='sm'
-        aria-current={parts.length === 0 ? 'page' : undefined}
-        onClick={() => onOpen('')}
-      >
-        Media
-      </Button>
-      {parts.map((part, index) => (
-        <span key={parts.slice(0, index + 1).join('/')} className='contents'>
-          <span aria-hidden='true' className='text-muted-foreground'>
-            /
-          </span>
-          <Button
-            type='button'
-            variant='ghost'
-            size='sm'
-            className='capitalize'
-            aria-current={index === parts.length - 1 ? 'page' : undefined}
-            onClick={() => onOpen(parts.slice(0, index + 1).join('/'))}
-          >
-            {part}
-          </Button>
-        </span>
-      ))}
-    </nav>
+        items={[
+          {
+            label: 'Media',
+            onClick: parts.length > 0 ? open(0) : undefined,
+          },
+          ...parts.map((part, index) => ({
+            label: part,
+            onClick: index < parts.length - 1 ? open(index + 1) : undefined,
+          })),
+        ]}
+      />
+    </div>
   );
 }

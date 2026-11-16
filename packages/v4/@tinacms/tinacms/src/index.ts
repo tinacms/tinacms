@@ -21,11 +21,14 @@ export {
   toUserId,
   type UserId,
 } from './core/auth/contract';
-export type {
-  ContentProvider,
-  ContentSlice,
-  DocumentEntry,
-  DocumentSummary,
+export {
+  ContentError,
+  type ContentErrorCode,
+  type ContentFieldErrors,
+  type ContentProvider,
+  type ContentSlice,
+  type DocumentEntry,
+  type DocumentSummary,
 } from './core/content/contract';
 export {
   type MediaFeatures,
@@ -38,10 +41,23 @@ export {
   type MediaErrorCode,
   type MediaSlice,
   type MediaStatus,
+  type MediaUploadOptions,
   type MediaUrlOptions,
   type ResolveMediaUrl,
 } from './core/media/contract';
 export { resolveMediaUrl } from './core/media/resolve-media-url';
+export {
+  SearchError,
+  type SearchErrorCode,
+  type SearchHit,
+  type SearchProvider,
+  type SearchQuery,
+  type SearchRef,
+} from './core/search/contract';
+export {
+  defineSearchPlugin,
+  searchIndex,
+} from './plugins/search/search.plugin';
 export type { AdminScreen, AdminScreenProps } from './core/screen/contract';
 export {
   type Capability,
@@ -85,9 +101,11 @@ export {
   v,
 } from './plugins/fields';
 export type {
+  ArrayTemplateSchema,
   BooleanFieldSchema,
   DatetimeFieldSchema,
   NumberFieldSchema,
+  ObjectDisplay,
   RichTextFieldSchema,
   RichTextTemplate,
   StringFieldSchema,

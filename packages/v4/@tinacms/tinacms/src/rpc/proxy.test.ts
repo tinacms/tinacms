@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { definePlugin } from '../core/plugin';
 import { defineServerPlugin, publicOp } from '../server';
 import { createRpcHandler } from './handler';
-import { RpcError, createRpcClient } from './proxy';
+import { RpcError, type RpcProxy, createRpcClient } from './proxy';
 
 const searchOps = defineServerPlugin({
   query: publicOp(async (input: { q: string }) => ({ hits: [input.q] })),
@@ -75,5 +75,19 @@ describe('createRpcClient', () => {
     });
     await spying.search.query({ q: 'x' });
     expect(seenAuthorization).toBe('Bearer session-token');
+  });
+});
+
+describe('RpcProxy', () => {
+  it('has no key for the reserved hooks of a server segment', () => {
+    const segment = defineServerPlugin({
+      hooks: {},
+      update: async (input: { id: string }) => input.id,
+    });
+    type ContentOps = keyof RpcProxy<{ content: typeof segment }>['content'];
+    const routed: ContentOps = 'update';
+    // @ts-expect-error `hooks` never routes, so the proxy does not offer it
+    const reserved: ContentOps = 'hooks';
+    expect([routed, reserved]).toEqual(['update', 'hooks']);
   });
 });

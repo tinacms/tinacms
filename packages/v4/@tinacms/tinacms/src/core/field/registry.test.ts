@@ -115,11 +115,11 @@ describe('resolveClientSegments', () => {
     ).rejects.toThrow(/no client segment to render it/);
   });
 
-  it('throws when a plugin declares hooks but has no client segment', async () => {
+  it('throws when a plugin declares hooks but has no client or server segment', async () => {
     await expect(
       resolveClientSegments([
         definePlugin({ name: 'x', provides: ['hooks'], hooks: ['x'] }),
       ])
-    ).rejects.toThrow(/no client segment/);
+    ).rejects.toThrow(/no client or server segment/);
   });
 });

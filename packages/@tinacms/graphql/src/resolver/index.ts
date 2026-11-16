@@ -1797,6 +1797,10 @@ export class Resolver {
           accum[fieldName] = fieldValue;
           break;
         case 'image':
+          // Leaving the key out also clears it on update: the document is rewritten in full.
+          if (!field.required && !field.list && !fieldValue) {
+            break;
+          }
           accum[fieldName] = resolveMediaCloudToRelative(
             fieldValue as string,
             this.config,

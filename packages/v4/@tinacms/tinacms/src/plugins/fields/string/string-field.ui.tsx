@@ -1,29 +1,35 @@
-import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { Input } from '@tinacms/ui/components/input';
 import { useRef } from 'react';
 import {
   useFieldActivation,
   useFieldAddress,
-  useFieldErrors,
+  useFieldFrame,
+  useFieldSchema,
   useFieldValue,
 } from '../../../editor';
+import type { StringFieldSchema } from './string-field.schema';
+import { StringFieldView } from './string-field.view';
 
 export function StringField() {
   const address = useFieldAddress();
+  const { multiline, mono, placeholder } = useFieldSchema<StringFieldSchema>();
   const [value, setValue] = useFieldValue<string>(address);
-  const errors = useFieldErrors(address);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const frame = useFieldFrame();
+  const boxRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
 
-  useFieldActivation(() => inputRef.current?.focus());
+  useFieldActivation(() => boxRef.current?.focus());
 
   return (
-    <FieldWrapper errors={errors}>
-      <Input
-        ref={inputRef}
-        id={address}
-        value={value ?? ''}
-        onChange={(event) => setValue(event.target.value)}
-      />
-    </FieldWrapper>
+    <StringFieldView
+      {...frame}
+      ref={(box) => {
+        boxRef.current = box;
+      }}
+      id={address}
+      value={value ?? ''}
+      onChange={setValue}
+      multiline={multiline}
+      mono={mono}
+      placeholder={placeholder}
+    />
   );
 }

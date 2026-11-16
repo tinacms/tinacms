@@ -63,7 +63,7 @@ const renderBody = (markdown: string) =>
 describe('RichTextField rendering', () => {
   it('mounts the editor and shows the stored prose', async () => {
     renderBody('# Heading\n\nSome prose.\n');
-    const editable = await screen.findByLabelText('Body');
+    const editable = await screen.findByLabelText(/^Body\b/);
     expect(editable).toHaveAttribute('role', 'textbox');
     expect(editable).toHaveTextContent('Heading');
     expect(editable).toHaveTextContent('Some prose.');
@@ -86,7 +86,7 @@ describe('RichTextField rendering', () => {
         </FormProvider>
       </TinaProvider>
     );
-    const editable = await screen.findByLabelText('Body');
+    const editable = await screen.findByLabelText(/^Body\b/);
     expect(editable).toHaveTextContent('Callout');
   });
 });

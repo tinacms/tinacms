@@ -145,6 +145,9 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
       gfmToMarkdown(),
     ],
     listItemIndent: 'one',
+    // Setting these replaces the `<!---->` separator between same-kind lists, which MDX rejects.
+    bulletOther: '-',
+    bulletOrderedOther: ')',
     handlers,
   });
 };
@@ -359,6 +362,12 @@ export const blockElement = (
       );
   }
 };
+// The editor can leave a bare text node (e.g. an empty bullet) directly in an `li`.
+const isText = (node: unknown): node is Plate.TextElement =>
+  typeof node === 'object' &&
+  node !== null &&
+  typeof (node as { text?: unknown }).text === 'string';
+
 const listItemElement = (
   content: Plate.ListItemElement,
   field: RichTextField,
@@ -377,6 +386,12 @@ const listItemElement = (
         return {
           type: 'paragraph',
           children: eat(child.children, field, imageCallback),
+        };
+      }
+      if (isText(child)) {
+        return {
+          type: 'paragraph',
+          children: eat([child], field, imageCallback),
         };
       }
       return blockContentElement(child, field, imageCallback);

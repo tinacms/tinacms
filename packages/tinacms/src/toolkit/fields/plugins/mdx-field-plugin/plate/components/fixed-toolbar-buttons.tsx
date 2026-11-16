@@ -30,6 +30,7 @@ import {
   HighlightToolbarButton,
   ItalicToolbarButton,
   StrikethroughToolbarButton,
+  TextColorToolbarButton,
 } from './plate-ui/mark-toolbar-button';
 import { TablePlugin } from '@udecode/plate-table/react';
 import {
@@ -102,6 +103,11 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Highlight',
     width: () => STANDARD_ICON_WIDTH,
     Component: <HighlightToolbarButton />,
+  },
+  textColor: {
+    label: 'Text Color',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <TextColorToolbarButton />,
   },
   italic: {
     label: 'Italic',

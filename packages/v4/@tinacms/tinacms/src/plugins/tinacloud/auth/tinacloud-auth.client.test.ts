@@ -43,7 +43,7 @@ const boot = () => {
     );
   });
   Object.assign(state, slice);
-  return { slice, state, tinaCloudToken: auth.tinaCloudToken };
+  return { slice, state, tinaCloudToken: slice.getToken };
 };
 
 const signIn = async (tokens = loginTokens()) => {
@@ -428,8 +428,8 @@ describe('TinaCloud redirect sign-in', () => {
   const currentPath = () =>
     `${window.location.pathname}${window.location.search}${window.location.hash}`;
 
-  const signedInTokens = () =>
-    json({ access_token: jwtExpiringIn(3600), refresh_token: 'refresh' });
+  const signedInTokens = (accessToken = jwtExpiringIn(3600)) =>
+    json({ access_token: accessToken, refresh_token: 'refresh' });
 
   it('redirects to the WorkOS sign-in instead of opening the popup', async () => {
     stubFetch((url) => tinaCloudIdentity(url, { workosEnabled: true }));
@@ -472,8 +472,9 @@ describe('TinaCloud redirect sign-in', () => {
   });
 
   it('signs in with the code TinaCloud returns, keeping no token in storage', async () => {
+    const accessToken = jwtExpiringIn(3600);
     const fetchMock = stubFetch((url) =>
-      url === TOKEN_URL ? signedInTokens() : tinaCloudIdentity(url)
+      url === TOKEN_URL ? signedInTokens(accessToken) : tinaCloudIdentity(url)
     );
     returnFromTinaCloud('code=the-code&state=the-state');
 
@@ -495,7 +496,7 @@ describe('TinaCloud redirect sign-in', () => {
     expect(state).toMatchObject({ user: { id: 'ada' }, roles: ['admin'] });
     expect(sessionStorage.length).toBe(0);
     expect(localStorage.length).toBe(0);
-    expect(await tinaCloudToken()).toBe(jwtExpiringIn(3600));
+    expect(await tinaCloudToken()).toBe(accessToken);
   });
 
   it('shares one code exchange when StrictMode boots the admin twice', async () => {

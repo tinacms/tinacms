@@ -63,7 +63,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
   const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem;
 
   return (
-    <div className='rounded-md'>
+    <div className='rounded-sm'>
       <DropdownMenu modal={false} {...openState} {...props}>
         <DropdownMenuTrigger asChild>
           <ToolbarButton
@@ -80,7 +80,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
 
         <DropdownMenuContent
           align='start'
-          className='min-w-0 rounded-none rounded-bl rounded-br border-border'
+          className='min-w-0 rounded-none rounded-bl-sm rounded-br-sm border-border'
         >
           <DropdownMenuRadioGroup
             className='flex flex-col gap-0.5'

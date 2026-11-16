@@ -7,6 +7,7 @@ import {
   definePlugin,
   resolveClientSegments,
 } from '../plugin';
+import { resolveServerSegments } from '../resolve';
 import type { TinaDocument } from '../schema/types';
 import {
   type FormHookFactory,
@@ -14,11 +15,13 @@ import {
   createFormHookRegistry,
   defineHook,
   defineHooksPlugin,
+  defineServerHook,
   resolveFormHooks,
   runAfterSave,
   runBeforeSave,
   runOnChange,
 } from './hooks';
+import { createServerHookRegistry } from './server-hooks';
 
 const scope = {
   formId: toFormId('content/posts/a.mdx'),
@@ -301,5 +304,95 @@ describe('defineHooksPlugin', () => {
       title: 'x',
       trail: 'ab',
     });
+  });
+});
+
+describe('defineHook with a server side', () => {
+  const server = async () => ({
+    default: defineServerHook((prefix: string) => ({
+      beforeSave: (document, { session }) => ({
+        ...document,
+        by: `${prefix}${session?.identity.id ?? ''}`,
+      }),
+    })),
+  });
+  const both = defineHook('both', {
+    client: (prefix: string) => ({ afterSave: () => console.info(prefix) }),
+    server,
+  });
+
+  it('infers the args from either side', () => {
+    expect(both('x')).toEqual({ name: 'both', args: ['x'] });
+    expect(defineHook('serverOnly', { server })('y')).toEqual({
+      name: 'serverOnly',
+      args: ['y'],
+    });
+    // @ts-expect-error a number is not a string
+    both(1);
+  });
+
+  it('rejects two sides whose args disagree', () => {
+    // @ts-expect-error the client side takes a number, the server side a string
+    defineHook('mismatch', {
+      client: (count: number) => ({ afterSave: () => console.info(count) }),
+      server,
+    });
+  });
+
+  it('types the session and branch a server hook receives', () => {
+    defineServerHook(() => ({
+      beforeSave: (document, { session, branch }) => {
+        // @ts-expect-error a Session has no `token`
+        console.info(session?.token);
+        // @ts-expect-error a branch is a string
+        const count: number = branch;
+        console.info(count);
+        return document;
+      },
+    }));
+  });
+
+  it('keeps the factory form client only', () => {
+    const clientOnly = defineHook('clientOnly', () => ({}));
+    expect(clientOnly.server).toBeUndefined();
+    expect(clientOnly.factory()).toEqual({});
+  });
+});
+
+describe('defineHooksPlugin with server sides', () => {
+  const serverOnly = defineHook('serverOnly', {
+    server: async () => ({
+      default: defineServerHook(() => ({
+        beforeSave: (document) => ({ ...document, checked: true }),
+      })),
+    }),
+  });
+  const plugin = defineHooksPlugin('test:hooks', [
+    serverOnly,
+    defineHook('clientOnly', () => ({})),
+  ]);
+
+  it('declares which names have a server side', () => {
+    expect(plugin.hooks).toEqual(['serverOnly', 'clientOnly']);
+    expect(plugin.serverHooks).toEqual(['serverOnly']);
+  });
+
+  it('loads the server sides in its server segment, and none in its client segment', async () => {
+    const registry = createServerHookRegistry(
+      [plugin],
+      await resolveServerSegments([plugin])
+    );
+    const factory = registry.get('serverOnly');
+    expect(
+      await factory?.().beforeSave?.(
+        { title: 'x' },
+        { path: scope.path, collection: scope.collection, session: null }
+      )
+    ).toEqual({ title: 'x', checked: true });
+
+    const client = createFormHookRegistry(
+      await resolveClientSegments([plugin])
+    );
+    expect(resolveFormHooks(client, [serverOnly()])).toEqual([{}]);
   });
 });

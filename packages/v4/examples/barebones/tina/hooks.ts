@@ -16,7 +16,14 @@ export const logSave = defineHook('logSave', (prefix: string) => ({
   },
 }));
 
+// A hook with only a server side. The `server` loader is the one import of
+// tina/slug.server.ts, so the admin bundle never holds it.
+export const slug = defineHook('slug', {
+  server: () => import('./slug.server'),
+});
+
 export const hooksPlugin = defineHooksPlugin('example:hooks', [
   trimTitle,
   logSave,
+  slug,
 ]);

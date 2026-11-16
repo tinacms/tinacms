@@ -20,11 +20,11 @@
 
 ### Positive / clarifying
 - **Custom server logic *is* available to TinaCloud users — via the Backend** (a Server segment), not via TinaCloud. The earlier "self-hosted only" framing was too broad.
-- The strictly **self-hosted-only** cases are narrow: logic that must run **inside the Data Layer** — a custom **Format adapter** (the file write), or enforcement that must survive writes made *directly* to the Data Layer.
+- The strictly **self-hosted-only** cases are narrow: logic that must run **inside the Data Layer** — a custom **Format adapter** (the file write), or enforcement that must survive writes made *directly* to the Data Layer. Server save hooks ([ADR-028](./028-server-save-hooks.md)) run on the Backend and enforce every save made through the admin, but a direct write to TinaCloud skips them until TinaCloud requires a server secret for it.
 - It establishes a clear bias: **prefer declarative over custom** for anything that must be enforced on managed TinaCloud (since only declarative artifacts run there).
 
 ### Open dependency — the save path (resolved)
-Whether a Backend `beforeSave` is a **true enforcement gate** depends on whether content writes route **Client → Backend → Data Layer** or **Client → Data Layer directly**. **Resolved by [ADR-018](./018-save-flow.md): path A** — content writes go Client → Data Layer directly, enforcement lives at the Data Layer write point, so custom content-write *enforcement* is self-hosted-only (a client `beforeSave` may still call the Backend, but only advisorily).
+Whether a Backend `beforeSave` is a **true enforcement gate** depends on whether content writes route **Client → Backend → Data Layer** or **Client → Data Layer directly**. **Resolved by [ADR-018](./018-save-flow.md): path A** — content writes go Client → Data Layer directly, enforcement lives at the Data Layer write point, and a client `beforeSave` that calls the Backend is only advisory. **Amended by [ADR-028](./028-server-save-hooks.md):** a save to a collection with a server hook goes Client → Backend → Data Layer, so a Backend `beforeSave` is an enforcement gate for that collection on every Data Layer.
 
 ## Alternatives Considered
 - **Run sandboxed plugin code inside TinaCloud** — *rejected*: there is no safe way to run arbitrary user formatters/validators in managed infra; that risk is precisely why TinaCloud's surface is fixed and first-party.

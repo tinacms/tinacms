@@ -13,7 +13,7 @@ export function ErrorMessage({ error }: ErrorMessageProps) {
   return (
     <div
       contentEditable={false}
-      className='mt-2 flex items-start rounded-md border border-red-300 bg-red-50 p-3 shadow-sm'
+      className='mt-2 flex items-start rounded-sm border border-red-300 bg-red-50 p-3 shadow-sm'
       role='alert'
     >
       <div className='flex-shrink-0'>

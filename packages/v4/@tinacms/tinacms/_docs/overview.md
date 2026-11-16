@@ -56,7 +56,7 @@ A plugin's section of the store, set by the `slice` property of its `ClientSegme
 
 ### Screen
 
-A full adin page, opened at `#/screens/<name>`. Each has a unique `name`, `label` and a React component. 
+A full adin page, opened at `#/screens/<name>`. Each has a unique `name`, `label` and a React component. The screen with the name `home` also opens at `#/`. 
 
 A screen does not add itself to the sidebar. Rather, a plugin adds a `slot` entry that targets a screen by name. 
 

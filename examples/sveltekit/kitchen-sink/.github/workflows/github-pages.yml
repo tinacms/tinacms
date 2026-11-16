@@ -1,0 +1,74 @@
+# Copy to .github/workflows/ at the monorepo root: GitHub only runs workflows from
+# the repository root. See ../../DEPLOY.md for the TinaCloud setup this expects.
+name: Deploy SvelteKit kitchen-sink to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+  EXAMPLE_DIR: examples/sveltekit/kitchen-sink
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm with runtime
+        uses: pnpm/setup@v3.0.0
+        with:
+          cache: true
+          runtime: node@22
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Outputs base_path ("/<repo>" for project pages, "" for user pages or a custom domain).
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v6
+
+      # The example consumes the TinaCMS packages from this workspace.
+      - name: Build TinaCMS packages
+        run: pnpm build
+
+      - name: Build site and Tina admin
+        run: pnpm --filter "./${{ env.EXAMPLE_DIR }}" build:pages
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          GITHUB_BRANCH: ${{ github.head_ref || github.ref_name }}
+          TINA_CLIENT_ID: ${{ vars.TINA_CLIENT_ID }}
+          TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          name: github-pages
+          path: ${{ env.EXAMPLE_DIR }}/build-static/
+
+  deploy:
+    # Pull requests only check that the site builds.
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5

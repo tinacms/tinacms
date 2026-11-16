@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { type ResolvedConfig, asResolvedConfig } from '../config';
+import {
+  defineHook,
+  defineHooksPlugin,
+  defineServerHook,
+} from '../core/form/hooks';
 import { definePlugin } from '../core/plugin';
+import {
+  defineSearchPlugin,
+  searchIndex,
+} from '../plugins/search/search.plugin';
+import type { SearchFields } from '../core/search/index-contract';
 import type { FieldSchema } from '../core/schema/types';
 import { LOCK_VERSION, checkLock, compileSchema } from './compile-schema';
 
@@ -200,6 +210,31 @@ describe('compileSchema collection-level hooks', () => {
     ]);
   });
 
+  it('accepts a hook that only has a server side', () => {
+    const slug = defineHook('slug', {
+      server: async () => ({ default: defineServerHook(() => ({})) }),
+    });
+    const lock = compileSchema(
+      asResolvedConfig({
+        plugins: [
+          fieldPlugin('string', 1),
+          defineHooksPlugin('test:hooks', [slug]),
+        ],
+        schema: {
+          collections: [
+            {
+              name: 'post',
+              format: 'mdx',
+              hooks: [slug()],
+              fields: [{ name: 'title', type: 'string' }],
+            },
+          ],
+        },
+      })
+    );
+    expect(lock.schema.collections[0].hooks).toEqual([{ name: 'slug' }]);
+  });
+
   it('rejects a form hook no installed plugin registers', () => {
     expect(() =>
       compileSchema(
@@ -386,5 +421,359 @@ describe('checkLock across lock formats', () => {
         )
       )
     ).toEqual({ status: 'current' });
+  });
+});
+
+describe('compileSchema dropped v3 options', () => {
+  const plugins = [
+    fieldPlugin('string', 1),
+    fieldPlugin('object', 1),
+    fieldPlugin('array', 1),
+  ];
+  const dropped = [
+    'ui',
+    'component',
+    'parse',
+    'format',
+    'validate',
+    'min',
+    'max',
+  ];
+  const placements: Record<string, (extra: object) => FieldSchema[]> = {
+    'a top-level field': (extra) => [{ name: 'a', type: 'string', ...extra }],
+    'a field inside fields': (extra) => [
+      {
+        name: 'o',
+        type: 'object',
+        fields: [{ name: 'a', type: 'string', ...extra }],
+      } as FieldSchema,
+    ],
+    'a field inside templates': (extra) => [
+      {
+        name: 'l',
+        type: 'array',
+        templates: [
+          { name: 't', fields: [{ name: 'a', type: 'string', ...extra }] },
+        ],
+      } as FieldSchema,
+    ],
+    'a template': (extra) => [
+      {
+        name: 'l',
+        type: 'array',
+        templates: [{ name: 't', fields: [], ...extra }],
+      } as FieldSchema,
+    ],
+    'an of field': (extra) => [
+      {
+        name: 'l',
+        type: 'array',
+        of: { name: 'a', type: 'string', ...extra },
+      } as FieldSchema,
+    ],
+  };
+
+  for (const option of dropped) {
+    it(`rejects "${option}" at any depth, naming the option`, () => {
+      for (const make of Object.values(placements)) {
+        expect(() =>
+          compileSchema(configWith(make({ [option]: 1 }), plugins))
+        ).toThrow(new RegExp(`sets "${option}", which v4 does not have`));
+      }
+    });
+  }
+
+  it('allows a collection format and other plugin-defined keys', () => {
+    expect(() =>
+      compileSchema(
+        configWith(
+          [{ name: 'a', type: 'string', pluginOption: 1 } as FieldSchema],
+          plugins
+        )
+      )
+    ).not.toThrow();
+  });
+
+  it('rejects hidden and description on a scalar array item', () => {
+    for (const option of ['hidden', 'description']) {
+      expect(() =>
+        compileSchema(
+          configWith(
+            [
+              {
+                name: 'l',
+                type: 'array',
+                of: { name: 'a', type: 'string', [option]: true },
+              } as FieldSchema,
+            ],
+            plugins
+          )
+        )
+      ).toThrow(new RegExp(`sets "${option}" on its "of" field`));
+    }
+  });
+});
+
+describe('compileSchema array options', () => {
+  const plugins = [fieldPlugin('string', 1), fieldPlugin('array', 1)];
+  const blocks = (extra: object): FieldSchema[] => [
+    {
+      name: 'blocks',
+      type: 'array',
+      templates: [
+        {
+          name: 'hero',
+          fields: [],
+          itemLabel: () => 'x',
+          previewImage: 'a.png',
+        },
+      ],
+      ...extra,
+    } as unknown as FieldSchema,
+  ];
+
+  it('rejects defaultItem on a templates array', () => {
+    expect(() =>
+      compileSchema(configWith(blocks({ defaultItem: {} }), plugins))
+    ).toThrow(/sets "defaultItem" on the array/);
+  });
+
+  it('rejects an unknown picker, and a picker on an array without templates', () => {
+    expect(() =>
+      compileSchema(configWith(blocks({ picker: 'carousel' }), plugins))
+    ).toThrow(/"picker" takes "list" or "grid"/);
+    expect(() =>
+      compileSchema(
+        configWith(
+          [
+            {
+              name: 'l',
+              type: 'array',
+              picker: 'grid',
+              fields: [],
+            } as FieldSchema,
+          ],
+          plugins
+        )
+      )
+    ).toThrow(/"picker" takes/);
+  });
+
+  it('rejects an object display it does not know, naming the object', () => {
+    const objectPlugins = [...plugins, fieldPlugin('object', 1)];
+    const object = (extra: object) => [
+      { name: 'seo', type: 'object', fields: [], ...extra } as FieldSchema,
+    ];
+    expect(() =>
+      compileSchema(configWith(object({ display: 'tabs' }), objectPlugins))
+    ).toThrow(/object "seo".*"display" to "tabs"/);
+    for (const display of ['fieldset', 'collapsible', 'drillIn']) {
+      expect(() =>
+        compileSchema(configWith(object({ display }), objectPlugins))
+      ).not.toThrow();
+    }
+  });
+
+  it('treats an omitted or undefined object display as unset', () => {
+    const objectPlugins = [...plugins, fieldPlugin('object', 1)];
+    for (const extra of [{}, { display: undefined }] satisfies object[]) {
+      expect(() =>
+        compileSchema(
+          configWith(
+            [
+              {
+                name: 'seo',
+                type: 'object',
+                fields: [],
+                ...extra,
+              } as unknown as FieldSchema,
+            ],
+            objectPlugins
+          )
+        )
+      ).not.toThrow();
+    }
+  });
+
+  it('leaves picker and of to a non-array field that defines them', () => {
+    expect(() =>
+      compileSchema(
+        configWith(
+          [
+            {
+              name: 'w',
+              type: 'wheel',
+              picker: 'spin',
+              of: { name: 'a', type: 'string', description: 'x' },
+            } as FieldSchema,
+          ],
+          [...plugins, fieldPlugin('wheel', 1)]
+        )
+      )
+    ).not.toThrow();
+  });
+
+  it('writes no itemLabel, and no picker when unset, to the lock', () => {
+    const lock = JSON.parse(
+      JSON.stringify(compileSchema(configWith(blocks({}), plugins)))
+    );
+    const [template] = lock.schema.collections[0].fields[0].templates;
+    expect(template).not.toHaveProperty('itemLabel');
+    expect(lock.schema.collections[0].fields[0]).not.toHaveProperty('picker');
+  });
+});
+
+describe('compileSchema search fields', () => {
+  const searchable = (fields: SearchFields) =>
+    defineSearchPlugin({
+      name: 'test:search',
+      fields,
+      server: () => import('../test/in-memory-search.server'),
+    });
+  const fieldTypes = [
+    'string',
+    'rich-text',
+    'boolean',
+    'image',
+    'reference',
+    'object',
+    'select',
+    'datetime',
+    'number',
+    'array',
+  ];
+  const withSearch = (
+    fields: SearchFields,
+    hooks: { name: string }[] = []
+  ): ResolvedConfig =>
+    asResolvedConfig({
+      plugins: [
+        ...fieldTypes.map((type) => fieldPlugin(type, 1)),
+        searchable(fields),
+      ],
+      schema: {
+        collections: [
+          {
+            name: 'post',
+            path: 'content/posts',
+            format: 'md',
+            hooks,
+            fields: fieldTypes.map((type) => ({ name: `${type}Field`, type })),
+          },
+        ],
+      },
+    });
+
+  it('accepts string and rich-text fields', () => {
+    expect(() =>
+      compileSchema(
+        withSearch({ post: { stringField: 3, ['rich-textField']: 1 } })
+      )
+    ).not.toThrow();
+  });
+
+  it('names the plugin and the collection for an unknown collection', () => {
+    expect(() => compileSchema(withSearch({ blog: { title: 1 } }))).toThrow(
+      /test:search.*"blog"/
+    );
+  });
+
+  it('names the field for an unknown field', () => {
+    expect(() => compileSchema(withSearch({ post: { nope: 1 } }))).toThrow(
+      /test:search.*"nope".*"post"/
+    );
+  });
+
+  it.each(
+    fieldTypes.filter((type) => type !== 'string' && type !== 'rich-text')
+  )('refuses a %s field', (type) => {
+    expect(() =>
+      compileSchema(withSearch({ post: { [`${type}Field`]: 1 } }))
+    ).toThrow(new RegExp(`"${type}Field".*"post".*"${type}"`));
+  });
+
+  it.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY])(
+    'refuses the weight %s',
+    (weight) => {
+      expect(() =>
+        compileSchema(withSearch({ post: { stringField: weight } }))
+      ).toThrow(/"stringField".*"post"/);
+    }
+  );
+
+  it('refuses a collection that lists searchIndex() without fields', () => {
+    expect(() => compileSchema(withSearch({}, [searchIndex()]))).toThrow(
+      /"post".*searchIndex/
+    );
+  });
+
+  it('allows fields for a collection that does not list searchIndex()', () => {
+    expect(() =>
+      compileSchema(withSearch({ post: { stringField: 1 } }))
+    ).not.toThrow();
+  });
+
+  it('writes a lock identical to the same project without the search plugin', () => {
+    const plain = asResolvedConfig({
+      ...withSearch({ post: { stringField: 1 } }),
+      plugins: fieldTypes.map((type) => fieldPlugin(type, 1)),
+    });
+    expect(
+      JSON.stringify(compileSchema(withSearch({ post: { stringField: 1 } })))
+    ).toBe(JSON.stringify(compileSchema(plain)));
+  });
+
+  it.each([
+    ['loser then winner', false],
+    ['winner then loser', true],
+  ])(
+    'checks only the fields of a defineSearchPlugin that overrides another (%s)',
+    (_order, reversed) => {
+      const base = withSearch({});
+      const plugins = (winnerFields: SearchFields) => {
+        const search = [
+          searchable({ missing: { title: 1 } }),
+          defineSearchPlugin({
+            name: 'test:winner',
+            fields: winnerFields,
+            server: () => import('../test/in-memory-search.server'),
+            overrides: [{ capability: 'search' }],
+          }),
+        ];
+        return [
+          ...fieldTypes.map((type) => fieldPlugin(type, 1)),
+          ...(reversed ? search.reverse() : search),
+        ];
+      };
+      expect(() =>
+        compileSchema(
+          asResolvedConfig({
+            ...base,
+            plugins: plugins({ post: { stringField: 1 } }),
+          })
+        )
+      ).not.toThrow();
+      expect(() =>
+        compileSchema(
+          asResolvedConfig({ ...base, plugins: plugins({ post: { nope: 1 } }) })
+        )
+      ).toThrow(/test:winner.*"nope"/);
+    }
+  );
+
+  it('does not check the fields of a plugin that lost search to an override', () => {
+    const config = asResolvedConfig({
+      ...withSearch({}),
+      plugins: [
+        ...fieldTypes.map((type) => fieldPlugin(type, 1)),
+        searchable({ missing: { title: 1 } }),
+        definePlugin({
+          name: 'test:winner',
+          provides: ['search'],
+          overrides: [{ capability: 'search' }],
+        }),
+      ],
+    });
+    expect(() => compileSchema(config)).not.toThrow();
   });
 });
