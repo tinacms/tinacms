@@ -147,7 +147,7 @@ function PreviewFrame({
             'relative bg-[Canvas]',
             fit
               ? 'min-h-0 w-full flex-1'
-              : 'mx-auto flex-none shadow-xs ring-1 ring-border',
+              : 'mx-auto flex-none shadow-xs ring-1 ring-pv-edge',
             hidden && 'invisible'
           )}
           style={

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -185,4 +186,31 @@ describe('PreviewFrame conditions', () => {
     );
     expect(screen.getByTitle('Page')).toBe(node);
   });
+
+  it.each(['tablet', 'phone'] as const)(
+    '%s: the page edge colour differs from the ground',
+    (device) => {
+      render(
+        <PreviewFrame device={device}>
+          <iframe title='Page' />
+        </PreviewFrame>
+      );
+      const page = screen
+        .getByTitle('Page')
+        .closest('[data-slot="preview-page"]');
+      expect(page).toHaveClass('ring-pv-edge');
+
+      const tokens = readFileSync('src/styles/tokens.css', 'utf8');
+      const channels = (name: string) => {
+        const hex = tokens.match(new RegExp(`${name}: (#[0-9a-f]{6})`))?.[1];
+        if (!hex) throw new Error(`${name} is not a hex colour`);
+        return [1, 3, 5].map((i) => Number.parseInt(hex.slice(i, i + 2), 16));
+      };
+      const ground = [0xe2, 0xe8, 0xf0];
+      expect(tokens).toContain('--pv-ground: var(--slate-200)');
+      const edge = channels('--pv-edge');
+      const distance = Math.max(...edge.map((c, i) => Math.abs(c - ground[i])));
+      expect(distance).toBeGreaterThanOrEqual(60);
+    }
+  );
 });
