@@ -18,8 +18,12 @@ const snapshot = new Map<string, string>();
 
 test.beforeAll(async () => {
   for (const dir of ['posts', 'pages']) {
-    for (const name of await fs.readdir(path.join(PLAYGROUND, dir))) {
-      const file = path.join(PLAYGROUND, dir, name);
+    const entries = await fs.readdir(path.join(PLAYGROUND, dir), {
+      recursive: true,
+      withFileTypes: true,
+    });
+    for (const entry of entries.filter((e) => e.isFile())) {
+      const file = path.join(entry.parentPath, entry.name);
       snapshot.set(file, await fs.readFile(file, 'utf8'));
     }
   }

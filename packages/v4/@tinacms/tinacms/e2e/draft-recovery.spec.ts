@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
-import { setColumnWidth } from './form-column';
+import { formScroller, setColumnWidth } from './form-column';
 
 const DOCUMENT = '/#/collections/post/content%2Fposts%2Fhello-world.mdx';
 const LONG_DOCUMENT = '/#/collections/post/content%2Fposts%2Flong-post.mdx';
@@ -294,10 +294,7 @@ test.describe('the Resume toast keeps the form usable', () => {
     await page.reload();
     await waitForPrompt(page);
 
-    await page
-      .locator('div.overflow-y-auto')
-      .first()
-      .evaluate((scroller) => scroller.scrollTo(0, 600));
+    await formScroller(page).evaluate((scroller) => scroller.scrollTo(0, 600));
     await expect(page.locator('[data-slot="toolbar-shell"]')).toHaveAttribute(
       'data-stuck',
       ''

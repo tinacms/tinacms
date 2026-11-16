@@ -27,17 +27,20 @@ function useStuck(
   const [stuck, setStuck] = React.useState(false);
   React.useEffect(() => {
     const target = sentinel.current;
-    if (!on || !target || typeof IntersectionObserver === 'undefined') return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        const top = entry.rootBounds?.top ?? 0;
-        setStuck(!entry.isIntersecting && entry.boundingClientRect.top < top);
-      },
-      { root: scrollParent(target), rootMargin: '-8px 0px 0px 0px' }
-    );
-    observer.observe(target);
-    return () => observer.disconnect();
+    if (!on || !target) return;
+    const root = scrollParent(target);
+    const update = () => {
+      const top = root ? root.getBoundingClientRect().top : 0;
+      setStuck(target.getBoundingClientRect().top < top + 8);
+    };
+    update();
+    const scroller = root ?? window;
+    scroller.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      scroller.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
   }, [sentinel, on]);
   return on && stuck;
 }
