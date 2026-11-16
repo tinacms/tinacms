@@ -1079,11 +1079,12 @@ describe('a phone', () => {
     within(await errorsSheet()).getByRole('button', { name });
 
   // The row button carries the field's name too, so focus must sit in the field itself.
-  const expectFocusInField = (name: RegExp) =>
+  const expectFocusInField = (name: RegExp, id?: string) =>
     waitFor(() => {
       const active = globalThis.document.activeElement;
       expect(active?.tagName).toBe('INPUT');
       expect(active).toHaveAccessibleName(name);
+      if (id) expect(active?.id).toBe(id);
     });
 
   const blockOnSecondItem = async () => {
@@ -1129,7 +1130,7 @@ describe('a phone', () => {
       stubPhone();
       const user = await blockOnSecondItem();
       await tap(user, await rowOf(/^Heading, in Items › Item 2\. /));
-      await expectFocusInField(/^Heading\b/);
+      await expectFocusInField(/^Heading\b/, 'items.1.heading');
     });
 
     it('focuses a field inside an object inside an object', async () => {

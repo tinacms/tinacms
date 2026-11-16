@@ -132,7 +132,7 @@ function SaveToBranchDialog({
               </p>
             ) : null}
           </FieldWrapper>
-          <DialogFooter>
+          <DialogFooter className='max-md:items-stretch'>
             <Button
               type='button'
               variant='ghost'
@@ -144,11 +144,12 @@ function SaveToBranchDialog({
             <Button
               type='submit'
               variant='primary'
-              className='max-md:h-auto max-md:min-h-8 max-md:py-1.5 max-md:whitespace-normal'
               busy={saving}
               disabled={!canSave}
             >
-              {saving ? 'Saving' : WORDS[reason].action}
+              <span className='min-w-0 max-md:py-1.5 max-md:whitespace-normal'>
+                {saving ? 'Saving' : WORDS[reason].action}
+              </span>
             </Button>
           </DialogFooter>
         </form>

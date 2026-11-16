@@ -274,6 +274,7 @@ function BranchSwitcher({
         onKeyDown={move}
         className={cn(
           fullScreen &&
+            !phone &&
             'top-14 bottom-7 left-0 h-auto w-full max-w-none translate-x-0 translate-y-0 rounded-none'
         )}
       >
@@ -421,9 +422,11 @@ function BranchSwitcher({
                 {nameError}
               </p>
             ) : null}
-            <div className='flex justify-end gap-2 max-md:*:min-w-0 max-md:*:flex-1'>
+            <div className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'>
               <Button onClick={() => setCreating(false)}>
-                Back to branches
+                <span className='min-w-0 max-md:py-1.5 max-md:whitespace-normal'>
+                  Back to branches
+                </span>
               </Button>
               <Button
                 variant='primary'

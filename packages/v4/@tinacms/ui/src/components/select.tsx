@@ -147,7 +147,7 @@ function SelectItem({
       className={cn(selectOptionClassName, className)}
       {...props}
     >
-      <SelectPrimitive.ItemText className='block min-w-0 flex-1 truncate'>
+      <SelectPrimitive.ItemText className='flex min-w-0 flex-1 gap-2 whitespace-nowrap'>
         {children}
       </SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator

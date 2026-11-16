@@ -355,7 +355,25 @@ test('the navigation sheet closes at 390px without navigating', async ({
   await expect(side).toBeVisible();
   await settle(page);
   expect((await box(side)).width).toBe(390);
-  await side.getByRole('button', { name: 'Close', exact: true }).click();
+  const close = side.getByRole('button', { name: 'Close', exact: true });
+  const x = await box(close);
+  const overlaps = await side.evaluate(
+    (el, { left, top, right, bottom }) =>
+      [...el.querySelectorAll('a, button')].some((control) => {
+        if (control.getAttribute('aria-label') === 'Close') return false;
+        const r = control.getBoundingClientRect();
+        return (
+          r.width > 0 &&
+          r.left < right &&
+          r.right > left &&
+          r.top < bottom &&
+          r.bottom > top
+        );
+      }),
+    { left: x.x, top: x.y, right: x.x + x.width, bottom: x.y + x.height }
+  );
+  expect(overlaps).toBe(false);
+  await close.click();
   await expect(side).toBeHidden();
   expect(page.url()).toBe(url);
 });

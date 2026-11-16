@@ -615,20 +615,50 @@ test.describe('the branch switcher on a phone', () => {
   });
 });
 
-test('the Save label wraps instead of truncating at 375px', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto('/sheets.html?case=branch&reason=deleted');
-  const save = page.getByRole('button', { name: 'Save to new branch' });
-  await expect(save).toBeVisible();
+// The label is the innermost span, so a Button that ellipsises it fails this.
+const labelFits = (button: Locator) =>
+  button
+    .locator('span')
+    .last()
+    .evaluate((el) => {
+      const css = getComputedStyle(el);
+      return (
+        el.scrollWidth <= el.clientWidth + 1 && css.textOverflow !== 'ellipsis'
+      );
+    });
+
+for (const width of [375, 320]) {
+  test(`the Save label wraps and the buttons match in height at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 812 });
+    await page.goto('/sheets.html?case=branch&reason=deleted');
+    const save = page.getByRole('button', { name: 'Save to new branch' });
+    await expect(save).toBeVisible();
+    await settle(page);
+    expect(await labelFits(save)).toBe(true);
+    const cancel = await box(page.getByRole('button', { name: 'Cancel' }));
+    expect(
+      Math.abs((await box(save)).height - cancel.height)
+    ).toBeLessThanOrEqual(1);
+  });
+}
+
+test('Back to branches wraps at 320px', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/branches.html?docs=1#/');
+  await page
+    .getByRole('button', { name: /feature\/news/ })
+    .first()
+    .click();
+  await page.getByRole('button', { name: 'New branch' }).click();
   await settle(page);
   expect(
-    await save.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)
+    await labelFits(page.getByRole('button', { name: 'Back to branches' }))
   ).toBe(true);
 });
 
-test('a nested confirm gets its own scrim over its parent sheet', async ({
+test('a nested confirm gets its own scrim and covers its parent sheet', async ({
   page,
 }) => {
   await page.setViewportSize(PHONE);
@@ -639,17 +669,16 @@ test('a nested confirm gets its own scrim over its parent sheet', async ({
     page.locator('[data-slot=foot-sheet-scrim]:visible')
   ).toHaveCount(2);
   const parent = await box(page.getByText('Parent action'));
-  const hit = await page.evaluate(
+  const covered = await page.evaluate(
     ({ x, y }) =>
-      document
-        .elementFromPoint(x, y)
-        ?.closest(
-          '[role=dialog],[role=alertdialog],[data-slot=foot-sheet-scrim]'
-        )
-        ?.getAttribute('data-slot') ?? '',
+      document.elementFromPoint(x, y)?.closest('[role=alertdialog]') !== null,
     { x: parent.x + parent.width / 2, y: parent.y + parent.height / 2 }
   );
-  expect(hit).not.toBe('');
+  expect(covered).toBe(true);
+  const strip = await page.evaluate(
+    () => document.elementFromPoint(195, 10)?.getAttribute('data-slot') ?? ''
+  );
+  expect(strip).toBe('foot-sheet-scrim');
 });
 
 test('a long select option ends in an ellipsis', async ({ page }) => {

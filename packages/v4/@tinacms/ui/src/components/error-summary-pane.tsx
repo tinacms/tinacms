@@ -166,6 +166,7 @@ type ErrorRowProps = {
   stillHover: boolean;
   /** On a phone "Go to field" shows at rest, as a finger cannot hover. */
   atRest?: boolean;
+  disabled?: boolean;
   onSelect?: (error: ErrorSummaryItem) => void;
 };
 
@@ -174,6 +175,7 @@ function ErrorRow({
   selected,
   stillHover,
   atRest = false,
+  disabled = false,
   onSelect,
 }: ErrorRowProps) {
   const trail = error.trail ?? [];
@@ -187,6 +189,9 @@ function ErrorRow({
     <button
       type='button'
       data-error-row=''
+      onMouseDown={(event) => {
+        if (disabled) event.preventDefault();
+      }}
       data-look={stillHover ? 'hover' : undefined}
       aria-current={selected ? 'true' : undefined}
       aria-label={name}
@@ -636,9 +641,6 @@ function ErrorSheet({
           ref={popup}
           id={id}
           inert={!open}
-          onMouseDown={(event) => {
-            if (!open) event.preventDefault();
-          }}
           data-slot='foot-sheet'
           data-layout='sheet'
           data-status={status}
@@ -689,6 +691,7 @@ function ErrorSheet({
                         selected={error.id === selectedId}
                         stillHover={error.id === stillHoverId}
                         atRest
+                        disabled={!open}
                         onSelect={pick}
                       />
                     </li>

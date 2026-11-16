@@ -89,7 +89,7 @@ export function SelectFieldView({
               value={row.value}
               disabled={row.disabled}
             >
-              {row.label}
+              <span className='min-w-0 truncate'>{row.label}</span>
               {row.hint ? (
                 <span className='ml-auto text-xs text-muted-foreground'>
                   {row.hint}
