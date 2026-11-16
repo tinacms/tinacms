@@ -65,7 +65,22 @@ export const pageCollection = {
   allowedActions: { canDelete: false, canDuplicate: false },
 } satisfies CollectionSchema;
 
+export const checklistCollection = {
+  name: 'checklist',
+  label: 'Checklists',
+  path: 'content/checklists',
+  description: 'Two required fields, for the error list.',
+  format: 'mdx',
+  fields: [
+    t.string({ name: 'first', label: 'First', validators: [required()] }),
+    t.string({ name: 'second', label: 'Second', validators: [required()] }),
+    t.string({ name: 'note', label: 'Note' }),
+  ],
+} satisfies CollectionSchema;
+
 export default defineConfig({
   plugins: [localContentPlugin(), localMediaPlugin(), mediaManagerPlugin()],
-  schema: { collections: [postCollection, pageCollection] },
+  schema: {
+    collections: [postCollection, pageCollection, checklistCollection],
+  },
 });

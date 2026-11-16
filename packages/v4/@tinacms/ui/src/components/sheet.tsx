@@ -1,8 +1,18 @@
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { cva } from 'class-variance-authority';
 import type * as React from 'react';
+import { useRef } from 'react';
 
 import { Button } from '@tinacms/ui/components/button';
+import {
+  FootSheetCloseButton,
+  FootSheetHandle,
+  firstBodyFocus,
+  footSheetClasses,
+  footSheetScrimClasses,
+  useFootSheetRide,
+} from '@tinacms/ui/components/foot-sheet';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { dialogTitleClasses } from '@tinacms/ui/lib/dialog-styles';
 import { cn } from '@tinacms/ui/lib/utils';
 
@@ -47,6 +57,7 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
       data-slot='sheet-overlay'
       className={cn(
         'fixed inset-0 z-50 bg-scrim-light transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0',
+        footSheetScrimClasses,
         className
       )}
       {...props}
@@ -59,22 +70,50 @@ function SheetContent({
   children,
   side = 'right',
   showCloseButton = true,
+  initialFocus,
+  style,
   ...props
 }: SheetPrimitive.Popup.Props & {
   side?: SheetSide;
   showCloseButton?: boolean;
 }) {
+  const phone = useTier() === 'phone';
+  const footSheet = phone && side === 'bottom';
+  const popup = useRef<HTMLDivElement>(null);
+  const ride = useFootSheetRide(footSheet);
   return (
     <SheetPortal>
-      <SheetOverlay />
+      <SheetOverlay data-slot={footSheet ? 'foot-sheet-scrim' : undefined} />
       <SheetPrimitive.Popup
-        data-slot='sheet-content'
+        ref={popup}
+        data-slot={footSheet ? 'foot-sheet' : 'sheet-content'}
         data-side={side}
-        className={cn(sheetVariants({ side }), className)}
+        className={cn(
+          footSheet ? footSheetClasses : sheetVariants({ side }),
+          className,
+          // After `className`, so a caller's own width gives way to the screen's.
+          phone && (side === 'left' || side === 'right') && 'w-full'
+        )}
+        initialFocus={
+          initialFocus ?? (footSheet ? firstBodyFocus(popup) : undefined)
+        }
+        style={{ ...style, ...ride }}
         {...props}
       >
         {children}
-        {showCloseButton ? (
+        {footSheet ? (
+          <>
+            <FootSheetCloseButton Close={SheetPrimitive.Close} />
+            <FootSheetHandle
+              close={(handle) => (
+                <SheetPrimitive.Close
+                  {...handle}
+                  data-slot='foot-sheet-handle'
+                />
+              )}
+            />
+          </>
+        ) : showCloseButton ? (
           <SheetPrimitive.Close
             data-slot='sheet-close'
             render={

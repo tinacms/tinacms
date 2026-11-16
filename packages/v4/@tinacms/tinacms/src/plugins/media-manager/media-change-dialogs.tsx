@@ -419,7 +419,7 @@ export function NewFolderForm({
     >
       <AlertDialogContent>
         <form
-          className='flex flex-col gap-4'
+          className='flex flex-col gap-4 max-md:flex-1'
           noValidate
           onSubmit={(event) => {
             event.preventDefault();

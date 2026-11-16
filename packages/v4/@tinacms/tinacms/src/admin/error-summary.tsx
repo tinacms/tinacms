@@ -12,6 +12,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { useFormContext } from 'react-hook-form';
 import { useStore } from 'zustand';
 import { toFieldAddress } from '../core/field/address';
@@ -87,7 +88,11 @@ function useGoTo() {
   const narrow = useNarrow();
   return (key: string) => {
     const address = scope.view.getState().goTo(key);
-    if (!address) return;
+    if (!address) {
+      // A phone's row tap has closed the sheet; with no field to go to, focus goes back to Save.
+      resolveButton()?.focus();
+      return;
+    }
     useFormStore.getState().setActive(scope.formId, toFieldAddress(address));
     // Below lg the pane covers the form, so it clears the way for the field.
     if (narrow) scope.view.getState().tuckPane();
@@ -250,6 +255,7 @@ function ErrorPaneHost() {
   const goTo = useGoTo();
   const summary = useStore(scope.view, (state) => state.errorSummary);
   const [pinned, setPinned] = useState(readPinned);
+  const phone = useTier() === 'phone';
   useFollowFixes(rows);
 
   const { blocked, paneOpen, current, done, focusRow, announcement } = summary;
@@ -265,7 +271,15 @@ function ErrorPaneHost() {
     if (hadFocus) resolveButton()?.focus();
   };
 
-  useTuckOutside(open && !pinned && listed, tuck);
+  useTuckOutside(open && !pinned && listed && !phone, tuck);
+
+  // Crossing 768px rebuilds the pane in the other layout, so an open one tucks.
+  const wasPhone = useRef(phone);
+  useEffect(() => {
+    if (wasPhone.current === phone) return;
+    wasPhone.current = phone;
+    tuck();
+  });
 
   // The rows vanish with "All fixed", so a focus that sat in one falls to the page.
   useLayoutEffect(() => {
@@ -293,6 +307,7 @@ function ErrorPaneHost() {
         status={done === 'pane' ? 'success' : 'list'}
         autoFocusRow={focusRow}
         className='z-40 data-[layout=docked]:order-1 max-lg:w-[min(22.5rem,calc(100vw-1.5rem))]'
+        returnFocusTo={resolveButton}
         onSelect={(row) => goTo(row.id)}
         onPin={(next) => {
           setPinned(next);
@@ -313,9 +328,11 @@ function ErrorPaneHost() {
             className='z-40'
             onOpen={() => scope.view.getState().openPane(true)}
           />
-          <EdgeHoverZone
-            onDwell={() => scope.view.getState().openPane(false)}
-          />
+          {phone ? null : (
+            <EdgeHoverZone
+              onDwell={() => scope.view.getState().openPane(false)}
+            />
+          )}
         </>
       ) : null}
     </>

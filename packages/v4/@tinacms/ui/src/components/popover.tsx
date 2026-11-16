@@ -20,6 +20,7 @@ function PopoverContent({
   side = 'bottom',
   sideOffset = 4,
   collisionAvoidance,
+  collisionPadding = 12,
   sticky,
   ...props
 }: PopoverPrimitive.Popup.Props &
@@ -30,6 +31,7 @@ function PopoverContent({
     | 'side'
     | 'sideOffset'
     | 'collisionAvoidance'
+    | 'collisionPadding'
     | 'sticky'
   >) {
   return (
@@ -40,6 +42,7 @@ function PopoverContent({
         side={side}
         sideOffset={sideOffset}
         collisionAvoidance={collisionAvoidance}
+        collisionPadding={collisionPadding}
         sticky={sticky}
         className='isolate z-50 outline-none'
       >

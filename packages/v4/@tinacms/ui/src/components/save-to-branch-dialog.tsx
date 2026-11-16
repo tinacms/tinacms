@@ -78,12 +78,14 @@ function SaveToBranchDialog({
   return (
     <Dialog
       open={open}
+      keepOnDismiss={name !== ''}
       onOpenChange={(next) => {
         if (!next) close();
         else onOpenChange(true);
       }}
     >
       <DialogContent
+        keyboard
         showCloseButton={false}
         initialFocus={input}
         finalFocus={returnFocusTo}
