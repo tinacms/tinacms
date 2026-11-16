@@ -23,6 +23,7 @@ import {
   type PreviewConnectionOptions,
   usePreviewConnection,
 } from './preview-connection';
+import { connectionOf } from '../test/connection';
 
 const collection: CollectionSchema = {
   name: 'post',
@@ -123,7 +124,7 @@ const renderWithReference = (
       default: {
         slice: () => ({
           get,
-          list: async () => [],
+          list: async () => connectionOf([]),
           update: async (_c: string, p: string, value: TinaDocument) => ({
             path: p,
             document: value,

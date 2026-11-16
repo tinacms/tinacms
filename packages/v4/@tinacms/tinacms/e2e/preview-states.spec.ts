@@ -231,6 +231,7 @@ const leaveStep: [string, (page: Page) => Promise<void>][] = [
         .getByRole('navigation', { name: 'Location' })
         .getByRole('button', { name: 'Posts' })
         .click();
+      await page.getByRole('button', { name: 'Restore' }).click();
       await openSecond(page, false);
     },
   ],

@@ -100,7 +100,14 @@ describe('fetchDocument', () => {
 describe('fetchDocumentPage', () => {
   it('asks for one page after the cursor', async () => {
     const documents = {
-      edges: [{ node: { _sys: { path: 'content/posts/a.mdx' } } }],
+      edges: [
+        {
+          node: {
+            _sys: { path: 'content/posts/a.mdx', relativePath: 'a.mdx' },
+            _values: { title: 'A' },
+          },
+        },
+      ],
       pageInfo: { hasNextPage: false, endCursor: null },
     };
     const fetchMock = stubFetch(

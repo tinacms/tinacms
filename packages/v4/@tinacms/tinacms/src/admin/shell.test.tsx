@@ -2,6 +2,7 @@ import { ImageIcon } from 'lucide-react';
 import { use, useEffect } from 'react';
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { returnToTree } from '../test/collection-tree';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
@@ -18,6 +19,7 @@ import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
+import { connectionOf } from '../test/connection';
 
 type Mode = 'branches' | 'local' | 'none';
 
@@ -91,7 +93,8 @@ const contentPlugin = () =>
                   },
                 }
               : {}),
-            list: async () => entries().map(({ path }) => ({ path })),
+            list: async () =>
+              connectionOf(entries().map(({ path }) => ({ path }))),
             get: async (_collection: string, path: string) => {
               if (failGet) throw new Error('disk unreadable');
               return entries().find((entry) => entry.path === path) ?? null;
@@ -545,12 +548,7 @@ describe('side nav entries', () => {
 
     await user.click(row);
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    await user.click(
-      within(screen.getByRole('navigation', { name: 'Location' })).getByRole(
-        'button',
-        { name: 'Posts' }
-      )
-    );
+    await returnToTree(user);
     const back = await screen.findByRole('button', { name: /hello\.mdx/ });
     expect(back).toHaveTextContent('Unsaved');
     expect(
@@ -1043,7 +1041,7 @@ describe('panel headers', () => {
       ).getByRole('button', { name: 'Posts' })
     );
     await waitFor(() =>
-      expect(window.location.hash).toBe('#/collections/post')
+      expect(window.location.hash).toBe('#/collections/post?max')
     );
     view.unmount();
 

@@ -29,13 +29,14 @@ import type { AdminRoute } from './routing';
 import { FormScopeContext, type FormScope } from '../editor/context';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
-import { useDocument } from '../editor/content-queries';
+import { folderOfDocument } from '../editor/collection-documents';
+import { useCurrentBranch, useDocument } from '../editor/content-queries';
 import {
   type DocumentRef,
   type ReferenceStep,
   usePreviewConnection,
 } from '../editor/preview-connection';
-import { toFormId, useFormStore } from '../form/form-store';
+import { toFormId, useFormStore, useHasNewDocument } from '../form/form-store';
 import { documentTitle } from './document-title';
 import { TinaProvider } from '../editor/provider';
 import { AuthGate } from './auth-gate';
@@ -47,7 +48,10 @@ import {
   MediaPanel,
   SettingsPane,
   ToolsPane,
+  useTreeFolders,
 } from './navigator';
+import { CollectionTable } from './collection-table/collection-table';
+import { CollectionsIndex } from './collections-index/collections-index';
 import { AdminRail, HOME_SCREEN, MEDIA_SCREEN } from './rail';
 import { MediaPaneShellContext } from './media-pane-shell';
 import { AdminErrorBoundary } from './error-boundary';
@@ -175,6 +179,8 @@ function PreviewSlot({
     <div data-preview-slot='' className='min-w-0 flex-1'>
       {typeof preview === 'string' ? (
         <PreviewFrame src={preview} connection={connection} />
+      ) : connection.open === null ? (
+        <Placeholder>Select a document to edit.</Placeholder>
       ) : (
         (preview ?? <Placeholder>No preview configured.</Placeholder>)
       )}
@@ -217,6 +223,20 @@ function FormColumnFrame({ children }: { children: ReactNode }) {
   );
 }
 
+/** Where Back from a document lands: the table of the folder that holds it. */
+const folderRouteOf = (
+  collection: CollectionSchema,
+  documentPath: string | undefined
+): AdminRoute => {
+  const folder =
+    documentPath === undefined
+      ? ''
+      : folderOfDocument(collection, documentPath);
+  return folder === ''
+    ? { view: 'collection', collection: collection.name, maximised: true }
+    : { view: 'folder', collection: collection.name, folder };
+};
+
 const collectionLabel = (collection: CollectionSchema) =>
   collection.label ?? collection.name;
 
@@ -251,7 +271,9 @@ function FormHead({
     {
       label: collectionLabel(trailCollection),
       onClick: () =>
-        navigate({ view: 'collection', collection: trailCollection.name }),
+        navigate(
+          folderRouteOf(trailCollection, step ? step.from.path : openPath)
+        ),
     },
     ...(step
       ? [
@@ -547,6 +569,7 @@ function AdminShell({
   const screens = useAdminScreens();
   const globalNav = useGlobalNav();
   const { route, navigate } = useAdminRoute();
+  const branch = useCurrentBranch();
 
   // A reference step belongs to the document it opened. Any other navigation drops it.
   const [stepState, setStepState] = useState<{
@@ -583,12 +606,15 @@ function AdminShell({
   const mainRoute = isMediaRoute ? lastMain : route;
 
   const [maximised, setMaximised] = useState(false);
+  const treeFolders = useTreeFolders();
   useEffect(() => {
     if (!isMediaRoute) setMaximised(false);
   }, [isMediaRoute]);
 
   const activeCollectionName =
-    mainRoute.view === 'collection' || mainRoute.view === 'document'
+    mainRoute.view === 'collection' ||
+    mainRoute.view === 'folder' ||
+    mainRoute.view === 'document'
       ? mainRoute.collection
       : undefined;
   const collection = schema.collections.find(
@@ -634,12 +660,16 @@ function AdminShell({
     isLoading: isLoadingOpenDocument,
     error: openDocumentError,
   } = useDocument(collection?.name, openPath);
+  const holdsNewDocument = useHasNewDocument(
+    openPath ? toFormId(openPath) : undefined
+  );
   const isStaleDocumentRoute =
     collection !== undefined &&
     openPath !== undefined &&
     !isLoadingOpenDocument &&
     openDocumentError === null &&
-    openEntry === null;
+    openEntry === null &&
+    !holdsNewDocument;
 
   const goToCollections = () => navigate(COLLECTIONS_ROUTE);
   const goHome = () => navigate(HOME_ROUTE);
@@ -663,21 +693,35 @@ function AdminShell({
     (lastOpen && lastOpen.collection === activeCollectionName
       ? lastOpen.path
       : undefined);
+  const tableFolder =
+    mainRoute.view === 'folder'
+      ? mainRoute.folder
+      : mainRoute.view === 'collection' && mainRoute.maximised
+        ? ''
+        : undefined;
+  const showTable = collection !== undefined && tableFolder !== undefined;
+  const showIndex = mainRoute.view === 'collections' && !!mainRoute.maximised;
   const mainShowsNavigator =
-    mainRoute.view === 'collections' ||
-    mainRoute.view === 'collection' ||
+    (mainRoute.view === 'collections' && !showIndex) ||
+    (mainRoute.view === 'collection' && !showTable) ||
+    (mainRoute.view === 'folder' && !showTable) ||
     (mainRoute.view === 'document' && collection === undefined);
   const showNavigator = !isMediaRoute && mainShowsNavigator;
   const documentFailed = openPath !== undefined && openDocumentError !== null;
   const showsPreviewRoute =
     !activeScreen &&
     !homeSegments &&
+    !showIndex &&
+    !showTable &&
     mainRoute.view !== 'tools' &&
     mainRoute.view !== 'settings' &&
     !isStaleCollectionRoute &&
     !isStaleDocumentRoute &&
     !documentFailed;
-  const showsPreview = showsPreviewRoute && !(isMediaRoute && maximised);
+  // Beside the navigator the Home screen takes the pane. The frame stays mounted, hidden.
+  const previewVisible =
+    showsPreviewRoute && !(mainShowsNavigator && homeScreen);
+  const showsPreview = previewVisible && !(isMediaRoute && maximised);
   const [previewMounted, setPreviewMounted] = useState(false);
   useEffect(() => {
     if (showsPreviewRoute) setPreviewMounted(true);
@@ -694,6 +738,17 @@ function AdminShell({
     onOpen: openDocument,
     onNothingToEdit: () => navigate({ view: 'page' }),
   };
+
+  const maximiseNavigator = () =>
+    navigate(
+      collection
+        ? { view: 'collection', collection: collection.name, maximised: true }
+        : { view: 'collections', maximised: true }
+    );
+  const goToFolderOf = (documentPath: string) =>
+    collection
+      ? navigate(folderRouteOf(collection, documentPath))
+      : goToCollections();
 
   return (
     <SidebarProvider
@@ -741,6 +796,8 @@ function AdminShell({
             route={route}
             navigate={navigate}
             onClose={goHome}
+            onMaximise={maximiseNavigator}
+            treeFolders={treeFolders}
             hideBelowLg={isStaleCollectionRoute}
           />
         ) : null}
@@ -777,6 +834,21 @@ function AdminShell({
             <MissingPanel title='Collection not found' onClose={goHome}>
               No collection named “{activeCollectionName}”.
             </MissingPanel>
+          ) : showIndex ? (
+            <SidebarInset className='min-w-0'>
+              <CollectionsIndex />
+            </SidebarInset>
+          ) : showTable ? (
+            <SidebarInset className='min-w-0'>
+              <CollectionTable
+                key={`${branch ?? ''}/${collection.name}/${tableFolder}`}
+                collection={collection.name}
+                folder={tableFolder}
+                onRestore={(folder) =>
+                  treeFolders.reveal(collection.name, folder)
+                }
+              />
+            </SidebarInset>
           ) : isStaleDocumentRoute ? (
             <MissingPanel title='Document not found' onClose={goHome}>
               No document named “{openPath}”.
@@ -787,16 +859,24 @@ function AdminShell({
                 Cannot read “{openPath}”. {openDocumentError.message}
               </span>
             </MissingPanel>
+          ) : mainShowsNavigator && homeScreen ? (
+            <HomeOutlet screen={homeScreen} segments={[]} />
           ) : null}
 
           {showsPreviewRoute || previewMounted ? (
             <SidebarInset
               className={
-                showsPreviewRoute ? 'relative min-w-0 flex-row' : 'hidden'
+                previewVisible ? 'relative min-w-0 flex-row' : 'hidden'
               }
             >
               {mainRoute.view === 'document' ? (
-                <DocumentScope collection={collection} path={openPath}>
+                <DocumentScope
+                  collection={collection}
+                  path={openPath}
+                  onDiscardNew={() =>
+                    openPath ? goToFolderOf(openPath) : undefined
+                  }
+                >
                   <FormColumn
                     openPath={openPath}
                     collection={collection}

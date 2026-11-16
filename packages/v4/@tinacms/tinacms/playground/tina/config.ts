@@ -58,6 +58,7 @@ export const postCollection = {
   name: 'post',
   label: 'Posts',
   path: 'content/posts',
+  description: 'Posts for the playground blog.',
   format: 'mdx',
   fields: [
     t.string({
@@ -85,8 +86,14 @@ export const postCollection = {
       label: 'Blocks',
       templates: [heroBlock, quoteBlock],
     }),
+    t.reference({
+      name: 'related',
+      label: 'Related post',
+      collections: ['post'],
+    }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
   ],
+  allowedActions: { canCreateNestedFolder: true },
 } satisfies CollectionSchema;
 
 const longTemplates = Array.from({ length: 10 }, (_, index) => ({
@@ -100,6 +107,7 @@ export const pageCollection = {
   name: 'page',
   label: 'Pages',
   path: 'content/pages',
+  description: 'Landing pages with visual and plain blocks.',
   format: 'mdx',
   fields: [
     t.string({ name: 'title', label: 'Title' }),
@@ -117,6 +125,7 @@ export const pageCollection = {
     }),
     t.image({ name: 'hero', label: 'Hero image' }),
   ],
+  allowedActions: { canDelete: false, canDuplicate: false },
 } satisfies CollectionSchema;
 
 export default defineConfig({
