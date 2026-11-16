@@ -75,7 +75,12 @@ describe('RichEditor frame props', () => {
     expect((await editor()).className).toContain('max-h-60');
     framed.unmount();
     mount({ layout: 'body' });
-    expect((await editor()).className).toContain('min-h-56');
+    const body = (await editor()).className;
+    expect(body).toContain('min-h-56');
+    expect(body).toContain('max-h-[min(70vh,640px)]');
+    expect(body).toContain('overflow-y-auto');
+    expect(body).not.toContain('max-h-60');
+    expect(body).not.toMatch(/overflow-y-visible|overscroll-/);
   });
 });
 

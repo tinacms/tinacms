@@ -274,10 +274,14 @@ points `react` and `react-dom` to the types in this package.
 - **Disabled**: read-only plus `inert` and `aria-disabled`, so the toolbar is
   still drawn but takes no focus, pointer or tooltip.
 - **Body** (`isBody: true`): the same frame, visible label and messages as
-  every field, at least `min-h-56` tall. The text grows with its content and has
-  no scroll of its own, thus the wheel scrolls the form. The toolbar is flat at
-  the top of the box, sticks 8px under the top of the form, and becomes a
-  floating card (`data-stuck`) while it is stuck. On a phone, the toolbar sits on
+  every field, at least `min-h-56` (224px) tall. The text grows with its content
+  up to `min(70vh, 640px)`, then scrolls inside the box (`overflow-y: auto`).
+  The toolbar is a sibling above the text, so it stays put while the text
+  scrolls. At the text's top or bottom the wheel moves the form (no
+  `overscroll-behavior` is set), and over a body shorter than the cap the wheel
+  moves the form at once. The toolbar is flat at the top of the box, sticks 8px
+  under the top of the form, and becomes a floating card (`data-stuck`) while it
+  is stuck; scrolling the text leaves it where it is. On a phone, the toolbar sits on
   top of the keyboard while the body has focus.
 
 No live field is disabled or read-only yet; the catalogue is the only source.

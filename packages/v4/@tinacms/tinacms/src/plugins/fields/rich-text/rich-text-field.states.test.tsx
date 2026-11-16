@@ -73,7 +73,11 @@ describe('rich text field states', () => {
     expect(frame?.className).toMatch(/\bborder\b/);
     expect(frame?.className).not.toContain('overflow-hidden');
     expect(editor.className).toContain('min-h-56');
+    expect(editor.className).toContain('max-h-[min(70vh,640px)]');
+    expect(editor.className).toContain('overflow-y-auto');
     expect(editor.className).not.toContain('max-h-60');
+    expect(editor.className).not.toMatch(/overscroll-/);
+    expect(editor.contains(screen.getByRole('toolbar'))).toBe(false);
     const label = screen.getByText('Body', { selector: 'label' });
     expect(label).not.toHaveClass('sr-only');
     expect(label.id).toBe(editor.getAttribute('aria-labelledby'));

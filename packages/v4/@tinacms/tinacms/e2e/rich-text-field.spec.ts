@@ -230,6 +230,42 @@ test.describe('the body toolbar sticks and a framed one does not', () => {
     });
   }
 
+  for (const width of [1280, 390]) {
+    test(`scrolling the body text leaves the stuck toolbar put at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 560 });
+      await openDocument(page, LONG_POST);
+      const shell = toolbarShell(page);
+      await scrollForm(page, 600);
+      await expect(shell).toHaveAttribute('data-stuck', '');
+      await expect.poll(() => offsetUnderForm(page)).toBeCloseTo(8, 0);
+
+      const body = page.getByRole('textbox', { name: /^Body/ });
+      await body.evaluate((el) => {
+        el.scrollTop = el.scrollHeight;
+      });
+      expect(await body.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+      await expect(shell).toHaveAttribute('data-stuck', '');
+      expect(await offsetUnderForm(page)).toBeCloseTo(8, 0);
+    });
+
+    test(`scrolling the body text leaves the flat toolbar at the top of the box at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await openDocument(page, LONG_POST);
+      const shell = toolbarShell(page);
+      const before = await shell.boundingBox();
+      await page.getByRole('textbox', { name: /^Body/ }).evaluate((el) => {
+        el.scrollTop = 200;
+      });
+      const after = await shell.boundingBox();
+      expect(after?.y).toBe(before?.y);
+      await expect(shell).not.toHaveAttribute('data-stuck');
+    });
+  }
+
   test('a framed field never sticks or gets data-stuck', async ({ page }) => {
     await openRichPage(page);
     const shell = toolbarShell(page, /^Summary/);
@@ -257,13 +293,102 @@ test.describe('the wheel over a rich-text field', () => {
     await page.mouse.wheel(0, deltaY);
   };
 
-  test('scrolls the form over the body text', async ({ page }) => {
-    await openDocument(page, LONG_POST);
-    await wheelOver(page, /^Body/, 300);
-    await expect
-      .poll(() => formScroller(page).evaluate((el) => el.scrollTop))
-      .toBeGreaterThan(0);
-  });
+  const bodyBox = (page: import('@playwright/test').Page) =>
+    page.getByRole('textbox', { name: /^Body/ });
+  const scrollTop = (locator: import('@playwright/test').Locator) =>
+    locator.evaluate((el) => el.scrollTop);
+
+  for (const viewport of [
+    { width: 1280, height: 800 },
+    { width: 390, height: 844 },
+  ]) {
+    test.describe(`at ${viewport.width}px`, () => {
+      test.use({ viewport });
+
+      test('a long body stops at min(70vh, 640px) and scrolls its text', async ({
+        page,
+      }) => {
+        await openDocument(page, LONG_POST);
+        const body = bodyBox(page);
+        const cap = Math.min(viewport.height * 0.7, 640);
+        await expect(body).toHaveCSS('overflow-y', 'auto');
+        await expect(body).toHaveCSS('max-height', `${cap}px`);
+        const { client, scroll } = await body.evaluate((el) => ({
+          client: el.clientHeight,
+          scroll: el.scrollHeight,
+        }));
+        expect(client).toBeLessThanOrEqual(Math.ceil(cap));
+        expect(client).toBeGreaterThan(cap - 4);
+        expect(scroll).toBeGreaterThan(client);
+      });
+
+      test('a short body keeps its 224px minimum, has nothing to scroll, and the wheel moves the form', async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width: viewport.width, height: 560 });
+        await openDocument(page, 'hello-world.mdx');
+        const body = bodyBox(page);
+        const { client, scroll } = await body.evaluate((el) => ({
+          client: el.clientHeight,
+          scroll: el.scrollHeight,
+        }));
+        expect(client).toBeGreaterThanOrEqual(222);
+        expect(scroll).toBeLessThanOrEqual(client);
+        await wheelOver(page, /^Body/, 150);
+        await expect
+          .poll(() => scrollTop(formScroller(page)))
+          .toBeGreaterThan(0);
+        expect(await scrollTop(body)).toBe(0);
+      });
+
+      test('the wheel scrolls the body text first, then the form, and back up at the top', async ({
+        page,
+      }) => {
+        await openDocument(page, LONG_POST);
+        const body = bodyBox(page);
+        await body.scrollIntoViewIfNeeded();
+        const formStart = await scrollTop(formScroller(page));
+
+        await wheelOver(page, /^Body/, 200);
+        await expect.poll(() => scrollTop(body)).toBeGreaterThan(0);
+        expect(await scrollTop(formScroller(page))).toBe(formStart);
+
+        for (let attempt = 0; attempt < 10; attempt++) {
+          await wheelOver(page, /^Body/, 400);
+        }
+        const end = await body.evaluate(
+          (el) => el.scrollHeight - el.clientHeight
+        );
+        expect(await scrollTop(body)).toBeGreaterThanOrEqual(end - 1);
+        await expect
+          .poll(() => scrollTop(formScroller(page)))
+          .toBeGreaterThan(formStart);
+
+        const formAtEnd = await scrollTop(formScroller(page));
+        await body.evaluate((el) => {
+          el.scrollTop = 0;
+        });
+        await wheelOver(page, /^Body/, -300);
+        await expect
+          .poll(() => scrollTop(formScroller(page)))
+          .toBeLessThan(formAtEnd);
+      });
+
+      test('nothing around the text sets overscroll-behavior', async ({
+        page,
+      }) => {
+        await openDocument(page, LONG_POST);
+        const values = await bodyBox(page).evaluate((el) => {
+          const out: string[] = [];
+          for (let n: Element | null = el; n; n = n.parentElement) {
+            out.push(getComputedStyle(n).overscrollBehaviorY);
+          }
+          return out;
+        });
+        expect(values.filter((v) => v !== 'auto')).toEqual([]);
+      });
+    });
+  }
 
   test('scrolls a framed field first, then hands the wheel to the form', async ({
     page,
