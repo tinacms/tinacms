@@ -75,8 +75,18 @@ describe('createPreviewLoad', () => {
     expect(seen.at(-1)).toBe('failed');
   });
 
-  it('a timed-out probe waits for load, probes again and shows the page', async () => {
-    const { load, seen, answer } = setup();
+  it('a timed-out probe waits for load, then shows a readable frame without another probe', async () => {
+    const { load, seen, answer, probes } = setup();
+    load.start('loading', 'http://x/');
+    await answer('timeout');
+    expect(seen.at(-1)).toBe('loading');
+    load.loaded();
+    expect(seen.at(-1)).toBeUndefined();
+    expect(probes).toHaveLength(0);
+  });
+
+  it('a timed-out probe and an unreadable frame probe again and show the page when it answers', async () => {
+    const { load, seen, answer } = setup(false);
     load.start('loading', 'http://x/');
     await answer('timeout');
     expect(seen.at(-1)).toBe('loading');
@@ -85,11 +95,10 @@ describe('createPreviewLoad', () => {
     expect(seen.at(-1)).toBeUndefined();
   });
 
-  it('a second timeout shows a readable frame and fails an unreadable one', async () => {
+  it('a second timeout fails an unreadable frame and shows a readable one', async () => {
     const readable = setup(true);
     readable.load.start('loading', 'http://x/');
     readable.load.loaded();
-    await readable.answer('timeout');
     await readable.answer('timeout');
     expect(readable.seen.at(-1)).toBeUndefined();
 
@@ -108,7 +117,6 @@ describe('createPreviewLoad', () => {
     await vi.advanceTimersByTimeAsync(30_000);
     expect(seen.at(-1)).toBe('failed');
     load.loaded();
-    await answer('reached');
     expect(seen.at(-1)).toBeUndefined();
   });
 

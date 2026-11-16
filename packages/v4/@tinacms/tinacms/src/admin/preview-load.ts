@@ -16,8 +16,8 @@ interface PreviewLoadDeps {
 /**
  * The state of one admin-started load. The condition ends when the iframe's `load` and the probe
  * have both settled. A rejected probe is a failure. A timed-out probe is unknown: the machine
- * probes again once `load` arrives, and a second timeout counts as shown only when the frame is
- * readable. With no answer by the cap, the condition is `failed`; a later `load` re-checks it.
+ * shows the page once `load` arrives if the frame is readable, and otherwise probes again; a second
+ * timeout counts as shown only when the frame is readable. With no answer by the cap, the condition is `failed`; a later `load` re-checks it.
  *
  * The machine starts active, so a `load` that fires before the first `start` still counts.
  */
@@ -62,9 +62,19 @@ export function createPreviewLoad({
     } else if (second) {
       finish(frameReadable() ? undefined : 'failed');
     } else {
-      second = true;
-      run(token);
+      probeAgain();
     }
+  }
+
+  // After a timed-out probe and a `load`, a readable frame is a real page: show it at once
+  // instead of waiting for another probe to time out.
+  function probeAgain() {
+    second = true;
+    if (frameReadable()) {
+      finish(undefined);
+      return;
+    }
+    run(token);
   }
 
   return {
@@ -90,8 +100,7 @@ export function createPreviewLoad({
       loaded = true;
       if (capped && result !== 'rejected') {
         capped = false;
-        second = true;
-        run(token);
+        probeAgain();
         return;
       }
       evaluate();
