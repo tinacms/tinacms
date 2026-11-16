@@ -148,7 +148,9 @@ function useSaveAllRun(): () => Promise<string> {
         const state = context();
         if (state.userId !== userId || state.branch !== startBranch) break;
         state.setSaveAllIndex(index + 1);
-        if (formStatus(state.forms[formId]) !== 'dirty') continue;
+        const scope = state.forms[formId];
+        if (formStatus(scope) !== 'dirty') continue;
+        const isNew = isEdited(scope) && scope.isNew === true;
         const collection = runtime.schema.collections.find(
           ({ name }) => name === state.collections[formId]
         );
@@ -171,7 +173,12 @@ function useSaveAllRun(): () => Promise<string> {
             () => readFormBindings(formId),
             {
               write: (value) =>
-                save({ collection: collection.name, path: formId, value }),
+                save({
+                  collection: collection.name,
+                  path: formId,
+                  value,
+                  isNew,
+                }),
               onStage: (next) => {
                 stage = next;
               },
@@ -341,7 +348,12 @@ export function SaveAllControl() {
         button
       )}
       {Object.keys(results).length > 0 ? <SaveResults /> : null}
-      <span role='status' aria-live='polite' className='sr-only'>
+      <span
+        role='status'
+        aria-live='polite'
+        data-save-all-status
+        className='sr-only'
+      >
         {announcement}
       </span>
     </div>

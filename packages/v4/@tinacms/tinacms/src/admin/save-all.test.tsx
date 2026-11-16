@@ -11,6 +11,7 @@ import { ContentError } from '../core/content/contract';
 import type { DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
 import type { FieldSchema, TinaDocument } from '../core/schema/types';
+import { toFieldAddress } from '../core/field/address';
 import { draftKey } from '../form/drafts';
 import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
@@ -51,6 +52,7 @@ const BRANCHES: BranchInfo[] = [
 let mode: Mode;
 let files: Record<string, TinaDocument>;
 let writes: { path: string; value: TinaDocument }[];
+let creates: string[];
 let inFlight: number;
 let maxInFlight: number;
 let held: Map<string, () => void>;
@@ -126,6 +128,16 @@ const contentPlugin = () =>
           ): Promise<DocumentEntry | null> => {
             gets.push(path);
             return files[path] ? { path, document: files[path] } : null;
+          },
+          create: async (
+            _collection: string,
+            path: string,
+            value: TinaDocument
+          ) => {
+            if (files[path]) throw new ContentError('name-taken');
+            creates.push(path);
+            files[path] = value;
+            return { path, document: value };
           },
           update: async (
             _collection: string,
@@ -296,6 +308,7 @@ beforeEach(() => {
     [POST_B]: { title: 'Second', slug: 'second' },
   };
   writes = [];
+  creates = [];
   inFlight = 0;
   maxInFlight = 0;
   held = new Map();
@@ -1314,5 +1327,52 @@ describe('Open in the Save results list', () => {
     await waitFor(() =>
       expect(screen.queryByRole('dialog', { name: 'Save results' })).toBeNull()
     );
+  });
+});
+
+describe("Save All with main's rename and new documents", () => {
+  it('saves a dirty document that was renamed while it was not open', async () => {
+    const user = userEvent.setup();
+    await editSlugs(user, [POST, POST_B]);
+    const renamed = toFormId('content/posts/hello-renamed.mdx');
+    act(() => useFormStore.getState().moveForm(toFormId(POST), renamed));
+    await waitFor(() => expect(saveAll()).toBeEnabled());
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(within(statusBar()).getByText('Saved 2 documents')).toBeVisible()
+    );
+    expect(files['content/posts/hello-renamed.mdx']).toMatchObject({
+      slug: 'hello-x',
+    });
+  });
+
+  it('creates a new document and refuses a name that was taken meanwhile', async () => {
+    consoleGuard.expect(/Save failed/);
+    const user = userEvent.setup();
+    window.location.hash = hashOf('post', POST);
+    renderAdmin();
+    await titleInput();
+    const fresh = 'content/posts/copy.mdx';
+    const taken = 'content/posts/taken.mdx';
+    act(() => {
+      for (const path of [fresh, taken]) {
+        const formId = toFormId(path);
+        useFormStore.getState().registerCollection(formId, 'post');
+        useFormStore.getState().seedNewDocument(formId, {
+          [toFieldAddress('title')]: 'Copy',
+          [toFieldAddress('slug')]: 'copy',
+        });
+      }
+    });
+    files[taken] = { title: 'Theirs', slug: 'theirs' };
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 1 of 2 documents')
+      ).toBeVisible()
+    );
+    expect(creates).toEqual([fresh]);
+    expect(writes).toEqual([]);
+    expect(files[taken]).toMatchObject({ title: 'Theirs' });
   });
 });

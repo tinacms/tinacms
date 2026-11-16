@@ -876,6 +876,13 @@ export const useFormStore = create<FormStore>()(
               failures: rekey(state.failures),
               swapFailures: rekey(state.swapFailures),
               hidden: rekey(state.hidden),
+              collections: rekey(state.collections),
+              revealOnOpen: rekey(state.revealOnOpen),
+              savePending: rekey(state.savePending),
+              saveAll: {
+                ...state.saveAll,
+                results: rekey(state.saveAll.results),
+              },
               active:
                 state.active?.formId === from
                   ? { ...state.active, formId: to }
