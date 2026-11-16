@@ -10,6 +10,10 @@ export interface DocumentSummary {
   path: string;
   /** The document's name for people, such as its title. Pickers show it above the path. */
   title?: string;
+  /** When the document last changed, as an ISO 8601 UTC string. */
+  updatedAt?: string;
+  /** Who last changed the document. */
+  lastAuthor?: { name: string };
 }
 
 export interface DocumentEntry extends DocumentSummary {

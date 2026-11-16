@@ -46,6 +46,14 @@ export interface ImageTileProps {
   lifted?: boolean;
   dropTarget?: boolean;
   handle?: ReactNode;
+  /** A muted line under the file name, such as the name an upload was saved under. */
+  note?: string;
+  /** The words on the veil while a file uploads to this tile, such as "Uploading 40%". */
+  veil?: string;
+  /** The words over the picture while a file is dragged over it. */
+  dropLabel?: string;
+  /** The picture of the file that uploads, shown while the tile has no path. */
+  localSrc?: string;
 }
 
 export function ImageTile({
@@ -66,6 +74,10 @@ export function ImageTile({
   lifted,
   dropTarget,
   handle,
+  note,
+  veil,
+  dropLabel,
+  localSrc,
 }: ImageTileProps) {
   const preview = useImagePreview(path, resolveUrl, previewKey);
   const missing = path === null || forcedMissing || preview.missing;
@@ -90,10 +102,20 @@ export function ImageTile({
           'relative w-full overflow-hidden rounded-sm border bg-muted transition',
           tileShape[look],
           invalid && 'border-destructive',
-          dropTarget && 'border-primary bg-selected'
+          dropTarget && 'border-primary bg-selected',
+          dropLabel !== undefined && !invalid && 'border-primary'
         )}
       >
-        {missing ? (
+        {path === null && veil !== undefined ? (
+          localSrc ? (
+            <img
+              src={localSrc}
+              alt=''
+              draggable={false}
+              className='size-full object-cover'
+            />
+          ) : null
+        ) : missing ? (
           <span className='flex size-full items-center justify-center text-muted-foreground'>
             <Icon glyph='image-missing' size={20} />
           </span>
@@ -108,6 +130,16 @@ export function ImageTile({
             onError={preview.onError}
           />
         )}
+        {veil !== undefined ? (
+          <TileOverlay>
+            <Icon glyph='spinner' size={20} />
+            <span>{veil}</span>
+          </TileOverlay>
+        ) : dropLabel !== undefined ? (
+          <TileOverlay>
+            <span>{dropLabel}</span>
+          </TileOverlay>
+        ) : null}
         {handle ? (
           <div data-handle='' className='absolute bottom-2 left-2'>
             {handle}
@@ -155,7 +187,20 @@ export function ImageTile({
       >
         {path === null ? placeholder : missing ? 'File not found' : name}
       </figcaption>
+      {note ? (
+        <p className='m-0 text-xs text-muted-foreground [overflow-wrap:anywhere]'>
+          {note}
+        </p>
+      ) : null}
     </figure>
+  );
+}
+
+function TileOverlay({ children }: { children: ReactNode }) {
+  return (
+    <div className='absolute inset-0 flex flex-col items-center justify-center gap-1 bg-card/80 p-2 text-center text-sm font-medium [overflow-wrap:anywhere]'>
+      {children}
+    </div>
   );
 }
 

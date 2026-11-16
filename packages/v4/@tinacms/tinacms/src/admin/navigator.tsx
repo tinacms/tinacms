@@ -333,39 +333,19 @@ export function CollectionsNavigator({
   );
 }
 
-/** The panel the Media entry opens beside the rail. The library itself fills the main area. */
+/** The Media pane when no media plugin is installed. */
 export function MediaPanel({
-  hasLibrary,
-  open,
-  navigate,
   onClose,
   hideBelowLg = false,
 }: {
-  hasLibrary: boolean;
-  open: boolean;
-  navigate: (route: AdminRoute) => void;
   onClose: () => void;
   hideBelowLg?: boolean;
 }) {
   return (
-    <aside aria-label='Media panel' className={paneClass(hideBelowLg)}>
+    <aside aria-label='Media' className={paneClass(hideBelowLg)}>
       <PanelHeader heading='Media' closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
-        {hasLibrary ? (
-          <NavRow
-            kind='doc'
-            icon='media'
-            selected={open}
-            aria-current={open ? 'page' : undefined}
-            onClick={() =>
-              navigate({ view: 'screen', screen: 'media', segments: [] })
-            }
-          >
-            Media library
-          </NavRow>
-        ) : (
-          <EmptyState text='No media library is installed.' />
-        )}
+        <EmptyState text='No media library is installed.' />
       </div>
     </aside>
   );

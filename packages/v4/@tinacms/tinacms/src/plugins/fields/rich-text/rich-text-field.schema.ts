@@ -7,7 +7,9 @@ import type {
   TemplateSchema,
 } from '../../../core/schema/types';
 
-export const RICH_TEXT_FIELD_TYPE = 'rich-text';
+import { RICH_TEXT_FIELD_TYPE } from './rich-text-field.type';
+
+export { RICH_TEXT_FIELD_TYPE };
 
 import type {
   RichTextCodec,

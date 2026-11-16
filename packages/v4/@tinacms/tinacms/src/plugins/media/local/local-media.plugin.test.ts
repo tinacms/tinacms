@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { MEDIA_EXTENSIONS } from '../../media-manager/media-types';
 import { toUserId } from '../../../core/auth/contract';
-import type { MediaSlice } from '../../../core/media/contract';
+import { MediaError, type MediaSlice } from '../../../core/media/contract';
 import type { SliceSet, SliceState } from '../../../core/plugin';
+import { type FakeXhr, stubXhr } from '../../../test/fake-xhr';
 import { MEDIA_ERROR_HEADER, localMediaPlugin } from './local-media.plugin';
 
 interface RecordedRequest {
@@ -48,6 +50,21 @@ const createSliceHarness = async (
       };
     })
   );
+  stubXhr((xhr) => {
+    requests.push({
+      url: xhr.url,
+      method: xhr.method,
+      body: xhr.body,
+      authorization: xhr.requestHeaders.authorization ?? null,
+    });
+    queueMicrotask(() => {
+      if (ok) {
+        xhr.respond(200, JSON.stringify(responseBody));
+      } else {
+        xhr.respond(failure.status, 'boom', failure.headers);
+      }
+    });
+  });
   const manifest = localMediaPlugin({ url: '/test/media' });
   const clientModule = await manifest.client?.();
   const sliceCreator = clientModule?.default.slice;
@@ -73,11 +90,13 @@ describe('local media plugin', () => {
     expect(localMediaPlugin().provides).toEqual(['media']);
   });
 
-  it('mounts a slice with the four media operations', async () => {
+  it('mounts a slice with the five media operations and its features', async () => {
     const harness = await createSliceHarness(null);
     expect(Object.keys(harness.slice()).sort()).toEqual([
       'delete',
+      'features',
       'list',
+      'rename',
       'resolveUrl',
       'upload',
     ]);
@@ -91,6 +110,7 @@ describe('media slice', () => {
     expect(await harness.slice().upload(file, 'posts')).toBe('posts/hero.jpg');
     const [request] = harness.requests;
     expect(request.url).toBe('/test/media/upload');
+    expect(request.method).toBe('POST');
     expect(request.body).toBeInstanceOf(FormData);
     const form = request.body as FormData;
     expect(form.get('folder')).toBe('posts');
@@ -109,6 +129,18 @@ describe('media slice', () => {
     const harness = await createSliceHarness(null);
     await harness.slice().delete('old.png');
     expect(harness.requests[0].body).toEqual({ op: 'delete', path: 'old.png' });
+  });
+
+  it('posts a rename op and returns the new path', async () => {
+    const harness = await createSliceHarness({ path: 'posts/new.png' });
+    expect(await harness.slice().rename?.('old.png', 'posts/new.png')).toBe(
+      'posts/new.png'
+    );
+    expect(harness.requests[0].body).toEqual({
+      op: 'rename',
+      from: 'old.png',
+      to: 'posts/new.png',
+    });
   });
 
   it('resolves a media path to a URL under the media root', async () => {
@@ -132,6 +164,16 @@ describe('media slice', () => {
     ).rejects.toMatchObject({ code: 'too-large' });
   });
 
+  it('keeps the code the server reports for an upload', async () => {
+    const harness = await createSliceHarness(null, false, {
+      status: 400,
+      headers: { [MEDIA_ERROR_HEADER]: 'name-taken' },
+    });
+    await expect(
+      harness.slice().upload(new File(['x'], 'x.png'))
+    ).rejects.toMatchObject({ code: 'name-taken', detail: 'boom' });
+  });
+
   it('keeps the code the server reports', async () => {
     const harness = await createSliceHarness(null, false, {
       status: 400,
@@ -141,6 +183,98 @@ describe('media slice', () => {
       code: 'not-found',
     });
   });
+});
+
+describe('media slice upload options', () => {
+  const startUpload = async (signal?: AbortSignal) => {
+    const harness = await createSliceHarness(null);
+    const { sent } = stubXhr();
+    const onProgress = vi.fn();
+    const done = harness
+      .slice()
+      .upload(new File(['jpeg'], 'hero.jpg'), 'posts', { onProgress, signal });
+    await vi.waitFor(() => expect(sent).toHaveLength(1));
+    const xhr: FakeXhr = sent[0];
+    return { xhr, done, onProgress };
+  };
+
+  it('accepts files up to 24 MB', async () => {
+    const harness = await createSliceHarness(null);
+    expect(harness.slice().features?.maxSize).toBe(24 * 1024 * 1024);
+  });
+
+  it('accepts exactly the extensions of the media type table', async () => {
+    const harness = await createSliceHarness(null);
+    const { features } = harness.slice();
+    expect(features?.acceptedExtensions).toEqual([...MEDIA_EXTENSIONS]);
+    expect(features?.acceptedMimeTypes).toBeUndefined();
+  });
+
+  it('reports rising progress from 0 to 1 and returns the path of the server', async () => {
+    const { xhr, done, onProgress } = await startUpload();
+    xhr.progress(1, 4);
+    xhr.progress(3, 4);
+    xhr.finishUpload();
+    xhr.respond(200, JSON.stringify({ path: 'posts/hero.jpg' }));
+    expect(await done).toBe('posts/hero.jpg');
+    expect(onProgress.mock.calls.map(([fraction]) => fraction)).toEqual([
+      0, 0.25, 0.75, 1,
+    ]);
+  });
+
+  it('stops the request with an AbortError when the signal aborts mid-body', async () => {
+    const controller = new AbortController();
+    const { xhr, done } = await startUpload(controller.signal);
+    xhr.progress(1, 4);
+    controller.abort();
+    await expect(done).rejects.toMatchObject({ name: 'AbortError' });
+    expect(xhr.aborted).toBe(true);
+  });
+
+  it('sends no request for a signal that is already aborted', async () => {
+    const harness = await createSliceHarness(null);
+    const { sent } = stubXhr();
+    await expect(
+      harness
+        .slice()
+        .upload(new File(['x'], 'x.png'), '', { signal: AbortSignal.abort() })
+    ).rejects.toMatchObject({ name: 'AbortError' });
+    expect(sent).toHaveLength(0);
+  });
+
+  it('ignores an abort after every byte is sent', async () => {
+    const controller = new AbortController();
+    const { xhr, done } = await startUpload(controller.signal);
+    xhr.finishUpload();
+    controller.abort();
+    expect(xhr.aborted).toBe(false);
+    xhr.respond(200, JSON.stringify({ path: 'posts/hero.jpg' }));
+    expect(await done).toBe('posts/hero.jpg');
+  });
+
+  it('rejects a connection that drops mid-body with an error that is no MediaError', async () => {
+    const { xhr, done, onProgress } = await startUpload();
+    xhr.progress(1, 4);
+    xhr.fail();
+    const failure = await done.catch((cause: unknown) => cause);
+    expect(failure).toBeInstanceOf(Error);
+    expect(failure).not.toBeInstanceOf(MediaError);
+    expect(failure).not.toMatchObject({ name: 'AbortError' });
+    expect(onProgress).not.toHaveBeenCalledWith(1);
+  });
+
+  it.each(['', '<html>proxy</html>', '{"path":'])(
+    'rejects a 2xx with the unreadable body %j with an error that is no MediaError',
+    async (body) => {
+      const { xhr, done, onProgress } = await startUpload();
+      xhr.finishUpload();
+      xhr.respond(200, body);
+      const failure = await done.catch((cause: unknown) => cause);
+      expect(failure).toBeInstanceOf(Error);
+      expect(failure).not.toBeInstanceOf(MediaError);
+      expect(onProgress).toHaveBeenLastCalledWith(1);
+    }
+  );
 });
 
 describe('media slice with an auth plugin', () => {

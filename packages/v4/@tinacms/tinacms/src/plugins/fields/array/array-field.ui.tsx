@@ -57,6 +57,7 @@ import {
   itemFieldsOf,
   pickerOf,
 } from './array-field.schema';
+import { centerInScroller } from '../../../utils/center-in-scroller';
 import { seedItem } from './seed-item';
 import {
   BlockAddView,
@@ -69,22 +70,6 @@ import {
   type ArrayItemView,
   FULL_REASON,
 } from './array-field.view';
-
-/** Centres `el` in its nearest scrollable ancestor. Unlike `scrollIntoView`, it never scrolls an `overflow-hidden` ancestor such as the admin wrapper. */
-function centerInScroller(el: Element) {
-  for (let node = el.parentElement; node; node = node.parentElement) {
-    const { overflowY } = getComputedStyle(node);
-    if (
-      (overflowY === 'auto' || overflowY === 'scroll') &&
-      node.scrollHeight > node.clientHeight
-    ) {
-      const box = node.getBoundingClientRect();
-      const rect = el.getBoundingClientRect();
-      node.scrollTop += rect.top + rect.height / 2 - (box.top + box.height / 2);
-      return;
-    }
-  }
-}
 
 export function ArrayField() {
   const address = useFieldAddress();
@@ -353,7 +338,7 @@ function ObjectItems({
     }
     refocusOpener.current = null;
     afterChange({ open: index, focus: index });
-    insert(index, seedFor(template));
+    listItems.insert(address, index, () => insert(index, seedFor(template)));
     setInserting(null);
   };
   const add = (template?: ArrayTemplateSchema) => {
@@ -365,7 +350,7 @@ function ObjectItems({
   const moveTo = (from: number, to: number) => {
     if (to < 0 || to >= items.length) return;
     afterChange({ focus: to });
-    move(from, to);
+    listItems.move(address, from, to, () => move(from, to));
   };
 
   const views: ArrayItemView[] = items.map((item, index) => {
@@ -496,11 +481,13 @@ function ObjectItems({
       onDuplicate={(index) => {
         if (atMax()) return;
         afterChange({ open: index + 1, focus: index + 1 });
-        insert(index + 1, structuredClone(getValues(`${address}.${index}`)));
+        listItems.insert(address, index + 1, () =>
+          insert(index + 1, structuredClone(getValues(`${address}.${index}`)))
+        );
       }}
       onRemove={(index) => {
         afterChange({ focus: focusAfterRemove(index, items.length - 1) });
-        remove(index);
+        listItems.remove(address, index, () => remove(index));
       }}
     />
   );
@@ -638,12 +625,14 @@ function ScalarItems({
     next.splice(to, 0, ...next.splice(from, 1));
     keys.current.splice(to, 0, ...keys.current.splice(from, 1));
     afterChange({ focus: to });
-    setList(next);
+    listItems.move(address, from, to, () => setList(next));
   };
   const remove = (index: number) => {
     keys.current = keys.current.filter((_, position) => position !== index);
     afterChange({ focus: focusAfterRemove(index, items.length - 1) });
-    setList(liveItems().filter((_, position) => position !== index));
+    listItems.remove(address, index, () =>
+      setList(liveItems().filter((_, position) => position !== index))
+    );
   };
   const atMax = () => max !== undefined && liveItems().length >= max;
   const insertValue = (index: number, entry: unknown) => {
@@ -652,7 +641,7 @@ function ScalarItems({
     const next = [...liveItems()];
     next.splice(index, 0, entry);
     afterChange({ focus: index });
-    setList(next);
+    listItems.insert(address, index, () => setList(next));
   };
   // `defaultItem`, then `of.defaultValue`, then the item type's own default.
   const seedScalar = (): unknown => {

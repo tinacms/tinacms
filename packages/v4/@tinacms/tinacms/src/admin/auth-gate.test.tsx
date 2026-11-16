@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../config';
@@ -72,6 +72,11 @@ const signOut = async (user: User) => {
 beforeEach(() => {
   window.location.hash = '#/collections';
 });
+
+const documentStatus = () =>
+  within(
+    screen.getByRole('complementary', { name: 'Document form' })
+  ).getByRole('status');
 
 describe('AuthGate', () => {
   it('shows the admin with no sign-in screen when no plugin provides auth', async () => {
@@ -246,9 +251,7 @@ describe('AuthGate', () => {
     const adaInput = await screen.findByRole('textbox', { name: /^Title/ });
     expect(adaInput).toHaveValue('Hello');
     await user.type(adaInput, ' from Ada');
-    await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('Unsaved')
-    );
+    await waitFor(() => expect(documentStatus()).toHaveTextContent('Unsaved'));
 
     act(() => expireSession?.());
     expect(await screen.findByRole('alert')).toHaveTextContent(
@@ -259,7 +262,7 @@ describe('AuthGate', () => {
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
     const graceInput = await screen.findByRole('textbox', { name: /^Title/ });
     expect(graceInput).toHaveValue('Hello');
-    expect(screen.getByRole('status')).toHaveTextContent('No changes');
+    expect(documentStatus()).toHaveTextContent('No changes');
     await signOut(user);
 
     nextUser = ada;
@@ -269,7 +272,7 @@ describe('AuthGate', () => {
     await user.click(await screen.findByRole('button', { name: 'Resume' }));
     const adaRestored = screen.getByRole('textbox', { name: /^Title/ });
     expect(adaRestored).toHaveValue('Hello from Ada');
-    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    expect(documentStatus()).toHaveTextContent('Unsaved');
     await signOut(user);
 
     firstTab.unmount();
@@ -281,7 +284,7 @@ describe('AuthGate', () => {
     expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
       'Hello'
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No changes');
+    expect(documentStatus()).toHaveTextContent('No changes');
     graceReloaded.unmount();
     simulateReload();
 
@@ -291,11 +294,11 @@ describe('AuthGate', () => {
     expect(await screen.findByRole('textbox', { name: /^Title/ })).toHaveValue(
       'Hello'
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No changes');
+    expect(documentStatus()).toBeEmptyDOMElement();
     await user.click(await screen.findByRole('button', { name: 'Resume' }));
     expect(screen.getByRole('textbox', { name: /^Title/ })).toHaveValue(
       'Hello from Ada'
     );
-    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    expect(documentStatus()).toHaveTextContent('Unsaved');
   });
 });

@@ -83,6 +83,7 @@
   --color-unsaved-subtle: var(--unsaved-subtle);
   --color-unsaved-edge: var(--unsaved-edge);
   --color-unsaved-dot: var(--unsaved-dot);
+  --color-row-current: var(--row-current);
   --color-status-published: var(--status-published);
   --color-status-published-subtle: var(--status-published-subtle);
   --color-status-failed: var(--status-failed);
@@ -153,6 +154,7 @@
   --leading-code: var(--leading-code);
 
   --ease-standard: var(--ease);
+  --ease-exit: var(--ease-exit);
   --default-transition-timing-function: var(--ease);
   --default-transition-duration: var(--dur);
 }

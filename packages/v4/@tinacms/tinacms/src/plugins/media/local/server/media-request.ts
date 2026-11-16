@@ -10,10 +10,14 @@ const listQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_MEDIA_PAGE_SIZE).optional(),
 });
 
-const mediaRequestSchema = z.object({
-  op: z.literal('delete'),
-  path: z.string().min(1),
-});
+const mediaRequestSchema = z.discriminatedUnion('op', [
+  z.object({ op: z.literal('delete'), path: z.string().min(1) }),
+  z.object({
+    op: z.literal('rename'),
+    from: z.string().min(1),
+    to: z.string().min(1),
+  }),
+]);
 
 export type MediaRequest = z.infer<typeof mediaRequestSchema>;
 
@@ -30,8 +34,11 @@ export const listMedia = (
 export const dispatchMediaRequest = async (
   media: LocalMedia,
   request: unknown
-): Promise<null> => {
+): Promise<{ path: string } | null> => {
   const parsed = mediaRequestSchema.parse(request);
+  if (parsed.op === 'rename') {
+    return { path: await media.rename(parsed.from, parsed.to) };
+  }
   await media.delete(parsed.path);
   return null;
 };

@@ -1,7 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import userEvent from '@testing-library/user-event';
-import { Toaster } from '@tinacms/ui/components/sonner';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
@@ -197,13 +196,16 @@ describe('nested form levels', () => {
 
   it('keeps showing the error of an edited field after a save is tried', async () => {
     const user = userEvent.setup();
-    renderForm(<Toaster />);
+    renderForm();
     await user.click(await screen.findByRole('button', { name: 'Open Three' }));
     await user.clear(await screen.findByLabelText(/^Handle\b/));
     await user.click(await screen.findByRole('button', { name: /Up to Two/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.tab();
     await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    );
     expect((await screen.findAllByRole('alert')).length).toBeGreaterThan(0);
   });
 

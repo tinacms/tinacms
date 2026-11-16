@@ -24,15 +24,16 @@ import {
 } from 'react';
 import { HashRouter } from 'react-router-dom';
 import type { ResolvedConfig } from '../config';
+import type { AdminRoute } from './routing';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
 import { useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
 import { TinaProvider } from '../editor/provider';
-import { HomePanel } from './home';
 import { AuthGate } from './auth-gate';
 import { DocumentForm } from './document-form';
+import { DocumentErrorPane } from './error-summary';
 import { DocumentScope } from './document-scope';
 import {
   CollectionsNavigator,
@@ -40,11 +41,13 @@ import {
   SettingsPane,
   ToolsPane,
 } from './navigator';
-import { AdminRail, MEDIA_SCREEN } from './rail';
+import { AdminRail, HOME_SCREEN, MEDIA_SCREEN } from './rail';
+import { MediaPaneShellContext } from './media-pane-shell';
 import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useGlobalNav, useTinaSchema } from './hooks';
 import { COLLECTIONS_ROUTE, HOME_ROUTE } from './routing';
 import { useBranchSync } from '../editor/branch';
+import { UploadHost } from '../editor/uploads/upload-host';
 import {
   ShellSaveProgress,
   ShellStatusBar,
@@ -73,6 +76,16 @@ function Placeholder({ children }: { children: ReactNode }) {
   return <p className='p-4 text-sm text-muted-foreground'>{children}</p>;
 }
 
+function MediaPaneSlot({
+  screen,
+  segments,
+}: {
+  screen: AdminScreen;
+  segments: string[];
+}) {
+  return <screen.component key={screen.name} segments={segments} />;
+}
+
 function ScreenOutlet({
   name,
   screen,
@@ -98,6 +111,28 @@ function ScreenOutlet({
           <Placeholder>No screen named “{name}”.</Placeholder>
         )}
       </div>
+    </SidebarInset>
+  );
+}
+
+// Home has no panel header and no Close: there is nowhere to close to. The
+// frame scrolls the screen and adds no padding, as the general outlet does.
+function HomeOutlet({
+  screen,
+  segments,
+}: {
+  screen: AdminScreen | undefined;
+  segments: string[];
+}) {
+  return (
+    <SidebarInset className='min-w-0'>
+      {screen ? (
+        <div data-slot='home-frame' className='min-h-0 flex-1 overflow-y-auto'>
+          <screen.component segments={segments} />
+        </div>
+      ) : (
+        <Placeholder>Pick a place from the sidebar.</Placeholder>
+      )}
     </SidebarInset>
   );
 }
@@ -294,17 +329,71 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
 
 // Toasts sit above the Save progress card while it shows.
 const TOAST_OFFSET_ABOVE_CARD = { bottom: '8rem' };
-// Toasts clear the form bar and the Status bar at every form column width.
+// Toasts clear the form bar when one would sit under them.
 const TOAST_OFFSET_ABOVE_BAR = { bottom: '7rem' };
+// Elsewhere toasts sit 16px above the 28px Status bar.
+const TOAST_OFFSET_LOW = { bottom: '44px' };
+// The widest toast (the Resume prompt with its buttons inline) and the Toaster's
+// right inset decide whether a toast can reach the form bar.
+const TOAST_WIDEST_PX = 480;
+const TOAST_RIGHT_PX = 24;
 // Below the dialog layer, so a Confirm dims the toasts behind it.
 const TOAST_LAYER = { zIndex: 40 };
 // With the on-screen keyboard open the toast would cover the field being typed in.
 const TOAST_HIDDEN = { ...TOAST_LAYER, visibility: 'hidden' } as const;
 
+// The Toaster renders outside the shell, so it reads the form bar from the page.
+function useFormBarUnderToast(): boolean {
+  const [under, setUnder] = useState(false);
+  useEffect(() => {
+    const measure = () => {
+      const bar = document.querySelector('[data-slot=form-bar]');
+      setUnder(
+        bar !== null &&
+          bar.getBoundingClientRect().right >
+            window.innerWidth - TOAST_RIGHT_PX - TOAST_WIDEST_PX
+      );
+    };
+    const observer = new ResizeObserver(measure);
+    // Collapsing the sidebar moves the form bar without resizing it, so the
+    // sidebar's gap is watched too.
+    let watched: (Element | null)[] = [];
+    const watch = () => {
+      const next = [
+        document.querySelector('[data-slot=form-bar]'),
+        document.querySelector('[data-slot=sidebar-gap]'),
+      ];
+      if (next.every((element, index) => element === watched[index])) return;
+      observer.disconnect();
+      watched = next;
+      for (const element of next) {
+        if (element) observer.observe(element);
+      }
+      measure();
+    };
+    watch();
+    // The form bar mounts and unmounts with the open document.
+    const mutations = new MutationObserver(watch);
+    mutations.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      mutations.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+  return under;
+}
+
 function ShellToaster() {
   const cardShowing = useLongSave();
   const keyboardOpen = useKeyboardOpen();
-  const offset = cardShowing ? TOAST_OFFSET_ABOVE_CARD : TOAST_OFFSET_ABOVE_BAR;
+  const barUnder = useFormBarUnderToast();
+  const offset = cardShowing
+    ? TOAST_OFFSET_ABOVE_CARD
+    : barUnder
+      ? TOAST_OFFSET_ABOVE_BAR
+      : TOAST_OFFSET_LOW;
   return (
     <Toaster
       offset={offset}
@@ -348,17 +437,47 @@ function AdminShell({
   const screens = useAdminScreens();
   const globalNav = useGlobalNav();
   const { route, navigate } = useAdminRoute();
-  useKeptEditsNotice(route, navigate);
+
+  const isMediaRoute =
+    route.view === 'media' ||
+    (route.view === 'screen' && route.screen === MEDIA_SCREEN);
+
+  // The main area keeps the last route that was not Media; a deep link to Media shows Home.
+  const [lastMain, setLastMain] = useState<AdminRoute>(HOME_ROUTE);
+  useEffect(() => {
+    if (!isMediaRoute) setLastMain(route);
+  }, [route, isMediaRoute]);
+  const mainRoute = isMediaRoute ? lastMain : route;
+  useKeptEditsNotice(mainRoute, navigate);
+
+  const [maximised, setMaximised] = useState(false);
+  useEffect(() => {
+    if (!isMediaRoute) setMaximised(false);
+  }, [isMediaRoute]);
 
   const activeCollectionName =
-    route.view === 'collection' || route.view === 'document'
-      ? route.collection
+    mainRoute.view === 'collection' || mainRoute.view === 'document'
+      ? mainRoute.collection
       : undefined;
   const collection = schema.collections.find(
     (candidate) => candidate.name === activeCollectionName
   );
-  const openPath = route.view === 'document' ? route.path : undefined;
-  const activeScreen = route.view === 'screen' ? route : undefined;
+  const openPath = mainRoute.view === 'document' ? mainRoute.path : undefined;
+  const homeScreen = screens.find(({ name }) => name === HOME_SCREEN);
+  // `#/screens/home` draws Home as `#/` does. With Home removed, it falls to
+  // the general outlet, which says that no screen has that name.
+  const homeSegments =
+    mainRoute.view === 'home'
+      ? []
+      : mainRoute.view === 'screen' &&
+          mainRoute.screen === HOME_SCREEN &&
+          homeScreen
+        ? mainRoute.segments
+        : undefined;
+  const activeScreen =
+    mainRoute.view === 'screen' && homeSegments === undefined
+      ? mainRoute
+      : undefined;
   const isStaleCollectionRoute =
     activeCollectionName !== undefined && collection === undefined;
 
@@ -379,9 +498,9 @@ function AdminShell({
   const goToCollections = () => navigate(COLLECTIONS_ROUTE);
   const goHome = () => navigate(HOME_ROUTE);
   const hasMediaScreen = screens.some(({ name }) => name === MEDIA_SCREEN);
-  const showMediaPanel =
-    route.view === 'media' ||
-    (route.view === 'screen' && route.screen === MEDIA_SCREEN);
+  const mediaScreen = screens.find(({ name }) => name === MEDIA_SCREEN);
+  const mediaSegments = route.view === 'screen' ? route.segments : [];
+  const closeMedia = () => navigate(lastMain);
 
   // The navigator keeps the last opened document selected after Back.
   const [lastOpen, setLastOpen] = useState<{
@@ -398,10 +517,11 @@ function AdminShell({
     (lastOpen && lastOpen.collection === activeCollectionName
       ? lastOpen.path
       : undefined);
-  const showNavigator =
-    route.view === 'collections' ||
-    route.view === 'collection' ||
-    (route.view === 'document' && collection === undefined);
+  const mainShowsNavigator =
+    mainRoute.view === 'collections' ||
+    mainRoute.view === 'collection' ||
+    (mainRoute.view === 'document' && collection === undefined);
+  const showNavigator = !isMediaRoute && mainShowsNavigator;
 
   return (
     <SidebarProvider
@@ -409,6 +529,7 @@ function AdminShell({
       className='h-svh min-h-0 flex-col overflow-hidden'
     >
       <ShellTopBar projectName={projectName} />
+      <UploadHost primary />
 
       <div className='flex min-h-0 flex-1'>
         <Sidebar
@@ -425,14 +546,20 @@ function AdminShell({
           />
         </Sidebar>
 
-        {showMediaPanel ? (
-          <MediaPanel
-            hasLibrary={hasMediaScreen}
-            open={route.view === 'screen'}
-            navigate={navigate}
-            onClose={goHome}
-            hideBelowLg={route.view === 'screen'}
-          />
+        {isMediaRoute ? (
+          mediaScreen ? (
+            <MediaPaneShellContext
+              value={{
+                maximised,
+                toggleMaximise: () => setMaximised((current) => !current),
+                close: closeMedia,
+              }}
+            >
+              <MediaPaneSlot screen={mediaScreen} segments={mediaSegments} />
+            </MediaPaneShellContext>
+          ) : (
+            <MediaPanel onClose={closeMedia} />
+          )
         ) : null}
 
         {showNavigator ? (
@@ -450,69 +577,75 @@ function AdminShell({
 
         {route.view === 'settings' ? <SettingsPane onClose={goHome} /> : null}
 
-        {activeScreen ? (
-          <ScreenOutlet
-            name={activeScreen.screen}
-            screen={screens.find(
-              (candidate) => candidate.name === activeScreen.screen
-            )}
-            segments={activeScreen.segments}
-            onClose={goHome}
-          />
-        ) : route.view === 'home' ? (
-          <HomePanel collections={schema.collections} navigate={navigate} />
-        ) : route.view === 'media' ? (
-          <MissingPanel title='Media' onClose={goHome} hideBelowLg>
-            {hasMediaScreen
-              ? 'Pick a file from the Media panel.'
-              : 'Nothing to show here yet.'}
-          </MissingPanel>
-        ) : route.view === 'tools' || route.view === 'settings' ? (
-          <SidebarInset className='min-w-0'>
-            <Placeholder>Pick an entry to open it.</Placeholder>
-          </SidebarInset>
-        ) : isStaleCollectionRoute ? (
-          <MissingPanel title='Collection not found' onClose={goHome}>
-            No collection named “{activeCollectionName}”.
-          </MissingPanel>
-        ) : isStaleDocumentRoute ? (
-          <MissingPanel title='Document not found' onClose={goHome}>
-            No document named “{openPath}”.
-          </MissingPanel>
-        ) : openPath !== undefined && openDocumentError !== null ? (
-          <MissingPanel title='Cannot open document' onClose={goHome}>
-            <span role='alert'>
-              Cannot read “{openPath}”. {openDocumentError.message}
-            </span>
-          </MissingPanel>
-        ) : showNavigator ? (
-          <DocumentScope collection={collection} path={undefined}>
+        <div
+          className={
+            isMediaRoute
+              ? maximised
+                ? 'hidden'
+                : 'contents max-lg:hidden'
+              : 'contents'
+          }
+        >
+          {activeScreen ? (
+            <ScreenOutlet
+              name={activeScreen.screen}
+              screen={screens.find(
+                (candidate) => candidate.name === activeScreen.screen
+              )}
+              segments={activeScreen.segments}
+              onClose={goHome}
+            />
+          ) : homeSegments ? (
+            <HomeOutlet screen={homeScreen} segments={homeSegments} />
+          ) : mainRoute.view === 'tools' || mainRoute.view === 'settings' ? (
             <SidebarInset className='min-w-0'>
-              <PreviewSlot preview={preview} />
+              <Placeholder>Pick an entry to open it.</Placeholder>
             </SidebarInset>
-          </DocumentScope>
-        ) : (
-          <DocumentScope collection={collection} path={openPath}>
-            <SidebarInset className='min-w-0 flex-row'>
-              <FormColumn
-                openPath={openPath}
-                collection={collection}
-                onBack={() =>
-                  collection
-                    ? navigate({
-                        view: 'collection',
-                        collection: collection.name,
-                      })
-                    : goToCollections()
-                }
-              />
-
-              <div className='min-w-0 flex-1'>
+          ) : isStaleCollectionRoute ? (
+            <MissingPanel title='Collection not found' onClose={goHome}>
+              No collection named “{activeCollectionName}”.
+            </MissingPanel>
+          ) : isStaleDocumentRoute ? (
+            <MissingPanel title='Document not found' onClose={goHome}>
+              No document named “{openPath}”.
+            </MissingPanel>
+          ) : openPath !== undefined && openDocumentError !== null ? (
+            <MissingPanel title='Cannot open document' onClose={goHome}>
+              <span role='alert'>
+                Cannot read “{openPath}”. {openDocumentError.message}
+              </span>
+            </MissingPanel>
+          ) : mainShowsNavigator ? (
+            <DocumentScope collection={collection} path={undefined}>
+              <SidebarInset className='min-w-0'>
                 <PreviewSlot preview={preview} />
-              </div>
-            </SidebarInset>
-          </DocumentScope>
-        )}
+              </SidebarInset>
+            </DocumentScope>
+          ) : (
+            <DocumentScope collection={collection} path={openPath}>
+              <SidebarInset className='relative min-w-0 flex-row'>
+                <FormColumn
+                  openPath={openPath}
+                  collection={collection}
+                  onBack={() =>
+                    collection
+                      ? navigate({
+                          view: 'collection',
+                          collection: collection.name,
+                        })
+                      : goToCollections()
+                  }
+                />
+
+                <DocumentErrorPane />
+
+                <div data-preview-slot='' className='min-w-0 flex-1'>
+                  <PreviewSlot preview={preview} />
+                </div>
+              </SidebarInset>
+            </DocumentScope>
+          )}
+        </div>
       </div>
 
       <ShellStatusBar />

@@ -32,6 +32,20 @@ const RAIL_ROW =
 // The Media manager plugin ships its own entry. The core Media row replaces it.
 export const MEDIA_SCREEN = 'media';
 
+// The core Home plugin ships the Home entry. The rail draws it as its fixed first row.
+export const HOME_SCREEN = 'home';
+
+const FIXED_ROW_SCREENS: readonly string[] = [HOME_SCREEN, MEDIA_SCREEN];
+
+export const targetsScreen = (target: NavTarget, screen: string): boolean =>
+  target.kind === 'screen' && target.screen === screen;
+
+/** Whether a plugin contributes the Home entry. Without it, there is no Home row. */
+export const hasHomeEntry = (sections: GlobalNavSection[]): boolean =>
+  sections.some(({ entries }) =>
+    entries.some(({ target }) => targetsScreen(target, HOME_SCREEN))
+  );
+
 interface RailEntryProps {
   label: string;
   glyph: Glyph;
@@ -104,16 +118,16 @@ function moveWithArrows(event: KeyboardEvent<HTMLElement>) {
   rows[next]?.focus();
 }
 
-const withoutMedia = (entries: GlobalNavEntry[]) =>
+const withoutFixedRows = (entries: GlobalNavEntry[]) =>
   entries.filter(
     ({ target }) =>
-      !(target.kind === 'screen' && target.screen === MEDIA_SCREEN)
+      !FIXED_ROW_SCREENS.some((screen) => targetsScreen(target, screen))
   );
 
 // ADR-027 §2: ungrouped entries and groups share one list, already sorted by `order`.
 const railSections = (sections: GlobalNavSection[]) =>
   sections.flatMap(({ group, entries }) => {
-    const visible = withoutMedia(entries);
+    const visible = withoutFixedRows(entries);
     return visible.length > 0 ? [{ group, entries: visible }] : [];
   });
 
@@ -207,6 +221,9 @@ export function AdminRail({
   const onMedia =
     route.view === 'media' ||
     (route.view === 'screen' && route.screen === MEDIA_SCREEN);
+  const onHome =
+    route.view === 'home' ||
+    (route.view === 'screen' && route.screen === HOME_SCREEN);
   const { setOpenMobile } = useSidebar();
   const go = (next: AdminRoute) => {
     setOpenMobile(false);
@@ -217,12 +234,14 @@ export function AdminRail({
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu aria-label='Navigation'>
-            <RailEntry
-              label='Home'
-              glyph='home'
-              selected={route.view === 'home'}
-              onOpen={() => go({ view: 'home' })}
-            />
+            {hasHomeEntry(sections) ? (
+              <RailEntry
+                label='Home'
+                glyph='home'
+                selected={onHome}
+                onOpen={() => go({ view: 'home' })}
+              />
+            ) : null}
             <RailEntry
               label='Collections'
               glyph='collection'
@@ -270,7 +289,7 @@ export function AdminRail({
         <PluginEntries
           sections={sections}
           activeScreen={
-            route.view === 'screen' && route.screen !== MEDIA_SCREEN
+            route.view === 'screen' && !FIXED_ROW_SCREENS.includes(route.screen)
               ? route.screen
               : undefined
           }

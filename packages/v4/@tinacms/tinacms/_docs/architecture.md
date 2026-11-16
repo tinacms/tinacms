@@ -116,8 +116,12 @@ something because it went looking underneath it.
 `useFormSave` (`editor/hooks.ts`) first calls react-hook-form's `trigger()`
 with no arguments, so every field validates, including a field the editor
 never touched. If any field has a message, save throws `FormValidationError`
-and the form stays dirty (ADR-018 §2). The admin `SaveButton` also reads
-`useFormErrors(formId)` and is disabled while the form has a message.
+and the form stays dirty (ADR-018 §2). The admin `SaveButton` catches that
+error and reads the failing fields from the form store. A blocked Save turns
+into "Resolve N errors" and opens the error summary pane. The button is never
+disabled while blocked. Each row of the pane goes to its field through the
+same activation that preview click-to-edit uses. The list is a snapshot, so a
+fix removes a row and a new failure adds none until the next Save.
 
 `digestDocument(values, fields, registry)` (`core/form/ingest.ts`) does the
 opposite operation to `ingestDocument`. For each field, it calls the

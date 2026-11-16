@@ -202,7 +202,6 @@ describe('tinaCloud()', () => {
       'delete',
       'features',
       'list',
-      'rename',
       'resolveUrl',
       'upload',
     ]);

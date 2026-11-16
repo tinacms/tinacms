@@ -97,7 +97,9 @@ export function ShellTopBar({ projectName }: { projectName?: string }) {
 export function ShellStatusBar() {
   const branch = useBranchView();
   const summary = useSaveSummary();
-  const { state } = summary;
+  // Kept edits draw the unsaved dot while the save state stays idle.
+  const state =
+    summary.state === 'idle' && summary.kept ? 'unsaved' : summary.state;
   const words = statusWords(summary, branch?.mode === 'local');
   if (branch?.mode === 'local') {
     return (

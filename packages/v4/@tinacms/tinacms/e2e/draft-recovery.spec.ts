@@ -227,6 +227,46 @@ test.describe('the Resume toast keeps the form usable', () => {
     await expect.poll(() => clearOf(page, '[data-slot=form-bar]')).toBe(true);
   });
 
+  test('the prompt sits 16px above the Status bar at 1440px', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await waitForPrompt(page);
+    const gap = async () => {
+      const toast = await page.locator('[data-sonner-toast]').boundingBox();
+      const bar = await page.getByRole('contentinfo').boundingBox();
+      return toast && bar ? bar.y - (toast.y + toast.height) : Number.NaN;
+    };
+    await expect.poll(gap).toBeGreaterThan(14);
+    await expect.poll(gap).toBeLessThan(18);
+  });
+
+  test('Cancel shows a focus ring in the Resume confirm and the menu confirm', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await waitForPrompt(page);
+    await page.getByRole('button', { name: 'Discard' }).first().click();
+    const cancel = page
+      .getByRole('alertdialog')
+      .getByRole('button', { name: 'Cancel' });
+    await expect(cancel).toBeFocused();
+    expect(
+      await cancel.evaluate((node) => node.matches(':focus-visible'))
+    ).toBe(true);
+    await page.keyboard.press('Escape');
+
+    await typeTitle(page, '!');
+    await page.getByRole('button', { name: 'Document actions' }).click();
+    await page.getByRole('menuitem', { name: 'Discard unsaved edits' }).click();
+    const dialog = page.getByRole('alertdialog');
+    await expect(dialog).toContainText('Discard unsaved edits to “');
+    await expect(cancel).toBeFocused();
+    expect(
+      await cancel.evaluate((node) => node.matches(':focus-visible'))
+    ).toBe(true);
+  });
+
   for (const height of [440, 460, 480]) {
     test(`Resume can be tapped over the rich-text toolbar at ${height}px high`, async ({
       page,
