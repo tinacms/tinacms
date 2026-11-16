@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import type { FieldDescriptor } from '../core/field/contract';
 import type { FieldSchema } from '../core/schema/types';
 import { toFormId } from '../form/form-store';
 import { t } from '../index';
@@ -96,7 +97,7 @@ describe('items as levels', () => {
     expect(levels.map((level) => level.address)).toEqual(['wrap.rows.0']);
   });
 
-  it('opens a block as its own level when the block is the address, in a top-level list and a nested one', () => {
+  it('opens a block as its own level when the block is the address, in a top-level list, and under its list when a nested list drills in', () => {
     const blocks = (name: string) =>
       ({
         type: 'array',
@@ -104,8 +105,12 @@ describe('items as levels', () => {
         templates: [{ name: 'hero', fields: [{ type: 'string', name: 'h' }] }],
       }) as FieldSchema;
     const hero = () => ({ _template: 'hero' });
+    const arrayDescriptor: FieldDescriptor = {
+      Component: () => null,
+      metadata: { drillable: true },
+    };
     const drills = (step: Parameters<typeof levelDrillsIn>[1]) =>
-      levelDrillsIn(undefined, step);
+      levelDrillsIn(arrayDescriptor, step);
     expect(
       levelsFor('blocks.0', [blocks('blocks')], hero, drills).map(
         (level) => level.address
@@ -120,7 +125,7 @@ describe('items as levels', () => {
       levelsFor('wrap.inner.blocks.0', [nested], hero, drills).map(
         (level) => level.address
       )
-    ).toEqual(['wrap.inner.blocks.0']);
+    ).toEqual(['wrap.inner.blocks', 'wrap.inner.blocks.0']);
   });
 
   it('adds no step for a block whose template is unknown', () => {

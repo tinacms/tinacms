@@ -236,3 +236,52 @@ test('clicking a block on its own padding opens the block level with its card ac
     form.locator('[data-slot="list-card-item"][data-active]')
   ).toHaveCount(1);
 });
+
+test('on Collections the preview frame is hidden but mounted, nothing from the page acts, and a document from the tree shows the same frame again', async ({
+  page,
+}) => {
+  await page.goto(adminUrl(declared(HELLO), '/collections'));
+  const iframe = page.locator('iframe[title="Preview"]');
+  await expect(iframe).toBeHidden();
+  await expect(iframe).toHaveCount(1);
+  const src = await iframe.getAttribute('src');
+  await frame(page).getByTestId('post-title').dispatchEvent('click');
+  await page.waitForTimeout(1000);
+  await expect(page).toHaveURL(/#\/collections$/);
+  await expect(
+    page.getByRole('complementary', { name: 'Navigator' })
+  ).toBeVisible();
+
+  const handle = await iframe.elementHandle();
+  await page
+    .getByRole('complementary', { name: 'Navigator' })
+    .getByRole('button', { name: 'Posts' })
+    .click();
+  await page.getByRole('button', { name: /hello-world\.mdx/ }).click();
+  await expect(iframe).toBeVisible();
+  expect(await iframe.getAttribute('src')).toBe(src);
+  expect(await handle?.evaluate((node) => node.isConnected)).toBe(true);
+  await expect(heading(page)).toHaveText(/^Hello World/);
+  await frame(page).getByTestId('post-title').click();
+  await expect(page.getByRole('textbox', { name: /^title\b/i })).toBeFocused();
+});
+
+test('the returned card keeps its active look with its block after Move down', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  await frame(page)
+    .getByTestId('block-0')
+    .click({ position: { x: 4, y: 4 } });
+  await expect(heading(page)).toHaveText(/^Hero/);
+  const form = page.getByRole('complementary', { name: 'Document form' });
+  await location(page).getByRole('button', { name: 'Hello World' }).click();
+  const cards = form.locator(
+    '[data-array-item] > [data-slot="list-card-item"]'
+  );
+  await expect(cards.first()).toHaveAttribute('data-active', '');
+  await page.getByRole('button', { name: 'Actions for Item 1' }).click();
+  await page.getByRole('menuitem', { name: /^Move down/ }).click();
+  await expect(cards.nth(1)).toHaveAttribute('data-active', '');
+  await expect(cards.first()).not.toHaveAttribute('data-active', '');
+});

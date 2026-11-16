@@ -199,7 +199,7 @@ function ObjectItems({
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
   const [inserting, setInserting] = useState<InsertPicker | null>(null);
   const [adding, setAdding] = useState(false);
-  // The card the editor came back to, still drawn active while its focus is the list's own.
+  // Id of the card the editor came back from. It stays drawn active, wherever a move takes it, while the list's own address or that card is active.
   const [returnedTo, setReturnedTo] = useState<string | null>(null);
   const insertRuns = useRef(0);
   const refocusOpener = useRef<string | null>(null);
@@ -306,9 +306,9 @@ function ObjectItems({
       '[data-grip], [data-slot="list-card-head"] button'
     );
     if (card && target) {
-      const itemAddress = `${address}.${returned}`;
-      if (activation?.address === itemAddress) {
-        setReturnedTo(itemAddress);
+      const returnedId = items[Math.min(returned, items.length - 1)]?.id;
+      if (returnedId && activation?.address === `${address}.${returned}`) {
+        setReturnedTo(returnedId);
       }
       target.focus({ preventScroll: true });
       centerInScroller(card);
@@ -359,6 +359,21 @@ function ObjectItems({
     listItems.move(address, from, to, () => move(from, to));
   };
 
+  useEffect(() => {
+    if (returnedTo === null) return;
+    const index = items.findIndex((item) => item.id === returnedTo);
+    if (
+      activation?.address !== address &&
+      activation?.address !== `${address}.${index}`
+    ) {
+      setReturnedTo(null);
+    }
+  }, [activation]);
+
+  const isActive = (id: string, itemAddress: string) =>
+    activation?.address === itemAddress ||
+    (returnedTo === id && activation?.address === address);
+
   const views: ArrayItemView[] = items.map((item, index) => {
     const itemAddress = `${address}.${index}`;
     const stored: unknown = getValues(itemAddress);
@@ -393,9 +408,7 @@ function ObjectItems({
       opens,
       open: open.has(item.id),
       errorCount: counts[index],
-      active:
-        activation?.address === itemAddress ||
-        (returnedTo === itemAddress && activation?.address === address),
+      active: isActive(item.id, itemAddress),
       onToggle: () => {
         if (opens === 'next-level') {
           showItem(index);

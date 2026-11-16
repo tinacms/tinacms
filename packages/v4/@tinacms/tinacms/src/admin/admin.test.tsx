@@ -379,13 +379,18 @@ describe('TinaAdmin', () => {
     expect(screen.queryByText(/No document named/)).not.toBeInTheDocument();
   });
 
-  it('shows the preview frame beside the navigator on Collections', async () => {
+  it('shows Home beside the navigator on Collections, with the preview frame mounted but hidden', async () => {
     renderAdmin('about:blank');
-    expect(await screen.findByTitle('Preview')).toHaveAttribute(
-      'src',
-      'about:blank'
-    );
+    const frame = await screen.findByTitle('Preview');
+    expect(frame).toHaveAttribute('src', 'about:blank');
+    expect(frame.closest('.hidden')).not.toBeNull();
     expect(screen.queryByText('Select a document to edit.')).toBeNull();
+  });
+
+  it('shows the preview frame beside the navigator on Collections when no Home screen is registered', async () => {
+    renderAdmin('about:blank', false);
+    const frame = await screen.findByTitle('Preview');
+    expect(frame.closest('.hidden')).toBeNull();
   });
 
   it('does not mount the preview frame until a route shows it', async () => {
