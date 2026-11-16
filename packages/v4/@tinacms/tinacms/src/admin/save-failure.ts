@@ -72,6 +72,11 @@ export function saveFailureWords(
           'Some fields are not valid.',
           'Fix the marked fields, then try again.'
         );
+      case 'name-taken':
+        return failure(
+          'A document or folder with that name already exists.',
+          'Your copy is kept. Discard it, then duplicate again with another name.'
+        );
       case 'hook-rejected':
         return failure('A save hook rejected this save.');
       default:

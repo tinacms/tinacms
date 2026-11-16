@@ -217,6 +217,7 @@ export function AdminRail({
   const inCollections =
     route.view === 'collections' ||
     route.view === 'collection' ||
+    route.view === 'folder' ||
     route.view === 'document';
   const onMedia =
     route.view === 'media' ||

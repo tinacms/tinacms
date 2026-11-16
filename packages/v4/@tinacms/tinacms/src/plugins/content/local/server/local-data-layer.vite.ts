@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { readFile } from 'node:fs/promises';
 import type { ServerResponse } from 'node:http';
 import path from 'node:path';
@@ -6,6 +7,7 @@ import { runCodegen } from '../../../../cli/commands/codegen';
 import { type ResolvedConfig, resolveBuild } from '../../../../config';
 import type { Session } from '../../../../core/auth/contract';
 import {
+  CONTENT_CREATE_PERMISSION,
   CONTENT_SAVE_PERMISSION,
   type ContentSaveResult,
   DEFAULT_CONTENT_URL,
@@ -34,8 +36,13 @@ import { errorResponse, toErrorResponse } from '../../../../rpc/error-response';
 import {
   createOpContextRunner,
   createRequestAuthorizer,
+  createSessionPermissionsResponder,
 } from '../../../../rpc/handler';
 import { DEFAULT_RPC_URL } from '../../../../rpc/proxy';
+import {
+  SESSION_NAMESPACE,
+  SESSION_PERMISSIONS_OP,
+} from '../../../../rpc/session-permissions';
 import {
   LOCAL_MEDIA_PLUGIN_NAME,
   MEDIA_ERROR_HEADER,
@@ -48,10 +55,14 @@ import {
   dispatchMediaRequest,
   listMedia,
 } from '../../../media/local/server/media-request';
-import { isRecord } from '../../../../utils/is-record';
 import { mimeTypeOfPath } from '../../../media-manager/media-types';
 import { LOCAL_CONTENT_PLUGIN_NAME } from '../local-content.plugin';
-import { dispatchContentRequest } from './content-request';
+import {
+  type ContentRequest,
+  dispatchContentRequest,
+  parseContentRequest,
+  permissionForOp,
+} from './content-request';
 import {
   type LocalDataLayerOptions,
   createLocalDataLayer,
@@ -160,11 +171,15 @@ const sessionRequestOf = (req: Connect.IncomingMessage): Request => {
 };
 
 // The verified session, or null once the gate has sent its refusal.
-type SessionGate = (
-  req: Connect.IncomingMessage,
-  res: ServerResponse,
-  permission?: string
-) => Promise<Session | null>;
+type SessionGate = {
+  (
+    req: Connect.IncomingMessage,
+    res: ServerResponse,
+    permission?: string
+  ): Promise<Session | null>;
+  // Whether the session of a request that passed the gate holds `permission`.
+  allows(req: Connect.IncomingMessage, permission: string): Promise<boolean>;
+};
 
 // ADR-023 §4: with an auth plugin, the Data Layer authorizes a request as
 // rpc/handler.ts does. When no auth plugin, or the winning one has no server
@@ -177,7 +192,11 @@ const createSessionGate = (
   const authorize = createRequestAuthorizer(plugins);
   const permission = capabilityProvider(plugins, capability)?.requires
     ?.permission;
-  return async (req, res, opPermission) => {
+  const gate = async (
+    req: Connect.IncomingMessage,
+    res: ServerResponse,
+    opPermission?: string
+  ): Promise<Session | null> => {
     try {
       const authorization = await authorize(sessionRequestOf(req), [
         permission,
@@ -192,6 +211,22 @@ const createSessionGate = (
     }
     return null;
   };
+  const allows = async (
+    req: Connect.IncomingMessage,
+    opPermission: string
+  ): Promise<boolean> => {
+    try {
+      const authorization = await authorize(sessionRequestOf(req), [
+        permission,
+        opPermission,
+      ]);
+      return !('refusal' in authorization);
+    } catch (cause) {
+      console.error('[tinacms] Data Layer session check failed:', cause);
+      return false;
+    }
+  };
+  return Object.assign(gate, { allows });
 };
 
 const readJsonBody = async (req: Connect.IncomingMessage): Promise<unknown> => {
@@ -212,16 +247,23 @@ const sendResponse = async (
   res.end(await response.text());
 };
 
-// The local route of the RPC `content/update` op, so `vite dev` runs the server
-// hooks. The RPC handler itself refuses every op without an auth plugin, and
-// local development runs without one.
+// The local routes of the RPC `content/update` and `content/create` ops, so
+// `vite dev` runs the server hooks. The RPC handler itself refuses every op
+// without an auth plugin, and local development runs without one.
+type SaveKind = 'update' | 'create';
+
 type LocalSave = (
+  kind: SaveKind,
   req: Connect.IncomingMessage,
   input: unknown,
-  session: Session | null
+  session: Session | null,
+  mayCreate: boolean
 ) => Promise<ContentSaveResult>;
 
+// An `update` to a path with no file is a create, so it also needs
+// `content:create`. The route learns that from the session after the gate.
 const createServerSaveHandler = (
+  kind: SaveKind,
   save: LocalSave,
   gate: SessionGate | null
 ): Connect.NextHandleFunction => {
@@ -231,9 +273,13 @@ const createServerSaveHandler = (
   ): Promise<Response> => {
     try {
       const input = await readJsonBody(req);
-      return Response.json(await save(req, input, session));
+      const mayCreate =
+        kind === 'create' || !gate
+          ? true
+          : await gate.allows(req, CONTENT_CREATE_PERMISSION);
+      return Response.json(await save(kind, req, input, session, mayCreate));
     } catch (cause) {
-      return toErrorResponse(cause, 'Local content/update');
+      return toErrorResponse(cause, `Local content/${kind}`);
     }
   };
   return async (req, res) => {
@@ -253,7 +299,15 @@ const createServerSaveHandler = (
       );
       return;
     }
-    const session = gate ? await gate(req, res, CONTENT_SAVE_PERMISSION) : null;
+    const session = gate
+      ? await gate(
+          req,
+          res,
+          kind === 'create'
+            ? CONTENT_CREATE_PERMISSION
+            : CONTENT_SAVE_PERMISSION
+        )
+      : null;
     if (gate && !session) return;
     const response = await respond(req, session);
     await sendResponse(res, response);
@@ -272,6 +326,49 @@ const isServerModuleIn = (tinaDir: string, id: string): boolean => {
   const relative = path.relative(tinaDir, file);
   return !relative.startsWith('..') && !path.isAbsolute(relative);
 };
+
+// The local route of the RPC `session/permissions` op. With no gate the server
+// checks nothing, so the answer is the wildcard.
+const createSessionPermissionsHandler =
+  (
+    answer: ((request: Request) => Promise<Response>) | null
+  ): Connect.NextHandleFunction =>
+  async (req, res) => {
+    if (isCrossOriginRequest(req)) {
+      res.statusCode = 403;
+      res.end('Cross-origin request rejected');
+      return;
+    }
+    if (req.method !== 'POST') {
+      await sendResponse(
+        res,
+        errorResponse(405, 'method-not-allowed', 'RPC operations are POST.')
+      );
+      return;
+    }
+    if (coreContentTypeOfRequest(req) !== 'application/json') {
+      await sendResponse(
+        res,
+        errorResponse(
+          415,
+          'unsupported-media-type',
+          'RPC requests must be application/json.'
+        )
+      );
+      return;
+    }
+    try {
+      await sendResponse(
+        res,
+        answer ? await answer(sessionRequestOf(req)) : Response.json(['*'])
+      );
+    } catch (cause) {
+      await sendResponse(
+        res,
+        toErrorResponse(cause, 'Local session/permissions')
+      );
+    }
+  };
 
 const createMediaHandler = (
   media: LocalMedia,
@@ -376,24 +473,29 @@ export const tinaLocalDataLayerVitePlugin = (
   const plugins = options.config?.plugins ?? [];
   const contentGate = createSessionGate(plugins, 'content');
   const mediaGate = createSessionGate(plugins, 'media');
-  let serverSave: Promise<ServerSave> | undefined;
-  const loadServerSave = (): Promise<ServerSave> => {
-    serverSave ??= resolveServerSegments(plugins).then(
+  const mayCreateStorage = new AsyncLocalStorage<boolean>();
+  const serverSaves: Partial<Record<SaveKind, Promise<ServerSave>>> = {};
+  const loadServerSave = (kind: SaveKind): Promise<ServerSave> => {
+    serverSaves[kind] ??= resolveServerSegments(plugins).then(
       (resolved) =>
         createServerSave({
           hooks: createServerHookRegistry(plugins, resolved),
           collections,
           write: ({ collection, path: documentPath, value }) =>
-            dataLayer.update(collection, documentPath, value),
+            kind === 'create'
+              ? dataLayer.create(collection, documentPath, value)
+              : dataLayer.update(collection, documentPath, value, {
+                  mayCreate: mayCreateStorage.getStore() === true,
+                }),
           resolvePath: (collection, documentPath) =>
             dataLayer.canonicalPath(collection, documentPath),
         }),
       (cause) => {
-        serverSave = undefined;
+        delete serverSaves[kind];
         throw cause;
       }
     );
-    return serverSave;
+    return serverSaves[kind];
   };
   const tinaDir = path.resolve(options.rootDir, 'tina');
   const servesContentSave =
@@ -436,21 +538,34 @@ export const tinaLocalDataLayerVitePlugin = (
     }
   };
   const runInOpContext = createOpContextRunner(plugins);
-  const saveLocally: LocalSave = (req, input, session) =>
-    runInOpContext(sessionRequestOf(req), session, async () =>
-      (await loadServerSave())(input, session)
+  const saveLocally: LocalSave = (kind, req, input, session, mayCreate) =>
+    runInOpContext(sessionRequestOf(req), session, () =>
+      mayCreateStorage.run(mayCreate, async () =>
+        (await loadServerSave(kind))(input, session)
+      )
     );
 
-  const saveContentUpdate = async (
+  const saveThroughHooks = async (
+    kind: SaveKind,
     req: Connect.IncomingMessage,
     request: unknown,
     session: Session | null
   ): Promise<Response> => {
     try {
-      const { entry } = await saveLocally(req, request, session);
+      const mayCreate =
+        kind === 'create' || !contentGate
+          ? true
+          : await contentGate.allows(req, CONTENT_CREATE_PERMISSION);
+      const { entry } = await saveLocally(
+        kind,
+        req,
+        request,
+        session,
+        mayCreate
+      );
       return Response.json(entry);
     } catch (cause) {
-      return toErrorResponse(cause, 'Local content update');
+      return toErrorResponse(cause, `Local content ${kind}`);
     }
   };
 
@@ -482,25 +597,43 @@ export const tinaLocalDataLayerVitePlugin = (
       sendError(req, res, cause);
       return;
     }
-    const isUpdate = isRecord(request) && request.op === 'update';
+    let parsed: ContentRequest | undefined;
+    let invalid: unknown;
+    try {
+      parsed = parseContentRequest(request);
+    } catch (cause) {
+      invalid = cause;
+    }
     const session = contentGate
-      ? await contentGate(
-          req,
-          res,
-          isUpdate ? CONTENT_SAVE_PERMISSION : undefined
-        )
+      ? await contentGate(req, res, parsed && permissionForOp(parsed.op))
       : null;
     if (contentGate && !session) return;
-    if (isUpdate) {
-      await sendResponse(res, await saveContentUpdate(req, request, session));
+    if (!parsed) {
+      await sendResponse(res, toErrorResponse(invalid, 'Local content'));
+      return;
+    }
+    if (parsed.op === 'update' || parsed.op === 'create') {
+      await sendResponse(
+        res,
+        await saveThroughHooks(parsed.op, req, request, session)
+      );
       return;
     }
     try {
-      const result = await dispatchContentRequest(dataLayer, request);
+      const maySave =
+        (parsed.op === 'rename' || parsed.op === 'renameFolder') && contentGate
+          ? await contentGate.allows(req, CONTENT_SAVE_PERMISSION)
+          : true;
+      const result = await dispatchContentRequest(dataLayer, request, {
+        maySave,
+      });
       res.setHeader('content-type', 'application/json');
       res.end(JSON.stringify(result));
     } catch (cause) {
-      sendError(req, res, cause);
+      await sendResponse(
+        res,
+        toErrorResponse(cause, `Local content ${parsed.op}`)
+      );
     }
   };
 
@@ -606,11 +739,19 @@ export const tinaLocalDataLayerVitePlugin = (
         );
       }
       if (servesContentSave) {
-        server.middlewares.use(
-          `${options.config?.rpcUrl ?? DEFAULT_RPC_URL}/content/update`,
-          createServerSaveHandler(saveLocally, contentGate)
-        );
+        for (const kind of ['update', 'create'] as const) {
+          server.middlewares.use(
+            `${options.config?.rpcUrl ?? DEFAULT_RPC_URL}/content/${kind}`,
+            createServerSaveHandler(kind, saveLocally, contentGate)
+          );
+        }
       }
+      server.middlewares.use(
+        `${options.config?.rpcUrl ?? DEFAULT_RPC_URL}/${SESSION_NAMESPACE}/${SESSION_PERMISSIONS_OP}`,
+        createSessionPermissionsHandler(
+          contentGate ? createSessionPermissionsResponder(plugins) : null
+        )
+      );
       server.middlewares.use(
         options.url ?? DEFAULT_CONTENT_URL,
         serveContentRequest

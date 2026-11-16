@@ -511,6 +511,8 @@ export interface FormProviderProps {
   path: string;
   document?: TinaDocument;
   onSave?: SaveHandler;
+  /** Set for a document that has no file yet: Discard drops its copy and calls this. */
+  onDiscardNew?: () => void;
   children: ReactNode;
 }
 
@@ -519,6 +521,7 @@ export function FormProvider({
   path,
   document,
   onSave,
+  onDiscardNew,
   children,
 }: FormProviderProps) {
   const runtime = use(TinaRuntimeContext);
@@ -638,6 +641,17 @@ export function FormProvider({
     [formId]
   );
 
+  const discardNewDocument = useMemo(
+    () =>
+      onDiscardNew
+        ? () => {
+            readFormStore().discardStoredDraft(formId);
+            onDiscardNew();
+          }
+        : undefined,
+    [onDiscardNew, formId]
+  );
+
   const formScope = useMemo(
     () => ({
       formId,
@@ -650,7 +664,7 @@ export function FormProvider({
       saveFailure,
       setSaveFailure,
       view,
-      discardEdits,
+      discardEdits: discardNewDocument ?? discardEdits,
       hooks: formHooks,
       staleDraft: staleDraftActions,
     }),
@@ -666,6 +680,7 @@ export function FormProvider({
       setSaveFailure,
       view,
       discardEdits,
+      discardNewDocument,
       formHooks,
       staleDraftActions,
     ]

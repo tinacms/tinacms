@@ -16,6 +16,8 @@ export interface StoredDraft {
   readonly baseline: TinaDocument;
   /** Holds only values that lost to another copy when Resume ran. */
   readonly leftover?: boolean;
+  /** Marks a document that has no file yet. A draft stored before this marker reads as not new. */
+  readonly new?: true;
 }
 
 // A draft belongs to the branch it was typed on. The default branch has no
@@ -59,6 +61,7 @@ const asDraft = (entry: unknown): StoredDraft | undefined => {
     values: entry.values,
     baseline: entry.baseline,
     ...(entry.leftover === true ? { leftover: true } : {}),
+    ...(entry.new === true ? { new: true } : {}),
   };
 };
 
@@ -208,4 +211,27 @@ export const listStoredDraftIds = (
     }
   }
   return [...ids];
+};
+
+/**
+ * Moves every stored copy of a form, live and waiting, to a new form id. The
+ * copies of `to` stay; a moved live copy waits behind a live copy already there.
+ */
+export const moveDrafts = (
+  from: FormId,
+  to: FormId,
+  userId?: DraftUserScope,
+  branch?: string
+): void => {
+  if (userId === null || from === to) return;
+  const live = readDraft(from, userId, branch);
+  const waiting = readWaitingDrafts(from, userId, branch);
+  if (!live && waiting.length === 0) return;
+  const keptWaiting = readWaitingDrafts(to, userId, branch);
+  const movedLive = live && !readDraft(to, userId, branch) ? live : undefined;
+  const aside = live && !movedLive ? [live] : [];
+  if (movedLive) writeDraft(to, movedLive, userId, branch);
+  const copies = [...keptWaiting, ...waiting, ...aside];
+  if (copies.length > 0) writeWaitingDrafts(to, copies, userId, branch);
+  removeAllDrafts(from, userId, branch);
 };

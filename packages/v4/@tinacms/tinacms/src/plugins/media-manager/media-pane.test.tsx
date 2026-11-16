@@ -34,6 +34,7 @@ import { type SavePhase, toFormId, useFormStore } from '../../form/form-store';
 import { MEDIA_EXTENSIONS } from './media-types';
 import { MediaPane } from './media-pane';
 import { mediaManagerPlugin } from './media-manager.plugin';
+import { connectionOf } from '../../test/connection';
 
 const BRANCHES: BranchInfo[] = [
   { name: 'main', protected: true },
@@ -212,7 +213,7 @@ const contentPlugin = definePlugin({
             list: async () => BRANCHES,
             defaultBranch: async () => 'main',
           },
-          list: async () => [{ path: POST.path }],
+          list: async () => connectionOf([{ path: POST.path }]),
           get: async (_collection: string, path: string) =>
             path === POST.path
               ? {
