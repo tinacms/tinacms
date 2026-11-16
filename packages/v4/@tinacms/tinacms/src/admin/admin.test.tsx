@@ -453,6 +453,79 @@ describe('TinaAdmin', () => {
     expect(frame.closest('.hidden')).not.toBeNull();
   });
 
+  it('wraps a string preview in the toolbar, and a node preview or none gets no toolbar', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const first = renderAdmin('about:blank');
+    expect(
+      await screen.findByRole('group', { name: 'Preview toolbar' })
+    ).toBeInTheDocument();
+    first.unmount();
+
+    const second = renderAdmin(<p>custom preview</p>);
+    await screen.findByText('custom preview');
+    expect(screen.queryByRole('group', { name: 'Preview toolbar' })).toBeNull();
+    second.unmount();
+
+    renderAdmin();
+    expect(
+      await screen.findByRole('button', { name: 'How previews are set up' })
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Preview toolbar' })).toBeNull();
+    expect(screen.queryByText('No preview configured.')).toBeNull();
+  });
+
+  it('keeps the same preview frame node across device, scale, expand and Reload', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    const frame = await screen.findByTitle('Preview');
+    const bar = screen.getByRole('group', { name: 'Preview toolbar' });
+    // The test window is 1024px wide, a tablet: the device sizes sit in the actions menu.
+    await user.click(
+      within(bar).getByRole('button', { name: 'Preview actions' })
+    );
+    await user.click(
+      await screen.findByRole('menuitemcheckbox', { name: /^Tablet/ })
+    );
+    expect(screen.getByTitle('Preview')).toBe(frame);
+    await user.click(
+      within(bar).getByRole('button', { name: /^768px, scale/ })
+    );
+    await user.click(
+      await screen.findByRole('menuitemcheckbox', { name: '50%' })
+    );
+    expect(screen.getByTitle('Preview')).toBe(frame);
+    await user.click(
+      within(bar).getByRole('button', { name: 'Expand preview' })
+    );
+    expect(screen.getByTitle('Preview')).toBe(frame);
+    expect(
+      screen.getByRole('button', { name: 'Collapse preview' })
+    ).toHaveFocus();
+    await user.keyboard('{Escape}');
+    expect(
+      screen.getByRole('button', { name: 'Expand preview' })
+    ).toHaveFocus();
+    await user.click(
+      within(bar).getByRole('button', { name: 'Preview actions' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: 'Reload' }));
+    expect(screen.getByTitle('Preview')).toBe(frame);
+  });
+
+  it('gives every toolbar control a name and Tab order', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin('about:blank');
+    const bar = await screen.findByRole('group', { name: 'Preview toolbar' });
+    for (const button of within(bar).getAllByRole('button')) {
+      expect(button).toHaveAccessibleName();
+      expect(button).not.toHaveAttribute('tabindex', '-1');
+    }
+    expect(
+      within(bar).getByRole('textbox', { name: 'Page address' })
+    ).toBeInTheDocument();
+  });
+
   it('has no tab list and no preview place bar on a document', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     renderAdmin('about:blank');

@@ -106,6 +106,7 @@
 
   --color-scrim: var(--scrim);
   --color-scrim-light: var(--scrim-light);
+  --color-pv-ground: var(--pv-ground);
 
   --shadow-xs: var(--shadow-xs);
   --shadow-popover: var(--shadow-popover);

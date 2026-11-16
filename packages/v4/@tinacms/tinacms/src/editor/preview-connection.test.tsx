@@ -75,7 +75,10 @@ const messageFromPreview = (
 const hear = (iframe: ReturnType<typeof fakeIframe>) =>
   messageFromPreview(readyMessage(), iframe.ref.current?.contentWindow);
 
-const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
+const renderConnected = (
+  iframeRef: RefObject<HTMLIFrameElement | null>,
+  options?: PreviewConnectionOptions
+) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
@@ -89,7 +92,7 @@ const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
         document={{ title: 'Hello' }}
       >
         <LabelledFields />
-        <Connection iframeRef={iframeRef} />
+        <Connection iframeRef={iframeRef} options={options} />
       </FormProvider>
     </TinaProvider>
   );
@@ -269,6 +272,27 @@ describe('usePreviewConnection', () => {
       source: 'page',
     });
     expect(input).toHaveFocus();
+  });
+
+  it('calls onActivate once per accepted activate message, and not for a refused one', async () => {
+    const iframe = fakeIframe();
+    const onActivate = vi.fn();
+    renderConnected(iframe.ref, { open: openPost, onActivate });
+    await screen.findByLabelText(/^Title\b/);
+
+    messageFromPreview(
+      activateMessage('title'),
+      iframe.ref.current?.contentWindow,
+      'https://evil.example'
+    );
+    messageFromPreview(activateMessage('title'), { not: 'the iframe' });
+    expect(onActivate).not.toHaveBeenCalled();
+
+    messageFromPreview(
+      activateMessage('title'),
+      iframe.ref.current?.contentWindow
+    );
+    expect(onActivate).toHaveBeenCalledTimes(1);
   });
 
   it('ignores the wrong origin, the wrong source, and malformed data', async () => {

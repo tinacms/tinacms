@@ -24,8 +24,51 @@ const restartOnTinaConfigChange = (): Plugin => ({
   },
 });
 
+// Pages the preview toolbar's tests need: a slow one, other statuses, and a site that is down.
+const previewFixtures = (): Plugin => {
+  const up = new Set<string>();
+  return {
+    name: 'tina-playground-preview-fixtures',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const url = new URL(req.url ?? '/', 'http://localhost');
+        if (url.pathname === '/slow.html') {
+          const wait = Number(url.searchParams.get('ms') ?? 1500);
+          setTimeout(() => {
+            res.setHeader('content-type', 'text/html');
+            res.end('<h1 data-testid="slow-title">Slow page</h1>');
+          }, wait);
+        } else if (
+          url.pathname === '/status/404' ||
+          url.pathname === '/status/500'
+        ) {
+          res.statusCode = Number(url.pathname.split('/').pop());
+          res.setHeader('content-type', 'text/html');
+          res.end(
+            `<h1 data-testid="status-title">Site says ${res.statusCode}</h1>`
+          );
+        } else if (url.pathname === '/down.html') {
+          const key = url.searchParams.get('key') ?? '';
+          if (up.has(key)) {
+            res.setHeader('content-type', 'text/html');
+            res.end('<h1 data-testid="down-title">Site is up</h1>');
+          } else {
+            req.socket.destroy();
+          }
+        } else if (url.pathname === '/__up') {
+          up.add(url.searchParams.get('key') ?? '');
+          res.end('ok');
+        } else {
+          next();
+        }
+      });
+    },
+  };
+};
+
 export default defineConfig({
   plugins: [
+    previewFixtures(),
     react({ babel: { plugins: ['babel-plugin-react-compiler'] } }),
     tailwindcss(),
     tinaLocalDataLayerVitePlugin({
