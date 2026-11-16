@@ -943,3 +943,49 @@ test.describe('Reload and a pending address', () => {
     await expect(page.locator('iframe[title="Preview"]')).toBeHidden();
   });
 });
+
+test.describe('pending loads, next to the fix', () => {
+  test('typing the shown page with a hash during a pending load loads that page, not the pending one', async ({
+    page,
+  }) => {
+    await page.goto(adminUrl('/plain.html'));
+    await expect(frame(page).getByTestId('plain-title')).toBeAttached();
+    const box = address(page);
+    await box.fill('/slow.html?ms=6000');
+    await box.press('Enter');
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Loading the page' })
+    ).toBeVisible();
+    await box.fill('/plain.html#x');
+    await box.press('Enter');
+    // The slow page answers at 6s; the typed page must show well before that, and stay.
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Loading the page' })
+    ).toHaveCount(0, { timeout: 3000 });
+    await expect(frame(page).getByTestId('plain-title')).toBeVisible();
+    await page.waitForTimeout(4000);
+    await expect(frame(page).getByTestId('plain-title')).toBeVisible();
+    await expect(box).toHaveValue(/\/plain\.html/);
+  });
+
+  test('after a redirect with a late probe, the box follows the page that shows', async ({
+    page,
+  }) => {
+    await page.goto(adminUrl('/plain.html'));
+    await expect(frame(page).getByTestId('plain-title')).toBeAttached();
+    await page.route('**/redir.html', async (route) => {
+      if (route.request().resourceType() === 'fetch') {
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+      }
+      await route.continue();
+    });
+    const box = address(page);
+    await box.fill('/redir.html');
+    await box.press('Enter');
+    await expect(frame(page).getByTestId('query')).toHaveText('?second=1');
+    await expect(page.getByText('Loading the page')).toHaveCount(0, {
+      timeout: 8000,
+    });
+    await expect(box).toHaveValue(/\/plain\.html\?second=1$/);
+  });
+});

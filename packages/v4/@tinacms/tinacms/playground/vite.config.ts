@@ -69,6 +69,10 @@ const previewFixtures = (): Plugin => {
           released.add(key);
           stalled.get(key)?.();
           res.end('ok');
+        } else if (url.pathname === '/redir.html') {
+          res.statusCode = 302;
+          res.setHeader('location', '/plain.html?second=1');
+          res.end();
         } else if (url.pathname === '/__up') {
           up.add(url.searchParams.get('key') ?? '');
           res.end('ok');

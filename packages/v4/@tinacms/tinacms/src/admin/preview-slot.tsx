@@ -109,7 +109,12 @@ function PreviewPane({
       probe,
       frameReadable: () => framePage() !== null,
       onCondition: (next) => {
-        if (next === undefined) pending.current = null;
+        if (next === undefined) {
+          pending.current = null;
+          // The page may have redirected, and the load event came before the probe settled.
+          const shown = framePage();
+          if (shown) setHref(shown);
+        }
         setCondition(next);
       },
     })
@@ -205,13 +210,18 @@ function PreviewPane({
       return;
     }
     setHref(next);
+    const pendingLoad = pending.current !== null;
     // While a load is pending or failed, any other address is a new load.
-    if (pending.current === null && isHashOnlyChange(current, next)) {
+    if (!pendingLoad && isHashOnlyChange(current, next)) {
       moveFrame(next);
       return;
     }
     startLoad('loading', next);
-    moveFrame(next);
+    // A fragment on the frame's own document fetches nothing and leaves the pending navigation running.
+    const page = framePage();
+    const sameDocument =
+      pendingLoad && page !== null && withoutHash(page) === withoutHash(next);
+    moveFrame(sameDocument ? withoutHash(next) : next);
   };
 
   const openInNewTab = () => {
