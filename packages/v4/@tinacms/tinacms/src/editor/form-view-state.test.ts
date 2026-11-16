@@ -96,6 +96,33 @@ describe('items as levels', () => {
     expect(levels.map((level) => level.address)).toEqual(['wrap.rows.0']);
   });
 
+  it('opens a block as its own level when the block is the address, in a top-level list and a nested one', () => {
+    const blocks = (name: string) =>
+      ({
+        type: 'array',
+        name,
+        templates: [{ name: 'hero', fields: [{ type: 'string', name: 'h' }] }],
+      }) as FieldSchema;
+    const hero = () => ({ _template: 'hero' });
+    const drills = (step: Parameters<typeof levelDrillsIn>[1]) =>
+      levelDrillsIn(undefined, step);
+    expect(
+      levelsFor('blocks.0', [blocks('blocks')], hero, drills).map(
+        (level) => level.address
+      )
+    ).toEqual(['blocks.0']);
+    const nested = {
+      type: 'object',
+      name: 'wrap',
+      fields: [{ type: 'object', name: 'inner', fields: [blocks('blocks')] }],
+    } as FieldSchema;
+    expect(
+      levelsFor('wrap.inner.blocks.0', [nested], hero, drills).map(
+        (level) => level.address
+      )
+    ).toEqual(['wrap.inner.blocks.0']);
+  });
+
   it('adds no step for a block whose template is unknown', () => {
     const blocks = {
       type: 'array',

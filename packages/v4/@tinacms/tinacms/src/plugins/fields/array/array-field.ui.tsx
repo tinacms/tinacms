@@ -199,6 +199,8 @@ function ObjectItems({
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
   const [inserting, setInserting] = useState<InsertPicker | null>(null);
   const [adding, setAdding] = useState(false);
+  // The card the editor came back to, still drawn active while its focus is the list's own.
+  const [returnedTo, setReturnedTo] = useState<string | null>(null);
   const insertRuns = useRef(0);
   const refocusOpener = useRef<string | null>(null);
   const { listRef, afterChange } = useAfterChange(items, (index) =>
@@ -304,6 +306,10 @@ function ObjectItems({
       '[data-grip], [data-slot="list-card-head"] button'
     );
     if (card && target) {
+      const itemAddress = `${address}.${returned}`;
+      if (activation?.address === itemAddress) {
+        setReturnedTo(itemAddress);
+      }
       target.focus({ preventScroll: true });
       centerInScroller(card);
     }
@@ -387,6 +393,9 @@ function ObjectItems({
       opens,
       open: open.has(item.id),
       errorCount: counts[index],
+      active:
+        activation?.address === itemAddress ||
+        (returnedTo === itemAddress && activation?.address === address),
       onToggle: () => {
         if (opens === 'next-level') {
           showItem(index);

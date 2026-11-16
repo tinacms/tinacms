@@ -215,3 +215,24 @@ test.describe('on a touch screen', () => {
     await expect(page.locator('input#title')).toBeFocused();
   });
 });
+
+test('clicking a block on its own padding opens the block level with its card active and keeps it on a second click', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  const block = frame(page).getByTestId('block-0');
+  await block.click({ position: { x: 4, y: 4 } });
+  await expect(heading(page)).toHaveText(/^Hero/);
+  const form = page.getByRole('complementary', { name: 'Document form' });
+  await expect(form.getByRole('textbox', { name: /headline/i })).toBeVisible();
+  await expect(form.locator(':focus')).toHaveCount(0);
+  await block.click({ position: { x: 4, y: 4 } });
+  await expect(heading(page)).toHaveText(/^Hero/);
+  await location(page).getByRole('button', { name: 'Hello World' }).click();
+  await expect(
+    form.locator('[data-active]').filter({ hasText: 'Hero' })
+  ).toHaveCount(1);
+  await expect(
+    form.locator('[data-slot="list-card-item"][data-active]')
+  ).toHaveCount(1);
+});

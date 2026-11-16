@@ -699,7 +699,11 @@ function ActiveFieldLevels({ scope }: { scope: FormScope }) {
       levels.every(
         (level, index) => level.address === openLevels[index]?.address
       );
-    if (sameLevels || top === address || top?.startsWith(`${address}.`)) return;
+    if (sameLevels) return;
+    const opensItself = levels.at(-1)?.address === address;
+    if (!opensItself && (top === address || top?.startsWith(`${address}.`))) {
+      return;
+    }
     view.getState().showLevels(levels);
   });
   useEffect(() => {

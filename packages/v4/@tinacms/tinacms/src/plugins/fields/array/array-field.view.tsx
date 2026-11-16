@@ -57,6 +57,8 @@ export interface ArrayItemView {
   errorCount?: number;
   /** The message under the card. */
   error?: string;
+  /** The page is pointing at this item: draw its card like focus. */
+  active?: boolean;
   onBlur?: () => void;
   onFocus?: () => void;
   children?: ReactNode;
@@ -221,6 +223,12 @@ function Card({
           alwaysOpen={item.alwaysOpen}
           errorCount={item.errorCount}
           onToggle={item.onToggle}
+          data-active={item.active ? '' : undefined}
+          className={
+            item.active && !disabled && !readOnly
+              ? 'border-ring shadow-focus-ring'
+              : undefined
+          }
         >
           {item.children}
         </ListCard>
