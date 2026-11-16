@@ -541,3 +541,90 @@ test.describe('table controls in a real browser', () => {
     });
   });
 });
+
+test('selected cells carry aria-selected in a mounted field view, by drag and by Shift+Arrow', async ({
+  page,
+}) => {
+  await page.goto('/rich-text-states.html?state=with%20a%20table');
+  const cell = (text: string) => page.locator('th, td', { hasText: text });
+  await cell('r2c1').click();
+  const selected = page.locator('td[aria-selected="true"]');
+  for (const key of [
+    'Shift+ArrowDown',
+    'Shift+ArrowDown',
+    'Shift+ArrowRight',
+  ]) {
+    await page.keyboard.press(key);
+    await page.waitForTimeout(300);
+  }
+  await expect(selected).toHaveCount(6);
+  await cell('r1c1').click();
+  await expect(page.locator('td[aria-selected="true"]')).toHaveCount(0);
+  const from = await cell('r2c1').boundingBox();
+  const to = await cell('r4c2').boundingBox();
+  if (!from || !to) throw new Error('cells not drawn');
+  await page.mouse.move(from.x + 10, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x + 20, to.y + to.height / 2, { steps: 10 });
+  await page.mouse.up();
+  await expect(page.locator('td[aria-selected="true"]')).toHaveCount(6);
+});
+
+test.describe('focus after a tool from More tools', () => {
+  test('desktop: a quote from ⋯ closes the panel and typing goes into the text', async ({
+    page,
+  }) => {
+    await page.goto(POST('long-post.mdx'));
+    await body(page).getByText('Body paragraph 1 keeps').first().click();
+    await toolbar(page).getByRole('button', { name: 'More tools...' }).click();
+    await page.getByRole('button', { name: 'Quote' }).click();
+    await expect(body(page)).toBeFocused();
+    await page.keyboard.type('ZZTYPED');
+    await expect(body(page).locator('blockquote')).toContainText('ZZTYPED');
+  });
+
+  test('desktop: Link OK and Cancel from ⋯ return focus to the text', async ({
+    page,
+  }) => {
+    await page.goto(POST('long-post.mdx'));
+    for (const action of ['Cancel', 'OK']) {
+      await body(page).getByText('Body paragraph 2 keeps').first().dblclick();
+      await toolbar(page)
+        .getByRole('button', { name: 'More tools...' })
+        .click();
+      await page.getByRole('button', { name: 'Link', exact: true }).click();
+      await page.getByRole('textbox', { name: 'Link' }).fill('https://tina.io');
+      await page.getByRole('button', { name: action, exact: true }).click();
+      await expect(body(page)).toBeFocused();
+    }
+  });
+
+  for (const mobile of [false, true]) {
+    test.describe(`phone, keyboard up, isMobile ${mobile}`, () => {
+      test.use({
+        viewport: { width: 390, height: 844 },
+        hasTouch: true,
+        isMobile: mobile,
+      });
+
+      test('a list from ⋯ keeps focus in the text and the toolbar on the keyboard', async ({
+        page,
+      }) => {
+        await fakeVisualViewport(page);
+        await page.goto(POST('long-post.mdx'));
+        await body(page).getByText('Body paragraph 1 keeps').first().tap();
+        await setKeyboardHeight(page, 500);
+        const shell = page.locator('[data-slot="toolbar-shell"]').first();
+        await expect(shell).toHaveAttribute('data-lifted', '');
+        await toolbar(page)
+          .getByRole('button', { name: 'More tools...' })
+          .tap();
+        await page.getByRole('button', { name: 'Bulleted list' }).tap();
+        await expect(body(page)).toBeFocused();
+        await expect(shell).toHaveAttribute('data-lifted', '');
+        await page.keyboard.type('TYPED');
+        await expect(body(page).locator('ul')).toContainText('TYPED');
+      });
+    });
+  }
+});

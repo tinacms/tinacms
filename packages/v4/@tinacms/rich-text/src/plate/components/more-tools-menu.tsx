@@ -3,6 +3,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@tinacms/ui/components/popover';
+import { useEditorRef } from '@udecode/plate/react';
 import React from 'react';
 import { Icons } from './plate-ui/icons';
 import { ToolRowContext } from './plate-ui/tool-row-context';
@@ -15,8 +16,19 @@ export function MoreToolsMenu({
   children: React.ReactNode;
   disabled?: boolean;
 }) {
+  const editor = useEditorRef();
   const [open, setOpen] = React.useState(false);
-  const row = React.useMemo(() => ({ onRun: () => setOpen(false) }), []);
+  const ran = React.useRef(false);
+  const row = React.useMemo(
+    () => ({
+      onRun: () => {
+        ran.current = true;
+        setOpen(false);
+        editor.tf.focus();
+      },
+    }),
+    [editor]
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -35,6 +47,11 @@ export function MoreToolsMenu({
           fallbackAxisSide: 'none',
         }}
         aria-label='More tools'
+        finalFocus={() => {
+          if (!ran.current) return true;
+          ran.current = false;
+          return false;
+        }}
         className='w-64 max-w-(--available-width) gap-0 p-1'
       >
         <ToolRowContext.Provider value={row}>

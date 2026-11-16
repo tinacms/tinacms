@@ -42,6 +42,14 @@ export const TableCellElement = withRef<
   const active = useActiveTableCell();
   const colSpan = api.table.getColSpan(element);
   const rowSpan = api.table.getRowSpan(element);
+  const range = active?.range;
+  const inRange =
+    !!range &&
+    rowIndex >= range.top &&
+    rowIndex - rowSpan + 1 <= range.bottom &&
+    colIndex >= range.left &&
+    colIndex - colSpan + 1 <= range.right;
+  const isSelected = selected || inRange;
   const showRowHandle =
     !readOnly &&
     active !== null &&
@@ -61,7 +69,7 @@ export const TableCellElement = withRef<
       as={isHeader ? 'th' : 'td'}
       attributes={{
         ...attributes,
-        'aria-selected': selected || undefined,
+        'aria-selected': isSelected || undefined,
         colSpan,
         rowSpan,
       }}
@@ -75,7 +83,7 @@ export const TableCellElement = withRef<
         cn(
           headerLook && 'text-left font-medium [&_>_*]:m-0',
           'before:size-full',
-          selected && 'before:z-10 before:bg-muted',
+          isSelected && 'before:z-10 before:bg-muted',
           "before:absolute before:box-border before:select-none before:content-['']"
         ),
         className
