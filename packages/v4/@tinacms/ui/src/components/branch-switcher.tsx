@@ -423,7 +423,10 @@ function BranchSwitcher({
               </p>
             ) : null}
             <div className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'>
-              <Button onClick={() => setCreating(false)}>
+              <Button
+                className='max-md:h-auto max-md:min-h-9'
+                onClick={() => setCreating(false)}
+              >
                 <span className='min-w-0 max-md:py-1.5 max-md:whitespace-normal'>
                   Back to branches
                 </span>
@@ -431,6 +434,7 @@ function BranchSwitcher({
               <Button
                 variant='primary'
                 type='submit'
+                className='max-md:h-auto max-md:min-h-9'
                 disabled={
                   !onCreate || (typed !== '' && nameError !== undefined)
                 }

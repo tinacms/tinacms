@@ -136,6 +136,7 @@ function SaveToBranchDialog({
             <Button
               type='button'
               variant='ghost'
+              className='max-md:h-auto max-md:min-h-9'
               disabled={saving}
               onClick={close}
             >
@@ -144,6 +145,7 @@ function SaveToBranchDialog({
             <Button
               type='submit'
               variant='primary'
+              className='max-md:h-auto max-md:min-h-9'
               busy={saving}
               disabled={!canSave}
             >

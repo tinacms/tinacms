@@ -615,17 +615,21 @@ test.describe('the branch switcher on a phone', () => {
   });
 });
 
-// The label is the innermost span, so a Button that ellipsises it fails this.
+// Button puts the label in its last span; a span added after it makes this locator measure the wrong element.
 const labelFits = (button: Locator) =>
-  button
-    .locator('span')
-    .last()
-    .evaluate((el) => {
-      const css = getComputedStyle(el);
-      return (
-        el.scrollWidth <= el.clientWidth + 1 && css.textOverflow !== 'ellipsis'
-      );
-    });
+  button.evaluate((el) => {
+    const label = el.querySelector('span:last-of-type');
+    if (!label) return false;
+    const css = getComputedStyle(label);
+    const inner = label.getBoundingClientRect();
+    const outer = el.getBoundingClientRect();
+    return (
+      label.scrollWidth <= label.clientWidth + 1 &&
+      css.textOverflow !== 'ellipsis' &&
+      inner.top >= outer.top - 1 &&
+      inner.bottom <= outer.bottom + 1
+    );
+  });
 
 for (const width of [375, 320]) {
   test(`the Save label wraps and the buttons match in height at ${width}px`, async ({
