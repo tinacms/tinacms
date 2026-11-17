@@ -1,5 +1,11 @@
 import { cn } from '@tinacms/ui/lib/utils';
-import { useEditorState } from '@udecode/plate/react';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import {
+  useEditorReadOnly,
+  useEditorRef,
+  useEditorState,
+  useHotkeys,
+} from '@udecode/plate/react';
 import {
   BulletedListPlugin,
   NumberedListPlugin,
@@ -24,6 +30,11 @@ import {
 } from './plate-ui/mark-toolbar-button';
 import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button';
 import { Toolbar, ToolbarSeparator } from './plate-ui/toolbar';
+import { helpers } from '../plugins/core/common';
+import {
+  LinkShortcutContext,
+  useLinkShortcutRegistry,
+} from './plate-ui/link-shortcut';
 import { useToolBlocked } from './use-tool-blocked';
 
 const WIDE_TOOLBAR = 448;
@@ -95,6 +106,10 @@ export default function FixedToolbarButtons({
   const coarse = useCoarsePointer();
   const { isBlocked, inCodeBlock } = useToolBlocked();
   useEditorState();
+  const editor = useEditorRef();
+  const readOnly = useEditorReadOnly();
+  const linkShortcut = useLinkShortcutRegistry();
+  const [moreOpen, setMoreOpen] = React.useState(false);
 
   const layout = React.useMemo(
     () => resolveToolbarLayout(overrides?.toolbar, templates.length),
@@ -102,6 +117,32 @@ export default function FixedToolbarButtons({
   );
 
   useResize(ref, (entry) => setWidth(entry.contentRect.width));
+
+  const hasLink = layout.inLine.includes('link');
+  useHotkeys(
+    'meta+k, ctrl+k',
+    (event) => {
+      const root = editor.api.toDOMNode(editor);
+      if (!root?.contains(document.activeElement)) return;
+      if (
+        readOnly ||
+        !hasLink ||
+        disabled ||
+        helpers.isNodeActive(editor, CodeBlockPlugin)
+      ) {
+        return;
+      }
+      event.preventDefault();
+      if (linkShortcut.open.current) {
+        linkShortcut.open.current();
+        return;
+      }
+      linkShortcut.pending.current = true;
+      setMoreOpen(true);
+    },
+    { enableOnContentEditable: true },
+    [editor, hasLink, disabled, readOnly, linkShortcut]
+  );
 
   if (!hasAnyTool(layout)) return null;
 
@@ -137,37 +178,45 @@ export default function FixedToolbarButtons({
   );
 
   return (
-    <Toolbar
-      ref={ref}
-      aria-label='Formatting'
-      className={cn('min-w-0 flex-1 flex-nowrap overflow-hidden px-1.5 py-1')}
-    >
-      {layout.textStyle ? (
-        <TextStyleMenu showLabel={wide} disabled={off} />
-      ) : null}
-      {layout.textStyle && layout.inLine.length > 0 ? (
-        <ToolbarSeparator />
-      ) : null}
-      {inLine.map(render)}
-      {inLine.length > 0 && (hasMoreFormatting || folded.length > 0) ? (
-        <ToolbarSeparator />
-      ) : null}
-      {hasMoreFormatting ? (
-        <MoreFormattingMenu tools={layout.moreFormatting} disabled={off} />
-      ) : null}
-      {folded.length > 0 ? (
-        <MoreToolsMenu disabled={off}>{folded.map(render)}</MoreToolsMenu>
-      ) : null}
-      {layout.showInsert ? (
-        <>
+    <LinkShortcutContext.Provider value={linkShortcut}>
+      <Toolbar
+        ref={ref}
+        aria-label='Formatting'
+        className={cn('min-w-0 flex-1 flex-nowrap overflow-hidden px-1.5 py-1')}
+      >
+        {layout.textStyle ? (
+          <TextStyleMenu showLabel={wide} disabled={off} />
+        ) : null}
+        {layout.textStyle && layout.inLine.length > 0 ? (
           <ToolbarSeparator />
-          <InsertMenu
-            inserts={layout.inserts}
-            templates={layout.templates}
+        ) : null}
+        {inLine.map(render)}
+        {inLine.length > 0 && (hasMoreFormatting || folded.length > 0) ? (
+          <ToolbarSeparator />
+        ) : null}
+        {hasMoreFormatting ? (
+          <MoreFormattingMenu tools={layout.moreFormatting} disabled={off} />
+        ) : null}
+        {folded.length > 0 ? (
+          <MoreToolsMenu
             disabled={off}
-          />
-        </>
-      ) : null}
-    </Toolbar>
+            open={moreOpen}
+            onOpenChange={setMoreOpen}
+          >
+            {folded.map(render)}
+          </MoreToolsMenu>
+        ) : null}
+        {layout.showInsert ? (
+          <>
+            <ToolbarSeparator />
+            <InsertMenu
+              inserts={layout.inserts}
+              templates={layout.templates}
+              disabled={off}
+            />
+          </>
+        ) : null}
+      </Toolbar>
+    </LinkShortcutContext.Provider>
   );
 }

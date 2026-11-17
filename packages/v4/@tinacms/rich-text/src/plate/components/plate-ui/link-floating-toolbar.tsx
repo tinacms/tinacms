@@ -20,6 +20,7 @@ import {
 } from '@udecode/plate-link';
 import { LinkPlugin } from '@udecode/plate-link/react';
 import {
+  type PlateEditor,
   useEditorReadOnly,
   useEditorRef,
   useEditorSelector,
@@ -183,6 +184,24 @@ export function LinkSheet({
   );
 }
 
+const scrollParentOf = (node: HTMLElement) => {
+  for (let up = node.parentElement; up; up = up.parentElement) {
+    if (/auto|scroll/.test(getComputedStyle(up).overflowY)) return up;
+  }
+  return null;
+};
+
+/** How far the stuck body toolbar reaches into the form's scroll area; a link under it is out of view. */
+const stuckToolbarOverlap = (editor: PlateEditor) => {
+  const shell = editor.api
+    .toDOMNode(editor)
+    ?.closest('[data-slot="field-wrapper"]')
+    ?.querySelector<HTMLElement>('[data-slot="toolbar-shell"][data-stuck]');
+  if (!shell) return 0;
+  const top = scrollParentOf(shell)?.getBoundingClientRect().top ?? 0;
+  return Math.max(0, shell.getBoundingClientRect().bottom - top);
+};
+
 function useLinkEntry() {
   return useEditorSelector(
     (editor) =>
@@ -237,7 +256,7 @@ export function LinkFloatingToolbar() {
       offset(8),
       flip({ fallbackPlacements: ['top-start', 'bottom-end', 'top-end'] }),
       shift({ padding: 8 }),
-      hide(),
+      hide(() => ({ padding: { top: stuckToolbarOverlap(editor) } })),
     ],
   });
   floating.virtualElementRef.current.contextElement = element

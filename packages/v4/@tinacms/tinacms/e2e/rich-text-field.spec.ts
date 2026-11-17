@@ -596,3 +596,149 @@ test.describe('the link bar and the body text scroll box', () => {
     });
   }
 });
+
+test.describe('Ctrl+K with Link folded into More tools', () => {
+  for (const viewport of [
+    { width: 1280, height: 800 },
+    { width: 390, height: 844 },
+  ]) {
+    test(`opens the link box and makes a link at ${viewport.width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      await openDocument(page, LONG_POST);
+      const body = page.getByRole('textbox', { name: /^Body/ });
+      await expect(
+        page.getByRole('toolbar', { name: 'Formatting' }).getByRole('button', {
+          name: 'Link',
+        })
+      ).toHaveCount(0);
+      await body.getByText('paragraph').first().dblclick();
+
+      await page.keyboard.press('Control+k');
+      const address = page.getByRole('textbox', { name: 'Link' });
+      await expect(address).toBeVisible();
+      await expect(address).toBeFocused();
+      await address.fill('https://tina.io/shortcut');
+      await address.press('Enter');
+      await expect(
+        body.locator('a[href="https://tina.io/shortcut"]')
+      ).toHaveCount(1);
+    });
+  }
+});
+
+test.describe('the link bar and the stuck body toolbar', () => {
+  for (const width of [1280]) {
+    test(`hides while its link is under the stuck toolbar and shows below it at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 340 });
+      await openDocument(page, LONG_POST);
+      const body = page.getByRole('textbox', { name: /^Body/ });
+      const link = body.getByText('Tina docs');
+      await link.scrollIntoViewIfNeeded();
+      await link.click();
+      const bar = page.getByRole('toolbar', { name: 'Link' });
+      await expect(bar).toBeVisible();
+      const shell = toolbarShell(page);
+
+      const placeLink = async (below: number) => {
+        for (let attempt = 0; attempt < 4; attempt++) {
+          const [s, l] = await Promise.all([
+            shell.boundingBox(),
+            link.boundingBox(),
+          ]);
+          if (!s || !l) throw new Error('not drawn');
+          const delta = l.y - (s.y + s.height + below);
+          if (Math.abs(delta) < 2) return;
+          await formScroller(page).evaluate((el, by) => {
+            el.scrollTop += by;
+          }, delta);
+          await page.waitForTimeout(100);
+        }
+      };
+
+      await scrollForm(page, 300);
+      await expect(shell).toHaveAttribute('data-stuck', '');
+      await placeLink(-40);
+      await expect(bar).toBeHidden();
+      await placeLink(24);
+      await expect(bar).toBeVisible();
+    });
+  }
+});
+
+test.describe('the table fills the field and keeps Add a column outside its scroll', () => {
+  test('a 3-column table fills a widened body column at 1440px', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openDocument(page, LONG_POST);
+    await setColumnWidth(page, 900);
+    const body = page.getByRole('textbox', { name: /^Body/ });
+    await body.getByText('Ada').first().scrollIntoViewIfNeeded();
+    await body.getByText('Ada').first().click();
+    const add = page.getByRole('button', { name: 'Add a column' });
+    await expect(add).toBeVisible();
+    const [table, text, strip] = await Promise.all([
+      body.locator('table').boundingBox(),
+      body.boundingBox(),
+      add.boundingBox(),
+    ]);
+    if (!table || !text || !strip) throw new Error('not drawn');
+    expect(table.x + table.width).toBeGreaterThan(
+      text.x + text.width - 40 - 24
+    );
+    expect(strip.x + strip.width).toBeLessThanOrEqual(text.x + text.width + 1);
+    expect(strip.x).toBeGreaterThanOrEqual(table.x + table.width - 1);
+  });
+
+  test('at 390px the table scrolls sideways under Add a column, which stays in view', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openDocument(page, LONG_POST);
+    const body = page.getByRole('textbox', { name: /^Body/ });
+    await body.getByText('Ada').first().scrollIntoViewIfNeeded();
+    await body.getByText('Ada').first().click();
+    const add = page.getByRole('button', { name: 'Add a column' });
+    await expect(add).toBeVisible();
+    const [text, strip] = await Promise.all([
+      body.boundingBox(),
+      add.boundingBox(),
+    ]);
+    if (!text || !strip) throw new Error('not drawn');
+    expect(strip.x + strip.width).toBeLessThanOrEqual(text.x + text.width + 1);
+    const scroller = body
+      .locator('[data-slate-node="element"]', { has: page.locator('table') })
+      .last();
+    const { client, scroll } = await scroller.evaluate((el) => ({
+      client: el.clientWidth,
+      scroll: el.scrollWidth,
+    }));
+    expect(scroll).toBeGreaterThan(client);
+  });
+});
+
+test('the Link tool shows its tooltip with the Ctrl K keycap, like the other in-line tools', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await openDocument(page, LONG_POST);
+  await setColumnWidth(page, 900);
+  const tip = page.locator('[data-slot="tooltip-content"]');
+  const tool = (name: string) =>
+    page.getByRole('toolbar', { name: 'Formatting' }).getByRole('button', {
+      name,
+    });
+
+  await tool('Italic').hover();
+  await expect(tip).toContainText('Italic');
+  await page.mouse.move(5, 5);
+  await expect(tip).toHaveCount(0);
+
+  await tool('Link').hover();
+  await expect(tip).toContainText('Link');
+  await expect(tip).toContainText(/Ctrl\s?K|⌘\s?K/);
+});

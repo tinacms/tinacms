@@ -4,11 +4,7 @@ import type { TRange } from '@udecode/plate';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { type TLinkElement } from '@udecode/plate-link';
 import { LinkPlugin } from '@udecode/plate-link/react';
-import {
-  useEditorRef,
-  useEditorSelector,
-  useHotkeys,
-} from '@udecode/plate/react';
+import { useEditorRef, useEditorSelector } from '@udecode/plate/react';
 
 import {
   Popover,
@@ -24,6 +20,7 @@ import {
   LinkSheet,
   applyLink,
 } from './link-floating-toolbar';
+import { LinkShortcutContext } from './link-shortcut';
 import { ToolRowContext } from './tool-row-context';
 import { ToolbarButton } from './toolbar';
 
@@ -56,19 +53,21 @@ export function LinkToolbarButton({
     setBox({ draft, selection: editor.selection });
   };
 
-  useHotkeys(
-    'meta+k, ctrl+k',
-    (event) => {
-      const root = editor.api.toDOMNode(editor);
-      if (disabled || inCodeBlock || !root?.contains(document.activeElement)) {
-        return;
-      }
-      event.preventDefault();
-      openBox();
-    },
-    { enableOnContentEditable: true },
-    []
-  );
+  const shortcut = React.useContext(LinkShortcutContext);
+  const openRef = React.useRef(openBox);
+  openRef.current = openBox;
+  React.useEffect(() => {
+    if (!shortcut) return;
+    const open = () => openRef.current();
+    shortcut.open.current = open;
+    const waiting = shortcut.pending.current;
+    shortcut.pending.current = false;
+    const timer = waiting ? window.setTimeout(open, 50) : undefined;
+    return () => {
+      window.clearTimeout(timer);
+      if (shortcut.open.current === open) shortcut.open.current = null;
+    };
+  }, [shortcut]);
 
   const close = (refocus: boolean) => {
     const selection = box?.selection;
@@ -104,6 +103,11 @@ export function LinkToolbarButton({
       aria-haspopup='dialog'
       aria-expanded={box !== null}
       onClick={tier === 'phone' ? openBox : undefined}
+      wrapTrigger={
+        tier === 'phone'
+          ? undefined
+          : (base) => <PopoverTrigger render={base} />
+      }
     >
       <Icons.link />
     </ToolbarButton>
@@ -133,7 +137,7 @@ export function LinkToolbarButton({
         else close(details.reason === 'escape-key');
       }}
     >
-      <PopoverTrigger render={button} />
+      {button}
       <PopoverContent
         aria-label='Link'
         initialFocus={false}

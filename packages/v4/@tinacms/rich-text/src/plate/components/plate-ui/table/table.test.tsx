@@ -173,7 +173,8 @@ describe('table handles', () => {
     expect(scrollBox).not.toBeNull();
     expect(scrollBox).not.toContainElement(add);
     expect(scrollBox?.parentElement).toContainElement(add);
-    expect(scrollBox).toHaveClass('w-fit', 'max-w-full');
+    expect(scrollBox).toHaveClass('flex-1', 'min-w-0');
+    expect(scrollBox).not.toHaveClass('w-fit');
   });
 
   it('marks selected cells with aria-selected, colSpan and rowSpan', async () => {
@@ -291,6 +292,23 @@ describe('handles on merged cells', () => {
     expect(
       await screen.findAllByRole('button', { name: /^Row \d+ actions$/ })
     ).toHaveLength(1);
+  });
+});
+
+describe('header look on a merged top cell', () => {
+  it('draws a cell merged down from the first row with the header look', async () => {
+    const editor = mount(
+      merged([
+        [{ text: 'ad', rowSpan: 2 }, { text: 'b' }, { text: 'c' }],
+        [{ text: 'e' }, { text: 'f' }],
+        [{ text: 'g' }, { text: 'h' }, { text: 'i' }],
+      ])
+    );
+    await caretIn(editor, [0, 2, 0, 0, 0]);
+    const cells = Array.from(document.querySelectorAll('td'));
+    const [mergedCell, , , , , body] = cells;
+    expect(mergedCell).toHaveClass('bg-muted');
+    expect(body).not.toHaveClass('bg-muted');
   });
 });
 

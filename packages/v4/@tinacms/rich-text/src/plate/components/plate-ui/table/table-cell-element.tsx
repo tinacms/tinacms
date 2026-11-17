@@ -38,10 +38,12 @@ export const TableCellElement = withRef<
   const { colIndex, minHeight, rowIndex, selected, width } =
     useTableCellElement();
   const readOnly = useReadOnly();
-  const headerLook = isHeader || rowIndex === 0;
   const active = useActiveTableCell();
   const colSpan = api.table.getColSpan(element);
   const rowSpan = api.table.getRowSpan(element);
+  const firstRow = rowIndex - rowSpan + 1;
+  const firstCol = colIndex - colSpan + 1;
+  const headerLook = isHeader || firstRow === 0;
   const range = active?.range;
   const inRange =
     !!range &&
@@ -50,8 +52,6 @@ export const TableCellElement = withRef<
     colIndex >= range.left &&
     colIndex - colSpan + 1 <= range.right;
   const isSelected = selected || inRange;
-  const firstRow = rowIndex - rowSpan + 1;
-  const firstCol = colIndex - colSpan + 1;
   const showRowHandle =
     !readOnly &&
     active !== null &&

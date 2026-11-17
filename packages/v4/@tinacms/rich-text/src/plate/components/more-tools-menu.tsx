@@ -12,12 +12,15 @@ import { ToolbarButton } from './plate-ui/toolbar';
 export function MoreToolsMenu({
   children,
   disabled = false,
+  open,
+  onOpenChange: setOpen,
 }: {
   children: React.ReactNode;
   disabled?: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
   const editor = useEditorRef();
-  const [open, setOpen] = React.useState(false);
   const row = React.useMemo(
     () => ({
       onRun: () => {
@@ -25,7 +28,7 @@ export function MoreToolsMenu({
         editor.tf.focus();
       },
     }),
-    [editor]
+    [editor, setOpen]
   );
 
   return (

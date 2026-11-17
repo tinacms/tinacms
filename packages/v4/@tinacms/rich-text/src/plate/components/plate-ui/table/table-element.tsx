@@ -42,10 +42,7 @@ const TableBody = withRef<typeof PlateElement, { table: TTableElement }>(
       <div className='relative flex'>
         <PlateElement
           ref={ref}
-          className={cn(
-            className,
-            'w-fit max-w-full min-w-0 overflow-x-auto py-2'
-          )}
+          className={cn(className, 'min-w-0 flex-1 overflow-x-auto py-2')}
           style={{ paddingLeft: marginLeft }}
           {...props}
         >

@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { TRange, Value } from '@udecode/plate';
 import { Plate, PlateContent, usePlateEditor } from '@udecode/plate/react';
@@ -97,7 +97,7 @@ const Harness = ({
       <ToolbarProvider templates={templates} overrides={overrides}>
         <Plate editor={editor} readOnly={readOnly}>
           <FixedToolbarButtons disabled={disabled} />
-          <PlateContent />
+          <PlateContent tabIndex={0} />
         </Plate>
       </ToolbarProvider>
     </TooltipProvider>
@@ -560,5 +560,181 @@ describe('Text style on a list item', () => {
     expect(nodes[0]).toMatchObject({ type: 'h2' });
     expect(JSON.stringify(nodes)).not.toMatch(/"type":"(ul|ol|li|lic)"/);
     expect(JSON.stringify(nodes)).not.toContain('listStyleType');
+  });
+
+  it('leaves no list behind when the selection runs from a paragraph into a nested list', async () => {
+    const user = userEvent.setup();
+    const item = (text: string, nested?: Value[number]) => ({
+      type: 'li',
+      children: [
+        { type: 'lic', children: [{ text }] },
+        ...(nested ? [nested] : []),
+      ],
+    });
+    const mixed: Value = [
+      { type: 'p', children: [{ text: 'P' }] },
+      {
+        type: 'ul',
+        children: [item('A', { type: 'ul', children: [item('B')] }), item('C')],
+      },
+    ];
+    render(
+      <Harness
+        value={mixed}
+        selection={{
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [1, 1, 0, 0], offset: 1 },
+        }}
+      />
+    );
+
+    await user.click(
+      within(toolbar()).getByRole('button', { name: /^Text style/ })
+    );
+    await user.click(
+      await screen.findByRole('menuitemradio', { name: 'Heading 1' })
+    );
+
+    const json = JSON.stringify(lastEditor?.children);
+    expect(json).not.toMatch(/"type":"(ul|ol|li|lic)"/);
+    expect(json).not.toContain('listStyleType');
+    expect(lastEditor?.api.string([])).toContain('P');
+    expect(lastEditor?.api.string([])).toContain('B');
+  });
+});
+
+const narrow = (width: number) =>
+  vi.stubGlobal(
+    'ResizeObserver',
+    class extends FakeResizeObserver {
+      observe(target: Element) {
+        widths.set(target, width);
+        super.observe(target);
+      }
+    }
+  );
+
+const codeValue: Value = [
+  { type: 'p', children: [{ text: 'plain' }] },
+  {
+    type: 'code_block',
+    children: [{ type: 'code_line', children: [{ text: 'x = 1' }] }],
+  },
+];
+
+const focusText = () => {
+  act(() =>
+    document.querySelector<HTMLElement>('[data-slate-editor]')?.focus()
+  );
+};
+
+const linkBox = () => screen.queryByRole('textbox', { name: 'Link' });
+
+describe('Cmd/Ctrl+K', () => {
+  it('opens the link box with the selected words when Link is in line', async () => {
+    const user = userEvent.setup();
+    render(
+      <Harness
+        selection={{
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 5 },
+        }}
+      />
+    );
+    focusText();
+
+    await user.keyboard('{Control>}k{/Control}');
+    expect(
+      await screen.findByRole('textbox', { name: 'Text to display' })
+    ).toHaveValue('plain');
+  });
+
+  it('opens the same link box when Link is folded into More tools', async () => {
+    const user = userEvent.setup();
+    narrow(192);
+    render(
+      <Harness
+        overrides={{ toolbar: ['bold', 'italic', 'link', 'ul', 'table'] }}
+        selection={{
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 5 },
+        }}
+      />
+    );
+    expect(names()).not.toContain('Link');
+    focusText();
+
+    await user.keyboard('{Control>}k{/Control}');
+    expect(
+      await screen.findByRole('textbox', { name: 'Text to display' })
+    ).toHaveValue('plain');
+    expect(linkBox()).not.toBeNull();
+  });
+
+  it('does nothing in a code block, also after moving there once mounted', async () => {
+    const user = userEvent.setup();
+    render(<Harness value={codeValue} selection={at([0, 0])} />);
+    focusText();
+    act(() => lastEditor?.tf.select(at([1, 0, 0])));
+
+    await user.keyboard('{Control>}k{/Control}');
+    expect(linkBox()).toBeNull();
+  });
+
+  it('does nothing in a code block when Link is folded', async () => {
+    const user = userEvent.setup();
+    narrow(192);
+    render(
+      <Harness
+        value={codeValue}
+        overrides={{ toolbar: ['bold', 'italic', 'link', 'ul', 'table'] }}
+        selection={at([0, 0])}
+      />
+    );
+    focusText();
+    act(() => lastEditor?.tf.select(at([1, 0, 0])));
+
+    await user.keyboard('{Control>}k{/Control}');
+    expect(linkBox()).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Link' })).toBeNull();
+  });
+
+  it('works again after leaving a code block', async () => {
+    const user = userEvent.setup();
+    render(<Harness value={codeValue} selection={at([1, 0, 0])} />);
+    focusText();
+    act(() => lastEditor?.tf.select(at([0, 0])));
+
+    await user.keyboard('{Control>}k{/Control}');
+    expect(await screen.findByRole('textbox', { name: 'Link' })).toBeVisible();
+  });
+
+  it('does nothing without link in overrides.toolbar', async () => {
+    const user = userEvent.setup();
+    render(
+      <Harness overrides={{ toolbar: ['bold'] }} selection={at([0, 0])} />
+    );
+    focusText();
+
+    await user.keyboard('{Control>}k{/Control}');
+    expect(linkBox()).toBeNull();
+  });
+
+  it('does nothing when the field is disabled', async () => {
+    const user = userEvent.setup();
+    render(<Harness disabled selection={at([0, 0])} />);
+    focusText();
+
+    await user.keyboard('{Control>}k{/Control}');
+    expect(linkBox()).toBeNull();
+  });
+
+  it('does nothing when the field is read-only', async () => {
+    const user = userEvent.setup();
+    render(<Harness readOnly selection={at([0, 0])} />);
+    focusText();
+
+    await user.keyboard('{Control>}k{/Control}');
+    expect(linkBox()).toBeNull();
   });
 });

@@ -148,6 +148,8 @@ ToolbarButtonBase.displayName = 'ToolbarButtonBase';
 export type ToolbarButtonProps = ToolbarButtonBaseProps & {
   tooltip?: string;
   shortcut?: string;
+  /** Lets a popover trigger wrap the button inside the tooltip trigger, so both keep their hover handlers. */
+  wrapTrigger?: (button: React.ReactElement) => React.ReactElement;
 };
 
 /** In line it shows a tooltip. Inside More tools it draws as a menu row and closes the panel after it runs. */
@@ -159,6 +161,7 @@ export const ToolbarButton = React.forwardRef<
     {
       tooltip,
       shortcut,
+      wrapTrigger,
       'aria-label': ariaLabel,
       children,
       className,
@@ -170,7 +173,7 @@ export const ToolbarButton = React.forwardRef<
     const name = ariaLabel ?? tooltip;
 
     if (row) {
-      return (
+      const rowButton = (
         <ToolbarButtonBase
           ref={ref}
           aria-label={name}
@@ -191,9 +194,10 @@ export const ToolbarButton = React.forwardRef<
           {shortcut ? <KbdShortcut keys={shortcut} size='sm' /> : null}
         </ToolbarButtonBase>
       );
+      return wrapTrigger ? wrapTrigger(rowButton) : rowButton;
     }
 
-    const button = (
+    const base = (
       <ToolbarButtonBase
         ref={ref}
         aria-label={name}
@@ -203,6 +207,7 @@ export const ToolbarButton = React.forwardRef<
         {children}
       </ToolbarButtonBase>
     );
+    const button = wrapTrigger ? wrapTrigger(base) : base;
 
     if (!tooltip || props.disabled) return button;
 

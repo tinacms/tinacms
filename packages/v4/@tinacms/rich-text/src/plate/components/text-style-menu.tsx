@@ -1,5 +1,7 @@
+import { ElementApi } from '@udecode/plate';
 import { unwrapList } from '@udecode/plate-list';
 import {
+  type PlateEditor,
   ParagraphPlugin,
   useEditorRef,
   useEditorSelector,
@@ -22,6 +24,23 @@ import {
 } from './plate-ui/heading-items';
 import { ToolbarButton } from './plate-ui/toolbar';
 import { useToolBlocked } from './use-tool-blocked';
+
+const LIST_TYPES = ['ul', 'ol', 'li', 'lic'];
+const MAX_UNWRAPS = 20;
+
+const hasListInSelection = (editor: PlateEditor) =>
+  editor.api.some({
+    match: (node) =>
+      ElementApi.isElement(node) &&
+      (LIST_TYPES.includes(node.type) || 'listStyleType' in node),
+  });
+
+/** One unwrapList only lifts one list level; a selection that spans nested lists needs several. */
+const unwrapListsInSelection = (editor: PlateEditor) => {
+  for (let pass = 0; pass < MAX_UNWRAPS && hasListInSelection(editor); pass++) {
+    unwrapList(editor);
+  }
+};
 
 const headingTextClass: Record<string, string> = {
   h1: 'text-2xl font-semibold',
@@ -91,7 +110,7 @@ export function TextStyleMenu({
         <DropdownMenuRadioGroup
           value={value}
           onValueChange={(type) => {
-            unwrapList(editor);
+            unwrapListsInSelection(editor);
             editor.tf.toggleBlock(type);
             editor.tf.collapse();
             editor.tf.focus();
