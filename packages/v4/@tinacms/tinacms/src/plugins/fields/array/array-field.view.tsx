@@ -59,6 +59,10 @@ export interface ArrayItemView {
   error?: string;
   /** The page is pointing at this item: draw its card like focus. */
   active?: boolean;
+  /** The mouse or pen enters or leaves the card. */
+  onHoverChange?: (hovering: boolean) => void;
+  /** Focus enters or leaves anywhere in the card. `steppedFromCard` is true when focus reached this card's grip from a different card. */
+  onFocusChange?: (focused: boolean, steppedFromCard?: boolean) => void;
   onBlur?: () => void;
   onFocus?: () => void;
   children?: ReactNode;
@@ -198,6 +202,34 @@ function Card({
       ref={setNodeRef}
       data-array-item=''
       style={{ transform: CSS.Translate.toString(transform), transition }}
+      onPointerOver={(event) => {
+        if (event.pointerType === 'touch') return;
+        item.onHoverChange?.(true);
+        event.stopPropagation();
+      }}
+      onPointerOut={(event) => {
+        if (event.pointerType === 'touch') return;
+        const next = event.relatedTarget;
+        if (next instanceof Node && event.currentTarget.contains(next)) return;
+        item.onHoverChange?.(false);
+      }}
+      onFocus={(event) => {
+        const from = event.relatedTarget;
+        const previous =
+          from instanceof Element ? from.closest('[data-array-item]') : null;
+        const onGrip =
+          event.target instanceof Element &&
+          event.target.hasAttribute('data-grip');
+        item.onFocusChange?.(
+          true,
+          onGrip && previous !== null && previous !== event.currentTarget
+        );
+      }}
+      onBlur={(event) => {
+        const next = event.relatedTarget;
+        if (next instanceof Node && event.currentTarget.contains(next)) return;
+        item.onFocusChange?.(false);
+      }}
     >
       {item.kind === 'value' ? (
         <ListCard

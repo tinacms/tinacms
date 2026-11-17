@@ -16,7 +16,8 @@ import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
 import { draftKey, readDraft, readWaitingDrafts } from '../form/drafts';
-import { useFormId } from '../editor/hooks';
+import { useFieldValue, useFormId } from '../editor/hooks';
+import { toFieldAddress } from '../core/field/address';
 import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -232,6 +233,12 @@ function GoToNothingToEdit() {
   );
 }
 
+function PreviewTitle() {
+  useFormId();
+  const [title] = useFieldValue<string>(toFieldAddress('title'));
+  return <p>title: {title}</p>;
+}
+
 function PreviewProbe() {
   return <p>previewing {useFormId()}</p>;
 }
@@ -400,10 +407,20 @@ describe('TinaAdmin', () => {
     expect(screen.queryByTitle('Preview')).toBeNull();
   });
 
-  it('renders a preview node outside the document form scope', async () => {
-    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
-    renderAdmin(<p>custom preview</p>);
-    expect(await screen.findByText('custom preview')).toBeInTheDocument();
+  it('renders a preview node inside the document form scope, only once the form exists', async () => {
+    const user = userEvent.setup();
+    renderAdmin(<PreviewTitle />);
+    await openCollectionTree('post');
+    expect(screen.getByText('Select a document to edit.')).toBeInTheDocument();
+    expect(screen.queryByText(/^title: /)).not.toBeInTheDocument();
+
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    expect(await screen.findByText(/^title: /)).toBeInTheDocument();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    expect(await screen.findByText(/^title: .*!$/)).toBeInTheDocument();
+    expect(document.querySelector('[data-preview-slot]')).toContainElement(
+      screen.getByText(/^title: /)
+    );
   });
 
   it('keeps the same preview frame node from Collections to a document and back', async () => {

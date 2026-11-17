@@ -157,6 +157,8 @@ const createPreviewBridge = ({
   const mainDocument = () =>
     mergeDeclarations(registrations).find((entry) => !entry.shared)?.path;
 
+  const idle = () => registrations.size === 0;
+
   const pageDeclares = () => [...registrations].some((entry) => entry.document);
 
   const pruneStored = () => {
@@ -210,12 +212,18 @@ const createPreviewBridge = ({
     ) {
       storedValues.set(document, values);
     }
+    const unshared = mergeDeclarations(registrations).filter(
+      (entry) => !entry.shared
+    );
+    const soleDocument = unshared.length === 1 ? unshared[0].path : undefined;
     for (const registration of [...registrations]) {
       const takes =
-        document === undefined ||
-        (registration.document
-          ? registration.document === document
-          : !declaring);
+        document === undefined
+          ? registration.document === undefined ||
+            registration.document === soleDocument
+          : registration.document
+            ? registration.document === document
+            : !declaring;
       if (takes) registration.onValues(values);
     }
   };
@@ -229,12 +237,13 @@ const createPreviewBridge = ({
     drawFrame = null;
     if (!answered) return;
     const main = mainDocument();
-    const activeElement = active
-      ? findActive(page, active, main, lastClicked)
-      : null;
+    const activeElement =
+      active && !idle() ? findActive(page, active, main, lastClicked) : null;
     const hoveredElements = new Set<Element>();
-    if (pointerHover?.isConnected) hoveredElements.add(pointerHover);
-    if (hovered) {
+    if (!idle()) {
+      if (pointerHover?.isConnected) hoveredElements.add(pointerHover);
+    }
+    if (hovered && !idle()) {
       for (const element of findHovered(page, hovered, main)) {
         hoveredElements.add(element);
       }
@@ -334,7 +343,7 @@ const createPreviewBridge = ({
       : null;
 
   const onClickCapture = (event: MouseEvent) => {
-    if (!answered) return;
+    if (!answered || idle()) return;
     const marked = markedTarget(event);
     const address = marked?.getAttribute(TINA_FIELD_ATTR);
     if (!marked || !address) return;
@@ -349,7 +358,7 @@ const createPreviewBridge = ({
   };
 
   const onClickBubble = (event: MouseEvent) => {
-    if (!answered || event.defaultPrevented) return;
+    if (!answered || idle() || event.defaultPrevented) return;
     if (event.button !== 0 || hasModifier(event)) return;
     if (!(event.target instanceof Element)) return;
     const anchor = event.target.closest('a[href]');
@@ -362,7 +371,7 @@ const createPreviewBridge = ({
   const onPointerMove = (event: PointerEvent) => {
     if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
     lastPointer = { x: event.clientX, y: event.clientY };
-    if (!answered) return;
+    if (!answered || idle()) return;
     const next = markedTarget(event);
     if (next === pointerHover) return;
     pointerHover = next;
@@ -405,6 +414,7 @@ const createPreviewBridge = ({
       return () => {
         registrations.delete(registration);
         scheduleFlush();
+        scheduleDraw();
       };
     },
     syncUrl: scheduleFlush,

@@ -1,4 +1,3 @@
-import type { LucideIcon } from 'lucide-react';
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
 
 import {
@@ -6,20 +5,12 @@ import {
   type BreadcrumbStep,
 } from '@tinacms/ui/components/breadcrumb';
 import { Button } from '@tinacms/ui/components/button';
-import type { Glyph } from '@tinacms/ui/components/icon';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@tinacms/ui/components/dropdown-menu';
 import { cn } from '@tinacms/ui/lib/utils';
-
-type PanelHeaderTool = {
-  label: string;
-  icon: Glyph | LucideIcon;
-  onClick?: () => void;
-  selected?: boolean;
-};
 
 type PanelHeaderProps = Omit<ComponentProps<'div'>, 'children'> & {
   /** Long titles end in an ellipsis. A back button replaces it. */
@@ -29,8 +20,6 @@ type PanelHeaderProps = Omit<ComponentProps<'div'>, 'children'> & {
    * trail over the heading, and no back button. Every step should have an `onClick`.
    */
   trail?: BreadcrumbStep[];
-  /** Icon buttons before the ⋯ menu, as a group named "Document tools". Without any there is no group. */
-  tools?: PanelHeaderTool[];
   /** Shows a back button with these words in place of the title. */
   backLabel?: string;
   backTitle?: string;
@@ -61,7 +50,6 @@ type PanelHeaderProps = Omit<ComponentProps<'div'>, 'children'> & {
 function PanelHeader({
   heading,
   trail,
-  tools,
   backLabel,
   backTitle,
   onBack,
@@ -77,22 +65,6 @@ function PanelHeader({
   ...props
 }: PanelHeaderProps) {
   const titled = trail !== undefined;
-  const toolbar = tools?.length ? (
-    <div role='group' aria-label='Document tools' className='flex items-center'>
-      {tools.map((tool) => (
-        <Button
-          key={tool.label}
-          variant='icon'
-          size='sm'
-          icon={tool.icon}
-          aria-label={tool.label}
-          aria-pressed={tool.selected ?? false}
-          onClick={tool.onClick}
-        />
-      ))}
-    </div>
-  ) : null;
-
   return (
     <div
       data-slot='panel-header'
@@ -136,7 +108,6 @@ function PanelHeader({
       {actionAt === 'start' ? action : null}
       {titled ? null : <span aria-hidden='true' className='flex-1' />}
       {actionAt === 'end' ? action : null}
-      {toolbar}
       {menu ? (
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -171,5 +142,5 @@ function PanelHeader({
   );
 }
 
-export type { PanelHeaderProps, PanelHeaderTool };
+export type { PanelHeaderProps };
 export { PanelHeader };

@@ -168,6 +168,7 @@ function PreviewFrame({
   );
 }
 
+// The string-URL iframe, kept outside DocumentScope so it never remounts. A node `preview` is PreviewNodeSlot's.
 function PreviewSlot({
   preview,
   connection,
@@ -175,14 +176,31 @@ function PreviewSlot({
   preview?: ReactNode;
   connection: PreviewConnectionOptions;
 }) {
+  if (typeof preview === 'string') {
+    return (
+      <div data-preview-slot='' className='min-w-0 flex-1'>
+        <PreviewFrame src={preview} connection={connection} />
+      </div>
+    );
+  }
+  return <PreviewNodeSlot preview={preview} formScope={false} />;
+}
+
+// A custom `preview` node renders inside DocumentScope so it can read the open form.
+function PreviewNodeSlot({
+  preview,
+  formScope = true,
+}: {
+  preview?: ReactNode;
+  formScope?: boolean;
+}) {
+  const hasForm = use(FormScopeContext) !== null && formScope;
   return (
     <div data-preview-slot='' className='min-w-0 flex-1'>
-      {typeof preview === 'string' ? (
-        <PreviewFrame src={preview} connection={connection} />
-      ) : connection.open === null ? (
-        <Placeholder>Select a document to edit.</Placeholder>
-      ) : (
+      {hasForm ? (
         (preview ?? <Placeholder>No preview configured.</Placeholder>)
+      ) : (
+        <Placeholder>Select a document to edit.</Placeholder>
       )}
     </div>
   );
@@ -885,11 +903,17 @@ function AdminShell({
                     navigate={navigate}
                   />
                   <DocumentErrorPane />
+                  {typeof preview === 'string' ? null : (
+                    <PreviewNodeSlot preview={preview} />
+                  )}
                 </DocumentScope>
               ) : mainRoute.view === 'page' ? (
                 <NothingToEditColumn onOpenCollections={goToCollections} />
               ) : null}
-              <PreviewSlot preview={preview} connection={connection} />
+              {mainRoute.view === 'document' &&
+              typeof preview !== 'string' ? null : (
+                <PreviewSlot preview={preview} connection={connection} />
+              )}
             </SidebarInset>
           ) : null}
         </div>

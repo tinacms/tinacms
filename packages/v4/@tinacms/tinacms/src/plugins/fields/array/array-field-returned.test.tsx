@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { DocumentForm } from '../../../admin/document-form';
 import { asResolvedConfig } from '../../../config';
 import { toFieldAddress } from '../../../core/field/address';
+import { useFormStore } from '../../../form/form-store';
 import type { CollectionSchema } from '../../../core/schema/types';
 import { FormProvider, TinaProvider, useActiveField } from '../../../editor';
 import { t } from '../../../index';
@@ -117,7 +118,7 @@ async function cameBackTo(address: string, back: string | RegExp) {
     );
     await user.click(await screen.findByRole('menuitem', { name: action }));
   };
-  return { active, act };
+  return { active, act, user, container };
 }
 
 describe.each([
@@ -152,5 +153,64 @@ describe.each([
     await waitFor(() => expect(active()).toEqual([0]));
     await act(1, /^Remove/);
     expect(active()).toEqual([]);
+  });
+});
+
+describe('focusing another card', () => {
+  it('clears the returned card active look and moves the outline to the focused card', async () => {
+    const { active, container } = await cameBackTo('blocks.0', 'Home');
+    await waitFor(() => expect(active()).toEqual([0]));
+    container.querySelectorAll<HTMLElement>('[data-grip]')[1].focus();
+    await waitFor(() => expect(active()).toEqual([]));
+    expect(useFormStore.getState().focusedCard?.address).toBe('blocks.1');
+  });
+});
+
+describe.each([
+  {
+    list: 'a top-level list',
+    address: 'blocks.0',
+    back: 'Home',
+    root: 'blocks',
+  },
+  {
+    list: 'a nested list',
+    address: 'wrap.inner.blocks.0',
+    back: 'Blocks',
+    root: 'wrap.inner.blocks',
+  },
+])('the page outline for cards in $list', ({ address, back, root }) => {
+  const outlined = () => useFormStore.getState().focusedCard?.address;
+
+  it('points at the returned card, and follows it on Move down', async () => {
+    const { active, act } = await cameBackTo(address, back);
+    await waitFor(() => expect(active()).toEqual([0]));
+    await waitFor(() => expect(outlined()).toBe(`${root}.0`));
+    expect(useFormStore.getState().active?.address).toBe(root);
+    await act(1, /^Move down/);
+    await waitFor(() => expect(outlined()).toBe(`${root}.1`));
+  });
+
+  it('points hover at the card, not the list, and clears on leaving', async () => {
+    const { user, container } = await cameBackTo(address, back);
+    const card = container.querySelectorAll('[data-array-item]')[1];
+    await user.hover(card);
+    expect(useFormStore.getState().hovered?.address).toBe(`${root}.1`);
+    await user.unhover(card);
+    expect(useFormStore.getState().hovered).toBeNull();
+  });
+
+  it('points at a card whose grip takes focus, with no level opened, and falls back to the returned card on blur', async () => {
+    const { user, container } = await cameBackTo(address, back);
+    const grips = container.querySelectorAll<HTMLElement>('[data-grip]');
+    await user.click(document.body);
+    grips[2].focus();
+    await waitFor(() => expect(outlined()).toBe(`${root}.2`));
+    expect(useFormStore.getState().active?.address).toBe(root);
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'Call to action' })
+    ).toBeNull();
+    grips[2].blur();
+    await waitFor(() => expect(outlined()).toBe(`${root}.0`));
   });
 });

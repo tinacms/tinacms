@@ -65,33 +65,3 @@ describe('PanelHeader with a trail', () => {
     expect(screen.queryByRole('navigation')).toBeNull();
   });
 });
-
-describe('PanelHeader tools', () => {
-  it('shows a Document tools group of pressed-state icon buttons', async () => {
-    const user = userEvent.setup();
-    const onClick = vi.fn();
-    render(
-      <PanelHeader
-        heading='Title'
-        trail={trail}
-        tools={[
-          { label: 'History', icon: 'changes', onClick, selected: true },
-          { label: 'References', icon: 'branch' },
-        ]}
-      />
-    );
-    const group = screen.getByRole('group', { name: 'Document tools' });
-    const history = within(group).getByRole('button', { name: 'History' });
-    expect(history).toHaveAttribute('aria-pressed', 'true');
-    expect(
-      within(group).getByRole('button', { name: 'References' })
-    ).toHaveAttribute('aria-pressed', 'false');
-    await user.click(history);
-    expect(onClick).toHaveBeenCalledOnce();
-  });
-
-  it('renders no group when empty', () => {
-    render(<PanelHeader heading='Title' trail={trail} tools={[]} />);
-    expect(screen.queryByRole('group')).toBeNull();
-  });
-});

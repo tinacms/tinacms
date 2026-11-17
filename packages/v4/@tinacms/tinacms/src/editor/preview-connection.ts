@@ -281,8 +281,14 @@ function createHandlers(deps: Deps) {
   };
 
   const outline = () => {
-    const { active, hovered } = useFormStore.getState();
-    const activeMark = markFor(active);
+    const { active, hovered, focusedCard } = useFormStore.getState();
+    const onCard =
+      active &&
+      focusedCard?.formId === active.formId &&
+      focusedCard.list === active.address
+        ? { formId: focusedCard.formId, address: focusedCard.address }
+        : active;
+    const activeMark = markFor(onCard);
     const hoveredMark = markFor(hovered);
     return outlineMessage(
       hoveredMark && {
@@ -457,7 +463,8 @@ function createHandlers(deps: Deps) {
       if (shownFormChanged(state.forms, previous.forms)) publishAll();
       if (
         state.active !== previous.active ||
-        state.hovered !== previous.hovered
+        state.hovered !== previous.hovered ||
+        state.focusedCard !== previous.focusedCard
       ) {
         scheduleOutline();
       }

@@ -1,7 +1,7 @@
 import type { TinaDocument } from '@tinacms/tinacms';
 import { useTina } from '@tinacms/tinacms/adapters/react';
 import { useEffect, useState } from 'react';
-import { RouterLink } from './declared-app';
+import { RouterLink } from './router-link';
 import {
   GLOBAL_DOCUMENT,
   readDocument,

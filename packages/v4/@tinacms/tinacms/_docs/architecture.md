@@ -155,6 +155,11 @@ is `usePreviewConnection`. The protocol is in `src/preview/protocol.ts`. Every
 field a message adds is optional, so an old page works with a new admin and the
 other way round.
 
+The admin shows a string `preview` as an iframe outside the document scope, so the
+frame stays mounted. A `preview` node renders inside the document scope on a
+document route, once the form exists. It can call `useFormId()` and read form
+values. On other routes it shows "Select a document to edit."
+
 `useTina({ data, document?, shared?, allowedOrigin? })` returns
 `{ data, isEditing, tinaField }`. Pass `document` to say which document `data`
 comes from. Pass `shared: true` for a document that many pages draw, such as the

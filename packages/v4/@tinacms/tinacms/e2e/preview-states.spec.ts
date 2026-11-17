@@ -289,3 +289,26 @@ for (const [name, leave] of leaveStep) {
     ).toBeVisible();
   });
 }
+
+test('hovering a block card dashes that block on the page, and focusing its grip draws the solid outline', async ({
+  page,
+}) => {
+  const muted: Rgb = [100, 116, 139];
+  const orange: Rgb = [209, 63, 19];
+  await openDeclared(page);
+  const form = page.getByRole('complementary', { name: 'Document form' });
+  const cards = form.locator('[data-array-item]');
+  await expect(cards.first()).toBeVisible();
+  const aboveBlock = async (color: Rgb) =>
+    (await aboveTop(page, 'block-0')).filter((pixel) => near(pixel, color, 16))
+      .length;
+  expect(await aboveBlock(muted)).toBe(0);
+
+  await cards.first().hover();
+  await expect.poll(() => aboveBlock(muted)).toBeGreaterThan(5);
+
+  await page.mouse.move(2, 2);
+  await cards.first().locator('[data-grip]').focus();
+  await expect.poll(() => aboveBlock(orange)).toBeGreaterThan(50);
+  await expect(heading(page)).not.toHaveText(/^Hero/);
+});

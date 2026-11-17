@@ -28,6 +28,7 @@ import {
   ownFieldErrors,
   useActiveField,
   useActivation,
+  useCardOutline,
   useDocumentPath,
   useFieldAddress,
   useFieldFrame,
@@ -186,6 +187,8 @@ function ObjectItems({
   const listItems = useListItems();
   const activation = useActivation();
   const { setActive } = useActiveField();
+  const cardOutline = useCardOutline(toFieldAddress(address));
+  const [focusedCard, setFocusedCard] = useState<string | null>(null);
   const { control, getValues } = useFormContext();
   const {
     fields: items,
@@ -370,6 +373,19 @@ function ObjectItems({
     }
   }, [activation]);
 
+  const outlinedId =
+    focusedCard ?? (activation?.address === address ? returnedTo : null);
+  const outlinedIndex =
+    outlinedId === null
+      ? -1
+      : items.findIndex((item) => item.id === outlinedId);
+  useEffect(() => {
+    cardOutline.focus(
+      outlinedIndex < 0 ? null : toFieldAddress(`${address}.${outlinedIndex}`)
+    );
+  }, [cardOutline, address, outlinedIndex]);
+  useEffect(() => () => cardOutline.focus(null), [cardOutline]);
+
   const isActive = (id: string, itemAddress: string) =>
     activation?.address === itemAddress ||
     (returnedTo === id && activation?.address === address);
@@ -409,6 +425,16 @@ function ObjectItems({
       open: open.has(item.id),
       errorCount: counts[index],
       active: isActive(item.id, itemAddress),
+      onHoverChange: (hovering) =>
+        cardOutline.hover(hovering ? toFieldAddress(itemAddress) : null),
+      onFocusChange: (focused, steppedFromCard) => {
+        if (focused && steppedFromCard) {
+          setReturnedTo((held) => (held === item.id ? held : null));
+        }
+        setFocusedCard((held) =>
+          focused ? item.id : held === item.id ? null : held
+        );
+      },
       onToggle: () => {
         if (opens === 'next-level') {
           showItem(index);

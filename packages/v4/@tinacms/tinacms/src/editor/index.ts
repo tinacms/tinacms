@@ -55,6 +55,7 @@ export {
   FormValidationError,
   useActiveField,
   useActivation,
+  useCardOutline,
   useInvalidFieldCount,
   useInvalidFieldCounts,
   useExpansion,

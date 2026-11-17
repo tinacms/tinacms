@@ -99,8 +99,15 @@ const start = (editor = fakeEditor(), allowedOrigin = window.origin) => ({
   }),
 });
 
-const startAnswered = () => {
-  const started = start();
+// A page with a useTina: the bridge only intercepts and draws while one is registered.
+const startPage = (...args: Parameters<typeof start>) => {
+  const started = start(...args);
+  started.bridge.register({ onValues: vi.fn() });
+  return started;
+};
+
+const startAnsweredPage = () => {
+  const started = startPage();
   fromEditor(started.editor, outlineMessage(null, null));
   return started;
 };
@@ -220,13 +227,24 @@ describe('values routing', () => {
     expect(a).toHaveBeenCalledWith({ t: 1 });
     expect(b).not.toHaveBeenCalled();
     fromEditor(editor, valuesMessage({ t: 2 }));
-    expect(a).toHaveBeenCalledTimes(2);
-    expect(b).toHaveBeenCalledTimes(1);
+    expect(a).toHaveBeenCalledTimes(1);
+    expect(b).not.toHaveBeenCalled();
 
     fromEditor(editor, valuesMessage({ t: 3 }, 'a.md'), 'https://evil.example');
     fromEditor(fakeEditor(), valuesMessage({ t: 3 }, 'a.md'));
     fromEditor(editor, { type: 'tina:values' });
-    expect(a).toHaveBeenCalledTimes(2);
+    expect(a).toHaveBeenCalledTimes(1);
+  });
+
+  it('sends values without a document to the single non-shared document, never to a shared one', () => {
+    const { editor, bridge } = start();
+    const post = vi.fn();
+    const nav = vi.fn();
+    bridge.register({ document: 'post.md', onValues: post });
+    bridge.register({ document: 'nav.json', shared: true, onValues: nav });
+    fromEditor(editor, valuesMessage({ t: 1 }));
+    expect(post).toHaveBeenCalledWith({ t: 1 });
+    expect(nav).not.toHaveBeenCalled();
   });
 
   it('gives an undeclared hook every values message while no hook declares a document', () => {
@@ -382,7 +400,7 @@ describe('origin', () => {
 
 describe('marked clicks', () => {
   it('posts the innermost address and its document and prevents the default', () => {
-    const { editor } = startAnswered();
+    const { editor } = startAnsweredPage();
     const outer = marked('blocks.0');
     const inner = marked('blocks.0.text', {
       parent: outer,
@@ -401,7 +419,7 @@ describe('marked clicks', () => {
   });
 
   it('omits document when the element has none', () => {
-    const { editor } = startAnswered();
+    const { editor } = startAnsweredPage();
     const title = marked('title');
     title.dispatchEvent(
       new MouseEvent('click', { bubbles: true, cancelable: true })
@@ -413,7 +431,7 @@ describe('marked clicks', () => {
   });
 
   it('runs before a router in an onClick that checks defaultPrevented', () => {
-    startAnswered();
+    startAnsweredPage();
     const link = document.createElement('a');
     link.href = '/next';
     const title = marked('title', { parent: link, tag: 'span' });
@@ -430,7 +448,7 @@ describe('marked clicks', () => {
   });
 
   it('leaves an unmarked link alone', () => {
-    const { editor } = startAnswered();
+    const { editor } = startAnsweredPage();
     const link = document.createElement('a');
     link.href = '/next';
     document.body.append(link);
@@ -442,7 +460,7 @@ describe('marked clicks', () => {
   });
 
   it('intercepts nothing until the editor has answered', () => {
-    const { editor } = start();
+    const { editor } = startPage();
     const title = marked('title');
     editor.postMessage.mockClear();
     const event = new MouseEvent('click', { bubbles: true, cancelable: true });
@@ -479,7 +497,7 @@ describe('off-site links', () => {
   };
 
   it('opens a plain click on an other-origin https link in a new tab and keeps the frame', () => {
-    startAnswered();
+    startAnsweredPage();
     const open = vi.spyOn(window, 'open').mockImplementation(() => null);
     const event = click('https://elsewhere.example/page');
     expect(event.defaultPrevented).toBe(true);
@@ -522,7 +540,7 @@ describe('off-site links', () => {
       () => click('https://elsewhere.example/', { init: { button: 1 } }),
     ],
   ])('leaves a %s link to the browser', (_name, act) => {
-    startAnswered();
+    startAnsweredPage();
     const open = vi.spyOn(window, 'open').mockImplementation(() => null);
     const event = act();
     expect(open).not.toHaveBeenCalled();
@@ -530,7 +548,7 @@ describe('off-site links', () => {
   });
 
   it('does not touch links before the editor has answered', () => {
-    start();
+    startPage();
     const open = vi.spyOn(window, 'open').mockImplementation(() => null);
     const event = click('https://elsewhere.example/');
     expect(open).not.toHaveBeenCalled();
@@ -559,7 +577,7 @@ describe('outlines from the editor', () => {
   };
 
   it('draws nothing and no overlay until the editor answers', () => {
-    const { bridge } = start();
+    const { bridge } = startPage();
     marked('title');
     bridge.register({ onValues: vi.fn() });
     runFrames();
@@ -567,7 +585,7 @@ describe('outlines from the editor', () => {
   });
 
   it('draws the hover outline on every element holding the hovered address, without a name', () => {
-    const { editor } = start();
+    const { editor } = startPage();
     const one = at(marked('title'), rect(10, 50));
     const two = at(marked('title'), rect(10, 200));
     marked('other');
@@ -581,7 +599,7 @@ describe('outlines from the editor', () => {
   });
 
   it('draws the active outline with an aria-hidden tab holding the name', () => {
-    const { editor } = start();
+    const { editor } = startPage();
     at(marked('title'), rect(10, 50));
     fromEditor(
       editor,
@@ -596,7 +614,7 @@ describe('outlines from the editor', () => {
   });
 
   it('puts the name tab above the element, and below it when there is no room above', () => {
-    const { editor } = start();
+    const { editor } = startPage();
     const title = at(marked('title'), rect(0, 100, 100, 40));
     const tabStyle = () =>
       (overlayRoot()?.querySelector('[data-outline-tab]') as HTMLElement).style;
@@ -612,7 +630,7 @@ describe('outlines from the editor', () => {
   });
 
   it('active takes the innermost element and never reads blocks.1 as holding blocks.10', () => {
-    const { editor } = start();
+    const { editor } = startPage();
     const block = at(marked('blocks.1'), rect(0, 10));
     const text = at(marked('blocks.1.text', { parent: block }), rect(0, 300));
     const tenth = at(marked('blocks.10.text'), rect(0, 600));
@@ -632,7 +650,7 @@ describe('outlines from the editor', () => {
   });
 
   it('matches documents: the element attribute, else the main declared document', async () => {
-    const { editor, bridge } = start();
+    const { editor, bridge } = startPage();
     bridge.register({ document: 'nav.json', shared: true, onValues: vi.fn() });
     bridge.register({ document: 'post.md', onValues: vi.fn() });
     at(marked('title'), rect(0, 10));
@@ -649,7 +667,7 @@ describe('outlines from the editor', () => {
   });
 
   it('a mark without a document matches elements on a page that declared nothing', () => {
-    const { editor, bridge } = start();
+    const { editor, bridge } = startPage();
     bridge.register({ onValues: vi.fn() });
     at(marked('title'), rect(0, 10));
     fromEditor(editor, outlineMessage({ address: 'title' }, null));
@@ -658,7 +676,7 @@ describe('outlines from the editor', () => {
   });
 
   it('tie goes to the last clicked element, else the first in order', () => {
-    const { editor } = startAnswered();
+    const { editor } = startAnsweredPage();
     const first = at(marked('title'), rect(0, 10));
     const second = at(marked('title'), rect(0, 90));
     const tops = () => {
@@ -676,7 +694,7 @@ describe('outlines from the editor', () => {
   });
 
   it('draws no hover over the active element and the host ignores the pointer', () => {
-    const { editor } = start();
+    const { editor } = startPage();
     at(marked('title'), rect(0, 10));
     fromEditor(
       editor,
@@ -691,7 +709,7 @@ describe('outlines from the editor', () => {
   });
 
   it('draws the host again after the page removed it and drops an outline whose element is gone', () => {
-    const { editor } = start();
+    const { editor } = startPage();
     const title = at(marked('title'), rect(0, 10));
     fromEditor(editor, outlineMessage({ address: 'title' }, null));
     runFrames();
@@ -707,7 +725,7 @@ describe('outlines from the editor', () => {
   });
 
   it('scrolls a newly active element that is outside the viewport into view, but not one in view', () => {
-    const { editor } = start();
+    const { editor } = startPage();
     const far = at(marked('far'), rect(0, 5000));
     const near = at(marked('near'), rect(0, 10));
     const scrollFar = vi.fn();
@@ -723,7 +741,7 @@ describe('outlines from the editor', () => {
   });
 
   it('does not scroll for a change that came from a click in the page', () => {
-    const { editor } = startAnswered();
+    const { editor } = startAnsweredPage();
     const far = at(marked('far'), rect(0, 5000));
     far.scrollIntoView = vi.fn();
     far.dispatchEvent(
@@ -735,7 +753,7 @@ describe('outlines from the editor', () => {
   });
 
   it("redraws on scroll and ignores the overlay host's own mutations", () => {
-    const { editor } = start();
+    const { editor } = startPage();
     const title = at(marked('title'), rect(0, 10));
     fromEditor(editor, outlineMessage({ address: 'title' }, null));
     runFrames();
@@ -746,7 +764,7 @@ describe('outlines from the editor', () => {
   });
 
   it('ignores outlines from the wrong origin or window', () => {
-    const { editor } = start();
+    const { editor } = startPage();
     marked('title');
     fromEditor(
       editor,
@@ -771,7 +789,7 @@ describe('pointer hover', () => {
   };
 
   it('outlines the innermost marked element under a mouse or pen and clears when it leaves', () => {
-    startAnswered();
+    startAnsweredPage();
     const outer = marked('blocks.0');
     const inner = marked('blocks.0.text', { parent: outer });
     const plain = document.createElement('p');
@@ -791,7 +809,7 @@ describe('pointer hover', () => {
   });
 
   it('outlines the element already under the pointer when the editor first answers', () => {
-    const { editor } = start();
+    const { editor } = startPage();
     const title = marked('title');
     point(title, 'mouse');
     Object.defineProperty(document, 'elementFromPoint', {
@@ -807,7 +825,7 @@ describe('pointer hover', () => {
   });
 
   it('draws no hover for touch (a tap is a click)', () => {
-    const { editor } = startAnswered();
+    const { editor } = startAnsweredPage();
     const title = marked('title');
     point(title, 'touch');
     runFrames();
@@ -825,5 +843,54 @@ describe('pointer hover', () => {
     );
     runFrames();
     expect(drawn('active')).toHaveLength(1);
+  });
+});
+
+describe('after the last registration leaves', () => {
+  const settled = () => {
+    const { editor, bridge } = start();
+    fromEditor(editor, outlineMessage(null, null));
+    const element = marked('title');
+    const unregister = bridge.register({ onValues: vi.fn() });
+    editor.postMessage.mockClear();
+    return { editor, element, unregister };
+  };
+
+  it('lets a marked click navigate and posts no activate', () => {
+    const { editor, element, unregister } = settled();
+    unregister();
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true });
+    element.dispatchEvent(click);
+    expect(click.defaultPrevented).toBe(false);
+    expect(editor.postMessage).not.toHaveBeenCalled();
+  });
+
+  it('clears the outline on screen, draws no hover and ignores a later outline message', () => {
+    const { editor, element, unregister } = settled();
+    fromEditor(editor, outlineMessage(null, { address: 'title', name: 'T' }));
+    runFrames();
+    expect(drawn('active')).toHaveLength(1);
+
+    unregister();
+    runFrames();
+    expect(drawn('active')).toHaveLength(0);
+
+    const move = new MouseEvent('pointermove', { bubbles: true });
+    Object.defineProperty(move, 'pointerType', { value: 'mouse' });
+    element.dispatchEvent(move);
+    fromEditor(editor, outlineMessage({ address: 'title' }, null));
+    runFrames();
+    expect(drawn('hover')).toHaveLength(0);
+    expect(drawn('active')).toHaveLength(0);
+  });
+
+  it('intercepts again once a registration returns', () => {
+    const { bridge } = start();
+    const element = marked('title');
+    bridge.register({ onValues: vi.fn() })();
+    bridge.register({ onValues: vi.fn() });
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true });
+    element.dispatchEvent(click);
+    expect(click.defaultPrevented).toBe(false);
   });
 });
