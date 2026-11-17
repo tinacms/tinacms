@@ -4,8 +4,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@tinacms/ui/components/popover';
+import { cn } from '@tinacms/ui/lib/utils';
 import { Save } from 'lucide-react';
-import { type ReactNode, use, useId, useState } from 'react';
+import { type ReactNode, use, useId, useRef, useState } from 'react';
 import { ContentError } from '../core/content/contract';
 import { resolveFormHooks } from '../core/form/hooks';
 import { fieldsOf } from '../core/schema/children';
@@ -106,26 +107,16 @@ const failureOf = (
   }
   if (cause instanceof ContentError) {
     const stop = STOPPING_CODES.includes(cause.code);
-    if (cause.code === 'not-found') {
-      return {
-        result: { status: 'failed', words: cause.message },
-        stop,
-      };
-    }
-    if (cause.code === 'branch-not-found') {
-      return {
-        result: { status: 'failed', words: 'The branch no longer exists' },
-        stop,
-      };
-    }
-    if (stop) {
-      return {
-        result: { status: 'failed', words: saveFailureWords(cause).title },
-        stop,
-      };
-    }
+    const words =
+      cause.code === 'not-found'
+        ? cause.message
+        : saveFailureWords(cause).title;
+    return { result: { status: 'failed', words }, stop };
   }
-  return { result: { status: 'failed', words: 'Save failed' }, stop: false };
+  return {
+    result: { status: 'failed', words: saveFailureWords(cause).title },
+    stop: false,
+  };
 };
 
 function useSaveAllRun(): () => Promise<string> {
@@ -155,7 +146,10 @@ function useSaveAllRun(): () => Promise<string> {
           ({ name }) => name === state.collections[formId]
         );
         if (!collection) {
-          record(formId, { status: 'failed', words: 'Save failed' });
+          record(formId, {
+            status: 'failed',
+            words: saveFailureWords(undefined).title,
+          });
           continue;
         }
         let stage: SaveStage = 'validate';
@@ -307,6 +301,8 @@ export function SaveAllControl() {
   const failed = useSaveAllFailureCount();
   const messageId = useId();
   const [announcement, setAnnouncement] = useState('');
+  const [reasonOpen, setReasonOpen] = useState(false);
+  const pointerDown = useRef(false);
   const disabled = running || message !== undefined || !dirty;
   const label = failed > 0 ? `Save all, ${failed} failed` : 'Save all';
   const button: ReactNode = (
@@ -316,7 +312,10 @@ export function SaveAllControl() {
       icon={failed > 0 ? 'error' : Save}
       disabled={disabled}
       aria-label={label}
-      className='max-sm:w-8 max-sm:px-0'
+      className={cn(
+        'max-sm:w-8 max-sm:px-0',
+        message !== undefined && 'pointer-events-none'
+      )}
       onClick={() => {
         setAnnouncement('');
         void run().then(setAnnouncement);
@@ -331,19 +330,42 @@ export function SaveAllControl() {
   return (
     <div className='flex items-center gap-1'>
       {message !== undefined && !running ? (
-        <span
-          tabIndex={0}
-          role='group'
-          aria-label='Save all, unavailable'
-          aria-describedby={messageId}
-          title={message}
-          className='rounded-sm outline-none focus-visible:shadow-focus-ring'
-        >
-          {button}
-          <span id={messageId} className='sr-only'>
+        <Popover open={reasonOpen} onOpenChange={setReasonOpen}>
+          <PopoverTrigger
+            nativeButton={false}
+            render={
+              <span
+                tabIndex={0}
+                role='group'
+                aria-label='Save all, unavailable'
+                aria-describedby={messageId}
+                className='rounded-sm outline-none focus-visible:shadow-focus-ring'
+                onPointerDown={() => {
+                  pointerDown.current = true;
+                }}
+                onFocus={() => {
+                  if (!pointerDown.current) setReasonOpen(true);
+                  pointerDown.current = false;
+                }}
+                onBlur={() => setReasonOpen(false)}
+              />
+            }
+          >
+            {button}
+            <span id={messageId} className='sr-only'>
+              {message}
+            </span>
+          </PopoverTrigger>
+          <PopoverContent
+            aria-label='Save all, unavailable'
+            initialFocus={false}
+            finalFocus={false}
+            align='end'
+            className='w-56 max-w-[calc(100vw-1rem)]'
+          >
             {message}
-          </span>
-        </span>
+          </PopoverContent>
+        </Popover>
       ) : (
         button
       )}

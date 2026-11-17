@@ -60,7 +60,7 @@ let holdPaths: Set<string>;
 let failWrite: Map<string, Error>;
 let beforeSaves: { path: string }[];
 let afterSaves: { path: string }[];
-let failBeforeSave: boolean;
+let failBeforeSave: Set<string>;
 let failAfterSave: boolean;
 let gets: string[];
 let holdList: Promise<void> | undefined;
@@ -83,7 +83,8 @@ const auditPlugin = () =>
               scope: { path: string; collection: { name: string } }
             ) => {
               beforeSaves.push({ path: scope.path });
-              if (failBeforeSave) throw new Error('audit refused');
+              if (failBeforeSave.has(scope.path))
+                throw new Error('audit refused');
               return document;
             },
             afterSave: (
@@ -316,7 +317,7 @@ beforeEach(() => {
   failWrite = new Map();
   beforeSaves = [];
   afterSaves = [];
-  failBeforeSave = false;
+  failBeforeSave = new Set();
   failAfterSave = false;
   gets = [];
   holdList = undefined;
@@ -672,9 +673,57 @@ describe('Save All guards', () => {
     expect(afterSaves.map(({ path }) => path).sort()).toEqual([POST, POST_B]);
   });
 
+  it("writes the other document when one document's beforeSave throws", async () => {
+    consoleGuard.expect(/Save failed/);
+    failBeforeSave = new Set([POST]);
+    const user = userEvent.setup();
+    await editSlugs(user, [POST, POST_B]);
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 1 of 2 documents')
+      ).toBeVisible()
+    );
+    expect(writes.map(({ path }) => path)).toEqual([POST_B]);
+    expect(
+      within(await openResults(user)).getAllByRole('listitem')[0]
+    ).toHaveTextContent('Failed: A beforeSave hook failed');
+  });
+
+  it.each([
+    [
+      'name-taken',
+      new ContentError('name-taken'),
+      "Couldn't save. A document or folder with that name already exists.",
+    ],
+    [
+      'a plain Error',
+      new Error('boom'),
+      "Couldn't save. Something went wrong.",
+    ],
+  ])(
+    "shows Save Document's words when the write fails with %s",
+    async (_name, error, words) => {
+      consoleGuard.expect(/Save failed/);
+      failWrite.set(POST, error);
+      const user = userEvent.setup();
+      await editSlugs(user, [POST, POST_B]);
+      await user.click(saveAll());
+      await waitFor(() =>
+        expect(
+          within(statusBar()).getByText('Save failed: 1 of 2 documents')
+        ).toBeVisible()
+      );
+      expect(writes.map(({ path }) => path)).toEqual([POST_B]);
+      const row = within(await openResults(user)).getAllByRole('listitem')[0];
+      expect(row).toHaveTextContent(`Failed: ${words}`);
+      expect(row).not.toHaveTextContent('Save failed');
+    }
+  );
+
   it('shows "A beforeSave hook failed" and writes nothing when the hook throws', async () => {
     consoleGuard.expect(/Save failed/);
-    failBeforeSave = true;
+    failBeforeSave = new Set([POST, POST_B]);
     const user = userEvent.setup();
     await editSlugs(user, [POST, POST_B]);
     await user.click(saveAll());
@@ -859,8 +908,27 @@ describe('Save All on a protected branch', () => {
     });
     expect(wrapper).toHaveAttribute('tabindex', '0');
     expect(wrapper).toHaveAccessibleDescription(message);
-    expect(wrapper).toHaveAttribute('title', message);
     expect(saveAll()).toBeDisabled();
+    expect(
+      screen.queryByRole('dialog', { name: 'Save all, unavailable' })
+    ).toBeNull();
+    await act(async () => wrapper.focus());
+    expect(
+      await screen.findByRole('dialog', { name: 'Save all, unavailable' })
+    ).toHaveTextContent(message);
+    await user.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('dialog', { name: 'Save all, unavailable' })
+      ).toBeNull()
+    );
+    await user.click(wrapper);
+    expect(
+      await screen.findByRole('dialog', { name: 'Save all, unavailable' })
+    ).toHaveTextContent(message);
+    expect(
+      await screen.findByRole('dialog', { name: 'Save all, unavailable' })
+    ).toBeVisible();
   });
 
   it('says it is checking while the branch list loads', async () => {
