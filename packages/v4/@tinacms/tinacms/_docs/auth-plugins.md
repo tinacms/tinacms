@@ -35,6 +35,23 @@ The handler refuses every op that is not a `publicOp`: `401` with no session,
 `publicOp` answers. Import `Session` and `AuthTransportHooks` from
 `@tinacms/tinacms/server`.
 
+### What the caller may do: `session/permissions`
+
+The RPC handler and the local dev server both answer one built-in op, `session/permissions`, at
+`{rpcUrl}/session/permissions` (a `POST` with no body). It returns the permissions of the
+caller as a `string[]`, resolved the same way the permission check resolves
+them: the `rolePermissions` of the provider when it has one, otherwise the
+built-in map. `*` passes through as `*`.
+
+- It needs a session and no permission. With no session it answers `401` and no
+  list.
+- Where the server checks nothing (the auth plugin has no server segment), it
+  answers `['*']` with no session. That server accepts every request, and the
+  answer grants nothing: the permission check stays the only enforcement.
+
+On the signed-in slice, `can(permission)` reads this answer, so a custom
+`rolePermissions` decides which actions the admin shows.
+
 ## The client half
 
 The plugin mounts a slice at `store.auth`. The slice is an `AuthSlice`:
@@ -136,7 +153,8 @@ with no login.
 ## TinaCloud
 
 `tinaCloud({ clientId })` is the reference auth plugin. It provides `auth`,
-`media` and `content` from one plugin.
+`media` and `content` from one plugin, and optionally `search`
+(see [search-plugins.md](./search-plugins.md#tinacloud)).
 
 - `login()` signs in the way `https://identity.tinajs.io/v2/auth/config`
   says, as v3 does:

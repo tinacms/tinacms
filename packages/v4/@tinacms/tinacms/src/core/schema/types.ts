@@ -80,6 +80,25 @@ export const formatForPath = (
   );
 };
 
+/** Each switch defaults to true. A false switch hides the action and the server refuses it. */
+export interface AllowedActions {
+  /** False also hides Duplicate, and the server refuses every create. */
+  canCreate?: boolean;
+  canDelete?: boolean;
+  /** Counts only when `canCreate` is on. The server cannot tell a Duplicate from a create, so only the UI reads it. */
+  canDuplicate?: boolean;
+  canCreateFolder?: boolean;
+  canCreateNestedFolder?: boolean;
+}
+
+export const ALLOWED_ACTION_NAMES = [
+  'canCreate',
+  'canDelete',
+  'canDuplicate',
+  'canCreateFolder',
+  'canCreateNestedFolder',
+] as const satisfies readonly (keyof AllowedActions)[];
+
 export interface CollectionSchema {
   name: string;
   label?: string;
@@ -87,6 +106,9 @@ export interface CollectionSchema {
   format: CollectionFormat | CollectionFormat[];
   fields: FieldSchema[];
   hooks?: HookRef[];
+  allowedActions?: AllowedActions;
+  /** Shown above the collection's table by a later change. */
+  description?: string;
 }
 
 export type TinaDocument = Record<string, unknown>;

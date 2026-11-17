@@ -26,6 +26,9 @@ const PROVIDER_REFUSAL_STATUS: Record<ProviderRefusalCode, number> = {
   'not-indexed': 422,
   validation: 422,
   network: 502,
+  'name-taken': 422,
+  'invalid-path': 422,
+  'folder-not-owned': 422,
 };
 
 const SEARCH_ERROR_STATUS: Record<SearchErrorCode, number> = {

@@ -257,6 +257,10 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     return (await freshTokens(tokens))?.bearer;
   };
 
+  // Search sends no token, instead of throwing, when another plugin owns `auth`.
+  const tinaCloudTokenIfMounted = async (): Promise<string | undefined> =>
+    mounted ? tinaCloudToken() : undefined;
+
   const signInWith = async (next: TinaCloudTokens, signOutsAtStart: number) => {
     const identity = await fetchProjectIdentity(clientId, next.bearer);
     if (signOuts !== signOutsAtStart) return;
@@ -338,5 +342,5 @@ export const createTinaCloudAuth = ({ clientId }: TinaCloudOptions) => {
     };
   };
 
-  return { slice, tinaCloudToken };
+  return { slice, tinaCloudToken, tinaCloudTokenIfMounted };
 };
