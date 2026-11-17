@@ -116,6 +116,23 @@ test.describe('address', () => {
     expect(before).toMatch(/plain\.html$/);
   });
 
+  test('logs no console error when the address changes by a link click or a typed move', async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on('console', (message) => {
+      if (message.type() === 'error') errors.push(message.text());
+    });
+    await page.goto(adminUrl('/plain.html'));
+    await expect(address(page)).toHaveValue(/\/plain\.html$/);
+    await frame(page).getByTestId('plain-link').click();
+    await expect(address(page)).toHaveValue(/\/plain\.html\?second=1$/);
+    await address(page).fill('/plain.html?typed=1');
+    await address(page).press('Enter');
+    await expect(address(page)).toHaveValue(/\/plain\.html\?typed=1$/);
+    expect(errors).toEqual([]);
+  });
+
   test('does not replace text the editor is typing when the page moves', async ({
     page,
   }) => {

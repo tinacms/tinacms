@@ -130,6 +130,7 @@ function PreviewToolbar({
   const level = Math.max(tierLevel, overflowLevel(paneWidth, device === 'fit'));
 
   const addressInput = useRef<HTMLInputElement>(null);
+  const [firstAddress] = useState(address);
   const typing = useRef(false);
   const waiting = useRef<string | null>(null);
   useEffect(() => {
@@ -299,7 +300,7 @@ function PreviewToolbar({
             aria-label='Page address'
             aria-invalid={addressError ? true : undefined}
             aria-describedby={addressError ? errorId : undefined}
-            defaultValue={address}
+            defaultValue={firstAddress}
             spellCheck={false}
             onChange={() => {
               typing.current = true;
