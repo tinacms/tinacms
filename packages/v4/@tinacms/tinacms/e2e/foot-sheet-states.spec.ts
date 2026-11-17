@@ -183,10 +183,12 @@ test.describe('a sheet taller than the screen at 375px', () => {
     });
     await sheet.evaluate((el) => el.scrollTo(0, el.scrollHeight));
     await page.locator('input[aria-label="f29"]').focus();
-    for (let i = 0; i < 8; i++) await page.keyboard.press('Shift+Tab');
-    const field = await box(page.locator(':focus'));
     const header = await box(sheet.locator('[data-slot=dialog-header]'));
-    expect(field.y).toBeGreaterThanOrEqual(header.y + header.height - 1);
+    for (let i = 0; i < 25; i++) {
+      await page.keyboard.press('Shift+Tab');
+      const field = await box(page.locator(':focus'));
+      expect(field.y).toBeGreaterThanOrEqual(header.y + header.height - 1);
+    }
   });
 
   test('the image pickers keep handle room and the safe area under a caller’s p-0', async ({
