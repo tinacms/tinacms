@@ -14,6 +14,7 @@ import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import {
   activateMessage,
+  documentsMessage,
   readyMessage,
   valuesMessage,
 } from '../preview/protocol';
@@ -293,6 +294,55 @@ describe('usePreviewConnection', () => {
       iframe.ref.current?.contentWindow
     );
     expect(onActivate).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onPageUrl once per ready or documents message, including from another origin, and not for a foreign window or a url on a different origin', async () => {
+    const iframe = fakeIframe();
+    const onPageUrl = vi.fn();
+    renderConnected(iframe.ref, { open: openPost, onPageUrl });
+    await screen.findByLabelText(/^Title\b/);
+    const win = iframe.ref.current?.contentWindow;
+    const site = 'https://site.example';
+
+    messageFromPreview(readyMessage(undefined, `${site}/a`), win, site);
+    expect(onPageUrl).toHaveBeenCalledTimes(1);
+    expect(onPageUrl).toHaveBeenLastCalledWith(`${site}/a`);
+
+    messageFromPreview(documentsMessage([], `${site}/b`), win, site);
+    expect(onPageUrl).toHaveBeenCalledTimes(2);
+    expect(onPageUrl).toHaveBeenLastCalledWith(`${site}/b`);
+
+    messageFromPreview(
+      readyMessage(undefined, `${site}/c`),
+      { not: 'the iframe' },
+      site
+    );
+    messageFromPreview(
+      readyMessage(undefined, 'https://other.example/c'),
+      win,
+      site
+    );
+    messageFromPreview(readyMessage(undefined, 'not a url'), win, site);
+    messageFromPreview(readyMessage(), win, site);
+    expect(onPageUrl).toHaveBeenCalledTimes(2);
+  });
+
+  it('opens nothing for a cross-origin ready message even though it reports its url', async () => {
+    const iframe = fakeIframe();
+    const onOpen = vi.fn();
+    const onPageUrl = vi.fn();
+    renderConnected(iframe.ref, { open: openPost, onOpen, onPageUrl });
+    await screen.findByLabelText(/^Title\b/);
+    iframe.postMessage.mockClear();
+
+    messageFromPreview(
+      readyMessage(undefined, 'https://site.example/a'),
+      iframe.ref.current?.contentWindow,
+      'https://site.example'
+    );
+    expect(onPageUrl).toHaveBeenCalledTimes(1);
+    expect(onOpen).not.toHaveBeenCalled();
+    expect(iframe.postMessage).not.toHaveBeenCalled();
   });
 
   it('ignores the wrong origin, the wrong source, and malformed data', async () => {

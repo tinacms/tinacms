@@ -526,6 +526,35 @@ describe('TinaAdmin', () => {
     ).toBeInTheDocument();
   });
 
+  it('follows the page address a cross-origin preview reports, but only on its own origin', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(new Response()))
+    );
+    renderAdmin('https://site.example/');
+    const bar = await screen.findByRole('group', { name: 'Preview toolbar' });
+    const address = within(bar).getByRole('textbox', { name: 'Page address' });
+    const frame = screen.getByTitle('Preview') as HTMLIFrameElement;
+    const report = (url: string) => {
+      const event = new MessageEvent('message', {
+        data: { type: 'tina:ready', url },
+      });
+      Object.defineProperty(event, 'origin', { value: 'https://site.example' });
+      Object.defineProperty(event, 'source', { value: frame.contentWindow });
+      act(() => {
+        window.dispatchEvent(event);
+      });
+    };
+
+    report('https://site.example/posts/new');
+    expect(address).toHaveValue('site.example/posts/new');
+
+    report('https://other.example/elsewhere');
+    expect(address).toHaveValue('site.example/posts/new');
+    vi.unstubAllGlobals();
+  });
+
   it('has no tab list and no preview place bar on a document', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     renderAdmin('about:blank');
