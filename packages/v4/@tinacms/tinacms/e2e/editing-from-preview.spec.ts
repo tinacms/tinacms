@@ -286,6 +286,50 @@ test('the returned card keeps its active look with its block after Move down', a
   await expect(cards.first()).not.toHaveAttribute('data-active', '');
 });
 
+const cameBackToHero = async (page: Page) => {
+  await openDeclared(page);
+  await frame(page)
+    .getByTestId('block-0')
+    .click({ position: { x: 4, y: 4 } });
+  await expect(heading(page)).toHaveText(/^Hero/);
+  await location(page).getByRole('button', { name: 'Hello World' }).click();
+  const cards = page
+    .getByRole('complementary', { name: 'Document form' })
+    .locator('[data-array-item] > [data-slot="list-card-item"]');
+  await expect(cards.first()).toHaveAttribute('data-active', '');
+  return cards;
+};
+
+test('dragging the returned card by its grip moves its active look with it', async ({
+  page,
+}) => {
+  const cards = await cameBackToHero(page);
+  const from = await cards.first().locator('[data-grip]').boundingBox();
+  const to = await cards.nth(1).boundingBox();
+  if (!from || !to) throw new Error('cards are not visible');
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(from.x + 4, from.y + 20, { steps: 4 });
+  await page.mouse.move(to.x + 20, to.y + to.height - 2, { steps: 12 });
+  await page.mouse.up();
+  await expect(cards.nth(1)).toHaveAttribute('data-active', '');
+  await expect(cards.first()).not.toHaveAttribute('data-active', '');
+});
+
+test("pressing another card's menu clears the returned card, and its Remove leaves no card active", async ({
+  page,
+}) => {
+  const cards = await cameBackToHero(page);
+  await page.getByRole('button', { name: 'Actions for Item 2' }).click();
+  await expect(cards.first()).not.toHaveAttribute('data-active', '');
+  await page.getByRole('menuitem', { name: /^Remove/ }).click();
+  await expect(
+    page
+      .getByRole('complementary', { name: 'Document form' })
+      .locator('[data-slot="list-card-item"][data-active]')
+  ).toHaveCount(0);
+});
+
 test('hovering a block card dashes its block, and tabbing onto its grip draws the solid outline with the Hero tab', async ({
   page,
 }) => {

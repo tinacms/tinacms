@@ -1,5 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useFormContext } from 'react-hook-form';
 import { describe, expect, it } from 'vitest';
 import { DocumentForm } from '../../../admin/document-form';
 import { asResolvedConfig } from '../../../config';
@@ -68,6 +69,27 @@ function Activate({ address }: { address: string }) {
   );
 }
 
+// Replaces the list at `address` without its second item, as code outside the card would.
+function DropSecond({ address }: { address: string }) {
+  const { getValues, setValue } = useFormContext();
+  return (
+    <button
+      type='button'
+      onClick={() => {
+        const list: unknown = getValues(address);
+        if (Array.isArray(list)) {
+          setValue(
+            address,
+            list.filter((_, index) => index !== 1)
+          );
+        }
+      }}
+    >
+      drop second of {address}
+    </button>
+  );
+}
+
 // Clicks `address` on the page, then steps back to the level that lists it.
 async function cameBackTo(address: string, back: string | RegExp) {
   const user = userEvent.setup();
@@ -90,6 +112,7 @@ async function cameBackTo(address: string, back: string | RegExp) {
         <LevelHead />
         <DocumentForm />
         <Activate address={address} />
+        <DropSecond address={address.replace(/\.0$/, '')} />
       </FormProvider>
     </TinaProvider>
   );
@@ -146,6 +169,112 @@ describe.each([
     expect(active()).toEqual([]);
   });
 });
+
+describe.each([
+  {
+    list: 'a top-level list',
+    address: 'blocks.0',
+    back: 'Home',
+    root: 'blocks',
+  },
+  {
+    list: 'a nested list',
+    address: 'wrap.inner.blocks.0',
+    back: 'Blocks',
+    root: 'wrap.inner.blocks',
+  },
+])(
+  'acting on cards after stepping back in $list',
+  ({ address, back, root }) => {
+    const focusedCardAddress = () => {
+      const card = document.activeElement?.closest('[data-array-item]');
+      const cards = Array.from(document.querySelectorAll('[data-array-item]'));
+      const index = card ? cards.indexOf(card) : -1;
+      return index < 0 ? null : `${root}.${index}`;
+    };
+    const outlined = () => useFormStore.getState().focusedCard?.address;
+    const grip = (container: HTMLElement, index: number) =>
+      container.querySelectorAll<HTMLElement>('[data-grip]')[index];
+
+    it('moves the look with Hero when its grip is dragged down, then up', async () => {
+      const { active, container, user } = await cameBackTo(address, back);
+      await waitFor(() => expect(active()).toEqual([0]));
+      grip(container, 0).focus();
+      await user.keyboard('{ArrowDown}');
+      await waitFor(() => expect(active()).toEqual([1]));
+      grip(container, 1).focus();
+      await user.keyboard('{ArrowUp}');
+      await waitFor(() => expect(active()).toEqual([0]));
+    });
+
+    it.each([
+      ['Remove', /^Remove/],
+      ['Move up', /^Move up/],
+    ])(
+      'leaves no card active after Quote menu %s, and the outline follows the focused card',
+      async (_name, action) => {
+        const { active, act } = await cameBackTo(address, back);
+        await waitFor(() => expect(active()).toEqual([0]));
+        await act(2, action);
+        await waitFor(() => expect(active()).toEqual([]));
+        await waitFor(() => expect(outlined()).toBe(focusedCardAddress()));
+        expect(outlined()).toBeDefined();
+      }
+    );
+
+    it("clears the look when Quote's grip is dragged to a new place, and not again when dropped back", async () => {
+      const { active, container, user } = await cameBackTo(address, back);
+      await waitFor(() => expect(active()).toEqual([0]));
+      grip(container, 1).focus();
+      await user.keyboard('{ArrowUp}');
+      await waitFor(() => expect(active()).toEqual([]));
+      await waitFor(() => expect(outlined()).toBe(`${root}.0`));
+      const order = () =>
+        Array.from(container.querySelectorAll('[data-array-item]')).map(
+          (card) => card.textContent
+        );
+      const before = order();
+      grip(container, 0).focus();
+      await user.keyboard(' {ArrowDown}{ArrowUp} ');
+      expect(order()).toEqual(before);
+      expect(active()).toEqual([]);
+      expect(outlined()).toBe(`${root}.0`);
+    });
+
+    it.each([
+      ['Hero', 1, 1],
+      ['Quote', 2, 2],
+    ])(
+      'leaves no card active when Duplicate on %s opens the copy as its own level',
+      async (name, item, copy) => {
+        const { active, act } = await cameBackTo(address, back);
+        await waitFor(() => expect(active()).toEqual([0]));
+        await act(item, /^Duplicate/);
+        await screen.findByRole('heading', { level: 2, name });
+        expect(active()).toEqual([]);
+        expect(useFormStore.getState().active?.address).toContain(
+          `${root}.${copy}.`
+        );
+      }
+    );
+
+    it('never moves the look to another card when code outside removes Quote', async () => {
+      const { active, user } = await cameBackTo(address, back);
+      await waitFor(() => expect(active()).toEqual([0]));
+      await user.click(
+        screen.getByRole('button', {
+          name: `drop second of ${root}`,
+        })
+      );
+      await waitFor(() =>
+        expect(
+          screen.getAllByRole('button', { name: /^Actions for Item/ })
+        ).toHaveLength(2)
+      );
+      expect(active()).not.toContain(1);
+    });
+  }
+);
 
 describe('focusing another card', () => {
   it('clears the returned card active look and moves the outline to the focused card', async () => {
