@@ -23,15 +23,26 @@ const TAP_SLOP = 6;
 const DRAG_CLOSE_MAX = 80;
 const SCRIM_STRIP = 48;
 
-/** The whole look of a popup as a foot sheet; a caller uses it in place of its centred classes. */
-const footSheetClasses = cn(
-  'group/dialog fixed inset-x-0 bottom-0 z-50 m-0 flex h-auto max-h-[calc(100dvh-48px)] min-h-[50dvh] w-auto flex-col gap-4 overflow-y-auto rounded-t-xl bg-popover px-6 pt-9 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] font-sans text-base leading-control text-foreground shadow-dialog outline-none',
-  'transition-[translate,opacity] duration-(--dur-slide-in) data-ending-style:translate-y-full data-ending-style:duration-(--dur-slide-out) data-ending-style:ease-exit data-starting-style:translate-y-full',
-  'motion-reduce:data-ending-style:translate-y-0 motion-reduce:data-ending-style:opacity-0 motion-reduce:data-starting-style:translate-y-0 motion-reduce:data-starting-style:opacity-0'
-);
+/**
+ * The whole look of a popup as a foot sheet. The top room for the handle comes from the chrome
+ * strip and the safe-area room from a transparent bottom border, so a caller's `p-0` keeps both.
+ * `--sheet-gap` is the space between children; a caller changes it there, not with `gap-*`,
+ * so the strip can cancel it.
+ */
+const footSheetClasses = (bodyScrolls: boolean) =>
+  cn(
+    'group/dialog fixed inset-x-0 bottom-0 z-50 m-0 flex h-auto max-h-[calc(100dvh-48px)] min-h-[50dvh] w-auto flex-col gap-(--sheet-gap) overflow-y-auto rounded-t-xl border-b-[length:env(safe-area-inset-bottom,0px)] border-transparent bg-popover px-6 pb-6 [--sheet-gap:--spacing(4)] font-sans text-base leading-control text-foreground shadow-dialog outline-none',
+    bodyScrolls ? 'pt-0' : 'pt-9',
+    'transition-[translate,opacity] duration-(--dur-slide-in) data-ending-style:translate-y-full data-ending-style:duration-(--dur-slide-out) data-ending-style:ease-exit data-starting-style:translate-y-full',
+    'motion-reduce:data-ending-style:translate-y-0 motion-reduce:data-ending-style:opacity-0 motion-reduce:data-starting-style:translate-y-0 motion-reduce:data-starting-style:opacity-0'
+  );
 
 const footSheetScrimClasses =
   'max-md:duration-(--dur-slide-in) max-md:data-ending-style:duration-(--dur-slide-out)';
+
+/** A header that stays under the chrome strip while a foot sheet's body scrolls. */
+const footSheetHeaderClasses =
+  'group-data-[slot=foot-sheet]/dialog:sticky group-data-[slot=foot-sheet]/dialog:top-9 group-data-[slot=foot-sheet]/dialog:z-10 group-data-[slot=foot-sheet]/dialog:bg-popover';
 
 /** A footer whose buttons share the row in equal parts on a phone. */
 const footSheetFooterClasses =
@@ -274,15 +285,99 @@ function usePopupEdgePadding(): number | undefined {
   return useTier() === 'phone' ? 12 : undefined;
 }
 
+type FootSheetPopupOptions = {
+  /** Whether the popup is a foot sheet right now (a phone, and a bottom sheet for `SheetContent`). */
+  on: boolean;
+  /** The root's own `Close` part: a dialog's or an alert dialog's. */
+  Close: typeof DialogPrimitive.Close;
+  /** The `data-slot` the popup keeps when it is not a foot sheet. */
+  slot: string;
+  /** The classes the popup keeps when it is not a foot sheet. */
+  look: string;
+  className?: DialogPrimitive.Popup.Props['className'];
+  initialFocus?: DialogPrimitive.Popup.Props['initialFocus'];
+  style?: DialogPrimitive.Popup.Props['style'];
+  /** False when the popup does not scroll and its chrome stays absolute (the error sheet). */
+  bodyScrolls?: boolean;
+};
+
+type FootSheetPopup = {
+  popup: {
+    ref: RefObject<HTMLDivElement | null>;
+    'data-slot': string;
+    className: (state: DialogPrimitive.Popup.State) => string;
+    initialFocus: DialogPrimitive.Popup.Props['initialFocus'];
+    style: (state: DialogPrimitive.Popup.State) => CSSProperties;
+  };
+  scrim: { forceRender?: boolean; 'data-slot'?: string; className?: string };
+  chrome: ReactNode;
+  ref: RefObject<HTMLDivElement | null>;
+};
+
+/**
+ * Everything a popup needs to be a foot sheet: spread `popup` on its Popup and `scrim` on its
+ * overlay, and render `chrome` last inside the popup. Off, `popup` and `scrim` carry the
+ * caller's own props and `chrome` is null.
+ */
+function useFootSheetPopup({
+  on,
+  Close,
+  slot,
+  look,
+  className,
+  initialFocus,
+  style,
+  bodyScrolls = true,
+}: FootSheetPopupOptions): FootSheetPopup {
+  const ref = useRef<HTMLDivElement>(null);
+  const ride = useFootSheetRide(on);
+  const popup = {
+    ref,
+    'data-slot': on ? 'foot-sheet' : slot,
+    className: (state: DialogPrimitive.Popup.State) =>
+      cn(
+        on ? footSheetClasses(bodyScrolls) : look,
+        typeof className === 'function' ? className(state) : className
+      ),
+    initialFocus: initialFocus ?? (on ? firstBodyFocus(ref) : undefined),
+    style: (state: DialogPrimitive.Popup.State): CSSProperties => ({
+      ...(typeof style === 'function' ? style(state) : style),
+      ...ride,
+    }),
+  };
+  const scrim = on
+    ? {
+        forceRender: true,
+        'data-slot': 'foot-sheet-scrim',
+        className: footSheetScrimClasses,
+      }
+    : {};
+  const buttons = (
+    <>
+      <FootSheetCloseButton Close={Close} />
+      <FootSheetHandle
+        close={(handle) => <Close {...handle} data-slot='foot-sheet-handle' />}
+      />
+    </>
+  );
+  const chrome = !on ? null : bodyScrolls ? (
+    <div
+      data-slot='foot-sheet-chrome'
+      className='sticky top-0 z-20 order-first -mb-(--sheet-gap) h-9 flex-none bg-popover'
+    >
+      {buttons}
+    </div>
+  ) : (
+    buttons
+  );
+  return { popup, scrim, chrome, ref };
+}
+
 export type { FootSheetHandleProps };
 export {
-  FootSheetCloseButton,
-  FootSheetHandle,
   FootSheetRootProvider,
-  firstBodyFocus,
-  footSheetClasses,
   footSheetFooterClasses,
-  footSheetScrimClasses,
-  useFootSheetRide,
+  footSheetHeaderClasses,
+  useFootSheetPopup,
   usePopupEdgePadding,
 };

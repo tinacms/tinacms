@@ -10,6 +10,7 @@ import {
   DialogClose,
   DialogContent,
   DialogFooter,
+  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@tinacms/ui/components/dialog';
@@ -55,7 +56,9 @@ function Plain() {
     <Dialog>
       <DialogTrigger render={<Button />}>Open</DialogTrigger>
       <DialogContent>
-        <DialogTitle>Plain</DialogTitle>
+        <DialogHeader>
+          <DialogTitle>Plain</DialogTitle>
+        </DialogHeader>
         <div style={{ flexShrink: 0, height: 1500 }}>A long body.</div>
         <DialogFooter>
           <DialogClose render={<Button variant='ghost' />}>Cancel</DialogClose>

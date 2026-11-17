@@ -14,14 +14,7 @@ import {
 import { Badge } from '@tinacms/ui/components/badge';
 import { foldPath } from '@tinacms/ui/components/breadcrumb';
 import { Button } from '@tinacms/ui/components/button';
-import {
-  FootSheetCloseButton,
-  FootSheetHandle,
-  firstBodyFocus,
-  footSheetClasses,
-  footSheetScrimClasses,
-  useFootSheetRide,
-} from '@tinacms/ui/components/foot-sheet';
+import { useFootSheetPopup } from '@tinacms/ui/components/foot-sheet';
 import { Icon } from '@tinacms/ui/components/icon';
 import { Kbd } from '@tinacms/ui/components/kbd';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
@@ -599,8 +592,19 @@ function ErrorSheet({
 }: ErrorSheetProps) {
   const success = status === 'success';
   const count = success ? 0 : errors.length;
-  const popup = useRef<HTMLDivElement>(null);
-  const ride = useFootSheetRide(true);
+  const {
+    popup,
+    scrim,
+    chrome,
+    ref: popupRef,
+  } = useFootSheetPopup({
+    on: true,
+    Close: DialogPrimitive.Close,
+    slot: 'foot-sheet',
+    look: '',
+    className: 'h-[50dvh] gap-0 overflow-hidden px-0 pb-0',
+    bodyScrolls: false,
+  });
   const picked = useRef<ErrorSummaryItem | null>(null);
   // Stays set until the sheet opens again: the focus return may run after the close completes.
   const tapped = useRef(false);
@@ -631,29 +635,22 @@ function ErrorSheet({
     >
       <DialogPrimitive.Portal keepMounted>
         <DialogPrimitive.Backdrop
-          data-slot='foot-sheet-scrim'
+          {...scrim}
           className={cn(
             'fixed inset-0 isolate z-50 bg-scrim transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0',
-            footSheetScrimClasses
+            scrim.className
           )}
         />
         <DialogPrimitive.Popup
-          ref={popup}
+          {...popup}
           id={id}
           inert={!open}
-          data-slot='foot-sheet'
           data-layout='sheet'
           data-status={status}
-          initialFocus={firstBodyFocus(popup)}
           finalFocus={() => {
             if (tapped.current) return false;
             return returnFocusTo?.() ?? true;
           }}
-          className={cn(
-            footSheetClasses,
-            'h-[50dvh] gap-0 overflow-hidden px-0 pb-[env(safe-area-inset-bottom,0px)]'
-          )}
-          style={ride}
         >
           <header className='flex flex-none items-center gap-2 border-b border-border py-3.5 pr-14 pl-5'>
             <DialogPrimitive.Title className='m-0 inline-flex items-center gap-2 font-heading text-md leading-title font-semibold text-foreground'>
@@ -665,7 +662,7 @@ function ErrorSheet({
             <SuccessFace
               still={stillSuccess}
               onEnd={onSuccessEnd}
-              pane={popup}
+              pane={popupRef}
             />
           ) : (
             <>
@@ -700,15 +697,7 @@ function ErrorSheet({
               </ul>
             </>
           )}
-          <FootSheetCloseButton Close={DialogPrimitive.Close} />
-          <FootSheetHandle
-            close={(handle) => (
-              <DialogPrimitive.Close
-                {...handle}
-                data-slot='foot-sheet-handle'
-              />
-            )}
-          />
+          {chrome}
         </DialogPrimitive.Popup>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

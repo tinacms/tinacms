@@ -1,16 +1,11 @@
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { cva } from 'class-variance-authority';
 import type * as React from 'react';
-import { useRef } from 'react';
 
 import { Button } from '@tinacms/ui/components/button';
 import {
-  FootSheetCloseButton,
-  FootSheetHandle,
-  firstBodyFocus,
-  footSheetClasses,
-  footSheetScrimClasses,
-  useFootSheetRide,
+  footSheetHeaderClasses,
+  useFootSheetPopup,
 } from '@tinacms/ui/components/foot-sheet';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { dialogTitleClasses } from '@tinacms/ui/lib/dialog-styles';
@@ -57,7 +52,6 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
       data-slot='sheet-overlay'
       className={cn(
         'fixed inset-0 z-50 bg-scrim-light transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0',
-        footSheetScrimClasses,
         className
       )}
       {...props}
@@ -79,43 +73,26 @@ function SheetContent({
 }) {
   const phone = useTier() === 'phone';
   const footSheet = phone && side === 'bottom';
-  const popup = useRef<HTMLDivElement>(null);
-  const ride = useFootSheetRide(footSheet);
+  const { popup, scrim, chrome } = useFootSheetPopup({
+    on: footSheet,
+    Close: SheetPrimitive.Close,
+    slot: 'sheet-content',
+    look: sheetVariants({ side }),
+    // After `className`, so a caller's own width gives way to the screen's.
+    className: cn(
+      className,
+      phone && (side === 'left' || side === 'right') && 'w-full'
+    ),
+    initialFocus,
+    style,
+  });
   return (
     <SheetPortal>
-      <SheetOverlay
-        {...(footSheet ? { 'data-slot': 'foot-sheet-scrim' } : {})}
-      />
-      <SheetPrimitive.Popup
-        ref={popup}
-        data-slot={footSheet ? 'foot-sheet' : 'sheet-content'}
-        data-side={side}
-        className={cn(
-          footSheet ? footSheetClasses : sheetVariants({ side }),
-          className,
-          // After `className`, so a caller's own width gives way to the screen's.
-          phone && (side === 'left' || side === 'right') && 'w-full'
-        )}
-        initialFocus={
-          initialFocus ?? (footSheet ? firstBodyFocus(popup) : undefined)
-        }
-        style={{ ...style, ...ride }}
-        {...props}
-      >
+      <SheetOverlay {...scrim} />
+      <SheetPrimitive.Popup {...popup} data-side={side} {...props}>
         {children}
-        {footSheet ? (
-          <>
-            <FootSheetCloseButton Close={SheetPrimitive.Close} />
-            <FootSheetHandle
-              close={(handle) => (
-                <SheetPrimitive.Close
-                  {...handle}
-                  data-slot='foot-sheet-handle'
-                />
-              )}
-            />
-          </>
-        ) : showCloseButton ? (
+        {chrome}
+        {!footSheet && showCloseButton ? (
           <SheetPrimitive.Close
             data-slot='sheet-close'
             render={
@@ -140,6 +117,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
       data-slot='sheet-header'
       className={cn(
         'flex flex-none flex-col gap-0.5 border-b border-border-subtle py-4 pr-12 pl-5',
+        footSheetHeaderClasses,
         className
       )}
       {...props}

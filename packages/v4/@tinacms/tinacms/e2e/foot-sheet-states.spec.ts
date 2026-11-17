@@ -112,6 +112,91 @@ test.describe('a plain dialog on a phone', () => {
   });
 });
 
+test.describe('a sheet taller than the screen at 375px', () => {
+  const open = async (page: Page) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/sheets.html?case=plain');
+    const trigger = page.getByRole('button', { name: 'Open' });
+    await trigger.click();
+    const sheet = page.locator(SHEET);
+    await expect(sheet).toBeVisible();
+    await settle(page);
+    await sheet.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+    await expect
+      .poll(() =>
+        sheet.evaluate((el) => el.scrollHeight - el.clientHeight - el.scrollTop)
+      )
+      .toBeLessThanOrEqual(1);
+    return { trigger, sheet };
+  };
+
+  test('keeps the handle, × and header in view, and the footer at the foot, scrolled to the end', async ({
+    page,
+  }) => {
+    const { sheet } = await open(page);
+    const top = (await box(sheet)).y;
+    for (const target of [
+      sheet.getByRole('button', { name: 'Close sheet' }),
+      sheet.getByRole('button', { name: 'Close', exact: true }),
+    ]) {
+      const rect = await box(target);
+      expect(rect.y).toBeGreaterThanOrEqual(top);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(top + 48);
+    }
+    const header = await box(sheet.locator('[data-slot=dialog-header]'));
+    expect(Math.round(header.y - top)).toBe(36);
+    const footer = await box(sheet.locator('[data-slot=dialog-footer]'));
+    const sheetBox = await box(sheet);
+    expect(footer.y + footer.height).toBeLessThanOrEqual(
+      sheetBox.y + sheetBox.height + 1
+    );
+    expect(footer.y).toBeGreaterThan(sheetBox.y + sheetBox.height / 2);
+  });
+
+  for (const route of ['×', 'handle tap', '120px drag']) {
+    test(`closes by ${route} after scrolling to the end`, async ({ page }) => {
+      const { trigger, sheet } = await open(page);
+      const handle = sheet.getByRole('button', { name: 'Close sheet' });
+      if (route === '×') {
+        await sheet.getByRole('button', { name: 'Close', exact: true }).click();
+      } else if (route === 'handle tap') {
+        await handle.click();
+      } else {
+        await drag(page, handle, 120);
+      }
+      await expect(page.locator(SHEET)).toHaveCount(0);
+      await expect(trigger).toBeFocused();
+    });
+  }
+
+  test('the image pickers keep handle room and the safe area under a caller’s p-0', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Emulation.setSafeAreaInsetsOverride', {
+      insets: { top: 0, bottom: 34, left: 0, right: 0 },
+    });
+    await page.goto(CHECKLIST);
+    await page.getByRole('button', { name: 'Add images' }).click();
+    const sheet = page.locator(SHEET);
+    await expect(sheet).toBeVisible();
+    await settle(page);
+    const sheetBox = await box(sheet);
+    const handle = await box(
+      sheet.getByRole('button', { name: 'Close sheet' })
+    );
+    const firstChild = await box(sheet.locator('> :first-child'));
+    expect(handle.y + handle.height).toBeLessThanOrEqual(firstChild.y + 1);
+    expect(firstChild.y - sheetBox.y).toBeGreaterThanOrEqual(36);
+    const inner = await sheet.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return Number.parseFloat(style.borderBottomWidth);
+    });
+    expect(inner).toBe(34);
+  });
+});
+
 test.describe('the Discard confirm on a phone', () => {
   const open = async (page: Page) => {
     await page.setViewportSize(PHONE);

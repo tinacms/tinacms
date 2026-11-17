@@ -1,7 +1,6 @@
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import type { VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
-import { useRef } from 'react';
 import {
   dialogDescriptionClasses,
   dialogFooterClasses,
@@ -13,14 +12,10 @@ import { cn } from '@tinacms/ui/lib/utils';
 
 import { Button } from '@tinacms/ui/components/button';
 import {
-  FootSheetCloseButton,
-  FootSheetHandle,
   FootSheetRootProvider,
-  firstBodyFocus,
-  footSheetClasses,
   footSheetFooterClasses,
-  footSheetScrimClasses,
-  useFootSheetRide,
+  footSheetHeaderClasses,
+  useFootSheetPopup,
 } from '@tinacms/ui/components/foot-sheet';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
 
@@ -74,12 +69,10 @@ function DialogOverlay({
   className,
   ...props
 }: DialogPrimitive.Backdrop.Props) {
-  const phone = useTier() === 'phone';
   return (
     <DialogPrimitive.Backdrop
-      forceRender={phone}
-      data-slot={phone ? 'foot-sheet-scrim' : 'dialog-overlay'}
-      className={cn(dialogOverlayClasses, footSheetScrimClasses, className)}
+      data-slot='dialog-overlay'
+      className={cn(dialogOverlayClasses, className)}
       {...props}
     />
   );
@@ -101,42 +94,40 @@ function DialogContent({
     keyboard?: boolean;
   }) {
   const phone = useTier() === 'phone';
-  const popup = useRef<HTMLDivElement>(null);
-  const ride = useFootSheetRide(phone);
+  const { popup, scrim, chrome } = useFootSheetPopup({
+    on: phone,
+    Close: DialogPrimitive.Close,
+    slot: 'dialog-content',
+    look: cn(dialogVariants({ size }), 'group/dialog'),
+    className,
+    initialFocus,
+    style,
+  });
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay {...scrim} />
       <DialogPrimitive.Popup
-        ref={popup}
-        data-slot={phone ? 'foot-sheet' : 'dialog-content'}
+        {...popup}
         data-close-button={showCloseButton || phone ? '' : undefined}
         data-keyboard={keyboard ? '' : undefined}
-        className={cn(
-          phone
-            ? footSheetClasses
-            : cn(dialogVariants({ size }), 'group/dialog'),
-          className
-        )}
-        initialFocus={
-          initialFocus ?? (phone ? firstBodyFocus(popup) : undefined)
-        }
-        style={{ ...style, ...ride }}
         {...props}
       >
         {children}
-        {showCloseButton || phone ? (
-          <FootSheetCloseButton Close={DialogPrimitive.Close} />
-        ) : null}
-        {phone ? (
-          <FootSheetHandle
-            close={(handle) => (
-              <DialogPrimitive.Close
-                {...handle}
-                data-slot='foot-sheet-handle'
+        {showCloseButton && !phone ? (
+          <DialogPrimitive.Close
+            data-slot='dialog-close'
+            render={
+              <Button
+                variant='icon'
+                size='sm'
+                icon='close'
+                aria-label='Close'
+                className='absolute top-4 right-4'
               />
-            )}
+            }
           />
         ) : null}
+        {chrome}
       </DialogPrimitive.Popup>
     </DialogPortal>
   );
@@ -148,6 +139,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
       data-slot='dialog-header'
       className={cn(
         'flex flex-col gap-1 group-data-close-button/dialog:pr-8',
+        footSheetHeaderClasses,
         className
       )}
       {...props}
