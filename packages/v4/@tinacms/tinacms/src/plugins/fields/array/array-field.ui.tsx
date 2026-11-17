@@ -384,7 +384,13 @@ function ObjectItems({
       outlinedIndex < 0 ? null : toFieldAddress(`${address}.${outlinedIndex}`)
     );
   }, [cardOutline, address, outlinedIndex]);
-  useEffect(() => () => cardOutline.focus(null), [cardOutline]);
+  useEffect(
+    () => () => {
+      cardOutline.focus(null);
+      cardOutline.hover(null);
+    },
+    [cardOutline]
+  );
 
   const isActive = (id: string, itemAddress: string) =>
     activation?.address === itemAddress ||

@@ -200,6 +200,22 @@ describe.each([
     expect(useFormStore.getState().hovered).toBeNull();
   });
 
+  it('clears the card hover when the list unmounts under the pointer', async () => {
+    const { user, container } = await cameBackTo(address, back);
+    await user.hover(container.querySelectorAll('[data-array-item]')[1]);
+    expect(useFormStore.getState().hovered?.address).toBe(`${root}.1`);
+    await user.click(
+      container.querySelectorAll(
+        '[data-array-item] [data-slot="list-card-head"] button'
+      )[1]
+    );
+    await waitFor(() =>
+      expect(useFormStore.getState().hovered?.address ?? '').not.toContain(
+        `${root}.`
+      )
+    );
+  });
+
   it('points at a card whose grip takes focus, with no level opened, and falls back to the returned card on blur', async () => {
     const { user, container } = await cameBackTo(address, back);
     const grips = container.querySelectorAll<HTMLElement>('[data-grip]');
