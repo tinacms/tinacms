@@ -343,6 +343,12 @@ export function SaveAllControl() {
                 onPointerDown={() => {
                   pointerDown.current = true;
                 }}
+                onPointerUp={() => {
+                  pointerDown.current = false;
+                }}
+                onPointerCancel={() => {
+                  pointerDown.current = false;
+                }}
                 onFocus={() => {
                   if (!pointerDown.current) setReasonOpen(true);
                   pointerDown.current = false;

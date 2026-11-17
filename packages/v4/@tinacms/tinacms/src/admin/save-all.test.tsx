@@ -931,6 +931,26 @@ describe('Save All on a protected branch', () => {
     ).toBeVisible();
   });
 
+  it('shows the reason on keyboard focus after two mouse clicks', async () => {
+    const user = userEvent.setup();
+    window.location.hash = hashOf('post', POST);
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-x');
+    const wrapper = await screen.findByRole('group', {
+      name: 'Save all, unavailable',
+    });
+    const reason = () =>
+      screen.queryByRole('dialog', { name: 'Save all, unavailable' });
+    await user.click(wrapper);
+    await user.click(wrapper);
+    await waitFor(() => expect(reason()).toBeNull());
+    await act(async () => wrapper.blur());
+    await act(async () => wrapper.focus());
+    expect(
+      await screen.findByRole('dialog', { name: 'Save all, unavailable' })
+    ).toBeVisible();
+  });
+
   it('says it is checking while the branch list loads', async () => {
     let open: () => void = () => {};
     holdList = new Promise<void>((resolve) => {
