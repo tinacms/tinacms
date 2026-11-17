@@ -4,7 +4,11 @@ import type { TRange } from '@udecode/plate';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { type TLinkElement } from '@udecode/plate-link';
 import { LinkPlugin } from '@udecode/plate-link/react';
-import { useEditorRef, useEditorSelector } from '@udecode/plate/react';
+import {
+  useEditorRef,
+  useEditorSelector,
+  useHotkeys,
+} from '@udecode/plate/react';
 
 import {
   Popover,
@@ -52,6 +56,20 @@ export function LinkToolbarButton({
     setBox({ draft, selection: editor.selection });
   };
 
+  useHotkeys(
+    'meta+k, ctrl+k',
+    (event) => {
+      const root = editor.api.toDOMNode(editor);
+      if (disabled || inCodeBlock || !root?.contains(document.activeElement)) {
+        return;
+      }
+      event.preventDefault();
+      openBox();
+    },
+    { enableOnContentEditable: true },
+    []
+  );
+
   const close = (refocus: boolean) => {
     const selection = box?.selection;
     setBox(null);
@@ -81,6 +99,7 @@ export function LinkToolbarButton({
   const button = (
     <ToolbarButton
       tooltip='Link'
+      shortcut='⌘K'
       disabled={disabled || inCodeBlock}
       aria-haspopup='dialog'
       aria-expanded={box !== null}

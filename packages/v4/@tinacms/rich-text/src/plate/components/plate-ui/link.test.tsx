@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import type { Value } from '@udecode/plate';
 import { Plate, PlateContent, usePlateEditor } from '@udecode/plate/react';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createEditorPlugins } from '../../plugins/editor-plugins';
 import { Components } from '../../plugins/ui/components';
 import { ToolbarProvider } from '../../toolbar/toolbar-provider';
@@ -11,6 +11,31 @@ import { LinkToolbarButton } from './link-toolbar-button';
 import { ToolRowContext } from './tool-row-context';
 import { Toolbar } from './toolbar';
 import { TooltipProvider } from './tooltip';
+
+const box = {
+  x: 10,
+  y: 10,
+  top: 10,
+  left: 10,
+  right: 210,
+  bottom: 40,
+  width: 200,
+  height: 30,
+  toJSON: () => ({}),
+} as DOMRect;
+
+beforeEach(() => {
+  vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(box);
+  vi.spyOn(Element.prototype, 'getClientRects').mockReturnValue([
+    box,
+  ] as unknown as DOMRectList);
+  vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(1000);
+  vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(800);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 type HarnessEditor = ReturnType<typeof usePlateEditor>;
 
@@ -51,7 +76,7 @@ const Harness = ({
               <LinkToolbarButton />
             </ToolRowContext.Provider>
           </Toolbar>
-          <PlateContent />
+          <PlateContent tabIndex={0} />
         </Plate>
       </ToolbarProvider>
     </TooltipProvider>
@@ -332,5 +357,49 @@ describe('Link box inside the More tools panel', () => {
     );
     await user.click(screen.getByRole('button', { name: 'OK' }));
     expect(onRun).not.toHaveBeenCalled();
+  });
+});
+
+const focusText = () => {
+  act(() => screen.getByRole('textbox', { name: '' }).focus());
+};
+
+describe('Link shortcut', () => {
+  it('Ctrl+K opens the same box as the Link button, prefilled from the selection', async () => {
+    const user = userEvent.setup();
+    const editor = mount(words('hello world'));
+    select(editor, [0, 0], 0, 5);
+    focusText();
+
+    await user.keyboard('{Control>}k{/Control}');
+    expect(
+      await screen.findByRole('textbox', { name: 'Text to display' })
+    ).toHaveValue('hello');
+    expect(screen.getByRole('textbox', { name: 'Link' })).toBeVisible();
+  });
+
+  it('Ctrl+K inside a link opens the box on that link, and Enter saves the edit', async () => {
+    const user = userEvent.setup();
+    const editor = mount(linked('https://a.io'));
+    select(editor, [0, 1, 0], 2, 2);
+    focusText();
+
+    await user.keyboard('{Control>}k{/Control}');
+    const input = await screen.findByRole('textbox', { name: 'Link' });
+    expect(input).toHaveValue('https://a.io');
+    await user.clear(input);
+    await user.type(input, 'https://b.io{Enter}');
+
+    const [[node]] = linkNodes(editor) as [[{ url?: string }, unknown]];
+    expect(node.url).toBe('https://b.io');
+    expect(linkNodes(editor)).toHaveLength(1);
+  });
+
+  it('does nothing while the editor is not focused', async () => {
+    const user = userEvent.setup();
+    mount(words('hello world'));
+
+    await user.keyboard('{Control>}k{/Control}');
+    expect(screen.queryByRole('textbox', { name: 'Link' })).toBeNull();
   });
 });

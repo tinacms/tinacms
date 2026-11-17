@@ -1,3 +1,4 @@
+import { unwrapList } from '@udecode/plate-list';
 import {
   ParagraphPlugin,
   useEditorRef,
@@ -90,6 +91,7 @@ export function TextStyleMenu({
         <DropdownMenuRadioGroup
           value={value}
           onValueChange={(type) => {
+            unwrapList(editor);
             editor.tf.toggleBlock(type);
             editor.tf.collapse();
             editor.tf.focus();

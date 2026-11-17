@@ -60,7 +60,7 @@ export function TableHandle({
   );
 }
 
-export function TableAddButtons({ table }: { table: TTableElement }) {
+export function TableAddRow({ table }: { table: TTableElement }) {
   const { editor, tf } = useEditorPlugin(TablePlugin);
 
   const addRow = () => {
@@ -68,6 +68,24 @@ export function TableAddButtons({ table }: { table: TTableElement }) {
     if (!path) return;
     tf.insert.tableRow({ at: path });
   };
+
+  return (
+    <div contentEditable={false} className='select-none'>
+      <button
+        type='button'
+        className={cn(addClass, 'absolute right-0 bottom-0 left-7 h-6')}
+        onMouseDown={(event) => event.preventDefault()}
+        onClick={addRow}
+      >
+        <PlusIcon className='size-3' />
+        <span>Add a row</span>
+      </button>
+    </div>
+  );
+}
+
+export function TableAddColumn({ table }: { table: TTableElement }) {
+  const { editor, tf } = useEditorPlugin(TablePlugin);
 
   const addColumn = () => {
     const path = editor.api.findPath(table);
@@ -79,25 +97,14 @@ export function TableAddButtons({ table }: { table: TTableElement }) {
   };
 
   return (
-    <div contentEditable={false} className='select-none'>
-      <button
-        type='button'
-        className={cn(addClass, 'absolute right-7 bottom-0 left-7 h-6')}
-        onMouseDown={(event) => event.preventDefault()}
-        onClick={addRow}
-      >
-        <PlusIcon className='size-3' />
-        <span>Add a row</span>
-      </button>
-      <button
-        type='button'
-        aria-label='Add a column'
-        className={cn(addClass, 'absolute top-7 right-0 bottom-7 w-6')}
-        onMouseDown={(event) => event.preventDefault()}
-        onClick={addColumn}
-      >
-        <PlusIcon className='size-3' />
-      </button>
-    </div>
+    <button
+      type='button'
+      aria-label='Add a column'
+      className={cn(addClass, 'w-6 flex-1')}
+      onMouseDown={(event) => event.preventDefault()}
+      onClick={addColumn}
+    >
+      <PlusIcon className='size-3' />
+    </button>
   );
 }

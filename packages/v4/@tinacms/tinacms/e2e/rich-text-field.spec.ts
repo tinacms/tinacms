@@ -552,3 +552,47 @@ test.describe('rich text inside an object and a list item', () => {
     await expect(styleTriggers).toHaveCount(before + 1);
   });
 });
+
+test.describe('the link bar and the body text scroll box', () => {
+  for (const viewport of [
+    { width: 1280, height: 800 },
+    { width: 390, height: 844 },
+  ]) {
+    test(`follows its link while the text scrolls and hides once the link is out of the box at ${viewport.width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      await openDocument(page, LONG_POST);
+      const body = page.getByRole('textbox', { name: /^Body/ });
+      await body.scrollIntoViewIfNeeded();
+      await body.getByText('Tina docs').click();
+      const bar = page.getByRole('toolbar', { name: 'Link' });
+      await expect(bar).toBeVisible();
+      const link = body.getByText('Tina docs');
+      const gap = async () => {
+        const [b, l] = await Promise.all([
+          bar.boundingBox(),
+          link.boundingBox(),
+        ]);
+        if (!b || !l) throw new Error('bar or link not drawn');
+        return b.y - l.y;
+      };
+      const before = await gap();
+
+      await body.evaluate((el) => {
+        el.scrollTop = 24;
+      });
+      await expect.poll(gap).toBeCloseTo(before, 0);
+
+      await body.evaluate((el) => {
+        el.scrollTop = el.scrollHeight;
+      });
+      await expect(bar).toBeHidden();
+
+      await body.evaluate((el) => {
+        el.scrollTop = 0;
+      });
+      await expect(bar).toBeVisible();
+    });
+  }
+});

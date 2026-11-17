@@ -6,6 +6,7 @@ import { useKeyboardInset } from '../../hooks/use-keyboard-inset';
 import { PortalBody } from '@udecode/cn';
 import {
   flip,
+  hide,
   offset,
   shift,
   useVirtualFloating,
@@ -236,8 +237,12 @@ export function LinkFloatingToolbar() {
       offset(8),
       flip({ fallbackPlacements: ['top-start', 'bottom-end', 'top-end'] }),
       shift({ padding: 8 }),
+      hide(),
     ],
   });
+  floating.virtualElementRef.current.contextElement = element
+    ? editor.api.toDOMNode(element)
+    : undefined;
 
   const { update } = floating;
   React.useEffect(() => {

@@ -11,7 +11,7 @@ import {
   ActiveTableCellProvider,
   useActiveTableCell,
 } from './table-active-cell';
-import { TableAddButtons } from './table-handles';
+import { TableAddColumn, TableAddRow } from './table-handles';
 
 export const TableElement = withHOC(
   TableProvider,
@@ -39,30 +39,43 @@ const TableBody = withRef<typeof PlateElement, { table: TTableElement }>(
     } = useTableElement();
 
     return (
-      <PlateElement
-        ref={ref}
-        className={cn(className, 'overflow-x-auto py-2')}
-        style={{ paddingLeft: marginLeft }}
-        {...props}
-      >
-        <div
+      <div className='relative flex'>
+        <PlateElement
+          ref={ref}
           className={cn(
-            'group/table relative w-fit min-w-full',
-            !readOnly && 'pt-7 pr-7 pb-7 pl-7'
+            className,
+            'w-fit max-w-full min-w-0 overflow-x-auto py-2'
           )}
+          style={{ paddingLeft: marginLeft }}
+          {...props}
         >
-          <table
+          <div
             className={cn(
-              'mr-0 table h-px w-full border-collapse border border-border not-tina-prose',
-              isSelectingCell && 'selection:bg-transparent'
+              'group/table relative w-fit min-w-full',
+              !readOnly && 'pt-7 pb-7 pl-7'
             )}
-            {...tableProps}
           >
-            <tbody className='min-w-full'>{children}</tbody>
-          </table>
-          {!readOnly && active ? <TableAddButtons table={table} /> : null}
-        </div>
-      </PlateElement>
+            <table
+              className={cn(
+                'mr-0 table h-px w-full border-collapse border border-border not-tina-prose',
+                isSelectingCell && 'selection:bg-transparent'
+              )}
+              {...tableProps}
+            >
+              <tbody className='min-w-full'>{children}</tbody>
+            </table>
+            {!readOnly && active ? <TableAddRow table={table} /> : null}
+          </div>
+        </PlateElement>
+        {!readOnly ? (
+          <div
+            contentEditable={false}
+            className='flex w-7 shrink-0 flex-col py-9 pl-1 select-none'
+          >
+            {active ? <TableAddColumn table={table} /> : null}
+          </div>
+        ) : null}
+      </div>
     );
   }
 );

@@ -50,18 +50,20 @@ export const TableCellElement = withRef<
     colIndex >= range.left &&
     colIndex - colSpan + 1 <= range.right;
   const isSelected = selected || inRange;
+  const firstRow = rowIndex - rowSpan + 1;
+  const firstCol = colIndex - colSpan + 1;
   const showRowHandle =
     !readOnly &&
     active !== null &&
-    colIndex === 0 &&
-    active.row >= rowIndex &&
-    active.row < rowIndex + rowSpan;
+    firstCol === 0 &&
+    active.row >= firstRow &&
+    active.row <= rowIndex;
   const showColumnHandle =
     !readOnly &&
     active !== null &&
-    rowIndex === 0 &&
-    active.col >= colIndex &&
-    active.col < colIndex + colSpan;
+    firstRow === 0 &&
+    active.col >= firstCol &&
+    active.col <= colIndex;
 
   return (
     <PlateElement

@@ -456,6 +456,48 @@ test.describe('the phone keyboard toolbar', () => {
 });
 
 test.describe('table controls in a real browser', () => {
+  for (const viewport of [
+    { width: 1280, height: 800 },
+    { width: 375, height: 800 },
+  ]) {
+    test(`Add a column stays on the visible right edge of the table's scroll box at ${viewport.width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      await page.goto(POST('long-post.mdx'));
+      await body(page).getByText('Ada').first().scrollIntoViewIfNeeded();
+      await body(page).getByText('Ada').first().click();
+      const add = page.getByRole('button', { name: 'Add a column' });
+      await expect(add).toBeVisible();
+      const scrollBox = body(page)
+        .locator('[data-slate-node="element"]', {
+          has: page.locator('table'),
+        })
+        .last();
+      const inside = async () => {
+        const [a, b] = await Promise.all([
+          add.boundingBox(),
+          body(page).boundingBox(),
+        ]);
+        if (!a || !b) throw new Error('not drawn');
+        return a.x >= b.x - 1 && a.x + a.width <= b.x + b.width + 1;
+      };
+      await expect.poll(inside).toBe(true);
+      await scrollBox.evaluate((el) => {
+        el.scrollLeft = el.scrollWidth;
+      });
+      await expect.poll(inside).toBe(true);
+      await scrollBox.evaluate((el) => {
+        el.scrollLeft = 0;
+      });
+      await expect.poll(inside).toBe(true);
+      await add.click();
+      await expect(
+        body(page).locator('tr').first().locator('th, td')
+      ).toHaveCount(4);
+    });
+  }
+
   test('Add a column sits past the table end and covers no cell', async ({
     page,
   }) => {
@@ -465,12 +507,20 @@ test.describe('table controls in a real browser', () => {
     const add = page.getByRole('button', { name: 'Add a column' });
     await expect(add).toBeVisible();
     const strip = await add.boundingBox();
+    const scrollBox = await body(page)
+      .locator('[data-slate-node="element"]', { has: page.locator('table') })
+      .last()
+      .boundingBox();
     const cells = await body(page).locator('td').all();
     for (const cell of cells) {
       const box = await cell.boundingBox();
-      if (!strip || !box) throw new Error('not drawn');
+      if (!strip || !box || !scrollBox) throw new Error('not drawn');
+      const visibleRight = Math.min(
+        box.x + box.width,
+        scrollBox.x + scrollBox.width
+      );
       const overlaps =
-        strip.x < box.x + box.width - 1 &&
+        strip.x < visibleRight - 1 &&
         strip.x + strip.width > box.x + 1 &&
         strip.y < box.y + box.height &&
         strip.y + strip.height > box.y;

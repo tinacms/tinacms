@@ -163,13 +163,17 @@ describe('table handles', () => {
     ).not.toHaveAttribute('aria-disabled', 'true');
   });
 
-  it('anchors Add a column to a box that wraps the table and fits it', async () => {
+  it('pins Add a column beside the table scroll box, not inside the scrolling content', async () => {
     const editor = mount(grid(2, 3));
     await caretIn(editor, [0, 0, 0, 0, 0]);
     const add = await screen.findByRole('button', { name: 'Add a column' });
-    const anchor = add.closest('.relative');
-    expect(anchor).toContainElement(document.querySelector('table'));
-    expect(anchor).toHaveClass('w-fit', 'min-w-full');
+    const scrollBox = document
+      .querySelector('table')
+      ?.closest('.overflow-x-auto');
+    expect(scrollBox).not.toBeNull();
+    expect(scrollBox).not.toContainElement(add);
+    expect(scrollBox?.parentElement).toContainElement(add);
+    expect(scrollBox).toHaveClass('w-fit', 'max-w-full');
   });
 
   it('marks selected cells with aria-selected, colSpan and rowSpan', async () => {
@@ -230,6 +234,63 @@ describe('table handles', () => {
     await caretIn(editor, [0, 0, 0, 0, 0]);
     expect(screen.queryByRole('button', { name: /actions$/ })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Add a row' })).toBeNull();
+  });
+});
+
+const merged = (
+  rows: Array<Array<{ colSpan?: number; rowSpan?: number; text: string }>>
+): Value => [
+  {
+    type: 'table',
+    children: rows.map((row) => ({
+      type: 'tr',
+      children: row.map(({ text, ...span }) => ({
+        ...cell(text),
+        ...span,
+      })),
+    })),
+  },
+  { type: 'p', children: [{ text: 'after' }] },
+];
+
+describe('handles on merged cells', () => {
+  it('gives a row handle to a cell merged across the first two columns', async () => {
+    const editor = mount(
+      merged([
+        [{ text: 'ab', colSpan: 2 }, { text: 'c' }],
+        [{ text: 'd' }, { text: 'e' }, { text: 'f' }],
+      ])
+    );
+    await caretIn(editor, [0, 0, 0, 0, 0]);
+    expect(
+      await screen.findAllByRole('button', { name: 'Row 1 actions' })
+    ).toHaveLength(1);
+  });
+
+  it('gives a merged top cell one column handle, not none', async () => {
+    const editor = mount(
+      merged([
+        [{ text: 'ab', colSpan: 2 }, { text: 'c' }],
+        [{ text: 'd' }, { text: 'e' }, { text: 'f' }],
+      ])
+    );
+    await caretIn(editor, [0, 0, 0, 0, 0]);
+    expect(
+      await screen.findAllByRole('button', { name: /^Column \d+ actions$/ })
+    ).toHaveLength(1);
+  });
+
+  it('gives a cell merged down the first column one row handle with the caret on its first row', async () => {
+    const editor = mount(
+      merged([
+        [{ text: 'ad', rowSpan: 2 }, { text: 'b' }, { text: 'c' }],
+        [{ text: 'e' }, { text: 'f' }],
+      ])
+    );
+    await caretIn(editor, [0, 0, 0, 0, 0]);
+    expect(
+      await screen.findAllByRole('button', { name: /^Row \d+ actions$/ })
+    ).toHaveLength(1);
   });
 });
 

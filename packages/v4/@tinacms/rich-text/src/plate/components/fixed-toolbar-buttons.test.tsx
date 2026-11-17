@@ -534,3 +534,31 @@ describe('shortcuts and insertion', () => {
     await waitFor(() => expect(trigger).toHaveFocus());
   });
 });
+
+describe('Text style on a list item', () => {
+  it('turns a list item into a heading without its bullet', async () => {
+    const user = userEvent.setup();
+    const list: Value = [
+      {
+        type: 'ul',
+        children: [
+          {
+            type: 'li',
+            children: [{ type: 'lic', children: [{ text: 'item' }] }],
+          },
+        ],
+      },
+    ];
+    render(<Harness value={list} selection={at([0, 0, 0, 0])} />);
+
+    await user.click(screen.getByRole('button', { name: /^Text style/ }));
+    await user.click(
+      await screen.findByRole('menuitemradio', { name: 'Heading 2' })
+    );
+
+    const nodes = lastEditor?.children ?? [];
+    expect(nodes[0]).toMatchObject({ type: 'h2' });
+    expect(JSON.stringify(nodes)).not.toMatch(/"type":"(ul|ol|li|lic)"/);
+    expect(JSON.stringify(nodes)).not.toContain('listStyleType');
+  });
+});
