@@ -168,7 +168,7 @@ function PreviewFrame({
   );
 }
 
-// The string-URL iframe, kept outside DocumentScope so it never remounts. A node `preview` is PreviewNodeSlot's.
+// The string-URL iframe, kept outside DocumentScope so it never remounts.
 function PreviewSlot({
   preview,
   connection,
@@ -183,18 +183,11 @@ function PreviewSlot({
       </div>
     );
   }
-  return <PreviewNodeSlot preview={preview} formScope={false} />;
+  return <PreviewNodeSlot preview={preview} />;
 }
 
-// A custom `preview` node renders inside DocumentScope so it can read the open form.
-function PreviewNodeSlot({
-  preview,
-  formScope = true,
-}: {
-  preview?: ReactNode;
-  formScope?: boolean;
-}) {
-  const hasForm = use(FormScopeContext) !== null && formScope;
+function PreviewNodeSlot({ preview }: { preview?: ReactNode }) {
+  const hasForm = use(FormScopeContext) !== null;
   return (
     <div data-preview-slot='' className='min-w-0 flex-1'>
       {hasForm ? (

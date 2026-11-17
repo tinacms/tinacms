@@ -285,3 +285,39 @@ test('the returned card keeps its active look with its block after Move down', a
   await expect(cards.nth(1)).toHaveAttribute('data-active', '');
   await expect(cards.first()).not.toHaveAttribute('data-active', '');
 });
+
+test('hovering a block card dashes its block, and tabbing onto its grip draws the solid outline with the Hero tab', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const attach = Element.prototype.attachShadow;
+    Element.prototype.attachShadow = function open(init) {
+      return attach.call(this, { ...init, mode: 'open' });
+    };
+  });
+  await openDeclared(page);
+  const form = page.getByRole('complementary', { name: 'Document form' });
+  const hero = form.locator('[data-array-item]').first();
+  await expect(hero).toBeVisible();
+  const hover = frame(page).locator('[data-outline="hover"]');
+  const active = frame(page).locator('[data-outline="active"]');
+
+  await hero.hover();
+  await expect(hover).toHaveCount(1);
+  await expect(active).toHaveCount(0);
+
+  await page.locator('input#title').focus();
+  for (let step = 0; step < 20; step += 1) {
+    await page.keyboard.press('Tab');
+    if (
+      await page.evaluate(() =>
+        document.activeElement?.hasAttribute('data-grip')
+      )
+    )
+      break;
+  }
+  await expect(hero.locator('[data-grip]')).toBeFocused();
+  await expect(active).toHaveCount(1);
+  await expect(active.locator('[data-outline-tab]')).toHaveText('Hero');
+  await expect(heading(page)).not.toHaveText(/^Hero/);
+});

@@ -28,6 +28,17 @@ const post: CollectionSchema = {
   fields: [
     t.string({ name: 'title', label: 'Title' }),
     t.reference({ name: 'author', label: 'Author', collections: ['author'] }),
+    t.array({
+      name: 'blocks',
+      label: 'Blocks',
+      templates: [
+        {
+          name: 'hero',
+          label: 'Hero',
+          fields: [t.string({ name: 'headline', label: 'Headline' })],
+        },
+      ],
+    }),
   ],
 };
 const author: CollectionSchema = {
@@ -51,7 +62,11 @@ const POST_REF = { collection: 'post', path: A };
 const AUTHOR_REF = { collection: 'author', path: AUTHOR };
 
 const documents: Record<string, TinaDocument> = {
-  [A]: { title: 'A', author: AUTHOR },
+  [A]: {
+    title: 'A',
+    author: AUTHOR,
+    blocks: [{ _template: 'hero', headline: 'Welcome' }],
+  },
   [B]: { title: 'B' },
   [AUTHOR]: { name: 'Jane' },
   [NAV]: { siteName: 'Site' },
@@ -455,6 +470,27 @@ describe('outline', () => {
     expect(outlines(page)[0]).toMatchObject({
       active: { address: 'author', document: A, name: 'Author' },
       hovered: { address: 'author', document: A },
+    });
+    act(() => useFormStore.getState().setFocusedCard(toFormId(A), null));
+  });
+
+  it('names a focused block card with its template title', async () => {
+    register(A);
+    const { page } = await setup({ open: POST_REF });
+    fromPage(readyMessage([{ path: A }], URL_A), page.window);
+    page.window.postMessage.mockClear();
+    act(() => {
+      const store = useFormStore.getState();
+      store.setActive(toFormId(A), toFieldAddress('blocks'));
+      store.setFocusedCard(toFormId(A), {
+        list: toFieldAddress('blocks'),
+        address: toFieldAddress('blocks.0'),
+      });
+    });
+    await waitFor(() => expect(outlines(page)).toHaveLength(1));
+    expect(outlines(page)[0].active).toMatchObject({
+      address: 'blocks.0',
+      name: 'Hero',
     });
     act(() => useFormStore.getState().setFocusedCard(toFormId(A), null));
   });

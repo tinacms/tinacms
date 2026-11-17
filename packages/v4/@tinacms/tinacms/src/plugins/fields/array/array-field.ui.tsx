@@ -22,13 +22,13 @@ import {
   templateTitle,
 } from '../../../core/schema/children';
 import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
+import { useCardOutline } from '../../../editor/hooks';
 import {
   itemOpensNextLevel,
   NestedFieldRow,
   ownFieldErrors,
   useActiveField,
   useActivation,
-  useCardOutline,
   useDocumentPath,
   useFieldAddress,
   useFieldFrame,
@@ -202,7 +202,7 @@ function ObjectItems({
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
   const [inserting, setInserting] = useState<InsertPicker | null>(null);
   const [adding, setAdding] = useState(false);
-  // Id of the card the editor came back from. It stays drawn active, wherever a move takes it, while the list's own address or that card is active.
+  // Id of the card the editor came back from.
   const [returnedTo, setReturnedTo] = useState<string | null>(null);
   const insertRuns = useRef(0);
   const refocusOpener = useRef<string | null>(null);
@@ -433,8 +433,8 @@ function ObjectItems({
       active: isActive(item.id, itemAddress),
       onHoverChange: (hovering) =>
         cardOutline.hover(hovering ? toFieldAddress(itemAddress) : null),
-      onFocusChange: (focused, steppedFromCard) => {
-        if (focused && steppedFromCard) {
+      onFocusChange: (focused) => {
+        if (focused) {
           setReturnedTo((held) => (held === item.id ? held : null));
         }
         setFocusedCard((held) =>

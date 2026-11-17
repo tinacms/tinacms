@@ -270,10 +270,16 @@ export function useCardOutline(list: FieldAddress) {
           store.setHovered(formId, null);
         }
       },
-      focus: (address: FieldAddress | null) =>
-        useFormStore
-          .getState()
-          .setFocusedCard(formId, address && { list, address }),
+      focus: (address: FieldAddress | null) => {
+        const store = useFormStore.getState();
+        if (address !== null) {
+          store.setFocusedCard(formId, { list, address });
+          return;
+        }
+        if (store.focusedCard?.list === list) {
+          store.setFocusedCard(formId, null);
+        }
+      },
     }),
     [formId, list]
   );

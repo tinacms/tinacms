@@ -885,12 +885,17 @@ describe('after the last registration leaves', () => {
   });
 
   it('intercepts again once a registration returns', () => {
-    const { bridge } = start();
+    const { bridge, editor } = startAnsweredPage();
     const element = marked('title');
     bridge.register({ onValues: vi.fn() })();
     bridge.register({ onValues: vi.fn() });
+    editor.postMessage.mockClear();
     const click = new MouseEvent('click', { bubbles: true, cancelable: true });
     element.dispatchEvent(click);
-    expect(click.defaultPrevented).toBe(false);
+    expect(click.defaultPrevented).toBe(true);
+    expect(editor.postMessage).toHaveBeenCalledWith(
+      activateMessage('title'),
+      window.origin
+    );
   });
 });

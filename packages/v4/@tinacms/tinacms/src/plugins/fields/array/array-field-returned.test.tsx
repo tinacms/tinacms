@@ -139,15 +139,6 @@ describe.each([
     await waitFor(() => expect(active()).toEqual([0]));
   });
 
-  it('keeps it on the card at its new index when another card is removed', async () => {
-    const { active, act } = await cameBackTo(address, back);
-    await waitFor(() => expect(active()).toEqual([0]));
-    await act(1, /^Move down/);
-    await waitFor(() => expect(active()).toEqual([1]));
-    await act(1, /^Remove/);
-    await waitFor(() => expect(active()).toEqual([0]));
-  });
-
   it('leaves no card active when the returned card is removed', async () => {
     const { active, act } = await cameBackTo(address, back);
     await waitFor(() => expect(active()).toEqual([0]));
@@ -216,7 +207,7 @@ describe.each([
     );
   });
 
-  it('points at a card whose grip takes focus, with no level opened, and falls back to the returned card on blur', async () => {
+  it('points at a card whose grip takes focus, with no level opened, and lets go on blur', async () => {
     const { user, container } = await cameBackTo(address, back);
     const grips = container.querySelectorAll<HTMLElement>('[data-grip]');
     await user.click(document.body);
@@ -227,6 +218,102 @@ describe.each([
       screen.queryByRole('heading', { level: 2, name: 'Call to action' })
     ).toBeNull();
     grips[2].blur();
-    await waitFor(() => expect(outlined()).toBe(`${root}.0`));
+    await waitFor(() => expect(outlined()).toBeUndefined());
+  });
+});
+
+const rowsCollection: CollectionSchema = {
+  name: 'sheet',
+  label: 'Sheets',
+  format: 'json',
+  fields: [
+    t.array({
+      name: 'rows',
+      label: 'Rows',
+      fields: [
+        t.string({ name: 'title', label: 'Title' }),
+        t.array({
+          name: 'inner',
+          label: 'Inner',
+          fields: [t.string({ name: 'note', label: 'Note' })],
+        }),
+      ],
+    }),
+  ],
+};
+
+function renderRows() {
+  const view = render(
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [objectFieldPlugin, arrayFieldPlugin, stringFieldPlugin],
+        schema: { collections: [] },
+      })}
+    >
+      <FormProvider
+        collection={rowsCollection}
+        path='content/sheets/main.json'
+        document={{
+          rows: [
+            { title: 'One', inner: [{ note: 'a' }] },
+            { title: 'Two', inner: [] },
+          ],
+        }}
+      >
+        <DocumentForm />
+      </FormProvider>
+    </TinaProvider>
+  );
+  return { ...view, user: userEvent.setup() };
+}
+
+async function toggleFirstRow(
+  user: ReturnType<typeof userEvent.setup>,
+  container: HTMLElement
+) {
+  await screen.findAllByRole('button', { name: 'Actions for Item 1' });
+  const toggle = container.querySelector<HTMLElement>(
+    '[data-array-item] button[aria-expanded]'
+  );
+  if (!toggle) throw new Error('no card toggle');
+  await user.click(toggle);
+}
+
+describe('cards that open in place', () => {
+  it('keeps the hover on a field inside an open card instead of the card', async () => {
+    const { user, container } = renderRows();
+    await toggleFirstRow(user, container);
+    const field = await screen.findByLabelText('Title');
+    await user.hover(field);
+    expect(useFormStore.getState().hovered?.address).toBe('rows.0.title');
+    await user.unhover(field);
+    const cards = container.querySelectorAll('[data-array-item]');
+    await user.hover(cards[cards.length - 1]);
+    expect(useFormStore.getState().hovered?.address).toBe('rows.1');
+  });
+
+  it('keeps the outer card outlined when its nested list mounts and unmounts', async () => {
+    const { user, container } = renderRows();
+    await screen.findAllByRole('button', { name: 'Actions for Item 1' });
+    container.querySelectorAll<HTMLElement>('[data-grip]')[0].focus();
+    await waitFor(() =>
+      expect(useFormStore.getState().focusedCard?.address).toBe('rows.0')
+    );
+    await toggleFirstRow(user, container);
+    await screen.findByLabelText('Title');
+    expect(useFormStore.getState().focusedCard?.address).toBe('rows.0');
+    await toggleFirstRow(user, container);
+    await waitFor(() => expect(screen.queryByLabelText('Title')).toBeNull());
+    expect(useFormStore.getState().focusedCard?.address).toBe('rows.0');
+  });
+});
+
+describe('focusing another card', () => {
+  it('clears the returned card when focus lands on its menu button', async () => {
+    const { active } = await cameBackTo('blocks.0', 'Home');
+    await waitFor(() => expect(active()).toEqual([0]));
+    screen.getByRole('button', { name: 'Actions for Item 2' }).focus();
+    await waitFor(() => expect(active()).toEqual([]));
+    expect(useFormStore.getState().focusedCard?.address).toBe('blocks.1');
   });
 });
