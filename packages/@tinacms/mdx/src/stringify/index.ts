@@ -142,8 +142,6 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
     extensions: [
       directiveToMarkdown(patterns),
       mdxJsxToMarkdown(),
-      // MDX reads `{` in text as the start of an expression, so it is escaped as `<` is. These are
-      // the rules mdast-util-mdx-expression's own extension registers.
       {
         unsafe: [
           { character: '{', inConstruct: ['phrasing'] },
