@@ -26,12 +26,12 @@ const SCRIM_STRIP = 48;
 /**
  * The whole look of a popup as a foot sheet. The top room for the handle comes from the chrome
  * strip and the safe-area room from a transparent bottom border, so a caller's `p-0` keeps both.
- * `--sheet-gap` is the space between children; a caller changes it there, not with `gap-*`,
- * so the strip can cancel it.
+ * `--sheet-gap` and `--sheet-px` are the space between children and at the sides; a caller
+ * changes them there, not with `gap-*` or `px-*`, so the strip can cancel and span them.
  */
 const footSheetClasses = (bodyScrolls: boolean) =>
   cn(
-    'group/dialog fixed inset-x-0 bottom-0 z-50 m-0 flex h-auto max-h-[calc(100dvh-48px)] min-h-[50dvh] w-auto flex-col gap-(--sheet-gap) overflow-y-auto rounded-t-xl border-b-[length:env(safe-area-inset-bottom,0px)] border-transparent bg-popover px-6 pb-6 [--sheet-gap:--spacing(4)] font-sans text-base leading-control text-foreground shadow-dialog outline-none',
+    'group/dialog fixed inset-x-0 bottom-0 z-50 m-0 flex h-auto max-h-[calc(100dvh-48px)] min-h-[50dvh] w-auto flex-col gap-(--sheet-gap) overflow-y-auto rounded-t-xl border-b-[length:env(safe-area-inset-bottom,0px)] border-transparent bg-popover px-(--sheet-px) pb-6 [--sheet-gap:--spacing(4)] [--sheet-px:--spacing(6)] font-sans text-base leading-control text-foreground shadow-dialog outline-none',
     bodyScrolls ? 'scroll-pt-28 scroll-pb-20 pt-0' : 'pt-9',
     'transition-[translate,opacity] duration-(--dur-slide-in) data-ending-style:translate-y-full data-ending-style:duration-(--dur-slide-out) data-ending-style:ease-exit data-starting-style:translate-y-full',
     'motion-reduce:data-ending-style:translate-y-0 motion-reduce:data-ending-style:opacity-0 motion-reduce:data-starting-style:translate-y-0 motion-reduce:data-starting-style:opacity-0'
@@ -251,7 +251,7 @@ function FootSheetCloseButton({
           size='sm'
           icon='close'
           aria-label='Close'
-          className={cn('absolute top-4 right-4', className)}
+          className={cn('absolute top-0.5 right-4', className)}
         />
       }
     />
@@ -363,7 +363,7 @@ function useFootSheetPopup({
   const chrome = !on ? null : bodyScrolls ? (
     <div
       data-slot='foot-sheet-chrome'
-      className='sticky top-0 z-20 order-first -mb-(--sheet-gap) h-9 flex-none bg-popover'
+      className='sticky top-0 z-20 order-first -mx-(--sheet-px) -mb-(--sheet-gap) h-9 flex-none bg-popover'
     >
       {buttons}
     </div>

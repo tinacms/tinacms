@@ -211,12 +211,44 @@ test.describe('a sheet taller than the screen at 375px', () => {
     const firstChild = await box(sheet.locator('> :first-child'));
     expect(handle.y + handle.height).toBeLessThanOrEqual(firstChild.y + 1);
     expect(firstChild.y - sheetBox.y).toBeGreaterThanOrEqual(36);
+    const close = await box(
+      sheet.getByRole('button', { name: 'Close', exact: true })
+    );
+    expect(sheetBox.x + sheetBox.width - (close.x + close.width)).toBe(16);
+    expect(close.y + close.height - sheetBox.y).toBeLessThanOrEqual(36);
     const inner = await sheet.evaluate((el) => {
       const style = getComputedStyle(el);
       return Number.parseFloat(style.borderBottomWidth);
     });
     expect(inner).toBe(34);
   });
+});
+
+test('the × sits inside the chrome strip and clear of a long title at 390px', async ({
+  page,
+}) => {
+  await page.setViewportSize(PHONE);
+  await page.goto('/sheets.html?case=plain');
+  await page.getByRole('button', { name: 'Open' }).click();
+  const sheet = page.locator(SHEET);
+  await expect(sheet).toBeVisible();
+  await settle(page);
+  await sheet.locator('[data-slot=dialog-title]').evaluate((el) => {
+    el.textContent =
+      'Discard changes to content/posts/my-very-long-post-file-name-here.mdx?';
+  });
+  const sheetBox = await box(sheet);
+  const strip = await box(sheet.locator('[data-slot=foot-sheet-chrome]'));
+  const close = await box(
+    sheet.getByRole('button', { name: 'Close', exact: true })
+  );
+  const title = await box(sheet.locator('[data-slot=dialog-title]'));
+  expect(close.y).toBeGreaterThanOrEqual(strip.y);
+  expect(close.y + close.height).toBeLessThanOrEqual(strip.y + strip.height);
+  expect(close.x).toBeGreaterThanOrEqual(strip.x);
+  expect(close.x + close.width).toBeLessThanOrEqual(strip.x + strip.width);
+  expect(sheetBox.x + sheetBox.width - (close.x + close.width)).toBe(16);
+  expect(close.x).toBeGreaterThanOrEqual(title.x + title.width);
 });
 
 test.describe('the Discard confirm on a phone', () => {

@@ -102,7 +102,7 @@ export function ImageGallery() {
       <Dialog open={picking} onOpenChange={setPicking}>
         <DialogContent
           finalFocus={opener}
-          className='flex h-[80vh] flex-col gap-0 [--sheet-gap:0px] p-0 max-w-5xl'
+          className='flex h-[80vh] flex-col gap-0 [--sheet-gap:0px] [--sheet-px:0px] p-0 max-w-5xl'
         >
           <DialogHeader className='border-b px-4 py-3'>
             <DialogTitle>Choose an image</DialogTitle>
