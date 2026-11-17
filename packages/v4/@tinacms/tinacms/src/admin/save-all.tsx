@@ -39,6 +39,8 @@ import { saveFailureWords } from './save-failure';
 import { dismissSaveFailedToast } from './document-form';
 import { statusWords } from './status-words';
 
+const FOCUS_CLICK_MS = 400;
+
 const RUN_STOPPED = 'the run stopped';
 
 const STOPPING_CODES: readonly string[] = [
@@ -302,7 +304,7 @@ export function SaveAllControl() {
   const messageId = useId();
   const [announcement, setAnnouncement] = useState('');
   const [reasonOpen, setReasonOpen] = useState(false);
-  const pointerDown = useRef(false);
+  const focusOpenedAt = useRef(0);
   const disabled = running || message !== undefined || !dirty;
   const label = failed > 0 ? `Save all, ${failed} failed` : 'Save all';
   const button: ReactNode = (
@@ -330,7 +332,17 @@ export function SaveAllControl() {
   return (
     <div className='flex items-center gap-1'>
       {message !== undefined && !running ? (
-        <Popover open={reasonOpen} onOpenChange={setReasonOpen}>
+        <Popover
+          open={reasonOpen}
+          onOpenChange={(next, details) => {
+            // A pointer focuses the control, then clicks it: the click must not undo the focus open.
+            const isFocusClick =
+              !next &&
+              details.reason === 'trigger-press' &&
+              Date.now() - focusOpenedAt.current < FOCUS_CLICK_MS;
+            if (!isFocusClick) setReasonOpen(next);
+          }}
+        >
           <PopoverTrigger
             nativeButton={false}
             render={
@@ -340,18 +352,9 @@ export function SaveAllControl() {
                 aria-label='Save all, unavailable'
                 aria-describedby={messageId}
                 className='rounded-sm outline-none focus-visible:shadow-focus-ring'
-                onPointerDown={() => {
-                  pointerDown.current = true;
-                }}
-                onPointerUp={() => {
-                  pointerDown.current = false;
-                }}
-                onPointerCancel={() => {
-                  pointerDown.current = false;
-                }}
                 onFocus={() => {
-                  if (!pointerDown.current) setReasonOpen(true);
-                  pointerDown.current = false;
+                  focusOpenedAt.current = Date.now();
+                  setReasonOpen(true);
                 }}
                 onBlur={() => setReasonOpen(false)}
               />

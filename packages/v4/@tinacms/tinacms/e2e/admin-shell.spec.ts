@@ -289,6 +289,8 @@ test.describe('Save All on a protected branch, by touch', () => {
     await expect(message).toBeHidden();
     await wrapper.tap();
     await expect(message).toBeVisible();
+    await page.waitForTimeout(600);
+    await expect(message).toBeVisible();
     await expect(message).toHaveText(
       'Save each document to a new branch from its form'
     );
@@ -304,5 +306,7 @@ test.describe('Save All on a protected branch, by touch', () => {
     expect(overflow).toBeLessThanOrEqual(0);
     expect(labelAfter?.width).toBe(before[0]?.width);
     expect(searchAfter?.x).toBe(before[1]?.x);
+    await wrapper.tap();
+    await expect(message).toBeHidden();
   });
 });

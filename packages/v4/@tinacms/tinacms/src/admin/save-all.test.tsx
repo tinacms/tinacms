@@ -942,6 +942,9 @@ describe('Save All on a protected branch', () => {
     const reason = () =>
       screen.queryByRole('dialog', { name: 'Save all, unavailable' });
     await user.click(wrapper);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 450));
+    });
     await user.click(wrapper);
     await waitFor(() => expect(reason()).toBeNull());
     await act(async () => wrapper.blur());
