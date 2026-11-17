@@ -27,6 +27,12 @@ describe('parseAddress', () => {
     expect(hrefOf('localhost:3000')).toBe('http://localhost:3000/');
   });
 
+  it('reads the preview host typed with capitals', () => {
+    expect(hrefOf('Localhost:3000/posts/x')).toBe(
+      'http://localhost:3000/posts/x'
+    );
+  });
+
   it('reads a path on the preview origin, with or without the slash', () => {
     expect(hrefOf('/posts/other')).toBe('http://localhost:3000/posts/other');
     expect(hrefOf('posts/other')).toBe('http://localhost:3000/posts/other');

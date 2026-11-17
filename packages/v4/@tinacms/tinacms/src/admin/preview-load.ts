@@ -56,6 +56,7 @@ export function createPreviewLoad({
   function evaluate() {
     if (!active || !loaded || result === 'pending') return;
     if (result === 'reached') {
+      if (capped && !frameReadable()) return;
       finish(undefined);
     } else if (result === 'rejected') {
       finish('failed');

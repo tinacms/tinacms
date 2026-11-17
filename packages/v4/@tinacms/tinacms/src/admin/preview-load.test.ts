@@ -120,14 +120,14 @@ describe('createPreviewLoad', () => {
     expect(seen.at(-1)).toBeUndefined();
   });
 
-  it('a late load of the browser error page keeps the note', async () => {
+  it('a late load of the browser error page keeps the note, even when the probe then reaches', async () => {
     const { load, seen, answer } = setup(false);
     load.start('loading', 'http://x/');
-    await answer('timeout');
     await vi.advanceTimersByTimeAsync(30_000);
+    expect(seen.at(-1)).toBe('failed');
     load.loaded();
     expect(seen.at(-1)).toBe('failed');
-    await answer('reached').catch(() => {});
+    await answer('reached');
     expect(seen.at(-1)).toBe('failed');
   });
 });

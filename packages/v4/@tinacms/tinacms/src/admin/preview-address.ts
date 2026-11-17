@@ -27,7 +27,7 @@ export function parseAddress(
 
   let href: string;
   if (
-    text.startsWith(origin.host) &&
+    text.toLowerCase().startsWith(origin.host) &&
     AFTER_HOST.test(text.slice(origin.host.length))
   ) {
     href = `${origin.protocol}//${text}`;
