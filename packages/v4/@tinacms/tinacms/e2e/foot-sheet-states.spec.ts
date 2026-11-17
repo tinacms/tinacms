@@ -169,6 +169,26 @@ test.describe('a sheet taller than the screen at 375px', () => {
     });
   }
 
+  test('Shift+Tab scrolls a field clear of the sticky handle strip and header', async ({
+    page,
+  }) => {
+    const { sheet } = await open(page);
+    await sheet.evaluate((el) => {
+      const body = el.querySelector('div[style]');
+      if (!body) throw new Error('no body');
+      body.innerHTML = Array.from(
+        { length: 30 },
+        (_, i) => `<input aria-label="f${i}" style="height:40px" />`
+      ).join('');
+    });
+    await sheet.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+    await page.locator('input[aria-label="f29"]').focus();
+    for (let i = 0; i < 8; i++) await page.keyboard.press('Shift+Tab');
+    const field = await box(page.locator(':focus'));
+    const header = await box(sheet.locator('[data-slot=dialog-header]'));
+    expect(field.y).toBeGreaterThanOrEqual(header.y + header.height - 1);
+  });
+
   test('the image pickers keep handle room and the safe area under a caller’s p-0', async ({
     page,
   }) => {

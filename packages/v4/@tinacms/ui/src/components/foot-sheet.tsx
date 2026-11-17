@@ -32,7 +32,7 @@ const SCRIM_STRIP = 48;
 const footSheetClasses = (bodyScrolls: boolean) =>
   cn(
     'group/dialog fixed inset-x-0 bottom-0 z-50 m-0 flex h-auto max-h-[calc(100dvh-48px)] min-h-[50dvh] w-auto flex-col gap-(--sheet-gap) overflow-y-auto rounded-t-xl border-b-[length:env(safe-area-inset-bottom,0px)] border-transparent bg-popover px-6 pb-6 [--sheet-gap:--spacing(4)] font-sans text-base leading-control text-foreground shadow-dialog outline-none',
-    bodyScrolls ? 'pt-0' : 'pt-9',
+    bodyScrolls ? 'scroll-pt-28 scroll-pb-20 pt-0' : 'pt-9',
     'transition-[translate,opacity] duration-(--dur-slide-in) data-ending-style:translate-y-full data-ending-style:duration-(--dur-slide-out) data-ending-style:ease-exit data-starting-style:translate-y-full',
     'motion-reduce:data-ending-style:translate-y-0 motion-reduce:data-ending-style:opacity-0 motion-reduce:data-starting-style:translate-y-0 motion-reduce:data-starting-style:opacity-0'
   );
