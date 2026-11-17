@@ -66,6 +66,8 @@ export interface PreviewConnectionOptions {
   onNothingToEdit?: () => void;
   /** Called once for each accepted `tina:activate` message, before the field opens. */
   onActivate?: () => void;
+  /** Called with the page address each accepted `tina:ready` or `tina:documents` message carries. */
+  onPageUrl?: (url: string) => void;
 }
 
 interface Persistent {
@@ -529,6 +531,7 @@ function createHandlers(deps: Deps) {
         } else if (data.url !== undefined) {
           follower().clear(data.url);
         }
+        if (data.url !== undefined) options.onPageUrl?.(data.url);
         publishAll();
         sendOutline(true);
       } else if (isActivateMessage(data)) {

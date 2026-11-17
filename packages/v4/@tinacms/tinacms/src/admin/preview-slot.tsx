@@ -9,7 +9,6 @@ import {
   type PreviewConnectionOptions,
   usePreviewConnection,
 } from '../editor/preview-connection';
-import { isDocumentsMessage, isReadyMessage } from '../preview/protocol';
 import {
   displayAddress,
   isHashOnlyChange,
@@ -75,7 +74,10 @@ function PreviewPane({
 }: PreviewPaneProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const paneRef = useRef<HTMLDivElement>(null);
-  usePreviewConnection(iframeRef, connection);
+  usePreviewConnection(iframeRef, {
+    ...connection,
+    onPageUrl: (pageUrl) => followPageUrl(pageUrl),
+  });
 
   const [startHref] = useState(() => new URL(src, window.location.href).href);
   const previewOrigin = new URL(startHref).origin;
@@ -146,29 +148,16 @@ function PreviewPane({
     if (live !== knownHref.current) setHref(live);
   };
 
-  useEffect(() => {
-    const onMessage = (event: MessageEvent) => {
-      if (
-        event.origin !== previewOrigin ||
-        event.source !== iframeRef.current?.contentWindow
-      ) {
-        return;
+  const followPageUrl = (pageUrl: string) => {
+    try {
+      const url = new URL(pageUrl);
+      if (url.origin === previewOrigin && isWebAddress(url.href)) {
+        setHref(url.href);
       }
-      const data: unknown = event.data;
-      if (!(isReadyMessage(data) || isDocumentsMessage(data))) return;
-      if (data.url === undefined) return;
-      try {
-        const url = new URL(data.url);
-        if (url.origin === previewOrigin && isWebAddress(url.href)) {
-          setHref(url.href);
-        }
-      } catch {
-        // A message with a url that is not an address changes nothing.
-      }
-    };
-    window.addEventListener('message', onMessage);
-    return () => window.removeEventListener('message', onMessage);
-  }, [previewOrigin]);
+    } catch {
+      // A message with a url that is not an address changes nothing.
+    }
+  };
 
   const moveFrame = (target: string) => {
     if (iframeRef.current) iframeRef.current.src = target;
