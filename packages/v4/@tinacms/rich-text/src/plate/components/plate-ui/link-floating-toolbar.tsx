@@ -325,7 +325,11 @@ export function LinkFloatingToolbar() {
     const viewport = window.visualViewport;
     if (!visible || !viewport || !update) return;
     viewport.addEventListener('resize', update);
-    return () => viewport.removeEventListener('resize', update);
+    viewport.addEventListener('scroll', update);
+    return () => {
+      viewport.removeEventListener('resize', update);
+      viewport.removeEventListener('scroll', update);
+    };
   }, [visible, update]);
 
   React.useEffect(() => {
@@ -334,7 +338,7 @@ export function LinkFloatingToolbar() {
     const watch = new MutationObserver(() => update());
     watch.observe(shell, {
       attributes: true,
-      attributeFilter: ['data-lifted', 'data-stuck'],
+      attributeFilter: ['data-lifted', 'data-stuck', 'style'],
     });
     return () => watch.disconnect();
   }, [editor, visible, update]);

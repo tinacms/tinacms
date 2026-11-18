@@ -878,6 +878,30 @@ test.describe('the link bar with the phone keyboard', () => {
     expect(overlaps(b, lifted)).toBe(false);
   });
 
+  test('re-places the bar when the visible area scrolls, with no form scroll', async ({
+    page,
+  }) => {
+    const { link, shell, bar } = await liftedSetup(page, 500);
+    const before = await measured(shell);
+    await placeLinkAt(page, link, before.y - 70);
+    await expect(bar).toBeVisible();
+    await setVisibleAreaOffset(page, 100);
+    await setVisibleAreaOffset(page, 0);
+    await expect.poll(async () => (await measured(shell)).y).toBe(before.y);
+    await setVisibleAreaOffset(page, 100);
+    await expect
+      .poll(async () => (await measured(shell)).y)
+      .toBeGreaterThan(before.y + 50);
+    await page.waitForTimeout(400);
+    const moved = await measured(shell);
+    const b = await measured(bar);
+    expect(overlaps(b, moved)).toBe(false);
+    await setVisibleAreaOffset(page, 0);
+    await expect.poll(async () => (await measured(shell)).y).toBe(before.y);
+    await page.waitForTimeout(400);
+    expect(overlaps(await measured(bar), await measured(shell))).toBe(false);
+  });
+
   test('never covers the form header above the body', async ({ page }) => {
     const { link, bar, header } = await liftedSetup(page, 500);
     await placeLinkAt(page, link, 150);
