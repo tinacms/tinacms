@@ -883,23 +883,61 @@ test.describe('the link bar with the phone keyboard', () => {
   }) => {
     const { link, shell, bar } = await liftedSetup(page, 500);
     const before = await measured(shell);
-    await placeLinkAt(page, link, before.y - 70);
+    await placeLinkAt(page, link, before.y - 30);
     await expect(bar).toBeVisible();
-    await setVisibleAreaOffset(page, 100);
-    await setVisibleAreaOffset(page, 0);
-    await expect.poll(async () => (await measured(shell)).y).toBe(before.y);
+    const above = async () => {
+      const [l, b] = await Promise.all([measured(link), measured(bar)]);
+      return b.y + b.height <= l.y;
+    };
+    expect(await above()).toBe(true);
+
     await setVisibleAreaOffset(page, 100);
     await expect
       .poll(async () => (await measured(shell)).y)
       .toBeGreaterThan(before.y + 50);
-    await page.waitForTimeout(400);
-    const moved = await measured(shell);
-    const b = await measured(bar);
-    expect(overlaps(b, moved)).toBe(false);
+    await expect.poll(above).toBe(false);
+    const [l, b] = await Promise.all([measured(link), measured(bar)]);
+    expect(b.y).toBeGreaterThanOrEqual(l.y + l.height);
+
     await setVisibleAreaOffset(page, 0);
     await expect.poll(async () => (await measured(shell)).y).toBe(before.y);
-    await page.waitForTimeout(400);
-    expect(overlaps(await measured(bar), await measured(shell))).toBe(false);
+    await expect.poll(above).toBe(true);
+  });
+
+  test('with the text box ending just above the lifted toolbar, a link at its bottom still gets a bar off the toolbar', async ({
+    page,
+  }) => {
+    const { link, shell, bar } = await liftedSetup(page, 500);
+    const lifted = await measured(shell);
+    await link.evaluate((el, toolbarTop) => {
+      const scrollers: HTMLElement[] = [];
+      for (let up = el.parentElement; up; up = up.parentElement) {
+        if (/auto|scroll/.test(getComputedStyle(up).overflowY)) {
+          scrollers.push(up);
+        }
+      }
+      const [box, form] = scrollers;
+      if (!box || !form) throw new Error('no text box and form scroller');
+      box.style.setProperty('max-height', '230px', 'important');
+      box.style.setProperty('min-height', '0', 'important');
+      box.dataset.cappedForTest = '';
+      form.style.paddingBottom = '1200px';
+      form.scrollTop += box.getBoundingClientRect().bottom - (toolbarTop - 20);
+      box.scrollTop +=
+        el.getBoundingClientRect().top -
+        (box.getBoundingClientRect().bottom - 30);
+    }, lifted.y);
+    const box = await measured(page.locator('[data-capped-for-test]'));
+    const l = await measured(link);
+    expect(lifted.y - (box.y + box.height)).toBeGreaterThan(10);
+    expect(lifted.y - (box.y + box.height)).toBeLessThan(30);
+    expect(l.y).toBeGreaterThan(box.y);
+    expect(l.y + l.height).toBeLessThan(box.y + box.height);
+    expect(lifted.y - (l.y + l.height)).toBeLessThan(48);
+    await expect(bar).toBeVisible();
+    const b = await measured(bar);
+    expect(b.y + b.height).toBeLessThanOrEqual(l.y);
+    expect(overlaps(b, lifted)).toBe(false);
   });
 
   test('never covers the form header above the body', async ({ page }) => {

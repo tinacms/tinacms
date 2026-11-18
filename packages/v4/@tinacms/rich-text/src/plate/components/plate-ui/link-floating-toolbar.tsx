@@ -206,15 +206,19 @@ const isWebKit = () =>
 const CLIPS = /auto|scroll|hidden|clip|overlay/;
 
 /**
- * Bottom of what the link can be seen through: the visual viewport (never `innerHeight`, which a phone keyboard doesn't shrink) cut by each clipping ancestor.
+ * Bottom of the visual viewport (never `innerHeight`, which a phone keyboard doesn't shrink).
  * floating-ui offsets its viewport rect by `offsetTop` except on WebKit; this follows the same rule so the padding lines up with it.
  */
-const visibleBottom = (node: HTMLElement) => {
+const viewportBottom = () => {
   const viewport = window.visualViewport;
-  let bottom = viewport
-    ? (isWebKit() ? 0 : viewport.offsetTop) + viewport.height
-    : window.innerHeight;
-  for (let up = node.parentElement; up; up = up.parentElement) {
+  if (!viewport) return window.innerHeight;
+  return (isWebKit() ? 0 : viewport.offsetTop) + viewport.height;
+};
+
+/** The viewport bottom cut by each clipping ancestor of the link, which is what `hide` measures the link against. */
+const clippedBottom = (link: HTMLElement) => {
+  let bottom = viewportBottom();
+  for (let up = link.parentElement; up; up = up.parentElement) {
     if (CLIPS.test(getComputedStyle(up).overflowY)) {
       bottom = Math.min(bottom, up.getBoundingClientRect().bottom);
     }
@@ -229,11 +233,19 @@ const toolbarShellOf = (editor: PlateEditor, selector: string) =>
     ?.querySelector<HTMLElement>(`[data-slot="toolbar-shell"]${selector}`) ??
   null;
 
-/** The room the lifted phone toolbar (and the keyboard under it) takes from the bottom of the open area. */
-const liftedToolbarInset = (editor: PlateEditor, link: HTMLElement | null) => {
+/**
+ * The room the lifted phone toolbar (and the keyboard under it) takes from the bottom of the open area.
+ * The bar itself is portaled to the body, so flip and shift measure it against the viewport alone; only `hide`, which tests the link, uses the link's clipped bottom.
+ */
+const liftedToolbarInset = (
+  editor: PlateEditor,
+  link: HTMLElement | null,
+  clipToLink: boolean
+) => {
   const shell = toolbarShellOf(editor, '[data-lifted]');
   if (!shell || !link) return 0;
-  return Math.max(0, visibleBottom(link) - shell.getBoundingClientRect().top);
+  const bottom = clipToLink ? clippedBottom(link) : viewportBottom();
+  return Math.max(0, bottom - shell.getBoundingClientRect().top);
 };
 
 function useLinkEntry() {
@@ -285,9 +297,9 @@ export function LinkFloatingToolbar() {
     elementRef.current
       ? (editor.api.toDOMNode(elementRef.current) ?? null)
       : null;
-  const openAreaPadding = () => ({
+  const openAreaPadding = (clipToLink = false) => ({
     top: stuckToolbarOverlap(editor),
-    bottom: liftedToolbarInset(editor, linkNode()),
+    bottom: liftedToolbarInset(editor, linkNode(), clipToLink),
   });
 
   const floating = useVirtualFloating({
@@ -309,7 +321,7 @@ export function LinkFloatingToolbar() {
           padding: { top: 8 + top, right: 8, left: 8, bottom: 8 + bottom },
         };
       }),
-      hide(() => ({ padding: openAreaPadding() })),
+      hide(() => ({ padding: openAreaPadding(true) })),
     ],
   });
   floating.virtualElementRef.current.contextElement = element
