@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AUTH_TOKEN_KEY, PKCE_STORAGE_KEY } from './authenticate';
 
 export interface AuthRedirectParams {
@@ -7,20 +7,57 @@ export interface AuthRedirectParams {
   error: string | null;
 }
 
+export type AuthRedirectStatus =
+  | { status: 'idle' }
+  | { status: 'pending' }
+  | { status: 'failed'; message: string };
+
+export const NO_PROJECT_ACCESS_MESSAGE =
+  'This account does not have access to this project. Log in with a different account.';
+export const LOGIN_FAILED_MESSAGE =
+  'We could not log you in. Please try again.';
+
+class TokenExchangeError extends Error {
+  constructor(
+    message: string,
+    readonly status: number
+  ) {
+    super(message);
+    this.name = 'TokenExchangeError';
+  }
+}
+
+const failureMessage = (err: unknown): string => {
+  if (err instanceof TokenExchangeError && err.status === 403) {
+    return NO_PROJECT_ACCESS_MESSAGE;
+  }
+  return LOGIN_FAILED_MESSAGE;
+};
+
 export const useTinaAuthRedirect = (
   params: AuthRedirectParams,
   enabled = true
-) => {
+): AuthRedirectStatus => {
   const { code, state, error } = params;
+  const [result, setResult] = useState<AuthRedirectStatus>(() =>
+    enabled && (error || (code && state))
+      ? { status: 'pending' }
+      : { status: 'idle' }
+  );
 
   useEffect(() => {
     if (!enabled) {
       return;
     }
 
+    const fail = (message: string) => {
+      window.history.replaceState({}, '', window.location.pathname);
+      setResult({ status: 'failed', message });
+    };
+
     if (error) {
       console.error('Auth error:', error);
-      window.history.replaceState({}, '', window.location.pathname);
+      fail(LOGIN_FAILED_MESSAGE);
       return;
     }
 
@@ -33,14 +70,14 @@ export const useTinaAuthRedirect = (
     );
     if (!pkceData) {
       console.error('No PKCE data found in localStorage');
-      window.history.replaceState({}, '', window.location.pathname);
+      fail(LOGIN_FAILED_MESSAGE);
       return;
     }
 
     if (pkceData.state !== state) {
       console.error('State mismatch - possible CSRF attack');
       localStorage.removeItem(PKCE_STORAGE_KEY);
-      window.history.replaceState({}, '', window.location.pathname);
+      fail(LOGIN_FAILED_MESSAGE);
       return;
     }
 
@@ -65,8 +102,11 @@ export const useTinaAuthRedirect = (
       .then(async (res) => {
         const data = await res.json();
         if (!res.ok) {
-          throw new Error(
-            data.message || data.error || `Token exchange failed: ${res.status}`
+          throw new TokenExchangeError(
+            data.message ||
+              data.error ||
+              `Token exchange failed: ${res.status}`,
+            res.status
           );
         }
         if (data.error) {
@@ -90,7 +130,9 @@ export const useTinaAuthRedirect = (
       .catch((err) => {
         console.error('Token exchange failed:', err);
         localStorage.removeItem(PKCE_STORAGE_KEY);
-        window.history.replaceState({}, '', window.location.pathname);
+        fail(failureMessage(err));
       });
   }, [code, state, error, enabled]);
+
+  return result;
 };
