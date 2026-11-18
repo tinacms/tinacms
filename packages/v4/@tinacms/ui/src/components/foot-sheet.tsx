@@ -40,9 +40,9 @@ const footSheetClasses = (bodyScrolls: boolean) =>
 const footSheetScrimClasses =
   'max-md:duration-(--dur-slide-in) max-md:data-ending-style:duration-(--dur-slide-out)';
 
-/** A header that stays under the chrome strip while a foot sheet's body scrolls. */
+/** A header that stays under the chrome strip while a foot sheet's body scrolls. It never shrinks, and scrolls itself past 40dvh. */
 const footSheetHeaderClasses =
-  'group-data-[slot=foot-sheet]/dialog:sticky group-data-[slot=foot-sheet]/dialog:top-9 group-data-[slot=foot-sheet]/dialog:z-10 group-data-[slot=foot-sheet]/dialog:max-h-[40dvh] group-data-[slot=foot-sheet]/dialog:overflow-y-auto group-data-[slot=foot-sheet]/dialog:bg-popover';
+  'group-data-[slot=foot-sheet]/dialog:sticky group-data-[slot=foot-sheet]/dialog:top-9 group-data-[slot=foot-sheet]/dialog:z-10 group-data-[slot=foot-sheet]/dialog:shrink-0 group-data-[slot=foot-sheet]/dialog:max-h-[40dvh] group-data-[slot=foot-sheet]/dialog:overflow-y-auto group-data-[slot=foot-sheet]/dialog:bg-popover';
 
 /** A footer whose buttons share the row in equal parts on a phone. */
 const footSheetFooterClasses =

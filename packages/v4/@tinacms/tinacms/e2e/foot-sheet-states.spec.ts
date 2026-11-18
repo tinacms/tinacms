@@ -224,6 +224,32 @@ test.describe('a sheet taller than the screen at 375px', () => {
   });
 });
 
+for (const size of [
+  { width: 375, height: 667 },
+  { width: 320, height: 568 },
+]) {
+  test(`a tall sheet keeps its header and title at ${size.width}x${size.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(size);
+    await page.goto('/sheets.html?case=plain');
+    await page.getByRole('button', { name: 'Open' }).click();
+    const sheet = page.locator(SHEET);
+    await expect(sheet).toBeVisible();
+    await settle(page);
+    const header = sheet.locator('[data-slot=dialog-header]');
+    expect((await box(header)).height).toBeGreaterThan(0);
+    await expect(
+      sheet.getByRole('heading', { name: 'Plain' })
+    ).toBeInViewport();
+    await sheet.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+    expect((await box(header)).height).toBeGreaterThan(0);
+    await expect(
+      sheet.getByRole('heading', { name: 'Plain' })
+    ).toBeInViewport();
+  });
+}
+
 test('the × sits inside the chrome strip and clear of a long title at 390px', async ({
   page,
 }) => {

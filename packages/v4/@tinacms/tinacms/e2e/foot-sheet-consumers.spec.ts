@@ -262,3 +262,102 @@ test.describe('media manager confirms as foot sheets on a phone', () => {
     ).toHaveCount(0);
   });
 });
+
+test.describe('a long usage list keeps the confirm usable on a small phone', () => {
+  const SIZES = [
+    { width: 375, height: 667 },
+    { width: 320, height: 568 },
+  ];
+
+  // Stored drafts count as unsaved uses, so ten of them make a ten-document usage list.
+  const seedUsage = (page: Page) =>
+    page.addInitScript(() => {
+      for (let i = 0; i < 10; i++) {
+        const values = { title: `Used ${i}`, image: 'preview.svg' };
+        localStorage.setItem(
+          `tina-drafts:content/pages/used-with-a-long-file-name-${i}.mdx`,
+          JSON.stringify({
+            version: 2,
+            values,
+            baseline: { title: `Used ${i}` },
+          })
+        );
+      }
+    });
+
+  // Forty folders beside the file, so the Move list fills its own box and the sheet overflows.
+  const manyFolders = (page: Page) =>
+    page.route('**/api/tina/media?*', (route) =>
+      route.fulfill({
+        json: {
+          items: [
+            { path: 'preview.svg', kind: 'file' },
+            ...Array.from({ length: 40 }, (_, i) => ({
+              path: `folder-${i}`,
+              kind: 'directory',
+            })),
+          ],
+        },
+      })
+    );
+
+  const expectReachable = async (page: Page, size: { height: number }) => {
+    const sheet = page.locator(SHEET);
+    await expect(sheet).toBeVisible();
+    await expect(
+      sheet.getByRole('button', { name: /^Open used-with-a-long-file-name-9/ })
+    ).toBeAttached();
+    await settle(page);
+    const header = await box(sheet.locator('[data-slot=alert-dialog-header]'));
+    const footer = await box(sheet.locator('[data-slot=alert-dialog-footer]'));
+    expect(header.height).toBeGreaterThan(0);
+    const natural = await sheet
+      .locator('[data-slot=alert-dialog-header]')
+      .evaluate((el) => el.scrollHeight);
+    expect(header.height).toBeGreaterThanOrEqual(
+      Math.min(natural, size.height * 0.4) - 1
+    );
+    expect(header.height).toBeLessThanOrEqual(size.height * 0.4 + 1);
+    expect(header.y + header.height).toBeLessThanOrEqual(footer.y + 1);
+    await expect(sheet.locator('[data-slot=alert-dialog-title]')).toBeVisible();
+    await expect(
+      sheet.getByRole('button', { name: 'Cancel' })
+    ).toBeInViewport();
+    return sheet;
+  };
+
+  for (const size of SIZES) {
+    const label = `${size.width}x${size.height}`;
+    const open = async (page: Page, action: 'Delete' | 'Move') => {
+      await page.setViewportSize(size);
+      await seedUsage(page);
+      await manyFolders(page);
+      await page.goto(MEDIA);
+      const pane = page.getByRole('complementary', { name: 'Media' });
+      await pane.getByRole('button', { name: 'Select', exact: true }).click();
+      await pane.getByRole('checkbox', { name: 'preview.svg' }).click();
+      await pane
+        .getByRole('button', {
+          name: action === 'Delete' ? /^Delete/ : 'Move',
+          exact: action === 'Move',
+        })
+        .click();
+    };
+
+    test(`the delete confirm at ${label}`, async ({ page }) => {
+      await open(page, 'Delete');
+      const sheet = await expectReachable(page, size);
+      await expect(
+        sheet.getByRole('button', { name: 'Delete', exact: true })
+      ).toBeInViewport();
+    });
+
+    test(`the move dialog at ${label}`, async ({ page }) => {
+      await open(page, 'Move');
+      const sheet = await expectReachable(page, size);
+      await expect(
+        sheet.getByRole('button', { name: 'Move here' })
+      ).toBeInViewport();
+    });
+  }
+});
