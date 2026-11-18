@@ -1,7 +1,11 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AUTH_TOKEN_KEY, PKCE_STORAGE_KEY } from './authenticate';
-import { useTinaAuthRedirect } from './useTinaAuthRedirect';
+import {
+  LOGIN_FAILED_MESSAGE,
+  NO_PROJECT_ACCESS_MESSAGE,
+  useTinaAuthRedirect,
+} from './useTinaAuthRedirect';
 
 const CODE = 'auth-code';
 const STATE = 'expected-state';
@@ -47,7 +51,7 @@ afterEach(() => {
 
 describe('useTinaAuthRedirect', () => {
   it('reports auth errors and bails without touching storage', () => {
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useTinaAuthRedirect({
         code: CODE,
         state: STATE,
@@ -66,12 +70,17 @@ describe('useTinaAuthRedirect', () => {
     );
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(localStorage.getItem(PKCE_STORAGE_KEY)).toBeNull();
+    expect(result.current).toEqual({
+      status: 'failed',
+      message: LOGIN_FAILED_MESSAGE,
+    });
   });
 
   it('does nothing when code is missing', () => {
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useTinaAuthRedirect({ code: null, state: STATE, error: null })
     );
+    expect(result.current).toEqual({ status: 'idle' });
 
     expect(consoleErrorSpy).not.toHaveBeenCalled();
     expect(replaceStateSpy).not.toHaveBeenCalled();
@@ -89,9 +98,10 @@ describe('useTinaAuthRedirect', () => {
   });
 
   it('does nothing when disabled even with code and state', () => {
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useTinaAuthRedirect({ code: CODE, state: STATE, error: null }, false)
     );
+    expect(result.current).toEqual({ status: 'idle' });
 
     expect(consoleErrorSpy).not.toHaveBeenCalled();
     expect(replaceStateSpy).not.toHaveBeenCalled();
@@ -100,13 +110,17 @@ describe('useTinaAuthRedirect', () => {
   });
 
   it('bails when no PKCE data is stored', () => {
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useTinaAuthRedirect({ code: CODE, state: STATE, error: null })
     );
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       'No PKCE data found in localStorage'
     );
+    expect(result.current).toEqual({
+      status: 'failed',
+      message: LOGIN_FAILED_MESSAGE,
+    });
     expect(replaceStateSpy).toHaveBeenCalledWith(
       {},
       '',
@@ -146,9 +160,10 @@ describe('useTinaAuthRedirect', () => {
         Promise.resolve({ access_token: 'access-token', refresh_token: '' }),
     });
 
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useTinaAuthRedirect({ code: CODE, state: STATE, error: null })
     );
+    expect(result.current).toEqual({ status: 'pending' });
 
     await vi.waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledTimes(1);
@@ -197,7 +212,7 @@ describe('useTinaAuthRedirect', () => {
       json: () => Promise.resolve({ message: 'invalid_grant' }),
     });
 
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useTinaAuthRedirect({ code: CODE, state: STATE, error: null })
     );
 
@@ -215,6 +230,38 @@ describe('useTinaAuthRedirect', () => {
       window.location.pathname
     );
     expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
+    await vi.waitFor(() => {
+      expect(result.current).toEqual({
+        status: 'failed',
+        message: LOGIN_FAILED_MESSAGE,
+      });
+    });
+  });
+
+  it('asks for a different account when the token endpoint returns 403', async () => {
+    seedPkceStorage();
+    fetchSpy.mockResolvedValueOnce({
+      ok: false,
+      status: 403,
+      json: () =>
+        Promise.resolve({
+          message: 'this account does not have access to this project',
+        }),
+    });
+
+    const { result } = renderHook(() =>
+      useTinaAuthRedirect({ code: CODE, state: STATE, error: null })
+    );
+
+    await vi.waitFor(() => {
+      expect(result.current).toEqual({
+        status: 'failed',
+        message: NO_PROJECT_ACCESS_MESSAGE,
+      });
+    });
+    expect(localStorage.getItem(PKCE_STORAGE_KEY)).toBeNull();
+    expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
+    expect(window.location.reload).not.toHaveBeenCalled();
   });
 
   it('bails and clears storage when the response is ok but body contains an error', async () => {
