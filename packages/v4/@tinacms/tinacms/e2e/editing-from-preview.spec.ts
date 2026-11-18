@@ -139,7 +139,9 @@ test('a page that draws only the shared nav shows Nothing to edit, and the nav o
   await expect(
     page.getByRole('button', { name: 'Open Collections' })
   ).toBeVisible();
-  await expect(page.getByRole('button', { name: /^Save/ })).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Save', exact: true })
+  ).toHaveCount(0);
   await frame(page).getByText('Playground Blog').click();
   await expect(heading(page)).toHaveText('site.json');
 });

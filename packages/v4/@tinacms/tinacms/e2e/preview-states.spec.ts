@@ -168,7 +168,7 @@ test('with validation errors the error pane docks beside the frame, and a click 
 }) => {
   await openDeclared(page);
   await page.locator('input#title').fill('ab');
-  await page.getByRole('button', { name: /^Save/ }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
   const pane = page.locator('#error-pane');
   await expect(pane).toBeVisible();
   const slot = await page.locator('[data-preview-slot]').boundingBox();
