@@ -70,6 +70,7 @@ describe('array field states', () => {
           {
             id: '1',
             name: 'Item 1',
+            address: 'flags.0',
             kind: 'group',
             alwaysOpen: true,
             summary: 'Item 1',
@@ -474,7 +475,15 @@ describe('array field view without handlers', () => {
       <ArrayFieldView
         label='Tags'
         itemPlaceholder='Empty tag'
-        items={[{ id: 'a', name: 'Item 1', kind: 'value', value: '' }]}
+        items={[
+          {
+            id: 'a',
+            name: 'Item 1',
+            address: 'tags.0',
+            kind: 'value',
+            value: '',
+          },
+        ]}
       />
     );
     expect(screen.getByRole('textbox', { name: 'Item 1' })).toHaveAttribute(

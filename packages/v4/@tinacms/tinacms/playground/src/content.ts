@@ -3,6 +3,7 @@ import type { TinaDocument } from '@tinacms/tinacms';
 export const sampleDocument = {
   title: 'Hello World',
   featured: false,
+  author: { name: 'Jane Doe' },
   body: {
     type: 'root',
     children: [

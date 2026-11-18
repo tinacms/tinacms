@@ -75,6 +75,8 @@ type FieldWrapperProps = Omit<ComponentProps<'div'>, 'children'> & {
   warnings?: string[];
   /** Fades the whole field. Turn the control off too. */
   disabled?: boolean;
+  /** The preview is pointing at this field. Renders `data-active` for views to style; the control draws its own look. */
+  active?: boolean;
   children: ReactNode;
 };
 
@@ -92,6 +94,7 @@ function FieldWrapper({
   errors = [],
   warnings = [],
   disabled = false,
+  active = false,
   className,
   children,
   ...props
@@ -101,6 +104,7 @@ function FieldWrapper({
     <div
       data-slot='field-wrapper'
       data-disabled={disabled || undefined}
+      data-active={active || undefined}
       className={cn(
         'flex w-full min-w-0 flex-col gap-1.5 font-sans text-base text-foreground',
         disabled && 'opacity-60',

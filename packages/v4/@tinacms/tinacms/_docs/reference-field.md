@@ -237,6 +237,12 @@ substitutes the documents that the content cache already holds. The post stays
 synchronous, so a keystroke never waits on the network. A reference that has
 not arrived yet keeps its path for a frame.
 
+A site can mark the referenced document's fields in the page. Give the marker
+the address in the post, such as `author.name`. A click on it opens the author's
+form as a step from the post, and the admin sends the author's live values back
+to the page while the editor types. See `useTina` in the architecture notes for
+the `document` option.
+
 ## The connections
 
 - The manifest is `reference-field.plugin.ts`. Its name is

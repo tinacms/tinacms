@@ -26,6 +26,8 @@ export type RichTextFieldViewProps = Pick<
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   /** The document body: the same frame, but it grows with its text and its toolbar sticks. */
   body?: boolean;
 };
@@ -42,6 +44,7 @@ export function RichTextFieldView({
   disabled = false,
   readOnly = false,
   body = false,
+  active = false,
   ...frame
 }: RichTextFieldViewProps) {
   const labelId = frame.labelId ?? `${id}-label`;
@@ -51,15 +54,16 @@ export function RichTextFieldView({
     <FieldWrapper {...frame} labelId={labelId} disabled={disabled}>
       <div
         data-slot='rich-text-frame'
+        data-active={active ? '' : undefined}
         className={cn(
-          'min-w-0 rounded-sm border border-input bg-card hover:border-input-hover has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
+          'min-w-0 rounded-sm border border-input bg-card hover:border-input-hover has-focus-visible:border-ring has-focus-visible:shadow-focus-field data-active:border-ring data-active:shadow-focus-field',
           !body && 'overflow-hidden',
           invalid &&
-            'border-destructive hover:border-destructive has-focus-visible:border-destructive',
+            'border-destructive hover:border-destructive has-focus-visible:border-destructive data-active:border-destructive',
           readOnly &&
-            'border-border-subtle bg-muted hover:border-border-subtle has-focus-visible:border-border-subtle has-focus-visible:shadow-none',
+            'border-border-subtle bg-muted hover:border-border-subtle has-focus-visible:border-border-subtle has-focus-visible:shadow-none data-active:border-border-subtle data-active:shadow-none',
           disabled &&
-            'border-input hover:border-input has-focus-visible:border-input has-focus-visible:shadow-none'
+            'border-input hover:border-input has-focus-visible:border-input has-focus-visible:shadow-none data-active:border-input data-active:shadow-none'
         )}
       >
         <EditorContext.Provider

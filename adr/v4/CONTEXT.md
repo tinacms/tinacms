@@ -69,7 +69,7 @@ The stable identity of a field *instance* within a form — the path from the fo
 _Avoid_: positional indices as identity (`blocks.2` breaks on reorder)
 
 **Visual editing** (click-to-edit):
-The feature where an editor clicks rendered content in the preview **iframe** and the matching field is revealed in the **Admin UI**. The user's site wraps content in markers carrying a **Field address**; a click `postMessage`s that address across the window boundary, and the form sets it as the active field. The message carries *only* an address — it is one producer among several (validation jump, deep-link) of the form's single active-field state.
+The feature where an editor clicks rendered content in the preview **iframe** and the matching field is revealed in the **Admin UI**. The user's site wraps content in markers carrying a **Field address**; a click `postMessage`s that address across the window boundary, and the form sets it as the active field. The message carries an address and, optionally, the path of the document the marker belongs to (a repo-relative path such as `content/posts/hello-world.mdx`), so a click on a referenced author or a shared nav opens that document — it is one producer among several (validation jump, deep-link) of the form's single active-field state. The page also declares the documents it draws (`tina:ready`, `tina:documents`, with its `url`), and the admin sends the hovered and active field back (`tina:outline`) so the page can draw outlines; a page that declares only shared documents counts as drawing no document.
 _Avoid_: treating this as a separate focus mechanism — it just sets the active **Field address**
 
 **Form**:

@@ -52,6 +52,8 @@ export interface ImageFieldViewProps
   previewKey?: number;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   primaryRef?: Ref<HTMLButtonElement>;
   groupRef?: Ref<HTMLDivElement>;
 }
@@ -90,6 +92,7 @@ export function ImageFieldView({
   previewKey,
   disabled,
   readOnly,
+  active,
   primaryRef,
   groupRef,
 }: ImageFieldViewProps) {
@@ -184,7 +187,8 @@ export function ImageFieldView({
         tabIndex={-1}
         aria-labelledby={labelId}
         data-dragging={dragging ? 'true' : undefined}
-        className='flex min-w-0 flex-col items-start gap-2 outline-none'
+        data-active={active ? '' : undefined}
+        className='flex min-w-0 flex-col items-start gap-2 rounded-sm outline-none data-active:shadow-focus-ring'
         onDragEnter={dragOver}
         onDragOver={dragOver}
         onDragLeave={dragLeave}

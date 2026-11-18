@@ -15,6 +15,8 @@ type TopBarProps = Omit<ComponentProps<'header'>, 'children'> & {
   devControls?: ReactNode;
   /** The Search control. */
   search?: ReactNode;
+  /** The Save All control: a button and, after a run, its result list. Placed after Search. */
+  save?: ReactNode;
   /** The account button. */
   account?: ReactNode;
 };
@@ -42,6 +44,7 @@ function TopBar({
   branch,
   devControls,
   search,
+  save,
   account,
   className,
   ...props
@@ -80,6 +83,7 @@ function TopBar({
       <div className='flex flex-none items-center gap-1'>
         {devControls}
         {search}
+        {save}
         {account}
       </div>
     </header>

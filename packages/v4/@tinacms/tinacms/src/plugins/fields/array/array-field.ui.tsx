@@ -22,6 +22,7 @@ import {
   templateTitle,
 } from '../../../core/schema/children';
 import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
+import { useCardOutline } from '../../../editor/hooks';
 import {
   itemOpensNextLevel,
   NestedFieldRow,
@@ -186,6 +187,7 @@ function ObjectItems({
   const listItems = useListItems();
   const activation = useActivation();
   const { setActive } = useActiveField();
+  const cardOutline = useCardOutline(toFieldAddress(address));
   const { control, getValues } = useFormContext();
   const {
     fields: items,
@@ -199,6 +201,8 @@ function ObjectItems({
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
   const [inserting, setInserting] = useState<InsertPicker | null>(null);
   const [adding, setAdding] = useState(false);
+  // Id of the card the editor came back from.
+  const [returnedTo, setReturnedTo] = useState<string | null>(null);
   const insertRuns = useRef(0);
   const refocusOpener = useRef<string | null>(null);
   const { listRef, afterChange } = useAfterChange(items, (index) =>
@@ -304,6 +308,10 @@ function ObjectItems({
       '[data-grip], [data-slot="list-card-head"] button'
     );
     if (card && target) {
+      const returnedId = items[Math.min(returned, items.length - 1)]?.id;
+      if (returnedId && activation?.address === `${address}.${returned}`) {
+        setReturnedTo(returnedId);
+      }
       target.focus({ preventScroll: true });
       centerInScroller(card);
     }
@@ -353,6 +361,32 @@ function ObjectItems({
     listItems.move(address, from, to, () => move(from, to));
   };
 
+  useEffect(() => {
+    if (returnedTo === null) return;
+    if (activation?.address === address && activation.source === 'page') {
+      setReturnedTo(null);
+      return;
+    }
+    const index = items.findIndex((item) => item.id === returnedTo);
+    if (
+      activation?.address !== address &&
+      activation?.address !== `${address}.${index}`
+    ) {
+      setReturnedTo(null);
+    }
+  }, [activation]);
+
+  useEffect(
+    () => () => {
+      cardOutline.hover(null);
+    },
+    [cardOutline]
+  );
+
+  const isActive = (id: string, itemAddress: string) =>
+    activation?.address === itemAddress ||
+    (returnedTo === id && activation?.address === address);
+
   const views: ArrayItemView[] = items.map((item, index) => {
     const itemAddress = `${address}.${index}`;
     const stored: unknown = getValues(itemAddress);
@@ -381,12 +415,18 @@ function ObjectItems({
     return {
       id: item.id,
       name: `Item ${index + 1}`,
+      address: itemAddress,
       kind: 'group',
       title,
       summary,
       opens,
       open: open.has(item.id),
       errorCount: counts[index],
+      active: isActive(item.id, itemAddress),
+      onHoverChange: (hovering) =>
+        cardOutline.hover(hovering ? toFieldAddress(itemAddress) : null),
+      onCardFocus: () =>
+        setReturnedTo((held) => (held === item.id ? held : null)),
       onToggle: () => {
         if (opens === 'next-level') {
           showItem(index);
@@ -658,6 +698,7 @@ function ScalarItems({
     const base = {
       id: keys.current[index] ?? itemAddress,
       name: `Item ${index + 1}`,
+      address: itemAddress,
     };
     const messages = ownFieldErrors(get(errors, itemAddress), itemAddress)[
       itemAddress
