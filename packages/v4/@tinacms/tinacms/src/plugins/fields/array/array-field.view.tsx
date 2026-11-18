@@ -219,6 +219,8 @@ function Card({
         item.onHoverChange?.(false);
       }}
       onFocus={(event) => {
+        if (event.target.closest('[data-array-item]') !== event.currentTarget)
+          return;
         item.onFocusChange?.(true);
       }}
       onBlur={(event) => {

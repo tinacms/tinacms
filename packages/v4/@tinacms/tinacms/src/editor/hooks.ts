@@ -276,7 +276,8 @@ export function useCardOutline(list: FieldAddress) {
           store.setFocusedCard(formId, { list, address });
           return;
         }
-        if (store.focusedCard?.list === list) {
+        const held = store.focusedCard;
+        if (held?.formId === formId && held.list === list) {
           store.setFocusedCard(formId, null);
         }
       },

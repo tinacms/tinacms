@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useFormContext } from 'react-hook-form';
 import { describe, expect, it } from 'vitest';
@@ -419,6 +419,25 @@ describe('cards that open in place', () => {
     const cards = container.querySelectorAll('[data-array-item]');
     await user.hover(cards[cards.length - 1]);
     expect(useFormStore.getState().hovered?.address).toBe('rows.1');
+  });
+
+  it("outlines the inner card, not the outer one, when focus lands on a nested list's grip", async () => {
+    const { user, container } = renderRows();
+    await toggleFirstRow(user, container);
+    await screen.findByLabelText('Title');
+    const inner = container.querySelector<HTMLElement>(
+      '[data-array-item] [data-array-item] [data-grip]'
+    );
+    if (!inner) throw new Error('no inner grip');
+    await act(async () => {
+      if (document.activeElement instanceof HTMLElement)
+        document.activeElement.blur();
+    });
+    await act(async () => inner.focus());
+    expect(useFormStore.getState().focusedCard).toMatchObject({
+      list: 'rows.0.inner',
+      address: 'rows.0.inner.0',
+    });
   });
 
   it('keeps the outer card outlined when its nested list mounts and unmounts', async () => {
