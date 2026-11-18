@@ -9,11 +9,17 @@ const mocks = vi.hoisted(() => ({
   branchExists: vi.fn(),
   listBranches: vi.fn(),
   success: vi.fn(),
+  hasExplicitListenerFor: vi.fn(),
+  dispatch: vi.fn(),
 }));
 
 vi.mock('../react-core', () => ({
   useCMS: () => ({
     alerts: { success: mocks.success },
+    events: {
+      hasExplicitListenerFor: mocks.hasExplicitListenerFor,
+      dispatch: mocks.dispatch,
+    },
     api: {
       tina: {
         executeEditorialWorkflow: mocks.executeEditorialWorkflow,
@@ -59,6 +65,7 @@ describe('editorial workflow branch naming', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.listBranches.mockResolvedValue([]);
+    mocks.hasExplicitListenerFor.mockReturnValue(false);
     vi.spyOn(Math, 'random').mockReturnValue(0);
     mocks.branchExists.mockResolvedValue(false);
     mocks.executeEditorialWorkflow.mockImplementation(
@@ -160,5 +167,85 @@ describe('editorial workflow branch naming', () => {
     });
     expect(mocks.executeEditorialWorkflow).toHaveBeenCalledTimes(2);
     expect(mocks.beforeSubmit).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('editorial workflow completion', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.branchExists.mockResolvedValue(false);
+    mocks.executeEditorialWorkflow.mockImplementation(
+      async ({ branchName }) => ({
+        branchName,
+        pullRequestUrl: 'https://example.com/pull/1',
+      })
+    );
+    window.location.hash = '';
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  const run = async (overrides: Record<string, unknown>) => {
+    const { result } = renderHook(() => useEditorialWorkflow());
+    await act(async () => {
+      await result.current.executeWorkflow({
+        ...options,
+        targetBranchExists: false,
+        ...overrides,
+      });
+    });
+  };
+
+  it('hands the created pull request to a mounted prompt instead of a toast', async () => {
+    mocks.hasExplicitListenerFor.mockReturnValue(true);
+
+    await run({ path: 'content/rules/team/example.mdx', crudType: 'create' });
+
+    expect(mocks.hasExplicitListenerFor).toHaveBeenCalledWith(
+      'editorial-workflow:complete'
+    );
+    expect(mocks.dispatch).toHaveBeenCalledWith({
+      type: 'editorial-workflow:complete',
+      branchName: 'tina/rules/example',
+      pullRequestUrl: 'https://example.com/pull/1',
+      isDraft: true,
+      collection: 'rules',
+      relativePath: 'team/example.mdx',
+      crudType: 'create',
+    });
+    expect(mocks.success).not.toHaveBeenCalled();
+    expect(window.location.hash).toBe('');
+  });
+
+  it('reports a ready-for-review pull request as not a draft', async () => {
+    mocks.hasExplicitListenerFor.mockReturnValue(true);
+
+    await run({ isDraft: false });
+
+    expect(mocks.dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({ isDraft: false })
+    );
+  });
+
+  it("reports the server's draft-first default as a draft", async () => {
+    mocks.hasExplicitListenerFor.mockReturnValue(true);
+
+    await run({ isDraft: undefined });
+
+    expect(mocks.dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({ isDraft: true })
+    );
+  });
+
+  it('falls back to the toast and the collection list without a mounted prompt', async () => {
+    mocks.hasExplicitListenerFor.mockReturnValue(false);
+
+    await run({ path: 'content/rules/team/example.mdx', crudType: 'create' });
+
+    expect(mocks.dispatch).not.toHaveBeenCalled();
+    expect(mocks.success).toHaveBeenCalledWith(
+      expect.stringContaining('https://example.com/pull/1'),
+      0
+    );
+    expect(window.location.hash).toBe('#/collections/rules/team');
   });
 });
