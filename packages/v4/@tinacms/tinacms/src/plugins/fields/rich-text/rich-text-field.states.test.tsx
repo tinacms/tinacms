@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 // Warm the Plate editor chain at module scope, as the render test does.
@@ -26,9 +26,7 @@ describe('rich text field states', () => {
     const { container } = render(<RichTextFieldView {...props} />);
     const editor = await findEditor();
     expect(screen.queryByText(/unsaved/i)).toBeNull();
-    expect(screen.queryByText('*') !== null).toBe(
-      !!props.required && !props.body
-    );
+    expect(screen.queryByText('*') !== null).toBe(!!props.required);
     expect(screen.queryByRole('alert') !== null).toBe(!!props.errors?.length);
     expect(screen.queryByRole('status') !== null).toBe(
       !!props.warnings?.length
@@ -66,25 +64,42 @@ describe('rich text field states', () => {
     ).toContain('border');
   });
 
-  it('draws the body with no frame border and a hidden but named label', async () => {
+  it('draws the body in the same frame as a field, with a visible label and a 224px minimum', async () => {
     const { container } = render(
       <RichTextFieldView {...richTextFieldState('body')} />
     );
     const editor = await findEditor();
     const frame = container.querySelector('[data-slot=rich-text-frame]');
-    expect(frame?.className).not.toMatch(/\bborder\b/);
+    expect(frame?.className).toMatch(/\bborder\b/);
+    expect(frame?.className).not.toContain('overflow-hidden');
     expect(editor.className).toContain('min-h-56');
-    const label = screen.getByText('Body', { selector: 'span' });
-    expect(label).toHaveClass('sr-only');
+    expect(editor.className).toContain('max-h-[min(70vh,640px)]');
+    expect(editor.className).toContain('overflow-y-auto');
+    expect(editor.className).not.toContain('max-h-60');
+    expect(editor.className).not.toMatch(/overscroll-/);
+    expect(editor.contains(screen.getByRole('toolbar'))).toBe(false);
+    const label = screen.getByText('Body', { selector: 'label' });
+    expect(label).not.toHaveClass('sr-only');
     expect(label.id).toBe(editor.getAttribute('aria-labelledby'));
   });
 
-  it('puts body errors above the editor', async () => {
+  it('keeps the framed field clipped and capped at 240px', async () => {
+    const { container } = render(
+      <RichTextFieldView {...richTextFieldState('filled')} />
+    );
+    const editor = await findEditor();
+    expect(
+      container.querySelector('[data-slot=rich-text-frame]')?.className
+    ).toContain('overflow-hidden');
+    expect(editor.className).toContain('max-h-60');
+  });
+
+  it('puts body errors under the editor', async () => {
     render(<RichTextFieldView {...richTextFieldState('body invalid')} />);
     const editor = await findEditor();
     const alert = screen.getByRole('alert');
     expect(
-      alert.compareDocumentPosition(editor) & Node.DOCUMENT_POSITION_FOLLOWING
+      editor.compareDocumentPosition(alert) & Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy();
   });
 
@@ -126,22 +141,52 @@ describe('rich text field states', () => {
     expect(classes).not.toContain('hover:border-input-hover');
   });
 
-  it('shows the invalid border on a read-only field that has errors', async () => {
-    const { container } = render(
-      <RichTextFieldView
-        {...richTextFieldState('read-only')}
-        errors={['Body is required']}
-      />
-    );
-    await findEditor();
-    const classes = container
+  const frameClasses = (container: HTMLElement) =>
+    container
       .querySelector('[data-slot=rich-text-frame]')
       ?.className.split(' ');
-    expect(classes).toContain('border-destructive');
-    expect(classes).not.toContain('border-border-subtle');
+
+  it('keeps the invalid border on hover and on keyboard focus', async () => {
+    const { container } = render(
+      <RichTextFieldView {...richTextFieldState('invalid')} />
+    );
+    await findEditor();
+    expect(frameClasses(container)).toEqual(
+      expect.arrayContaining([
+        'border-destructive',
+        'hover:border-destructive',
+        'has-focus-visible:border-destructive',
+      ])
+    );
   });
 
-  it('does not point the body editor at help text that body mode never renders', async () => {
+  it.each([
+    ['read-only', 'border-border-subtle', 'bg-muted'],
+    ['disabled', 'border-input', 'hover:border-input'],
+    ['body read-only', 'border-border-subtle', 'bg-muted'],
+    ['body disabled', 'border-input', 'hover:border-input'],
+  ] as const)(
+    'shows the %s look over invalid and keeps the error under the box',
+    async (name, ...looks) => {
+      const { container } = render(
+        <RichTextFieldView
+          {...richTextFieldState(name)}
+          errors={['Body is required']}
+        />
+      );
+      const editor = await findEditor();
+      const classes = frameClasses(container);
+      expect(classes).toEqual(expect.arrayContaining([...looks]));
+      expect(classes).not.toContain('border-destructive');
+      expect(classes).not.toContain('hover:border-destructive');
+      expect(
+        editor.compareDocumentPosition(screen.getByRole('alert')) &
+          Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBeTruthy();
+    }
+  );
+
+  it('points the body editor at the help text under its label', async () => {
     render(
       <RichTextFieldView
         {...richTextFieldState('body')}
@@ -149,7 +194,40 @@ describe('rich text field states', () => {
         helpId='body-help'
       />
     );
-    expect(await findEditor()).not.toHaveAttribute('aria-describedby');
+    const editor = await findEditor();
+    expect(editor).toHaveAttribute('aria-describedby', 'body-help');
+    expect(screen.getByText('Markdown is supported')).toHaveAttribute(
+      'id',
+      'body-help'
+    );
+  });
+
+  it('shows only the allowed tools of a limited toolbar', async () => {
+    render(<RichTextFieldView {...richTextFieldState('limited toolbar')} />);
+    await findEditor();
+    const toolbar = screen.getByRole('toolbar', { name: 'Formatting' });
+    expect(within(toolbar).getByRole('button', { name: 'Bold' })).toBeVisible();
+    expect(within(toolbar).queryByRole('button', { name: 'Quote' })).toBeNull();
+    expect(
+      within(toolbar).queryByRole('button', { name: 'Insert' })
+    ).toBeNull();
+  });
+
+  it('shows a body with a long text, and a disabled body with its toolbar off', async () => {
+    const long = render(
+      <RichTextFieldView {...richTextFieldState('body long')} />
+    );
+    await findEditor();
+    expect(await screen.findByText(/Paragraph 40 /)).toBeVisible();
+    long.unmount();
+
+    render(<RichTextFieldView {...richTextFieldState('body disabled')} />);
+    await findEditor();
+    for (const button of within(screen.getByRole('toolbar')).getAllByRole(
+      'button'
+    )) {
+      expect(button).toBeDisabled();
+    }
   });
 
   it('links help text to the editor', async () => {

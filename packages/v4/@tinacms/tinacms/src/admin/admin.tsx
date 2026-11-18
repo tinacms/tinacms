@@ -12,7 +12,7 @@ import {
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
 import { cn } from '@tinacms/ui/lib/utils';
-import { useKeyboardOpen } from './use-narrow';
+import { useKeyboardOpen } from '@tinacms/ui/hooks/use-keyboard-open';
 import { toast } from '@tinacms/ui/components/toast';
 import {
   type CSSProperties,

@@ -4,6 +4,7 @@ import { Plate, PlateContent, usePlateEditor } from '@udecode/plate/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { INVALID_MARKDOWN_TYPE } from '../../../error-message';
+import { ToolbarProvider } from '../../toolbar/toolbar-provider';
 import { createEditorPlugins } from '../editor-plugins';
 
 type HarnessEditor = ReturnType<typeof usePlateEditor>;
@@ -30,9 +31,11 @@ const Harness = ({
   onEditorReady(editor);
 
   return (
-    <Plate editor={editor}>
-      <PlateContent />
-    </Plate>
+    <ToolbarProvider templates={[]} overrides={undefined}>
+      <Plate editor={editor}>
+        <PlateContent />
+      </Plate>
+    </ToolbarProvider>
   );
 };
 

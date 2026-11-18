@@ -29,11 +29,7 @@ test('opens at the default width and drags wider', async ({ page }) => {
 });
 
 test('a wider column shows more of the rich-text toolbar', async ({ page }) => {
-  const controlsShown = () =>
-    toolbar(page).evaluate(
-      (container) =>
-        (container.firstElementChild as HTMLElement).childElementCount
-    );
+  const controlsShown = () => toolbar(page).getByRole('button').count();
 
   const atDefault = await controlsShown();
   await setColumnWidth(page, 700);
