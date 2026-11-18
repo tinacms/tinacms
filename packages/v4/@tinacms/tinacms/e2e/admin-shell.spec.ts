@@ -281,6 +281,8 @@ test.describe('Save All on a protected branch, by touch', () => {
       .getByRole('button', { name: /^Branch:/ })
       .locator('span.font-mono');
     const search = bar.getByRole('button', { name: 'Search' });
+    await expect(wrapper).toBeVisible();
+    await page.waitForTimeout(300);
     const before = await Promise.all([
       branchLabel.boundingBox(),
       search.boundingBox(),

@@ -7,7 +7,7 @@ The smallest TinaCMS v4 app. One Vite project holds everything:
 | The content model | `tina/config.ts` | One declaration. The data layer and the forms both read it. |
 | The pipeline | `vite.config.ts` | The project owns its pipeline. `pnpm dev` runs Vite; there is no `tinacms dev`. Tina mounts as one Vite plugin. |
 | The admin | `public/admin/index.html` → `tina/admin.tsx` | Codegen scaffolds the shell in `public/` (the v3 shape, at the `build` folders from `defineConfig`), the entry, and `tina/admin.css` once. The admin serves on `/admin/` with no route of the project's own. After that, all three files belong to the project. |
-| The site | `index.html` → `src/preview/` | Visual editing with `useTina`, `tinaField`, and `TinaMarkdown` from `@tinacms/tinacms/adapters/react`. The admin's preview pane renders this page. |
+| The site | `index.html` → `src/preview/` | Visual editing with `useTina`, `tinaField`, and `TinaMarkdown` from `@tinacms/tinacms/adapters/react`. The admin's preview pane renders this page, draws an outline on the marked field you hover, and opens the field you click. |
 | A custom field | `tina/rating-field.tsx` | A whole field plugin in one `definePlugin({...})` call, in one project-owned file. The config registers it next to `localContentPlugin()`. |
 | A sidebar entry | `tina/help-nav.tsx` | A Help screen and an external docs link, contributed to the `globalNav` slot. |
 | The content | `content/posts/*.mdx` | Files in the repository. A save in the admin writes them back to disk. |
@@ -31,6 +31,31 @@ Open the printed URL. The site renders at `/`, and the admin at `/admin/`
 (dev codegen scaffolds `public/admin/index.html` once; the project commits
 it). A schema change in `tina/config.ts` refreshes `tina/tina-lock.json` on
 the next dev run or `pnpm codegen` — commit the lock.
+
+## Visual editing with more than one document
+
+This site calls `useTina({ data })` for one document, so the admin treats the
+page as the open document. A page can say more. Pass `document` to name the
+document that `data` comes from, as a path relative to the repository with the
+collection folder and the file extension (`content/posts/hello-world.mdx`).
+Pass `shared: true` for a document that many pages draw, such as a nav.
+
+```tsx
+const { data, tinaField } = useTina({
+  data: nav,
+  document: 'content/global/site.json',
+  shared: true,
+});
+```
+
+The `tinaField` that the hook returns adds `data-tina-document` to each mark.
+The admin then follows links to pages that declare another document, and opens
+a shared or referenced document when you click its mark. A page that declares
+only shared documents counts as drawing no document. The admin shows "Nothing
+to edit on this page" there. The page and the admin talk through
+`tina:ready`, `tina:documents`, `tina:activate`, `tina:values` and
+`tina:outline`. The playground in `packages/v4/@tinacms/tinacms/playground`
+shows a full declared page.
 
 ## What is not real yet
 

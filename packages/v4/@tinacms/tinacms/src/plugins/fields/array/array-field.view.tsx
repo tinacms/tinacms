@@ -21,6 +21,7 @@ import {
 } from '@tinacms/ui/components/field-wrapper';
 import { DrillInCard } from '@tinacms/ui/components/drill-in-card';
 import { CardList, ListCard } from '@tinacms/ui/components/list-card';
+import { cardProps } from '../../../editor/outline-markup';
 import { ArrowDown, ArrowUp, Copy } from 'lucide-react';
 import { type PointerEvent, type ReactNode, type Ref, useId } from 'react';
 
@@ -34,6 +35,8 @@ export interface ArrayItemView {
   id: string;
   /** The item for screen readers, such as "Item 1". */
   name: string;
+  /** The item's field address, such as `blocks.1`. Follows a move. */
+  address: string;
   kind: 'value' | 'group';
   /** Value boxes only. */
   value?: string;
@@ -57,6 +60,12 @@ export interface ArrayItemView {
   errorCount?: number;
   /** The message under the card. */
   error?: string;
+  /** The page is pointing at this item: draw its card like focus. */
+  active?: boolean;
+  /** The mouse or pen enters or leaves the card. */
+  onHoverChange?: (hovering: boolean) => void;
+  /** Focus enters the card itself, not a card nested in it. */
+  onCardFocus?: () => void;
   onBlur?: () => void;
   onFocus?: () => void;
   children?: ReactNode;
@@ -194,8 +203,29 @@ function Card({
   return (
     <div
       ref={setNodeRef}
-      data-array-item=''
+      {...cardProps(item.address)}
       style={{ transform: CSS.Translate.toString(transform), transition }}
+      onPointerOver={(event) => {
+        if (event.pointerType === 'touch') return;
+        event.stopPropagation();
+        const frame =
+          event.target instanceof Element
+            ? event.target.closest('[data-field-frame]')
+            : null;
+        if (frame && event.currentTarget.contains(frame)) return;
+        item.onHoverChange?.(true);
+      }}
+      onPointerOut={(event) => {
+        if (event.pointerType === 'touch') return;
+        const next = event.relatedTarget;
+        if (next instanceof Node && event.currentTarget.contains(next)) return;
+        item.onHoverChange?.(false);
+      }}
+      onFocus={(event) => {
+        if (event.target.closest('[data-array-item]') !== event.currentTarget)
+          return;
+        item.onCardFocus?.();
+      }}
     >
       {item.kind === 'value' ? (
         <ListCard
@@ -221,6 +251,12 @@ function Card({
           alwaysOpen={item.alwaysOpen}
           errorCount={item.errorCount}
           onToggle={item.onToggle}
+          data-active={item.active ? '' : undefined}
+          className={
+            item.active && !disabled && !readOnly
+              ? 'border-ring shadow-focus-ring'
+              : undefined
+          }
         >
           {item.children}
         </ListCard>
@@ -427,6 +463,8 @@ export interface ArrayDrillInViewProps
   invalidCount?: number;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   onDrillIn?: () => void;
 }
 
@@ -447,11 +485,14 @@ export function ArrayDrillInView({
   invalidCount,
   disabled,
   readOnly,
+  active,
   onDrillIn,
 }: ArrayDrillInViewProps) {
   return (
     <FieldWrapper errors={errors} help={help} helpId={helpId}>
       <DrillInCard
+        data-active={active ? '' : undefined}
+        className='data-active:border-ring data-active:shadow-focus-ring disabled:data-active:border-border disabled:data-active:shadow-none'
         label={typeof label === 'string' ? label : (name ?? '')}
         required={required}
         summary={countWords(count)}

@@ -43,6 +43,7 @@ import {
   createRpcClient,
 } from '../rpc/proxy';
 import {
+  FieldActiveContext,
   FieldAddressContext,
   FieldLockContext,
   FieldSchemaContext,
@@ -255,6 +256,35 @@ export function useActiveField(): ActiveField {
   return useMemo(() => ({ active, setActive }), [active, setActive]);
 }
 
+/** Lets a list point the page at one of its cards: `hover` outlines the card's block on the page. */
+export function useCardOutline(list: FieldAddress) {
+  const formId = useFormId();
+  return useMemo(
+    () => ({
+      hover: (address: FieldAddress | null) => {
+        const store = useFormStore.getState();
+        if (address !== null) {
+          store.setHovered(formId, address);
+          return;
+        }
+        const { hovered } = store;
+        if (
+          hovered?.formId === formId &&
+          hovered.address.startsWith(`${list}.`)
+        ) {
+          store.setHovered(formId, null);
+        }
+      },
+    }),
+    [formId, list]
+  );
+}
+
+/** True while this field is the one the form shows as active, whether or not it has DOM focus. */
+export function useFieldActive(): boolean {
+  return use(FieldActiveContext);
+}
+
 export function useFormCheck(): () => Promise<boolean> {
   const { formId, view } = useFormScope(
     'form-check-outside-provider',
@@ -344,7 +374,12 @@ export function useFieldFrame({
 }: FieldFrameOptions = {}): Pick<
   FieldWrapperProps,
   'label' | 'htmlFor' | 'labelId' | 'required' | 'errors' | 'help' | 'helpId'
-> & { warnings: string[]; disabled: boolean; readOnly: boolean } {
+> & {
+  warnings: string[];
+  disabled: boolean;
+  readOnly: boolean;
+  active: boolean;
+} {
   const address = useFieldAddress();
   const node = useFieldSchema();
   const { view } = useFormScope(
@@ -352,6 +387,7 @@ export function useFieldFrame({
     'useFieldFrame'
   );
   const lock = use(FieldLockContext);
+  const active = useFieldActive();
   const labelable =
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
   const { errors } = useFormState({ name: address });
@@ -377,6 +413,7 @@ export function useFieldFrame({
     helpId: node.description ? `${address}-help` : undefined,
     disabled: lock.disabled,
     readOnly: lock.readOnly,
+    active,
   };
 }
 

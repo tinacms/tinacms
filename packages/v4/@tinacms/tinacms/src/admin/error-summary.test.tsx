@@ -8,6 +8,7 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
+import { returnToTree } from '../test/collection-tree';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defineClientPlugin } from '../client';
@@ -27,7 +28,6 @@ import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 import { connectionOf } from '../test/connection';
-import { returnToTree } from '../test/collection-tree';
 
 // Each test drives the whole admin, so a loaded machine needs longer than the defaults.
 configure({ asyncUtilTimeout: 4000 });

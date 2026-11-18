@@ -169,7 +169,14 @@ export interface FormStore {
     formId: FormId,
     previous: FormStore['saves'][FormId]
   ) => void;
-  active: { formId: FormId; address: FieldAddress } | null;
+  /** `source: 'page'` marks an activation that came from a click on the preview. */
+  active: {
+    formId: FormId;
+    address: FieldAddress;
+    source?: 'page';
+  } | null;
+  /** The field under the pointer. Transient: never written to a draft. */
+  hovered: { formId: FormId; address: FieldAddress } | null;
   setUserId: (userId: DraftUserScope) => void;
   registerForm: (
     formId: FormId,
@@ -182,7 +189,12 @@ export interface FormStore {
     value: unknown
   ) => void;
   setFieldErrors: (formId: FormId, errors: FieldErrors) => void;
-  setActive: (formId: FormId, address: FieldAddress | null) => void;
+  setActive: (
+    formId: FormId,
+    address: FieldAddress | null,
+    options?: { source: 'page' }
+  ) => void;
+  setHovered: (formId: FormId, address: FieldAddress | null) => void;
   markSaved: (formId: FormId, savedValues?: FormValues) => void;
   discardEdits: (formId: FormId) => void;
   /** Puts the waiting copies in the form. Returns the form's new values. */
@@ -365,6 +377,7 @@ const DEVTOOLS_ACTION = {
   setFieldValue: 'form/setFieldValue',
   setFieldErrors: 'form/setFieldErrors',
   setActive: 'form/setActive',
+  setHovered: 'form/setHovered',
   markSaved: 'form/markSaved',
   discardEdits: 'form/discardEdits',
   resumeWaiting: 'form/resumeWaiting',
@@ -403,6 +416,7 @@ export const useFormStore = create<FormStore>()(
         swapFailures: {},
         hidden: {},
         active: null,
+        hovered: null,
         collections: {},
         revealOnOpen: {},
         savePending: {},
@@ -566,6 +580,7 @@ export const useFormStore = create<FormStore>()(
               swapFailures: {},
               hidden: {},
               active: null,
+              hovered: null,
               collections: {},
               revealOnOpen: {},
               savePending: {},
@@ -614,6 +629,7 @@ export const useFormStore = create<FormStore>()(
               swapFailures: {},
               hidden: {},
               active: null,
+              hovered: null,
               collections: {},
               revealOnOpen: {},
               savePending: {},
@@ -711,11 +727,24 @@ export const useFormStore = create<FormStore>()(
             };
           }, DEVTOOLS_ACTION.setFieldErrors),
 
-        setActive: (formId, address) =>
+        setActive: (formId, address, options) =>
           apply(
-            () => ({ active: address == null ? null : { formId, address } }),
+            () => ({
+              active: address == null ? null : { formId, address, ...options },
+            }),
             DEVTOOLS_ACTION.setActive
           ),
+
+        setHovered: (formId, address) =>
+          apply((state) => {
+            const same =
+              address == null
+                ? state.hovered === null
+                : state.hovered?.formId === formId &&
+                  state.hovered.address === address;
+            if (same) return state;
+            return { hovered: address == null ? null : { formId, address } };
+          }, DEVTOOLS_ACTION.setHovered),
 
         markSaved: (formId, savedValues) =>
           apply((state) => {
@@ -933,6 +962,7 @@ export const useFormStore = create<FormStore>()(
             return {
               forms: rest,
               active: state.active?.formId === formId ? null : state.active,
+              hovered: state.hovered?.formId === formId ? null : state.hovered,
             };
           }, DEVTOOLS_ACTION.removeForm),
       };
