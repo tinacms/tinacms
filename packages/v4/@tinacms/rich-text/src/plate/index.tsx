@@ -26,13 +26,17 @@ export interface RichEditorProps {
   /** Stops edits and all pointer and keyboard input, toolbar included. */
   disabled?: boolean;
   placeholder?: string;
-  /** `framed` stops growing at a fixed height and scrolls; `body` has a minimum height and grows. */
+  /**
+   * `framed` stops growing at 240px and scrolls its text. `body` grows from 224px with its text up
+   * to `min(70vh, 640px)`, then scrolls its text; its toolbar stays above the text and sticks under
+   * the top of the form's scroll area.
+   */
   layout?: 'framed' | 'body';
 }
 
 const layoutClass = {
   framed: 'max-h-60',
-  body: 'min-h-56',
+  body: 'min-h-56 max-h-[min(70vh,640px)]',
 } as const;
 
 export const RichEditor = ({
@@ -87,14 +91,14 @@ export const RichEditor = ({
         }}
       >
         <EditorContainer>
-          <TooltipProvider delayDuration={500}>
+          <TooltipProvider>
             <ToolbarProvider
               templates={field.templates ?? []}
               overrides={field?.overrides}
             >
               {readOnly ? null : (
-                <FixedToolbar>
-                  <FixedToolbarButtons />
+                <FixedToolbar layout={layout}>
+                  <FixedToolbarButtons disabled={disabled} />
                 </FixedToolbar>
               )}
               <Editor

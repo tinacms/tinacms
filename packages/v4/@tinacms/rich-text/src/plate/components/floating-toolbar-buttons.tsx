@@ -1,10 +1,6 @@
 import React from 'react';
-import { TurnIntoDropdownMenu } from './plate-ui/turn-into-dropdown-menu';
+import { TextStyleMenu } from './text-style-menu';
 
 export default function FloatingToolbarButtons() {
-  return (
-    <div className='rounded-sm'>
-      <TurnIntoDropdownMenu />
-    </div>
-  );
+  return <TextStyleMenu />;
 }

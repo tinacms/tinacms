@@ -392,6 +392,85 @@
             "name": "hero",
             "label": "Hero image",
             "type": "image"
+          },
+          {
+            "name": "summary",
+            "label": "Summary",
+            "type": "rich-text"
+          },
+          {
+            "name": "section",
+            "label": "Section",
+            "fields": [
+              {
+                "name": "inner",
+                "label": "Inner",
+                "fields": [
+                  {
+                    "name": "notes",
+                    "label": "Notes",
+                    "overrides": {
+                      "toolbar": [
+                        "heading",
+                        "bold",
+                        "italic",
+                        "link",
+                        "textColor"
+                      ],
+                      "headingLevels": [
+                        "h2"
+                      ],
+                      "textColors": [
+                        {
+                          "label": "Brand",
+                          "value": "#123456"
+                        }
+                      ],
+                      "showFloatingToolbar": false
+                    },
+                    "type": "rich-text"
+                  }
+                ],
+                "type": "object"
+              }
+            ],
+            "type": "object"
+          },
+          {
+            "name": "items",
+            "label": "Items",
+            "fields": [
+              {
+                "name": "heading",
+                "label": "Heading",
+                "type": "string"
+              },
+              {
+                "name": "text",
+                "label": "Text",
+                "overrides": {
+                  "toolbar": [
+                    "heading",
+                    "bold",
+                    "italic",
+                    "link",
+                    "textColor"
+                  ],
+                  "headingLevels": [
+                    "h2"
+                  ],
+                  "textColors": [
+                    {
+                      "label": "Brand",
+                      "value": "#123456"
+                    }
+                  ],
+                  "showFloatingToolbar": false
+                },
+                "type": "rich-text"
+              }
+            ],
+            "type": "array"
           }
         ],
         "allowedActions": {
