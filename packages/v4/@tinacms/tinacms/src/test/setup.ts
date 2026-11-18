@@ -3,7 +3,7 @@ import { configure } from '@testing-library/dom';
 import { toast } from '@tinacms/ui/components/toast';
 import { afterEach, beforeEach } from 'vitest';
 import { resolveClientSegments } from '../core/plugin';
-import { useFormStore } from '../form/form-store';
+import { IDLE_SAVE_ALL, useFormStore } from '../form/form-store';
 import { corePlugins } from '../plugins/fields';
 
 // TinaProvider renders null until its boot resolves each plugin's client() thunk —
@@ -43,6 +43,10 @@ beforeEach(() => {
     swapFailures: {},
     hidden: {},
     active: null,
+    collections: {},
+    revealOnOpen: {},
+    savePending: {},
+    saveAll: IDLE_SAVE_ALL,
   });
   localStorage.clear();
   toast.dismiss();

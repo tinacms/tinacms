@@ -207,3 +207,106 @@ for (const width of [320, 375, 414]) {
     });
   }
 }
+
+for (const width of [320, 375, 390, 414, 480, 520, 639, 640]) {
+  test(`Save All and its result list stay on screen at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 700 });
+    await page.goto(
+      '/branches.html?docs=1#/collections/post/content%2Fposts%2Fpost-01.mdx'
+    );
+    const title = page.getByRole('textbox', { name: /^Title/ });
+    await title.fill('');
+    const bar = page.getByRole('banner', { name: 'Top bar' });
+    const saveAll = bar.getByRole('button', { name: 'Save all' });
+    await expect(saveAll).toBeEnabled();
+    await saveAll.click();
+    await expect(
+      bar.getByRole('button', { name: /^Save all, 1 failed/ })
+    ).toBeVisible();
+    await bar.getByRole('button', { name: 'Save results' }).click();
+    const results = page.getByRole('dialog', { name: 'Save results' });
+    await expect(results).toBeVisible();
+    const [barBox, buttonBox, searchBox, resultsBox, overflow] =
+      await Promise.all([
+        bar.boundingBox(),
+        bar.getByRole('button', { name: /^Save all/ }).boundingBox(),
+        bar.getByRole('button', { name: 'Search' }).boundingBox(),
+        results.boundingBox(),
+        page.evaluate(
+          () =>
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth
+        ),
+      ]);
+    expect(overflow).toBeLessThanOrEqual(0);
+    const branch = bar.getByRole('button', { name: /^Branch:/ });
+    const label = branch.locator('span.font-mono');
+    const labelBox = await label.boundingBox();
+    const full = await label.evaluate((node) => node.scrollWidth);
+    expect(labelBox?.width).toBeGreaterThanOrEqual(Math.min(32, full) - 1);
+    const text = await bar
+      .getByRole('button', { name: /^Save all/ })
+      .innerText();
+    if (width < 640) expect(text.trim()).toBe('');
+    else expect(text).toMatch(/Save all\s*1 failed/);
+    expect((buttonBox?.x ?? 0) + (buttonBox?.width ?? 0)).toBeLessThanOrEqual(
+      (barBox?.x ?? 0) + (barBox?.width ?? 0)
+    );
+    expect(searchBox?.x ?? 0).toBeGreaterThanOrEqual(barBox?.x ?? 0);
+    expect(resultsBox?.x ?? -1).toBeGreaterThanOrEqual(0);
+    expect((resultsBox?.x ?? 0) + (resultsBox?.width ?? 0)).toBeLessThanOrEqual(
+      width
+    );
+    expect(
+      (resultsBox?.y ?? 0) + (resultsBox?.height ?? 0)
+    ).toBeLessThanOrEqual(700);
+  });
+}
+
+test.describe('Save All on a protected branch, by touch', () => {
+  test.use({ viewport: { width: 320, height: 700 }, hasTouch: true });
+
+  test('a tap shows why Save All is off and moves nothing in the top bar', async ({
+    page,
+  }) => {
+    await page.goto(
+      '/branches.html?docs=1&protected=1#/collections/post/content%2Fposts%2Fpost-01.mdx'
+    );
+    await page.getByRole('textbox', { name: /^Title/ }).fill('Changed');
+    const bar = page.getByRole('banner', { name: 'Top bar' });
+    const wrapper = bar.getByRole('group', { name: 'Save all, unavailable' });
+    const branchLabel = bar
+      .getByRole('button', { name: /^Branch:/ })
+      .locator('span.font-mono');
+    const search = bar.getByRole('button', { name: 'Search' });
+    const before = await Promise.all([
+      branchLabel.boundingBox(),
+      search.boundingBox(),
+    ]);
+    const message = page.getByRole('dialog', { name: 'Save all, unavailable' });
+    await expect(message).toBeHidden();
+    await wrapper.tap();
+    await expect(message).toBeVisible();
+    await page.waitForTimeout(600);
+    await expect(message).toBeVisible();
+    await expect(message).toHaveText(
+      'Save each document to a new branch from its form'
+    );
+    const [labelAfter, searchAfter, overflow] = await Promise.all([
+      branchLabel.boundingBox(),
+      search.boundingBox(),
+      page.evaluate(
+        () =>
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth
+      ),
+    ]);
+    expect(overflow).toBeLessThanOrEqual(0);
+    expect(labelAfter?.width).toBe(before[0]?.width);
+    expect(searchAfter?.x).toBe(before[1]?.x);
+    await wrapper.tap();
+    await expect(message).toBeHidden();
+  });
+});
