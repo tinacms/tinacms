@@ -43,9 +43,11 @@ const at = (path: number[]): TRange => ({
 
 const widths = new Map<Element, number>();
 
+const observed: Array<{ target: Element; fire: () => void }> = [];
+
 class FakeResizeObserver {
   constructor(private callback: ResizeObserverCallback) {}
-  observe(target: Element) {
+  private notify(target: Element) {
     this.callback(
       [
         {
@@ -55,6 +57,10 @@ class FakeResizeObserver {
       ],
       this as unknown as ResizeObserver
     );
+  }
+  observe(target: Element) {
+    observed.push({ target, fire: () => this.notify(target) });
+    this.notify(target);
   }
   unobserve() {}
   disconnect() {}
@@ -66,6 +72,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   widths.clear();
+  observed.length = 0;
 });
 
 let lastEditor: ReturnType<typeof usePlateEditor> | undefined;
@@ -740,5 +747,89 @@ describe('Cmd/Ctrl+K', () => {
 
     await user.keyboard('{Control>}k{/Control}');
     expect(linkBox()).toBeNull();
+  });
+});
+
+const resizeTo = (width: number) => {
+  act(() => {
+    for (const { target, fire } of observed) {
+      widths.set(target, width);
+      fire();
+    }
+  });
+};
+
+describe('the quiet More tools panel after Cmd/Ctrl+K', () => {
+  const folded = () => (
+    <Harness
+      overrides={{ toolbar: ['bold', 'italic', 'link', 'ul', 'table'] }}
+      selection={{
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 5 },
+      }}
+    />
+  );
+
+  it('closes after Escape, and the next More tools click opens a visible panel', async () => {
+    const user = userEvent.setup();
+    narrow(192);
+    render(folded());
+    focusText();
+
+    await user.keyboard('{Control>}k{/Control}');
+    await screen.findByRole('textbox', { name: 'Link' });
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(linkBox()).toBeNull());
+    expect(screen.queryByRole('dialog', { name: 'More tools' })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'More tools...' }));
+    expect(
+      await screen.findByRole('dialog', { name: 'More tools' })
+    ).toBeVisible();
+  });
+
+  it('is reset when Link stops being folded, so More tools does not come back open', async () => {
+    const user = userEvent.setup();
+    narrow(192);
+    render(folded());
+    focusText();
+
+    await user.keyboard('{Control>}k{/Control}');
+    await screen.findByRole('textbox', { name: 'Link' });
+    resizeTo(1200);
+    await waitFor(() => expect(names()).toContain('Link'));
+    expect(document.querySelector('[data-quiet]')).toBeNull();
+
+    resizeTo(192);
+    await waitFor(() => expect(names()).toContain('More tools...'));
+    expect(
+      screen.getByRole('button', { name: 'More tools...' })
+    ).toHaveAttribute('aria-expanded', 'false');
+    expect(document.querySelector('[data-quiet]')).toBeNull();
+  });
+});
+
+describe('Text style on an indent-list paragraph', () => {
+  it('turns it into a heading and drops its bullet', async () => {
+    const user = userEvent.setup();
+    const bulleted: Value = [
+      {
+        type: 'p',
+        indent: 1,
+        listStyleType: 'disc',
+        children: [{ text: 'item' }],
+      },
+    ];
+    render(<Harness value={bulleted} selection={at([0, 0])} />);
+
+    await user.click(
+      within(toolbar()).getByRole('button', { name: /^Text style/ })
+    );
+    await user.click(
+      await screen.findByRole('menuitemradio', { name: 'Heading 2' })
+    );
+
+    expect(lastEditor?.children[0]).toMatchObject({ type: 'h2' });
+    expect(JSON.stringify(lastEditor?.children)).not.toContain('listStyleType');
   });
 });

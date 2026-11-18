@@ -204,6 +204,16 @@ const stuckToolbarOverlap = (editor: PlateEditor) => {
   return Math.max(0, shell.getBoundingClientRect().bottom - top);
 };
 
+/** The room the lifted phone toolbar and the keyboard take at the bottom of the window. */
+const liftedToolbarInset = (editor: PlateEditor) => {
+  const shell = editor.api
+    .toDOMNode(editor)
+    ?.closest('[data-slot="field-wrapper"]')
+    ?.querySelector<HTMLElement>('[data-slot="toolbar-shell"][data-lifted]');
+  if (!shell) return 0;
+  return Math.max(0, window.innerHeight - shell.getBoundingClientRect().top);
+};
+
 function useLinkEntry() {
   return useEditorSelector(
     (editor) =>
@@ -256,8 +266,18 @@ export function LinkFloatingToolbar() {
     placement: 'bottom-start',
     middleware: [
       offset(8),
-      flip({ fallbackPlacements: ['top-start', 'bottom-end', 'top-end'] }),
-      shift({ padding: 8 }),
+      flip(() => ({
+        fallbackPlacements: ['top-start', 'bottom-end', 'top-end'],
+        padding: { bottom: liftedToolbarInset(editor) },
+      })),
+      shift(() => ({
+        padding: {
+          top: 8,
+          right: 8,
+          left: 8,
+          bottom: 8 + liftedToolbarInset(editor),
+        },
+      })),
       hide(() => ({ padding: { top: stuckToolbarOverlap(editor) } })),
     ],
   });

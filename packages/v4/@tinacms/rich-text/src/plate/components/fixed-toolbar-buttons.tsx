@@ -95,6 +95,19 @@ const InLineButton = ({
   }
 };
 
+const ResetWhenUnfolded = ({
+  folded,
+  onReset,
+}: {
+  folded: boolean;
+  onReset: () => void;
+}) => {
+  React.useEffect(() => {
+    if (!folded) onReset();
+  }, [folded, onReset]);
+  return null;
+};
+
 export default function FixedToolbarButtons({
   disabled = false,
 }: {
@@ -115,6 +128,10 @@ export default function FixedToolbarButtons({
     setMoreOpenState(open);
     if (!open) setMoreQuiet(false);
   }, []);
+  const resetLinkShortcut = React.useCallback(() => {
+    linkShortcut.pending.current = false;
+    if (moreQuiet) setMoreOpen(false);
+  }, [linkShortcut, moreQuiet, setMoreOpen]);
 
   const layout = React.useMemo(
     () => resolveToolbarLayout(overrides?.toolbar, templates.length),
@@ -185,6 +202,10 @@ export default function FixedToolbarButtons({
 
   return (
     <LinkShortcutContext.Provider value={linkShortcut}>
+      <ResetWhenUnfolded
+        folded={folded.includes('link')}
+        onReset={resetLinkShortcut}
+      />
       <Toolbar
         ref={ref}
         aria-label='Formatting'

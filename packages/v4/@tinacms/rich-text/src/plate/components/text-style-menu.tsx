@@ -31,8 +31,7 @@ const MAX_UNWRAPS = 20;
 const hasListInSelection = (editor: PlateEditor) =>
   editor.api.some({
     match: (node) =>
-      ElementApi.isElement(node) &&
-      (LIST_TYPES.includes(node.type) || 'listStyleType' in node),
+      ElementApi.isElement(node) && LIST_TYPES.includes(node.type),
   });
 
 /** One unwrapList only lifts one list level; a selection that spans nested lists needs several. */
@@ -40,6 +39,9 @@ const unwrapListsInSelection = (editor: PlateEditor) => {
   for (let pass = 0; pass < MAX_UNWRAPS && hasListInSelection(editor); pass++) {
     unwrapList(editor);
   }
+  editor.tf.unsetNodes(['listStyleType', 'indent'], {
+    match: (node) => ElementApi.isElement(node) && 'listStyleType' in node,
+  });
 };
 
 const headingTextClass: Record<string, string> = {

@@ -799,22 +799,76 @@ test.describe('the link bar with the phone keyboard', () => {
     });
   }
 
-  test('after the keyboard closes with the toolbar stuck, hides the bar only while its link is under the toolbar', async ({
+  test('never covers the lifted toolbar, even with the link just above it', async ({
     page,
   }) => {
-    await openDocument(page, LONG_POST);
+    await openDocument(page, 'looks.mdx');
     const body = page.getByRole('textbox', { name: /^Body/ });
-    const link = body.getByText('Tina docs');
+    const link = body.getByText('link to the').first();
     await link.scrollIntoViewIfNeeded();
     await link.tap();
-    await setKeyboardHeight(page, 500);
-    await setKeyboardHeight(page, 844);
     const shell = toolbarShell(page);
+    await setKeyboardHeight(page, 500);
+    await expect(shell).toHaveAttribute('data-lifted', '');
+    const lifted = await shell.boundingBox();
+    if (!lifted) throw new Error('toolbar not drawn');
+    await placeLinkAt(page, link, lifted.y - 28);
     const bar = page.getByRole('toolbar', { name: 'Link' });
-    await expect(shell).not.toHaveAttribute('data-lifted');
-
-    await placeLinkAt(page, link, 260);
-    await expect(shell).toHaveAttribute('data-stuck', '');
     await expect(bar).toBeVisible();
+
+    const [barBox, shellBox] = await Promise.all([
+      bar.boundingBox(),
+      shell.boundingBox(),
+    ]);
+    if (!barBox || !shellBox) throw new Error('not drawn');
+    const overlaps =
+      barBox.x < shellBox.x + shellBox.width &&
+      barBox.x + barBox.width > shellBox.x &&
+      barBox.y < shellBox.y + shellBox.height &&
+      barBox.y + barBox.height > shellBox.y;
+    expect(overlaps).toBe(false);
+  });
+
+  test.describe('on a short screen', () => {
+    test.use({ viewport: { width: 390, height: 410 } });
+
+    test('after the keyboard closes with the toolbar stuck, hides the bar only while its link is under the toolbar', async ({
+      page,
+    }) => {
+      await openDocument(page, LONG_POST);
+      const body = page.getByRole('textbox', { name: /^Body/ });
+      const link = body.getByText('Tina docs');
+      await link.scrollIntoViewIfNeeded();
+      await link.tap();
+      await setKeyboardHeight(page, 250);
+      await setKeyboardHeight(page, 410);
+      const shell = toolbarShell(page);
+      const bar = page.getByRole('toolbar', { name: 'Link' });
+      await expect(shell).not.toHaveAttribute('data-lifted');
+      await expect(shell).toHaveAttribute('data-stuck', '');
+
+      await formScroller(page).evaluate((el) => {
+        el.scrollTop = el.scrollHeight;
+      });
+      const below = async (offset: number) => {
+        for (let attempt = 0; attempt < 4; attempt++) {
+          const [s, l] = await Promise.all([
+            shell.boundingBox(),
+            link.boundingBox(),
+          ]);
+          if (!s || !l) throw new Error('not drawn');
+          const delta = l.y - (s.y + s.height + offset);
+          if (Math.abs(delta) < 2) return;
+          await body.evaluate((el, by) => {
+            el.scrollTop += by;
+          }, delta);
+          await page.waitForTimeout(100);
+        }
+      };
+      await below(-40);
+      await expect(bar).toBeHidden();
+      await below(24);
+      await expect(bar).toBeVisible();
+    });
   });
 });
