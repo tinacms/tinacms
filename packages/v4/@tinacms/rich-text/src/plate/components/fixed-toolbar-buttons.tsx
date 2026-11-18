@@ -109,7 +109,12 @@ export default function FixedToolbarButtons({
   const editor = useEditorRef();
   const readOnly = useEditorReadOnly();
   const linkShortcut = useLinkShortcutRegistry();
-  const [moreOpen, setMoreOpen] = React.useState(false);
+  const [moreOpen, setMoreOpenState] = React.useState(false);
+  const [moreQuiet, setMoreQuiet] = React.useState(false);
+  const setMoreOpen = React.useCallback((open: boolean) => {
+    setMoreOpenState(open);
+    if (!open) setMoreQuiet(false);
+  }, []);
 
   const layout = React.useMemo(
     () => resolveToolbarLayout(overrides?.toolbar, templates.length),
@@ -138,10 +143,11 @@ export default function FixedToolbarButtons({
         return;
       }
       linkShortcut.pending.current = true;
+      setMoreQuiet(true);
       setMoreOpen(true);
     },
     { enableOnContentEditable: true },
-    [editor, hasLink, disabled, readOnly, linkShortcut]
+    [editor, hasLink, disabled, readOnly, linkShortcut, setMoreOpen]
   );
 
   if (!hasAnyTool(layout)) return null;
@@ -201,6 +207,7 @@ export default function FixedToolbarButtons({
           <MoreToolsMenu
             disabled={off}
             open={moreOpen}
+            quiet={moreQuiet}
             onOpenChange={setMoreOpen}
           >
             {folded.map(render)}

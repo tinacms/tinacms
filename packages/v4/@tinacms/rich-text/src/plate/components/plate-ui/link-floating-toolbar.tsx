@@ -196,7 +196,9 @@ const stuckToolbarOverlap = (editor: PlateEditor) => {
   const shell = editor.api
     .toDOMNode(editor)
     ?.closest('[data-slot="field-wrapper"]')
-    ?.querySelector<HTMLElement>('[data-slot="toolbar-shell"][data-stuck]');
+    ?.querySelector<HTMLElement>(
+      '[data-slot="toolbar-shell"][data-stuck]:not([data-lifted])'
+    );
   if (!shell) return 0;
   const top = scrollParentOf(shell)?.getBoundingClientRect().top ?? 0;
   return Math.max(0, shell.getBoundingClientRect().bottom - top);
@@ -267,6 +269,13 @@ export function LinkFloatingToolbar() {
   React.useEffect(() => {
     if (visible) update?.();
   }, [visible, update, element]);
+
+  React.useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!visible || !viewport || !update) return;
+    viewport.addEventListener('resize', update);
+    return () => viewport.removeEventListener('resize', update);
+  }, [visible, update]);
 
   if (!visible || !element || !path) return null;
 

@@ -12,11 +12,14 @@ import { ToolbarButton } from './plate-ui/toolbar';
 export function MoreToolsMenu({
   children,
   disabled = false,
+  quiet = false,
   open,
   onOpenChange: setOpen,
 }: {
   children: React.ReactNode;
   disabled?: boolean;
+  /** Keeps the panel mounted but out of sight while a box opened from inside it is showing. */
+  quiet?: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -48,6 +51,8 @@ export function MoreToolsMenu({
           fallbackAxisSide: 'none',
         }}
         aria-label='More tools'
+        data-quiet={quiet ? '' : undefined}
+        style={quiet ? { visibility: 'hidden' } : undefined}
         className='w-64 max-w-(--available-width) gap-0 p-1'
       >
         <ToolRowContext.Provider value={row}>

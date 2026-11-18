@@ -72,6 +72,7 @@ export const TableCellElement = withRef<
       attributes={{
         ...attributes,
         'aria-selected': isSelected || undefined,
+        'data-header-look': headerLook || undefined,
         colSpan,
         rowSpan,
       }}

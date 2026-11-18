@@ -669,6 +669,10 @@ describe('Cmd/Ctrl+K', () => {
       await screen.findByRole('textbox', { name: 'Text to display' })
     ).toHaveValue('plain');
     expect(linkBox()).not.toBeNull();
+    expect(document.querySelector('[data-quiet]')).toHaveAttribute(
+      'aria-label',
+      'More tools'
+    );
   });
 
   it('does nothing in a code block, also after moving there once mounted', async () => {

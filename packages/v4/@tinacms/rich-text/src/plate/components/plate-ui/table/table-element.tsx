@@ -45,6 +45,7 @@ const TableBody = withRef<typeof PlateElement, { table: TTableElement }>(
           className={cn(className, 'min-w-0 flex-1 overflow-x-auto py-2')}
           style={{ paddingLeft: marginLeft }}
           {...props}
+          attributes={{ ...props.attributes, 'data-slot': 'table-scroll' }}
         >
           <div
             className={cn(

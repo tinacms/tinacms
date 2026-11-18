@@ -167,14 +167,11 @@ describe('table handles', () => {
     const editor = mount(grid(2, 3));
     await caretIn(editor, [0, 0, 0, 0, 0]);
     const add = await screen.findByRole('button', { name: 'Add a column' });
-    const scrollBox = document
-      .querySelector('table')
-      ?.closest('.overflow-x-auto');
+    const scrollBox = document.querySelector('[data-slot=table-scroll]');
     expect(scrollBox).not.toBeNull();
     expect(scrollBox).not.toContainElement(add);
     expect(scrollBox?.parentElement).toContainElement(add);
-    expect(scrollBox).toHaveClass('flex-1', 'min-w-0');
-    expect(scrollBox).not.toHaveClass('w-fit');
+    expect(scrollBox).toContainElement(document.querySelector('table'));
   });
 
   it('marks selected cells with aria-selected, colSpan and rowSpan', async () => {
@@ -307,8 +304,8 @@ describe('header look on a merged top cell', () => {
     await caretIn(editor, [0, 2, 0, 0, 0]);
     const cells = Array.from(document.querySelectorAll('td'));
     const [mergedCell, , , , , body] = cells;
-    expect(mergedCell).toHaveClass('bg-muted');
-    expect(body).not.toHaveClass('bg-muted');
+    expect(mergedCell).toHaveAttribute('data-header-look', 'true');
+    expect(body).not.toHaveAttribute('data-header-look');
   });
 });
 

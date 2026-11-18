@@ -619,6 +619,9 @@ test.describe('Ctrl+K with Link folded into More tools', () => {
       const address = page.getByRole('textbox', { name: 'Link' });
       await expect(address).toBeVisible();
       await expect(address).toBeFocused();
+      await expect(
+        page.getByRole('dialog', { name: 'More tools' })
+      ).toBeHidden();
       await address.fill('https://tina.io/shortcut');
       await address.press('Enter');
       await expect(
@@ -741,4 +744,77 @@ test('the Link tool shows its tooltip with the Ctrl K keycap, like the other in-
   await tool('Link').hover();
   await expect(tip).toContainText('Link');
   await expect(tip).toContainText(/Ctrl\s?K|⌘\s?K/);
+});
+
+test.describe('the link bar with the phone keyboard', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+  });
+
+  test.beforeEach(async ({ page }) => {
+    await fakeVisualViewport(page);
+    await page.reload();
+  });
+
+  const placeLinkAt = async (
+    page: import('@playwright/test').Page,
+    link: import('@playwright/test').Locator,
+    y: number
+  ) => {
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const box = await link.boundingBox();
+      if (!box) throw new Error('link not drawn');
+      const delta = box.y - y;
+      if (Math.abs(delta) < 2) return;
+      await formScroller(page).evaluate((el, by) => {
+        el.scrollTop += by;
+      }, delta);
+      await page.waitForTimeout(100);
+    }
+  };
+
+  for (const { doc, link: linkText, keyboard } of [
+    { doc: 'looks.mdx', link: 'link to the', keyboard: 500 },
+  ]) {
+    test(`shows the bar for a link above the keyboard in ${doc} with the toolbar lifted`, async ({
+      page,
+    }) => {
+      await openDocument(page, doc);
+      const body = page.getByRole('textbox', { name: /^Body/ });
+      const link = body.getByText(linkText).first();
+      await link.scrollIntoViewIfNeeded();
+      await link.tap();
+      const shell = toolbarShell(page);
+      await setKeyboardHeight(page, keyboard);
+      await expect(shell).toHaveAttribute('data-lifted', '');
+      await placeLinkAt(page, link, 250);
+      const [l, s] = await Promise.all([
+        link.boundingBox(),
+        shell.boundingBox(),
+      ]);
+      if (!l || !s) throw new Error('not drawn');
+      expect(l.y + l.height).toBeLessThan(s.y);
+      await expect(page.getByRole('toolbar', { name: 'Link' })).toBeVisible();
+    });
+  }
+
+  test('after the keyboard closes with the toolbar stuck, hides the bar only while its link is under the toolbar', async ({
+    page,
+  }) => {
+    await openDocument(page, LONG_POST);
+    const body = page.getByRole('textbox', { name: /^Body/ });
+    const link = body.getByText('Tina docs');
+    await link.scrollIntoViewIfNeeded();
+    await link.tap();
+    await setKeyboardHeight(page, 500);
+    await setKeyboardHeight(page, 844);
+    const shell = toolbarShell(page);
+    const bar = page.getByRole('toolbar', { name: 'Link' });
+    await expect(shell).not.toHaveAttribute('data-lifted');
+
+    await placeLinkAt(page, link, 260);
+    await expect(shell).toHaveAttribute('data-stuck', '');
+    await expect(bar).toBeVisible();
+  });
 });
