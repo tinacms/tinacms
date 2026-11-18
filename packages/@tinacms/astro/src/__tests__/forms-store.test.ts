@@ -3,7 +3,6 @@ import {
   type CollectedForm,
   formsStore,
   recordForm,
-  sortByPriority,
 } from '../internal/forms-store';
 
 function makeForm(overrides: Partial<CollectedForm> = {}): CollectedForm {
@@ -42,29 +41,5 @@ describe('recordForm', () => {
   it('is a no-op outside a request scope', () => {
     // Just don't throw — there's no store to read.
     expect(() => recordForm(makeForm())).not.toThrow();
-  });
-});
-
-describe('sortByPriority', () => {
-  it('moves primaries to the front while preserving relative order', () => {
-    const forms = [
-      makeForm({ id: 'a' }),
-      makeForm({ id: 'b', priority: 'primary' }),
-      makeForm({ id: 'c' }),
-      makeForm({ id: 'd', priority: 'primary' }),
-    ];
-    expect(sortByPriority(forms).map((f) => f.id)).toEqual([
-      'b',
-      'd',
-      'a',
-      'c',
-    ]);
-  });
-
-  it('returns a new array without mutating the input', () => {
-    const forms = [makeForm({ id: 'a' }), makeForm({ id: 'b' })];
-    const sorted = sortByPriority(forms);
-    expect(sorted).not.toBe(forms);
-    expect(forms.map((f) => f.id)).toEqual(['a', 'b']);
   });
 });

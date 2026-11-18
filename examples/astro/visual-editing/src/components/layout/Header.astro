@@ -7,11 +7,14 @@ import Container from './Container.astro';
 interface Props {
   data: NonNullable<GlobalQuery['global']>['header'] | null;
   pathname?: string;
+  /** Set while editing, so `Base.astro` can apply theme edits live. */
+  theme?: NonNullable<GlobalQuery['global']>['theme'];
 }
 
-const { data, pathname = '/' } = Astro.props;
+const { data, pathname = '/', theme } = Astro.props;
 const nav = (data?.nav ?? []).filter((item) => item !== null);
 ---
+{theme && <span hidden data-theme-sync data-color={theme.color} data-dark-mode={theme.darkMode} data-font={theme.font} />}
 <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30">
   <Container size="custom" class="py-4 flex items-center justify-between">
     <a href="/" class="font-extrabold text-xl text-theme-600 dark:text-theme-400" data-tina-field={data ? tinaField(data, 'name') : undefined}>

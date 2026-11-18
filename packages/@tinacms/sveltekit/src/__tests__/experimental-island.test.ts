@@ -5,6 +5,7 @@ import { render } from 'svelte/server';
 import { describe, expect, it } from 'vitest';
 import { requestWithMetadata } from '../data';
 import { experimental_createIslandHandler } from '../experimental/island';
+import TinaIsland from '../TinaIsland.svelte';
 import CalloutOverride from './fixtures/CalloutOverride.svelte';
 import TinaIslandFixture from './fixtures/TinaIslandFixture.svelte';
 
@@ -92,13 +93,14 @@ describe('experimental_createIslandHandler', () => {
     expect(response.status).toBe(404);
   });
 
-  it('rejects requests from another origin', async () => {
+  it('rejects cross-site requests', async () => {
     const handler = experimental_createIslandHandler({});
     const request = new Request('http://localhost/tina-island/post', {
       method: 'POST',
       headers: {
         'content-type': PREVIEW_CONTENT_TYPE,
         origin: 'https://other.example',
+        'sec-fetch-site': 'cross-site',
       },
       body: '{}',
     });
@@ -137,6 +139,47 @@ describe('experimental_createIslandHandler', () => {
     expect(response.status).toBe(413);
   });
 
+  it('answers a failing loader with a generic 500', async () => {
+    const handler = experimental_createIslandHandler({
+      post: {
+        component: CalloutOverride,
+        wrapper: { tag: 'article' },
+        fetch: () => Promise.reject(new Error('backend down')),
+        propsFromData: () => ({}),
+      },
+    });
+    const request = new Request('http://localhost/tina-island/post', {
+      method: 'POST',
+      headers: {
+        'content-type': PREVIEW_CONTENT_TYPE,
+        origin: 'http://localhost',
+      },
+      body: '{}',
+    });
+    const response = await handler(makeEvent(request));
+
+    expect(response.status).toBe(500);
+    expect(await response.text()).toBe('Island render failed');
+  });
+
+  it('throws on an invalid registry', () => {
+    const island = {
+      component: CalloutOverride,
+      fetch: async () => ({}),
+      propsFromData: () => ({}),
+    };
+    expect(() =>
+      experimental_createIslandHandler({
+        'not/a/segment': { ...island, wrapper: { tag: 'div' } },
+      })
+    ).toThrow(TypeError);
+    expect(() =>
+      experimental_createIslandHandler({
+        post: { ...island, wrapper: { tag: 'img' } },
+      })
+    ).toThrow(TypeError);
+  });
+
   it('renders the island wrapper with encoded parameters', () => {
     const { body } = render(TinaIslandFixture);
 
@@ -145,5 +188,17 @@ describe('experimental_createIslandHandler', () => {
     );
     expect(body).toContain('data-tina-island-primary');
     expect(body).toContain('<p>Island content</p>');
+  });
+
+  it('accepts any island name that fits one path segment', () => {
+    const wrapper = { tag: 'section' };
+    const { body } = render(TinaIsland, {
+      props: { name: 'post_body', wrapper },
+    });
+
+    expect(body).toContain('data-tina-island="/tina-island/post_body"');
+    expect(
+      () => render(TinaIsland, { props: { name: 'post/body', wrapper } }).body
+    ).toThrow(TypeError);
   });
 });

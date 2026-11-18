@@ -2,6 +2,7 @@ import { copyFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { bridgeBundlePath, serveBridge } from '@tinacms/bridge/dev-server';
 import type { AstroIntegration, AstroIntegrationLogger } from 'astro';
 import type { Plugin as VitePlugin } from 'vite';
 
@@ -15,9 +16,6 @@ export interface TinaIntegrationOptions {
    */
   cloudflareWorkers?: boolean;
 }
-
-/** Where the injected bridge bootstrap imports the bridge bundle from. */
-const BRIDGE_ROUTE = '/admin/bridge.js';
 
 const CLOUDFLARE_ADAPTER_NAME = '@astrojs/cloudflare';
 /** A valid absolute URL that stands in for `import.meta.url` in server bundles. */
@@ -103,10 +101,6 @@ export default function tina(
   };
 }
 
-function resolveBridge(): string {
-  return createRequire(import.meta.url).resolve('@tinacms/bridge');
-}
-
 /**
  * Major version of the consumer's installed `astro`, or `undefined` if it can't
  * be resolved. Used to scope the dev content-invalidation plugin to Astro 6+,
@@ -157,29 +151,13 @@ function readTinaCollectionRoots(root: string | undefined): string[] {
 }
 
 // Dev-only Vite plugin that answers `/admin/bridge.js` from the installed
-// bridge package. The bridge never varies per request, so a single readFile
-// per request is fine and nothing is persisted to disk.
+// bridge package, so nothing is persisted to disk.
 function bridgeDevPlugin(): VitePlugin {
   return {
     name: '@tinacms/astro:bridge-dev',
     apply: 'serve',
     configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        const path = (req.url || '').split('?')[0];
-        if (path !== BRIDGE_ROUTE) {
-          next();
-          return;
-        }
-        try {
-          const body = readFileSync(resolveBridge());
-          res.setHeader('Content-Type', 'text/javascript');
-          res.setHeader('Cache-Control', 'no-cache');
-          res.end(body);
-        } catch (error) {
-          res.statusCode = 500;
-          res.end(`/* @tinacms/astro: bridge unavailable: ${error} */`);
-        }
-      });
+      server.middlewares.use(serveBridge);
     },
   };
 }
@@ -314,7 +292,7 @@ function cloudflareImportMetaUrlPlugin(
 function emitBridgeAsset(adminDir: string, logger: AstroIntegrationLogger) {
   try {
     mkdirSync(adminDir, { recursive: true });
-    copyFileSync(resolveBridge(), join(adminDir, 'bridge.js'));
+    copyFileSync(bridgeBundlePath(), join(adminDir, 'bridge.js'));
   } catch (error) {
     logger.warn(
       `could not emit admin/bridge.js — visual editing will not load: ${error}`
