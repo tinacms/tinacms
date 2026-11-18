@@ -709,10 +709,10 @@ function AdminShell({
   }, []);
   const tier = useTier();
   useEffect(() => {
-    if (!showsPreviewRoute || isMediaRoute || tier === 'phone') {
+    if (!previewVisible || isMediaRoute || tier === 'phone') {
       setPreviewExpanded(false, false);
     }
-  }, [showsPreviewRoute, isMediaRoute, tier, setPreviewExpanded]);
+  }, [previewVisible, isMediaRoute, tier, setPreviewExpanded]);
   useEffect(() => {
     if (!previewExpanded) return;
     const onKeyDown = (event: KeyboardEvent) => {

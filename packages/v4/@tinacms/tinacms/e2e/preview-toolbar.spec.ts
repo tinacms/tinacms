@@ -406,6 +406,18 @@ test.describe('expand', () => {
     ).toBeVisible();
   });
 
+  test('going to Home beside the navigator collapses it', async ({ page }) => {
+    await page.goto(adminUrl(declared(HELLO), postHash(HELLO)));
+    await toolbar(page).getByRole('button', { name: 'Expand preview' }).click();
+    await expect(form(page)).toBeHidden();
+    await page.evaluate(() => {
+      window.location.hash = '#/collections';
+    });
+    await expect(
+      page.getByRole('navigation', { name: 'Content' })
+    ).toBeVisible();
+  });
+
   test('narrowing to phone width collapses it', async ({ page }) => {
     await page.goto(adminUrl(declared(HELLO), postHash(HELLO)));
     await toolbar(page).getByRole('button', { name: 'Expand preview' }).click();
