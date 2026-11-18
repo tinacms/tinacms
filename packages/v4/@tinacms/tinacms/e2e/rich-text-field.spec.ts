@@ -8,6 +8,7 @@ import {
   formScroller,
   setColumnWidth,
   setKeyboardHeight,
+  setVisibleAreaOffset,
   toolbar,
   toolbarShell,
 } from './form-column';
@@ -757,80 +758,182 @@ test.describe('the link bar with the phone keyboard', () => {
     await page.reload();
   });
 
+  type Box = { x: number; y: number; width: number; height: number };
+  const overlaps = (a: Box, b: Box) =>
+    a.x < b.x + b.width &&
+    a.x + a.width > b.x &&
+    a.y < b.y + b.height &&
+    a.y + a.height > b.y;
+  const measured = async (target: import('@playwright/test').Locator) => {
+    const box = await target.boundingBox();
+    if (!box) throw new Error('not drawn');
+    return box;
+  };
+
+  /** Scrolls the link's scrollable ancestors (text box first, then the form) until its top is at `y`; throws when it can't get there. */
   const placeLinkAt = async (
-    page: import('@playwright/test').Page,
+    _page: import('@playwright/test').Page,
     link: import('@playwright/test').Locator,
     y: number
   ) => {
-    for (let attempt = 0; attempt < 4; attempt++) {
-      const box = await link.boundingBox();
-      if (!box) throw new Error('link not drawn');
-      const delta = box.y - y;
-      if (Math.abs(delta) < 2) return;
-      await formScroller(page).evaluate((el, by) => {
-        el.scrollTop += by;
-      }, delta);
-      await page.waitForTimeout(100);
+    const top = await link.evaluate((el, target) => {
+      for (let up = el.parentElement; up; up = up.parentElement) {
+        if (!/auto|scroll/.test(getComputedStyle(up).overflowY)) continue;
+        up.scrollTop += el.getBoundingClientRect().top - target;
+      }
+      return el.getBoundingClientRect().top;
+    }, y);
+    await link.page().waitForTimeout(150);
+    const box = await measured(link);
+    if (Math.abs(box.y - y) >= 2) {
+      throw new Error(
+        `could not place the link at ${y}, it is at ${box.y} (was ${top})`
+      );
     }
   };
 
-  for (const { doc, link: linkText, keyboard } of [
-    { doc: 'looks.mdx', link: 'link to the', keyboard: 500 },
-  ]) {
-    test(`shows the bar for a link above the keyboard in ${doc} with the toolbar lifted`, async ({
-      page,
-    }) => {
-      await openDocument(page, doc);
-      const body = page.getByRole('textbox', { name: /^Body/ });
-      const link = body.getByText(linkText).first();
-      await link.scrollIntoViewIfNeeded();
-      await link.tap();
-      const shell = toolbarShell(page);
-      await setKeyboardHeight(page, keyboard);
-      await expect(shell).toHaveAttribute('data-lifted', '');
-      await placeLinkAt(page, link, 250);
-      const [l, s] = await Promise.all([
-        link.boundingBox(),
-        shell.boundingBox(),
-      ]);
-      if (!l || !s) throw new Error('not drawn');
-      expect(l.y + l.height).toBeLessThan(s.y);
-      await expect(page.getByRole('toolbar', { name: 'Link' })).toBeVisible();
-    });
-  }
-
-  test('never covers the lifted toolbar, even with the link just above it', async ({
-    page,
-  }) => {
-    await openDocument(page, 'looks.mdx');
+  const liftedSetup = async (
+    page: import('@playwright/test').Page,
+    keyboard: number
+  ) => {
+    await openDocument(page, LONG_POST);
     const body = page.getByRole('textbox', { name: /^Body/ });
-    const link = body.getByText('link to the').first();
+    const link = body.getByText('Tina docs');
     await link.scrollIntoViewIfNeeded();
     await link.tap();
     const shell = toolbarShell(page);
-    await setKeyboardHeight(page, 500);
+    await setKeyboardHeight(page, keyboard);
     await expect(shell).toHaveAttribute('data-lifted', '');
-    const lifted = await shell.boundingBox();
-    if (!lifted) throw new Error('toolbar not drawn');
-    await placeLinkAt(page, link, lifted.y - 28);
-    const bar = page.getByRole('toolbar', { name: 'Link' });
-    await expect(bar).toBeVisible();
+    return {
+      link,
+      shell,
+      bar: page.getByRole('toolbar', { name: 'Link' }),
+      header: page.getByRole('textbox', { name: /^Title/ }),
+    };
+  };
 
-    const [barBox, shellBox] = await Promise.all([
-      bar.boundingBox(),
-      shell.boundingBox(),
-    ]);
-    if (!barBox || !shellBox) throw new Error('not drawn');
-    const overlaps =
-      barBox.x < shellBox.x + shellBox.width &&
-      barBox.x + barBox.width > shellBox.x &&
-      barBox.y < shellBox.y + shellBox.height &&
-      barBox.y + barBox.height > shellBox.y;
-    expect(overlaps).toBe(false);
+  const sizes = [
+    { width: 390, height: 844, keyboard: 500 },
+    { width: 360, height: 740, keyboard: 400 },
+  ];
+  for (const { width, height, keyboard } of sizes) {
+    test.describe(`at ${width}x${height} with the keyboard at ${keyboard}`, () => {
+      test.use({ viewport: { width, height } });
+
+      test('a link well above the toolbar: the bar sits below it and off the toolbar', async ({
+        page,
+      }) => {
+        const { link, shell, bar } = await liftedSetup(page, keyboard);
+        const lifted = await measured(shell);
+        await placeLinkAt(page, link, 150);
+        const l = await measured(link);
+        await expect(bar).toBeVisible();
+        const b = await measured(bar);
+        expect(b.y).toBeGreaterThanOrEqual(l.y + l.height);
+        expect(overlaps(b, lifted)).toBe(false);
+      });
+
+      test('a link just above the toolbar: the bar flips above it, off the toolbar', async ({
+        page,
+      }) => {
+        const { link, shell, bar } = await liftedSetup(page, keyboard);
+        const lifted = await measured(shell);
+        await placeLinkAt(page, link, lifted.y - 28 - 18);
+        const l = await measured(link);
+        expect(lifted.y - (l.y + l.height)).toBeGreaterThan(20);
+        expect(lifted.y - (l.y + l.height)).toBeLessThan(40);
+        await expect(bar).toBeVisible();
+        const b = await measured(bar);
+        expect(b.y + b.height).toBeLessThanOrEqual(l.y);
+        expect(overlaps(b, lifted)).toBe(false);
+      });
+
+      test('a link under the toolbar: the bar is hidden', async ({ page }) => {
+        const { link, shell, bar } = await liftedSetup(page, keyboard);
+        const lifted = await measured(shell);
+        await placeLinkAt(page, link, lifted.y + 12);
+        const l = await measured(link);
+        expect(l.y).toBeGreaterThan(lifted.y);
+        expect(l.y + l.height).toBeLessThan(lifted.y + lifted.height);
+        await expect(bar).toBeHidden();
+      });
+
+      test('a link under the keyboard: the bar is hidden', async ({ page }) => {
+        const { link, bar } = await liftedSetup(page, keyboard);
+        await placeLinkAt(page, link, keyboard + 20);
+        await expect(bar).toBeHidden();
+      });
+    });
+  }
+
+  test('a link partly above the toolbar keeps its bar, above the link and off the toolbar', async ({
+    page,
+  }) => {
+    const { link, shell, bar } = await liftedSetup(page, 500);
+    const lifted = await measured(shell);
+    await placeLinkAt(page, link, lifted.y - 6);
+    await expect(bar).toBeVisible();
+    const [l, b] = await Promise.all([measured(link), measured(bar)]);
+    expect(b.y + b.height).toBeLessThanOrEqual(l.y);
+    expect(overlaps(b, lifted)).toBe(false);
+  });
+
+  test('never covers the form header above the body', async ({ page }) => {
+    const { link, bar, header } = await liftedSetup(page, 500);
+    await placeLinkAt(page, link, 150);
+    await expect(bar).toBeVisible();
+    const [b, h] = await Promise.all([measured(bar), measured(header)]);
+    expect(overlaps(b, h)).toBe(false);
+  });
+
+  test('with the visible area scrolled 100px, a link above the toolbar still gets a bar off the toolbar', async ({
+    page,
+  }) => {
+    const { link, shell, bar } = await liftedSetup(page, 500);
+    await setVisibleAreaOffset(page, 100);
+    await expect
+      .poll(async () => (await measured(shell)).y)
+      .toBeGreaterThan(500);
+    const lifted = await measured(shell);
+    for (const above of [220, 46]) {
+      await placeLinkAt(page, link, lifted.y - above);
+      await expect(bar).toBeVisible();
+      const b = await measured(bar);
+      expect(overlaps(b, lifted)).toBe(false);
+    }
+    await placeLinkAt(page, link, lifted.y + 12);
+    await expect(bar).toBeHidden();
   });
 
   test.describe('on a short screen', () => {
     test.use({ viewport: { width: 390, height: 410 } });
+
+    test('a link placed under the future stuck toolbar has no bar the moment the keyboard closes, with no scroll', async ({
+      page,
+    }) => {
+      await openDocument(page, LONG_POST);
+      const body = page.getByRole('textbox', { name: /^Body/ });
+      const link = body.getByText('Tina docs');
+      await link.scrollIntoViewIfNeeded();
+      await link.tap();
+      await setKeyboardHeight(page, 250);
+      const shell = toolbarShell(page);
+      const bar = page.getByRole('toolbar', { name: 'Link' });
+      await expect(shell).toHaveAttribute('data-lifted', '');
+      const form = await measured(formScroller(page));
+      await placeLinkAt(page, link, form.y + 10);
+      await setKeyboardHeight(page, 410);
+      await expect(shell).not.toHaveAttribute('data-lifted');
+      await expect(shell).toHaveAttribute('data-stuck', '');
+      const [s, l] = await Promise.all([measured(shell), measured(link)]);
+      expect(overlaps(s, l)).toBe(true);
+      await expect(bar).toBeHidden();
+
+      await placeLinkAt(page, link, s.y + s.height + 24);
+      await expect(bar).toBeVisible();
+      const [l2, b] = await Promise.all([measured(link), measured(bar)]);
+      expect(b.y).toBeGreaterThanOrEqual(l2.y + l2.height);
+    });
 
     test('after the keyboard closes with the toolbar stuck, hides the bar only while its link is under the toolbar', async ({
       page,
@@ -870,5 +973,44 @@ test.describe('the link bar with the phone keyboard', () => {
       await below(24);
       await expect(bar).toBeVisible();
     });
+  });
+});
+
+test.describe('the link bar on a desktop screen', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('sits below its link, and hides while the link is under the stuck toolbar', async ({
+    page,
+  }) => {
+    await openDocument(page, LONG_POST);
+    const body = page.getByRole('textbox', { name: /^Body/ });
+    const link = body.getByText('Tina docs');
+    await link.scrollIntoViewIfNeeded();
+    await link.click();
+    const bar = page.getByRole('toolbar', { name: 'Link' });
+    const shell = toolbarShell(page);
+    await expect(bar).toBeVisible();
+    const [l, b] = await Promise.all([link.boundingBox(), bar.boundingBox()]);
+    if (!l || !b) throw new Error('not drawn');
+    expect(b.y).toBeGreaterThanOrEqual(l.y + l.height);
+
+    await formScroller(page).evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+    await expect(shell).toHaveAttribute('data-stuck', '');
+    const s = await shell.boundingBox();
+    if (!s) throw new Error('not drawn');
+    await link.evaluate((el, target) => {
+      for (let up = el.parentElement; up; up = up.parentElement) {
+        if (/auto|scroll/.test(getComputedStyle(up).overflowY)) {
+          up.scrollTop += el.getBoundingClientRect().top - target;
+        }
+      }
+    }, s.y + 4);
+    const under = await link.boundingBox();
+    if (!under || under.y > s.y + s.height) {
+      throw new Error('could not put the link under the toolbar');
+    }
+    await expect(bar).toBeHidden();
   });
 });

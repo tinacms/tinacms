@@ -37,6 +37,12 @@ export const fakeVisualViewport = (page: Page) =>
       scale: 1,
     });
     Object.defineProperty(window, 'visualViewport', { get: () => fake });
+    Object.defineProperty(window, '__setOffsetTop', {
+      value: (offsetTop: number) => {
+        fake.offsetTop = offsetTop;
+        fake.dispatchEvent(new Event('scroll'));
+      },
+    });
     Object.defineProperty(window, '__setKeyboard', {
       value: (height: number) => {
         fake.height = height;
@@ -44,6 +50,13 @@ export const fakeVisualViewport = (page: Page) =>
       },
     });
   });
+
+export const setVisibleAreaOffset = (page: Page, offsetTop: number) =>
+  page.evaluate((next) => {
+    const offset = Reflect.get(window, '__setOffsetTop');
+    if (typeof offset !== 'function') throw new Error('no fake keyboard');
+    offset(next);
+  }, offsetTop);
 
 export const setKeyboardHeight = (page: Page, height: number) =>
   page.evaluate((next) => {

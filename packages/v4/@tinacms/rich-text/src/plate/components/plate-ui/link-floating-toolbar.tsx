@@ -193,25 +193,47 @@ const scrollParentOf = (node: HTMLElement) => {
 
 /** How far the stuck body toolbar reaches into the form's scroll area; a link under it is out of view. */
 const stuckToolbarOverlap = (editor: PlateEditor) => {
-  const shell = editor.api
-    .toDOMNode(editor)
-    ?.closest('[data-slot="field-wrapper"]')
-    ?.querySelector<HTMLElement>(
-      '[data-slot="toolbar-shell"][data-stuck]:not([data-lifted])'
-    );
+  const shell = toolbarShellOf(editor, '[data-stuck]:not([data-lifted])');
   if (!shell) return 0;
   const top = scrollParentOf(shell)?.getBoundingClientRect().top ?? 0;
   return Math.max(0, shell.getBoundingClientRect().bottom - top);
 };
 
-/** The room the lifted phone toolbar and the keyboard take at the bottom of the window. */
-const liftedToolbarInset = (editor: PlateEditor) => {
-  const shell = editor.api
+const isWebKit = () =>
+  typeof CSS !== 'undefined' &&
+  CSS.supports?.('-webkit-backdrop-filter', 'none');
+
+const CLIPS = /auto|scroll|hidden|clip|overlay/;
+
+/**
+ * Bottom of what the link can be seen through: the visual viewport (never `innerHeight`, which a phone keyboard doesn't shrink) cut by each clipping ancestor.
+ * floating-ui offsets its viewport rect by `offsetTop` except on WebKit; this follows the same rule so the padding lines up with it.
+ */
+const visibleBottom = (node: HTMLElement) => {
+  const viewport = window.visualViewport;
+  let bottom = viewport
+    ? (isWebKit() ? 0 : viewport.offsetTop) + viewport.height
+    : window.innerHeight;
+  for (let up = node.parentElement; up; up = up.parentElement) {
+    if (CLIPS.test(getComputedStyle(up).overflowY)) {
+      bottom = Math.min(bottom, up.getBoundingClientRect().bottom);
+    }
+  }
+  return bottom;
+};
+
+const toolbarShellOf = (editor: PlateEditor, selector: string) =>
+  editor.api
     .toDOMNode(editor)
     ?.closest('[data-slot="field-wrapper"]')
-    ?.querySelector<HTMLElement>('[data-slot="toolbar-shell"][data-lifted]');
-  if (!shell) return 0;
-  return Math.max(0, window.innerHeight - shell.getBoundingClientRect().top);
+    ?.querySelector<HTMLElement>(`[data-slot="toolbar-shell"]${selector}`) ??
+  null;
+
+/** The room the lifted phone toolbar (and the keyboard under it) takes from the bottom of the open area. */
+const liftedToolbarInset = (editor: PlateEditor, link: HTMLElement | null) => {
+  const shell = toolbarShellOf(editor, '[data-lifted]');
+  if (!shell || !link) return 0;
+  return Math.max(0, visibleBottom(link) - shell.getBoundingClientRect().top);
 };
 
 function useLinkEntry() {
@@ -257,6 +279,17 @@ export function LinkFloatingToolbar() {
     if (!visible || editingState?.element !== element) setEditing(null);
   }, [visible, element, editingState]);
 
+  const elementRef = React.useRef(element);
+  elementRef.current = element;
+  const linkNode = () =>
+    elementRef.current
+      ? (editor.api.toDOMNode(elementRef.current) ?? null)
+      : null;
+  const openAreaPadding = () => ({
+    top: stuckToolbarOverlap(editor),
+    bottom: liftedToolbarInset(editor, linkNode()),
+  });
+
   const floating = useVirtualFloating({
     open: visible,
     getBoundingClientRect: () => {
@@ -268,17 +301,15 @@ export function LinkFloatingToolbar() {
       offset(8),
       flip(() => ({
         fallbackPlacements: ['top-start', 'bottom-end', 'top-end'],
-        padding: { bottom: liftedToolbarInset(editor) },
+        padding: openAreaPadding(),
       })),
-      shift(() => ({
-        padding: {
-          top: 8,
-          right: 8,
-          left: 8,
-          bottom: 8 + liftedToolbarInset(editor),
-        },
-      })),
-      hide(() => ({ padding: { top: stuckToolbarOverlap(editor) } })),
+      shift(() => {
+        const { top, bottom } = openAreaPadding();
+        return {
+          padding: { top: 8 + top, right: 8, left: 8, bottom: 8 + bottom },
+        };
+      }),
+      hide(() => ({ padding: openAreaPadding() })),
     ],
   });
   floating.virtualElementRef.current.contextElement = element
@@ -296,6 +327,17 @@ export function LinkFloatingToolbar() {
     viewport.addEventListener('resize', update);
     return () => viewport.removeEventListener('resize', update);
   }, [visible, update]);
+
+  React.useEffect(() => {
+    const shell = toolbarShellOf(editor, '');
+    if (!visible || !shell || !update) return;
+    const watch = new MutationObserver(() => update());
+    watch.observe(shell, {
+      attributes: true,
+      attributeFilter: ['data-lifted', 'data-stuck'],
+    });
+    return () => watch.disconnect();
+  }, [editor, visible, update]);
 
   if (!visible || !element || !path) return null;
 
