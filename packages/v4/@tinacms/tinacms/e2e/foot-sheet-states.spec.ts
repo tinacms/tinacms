@@ -716,7 +716,7 @@ test('a list card’s action menu at the right edge stays inside the screen', as
     .getByRole('button', { name: /Template number/ })
     .first()
     .click();
-  await page.getByRole('button', { name: 'Up to Plain blocks' }).click();
+  await page.getByRole('button', { name: 'Plain blocks', exact: true }).click();
   await page
     .getByRole('button', { name: /^Actions for/ })
     .first()

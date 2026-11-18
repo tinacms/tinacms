@@ -270,9 +270,9 @@ test.describe('a long usage list keeps the confirm usable on a small phone', () 
   ];
 
   // Stored drafts count as unsaved uses, so ten of them make a ten-document usage list.
-  const seedUsage = (page: Page) =>
-    page.addInitScript(() => {
-      for (let i = 0; i < 10; i++) {
+  const seedUsage = (page: Page, count = 10) =>
+    page.addInitScript((uses) => {
+      for (let i = 0; i < uses; i++) {
         const values = { title: `Used ${i}`, image: 'preview.svg' };
         localStorage.setItem(
           `tina-drafts:content/pages/used-with-a-long-file-name-${i}.mdx`,
@@ -283,7 +283,7 @@ test.describe('a long usage list keeps the confirm usable on a small phone', () 
           })
         );
       }
-    });
+    }, count);
 
   // Forty folders beside the file, so the Move list fills its own box and the sheet overflows.
   const manyFolders = (page: Page) =>
@@ -326,23 +326,64 @@ test.describe('a long usage list keeps the confirm usable on a small phone', () 
     return sheet;
   };
 
+  const openMedia = async (
+    page: Page,
+    size: { width: number; height: number },
+    action: 'Delete' | 'Move',
+    uses: number
+  ) => {
+    await page.setViewportSize(size);
+    await seedUsage(page, uses);
+    await manyFolders(page);
+    await page.goto(MEDIA);
+    const pane = page.getByRole('complementary', { name: 'Media' });
+    await pane.getByRole('button', { name: 'Select', exact: true }).click();
+    await pane.getByRole('checkbox', { name: 'preview.svg' }).click();
+    await pane
+      .getByRole('button', {
+        name: action === 'Delete' ? /^Delete/ : 'Move',
+        exact: action === 'Move',
+      })
+      .click();
+  };
+
+  // The sheet scrolls instead of squeezing the folder list, in landscape too.
+  for (const size of [
+    { width: 667, height: 375 },
+    { width: 568, height: 320 },
+    { width: 375, height: 667 },
+    { width: 320, height: 568 },
+  ]) {
+    for (const uses of [0, 3, 8]) {
+      test(`the move folder list is usable at ${size.width}x${size.height} with the file used in ${uses}`, async ({
+        page,
+      }) => {
+        await openMedia(page, size, 'Move', uses);
+        const sheet = page.locator(SHEET);
+        await expect(sheet).toBeVisible();
+        await settle(page);
+        await expect(
+          sheet.locator('[data-slot=alert-dialog-title]')
+        ).toBeVisible();
+        const list = sheet.getByRole('list', { name: 'Folders' });
+        await expect(list.getByRole('button').first()).toBeVisible();
+        expect((await box(list)).height).toBeGreaterThanOrEqual(80);
+        const folder = list.getByRole('button', { name: 'folder-0' });
+        await folder.scrollIntoViewIfNeeded();
+        await expect(folder).toBeInViewport();
+        await folder.click();
+        const moveHere = sheet.getByRole('button', { name: 'Move here' });
+        await expect(moveHere).toBeEnabled();
+        await moveHere.scrollIntoViewIfNeeded();
+        await moveHere.click({ trial: true });
+      });
+    }
+  }
+
   for (const size of SIZES) {
     const label = `${size.width}x${size.height}`;
-    const open = async (page: Page, action: 'Delete' | 'Move') => {
-      await page.setViewportSize(size);
-      await seedUsage(page);
-      await manyFolders(page);
-      await page.goto(MEDIA);
-      const pane = page.getByRole('complementary', { name: 'Media' });
-      await pane.getByRole('button', { name: 'Select', exact: true }).click();
-      await pane.getByRole('checkbox', { name: 'preview.svg' }).click();
-      await pane
-        .getByRole('button', {
-          name: action === 'Delete' ? /^Delete/ : 'Move',
-          exact: action === 'Move',
-        })
-        .click();
-    };
+    const open = (page: Page, action: 'Delete' | 'Move') =>
+      openMedia(page, size, action, 10);
 
     test(`the delete confirm at ${label}`, async ({ page }) => {
       await open(page, 'Delete');
