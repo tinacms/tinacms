@@ -188,7 +188,6 @@ function ObjectItems({
   const activation = useActivation();
   const { setActive } = useActiveField();
   const cardOutline = useCardOutline(toFieldAddress(address));
-  const [focusedCard, setFocusedCard] = useState<string | null>(null);
   const { control, getValues } = useFormContext();
   const {
     fields: items,
@@ -373,20 +372,8 @@ function ObjectItems({
     }
   }, [activation]);
 
-  const outlinedId =
-    focusedCard ?? (activation?.address === address ? returnedTo : null);
-  const outlinedIndex =
-    outlinedId === null
-      ? -1
-      : items.findIndex((item) => item.id === outlinedId);
-  useEffect(() => {
-    cardOutline.focus(
-      outlinedIndex < 0 ? null : toFieldAddress(`${address}.${outlinedIndex}`)
-    );
-  }, [cardOutline, address, outlinedIndex]);
   useEffect(
     () => () => {
-      cardOutline.focus(null);
       cardOutline.hover(null);
     },
     [cardOutline]
@@ -424,6 +411,7 @@ function ObjectItems({
     return {
       id: item.id,
       name: `Item ${index + 1}`,
+      address: itemAddress,
       kind: 'group',
       title,
       summary,
@@ -433,14 +421,8 @@ function ObjectItems({
       active: isActive(item.id, itemAddress),
       onHoverChange: (hovering) =>
         cardOutline.hover(hovering ? toFieldAddress(itemAddress) : null),
-      onFocusChange: (focused) => {
-        if (focused) {
-          setReturnedTo((held) => (held === item.id ? held : null));
-        }
-        setFocusedCard((held) =>
-          focused ? item.id : held === item.id ? null : held
-        );
-      },
+      onCardFocus: () =>
+        setReturnedTo((held) => (held === item.id ? held : null)),
       onToggle: () => {
         if (opens === 'next-level') {
           showItem(index);
@@ -712,6 +694,7 @@ function ScalarItems({
     const base = {
       id: keys.current[index] ?? itemAddress,
       name: `Item ${index + 1}`,
+      address: itemAddress,
     };
     const messages = ownFieldErrors(get(errors, itemAddress), itemAddress)[
       itemAddress

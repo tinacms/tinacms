@@ -34,6 +34,8 @@ export interface ArrayItemView {
   id: string;
   /** The item for screen readers, such as "Item 1". */
   name: string;
+  /** The item's field address, such as `blocks.1`. Follows a move. */
+  address?: string;
   kind: 'value' | 'group';
   /** Value boxes only. */
   value?: string;
@@ -61,8 +63,8 @@ export interface ArrayItemView {
   active?: boolean;
   /** The mouse or pen enters or leaves the card. */
   onHoverChange?: (hovering: boolean) => void;
-  /** Focus enters or leaves anywhere in the card. */
-  onFocusChange?: (focused: boolean) => void;
+  /** Focus enters the card itself, not a card nested in it. */
+  onCardFocus?: () => void;
   onBlur?: () => void;
   onFocus?: () => void;
   children?: ReactNode;
@@ -201,6 +203,7 @@ function Card({
     <div
       ref={setNodeRef}
       data-array-item=''
+      data-item-address={item.address}
       style={{ transform: CSS.Translate.toString(transform), transition }}
       onPointerOver={(event) => {
         if (event.pointerType === 'touch') return;
@@ -221,12 +224,7 @@ function Card({
       onFocus={(event) => {
         if (event.target.closest('[data-array-item]') !== event.currentTarget)
           return;
-        item.onFocusChange?.(true);
-      }}
-      onBlur={(event) => {
-        const next = event.relatedTarget;
-        if (next instanceof Node && event.currentTarget.contains(next)) return;
-        item.onFocusChange?.(false);
+        item.onCardFocus?.();
       }}
     >
       {item.kind === 'value' ? (

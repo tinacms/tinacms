@@ -186,13 +186,6 @@ describe.each([
 ])(
   'acting on cards after stepping back in $list',
   ({ address, back, root }) => {
-    const focusedCardAddress = () => {
-      const card = document.activeElement?.closest('[data-array-item]');
-      const cards = Array.from(document.querySelectorAll('[data-array-item]'));
-      const index = card ? cards.indexOf(card) : -1;
-      return index < 0 ? null : `${root}.${index}`;
-    };
-    const outlined = () => useFormStore.getState().focusedCard?.address;
     const grip = (container: HTMLElement, index: number) =>
       container.querySelectorAll<HTMLElement>('[data-grip]')[index];
 
@@ -217,8 +210,6 @@ describe.each([
         await waitFor(() => expect(active()).toEqual([0]));
         await act(2, action);
         await waitFor(() => expect(active()).toEqual([]));
-        await waitFor(() => expect(outlined()).toBe(focusedCardAddress()));
-        expect(outlined()).toBeDefined();
       }
     );
 
@@ -228,7 +219,6 @@ describe.each([
       grip(container, 1).focus();
       await user.keyboard('{ArrowUp}');
       await waitFor(() => expect(active()).toEqual([]));
-      await waitFor(() => expect(outlined()).toBe(`${root}.0`));
       const order = () =>
         Array.from(container.querySelectorAll('[data-array-item]')).map(
           (card) => card.textContent
@@ -238,7 +228,6 @@ describe.each([
       await user.keyboard(' {ArrowDown}{ArrowUp} ');
       expect(order()).toEqual(before);
       expect(active()).toEqual([]);
-      expect(outlined()).toBe(`${root}.0`);
     });
 
     it.each([
@@ -277,12 +266,11 @@ describe.each([
 );
 
 describe('focusing another card', () => {
-  it('clears the returned card active look and moves the outline to the focused card', async () => {
+  it('clears the returned card active look', async () => {
     const { active, container } = await cameBackTo('blocks.0', 'Home');
     await waitFor(() => expect(active()).toEqual([0]));
     container.querySelectorAll<HTMLElement>('[data-grip]')[1].focus();
     await waitFor(() => expect(active()).toEqual([]));
-    expect(useFormStore.getState().focusedCard?.address).toBe('blocks.1');
   });
 });
 
@@ -300,17 +288,6 @@ describe.each([
     root: 'wrap.inner.blocks',
   },
 ])('the page outline for cards in $list', ({ address, back, root }) => {
-  const outlined = () => useFormStore.getState().focusedCard?.address;
-
-  it('points at the returned card, and follows it on Move down', async () => {
-    const { active, act } = await cameBackTo(address, back);
-    await waitFor(() => expect(active()).toEqual([0]));
-    await waitFor(() => expect(outlined()).toBe(`${root}.0`));
-    expect(useFormStore.getState().active?.address).toBe(root);
-    await act(1, /^Move down/);
-    await waitFor(() => expect(outlined()).toBe(`${root}.1`));
-  });
-
   it('points hover at the card, not the list, and clears on leaving', async () => {
     const { user, container } = await cameBackTo(address, back);
     const card = container.querySelectorAll('[data-array-item]')[1];
@@ -334,20 +311,6 @@ describe.each([
         `${root}.`
       )
     );
-  });
-
-  it('points at a card whose grip takes focus, with no level opened, and lets go on blur', async () => {
-    const { user, container } = await cameBackTo(address, back);
-    const grips = container.querySelectorAll<HTMLElement>('[data-grip]');
-    await user.click(document.body);
-    grips[2].focus();
-    await waitFor(() => expect(outlined()).toBe(`${root}.2`));
-    expect(useFormStore.getState().active?.address).toBe(root);
-    expect(
-      screen.queryByRole('heading', { level: 2, name: 'Call to action' })
-    ).toBeNull();
-    grips[2].blur();
-    await waitFor(() => expect(outlined()).toBeUndefined());
   });
 });
 
@@ -420,40 +383,6 @@ describe('cards that open in place', () => {
     await user.hover(cards[cards.length - 1]);
     expect(useFormStore.getState().hovered?.address).toBe('rows.1');
   });
-
-  it("outlines the inner card, not the outer one, when focus lands on a nested list's grip", async () => {
-    const { user, container } = renderRows();
-    await toggleFirstRow(user, container);
-    await screen.findByLabelText('Title');
-    const inner = container.querySelector<HTMLElement>(
-      '[data-array-item] [data-array-item] [data-grip]'
-    );
-    if (!inner) throw new Error('no inner grip');
-    await act(async () => {
-      if (document.activeElement instanceof HTMLElement)
-        document.activeElement.blur();
-    });
-    await act(async () => inner.focus());
-    expect(useFormStore.getState().focusedCard).toMatchObject({
-      list: 'rows.0.inner',
-      address: 'rows.0.inner.0',
-    });
-  });
-
-  it('keeps the outer card outlined when its nested list mounts and unmounts', async () => {
-    const { user, container } = renderRows();
-    await screen.findAllByRole('button', { name: 'Actions for Item 1' });
-    container.querySelectorAll<HTMLElement>('[data-grip]')[0].focus();
-    await waitFor(() =>
-      expect(useFormStore.getState().focusedCard?.address).toBe('rows.0')
-    );
-    await toggleFirstRow(user, container);
-    await screen.findByLabelText('Title');
-    expect(useFormStore.getState().focusedCard?.address).toBe('rows.0');
-    await toggleFirstRow(user, container);
-    await waitFor(() => expect(screen.queryByLabelText('Title')).toBeNull());
-    expect(useFormStore.getState().focusedCard?.address).toBe('rows.0');
-  });
 });
 
 describe('focusing another card', () => {
@@ -462,6 +391,5 @@ describe('focusing another card', () => {
     await waitFor(() => expect(active()).toEqual([0]));
     screen.getByRole('button', { name: 'Actions for Item 2' }).focus();
     await waitFor(() => expect(active()).toEqual([]));
-    expect(useFormStore.getState().focusedCard?.address).toBe('blocks.1');
   });
 });

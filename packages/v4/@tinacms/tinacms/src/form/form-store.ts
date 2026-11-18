@@ -128,15 +128,6 @@ export interface FormStore {
   active: { formId: FormId; address: FieldAddress } | null;
   /** The field under the pointer. Transient: never written to a draft. */
   hovered: { formId: FormId; address: FieldAddress } | null;
-  /**
-   * The card of a list that has focus or was returned to. While the list's own address is active,
-   * the page outlines this card's block instead. Transient: never written to a draft.
-   */
-  focusedCard: {
-    formId: FormId;
-    list: FieldAddress;
-    address: FieldAddress;
-  } | null;
   setUserId: (userId: DraftUserScope) => void;
   registerForm: (
     formId: FormId,
@@ -151,10 +142,6 @@ export interface FormStore {
   setFieldErrors: (formId: FormId, errors: FieldErrors) => void;
   setActive: (formId: FormId, address: FieldAddress | null) => void;
   setHovered: (formId: FormId, address: FieldAddress | null) => void;
-  setFocusedCard: (
-    formId: FormId,
-    card: { list: FieldAddress; address: FieldAddress } | null
-  ) => void;
   markSaved: (formId: FormId, savedValues?: FormValues) => void;
   discardEdits: (formId: FormId) => void;
   /** Puts the waiting copies in the form. Returns the form's new values. */
@@ -324,7 +311,6 @@ const DEVTOOLS_ACTION = {
   setFieldErrors: 'form/setFieldErrors',
   setActive: 'form/setActive',
   setHovered: 'form/setHovered',
-  setFocusedCard: 'form/setFocusedCard',
   markSaved: 'form/markSaved',
   discardEdits: 'form/discardEdits',
   resumeWaiting: 'form/resumeWaiting',
@@ -360,7 +346,6 @@ export const useFormStore = create<FormStore>()(
         hidden: {},
         active: null,
         hovered: null,
-        focusedCard: null,
 
         discardStoredDraft: (formId) => {
           const { userId, branch } = readFormStore();
@@ -593,18 +578,6 @@ export const useFormStore = create<FormStore>()(
             return { hovered: address == null ? null : { formId, address } };
           }, DEVTOOLS_ACTION.setHovered),
 
-        setFocusedCard: (formId, card) =>
-          apply((state) => {
-            const same =
-              card === null
-                ? state.focusedCard === null
-                : state.focusedCard?.formId === formId &&
-                  state.focusedCard.list === card.list &&
-                  state.focusedCard.address === card.address;
-            if (same) return state;
-            return { focusedCard: card === null ? null : { formId, ...card } };
-          }, DEVTOOLS_ACTION.setFocusedCard),
-
         markSaved: (formId, savedValues) =>
           apply((state) => {
             const scope = state.forms[formId];
@@ -813,8 +786,6 @@ export const useFormStore = create<FormStore>()(
               forms: rest,
               active: state.active?.formId === formId ? null : state.active,
               hovered: state.hovered?.formId === formId ? null : state.hovered,
-              focusedCard:
-                state.focusedCard?.formId === formId ? null : state.focusedCard,
             };
           }, DEVTOOLS_ACTION.removeForm),
       };

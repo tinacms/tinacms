@@ -802,7 +802,10 @@ export function DocumentForm() {
       <ResumeDraftToast scope={scope} />
       <StorageWarning scope={scope} />
       <ActiveFieldLevels scope={scope} />
-      <div className='min-h-0 flex-1 overflow-y-auto'>
+      <div
+        className='min-h-0 flex-1 overflow-y-auto'
+        data-form-id={scope.formId}
+      >
         <FormFields scope={scope} />
       </div>
       <FormBar />

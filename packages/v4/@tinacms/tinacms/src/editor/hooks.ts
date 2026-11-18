@@ -248,10 +248,7 @@ export function useActiveField(): ActiveField {
   return useMemo(() => ({ active, setActive }), [active, setActive]);
 }
 
-/**
- * Lets a list point the page at one of its cards: `hover` outlines the card's block on the page,
- * and `focus` outlines it as the active block while the list's own address is active.
- */
+/** Lets a list point the page at one of its cards: `hover` outlines the card's block on the page. */
 export function useCardOutline(list: FieldAddress) {
   const formId = useFormId();
   return useMemo(
@@ -268,17 +265,6 @@ export function useCardOutline(list: FieldAddress) {
           hovered.address.startsWith(`${list}.`)
         ) {
           store.setHovered(formId, null);
-        }
-      },
-      focus: (address: FieldAddress | null) => {
-        const store = useFormStore.getState();
-        if (address !== null) {
-          store.setFocusedCard(formId, { list, address });
-          return;
-        }
-        const held = store.focusedCard;
-        if (held?.formId === formId && held.list === list) {
-          store.setFocusedCard(formId, null);
         }
       },
     }),

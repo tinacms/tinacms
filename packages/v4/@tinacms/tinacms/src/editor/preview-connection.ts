@@ -65,6 +65,8 @@ interface Persistent {
   frame: number | null;
   /** The latest render's outline sender, so a frame that fires after a re-render reads the new step. */
   sendOutline: (force: boolean) => void;
+  /** The last element that took focus inside a document form. A card's outline derives from it. */
+  lastFormFocus: Element | null;
   /** The page has said ready, so it can tell which document each value is for. */
   heard: boolean;
 }
@@ -280,14 +282,25 @@ function createHandlers(deps: Deps) {
     };
   };
 
+  // The card holding DOM focus, when it is a direct item of the active list in the active form.
+  const focusedCard = (
+    active: NonNullable<ReturnType<typeof useFormStore.getState>['active']>
+  ) => {
+    const focused = persistent.lastFormFocus;
+    if (!focused?.isConnected) return null;
+    const card = focused.closest('[data-array-item]');
+    const address = card?.getAttribute('data-item-address');
+    const formRoot = focused.closest('[data-form-id]');
+    if (!(address && formRoot?.getAttribute('data-form-id') === active.formId))
+      return null;
+    if (address.slice(0, address.lastIndexOf('.')) !== active.address)
+      return null;
+    return { formId: active.formId, address: toFieldAddress(address) };
+  };
+
   const outline = () => {
-    const { active, hovered, focusedCard } = useFormStore.getState();
-    const onCard =
-      active &&
-      focusedCard?.formId === active.formId &&
-      focusedCard.list === active.address
-        ? { formId: focusedCard.formId, address: focusedCard.address }
-        : active;
+    const { active, hovered } = useFormStore.getState();
+    const onCard = active ? (focusedCard(active) ?? active) : active;
     const activeMark = markFor(onCard);
     const hoveredMark = markFor(hovered);
     return outlineMessage(
@@ -425,6 +438,7 @@ function createHandlers(deps: Deps) {
       if (token !== persistent.click) return;
       options.onOpen?.(placement.target, placement.step);
     }
+    persistent.lastFormFocus = null;
     useFormStore
       .getState()
       .setActive(
@@ -433,6 +447,7 @@ function createHandlers(deps: Deps) {
         ),
         toFieldAddress(targetAddress)
       );
+    scheduleOutline();
   };
 
   return {
@@ -463,8 +478,15 @@ function createHandlers(deps: Deps) {
       if (shownFormChanged(state.forms, previous.forms)) publishAll();
       if (
         state.active !== previous.active ||
-        state.hovered !== previous.hovered ||
-        state.focusedCard !== previous.focusedCard
+        state.hovered !== previous.hovered
+      ) {
+        scheduleOutline();
+        return;
+      }
+      const activeForm = state.active?.formId;
+      if (
+        activeForm !== undefined &&
+        state.forms[activeForm]?.values !== previous.forms[activeForm]?.values
       ) {
         scheduleOutline();
       }
@@ -475,6 +497,16 @@ function createHandlers(deps: Deps) {
       publishAll();
       sendOutline(true);
     },
+    onFocusIn: (event: FocusEvent) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest('[data-form-id]')
+      ) {
+        persistent.lastFormFocus = event.target;
+      }
+      scheduleOutline();
+    },
+    onFocusOut: scheduleOutline,
     sendOutline,
     followOpen,
     publishAll,
@@ -515,6 +547,7 @@ export function usePreviewConnection(
     lastOutline: null,
     frame: null,
     heard: false,
+    lastFormFocus: null,
     sendOutline: () => {},
   };
   const persistent = held.current;
@@ -535,12 +568,18 @@ export function usePreviewConnection(
   useEffect(() => {
     const onMessage = (event: MessageEvent) =>
       handlers.current?.onMessage(event);
+    const onFocusIn = (event: FocusEvent) => handlers.current?.onFocusIn(event);
+    const onFocusOut = () => handlers.current?.onFocusOut();
     window.addEventListener('message', onMessage);
+    document.addEventListener('focusin', onFocusIn, true);
+    document.addEventListener('focusout', onFocusOut, true);
     const unsubscribe = useFormStore.subscribe((state, previous) =>
       handlers.current?.onStore(state, previous)
     );
     return () => {
       window.removeEventListener('message', onMessage);
+      document.removeEventListener('focusin', onFocusIn, true);
+      document.removeEventListener('focusout', onFocusOut, true);
       unsubscribe();
       persistent.follower.dispose();
       if (persistent.frame !== null) cancelAnimationFrame(persistent.frame);

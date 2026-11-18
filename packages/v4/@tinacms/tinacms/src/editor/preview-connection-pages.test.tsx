@@ -452,49 +452,6 @@ describe('outline', () => {
     });
   });
 
-  it('outlines the focused card instead of the list while the list is active, and the hovered card as hovered', async () => {
-    register(A);
-    const { page } = await setup({ open: POST_REF });
-    fromPage(readyMessage([{ path: A }], URL_A), page.window);
-    page.window.postMessage.mockClear();
-    act(() => {
-      const store = useFormStore.getState();
-      store.setActive(toFormId(A), toFieldAddress('title'));
-      store.setFocusedCard(toFormId(A), {
-        list: toFieldAddress('title'),
-        address: toFieldAddress('author'),
-      });
-      store.setHovered(toFormId(A), toFieldAddress('author'));
-    });
-    await waitFor(() => expect(outlines(page)).toHaveLength(1));
-    expect(outlines(page)[0]).toMatchObject({
-      active: { address: 'author', document: A, name: 'Author' },
-      hovered: { address: 'author', document: A },
-    });
-    act(() => useFormStore.getState().setFocusedCard(toFormId(A), null));
-  });
-
-  it('names a focused block card with its template title', async () => {
-    register(A);
-    const { page } = await setup({ open: POST_REF });
-    fromPage(readyMessage([{ path: A }], URL_A), page.window);
-    page.window.postMessage.mockClear();
-    act(() => {
-      const store = useFormStore.getState();
-      store.setActive(toFormId(A), toFieldAddress('blocks'));
-      store.setFocusedCard(toFormId(A), {
-        list: toFieldAddress('blocks'),
-        address: toFieldAddress('blocks.0'),
-      });
-    });
-    await waitFor(() => expect(outlines(page)).toHaveLength(1));
-    expect(outlines(page)[0].active).toMatchObject({
-      address: 'blocks.0',
-      name: 'Hero',
-    });
-    act(() => useFormStore.getState().setFocusedCard(toFormId(A), null));
-  });
-
   it('sends no document to an older page', async () => {
     register(A);
     const { page } = await setup({ open: POST_REF });
