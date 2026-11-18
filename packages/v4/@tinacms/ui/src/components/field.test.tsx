@@ -12,6 +12,33 @@ import { ListCard } from '@tinacms/ui/components/list-card';
 import type { ReactNode } from 'react';
 
 describe('FieldWrapper', () => {
+  it('renders data-active only while active, and never passes active to the DOM', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { rerender } = render(
+      <FieldWrapper label='Title' active>
+        <Input aria-label='Title' />
+      </FieldWrapper>
+    );
+    const wrapper = () =>
+      document.querySelector('[data-slot=field-wrapper]') as HTMLElement;
+    expect(wrapper()).toHaveAttribute('data-active');
+    expect(wrapper()).not.toHaveAttribute('active');
+    rerender(
+      <FieldWrapper label='Title' active={false}>
+        <Input aria-label='Title' />
+      </FieldWrapper>
+    );
+    expect(wrapper()).not.toHaveAttribute('data-active');
+    rerender(
+      <FieldWrapper label='Title'>
+        <Input aria-label='Title' />
+      </FieldWrapper>
+    );
+    expect(wrapper()).not.toHaveAttribute('data-active');
+    expect(error).not.toHaveBeenCalled();
+    error.mockRestore();
+  });
+
   it('names the control, marks it required for screen readers and points help at it', () => {
     render(
       <FieldWrapper

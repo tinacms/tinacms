@@ -28,15 +28,23 @@ import { toFormId, useFormStore } from '../form/form-store';
 import { readDraft, writeDraft } from '../form/drafts';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
-import { openCollectionTree } from '../test/collection-tree';
+import {
+  backToFolder,
+  openCollectionTree,
+  returnToTree,
+} from '../test/collection-tree';
 import { connectionOf } from '../test/connection';
 import { TinaAdmin } from './admin';
 
-// The shell also draws an upload status region, so pick the document's own.
+// The shell also draws upload and Save All status regions, so pick the document's own.
 const documentStatus = (): HTMLElement => {
   const status = screen
     .getAllByRole('status')
-    .find((element) => !element.hasAttribute('data-upload-status'));
+    .find(
+      (element) =>
+        !element.hasAttribute('data-upload-status') &&
+        !element.hasAttribute('data-save-all-status')
+    );
   if (!status) throw new Error('The document status is not on screen.');
   return status;
 };
@@ -157,10 +165,7 @@ describe('a document with no file yet', () => {
     await screen.findByLabelText(/^Title\b/);
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
-    await user.click(await screen.findByRole('button', { name: 'Restore' }));
+    await returnToTree(user);
     const after = await screen.findByRole('list', { name: 'Posts documents' });
     expect(
       await within(after).findByRole('button', { name: 'top-copy.mdx' })
@@ -266,9 +271,7 @@ describe('the collection views', () => {
     window.location.hash = `#/collections/post/${encodeURIComponent('content/posts/a/hello.mdx')}`;
     renderAdmin();
     await screen.findByLabelText(/^Title\b/);
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await backToFolder(user);
     await waitFor(() =>
       expect(window.location.hash).toBe('#/collections/post/folder/a')
     );
@@ -277,9 +280,7 @@ describe('the collection views', () => {
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
     await screen.findByDisplayValue('Top');
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await backToFolder(user);
     await waitFor(() =>
       expect(window.location.hash).toBe('#/collections/post?max')
     );
@@ -333,9 +334,7 @@ describe('the table after a save and after Duplicate', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(update).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await backToFolder(user);
     const row = (
       await screen.findByRole('button', { name: 'top.mdx' })
     ).closest('tr');

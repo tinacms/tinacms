@@ -13,5 +13,5 @@ test('a click on a marked element in the preview focuses its field in the form',
   await expect(markedTitle).toBeVisible();
   await markedTitle.click();
 
-  await expect(page.getByRole('textbox', { name: 'title' })).toBeFocused();
+  await expect(page.locator('input#title')).toBeFocused();
 });

@@ -34,6 +34,8 @@ export interface NumberFieldViewProps
   step?: number;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   ref?: Ref<HTMLInputElement>;
 }
 
@@ -59,6 +61,7 @@ export function NumberFieldView({
   step,
   disabled,
   readOnly,
+  active,
   ref,
 }: NumberFieldViewProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -95,6 +98,7 @@ export function NumberFieldView({
             else if (ref) ref.current = node;
           }}
           id={id}
+          data-active={active ? '' : undefined}
           type='number'
           step={step ?? 'any'}
           value={value ?? ''}

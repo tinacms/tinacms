@@ -86,7 +86,7 @@ A **Form** is core editing state, scoped to one open document by `formId`. Field
 - **Composite fields delegate.** `object`, `list`, and rich-text never branch on a child's `type`; they resolve children through the runtime by capability key. Adding a field type touches zero lines of any composite.
 - **Form state is flat and normalized by address** — values are `{ address: value }` with a separate structure index for child ordering. Leaf re-renders are O(1) and structurally isolated; editing one field never re-renders the tree.
 
-**Visual editing** (click-to-edit) `postMessage`s a Field address across the preview iframe and sets it as the form's active field. Reveal (expand ancestors, scroll into view) is runtime-owned; activate (focus input, open popover) is field-owned via `useFieldActivation`.
+**Visual editing** (click-to-edit) `postMessage`s a Field address across the preview iframe and sets it as the form's active field. Reveal (expand ancestors, scroll into view) is runtime-owned; activate (focus input, open popover) is field-owned via `useFieldActivation`. The page names the document each mark belongs to (`data-tina-document`, a repo-relative path such as `content/posts/hello-world.mdx`) and declares the documents it draws (`tina:ready`, `tina:documents`), so the admin can follow a link or open a referenced or shared document. The admin sends the hovered and active field back as `tina:outline`, and values per document through `tina:values`. A page that declares only shared documents counts as drawing no document.
 
 ## Where state lives
 

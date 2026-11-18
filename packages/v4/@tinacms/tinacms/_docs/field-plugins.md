@@ -216,7 +216,7 @@ Hooks:
 | `useFieldValue<T>(address)` | Gives `[value, setValue]` from the react-hook-form controller |
 | `useFieldErrors(address)` | Gives every validation message at `address` or under it |
 | `useFieldActivation(handler)` | Runs `handler` when this field becomes the active field, for visual editing |
-| `useFieldFrame(options?)` | Gives the label, `htmlFor`, errors, help, `disabled` and `readOnly` for `FieldWrapper`. `disabled` and `readOnly` come from the field's schema or from an enclosing field. `{ warnings }` adds amber messages that do not block Save. `{ ownErrorsOnly: true }` keeps only the errors on this field's own address. |
+| `useFieldFrame(options?)` | Gives the label, `htmlFor`, errors, help, `disabled` and `readOnly` for `FieldWrapper`. `disabled` and `readOnly` come from the field's schema or from an enclosing field. `{ warnings }` adds amber messages that do not block Save. `{ ownErrorsOnly: true }` keeps only the errors on this field's own address. It also returns `active`, which is `true` while the preview points at the field; `FieldWrapper` renders it as `data-active`. |
 | `useOpenLevel()` | Gives a function that opens this field as the next form level |
 | `useInvalidFieldCount()` | Gives how many fields under this field show an error. It counts fields, not messages. |
 | `useIsOpenLevel()` | Gives `true` when this field is the open form level |

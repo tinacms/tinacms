@@ -27,6 +27,8 @@ export type RichTextFieldViewProps = Pick<
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   /** No frame and no visible label, for the document body. The live field never sets it. */
   body?: boolean;
 };
@@ -43,6 +45,7 @@ export function RichTextFieldView({
   disabled = false,
   readOnly = false,
   body = false,
+  active = false,
   ...frame
 }: RichTextFieldViewProps) {
   const labelId = frame.labelId ?? `${id}-label`;
@@ -51,15 +54,20 @@ export function RichTextFieldView({
   const editor = (
     <div
       data-slot='rich-text-frame'
+      data-active={active && !body ? '' : undefined}
       className={cn(
         'min-w-0 overflow-hidden rounded-sm',
         !body &&
-          'border border-input bg-card hover:border-input-hover has-focus-visible:border-ring has-focus-visible:shadow-focus-field',
-        !body && disabled && 'hover:border-input',
+          'border border-input bg-card hover:border-input-hover has-focus-visible:border-ring has-focus-visible:shadow-focus-field data-active:border-ring data-active:shadow-focus-field',
+        !body &&
+          disabled &&
+          'hover:border-input data-active:border-input data-active:shadow-none',
         !body &&
           readOnly &&
-          'border-border-subtle bg-muted hover:border-border-subtle',
-        !body && invalid && 'border-destructive hover:border-destructive'
+          'border-border-subtle bg-muted hover:border-border-subtle data-active:border-border-subtle data-active:shadow-none',
+        !body &&
+          invalid &&
+          'border-destructive hover:border-destructive data-active:border-destructive'
       )}
     >
       <EditorContext.Provider

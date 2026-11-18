@@ -123,7 +123,7 @@ for (const { name, width, height } of WIDTHS) {
           : route.continue()
       );
       await typeTitle(page, ' EDIT');
-      await page.getByRole('button', { name: 'Save' }).click();
+      await page.getByRole('button', { name: 'Save', exact: true }).click();
       await reload(page);
       await expect(prompt(page)).toBeVisible();
       expect((await drafts(page)).waiting).toEqual([
@@ -141,7 +141,9 @@ for (const { name, width, height } of WIDTHS) {
       // Playwright waits until the control receives pointer events, so a toast
       // that stays on top of it times out instead of passing.
       for (const name of ['Save', 'Document actions']) {
-        await page.getByRole('button', { name }).hover({ timeout: 4000 });
+        await page
+          .getByRole('button', { name, exact: true })
+          .hover({ timeout: 4000 });
       }
       // Whatever the toast does, its rectangle must clear the form bar's.
       await expect
