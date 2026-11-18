@@ -493,8 +493,10 @@ export const TinaCloudProvider = (
   const SessionProvider = client.authProvider.getSessionProvider();
 
   const handleListBranches = async (): Promise<Branch[]> => {
+    // Index statuses are fetched lazily by the branch switcher for the rows
+    // it displays, instead of one request per branch when the list opens.
     const branches = await cms.api.tina.listBranches({
-      includeIndexStatus: true,
+      includeIndexStatus: false,
     });
 
     if (!Array.isArray(branches)) {
