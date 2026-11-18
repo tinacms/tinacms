@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import type { RefObject } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DocumentForm } from '../admin/document-form';
+import { LevelHead } from '../test/level-head';
 import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema } from '../core/schema/types';
@@ -40,6 +41,17 @@ const page: CollectionSchema = {
   fields: [
     blocksField('blocks'),
     blocksField('solo'),
+    t.object({
+      name: 'wrap',
+      label: 'Wrap',
+      fields: [
+        t.object({
+          name: 'inner',
+          label: 'Inner',
+          fields: [blocksField('blocks')],
+        }),
+      ],
+    }),
     t.array({
       name: 'rows',
       label: 'Rows',
@@ -65,6 +77,14 @@ const homeDocument = {
     { _template: 'quote', text: 'Hi' },
   ],
   solo: [{ _template: 'hero', headline: 'Only' }],
+  wrap: {
+    inner: {
+      blocks: [
+        { _template: 'hero', headline: 'Deep' },
+        { _template: 'quote', text: 'Deeper' },
+      ],
+    },
+  },
   rows: [{ title: 'One', inner: [{ note: 'a' }] }],
 };
 
@@ -91,7 +111,9 @@ async function setup({ withOther = false } = {}) {
       })}
     >
       <Connection iframeRef={iframeRef} />
+      <button type='button'>outside the form</button>
       <FormProvider collection={page} path={HOME} document={homeDocument}>
+        <LevelHead />
         <DocumentForm />
       </FormProvider>
       {withOther ? (
@@ -193,11 +215,30 @@ describe('the card the page outlines', () => {
     await waitFor(() => expect(lastOutline().active.address).toBe('blocks.0'));
     await user.click(actions('blocks.0'));
     await screen.findByRole('menuitem', { name: /^Move down/ });
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    });
-    expect(document.activeElement?.closest('[data-array-item]')).toBeNull();
+    await waitFor(() =>
+      expect(document.activeElement?.closest('[data-array-item]')).toBeNull()
+    );
     expect(lastOutline().active).toMatchObject({ address: 'blocks.0' });
+  });
+
+  it('lets go of the card when focus leaves the form, and keeps it while the Actions menu is open', async () => {
+    const { user, grip, actions, lastOutline, activate } = await setup();
+    activate('blocks');
+    act(() => grip('blocks.0').focus());
+    await waitFor(() => expect(lastOutline().active.address).toBe('blocks.0'));
+
+    act(() => (document.activeElement as HTMLElement).blur());
+    await waitFor(() => expect(lastOutline().active.address).toBe('blocks'));
+
+    act(() => grip('blocks.0').focus());
+    await waitFor(() => expect(lastOutline().active.address).toBe('blocks.0'));
+    act(() => screen.getByRole('button', { name: 'outside the form' }).focus());
+    await waitFor(() => expect(lastOutline().active.address).toBe('blocks'));
+
+    act(() => grip('blocks.0').focus());
+    await user.click(actions('blocks.0'));
+    await screen.findByRole('menuitem', { name: /^Move down/ });
+    await waitFor(() => expect(lastOutline().active.address).toBe('blocks.0'));
   });
 
   it("outlines the card's new index after Move down", async () => {
@@ -282,5 +323,64 @@ describe('the card the page outlines', () => {
     await waitFor(() => expect(lastOutline().active.address).toBe('blocks.0'));
     fromPage(activateMessage('blocks', HOME));
     await waitFor(() => expect(lastOutline().active.address).toBe('blocks'));
+  });
+
+  describe.each([
+    { list: 'blocks', open: 'blocks.0', root: 'blocks' },
+    {
+      list: 'wrap.inner.blocks',
+      open: 'wrap.inner.blocks.0',
+      root: 'wrap.inner.blocks',
+    },
+  ])('after stepping back to $list', ({ open, root }) => {
+    async function steppedBack() {
+      const harness = await setup();
+      harness.activate(open);
+      await screen.findByRole('heading', { level: 2, name: 'Hero' });
+      const trail = within(
+        screen.getByRole('navigation', { name: 'Location' })
+      );
+      await harness.user.click(
+        trail.getAllByRole('button').at(-1) as HTMLElement
+      );
+      await screen.findAllByRole('button', { name: 'Actions for Item 1' });
+      return harness;
+    }
+    const ringed = (container: HTMLElement) =>
+      container.querySelectorAll('[data-slot="list-card-item"][data-active]');
+
+    it('outlines the returned card, follows it on Move down, and keeps it when focus goes to <body>', async () => {
+      const { user, container, actions, lastOutline } = await steppedBack();
+      await waitFor(() =>
+        expect(lastOutline().active).toMatchObject({
+          address: `${root}.0`,
+          name: 'Hero',
+        })
+      );
+      act(() => (document.activeElement as HTMLElement).blur());
+      await act(async () => {});
+      expect(ringed(container)).toHaveLength(1);
+      await waitFor(() =>
+        expect(lastOutline().active.address).toBe(`${root}.0`)
+      );
+      await user.click(actions(`${root}.0`));
+      await user.click(
+        await screen.findByRole('menuitem', { name: /^Move down/ })
+      );
+      await waitFor(() =>
+        expect(lastOutline().active.address).toBe(`${root}.1`)
+      );
+    });
+
+    it('shows the list in the form and on the page after the page activates it', async () => {
+      const { container, lastOutline, fromPage } = await steppedBack();
+      await waitFor(() =>
+        expect(lastOutline().active.address).toBe(`${root}.0`)
+      );
+      expect(ringed(container)).toHaveLength(1);
+      fromPage(activateMessage(root, HOME));
+      await waitFor(() => expect(lastOutline().active.address).toBe(root));
+      expect(ringed(container)).toHaveLength(0);
+    });
   });
 });

@@ -363,6 +363,10 @@ function ObjectItems({
 
   useEffect(() => {
     if (returnedTo === null) return;
+    if (activation?.address === address && activation.source === 'page') {
+      setReturnedTo(null);
+      return;
+    }
     const index = items.findIndex((item) => item.id === returnedTo);
     if (
       activation?.address !== address &&

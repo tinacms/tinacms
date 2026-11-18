@@ -241,8 +241,8 @@ describe.each([
         await act(item, /^Duplicate/);
         await screen.findByRole('heading', { level: 2, name });
         expect(active()).toEqual([]);
-        expect(useFormStore.getState().active?.address).toContain(
-          `${root}.${copy}.`
+        expect(useFormStore.getState().active?.address).toMatch(
+          new RegExp(`^${root.replaceAll('.', '\\.')}\\.${copy}\\.`)
         );
       }
     );
@@ -260,7 +260,7 @@ describe.each([
           screen.getAllByRole('button', { name: /^Actions for Item/ })
         ).toHaveLength(2)
       );
-      expect(active()).not.toContain(1);
+      expect(active()).toEqual([]);
     });
   }
 );

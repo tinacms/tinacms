@@ -125,7 +125,12 @@ export interface FormStore {
     formId: FormId,
     previous: FormStore['saves'][FormId]
   ) => void;
-  active: { formId: FormId; address: FieldAddress } | null;
+  /** `source: 'page'` marks an activation that came from a click on the preview. */
+  active: {
+    formId: FormId;
+    address: FieldAddress;
+    source?: 'page';
+  } | null;
   /** The field under the pointer. Transient: never written to a draft. */
   hovered: { formId: FormId; address: FieldAddress } | null;
   setUserId: (userId: DraftUserScope) => void;
@@ -140,7 +145,11 @@ export interface FormStore {
     value: unknown
   ) => void;
   setFieldErrors: (formId: FormId, errors: FieldErrors) => void;
-  setActive: (formId: FormId, address: FieldAddress | null) => void;
+  setActive: (
+    formId: FormId,
+    address: FieldAddress | null,
+    options?: { source: 'page' }
+  ) => void;
   setHovered: (formId: FormId, address: FieldAddress | null) => void;
   markSaved: (formId: FormId, savedValues?: FormValues) => void;
   discardEdits: (formId: FormId) => void;
@@ -561,9 +570,11 @@ export const useFormStore = create<FormStore>()(
             };
           }, DEVTOOLS_ACTION.setFieldErrors),
 
-        setActive: (formId, address) =>
+        setActive: (formId, address, options) =>
           apply(
-            () => ({ active: address == null ? null : { formId, address } }),
+            () => ({
+              active: address == null ? null : { formId, address, ...options },
+            }),
             DEVTOOLS_ACTION.setActive
           ),
 

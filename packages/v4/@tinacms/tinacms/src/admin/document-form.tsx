@@ -42,6 +42,7 @@ import {
   type OpenLevel,
 } from '../editor/form-view-state';
 import { useBranchView } from '../editor/branch';
+import { formRootProps } from '../editor/outline-markup';
 import {
   AfterSaveHookError,
   FormValidationError,
@@ -804,7 +805,7 @@ export function DocumentForm() {
       <ActiveFieldLevels scope={scope} />
       <div
         className='min-h-0 flex-1 overflow-y-auto'
-        data-form-id={scope.formId}
+        {...formRootProps(scope.formId)}
       >
         <FormFields scope={scope} />
       </div>

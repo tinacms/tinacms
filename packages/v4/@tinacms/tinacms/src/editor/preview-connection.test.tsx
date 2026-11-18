@@ -266,6 +266,7 @@ describe('usePreviewConnection', () => {
     expect(useFormStore.getState().active).toEqual({
       formId,
       address: 'title',
+      source: 'page',
     });
     expect(input).toHaveFocus();
   });
@@ -471,6 +472,7 @@ describe('usePreviewConnection with a read-only field', () => {
       expect(useFormStore.getState().active).toEqual({
         formId,
         address: 'title',
+        source: 'page',
       });
       await userEvent.type(input, '!', { skipClick: true });
       expect(input).toHaveValue('Hello');

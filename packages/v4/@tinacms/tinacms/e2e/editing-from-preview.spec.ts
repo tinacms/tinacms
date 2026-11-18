@@ -364,4 +364,11 @@ test('hovering a block card dashes its block, and tabbing onto its grip draws th
   await expect(active).toHaveCount(1);
   await expect(active.locator('[data-outline-tab]')).toHaveText('Hero');
   await expect(heading(page)).not.toHaveText(/^Hero/);
+
+  await hero.getByRole('button', { name: /^Actions for/ }).click();
+  await expect(
+    page.getByRole('menuitem', { name: /^Move down/ })
+  ).toBeVisible();
+  await expect(active).toHaveCount(1);
+  await expect(active.locator('[data-outline-tab]')).toHaveText('Hero');
 });

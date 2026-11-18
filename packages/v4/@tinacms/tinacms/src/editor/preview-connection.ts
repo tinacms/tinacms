@@ -11,6 +11,8 @@ import {
 import { invariant } from '../core/invariant';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import {
+  type FormId,
+  type FormStore,
   type FormValues,
   toDocument,
   toFormId,
@@ -29,6 +31,13 @@ import {
   contentKeys,
   useCurrentBranch,
 } from './content-queries';
+import {
+  CARD_SELECTOR,
+  FORM_ROOT_SELECTOR,
+  cardAddressOf,
+  formIdOf,
+  listOf,
+} from './outline-markup';
 import { fieldsAlong } from './form-view-state';
 import { useOptionalContentSlice, useSchemaCollections } from './hooks';
 import {
@@ -63,6 +72,8 @@ interface Persistent {
   click: number;
   lastOutline: string | null;
   frame: number | null;
+  /** A `focusout` happened, so the next frame checks whether focus left the form. */
+  checkFocusLeft: boolean;
   /** The latest render's outline sender, so a frame that fires after a re-render reads the new step. */
   sendOutline: (force: boolean) => void;
   /** The last element that took focus inside a document form. A card's outline derives from it. */
@@ -282,25 +293,70 @@ function createHandlers(deps: Deps) {
     };
   };
 
-  // The card holding DOM focus, when it is a direct item of the active list in the active form.
-  const focusedCard = (
-    active: NonNullable<ReturnType<typeof useFormStore.getState>['active']>
-  ) => {
+  const returnedCard = (
+    active: NonNullable<FormStore['active']>
+  ): { formId: FormId; address: FieldAddress } | null => {
+    if (active.source === 'page') return null;
+    const root = [...document.querySelectorAll(FORM_ROOT_SELECTOR)].find(
+      (candidate) => formIdOf(candidate) === active.formId
+    );
+    if (!root) return null;
+    for (const card of root.querySelectorAll(CARD_SELECTOR)) {
+      const address = cardAddressOf(card);
+      if (address === null || listOf(address) !== active.address) continue;
+      const ringed = [...card.children].some(
+        (child) =>
+          child.getAttribute('data-slot') === 'list-card-item' &&
+          child.hasAttribute('data-active')
+      );
+      if (ringed) {
+        return { formId: active.formId, address: toFieldAddress(address) };
+      }
+    }
+    return null;
+  };
+
+  const focusedCard = (active: NonNullable<FormStore['active']>) => {
     const focused = persistent.lastFormFocus;
     if (!focused?.isConnected) return null;
-    const card = focused.closest('[data-array-item]');
-    const address = card?.getAttribute('data-item-address');
-    const formRoot = focused.closest('[data-form-id]');
-    if (!(address && formRoot?.getAttribute('data-form-id') === active.formId))
-      return null;
-    if (address.slice(0, address.lastIndexOf('.')) !== active.address)
-      return null;
+    const card = focused.closest(CARD_SELECTOR);
+    const address = card && cardAddressOf(card);
+    const root = focused.closest(FORM_ROOT_SELECTOR);
+    if (!(address && root && formIdOf(root) === active.formId)) return null;
+    if (listOf(address) !== active.address) return null;
     return { formId: active.formId, address: toFieldAddress(address) };
+  };
+
+  // Focus has left the form: it sits on <body>, in the preview frame, or in an
+  // element outside the form that is not a popup opened from one of its cards.
+  const focusLeftForm = (): boolean => {
+    const focused = persistent.lastFormFocus;
+    const current = document.activeElement;
+    if (!focused || !current) return false;
+    if (current === document.body || current instanceof HTMLIFrameElement) {
+      return true;
+    }
+    const root = focused.closest(FORM_ROOT_SELECTOR);
+    if (current.closest(FORM_ROOT_SELECTOR)) return false;
+    const openers = root
+      ? root.querySelectorAll(
+          `${CARD_SELECTOR} [aria-expanded="true"][aria-controls]`
+        )
+      : [];
+    for (const opener of openers) {
+      const popup = document.getElementById(
+        opener.getAttribute('aria-controls') ?? ''
+      );
+      if (popup?.contains(current)) return false;
+    }
+    return true;
   };
 
   const outline = () => {
     const { active, hovered } = useFormStore.getState();
-    const onCard = active ? (focusedCard(active) ?? active) : active;
+    const onCard = active
+      ? (focusedCard(active) ?? returnedCard(active) ?? active)
+      : active;
     const activeMark = markFor(onCard);
     const hoveredMark = markFor(hovered);
     return outlineMessage(
@@ -324,6 +380,10 @@ function createHandlers(deps: Deps) {
     if (persistent.frame !== null) return;
     persistent.frame = requestAnimationFrame(() => {
       persistent.frame = null;
+      if (persistent.checkFocusLeft) {
+        persistent.checkFocusLeft = false;
+        if (focusLeftForm()) persistent.lastFormFocus = null;
+      }
       persistent.sendOutline(false);
     });
   };
@@ -445,7 +505,8 @@ function createHandlers(deps: Deps) {
         toFormId(
           placement.kind === 'open' ? placement.target.path : targetRef.path
         ),
-        toFieldAddress(targetAddress)
+        toFieldAddress(targetAddress),
+        { source: 'page' }
       );
     scheduleOutline();
   };
@@ -500,13 +561,16 @@ function createHandlers(deps: Deps) {
     onFocusIn: (event: FocusEvent) => {
       if (
         event.target instanceof Element &&
-        event.target.closest('[data-form-id]')
+        event.target.closest(FORM_ROOT_SELECTOR)
       ) {
         persistent.lastFormFocus = event.target;
       }
       scheduleOutline();
     },
-    onFocusOut: scheduleOutline,
+    onFocusOut: () => {
+      persistent.checkFocusLeft = true;
+      scheduleOutline();
+    },
     sendOutline,
     followOpen,
     publishAll,
@@ -548,6 +612,7 @@ export function usePreviewConnection(
     frame: null,
     heard: false,
     lastFormFocus: null,
+    checkFocusLeft: false,
     sendOutline: () => {},
   };
   const persistent = held.current;

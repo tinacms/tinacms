@@ -248,6 +248,7 @@ describe('following the page', () => {
     expect(useFormStore.getState().active).toEqual({
       formId: toFormId(A),
       address: 'title',
+      source: 'page',
     });
   });
 
@@ -329,6 +330,7 @@ describe('clicks on a declared page', () => {
     expect(useFormStore.getState().active).toEqual({
       formId: toFormId(AUTHOR),
       address: 'name',
+      source: 'page',
     });
   });
 
@@ -348,6 +350,7 @@ describe('clicks on a declared page', () => {
     expect(useFormStore.getState().active).toEqual({
       formId: toFormId(A),
       address: 'title',
+      source: 'page',
     });
   });
 
