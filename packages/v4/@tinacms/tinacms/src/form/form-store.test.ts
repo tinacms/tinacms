@@ -376,6 +376,32 @@ describe('form-store discarded edits', () => {
   });
 });
 
+describe('form-store moveForm', () => {
+  it('carries the Save All state of the form to the new id', () => {
+    const state = store.getState();
+    state.registerForm(postA, { [title]: 'A' });
+    state.setFieldValue(postA, title, 'A edited');
+    state.registerCollection(postA, 'post');
+    state.setRevealOnOpen(postA);
+    state.setSavePending(postA, true);
+    state.recordSaveAllResult(postA, {
+      status: 'failed',
+      words: 'Save failed',
+    });
+    state.moveForm(postA, postB);
+
+    const moved = store.getState();
+    expect(moved.collections[postB]).toBe('post');
+    expect(moved.revealOnOpen[postB]).toBe(true);
+    expect(moved.savePending[postB]).toBe(true);
+    expect(moved.saveAll.results[postB]?.status).toBe('failed');
+    expect(moved.collections[postA]).toBeUndefined();
+    expect(moved.revealOnOpen[postA]).toBeUndefined();
+    expect(moved.savePending[postA]).toBeUndefined();
+    expect(moved.saveAll.results[postA]).toBeUndefined();
+  });
+});
+
 describe('form-store teardown', () => {
   it('removeForm drops the scope', () => {
     store.getState().registerForm(postA, { [title]: 'Hello' });

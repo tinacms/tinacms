@@ -36,11 +36,15 @@ import {
 import { connectionOf } from '../test/connection';
 import { TinaAdmin } from './admin';
 
-// The shell also draws an upload status region, so pick the document's own.
+// The shell also draws upload and Save All status regions, so pick the document's own.
 const documentStatus = (): HTMLElement => {
   const status = screen
     .getAllByRole('status')
-    .find((element) => !element.hasAttribute('data-upload-status'));
+    .find(
+      (element) =>
+        !element.hasAttribute('data-upload-status') &&
+        !element.hasAttribute('data-save-all-status')
+    );
   if (!status) throw new Error('The document status is not on screen.');
   return status;
 };
