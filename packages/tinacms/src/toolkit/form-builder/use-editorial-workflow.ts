@@ -10,10 +10,12 @@ import { useCMS } from '../react-core';
 import { createWorkflowBranch } from './create-workflow-branch';
 import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
 import {
+  type EditorialWorkflowCompleteEvent,
   type EditorialWorkflowErrorCopy,
   TARGET_BRANCH_EXISTS_ERROR,
   checkTargetBranchExists,
   collectionLabelResolver,
+  collectionListHash,
   getEditorialWorkflowError,
   getEditorialWorkflowPrTitle,
   messageText,
@@ -253,18 +255,29 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
         );
       }
 
-      cms.alerts.success(
-        `Branch ${result.branchName} created successfully - Pull Request at ${result.pullRequestUrl}`,
-        0
-      );
+      const completed: EditorialWorkflowCompleteEvent = {
+        type: 'editorial-workflow:complete',
+        branchName: result.branchName,
+        pullRequestUrl: result.pullRequestUrl,
+        isDraft: isDraft !== false,
+        collection: collection.name,
+        relativePath,
+        crudType,
+      };
 
-      if (crudType === 'create') {
-        const folderPath = relativePath.includes('/')
-          ? relativePath.substring(0, relativePath.lastIndexOf('/'))
-          : '';
-        window.location.hash = `#/collections/${collection.name}${
-          folderPath ? `/${folderPath}` : ''
-        }`;
+      if (cms.events.hasExplicitListenerFor(completed.type)) {
+        cms.events.dispatch(completed);
+      } else {
+        cms.alerts.success(
+          `Branch ${result.branchName} created successfully - Pull Request at ${result.pullRequestUrl}`,
+          0
+        );
+        if (crudType === 'create') {
+          window.location.hash = collectionListHash(
+            collection.name,
+            relativePath
+          );
+        }
       }
 
       return { success: true };

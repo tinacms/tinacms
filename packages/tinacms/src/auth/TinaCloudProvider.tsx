@@ -6,6 +6,7 @@ import {
   DummyMediaStore,
   MediaStore,
   MediaWorkflowOverlay,
+  PullRequestCreatedOverlay,
   StaticMedia,
   TinaCMS,
   TinaMediaStore,
@@ -592,6 +593,7 @@ export const TinaCloudProvider = (
       >
         <TinaProvider cms={cms}>
           <MediaWorkflowOverlay />
+          <PullRequestCreatedOverlay />
           <AuthWallInner
             {...props}
             cms={cms}

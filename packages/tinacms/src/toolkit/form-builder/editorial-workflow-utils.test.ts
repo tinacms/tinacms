@@ -7,6 +7,8 @@ import {
 import {
   checkBranchGuard,
   collectionLabelResolver,
+  collectionListHash,
+  documentEditHash,
   getEditorialWorkflowError,
   messageText,
   plainMessage,
@@ -232,5 +234,31 @@ describe('getEditorialWorkflowError', () => {
     ).toEqual({
       messageParts: plainMessage('A branch with this name already exists'),
     });
+  });
+});
+
+describe('collectionListHash', () => {
+  it('points at the collection root for a top-level document', () => {
+    expect(collectionListHash('post', 'hello.md')).toBe('#/collections/post');
+  });
+
+  it("points at the document's folder for a nested document", () => {
+    expect(collectionListHash('post', 'a/b/hello.md')).toBe(
+      '#/collections/post/a/b'
+    );
+  });
+});
+
+describe('documentEditHash', () => {
+  it('drops only the file extension', () => {
+    expect(documentEditHash('post', 'a/my.post.mdx')).toBe(
+      '#/collections/edit/post/a/my.post'
+    );
+  });
+
+  it('keeps a dotted folder name intact', () => {
+    expect(documentEditHash('post', 'v1.2/hello')).toBe(
+      '#/collections/edit/post/v1.2/hello'
+    );
   });
 });
