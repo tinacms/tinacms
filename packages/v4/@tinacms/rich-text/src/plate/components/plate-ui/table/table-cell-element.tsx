@@ -15,16 +15,19 @@ import {
   PlateElement,
   useEditorPlugin,
   useElementSelector,
+  useReadOnly,
 } from '@udecode/plate/react';
 
 import { blockSelectionVariants } from './block-selection';
+import { useActiveTableCell } from './table-active-cell';
+import { TableHandle } from './table-handles';
 
 export const TableCellElement = withRef<
   typeof PlateElement,
   {
     isHeader?: boolean;
   }
->(({ children, className, isHeader, style, ...props }, ref) => {
+>(({ children, className, isHeader, style, attributes, ...props }, ref) => {
   const { api } = useEditorPlugin(TablePlugin);
   const element = props.element as TTableCellElement;
 
@@ -32,24 +35,58 @@ export const TableCellElement = withRef<
     key: TableRowPlugin.key,
   });
   const isSelectingRow = useBlockSelected(rowId);
-  const { borders, minHeight, selected, width } = useTableCellElement();
+  const { colIndex, minHeight, rowIndex, selected, width } =
+    useTableCellElement();
+  const readOnly = useReadOnly();
+  const active = useActiveTableCell();
+  const colSpan = api.table.getColSpan(element);
+  const rowSpan = api.table.getRowSpan(element);
+  const firstRow = rowIndex - rowSpan + 1;
+  const firstCol = colIndex - colSpan + 1;
+  const headerLook = isHeader || firstRow === 0;
+  const range = active?.range;
+  const inRange =
+    !!range &&
+    rowIndex >= range.top &&
+    rowIndex - rowSpan + 1 <= range.bottom &&
+    colIndex >= range.left &&
+    colIndex - colSpan + 1 <= range.right;
+  const isSelected = selected || inRange;
+  const showRowHandle =
+    !readOnly &&
+    active !== null &&
+    firstCol === 0 &&
+    active.row >= firstRow &&
+    active.row <= rowIndex;
+  const showColumnHandle =
+    !readOnly &&
+    active !== null &&
+    firstRow === 0 &&
+    active.col >= firstCol &&
+    active.col <= colIndex;
 
   return (
     <PlateElement
       ref={ref}
       as={isHeader ? 'th' : 'td'}
-      attributes={() => ({
-        ...props.attributes,
-        colSpan: api.table.getColSpan(element),
-        rowSpan: api.table.getRowSpan(element),
-      })}
+      attributes={{
+        ...attributes,
+        'aria-selected': isSelected || undefined,
+        'data-header-look': headerLook || undefined,
+        colSpan,
+        rowSpan,
+      }}
       className={cn(
-        'relative h-full overflow-visible border border-gray-200 bg-background p-0',
-        element.background ? 'bg-[--cellBackground]' : 'bg-background',
+        'relative h-full overflow-visible border border-border p-0',
+        element.background
+          ? 'bg-(--cellBackground)'
+          : headerLook
+            ? 'bg-muted'
+            : 'bg-background',
         cn(
-          isHeader && 'text-left [&_>_*]:m-0',
+          headerLook && 'text-left font-medium [&_>_*]:m-0',
           'before:size-full',
-          selected && 'before:z-10 before:bg-muted',
+          isSelected && 'before:z-10 before:bg-muted',
           "before:absolute before:box-border before:select-none before:content-['']"
         ),
         className
@@ -71,9 +108,16 @@ export const TableCellElement = withRef<
         {children}
       </div>
 
-      {isSelectingRow && (
+      {showRowHandle && active ? (
+        <TableHandle axis='row' active={active} />
+      ) : null}
+      {showColumnHandle && active ? (
+        <TableHandle axis='column' active={active} />
+      ) : null}
+
+      {isSelectingRow ? (
         <div className={blockSelectionVariants()} contentEditable={false} />
-      )}
+      ) : null}
     </PlateElement>
   );
 });

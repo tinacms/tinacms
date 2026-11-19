@@ -12,6 +12,7 @@ import {
 } from '../plugins/search/search.plugin';
 import type { SearchFields } from '../core/search/index-contract';
 import type { FieldSchema } from '../core/schema/types';
+import { tinaCloud } from '../plugins/tinacloud/tinacloud.plugin';
 import { LOCK_VERSION, checkLock, compileSchema } from './compile-schema';
 
 const fieldPlugin = (type: string, contractVersion: number) =>
@@ -514,6 +515,47 @@ describe('compileSchema dropped v3 options', () => {
   });
 });
 
+describe('compileSchema collection actions', () => {
+  const configFor = (extra: object) =>
+    asResolvedConfig({
+      plugins: [fieldPlugin('string', 1)],
+      schema: {
+        collections: [
+          {
+            name: 'post',
+            path: 'content/posts',
+            format: 'md',
+            fields: [{ name: 'title', type: 'string' }],
+            ...extra,
+          },
+        ],
+      },
+    });
+
+  it('carries allowedActions and description into the lock', () => {
+    const allowedActions = {
+      canCreate: true,
+      canDelete: false,
+      canDuplicate: false,
+      canCreateFolder: true,
+      canCreateNestedFolder: false,
+    };
+    const lock = compileSchema(
+      configFor({ allowedActions, description: 'All posts.' })
+    );
+    expect(lock.schema.collections[0]).toMatchObject({
+      allowedActions,
+      description: 'All posts.',
+    });
+  });
+
+  it('refuses an allowedActions key v4 does not have', () => {
+    expect(() =>
+      compileSchema(configFor({ allowedActions: { delete: false } }))
+    ).toThrow(/allowedActions\.delete, which v4 does not have/);
+  });
+});
+
 describe('compileSchema array options', () => {
   const plugins = [fieldPlugin('string', 1), fieldPlugin('array', 1)];
   const blocks = (extra: object): FieldSchema[] => [
@@ -620,6 +662,48 @@ describe('compileSchema array options', () => {
     const [template] = lock.schema.collections[0].fields[0].templates;
     expect(template).not.toHaveProperty('itemLabel');
     expect(lock.schema.collections[0].fields[0]).not.toHaveProperty('picker');
+  });
+});
+
+describe('compileSchema tinaCloud() search fields', () => {
+  const withTinaCloud = (
+    fields: SearchFields,
+    hooks: { name: string }[] = []
+  ): ResolvedConfig =>
+    asResolvedConfig({
+      plugins: [
+        fieldPlugin('string', 1),
+        tinaCloud({ clientId: 'abc', search: { fields } }),
+      ],
+      schema: {
+        collections: [
+          {
+            name: 'post',
+            path: 'content/posts',
+            format: 'md',
+            hooks,
+            fields: [{ name: 'title', type: 'string' }],
+          },
+        ],
+      },
+    });
+
+  it('names tina:tinacloud for an unknown field', () => {
+    expect(() => compileSchema(withTinaCloud({ post: { nope: 1 } }))).toThrow(
+      /tina:tinacloud.*"nope".*"post"/
+    );
+  });
+
+  it('refuses searchIndex() on a collection tinaCloud() does not list', () => {
+    expect(() => compileSchema(withTinaCloud({}, [searchIndex()]))).toThrow(
+      /"post".*searchIndex/
+    );
+  });
+
+  it('refuses searchIndex() on a listed collection, as no plugin registers the hook', () => {
+    expect(() =>
+      compileSchema(withTinaCloud({ post: { title: 1 } }, [searchIndex()]))
+    ).toThrow(/form hook "searchIndex"/);
   });
 });
 

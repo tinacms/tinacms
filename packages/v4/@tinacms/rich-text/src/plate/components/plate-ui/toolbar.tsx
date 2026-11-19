@@ -2,166 +2,235 @@
 
 import * as React from 'react';
 
-import * as ToolbarPrimitive from '@radix-ui/react-toolbar';
-import { cn, withCn, withRef, withVariants } from '@udecode/cn';
-import { type VariantProps, cva } from 'class-variance-authority';
-
+import { cn } from '@tinacms/ui/lib/utils';
 import { Icons } from './icons';
+import { KbdShortcut } from '@tinacms/ui/components/kbd';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@tinacms/ui/components/tooltip';
+import { ToolRowContext } from './tool-row-context';
 
-import { Separator } from './separator';
-import { withTooltip } from './tooltip';
+const itemSelector = '[data-toolbar-item]:not(:disabled)';
 
-export const Toolbar = withCn(
-  ToolbarPrimitive.Root,
-  'relative flex select-none items-center gap-1 bg-background'
-);
+/** The toolbar's items, in DOM order, that the arrow keys visit. */
+const itemsOf = (root: HTMLElement) =>
+  Array.from(root.querySelectorAll<HTMLElement>(itemSelector));
 
-export const ToolbarToggleGroup = withCn(
-  ToolbarPrimitive.ToolbarToggleGroup,
-  'flex items-center'
-);
+/**
+ * A `toolbar` with one Tab stop. ArrowLeft/ArrowRight move between items and
+ * wrap, Home and End go to the first and last. Items opt in with
+ * `data-toolbar-item`.
+ */
+export const Toolbar = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<'div'>
+>(({ className, onKeyDown, onFocus, children, ...props }, ref) => {
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const stopRef = React.useRef<HTMLElement | null>(null);
 
-export const ToolbarLink = withCn(
-  ToolbarPrimitive.Link,
-  'font-medium underline underline-offset-4'
-);
+  React.useImperativeHandle(ref, () => rootRef.current as HTMLDivElement);
 
-export const ToolbarSeparator = withCn(
-  ToolbarPrimitive.Separator,
-  'my-1 w-px shrink-0 bg-border'
-);
-
-const toolbarButtonVariants = cva(
-  cn(
-    'inline-flex items-center justify-center rounded-sm text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-    '[&_svg:not([data-icon])]:size-5'
-  ),
-  {
-    defaultVariants: {
-      size: 'sm',
-      variant: 'default',
-    },
-    variants: {
-      size: {
-        default: 'h-10 px-3',
-        lg: 'h-11 px-5',
-        sm: 'h-9 px-2',
-      },
-      variant: {
-        default:
-          'bg-transparent hover:bg-muted hover:text-muted-foreground aria-checked:bg-accent aria-checked:text-accent-foreground',
-        outline:
-          'border border-input bg-transparent hover:bg-accent hover:text-accent-foreground',
-      },
-    },
-  }
-);
-
-const ToolbarButton = withTooltip(
-  React.forwardRef<
-    React.ElementRef<typeof ToolbarToggleItem>,
-    {
-      isDropdown?: boolean;
-      pressed?: boolean;
-      showArrow?: boolean;
-    } & Omit<
-      React.ComponentPropsWithoutRef<typeof ToolbarToggleItem>,
-      'asChild' | 'value'
-    > &
-      VariantProps<typeof toolbarButtonVariants>
-  >(
-    (
-      {
-        children,
-        className,
-        isDropdown = true,
-        showArrow,
-        pressed,
-        size,
-        variant,
-        ...props
-      },
-      ref
-    ) => {
-      return typeof pressed === 'boolean' ? (
-        <ToolbarToggleGroup
-          disabled={props.disabled}
-          type='single'
-          value='single'
-        >
-          <ToolbarToggleItem
-            className={cn(
-              toolbarButtonVariants({
-                size,
-                variant,
-              }),
-              isDropdown && 'my-1 justify-between',
-              className
-            )}
-            ref={ref}
-            value={pressed ? 'single' : ''}
-            {...props}
-          >
-            {isDropdown && showArrow ? (
-              <>
-                <div className='flex flex-1'>{children}</div>
-                <div>
-                  <Icons.arrowDown className='ml-0.5 size-4' data-icon />
-                </div>
-              </>
-            ) : (
-              children
-            )}
-          </ToolbarToggleItem>
-        </ToolbarToggleGroup>
-      ) : (
-        <ToolbarPrimitive.Button
-          className={cn(
-            toolbarButtonVariants({
-              size,
-              variant,
-            }),
-            isDropdown && 'pr-1',
-            className
-          )}
-          ref={ref}
-          {...props}
-        >
-          {children}
-        </ToolbarPrimitive.Button>
-      );
+  const syncTabStops = React.useCallback(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const items = itemsOf(root);
+    const stop = stopRef.current;
+    const current = stop && items.includes(stop) ? stop : items[0];
+    for (const item of items) {
+      item.tabIndex = item === current ? 0 : -1;
     }
-  )
-);
-ToolbarButton.displayName = 'ToolbarButton';
+  }, []);
 
-export { ToolbarButton };
-
-export const ToolbarToggleItem = withVariants(
-  ToolbarPrimitive.ToggleItem,
-  toolbarButtonVariants,
-  ['variant', 'size']
-);
-
-export const ToolbarGroup = withRef<
-  'div',
-  {
-    noSeparator?: boolean;
-  }
->(({ children, className, noSeparator }, ref) => {
-  const childArr = React.Children.map(children, (c) => c);
-
-  if (!childArr || childArr.length === 0) return null;
+  React.useLayoutEffect(() => {
+    syncTabStops();
+    const root = rootRef.current;
+    if (!root) return;
+    const observer = new MutationObserver(syncTabStops);
+    observer.observe(root, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['disabled', 'data-toolbar-item'],
+    });
+    return () => observer.disconnect();
+  }, [syncTabStops]);
 
   return (
-    <div className={cn('flex', className)} ref={ref}>
-      {!noSeparator && (
-        <div className='h-full py-1'>
-          <Separator orientation='vertical' />
-        </div>
+    <div
+      ref={rootRef}
+      role='toolbar'
+      aria-orientation='horizontal'
+      className={cn(
+        'relative flex select-none items-center gap-0.5',
+        className
       )}
-
-      <div className='mx-1 flex items-center gap-1'>{children}</div>
+      onFocus={(event) => {
+        onFocus?.(event);
+        const target = event.target as HTMLElement;
+        if (target.matches('[data-toolbar-item]')) {
+          stopRef.current = target;
+          syncTabStops();
+        }
+      }}
+      onKeyDown={(event) => {
+        onKeyDown?.(event);
+        if (event.defaultPrevented) return;
+        const target = event.target as HTMLElement;
+        if (!target.matches('[data-toolbar-item]')) return;
+        const root = rootRef.current;
+        if (!root) return;
+        const items = itemsOf(root);
+        const at = items.indexOf(target);
+        let next: number | null = null;
+        if (event.key === 'ArrowRight') next = (at + 1) % items.length;
+        if (event.key === 'ArrowLeft')
+          next = (at - 1 + items.length) % items.length;
+        if (event.key === 'Home') next = 0;
+        if (event.key === 'End') next = items.length - 1;
+        if (next === null) return;
+        event.preventDefault();
+        items[next]?.focus();
+      }}
+      {...props}
+    >
+      {children}
     </div>
   );
 });
+Toolbar.displayName = 'Toolbar';
+
+export const ToolbarSeparator = ({ className }: { className?: string }) => (
+  <div
+    role='separator'
+    aria-orientation='vertical'
+    className={cn('mx-1 h-5 w-px shrink-0 bg-border', className)}
+  />
+);
+
+type ToolbarButtonBaseProps = Omit<
+  React.ComponentPropsWithoutRef<'button'>,
+  'type'
+> & {
+  pressed?: boolean;
+  open?: boolean;
+  showArrow?: boolean;
+};
+
+const ToolbarButtonBase = React.forwardRef<
+  HTMLButtonElement,
+  ToolbarButtonBaseProps
+>(({ children, className, pressed, open, showArrow, ...props }, ref) => (
+  <button
+    ref={ref}
+    type='button'
+    data-toolbar-item=''
+    aria-pressed={typeof pressed === 'boolean' ? pressed : undefined}
+    data-state={open ? 'open' : undefined}
+    className={cn(
+      'inline-flex h-8 min-w-8 shrink-0 items-center justify-center gap-1 rounded-sm px-1.5 font-sans text-sm font-medium text-foreground outline-none transition-colors pointer-coarse:h-10 pointer-coarse:min-w-10',
+      'focus-visible:shadow-focus-ring disabled:cursor-not-allowed disabled:opacity-45',
+      'not-disabled:hover:bg-muted aria-pressed:bg-selected not-disabled:aria-pressed:hover:bg-selected data-[state=open]:bg-muted',
+      '[&_svg:not([data-icon])]:size-4',
+      className
+    )}
+    {...props}
+  >
+    {children}
+    {showArrow ? (
+      <Icons.arrowDown data-icon className='size-3.5 text-muted-foreground' />
+    ) : null}
+  </button>
+));
+ToolbarButtonBase.displayName = 'ToolbarButtonBase';
+
+export type ToolbarButtonProps = ToolbarButtonBaseProps & {
+  tooltip?: string;
+  shortcut?: string;
+  /** Lets a popover trigger wrap the button inside the tooltip trigger, so both keep their hover handlers. */
+  wrapTrigger?: (button: React.ReactElement) => React.ReactElement;
+};
+
+/** In line it shows a tooltip. Inside More tools it draws as a menu row and closes the panel after it runs. */
+export const ToolbarButton = React.forwardRef<
+  HTMLButtonElement,
+  ToolbarButtonProps
+>(
+  (
+    {
+      tooltip,
+      shortcut,
+      wrapTrigger,
+      'aria-label': ariaLabel,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const row = React.useContext(ToolRowContext);
+    const name = ariaLabel ?? tooltip;
+
+    if (row) {
+      const rowButton = (
+        <ToolbarButtonBase
+          ref={ref}
+          aria-label={name}
+          {...props}
+          onClick={(event) => {
+            props.onClick?.(event);
+            if (!props['aria-haspopup']) row.onRun();
+          }}
+          className={cn(
+            'h-9 w-full justify-start gap-2.5 px-2.5 text-base font-normal pointer-coarse:h-10',
+            className
+          )}
+        >
+          <span className='flex size-4 shrink-0 items-center justify-center [&_svg]:size-4'>
+            {children}
+          </span>
+          <span className='min-w-0 flex-1 truncate text-left'>{tooltip}</span>
+          {shortcut ? <KbdShortcut keys={shortcut} size='sm' /> : null}
+        </ToolbarButtonBase>
+      );
+      return wrapTrigger ? wrapTrigger(rowButton) : rowButton;
+    }
+
+    const base = (
+      <ToolbarButtonBase
+        ref={ref}
+        aria-label={name}
+        className={className}
+        {...props}
+      >
+        {children}
+      </ToolbarButtonBase>
+    );
+    const button = wrapTrigger ? wrapTrigger(base) : base;
+
+    if (!tooltip || props.disabled) return button;
+
+    return (
+      <Tooltip>
+        <TooltipTrigger render={button} />
+        <TooltipContent>
+          {tooltip}
+          {shortcut ? <KbdShortcut keys={shortcut} size='sm' /> : null}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+);
+ToolbarButton.displayName = 'ToolbarButton';
+
+export const ToolbarGroup = ({
+  children,
+  className,
+}: {
+  children?: React.ReactNode;
+  className?: string;
+  noSeparator?: boolean;
+}) => (
+  <div className={cn('flex items-center gap-0.5', className)}>{children}</div>
+);

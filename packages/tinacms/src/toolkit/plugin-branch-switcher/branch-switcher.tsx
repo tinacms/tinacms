@@ -85,19 +85,25 @@ export const EditoralBranchSwitcher = ({
     createBranch({
       branchName: normalizeBranchName(formatBranchName(value)),
       baseBranch: currentBranch,
-    }).then(async (createdBranchName) => {
-      cms.alerts.success('Branch created.');
-      setBranchList((oldBranchList) => {
-        return [
+    })
+      .then((createdBranchName) => {
+        cms.alerts.success('Branch created.');
+        setBranchList((oldBranchList) => [
           ...oldBranchList,
           {
             indexStatus: { status: 'unknown' },
             name: createdBranchName,
           },
-        ];
-      });
-      setListState('ready');
-    });
+        ]);
+      })
+      .catch((error: unknown) => {
+        if (error instanceof Error) {
+          cms.alerts.error(error.message);
+        } else {
+          cms.alerts.error('There was an error creating a new branch.');
+        }
+      })
+      .finally(() => setListState('ready'));
   }, []);
 
   const refreshBranchList = React.useCallback(async () => {

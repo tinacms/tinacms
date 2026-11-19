@@ -11,6 +11,9 @@ const CODES: ContentErrorCode[] = [
   'validation',
   'network',
   'backend-failure',
+  'name-taken',
+  'invalid-path',
+  'folder-not-owned',
 ];
 
 describe('ContentError', () => {

@@ -1,5 +1,5 @@
 import { useQueries } from '@tanstack/react-query';
-import type { DocumentSummary } from '../core/content/contract';
+import { type DocumentSummary, nodesOf } from '../core/content/contract';
 import {
   CONTENT_STALE_TIME,
   contentKeys,
@@ -27,7 +27,7 @@ export const useCollectionLists = (
   const results = useQueries({
     queries: collections.map((collection) => ({
       queryKey: contentKeys.list(collection, branch),
-      queryFn: () => content.list(collection),
+      queryFn: async () => nodesOf(await content.list(collection)),
       staleTime: CONTENT_STALE_TIME,
     })),
   });

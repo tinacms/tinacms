@@ -1,5 +1,6 @@
 import { AlertDialog as AlertDialogPrimitive } from '@base-ui/react/alert-dialog';
 import type * as React from 'react';
+import { createContext, use, useImperativeHandle, useRef } from 'react';
 
 import {
   dialogDescriptionClasses,
@@ -8,10 +9,41 @@ import {
   dialogTitleClasses,
   dialogVariants,
 } from '@tinacms/ui/lib/dialog-styles';
+import {
+  footSheetFooterClasses,
+  footSheetHeaderClasses,
+  useFootSheetPopup,
+} from '@tinacms/ui/components/foot-sheet';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { cn } from '@tinacms/ui/lib/utils';
 
-function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
-  return <AlertDialogPrimitive.Root data-slot='alert-dialog' {...props} />;
+/** Lets the scrim close the confirm on a phone: Base UI's alert dialog ignores outside presses. */
+const AlertDialogActionsContext = createContext<
+  React.RefObject<AlertDialogPrimitive.Root.Actions | null>
+>({ current: null });
+
+function AlertDialog({
+  actionsRef,
+  ...props
+}: AlertDialogPrimitive.Root.Props) {
+  const own = useRef<AlertDialogPrimitive.Root.Actions | null>(null);
+  useImperativeHandle(
+    actionsRef,
+    () => ({
+      close: () => own.current?.close(),
+      unmount: () => own.current?.unmount(),
+    }),
+    []
+  );
+  return (
+    <AlertDialogActionsContext value={own}>
+      <AlertDialogPrimitive.Root
+        data-slot='alert-dialog'
+        actionsRef={own}
+        {...props}
+      />
+    </AlertDialogActionsContext>
+  );
 }
 
 function AlertDialogTrigger({ ...props }: AlertDialogPrimitive.Trigger.Props) {
@@ -28,12 +60,19 @@ function AlertDialogClose({ ...props }: AlertDialogPrimitive.Close.Props) {
 
 function AlertDialogOverlay({
   className,
+  onClick,
   ...props
 }: AlertDialogPrimitive.Backdrop.Props) {
+  const phone = useTier() === 'phone';
+  const actions = use(AlertDialogActionsContext);
   return (
     <AlertDialogPrimitive.Backdrop
       data-slot='alert-dialog-overlay'
       className={cn(dialogOverlayClasses, className)}
+      onClick={(event) => {
+        onClick?.(event);
+        if (phone) actions.current?.close();
+      }}
       {...props}
     />
   );
@@ -42,17 +81,25 @@ function AlertDialogOverlay({
 function AlertDialogContent({
   className,
   children,
+  initialFocus,
+  style,
   ...props
 }: AlertDialogPrimitive.Popup.Props) {
+  const { popup, scrim, chrome } = useFootSheetPopup({
+    on: useTier() === 'phone',
+    Close: AlertDialogPrimitive.Close,
+    slot: 'alert-dialog-content',
+    look: cn(dialogVariants({ size: 'sm' }), 'group/dialog'),
+    className,
+    initialFocus,
+    style,
+  });
   return (
     <AlertDialogPrimitive.Portal data-slot='alert-dialog-portal'>
-      <AlertDialogOverlay />
-      <AlertDialogPrimitive.Popup
-        data-slot='alert-dialog-content'
-        className={cn(dialogVariants({ size: 'sm' }), className)}
-        {...props}
-      >
+      <AlertDialogOverlay {...scrim} />
+      <AlertDialogPrimitive.Popup {...popup} {...props}>
         {children}
+        {chrome}
       </AlertDialogPrimitive.Popup>
     </AlertDialogPrimitive.Portal>
   );
@@ -65,7 +112,11 @@ function AlertDialogHeader({
   return (
     <div
       data-slot='alert-dialog-header'
-      className={cn('flex flex-col gap-1', className)}
+      className={cn(
+        'flex flex-col gap-1 max-md:pr-8',
+        footSheetHeaderClasses,
+        className
+      )}
       {...props}
     />
   );
@@ -78,7 +129,12 @@ function AlertDialogFooter({
   return (
     <div
       data-slot='alert-dialog-footer'
-      className={cn(dialogFooterClasses, className)}
+      className={cn(
+        dialogFooterClasses,
+        footSheetFooterClasses,
+        'max-md:mt-auto',
+        className
+      )}
       {...props}
     />
   );

@@ -14,6 +14,7 @@ import type { TinaDocument } from '../core/schema/types';
 import {
   type DraftUserScope,
   listStoredDraftIds,
+  moveDrafts,
   readDraft,
   readWaitingDrafts,
   removeAllDrafts,
@@ -39,6 +40,10 @@ export const toFormId = (path: string): FormId => {
 
 export type FormValues = Record<FieldAddress, unknown>;
 
+/** The ids of the open forms, typed. */
+export const openFormIds = (forms: object): FormId[] =>
+  Object.keys(forms).map(toFormId);
+
 export const toFormValues = (document: TinaDocument): FormValues => {
   const values: FormValues = {};
   for (const [name, value] of Object.entries(document)) {
@@ -63,6 +68,34 @@ export type SavePhase =
       readonly reason?: SaveFailureReason;
     };
 
+/** How one document ended in the latest Save All run. */
+export type SaveAllResult =
+  | { readonly status: 'saved' }
+  | { readonly status: 'saved-with-warning' }
+  | { readonly status: 'failed'; readonly words: string }
+  | { readonly status: 'not-saved'; readonly words: string };
+
+export interface SaveAllState {
+  /** Set from the start of a run to its end, so nothing re-enables between documents. */
+  readonly running: { readonly index: number; readonly total: number } | null;
+  /** The documents of the latest run, in the order they were saved. */
+  readonly results: Partial<Record<FormId, SaveAllResult>>;
+  /** The save-phase counter when the run ended. A save phase stamped later is newer than the run. */
+  readonly endedAt: number | null;
+  /** Set once a single save starts after the run ended. The run's words then leave the Status bar. */
+  readonly superseded: boolean;
+  /** The documents the run tried, skipped ones excluded. Fixed when the run ends. */
+  readonly attempted: number;
+}
+
+export const IDLE_SAVE_ALL: SaveAllState = {
+  running: null,
+  results: {},
+  endedAt: null,
+  superseded: false,
+  attempted: 0,
+};
+
 export type FieldErrors = Partial<Record<FieldAddress, string[]>>;
 
 type OpenForm =
@@ -77,6 +110,8 @@ type OpenForm =
       readonly baseline: FormValues;
       readonly errors: FieldErrors;
       readonly equal: FieldEquality;
+      /** The document has no file yet: its baseline is empty and Save creates it. */
+      readonly isNew?: true;
     };
 
 export const isEdited = (
@@ -107,6 +142,22 @@ export interface FormStore {
   /** Forms the editor left while copies waited. Their Resume prompt stays down until reload or until a new copy joins the waiting list (ADR-026 §2). */
   promptDown: Partial<Record<FormId, true>>;
   lowerPrompt: (formId: FormId) => void;
+  /** The collection name of each open form, so Save All finds the schema of a form that is not on screen. */
+  collections: Partial<Record<FormId, string>>;
+  /** Forms that failed validation in a save without a mounted form. They show their errors once when they open. */
+  revealOnOpen: Partial<Record<FormId, true>>;
+  /** Forms whose Save Document button is between its click and the end of its save. */
+  savePending: Partial<Record<FormId, true>>;
+  saveAll: SaveAllState;
+  registerCollection: (formId: FormId, collection: string) => void;
+  setRevealOnOpen: (formId: FormId) => void;
+  clearRevealOnOpen: (formId: FormId) => void;
+  setSavePending: (formId: FormId, pending: boolean) => void;
+  startSaveAll: (total: number) => void;
+  setSaveAllIndex: (index: number) => void;
+  recordSaveAllResult: (formId: FormId, result: SaveAllResult) => void;
+  endSaveAll: () => void;
+  clearFailedResult: (formId: FormId) => void;
   /** Removes the live copy, every waiting copy and the in-memory edits. */
   discardStoredDraft: (formId: FormId) => void;
   /**
@@ -121,7 +172,14 @@ export interface FormStore {
     formId: FormId,
     previous: FormStore['saves'][FormId]
   ) => void;
-  active: { formId: FormId; address: FieldAddress } | null;
+  /** `source: 'page'` marks an activation that came from a click on the preview. */
+  active: {
+    formId: FormId;
+    address: FieldAddress;
+    source?: 'page';
+  } | null;
+  /** The field under the pointer. Transient: never written to a draft. */
+  hovered: { formId: FormId; address: FieldAddress } | null;
   setUserId: (userId: DraftUserScope) => void;
   registerForm: (
     formId: FormId,
@@ -134,12 +192,27 @@ export interface FormStore {
     value: unknown
   ) => void;
   setFieldErrors: (formId: FormId, errors: FieldErrors) => void;
-  setActive: (formId: FormId, address: FieldAddress | null) => void;
+  setActive: (
+    formId: FormId,
+    address: FieldAddress | null,
+    options?: { source: 'page' }
+  ) => void;
+  setHovered: (formId: FormId, address: FieldAddress | null) => void;
   markSaved: (formId: FormId, savedValues?: FormValues) => void;
   discardEdits: (formId: FormId) => void;
   /** Puts the waiting copies in the form. Returns the form's new values. */
   resumeWaiting: (formId: FormId) => FormValues | undefined;
   removeForm: (formId: FormId) => void;
+  /** Re-keys a form, its save state and every stored copy to a new path. */
+  moveForm: (from: FormId, to: FormId) => void;
+  /** Opens a form on a document that has no file yet. Values are the form's own. */
+  seedNewDocument: (
+    formId: FormId,
+    values: FormValues,
+    equal?: FieldEquality
+  ) => void;
+  /** Stores a copy for a document that has no file yet. */
+  storeNewDocumentDraft: (formId: FormId, values: TinaDocument) => StoreResult;
 }
 
 export const valuesEqual = (
@@ -203,6 +276,15 @@ export const offeredCopies = (
   return held ? undefined : copies;
 };
 
+const withoutNew = ({ isNew: _created, ...rest }: EditedForm): EditedForm =>
+  rest;
+
+const draftOfScope = (scope: EditedForm): StoredDraft => ({
+  values: toDocument(scope.values),
+  baseline: toDocument(scope.baseline),
+  ...(scope.isNew ? { new: true } : {}),
+});
+
 const toWaitingCopy = (copy: StoredDraft) => ({
   values: toFormValues(copy.values),
   baseline: toFormValues(copy.baseline),
@@ -231,6 +313,20 @@ const withoutKey = <T>(record: Partial<Record<FormId, T>>, formId: FormId) => {
   const { [formId]: _gone, ...rest } = record;
   return rest;
 };
+
+const withoutFailedResult = (saveAll: SaveAllState, formId: FormId) => {
+  const status = saveAll.results[formId]?.status;
+  if (status !== 'failed' && status !== 'not-saved') return saveAll;
+  return { ...saveAll, results: withoutKey(saveAll.results, formId) };
+};
+
+export const formEntries = <T>(
+  record: Partial<Record<FormId, T>>
+): [FormId, T][] =>
+  (Object.entries(record) as [FormId, T | undefined][]).flatMap(
+    ([formId, value]): [FormId, T][] =>
+      value === undefined ? [] : [[formId, value]]
+  );
 
 const storeFailed = (...results: StoreResult[]) =>
   results.some((result) => result === 'failed');
@@ -304,11 +400,19 @@ const DEVTOOLS_ACTION = {
   setFieldValue: 'form/setFieldValue',
   setFieldErrors: 'form/setFieldErrors',
   setActive: 'form/setActive',
+  setHovered: 'form/setHovered',
   markSaved: 'form/markSaved',
   discardEdits: 'form/discardEdits',
   resumeWaiting: 'form/resumeWaiting',
   removeForm: 'form/removeForm',
   lowerPrompt: 'form/lowerPrompt',
+  registerCollection: 'form/registerCollection',
+  revealOnOpen: 'form/revealOnOpen',
+  savePending: 'form/savePending',
+  saveAll: 'form/saveAll',
+  moveForm: 'form/moveForm',
+  seedNewDocument: 'form/seedNewDocument',
+  storeNewDocumentDraft: 'form/storeNewDocumentDraft',
 } as const;
 type DevtoolsActionLabel =
   (typeof DEVTOOLS_ACTION)[keyof typeof DEVTOOLS_ACTION];
@@ -337,6 +441,90 @@ export const useFormStore = create<FormStore>()(
         hidden: {},
         promptDown: {},
         active: null,
+        hovered: null,
+        collections: {},
+        revealOnOpen: {},
+        savePending: {},
+        saveAll: IDLE_SAVE_ALL,
+
+        registerCollection: (formId, collection) =>
+          apply((state) => {
+            if (state.collections[formId] === collection) return state;
+            return {
+              collections: { ...state.collections, [formId]: collection },
+            };
+          }, DEVTOOLS_ACTION.registerCollection),
+
+        setRevealOnOpen: (formId) =>
+          apply(
+            (state) => ({
+              revealOnOpen: { ...state.revealOnOpen, [formId]: true },
+            }),
+            DEVTOOLS_ACTION.revealOnOpen
+          ),
+
+        clearRevealOnOpen: (formId) =>
+          apply((state) => {
+            if (!state.revealOnOpen[formId]) return state;
+            return { revealOnOpen: withoutKey(state.revealOnOpen, formId) };
+          }, DEVTOOLS_ACTION.revealOnOpen),
+
+        setSavePending: (formId, pending) =>
+          apply((state) => {
+            if ((state.savePending[formId] === true) === pending) return state;
+            return {
+              savePending: pending
+                ? { ...state.savePending, [formId]: true }
+                : withoutKey(state.savePending, formId),
+            };
+          }, DEVTOOLS_ACTION.savePending),
+
+        startSaveAll: (total) =>
+          apply(
+            () => ({
+              saveAll: { ...IDLE_SAVE_ALL, running: { index: 0, total } },
+            }),
+            DEVTOOLS_ACTION.saveAll
+          ),
+
+        setSaveAllIndex: (index) =>
+          apply((state) => {
+            const { running } = state.saveAll;
+            if (!running) return state;
+            return {
+              saveAll: { ...state.saveAll, running: { ...running, index } },
+            };
+          }, DEVTOOLS_ACTION.saveAll),
+
+        recordSaveAllResult: (formId, result) =>
+          apply(
+            (state) => ({
+              saveAll: {
+                ...state.saveAll,
+                results: { ...state.saveAll.results, [formId]: result },
+              },
+            }),
+            DEVTOOLS_ACTION.saveAll
+          ),
+
+        endSaveAll: () =>
+          apply(
+            (state) => ({
+              saveAll: {
+                ...state.saveAll,
+                running: null,
+                endedAt: ++savePhaseClock,
+                attempted: Object.keys(state.saveAll.results).length,
+              },
+            }),
+            DEVTOOLS_ACTION.saveAll
+          ),
+
+        clearFailedResult: (formId) =>
+          apply((state) => {
+            const saveAll = withoutFailedResult(state.saveAll, formId);
+            return saveAll === state.saveAll ? state : { saveAll };
+          }, DEVTOOLS_ACTION.saveAll),
 
         lowerPrompt: (formId) =>
           apply((state) => {
@@ -361,6 +549,8 @@ export const useFormStore = create<FormStore>()(
               waiting,
               held,
               unstored,
+              revealOnOpen: withoutKey(state.revealOnOpen, formId),
+              saveAll: withoutFailedResult(state.saveAll, formId),
               draftsVersion: state.draftsVersion + 1,
             };
           }, DEVTOOLS_ACTION.discardStoredDraft);
@@ -374,10 +564,7 @@ export const useFormStore = create<FormStore>()(
           if (isEdited(scope) && formStatus(scope) === 'dirty') {
             const result = writeDraft(
               formId,
-              {
-                values: toDocument(scope.values),
-                baseline: toDocument(scope.baseline),
-              },
+              draftOfScope(scope),
               userId,
               branch
             );
@@ -429,19 +616,26 @@ export const useFormStore = create<FormStore>()(
               hidden: {},
               promptDown: {},
               active: null,
+              hovered: null,
+              collections: {},
+              revealOnOpen: {},
+              savePending: {},
+              saveAll: IDLE_SAVE_ALL,
             };
           }, DEVTOOLS_ACTION.setBranch),
 
         setSavePhase: (formId, phase) =>
-          apply(
-            (state) => ({
-              saves: {
-                ...state.saves,
-                [formId]: { ...phase, at: ++savePhaseClock },
-              },
-            }),
-            DEVTOOLS_ACTION.setSavePhase
-          ),
+          apply((state) => {
+            const at = ++savePhaseClock;
+            const { endedAt, superseded } = state.saveAll;
+            const newer = endedAt !== null && at > endedAt && !superseded;
+            return {
+              saves: { ...state.saves, [formId]: { ...phase, at } },
+              ...(newer
+                ? { saveAll: { ...state.saveAll, superseded: true } }
+                : {}),
+            };
+          }, DEVTOOLS_ACTION.setSavePhase),
 
         clearSavePhase: (formId) =>
           apply((state) => {
@@ -472,6 +666,11 @@ export const useFormStore = create<FormStore>()(
               hidden: {},
               promptDown: {},
               active: null,
+              hovered: null,
+              collections: {},
+              revealOnOpen: {},
+              savePending: {},
+              saveAll: IDLE_SAVE_ALL,
             };
           }, DEVTOOLS_ACTION.setUserId),
 
@@ -571,21 +770,35 @@ export const useFormStore = create<FormStore>()(
             };
           }, DEVTOOLS_ACTION.setFieldErrors),
 
-        setActive: (formId, address) =>
+        setActive: (formId, address, options) =>
           apply(
-            () => ({ active: address == null ? null : { formId, address } }),
+            () => ({
+              active: address == null ? null : { formId, address, ...options },
+            }),
             DEVTOOLS_ACTION.setActive
           ),
+
+        setHovered: (formId, address) =>
+          apply((state) => {
+            const same =
+              address == null
+                ? state.hovered === null
+                : state.hovered?.formId === formId &&
+                  state.hovered.address === address;
+            if (same) return state;
+            return { hovered: address == null ? null : { formId, address } };
+          }, DEVTOOLS_ACTION.setHovered),
 
         markSaved: (formId, savedValues) =>
           apply((state) => {
             const scope = state.forms[formId];
             if (!scope) return state;
+            const saved = isEdited(scope) ? withoutNew(scope) : scope;
             return {
               forms: {
                 ...state.forms,
                 [formId]: {
-                  ...scope,
+                  ...saved,
                   status: 'edited',
                   // A caller passes the form library's own value tree, which it
                   // keeps mutating in place. The baseline must be a private
@@ -606,6 +819,8 @@ export const useFormStore = create<FormStore>()(
             return {
               saves,
               hidden: withoutKey(state.hidden, formId),
+              revealOnOpen: withoutKey(state.revealOnOpen, formId),
+              saveAll: withoutFailedResult(state.saveAll, formId),
               forms: {
                 ...state.forms,
                 [formId]: {
@@ -716,6 +931,73 @@ export const useFormStore = create<FormStore>()(
           return keep ? scope.values : values;
         },
 
+        moveForm: (from, to) => {
+          const { userId, branch } = readFormStore();
+          moveDrafts(from, to, userId, branch);
+          apply((state) => {
+            const rekey = <T>(record: Partial<Record<FormId, T>>) => {
+              const { [from]: moved, ...rest } = record;
+              return moved === undefined ? record : { ...rest, [to]: moved };
+            };
+            return {
+              forms: rekey(state.forms),
+              saves: rekey(state.saves),
+              waiting: rekey(state.waiting),
+              held: rekey(state.held),
+              unstored: rekey(state.unstored),
+              failures: rekey(state.failures),
+              swapFailures: rekey(state.swapFailures),
+              hidden: rekey(state.hidden),
+              collections: rekey(state.collections),
+              revealOnOpen: rekey(state.revealOnOpen),
+              savePending: rekey(state.savePending),
+              saveAll: {
+                ...state.saveAll,
+                results: rekey(state.saveAll.results),
+              },
+              active:
+                state.active?.formId === from
+                  ? { ...state.active, formId: to }
+                  : state.active,
+              draftsVersion: state.draftsVersion + 1,
+            };
+          }, DEVTOOLS_ACTION.moveForm);
+        },
+
+        seedNewDocument: (formId, values, equal = STRUCTURAL_EQUALITY) =>
+          apply((state) => {
+            const scope = state.forms[formId];
+            if (isEdited(scope) && scope.isNew) return state;
+            return {
+              forms: {
+                ...state.forms,
+                [formId]: {
+                  status: 'edited',
+                  values,
+                  baseline: {},
+                  errors: {},
+                  equal,
+                  isNew: true,
+                },
+              },
+            };
+          }, DEVTOOLS_ACTION.seedNewDocument),
+
+        storeNewDocumentDraft: (formId, values) => {
+          const { userId, branch } = readFormStore();
+          const result = writeDraft(
+            formId,
+            { values, baseline: {}, new: true },
+            userId,
+            branch
+          );
+          apply(
+            (state) => ({ draftsVersion: state.draftsVersion + 1 }),
+            DEVTOOLS_ACTION.storeNewDocumentDraft
+          );
+          return result;
+        },
+
         removeForm: (formId) =>
           apply((state) => {
             if (!state.forms[formId]) return state;
@@ -723,6 +1005,7 @@ export const useFormStore = create<FormStore>()(
             return {
               forms: rest,
               active: state.active?.formId === formId ? null : state.active,
+              hovered: state.hovered?.formId === formId ? null : state.hovered,
             };
           }, DEVTOOLS_ACTION.removeForm),
       };
@@ -746,7 +1029,7 @@ export const readOpeningScope = (
 export const syncDrafts = () =>
   useFormStore.subscribe((next, prev) => {
     if (next.userId !== prev.userId || next.userId === null) return;
-    for (const formId of Object.keys(next.forms) as FormId[]) {
+    for (const formId of openFormIds(next.forms)) {
       const scope = next.forms[formId];
       const before = prev.forms[formId];
       if (scope === before) continue;
@@ -756,10 +1039,7 @@ export const syncDrafts = () =>
       if (isEdited(scope) && formStatus(scope) === 'dirty') {
         const result = writeDraft(
           formId,
-          {
-            values: toDocument(scope.values),
-            baseline: toDocument(scope.baseline),
-          },
+          draftOfScope(scope),
           next.userId,
           next.branch
         );
@@ -804,29 +1084,92 @@ export interface SaveSummary {
   reason?: SaveFailureReason;
   /** The file name of the document the newest save wrote, when `state` is `saved`. */
   document?: string;
+  // The Save All fields stay flat: `useSaveSummary` compares them shallowly.
+  /** The document Save All is on, and how many it will save, while it runs. */
+  runIndex?: number;
+  runTotal?: number;
+  /** The documents of the latest Save All that did not save, out of those it tried. */
+  runFailed?: number;
+  runTried?: number;
+  /** The documents the latest Save All saved, when nothing in it failed. */
+  runSaved?: number;
+  runWarnings?: boolean;
 }
 
+// A document the editor edited back to its saved values has nothing left to fail.
+const failedIds = (state: FormStore): FormId[] =>
+  formEntries(state.saveAll.results)
+    .filter(
+      ([formId, result]) =>
+        (result.status === 'failed' || result.status === 'not-saved') &&
+        formStatus(state.forms[formId]) === 'dirty'
+    )
+    .map(([formId]) => formId);
+
 /**
- * One answer for the whole shell: a running save wins, then the newest
- * failure, then unsaved edits, then the newest success, else idle.
+ * One answer for the whole shell, first match wins: Save All running, a
+ * Document save running, the failures of the latest Save All, then today's
+ * order: newest failure, unsaved edits, newest success, idle. A single save
+ * that starts after a run ends replaces the run's words for good. A form whose
+ * `afterSave` hook failed during the run is written, so that phase does not count
+ * as a failure; a later save attempt of the same form still does.
  */
-const summarizeSaves = (state: FormStore): SaveSummary => {
-  const entries = Object.entries(state.saves).flatMap(([formId, save]) =>
-    save === undefined ? [] : [{ formId, ...save }]
-  );
+export const summarizeSaves = (state: FormStore): SaveSummary => {
+  const { running, results, superseded, attempted, endedAt } = state.saveAll;
+  if (running)
+    return {
+      state: 'saving',
+      runIndex: running.index,
+      runTotal: running.total,
+    };
+  const entries = formEntries(state.saves).map(([formId, save]) => ({
+    formId,
+    ...save,
+  }));
   if (entries.some((save) => save.phase === 'saving')) {
     return { state: 'saving' };
   }
-  const newest = entries.sort((a, b) => b.at - a.at)[0];
+  const failed = failedIds(state).length;
+  if (failed > 0 && !superseded) {
+    return { state: 'failed', runFailed: failed, runTried: attempted };
+  }
+  const newest = entries
+    .filter(
+      (save) =>
+        !(
+          save.phase === 'failed' &&
+          endedAt !== null &&
+          save.at < endedAt &&
+          results[save.formId]?.status === 'saved-with-warning'
+        )
+    )
+    .sort((a, b) => b.at - a.at)[0];
   if (newest?.phase === 'failed') {
     return { state: 'failed', message: newest.message, reason: newest.reason };
   }
+  const written = Object.values(results).filter(
+    (result) =>
+      result.status === 'saved' || result.status === 'saved-with-warning'
+  );
+  const runSaved =
+    written.length > 0 && !superseded
+      ? {
+          runSaved: written.length,
+          runWarnings: written.some(
+            (result) => result.status === 'saved-with-warning'
+          ),
+        }
+      : {};
   if (anyFormDirty(state)) return { state: 'unsaved' };
   if (newest?.phase === 'saved') {
-    return { state: 'saved', document: newest.formId.split('/').at(-1) };
+    return {
+      state: 'saved',
+      document: newest.formId.split('/').at(-1),
+      ...runSaved,
+    };
   }
   if (keptEdits(state)) return { state: 'idle', kept: true };
-  return { state: 'idle' };
+  return { state: 'idle', ...runSaved };
 };
 
 const keptEdits = (state: FormStore): boolean =>
@@ -861,7 +1204,21 @@ export const useFormErrors = (formId: FormId): FieldErrors =>
 export const useSaveSummary = (): SaveSummary =>
   useFormStore(useShallow(summarizeSaves));
 
+export const useSaveAllFailureCount = (): number =>
+  useFormStore((state) => failedIds(state).length);
+
 export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
+
+export const useSaveAllState = (): SaveAllState =>
+  useFormStore((state) => state.saveAll);
+
+export const useAnySaveRunning = (): boolean =>
+  useFormStore(
+    (state) =>
+      state.saveAll.running !== null ||
+      Object.keys(state.savePending).length > 0 ||
+      Object.values(state.saves).some((save) => save?.phase === 'saving')
+  );
 
 /**
  * The documents with unsaved edits: the open forms that are dirty, and the
@@ -871,10 +1228,69 @@ export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
 export const useUnsavedFormIds = (): FormId[] =>
   useFormStore(
     useShallow((state) => {
-      const dirty = (Object.keys(state.forms) as FormId[]).filter(
+      const dirty = openFormIds(state.forms).filter(
         (id) => formStatus(state.forms[id]) === 'dirty'
       );
       const stored = listStoredDraftIds(state.userId, state.branch);
       return [...new Set([...dirty, ...stored])];
     })
   );
+
+/**
+ * The documents that have no file yet, for this editor on this branch: the open
+ * forms marked new, and the stored copies marked new.
+ */
+export const useNewDocumentIds = (): FormId[] =>
+  useFormStore(
+    useShallow((state) => {
+      const open = openFormIds(state.forms).filter((id) => {
+        const scope = state.forms[id];
+        return isEdited(scope) && scope.isNew === true;
+      });
+      const stored = listStoredDraftIds(state.userId, state.branch).filter(
+        (id) => readDraft(id, state.userId, state.branch)?.new === true
+      );
+      return [...new Set([...open, ...stored])].sort();
+    })
+  );
+
+export interface UnsavedDocument {
+  path: string;
+  values: TinaDocument;
+}
+
+/**
+ * Every unsaved copy this editor holds on this branch: dirty open forms, open new
+ * documents, and stored live and waiting drafts. A document with several copies
+ * appears once per copy.
+ */
+export const readUnsavedDocuments = (): UnsavedDocument[] => {
+  const { userId, branch, forms } = readFormStore();
+  const documents: UnsavedDocument[] = [];
+  for (const id of openFormIds(forms)) {
+    const scope = forms[id];
+    if (
+      isEdited(scope) &&
+      (scope.isNew === true || formStatus(scope) === 'dirty')
+    ) {
+      documents.push({ path: id, values: toDocument(scope.values) });
+    }
+  }
+  for (const id of listStoredDraftIds(userId, branch)) {
+    const live = readDraft(id, userId, branch);
+    if (live) documents.push({ path: id, values: live.values });
+    for (const copy of readWaitingDrafts(id, userId, branch)) {
+      documents.push({ path: id, values: copy.values });
+    }
+  }
+  return documents;
+};
+
+/** Whether this editor holds a copy of a document that has no file yet. */
+export const useHasNewDocument = (formId: FormId | undefined): boolean =>
+  useFormStore((state) => {
+    if (!formId) return false;
+    const scope = state.forms[formId];
+    if (isEdited(scope) && scope.isNew) return true;
+    return readDraft(formId, state.userId, state.branch)?.new === true;
+  });

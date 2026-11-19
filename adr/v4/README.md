@@ -46,6 +46,9 @@ The ADRs are the canonical decisions. Read them in order; each one's `Status` fi
 - [ADR-027: Global Nav Groups](./027-global-nav-groups.md) — *extends ADR-013*
 - [ADR-028: Server Save Hooks](./028-server-save-hooks.md) — *amends ADR-008, ADR-018 and ADR-025*
 - [ADR-029: Field Options Live at the Top Level, Not Under `ui`](./029-field-ui-options.md) — *builds on ADR-009 and ADR-017*
+- [ADR-030: TinaCloud Website Search Uses a Public Search Token](./030-tinacloud-public-search-token.md) — *builds on ADR-021*
+- [ADR-031: Save Scope: Save Document and Save All](./031-save-scope.md) — *clarifies ADR-011 §2*
+- [ADR-032: Collection Options Live at the Top Level, Not Under `ui`](./032-collection-options.md) — *completes ADR-029; builds on ADR-015, ADR-016 and ADR-017*
 
 ## Supporting documentation
 

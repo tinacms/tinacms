@@ -2,13 +2,29 @@ import { EmptyState } from '@tinacms/ui/components/empty-state';
 import { Button } from '@tinacms/ui/components/button';
 import { NavRow } from '@tinacms/ui/components/nav-row';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CollectionSchema } from '../core/schema/types';
 import {
   useCollectionDocuments,
   useCollectionsDocumentPaths,
 } from '../editor/content-queries';
-import { useFormStore, useUnsavedFormIds } from '../form/form-store';
+import {
+  carryOpenFolders,
+  foldersThrough,
+  useCollectionLevel,
+} from '../editor/collection-tree';
+import type { FolderSummary } from '../core/content/contract';
+import {
+  useFormStore,
+  useNewDocumentIds,
+  useUnsavedFormIds,
+} from '../form/form-store';
+import { isUnder } from '../core/content/names';
+import {
+  directoryOf,
+  folderOfDocument,
+  useNewDocumentDrafts,
+} from '../editor/collection-documents';
 import type { GlobalNavEntry } from '../core/slot/contract';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { DiscardConfirm } from './discard-confirm';
@@ -51,26 +67,102 @@ function DocumentRow({
   );
 }
 
-function CollectionDocuments({
-  collection,
-  activePath,
-  unsavedIds,
-  navigate,
-}: {
+type OpenFolders = ReadonlySet<string>;
+type SetOpenFolders = (update: (open: OpenFolders) => OpenFolders) => void;
+
+const NO_FOLDERS: OpenFolders = new Set();
+
+/** Which folders are open in the tree, per collection. The shell owns it so the tree keeps them while a table replaces it. */
+export const useTreeFolders = () => {
+  const [byCollection, setByCollection] = useState<
+    Readonly<Record<string, OpenFolders>>
+  >({});
+  const setFolders = (
+    collection: string,
+    update: (open: OpenFolders) => OpenFolders
+  ) =>
+    setByCollection((current) => ({
+      ...current,
+      [collection]: update(current[collection] ?? NO_FOLDERS),
+    }));
+  const reveal = (collection: string, folder: string) =>
+    setFolders(
+      collection,
+      (open) => new Set([...open, ...foldersThrough(folder)])
+    );
+  return { byCollection, setFolders, reveal };
+};
+
+export type TreeFolders = ReturnType<typeof useTreeFolders>;
+
+interface LevelProps {
   collection: CollectionSchema;
+  folder: string;
   activePath?: string;
   unsavedIds: ReadonlySet<string>;
   navigate: (route: AdminRoute) => void;
-}) {
-  const { documents, isLoading, error } = useCollectionDocuments(
-    collection.name
+  openFolders: OpenFolders;
+  setOpenFolders: SetOpenFolders;
+}
+
+function FolderRow({
+  folder,
+  ...level
+}: Omit<LevelProps, 'folder'> & { folder: FolderSummary }) {
+  const open = level.openFolders.has(folder.path);
+  return (
+    <li>
+      <NavRow
+        kind='folder'
+        open={open}
+        title={folder.path}
+        onClick={() =>
+          level.setOpenFolders((current) => {
+            const next = new Set(current);
+            if (open) next.delete(folder.path);
+            else next.add(folder.path);
+            return next;
+          })
+        }
+      >
+        {folder.name}
+      </NavRow>
+      {open ? <CollectionLevel {...level} folder={folder.path} /> : null}
+    </li>
   );
+}
+
+function CollectionLevel(props: LevelProps) {
+  const { collection, folder, activePath, unsavedIds, navigate } = props;
+  const { folders, documents, isLoading, error, refetch, loaded } =
+    useCollectionLevel(collection.name, folder);
+  const drafts = useNewDocumentDrafts(collection.name, folder).filter(
+    ({ path }) => !documents.some((document) => document.path === path)
+  );
+  const seenFolders = useRef<FolderSummary[] | null>(null);
+  const { setOpenFolders } = props;
+  useEffect(() => {
+    if (!loaded) {
+      seenFolders.current = null;
+      return;
+    }
+    const before = seenFolders.current;
+    seenFolders.current = folders;
+    if (before === null || before === folders) return;
+    setOpenFolders((open) => carryOpenFolders(open, before, folders));
+  }, [loaded, folders, setOpenFolders]);
+
   const label = collection.label ?? collection.name;
   if (error) {
     return (
-      <p role='alert' className='py-1.5 pl-8 text-sm text-destructive'>
-        Could not load {label}. {error.message}
-      </p>
+      <div className='py-1.5 pl-8'>
+        <p role='alert' className='text-sm text-destructive'>
+          {error.message}
+        </p>
+        <Button size='sm' onClick={refetch}>
+          Retry
+        </Button>
+      </div>
     );
   }
   if (isLoading) {
@@ -78,15 +170,33 @@ function CollectionDocuments({
       <p className='py-1.5 pl-8 text-sm text-muted-foreground'>Loading…</p>
     );
   }
-  if (documents.length === 0) {
+  if (folders.length + drafts.length + documents.length === 0) {
     return (
       <p className='py-1.5 pl-8 text-sm text-muted-foreground'>
         No documents yet.
       </p>
     );
   }
+  const listLabel =
+    folder === '' ? label : (folder.split('/').at(-1) ?? folder);
   return (
-    <ul aria-label={`${label} documents`} className='m-0 list-none p-0 pl-4.5'>
+    <ul
+      aria-label={`${listLabel} documents`}
+      className='m-0 list-none p-0 pl-4.5'
+    >
+      {folders.map((entry) => (
+        <FolderRow key={entry.path} {...props} folder={entry} />
+      ))}
+      {drafts.map(({ path }) => (
+        <DocumentRow
+          key={path}
+          collection={collection.name}
+          path={path}
+          selected={path === activePath}
+          unsaved
+          navigate={navigate}
+        />
+      ))}
       {documents.map(({ path }) => (
         <DocumentRow
           key={path}
@@ -104,15 +214,31 @@ function CollectionDocuments({
 // Review N unsaved: only the documents that hold edits, open or kept in a stored draft, grouped by collection.
 function UnsavedCollection({
   collection,
+  collections,
   unsavedIds,
   navigate,
 }: {
   collection: CollectionSchema;
+  collections: CollectionSchema[];
   unsavedIds: ReadonlySet<string>;
   navigate: (route: AdminRoute) => void;
 }) {
   const { documents, error } = useCollectionDocuments(collection.name);
-  const unsaved = documents.filter(({ path }) => unsavedIds.has(path));
+  const directory = directoryOf(collection, '');
+  const created = useNewDocumentIds().filter(
+    (id) =>
+      isUnder(id, directory) &&
+      !collections.some((other) => {
+        const nested = directoryOf(other, '');
+        return nested.length > directory.length && isUnder(id, nested);
+      })
+  );
+  const unsaved = [
+    ...documents.filter(({ path }) => unsavedIds.has(path)),
+    ...created
+      .filter((id) => !documents.some(({ path }) => path === id))
+      .map((id) => ({ path: id })),
+  ];
   const label = collection.label ?? collection.name;
   if (error) {
     return (
@@ -160,7 +286,10 @@ function MissingDocumentEdits({
   );
   const discard = useFormStore((state) => state.discardStoredDraft);
   const [confirming, setConfirming] = useState<string | null>(null);
-  const missing = useUnsavedFormIds().filter((id) => !paths.has(id));
+  const created = new Set<string>(useNewDocumentIds());
+  const missing = useUnsavedFormIds().filter(
+    (id) => !paths.has(id) && !created.has(id)
+  );
   if (!settled || missing.length === 0) return null;
   return (
     <ul
@@ -209,17 +338,37 @@ function CollectionNode({
   activePath,
   unsavedIds,
   navigate,
+  treeFolders,
 }: {
   collection: CollectionSchema;
   active: boolean;
   activePath?: string;
   unsavedIds: ReadonlySet<string>;
   navigate: (route: AdminRoute) => void;
+  treeFolders: TreeFolders;
 }) {
   const [open, setOpen] = useState(active);
   useEffect(() => {
     if (active) setOpen(true);
   }, [active]);
+  const selectedFolders =
+    active && activePath
+      ? foldersThrough(folderOfDocument(collection, activePath))
+      : [];
+  const selectedKey = selectedFolders.join('\n');
+  const openFolders = treeFolders.byCollection[collection.name] ?? NO_FOLDERS;
+  const { setFolders } = treeFolders;
+  const setOpenFolders: SetOpenFolders = (update) =>
+    setFolders(collection.name, update);
+  useEffect(() => {
+    if (selectedKey === '') return;
+    setFolders(collection.name, (current) => {
+      const missing = selectedKey
+        .split('\n')
+        .filter((path) => !current.has(path));
+      return missing.length === 0 ? current : new Set([...current, ...missing]);
+    });
+  }, [selectedKey, collection.name]);
   const label = collection.label ?? collection.name;
   return (
     <li>
@@ -238,8 +387,11 @@ function CollectionNode({
         {label}
       </NavRow>
       {open ? (
-        <CollectionDocuments
+        <CollectionLevel
           collection={collection}
+          folder=''
+          openFolders={openFolders}
+          setOpenFolders={setOpenFolders}
           activePath={activePath}
           unsavedIds={unsavedIds}
           navigate={navigate}
@@ -259,18 +411,24 @@ export function CollectionsNavigator({
   route,
   navigate,
   onClose,
+  onMaximise,
+  treeFolders,
   hideBelowLg = false,
 }: {
   collections: CollectionSchema[];
+  treeFolders: TreeFolders;
   /** The document row to mark, when no document is open. */
   selectedPath?: string;
   route: AdminRoute;
   navigate: (route: AdminRoute) => void;
   onClose: () => void;
+  onMaximise: () => void;
   hideBelowLg?: boolean;
 }) {
   const activeCollection =
-    route.view === 'collection' || route.view === 'document'
+    route.view === 'collection' ||
+    route.view === 'folder' ||
+    route.view === 'document'
       ? route.collection
       : undefined;
   const activePath = route.view === 'document' ? route.path : selectedPath;
@@ -284,6 +442,7 @@ export function CollectionsNavigator({
         heading='Collections'
         closeLabel='Close'
         onClose={onClose}
+        onMaximise={onMaximise}
         menuLabel='Collections menu'
         menu={
           <DropdownMenuItem
@@ -307,6 +466,7 @@ export function CollectionsNavigator({
                 <UnsavedCollection
                   key={collection.name}
                   collection={collection}
+                  collections={collections}
                   unsavedIds={unsavedIds}
                   navigate={navigate}
                 />
@@ -324,6 +484,7 @@ export function CollectionsNavigator({
                 active={collection.name === activeCollection}
                 activePath={activePath}
                 navigate={navigate}
+                treeFolders={treeFolders}
               />
             ))}
           </ul>

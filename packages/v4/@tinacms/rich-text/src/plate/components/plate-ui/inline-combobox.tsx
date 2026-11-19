@@ -234,9 +234,11 @@ const InlineComboboxContent: typeof ComboboxPopover = ({
     <Portal>
       <ComboboxPopover
         className={cn(
-          'z-[9999999] max-h-[288px] w-[300px] overflow-y-auto rounded-sm bg-white shadow-md',
+          'z-[9999999] box-border max-h-[min(18rem,var(--popover-available-height,18rem))] w-[min(300px,var(--popover-available-width,300px))] overflow-y-auto rounded-md bg-popover p-1 font-sans text-base text-foreground shadow-popover outline-none',
           className
         )}
+        fitViewport
+        overflowPadding={8}
         {...props}
       />
     </Portal>
@@ -244,15 +246,15 @@ const InlineComboboxContent: typeof ComboboxPopover = ({
 };
 
 const comboboxItemVariants = cva(
-  'relative flex h-9 select-none items-center rounded-xs px-2 py-1.5 text-sm outline-none',
+  'relative box-border flex min-h-9 w-full select-none items-center gap-2.5 rounded-sm px-2.5 text-base text-foreground outline-none aria-disabled:text-muted-foreground',
   {
     defaultVariants: {
       interactive: true,
     },
     variants: {
       interactive: {
-        false: '',
-        true: 'cursor-pointer transition-colors hover:bg-blue-500 hover:text-black data-[active-item=true]:bg-orange-400 data-[active-item=true]:text-black',
+        false: 'text-muted-foreground',
+        true: 'cursor-pointer data-[active-item=true]:bg-muted aria-disabled:cursor-default aria-disabled:data-[active-item=true]:bg-transparent',
       },
     },
   }
@@ -288,7 +290,9 @@ const InlineComboboxItem = ({
   return (
     <ComboboxItem
       className={cn(comboboxItemVariants(), className)}
+      accessibleWhenDisabled
       onClick={(event) => {
+        if (props.disabled) return;
         removeInput(true);
         onClick?.(event);
       }}

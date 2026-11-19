@@ -12,23 +12,22 @@ import {
   TinaProvider,
   useLocalStorage,
 } from '@tinacms/toolkit';
-import React, { useEffect, useState } from 'react';
-import { ModalBuilder } from './AuthModal';
-import loginLlama from './tina-login.png';
-
 import { isErrorNamed } from '@toolkit/core/errors';
+import React, { useEffect, useState } from 'react';
 import { TinaAdminApi } from '../admin/api';
 import {
   Client,
   LocalSearchClient,
-  TinaCMSSearchClient,
   TinaCloudAuthProvider,
+  TinaCMSSearchClient,
   TinaIOConfig,
 } from '../internalClient';
 import { BranchSwitchedEvent } from '../lib/posthog/posthog';
 import { captureEvent } from '../lib/posthog/posthogProvider';
 import { CreateClientProps, createClient } from '../utils';
+import { ModalBuilder } from './AuthModal';
 import { AuthenticationCancelledError } from './authenticate';
+import loginLlama from './tina-login.png';
 import {
   type AuthRedirectParams,
   useTinaAuthRedirect,
@@ -63,7 +62,11 @@ const AuthWallInner = ({
   cms,
   getModalActions,
   isAuthRedirect,
-}: TinaCloudAuthWallProps & { isAuthRedirect?: boolean }) => {
+  authRedirectError,
+}: TinaCloudAuthWallProps & {
+  isAuthRedirect?: boolean;
+  authRedirectError?: string;
+}) => {
   const client: Client = cms.api.tina;
   // Whether we are using TinaCloud for auth
   const isTinaCloud =
@@ -104,7 +107,7 @@ const AuthWallInner = ({
   React.useEffect(() => {
     let mounted = true;
 
-    if (isAuthRedirect) {
+    if (isAuthRedirect || authRedirectError) {
       setActiveModal('authenticate');
       return () => {
         mounted = false;
@@ -228,7 +231,7 @@ const AuthWallInner = ({
       {activeModal === 'authenticate' && loginStrategy === 'Redirect' && (
         <ModalBuilder
           title={modalTitle}
-          error={sessionExpired ? SESSION_EXPIRED_MESSAGE : undefined}
+          error={sessionExpired ? SESSION_EXPIRED_MESSAGE : authRedirectError}
           message={
             isTinaCloud ? (
               <img
@@ -258,7 +261,7 @@ const AuthWallInner = ({
         loginStrategy === 'UsernamePassword' && (
           <ModalBuilder
             title={modalTitle}
-            error={sessionExpired ? SESSION_EXPIRED_MESSAGE : undefined}
+            error={sessionExpired ? SESSION_EXPIRED_MESSAGE : authRedirectError}
             message={''}
             close={close}
             busy={isAuthRedirect}
@@ -483,9 +486,10 @@ export const TinaCloudProvider = (
     state: urlParams.get('state'),
     error: urlParams.get('error'),
   };
-  const isAuthRedirect =
-    isTinaCloudAuth && !!(authRedirectParams.code && authRedirectParams.state);
-  useTinaAuthRedirect(authRedirectParams, isTinaCloudAuth);
+  const authRedirect = useTinaAuthRedirect(authRedirectParams, isTinaCloudAuth);
+  const isAuthRedirect = authRedirect.status === 'pending';
+  const authRedirectError =
+    authRedirect.status === 'failed' ? authRedirect.message : undefined;
   const SessionProvider = client.authProvider.getSessionProvider();
 
   const handleListBranches = async (): Promise<Branch[]> => {
@@ -588,7 +592,12 @@ export const TinaCloudProvider = (
       >
         <TinaProvider cms={cms}>
           <MediaWorkflowOverlay />
-          <AuthWallInner {...props} cms={cms} isAuthRedirect={isAuthRedirect} />
+          <AuthWallInner
+            {...props}
+            cms={cms}
+            isAuthRedirect={isAuthRedirect}
+            authRedirectError={authRedirectError}
+          />
         </TinaProvider>
       </BranchDataProvider>
     </SessionProvider>

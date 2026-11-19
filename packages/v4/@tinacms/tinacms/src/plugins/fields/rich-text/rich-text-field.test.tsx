@@ -1,3 +1,4 @@
+import { render } from '@testing-library/react';
 import { INVALID_MARKDOWN_TYPE } from '@tinacms/rich-text';
 import { describe, expect, it } from 'vitest';
 import { required } from '../../../plugins/fields';
@@ -13,6 +14,8 @@ import {
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import type { CollectionSchema } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
+import { TinaMarkdown } from '../../../adapters/react/tina-markdown';
+import type { TinaMarkdownContent } from '../../../rich-text';
 import { t } from '../../../index';
 import { formatAdapterFor } from '../../content/local/adapters/format-adapters';
 import type { RichTextValue } from './rich-text-codec';
@@ -326,6 +329,43 @@ describe('RichTextField metadata wrapping', () => {
     const descriptor = registry.get('rich-text');
     expect(descriptor?.metadata).toEqual({ layout: 'block', labelable: false });
     expect(descriptor?.defaultValue).toEqual({ type: 'root', children: [] });
+  });
+});
+
+describe('rich-text rendering in the preview', () => {
+  it('marks no inner element for visual editing, so the field gets one outline', () => {
+    const text = (value: string, marks = {}) => ({
+      type: 'text',
+      text: value,
+      ...marks,
+    });
+    const { container } = render(
+      <TinaMarkdown
+        content={[
+          { type: 'h2', children: [text('Title')] },
+          {
+            type: 'p',
+            children: [
+              text('Some '),
+              text('bold', { bold: true }),
+              {
+                type: 'a',
+                url: 'https://tina.io',
+                children: [text('link')],
+              } as TinaMarkdownContent,
+            ],
+          },
+          { type: 'ul', children: [{ type: 'li', children: [text('item')] }] },
+          {
+            type: 'code_block',
+            lang: 'ts',
+            value: 'const a = 1;',
+          } as TinaMarkdownContent,
+        ]}
+      />
+    );
+    expect(container.textContent).toContain('Title');
+    expect(container.querySelectorAll('[data-tina-field]')).toHaveLength(0);
   });
 });
 
