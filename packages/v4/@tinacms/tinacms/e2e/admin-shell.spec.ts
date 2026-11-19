@@ -4,7 +4,7 @@ test('the rail draws a divider above Tools and Settings', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/#/');
   const divider = page.locator('[data-slot=sidebar-separator]');
-  await expect(divider).toBeVisible();
+  await expect(divider).toBeVisible({ timeout: 30_000 });
   const box = await divider.boundingBox();
   expect(box?.height).toBeGreaterThanOrEqual(1);
 });

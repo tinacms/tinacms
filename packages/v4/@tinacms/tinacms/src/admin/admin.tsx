@@ -11,6 +11,7 @@ import {
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
+import { cn } from '@tinacms/ui/lib/utils';
 import { useKeyboardOpen } from '@tinacms/ui/hooks/use-keyboard-open';
 import { toast } from '@tinacms/ui/components/toast';
 import {
@@ -31,11 +32,7 @@ import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
 import { folderOfDocument } from '../editor/collection-documents';
 import { useCurrentBranch, useDocument } from '../editor/content-queries';
-import {
-  type DocumentRef,
-  type ReferenceStep,
-  usePreviewConnection,
-} from '../editor/preview-connection';
+import type { DocumentRef, ReferenceStep } from '../editor/preview-connection';
 import { toFormId, useFormStore, useHasNewDocument } from '../form/form-store';
 import { documentTitle } from './document-title';
 import { TinaProvider } from '../editor/provider';
@@ -70,6 +67,8 @@ import { useKeptEditsNotice } from './use-kept-edits-notice';
 import { useAdminRoute } from './use-admin-route';
 import type { PreviewConnectionOptions } from '../editor/preview-connection';
 import { useFormColumnWidth } from './use-form-column-width';
+import { NoPreview, PreviewSlot } from './preview-slot';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
 
 const SHELL_WIDTH = { '--sidebar-width': '15rem' } as CSSProperties;
@@ -149,49 +148,12 @@ function HomeOutlet({
   );
 }
 
-function PreviewFrame({
-  src,
-  connection,
-}: {
-  src: string;
-  connection: PreviewConnectionOptions;
-}) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  usePreviewConnection(iframeRef, connection);
-  return (
-    <iframe
-      ref={iframeRef}
-      src={src}
-      title='Preview'
-      className='size-full border-none'
-    />
-  );
-}
-
-// The string-URL iframe, kept outside DocumentScope so it never remounts.
-function PreviewSlot({
-  preview,
-  connection,
-}: {
-  preview?: ReactNode;
-  connection: PreviewConnectionOptions;
-}) {
-  if (typeof preview === 'string') {
-    return (
-      <div data-preview-slot='' className='min-w-0 flex-1'>
-        <PreviewFrame src={preview} connection={connection} />
-      </div>
-    );
-  }
-  return <PreviewNodeSlot preview={preview} />;
-}
-
 function PreviewNodeSlot({ preview }: { preview?: ReactNode }) {
   const hasForm = use(FormScopeContext) !== null;
   return (
     <div data-preview-slot='' className='min-w-0 flex-1'>
       {hasForm ? (
-        (preview ?? <Placeholder>No preview configured.</Placeholder>)
+        (preview ?? <NoPreview />)
       ) : (
         <Placeholder>Select a document to edit.</Placeholder>
       )}
@@ -738,6 +700,37 @@ function AdminShell({
     if (showsPreviewRoute) setPreviewMounted(true);
   }, [showsPreviewRoute]);
 
+  // A page click or any move off the preview brings the form back. `focus` says the
+  // change came from a control, so focus follows it to the other toggle.
+  const [expansion, setExpansion] = useState({ on: false, focus: false });
+  const previewExpanded = expansion.on;
+  const setPreviewExpanded = useCallback((on: boolean, focus = true) => {
+    setExpansion((current) => (current.on === on ? current : { on, focus }));
+  }, []);
+  const tier = useTier();
+  useEffect(() => {
+    if (!previewVisible || isMediaRoute || tier === 'phone') {
+      setPreviewExpanded(false, false);
+    }
+  }, [previewVisible, isMediaRoute, tier, setPreviewExpanded]);
+  useEffect(() => {
+    if (!previewExpanded) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      if (
+        event.target instanceof Element &&
+        event.target.closest(
+          '[role=menu],[role=dialog],[role=alertdialog],[data-slot=save-progress]'
+        )
+      ) {
+        return;
+      }
+      setPreviewExpanded(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [previewExpanded, setPreviewExpanded]);
+
   const connection: PreviewConnectionOptions = {
     open:
       collection && openPath
@@ -748,6 +741,7 @@ function AdminShell({
     onPage: mainRoute.view === 'page',
     onOpen: openDocument,
     onNothingToEdit: () => navigate({ view: 'page' }),
+    onActivate: () => setPreviewExpanded(false, false),
   };
 
   const maximiseNavigator = () =>
@@ -769,7 +763,12 @@ function AdminShell({
       <ShellTopBar projectName={projectName} />
       <UploadHost primary />
 
-      <div className='flex min-h-0 flex-1'>
+      <div
+        className={cn(
+          'flex min-h-0 flex-1',
+          previewExpanded && '[&>:not([data-main-region])]:hidden'
+        )}
+      >
         <Sidebar
           aria-label='Content'
           role='navigation'
@@ -818,6 +817,7 @@ function AdminShell({
         {route.view === 'settings' ? <SettingsPane onClose={goHome} /> : null}
 
         <div
+          data-main-region=''
           className={
             isMediaRoute
               ? maximised
@@ -876,9 +876,10 @@ function AdminShell({
 
           {showsPreviewRoute || previewMounted ? (
             <SidebarInset
-              className={
-                previewVisible ? 'relative min-w-0 flex-row' : 'hidden'
-              }
+              className={cn(
+                previewVisible ? 'relative min-w-0 flex-row' : 'hidden',
+                previewExpanded && '[&>:not([data-preview-slot])]:hidden'
+              )}
             >
               {mainRoute.view === 'document' ? (
                 <DocumentScope
@@ -903,9 +904,16 @@ function AdminShell({
               ) : mainRoute.view === 'page' ? (
                 <NothingToEditColumn onOpenCollections={goToCollections} />
               ) : null}
-              {mainRoute.view === 'document' &&
-              typeof preview !== 'string' ? null : (
-                <PreviewSlot preview={preview} connection={connection} />
+              {typeof preview === 'string' ? (
+                <PreviewSlot
+                  src={preview}
+                  connection={connection}
+                  expanded={previewExpanded}
+                  moveFocus={expansion.focus}
+                  onExpandedChange={setPreviewExpanded}
+                />
+              ) : mainRoute.view === 'document' ? null : (
+                <PreviewNodeSlot preview={preview} />
               )}
             </SidebarInset>
           ) : null}

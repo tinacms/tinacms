@@ -64,6 +64,14 @@ export interface PreviewConnectionOptions {
   /** Opens `target` as the form's document, with `step` as its way back. */
   onOpen?: (target: DocumentRef, step: ReferenceStep | null) => void;
   onNothingToEdit?: () => void;
+  /** Called once for each accepted `tina:activate` message, before the field opens. */
+  onActivate?: () => void;
+  /**
+   * Called once with the `url` of each `tina:ready` / `tina:documents` from the
+   * preview window whose url is on the sender's own origin. Runs even when that
+   * origin isn't `targetOrigin`; nothing else in the handler does.
+   */
+  onPageUrl?: (url: string) => void;
 }
 
 interface Persistent {
@@ -94,6 +102,14 @@ type Deps = {
 };
 
 const documentOf = (values: FormValues): TinaDocument => toDocument(values);
+
+function originOf(url: string): string | undefined {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return undefined;
+  }
+}
 
 function createHandlers(deps: Deps) {
   const {
@@ -462,6 +478,7 @@ function createHandlers(deps: Deps) {
     documentName: string | undefined
   ) => {
     if (!showing) return;
+    options.onActivate?.();
     const token = ++persistent.click;
     const main = follower().main();
     const clickedPath = documentName ?? main ?? fed()?.path;
@@ -514,10 +531,16 @@ function createHandlers(deps: Deps) {
   return {
     onMessage: (event: MessageEvent) => {
       const source = target();
-      if (!source || event.origin !== targetOrigin || event.source !== source) {
-        return;
-      }
+      if (!source || event.source !== source) return;
       const data: unknown = event.data;
+      if (
+        (isReadyMessage(data) || isDocumentsMessage(data)) &&
+        data.url !== undefined &&
+        originOf(data.url) === event.origin
+      ) {
+        options.onPageUrl?.(data.url);
+      }
+      if (event.origin !== targetOrigin) return;
       if (isReadyMessage(data) || isDocumentsMessage(data)) {
         persistent.heard = true;
         const context = { showing, onPage: options.onPage ?? false };

@@ -199,8 +199,15 @@ const openItems = async (page: import('@playwright/test').Page) => {
   await expect(page.getByRole('textbox', { name: /^Text/ })).toHaveCount(2);
 };
 
-const scrollForm = (page: import('@playwright/test').Page, top: number) =>
-  formScroller(page).evaluate((scroller, to) => scroller.scrollTo(0, to), top);
+const scrollForm = (
+  page: import('@playwright/test').Page,
+  top: number | 'end'
+) =>
+  formScroller(page).evaluate(
+    (scroller, to) =>
+      scroller.scrollTo(0, to === 'end' ? scroller.scrollHeight : to),
+    top
+  );
 
 const offsetUnderForm = async (page: import('@playwright/test').Page) => {
   const shell = await toolbarShell(page).boundingBox();
@@ -222,7 +229,7 @@ test.describe('the body toolbar sticks and a framed one does not', () => {
       const shell = toolbarShell(page);
 
       await expect(shell).not.toHaveAttribute('data-stuck');
-      await scrollForm(page, 600);
+      await scrollForm(page, 'end');
       await expect(shell).toHaveAttribute('data-stuck', '');
       await expect.poll(() => offsetUnderForm(page)).toBeCloseTo(8, 0);
 
@@ -238,7 +245,7 @@ test.describe('the body toolbar sticks and a framed one does not', () => {
       await page.setViewportSize({ width, height: 560 });
       await openDocument(page, LONG_POST);
       const shell = toolbarShell(page);
-      await scrollForm(page, 600);
+      await scrollForm(page, 'end');
       await expect(shell).toHaveAttribute('data-stuck', '');
       await expect.poll(() => offsetUnderForm(page)).toBeCloseTo(8, 0);
 
@@ -467,6 +474,7 @@ test.describe('the keyboard on a phone', () => {
       expect(box?.height).toBeGreaterThanOrEqual(40);
       expect(box?.width).toBeGreaterThanOrEqual(40);
     }
+    await scrollForm(page, 'end');
     await expect(
       toolbar(page).getByRole('button', { name: 'Insert' })
     ).toBeInViewport({ ratio: 1 });
@@ -663,7 +671,7 @@ test.describe('the link bar and the stuck body toolbar', () => {
         }
       };
 
-      await scrollForm(page, 300);
+      await scrollForm(page, 'end');
       await expect(shell).toHaveAttribute('data-stuck', '');
       await placeLink(-40);
       await expect(bar).toBeHidden();
