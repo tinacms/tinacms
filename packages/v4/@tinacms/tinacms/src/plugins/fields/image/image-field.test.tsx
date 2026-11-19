@@ -35,6 +35,7 @@ import { LabelledFields } from '../../../test/labelled-fields';
 import arrayFieldPlugin from '../array/array-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import imageFieldPlugin from './image-field.plugin';
+import { connectionOf } from '../../../test/connection';
 
 const DOCUMENT_PATH = 'content/posts/hello.mdx';
 const HERO = 'posts/hero.jpg';
@@ -58,7 +59,7 @@ const [heroNode, coverNode] = collection.fields;
 
 const contentPlugin = (): PluginManifest => {
   const provider: ContentProvider = {
-    list: vi.fn(async () => []),
+    list: vi.fn(async () => connectionOf([])),
     get: vi.fn(async () => null),
     update: vi.fn(async (_collection, path, value) => ({
       path,

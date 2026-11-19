@@ -4,6 +4,7 @@ import type { Value } from '@udecode/plate';
 import { Plate, PlateContent, usePlateEditor } from '@udecode/plate/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
+import { ToolbarProvider } from '../toolbar/toolbar-provider';
 import { createEditorPlugins } from '../plugins/editor-plugins';
 import { Components } from '../plugins/ui/components';
 
@@ -37,9 +38,11 @@ const Harness = ({
   onEditorReady(editor);
 
   return (
-    <Plate editor={editor}>
-      <PlateContent readOnly={readOnly} />
-    </Plate>
+    <ToolbarProvider templates={[]} overrides={undefined}>
+      <Plate editor={editor}>
+        <PlateContent readOnly={readOnly} />
+      </Plate>
+    </ToolbarProvider>
   );
 };
 

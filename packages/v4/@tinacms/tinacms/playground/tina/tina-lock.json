@@ -6,6 +6,7 @@
         "name": "post",
         "label": "Posts",
         "path": "content/posts",
+        "description": "Posts for the playground blog.",
         "format": "mdx",
         "fields": [
           {
@@ -30,17 +31,100 @@
             "type": "boolean"
           },
           {
+            "type": "reference",
+            "name": "author",
+            "label": "Author",
+            "collections": [
+              "author"
+            ]
+          },
+          {
+            "name": "seo",
+            "label": "SEO",
+            "fields": [
+              {
+                "name": "title",
+                "label": "SEO title",
+                "type": "string"
+              },
+              {
+                "name": "description",
+                "label": "SEO description",
+                "type": "string"
+              },
+              {
+                "name": "social",
+                "label": "Social",
+                "fields": [
+                  {
+                    "name": "handle",
+                    "label": "Handle",
+                    "type": "string"
+                  }
+                ],
+                "type": "object"
+              }
+            ],
+            "type": "object"
+          },
+          {
+            "name": "blocks",
+            "label": "Blocks",
+            "templates": [
+              {
+                "name": "hero",
+                "label": "Hero",
+                "fields": [
+                  {
+                    "name": "headline",
+                    "label": "Headline",
+                    "type": "string"
+                  },
+                  {
+                    "name": "tagline",
+                    "label": "Tagline",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "quote",
+                "label": "Quote",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  }
+                ]
+              }
+            ],
+            "type": "array"
+          },
+          {
+            "type": "reference",
+            "name": "related",
+            "label": "Related post",
+            "collections": [
+              "post"
+            ]
+          },
+          {
             "name": "body",
             "label": "Body",
             "isBody": true,
             "type": "rich-text"
           }
-        ]
+        ],
+        "allowedActions": {
+          "canCreateNestedFolder": true
+        }
       },
       {
         "name": "page",
         "label": "Pages",
         "path": "content/pages",
+        "description": "Landing pages with visual and plain blocks.",
         "format": "mdx",
         "fields": [
           {
@@ -308,6 +392,209 @@
             "name": "hero",
             "label": "Hero image",
             "type": "image"
+          },
+          {
+            "name": "summary",
+            "label": "Summary",
+            "type": "rich-text"
+          },
+          {
+            "name": "section",
+            "label": "Section",
+            "fields": [
+              {
+                "name": "inner",
+                "label": "Inner",
+                "fields": [
+                  {
+                    "name": "notes",
+                    "label": "Notes",
+                    "overrides": {
+                      "toolbar": [
+                        "heading",
+                        "bold",
+                        "italic",
+                        "link",
+                        "textColor"
+                      ],
+                      "headingLevels": [
+                        "h2"
+                      ],
+                      "textColors": [
+                        {
+                          "label": "Brand",
+                          "value": "#123456"
+                        }
+                      ],
+                      "showFloatingToolbar": false
+                    },
+                    "type": "rich-text"
+                  }
+                ],
+                "type": "object"
+              }
+            ],
+            "type": "object"
+          },
+          {
+            "name": "items",
+            "label": "Items",
+            "fields": [
+              {
+                "name": "heading",
+                "label": "Heading",
+                "type": "string"
+              },
+              {
+                "name": "text",
+                "label": "Text",
+                "overrides": {
+                  "toolbar": [
+                    "heading",
+                    "bold",
+                    "italic",
+                    "link",
+                    "textColor"
+                  ],
+                  "headingLevels": [
+                    "h2"
+                  ],
+                  "textColors": [
+                    {
+                      "label": "Brand",
+                      "value": "#123456"
+                    }
+                  ],
+                  "showFloatingToolbar": false
+                },
+                "type": "rich-text"
+              }
+            ],
+            "type": "array"
+          }
+        ],
+        "allowedActions": {
+          "canDelete": false,
+          "canDuplicate": false
+        }
+      },
+      {
+        "name": "author",
+        "label": "Authors",
+        "path": "content/authors",
+        "format": "md",
+        "fields": [
+          {
+            "name": "name",
+            "label": "Name",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "bio",
+            "label": "Bio",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "global",
+        "label": "Global",
+        "path": "content/global",
+        "format": "json",
+        "fields": [
+          {
+            "name": "siteName",
+            "label": "Site name",
+            "type": "string"
+          },
+          {
+            "name": "nav",
+            "label": "Navigation",
+            "fields": [
+              {
+                "name": "label",
+                "label": "Label",
+                "type": "string"
+              },
+              {
+                "name": "href",
+                "label": "Link",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          }
+        ]
+      },
+      {
+        "name": "checklist",
+        "label": "Checklists",
+        "path": "content/checklists",
+        "description": "Two required fields, for the error list.",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "first",
+            "label": "First",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "second",
+            "label": "Second",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "note",
+            "label": "Note",
+            "type": "string"
+          },
+          {
+            "name": "choice",
+            "label": "Choice",
+            "options": [
+              {
+                "value": "short",
+                "label": "Short"
+              },
+              {
+                "value": "long",
+                "label": "A very long option label that must wrap or truncate A very long option label that must wrap or truncate end"
+              }
+            ],
+            "type": "select"
+          },
+          {
+            "type": "reference",
+            "name": "related",
+            "label": "Related post",
+            "collections": [
+              "post"
+            ]
+          },
+          {
+            "name": "gallery",
+            "label": "Gallery",
+            "of": {
+              "name": "item",
+              "label": "Image",
+              "type": "image"
+            },
+            "type": "array"
           }
         ]
       }
@@ -323,7 +610,10 @@
     "array": 1,
     "boolean": 1,
     "image": 1,
+    "object": 1,
+    "reference": 1,
     "rich-text": 1,
+    "select": 1,
     "string": 1
   }
 }

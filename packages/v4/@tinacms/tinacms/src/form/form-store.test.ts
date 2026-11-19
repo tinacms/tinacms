@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { toFieldAddress } from '../core/field/address';
 import { type FieldEquality, sameValue } from '../core/form/compare';
+import { readDraft } from './drafts';
 import {
   type FormId,
   fieldDirty,
   formStatus,
   isEdited,
+  syncDrafts,
   toDocument,
   toFormId,
   toFormValues,
@@ -374,6 +376,32 @@ describe('form-store discarded edits', () => {
   });
 });
 
+describe('form-store moveForm', () => {
+  it('carries the Save All state of the form to the new id', () => {
+    const state = store.getState();
+    state.registerForm(postA, { [title]: 'A' });
+    state.setFieldValue(postA, title, 'A edited');
+    state.registerCollection(postA, 'post');
+    state.setRevealOnOpen(postA);
+    state.setSavePending(postA, true);
+    state.recordSaveAllResult(postA, {
+      status: 'failed',
+      words: 'Save failed',
+    });
+    state.moveForm(postA, postB);
+
+    const moved = store.getState();
+    expect(moved.collections[postB]).toBe('post');
+    expect(moved.revealOnOpen[postB]).toBe(true);
+    expect(moved.savePending[postB]).toBe(true);
+    expect(moved.saveAll.results[postB]?.status).toBe('failed');
+    expect(moved.collections[postA]).toBeUndefined();
+    expect(moved.revealOnOpen[postA]).toBeUndefined();
+    expect(moved.savePending[postA]).toBeUndefined();
+    expect(moved.saveAll.results[postA]).toBeUndefined();
+  });
+});
+
 describe('form-store teardown', () => {
   it('removeForm drops the scope', () => {
     store.getState().registerForm(postA, { [title]: 'Hello' });
@@ -417,5 +445,47 @@ describe('form-store reference stability', () => {
     store.getState().registerForm(postA, { [title]: 'Hello' });
     store.getState().markSaved(postA);
     expect(statusOf(postA)).toBe('clean');
+  });
+});
+
+describe('form-store hovered field', () => {
+  const hoverTitle = () => store.getState().setHovered(postA, title);
+
+  it('is set, cleared, and dropped with its form', () => {
+    store.getState().registerForm(postA, { [title]: 'x' });
+    hoverTitle();
+    expect(store.getState().hovered).toEqual({ formId: postA, address: title });
+    store.getState().setHovered(postA, null);
+    expect(store.getState().hovered).toBeNull();
+
+    hoverTitle();
+    store.getState().removeForm(postA);
+    expect(store.getState().hovered).toBeNull();
+  });
+
+  it('never reaches the stored draft', () => {
+    const stop = syncDrafts();
+    try {
+      store.getState().registerForm(postA, { [title]: 'x' });
+      hoverTitle();
+      store.getState().setFieldValue(postA, title, 'edited');
+
+      const entries = Object.keys(localStorage).map((key) => [
+        key,
+        localStorage.getItem(key),
+      ]);
+      expect(entries.some(([, value]) => value?.includes('edited'))).toBe(true);
+      expect(entries.some(([, value]) => /hover/i.test(value ?? ''))).toBe(
+        false
+      );
+      expect(Object.keys(readDraft(postA) ?? {}).sort()).toEqual([
+        'baseline',
+        'values',
+      ]);
+    } finally {
+      stop();
+      store.getState().removeForm(postA);
+      localStorage.clear();
+    }
   });
 });

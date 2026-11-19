@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type ResolvedConfig, asResolvedConfig } from '../../config';
+import { nodesOf } from '../../core/content/contract';
 import { definePlugin } from '../../core/plugin';
 import { buildSearchRecord } from '../../core/search/record';
 import { SearchError } from '../../core/search/contract';
@@ -10,6 +11,7 @@ import { defineSearchPlugin } from '../../plugins/search/search.plugin';
 import type { SearchIndexProvider } from '../../core/search/index-contract';
 import type { CollectionSchema } from '../../core/schema/types';
 import { createLocalDataLayer } from '../../plugins/content/local/server/local-data-layer';
+import { tinaCloud } from '../../plugins/tinacloud/tinacloud.plugin';
 import { runCli } from '../index';
 import { codecFor } from '../../plugins/fields/rich-text/rich-text-codecs';
 
@@ -241,6 +243,32 @@ describe('tinacms search reindex', () => {
   });
 });
 
+describe('tinacms search reindex with a provider that indexes itself (AC25)', () => {
+  const selfIndexing = () =>
+    asResolvedConfig({
+      plugins: [
+        tinaCloud({
+          clientId: 'abc',
+          search: { fields: { post: { title: 1 } } },
+        }),
+      ],
+      schema: { collections: [collection('post')] },
+    });
+
+  it.each([
+    ['an empty root', false],
+    ['a root with documents', true],
+  ])('says so, exits 0 and counts nothing with %s', async (_name, withDocs) => {
+    if (withDocs) await writeDoc('content/post/a.json', '{"title":"Alpha"}');
+    const { code, out, err } = await reindex(selfIndexing());
+    expect(code).toBe(0);
+    expect(err).toEqual([]);
+    expect(out).toEqual([
+      'This search provider indexes itself; nothing to reindex.',
+    ]);
+  });
+});
+
 describe('tinacms search reindex and the schema', () => {
   const site = (withPath = true): CollectionSchema => ({
     name: 'site',
@@ -261,7 +289,7 @@ describe('tinacms search reindex and the schema', () => {
       rootDir: rootDir,
       collections: schema.filter(({ path: folder }) => folder),
     });
-    return (await layer.list(collection.name)).map(({ path: p }) => ({
+    return nodesOf(await layer.list(collection.name)).map(({ path: p }) => ({
       collection: collection.name,
       path: p,
     }));
@@ -368,10 +396,12 @@ describe('tinacms search reindex source documents', () => {
         rootDir,
         collections: [article('doc', format)],
       });
-      const saved = await layer.update('doc', `content/doc/a.${format}`, {
-        title: 'T',
-        body: 'Hello <b>bold</b> &amp; more\n\nSecond',
-      });
+      const saved = await layer.update(
+        'doc',
+        `content/doc/a.${format}`,
+        { title: 'T', body: 'Hello <b>bold</b> &amp; more\n\nSecond' },
+        { mayCreate: true }
+      );
       await layer.close();
       const provider = providerWith();
       await reindex(

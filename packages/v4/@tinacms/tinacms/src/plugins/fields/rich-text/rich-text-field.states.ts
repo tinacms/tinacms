@@ -34,6 +34,13 @@ const field = {
   ],
 } satisfies RichTextFieldViewProps['field'];
 
+const manyTemplates = Array.from({ length: 12 }, (_, index) => ({
+  name: `Block${index + 1}`,
+  label: `Block ${index + 1}`,
+  key: `block-${index + 1}`,
+  fields: [{ name: 'text', type: 'string' }],
+}));
+
 const filled = doc(
   'TinaCMS keeps content in your repo.',
   'Edit it here and the file on disk changes.'
@@ -48,9 +55,38 @@ const base = {
   onChange: () => {},
 } satisfies RichTextFieldViewProps;
 
+const tableCell = (type: 'th' | 'td', text: string) => ({
+  type,
+  children: [paragraph(text)],
+});
+
+const withTable: RichTextValue = {
+  type: 'root',
+  children: [
+    paragraph('Before the table.'),
+    {
+      type: 'table',
+      children: [1, 2, 3, 4].map((row) => ({
+        type: 'tr',
+        children: [1, 2, 3].map((col) =>
+          tableCell(row === 1 ? 'th' : 'td', 'r' + row + 'c' + col)
+        ),
+      })),
+    },
+    paragraph('After the table.'),
+  ],
+};
+
 const long = Array.from(
   { length: 14 },
   (_, index) => `Paragraph ${index + 1} keeps the box growing.`
+);
+
+const longBody = doc(
+  ...Array.from(
+    { length: 40 },
+    (_, index) => `Paragraph ${index + 1} keeps the body growing past a screen.`
+  )
 );
 
 export const richTextFieldStates = [
@@ -105,6 +141,26 @@ export const richTextFieldStates = [
     },
   },
   { name: 'body read-only', props: { ...base, body: true, readOnly: true } },
+  { name: 'body disabled', props: { ...base, body: true, disabled: true } },
+  { name: 'body long', props: { ...base, body: true, value: longBody } },
+  { name: 'with a table', props: { ...base, value: withTable } },
+  {
+    name: 'limited toolbar',
+    props: {
+      ...base,
+      field: {
+        ...field,
+        overrides: {
+          toolbar: ['bold', 'italic', 'link'],
+          headingLevels: ['h2'],
+        },
+      },
+    },
+  },
+  {
+    name: 'with many templates',
+    props: { ...base, field: { templates: manyTemplates } },
+  },
 ] satisfies { name: string; props: RichTextFieldViewProps }[];
 
 export type RichTextFieldStateName =

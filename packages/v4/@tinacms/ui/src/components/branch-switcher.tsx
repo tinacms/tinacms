@@ -13,6 +13,7 @@ import { Badge } from '@tinacms/ui/components/badge';
 import { Icon } from '@tinacms/ui/components/icon';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { BRANCH_NAME_HINT, branchNameError } from '@tinacms/ui/lib/branch-name';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type BranchEntry = {
@@ -194,6 +195,7 @@ function BranchSwitcher({
 }: BranchSwitcherProps) {
   const [open, setOpen] = useState(defaultOpen);
   const [fullScreen, setFullScreen] = useState(defaultFullScreen);
+  const phone = useTier() === 'phone';
   const isProtected = branches.some(
     (branch) => branch.name === current && branch.protected
   );
@@ -272,6 +274,7 @@ function BranchSwitcher({
         onKeyDown={move}
         className={cn(
           fullScreen &&
+            !phone &&
             'top-14 bottom-7 left-0 h-auto w-full max-w-none translate-x-0 translate-y-0 rounded-none'
         )}
       >
@@ -283,20 +286,24 @@ function BranchSwitcher({
             </DialogDescription>
           </div>
           <div className='flex flex-none items-center gap-1'>
-            <Button
-              variant='icon'
-              size='sm'
-              icon={fullScreen ? 'restore' : 'maximise'}
-              aria-label={fullScreen ? 'Exit full screen' : 'Full screen'}
-              onClick={() => setFullScreen((value) => !value)}
-            />
-            <Button
-              variant='icon'
-              size='sm'
-              icon='close'
-              aria-label='Close'
-              onClick={() => setOpen(false)}
-            />
+            {phone ? null : (
+              <Button
+                variant='icon'
+                size='sm'
+                icon={fullScreen ? 'restore' : 'maximise'}
+                aria-label={fullScreen ? 'Exit full screen' : 'Full screen'}
+                onClick={() => setFullScreen((value) => !value)}
+              />
+            )}
+            {phone ? null : (
+              <Button
+                variant='icon'
+                size='sm'
+                icon='close'
+                aria-label='Close'
+                onClick={() => setOpen(false)}
+              />
+            )}
           </div>
         </DialogHeader>
         {blocked ? (
@@ -415,13 +422,19 @@ function BranchSwitcher({
                 {nameError}
               </p>
             ) : null}
-            <div className='flex justify-end gap-2'>
-              <Button onClick={() => setCreating(false)}>
-                Back to branches
+            <div className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'>
+              <Button
+                className='max-md:h-auto max-md:min-h-9'
+                onClick={() => setCreating(false)}
+              >
+                <span className='min-w-0 max-md:py-1.5 max-md:whitespace-normal'>
+                  Back to branches
+                </span>
               </Button>
               <Button
                 variant='primary'
                 type='submit'
+                className='max-md:h-auto max-md:min-h-9'
                 disabled={
                   !onCreate || (typed !== '' && nameError !== undefined)
                 }

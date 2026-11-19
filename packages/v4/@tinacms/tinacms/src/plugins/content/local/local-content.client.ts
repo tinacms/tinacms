@@ -1,11 +1,16 @@
 import { siteAuthHeadersOf } from '../../../core/auth/slice';
 import {
+  type ContentErrorCode,
   type ContentProvider,
   ContentError,
-  type ContentRefusalCode,
+  type DocumentConnection,
   type DocumentEntry,
-  type DocumentSummary,
+  type DocumentReferrer,
+  type FolderSummary,
+  type RenameFolderResult,
+  type RenameResult,
   isContentRefusalCode,
+  isProviderRefusalCode,
 } from '../../../core/content/contract';
 import { isRecord } from '../../../utils/is-record';
 import type { ClientSlice, TinaStoreState } from '../../../core/plugin';
@@ -13,7 +18,7 @@ import type { ContentRequest } from './server/content-request';
 
 const refusalIn = (
   text: string
-): { code: ContentRefusalCode; message: string } | null => {
+): { code: ContentErrorCode; message: string } | null => {
   let body: unknown;
   try {
     body = JSON.parse(text);
@@ -22,7 +27,9 @@ const refusalIn = (
   }
   const error = isRecord(body) ? body.error : undefined;
   if (!isRecord(error) || typeof error.message !== 'string') return null;
-  if (!isContentRefusalCode(error.code)) return null;
+  if (!isContentRefusalCode(error.code) && !isProviderRefusalCode(error.code)) {
+    return null;
+  }
   return { code: error.code, message: error.message };
 };
 
@@ -55,10 +62,11 @@ export const createContentSlice =
   (_set, get) => {
     const slice: ContentProvider = {
       local: true,
-      list: (collection) =>
-        postContentRequest<DocumentSummary[]>(url, get(), {
+      list: (collection, query) =>
+        postContentRequest<DocumentConnection>(url, get(), {
           op: 'list',
           collection,
+          query,
         }),
       get: (collection, path) =>
         postContentRequest<DocumentEntry | null>(url, get(), {
@@ -72,6 +80,53 @@ export const createContentSlice =
           collection,
           path,
           value,
+        }),
+      create: (collection, path, value, template) =>
+        postContentRequest<DocumentEntry>(url, get(), {
+          op: 'create',
+          collection,
+          path,
+          value,
+          template,
+        }),
+      rename: (collection, from, to) =>
+        postContentRequest<RenameResult>(url, get(), {
+          op: 'rename',
+          collection,
+          from,
+          to,
+        }),
+      delete: async (collection, path) => {
+        await postContentRequest<null>(url, get(), {
+          op: 'delete',
+          collection,
+          path,
+        });
+      },
+      referrers: (collection, path) =>
+        postContentRequest<DocumentReferrer[]>(url, get(), {
+          op: 'referrers',
+          collection,
+          path,
+        }),
+      createFolder: (collection, folder) =>
+        postContentRequest<FolderSummary>(url, get(), {
+          op: 'createFolder',
+          collection,
+          folder,
+        }),
+      renameFolder: (collection, from, to) =>
+        postContentRequest<RenameFolderResult>(url, get(), {
+          op: 'renameFolder',
+          collection,
+          from,
+          to,
+        }),
+      deleteFolder: (collection, folder) =>
+        postContentRequest<{ deleted: string[] }>(url, get(), {
+          op: 'deleteFolder',
+          collection,
+          folder,
         }),
     };
     return { ...slice };

@@ -38,7 +38,7 @@ export function NewFolderDialog({
   return (
     <AlertDialog open onOpenChange={closeOn(onClose)}>
       <AlertDialogContent>
-        <form className='flex flex-col gap-4' onSubmit={submit}>
+        <form className='flex flex-col gap-4 max-md:flex-1' onSubmit={submit}>
           <AlertDialogHeader>
             <AlertDialogTitle>New Folder</AlertDialogTitle>
             <AlertDialogDescription>

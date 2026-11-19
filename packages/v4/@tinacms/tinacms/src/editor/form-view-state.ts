@@ -436,7 +436,8 @@ export const lockAbove = (
   };
 };
 
-// The levels that must be open for the field at `address` to be on screen.
+// The levels that must be open for the field at `address` to be on screen. A
+// list item that opens as a form level is its own level.
 export const levelsFor = (
   address: string,
   fields: readonly FieldSchema[],
@@ -444,5 +445,5 @@ export const levelsFor = (
   drillsIn: (step: OpenLevel) => boolean
 ): OpenLevel[] =>
   fieldsAlong(address, fields, valueAt).filter(
-    (step) => step.address !== address && drillsIn(step)
+    (step) => (step.address !== address || step.item === true) && drillsIn(step)
   );

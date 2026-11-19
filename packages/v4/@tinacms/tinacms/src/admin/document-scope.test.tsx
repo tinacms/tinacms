@@ -18,6 +18,7 @@ import { toFormId, useFormStatus } from '../form/form-store';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import { DocumentForm } from './document-form';
 import { DocumentScope } from './document-scope';
+import { connectionOf } from '../test/connection';
 
 const path = 'content/posts/hello.mdx';
 
@@ -33,7 +34,7 @@ const ON_LOAD: DocumentEntry = { path, document: { title: 'Hello' } };
 const ON_DISK: DocumentEntry = { path, document: { title: 'Changed on disk' } };
 
 const providerReading = (read: ContentProvider['get']): ContentProvider => ({
-  list: async () => [{ path }],
+  list: async () => connectionOf([{ path }]),
   get: read,
   update: async (_collection, target, value) => ({
     path: target,

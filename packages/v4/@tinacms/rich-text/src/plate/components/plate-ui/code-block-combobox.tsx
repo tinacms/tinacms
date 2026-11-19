@@ -95,6 +95,23 @@ export function CodeBlockCombobox({
   onLanguageChange,
 }: CodeBlockComboboxProps) {
   const [open, setOpen] = useState(false);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+
+  React.useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!open || !viewport) return;
+    const keepTriggerAboveKeyboard = () => {
+      const trigger = triggerRef.current;
+      if (!trigger || window.innerHeight - viewport.height < 120) return;
+      if (trigger.getBoundingClientRect().bottom + 240 > viewport.height) {
+        trigger.scrollIntoView({ block: 'start' });
+      }
+    };
+    keepTriggerAboveKeyboard();
+    viewport.addEventListener('resize', keepTriggerAboveKeyboard);
+    return () =>
+      viewport.removeEventListener('resize', keepTriggerAboveKeyboard);
+  }, [open]);
   const readOnly = useReadOnly();
   const element = useElement<TCodeBlockElement>();
   const value = element.lang || 'plaintext';
@@ -116,56 +133,62 @@ export function CodeBlockCombobox({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild tabIndex={-1}>
         <Button
+          ref={triggerRef}
           tabIndex={-1}
-          size='xs'
+          size='none'
+          variant='ghost'
           className={cn(
-            'h-6 justify-between gap-1 px-2 text-xs text-muted-foreground select-none',
-            'hover:bg-[#E2E8F0] bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A]',
-            open && 'bg-[#E2E8F0] text-[#0F172A]'
+            'h-6 justify-between gap-1 px-2 text-xs text-foreground select-none hover:bg-muted',
+            open && 'bg-muted'
           )}
           aria-expanded={open}
+          aria-label='Code language'
           role='combobox'
         >
           {languages.find((language) => language.value === value)?.label ??
             'Plain Text'}
-          <ChevronDown className='size-4' />
+          <ChevronDown aria-hidden className='size-3.5 text-muted-foreground' />
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className='w-[200px] p-0 z-[10000]'
+        variant='menu'
+        align='start'
+        className='z-[10000] w-56'
         onCloseAutoFocus={() => setSearchValue('')}
       >
         <Command shouldFilter={false}>
           <CommandInput
             tabIndex={-1}
-            className='h-9'
             value={searchValue}
             onValueChange={(value) => setSearchValue(value)}
             placeholder='Search language...'
           />
           <CommandEmpty>No language found.</CommandEmpty>
 
-          <CommandList className='h-48 overflow-y-auto'>
+          <CommandList className='max-h-[min(12rem,var(--radix-popover-content-available-height,12rem))]'>
             <CommandGroup>
-              {items.map((language) => (
-                <CommandItem
-                  key={language.label}
-                  className='cursor-pointer rounded-sm'
-                  value={language.value}
-                  onSelect={(value) => {
-                    onLanguageChange(value);
-                    setSearchValue(value);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      value === language.value ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                  {language.label}
-                </CommandItem>
-              ))}
+              {items.map((language) => {
+                const current = value === language.value;
+                return (
+                  <CommandItem
+                    key={language.label}
+                    value={language.value}
+                    aria-current={current || undefined}
+                    onSelect={(value) => {
+                      onLanguageChange(value);
+                      setSearchValue(value);
+                      setOpen(false);
+                    }}
+                  >
+                    <span className='min-w-0 flex-1 truncate'>
+                      {language.label}
+                    </span>
+                    {current ? (
+                      <Check aria-hidden className='size-4 text-foreground' />
+                    ) : null}
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
           </CommandList>
         </Command>

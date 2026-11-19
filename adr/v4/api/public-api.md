@@ -145,7 +145,7 @@ const current = useTinaStore((s) => s.branch.current)
 | `useFieldAddress()` | identity of *this* field |
 | `useFieldValue<T>(address)` | one leaf value (stable reference) |
 | `useFieldErrors(address)` | every error at an address, shown at once |
-| `useFieldFrame()` | props for `FieldWrapper`: label, ids, required, and the errors to show now (after the field is left, or after a save was tried). Reads the address from context |
+| `useFieldFrame()` | props for `FieldWrapper`: label, ids, required, and the errors to show now (after the field is left, or after a save was tried). Reads the address from context. It also returns `active`, which `FieldWrapper` renders as `data-active` |
 | `useFieldActivation(handler)` | opt-in callback when this field becomes active |
 | `useSiblingValue(address, name)` | sibling leaf |
 | `useChildKeys(address)` | ordered child keys at a composite address |

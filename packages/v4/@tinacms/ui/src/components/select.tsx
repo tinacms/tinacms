@@ -8,6 +8,7 @@ import {
   selectListClassName,
   selectOptionClassName,
 } from '@tinacms/ui/lib/field-styles';
+import { usePopupEdgePadding } from '@tinacms/ui/components/foot-sheet';
 import { cn } from '@tinacms/ui/lib/utils';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
@@ -46,7 +47,7 @@ function SelectTrigger({
       data-slot='select-trigger'
       data-size={size}
       className={cn(
-        "box-border flex w-55 max-w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-sm border border-input bg-card py-0 pr-2 pl-2.5 font-sans text-base leading-5 whitespace-nowrap text-foreground transition-[border-color,box-shadow] outline-none select-none hover:border-input-hover data-popup-open:border-field-active-border focus-visible:border-ring focus-visible:shadow-focus-field disabled:opacity-45 data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:text-sm *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:truncate [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "box-border flex w-55 max-w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-sm border border-input bg-card py-0 pr-2 pl-2.5 font-sans text-base leading-5 whitespace-nowrap text-foreground transition-[border-color,box-shadow] outline-none select-none hover:border-input-hover data-popup-open:border-field-active-border focus-visible:border-ring focus-visible:shadow-focus-field data-active:border-ring data-active:shadow-focus-field disabled:opacity-45 data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:text-sm *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:truncate [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         fieldInvalidClassName,
         fieldDisabledClassName,
         fieldReadOnlyClassName,
@@ -73,12 +74,21 @@ function SelectContent({
   align = 'start',
   alignOffset = 0,
   alignItemWithTrigger = false,
+  collisionPadding,
+  collisionAvoidance,
   ...props
 }: SelectPrimitive.Popup.Props &
   Pick<
     SelectPrimitive.Positioner.Props,
-    'align' | 'alignOffset' | 'side' | 'sideOffset' | 'alignItemWithTrigger'
+    | 'align'
+    | 'alignOffset'
+    | 'side'
+    | 'sideOffset'
+    | 'alignItemWithTrigger'
+    | 'collisionPadding'
+    | 'collisionAvoidance'
   >) {
+  const edge = usePopupEdgePadding();
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner
@@ -87,6 +97,8 @@ function SelectContent({
         align={align}
         alignOffset={alignOffset}
         alignItemWithTrigger={alignItemWithTrigger}
+        collisionPadding={collisionPadding ?? edge}
+        collisionAvoidance={collisionAvoidance}
         className='isolate z-50'
       >
         <SelectPrimitive.Popup
@@ -94,7 +106,7 @@ function SelectContent({
           data-align-trigger={alignItemWithTrigger}
           className={cn(
             selectListClassName,
-            'relative isolate z-50 max-h-[min(--spacing(80),var(--available-height))] origin-(--transform-origin) overflow-x-hidden overflow-y-auto duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
+            'relative isolate z-50 max-h-[min(--spacing(80),var(--available-height))] max-w-(--available-width) origin-(--transform-origin) overflow-x-hidden overflow-y-auto duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
             className
           )}
           {...props}
