@@ -8,7 +8,6 @@ import {
   readDraft,
   readWaitingDrafts,
   removeDraft,
-  setDraftAside,
   writeDraft,
 } from './drafts';
 import {
@@ -121,13 +120,13 @@ describe('form drafts', () => {
   it('keeps a left prompt down on reopen until a new copy joins the waiting list', () => {
     reloadWithEdit();
     open();
-    store.getState().markLeftWithWaiting(postA);
+    store.getState().lowerPrompt(postA);
     open();
-    expect(store.getState().leftWithWaiting[postA]).toBe(true);
+    expect(store.getState().promptDown[postA]).toBe(true);
     otherTabWrites(postA, 'Theirs');
     open();
     expect(waitingOf()).toHaveLength(2);
-    expect(store.getState().leftWithWaiting[postA]).toBeUndefined();
+    expect(store.getState().promptDown[postA]).toBeUndefined();
   });
 
   it('keeps a left prompt down when a waiting copy only leaves the list', () => {
@@ -137,48 +136,29 @@ describe('form drafts', () => {
     simulateReload();
     open();
     expect(waitingOf()).toHaveLength(2);
-    store.getState().markLeftWithWaiting(postA);
+    store.getState().lowerPrompt(postA);
     open({ [title]: 'Older', [summary]: 'Same' });
     expect(waitingOf()).toHaveLength(1);
-    expect(store.getState().leftWithWaiting[postA]).toBe(true);
+    expect(store.getState().promptDown[postA]).toBe(true);
   });
 
-  it('keeps a copy another tab set aside, even when the form holds the same values', () => {
-    syncing();
-    open();
-    typeTitle('Mine');
-    const mine = readDraft(postA);
-    if (!mine) throw new Error('No live copy was written');
-    setDraftAside(postA, mine);
-    typeTitle('Mine again');
-    typeTitle('Mine');
-    expect(readWaitingDrafts(postA)).toEqual([mine]);
-  });
-
-  it('drops the waiting copies once the form holds the same values', () => {
+  it('lowers the prompt and keeps the waiting copies once the form holds the same values', () => {
     reloadWithEdit();
     open();
     typeTitle('Mine');
-    expect(waitingOf()).toEqual([]);
-    expect(readWaitingDrafts(postA)).toEqual([]);
-    expect(readDraft(postA)?.values).toEqual({
-      title: 'Mine',
-      summary: 'Same',
-    });
+    expect(store.getState().promptDown[postA]).toBe(true);
+    expect(readWaitingDrafts(postA)).toHaveLength(1);
   });
 
-  it('keeps every waiting copy when only the newest matches the form', () => {
+  it('keeps the prompt up when only the newest waiting copy matches the form', () => {
     reloadWithEdit('Older');
     open();
     typeTitle('Newer');
-    store.getState().setFieldValue(postA, summary, 'Changed');
     simulateReload();
     open();
     expect(waitingOf()).toHaveLength(2);
     typeTitle('Newer');
-    store.getState().setFieldValue(postA, summary, 'Changed');
-    expect(waitingOf()).toHaveLength(2);
-    expect(readWaitingDrafts(postA)).toHaveLength(2);
+    expect(store.getState().promptDown[postA]).toBeUndefined();
   });
 
   it('row 3: a draft typed on an older file waits too', () => {

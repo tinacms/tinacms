@@ -1107,7 +1107,7 @@ describe('TinaAdmin draft recovery contract', () => {
     ).toBeVisible();
   });
 
-  it('drops the waiting copy once the form holds the same values', async () => {
+  it('lowers the toast and keeps the waiting copy once the form holds the same values', async () => {
     store(hello, { title: 'Mine' }, { title: 'Hello' });
     const user = await openDoc(/hello\.mdx/);
     await screen.findByText('Resume your unsaved edits?');
@@ -1117,7 +1117,7 @@ describe('TinaAdmin draft recovery contract', () => {
     await waitFor(() =>
       expect(screen.queryByText('Resume your unsaved edits?')).toBeNull()
     );
-    expect(readWaitingDrafts(hello)).toHaveLength(0);
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
     expect(readDraft(hello)?.values).toMatchObject({ title: 'Mine' });
   });
 

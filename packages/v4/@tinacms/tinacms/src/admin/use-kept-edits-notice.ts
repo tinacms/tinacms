@@ -32,7 +32,7 @@ export function useKeptEditsNotice(
     ) {
       return;
     }
-    readFormStore().markLeftWithWaiting(toFormId(left.path));
+    readFormStore().lowerPrompt(toFormId(left.path));
     const scope = readFormStore().forms[toFormId(left.path)];
     if (formStatus(scope) !== 'dirty') return;
     if (readFormStore().unstored[toFormId(left.path)]) return;

@@ -42,7 +42,7 @@ beforeEach(() => {
     failures: {},
     swapFailures: {},
     hidden: {},
-    leftWithWaiting: {},
+    promptDown: {},
     active: null,
   });
   localStorage.clear();

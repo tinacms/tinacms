@@ -104,9 +104,9 @@ export interface FormStore {
   swapFailures: Partial<Record<FormId, number>>;
   /** Forms whose Resume prompt is hidden until the document opens again, after a failed Resume. */
   hidden: Partial<Record<FormId, true>>;
-  /** Forms the editor left while copies waited. Their Resume prompt stays down until reload or until a new copy joins the waiting list (ADR-026 §2). */
-  leftWithWaiting: Partial<Record<FormId, true>>;
-  markLeftWithWaiting: (formId: FormId) => void;
+  /** Forms whose Resume prompt stays down until reload or until a new copy joins the waiting list: the editor left them, or the form holds every waiting copy (ADR-026 §2). */
+  promptDown: Partial<Record<FormId, true>>;
+  lowerPrompt: (formId: FormId) => void;
   /** Removes the live copy, every waiting copy and the in-memory edits. */
   discardStoredDraft: (formId: FormId) => void;
   /**
@@ -288,7 +288,7 @@ const DEVTOOLS_ACTION = {
   discardEdits: 'form/discardEdits',
   resumeWaiting: 'form/resumeWaiting',
   removeForm: 'form/removeForm',
-  markLeftWithWaiting: 'form/markLeftWithWaiting',
+  lowerPrompt: 'form/lowerPrompt',
 } as const;
 type DevtoolsActionLabel =
   (typeof DEVTOOLS_ACTION)[keyof typeof DEVTOOLS_ACTION];
@@ -315,21 +315,18 @@ export const useFormStore = create<FormStore>()(
         failures: {},
         swapFailures: {},
         hidden: {},
-        leftWithWaiting: {},
+        promptDown: {},
         active: null,
 
-        markLeftWithWaiting: (formId) =>
+        lowerPrompt: (formId) =>
           apply((state) => {
-            if (
-              state.leftWithWaiting[formId] ||
-              !state.waiting[formId]?.length
-            ) {
+            if (state.promptDown[formId] || !state.waiting[formId]?.length) {
               return state;
             }
             return {
-              leftWithWaiting: { ...state.leftWithWaiting, [formId]: true },
+              promptDown: { ...state.promptDown, [formId]: true },
             };
-          }, DEVTOOLS_ACTION.markLeftWithWaiting),
+          }, DEVTOOLS_ACTION.lowerPrompt),
 
         discardStoredDraft: (formId) => {
           const { userId, branch } = readFormStore();
@@ -410,7 +407,7 @@ export const useFormStore = create<FormStore>()(
               failures: {},
               swapFailures: {},
               hidden: {},
-              leftWithWaiting: {},
+              promptDown: {},
               active: null,
             };
           }, DEVTOOLS_ACTION.setBranch),
@@ -453,7 +450,7 @@ export const useFormStore = create<FormStore>()(
               failures: {},
               swapFailures: {},
               hidden: {},
-              leftWithWaiting: {},
+              promptDown: {},
               active: null,
             };
           }, DEVTOOLS_ACTION.setUserId),
@@ -498,9 +495,9 @@ export const useFormStore = create<FormStore>()(
                 ? withFailure(state.failures, formId)
                 : state.failures,
               hidden: opening ? state.hidden : withoutKey(state.hidden, formId),
-              leftWithWaiting: newCopy
-                ? withoutKey(state.leftWithWaiting, formId)
-                : state.leftWithWaiting,
+              promptDown: newCopy
+                ? withoutKey(state.promptDown, formId)
+                : state.promptDown,
               draftsVersion: sameCopies
                 ? state.draftsVersion
                 : state.draftsVersion + 1,
@@ -747,9 +744,7 @@ export const syncDrafts = () =>
           next.branch
         );
         markStorage(formId, result === 'failed');
-        if (result === 'ok') {
-          dropHeldWaiting(formId, scope, next.userId, next.branch);
-        }
+        lowerHeldPrompt(formId, scope);
       } else if (formStatus(before) === 'dirty') {
         removeDraft(formId, next.userId, next.branch);
         markStorage(formId, false);
@@ -757,33 +752,15 @@ export const syncDrafts = () =>
     }
   });
 
-// When every waiting copy equals what the form holds, Resume has nothing to add and
-// the live copy holds the same values. Dropping only some copies would let an older
-// copy outrank a newer one on Resume, so the copies go all together or not at all.
-// A copy another tab set aside holds that tab's edits, so only known copies go.
-const dropHeldWaiting = (
-  formId: FormId,
-  scope: EditedForm,
-  userId: DraftUserScope,
-  branch: string | undefined
-) => {
-  const waiting = readWaitingDrafts(formId, userId, branch);
-  const seen = readFormStore().waiting[formId] ?? [];
-  const held = waiting.every(
-    (copy) =>
-      seen.some((known) => sameDraft(known, copy)) &&
-      valuesEqual(toFormValues(copy.values), scope.values, scope.equal)
+// When every waiting copy equals what the form holds, Resume has nothing to add, so
+// the prompt goes down. The copies stay in storage: another tab can share the live
+// slot, so a copy that looks held here can be the only record of its edits.
+const lowerHeldPrompt = (formId: FormId, scope: EditedForm) => {
+  const waiting = readFormStore().waiting[formId] ?? [];
+  const held = waiting.every((copy) =>
+    valuesEqual(toFormValues(copy.values), scope.values, scope.equal)
   );
-  if (waiting.length === 0 || !held) return;
-  if (storeFailed(writeWaitingDrafts(formId, [], userId, branch))) return;
-  useFormStore.setState(
-    (state) => ({
-      waiting: withoutKey(state.waiting, formId),
-      draftsVersion: state.draftsVersion + 1,
-    }),
-    false,
-    DEVTOOLS_ACTION.storage
-  );
+  if (waiting.length > 0 && held) readFormStore().lowerPrompt(formId);
 };
 
 // Records whether the newest edits of a form are confirmed stored. Only a change

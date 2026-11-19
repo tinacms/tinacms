@@ -579,7 +579,7 @@ export function FormProvider({
   );
 
   const waiting = useFormStore((state) =>
-    state.hidden[formId] || state.leftWithWaiting[formId]
+    state.hidden[formId] || state.promptDown[formId]
       ? undefined
       : state.waiting[formId]
   );
