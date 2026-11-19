@@ -338,7 +338,7 @@ export function MoveDialog({
         <ul
           aria-label='Folders'
           className={cn(
-            'm-0 flex max-h-48 list-none flex-col gap-0.5 overflow-y-auto p-0'
+            'm-0 flex max-h-48 min-h-[5.25rem] shrink-0 list-none flex-col gap-0.5 overflow-y-auto p-0'
           )}
           onScroll={(event) => {
             const list = event.currentTarget;
@@ -419,7 +419,7 @@ export function NewFolderForm({
     >
       <AlertDialogContent>
         <form
-          className='flex flex-col gap-4'
+          className='flex flex-col gap-4 max-md:flex-1'
           noValidate
           onSubmit={(event) => {
             event.preventDefault();

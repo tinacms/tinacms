@@ -1031,8 +1031,10 @@ describe('a scalar list while blocked', () => {
 
 describe('a phone-width window', () => {
   it('tucks the pane when a row is pressed, so the field shows', async () => {
+    // A 1023px window: narrow, and a tablet to the tier hook.
     vi.stubGlobal('matchMedia', (query: string) => ({
-      matches: query === '(max-width: 1023px)',
+      matches:
+        query === '(max-width: 1023px)' || query === '(min-width: 768px)',
       media: query,
       addEventListener: () => {},
       removeEventListener: () => {},
@@ -1060,6 +1062,112 @@ describe('a phone-width window', () => {
     const user = await blockOnTwoFields();
     await user.click(await rowNamed(/^Meta title/));
     expect(await errorsPane()).toBeVisible();
+  });
+});
+
+describe('a phone', () => {
+  const stubPhone = () =>
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: query === '(max-width: 1023px)',
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+  afterEach(() => vi.unstubAllGlobals());
+  const errorsSheet = () => screen.findByRole('dialog', { name: /^Errors/ });
+  const rowOf = async (name: RegExp) =>
+    within(await errorsSheet()).getByRole('button', { name });
+
+  // The row button carries the field's name too, so focus must sit in the field itself.
+  const expectFocusInField = (name: RegExp, id?: string) =>
+    waitFor(() => {
+      const active = globalThis.document.activeElement;
+      expect(active?.tagName).toBe('INPUT');
+      expect(active).toHaveAccessibleName(name);
+      if (id) expect(active?.id).toBe(id);
+    });
+
+  const blockOnSecondItem = async () => {
+    document = {
+      ...document,
+      items: [{ heading: 'A' }, { heading: '' }],
+    };
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    await user.click(await saveButton());
+    return user;
+  };
+
+  const taps = [
+    [
+      'tap',
+      (user: ReturnType<typeof userEvent.setup>, row: HTMLElement) =>
+        user.click(row),
+    ],
+    [
+      'double tap',
+      (user: ReturnType<typeof userEvent.setup>, row: HTMLElement) =>
+        user.dblClick(row),
+    ],
+  ] as const;
+
+  describe.each(taps)('a %s on a row', (_, tap) => {
+    it.each([
+      ['a field in a closed card', /^Meta title/, /^Meta title\b/],
+      ['a field in the first item of a list', /^Heading/, /^Heading\b/],
+    ])('closes the sheet, then focuses %s', async (_, row, field) => {
+      stubPhone();
+      const user = await blockOnTwoFields();
+      await tap(user, await rowOf(row));
+      await expectFocusInField(field);
+      expect(
+        screen.getByRole('button', { name: 'Show errors, 2' })
+      ).toBeVisible();
+    });
+
+    it('focuses the field of the second list item', async () => {
+      stubPhone();
+      const user = await blockOnSecondItem();
+      await tap(user, await rowOf(/^Heading, in Items › Item 2\. /));
+      await expectFocusInField(/^Heading\b/, 'items.1.heading');
+    });
+
+    it('focuses a field inside an object inside an object', async () => {
+      stubPhone();
+      document = { ...document, outer: { inner: { leaf: '' } } };
+      const user = userEvent.setup();
+      renderAdmin();
+      await user.type(await titleInput(), '!');
+      await user.click(await saveButton());
+      await tap(user, await rowOf(/^Leaf, in Outer › Inner\. /));
+      await expectFocusInField(/^Leaf\b/);
+    });
+  });
+
+  it('brings the sheet back from Resolve and gives focus back to it on ×', async () => {
+    stubPhone();
+    const user = await blockOnTwoFields();
+    await errorsSheet();
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    const resolve = await screen.findByRole('button', {
+      name: 'Resolve 2 errors',
+    });
+    await waitFor(() => expect(resolve).toHaveFocus());
+    await user.click(resolve);
+    expect(await errorsSheet()).toBeVisible();
+  });
+
+  it('leaves the stored pin alone', async () => {
+    stubPhone();
+    localStorage.setItem('tina.errorPane.pinned', 'true');
+    try {
+      const user = await blockOnTwoFields();
+      await user.click(await rowOf(/^Meta title/));
+      expect(localStorage.getItem('tina.errorPane.pinned')).toBe('true');
+    } finally {
+      localStorage.removeItem('tina.errorPane.pinned');
+    }
   });
 });
 
