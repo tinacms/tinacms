@@ -31,24 +31,14 @@ export function deepMerge(target: any, source: any): any {
 export async function sequential<A, B>(
   items: A[] | undefined,
   callback: (args: A, idx: number) => Promise<B>
-) {
-  const accum: B[] = [];
+): Promise<B[]> {
   if (!items) {
     return [];
   }
 
-  const reducePromises = async (previous: Promise<B>, endpoint: A) => {
-    const prev = await previous;
-    // Initial value will be undefined
-    if (prev) accum.push(prev);
-    return callback(endpoint, accum.length);
-  };
-
-  // @ts-ignore FIXME: this can be properly typed
-  const result = await items.reduce(reducePromises, Promise.resolve());
-  if (result) {
-    // @ts-ignore FIXME: this can be properly typed
-    accum.push(result);
+  const accum: B[] = [];
+  for (let i = 0; i < items.length; i++) {
+    accum.push(await callback(items[i], i));
   }
 
   return accum;
