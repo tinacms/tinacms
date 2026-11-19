@@ -42,6 +42,7 @@ beforeEach(() => {
     failures: {},
     swapFailures: {},
     hidden: {},
+    promptDown: {},
     active: null,
     collections: {},
     revealOnOpen: {},

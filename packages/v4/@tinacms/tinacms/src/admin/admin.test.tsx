@@ -27,6 +27,7 @@ import { TinaAdmin } from './admin';
 import { useAdminRoute } from './use-admin-route';
 import { connectionOf } from '../test/connection';
 import {
+  backToFolder,
   findCollectionTree,
   openCollectionTree,
   returnToTree,
@@ -1289,6 +1290,43 @@ describe('TinaAdmin draft recovery contract', () => {
     expect(new Set(ids)).toEqual(
       new Set([`resume-draft:${hello}`, `resume-draft:${second}`])
     );
+  });
+
+  it('does not show the toast again on a document the editor left', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    await backToFolder(user);
+    await user.click(
+      await screen.findByRole('button', { name: /second\.mdx/ })
+    );
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Second');
+    await backToFolder(user);
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello');
+    await waitFor(() =>
+      expect(screen.queryByText('Resume your unsaved edits?')).toBeNull()
+    );
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
+    expect(
+      within(screen.getByRole('contentinfo')).getByText(
+        'Unsaved edits kept in this browser'
+      )
+    ).toBeVisible();
+  });
+
+  it('lowers the toast and keeps the waiting copy once the form holds the same values', async () => {
+    store(hello, { title: 'Mine' }, { title: 'Hello' });
+    const user = await openDoc(/hello\.mdx/);
+    await screen.findByText('Resume your unsaved edits?');
+    const title = screen.getByLabelText(/^Title\b/);
+    await user.clear(title);
+    await user.type(title, 'Mine');
+    await waitFor(() =>
+      expect(screen.queryByText('Resume your unsaved edits?')).toBeNull()
+    );
+    expect(readWaitingDrafts(hello)).toHaveLength(1);
+    expect(readDraft(hello)?.values).toMatchObject({ title: 'Mine' });
   });
 
   it('row 11: the confirm takes focus when a field held it', async () => {

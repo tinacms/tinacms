@@ -38,6 +38,7 @@ import {
   type FieldErrors,
   type FormId,
   isEdited,
+  offeredCopies,
   readFormStore,
   readOpeningScope,
   syncDrafts,
@@ -589,9 +590,7 @@ export function FormProvider({
     collection.name
   );
 
-  const waiting = useFormStore((state) =>
-    state.hidden[formId] ? undefined : state.waiting[formId]
-  );
+  const waiting = useFormStore((state) => offeredCopies(state, formId));
   const staleDraftActions = useMemo(
     () =>
       buildStaleDraftActions(

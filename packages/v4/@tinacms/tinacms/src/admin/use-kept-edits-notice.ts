@@ -15,6 +15,8 @@ const noticeId = (path: string) => `kept-edits:${path}`;
  * notice says the edits stay in this browser and offers a way back to them.
  * Entering a reference step keeps the document it came from open, so it says
  * nothing until the step is left for somewhere other than that document.
+ * Waiting copies the editor leaves keep their Resume prompt down until reload
+ * or until a new copy joins the waiting list (ADR-026 §2).
  */
 export function useKeptEditsNotice(
   route: AdminRoute,
@@ -36,6 +38,7 @@ export function useKeptEditsNotice(
       route.collection === left.collection &&
       route.path === left.path;
     const notify = (target: DocumentRoute) => {
+      readFormStore().lowerPrompt(toFormId(target.path));
       const scope = readFormStore().forms[toFormId(target.path)];
       if (formStatus(scope) !== 'dirty') return;
       if (readFormStore().unstored[toFormId(target.path)]) return;

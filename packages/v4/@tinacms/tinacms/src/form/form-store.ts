@@ -137,8 +137,11 @@ export interface FormStore {
   failures: Partial<Record<FormId, number>>;
   /** Counts failed swaps per form. A swap that does nothing must say so every time. */
   swapFailures: Partial<Record<FormId, number>>;
-  /** Forms whose Resume prompt is hidden until the document opens again, after a failed Resume. */
+  /** Forms whose Resume prompt is hidden after a failed Resume. Leaving the document keeps it down until reload (ADR-026 §2). */
   hidden: Partial<Record<FormId, true>>;
+  /** Forms the editor left while copies waited. Their Resume prompt stays down until reload or until a new copy joins the waiting list (ADR-026 §2). */
+  promptDown: Partial<Record<FormId, true>>;
+  lowerPrompt: (formId: FormId) => void;
   /** The collection name of each open form, so Save All finds the schema of a form that is not on screen. */
   collections: Partial<Record<FormId, string>>;
   /** Forms that failed validation in a save without a mounted form. They show their errors once when they open. */
@@ -252,6 +255,26 @@ const openingScope = (
   scope: OpenForm | undefined,
   incoming: FormValues
 ): EditedForm | undefined => (keepsValues(scope, incoming) ? scope : undefined);
+
+// The copies the Resume prompt offers, or undefined while the prompt is down. When
+// every copy equals what the form holds, Resume has nothing to add. The copies stay
+// in storage, because another tab can share the live slot (ADR-026 §2).
+export const offeredCopies = (
+  state: FormStore,
+  formId: FormId
+): readonly StoredDraft[] | undefined => {
+  const copies = state.waiting[formId];
+  if (!copies?.length || state.hidden[formId] || state.promptDown[formId]) {
+    return undefined;
+  }
+  const scope = state.forms[formId];
+  const held =
+    isEdited(scope) &&
+    copies.every((copy) =>
+      valuesEqual(toFormValues(copy.values), scope.values, scope.equal)
+    );
+  return held ? undefined : copies;
+};
 
 const withoutNew = ({ isNew: _created, ...rest }: EditedForm): EditedForm =>
   rest;
@@ -382,6 +405,7 @@ const DEVTOOLS_ACTION = {
   discardEdits: 'form/discardEdits',
   resumeWaiting: 'form/resumeWaiting',
   removeForm: 'form/removeForm',
+  lowerPrompt: 'form/lowerPrompt',
   registerCollection: 'form/registerCollection',
   revealOnOpen: 'form/revealOnOpen',
   savePending: 'form/savePending',
@@ -415,6 +439,7 @@ export const useFormStore = create<FormStore>()(
         failures: {},
         swapFailures: {},
         hidden: {},
+        promptDown: {},
         active: null,
         hovered: null,
         collections: {},
@@ -501,6 +526,16 @@ export const useFormStore = create<FormStore>()(
             return saveAll === state.saveAll ? state : { saveAll };
           }, DEVTOOLS_ACTION.saveAll),
 
+        lowerPrompt: (formId) =>
+          apply((state) => {
+            if (state.promptDown[formId] || !state.waiting[formId]?.length) {
+              return state;
+            }
+            return {
+              promptDown: { ...state.promptDown, [formId]: true },
+            };
+          }, DEVTOOLS_ACTION.lowerPrompt),
+
         discardStoredDraft: (formId) => {
           const { userId, branch } = readFormStore();
           removeAllDrafts(formId, userId, branch);
@@ -579,6 +614,7 @@ export const useFormStore = create<FormStore>()(
               failures: {},
               swapFailures: {},
               hidden: {},
+              promptDown: {},
               active: null,
               hovered: null,
               collections: {},
@@ -628,6 +664,7 @@ export const useFormStore = create<FormStore>()(
               failures: {},
               swapFailures: {},
               hidden: {},
+              promptDown: {},
               active: null,
               hovered: null,
               collections: {},
@@ -657,9 +694,12 @@ export const useFormStore = create<FormStore>()(
               state.branch,
               settled.held
             );
+            const before = state.waiting[formId] ?? [];
             const sameCopies =
-              JSON.stringify(copies) ===
-              JSON.stringify(state.waiting[formId] ?? []);
+              JSON.stringify(copies) === JSON.stringify(before);
+            const newCopy = copies.some(
+              (copy) => !before.some((seen) => sameDraft(seen, copy))
+            );
             const storage = {
               waiting: sameCopies
                 ? state.waiting
@@ -674,6 +714,9 @@ export const useFormStore = create<FormStore>()(
                 ? withFailure(state.failures, formId)
                 : state.failures,
               hidden: opening ? state.hidden : withoutKey(state.hidden, formId),
+              promptDown: newCopy
+                ? withoutKey(state.promptDown, formId)
+                : state.promptDown,
               draftsVersion: sameCopies
                 ? state.draftsVersion
                 : state.draftsVersion + 1,
