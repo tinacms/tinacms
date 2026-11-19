@@ -706,8 +706,9 @@ test('a form column dragged wide at desktop width moves controls into ⋯ and ke
   await expect(
     toolbar(page).getByRole('group', { name: 'Device size' })
   ).toHaveCount(0);
-  const box = await address(page).boundingBox();
-  expect(box?.width ?? 0).toBeGreaterThanOrEqual(128);
+  await expect
+    .poll(async () => (await address(page).boundingBox())?.width ?? 0)
+    .toBeGreaterThanOrEqual(128);
   const more = await actions(page).boundingBox();
   expect((more?.x ?? 0) + (more?.width ?? 0)).toBeLessThanOrEqual(1440);
   await actions(page).click();

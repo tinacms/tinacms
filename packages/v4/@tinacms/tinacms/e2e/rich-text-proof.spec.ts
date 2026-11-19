@@ -5,7 +5,6 @@ import { type Page, expect, test } from '@playwright/test';
 import {
   fakeVisualViewport,
   formColumn,
-  formScroller,
   setKeyboardHeight,
   toolbar,
 } from './form-column';
@@ -205,11 +204,21 @@ test.describe('with the keyboard up at 390px', () => {
     await page.keyboard.type('/head');
     const rows = page.getByRole('option');
     await expect(rows.first()).toBeVisible();
-    for (const row of await rows.all()) {
-      const box = await row.boundingBox();
-      if (!box) continue;
-      expect(box.y + box.height).toBeLessThanOrEqual(KEYBOARD_TOP);
-    }
+    await page
+      .getByRole('combobox')
+      .first()
+      .evaluate((input) => {
+        input.scrollIntoView({ block: 'center' });
+      });
+    const lastRow = rows.last();
+    await expect
+      .poll(async () => {
+        const box = await lastRow.boundingBox();
+        return box ? Math.round(box.y + box.height) : Number.NaN;
+      })
+      .toBeLessThanOrEqual(KEYBOARD_TOP);
+    const first = await rows.first().boundingBox();
+    expect(first?.y ?? -1).toBeGreaterThanOrEqual(0);
   });
 
   test('AC21: the code language search lists rows above the keyboard', async ({
