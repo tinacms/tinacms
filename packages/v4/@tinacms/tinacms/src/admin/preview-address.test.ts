@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   displayAddress,
+  frameAddress,
   isHashOnlyChange,
   parseAddress,
 } from './preview-address';
@@ -77,5 +78,23 @@ describe('isHashOnlyChange', () => {
     expect(isHashOnlyChange(`${a}#x`, a)).toBe(false);
     expect(isHashOnlyChange(a, a)).toBe(false);
     expect(isHashOnlyChange(a, 'http://localhost:3000/q#x')).toBe(false);
+  });
+});
+
+describe('frameAddress', () => {
+  const START = 'http://localhost:3000/posts/a';
+  const BASE = 'http://localhost:5173/admin';
+
+  it('keeps an address on the preview origin', () => {
+    expect(frameAddress(START, BASE, START)).toBe(START);
+    expect(
+      frameAddress('/posts/b?x=1#y', 'http://localhost:3000/', START)
+    ).toBe('http://localhost:3000/posts/b?x=1#y');
+  });
+
+  it('falls back to the start address for another origin or scheme', () => {
+    expect(frameAddress('https://example.com/', BASE, START)).toBe(START);
+    expect(frameAddress('javascript:void(0)', BASE, START)).toBe(START);
+    expect(frameAddress('data:text/html,hi', BASE, START)).toBe(START);
   });
 });

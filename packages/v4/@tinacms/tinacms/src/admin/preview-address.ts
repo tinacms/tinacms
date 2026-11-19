@@ -65,3 +65,22 @@ export const isHashOnlyChange = (current: string, next: string): boolean => {
     return false;
   }
 };
+
+/**
+ * The address the preview frame loads. It resolves `address` against `base`, then returns it
+ * only when it is an http(s) address on the origin of `startHref`. Any other address gives `startHref`.
+ */
+export function frameAddress(
+  address: string,
+  base: string,
+  startHref: string
+): string {
+  try {
+    const url = new URL(address, base);
+    const web = url.protocol === 'http:' || url.protocol === 'https:';
+    if (web && url.origin === new URL(startHref).origin) return url.href;
+  } catch {
+    // An address that does not parse falls through to the start address.
+  }
+  return startHref;
+}

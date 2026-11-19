@@ -11,6 +11,7 @@ import {
 } from '../editor/preview-connection';
 import {
   displayAddress,
+  frameAddress,
   isHashOnlyChange,
   parseAddress,
 } from './preview-address';
@@ -266,7 +267,7 @@ function PreviewPane({
       >
         <iframe
           ref={iframeRef}
-          src={src}
+          src={frameAddress(src, window.location.href, startHref)}
           title='Preview'
           className='size-full border-none'
           onLoad={onFrameLoad}
