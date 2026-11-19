@@ -10,6 +10,7 @@ import {
   type RichTextFieldSchema,
   t,
 } from '@tinacms/tinacms';
+import { navDemoPlugin } from './nav-demo';
 
 export const authorCollection = {
   name: 'author',
@@ -201,7 +202,12 @@ export const checklistCollection = {
 } satisfies CollectionSchema;
 
 export default defineConfig({
-  plugins: [localContentPlugin(), localMediaPlugin(), mediaManagerPlugin()],
+  plugins: [
+    localContentPlugin(),
+    localMediaPlugin(),
+    mediaManagerPlugin(),
+    navDemoPlugin,
+  ],
   schema: {
     collections: [
       postCollection,

@@ -218,7 +218,7 @@ const duplicateScreenPlugin = definePlugin({
     default: {
       screens: [{ name: 'prefs', label: 'Prefs', component: NotesScreen }],
       slots: {
-        globalNav: ['Settings', 'Notes', 'Notes'].map((label) => ({
+        globalNav: ['Prefs', 'Prefs', 'Notes', 'Notes'].map((label) => ({
           label,
           icon: ImageIcon,
           target: { kind: 'screen' as const, screen: 'prefs' },
@@ -468,13 +468,13 @@ describe('Top bar', () => {
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: /Search/ }));
     const dialog = await screen.findByRole('dialog', { name: 'Search' });
-    await user.type(within(dialog).getByRole('searchbox'), 'sett');
+    await user.type(within(dialog).getByRole('searchbox'), 'coll');
     const list = within(dialog).getByRole('list', {
       name: 'Navigation results',
     });
     expect(within(list).getAllByRole('listitem')).toHaveLength(1);
-    await user.click(within(list).getByRole('button', { name: 'Settings' }));
-    await waitFor(() => expect(window.location.hash).toBe('#/settings'));
+    await user.click(within(list).getByRole('button', { name: 'Collections' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/collections'));
   });
 
   it('keeps every Search row when two entries share a label', async () => {
@@ -489,12 +489,12 @@ describe('Top bar', () => {
     });
     const all = within(list).getAllByRole('listitem').length;
     const box = within(dialog).getByRole('searchbox');
-    await user.type(box, 'Set');
+    await user.type(box, 'Pre');
     expect(
       within(list)
         .getAllByRole('listitem')
         .map((row) => row.textContent)
-    ).toEqual(['Settings', 'Settings']);
+    ).toEqual(['Prefs', 'Prefs']);
     await user.clear(box);
     await user.type(box, 'Not');
     expect(
@@ -558,9 +558,9 @@ describe('side nav entries', () => {
     ).toBeNull();
   });
 
-  it('puts Help & docs at the foot and opens it in a new tab', async () => {
+  it('puts Help and docs at the foot and opens it in a new tab', async () => {
     renderAdmin();
-    const help = await screen.findByRole('link', { name: /Help & docs/ });
+    const help = await screen.findByRole('link', { name: /Help and docs/ });
     expect(help).toHaveAttribute('target', '_blank');
     expect(help).toHaveAttribute('rel', expect.stringContaining('noopener'));
   });

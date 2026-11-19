@@ -436,7 +436,7 @@ describe('Home screen', () => {
     await user.click(rows[0]);
     await waitFor(() => expect(window.location.hash).toBe('#/'));
     expect(await railRow('Home')).toHaveAttribute('aria-current', 'page');
-    for (const name of ['Tools', 'Settings']) {
+    for (const name of ['Collections', 'Media']) {
       await user.click(within(await rail()).getByRole('button', { name }));
       expect(await railRow('Home')).not.toHaveAttribute('aria-current');
     }

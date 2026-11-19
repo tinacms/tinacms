@@ -47,8 +47,8 @@ them.
 
 ## `globalNav`
 
-`globalNav` is the list of entries in the admin sidebar, below the
-collections. Each entry is a `GlobalNavEntry` (`core/slot/contract.ts`):
+`globalNav` is the list of entries in the admin sidebar, below Home,
+Collections and Media. Each entry is a `GlobalNavEntry` (`core/slot/contract.ts`):
 
 | Property | Type | Role |
 |---|---|---|
@@ -122,7 +122,8 @@ slots: {
 `useGlobalNav()` (`@tinacms/tinacms/admin`) gives a list of
 `GlobalNavSection` values after the filter and the sort. A section is a group
 with its entries, or a run of entries without a group (`group` is
-`undefined`). The admin sidebar renders one menu for each section.
+`undefined`). The admin sidebar renders one menu for each section, with a
+divider above it. A group shows its `label` as a heading above its menu.
 
 ## Not supported yet
 

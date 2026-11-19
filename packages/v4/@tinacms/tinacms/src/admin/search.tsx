@@ -137,8 +137,6 @@ function useNavigationResults(): NavigationResult[] {
               : { view: 'media' }
           ),
       },
-      { label: 'Tools', run: () => navigate({ view: 'tools' }) },
-      { label: 'Settings', run: () => navigate({ view: 'settings' }) },
     ];
     const plugins = globalNav
       .flatMap(({ entries }) => entries)
