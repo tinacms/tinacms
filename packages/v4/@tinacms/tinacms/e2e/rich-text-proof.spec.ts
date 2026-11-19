@@ -97,7 +97,7 @@ test('AC18: focusing then blurring the body leaves the form clean', async ({
 }) => {
   await page.goto(POST('hello-world.mdx'));
   await body(page).click();
-  await page.getByRole('textbox', { name: 'title' }).click();
+  await page.getByRole('textbox', { name: /^Title/ }).click();
   await expect(status(page)).toHaveText('No changes');
   await expect(save(page)).toBeDisabled();
 });
