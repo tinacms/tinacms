@@ -296,7 +296,9 @@ test.describe('the Resume toast keeps the form usable', () => {
     await page.reload();
     await waitForPrompt(page);
 
-    await formScroller(page).evaluate((scroller) => scroller.scrollTo(0, 600));
+    await formScroller(page).evaluate((scroller) =>
+      scroller.scrollTo(0, scroller.scrollHeight)
+    );
     await expect(page.locator('[data-slot="toolbar-shell"]')).toHaveAttribute(
       'data-stuck',
       ''
