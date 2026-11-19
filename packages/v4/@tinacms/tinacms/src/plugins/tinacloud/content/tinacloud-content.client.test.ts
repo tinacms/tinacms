@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ContentError } from '../../../core/content/contract';
+import { ContentError, nodesOf } from '../../../core/content/contract';
 import type { TinaStoreState } from '../../../core/plugin';
 import { TINACLOUD_IDENTITY_URL } from '../client';
 import { contentUrl } from './request';
@@ -18,11 +18,30 @@ const content = () => {
   );
 };
 
-const page = (paths: string[], endCursor: string | null) => ({
+const POSTS_FOLDER = 'content/posts/';
+
+type Row =
+  | string
+  | { path: string; title?: string; root?: string; relativePath?: string };
+
+const nodeOf = (row: Row) => {
+  const {
+    path,
+    title,
+    root = POSTS_FOLDER,
+    relativePath = path.slice(root.length),
+  } = typeof row === 'string' ? { path: row } : row;
+  return {
+    _sys: { path, relativePath },
+    _values: title === undefined ? {} : { title },
+  };
+};
+
+const page = (rows: Row[], endCursor: string | null) => ({
   data: {
     collection: {
       documents: {
-        edges: paths.map((path) => ({ node: { _sys: { path } } })),
+        edges: rows.map((row) => ({ node: nodeOf(row) })),
         pageInfo: { hasNextPage: endCursor !== null, endCursor },
       },
     },
@@ -102,7 +121,7 @@ describe('TinaCloud content slice', () => {
       page(['a.mdx'], 'c1'),
       page(['b.mdx'], 'c1')
     );
-    expect(await content().list('post')).toEqual([
+    expect(nodesOf(await content().list('post'))).toEqual([
       { path: 'a.mdx' },
       { path: 'b.mdx' },
     ]);
@@ -115,7 +134,7 @@ describe('TinaCloud content slice', () => {
       page(['c.mdx'], 'c2'),
       page(['d.mdx'], null)
     );
-    expect(await content().list('post')).toEqual([
+    expect(nodesOf(await content().list('post'))).toEqual([
       { path: 'a.mdx' },
       { path: 'b.mdx' },
       { path: 'c.mdx' },
@@ -128,7 +147,172 @@ describe('TinaCloud content slice', () => {
 
   it('lists an empty collection', async () => {
     stubTinaCloud(page([], null));
-    expect(await content().list('post')).toEqual([]);
+    expect(await content().list('post')).toMatchObject({
+      edges: [],
+      totalCount: 0,
+      folders: [],
+    });
+  });
+
+  it('answers a list query over the full path list, without placeholders', async () => {
+    stubTinaCloud(
+      page(
+        [
+          'content/posts/zebra.mdx',
+          'content/posts/apple.mdx',
+          'content/posts/.gitkeep.mdx',
+          'content/posts/2024/jan.mdx',
+          'content/posts/2024/.gitkeep.mdx',
+          'content/posts/empty/.gitkeep.mdx',
+        ],
+        null
+      )
+    );
+    const connection = await content().list('post', {
+      folder: '',
+      sort: { by: 'title', direction: 'asc' },
+    });
+    expect(nodesOf(connection).map(({ path }) => path)).toEqual([
+      'content/posts/apple.mdx',
+      'content/posts/zebra.mdx',
+    ]);
+    expect(connection.totalCount).toBe(2);
+    expect(connection.folders).toEqual([
+      { path: '2024', name: '2024', documentCount: 1 },
+    ]);
+  });
+
+  it('lists a folder scope filtered, sorted and paged, never a placeholder', async () => {
+    const paths = [
+      'content/posts/2024/.gitkeep.mdx',
+      'content/posts/2024/delta.mdx',
+      'content/posts/2024/alpha.mdx',
+      'content/posts/2024/charlie.mdx',
+      'content/posts/2024/bravo.mdx',
+      'content/posts/2024/skip.mdx',
+      'content/posts/root.mdx',
+    ];
+    const query = {
+      folder: '2024',
+      filter: 'a',
+      sort: { by: 'title', direction: 'asc' },
+      first: 2,
+    } as const;
+    stubTinaCloud(page(paths, null), page(paths, null));
+    const slice = content();
+    const first = await slice.list('post', query);
+    expect(nodesOf(first).map(({ path }) => path)).toEqual([
+      'content/posts/2024/alpha.mdx',
+      'content/posts/2024/bravo.mdx',
+    ]);
+    expect(first.totalCount).toBe(4);
+    expect(first.pageInfo.hasNextPage).toBe(true);
+    expect(first.folders).toEqual([]);
+    expect(JSON.stringify(first)).not.toContain('.gitkeep');
+
+    const second = await slice.list('post', {
+      ...query,
+      after: first.pageInfo.endCursor ?? undefined,
+    });
+    expect(nodesOf(second).map(({ path }) => path)).toEqual([
+      'content/posts/2024/charlie.mdx',
+      'content/posts/2024/delta.mdx',
+    ]);
+    expect(second.pageInfo.hasNextPage).toBe(false);
+  });
+
+  it("roots folders at the collection's path when every document sits in a subfolder", async () => {
+    stubTinaCloud(
+      page(['content/posts/guides/a.md'], null),
+      page(['content/posts/guides/a.md'], null)
+    );
+    const slice = content();
+    const top = await slice.list('post', { folder: '' });
+    expect(top.folders).toEqual([
+      { path: 'guides', name: 'guides', documentCount: 1 },
+    ]);
+    expect(nodesOf(top)).toEqual([]);
+    const guides = await slice.list('post', { folder: 'guides' });
+    expect(nodesOf(guides).map(({ path }) => path)).toEqual([
+      'content/posts/guides/a.md',
+    ]);
+  });
+
+  it('roots folders at the repository top for a collection with an empty path', async () => {
+    stubTinaCloud(page([{ path: 'docs/a.md', root: '' }], null));
+    const connection = await content().list('post', { folder: '' });
+    expect(connection.folders).toEqual([
+      { path: 'docs', name: 'docs', documentCount: 1 },
+    ]);
+  });
+
+  it('falls back to the unrooted listing when relativePath is not a trailing segment of path', async () => {
+    stubTinaCloud(
+      page([{ path: 'content/posts/a.md', relativePath: '/a.md' }], null)
+    );
+    const connection = await content().list('post', { folder: '' });
+    expect(connection.folders).toEqual([
+      { path: 'content', name: 'content', documentCount: 1 },
+    ]);
+  });
+
+  it('carries each title, and filters and sorts by it', async () => {
+    stubTinaCloud(
+      page(
+        [
+          { path: 'content/posts/a.mdx', title: 'Zebra crossing' },
+          { path: 'content/posts/b.mdx', title: 'Apple pie' },
+          { path: 'content/posts/c.mdx', title: 'Banana bread' },
+          'content/posts/d.mdx',
+        ],
+        null
+      ),
+      page(
+        [
+          { path: 'content/posts/a.mdx', title: 'Zebra crossing' },
+          { path: 'content/posts/b.mdx', title: 'Apple pie' },
+          { path: 'content/posts/c.mdx', title: 'Banana bread' },
+        ],
+        null
+      )
+    );
+    const slice = content();
+    const sorted = await slice.list('post', {
+      folder: '',
+      sort: { by: 'title', direction: 'asc' },
+    });
+    expect(nodesOf(sorted).map(({ path, title }) => [path, title])).toEqual([
+      ['content/posts/b.mdx', 'Apple pie'],
+      ['content/posts/c.mdx', 'Banana bread'],
+      ['content/posts/d.mdx', undefined],
+      ['content/posts/a.mdx', 'Zebra crossing'],
+    ]);
+    const filtered = await slice.list('post', { folder: '', filter: 'pie' });
+    expect(nodesOf(filtered).map(({ path }) => path)).toEqual([
+      'content/posts/b.mdx',
+    ]);
+  });
+
+  it('offers no structural operations, because TinaCloud has no such API', () => {
+    const slice = content();
+    for (const op of [
+      'create',
+      'rename',
+      'delete',
+      'referrers',
+      'createFolder',
+      'renameFolder',
+      'deleteFolder',
+    ]) {
+      expect(slice).not.toHaveProperty(op);
+    }
+  });
+
+  it('refuses a page size above 200 as a ContentError', async () => {
+    stubTinaCloud(page(['a.mdx'], null));
+    await expect(content().list('post', { first: 500 })).rejects.toMatchObject({
+      code: 'validation',
+    });
   });
 
   it('updates a document and returns the saved values', async () => {

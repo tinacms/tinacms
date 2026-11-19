@@ -30,6 +30,7 @@ import {
 } from '@udecode/plate-table/react';
 import { ParagraphPlugin, PlateLeaf } from '@udecode/plate/react';
 import colorString from 'color-string';
+import { Lock } from 'lucide-react';
 import React from 'react';
 import { BlockquoteElement } from '../../components/plate-ui/blockquote-element';
 import { CodeBlockElement } from '../../components/plate-ui/code-block/code-block-element';
@@ -50,9 +51,6 @@ import { TableElement } from '../../components/plate-ui/table/table-element';
 import { TableRowElement } from '../../components/plate-ui/table/table-row-element';
 import { TextColorPlugin } from '../text-color-plugin';
 import { classNames } from './helpers';
-
-const blockClasses = 'mt-0.5';
-const headerClasses = 'font-normal';
 
 function getContrastColor(color: string): string {
   const parsed = colorString.get.rgb(color);
@@ -164,119 +162,95 @@ type HeadingComponentProps = {
   className?: string;
 };
 
-const Heading1 = ({
-  attributes,
-  children,
-  className,
-}: HeadingComponentProps) => (
-  <h1
-    {...attributes}
-    className={classNames(
-      headerClasses,
-      blockClasses,
-      className,
-      'text-4xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
-    )}
-  >
-    {children}
-  </h1>
-);
+const headingBase =
+  'mb-3 mt-6 font-heading font-semibold text-foreground first:mt-0 last:mb-0';
 
-const Heading2 = ({
-  attributes,
-  children,
-  className,
-}: HeadingComponentProps) => (
-  <h2
-    {...attributes}
-    className={classNames(
-      headerClasses,
-      blockClasses,
-      className,
-      'text-3xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
-    )}
-  >
-    {children}
-  </h2>
-);
-
-const Heading3 = ({
-  attributes,
-  children,
-  className,
-}: HeadingComponentProps) => (
-  <h3
-    {...attributes}
-    className={classNames(
-      headerClasses,
-      blockClasses,
-      className,
-      'text-2xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
-    )}
-  >
-    {children}
-  </h3>
-);
-
-const Heading4 = ({
-  attributes,
-  children,
-  className,
-}: HeadingComponentProps) => (
-  <h4
-    {...attributes}
-    className={classNames(
-      headerClasses,
-      blockClasses,
-      className,
-      'text-xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
-    )}
-  >
-    {children}
-  </h4>
-);
-
-const headerFontStyle: React.CSSProperties = {
-  fontFamily: "'Inter', sans-serif",
-  fontWeight: '400',
+const createHeading = (
+  Tag: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6',
+  scale: string
+) => {
+  const Heading = ({
+    attributes,
+    children,
+    className,
+  }: HeadingComponentProps) => (
+    <Tag {...attributes} className={classNames(headingBase, scale, className)}>
+      {children}
+    </Tag>
+  );
+  return Heading;
 };
 
-const Heading5 = ({
+const Heading1 = createHeading('h1', 'text-[1.75rem] leading-9');
+const Heading2 = createHeading('h2', 'text-lg leading-7');
+const Heading3 = createHeading('h3', 'text-md leading-6');
+const Heading4 = createHeading('h4', 'text-base leading-6');
+const Heading5 = createHeading(
+  'h5',
+  'text-base leading-6 text-muted-foreground'
+);
+const Heading6 = createHeading('h6', 'text-sm leading-5 text-muted-foreground');
+
+const LOCK_ICON = <Lock aria-hidden className='size-3.5 shrink-0' />;
+
+export const RAW_HTML_NAME = 'Raw HTML, edit it in the file';
+
+const RawHtmlBlock = ({
   attributes,
+  element,
   children,
   className,
-}: HeadingComponentProps) => (
-  <h5
+}: {
+  attributes: React.HTMLAttributes<HTMLDivElement>;
+  element: { value?: unknown };
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <div
     {...attributes}
+    role='group'
+    aria-label={RAW_HTML_NAME}
     className={classNames(
-      headerClasses,
-      blockClasses,
-      className,
-      'text-md mb-4 last:mb-0 mt-6 first:mt-0'
+      'mb-3 flex cursor-not-allowed items-start gap-2 rounded-sm border border-border-subtle bg-muted px-3 py-2 font-mono text-sm text-muted-foreground last:mb-0',
+      className
     )}
-    style={headerFontStyle}
   >
-    {children}
-  </h5>
+    <span contentEditable={false} className='mt-0.5'>
+      {LOCK_ICON}
+    </span>
+    <span className='min-w-0 flex-1 whitespace-pre-wrap break-words'>
+      {children}
+      {String(element.value ?? '')}
+    </span>
+  </div>
 );
 
-const Heading6 = ({
+const RawHtmlChip = ({
   attributes,
+  element,
   children,
   className,
-}: HeadingComponentProps) => (
-  <h6
+}: {
+  attributes: React.HTMLAttributes<HTMLSpanElement>;
+  element: { value?: unknown };
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <span
     {...attributes}
+    role='group'
+    aria-label={RAW_HTML_NAME}
     className={classNames(
-      headerClasses,
-      blockClasses,
-      className,
-      'text-base mb-4 last:mb-0 mt-6 first:mt-0'
+      'inline-flex cursor-not-allowed items-center gap-1 rounded-xs bg-muted px-1 py-0.5 align-baseline font-mono text-[0.9em] text-muted-foreground',
+      className
     )}
-    style={headerFontStyle}
   >
-    {children}
-  </h6>
+    <span contentEditable={false}>{LOCK_ICON}</span>
+    <span>
+      {children}
+      {String(element.value ?? '')}
+    </span>
+  </span>
 );
 
 export const Components = () => {
@@ -293,34 +267,8 @@ export const Components = () => {
     [CodeBlockPlugin.key]: CodeBlockElement,
     [CodeLinePlugin.key]: CodeLineElement,
     [CodeSyntaxPlugin.key]: CodeSyntaxLeaf,
-    html: ({ attributes, editor, element, children, className }) => {
-      return (
-        <div
-          {...attributes}
-          className={classNames(
-            'font-mono text-sm bg-green-100 cursor-not-allowed mb-4',
-            className
-          )}
-        >
-          {children}
-          {element.value}
-        </div>
-      );
-    },
-    html_inline: ({ attributes, editor, element, children, className }) => {
-      return (
-        <span
-          {...attributes}
-          className={classNames(
-            'font-mono bg-green-100 cursor-not-allowed',
-            className
-          )}
-        >
-          {children}
-          {element.value}
-        </span>
-      );
-    },
+    html: RawHtmlBlock,
+    html_inline: RawHtmlChip,
     [BulletedListPlugin.key]: withProps(ListElement, { variant: 'ul' }),
     [NumberedListPlugin.key]: withProps(ListElement, { variant: 'ol' }),
     [ListItemPlugin.key]: ListItemElement,

@@ -16,6 +16,7 @@ export {
 export {
   AuthError,
   type AuthErrorCode,
+  type AuthPluginSlice,
   type AuthSlice,
   type AuthUser,
   toUserId,
@@ -27,8 +28,15 @@ export {
   type ContentFieldErrors,
   type ContentProvider,
   type ContentSlice,
+  type DocumentConnection,
   type DocumentEntry,
+  type DocumentReferrer,
   type DocumentSummary,
+  type FolderSummary,
+  type ListQuery,
+  type ListSort,
+  type RenameFolderResult,
+  type RenameResult,
 } from './core/content/contract';
 export {
   type MediaFeatures,
@@ -41,6 +49,7 @@ export {
   type MediaErrorCode,
   type MediaSlice,
   type MediaStatus,
+  type MediaUploadOptions,
   type MediaUrlOptions,
   type ResolveMediaUrl,
 } from './core/media/contract';

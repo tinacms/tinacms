@@ -6,19 +6,19 @@ import { ELEMENT_IMG } from '../create-img-plugin';
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
 import { HANDLES_MDX } from './formatting';
 
-export const unsupportedItemsInTable = new Set([
-  'Code Block',
-  'Unordered List',
-  'Ordered List',
-  'Horizontal Rule',
-  'Quote',
-  'Mermaid',
-  'Heading 1',
-  'Heading 2',
-  'Heading 3',
-  'Heading 4',
-  'Heading 5',
-  'Heading 6',
+export const unsupportedItemsInTable: ReadonlySet<string> = new Set([
+  'ul',
+  'ol',
+  'quote',
+  'codeBlock',
+  'mermaid',
+  'hr',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
 ]);
 
 const isNodeActive = (editor, type) => {
@@ -33,11 +33,25 @@ const isListActive = (editor, type) => {
   return !!res && res.list[0].type === type;
 };
 
+type SeedNode = { id?: string; type?: string; children?: unknown[] };
+
 let seededNodeIds = 0;
-const withRootNodeIds = (nodes: any[]) =>
-  nodes.map((node) =>
-    node.id ? node : { ...node, id: `seed-${++seededNodeIds}` }
-  );
+const TABLE_PARTS = new Set(['table', 'tr', 'td', 'th']);
+
+const withNodeIds = <T extends SeedNode>(node: T): T => {
+  const withId = node.id ? node : { ...node, id: `seed-${++seededNodeIds}` };
+  if (!node.type || !TABLE_PARTS.has(node.type) || !node.children) {
+    return withId;
+  }
+  return {
+    ...withId,
+    children: node.children.map((child) => withNodeIds(child as SeedNode)),
+  };
+};
+
+// Table rows and cells need ids: the table plugin keys each cell's row and column by `id`.
+const withRootNodeIds = <T extends SeedNode>(nodes: T[]): T[] =>
+  nodes.map(withNodeIds);
 
 const normalize = (node: any) => {
   if (

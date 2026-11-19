@@ -6,6 +6,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { RichTextValue } from '../value';
 import { RichEditor, type RichEditorProps } from './index';
@@ -74,26 +75,25 @@ describe('RichEditor frame props', () => {
     expect((await editor()).className).toContain('max-h-60');
     framed.unmount();
     mount({ layout: 'body' });
-    expect((await editor()).className).toContain('min-h-56');
+    const body = (await editor()).className;
+    expect(body).toContain('min-h-56');
+    expect(body).toContain('max-h-[min(70vh,640px)]');
+    expect(body).toContain('overflow-y-auto');
+    expect(body).not.toContain('max-h-60');
+    expect(body).not.toMatch(/overflow-y-visible|overscroll-/);
   });
 });
 
 describe('RichEditor toolbar tooltips', () => {
-  it('opens after the half second the rest of the admin uses, not Radix’s 700ms default', async () => {
+  it('opens after the half second the rest of the admin uses, with the name and the keycap', async () => {
+    const user = userEvent.setup();
     mount();
     await editor();
-    vi.useFakeTimers();
-    const button = screen.getByRole('radio', { name: 'Bold (⌘+B)' });
-    const tip = () => document.querySelector('[role="tooltip"]');
-    act(() => {
-      fireEvent.pointerEnter(button);
-      fireEvent.pointerMove(button);
-      fireEvent.mouseEnter(button);
-      fireEvent.mouseMove(button);
-    });
-    await act(() => vi.advanceTimersByTimeAsync(499));
+    const tip = () => document.querySelector('[data-slot="tooltip-content"]');
+    await user.hover(screen.getByRole('button', { name: 'Bold' }));
     expect(tip()).toBeNull();
-    await act(() => vi.advanceTimersByTimeAsync(1));
-    expect(tip()).not.toBeNull();
+    await waitFor(() => expect(tip()).not.toBeNull());
+    expect(tip()).toHaveTextContent('Bold');
+    expect(tip()?.querySelector('kbd')).not.toBeNull();
   });
 });

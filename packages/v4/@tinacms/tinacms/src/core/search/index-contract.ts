@@ -20,6 +20,11 @@ export interface SearchIndexProvider {
   upsert(records: SearchRecord[]): Promise<void>;
   /** The index becomes exactly these records. */
   replace(records: SearchRecord[]): Promise<void>;
+  /**
+   * Set by a provider whose service builds its own index (ADR-021 §4, first-party
+   * TinaCloud). `tinacms search reindex` then writes nothing.
+   */
+  indexesItself?: true;
 }
 
 /** Collection name to field name to weight (a finite number above 0). */

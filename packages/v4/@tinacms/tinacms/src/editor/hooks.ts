@@ -17,12 +17,11 @@ import { useShallow } from 'zustand/react/shallow';
 import type { FieldWrapperProps } from '@tinacms/ui/components/field-wrapper';
 import type { AuthSlice } from '../core/auth/contract';
 import { authSliceOf, siteAuthTokenOf } from '../core/auth/slice';
+import { currentBranchOf } from '../core/branch/contract';
 import { ContentError, type ContentSlice } from '../core/content/contract';
 import type { MediaSlice } from '../core/media/contract';
 import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
-import { runAfterSave, runBeforeSave } from '../core/form/hooks';
-import { digestDocument, ingestDocument } from '../core/form/ingest';
 import { invariant } from '../core/invariant';
 import type { SliceState, TinaStoreState } from '../core/plugin';
 import {
@@ -44,11 +43,13 @@ import {
   createRpcClient,
 } from '../rpc/proxy';
 import {
+  FieldActiveContext,
   FieldAddressContext,
   FieldLockContext,
   FieldSchemaContext,
   type FormScope,
   FormScopeContext,
+  type SaveHandler,
   type StaleDraftActions,
   TinaRuntimeContext,
 } from './context';
@@ -57,7 +58,20 @@ import {
   type ListChange,
   ownFieldErrors,
 } from './field-errors';
+import { type PermissionSegments, useAuthSliceWithCan } from './permissions';
+import { UploadFormContext } from './uploads/upload-context';
+import { uploadListOf } from './uploads/upload-list';
+import { readFormBindings } from './form-bindings';
+import {
+  AfterSaveHookError,
+  FormValidationError,
+  type SaveSteps,
+  checkForm,
+  saveDocument,
+} from './save-pipeline';
 import { countRevealedErrors, isRevealed, itemLevel } from './form-view-state';
+
+export { AfterSaveHookError, FormValidationError, type SaveSteps };
 
 export function useFieldRegistry(): FieldRegistry {
   const runtime = use(TinaRuntimeContext);
@@ -120,7 +134,18 @@ export function useMediaSlice(): MediaSlice {
 }
 
 export function useOptionalAuthSlice(): AuthSlice | null {
-  return useTinaStore(authSliceOf);
+  const runtime = use(TinaRuntimeContext);
+  invariant(
+    runtime,
+    'auth-slice-outside-provider',
+    'useOptionalAuthSlice must be used within a TinaProvider'
+  );
+  const server = useRpcClient<PermissionSegments>({ url: runtime.rpcUrl });
+  return useAuthSliceWithCan(
+    useTinaStore(authSliceOf),
+    server,
+    useTinaStore(currentBranchOf)
+  );
 }
 
 export function useRpcClient<TSegments>(
@@ -231,122 +256,75 @@ export function useActiveField(): ActiveField {
   return useMemo(() => ({ active, setActive }), [active, setActive]);
 }
 
-// Save refused because the document has validation errors. The form stays
-// dirty and every field keeps its messages (ADR-018 §2).
-export class FormValidationError extends Error {
-  constructor() {
-    super('The document has validation errors. Fix them, then save again.');
-    this.name = 'FormValidationError';
-  }
-}
-
-export class AfterSaveHookError extends Error {
-  constructor(cause: unknown) {
-    super('The document was saved, but an afterSave hook failed.', { cause });
-    this.name = 'AfterSaveHookError';
-  }
-}
-
-// The stored document becomes the baseline. A field the save changed takes the
-// stored value, unless the editor changed it again while the save ran. Returns
-// the fields it wrote, or null when the save changed nothing.
-const adoptSavedValues = (
-  formId: FormId,
-  submitted: FormValues,
-  saved: FormValues,
-  setValue: (address: FieldAddress, value: unknown) => void
-): FieldAddress[] | null => {
-  const store = useFormStore.getState();
-  const open = store.forms[formId];
-  if (!open) return null;
-  const changed = Object.keys(saved)
-    .map(toFieldAddress)
-    .filter(
-      (address) => !open.equal(address, submitted[address], saved[address])
-    );
-  if (changed.length === 0) return null;
-  const written = changed.filter((address) =>
-    open.equal(address, open.values[address], submitted[address])
+/** Lets a list point the page at one of its cards: `hover` outlines the card's block on the page. */
+export function useCardOutline(list: FieldAddress) {
+  const formId = useFormId();
+  return useMemo(
+    () => ({
+      hover: (address: FieldAddress | null) => {
+        const store = useFormStore.getState();
+        if (address !== null) {
+          store.setHovered(formId, address);
+          return;
+        }
+        const { hovered } = store;
+        if (
+          hovered?.formId === formId &&
+          hovered.address.startsWith(`${list}.`)
+        ) {
+          store.setHovered(formId, null);
+        }
+      },
+    }),
+    [formId, list]
   );
-  for (const address of written) {
-    store.setFieldValue(formId, address, saved[address]);
-    setValue(address, saved[address]);
-  }
-  store.markSaved(formId, saved);
-  return written;
-};
+}
 
-async function recordSavePhase(
-  formId: FormId,
-  run: () => Promise<void>
-): Promise<void> {
-  const { setSavePhase, restoreSavePhase, saves } = useFormStore.getState();
-  const previous = saves[formId];
-  setSavePhase(formId, { phase: 'saving' });
-  try {
-    await run();
-  } catch (cause) {
-    if (cause instanceof FormValidationError) {
-      restoreSavePhase(formId, previous);
-      throw cause;
-    }
-    let message = 'Save failed.';
-    if (cause instanceof Error && cause.message) message = cause.message;
-    if (cause instanceof ContentError && cause.code === 'branch-not-found') {
-      setSavePhase(formId, { phase: 'failed', message, reason: 'branch-gone' });
-    } else {
-      setSavePhase(formId, { phase: 'failed', message });
-    }
-    throw cause;
-  }
-  setSavePhase(formId, { phase: 'saved' });
+/** True while this field is the one the form shows as active, whether or not it has DOM focus. */
+export function useFieldActive(): boolean {
+  return use(FieldActiveContext);
+}
+
+export function useFormCheck(): () => Promise<boolean> {
+  const { formId, view } = useFormScope(
+    'form-check-outside-provider',
+    'useFormCheck'
+  );
+  const { trigger } = useFormContext<TinaDocument>();
+  return useCallback(
+    () => checkForm(formId, view, () => trigger()),
+    [formId, view, trigger]
+  );
+}
+
+// The admin's Save to new branch swaps the write step. Not exported from `editor/index.ts`.
+export function useFormSaveWith(): (steps?: SaveSteps) => Promise<void> {
+  const registry = useFieldRegistry();
+  const runtime = use(TinaRuntimeContext);
+  const scope = useFormScope('form-save-outside-provider', 'useFormSave');
+  const { formId, path, collection, onSave, hooks } = scope;
+  const validators = runtime?.validators;
+  return useCallback(
+    (steps = {}) =>
+      saveDocument(
+        {
+          formId,
+          path,
+          collection,
+          hooks,
+          registry,
+          validators: validators ?? new Map(),
+        },
+        () => readFormBindings(formId),
+        { ...steps, write: steps.write ?? onSave }
+      ),
+    [formId, path, collection, hooks, registry, validators, onSave]
+  );
 }
 
 export function useFormSave(): () => Promise<void> {
-  const registry = useFieldRegistry();
-  const scope = useFormScope('form-save-outside-provider', 'useFormSave');
-  const { getValues, trigger, setValue } = useFormContext<TinaDocument>();
-  const runSave = useCallback(async () => {
-    const { formId, path, collection, onSave, hooks, reseedFields } = scope;
-    // Validate every field, not only the edited ones, so a required field the
-    // editor never touched surfaces its message at submit.
-    scope.view.getState().attemptSave();
-    const valid = await trigger();
-    if (!valid) throw new FormValidationError();
-    const values = getValues();
-    const submitted = structuredClone(toFormValues(values));
-    const context = { documentPath: path, registry };
-    const hookScope = { formId, path, collection };
-    const digested = await runBeforeSave(
-      hooks,
-      digestDocument(values, collection.fields, context),
-      hookScope
-    );
-    const saved = await onSave?.(digested);
-    const savedDocument = saved ? saved.document : digested;
-    const written = adoptSavedValues(
-      formId,
-      submitted,
-      toFormValues(ingestDocument(savedDocument, collection.fields, context)),
-      (address, value) => setValue(address, value)
-    );
-    if (!written) useFormStore.getState().markSaved(formId, submitted);
-    if (written && written.length > 0) reseedFields();
-    try {
-      await runAfterSave(hooks, savedDocument, hookScope);
-    } catch (cause) {
-      throw new AfterSaveHookError(cause);
-    }
-    scope.view.getState().resetReveal();
-    const warnings = saved ? (saved.hookWarnings ?? []) : [];
-    if (warnings.length > 0) {
-      throw new AfterSaveHookError(new Error(warnings.join(' ')));
-    }
-  }, [scope, getValues, trigger, setValue, registry]);
-  return useCallback(
-    () => recordSavePhase(scope.formId, runSave),
-    [scope.formId, runSave]
-  );
+  const saveWith = useFormSaveWith();
+  return useCallback(() => saveWith(), [saveWith]);
 }
 
 export function useFieldAddress(): FieldAddress {
@@ -396,7 +374,12 @@ export function useFieldFrame({
 }: FieldFrameOptions = {}): Pick<
   FieldWrapperProps,
   'label' | 'htmlFor' | 'labelId' | 'required' | 'errors' | 'help' | 'helpId'
-> & { warnings: string[]; disabled: boolean; readOnly: boolean } {
+> & {
+  warnings: string[];
+  disabled: boolean;
+  readOnly: boolean;
+  active: boolean;
+} {
   const address = useFieldAddress();
   const node = useFieldSchema();
   const { view } = useFormScope(
@@ -404,6 +387,7 @@ export function useFieldFrame({
     'useFieldFrame'
   );
   const lock = use(FieldLockContext);
+  const active = useFieldActive();
   const labelable =
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
   const { errors } = useFormState({ name: address });
@@ -429,6 +413,7 @@ export function useFieldFrame({
     helpId: node.description ? `${address}-help` : undefined,
     disabled: lock.disabled,
     readOnly: lock.readOnly,
+    active,
   };
 }
 
@@ -474,12 +459,17 @@ export function useInvalidFieldCounts(addresses: readonly string[]): number[] {
  */
 export function useListItems() {
   const { view } = useFormScope('list-items-outside-provider', 'useListItems');
+  const runtime = use(TinaRuntimeContext);
+  const uploadForm = use(UploadFormContext);
   const rekeyThen = (
     listAddress: string,
     change: ListChange,
     apply: () => void
   ) => {
     view.getState().rekey(listAddress, change);
+    if (runtime && uploadForm) {
+      uploadListOf(runtime.store).rekeyFields(uploadForm, listAddress, change);
+    }
     apply();
   };
   return {

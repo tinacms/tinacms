@@ -2,6 +2,7 @@
 
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover';
 
+import { usePopupEdgePadding } from '@tinacms/ui/components/foot-sheet';
 import { cn } from '@tinacms/ui/lib/utils';
 
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
@@ -20,6 +21,7 @@ function PopoverContent({
   side = 'bottom',
   sideOffset = 4,
   collisionAvoidance,
+  collisionPadding,
   sticky,
   ...props
 }: PopoverPrimitive.Popup.Props &
@@ -30,8 +32,10 @@ function PopoverContent({
     | 'side'
     | 'sideOffset'
     | 'collisionAvoidance'
+    | 'collisionPadding'
     | 'sticky'
   >) {
+  const edge = usePopupEdgePadding();
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Positioner
@@ -40,6 +44,7 @@ function PopoverContent({
         side={side}
         sideOffset={sideOffset}
         collisionAvoidance={collisionAvoidance}
+        collisionPadding={collisionPadding ?? edge}
         sticky={sticky}
         className='isolate z-50 outline-none'
       >

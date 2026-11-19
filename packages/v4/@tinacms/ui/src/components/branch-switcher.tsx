@@ -12,6 +12,8 @@ import {
 import { Badge } from '@tinacms/ui/components/badge';
 import { Icon } from '@tinacms/ui/components/icon';
 import { SearchBox } from '@tinacms/ui/components/search-box';
+import { BRANCH_NAME_HINT, branchNameError } from '@tinacms/ui/lib/branch-name';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type BranchEntry = {
@@ -23,29 +25,6 @@ type BranchEntry = {
   unsaved?: number;
   /** `false` while the branch is still being made: its row is greyed and cannot be picked. */
   ready?: boolean;
-};
-
-const BRANCH_NAME_RULE = /^[A-Za-z0-9._/-]+$/;
-const BRANCH_NAME_HINT =
-  'Letters, numbers, dashes, dots and slashes. No spaces.';
-
-/** Why a branch name cannot be used, in the story's words, or undefined when it can. */
-const branchNameError = (
-  name: string,
-  taken: readonly BranchEntry[],
-  revealEmpty: boolean
-): string | undefined => {
-  if (name === '') return revealEmpty ? 'Enter a branch name.' : undefined;
-  if (/\s/.test(name)) {
-    return 'Branch names can’t have spaces. Use dashes instead, such as docs/new-page.';
-  }
-  if (!BRANCH_NAME_RULE.test(name) || /[/.]$/.test(name)) {
-    return 'Use letters, numbers, dashes, dots and slashes only, and don’t end with a slash or a dot.';
-  }
-  if (taken.some((branch) => branch.name === name)) {
-    return `A branch called ${name} already exists. Pick another name.`;
-  }
-  return undefined;
 };
 
 type BranchSwitcherProps = {
@@ -216,6 +195,7 @@ function BranchSwitcher({
 }: BranchSwitcherProps) {
   const [open, setOpen] = useState(defaultOpen);
   const [fullScreen, setFullScreen] = useState(defaultFullScreen);
+  const phone = useTier() === 'phone';
   const isProtected = branches.some(
     (branch) => branch.name === current && branch.protected
   );
@@ -232,7 +212,8 @@ function BranchSwitcher({
   );
   const [submitted, setSubmitted] = useState(false);
   const typed = newName.trim();
-  const nameError = branchNameError(typed, branches, submitted);
+  const takenNames = branches.map((branch) => branch.name);
+  const nameError = branchNameError(typed, takenNames, submitted);
   const move = (event: KeyboardEvent<HTMLElement>) => {
     const keys = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
     if (!keys.includes(event.key)) return;
@@ -293,6 +274,7 @@ function BranchSwitcher({
         onKeyDown={move}
         className={cn(
           fullScreen &&
+            !phone &&
             'top-14 bottom-7 left-0 h-auto w-full max-w-none translate-x-0 translate-y-0 rounded-none'
         )}
       >
@@ -304,20 +286,24 @@ function BranchSwitcher({
             </DialogDescription>
           </div>
           <div className='flex flex-none items-center gap-1'>
-            <Button
-              variant='icon'
-              size='sm'
-              icon={fullScreen ? 'restore' : 'maximise'}
-              aria-label={fullScreen ? 'Exit full screen' : 'Full screen'}
-              onClick={() => setFullScreen((value) => !value)}
-            />
-            <Button
-              variant='icon'
-              size='sm'
-              icon='close'
-              aria-label='Close'
-              onClick={() => setOpen(false)}
-            />
+            {phone ? null : (
+              <Button
+                variant='icon'
+                size='sm'
+                icon={fullScreen ? 'restore' : 'maximise'}
+                aria-label={fullScreen ? 'Exit full screen' : 'Full screen'}
+                onClick={() => setFullScreen((value) => !value)}
+              />
+            )}
+            {phone ? null : (
+              <Button
+                variant='icon'
+                size='sm'
+                icon='close'
+                aria-label='Close'
+                onClick={() => setOpen(false)}
+              />
+            )}
           </div>
         </DialogHeader>
         {blocked ? (
@@ -399,7 +385,7 @@ function BranchSwitcher({
             onSubmit={(event) => {
               event.preventDefault();
               setSubmitted(true);
-              if (typed === '' || branchNameError(typed, branches, true))
+              if (typed === '' || branchNameError(typed, takenNames, true))
                 return;
               if (!onCreate) return;
               onCreate(typed);
@@ -436,13 +422,19 @@ function BranchSwitcher({
                 {nameError}
               </p>
             ) : null}
-            <div className='flex justify-end gap-2'>
-              <Button onClick={() => setCreating(false)}>
-                Back to branches
+            <div className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'>
+              <Button
+                className='max-md:h-auto max-md:min-h-9'
+                onClick={() => setCreating(false)}
+              >
+                <span className='min-w-0 max-md:py-1.5 max-md:whitespace-normal'>
+                  Back to branches
+                </span>
               </Button>
               <Button
                 variant='primary'
                 type='submit'
+                className='max-md:h-auto max-md:min-h-9'
                 disabled={
                   !onCreate || (typed !== '' && nameError !== undefined)
                 }

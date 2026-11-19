@@ -1,5 +1,7 @@
 import { EventEmitter } from 'node:events';
 import { promises as fs } from 'node:fs';
+import http from 'node:http';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -243,6 +245,114 @@ describe('local media endpoint', () => {
     expect(res.statusCode).toBe(413);
   });
 
+  it('400s an upload onto an existing name and keeps the first file', async () => {
+    const handler = mediaMiddleware();
+    expect((await upload(SAME_ORIGIN, handler)).statusCode).toBe(200);
+    const folder = path.join(rootDir, 'public/uploads/posts');
+    await fs.writeFile(path.join(folder, 'hero.jpg'), 'first');
+    const res = await upload(SAME_ORIGIN, handler);
+    expect(res.statusCode).toBe(400);
+    expect(res.headers[MEDIA_ERROR_HEADER]).toBe('name-taken');
+    expect(await fs.readFile(path.join(folder, 'hero.jpg'), 'utf8')).toBe(
+      'first'
+    );
+    expect(await fs.readdir(folder)).toEqual(['hero.jpg']);
+  });
+
+  it.each([
+    ['tool.exe', 'image/png'],
+    ['notes.docx', ''],
+    ['README', 'image/png'],
+    ['photo.png.zip', 'image/png'],
+  ])(
+    '400s an upload of "%s" as unsupported and writes nothing',
+    async (name, type) => {
+      const form = new FormData();
+      form.append('folder', 'posts');
+      form.append('file', new File(['bytes'], name, { type }));
+      const { contentType, body } = await multipartOf(form);
+      const res = responseDouble();
+      await mediaMiddleware()(
+        requestDouble(
+          '/upload',
+          { ...SAME_ORIGIN, 'content-type': contentType },
+          [body]
+        ),
+        res
+      );
+      expect(res.statusCode).toBe(400);
+      expect(res.headers[MEDIA_ERROR_HEADER]).toBe('unsupported');
+      await expect(
+        fs.access(path.join(rootDir, 'public/uploads'))
+      ).rejects.toThrow();
+    }
+  );
+
+  it('stores an accepted extension whatever type the request reports', async () => {
+    const form = new FormData();
+    form.append('folder', '');
+    form.append(
+      'file',
+      new File(['bytes'], 'hero.png', { type: 'application/octet-stream' })
+    );
+    const { contentType, body } = await multipartOf(form);
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble(
+        '/upload',
+        { ...SAME_ORIGIN, 'content-type': contentType },
+        [body]
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toEqual({ path: 'hero.png' });
+  });
+
+  it('writes nothing when the browser drops the request mid-body', async () => {
+    const handler = mediaMiddleware();
+    let requestClosed = () => {};
+    const closed = new Promise<void>((resolve) => {
+      requestClosed = resolve;
+    });
+    const server = http.createServer((req, res) => {
+      req.url = '/upload';
+      req.on('close', requestClosed);
+      res.on('error', () => {});
+      void handler(req, res);
+    });
+    await new Promise<void>((resolve) =>
+      server.listen(0, '127.0.0.1', resolve)
+    );
+    const { port } = server.address() as AddressInfo;
+    const form = new FormData();
+    form.append('folder', 'posts');
+    form.append('file', new File(['x'.repeat(4096)], 'hero.jpg'));
+    const { contentType, body } = await multipartOf(form);
+    const request = http.request({
+      host: '127.0.0.1',
+      port,
+      method: 'POST',
+      path: '/upload',
+      headers: {
+        host: `localhost:${port}`,
+        origin: `http://localhost:${port}`,
+        'content-type': contentType,
+        'content-length': body.length,
+      },
+    });
+    request.on('error', () => {});
+    await new Promise<void>((resolve) =>
+      request.write(body.subarray(0, body.length - 100), () => resolve())
+    );
+    request.destroy();
+    await closed;
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await expect(
+      fs.readdir(path.join(rootDir, 'public/uploads'), { recursive: true })
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
   it('lists a folder on GET', async () => {
     await upload();
     const res = responseDouble();
@@ -285,6 +395,78 @@ describe('local media endpoint', () => {
         '/',
         { ...SAME_ORIGIN, 'content-type': 'application/json' },
         [JSON.stringify({ op: 'delete', path: '../../package.json' })]
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.headers[MEDIA_ERROR_HEADER]).toBe('invalid-path');
+  });
+
+  it('renames a file, returns its new path and serves it before Vite notices', async () => {
+    await upload();
+    await fs.mkdir(path.join(rootDir, 'public/uploads/moved'));
+    const routes = mountedRoutes();
+    const handler = routes.get(DEFAULT_MEDIA_URL);
+    if (!handler) throw new Error('The plugin mounted no media middleware.');
+    const res = responseDouble();
+    await handler(
+      requestDouble(
+        '/',
+        { ...SAME_ORIGIN, 'content-type': 'application/json' },
+        [
+          JSON.stringify({
+            op: 'rename',
+            from: 'posts/hero.jpg',
+            to: 'moved/hero.jpg',
+          }),
+        ]
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toEqual({ path: 'moved/hero.jpg' });
+    const served = responseDouble();
+    for (const [route, serve] of routes) {
+      if (!route.startsWith('*')) continue;
+      let passed = false;
+      await serve(
+        requestDouble('/uploads/moved/hero.jpg', SAME_ORIGIN, [], 'GET'),
+        served,
+        () => {
+          passed = true;
+        }
+      );
+      if (!passed) break;
+    }
+    expect(served.body).toBe('jpeg');
+  });
+
+  it('400s a rename onto an existing file', async () => {
+    await fs.mkdir(path.join(rootDir, 'public/uploads'), { recursive: true });
+    await fs.writeFile(path.join(rootDir, 'public/uploads/a.png'), 'a');
+    await fs.writeFile(path.join(rootDir, 'public/uploads/b.png'), 'b');
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble(
+        '/',
+        { ...SAME_ORIGIN, 'content-type': 'application/json' },
+        [JSON.stringify({ op: 'rename', from: 'a.png', to: 'b.png' })]
+      ),
+      res
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.headers[MEDIA_ERROR_HEADER]).toBe('name-taken');
+  });
+
+  it('400s a rename outside the media folder', async () => {
+    await fs.mkdir(path.join(rootDir, 'public/uploads'), { recursive: true });
+    await fs.writeFile(path.join(rootDir, 'public/uploads/a.png'), 'a');
+    const res = responseDouble();
+    await mediaMiddleware()(
+      requestDouble(
+        '/',
+        { ...SAME_ORIGIN, 'content-type': 'application/json' },
+        [JSON.stringify({ op: 'rename', from: 'a.png', to: '../../b.png' })]
       ),
       res
     );

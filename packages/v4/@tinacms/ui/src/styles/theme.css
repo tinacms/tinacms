@@ -190,5 +190,11 @@
       transition-duration: 0s !important;
       animation-duration: 0s !important;
     }
+
+    [data-slot="foot-sheet"],
+    [data-slot="foot-sheet-scrim"] {
+      transition-property: opacity !important;
+      transition-duration: var(--dur-reduced) !important;
+    }
   }
 }

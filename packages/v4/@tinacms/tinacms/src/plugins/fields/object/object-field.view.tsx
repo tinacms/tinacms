@@ -28,6 +28,8 @@ export interface ObjectFieldViewProps
   invalidCount?: number;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   /** The object is the open form level: its fields show in place, with no frame of its own. */
   inPlace?: boolean;
   onHeaderFocus?: FocusEventHandler<HTMLButtonElement>;
@@ -59,10 +61,13 @@ function InPlaceLook(props: LookProps) {
 }
 
 function DrillInLook(props: LookProps) {
-  const { label, name, required, summary, invalidCount, disabled } = props;
+  const { label, name, required, summary, invalidCount, disabled, active } =
+    props;
   return (
     <Frame {...props}>
       <DrillInCard
+        data-active={active ? '' : undefined}
+        className='data-active:border-ring data-active:shadow-focus-ring disabled:data-active:border-border disabled:data-active:shadow-none'
         label={typeof label === 'string' ? label : (name ?? '')}
         required={required}
         summary={summary ?? NOT_SET}

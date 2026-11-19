@@ -5,17 +5,12 @@ import type {
 } from '@tinacms/schema-tools';
 export type { HeadingLevel, RichTextColorOption, ToolbarOverrideType };
 
-export const STANDARD_ICON_WIDTH = 36;
-export const HEADING_ICON_WITH_TEXT = 130;
-export const HEADING_ICON_ONLY = 62;
-export const EMBED_ICON_WIDTH = 54;
-export const HIGHLIGHT_ICON_WIDTH = 54;
-export const CONTAINER_MD_BREAKPOINT = 448;
-export const OVERFLOW_MENU_WIDTH = 36;
-
-export const HEADING_LABEL = 'Headings';
-
 export type ToolbarOverrides = {
+  /**
+   * An allow-list: a tool not listed does not show, and the order of the list
+   * is ignored because the toolbar places each tool by kind. An unknown key is
+   * ignored. Leave it out to show every tool.
+   */
   toolbar?: ToolbarOverrideType[];
   showFloatingToolbar?: boolean;
   headingLevels?: HeadingLevel[];

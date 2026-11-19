@@ -15,8 +15,9 @@ import type { ContentProvider, DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
-import { useFormId } from '../editor/hooks';
 import { draftKey, readDraft, readWaitingDrafts } from '../form/drafts';
+import { useFieldValue, useFormId } from '../editor/hooks';
+import { toFieldAddress } from '../core/field/address';
 import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -24,6 +25,12 @@ import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 import { useAdminRoute } from './use-admin-route';
+import { connectionOf } from '../test/connection';
+import {
+  findCollectionTree,
+  openCollectionTree,
+  returnToTree,
+} from '../test/collection-tree';
 
 const saved: { path: string; value: TinaDocument }[] = [];
 
@@ -43,7 +50,7 @@ const store: Record<string, DocumentEntry[]> = {
 
 const provider: ContentProvider = {
   list: async (collection) =>
-    (store[collection] ?? []).map(({ path }) => ({ path })),
+    connectionOf((store[collection] ?? []).map(({ path }) => ({ path }))),
   get: async (collection, path) =>
     (store[collection] ?? []).find((entry) => entry.path === path) ?? null,
   update: async (collection, path, value) => {
@@ -197,16 +204,40 @@ const config = asResolvedConfig({
   },
 });
 
-const renderAdmin = (preview?: React.ReactNode) =>
+// The Home screen reads every collection too, so a test that counts the tree's
+// own reads renders without it.
+const renderAdmin = (preview?: React.ReactNode, withHome = true) =>
   render(
     <TinaAdmin
-      config={config}
+      config={
+        withHome
+          ? config
+          : asResolvedConfig({
+              ...config,
+              plugins: config.plugins.filter((plugin) => plugin !== homePlugin),
+            })
+      }
       queryClient={
         new QueryClient({ defaultOptions: { queries: { retry: false } } })
       }
       preview={preview}
     />
   );
+
+function GoToNothingToEdit() {
+  const { navigate } = useAdminRoute();
+  return (
+    <button type='button' onClick={() => navigate({ view: 'page' })}>
+      Go to #/page
+    </button>
+  );
+}
+
+function PreviewTitle() {
+  useFormId();
+  const [title] = useFieldValue<string>(toFieldAddress('title'));
+  return <p>title: {title}</p>;
+}
 
 function PreviewProbe() {
   return <p>previewing {useFormId()}</p>;
@@ -259,10 +290,15 @@ beforeEach(() => {
   }
 });
 
+const documentStatus = () =>
+  within(
+    screen.getByRole('complementary', { name: 'Document form' })
+  ).getByRole('status');
+
 describe('TinaAdmin', () => {
   it('lists every collection the schema declares, and nothing else', async () => {
     renderAdmin();
-    const menu = await screen.findByRole('list', { name: 'Collections' });
+    const menu = await findCollectionTree();
     expect(
       within(menu)
         .getAllByRole('button')
@@ -274,7 +310,7 @@ describe('TinaAdmin', () => {
     const user = userEvent.setup();
     renderAdmin();
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
 
     const input = await screen.findByLabelText(/^Title\b/);
@@ -288,23 +324,21 @@ describe('TinaAdmin', () => {
       path: 'content/posts/hello.mdx',
       value: { title: 'Hello!' },
     });
-    await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('Saved')
-    );
+    await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
     expect(input).toHaveValue('Hello!');
   });
 
   it('keeps a document with a validation error from saving, and shows the error after a save is tried', async () => {
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     const input = await screen.findByLabelText(/^Title\b/);
 
     await user.clear(input);
     expect(screen.queryByRole('alert')).toBeNull();
 
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     const alerts = await screen.findAllByRole('alert');
     expect(alerts[0]).toHaveTextContent('Title is required');
   });
@@ -318,7 +352,9 @@ describe('TinaAdmin', () => {
   it('navigating writes a shareable hash', async () => {
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Pages' }));
+    await user.click(
+      within(await findCollectionTree()).getByRole('button', { name: 'Pages' })
+    );
     await waitFor(() =>
       expect(window.location.hash).toBe('#/collections/page')
     );
@@ -350,15 +386,94 @@ describe('TinaAdmin', () => {
     expect(screen.queryByText(/No document named/)).not.toBeInTheDocument();
   });
 
-  it('renders the preview inside the open document form scope', async () => {
+  it('shows Home beside the navigator on Collections, with the preview frame mounted but hidden', async () => {
+    renderAdmin('about:blank');
+    const frame = await screen.findByTitle('Preview');
+    expect(frame).toHaveAttribute('src', 'about:blank');
+    expect(frame.closest('.hidden')).not.toBeNull();
+    expect(screen.queryByText('Select a document to edit.')).toBeNull();
+  });
+
+  it('shows the preview frame beside the navigator on Collections when no Home screen is registered', async () => {
+    renderAdmin('about:blank', false);
+    const frame = await screen.findByTitle('Preview');
+    expect(frame.closest('.hidden')).toBeNull();
+  });
+
+  it('does not mount the preview frame until a route shows it', async () => {
+    window.location.hash = '#/settings';
+    renderAdmin('about:blank');
+    await screen.findByRole('button', { name: 'Settings' });
+    expect(screen.queryByTitle('Preview')).toBeNull();
+  });
+
+  it('renders a preview node inside the document form scope, only once the form exists', async () => {
+    const user = userEvent.setup();
+    renderAdmin(<PreviewTitle />);
+    await openCollectionTree('post');
+    expect(screen.getByText('Select a document to edit.')).toBeInTheDocument();
+    expect(screen.queryByText(/^title: /)).not.toBeInTheDocument();
+
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    expect(await screen.findByText(/^title: /)).toBeInTheDocument();
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    expect(await screen.findByText(/^title: .*!$/)).toBeInTheDocument();
+    expect(document.querySelector('[data-preview-slot]')).toContainElement(
+      screen.getByText(/^title: /)
+    );
+  });
+
+  it('keeps the same preview frame node from Collections to a document and back', async () => {
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    const frame = await screen.findByTitle('Preview');
+    await user.click(
+      within(await findCollectionTree()).getByRole('button', { name: 'Posts' })
+    );
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Hello');
+    expect(screen.getByTitle('Preview')).toBe(frame);
+    await returnToTree(user);
+    await screen.findByRole('complementary', { name: 'Navigator' });
+    expect(screen.getByTitle('Preview')).toBe(frame);
+  });
+
+  it('hides the preview frame on Home without unmounting it', async () => {
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    const frame = await screen.findByTitle('Preview');
+    await user.click(
+      within(screen.getByRole('navigation', { name: 'Content' })).getByRole(
+        'button',
+        { name: 'Settings' }
+      )
+    );
+    await screen.findByText('Pick an entry to open it.');
+    expect(screen.getByTitle('Preview')).toBe(frame);
+    expect(frame.closest('.hidden')).not.toBeNull();
+  });
+
+  it('has no tab list and no preview place bar on a document', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
-    renderAdmin(<PreviewProbe />);
-    expect(await screen.findByText(/^previewing /)).toBeInTheDocument();
+    renderAdmin('about:blank');
+    await screen.findByLabelText(/^Title\b/);
+    expect(
+      screen.queryByRole('tablist', { name: 'Document views' })
+    ).toBeNull();
+    expect(
+      screen.queryByRole('navigation', { name: 'Preview location' })
+    ).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: 'Return to navigator' })
+    ).toBeNull();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Hello' })
+    ).toBeVisible();
   });
 
   it('shows no preview until a document is open', async () => {
     renderAdmin(<PreviewProbe />);
-    await screen.findByRole('list', { name: 'Collections' });
+    await findCollectionTree();
     expect(screen.queryByText(/^previewing /)).not.toBeInTheDocument();
   });
 
@@ -366,21 +481,17 @@ describe('TinaAdmin', () => {
     const user = userEvent.setup();
     renderAdmin();
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await returnToTree(user);
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
     expect(await screen.findByLabelText(/^Title\b/)).toHaveValue('Second');
 
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await returnToTree(user);
     const helloEntry = await screen.findByRole('button', {
       name: /hello\.mdx/,
     });
@@ -390,7 +501,7 @@ describe('TinaAdmin', () => {
 
 describe('TinaAdmin Save button', () => {
   const openHello = async (user: ReturnType<typeof userEvent.setup>) => {
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     return screen.findByLabelText(/^Title\b/);
   };
@@ -443,7 +554,7 @@ describe('TinaAdmin Save button', () => {
     renderAdmin();
     const input = await openHello(user);
     await user.clear(input);
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     expect(
       await screen.findByRole('button', { name: 'Resolve 1 error' })
     ).toBeVisible();
@@ -455,7 +566,7 @@ describe('TinaAdmin unsaved changes', () => {
     const user = userEvent.setup();
     renderAdmin();
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await screen.findByLabelText(/^Title\b/);
     expect(reloadIsBlocked()).toBe(false);
@@ -472,13 +583,11 @@ describe('TinaAdmin unsaved changes', () => {
     const user = userEvent.setup();
     renderAdmin();
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await returnToTree(user);
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
@@ -492,7 +601,7 @@ describe('TinaAdmin unsaved changes', () => {
     const user = userEvent.setup();
     const { unmount } = renderAdmin();
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     expect(reloadIsBlocked()).toBe(true);
@@ -505,10 +614,10 @@ describe('TinaAdmin unsaved changes', () => {
     const user = userEvent.setup();
     renderAdmin();
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    expect(documentStatus()).toHaveTextContent('Unsaved');
 
     const dialog = await openDiscardConfirm(user);
     expect(dialog).toHaveAccessibleName('Discard unsaved edits to “Hello!”?');
@@ -520,14 +629,14 @@ describe('TinaAdmin unsaved changes', () => {
     await waitFor(() =>
       expect(screen.getByLabelText(/^Title\b/)).toHaveValue('Hello')
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No changes');
+    expect(documentStatus()).toHaveTextContent('No changes');
     expect(reloadIsBlocked()).toBe(false);
   });
 
   it('opens the discard confirm on Cancel, and Cancel keeps the edits and returns focus to the menu button', async () => {
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
@@ -549,7 +658,7 @@ describe('TinaAdmin content reads', () => {
     const user = userEvent.setup();
     renderAdmin();
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     const menu = await screen.findByRole('list', { name: 'Posts documents' });
 
     expect(
@@ -564,7 +673,7 @@ describe('TinaAdmin content reads', () => {
     const user = userEvent.setup();
     renderAdmin();
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await screen.findByLabelText(/^Title\b/);
 
@@ -573,9 +682,9 @@ describe('TinaAdmin content reads', () => {
 
   it('reads a collection once when two components ask for it', async () => {
     const user = userEvent.setup();
-    renderAdmin();
+    renderAdmin(undefined, false);
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await screen.findByRole('button', { name: /hello\.mdx/ });
 
     expect(listCalls.filter((name) => name === 'post')).toEqual(['post']);
@@ -583,13 +692,13 @@ describe('TinaAdmin content reads', () => {
 
   it('does not read a collection again on returning to it', async () => {
     const user = userEvent.setup();
-    renderAdmin();
+    renderAdmin(undefined, false);
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await screen.findByRole('button', { name: /hello\.mdx/ });
-    await user.click(await screen.findByRole('button', { name: 'Pages' }));
+    await openCollectionTree('page');
     await screen.findByRole('button', { name: /about\.mdx/ });
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await screen.findByRole('button', { name: /hello\.mdx/ });
 
     expect(listCalls).toEqual(['post', 'page']);
@@ -617,11 +726,13 @@ describe('TinaAdmin content reads', () => {
     const failing = vi
       .spyOn(provider, 'list')
       .mockRejectedValueOnce(new Error('data layer offline'));
-    renderAdmin();
+    renderAdmin(undefined, false);
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
 
-    expect(await screen.findByText(/data layer offline/)).toBeInTheDocument();
+    expect(
+      await screen.findByText('Something went wrong. Please try again.')
+    ).toBeInTheDocument();
     expect(screen.queryByText('No documents yet.')).not.toBeInTheDocument();
     failing.mockRestore();
   });
@@ -640,9 +751,9 @@ describe('TinaAdmin content reads', () => {
 
   it('shows a save in the document list without re-reading the collection', async () => {
     const user = userEvent.setup();
-    renderAdmin();
+    renderAdmin(undefined, false);
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.click(screen.getByRole('button', { name: 'Save' }));
@@ -812,7 +923,7 @@ describe('TinaAdmin screens', () => {
     const user = userEvent.setup();
     renderAdmin();
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await screen.findByRole('list', { name: 'Posts documents' });
 
     await user.click(await screen.findByRole('button', { name: 'Media' }));
@@ -827,7 +938,7 @@ describe('TinaAdmin screens', () => {
     const user = userEvent.setup();
     renderAdmin();
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
@@ -835,9 +946,12 @@ describe('TinaAdmin screens', () => {
     await screen.findByText(/media library at/);
 
     await user.click(
-      await screen.findByRole('button', { name: 'Collections' })
+      within(screen.getByRole('navigation', { name: 'Content' })).getByRole(
+        'button',
+        { name: 'Collections' }
+      )
     );
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
 
     // The label of a dirty field also carries its unsaved marker.
@@ -860,7 +974,7 @@ describe('TinaAdmin stale drafts', () => {
   const openHello = async () => {
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     return user;
   };
@@ -943,7 +1057,7 @@ describe('TinaAdmin draft recovery contract', () => {
   const openDoc = async (name: RegExp) => {
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: name }));
     return user;
   };
@@ -967,7 +1081,7 @@ describe('TinaAdmin draft recovery contract', () => {
     store(hello, { title: 'Mine' }, { title: 'Hello' });
     const user = await openDoc(/hello\.mdx/);
     await screen.findByText('Resume your unsaved edits?');
-    expect(screen.getByRole('status')).not.toHaveTextContent('No changes');
+    expect(documentStatus()).not.toHaveTextContent('No changes');
     await user.click(screen.getByRole('button', { name: 'Discard' }));
     await user.click(
       within(await screen.findByRole('alertdialog')).getByRole('button', {
@@ -975,7 +1089,7 @@ describe('TinaAdmin draft recovery contract', () => {
       })
     );
     await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('No changes')
+      expect(documentStatus()).toHaveTextContent('No changes')
     );
   });
 
@@ -984,11 +1098,9 @@ describe('TinaAdmin draft recovery contract', () => {
     const user = await openDoc(/hello\.mdx/);
     await screen.findByText('Resume your unsaved edits?');
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+    expect(documentStatus()).toHaveTextContent('Unsaved');
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent('Saved')
-    );
+    await waitFor(() => expect(documentStatus()).toHaveTextContent('Saved'));
   });
 
   it('row 3: a draft of an older file says the document changed', async () => {
@@ -1060,9 +1172,7 @@ describe('TinaAdmin draft recovery contract', () => {
     store(second, { title: 'Theirs' }, { title: 'Second' });
     const user = await openDoc(/hello\.mdx/);
     await screen.findByText('Resume your unsaved edits?');
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await returnToTree(user);
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
@@ -1123,7 +1233,7 @@ describe('TinaAdmin draft recovery contract', () => {
   it('Expand all and Collapse all show in the form menu, disabled when no field has cards', async () => {
     const user = await openDoc(/hello\.mdx/);
     await user.click(
-      await screen.findByRole('button', { name: 'Document menu' })
+      await screen.findByRole('button', { name: 'Form actions' })
     );
     expect(
       await screen.findByRole('menuitem', { name: 'Expand all' })
@@ -1200,9 +1310,7 @@ describe('TinaAdmin draft recovery contract', () => {
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await screen.findByRole('alert');
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await returnToTree(user);
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
@@ -1226,9 +1334,7 @@ describe('TinaAdmin draft recovery contract', () => {
     const retry = within(await screen.findByRole('alert')).getByRole('button', {
       name: 'Retry',
     });
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await returnToTree(user);
     await user.click(retry);
     expect(update).toHaveBeenCalledTimes(1);
     expect(readDraft(hello)?.values).toMatchObject({
@@ -1248,9 +1354,7 @@ describe('TinaAdmin draft recovery contract', () => {
     const retry = within(await screen.findByRole('alert')).getByRole('button', {
       name: 'Retry',
     });
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await returnToTree(user);
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
@@ -1271,9 +1375,7 @@ describe('TinaAdmin draft recovery contract', () => {
     const retry = within(await screen.findByRole('alert')).getByRole('button', {
       name: 'Retry',
     });
-    await user.click(
-      screen.getByRole('button', { name: 'Return to navigator' })
-    );
+    await returnToTree(user);
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '?');
     await user.click(retry);
@@ -1372,7 +1474,7 @@ describe('TinaAdmin after a save that changes the document', () => {
       />
     );
 
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
     await user.click(screen.getByRole('button', { name: 'Save' }));
@@ -1407,6 +1509,34 @@ describe('TinaAdmin leaving a document with unsaved edits', () => {
         '#/collections/post/content%2Fposts%2Fhello.mdx'
       )
     );
+  });
+
+  it('says the edits are kept when the editor leaves for Nothing to edit', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin(<GoToNothingToEdit />);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Go to #/page' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/page'));
+    expect(
+      await screen.findByText('Edits to “Hello!” are kept in this browser')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Nothing to edit on this page' })
+    ).toBeVisible();
+  });
+
+  it('stays quiet when Media opens beside the document, and speaks when the editor leaves for Home', async () => {
+    const user = userEvent.setup();
+    await editHello(user);
+    await user.click(screen.getByRole('button', { name: 'Media' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/screens/media'));
+    expect(await screen.findByLabelText(/^Title\b/)).toBeVisible();
+    expect(screen.queryByText(/are kept in this browser/)).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Home' }));
+    expect(
+      await screen.findByText('Edits to “Hello!” are kept in this browser')
+    ).toBeVisible();
   });
 
   it('names a document by its file when the title is cleared', async () => {
@@ -1496,10 +1626,15 @@ describe('TinaAdmin rail', () => {
   it('shows only the documents with unsaved edits when the navigator is filtered', async () => {
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
-    await user.click(screen.getByRole('button', { name: 'Collections' }));
+    await user.click(
+      within(screen.getByRole('navigation', { name: 'Location' })).getByRole(
+        'button',
+        { name: 'Collections' }
+      )
+    );
     await screen.findByRole('complementary', { name: 'Navigator' });
     await user.click(screen.getByRole('button', { name: 'Collections menu' }));
     await user.click(
@@ -1571,7 +1706,11 @@ describe('TinaAdmin rail', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Collections' })
     );
-    expect(await screen.findByText('No collections yet.')).toBeVisible();
+    expect(
+      await within(
+        await screen.findByRole('complementary', { name: 'Navigator' })
+      ).findByText('No collections yet.')
+    ).toBeVisible();
   });
 
   it('moves between the rows with the arrow keys, Home and End', async () => {
@@ -1643,7 +1782,7 @@ describe('TinaAdmin rail', () => {
   it('keeps unsaved edits when a rail row is clicked, and still blocks a reload', async () => {
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
     await user.type(await screen.findByLabelText(/^Title\b/), '!');
 
@@ -1654,44 +1793,38 @@ describe('TinaAdmin rail', () => {
   it('marks the last opened document in the navigator after Back', async () => {
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    const [back] = within(
-      await screen.findByRole('complementary', { name: 'Document form' })
-    ).getAllByRole('button');
-    await user.click(back);
+    await returnToTree(user);
     expect(
       await screen.findByRole('button', { name: /hello\.mdx/ })
     ).toHaveAttribute('aria-current', 'page');
   });
 
-  it('opens the Media panel beside the rail, with the library in the main area', async () => {
+  it('opens Media as a pane beside the rail, and the main area keeps its route', async () => {
     const user = userEvent.setup();
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: 'Media' }));
-    const panel = await screen.findByRole('complementary', {
-      name: 'Media panel',
-    });
-    expect(
-      within(panel).getByRole('button', { name: 'Media library' })
-    ).toHaveAttribute('aria-current', 'page');
     expect(await screen.findByText(/media library at/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Media library' })).toBeNull();
   });
 
   it('says so when a collection has no documents', async () => {
     store.page = [];
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Pages' }));
+    await openCollectionTree('page');
     expect(await screen.findByText('No documents yet.')).toBeVisible();
   });
 
   it('closes an open collection when its row is clicked again, and the panel closes to Home', async () => {
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await screen.findByRole('button', { name: /hello\.mdx/ });
-    await user.click(screen.getByRole('button', { name: 'Posts' }));
+    await user.click(
+      within(await findCollectionTree()).getByRole('button', { name: 'Posts' })
+    );
     expect(screen.queryByRole('button', { name: /hello\.mdx/ })).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() => expect(window.location.hash).toBe('#/'));
@@ -1730,7 +1863,7 @@ describe('TinaAdmin rail', () => {
     await waitFor(() => expect(window.location.hash).toBe('#/media'));
     expect(
       within(
-        await screen.findByRole('complementary', { name: 'Media panel' })
+        await screen.findByRole('complementary', { name: 'Media' })
       ).getByText('No media library is installed.')
     ).toBeVisible();
   });
@@ -1802,28 +1935,25 @@ describe('TinaAdmin rail', () => {
   it('marks no document in another collection after Back', async () => {
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    const [back] = within(
-      await screen.findByRole('complementary', { name: 'Document form' })
-    ).getAllByRole('button');
-    await user.click(back);
-    await user.click(await screen.findByRole('button', { name: 'Pages' }));
+    await returnToTree(user);
+    await openCollectionTree('page');
     const about = await screen.findByRole('button', { name: /about\.mdx/ });
     expect(about).not.toHaveAttribute('aria-current');
   });
 
   it('shows Loading while a collection reads, then its documents', async () => {
-    let finish: (list: { path: string }[]) => void = () => {};
-    const pending = new Promise<{ path: string }[]>((resolve) => {
+    let finish: (list: ReturnType<typeof connectionOf>) => void = () => {};
+    const pending = new Promise<ReturnType<typeof connectionOf>>((resolve) => {
       finish = resolve;
     });
     const reading = vi.spyOn(provider, 'list').mockReturnValueOnce(pending);
     const user = userEvent.setup();
     renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await openCollectionTree('post');
     expect(await screen.findByText('Loading…')).toBeVisible();
-    finish([{ path: 'content/posts/hello.mdx' }]);
+    finish(connectionOf([{ path: 'content/posts/hello.mdx' }]));
     expect(
       await screen.findByRole('button', { name: /hello\.mdx/ })
     ).toBeVisible();
@@ -1869,16 +1999,6 @@ describe('TinaAdmin rail', () => {
       'aria-current',
       'page'
     );
-  });
-
-  it('hides the empty Media main area below lg', async () => {
-    window.location.hash = '#/media';
-    renderAdmin();
-    const heading = await screen.findAllByRole('heading', { name: 'Media' });
-    const main = heading
-      .map((node) => node.closest('[data-slot=sidebar-inset]'))
-      .find(Boolean);
-    expect(main).toHaveClass('max-lg:hidden');
   });
 });
 

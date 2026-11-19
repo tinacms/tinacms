@@ -7,8 +7,16 @@ import {
   DropdownMenuTrigger,
 } from '@tinacms/ui/components/dropdown-menu';
 import { tinaResolveLabel } from '@tinacms/ui/components/error-summary-pane';
+import type { BreadcrumbStep } from '@tinacms/ui/components/breadcrumb';
 import { FormLevel } from '@tinacms/ui/components/form-level';
+import { SaveToBranchDialog } from '@tinacms/ui/components/save-to-branch-dialog';
 import { toast } from '@tinacms/ui/components/toast';
+import {
+  branchNameError,
+  branchNameFromPath,
+  freeName,
+  takenBy,
+} from '@tinacms/ui/lib/branch-name';
 import {
   type ReactNode,
   use,
@@ -17,7 +25,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { get, useFormContext } from 'react-hook-form';
 import { useStore } from 'zustand';
 import {
   FieldLockContext,
@@ -33,24 +41,34 @@ import {
   lockAbove,
   type OpenLevel,
 } from '../editor/form-view-state';
+import { useBranchView } from '../editor/branch';
+import { formRootProps } from '../editor/outline-markup';
 import {
+  AfterSaveHookError,
   FormValidationError,
   useDiscardEdits,
   useFieldRegistry,
+  useFormCheck,
   useFormId,
   useFormSave,
+  useFormSaveWith,
+  useOptionalContentSlice,
   useStaleDraft,
 } from '../editor/hooks';
 import {
+  type FormId,
   useFormErrors,
   useFormStore,
   useFormValues,
+  useHasNewDocument,
   useIsFormDirty,
+  type FormStore,
 } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import type { StoredDraft } from '../form/drafts';
 import { DiscardConfirm } from './discard-confirm';
 import { DocumentStatus } from './document-status';
+import { ContentError } from '../core/content/contract';
 import { ErrorSuccessBubble, useErrorSummary } from './error-summary';
 import { saveFailureWords } from './save-failure';
 import { leftoverText } from './leftover-text';
@@ -80,6 +98,12 @@ const dismissIfUnowned = (toastId: string) => {
   );
 };
 
+export function dismissSaveFailedToast(formId: FormId) {
+  const toastId = `save-failed:${formId}`;
+  goneToasts.delete(toastId);
+  toast.dismiss(toastId);
+}
+
 export function flushPendingToastDismissals() {
   for (const toastId of [...dismissTimers.keys()]) dismissNowIfUnowned(toastId);
 }
@@ -99,14 +123,105 @@ function useToastOwner(toastId: string, present: boolean) {
   }, [present, toastId]);
 }
 
+type DialogState = {
+  reason: 'protected' | 'deleted';
+  branch: string;
+  defaultName: string;
+};
+
+type NewBranchRequest = { name: string; from: string | undefined };
+
+// Failed toasts whose action means "save to a new branch" rather than Retry.
+const goneToasts = new Set<string>();
+
+const isBranchGoneError = (cause: unknown) => {
+  if (cause instanceof ContentError) {
+    return cause.code === 'branch-not-found';
+  }
+  return false;
+};
+
+// Sonner puts focus back where it was when focus leaves the toasts. A dialog a
+// toast action opens would lose its focus to that, so focus leaves first.
+const leaveToaster = () => {
+  const active = document.activeElement;
+  if (
+    active instanceof HTMLElement &&
+    active.closest('[data-sonner-toaster]')
+  ) {
+    active.blur();
+  }
+};
+
+const isBranchGone = (save: { phase: string; reason?: string } | undefined) =>
+  save?.phase === 'failed' && save.reason === 'branch-gone';
+
+const DEFAULT_LABEL = 'Save';
+const NEW_BRANCH_LABEL = 'Save to new branch';
+
+// Save, or Save to new branch on a protected branch. `run` is the one gate:
+// Save, the toast's action and Retry all come through it.
 function SaveButton() {
+  const scope = use(FormScopeContext);
   const formId = useFormId();
   const dirty = useIsFormDirty(formId);
+  const values = useFormValues(formId);
   const save = useFormSave();
+  const saveWith = useFormSaveWith();
+  const check = useFormCheck();
+  const content = useOptionalContentSlice();
+  const narrow = useNarrow();
+  const view = useBranchView();
   const summary = useErrorSummary();
-  const [pending, setPending] = useState(false);
+  const [pending, setPendingState] = useState(false);
+  const saveAllRunning = useFormStore(
+    (state) => state.saveAll.running !== null
+  );
+  const setPending = (next: boolean) => {
+    setPendingState(next);
+    useFormStore.getState().setSavePending(formId, next);
+  };
+  useEffect(
+    () => () => useFormStore.getState().setSavePending(formId, false),
+    [formId]
+  );
+  const [dialog, setDialog] = useState<DialogState | null>(null);
+  const [name, setName] = useState('');
+  const [revealed, setRevealed] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [confirmError, setConfirmError] = useState<string>();
+  const [reread, setReread] = useState<readonly string[]>([]);
+  const saveButton = useRef<HTMLButtonElement>(null);
+  // A failed protected save to a new branch. Retry sends it again while the
+  // form's save phase is still the failure it recorded (ADR-018 §2).
+  const remembered = useRef<{
+    request: NewBranchRequest;
+    failure: FormStore['saves'][FormId];
+  } | null>(null);
+  // Set while the deleted dialog saves: the phase leaves branch-gone, but the toast stays.
+  const keepGoneToast = useRef(false);
   const failedToastId = `save-failed:${formId}`;
+  const branchName = view?.name;
+  const isProtected =
+    view?.mode === 'branches' &&
+    view.listState === 'ready' &&
+    branchName !== undefined &&
+    view.branches.some((entry) => entry.name === branchName && entry.protected);
+  const listed = [
+    ...(view?.branches.map((entry) => entry.name) ?? []),
+    ...reread,
+  ];
+  const taken =
+    dialog?.reason === 'deleted'
+      ? listed.filter((entry) => entry !== dialog.branch)
+      : listed;
+  const nameError =
+    confirmError ?? branchNameError(name.trim(), taken, revealed);
   useToastOwner(failedToastId, true);
+  const currentBranch = useRef(branchName);
+  useEffect(() => {
+    currentBranch.current = branchName;
+  }, [branchName]);
   const retry = useEffectEvent(() => run());
   useEffect(() => {
     const live = () => retry();
@@ -117,8 +232,112 @@ function SaveButton() {
       }
     };
   }, [failedToastId]);
-  const run = useEffectEvent(() => {
+
+  const openDialog = (
+    reason: DialogState['reason'],
+    branch: string,
+    refused?: string
+  ) => {
+    const defaultName =
+      refused !== undefined
+        ? refused
+        : reason === 'deleted'
+          ? freeName(
+              branch,
+              listed.filter((entry) => entry !== branch),
+              { suffixed: true }
+            )
+          : freeName(branchNameFromPath(scope?.path ?? ''), listed);
+    setName(defaultName);
+    setRevealed(false);
+    setConfirmError(undefined);
+    setDialog({ reason, branch, defaultName });
+  };
+
+  const savePhase = useFormStore((state) => state.saves[formId]);
+  // Discard and a branch switch clear the failure. The toast that named it goes
+  // too, and Retry no longer sends the remembered request.
+  useEffect(() => {
+    const live = useFormStore.getState().saves[formId];
+    if (remembered.current && live !== remembered.current.failure) {
+      remembered.current = null;
+    }
+    if (
+      !isBranchGone(savePhase) &&
+      !keepGoneToast.current &&
+      goneToasts.delete(failedToastId)
+    ) {
+      toast.dismiss(failedToastId);
+    }
+  }, [savePhase, formId, failedToastId]);
+
+  const showFailure = (cause: unknown) => {
+    // The raw reason is for the console. The editor reads fixed words.
+    console.error('[tinacms] Save failed:', cause);
+    if (isBranchGoneError(cause)) goneToasts.add(failedToastId);
+    else goneToasts.delete(failedToastId);
+    const { title, text, disk, action } = saveFailureWords(
+      cause,
+      view?.defaultBranch
+    );
+    toast({
+      id: failedToastId,
+      tone: 'error',
+      title,
+      text,
+      dismissible: !disk,
+      actionsInline: !narrow && !disk,
+      action: {
+        label: action,
+        onClick: () => {
+          leaveToaster();
+          const live = liveRetries.get(failedToastId);
+          if (
+            goneToasts.has(failedToastId) &&
+            !isBranchGone(useFormStore.getState().saves[formId])
+          ) {
+            toast.dismiss(failedToastId);
+          } else if (live) live();
+          else toast.dismiss(failedToastId);
+        },
+      },
+      secondaryAction: disk
+        ? { label: 'Dismiss', onClick: () => toast.dismiss(failedToastId) }
+        : undefined,
+    });
+    dismissIfUnowned(failedToastId);
+  };
+
+  // Query the provider again. The cached branch list can be out of date.
+  const readBranchNames = (): Promise<string[] | undefined> =>
+    content?.branches?.list().then(
+      (list) => list.map((entry) => entry.name),
+      () => undefined
+    ) ?? Promise.resolve(undefined);
+
+  const branchIsBack = () =>
+    readBranchNames().then(
+      (names) =>
+        branchName !== undefined && names?.includes(branchName) === true
+    );
+
+  const saveHere = () => {
     setPending(true);
+    if (isProtected && branchName !== undefined) {
+      const previous = useFormStore.getState().saves[formId];
+      check()
+        .then((valid) => {
+          if (valid) {
+            toast.dismiss(failedToastId);
+            openDialog('protected', branchName);
+          } else if (summary.block()) {
+            useFormStore.getState().restoreSavePhase(formId, previous);
+            toast.dismiss(failedToastId);
+          } else showFailure(new FormValidationError());
+        })
+        .finally(() => setPending(false));
+      return;
+    }
     save()
       .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
@@ -126,50 +345,191 @@ function SaveButton() {
           toast.dismiss(failedToastId);
           return;
         }
-        // The raw reason is for the console. The editor reads fixed words.
-        console.error('[tinacms] Save failed:', cause);
-        const { title, text, disk } = saveFailureWords(cause);
-        toast({
-          id: failedToastId,
-          tone: 'error',
-          title,
-          text,
-          dismissible: !disk,
-          action: {
-            label: 'Retry',
-            onClick: () => {
-              const live = liveRetries.get(failedToastId);
-              if (live) live();
-              else toast.dismiss(failedToastId);
-            },
-          },
-          secondaryAction: disk
-            ? {
-                label: 'Dismiss',
-                onClick: () => toast.dismiss(failedToastId),
-              }
-            : undefined,
-        });
-        dismissIfUnowned(failedToastId);
+        showFailure(cause);
+        if (isBranchGoneError(cause)) {
+          openDialog('deleted', branchName ?? '');
+        }
       })
       .finally(() => setPending(false));
+  };
+
+  // An `AfterSaveHookError` means the branch exists and the editor is on it.
+  const sendToNewBranch = async (request: NewBranchRequest) => {
+    const action = view?.saveToNewBranch;
+    if (!action || !scope) return;
+    await saveWith({
+      write: (value) =>
+        action({
+          ...request,
+          collection: scope.collection.name,
+          path: scope.path,
+          value,
+        }),
+      afterWrite: () => {
+        remembered.current = null;
+        view.switchTo(request.name);
+      },
+    });
+  };
+
+  const saveToProtected = (request: NewBranchRequest) => {
+    setPending(true);
+    sendToNewBranch(request)
+      .then(() => toast.dismiss(failedToastId))
+      .catch((cause) => {
+        if (cause instanceof FormValidationError && summary.block()) {
+          toast.dismiss(failedToastId);
+          return;
+        }
+        if (!(cause instanceof AfterSaveHookError)) {
+          remembered.current = {
+            request,
+            failure: useFormStore.getState().saves[formId],
+          };
+        }
+        showFailure(cause);
+      })
+      .finally(() => setPending(false));
+  };
+
+  const saveFromDeleted = (request: NewBranchRequest) => {
+    const previous = useFormStore.getState().saves[formId];
+    setSaving(true);
+    keepGoneToast.current = true;
+    const done = () => {
+      keepGoneToast.current = false;
+      setSaving(false);
+    };
+    sendToNewBranch(request).then(
+      () => {
+        done();
+        setDialog(null);
+        goneToasts.delete(failedToastId);
+        toast.dismiss(failedToastId);
+      },
+      (cause) => {
+        done();
+        if (cause instanceof AfterSaveHookError) {
+          setDialog(null);
+          showFailure(cause);
+          return;
+        }
+        useFormStore.getState().restoreSavePhase(formId, previous);
+        if (cause instanceof FormValidationError) {
+          setDialog(null);
+          if (!summary.block()) showFailure(cause);
+          return;
+        }
+        console.error('[tinacms] Could not make the branch:', cause);
+        setConfirmError('Couldn’t make the branch. Try again.');
+      }
+    );
+  };
+
+  const run = useEffectEvent(() => {
+    if (dialog || pending || useFormStore.getState().saveAll.running) return;
+    if (remembered.current && view?.saveToNewBranch) {
+      const { request, failure } = remembered.current;
+      const startedOn = branchName;
+      setPending(true);
+      readBranchNames().then((names) => {
+        const stale =
+          remembered.current?.request !== request ||
+          useFormStore.getState().saves[formId] !== failure ||
+          currentBranch.current !== startedOn;
+        if (stale) {
+          setPending(false);
+        } else if (names && takenBy(request.name, names) !== undefined) {
+          setPending(false);
+          setReread(names);
+          toast.dismiss(failedToastId);
+          openDialog('protected', startedOn ?? '', request.name);
+        } else saveToProtected(request);
+      });
+      return;
+    }
+    remembered.current = null;
+    if (isBranchGone(useFormStore.getState().saves[formId])) {
+      setPending(true);
+      const failure = useFormStore.getState().saves[formId];
+      const startedOn = branchName;
+      branchIsBack().then((back) => {
+        const stale =
+          useFormStore.getState().saves[formId] !== failure ||
+          currentBranch.current !== startedOn;
+        if (stale) {
+          setPending(false);
+        } else if (back) {
+          useFormStore.getState().clearSavePhase(formId);
+          saveHere();
+        } else {
+          setPending(false);
+          openDialog('deleted', branchName ?? '');
+        }
+      });
+      return;
+    }
+    saveHere();
   });
+
+  const confirm = (typed: string) => {
+    if (!dialog) return;
+    const chosen = typed.trim();
+    setRevealed(true);
+    if (!view?.saveToNewBranch || branchNameError(chosen, taken, true)) return;
+    if (dialog.reason === 'protected') {
+      setDialog(null);
+      saveToProtected({ name: chosen, from: dialog.branch });
+      return;
+    }
+    saveFromDeleted({ name: chosen, from: undefined });
+  };
+
   const { blocked } = summary;
   return (
-    <Button
-      variant='primary'
-      type='button'
-      data-resolve=''
-      className='min-w-40 shrink-0'
-      icon={blocked ? 'error' : undefined}
-      aria-expanded={blocked ? summary.paneOpen : undefined}
-      aria-controls={blocked ? 'error-pane' : undefined}
-      disabled={!(blocked || dirty || pending)}
-      busy={pending}
-      onClick={blocked ? summary.resolve : run}
-    >
-      {blocked ? tinaResolveLabel(summary.count) : 'Save'}
-    </Button>
+    <>
+      <Button
+        ref={saveButton}
+        variant='primary'
+        type='button'
+        className='min-w-41 shrink-0'
+        disabled={saveAllRunning || !(blocked || dirty || pending)}
+        busy={pending}
+        data-resolve=''
+        icon={blocked ? 'error' : undefined}
+        aria-expanded={blocked ? summary.paneOpen : undefined}
+        aria-controls={blocked ? 'error-pane' : undefined}
+        onClick={blocked ? summary.resolve : run}
+      >
+        {blocked
+          ? tinaResolveLabel(summary.count)
+          : isProtected
+            ? NEW_BRANCH_LABEL
+            : DEFAULT_LABEL}
+      </Button>
+      <SaveToBranchDialog
+        open={dialog !== null}
+        onOpenChange={(open) => {
+          if (open) return;
+          setDialog(null);
+          remembered.current = null;
+        }}
+        reason={dialog?.reason}
+        branch={dialog?.branch ?? ''}
+        document={documentTitle(values, scope?.path ?? '')}
+        name={name}
+        onNameChange={(next) => {
+          setName(next);
+          setRevealed(true);
+          setConfirmError(undefined);
+        }}
+        error={nameError}
+        saving={saving}
+        canSave={view?.saveToNewBranch !== undefined}
+        onSave={confirm}
+        returnFocusTo={saveButton}
+      />
+    </>
   );
 }
 
@@ -180,6 +540,7 @@ function FormBar() {
   const discard = useDiscardEdits();
   const values = useFormValues(formId);
   const scope = use(FormScopeContext);
+  const isNewDocument = useHasNewDocument(formId);
   const [confirming, setConfirming] = useState(false);
   // Read when the confirm opens, so typing in the title does not change it.
   const [documentName, setDocumentName] = useState('');
@@ -229,6 +590,7 @@ function FormBar() {
         onOpenChange={setConfirming}
         onConfirm={discard}
         returnFocusTo={menuButton}
+        isNewDocument={isNewDocument}
         title={`Discard unsaved edits to “${documentName}”?`}
       />
     </div>
@@ -358,7 +720,11 @@ function ActiveFieldLevels({ scope }: { scope: FormScope }) {
       levels.every(
         (level, index) => level.address === openLevels[index]?.address
       );
-    if (sameLevels || top === address || top?.startsWith(`${address}.`)) return;
+    if (sameLevels) return;
+    const opensItself = levels.at(-1)?.address === address;
+    if (!opensItself && (top === address || top?.startsWith(`${address}.`))) {
+      return;
+    }
     view.getState().showLevels(levels);
   });
   useEffect(() => {
@@ -367,50 +733,59 @@ function ActiveFieldLevels({ scope }: { scope: FormScope }) {
   return null;
 }
 
-// Reads the whole view and every error for the trail. `children` keeps its
-// element identity, so a re-render here does not reach the fields.
-function OpenLevelFrame({
-  scope,
-  current,
-  children,
-}: {
-  scope: FormScope;
-  current: OpenLevel;
-  children: ReactNode;
-}) {
-  const errors = useFormErrors(useFormId());
-  const { getValues } = useFormContext();
-  const view = useStore(scope.view);
-  const { collection, path } = scope;
-  const { closeLevelsAbove } = scope.view.getState();
+function OpenLevelFrame({ children }: { children: ReactNode }) {
+  return <FormLevel pinHeaders>{children}</FormLevel>;
+}
 
+/**
+ * The levels the form is drilled into, as trail steps for the head. `parents`
+ * are the levels above the open one, each returning to its level; `heading` is
+ * the open level; `closeAll` returns to the document.
+ */
+export function useLevelTrail(scope: FormScope): {
+  heading: string | null;
+  parents: BreadcrumbStep[];
+  documentInvalid: boolean;
+  closeAll: () => void;
+} {
+  const errors = useFormErrors(scope.formId);
+  const values = useFormStore((state) => state.forms[scope.formId]?.values);
+  const view = useStore(scope.view);
+  const { closeLevelsAbove } = scope.view.getState();
+  const current = view.openLevels.at(-1);
   const errorAddresses = Object.keys(errors);
-  const steps = [
-    {
-      label: path.split('/').at(-1) ?? path,
-      onClick: () => closeLevelsAbove(0),
-      invalid: holdsRevealedError(view, errorAddresses),
-    },
-    ...fieldsAlong(current.address, collection.fields, getValues).map(
-      (step) => {
-        const keep = view.openLevels.filter(
-          (level) =>
-            level.address === step.address ||
-            step.address.startsWith(`${level.address}.`)
-        ).length;
-        return {
-          label: step.label,
-          onClick: () => closeLevelsAbove(keep),
-          invalid: holdsRevealedError(view, errorAddresses, step.address),
-        };
-      }
-    ),
-  ];
-  return (
-    <FormLevel pinHeaders steps={steps} onUp={steps.at(-2)?.onClick}>
-      {children}
-    </FormLevel>
+  const documentInvalid = holdsRevealedError(view, errorAddresses);
+  if (!current) {
+    return {
+      heading: null,
+      parents: [],
+      documentInvalid,
+      closeAll: () => closeLevelsAbove(0),
+    };
+  }
+  const along = fieldsAlong(
+    current.address,
+    scope.collection.fields,
+    (address) => (values ? get(values, address) : undefined)
   );
+  const parents = along.slice(0, -1).map((step) => {
+    const keep = view.openLevels.filter(
+      (level) =>
+        level.address === step.address ||
+        step.address.startsWith(`${level.address}.`)
+    ).length;
+    return {
+      label: step.label,
+      onClick: () => closeLevelsAbove(keep),
+      invalid: holdsRevealedError(view, errorAddresses, step.address),
+    };
+  });
+  return {
+    heading: along.at(-1)?.label ?? current.address,
+    parents,
+    documentInvalid,
+    closeAll: () => closeLevelsAbove(0),
+  };
 }
 
 function FormFields({ scope }: { scope: FormScope }) {
@@ -426,7 +801,7 @@ function FormFields({ scope }: { scope: FormScope }) {
     );
   }
   return (
-    <OpenLevelFrame scope={scope} current={current}>
+    <OpenLevelFrame>
       <FieldLockContext
         value={lockAbove(current.address, scope.collection.fields, getValues)}
       >
@@ -445,7 +820,10 @@ export function DocumentForm() {
       <ResumeDraftToast scope={scope} />
       <StorageWarning scope={scope} />
       <ActiveFieldLevels scope={scope} />
-      <div className='min-h-0 flex-1 overflow-y-auto'>
+      <div
+        className='min-h-0 flex-1 overflow-y-auto'
+        {...formRootProps(scope.formId)}
+      >
         <FormFields scope={scope} />
       </div>
       <FormBar />

@@ -26,7 +26,7 @@ const NARROW_VIEWPORTS = [
   { width: 375, height: 812 },
   { width: 768, height: 1024 },
 ];
-const SCREEN_ROUTES = ['/#/screens/media', '/#/collections/nope'];
+const SCREEN_ROUTES = ['/#/collections/nope'];
 
 for (const viewport of NARROW_VIEWPORTS) {
   for (const route of SCREEN_ROUTES) {
@@ -52,15 +52,97 @@ for (const viewport of NARROW_VIEWPORTS) {
   }
 }
 
-test('the media route hides its empty main area below 1024px', async ({
+test('the Media pane fills the screen below 1024px and hides the main area', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 768, height: 1024 });
   await page.goto('/#/media');
-  await expect(page.locator('[data-slot=sidebar-inset]')).toBeHidden();
   await expect(
-    page.getByRole('complementary', { name: 'Media panel' })
+    page.getByRole('complementary', { name: 'Media' })
   ).toBeVisible();
+  await expect(page.locator('[data-slot=sidebar-inset]')).toBeHidden();
+});
+
+for (const viewport of [
+  { width: 390, height: 844 },
+  { width: 1280, height: 800 },
+]) {
+  test(`the Media pane does not scroll the page sideways at ${viewport.width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto('/#/screens/media');
+    const pane = page.getByRole('complementary', { name: 'Media' });
+    await expect(pane).toBeVisible();
+    await expect(
+      pane.getByRole('button', { name: 'preview.svg' })
+    ).toBeVisible();
+    for (const view of ['List view', 'Grid view']) {
+      await pane.getByRole('button', { name: view }).click();
+      const overflow = await page.evaluate(() => {
+        const root = document.scrollingElement;
+        return root ? root.scrollWidth - root.clientWidth : 0;
+      });
+      expect(overflow).toBeLessThanOrEqual(0);
+    }
+    await pane.getByRole('button', { name: 'Select' }).click();
+    const overflow = await page.evaluate(() => {
+      const root = document.scrollingElement;
+      return root ? root.scrollWidth - root.clientWidth : 0;
+    });
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}
+
+for (const width of [320, 360, 375, 390, 1280]) {
+  test(`the Select bar keeps one height and every action inside the Media pane at ${width}px as the count grows past 10`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/#/screens/media');
+    const pane = page.getByRole('complementary', { name: 'Media' });
+    await pane.getByRole('button', { name: 'Select', exact: true }).click();
+    const bar = pane.getByRole('toolbar', { name: 'Selected files' });
+    const boxes = pane.getByRole('checkbox');
+    expect(await boxes.count()).toBeGreaterThanOrEqual(12);
+    const heights: number[] = [];
+    for (const count of [0, 1, 10, 12]) {
+      while (
+        (await pane.getByText(/^\d+ selected$/).innerText()) !==
+        `${count} selected`
+      ) {
+        const selected = Number(
+          (await pane.getByText(/^\d+ selected$/).innerText()).split(' ')[0]
+        );
+        await boxes.nth(selected).click();
+      }
+      heights.push((await bar.boundingBox())?.height ?? 0);
+      const paneBox = await pane.boundingBox();
+      for (const button of await bar.getByRole('button').all()) {
+        const box = await button.boundingBox();
+        expect(box).not.toBeNull();
+        expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(
+          (paneBox?.x ?? 0) + (paneBox?.width ?? 0)
+        );
+        expect(
+          await button.evaluate((el) => el.scrollWidth - el.clientWidth)
+        ).toBeLessThanOrEqual(0);
+      }
+    }
+    expect(new Set(heights).size).toBe(1);
+  });
+}
+
+test('on a desktop the Media pane maximises over the main area and restores', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/#/screens/media');
+  const pane = page.getByRole('complementary', { name: 'Media' });
+  await pane.getByRole('button', { name: 'Maximise' }).click();
+  await expect(page.locator('[data-slot=sidebar-inset]')).toBeHidden();
+  await pane.getByRole('button', { name: 'Restore' }).click();
+  await expect(page.locator('[data-slot=sidebar-inset]')).toBeVisible();
 });
 
 test('the rail starts where the Top bar ends', async ({ page }) => {
@@ -125,3 +207,108 @@ for (const width of [320, 375, 414]) {
     });
   }
 }
+
+for (const width of [320, 375, 390, 414, 480, 520, 639, 640]) {
+  test(`Save All and its result list stay on screen at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 700 });
+    await page.goto(
+      '/branches.html?docs=1#/collections/post/content%2Fposts%2Fpost-01.mdx'
+    );
+    const title = page.getByRole('textbox', { name: /^Title/ });
+    await title.fill('');
+    const bar = page.getByRole('banner', { name: 'Top bar' });
+    const saveAll = bar.getByRole('button', { name: 'Save all' });
+    await expect(saveAll).toBeEnabled();
+    await saveAll.click();
+    await expect(
+      bar.getByRole('button', { name: /^Save all, 1 failed/ })
+    ).toBeVisible();
+    await bar.getByRole('button', { name: 'Save results' }).click();
+    const results = page.getByRole('dialog', { name: 'Save results' });
+    await expect(results).toBeVisible();
+    const [barBox, buttonBox, searchBox, resultsBox, overflow] =
+      await Promise.all([
+        bar.boundingBox(),
+        bar.getByRole('button', { name: /^Save all/ }).boundingBox(),
+        bar.getByRole('button', { name: 'Search' }).boundingBox(),
+        results.boundingBox(),
+        page.evaluate(
+          () =>
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth
+        ),
+      ]);
+    expect(overflow).toBeLessThanOrEqual(0);
+    const branch = bar.getByRole('button', { name: /^Branch:/ });
+    const label = branch.locator('span.font-mono');
+    const labelBox = await label.boundingBox();
+    const full = await label.evaluate((node) => node.scrollWidth);
+    expect(labelBox?.width).toBeGreaterThanOrEqual(Math.min(32, full) - 1);
+    const text = await bar
+      .getByRole('button', { name: /^Save all/ })
+      .innerText();
+    if (width < 640) expect(text.trim()).toBe('');
+    else expect(text).toMatch(/Save all\s*1 failed/);
+    expect((buttonBox?.x ?? 0) + (buttonBox?.width ?? 0)).toBeLessThanOrEqual(
+      (barBox?.x ?? 0) + (barBox?.width ?? 0)
+    );
+    expect(searchBox?.x ?? 0).toBeGreaterThanOrEqual(barBox?.x ?? 0);
+    expect(resultsBox?.x ?? -1).toBeGreaterThanOrEqual(0);
+    expect((resultsBox?.x ?? 0) + (resultsBox?.width ?? 0)).toBeLessThanOrEqual(
+      width
+    );
+    expect(
+      (resultsBox?.y ?? 0) + (resultsBox?.height ?? 0)
+    ).toBeLessThanOrEqual(700);
+  });
+}
+
+test.describe('Save All on a protected branch, by touch', () => {
+  test.use({ viewport: { width: 320, height: 700 }, hasTouch: true });
+
+  test('a tap shows why Save All is off and moves nothing in the top bar', async ({
+    page,
+  }) => {
+    await page.goto(
+      '/branches.html?docs=1&protected=1#/collections/post/content%2Fposts%2Fpost-01.mdx'
+    );
+    await page.getByRole('textbox', { name: /^Title/ }).fill('Changed');
+    const bar = page.getByRole('banner', { name: 'Top bar' });
+    const wrapper = bar.getByRole('group', { name: 'Save all, unavailable' });
+    const branchLabel = bar
+      .getByRole('button', { name: /^Branch:/ })
+      .locator('span.font-mono');
+    const search = bar.getByRole('button', { name: 'Search' });
+    await expect(wrapper).toBeVisible();
+    await page.waitForTimeout(300);
+    const before = await Promise.all([
+      branchLabel.boundingBox(),
+      search.boundingBox(),
+    ]);
+    const message = page.getByRole('dialog', { name: 'Save all, unavailable' });
+    await expect(message).toBeHidden();
+    await wrapper.tap();
+    await expect(message).toBeVisible();
+    await page.waitForTimeout(600);
+    await expect(message).toBeVisible();
+    await expect(message).toHaveText(
+      'Save each document to a new branch from its form'
+    );
+    const [labelAfter, searchAfter, overflow] = await Promise.all([
+      branchLabel.boundingBox(),
+      search.boundingBox(),
+      page.evaluate(
+        () =>
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth
+      ),
+    ]);
+    expect(overflow).toBeLessThanOrEqual(0);
+    expect(labelAfter?.width).toBe(before[0]?.width);
+    expect(searchAfter?.x).toBe(before[1]?.x);
+    await wrapper.tap();
+    await expect(message).toBeHidden();
+  });
+});

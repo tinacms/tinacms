@@ -1,4 +1,5 @@
 import { PlateElementProps, createPlatePlugin } from '@udecode/plate/react';
+import { AlertTriangle } from 'lucide-react';
 import React from 'react';
 import {
   INVALID_MARKDOWN_TYPE,
@@ -39,19 +40,16 @@ function ErrorMessage({ error }) {
     <div
       role='alert'
       contentEditable={false}
-      className='bg-red-50 sm:rounded-sm'
+      className='mb-3 flex items-start gap-3 rounded-sm border border-status-failed-border bg-status-failed-subtle p-3 text-status-failed last:mb-0'
     >
-      <div className='px-4 py-5 sm:p-6'>
-        <h3 className='text-lg leading-6 font-medium text-red-800'>
-          ❌ Error parsing markdown
-        </h3>
-        <div className='mt-2 max-w-xl text-sm text-red-800 space-y-4'>
-          <p>{message}</p>
-          <p>
-            To fix this, edit the file directly. Your original markdown is kept
-            as-is until it parses.
-          </p>
-        </div>
+      <AlertTriangle aria-hidden className='mt-0.5 size-4 shrink-0' />
+      <div className='min-w-0 space-y-2 text-sm'>
+        <h3 className='m-0 text-base font-semibold'>Error parsing markdown</h3>
+        <p className='m-0'>{message}</p>
+        <p className='m-0'>
+          To fix this, edit the file directly. Your original markdown is kept
+          as-is until it parses.
+        </p>
       </div>
     </div>
   );

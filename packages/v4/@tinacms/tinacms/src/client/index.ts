@@ -5,6 +5,7 @@ export type { JsonValue } from '../core/json';
 export {
   AuthError,
   type AuthErrorCode,
+  type AuthPluginSlice,
   type AuthSlice,
   type AuthUser,
   toUserId,
@@ -44,6 +45,7 @@ export {
   type MediaErrorCode,
   type MediaSlice,
   type MediaStatus,
+  type MediaUploadOptions,
   type MediaUrlOptions,
 } from '../core/media/contract';
 export {

@@ -13,6 +13,7 @@ import {
 import { cva } from 'class-variance-authority';
 
 import { Icons } from './icons';
+import { visualViewportBoundary } from './visual-viewport-boundary';
 
 export const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -34,8 +35,8 @@ export const DropdownMenuSubTrigger = withRef<
 >(({ children, className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.SubTrigger
     className={cn(
-      'flex cursor-default select-none items-center rounded-xs px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent',
-      'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative box-border flex min-h-9 w-full cursor-default items-center gap-2.5 rounded-sm px-2.5 py-0 font-sans text-base leading-control text-foreground no-underline outline-none select-none focus-visible:shadow-focus-inset data-[highlighted]:bg-muted data-[disabled]:pointer-events-none data-[disabled]:text-muted-foreground',
+      'data-[state=open]:bg-muted',
       inset && 'pl-8',
       className
     )}
@@ -47,30 +48,45 @@ export const DropdownMenuSubTrigger = withRef<
   </DropdownMenuPrimitive.SubTrigger>
 ));
 
-export const DropdownMenuSubContent = withCn(
+const DropdownMenuSubContentBase = withCn(
   DropdownMenuPrimitive.SubContent,
-  'z-[99999] min-w-32 overflow-hidden rounded-sm border bg-white p-1 text-black shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2'
+  'z-[99999] box-border max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-60 max-w-[var(--radix-dropdown-menu-content-available-width)] origin-[var(--radix-dropdown-menu-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-md bg-popover p-1 font-sans text-base leading-control text-foreground shadow-popover outline-none'
 );
+
+export const DropdownMenuSubContent = withRef<
+  typeof DropdownMenuPrimitive.SubContent
+>((props, ref) => (
+  <DropdownMenuSubContentBase
+    ref={ref}
+    collisionBoundary={visualViewportBoundary()}
+    collisionPadding={8}
+    {...props}
+  />
+));
 
 const DropdownMenuContentVariants = withProps(DropdownMenuPrimitive.Content, {
   className: cn(
-    'z-[99999] min-w-32 overflow-hidden rounded-sm border bg-white p-1 text-black shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2'
+    'z-[99999] box-border max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-60 max-w-[var(--radix-dropdown-menu-content-available-width)] origin-[var(--radix-dropdown-menu-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-md bg-popover p-1 font-sans text-base leading-control text-foreground shadow-popover outline-none'
   ),
   sideOffset: 4,
+  collisionPadding: 8,
 });
 
 export const DropdownMenuContent = withRef<
   typeof DropdownMenuPrimitive.Content
 >(({ ...props }, ref) => (
   <DropdownMenuPrimitive.Portal>
-    <DropdownMenuContentVariants ref={ref} {...props} />
+    <DropdownMenuContentVariants
+      ref={ref}
+      collisionBoundary={visualViewportBoundary()}
+      {...props}
+    />
   </DropdownMenuPrimitive.Portal>
 ));
 
 const menuItemVariants = cva(
   cn(
-    'relative flex h-9 cursor-pointer select-none items-center rounded-xs px-2 py-1.5 text-sm outline-none transition-colors',
-    'focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+    'relative box-border flex min-h-9 w-full cursor-default items-center gap-2.5 rounded-sm px-2.5 py-0 font-sans text-base leading-control text-foreground no-underline outline-none select-none focus-visible:shadow-focus-inset data-[highlighted]:bg-muted data-[disabled]:pointer-events-none data-[disabled]:text-muted-foreground'
   ),
   {
     variants: {
@@ -92,14 +108,14 @@ export const DropdownMenuCheckboxItem = withRef<
 >(({ children, className, ...props }, ref) => (
   <DropdownMenuPrimitive.CheckboxItem
     className={cn(
-      'relative flex select-none items-center rounded-xs py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      'cursor-pointer',
+      'relative box-border flex min-h-9 w-full cursor-default items-center gap-2.5 rounded-sm px-2.5 py-0 font-sans text-base leading-control text-foreground no-underline outline-none select-none focus-visible:shadow-focus-inset data-[highlighted]:bg-muted data-[disabled]:pointer-events-none data-[disabled]:text-muted-foreground',
+      'pr-8',
       className
     )}
     ref={ref}
     {...props}
   >
-    <span className='absolute left-2 flex size-3.5 items-center justify-center'>
+    <span className='pointer-events-none absolute right-2.5 flex size-4 items-center justify-center'>
       <DropdownMenuPrimitive.ItemIndicator>
         <Icons.check className='size-4' />
       </DropdownMenuPrimitive.ItemIndicator>
@@ -116,15 +132,15 @@ export const DropdownMenuRadioItem = withRef<
 >(({ children, className, hideIcon, ...props }, ref) => (
   <DropdownMenuPrimitive.RadioItem
     className={cn(
-      'relative flex select-none items-center rounded-xs pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      'h-9 cursor-pointer px-2 data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground',
+      'relative box-border flex min-h-9 w-full cursor-default items-center gap-2.5 rounded-sm px-2.5 py-0 font-sans text-base leading-control text-foreground no-underline outline-none select-none focus-visible:shadow-focus-inset data-[highlighted]:bg-muted data-[disabled]:pointer-events-none data-[disabled]:text-muted-foreground',
+      'pr-8',
       className
     )}
     ref={ref}
     {...props}
   >
     {!hideIcon && (
-      <span className='absolute right-2 flex size-3.5 items-center justify-center'>
+      <span className='pointer-events-none absolute right-2.5 flex size-4 items-center justify-center'>
         <DropdownMenuPrimitive.ItemIndicator>
           <Icons.check className='size-4' />
         </DropdownMenuPrimitive.ItemIndicator>
@@ -135,7 +151,7 @@ export const DropdownMenuRadioItem = withRef<
 ));
 
 const dropdownMenuLabelVariants = cva(
-  cn('select-none px-2 py-1.5 text-sm font-semibold'),
+  cn('select-none px-2.5 py-1.5 text-xs font-medium text-muted-foreground'),
   {
     variants: {
       inset: {
@@ -153,7 +169,7 @@ export const DropdownMenuLabel = withVariants(
 
 export const DropdownMenuSeparator = withCn(
   DropdownMenuPrimitive.Separator,
-  '-mx-1 my-1 h-px bg-muted'
+  '-mx-1 my-1 h-px bg-border-subtle'
 );
 
 export const DropdownMenuShortcut = withCn(

@@ -79,11 +79,14 @@ export interface BranchView {
   /** The pull request of the branch `name`, when it has one. */
   pullRequestUrl: string | undefined;
   branches: { name: string; protected: boolean }[];
+  /** The provider's default branch, once the list has been read. */
+  defaultBranch: string | undefined;
   /** Whether the list is being read, read, or failed. */
   listState: BranchListState | undefined;
   /** Reads the branch list again after a failure. */
   retryList: () => void;
   switchTo: (name: string) => void;
+  saveToNewBranch: BranchSlice['saveToNewBranch'];
 }
 
 export function useBranchView(): BranchView | null {
@@ -99,6 +102,7 @@ export function useBranchView(): BranchView | null {
     mode: slice.mode,
     name,
     pullRequestUrl: name ? slice.pullRequests[name] : undefined,
+    defaultBranch: slice.fallback,
     branches: slice.list.map((name) => ({
       name,
       protected: slice.protected.includes(name),
@@ -112,5 +116,6 @@ export function useBranchView(): BranchView | null {
         },
       })),
     switchTo: slice.switchTo,
+    saveToNewBranch: slice.saveToNewBranch,
   };
 }

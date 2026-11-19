@@ -28,7 +28,7 @@ const branchListSchema = z.array(
   })
 );
 
-const projectSchema = z.object({
+export const projectSchema = z.object({
   defaultBranch: z.string().optional(),
   mediaBranch: z.string().optional(),
 });
@@ -42,6 +42,11 @@ export interface TinaCloudOptions {
 
 export interface TinaCloudClientOptions extends TinaCloudOptions {
   getToken: () => string | undefined | Promise<string | undefined>;
+  /**
+   * How the token is sent: `Authorization: Bearer` (the default, a user token)
+   * or `X-API-KEY` (an API token, as TinaCloud's Public Search token is).
+   */
+  credential?: 'bearer' | 'api-key';
 }
 
 const bodyMessage = (body: unknown): string | undefined => {
@@ -67,6 +72,9 @@ export class TinaCloudError extends Error {
     return bodyMessage(this.body);
   }
 }
+
+/** TinaCloud answered that a background request failed. */
+export class TinaCloudRequestFailedError extends TinaCloudError {}
 
 const parseBody = (text: string): unknown => {
   if (!text) return null;
@@ -102,7 +110,12 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       });
     }
     const headers = new Headers(init.headers);
-    headers.set('Authorization', `Bearer ${token}`);
+    if (options.credential === 'api-key') {
+      headers.delete('Authorization');
+      headers.set('X-API-KEY', token);
+    } else {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
     let response: Response;
     try {
       response = await fetch(url, { ...init, headers });
@@ -136,7 +149,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       const status = requestStatusSchema.safeParse(body);
       if (status.success) {
         if (!status.data.error) return;
-        throw new TinaCloudError(
+        throw new TinaCloudRequestFailedError(
           status.data.message ?? 'TinaCloud reported that the request failed.',
           { body }
         );

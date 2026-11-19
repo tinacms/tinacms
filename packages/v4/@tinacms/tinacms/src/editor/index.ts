@@ -69,6 +69,7 @@ export {
   useDocumentPath,
   useStaleDraft,
   useFieldActivation,
+  useFieldActive,
   useFieldAddress,
   useFieldErrors,
   useFieldFrame,
