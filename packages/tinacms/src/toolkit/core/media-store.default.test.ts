@@ -534,7 +534,7 @@ describe('TinaMediaStore — branch query param', () => {
       // First call is upload_url with branch query.
       const uploadUrl = fetchWithToken.mock.calls[0][0];
       expect(uploadUrl).toContain(
-        '/upload_url/uploads/llama.png?branch=feat%2Fx'
+        '/upload_url/uploads/llama.png?contentType=image%2Fpng&branch=feat%2Fx'
       );
 
       // Result contains the canonical entry from the list endpoint, not a
@@ -544,6 +544,35 @@ describe('TinaMediaStore — branch query param', () => {
       expect(result[0].src).toBe(
         'https://assets.tina.io/test-client/__staging/feat/x/__file/uploads/llama.png'
       );
+    });
+
+    it('PUTs with the Content-Type the upload URL was signed for', async () => {
+      const { store, fetchWithToken } = buildStore({ branch: 'main' });
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, {
+          signedUrl: 'https://s3.example/signed',
+          requestId: 'req-1',
+          contentType: 'image/webp',
+        })
+      );
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+      );
+      const fetchMock = stubFetchGlobal(200, {});
+
+      const persistPromise = store.persist([
+        {
+          directory: 'uploads',
+          file: new File(['x'], 'llama.png', { type: 'image/png' }),
+        },
+      ]);
+      await vi.advanceTimersByTimeAsync(1100);
+      await persistPromise;
+
+      const putCall = fetchMock.mock.calls.find(
+        ([url]) => url === 'https://s3.example/signed'
+      );
+      expect(putCall?.[1].headers['Content-Type']).toBe('image/webp');
     });
 
     it('sanitizes the filename so the upload URL matches the canonical (sanitized) entry', async () => {
@@ -675,7 +704,7 @@ describe('TinaMediaStore — protected-branch interception', () => {
       expect.any(Function)
     );
     expect(fetchWithToken.mock.calls[0][0]).toContain(
-      `?branch=${encodeURIComponent(mediaBranch)}`
+      `&branch=${encodeURIComponent(mediaBranch)}`
     );
   });
 
@@ -753,7 +782,7 @@ describe('TinaMediaStore — protected-branch interception', () => {
     const mediaBranch = startMediaEditorialWorkflow.mock.calls[0][0].branchName;
     expect(mediaBranch).toMatch(/^tina\/media-upload-asset-[a-z0-9]+$/);
     expect(fetchWithToken.mock.calls[0][0]).toContain(
-      `?branch=${encodeURIComponent(mediaBranch)}`
+      `&branch=${encodeURIComponent(mediaBranch)}`
     );
   });
 
@@ -858,7 +887,7 @@ describe('TinaMediaStore — protected-branch interception', () => {
       selectedBranch
     );
     expect(fetchWithToken.mock.calls[0][0]).toContain(
-      `?branch=${encodeURIComponent(selectedBranch)}`
+      `&branch=${encodeURIComponent(selectedBranch)}`
     );
   });
 
@@ -937,7 +966,7 @@ describe('TinaMediaStore — protected-branch interception', () => {
     );
     expect(startMediaEditorialWorkflow).toHaveBeenCalledTimes(2);
     expect(fetchWithToken.mock.calls[0][0]).toContain(
-      `?branch=${encodeURIComponent('tina/custom-media-change-2')}`
+      `&branch=${encodeURIComponent('tina/custom-media-change-2')}`
     );
   });
 
@@ -975,7 +1004,7 @@ describe('TinaMediaStore — protected-branch interception', () => {
     await persistPromise;
 
     expect(startMediaEditorialWorkflow).not.toHaveBeenCalled();
-    expect(fetchWithToken.mock.calls[0][0]).toContain('?branch=main');
+    expect(fetchWithToken.mock.calls[0][0]).toContain('&branch=main');
   });
 
   it('fails fast on a protected branch when no media workflow overlay is mounted', async () => {
