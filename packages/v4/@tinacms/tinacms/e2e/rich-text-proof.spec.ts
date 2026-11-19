@@ -201,15 +201,15 @@ test.describe('with the keyboard up at 390px', () => {
     await page.keyboard.press('End');
     await page.keyboard.press('Enter');
     await setKeyboardHeight(page, KEYBOARD_TOP);
-    await page.keyboard.type('/head');
+    const slashInput = page.getByRole('combobox', { expanded: true });
+    await page.keyboard.type('/');
+    await expect(slashInput).toBeFocused();
+    await page.keyboard.type('head');
     const rows = page.getByRole('option');
     await expect(rows.first()).toBeVisible();
-    await page
-      .getByRole('combobox')
-      .first()
-      .evaluate((input) => {
-        input.scrollIntoView({ block: 'center' });
-      });
+    await slashInput.evaluate((input) => {
+      input.scrollIntoView({ block: 'center' });
+    });
     const lastRow = rows.last();
     await expect
       .poll(async () => {

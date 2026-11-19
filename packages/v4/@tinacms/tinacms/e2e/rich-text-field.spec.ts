@@ -671,7 +671,7 @@ test.describe('the link bar and the stuck body toolbar', () => {
         }
       };
 
-      await scrollForm(page, 300);
+      await scrollForm(page, 'end');
       await expect(shell).toHaveAttribute('data-stuck', '');
       await placeLink(-40);
       await expect(bar).toBeHidden();
