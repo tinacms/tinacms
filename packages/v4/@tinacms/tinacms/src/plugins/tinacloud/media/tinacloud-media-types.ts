@@ -13,4 +13,7 @@ export const requestIdResponseSchema = z.object({
 export const uploadUrlResponseSchema = z.object({
   signedUrl: z.string(),
   requestId: z.string().optional(),
+  // The Content-Type the URL is signed for. Newer TinaCloud returns it; the
+  // upload sends it on the PUT, so the two must match.
+  contentType: z.string().optional(),
 });
