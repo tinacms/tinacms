@@ -8,7 +8,6 @@ import {
 
 const url = (href: string) => ({ kind: 'url' as const, href });
 
-// Shows the ADR-027 order in the rail: an entry, then a group, then an entry.
 export default defineClientPlugin({
   slots: {
     navGroups: [{ id: 'cloud', label: 'Cloud', order: 5 }],
