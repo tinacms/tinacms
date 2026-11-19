@@ -38,6 +38,7 @@ import {
   type FieldErrors,
   type FormId,
   isEdited,
+  offeredCopies,
   readFormStore,
   readOpeningScope,
   syncDrafts,
@@ -578,11 +579,7 @@ export function FormProvider({
     dropFieldTargets
   );
 
-  const waiting = useFormStore((state) =>
-    state.hidden[formId] || state.promptDown[formId]
-      ? undefined
-      : state.waiting[formId]
-  );
+  const waiting = useFormStore((state) => offeredCopies(state, formId));
   const staleDraftActions = useMemo(
     () =>
       buildStaleDraftActions(

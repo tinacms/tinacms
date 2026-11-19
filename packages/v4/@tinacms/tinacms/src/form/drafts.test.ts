@@ -13,6 +13,7 @@ import {
 import {
   type FormId,
   formStatus,
+  offeredCopies,
   syncDrafts,
   toFormId,
   useFormStore,
@@ -142,12 +143,14 @@ describe('form drafts', () => {
     expect(store.getState().promptDown[postA]).toBe(true);
   });
 
-  it('lowers the prompt and keeps the waiting copies once the form holds the same values', () => {
+  it('lowers the prompt while the form holds every waiting copy, and keeps the copies', () => {
     reloadWithEdit();
     open();
     typeTitle('Mine');
-    expect(store.getState().promptDown[postA]).toBe(true);
+    expect(offeredCopies(store.getState(), postA)).toBeUndefined();
     expect(readWaitingDrafts(postA)).toHaveLength(1);
+    typeTitle('Mine2');
+    expect(offeredCopies(store.getState(), postA)).toHaveLength(1);
   });
 
   it('keeps the prompt up when only the newest waiting copy matches the form', () => {
@@ -158,7 +161,7 @@ describe('form drafts', () => {
     open();
     expect(waitingOf()).toHaveLength(2);
     typeTitle('Newer');
-    expect(store.getState().promptDown[postA]).toBeUndefined();
+    expect(offeredCopies(store.getState(), postA)).toHaveLength(2);
   });
 
   it('row 3: a draft typed on an older file waits too', () => {
