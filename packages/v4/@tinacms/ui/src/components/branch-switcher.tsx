@@ -7,6 +7,9 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 
+import { Radio } from '@base-ui/react/radio';
+import { RadioGroup } from '@base-ui/react/radio-group';
+
 import { Button } from '@tinacms/ui/components/button';
 import {
   Dialog,
@@ -22,7 +25,6 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from '@tinacms/ui/components/popover';
-import { Segmented } from '@tinacms/ui/components/segmented';
 import { Badge } from '@tinacms/ui/components/badge';
 import { Icon } from '@tinacms/ui/components/icon';
 import { SearchBox } from '@tinacms/ui/components/search-box';
@@ -310,22 +312,6 @@ function BranchSwitcher({
       .querySelector('[data-branch-actions]')
       ?.scrollIntoView?.({ block: 'nearest' });
   };
-  const [stacked, setStacked] = useState(false);
-  useEffect(() => {
-    const group = frame().querySelector<HTMLElement>('[data-branch-start]');
-    if (!creating || !group) return;
-    const measure = () => {
-      const options = [...group.querySelectorAll<HTMLElement>('button')];
-      const rows = new Set(options.map((option) => option.offsetTop));
-      setStacked(
-        rows.size > 1 || options.some((option) => option.offsetHeight > 36)
-      );
-    };
-    measure();
-    const watch = new ResizeObserver(measure);
-    watch.observe(group);
-    return () => watch.disconnect();
-  }, [creating, maximised]);
   useEffect(() => {
     if (failed) return afterPaint(showActions);
   }, [failed, maximised]);
@@ -608,24 +594,39 @@ function BranchSwitcher({
                 {nameError}
               </p>
             ) : null}
-            <div data-branch-start='' className='flex flex-col gap-1'>
+            <div className='flex flex-col gap-1'>
               <span className='text-xs font-medium text-muted-foreground-strong'>
                 Start from
               </span>
               {startOptions.length > 1 ? (
-                <Segmented
-                  size='sm'
-                  orientation={stacked ? 'vertical' : 'horizontal'}
+                <RadioGroup
                   aria-label='Start from'
-                  options={startOptions}
                   value={startFrom}
                   disabled={busy}
-                  onValueChange={setStartFrom}
-                  className={cn(
-                    'w-full max-w-full flex-wrap *:h-auto! *:min-h-7 *:min-w-[min(100%,9rem)] *:flex-1 *:justify-start *:py-1 *:text-left *:whitespace-normal *:[overflow-wrap:anywhere]',
-                    stacked ? 'rounded-[10px]' : 'rounded-[18px]'
-                  )}
-                />
+                  onValueChange={(value) => {
+                    if (value === 'current' || value === 'base') {
+                      setStartFrom(value);
+                    }
+                  }}
+                  className='flex w-full flex-col'
+                >
+                  {startOptions.map((option) => (
+                    <label
+                      key={option.value}
+                      className='box-border flex min-h-8.5 w-full cursor-pointer items-start gap-2 rounded-sm px-2.5 py-1.5 text-base leading-control hover:bg-muted has-data-checked:bg-pressed has-data-disabled:cursor-not-allowed has-data-disabled:opacity-45 has-focus-visible:shadow-focus-ring'
+                    >
+                      <Radio.Root
+                        value={option.value}
+                        className='mt-0.5 grid size-4 flex-none place-items-center rounded-full border border-border bg-card outline-none data-checked:border-primary'
+                      >
+                        <Radio.Indicator className='size-2 rounded-full bg-primary' />
+                      </Radio.Root>
+                      <span className='min-w-0 flex-1 font-mono tracking-code [overflow-wrap:anywhere]'>
+                        {option.label}
+                      </span>
+                    </label>
+                  ))}
+                </RadioGroup>
               ) : (
                 <span className='font-mono text-sm tracking-code'>
                   {current ?? baseBranch}
@@ -718,7 +719,12 @@ function BranchSwitcher({
     return (
       <Dialog open={shown} onOpenChange={setOpen}>
         <DialogTrigger render={trigger}>{label}</DialogTrigger>
-        <DialogContent size='md' showCloseButton={false} onKeyDown={move}>
+        <DialogContent
+          size='md'
+          showCloseButton={false}
+          data-branch-switcher=''
+          onKeyDown={move}
+        >
           {panel(({ children }) => (
             <>
               <DialogTitle>{children}</DialogTitle>
@@ -818,7 +824,7 @@ function MaximisedView({
       aria-label='Branches'
       data-slot='branch-maximised'
       onKeyDown={onKeyDown}
-      className='fixed inset-x-0 top-14 bottom-7 z-40 overflow-y-auto bg-background p-6 font-sans text-base leading-control text-foreground'
+      className='fixed inset-x-0 top-14 bottom-7 z-30 overflow-y-auto bg-background p-6 font-sans text-base leading-control text-foreground'
     >
       <div className='mx-auto flex max-w-190 flex-col gap-3 rounded-md border border-border bg-card p-4'>
         {children}

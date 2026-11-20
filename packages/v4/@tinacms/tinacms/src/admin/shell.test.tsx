@@ -1935,8 +1935,8 @@ describe('branch switcher rows and creating a branch', () => {
     );
     await first.user.click(
       within(
-        within(dialog).getByRole('group', { name: 'Start from' })
-      ).getByRole('button', { name: 'main' })
+        within(dialog).getByRole('radiogroup', { name: 'Start from' })
+      ).getByRole('radio', { name: /^main/ })
     );
     await press(dialog, first.user);
     expect(create).toHaveBeenCalledWith({ name: 'cms/x', from: 'main' });

@@ -444,6 +444,8 @@ const TOAST_WIDEST_PX = 480;
 const TOAST_RIGHT_PX = 24;
 // Below the dialog layer, so a Confirm dims the toasts behind it.
 const TOAST_LAYER = { zIndex: 40 };
+// The phone sheet of the branch switcher sits at the dialog layer, so toasts rise above it.
+const TOAST_ABOVE_SHEET = { zIndex: 60 };
 // With the on-screen keyboard open the toast would cover the field being typed in.
 const TOAST_HIDDEN = { ...TOAST_LAYER, visibility: 'hidden' } as const;
 
@@ -490,10 +492,25 @@ function useFormBarUnderToast(): boolean {
   return under;
 }
 
+// The branch switcher's phone sheet reports its outcomes in toasts, so they must show over it.
+function useSwitcherSheetOpen(): boolean {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const check = () =>
+      setOpen(document.querySelector('[data-branch-switcher]') !== null);
+    check();
+    const mutations = new MutationObserver(check);
+    mutations.observe(document.body, { childList: true, subtree: true });
+    return () => mutations.disconnect();
+  }, []);
+  return open;
+}
+
 function ShellToaster() {
   const cardShowing = useLongSave();
   const keyboardOpen = useKeyboardOpen();
   const barUnder = useFormBarUnderToast();
+  const sheetOpen = useSwitcherSheetOpen();
   const offset = cardShowing
     ? TOAST_OFFSET_ABOVE_CARD
     : barUnder
@@ -503,7 +520,13 @@ function ShellToaster() {
     <Toaster
       offset={offset}
       mobileOffset={offset}
-      style={keyboardOpen ? TOAST_HIDDEN : TOAST_LAYER}
+      style={
+        keyboardOpen
+          ? TOAST_HIDDEN
+          : sheetOpen
+            ? TOAST_ABOVE_SHEET
+            : TOAST_LAYER
+      }
     />
   );
 }

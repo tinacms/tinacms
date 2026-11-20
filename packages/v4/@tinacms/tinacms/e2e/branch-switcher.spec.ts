@@ -89,11 +89,11 @@ test.describe('branch switcher pop-up', () => {
     await page
       .getByRole('searchbox', { name: 'New branch name' })
       .fill('cms/x');
-    await page
-      .getByRole('group', { name: 'Start from' })
-      .getByRole('button', { name: 'feature/news' })
-      .click();
+    await page.getByRole('radio', { name: /^feature\/news/ }).click();
     await expect(page.getByRole('dialog', { name: 'Branches' })).toBeVisible();
+    await expect(
+      page.getByRole('radio', { name: /^feature\/news/ })
+    ).toBeChecked();
   });
 
   test('makes a branch and lands on it', async ({ page }) => {
@@ -322,38 +322,6 @@ test.describe('branch switcher pop-up', () => {
     });
   }
 
-  test('keeps a long base-branch name inside its Start from segment', async ({
-    page,
-  }) => {
-    await page.setViewportSize(DESKTOP);
-    await page.goto(
-      '/branches.html?docs=1&branch=feature/a-very-long-default-branch-name-for-start-from-check&create=ok#/'
-    );
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: /^main/ }).click();
-    await page.getByRole('button', { name: /^Branch: main/ }).click();
-    await page.getByRole('button', { name: 'New branch' }).click();
-    const spills = await page.evaluate(() => {
-      const group = document.querySelector('[aria-label="Start from"]');
-      const popup = group?.closest('[role="dialog"]');
-      if (!group || !popup) return ['missing'];
-      const p = popup.getBoundingClientRect();
-      return [...group.querySelectorAll('button')].flatMap((b) => {
-        const r = b.getBoundingClientRect();
-        const out: string[] = [];
-        if (
-          b.scrollHeight > b.clientHeight + 1 ||
-          b.scrollWidth > b.clientWidth + 1
-        )
-          out.push('text spills ' + b.textContent);
-        if (r.right > p.right + 1)
-          out.push('segment past the pop-up ' + b.textContent);
-        return out;
-      });
-    });
-    expect(spills).toEqual([]);
-  });
-
   test('scrolls Retry into view when a create fails on a short screen', async ({
     page,
   }) => {
@@ -406,82 +374,6 @@ test.describe('branch switcher pop-up', () => {
     await expect(name).toBeFocused();
     await view.getByRole('button', { name: 'Back to branches' }).click();
     await expect(search).toBeFocused();
-  });
-
-  test('keeps the current segment readable beside a long base-branch name', async ({
-    page,
-  }) => {
-    await page.setViewportSize(DESKTOP);
-    await page.goto(
-      '/branches.html?docs=1&many=2&branch=feature/a-very-long-default-branch-name-for-start-from-check&create=ok#/'
-    );
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: /many\/branch-1/ }).click();
-    await page.getByRole('button', { name: /^Branch: many\/branch-1/ }).click();
-    await page.getByRole('button', { name: 'New branch' }).click();
-    const broken = await page.evaluate(() => {
-      const group = document.querySelector('[aria-label="Start from"]');
-      if (!group) return ['missing'];
-      return [...group.querySelectorAll('button')]
-        .filter((b) => b.getBoundingClientRect().width < 120)
-        .map((b) => b.textContent);
-    });
-    expect(broken).toEqual([]);
-  });
-
-  test('lays short Start from options in one row with soft corners, and moves between them with the arrow keys', async ({
-    page,
-  }) => {
-    await page.setViewportSize(DESKTOP);
-    await page.goto('/branches.html?docs=1&many=2&create=ok#/');
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: /many\/branch-1/ }).click();
-    await page.getByRole('button', { name: /^Branch: many\/branch-1/ }).click();
-    await page.getByRole('button', { name: 'New branch' }).click();
-    const group = page.getByRole('group', { name: 'Start from' });
-    const options = group.getByRole('button');
-    await expect(options).toHaveCount(2);
-    const [a, b] = await Promise.all([
-      options.nth(0).boundingBox(),
-      options.nth(1).boundingBox(),
-    ]);
-    expect(Math.abs((a?.y ?? 0) - (b?.y ?? 99))).toBeLessThanOrEqual(1);
-    const radius = await group.evaluate((el) =>
-      parseFloat(getComputedStyle(el).borderTopLeftRadius)
-    );
-    expect(radius).toBeGreaterThan(8);
-    expect(radius).toBeLessThan(40);
-    await options.nth(0).focus();
-    await page.keyboard.press('ArrowRight');
-    await expect(options.nth(1)).toBeFocused();
-  });
-
-  test('stacks long Start from options with up and down arrows and a smaller radius', async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 320, height: 640 });
-    await page.goto(
-      '/branches.html?docs=1&many=2&branch=feature/a-very-long-default-branch-name-for-start-from-check&create=ok#/'
-    );
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: /many\/branch-1/ }).click();
-    await page.getByRole('button', { name: /^Branch: many\/branch-1/ }).click();
-    await page.getByRole('button', { name: 'New branch' }).click();
-    const group = page.getByRole('group', { name: 'Start from' });
-    const options = group.getByRole('button');
-    const [a, b] = await Promise.all([
-      options.nth(0).boundingBox(),
-      options.nth(1).boundingBox(),
-    ]);
-    expect((b?.y ?? 0) - (a?.y ?? 0)).toBeGreaterThan(10);
-    await expect(group).toHaveAttribute('data-orientation', 'vertical');
-    const radius = await group.evaluate((el) =>
-      parseFloat(getComputedStyle(el).borderTopLeftRadius)
-    );
-    expect(radius).toBeLessThanOrEqual(12);
-    await options.nth(0).focus();
-    await page.keyboard.press('ArrowDown');
-    await expect(options.nth(1)).toBeFocused();
   });
 
   test('has the action row in view when New branch opens on a short screen', async ({
@@ -611,26 +503,6 @@ test.describe('branch switcher pop-up', () => {
     expect(await rowInView()).toBe(true);
   });
 
-  test('stacks as soon as an option wraps past one line, with soft corners', async ({
-    page,
-  }) => {
-    await page.setViewportSize(DESKTOP);
-    await page.goto(
-      '/branches.html?docs=1&many=2&branch=feature/a-very-long-default-branch-name-for-start-from-check-and-it-keeps-going&create=ok#/'
-    );
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: /many\/branch-1/ }).click();
-    await page.getByRole('button', { name: /^Branch: many\/branch-1/ }).click();
-    await page.getByRole('button', { name: 'New branch' }).click();
-    const group = page.getByRole('group', { name: 'Start from' });
-    await expect(group).toHaveAttribute('data-orientation', 'vertical');
-    const radius = await group.evaluate((el) =>
-      parseFloat(getComputedStyle(el).borderTopLeftRadius)
-    );
-    expect(radius).toBeGreaterThan(0);
-    expect(radius).toBeLessThanOrEqual(12);
-  });
-
   test('puts focus in the name field after Restore with the form open', async ({
     page,
   }) => {
@@ -650,5 +522,255 @@ test.describe('branch switcher pop-up', () => {
     await expect(
       page.getByRole('searchbox', { name: 'New branch name' })
     ).toBeFocused();
+  });
+
+  const LONG =
+    'feature/a-very-long-branch-name-that-keeps-going-past-the-row-width-0123456789';
+  const frames = [
+    {
+      name: '320px phone sheet',
+      size: { width: 320, height: 640 },
+      maximise: false,
+    },
+    {
+      name: '768px pop-up',
+      size: { width: 768, height: 900 },
+      maximise: false,
+    },
+    {
+      name: '768px maximised view',
+      size: { width: 768, height: 900 },
+      maximise: true,
+    },
+    {
+      name: '1440px pop-up',
+      size: { width: 1440, height: 900 },
+      maximise: false,
+    },
+    {
+      name: '1440px maximised view',
+      size: { width: 1440, height: 900 },
+      maximise: true,
+    },
+  ];
+
+  const openStartFrom = async (
+    page: import('@playwright/test').Page,
+    maximise: boolean,
+    branch?: string
+  ) => {
+    const query = branch ? '&branch=' + branch : '';
+    await page.goto('/branches.html?docs=1&many=2' + query + '&create=slow#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: /^many\/branch-1/ }).click();
+    await page.getByRole('button', { name: /^Branch: many\/branch-1/ }).click();
+    if (maximise) {
+      await page.getByRole('button', { name: 'Maximise' }).click();
+      await expect(
+        page.locator('[data-slot="branch-maximised"]')
+      ).toBeVisible();
+      await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+    }
+    await page.getByRole('button', { name: 'New branch' }).click();
+  };
+
+  const layout = (page: import('@playwright/test').Page) =>
+    page.evaluate(() => {
+      const group = document.querySelector(
+        '[role="radiogroup"][aria-label="Start from"]'
+      );
+      if (!group) return { problems: ['no radiogroup'] };
+      const rows = [...group.querySelectorAll('label')];
+      const frame = group.closest(
+        '[role="dialog"], [data-slot="branch-maximised"]'
+      );
+      let body: Element | null = group.parentElement;
+      while (body && getComputedStyle(body).overflowY !== 'auto')
+        body = body.parentElement;
+      const listRow =
+        document.querySelector('[data-branch-row]')?.parentElement;
+      const listRadius = listRow
+        ? getComputedStyle(listRow.firstElementChild as Element)
+            .borderTopLeftRadius
+        : '';
+      const problems: string[] = [];
+      if (rows.length !== 2) problems.push('rows ' + rows.length);
+      const [a, b] = rows.map((row) => row.getBoundingClientRect());
+      if (a && b) {
+        if (b.top < a.bottom - 1) problems.push('second row not below first');
+        if (Math.abs(a.left - b.left) > 1 || Math.abs(a.width - b.width) > 1)
+          problems.push('rows differ in left or width');
+      }
+      const box = frame ? frame.getBoundingClientRect() : undefined;
+      const padRight = frame
+        ? parseFloat(getComputedStyle(frame).paddingRight)
+        : 0;
+      for (const row of rows) {
+        if (row.scrollWidth > row.clientWidth) problems.push('row scrollWidth');
+        if (row.scrollHeight > row.clientHeight)
+          problems.push('row scrollHeight');
+        const r = row.getBoundingClientRect();
+        if (box && r.right > box.right - padRight + 1)
+          problems.push('row past the frame content box');
+        const radius = getComputedStyle(row).borderTopLeftRadius;
+        if (listRadius && radius !== listRadius)
+          problems.push('radius ' + radius + ' vs ' + listRadius);
+      }
+      if (body && body.scrollWidth > body.clientWidth)
+        problems.push('body scrolls sideways');
+      return { problems };
+    });
+
+  const arrows = async (page: import('@playwright/test').Page) => {
+    const first = page.getByRole('radio').first();
+    const second = page.getByRole('radio').nth(1);
+    await expect(first).toBeChecked();
+    await first.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(second).toBeChecked();
+    await page.keyboard.press('ArrowUp');
+    await expect(first).toBeChecked();
+    await page.keyboard.press('ArrowRight');
+    await expect(second).toBeChecked();
+    await page.keyboard.press('ArrowLeft');
+    await expect(first).toBeChecked();
+    await page.keyboard.press('ArrowUp');
+    await expect(second).toBeChecked();
+    await page.keyboard.press('ArrowDown');
+    await expect(first).toBeChecked();
+  };
+
+  for (const frame of frames) {
+    for (const names of ['a long default branch name', 'short names']) {
+      test(
+        'lays Start from out as full-width radio rows in the ' +
+          frame.name +
+          ' with ' +
+          names,
+        async ({ page }) => {
+          await page.setViewportSize(frame.size);
+          await openStartFrom(
+            page,
+            frame.maximise,
+            names === 'short names' ? undefined : LONG
+          );
+          const group = page.getByRole('radiogroup', { name: 'Start from' });
+          await expect(group.getByRole('radio')).toHaveCount(2);
+          await expect(group.getByRole('radio').first()).toBeChecked();
+          await expect(group.getByRole('radio').first()).toHaveAccessibleName(
+            /\(current\)/
+          );
+          expect((await layout(page)).problems).toEqual([]);
+          await arrows(page);
+        }
+      );
+    }
+  }
+
+  test('keeps the Start from layout and arrow keys after Maximise then Restore', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 768, height: 900 });
+    await openStartFrom(page, false, LONG);
+    expect((await layout(page)).problems).toEqual([]);
+    await page.getByRole('button', { name: 'Maximise' }).click();
+    const view = page.locator('[data-slot="branch-maximised"]');
+    await expect(view).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+    expect((await layout(page)).problems).toEqual([]);
+    await view.getByRole('button', { name: 'Restore' }).click();
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeVisible();
+    expect((await layout(page)).problems).toEqual([]);
+    await arrows(page);
+  });
+
+  test('disables both Start from radios while a create is pending', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await openStartFrom(page, false, LONG);
+    await page
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/x');
+    await page.getByRole('button', { name: 'Create branch' }).click();
+    await expect(page.getByRole('button', { name: 'Creating' })).toBeVisible();
+    for (const radio of await page.getByRole('radio').all()) {
+      await expect(radio).toHaveAttribute('aria-disabled', 'true');
+    }
+  });
+
+  const toastOnTop = (page: import('@playwright/test').Page, text: string) =>
+    page.evaluate((words) => {
+      const toast = [...document.querySelectorAll('[data-sonner-toast]')].find(
+        (el) => el.textContent?.includes(words)
+      );
+      if (!toast) return false;
+      const r = toast.getBoundingClientRect();
+      const hit = document.elementFromPoint(
+        r.x + r.width / 2,
+        r.y + r.height / 2
+      );
+      return hit !== null && toast.contains(hit);
+    }, text);
+
+  for (const frame of [
+    { name: 'pop-up', size: DESKTOP, maximise: false },
+    { name: 'maximised view', size: DESKTOP, maximise: true },
+    { name: 'phone sheet', size: { width: 390, height: 844 }, maximise: false },
+  ]) {
+    test(`shows the not-ready toast on top of the ${frame.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=unready#/');
+      await page.getByRole('button', { name: /^Branch:/ }).click();
+      if (frame.maximise) {
+        await page.getByRole('button', { name: 'Maximise' }).click();
+        await expect(
+          page.locator('[data-slot="branch-maximised"]')
+        ).toBeVisible();
+        await expect(
+          page.getByRole('dialog', { name: 'Branches' })
+        ).toBeHidden();
+      }
+      await page.getByRole('button', { name: 'New branch' }).click();
+      await page
+        .getByRole('searchbox', { name: 'New branch name' })
+        .fill('cms/x');
+      await page.getByRole('button', { name: 'Create branch' }).click();
+      await expect(page.getByText("cms/x isn't ready yet")).toBeVisible();
+      await page.waitForTimeout(500);
+      expect(await toastOnTop(page, "cms/x isn't ready yet")).toBe(true);
+    });
+  }
+
+  test('can press Retry on the failure toast while the maximised view is open', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto('/branches.html?docs=1&create=fail#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    await page
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/x');
+    await page.getByRole('button', { name: 'Create branch' }).click();
+    await page
+      .getByRole('dialog', { name: 'Branches' })
+      .getByRole('button', { name: 'Close branches' })
+      .click();
+    await expect(page.getByText("Couldn't create cms/x")).toBeVisible();
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'Maximise' }).click();
+    await expect(page.locator('[data-slot="branch-maximised"]')).toBeVisible();
+    await page.waitForTimeout(500);
+    expect(await toastOnTop(page, "Couldn't create cms/x")).toBe(true);
+    const retry = page.getByRole('button', { name: 'Retry' });
+    await retry.click({ timeout: 3000 });
+    await expect(
+      page
+        .locator('[data-slot="branch-maximised"]')
+        .getByText("Couldn't create cms/x. Check your connection, then retry.")
+    ).toBeVisible({ timeout: 5000 });
   });
 });

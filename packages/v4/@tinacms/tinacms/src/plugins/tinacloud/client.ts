@@ -22,9 +22,11 @@ const INDEX_TIMEOUT_MS = 15 * 60 * 1000;
 const MAX_UNKNOWN_INDEX_STATUSES = 6;
 
 /** A poll that failed on the network, a 404 before indexing starts, or a 5xx: worth asking again. */
-const isTransient = (cause: unknown): boolean =>
-  cause instanceof TinaCloudError &&
-  (cause.status === undefined || cause.status === 404 || cause.status >= 500);
+const isTransient = (cause: unknown): boolean => {
+  if (!(cause instanceof TinaCloudError)) return false;
+  const { status } = cause;
+  return status === undefined || status === 404 || status >= 500;
+};
 
 const HEADS_PREFIX = 'refs/heads/';
 
