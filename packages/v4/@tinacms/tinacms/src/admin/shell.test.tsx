@@ -9,6 +9,7 @@ import { asResolvedConfig } from '../config';
 import type { BranchInfo, BranchSlice } from '../core/branch/contract';
 import { currentBranchOf } from '../core/branch/contract';
 import { ContentError, type DocumentEntry } from '../core/content/contract';
+import { toFieldAddress } from '../core/field/address';
 import { definePlugin } from '../core/plugin';
 import { TinaRuntimeContext } from '../editor/context';
 import { draftKey } from '../form/drafts';
@@ -953,6 +954,50 @@ describe('toasts', () => {
   });
 });
 
+describe('server field errors in the document form', () => {
+  const refusal = () =>
+    new ContentError('validation', undefined, {
+      [toFieldAddress('title')]: ['Title is taken'],
+    });
+
+  it('shows the message on the field after Save, and again after Retry', async () => {
+    useUnprotectedBranch();
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    updateError = refusal();
+    const user = userEvent.setup();
+    renderAdmin();
+    const input = await screen.findByLabelText(/^Title\b/);
+    await user.type(input, '!');
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
+    await waitFor(() =>
+      expect(
+        screen
+          .getAllByRole('alert')
+          .some((alert) => /Title is taken/.test(alert.textContent ?? ''))
+      ).toBe(true)
+    );
+    expect(input).toHaveValue('Hello!');
+
+    await user.type(input, '?');
+    await waitFor(() =>
+      expect(
+        screen
+          .queryAllByRole('alert')
+          .some((alert) => /Title is taken/.test(alert.textContent ?? ''))
+      ).toBe(false)
+    );
+    const toast = document.querySelector('[data-slot=toast]') as HTMLElement;
+    await user.click(within(toast).getByRole('button', { name: 'Retry' }));
+    await waitFor(() =>
+      expect(
+        screen
+          .getAllByRole('alert')
+          .some((alert) => /Title is taken/.test(alert.textContent ?? ''))
+      ).toBe(true)
+    );
+  });
+});
+
 describe('read-error and screen views', () => {
   it('draws one toggle and a Close in the read-error view', async () => {
     failGet = true;
@@ -1229,6 +1274,25 @@ describe('Save to new branch', () => {
     ).toBeVisible();
     expect(await screen.findByRole('button', { name: 'Save' })).toBeDisabled();
     expect(updates).toHaveLength(0);
+  });
+
+  it('shows a validation refusal of the new-branch write on the field', async () => {
+    const action = withAction();
+    action.mockRejectedValueOnce(
+      new ContentError('validation', undefined, {
+        [toFieldAddress('title')]: ['Title is taken'],
+      })
+    );
+    const { user, dialog } = await openProtectedDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(
+        screen
+          .getAllByRole('alert')
+          .some((alert) => /Title is taken/.test(alert.textContent ?? ''))
+      ).toBe(true)
+    );
+    expect(switchCalls).toHaveLength(0);
   });
 
   it('keeps the editor on the protected branch with the edits when the action rejects, and Retry sends the same call', async () => {

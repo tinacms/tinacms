@@ -598,6 +598,24 @@ describe('useSaveDocument on a collection with a custom validator', () => {
     await expect(rejection).rejects.toHaveProperty('fieldErrors', undefined);
   });
 
+  it('fails a new document with server-route-missing when the Backend has no create op, and writes nothing', async () => {
+    const fetchMock = stubRoute(
+      () => new Response('Not found', { status: 404 })
+    );
+    const { provider, result } = render(['acme.after']);
+    await expect(
+      result.current.save({
+        collection: 'top',
+        path: 'p.mdx',
+        value: {},
+        isNew: true,
+      })
+    ).rejects.toMatchObject({ code: 'server-route-missing' });
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/tina/content/create');
+    expect(provider.update).not.toHaveBeenCalled();
+    expect(provider.create).toBeUndefined();
+  });
+
   it('fails with the server-route error on a site with no server route, and never writes directly', async () => {
     stubRoute(() => new Response('Not found', { status: 404 }));
     const { provider, result } = render(['acme.after']);
