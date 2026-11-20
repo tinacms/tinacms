@@ -168,10 +168,12 @@ const validateWithoutForm = (target: SaveTarget): void => {
 // show like the form's own: on the open form, or in the store for the form
 // that opens later. The values stay as the editor typed them.
 // A refusal with field errors that the form can show and list.
-export const isServerFieldRefusal = (cause: unknown): cause is ContentError =>
-  cause instanceof ContentError &&
-  cause.code === 'validation' &&
-  cause.fieldErrors !== undefined;
+export const isServerFieldRefusal = (cause: unknown): cause is ContentError => {
+  if (cause instanceof ContentError) {
+    return cause.code === 'validation' && cause.fieldErrors !== undefined;
+  }
+  return false;
+};
 
 const showServerFieldErrors = (
   { formId }: SaveTarget,
