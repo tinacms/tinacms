@@ -402,9 +402,9 @@ describe('TinaAdmin', () => {
   });
 
   it('does not mount the preview frame until a route shows it', async () => {
-    window.location.hash = '#/settings';
+    window.location.hash = '#/';
     renderAdmin('about:blank');
-    await screen.findByRole('button', { name: 'Settings' });
+    await screen.findByRole('heading', { name: 'Home' });
     expect(screen.queryByTitle('Preview')).toBeNull();
   });
 
@@ -446,10 +446,10 @@ describe('TinaAdmin', () => {
     await user.click(
       within(screen.getByRole('navigation', { name: 'Content' })).getByRole(
         'button',
-        { name: 'Settings' }
+        { name: 'Home' }
       )
     );
-    await screen.findByText('Pick an entry to open it.');
+    await screen.findByRole('heading', { name: 'Home' });
     expect(screen.getByTitle('Preview')).toBe(frame);
     expect(frame.closest('.hidden')).not.toBeNull();
   });
@@ -879,6 +879,22 @@ describe('TinaAdmin global nav', () => {
     ).toEqual(shown);
   });
 
+  it('draws a divider above each group and each run of entries without a group', async () => {
+    renderAdmin();
+    const rail = await screen.findByRole('navigation', { name: 'Content' });
+    await screen.findByRole('list', { name: 'Help' });
+    const firstRows = ['Switch branch', 'Guides', 'Changelog'];
+    const marks = [
+      ...rail.querySelectorAll(
+        '[data-slot=sidebar-separator], [data-rail-row]'
+      ),
+    ].map((node) => node.getAttribute('aria-label') ?? 'divider');
+    expect(marks.filter((mark) => mark === 'divider')).toHaveLength(3);
+    for (const row of firstRows) {
+      expect(marks[marks.indexOf(row) - 1]).toBe('divider');
+    }
+  });
+
   it('lists the entries of a group under its heading in the rail', async () => {
     renderAdmin();
     const menu = await screen.findByRole('list', { name: 'Help' });
@@ -911,38 +927,6 @@ describe('TinaAdmin global nav', () => {
       await screen.findByRole('button', { name: 'Switch branch' })
     );
     expect(navAction).toHaveBeenCalledOnce();
-  });
-
-  it('shows an empty Tools pane when no plugin adds an entry', async () => {
-    const user = userEvent.setup();
-    render(
-      <TinaAdmin
-        config={asResolvedConfig({
-          ...config,
-          plugins: config.plugins.filter((plugin) => plugin !== screenPlugin),
-        })}
-        queryClient={
-          new QueryClient({ defaultOptions: { queries: { retry: false } } })
-        }
-      />
-    );
-    await user.click(await screen.findByRole('button', { name: 'Tools' }));
-    const pane = await screen.findByRole('complementary', {
-      name: 'Tools panel',
-    });
-    expect(within(pane).getByText('No tools installed.')).toBeVisible();
-  });
-
-  it('opens a Settings pane beside the rail', async () => {
-    const user = userEvent.setup();
-    renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Settings' }));
-    const pane = await screen.findByRole('complementary', {
-      name: 'Settings panel',
-    });
-    expect(within(pane).getByText('No settings yet.')).toBeVisible();
-    await user.click(within(pane).getByRole('button', { name: 'Close' }));
-    await waitFor(() => expect(window.location.hash).toBe('#/'));
   });
 });
 
@@ -1728,7 +1712,7 @@ describe('TinaAdmin rail', () => {
     ).getAllByRole('button');
   };
 
-  it('lists Home, Collections, Media, Tools and Settings, and no collection or document', async () => {
+  it('lists Home, Collections and Media, and no collection or document', async () => {
     renderAdmin();
     const buttons = await railButtons();
     expect(buttons.map((button) => button.getAttribute('aria-label'))).toEqual([
@@ -1737,11 +1721,6 @@ describe('TinaAdmin rail', () => {
       'Media',
     ]);
     const rail = screen.getByRole('navigation', { name: 'Content' });
-    expect(
-      within(within(rail).getByRole('list', { name: 'Tools and settings' }))
-        .getAllByRole('button')
-        .map((button) => button.getAttribute('aria-label'))
-    ).toEqual(['Tools', 'Settings']);
     expect(within(rail).queryByText('Posts')).toBeNull();
   });
 
@@ -1797,22 +1776,6 @@ describe('TinaAdmin rail', () => {
     await waitFor(() => expect(window.location.hash).toBe('#/collections'));
   });
 
-  it.each([
-    ['tools', 'Tools'],
-    ['settings', 'Settings'],
-  ])(
-    'marks %s selected on a deep link and asks for an entry',
-    async (hash, name) => {
-      window.location.hash = `#/${hash}`;
-      renderAdmin();
-      expect(await screen.findByRole('button', { name })).toHaveAttribute(
-        'aria-current',
-        'page'
-      );
-      expect(screen.getByText('Pick an entry to open it.')).toBeVisible();
-    }
-  );
-
   it('opens the collections beside the rail, not inside it', async () => {
     const user = userEvent.setup();
     renderAdmin();
@@ -1861,7 +1824,7 @@ describe('TinaAdmin rail', () => {
     await user.keyboard('{ArrowDown}');
     expect(screen.getByRole('button', { name: 'Collections' })).toHaveFocus();
     await user.keyboard('{End}');
-    const help = screen.getByRole('link', { name: /Help & docs/ });
+    const help = screen.getByRole('link', { name: /Help and docs/ });
     expect(help).toHaveFocus();
     await user.keyboard('{ArrowUp}');
     expect(help).not.toHaveFocus();
@@ -1888,7 +1851,7 @@ describe('TinaAdmin rail', () => {
     await user.keyboard('{ArrowUp}{Home}');
     expect(home).toHaveFocus();
     await user.keyboard('{End}');
-    expect(screen.getByRole('link', { name: /Help & docs/ })).toHaveFocus();
+    expect(screen.getByRole('link', { name: /Help and docs/ })).toHaveFocus();
   });
 
   it('closes the phone rail sheet when a row is chosen', async () => {

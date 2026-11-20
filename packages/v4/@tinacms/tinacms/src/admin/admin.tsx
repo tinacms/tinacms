@@ -40,13 +40,7 @@ import { AuthGate } from './auth-gate';
 import { DocumentForm, useLevelTrail } from './document-form';
 import { DocumentErrorPane } from './error-summary';
 import { DocumentScope } from './document-scope';
-import {
-  CollectionsNavigator,
-  MediaPanel,
-  SettingsPane,
-  ToolsPane,
-  useTreeFolders,
-} from './navigator';
+import { CollectionsNavigator, MediaPanel, useTreeFolders } from './navigator';
 import { CollectionTable } from './collection-table/collection-table';
 import { CollectionsIndex } from './collections-index/collections-index';
 import { AdminRail, HOME_SCREEN, MEDIA_SCREEN } from './rail';
@@ -686,8 +680,6 @@ function AdminShell({
     !homeSegments &&
     !showIndex &&
     !showTable &&
-    mainRoute.view !== 'tools' &&
-    mainRoute.view !== 'settings' &&
     !isStaleCollectionRoute &&
     !isStaleDocumentRoute &&
     !documentFailed;
@@ -812,10 +804,6 @@ function AdminShell({
           />
         ) : null}
 
-        {route.view === 'tools' ? <ToolsPane onClose={goHome} /> : null}
-
-        {route.view === 'settings' ? <SettingsPane onClose={goHome} /> : null}
-
         <div
           data-main-region=''
           className={
@@ -837,10 +825,6 @@ function AdminShell({
             />
           ) : homeSegments ? (
             <HomeOutlet screen={homeScreen} segments={homeSegments} />
-          ) : mainRoute.view === 'tools' || mainRoute.view === 'settings' ? (
-            <SidebarInset className='min-w-0'>
-              <Placeholder>Pick an entry to open it.</Placeholder>
-            </SidebarInset>
           ) : isStaleCollectionRoute ? (
             <MissingPanel title='Collection not found' onClose={goHome}>
               No collection named “{activeCollectionName}”.

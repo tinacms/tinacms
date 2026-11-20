@@ -1,15 +1,28 @@
 import { expect, test } from '@playwright/test';
 
-test('the rail draws a divider above Tools and Settings', async ({ page }) => {
+test('the rail draws a divider above each group and each run of plugin entries', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/#/');
-  const divider = page.locator('[data-slot=sidebar-separator]');
-  await expect(divider).toBeVisible({ timeout: 30_000 });
-  const box = await divider.boundingBox();
-  expect(box?.height).toBeGreaterThanOrEqual(1);
+  const rail = page.getByRole('navigation', { name: 'Content' });
+  const dividers = rail.locator('[data-slot=sidebar-separator]');
+  await expect(dividers).toHaveCount(3, { timeout: 30_000 });
+  const tops = await Promise.all(
+    ['Redirects', 'Project Config', 'Analytics'].map(async (name) => {
+      const box = await rail.getByRole('link', { name }).boundingBox();
+      return box?.y ?? 0;
+    })
+  );
+  for (const [index, top] of tops.entries()) {
+    const box = await dividers.nth(index).boundingBox();
+    expect(box?.height).toBeGreaterThanOrEqual(1);
+    expect(box?.y).toBeLessThan(top);
+    expect(box?.y).toBeGreaterThan(tops[index - 1] ?? 0);
+  }
 });
 
-for (const pane of ['collections', 'media', 'tools', 'settings']) {
+for (const pane of ['collections', 'media']) {
   test(`the ${pane} pane keeps its Close button on a 390px screen`, async ({
     page,
   }) => {

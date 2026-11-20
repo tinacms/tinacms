@@ -246,7 +246,7 @@ describe('the Search dialog content results', () => {
     const user = userEvent.setup();
     renderWithoutContent(searchProviderPlugin(search));
     const dialog = await openSearch(user);
-    await user.type(within(dialog).getByRole('searchbox'), 'sett');
+    await user.type(within(dialog).getByRole('searchbox'), 'coll');
     expect(
       within(dialog).getByRole('list', { name: 'Navigation results' })
     ).toBeVisible();

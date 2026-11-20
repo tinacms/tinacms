@@ -1,8 +1,6 @@
 export type AdminRoute =
   | { view: 'home' }
   | { view: 'media' }
-  | { view: 'tools' }
-  | { view: 'settings' }
   | { view: 'page' }
   | { view: 'collections'; unsavedOnly?: boolean; maximised?: true }
   | { view: 'collection'; collection: string; maximised?: true }
@@ -27,13 +25,7 @@ export const formatAdminRoute = (route: AdminRoute): string => {
     }
     return `#/${COLLECTIONS_PREFIX}${route.unsavedOnly ? UNSAVED_ONLY : ''}`;
   }
-  if (
-    route.view === 'media' ||
-    route.view === 'tools' ||
-    route.view === 'settings' ||
-    route.view === 'page'
-  )
-    return `#/${route.view}`;
+  if (route.view === 'media' || route.view === 'page') return `#/${route.view}`;
   if (route.view === 'screen') {
     const parts = [route.screen, ...route.segments].map(encodeURIComponent);
     return `#/${SCREENS_PREFIX}/${parts.join('/')}`;
@@ -66,13 +58,7 @@ export const parseAdminRoute = (hash: string): AdminRoute => {
   const decoded = raw.map(decodeSegment);
   if (decoded.some((segment) => segment === null)) return HOME_ROUTE;
   const [prefix, head, ...rest] = decoded as string[];
-  if (
-    !head &&
-    (prefix === 'media' ||
-      prefix === 'tools' ||
-      prefix === 'settings' ||
-      prefix === 'page')
-  )
+  if (!head && (prefix === 'media' || prefix === 'page'))
     return { view: prefix };
   if (prefix === COLLECTIONS_PREFIX && !head) {
     const flags = (query ?? '').split('&');

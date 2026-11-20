@@ -12,8 +12,6 @@ describe('admin routing', () => {
     { view: 'collections' },
     { view: 'home' },
     { view: 'media' },
-    { view: 'tools' },
-    { view: 'settings' },
     { view: 'page' },
     { view: 'collections', unsavedOnly: true },
     { view: 'collection', collection: 'post' },

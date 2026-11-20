@@ -25,10 +25,8 @@ import {
   folderOfDocument,
   useNewDocumentDrafts,
 } from '../editor/collection-documents';
-import type { GlobalNavEntry } from '../core/slot/contract';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { DiscardConfirm } from './discard-confirm';
-import { openNavTarget } from './rail';
 import type { AdminRoute } from './routing';
 
 const paneClass = (hideBelowLg: boolean) =>
@@ -507,33 +505,6 @@ export function MediaPanel({
       <PanelHeader heading='Media' closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
         <EmptyState text='No media library is installed.' />
-      </div>
-    </aside>
-  );
-}
-
-/** The panel the Tools entry opens beside the rail. Plugin entries sit in the rail (ADR-027), so it has none yet. */
-export function ToolsPane({ onClose }: { onClose: () => void }) {
-  return (
-    <aside aria-label='Tools panel' className={paneClass(false)}>
-      <PanelHeader heading='Tools' closeLabel='Close' onClose={onClose} />
-      <div className='min-h-0 flex-1 overflow-y-auto p-2'>
-        <EmptyState text='No tools installed.' />
-      </div>
-    </aside>
-  );
-}
-
-/** The panel the Settings entry opens beside the rail. Plugins have no way to add to it yet. */
-export function SettingsPane({ onClose }: { onClose: () => void }) {
-  return (
-    <aside
-      aria-label='Settings panel'
-      className='flex w-110 min-w-0 flex-col border-r border-border'
-    >
-      <PanelHeader heading='Settings' closeLabel='Close' onClose={onClose} />
-      <div className='min-h-0 flex-1 overflow-y-auto p-2'>
-        <EmptyState text='No settings yet.' />
       </div>
     </aside>
   );
