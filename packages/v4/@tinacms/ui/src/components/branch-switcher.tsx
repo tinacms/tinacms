@@ -330,9 +330,18 @@ function BranchSwitcher({
 
   useEffect(() => {
     if (!creating) return;
-    nameRef.current?.focus();
+    focusField('name');
     formRef.current?.scrollIntoView?.({ block: 'nearest' });
   }, [creating]);
+
+  /** The field in the frame on screen: the pop-up and the maximised view each hold their own. */
+  const focusField = (field: 'search' | 'name') => {
+    const frame =
+      document.querySelector('[data-slot="branch-maximised"]') ?? document;
+    frame
+      .querySelector<HTMLInputElement>(`[data-branch-field="${field}"]`)
+      ?.focus();
+  };
 
   const closeAndFocusButton = () => {
     setOpen(false);
@@ -432,13 +441,14 @@ function BranchSwitcher({
       ) : null}
       <SearchBox
         ref={searchRef}
+        data-branch-field='search'
         label='Search branches'
         placeholder='Branch name'
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         onClear={() => {
           setQuery('');
-          searchRef.current?.focus();
+          focusField('search');
         }}
       />
       <div className='flex min-h-0 flex-col gap-3 overflow-y-auto'>
@@ -484,7 +494,7 @@ function BranchSwitcher({
                   size='sm'
                   onClick={() => {
                     setQuery('');
-                    searchRef.current?.focus();
+                    focusField('search');
                   }}
                 >
                   Clear search
@@ -524,6 +534,7 @@ function BranchSwitcher({
             </p>
             <SearchBox
               ref={nameRef}
+              data-branch-field='name'
               label='New branch name'
               clearLabel='Clear name'
               placeholder='Branch name'
@@ -542,7 +553,7 @@ function BranchSwitcher({
                   : () => {
                       setNewName('');
                       setSubmitted(true);
-                      nameRef.current?.focus();
+                      focusField('name');
                     }
               }
               aria-invalid={nameError ? true : undefined}
@@ -567,7 +578,7 @@ function BranchSwitcher({
                   value={startFrom}
                   disabled={busy}
                   onValueChange={setStartFrom}
-                  className='max-w-full *:h-auto! *:min-h-7 *:min-w-0 *:shrink *:py-1 *:text-left *:whitespace-normal *:break-all'
+                  className='w-full max-w-full flex-col *:h-auto! *:min-h-7 *:min-w-0 *:justify-start *:py-1 *:text-left *:whitespace-normal *:[overflow-wrap:anywhere]'
                 />
               ) : (
                 <span className='font-mono text-sm tracking-code'>
@@ -592,7 +603,7 @@ function BranchSwitcher({
                 onClick={() => {
                   setCreating(false);
                   setDismissed(true);
-                  searchRef.current?.focus();
+                  focusField('search');
                 }}
               >
                 <span className='min-w-0 max-md:py-1.5 max-md:whitespace-normal'>

@@ -384,4 +384,48 @@ test.describe('branch switcher pop-up', () => {
     });
     expect(inside).toBe(true);
   });
+
+  test('keeps focus in the fields after Clear and Back in the maximised view', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto('/branches.html?docs=1&create=ok#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'Maximise' }).click();
+    const view = page.locator('[data-slot="branch-maximised"]');
+    await expect(view).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+    const search = view.getByRole('searchbox', { name: 'Search branches' });
+    await search.fill('feat');
+    await view.getByRole('button', { name: 'Clear search' }).click();
+    await expect(search).toBeFocused();
+    await view.getByRole('button', { name: 'New branch' }).click();
+    const name = view.getByRole('searchbox', { name: 'New branch name' });
+    await name.fill('cms/x');
+    await view.getByRole('button', { name: 'Clear name' }).click();
+    await expect(name).toBeFocused();
+    await view.getByRole('button', { name: 'Back to branches' }).click();
+    await expect(search).toBeFocused();
+  });
+
+  test('keeps the current segment readable beside a long base-branch name', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto(
+      '/branches.html?docs=1&many=2&branch=feature/a-very-long-default-branch-name-for-start-from-check&create=ok#/'
+    );
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: /many\/branch-1/ }).click();
+    await page.getByRole('button', { name: /^Branch: many\/branch-1/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    const broken = await page.evaluate(() => {
+      const group = document.querySelector('[aria-label="Start from"]');
+      if (!group) return ['missing'];
+      return [...group.querySelectorAll('button')]
+        .filter((b) => b.getBoundingClientRect().width < 120)
+        .map((b) => b.textContent);
+    });
+    expect(broken).toEqual([]);
+  });
 });
