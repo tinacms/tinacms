@@ -1,4 +1,5 @@
 import { definePlugin } from '../../core/plugin';
+import coreValidatorsServer from './core-validators.server';
 import { CORE_VALIDATOR_NAMES } from './core-validators.schema';
 
 /**
@@ -13,5 +14,8 @@ export default definePlugin({
   provides: ['validator'],
   validators: [...CORE_VALIDATOR_NAMES],
   client: () => import('./core-validators.client'),
-  server: () => import('./core-validators.server'),
+  // A static import, not a lazy one: the Vite config loader closes its module runner
+  // once the config is read, and a later `import()` through it fails on the first save.
+  // The module holds only the factories, so a browser bundle gains no node code.
+  server: async () => ({ default: coreValidatorsServer }),
 });
