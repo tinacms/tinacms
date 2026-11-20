@@ -49,6 +49,7 @@ let listError: boolean;
 let listCalls: number;
 let failAfterSave: boolean;
 let updateError: Error | undefined;
+let updateCalls = 0;
 let listOmits: string | undefined;
 let holdNextList: Promise<void> | undefined;
 let heldDefault: Promise<void> | undefined;
@@ -105,6 +106,7 @@ const contentPlugin = () =>
               path: string,
               value: TinaDocument
             ) => {
+              updateCalls += 1;
               if (updateError) throw updateError;
               if (holdUpdates) {
                 await new Promise<void>((resolve) => {
@@ -295,6 +297,7 @@ const press = async (user: ReturnType<typeof userEvent.setup>, chord: string) =>
 beforeEach(() => {
   mode = 'branches';
   updates = [];
+  updateCalls = 0;
   holdUpdates = false;
   releaseUpdate = undefined;
   searchEnabled = false;
@@ -985,6 +988,28 @@ describe('server field errors in the document form', () => {
     expect(await screen.findByRole('button', { name: /^Save$/ })).toBeVisible();
     expect(taken()).toBe(false);
   });
+
+  it('never sends a save from Resolve, and sends the next save after an edit', async () => {
+    useUnprotectedBranch();
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    updateError = refusal();
+    const user = userEvent.setup();
+    renderAdmin();
+    const input = await screen.findByLabelText(/^Title\b/);
+    await user.type(input, '!');
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    );
+    expect(updateCalls).toBe(1);
+    await waitFor(() => expect(input).toHaveFocus());
+
+    updateError = undefined;
+    await user.type(input, '?');
+    await user.click(await screen.findByRole('button', { name: /^Save$/ }));
+    await waitFor(() => expect(updates).toHaveLength(1));
+    expect(updateCalls).toBe(2);
+  });
 });
 
 describe('read-error and screen views', () => {
@@ -1283,6 +1308,11 @@ describe('Save to new branch', () => {
         .some((alert) => /Title is taken/.test(alert.textContent ?? ''))
     ).toBe(true);
     expect(switchCalls).toHaveLength(0);
+    // An edit ends the message, and the protected branch's own label comes back.
+    await user.type(screen.getByRole('textbox', { name: /^Title\b/ }), '?');
+    expect(
+      await screen.findByRole('button', { name: 'Save to new branch' })
+    ).toBeVisible();
   });
 
   it('keeps the editor on the protected branch with the edits when the action rejects, and Retry sends the same call', async () => {

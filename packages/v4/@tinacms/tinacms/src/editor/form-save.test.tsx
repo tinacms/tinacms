@@ -475,7 +475,7 @@ describe('useFormSave when the server refuses the save with field errors', () =>
     await vi.waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
   });
 
-  it('keeps a value typed while the save ran', async () => {
+  it('keeps a value typed while the save ran, and shows no message for it', async () => {
     let refusal: () => void = () => {};
     const onSave = vi.fn(
       () =>
@@ -495,12 +495,20 @@ describe('useFormSave when the server refuses the save with field errors', () =>
     await userEvent.type(input, '?');
     refusal();
 
-    await screen.findByRole('alert');
+    // The message judged 'Hi', a value the editor no longer has, so it shows nowhere.
+    await vi.waitFor(() =>
+      expect(Object.values(useFormStore.getState().saves)).toMatchObject([
+        {
+          phase: 'failed',
+          message: 'Some fields are not valid. Fix them and try again.',
+        },
+      ])
+    );
     expect(input).toHaveValue('Hi?');
-    // The message belongs to the value the server saw, not to the one typed since.
-    const formId = toFormId('content/posts/save.mdx');
-    expect(heldServerErrors(formId, { title: 'Hi' })).toHaveProperty('title');
-    expect(heldServerErrors(formId, { title: 'Hi?' })).toEqual({});
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(
+      heldServerErrors(toFormId('content/posts/save.mdx'), { title: 'Hi?' })
+    ).toEqual({});
   });
 
   it('fails the save with the message when no field matches the address', async () => {

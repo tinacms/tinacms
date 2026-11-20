@@ -18,7 +18,7 @@ import {
 import type { SaveHandler, SavedDocument } from './context';
 import type { FormViewStore } from './form-view-state';
 import { type FormBindings } from './form-bindings';
-import { forgetServerErrors, rememberServerErrors } from './server-errors';
+import { forgetServerErrors, holdServerErrors } from './server-errors';
 import { validateDocument } from './resolver';
 
 // Save refused because the document has validation errors. The form stays
@@ -184,13 +184,20 @@ const showServerFieldErrors = (
   for (const [address, messages] of Object.entries(cause.fieldErrors)) {
     if (messages) flat[address] = messages;
   }
-  rememberServerErrors(formId, flat, sent);
+  const open = useFormStore.getState().forms[formId];
+  const shown = holdServerErrors(
+    formId,
+    flat,
+    sent,
+    mounted ? mounted.getValues() : toDocument(open?.values ?? {})
+  );
+  if (Object.keys(shown).length === 0) return;
   if (mounted) {
-    mounted.setServerErrors(flat);
+    mounted.setServerErrors(shown);
     return;
   }
   const store = useFormStore.getState();
-  store.setFieldErrors(formId, mirrorErrors(flat));
+  store.setFieldErrors(formId, mirrorErrors(shown));
   store.setRevealOnOpen(formId);
 };
 

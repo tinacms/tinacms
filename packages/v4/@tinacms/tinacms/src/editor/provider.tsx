@@ -50,6 +50,7 @@ import {
   valuesEqual,
 } from '../form/form-store';
 import { blockOnFormErrors } from './block-errors';
+import { endServerErrorsIfChanged, forgetServerErrors } from './server-errors';
 import { registerFormBindings } from './form-bindings';
 import { checkForm } from './save-pipeline';
 import { UploadFormContext } from './uploads/upload-context';
@@ -273,6 +274,7 @@ const discardFormEdits = (
   const store = readFormStore();
   const scope = store.forms[formId];
   if (!isEdited(scope)) return;
+  forgetServerErrors(formId);
   const baseline = toDocument(scope.baseline);
   store.discardEdits(formId);
   resetForm(baseline);
@@ -370,8 +372,13 @@ const notifyWatchedFieldChange = (
   formId: FormId,
   path: string,
   collection: CollectionSchema,
-  trigger: (names: string[]) => Promise<boolean>
+  trigger: (names: string[]) => Promise<boolean>,
+  revalidate: () => void
 ) => {
+  // A refusal judged the whole document, so any change to the values ends
+  // every held server message. A list action has already moved the form's
+  // errors to new addresses, so the whole form is judged again by the client rules.
+  if (endServerErrorsIfChanged(formId, values).length > 0) revalidate();
   if (name === undefined) return;
   runOnChange(
     formHooks,
@@ -514,7 +521,11 @@ function useFormMethodSubscriptions(
         formId,
         path,
         collection,
-        methods.trigger
+        methods.trigger,
+        () => {
+          methods.clearErrors();
+          void methods.trigger();
+        }
       )
     );
     return () => unsubscribe();

@@ -134,5 +134,14 @@ describe('server messages for a form that was closed during Save all', () => {
       ).toBe(true)
     );
     expect(storeErrors()).toContain(address);
+
+    // The first change to any value ends every message of a reopened form too.
+    await userEvent.type(await screen.findByLabelText(/^Title\b/), '?');
+    await waitFor(() => expect(storeErrors()).toEqual([]));
+    expect(
+      screen
+        .queryAllByRole('alert')
+        .some((alert) => /Server says no/.test(alert.textContent ?? ''))
+    ).toBe(false);
   });
 });

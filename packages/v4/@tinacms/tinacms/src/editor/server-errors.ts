@@ -1,49 +1,77 @@
 import { get } from 'react-hook-form';
 import type { FormId } from '../form/form-store';
 
-// The messages a Backend refusal put on a form, each with the value it
-// refused. The form resolver adds them back while the value at that address
-// is unchanged, so a re-validation that the client rules pass (an array
-// action, a sibling rule) does not drop a message the server still holds.
-// A message ends when its value changes, and when the next save starts.
-interface Refusal {
-  messages: string[];
-  value: string;
+// A Backend refusal is a verdict on the whole document it received, so its
+// messages live together. They hold while the form's values equal the values
+// the form held when the refusal arrived, and all end the first time those
+// values differ (ADR-028 §5). The comparison is by value: a re-render, a focus
+// or an equal rewrite ends nothing, and a value changed back does not bring
+// them back.
+interface Held {
+  messages: Record<string, string[]>;
+  snapshot: string;
 }
 
-const refusals = new Map<FormId, Map<string, Refusal>>();
+const held = new Map<FormId, Held>();
 
-const fingerprint = (value: unknown): string => JSON.stringify(value) ?? '';
+const sortKeys = (_key: string, value: unknown): unknown => {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return value;
+  }
+  return Object.fromEntries(
+    Object.entries(value).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+  );
+};
 
-export const rememberServerErrors = (
+const fingerprint = (value: unknown): string =>
+  JSON.stringify(value, sortKeys) ?? '';
+
+/**
+ * Holds the messages of a refusal and returns the ones to show. A message
+ * whose field changed while the save ran judged a value the editor no longer
+ * has, so it is dropped. `current` is the form's values as the answer arrives.
+ */
+export const holdServerErrors = (
   formId: FormId,
   errors: Record<string, string[]>,
-  values: Record<string, unknown>
-): void => {
-  const held = new Map<string, Refusal>();
+  sent: Record<string, unknown>,
+  current: Record<string, unknown>
+): Record<string, string[]> => {
+  const shown: Record<string, string[]> = {};
   for (const [address, messages] of Object.entries(errors)) {
-    held.set(address, {
-      messages,
-      value: fingerprint(get(values, address)),
-    });
+    if (
+      fingerprint(get(current, address)) === fingerprint(get(sent, address))
+    ) {
+      shown[address] = messages;
+    }
   }
-  refusals.set(formId, held);
+  if (Object.keys(shown).length === 0) held.delete(formId);
+  else held.set(formId, { messages: shown, snapshot: fingerprint(current) });
+  return shown;
 };
 
-export const forgetServerErrors = (formId: FormId): void => {
-  refusals.delete(formId);
-};
-
-/** The remembered messages whose value is still the one the server refused. */
+/** The held messages, while `values` still equal the values of the refusal. */
 export const heldServerErrors = (
   formId: FormId,
   values: Record<string, unknown>
 ): Record<string, string[]> => {
-  const held: Record<string, string[]> = {};
-  for (const [address, refusal] of refusals.get(formId) ?? []) {
-    if (fingerprint(get(values, address)) === refusal.value) {
-      held[address] = refusal.messages;
-    }
-  }
-  return held;
+  const current = held.get(formId);
+  return current && fingerprint(values) === current.snapshot
+    ? current.messages
+    : {};
+};
+
+/** Ends every held message when `values` differ. Returns the addresses that held one. */
+export const endServerErrorsIfChanged = (
+  formId: FormId,
+  values: Record<string, unknown>
+): string[] => {
+  const current = held.get(formId);
+  if (!current || fingerprint(values) === current.snapshot) return [];
+  held.delete(formId);
+  return Object.keys(current.messages);
+};
+
+export const forgetServerErrors = (formId: FormId): void => {
+  held.delete(formId);
 };
