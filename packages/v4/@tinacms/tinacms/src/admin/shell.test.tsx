@@ -477,6 +477,18 @@ describe('Top bar', () => {
     await waitFor(() => expect(window.location.hash).toBe('#/collections'));
   });
 
+  it('shows no Navigation heading when no entry matches the query', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /Search/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Search' });
+    await user.type(within(dialog).getByRole('searchbox'), 'zzz');
+    expect(within(dialog).queryByText('Navigation')).toBeNull();
+    expect(
+      within(dialog).queryByRole('list', { name: 'Navigation results' })
+    ).toBeNull();
+  });
+
   it('keeps every Search row when two entries share a label', async () => {
     duplicateLabels = true;
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});

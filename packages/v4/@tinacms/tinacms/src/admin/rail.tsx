@@ -125,13 +125,22 @@ const withoutFixedRows = (entries: GlobalNavEntry[]) =>
   );
 
 // ADR-027 §2: ungrouped entries and groups share one list, already sorted by `order`.
-const railSections = (sections: GlobalNavSection[]) =>
-  sections.flatMap(({ group, entries }) => {
+// A group that holds only fixed rows drops out, so the runs on each side of it join.
+const railSections = (sections: GlobalNavSection[]) => {
+  const shown: GlobalNavSection[] = [];
+  for (const { group, entries } of sections) {
     const visible = withoutFixedRows(entries);
-    return visible.length > 0 ? [{ group, entries: visible }] : [];
-  });
+    if (visible.length === 0) continue;
+    const last = shown.at(-1);
+    if (group === undefined && last && last.group === undefined) {
+      last.entries.push(...visible);
+    } else {
+      shown.push({ group, entries: visible });
+    }
+  }
+  return shown;
+};
 
-/** Where a nav entry leads. */
 export function openNavTarget(
   target: NavTarget,
   navigate: (route: AdminRoute) => void
