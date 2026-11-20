@@ -431,3 +431,106 @@ describe('Branch switcher, the full design', () => {
     expect(onRetry).toHaveBeenCalledOnce();
   });
 });
+
+describe('Branch switcher controls', () => {
+  const entries = [
+    { name: 'feature/news' },
+    { name: 'fix/typo' },
+    { name: 'main', protected: true },
+  ];
+
+  it('opens and closes only through open and onOpenChange when controlled, and stays open after onCreate', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    const onCreate = vi.fn();
+    const { rerender } = render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        onCreate={onCreate}
+        baseBranch='main'
+        open={false}
+        onOpenChange={onOpenChange}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    rerender(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        onCreate={onCreate}
+        baseBranch='main'
+        open
+        onOpenChange={onOpenChange}
+      />
+    );
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      within(dialog).getByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      'cms/x'
+    );
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Create branch' })
+    );
+    expect(onCreate).toHaveBeenCalledWith('cms/x', 'feature/news');
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
+    expect(screen.getByRole('dialog', { name: 'Branches' })).toBeVisible();
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it('moves between rows with the keys in the maximised view', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        defaultOpen
+        defaultMaximised
+      />
+    );
+    const search = screen.getByRole('searchbox', { name: 'Search branches' });
+    await waitFor(() => expect(search).toHaveFocus());
+    await user.keyboard('{ArrowDown}');
+    const rows = screen
+      .getAllByRole('button', { name: /feature|fix|main/ })
+      .filter((row) => row.hasAttribute('data-branch-row'));
+    expect(rows[0]).toHaveFocus();
+    await user.keyboard('{End}');
+    expect(rows.at(-1)).toHaveFocus();
+    await user.keyboard('{Home}');
+    expect(rows[0]).toHaveFocus();
+  });
+
+  it('shows No branches match with Clear search, which empties and focuses the box', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        defaultOpen
+      />
+    );
+    const search = screen.getByRole('searchbox', { name: 'Search branches' });
+    await user.type(search, 'zzz');
+    expect(screen.getByText('No branches match “zzz”.')).toBeVisible();
+    const empty = screen.getByText('No branches match “zzz”.').parentElement;
+    if (!empty) throw new Error('no empty state');
+    await user.click(
+      within(empty).getByRole('button', { name: 'Clear search' })
+    );
+    expect(search).toHaveValue('');
+    expect(search).toHaveFocus();
+  });
+});

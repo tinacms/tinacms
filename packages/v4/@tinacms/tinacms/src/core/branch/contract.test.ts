@@ -1,10 +1,21 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, expectTypeOf, it, vi } from 'vitest';
+import type { ContentProvider } from '../content/contract';
 import { branchSliceOf } from './contract';
 
 const sliceWith = (saveToNewBranch: unknown) =>
   branchSliceOf({
     branch: { list: [], protected: [], switchTo: () => {}, saveToNewBranch },
   });
+
+describe('BranchSource', () => {
+  it('needs only list and defaultBranch', () => {
+    const branches = {
+      list: async () => [],
+      defaultBranch: async () => 'main',
+    };
+    expectTypeOf(branches).toExtend<NonNullable<ContentProvider['branches']>>();
+  });
+});
 
 describe('branchSliceOf create fields', () => {
   it('leaves create and creating undefined for a provider that cannot create', () => {

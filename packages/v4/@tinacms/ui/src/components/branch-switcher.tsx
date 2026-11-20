@@ -708,7 +708,7 @@ function LocalFilesBadge() {
   return (
     <Badge kind='label' className='max-w-full'>
       <Icon glyph='folder' size={14} />
-      <span className='max-[479px]:sr-only'>Local files</span>
+      <span className='max-[480px]:sr-only'>Local files</span>
     </Badge>
   );
 }

@@ -131,4 +131,28 @@ test.describe('branch switcher pop-up', () => {
     await expect(page.getByRole('dialog', { name: 'Branches' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Maximise' })).toHaveCount(0);
   });
+
+  for (const width of [479, 320]) {
+    test(`shows the Local files badge as an icon with its name at ${width}px without overflow`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/');
+      await page.waitForLoadState('networkidle');
+      const badge = page.getByRole('banner').getByText('Local files');
+      await expect(badge).toBeAttached();
+      await expect
+        .poll(async () => (await badge.boundingBox())?.width ?? 0)
+        .toBeLessThanOrEqual(1);
+      await expect(
+        page.getByRole('banner').getByRole('button', { name: /Search/ })
+      ).toBeVisible();
+      const overflow = await page.evaluate(
+        () =>
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth
+      );
+      expect(overflow).toBeLessThanOrEqual(0);
+    });
+  }
 });

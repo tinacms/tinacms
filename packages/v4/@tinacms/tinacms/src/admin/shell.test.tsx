@@ -1,7 +1,14 @@
 import { ImageIcon } from 'lucide-react';
 import { use, useEffect } from 'react';
 import { QueryClient } from '@tanstack/react-query';
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { returnToTree } from '../test/collection-tree';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -1938,6 +1945,149 @@ describe('branch switcher rows and creating a branch', () => {
         screen.getByRole('button', { name: 'Branch: cms/x' })
       ).toBeVisible()
     );
+  });
+
+  const openDocument = async (user: ReturnType<typeof userEvent.setup>) => {
+    window.location.hash = '#/collections/post';
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    return screen.findByLabelText(/^Title\b/);
+  };
+
+  it("counts the current branch's dirty form, and drops the badge once the edit is undone", async () => {
+    const user = userEvent.setup();
+    const title = await openDocument(user);
+    await user.type(title, '!');
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(
+      await within(dialog).findByRole('button', { name: /^main/ })
+    ).toHaveTextContent('1 unsaved');
+    await user.keyboard('{Escape}');
+    await user.click(title);
+    await user.keyboard('{Backspace}');
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const again = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(
+      await within(again).findByRole('button', { name: /^main/ })
+    ).not.toHaveTextContent('unsaved');
+  });
+
+  it('keeps New branch off while the list loads, and Create branch off with unsaved changes', async () => {
+    const user = userEvent.setup();
+    let release: () => void = () => {};
+    heldDefault = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    createBranch = async ({ name }) => ({ name });
+    const title = await openDocument(user);
+    await user.click(screen.getByRole('button', { name: 'Branches' }));
+    const loading = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(
+      within(loading).getByRole('button', { name: 'New branch' })
+    ).toBeDisabled();
+    release();
+    await within(loading).findByRole('button', { name: /^main/ });
+    await user.keyboard('{Escape}');
+    await user.type(title, '!');
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(
+      within(dialog).getByText('Save or discard your changes first')
+    ).toBeVisible();
+    await user.click(
+      within(dialog).getByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      'cms/x'
+    );
+    expect(
+      within(dialog).getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
+  });
+
+  it('stays put and toasts when a form became dirty while the branch was made', async () => {
+    let ready: () => void = () => {};
+    createBranch = async ({ name }) => ({
+      name,
+      ready: new Promise<void>((resolve) => {
+        ready = resolve;
+      }),
+    });
+    const user = userEvent.setup();
+    const title = await openDocument(user);
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      await within(dialog).findByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      'cms/x'
+    );
+    await press(dialog, user);
+    fireEvent.change(title, { target: { value: 'Hello!' } });
+    act(() => ready());
+    expect(await screen.findByText('cms/x is ready')).toBeVisible();
+    expect(screen.getByRole('button', { name: /^Branch: main/ })).toBeVisible();
+  });
+
+  it('refuses Switch in the ready toast, and a Retry, while a form is dirty', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let ready: () => void = () => {};
+    createBranch = async ({ name }) => ({
+      name,
+      ready: new Promise<void>((resolve) => {
+        ready = resolve;
+      }),
+    });
+    const user = userEvent.setup();
+    const title = await openDocument(user);
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      await within(dialog).findByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      'cms/x'
+    );
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    act(() => ready());
+    await screen.findByText('cms/x is ready');
+    await user.type(title, '!');
+    await user.click(screen.getByRole('button', { name: 'Switch to cms/x' }));
+    expect(
+      await screen.findByText('Save or discard your changes first')
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: /^Branch: main/ })).toBeVisible();
+  });
+
+  it("reads no other branch's drafts while the switcher is closed", async () => {
+    localStorage.setItem(
+      draftKey(toFormId('content/posts/hello.mdx'), undefined, 'other'),
+      JSON.stringify({
+        version: 2,
+        values: { title: 'Kept' },
+        baseline: { title: 'Hello' },
+      })
+    );
+    const read = vi.spyOn(window.localStorage, 'getItem');
+    const user = userEvent.setup();
+    const title = await openDocument(user);
+    await user.type(title, '!');
+    const touched = () =>
+      read.mock.calls.some(([key]) => String(key).includes('@@other'));
+    expect(touched()).toBe(false);
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await within(dialog).findByRole('button', { name: /^other/ });
+    await waitFor(() => expect(touched()).toBe(true));
+    read.mockRestore();
   });
 
   it('leaves Create branch off when the provider cannot create', async () => {
