@@ -1,11 +1,21 @@
-import { BranchSwitcher } from '@tinacms/ui/components/branch-switcher';
+import {
+  BranchSwitcher,
+  LocalFilesBadge,
+} from '@tinacms/ui/components/branch-switcher';
 import { SaveProgress } from '@tinacms/ui/components/save-progress';
 import { SidebarTrigger } from '@tinacms/ui/components/sidebar';
 import { StatusBar } from '@tinacms/ui/components/status-bar';
 import { TopBar } from '@tinacms/ui/components/top-bar';
 import tinaLogo from '@tinacms/ui/assets/tinacms-logo.svg';
-import { useEffect, useState } from 'react';
-import { useAnyFormDirty, useSaveSummary } from '../form/form-store';
+import { toast } from '@tinacms/ui/components/toast';
+import { use, useEffect, useRef, useState } from 'react';
+import {
+  readAnyFormDirty,
+  useAnyFormDirty,
+  useSaveSummary,
+} from '../form/form-store';
+import { TinaRuntimeContext } from '../editor/context';
+import { useBranchEntries } from './use-branch-entries';
 import { useBranchView } from '../editor/branch';
 import { AccountMenu } from './account-menu';
 import { SaveAllControl } from './save-all';
@@ -31,10 +41,91 @@ export function useLongSave(): boolean {
   return long;
 }
 
+type CreateRequest = { name: string; from: string };
+
 function BranchControl() {
+  const runtime = use(TinaRuntimeContext);
   const branch = useBranchView();
   const saving = useSaveSummary().state === 'saving';
   const dirty = useAnyFormDirty();
+  const [open, setOpen] = useState(false);
+  const [failed, setFailed] = useState<CreateRequest>();
+  const entries = useBranchEntries(branch, open);
+
+  const create = branch?.create;
+  const startCreate = (request: CreateRequest) => {
+    if (readAnyFormDirty()) {
+      toast({ tone: 'warning', title: 'Save or discard your changes first' });
+      return;
+    }
+    setFailed(undefined);
+    create?.(request.name, request.from);
+  };
+
+  // The create that is running, and where it began, outlive `creating` for the result below.
+  const started = useRef<{ startedOn: string | undefined }>(undefined);
+  if (branch?.creating) {
+    started.current = { startedOn: branch.creating.startedOn };
+  }
+
+  const result = branch?.createResult;
+  const latest = useRef({ branch, open, startCreate });
+  latest.current = { branch, open, startCreate };
+  useEffect(() => {
+    if (!result) return;
+    const { branch: view, open: isOpen, startCreate: retry } = latest.current;
+    runtime?.store.setState((state) => ({
+      branch: { ...state.branch, createResult: undefined },
+    }));
+    if (!view) return;
+    const { name, from, outcome } = result;
+    if (outcome === 'failed') {
+      if (isOpen) {
+        setFailed({ name, from });
+        return;
+      }
+      toast({
+        tone: 'error',
+        title: `Couldn't create ${name}`,
+        text: 'Check your connection, then retry.',
+        action: { label: 'Retry', onClick: () => retry({ name, from }) },
+      });
+      return;
+    }
+    if (outcome === 'unready') {
+      toast({
+        tone: 'warning',
+        title: `${name} isn't ready yet`,
+        text: 'It was made. Try switching to it in a few minutes.',
+      });
+      return;
+    }
+    const startedOn = started.current?.startedOn ?? view.defaultBranch;
+    if (isOpen && view.name === startedOn && !readAnyFormDirty()) {
+      view.switchTo(name);
+      setOpen(false);
+      return;
+    }
+    toast({
+      tone: 'success',
+      title: `${name} is ready`,
+      action: {
+        label: `Switch to ${name}`,
+        onClick: () => {
+          if (readAnyFormDirty()) {
+            toast({
+              tone: 'warning',
+              title: 'Save or discard your changes first',
+            });
+            return;
+          }
+          latest.current.branch?.switchTo(name);
+        },
+      },
+    });
+  }, [result, runtime]);
+
+  if (branch?.mode === 'local') return <LocalFilesBadge />;
   if (branch?.mode !== 'branches') return null;
   const loading = branch.listState === 'loading';
   if (!branch.name && !loading && branch.listState !== 'failed') return null;
@@ -43,10 +134,23 @@ function BranchControl() {
       current={branch.name}
       status={branch.listState ?? 'ready'}
       onRetry={branch.retryList}
-      branches={branch.branches}
+      branches={entries}
       disabled={saving}
       blockedMessage={dirty ? 'Save or discard your changes first' : undefined}
       onSwitch={branch.switchTo}
+      open={open}
+      onOpenChange={setOpen}
+      baseBranch={branch.defaultBranch}
+      onCreate={
+        create ? (name, from) => startCreate({ name, from }) : undefined
+      }
+      createState={
+        branch.creating
+          ? 'creating'
+          : failed || (result?.outcome === 'failed' && open)
+            ? 'failed'
+            : 'idle'
+      }
     />
   );
 }

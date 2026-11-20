@@ -15,6 +15,16 @@ const POLL_INTERVAL_MS = 1000;
 
 const POLL_TIMEOUT_MS = 30_000;
 
+const INDEX_POLL_MS = 5000;
+
+const INDEX_TIMEOUT_MS = 15 * 60 * 1000;
+
+const MAX_UNKNOWN_INDEX_STATUSES = 6;
+
+const createBranchResponseSchema = z.object({ ref: z.string().optional() });
+
+const indexStatusSchema = z.object({ status: z.string().optional() });
+
 const requestStatusSchema = z.object({
   error: z.boolean(),
   message: z.string().optional(),
@@ -47,6 +57,10 @@ export interface TinaCloudClientOptions extends TinaCloudOptions {
    * or `X-API-KEY` (an API token, as TinaCloud's Public Search token is).
    */
   credential?: 'bearer' | 'api-key';
+  /** How often a new branch's index status is read. */
+  indexPollMs?: number;
+  /** How long a new branch may take to index before `ready` rejects. */
+  indexTimeoutMs?: number;
 }
 
 const bodyMessage = (body: unknown): string | undefined => {
@@ -214,11 +228,70 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     );
   };
 
+  const waitForIndex = async (name: string): Promise<void> => {
+    const url = `${TINACLOUD_CONTENT_URL}/db/${options.clientId}/status/${name}`;
+    const pollMs = options.indexPollMs ?? INDEX_POLL_MS;
+    const timeoutMs = options.indexTimeoutMs ?? INDEX_TIMEOUT_MS;
+    const startedAt = Date.now();
+    let unknowns = 0;
+    while (true) {
+      const body = await authedFetch(url);
+      const status = indexStatusSchema.safeParse(body);
+      const value = status.success ? status.data.status : undefined;
+      if (value === 'complete') return;
+      if (value === 'failed') {
+        throw new TinaCloudError(`TinaCloud failed to index branch ${name}.`, {
+          body,
+        });
+      }
+      if (value !== 'inprogress') {
+        unknowns += 1;
+        if (unknowns >= MAX_UNKNOWN_INDEX_STATUSES) {
+          throw new TinaCloudError(
+            `TinaCloud could not report the index status of branch ${name}.`,
+            { body }
+          );
+        }
+      }
+      if (Date.now() - startedAt >= timeoutMs) {
+        throw new TinaCloudError(
+          `TinaCloud did not finish indexing branch ${name} in time.`,
+          {}
+        );
+      }
+      await sleep(pollMs);
+    }
+  };
+
+  const createBranch = async ({
+    name,
+    from,
+  }: {
+    name: string;
+    from: string;
+  }): Promise<{ name: string; ready: Promise<void> }> => {
+    const body = await authedFetch(
+      `${TINACLOUD_CONTENT_URL}/github/${options.clientId}/create_branch`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ baseBranch: from, branchName: name }),
+      }
+    );
+    const parsed = createBranchResponseSchema.safeParse(body);
+    const ref = parsed.success ? parsed.data.ref : undefined;
+    const made = ref ? ref.replace(/^refs\/heads\//, '') : name;
+    const ready = waitForIndex(made);
+    ready.catch(() => {});
+    return { name: made, ready };
+  };
+
   return {
     clientId: options.clientId,
     authedFetch,
     waitForRequest,
     getProject,
     listBranches,
+    createBranch,
   };
 };

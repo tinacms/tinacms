@@ -6,6 +6,35 @@ const sliceWith = (saveToNewBranch: unknown) =>
     branch: { list: [], protected: [], switchTo: () => {}, saveToNewBranch },
   });
 
+describe('branchSliceOf create fields', () => {
+  it('leaves create and creating undefined for a provider that cannot create', () => {
+    const slice = branchSliceOf({
+      branch: { list: [], protected: [], switchTo: () => {} },
+    });
+    expect(slice?.create).toBeUndefined();
+    expect(slice?.creating).toBeUndefined();
+    expect(slice?.createResult).toBeUndefined();
+  });
+
+  it('keeps a well-formed creating record and drops a malformed one', () => {
+    const base = { list: [], protected: [], switchTo: () => {} };
+    const creating = {
+      name: 'cms/x',
+      from: 'main',
+      startedOn: undefined,
+      phase: 'making',
+    };
+    expect(branchSliceOf({ branch: { ...base, creating } })?.creating).toEqual(
+      creating
+    );
+    expect(
+      branchSliceOf({
+        branch: { ...base, creating: { ...creating, phase: 'x' } },
+      })?.creating
+    ).toBeUndefined();
+  });
+});
+
 describe('branchSliceOf', () => {
   it('passes saveToNewBranch through when it is a function', async () => {
     const action = vi.fn().mockResolvedValue({

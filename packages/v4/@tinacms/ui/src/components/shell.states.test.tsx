@@ -66,20 +66,35 @@ describe('Top bar states', () => {
 });
 
 describe('Branch switcher states', () => {
-  it.each(branchSwitcherStates)('renders $name', ({ props, shows }) => {
-    render(<BranchSwitcher {...props} />);
-    const button = screen.getByRole('button', {
-      name: new RegExp(`^Branch: ${props.current}`),
-      hidden: true,
-    });
-    expect(button.hasAttribute('disabled')).toBe(props.disabled === true);
-    for (const words of shows) {
-      expect(screen.getAllByText(words).length).toBeGreaterThan(0);
+  it.each(branchSwitcherStates)(
+    'renders $name',
+    async ({ props, shows, openForm }) => {
+      const { createState, ...idle } = props;
+      const { rerender } = render(
+        <BranchSwitcher {...(openForm ? idle : props)} />
+      );
+      if (openForm) {
+        await userEvent.click(
+          screen.getByRole('button', { name: 'New branch' })
+        );
+        rerender(<BranchSwitcher {...props} />);
+      }
+      const button = screen.getByRole('button', {
+        name: new RegExp(`^Branch: ${props.current}`),
+        hidden: true,
+      });
+      expect(button.hasAttribute('disabled')).toBe(props.disabled === true);
+      for (const words of shows) {
+        expect(screen.getAllByText(words).length).toBeGreaterThan(0);
+      }
+      const framed = props.defaultOpen === true;
+      const maximised = props.defaultMaximised === true;
+      expect(screen.queryByRole('dialog') !== null).toBe(framed && !maximised);
+      expect(
+        document.querySelector('[data-slot="branch-maximised"]') !== null
+      ).toBe(framed && maximised);
     }
-    expect(screen.queryByRole('dialog') !== null).toBe(
-      props.defaultOpen === true
-    );
-  });
+  );
 });
 
 describe('Save to branch dialog states', () => {
@@ -352,7 +367,7 @@ describe('Branch switcher, the full design', () => {
     await user.click(
       within(dialog).getByRole('button', { name: 'Create branch' })
     );
-    expect(onCreate).toHaveBeenCalledWith('docs/astro-guide');
+    expect(onCreate).toHaveBeenCalledWith('docs/astro-guide', 'docs/v4-launch');
   });
 
   it.each([
@@ -410,7 +425,7 @@ describe('Branch switcher, the full design', () => {
     const onRetry = vi.fn();
     const { user, dialog } = await open({ status: 'failed', onRetry });
     expect(within(dialog).getByRole('alert')).toHaveTextContent(
-      "Couldn't load branches. You're still on docs/v4-launch and can keep editing."
+      "Couldn't load branches. Check your connection, then retry. You're still on docs/v4-launch and can keep editing."
     );
     await user.click(within(dialog).getByRole('button', { name: 'Retry' }));
     expect(onRetry).toHaveBeenCalledOnce();

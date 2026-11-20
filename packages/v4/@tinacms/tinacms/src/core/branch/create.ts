@@ -1,0 +1,69 @@
+import type { StoreApi } from 'zustand';
+import type { TinaStoreState } from '../plugin';
+import {
+  type BranchSource,
+  type BranchSlice,
+  branchSliceOf,
+  currentBranchOf,
+} from './contract';
+
+type Creatable = BranchSource & Required<Pick<BranchSource, 'create'>>;
+
+/**
+ * The `branch.create` slice action: makes the branch through the provider and records
+ * `creating` and `createResult`. It knows nothing about the pop-up; the shell reads the result.
+ * One create at a time.
+ */
+export const createBranchAction =
+  (store: StoreApi<TinaStoreState>, source: Creatable) =>
+  (name: string, from: string): void => {
+    if (branchSliceOf(store.getState())?.creating) return;
+    const fill = (patch: Partial<BranchSlice>) =>
+      store.setState((state) => ({ branch: { ...state.branch, ...patch } }));
+    const finish = (made: string, outcome: 'ready' | 'unready' | 'failed') =>
+      fill({
+        creating: undefined,
+        createResult: { name: made, from, outcome },
+      });
+
+    fill({
+      creating: {
+        name,
+        from,
+        startedOn: currentBranchOf(store.getState()),
+        phase: 'making',
+      },
+      createResult: undefined,
+    });
+    source.create({ name, from }).then(
+      ({ name: made, ready }) => {
+        const slice = branchSliceOf(store.getState());
+        fill({
+          list: slice?.list.includes(made)
+            ? slice.list
+            : [...(slice?.list ?? []), made],
+          creating: {
+            name: made,
+            from,
+            startedOn: slice?.creating?.startedOn,
+            phase: 'preparing',
+          },
+        });
+        if (!ready) {
+          finish(made, 'ready');
+          return;
+        }
+        ready.then(
+          () => finish(made, 'ready'),
+          (cause: unknown) => {
+            console.warn(`[tinacms] ${made} was made but is not ready:`, cause);
+            finish(made, 'unready');
+          }
+        );
+      },
+      (cause: unknown) => {
+        console.warn(`[tinacms] could not create branch ${name}:`, cause);
+        finish(name, 'failed');
+      }
+    );
+  };

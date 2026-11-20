@@ -1209,6 +1209,9 @@ export const useSaveAllFailureCount = (): number =>
 
 export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
 
+/** Whether any form is dirty right now, for code that runs outside a render. */
+export const readAnyFormDirty = (): boolean => anyFormDirty(readFormStore());
+
 export const useSaveAllState = (): SaveAllState =>
   useFormStore((state) => state.saveAll);
 
