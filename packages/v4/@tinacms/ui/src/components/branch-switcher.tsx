@@ -291,6 +291,24 @@ function BranchSwitcher({
   const failed =
     createState === 'failed' && !dismissed && typed === attempted.current;
   const actionsRef = useRef<HTMLDivElement>(null);
+  const startRef = useRef<HTMLDivElement>(null);
+  const [stacked, setStacked] = useState(false);
+  useEffect(() => {
+    const group = startRef.current;
+    if (!creating || !group) return;
+    const measure = () => {
+      const [first, second] = group.querySelectorAll<HTMLElement>('button');
+      setStacked(
+        first !== undefined &&
+          second !== undefined &&
+          first.offsetTop !== second.offsetTop
+      );
+    };
+    measure();
+    const watch = new ResizeObserver(measure);
+    watch.observe(group);
+    return () => watch.disconnect();
+  }, [creating]);
   useEffect(() => {
     if (failed) actionsRef.current?.scrollIntoView?.({ block: 'nearest' });
   }, [failed]);
@@ -331,7 +349,7 @@ function BranchSwitcher({
   useEffect(() => {
     if (!creating) return;
     focusField('name');
-    formRef.current?.scrollIntoView?.({ block: 'nearest' });
+    actionsRef.current?.scrollIntoView?.({ block: 'nearest' });
   }, [creating]);
 
   /** The field in the frame on screen: the pop-up and the maximised view each hold their own. */
@@ -478,7 +496,13 @@ function BranchSwitcher({
                 : ` You're still on ${current} and can keep editing.`}
             </span>
             {onRetry ? (
-              <Button size='sm' onClick={onRetry}>
+              <Button
+                size='sm'
+                onClick={() => {
+                  onRetry();
+                  focusField('search');
+                }}
+              >
                 Retry
               </Button>
             ) : null}
@@ -566,19 +590,23 @@ function BranchSwitcher({
                 {nameError}
               </p>
             ) : null}
-            <div className='flex flex-col gap-1'>
+            <div ref={startRef} className='flex flex-col gap-1'>
               <span className='text-xs font-medium text-muted-foreground-strong'>
                 Start from
               </span>
               {startOptions.length > 1 ? (
                 <Segmented
                   size='sm'
+                  orientation={stacked ? 'vertical' : 'horizontal'}
                   aria-label='Start from'
                   options={startOptions}
                   value={startFrom}
                   disabled={busy}
                   onValueChange={setStartFrom}
-                  className='w-full max-w-full flex-wrap rounded-2xl *:h-auto! *:min-h-7 *:min-w-[min(100%,9rem)] *:flex-1 *:justify-start *:py-1 *:text-left *:whitespace-normal *:[overflow-wrap:anywhere]'
+                  className={cn(
+                    'w-full max-w-full flex-wrap *:h-auto! *:min-h-7 *:min-w-[min(100%,9rem)] *:flex-1 *:justify-start *:py-1 *:text-left *:whitespace-normal *:[overflow-wrap:anywhere]',
+                    stacked ? 'rounded-[10px]' : 'rounded-2xl'
+                  )}
                 />
               ) : (
                 <span className='font-mono text-sm tracking-code'>
@@ -619,7 +647,6 @@ function BranchSwitcher({
                   !onCreate ||
                   from === undefined ||
                   blocked ||
-                  busy ||
                   (typed !== '' && nameError !== undefined)
                 }
               >
@@ -729,10 +756,8 @@ function BranchSwitcher({
       {shown && maximised
         ? createPortal(
             <MaximisedView
-              onKeyDown={(event) => {
-                move(event);
-                if (event.key === 'Escape') closeAndFocusButton();
-              }}
+              onKeyDown={move}
+              onEscape={closeAndFocusButton}
               focusTarget={creating ? nameRef : searchRef}
             >
               {panel(({ children }) => (
@@ -750,15 +775,26 @@ function BranchSwitcher({
 function MaximisedView({
   children,
   onKeyDown,
+  onEscape,
   focusTarget,
 }: {
   children: ReactNode;
   onKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
+  onEscape: () => void;
   focusTarget: { current: HTMLInputElement | null };
 }) {
   useEffect(() => {
     focusTarget.current?.focus();
   }, [focusTarget]);
+  const escape = useRef(onEscape);
+  escape.current = onEscape;
+  useEffect(() => {
+    const close = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape' && !event.defaultPrevented) escape.current();
+    };
+    document.addEventListener('keydown', close);
+    return () => document.removeEventListener('keydown', close);
+  }, []);
   return (
     <section
       aria-label='Branches'

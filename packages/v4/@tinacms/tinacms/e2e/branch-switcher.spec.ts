@@ -454,4 +454,80 @@ test.describe('branch switcher pop-up', () => {
     await page.keyboard.press('ArrowRight');
     await expect(options.nth(1)).toBeFocused();
   });
+
+  test('stacks long Start from options with up and down arrows and a smaller radius', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto(
+      '/branches.html?docs=1&many=2&branch=feature/a-very-long-default-branch-name-for-start-from-check&create=ok#/'
+    );
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: /many\/branch-1/ }).click();
+    await page.getByRole('button', { name: /^Branch: many\/branch-1/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    const group = page.getByRole('group', { name: 'Start from' });
+    const options = group.getByRole('button');
+    const [a, b] = await Promise.all([
+      options.nth(0).boundingBox(),
+      options.nth(1).boundingBox(),
+    ]);
+    expect((b?.y ?? 0) - (a?.y ?? 0)).toBeGreaterThan(10);
+    await expect(group).toHaveAttribute('data-orientation', 'vertical');
+    const radius = await group.evaluate((el) =>
+      parseFloat(getComputedStyle(el).borderTopLeftRadius)
+    );
+    expect(radius).toBeLessThanOrEqual(12);
+    await options.nth(0).focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(options.nth(1)).toBeFocused();
+  });
+
+  test('has the action row in view when New branch opens on a short screen', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 400 });
+    await page.goto('/branches.html?docs=1&many=30&create=ok#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    await page.waitForTimeout(400);
+    const inside = await page.evaluate(() => {
+      const button = [...document.querySelectorAll('button')].find(
+        (b) => b.textContent === 'Create branch'
+      );
+      const box = button?.closest('[role="dialog"]');
+      if (!button || !box) return false;
+      const b = button.getBoundingClientRect();
+      const c = box.getBoundingClientRect();
+      return (
+        b.bottom <= c.bottom + 1 &&
+        b.top >= c.top - 1 &&
+        b.bottom <= window.innerHeight
+      );
+    });
+    expect(inside).toBe(true);
+  });
+
+  test('keeps focus in the form after Retry, and Escape still closes the maximised view', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto('/branches.html?docs=1&create=fail#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'Maximise' }).click();
+    const view = page.locator('[data-slot="branch-maximised"]');
+    await view.getByRole('button', { name: 'New branch' }).click();
+    await view
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/x');
+    await view.getByRole('button', { name: 'Create branch' }).click();
+    const retry = view.getByRole('button', { name: 'Retry' });
+    await expect(retry).toBeVisible();
+    await retry.click();
+    await expect(view.getByRole('button', { name: 'Creating' })).toBeFocused();
+    await expect(retry).toBeVisible();
+    await expect(retry).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(view).toBeHidden();
+  });
 });

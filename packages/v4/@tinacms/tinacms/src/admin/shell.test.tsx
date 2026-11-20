@@ -1774,7 +1774,7 @@ describe('branch switcher rows and creating a branch', () => {
     expect(create).toHaveBeenCalledWith({ name: 'cms/x', from: 'main' });
     expect(
       await within(dialog).findByRole('button', { name: 'Creating' })
-    ).toBeDisabled();
+    ).toHaveAttribute('aria-disabled', 'true');
     expect(within(dialog).queryByRole('alert')).toBeNull();
     act(() => ready());
     await waitFor(() =>

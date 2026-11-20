@@ -738,4 +738,63 @@ describe('Branch switcher controls', () => {
     await user.click(screen.getByRole('button', { name: 'Clear search' }));
     expect(search).toHaveFocus();
   });
+
+  it('keeps focus on the Create button while it creates, and puts it in the search box after the list Retry', async () => {
+    const user = userEvent.setup();
+    const props = {
+      current: 'feature/news',
+      branches: entries,
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    await user.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/a'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    expect(screen.getByRole('button', { name: 'Creating' })).toHaveFocus();
+    rerender(<BranchSwitcher {...props} createState='failed' />);
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
+
+    const onRetry = vi.fn();
+    rerender(
+      <BranchSwitcher
+        {...props}
+        createState='idle'
+        status='failed'
+        onRetry={onRetry}
+      />
+    );
+    await user.click(
+      screen.getAllByRole('button', { name: 'Retry' }).at(-1) as HTMLElement
+    );
+    expect(onRetry).toHaveBeenCalledOnce();
+    expect(
+      screen.getByRole('searchbox', { name: 'Search branches' })
+    ).toHaveFocus();
+  });
+
+  it('closes the maximised view on Escape even when focus is on the page body', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        defaultOpen
+        defaultMaximised
+        onOpenChange={onOpenChange}
+      />
+    );
+    (document.activeElement as HTMLElement | null)?.blur();
+    expect(document.body).toHaveFocus();
+    await user.keyboard('{Escape}');
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
 });
