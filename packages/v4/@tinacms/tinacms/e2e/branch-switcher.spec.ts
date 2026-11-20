@@ -278,4 +278,47 @@ test.describe('branch switcher pop-up', () => {
       popup.getByRole('button', { name: 'Create branch' })
     ).toBeInViewport();
   });
+
+  for (const size of [
+    { width: 1280, height: 380 },
+    { width: 390, height: 330 },
+  ]) {
+    test(`keeps Create branch reachable on a ${size.width}x${size.height} screen`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(size);
+      await page.goto('/branches.html?docs=1&many=40&create=slow#/');
+      await page.getByRole('button', { name: /^Branch:/ }).click();
+      await page.getByRole('button', { name: 'New branch' }).click();
+      await page
+        .getByRole('searchbox', { name: 'New branch name' })
+        .fill('cms/x');
+      const create = page.getByRole('button', { name: 'Create branch' });
+      await page.getByRole('searchbox', { name: 'New branch name' }).hover();
+      const fits = () =>
+        page.evaluate(() => {
+          const button = [...document.querySelectorAll('button')].find(
+            (b) => b.textContent === 'Create branch'
+          );
+          const box = button?.closest('[role="dialog"]');
+          if (!button || !box) return false;
+          const b = button.getBoundingClientRect();
+          const c = box.getBoundingClientRect();
+          return (
+            b.bottom <= c.bottom + 1 &&
+            b.top >= c.top - 1 &&
+            b.bottom <= window.innerHeight
+          );
+        });
+      for (let at = 0; at < 12 && !(await fits()); at += 1) {
+        await page.mouse.wheel(0, 300);
+        await page.waitForTimeout(100);
+      }
+      expect(await fits()).toBe(true);
+      await create.click();
+      await expect(
+        page.getByRole('button', { name: 'Creating' })
+      ).toBeVisible();
+    });
+  }
 });

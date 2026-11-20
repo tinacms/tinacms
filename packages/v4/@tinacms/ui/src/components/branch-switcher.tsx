@@ -259,6 +259,7 @@ function BranchSwitcher({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const isProtected = branches.some(
     (branch) => branch.name === current && branch.protected
   );
@@ -316,7 +317,9 @@ function BranchSwitcher({
   });
 
   useEffect(() => {
-    if (creating) nameRef.current?.focus();
+    if (!creating) return;
+    nameRef.current?.focus();
+    formRef.current?.scrollIntoView?.({ block: 'nearest' });
   }, [creating]);
 
   const closeAndFocusButton = () => {
@@ -490,110 +493,112 @@ function BranchSwitcher({
             />
           </>
         )}
-      </div>
-      {creating ? (
-        <form
-          aria-label='New branch form'
-          className='flex flex-none flex-col gap-2 border-t border-border-subtle pt-3'
-          onSubmit={(event) => {
-            event.preventDefault();
-            submit();
-          }}
-        >
-          <h3 className='m-0 text-base font-semibold'>New branch</h3>
-          <p className='m-0 text-sm text-muted-foreground'>
-            It starts with no unsaved changes. Yours stay on the branch they
-            were made on.
-          </p>
-          <SearchBox
-            ref={nameRef}
-            label='New branch name'
-            placeholder='Branch name'
-            icon='branch'
-            value={newName}
-            readOnly={busy}
-            onChange={(event) => {
-              setNewName(event.target.value);
-              if (event.target.value.trim() === '' && newName !== '') {
-                setSubmitted(true);
-              }
+        {creating ? (
+          <form
+            ref={formRef}
+            aria-label='New branch form'
+            className='flex flex-none flex-col gap-2 border-t border-border-subtle pt-3'
+            onSubmit={(event) => {
+              event.preventDefault();
+              submit();
             }}
-            onClear={
-              busy
-                ? undefined
-                : () => {
-                    setNewName('');
-                    setSubmitted(true);
-                  }
-            }
-            aria-invalid={nameError ? true : undefined}
-          />
-          <p className='m-0 text-xs text-muted-foreground'>
-            {BRANCH_NAME_HINT}
-          </p>
-          {nameError ? (
-            <p role='alert' className='m-0 text-sm text-destructive'>
-              {nameError}
+          >
+            <h3 className='m-0 text-base font-semibold'>New branch</h3>
+            <p className='m-0 text-sm text-muted-foreground'>
+              It starts with no unsaved changes. Yours stay on the branch they
+              were made on.
             </p>
-          ) : null}
-          <div className='flex flex-col gap-1'>
-            <span className='text-xs font-medium text-muted-foreground-strong'>
-              Start from
-            </span>
-            {startOptions.length > 1 ? (
-              <Segmented
-                size='sm'
-                aria-label='Start from'
-                options={startOptions}
-                value={startFrom}
-                disabled={busy}
-                onValueChange={setStartFrom}
-                className='max-w-full'
-              />
-            ) : (
-              <span className='font-mono text-sm tracking-code'>
-                {current ?? baseBranch}
-                {current === undefined ? '' : ' (current)'}
-              </span>
-            )}
-          </div>
-          {failed ? (
-            <p role='alert' className='m-0 text-sm text-destructive'>
-              Couldn't create {attempted.current}. Check your connection, then
-              retry.
-            </p>
-          ) : null}
-          <div className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'>
-            <Button
-              className='max-md:h-auto max-md:min-h-9'
-              disabled={busy}
-              onClick={() => {
-                setCreating(false);
-                setDismissed(true);
+            <SearchBox
+              ref={nameRef}
+              label='New branch name'
+              placeholder='Branch name'
+              icon='branch'
+              value={newName}
+              readOnly={busy}
+              onChange={(event) => {
+                setNewName(event.target.value);
+                if (event.target.value.trim() === '' && newName !== '') {
+                  setSubmitted(true);
+                }
               }}
-            >
-              <span className='min-w-0 max-md:py-1.5 max-md:whitespace-normal'>
-                Back to branches
-              </span>
-            </Button>
-            <Button
-              variant='primary'
-              type='submit'
-              busy={busy}
-              className='max-md:h-auto max-md:min-h-9'
-              disabled={
-                !onCreate ||
-                from === undefined ||
-                blocked ||
-                busy ||
-                (typed !== '' && nameError !== undefined)
+              onClear={
+                busy
+                  ? undefined
+                  : () => {
+                      setNewName('');
+                      setSubmitted(true);
+                    }
               }
-            >
-              {busy ? 'Creating' : failed ? 'Retry' : 'Create branch'}
-            </Button>
-          </div>
-        </form>
-      ) : (
+              aria-invalid={nameError ? true : undefined}
+            />
+            <p className='m-0 text-xs text-muted-foreground'>
+              {BRANCH_NAME_HINT}
+            </p>
+            {nameError ? (
+              <p role='alert' className='m-0 text-sm text-destructive'>
+                {nameError}
+              </p>
+            ) : null}
+            <div className='flex flex-col gap-1'>
+              <span className='text-xs font-medium text-muted-foreground-strong'>
+                Start from
+              </span>
+              {startOptions.length > 1 ? (
+                <Segmented
+                  size='sm'
+                  aria-label='Start from'
+                  options={startOptions}
+                  value={startFrom}
+                  disabled={busy}
+                  onValueChange={setStartFrom}
+                  className='max-w-full'
+                />
+              ) : (
+                <span className='font-mono text-sm tracking-code'>
+                  {current ?? baseBranch}
+                  {current === undefined ? '' : ' (current)'}
+                </span>
+              )}
+            </div>
+            {failed ? (
+              <p role='alert' className='m-0 text-sm text-destructive'>
+                Couldn't create {attempted.current}. Check your connection, then
+                retry.
+              </p>
+            ) : null}
+            <div className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'>
+              <Button
+                className='max-md:h-auto max-md:min-h-9'
+                disabled={busy}
+                onClick={() => {
+                  setCreating(false);
+                  setDismissed(true);
+                }}
+              >
+                <span className='min-w-0 max-md:py-1.5 max-md:whitespace-normal'>
+                  Back to branches
+                </span>
+              </Button>
+              <Button
+                variant='primary'
+                type='submit'
+                busy={busy}
+                className='max-md:h-auto max-md:min-h-9'
+                disabled={
+                  !onCreate ||
+                  from === undefined ||
+                  blocked ||
+                  busy ||
+                  (typed !== '' && nameError !== undefined)
+                }
+              >
+                {busy ? 'Creating' : failed ? 'Retry' : 'Create branch'}
+              </Button>
+            </div>
+          </form>
+        ) : null}
+      </div>
+      {creating ? null : (
         <div className='flex-none border-t border-border-subtle pt-2'>
           <Button
             variant='ghost'
