@@ -449,6 +449,7 @@ test.describe('branch switcher pop-up', () => {
     const radius = await group.evaluate((el) =>
       parseFloat(getComputedStyle(el).borderTopLeftRadius)
     );
+    expect(radius).toBeGreaterThan(8);
     expect(radius).toBeLessThan(40);
     await options.nth(0).focus();
     await page.keyboard.press('ArrowRight');
@@ -529,5 +530,125 @@ test.describe('branch switcher pop-up', () => {
     await expect(retry).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(view).toBeHidden();
+  });
+
+  for (const size of [
+    { width: 1280, height: 400 },
+    { width: 768, height: 400 },
+  ]) {
+    test(`keeps the action row clear of the Status bar after a failure in the maximised view at ${size.width}x${size.height}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(size);
+      await page.goto('/branches.html?docs=1&many=30&create=fail#/');
+      await page.getByRole('button', { name: /^Branch:/ }).click();
+      await page.getByRole('button', { name: 'Maximise' }).click();
+      const view = page.locator('[data-slot="branch-maximised"]');
+      await view.getByRole('button', { name: 'New branch' }).click();
+      await view
+        .getByRole('searchbox', { name: 'New branch name' })
+        .fill('cms/x');
+      await view.getByRole('button', { name: 'Create branch' }).click();
+      const retry = view.getByRole('button', { name: 'Retry' });
+      await expect(retry).toBeVisible();
+      await page.waitForTimeout(400);
+      const clear = await page.evaluate(() => {
+        const button = [...document.querySelectorAll('button')].find(
+          (b) => b.textContent === 'Retry'
+        );
+        const bar = document.querySelector('[aria-label="Status bar"]');
+        if (!button || !bar) return false;
+        const b = button.getBoundingClientRect();
+        const hit = document.elementFromPoint(
+          b.x + b.width / 2,
+          b.y + b.height / 2
+        );
+        return (
+          b.bottom <= bar.getBoundingClientRect().top + 1 &&
+          button.contains(hit)
+        );
+      });
+      expect(clear).toBe(true);
+    });
+  }
+
+  test('has the action row in view after Maximise and after Restore with the form open', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 400 });
+    await page.goto('/branches.html?docs=1&many=30&create=ok#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    await page
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/x');
+    const rowInView = () =>
+      page.evaluate(() => {
+        const button = [...document.querySelectorAll('button')].find(
+          (b) => b.textContent === 'Create branch'
+        );
+        const bar = document.querySelector('[aria-label="Status bar"]');
+        if (!button || !bar) return false;
+        const b = button.getBoundingClientRect();
+        const hit = document.elementFromPoint(
+          b.x + b.width / 2,
+          b.y + b.height / 2
+        );
+        return (
+          b.bottom <= bar.getBoundingClientRect().top + 1 &&
+          button.contains(hit)
+        );
+      });
+    const view = page.locator('[data-slot="branch-maximised"]');
+    await page.getByRole('button', { name: 'Maximise' }).click();
+    await expect(view).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+    await page.waitForTimeout(400);
+    expect(await rowInView()).toBe(true);
+    await view.getByRole('button', { name: 'Restore' }).click();
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeVisible();
+    await page.waitForTimeout(400);
+    expect(await rowInView()).toBe(true);
+  });
+
+  test('stacks as soon as an option wraps past one line, with soft corners', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto(
+      '/branches.html?docs=1&many=2&branch=feature/a-very-long-default-branch-name-for-start-from-check-and-it-keeps-going&create=ok#/'
+    );
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: /many\/branch-1/ }).click();
+    await page.getByRole('button', { name: /^Branch: many\/branch-1/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    const group = page.getByRole('group', { name: 'Start from' });
+    await expect(group).toHaveAttribute('data-orientation', 'vertical');
+    const radius = await group.evaluate((el) =>
+      parseFloat(getComputedStyle(el).borderTopLeftRadius)
+    );
+    expect(radius).toBeGreaterThan(0);
+    expect(radius).toBeLessThanOrEqual(12);
+  });
+
+  test('puts focus in the name field after Restore with the form open', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto('/branches.html?docs=1&create=ok#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    await page
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/x');
+    const view = page.locator('[data-slot="branch-maximised"]');
+    await page.getByRole('button', { name: 'Maximise' }).click();
+    await expect(view).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+    await view.getByRole('button', { name: 'Restore' }).click();
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeVisible();
+    await expect(
+      page.getByRole('searchbox', { name: 'New branch name' })
+    ).toBeFocused();
   });
 });

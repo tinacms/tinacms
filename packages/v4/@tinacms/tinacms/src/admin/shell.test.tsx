@@ -2154,6 +2154,45 @@ describe('branch switcher rows and creating a branch', () => {
     expect(await screen.findByText("Couldn't create cms/x")).toBeVisible();
   });
 
+  it('reports a retried create that fails while the maximised view shows an empty form', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const rejects: ((cause: Error) => void)[] = [];
+    createBranch = vi.fn<NonNullable<BranchSource['create']>>(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejects.push(reject);
+        })
+    );
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    act(() => rejects[0](new Error('offline')));
+    await screen.findByText("Couldn't create cms/x");
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      within(reopened).getByRole('button', { name: 'Maximise' })
+    );
+    await waitFor(() =>
+      expect(
+        document.querySelector('[data-slot="branch-maximised"]')
+      ).not.toBeNull()
+    );
+    const view = document.querySelector(
+      '[data-slot="branch-maximised"]'
+    ) as HTMLElement;
+    await user.click(within(view).getByRole('button', { name: 'New branch' }));
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    await waitFor(() => expect(rejects).toHaveLength(2));
+    await waitFor(() =>
+      expect(screen.queryByText("Couldn't create cms/x")).toBeNull()
+    );
+    act(() => rejects[1](new Error('offline')));
+    expect(await screen.findByText("Couldn't create cms/x")).toBeVisible();
+  });
+
   it('dismisses the failure toast when its Retry is pressed', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     let fail: (cause: Error) => void = () => {};

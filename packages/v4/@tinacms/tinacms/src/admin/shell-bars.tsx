@@ -51,6 +51,7 @@ function BranchControl() {
   const [open, setOpen] = useState(false);
   const [failed, setFailed] = useState<CreateRequest>();
   const [formShown, setFormShown] = useState(false);
+  const startedVia = useRef<'form' | 'toast'>('form');
   const entries = useBranchEntries(branch, open);
 
   const create = branch?.create;
@@ -58,10 +59,12 @@ function BranchControl() {
     branch: typeof branch;
     open: boolean;
     formShown: boolean;
-    startCreate: (request: CreateRequest) => boolean;
+    startCreate: (request: CreateRequest, via?: 'form' | 'toast') => boolean;
   }>({ branch, open, formShown, startCreate: () => false });
-  /** Starts the create, or says why not. True when it started. */
-  const startCreate = (request: CreateRequest): boolean => {
+  const startCreate = (
+    request: CreateRequest,
+    via: 'form' | 'toast' = 'form'
+  ): boolean => {
     if (readAnyFormDirty()) {
       toast({ tone: 'warning', title: 'Save or discard your changes first' });
       return false;
@@ -76,6 +79,7 @@ function BranchControl() {
       return false;
     }
     setFailed(undefined);
+    startedVia.current = via;
     create?.(request.name, request.from);
     return true;
   };
@@ -91,7 +95,7 @@ function BranchControl() {
     if (!view) return;
     const { name, from, startedOn: began, outcome } = result;
     if (outcome === 'failed') {
-      if (isOpen && latest.current.formShown) {
+      if (isOpen && latest.current.formShown && startedVia.current === 'form') {
         setFailed({ name, from });
         return;
       }
@@ -102,7 +106,7 @@ function BranchControl() {
         action: {
           label: 'Retry',
           onClick: () => {
-            if (retry({ name, from })) toast.dismiss(failure);
+            if (retry({ name, from }, 'toast')) toast.dismiss(failure);
           },
         },
       });
@@ -164,7 +168,11 @@ function BranchControl() {
       createState={
         branch.creating
           ? 'creating'
-          : failed || (result?.outcome === 'failed' && open && formShown)
+          : failed ||
+              (result?.outcome === 'failed' &&
+                open &&
+                formShown &&
+                startedVia.current === 'form')
             ? 'failed'
             : 'idle'
       }

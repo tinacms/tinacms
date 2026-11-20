@@ -207,6 +207,12 @@ function BranchGroup({
   );
 }
 
+/** Runs `run` once the frame on screen has laid out; the returned function cancels it. */
+const afterPaint = (run: () => void) => {
+  const id = requestAnimationFrame(() => requestAnimationFrame(run));
+  return () => cancelAnimationFrame(id);
+};
+
 /** State that is controlled when the caller passes `value`, else kept here. */
 function useControllable(
   value: boolean | undefined,
@@ -262,7 +268,6 @@ function BranchSwitcher({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
   const isProtected = branches.some(
     (branch) => branch.name === current && branch.protected
   );
@@ -290,28 +295,37 @@ function BranchSwitcher({
   const attempted = useRef('');
   const failed =
     createState === 'failed' && !dismissed && typed === attempted.current;
-  const actionsRef = useRef<HTMLDivElement>(null);
-  const startRef = useRef<HTMLDivElement>(null);
+  const frame = () =>
+    document.querySelector('[data-slot="branch-maximised"]') ?? document;
+  const focusField = (field: 'search' | 'name') => {
+    frame()
+      .querySelector<HTMLInputElement>(`[data-branch-field="${field}"]`)
+      ?.focus();
+  };
+  const showActions = () => {
+    frame()
+      .querySelector('[data-branch-actions]')
+      ?.scrollIntoView?.({ block: 'nearest' });
+  };
   const [stacked, setStacked] = useState(false);
   useEffect(() => {
-    const group = startRef.current;
+    const group = frame().querySelector<HTMLElement>('[data-branch-start]');
     if (!creating || !group) return;
     const measure = () => {
-      const [first, second] = group.querySelectorAll<HTMLElement>('button');
+      const options = [...group.querySelectorAll<HTMLElement>('button')];
+      const rows = new Set(options.map((option) => option.offsetTop));
       setStacked(
-        first !== undefined &&
-          second !== undefined &&
-          first.offsetTop !== second.offsetTop
+        rows.size > 1 || options.some((option) => option.offsetHeight > 36)
       );
     };
     measure();
     const watch = new ResizeObserver(measure);
     watch.observe(group);
     return () => watch.disconnect();
-  }, [creating]);
+  }, [creating, maximised]);
   useEffect(() => {
-    if (failed) actionsRef.current?.scrollIntoView?.({ block: 'nearest' });
-  }, [failed]);
+    if (failed) return afterPaint(showActions);
+  }, [failed, maximised]);
   useEffect(() => setDismissed(false), [createState]);
 
   // A create that finished or was given up returns to the list; a failed one keeps the form.
@@ -338,6 +352,7 @@ function BranchSwitcher({
     if (staleTier) setOpen(false);
   });
 
+  // However it closed, the next open starts as the pop-up.
   useEffect(() => {
     if (!open && maximised) setMaximised(false);
   });
@@ -349,17 +364,8 @@ function BranchSwitcher({
   useEffect(() => {
     if (!creating) return;
     focusField('name');
-    actionsRef.current?.scrollIntoView?.({ block: 'nearest' });
-  }, [creating]);
-
-  /** The field in the frame on screen: the pop-up and the maximised view each hold their own. */
-  const focusField = (field: 'search' | 'name') => {
-    const frame =
-      document.querySelector('[data-slot="branch-maximised"]') ?? document;
-    frame
-      .querySelector<HTMLInputElement>(`[data-branch-field="${field}"]`)
-      ?.focus();
-  };
+    return afterPaint(showActions);
+  }, [creating, maximised]);
 
   const closeAndFocusButton = () => {
     setOpen(false);
@@ -543,7 +549,6 @@ function BranchSwitcher({
         )}
         {creating ? (
           <form
-            ref={formRef}
             aria-label='New branch form'
             className='flex flex-none flex-col gap-2 border-t border-border-subtle pt-3'
             onSubmit={(event) => {
@@ -590,7 +595,7 @@ function BranchSwitcher({
                 {nameError}
               </p>
             ) : null}
-            <div ref={startRef} className='flex flex-col gap-1'>
+            <div data-branch-start='' className='flex flex-col gap-1'>
               <span className='text-xs font-medium text-muted-foreground-strong'>
                 Start from
               </span>
@@ -605,7 +610,7 @@ function BranchSwitcher({
                   onValueChange={setStartFrom}
                   className={cn(
                     'w-full max-w-full flex-wrap *:h-auto! *:min-h-7 *:min-w-[min(100%,9rem)] *:flex-1 *:justify-start *:py-1 *:text-left *:whitespace-normal *:[overflow-wrap:anywhere]',
-                    stacked ? 'rounded-[10px]' : 'rounded-2xl'
+                    stacked ? 'rounded-[10px]' : 'rounded-[18px]'
                   )}
                 />
               ) : (
@@ -622,7 +627,7 @@ function BranchSwitcher({
               </p>
             ) : null}
             <div
-              ref={actionsRef}
+              data-branch-actions=''
               className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'
             >
               <Button
@@ -731,7 +736,7 @@ function BranchSwitcher({
           side='bottom'
           align='start'
           sideOffset={6}
-          initialFocus={searchRef}
+          initialFocus={() => (creating ? nameRef.current : searchRef.current)}
           onKeyDown={move}
           onBlur={(event) => {
             const next = event.relatedTarget;

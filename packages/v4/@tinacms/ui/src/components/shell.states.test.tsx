@@ -698,13 +698,15 @@ describe('Branch switcher controls', () => {
     scrolled.mockClear();
     rerender(<BranchSwitcher {...props} createState='failed' />);
     expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
-    expect(
-      scrolled.mock.contexts.some(
-        (el) =>
-          el instanceof Element &&
-          el.contains(screen.getByRole('button', { name: 'Retry' }))
-      )
-    ).toBe(true);
+    await waitFor(() =>
+      expect(
+        scrolled.mock.contexts.some(
+          (el) =>
+            el instanceof Element &&
+            el.contains(screen.getByRole('button', { name: 'Retry' }))
+        )
+      ).toBe(true)
+    );
     await user.type(box, 'b');
     expect(screen.queryByText(/Couldn't create/)).toBeNull();
     expect(screen.getByRole('button', { name: 'Create branch' })).toBeVisible();
