@@ -578,7 +578,7 @@ function BranchSwitcher({
                   value={startFrom}
                   disabled={busy}
                   onValueChange={setStartFrom}
-                  className='w-full max-w-full flex-col *:h-auto! *:min-h-7 *:min-w-0 *:justify-start *:py-1 *:text-left *:whitespace-normal *:[overflow-wrap:anywhere]'
+                  className='w-full max-w-full flex-wrap rounded-2xl *:h-auto! *:min-h-7 *:min-w-[min(100%,9rem)] *:flex-1 *:justify-start *:py-1 *:text-left *:whitespace-normal *:[overflow-wrap:anywhere]'
                 />
               ) : (
                 <span className='font-mono text-sm tracking-code'>

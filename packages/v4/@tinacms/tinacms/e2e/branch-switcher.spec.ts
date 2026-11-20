@@ -428,4 +428,30 @@ test.describe('branch switcher pop-up', () => {
     });
     expect(broken).toEqual([]);
   });
+
+  test('lays short Start from options in one row with soft corners, and moves between them with the arrow keys', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto('/branches.html?docs=1&many=2&create=ok#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: /many\/branch-1/ }).click();
+    await page.getByRole('button', { name: /^Branch: many\/branch-1/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    const group = page.getByRole('group', { name: 'Start from' });
+    const options = group.getByRole('button');
+    await expect(options).toHaveCount(2);
+    const [a, b] = await Promise.all([
+      options.nth(0).boundingBox(),
+      options.nth(1).boundingBox(),
+    ]);
+    expect(Math.abs((a?.y ?? 0) - (b?.y ?? 99))).toBeLessThanOrEqual(1);
+    const radius = await group.evaluate((el) =>
+      parseFloat(getComputedStyle(el).borderTopLeftRadius)
+    );
+    expect(radius).toBeLessThan(40);
+    await options.nth(0).focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(options.nth(1)).toBeFocused();
+  });
 });
