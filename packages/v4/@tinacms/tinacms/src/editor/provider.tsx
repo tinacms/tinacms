@@ -50,7 +50,11 @@ import {
   valuesEqual,
 } from '../form/form-store';
 import { blockOnFormErrors } from './block-errors';
-import { endServerErrorsIfChanged, forgetServerErrors } from './server-errors';
+import {
+  endServerErrorsIfChanged,
+  forgetServerErrors,
+  heldServerErrors,
+} from './server-errors';
 import { registerFormBindings } from './form-bindings';
 import { checkForm } from './save-pipeline';
 import { UploadFormContext } from './uploads/upload-context';
@@ -676,7 +680,11 @@ export function FormProvider({
     if (!store.revealOnOpen[formId]) return;
     view.getState().attemptSave();
     store.clearRevealOnOpen(formId);
-  }, [formId, view]);
+    // A refusal that Save All left on this form blocks Save here as it did on an open form.
+    if (Object.keys(heldServerErrors(formId, methods.getValues())).length > 0) {
+      blockOnFormErrors(formId, view, collection, methods.getValues);
+    }
+  }, [formId, view, methods, collection]);
   useEffect(() => {
     view.getState().showLevels([]);
   }, [fieldSeedKey, view]);

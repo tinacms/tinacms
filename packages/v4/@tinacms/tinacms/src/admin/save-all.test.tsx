@@ -1344,6 +1344,10 @@ describe('Server field errors from Save All', () => {
 
     await goTo('post', POST_B);
     expect(await screen.findByRole('alert')).toHaveTextContent('Slug is taken');
+    // Save blocks here as it does on a form that stayed open.
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
   });
 });
 
