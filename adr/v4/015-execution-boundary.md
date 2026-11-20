@@ -24,7 +24,7 @@
 - It establishes a clear bias: **prefer declarative over custom** for anything that must be enforced on managed TinaCloud (since only declarative artifacts run there).
 
 ### Open dependency — the save path (resolved)
-Whether a Backend `beforeSave` is a **true enforcement gate** depends on whether content writes route **Client → Backend → Data Layer** or **Client → Data Layer directly**. **Resolved by [ADR-018](./018-save-flow.md): path A** — content writes go Client → Data Layer directly, enforcement lives at the Data Layer write point, and a client `beforeSave` that calls the Backend is only advisory. **Amended by [ADR-028](./028-server-save-hooks.md):** a save to a collection with a server hook goes Client → Backend → Data Layer, so a Backend `beforeSave` is an enforcement gate for that collection on every Data Layer.
+Whether a Backend `beforeSave` is a **true enforcement gate** depends on whether content writes route **Client → Backend → Data Layer** or **Client → Data Layer directly**. **Resolved by [ADR-018](./018-save-flow.md): path A** — content writes go Client → Data Layer directly, enforcement lives at the Data Layer write point, and a client `beforeSave` that calls the Backend is only advisory. **Amended by [ADR-028](./028-server-save-hooks.md):** a save to a collection with a server hook or a custom validator goes Client → Backend → Data Layer, so a Backend `beforeSave` and the collection's validators are an enforcement gate for that collection on every Data Layer.
 
 ## Alternatives Considered
 - **Run sandboxed plugin code inside TinaCloud** — *rejected*: there is no safe way to run arbitrary user formatters/validators in managed infra; that risk is precisely why TinaCloud's surface is fixed and first-party.

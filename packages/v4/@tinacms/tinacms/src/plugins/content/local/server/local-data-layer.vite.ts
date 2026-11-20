@@ -18,6 +18,8 @@ import {
   createServerHookRegistry,
   createServerSave,
 } from '../../../../core/form/server-hooks';
+import { storedHelpersOf } from '../../../../core/form/server-validation';
+import { createServerValidatorRegistry } from '../../../../core/validator/server-registry';
 import { invariant } from '../../../../core/invariant';
 import { capabilityProvider } from '../../../../core/mount';
 import {
@@ -480,6 +482,8 @@ export const tinaLocalDataLayerVitePlugin = (
       (resolved) =>
         createServerSave({
           hooks: createServerHookRegistry(plugins, resolved),
+          validators: createServerValidatorRegistry(plugins, resolved),
+          stored: storedHelpersOf(plugins),
           collections,
           write: ({ collection, path: documentPath, value }) =>
             kind === 'create'

@@ -41,7 +41,7 @@ export const postCollection = {
       label: 'Title',
       validators: [
         required(),
-        matches('^[A-Z]', 'Start with a capital letter'),
+        ...(isLocal ? [matches('^[A-Z]', 'Start with a capital letter')] : []),
       ],
     }),
     t.string({
@@ -63,13 +63,15 @@ export const postCollection = {
       name: 'stars',
       label: 'Stars',
       // A sibling rule: `stars` is top level, so `siblings` is the document root.
-      validators: [
-        requiredWhen(
-          'status',
-          'published',
-          'Rate the post before you publish it'
-        ),
-      ],
+      validators: isLocal
+        ? [
+            requiredWhen(
+              'status',
+              'published',
+              'Rate the post before you publish it'
+            ),
+          ]
+        : [],
     }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
     t.array({
@@ -83,9 +85,9 @@ export const postCollection = {
           name: 'alias',
           label: 'Alias',
           // A sibling rule: `siblings` is this author, not the document root.
-          validators: [
-            differentFrom('name', 'Alias must differ from the name'),
-          ],
+          validators: isLocal
+            ? [differentFrom('name', 'Alias must differ from the name')]
+            : [],
         }),
       ],
     }),

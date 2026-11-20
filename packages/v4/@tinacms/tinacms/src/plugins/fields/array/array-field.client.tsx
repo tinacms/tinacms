@@ -3,7 +3,7 @@ import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import { TEMPLATE_KEY, nestedValuesOf } from '../../../core/schema/children';
 import { isRecord } from '../../../utils/is-record';
 import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
-import { validateFieldTree } from '../../../core/validation';
+import { joinAddress, validateFieldTree } from '../../../core/validation';
 import {
   type ObjectArrayFieldSchema,
   arraySchema,
@@ -101,7 +101,7 @@ export default defineClientPlugin({
       const errors: Record<string, string[]> = {};
       for (const nested of nestedValuesOf(field, value)) {
         if (nested.index === undefined) continue;
-        const at = `${address}.${nested.index}`;
+        const at = joinAddress(address, nested.index);
         if ('field' in nested) {
           Object.assign(
             errors,
@@ -125,7 +125,7 @@ export default defineClientPlugin({
               subfield,
               registry.get(subfield.type),
               siblings[subfield.name],
-              `${at}.${subfield.name}`,
+              joinAddress(at, subfield.name),
               registry,
               { ...scope, siblings }
             )

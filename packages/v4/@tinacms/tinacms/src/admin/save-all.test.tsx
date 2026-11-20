@@ -1294,6 +1294,33 @@ describe('Revealed errors show only on the first open', () => {
   });
 });
 
+describe('Server field errors from Save All', () => {
+  it("shows a refused document's messages on its fields when it opens", async () => {
+    consoleGuard.expect(/Save failed/);
+    failWrite.set(
+      POST_B,
+      new ContentError('validation', undefined, {
+        [toFieldAddress('slug')]: ['Slug is taken'],
+      })
+    );
+    const user = userEvent.setup();
+    window.location.hash = hashOf('post', POST_B);
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-x');
+    await goTo('post', POST);
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-y');
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 1 of 2 documents')
+      ).toBeVisible()
+    );
+
+    await goTo('post', POST_B);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Slug is taken');
+  });
+});
+
 describe('Status bar after a run', () => {
   it('shows a later single save, not the finished run', async () => {
     const user = userEvent.setup();

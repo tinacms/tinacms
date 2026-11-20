@@ -28,6 +28,7 @@ import {
   type TinaStoreState,
 } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
+import { customValidatorNamesOf } from '../core/validator/registry';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { createScreenRegistry } from '../core/screen/registry';
 import { createGlobalNav } from '../core/slot/global-nav';
@@ -63,7 +64,11 @@ import {
   type StaleDraftActions,
   type WaitingCause,
 } from './context';
-import { flattenFieldErrors, nestFieldErrors } from './field-errors';
+import {
+  flattenFieldErrors,
+  nestFieldErrors,
+  toFieldErrorEntry,
+} from './field-errors';
 import { useFormViewStore } from './form-view-state';
 import { buildFormResolver } from './resolver';
 
@@ -126,6 +131,7 @@ export function TinaProvider({
         validators: createValidatorRegistry(resolved),
         hooks: createFormHookRegistry(resolved),
         serverHooks: serverHookNamesOf(composedPlugins),
+        customValidators: customValidatorNamesOf(composedPlugins),
         store: createTinaStore(resolved, {
           rpcUrl: config.rpcUrl ?? DEFAULT_RPC_URL,
         }),
@@ -640,6 +646,11 @@ export function FormProvider({
         validate: () => checkForm(formId, view, methods.trigger),
         getValues: methods.getValues,
         setValue: (address, value) => methods.setValue(address, value),
+        setServerErrors: (errors) => {
+          for (const [address, messages] of Object.entries(errors)) {
+            methods.setError(address, toFieldErrorEntry(messages));
+          }
+        },
         reseedFields,
         resetReveal: () => view.getState().resetReveal(),
       }),

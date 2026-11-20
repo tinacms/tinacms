@@ -10,7 +10,8 @@ import {
   type DocumentSummary,
 } from '../core/content/contract';
 import type { TinaStoreState } from '../core/plugin';
-import type { CollectionSchema } from '../core/schema/types';
+import type { CollectionSchema, ValidatorRef } from '../core/schema/types';
+import { t } from '../index';
 import {
   contentKeys,
   useCollectionDocuments,
@@ -31,7 +32,8 @@ const renderWithContent = (
   provider: ContentProvider,
   collections: CollectionSchema[] = [],
   serverHooks: ReadonlySet<string> = new Set(),
-  rpcUrl = '/api/tina'
+  rpcUrl = '/api/tina',
+  customValidators: ReadonlySet<string> = new Set()
 ) => {
   const store = createStore<TinaStoreState>()(() => ({
     content: provider as unknown as Record<string, unknown>,
@@ -40,6 +42,7 @@ const renderWithContent = (
     store,
     schema: { collections },
     serverHooks,
+    customValidators,
     rpcUrl,
   } as unknown as TinaRuntime;
   const queryClient = new QueryClient({
@@ -399,7 +402,7 @@ describe('useSaveDocument on a collection with a server hook', () => {
     });
     await expect(rejection).rejects.toBeInstanceOf(ContentError);
     await expect(rejection).rejects.toThrow(
-      "This collection has server hooks, so it needs the site's server route."
+      "This collection runs checks on the site's server, so it needs the site's server route."
     );
     expect(provider.update).not.toHaveBeenCalled();
   });
@@ -445,5 +448,162 @@ describe('useSaveDocument on a collection with a server hook', () => {
       code: 'hook-rejected',
       message: 'Only admins can publish',
     });
+  });
+});
+
+describe('useSaveDocument on a collection with a custom validator', () => {
+  const field = (name: string, rest: { validators?: ValidatorRef[] } = {}) =>
+    t.string({ name, ...rest });
+  const custom = [{ name: 'acme.after' }];
+  const collection = (name: string, fields: CollectionSchema['fields']) =>
+    ({ name, format: 'mdx', fields }) satisfies CollectionSchema;
+  const collections = [
+    collection('top', [field('a', { validators: custom })]),
+    collection('nested', [
+      t.object({ name: 'seo', fields: [field('a', { validators: custom })] }),
+    ]),
+    collection('item', [
+      t.array({ name: 'tags', of: field('tag', { validators: custom }) }),
+    ]),
+    collection('blocks', [
+      t.array({
+        name: 'blocks',
+        templates: [
+          { name: 'hero', fields: [field('a')] },
+          { name: 'cta', fields: [field('a', { validators: custom })] },
+        ],
+      }),
+    ]),
+    collection('builtin', [field('a', { validators: [{ name: 'required' }] })]),
+    collection('overridden', [
+      field('a', { validators: [{ name: 'required' }] }),
+    ]),
+  ];
+
+  const render = (customNames: string[]) => {
+    const provider = stubProvider();
+    const { wrapper } = renderWithContent(
+      provider,
+      collections,
+      new Set(),
+      '/api/tina',
+      new Set(customNames)
+    );
+    return { provider, ...renderHook(() => useSaveDocument(), { wrapper }) };
+  };
+  const stubRoute = (respond: () => Response) => {
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) =>
+      respond()
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    return fetchMock;
+  };
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it.each(['top', 'nested', 'item', 'blocks'])(
+    'routes %s through content/update at any depth, even with no values',
+    async (name) => {
+      const fetchMock = stubRoute(() =>
+        Response.json({
+          entry: { path: 'p.mdx', document: {} },
+          hookWarnings: [],
+        })
+      );
+      const { provider, result } = render(['acme.after']);
+      await result.current.save({ collection: name, path: 'p.mdx', value: {} });
+      expect(fetchMock.mock.calls[0][0]).toBe('/api/tina/content/update');
+      expect(provider.update).not.toHaveBeenCalled();
+    }
+  );
+
+  it('writes straight to the provider while only built-in validators are listed', async () => {
+    const fetchMock = stubRoute(() => new Response('no', { status: 500 }));
+    const { provider, result } = render(['acme.after']);
+    await result.current.save({
+      collection: 'builtin',
+      path: 'p.mdx',
+      value: {},
+    });
+    expect(provider.update).toHaveBeenCalledTimes(1);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('routes a built-in name that another plugin overrides', async () => {
+    const fetchMock = stubRoute(() =>
+      Response.json({
+        entry: { path: 'p.mdx', document: {} },
+        hookWarnings: [],
+      })
+    );
+    const { result } = render(['required']);
+    await result.current.save({
+      collection: 'overridden',
+      path: 'p.mdx',
+      value: {},
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('turns a 422 validation answer into a ContentError with its field errors', async () => {
+    stubRoute(() =>
+      Response.json(
+        {
+          error: {
+            code: 'validation',
+            message: 'Some fields are not valid. Fix them and try again.',
+            fieldErrors: {
+              'authors.1.alias': ['Must differ'],
+              '': ['dropped'],
+              bad: 'not a list',
+              also: [1],
+            },
+          },
+        },
+        { status: 422 }
+      )
+    );
+    const { result } = render(['acme.after']);
+    const rejection = result.current.save({
+      collection: 'top',
+      path: 'p.mdx',
+      value: {},
+    });
+    await expect(rejection).rejects.toMatchObject({
+      code: 'validation',
+      fieldErrors: { 'authors.1.alias': ['Must differ'] },
+    });
+  });
+
+  it('keeps the validation code when no field error is valid', async () => {
+    stubRoute(() =>
+      Response.json(
+        {
+          error: {
+            code: 'validation',
+            message: 'x',
+            fieldErrors: { '': ['a'] },
+          },
+        },
+        { status: 422 }
+      )
+    );
+    const { result } = render(['acme.after']);
+    const rejection = result.current.save({
+      collection: 'top',
+      path: 'p.mdx',
+      value: {},
+    });
+    await expect(rejection).rejects.toMatchObject({ code: 'validation' });
+    await expect(rejection).rejects.toHaveProperty('fieldErrors', undefined);
+  });
+
+  it('fails with the server-route error on a site with no server route, and never writes directly', async () => {
+    stubRoute(() => new Response('Not found', { status: 404 }));
+    const { provider, result } = render(['acme.after']);
+    await expect(
+      result.current.save({ collection: 'top', path: 'p.mdx', value: {} })
+    ).rejects.toMatchObject({ code: 'server-route-missing' });
+    expect(provider.update).not.toHaveBeenCalled();
   });
 });

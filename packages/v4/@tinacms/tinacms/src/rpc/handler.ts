@@ -11,7 +11,13 @@ import {
   createServerHookRegistry,
   createServerSave,
 } from '../core/form/server-hooks';
+import { storedHelpersOf } from '../core/form/server-validation';
 import { invariant } from '../core/invariant';
+import { customValidatorNamesOf } from '../core/validator/registry';
+import {
+  type ServerValidatorRegistry,
+  createServerValidatorRegistry,
+} from '../core/validator/server-registry';
 import { capabilityMountsFor, capabilityProvider } from '../core/mount';
 import {
   REGISTRY_CONFLICTS,
@@ -61,8 +67,8 @@ export interface RpcHandlerConfig {
   // route is the last two segments of the path, so any prefix reaches an operation and
   // a proxy rule keyed on an exact path does not hold. Set it to pin the route.
   rpcUrl?: string;
-  // The collections, so a content save runs the server hooks each one lists.
-  // Required once a plugin registers a server hook.
+  // The collections, so a content save runs the validators and the server hooks
+  // each one lists. Required once a plugin registers a server hook or a custom validator.
   schema?: TinaSchema;
 }
 
@@ -147,11 +153,16 @@ export const createRpcHandler = ({
 const composeServerSegments = async (
   plugins: PluginManifest[]
 ): Promise<
-  Omit<ServerRuntime, 'destroy' | 'collections'> & { hooks: ServerHookRegistry }
+  Omit<ServerRuntime, 'destroy' | 'collections'> & {
+    hooks: ServerHookRegistry;
+    validators: ServerValidatorRegistry;
+    stored: ReturnType<typeof storedHelpersOf>;
+  }
 > => {
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
   const hooks = createServerHookRegistry(plugins, resolved);
+  const validators = createServerValidatorRegistry(plugins, resolved);
   const segmentsByNamespace = composeOverridableRegistry(
     resolved.flatMap((segment) =>
       capabilityMountsFor(segment.manifest).map((mount) => ({
@@ -165,6 +176,8 @@ const composeServerSegments = async (
   claimServerHookFactories(segmentsByNamespace);
   return {
     hooks,
+    validators,
+    stored: storedHelpersOf(plugins),
     searchIndex: claimSearchIndexProvider(
       segmentsByNamespace,
       capabilityProvider(plugins, 'search')
@@ -186,18 +199,25 @@ const composeServerRuntime = async (
   plugins: PluginManifest[],
   schema: TinaSchema | undefined
 ): Promise<ServerRuntime> => {
-  const { hooks, ...composed } = await composeServerSegments(plugins);
+  const { hooks, validators, stored, ...composed } =
+    await composeServerSegments(plugins);
   const { resolveBranch } = composed;
   invariant(
-    hooks.size === 0 || schema,
+    (hooks.size === 0 && customValidatorNamesOf(plugins).size === 0) || schema,
     'rpc-server-hooks-no-schema',
-    'A plugin registers a server hook, but the RPC handler has no `schema`. ' +
-      'Pass the config schema to mountHandler so a save runs the hooks its collection lists.'
+    'A plugin registers a server hook or a custom validator, but the RPC handler has no `schema`. ' +
+      'Pass the config schema to mountHandler so a save runs the validators and the hooks its collection lists.'
   );
   wrapContentSave(
     composed.segmentsByNamespace,
     capabilityProvider(plugins, 'content'),
-    { hooks, collections: schema?.collections, resolveBranch }
+    {
+      hooks,
+      validators,
+      stored,
+      collections: schema?.collections,
+      resolveBranch,
+    }
   );
   // The init runs last, so a failed composition leaves no initialized plugin behind
   // for the next attempt. The teardown travels on the runtime: a handler that is
@@ -212,7 +232,7 @@ const lazyRuntimeOf = (plugins: PluginManifest[]) => {
   let composing: Promise<ServerRuntime> | null = null;
   return (): Promise<ServerRuntime> => {
     composing ??= composeServerSegments(plugins).then(
-      (composed) => ({
+      ({ hooks, validators, stored, ...composed }) => ({
         ...composed,
         collections: [],
         destroy: async () => {},
@@ -289,12 +309,12 @@ export const createOpContextRunner = (plugins: PluginManifest[]) => {
   };
 };
 
-// The reserved `hooks` key holds server hook factories, not an op, so it never routes.
+// The reserved `hooks` and `validators` keys hold factories, not ops, so they never route.
 const claimServerHookFactories = (
   segmentsByNamespace: Map<string, ResolvedServerSegment>
 ): void => {
   for (const [namespace, segment] of segmentsByNamespace) {
-    const { hooks, ...routableOps } = segment.ops;
+    const { hooks, validators, ...routableOps } = segment.ops;
     segmentsByNamespace.set(namespace, { ...segment, ops: routableOps });
   }
 };

@@ -15,7 +15,7 @@ import {
   toFormValues,
   useFormStore,
 } from '../form/form-store';
-import type { SaveHandler } from './context';
+import type { SaveHandler, SavedDocument } from './context';
 import type { FormViewStore } from './form-view-state';
 import { type FormBindings } from './form-bindings';
 import { validateDocument } from './resolver';
@@ -162,6 +162,29 @@ const validateWithoutForm = (target: SaveTarget): void => {
   throw new FormValidationError();
 };
 
+// The Backend, or TinaCloud, refused the save with messages for fields. They
+// show like the form's own: on the open form, or in the store for the form
+// that opens later. The values stay as the editor typed them.
+const showServerFieldErrors = (
+  { formId }: SaveTarget,
+  mounted: FormBindings | undefined,
+  cause: unknown
+): void => {
+  if (!(cause instanceof ContentError) || cause.code !== 'validation') return;
+  if (!cause.fieldErrors) return;
+  const flat: Record<string, string[]> = {};
+  for (const [address, messages] of Object.entries(cause.fieldErrors)) {
+    if (messages) flat[address] = messages;
+  }
+  if (mounted) {
+    mounted.setServerErrors(flat);
+    return;
+  }
+  const store = useFormStore.getState();
+  store.setFieldErrors(formId, mirrorErrors(flat));
+  store.setRevealOnOpen(formId);
+};
+
 /**
  * The one save flow: validate, digest, `beforeSave`, write, adopt the saved
  * values, `afterSave`. `bindings` is read at each step that needs the form,
@@ -197,7 +220,13 @@ export function saveDocument(
       hookScope
     );
     stage('write');
-    const saved = await write?.(digested);
+    let saved: void | SavedDocument;
+    try {
+      saved = await write?.(digested);
+    } catch (cause) {
+      showServerFieldErrors(target, bindings(), cause);
+      throw cause;
+    }
     const savedDocument = saved ? saved.document : digested;
     const written = adoptSavedValues(
       formId,
