@@ -51,6 +51,7 @@ function BranchControl() {
   const [open, setOpen] = useState(false);
   const [failed, setFailed] = useState<CreateRequest>();
   const [formShown, setFormShown] = useState(false);
+  const [toastFailure, setToastFailure] = useState<string>();
   const startedVia = useRef<'form' | 'toast'>('form');
   const entries = useBranchEntries(branch, open);
 
@@ -79,10 +80,15 @@ function BranchControl() {
       return false;
     }
     setFailed(undefined);
+    setToastFailure(undefined);
     startedVia.current = via;
     create?.(request.name, request.from);
     return true;
   };
+
+  useEffect(() => {
+    if (!open) setToastFailure(undefined);
+  }, [open]);
 
   const result = branch?.createResult;
   latest.current = { branch, open, formShown, startCreate };
@@ -99,6 +105,7 @@ function BranchControl() {
         setFailed({ name, from });
         return;
       }
+      if (isOpen) setToastFailure(name);
       const failure = toast({
         tone: 'error',
         title: `Couldn't create ${name}`,
@@ -161,6 +168,7 @@ function BranchControl() {
       open={open}
       onOpenChange={setOpen}
       onFormChange={setFormShown}
+      failedBranch={toastFailure}
       baseBranch={branch.defaultBranch}
       onCreate={
         create ? (name, from) => startCreate({ name, from }) : undefined

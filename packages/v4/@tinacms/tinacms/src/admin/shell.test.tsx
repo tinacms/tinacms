@@ -2193,6 +2193,69 @@ describe('branch switcher rows and creating a branch', () => {
     expect(await screen.findByText("Couldn't create cms/x")).toBeVisible();
   });
 
+  const failFromToast = async (type?: string) => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const rejects: ((cause: Error) => void)[] = [];
+    createBranch = vi.fn<NonNullable<BranchSource['create']>>(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejects.push(reject);
+        })
+    );
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    act(() => rejects[0](new Error('offline')));
+    await screen.findByText("Couldn't create cms/x");
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      within(reopened).getByRole('button', { name: 'Maximise' })
+    );
+    await waitFor(() =>
+      expect(
+        document.querySelector('[data-slot="branch-maximised"]')
+      ).not.toBeNull()
+    );
+    const view = document.querySelector(
+      '[data-slot="branch-maximised"]'
+    ) as HTMLElement;
+    if (type !== undefined) {
+      await user.click(
+        within(view).getByRole('button', { name: 'New branch' })
+      );
+      await user.type(
+        within(view).getByRole('searchbox', { name: 'New branch name' }),
+        type
+      );
+    }
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    await waitFor(() => expect(rejects).toHaveLength(2));
+    act(() => rejects[1](new Error('offline')));
+    return { view, user };
+  };
+
+  it('shows a toast-started failure inside the maximised view, where a toast may sit under it', async () => {
+    const { view } = await failFromToast();
+    expect(
+      await within(view).findByText(
+        "Couldn't create cms/x. Check your connection, then retry."
+      )
+    ).toBeVisible();
+  });
+
+  it('keeps what was typed in the New branch form when a toast-started create ends', async () => {
+    const { view } = await failFromToast('draft-name');
+    await within(view).findByText(
+      "Couldn't create cms/x. Check your connection, then retry."
+    );
+    expect(
+      within(view).getByRole('searchbox', { name: 'New branch name' })
+    ).toHaveValue('draft-name');
+  });
+
   it('dismisses the failure toast when its Retry is pressed', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     let fail: (cause: Error) => void = () => {};

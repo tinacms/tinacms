@@ -62,6 +62,8 @@ type BranchSwitcherProps = {
   onFormChange?: (shown: boolean) => void;
   /** `creating` shows "Creating" on the form; `failed` keeps the form with a Retry. */
   createState?: 'idle' | 'creating' | 'failed';
+  /** A branch that failed to create without the form: shown as a note above the list, as a toast may sit under this view. */
+  failedBranch?: string;
   /** `loading` shows a skeleton and `failed` shows the problem with Retry, both in place. */
   status?: 'ready' | 'loading' | 'failed';
   onRetry?: () => void;
@@ -249,6 +251,7 @@ function BranchSwitcher({
   baseBranch,
   onFormChange,
   createState = 'idle',
+  failedBranch,
   status = 'ready',
   onRetry,
   open: openProp,
@@ -330,12 +333,16 @@ function BranchSwitcher({
 
   // A create that finished or was given up returns to the list; a failed one keeps the form.
   const lastCreateState = useRef(createState);
+  const startedHere = useRef(false);
   useEffect(() => {
-    if (lastCreateState.current === 'creating' && createState === 'idle') {
-      setCreating(false);
-      setNewName('');
-      setSubmitted(false);
-      setStartFrom('current');
+    if (lastCreateState.current === 'creating') {
+      if (createState === 'idle' && startedHere.current) {
+        setCreating(false);
+        setNewName('');
+        setSubmitted(false);
+        setStartFrom('current');
+      }
+      startedHere.current = false;
     }
     lastCreateState.current = createState;
   }, [createState]);
@@ -419,6 +426,7 @@ function BranchSwitcher({
     if (typed === '' || branchNameError(typed, takenNames, true)) return;
     if (!onCreate || from === undefined || blocked || busy) return;
     attempted.current = typed;
+    startedHere.current = true;
     onCreate(typed, from);
   };
 
@@ -475,6 +483,11 @@ function BranchSwitcher({
           focusField('search');
         }}
       />
+      {failedBranch !== undefined ? (
+        <p role='alert' className='m-0 flex-none text-sm text-destructive'>
+          Couldn't create {failedBranch}. Check your connection, then retry.
+        </p>
+      ) : null}
       <div className='flex min-h-0 flex-col gap-3 overflow-y-auto'>
         {status === 'loading' ? (
           <div
