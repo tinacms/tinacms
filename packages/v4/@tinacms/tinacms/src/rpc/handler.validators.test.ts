@@ -336,17 +336,21 @@ describe('the Backend runs validators before a save', () => {
   });
 
   it('does not walk deeper than the schema', async () => {
-    const { save } = setup({
+    const { handler, update } = setup({
       fields: [field('string', 'title', { validators: [required()] })],
     });
-    const deep: Record<string, unknown> = {};
-    let cursor = deep;
-    for (let depth = 0; depth < 5000; depth += 1) {
-      cursor.next = {};
-      cursor = cursor.next as Record<string, unknown>;
-    }
-    const response = await save({ title: deep });
+    // Built as text, so the test needs no deep recursion of its own.
+    const depth = 1000;
+    const deep = `${'{"next":'.repeat(depth)}{}${'}'.repeat(depth)}`;
+    const response = await handler(
+      new Request('http://localhost/api/tina/content/update', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: `{"collection":"post","path":"content/posts/a.mdx","value":{"title":${deep}}}`,
+      })
+    );
     expect(response.status).toBe(200);
+    expect(update).toHaveBeenCalledTimes(1);
   });
 
   it('answers a generic 500 for a validator that throws or returns a non-message', async () => {

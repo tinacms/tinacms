@@ -959,8 +959,12 @@ describe('server field errors in the document form', () => {
     new ContentError('validation', undefined, {
       [toFieldAddress('title')]: ['Title is taken'],
     });
+  const taken = () =>
+    screen
+      .queryAllByRole('alert')
+      .some((alert) => /Title is taken/.test(alert.textContent ?? ''));
 
-  it('shows the message on the field after Save, and again after Retry', async () => {
+  it('lists the refused field in the Errors pane and turns Save into Resolve, with no toast', async () => {
     useUnprotectedBranch();
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     updateError = refusal();
@@ -969,32 +973,17 @@ describe('server field errors in the document form', () => {
     const input = await screen.findByLabelText(/^Title\b/);
     await user.type(input, '!');
     await user.click(screen.getByRole('button', { name: /^Save$/ }));
-    await waitFor(() =>
-      expect(
-        screen
-          .getAllByRole('alert')
-          .some((alert) => /Title is taken/.test(alert.textContent ?? ''))
-      ).toBe(true)
-    );
+
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    expect(taken()).toBe(true);
+    expect(document.querySelector('[data-slot=toast]')).toBeNull();
     expect(input).toHaveValue('Hello!');
 
     await user.type(input, '?');
-    await waitFor(() =>
-      expect(
-        screen
-          .queryAllByRole('alert')
-          .some((alert) => /Title is taken/.test(alert.textContent ?? ''))
-      ).toBe(false)
-    );
-    const toast = document.querySelector('[data-slot=toast]') as HTMLElement;
-    await user.click(within(toast).getByRole('button', { name: 'Retry' }));
-    await waitFor(() =>
-      expect(
-        screen
-          .getAllByRole('alert')
-          .some((alert) => /Title is taken/.test(alert.textContent ?? ''))
-      ).toBe(true)
-    );
+    expect(await screen.findByRole('button', { name: /^Save$/ })).toBeVisible();
+    expect(taken()).toBe(false);
   });
 });
 
@@ -1285,13 +1274,14 @@ describe('Save to new branch', () => {
     );
     const { user, dialog } = await openProtectedDialog();
     await user.click(within(dialog).getByRole('button', { name: 'Save' }));
-    await waitFor(() =>
-      expect(
-        screen
-          .getAllByRole('alert')
-          .some((alert) => /Title is taken/.test(alert.textContent ?? ''))
-      ).toBe(true)
-    );
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    expect(
+      screen
+        .getAllByRole('alert')
+        .some((alert) => /Title is taken/.test(alert.textContent ?? ''))
+    ).toBe(true);
     expect(switchCalls).toHaveLength(0);
   });
 

@@ -67,11 +67,17 @@ import {
   FormValidationError,
   type SaveSteps,
   checkForm,
+  isServerFieldRefusal,
   saveDocument,
 } from './save-pipeline';
 import { countRevealedErrors, isRevealed, itemLevel } from './form-view-state';
 
-export { AfterSaveHookError, FormValidationError, type SaveSteps };
+export {
+  AfterSaveHookError,
+  FormValidationError,
+  isServerFieldRefusal,
+  type SaveSteps,
+};
 
 export function useFieldRegistry(): FieldRegistry {
   const runtime = use(TinaRuntimeContext);

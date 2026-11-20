@@ -114,4 +114,29 @@ describe('a server message on a list item', () => {
     expect(errorAddresses()).not.toContain('authors.1.alias');
     expect(errorAddresses()).not.toContain('authors.2.alias');
   });
+
+  it('survives a list action that re-validates the list while the refused value is unchanged', async () => {
+    renderAuthors();
+    await userEvent.click(
+      await screen.findByRole('button', { name: /^Item 3:/ })
+    );
+    await userEvent.type(
+      await screen.findByRole('textbox', { name: /^Alias\b/ }),
+      'x'
+    );
+    await userEvent.click(await screen.findByText('save'));
+    await waitFor(() => expect(errorAddresses()).toContain('authors.1.alias'));
+
+    const group = await screen.findByRole('group', { name: 'Authors' });
+    await userEvent.click(
+      group.querySelector('[data-slot=add-button]') as HTMLElement
+    );
+    await waitFor(() =>
+      expect(
+        toDocument(useFormStore.getState().forms[toFormId(PATH)]?.values ?? {})
+          .authors
+      ).toHaveLength(4)
+    );
+    expect(errorAddresses()).toContain('authors.1.alias');
+  });
 });

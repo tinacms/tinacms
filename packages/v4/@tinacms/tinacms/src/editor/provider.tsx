@@ -49,6 +49,7 @@ import {
   useFormStore,
   valuesEqual,
 } from '../form/form-store';
+import { blockOnFormErrors } from './block-errors';
 import { registerFormBindings } from './form-bindings';
 import { checkForm } from './save-pipeline';
 import { UploadFormContext } from './uploads/upload-context';
@@ -568,7 +569,7 @@ export function FormProvider({
     [formId, userId, ingested, equal]
   );
   const seedValues = resolveSeedValues(keepsIncoming, kept.seed, ingested);
-  const resolver = buildFormResolver(collection, registry, validators);
+  const resolver = buildFormResolver(collection, registry, validators, formId);
   const methods = useForm<TinaDocument>({
     defaultValues: seedValues,
     errors: kept.errors,
@@ -651,10 +652,12 @@ export function FormProvider({
             methods.setError(address, toFieldErrorEntry(messages));
           }
         },
+        blockOnErrors: () =>
+          blockOnFormErrors(formId, view, collection, methods.getValues),
         reseedFields,
         resetReveal: () => view.getState().resetReveal(),
       }),
-    [formId, methods, reseedFields, view]
+    [formId, methods, reseedFields, view, collection]
   );
   useEffect(() => {
     view.getState().resetReveal();

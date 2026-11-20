@@ -18,6 +18,7 @@ import {
 import type { SaveHandler, SavedDocument } from './context';
 import type { FormViewStore } from './form-view-state';
 import { type FormBindings } from './form-bindings';
+import { forgetServerErrors, rememberServerErrors } from './server-errors';
 import { validateDocument } from './resolver';
 
 // Save refused because the document has validation errors. The form stays
@@ -99,6 +100,7 @@ export async function checkForm(
   view: FormViewStore,
   trigger: () => Promise<boolean>
 ): Promise<boolean> {
+  forgetServerErrors(formId);
   view.getState().attemptSave();
   const valid = await trigger();
   const store = useFormStore.getState();
@@ -165,17 +167,28 @@ const validateWithoutForm = (target: SaveTarget): void => {
 // The Backend, or TinaCloud, refused the save with messages for fields. They
 // show like the form's own: on the open form, or in the store for the form
 // that opens later. The values stay as the editor typed them.
+// A refusal with field errors that the form can show and list.
+export const isServerFieldRefusal = (cause: unknown): cause is ContentError =>
+  cause instanceof ContentError &&
+  cause.code === 'validation' &&
+  cause.fieldErrors !== undefined;
+
 const showServerFieldErrors = (
   { formId }: SaveTarget,
   mounted: FormBindings | undefined,
   cause: unknown
 ): void => {
-  if (!(cause instanceof ContentError) || cause.code !== 'validation') return;
-  if (!cause.fieldErrors) return;
+  if (!isServerFieldRefusal(cause) || !cause.fieldErrors) return;
   const flat: Record<string, string[]> = {};
   for (const [address, messages] of Object.entries(cause.fieldErrors)) {
     if (messages) flat[address] = messages;
   }
+  const open = useFormStore.getState().forms[formId];
+  rememberServerErrors(
+    formId,
+    flat,
+    mounted ? mounted.getValues() : toDocument(open?.values ?? {})
+  );
   if (mounted) {
     mounted.setServerErrors(flat);
     return;
@@ -199,6 +212,7 @@ export function saveDocument(
   const stage = (next: SaveStage) => onStage?.(next);
   return recordSavePhase(formId, async () => {
     stage('validate');
+    forgetServerErrors(formId);
     const mounted = bindings();
     if (mounted) {
       if (!(await mounted.validate())) throw new FormValidationError();
