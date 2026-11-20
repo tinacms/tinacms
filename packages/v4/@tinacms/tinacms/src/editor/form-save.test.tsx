@@ -16,7 +16,8 @@ import { t } from '../index';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
-import { useFormStore } from '../form/form-store';
+import { toFormId, useFormStore } from '../form/form-store';
+import { heldServerErrors } from './server-errors';
 import { LabelledFields } from '../test/labelled-fields';
 import {
   AfterSaveHookError,
@@ -496,6 +497,10 @@ describe('useFormSave when the server refuses the save with field errors', () =>
 
     await screen.findByRole('alert');
     expect(input).toHaveValue('Hi?');
+    // The message belongs to the value the server saw, not to the one typed since.
+    const formId = toFormId('content/posts/save.mdx');
+    expect(heldServerErrors(formId, { title: 'Hi' })).toHaveProperty('title');
+    expect(heldServerErrors(formId, { title: 'Hi?' })).toEqual({});
   });
 
   it('fails the save with the message when no field matches the address', async () => {

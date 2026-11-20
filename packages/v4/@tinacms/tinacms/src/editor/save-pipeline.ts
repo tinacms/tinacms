@@ -6,7 +6,7 @@ import { runAfterSave, runBeforeSave } from '../core/form/hooks';
 import type { FormHooks } from '../core/form/hooks';
 import { digestDocument, ingestDocument } from '../core/form/ingest';
 import { ContentError } from '../core/content/contract';
-import type { CollectionSchema } from '../core/schema/types';
+import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import {
   type FieldErrors,
   type FormId,
@@ -176,19 +176,15 @@ export const isServerFieldRefusal = (cause: unknown): cause is ContentError =>
 const showServerFieldErrors = (
   { formId }: SaveTarget,
   mounted: FormBindings | undefined,
-  cause: unknown
+  cause: unknown,
+  sent: TinaDocument
 ): void => {
   if (!isServerFieldRefusal(cause) || !cause.fieldErrors) return;
   const flat: Record<string, string[]> = {};
   for (const [address, messages] of Object.entries(cause.fieldErrors)) {
     if (messages) flat[address] = messages;
   }
-  const open = useFormStore.getState().forms[formId];
-  rememberServerErrors(
-    formId,
-    flat,
-    mounted ? mounted.getValues() : toDocument(open?.values ?? {})
-  );
+  rememberServerErrors(formId, flat, sent);
   if (mounted) {
     mounted.setServerErrors(flat);
     return;
@@ -225,6 +221,7 @@ export function saveDocument(
       ? current.getValues()
       : toDocument(open?.values ?? {});
     const submitted = structuredClone(toFormValues(values));
+    const sent = structuredClone(values);
     const context = { documentPath: path, registry };
     const hookScope = { formId, path, collection };
     stage('beforeSave');
@@ -238,7 +235,7 @@ export function saveDocument(
     try {
       saved = await write?.(digested);
     } catch (cause) {
-      showServerFieldErrors(target, bindings(), cause);
+      showServerFieldErrors(target, bindings(), cause, sent);
       throw cause;
     }
     const savedDocument = saved ? saved.document : digested;
