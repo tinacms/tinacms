@@ -58,6 +58,8 @@ type BranchSwitcherProps = {
   onCreate?: (name: string, from: string) => void;
   /** The default branch, offered next to the current one as where a new branch starts from. */
   baseBranch?: string;
+  /** Called when the New branch form opens or closes, so the caller knows whether an inline failure will be seen. */
+  onFormChange?: (shown: boolean) => void;
   /** `creating` shows "Creating" on the form; `failed` keeps the form with a Retry. */
   createState?: 'idle' | 'creating' | 'failed';
   /** `loading` shows a skeleton and `failed` shows the problem with Retry, both in place. */
@@ -239,6 +241,7 @@ function BranchSwitcher({
   onSwitch,
   onCreate,
   baseBranch,
+  onFormChange,
   createState = 'idle',
   status = 'ready',
   onRetry,
@@ -287,9 +290,9 @@ function BranchSwitcher({
   const attempted = useRef('');
   const failed =
     createState === 'failed' && !dismissed && typed === attempted.current;
-  const alertRef = useRef<HTMLParagraphElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (failed) alertRef.current?.scrollIntoView?.({ block: 'nearest' });
+    if (failed) actionsRef.current?.scrollIntoView?.({ block: 'nearest' });
   }, [failed]);
   useEffect(() => setDismissed(false), [createState]);
 
@@ -317,10 +320,13 @@ function BranchSwitcher({
     if (staleTier) setOpen(false);
   });
 
-  // However it closed, the next open starts as the pop-up.
   useEffect(() => {
     if (!open && maximised) setMaximised(false);
   });
+
+  useEffect(() => {
+    onFormChange?.(creating);
+  }, [creating, onFormChange]);
 
   useEffect(() => {
     if (!creating) return;
@@ -430,7 +436,10 @@ function BranchSwitcher({
         placeholder='Branch name'
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        onClear={() => setQuery('')}
+        onClear={() => {
+          setQuery('');
+          searchRef.current?.focus();
+        }}
       />
       <div className='flex min-h-0 flex-col gap-3 overflow-y-auto'>
         {status === 'loading' ? (
@@ -533,6 +542,7 @@ function BranchSwitcher({
                   : () => {
                       setNewName('');
                       setSubmitted(true);
+                      nameRef.current?.focus();
                     }
               }
               aria-invalid={nameError ? true : undefined}
@@ -557,7 +567,7 @@ function BranchSwitcher({
                   value={startFrom}
                   disabled={busy}
                   onValueChange={setStartFrom}
-                  className='max-w-full'
+                  className='max-w-full *:h-auto! *:min-h-7 *:min-w-0 *:shrink *:py-1 *:text-left *:whitespace-normal *:break-all'
                 />
               ) : (
                 <span className='font-mono text-sm tracking-code'>
@@ -567,22 +577,22 @@ function BranchSwitcher({
               )}
             </div>
             {failed ? (
-              <p
-                ref={alertRef}
-                role='alert'
-                className='m-0 text-sm text-destructive'
-              >
+              <p role='alert' className='m-0 text-sm text-destructive'>
                 Couldn't create {attempted.current}. Check your connection, then
                 retry.
               </p>
             ) : null}
-            <div className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'>
+            <div
+              ref={actionsRef}
+              className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'
+            >
               <Button
                 className='max-md:h-auto max-md:min-h-9'
                 disabled={busy}
                 onClick={() => {
                   setCreating(false);
                   setDismissed(true);
+                  searchRef.current?.focus();
                 }}
               >
                 <span className='min-w-0 max-md:py-1.5 max-md:whitespace-normal'>

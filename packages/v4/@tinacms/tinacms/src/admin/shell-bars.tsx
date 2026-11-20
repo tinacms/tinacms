@@ -50,18 +50,21 @@ function BranchControl() {
   const dirty = useAnyFormDirty();
   const [open, setOpen] = useState(false);
   const [failed, setFailed] = useState<CreateRequest>();
+  const [formShown, setFormShown] = useState(false);
   const entries = useBranchEntries(branch, open);
 
   const create = branch?.create;
   const latest = useRef<{
     branch: typeof branch;
     open: boolean;
-    startCreate: (request: CreateRequest) => void;
-  }>({ branch, open, startCreate: () => {} });
-  const startCreate = (request: CreateRequest) => {
+    formShown: boolean;
+    startCreate: (request: CreateRequest) => boolean;
+  }>({ branch, open, formShown, startCreate: () => false });
+  /** Starts the create, or says why not. True when it started. */
+  const startCreate = (request: CreateRequest): boolean => {
     if (readAnyFormDirty()) {
       toast({ tone: 'warning', title: 'Save or discard your changes first' });
-      return;
+      return false;
     }
     const running = latest.current.branch?.creating;
     if (running) {
@@ -70,14 +73,15 @@ function BranchControl() {
         title: `Wait for ${running.name} to finish first`,
         text: 'Only one branch is made at a time.',
       });
-      return;
+      return false;
     }
     setFailed(undefined);
     create?.(request.name, request.from);
+    return true;
   };
 
   const result = branch?.createResult;
-  latest.current = { branch, open, startCreate };
+  latest.current = { branch, open, formShown, startCreate };
   useEffect(() => {
     if (!result) return;
     const { branch: view, open: isOpen, startCreate: retry } = latest.current;
@@ -87,7 +91,7 @@ function BranchControl() {
     if (!view) return;
     const { name, from, startedOn: began, outcome } = result;
     if (outcome === 'failed') {
-      if (isOpen) {
+      if (isOpen && latest.current.formShown) {
         setFailed({ name, from });
         return;
       }
@@ -98,8 +102,7 @@ function BranchControl() {
         action: {
           label: 'Retry',
           onClick: () => {
-            toast.dismiss(failure);
-            retry({ name, from });
+            if (retry({ name, from })) toast.dismiss(failure);
           },
         },
       });
@@ -153,6 +156,7 @@ function BranchControl() {
       onSwitch={branch.switchTo}
       open={open}
       onOpenChange={setOpen}
+      onFormChange={setFormShown}
       baseBranch={branch.defaultBranch}
       onCreate={
         create ? (name, from) => startCreate({ name, from }) : undefined
@@ -160,7 +164,7 @@ function BranchControl() {
       createState={
         branch.creating
           ? 'creating'
-          : failed || (result?.outcome === 'failed' && open)
+          : failed || (result?.outcome === 'failed' && open && formShown)
             ? 'failed'
             : 'idle'
       }

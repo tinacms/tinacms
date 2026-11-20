@@ -21,6 +21,11 @@ const INDEX_TIMEOUT_MS = 15 * 60 * 1000;
 
 const MAX_UNKNOWN_INDEX_STATUSES = 6;
 
+/** A poll that failed on the network, a 404 before indexing starts, or a 5xx: worth asking again. */
+const isTransient = (cause: unknown): boolean =>
+  cause instanceof TinaCloudError &&
+  (cause.status === undefined || cause.status === 404 || cause.status >= 500);
+
 const HEADS_PREFIX = 'refs/heads/';
 
 const createBranchResponseSchema = z.object({
@@ -243,8 +248,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       try {
         body = await authedFetch(url);
       } catch (cause) {
-        if (cause instanceof TinaCloudError && cause.status === 401)
-          throw cause;
+        if (!isTransient(cause)) throw cause;
         body = undefined;
       }
       const status = indexStatusSchema.safeParse(body);

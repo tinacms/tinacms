@@ -698,9 +698,44 @@ describe('Branch switcher controls', () => {
     scrolled.mockClear();
     rerender(<BranchSwitcher {...props} createState='failed' />);
     expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
-    expect(scrolled).toHaveBeenCalled();
+    expect(
+      scrolled.mock.contexts.some(
+        (el) =>
+          el instanceof Element &&
+          el.contains(screen.getByRole('button', { name: 'Retry' }))
+      )
+    ).toBe(true);
     await user.type(box, 'b');
     expect(screen.queryByText(/Couldn't create/)).toBeNull();
     expect(screen.getByRole('button', { name: 'Create branch' })).toBeVisible();
+  });
+
+  it('puts focus back in the search box after Back to branches and in the name field after Clear name', async () => {
+    const user = userEvent.setup();
+    const onFormChange = vi.fn();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        baseBranch='main'
+        onFormChange={onFormChange}
+        defaultOpen
+      />
+    );
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    expect(onFormChange).toHaveBeenLastCalledWith(true);
+    const name = screen.getByRole('searchbox', { name: 'New branch name' });
+    await user.type(name, 'cms/a');
+    await user.click(screen.getByRole('button', { name: 'Clear name' }));
+    expect(name).toHaveFocus();
+    await user.click(screen.getByRole('button', { name: 'Back to branches' }));
+    expect(onFormChange).toHaveBeenLastCalledWith(false);
+    const search = screen.getByRole('searchbox', { name: 'Search branches' });
+    expect(search).toHaveFocus();
+    await user.type(search, 'x');
+    await user.click(screen.getByRole('button', { name: 'Clear search' }));
+    expect(search).toHaveFocus();
   });
 });

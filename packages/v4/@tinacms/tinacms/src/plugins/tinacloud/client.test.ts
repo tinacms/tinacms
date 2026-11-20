@@ -203,10 +203,10 @@ describe('createBranch', () => {
     });
 
   it('posts the base and new branch and takes the made name from the ref', async () => {
-    const fetchMock = stubFetch(json({ data: { ref: 'refs/heads/cms/x' } }));
+    const fetchMock = stubFetch(json({ data: { ref: 'refs/heads/cms/x-1' } }));
     const made = await client().createBranch({ name: 'cms/x', from: 'main' });
     made.ready.catch(() => {});
-    expect(made.name).toBe('cms/x');
+    expect(made.name).toBe('cms/x-1');
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe(`${TINACLOUD_CONTENT_URL}/github/abc/create_branch`);
     expect(init?.method).toBe('POST');
@@ -219,6 +219,13 @@ describe('createBranch', () => {
     expect(headers.get('Content-Type')).toBe('application/json');
   });
 
+  it('keeps the requested name when the ref has no refs/heads/ prefix', async () => {
+    stubFetch(json({ data: { ref: 'cms/other' } }));
+    const made = await client().createBranch({ name: 'cms/y', from: 'main' });
+    made.ready.catch(() => {});
+    expect(made.name).toBe('cms/y');
+  });
+
   it('falls back to the requested name when the response has no ref', async () => {
     stubFetch(json({}));
     const made = await client().createBranch({ name: 'cms/y', from: 'main' });
@@ -229,16 +236,17 @@ describe('createBranch', () => {
   it('polls the raw-path status until it is complete', async () => {
     vi.useFakeTimers();
     const fetchMock = stubFetch(
-      json({ data: { ref: 'refs/heads/cms/x' } }),
+      json({ data: { ref: 'refs/heads/cms/x-1' } }),
       json({ status: 'inprogress' }),
       json({ status: 'complete' })
     );
     const made = await fast().createBranch({ name: 'cms/x', from: 'main' });
     await vi.advanceTimersByTimeAsync(100);
     await made.ready;
+    expect(made.name).toBe('cms/x-1');
     expect(fetchMock.mock.calls.slice(1).map(([url]) => url)).toEqual([
-      statusUrl('cms/x'),
-      statusUrl('cms/x'),
+      statusUrl('cms/x-1'),
+      statusUrl('cms/x-1'),
     ]);
   });
 
@@ -288,6 +296,27 @@ describe('createBranch', () => {
     const assertion = expect(made.ready).rejects.toBeInstanceOf(TinaCloudError);
     await vi.advanceTimersByTimeAsync(700);
     await assertion;
+  });
+
+  it('rejects ready on a 403 or a non-HTTP error instead of asking again', async () => {
+    stubFetch(json({}), json({ message: 'forbidden' }, 403));
+    const refused = await fast().createBranch({ name: 'cms/x', from: 'main' });
+    await expect(refused.ready).rejects.toMatchObject({ status: 403 });
+
+    let calls = 0;
+    const throwing = createTinaCloudClient({
+      clientId: 'abc',
+      getToken: () => {
+        calls += 1;
+        if (calls > 1) throw new TypeError('token store broke');
+        return 'secret';
+      },
+      indexPollMs: 100,
+      indexTimeoutMs: 1000,
+    });
+    stubFetch(json({}));
+    const broken = await throwing.createBranch({ name: 'cms/x', from: 'main' });
+    await expect(broken.ready).rejects.toBeInstanceOf(TypeError);
   });
 
   it('rejects ready when a poll is refused as unauthorised', async () => {

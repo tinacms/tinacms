@@ -321,4 +321,67 @@ test.describe('branch switcher pop-up', () => {
       ).toBeVisible();
     });
   }
+
+  test('keeps a long base-branch name inside its Start from segment', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto(
+      '/branches.html?docs=1&branch=feature/a-very-long-default-branch-name-for-start-from-check&create=ok#/'
+    );
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: /^main/ }).click();
+    await page.getByRole('button', { name: /^Branch: main/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    const spills = await page.evaluate(() => {
+      const group = document.querySelector('[aria-label="Start from"]');
+      const popup = group?.closest('[role="dialog"]');
+      if (!group || !popup) return ['missing'];
+      const p = popup.getBoundingClientRect();
+      return [...group.querySelectorAll('button')].flatMap((b) => {
+        const r = b.getBoundingClientRect();
+        const out: string[] = [];
+        if (
+          b.scrollHeight > b.clientHeight + 1 ||
+          b.scrollWidth > b.clientWidth + 1
+        )
+          out.push('text spills ' + b.textContent);
+        if (r.right > p.right + 1)
+          out.push('segment past the pop-up ' + b.textContent);
+        return out;
+      });
+    });
+    expect(spills).toEqual([]);
+  });
+
+  test('scrolls Retry into view when a create fails on a short screen', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 400 });
+    await page.goto('/branches.html?docs=1&many=30&create=fail#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    await page
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/x');
+    await page.getByRole('button', { name: 'Create branch' }).click();
+    const retry = page.getByRole('button', { name: 'Retry' });
+    await expect(retry).toBeVisible();
+    await page.waitForTimeout(400);
+    const inside = await page.evaluate(() => {
+      const button = [...document.querySelectorAll('button')].find(
+        (b) => b.textContent === 'Retry'
+      );
+      const box = button?.closest('[role="dialog"]');
+      if (!button || !box) return false;
+      const b = button.getBoundingClientRect();
+      const c = box.getBoundingClientRect();
+      return (
+        b.bottom <= c.bottom + 1 &&
+        b.top >= c.top - 1 &&
+        b.bottom <= window.innerHeight
+      );
+    });
+    expect(inside).toBe(true);
+  });
 });
