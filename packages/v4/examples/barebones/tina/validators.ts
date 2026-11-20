@@ -1,10 +1,10 @@
 import { type ValidatorRef, definePlugin } from '@tinacms/tinacms';
+import { defineClientPlugin } from '@tinacms/tinacms/client';
 import {
-  type FieldValidationContext,
-  type JsonValue,
-  type Validate,
-  defineClientPlugin,
-} from '@tinacms/tinacms/client';
+  differentFromFactory,
+  matchesFactory,
+  requiredWhenFactory,
+} from './validators.factories';
 
 // The custom validators of this project. A collection attaches one to a field
 // with `validators: [matches('^[A-Z]', 'Start with a capital')]`.
@@ -32,44 +32,11 @@ export const requiredWhen = (
   args: message === undefined ? [other, value] : [other, value, message],
 });
 
-// A factory takes the `args` the collection wrote, then returns the rule that
-// the form runs against a value.
-function matchesFactory(
-  pattern: JsonValue,
-  message: JsonValue = 'Invalid format'
-): Validate<unknown, FieldValidationContext> {
-  return function rule(value) {
-    if (typeof value !== 'string') return null;
-    if (new RegExp(String(pattern)).test(value)) return null;
-    return String(message);
-  };
-}
-
-function differentFromFactory(
-  other: JsonValue,
-  message?: JsonValue
-): Validate<unknown, FieldValidationContext> {
-  return function rule(value, { siblings }) {
-    if (!value || value !== siblings[String(other)]) return null;
-    return String(message ?? `Must differ from ${other}`);
-  };
-}
-
-function requiredWhenFactory(
-  other: JsonValue,
-  expected: JsonValue,
-  message?: JsonValue
-): Validate<unknown, FieldValidationContext> {
-  return function rule(value, { siblings }) {
-    if (value || siblings[String(other)] !== expected) return null;
-    return String(message ?? `Required when ${other} is ${expected}`);
-  };
-}
-
 export const validatorsPlugin = definePlugin({
   name: 'example:validators',
   provides: ['validator'],
   validators: ['matches', 'differentFrom', 'requiredWhen'],
+  server: () => import('./validators.server'),
   client: async () => ({
     default: defineClientPlugin({
       validators: {

@@ -1,6 +1,6 @@
 import { hasErrorBrand } from '../error-brand';
 import type { BranchSource } from '../branch/contract';
-import type { FieldAddress } from '../field/address';
+import { type FieldAddress, toFieldAddress } from '../field/address';
 import type { TinaDocument } from '../schema/types';
 
 // `list` names the documents of a collection. It carries no content, because a
@@ -31,7 +31,7 @@ export const CONTENT_ERROR_MESSAGES = {
   'backend-failure': 'Something went wrong. Please try again.',
   'hook-rejected': 'A save hook rejected this save.',
   'server-route-missing':
-    "This collection has server hooks, so it needs the site's server route.",
+    "This collection runs checks on the site's server, so it needs the site's server route.",
   'write-refused': 'The content server refused this save.',
   'name-taken': 'A document or folder with that name already exists.',
   'invalid-path': 'That name is not allowed.',
@@ -59,6 +59,31 @@ export const isContentRefusalCode = (
 export type ContentErrorCode = keyof typeof CONTENT_ERROR_MESSAGES;
 
 export type ContentFieldErrors = Partial<Record<FieldAddress, string[]>>;
+
+// The field errors of an error payload. An entry with an empty key or a value
+// that is not a list of strings is dropped, and a payload with none left has none.
+export const parseFieldErrors = (
+  payload: unknown
+): ContentFieldErrors | undefined => {
+  if (
+    typeof payload !== 'object' ||
+    payload === null ||
+    Array.isArray(payload)
+  ) {
+    return undefined;
+  }
+  const parsed: ContentFieldErrors = {};
+  for (const [address, messages] of Object.entries(payload)) {
+    if (
+      address !== '' &&
+      Array.isArray(messages) &&
+      messages.every((message) => typeof message === 'string')
+    ) {
+      parsed[toFieldAddress(address)] = messages;
+    }
+  }
+  return Object.keys(parsed).length > 0 ? parsed : undefined;
+};
 
 /**
  * `message` is the sentence to show the user; `detail` is the technical reason.
@@ -235,6 +260,26 @@ export class ContentWriteError extends Error {
     this.name = 'ContentWriteError';
   }
 }
+
+// The Backend refuses a save whose document fails the collection's validators
+// (ADR-028 §9). `fieldErrors` maps each field address to its messages.
+const DOCUMENT_VALIDATION_BRAND: unique symbol = Symbol.for(
+  'tinacms.error.document-validation'
+);
+
+export class DocumentValidationError extends Error {
+  readonly [DOCUMENT_VALIDATION_BRAND] = true;
+
+  constructor(readonly fieldErrors: ContentFieldErrors) {
+    super(CONTENT_ERROR_MESSAGES.validation);
+    this.name = 'DocumentValidationError';
+  }
+}
+
+export const isDocumentValidationError = (
+  value: unknown
+): value is DocumentValidationError =>
+  hasErrorBrand(value, DOCUMENT_VALIDATION_BRAND) && 'fieldErrors' in value;
 
 export const isInvalidSaveInputError = (value: unknown): value is Error =>
   hasErrorBrand(value, INVALID_SAVE_INPUT_BRAND);

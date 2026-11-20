@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
+import { ContentError } from '../core/content/contract';
+import { toFieldAddress } from '../core/field/address';
 import type { JsonValue } from '../core/json';
 import { type PluginManifest, definePlugin } from '../core/plugin';
 import type {
@@ -14,6 +16,8 @@ import { t } from '../index';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
+import { toFormId, useFormStore } from '../form/form-store';
+import { heldServerErrors } from './server-errors';
 import { LabelledFields } from '../test/labelled-fields';
 import {
   AfterSaveHookError,
@@ -424,6 +428,102 @@ const structureCollection: CollectionSchema = {
   format: 'mdx',
   fields: [{ name: 'body', type: 'structure' }],
 };
+
+describe('useFormSave when the server refuses the save with field errors', () => {
+  const refuse = (fieldErrors: ContentError['fieldErrors']) =>
+    vi.fn(async () => {
+      throw new ContentError('validation', 'refused', fieldErrors);
+    });
+
+  it('shows the message on its field, keeps the form dirty and the typed value', async () => {
+    renderWithSave(
+      refuse({ [toFieldAddress('title')]: ['Taken by another post'] })
+    );
+    const input = await screen.findByLabelText(/^Title\b/);
+    await userEvent.type(input, '!');
+    await userEvent.click(screen.getByText('save'));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Taken by another post'
+    );
+    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+    expect(input).toHaveValue('Hi!');
+  });
+
+  it('clears the message when the field changes', async () => {
+    renderWithSave(
+      refuse({ [toFieldAddress('title')]: ['Taken by another post'] })
+    );
+    const input = await screen.findByLabelText(/^Title\b/);
+    await userEvent.click(screen.getByText('save'));
+    await screen.findByRole('alert');
+
+    await userEvent.type(input, '!');
+    await vi.waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+  });
+
+  it('clears every server message when the next save starts', async () => {
+    const onSave = refuse({
+      [toFieldAddress('title')]: ['Taken by another post'],
+    });
+    renderWithSave(onSave);
+    await userEvent.click(await screen.findByText('save'));
+    await screen.findByRole('alert');
+    onSave.mockResolvedValueOnce(undefined as never);
+
+    await userEvent.click(screen.getByText('save'));
+    await vi.waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+  });
+
+  it('keeps a value typed while the save ran, and shows no message for it', async () => {
+    let refusal: () => void = () => {};
+    const onSave = vi.fn(
+      () =>
+        new Promise<void>((_resolve, reject) => {
+          refusal = () =>
+            reject(
+              new ContentError('validation', 'refused', {
+                [toFieldAddress('title')]: ['Taken by another post'],
+              })
+            );
+        })
+    );
+    renderWithSave(onSave);
+    const input = await screen.findByLabelText(/^Title\b/);
+    await userEvent.click(screen.getByText('save'));
+    await vi.waitFor(() => expect(onSave).toHaveBeenCalled());
+    await userEvent.type(input, '?');
+    refusal();
+
+    // The message judged 'Hi', a value the editor no longer has, so it shows nowhere.
+    await vi.waitFor(() =>
+      expect(Object.values(useFormStore.getState().saves)).toMatchObject([
+        {
+          phase: 'failed',
+          message: 'Some fields are not valid. Fix them and try again.',
+        },
+      ])
+    );
+    expect(input).toHaveValue('Hi?');
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(
+      heldServerErrors(toFormId('content/posts/save.mdx'), { title: 'Hi?' })
+    ).toEqual({});
+  });
+
+  it('fails the save with the message when no field matches the address', async () => {
+    renderWithSave(refuse({ [toFieldAddress('nowhere')]: ['Nope'] }));
+    await userEvent.click(await screen.findByText('save'));
+    await vi.waitFor(() =>
+      expect(Object.values(useFormStore.getState().saves)).toMatchObject([
+        {
+          phase: 'failed',
+          message: 'Some fields are not valid. Fix them and try again.',
+        },
+      ])
+    );
+  });
+});
 
 describe('useFormSave with a structured field value', () => {
   it('reaches clean after a save, despite RHF cloning the value', async () => {

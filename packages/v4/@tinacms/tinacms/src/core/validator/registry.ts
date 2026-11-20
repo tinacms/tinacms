@@ -1,4 +1,5 @@
 import type { ValidatorFactory, ValidatorRegistry } from '../field/contract';
+import coreValidatorsPlugin from '../../plugins/validators/core-validators.plugin';
 import { invariant } from '../invariant';
 import {
   REGISTRY_CONFLICTS,
@@ -75,4 +76,30 @@ export const createValidatorRegistry = (
   composeOverridableRegistry(
     resolved.flatMap(validatorEntriesOf),
     validatorConflictError
+  );
+
+// The plugin that wins each validator name, after overrides.
+export const validatorProvidersOf = (
+  plugins: PluginManifest[]
+): Map<string, PluginManifest> =>
+  composeOverridableRegistry(
+    plugins.flatMap((plugin) =>
+      (plugin.validators ?? []).map((name) => ({
+        key: name,
+        value: plugin,
+        isOverride: overridesValidatorKey(plugin, name),
+      }))
+    ),
+    validatorConflictError
+  );
+
+// The names whose winner is not the core validators plugin (ADR-028 §3). The
+// core plugin is known by identity, so a plugin that reuses its name stays custom.
+export const customValidatorNamesOf = (
+  plugins: PluginManifest[]
+): ReadonlySet<string> =>
+  new Set(
+    [...validatorProvidersOf(plugins)]
+      .filter(([, plugin]) => plugin !== coreValidatorsPlugin)
+      .map(([name]) => name)
   );

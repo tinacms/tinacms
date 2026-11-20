@@ -192,7 +192,7 @@ import config from '../../../../tina.config'
 export const { GET, POST } = mountHandler(config)
 ```
 
-The adapter mounts the runtime-composed server-segment handler (all server segments + RPC transport). It needs the config's `schema` once a plugin registers a server hook ([ADR-028](../028-server-save-hooks.md)). Express, Hono, Remix, etc. have equivalent adapters.
+The adapter mounts the runtime-composed server-segment handler (all server segments + RPC transport). It needs the config's `schema` once a plugin registers a server hook or a custom validator ([ADR-028](../028-server-save-hooks.md)). Express, Hono, Remix, etc. have equivalent adapters.
 
 ## Stability
 

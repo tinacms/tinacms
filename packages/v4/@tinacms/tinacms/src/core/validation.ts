@@ -15,6 +15,16 @@ export interface ValidateFieldOptions extends ValidationScope {
   address?: string;
 }
 
+// An editor cannot see, or cannot change, a hidden, disabled or read-only
+// field, so it never blocks Save, and the Backend skips it the same way. Its
+// children are not checked either.
+export const isSkippedField = (node: FieldSchema): boolean =>
+  Boolean(node.hidden) || node.disabled === true || node.readOnly === true;
+
+// The one address join: the form and the Backend key errors the same way.
+export const joinAddress = (prefix: string, key: string | number): string =>
+  prefix ? `${prefix}.${key}` : String(key);
+
 // What `required` means when a field type declares no `isEmpty` of its own.
 export const isEmptyValue = (value: unknown): boolean => {
   if (value == null || value === '') return true;
@@ -108,10 +118,7 @@ export const validateFieldTree = (
   scope: ValidationScope = {}
 ): Record<string, string[]> => {
   const errors: Record<string, string[]> = {};
-  // An editor cannot see, or cannot change, a hidden, disabled or read-only
-  // field, so it never blocks Save. Its children are not checked either.
-  if (node.hidden || node.disabled === true || node.readOnly === true)
-    return errors;
+  if (isSkippedField(node)) return errors;
   const messages = validateField(node, descriptor, value, {
     ...scope,
     address,
@@ -150,11 +157,13 @@ export const addressesWithValidators = (
       ? [address]
       : [];
   return fields.flatMap((node) => {
-    const address = prefix ? `${prefix}.${node.name}` : node.name;
+    const address = joinAddress(prefix, node.name);
     const value = isRecord(values) ? values[node.name] : undefined;
     const children = nestedValuesOf(node, value).flatMap((nested) => {
       const at =
-        nested.index === undefined ? address : `${address}.${nested.index}`;
+        nested.index === undefined
+          ? address
+          : joinAddress(address, nested.index);
       return 'field' in nested
         ? ownAddress(nested.field, at)
         : addressesWithValidators(

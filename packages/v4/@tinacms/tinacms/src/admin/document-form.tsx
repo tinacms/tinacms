@@ -46,6 +46,7 @@ import { formRootProps } from '../editor/outline-markup';
 import {
   AfterSaveHookError,
   FormValidationError,
+  isServerFieldRefusal,
   useDiscardEdits,
   useFieldRegistry,
   useFormCheck,
@@ -321,6 +322,13 @@ function SaveButton() {
         branchName !== undefined && names?.includes(branchName) === true
     );
 
+  // A client block and a Backend refusal with field errors both list the failing
+  // fields in the Errors pane and turn Save into Resolve.
+  const isBlockingFailure = (cause: unknown): boolean => {
+    if (cause instanceof FormValidationError) return true;
+    return isServerFieldRefusal(cause);
+  };
+
   const saveHere = () => {
     setPending(true);
     if (isProtected && branchName !== undefined) {
@@ -341,7 +349,7 @@ function SaveButton() {
     save()
       .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
-        if (cause instanceof FormValidationError && summary.block()) {
+        if (isBlockingFailure(cause) && summary.block()) {
           toast.dismiss(failedToastId);
           return;
         }
@@ -377,7 +385,7 @@ function SaveButton() {
     sendToNewBranch(request)
       .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
-        if (cause instanceof FormValidationError && summary.block()) {
+        if (isBlockingFailure(cause) && summary.block()) {
           toast.dismiss(failedToastId);
           return;
         }
@@ -415,7 +423,7 @@ function SaveButton() {
           return;
         }
         useFormStore.getState().restoreSavePhase(formId, previous);
-        if (cause instanceof FormValidationError) {
+        if (isBlockingFailure(cause)) {
           setDialog(null);
           if (!summary.block()) showFailure(cause);
           return;
