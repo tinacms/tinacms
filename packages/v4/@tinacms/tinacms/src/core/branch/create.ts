@@ -20,17 +20,18 @@ export const createBranchAction =
     if (branchSliceOf(store.getState())?.creating) return;
     const fill = (patch: Partial<BranchSlice>) =>
       store.setState((state) => ({ branch: { ...state.branch, ...patch } }));
+    const startedOn = currentBranchOf(store.getState());
     const finish = (made: string, outcome: 'ready' | 'unready' | 'failed') =>
       fill({
         creating: undefined,
-        createResult: { name: made, from, outcome },
+        createResult: { name: made, from, startedOn, outcome },
       });
 
     fill({
       creating: {
         name,
         from,
-        startedOn: currentBranchOf(store.getState()),
+        startedOn,
         phase: 'making',
       },
       createResult: undefined,

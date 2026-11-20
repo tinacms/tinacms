@@ -44,7 +44,7 @@ useTinaStore((s) => s.branch.dirty)          // true if there are unsaved/uncomm
 useTinaStore((s) => s.branch.mode)           // 'local' | 'branches' (unset: the provider has no branches)
 useTinaStore((s) => s.branch.protected)      // names of the protected branches
 useTinaStore((s) => s.branch.creating)       // { name, from, startedOn, phase } while this session makes a branch
-useTinaStore((s) => s.branch.createResult)   // { name, from, outcome } of the last create, until the shell handles it
+useTinaStore((s) => s.branch.createResult)   // { name, from, startedOn, outcome } of the last create, until the shell handles it
 ```
 
 The content provider fills the slice. A provider that reads from branches adds `branches: { list, defaultBranch }` to its content slice, and core sets `mode: 'branches'`, `list` and `protected`. A provider that can make branches also adds `branches.create`, and core then adds the `create` action to the slice. A provider that reads local files adds `local: true`, and core sets `mode: 'local'`. A provider with neither leaves `mode` unset, and the shell shows no branch spot. Only `current` persists across reloads. Core rebuilds the rest on each boot.

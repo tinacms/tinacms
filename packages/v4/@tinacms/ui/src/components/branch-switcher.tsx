@@ -298,12 +298,26 @@ function BranchSwitcher({
     lastCreateState.current = createState;
   }, [createState]);
 
-  // Crossing into a phone while open closes the switcher; its state is kept for the next open.
-  const wasPhone = useRef(phone);
+  // An open switcher belongs to the tier it opened on. Crossing 768px closes it before the other
+  // frame mounts open, so no closed scrim is left over the page; its state is kept for the next open.
+  const maximisedNow = useRef(maximised);
+  maximisedNow.current = maximised;
+  const openedOnPhone = useRef(phone);
+  if (!open) openedOnPhone.current = phone;
+  const staleTier = open && openedOnPhone.current !== phone;
+  const shown = open && !staleTier;
   useEffect(() => {
-    if (wasPhone.current !== phone && open) setOpen(false);
-    wasPhone.current = phone;
+    if (staleTier) setOpen(false);
   });
+
+  // However it closed, the next open starts as the pop-up.
+  useEffect(() => {
+    if (!open && maximised) setMaximised(false);
+  });
+
+  useEffect(() => {
+    if (creating) nameRef.current?.focus();
+  }, [creating]);
 
   const closeAndFocusButton = () => {
     setOpen(false);
@@ -335,9 +349,13 @@ function BranchSwitcher({
     rows[next]?.focus();
   };
   const currentFirst = [
+    ...matching.filter(
+      (branch) => branch.ready === false && branch.name !== current
+    ),
     ...matching.filter((branch) => branch.name === current),
     ...matching.filter(
-      (branch) => branch.name !== current && !branch.protected
+      (branch) =>
+        branch.name !== current && !branch.protected && branch.ready !== false
     ),
   ];
   const protectedBranches = matching.filter(
@@ -348,10 +366,12 @@ function BranchSwitcher({
     setOpen(false);
   };
 
+  const attempted = useRef('');
   const submit = () => {
     setSubmitted(true);
     if (typed === '' || branchNameError(typed, takenNames, true)) return;
     if (!onCreate || from === undefined || blocked || busy) return;
+    attempted.current = typed;
     onCreate(typed, from);
   };
 
@@ -404,71 +424,73 @@ function BranchSwitcher({
         onChange={(event) => setQuery(event.target.value)}
         onClear={() => setQuery('')}
       />
-      {status === 'loading' ? (
-        <div
-          aria-busy='true'
-          aria-label='Loading branches'
-          role='group'
-          className='flex flex-col gap-2'
-        >
-          <span className='text-sm text-muted-foreground'>
-            Loading branches
-          </span>
-          {[0, 1, 2].map((row) => (
-            <span
-              key={row}
-              className='h-8.5 animate-pulse rounded-sm bg-muted motion-reduce:animate-none'
-            />
-          ))}
-        </div>
-      ) : status === 'failed' ? (
-        <div role='alert' className='flex items-center gap-2 text-sm'>
-          <span className='min-w-0 flex-1 text-destructive'>
-            Couldn't load branches. Check your connection, then retry.
-            {current === undefined
-              ? ' You can keep editing.'
-              : ` You're still on ${current} and can keep editing.`}
-          </span>
-          {onRetry ? (
-            <Button size='sm' onClick={onRetry}>
-              Retry
-            </Button>
-          ) : null}
-        </div>
-      ) : (
-        <>
-          {matching.length === 0 ? (
-            <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-              <p className='m-0 min-w-0 flex-1'>
-                No branches match “{query.trim()}”.
-              </p>
-              <Button
-                size='sm'
-                onClick={() => {
-                  setQuery('');
-                  searchRef.current?.focus();
-                }}
-              >
-                Clear search
+      <div className='flex min-h-0 flex-col gap-3 overflow-y-auto'>
+        {status === 'loading' ? (
+          <div
+            aria-busy='true'
+            aria-label='Loading branches'
+            role='group'
+            className='flex flex-col gap-2'
+          >
+            <span className='text-sm text-muted-foreground'>
+              Loading branches
+            </span>
+            {[0, 1, 2].map((row) => (
+              <span
+                key={row}
+                className='h-8.5 animate-pulse rounded-sm bg-muted motion-reduce:animate-none'
+              />
+            ))}
+          </div>
+        ) : status === 'failed' ? (
+          <div role='alert' className='flex items-center gap-2 text-sm'>
+            <span className='min-w-0 flex-1 text-destructive'>
+              Couldn't load branches. Check your connection, then retry.
+              {current === undefined
+                ? ' You can keep editing.'
+                : ` You're still on ${current} and can keep editing.`}
+            </span>
+            {onRetry ? (
+              <Button size='sm' onClick={onRetry}>
+                Retry
               </Button>
-            </div>
-          ) : null}
-          <BranchGroup
-            branches={currentFirst}
-            current={current ?? ''}
-            blocked={blocked}
-            onSwitch={pick}
-          />
-          <BranchGroup
-            heading='Protected'
-            description='Saving on these makes a new branch.'
-            branches={protectedBranches}
-            current={current ?? ''}
-            blocked={blocked}
-            onSwitch={pick}
-          />
-        </>
-      )}
+            ) : null}
+          </div>
+        ) : (
+          <>
+            {matching.length === 0 ? (
+              <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                <p className='m-0 min-w-0 flex-1'>
+                  No branches match “{query.trim()}”.
+                </p>
+                <Button
+                  size='sm'
+                  onClick={() => {
+                    setQuery('');
+                    searchRef.current?.focus();
+                  }}
+                >
+                  Clear search
+                </Button>
+              </div>
+            ) : null}
+            <BranchGroup
+              branches={currentFirst}
+              current={current ?? ''}
+              blocked={blocked}
+              onSwitch={pick}
+            />
+            <BranchGroup
+              heading='Protected'
+              description='Saving on these makes a new branch.'
+              branches={protectedBranches}
+              current={current ?? ''}
+              blocked={blocked}
+              onSwitch={pick}
+            />
+          </>
+        )}
+      </div>
       {creating ? (
         <form
           aria-label='New branch form'
@@ -537,7 +559,8 @@ function BranchSwitcher({
           </div>
           {failed ? (
             <p role='alert' className='m-0 text-sm text-destructive'>
-              Couldn't create {typed}. Check your connection, then retry.
+              Couldn't create {attempted.current}. Check your connection, then
+              retry.
             </p>
           ) : null}
           <div className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'>
@@ -578,8 +601,8 @@ function BranchSwitcher({
             icon='plus'
             disabled={
               busy ||
-              (onCreate !== undefined &&
-                (status !== 'ready' || from === undefined))
+              status !== 'ready' ||
+              (onCreate !== undefined && from === undefined)
             }
             onClick={() => setCreating(true)}
           >
@@ -612,7 +635,7 @@ function BranchSwitcher({
 
   if (phone) {
     return (
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={shown} onOpenChange={setOpen}>
         <DialogTrigger render={trigger}>{label}</DialogTrigger>
         <DialogContent size='md' showCloseButton={false} onKeyDown={move}>
           {panel(({ children }) => (
@@ -631,7 +654,7 @@ function BranchSwitcher({
   return (
     <>
       <Popover
-        open={open && !maximised}
+        open={shown && !maximised}
         onOpenChange={(next) => {
           if (maximised && next) {
             closeAndFocusButton();
@@ -647,7 +670,18 @@ function BranchSwitcher({
           sideOffset={6}
           initialFocus={searchRef}
           onKeyDown={move}
-          className={cn('gap-3 p-3', POPUP_WIDTH)}
+          onBlur={(event) => {
+            const next = event.relatedTarget;
+            if (
+              !maximisedNow.current &&
+              next instanceof Node &&
+              !event.currentTarget.contains(next) &&
+              !triggerRef.current?.contains(next)
+            ) {
+              setOpen(false);
+            }
+          }}
+          className={cn('gap-3 overflow-hidden p-3', POPUP_WIDTH)}
         >
           {panel(({ children }) => (
             <PopoverTitle className={dialogTitleClasses}>
@@ -656,7 +690,7 @@ function BranchSwitcher({
           ))}
         </PopoverContent>
       </Popover>
-      {open && maximised
+      {shown && maximised
         ? createPortal(
             <MaximisedView
               onKeyDown={(event) => {

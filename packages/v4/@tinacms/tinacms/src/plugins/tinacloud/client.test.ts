@@ -203,7 +203,7 @@ describe('createBranch', () => {
     });
 
   it('posts the base and new branch and takes the made name from the ref', async () => {
-    const fetchMock = stubFetch(json({ ref: 'refs/heads/cms/x' }));
+    const fetchMock = stubFetch(json({ data: { ref: 'refs/heads/cms/x' } }));
     const made = await client().createBranch({ name: 'cms/x', from: 'main' });
     made.ready.catch(() => {});
     expect(made.name).toBe('cms/x');
@@ -229,7 +229,7 @@ describe('createBranch', () => {
   it('polls the raw-path status until it is complete', async () => {
     vi.useFakeTimers();
     const fetchMock = stubFetch(
-      json({ ref: 'refs/heads/cms/x' }),
+      json({ data: { ref: 'refs/heads/cms/x' } }),
       json({ status: 'inprogress' }),
       json({ status: 'complete' })
     );
@@ -265,6 +265,35 @@ describe('createBranch', () => {
     await vi.advanceTimersByTimeAsync(700);
     await assertion;
     expect(fetchMock).toHaveBeenCalledTimes(8);
+  });
+
+  it('counts a 404 or a network failure before indexing as one unknown status, not a rejection', async () => {
+    vi.useFakeTimers();
+    const fetchMock = stubFetch(
+      json({}),
+      json({ message: 'not found' }, 404),
+      json({ message: 'bad gateway' }, 502),
+      json({ status: 'complete' })
+    );
+    const made = await fast().createBranch({ name: 'cms/x', from: 'main' });
+    await vi.advanceTimersByTimeAsync(300);
+    await expect(made.ready).resolves.toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+  });
+
+  it('still rejects ready once enough polls in total fail', async () => {
+    vi.useFakeTimers();
+    stubFetch(json({}), ...Array.from({ length: 6 }, () => json({}, 404)));
+    const made = await fast().createBranch({ name: 'cms/x', from: 'main' });
+    const assertion = expect(made.ready).rejects.toBeInstanceOf(TinaCloudError);
+    await vi.advanceTimersByTimeAsync(700);
+    await assertion;
+  });
+
+  it('rejects ready when a poll is refused as unauthorised', async () => {
+    stubFetch(json({}), json({ message: 'expired' }, 401));
+    const made = await fast().createBranch({ name: 'cms/x', from: 'main' });
+    await expect(made.ready).rejects.toMatchObject({ status: 401 });
   });
 
   it('rejects ready when indexing outlasts the timeout', async () => {

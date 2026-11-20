@@ -2090,6 +2090,43 @@ describe('branch switcher rows and creating a branch', () => {
     read.mockRestore();
   });
 
+  it('tells the editor to wait when Retry is pressed while another branch is being made', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let fail: (cause: Error) => void = () => {};
+    const create = vi
+      .fn<NonNullable<BranchSource['create']>>()
+      .mockImplementationOnce(
+        () =>
+          new Promise((_resolve, reject) => {
+            fail = reject;
+          })
+      )
+      .mockImplementationOnce(() => new Promise(() => {}));
+    createBranch = create;
+    const { user, dialog } = await startCreate('cms/a');
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    act(() => fail(new Error('offline')));
+    await screen.findByText("Couldn't create cms/a");
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const again = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      await within(again).findByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(again).getByRole('searchbox', { name: 'New branch name' }),
+      'cms/b'
+    );
+    await press(again, user);
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(
+      await screen.findByText('Wait for cms/b to finish first')
+    ).toBeVisible();
+    expect(create).toHaveBeenCalledTimes(2);
+  });
+
   it('leaves Create branch off when the provider cannot create', async () => {
     const { user, dialog } = await openSwitcher();
     await user.click(

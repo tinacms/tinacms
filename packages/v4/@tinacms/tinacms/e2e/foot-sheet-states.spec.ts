@@ -772,6 +772,11 @@ test.describe('the branch switcher on a phone', () => {
     await expect(page.locator(SHEET)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Maximise' })).toHaveCount(0);
     await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(page.locator(SHEET)).toHaveCount(0);
+    await page
+      .getByRole('button', { name: /feature\/news/ })
+      .first()
+      .click();
     await expect(page.getByRole('button', { name: 'Maximise' })).toBeVisible();
   });
 });

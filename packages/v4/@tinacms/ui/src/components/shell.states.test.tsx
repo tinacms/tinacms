@@ -303,7 +303,8 @@ describe('Branch switcher, the full design', () => {
     const onSwitch = vi.fn();
     const { user, dialog } = await open({ onSwitch });
     const rows = within(dialog).getAllByRole('listitem');
-    expect(rows[0]).toHaveTextContent('docs/v4-launch#4822, 2 unsaved');
+    expect(rows[0]).toHaveTextContent('docs/changelog-2-24');
+    expect(rows[1]).toHaveTextContent('docs/v4-launch#4822, 2 unsaved');
     const ready = within(dialog).getByRole('button', {
       name: /docs\/changelog-2-24/,
     });
@@ -533,4 +534,155 @@ describe('Branch switcher controls', () => {
     expect(search).toHaveValue('');
     expect(search).toHaveFocus();
   });
+
+  it('puts the Getting ready row first, and focuses the name field when New branch opens', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={[
+          { name: 'feature/news' },
+          { name: 'fix/typo' },
+          { name: 'cms/new', ready: false },
+          { name: 'main', protected: true },
+        ]}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        baseBranch='main'
+        defaultOpen
+      />
+    );
+    const rows = screen
+      .getAllByRole('button')
+      .filter((row) => row.hasAttribute('data-branch-row'));
+    expect(rows.map((row) => row.textContent)).toEqual([
+      'cms/newGetting ready',
+      'feature/news',
+      'fix/typo',
+      'main',
+    ]);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    expect(
+      screen.getByRole('searchbox', { name: 'New branch name' })
+    ).toHaveFocus();
+    expect(
+      screen.getByText('Use letters, numbers, dashes, dots and slashes.')
+    ).toBeVisible();
+  });
+
+  it('disables New branch while the list loads or failed, even without a create', () => {
+    const { rerender } = render(
+      <BranchSwitcher
+        current='main'
+        branches={entries}
+        onSwitch={() => {}}
+        status='loading'
+        defaultOpen
+      />
+    );
+    expect(screen.getByRole('button', { name: 'New branch' })).toBeDisabled();
+    rerender(
+      <BranchSwitcher
+        current='main'
+        branches={entries}
+        onSwitch={() => {}}
+        status='failed'
+        defaultOpen
+      />
+    );
+    expect(screen.getByRole('button', { name: 'New branch' })).toBeDisabled();
+  });
+
+  it('names the branch that failed, not what is typed now', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        baseBranch='main'
+        defaultOpen
+      />
+    );
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    const box = screen.getByRole('searchbox', { name: 'New branch name' });
+    await user.type(box, 'cms/one');
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    rerender(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        baseBranch='main'
+        createState='failed'
+        defaultOpen
+      />
+    );
+    await user.type(box, '-two');
+    expect(
+      screen.getByText(
+        "Couldn't create cms/one. Check your connection, then retry."
+      )
+    ).toBeVisible();
+  });
+
+  it('closes when focus leaves the pop-up for the page', async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <BranchSwitcher
+          current='feature/news'
+          branches={entries}
+          onSwitch={() => {}}
+          defaultOpen
+        />
+        <button type='button'>page</button>
+      </>
+    );
+    expect(
+      screen.getByRole('dialog', { name: 'Branches' })
+    ).toBeInTheDocument();
+    screen.getByRole('searchbox', { name: 'Search branches' }).focus();
+    screen.getByRole('button', { name: 'page' }).focus();
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    expect(
+      await screen.findByRole('dialog', { name: 'Branches' })
+    ).toBeVisible();
+  });
+
+  it.each(['Close branches', 'Escape'])(
+    'opens again as the pop-up after the maximised view is closed with %s',
+    async (how) => {
+      const user = userEvent.setup();
+      render(
+        <BranchSwitcher
+          current='feature/news'
+          branches={entries}
+          onSwitch={() => {}}
+          defaultOpen
+          defaultMaximised
+        />
+      );
+      expect(
+        document.querySelector('[data-slot="branch-maximised"]')
+      ).not.toBeNull();
+      if (how === 'Escape') await user.keyboard('{Escape}');
+      else
+        await user.click(
+          screen.getByRole('button', { name: 'Close branches' })
+        );
+      await waitFor(() =>
+        expect(
+          document.querySelector('[data-slot="branch-maximised"]')
+        ).toBeNull()
+      );
+      await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+      expect(
+        await screen.findByRole('dialog', { name: 'Branches' })
+      ).toBeVisible();
+    }
+  );
 });

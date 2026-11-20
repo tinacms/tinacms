@@ -53,23 +53,30 @@ function BranchControl() {
   const entries = useBranchEntries(branch, open);
 
   const create = branch?.create;
+  const latest = useRef<{
+    branch: typeof branch;
+    open: boolean;
+    startCreate: (request: CreateRequest) => void;
+  }>({ branch, open, startCreate: () => {} });
   const startCreate = (request: CreateRequest) => {
     if (readAnyFormDirty()) {
       toast({ tone: 'warning', title: 'Save or discard your changes first' });
+      return;
+    }
+    const running = latest.current.branch?.creating;
+    if (running) {
+      toast({
+        tone: 'warning',
+        title: `Wait for ${running.name} to finish first`,
+        text: 'Only one branch is made at a time.',
+      });
       return;
     }
     setFailed(undefined);
     create?.(request.name, request.from);
   };
 
-  // The create that is running, and where it began, outlive `creating` for the result below.
-  const started = useRef<{ startedOn: string | undefined }>(undefined);
-  if (branch?.creating) {
-    started.current = { startedOn: branch.creating.startedOn };
-  }
-
   const result = branch?.createResult;
-  const latest = useRef({ branch, open, startCreate });
   latest.current = { branch, open, startCreate };
   useEffect(() => {
     if (!result) return;
@@ -78,7 +85,7 @@ function BranchControl() {
       branch: { ...state.branch, createResult: undefined },
     }));
     if (!view) return;
-    const { name, from, outcome } = result;
+    const { name, from, startedOn: began, outcome } = result;
     if (outcome === 'failed') {
       if (isOpen) {
         setFailed({ name, from });
@@ -100,7 +107,7 @@ function BranchControl() {
       });
       return;
     }
-    const startedOn = started.current?.startedOn ?? view.defaultBranch;
+    const startedOn = began ?? view.defaultBranch;
     if (isOpen && view.name === startedOn && !readAnyFormDirty()) {
       view.switchTo(name);
       setOpen(false);

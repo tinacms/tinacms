@@ -81,6 +81,8 @@ export interface BranchCreating {
 export interface BranchCreateResult {
   name: string;
   from: string;
+  /** `current` when the create started; the auto-switch only fires if it is still current. */
+  startedOn: string | undefined;
   outcome: 'ready' | 'unready' | 'failed';
 }
 
@@ -107,12 +109,12 @@ const creatingOf = (value: unknown): BranchCreating | undefined => {
 
 const createResultOf = (value: unknown): BranchCreateResult | undefined => {
   if (!isRecord(value)) return undefined;
-  const { name, from, outcome } = value;
+  const { name, from, startedOn, outcome } = value;
   if (typeof name !== 'string' || typeof from !== 'string') return undefined;
   if (outcome !== 'ready' && outcome !== 'unready' && outcome !== 'failed') {
     return undefined;
   }
-  return { name, from, outcome };
+  return { name, from, startedOn: optionalString(startedOn), outcome };
 };
 
 const pullRequestsOf = (value: unknown): Record<string, string> => {

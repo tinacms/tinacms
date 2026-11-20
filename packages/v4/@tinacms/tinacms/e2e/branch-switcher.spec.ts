@@ -155,4 +155,127 @@ test.describe('branch switcher pop-up', () => {
       expect(overflow).toBeLessThanOrEqual(0);
     });
   }
+
+  for (const how of [
+    'Close branches',
+    'Escape',
+    'the branch button',
+    'Restore, then Close branches',
+  ]) {
+    test(`opens again after the maximised view is closed with ${how}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(DESKTOP);
+      await page.goto(URL);
+      const button = page.getByRole('button', { name: /^Branch:/ });
+      await button.click();
+      await page.getByRole('button', { name: 'Maximise' }).click();
+      const view = page.locator('[data-slot="branch-maximised"]');
+      await expect(view).toBeVisible();
+      await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+      if (how === 'Close branches')
+        await view.getByRole('button', { name: 'Close branches' }).click();
+      else if (how === 'Escape') await page.keyboard.press('Escape');
+      else if (how === 'the branch button') await button.click();
+      else {
+        await page.getByRole('button', { name: 'Restore' }).click();
+        await page
+          .getByRole('dialog', { name: 'Branches' })
+          .getByRole('button', { name: 'Close branches' })
+          .click();
+      }
+      await expect(view).toBeHidden();
+      await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+      await button.click();
+      await expect(
+        page.getByRole('dialog', { name: 'Branches' })
+      ).toBeVisible();
+    });
+  }
+
+  const states = [
+    { name: 'the pop-up', create: false, maximise: false, form: false },
+    { name: 'the maximised view', create: false, maximise: true, form: false },
+    { name: 'the New branch form', create: false, maximise: false, form: true },
+    {
+      name: 'the New branch form with a pending create',
+      create: true,
+      maximise: false,
+      form: true,
+    },
+    {
+      name: 'the maximised form with a pending create',
+      create: true,
+      maximise: true,
+      form: true,
+    },
+  ];
+  for (const state of states) {
+    test(`leaves no scrim after ${state.name} is open while the window shrinks to a phone`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(DESKTOP);
+      await page.goto('/branches.html?docs=1&create=slow#/');
+      const button = page.getByRole('button', { name: /^Branch:/ });
+      await button.click();
+      if (state.form) {
+        await page.getByRole('button', { name: 'New branch' }).click();
+        await page
+          .getByRole('searchbox', { name: 'New branch name' })
+          .fill('cms/x');
+        if (state.create)
+          await page.getByRole('button', { name: 'Create branch' }).click();
+      }
+      if (state.maximise)
+        await page.getByRole('button', { name: 'Maximise' }).click();
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.waitForTimeout(600);
+      await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+      const blocked = await page.evaluate(() => {
+        const at = document.elementFromPoint(195, 400);
+        return (
+          at?.closest(
+            '[data-slot="foot-sheet-scrim"], [data-slot="dialog-overlay"]'
+          ) !== null
+        );
+      });
+      expect(blocked).toBe(false);
+      await button.click();
+      const sheet = page.getByRole('dialog', { name: 'Branches' });
+      await expect(sheet).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(sheet).toBeHidden();
+      await button.click();
+      await expect(sheet).toBeVisible();
+    });
+  }
+
+  test('keeps the header and search in view while a long list scrolls', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 600 });
+    await page.goto('/branches.html?docs=1&many=40&create=ok#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    const popup = page.getByRole('dialog', { name: 'Branches' });
+    await expect(popup).toBeVisible();
+    await popup
+      .getByRole('button', { name: 'many/branch-40' })
+      .scrollIntoViewIfNeeded();
+    await expect(
+      popup.getByRole('button', { name: 'Maximise' })
+    ).toBeInViewport();
+    await expect(
+      popup.getByRole('searchbox', { name: 'Search branches' })
+    ).toBeInViewport();
+    await expect(
+      popup.getByRole('button', { name: 'New branch' })
+    ).toBeInViewport();
+    await popup.getByRole('button', { name: 'New branch' }).click();
+    await expect(
+      popup.getByRole('searchbox', { name: 'New branch name' })
+    ).toBeFocused();
+    await expect(
+      popup.getByRole('button', { name: 'Create branch' })
+    ).toBeInViewport();
+  });
 });

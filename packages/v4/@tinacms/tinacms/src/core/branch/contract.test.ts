@@ -46,6 +46,21 @@ describe('branchSliceOf create fields', () => {
   });
 });
 
+describe('branchSliceOf createResult', () => {
+  it('keeps the branch the create started on', () => {
+    const base = { list: [], protected: [], switchTo: () => {} };
+    const createResult = {
+      name: 'cms/x',
+      from: 'main',
+      startedOn: 'docs',
+      outcome: 'ready',
+    };
+    expect(
+      branchSliceOf({ branch: { ...base, createResult } })?.createResult
+    ).toEqual(createResult);
+  });
+});
+
 describe('branchSliceOf', () => {
   it('passes saveToNewBranch through when it is a function', async () => {
     const action = vi.fn().mockResolvedValue({

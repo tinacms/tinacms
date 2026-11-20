@@ -21,7 +21,11 @@ const INDEX_TIMEOUT_MS = 15 * 60 * 1000;
 
 const MAX_UNKNOWN_INDEX_STATUSES = 6;
 
-const createBranchResponseSchema = z.object({ ref: z.string().optional() });
+const HEADS_PREFIX = 'refs/heads/';
+
+const createBranchResponseSchema = z.object({
+  data: z.object({ ref: z.string().optional() }).optional(),
+});
 
 const indexStatusSchema = z.object({ status: z.string().optional() });
 
@@ -235,7 +239,14 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     const startedAt = Date.now();
     let unknowns = 0;
     while (true) {
-      const body = await authedFetch(url);
+      let body: unknown;
+      try {
+        body = await authedFetch(url);
+      } catch (cause) {
+        if (cause instanceof TinaCloudError && cause.status === 401)
+          throw cause;
+        body = undefined;
+      }
       const status = indexStatusSchema.safeParse(body);
       const value = status.success ? status.data.status : undefined;
       if (value === 'complete') return;
@@ -279,8 +290,10 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       }
     );
     const parsed = createBranchResponseSchema.safeParse(body);
-    const ref = parsed.success ? parsed.data.ref : undefined;
-    const made = ref ? ref.replace(/^refs\/heads\//, '') : name;
+    const ref = parsed.success ? parsed.data.data?.ref : undefined;
+    const made = ref?.startsWith(HEADS_PREFIX)
+      ? ref.slice(HEADS_PREFIX.length)
+      : name;
     const ready = waitForIndex(made);
     ready.catch(() => {});
     return { name: made, ready };

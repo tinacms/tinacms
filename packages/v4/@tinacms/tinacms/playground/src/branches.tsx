@@ -29,6 +29,7 @@ const slow = params.get('slow') === '1';
 const slowBranches = slow || params.get('slowBranches') === '1';
 const failing = params.get('fail');
 const createMode = params.get('create');
+const extraBranches = Number(params.get('many') ?? 0);
 const madeBranches: string[] = [];
 
 const AUTHORS = ['Priya Raman', 'Josh Berman', 'Ada Lovelace'];
@@ -112,6 +113,9 @@ const content = definePlugin({
             if (failing === 'branches') throw new Error('offline');
             return [
               { name: 'main', protected: true },
+              ...Array.from({ length: extraBranches }, (_, at) => ({
+                name: `many/branch-${at + 1}`,
+              })),
               ...madeBranches.map((name) => ({ name })),
               ...(branchGone
                 ? []

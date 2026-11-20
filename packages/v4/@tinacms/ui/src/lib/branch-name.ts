@@ -2,7 +2,7 @@ const BRANCH_NAME_RULE = /^[A-Za-z0-9._/-]+$/;
 const GIT_REFUSED = /\.\.|\/\/|^[-/]|(^|\/)\.|\.lock(\/|$)|^HEAD$/;
 
 export const BRANCH_NAME_HINT =
-  'Letters, numbers, dashes, dots and slashes. No spaces.';
+  'Use letters, numbers, dashes, dots and slashes.';
 
 /**
  * The branch in `taken` that blocks `name`, or undefined. Git keeps a branch as a file under its
