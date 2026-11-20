@@ -593,41 +593,6 @@ describe('Branch switcher controls', () => {
     expect(screen.getByRole('button', { name: 'New branch' })).toBeDisabled();
   });
 
-  it('names the branch that failed, not what is typed now', async () => {
-    const user = userEvent.setup();
-    const { rerender } = render(
-      <BranchSwitcher
-        current='feature/news'
-        branches={entries}
-        onSwitch={() => {}}
-        onCreate={() => {}}
-        baseBranch='main'
-        defaultOpen
-      />
-    );
-    await user.click(screen.getByRole('button', { name: 'New branch' }));
-    const box = screen.getByRole('searchbox', { name: 'New branch name' });
-    await user.type(box, 'cms/one');
-    await user.click(screen.getByRole('button', { name: 'Create branch' }));
-    rerender(
-      <BranchSwitcher
-        current='feature/news'
-        branches={entries}
-        onSwitch={() => {}}
-        onCreate={() => {}}
-        baseBranch='main'
-        createState='failed'
-        defaultOpen
-      />
-    );
-    await user.type(box, '-two');
-    expect(
-      screen.getByText(
-        "Couldn't create cms/one. Check your connection, then retry."
-      )
-    ).toBeVisible();
-  });
-
   it('closes when focus leaves the pop-up for the page', async () => {
     const user = userEvent.setup();
     render(
@@ -685,4 +650,57 @@ describe('Branch switcher controls', () => {
       ).toBeVisible();
     }
   );
+
+  it('names the clear button of the name field apart from the search box', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        baseBranch='main'
+        defaultOpen
+      />
+    );
+    await user.type(
+      screen.getByRole('searchbox', { name: 'Search branches' }),
+      'x'
+    );
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    await user.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/a'
+    );
+    expect(screen.getByRole('button', { name: 'Clear name' })).toBeVisible();
+    expect(
+      screen.getAllByRole('button', { name: 'Clear search' })
+    ).toHaveLength(1);
+  });
+
+  it('drops the failure and Retry once the name is edited, and scrolls the alert into view', async () => {
+    const user = userEvent.setup();
+    const scrolled = vi.fn();
+    Element.prototype.scrollIntoView = scrolled;
+    const props = {
+      current: 'feature/news',
+      branches: entries,
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    const box = screen.getByRole('searchbox', { name: 'New branch name' });
+    await user.type(box, 'aaa');
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    scrolled.mockClear();
+    rerender(<BranchSwitcher {...props} createState='failed' />);
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
+    expect(scrolled).toHaveBeenCalled();
+    await user.type(box, 'b');
+    expect(screen.queryByText(/Couldn't create/)).toBeNull();
+    expect(screen.getByRole('button', { name: 'Create branch' })).toBeVisible();
+  });
 });

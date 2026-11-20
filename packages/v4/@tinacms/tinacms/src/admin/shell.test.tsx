@@ -2127,6 +2127,31 @@ describe('branch switcher rows and creating a branch', () => {
     expect(create).toHaveBeenCalledTimes(2);
   });
 
+  it('dismisses the failure toast when its Retry is pressed', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let fail: (cause: Error) => void = () => {};
+    createBranch = vi
+      .fn<NonNullable<BranchSource['create']>>()
+      .mockImplementationOnce(
+        () =>
+          new Promise((_resolve, reject) => {
+            fail = reject;
+          })
+      )
+      .mockImplementationOnce(() => new Promise(() => {}));
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    act(() => fail(new Error('offline')));
+    await screen.findByText("Couldn't create cms/x");
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    await waitFor(() =>
+      expect(screen.queryByText("Couldn't create cms/x")).toBeNull()
+    );
+  });
+
   it('leaves Create branch off when the provider cannot create', async () => {
     const { user, dialog } = await openSwitcher();
     await user.click(

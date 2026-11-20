@@ -24,6 +24,8 @@ type SearchBoxProps = Omit<
   size?: 'md' | 'sm';
   /** Keys shown at the end, such as `/` or `⌘K`. */
   shortcut?: string;
+  /** The Clear button's name for screen readers. Defaults to "Clear search". */
+  clearLabel?: string;
   /** How many hits the search found, shown at the end of the box and read by screen readers. */
   results?: string;
 } & (
@@ -47,6 +49,7 @@ function SearchBox({
   shortcut,
   results,
   onClear,
+  clearLabel = 'Clear search',
   id,
   className,
   value,
@@ -89,7 +92,7 @@ function SearchBox({
             ) : null}
             <InputGroupButton
               size='icon-xs'
-              aria-label='Clear search'
+              aria-label={clearLabel}
               onClick={onClear}
             >
               <Icon glyph='close' size={14} />

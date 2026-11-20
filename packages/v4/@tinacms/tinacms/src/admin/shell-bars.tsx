@@ -91,11 +91,17 @@ function BranchControl() {
         setFailed({ name, from });
         return;
       }
-      toast({
+      const failure = toast({
         tone: 'error',
         title: `Couldn't create ${name}`,
         text: 'Check your connection, then retry.',
-        action: { label: 'Retry', onClick: () => retry({ name, from }) },
+        action: {
+          label: 'Retry',
+          onClick: () => {
+            toast.dismiss(failure);
+            retry({ name, from });
+          },
+        },
       });
       return;
     }

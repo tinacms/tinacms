@@ -284,7 +284,13 @@ function BranchSwitcher({
     : branchNameError(typed, takenNames, submitted);
   const from = startFrom === 'base' ? baseBranch : (current ?? baseBranch);
   const [dismissed, setDismissed] = useState(false);
-  const failed = createState === 'failed' && !dismissed;
+  const attempted = useRef('');
+  const failed =
+    createState === 'failed' && !dismissed && typed === attempted.current;
+  const alertRef = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (failed) alertRef.current?.scrollIntoView?.({ block: 'nearest' });
+  }, [failed]);
   useEffect(() => setDismissed(false), [createState]);
 
   // A create that finished or was given up returns to the list; a failed one keeps the form.
@@ -369,7 +375,6 @@ function BranchSwitcher({
     setOpen(false);
   };
 
-  const attempted = useRef('');
   const submit = () => {
     setSubmitted(true);
     if (typed === '' || branchNameError(typed, takenNames, true)) return;
@@ -511,6 +516,7 @@ function BranchSwitcher({
             <SearchBox
               ref={nameRef}
               label='New branch name'
+              clearLabel='Clear name'
               placeholder='Branch name'
               icon='branch'
               value={newName}
@@ -561,7 +567,11 @@ function BranchSwitcher({
               )}
             </div>
             {failed ? (
-              <p role='alert' className='m-0 text-sm text-destructive'>
+              <p
+                ref={alertRef}
+                role='alert'
+                className='m-0 text-sm text-destructive'
+              >
                 Couldn't create {attempted.current}. Check your connection, then
                 retry.
               </p>
