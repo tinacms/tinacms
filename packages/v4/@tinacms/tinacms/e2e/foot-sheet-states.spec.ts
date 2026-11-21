@@ -760,7 +760,7 @@ test.describe('the branch switcher on a phone', () => {
     });
   }
 
-  test('shows no Full screen button, but keeps it from 768px up', async ({
+  test('shows no Maximise button, but keeps it from 768px up', async ({
     page,
   }) => {
     await page.setViewportSize(PHONE);
@@ -770,13 +770,14 @@ test.describe('the branch switcher on a phone', () => {
       .first()
       .click();
     await expect(page.locator(SHEET)).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Full screen' })).toHaveCount(
-      0
-    );
+    await expect(page.getByRole('button', { name: 'Maximise' })).toHaveCount(0);
     await page.setViewportSize({ width: 1280, height: 800 });
-    await expect(
-      page.getByRole('button', { name: 'Full screen' })
-    ).toBeVisible();
+    await expect(page.locator(SHEET)).toHaveCount(0);
+    await page
+      .getByRole('button', { name: /feature\/news/ })
+      .first()
+      .click();
+    await expect(page.getByRole('button', { name: 'Maximise' })).toBeVisible();
   });
 });
 

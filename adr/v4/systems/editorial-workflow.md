@@ -43,22 +43,28 @@ useTinaStore((s) => s.branch.list)           // ['main', 'cms/new-post', ...]
 useTinaStore((s) => s.branch.dirty)          // true if there are unsaved/uncommitted changes
 useTinaStore((s) => s.branch.mode)           // 'local' | 'branches' (unset: the provider has no branches)
 useTinaStore((s) => s.branch.protected)      // names of the protected branches
+useTinaStore((s) => s.branch.creating)       // { name, from, startedOn, phase } while this session makes a branch
+useTinaStore((s) => s.branch.createResult)   // { name, from, startedOn, outcome } of the last create, until the shell handles it
 ```
 
-The content provider fills the slice. A provider that reads from branches adds `branches: { list, defaultBranch }` to its content slice, and core sets `mode: 'branches'`, `list` and `protected`. A provider that reads local files adds `local: true`, and core sets `mode: 'local'`. A provider with neither leaves `mode` unset, and the shell shows no branch spot. Only `current` persists across reloads. Core rebuilds the rest on each boot.
+The content provider fills the slice. A provider that reads from branches adds `branches: { list, defaultBranch }` to its content slice, and core sets `mode: 'branches'`, `list` and `protected`. A provider that can make branches also adds `branches.create`, and core then adds the `create` action to the slice. A provider that reads local files adds `local: true`, and core sets `mode: 'local'`. A provider with neither leaves `mode` unset, and the shell shows no branch spot. Only `current` persists across reloads. Core rebuilds the rest on each boot.
 
 The Branch switcher blocks a switch while any form has unsaved edits. A form is dirty when the form store says so, so `branch.dirty` is not a store field yet.
 
 `switchTo(name)` is a plain setter on the slice. It sets `branch.current`, and every content and media read, query key and draft key follows it. Picking the default branch by name stores the same keys as picking nothing. The other actions call the Data Layer, and none exists yet:
 
 ```ts
-const { saveToNewBranch, switchTo, requestPublish, discard } = useTinaStore((s) => s.branch)
+const { saveToNewBranch, create, switchTo, requestPublish, discard } = useTinaStore((s) => s.branch)
 
 // All or nothing: one request makes the branch from `from` and writes the change.
 // When it rejects, no branch exists and the editor stays on their branch.
 await saveToNewBranch({ name: 'cms/new-post', from: 'main', collection, path, value })
 switchTo('cms/new-post')      // only after the save resolves
 await requestPublish()        // calls into the content capability or the workflow plugin
+
+// Makes a branch through `branches.create` and records `creating` and `createResult`.
+// It resolves once the branch exists; the shell reads `createResult` when the branch is ready.
+create('cms/new-post', 'main')
 ```
 
 `switchTo` takes no Data Layer call because switching branches reads a different branch. It does not change files.

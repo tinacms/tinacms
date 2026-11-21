@@ -7,6 +7,7 @@ import {
   branchSliceOf,
   currentBranchOf,
 } from '../core/branch/contract';
+import { createBranchAction } from '../core/branch/create';
 import { TinaRuntimeContext } from './context';
 import { useOptionalContentSlice, useTinaStore } from './hooks';
 
@@ -27,15 +28,30 @@ export function useBranchSync(): void {
     const source = content.branches;
     if (!source) return;
     let cancelled = false;
-    fill({ mode: 'branches', listState: 'loading' });
+    const { create } = source;
+    fill({
+      mode: 'branches',
+      listState: 'loading',
+      create: create
+        ? createBranchAction(store, {
+            ...source,
+            create: (r) => create.call(source, r),
+          })
+        : undefined,
+    });
     Promise.all([source.list(), source.defaultBranch()]).then(
       ([branches, fallback]) => {
         if (cancelled) return;
+        const names = branches.map((branch) => branch.name);
+        const pending = branchSliceOf(store.getState())?.creating?.name;
         fill({
           mode: 'branches',
           listState: 'ready',
           fallback,
-          list: branches.map((branch) => branch.name),
+          list:
+            pending !== undefined && !names.includes(pending)
+              ? [...names, pending]
+              : names,
           protected: branches
             .filter((branch) => branch.protected)
             .map((branch) => branch.name),
@@ -87,6 +103,11 @@ export interface BranchView {
   retryList: () => void;
   switchTo: (name: string) => void;
   saveToNewBranch: BranchSlice['saveToNewBranch'];
+  /** Makes a branch through the provider. Absent when the provider cannot. */
+  create: BranchSlice['create'];
+  /** The branch being made by this session, if any. */
+  creating: BranchSlice['creating'];
+  createResult: BranchSlice['createResult'];
 }
 
 export function useBranchView(): BranchView | null {
@@ -117,5 +138,8 @@ export function useBranchView(): BranchView | null {
       })),
     switchTo: slice.switchTo,
     saveToNewBranch: slice.saveToNewBranch,
+    create: slice.create,
+    creating: slice.creating,
+    createResult: slice.createResult,
   };
 }

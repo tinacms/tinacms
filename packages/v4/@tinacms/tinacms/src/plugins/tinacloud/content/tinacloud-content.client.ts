@@ -48,6 +48,8 @@ export const createTinaCloudContentSlice =
     const content = {
       branches: {
         list: () => client.listBranches(),
+        create: ({ name, from }: { name: string; from: string }) =>
+          client.createBranch({ name, from }),
         defaultBranch: async () => (await client.getProject()).defaultBranch,
       },
       get: async (collection, path) => {

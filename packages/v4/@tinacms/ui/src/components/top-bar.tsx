@@ -9,7 +9,7 @@ type TopBarProps = Omit<ComponentProps<'header'>, 'children'> & {
   logo?: ReactNode;
   /** Shown after the logo. Long names end in an ellipsis. */
   projectName?: string;
-  /** The branch button. Leave it out when there are no branches. */
+  /** The branch button, or the Local files badge in local mode. Leave it out when there are no branches. */
   branch?: ReactNode;
   /** Dev controls: a dashed button before Search. Leave it out outside development. */
   devControls?: ReactNode;

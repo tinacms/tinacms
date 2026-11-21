@@ -368,6 +368,19 @@ describe('TinaCloud content slice', () => {
     ]);
   });
 
+  it('creates a branch through the client', async () => {
+    const fetchMock = stubTinaCloud({ ref: 'refs/heads/cms/x' });
+    const made = await content().branches?.create({
+      name: 'cms/x',
+      from: 'main',
+    });
+    made?.ready.catch(() => {});
+    expect(made?.name).toBe('cms/x');
+    expect(
+      fetchMock.mock.calls.some(([url]) => url.endsWith('/create_branch'))
+    ).toBe(true);
+  });
+
   it('reports a failed save as a ContentError', async () => {
     stubTinaCloud({
       errors: [
