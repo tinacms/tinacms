@@ -1817,7 +1817,11 @@ describe('branch switcher rows and creating a branch', () => {
     createBranch = create;
     const { user, dialog } = await startCreate();
     await press(dialog, user);
-    expect(await screen.findByText("cms/x isn't ready yet")).toBeVisible();
+    expect(
+      await screen.findByText(
+        "cms/x isn't ready yet. It was made. Try switching to it in a few minutes."
+      )
+    ).toBeVisible();
     expect(create).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: /^Branch: main/ })).toBeVisible();
     expect(await screen.findByRole('button', { name: /cms\/x/ })).toBeVisible();
@@ -2029,7 +2033,19 @@ describe('branch switcher rows and creating a branch', () => {
     await press(dialog, user);
     fireEvent.change(title, { target: { value: 'Hello!' } });
     act(() => ready());
-    expect(await screen.findByText('cms/x is ready')).toBeVisible();
+    expect(await within(dialog).findByText('cms/x is ready')).toBeVisible();
+    expect(document.querySelectorAll('[data-sonner-toast]')).toHaveLength(0);
+    const switchButton = within(dialog).getByRole('button', {
+      name: 'Switch to cms/x',
+    });
+    await user.click(switchButton);
+    const note = dialog.querySelector(
+      '[data-slot="branch-outcome-note"]'
+    ) as HTMLElement;
+    expect(
+      await within(note).findByText('Save or discard your changes first')
+    ).toBeVisible();
+    expect(within(note).getByText('cms/x is ready')).toBeVisible();
     expect(screen.getByRole('button', { name: /^Branch: main/ })).toBeVisible();
   });
 
@@ -2090,45 +2106,7 @@ describe('branch switcher rows and creating a branch', () => {
     read.mockRestore();
   });
 
-  it('tells the editor to wait when Retry is pressed while another branch is being made', async () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    let fail: (cause: Error) => void = () => {};
-    const create = vi
-      .fn<NonNullable<BranchSource['create']>>()
-      .mockImplementationOnce(
-        () =>
-          new Promise((_resolve, reject) => {
-            fail = reject;
-          })
-      )
-      .mockImplementationOnce(() => new Promise(() => {}));
-    createBranch = create;
-    const { user, dialog } = await startCreate('cms/a');
-    await press(dialog, user);
-    await user.click(
-      within(dialog).getByRole('button', { name: 'Close branches' })
-    );
-    act(() => fail(new Error('offline')));
-    await screen.findByText("Couldn't create cms/a");
-    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
-    const again = await screen.findByRole('dialog', { name: 'Branches' });
-    await user.click(
-      await within(again).findByRole('button', { name: 'New branch' })
-    );
-    await user.type(
-      within(again).getByRole('searchbox', { name: 'New branch name' }),
-      'cms/b'
-    );
-    await press(again, user);
-    await user.click(screen.getByRole('button', { name: 'Retry' }));
-    expect(
-      await screen.findByText('Wait for cms/b to finish first')
-    ).toBeVisible();
-    expect(create).toHaveBeenCalledTimes(2);
-    expect(screen.getByText("Couldn't create cms/a")).toBeVisible();
-  });
-
-  it('reports a retried create that fails while the switcher is open without the form', async () => {
+  const failWhileClosed = async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     const rejects: ((cause: Error) => void)[] = [];
     createBranch = vi.fn<NonNullable<BranchSource['create']>>(
@@ -2144,147 +2122,72 @@ describe('branch switcher rows and creating a branch', () => {
     );
     act(() => rejects[0](new Error('offline')));
     await screen.findByText("Couldn't create cms/x");
-    await user.click(screen.getByRole('button', { name: 'Retry' }));
-    await waitFor(() =>
-      expect(screen.queryByText("Couldn't create cms/x")).toBeNull()
-    );
-    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
-    await screen.findByRole('dialog', { name: 'Branches' });
-    act(() => rejects[1](new Error('offline')));
-    expect(
-      await screen.findByText(
-        "Couldn't create cms/x. Check your connection, then retry."
-      )
-    ).toBeVisible();
-  });
-
-  it('reports a retried create that fails while the maximised view shows an empty form', async () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const rejects: ((cause: Error) => void)[] = [];
-    createBranch = vi.fn<NonNullable<BranchSource['create']>>(
-      () =>
-        new Promise((_resolve, reject) => {
-          rejects.push(reject);
-        })
-    );
-    const { user, dialog } = await startCreate();
-    await press(dialog, user);
-    await user.click(
-      within(dialog).getByRole('button', { name: 'Close branches' })
-    );
-    act(() => rejects[0](new Error('offline')));
-    await screen.findByText("Couldn't create cms/x");
-    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
-    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
-    await user.click(
-      within(reopened).getByRole('button', { name: 'Maximise' })
-    );
-    await waitFor(() =>
-      expect(
-        document.querySelector('[data-slot="branch-maximised"]')
-      ).not.toBeNull()
-    );
-    const view = document.querySelector(
-      '[data-slot="branch-maximised"]'
-    ) as HTMLElement;
-    await user.click(within(view).getByRole('button', { name: 'New branch' }));
-    await user.click(screen.getByRole('button', { name: 'Retry' }));
-    await waitFor(() => expect(rejects).toHaveLength(2));
-    await waitFor(() =>
-      expect(screen.queryByText("Couldn't create cms/x")).toBeNull()
-    );
-    act(() => rejects[1](new Error('offline')));
-    expect(
-      await screen.findByText(
-        "Couldn't create cms/x. Check your connection, then retry."
-      )
-    ).toBeVisible();
-  });
-
-  const failFromToast = async (type?: string) => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const rejects: ((cause: Error) => void)[] = [];
-    createBranch = vi.fn<NonNullable<BranchSource['create']>>(
-      () =>
-        new Promise((_resolve, reject) => {
-          rejects.push(reject);
-        })
-    );
-    const { user, dialog } = await startCreate();
-    await press(dialog, user);
-    await user.click(
-      within(dialog).getByRole('button', { name: 'Close branches' })
-    );
-    act(() => rejects[0](new Error('offline')));
-    await screen.findByText("Couldn't create cms/x");
-    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
-    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
-    await user.click(
-      within(reopened).getByRole('button', { name: 'Maximise' })
-    );
-    await waitFor(() =>
-      expect(
-        document.querySelector('[data-slot="branch-maximised"]')
-      ).not.toBeNull()
-    );
-    const view = document.querySelector(
-      '[data-slot="branch-maximised"]'
-    ) as HTMLElement;
-    if (type !== undefined) {
-      await user.click(
-        within(view).getByRole('button', { name: 'New branch' })
-      );
-      await user.type(
-        within(view).getByRole('searchbox', { name: 'New branch name' }),
-        type
-      );
-    }
-    await user.click(screen.getByRole('button', { name: 'Retry' }));
-    await waitFor(() => expect(rejects).toHaveLength(2));
-    act(() => rejects[1](new Error('offline')));
-    return { view, user };
+    return { user, rejects };
   };
 
-  it('shows a toast-started failure inside the maximised view, where a toast may sit under it', async () => {
-    const { view } = await failFromToast();
+  const toasts = () => document.querySelectorAll('[data-sonner-toast]');
+
+  it('takes the failure toast back when the switcher reopens and shows the note instead', async () => {
+    const { user } = await failWhileClosed();
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
     expect(
-      await within(view).findByText(
+      await within(dialog).findByText(
         "Couldn't create cms/x. Check your connection, then retry."
       )
     ).toBeVisible();
+    await waitFor(() => expect(toasts()).toHaveLength(0));
   });
 
-  it('keeps what was typed in the New branch form when a toast-started create ends', async () => {
-    const { view } = await failFromToast('draft-name');
-    await within(view).findByText(
-      "Couldn't create cms/x. Check your connection, then retry."
+  it('retries from the note, and focuses the search box only when the retry started', async () => {
+    const { user, rejects } = await failWhileClosed();
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      await within(dialog).findByRole('button', { name: 'Retry' })
     );
+    await waitFor(() => expect(rejects).toHaveLength(2));
+    expect(createBranch).toHaveBeenLastCalledWith({
+      name: 'cms/x',
+      from: 'main',
+    });
+    expect(await within(dialog).findByText('Creating cms/x…')).toBeVisible();
+    act(() => rejects[1](new Error('offline')));
     expect(
-      within(view).getByRole('searchbox', { name: 'New branch name' })
-    ).toHaveValue('draft-name');
-  });
-
-  it('retries from the note inside the open switcher, and shows no toast beside it', async () => {
-    const { view } = await failFromToast();
-    const note = await within(view).findByText(
-      "Couldn't create cms/x. Check your connection, then retry."
-    );
-    await waitFor(() =>
-      expect(document.querySelector('[data-slot="toast"]')).toBeNull()
-    );
-    const create = vi.mocked(createBranch as NonNullable<typeof createBranch>);
-    await userEvent.click(
-      within(note.closest('[role="alert"]') as HTMLElement).getByRole(
-        'button',
-        { name: 'Retry' }
+      await within(dialog).findByText(
+        "Couldn't create cms/x. Check your connection, then retry."
       )
+    ).toBeVisible();
+    await waitFor(() => expect(toasts()).toHaveLength(0));
+  });
+
+  it('sends one toast when the switcher closes with the note, and none after Dismiss', async () => {
+    const { user } = await failWhileClosed();
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      await within(dialog).findByRole('button', { name: 'Dismiss' })
     );
-    await waitFor(() => expect(create).toHaveBeenCalledTimes(3));
-    expect(create).toHaveBeenLastCalledWith({ name: 'cms/x', from: 'main' });
-    expect(await within(view).findByText('Creating cms/x…')).toBeVisible();
     expect(
-      within(view).getByRole('searchbox', { name: 'Search branches' })
+      within(dialog).getByRole('searchbox', { name: 'Search branches' })
     ).toHaveFocus();
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    await waitFor(() => expect(toasts()).toHaveLength(0));
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const again = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(within(again).queryByText(/Couldn't create cms\/x/)).toBeNull();
+  });
+
+  it('sends the toast again when the switcher closes with the note still held', async () => {
+    const { user } = await failWhileClosed();
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    await screen.findByRole('dialog', { name: 'Branches' });
+    await waitFor(() => expect(toasts()).toHaveLength(0));
+    await user.keyboard('{Escape}');
+    expect(await screen.findByText("Couldn't create cms/x")).toBeVisible();
+    expect(toasts()).toHaveLength(1);
   });
 
   it('dismisses the failure toast when its Retry is pressed', async () => {

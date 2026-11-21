@@ -808,8 +808,8 @@ describe('Branch switcher controls', () => {
         current='feature/news'
         branches={entries}
         onSwitch={() => {}}
-        failedBranch='cms/x'
-        onRetryFailed={refused}
+        note={{ kind: 'failed', name: 'cms/x' }}
+        onNoteAction={refused}
         defaultOpen
       />
     );
@@ -824,12 +824,43 @@ describe('Branch switcher controls', () => {
         current='feature/news'
         branches={entries}
         onSwitch={() => {}}
-        failedBranch='cms/x'
-        onRetryFailed={started}
+        note={{ kind: 'failed', name: 'cms/x' }}
+        onNoteAction={started}
         defaultOpen
       />
     );
     await user.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(
+      screen.getByRole('searchbox', { name: 'Search branches' })
+    ).toHaveFocus();
+  });
+
+  it('shows one note with its action and Dismiss, and Dismiss focuses the search box', async () => {
+    const user = userEvent.setup();
+    const onNoteDismiss = vi.fn();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        note={{
+          kind: 'ready',
+          name: 'cms/x',
+          reason: 'Save or discard your changes first',
+        }}
+        onNoteDismiss={onNoteDismiss}
+        defaultOpen
+      />
+    );
+    expect(screen.getByText('cms/x is ready')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Switch to cms/x' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Save or discard your changes first')
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Dismiss' }));
+    expect(onNoteDismiss).toHaveBeenCalledOnce();
     expect(
       screen.getByRole('searchbox', { name: 'Search branches' })
     ).toHaveFocus();

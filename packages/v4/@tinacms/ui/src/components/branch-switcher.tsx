@@ -42,6 +42,13 @@ type BranchEntry = {
   ready?: boolean;
 };
 
+/** What a create ended in. `reason` says why the note's action was refused. */
+type BranchNote = {
+  kind: 'failed' | 'unready' | 'ready';
+  name: string;
+  reason?: string;
+};
+
 type BranchSwitcherProps = {
   /** The branch edits save to. Left out while it is not known yet, as when the list failed to load. */
   current?: string;
@@ -62,10 +69,11 @@ type BranchSwitcherProps = {
   onFormChange?: (shown: boolean) => void;
   /** `creating` shows "Creating" on the form; `failed` keeps the form with a Retry. */
   createState?: 'idle' | 'creating' | 'failed';
-  /** A branch that failed to create without the form: shown as a note above the list, as a toast may sit under this view. */
-  failedBranch?: string;
-  /** Tries the create of `failedBranch` again, from the note's Retry button. Return false when it did not start. */
-  onRetryFailed?: () => boolean | void;
+  /** The outcome of a create, shown above the list while the switcher is open. One at a time. */
+  note?: BranchNote;
+  /** Runs the note's action (Retry, or Switch). Return false when it was refused: the note stays. */
+  onNoteAction?: () => boolean | void;
+  onNoteDismiss?: () => void;
   /** The branch being made while the form is not on screen, so the switcher can say so. */
   creatingBranch?: string;
   /** `loading` shows a skeleton and `failed` shows the problem with Retry, both in place. */
@@ -213,9 +221,59 @@ function BranchGroup({
   );
 }
 
-/** Marks the maximised view and the phone sheet, so the app can lift its toasts above them. */
-export const BRANCH_SWITCHER_OVERLAY_ATTRIBUTE = 'data-branch-switcher-overlay';
-export const BRANCH_SWITCHER_OVERLAY_SELECTOR = `[${BRANCH_SWITCHER_OVERLAY_ATTRIBUTE}]`;
+/** One note above the list: what a create ended in, its action and Dismiss. */
+function OutcomeNote({
+  note,
+  onAction,
+  onDismiss,
+}: {
+  note: BranchNote;
+  onAction: () => void;
+  onDismiss: () => void;
+}) {
+  const failed = note.kind === 'failed';
+  const action =
+    note.kind === 'failed'
+      ? 'Retry'
+      : note.kind === 'ready'
+        ? `Switch to ${note.name}`
+        : undefined;
+  return (
+    <div
+      data-slot='branch-outcome-note'
+      className='flex flex-none flex-col gap-1.5 text-sm'
+    >
+      <div
+        role={failed ? 'alert' : 'status'}
+        className={cn(
+          'flex flex-wrap items-center gap-2',
+          failed ? 'text-destructive' : 'text-foreground'
+        )}
+      >
+        <span className='min-w-0 flex-1 [overflow-wrap:anywhere]'>
+          {note.kind === 'failed'
+            ? `Couldn't create ${note.name}. Check your connection, then retry.`
+            : note.kind === 'unready'
+              ? `${note.name} isn't ready yet. It was made. Try switching to it in a few minutes.`
+              : `${note.name} is ready`}
+        </span>
+        {action ? (
+          <Button size='sm' onClick={onAction}>
+            {action}
+          </Button>
+        ) : null}
+        <Button size='sm' variant='ghost' onClick={onDismiss}>
+          Dismiss
+        </Button>
+      </div>
+      {note.reason ? (
+        <p className='m-0 text-muted-foreground [overflow-wrap:anywhere]'>
+          {note.reason}
+        </p>
+      ) : null}
+    </div>
+  );
+}
 
 /** Runs `run` once the frame on screen has laid out; the returned function cancels it. */
 const afterPaint = (run: () => void) => {
@@ -261,8 +319,9 @@ function BranchSwitcher({
   baseBranch,
   onFormChange,
   createState = 'idle',
-  failedBranch,
-  onRetryFailed,
+  note,
+  onNoteAction,
+  onNoteDismiss,
   creatingBranch,
   status = 'ready',
   onRetry,
@@ -359,6 +418,10 @@ function BranchSwitcher({
   useEffect(() => {
     if (!open && maximised) setMaximised(false);
   });
+
+  useEffect(() => {
+    if (note !== undefined && note.kind !== 'failed') setCreating(false);
+  }, [note]);
 
   useEffect(() => {
     onFormChange?.(creating);
@@ -487,26 +550,18 @@ function BranchSwitcher({
           Creating {creatingBranch}…
         </p>
       ) : null}
-      {failedBranch !== undefined ? (
-        <div
-          role='alert'
-          data-slot='branch-failure-note'
-          className='flex flex-none items-center gap-2 text-sm text-destructive'
-        >
-          <span className='min-w-0 flex-1 [overflow-wrap:anywhere]'>
-            Couldn't create {failedBranch}. Check your connection, then retry.
-          </span>
-          {onRetryFailed ? (
-            <Button
-              size='sm'
-              onClick={() => {
-                if (onRetryFailed() !== false) focusField('search');
-              }}
-            >
-              Retry
-            </Button>
-          ) : null}
-        </div>
+      {note !== undefined ? (
+        <OutcomeNote
+          note={note}
+          onAction={() => {
+            if (onNoteAction?.() !== false && note.kind === 'failed')
+              focusField('search');
+          }}
+          onDismiss={() => {
+            onNoteDismiss?.();
+            focusField('search');
+          }}
+        />
       ) : null}
       <div className='flex min-h-0 flex-col gap-3 overflow-y-auto'>
         {status === 'loading' ? (
@@ -741,12 +796,7 @@ function BranchSwitcher({
     return (
       <Dialog open={shown} onOpenChange={setOpen}>
         <DialogTrigger render={trigger}>{label}</DialogTrigger>
-        <DialogContent
-          size='md'
-          showCloseButton={false}
-          {...{ [BRANCH_SWITCHER_OVERLAY_ATTRIBUTE]: '' }}
-          onKeyDown={move}
-        >
+        <DialogContent size='md' showCloseButton={false} onKeyDown={move}>
           {panel(({ children }) => (
             <>
               <DialogTitle>{children}</DialogTitle>
@@ -845,7 +895,6 @@ function MaximisedView({
     <section
       aria-label='Branches'
       data-slot='branch-maximised'
-      {...{ [BRANCH_SWITCHER_OVERLAY_ATTRIBUTE]: '' }}
       onKeyDown={onKeyDown}
       className='fixed inset-x-0 top-14 bottom-7 z-40 overflow-y-auto bg-background p-6 font-sans text-base leading-control text-foreground'
     >
@@ -866,5 +915,5 @@ function LocalFilesBadge() {
   );
 }
 
-export type { BranchEntry, BranchSwitcherProps };
+export type { BranchEntry, BranchNote, BranchSwitcherProps };
 export { BranchSwitcher, LocalFilesBadge };

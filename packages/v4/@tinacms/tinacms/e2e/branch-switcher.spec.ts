@@ -699,226 +699,227 @@ test.describe('branch switcher pop-up', () => {
     }
   });
 
-  const toastOnTop = (page: import('@playwright/test').Page, text: string) =>
-    page.evaluate((words) => {
-      const toast = [...document.querySelectorAll('[data-sonner-toast]')].find(
-        (el) => el.textContent?.includes(words)
-      );
-      if (!toast) return false;
-      const r = toast.getBoundingClientRect();
-      const hit = document.elementFromPoint(
-        r.x + r.width / 2,
-        r.y + r.height / 2
-      );
-      return hit !== null && toast.contains(hit);
-    }, text);
-
-  for (const frame of [
+  type Page = import('@playwright/test').Page;
+  const FRAMES = [
     { name: 'pop-up', size: DESKTOP, maximise: false },
     { name: 'maximised view', size: DESKTOP, maximise: true },
     { name: 'phone sheet', size: { width: 390, height: 844 }, maximise: false },
-  ]) {
-    test(`shows the not-ready toast on top of the ${frame.name}`, async ({
+  ];
+  const toastCount = (page: Page) =>
+    page.locator('[data-sonner-toast]').count();
+  const frameOf = (page: Page, maximise: boolean) =>
+    maximise
+      ? page.locator('[data-slot="branch-maximised"]')
+      : page.getByRole('dialog', { name: 'Branches' });
+  const openFrame = async (page: Page, maximise: boolean) => {
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    if (maximise) {
+      await page.getByRole('button', { name: 'Maximise' }).click();
+      await expect(frameOf(page, true)).toBeVisible();
+    }
+  };
+  const makeBranch = async (
+    page: Page,
+    frame: ReturnType<typeof frameOf>,
+    name = 'cms/x'
+  ) => {
+    await frame.getByRole('button', { name: 'New branch' }).click();
+    await frame.getByRole('searchbox', { name: 'New branch name' }).fill(name);
+    await frame.getByRole('button', { name: 'Create branch' }).click();
+  };
+
+  for (const frame of FRAMES) {
+    test(`shows the not-ready note inside the ${frame.name}, with no toast`, async ({
       page,
     }) => {
       await page.setViewportSize(frame.size);
       await page.goto('/branches.html?docs=1&create=unready#/');
-      await page.getByRole('button', { name: /^Branch:/ }).click();
-      if (frame.maximise) {
-        await page.getByRole('button', { name: 'Maximise' }).click();
-        await expect(
-          page.locator('[data-slot="branch-maximised"]')
-        ).toBeVisible();
-        await expect(
-          page.getByRole('dialog', { name: 'Branches' })
-        ).toBeHidden();
-      }
-      await page.getByRole('button', { name: 'New branch' }).click();
-      await page
-        .getByRole('searchbox', { name: 'New branch name' })
-        .fill('cms/x');
-      await page.getByRole('button', { name: 'Create branch' }).click();
-      await expect(page.getByText("cms/x isn't ready yet")).toBeVisible();
-      await expect
-        .poll(() => toastOnTop(page, "cms/x isn't ready yet"))
-        .toBe(true);
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      await makeBranch(page, view);
+      await expect(
+        view.getByText(
+          "cms/x isn't ready yet. It was made. Try switching to it in a few minutes."
+        )
+      ).toBeVisible();
+      await expect(view.getByRole('button', { name: 'Dismiss' })).toBeVisible();
+      expect(await toastCount(page)).toBe(0);
+      await view.getByRole('button', { name: 'Dismiss' }).click();
+      await expect(
+        view.getByRole('searchbox', { name: 'Search branches' })
+      ).toBeFocused();
+    });
+
+    test(`shows the failure note with Retry inside the ${frame.name} after a toast-started failure, with no toast`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=fail#/');
+      await openFrame(page, false);
+      await makeBranch(page, frameOf(page, false));
+      await page.keyboard.press('Escape');
+      await expect(page.getByText("Couldn't create cms/x")).toBeVisible();
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      await expect(
+        view.getByText(
+          "Couldn't create cms/x. Check your connection, then retry."
+        )
+      ).toBeVisible();
+      await expect.poll(() => toastCount(page)).toBe(0);
+      await view.getByRole('button', { name: 'Retry' }).click();
+      await expect(
+        view.getByText(
+          "Couldn't create cms/x. Check your connection, then retry."
+        )
+      ).toBeVisible({ timeout: 5000 });
+      expect(await toastCount(page)).toBe(0);
     });
   }
 
-  test('can press Retry on the failure toast while the maximised view is open', async ({
+  test('sends one toast when the switcher closes with the note, and takes it back on reopen', async ({
     page,
   }) => {
     await page.setViewportSize(DESKTOP);
-    await page.goto('/branches.html?docs=1&create=fail#/');
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: 'New branch' }).click();
-    await page
-      .getByRole('searchbox', { name: 'New branch name' })
-      .fill('cms/x');
-    await page.getByRole('button', { name: 'Create branch' }).click();
-    await page
-      .getByRole('dialog', { name: 'Branches' })
-      .getByRole('button', { name: 'Close branches' })
-      .click();
-    await expect(page.getByText("Couldn't create cms/x")).toBeVisible();
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: 'Maximise' }).click();
-    await expect(page.locator('[data-slot="branch-maximised"]')).toBeVisible();
-    await expect
-      .poll(() => toastOnTop(page, "Couldn't create cms/x"))
-      .toBe(true);
-    const retry = page.getByRole('button', { name: 'Retry' });
-    await retry.click({ timeout: 3000 });
+    await page.goto('/branches.html?docs=1&create=unready#/');
+    await openFrame(page, false);
+    const view = frameOf(page, false);
+    await makeBranch(page, view);
+    await expect(view.getByText(/isn't ready yet\. It was made/)).toBeVisible();
+    await page.keyboard.press('Escape');
     await expect(
-      page
-        .locator('[data-slot="branch-maximised"]')
-        .getByText("Couldn't create cms/x. Check your connection, then retry.")
-    ).toBeVisible({ timeout: 5000 });
+      page.getByText("cms/x isn't ready yet", { exact: true })
+    ).toBeVisible();
+    expect(await toastCount(page)).toBe(1);
+    await openFrame(page, false);
+    await expect(
+      frameOf(page, false).getByText(/isn't ready yet\. It was made/)
+    ).toBeVisible();
+    await expect.poll(() => toastCount(page)).toBe(0);
+    await frameOf(page, false).getByRole('button', { name: 'Dismiss' }).click();
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(500);
+    expect(await toastCount(page)).toBe(0);
   });
 
-  test('keeps the maximised view above the Errors pane, with Close branches clickable', async ({
-    page,
-  }) => {
-    await page.setViewportSize(DESKTOP);
-    await page.goto(
-      '/branches.html?docs=1#/collections/post/content%2Fposts%2Fpost-01.mdx'
-    );
-    const title = page.getByRole('textbox', { name: /^Title/ });
-    await title.fill('');
-    await page
-      .locator('[data-slot=form-bar]')
-      .getByRole('button', { name: /^(Save|Resolve)/ })
-      .click();
-    await expect(
-      page.locator('[data-slot="error-summary-pane"]').first()
-    ).toBeVisible();
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: 'Maximise' }).click();
-    const view = page.locator('[data-slot="branch-maximised"]');
-    await expect(view).toBeVisible();
-    const onTop = await page.evaluate(() => {
-      const view = document.querySelector('[data-slot="branch-maximised"]');
-      if (!view) return false;
-      const r = view.getBoundingClientRect();
-      return [r.right - 6, r.right - 40].every((x) => {
-        const hit = document.elementFromPoint(x, r.top + r.height / 2);
-        return hit !== null && view.contains(hit);
+  for (const width of [1280, 800])
+    test(`keeps the maximised view above the Errors pane at ${width}px, with Close branches clickable`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(
+        '/branches.html?docs=1#/collections/post/content%2Fposts%2Fpost-01.mdx'
+      );
+      const title = page.getByRole('textbox', { name: /^Title/ });
+      await title.fill('');
+      await page
+        .locator('[data-slot=form-bar]')
+        .getByRole('button', { name: /^(Save|Resolve)/ })
+        .click();
+      await expect(
+        page.locator('[data-slot="error-summary-pane"]').first()
+      ).toBeVisible();
+      await page.getByRole('button', { name: /^Branch:/ }).click();
+      await page.getByRole('button', { name: 'Maximise' }).click();
+      const view = page.locator('[data-slot="branch-maximised"]');
+      await expect(view).toBeVisible();
+      const onTop = await page.evaluate(() => {
+        const view = document.querySelector('[data-slot="branch-maximised"]');
+        if (!view) return false;
+        const r = view.getBoundingClientRect();
+        return [r.right - 6, r.right - 40].every((x) => {
+          const hit = document.elementFromPoint(x, r.top + r.height / 2);
+          return hit !== null && view.contains(hit);
+        });
       });
+      expect(onTop).toBe(true);
+      await view.getByRole('button', { name: 'Close branches' }).click();
+      await expect(view).toBeHidden();
     });
-    expect(onTop).toBe(true);
-    await view.getByRole('button', { name: 'Close branches' }).click();
-    await expect(view).toBeHidden();
-  });
 
   test('keeps the note and its Retry inside the switcher when the branch name is long', async ({
     page,
   }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+    await page.setViewportSize({ width: 320, height: 700 });
     await page.goto('/branches.html?docs=1&create=fail#/');
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: 'New branch' }).click();
-    await page
-      .getByRole('searchbox', { name: 'New branch name' })
-      .fill('cms/' + 'a'.repeat(80));
-    await page.getByRole('button', { name: 'Create branch' }).click();
+    await openFrame(page, false);
+    await makeBranch(page, frameOf(page, false), `cms/${'a'.repeat(120)}`);
     await page.keyboard.press('Escape');
     await page.getByRole('button', { name: 'Retry' }).click();
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    const note = page.locator('[data-slot="branch-failure-note"]');
+    await expect(page.getByText(/^Couldn't create cms\/a+$/)).toBeVisible({
+      timeout: 5000,
+    });
+    await page.keyboard.press('Escape');
+    await openFrame(page, false);
+    const note = page.locator('[data-slot="branch-outcome-note"]');
     await expect(note).toBeVisible({ timeout: 5000 });
     const fits = await note.evaluate((el) => {
-      const text = el.firstElementChild as HTMLElement;
+      const text = el.querySelector('span') as HTMLElement;
       const retry = el.querySelector('button')?.getBoundingClientRect();
       const box = el.getBoundingClientRect();
       return (
         text.scrollWidth <= text.clientWidth &&
         !!retry &&
-        retry.right <= box.right + 1
+        retry.right <= box.right + 1 &&
+        document.documentElement.scrollWidth <= window.innerWidth
       );
     });
     expect(fits).toBe(true);
   });
 
-  test('lets a modal dim the toast again while the maximised view is open', async ({
+  test('leaves the Toaster layer as it was: no lift above the switcher', async ({
     page,
   }) => {
     await page.setViewportSize(DESKTOP);
     await page.goto('/branches.html?docs=1&create=unready#/');
+    await openFrame(page, true);
+    await makeBranch(page, frameOf(page, true));
+    await expect(
+      frameOf(page, true).getByText(/isn't ready yet/)
+    ).toBeVisible();
+    const layer = await page.evaluate(() => {
+      const toaster = document.querySelector('[data-sonner-toaster]');
+      return toaster ? getComputedStyle(toaster).zIndex : 'none';
+    });
+    expect(['40', 'none']).toContain(layer);
+  });
+
+  test('keeps a page toast from covering a modal opened over the phone sheet', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(
+      '/branches.html?docs=1&fail=branch-gone#/collections/post/content%2Fposts%2Fpost-01.mdx'
+    );
+    await page.getByRole('textbox', { name: /^Title/ }).fill('Edited');
+    await page
+      .locator('[data-slot=form-bar]')
+      .getByRole('button', { name: /^Save/ })
+      .click();
+    await expect(page.getByText(/Couldn't save/).first()).toBeVisible();
+    await page.keyboard.press('Escape');
     await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: 'Maximise' }).click();
-    const view = page.locator('[data-slot="branch-maximised"]');
-    await expect(view).toBeVisible();
-    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
-    await view.getByRole('button', { name: 'New branch' }).click();
-    await view
-      .getByRole('searchbox', { name: 'New branch name' })
-      .fill('cms/x');
-    await view.getByRole('button', { name: 'Create branch' }).click();
-    await expect
-      .poll(() => toastOnTop(page, "cms/x isn't ready yet"))
-      .toBe(true);
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeVisible();
     await page.keyboard.press(
       process.platform === 'darwin' ? 'Meta+k' : 'Control+k'
     );
-    await expect(page.getByRole('dialog', { name: /Search/ })).toBeVisible();
     await expect
-      .poll(() => toastOnTop(page, "cms/x isn't ready yet"))
-      .toBe(false);
-  });
-
-  test('lets a phone modal dim the toast too, after the switcher sheet is closed', async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/branches.html?docs=1&create=unready#/');
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: 'New branch' }).click();
-    await page
-      .getByRole('searchbox', { name: 'New branch name' })
-      .fill('cms/x');
-    await page.getByRole('button', { name: 'Create branch' }).click();
-    await expect
-      .poll(() => toastOnTop(page, "cms/x isn't ready yet"))
-      .toBe(true);
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
-    await page.getByRole('button', { name: 'Search' }).first().click();
-    await expect(
-      page.locator('[data-slot=foot-sheet]:not([hidden])')
-    ).toBeVisible();
-    await expect
-      .poll(() => toastOnTop(page, "cms/x isn't ready yet"))
-      .toBe(false);
-  });
-
-  test('drops the toast lift when another phone sheet opens over the switcher sheet', async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/branches.html?docs=1&create=unready#/');
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    await page.getByRole('button', { name: 'New branch' }).click();
-    await page
-      .getByRole('searchbox', { name: 'New branch name' })
-      .fill('cms/x');
-    await page.getByRole('button', { name: 'Create branch' }).click();
-    await expect(page.getByText("cms/x isn't ready yet")).toBeVisible();
-    const layer = () =>
-      page.evaluate(
-        () =>
-          getComputedStyle(
-            document.querySelector('[data-sonner-toaster]') as Element
-          ).zIndex
-      );
-    await expect.poll(layer).toBe('60');
-    await page.evaluate(() => {
-      const sheet = document.createElement('div');
-      sheet.setAttribute('data-slot', 'foot-sheet');
-      sheet.id = 'extra-sheet';
-      document.body.append(sheet);
-    });
-    await expect.poll(layer).toBe('40');
-    await page.evaluate(() => document.getElementById('extra-sheet')?.remove());
-    await expect.poll(layer).toBe('60');
+      .poll(() =>
+        page.evaluate(() => {
+          const field = document.querySelector<HTMLElement>(
+            '[data-slot=foot-sheet]:not([hidden]) input'
+          );
+          if (!field) return 'no field';
+          const r = field.getBoundingClientRect();
+          const hit = document.elementFromPoint(
+            r.x + r.width / 2,
+            r.y + r.height / 2
+          );
+          return hit?.closest('[data-sonner-toast]') === null
+            ? 'dialog'
+            : 'toast';
+        })
+      )
+      .toBe('dialog');
   });
 });
