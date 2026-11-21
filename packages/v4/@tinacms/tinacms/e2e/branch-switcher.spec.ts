@@ -739,8 +739,9 @@ test.describe('branch switcher pop-up', () => {
         .fill('cms/x');
       await page.getByRole('button', { name: 'Create branch' }).click();
       await expect(page.getByText("cms/x isn't ready yet")).toBeVisible();
-      await page.waitForTimeout(500);
-      expect(await toastOnTop(page, "cms/x isn't ready yet")).toBe(true);
+      await expect
+        .poll(() => toastOnTop(page, "cms/x isn't ready yet"))
+        .toBe(true);
     });
   }
 
@@ -763,8 +764,9 @@ test.describe('branch switcher pop-up', () => {
     await page.getByRole('button', { name: /^Branch:/ }).click();
     await page.getByRole('button', { name: 'Maximise' }).click();
     await expect(page.locator('[data-slot="branch-maximised"]')).toBeVisible();
-    await page.waitForTimeout(500);
-    expect(await toastOnTop(page, "Couldn't create cms/x")).toBe(true);
+    await expect
+      .poll(() => toastOnTop(page, "Couldn't create cms/x"))
+      .toBe(true);
     const retry = page.getByRole('button', { name: 'Retry' });
     await retry.click({ timeout: 3000 });
     await expect(
@@ -772,5 +774,39 @@ test.describe('branch switcher pop-up', () => {
         .locator('[data-slot="branch-maximised"]')
         .getByText("Couldn't create cms/x. Check your connection, then retry.")
     ).toBeVisible({ timeout: 5000 });
+  });
+
+  test('keeps the maximised view above the Errors pane, with Close branches clickable', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto(
+      '/branches.html?docs=1#/collections/post/content%2Fposts%2Fpost-01.mdx'
+    );
+    const title = page.getByRole('textbox', { name: /^Title/ });
+    await title.fill('');
+    await page
+      .locator('[data-slot=form-bar]')
+      .getByRole('button', { name: /^(Save|Resolve)/ })
+      .click();
+    await expect(
+      page.locator('[data-slot="error-summary-pane"]').first()
+    ).toBeVisible();
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'Maximise' }).click();
+    const view = page.locator('[data-slot="branch-maximised"]');
+    await expect(view).toBeVisible();
+    const onTop = await page.evaluate(() => {
+      const view = document.querySelector('[data-slot="branch-maximised"]');
+      if (!view) return false;
+      const r = view.getBoundingClientRect();
+      return [r.right - 6, r.right - 40].every((x) => {
+        const hit = document.elementFromPoint(x, r.top + r.height / 2);
+        return hit !== null && view.contains(hit);
+      });
+    });
+    expect(onTop).toBe(true);
+    await view.getByRole('button', { name: 'Close branches' }).click();
+    await expect(view).toBeHidden();
   });
 });

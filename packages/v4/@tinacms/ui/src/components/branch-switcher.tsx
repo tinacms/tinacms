@@ -7,9 +7,6 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 
-import { Radio } from '@base-ui/react/radio';
-import { RadioGroup } from '@base-ui/react/radio-group';
-
 import { Button } from '@tinacms/ui/components/button';
 import {
   Dialog,
@@ -27,6 +24,7 @@ import {
 } from '@tinacms/ui/components/popover';
 import { Badge } from '@tinacms/ui/components/badge';
 import { Icon } from '@tinacms/ui/components/icon';
+import { RadioGroup, RadioGroupItem } from '@tinacms/ui/components/radio-group';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { BRANCH_NAME_HINT, branchNameError } from '@tinacms/ui/lib/branch-name';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
@@ -66,6 +64,8 @@ type BranchSwitcherProps = {
   createState?: 'idle' | 'creating' | 'failed';
   /** A branch that failed to create without the form: shown as a note above the list, as a toast may sit under this view. */
   failedBranch?: string;
+  /** Tries the create of `failedBranch` again, from the note's Retry button. */
+  onRetryFailed?: () => void;
   /** `loading` shows a skeleton and `failed` shows the problem with Retry, both in place. */
   status?: 'ready' | 'loading' | 'failed';
   onRetry?: () => void;
@@ -211,10 +211,16 @@ function BranchGroup({
   );
 }
 
+/** Marks the maximised view and the phone sheet, so the app can lift its toasts above them. */
+export const BRANCH_SWITCHER_OVERLAY_ATTRIBUTE = 'data-branch-switcher-overlay';
+export const BRANCH_SWITCHER_OVERLAY_SELECTOR = `[${BRANCH_SWITCHER_OVERLAY_ATTRIBUTE}]`;
+
 /** Runs `run` once the frame on screen has laid out; the returned function cancels it. */
 const afterPaint = (run: () => void) => {
-  const id = requestAnimationFrame(() => requestAnimationFrame(run));
-  return () => cancelAnimationFrame(id);
+  let frame = requestAnimationFrame(() => {
+    frame = requestAnimationFrame(run);
+  });
+  return () => cancelAnimationFrame(frame);
 };
 
 /** State that is controlled when the caller passes `value`, else kept here. */
@@ -254,6 +260,7 @@ function BranchSwitcher({
   onFormChange,
   createState = 'idle',
   failedBranch,
+  onRetryFailed,
   status = 'ready',
   onRetry,
   open: openProp,
@@ -470,9 +477,19 @@ function BranchSwitcher({
         }}
       />
       {failedBranch !== undefined ? (
-        <p role='alert' className='m-0 flex-none text-sm text-destructive'>
-          Couldn't create {failedBranch}. Check your connection, then retry.
-        </p>
+        <div
+          role='alert'
+          className='flex flex-none items-center gap-2 text-sm text-destructive'
+        >
+          <span className='min-w-0 flex-1'>
+            Couldn't create {failedBranch}. Check your connection, then retry.
+          </span>
+          {onRetryFailed ? (
+            <Button size='sm' onClick={onRetryFailed}>
+              Retry
+            </Button>
+          ) : null}
+        </div>
       ) : null}
       <div className='flex min-h-0 flex-col gap-3 overflow-y-auto'>
         {status === 'loading' ? (
@@ -608,23 +625,11 @@ function BranchSwitcher({
                       setStartFrom(value);
                     }
                   }}
-                  className='flex w-full flex-col'
                 >
                   {startOptions.map((option) => (
-                    <label
-                      key={option.value}
-                      className='box-border flex min-h-8.5 w-full cursor-pointer items-start gap-2 rounded-sm px-2.5 py-1.5 text-base leading-control hover:bg-muted has-data-checked:bg-pressed has-data-disabled:cursor-not-allowed has-data-disabled:opacity-45 has-focus-visible:shadow-focus-ring'
-                    >
-                      <Radio.Root
-                        value={option.value}
-                        className='mt-0.5 grid size-4 flex-none place-items-center rounded-full border border-border bg-card outline-none data-checked:border-primary'
-                      >
-                        <Radio.Indicator className='size-2 rounded-full bg-primary' />
-                      </Radio.Root>
-                      <span className='min-w-0 flex-1 font-mono tracking-code [overflow-wrap:anywhere]'>
-                        {option.label}
-                      </span>
-                    </label>
+                    <RadioGroupItem key={option.value} value={option.value}>
+                      {option.label}
+                    </RadioGroupItem>
                   ))}
                 </RadioGroup>
               ) : (
@@ -722,7 +727,7 @@ function BranchSwitcher({
         <DialogContent
           size='md'
           showCloseButton={false}
-          data-branch-switcher=''
+          {...{ [BRANCH_SWITCHER_OVERLAY_ATTRIBUTE]: '' }}
           onKeyDown={move}
         >
           {panel(({ children }) => (
@@ -823,8 +828,9 @@ function MaximisedView({
     <section
       aria-label='Branches'
       data-slot='branch-maximised'
+      {...{ [BRANCH_SWITCHER_OVERLAY_ATTRIBUTE]: '' }}
       onKeyDown={onKeyDown}
-      className='fixed inset-x-0 top-14 bottom-7 z-30 overflow-y-auto bg-background p-6 font-sans text-base leading-control text-foreground'
+      className='fixed inset-x-0 top-14 bottom-7 z-40 overflow-y-auto bg-background p-6 font-sans text-base leading-control text-foreground'
     >
       <div className='mx-auto flex max-w-190 flex-col gap-3 rounded-md border border-border bg-card p-4'>
         {children}

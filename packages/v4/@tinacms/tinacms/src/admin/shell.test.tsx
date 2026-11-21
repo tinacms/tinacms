@@ -2151,7 +2151,11 @@ describe('branch switcher rows and creating a branch', () => {
     await user.click(screen.getByRole('button', { name: /^Branch:/ }));
     await screen.findByRole('dialog', { name: 'Branches' });
     act(() => rejects[1](new Error('offline')));
-    expect(await screen.findByText("Couldn't create cms/x")).toBeVisible();
+    expect(
+      await screen.findByText(
+        "Couldn't create cms/x. Check your connection, then retry."
+      )
+    ).toBeVisible();
   });
 
   it('reports a retried create that fails while the maximised view shows an empty form', async () => {
@@ -2190,7 +2194,11 @@ describe('branch switcher rows and creating a branch', () => {
       expect(screen.queryByText("Couldn't create cms/x")).toBeNull()
     );
     act(() => rejects[1](new Error('offline')));
-    expect(await screen.findByText("Couldn't create cms/x")).toBeVisible();
+    expect(
+      await screen.findByText(
+        "Couldn't create cms/x. Check your connection, then retry."
+      )
+    ).toBeVisible();
   });
 
   const failFromToast = async (type?: string) => {
@@ -2254,6 +2262,25 @@ describe('branch switcher rows and creating a branch', () => {
     expect(
       within(view).getByRole('searchbox', { name: 'New branch name' })
     ).toHaveValue('draft-name');
+  });
+
+  it('retries from the note inside the open switcher, and shows no toast beside it', async () => {
+    const { view } = await failFromToast();
+    const note = await within(view).findByText(
+      "Couldn't create cms/x. Check your connection, then retry."
+    );
+    await waitFor(() =>
+      expect(document.querySelector('[data-slot="toast"]')).toBeNull()
+    );
+    const create = vi.mocked(createBranch as NonNullable<typeof createBranch>);
+    await userEvent.click(
+      within(note.closest('[role="alert"]') as HTMLElement).getByRole(
+        'button',
+        { name: 'Retry' }
+      )
+    );
+    await waitFor(() => expect(create).toHaveBeenCalledTimes(3));
+    expect(create).toHaveBeenLastCalledWith({ name: 'cms/x', from: 'main' });
   });
 
   it('dismisses the failure toast when its Retry is pressed', async () => {

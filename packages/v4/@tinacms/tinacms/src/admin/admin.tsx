@@ -10,6 +10,7 @@ import {
   SidebarProvider,
 } from '@tinacms/ui/components/sidebar';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
+import { BRANCH_SWITCHER_OVERLAY_SELECTOR } from '@tinacms/ui/components/branch-switcher';
 import { Toaster } from '@tinacms/ui/components/sonner';
 import { cn } from '@tinacms/ui/lib/utils';
 import { useKeyboardOpen } from '@tinacms/ui/hooks/use-keyboard-open';
@@ -444,8 +445,7 @@ const TOAST_WIDEST_PX = 480;
 const TOAST_RIGHT_PX = 24;
 // Below the dialog layer, so a Confirm dims the toasts behind it.
 const TOAST_LAYER = { zIndex: 40 };
-// The phone sheet of the branch switcher sits at the dialog layer, so toasts rise above it.
-const TOAST_ABOVE_SHEET = { zIndex: 60 };
+const TOAST_ABOVE_SWITCHER = { zIndex: 60 };
 // With the on-screen keyboard open the toast would cover the field being typed in.
 const TOAST_HIDDEN = { ...TOAST_LAYER, visibility: 'hidden' } as const;
 
@@ -492,12 +492,13 @@ function useFormBarUnderToast(): boolean {
   return under;
 }
 
-// The branch switcher's phone sheet reports its outcomes in toasts, so they must show over it.
-function useSwitcherSheetOpen(): boolean {
+function useSwitcherOverlayOpen(): boolean {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     const check = () =>
-      setOpen(document.querySelector('[data-branch-switcher]') !== null);
+      setOpen(
+        document.querySelector(BRANCH_SWITCHER_OVERLAY_SELECTOR) !== null
+      );
     check();
     const mutations = new MutationObserver(check);
     mutations.observe(document.body, { childList: true, subtree: true });
@@ -510,25 +511,16 @@ function ShellToaster() {
   const cardShowing = useLongSave();
   const keyboardOpen = useKeyboardOpen();
   const barUnder = useFormBarUnderToast();
-  const sheetOpen = useSwitcherSheetOpen();
+  const overlayOpen = useSwitcherOverlayOpen();
   const offset = cardShowing
     ? TOAST_OFFSET_ABOVE_CARD
     : barUnder
       ? TOAST_OFFSET_ABOVE_BAR
       : TOAST_OFFSET_LOW;
-  return (
-    <Toaster
-      offset={offset}
-      mobileOffset={offset}
-      style={
-        keyboardOpen
-          ? TOAST_HIDDEN
-          : sheetOpen
-            ? TOAST_ABOVE_SHEET
-            : TOAST_LAYER
-      }
-    />
-  );
+  let toastStyle = TOAST_LAYER;
+  if (overlayOpen) toastStyle = TOAST_ABOVE_SWITCHER;
+  if (keyboardOpen) toastStyle = TOAST_HIDDEN;
+  return <Toaster offset={offset} mobileOffset={offset} style={toastStyle} />;
 }
 
 function MissingPanel({

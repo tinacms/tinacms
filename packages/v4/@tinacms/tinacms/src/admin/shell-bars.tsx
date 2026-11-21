@@ -51,7 +51,7 @@ function BranchControl() {
   const [open, setOpen] = useState(false);
   const [failed, setFailed] = useState<CreateRequest>();
   const [formShown, setFormShown] = useState(false);
-  const [toastFailure, setToastFailure] = useState<string>();
+  const [toastFailure, setToastFailure] = useState<CreateRequest>();
   const startedVia = useRef<'form' | 'toast'>('form');
   const entries = useBranchEntries(branch, open);
 
@@ -105,7 +105,10 @@ function BranchControl() {
         setFailed({ name, from });
         return;
       }
-      if (isOpen) setToastFailure(name);
+      if (isOpen) {
+        setToastFailure({ name, from });
+        return;
+      }
       const failure = toast({
         tone: 'error',
         title: `Couldn't create ${name}`,
@@ -168,7 +171,10 @@ function BranchControl() {
       open={open}
       onOpenChange={setOpen}
       onFormChange={setFormShown}
-      failedBranch={toastFailure}
+      failedBranch={toastFailure?.name}
+      onRetryFailed={
+        toastFailure ? () => startCreate(toastFailure, 'toast') : undefined
+      }
       baseBranch={branch.defaultBranch}
       onCreate={
         create ? (name, from) => startCreate({ name, from }) : undefined
