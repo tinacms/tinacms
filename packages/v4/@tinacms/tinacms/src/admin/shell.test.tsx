@@ -2281,6 +2281,10 @@ describe('branch switcher rows and creating a branch', () => {
     );
     await waitFor(() => expect(create).toHaveBeenCalledTimes(3));
     expect(create).toHaveBeenLastCalledWith({ name: 'cms/x', from: 'main' });
+    expect(await within(view).findByText('Creating cms/x…')).toBeVisible();
+    expect(
+      within(view).getByRole('searchbox', { name: 'Search branches' })
+    ).toHaveFocus();
   });
 
   it('dismisses the failure toast when its Retry is pressed', async () => {

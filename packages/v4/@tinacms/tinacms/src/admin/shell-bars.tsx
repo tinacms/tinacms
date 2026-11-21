@@ -172,6 +172,7 @@ function BranchControl() {
       onOpenChange={setOpen}
       onFormChange={setFormShown}
       failedBranch={toastFailure?.name}
+      creatingBranch={branch.creating?.name}
       onRetryFailed={
         toastFailure ? () => startCreate(toastFailure, 'toast') : undefined
       }

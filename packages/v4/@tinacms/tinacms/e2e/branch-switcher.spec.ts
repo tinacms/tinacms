@@ -809,4 +809,60 @@ test.describe('branch switcher pop-up', () => {
     await view.getByRole('button', { name: 'Close branches' }).click();
     await expect(view).toBeHidden();
   });
+
+  test('keeps the note and its Retry inside the switcher when the branch name is long', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/branches.html?docs=1&create=fail#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    await page
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/' + 'a'.repeat(80));
+    await page.getByRole('button', { name: 'Create branch' }).click();
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Retry' }).click();
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    const note = page.locator('[data-slot="branch-failure-note"]');
+    await expect(note).toBeVisible({ timeout: 5000 });
+    const fits = await note.evaluate((el) => {
+      const text = el.firstElementChild as HTMLElement;
+      const retry = el.querySelector('button')?.getBoundingClientRect();
+      const box = el.getBoundingClientRect();
+      return (
+        text.scrollWidth <= text.clientWidth &&
+        !!retry &&
+        retry.right <= box.right + 1
+      );
+    });
+    expect(fits).toBe(true);
+  });
+
+  test('lets a modal dim the toast again while the maximised view is open', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto('/branches.html?docs=1&create=unready#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'Maximise' }).click();
+    const view = page.locator('[data-slot="branch-maximised"]');
+    await expect(view).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+    await view.getByRole('button', { name: 'New branch' }).click();
+    await view
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/x');
+    await view.getByRole('button', { name: 'Create branch' }).click();
+    await expect
+      .poll(() => toastOnTop(page, "cms/x isn't ready yet"))
+      .toBe(true);
+    await page.keyboard.press(
+      process.platform === 'darwin' ? 'Meta+k' : 'Control+k'
+    );
+    await expect(page.getByRole('dialog', { name: /Search/ })).toBeVisible();
+    await expect
+      .poll(() => toastOnTop(page, "cms/x isn't ready yet"))
+      .toBe(false);
+  });
 });

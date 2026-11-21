@@ -66,6 +66,8 @@ type BranchSwitcherProps = {
   failedBranch?: string;
   /** Tries the create of `failedBranch` again, from the note's Retry button. */
   onRetryFailed?: () => void;
+  /** The branch being made while the form is not on screen, so the switcher can say so. */
+  creatingBranch?: string;
   /** `loading` shows a skeleton and `failed` shows the problem with Retry, both in place. */
   status?: 'ready' | 'loading' | 'failed';
   onRetry?: () => void;
@@ -261,6 +263,7 @@ function BranchSwitcher({
   createState = 'idle',
   failedBranch,
   onRetryFailed,
+  creatingBranch,
   status = 'ready',
   onRetry,
   open: openProp,
@@ -476,16 +479,31 @@ function BranchSwitcher({
           focusField('search');
         }}
       />
+      {creatingBranch !== undefined && !creating ? (
+        <p
+          role='status'
+          className='m-0 flex-none text-sm text-muted-foreground [overflow-wrap:anywhere]'
+        >
+          Creating {creatingBranch}…
+        </p>
+      ) : null}
       {failedBranch !== undefined ? (
         <div
           role='alert'
+          data-slot='branch-failure-note'
           className='flex flex-none items-center gap-2 text-sm text-destructive'
         >
-          <span className='min-w-0 flex-1'>
+          <span className='min-w-0 flex-1 [overflow-wrap:anywhere]'>
             Couldn't create {failedBranch}. Check your connection, then retry.
           </span>
           {onRetryFailed ? (
-            <Button size='sm' onClick={onRetryFailed}>
+            <Button
+              size='sm'
+              onClick={() => {
+                onRetryFailed();
+                focusField('search');
+              }}
+            >
               Retry
             </Button>
           ) : null}

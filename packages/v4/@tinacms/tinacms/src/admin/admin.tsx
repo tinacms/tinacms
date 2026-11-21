@@ -492,12 +492,19 @@ function useFormBarUnderToast(): boolean {
   return under;
 }
 
+// A modal opened over the switcher dims the toasts again, so they are lifted only while none is open.
+const OTHER_MODAL =
+  '[data-slot=dialog-content], [data-slot=alert-dialog-content]';
+
 function useSwitcherOverlayOpen(): boolean {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     const check = () =>
       setOpen(
-        document.querySelector(BRANCH_SWITCHER_OVERLAY_SELECTOR) !== null
+        document.querySelector(BRANCH_SWITCHER_OVERLAY_SELECTOR) !== null &&
+          document.querySelector(
+            `:is(${OTHER_MODAL}):not(${BRANCH_SWITCHER_OVERLAY_SELECTOR})`
+          ) === null
       );
     check();
     const mutations = new MutationObserver(check);
