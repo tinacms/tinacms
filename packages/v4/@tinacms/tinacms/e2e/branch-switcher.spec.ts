@@ -865,4 +865,60 @@ test.describe('branch switcher pop-up', () => {
       .poll(() => toastOnTop(page, "cms/x isn't ready yet"))
       .toBe(false);
   });
+
+  test('lets a phone modal dim the toast too, after the switcher sheet is closed', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/branches.html?docs=1&create=unready#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    await page
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/x');
+    await page.getByRole('button', { name: 'Create branch' }).click();
+    await expect
+      .poll(() => toastOnTop(page, "cms/x isn't ready yet"))
+      .toBe(true);
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+    await page.getByRole('button', { name: 'Search' }).first().click();
+    await expect(
+      page.locator('[data-slot=foot-sheet]:not([hidden])')
+    ).toBeVisible();
+    await expect
+      .poll(() => toastOnTop(page, "cms/x isn't ready yet"))
+      .toBe(false);
+  });
+
+  test('drops the toast lift when another phone sheet opens over the switcher sheet', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/branches.html?docs=1&create=unready#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'New branch' }).click();
+    await page
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/x');
+    await page.getByRole('button', { name: 'Create branch' }).click();
+    await expect(page.getByText("cms/x isn't ready yet")).toBeVisible();
+    const layer = () =>
+      page.evaluate(
+        () =>
+          getComputedStyle(
+            document.querySelector('[data-sonner-toaster]') as Element
+          ).zIndex
+      );
+    await expect.poll(layer).toBe('60');
+    await page.evaluate(() => {
+      const sheet = document.createElement('div');
+      sheet.setAttribute('data-slot', 'foot-sheet');
+      sheet.id = 'extra-sheet';
+      document.body.append(sheet);
+    });
+    await expect.poll(layer).toBe('40');
+    await page.evaluate(() => document.getElementById('extra-sheet')?.remove());
+    await expect.poll(layer).toBe('60');
+  });
 });

@@ -494,7 +494,7 @@ function useFormBarUnderToast(): boolean {
 
 // A modal opened over the switcher dims the toasts again, so they are lifted only while none is open.
 const OTHER_MODAL =
-  '[data-slot=dialog-content], [data-slot=alert-dialog-content]';
+  '[data-slot=dialog-content], [data-slot=alert-dialog-content], [data-slot=foot-sheet]:not([hidden])';
 
 function useSwitcherOverlayOpen(): boolean {
   const [open, setOpen] = useState(false);

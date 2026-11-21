@@ -64,8 +64,8 @@ type BranchSwitcherProps = {
   createState?: 'idle' | 'creating' | 'failed';
   /** A branch that failed to create without the form: shown as a note above the list, as a toast may sit under this view. */
   failedBranch?: string;
-  /** Tries the create of `failedBranch` again, from the note's Retry button. */
-  onRetryFailed?: () => void;
+  /** Tries the create of `failedBranch` again, from the note's Retry button. Return false when it did not start. */
+  onRetryFailed?: () => boolean | void;
   /** The branch being made while the form is not on screen, so the switcher can say so. */
   creatingBranch?: string;
   /** `loading` shows a skeleton and `failed` shows the problem with Retry, both in place. */
@@ -500,8 +500,7 @@ function BranchSwitcher({
             <Button
               size='sm'
               onClick={() => {
-                onRetryFailed();
-                focusField('search');
+                if (onRetryFailed() !== false) focusField('search');
               }}
             >
               Retry

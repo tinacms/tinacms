@@ -799,4 +799,39 @@ describe('Branch switcher controls', () => {
     await user.keyboard('{Escape}');
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
   });
+
+  it('moves focus to the search box after the note Retry only when the retry started', async () => {
+    const user = userEvent.setup();
+    const refused = vi.fn(() => false);
+    const { rerender } = render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        failedBranch='cms/x'
+        onRetryFailed={refused}
+        defaultOpen
+      />
+    );
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(refused).toHaveBeenCalledOnce();
+    expect(
+      screen.getByRole('searchbox', { name: 'Search branches' })
+    ).not.toHaveFocus();
+    const started = vi.fn(() => true);
+    rerender(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        failedBranch='cms/x'
+        onRetryFailed={started}
+        defaultOpen
+      />
+    );
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(
+      screen.getByRole('searchbox', { name: 'Search branches' })
+    ).toHaveFocus();
+  });
 });
