@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -864,5 +865,30 @@ describe('Branch switcher controls', () => {
     expect(
       screen.getByRole('searchbox', { name: 'Search branches' })
     ).toHaveFocus();
+  });
+
+  it('opens the New branch form while a ready note is held', async () => {
+    const user = userEvent.setup();
+    // Like the app's Top bar, the parent re-renders when the form opens and builds a new note object.
+    function Parent() {
+      const [, setShown] = useState(false);
+      return (
+        <BranchSwitcher
+          current='feature/news'
+          branches={entries}
+          onSwitch={() => {}}
+          onCreate={() => {}}
+          baseBranch='main'
+          onFormChange={setShown}
+          note={{ kind: 'ready', name: 'cms/x' }}
+          defaultOpen
+        />
+      );
+    }
+    render(<Parent />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    expect(
+      screen.getByRole('searchbox', { name: 'New branch name' })
+    ).toBeInTheDocument();
   });
 });

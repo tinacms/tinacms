@@ -419,9 +419,10 @@ function BranchSwitcher({
     if (!open && maximised) setMaximised(false);
   });
 
+  const noteKey = note === undefined ? '' : `${note.kind}:${note.name}`;
   useEffect(() => {
-    if (note !== undefined && note.kind !== 'failed') setCreating(false);
-  }, [note]);
+    if (noteKey !== '' && !noteKey.startsWith('failed:')) setCreating(false);
+  }, [noteKey]);
 
   useEffect(() => {
     onFormChange?.(creating);
