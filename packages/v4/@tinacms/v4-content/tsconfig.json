@@ -1,0 +1,16 @@
+{
+  "extends": "../../../../base.tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "paths": {
+      // The v3 types want a v3 `Config`. The converter builds a v3 schema from
+      // a v4 lock, so it declares the one function it calls, as
+      // @tinacms/tinacms does.
+      "@tinacms/graphql": ["./src/tinacms-graphql.d.ts"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts"],
+  "include": ["src"]
+}

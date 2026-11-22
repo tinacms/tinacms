@@ -1,7 +1,1 @@
-export type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | { [key: string]: JsonValue };
+export type { JsonValue } from '@tinacms/v4-content/schema';

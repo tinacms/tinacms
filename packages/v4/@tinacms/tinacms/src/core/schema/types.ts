@@ -1,75 +1,24 @@
-import type { JsonValue } from '../json';
+import {
+  type AllowedActions,
+  COLLECTION_FORMATS,
+  type CollectionFormat,
+  FORMAT_EXTENSIONS,
+} from '@tinacms/v4-content/schema';
 
-/**
- * A rule attached to one field, by the name a plugin registered it under.
- *
- * `args` configures the rule and is passed to its factory, so it holds plain
- * JSON and never a function: `compileSchema` writes this entry into
- * `tina-lock.json`. The build fails on a name no installed plugin registers.
- *
- * Prefer a plugin's typed helper over writing this by hand:
- * `validators: [min(3)]` rather than `validators: [{ name: 'min', args: [3] }]`.
- */
-export interface ValidatorRef {
-  name: string;
-  args?: JsonValue[];
-}
-
-/** Whether a field carries a validator, by the name it was registered under. */
-export const hasValidator = (
-  node: { validators?: ValidatorRef[] },
-  name: string
-): boolean => (node.validators ?? []).some((ref) => ref.name === name);
-
-/**
- * A form hook attached to one collection, by the name a plugin registered it
- * under. Same rules as `ValidatorRef`: `args` is plain JSON, it lands in
- * `tina-lock.json`, and the build fails on a name no installed plugin registers.
- */
-export interface HookRef {
-  name: string;
-  args?: JsonValue[];
-}
-
-export interface BaseFieldSchema {
-  name: string;
-  label?: string;
-  description?: string;
-  defaultValue?: Exclude<JsonValue, null>;
-  hidden?: boolean;
-  /** The field shows its value and cannot be edited. It also drops out of the Tab order. */
-  disabled?: boolean;
-  /** The field shows its value, takes focus and cannot be edited. */
-  readOnly?: boolean;
-  validators?: ValidatorRef[];
-}
-
-// ADR-017 §3: a template is a named fieldset. A field plugin extends it with
-// its own options, as rich-text does for MDX embeds.
-export interface TemplateSchema {
-  name: string;
-  label?: string;
-  fields: FieldSchema[];
-  defaultItem?: TinaDocument;
-}
-
-export interface FieldSchema extends BaseFieldSchema {
-  type: string;
-  isBody?: boolean;
-  templates?: TemplateSchema[];
-  collections?: string[];
-}
-
-export const COLLECTION_FORMATS = ['md', 'mdx', 'json', 'yaml'] as const;
-
-export type CollectionFormat = (typeof COLLECTION_FORMATS)[number];
-
-export const FORMAT_EXTENSIONS: Record<CollectionFormat, string> = {
-  md: '.md',
-  mdx: '.mdx',
-  json: '.json',
-  yaml: '.yaml',
-};
+export {
+  type AllowedActions,
+  type BaseFieldSchema,
+  COLLECTION_FORMATS,
+  type CollectionFormat,
+  type CollectionSchema,
+  type FieldSchema,
+  FORMAT_EXTENSIONS,
+  type HookRef,
+  hasValidator,
+  type TemplateSchema,
+  type TinaDocument,
+  type ValidatorRef,
+} from '@tinacms/v4-content/schema';
 
 export const formatForPath = (
   documentPath: string
@@ -80,17 +29,6 @@ export const formatForPath = (
   );
 };
 
-/** Each switch defaults to true. A false switch hides the action and the server refuses it. */
-export interface AllowedActions {
-  /** False also hides Duplicate, and the server refuses every create. */
-  canCreate?: boolean;
-  canDelete?: boolean;
-  /** Counts only when `canCreate` is on. The server cannot tell a Duplicate from a create, so only the UI reads it. */
-  canDuplicate?: boolean;
-  canCreateFolder?: boolean;
-  canCreateNestedFolder?: boolean;
-}
-
 export const ALLOWED_ACTION_NAMES = [
   'canCreate',
   'canDelete',
@@ -98,17 +36,3 @@ export const ALLOWED_ACTION_NAMES = [
   'canCreateFolder',
   'canCreateNestedFolder',
 ] as const satisfies readonly (keyof AllowedActions)[];
-
-export interface CollectionSchema {
-  name: string;
-  label?: string;
-  path?: string;
-  format: CollectionFormat | CollectionFormat[];
-  fields: FieldSchema[];
-  hooks?: HookRef[];
-  allowedActions?: AllowedActions;
-  /** Shown above the collection's table by a later change. */
-  description?: string;
-}
-
-export type TinaDocument = Record<string, unknown>;

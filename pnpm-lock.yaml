@@ -2875,6 +2875,9 @@ importers:
       '@tinacms/ui':
         specifier: workspace:*
         version: link:../ui
+      '@tinacms/v4-content':
+        specifier: workspace:*
+        version: link:../v4-content
       gray-matter:
         specifier: 'catalog:'
         version: 4.0.3
@@ -2936,6 +2939,9 @@ importers:
       babel-plugin-react-compiler:
         specifier: ^1.0.0
         version: 1.0.0
+      graphql:
+        specifier: 15.8.0
+        version: 15.8.0
       happy-dom:
         specifier: 'catalog:'
         version: 15.10.2
@@ -3027,6 +3033,31 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(@vitest/coverage-v8@4.1.12)(happy-dom@15.10.2)(jsdom@29.1.1)(vite@7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
+
+  packages/v4/@tinacms/v4-content:
+    dependencies:
+      gray-matter:
+        specifier: 'catalog:'
+        version: 4.0.3
+    devDependencies:
+      '@tinacms/graphql':
+        specifier: workspace:*
+        version: link:../../../@tinacms/graphql
+      '@tinacms/scripts':
+        specifier: workspace:*
+        version: link:../../../@tinacms/scripts
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 4.1.12(@vitest/browser@4.1.12)(vitest@4.1.12)
+      graphql:
+        specifier: 15.8.0
+        version: 15.8.0
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(@vitest/coverage-v8@4.1.12)(happy-dom@21.0.4)(jsdom@29.1.1)(vite@7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.33.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
 
   packages/v4/examples/barebones:
     dependencies:
@@ -7495,6 +7526,9 @@ packages:
   '@smithy/smithy-client@4.10.1':
     resolution: {integrity: sha512-1ovWdxzYprhq+mWqiGZlt3kF69LJthuQcfY9BIyHx9MywTFKzFapluku1QXoaBB43GCsLDxNqS+1v30ure69AA==}
     engines: {node: '>=18.0.0'}
+    deprecated: |-
+      Deprecated due to a bug in custom logger data redaction. Upgrade to the latest version. If you used a custom logger with
+        this version, review your logs and rotate any credentials or other secrets. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/types@4.10.0':
     resolution: {integrity: sha512-K9mY7V/f3Ul+/Gz4LJANZ3vJ/yiBIwCyxe0sPT4vNJK63Srvd+Yk1IzP0t+nE7XFSpIGtzR71yljtnqpUTYFlQ==}
@@ -16259,7 +16293,7 @@ snapshots:
       '@types/hast': 3.0.5
       '@types/mdast': 4.0.4
       js-yaml: 4.3.2
-      picomatch: 4.0.4
+      picomatch: 4.0.7
       retext-smartypants: 6.2.0
       shiki: 4.1.0
       smol-toml: 1.9.1
@@ -19827,7 +19861,7 @@ snapshots:
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/remapping@2.3.5':
@@ -19855,7 +19889,7 @@ snapshots:
   '@jridgewell/trace-mapping@0.3.9':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
 
   '@jsep-plugin/assignment@1.3.0(jsep@1.4.0)':
     dependencies:
@@ -20200,7 +20234,7 @@ snapshots:
       detect-libc: 2.1.2
       is-glob: 4.0.3
       node-addon-api: 7.1.1
-      picomatch: 4.0.4
+      picomatch: 4.0.7
     optionalDependencies:
       '@parcel/watcher-android-arm64': 2.5.4
       '@parcel/watcher-darwin-arm64': 2.5.4
@@ -24253,7 +24287,7 @@ snapshots:
 
   acorn-walk@8.3.4:
     dependencies:
-      acorn: 8.16.0
+      acorn: 8.19.0
 
   acorn@7.4.1: {}
 
@@ -28347,7 +28381,7 @@ snapshots:
       chalk: 4.1.2
       ci-info: 4.4.0
       graceful-fs: 4.2.11
-      picomatch: 4.0.4
+      picomatch: 4.0.7
 
   jest-validate@29.7.0:
     dependencies:
@@ -28892,7 +28926,7 @@ snapshots:
 
   magic-string@0.30.21:
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
 
   magic-string@1.2.0:
     dependencies:
@@ -32542,7 +32576,7 @@ snapshots:
   terser@5.46.0:
     dependencies:
       '@jridgewell/source-map': 0.3.11
-      acorn: 8.16.0
+      acorn: 8.19.0
       commander: 2.20.3
       source-map-support: 0.5.21
     optional: true
@@ -32734,7 +32768,7 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 22.19.17
-      acorn: 8.16.0
+      acorn: 8.19.0
       acorn-walk: 8.3.4
       arg: 4.1.3
       create-require: 1.1.1
@@ -32753,7 +32787,7 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 22.19.3
-      acorn: 8.16.0
+      acorn: 8.19.0
       acorn-walk: 8.3.4
       arg: 4.1.3
       create-require: 1.1.1
@@ -32771,7 +32805,7 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 25.1.0
-      acorn: 8.16.0
+      acorn: 8.19.0
       acorn-walk: 8.3.4
       arg: 4.1.3
       create-require: 1.1.1
@@ -33872,6 +33906,38 @@ snapshots:
       '@vitest/browser-playwright': 4.1.12(playwright@1.61.1)(vite@7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.33.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))(vitest@4.1.12)
       '@vitest/coverage-v8': 4.1.12(@vitest/browser@4.1.12)(vitest@4.1.12)
       happy-dom: 15.10.2
+      jsdom: 29.1.1
+    transitivePeerDependencies:
+      - msw
+
+  vitest@4.1.12(@opentelemetry/api@1.9.0)(@types/node@25.1.0)(@vitest/browser-playwright@4.1.12)(@vitest/coverage-v8@4.1.12)(happy-dom@21.0.4)(jsdom@29.1.1)(vite@7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.33.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)):
+    dependencies:
+      '@vitest/expect': 4.1.12
+      '@vitest/mocker': 4.1.12(vite@7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.33.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))
+      '@vitest/pretty-format': 4.1.12
+      '@vitest/runner': 4.1.12
+      '@vitest/snapshot': 4.1.12
+      '@vitest/spy': 4.1.12
+      '@vitest/utils': 4.1.12
+      es-module-lexer: 2.1.0
+      expect-type: 1.3.0
+      magic-string: 0.30.21
+      obug: 2.1.1
+      pathe: 2.0.3
+      picomatch: 4.0.4
+      std-env: 4.3.0
+      tinybench: 2.9.0
+      tinyexec: 1.2.2
+      tinyglobby: 0.2.17
+      tinyrainbow: 3.2.0
+      vite: 7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.33.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1)
+      why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.0
+      '@types/node': 25.1.0
+      '@vitest/browser-playwright': 4.1.12(playwright@1.61.1)(vite@7.3.6(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.33.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.9.1))(vitest@4.1.12)
+      '@vitest/coverage-v8': 4.1.12(@vitest/browser@4.1.12)(vitest@4.1.12)
+      happy-dom: 21.0.4
       jsdom: 29.1.1
     transitivePeerDependencies:
       - msw

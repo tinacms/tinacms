@@ -1,0 +1,86 @@
+{
+  "name": "@tinacms/v4-content",
+  "version": "0.1.0",
+  "private": false,
+  "license": "Apache-2.0",
+  "description": "The content contract that TinaCMS v4 shares with TinaCloud: the tina-lock.json shape, the format adapters that read and write documents, and the bridge from a lock to the v3 GraphQL engine.",
+  "type": "module",
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/v4/@tinacms/v4-content"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "default": "./dist/schema.js"
+    },
+    "./lock": {
+      "types": "./dist/lock.d.ts",
+      "default": "./dist/lock.js"
+    },
+    "./format-adapters": {
+      "types": "./dist/format-adapters.d.ts",
+      "default": "./dist/format-adapters.js"
+    },
+    "./graphql": {
+      "types": "./dist/graphql.d.ts",
+      "default": "./dist/graphql.js"
+    }
+  },
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/schema.ts",
+        "target": "node"
+      },
+      {
+        "name": "src/lock.ts",
+        "target": "node"
+      },
+      {
+        "name": "src/format-adapters.ts",
+        "target": "node"
+      },
+      {
+        "name": "src/graphql.ts",
+        "target": "node"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "tinacms-scripts build",
+    "types": "tsc && tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "gray-matter": "catalog:"
+  },
+  "peerDependencies": {
+    "@tinacms/graphql": "workspace:^",
+    "graphql": "^15.8.0"
+  },
+  "peerDependenciesMeta": {
+    "@tinacms/graphql": {
+      "optional": true
+    },
+    "graphql": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@tinacms/graphql": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
+    "@vitest/coverage-v8": "catalog:",
+    "graphql": "15.8.0",
+    "typescript": "^5.7.3",
+    "vitest": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

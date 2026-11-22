@@ -1,5 +1,5 @@
-import type { TinaDocument } from '../../../../core/schema/types';
-import type { FormatAdapter } from './format-adapters';
+import type { FormatAdapter } from '../format-adapters';
+import type { TinaDocument } from '../schema';
 
 export const jsonAdapter: FormatAdapter = {
   extension: '.json',

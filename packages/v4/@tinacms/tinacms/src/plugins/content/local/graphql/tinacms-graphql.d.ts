@@ -20,6 +20,8 @@ declare module '@tinacms/graphql' {
     indexContentByPaths(documentPaths: string[]): Promise<void>;
     deleteContentByPaths(documentPaths: string[]): Promise<void>;
     deleteIndexEntriesForPaths(documentPaths: string[]): Promise<void>;
+    getLookup(): Promise<Record<string, unknown>>;
+    getGraphQLSchema(): Promise<unknown>;
   }
 
   export function createDatabaseInternal(config: {
@@ -27,16 +29,6 @@ declare module '@tinacms/graphql' {
     level: Level;
     tinaDirectory?: string;
   }): Database;
-
-  export function buildDotTinaFiles(args: {
-    config: { schema: { collections: unknown[] } };
-    flags?: string[];
-    buildSDK?: boolean;
-  }): Promise<{
-    graphQLSchema: unknown;
-    tinaSchema: unknown;
-    lookup: object;
-  }>;
 
   export interface GraphQLResult {
     data?: Record<string, unknown> | null;

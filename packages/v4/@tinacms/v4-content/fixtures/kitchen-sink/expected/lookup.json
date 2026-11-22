@@ -1,0 +1,58 @@
+{
+  "DocumentConnection": {
+    "type": "DocumentConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "post",
+      "author"
+    ]
+  },
+  "Node": {
+    "type": "Node",
+    "resolveType": "nodeDocument"
+  },
+  "DocumentNode": {
+    "type": "DocumentNode",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "PostAuthor": {
+    "type": "PostAuthor",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "PostBlocks": {
+    "type": "PostBlocks",
+    "resolveType": "unionData",
+    "typeMap": {
+      "hero": "PostBlocksHero",
+      "quote": "PostBlocksQuote"
+    }
+  },
+  "Post": {
+    "type": "Post",
+    "resolveType": "collectionDocument",
+    "collection": "post",
+    "createPost": "create",
+    "updatePost": "update"
+  },
+  "PostConnection": {
+    "type": "PostConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "post"
+  },
+  "Author": {
+    "type": "Author",
+    "resolveType": "collectionDocument",
+    "collection": "author",
+    "createAuthor": "create",
+    "updateAuthor": "update"
+  },
+  "AuthorConnection": {
+    "type": "AuthorConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "author"
+  }
+}

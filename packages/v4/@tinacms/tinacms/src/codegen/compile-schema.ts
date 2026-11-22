@@ -1,4 +1,5 @@
-import type { ResolvedConfig, TinaSchema } from '../config';
+import { LOCK_VERSION, type TinaLock } from '@tinacms/v4-content/lock';
+import type { ResolvedConfig } from '../config';
 import { fieldConflictError, overridesFieldKey } from '../core/field/registry';
 import { hookProvidersOf } from '../core/form/hooks';
 import { invariant } from '../core/invariant';
@@ -26,15 +27,9 @@ import {
   OBJECT_DISPLAYS,
   OBJECT_FIELD_TYPE,
 } from '../plugins/fields/object/object-field.schema';
-import { type PackageVersion, packageVersion } from './package-version';
+import { packageVersion } from './package-version';
 
-export const LOCK_VERSION = 5;
-
-export interface TinaLock {
-  version: number;
-  schema: TinaSchema & { version: PackageVersion };
-  primitives: Record<string, number>;
-}
+export { LOCK_VERSION, type TinaLock };
 
 const fieldProvisionsOf = (
   plugins: PluginManifest[]

@@ -1,5 +1,5 @@
 import matter from 'gray-matter';
-import type { FormatAdapter } from './format-adapters';
+import type { FormatAdapter } from '../format-adapters';
 
 const dropLayoutBlankLine = (body: string): string =>
   body.startsWith('\n') ? body.slice(1) : body;

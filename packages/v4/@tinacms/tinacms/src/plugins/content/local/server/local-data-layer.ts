@@ -3,6 +3,12 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import {
+  LOCK_VERSION,
+  parseTinaLock,
+  type TinaLock,
+} from '@tinacms/v4-content/lock';
+import { packageVersion } from '../../../../codegen/package-version';
+import {
   CONTENT_ERROR_MESSAGES,
   type ContentProvider,
   ContentWriteError,
@@ -252,6 +258,18 @@ const isDirectory = async (absolute: string): Promise<boolean> => {
   }
 };
 
+// The data layer has the collections and not the plugins, so the lock pins no
+// primitives. The JSON round trip drops what a committed lock cannot hold, such
+// as an `itemLabel` function, so GraphQL reads what TinaCloud reads.
+const lockOf = (collections: CollectionSchema[]): TinaLock =>
+  parseTinaLock(
+    JSON.stringify({
+      version: LOCK_VERSION,
+      schema: { collections, version: packageVersion() },
+      primitives: {},
+    })
+  );
+
 export const createLocalDataLayer = (
   options: LocalDataLayerOptions
 ): LocalDataLayer => {
@@ -264,7 +282,7 @@ export const createLocalDataLayer = (
     if (!pipeline) {
       pipeline = createGraphQLPipeline({
         rootDir,
-        collections: options.collections,
+        lock: lockOf(options.collections),
       }).catch((cause) => {
         pipeline = undefined;
         throw cause;
