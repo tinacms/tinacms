@@ -11,6 +11,10 @@ This package holds that code, so the two cannot drift.
 | `@tinacms/v4-content/format-adapters` | The markdown and JSON adapters that parse and serialize documents. |
 | `@tinacms/v4-content/graphql` | `lockToGraphQL(lock)`. It builds the v3 GraphQL schema and lookup for a lock. It needs the optional peers `@tinacms/graphql` and `graphql`. |
 
+`parseTinaLock` checks the shape of a lock. It does not check `version`. A
+consumer that reads locks from a repo must check `version` against the values
+it supports before it uses the lock.
+
 `lockToGraphQL` puts a collection that the v3 engine cannot serve into
 `skipped`. It does not throw for that collection.
 

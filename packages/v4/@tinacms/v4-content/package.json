@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/v4-content",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "private": false,
   "license": "Apache-2.0",
   "description": "The content contract that TinaCMS v4 shares with TinaCloud: the tina-lock.json shape, the format adapters that read and write documents, and the bridge from a lock to the v3 GraphQL engine.",

@@ -179,7 +179,6 @@ export const lockToGraphQL = async (
 ): Promise<LockGraphQL> => {
   const { collections } = lock.schema;
   const { served, skipped } = partition(collections.map(toV3Collection));
-  const servedNames = new Set(served.map(({ name }) => name));
   const { graphQLSchema, tinaSchema, lookup } = await buildDotTinaFiles({
     config: { schema: { collections: served } },
     buildSDK: false,
@@ -189,8 +188,6 @@ export const lockToGraphQL = async (
     graphQLSchema,
     lookup,
     skipped,
-    warnings: unindexedFormatWarnings(
-      collections.filter(({ name }) => servedNames.has(name))
-    ),
+    warnings: unindexedFormatWarnings(collections),
   };
 };
