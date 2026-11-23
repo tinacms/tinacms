@@ -509,6 +509,28 @@ describe('the picker and the error summary pane', () => {
   });
 });
 
+describe('Escape inside the picker', () => {
+  it('closes only the picker: a pinned error pane stays open and no outer Escape handler runs', async () => {
+    localStorage.setItem('tina.errorPane.pinned', 'true');
+    renderField();
+    const hero = await group('Hero');
+    act(() => {
+      view?.getState().block(['hero']);
+    });
+    const outer = vi.fn();
+    window.addEventListener('keydown', outer);
+    await userEvent.click(
+      within(hero).getByRole('button', { name: 'Choose from Media' })
+    );
+    await picker();
+    await userEvent.keyboard('{Escape}');
+    window.removeEventListener('keydown', outer);
+    expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull();
+    expect(view?.getState().errorSummary.paneOpen).toBe(true);
+    expect(outer).not.toHaveBeenCalled();
+  });
+});
+
 describe('the picker for a missing image', () => {
   it('opens in the old folder with a card that names the old file', async () => {
     renderField({ hero: 'posts/gone.jpg' });
