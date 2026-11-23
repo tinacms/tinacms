@@ -158,6 +158,8 @@ describe('createBranchAction', () => {
   const unusable = {
     'create resolving to undefined': () => undefined,
     'create resolving to a non-object': () => 42,
+    'create resolving to a non-string name': () => ({ name: 5 }),
+    'create resolving to an empty name': () => ({ name: '' }),
     'create resolving to a name getter that throws': () => ({
       get name(): string {
         throw new Error('name');
@@ -227,6 +229,22 @@ describe('createBranchAction', () => {
       expect(unhandled).not.toHaveBeenCalled();
     }
   );
+
+  it('keeps the first outcome when a ready thenable fulfils and then throws', async () => {
+    const { slice } = await run(() => ({
+      name: 'cms/one',
+      ready: {
+        then: (fulfil: () => void) => {
+          fulfil();
+          throw new Error('late');
+        },
+      } as unknown as Promise<void>,
+    }));
+    expect(slice?.createResult).toMatchObject({
+      name: 'cms/one',
+      outcome: 'ready',
+    });
+  });
 
   it('still ends unready when ready rejects and ready when it resolves', async () => {
     const rejected = await run(() => ({

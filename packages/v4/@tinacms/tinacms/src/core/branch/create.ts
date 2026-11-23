@@ -21,11 +21,15 @@ export const createBranchAction =
     const fill = (patch: Partial<BranchSlice>) =>
       store.setState((state) => ({ branch: { ...state.branch, ...patch } }));
     const startedOn = currentBranchOf(store.getState());
-    const finish = (made: string, outcome: 'ready' | 'unready' | 'failed') =>
+    let settled = false;
+    const finish = (made: string, outcome: 'ready' | 'unready' | 'failed') => {
+      if (settled) return;
+      settled = true;
       fill({
         creating: undefined,
         createResult: { name: made, from, startedOn, outcome },
       });
+    };
 
     fill({
       creating: {
@@ -46,7 +50,7 @@ export const createBranchAction =
         } catch {
           made = undefined;
         }
-        if (typeof made !== 'string') {
+        if (typeof made !== 'string' || made.trim() === '') {
           console.warn(`[tinacms] could not create branch ${name}:`, result);
           finish(name, 'failed');
           return;

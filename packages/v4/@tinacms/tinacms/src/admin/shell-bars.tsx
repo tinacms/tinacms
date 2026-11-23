@@ -111,6 +111,13 @@ function BranchControl() {
     return true;
   };
 
+  const currentName = branch?.name;
+  useEffect(() => {
+    setHeld((note) =>
+      note?.kind === 'ready' && note.name === currentName ? undefined : note
+    );
+  }, [currentName]);
+
   const result = branch?.createResult;
   latest.current = { branch, open, formShown, startCreate };
   useEffect(() => {

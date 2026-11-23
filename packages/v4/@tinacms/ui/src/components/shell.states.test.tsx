@@ -782,6 +782,33 @@ describe('Branch switcher controls', () => {
     ).toHaveFocus();
   });
 
+  it('clears the New branch form when a create started from the note finishes', async () => {
+    const user = userEvent.setup();
+    const props = {
+      current: 'feature/news',
+      branches: entries,
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    await user.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/a'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    rerender(<BranchSwitcher {...props} createState='failed' />);
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    rerender(<BranchSwitcher {...props} createState='idle' />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    expect(
+      screen.getByRole('searchbox', { name: 'New branch name' })
+    ).toHaveValue('');
+  });
+
   it('closes the maximised view on Escape even when focus is on the page body', async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();

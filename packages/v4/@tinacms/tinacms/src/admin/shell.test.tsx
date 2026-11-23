@@ -2161,6 +2161,41 @@ describe('branch switcher rows and creating a branch', () => {
     await waitFor(() => expect(toasts()).toHaveLength(0));
   });
 
+  it('sends no toast for a ready note once you switched to its branch from the list', async () => {
+    let ready: () => void = () => {};
+    createBranch = async ({ name }) => ({
+      name,
+      ready: new Promise<void>((resolve) => {
+        ready = resolve;
+      }),
+    });
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    act(() => ready());
+    await screen.findByText('cms/x is ready');
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const open = await screen.findByRole('dialog', { name: 'Branches' });
+    await waitFor(() => expect(toasts()).toHaveLength(0));
+    const row = (
+      await within(open).findAllByRole('button', { name: /cms\/x/ })
+    ).find((button) => !/Switch to/.test(button.textContent ?? ''));
+    if (!row) throw new Error('no cms/x row');
+    await user.click(row);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Branch: cms/x' })
+      ).toBeVisible()
+    );
+    if (screen.queryByRole('dialog', { name: 'Branches' })) {
+      await user.keyboard('{Escape}');
+    }
+    await new Promise((r) => setTimeout(r, 50));
+    await waitFor(() => expect(toasts()).toHaveLength(0), { timeout: 3000 });
+  });
+
   it('sends one toast when the switcher closes with the note, and none after Dismiss', async () => {
     const { user } = await failWhileClosed();
     await user.click(screen.getByRole('button', { name: /^Branch:/ }));

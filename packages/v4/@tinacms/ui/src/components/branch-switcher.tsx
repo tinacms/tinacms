@@ -388,16 +388,14 @@ function BranchSwitcher({
 
   // A create that finished or was given up returns to the list; a failed one keeps the form.
   const lastCreateState = useRef(createState);
-  const startedHere = useRef(false);
   useEffect(() => {
     if (lastCreateState.current === 'creating') {
-      if (createState === 'idle' && startedHere.current) {
+      if (createState === 'idle') {
         setCreating(false);
         setNewName('');
         setSubmitted(false);
         setStartFrom('current');
       }
-      startedHere.current = false;
     }
     lastCreateState.current = createState;
   }, [createState]);
@@ -486,7 +484,6 @@ function BranchSwitcher({
     if (typed === '' || branchNameError(typed, takenNames, true)) return;
     if (!onCreate || from === undefined || blocked || busy) return;
     attempted.current = typed;
-    startedHere.current = true;
     onCreate(typed, from);
   };
 
