@@ -191,8 +191,10 @@ export const parseContentRequest = (request: unknown): ContentRequest => {
   const parsed = contentRequestSchema.safeParse(request);
   if (!parsed.success) {
     const [issue] = parsed.error.issues;
+    // A schema message may already end with a period; end with exactly one.
+    const reason = (issue?.message ?? 'unknown').replace(/\.+$/, '');
     throw new InvalidSaveInputError(
-      `The content request is not valid: ${issue?.message ?? 'unknown'}.`
+      `The content request is not valid: ${reason}.`
     );
   }
   return parsed.data;

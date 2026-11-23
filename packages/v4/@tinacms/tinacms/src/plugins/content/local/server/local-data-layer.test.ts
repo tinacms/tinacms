@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { nodesOf } from '../../../../core/content/contract';
 import { createGraphQLPipeline } from '../graphql/graphql-pipeline';
 import { dispatchContentRequest } from './content-request';
-import { type LocalDataLayer, createLocalDataLayer } from './local-data-layer';
+import { createLocalDataLayer, type LocalDataLayer } from './local-data-layer';
 
 vi.mock('../graphql/graphql-pipeline', () => ({
   createGraphQLPipeline: vi.fn(),
@@ -765,7 +765,9 @@ describe('dispatchContentRequest', () => {
     ]) {
       await expect(
         dispatchContentRequest(dataLayer, { op: 'graphql', query })
-      ).rejects.toThrow(/queries only/);
+      ).rejects.toThrow(
+        /^The content request is not valid: The content endpoint serves GraphQL queries only\.$/
+      );
     }
     expect(await fs.readFile(file, 'utf8')).toBe(before);
   });
