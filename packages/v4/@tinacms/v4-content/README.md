@@ -21,7 +21,9 @@ it supports before it uses the lock.
 ## Golden fixtures
 
 Each folder in `fixtures/` holds a lock, its content, a list of queries, and
-the expected output. `@tinacms/tinacms` runs the local GraphQL pipeline against
+the expected output. The folders ship in the package, next to `dist/`, so
+another implementation such as TinaCloud can run the same checks.
+`@tinacms/tinacms` runs the local GraphQL pipeline against
 each folder and compares the output byte for byte. A change to the output is a
 change to the contract: update the files in `expected/` in the same pull
 request, and say why.

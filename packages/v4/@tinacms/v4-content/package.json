@@ -11,7 +11,8 @@
   },
   "sideEffects": false,
   "files": [
-    "dist"
+    "dist",
+    "fixtures"
   ],
   "exports": {
     "./schema": {
@@ -29,6 +30,22 @@
     "./graphql": {
       "types": "./dist/graphql.d.ts",
       "default": "./dist/graphql.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "schema": [
+        "./dist/schema.d.ts"
+      ],
+      "lock": [
+        "./dist/lock.d.ts"
+      ],
+      "format-adapters": [
+        "./dist/format-adapters.d.ts"
+      ],
+      "graphql": [
+        "./dist/graphql.d.ts"
+      ]
     }
   },
   "buildConfig": {
@@ -52,7 +69,7 @@
     ]
   },
   "scripts": {
-    "build": "tinacms-scripts build",
+    "build": "tinacms-scripts build && tsc",
     "types": "tsc && tsc -p tsconfig.test.json",
     "test": "vitest run",
     "coverage": "vitest run --coverage"
