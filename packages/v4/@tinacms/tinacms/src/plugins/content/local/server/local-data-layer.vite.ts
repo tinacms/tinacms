@@ -18,6 +18,7 @@ import {
   createServerHookRegistry,
   createServerSave,
 } from '../../../../core/form/server-hooks';
+import coreValidatorsPlugin from '../../../validators/core-validators.plugin';
 import { storedHelpersOf } from '../../../../core/form/server-validation';
 import { createServerValidatorRegistry } from '../../../../core/validator/server-registry';
 import { invariant } from '../../../../core/invariant';
@@ -472,7 +473,8 @@ export const tinaLocalDataLayerVitePlugin = (
     'tinaLocalDataLayerVitePlugin needs `config` (the loaded tina/config.ts) or `collections`.'
   );
   const dataLayer = createLocalDataLayer({ ...options, collections });
-  const plugins = options.config?.plugins ?? [];
+  // With no config, only the core validators are known, so a collection's built-in rules still run.
+  const plugins = options.config?.plugins ?? [coreValidatorsPlugin];
   const contentGate = createSessionGate(plugins, 'content');
   const mediaGate = createSessionGate(plugins, 'media');
   const mayCreateStorage = new AsyncLocalStorage<boolean>();

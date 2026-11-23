@@ -167,7 +167,11 @@ const validateWithoutForm = (target: SaveTarget): void => {
 // A refusal with field errors that the form can show and list.
 export const isServerFieldRefusal = (cause: unknown): cause is ContentError => {
   if (cause instanceof ContentError) {
-    return cause.code === 'validation' && cause.fieldErrors !== undefined;
+    return (
+      cause.code === 'validation' &&
+      cause.fieldErrors !== undefined &&
+      Object.keys(cause.fieldErrors).length > 0
+    );
   }
   return false;
 };

@@ -645,6 +645,45 @@ describe('saves run the collection validators', () => {
   });
 });
 
+describe('a plugin given collections and no config', () => {
+  it('still registers the core validators, so a required field is refused with 422', async () => {
+    const plugin = tinaLocalDataLayerVitePlugin({
+      rootDir,
+      collections: [
+        {
+          ...POSTS,
+          fields: [
+            {
+              type: 'string',
+              name: 'title',
+              validators: [{ name: 'required' }],
+            },
+          ],
+        },
+      ],
+    });
+    const mounted = new Map<string, Function>();
+    (plugin.configureServer as (server: unknown) => void)({
+      config: { logger: { info: () => {} } },
+      middlewares: {
+        use: (route: string | Function, handler?: Function) => {
+          if (typeof route === 'string' && handler) mounted.set(route, handler);
+        },
+      },
+    });
+    const refused = await content(mounted, {
+      op: 'create',
+      collection: 'posts',
+      path: 'content/posts/new.mdx',
+      value: { title: '' },
+    });
+    expect(refused.status).toBe(422);
+    expect(refused.body.error.fieldErrors).toEqual({
+      title: ['title is required'],
+    });
+  });
+});
+
 describe('a rename that rewrites other collections', () => {
   const PEOPLE: CollectionSchema = {
     name: 'people',

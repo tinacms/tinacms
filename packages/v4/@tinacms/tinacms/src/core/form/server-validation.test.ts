@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { resolveFieldPlugins } from '../field/registry';
-import { resolveClientSegments } from '../plugin';
+import { definePlugin, resolveClientSegments } from '../plugin';
 import { validateDocument } from '../../editor/resolver';
 import { corePlugins, t } from '../../plugins/fields';
 import type { CollectionSchema, TinaDocument } from '../schema/types';
@@ -125,5 +125,31 @@ describe('the Backend validation matches the form', () => {
     expect(validateStoredDocument(rich, sent, { validators, stored })).toEqual({
       rank: ['rank must be at least 3'],
     });
+  });
+});
+
+describe('stored helpers after a field override', () => {
+  const overridingBoolean = definePlugin({
+    name: 'test:field:boolean-override',
+    provides: ['field'],
+    overrides: [{ capability: 'field', key: 'boolean' }],
+    field: { type: 'boolean', contractVersion: 1 },
+    client: async () => ({ default: {} }),
+  });
+
+  it('reads an overridden boolean with the default, not the built-in helpers', () => {
+    expect(storedHelpersOf(corePlugins).get('boolean')).toBeDefined();
+    const overridden = storedHelpersOf([...corePlugins, overridingBoolean]);
+    expect(overridden.get('boolean')).toBeUndefined();
+    const errors = validateStoredDocument(
+      {
+        name: 'p',
+        format: 'mdx',
+        fields: [t.boolean({ name: 'featured', validators: [required] })],
+      },
+      { featured: false },
+      { validators, stored: overridden }
+    );
+    expect(errors).toEqual({});
   });
 });

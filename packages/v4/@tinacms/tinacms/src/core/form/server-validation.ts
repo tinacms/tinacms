@@ -7,6 +7,8 @@ import type {
 } from '../field/contract';
 import { invariant } from '../invariant';
 import type { FieldProvision, PluginManifest } from '../plugin';
+import { fieldConflictError, overridesFieldKey } from '../field/registry';
+import { composeOverridableRegistry } from '../overridable-registry';
 import { fieldsOf, nestedValuesOf } from '../schema/children';
 import type {
   CollectionSchema,
@@ -23,20 +25,30 @@ import { isRecord } from '../../utils/is-record';
 
 type StoredHelpers = NonNullable<FieldProvision['stored']>;
 
-// The stored-value helpers each field type declares on its manifest. The
+// The stored-value helpers of the plugin that wins each field type, after
+// overrides. A winner that declares none leaves the type on the defaults. The
 // Backend loads manifests and never client segments (ADR-028 §9).
 export const storedHelpersOf = (
   plugins: readonly PluginManifest[]
-): ReadonlyMap<string, StoredHelpers> =>
-  new Map(
+): ReadonlyMap<string, StoredHelpers | undefined> =>
+  composeOverridableRegistry(
     plugins.flatMap((plugin) =>
-      plugin.field?.stored ? [[plugin.field.type, plugin.field.stored]] : []
-    )
+      plugin.field
+        ? [
+            {
+              key: plugin.field.type,
+              value: plugin.field.stored,
+              isOverride: overridesFieldKey(plugin, plugin.field.type),
+            },
+          ]
+        : []
+    ),
+    fieldConflictError
   );
 
 export interface StoredValidationConfig {
   validators: ValidatorRegistry;
-  stored: ReadonlyMap<string, StoredHelpers>;
+  stored: ReadonlyMap<string, StoredHelpers | undefined>;
 }
 
 // A rule returns a message, a list of messages or null. Anything else, such as

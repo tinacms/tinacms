@@ -1,3 +1,4 @@
+import { rmSync } from 'node:fs';
 import { createServer } from 'vite';
 import path from 'node:path';
 import { expect, it } from 'vitest';
@@ -30,5 +31,11 @@ it('saves through the playground dev server, so its lazy server segments still l
     expect(body.error.code).toBe('validation');
   } finally {
     await server.close();
+    rmSync(
+      path.resolve(__dirname, '../../playground/content/authors/probe.md'),
+      {
+        force: true,
+      }
+    );
   }
 }, 60_000);

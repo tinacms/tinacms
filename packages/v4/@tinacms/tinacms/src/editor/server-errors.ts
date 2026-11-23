@@ -1,4 +1,3 @@
-import { get } from 'react-hook-form';
 import type { FormId } from '../form/form-store';
 
 // A Backend refusal is a verdict on the whole document it received, so its
@@ -27,9 +26,10 @@ const fingerprint = (value: unknown): string =>
   JSON.stringify(value, sortKeys) ?? '';
 
 /**
- * Holds the messages of a refusal and returns the ones to show. A message
- * whose field changed while the save ran judged a value the editor no longer
- * has, so it is dropped. `current` is the form's values as the answer arrives.
+ * Holds the messages of a refusal and returns the ones to show. If any value
+ * of the form differs from the values the save sent, the refusal judged a
+ * document the editor no longer has, so none of its messages show. `current`
+ * is the form's values as the answer arrives.
  */
 export const holdServerErrors = (
   formId: FormId,
@@ -37,14 +37,8 @@ export const holdServerErrors = (
   sent: Record<string, unknown>,
   current: Record<string, unknown>
 ): Record<string, string[]> => {
-  const shown: Record<string, string[]> = {};
-  for (const [address, messages] of Object.entries(errors)) {
-    if (
-      fingerprint(get(current, address)) === fingerprint(get(sent, address))
-    ) {
-      shown[address] = messages;
-    }
-  }
+  const unchanged = fingerprint(current) === fingerprint(sent);
+  const shown = unchanged ? errors : {};
   if (Object.keys(shown).length === 0) held.delete(formId);
   else held.set(formId, { messages: shown, snapshot: fingerprint(current) });
   return shown;

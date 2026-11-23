@@ -511,6 +511,43 @@ describe('useFormSave when the server refuses the save with field errors', () =>
     ).toEqual({});
   });
 
+  it('shows no message on an unchanged field when a sibling changed while the save ran', async () => {
+    let refusal: () => void = () => {};
+    const onSave = vi.fn(
+      () =>
+        new Promise<void>((_resolve, reject) => {
+          refusal = () =>
+            reject(
+              new ContentError('validation', 'refused', {
+                [toFieldAddress('title')]: ['Title clashes with the subtitle'],
+              })
+            );
+        })
+    );
+    renderWithSave(
+      onSave,
+      {
+        ...collection,
+        fields: [
+          t.string({ name: 'title', label: 'Title' }),
+          t.string({ name: 'subtitle', label: 'Subtitle' }),
+        ],
+      },
+      { title: 'Hi', subtitle: 'Sub' }
+    );
+    await userEvent.click(await screen.findByText('save'));
+    await vi.waitFor(() => expect(onSave).toHaveBeenCalled());
+    await userEvent.type(await screen.findByLabelText(/^Subtitle\b/), '!');
+    refusal();
+
+    await vi.waitFor(() =>
+      expect(Object.values(useFormStore.getState().saves)).toMatchObject([
+        { phase: 'failed' },
+      ])
+    );
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
   it('fails the save with the message when no field matches the address', async () => {
     renderWithSave(refuse({ [toFieldAddress('nowhere')]: ['Nope'] }));
     await userEvent.click(await screen.findByText('save'));
