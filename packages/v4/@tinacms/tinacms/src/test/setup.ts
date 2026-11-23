@@ -62,8 +62,7 @@ afterEach(async () => {
 
 // Sonner removes a closed toast 200 ms later, with a timer it never clears. A test
 // file that ends inside that window lets the timer fire after its environment is
-// gone, and vitest exits 1 on `window is not defined`. A file that showed a toast
-// waits here, while the window still exists, so the timer runs against it.
+// gone, and vitest exits 1 on `window is not defined`.
 const TOAST_REMOVAL_MS = 250;
 
 let toastShown = false;

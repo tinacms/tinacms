@@ -4,12 +4,7 @@ import type { FormId } from '../form/form-store';
 import { failingLeaves, inDocumentOrder } from './field-errors';
 import type { FormViewStore } from './form-view-state';
 
-/**
- * Lists the form's failing fields in the Errors pane and opens it, so Save
- * reads "Resolve N errors". Reads the errors from the form store. A client
- * block and a Backend refusal with field errors both come through here.
- * Returns false when no field fails.
- */
+/** Lists the form's failing fields in the Errors pane, so Save reads "Resolve N errors". False when none fail. */
 export const blockOnFormErrors = (
   formId: FormId,
   view: FormViewStore,

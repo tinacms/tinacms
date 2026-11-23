@@ -164,9 +164,6 @@ const validateWithoutForm = (target: SaveTarget): void => {
   throw new FormValidationError();
 };
 
-// The Backend, or TinaCloud, refused the save with messages for fields. They
-// show like the form's own: on the open form, or in the store for the form
-// that opens later. The values stay as the editor typed them.
 // A refusal with field errors that the form can show and list.
 export const isServerFieldRefusal = (cause: unknown): cause is ContentError => {
   if (cause instanceof ContentError) {
@@ -175,6 +172,8 @@ export const isServerFieldRefusal = (cause: unknown): cause is ContentError => {
   return false;
 };
 
+// Shows the refusal like the form's own errors: on the open form, or in the store for
+// the form that opens later. The values stay as the editor typed them.
 const showServerFieldErrors = (
   { formId }: SaveTarget,
   mounted: FormBindings | undefined,

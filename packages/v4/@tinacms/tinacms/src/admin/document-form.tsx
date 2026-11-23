@@ -322,8 +322,6 @@ function SaveButton() {
         branchName !== undefined && names?.includes(branchName) === true
     );
 
-  // A client block and a Backend refusal with field errors both list the failing
-  // fields in the Errors pane and turn Save into Resolve.
   const isBlockingFailure = (cause: unknown): boolean => {
     if (cause instanceof FormValidationError) return true;
     return isServerFieldRefusal(cause);
