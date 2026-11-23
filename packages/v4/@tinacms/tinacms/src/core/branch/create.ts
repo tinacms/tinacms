@@ -40,7 +40,12 @@ export const createBranchAction =
       resolve(source.create({ name, from }))
     ).then(
       (result) => {
-        const made: unknown = result?.name;
+        let made: unknown;
+        try {
+          made = result?.name;
+        } catch {
+          made = undefined;
+        }
         if (typeof made !== 'string') {
           console.warn(`[tinacms] could not create branch ${name}:`, result);
           finish(name, 'failed');

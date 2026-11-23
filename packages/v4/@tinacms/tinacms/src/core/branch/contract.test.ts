@@ -158,6 +158,11 @@ describe('createBranchAction', () => {
   const unusable = {
     'create resolving to undefined': () => undefined,
     'create resolving to a non-object': () => 42,
+    'create resolving to a name getter that throws': () => ({
+      get name(): string {
+        throw new Error('name');
+      },
+    }),
   };
 
   const run = async (result: () => unknown) => {
