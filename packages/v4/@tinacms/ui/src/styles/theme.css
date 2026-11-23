@@ -106,6 +106,8 @@
 
   --color-scrim: var(--scrim);
   --color-scrim-light: var(--scrim-light);
+  --color-pv-ground: var(--pv-ground);
+  --color-pv-edge: var(--pv-edge);
 
   --shadow-xs: var(--shadow-xs);
   --shadow-popover: var(--shadow-popover);
@@ -189,6 +191,12 @@
     *::after {
       transition-duration: 0s !important;
       animation-duration: 0s !important;
+    }
+
+    [data-slot="foot-sheet"],
+    [data-slot="foot-sheet-scrim"] {
+      transition-property: opacity !important;
+      transition-duration: var(--dur-reduced) !important;
     }
   }
 }

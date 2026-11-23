@@ -16,10 +16,20 @@ export const openCollectionTree = async (collection: string) => {
   await findCollectionTree();
 };
 
-/** Back from a document lands on the maximised table. Restore returns to the tree. */
+/** Back from a document: the Location trail's collection step lands on the table of its folder. */
+export const backToFolder = async (
+  user: ReturnType<typeof userEvent.setup>
+) => {
+  const [, collectionStep] = within(
+    screen.getByRole('navigation', { name: 'Location' })
+  ).getAllByRole('button');
+  if (collectionStep) await user.click(collectionStep);
+};
+
+/** Back lands on the maximised table. Restore returns to the tree. */
 export const returnToTree = async (
   user: ReturnType<typeof userEvent.setup>
 ) => {
-  await user.click(screen.getByRole('button', { name: 'Return to navigator' }));
+  await backToFolder(user);
   await user.click(await screen.findByRole('button', { name: 'Restore' }));
 };

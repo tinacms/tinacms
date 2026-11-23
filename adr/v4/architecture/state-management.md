@@ -139,7 +139,7 @@ These are non-negotiable because the cost of going flat is value↔structure con
 
 ## The visual-editing channel
 
-Click-to-edit `postMessage`s a **Field address** across the preview iframe and sets it as the Form's active field. The active-field state has multiple producers (visual-editing click, validation jump, deep link) and one consumer (the Form). ([ADR-009](../009-field-plugins.md))
+Click-to-edit `postMessage`s a **Field address** across the preview iframe and sets it as the Form's active field. The active-field state has multiple producers (visual-editing click, validation jump, deep link) and one consumer (the Form). The click carries an optional `document` (the path of the document the mark belongs to), so a click on a referenced or shared document opens that document's form. The admin sends the form's hovered and active field back to the page as `tina:outline`; that is a one-way picture of the state, not a second producer. ([ADR-009](../009-field-plugins.md))
 
 - **Reveal** (expand collapsed ancestors + scroll into view) is **runtime-owned and universal** — works for any addressable node without the field cooperating.
 - **Activate** (focus input, open popover, center map) is **field-owned and opt-in** via `useFieldActivation`.

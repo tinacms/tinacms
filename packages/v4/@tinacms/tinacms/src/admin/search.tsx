@@ -194,7 +194,7 @@ function SearchDialog({
   }, [provider, content, query]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size='lg' showCloseButton>
+      <DialogContent size='lg' showCloseButton keyboard>
         <DialogTitle>Search</DialogTitle>
         <SearchBox
           label='Search'

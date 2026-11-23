@@ -1,0 +1,376 @@
+import { type Page, expect, test } from '@playwright/test';
+
+const HELLO = 'content/posts/hello-world.mdx';
+const SECOND = 'content/posts/second-post.mdx';
+
+const adminUrl = (preview: string, hash: string) =>
+  `/?preview=${encodeURIComponent(preview)}#${hash}`;
+const postHash = (path: string) =>
+  `/collections/post/${encodeURIComponent(path)}`;
+const declared = (path: string) => `/declared.html?post=${path}`;
+const frame = (page: Page) => page.frameLocator('iframe[title="Preview"]');
+const location = (page: Page) =>
+  page.getByRole('navigation', { name: 'Location' });
+const heading = (page: Page) =>
+  page.getByRole('complementary', { name: 'Document form' }).locator('h2');
+
+const openDeclared = async (page: Page, path = HELLO) => {
+  await page.goto(adminUrl(declared(path), postHash(path)));
+  await expect(frame(page).getByTestId('post-title')).toBeVisible();
+};
+
+const outlineOf = (page: Page, testId: string) =>
+  frame(page)
+    .getByTestId(testId)
+    .evaluate((element) => {
+      const host = element.ownerDocument.body.lastElementChild;
+      return host?.shadowRoot ? 'closed' : 'none';
+    });
+
+test('hovering a marked part outlines it and an unmarked part gets none', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  const title = frame(page).getByTestId('post-title');
+  const before = await title.boundingBox();
+  await title.hover();
+  await page.waitForTimeout(150);
+  expect(await title.boundingBox()).toEqual(before);
+  await frame(page).getByTestId('plain-paragraph').hover();
+  expect(await outlineOf(page, 'post-title')).toBeDefined();
+});
+
+test('clicking the title focuses the Title field and it keeps the active look after clicking elsewhere on the page', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  await frame(page).getByTestId('post-title').click();
+  const title = page.getByRole('textbox', { name: /^title\b/i });
+  await expect(title).toBeFocused();
+  await frame(page).getByTestId('plain-paragraph').click();
+  await expect(title).toHaveAttribute('data-active', /.*/);
+});
+
+test('hovering a field in the form does not move page layout and focusing it keeps the frame', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  const title = frame(page).getByTestId('post-title');
+  const before = await title.boundingBox();
+  await page.getByRole('textbox', { name: /^title\b/i }).hover();
+  await page.waitForTimeout(150);
+  expect(await title.boundingBox()).toEqual(before);
+});
+
+test('the form head is title-led with a Location trail and no Return to navigator or tabs', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  await expect(location(page)).toBeVisible();
+  await expect(heading(page)).toHaveText(/^Hello World/);
+  await expect(
+    page.getByRole('button', { name: 'Return to navigator' })
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('tablist', { name: 'Document views' })
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('navigation', { name: 'Preview location' })
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Form actions' })
+  ).toBeVisible();
+});
+
+test('clicking a referenced author opens the author as a reference step and back returns', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  await frame(page).getByTestId('author-name').click();
+  await expect(page.getByRole('textbox', { name: /^name\b/i })).toBeFocused();
+  await expect(
+    location(page).getByRole('button', { name: /^Hello World/ })
+  ).toBeVisible();
+  await location(page)
+    .getByRole('button', { name: /^Hello World/ })
+    .click();
+  await expect(heading(page)).toHaveText(/^Hello World/);
+});
+
+test('following a link opens the next post in the form and the preview stays on it, in the same frame', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  const iframe = await page.locator('iframe[title="Preview"]').elementHandle();
+  await page.evaluate((node) => {
+    (window as unknown as { __loads: number }).__loads = 0;
+    node?.addEventListener('load', () => {
+      (window as unknown as { __loads: number }).__loads += 1;
+    });
+  }, iframe);
+  await frame(page).getByTestId('next-post').click();
+  await expect(heading(page)).not.toHaveText(/^Hello World/);
+  await expect(page).toHaveURL(
+    new RegExp(encodeURIComponent(SECOND).slice(0, 20))
+  );
+  await expect(frame(page).getByTestId('post-title')).toBeVisible();
+  const handle = await page.locator('iframe[title="Preview"]').elementHandle();
+  expect(
+    await handle?.evaluate((node, original) => node === original, iframe)
+  ).toBe(true);
+});
+
+test('a link off the site opens in a new tab and the preview stays on the site', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  const popup = page.waitForEvent('popup');
+  await frame(page).getByTestId('off-site-link').click();
+  expect((await popup).url()).toContain('example.com');
+  await expect(frame(page).getByTestId('post-title')).toBeVisible();
+});
+
+test('a page that draws only the shared nav shows Nothing to edit, and the nav opens its document', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  await frame(page).getByRole('link', { name: 'Blog' }).dispatchEvent('click');
+  await expect(heading(page)).toHaveText('Nothing to edit on this page');
+  await expect(
+    page.getByRole('button', { name: 'Open Collections' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Save', exact: true })
+  ).toHaveCount(0);
+  await frame(page).getByText('Playground Blog').click();
+  await expect(heading(page)).toHaveText('site.json');
+});
+
+test('opening a document from Collections does not move the form to the page the preview shows', async ({
+  page,
+}) => {
+  await page.goto(adminUrl(declared(HELLO), postHash(SECOND)));
+  await expect(heading(page)).not.toHaveText(/^Hello World/);
+  await expect(frame(page).getByTestId('post-title')).toBeVisible();
+  await page.waitForTimeout(1000);
+  await expect(page).toHaveURL(
+    new RegExp(encodeURIComponent(SECOND).slice(0, 20))
+  );
+});
+
+test('the outline never blocks the page: hit-testing over a hovered part still reaches the site element', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  const title = frame(page).getByTestId('post-title');
+  await title.hover();
+  const hit = await title.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return (
+      element.ownerDocument.elementFromPoint(
+        box.x + box.width / 2,
+        box.y + box.height / 2
+      ) === element
+    );
+  });
+  expect(hit).toBe(true);
+});
+
+test('focusing a field whose part of the page is off-screen scrolls it into view', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 500 });
+  await openDeclared(page);
+  await page.locator('input[id="seo.social.handle"]').focus();
+  await expect
+    .poll(() =>
+      frame(page)
+        .getByTestId('social-handle')
+        .evaluate((element) => {
+          const box = element.getBoundingClientRect();
+          return box.top >= 0 && box.bottom <= window.innerHeight + 1;
+        })
+    )
+    .toBe(true);
+});
+
+test('at 390px wide the head shows the trail and title without overflowing sideways', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto(adminUrl(declared(HELLO), postHash(HELLO)));
+  await expect(location(page)).toBeVisible();
+  await expect(heading(page)).toHaveText(/^Hello World/);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth
+    )
+  ).toBe(true);
+});
+
+test.describe('on a touch screen', () => {
+  test.use({ hasTouch: true });
+
+  test('a tap on a marked part makes its field active', async ({ page }) => {
+    await openDeclared(page);
+    await frame(page).getByTestId('post-title').tap();
+    await expect(page.locator('input#title')).toBeFocused();
+  });
+});
+
+test('clicking a block on its own padding opens the block level with its card active and keeps it on a second click', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  const block = frame(page).getByTestId('block-0');
+  await block.click({ position: { x: 4, y: 4 } });
+  await expect(heading(page)).toHaveText(/^Hero/);
+  const form = page.getByRole('complementary', { name: 'Document form' });
+  await expect(form.getByRole('textbox', { name: /headline/i })).toBeVisible();
+  await expect(form.locator(':focus')).toHaveCount(0);
+  await block.click({ position: { x: 4, y: 4 } });
+  await expect(heading(page)).toHaveText(/^Hero/);
+  await location(page).getByRole('button', { name: 'Hello World' }).click();
+  await expect(
+    form.locator('[data-active]').filter({ hasText: 'Hero' })
+  ).toHaveCount(1);
+  await expect(
+    form.locator('[data-slot="list-card-item"][data-active]')
+  ).toHaveCount(1);
+});
+
+test('on Collections the preview frame is hidden but mounted, nothing from the page acts, and a document from the tree shows the same frame again', async ({
+  page,
+}) => {
+  await page.goto(adminUrl(declared(HELLO), '/collections'));
+  const iframe = page.locator('iframe[title="Preview"]');
+  await expect(iframe).toBeHidden();
+  await expect(iframe).toHaveCount(1);
+  const src = await iframe.getAttribute('src');
+  await frame(page).getByTestId('post-title').dispatchEvent('click');
+  await page.waitForTimeout(1000);
+  await expect(page).toHaveURL(/#\/collections$/);
+  await expect(
+    page.getByRole('complementary', { name: 'Navigator' })
+  ).toBeVisible();
+
+  const handle = await iframe.elementHandle();
+  await page
+    .getByRole('complementary', { name: 'Navigator' })
+    .getByRole('button', { name: 'Posts' })
+    .click();
+  await page.getByRole('button', { name: /hello-world\.mdx/ }).click();
+  await expect(iframe).toBeVisible();
+  expect(await iframe.getAttribute('src')).toBe(src);
+  expect(await handle?.evaluate((node) => node.isConnected)).toBe(true);
+  await expect(heading(page)).toHaveText(/^Hello World/);
+  await frame(page).getByTestId('post-title').click();
+  await expect(page.getByRole('textbox', { name: /^title\b/i })).toBeFocused();
+});
+
+test('the returned card keeps its active look with its block after Move down', async ({
+  page,
+}) => {
+  await openDeclared(page);
+  await frame(page)
+    .getByTestId('block-0')
+    .click({ position: { x: 4, y: 4 } });
+  await expect(heading(page)).toHaveText(/^Hero/);
+  const form = page.getByRole('complementary', { name: 'Document form' });
+  await location(page).getByRole('button', { name: 'Hello World' }).click();
+  const cards = form.locator(
+    '[data-array-item] > [data-slot="list-card-item"]'
+  );
+  await expect(cards.first()).toHaveAttribute('data-active', '');
+  await page.getByRole('button', { name: 'Actions for Item 1' }).click();
+  await page.getByRole('menuitem', { name: /^Move down/ }).click();
+  await expect(cards.nth(1)).toHaveAttribute('data-active', '');
+  await expect(cards.first()).not.toHaveAttribute('data-active', '');
+});
+
+const cameBackToHero = async (page: Page) => {
+  await openDeclared(page);
+  await frame(page)
+    .getByTestId('block-0')
+    .click({ position: { x: 4, y: 4 } });
+  await expect(heading(page)).toHaveText(/^Hero/);
+  await location(page).getByRole('button', { name: 'Hello World' }).click();
+  const cards = page
+    .getByRole('complementary', { name: 'Document form' })
+    .locator('[data-array-item] > [data-slot="list-card-item"]');
+  await expect(cards.first()).toHaveAttribute('data-active', '');
+  return cards;
+};
+
+test('dragging the returned card by its grip moves its active look with it', async ({
+  page,
+}) => {
+  const cards = await cameBackToHero(page);
+  const from = await cards.first().locator('[data-grip]').boundingBox();
+  const to = await cards.nth(1).boundingBox();
+  if (!from || !to) throw new Error('cards are not visible');
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(from.x + 4, from.y + 20, { steps: 4 });
+  await page.mouse.move(to.x + 20, to.y + to.height - 2, { steps: 12 });
+  await page.mouse.up();
+  await expect(cards.nth(1)).toHaveAttribute('data-active', '');
+  await expect(cards.first()).not.toHaveAttribute('data-active', '');
+});
+
+test("pressing another card's menu clears the returned card, and its Remove leaves no card active", async ({
+  page,
+}) => {
+  const cards = await cameBackToHero(page);
+  await page.getByRole('button', { name: 'Actions for Item 2' }).click();
+  await expect(cards.first()).not.toHaveAttribute('data-active', '');
+  await page.getByRole('menuitem', { name: /^Remove/ }).click();
+  await expect(
+    page
+      .getByRole('complementary', { name: 'Document form' })
+      .locator('[data-slot="list-card-item"][data-active]')
+  ).toHaveCount(0);
+});
+
+test('hovering a block card dashes its block, and tabbing onto its grip draws the solid outline with the Hero tab', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const attach = Element.prototype.attachShadow;
+    Element.prototype.attachShadow = function open(init) {
+      return attach.call(this, { ...init, mode: 'open' });
+    };
+  });
+  await openDeclared(page);
+  const form = page.getByRole('complementary', { name: 'Document form' });
+  const hero = form.locator('[data-array-item]').first();
+  await expect(hero).toBeVisible();
+  const hover = frame(page).locator('[data-outline="hover"]');
+  const active = frame(page).locator('[data-outline="active"]');
+
+  await hero.hover();
+  await expect(hover).toHaveCount(1);
+  await expect(active).toHaveCount(0);
+
+  await page.locator('input#title').focus();
+  for (let step = 0; step < 20; step += 1) {
+    await page.keyboard.press('Tab');
+    if (
+      await page.evaluate(() =>
+        document.activeElement?.hasAttribute('data-grip')
+      )
+    )
+      break;
+  }
+  await expect(hero.locator('[data-grip]')).toBeFocused();
+  await expect(active).toHaveCount(1);
+  await expect(active.locator('[data-outline-tab]')).toHaveText('Hero');
+  await expect(heading(page)).not.toHaveText(/^Hero/);
+
+  await hero.getByRole('button', { name: /^Actions for/ }).click();
+  await expect(
+    page.getByRole('menuitem', { name: /^Move down/ })
+  ).toBeVisible();
+  await expect(active).toHaveCount(1);
+  await expect(active.locator('[data-outline-tab]')).toHaveText('Hero');
+});

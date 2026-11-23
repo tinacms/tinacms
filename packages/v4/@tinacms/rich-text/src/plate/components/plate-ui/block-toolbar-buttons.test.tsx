@@ -1,14 +1,13 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, render } from '@testing-library/react';
 import type { Value } from '@udecode/plate';
 import { Plate, PlateContent, usePlateEditor } from '@udecode/plate/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { createEditorPlugins } from '../../plugins/editor-plugins';
 import { Components } from '../../plugins/ui/components';
-import { CodeBlockToolbarButton } from './code-block-toolbar-button';
-import { HorizontalRuleToolbarButton } from './hr-toolbar-button';
-import { Toolbar } from './toolbar';
+import { ToolbarProvider } from '../../toolbar/toolbar-provider';
+import { insertCodeBlock } from './code-block-toolbar-button';
+import { insertHorizontalRule } from './hr-toolbar-button';
 import { TooltipProvider } from './tooltip';
 
 const bulletedList: Value = [
@@ -31,10 +30,8 @@ type HarnessEditor = ReturnType<typeof usePlateEditor>;
 
 const Harness = ({
   onEditorReady,
-  children,
 }: {
   onEditorReady: (editor: HarnessEditor) => void;
-  children: React.ReactNode;
 }) => {
   const editor = usePlateEditor({
     plugins: createEditorPlugins(),
@@ -46,17 +43,16 @@ const Harness = ({
 
   return (
     <TooltipProvider>
-      <Plate editor={editor}>
-        <Toolbar>{children}</Toolbar>
-        <PlateContent />
-      </Plate>
+      <ToolbarProvider templates={[]} overrides={undefined}>
+        <Plate editor={editor}>
+          <PlateContent />
+        </Plate>
+      </ToolbarProvider>
     </TooltipProvider>
   );
 };
 
-const renderWithCaretInListItem = (
-  children: React.ReactNode
-): HarnessEditor => {
+const renderWithCaretInListItem = (): HarnessEditor => {
   let editor: HarnessEditor | undefined;
 
   render(
@@ -64,9 +60,7 @@ const renderWithCaretInListItem = (
       onEditorReady={(next) => {
         editor = next;
       }}
-    >
-      {children}
-    </Harness>
+    />
   );
 
   if (!editor) {
@@ -104,12 +98,11 @@ const listItemChildTypes = (nodes: readonly ValueNode[]): string[] => {
  */
 const LIST_ITEM_CHILDREN = ['lic', 'ul', 'ol'];
 
-describe('a block button with the caret in a list item', () => {
-  it('puts a code block outside the list, not inside the item', async () => {
-    const user = userEvent.setup();
-    const editor = renderWithCaretInListItem(<CodeBlockToolbarButton />);
+describe('a block insert with the caret in a list item', () => {
+  it('puts a code block outside the list, not inside the item', () => {
+    const editor = renderWithCaretInListItem();
 
-    await user.click(screen.getByRole('radio', { name: 'Code Block' }));
+    act(() => insertCodeBlock(editor));
 
     expect(JSON.stringify(editor.children)).toContain('"code_block"');
     expect(JSON.stringify(editor.children)).toContain('second');
@@ -118,11 +111,10 @@ describe('a block button with the caret in a list item', () => {
     }
   });
 
-  it('puts a horizontal rule outside the list, not inside the item', async () => {
-    const user = userEvent.setup();
-    const editor = renderWithCaretInListItem(<HorizontalRuleToolbarButton />);
+  it('puts a horizontal rule outside the list, not inside the item', () => {
+    const editor = renderWithCaretInListItem();
 
-    await user.click(screen.getByRole('radio', { name: 'Horizontal Rule' }));
+    act(() => insertHorizontalRule(editor));
 
     expect(JSON.stringify(editor.children)).toContain('"hr"');
     expect(JSON.stringify(editor.children)).toContain('second');
