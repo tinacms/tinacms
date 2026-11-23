@@ -39,30 +39,45 @@ export const createBranchAction =
     new Promise<Awaited<ReturnType<Creatable['create']>>>((resolve) =>
       resolve(source.create({ name, from }))
     ).then(
-      ({ name: made, ready }) => {
-        const slice = branchSliceOf(store.getState());
-        fill({
-          list: slice?.list.includes(made)
-            ? slice.list
-            : [...(slice?.list ?? []), made],
-          creating: {
-            name: made,
-            from,
-            startedOn: slice?.creating?.startedOn,
-            phase: 'preparing',
-          },
-        });
-        if (!ready) {
-          finish(made, 'ready');
+      (result) => {
+        const made: unknown = result?.name;
+        if (typeof made !== 'string') {
+          console.warn(`[tinacms] could not create branch ${name}:`, result);
+          finish(name, 'failed');
           return;
         }
-        ready.then(
-          () => finish(made, 'ready'),
-          (cause: unknown) => {
-            console.warn(`[tinacms] ${made} was made but is not ready:`, cause);
-            finish(made, 'unready');
+        try {
+          const slice = branchSliceOf(store.getState());
+          fill({
+            list: slice?.list.includes(made)
+              ? slice.list
+              : [...(slice?.list ?? []), made],
+            creating: {
+              name: made,
+              from,
+              startedOn: slice?.creating?.startedOn,
+              phase: 'preparing',
+            },
+          });
+          const { ready } = result;
+          if (!ready) {
+            finish(made, 'ready');
+            return;
           }
-        );
+          ready.then(
+            () => finish(made, 'ready'),
+            (cause: unknown) => {
+              console.warn(
+                `[tinacms] ${made} was made but is not ready:`,
+                cause
+              );
+              finish(made, 'unready');
+            }
+          );
+        } catch (cause) {
+          console.warn(`[tinacms] ${made} was made but is not ready:`, cause);
+          finish(made, 'unready');
+        }
       },
       (cause: unknown) => {
         console.warn(`[tinacms] could not create branch ${name}:`, cause);

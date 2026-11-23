@@ -133,4 +133,106 @@ describe('createBranchAction', () => {
     expect(create).toHaveBeenCalledTimes(2);
     warn.mockRestore();
   });
+
+  const brokenReady = {
+    'a ready getter that throws': () => ({
+      name: 'cms/one',
+      get ready(): Promise<void> {
+        throw new Error('getter');
+      },
+    }),
+    'a ready that is not a promise': () => ({
+      name: 'cms/one',
+      ready: true as unknown as Promise<void>,
+    }),
+    'a ready whose then throws': () => ({
+      name: 'cms/one',
+      ready: {
+        then: () => {
+          throw new Error('then');
+        },
+      } as unknown as Promise<void>,
+    }),
+  };
+
+  const unusable = {
+    'create resolving to undefined': () => undefined,
+    'create resolving to a non-object': () => 42,
+  };
+
+  const run = async (result: () => unknown) => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const unhandled = vi.fn();
+    process.on('unhandledRejection', unhandled);
+    const store = createTinaStore([]);
+    store.setState({
+      branch: { list: ['main'], protected: [], switchTo: () => {} },
+    } as never);
+    const create = vi
+      .fn()
+      .mockImplementationOnce(async () => result())
+      .mockResolvedValueOnce({ name: 'cms/two' });
+    const start = createBranchAction(store, {
+      list: async () => [],
+      defaultBranch: async () => 'main',
+      create: create as never,
+    });
+    start('cms/one', 'main');
+    await vi.waitFor(() =>
+      expect(branchSliceOf(store.getState())?.createResult).toBeDefined()
+    );
+    const slice = branchSliceOf(store.getState());
+    start('cms/two', 'main');
+    await vi.waitFor(() =>
+      expect(branchSliceOf(store.getState())?.createResult?.name).toBe(
+        'cms/two'
+      )
+    );
+    await new Promise((r) => setTimeout(r, 0));
+    process.off('unhandledRejection', unhandled);
+    warn.mockRestore();
+    return { slice, unhandled, create };
+  };
+
+  it.each(Object.entries(brokenReady))(
+    'ends unready, keeps the branch and accepts a later create for %s',
+    async (_label, result) => {
+      const { slice, unhandled, create } = await run(result);
+      expect(slice?.createResult).toMatchObject({
+        name: 'cms/one',
+        outcome: 'unready',
+      });
+      expect(slice?.creating).toBeUndefined();
+      expect(slice?.list).toContain('cms/one');
+      expect(create).toHaveBeenCalledTimes(2);
+      expect(unhandled).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each(Object.entries(unusable))(
+    'ends failed for the requested name and accepts a later create for %s',
+    async (_label, result) => {
+      const { slice, unhandled, create } = await run(result);
+      expect(slice?.createResult).toMatchObject({
+        name: 'cms/one',
+        outcome: 'failed',
+      });
+      expect(slice?.creating).toBeUndefined();
+      expect(create).toHaveBeenCalledTimes(2);
+      expect(unhandled).not.toHaveBeenCalled();
+    }
+  );
+
+  it('still ends unready when ready rejects and ready when it resolves', async () => {
+    const rejected = await run(() => ({
+      name: 'cms/one',
+      ready: Promise.reject(new Error('no')),
+    }));
+    expect(rejected.slice?.createResult?.outcome).toBe('unready');
+    const fine = await run(() => ({
+      name: 'cms/one',
+      ready: Promise.resolve(),
+    }));
+    expect(fine.slice?.createResult?.outcome).toBe('ready');
+  });
 });
