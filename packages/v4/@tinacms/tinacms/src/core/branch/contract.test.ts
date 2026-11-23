@@ -1,5 +1,7 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import type { ContentProvider } from '../content/contract';
+import { createTinaStore } from '../../store/create-store';
+import { createBranchAction } from './create';
 import { branchSliceOf } from './contract';
 
 const sliceWith = (saveToNewBranch: unknown) =>
@@ -91,4 +93,44 @@ describe('branchSliceOf', () => {
       expect(slice?.saveToNewBranch).toBeUndefined();
     }
   );
+});
+
+describe('createBranchAction', () => {
+  it('records a failure and accepts a later create when the provider throws synchronously', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createTinaStore([]);
+    store.setState({
+      branch: { list: ['main'], protected: [], switchTo: () => {} },
+    } as never);
+    const create = vi
+      .fn()
+      .mockImplementationOnce(() => {
+        throw new Error('boom');
+      })
+      .mockResolvedValueOnce({ name: 'cms/two' });
+    const act = createBranchAction(store, {
+      list: async () => [],
+      defaultBranch: async () => 'main',
+      create,
+    });
+
+    act('cms/one', 'main');
+    await vi.waitFor(() =>
+      expect(branchSliceOf(store.getState())?.createResult).toMatchObject({
+        name: 'cms/one',
+        outcome: 'failed',
+      })
+    );
+    expect(branchSliceOf(store.getState())?.creating).toBeUndefined();
+
+    act('cms/two', 'main');
+    await vi.waitFor(() =>
+      expect(branchSliceOf(store.getState())?.createResult).toMatchObject({
+        name: 'cms/two',
+        outcome: 'ready',
+      })
+    );
+    expect(create).toHaveBeenCalledTimes(2);
+    warn.mockRestore();
+  });
 });

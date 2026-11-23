@@ -256,23 +256,40 @@ describe('createBranch', () => {
     await expect(made.ready).rejects.toBeInstanceOf(TinaCloudError);
   });
 
-  it('rejects ready on the sixth unknown status, counting a missing one', async () => {
+  it('rejects ready on the sixth unknown status in a row, counting a missing one', async () => {
     vi.useFakeTimers();
     const fetchMock = stubFetch(
       json({}),
       json({ status: 'unknown' }),
       json({}),
       json({ status: 'unknown' }),
-      json({ status: 'inprogress' }),
       json({ status: 'unknown' }),
-      json({ status: 'unknown' }),
+      json({}),
       json({ status: 'unknown' })
     );
     const made = await fast().createBranch({ name: 'cms/x', from: 'main' });
     const assertion = expect(made.ready).rejects.toBeInstanceOf(TinaCloudError);
     await vi.advanceTimersByTimeAsync(700);
     await assertion;
-    expect(fetchMock).toHaveBeenCalledTimes(8);
+    expect(fetchMock).toHaveBeenCalledTimes(7);
+  });
+
+  it('resets the unknown count on an inprogress response', async () => {
+    vi.useFakeTimers();
+    const flaky = Array.from({ length: 10 }, () => [
+      json({ message: 'bad gateway' }, 502),
+      json({ status: 'inprogress' }),
+    ]).flat();
+    stubFetch(json({}), ...flaky, json({ status: 'complete' }));
+    const made = await createTinaCloudClient({
+      clientId: 'abc',
+      getToken: async () => 'secret',
+      indexPollMs: 100,
+      indexTimeoutMs: 100000,
+    }).createBranch({ name: 'cms/x', from: 'main' });
+    const done = expect(made.ready).resolves.toBeUndefined();
+    await vi.advanceTimersByTimeAsync(3000);
+    await done;
   });
 
   it('counts a 404 or a network failure before indexing as one unknown status, not a rejection', async () => {

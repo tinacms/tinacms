@@ -261,7 +261,9 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
           body,
         });
       }
-      if (value !== 'inprogress') {
+      if (value === 'inprogress') {
+        unknowns = 0;
+      } else {
         unknowns += 1;
         if (unknowns >= MAX_UNKNOWN_INDEX_STATUSES) {
           throw new TinaCloudError(

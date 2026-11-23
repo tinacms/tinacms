@@ -36,7 +36,9 @@ export const createBranchAction =
       },
       createResult: undefined,
     });
-    source.create({ name, from }).then(
+    new Promise<Awaited<ReturnType<Creatable['create']>>>((resolve) =>
+      resolve(source.create({ name, from }))
+    ).then(
       ({ name: made, ready }) => {
         const slice = branchSliceOf(store.getState());
         fill({
