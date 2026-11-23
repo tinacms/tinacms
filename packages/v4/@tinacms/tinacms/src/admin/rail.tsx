@@ -15,7 +15,7 @@ import {
   SidebarSeparator,
   useSidebar,
 } from '@tinacms/ui/components/sidebar';
-import { type KeyboardEvent, type ReactElement, useId } from 'react';
+import { Fragment, type KeyboardEvent, type ReactElement, useId } from 'react';
 import type {
   GlobalNavEntry,
   GlobalNavSection,
@@ -27,7 +27,7 @@ const DOCS_URL = 'https://tina.io/docs';
 
 // The collapsed rail keeps only the icon. Each row names itself with `aria-label`.
 const RAIL_ROW =
-  'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:[&>span:not([data-slot])]:hidden group-data-[collapsible=icon]:[&>[data-slot=nav-row-label]]:hidden';
+  'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:[&>span:not([data-slot])]:hidden group-data-[collapsible=icon]:[&>svg]:hidden group-data-[collapsible=icon]:[&>[data-slot=nav-row-label]]:hidden';
 
 // The Media manager plugin ships its own entry. The core Media row replaces it.
 export const MEDIA_SCREEN = 'media';
@@ -125,13 +125,22 @@ const withoutFixedRows = (entries: GlobalNavEntry[]) =>
   );
 
 // ADR-027 §2: ungrouped entries and groups share one list, already sorted by `order`.
-const railSections = (sections: GlobalNavSection[]) =>
-  sections.flatMap(({ group, entries }) => {
+// A group that holds only fixed rows drops out, so the runs on each side of it join.
+const railSections = (sections: GlobalNavSection[]) => {
+  const shown: GlobalNavSection[] = [];
+  for (const { group, entries } of sections) {
     const visible = withoutFixedRows(entries);
-    return visible.length > 0 ? [{ group, entries: visible }] : [];
-  });
+    if (visible.length === 0) continue;
+    const last = shown.at(-1);
+    if (group === undefined && last && last.group === undefined) {
+      last.entries.push(...visible);
+    } else {
+      shown.push({ group, entries: visible });
+    }
+  }
+  return shown;
+};
 
-/** Where a nav entry leads, as one function for the rail and the Tools pane. */
 export function openNavTarget(
   target: NavTarget,
   navigate: (route: AdminRoute) => void
@@ -159,49 +168,61 @@ function PluginEntries({
     const labelId = `${labelPrefix}-${index}`;
     const rows = entries.map(({ label, icon, target }, entryIndex) => (
       <SidebarMenuItem key={`${entryIndex}:${label}`}>
-        <NavRow
-          kind='section'
-          icon={icon}
-          external={target.kind === 'url'}
-          selected={target.kind === 'screen' && target.screen === activeScreen}
-          aria-current={
-            target.kind === 'screen' && target.screen === activeScreen
-              ? 'page'
-              : undefined
-          }
-          aria-label={label}
-          data-rail-row=''
-          className={RAIL_ROW}
-          render={
-            target.kind === 'url' ? (
-              <a href={target.href} target='_blank' rel='noopener noreferrer' />
-            ) : undefined
-          }
-          onClick={() => {
-            setOpenMobile(false);
-            openNavTarget(target, navigate);
-          }}
-        >
-          {label}
-        </NavRow>
+        <RailTooltip label={label}>
+          <NavRow
+            kind='section'
+            icon={icon}
+            external={target.kind === 'url'}
+            selected={
+              target.kind === 'screen' && target.screen === activeScreen
+            }
+            aria-current={
+              target.kind === 'screen' && target.screen === activeScreen
+                ? 'page'
+                : undefined
+            }
+            aria-label={label}
+            data-rail-row=''
+            className={RAIL_ROW}
+            render={
+              target.kind === 'url' ? (
+                <a
+                  href={target.href}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                />
+              ) : undefined
+            }
+            onClick={() => {
+              setOpenMobile(false);
+              openNavTarget(target, navigate);
+            }}
+          >
+            {label}
+          </NavRow>
+        </RailTooltip>
       </SidebarMenuItem>
     ));
-    return group ? (
-      <SidebarGroup key={`group:${group.id}`}>
-        <SidebarGroupLabel id={labelId}>{group.label}</SidebarGroupLabel>
-        <SidebarMenu aria-labelledby={labelId}>{rows}</SidebarMenu>
-      </SidebarGroup>
-    ) : (
-      <SidebarGroup key={`entries:${index}`}>
-        <SidebarMenu>{rows}</SidebarMenu>
-      </SidebarGroup>
+    return (
+      <Fragment key={group ? `group:${group.id}` : `entries:${index}`}>
+        <SidebarSeparator />
+        <SidebarGroup>
+          {group ? (
+            <SidebarGroupLabel id={labelId}>{group.label}</SidebarGroupLabel>
+          ) : null}
+          <SidebarMenu aria-labelledby={group ? labelId : undefined}>
+            {rows}
+          </SidebarMenu>
+        </SidebarGroup>
+      </Fragment>
     );
   });
 }
 
 /**
- * The side nav: Home, Collections and Media, then Tools and Settings, then the
- * entries plugins add, grouped or not, in ADR-027 order. An entry that ends in an arrow opens its panel beside the rail.
+ * The side nav: Home, Collections and Media, then the entries plugins add,
+ * grouped or not, in ADR-027 order. A divider sits above each group and each
+ * run of entries without a group. An entry that ends in an arrow opens its panel beside the rail.
  */
 export function AdminRail({
   route,
@@ -266,27 +287,6 @@ export function AdminRail({
           </SidebarMenu>
         </SidebarGroup>
 
-        <SidebarSeparator />
-
-        <SidebarGroup>
-          <SidebarMenu aria-label='Tools and settings'>
-            <RailEntry
-              label='Tools'
-              glyph='tools'
-              opens
-              selected={route.view === 'tools'}
-              onOpen={() => go({ view: 'tools' })}
-            />
-            <RailEntry
-              label='Settings'
-              glyph='settings'
-              opens
-              selected={route.view === 'settings'}
-              onOpen={() => go({ view: 'settings' })}
-            />
-          </SidebarMenu>
-        </SidebarGroup>
-
         <PluginEntries
           sections={sections}
           activeScreen={
@@ -301,19 +301,25 @@ export function AdminRail({
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <NavRow
-              kind='section'
-              icon='help'
-              external
-              aria-label='Help & docs'
-              data-rail-row=''
-              className={RAIL_ROW}
-              render={
-                <a href={DOCS_URL} target='_blank' rel='noopener noreferrer' />
-              }
-            >
-              Help &amp; docs
-            </NavRow>
+            <RailTooltip label='Help and docs'>
+              <NavRow
+                kind='section'
+                icon='help'
+                external
+                aria-label='Help and docs'
+                data-rail-row=''
+                className={RAIL_ROW}
+                render={
+                  <a
+                    href={DOCS_URL}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  />
+                }
+              >
+                Help and docs
+              </NavRow>
+            </RailTooltip>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
