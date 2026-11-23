@@ -56,7 +56,7 @@ v4 supplies four more examples:
   the content capability, not from a fixed list.
 - The `image` field ([`image-field.md`](./image-field.md)) stores the media
   path of one image. It depends on the `media` capability, and it picks with
-  `MediaBrowser` in `pick` mode.
+  the media picker (`useMediaPicker()`).
 - The `rich-text` field ([`rich-text-field.md`](./rich-text-field.md)) uses the
   `block` layout. With `isBody`, it controls the markdown body of the file.
 

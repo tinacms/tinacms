@@ -295,7 +295,7 @@ export function PreviewSlot(props: PreviewSlotProps) {
   return (
     <div
       data-preview-slot=''
-      className='flex min-w-0 flex-1 flex-col overflow-clip contain-[inline-size]'
+      className='relative flex min-w-0 flex-1 flex-col overflow-clip contain-[inline-size]'
     >
       <PreviewPane {...props} />
     </div>

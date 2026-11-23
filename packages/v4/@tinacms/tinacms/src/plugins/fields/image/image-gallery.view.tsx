@@ -30,10 +30,14 @@ export interface ImageGalleryViewProps
   items: ImageGalleryItem[];
   resolveUrl: ResolveImageUrl;
   onAdd: (opener: HTMLElement) => void;
-  onReplace: (index: number, opener: HTMLElement) => void;
+  onReplace: (key: string, opener: HTMLElement) => void;
   onRemove: (index: number) => void;
   onMove: (from: number, to: number) => void;
   focusRequest?: { index: number };
+  /** The media picker is open for the tile with this item key. */
+  choosingKey?: string;
+  /** Called per item key with whether its picture is missing: `item.missing`, or the picture failing to load. */
+  onMissingChange?: (key: string, missing: boolean) => void;
   disabled?: boolean;
   readOnly?: boolean;
 }
@@ -69,6 +73,8 @@ export function ImageGalleryView({
   onRemove,
   onMove,
   focusRequest,
+  choosingKey,
+  onMissingChange,
   disabled,
   readOnly,
 }: ImageGalleryViewProps) {
@@ -213,6 +219,25 @@ export function ImageGalleryView({
     if (item && over >= 0) moveTo(current.index, over, item.key);
   };
 
+  const reported = useRef(new Map<string, boolean>());
+  const reportMissing = useRef(onMissingChange);
+  reportMissing.current = onMissingChange;
+  useEffect(() => {
+    const seen = reported.current;
+    const keys = new Set(items.map((item) => item.key));
+    for (const item of items) {
+      const missing = !!item.missing || missingKeys.has(item.key);
+      if ((seen.get(item.key) ?? false) === missing) continue;
+      seen.set(item.key, missing);
+      reportMissing.current?.(item.key, missing);
+    }
+    for (const [key, wasMissing] of seen) {
+      if (keys.has(key)) continue;
+      seen.delete(key);
+      if (wasMissing) reportMissing.current?.(key, false);
+    }
+  }, [items, missingKeys]);
+
   const missingWarnings = items.some(
     (item) => item.missing || missingKeys.has(item.key)
   )
@@ -255,7 +280,8 @@ export function ImageGalleryView({
                     placeholder={name}
                     fallbackName={`Image ${index + 1}`}
                     resolveUrl={resolveUrl}
-                    look='square'
+                    look='gallery'
+                    choosing={choosingKey === item.key}
                     inert={!editable}
                     missing={item.missing}
                     onMissingChange={(missing) => setMissing(item.key, missing)}
@@ -273,7 +299,7 @@ export function ImageGalleryView({
                       editable
                         ? () => {
                             const opener = replaceEls.current.get(item.key);
-                            if (opener) onReplace(index, opener);
+                            if (opener) onReplace(item.key, opener);
                           }
                         : undefined
                     }
@@ -299,7 +325,7 @@ export function ImageGalleryView({
                 ref={addEl}
                 type='button'
                 className={cn(
-                  'flex aspect-square min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-sm border border-dashed border-input text-sm text-muted-foreground transition outline-none hover:bg-muted focus-visible:shadow-focus-ring'
+                  'flex aspect-4/3 min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-sm border border-dashed border-input text-sm text-muted-foreground transition outline-none hover:bg-muted focus-visible:shadow-focus-ring'
                 )}
                 onClick={(event) => onAdd(event.currentTarget)}
               >

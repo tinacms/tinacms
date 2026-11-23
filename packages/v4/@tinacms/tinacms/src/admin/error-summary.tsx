@@ -19,28 +19,12 @@ import { toFieldAddress } from '../core/field/address';
 import { FormScopeContext } from '../editor/context';
 import { failingLeaves, inDocumentOrder } from '../editor/field-errors';
 import { fieldsAlong, REMOVED } from '../editor/form-view-state';
+import { readPinned, writePinned } from '../editor/pane-pin';
 import { useFormErrors, useFormStore } from '../form/form-store';
 import { useNarrow } from './use-narrow';
 
-const PIN_KEY = 'tina.errorPane.pinned';
 const HOVER_DWELL_MS = 300;
 const ERROR_PANE_ID = 'error-pane';
-
-const readPinned = (): boolean => {
-  try {
-    return localStorage.getItem(PIN_KEY) === 'true';
-  } catch {
-    return false;
-  }
-};
-
-const writePinned = (pinned: boolean) => {
-  try {
-    localStorage.setItem(PIN_KEY, String(pinned));
-  } catch {
-    // Storage can be blocked; the pin then lasts for the session only.
-  }
-};
 
 const resolveButton = () =>
   document.querySelector<HTMLElement>('[data-resolve]');

@@ -44,7 +44,6 @@ import { t } from '../../../index';
 import { required } from '../../../plugins/fields';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
 import { LabelledFields } from '../../../test/labelled-fields';
-import { MediaBrowser } from '../../media-manager/media-browser';
 import { simulateReload } from '../../../test/simulate-reload';
 import arrayFieldPlugin from '../array/array-field.plugin';
 import objectFieldPlugin from '../object/object-field.plugin';
@@ -461,14 +460,11 @@ describe('a file dropped on an empty image field', () => {
   });
 
   it('starts before the files that wait for their turn', async () => {
-    render(
-      host(
-        flat,
-        undefined,
-        <MediaBrowser mode='pick' accept='image' onSelect={() => {}} />
-      )
-    );
+    render(host(flat));
     const group = await fieldGroup('Hero');
+    await userEvent.click(
+      within(group).getByRole('button', { name: 'Choose from Media' })
+    );
     const picked = ['a.png', 'b.png', 'c.png', 'd.png', 'e.png'].map((name) =>
       imageFile(name)
     );
@@ -910,14 +906,14 @@ describe('a Save while a file uploads to an image field', () => {
 describe('a failed upload on an image field', () => {
   const pick = async (group: HTMLElement, button: string) => {
     await userEvent.click(within(group).getByRole('button', { name: button }));
-    const dialog = await screen.findByRole('dialog', {
+    const picker = await screen.findByRole('region', {
       name: 'Choose an image',
     });
     await userEvent.click(
-      await within(dialog).findByRole('button', { name: 'hero.jpg' })
+      await within(picker).findByRole('button', { name: 'hero.jpg' })
     );
     await userEvent.click(
-      await within(dialog).findByRole('button', { name: 'Insert' })
+      await within(picker).findByRole('button', { name: 'Choose image' })
     );
   };
 
@@ -1226,7 +1222,7 @@ describe('a file dropped on a field that has an image', () => {
   });
 });
 
-describe('focus while a dialog of the image field is open', () => {
+describe('focus while a dialog or the picker of the image field is open', () => {
   const focusInside = (dialog: HTMLElement) =>
     vi.waitFor(
       () => expect(dialog.contains(document.activeElement)).toBe(true),
@@ -1313,7 +1309,7 @@ describe('focus while a dialog of the image field is open', () => {
       within(group).getByRole('button', { name: 'Replace hero.jpg' })
     );
     await expectFocusStays(
-      await screen.findByRole('dialog', { name: 'Choose an image' })
+      await screen.findByRole('region', { name: 'Choose an image' })
     );
   });
 

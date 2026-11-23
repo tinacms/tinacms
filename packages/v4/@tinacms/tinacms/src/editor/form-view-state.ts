@@ -13,6 +13,8 @@ import type { FieldSchema } from '../core/schema/types';
 import type { FormId } from '../form/form-store';
 import type { FieldLock } from './context';
 import { type ListChange, rekeyAddresses } from './field-errors';
+import type { MediaPickerRequest } from './media-picker';
+import { readPinned } from './pane-pin';
 
 export interface OpenLevel {
   address: FieldAddress;
@@ -94,6 +96,15 @@ export interface FormViewState {
   showLevels: (levels: readonly OpenLevel[]) => void;
   closeLevelsAbove: (keep: number) => void;
   clearReturn: () => void;
+  /** The one open request of the form's media picker, or null while it is closed. */
+  picker: MediaPickerRequest | null;
+  /** True while the open picker tucked the error summary pane, so closing it brings the pane back. */
+  pickerTuckedPane: boolean;
+  /** Ids of the mounted picker hosts. The first one draws, and the admin's primary host goes first. */
+  pickerHosts: readonly string[];
+  openPicker: (request: MediaPickerRequest) => void;
+  closePicker: () => void;
+  claimPickerHost: (id: string, primary: boolean) => () => void;
 }
 
 export type FormViewStore = StoreApi<FormViewState>;
@@ -265,6 +276,50 @@ export const createFormViewStore = (): FormViewStore => {
         returnedFrom: state.openLevels[keep]?.address ?? null,
       })),
     clearReturn: () => set({ returnedFrom: null }),
+    picker: null,
+    pickerTuckedPane: false,
+    pickerHosts: [],
+    openPicker: (request) =>
+      set((state) => {
+        const summary = state.errorSummary;
+        const tucks =
+          state.picker === null &&
+          summary.paneOpen &&
+          summary.blocked.length > 0 &&
+          !readPinned();
+        return {
+          picker: request,
+          pickerTuckedPane:
+            state.picker === null ? tucks : state.pickerTuckedPane,
+          errorSummary: tucks
+            ? { ...summary, paneOpen: false, focusRow: false }
+            : summary,
+        };
+      }),
+    closePicker: () =>
+      set((state) => {
+        if (state.picker === null) return state;
+        const summary = state.errorSummary;
+        const reopens = state.pickerTuckedPane && summary.blocked.length > 0;
+        return {
+          picker: null,
+          pickerTuckedPane: false,
+          errorSummary: reopens
+            ? { ...summary, paneOpen: true, focusRow: false }
+            : summary,
+        };
+      }),
+    claimPickerHost: (id, primary) => {
+      set((state) => ({
+        pickerHosts: primary
+          ? [id, ...state.pickerHosts]
+          : [...state.pickerHosts, id],
+      }));
+      return () =>
+        set((state) => ({
+          pickerHosts: state.pickerHosts.filter((host) => host !== id),
+        }));
+    },
   }));
 };
 

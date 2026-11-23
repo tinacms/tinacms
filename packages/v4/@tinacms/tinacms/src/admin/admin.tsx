@@ -39,6 +39,7 @@ import { TinaProvider } from '../editor/provider';
 import { AuthGate } from './auth-gate';
 import { DocumentForm, useLevelTrail } from './document-form';
 import { DocumentErrorPane } from './error-summary';
+import { MediaPickerHost } from '../plugins/media-manager/media-picker-host';
 import { DocumentScope } from './document-scope';
 import { CollectionsNavigator, MediaPanel, useTreeFolders } from './navigator';
 import { CollectionTable } from './collection-table/collection-table';
@@ -145,7 +146,7 @@ function HomeOutlet({
 function PreviewNodeSlot({ preview }: { preview?: ReactNode }) {
   const hasForm = use(FormScopeContext) !== null;
   return (
-    <div data-preview-slot='' className='min-w-0 flex-1'>
+    <div data-preview-slot='' className='relative min-w-0 flex-1'>
       {hasForm ? (
         (preview ?? <NoPreview />)
       ) : (
@@ -881,6 +882,10 @@ function AdminShell({
                     navigate={navigate}
                   />
                   <DocumentErrorPane />
+                  <MediaPickerHost
+                    primary
+                    suspended={previewExpanded || isMediaRoute}
+                  />
                   {typeof preview === 'string' ? null : (
                     <PreviewNodeSlot preview={preview} />
                   )}

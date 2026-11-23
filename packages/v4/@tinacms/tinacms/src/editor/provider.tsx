@@ -48,6 +48,7 @@ import {
   useFormStore,
   valuesEqual,
 } from '../form/form-store';
+import { MediaPickerHost } from '../plugins/media-manager/media-picker-host';
 import { registerFormBindings } from './form-bindings';
 import { checkForm } from './save-pipeline';
 import { UploadFormContext } from './uploads/upload-context';
@@ -716,6 +717,7 @@ export function FormProvider({
       <UploadFormContext value={uploadForm}>
         <RhfFormProvider {...methods}>
           <>{children}</>
+          <MediaPickerHost />
         </RhfFormProvider>
       </UploadFormContext>
     </FormScopeContext>
