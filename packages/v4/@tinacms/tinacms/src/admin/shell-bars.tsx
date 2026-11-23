@@ -116,7 +116,7 @@ function BranchControl() {
     setHeld((note) =>
       note?.kind === 'ready' && note.name === currentName ? undefined : note
     );
-  }, [currentName]);
+  }, [currentName, held]);
 
   const result = branch?.createResult;
   latest.current = { branch, open, formShown, startCreate };
