@@ -1,6 +1,9 @@
 import type { FormatAdapter } from '../format-adapters';
 import type { TinaDocument } from '../schema';
 
+const isSameValue = (next: unknown, previous: unknown): boolean =>
+  JSON.stringify(next) === JSON.stringify(previous);
+
 export const jsonAdapter: FormatAdapter = {
   extension: '.json',
   parse: (raw) => JSON.parse(raw),
@@ -9,6 +12,12 @@ export const jsonAdapter: FormatAdapter = {
     for (const key of schemaKeys) {
       if (!(key in document)) delete previous[key];
     }
-    return `${JSON.stringify({ ...previous, ...document }, null, 2)}\n`;
+    const next = { ...previous, ...document };
+    // Like the markdown adapter, an unchanged document keeps the file's own
+    // formatting, so a save that changes nothing makes no diff.
+    if (previousRaw && isSameValue(next, JSON.parse(previousRaw))) {
+      return previousRaw;
+    }
+    return `${JSON.stringify(next, null, 2)}\n`;
   },
 };
