@@ -84,7 +84,12 @@ test('browser Back from Collections after Maximise form shows the split with the
   await page.locator('#title').fill('Back keeps the edit');
   await page.getByRole('button', { name: 'Maximise form' }).click();
   await openCollections(page);
+  await expectColumnBesidePreview(page);
   await page.goBack();
+  await expect(page).not.toHaveURL(/\?nav/);
+  await expect(
+    page.getByRole('complementary', { name: 'Navigator' })
+  ).toBeHidden();
   await expectSplitWithEdit(page, 'Back keeps the edit');
 });
 
