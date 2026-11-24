@@ -83,9 +83,12 @@ export const markdownAdapter = (extension: string): FormatAdapter => ({
       hasFrontmatter,
       bodyField
     );
+    // parse drops the blank line after the front matter and bodyToWrite always
+    // adds one, so compare bodies as parse returns them.
+    const body = hasFrontmatter ? dropLayoutBlankLine(content) : content;
     if (
       previousRaw !== undefined &&
-      content === previous.content &&
+      body === dropLayoutBlankLine(previous.content) &&
       isSameValue(frontmatter, previous.data)
     ) {
       return previousRaw;
