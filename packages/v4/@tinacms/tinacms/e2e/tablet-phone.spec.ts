@@ -91,6 +91,64 @@ test.describe('side nav below desktop', () => {
   });
 });
 
+test.describe('side nav sheet details', () => {
+  test('AC7: a scrim tap closes it without navigating, a tap on its padding does not', async ({
+    page,
+  }) => {
+    await open(page, TABLET);
+    const hash = await page.evaluate(() => location.hash);
+    await page.getByRole('button', { name: 'Open side nav' }).click();
+    const sheet = page.getByRole('navigation', { name: 'Content' });
+    const box = await sheet.boundingBox();
+    if (!box) throw new Error('no sheet');
+    await page.mouse.click(box.x + box.width - 3, box.y + box.height - 3);
+    await expect(sheet).toBeVisible();
+    await page.mouse.click(TABLET.width - 20, TABLET.height - 20);
+    await expect(sheet).toBeHidden();
+    expect(await page.evaluate(() => location.hash)).toBe(hash);
+  });
+
+  test('AC8: focus goes to the current entry, and resizing to desktop closes the sheet', async ({
+    page,
+  }) => {
+    await open(page, TABLET);
+    await page.getByRole('button', { name: 'Open side nav' }).click();
+    await expect(rail(page, 'Collections')).toBeFocused();
+    await page.setViewportSize(DESKTOP);
+    await expect(
+      page.getByRole('button', { name: 'Toggle Sidebar' })
+    ).toBeVisible();
+    expect(
+      (await page.getByRole('navigation', { name: 'Content' }).boundingBox())?.x
+    ).toBe(0);
+  });
+
+  test('AC8: ⌘B does nothing below desktop and collapses the sidebar at desktop', async ({
+    page,
+  }) => {
+    await open(page, TABLET);
+    await page.keyboard.press('ControlOrMeta+b');
+    await expect(
+      page.getByRole('navigation', { name: 'Content' })
+    ).toBeHidden();
+    await page.setViewportSize(DESKTOP);
+    const before = (
+      await page.getByRole('navigation', { name: 'Content' }).boundingBox()
+    )?.width;
+    await page.keyboard.press('ControlOrMeta+b');
+    await expect
+      .poll(
+        async () =>
+          (
+            await page
+              .getByRole('navigation', { name: 'Content' })
+              .boundingBox()
+          )?.width
+      )
+      .not.toBe(before);
+  });
+});
+
 test.describe('phone document', () => {
   test('one view at a time, the preview never reloads, Save stays in both', async ({
     page,
