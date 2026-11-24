@@ -45,7 +45,7 @@ export interface LockGraphQL {
   lookup: Record<string, unknown>;
   /** Collections left out of the schema. Their documents are not queryable. */
   skipped: SkippedCollection[];
-  /** Collections in the schema that GraphQL serves in part. */
+  /** Served collections whose secondary formats GraphQL does not index. */
   warnings: string[];
 }
 
@@ -179,6 +179,8 @@ export const lockToGraphQL = async (
 ): Promise<LockGraphQL> => {
   const { collections } = lock.schema;
   const { served, skipped } = partition(collections.map(toV3Collection));
+  // A skipped collection is reported in `skipped`, so no format warning for it.
+  const skippedNames = new Set(skipped.map(({ collection }) => collection));
   const { graphQLSchema, tinaSchema, lookup } = await buildDotTinaFiles({
     config: { schema: { collections: served } },
     buildSDK: false,
@@ -188,6 +190,8 @@ export const lockToGraphQL = async (
     graphQLSchema,
     lookup,
     skipped,
-    warnings: unindexedFormatWarnings(collections),
+    warnings: unindexedFormatWarnings(
+      collections.filter(({ name }) => !skippedNames.has(name))
+    ),
   };
 };

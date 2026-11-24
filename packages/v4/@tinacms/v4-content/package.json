@@ -30,7 +30,8 @@
     "./graphql": {
       "types": "./dist/graphql.d.ts",
       "default": "./dist/graphql.js"
-    }
+    },
+    "./fixtures/*": "./fixtures/*"
   },
   "typesVersions": {
     "*": {

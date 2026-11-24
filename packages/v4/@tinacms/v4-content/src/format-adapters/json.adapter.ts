@@ -1,8 +1,6 @@
 import type { FormatAdapter } from '../format-adapters';
 import type { TinaDocument } from '../schema';
-
-const isSameValue = (next: unknown, previous: unknown): boolean =>
-  JSON.stringify(next) === JSON.stringify(previous);
+import { isSameValue } from './same-value';
 
 export const jsonAdapter: FormatAdapter = {
   extension: '.json',

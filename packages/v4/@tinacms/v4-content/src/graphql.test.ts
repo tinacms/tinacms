@@ -140,16 +140,14 @@ describe('lockToGraphQL', () => {
     expect(print(result.graphQLSchema)).toContain('type Query');
   });
 
-  it('warns about a multi-format collection that is skipped too', async () => {
+  it('does not warn about a multi-format collection that is skipped', async () => {
     const result = await lockToGraphQL(
       lockWith([author, { ...tagged, format: ['md', 'json'] }])
     );
     expect(result.skipped.map(({ collection }) => collection)).toEqual([
       'tagged',
     ]);
-    expect(result.warnings).toEqual([
-      'Collection "tagged" declares formats md, json, but GraphQL indexes "md" only — json documents are editable but will not appear in query results.',
-    ]);
+    expect(result.warnings).toEqual([]);
   });
 
   it('returns a warning for each collection with more than one format', async () => {
