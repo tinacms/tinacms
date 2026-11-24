@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { AuthError } from '../../core/auth/contract';
 import {
   TINACLOUD_CONTENT_URL,
   TINACLOUD_IDENTITY_URL,
@@ -321,6 +322,33 @@ describe('createBranch', () => {
     await expect(refused.ready).rejects.toMatchObject({ status: 403 });
   });
 
+  it('rejects ready at once when the token read says the session ended', async () => {
+    let calls = 0;
+    const ended = createTinaCloudClient({
+      clientId: 'abc',
+      getToken: () => {
+        calls += 1;
+        if (calls > 1) throw new AuthError('expired');
+        return 'secret';
+      },
+      indexPollMs: 100,
+      indexTimeoutMs: 1000,
+    });
+    stubFetch(json({}));
+    const made = await ended.createBranch({ name: 'cms/x', from: 'main' });
+    await expect(made.ready).rejects.toBeInstanceOf(AuthError);
+  });
+
+  it('keeps the original auth error on other requests when the token read throws', async () => {
+    const broken = createTinaCloudClient({
+      clientId: 'abc',
+      getToken: () => {
+        throw new AuthError('expired');
+      },
+    });
+    await expect(broken.listBranches()).rejects.toBeInstanceOf(AuthError);
+  });
+
   it('counts a token read that throws as an unknown status and keeps polling', async () => {
     vi.useFakeTimers();
     let calls = 0;
@@ -431,11 +459,25 @@ describe('createBranch', () => {
     await assertion;
   });
 
-  it('rejects when TinaCloud refuses the create', async () => {
-    stubFetch(json({ message: 'exists' }, 422));
+  it('says the name is taken on a 409 and passes the server message on otherwise', async () => {
+    stubFetch(json({ message: 'taken' }, 409));
     await expect(
       client().createBranch({ name: 'cms/x', from: 'main' })
-    ).rejects.toMatchObject({ status: 422 });
+    ).rejects.toMatchObject({ reason: 'exists' });
+    stubFetch(json({ message: 'Branch name is not allowed.' }, 422));
+    await expect(
+      client().createBranch({ name: 'cms/x', from: 'main' })
+    ).rejects.toMatchObject({
+      reason: 'other',
+      message: 'Branch name is not allowed.',
+    });
+  });
+
+  it('says it may still exist when the connection drops after the request went out', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('reset')));
+    await expect(
+      client().createBranch({ name: 'cms/x', from: 'main' })
+    ).rejects.toMatchObject({ reason: 'timeout' });
   });
 
   it('abandons a create request that never answers, aborts it and rejects', async () => {
@@ -460,7 +502,7 @@ describe('createBranch', () => {
     }).createBranch({ name: 'cms/x', from: 'main' });
     const assertion = expect(pending).rejects.toMatchObject({
       message: expect.stringMatching(/in time/),
-      maybeMade: true,
+      reason: 'timeout',
     });
     await vi.advanceTimersByTimeAsync(1500);
     await assertion;
@@ -475,8 +517,8 @@ describe('createBranch', () => {
       getToken: () => new Promise<string>(() => {}),
       createTimeoutMs: 1000,
     }).createBranch({ name: 'cms/x', from: 'main' });
-    const assertion = expect(pending).rejects.not.toMatchObject({
-      maybeMade: true,
+    const assertion = expect(pending).rejects.toMatchObject({
+      reason: 'other',
     });
     await vi.advanceTimersByTimeAsync(1500);
     await assertion;
@@ -486,7 +528,7 @@ describe('createBranch', () => {
     const fetchMock = stubFetch();
     await expect(
       client({}).createBranch({ name: 'cms/x', from: 'main' })
-    ).rejects.toBeInstanceOf(TinaCloudError);
+    ).rejects.toMatchObject({ reason: 'other' });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

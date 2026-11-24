@@ -1,4 +1,5 @@
 import {
+  type CreateFailure,
   BranchSwitcher,
   LocalFilesBadge,
   failureDetail,
@@ -50,8 +51,7 @@ type Outcome =
       name: string;
       from: string;
       viaForm?: boolean;
-      maybeMade?: boolean;
-      exists?: boolean;
+      failure?: CreateFailure;
     }
   | { kind: 'unready'; name: string }
   | { kind: 'ready'; name: string };
@@ -64,8 +64,8 @@ const sameOutcome = (a: Outcome, b: Outcome): boolean =>
   (a.kind !== 'failed' ||
     (b.kind === 'failed' &&
       a.from === b.from &&
-      a.maybeMade === b.maybeMade &&
-      a.exists === b.exists));
+      a.failure?.reason === b.failure?.reason &&
+      a.failure?.message === b.failure?.message));
 
 /**
  * The branch button. Owns whether the switcher is open and what the last create ended in. While
@@ -83,8 +83,8 @@ function BranchControl() {
   const [formShown, setFormShown] = useState(false);
   const [formTyped, setFormTyped] = useState('');
   const [deferred, setDeferred] = useState<Outcome>();
-  // A create ended ready or unready under the name the form holds: the form resets.
-  const [formDone, setFormDone] = useState(false);
+  // Counts the creates that ended ready or unready under the name the form holds: each resets it.
+  const [formReset, setFormReset] = useState(0);
   const released = useRef<Outcome>(undefined);
   // The create the shell started, until its result arrives. A direct slice call leaves it empty.
   const started = useRef<{ via: 'form' | 'note'; name: string }>(undefined);
@@ -119,7 +119,6 @@ function BranchControl() {
       return false;
     }
     setHeld(undefined);
-    setFormDone(false);
     setReason(undefined);
     started.current = { via, name: request.name };
     create?.(request.name, request.from);
@@ -194,33 +193,24 @@ function BranchControl() {
       const { branch: view, open: isOpen } = latest.current;
       const { formShown: shown, formTyped: typed } = latest.current;
       if (!view) return;
-      const {
-        name,
-        from,
-        startedOn: began,
-        outcome,
-        maybeMade,
-        exists,
-      } = result;
+      const { name, from, startedOn: began, outcome, failure } = result;
       setReason(undefined);
       if (outcome === 'failed') {
         setDeferred(undefined);
-        setFormDone(false);
         const inline = origin?.via === 'form' && isOpen && shown;
         setHeld({
           kind: 'failed',
           name,
           from,
           viaForm: inline,
-          maybeMade,
-          exists,
+          failure,
         });
         return;
       }
       const owned =
         origin?.via === 'form' ||
         (typed !== '' && (typed === origin?.name || typed === name));
-      if (owned) setFormDone(true);
+      if (owned) setFormReset((count) => count + 1);
       if (isOpen && shown && typed !== '' && !owned) {
         setDeferred({ kind: outcome, name });
         return;
@@ -265,11 +255,6 @@ function BranchControl() {
   useEffect(() => {
     if (!open) demoteInline();
   }, [open]);
-
-  // A create started by a direct slice call re-arms the form's done signal.
-  useEffect(() => {
-    if (running !== undefined) setFormDone(false);
-  }, [running]);
 
   const outcome = useMemo<Outcome | undefined>(() => {
     return held?.kind === 'ready' && held.name === currentName
@@ -318,16 +303,19 @@ function BranchControl() {
       id = toast({
         tone: 'error',
         title: `Couldn't create ${outcome.name}`,
-        text: failureDetail(outcome.name, outcome),
-        action: {
-          label: 'Retry',
-          onClick: act(idOf, () =>
-            latest.current.startCreate(
-              { name: outcome.name, from: outcome.from },
-              'note'
-            )
-          ),
-        },
+        text: failureDetail(outcome.name, outcome.failure),
+        action:
+          outcome.failure?.reason === 'exists'
+            ? undefined
+            : {
+                label: 'Retry',
+                onClick: act(idOf, () =>
+                  latest.current.startCreate(
+                    { name: outcome.name, from: outcome.from },
+                    'note'
+                  )
+                ),
+              },
       });
     } else if (outcome.kind === 'unready') {
       id = toast({
@@ -385,8 +373,8 @@ function BranchControl() {
         setHeld(undefined);
         setReason(undefined);
       }}
-      createMaybeMade={held?.kind === 'failed' && held.maybeMade === true}
-      createExists={held?.kind === 'failed' && held.exists === true}
+      createFailure={held?.kind === 'failed' ? held.failure : undefined}
+      formResetKey={formReset}
       creatingBranch={branch.creating?.name}
       baseBranch={branch.defaultBranch}
       onCreate={
@@ -397,9 +385,7 @@ function BranchControl() {
           ? 'creating'
           : held?.kind === 'failed' && held.viaForm
             ? 'failed'
-            : formDone
-              ? 'done'
-              : 'idle'
+            : 'idle'
       }
     />
   );

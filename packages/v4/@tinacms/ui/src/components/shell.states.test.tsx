@@ -155,6 +155,35 @@ describe('Branch switcher list and form edges', () => {
   });
 });
 
+describe('Branch switcher pending rows', () => {
+  it('keeps the rows of branches that already existed while the form creates', async () => {
+    const props = {
+      current: 'feature/news',
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const entries = [
+      { name: 'feature/news' },
+      { name: 'main', protected: true },
+    ];
+    const { rerender } = render(
+      <BranchSwitcher {...props} branches={entries} />
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    rerender(
+      <BranchSwitcher
+        {...props}
+        createState='creating'
+        creatingBranch='main'
+        branches={[{ name: 'main', protected: true, ready: false }, entries[0]]}
+      />
+    );
+    expect(screen.getByRole('button', { name: /^main/ })).toBeInTheDocument();
+  });
+});
+
 describe('Save to branch dialog states', () => {
   it.each(saveToBranchDialogStates)(
     'renders $name',
@@ -543,11 +572,11 @@ describe('Branch switcher, the full design', () => {
     );
   });
 
-  it('shows the New branch form without a create operation, but cannot create', async () => {
-    const { dialog } = await openForm();
+  it('offers no New branch without a create operation', async () => {
+    const { dialog } = await open();
     expect(
-      within(dialog).getByRole('button', { name: 'Create branch' })
-    ).toBeDisabled();
+      within(dialog).queryByRole('button', { name: 'New branch' })
+    ).toBeNull();
   });
 
   it('shows loading in place, and a failed load with Retry', async () => {
@@ -713,6 +742,7 @@ describe('Branch switcher controls', () => {
         branches={entries}
         onSwitch={() => {}}
         status='loading'
+        onCreate={() => {}}
         defaultOpen
       />
     );
@@ -723,6 +753,7 @@ describe('Branch switcher controls', () => {
         branches={entries}
         onSwitch={() => {}}
         status='failed'
+        onCreate={() => {}}
         defaultOpen
       />
     );
@@ -1028,11 +1059,15 @@ describe('Branch switcher controls', () => {
     rerender(<BranchSwitcher {...props} createState='creating' />);
     rerender(<BranchSwitcher {...props} createState='failed' />);
     rerender(<BranchSwitcher {...props} createState='creating' />);
-    rerender(<BranchSwitcher {...props} createState='done' />);
+    rerender(<BranchSwitcher {...props} formResetKey={1} />);
     await user.click(screen.getByRole('button', { name: 'New branch' }));
+    const name = screen.getByRole('searchbox', { name: 'New branch name' });
+    expect(name).toHaveValue('');
+    await user.type(name, 'main');
+    expect(screen.getByRole('alert')).toHaveTextContent(/already exists/);
     expect(
-      screen.getByRole('searchbox', { name: 'New branch name' })
-    ).toHaveValue('');
+      screen.getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
   });
 
   it('keeps the typed name when the form create ends without finishing, as when its failure is held elsewhere', async () => {

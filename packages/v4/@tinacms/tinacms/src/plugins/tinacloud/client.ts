@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { AuthError } from '../../core/auth/contract';
+import { BranchCreateError } from '../../core/branch/contract';
 import { isRecord } from '../../utils/is-record';
 
 export const TINACLOUD_ASSETS_URL = 'https://assets.tinajs.io';
@@ -101,11 +103,6 @@ export class TinaCloudError extends Error {
   }
 }
 
-/** The create request got no answer in time, so TinaCloud may still have made the branch. */
-export class TinaCloudCreateTimeoutError extends TinaCloudError {
-  readonly maybeMade = true;
-}
-
 /** TinaCloud answered that a background request failed. */
 export class TinaCloudRequestFailedError extends TinaCloudError {}
 
@@ -125,6 +122,18 @@ const causeMessage = (cause: unknown): string => {
   return String(cause);
 };
 
+/** A request that went out and got no answer may still have made the branch. */
+const createFailure = (cause: unknown, sent: boolean): unknown => {
+  if (!(cause instanceof TinaCloudError)) return cause;
+  if (cause.status === 409) {
+    return new BranchCreateError(cause.message, 'exists');
+  }
+  if (cause.status === undefined && sent) {
+    return new BranchCreateError(cause.message, 'timeout');
+  }
+  return new BranchCreateError(cause.serverMessage ?? cause.message, 'other');
+};
+
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -132,20 +141,12 @@ export type TinaCloudClient = ReturnType<typeof createTinaCloudClient>;
 
 export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
   /** Resolves to the parsed JSON body, the raw text if it is not JSON, or null. */
-  const authedFetch = async (
+  const sendAuthed = async (
     url: string,
-    init: RequestInit = {},
+    init: RequestInit,
+    token: string | undefined,
     onSend?: () => void
   ): Promise<unknown> => {
-    let token: string | undefined;
-    try {
-      token = await options.getToken();
-    } catch (cause) {
-      throw new TinaCloudError(
-        `Could not read the TinaCloud token: ${causeMessage(cause)}`,
-        {}
-      );
-    }
     if (!token) {
       throw new TinaCloudError('No TinaCloud token is available.', {
         status: 401,
@@ -177,6 +178,13 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     }
     return body;
   };
+
+  const authedFetch = async (
+    url: string,
+    init: RequestInit = {},
+    onSend?: () => void
+  ): Promise<unknown> =>
+    sendAuthed(url, init, await options.getToken(), onSend);
 
   // TinaCloud commits media writes in the background and returns a request id
   // at once; waiting means a write only resolves once it has landed, and a
@@ -257,6 +265,21 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     );
   };
 
+  // A token read that fails for any reason but an ended session counts as one unknown status.
+  const pollOnce = async (url: string, signal: AbortSignal) => {
+    let token: string | undefined;
+    try {
+      token = await options.getToken();
+    } catch (cause) {
+      if (cause instanceof AuthError) throw cause;
+      throw new TinaCloudError(
+        `Could not read the TinaCloud token: ${causeMessage(cause)}`,
+        {}
+      );
+    }
+    return sendAuthed(url, { signal }, token);
+  };
+
   const waitForIndex = async (name: string): Promise<void> => {
     const url = `${TINACLOUD_CONTENT_URL}/db/${options.clientId}/status/${name}`;
     const pollMs = options.indexPollMs ?? INDEX_POLL_MS;
@@ -280,10 +303,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       while (true) {
         let body: unknown;
         try {
-          body = await Promise.race([
-            authedFetch(url, { signal: deadline.signal }),
-            expired,
-          ]);
+          body = await Promise.race([pollOnce(url, deadline.signal), expired]);
         } catch (cause) {
           if (deadline.signal.aborted) throw timedOut();
           if (!isTransient(cause)) throw cause;
@@ -329,19 +349,17 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       () => deadline.abort(),
       options.createTimeoutMs ?? CREATE_TIMEOUT_MS
     );
-    // Only a request that went out can have made the branch.
     let sent = false;
     const expired = new Promise<never>((_resolve, reject) => {
       deadline.signal.addEventListener(
         'abort',
-        () => {
-          const message = `TinaCloud did not answer the request to create branch ${name} in time.`;
+        () =>
           reject(
-            sent
-              ? new TinaCloudCreateTimeoutError(message, {})
-              : new TinaCloudError(message, {})
-          );
-        },
+            new TinaCloudError(
+              `TinaCloud did not answer the request to create branch ${name} in time.`,
+              {}
+            )
+          ),
         { once: true }
       );
     });
@@ -363,6 +381,8 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
         ),
         expired,
       ]);
+    } catch (cause) {
+      throw createFailure(cause, sent);
     } finally {
       clearTimeout(timer);
     }

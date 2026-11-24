@@ -3,7 +3,7 @@ import { expect, type Locator, type Page, test } from '@playwright/test';
 const SCREEN = { width: 390, height: 844 };
 const KEYBOARD = 336;
 
-const BRANCHES = '/branches.html?docs=1';
+const BRANCHES = '/branches.html?docs=1&create=ok';
 const POSTS_FOLDER = '/#/collections/post/folder/guides';
 const MEDIA = '/#/screens/media';
 const HOME = `/#/collections/page/${encodeURIComponent('content/pages/home.mdx')}`;

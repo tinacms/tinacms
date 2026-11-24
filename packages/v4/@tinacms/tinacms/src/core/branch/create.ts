@@ -1,6 +1,7 @@
 import type { StoreApi } from 'zustand';
 import type { TinaStoreState } from '../plugin';
 import {
+  BranchCreateError,
   type BranchSource,
   type BranchSlice,
   branchSliceOf,
@@ -8,13 +9,6 @@ import {
 } from './contract';
 
 type Creatable = BranchSource & Required<Pick<BranchSource, 'create'>>;
-
-/** True when a provider error carries `key: value`, like `status` or the `maybeMade` hint. */
-const carries = (cause: unknown, key: string, value: unknown): boolean =>
-  typeof cause === 'object' &&
-  cause !== null &&
-  key in cause &&
-  Object.getOwnPropertyDescriptor(cause, key)?.value === value;
 
 let clock = 0;
 
@@ -67,7 +61,7 @@ export const createBranchAction =
     const finish = (
       made: string,
       outcome: 'ready' | 'unready' | 'failed',
-      flags: { maybeMade?: boolean; exists?: boolean } = {}
+      failure?: BranchCreateError
     ) => {
       if (settled) return;
       settled = true;
@@ -85,7 +79,9 @@ export const createBranchAction =
           from,
           startedOn,
           outcome,
-          ...flags,
+          ...(failure
+            ? { failure: { reason: failure.reason, message: failure.message } }
+            : {}),
         },
       });
     };
@@ -153,12 +149,8 @@ export const createBranchAction =
       },
       (cause: unknown) => {
         console.warn(`[tinacms] could not create branch ${name}:`, cause);
-        finish(name, 'failed', {
-          ...(carries(cause, 'maybeMade', true) ? { maybeMade: true } : {}),
-          ...(carries(cause, 'status', 409) || carries(cause, 'status', 422)
-            ? { exists: true }
-            : {}),
-        });
+        if (cause instanceof BranchCreateError) finish(name, 'failed', cause);
+        else finish(name, 'failed');
       }
     );
   };

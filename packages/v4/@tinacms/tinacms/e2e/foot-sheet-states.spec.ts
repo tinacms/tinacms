@@ -736,7 +736,7 @@ test.describe('the branch switcher on a phone', () => {
     size: { width: number; height: number }
   ) => {
     await page.setViewportSize(size);
-    await page.goto('/branches.html?docs=1#/');
+    await page.goto('/branches.html?docs=1&create=ok#/');
     await page
       .getByRole('button', { name: /feature\/news/ })
       .first()
@@ -764,7 +764,7 @@ test.describe('the branch switcher on a phone', () => {
     page,
   }) => {
     await page.setViewportSize(PHONE);
-    await page.goto('/branches.html?docs=1#/');
+    await page.goto('/branches.html?docs=1&create=ok#/');
     await page
       .getByRole('button', { name: /feature\/news/ })
       .first()
@@ -816,7 +816,7 @@ for (const width of [375, 320]) {
 
 test('Back to branches wraps at 320px', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
-  await page.goto('/branches.html?docs=1#/');
+  await page.goto('/branches.html?docs=1&create=ok#/');
   await page
     .getByRole('button', { name: /feature\/news/ })
     .first()

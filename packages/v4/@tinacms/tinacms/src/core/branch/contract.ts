@@ -21,12 +21,23 @@ export interface BranchSource {
   /**
    * Makes branch `name` from branch `from`. Resolves once the branch exists, with the name the
    * Data Layer gave it and, when it is not readable yet, a `ready` promise that settles when it is.
-   * Rejects when the branch was not made.
+   * Rejects when the branch was not made. Reject with `BranchCreateError` to say why.
    */
   create?(request: {
     name: string;
     from: string;
   }): Promise<{ name: string; ready?: Promise<void> }>;
+}
+
+/** Why a create failed: `timeout` (it may still exist), `exists` (the name is taken) or `other`. */
+export class BranchCreateError extends Error {
+  constructor(
+    message: string,
+    readonly reason: 'timeout' | 'exists' | 'other'
+  ) {
+    super(message);
+    this.name = 'BranchCreateError';
+  }
 }
 
 export type BranchMode = 'local' | 'branches';
@@ -89,10 +100,7 @@ export interface BranchCreateResult {
   /** `current` when the create started; the auto-switch only fires if it is still current. */
   startedOn: string | undefined;
   outcome: 'ready' | 'unready' | 'failed';
-  /** With `failed`: the provider got no answer, so the branch may exist. */
-  maybeMade?: boolean;
-  /** With `failed`: the provider answered 409 or 422, so the name is taken. */
-  exists?: boolean;
+  failure?: { reason: BranchCreateError['reason']; message: string };
 }
 
 type SaveToNewBranch = NonNullable<BranchSlice['saveToNewBranch']>;
@@ -116,9 +124,17 @@ const creatingOf = (value: unknown): BranchCreating | undefined => {
   return { name, from, startedOn: optionalString(startedOn), phase };
 };
 
+const failureOf = (
+  reason: unknown,
+  message: string
+): NonNullable<BranchCreateResult['failure']> => ({
+  reason: reason === 'timeout' || reason === 'exists' ? reason : 'other',
+  message,
+});
+
 const createResultOf = (value: unknown): BranchCreateResult | undefined => {
   if (!isRecord(value)) return undefined;
-  const { name, from, startedOn, outcome, maybeMade, exists } = value;
+  const { name, from, startedOn, outcome, failure } = value;
   if (typeof name !== 'string' || typeof from !== 'string') return undefined;
   if (outcome !== 'ready' && outcome !== 'unready' && outcome !== 'failed') {
     return undefined;
@@ -128,8 +144,9 @@ const createResultOf = (value: unknown): BranchCreateResult | undefined => {
     from,
     startedOn: optionalString(startedOn),
     outcome,
-    ...(maybeMade === true ? { maybeMade } : {}),
-    ...(exists === true ? { exists } : {}),
+    ...(isRecord(failure) && typeof failure.message === 'string'
+      ? { failure: failureOf(failure.reason, failure.message) }
+      : {}),
   };
 };
 

@@ -2,7 +2,7 @@ import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import type { ContentProvider } from '../content/contract';
 import { createTinaStore } from '../../store/create-store';
 import { createBranchAction } from './create';
-import { branchSliceOf } from './contract';
+import { BranchCreateError, branchSliceOf } from './contract';
 
 const sliceWith = (saveToNewBranch: unknown) =>
   branchSliceOf({
@@ -97,49 +97,21 @@ describe('branchSliceOf', () => {
 
 describe('createBranchAction', () => {
   it.each([
-    [409, true],
-    [422, true],
-    [403, false],
-    [undefined, false],
-  ])(
-    'flags a create refused with status %s as already existing: %s',
-    async (status, exists) => {
-      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const store = createTinaStore([]);
-      store.setState({
-        branch: { list: ['main'], protected: [], switchTo: () => {} },
-      } as never);
-      createBranchAction(store, {
-        list: async () => [],
-        defaultBranch: async () => 'main',
-        create: () =>
-          Promise.reject(Object.assign(new Error('refused'), { status })),
-      })('cms/one', 'main');
-      await vi.waitFor(() =>
-        expect(branchSliceOf(store.getState())?.createResult).toMatchObject({
-          outcome: 'failed',
-        })
-      );
-      expect(branchSliceOf(store.getState())?.createResult?.exists).toBe(
-        exists ? true : undefined
-      );
-      warn.mockRestore();
-    }
-  );
-
-  it.each([
-    ['a provider error that says the branch may exist', true],
-    ['an ordinary error', false],
-  ])('flags maybeMade only for %s', async (_label, flagged) => {
+    [
+      new BranchCreateError('no answer', 'timeout'),
+      { reason: 'timeout', message: 'no answer' },
+    ],
+    [
+      new BranchCreateError('taken', 'exists'),
+      { reason: 'exists', message: 'taken' },
+    ],
+    [new Error('boom'), undefined],
+  ])('records why a create failed: %s', async (cause, failure) => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const store = createTinaStore([]);
     store.setState({
       branch: { list: ['main'], protected: [], switchTo: () => {} },
     } as never);
-    const cause = Object.assign(
-      new Error('late'),
-      flagged ? { maybeMade: true } : {}
-    );
     createBranchAction(store, {
       list: async () => [],
       defaultBranch: async () => 'main',
@@ -150,8 +122,8 @@ describe('createBranchAction', () => {
         outcome: 'failed',
       })
     );
-    expect(branchSliceOf(store.getState())?.createResult?.maybeMade).toBe(
-      flagged ? true : undefined
+    expect(branchSliceOf(store.getState())?.createResult?.failure).toEqual(
+      failure
     );
     warn.mockRestore();
   });

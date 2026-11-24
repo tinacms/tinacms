@@ -18,7 +18,7 @@ import type {
   BranchSlice,
   BranchSource,
 } from '../core/branch/contract';
-import { currentBranchOf } from '../core/branch/contract';
+import { BranchCreateError, currentBranchOf } from '../core/branch/contract';
 import { ContentError, type DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
 import { TinaRuntimeContext } from '../editor/context';
@@ -402,6 +402,7 @@ describe('Branch list states', () => {
   });
 
   it('checks a new branch name against the list', async () => {
+    createBranch = async ({ name }) => ({ name });
     const user = userEvent.setup();
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
@@ -2312,6 +2313,7 @@ describe('branch switcher rows and creating a branch', () => {
   ] as const)(
     'ArrowDown in the New branch name field stays in the field (%s)',
     async (_tier, phone) => {
+      createBranch = async ({ name }) => ({ name });
       if (phone) phoneTier();
       const { user, dialog } = await startCreate('cms/a');
       const name = within(dialog).getByRole('searchbox', {
@@ -2431,47 +2433,82 @@ describe('branch switcher rows and creating a branch', () => {
   });
 
   it.each([
-    ['hit its deadline', true],
-    ['failed for another reason', false],
-  ] as const)(
-    'says the branch may still exist only when the create %s',
-    async (_label, maybeMade) => {
+    [
+      'hit its deadline',
+      new BranchCreateError('no answer', 'timeout'),
+      "Couldn't create cms/x. Check your connection, then retry. It may still have been made, so reload to check.",
+      true,
+    ],
+    [
+      'was refused because the name is taken',
+      new BranchCreateError('conflict', 'exists'),
+      'A branch called cms/x already exists. Reload to see it.',
+      false,
+    ],
+    [
+      'failed with a message from the server',
+      new BranchCreateError('Branch name is not allowed.', 'other'),
+      "Couldn't create cms/x. Branch name is not allowed.",
+      true,
+    ],
+    [
+      'failed for an unknown reason',
+      new Error('offline'),
+      "Couldn't create cms/x. Check your connection, then retry.",
+      true,
+    ],
+  ])(
+    'says the right thing and offers Retry only when it can help when the create %s',
+    async (_label, cause, words, retry) => {
       vi.spyOn(console, 'warn').mockImplementation(() => {});
       createBranch = vi.fn<NonNullable<BranchSource['create']>>(() =>
-        Promise.reject(
-          Object.assign(new Error('late'), maybeMade ? { maybeMade } : {})
-        )
+        Promise.reject(cause)
       );
       const { user, dialog } = await startCreate();
       await press(dialog, user);
-      const inline = await within(dialog).findByText(
-        /Couldn't create cms\/x\. Check/
-      );
-      expect(/reload to check/.test(inline.textContent ?? '')).toBe(maybeMade);
+      expect(await within(dialog).findByRole('alert')).toHaveTextContent(words);
+      expect(
+        within(dialog).queryByRole('button', { name: 'Retry' }) !== null
+      ).toBe(retry);
       await user.click(
         within(dialog).getByRole('button', { name: 'Close branches' })
       );
-      const toast = await screen.findByText(
-        /Check your connection, then retry\./
+      await screen.findByText("Couldn't create cms/x");
+      expect(screen.queryByRole('button', { name: 'Retry' }) !== null).toBe(
+        retry
       );
-      expect(/reload to check/.test(toast.textContent ?? '')).toBe(maybeMade);
+      await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+      const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+      expect(await within(reopened).findByRole('alert')).toHaveTextContent(
+        words
+      );
+      expect(
+        within(reopened).queryByRole('button', { name: 'Retry' }) !== null
+      ).toBe(retry);
     }
   );
 
-  it('keeps the failure line in place while the retry from the form runs', async () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    createBranch = vi
-      .fn<NonNullable<BranchSource['create']>>()
-      .mockRejectedValueOnce(new Error('offline'))
-      .mockImplementationOnce(() => new Promise(() => {}));
-    const { user, dialog } = await startCreate();
+  it('keeps validating the name after a create ended ready', async () => {
+    createBranch = async ({ name }) => ({ name, ready: Promise.resolve() });
+    const { user, dialog } = await startCreate('cms/z');
     await press(dialog, user);
-    await within(dialog).findByText(/Couldn't create cms\/x\. Check/);
-    await user.click(within(dialog).getByRole('button', { name: 'Retry' }));
-    await within(dialog).findByRole('button', { name: 'Creating' });
-    const gap = within(dialog).getByText(/Couldn't create cms\/x\. Check/);
-    expect(gap).toHaveAttribute('aria-hidden', 'true');
-    expect(gap).toHaveClass('invisible');
+    await user.click(
+      await screen.findByRole('button', { name: 'Branch: cms/z' })
+    );
+    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      await within(reopened).findByRole('button', { name: 'New branch' })
+    );
+    const name = within(reopened).getByRole('searchbox', {
+      name: 'New branch name',
+    });
+    await user.type(name, 'cms/z');
+    expect(await within(reopened).findByRole('alert')).toHaveTextContent(
+      /already exists/
+    );
+    expect(
+      within(reopened).getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
   });
 
   it('does not pull focus from the top bar Search when a create ends in the maximised view', async () => {
@@ -2501,46 +2538,6 @@ describe('branch switcher rows and creating a branch', () => {
     ).toBeVisible();
     await act(async () => {});
     expect(search).toHaveFocus();
-  });
-
-  it.each([409, 422])(
-    'says the name is taken, whether or not we timed out, when the create is refused with %s',
-    async (status) => {
-      vi.spyOn(console, 'warn').mockImplementation(() => {});
-      createBranch = vi.fn<NonNullable<BranchSource['create']>>(() =>
-        Promise.reject(Object.assign(new Error('exists'), { status }))
-      );
-      const { user, dialog } = await startCreate();
-      await press(dialog, user);
-      const inline = await within(dialog).findByText(/already exists/);
-      expect(inline).toHaveTextContent(
-        'A branch called cms/x already exists. Reload to see it.'
-      );
-      expect(inline).not.toHaveTextContent('Check your connection');
-      await user.click(
-        within(dialog).getByRole('button', { name: 'Close branches' })
-      );
-      const toast = await screen.findByText(/Reload to see it\./);
-      expect(toast).not.toHaveTextContent('Check your connection');
-    }
-  );
-
-  it('keeps the same sentence in the failure line while a retry of a timed-out create runs', async () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    createBranch = vi
-      .fn<NonNullable<BranchSource['create']>>()
-      .mockRejectedValueOnce(
-        Object.assign(new Error('late'), { maybeMade: true })
-      )
-      .mockImplementationOnce(() => new Promise(() => {}));
-    const { user, dialog } = await startCreate();
-    await press(dialog, user);
-    await within(dialog).findByText(/reload to check/);
-    await user.click(within(dialog).getByRole('button', { name: 'Retry' }));
-    await within(dialog).findByRole('button', { name: 'Creating' });
-    expect(
-      within(dialog).getByText(/Couldn't create cms\/x/)
-    ).toHaveTextContent('reload to check');
   });
 
   it('never shows "already exists" while a form create ends ready', async () => {
@@ -3186,18 +3183,12 @@ describe('branch switcher rows and creating a branch', () => {
     );
   });
 
-  it('leaves Create branch off when the provider cannot create', async () => {
-    const { user, dialog } = await openSwitcher();
-    await user.click(
-      await within(dialog).findByRole('button', { name: 'New branch' })
-    );
-    await user.type(
-      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
-      'cms/x'
-    );
+  it('offers no New branch when the provider cannot create', async () => {
+    const { dialog } = await openSwitcher();
+    await within(dialog).findByRole('searchbox', { name: 'Search branches' });
     expect(
-      within(dialog).getByRole('button', { name: 'Create branch' })
-    ).toBeDisabled();
+      within(dialog).queryByRole('button', { name: 'New branch' })
+    ).toBeNull();
   });
 
   it('refuses a name that is already listed and sends no request', async () => {
