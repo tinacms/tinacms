@@ -19,6 +19,18 @@ describe('jsonAdapter.serialize', () => {
     expect(jsonAdapter.serialize({ name: 'Ada' }, previous)).toBe(previous);
   });
 
+  it.each([
+    ['an array', '[{"title":"a"},{"title":"b"}]'],
+    ['a string', '"hello"'],
+    ['null', 'null'],
+  ])('refuses to read or save a file that holds %s', (_, previous) => {
+    const message = 'A JSON document must hold an object at the top level.';
+    expect(() => jsonAdapter.parse(previous)).toThrow(message);
+    expect(() => jsonAdapter.serialize({ title: 'x' }, previous)).toThrow(
+      message
+    );
+  });
+
   it('rewrites the file when a value changes', () => {
     const previous = '{"name":"Ada","scores":[1, 2, 3]}';
     expect(jsonAdapter.serialize({ name: 'Grace' }, previous)).toBe(
