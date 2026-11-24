@@ -863,7 +863,9 @@ function AdminShell({
     const before = previousTier.current;
     previousTier.current = tier;
     if (tier === 'desktop') setTabletMaximised(false);
-    else if (tier === 'tablet' && before === 'phone') setTabletMaximised(true);
+    else if (tier === 'tablet' && before === 'phone' && !showOverlay) {
+      setTabletMaximised(true);
+    }
   }, [tier]);
   const documentOpen = mainRoute.view === 'document' && previewVisible;
   // The Collections column beside the preview is the split, never one view.
@@ -873,10 +875,13 @@ function AdminShell({
   useEffect(() => {
     if (!previewVisible || isMediaRoute) setTabletMaximised(false);
   }, [previewVisible, isMediaRoute]);
-  // Set while rendering, so a quick Back never finds one view left on.
-  if (tabletMaximised && showOverlay && tier === 'tablet') {
-    setTabletMaximised(false);
-  }
+  const overlayWasShown = useRef(false);
+  useEffect(() => {
+    if (showOverlay && !overlayWasShown.current && tier === 'tablet') {
+      setTabletMaximised(false);
+    }
+    overlayWasShown.current = showOverlay;
+  }, [showOverlay, tier]);
   useEffect(() => {
     setView('form');
   }, [openPath]);

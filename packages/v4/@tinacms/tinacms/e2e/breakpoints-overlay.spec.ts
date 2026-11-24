@@ -218,11 +218,13 @@ test.describe('AC13 Collections over a document', () => {
     );
     expect(preview?.width).toBeGreaterThan(100);
     await expect(form(page)).toBeHidden();
-    expect(
-      await navigator(page).evaluate((node) =>
-        node.contains(document.activeElement)
+    await expect
+      .poll(() =>
+        navigator(page).evaluate((node) =>
+          node.contains(document.activeElement)
+        )
       )
-    ).toBe(true);
+      .toBe(true);
 
     const stillOnDocument = async () => {
       await expect(page).toHaveURL(
