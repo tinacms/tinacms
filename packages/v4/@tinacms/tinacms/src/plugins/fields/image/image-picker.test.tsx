@@ -840,3 +840,29 @@ describe('a gallery inside a list item', () => {
     ).toBeVisible();
   });
 });
+
+describe('a reseed that removes the picker target', () => {
+  it('closes a tile Replace picker whose tile the Discard removed', async () => {
+    renderField({ images: [] });
+    const images = await group('Images');
+    await userEvent.click(
+      within(images).getByRole('button', { name: 'Add images' })
+    );
+    await userEvent.click(await tile('photo.jpg'));
+    await userEvent.click(
+      within(await picker('Choose images')).getByRole('button', {
+        name: 'Add image',
+      })
+    );
+    await userEvent.click(
+      within(images).getByRole('button', { name: 'Replace photo.jpg' })
+    );
+    await picker();
+    act(() => {
+      scopeOf?.discardEdits();
+    });
+    await vi.waitFor(() =>
+      expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+    );
+  });
+});

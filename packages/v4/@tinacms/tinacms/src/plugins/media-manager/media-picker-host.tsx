@@ -24,6 +24,8 @@ const POPOVER_WIDTH_PX = 400;
 const INSET_PX = 12;
 // Under this preview width the popover would squeeze the header, so it covers the page instead.
 const MIN_REGION_PX = 440;
+// How long a remounting field has to adopt the picker a reseed left open.
+const ORPHAN_WAIT_MS = 1500;
 // The Top bar's and the Status bar's heights, which the admin's pickers keep clear.
 const TOP_BAR_PX = 56;
 const STATUS_BAR_PX = 28;
@@ -72,6 +74,17 @@ function ScopedHost({
   useEffect(() => {
     if (suspended && open) view.getState().closePicker();
   }, [view, suspended, open]);
+
+  // A reseed that removed the requesting field leaves no one to adopt the picker.
+  const orphaned = useStore(view, (state) => state.pickerOrphan !== null);
+  useEffect(() => {
+    if (!orphaned) return;
+    const timer = setTimeout(
+      () => view.getState().closePicker(),
+      ORPHAN_WAIT_MS
+    );
+    return () => clearTimeout(timer);
+  }, [view, orphaned]);
 
   return (
     <>

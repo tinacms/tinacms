@@ -124,7 +124,10 @@ export function ImageGallery() {
   // A reseed remounts the gallery under an open Add picker, and a slow load can flip a
   // tile's `missing` after its picker opened. Both send the request again.
   useEffect(() => {
-    if (adopted && choosingAdd) picker.open(addRequest(opener.current));
+    if (!adopted) return;
+    if (choosingAdd) picker.open(addRequest(opener.current));
+    // A reseed regenerates the item keys, so a held tile target can no longer be trusted.
+    else if (choosingKey !== undefined) picker.close();
   }, [adopted]);
   const choosingMissing = choosingKey !== undefined && missing.has(choosingKey);
   useEffect(() => {
