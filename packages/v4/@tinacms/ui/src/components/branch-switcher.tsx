@@ -48,6 +48,8 @@ type BranchEntry = {
 type BranchNote = {
   kind: 'failed' | 'unready' | 'ready';
   name: string;
+  /** With `failed`: the branch may exist, so the note says to reload and check. */
+  maybeMade?: boolean;
   reason?: string;
   /** The note was released by emptying the name field, so the form it came from stays open. */
   keepForm?: boolean;
@@ -81,6 +83,8 @@ type BranchSwitcherProps = {
   /** Runs the note's action (Retry, or Switch). Return false when it was refused: the note stays. */
   onNoteAction?: () => boolean | void;
   onNoteDismiss?: () => void;
+  /** With `createState: 'failed'`: the inline failure adds that the branch may still have been made. */
+  createMaybeMade?: boolean;
   /** The branch being made while the form is not on screen, so the switcher can say so. */
   creatingBranch?: string;
   /** `loading` shows a skeleton and `failed` shows the problem with Retry, both in place. */
@@ -261,7 +265,7 @@ function OutcomeNote({
       >
         <span className='min-w-0 flex-1 [overflow-wrap:anywhere]'>
           {note.kind === 'failed'
-            ? `Couldn't create ${note.name}. Check your connection, then retry. It may still have been made, so reload to check.`
+            ? `Couldn't create ${note.name}. Check your connection, then retry.${note.maybeMade ? ' It may still have been made, so reload to check.' : ''}`
             : note.kind === 'unready'
               ? `${note.name} isn't ready yet. It was made. You can switch to it after reloading the page.`
               : `${note.name} is ready`}
@@ -328,6 +332,7 @@ function BranchSwitcher({
   baseBranch,
   onFormChange,
   createState = 'idle',
+  createMaybeMade = false,
   note,
   onNoteAction,
   onNoteDismiss,
@@ -383,12 +388,27 @@ function BranchSwitcher({
     creating &&
     !dismissed &&
     typed === attempted.current;
+  // The failure line keeps its height while the retry runs, so the button stays under the pointer.
+  const failureGap = useRef(false);
+  if (!busy) failureGap.current = failed;
   const frame = () =>
     document.querySelector('[data-slot="branch-maximised"]') ?? document;
   const focusField = (field: 'search' | 'name') => {
     frame()
       .querySelector<HTMLInputElement>(`[data-branch-field="${field}"]`)
       ?.focus();
+  };
+  // A create that ends moves focus only from inside the switcher, never from the page behind it.
+  const focusHere = () => {
+    const active = document.activeElement;
+    return (
+      !active ||
+      active === document.body ||
+      active.closest('[data-slot="branch-maximised"]') !== null ||
+      Boolean(
+        active.closest('[role="dialog"]')?.querySelector('[data-branch-field]')
+      )
+    );
   };
   const showActions = () => {
     frame()
@@ -408,13 +428,16 @@ function BranchSwitcher({
     setNewName('');
     setSubmitted(false);
     setStartFrom('current');
-    if (!creating) return;
-    if (open) return afterPaint(() => focusField('search'));
-    if (wasOpen.current) triggerRef.current?.focus();
+    if (creating && open && focusHere()) {
+      return afterPaint(() => focusField('search'));
+    }
   }, [createState]);
   useEffect(() => {
+    const lost =
+      !document.activeElement || document.activeElement === document.body;
+    if (!open && wasOpen.current && lost) triggerRef.current?.focus();
     wasOpen.current = open;
-  });
+  }, [open]);
 
   // An open switcher belongs to the tier it opened on. Crossing 768px closes it before the other
   // frame mounts open, so no closed scrim is left over the page; its state is kept for the next open.
@@ -720,7 +743,10 @@ function BranchSwitcher({
               {BRANCH_NAME_HINT}
             </p>
             {nameError ? (
-              <p role='alert' className='m-0 text-sm text-destructive'>
+              <p
+                role='alert'
+                className='m-0 text-sm text-destructive [overflow-wrap:anywhere]'
+              >
                 {nameError}
               </p>
             ) : null}
@@ -757,10 +783,20 @@ function BranchSwitcher({
                 </span>
               )}
             </div>
-            {failed ? (
-              <p role='alert' className='m-0 text-sm text-destructive'>
+            {failed || (busy && failureGap.current) ? (
+              <p
+                role={failed ? 'alert' : undefined}
+                aria-hidden={failed ? undefined : true}
+                className={cn(
+                  'm-0 text-sm text-destructive [overflow-wrap:anywhere]',
+                  failed ? undefined : 'invisible'
+                )}
+              >
                 Couldn't create {attempted.current}. Check your connection, then
-                retry. It may still have been made, so reload to check.
+                retry.
+                {createMaybeMade
+                  ? ' It may still have been made, so reload to check.'
+                  : ''}
               </p>
             ) : null}
             <div
@@ -929,7 +965,7 @@ function MaximisedView({
 }) {
   useEffect(() => {
     focusTarget.current?.focus();
-  }, [focusTarget]);
+  }, []);
   const escape = useRef(onEscape);
   escape.current = onEscape;
   useEffect(() => {

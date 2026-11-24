@@ -452,7 +452,10 @@ describe('createBranch', () => {
       getToken: async () => 'secret',
       createTimeoutMs: 1000,
     }).createBranch({ name: 'cms/x', from: 'main' });
-    const assertion = expect(pending).rejects.toThrow(/in time/);
+    const assertion = expect(pending).rejects.toMatchObject({
+      message: expect.stringMatching(/in time/),
+      maybeMade: true,
+    });
     await vi.advanceTimersByTimeAsync(1500);
     await assertion;
     expect(signal?.aborted).toBe(true);

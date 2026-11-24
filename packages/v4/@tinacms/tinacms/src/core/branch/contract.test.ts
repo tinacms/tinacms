@@ -96,6 +96,35 @@ describe('branchSliceOf', () => {
 });
 
 describe('createBranchAction', () => {
+  it.each([
+    ['a provider error that says the branch may exist', true],
+    ['an ordinary error', false],
+  ])('flags maybeMade only for %s', async (_label, flagged) => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createTinaStore([]);
+    store.setState({
+      branch: { list: ['main'], protected: [], switchTo: () => {} },
+    } as never);
+    const cause = Object.assign(
+      new Error('late'),
+      flagged ? { maybeMade: true } : {}
+    );
+    createBranchAction(store, {
+      list: async () => [],
+      defaultBranch: async () => 'main',
+      create: () => Promise.reject(cause),
+    })('cms/one', 'main');
+    await vi.waitFor(() =>
+      expect(branchSliceOf(store.getState())?.createResult).toMatchObject({
+        outcome: 'failed',
+      })
+    );
+    expect(branchSliceOf(store.getState())?.createResult?.maybeMade).toBe(
+      flagged ? true : undefined
+    );
+    warn.mockRestore();
+  });
+
   it('records a failure and accepts a later create when the provider throws synchronously', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const store = createTinaStore([]);

@@ -89,6 +89,8 @@ export interface BranchCreateResult {
   /** `current` when the create started; the auto-switch only fires if it is still current. */
   startedOn: string | undefined;
   outcome: 'ready' | 'unready' | 'failed';
+  /** With `failed`: the provider got no answer, so the branch may exist. */
+  maybeMade?: boolean;
 }
 
 type SaveToNewBranch = NonNullable<BranchSlice['saveToNewBranch']>;
@@ -114,12 +116,18 @@ const creatingOf = (value: unknown): BranchCreating | undefined => {
 
 const createResultOf = (value: unknown): BranchCreateResult | undefined => {
   if (!isRecord(value)) return undefined;
-  const { name, from, startedOn, outcome } = value;
+  const { name, from, startedOn, outcome, maybeMade } = value;
   if (typeof name !== 'string' || typeof from !== 'string') return undefined;
   if (outcome !== 'ready' && outcome !== 'unready' && outcome !== 'failed') {
     return undefined;
   }
-  return { name, from, startedOn: optionalString(startedOn), outcome };
+  return {
+    name,
+    from,
+    startedOn: optionalString(startedOn),
+    outcome,
+    ...(maybeMade === true ? { maybeMade } : {}),
+  };
 };
 
 const pullRequestsOf = (value: unknown): Record<string, string> => {

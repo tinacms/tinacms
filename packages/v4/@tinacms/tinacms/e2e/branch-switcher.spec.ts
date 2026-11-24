@@ -863,6 +863,9 @@ test.describe('branch switcher pop-up', () => {
       await expect(
         page.getByRole('button', { name: 'Branch: cms/x' })
       ).toBeVisible({ timeout: 8000 });
+      await expect(
+        page.getByRole('button', { name: 'Branch: cms/x' })
+      ).toBeFocused();
       await page.getByRole('button', { name: 'Branch: cms/x' }).click();
       const reopened = frameOf(page, false);
       await expect(
@@ -932,6 +935,25 @@ test.describe('branch switcher pop-up', () => {
       const button = page.getByRole('button', { name: 'Branch: cms/x' });
       await expect(button).toBeVisible({ timeout: 10000 });
       await expect(button).toBeFocused();
+    });
+
+    test(`wraps a long branch name in the inline failure in the ${frame.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=fail#/');
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      await makeBranch(page, view, `cms/${'a'.repeat(90)}`);
+      const alert = view
+        .getByRole('alert')
+        .filter({ hasText: /Couldn't create/ });
+      await expect(alert).toBeVisible();
+      const [scroll, client] = await alert.evaluate((el) => [
+        el.scrollWidth,
+        el.clientWidth,
+      ]);
+      expect(scroll).toBeLessThanOrEqual(client);
     });
 
     test(`resets the form and switches when the note's Retry makes a branch whose form create failed while the ${frame.name} was closed`, async ({
@@ -1014,14 +1036,14 @@ test.describe('branch switcher pop-up', () => {
       const view = frameOf(page, frame.maximise);
       await expect(
         view.getByText(
-          "Couldn't create cms/x. Check your connection, then retry. It may still have been made, so reload to check."
+          "Couldn't create cms/x. Check your connection, then retry."
         )
       ).toBeVisible();
       await expect.poll(() => toastCount(page)).toBe(0);
       await view.getByRole('button', { name: 'Retry' }).click();
       await expect(
         view.getByText(
-          "Couldn't create cms/x. Check your connection, then retry. It may still have been made, so reload to check."
+          "Couldn't create cms/x. Check your connection, then retry."
         )
       ).toBeVisible({ timeout: 5000 });
       expect(await toastCount(page)).toBe(0);

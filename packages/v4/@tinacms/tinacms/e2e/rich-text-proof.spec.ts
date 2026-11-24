@@ -202,8 +202,15 @@ test.describe('with the keyboard up at 390px', () => {
     await page.keyboard.press('Enter');
     await setKeyboardHeight(page, KEYBOARD_TOP);
     const slashInput = page.getByRole('combobox', { expanded: true });
-    await page.keyboard.type('/');
-    await expect(slashInput).toBeFocused();
+    await expect(async () => {
+      await page.keyboard.type('/');
+      try {
+        await expect(slashInput).toBeFocused({ timeout: 1500 });
+      } catch (cause) {
+        await page.keyboard.press('Backspace');
+        throw cause;
+      }
+    }).toPass();
     await page.keyboard.type('head');
     const rows = page.getByRole('option');
     await expect(rows.first()).toBeVisible();

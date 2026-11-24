@@ -101,6 +101,11 @@ export class TinaCloudError extends Error {
   }
 }
 
+/** The create request got no answer in time, so TinaCloud may still have made the branch. */
+export class TinaCloudCreateTimeoutError extends TinaCloudError {
+  readonly maybeMade = true;
+}
+
 /** TinaCloud answered that a background request failed. */
 export class TinaCloudRequestFailedError extends TinaCloudError {}
 
@@ -319,7 +324,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
         'abort',
         () =>
           reject(
-            new TinaCloudError(
+            new TinaCloudCreateTimeoutError(
               `TinaCloud did not answer the request to create branch ${name} in time.`,
               {}
             )

@@ -1808,7 +1808,7 @@ describe('branch switcher rows and creating a branch', () => {
     await press(dialog, user);
     expect(
       await within(dialog).findByText(
-        "Couldn't create cms/x. Check your connection, then retry. It may still have been made, so reload to check."
+        "Couldn't create cms/x. Check your connection, then retry."
       )
     ).toBeVisible();
     expect(warn).toHaveBeenCalled();
@@ -2187,7 +2187,7 @@ describe('branch switcher rows and creating a branch', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Branches' });
     expect(
       await within(dialog).findByText(
-        "Couldn't create cms/x. Check your connection, then retry. It may still have been made, so reload to check."
+        "Couldn't create cms/x. Check your connection, then retry."
       )
     ).toBeVisible();
     await waitFor(() => expect(toasts()).toHaveLength(0));
@@ -2241,7 +2241,7 @@ describe('branch switcher rows and creating a branch', () => {
     act(() => rejects[1](new Error('offline')));
     expect(
       await within(dialog).findByText(
-        "Couldn't create cms/x. Check your connection, then retry. It may still have been made, so reload to check."
+        "Couldn't create cms/x. Check your connection, then retry."
       )
     ).toBeVisible();
     await waitFor(() => expect(toasts()).toHaveLength(0));
@@ -2423,6 +2423,79 @@ describe('branch switcher rows and creating a branch', () => {
       ).toHaveValue('cms/b');
       expect(await within(reopened).findByText('cms/a is ready')).toBeVisible();
     });
+  });
+
+  it.each([
+    ['hit its deadline', true],
+    ['failed for another reason', false],
+  ] as const)(
+    'says the branch may still exist only when the create %s',
+    async (_label, maybeMade) => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      createBranch = vi.fn<NonNullable<BranchSource['create']>>(() =>
+        Promise.reject(
+          Object.assign(new Error('late'), maybeMade ? { maybeMade } : {})
+        )
+      );
+      const { user, dialog } = await startCreate();
+      await press(dialog, user);
+      const inline = await within(dialog).findByText(
+        /Couldn't create cms\/x\. Check/
+      );
+      expect(/reload to check/.test(inline.textContent ?? '')).toBe(maybeMade);
+      await user.click(
+        within(dialog).getByRole('button', { name: 'Close branches' })
+      );
+      const toast = await screen.findByText(
+        /Check your connection, then retry\./
+      );
+      expect(/reload to check/.test(toast.textContent ?? '')).toBe(maybeMade);
+    }
+  );
+
+  it('keeps the failure line in place while the retry from the form runs', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    createBranch = vi
+      .fn<NonNullable<BranchSource['create']>>()
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockImplementationOnce(() => new Promise(() => {}));
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await within(dialog).findByText(/Couldn't create cms\/x\. Check/);
+    await user.click(within(dialog).getByRole('button', { name: 'Retry' }));
+    await within(dialog).findByRole('button', { name: 'Creating' });
+    const gap = within(dialog).getByText(/Couldn't create cms\/x\. Check/);
+    expect(gap).toHaveAttribute('aria-hidden', 'true');
+    expect(gap).toHaveClass('invisible');
+  });
+
+  it('does not pull focus from the top bar Search when a create ends in the maximised view', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let finish: () => void = () => {};
+    createBranch = vi.fn<NonNullable<BranchSource['create']>>(
+      ({ name }) =>
+        new Promise((resolve) => {
+          finish = () =>
+            resolve({ name, ready: Promise.reject(new Error('late')) });
+        })
+    );
+    const { user, dialog } = await startCreate();
+    await user.click(within(dialog).getByRole('button', { name: 'Maximise' }));
+    await screen.findByRole('button', { name: 'Restore' });
+    const frame = globalThis.document.querySelector<HTMLElement>(
+      '[data-slot="branch-maximised"]'
+    );
+    if (!frame) throw new Error('no maximised view');
+    await press(frame, user);
+    const search = await screen.findByRole('button', { name: /Search/ });
+    search.focus();
+    expect(search).toHaveFocus();
+    act(() => finish());
+    expect(
+      await within(frame).findByText(/cms\/x isn't ready yet/)
+    ).toBeVisible();
+    await act(async () => {});
+    expect(search).toHaveFocus();
   });
 
   it('sends the toast again when the switcher closes with the note still held', async () => {
@@ -2656,10 +2729,11 @@ describe('branch switcher rows and creating a branch', () => {
 
     describe.each(tiers)('when the create ends (%s)', (_tier, phone) => {
       it('puts focus in the search box when the outcome note closes the focused empty form', async () => {
-        const { dialog, ended } = await noteRetry('unready', {
+        const { dialog, name, ended } = await noteRetry('unready', {
           typed: '',
           phone,
         });
+        name.focus();
         await ended();
         expect(
           await within(dialog).findByText(/cms\/a isn't ready yet/)

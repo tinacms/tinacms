@@ -57,7 +57,11 @@ export const createBranchAction =
       store.setState((state) => ({ branch: { ...state.branch, ...patch } }));
     const startedOn = currentBranchOf(store.getState());
     let settled = false;
-    const finish = (made: string, outcome: 'ready' | 'unready' | 'failed') => {
+    const finish = (
+      made: string,
+      outcome: 'ready' | 'unready' | 'failed',
+      maybeMade = false
+    ) => {
       if (settled) return;
       settled = true;
       const madeNames = madeByStore.get(store);
@@ -69,7 +73,13 @@ export const createBranchAction =
             ? [...unready, made]
             : unready,
         creating: undefined,
-        createResult: { name: made, from, startedOn, outcome },
+        createResult: {
+          name: made,
+          from,
+          startedOn,
+          outcome,
+          ...(maybeMade ? { maybeMade } : {}),
+        },
       });
     };
 
@@ -136,7 +146,14 @@ export const createBranchAction =
       },
       (cause: unknown) => {
         console.warn(`[tinacms] could not create branch ${name}:`, cause);
-        finish(name, 'failed');
+        finish(
+          name,
+          'failed',
+          typeof cause === 'object' &&
+            cause !== null &&
+            'maybeMade' in cause &&
+            cause.maybeMade === true
+        );
       }
     );
   };

@@ -44,9 +44,17 @@ export function useLongSave(): boolean {
 type CreateRequest = { name: string; from: string };
 
 type Outcome =
-  | { kind: 'failed'; name: string; from: string; viaForm?: boolean }
+  | {
+      kind: 'failed';
+      name: string;
+      from: string;
+      viaForm?: boolean;
+      maybeMade?: boolean;
+    }
   | { kind: 'unready'; name: string }
   | { kind: 'ready'; name: string };
+
+const MAYBE_MADE = 'It may still have been made, so reload to check.';
 
 const DIRTY_REASON = 'Save or discard your changes first';
 
@@ -183,13 +191,13 @@ function BranchControl() {
       branch: { ...state.branch, createResult: undefined },
     }));
     if (!view) return;
-    const { name, from, startedOn: began, outcome } = result;
+    const { name, from, startedOn: began, outcome, maybeMade } = result;
     setReason(undefined);
     if (outcome === 'failed') {
       setDeferred(undefined);
       setFormDone(false);
       const inline = origin?.via === 'form' && isOpen && shown;
-      setHeld({ kind: 'failed', name, from, viaForm: inline });
+      setHeld({ kind: 'failed', name, from, viaForm: inline, maybeMade });
       return;
     }
     const owned =
@@ -287,7 +295,9 @@ function BranchControl() {
       id = toast({
         tone: 'error',
         title: `Couldn't create ${outcome.name}`,
-        text: 'Check your connection, then retry. It may still have been made, so reload to check.',
+        text: outcome.maybeMade
+          ? `Check your connection, then retry. ${MAYBE_MADE}`
+          : 'Check your connection, then retry.',
         action: {
           label: 'Retry',
           onClick: act(idOf, () =>
@@ -354,6 +364,7 @@ function BranchControl() {
         setHeld(undefined);
         setReason(undefined);
       }}
+      createMaybeMade={held?.kind === 'failed' && held.maybeMade === true}
       creatingBranch={branch.creating?.name}
       baseBranch={branch.defaultBranch}
       onCreate={
