@@ -103,11 +103,14 @@ export interface FormViewState {
   /** Ids of the mounted picker hosts. The first one draws, and the admin's primary host goes first. */
   pickerHosts: readonly string[];
   /**
-   * Until this time (ms), a form column that mounts takes focus if focus fell to `body`. A close
-   * that is not the user's sets it, because the opener may leave with the remount that follows.
+   * Armed when the form closes the picker (a save, Resume, Discard or an outside change may
+   * remount the form column). The next form column to mount takes focus if it fell to `body`.
+   * A new picker disarms it.
    */
-  regionFocusUntil: number;
-  armRegionFocus: (ms: number) => void;
+  focusHandoff: boolean;
+  armFocusHandoff: () => void;
+  /** Reads and disarms the hand-off. */
+  takeFocusHandoff: () => boolean;
   /** Changes when the picker serves another requester, so the panel resets its picks. */
   pickerSerial: number;
   openPicker: (request: MediaPickerRequest) => void;
@@ -288,10 +291,22 @@ export const createFormViewStore = (): FormViewStore => {
     picker: null,
     pickerTuckedPane: false,
     pickerHosts: [],
-    regionFocusUntil: 0,
-    armRegionFocus: (ms) => set({ regionFocusUntil: Date.now() + ms }),
+    focusHandoff: false,
+    armFocusHandoff: () => set({ focusHandoff: true }),
+    takeFocusHandoff: () => {
+      const armed = get().focusHandoff;
+      if (armed) set({ focusHandoff: false });
+      return armed;
+    },
     pickerSerial: 0,
-    openPicker: (request) =>
+    openPicker: (asked) => {
+      // A `choose` held past the picker's close, or past a re-target, writes nothing.
+      const request: MediaPickerRequest = {
+        ...asked,
+        choose: (paths) => {
+          if (get().picker === request) asked.choose(paths);
+        },
+      };
       set((state) => {
         const summary = state.errorSummary;
         const tucks =
@@ -301,6 +316,7 @@ export const createFormViewStore = (): FormViewStore => {
           !readPinned();
         return {
           picker: request,
+          focusHandoff: false,
           pickerSerial:
             state.picker?.target === request.target
               ? state.pickerSerial
@@ -311,7 +327,8 @@ export const createFormViewStore = (): FormViewStore => {
             ? { ...summary, paneOpen: false, focusRow: false }
             : summary,
         };
-      }),
+      });
+    },
     closePicker: () =>
       set((state) => {
         if (state.picker === null) return state;

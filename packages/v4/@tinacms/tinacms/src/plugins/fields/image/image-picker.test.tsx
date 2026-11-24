@@ -24,6 +24,7 @@ import { MediaPickerHost } from '../../media-manager/media-picker-host';
 import { FormScopeContext } from '../../../editor/context';
 import type { FormScope } from '../../../editor/context';
 import type { FormViewStore } from '../../../editor/form-view-state';
+import { readFormBindings } from '../../../editor/form-bindings';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
 import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
@@ -225,23 +226,6 @@ describe('choosing an image with the picker', () => {
     expect(
       within(await picker()).getByRole('region', { name: 'Media library' })
     ).toHaveFocus();
-  });
-
-  it('puts the choice in the field when the document saved while the picker was open', async () => {
-    renderField({ hero: 'photo.jpg' });
-    await userEvent.click(
-      within(await group('Hero')).getByRole('button', {
-        name: 'Replace photo.jpg',
-      })
-    );
-    const panel = await picker();
-    await userEvent.click(await tile('sunset.jpg'));
-    act(() => useFormStore.getState().markSaved(toFormId(DOCUMENT_PATH)));
-    await userEvent.click(
-      within(panel).getByRole('button', { name: 'Choose image' })
-    );
-    expect(valueOf('hero')).toBe('sunset.jpg');
-    expect(status()).toBe('dirty');
   });
 
   it('lists images and folders only', async () => {
@@ -862,53 +846,188 @@ describe('a reseed that removes the picker target', () => {
   });
 });
 
-describe('focus when the form closes the picker', () => {
-  const region = (
-    <div data-form-id='stand-in' tabIndex={-1} data-testid='region' />
-  );
-  const focusedRegion = () =>
+describe('focus and the active mark when the form closes the picker', () => {
+  const FORM = toFormId(DOCUMENT_PATH);
+  const region = <div data-form-id={FORM} tabIndex={-1} data-testid='region' />;
+  const regionFocused = () =>
     vi.waitFor(() => expect(screen.getByTestId('region')).toHaveFocus());
   const gone = () =>
     vi.waitFor(() =>
       expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
     );
+  const active = () => useFormStore.getState().active?.address;
+  const setActive = (name: string) =>
+    act(() => useFormStore.getState().setActive(FORM, toFieldAddress(name)));
 
-  it('returns to the opener when it is still in the page', async () => {
+  const plain: CollectionSchema = {
+    name: 'post',
+    format: 'mdx',
+    fields: [
+      t.image({ name: 'hero', label: 'Hero' }),
+      t.array({
+        name: 'plain',
+        label: 'Plain',
+        templates: [
+          {
+            name: 'note',
+            label: 'Note',
+            fields: [t.string({ name: 'text', label: 'Text' })],
+          },
+        ],
+      }),
+    ],
+  };
+  const notes = {
+    plain: [
+      { _template: 'note', text: 'a' },
+      { _template: 'note', text: 'b' },
+    ],
+  };
+  const openHero = async () => {
+    await userEvent.click(
+      within(await group('Hero')).getByRole('button', {
+        name: 'Choose from Media',
+      })
+    );
+    await picker();
+  };
+
+  it('returns to the opener when focus is in the picker and the opener is still in the page', async () => {
     renderField(undefined, [], schema, region);
     const opener = within(await group('Hero')).getByRole('button', {
       name: 'Choose from Media',
     });
     await userEvent.click(opener);
-    await picker();
+    await userEvent.click(await tile('photo.jpg'));
     act(() => view?.getState().closePicker());
     await gone();
     expect(opener).toHaveFocus();
   });
 
-  it('goes to the form region when a drill-out removed the opener', async () => {
-    const nested: CollectionSchema = {
+  it('keeps the field the editor drilled into active and focused (a)', async () => {
+    renderField(notes, [], plain, region);
+    await openHero();
+    await userEvent.click(
+      await screen.findByRole('button', { name: /^Item 2/ })
+    );
+    await gone();
+    await vi.waitFor(() => expect(active()).toBe('plain.1.text'));
+    await vi.waitFor(() =>
+      expect(screen.getByRole('textbox', { name: /^Text/ })).toHaveFocus()
+    );
+    expect(screen.getByTestId('region')).not.toHaveFocus();
+  });
+
+  it('keeps a mark the editor set from the preview while the picker was open (a)', async () => {
+    renderField(notes, [], plain, region);
+    await openHero();
+    setActive('plain.0.text');
+    await userEvent.click(
+      await screen.findByRole('button', { name: /^Item 2/ })
+    );
+    await gone();
+    expect(active()).not.toBe('hero');
+    expect(active()).toBeDefined();
+  });
+
+  it('leaves focus and the mark on a form input behind the popover when an outside change closes the picker (b)', async () => {
+    const withTitle: CollectionSchema = {
+      name: 'post',
+      format: 'mdx',
+      fields: [
+        t.image({ name: 'hero', label: 'Hero' }),
+        t.string({ name: 'title', label: 'Title' }),
+      ],
+    };
+    const tree = (document: Record<string, unknown>) => (
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [
+            imageFieldPlugin,
+            stringFieldPlugin,
+            stubPlugin('test:content', 'content', contentStub),
+            stubPlugin('test:media', 'media', media()),
+            coreValidatorsPlugin,
+          ],
+          schema: { collections: [withTitle] },
+        })}
+        queryClient={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      >
+        <FormProvider
+          collection={withTitle}
+          path={DOCUMENT_PATH}
+          document={document}
+        >
+          <LabelledFields />
+          <Probes />
+        </FormProvider>
+      </TinaProvider>
+    );
+    const { rerender } = render(tree({ title: 'one' }));
+    await openHero();
+    const title = await screen.findByRole('textbox', { name: /^Title/ });
+    await userEvent.click(title);
+    expect(active()).toBe('title');
+    rerender(tree({ title: 'two' }));
+    await gone();
+    expect(title).toHaveFocus();
+    expect(active()).toBe('title');
+  });
+
+  describe('a list item holding the opener', () => {
+    const authors: CollectionSchema = {
       name: 'post',
       format: 'mdx',
       fields: [
         t.array({
-          name: 'slides',
-          label: 'Slides',
-          fields: [t.image({ name: 'image', label: 'Slide image' })],
+          name: 'authors',
+          label: 'Authors',
+          fields: [t.image({ name: 'avatar', label: 'Avatar' })],
         }),
       ],
     };
-    renderField({ slides: [{}] }, [], nested, region);
-    const head = await screen.findByRole('button', { name: /^Item 1/ });
-    await userEvent.click(head);
-    await userEvent.click(
-      within(await group('Slide image')).getByRole('button', {
-        name: 'Choose from Media',
-      })
-    );
-    await picker();
-    await userEvent.click(head);
-    await gone();
-    await focusedRegion();
+    const openFirst = async () => {
+      renderField({ authors: [{}, {}] }, [], authors, region);
+      for (const head of await screen.findAllByRole('button', {
+        name: /^Item \d/,
+      })) {
+        await userEvent.click(head);
+      }
+      const [first] = await screen.findAllByRole('group', { name: 'Avatar' });
+      await userEvent.click(
+        within(first as HTMLElement).getByRole('button', {
+          name: 'Choose from Media',
+        })
+      );
+      await userEvent.click(await tile('photo.jpg'));
+    };
+
+    it('removed in code while focus is in the picker: focus goes to the form region and the mark is cleared (c)', async () => {
+      await openFirst();
+      setActive('authors.0.avatar');
+      act(() =>
+        readFormBindings(FORM)?.setValue(toFieldAddress('authors'), [{}])
+      );
+      await gone();
+      await regionFocused();
+      expect(active()).toBeUndefined();
+    });
+
+    it('removed from the card menu: the list keeps its own focus rule and the picker does not move it (c2)', async () => {
+      await openFirst();
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Actions for Item 1' })
+      );
+      await userEvent.click(
+        await screen.findByRole('menuitem', { name: /^Remove/ })
+      );
+      await gone();
+      const focused = document.activeElement;
+      expect(screen.getByTestId('region')).not.toHaveFocus();
+      expect(focused).not.toBe(document.body);
+    });
   });
 
   it.each([
@@ -931,12 +1050,13 @@ describe('focus when the form closes the picker', () => {
       await userEvent.click(
         within(images).getByRole('button', { name: button })
       );
+      await userEvent.click(await tile('sunset.jpg'));
       await picker(title);
       act(() => {
         scopeOf?.discardEdits();
       });
       await gone();
-      await focusedRegion();
+      await regionFocused();
     }
   );
 });
@@ -962,7 +1082,11 @@ describe('a picker whose requester a reseed unmounted', () => {
       { authors: [{ name: 'Ivan' }, { name: 'Josh' }] },
       [],
       nested,
-      <div data-form-id='stand-in' tabIndex={-1} data-testid='region' />
+      <div
+        data-form-id={toFormId(DOCUMENT_PATH)}
+        tabIndex={-1}
+        data-testid='region'
+      />
     );
     for (const head of await screen.findAllByRole('button', {
       name: /^Item \d:/,

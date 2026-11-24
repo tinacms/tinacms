@@ -16,13 +16,12 @@ describe('the error pane pin', () => {
   });
 
   it('reads as not pinned and does not throw when storage is blocked', () => {
-    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+    const blocked = () => {
       throw new Error('blocked');
-    });
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new Error('blocked');
-    });
+    };
+    vi.stubGlobal('localStorage', { getItem: blocked, setItem: blocked });
     expect(readPinned()).toBe(false);
     expect(() => writePinned(true)).not.toThrow();
+    vi.unstubAllGlobals();
   });
 });

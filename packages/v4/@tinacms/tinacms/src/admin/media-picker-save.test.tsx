@@ -10,19 +10,24 @@ import type { TinaDocument } from '../core/schema/types';
 import { useFormStore } from '../form/form-store';
 import { simulateReload } from '../test/simulate-reload';
 import imageFieldPlugin from '../plugins/fields/image/image-field.plugin';
+import arrayFieldPlugin from '../plugins/fields/array/array-field.plugin';
+import objectFieldPlugin from '../plugins/fields/object/object-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
+import { t } from '../index';
 import { connectionOf } from '../test/connection';
 import { TinaAdmin } from './admin';
 
 const written: TinaDocument[] = [];
 let stored: TinaDocument;
+let hold: Promise<void> | undefined;
 
 const contentPlugin = () => {
   const provider: ContentProvider = {
     list: async () => connectionOf([{ path: 'content/posts/hello.mdx' }]),
     get: async () => ({ path: 'content/posts/hello.mdx', document: stored }),
     update: async (_collection, path, value) => {
+      if (hold) await hold;
       written.push(value);
       stored = { ...value };
       return { path, document: stored };
@@ -82,6 +87,8 @@ const renderAdmin = (hooked: boolean) => {
           upcase,
           stringFieldPlugin,
           imageFieldPlugin,
+          arrayFieldPlugin,
+          objectFieldPlugin,
           coreValidatorsPlugin,
         ],
         schema: {
@@ -95,6 +102,11 @@ const renderAdmin = (hooked: boolean) => {
               fields: [
                 { name: 'title', label: 'Title', type: 'string' },
                 { name: 'hero', label: 'Hero', type: 'image' },
+                t.array({
+                  name: 'gallery',
+                  label: 'Gallery',
+                  of: t.image({ name: 'image' }),
+                }),
               ],
             },
           ],
@@ -109,6 +121,7 @@ const renderAdmin = (hooked: boolean) => {
 
 beforeEach(() => {
   written.length = 0;
+  hold = undefined;
   stored = { title: 'Hello' };
   useFormStore.setState({ forms: {} });
 });
@@ -187,6 +200,77 @@ describe('resuming stored edits with the media picker open', () => {
     );
     await new Promise((resolve) => setTimeout(resolve, 500));
     expect(document.activeElement).not.toBe(document.body);
+    expect(written).toHaveLength(0);
+  });
+});
+
+describe('the admin with the media picker open', () => {
+  const openGalleryAdd = async (user: ReturnType<typeof userEvent.setup>) => {
+    const gallery = await screen.findByRole('group', { name: /^Gallery\b/ });
+    await user.click(
+      within(gallery).getByRole('button', { name: 'Add images' })
+    );
+    const picker = await screen.findByRole('region', { name: 'Choose images' });
+    await user.click(
+      await within(picker).findByRole('button', { name: 'photo.jpg' })
+    );
+  };
+
+  it('ends a save that took longer than any window with focus off body and the gallery unchanged (c)', async () => {
+    const user = userEvent.setup();
+    let release: () => void = () => {};
+    hold = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    renderAdmin(false);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await openGalleryAdd(user);
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+    );
+    const now = Date.now();
+    vi.spyOn(Date, 'now').mockReturnValue(now + 60_000);
+    release();
+    await waitFor(() => expect(written).toHaveLength(1));
+    expect(written[0]).toEqual({ title: 'Hello!' });
+    await waitFor(() =>
+      expect(
+        within(
+          screen.getByRole('complementary', { name: 'Document form' })
+        ).getByRole('status')
+      ).toHaveTextContent('Saved')
+    );
+    await waitFor(() => {
+      expect(document.activeElement).not.toBe(document.body);
+      expect(
+        document
+          .querySelector('[data-form-id]')
+          ?.contains(document.activeElement)
+      ).toBe(true);
+    });
+    vi.restoreAllMocks();
+  });
+
+  it('puts focus on the remounted scroll region after Discard with the picker open (d)', async () => {
+    const user = userEvent.setup();
+    renderAdmin(false);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await openGalleryAdd(user);
+    await user.click(screen.getByRole('button', { name: 'Document actions' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Discard unsaved edits' })
+    );
+    const dialog = await screen.findByRole('alertdialog');
+    await user.click(within(dialog).getByRole('button', { name: 'Discard' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+    );
+    await waitFor(() => {
+      const region = document.querySelector('[data-form-id]');
+      expect(document.activeElement).not.toBe(document.body);
+      expect(region?.contains(document.activeElement)).toBe(true);
+    });
     expect(written).toHaveLength(0);
   });
 });

@@ -20,15 +20,18 @@ import { useFormStore } from '../../form/form-store';
 import { UploadHost } from '../../editor/uploads/upload-host';
 import { MediaPickerPanel } from './media-picker';
 
-const PREVIEW_SLOT = '[data-preview-slot]';
-const FORM_REGION = '[data-form-id]';
-// How long after a form-driven close a new form column may take focus.
-const REGION_FOCUS_MS = 3000;
+type ActiveMark = Pick<
+  NonNullable<ReturnType<typeof useFormStore.getState>['active']>,
+  'formId' | 'address'
+>;
 
-const focusFormRegion = () => {
-  const region = document.querySelector<HTMLElement>(FORM_REGION);
-  region?.focus();
-};
+const PREVIEW_SLOT = '[data-preview-slot]';
+
+/** The scroll region of the form column for `formId`. */
+const formRegionOf = (formId: string | undefined): HTMLElement | undefined =>
+  Array.from(document.querySelectorAll<HTMLElement>('[data-form-id]')).find(
+    (region) => region.getAttribute('data-form-id') === formId
+  );
 const POPOVER_WIDTH_PX = 400;
 const INSET_PX = 12;
 // Under this preview width the popover would squeeze the header, so it covers the page instead.
@@ -240,9 +243,12 @@ function OpenPicker({
   const [root, setRoot] = useState<HTMLDivElement | null>(null);
   const [entered, setEntered] = useState(false);
   // `focus` is set by a close the user made. Left unset, the form closed the picker.
-  const restore = useRef<{ opener: HTMLElement | null; focus?: boolean }>({
-    opener: null,
-  });
+  const restore = useRef<{
+    opener: HTMLElement | null;
+    focus?: boolean;
+    mark?: ActiveMark | null;
+    panel?: HTMLElement | null;
+  }>({ opener: null });
 
   const phone = tier === 'phone';
   const tabletMaximised = tier === 'tablet' && maximised;
@@ -266,18 +272,46 @@ function OpenPicker({
     restore.current.opener = request?.opener ?? null;
   }, [request]);
 
+  // The active field when the picker opened for this target. A mark the editor sets later is theirs.
+  const target = request?.target;
+  useEffect(() => {
+    const { active } = useFormStore.getState();
+    restore.current.mark = active
+      ? { formId: active.formId, address: active.address }
+      : null;
+  }, [target]);
+
+  useEffect(() => {
+    restore.current.panel = root;
+  }, [root]);
+
+  // A close the form made (a save, Discard, Resume, an outside change, or the field going away)
+  // moves focus only when it is in the picker or on `body`, and keeps a mark the editor changed.
   useEffect(
     () => () => {
-      const { opener, focus } = restore.current;
+      const { opener, focus, mark, panel } = restore.current;
       if (focus === false) return;
-      if (opener?.isConnected) opener.focus();
-      else {
-        // The field is gone. Another field now at its address must not take focus from the active mark.
-        const { active, setActive } = useFormStore.getState();
-        if (active?.formId === formId) setActive(formId, null);
-        focusFormRegion();
+      if (focus === true) {
+        if (opener?.isConnected) opener.focus();
+        return;
       }
-      if (focus === undefined) view.getState().armRegionFocus(REGION_FOCUS_MS);
+      view.getState().armFocusHandoff();
+      const openerHere = opener?.isConnected === true;
+      const { active, setActive } = useFormStore.getState();
+      if (
+        !openerHere &&
+        mark &&
+        active?.formId === mark.formId &&
+        active.address === mark.address
+      ) {
+        setActive(mark.formId, null);
+      }
+      const focused = document.activeElement;
+      const free =
+        !focused || focused === document.body || panel?.contains(focused);
+      if (!free) return;
+      if (openerHere) opener.focus();
+      else formRegionOf(formId)?.focus();
     },
     [view, formId]
   );

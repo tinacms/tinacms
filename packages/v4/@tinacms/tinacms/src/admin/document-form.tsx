@@ -627,7 +627,10 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
   // again for that, so the effect keys on what the toast says, and the buttons
   // read the latest actions. While the confirm is open the buttons do nothing.
   const resume = useEffectEvent(() => {
-    if (!confirming) stale?.resume();
+    if (confirming) return;
+    // Sonner returns focus to its toast; the new form column must find focus on `body`.
+    leaveToaster();
+    stale?.resume();
   });
   const askToDiscard = useEffectEvent(() => {
     if (confirming) return;
@@ -813,24 +816,14 @@ function FormFields({ scope }: { scope: FormScope }) {
   );
 }
 
-// How long after a form-driven picker close the form column checks that focus did not fall to body.
-const REGION_RECHECK_MS = 300;
-
 export function DocumentForm() {
   const scope = use(FormScopeContext);
   const regionRef = useRef<HTMLDivElement>(null);
   const view = scope?.view;
   useLayoutEffect(() => {
-    if (!view || view.getState().regionFocusUntil < Date.now()) return;
-    view.getState().armRegionFocus(0);
-    const fallToBody = () => {
-      const focused = document.activeElement;
-      if (!focused || focused === document.body) regionRef.current?.focus();
-    };
-    fallToBody();
-    // The control that held focus (Resume, say) can unmount a moment after this form mounts.
-    const timer = setTimeout(fallToBody, REGION_RECHECK_MS);
-    return () => clearTimeout(timer);
+    if (!view?.getState().takeFocusHandoff()) return;
+    const focused = document.activeElement;
+    if (!focused || focused === document.body) regionRef.current?.focus();
   }, [view]);
   if (!scope) return null;
 
