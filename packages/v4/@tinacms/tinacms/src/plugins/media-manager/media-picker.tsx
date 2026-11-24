@@ -239,12 +239,14 @@ export function MediaPickerPanel({
 
   const listError = listing.isError ? listing.error : null;
   // A provider that lists a missing folder as empty looks the same as one that says not-found.
-  const missingFolderGone =
-    listError instanceof MediaError
-      ? listError.code === 'not-found'
-      : listing.isSuccess &&
-        !listing.hasNextPage &&
-        listing.data.pages.every((page) => page.items.length === 0);
+  let missingFolderGone = false;
+  if (listError instanceof MediaError) {
+    missingFolderGone = listError.code === 'not-found';
+  } else if (listing.isSuccess && !listing.hasNextPage) {
+    missingFolderGone = listing.data.pages.every(
+      (page) => page.items.length === 0
+    );
+  }
   useEffect(() => {
     if (missingFolder !== null && folder === missingFolder && folder !== '') {
       if (missingFolderGone) setFolder('');
