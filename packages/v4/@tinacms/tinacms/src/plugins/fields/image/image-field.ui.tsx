@@ -46,11 +46,7 @@ export function ImageField() {
   const focusAfterChoose = useRef(false);
   const picker = useMediaPicker();
   const parentLabel = useParentLabel(address);
-  const {
-    owner: target,
-    target: openTarget,
-    adopted,
-  } = useOwnedPicker(address);
+  const { owner: target, target: openTarget } = useOwnedPicker();
   const choosing = openTarget !== null;
   const [missing, setMissing] = useState(false);
   const [replacement, setReplacement] = useState<File | null>(null);
@@ -135,15 +131,11 @@ export function ImageField() {
       choose: (picked) => choose.current(picked),
     });
 
-  // A reseed remounts the field under an open picker, and a slow load can flip `missing`
-  // after the picker opened. Both send the request again with the newest state.
+  // A slow load can flip `missing` after the picker opened: send the request again.
   const resend = useRef(openPicker);
   useLayoutEffect(() => {
     resend.current = openPicker;
   });
-  useEffect(() => {
-    if (adopted) resend.current();
-  }, [adopted]);
   const wasMissing = useRef(missing);
   useEffect(() => {
     if (wasMissing.current === missing) return;

@@ -8,7 +8,7 @@ import {
   within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../config';
 import { branchSliceOf } from '../../core/branch/contract';
@@ -40,6 +40,7 @@ import { t } from '../../index';
 import { LabelledFields } from '../../test/labelled-fields';
 import stringFieldPlugin from '../fields/string/string-field.plugin';
 import { SESSION_EXPIRED } from './media-pane-words';
+import { MediaPickerHost } from './media-picker-host';
 import { LOAD_FAILED, missingCardWords } from './media-picker-words';
 
 const DOCUMENT_PATH = 'content/posts/hello.mdx';
@@ -822,6 +823,111 @@ describe('a missing image', () => {
   });
 });
 
+describe('a missing image with a search', () => {
+  it('stays in the old folder while a search finds nothing there', async () => {
+    const user = userEvent.setup();
+    renderPicker(createProvider({ features: { search: true } }), {
+      asks: {
+        hero: single({ replacing: { path: 'posts/gone.jpg', missing: true } }),
+      },
+    });
+    await openPicker(user);
+    await tile('hero.jpg');
+    await user.type(searchBox(), 'zzz');
+    expect(
+      await screen.findByText('No images in posts match “zzz”.')
+    ).toBeVisible();
+    expect(screen.getByText(missingCardWords('posts'))).toBeVisible();
+  });
+});
+
+describe('the picker beside the Media pane', () => {
+  function PaneHarness({ onClosePane }: { onClosePane: () => void }) {
+    const [paneOpen, setPaneOpen] = useState(false);
+    return (
+      <>
+        <button type='button' onClick={() => setPaneOpen(true)}>
+          Open the Media pane
+        </button>
+        <MediaPickerHost
+          primary
+          paneOpen={paneOpen}
+          onClosePane={onClosePane}
+        />
+      </>
+    );
+  }
+
+  it('closes an open picker when the Media pane opens', async () => {
+    const user = userEvent.setup();
+    renderPicker(createProvider(), {
+      extra: <PaneHarness onClosePane={vi.fn()} />,
+    });
+    await openPicker(user);
+    await user.click(
+      screen.getByRole('button', { name: 'Open the Media pane' })
+    );
+    await waitFor(() =>
+      expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+    );
+  });
+
+  it('closes the Media pane when a picker is asked for beside it, and shows the picker', async () => {
+    const user = userEvent.setup();
+    const closePane = vi.fn();
+    renderPicker(createProvider(), {
+      extra: <MediaPickerHost primary paneOpen onClosePane={closePane} />,
+    });
+    await openPicker(user);
+    expect(closePane).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('region', { name: /^Choose / })).toBeVisible();
+  });
+});
+
+describe('the picker over a narrow preview', () => {
+  const stubRegion = (width: number) => {
+    class FakeResizeObserver {
+      observe() {}
+      disconnect() {}
+    }
+    vi.stubGlobal('ResizeObserver', FakeResizeObserver);
+    const slot = document.createElement('div');
+    slot.setAttribute('data-preview-slot', '');
+    slot.getBoundingClientRect = () =>
+      ({ top: 56, left: 400, width, height: 600 }) as DOMRect;
+    document.body.append(slot);
+    return slot;
+  };
+
+  const withRegion = (width: number) => {
+    const slot = stubRegion(width);
+    renderPicker(createProvider(), { extra: <MediaPickerHost primary /> });
+    return slot;
+  };
+
+  it('hides Maximise while it covers the page, and shows it on a wide enough preview', async () => {
+    const user = userEvent.setup();
+    const slot = withRegion(400);
+    const panel = await openPicker(user);
+    expect(
+      within(panel).queryByRole('button', { name: 'Maximise' })
+    ).toBeNull();
+    expect(within(panel).queryByRole('button', { name: 'Restore' })).toBeNull();
+    slot.remove();
+  });
+
+  it('keeps Maximise on a popover and restores it', async () => {
+    const user = userEvent.setup();
+    const slot = withRegion(900);
+    const panel = await openPicker(user);
+    await user.click(within(panel).getByRole('button', { name: 'Maximise' }));
+    expect(
+      within(panel).getByRole('button', { name: 'Restore' })
+    ).toBeVisible();
+    slot.remove();
+  });
+});
+
 describe('states', () => {
   it('shows a loading status named for the folder', async () => {
     const user = userEvent.setup();
@@ -1148,6 +1254,14 @@ describe('upload', () => {
 });
 
 describe('upload with no TinaAdmin above the form', () => {
+  it('draws its status before any picker opens', async () => {
+    renderPicker(createProvider());
+    await waitFor(() =>
+      expect(document.querySelector('[data-upload-status]')).not.toBeNull()
+    );
+    expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull();
+  });
+
   it('reads progress and the result in one polite status', async () => {
     const user = userEvent.setup();
     const { upload, sent } = gatedUpload();

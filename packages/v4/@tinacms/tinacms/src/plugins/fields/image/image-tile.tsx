@@ -116,7 +116,10 @@ export function ImageTile({
   // The tap that reveals the actions must not also press the one under the finger.
   const swallowClick = useRef(false);
   const reveal = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return;
+    if (event.pointerType !== 'touch' && event.pointerType !== 'pen') {
+      swallowClick.current = false;
+      return;
+    }
     swallowClick.current = !revealed;
     setRevealed(true);
   };
@@ -149,6 +152,9 @@ export function ImageTile({
       <div
         ref={boxRef}
         onPointerDown={reveal}
+        onPointerCancel={() => {
+          swallowClick.current = false;
+        }}
         onClickCapture={guardClick}
         className={cn(
           'group relative w-full overflow-hidden rounded-sm border bg-muted transition',

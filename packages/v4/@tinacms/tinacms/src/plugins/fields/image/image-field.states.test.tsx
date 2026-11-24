@@ -318,6 +318,26 @@ describe('image field look', () => {
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
 
+  it.each([
+    ['a cancelled touch', () => ({ type: 'cancel' as const })],
+    ['a later mouse press', () => ({ type: 'mouse' as const })],
+  ])(
+    'runs Remove on a click after %s left the first tap unspent',
+    (_name, next) => {
+      const onRemove = vi.fn();
+      render(
+        <ImageFieldView {...imageFieldState('filled')} onRemove={onRemove} />
+      );
+      const remove = screen.getByRole('button', { name: 'Remove about.png' });
+      fireEvent.pointerDown(remove, { pointerType: 'touch' });
+      const { type } = next();
+      if (type === 'cancel') fireEvent.pointerCancel(remove);
+      else fireEvent.pointerDown(remove, { pointerType: 'mouse' });
+      fireEvent.click(remove);
+      expect(onRemove).toHaveBeenCalledTimes(1);
+    }
+  );
+
   it('does not reveal the actions for a mouse press', () => {
     render(<ImageFieldView {...imageFieldState('filled')} />);
     fireEvent.pointerDown(screen.getByAltText('about.png'), {

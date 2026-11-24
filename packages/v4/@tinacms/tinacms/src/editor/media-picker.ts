@@ -1,12 +1,4 @@
-import {
-  use,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { use, useEffect, useId, useMemo } from 'react';
 import { useStore } from 'zustand';
 import { FormScopeContext } from './context';
 import type { FormViewStore } from './form-view-state';
@@ -56,27 +48,23 @@ export const pickerOf = (view: FormViewStore): MediaPicker => ({
 });
 
 export interface OwnedPicker {
-  /** The start of every target this owner asks with. It survives a reseed that remounts the field. */
+  /** The start of every target this owner asks with. */
   owner: string;
   /** The target of the open picker when this owner asked for it, else null. */
   target: string | null;
-  /** True when this owner took over a picker that the reseed left open. Send the request again. */
-  adopted: boolean;
 }
 
 /**
  * Ties the open picker to one field. The picker closes, writing nothing, when the field
- * unmounts. A reseed of the same document remounts the field at the same address, and the
- * new instance adopts the open picker instead.
+ * unmounts, for any reason.
  */
-export function useOwnedPicker(address: string): OwnedPicker {
+export function useOwnedPicker(): OwnedPicker {
   const scope = use(FormScopeContext);
   if (!scope) {
     throw new Error('useOwnedPicker must be used within a FormProvider');
   }
   const { view } = scope;
   const owner = useId();
-  const [adopted, setAdopted] = useState(false);
   const owns = (target: string) =>
     target === owner || target.startsWith(`${owner}/`);
   const target = useStore(view, (state) =>
@@ -84,24 +72,12 @@ export function useOwnedPicker(address: string): OwnedPicker {
       ? state.picker.target
       : null
   );
-  const latestAddress = useRef(address);
-  useLayoutEffect(() => {
-    latestAddress.current = address;
-  });
-  useEffect(() => {
-    const { pickerOrphan, adoptPicker } = view.getState();
-    if (pickerOrphan?.address === latestAddress.current) {
-      adoptPicker(pickerOrphan.owner, owner);
-      setAdopted(true);
-    }
-    return () => {
-      const { picker, closePicker, pickerReseeding, orphanPicker } =
-        view.getState();
-      if (picker === null || !owns(picker.target)) return;
-      if (pickerReseeding)
-        orphanPicker({ owner, address: latestAddress.current });
-      else closePicker();
-    };
-  }, [view, owner]);
-  return { owner, target, adopted };
+  useEffect(
+    () => () => {
+      const { picker, closePicker } = view.getState();
+      if (picker !== null && owns(picker.target)) closePicker();
+    },
+    [view, owner]
+  );
+  return { owner, target };
 }

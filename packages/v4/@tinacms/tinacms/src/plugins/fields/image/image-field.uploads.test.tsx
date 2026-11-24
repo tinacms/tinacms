@@ -647,6 +647,35 @@ describe('a file that lands after the editor moved on', () => {
   });
 });
 
+describe('the media picker when stored edits resume', () => {
+  it('closes at once and writes nothing', async () => {
+    const first = renderField({ title: 'Hello' });
+    await userEvent.type(
+      await screen.findByRole('textbox', { name: /^Title/ }),
+      '!'
+    );
+    first.unmount();
+    act(simulateReload);
+
+    renderField({ title: 'Hello' });
+    await userEvent.click(
+      within(await fieldGroup('Cover')).getByRole('button', {
+        name: 'Choose from Media',
+      })
+    );
+    expect(
+      await screen.findByRole('region', { name: 'Choose an image' })
+    ).toBeVisible();
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'resume' })
+    );
+    await vi.waitFor(() =>
+      expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+    );
+    expect(valueOf('cover')).toBeNull();
+  });
+});
+
 describe('a Save while a file uploads to an image field', () => {
   function SaveProbe() {
     const save = useFormSave();

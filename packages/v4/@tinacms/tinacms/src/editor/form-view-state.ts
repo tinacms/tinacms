@@ -102,14 +102,6 @@ export interface FormViewState {
   pickerTuckedPane: boolean;
   /** Ids of the mounted picker hosts. The first one draws, and the admin's primary host goes first. */
   pickerHosts: readonly string[];
-  /** True from a reseed until its fields remount, so the remount does not close an open picker. */
-  pickerReseeding: boolean;
-  endReseed: () => void;
-  /** The field a reseed unmounted while its picker stayed open. The remounted field adopts the picker. */
-  pickerOrphan: { owner: string; address: string } | null;
-  orphanPicker: (orphan: { owner: string; address: string }) => void;
-  /** Hands the open picker of the orphaned `from` owner to the remounted `to` owner. */
-  adoptPicker: (from: string, to: string) => void;
   /** Changes when the picker serves another requester, so the panel resets its picks. */
   pickerSerial: number;
   openPicker: (request: MediaPickerRequest) => void;
@@ -257,7 +249,7 @@ export const createFormViewStore = (): FormViewStore => {
           },
         };
       }),
-    reset: () => set({ errorSummary: IDLE_SUMMARY, pickerReseeding: true }),
+    reset: () => set({ errorSummary: IDLE_SUMMARY }),
     touched: new Set(),
     saveAttempted: false,
     openLevels: [],
@@ -290,26 +282,7 @@ export const createFormViewStore = (): FormViewStore => {
     picker: null,
     pickerTuckedPane: false,
     pickerHosts: [],
-    pickerReseeding: false,
-    endReseed: () => set({ pickerReseeding: false }),
-    pickerOrphan: null,
-    orphanPicker: (orphan) => set({ pickerOrphan: orphan }),
     pickerSerial: 0,
-    adoptPicker: (from, to) =>
-      set((state) => {
-        const { picker } = state;
-        if (picker === null) return { pickerOrphan: null };
-        const rest = picker.target.startsWith(`${from}/`)
-          ? picker.target.slice(from.length)
-          : picker.target === from
-            ? ''
-            : null;
-        if (rest === null) return { pickerOrphan: null };
-        return {
-          pickerOrphan: null,
-          picker: { ...picker, target: `${to}${rest}` },
-        };
-      }),
     openPicker: (request) =>
       set((state) => {
         const summary = state.errorSummary;
@@ -320,8 +293,6 @@ export const createFormViewStore = (): FormViewStore => {
           !readPinned();
         return {
           picker: request,
-          pickerOrphan:
-            state.picker?.target === request.target ? state.pickerOrphan : null,
           pickerSerial:
             state.picker?.target === request.target
               ? state.pickerSerial
@@ -340,7 +311,6 @@ export const createFormViewStore = (): FormViewStore => {
         const reopens = state.pickerTuckedPane && summary.blocked.length > 0;
         return {
           picker: null,
-          pickerOrphan: null,
           pickerTuckedPane: false,
           errorSummary: reopens
             ? { ...summary, paneOpen: true, focusRow: false }

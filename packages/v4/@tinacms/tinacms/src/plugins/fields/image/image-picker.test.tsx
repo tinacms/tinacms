@@ -685,10 +685,9 @@ describe('round 2 behaviours', () => {
     expect(view?.getState().errorSummary.paneOpen).toBe(true);
   });
 
-  it('keeps the picker open across a reseed of the same document, and the pick lands', async () => {
+  it('closes the picker on Discard and writes nothing', async () => {
     renderField({ hero: 'photo.jpg' });
     await open();
-    const panel = await picker();
     await userEvent.click(await tile('sunset.jpg'));
     act(() => {
       useFormStore
@@ -702,14 +701,10 @@ describe('round 2 behaviours', () => {
     act(() => {
       scopeOf?.discardEdits();
     });
-    expect(screen.getByRole('region', { name: 'Choose an image' })).toBe(panel);
-    expect(
-      within(await group('Hero')).getByText('Choosing in the picker')
-    ).toBeVisible();
-    await userEvent.click(
-      within(panel).getByRole('button', { name: 'Choose image' })
+    await vi.waitFor(() =>
+      expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
     );
-    expect(valueOf('hero')).toBe('sunset.jpg');
+    expect(valueOf('hero')).toBe('photo.jpg');
   });
 
   it('draws no picker while the host is suspended', async () => {
@@ -867,58 +862,51 @@ describe('a reseed that removes the picker target', () => {
   });
 });
 
-describe('a picker left open by a reseed', () => {
+describe('a picker whose requester a reseed unmounted', () => {
   const nested: CollectionSchema = {
     name: 'post',
     format: 'mdx',
     fields: [
-      t.image({ name: 'hero', label: 'Hero' }),
       t.array({
         name: 'authors',
         label: 'Authors',
-        fields: [t.image({ name: 'avatar', label: 'Avatar' })],
+        fields: [
+          t.string({ name: 'name', label: 'Name' }),
+          t.image({ name: 'avatar', label: 'Avatar' }),
+        ],
       }),
     ],
   };
 
-  const openAvatarOfNewItem = async () => {
-    renderField({ authors: [] }, [], nested);
+  it('closes at once on Discard and writes nothing, even when another item asked', async () => {
+    renderField({ authors: [{ name: 'Ivan' }, { name: 'Josh' }] }, [], nested);
+    for (const head of await screen.findAllByRole('button', {
+      name: /^Item \d:/,
+    })) {
+      await userEvent.click(head);
+    }
     await userEvent.click(
-      await screen.findByRole('button', { name: 'Add item' })
+      screen.getByRole('button', { name: 'Actions for Item 1' })
     );
     await userEvent.click(
-      within(await group('Avatar')).getByRole('button', {
+      await screen.findByRole('menuitem', { name: /^Remove/ })
+    );
+    const [only] = await screen.findAllByRole('group', { name: 'Avatar' });
+    await userEvent.click(
+      within(only as HTMLElement).getByRole('button', {
         name: 'Choose from Media',
       })
     );
-    await picker();
-  };
-
-  it('writes nothing when the editor confirms before anything adopts it', async () => {
-    await openAvatarOfNewItem();
     await userEvent.click(await tile('photo.jpg'));
     act(() => {
       scopeOf?.discardEdits();
     });
-    await userEvent.click(
-      within(await picker()).getByRole('button', { name: 'Choose image' })
+    await vi.waitFor(() =>
+      expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
     );
-    expect(valueOf('authors')).toEqual([]);
-  });
-
-  it('is not closed by the wait timer once the editor opened another picker', async () => {
-    await openAvatarOfNewItem();
-    act(() => {
-      scopeOf?.discardEdits();
-    });
-    await userEvent.click(
-      within(await group('Hero')).getByRole('button', {
-        name: 'Choose from Media',
-      })
-    );
-    await new Promise((resolve) => setTimeout(resolve, 1700));
-    expect(
-      screen.getByRole('region', { name: 'Choose an image' })
-    ).toBeVisible();
+    expect(valueOf('authors')).toEqual([
+      { name: 'Ivan', avatar: null },
+      { name: 'Josh', avatar: null },
+    ]);
   });
 });

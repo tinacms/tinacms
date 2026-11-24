@@ -24,8 +24,6 @@ const POPOVER_WIDTH_PX = 400;
 const INSET_PX = 12;
 // Under this preview width the popover would squeeze the header, so it covers the page instead.
 const MIN_REGION_PX = 440;
-// How long a remounting field has to adopt the picker a reseed left open.
-const ORPHAN_WAIT_MS = 1500;
 // The Top bar's and the Status bar's heights, which the admin's pickers keep clear.
 const TOP_BAR_PX = 56;
 const STATUS_BAR_PX = 28;
@@ -38,6 +36,12 @@ interface MediaPickerHostProps {
   primary?: boolean;
   /** The admin sets it while the picker's place is taken, so an open picker closes. */
   suspended?: boolean;
+  /**
+   * The Media pane is open. Opening it closes an open picker; a picker asked for while it is
+   * open closes the pane through `onClosePane` and shows.
+   */
+  paneOpen?: boolean;
+  onClosePane?: () => void;
 }
 
 /**
@@ -48,11 +52,19 @@ interface MediaPickerHostProps {
 export function MediaPickerHost({
   primary = false,
   suspended = false,
+  paneOpen = false,
+  onClosePane,
 }: MediaPickerHostProps) {
   const scope = use(FormScopeContext);
   if (!scope) return null;
   return (
-    <ScopedHost view={scope.view} primary={primary} suspended={suspended} />
+    <ScopedHost
+      view={scope.view}
+      primary={primary}
+      suspended={suspended}
+      paneOpen={paneOpen}
+      onClosePane={onClosePane}
+    />
   );
 }
 
@@ -60,9 +72,12 @@ function ScopedHost({
   view,
   primary,
   suspended,
+  paneOpen,
+  onClosePane,
 }: {
   view: FormViewStore;
-} & Required<MediaPickerHostProps>) {
+} & Omit<Required<MediaPickerHostProps>, 'onClosePane'> &
+  Pick<MediaPickerHostProps, 'onClosePane'>) {
   const id = useId();
   useEffect(
     () => view.getState().claimPickerHost(id, primary),
@@ -75,19 +90,16 @@ function ScopedHost({
     if (suspended && open) view.getState().closePicker();
   }, [view, suspended, open]);
 
-  // A reseed that removed the requesting field leaves no one to adopt the picker.
-  const orphaned = useStore(view, (state) => state.pickerOrphan !== null);
   useEffect(() => {
-    if (!orphaned) return;
-    const timer = setTimeout(
-      () => view.getState().closePicker(),
-      ORPHAN_WAIT_MS
-    );
-    return () => clearTimeout(timer);
-  }, [view, orphaned]);
+    if (paneOpen && open) view.getState().closePicker();
+  }, [view, paneOpen]);
+  useEffect(() => {
+    if (open && paneOpen) onClosePane?.();
+  }, [open]);
 
   return (
     <>
+      {primary || !first ? null : <UploadHost />}
       {first && open && !suspended ? (
         <OpenPicker view={view} primary={primary} />
       ) : null}
@@ -224,9 +236,14 @@ function OpenPicker({
 
   const phone = tier === 'phone';
   const tabletMaximised = tier === 'tablet' && maximised;
-  const region = usePreviewRegion(primary && !phone && !tabletMaximised);
+  const region = usePreviewRegion(primary && !phone);
   const narrow = region !== null && region.width < MIN_REGION_PX;
   const covering = phone || tabletMaximised || narrow;
+
+  // A cover that wins over a maximised picker leaves it restored when the preview widens again.
+  useEffect(() => {
+    if (narrow) setMaximised(false);
+  }, [narrow]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setEntered(true));
@@ -294,16 +311,13 @@ function OpenPicker({
       <MediaPickerPanel
         request={request}
         maximised={maximised}
-        onMaximise={phone ? undefined : () => setMaximised((on) => !on)}
+        onMaximise={
+          phone || narrow ? undefined : () => setMaximised((on) => !on)
+        }
         onClose={close}
       />
     </div>
   );
 
-  return (
-    <>
-      {primary ? null : <UploadHost />}
-      {createPortal(panel, document.body)}
-    </>
-  );
+  return <>{createPortal(panel, document.body)}</>;
 }

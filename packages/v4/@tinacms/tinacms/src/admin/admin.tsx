@@ -884,7 +884,9 @@ function AdminShell({
                   <DocumentErrorPane />
                   <MediaPickerHost
                     primary
-                    suspended={previewExpanded || isMediaRoute}
+                    suspended={previewExpanded}
+                    paneOpen={isMediaRoute}
+                    onClosePane={closeMedia}
                   />
                   {typeof preview === 'string' ? null : (
                     <PreviewNodeSlot preview={preview} />

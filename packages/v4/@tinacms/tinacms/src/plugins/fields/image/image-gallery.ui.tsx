@@ -40,7 +40,7 @@ export function ImageGallery() {
 
   const picker = useMediaPicker();
   const parentLabel = useParentLabel(address);
-  const { owner, target: openTarget, adopted } = useOwnedPicker(address);
+  const { owner, target: openTarget } = useOwnedPicker();
   const tilePrefix = `${owner}/tile:`;
   const addTarget = `${owner}/add`;
   const choosingAdd = openTarget === addTarget;
@@ -121,14 +121,7 @@ export function ImageGallery() {
   };
 
   const opener = useRef<HTMLElement | null>(null);
-  // A reseed remounts the gallery under an open Add picker, and a slow load can flip a
-  // tile's `missing` after its picker opened. Both send the request again.
-  useEffect(() => {
-    if (!adopted) return;
-    if (choosingAdd) picker.open(addRequest(opener.current));
-    // A reseed regenerates the item keys, so a held tile target can no longer be trusted.
-    else if (choosingKey !== undefined) picker.close();
-  }, [adopted]);
+  // A slow load can flip a tile's `missing` after its picker opened: send the request again.
   const choosingMissing = choosingKey !== undefined && missing.has(choosingKey);
   useEffect(() => {
     if (choosingKey !== undefined) {
