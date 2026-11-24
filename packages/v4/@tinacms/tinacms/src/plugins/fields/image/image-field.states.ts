@@ -215,6 +215,10 @@ export const imageGalleryStates = [
     props: { ...galleryBase, items: galleryItems, choosingKey: 'b' },
   },
   {
+    name: 'gallery adding',
+    props: { ...galleryBase, items: galleryItems, choosingAdd: true },
+  },
+  {
     name: 'gallery read-only and empty',
     props: { ...galleryBase, readOnly: true },
   },

@@ -438,6 +438,17 @@ describe('image gallery states', () => {
     );
   });
 
+  it('shows the choosing look on the Add tile, and on no picture', () => {
+    render(<ImageGalleryView {...imageGalleryState('gallery adding')} />);
+    expect(screen.getAllByText('Choosing in the picker')).toHaveLength(1);
+    expect(screen.getByAltText('team.jpg').parentElement).not.toHaveClass(
+      'border-field-active-border'
+    );
+    expect(screen.getByRole('button', { name: 'Add images' })).toHaveClass(
+      'border-field-active-border'
+    );
+  });
+
   it('shows tiles 4:3', () => {
     render(<ImageGalleryView {...imageGalleryState('gallery filled')} />);
     expect(screen.getByAltText('about.png').parentElement).toHaveClass(

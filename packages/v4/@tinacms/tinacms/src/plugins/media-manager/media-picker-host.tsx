@@ -16,10 +16,19 @@ import { useStore } from 'zustand';
 import { useCurrentBranch } from '../../editor/content-queries';
 import { FormScopeContext } from '../../editor/context';
 import type { FormViewStore } from '../../editor/form-view-state';
+import { useFormStore } from '../../form/form-store';
 import { UploadHost } from '../../editor/uploads/upload-host';
 import { MediaPickerPanel } from './media-picker';
 
 const PREVIEW_SLOT = '[data-preview-slot]';
+const FORM_REGION = '[data-form-id]';
+// How long after a form-driven close a new form column may take focus.
+const REGION_FOCUS_MS = 3000;
+
+const focusFormRegion = () => {
+  const region = document.querySelector<HTMLElement>(FORM_REGION);
+  region?.focus();
+};
 const POPOVER_WIDTH_PX = 400;
 const INSET_PX = 12;
 // Under this preview width the popover would squeeze the header, so it covers the page instead.
@@ -223,15 +232,16 @@ function OpenPicker({
   primary: boolean;
 }) {
   const request = useStore(view, (state) => state.picker);
+  const formId = use(FormScopeContext)?.formId;
   const tier = useTier();
   const keyboard = useKeyboardOpen();
   const area = useVisibleArea();
   const [maximised, setMaximised] = useState(false);
   const [root, setRoot] = useState<HTMLDivElement | null>(null);
   const [entered, setEntered] = useState(false);
-  const restore = useRef<{ opener: HTMLElement | null; focus: boolean }>({
+  // `focus` is set by a close the user made. Left unset, the form closed the picker.
+  const restore = useRef<{ opener: HTMLElement | null; focus?: boolean }>({
     opener: null,
-    focus: false,
   });
 
   const phone = tier === 'phone';
@@ -259,9 +269,17 @@ function OpenPicker({
   useEffect(
     () => () => {
       const { opener, focus } = restore.current;
-      if (focus && opener?.isConnected) opener.focus();
+      if (focus === false) return;
+      if (opener?.isConnected) opener.focus();
+      else {
+        // The field is gone. Another field now at its address must not take focus from the active mark.
+        const { active, setActive } = useFormStore.getState();
+        if (active?.formId === formId) setActive(formId, null);
+        focusFormRegion();
+      }
+      if (focus === undefined) view.getState().armRegionFocus(REGION_FOCUS_MS);
     },
-    []
+    [view, formId]
   );
 
   const close = (restoreFocus: boolean) => {

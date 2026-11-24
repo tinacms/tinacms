@@ -862,6 +862,85 @@ describe('a reseed that removes the picker target', () => {
   });
 });
 
+describe('focus when the form closes the picker', () => {
+  const region = (
+    <div data-form-id='stand-in' tabIndex={-1} data-testid='region' />
+  );
+  const focusedRegion = () =>
+    vi.waitFor(() => expect(screen.getByTestId('region')).toHaveFocus());
+  const gone = () =>
+    vi.waitFor(() =>
+      expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+    );
+
+  it('returns to the opener when it is still in the page', async () => {
+    renderField(undefined, [], schema, region);
+    const opener = within(await group('Hero')).getByRole('button', {
+      name: 'Choose from Media',
+    });
+    await userEvent.click(opener);
+    await picker();
+    act(() => view?.getState().closePicker());
+    await gone();
+    expect(opener).toHaveFocus();
+  });
+
+  it('goes to the form region when a drill-out removed the opener', async () => {
+    const nested: CollectionSchema = {
+      name: 'post',
+      format: 'mdx',
+      fields: [
+        t.array({
+          name: 'slides',
+          label: 'Slides',
+          fields: [t.image({ name: 'image', label: 'Slide image' })],
+        }),
+      ],
+    };
+    renderField({ slides: [{}] }, [], nested, region);
+    const head = await screen.findByRole('button', { name: /^Item 1/ });
+    await userEvent.click(head);
+    await userEvent.click(
+      within(await group('Slide image')).getByRole('button', {
+        name: 'Choose from Media',
+      })
+    );
+    await picker();
+    await userEvent.click(head);
+    await gone();
+    await focusedRegion();
+  });
+
+  it.each([
+    ['gallery Add', 'Add images', 'Choose images'],
+    ['gallery tile Replace', 'Replace photo.jpg', 'Choose an image'],
+  ])(
+    'goes to the form region after Discard removed the %s opener',
+    async (_name, button, title) => {
+      renderField({ images: [] }, [], schema, region);
+      const images = await group('Images');
+      await userEvent.click(
+        within(images).getByRole('button', { name: 'Add images' })
+      );
+      await userEvent.click(await tile('photo.jpg'));
+      await userEvent.click(
+        within(await picker('Choose images')).getByRole('button', {
+          name: 'Add image',
+        })
+      );
+      await userEvent.click(
+        within(images).getByRole('button', { name: button })
+      );
+      await picker(title);
+      act(() => {
+        scopeOf?.discardEdits();
+      });
+      await gone();
+      await focusedRegion();
+    }
+  );
+});
+
 describe('a picker whose requester a reseed unmounted', () => {
   const nested: CollectionSchema = {
     name: 'post',
@@ -879,7 +958,12 @@ describe('a picker whose requester a reseed unmounted', () => {
   };
 
   it('closes at once on Discard and writes nothing, even when another item asked', async () => {
-    renderField({ authors: [{ name: 'Ivan' }, { name: 'Josh' }] }, [], nested);
+    renderField(
+      { authors: [{ name: 'Ivan' }, { name: 'Josh' }] },
+      [],
+      nested,
+      <div data-form-id='stand-in' tabIndex={-1} data-testid='region' />
+    );
     for (const head of await screen.findAllByRole('button', {
       name: /^Item \d:/,
     })) {
@@ -908,5 +992,6 @@ describe('a picker whose requester a reseed unmounted', () => {
       { name: 'Ivan', avatar: null },
       { name: 'Josh', avatar: null },
     ]);
+    await vi.waitFor(() => expect(screen.getByTestId('region')).toHaveFocus());
   });
 });

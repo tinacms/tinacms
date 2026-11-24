@@ -186,6 +186,7 @@ function Probes() {
   return (
     <>
       <span data-testid='status'>{status}</span>
+      <div data-form-id='stand-in' tabIndex={-1} data-testid='region' />
       <button type='button' onClick={discard}>
         discard
       </button>
@@ -658,11 +659,10 @@ describe('the media picker when stored edits resume', () => {
     act(simulateReload);
 
     renderField({ title: 'Hello' });
-    await userEvent.click(
-      within(await fieldGroup('Cover')).getByRole('button', {
-        name: 'Choose from Media',
-      })
-    );
+    const opener = within(await fieldGroup('Cover')).getByRole('button', {
+      name: 'Choose from Media',
+    });
+    await userEvent.click(opener);
     expect(
       await screen.findByRole('region', { name: 'Choose an image' })
     ).toBeVisible();
@@ -673,6 +673,7 @@ describe('the media picker when stored edits resume', () => {
       expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
     );
     expect(valueOf('cover')).toBeNull();
+    expect(opener).toHaveFocus();
   });
 });
 

@@ -100,6 +100,8 @@ export async function checkForm(
   trigger: () => Promise<boolean>
 ): Promise<boolean> {
   view.getState().attemptSave();
+  // The save starts here: a picker left open would write into a form that is saving.
+  view.getState().closePicker();
   const valid = await trigger();
   const store = useFormStore.getState();
   if (!valid) {

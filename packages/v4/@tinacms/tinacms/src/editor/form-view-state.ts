@@ -102,6 +102,12 @@ export interface FormViewState {
   pickerTuckedPane: boolean;
   /** Ids of the mounted picker hosts. The first one draws, and the admin's primary host goes first. */
   pickerHosts: readonly string[];
+  /**
+   * Until this time (ms), a form column that mounts takes focus if focus fell to `body`. A close
+   * that is not the user's sets it, because the opener may leave with the remount that follows.
+   */
+  regionFocusUntil: number;
+  armRegionFocus: (ms: number) => void;
   /** Changes when the picker serves another requester, so the panel resets its picks. */
   pickerSerial: number;
   openPicker: (request: MediaPickerRequest) => void;
@@ -282,6 +288,8 @@ export const createFormViewStore = (): FormViewStore => {
     picker: null,
     pickerTuckedPane: false,
     pickerHosts: [],
+    regionFocusUntil: 0,
+    armRegionFocus: (ms) => set({ regionFocusUntil: Date.now() + ms }),
     pickerSerial: 0,
     openPicker: (request) =>
       set((state) => {

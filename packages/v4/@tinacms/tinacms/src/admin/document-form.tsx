@@ -22,6 +22,7 @@ import {
   use,
   useEffect,
   useEffectEvent,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -814,6 +815,14 @@ function FormFields({ scope }: { scope: FormScope }) {
 
 export function DocumentForm() {
   const scope = use(FormScopeContext);
+  const regionRef = useRef<HTMLDivElement>(null);
+  const view = scope?.view;
+  useLayoutEffect(() => {
+    if (!view || view.getState().regionFocusUntil < Date.now()) return;
+    view.getState().armRegionFocus(0);
+    const focused = document.activeElement;
+    if (!focused || focused === document.body) regionRef.current?.focus();
+  }, [view]);
   if (!scope) return null;
 
   return (
@@ -822,7 +831,9 @@ export function DocumentForm() {
       <StorageWarning scope={scope} />
       <ActiveFieldLevels scope={scope} />
       <div
-        className='min-h-0 flex-1 overflow-y-auto'
+        ref={regionRef}
+        tabIndex={-1}
+        className='min-h-0 flex-1 overflow-y-auto outline-none'
         {...formRootProps(scope.formId)}
       >
         <FormFields scope={scope} />
