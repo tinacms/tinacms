@@ -189,8 +189,10 @@ function BranchActionScreen() {
   const runtime = use(TinaRuntimeContext);
   useEffect(() => {
     if (!runtime) return;
-    createDirect = (name, from) =>
-      runtime.store.getState().branch?.create?.(name, from);
+    createDirect = (name, from) => {
+      const create = runtime.store.getState().branch?.create;
+      if (typeof create === 'function') create(name, from);
+    };
     const action = saveToNewBranch;
     if (!action) return;
     dropAction = () =>
