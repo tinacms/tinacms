@@ -208,6 +208,27 @@ test.describe('tablet', () => {
     await expect(picker.getByText('0 picked')).toBeVisible();
   });
 
+  test('covers the page with no Maximise when the preview is under 440px', async ({
+    page,
+  }) => {
+    await page.goto(HOME);
+    const picker = await openPicker(page);
+    await expect(picker.getByRole('button', { name: 'Maximise' })).toHaveCount(
+      0
+    );
+    await expect(picker.getByRole('button', { name: 'Restore' })).toHaveCount(
+      0
+    );
+    const rect = await box(page.locator('[data-slot=media-picker-host]'));
+    expect(Math.round(rect.x)).toBe(0);
+    expect(Math.round(rect.width)).toBe(1024);
+    expect(Math.round(rect.y)).toBe(TOP_BAR);
+  });
+});
+
+test.describe('tablet with a wide enough preview', () => {
+  test.use({ viewport: { width: 1100, height: 800 } });
+
   test('Maximise fills the space below the top bar, form included', async ({
     page,
   }) => {
@@ -217,11 +238,30 @@ test.describe('tablet', () => {
     await page.waitForTimeout(300);
     const rect = await box(page.locator('[data-slot=media-picker-host]'));
     expect(Math.round(rect.x)).toBe(0);
-    expect(Math.round(rect.width)).toBe(1024);
+    expect(Math.round(rect.width)).toBe(1100);
     expect(Math.round(rect.y)).toBe(TOP_BAR);
     const covered = await box(heroField(page));
     expect(covered.x + covered.width).toBeLessThanOrEqual(rect.x + rect.width);
     expect(covered.x).toBeGreaterThanOrEqual(rect.x);
+  });
+
+  test('narrowing to 1024px swaps the maximised picker for the cover with no Restore, and widening restores the popover', async ({
+    page,
+  }) => {
+    await page.goto(HOME);
+    const picker = await openPicker(page);
+    await picker.getByRole('button', { name: 'Maximise' }).click();
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await expect(picker.getByRole('button', { name: 'Restore' })).toHaveCount(
+      0
+    );
+    await expect(picker.getByRole('button', { name: 'Maximise' })).toHaveCount(
+      0
+    );
+    await page.setViewportSize({ width: 1100, height: 800 });
+    await expect(
+      picker.getByRole('button', { name: 'Maximise' })
+    ).toBeVisible();
   });
 });
 
