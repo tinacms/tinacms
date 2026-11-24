@@ -58,6 +58,19 @@ test.describe('branch switcher pop-up', () => {
     await expect(view).toBeHidden();
   });
 
+  test('puts focus back on the branch button after picking a branch in the maximised view', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto('/branches.html?docs=1&many=3#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'Maximise' }).click();
+    const view = page.locator('[data-slot="branch-maximised"]');
+    await view.locator('[data-branch-row]:not([aria-current])').first().click();
+    await expect(view).toBeHidden();
+    await expect(page.getByRole('button', { name: /^Branch:/ })).toBeFocused();
+  });
+
   test('maximises between the Top bar and the Status bar and restores with the search kept', async ({
     page,
   }) => {
@@ -889,6 +902,51 @@ test.describe('branch switcher pop-up', () => {
         view.getByRole('form', { name: 'New branch form' })
       ).toBeVisible();
       await expect(name).toBeFocused();
+    });
+
+    test(`keeps the typed name when the form create fails while the ${frame.name} is closed`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=fail#/');
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      await makeBranch(page, view);
+      await page.keyboard.press('Escape');
+      await expect(page.getByText("Couldn't create cms/x")).toBeVisible();
+      await openFrame(page, frame.maximise);
+      await expect(
+        frameOf(page, frame.maximise).getByRole('searchbox', {
+          name: 'New branch name',
+        })
+      ).toHaveValue('cms/x');
+    });
+
+    test(`takes the failure toast back after the failed form is emptied and the ${frame.name} closed`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=fail#/');
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      await makeBranch(page, view);
+      await expect(
+        view.getByText(/Couldn't create cms\/x\. Check/)
+      ).toBeVisible({
+        timeout: 5000,
+      });
+      await view.getByRole('searchbox', { name: 'New branch name' }).fill('');
+      await page.keyboard.press('Escape');
+      await expect(
+        page.locator('[data-sonner-toast]').getByText("Couldn't create cms/x")
+      ).toBeVisible();
+      await openFrame(page, frame.maximise);
+      await expect(
+        frameOf(page, frame.maximise).getByText(
+          /Couldn't create cms\/x\. Check/
+        )
+      ).toBeVisible();
+      await expect.poll(() => toastCount(page)).toBe(0);
     });
 
     test(`keeps Create branch off for an empty name in the ${frame.name}`, async ({

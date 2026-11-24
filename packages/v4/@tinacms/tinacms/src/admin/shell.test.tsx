@@ -2184,6 +2184,38 @@ describe('branch switcher rows and creating a branch', () => {
     await waitFor(() => expect(toasts()).toHaveLength(0));
   });
 
+  it('keeps the typed name and the form when the form create fails while the switcher is closed', async () => {
+    const { user } = await failWhileClosed();
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(
+      await within(dialog).findByRole('searchbox', { name: 'New branch name' })
+    ).toHaveValue('cms/x');
+  });
+
+  it('takes the failure toast back after the failed form create is emptied and the switcher closed', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    createBranch = vi.fn<NonNullable<BranchSource['create']>>(() =>
+      Promise.reject(new Error('offline'))
+    );
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await within(dialog).findByText(/Couldn't create cms\/x\. Check/);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Clear name' })
+    );
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    await screen.findByText("Couldn't create cms/x");
+    await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(
+      await within(reopened).findByText(/Couldn't create cms\/x\. Check/)
+    ).toBeVisible();
+    await waitFor(() => expect(toasts()).toHaveLength(0));
+  });
+
   it('retries from the note, and focuses the search box only when the retry started', async () => {
     const { user, rejects } = await failWhileClosed();
     await user.click(screen.getByRole('button', { name: /^Branch:/ }));
@@ -2351,7 +2383,7 @@ describe('branch switcher rows and creating a branch', () => {
     await user.click(retry);
     const warnings = () =>
       screen.queryAllByText('Save or discard your changes first');
-    expect(warnings()).toHaveLength(1);
+    await waitFor(() => expect(warnings()).toHaveLength(1));
     await user.clear(title);
     await user.type(title, 'Hello');
     await waitFor(() => expect(readAnyFormDirty()).toBe(false));
@@ -2363,7 +2395,7 @@ describe('branch switcher rows and creating a branch', () => {
     await user.click(switchTo);
     await user.click(switchTo);
     await user.click(switchTo);
-    expect(warnings()).toHaveLength(1);
+    await waitFor(() => expect(warnings()).toHaveLength(1));
   });
 
   it('shows one wait warning however often Retry is pressed while another create runs', async () => {
@@ -2384,8 +2416,10 @@ describe('branch switcher rows and creating a branch', () => {
     await user.click(retry);
     await user.click(retry);
     await user.click(retry);
-    expect(screen.getAllByText('Wait for cms/y to finish first')).toHaveLength(
-      1
+    await waitFor(() =>
+      expect(
+        screen.getAllByText('Wait for cms/y to finish first')
+      ).toHaveLength(1)
     );
     expect(screen.getByText("Couldn't create cms/x")).toBeVisible();
   });

@@ -432,6 +432,45 @@ describe('createBranch', () => {
     ).rejects.toMatchObject({ status: 422 });
   });
 
+  it('abandons a create request that never answers, aborts it and rejects', async () => {
+    vi.useFakeTimers();
+    let signal: AbortSignal | undefined | null;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        (_url: string, init?: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            signal = init?.signal;
+            init?.signal?.addEventListener('abort', () =>
+              reject(new DOMException('aborted', 'AbortError'))
+            );
+          })
+      )
+    );
+    const pending = createTinaCloudClient({
+      clientId: 'abc',
+      getToken: async () => 'secret',
+      createTimeoutMs: 1000,
+    }).createBranch({ name: 'cms/x', from: 'main' });
+    const assertion = expect(pending).rejects.toThrow(/in time/);
+    await vi.advanceTimersByTimeAsync(1500);
+    await assertion;
+    expect(signal?.aborted).toBe(true);
+  });
+
+  it('abandons a create when the token read never answers', async () => {
+    vi.useFakeTimers();
+    stubFetch();
+    const pending = createTinaCloudClient({
+      clientId: 'abc',
+      getToken: () => new Promise<string>(() => {}),
+      createTimeoutMs: 1000,
+    }).createBranch({ name: 'cms/x', from: 'main' });
+    const assertion = expect(pending).rejects.toThrow(/in time/);
+    await vi.advanceTimersByTimeAsync(1500);
+    await assertion;
+  });
+
   it('rejects without a request when there is no token', async () => {
     const fetchMock = stubFetch();
     await expect(

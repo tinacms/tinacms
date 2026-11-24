@@ -977,11 +977,47 @@ describe('Branch switcher controls', () => {
     rerender(<BranchSwitcher {...props} createState='creating' />);
     rerender(<BranchSwitcher {...props} createState='failed' />);
     rerender(<BranchSwitcher {...props} createState='creating' />);
-    rerender(<BranchSwitcher {...props} createState='idle' />);
+    rerender(<BranchSwitcher {...props} createState='done' />);
     await user.click(screen.getByRole('button', { name: 'New branch' }));
     expect(
       screen.getByRole('searchbox', { name: 'New branch name' })
     ).toHaveValue('');
+  });
+
+  it('keeps the typed name when the form create ends without finishing, as when its failure is held elsewhere', async () => {
+    const user = userEvent.setup();
+    const props = {
+      current: 'feature/news',
+      branches: entries,
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    const name = screen.getByRole('searchbox', { name: 'New branch name' });
+    await user.type(name, 'cms/a');
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    rerender(<BranchSwitcher {...props} createState='idle' />);
+    expect(name).toHaveValue('cms/a');
+  });
+
+  it('puts focus back on the branch button after a branch is picked in the maximised view', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        defaultOpen
+        defaultMaximised
+      />
+    );
+    await user.click(screen.getByRole('button', { name: /^fix\/typo/ }));
+    expect(document.querySelector('[data-slot="branch-maximised"]')).toBeNull();
+    expect(screen.getByRole('button', { name: /^Branch:/ })).toHaveFocus();
   });
 
   it('closes the maximised view on Escape even when focus is on the page body', async () => {

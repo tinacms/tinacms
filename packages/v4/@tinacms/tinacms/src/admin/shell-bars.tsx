@@ -50,6 +50,11 @@ type Outcome =
 
 const DIRTY_REASON = 'Save or discard your changes first';
 
+const sameOutcome = (a: Outcome, b: Outcome): boolean =>
+  a.kind === b.kind &&
+  a.name === b.name &&
+  (a.kind !== 'failed' || (b.kind === 'failed' && a.from === b.from));
+
 /**
  * The branch button. Owns whether the switcher is open and what the last create ended in. While
  * the switcher is open that outcome shows as a note inside it; a toast is sent only once the
@@ -67,6 +72,8 @@ function BranchControl() {
   const [formShown, setFormShown] = useState(false);
   const [formTyped, setFormTyped] = useState(false);
   const [deferred, setDeferred] = useState<Outcome>();
+  // The form's own create ended ready or unready, so the form can reset (a failure keeps its text).
+  const [formDone, setFormDone] = useState(false);
   const released = useRef<Outcome>(undefined);
   const startedVia = useRef<'form' | 'note'>('form');
   const entries = useBranchEntries(branch, open);
@@ -77,8 +84,16 @@ function BranchControl() {
     open: boolean;
     formShown: boolean;
     formTyped: boolean;
+    failed: CreateRequest | undefined;
     startCreate: (request: CreateRequest, via?: 'form' | 'note') => boolean;
-  }>({ branch, open, formShown, formTyped, startCreate: () => false });
+  }>({
+    branch,
+    open,
+    formShown,
+    formTyped,
+    failed: undefined,
+    startCreate: () => false,
+  });
   const startCreate = (
     request: CreateRequest,
     via: 'form' | 'note' = 'form'
@@ -94,6 +109,7 @@ function BranchControl() {
     }
     setFailed(undefined);
     setHeld(undefined);
+    setFormDone(false);
     setReason(undefined);
     startedVia.current = via;
     create?.(request.name, request.from);
@@ -153,7 +169,14 @@ function BranchControl() {
   }, [currentName, held]);
 
   const result = branch?.createResult;
-  latest.current = { branch, open, formShown, formTyped, startCreate };
+  latest.current = {
+    branch,
+    open,
+    formShown,
+    formTyped,
+    failed,
+    startCreate,
+  };
   useEffect(() => {
     if (!result) return;
     const { branch: view, open: isOpen } = latest.current;
@@ -188,6 +211,7 @@ function BranchControl() {
       return;
     }
     setFailed(undefined);
+    if (startedVia.current === 'form') setFormDone(true);
     if (outcome === 'unready') {
       settle({ kind: 'unready', name });
       return;
@@ -243,7 +267,7 @@ function BranchControl() {
       sent.current = undefined;
       return;
     }
-    if (sent.current?.outcome === outcome) return;
+    if (sent.current && sameOutcome(sent.current.outcome, outcome)) return;
     if (sent.current) toast.dismiss(sent.current.id);
     const act = (id: () => string | number, run: () => boolean | void) => {
       let accepted = false;
@@ -316,7 +340,12 @@ function BranchControl() {
       onFormChange={(shown, typed) => {
         setFormShown(shown);
         setFormTyped(typed);
-        if (!shown) setFailed(undefined);
+        if (!shown) {
+          // A failure the closed switcher showed as a toast stays one when the form goes.
+          const { failed: pending, open: isOpen } = latest.current;
+          if (pending && !isOpen) setHeld({ kind: 'failed', ...pending });
+          setFailed(undefined);
+        }
       }}
       note={
         held
@@ -342,7 +371,9 @@ function BranchControl() {
                 formShown &&
                 startedVia.current === 'form')
             ? 'failed'
-            : 'idle'
+            : formDone
+              ? 'done'
+              : 'idle'
       }
     />
   );

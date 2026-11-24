@@ -18,6 +18,7 @@ const POLL_TIMEOUT_MS = 30_000;
 const INDEX_POLL_MS = 5000;
 
 const INDEX_TIMEOUT_MS = 15 * 60 * 1000;
+const CREATE_TIMEOUT_MS = 60 * 1000;
 
 const MAX_UNKNOWN_INDEX_STATUSES = 6;
 
@@ -72,6 +73,8 @@ export interface TinaCloudClientOptions extends TinaCloudOptions {
   indexPollMs?: number;
   /** How long a new branch may take to index before `ready` rejects. */
   indexTimeoutMs?: number;
+  /** How long the create request may take before it is abandoned. Default one minute. */
+  createTimeoutMs?: number;
 }
 
 const bodyMessage = (body: unknown): string | undefined => {
@@ -306,14 +309,42 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     name: string;
     from: string;
   }): Promise<{ name: string; ready: Promise<void> }> => {
-    const body = await authedFetch(
-      `${TINACLOUD_CONTENT_URL}/github/${options.clientId}/create_branch`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ baseBranch: from, branchName: name }),
-      }
+    const deadline = new AbortController();
+    const timer = setTimeout(
+      () => deadline.abort(),
+      options.createTimeoutMs ?? CREATE_TIMEOUT_MS
     );
+    const expired = new Promise<never>((_resolve, reject) => {
+      deadline.signal.addEventListener(
+        'abort',
+        () =>
+          reject(
+            new TinaCloudError(
+              `TinaCloud did not answer the request to create branch ${name} in time.`,
+              {}
+            )
+          ),
+        { once: true }
+      );
+    });
+    expired.catch(() => {});
+    let body: unknown;
+    try {
+      body = await Promise.race([
+        authedFetch(
+          `${TINACLOUD_CONTENT_URL}/github/${options.clientId}/create_branch`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ baseBranch: from, branchName: name }),
+            signal: deadline.signal,
+          }
+        ),
+        expired,
+      ]);
+    } finally {
+      clearTimeout(timer);
+    }
     const parsed = createBranchResponseSchema.safeParse(body);
     const ref = parsed.success ? parsed.data.data?.ref : undefined;
     const made = ref?.startsWith(HEADS_PREFIX)

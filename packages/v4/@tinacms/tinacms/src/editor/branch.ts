@@ -7,7 +7,12 @@ import {
   branchSliceOf,
   currentBranchOf,
 } from '../core/branch/contract';
-import { createBranchAction, madeBranchesOf } from '../core/branch/create';
+import {
+  createBranchAction,
+  forgetMadeBranches,
+  madeBranchesOf,
+  tickClock,
+} from '../core/branch/create';
 import { TinaRuntimeContext } from './context';
 import { useOptionalContentSlice, useTinaStore } from './hooks';
 
@@ -39,6 +44,7 @@ export function useBranchSync(): void {
           })
         : undefined,
     });
+    const startedAt = tickClock();
     Promise.all([source.list(), source.defaultBranch()]).then(
       ([branches, fallback]) => {
         if (cancelled) return;
@@ -48,11 +54,25 @@ export function useBranchSync(): void {
           slice?.creating?.phase === 'preparing'
             ? slice.creating.name
             : undefined;
+        const made = madeBranchesOf(store);
+        const omitted = made.filter(
+          ({ name, settledAt }) =>
+            settledAt !== null &&
+            settledAt < startedAt &&
+            !names.includes(name) &&
+            !slice?.unready.includes(name)
+        );
+        forgetMadeBranches(
+          store,
+          omitted.map(({ name }) => name)
+        );
         const kept = [
           ...new Set([
             ...(slice?.unready ?? []),
             ...(pending ? [pending] : []),
-            ...madeBranchesOf(store),
+            ...made
+              .map(({ name }) => name)
+              .filter((name) => !omitted.some((gone) => gone.name === name)),
           ]),
         ];
         fill({

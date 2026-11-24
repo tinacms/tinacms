@@ -72,7 +72,7 @@ type BranchSwitcherProps = {
   /** Called when the New branch form opens or closes, or its name goes empty or not, so the caller knows whether an inline failure will be seen and whether typed text would be lost. */
   onFormChange?: (shown: boolean, typed: boolean) => void;
   /** `creating` shows "Creating" on the form; `failed` keeps the form with a Retry. */
-  createState?: 'idle' | 'creating' | 'failed';
+  createState?: 'idle' | 'creating' | 'failed' | 'done';
   /** The outcome of a create, shown above the list while the switcher is open. One at a time. */
   note?: BranchNote;
   /** Runs the note's action (Retry, or Switch). Return false when it was refused: the note stays. */
@@ -393,18 +393,17 @@ function BranchSwitcher({
   }, [failed, maximised]);
   useEffect(() => setDismissed(false), [createState]);
 
-  // A create that finished or was given up returns to the list; a failed one keeps the form.
-  const lastCreateState = useRef(createState);
+  // A create the form made that finished returns to the list; one that failed keeps the form.
+  const formCreated = useRef(false);
   useEffect(() => {
-    if (lastCreateState.current === 'creating') {
-      if (createState === 'idle') {
-        setCreating(false);
-        setNewName('');
-        setSubmitted(false);
-        setStartFrom('current');
-      }
+    if (createState === 'creating') formCreated.current = true;
+    if (createState === 'done' && formCreated.current) {
+      formCreated.current = false;
+      setCreating(false);
+      setNewName('');
+      setSubmitted(false);
+      setStartFrom('current');
     }
-    lastCreateState.current = createState;
   }, [createState]);
 
   // An open switcher belongs to the tier it opened on. Crossing 768px closes it before the other
@@ -494,7 +493,8 @@ function BranchSwitcher({
   );
   const pick = (name: string) => {
     onSwitch(name);
-    setOpen(false);
+    if (maximised) closeAndFocusButton();
+    else setOpen(false);
   };
 
   const submit = () => {
@@ -570,8 +570,9 @@ function BranchSwitcher({
         <OutcomeNote
           note={note}
           onAction={() => {
-            if (onNoteAction?.() !== false && note.kind === 'failed')
-              focusField('search');
+            if (onNoteAction?.() === false) return;
+            if (note.kind === 'failed') focusField('search');
+            else if (maximised) triggerRef.current?.focus();
           }}
           onDismiss={() => {
             onNoteDismiss?.();

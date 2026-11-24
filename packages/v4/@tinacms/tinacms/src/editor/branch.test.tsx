@@ -152,7 +152,7 @@ describe('useBranchSync list re-read that outlasts a create', () => {
   const names = (view: ReturnType<typeof useBranchView>) =>
     view?.branches.map((branch) => branch.name);
 
-  it('keeps a branch that ended ready when the older list resolves late, and again when a later read omits it', async () => {
+  it('keeps a branch that ended ready when the older list resolves late, and drops it once a read that started after it settled omits it', async () => {
     const { view, reads, finish } = setup();
     await waitFor(() => expect(reads).toHaveLength(1));
     act(() => reads[0]());
@@ -170,7 +170,7 @@ describe('useBranchSync list re-read that outlasts a create', () => {
     await waitFor(() => expect(reads).toHaveLength(3));
     act(() => reads[2]());
     await waitFor(() => expect(view.result.current?.listState).toBe('ready'));
-    expect(names(view.result.current)).toEqual(['main', 'cms/n']);
+    expect(names(view.result.current)).toEqual(['main']);
   });
 
   it('does not switch away from a branch that ended ready when the older list omits it', async () => {
@@ -187,5 +187,9 @@ describe('useBranchSync list re-read that outlasts a create', () => {
     act(() => reads[1]());
     await waitFor(() => expect(view.result.current?.listState).toBe('ready'));
     expect(view.result.current?.name).toBe('cms/n');
+    act(() => view.result.current?.retryList());
+    await waitFor(() => expect(reads).toHaveLength(3));
+    act(() => reads[2]());
+    await waitFor(() => expect(view.result.current?.name).toBe('main'));
   });
 });

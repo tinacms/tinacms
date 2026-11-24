@@ -9,15 +9,40 @@ import {
 
 type Creatable = BranchSource & Required<Pick<BranchSource, 'create'>>;
 
-const madeByStore = new WeakMap<StoreApi<TinaStoreState>, Set<string>>();
+let clock = 0;
+
+/** Orders list reads against creates: a later value happened later. */
+export const tickClock = (): number => {
+  clock += 1;
+  return clock;
+};
+
+/** Branch name to when its create settled, or null while it is still being made. */
+const madeByStore = new WeakMap<
+  StoreApi<TinaStoreState>,
+  Map<string, number | null>
+>();
 
 /**
  * Branches this page session made. A list read that started before the provider knew of them
- * can resolve without them, so the list sync puts them back.
+ * can resolve without them, so the list sync puts them back. A read that started after the
+ * create settled is the provider's answer: `forgetMadeBranches` drops the ones it omits.
  */
-export const madeBranchesOf = (store: StoreApi<TinaStoreState>): string[] => [
-  ...(madeByStore.get(store) ?? []),
-];
+export const madeBranchesOf = (
+  store: StoreApi<TinaStoreState>
+): { name: string; settledAt: number | null }[] =>
+  [...(madeByStore.get(store) ?? [])].map(([name, settledAt]) => ({
+    name,
+    settledAt,
+  }));
+
+export const forgetMadeBranches = (
+  store: StoreApi<TinaStoreState>,
+  names: string[]
+): void => {
+  const made = madeByStore.get(store);
+  for (const name of names) made?.delete(name);
+};
 
 /**
  * The `branch.create` slice action: makes the branch through the provider and records
@@ -35,6 +60,8 @@ export const createBranchAction =
     const finish = (made: string, outcome: 'ready' | 'unready' | 'failed') => {
       if (settled) return;
       settled = true;
+      const madeNames = madeByStore.get(store);
+      if (madeNames?.has(made)) madeNames.set(made, tickClock());
       const unready = branchSliceOf(store.getState())?.unready ?? [];
       fill({
         unready:
@@ -73,7 +100,7 @@ export const createBranchAction =
         try {
           madeByStore.set(
             store,
-            new Set([...(madeByStore.get(store) ?? []), made])
+            new Map([...(madeByStore.get(store) ?? []), [made, null]])
           );
           const slice = branchSliceOf(store.getState());
           fill({
