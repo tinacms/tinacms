@@ -55,16 +55,15 @@ export function useBranchEntries(
   const counts = useUnsavedCounts(names, branch?.defaultBranch, open);
   if (!branch) return [];
   const creating = branch.creating?.name;
+  const unready = (name: string) =>
+    branch.unready.includes(name) && name !== branch.name;
   const rows = branch.branches.map((entry) => ({
     name: entry.name,
     protected: entry.protected,
     pullRequest: parsePullRequest(pullRequests?.[entry.name])?.number,
     unsaved: counts[entry.name],
-    ready:
-      entry.name === creating ||
-      (branch.unready.includes(entry.name) && entry.name !== branch.name)
-        ? false
-        : undefined,
+    ready: entry.name === creating || unready(entry.name) ? false : undefined,
+    unready: entry.name !== creating && unready(entry.name) ? true : undefined,
   }));
   return [
     ...rows.filter((row) => row.name === creating),

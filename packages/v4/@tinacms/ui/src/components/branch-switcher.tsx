@@ -40,6 +40,8 @@ type BranchEntry = {
   unsaved?: number;
   /** `false` while the branch is still being made: its row is greyed and cannot be picked. */
   ready?: boolean;
+  /** With `ready: false`: the branch was made but never became ready. It is disabled with no spinner, until a reload. */
+  unready?: boolean;
 };
 
 /** What a create ended in. `reason` says why the note's action was refused. */
@@ -141,7 +143,7 @@ function BranchLine({
           current && 'bg-pressed font-semibold'
         )}
       >
-        {branch.ready === false ? (
+        {branch.ready === false && !branch.unready ? (
           <Icon
             glyph='spinner'
             size={14}
@@ -158,7 +160,9 @@ function BranchLine({
           {branch.name}
         </span>
         {branch.ready === false ? (
-          <span className='text-xs text-muted-foreground'>Getting ready</span>
+          <span className='text-xs text-muted-foreground'>
+            {branch.unready ? 'Reload to switch' : 'Getting ready'}
+          </span>
         ) : null}
         {branch.pullRequest ? (
           <span className='text-xs text-muted-foreground tabular-nums'>
@@ -472,7 +476,8 @@ function BranchSwitcher({
     ),
   ];
   const protectedBranches = matching.filter(
-    (branch) => branch.protected && branch.name !== current
+    (branch) =>
+      branch.protected && branch.name !== current && branch.ready !== false
   );
   const pick = (name: string) => {
     onSwitch(name);

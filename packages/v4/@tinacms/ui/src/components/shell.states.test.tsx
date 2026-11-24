@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -312,6 +318,64 @@ describe('Branch switcher, the full design', () => {
     expect(ready).toHaveTextContent('Getting ready');
     await user.click(ready);
     expect(onSwitch).not.toHaveBeenCalled();
+  });
+
+  describe.each([
+    ['pop-up', false],
+    ['maximised switcher', true],
+  ])('unready and creating rows in the %s', (_surface, defaultMaximised) => {
+    const rowsFor = (
+      branches: React.ComponentProps<typeof BranchSwitcher>['branches']
+    ) => {
+      render(
+        <BranchSwitcher
+          current='docs/v4-launch'
+          branches={branches}
+          onSwitch={() => {}}
+          defaultOpen
+          defaultMaximised={defaultMaximised}
+        />
+      );
+      return screen
+        .getAllByRole('button')
+        .filter((row) => row.hasAttribute('data-branch-row'));
+    };
+
+    it('shows an unready row disabled with no spinner and Reload to switch, and a creating row with the spinner and Getting ready', () => {
+      const rows = rowsFor([
+        { name: 'docs/v4-launch' },
+        { name: 'cms/unready', ready: false, unready: true },
+        { name: 'cms/making', ready: false },
+      ]);
+      const unready = rows.find((row) =>
+        row.textContent?.includes('cms/unready')
+      );
+      const making = rows.find((row) =>
+        row.textContent?.includes('cms/making')
+      );
+      expect(unready).toHaveAttribute('aria-disabled', 'true');
+      expect(unready).toHaveTextContent('Reload to switch');
+      expect(unready).not.toHaveTextContent('Getting ready');
+      expect(unready?.querySelector('[class*="animate-spin"]')).toBeNull();
+      expect(making).toHaveTextContent('Getting ready');
+      expect(making?.querySelector('[class*="animate-spin"]')).not.toBeNull();
+    });
+
+    it('lists a protected branch once while it is creating, and once when unready', () => {
+      const count = (name: string, extra: object) => {
+        const rows = rowsFor([
+          { name: 'docs/v4-launch' },
+          { name, protected: true, ready: false, ...extra },
+        ]);
+        const found = rows.filter((row) =>
+          row.textContent?.includes(name)
+        ).length;
+        cleanup();
+        return found;
+      };
+      expect(count('release', {})).toBe(1);
+      expect(count('release', { unready: true })).toBe(1);
+    });
   });
 
   it('finds a branch by its pull request number', async () => {

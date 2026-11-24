@@ -72,6 +72,7 @@ let beforeSaveCalls: number;
 let failBeforeSave: boolean;
 let stampBeforeSave: boolean;
 let dropAction: () => void;
+let createDirect: (name: string, from: string) => void;
 let pullRequestUrls: Record<string, string>;
 let createBranch:
   | ((request: {
@@ -187,8 +188,11 @@ const NotesScreen = () => <p>notes screen</p>;
 function BranchActionScreen() {
   const runtime = use(TinaRuntimeContext);
   useEffect(() => {
+    if (!runtime) return;
+    createDirect = (name, from) =>
+      runtime.store.getState().branch?.create?.(name, from);
     const action = saveToNewBranch;
-    if (!runtime || !action) return;
+    if (!action) return;
     dropAction = () =>
       runtime.store.setState((state) => ({
         branch: { ...state.branch, saveToNewBranch: undefined },
@@ -1840,7 +1844,8 @@ describe('branch switcher rows and creating a branch', () => {
     const unswitchable = () => {
       const row = within(dialog).getByRole('button', { name: /cms\/x/ });
       expect(row).toHaveAttribute('aria-disabled', 'true');
-      expect(row).toHaveTextContent('Getting ready');
+      expect(row).toHaveTextContent('Reload to switch');
+      expect(row).not.toHaveTextContent('Getting ready');
     };
     unswitchable();
     await user.click(within(dialog).getByRole('button', { name: /cms\/x/ }));
@@ -2308,6 +2313,80 @@ describe('branch switcher rows and creating a branch', () => {
     await waitFor(() =>
       expect(screen.queryByText("Couldn't create cms/x")).toBeNull()
     );
+  });
+
+  it('shows one unsaved-changes warning however often a refused Retry or Switch to is pressed', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let ready: () => void = () => {};
+    createBranch = vi
+      .fn<NonNullable<BranchSource['create']>>()
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockImplementationOnce(async ({ name }) => ({
+        name,
+        ready: new Promise<void>((resolve) => {
+          ready = resolve;
+        }),
+      }));
+    const user = userEvent.setup();
+    const title = await openDocument(user);
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      await within(dialog).findByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      'cms/x'
+    );
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    await screen.findByText("Couldn't create cms/x");
+    await user.type(title, '!');
+    const retry = screen.getByRole('button', { name: 'Retry' });
+    await user.click(retry);
+    await user.click(retry);
+    await user.click(retry);
+    const warnings = () =>
+      screen.queryAllByText('Save or discard your changes first');
+    expect(warnings()).toHaveLength(1);
+    await user.clear(title);
+    await user.type(title, 'Hello');
+    await waitFor(() => expect(readAnyFormDirty()).toBe(false));
+    await user.click(await screen.findByRole('button', { name: 'Retry' }));
+    act(() => ready());
+    await screen.findByText('cms/x is ready');
+    await user.type(title, '!');
+    const switchTo = screen.getByRole('button', { name: 'Switch to cms/x' });
+    await user.click(switchTo);
+    await user.click(switchTo);
+    await user.click(switchTo);
+    expect(warnings()).toHaveLength(1);
+  });
+
+  it('shows one wait warning however often Retry is pressed while another create runs', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    createBranch = vi
+      .fn<NonNullable<BranchSource['create']>>()
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockImplementationOnce(() => new Promise(() => {}));
+    window.location.hash = '#/screens/branch-action';
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    await screen.findByText("Couldn't create cms/x");
+    act(() => createDirect('cms/y', 'main'));
+    const retry = screen.getByRole('button', { name: 'Retry' });
+    await user.click(retry);
+    await user.click(retry);
+    await user.click(retry);
+    expect(screen.getAllByText('Wait for cms/y to finish first')).toHaveLength(
+      1
+    );
+    expect(screen.getByText("Couldn't create cms/x")).toBeVisible();
   });
 
   it('dismisses the failure toast when its Retry is pressed', async () => {

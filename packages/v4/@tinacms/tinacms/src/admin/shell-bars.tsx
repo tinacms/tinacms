@@ -99,7 +99,7 @@ function BranchControl() {
   // A refused action says why inside the switcher while it is open, else in a toast.
   const refuse = (message: string) => {
     if (latest.current.open) setReason(message);
-    else toast({ tone: 'warning', title: message });
+    else toast({ id: `refused:${message}`, tone: 'warning', title: message });
   };
 
   const switchTo = (name: string): boolean => {
@@ -220,7 +220,11 @@ function BranchControl() {
           label: `Switch to ${outcome.name}`,
           onClick: act(idOf, () => {
             if (readAnyFormDirty()) {
-              toast({ tone: 'warning', title: DIRTY_REASON });
+              toast({
+                id: `refused:${DIRTY_REASON}`,
+                tone: 'warning',
+                title: DIRTY_REASON,
+              });
               return false;
             }
             latest.current.branch?.switchTo(outcome.name);

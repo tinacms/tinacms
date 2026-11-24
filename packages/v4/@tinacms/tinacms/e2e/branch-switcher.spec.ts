@@ -750,6 +750,29 @@ test.describe('branch switcher pop-up', () => {
       ).toBeFocused();
     });
 
+    test(`keeps an unready branch disabled, with no spinner, in the ${frame.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=unready#/');
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      await makeBranch(page, view);
+      await view.getByRole('button', { name: 'Dismiss' }).click();
+      const row = view.locator('[data-branch-row]', { hasText: 'cms/x' });
+      await expect(row).toHaveCount(1);
+      await expect(row).toHaveAttribute('aria-disabled', 'true');
+      await expect(row).toContainText('Reload to switch');
+      await expect(row).not.toContainText('Getting ready');
+      await expect(row.locator('[class*="animate-spin"]')).toHaveCount(0);
+      await row.click({ force: true });
+      await expect(row).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(
+        page.getByRole('button', { name: 'Branch: feature/news' })
+      ).toBeVisible();
+    });
+
     test(`shows the failure note with Retry inside the ${frame.name} after a toast-started failure, with no toast`, async ({
       page,
     }) => {
