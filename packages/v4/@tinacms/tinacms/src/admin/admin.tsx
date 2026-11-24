@@ -884,10 +884,12 @@ function AdminShell({
   const [previewAsked, setPreviewAsked] = useState(false);
   const toggleMaximise = useCallback(
     (from: DocumentView) => {
-      setPreviewAsked(from === 'preview');
+      // Entering from the preview keeps focus on the toolbar's button, as the form header is
+      // hidden in the preview view. Restoring puts focus on the form header's button.
+      setPreviewAsked(from === 'preview' && !tabletMaximised);
       if (tabletMaximised) {
         setTabletMaximised(false);
-        if (from === 'form') setFormFocusRequest((n) => n + 1);
+        setFormFocusRequest((n) => n + 1);
         return;
       }
       if (from === 'preview' && mainRoute.view === 'document') {
