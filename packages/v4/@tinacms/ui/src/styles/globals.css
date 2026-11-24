@@ -37,3 +37,9 @@
   width: var(--touch-height);
   height: var(--touch-height);
 }
+@utility w-touch {
+  width: var(--touch-height);
+}
+@utility min-w-touch {
+  min-width: var(--touch-height);
+}

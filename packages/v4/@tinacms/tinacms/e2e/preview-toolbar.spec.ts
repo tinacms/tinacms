@@ -516,7 +516,7 @@ test.describe('loading, reloading and failing', () => {
 });
 
 test.describe('window tiers', () => {
-  test('a tablet-width window moves the device sizes into ⋯ and keeps Expand', async ({
+  test('a tablet-width window moves the device sizes into ⋯ and keeps Maximise', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1000, height: 800 });
@@ -525,8 +525,11 @@ test.describe('window tiers', () => {
       toolbar(page).getByRole('group', { name: 'Device size' })
     ).toHaveCount(0);
     await expect(
-      toolbar(page).getByRole('button', { name: 'Expand preview' })
+      toolbar(page).getByRole('button', { name: 'Maximise preview' })
     ).toBeVisible();
+    await expect(
+      toolbar(page).getByRole('button', { name: 'Expand preview' })
+    ).toHaveCount(0);
     await actions(page).click();
     await expect(page.getByText('Device size')).toBeVisible();
     await page.getByRole('menuitemcheckbox', { name: 'Tablet' }).click();
@@ -534,6 +537,26 @@ test.describe('window tiers', () => {
     await expect(
       toolbar(page).getByRole('button', { name: /^768px, scale/ })
     ).toBeVisible();
+  });
+
+  test('at tablet width Maximise preview enters one view, and Esc restores it with focus on Maximise form (AC43)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1000, height: 800 });
+    await page.goto(adminUrl(declared(HELLO), postHash(HELLO)));
+    await toolbar(page)
+      .getByRole('button', { name: 'Maximise preview' })
+      .click();
+    await expect(
+      toolbar(page).getByRole('button', { name: 'Restore preview' })
+    ).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(
+      toolbar(page).getByRole('button', { name: 'Maximise preview' })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Maximise form' })
+    ).toBeFocused();
   });
 
   test('a phone-width window shows the address and ⋯ only, draws a stored Tablet at Fit, and draws it again when wider', async ({
@@ -670,13 +693,40 @@ test.describe('narrow pane', () => {
     }
   }
 
-  test('Expand stays reachable in ⋯ when the pane is too narrow for the button', async ({
+  test('at 768px the widest form column still leaves room for Maximise in the toolbar', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 768, height: 800 });
-    await page.goto(adminUrl('/plain.html'));
+    await page.goto(adminUrl(declared(HELLO), postHash(HELLO)));
+    await setColumnWidth(page, 480);
     await actions(page).click();
     await page.getByRole('menuitemcheckbox', { name: /^Tablet/ }).click();
+    await expect(
+      toolbar(page).getByRole('button', { name: 'Maximise preview' })
+    ).toBeVisible();
+    await toolbar(page)
+      .getByRole('button', { name: 'Maximise preview' })
+      .click();
+    await expect(
+      page.getByRole('group', { name: 'View', exact: true })
+    ).toBeVisible();
+    await toolbar(page)
+      .getByRole('button', { name: 'Restore preview' })
+      .click();
+    await expect(
+      page.getByRole('group', { name: 'View', exact: true })
+    ).toHaveCount(0);
+  });
+
+  test('Expand stays reachable in ⋯ when the pane is too narrow for the button', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto(adminUrl('/plain.html'));
+    await toolbar(page)
+      .getByRole('button', { name: /^Tablet/ })
+      .click();
+    await setColumnWidth(page, 1000);
     await expect(
       toolbar(page).getByRole('button', { name: 'Expand preview' })
     ).toHaveCount(0);
@@ -724,6 +774,8 @@ test.describe('375px window', () => {
     page,
   }) => {
     await page.goto(adminUrl(declared(HELLO), postHash(HELLO)));
+    const view = page.getByRole('group', { name: 'View', exact: true });
+    await view.getByRole('button', { name: 'Preview' }).click();
     await expect(toolbar(page)).toBeAttached();
     const scrolled = () =>
       page.evaluate(
@@ -743,6 +795,7 @@ test.describe('375px window', () => {
       page.getByRole('alert').filter({ hasText: /Type an address/ })
     ).toHaveCount(1);
     expect(await scrolled()).toBe(0);
+    await view.getByRole('button', { name: 'Form' }).click();
     const title = await page
       .getByRole('textbox', { name: /^title\b/i })
       .boundingBox();

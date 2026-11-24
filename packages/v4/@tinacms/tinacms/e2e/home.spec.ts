@@ -44,7 +44,7 @@ test('Home on a branch has two columns at 1280px and wider', async ({
   }
 });
 
-for (const width of [1279, 1024, 390]) {
+for (const width of [1039, 1024, 390]) {
   test(`Home on a branch is one column from Branch down at ${width}px`, async ({
     page,
   }) => {

@@ -22,6 +22,7 @@ import {
   use,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -510,6 +511,14 @@ export interface TinaAdminProps {
 export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
   const tier = useTier();
   useNoFieldZoom();
+  // Portalled content (dialogs, menus, sheets) sits outside the wrapper, so <html> carries the
+  // breakpoint too and the `phone:` variants reach it.
+  useLayoutEffect(() => {
+    document.documentElement.dataset.breakpoint = tier;
+    return () => {
+      delete document.documentElement.dataset.breakpoint;
+    };
+  }, [tier]);
   return (
     <div data-breakpoint={tier} className='contents'>
       <AdminErrorBoundary>
@@ -931,9 +940,7 @@ function AdminShell({
   };
 
   // The Collections column over a document keeps its own moves local, so the form stays mounted.
-  const [navigatorRoute, setNavigatorRoute] = useState<AdminRoute | null>(
-    null
-  );
+  const [navigatorRoute, setNavigatorRoute] = useState<AdminRoute | null>(null);
   useEffect(() => {
     if (!overlay) setNavigatorRoute(null);
   }, [overlay]);
@@ -1020,7 +1027,7 @@ function AdminShell({
       ? navigate(folderRouteOf(collection, documentPath))
       : goToCollections();
 
-  const navigatorOwnsScreen = showNavigator && phone;
+  const navigatorOwnsScreen = showNavigator && phone && !isStaleCollectionRoute;
   const preview_phonePage = phone && mainRoute.view === 'page';
   const expandedOnPreview =
     tier === 'tablet' ? tabletMaximised : previewExpanded;
@@ -1196,7 +1203,9 @@ function AdminShell({
                     src={preview}
                     connection={connection}
                     expanded={expandedOnPreview}
-                    moveFocus={tier === 'tablet' ? previewAsked : expansion.focus}
+                    moveFocus={
+                      tier === 'tablet' ? previewAsked : expansion.focus
+                    }
                     onExpandedChange={
                       tier === 'tablet'
                         ? () => toggleMaximise('preview')

@@ -482,9 +482,10 @@ describe('TinaAdmin', () => {
     const frame = await screen.findByTitle('Preview');
     const bar = screen.getByRole('group', { name: 'Preview toolbar' });
     await user.click(
-      within(
-        within(bar).getByRole('group', { name: 'Device size' })
-      ).getByRole('button', { name: /^Tablet/ })
+      within(within(bar).getByRole('group', { name: 'Device size' })).getByRole(
+        'button',
+        { name: /^Tablet/ }
+      )
     );
     expect(screen.getByTitle('Preview')).toBe(frame);
     await user.click(
