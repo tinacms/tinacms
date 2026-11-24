@@ -632,6 +632,20 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
     leaveToaster();
     stale?.resume();
   });
+  // The picker closes with the discard. The toast's Discard button goes away with the copies,
+  // so focus returns to the picker's opener, else to the form's scroll region.
+  const confirmDiscard = () => {
+    const picker = scope.view.getState().picker;
+    stale?.discard(shown.current);
+    if (!picker) return;
+    scope.view.getState().closePicker();
+    const region = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-form-id]')
+    ).find((node) => node.getAttribute('data-form-id') === scope.formId);
+    discardButton.current = picker.opener?.isConnected
+      ? picker.opener
+      : (region ?? null);
+  };
   const askToDiscard = useEffectEvent(() => {
     if (confirming) return;
     discardButton.current = document.activeElement as HTMLElement | null;
@@ -670,7 +684,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
     <DiscardConfirm
       open={confirming}
       onOpenChange={setConfirming}
-      onConfirm={() => stale?.discard(shown.current)}
+      onConfirm={confirmDiscard}
       returnFocusTo={discardButton}
       title={`Discard earlier unsaved edits to “${documentTitle(values, scope.path)}”?`}
       description='Discarded edits can’t be brought back. What you typed since stays.'

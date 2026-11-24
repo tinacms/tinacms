@@ -274,3 +274,31 @@ describe('the admin with the media picker open', () => {
     expect(written).toHaveLength(0);
   });
 });
+
+describe('discarding the waiting copy with the media picker open', () => {
+  it('closes the picker, writes nothing, and leaves focus off body (toast Discard, then its confirm)', async () => {
+    const user = userEvent.setup();
+    const first = renderAdmin(false);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    first.unmount();
+    act(simulateReload);
+
+    renderAdmin(false);
+    const hero = await screen.findByRole('group', { name: /^Hero\b/ });
+    const opener = within(hero).getByRole('button', {
+      name: 'Choose from Media',
+    });
+    await user.click(opener);
+    await screen.findByRole('region', { name: 'Choose an image' });
+    await user.click(await screen.findByRole('button', { name: 'Discard' }));
+    const dialog = await screen.findByRole('alertdialog');
+    await user.click(within(dialog).getByRole('button', { name: 'Discard' }));
+
+    await waitFor(() =>
+      expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+    );
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(opener).toHaveFocus());
+    expect(written).toHaveLength(0);
+  });
+});
