@@ -44,6 +44,11 @@ export interface BranchSlice {
   protected: string[];
   /** Branch name to pull request URL, for the branches that have one. */
   pullRequests: Record<string, string>;
+  /**
+   * Branches this session made whose `ready` rejected. They stay unswitchable until the page
+   * reloads: the provider has no readiness check. Each name once. Never persisted.
+   */
+  unready: string[];
   /** Whether the branch list is being read, read, or failed to read. Absent until the first read starts. */
   listState?: BranchListState;
   switchTo: (name: string | undefined) => void;
@@ -148,6 +153,7 @@ export const branchSliceOf = (
     list,
     protected: protectedNames,
     pullRequests: pullRequestsOf(slice.pullRequests),
+    unready: isNames(slice.unready) ? slice.unready : [],
     listState:
       slice.listState === 'loading' ||
       slice.listState === 'ready' ||

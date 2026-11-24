@@ -95,6 +95,8 @@ export interface BranchView {
   /** The pull request of the branch `name`, when it has one. */
   pullRequestUrl: string | undefined;
   branches: { name: string; protected: boolean }[];
+  /** Branches made this session that are not ready and cannot be switched to until a reload. */
+  unready: string[];
   /** The provider's default branch, once the list has been read. */
   defaultBranch: string | undefined;
   /** Whether the list is being read, read, or failed. */
@@ -128,6 +130,7 @@ export function useBranchView(): BranchView | null {
       name,
       protected: slice.protected.includes(name),
     })),
+    unready: slice.unready,
     listState: slice.listState,
     retryList: () =>
       runtime?.store.setState((state) => ({

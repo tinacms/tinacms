@@ -185,8 +185,9 @@ function BranchControl() {
     if (sent.current?.outcome === outcome) return;
     const act =
       (id: () => string | number, run: () => boolean | void) => () => {
+        if (run() === false) return;
         toast.dismiss(id());
-        if (run() !== false) setReason(undefined);
+        setReason(undefined);
       };
     let id: string | number = '';
     const idOf = () => id;
@@ -209,7 +210,7 @@ function BranchControl() {
       id = toast({
         tone: 'warning',
         title: `${outcome.name} isn't ready yet`,
-        text: 'It was made. Try switching to it in a few minutes.',
+        text: 'It was made. You can switch to it after reloading the page.',
       });
     } else {
       id = toast({

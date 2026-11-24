@@ -60,7 +60,11 @@ export function useBranchEntries(
     protected: entry.protected,
     pullRequest: parsePullRequest(pullRequests?.[entry.name])?.number,
     unsaved: counts[entry.name],
-    ready: entry.name === creating ? false : undefined,
+    ready:
+      entry.name === creating ||
+      (branch.unready.includes(entry.name) && entry.name !== branch.name)
+        ? false
+        : undefined,
   }));
   return [
     ...rows.filter((row) => row.name === creating),

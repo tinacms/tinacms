@@ -257,5 +257,57 @@ describe('createBranchAction', () => {
       ready: Promise.resolve(),
     }));
     expect(fine.slice?.createResult?.outcome).toBe('ready');
+    expect(fine.slice?.unready).toEqual([]);
+  });
+
+  it('keeps an unready branch listed once in unready after creating clears and a second create finishes', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createTinaStore([]);
+    store.setState({
+      branch: { list: ['main'], protected: [], switchTo: () => {} },
+    } as never);
+    const create = vi
+      .fn()
+      .mockImplementationOnce(async () => ({
+        name: 'cms/one',
+        ready: Promise.reject(new Error('no')),
+      }))
+      .mockImplementationOnce(async () => ({
+        name: 'cms/one',
+        ready: Promise.reject(new Error('no')),
+      }))
+      .mockResolvedValueOnce({ name: 'cms/two' });
+    const start = createBranchAction(store, {
+      list: async () => [],
+      defaultBranch: async () => 'main',
+      create,
+    });
+    const settled = async (name: string) => {
+      await vi.waitFor(() => {
+        const slice = branchSliceOf(store.getState());
+        expect(slice?.createResult?.name).toBe(name);
+        expect(slice?.creating).toBeUndefined();
+      });
+    };
+    start('cms/one', 'main');
+    await settled('cms/one');
+    expect(branchSliceOf(store.getState())?.unready).toEqual(['cms/one']);
+    start('cms/one', 'main');
+    await vi.waitFor(() => expect(create).toHaveBeenCalledTimes(2));
+    await vi.waitFor(() =>
+      expect(branchSliceOf(store.getState())?.creating).toBeUndefined()
+    );
+    start('cms/two', 'main');
+    await settled('cms/two');
+    expect(branchSliceOf(store.getState())).toMatchObject({
+      unready: ['cms/one'],
+      createResult: { outcome: 'ready' },
+    });
+    const reloaded = createTinaStore([]);
+    reloaded.setState({
+      branch: { list: ['main'], protected: [], switchTo: () => {} },
+    } as never);
+    expect(branchSliceOf(reloaded.getState())?.unready).toEqual([]);
+    warn.mockRestore();
   });
 });

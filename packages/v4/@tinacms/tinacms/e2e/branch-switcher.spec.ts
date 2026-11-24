@@ -739,7 +739,7 @@ test.describe('branch switcher pop-up', () => {
       await makeBranch(page, view);
       await expect(
         view.getByText(
-          "cms/x isn't ready yet. It was made. Try switching to it in a few minutes."
+          "cms/x isn't ready yet. It was made. You can switch to it after reloading the page."
         )
       ).toBeVisible();
       await expect(view.getByRole('button', { name: 'Dismiss' })).toBeVisible();

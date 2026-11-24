@@ -25,7 +25,12 @@ export const createBranchAction =
     const finish = (made: string, outcome: 'ready' | 'unready' | 'failed') => {
       if (settled) return;
       settled = true;
+      const unready = branchSliceOf(store.getState())?.unready ?? [];
       fill({
+        unready:
+          outcome === 'unready' && !unready.includes(made)
+            ? [...unready, made]
+            : unready,
         creating: undefined,
         createResult: { name: made, from, startedOn, outcome },
       });

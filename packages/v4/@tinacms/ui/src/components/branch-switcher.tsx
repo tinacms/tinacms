@@ -254,7 +254,7 @@ function OutcomeNote({
           {note.kind === 'failed'
             ? `Couldn't create ${note.name}. Check your connection, then retry.`
             : note.kind === 'unready'
-              ? `${note.name} isn't ready yet. It was made. Try switching to it in a few minutes.`
+              ? `${note.name} isn't ready yet. It was made. You can switch to it after reloading the page.`
               : `${note.name} is ready`}
         </span>
         {action ? (

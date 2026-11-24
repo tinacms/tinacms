@@ -23,7 +23,7 @@ import { ContentError, type DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
 import { TinaRuntimeContext } from '../editor/context';
 import { draftKey } from '../form/drafts';
-import { toFormId, useFormStore } from '../form/form-store';
+import { readAnyFormDirty, toFormId, useFormStore } from '../form/form-store';
 import type { TinaDocument } from '../core/schema/types';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -1819,12 +1819,51 @@ describe('branch switcher rows and creating a branch', () => {
     await press(dialog, user);
     expect(
       await screen.findByText(
-        "cms/x isn't ready yet. It was made. Try switching to it in a few minutes."
+        "cms/x isn't ready yet. It was made. You can switch to it after reloading the page."
       )
     ).toBeVisible();
     expect(create).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: /^Branch: main/ })).toBeVisible();
     expect(await screen.findByRole('button', { name: /cms\/x/ })).toBeVisible();
+  });
+
+  it('keeps an unready branch unswitchable after creating clears and after a later create', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    createBranch = vi.fn(async ({ name }: { name: string; from: string }) =>
+      name === 'cms/x'
+        ? { name, ready: Promise.reject(new Error('timed out')) }
+        : { name }
+    );
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await within(dialog).findByText(/isn't ready yet/);
+    const unswitchable = () => {
+      const row = within(dialog).getByRole('button', { name: /cms\/x/ });
+      expect(row).toHaveAttribute('aria-disabled', 'true');
+      expect(row).toHaveTextContent('Getting ready');
+    };
+    unswitchable();
+    await user.click(within(dialog).getByRole('button', { name: /cms\/x/ }));
+    expect(screen.getByRole('button', { name: /^Branch: main/ })).toBeVisible();
+    await user.click(
+      within(dialog).getByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      'cms/y'
+    );
+    await press(dialog, user);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Branch: cms/y' })
+      ).toBeVisible()
+    );
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+    const row = within(reopened).getByRole('button', { name: /cms\/x/ });
+    expect(row).toHaveAttribute('aria-disabled', 'true');
+    await user.click(row);
+    expect(screen.getByRole('button', { name: 'Branch: cms/y' })).toBeVisible();
   });
 
   it('offers Switch in a toast when the pop-up was closed while the branch was made', async () => {
@@ -2223,6 +2262,52 @@ describe('branch switcher rows and creating a branch', () => {
     await user.keyboard('{Escape}');
     expect(await screen.findByText("Couldn't create cms/x")).toBeVisible();
     expect(toasts()).toHaveLength(1);
+  });
+
+  it('keeps the failure toast when Retry is refused for unsaved edits, and retries once they are saved', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const create = vi
+      .fn<NonNullable<BranchSource['create']>>()
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockImplementationOnce(() => new Promise(() => {}));
+    createBranch = create;
+    const user = userEvent.setup();
+    const title = await openDocument(user);
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      await within(dialog).findByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      'cms/x'
+    );
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    await screen.findByText("Couldn't create cms/x");
+    await user.type(title, '!');
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(screen.getByText("Couldn't create cms/x")).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
+    expect(create).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(
+      await within(reopened).findByText(/Couldn't create cms\/x/)
+    ).toBeVisible();
+    await user.click(
+      within(reopened).getByRole('button', { name: 'Close branches' })
+    );
+    await user.clear(title);
+    await user.type(title, 'Hello');
+    await waitFor(() => expect(readAnyFormDirty()).toBe(false));
+    await user.click(await screen.findByRole('button', { name: 'Retry' }));
+    await waitFor(() => expect(create).toHaveBeenCalledTimes(2));
+    await waitFor(() =>
+      expect(screen.queryByText("Couldn't create cms/x")).toBeNull()
+    );
   });
 
   it('dismisses the failure toast when its Retry is pressed', async () => {
