@@ -43,15 +43,22 @@ export function useBranchSync(): void {
       ([branches, fallback]) => {
         if (cancelled) return;
         const names = branches.map((branch) => branch.name);
-        const pending = branchSliceOf(store.getState())?.creating?.name;
+        const slice = branchSliceOf(store.getState());
+        const pending =
+          slice?.creating?.phase === 'preparing'
+            ? slice.creating.name
+            : undefined;
+        const kept = [
+          ...new Set([
+            ...(slice?.unready ?? []),
+            ...(pending ? [pending] : []),
+          ]),
+        ];
         fill({
           mode: 'branches',
           listState: 'ready',
           fallback,
-          list:
-            pending !== undefined && !names.includes(pending)
-              ? [...names, pending]
-              : names,
+          list: [...names, ...kept.filter((name) => !names.includes(name))],
           protected: branches
             .filter((branch) => branch.protected)
             .map((branch) => branch.name),

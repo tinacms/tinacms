@@ -79,3 +79,37 @@ describe('useBranchView pullRequestUrl', () => {
     expect(result.current?.pullRequestUrl).toBeUndefined();
   });
 });
+
+describe('useBranchSync list re-read during a create', () => {
+  const reread = async (patch: Record<string, unknown>) => {
+    const { result, store } = renderBranchView([{ name: 'main' }]);
+    await waitFor(() => expect(result.current?.listState).toBe('ready'));
+    act(() =>
+      store.setState((state) => ({ branch: { ...state.branch, ...patch } }))
+    );
+    act(() => result.current?.retryList());
+    await waitFor(() => expect(result.current?.listState).toBe('ready'));
+    await waitFor(() => expect(result.current?.listState).toBe('ready'));
+    return result;
+  };
+  const making = (phase: 'making' | 'preparing') => ({
+    creating: { name: 'cms/x', from: 'main', startedOn: undefined, phase },
+  });
+  const names = (view: ReturnType<typeof useBranchView>) =>
+    view?.branches.map((branch) => branch.name);
+
+  it('adds no row for a name still being made, so a create that then fails leaves nothing behind', async () => {
+    const result = await reread(making('making'));
+    expect(names(result.current)).toEqual(['main']);
+  });
+
+  it('shows the pending name once the branch is being prepared', async () => {
+    const result = await reread(making('preparing'));
+    expect(names(result.current)).toEqual(['main', 'cms/x']);
+  });
+
+  it('puts back an unready branch the re-read list omits, once', async () => {
+    const result = await reread({ unready: ['cms/u'] });
+    expect(names(result.current)).toEqual(['main', 'cms/u']);
+  });
+});

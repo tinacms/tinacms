@@ -65,6 +65,8 @@ function BranchControl() {
   const [held, setHeld] = useState<Outcome>();
   const [reason, setReason] = useState<string>();
   const [formShown, setFormShown] = useState(false);
+  const [formTyped, setFormTyped] = useState(false);
+  const [deferred, setDeferred] = useState<Outcome>();
   const startedVia = useRef<'form' | 'note'>('form');
   const entries = useBranchEntries(branch, open);
 
@@ -73,8 +75,9 @@ function BranchControl() {
     branch: typeof branch;
     open: boolean;
     formShown: boolean;
+    formTyped: boolean;
     startCreate: (request: CreateRequest, via?: 'form' | 'note') => boolean;
-  }>({ branch, open, formShown, startCreate: () => false });
+  }>({ branch, open, formShown, formTyped, startCreate: () => false });
   const startCreate = (
     request: CreateRequest,
     via: 'form' | 'note' = 'form'
@@ -90,6 +93,7 @@ function BranchControl() {
     }
     setFailed(undefined);
     setHeld(undefined);
+    setDeferred(undefined);
     setReason(undefined);
     startedVia.current = via;
     create?.(request.name, request.from);
@@ -97,9 +101,26 @@ function BranchControl() {
   };
 
   // A refused action says why inside the switcher while it is open, else in a toast.
+  const refusalToasts = useRef(new Set<string>());
   const refuse = (message: string) => {
     if (latest.current.open) setReason(message);
-    else toast({ id: `refused:${message}`, tone: 'warning', title: message });
+    else refusalToast(message);
+  };
+  const refusalToast = (message: string) => {
+    const id = `refused:${message}`;
+    refusalToasts.current.add(id);
+    toast({ id, tone: 'warning', title: message });
+  };
+  // A refusal goes once its cause is gone: `only` limits it to one kind of message.
+  const clearRefusals = (only?: (message: string) => boolean) => {
+    for (const id of [...refusalToasts.current]) {
+      if (only && !only(id.slice('refused:'.length))) continue;
+      toast.dismiss(id);
+      refusalToasts.current.delete(id);
+    }
+    setReason((shown) =>
+      shown !== undefined && (!only || only(shown)) ? undefined : shown
+    );
   };
 
   const switchTo = (name: string): boolean => {
@@ -111,6 +132,19 @@ function BranchControl() {
     return true;
   };
 
+  useEffect(() => {
+    clearRefusals();
+  }, [open]);
+  useEffect(() => {
+    if (!dirty) clearRefusals((message) => message === DIRTY_REASON);
+  }, [dirty]);
+  const running = branch?.creating?.name;
+  useEffect(() => {
+    if (running === undefined) {
+      clearRefusals((message) => message.startsWith('Wait for '));
+    }
+  }, [running]);
+
   const currentName = branch?.name;
   useEffect(() => {
     setHeld((note) =>
@@ -119,7 +153,7 @@ function BranchControl() {
   }, [currentName, held]);
 
   const result = branch?.createResult;
-  latest.current = { branch, open, formShown, startCreate };
+  latest.current = { branch, open, formShown, formTyped, startCreate };
   useEffect(() => {
     if (!result) return;
     const { branch: view, open: isOpen } = latest.current;
@@ -129,6 +163,11 @@ function BranchControl() {
     if (!view) return;
     const { name, from, startedOn: began, outcome } = result;
     setReason(undefined);
+    const holdsForm =
+      isOpen &&
+      latest.current.formShown &&
+      latest.current.formTyped &&
+      startedVia.current !== 'form';
     if (outcome === 'failed') {
       if (isOpen && latest.current.formShown && startedVia.current === 'form') {
         setHeld(undefined);
@@ -141,10 +180,14 @@ function BranchControl() {
     }
     setFailed(undefined);
     if (outcome === 'unready') {
-      setHeld({ kind: 'unready', name });
+      (holdsForm ? setDeferred : setHeld)({ kind: 'unready', name });
       return;
     }
     const startedOn = began ?? view.defaultBranch;
+    if (holdsForm) {
+      setDeferred({ kind: 'ready', name });
+      return;
+    }
     if (isOpen && view.name === startedOn && !readAnyFormDirty()) {
       setHeld(undefined);
       view.switchTo(name);
@@ -154,10 +197,18 @@ function BranchControl() {
     setHeld({ kind: 'ready', name });
   }, [result, runtime]);
 
-  const outcome = useMemo<Outcome | undefined>(
-    () => held ?? (failed ? { kind: 'failed', ...failed } : undefined),
-    [held, failed]
-  );
+  useEffect(() => {
+    if (deferred && !(open && formShown && formTyped)) {
+      setHeld(deferred);
+      setDeferred(undefined);
+    }
+  }, [deferred, open, formShown, formTyped]);
+
+  const outcome = useMemo<Outcome | undefined>(() => {
+    const shown =
+      held?.kind === 'ready' && held.name === currentName ? undefined : held;
+    return shown ?? (failed ? { kind: 'failed', ...failed } : undefined);
+  }, [held, failed, currentName]);
 
   const handle = (): boolean | void => {
     if (!outcome) return;
@@ -183,12 +234,17 @@ function BranchControl() {
       return;
     }
     if (sent.current?.outcome === outcome) return;
-    const act =
-      (id: () => string | number, run: () => boolean | void) => () => {
+    if (sent.current) toast.dismiss(sent.current.id);
+    const act = (id: () => string | number, run: () => boolean | void) => {
+      let accepted = false;
+      return () => {
+        if (accepted) return;
         if (run() === false) return;
+        accepted = true;
         toast.dismiss(id());
-        setReason(undefined);
+        clearRefusals();
       };
+    };
     let id: string | number = '';
     const idOf = () => id;
     if (outcome.kind === 'failed') {
@@ -220,11 +276,7 @@ function BranchControl() {
           label: `Switch to ${outcome.name}`,
           onClick: act(idOf, () => {
             if (readAnyFormDirty()) {
-              toast({
-                id: `refused:${DIRTY_REASON}`,
-                tone: 'warning',
-                title: DIRTY_REASON,
-              });
+              refusalToast(DIRTY_REASON);
               return false;
             }
             latest.current.branch?.switchTo(outcome.name);
@@ -251,8 +303,9 @@ function BranchControl() {
       onSwitch={branch.switchTo}
       open={open}
       onOpenChange={setOpen}
-      onFormChange={(shown) => {
+      onFormChange={(shown, typed) => {
         setFormShown(shown);
+        setFormTyped(typed);
         if (!shown) setFailed(undefined);
       }}
       note={held ? { ...held, reason } : undefined}
@@ -267,7 +320,7 @@ function BranchControl() {
         create ? (name, from) => startCreate({ name, from }) : undefined
       }
       createState={
-        branch.creating
+        branch.creating && startedVia.current === 'form'
           ? 'creating'
           : failed ||
               (result?.outcome === 'failed' &&

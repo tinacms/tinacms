@@ -67,8 +67,8 @@ type BranchSwitcherProps = {
   onCreate?: (name: string, from: string) => void;
   /** The default branch, offered next to the current one as where a new branch starts from. */
   baseBranch?: string;
-  /** Called when the New branch form opens or closes, so the caller knows whether an inline failure will be seen. */
-  onFormChange?: (shown: boolean) => void;
+  /** Called when the New branch form opens or closes, or its name goes empty or not, so the caller knows whether an inline failure will be seen and whether typed text would be lost. */
+  onFormChange?: (shown: boolean, typed: boolean) => void;
   /** `creating` shows "Creating" on the form; `failed` keeps the form with a Retry. */
   createState?: 'idle' | 'creating' | 'failed';
   /** The outcome of a create, shown above the list while the switcher is open. One at a time. */
@@ -362,6 +362,7 @@ function BranchSwitcher({
         String(branch.pullRequest).includes(wanted))
   );
   const busy = createState === 'creating';
+  const waiting = creatingBranch !== undefined && !busy;
   const [submitted, setSubmitted] = useState(false);
   const typed = newName.trim();
   const takenNames = branches.map((branch) => branch.name);
@@ -427,8 +428,8 @@ function BranchSwitcher({
   }, [noteKey]);
 
   useEffect(() => {
-    onFormChange?.(creating);
-  }, [creating, onFormChange]);
+    onFormChange?.(creating, newName.trim() !== '');
+  }, [creating, newName, onFormChange]);
 
   useEffect(() => {
     if (!creating) return;
@@ -487,7 +488,7 @@ function BranchSwitcher({
   const submit = () => {
     setSubmitted(true);
     if (typed === '' || branchNameError(typed, takenNames, true)) return;
-    if (!onCreate || from === undefined || blocked || busy) return;
+    if (!onCreate || from === undefined || blocked || busy || waiting) return;
     attempted.current = typed;
     onCreate(typed, from);
   };
@@ -545,7 +546,7 @@ function BranchSwitcher({
           focusField('search');
         }}
       />
-      {creatingBranch !== undefined && !creating ? (
+      {creatingBranch !== undefined && (!creating || waiting) ? (
         <p
           role='status'
           className='m-0 flex-none text-sm text-muted-foreground [overflow-wrap:anywhere]'
@@ -686,6 +687,11 @@ function BranchSwitcher({
                 {nameError}
               </p>
             ) : null}
+            {waiting ? (
+              <p role='status' className='m-0 text-sm text-muted-foreground'>
+                Wait for {creatingBranch} to finish first
+              </p>
+            ) : null}
             <div className='flex flex-col gap-1'>
               <span className='text-xs font-medium text-muted-foreground-strong'>
                 Start from
@@ -746,7 +752,9 @@ function BranchSwitcher({
                   !onCreate ||
                   from === undefined ||
                   blocked ||
-                  (typed !== '' && nameError !== undefined)
+                  waiting ||
+                  typed === '' ||
+                  nameError !== undefined
                 }
               >
                 {busy ? 'Creating' : failed ? 'Retry' : 'Create branch'}

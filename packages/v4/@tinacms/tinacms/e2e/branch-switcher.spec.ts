@@ -773,6 +773,66 @@ test.describe('branch switcher pop-up', () => {
       ).toBeVisible();
     });
 
+    test(`keeps the New branch form free while the note's Retry runs in the ${frame.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=fail#/');
+      await openFrame(page, false);
+      await makeBranch(page, frameOf(page, false));
+      await page.keyboard.press('Escape');
+      await expect(page.getByText("Couldn't create cms/x")).toBeVisible();
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      const note = view.locator('[data-slot="branch-outcome-note"]');
+      const open = view.getByRole('button', { name: 'New branch' });
+      if (await open.isVisible()) await open.click();
+      const name = view.getByRole('searchbox', { name: 'New branch name' });
+      await name.fill('cms/b');
+      await note.getByRole('button', { name: 'Retry' }).click();
+      await expect(view.getByText('Creating cms/x…')).toBeVisible();
+      await expect(name).toBeEditable();
+      await expect(name).toHaveValue('cms/b');
+      await expect(
+        view.getByRole('button', { name: 'Create branch' })
+      ).toBeDisabled();
+      await expect(
+        view.getByText('Wait for cms/x to finish first')
+      ).toBeVisible();
+      await expect(view.getByText('Creating cms/x…')).toBeHidden({
+        timeout: 5000,
+      });
+      await expect(name).toHaveValue('cms/b');
+      await expect(
+        view.getByRole('form', { name: 'New branch form' })
+      ).toBeVisible();
+      await expect(
+        view.getByRole('button', { name: 'Create branch' })
+      ).toBeEnabled();
+    });
+
+    test(`keeps Create branch off for an empty name in the ${frame.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=ok#/');
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      await view.getByRole('button', { name: 'New branch' }).click();
+      const create = view.getByRole('button', { name: 'Create branch' });
+      const name = view.getByRole('searchbox', { name: 'New branch name' });
+      await expect(create).toBeDisabled();
+      await name.press('Enter');
+      await expect(
+        view.getByRole('form', { name: 'New branch form' })
+      ).toBeVisible();
+      await name.fill('cms/y');
+      await expect(create).toBeEnabled();
+      await name.fill('');
+      await expect(create).toBeDisabled();
+      await expect(view.getByText('Enter a branch name.')).toBeVisible();
+    });
+
     test(`shows the failure note with Retry inside the ${frame.name} after a toast-started failure, with no toast`, async ({
       page,
     }) => {

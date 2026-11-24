@@ -792,18 +792,75 @@ describe('Branch switcher controls', () => {
       />
     );
     await user.click(screen.getByRole('button', { name: 'New branch' }));
-    expect(onFormChange).toHaveBeenLastCalledWith(true);
+    expect(onFormChange).toHaveBeenLastCalledWith(true, false);
     const name = screen.getByRole('searchbox', { name: 'New branch name' });
     await user.type(name, 'cms/a');
     await user.click(screen.getByRole('button', { name: 'Clear name' }));
     expect(name).toHaveFocus();
     await user.click(screen.getByRole('button', { name: 'Back to branches' }));
-    expect(onFormChange).toHaveBeenLastCalledWith(false);
+    expect(onFormChange).toHaveBeenLastCalledWith(false, false);
     const search = screen.getByRole('searchbox', { name: 'Search branches' });
     expect(search).toHaveFocus();
     await user.type(search, 'x');
     await user.click(screen.getByRole('button', { name: 'Clear search' }));
     expect(search).toHaveFocus();
+  });
+
+  describe.each([
+    ['pop-up', false],
+    ['maximised switcher', true],
+  ])('the New branch form in the %s', (_surface, defaultMaximised) => {
+    const renderForm = (
+      props: Partial<React.ComponentProps<typeof BranchSwitcher>> = {}
+    ) => {
+      const onCreate = vi.fn();
+      render(
+        <BranchSwitcher
+          current='feature/news'
+          branches={entries}
+          onSwitch={() => {}}
+          onCreate={onCreate}
+          baseBranch='main'
+          defaultOpen
+          defaultMaximised={defaultMaximised}
+          {...props}
+        />
+      );
+      return onCreate;
+    };
+
+    it('keeps Create branch off while the name is empty, and starts nothing on Enter', async () => {
+      const user = userEvent.setup();
+      const onCreate = renderForm();
+      await user.click(screen.getByRole('button', { name: 'New branch' }));
+      const create = screen.getByRole('button', { name: 'Create branch' });
+      const name = screen.getByRole('searchbox', { name: 'New branch name' });
+      expect(create).toBeDisabled();
+      await user.type(name, '{Enter}');
+      expect(onCreate).not.toHaveBeenCalled();
+      await user.type(name, 'cms/a');
+      expect(create).toBeEnabled();
+      await user.clear(name);
+      expect(create).toBeDisabled();
+      expect(screen.getByText('Enter a branch name.')).toBeVisible();
+    });
+
+    it('stays editable and not busy while a create the form did not start runs', async () => {
+      const user = userEvent.setup();
+      const onCreate = renderForm({ creatingBranch: 'cms/a' });
+      expect(screen.getByText('Creating cms/a…')).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'New branch' }));
+      const name = screen.getByRole('searchbox', { name: 'New branch name' });
+      await user.type(name, 'cms/b');
+      expect(name).not.toHaveAttribute('readonly');
+      expect(name).toHaveValue('cms/b');
+      expect(screen.getByText('Creating cms/a…')).toBeVisible();
+      expect(screen.getByText('Wait for cms/a to finish first')).toBeVisible();
+      const create = screen.getByRole('button', { name: 'Create branch' });
+      expect(create).toBeDisabled();
+      await user.type(name, '{Enter}');
+      expect(onCreate).not.toHaveBeenCalled();
+    });
   });
 
   it('keeps focus on the Create button while it creates, and puts it in the search box after the list Retry', async () => {
