@@ -74,8 +74,8 @@ import { NoPreview, PreviewSlot } from './preview-slot';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
 
-// About a second of frames to wait for the document entry before the first control takes focus.
-const OVERLAY_FOCUS_FRAMES = 60;
+// About ten seconds of frames to wait for the document entry of a slow collection.
+const OVERLAY_FOCUS_FRAMES = 600;
 
 const SHELL_WIDTH = { '--sidebar-width': '15rem' } as CSSProperties;
 
@@ -994,26 +994,50 @@ function AdminShell({
     if (showOverlay) {
       wasOverlay.current = true;
       // The side nav sheet hands focus back to its menu button as it leaves, and the
-      // document entry draws once its collection loads: focus waits for both.
+      // document entry draws once its collection loads: the first control takes focus
+      // at once and the entry takes it when it draws, unless the user moved it first.
       let frame = 0;
       let waited = 0;
+      let placed: HTMLElement | undefined;
+      let userMoved = false;
+      // Any press or key after the overlay opens outside the leaving sheet means the user took focus.
+      const onInput = (event: Event) => {
+        if (
+          !(event.target instanceof Element) ||
+          !event.target.closest('[data-slot=sidebar]')
+        ) {
+          userMoved = true;
+        }
+      };
+      document.addEventListener('pointerdown', onInput, true);
+      document.addEventListener('keydown', onInput, true);
       const place = () => {
         waited += 1;
-        const sheetLeaving = document.querySelector(
-          '[data-slot=sidebar][data-mobile=true]'
-        );
-        const pane = document.querySelector('[aria-label=Navigator]');
-        const current = pane?.querySelector<HTMLElement>('[aria-current=page]');
-        if (!sheetLeaving && (current || waited > OVERLAY_FOCUS_FRAMES)) {
-          (current ?? pane?.querySelector<HTMLElement>('button'))?.focus();
+        if (document.querySelector('[data-slot=sidebar][data-mobile=true]')) {
+          frame = requestAnimationFrame(place);
           return;
         }
-        if (waited <= OVERLAY_FOCUS_FRAMES * 2) {
+        if (userMoved) return;
+        const pane = document.querySelector('[aria-label=Navigator]');
+        const current = pane?.querySelector<HTMLElement>('[aria-current=page]');
+        if (current) {
+          current.focus();
+          return;
+        }
+        if (!placed) {
+          placed = pane?.querySelector<HTMLElement>('button') ?? undefined;
+          placed?.focus();
+        }
+        if (waited <= OVERLAY_FOCUS_FRAMES) {
           frame = requestAnimationFrame(place);
         }
       };
       frame = requestAnimationFrame(place);
-      return () => cancelAnimationFrame(frame);
+      return () => {
+        cancelAnimationFrame(frame);
+        document.removeEventListener('pointerdown', onInput, true);
+        document.removeEventListener('keydown', onInput, true);
+      };
     }
     if (!wasOverlay.current || overlay) return;
     wasOverlay.current = false;
