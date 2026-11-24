@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
@@ -8,6 +8,7 @@ import type { MediaProvider } from '../core/media/contract';
 import { definePlugin } from '../core/plugin';
 import type { TinaDocument } from '../core/schema/types';
 import { useFormStore } from '../form/form-store';
+import { simulateReload } from '../test/simulate-reload';
 import imageFieldPlugin from '../plugins/fields/image/image-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
@@ -162,5 +163,30 @@ describe.each([
     expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull();
     expect(errors).not.toHaveBeenCalled();
     errors.mockRestore();
+  });
+});
+
+describe('resuming stored edits with the media picker open', () => {
+  it('closes the picker and leaves focus off body once the Resume prompt is gone', async () => {
+    const user = userEvent.setup();
+    const first = renderAdmin(false);
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    first.unmount();
+    act(simulateReload);
+
+    renderAdmin(false);
+    const hero = await screen.findByRole('group', { name: /^Hero\b/ });
+    await user.click(
+      within(hero).getByRole('button', { name: 'Choose from Media' })
+    );
+    await screen.findByRole('region', { name: 'Choose an image' });
+    await user.click(await screen.findByRole('button', { name: 'Resume' }));
+
+    await waitFor(() =>
+      expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+    );
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    expect(document.activeElement).not.toBe(document.body);
+    expect(written).toHaveLength(0);
   });
 });

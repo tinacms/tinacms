@@ -813,6 +813,9 @@ function FormFields({ scope }: { scope: FormScope }) {
   );
 }
 
+// How long after a form-driven picker close the form column checks that focus did not fall to body.
+const REGION_RECHECK_MS = 300;
+
 export function DocumentForm() {
   const scope = use(FormScopeContext);
   const regionRef = useRef<HTMLDivElement>(null);
@@ -820,8 +823,14 @@ export function DocumentForm() {
   useLayoutEffect(() => {
     if (!view || view.getState().regionFocusUntil < Date.now()) return;
     view.getState().armRegionFocus(0);
-    const focused = document.activeElement;
-    if (!focused || focused === document.body) regionRef.current?.focus();
+    const fallToBody = () => {
+      const focused = document.activeElement;
+      if (!focused || focused === document.body) regionRef.current?.focus();
+    };
+    fallToBody();
+    // The control that held focus (Resume, say) can unmount a moment after this form mounts.
+    const timer = setTimeout(fallToBody, REGION_RECHECK_MS);
+    return () => clearTimeout(timer);
   }, [view]);
   if (!scope) return null;
 
