@@ -287,7 +287,7 @@ function BranchControl() {
       id = toast({
         tone: 'error',
         title: `Couldn't create ${outcome.name}`,
-        text: 'Check your connection, then retry.',
+        text: 'Check your connection, then retry. It may still have been made, so reload to check.',
         action: {
           label: 'Retry',
           onClick: act(idOf, () =>

@@ -261,7 +261,7 @@ function OutcomeNote({
       >
         <span className='min-w-0 flex-1 [overflow-wrap:anywhere]'>
           {note.kind === 'failed'
-            ? `Couldn't create ${note.name}. Check your connection, then retry.`
+            ? `Couldn't create ${note.name}. Check your connection, then retry. It may still have been made, so reload to check.`
             : note.kind === 'unready'
               ? `${note.name} isn't ready yet. It was made. You can switch to it after reloading the page.`
               : `${note.name} is ready`}
@@ -400,6 +400,7 @@ function BranchSwitcher({
   }, [failed, maximised]);
   useEffect(() => setDismissed(false), [createState]);
 
+  const wasOpen = useRef(open);
   // A create that ended under the name in the form returns it to the list; a failure keeps it.
   useEffect(() => {
     if (createState !== 'done') return;
@@ -407,8 +408,13 @@ function BranchSwitcher({
     setNewName('');
     setSubmitted(false);
     setStartFrom('current');
-    if (open && creating) return afterPaint(() => focusField('search'));
+    if (!creating) return;
+    if (open) return afterPaint(() => focusField('search'));
+    if (wasOpen.current) triggerRef.current?.focus();
   }, [createState]);
+  useEffect(() => {
+    wasOpen.current = open;
+  });
 
   // An open switcher belongs to the tier it opened on. Crossing 768px closes it before the other
   // frame mounts open, so no closed scrim is left over the page; its state is kept for the next open.
@@ -434,7 +440,12 @@ function BranchSwitcher({
       !note?.keepForm &&
       typed === ''
     ) {
+      const focusInForm =
+        document.activeElement?.closest(
+          'form[aria-label="New branch form"]'
+        ) !== null;
       setCreating(false);
+      if (focusInForm && open) return afterPaint(() => focusField('search'));
     }
   }, [noteKey]);
 
@@ -749,7 +760,7 @@ function BranchSwitcher({
             {failed ? (
               <p role='alert' className='m-0 text-sm text-destructive'>
                 Couldn't create {attempted.current}. Check your connection, then
-                retry.
+                retry. It may still have been made, so reload to check.
               </p>
             ) : null}
             <div

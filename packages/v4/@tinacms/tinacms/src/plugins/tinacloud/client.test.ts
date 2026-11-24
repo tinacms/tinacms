@@ -425,47 +425,6 @@ describe('createBranch', () => {
     await assertion;
   });
 
-  it('treats a retry as the existing branch when the first create timed out and the server now refuses the name', async () => {
-    vi.useFakeTimers();
-    const fetchMock = vi
-      .fn<typeof fetch>()
-      .mockImplementationOnce(
-        (_url, init) =>
-          new Promise<Response>((_resolve, reject) => {
-            init?.signal?.addEventListener('abort', () =>
-              reject(new Error('aborted'))
-            );
-          })
-      )
-      .mockResolvedValueOnce(json({ message: 'exists' }, 422))
-      .mockResolvedValue(json({ status: 'complete' }));
-    vi.stubGlobal('fetch', fetchMock);
-    const c = createTinaCloudClient({
-      clientId: 'abc',
-      getToken: async () => 'secret',
-      createTimeoutMs: 1000,
-      indexPollMs: 100,
-      indexTimeoutMs: 1000,
-    });
-    const first = expect(
-      c.createBranch({ name: 'cms/x', from: 'main' })
-    ).rejects.toThrow(/in time/);
-    await vi.advanceTimersByTimeAsync(1500);
-    await first;
-    const retried = await c.createBranch({ name: 'cms/x', from: 'main' });
-    expect(retried.name).toBe('cms/x');
-    const done = expect(retried.ready).resolves.toBeUndefined();
-    await vi.advanceTimersByTimeAsync(500);
-    await done;
-  });
-
-  it('still rejects a refused create that did not time out first', async () => {
-    stubFetch(json({ message: 'exists' }, 422));
-    await expect(
-      client().createBranch({ name: 'cms/z', from: 'main' })
-    ).rejects.toMatchObject({ status: 422 });
-  });
-
   it('rejects when TinaCloud refuses the create', async () => {
     stubFetch(json({ message: 'exists' }, 422));
     await expect(

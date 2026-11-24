@@ -1808,7 +1808,7 @@ describe('branch switcher rows and creating a branch', () => {
     await press(dialog, user);
     expect(
       await within(dialog).findByText(
-        "Couldn't create cms/x. Check your connection, then retry."
+        "Couldn't create cms/x. Check your connection, then retry. It may still have been made, so reload to check."
       )
     ).toBeVisible();
     expect(warn).toHaveBeenCalled();
@@ -2187,7 +2187,7 @@ describe('branch switcher rows and creating a branch', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Branches' });
     expect(
       await within(dialog).findByText(
-        "Couldn't create cms/x. Check your connection, then retry."
+        "Couldn't create cms/x. Check your connection, then retry. It may still have been made, so reload to check."
       )
     ).toBeVisible();
     await waitFor(() => expect(toasts()).toHaveLength(0));
@@ -2241,7 +2241,7 @@ describe('branch switcher rows and creating a branch', () => {
     act(() => rejects[1](new Error('offline')));
     expect(
       await within(dialog).findByText(
-        "Couldn't create cms/x. Check your connection, then retry."
+        "Couldn't create cms/x. Check your connection, then retry. It may still have been made, so reload to check."
       )
     ).toBeVisible();
     await waitFor(() => expect(toasts()).toHaveLength(0));
@@ -2655,6 +2655,22 @@ describe('branch switcher rows and creating a branch', () => {
     );
 
     describe.each(tiers)('when the create ends (%s)', (_tier, phone) => {
+      it('puts focus in the search box when the outcome note closes the focused empty form', async () => {
+        const { dialog, ended } = await noteRetry('unready', {
+          typed: '',
+          phone,
+        });
+        await ended();
+        expect(
+          await within(dialog).findByText(/cms\/a isn't ready yet/)
+        ).toBeVisible();
+        await waitFor(() =>
+          expect(
+            within(dialog).getByRole('searchbox', { name: 'Search branches' })
+          ).toHaveFocus()
+        );
+      });
+
       it.each([
         ['ready', 'cms/a is ready'],
         ['unready', /cms\/a isn't ready yet/],

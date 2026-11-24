@@ -922,6 +922,18 @@ test.describe('branch switcher pop-up', () => {
       ).toHaveValue('cms/x');
     });
 
+    test(`returns focus to the branch button when a form create switches and closes the ${frame.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=ok#/');
+      await openFrame(page, frame.maximise);
+      await makeBranch(page, frameOf(page, frame.maximise));
+      const button = page.getByRole('button', { name: 'Branch: cms/x' });
+      await expect(button).toBeVisible({ timeout: 10000 });
+      await expect(button).toBeFocused();
+    });
+
     test(`resets the form and switches when the note's Retry makes a branch whose form create failed while the ${frame.name} was closed`, async ({
       page,
     }) => {
@@ -1002,14 +1014,14 @@ test.describe('branch switcher pop-up', () => {
       const view = frameOf(page, frame.maximise);
       await expect(
         view.getByText(
-          "Couldn't create cms/x. Check your connection, then retry."
+          "Couldn't create cms/x. Check your connection, then retry. It may still have been made, so reload to check."
         )
       ).toBeVisible();
       await expect.poll(() => toastCount(page)).toBe(0);
       await view.getByRole('button', { name: 'Retry' }).click();
       await expect(
         view.getByText(
-          "Couldn't create cms/x. Check your connection, then retry."
+          "Couldn't create cms/x. Check your connection, then retry. It may still have been made, so reload to check."
         )
       ).toBeVisible({ timeout: 5000 });
       expect(await toastCount(page)).toBe(0);
