@@ -72,7 +72,6 @@ export const generateTypes = async (
   return reexportExact(importRichTextType(res));
 };
 
-/** Each pointer must end in a literal extension; the loader parses extensionless pointers as GraphQL and throws on a space in the path. */
 const loadGraphQLDocuments = async (pointers: string[]) => {
   let result = [];
   try {

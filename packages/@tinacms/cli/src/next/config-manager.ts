@@ -186,6 +186,7 @@ export class ConfigManager {
       this.tinaFolderPath,
       'queries/**/*.{graphql,gql}'
     );
+    // Loader pointers must end in a literal extension: the loader parses extensionless ones as GraphQL and throws on a space in the path.
     this.userQueriesAndFragmentsPointers = ['graphql', 'gql'].map((ext) =>
       path.join(this.tinaFolderPath, `queries/**/*.${ext}`)
     );
