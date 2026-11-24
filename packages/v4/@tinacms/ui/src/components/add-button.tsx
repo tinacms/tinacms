@@ -6,7 +6,7 @@ import { KbdShortcut } from '@tinacms/ui/components/kbd';
 import { cn } from '@tinacms/ui/lib/utils';
 
 const ADD_ROW =
-  'box-border flex h-8.5 w-full min-w-0 items-center justify-start gap-0.5 rounded-sm border border-transparent bg-transparent py-0 pr-1 pl-0.5 text-left font-sans text-base font-normal text-muted-foreground hover:border-border-subtle hover:bg-list-add-hover hover:text-foreground focus-within:border-ring focus-within:bg-card focus-within:shadow-focus-field';
+  'box-border flex h-8.5 touch:h-touch w-full min-w-0 items-center justify-start gap-0.5 rounded-sm border border-transparent bg-transparent py-0 pr-1 pl-0.5 text-left font-sans text-base font-normal text-muted-foreground hover:border-border-subtle hover:bg-list-add-hover hover:text-foreground focus-within:border-ring focus-within:bg-card focus-within:shadow-focus-field';
 
 function PlusMark() {
   return (

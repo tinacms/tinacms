@@ -12,7 +12,7 @@ const open = async (page: Page) => {
 const button = (page: Page, name: string) =>
   page.getByRole('button', { name, exact: true });
 
-test('AC43: Restore preview moves focus to Maximise form on the other side', async ({
+test('Restore preview moves focus to Maximise form on the other side', async ({
   page,
 }) => {
   await open(page);
@@ -22,7 +22,7 @@ test('AC43: Restore preview moves focus to Maximise form on the other side', asy
   await expect(button(page, 'Maximise form')).toBeFocused();
 });
 
-test('AC43: Maximise form and Restore form keep focus on the form header button', async ({
+test('Maximise form and Restore form keep focus on the form header button', async ({
   page,
 }) => {
   await open(page);
@@ -32,7 +32,7 @@ test('AC43: Maximise form and Restore form keep focus on the form header button'
   await expect(button(page, 'Maximise form')).toBeFocused();
 });
 
-test('AC43: Escape restores and focuses Maximise form from either start', async ({
+test('Escape restores and focuses Maximise form from either start', async ({
   page,
 }) => {
   await open(page);

@@ -8,7 +8,8 @@ import { Button } from '@tinacms/ui/components/button';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { ScreenContent } from '@tinacms/ui/components/sheet';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
-import { useEffect, useMemo, useState } from 'react';
+import { use, useEffect, useMemo, useState } from 'react';
+import { OneViewContext } from './one-view';
 import {
   ContentError,
   type ContentProvider,
@@ -170,6 +171,7 @@ function SearchDialog({
 }) {
   const phone = useTier() === 'phone';
   const { navigate } = useAdminRoute();
+  const oneView = use(OneViewContext);
   const [query, setQuery] = useState('');
   const [outcome, setOutcome] = useState<ContentSearchOutcome>(NO_OUTCOME);
   const navigation = useNavigationResults();
@@ -244,6 +246,7 @@ function SearchDialog({
                   className='block w-full cursor-pointer rounded-sm px-2 py-1.5 text-left hover:bg-muted'
                   onClick={() => {
                     onOpenChange(false);
+                    oneView.setView('form');
                     navigate({
                       view: 'document',
                       collection: ref.collection,

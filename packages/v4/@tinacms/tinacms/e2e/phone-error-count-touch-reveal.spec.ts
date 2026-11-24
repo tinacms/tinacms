@@ -21,7 +21,7 @@ const inside = async (child: Locator, parent: Locator) => {
 const opacity = (locator: Locator) =>
   locator.evaluate((node) => Number(getComputedStyle(node).opacity));
 
-test.describe('AC18: error counts fit the phone form bar at 375px', () => {
+test.describe('error counts fit the phone form bar at 375px', () => {
   test.use({ viewport: P375 });
 
   const open = async (page: Page, filled: number) => {
@@ -75,7 +75,7 @@ test.describe('AC18: error counts fit the phone form bar at 375px', () => {
 });
 
 for (const touch of [true, false]) {
-  test.describe(`AC30 with${touch ? '' : 'out'} touch`, () => {
+  test.describe(`List card and table row reveal with${touch ? '' : 'out'} touch`, () => {
     test.use({
       hasTouch: touch,
       isMobile: touch,

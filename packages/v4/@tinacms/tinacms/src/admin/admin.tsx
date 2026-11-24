@@ -74,6 +74,9 @@ import { NoPreview, PreviewSlot } from './preview-slot';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
 
+// About a second of frames to wait for the document entry before the first control takes focus.
+const OVERLAY_FOCUS_FRAMES = 60;
+
 const SHELL_WIDTH = { '--sidebar-width': '15rem' } as CSSProperties;
 
 // Sits between the Top bar and the Status bar instead of the full viewport.
@@ -229,7 +232,6 @@ function NavigatorFrame({
   const tier = useTier();
   const { width, isResizing, handleProps } = useColumnWidth({
     ...NAVIGATOR_COLUMN,
-    // The handle's own label.
   });
   return (
     <>
@@ -514,9 +516,12 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
   // Portalled content (dialogs, menus, sheets) sits outside the wrapper, so <html> carries the
   // breakpoint too and the `phone:` variants reach it.
   useLayoutEffect(() => {
-    document.documentElement.dataset.breakpoint = tier;
+    const root = document.documentElement;
+    const before = root.dataset.breakpoint;
+    root.dataset.breakpoint = tier;
     return () => {
-      delete document.documentElement.dataset.breakpoint;
+      if (before === undefined) delete root.dataset.breakpoint;
+      else root.dataset.breakpoint = before;
     };
   }, [tier]);
   return (
@@ -693,7 +698,6 @@ function AdminShell({
   const mainRoute = isMediaRoute ? lastMain : route;
 
   const [desktopMaximised, setMaximised] = useState(false);
-  // Below desktop the Media pane always fills the space and has no Maximise.
   const maximised = desktopMaximised || tier !== 'desktop';
   const treeFolders = useTreeFolders();
   useEffect(() => {
@@ -862,12 +866,17 @@ function AdminShell({
     else if (tier === 'tablet' && before === 'phone') setTabletMaximised(true);
   }, [tier]);
   const documentOpen = mainRoute.view === 'document' && previewVisible;
+  // The Collections column beside the preview is the split, never one view.
   const oneViewActive =
-    documentOpen && (phone || (tier === 'tablet' && tabletMaximised));
+    documentOpen &&
+    (phone || (tier === 'tablet' && tabletMaximised && !showOverlay));
   useEffect(() => {
     if (!previewVisible || isMediaRoute) setTabletMaximised(false);
   }, [previewVisible, isMediaRoute]);
-  // A document opens on its form every time.
+  // Set while rendering, so a quick Back never finds one view left on.
+  if (tabletMaximised && showOverlay && tier === 'tablet') {
+    setTabletMaximised(false);
+  }
   useEffect(() => {
     setView('form');
   }, [openPath]);
@@ -979,13 +988,26 @@ function AdminShell({
   useEffect(() => {
     if (showOverlay) {
       wasOverlay.current = true;
-      const frame = requestAnimationFrame(() => {
+      // The side nav sheet hands focus back to its menu button as it leaves, and the
+      // document entry draws once its collection loads: focus waits for both.
+      let frame = 0;
+      let waited = 0;
+      const place = () => {
+        waited += 1;
+        const sheetLeaving = document.querySelector(
+          '[data-slot=sidebar][data-mobile=true]'
+        );
         const pane = document.querySelector('[aria-label=Navigator]');
-        (
-          pane?.querySelector<HTMLElement>('[aria-current=page]') ??
-          pane?.querySelector<HTMLElement>('button')
-        )?.focus();
-      });
+        const current = pane?.querySelector<HTMLElement>('[aria-current=page]');
+        if (!sheetLeaving && (current || waited > OVERLAY_FOCUS_FRAMES)) {
+          (current ?? pane?.querySelector<HTMLElement>('button'))?.focus();
+          return;
+        }
+        if (waited <= OVERLAY_FOCUS_FRAMES * 2) {
+          frame = requestAnimationFrame(place);
+        }
+      };
+      frame = requestAnimationFrame(place);
       return () => cancelAnimationFrame(frame);
     }
     if (!wasOverlay.current || overlay) return;

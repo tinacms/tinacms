@@ -99,7 +99,7 @@ const config = defineConfig({`
   });
 };
 
-test.describe('AC17: reference steps and Search on a phone', () => {
+test.describe('reference steps and Search on a phone', () => {
   test('the Open icon on the Author field shows the author on Form, and browser Back returns to the edited post on Form with no reload', async ({
     page,
   }) => {
@@ -167,7 +167,7 @@ test.describe('AC17: reference steps and Search on a phone', () => {
   });
 });
 
-test.describe('AC25: the branch switcher on a phone', () => {
+test.describe('the branch switcher on a phone', () => {
   // The list is read when the admin mounts and again on Retry, so a later
   // failure is a reload that finds the list down while a chosen branch is saved.
   test('a branch list that fails shows the failure with Retry, the top bar keeps the chosen branch, and Retry recovers', async ({
@@ -229,7 +229,7 @@ test.describe('AC25: the branch switcher on a phone', () => {
   });
 });
 
-test.describe('AC26: Search results on a phone', () => {
+test.describe('Search results on a phone', () => {
   const searchFor = async (page: Page, mode: SearchMode) => {
     await stubBranchesPlayground(page);
     await page.setViewportSize(P390);
@@ -253,6 +253,23 @@ test.describe('AC26: Search results on a phone', () => {
     await expectFormView(page);
   });
 
+  test('picking the document that is already open switches Preview back to Form', async ({
+    page,
+  }) => {
+    const search = await searchFor(page, 'document');
+    await search.getByText('content/posts/post-02.mdx').click();
+    await expect(page).toHaveURL(/post-02\.mdx/);
+    await viewSwitch(page).getByRole('button', { name: 'Preview' }).click();
+    await expect(page.locator('iframe[title="Preview"]')).toBeVisible();
+    await page.getByRole('button', { name: 'Search', exact: true }).click();
+    await searchOf(page)
+      .getByRole('searchbox', { name: 'Search' })
+      .fill('zzzz');
+    await searchOf(page).getByText('content/posts/post-02.mdx').click();
+    await expect(searchOf(page)).toBeHidden();
+    await expectFormView(page);
+  });
+
   test('a failed search shows the provider message in an alert, as at desktop', async ({
     page,
   }) => {
@@ -260,6 +277,8 @@ test.describe('AC26: Search results on a phone', () => {
     const message = "Can't reach search right now. Try again in a moment.";
     await expect(search.getByRole('alert')).toHaveText(message);
     await page.setViewportSize(DESKTOP);
+    await expect(page.locator('[data-slot=screen-content]')).toHaveCount(0);
+    await searchOf(page).getByRole('searchbox', { name: 'Search' }).focus();
     await page.keyboard.press('Escape');
     await expect(searchOf(page)).toBeHidden();
     await page.getByRole('button', { name: 'Search', exact: true }).click();

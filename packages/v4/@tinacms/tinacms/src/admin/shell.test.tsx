@@ -455,6 +455,30 @@ describe('Top bar', () => {
     expect(within(bar).queryByText('No saves yet this session')).toBeNull();
   });
 
+  it('announces only the short words from the live region on a phone, with no long copy in the page', async () => {
+    stubWidth(390);
+    mode = 'local';
+    renderAdmin();
+    const bar = await screen.findByRole('contentinfo', { name: 'Status bar' });
+    await within(bar).findByText('No saves yet');
+    const live = bar.querySelectorAll('[aria-live]');
+    expect(live).toHaveLength(1);
+    expect(live[0]).toHaveTextContent(/^No saves yet$/);
+    expect(document.body.textContent).not.toContain(
+      'No saves yet this session'
+    );
+  });
+
+  it('announces the long words from the live region at desktop', async () => {
+    mode = 'local';
+    renderAdmin();
+    const bar = await screen.findByRole('contentinfo', { name: 'Status bar' });
+    const live = bar.querySelector('[aria-live]');
+    await waitFor(() =>
+      expect(live).toHaveTextContent('No saves yet this session')
+    );
+  });
+
   it('omits the project name when none is configured', async () => {
     renderAdmin();
     await screen.findByRole('banner', { name: 'Top bar' });

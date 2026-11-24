@@ -517,7 +517,7 @@ function ErrorPane({
                 ? 'Pinned. It docks beside the preview on a wider window.'
                 : 'Fix these to save.'}
             </p>
-            <span className='inline-flex flex-none items-center gap-1.5 text-xs leading-control text-muted-foreground'>
+            <span className='inline-flex flex-none items-center gap-1.5 text-xs leading-control text-muted-foreground touch:hidden'>
               <Kbd size='sm'>Esc</Kbd>
               <span className='sr-only'>Escape</span>
               to hide
