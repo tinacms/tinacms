@@ -4,11 +4,7 @@ import type { ServerResponse } from 'node:http';
 import path from 'node:path';
 import type { Connect, Plugin } from 'vite';
 import { runCodegen } from '../../../../cli/commands/codegen';
-import {
-  type ResolvedConfig,
-  composePlugins,
-  resolveBuild,
-} from '../../../../config';
+import { type ResolvedConfig, resolveBuild } from '../../../../config';
 import type { Session } from '../../../../core/auth/contract';
 import {
   CONTENT_CREATE_PERMISSION,
@@ -22,7 +18,8 @@ import {
   createServerHookRegistry,
   createServerSave,
 } from '../../../../core/form/server-hooks';
-import { corePlugins } from '../../../fields';
+import coreValidatorsPlugin from '../../../validators/core-validators.plugin';
+import { coreStoredHelpers } from '../../../fields/core-stored-helpers';
 import { storedHelpersOf } from '../../../../core/form/server-validation';
 import { createServerValidatorRegistry } from '../../../../core/validator/server-registry';
 import { invariant } from '../../../../core/invariant';
@@ -477,9 +474,8 @@ export const tinaLocalDataLayerVitePlugin = (
     'tinaLocalDataLayerVitePlugin needs `config` (the loaded tina/config.ts) or `collections`.'
   );
   const dataLayer = createLocalDataLayer({ ...options, collections });
-  // With no config, the core plugins that need no other plugin (so not `image`) give the validators and the stored-value helpers.
-  const plugins =
-    options.config?.plugins ?? composePlugins([], corePlugins).plugins;
+  // With no config, the core validators and `coreStoredHelpers` keep a collection's built-in rules running.
+  const plugins = options.config?.plugins ?? [coreValidatorsPlugin];
   const contentGate = createSessionGate(plugins, 'content');
   const mediaGate = createSessionGate(plugins, 'media');
   const mayCreateStorage = new AsyncLocalStorage<boolean>();
@@ -490,7 +486,7 @@ export const tinaLocalDataLayerVitePlugin = (
         createServerSave({
           hooks: createServerHookRegistry(plugins, resolved),
           validators: createServerValidatorRegistry(plugins, resolved),
-          stored: storedHelpersOf(plugins),
+          stored: options.config ? storedHelpersOf(plugins) : coreStoredHelpers,
           collections,
           write: ({ collection, path: documentPath, value }) =>
             kind === 'create'

@@ -1,4 +1,5 @@
 import { definePlugin } from '../../../core/plugin';
+import { richTextStored } from '../core-stored-helpers';
 import { RICH_TEXT_FIELD_TYPE } from './rich-text-field.schema';
 
 export const richTextFieldPlugin = definePlugin({
@@ -7,11 +8,7 @@ export const richTextFieldPlugin = definePlugin({
   field: {
     type: RICH_TEXT_FIELD_TYPE,
     contractVersion: 1,
-    // The Backend sees the stored source, so no editor value is read here.
-    stored: {
-      isEmpty: (value) => typeof value !== 'string' || value.trim() === '',
-      measure: () => null,
-    },
+    stored: richTextStored,
   },
   client: () => import('./rich-text-field.client'),
 });

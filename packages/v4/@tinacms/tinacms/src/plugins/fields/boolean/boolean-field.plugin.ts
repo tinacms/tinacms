@@ -1,4 +1,5 @@
 import { definePlugin } from '../../../core/plugin';
+import { booleanStored } from '../core-stored-helpers';
 import { BOOLEAN_FIELD_TYPE } from './boolean-field.schema';
 
 export const booleanFieldPlugin = definePlugin({
@@ -7,7 +8,7 @@ export const booleanFieldPlugin = definePlugin({
   field: {
     type: BOOLEAN_FIELD_TYPE,
     contractVersion: 1,
-    stored: { isEmpty: () => false },
+    stored: booleanStored,
   },
   client: () => import('./boolean-field.client'),
 });

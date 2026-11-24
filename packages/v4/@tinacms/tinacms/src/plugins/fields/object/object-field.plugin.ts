@@ -1,4 +1,5 @@
 import { definePlugin } from '../../../core/plugin';
+import { objectStored } from '../core-stored-helpers';
 import { OBJECT_FIELD_TYPE } from './object-field.schema';
 
 export const objectFieldPlugin = definePlugin({
@@ -7,8 +8,7 @@ export const objectFieldPlugin = definePlugin({
   field: {
     type: OBJECT_FIELD_TYPE,
     contractVersion: 1,
-    // Storage drops unset subfields, so a stored `{}` is a present object.
-    stored: { isEmpty: (value) => value == null, childrenWhenAbsent: true },
+    stored: objectStored,
   },
   client: () => import('./object-field.client'),
 });
