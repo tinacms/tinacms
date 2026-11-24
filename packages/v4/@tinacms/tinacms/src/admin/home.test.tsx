@@ -118,13 +118,24 @@ const renderAdmin = () =>
     />
   );
 
+// The preview wrapper stays mounted but hidden after a route showed it.
+const shownMain = () => {
+  const shown = screen
+    .getAllByRole('main')
+    .filter((main) => !main.classList.contains('hidden'));
+  if (shown.length !== 1) throw new Error(`${shown.length} shown main regions`);
+  return shown[0] as HTMLElement;
+};
+
+const findShownMain = () => waitFor(shownMain);
+
 const panelTitles = () =>
-  within(screen.getByRole('main'))
+  within(shownMain())
     .getAllByRole('region')
     .map((region) => within(region).getByRole('heading').textContent);
 
 const panel = async (name: string | RegExp) =>
-  within(await screen.findByRole('main')).findByRole('region', { name });
+  within(await findShownMain()).findByRole('region', { name });
 
 const columnOf = (region: HTMLElement) =>
   region.closest('[data-home-column]')?.getAttribute('data-home-column');
@@ -284,7 +295,7 @@ describe('Home screen', () => {
     async (_case, hash) => {
       window.location.hash = hash;
       renderAdmin();
-      const main = await screen.findByRole('main');
+      const main = await findShownMain();
       expect(
         await within(main).findByRole('region', { name: /^Collections/ })
       ).toBeVisible();
@@ -300,7 +311,7 @@ describe('Home screen', () => {
     keepDraft('content/posts/hello.mdx');
     world.plugins = [customHomePlugin(true)];
     renderAdmin();
-    const main = await screen.findByRole('main');
+    const main = await findShownMain();
     expect(await within(main).findByText('custom home')).toBeVisible();
     expect(seenSegments.at(-1)).toEqual([]);
     expect(within(main).queryByRole('region')).toBeNull();
@@ -315,7 +326,7 @@ describe('Home screen', () => {
     world.plugins = [customHomePlugin(true)];
     window.location.hash = '#/screens/home/a/b';
     renderAdmin();
-    const main = await screen.findByRole('main');
+    const main = await findShownMain();
     expect(await within(main).findByText('custom home')).toBeVisible();
     expect(seenSegments.at(-1)).toEqual(['a', 'b']);
     expect(within(main).queryByRole('button', { name: 'Close' })).toBeNull();
@@ -352,7 +363,7 @@ describe('Home screen', () => {
     async (_case, renderIt) => {
       const user = userEvent.setup();
       renderIt();
-      const main = await screen.findByRole('main');
+      const main = await findShownMain();
       expect(
         within(main).getByText('Pick a place from the sidebar.')
       ).toBeVisible();
@@ -425,7 +436,7 @@ describe('Home screen', () => {
     await user.click(rows[0]);
     await waitFor(() => expect(window.location.hash).toBe('#/'));
     expect(await railRow('Home')).toHaveAttribute('aria-current', 'page');
-    for (const name of ['Tools', 'Settings']) {
+    for (const name of ['Collections', 'Media']) {
       await user.click(within(await rail()).getByRole('button', { name }));
       expect(await railRow('Home')).not.toHaveAttribute('aria-current');
     }
@@ -440,7 +451,7 @@ describe('Home screen', () => {
     await user.click(results.getByRole('button', { name: 'Home' }));
     await waitFor(() => expect(window.location.hash).toBe('#/'));
     expect(
-      await within(await screen.findByRole('main')).findByRole('heading', {
+      await within(await findShownMain()).findByRole('heading', {
         name: 'Home',
       })
     ).toBeVisible();
@@ -505,7 +516,7 @@ describe('Home head', () => {
       )
     ).toBeVisible();
     expect(
-      within(screen.getByRole('main')).getByRole('heading', { name: 'Home' })
+      within(shownMain()).getByRole('heading', { name: 'Home' })
     ).toBeVisible();
     expect(screen.queryByRole('button', { name: /^Review/ })).toBeNull();
   });
@@ -537,11 +548,9 @@ describe('Home head', () => {
     expect(
       await screen.findByRole('button', { name: 'Review 1 unsaved' })
     ).toBeVisible();
+    expect(within(shownMain()).queryByText(/^Local files/)).toBeNull();
     expect(
-      within(screen.getByRole('main')).queryByText(/^Local files/)
-    ).toBeNull();
-    expect(
-      within(screen.getByRole('main')).queryByRole('region', { name: 'Branch' })
+      within(shownMain()).queryByRole('region', { name: 'Branch' })
     ).toBeNull();
   });
 });
@@ -1107,7 +1116,7 @@ describe('Branch panel', () => {
       within(branch).queryByRole('button', { name: /^Review/ })
     ).toBeNull();
     expect(within(branch).queryByText(/not saved yet/)).toBeNull();
-    const main = screen.getByRole('main');
+    const main = shownMain();
     expect(within(main).getByRole('heading', { name: 'Home' })).toBeVisible();
     expect(within(main).queryByText(/^Local files/)).toBeNull();
     expect(
@@ -1355,7 +1364,7 @@ describe('Branch panel', () => {
     expect(within(branch).getByRole('button', { name: 'Retry' })).toBeVisible();
     expect(within(branch).getByText('feature/news')).toBeVisible();
     expect(within(branch).getByText('1 document not saved yet')).toBeVisible();
-    const main = screen.getByRole('main');
+    const main = shownMain();
     expect(
       within(main).getAllByRole('button', { name: /^Review/ })
     ).toHaveLength(1);
@@ -1383,7 +1392,7 @@ describe('Branch panel', () => {
     ).toBeVisible();
     expect(busyParts(branch)).toEqual(['pull-request-row']);
     expect(
-      within(screen.getByRole('main')).getAllByRole('button', {
+      within(shownMain()).getAllByRole('button', {
         name: /^Review/,
       })
     ).toHaveLength(1);
@@ -1405,7 +1414,7 @@ describe('Branch panel', () => {
       within(branch).getByRole('button', { name: 'Review 1 unsaved' })
     ).toBeVisible();
     expect(
-      within(screen.getByRole('main')).getAllByRole('button', {
+      within(shownMain()).getAllByRole('button', {
         name: /^Review/,
       })
     ).toHaveLength(1);

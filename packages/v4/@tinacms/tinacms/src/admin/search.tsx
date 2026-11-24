@@ -137,8 +137,6 @@ function useNavigationResults(): NavigationResult[] {
               : { view: 'media' }
           ),
       },
-      { label: 'Tools', run: () => navigate({ view: 'tools' }) },
-      { label: 'Settings', run: () => navigate({ view: 'settings' }) },
     ];
     const plugins = globalNav
       .flatMap(({ entries }) => entries)
@@ -194,7 +192,7 @@ function SearchDialog({
   }, [provider, content, query]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size='lg' showCloseButton>
+      <DialogContent size='lg' showCloseButton keyboard>
         <DialogTitle>Search</DialogTitle>
         <SearchBox
           label='Search'
@@ -203,25 +201,29 @@ function SearchDialog({
           onClear={() => setQuery('')}
           autoFocus
         />
-        <h3 className='text-sm font-semibold text-muted-foreground'>
-          Navigation
-        </h3>
-        <ul aria-label='Navigation results' className='m-0 list-none p-0'>
-          {matching.map(({ id, label, run }) => (
-            <li key={id}>
-              <button
-                type='button'
-                className='w-full cursor-pointer rounded-sm px-2 py-1.5 text-left text-base hover:bg-muted'
-                onClick={() => {
-                  onOpenChange(false);
-                  run();
-                }}
-              >
-                {label}
-              </button>
-            </li>
-          ))}
-        </ul>
+        {matching.length > 0 ? (
+          <>
+            <h3 className='text-sm font-semibold text-muted-foreground'>
+              Navigation
+            </h3>
+            <ul aria-label='Navigation results' className='m-0 list-none p-0'>
+              {matching.map(({ id, label, run }) => (
+                <li key={id}>
+                  <button
+                    type='button'
+                    className='w-full cursor-pointer rounded-sm px-2 py-1.5 text-left text-base hover:bg-muted'
+                    onClick={() => {
+                      onOpenChange(false);
+                      run();
+                    }}
+                  >
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
         {provider && content ? (
           <>
             <h3 className='text-sm font-semibold text-muted-foreground'>

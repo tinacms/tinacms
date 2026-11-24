@@ -10,7 +10,15 @@ import {
   offset,
 } from '@udecode/plate-floating';
 
-import { useEditorRef, useEventEditorValue } from '@udecode/plate/react';
+import { TablePlugin } from '@udecode/plate-table/react';
+import { LinkPlugin } from '@udecode/plate-link/react';
+import {
+  useEditorRef,
+  useEditorSelector,
+  useEventEditorValue,
+} from '@udecode/plate/react';
+import { helpers } from '../../plugins/core/common';
+import { useToolbarContext } from '../../toolbar/toolbar-provider';
 import { Toolbar } from './toolbar';
 import { useCustomFloatingToolbar } from './use-floating-toolbar-hook';
 import { useCustomFloatingToolbarState } from './use-floating-toolbar-state';
@@ -23,9 +31,30 @@ export const FloatingToolbar = withRef<
 >(({ children, state, ...props }, propRef) => {
   const editorId = useEditorRef();
   const focusedEditorId = useEventEditorValue('focus');
-  const test = useCustomFloatingToolbarState({
+  const { overrides } = useToolbarContext();
+  const inTable = useEditorSelector(
+    (e) =>
+      helpers.isNodeActive(e, TablePlugin) ||
+      (e.selection !== null &&
+        [e.selection.anchor, e.selection.focus].some((at) =>
+          e.api.above({ at, match: { type: e.getType(TablePlugin) } })
+        )),
+    []
+  );
+  const inLink = useEditorSelector(
+    (e) =>
+      e.selection !== null &&
+      !!e.api.above({ match: { type: e.getType(LinkPlugin) } }),
+    []
+  );
+  const floatingState = useCustomFloatingToolbarState({
     editorId: editorId.id,
     focusedEditorId,
+    hideToolbar:
+      state?.hideToolbar ||
+      inTable ||
+      inLink ||
+      overrides?.showFloatingToolbar === false,
     ...state,
     floatingOptions: {
       middleware: [
@@ -49,7 +78,7 @@ export const FloatingToolbar = withRef<
     hidden,
     props: rootProps,
     ref: floatingRef,
-  } = useCustomFloatingToolbar(test);
+  } = useCustomFloatingToolbar(floatingState);
 
   const ref = useComposedRef<HTMLDivElement>(propRef, floatingRef);
 
@@ -58,8 +87,9 @@ export const FloatingToolbar = withRef<
   return (
     <PortalBody>
       <Toolbar
+        aria-label='Turn into'
         className={cn(
-          'absolute z-[10799] whitespace-nowrap border bg-popover px-1 opacity-100 shadow-md print:hidden rounded-sm'
+          'absolute z-20 whitespace-nowrap rounded-md bg-popover p-1 font-sans shadow-popover inset-ring inset-ring-border print:hidden'
         )}
         {...props}
         {...rootProps}

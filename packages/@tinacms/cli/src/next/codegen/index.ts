@@ -410,8 +410,8 @@ export default client;
   async genTypes() {
     const typescriptTypes = await generateTypes(
       this.schema,
-      this.configManager.userQueriesAndFragmentsGlob,
-      this.configManager.generatedQueriesAndFragmentsGlob,
+      this.configManager.userQueriesAndFragmentsPointers,
+      this.configManager.generatedQueriesAndFragmentsPointers,
       this.getApiURL()
     );
     const codeString = `//@ts-nocheck

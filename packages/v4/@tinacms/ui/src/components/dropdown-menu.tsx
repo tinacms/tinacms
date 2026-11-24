@@ -6,6 +6,7 @@ import type * as React from 'react';
 
 import { Avatar } from '@tinacms/ui/components/avatar';
 import { type Glyph, Icon } from '@tinacms/ui/components/icon';
+import { usePopupEdgePadding } from '@tinacms/ui/components/foot-sheet';
 import { cn } from '@tinacms/ui/lib/utils';
 
 const menuRowClasses =
@@ -57,13 +58,21 @@ function DropdownMenuContent({
   alignOffset = 0,
   side = 'bottom',
   sideOffset = 4,
+  collisionPadding,
+  collisionAvoidance,
   className,
   ...props
 }: MenuPrimitive.Popup.Props &
   Pick<
     MenuPrimitive.Positioner.Props,
-    'align' | 'alignOffset' | 'side' | 'sideOffset'
+    | 'align'
+    | 'alignOffset'
+    | 'side'
+    | 'sideOffset'
+    | 'collisionPadding'
+    | 'collisionAvoidance'
   >) {
+  const edge = usePopupEdgePadding();
   return (
     <MenuPrimitive.Portal>
       <MenuPrimitive.Positioner
@@ -72,6 +81,8 @@ function DropdownMenuContent({
         alignOffset={alignOffset}
         side={side}
         sideOffset={sideOffset}
+        collisionPadding={collisionPadding ?? edge}
+        collisionAvoidance={collisionAvoidance}
       >
         <MenuPrimitive.Popup
           data-slot='dropdown-menu-content'

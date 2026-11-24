@@ -50,6 +50,15 @@ v3 also took a bare list of buttons under `toolbarOverride`. v4 has no
 the same list: `toolbarOverride: ['bold', 'italic']` is
 `overrides: { toolbar: ['bold', 'italic'] }`.
 
+`overrides.toolbar` is an allow-list. A tool that is not in the list does not
+show, and the order of the list does not change the toolbar. The toolbar puts
+each tool in a fixed place by kind: the text style menu (`heading`); in line
+(`bold`, `italic`, `link`, `ul`, `ol`, `quote`); More formatting
+(`strikethrough`, `code`, `highlight`, `textColor`); Insert (`embed` templates,
+then `image`, `table`, `codeBlock`, `mermaid`, `hr`). An unknown key is
+ignored. A group with no allowed tool does not draw, and an empty list draws no
+toolbar. v3 ordered the toolbar by this list. v4 does not.
+
 There is no `parser` option. Both of v3's values lose content through this
 field. `slatejson` makes `serializeMDX` return the AST, and this field writes
 that as an empty body. `markdown` uses a stringifier that has no
@@ -203,7 +212,7 @@ the necessary capabilities now:
 | Stub | It waits for | Effect now |
 |---|---|---|
 | `nested-form.tsx` | The object field (`plugins/fields/object/`) | The CMS parses, renders, and serializes the embeds. Their side panel is not available, thus a document loses no data when a user opens it. |
-| `image-toolbar-button.tsx` | The media capability (`plugins/media/`) | The CMS renders and serializes the image nodes that exist. A user cannot insert a new image. |
+| The Image row of Insert (`insert-menu.tsx`) | The media capability (`plugins/media/`) | The CMS renders and serializes the image nodes that exist. A user cannot insert a new image. |
 | The field definitions of `create-img-plugin` | The image field | An author edits the URL of an embed as a plain string. |
 | Raw mode | A raw markdown editor | v4 has no editor to switch to, so the toolbar button and the button on the parse-error card are hidden instead of dead. `EditorContext` keeps the `setRawMode` shape for when one exists. |
 
@@ -257,15 +266,23 @@ points `react` and `react-dom` to the types in this package.
 | `rich-text-field.states.ts` | Empty, filled, too long, required, invalid, disabled, read-only, embed and body states. |
 | `rich-text-field.states.test.tsx` | Renders each state and checks the structure, not pixels. |
 
-- **Framed** (the live layout, also for `isBody`): the text stops growing at
-  `max-h-60` and scrolls beneath a toolbar that stays put.
+- **Framed** (a field without `isBody`): the text stops growing at `max-h-60`
+  and scrolls beneath a toolbar that stays put. At the end of its scroll, the
+  wheel moves the form.
 - **Read-only**: the toolbar is hidden, the fill is muted, and the text, the
   embed menu, the embed label and the Enter hotkey do nothing.
 - **Disabled**: read-only plus `inert` and `aria-disabled`, so the toolbar is
   still drawn but takes no focus, pointer or tooltip.
-- **Body** (catalogue only): no frame, the label is `sr-only`, errors and
-  warnings sit above, and the minimum height is `min-h-56`. The live field keeps
-  the framed layout for `isBody` because v4 has no editor pane yet.
+- **Body** (`isBody: true`): the same frame, visible label and messages as
+  every field, at least `min-h-56` (224px) tall. The text grows with its content
+  up to `min(70vh, 640px)`, then scrolls inside the box (`overflow-y: auto`).
+  The toolbar is a sibling above the text, so it stays put while the text
+  scrolls. At the text's top or bottom the wheel moves the form (no
+  `overscroll-behavior` is set), and over a body shorter than the cap the wheel
+  moves the form at once. The toolbar is flat at the top of the box, sticks 8px
+  under the top of the form, and becomes a floating card (`data-stuck`) while it
+  is stuck; scrolling the text leaves it where it is. On a phone, the toolbar sits on
+  top of the keyboard while the body has focus.
 
 No live field is disabled or read-only yet; the catalogue is the only source.
 

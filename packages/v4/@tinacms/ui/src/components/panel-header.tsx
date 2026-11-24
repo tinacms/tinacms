@@ -1,5 +1,9 @@
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
 
+import {
+  Breadcrumb,
+  type BreadcrumbStep,
+} from '@tinacms/ui/components/breadcrumb';
 import { Button } from '@tinacms/ui/components/button';
 import {
   DropdownMenu,
@@ -11,6 +15,11 @@ import { cn } from '@tinacms/ui/lib/utils';
 type PanelHeaderProps = Omit<ComponentProps<'div'>, 'children'> & {
   /** Long titles end in an ellipsis. A back button replaces it. */
   heading?: string;
+  /**
+   * Where the heading sits, top first. With it the bar is the 64px title-led head: the
+   * trail over the heading, and no back button. Every step should have an `onClick`.
+   */
+  trail?: BreadcrumbStep[];
   /** Shows a back button with these words in place of the title. */
   backLabel?: string;
   backTitle?: string;
@@ -34,12 +43,13 @@ type PanelHeaderProps = Omit<ComponentProps<'div'>, 'children'> & {
 };
 
 /**
- * The 44px bar at the top of every panel: a title or a back button, at most one
+ * The 44px bar at the top of every panel (64px with a `trail`): a title or a back button, at most one
  * action (after the title, or at the end with `actionAt`), then the ⋯ menu and close
  * at the end. Tab goes back, action, ⋯, maximise, close.
  */
 function PanelHeader({
   heading,
+  trail,
   backLabel,
   backTitle,
   onBack,
@@ -54,16 +64,33 @@ function PanelHeader({
   className,
   ...props
 }: PanelHeaderProps) {
+  const titled = trail !== undefined;
   return (
     <div
       data-slot='panel-header'
       className={cn(
-        'relative box-border flex h-11 flex-none items-center gap-1 border-b border-border-subtle bg-card pr-1.5 pl-2 font-sans text-base leading-control text-foreground',
+        'relative box-border flex flex-none items-center gap-1 border-b border-border-subtle bg-card pr-1.5 font-sans text-base leading-control text-foreground',
+        titled ? 'h-16 pl-4' : 'h-11 pl-2',
         className
       )}
       {...props}
     >
-      {backLabel ? (
+      {titled ? (
+        <div className='flex min-w-0 flex-1 flex-col justify-center'>
+          <Breadcrumb
+            items={trail}
+            size='sm'
+            max={4}
+            aria-label='Location'
+            className='-ml-1 text-muted-foreground'
+          />
+          {heading ? (
+            <h2 className='m-0 truncate text-md leading-title font-semibold text-foreground'>
+              {heading}
+            </h2>
+          ) : null}
+        </div>
+      ) : backLabel ? (
         <Button
           variant='ghost'
           size='sm'
@@ -79,7 +106,7 @@ function PanelHeader({
         </h2>
       ) : null}
       {actionAt === 'start' ? action : null}
-      <span aria-hidden='true' className='flex-1' />
+      {titled ? null : <span aria-hidden='true' className='flex-1' />}
       {actionAt === 'end' ? action : null}
       {menu ? (
         <DropdownMenu>
