@@ -61,7 +61,8 @@ const DIRTY_REASON = 'Save or discard your changes first';
 const sameOutcome = (a: Outcome, b: Outcome): boolean =>
   a.kind === b.kind &&
   a.name === b.name &&
-  (a.kind !== 'failed' || (b.kind === 'failed' && a.from === b.from));
+  (a.kind !== 'failed' ||
+    (b.kind === 'failed' && a.from === b.from && a.maybeMade === b.maybeMade));
 
 /**
  * The branch button. Owns whether the switcher is open and what the last create ended in. While
