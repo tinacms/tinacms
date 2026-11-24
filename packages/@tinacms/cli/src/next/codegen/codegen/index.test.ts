@@ -76,6 +76,10 @@ describe('generateTypes with a space in the project path', () => {
         path.join(dir, 'queries/nested/post.graphql'),
         'query SpacedPost { post(relativePath: "a.md") { title } }'
       );
+      fs.writeFileSync(
+        path.join(dir, 'queries/other.gql'),
+        'query SpacedGql { post(relativePath: "b.md") { title } }'
+      );
       const types = await generateTypes(
         schema,
         ['graphql', 'gql'].map((ext) => path.join(dir, `queries/**/*.${ext}`)),
@@ -83,6 +87,7 @@ describe('generateTypes with a space in the project path', () => {
         'http://localhost:4001/graphql'
       );
       expect(types).toContain('SpacedPostQuery');
+      expect(types).toContain('SpacedGqlQuery');
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
