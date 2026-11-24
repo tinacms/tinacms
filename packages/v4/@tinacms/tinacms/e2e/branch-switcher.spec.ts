@@ -4,6 +4,27 @@ const DESKTOP = { width: 1280, height: 800 };
 const TABLET = { width: 768, height: 900 };
 const URL = '/branches.html?docs=1&create=slow#/';
 
+type Locator = import('@playwright/test').Locator;
+/** Resolves once the element's box is the same on two polls in a row (animations done). */
+const settled = async (locator: Locator) => {
+  let last = '';
+  await expect
+    .poll(async () => {
+      const now = JSON.stringify(await locator.boundingBox());
+      const same = now === last;
+      last = now;
+      return same;
+    })
+    .toBe(true);
+};
+const nextFrames = (page: import('@playwright/test').Page) =>
+  page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+      )
+  );
+
 test.describe('branch switcher pop-up', () => {
   test('opens under the button with no scrim and returns focus on Escape', async ({
     page,
@@ -17,7 +38,7 @@ test.describe('branch switcher pop-up', () => {
     await expect(
       page.getByRole('searchbox', { name: 'Search branches' })
     ).toBeFocused();
-    await page.waitForTimeout(300);
+    await settled(popup);
     const trigger = await button.boundingBox();
     const box = await popup.boundingBox();
     if (!trigger || !box) throw new Error('no boxes');
@@ -142,6 +163,39 @@ test.describe('branch switcher pop-up', () => {
     await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
   });
 
+  test('leaves focus on the control you clicked when you dismiss the pop-up by clicking outside', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto(URL);
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeVisible();
+    const outside = page.getByRole('button', { name: 'Toggle Sidebar' });
+    await outside.click();
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+    await expect(outside).toBeFocused();
+  });
+
+  test('still switches to the new branch when Tab is pressed during the create in the pop-up', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto('/branches.html?docs=1&create=slow#/');
+    await openFrame(page, false);
+    const view = frameOf(page, false);
+    await view.getByRole('button', { name: 'New branch' }).click();
+    await view
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/x');
+    await view.getByRole('button', { name: 'Create branch' }).click();
+    await expect(view.getByRole('button', { name: 'Creating' })).toBeVisible();
+    await page.keyboard.press('Tab');
+    await expect(
+      page.getByRole('button', { name: 'Branch: cms/x' })
+    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('cms/x is ready')).toHaveCount(0);
+  });
+
   test('shows Local files in local mode', async ({ page }) => {
     await page.setViewportSize(DESKTOP);
     await page.goto('/');
@@ -259,7 +313,6 @@ test.describe('branch switcher pop-up', () => {
       if (state.maximise)
         await page.getByRole('button', { name: 'Maximise' }).click();
       await page.setViewportSize({ width: 390, height: 844 });
-      await page.waitForTimeout(600);
       await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
       const blocked = await page.evaluate(() => {
         const at = document.elementFromPoint(195, 400);
@@ -340,11 +393,13 @@ test.describe('branch switcher pop-up', () => {
             b.bottom <= window.innerHeight
           );
         });
-      for (let at = 0; at < 12 && !(await fits()); at += 1) {
-        await page.mouse.wheel(0, 300);
-        await page.waitForTimeout(100);
-      }
-      expect(await fits()).toBe(true);
+      await expect
+        .poll(async () => {
+          if (await fits()) return true;
+          await page.mouse.wheel(0, 300);
+          return false;
+        })
+        .toBe(true);
       await create.click();
       await expect(
         page.getByRole('button', { name: 'Creating' })
@@ -365,7 +420,7 @@ test.describe('branch switcher pop-up', () => {
     await page.getByRole('button', { name: 'Create branch' }).click();
     const retry = page.getByRole('button', { name: 'Retry' });
     await expect(retry).toBeVisible();
-    await page.waitForTimeout(400);
+    await settled(retry);
     const inside = await page.evaluate(() => {
       const button = [...document.querySelectorAll('button')].find(
         (b) => b.textContent === 'Retry'
@@ -413,7 +468,7 @@ test.describe('branch switcher pop-up', () => {
     await page.goto('/branches.html?docs=1&many=30&create=ok#/');
     await page.getByRole('button', { name: /^Branch:/ }).click();
     await page.getByRole('button', { name: 'New branch' }).click();
-    await page.waitForTimeout(400);
+    await settled(page.getByRole('button', { name: 'Create branch' }));
     const inside = await page.evaluate(() => {
       const button = [...document.querySelectorAll('button')].find(
         (b) => b.textContent === 'Create branch'
@@ -473,7 +528,7 @@ test.describe('branch switcher pop-up', () => {
       await view.getByRole('button', { name: 'Create branch' }).click();
       const retry = view.getByRole('button', { name: 'Retry' });
       await expect(retry).toBeVisible();
-      await page.waitForTimeout(400);
+      await settled(retry);
       const clear = await page.evaluate(() => {
         const button = [...document.querySelectorAll('button')].find(
           (b) => b.textContent === 'Retry'
@@ -525,11 +580,11 @@ test.describe('branch switcher pop-up', () => {
     await page.getByRole('button', { name: 'Maximise' }).click();
     await expect(view).toBeVisible();
     await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
-    await page.waitForTimeout(400);
+    await settled(view);
     expect(await rowInView()).toBe(true);
     await view.getByRole('button', { name: 'Restore' }).click();
     await expect(page.getByRole('dialog', { name: 'Branches' })).toBeVisible();
-    await page.waitForTimeout(400);
+    await settled(page.getByRole('dialog', { name: 'Branches' }));
     expect(await rowInView()).toBe(true);
   });
 
@@ -956,6 +1011,41 @@ test.describe('branch switcher pop-up', () => {
       expect(scroll).toBeLessThanOrEqual(client);
     });
 
+    test(`keeps the Creating button in place while the branch gets ready in the ${frame.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=slow#/');
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      await view.getByRole('button', { name: 'New branch' }).click();
+      await view
+        .getByRole('searchbox', { name: 'New branch name' })
+        .fill('cms/x');
+      await view.getByRole('button', { name: 'Create branch' }).click();
+      const busy = view.getByRole('button', { name: 'Creating' });
+      const form = view.getByRole('form', { name: 'New branch form' });
+      await expect(busy).toBeVisible();
+      await settled(busy);
+      // The button's distance below the form's top, so a scroll of the frame does not count.
+      const gap = async () => {
+        const [b, f] = await Promise.all([
+          busy.boundingBox(),
+          form.boundingBox(),
+        ]);
+        return b && f ? Math.round(b.y - f.y) : undefined;
+      };
+      const first = await gap();
+      let samples = 0;
+      while (await busy.isVisible()) {
+        const now = await gap();
+        if (now !== undefined) expect(now).toBe(first);
+        samples += 1;
+        if (samples > 400) break;
+      }
+      expect(samples).toBeGreaterThan(1);
+    });
+
     test(`resets the form and switches when the note's Retry makes a branch whose form create failed while the ${frame.name} was closed`, async ({
       page,
     }) => {
@@ -1071,7 +1161,8 @@ test.describe('branch switcher pop-up', () => {
     await expect.poll(() => toastCount(page)).toBe(0);
     await frameOf(page, false).getByRole('button', { name: 'Dismiss' }).click();
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(500);
+    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+    await nextFrames(page);
     expect(await toastCount(page)).toBe(0);
   });
 

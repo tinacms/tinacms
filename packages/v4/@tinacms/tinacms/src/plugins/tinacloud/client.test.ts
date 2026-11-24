@@ -315,25 +315,31 @@ describe('createBranch', () => {
     await assertion;
   });
 
-  it('rejects ready on a 403 or a non-HTTP error instead of asking again', async () => {
+  it('rejects ready on a 403 instead of asking again', async () => {
     stubFetch(json({}), json({ message: 'forbidden' }, 403));
     const refused = await fast().createBranch({ name: 'cms/x', from: 'main' });
     await expect(refused.ready).rejects.toMatchObject({ status: 403 });
+  });
 
+  it('counts a token read that throws as an unknown status and keeps polling', async () => {
+    vi.useFakeTimers();
     let calls = 0;
-    const throwing = createTinaCloudClient({
+    const flaky = createTinaCloudClient({
       clientId: 'abc',
       getToken: () => {
         calls += 1;
-        if (calls > 1) throw new TypeError('token store broke');
+        if (calls === 2 || calls === 3)
+          throw new TypeError('token store broke');
         return 'secret';
       },
       indexPollMs: 100,
-      indexTimeoutMs: 1000,
+      indexTimeoutMs: 5000,
     });
-    stubFetch(json({}));
-    const broken = await throwing.createBranch({ name: 'cms/x', from: 'main' });
-    await expect(broken.ready).rejects.toBeInstanceOf(TypeError);
+    stubFetch(json({}), json({ status: 'complete' }));
+    const made = await flaky.createBranch({ name: 'cms/x', from: 'main' });
+    const done = expect(made.ready).resolves.toBeUndefined();
+    await vi.advanceTimersByTimeAsync(1000);
+    await done;
   });
 
   it('rejects ready when a poll is refused as unauthorised', async () => {
@@ -469,7 +475,9 @@ describe('createBranch', () => {
       getToken: () => new Promise<string>(() => {}),
       createTimeoutMs: 1000,
     }).createBranch({ name: 'cms/x', from: 'main' });
-    const assertion = expect(pending).rejects.toThrow(/in time/);
+    const assertion = expect(pending).rejects.not.toMatchObject({
+      maybeMade: true,
+    });
     await vi.advanceTimersByTimeAsync(1500);
     await assertion;
   });

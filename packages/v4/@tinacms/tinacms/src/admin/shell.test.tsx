@@ -72,6 +72,7 @@ let beforeSaveCalls: number;
 let failBeforeSave: boolean;
 let stampBeforeSave: boolean;
 let dropAction: () => void;
+let dropCreate: () => void;
 let createDirect: (name: string, from: string) => void;
 let pullRequestUrls: Record<string, string>;
 let createBranch:
@@ -193,6 +194,10 @@ function BranchActionScreen() {
       const create = runtime.store.getState().branch?.create;
       if (typeof create === 'function') create(name, from);
     };
+    dropCreate = () =>
+      runtime.store.setState((state) => ({
+        branch: { ...state.branch, create: undefined },
+      }));
     const action = saveToNewBranch;
     if (!action) return;
     dropAction = () =>
@@ -2496,6 +2501,99 @@ describe('branch switcher rows and creating a branch', () => {
     ).toBeVisible();
     await act(async () => {});
     expect(search).toHaveFocus();
+  });
+
+  it.each([409, 422])(
+    'says the name is taken, whether or not we timed out, when the create is refused with %s',
+    async (status) => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      createBranch = vi.fn<NonNullable<BranchSource['create']>>(() =>
+        Promise.reject(Object.assign(new Error('exists'), { status }))
+      );
+      const { user, dialog } = await startCreate();
+      await press(dialog, user);
+      const inline = await within(dialog).findByText(/already exists/);
+      expect(inline).toHaveTextContent(
+        'A branch called cms/x already exists. Reload to see it.'
+      );
+      expect(inline).not.toHaveTextContent('Check your connection');
+      await user.click(
+        within(dialog).getByRole('button', { name: 'Close branches' })
+      );
+      const toast = await screen.findByText(/Reload to see it\./);
+      expect(toast).not.toHaveTextContent('Check your connection');
+    }
+  );
+
+  it('keeps the same sentence in the failure line while a retry of a timed-out create runs', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    createBranch = vi
+      .fn<NonNullable<BranchSource['create']>>()
+      .mockRejectedValueOnce(
+        Object.assign(new Error('late'), { maybeMade: true })
+      )
+      .mockImplementationOnce(() => new Promise(() => {}));
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await within(dialog).findByText(/reload to check/);
+    await user.click(within(dialog).getByRole('button', { name: 'Retry' }));
+    await within(dialog).findByRole('button', { name: 'Creating' });
+    expect(
+      within(dialog).getByText(/Couldn't create cms\/x/)
+    ).toHaveTextContent('reload to check');
+  });
+
+  it('never shows "already exists" while a form create ends ready', async () => {
+    createBranch = async ({ name }) => ({ name, ready: Promise.resolve() });
+    const { user, dialog } = await startCreate();
+    const seen: string[] = [];
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          seen.push(node.textContent ?? '');
+        }
+      }
+    });
+    observer.observe(globalThis.document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+    await press(dialog, user);
+    await screen.findByRole('button', { name: 'Branch: cms/x' });
+    await act(async () => {});
+    observer.disconnect();
+    expect(seen.filter((text) => /already exists/.test(text))).toEqual([]);
+  });
+
+  it('keeps the toast when Retry is pressed after the provider lost its create', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    window.location.hash = '#/screens/branch-action';
+    createBranch = vi.fn<NonNullable<BranchSource['create']>>(() =>
+      Promise.reject(new Error('offline'))
+    );
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await within(dialog).findByText(/Couldn't create cms\/x\. Check/);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    await screen.findByText("Couldn't create cms/x");
+    act(() => dropCreate());
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(screen.getByText("Couldn't create cms/x")).toBeVisible();
+  });
+
+  it('leaves focus on the field you clicked when you dismiss the pop-up by clicking outside', async () => {
+    const { user } = await openSwitcher();
+    const outside = screen.getAllByRole('button', {
+      name: 'Toggle Sidebar',
+    })[0];
+    await user.click(outside);
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: 'Branches' })).toBeNull()
+    );
+    expect(outside).toHaveFocus();
   });
 
   it('sends the toast again when the switcher closes with the note still held', async () => {

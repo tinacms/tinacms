@@ -9,6 +9,13 @@ import {
 
 type Creatable = BranchSource & Required<Pick<BranchSource, 'create'>>;
 
+/** True when a provider error carries `key: value`, like `status` or the `maybeMade` hint. */
+const carries = (cause: unknown, key: string, value: unknown): boolean =>
+  typeof cause === 'object' &&
+  cause !== null &&
+  key in cause &&
+  Object.getOwnPropertyDescriptor(cause, key)?.value === value;
+
 let clock = 0;
 
 /** Orders list reads against creates: a later value happened later. */
@@ -60,7 +67,7 @@ export const createBranchAction =
     const finish = (
       made: string,
       outcome: 'ready' | 'unready' | 'failed',
-      maybeMade = false
+      flags: { maybeMade?: boolean; exists?: boolean } = {}
     ) => {
       if (settled) return;
       settled = true;
@@ -78,7 +85,7 @@ export const createBranchAction =
           from,
           startedOn,
           outcome,
-          ...(maybeMade ? { maybeMade } : {}),
+          ...flags,
         },
       });
     };
@@ -146,14 +153,12 @@ export const createBranchAction =
       },
       (cause: unknown) => {
         console.warn(`[tinacms] could not create branch ${name}:`, cause);
-        finish(
-          name,
-          'failed',
-          typeof cause === 'object' &&
-            cause !== null &&
-            'maybeMade' in cause &&
-            cause.maybeMade === true
-        );
+        finish(name, 'failed', {
+          ...(carries(cause, 'maybeMade', true) ? { maybeMade: true } : {}),
+          ...(carries(cause, 'status', 409) || carries(cause, 'status', 422)
+            ? { exists: true }
+            : {}),
+        });
       }
     );
   };

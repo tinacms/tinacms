@@ -21,6 +21,8 @@ export const branchSwitcherStates: {
   shows: string[];
   /** Presses New branch first, to show the form. */
   openForm?: boolean;
+  /** With `openForm`: types this name and presses Create branch before the state applies. */
+  submit?: string;
 }[] = [
   { name: 'closed', props: base, shows: [] },
   {
@@ -107,6 +109,7 @@ export const branchSwitcherStates: {
     },
     shows: ['Start from', 'Retry'],
     openForm: true,
+    submit: 'cms/new',
   },
   {
     name: 'open and blocked by unsaved edits',

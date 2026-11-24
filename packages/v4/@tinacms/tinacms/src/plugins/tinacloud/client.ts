@@ -134,9 +134,18 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
   /** Resolves to the parsed JSON body, the raw text if it is not JSON, or null. */
   const authedFetch = async (
     url: string,
-    init: RequestInit = {}
+    init: RequestInit = {},
+    onSend?: () => void
   ): Promise<unknown> => {
-    const token = await options.getToken();
+    let token: string | undefined;
+    try {
+      token = await options.getToken();
+    } catch (cause) {
+      throw new TinaCloudError(
+        `Could not read the TinaCloud token: ${causeMessage(cause)}`,
+        {}
+      );
+    }
     if (!token) {
       throw new TinaCloudError('No TinaCloud token is available.', {
         status: 401,
@@ -151,6 +160,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     }
     let response: Response;
     try {
+      onSend?.();
       response = await fetch(url, { ...init, headers });
     } catch (cause) {
       throw new TinaCloudError(
@@ -319,16 +329,19 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       () => deadline.abort(),
       options.createTimeoutMs ?? CREATE_TIMEOUT_MS
     );
+    // Only a request that went out can have made the branch.
+    let sent = false;
     const expired = new Promise<never>((_resolve, reject) => {
       deadline.signal.addEventListener(
         'abort',
-        () =>
+        () => {
+          const message = `TinaCloud did not answer the request to create branch ${name} in time.`;
           reject(
-            new TinaCloudCreateTimeoutError(
-              `TinaCloud did not answer the request to create branch ${name} in time.`,
-              {}
-            )
-          ),
+            sent
+              ? new TinaCloudCreateTimeoutError(message, {})
+              : new TinaCloudError(message, {})
+          );
+        },
         { once: true }
       );
     });
@@ -343,6 +356,9 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ baseBranch: from, branchName: name }),
             signal: deadline.signal,
+          },
+          () => {
+            sent = true;
           }
         ),
         expired,

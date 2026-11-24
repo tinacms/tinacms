@@ -50,6 +50,8 @@ type BranchNote = {
   name: string;
   /** With `failed`: the branch may exist, so the note says to reload and check. */
   maybeMade?: boolean;
+  /** With `failed`: the provider said the name is taken, so the note says to reload. */
+  exists?: boolean;
   reason?: string;
   /** The note was released by emptying the name field, so the form it came from stays open. */
   keepForm?: boolean;
@@ -85,6 +87,8 @@ type BranchSwitcherProps = {
   onNoteDismiss?: () => void;
   /** With `createState: 'failed'`: the inline failure adds that the branch may still have been made. */
   createMaybeMade?: boolean;
+  /** With `createState: 'failed'`: the inline failure says the name is taken. */
+  createExists?: boolean;
   /** The branch being made while the form is not on screen, so the switcher can say so. */
   creatingBranch?: string;
   /** `loading` shows a skeleton and `failed` shows the problem with Retry, both in place. */
@@ -234,6 +238,19 @@ function BranchGroup({
   );
 }
 
+type FailureKind = { maybeMade?: boolean; exists?: boolean };
+
+/** What a failed create tells the user to do. A taken name is true whether or not we timed out. */
+const failureDetail = (name: string, { maybeMade, exists }: FailureKind) =>
+  exists
+    ? `A branch called ${name} already exists. Reload to see it.`
+    : `Check your connection, then retry.${maybeMade ? ' It may still have been made, so reload to check.' : ''}`;
+
+const failureLine = (name: string, kind: FailureKind) =>
+  kind.exists
+    ? failureDetail(name, kind)
+    : `Couldn't create ${name}. ${failureDetail(name, kind)}`;
+
 /** One note above the list: what a create ended in, its action and Dismiss. */
 function OutcomeNote({
   note,
@@ -265,7 +282,7 @@ function OutcomeNote({
       >
         <span className='min-w-0 flex-1 [overflow-wrap:anywhere]'>
           {note.kind === 'failed'
-            ? `Couldn't create ${note.name}. Check your connection, then retry.${note.maybeMade ? ' It may still have been made, so reload to check.' : ''}`
+            ? failureLine(note.name, note)
             : note.kind === 'unready'
               ? `${note.name} isn't ready yet. It was made. You can switch to it after reloading the page.`
               : `${note.name} is ready`}
@@ -333,6 +350,7 @@ function BranchSwitcher({
   onFormChange,
   createState = 'idle',
   createMaybeMade = false,
+  createExists = false,
   note,
   onNoteAction,
   onNoteDismiss,
@@ -346,7 +364,17 @@ function BranchSwitcher({
   onMaximisedChange,
   defaultMaximised = false,
 }: BranchSwitcherProps) {
-  const [open, setOpen] = useControllable(openProp, defaultOpen, onOpenChange);
+  const [open, setOpenState] = useControllable(
+    openProp,
+    defaultOpen,
+    onOpenChange
+  );
+  // Closes the switcher makes itself (Escape, outside press, focus out, a pick, a tier change).
+  const closedHere = useRef(false);
+  const setOpen = (next: boolean) => {
+    if (!next) closedHere.current = true;
+    setOpenState(next);
+  };
   const [maximised, setMaximised] = useControllable(
     maximisedProp,
     defaultMaximised,
@@ -365,11 +393,14 @@ function BranchSwitcher({
   const [newName, setNewName] = useState('');
   const [startFrom, setStartFrom] = useState<'current' | 'base'>('current');
   const wanted = query.trim().toLowerCase().replace(/^#/, '');
+  // The form's own create shows its progress on the form: a new row above it would push it down.
+  const hideMaking = createState === 'creating' && creating;
   const matching = branches.filter(
     (branch) =>
-      branch.name.toLowerCase().includes(wanted) ||
-      (branch.pullRequest !== undefined &&
-        String(branch.pullRequest).includes(wanted))
+      !(hideMaking && branch.ready === false && !branch.unready) &&
+      (branch.name.toLowerCase().includes(wanted) ||
+        (branch.pullRequest !== undefined &&
+          String(branch.pullRequest).includes(wanted)))
   );
   const busy = createState === 'creating';
   const waiting = creatingBranch !== undefined && !busy;
@@ -377,7 +408,7 @@ function BranchSwitcher({
   const typed = newName.trim();
   const takenNames = branches.map((branch) => branch.name);
   const nameError =
-    busy || (waiting && typed === creatingBranch)
+    busy || createState === 'done' || (waiting && typed === creatingBranch)
       ? undefined
       : branchNameError(typed, takenNames, submitted);
   const from = startFrom === 'base' ? baseBranch : (current ?? baseBranch);
@@ -387,10 +418,15 @@ function BranchSwitcher({
     createState === 'failed' &&
     creating &&
     !dismissed &&
+    attempted.current !== '' &&
     typed === attempted.current;
   // The failure line keeps its height while the retry runs, so the button stays under the pointer.
-  const failureGap = useRef(false);
-  if (!busy) failureGap.current = failed;
+  const failureGap = useRef<FailureKind | undefined>(undefined);
+  if (!busy) {
+    failureGap.current = failed
+      ? { maybeMade: createMaybeMade, exists: createExists }
+      : undefined;
+  }
   const frame = () =>
     document.querySelector('[data-slot="branch-maximised"]') ?? document;
   const focusField = (field: 'search' | 'name') => {
@@ -435,7 +471,10 @@ function BranchSwitcher({
   useEffect(() => {
     const lost =
       !document.activeElement || document.activeElement === document.body;
-    if (!open && wasOpen.current && lost) triggerRef.current?.focus();
+    if (!open && wasOpen.current && lost && !closedHere.current) {
+      triggerRef.current?.focus();
+    }
+    closedHere.current = false;
     wasOpen.current = open;
   }, [open]);
 
@@ -667,7 +706,7 @@ function BranchSwitcher({
           </div>
         ) : (
           <>
-            {matching.length === 0 ? (
+            {matching.length === 0 && query.trim() !== '' ? (
               <div className='flex items-center gap-2 text-sm text-muted-foreground'>
                 <p className='m-0 min-w-0 flex-1'>
                   No branches match “{query.trim()}”.
@@ -792,11 +831,12 @@ function BranchSwitcher({
                   failed ? undefined : 'invisible'
                 )}
               >
-                Couldn't create {attempted.current}. Check your connection, then
-                retry.
-                {createMaybeMade
-                  ? ' It may still have been made, so reload to check.'
-                  : ''}
+                {failureLine(
+                  attempted.current,
+                  failed
+                    ? { maybeMade: createMaybeMade, exists: createExists }
+                    : (failureGap.current ?? {})
+                )}
               </p>
             ) : null}
             <div
@@ -898,7 +938,9 @@ function BranchSwitcher({
     <>
       <Popover
         open={shown && !maximised}
-        onOpenChange={(next) => {
+        onOpenChange={(next, details) => {
+          // Tab off the busy button must not drop the create's own auto-switch.
+          if (!next && busy && details.reason === 'focus-out') return;
           if (maximised && next) {
             closeAndFocusButton();
             return;
@@ -917,6 +959,7 @@ function BranchSwitcher({
             const next = event.relatedTarget;
             if (
               !maximisedNow.current &&
+              !busy &&
               next instanceof Node &&
               !event.currentTarget.contains(next) &&
               !triggerRef.current?.contains(next)
@@ -1007,4 +1050,4 @@ function LocalFilesBadge() {
 }
 
 export type { BranchEntry, BranchNote, BranchSwitcherProps };
-export { BranchSwitcher, LocalFilesBadge };
+export { BranchSwitcher, LocalFilesBadge, failureDetail };

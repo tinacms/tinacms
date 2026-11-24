@@ -75,7 +75,7 @@ describe('Top bar states', () => {
 describe('Branch switcher states', () => {
   it.each(branchSwitcherStates)(
     'renders $name',
-    async ({ props, shows, openForm }) => {
+    async ({ props, shows, openForm, submit }) => {
       const { createState, ...idle } = props;
       const { rerender } = render(
         <BranchSwitcher {...(openForm ? idle : props)} />
@@ -84,6 +84,15 @@ describe('Branch switcher states', () => {
         await userEvent.click(
           screen.getByRole('button', { name: 'New branch' })
         );
+        if (submit) {
+          await userEvent.type(
+            screen.getByRole('searchbox', { name: 'New branch name' }),
+            submit
+          );
+          await userEvent.click(
+            screen.getByRole('button', { name: 'Create branch' })
+          );
+        }
         rerender(<BranchSwitcher {...props} />);
       }
       const button = screen.getByRole('button', {
@@ -102,6 +111,48 @@ describe('Branch switcher states', () => {
       ).toBe(framed && maximised);
     }
   );
+});
+
+describe('Branch switcher list and form edges', () => {
+  it('says nothing about a search when the branch list is empty', async () => {
+    render(
+      <BranchSwitcher
+        current='main'
+        branches={[]}
+        defaultOpen
+        onSwitch={() => {}}
+      />
+    );
+    expect(screen.queryByText(/No branches match/)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Clear search' })).toBeNull();
+  });
+
+  it('shows no failure line for a failed state before any name was submitted', async () => {
+    const { rerender } = render(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        baseBranch='main'
+        onCreate={() => {}}
+        defaultOpen
+        onSwitch={() => {}}
+      />
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    rerender(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        baseBranch='main'
+        onCreate={() => {}}
+        defaultOpen
+        onSwitch={() => {}}
+        createState='failed'
+      />
+    );
+    expect(screen.queryByText(/Couldn't create/)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
+  });
 });
 
 describe('Save to branch dialog states', () => {

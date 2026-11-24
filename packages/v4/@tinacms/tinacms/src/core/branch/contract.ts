@@ -91,6 +91,8 @@ export interface BranchCreateResult {
   outcome: 'ready' | 'unready' | 'failed';
   /** With `failed`: the provider got no answer, so the branch may exist. */
   maybeMade?: boolean;
+  /** With `failed`: the provider answered 409 or 422, so the name is taken. */
+  exists?: boolean;
 }
 
 type SaveToNewBranch = NonNullable<BranchSlice['saveToNewBranch']>;
@@ -116,7 +118,7 @@ const creatingOf = (value: unknown): BranchCreating | undefined => {
 
 const createResultOf = (value: unknown): BranchCreateResult | undefined => {
   if (!isRecord(value)) return undefined;
-  const { name, from, startedOn, outcome, maybeMade } = value;
+  const { name, from, startedOn, outcome, maybeMade, exists } = value;
   if (typeof name !== 'string' || typeof from !== 'string') return undefined;
   if (outcome !== 'ready' && outcome !== 'unready' && outcome !== 'failed') {
     return undefined;
@@ -127,6 +129,7 @@ const createResultOf = (value: unknown): BranchCreateResult | undefined => {
     startedOn: optionalString(startedOn),
     outcome,
     ...(maybeMade === true ? { maybeMade } : {}),
+    ...(exists === true ? { exists } : {}),
   };
 };
 

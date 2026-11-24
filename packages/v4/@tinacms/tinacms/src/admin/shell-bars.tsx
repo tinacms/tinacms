@@ -1,6 +1,7 @@
 import {
   BranchSwitcher,
   LocalFilesBadge,
+  failureDetail,
 } from '@tinacms/ui/components/branch-switcher';
 import { SaveProgress } from '@tinacms/ui/components/save-progress';
 import { SidebarTrigger } from '@tinacms/ui/components/sidebar';
@@ -50,11 +51,10 @@ type Outcome =
       from: string;
       viaForm?: boolean;
       maybeMade?: boolean;
+      exists?: boolean;
     }
   | { kind: 'unready'; name: string }
   | { kind: 'ready'; name: string };
-
-const MAYBE_MADE = 'It may still have been made, so reload to check.';
 
 const DIRTY_REASON = 'Save or discard your changes first';
 
@@ -62,7 +62,10 @@ const sameOutcome = (a: Outcome, b: Outcome): boolean =>
   a.kind === b.kind &&
   a.name === b.name &&
   (a.kind !== 'failed' ||
-    (b.kind === 'failed' && a.from === b.from && a.maybeMade === b.maybeMade));
+    (b.kind === 'failed' &&
+      a.from === b.from &&
+      a.maybeMade === b.maybeMade &&
+      a.exists === b.exists));
 
 /**
  * The branch button. Owns whether the switcher is open and what the last create ended in. While
@@ -105,6 +108,7 @@ function BranchControl() {
     request: CreateRequest,
     via: 'form' | 'note' = 'form'
   ): boolean => {
+    if (!create) return false;
     if (readAnyFormDirty()) {
       refuse(DIRTY_REASON);
       return false;
@@ -184,45 +188,63 @@ function BranchControl() {
   };
   useEffect(() => {
     if (!result) return;
-    const { branch: view, open: isOpen } = latest.current;
-    const { formShown: shown, formTyped: typed } = latest.current;
     const origin = started.current;
     started.current = undefined;
+    const settle = () => {
+      const { branch: view, open: isOpen } = latest.current;
+      const { formShown: shown, formTyped: typed } = latest.current;
+      if (!view) return;
+      const {
+        name,
+        from,
+        startedOn: began,
+        outcome,
+        maybeMade,
+        exists,
+      } = result;
+      setReason(undefined);
+      if (outcome === 'failed') {
+        setDeferred(undefined);
+        setFormDone(false);
+        const inline = origin?.via === 'form' && isOpen && shown;
+        setHeld({
+          kind: 'failed',
+          name,
+          from,
+          viaForm: inline,
+          maybeMade,
+          exists,
+        });
+        return;
+      }
+      const owned =
+        origin?.via === 'form' ||
+        (typed !== '' && (typed === origin?.name || typed === name));
+      if (owned) setFormDone(true);
+      if (isOpen && shown && typed !== '' && !owned) {
+        setDeferred({ kind: outcome, name });
+        return;
+      }
+      setDeferred(undefined);
+      const startedOn = began ?? view.defaultBranch;
+      if (
+        outcome === 'ready' &&
+        isOpen &&
+        view.name === startedOn &&
+        !readAnyFormDirty()
+      ) {
+        setHeld(undefined);
+        view.switchTo(name);
+        setOpen(false);
+        return;
+      }
+      setHeld({ kind: outcome, name });
+    };
+    settle();
+    // Cleared last, so the render that drops the result also carries the state set above.
     runtime?.store.setState((state) => ({
       branch: { ...state.branch, createResult: undefined },
     }));
-    if (!view) return;
-    const { name, from, startedOn: began, outcome, maybeMade } = result;
-    setReason(undefined);
-    if (outcome === 'failed') {
-      setDeferred(undefined);
-      setFormDone(false);
-      const inline = origin?.via === 'form' && isOpen && shown;
-      setHeld({ kind: 'failed', name, from, viaForm: inline, maybeMade });
-      return;
-    }
-    const owned =
-      origin?.via === 'form' ||
-      (typed !== '' && (typed === origin?.name || typed === name));
-    if (owned) setFormDone(true);
-    if (isOpen && shown && typed !== '' && !owned) {
-      setDeferred({ kind: outcome, name });
-      return;
-    }
-    setDeferred(undefined);
-    const startedOn = began ?? view.defaultBranch;
-    if (
-      outcome === 'ready' &&
-      isOpen &&
-      view.name === startedOn &&
-      !readAnyFormDirty()
-    ) {
-      setHeld(undefined);
-      view.switchTo(name);
-      setOpen(false);
-      return;
-    }
-    setHeld({ kind: outcome, name });
   }, [result, runtime]);
 
   useEffect(() => {
@@ -296,9 +318,7 @@ function BranchControl() {
       id = toast({
         tone: 'error',
         title: `Couldn't create ${outcome.name}`,
-        text: outcome.maybeMade
-          ? `Check your connection, then retry. ${MAYBE_MADE}`
-          : 'Check your connection, then retry.',
+        text: failureDetail(outcome.name, outcome),
         action: {
           label: 'Retry',
           onClick: act(idOf, () =>
@@ -366,13 +386,14 @@ function BranchControl() {
         setReason(undefined);
       }}
       createMaybeMade={held?.kind === 'failed' && held.maybeMade === true}
+      createExists={held?.kind === 'failed' && held.exists === true}
       creatingBranch={branch.creating?.name}
       baseBranch={branch.defaultBranch}
       onCreate={
         create ? (name, from) => startCreate({ name, from }) : undefined
       }
       createState={
-        branch.creating && started.current?.via === 'form'
+        (branch.creating || result) && started.current?.via === 'form'
           ? 'creating'
           : held?.kind === 'failed' && held.viaForm
             ? 'failed'
