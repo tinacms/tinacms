@@ -352,11 +352,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       // The retry of a create that timed out is refused as a conflict once the branch exists.
       const conflict =
         cause instanceof TinaCloudError &&
-        cause.status !== undefined &&
-        cause.status >= 400 &&
-        cause.status < 500 &&
-        cause.status !== 401 &&
-        cause.status !== 403;
+        (cause.status === 409 || cause.status === 422);
       if (!(conflict && timedOutCreates.delete(name))) throw cause;
       const ready = waitForIndex(name);
       ready.catch(() => {});
