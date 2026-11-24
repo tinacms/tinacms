@@ -245,7 +245,7 @@ export function MediaPickerPanel({
   } else if (
     listing.isSuccess &&
     !listing.hasNextPage &&
-    debouncedSearch === ''
+    (!serverSearch || debouncedSearch === '')
   ) {
     missingFolderGone = listing.data.pages.every(
       (page) => page.items.length === 0

@@ -841,6 +841,32 @@ describe('a missing image with a search', () => {
   });
 });
 
+describe('a missing image on a provider without search', () => {
+  it('still falls back to the root when the editor types before the folder lists', async () => {
+    const user = userEvent.setup();
+    let finishPosts: () => void = () => {};
+    const postsListed = new Promise<void>((resolve) => {
+      finishPosts = resolve;
+    });
+    const provider = createProvider({
+      list: vi.fn(async (folder: string): Promise<MediaPage> => {
+        if (folder === 'posts') await postsListed;
+        return { items: folder === 'posts' ? [] : childrenOf(folder) };
+      }),
+    });
+    renderPicker(provider, {
+      asks: {
+        hero: single({ replacing: { path: 'posts/gone.jpg', missing: true } }),
+      },
+    });
+    await openPicker(user);
+    await user.type(searchBox(), 'zzz');
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    finishPosts();
+    await waitFor(() => expect(screen.queryByRole('navigation')).toBeNull());
+  });
+});
+
 describe('the picker beside the Media pane', () => {
   function PaneHarness({ onClosePane }: { onClosePane: () => void }) {
     const [paneOpen, setPaneOpen] = useState(false);
