@@ -646,21 +646,10 @@ describe('saves run the collection validators', () => {
 });
 
 describe('a plugin given collections and no config', () => {
-  it('still registers the core validators, so a required field is refused with 422', async () => {
+  const mountWithCollection = (collection: CollectionSchema) => {
     const plugin = tinaLocalDataLayerVitePlugin({
       rootDir,
-      collections: [
-        {
-          ...POSTS,
-          fields: [
-            {
-              type: 'string',
-              name: 'title',
-              validators: [{ name: 'required' }],
-            },
-          ],
-        },
-      ],
+      collections: [collection],
     });
     const mounted = new Map<string, Function>();
     (plugin.configureServer as (server: unknown) => void)({
@@ -671,15 +660,53 @@ describe('a plugin given collections and no config', () => {
         },
       },
     });
-    const refused = await content(mounted, {
+    return mounted;
+  };
+  const create = (
+    mounted: Map<string, Function>,
+    value: Record<string, unknown>
+  ) =>
+    content(mounted, {
       op: 'create',
       collection: 'posts',
       path: 'content/posts/new.mdx',
-      value: { title: '' },
+      value,
     });
+
+  it('still registers the core validators, so a required field is refused with 422', async () => {
+    const mounted = mountWithCollection({
+      ...POSTS,
+      fields: [
+        { type: 'string', name: 'title', validators: [{ name: 'required' }] },
+      ],
+    });
+    const refused = await create(mounted, { title: '' });
     expect(refused.status).toBe(422);
     expect(refused.body.error.fieldErrors).toEqual({
       title: ['title is required'],
+    });
+  });
+
+  it('uses the core field plugins, so a required child of an absent object is refused', async () => {
+    const mounted = mountWithCollection({
+      ...POSTS,
+      fields: [
+        t.string({ name: 'title' }),
+        t.object({
+          name: 'seo',
+          fields: [
+            t.string({
+              name: 'description',
+              validators: [{ name: 'required' }],
+            }),
+          ],
+        }),
+      ],
+    });
+    const refused = await create(mounted, { title: 'N' });
+    expect(refused.status).toBe(422);
+    expect(refused.body.error.fieldErrors).toEqual({
+      'seo.description': ['description is required'],
     });
   });
 });

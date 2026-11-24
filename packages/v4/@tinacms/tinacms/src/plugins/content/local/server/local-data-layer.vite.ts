@@ -4,7 +4,11 @@ import type { ServerResponse } from 'node:http';
 import path from 'node:path';
 import type { Connect, Plugin } from 'vite';
 import { runCodegen } from '../../../../cli/commands/codegen';
-import { type ResolvedConfig, resolveBuild } from '../../../../config';
+import {
+  type ResolvedConfig,
+  composePlugins,
+  resolveBuild,
+} from '../../../../config';
 import type { Session } from '../../../../core/auth/contract';
 import {
   CONTENT_CREATE_PERMISSION,
@@ -18,7 +22,7 @@ import {
   createServerHookRegistry,
   createServerSave,
 } from '../../../../core/form/server-hooks';
-import coreValidatorsPlugin from '../../../validators/core-validators.plugin';
+import { corePlugins } from '../../../fields';
 import { storedHelpersOf } from '../../../../core/form/server-validation';
 import { createServerValidatorRegistry } from '../../../../core/validator/server-registry';
 import { invariant } from '../../../../core/invariant';
@@ -473,8 +477,9 @@ export const tinaLocalDataLayerVitePlugin = (
     'tinaLocalDataLayerVitePlugin needs `config` (the loaded tina/config.ts) or `collections`.'
   );
   const dataLayer = createLocalDataLayer({ ...options, collections });
-  // With no config, only the core validators are known, so a collection's built-in rules still run.
-  const plugins = options.config?.plugins ?? [coreValidatorsPlugin];
+  // With no config, the core plugins that need no other plugin (so not `image`) give the validators and the stored-value helpers.
+  const plugins =
+    options.config?.plugins ?? composePlugins([], corePlugins).plugins;
   const contentGate = createSessionGate(plugins, 'content');
   const mediaGate = createSessionGate(plugins, 'media');
   const mayCreateStorage = new AsyncLocalStorage<boolean>();

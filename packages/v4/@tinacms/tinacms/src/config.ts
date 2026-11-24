@@ -62,7 +62,7 @@ interface OmittedPlugin {
 }
 
 // A user plugin with an unmet dependency still fails in validateCapabilityGraph.
-const composePlugins = (
+export const composePlugins = (
   plugins: PluginManifest[],
   core: PluginManifest[]
 ): { plugins: PluginManifest[]; omitted: OmittedPlugin[] } => {
