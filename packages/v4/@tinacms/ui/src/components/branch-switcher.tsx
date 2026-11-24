@@ -49,6 +49,8 @@ type BranchNote = {
   kind: 'failed' | 'unready' | 'ready';
   name: string;
   reason?: string;
+  /** The note was released by emptying the name field, so the form it came from stays open. */
+  keepForm?: boolean;
 };
 
 type BranchSwitcherProps = {
@@ -424,8 +426,18 @@ function BranchSwitcher({
 
   const noteKey = note === undefined ? '' : `${note.kind}:${note.name}`;
   useEffect(() => {
-    if (noteKey !== '' && !noteKey.startsWith('failed:')) setCreating(false);
+    if (noteKey !== '' && !noteKey.startsWith('failed:') && !note?.keepForm) {
+      setCreating(false);
+    }
   }, [noteKey]);
+
+  // A form closed while empty and idle starts the next open as the list, as after Back to branches.
+  useEffect(() => {
+    if (open || busy || newName.trim() !== '') return;
+    setCreating(false);
+    setSubmitted(false);
+    setStartFrom('current');
+  }, [open]);
 
   useEffect(() => {
     onFormChange?.(creating, newName.trim() !== '');
@@ -897,7 +909,14 @@ function MaximisedView({
   escape.current = onEscape;
   useEffect(() => {
     const close = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape' && !event.defaultPrevented) escape.current();
+      if (event.key !== 'Escape') return;
+      // A busy Button swallows keys, so Escape on it still closes the view.
+      const onBusyButton =
+        event.target instanceof Element &&
+        event.target.closest(
+          'button[aria-disabled="true"], button[data-disabled], button:disabled'
+        ) !== null;
+      if (!event.defaultPrevented || onBusyButton) escape.current();
     };
     document.addEventListener('keydown', close);
     return () => document.removeEventListener('keydown', close);

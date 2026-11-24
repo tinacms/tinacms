@@ -9,6 +9,16 @@ import {
 
 type Creatable = BranchSource & Required<Pick<BranchSource, 'create'>>;
 
+const madeByStore = new WeakMap<StoreApi<TinaStoreState>, Set<string>>();
+
+/**
+ * Branches this page session made. A list read that started before the provider knew of them
+ * can resolve without them, so the list sync puts them back.
+ */
+export const madeBranchesOf = (store: StoreApi<TinaStoreState>): string[] => [
+  ...(madeByStore.get(store) ?? []),
+];
+
 /**
  * The `branch.create` slice action: makes the branch through the provider and records
  * `creating` and `createResult`. It knows nothing about the pop-up; the shell reads the result.
@@ -61,6 +71,10 @@ export const createBranchAction =
           return;
         }
         try {
+          madeByStore.set(
+            store,
+            new Set([...(madeByStore.get(store) ?? []), made])
+          );
           const slice = branchSliceOf(store.getState());
           fill({
             list: slice?.list.includes(made)

@@ -19,8 +19,8 @@ const signedIn = params.get('account') === '1';
 // names, `pr=<url>` gives the branch a pull request, `slow=1` never answers
 // (`slowBranches=1`: only the branch list), and `fail=lists` or
 // `fail=branches` makes that read fail. `fail=branch-gone` deletes the branch
-// on the first save, so the save fails with `branch-not-found`. `create=ok|fail|slow|unready`
-// adds `branches.create`: it makes the branch, fails, takes 2s to get ready, or never gets ready.
+// on the first save, so the save fails with `branch-not-found`. `create=ok|fail|failonce|slow|unready`
+// adds `branches.create`: it makes the branch, fails, fails the first time only, takes 2s to get ready, or never gets ready.
 const documentCount = Number(params.get('docs') ?? 0);
 const withDates = params.get('dates') !== '0';
 const longNames = params.get('long') === '1';
@@ -31,6 +31,7 @@ const failing = params.get('fail');
 const createMode = params.get('create');
 const extraBranches = Number(params.get('many') ?? 0);
 const madeBranches: string[] = [];
+let failedOnce = false;
 
 const AUTHORS = ['Priya Raman', 'Josh Berman', 'Ada Lovelace'];
 const HOUR = 3_600_000;
@@ -134,6 +135,10 @@ const content = definePlugin({
                 create: async ({ name }: { name: string; from: string }) => {
                   await new Promise((resolve) => setTimeout(resolve, 500));
                   if (createMode === 'fail') throw new Error('offline');
+                  if (createMode === 'failonce' && !failedOnce) {
+                    failedOnce = true;
+                    throw new Error('offline');
+                  }
                   madeBranches.push(name);
                   return {
                     name,

@@ -73,6 +73,18 @@ export const branchSwitcherStates: {
     shows: ['cms/new', 'Getting ready'],
   },
   {
+    name: 'open with a branch that did not get ready',
+    props: {
+      ...base,
+      defaultOpen: true,
+      branches: [
+        { name: 'feature/news' },
+        { name: 'cms/late', ready: false, unready: true },
+      ],
+    },
+    shows: ['cms/late', 'Reload to switch'],
+  },
+  {
     name: 'creating a branch',
     props: {
       ...base,

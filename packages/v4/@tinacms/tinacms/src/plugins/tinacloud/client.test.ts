@@ -354,6 +354,77 @@ describe('createBranch', () => {
     await assertion;
   });
 
+  it('aborts a status request that never answers at the timeout, with the timeout error', async () => {
+    vi.useFakeTimers();
+    const signals: (AbortSignal | undefined)[] = [];
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({}))
+      .mockImplementation(
+        (_url: string, init?: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            signals.push(init?.signal ?? undefined);
+            init?.signal?.addEventListener('abort', () =>
+              reject(new DOMException('aborted', 'AbortError'))
+            );
+          })
+      );
+    vi.stubGlobal('fetch', fetchMock);
+    const made = await fast().createBranch({ name: 'cms/x', from: 'main' });
+    const assertion = expect(made.ready).rejects.toThrow(/in time/);
+    await vi.advanceTimersByTimeAsync(1500);
+    await assertion;
+    expect(signals[0]?.aborted).toBe(true);
+  });
+
+  it('does not count the deadline abort as an unknown status', async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({}))
+      .mockResolvedValueOnce(json({}, 404))
+      .mockResolvedValueOnce(json({}, 404))
+      .mockResolvedValueOnce(json({}, 404))
+      .mockResolvedValueOnce(json({}, 404))
+      .mockResolvedValueOnce(json({}, 404))
+      .mockImplementation(
+        (_url: string, init?: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            init?.signal?.addEventListener('abort', () =>
+              reject(new DOMException('aborted', 'AbortError'))
+            );
+          })
+      );
+    vi.stubGlobal('fetch', fetchMock);
+    const made = await createTinaCloudClient({
+      clientId: 'abc',
+      getToken: async () => 'secret',
+      indexPollMs: 100,
+      indexTimeoutMs: 1000,
+    }).createBranch({ name: 'cms/x', from: 'main' });
+    const assertion = expect(made.ready).rejects.toThrow(/in time/);
+    await vi.advanceTimersByTimeAsync(1500);
+    await assertion;
+  });
+
+  it('ends at the timeout when the token read never answers', async () => {
+    vi.useFakeTimers();
+    let reads = 0;
+    stubFetch(json({}));
+    const made = await createTinaCloudClient({
+      clientId: 'abc',
+      getToken: () => {
+        reads += 1;
+        return reads === 1 ? 'secret' : new Promise<string>(() => {});
+      },
+      indexPollMs: 100,
+      indexTimeoutMs: 1000,
+    }).createBranch({ name: 'cms/x', from: 'main' });
+    const assertion = expect(made.ready).rejects.toThrow(/in time/);
+    await vi.advanceTimersByTimeAsync(1500);
+    await assertion;
+  });
+
   it('rejects when TinaCloud refuses the create', async () => {
     stubFetch(json({ message: 'exists' }, 422));
     await expect(

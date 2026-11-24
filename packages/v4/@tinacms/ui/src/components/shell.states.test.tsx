@@ -7,7 +7,7 @@ import {
   within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Button } from '@tinacms/ui/components/button';
 import { BranchSwitcher } from '@tinacms/ui/components/branch-switcher';
@@ -279,6 +279,15 @@ describe('Save progress card', () => {
   });
 });
 
+/** jsdom has no `matchMedia`; this makes `(min-width: ...)` false so `useTier` says phone. */
+const phoneTier = () =>
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  }));
+
 describe('Branch switcher, the full design', () => {
   const entries = [
     { name: 'docs/v4-launch', pullRequest: 482, unsaved: 2 },
@@ -321,62 +330,73 @@ describe('Branch switcher, the full design', () => {
   });
 
   describe.each([
-    ['pop-up', false],
-    ['maximised switcher', true],
-  ])('unready and creating rows in the %s', (_surface, defaultMaximised) => {
-    const rowsFor = (
-      branches: React.ComponentProps<typeof BranchSwitcher>['branches']
-    ) => {
-      render(
-        <BranchSwitcher
-          current='docs/v4-launch'
-          branches={branches}
-          onSwitch={() => {}}
-          defaultOpen
-          defaultMaximised={defaultMaximised}
-        />
-      );
-      return screen
-        .getAllByRole('button')
-        .filter((row) => row.hasAttribute('data-branch-row'));
-    };
+    ['pop-up', false, false],
+    ['maximised switcher', true, false],
+    ['phone sheet', false, true],
+  ])(
+    'unready and creating rows in the %s',
+    (_surface, defaultMaximised, phone) => {
+      afterEach(() => vi.unstubAllGlobals());
 
-    it('shows an unready row disabled with no spinner and Reload to switch, and a creating row with the spinner and Getting ready', () => {
-      const rows = rowsFor([
-        { name: 'docs/v4-launch' },
-        { name: 'cms/unready', ready: false, unready: true },
-        { name: 'cms/making', ready: false },
-      ]);
-      const unready = rows.find((row) =>
-        row.textContent?.includes('cms/unready')
-      );
-      const making = rows.find((row) =>
-        row.textContent?.includes('cms/making')
-      );
-      expect(unready).toHaveAttribute('aria-disabled', 'true');
-      expect(unready).toHaveTextContent('Reload to switch');
-      expect(unready).not.toHaveTextContent('Getting ready');
-      expect(unready?.querySelector('[class*="animate-spin"]')).toBeNull();
-      expect(making).toHaveTextContent('Getting ready');
-      expect(making?.querySelector('[class*="animate-spin"]')).not.toBeNull();
-    });
+      const rowsFor = (
+        branches: React.ComponentProps<typeof BranchSwitcher>['branches']
+      ) => {
+        if (phone) phoneTier();
+        render(
+          <BranchSwitcher
+            current='docs/v4-launch'
+            branches={branches}
+            onSwitch={() => {}}
+            defaultOpen
+            defaultMaximised={defaultMaximised}
+          />
+        );
+        expect(
+          screen.queryByRole('button', { name: /^(Maximise|Restore)$/ }) ===
+            null
+        ).toBe(phone);
+        return screen
+          .getAllByRole('button')
+          .filter((row) => row.hasAttribute('data-branch-row'));
+      };
 
-    it('lists a protected branch once while it is creating, and once when unready', () => {
-      const count = (name: string, extra: object) => {
+      it('shows an unready row disabled with no spinner and Reload to switch, and a creating row with the spinner and Getting ready', () => {
         const rows = rowsFor([
           { name: 'docs/v4-launch' },
-          { name, protected: true, ready: false, ...extra },
+          { name: 'cms/unready', ready: false, unready: true },
+          { name: 'cms/making', ready: false },
         ]);
-        const found = rows.filter((row) =>
-          row.textContent?.includes(name)
-        ).length;
-        cleanup();
-        return found;
-      };
-      expect(count('release', {})).toBe(1);
-      expect(count('release', { unready: true })).toBe(1);
-    });
-  });
+        const unready = rows.find((row) =>
+          row.textContent?.includes('cms/unready')
+        );
+        const making = rows.find((row) =>
+          row.textContent?.includes('cms/making')
+        );
+        expect(unready).toHaveAttribute('aria-disabled', 'true');
+        expect(unready).toHaveTextContent('Reload to switch');
+        expect(unready).not.toHaveTextContent('Getting ready');
+        expect(unready?.querySelector('[class*="animate-spin"]')).toBeNull();
+        expect(making).toHaveTextContent('Getting ready');
+        expect(making?.querySelector('[class*="animate-spin"]')).not.toBeNull();
+      });
+
+      it('lists a protected branch once while it is creating, and once when unready', () => {
+        const count = (name: string, extra: object) => {
+          const rows = rowsFor([
+            { name: 'docs/v4-launch' },
+            { name, protected: true, ready: false, ...extra },
+          ]);
+          const found = rows.filter((row) =>
+            row.textContent?.includes(name)
+          ).length;
+          cleanup();
+          return found;
+        };
+        expect(count('release', {})).toBe(1);
+        expect(count('release', { unready: true })).toBe(1);
+      });
+    }
+  );
 
   it('finds a branch by its pull request number', async () => {
     const { user, dialog } = await open();
@@ -807,13 +827,17 @@ describe('Branch switcher controls', () => {
   });
 
   describe.each([
-    ['pop-up', false],
-    ['maximised switcher', true],
-  ])('the New branch form in the %s', (_surface, defaultMaximised) => {
+    ['pop-up', false, false],
+    ['maximised switcher', true, false],
+    ['phone sheet', false, true],
+  ])('the New branch form in the %s', (_surface, defaultMaximised, phone) => {
+    afterEach(() => vi.unstubAllGlobals());
+
     const renderForm = (
       props: Partial<React.ComponentProps<typeof BranchSwitcher>> = {}
     ) => {
       const onCreate = vi.fn();
+      if (phone) phoneTier();
       render(
         <BranchSwitcher
           current='feature/news'
@@ -826,6 +850,9 @@ describe('Branch switcher controls', () => {
           {...props}
         />
       );
+      expect(
+        screen.queryByRole('button', { name: /^(Maximise|Restore)$/ }) === null
+      ).toBe(phone);
       return onCreate;
     };
 
@@ -903,7 +930,34 @@ describe('Branch switcher controls', () => {
     ).toHaveFocus();
   });
 
-  it('clears the New branch form when a create started from the note finishes', async () => {
+  it('closes the maximised view on Escape while the form create is busy and its button has focus', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    const props = {
+      current: 'feature/news',
+      branches: entries,
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      open: true,
+      onOpenChange,
+      defaultMaximised: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    await user.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/a'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    const busy = screen.getByRole('button', { name: 'Creating' });
+    busy.focus();
+    await user.keyboard('{Escape}');
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('clears the New branch form when a create the form started finishes', async () => {
     const user = userEvent.setup();
     const props = {
       current: 'feature/news',

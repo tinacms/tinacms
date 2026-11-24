@@ -41,6 +41,23 @@ test.describe('branch switcher pop-up', () => {
     await expect(popup).toBeHidden();
   });
 
+  test('closes the maximised view on Escape while the form create is busy', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto('/branches.html?docs=1&create=slow#/');
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    await page.getByRole('button', { name: 'Maximise' }).click();
+    const view = page.locator('[data-slot="branch-maximised"]');
+    await view.getByRole('button', { name: 'New branch' }).click();
+    await view
+      .getByRole('searchbox', { name: 'New branch name' })
+      .fill('cms/x');
+    await view.getByRole('button', { name: 'Create branch' }).click();
+    await page.keyboard.press('Escape');
+    await expect(view).toBeHidden();
+  });
+
   test('maximises between the Top bar and the Status bar and restores with the search kept', async ({
     page,
   }) => {
@@ -809,6 +826,69 @@ test.describe('branch switcher pop-up', () => {
       await expect(
         view.getByRole('button', { name: 'Create branch' })
       ).toBeEnabled();
+    });
+
+    test(`opens as the list again after the note's Retry switched with an empty form in the ${frame.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=failonce#/');
+      await openFrame(page, false);
+      await makeBranch(page, frameOf(page, false));
+      await page.keyboard.press('Escape');
+      await expect(page.getByText("Couldn't create cms/x")).toBeVisible();
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      const open = view.getByRole('button', { name: 'New branch' });
+      if (await open.isVisible()) await open.click();
+      const name = view.getByRole('searchbox', { name: 'New branch name' });
+      const retry = view
+        .locator('[data-slot="branch-outcome-note"]')
+        .getByRole('button', { name: 'Retry' });
+      await name.fill('');
+      await retry.click();
+      await expect(
+        page.getByRole('button', { name: 'Branch: cms/x' })
+      ).toBeVisible({ timeout: 8000 });
+      await page.getByRole('button', { name: 'Branch: cms/x' }).click();
+      const reopened = frameOf(page, false);
+      await expect(
+        reopened.getByRole('button', { name: 'New branch' })
+      ).toBeVisible();
+      await expect(
+        reopened.getByRole('form', { name: 'New branch form' })
+      ).toHaveCount(0);
+    });
+
+    test(`holds the note's ready outcome while the form keeps a typed name in the ${frame.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=failonce#/');
+      await openFrame(page, false);
+      await makeBranch(page, frameOf(page, false));
+      await page.keyboard.press('Escape');
+      await expect(page.getByText("Couldn't create cms/x")).toBeVisible();
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      const open = view.getByRole('button', { name: 'New branch' });
+      if (await open.isVisible()) await open.click();
+      const name = view.getByRole('searchbox', { name: 'New branch name' });
+      const retry = view
+        .locator('[data-slot="branch-outcome-note"]')
+        .getByRole('button', { name: 'Retry' });
+      await name.fill('cms/b');
+      await retry.click();
+      await expect(view.getByText('Creating cms/x…')).toBeHidden({
+        timeout: 8000,
+      });
+      await expect(name).toHaveValue('cms/b');
+      await name.fill('');
+      await expect(view.getByText('cms/x is ready')).toBeVisible();
+      await expect(
+        view.getByRole('form', { name: 'New branch form' })
+      ).toBeVisible();
+      await expect(name).toBeFocused();
     });
 
     test(`keeps Create branch off for an empty name in the ${frame.name}`, async ({

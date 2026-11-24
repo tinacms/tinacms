@@ -7,7 +7,7 @@ import {
   branchSliceOf,
   currentBranchOf,
 } from '../core/branch/contract';
-import { createBranchAction } from '../core/branch/create';
+import { createBranchAction, madeBranchesOf } from '../core/branch/create';
 import { TinaRuntimeContext } from './context';
 import { useOptionalContentSlice, useTinaStore } from './hooks';
 
@@ -52,6 +52,7 @@ export function useBranchSync(): void {
           ...new Set([
             ...(slice?.unready ?? []),
             ...(pending ? [pending] : []),
+            ...madeBranchesOf(store),
           ]),
         ];
         fill({
@@ -73,7 +74,8 @@ export function useBranchSync(): void {
           branchSliceOf(store.getState())?.switchTo(undefined);
         } else if (
           current &&
-          !branches.some((branch) => branch.name === current)
+          !branches.some((branch) => branch.name === current) &&
+          !kept.includes(current)
         ) {
           branchSliceOf(store.getState())?.switchTo(undefined);
           toast({

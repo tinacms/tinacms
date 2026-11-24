@@ -89,7 +89,6 @@ describe('useBranchSync list re-read during a create', () => {
     );
     act(() => result.current?.retryList());
     await waitFor(() => expect(result.current?.listState).toBe('ready'));
-    await waitFor(() => expect(result.current?.listState).toBe('ready'));
     return result;
   };
   const making = (phase: 'making' | 'preparing') => ({
@@ -111,5 +110,82 @@ describe('useBranchSync list re-read during a create', () => {
   it('puts back an unready branch the re-read list omits, once', async () => {
     const result = await reread({ unready: ['cms/u'] });
     expect(names(result.current)).toEqual(['main', 'cms/u']);
+  });
+});
+
+describe('useBranchSync list re-read that outlasts a create', () => {
+  const setup = () => {
+    const store = createTinaStore([]);
+    const reads: (() => void)[] = [];
+    let finishCreate: (name: string) => void = () => {};
+    store.setState({
+      content: {
+        get: async () => undefined,
+        list: async () => connectionOf([]),
+        update: async () => undefined,
+        branches: {
+          list: () =>
+            new Promise<BranchInfo[]>((resolve) => {
+              reads.push(() => resolve([{ name: 'main' }]));
+            }),
+          defaultBranch: async () => 'main',
+          create: () =>
+            new Promise<{ name: string }>((resolve) => {
+              finishCreate = (name) => resolve({ name });
+            }),
+        },
+      },
+    });
+    const runtime = { store } as unknown as TinaRuntime;
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>
+    );
+    const view = renderHook(
+      () => {
+        useBranchSync();
+        return useBranchView();
+      },
+      { wrapper }
+    );
+    return { view, reads, finish: (name: string) => finishCreate(name) };
+  };
+  const names = (view: ReturnType<typeof useBranchView>) =>
+    view?.branches.map((branch) => branch.name);
+
+  it('keeps a branch that ended ready when the older list resolves late, and again when a later read omits it', async () => {
+    const { view, reads, finish } = setup();
+    await waitFor(() => expect(reads).toHaveLength(1));
+    act(() => reads[0]());
+    await waitFor(() => expect(view.result.current?.listState).toBe('ready'));
+    act(() => view.result.current?.create?.('cms/n', 'main'));
+    act(() => view.result.current?.retryList());
+    await waitFor(() => expect(reads).toHaveLength(2));
+    act(() => finish('cms/n'));
+    await waitFor(() => expect(view.result.current?.creating).toBeUndefined());
+    expect(names(view.result.current)).toEqual(['main', 'cms/n']);
+    act(() => reads[1]());
+    await waitFor(() => expect(view.result.current?.listState).toBe('ready'));
+    expect(names(view.result.current)).toEqual(['main', 'cms/n']);
+    act(() => view.result.current?.retryList());
+    await waitFor(() => expect(reads).toHaveLength(3));
+    act(() => reads[2]());
+    await waitFor(() => expect(view.result.current?.listState).toBe('ready'));
+    expect(names(view.result.current)).toEqual(['main', 'cms/n']);
+  });
+
+  it('does not switch away from a branch that ended ready when the older list omits it', async () => {
+    const { view, reads, finish } = setup();
+    await waitFor(() => expect(reads).toHaveLength(1));
+    act(() => reads[0]());
+    await waitFor(() => expect(view.result.current?.listState).toBe('ready'));
+    act(() => view.result.current?.create?.('cms/n', 'main'));
+    act(() => view.result.current?.retryList());
+    await waitFor(() => expect(reads).toHaveLength(2));
+    act(() => finish('cms/n'));
+    await waitFor(() => expect(view.result.current?.creating).toBeUndefined());
+    act(() => view.result.current?.switchTo('cms/n'));
+    act(() => reads[1]());
+    await waitFor(() => expect(view.result.current?.listState).toBe('ready'));
+    expect(view.result.current?.name).toBe('cms/n');
   });
 });

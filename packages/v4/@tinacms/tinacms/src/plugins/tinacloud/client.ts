@@ -245,40 +245,57 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     const timeoutMs = options.indexTimeoutMs ?? INDEX_TIMEOUT_MS;
     const startedAt = Date.now();
     let unknowns = 0;
-    while (true) {
-      let body: unknown;
-      try {
-        body = await authedFetch(url);
-      } catch (cause) {
-        if (!isTransient(cause)) throw cause;
-        body = undefined;
-      }
-      const status = indexStatusSchema.safeParse(body);
-      const value = status.success ? status.data.status : undefined;
-      if (value === 'complete') return;
-      if (value === 'failed') {
-        throw new TinaCloudError(`TinaCloud failed to index branch ${name}.`, {
-          body,
-        });
-      }
-      if (value === 'inprogress') {
-        unknowns = 0;
-      } else {
-        unknowns += 1;
-        if (unknowns >= MAX_UNKNOWN_INDEX_STATUSES) {
+    const deadline = new AbortController();
+    const timer = setTimeout(() => deadline.abort(), timeoutMs);
+    const timedOut = () =>
+      new TinaCloudError(
+        `TinaCloud did not finish indexing branch ${name} in time.`,
+        {}
+      );
+    const expired = new Promise<never>((_resolve, reject) => {
+      deadline.signal.addEventListener('abort', () => reject(timedOut()), {
+        once: true,
+      });
+    });
+    expired.catch(() => {});
+    try {
+      while (true) {
+        let body: unknown;
+        try {
+          body = await Promise.race([
+            authedFetch(url, { signal: deadline.signal }),
+            expired,
+          ]);
+        } catch (cause) {
+          if (deadline.signal.aborted) throw timedOut();
+          if (!isTransient(cause)) throw cause;
+          body = undefined;
+        }
+        const status = indexStatusSchema.safeParse(body);
+        const value = status.success ? status.data.status : undefined;
+        if (value === 'complete') return;
+        if (value === 'failed') {
           throw new TinaCloudError(
-            `TinaCloud could not report the index status of branch ${name}.`,
+            `TinaCloud failed to index branch ${name}.`,
             { body }
           );
         }
+        if (value === 'inprogress') {
+          unknowns = 0;
+        } else {
+          unknowns += 1;
+          if (unknowns >= MAX_UNKNOWN_INDEX_STATUSES) {
+            throw new TinaCloudError(
+              `TinaCloud could not report the index status of branch ${name}.`,
+              { body }
+            );
+          }
+        }
+        if (Date.now() - startedAt >= timeoutMs) throw timedOut();
+        await sleep(pollMs);
       }
-      if (Date.now() - startedAt >= timeoutMs) {
-        throw new TinaCloudError(
-          `TinaCloud did not finish indexing branch ${name} in time.`,
-          {}
-        );
-      }
-      await sleep(pollMs);
+    } finally {
+      clearTimeout(timer);
     }
   };
 

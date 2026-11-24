@@ -67,6 +67,7 @@ function BranchControl() {
   const [formShown, setFormShown] = useState(false);
   const [formTyped, setFormTyped] = useState(false);
   const [deferred, setDeferred] = useState<Outcome>();
+  const released = useRef<Outcome>(undefined);
   const startedVia = useRef<'form' | 'note'>('form');
   const entries = useBranchEntries(branch, open);
 
@@ -93,7 +94,6 @@ function BranchControl() {
     }
     setFailed(undefined);
     setHeld(undefined);
-    setDeferred(undefined);
     setReason(undefined);
     startedVia.current = via;
     create?.(request.name, request.from);
@@ -163,12 +163,21 @@ function BranchControl() {
     if (!view) return;
     const { name, from, startedOn: began, outcome } = result;
     setReason(undefined);
+    const settle = (next: Outcome) => {
+      if (holdsForm) {
+        setDeferred(next);
+      } else {
+        setDeferred(undefined);
+        setHeld(next);
+      }
+    };
     const holdsForm =
       isOpen &&
       latest.current.formShown &&
       latest.current.formTyped &&
       startedVia.current !== 'form';
     if (outcome === 'failed') {
+      setDeferred(undefined);
       if (isOpen && latest.current.formShown && startedVia.current === 'form') {
         setHeld(undefined);
         setFailed({ name, from });
@@ -180,12 +189,12 @@ function BranchControl() {
     }
     setFailed(undefined);
     if (outcome === 'unready') {
-      (holdsForm ? setDeferred : setHeld)({ kind: 'unready', name });
+      settle({ kind: 'unready', name });
       return;
     }
     const startedOn = began ?? view.defaultBranch;
     if (holdsForm) {
-      setDeferred({ kind: 'ready', name });
+      settle({ kind: 'ready', name });
       return;
     }
     if (isOpen && view.name === startedOn && !readAnyFormDirty()) {
@@ -194,11 +203,12 @@ function BranchControl() {
       setOpen(false);
       return;
     }
-    setHeld({ kind: 'ready', name });
+    settle({ kind: 'ready', name });
   }, [result, runtime]);
 
   useEffect(() => {
     if (deferred && !(open && formShown && formTyped)) {
+      released.current = deferred;
       setHeld(deferred);
       setDeferred(undefined);
     }
@@ -308,7 +318,11 @@ function BranchControl() {
         setFormTyped(typed);
         if (!shown) setFailed(undefined);
       }}
-      note={held ? { ...held, reason } : undefined}
+      note={
+        held
+          ? { ...held, reason, keepForm: held === released.current }
+          : undefined
+      }
       onNoteAction={handle}
       onNoteDismiss={() => {
         setHeld(undefined);
