@@ -44,7 +44,7 @@ export function useLongSave(): boolean {
 type CreateRequest = { name: string; from: string };
 
 type Outcome =
-  | { kind: 'failed'; name: string; from: string }
+  | { kind: 'failed'; name: string; from: string; viaForm?: boolean }
   | { kind: 'unready'; name: string }
   | { kind: 'ready'; name: string };
 
@@ -66,16 +66,16 @@ function BranchControl() {
   const saving = useSaveSummary().state === 'saving';
   const dirty = useAnyFormDirty();
   const [open, setOpen] = useState(false);
-  const [failed, setFailed] = useState<CreateRequest>();
   const [held, setHeld] = useState<Outcome>();
   const [reason, setReason] = useState<string>();
   const [formShown, setFormShown] = useState(false);
-  const [formTyped, setFormTyped] = useState(false);
+  const [formTyped, setFormTyped] = useState('');
   const [deferred, setDeferred] = useState<Outcome>();
-  // The form's own create ended ready or unready, so the form can reset (a failure keeps its text).
+  // A create ended ready or unready under the name the form holds: the form resets.
   const [formDone, setFormDone] = useState(false);
   const released = useRef<Outcome>(undefined);
-  const startedVia = useRef<'form' | 'note'>('form');
+  // The create the shell started, until its result arrives. A direct slice call leaves it empty.
+  const started = useRef<{ via: 'form' | 'note'; name: string }>(undefined);
   const entries = useBranchEntries(branch, open);
 
   const create = branch?.create;
@@ -83,15 +83,13 @@ function BranchControl() {
     branch: typeof branch;
     open: boolean;
     formShown: boolean;
-    formTyped: boolean;
-    failed: CreateRequest | undefined;
+    formTyped: string;
     startCreate: (request: CreateRequest, via?: 'form' | 'note') => boolean;
   }>({
     branch,
     open,
     formShown,
     formTyped,
-    failed: undefined,
     startCreate: () => false,
   });
   const startCreate = (
@@ -107,11 +105,10 @@ function BranchControl() {
       refuse(`Wait for ${running.name} to finish first`);
       return false;
     }
-    setFailed(undefined);
     setHeld(undefined);
     setFormDone(false);
     setReason(undefined);
-    startedVia.current = via;
+    started.current = { via, name: request.name };
     create?.(request.name, request.from);
     return true;
   };
@@ -174,75 +171,80 @@ function BranchControl() {
     open,
     formShown,
     formTyped,
-    failed,
     startCreate,
   };
   useEffect(() => {
     if (!result) return;
     const { branch: view, open: isOpen } = latest.current;
+    const { formShown: shown, formTyped: typed } = latest.current;
+    const origin = started.current;
+    started.current = undefined;
     runtime?.store.setState((state) => ({
       branch: { ...state.branch, createResult: undefined },
     }));
     if (!view) return;
     const { name, from, startedOn: began, outcome } = result;
     setReason(undefined);
-    const settle = (next: Outcome) => {
-      if (holdsForm) {
-        setDeferred(next);
-      } else {
-        setDeferred(undefined);
-        setHeld(next);
-      }
-    };
-    const holdsForm =
-      isOpen &&
-      latest.current.formShown &&
-      latest.current.formTyped &&
-      startedVia.current !== 'form';
     if (outcome === 'failed') {
       setDeferred(undefined);
-      if (isOpen && latest.current.formShown && startedVia.current === 'form') {
-        setHeld(undefined);
-        setFailed({ name, from });
-      } else {
-        setFailed(undefined);
-        setHeld({ kind: 'failed', name, from });
-      }
+      setFormDone(false);
+      const inline = origin?.via === 'form' && isOpen && shown;
+      setHeld({ kind: 'failed', name, from, viaForm: inline });
       return;
     }
-    setFailed(undefined);
-    if (startedVia.current === 'form') setFormDone(true);
-    if (outcome === 'unready') {
-      settle({ kind: 'unready', name });
+    const owned =
+      origin?.via === 'form' ||
+      (typed !== '' && (typed === origin?.name || typed === name));
+    if (owned) setFormDone(true);
+    if (isOpen && shown && typed !== '' && !owned) {
+      setDeferred({ kind: outcome, name });
       return;
     }
+    setDeferred(undefined);
     const startedOn = began ?? view.defaultBranch;
-    if (holdsForm) {
-      settle({ kind: 'ready', name });
-      return;
-    }
-    if (isOpen && view.name === startedOn && !readAnyFormDirty()) {
+    if (
+      outcome === 'ready' &&
+      isOpen &&
+      view.name === startedOn &&
+      !readAnyFormDirty()
+    ) {
       setHeld(undefined);
       view.switchTo(name);
       setOpen(false);
       return;
     }
-    settle({ kind: 'ready', name });
+    setHeld({ kind: outcome, name });
   }, [result, runtime]);
 
   useEffect(() => {
-    if (deferred && !(open && formShown && formTyped)) {
-      released.current = deferred;
+    if (deferred && !(open && formShown && formTyped !== '')) {
+      if (open && formShown) released.current = deferred;
       setHeld(deferred);
       setDeferred(undefined);
     }
   }, [deferred, open, formShown, formTyped]);
 
+  // An inline form failure becomes the note once the switcher closes or the form goes.
+  const demoteInline = () =>
+    setHeld((note) =>
+      note?.kind === 'failed' && note.viaForm
+        ? { ...note, viaForm: false }
+        : note
+    );
+  useEffect(() => {
+    if (!open) demoteInline();
+  }, [open]);
+
+  // A create started by a direct slice call re-arms the form's done signal.
+  useEffect(() => {
+    if (running !== undefined) setFormDone(false);
+  }, [running]);
+
   const outcome = useMemo<Outcome | undefined>(() => {
-    const shown =
-      held?.kind === 'ready' && held.name === currentName ? undefined : held;
-    return shown ?? (failed ? { kind: 'failed', ...failed } : undefined);
-  }, [held, failed, currentName]);
+    return held?.kind === 'ready' && held.name === currentName
+      ? undefined
+      : held;
+  }, [held, currentName]);
 
   const handle = (): boolean | void => {
     if (!outcome) return;
@@ -340,12 +342,7 @@ function BranchControl() {
       onFormChange={(shown, typed) => {
         setFormShown(shown);
         setFormTyped(typed);
-        if (!shown) {
-          // A failure the closed switcher showed as a toast stays one when the form goes.
-          const { failed: pending, open: isOpen } = latest.current;
-          if (pending && !isOpen) setHeld({ kind: 'failed', ...pending });
-          setFailed(undefined);
-        }
+        if (!shown) demoteInline();
       }}
       note={
         held
@@ -363,13 +360,9 @@ function BranchControl() {
         create ? (name, from) => startCreate({ name, from }) : undefined
       }
       createState={
-        branch.creating && startedVia.current === 'form'
+        branch.creating && started.current?.via === 'form'
           ? 'creating'
-          : failed ||
-              (result?.outcome === 'failed' &&
-                open &&
-                formShown &&
-                startedVia.current === 'form')
+          : held?.kind === 'failed' && held.viaForm
             ? 'failed'
             : formDone
               ? 'done'

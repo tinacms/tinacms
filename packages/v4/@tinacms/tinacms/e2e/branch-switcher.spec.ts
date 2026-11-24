@@ -922,6 +922,24 @@ test.describe('branch switcher pop-up', () => {
       ).toHaveValue('cms/x');
     });
 
+    test(`resets the form and switches when the note's Retry makes a branch whose form create failed while the ${frame.name} was closed`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=failonce#/');
+      await openFrame(page, frame.maximise);
+      await makeBranch(page, frameOf(page, frame.maximise));
+      await page.keyboard.press('Escape');
+      await expect(page.getByText("Couldn't create cms/x")).toBeVisible();
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      await view.getByRole('button', { name: 'Retry' }).click();
+      await expect(
+        page.getByRole('button', { name: 'Branch: cms/x' })
+      ).toBeVisible();
+      await expect(page.getByText(/already exists/)).toHaveCount(0);
+    });
+
     test(`takes the failure toast back after the failed form is emptied and the ${frame.name} closed`, async ({
       page,
     }) => {

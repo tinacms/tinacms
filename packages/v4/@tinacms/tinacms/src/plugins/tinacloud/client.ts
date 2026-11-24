@@ -302,6 +302,9 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     }
   };
 
+  // A create that timed out here may still have made the branch on the server.
+  const timedOutCreates = new Set<string>();
+
   const createBranch = async ({
     name,
     from,
@@ -317,13 +320,15 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     const expired = new Promise<never>((_resolve, reject) => {
       deadline.signal.addEventListener(
         'abort',
-        () =>
+        () => {
+          timedOutCreates.add(name);
           reject(
             new TinaCloudError(
               `TinaCloud did not answer the request to create branch ${name} in time.`,
               {}
             )
-          ),
+          );
+        },
         { once: true }
       );
     });
@@ -342,6 +347,20 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
         ),
         expired,
       ]);
+      timedOutCreates.delete(name);
+    } catch (cause) {
+      // The retry of a create that timed out is refused as a conflict once the branch exists.
+      const conflict =
+        cause instanceof TinaCloudError &&
+        cause.status !== undefined &&
+        cause.status >= 400 &&
+        cause.status < 500 &&
+        cause.status !== 401 &&
+        cause.status !== 403;
+      if (!(conflict && timedOutCreates.delete(name))) throw cause;
+      const ready = waitForIndex(name);
+      ready.catch(() => {});
+      return { name, ready };
     } finally {
       clearTimeout(timer);
     }

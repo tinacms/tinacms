@@ -812,13 +812,13 @@ describe('Branch switcher controls', () => {
       />
     );
     await user.click(screen.getByRole('button', { name: 'New branch' }));
-    expect(onFormChange).toHaveBeenLastCalledWith(true, false);
+    expect(onFormChange).toHaveBeenLastCalledWith(true, '');
     const name = screen.getByRole('searchbox', { name: 'New branch name' });
     await user.type(name, 'cms/a');
     await user.click(screen.getByRole('button', { name: 'Clear name' }));
     expect(name).toHaveFocus();
     await user.click(screen.getByRole('button', { name: 'Back to branches' }));
-    expect(onFormChange).toHaveBeenLastCalledWith(false, false);
+    expect(onFormChange).toHaveBeenLastCalledWith(false, '');
     const search = screen.getByRole('searchbox', { name: 'Search branches' });
     expect(search).toHaveFocus();
     await user.type(search, 'x');

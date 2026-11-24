@@ -69,9 +69,12 @@ type BranchSwitcherProps = {
   onCreate?: (name: string, from: string) => void;
   /** The default branch, offered next to the current one as where a new branch starts from. */
   baseBranch?: string;
-  /** Called when the New branch form opens or closes, or its name goes empty or not, so the caller knows whether an inline failure will be seen and whether typed text would be lost. */
-  onFormChange?: (shown: boolean, typed: boolean) => void;
-  /** `creating` shows "Creating" on the form; `failed` keeps the form with a Retry. */
+  /** Called when the New branch form opens or closes or its trimmed name changes. The caller decides which outcomes the form holds back. */
+  onFormChange?: (shown: boolean, typed: string) => void;
+  /**
+   * `creating` shows "Creating" on the form; `failed` keeps the form with a Retry. `done` resets
+   * the form once: its name belongs to a create that ended ready or unready.
+   */
   createState?: 'idle' | 'creating' | 'failed' | 'done';
   /** The outcome of a create, shown above the list while the switcher is open. One at a time. */
   note?: BranchNote;
@@ -368,14 +371,18 @@ function BranchSwitcher({
   const [submitted, setSubmitted] = useState(false);
   const typed = newName.trim();
   const takenNames = branches.map((branch) => branch.name);
-  const nameError = busy
-    ? undefined
-    : branchNameError(typed, takenNames, submitted);
+  const nameError =
+    busy || (waiting && typed === creatingBranch)
+      ? undefined
+      : branchNameError(typed, takenNames, submitted);
   const from = startFrom === 'base' ? baseBranch : (current ?? baseBranch);
   const [dismissed, setDismissed] = useState(false);
   const attempted = useRef('');
   const failed =
-    createState === 'failed' && !dismissed && typed === attempted.current;
+    createState === 'failed' &&
+    creating &&
+    !dismissed &&
+    typed === attempted.current;
   const frame = () =>
     document.querySelector('[data-slot="branch-maximised"]') ?? document;
   const focusField = (field: 'search' | 'name') => {
@@ -393,17 +400,14 @@ function BranchSwitcher({
   }, [failed, maximised]);
   useEffect(() => setDismissed(false), [createState]);
 
-  // A create the form made that finished returns to the list; one that failed keeps the form.
-  const formCreated = useRef(false);
+  // A create that ended under the name in the form returns it to the list; a failure keeps it.
   useEffect(() => {
-    if (createState === 'creating') formCreated.current = true;
-    if (createState === 'done' && formCreated.current) {
-      formCreated.current = false;
-      setCreating(false);
-      setNewName('');
-      setSubmitted(false);
-      setStartFrom('current');
-    }
+    if (createState !== 'done') return;
+    setCreating(false);
+    setNewName('');
+    setSubmitted(false);
+    setStartFrom('current');
+    if (open && creating) return afterPaint(() => focusField('search'));
   }, [createState]);
 
   // An open switcher belongs to the tier it opened on. Crossing 768px closes it before the other
@@ -418,14 +422,18 @@ function BranchSwitcher({
     if (staleTier) setOpen(false);
   });
 
-  // However it closed, the next open starts as the pop-up.
   useEffect(() => {
     if (!open && maximised) setMaximised(false);
   });
 
   const noteKey = note === undefined ? '' : `${note.kind}:${note.name}`;
   useEffect(() => {
-    if (noteKey !== '' && !noteKey.startsWith('failed:') && !note?.keepForm) {
+    if (
+      noteKey !== '' &&
+      !noteKey.startsWith('failed:') &&
+      !note?.keepForm &&
+      typed === ''
+    ) {
       setCreating(false);
     }
   }, [noteKey]);
@@ -438,9 +446,11 @@ function BranchSwitcher({
     setStartFrom('current');
   }, [open]);
 
+  const formChange = useRef(onFormChange);
+  formChange.current = onFormChange;
   useEffect(() => {
-    onFormChange?.(creating, newName.trim() !== '');
-  }, [creating, newName, onFormChange]);
+    formChange.current?.(creating, typed);
+  }, [creating, typed]);
 
   useEffect(() => {
     if (!creating) return;
@@ -460,9 +470,12 @@ function BranchSwitcher({
       ...event.currentTarget.querySelectorAll<HTMLElement>('[data-branch-row]'),
     ];
     const at = rows.findIndex((row) => row === document.activeElement);
-    if (at === -1 && event.key !== 'ArrowDown') return;
-    if (at === -1 && !(document.activeElement instanceof HTMLInputElement))
-      return;
+    if (at === -1) {
+      const onSearch =
+        document.activeElement instanceof HTMLInputElement &&
+        document.activeElement.dataset.branchField === 'search';
+      if (event.key !== 'ArrowDown' || !onSearch) return;
+    }
     event.preventDefault();
     const next =
       event.key === 'Home'
@@ -566,7 +579,7 @@ function BranchSwitcher({
           Creating {creatingBranch}…
         </p>
       ) : null}
-      {note !== undefined ? (
+      {note !== undefined && !(failed && note.kind === 'failed') ? (
         <OutcomeNote
           note={note}
           onAction={() => {
