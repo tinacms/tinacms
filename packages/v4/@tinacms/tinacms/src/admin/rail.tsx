@@ -15,6 +15,7 @@ import {
   SidebarSeparator,
   useSidebar,
 } from '@tinacms/ui/components/sidebar';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { Fragment, type KeyboardEvent, type ReactElement, useId } from 'react';
 import type {
   GlobalNavEntry,
@@ -247,6 +248,7 @@ export function AdminRail({
     route.view === 'home' ||
     (route.view === 'screen' && route.screen === HOME_SCREEN);
   const { setOpenMobile } = useSidebar();
+  const tier = useTier();
   const go = (next: AdminRoute) => {
     setOpenMobile(false);
     navigate(next);
@@ -269,7 +271,15 @@ export function AdminRail({
               glyph='collection'
               opens
               selected={inCollections}
-              onOpen={() => go({ view: 'collections' })}
+              onOpen={() => {
+                if (tier === 'desktop' || route.view !== 'document') {
+                  go({ view: 'collections' });
+                } else if (route.navigator) {
+                  setOpenMobile(false);
+                } else {
+                  go({ ...route, navigator: true });
+                }
+              }}
             />
             <RailEntry
               label='Media'

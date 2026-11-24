@@ -481,12 +481,10 @@ describe('TinaAdmin', () => {
     renderAdmin('about:blank');
     const frame = await screen.findByTitle('Preview');
     const bar = screen.getByRole('group', { name: 'Preview toolbar' });
-    // The test window is 1024px wide, a tablet: the device sizes sit in the actions menu.
     await user.click(
-      within(bar).getByRole('button', { name: 'Preview actions' })
-    );
-    await user.click(
-      await screen.findByRole('menuitemcheckbox', { name: /^Tablet/ })
+      within(
+        within(bar).getByRole('group', { name: 'Device size' })
+      ).getByRole('button', { name: /^Tablet/ })
     );
     expect(screen.getByTitle('Preview')).toBe(frame);
     await user.click(
@@ -1856,7 +1854,7 @@ describe('TinaAdmin rail', () => {
 
   it('closes the phone rail sheet when a row is chosen', async () => {
     vi.stubGlobal('matchMedia', (query: string) => ({
-      matches: true,
+      matches: !/min-width/.test(query),
       media: query,
       addEventListener: () => {},
       removeEventListener: () => {},
@@ -1865,7 +1863,7 @@ describe('TinaAdmin rail', () => {
       const user = userEvent.setup();
       renderAdmin();
       await user.click(
-        await screen.findByRole('button', { name: 'Toggle Sidebar' })
+        await screen.findByRole('button', { name: 'Open side nav' })
       );
       const sheet = await waitFor(() => {
         const found = document.querySelector<HTMLElement>('[data-mobile=true]');

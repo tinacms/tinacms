@@ -15,7 +15,11 @@ function Input({ className, mono = false, readOnly, ...props }: InputProps) {
       data-slot='input'
       readOnly={readOnly}
       data-readonly={readOnly ? '' : undefined}
-      className={cn(fieldVariants({ kind: 'input', mono }), className)}
+      className={cn(
+        fieldVariants({ kind: 'input', mono }),
+        'touch:h-touch',
+        className
+      )}
       {...props}
     />
   );

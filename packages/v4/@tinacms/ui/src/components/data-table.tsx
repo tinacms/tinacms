@@ -73,7 +73,7 @@ type DataTableRow = {
   cells: Record<string, DataTableCell | undefined>;
 };
 
-const cellVariants = cva('px-4 py-2.5 whitespace-normal', {
+const cellVariants = cva('px-4 py-2.5 whitespace-normal touch:h-touch', {
   variants: {
     type: {
       link: '',
@@ -247,7 +247,7 @@ function DataTable({
                       column.sort === undefined ? undefined : ARIA_SORT[sort]
                     }
                     className={cn(
-                      'h-9 bg-background px-4 text-xs font-medium text-muted-foreground-strong',
+                      'h-9 touch:h-touch bg-background px-4 text-xs font-medium text-muted-foreground-strong',
                       column.align === 'right' && 'text-right',
                       column.hideNarrow && '@max-2xl:hidden',
                       column.className
@@ -259,7 +259,7 @@ function DataTable({
                       <button
                         type='button'
                         onClick={column.onSort}
-                        className='-mx-1.5 inline-flex h-7 cursor-pointer items-center gap-1 rounded-sm border-0 bg-transparent px-1.5 font-sans text-xs font-medium text-inherit outline-none hover:bg-muted hover:text-foreground focus-visible:shadow-focus-ring'
+                        className='-mx-1.5 inline-flex h-7 touch:h-touch cursor-pointer items-center gap-1 rounded-sm border-0 bg-transparent px-1.5 font-sans text-xs font-medium text-inherit outline-none hover:bg-muted hover:text-foreground focus-visible:shadow-focus-ring'
                       >
                         {column.label}
                         <span

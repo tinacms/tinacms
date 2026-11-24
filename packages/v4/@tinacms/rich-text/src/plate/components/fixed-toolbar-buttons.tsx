@@ -1,3 +1,4 @@
+import { useTouch } from '@tinacms/ui/hooks/use-touch';
 import { cn } from '@tinacms/ui/lib/utils';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import {
@@ -45,20 +46,6 @@ const TEXT_STYLE_ICON_WIDTH = 52;
 const MORE_FORMATTING_WIDTH = 52;
 const INSERT_WIDTH = 76;
 const SEPARATOR_WIDTH = 9;
-
-const useCoarsePointer = () => {
-  const [coarse, setCoarse] = React.useState(
-    () => window.matchMedia?.('(pointer: coarse)').matches ?? false
-  );
-  React.useEffect(() => {
-    const list = window.matchMedia?.('(pointer: coarse)');
-    if (!list) return;
-    const onChange = () => setCoarse(list.matches);
-    list.addEventListener('change', onChange);
-    return () => list.removeEventListener('change', onChange);
-  }, []);
-  return coarse;
-};
 
 const InLineButton = ({
   tool,
@@ -116,7 +103,7 @@ export default function FixedToolbarButtons({
   const ref = React.useRef<HTMLDivElement>(null);
   const [width, setWidth] = React.useState(Number.POSITIVE_INFINITY);
   const { overrides, templates } = useToolbarContext();
-  const coarse = useCoarsePointer();
+  const coarse = useTouch();
   const { isBlocked, inCodeBlock } = useToolBlocked();
   useEditorState();
   const editor = useEditorRef();

@@ -291,7 +291,20 @@ const toggles = () =>
 const press = async (user: ReturnType<typeof userEvent.setup>, chord: string) =>
   user.keyboard(chord);
 
+// happy-dom is 1024px wide, a tablet; the shell tests default to a desktop window.
+const stubWidth = (width: number) =>
+  vi.stubGlobal('matchMedia', (query: string) => {
+    const min = /min-width:\s*(\d+)px/.exec(query);
+    return {
+      matches: min ? width >= Number(min[1]) : false,
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    };
+  });
+
 beforeEach(() => {
+  stubWidth(1440);
   mode = 'branches';
   updates = [];
   holdUpdates = false;
@@ -417,6 +430,31 @@ describe('Top bar', () => {
     expect(toggles()).toHaveLength(1);
   });
 
+  it('shows the mark and Search as an icon on a phone, without the project name or the word logo', async () => {
+    stubWidth(390);
+    renderAdmin('Acme site');
+    const bar = await screen.findByRole('banner', { name: 'Top bar' });
+    expect(
+      await within(bar).findByRole('button', { name: 'Open side nav' })
+    ).toBeVisible();
+    expect(within(bar).getAllByRole('img', { name: 'TinaCMS' })).toHaveLength(
+      1
+    );
+    expect(
+      within(bar).getByRole('img', { name: 'TinaCMS' }).getAttribute('src')
+    ).toContain("width='184'");
+    expect(within(bar).getByRole('button', { name: 'Search' })).toBeVisible();
+  });
+
+  it('holds only the short status words on a phone', async () => {
+    stubWidth(390);
+    mode = 'local';
+    renderAdmin();
+    const bar = await screen.findByRole('contentinfo', { name: 'Status bar' });
+    expect(await within(bar).findByText('No saves yet')).toBeVisible();
+    expect(within(bar).queryByText('No saves yet this session')).toBeNull();
+  });
+
   it('omits the project name when none is configured', async () => {
     renderAdmin();
     await screen.findByRole('banner', { name: 'Top bar' });
@@ -438,13 +476,8 @@ describe('Top bar', () => {
     expect(sidebarState()).toBe('collapsed');
   });
 
-  it('ignores ⌘B below 768px', async () => {
-    vi.stubGlobal('matchMedia', (query: string) => ({
-      matches: true,
-      media: query,
-      addEventListener: () => {},
-      removeEventListener: () => {},
-    }));
+  it('ignores ⌘B below desktop', async () => {
+    stubWidth(600);
     const user = userEvent.setup();
     renderAdmin();
     await screen.findByRole('banner', { name: 'Top bar' });

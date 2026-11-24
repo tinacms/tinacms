@@ -7,6 +7,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
+    // happy-dom's 1024px default reads as a tablet. Tests run at a desktop width unless they stub one.
+    environmentOptions: { happyDOM: { width: 1440, height: 900 } },
     testTimeout: 30_000,
     execArgv: ['--no-experimental-webstorage'],
     setupFiles: ['./src/test/setup.ts'],

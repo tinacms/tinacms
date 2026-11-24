@@ -251,7 +251,7 @@ function ErrorRow({
             'col-start-1 row-start-1 inline-flex items-center justify-end gap-1 text-foreground opacity-0 transition-opacity',
             atRest && 'opacity-100',
             !selected &&
-              'group-hover/row:opacity-100 group-focus-visible/row:opacity-100 group-data-[look=hover]/row:opacity-100'
+              'touch:opacity-100 group-hover/row:opacity-100 group-focus-visible/row:opacity-100 group-data-[look=hover]/row:opacity-100'
           )}
         >
           Go to field

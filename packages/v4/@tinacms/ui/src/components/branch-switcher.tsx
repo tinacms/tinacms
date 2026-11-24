@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@tinacms/ui/components/dialog';
+import { ScreenContent } from '@tinacms/ui/components/sheet';
 import { Badge } from '@tinacms/ui/components/badge';
 import { Icon } from '@tinacms/ui/components/icon';
 import { SearchBox } from '@tinacms/ui/components/search-box';
@@ -61,7 +62,7 @@ function BranchButtonLabel({
         {current}
       </span>
       {isProtected ? (
-        <span className='text-xs text-muted-foreground-strong max-md:hidden'>
+        <span className='text-xs text-muted-foreground-strong phone:hidden'>
           protected
         </span>
       ) : null}
@@ -247,6 +248,157 @@ function BranchSwitcher({
   const protectedBranches = matching.filter(
     (branch) => branch.protected && branch.name !== current
   );
+  const content = (
+    <>
+      {blocked ? (
+        <p role='status' className='m-0 text-sm text-destructive'>
+          {blockedMessage}
+        </p>
+      ) : null}
+      <SearchBox
+        label='Search branches'
+        placeholder='Name or pull request number'
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        onClear={() => setQuery('')}
+      />
+      {status === 'loading' ? (
+        <div
+          aria-busy='true'
+          aria-label='Loading branches'
+          role='group'
+          className='flex flex-col gap-2'
+        >
+          <span className='text-sm text-muted-foreground'>
+            Loading branches
+          </span>
+          {[0, 1, 2].map((row) => (
+            <span
+              key={row}
+              className='h-8.5 animate-pulse rounded-sm bg-muted motion-reduce:animate-none'
+            />
+          ))}
+        </div>
+      ) : status === 'failed' ? (
+        <div role='alert' className='flex items-center gap-2 text-sm'>
+          <span className='min-w-0 flex-1 text-destructive'>
+            Couldn't load branches.
+            {current === undefined
+              ? ' You can keep editing.'
+              : ` You're still on ${current} and can keep editing.`}
+          </span>
+          {onRetry ? (
+            <Button size='sm' onClick={onRetry}>
+              Retry
+            </Button>
+          ) : null}
+        </div>
+      ) : (
+        <>
+          {matching.length === 0 ? (
+            <p className='m-0 text-sm text-muted-foreground'>
+              No branch matches “{query.trim()}”.
+            </p>
+          ) : null}
+          <BranchGroup
+            branches={currentFirst}
+            current={current ?? ''}
+            blocked={blocked}
+            onSwitch={(name) => {
+              onSwitch(name);
+              setOpen(false);
+            }}
+          />
+          <BranchGroup
+            heading='Protected'
+            description='Saving on these makes a new branch.'
+            branches={protectedBranches}
+            current={current ?? ''}
+            blocked={blocked}
+            onSwitch={(name) => {
+              onSwitch(name);
+              setOpen(false);
+            }}
+          />
+        </>
+      )}
+      {creating ? (
+        <form
+          aria-label='New branch form'
+          className='flex flex-col gap-2 border-t border-border-subtle pt-3'
+          onSubmit={(event) => {
+            event.preventDefault();
+            setSubmitted(true);
+            if (typed === '' || branchNameError(typed, takenNames, true))
+              return;
+            if (!onCreate) return;
+            onCreate(typed);
+            setOpen(false);
+          }}
+        >
+          <h3 className='m-0 text-base font-semibold'>New branch</h3>
+          <p className='m-0 text-sm text-muted-foreground'>
+            It starts with no unsaved edits. Yours stay on the branch they were
+            made on.
+          </p>
+          <SearchBox
+            label='New branch name'
+            placeholder='Branch name'
+            icon='branch'
+            value={newName}
+            onChange={(event) => {
+              setNewName(event.target.value);
+              if (event.target.value.trim() === '' && newName !== '') {
+                setSubmitted(true);
+              }
+            }}
+            onClear={() => {
+              setNewName('');
+              setSubmitted(true);
+            }}
+            aria-invalid={nameError ? true : undefined}
+          />
+          <p className='m-0 text-xs text-muted-foreground'>
+            {BRANCH_NAME_HINT}
+          </p>
+          {nameError ? (
+            <p role='alert' className='m-0 text-sm text-destructive'>
+              {nameError}
+            </p>
+          ) : null}
+          <div className='flex justify-end gap-2 phone:items-stretch phone:*:min-w-0 phone:*:flex-1'>
+            <Button
+              className='phone:h-auto phone:min-h-9'
+              onClick={() => setCreating(false)}
+            >
+              <span className='min-w-0 phone:py-1.5 phone:whitespace-normal'>
+                Back to branches
+              </span>
+            </Button>
+            <Button
+              variant='primary'
+              type='submit'
+              className='phone:h-auto phone:min-h-9'
+              disabled={!onCreate || (typed !== '' && nameError !== undefined)}
+            >
+              Create branch
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <div className='border-t border-border-subtle pt-2'>
+          <Button
+            variant='ghost'
+            size='sm'
+            icon='plus'
+            onClick={() => setCreating(true)}
+          >
+            New branch
+          </Button>
+        </div>
+      )}
+    </>
+  );
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
@@ -268,25 +420,33 @@ function BranchSwitcher({
       >
         <BranchButtonLabel current={current} isProtected={isProtected} />
       </DialogTrigger>
-      <DialogContent
-        size='md'
-        showCloseButton={false}
-        onKeyDown={move}
-        className={cn(
-          fullScreen &&
-            !phone &&
-            'top-14 bottom-7 left-0 h-auto w-full max-w-none translate-x-0 translate-y-0 rounded-none'
-        )}
-      >
-        <DialogHeader className='flex-row items-start justify-between gap-2'>
-          <div className='flex min-w-0 flex-col gap-1'>
-            <DialogTitle>Branches</DialogTitle>
-            <DialogDescription className='sr-only'>
-              Edits save to the branch you choose.
-            </DialogDescription>
-          </div>
-          <div className='flex flex-none items-center gap-1'>
-            {phone ? null : (
+      {phone ? (
+        <ScreenContent
+          title='Branches'
+          description='Edits save to the branch you choose.'
+          closeLabel='Close branches'
+          onKeyDown={move}
+        >
+          {content}
+        </ScreenContent>
+      ) : (
+        <DialogContent
+          size='md'
+          showCloseButton={false}
+          onKeyDown={move}
+          className={cn(
+            fullScreen &&
+              'top-14 bottom-7 left-0 h-auto w-full max-w-none translate-x-0 translate-y-0 rounded-none'
+          )}
+        >
+          <DialogHeader className='flex-row items-start justify-between gap-2'>
+            <div className='flex min-w-0 flex-col gap-1'>
+              <DialogTitle>Branches</DialogTitle>
+              <DialogDescription className='sr-only'>
+                Edits save to the branch you choose.
+              </DialogDescription>
+            </div>
+            <div className='flex flex-none items-center gap-1'>
               <Button
                 variant='icon'
                 size='sm'
@@ -294,8 +454,6 @@ function BranchSwitcher({
                 aria-label={fullScreen ? 'Exit full screen' : 'Full screen'}
                 onClick={() => setFullScreen((value) => !value)}
               />
-            )}
-            {phone ? null : (
               <Button
                 variant='icon'
                 size='sm'
@@ -303,159 +461,11 @@ function BranchSwitcher({
                 aria-label='Close'
                 onClick={() => setOpen(false)}
               />
-            )}
-          </div>
-        </DialogHeader>
-        {blocked ? (
-          <p role='status' className='m-0 text-sm text-destructive'>
-            {blockedMessage}
-          </p>
-        ) : null}
-        <SearchBox
-          label='Search branches'
-          placeholder='Name or pull request number'
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          onClear={() => setQuery('')}
-        />
-        {status === 'loading' ? (
-          <div
-            aria-busy='true'
-            aria-label='Loading branches'
-            role='group'
-            className='flex flex-col gap-2'
-          >
-            <span className='text-sm text-muted-foreground'>
-              Loading branches
-            </span>
-            {[0, 1, 2].map((row) => (
-              <span
-                key={row}
-                className='h-8.5 animate-pulse rounded-sm bg-muted motion-reduce:animate-none'
-              />
-            ))}
-          </div>
-        ) : status === 'failed' ? (
-          <div role='alert' className='flex items-center gap-2 text-sm'>
-            <span className='min-w-0 flex-1 text-destructive'>
-              Couldn't load branches.
-              {current === undefined
-                ? ' You can keep editing.'
-                : ` You're still on ${current} and can keep editing.`}
-            </span>
-            {onRetry ? (
-              <Button size='sm' onClick={onRetry}>
-                Retry
-              </Button>
-            ) : null}
-          </div>
-        ) : (
-          <>
-            {matching.length === 0 ? (
-              <p className='m-0 text-sm text-muted-foreground'>
-                No branch matches “{query.trim()}”.
-              </p>
-            ) : null}
-            <BranchGroup
-              branches={currentFirst}
-              current={current ?? ''}
-              blocked={blocked}
-              onSwitch={(name) => {
-                onSwitch(name);
-                setOpen(false);
-              }}
-            />
-            <BranchGroup
-              heading='Protected'
-              description='Saving on these makes a new branch.'
-              branches={protectedBranches}
-              current={current ?? ''}
-              blocked={blocked}
-              onSwitch={(name) => {
-                onSwitch(name);
-                setOpen(false);
-              }}
-            />
-          </>
-        )}
-        {creating ? (
-          <form
-            aria-label='New branch form'
-            className='flex flex-col gap-2 border-t border-border-subtle pt-3'
-            onSubmit={(event) => {
-              event.preventDefault();
-              setSubmitted(true);
-              if (typed === '' || branchNameError(typed, takenNames, true))
-                return;
-              if (!onCreate) return;
-              onCreate(typed);
-              setOpen(false);
-            }}
-          >
-            <h3 className='m-0 text-base font-semibold'>New branch</h3>
-            <p className='m-0 text-sm text-muted-foreground'>
-              It starts with no unsaved edits. Yours stay on the branch they
-              were made on.
-            </p>
-            <SearchBox
-              label='New branch name'
-              placeholder='Branch name'
-              icon='branch'
-              value={newName}
-              onChange={(event) => {
-                setNewName(event.target.value);
-                if (event.target.value.trim() === '' && newName !== '') {
-                  setSubmitted(true);
-                }
-              }}
-              onClear={() => {
-                setNewName('');
-                setSubmitted(true);
-              }}
-              aria-invalid={nameError ? true : undefined}
-            />
-            <p className='m-0 text-xs text-muted-foreground'>
-              {BRANCH_NAME_HINT}
-            </p>
-            {nameError ? (
-              <p role='alert' className='m-0 text-sm text-destructive'>
-                {nameError}
-              </p>
-            ) : null}
-            <div className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'>
-              <Button
-                className='max-md:h-auto max-md:min-h-9'
-                onClick={() => setCreating(false)}
-              >
-                <span className='min-w-0 max-md:py-1.5 max-md:whitespace-normal'>
-                  Back to branches
-                </span>
-              </Button>
-              <Button
-                variant='primary'
-                type='submit'
-                className='max-md:h-auto max-md:min-h-9'
-                disabled={
-                  !onCreate || (typed !== '' && nameError !== undefined)
-                }
-              >
-                Create branch
-              </Button>
             </div>
-          </form>
-        ) : (
-          <div className='border-t border-border-subtle pt-2'>
-            <Button
-              variant='ghost'
-              size='sm'
-              icon='plus'
-              onClick={() => setCreating(true)}
-            >
-              New branch
-            </Button>
-          </div>
-        )}
-      </DialogContent>
+          </DialogHeader>
+          {content}
+        </DialogContent>
+      )}
     </Dialog>
   );
 }

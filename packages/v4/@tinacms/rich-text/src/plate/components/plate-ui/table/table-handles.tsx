@@ -14,7 +14,7 @@ import type { ActiveTableCell } from './table-active-cell';
 import { TableActionsMenuContent } from './table-menu';
 
 const handleClass =
-  'relative flex items-center justify-center rounded-sm border border-border bg-card text-muted-foreground shadow-xs outline-none hover:bg-muted hover:text-foreground focus-visible:shadow-focus-ring data-[state=open]:bg-selected data-[state=open]:text-foreground pointer-coarse:after:absolute pointer-coarse:after:top-1/2 pointer-coarse:after:left-1/2 pointer-coarse:after:size-10 pointer-coarse:after:-translate-x-1/2 pointer-coarse:after:-translate-y-1/2 pointer-coarse:after:content-[""]';
+  'relative flex items-center justify-center rounded-sm border border-border bg-card text-muted-foreground shadow-xs outline-none hover:bg-muted hover:text-foreground focus-visible:shadow-focus-ring data-[state=open]:bg-selected data-[state=open]:text-foreground touch:after:absolute touch:after:top-1/2 touch:after:left-1/2 touch:after:size-touch touch:after:-translate-x-1/2 touch:after:-translate-y-1/2 touch:after:content-[""]';
 
 const addClass =
   'flex items-center justify-center gap-1 rounded-sm border border-dashed border-border bg-transparent text-xs text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:shadow-focus-ring';

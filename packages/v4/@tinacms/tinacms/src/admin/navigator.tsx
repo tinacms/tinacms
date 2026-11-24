@@ -29,8 +29,8 @@ import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { DiscardConfirm } from './discard-confirm';
 import type { AdminRoute } from './routing';
 
-const paneClass = (hideBelowLg: boolean) =>
-  `flex w-110 min-w-0 flex-col border-r border-border${hideBelowLg ? ' max-lg:hidden' : ''}`;
+// The frame around the pane (`NavigatorFrame` in admin.tsx) sets its width.
+const PANE_CLASS = 'flex min-w-0 flex-1 flex-col border-r border-border';
 
 const documentName = (path: string) => path.split('/').at(-1) ?? path;
 
@@ -411,7 +411,6 @@ export function CollectionsNavigator({
   onClose,
   onMaximise,
   treeFolders,
-  hideBelowLg = false,
 }: {
   collections: CollectionSchema[];
   treeFolders: TreeFolders;
@@ -420,8 +419,7 @@ export function CollectionsNavigator({
   route: AdminRoute;
   navigate: (route: AdminRoute) => void;
   onClose: () => void;
-  onMaximise: () => void;
-  hideBelowLg?: boolean;
+  onMaximise?: () => void;
 }) {
   const activeCollection =
     route.view === 'collection' ||
@@ -435,7 +433,7 @@ export function CollectionsNavigator({
   const unsavedIds = new Set<string>(useUnsavedFormIds());
   const hasUnsaved = unsavedIds.size > 0;
   return (
-    <aside aria-label='Navigator' className={paneClass(hideBelowLg)}>
+    <aside aria-label='Navigator' className={PANE_CLASS}>
       <PanelHeader
         heading='Collections'
         closeLabel='Close'
@@ -493,15 +491,9 @@ export function CollectionsNavigator({
 }
 
 /** The Media pane when no media plugin is installed. */
-export function MediaPanel({
-  onClose,
-  hideBelowLg = false,
-}: {
-  onClose: () => void;
-  hideBelowLg?: boolean;
-}) {
+export function MediaPanel({ onClose }: { onClose: () => void }) {
   return (
-    <aside aria-label='Media' className={paneClass(hideBelowLg)}>
+    <aside aria-label='Media' className={PANE_CLASS}>
       <PanelHeader heading='Media' closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
         <EmptyState text='No media library is installed.' />

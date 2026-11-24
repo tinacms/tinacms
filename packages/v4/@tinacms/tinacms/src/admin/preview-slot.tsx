@@ -230,14 +230,21 @@ function PreviewPane({
       return;
     }
     if (!moveFocus) return;
-    const name = expanded ? 'Collapse preview' : 'Expand preview';
+    const name =
+      tier === 'tablet'
+        ? expanded
+          ? 'Restore preview'
+          : 'Maximise preview'
+        : expanded
+          ? 'Collapse preview'
+          : 'Expand preview';
     const bar = paneRef.current?.querySelector('[data-slot=preview-toolbar]');
     // In a narrow pane the toggle lives in the actions menu, so focus goes to its button.
     (
       bar?.querySelector<HTMLElement>(`button[aria-label="${name}"]`) ??
       bar?.querySelector<HTMLElement>('button[aria-label="Preview actions"]')
     )?.focus();
-  }, [expanded, moveFocus]);
+  }, [expanded, moveFocus, tier]);
 
   return (
     <div ref={paneRef} className='flex min-h-0 min-w-0 flex-1 flex-col'>
