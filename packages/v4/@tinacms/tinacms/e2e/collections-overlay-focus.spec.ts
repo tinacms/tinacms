@@ -88,3 +88,19 @@ test('Search opened right after the overlay keeps focus when the entry draws lat
     0
   );
 });
+
+test('a click into the preview before the entry draws keeps focus in the preview', async ({
+  page,
+}) => {
+  await open(page, TABLET);
+  await slowApi(page);
+  await page.getByRole('button', { name: 'Open side nav' }).click();
+  await page.locator('[data-rail-row][aria-label="Collections"]').click();
+  await page
+    .locator('iframe[title="Preview"]')
+    .click({ position: { x: 5, y: 5 } });
+  const entry = page.locator('[aria-label=Navigator] [aria-current=page]');
+  await expect(entry).toBeAttached({ timeout: 20_000 });
+  await page.waitForTimeout(500);
+  await expect(entry).not.toBeFocused();
+});

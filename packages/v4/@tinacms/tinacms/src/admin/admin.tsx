@@ -1017,7 +1017,9 @@ function AdminShell({
           frame = requestAnimationFrame(place);
           return;
         }
-        if (userMoved) return;
+        if (userMoved || document.activeElement instanceof HTMLIFrameElement) {
+          return;
+        }
         const pane = document.querySelector('[aria-label=Navigator]');
         const current = pane?.querySelector<HTMLElement>('[aria-current=page]');
         if (current) {
