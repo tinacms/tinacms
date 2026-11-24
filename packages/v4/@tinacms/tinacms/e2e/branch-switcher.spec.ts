@@ -208,6 +208,28 @@ test.describe('branch switcher pop-up', () => {
     await expect(page.getByRole('button', { name: /^Branch:/ })).toBeFocused();
   });
 
+  test('wraps Tab inside the maximised view while Create branch is disabled', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto('/branches.html?docs=1&create=ok#/');
+    await openFrame(page, true);
+    const view = frameOf(page, true);
+    await view.getByRole('button', { name: 'New branch' }).click();
+    await view.getByRole('button', { name: 'Back to branches' }).focus();
+    await page.keyboard.press('Tab');
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            document.activeElement?.closest(
+              '[data-slot="branch-maximised"]'
+            ) !== null
+        )
+      )
+      .toBe(true);
+  });
+
   test('keeps Tab inside the maximised view while a create runs', async ({
     page,
   }) => {

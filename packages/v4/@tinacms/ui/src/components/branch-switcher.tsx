@@ -845,7 +845,7 @@ function BranchSwitcher({
               // Holds the failure line's height, so Create, Creating and Retry stay put.
               <p
                 aria-hidden='true'
-                data-text={failureLine(attempted.current || typed || 'branch')}
+                data-text={failureLine('branch')}
                 className='invisible m-0 text-sm before:content-[attr(data-text)] [overflow-wrap:anywhere]'
               />
             )}
@@ -1012,7 +1012,7 @@ function BranchSwitcher({
 const wrapTab = (event: KeyboardEvent<HTMLElement>) => {
   const items = [
     ...event.currentTarget.querySelectorAll<HTMLElement>(
-      'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled])'
     ),
   ];
   const end = event.shiftKey ? items[0] : items[items.length - 1];
