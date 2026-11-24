@@ -410,19 +410,25 @@ export interface TinaAdminProps {
 }
 
 export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
+  const tier = useTier();
   return (
-    <AdminErrorBoundary>
-      <TinaProvider config={config} queryClient={queryClient}>
-        <TooltipProvider>
-          <HashRouter>
-            <AuthGate>
-              <AdminShell preview={preview} projectName={config.projectName} />
-            </AuthGate>
-          </HashRouter>
-          <ShellToaster />
-        </TooltipProvider>
-      </TinaProvider>
-    </AdminErrorBoundary>
+    <div data-breakpoint={tier} className='contents'>
+      <AdminErrorBoundary>
+        <TinaProvider config={config} queryClient={queryClient}>
+          <TooltipProvider>
+            <HashRouter>
+              <AuthGate>
+                <AdminShell
+                  preview={preview}
+                  projectName={config.projectName}
+                />
+              </AuthGate>
+            </HashRouter>
+            <ShellToaster />
+          </TooltipProvider>
+        </TinaProvider>
+      </AdminErrorBoundary>
+    </div>
   );
 }
 

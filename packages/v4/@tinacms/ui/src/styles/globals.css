@@ -6,3 +6,34 @@
 /* Light theme only. Nothing sets `.dark`, so the `dark:` utilities stay off; without this
    variant they would follow the OS colour scheme. */
 @custom-variant dark (&:is(.dark *));
+
+/* Breakpoints read the two tokens in tokens.css through useTier, which writes
+   `data-breakpoint` on the admin root. A media query cannot read a custom property, so
+   these variants match that attribute. Each matches its own breakpoint only. */
+@custom-variant phone (:where([data-breakpoint="phone"]) &);
+@custom-variant tablet (:where([data-breakpoint="tablet"]) &);
+@custom-variant desktop (:where([data-breakpoint="desktop"]) &);
+@custom-variant below-desktop (
+  :where([data-breakpoint="phone"], [data-breakpoint="tablet"]) &
+);
+
+/* Touch follows the input, not the width: a coarse primary pointer, or a [data-touch] frame. */
+@custom-variant touch {
+  @media (pointer: coarse) {
+    @slot;
+  }
+  &:where([data-touch], [data-touch] *) {
+    @slot;
+  }
+}
+
+@utility h-touch {
+  height: var(--touch-height);
+}
+@utility min-h-touch {
+  min-height: var(--touch-height);
+}
+@utility size-touch {
+  width: var(--touch-height);
+  height: var(--touch-height);
+}
