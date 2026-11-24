@@ -15,7 +15,8 @@
       "!**/.next/**",
       "!**/node_modules/**",
       "!**/public/admin/**",
-      "!**/static/admin/**"
+      "!**/static/admin/**",
+      "!**/packages/v4/@tinacms/v4-content/fixtures/*/expected/**"
     ],
     "maxSize": 3145728
   },
