@@ -169,6 +169,7 @@ function SearchDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const phone = useTier() === 'phone';
+  const { navigate } = useAdminRoute();
   const [query, setQuery] = useState('');
   const [outcome, setOutcome] = useState<ContentSearchOutcome>(NO_OUTCOME);
   const navigation = useNavigationResults();
@@ -237,21 +238,31 @@ function SearchDialog({
           ) : null}
           <ul aria-label='Search results' className='m-0 list-none p-0'>
             {outcome.results.map(({ ref, title, snippet }) => (
-              <li
-                key={`${ref.collection}:${ref.path}`}
-                className='py-1.5 text-base'
-              >
-                <span className='flex items-center gap-2'>
-                  <span className='min-w-0 [overflow-wrap:anywhere] font-medium'>
-                    {title}
+              <li key={`${ref.collection}:${ref.path}`} className='text-base'>
+                <button
+                  type='button'
+                  className='block w-full cursor-pointer rounded-sm px-2 py-1.5 text-left hover:bg-muted'
+                  onClick={() => {
+                    onOpenChange(false);
+                    navigate({
+                      view: 'document',
+                      collection: ref.collection,
+                      path: ref.path,
+                    });
+                  }}
+                >
+                  <span className='flex items-center gap-2'>
+                    <span className='min-w-0 [overflow-wrap:anywhere] font-medium'>
+                      {title}
+                    </span>
+                    {unsavedPaths.has(ref.path) ? <Badge /> : null}
                   </span>
-                  {unsavedPaths.has(ref.path) ? <Badge /> : null}
-                </span>
-                {snippet ? (
-                  <span className='block [overflow-wrap:anywhere] text-sm text-muted-foreground'>
-                    {snippet}
-                  </span>
-                ) : null}
+                  {snippet ? (
+                    <span className='block [overflow-wrap:anywhere] text-sm text-muted-foreground'>
+                      {snippet}
+                    </span>
+                  ) : null}
+                </button>
               </li>
             ))}
           </ul>

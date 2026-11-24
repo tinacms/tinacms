@@ -163,7 +163,22 @@ describe('the Search dialog content results', () => {
     expect(first).toHaveTextContent('Hello post');
     expect(first).toHaveTextContent('a snippet');
     expect(second).toHaveTextContent('content/posts/untitled.mdx');
-    expect(within(results).queryByRole('button')).toBeNull();
+    expect(within(results).getAllByRole('button')).toHaveLength(2);
+  });
+
+  it('opens the document of a hit that is picked, and closes Search', async () => {
+    const search = vi.fn(async () => [hit('content/posts/hello.mdx')]);
+    const user = userEvent.setup();
+    renderAdmin(searchProviderPlugin(search));
+    const dialog = await openSearch(user);
+    await user.type(within(dialog).getByRole('searchbox'), 'hello');
+    await user.click(
+      await within(dialog).findByRole('button', { name: /Hello post/ })
+    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(window.location.hash).toBe(
+      '#/collections/post/content%2Fposts%2Fhello.mdx'
+    );
   });
 
   it.each([
