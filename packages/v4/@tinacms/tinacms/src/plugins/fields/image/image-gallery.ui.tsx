@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import {
   useFieldAddress,
@@ -9,10 +9,7 @@ import {
   useListItems,
   useMediaSlice,
 } from '../../../editor';
-import {
-  useMediaPicker,
-  useOwnedPickerTarget,
-} from '../../../editor/media-picker';
+import { useMediaPicker, useOwnedPicker } from '../../../editor/media-picker';
 import { useFormStore } from '../../../form/form-store';
 import { ImageGalleryView } from './image-gallery.view';
 import { useParentLabel } from './image-picker';
@@ -41,11 +38,16 @@ export function ImageGallery() {
   const [focusRequest, setFocusRequest] = useState<{ index: number }>();
   const [missing, setMissing] = useState<ReadonlySet<string>>(new Set());
 
-  const owner = useId();
   const picker = useMediaPicker();
   const parentLabel = useParentLabel(address);
-  const openTarget = useOwnedPickerTarget(owner);
+  const { owner, target: openTarget, adopted } = useOwnedPicker(address);
   const tilePrefix = `${owner}/tile:`;
+  const addTarget = `${owner}/add`;
+  const choosingAdd = openTarget === addTarget;
+  const latestAddress = useRef(address);
+  useLayoutEffect(() => {
+    latestAddress.current = address;
+  });
   const choosingKey = openTarget?.startsWith(tilePrefix)
     ? openTarget.slice(tilePrefix.length)
     : undefined;
@@ -63,7 +65,7 @@ export function ImageGallery() {
   const confirm = useRef((_target: string, _paths: string[]) => {});
   useLayoutEffect(() => {
     confirm.current = (target, paths) => {
-      if (target === `${owner}/add`) {
+      if (target === addTarget) {
         const before = liveItems().length;
         keys.current = [...keys.current, ...paths.map(nextGalleryKey)];
         setValue([...liveItems(), ...paths]);
@@ -79,13 +81,57 @@ export function ImageGallery() {
     };
   });
 
-  const request = (target: string, opener: HTMLElement) => ({
+  const request = (target: string, opener: HTMLElement | null) => ({
     forLabel: field.label ?? field.name,
     parentLabel,
     target,
     opener,
     choose: (paths: string[]) => confirm.current(target, paths),
   });
+
+  // The gallery's address changes when its own list item moves, so "Already added" reads the newest.
+  const takenAt = (paths: (held: unknown) => readonly string[]) => ({
+    get address() {
+      return latestAddress.current;
+    },
+    paths,
+  });
+
+  const addRequest = (opener: HTMLElement | null) => ({
+    ...request(addTarget, opener),
+    mode: 'multiple' as const,
+    taken: takenAt((held) => pathsOf(heldList(held))),
+  });
+
+  const replaceRequest = (key: string, opener: HTMLElement | null) => {
+    const current = liveItems()[keys.current.indexOf(key)];
+    return {
+      ...request(`${tilePrefix}${key}`, opener),
+      mode: 'single' as const,
+      replacing:
+        typeof current === 'string'
+          ? { path: current, missing: missing.has(key) }
+          : undefined,
+      taken: takenAt((held) =>
+        pathsOf(
+          heldList(held).filter((_, at) => at !== keys.current.indexOf(key))
+        )
+      ),
+    };
+  };
+
+  const opener = useRef<HTMLElement | null>(null);
+  // A reseed remounts the gallery under an open Add picker, and a slow load can flip a
+  // tile's `missing` after its picker opened. Both send the request again.
+  useEffect(() => {
+    if (adopted && choosingAdd) picker.open(addRequest(opener.current));
+  }, [adopted]);
+  const choosingMissing = choosingKey !== undefined && missing.has(choosingKey);
+  useEffect(() => {
+    if (choosingKey !== undefined) {
+      picker.open(replaceRequest(choosingKey, opener.current));
+    }
+  }, [choosingMissing]);
 
   return (
     <ImageGalleryView
@@ -106,33 +152,14 @@ export function ImageGallery() {
           return next;
         })
       }
-      onAdd={(opener) =>
-        picker.open({
-          ...request(`${owner}/add`, opener),
-          mode: 'multiple',
-          taken: { address, paths: (held) => pathsOf(heldList(held)) },
-        })
-      }
-      onReplace={(key, opener) => {
-        const index = keys.current.indexOf(key);
-        const current = liveItems()[index];
-        picker.open({
-          ...request(`${tilePrefix}${key}`, opener),
-          mode: 'single',
-          replacing:
-            typeof current === 'string'
-              ? { path: current, missing: missing.has(key) }
-              : undefined,
-          taken: {
-            address,
-            paths: (held) =>
-              pathsOf(
-                heldList(held).filter(
-                  (_, at) => at !== keys.current.indexOf(key)
-                )
-              ),
-          },
-        });
+      choosingAdd={choosingAdd}
+      onAdd={(from) => {
+        opener.current = from;
+        picker.open(addRequest(from));
+      }}
+      onReplace={(key, from) => {
+        opener.current = from;
+        picker.open(replaceRequest(key, from));
       }}
       onRemove={(index) => {
         const removed = keys.current[index];

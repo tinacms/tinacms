@@ -13,6 +13,7 @@ import {
   useState,
 } from 'react';
 import { mediaNameOf } from '../../media-manager/media-types';
+import { CHOOSING_IN_PICKER } from './image-words';
 import { MISSING_IMAGE_WARNING } from './image-field.view';
 import { ImageTile, MoveHandle, type ResolveImageUrl } from './image-tile';
 
@@ -36,6 +37,8 @@ export interface ImageGalleryViewProps
   focusRequest?: { index: number };
   /** The media picker is open for the tile with this item key. */
   choosingKey?: string;
+  /** The Add images picker is open for this gallery. */
+  choosingAdd?: boolean;
   /** Called per item key with whether its picture is missing: `item.missing`, or the picture failing to load. */
   onMissingChange?: (key: string, missing: boolean) => void;
   disabled?: boolean;
@@ -74,6 +77,7 @@ export function ImageGalleryView({
   onMove,
   focusRequest,
   choosingKey,
+  choosingAdd,
   onMissingChange,
   disabled,
   readOnly,
@@ -324,13 +328,18 @@ export function ImageGalleryView({
               <button
                 ref={addEl}
                 type='button'
+                aria-label='Add images'
                 className={cn(
-                  'flex aspect-4/3 min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-sm border border-dashed border-input text-sm text-muted-foreground transition outline-none hover:bg-muted focus-visible:shadow-focus-ring'
+                  'flex aspect-4/3 min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-sm border border-dashed border-input text-sm text-muted-foreground transition outline-none hover:bg-muted focus-visible:shadow-focus-ring',
+                  choosingAdd && 'border-field-active-border'
                 )}
                 onClick={(event) => onAdd(event.currentTarget)}
               >
                 <Icon glyph='plus' size={20} />
                 Add images
+                {choosingAdd ? (
+                  <span className='text-xs'>{CHOOSING_IN_PICKER}</span>
+                ) : null}
               </button>
             ) : null}
           </div>

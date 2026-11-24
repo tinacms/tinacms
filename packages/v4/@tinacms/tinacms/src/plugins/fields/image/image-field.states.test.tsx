@@ -303,6 +303,21 @@ describe('image field look', () => {
     expect(actions).not.toHaveAttribute('data-revealed');
   });
 
+  it('does not run a hidden Remove on the tap that reveals it, but runs it on the next tap', () => {
+    const onRemove = vi.fn();
+    render(
+      <ImageFieldView {...imageFieldState('filled')} onRemove={onRemove} />
+    );
+    const remove = screen.getByRole('button', { name: 'Remove about.png' });
+    expect(remove.parentElement).toHaveClass('pointer-events-none');
+    fireEvent.pointerDown(remove, { pointerType: 'touch' });
+    fireEvent.click(remove);
+    expect(onRemove).not.toHaveBeenCalled();
+    fireEvent.pointerDown(remove, { pointerType: 'touch' });
+    fireEvent.click(remove);
+    expect(onRemove).toHaveBeenCalledTimes(1);
+  });
+
   it('does not reveal the actions for a mouse press', () => {
     render(<ImageFieldView {...imageFieldState('filled')} />);
     fireEvent.pointerDown(screen.getByAltText('about.png'), {

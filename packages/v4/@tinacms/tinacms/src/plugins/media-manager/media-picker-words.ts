@@ -10,6 +10,7 @@ export const SEARCH_LABEL = 'Search this folder';
 export const SEARCH_PLACEHOLDER = 'Search this folder...';
 export const CLEAR_PICKS = 'Clear picks';
 export const CANCEL = 'Cancel';
+export const UPLOAD = 'Upload';
 export const ALREADY_ADDED = 'Already added';
 export const CHOOSING_NOTE = 'Choosing in the picker';
 

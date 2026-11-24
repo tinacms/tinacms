@@ -3,6 +3,7 @@ import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { cn } from '@tinacms/ui/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
+import { useStore } from 'zustand';
 import { XIcon } from 'lucide-react';
 import {
   type DragEvent,
@@ -61,6 +62,7 @@ import {
   LOAD_FAILED,
   RETRY,
   SEARCH_LABEL,
+  UPLOAD,
   SEARCH_PLACEHOLDER,
   confirmWords,
   emptyWords,
@@ -161,17 +163,26 @@ export function MediaPickerPanel({
   const [notice, setNotice] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const library = useRef<HTMLDivElement>(null);
+  const panel = useRef<HTMLElement>(null);
 
-  const [served, setServed] = useState({ target: request.target, serial: 0 });
-  if (served.target !== request.target) {
-    setServed({ target: request.target, serial: served.serial + 1 });
+  const [servedMissing, setServedMissing] = useState(missingFolder);
+  if (servedMissing !== missingFolder) {
+    setServedMissing(missingFolder);
+    if (missingFolder !== null) setFolder(missingFolder);
+  }
+  const scope = use(FormScopeContext);
+  if (!scope) throw new Error('The media picker needs a form scope');
+  const pickerSerial = useStore(scope.view, (state) => state.pickerSerial);
+  const [served, setServed] = useState(pickerSerial);
+  if (served !== pickerSerial) {
+    setServed(pickerSerial);
     setPicks([]);
     setNotice(null);
     if (missingFolder !== null) setFolder(missingFolder);
   }
   const origin = useMemo<UploadOrigin>(
-    () => ({ kind: 'picker', id: `${pickerId}:${served.serial}` }),
-    [pickerId, served.serial]
+    () => ({ kind: 'picker', id: `${pickerId}:${served}` }),
+    [pickerId, served]
   );
 
   const openFolder = (next: string) => {
@@ -210,9 +221,10 @@ export function MediaPickerPanel({
     return () => clearTimeout(timer);
   }, [search, debouncedSearch]);
 
+  // Opening a folder removes the button that had focus, so Escape would find none inside the picker.
   useEffect(() => {
     library.current?.focus({ preventScroll: true });
-  }, []);
+  }, [folder]);
 
   const features = media.features ?? {};
   const readOnly = features.readOnly === true;
@@ -226,24 +238,23 @@ export function MediaPickerPanel({
   const status = useMediaStatus();
 
   const listError = listing.isError ? listing.error : null;
+  // A provider that lists a missing folder as empty looks the same as one that says not-found.
+  const missingFolderGone =
+    listError instanceof MediaError
+      ? listError.code === 'not-found'
+      : listing.isSuccess &&
+        !listing.hasNextPage &&
+        listing.data.pages.every((page) => page.items.length === 0);
   useEffect(() => {
-    if (
-      missingFolder !== null &&
-      folder === missingFolder &&
-      folder !== '' &&
-      listError instanceof MediaError &&
-      listError.code === 'not-found'
-    ) {
-      setFolder('');
+    if (missingFolder !== null && folder === missingFolder && folder !== '') {
+      if (missingFolderGone) setFolder('');
     }
-  }, [missingFolder, folder, listError]);
+  }, [missingFolder, folder, missingFolderGone]);
 
   // The form store mirrors every live value of the form, so a removal while the picker
   // is open re-renders it. `getValues` would hide the change from the compiler's memo.
-  const formId = use(FormScopeContext)?.formId;
-  const liveValues = useFormStore((state) =>
-    formId ? state.forms[formId]?.values : undefined
-  );
+  const { formId } = scope;
+  const liveValues = useFormStore((state) => state.forms[formId]?.values);
   const added: ReadonlySet<string> = new Set(
     request.taken
       ? request.taken.paths(liveValueAt(liveValues, request.taken.address))
@@ -351,6 +362,11 @@ export function MediaPickerPanel({
     if (!event.currentTarget.contains(event.target)) return;
     event.preventDefault();
     event.stopPropagation();
+    if (event.target instanceof HTMLInputElement && event.target.value !== '') {
+      setSearch('');
+      setDebouncedSearch('');
+      return;
+    }
     onClose(true);
   };
 
@@ -419,7 +435,24 @@ export function MediaPickerPanel({
           ) : (
             <div className='flex flex-col items-start gap-2 p-2 text-sm text-muted-foreground'>
               <p className='m-0'>{emptyWords(folder)}</p>
-              {readOnly ? null : <p className='m-0'>{DROP_OR}</p>}
+              {readOnly ? null : (
+                <>
+                  <p className='m-0'>{DROP_OR}</p>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    disabled={hold !== null}
+                    onClick={() =>
+                      panel.current
+                        ?.querySelector<HTMLInputElement>('input[type=file]')
+                        ?.click()
+                    }
+                  >
+                    {UPLOAD}
+                  </Button>
+                </>
+              )}
             </div>
           )
         ) : (
@@ -476,6 +509,7 @@ export function MediaPickerPanel({
 
   return (
     <section
+      ref={panel}
       role='region'
       aria-label={title}
       data-slot='media-picker'
@@ -490,6 +524,7 @@ export function MediaPickerPanel({
               accept={inputAcceptOf(UPLOAD_RULES)}
               holdReason={hold}
               size='sm'
+              compact
               onPick={upload}
             />
           )

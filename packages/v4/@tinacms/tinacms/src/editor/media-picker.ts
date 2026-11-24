@@ -1,4 +1,12 @@
-import { use, useEffect, useMemo } from 'react';
+import {
+  use,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useStore } from 'zustand';
 import { FormScopeContext } from './context';
 import type { FormViewStore } from './form-view-state';
@@ -19,7 +27,8 @@ export interface MediaPickerRequest {
   opener: HTMLElement | null;
   /**
    * The paths the field already holds. The picker reads the live value at `address` and
-   * shows what `paths` returns for it as "Already added".
+   * shows what `paths` returns for it as "Already added". `address` may be a getter, for a
+   * field whose address changes while the picker is open.
    */
   taken?: { address: string; paths: (value: unknown) => readonly string[] };
   /** Called with the picked paths, in pick order, when the editor confirms. */
@@ -46,17 +55,28 @@ export const pickerOf = (view: FormViewStore): MediaPicker => ({
   close: () => view.getState().closePicker(),
 });
 
+export interface OwnedPicker {
+  /** The start of every target this owner asks with. It survives a reseed that remounts the field. */
+  owner: string;
+  /** The target of the open picker when this owner asked for it, else null. */
+  target: string | null;
+  /** True when this owner took over a picker that the reseed left open. Send the request again. */
+  adopted: boolean;
+}
+
 /**
- * The target of the open picker when this owner asked for it, else null. `owner` is the
- * owner's own target, or the start of its targets (`owner/…`) for a field that asks in
- * several ways. The picker closes, writing nothing, when the owner unmounts.
+ * Ties the open picker to one field. The picker closes, writing nothing, when the field
+ * unmounts. A reseed of the same document remounts the field at the same address, and the
+ * new instance adopts the open picker instead.
  */
-export function useOwnedPickerTarget(owner: string): string | null {
+export function useOwnedPicker(address: string): OwnedPicker {
   const scope = use(FormScopeContext);
   if (!scope) {
-    throw new Error('useOwnedPickerTarget must be used within a FormProvider');
+    throw new Error('useOwnedPicker must be used within a FormProvider');
   }
   const { view } = scope;
+  const owner = useId();
+  const [adopted, setAdopted] = useState(false);
   const owns = (target: string) =>
     target === owner || target.startsWith(`${owner}/`);
   const target = useStore(view, (state) =>
@@ -64,12 +84,24 @@ export function useOwnedPickerTarget(owner: string): string | null {
       ? state.picker.target
       : null
   );
-  useEffect(
-    () => () => {
-      const { picker, closePicker } = view.getState();
-      if (picker !== null && owns(picker.target)) closePicker();
-    },
-    [view, owner]
-  );
-  return target;
+  const latestAddress = useRef(address);
+  useLayoutEffect(() => {
+    latestAddress.current = address;
+  });
+  useEffect(() => {
+    const { pickerOrphan, adoptPicker } = view.getState();
+    if (pickerOrphan?.address === latestAddress.current) {
+      adoptPicker(pickerOrphan.owner, owner);
+      setAdopted(true);
+    }
+    return () => {
+      const { picker, closePicker, pickerReseeding, orphanPicker } =
+        view.getState();
+      if (picker === null || !owns(picker.target)) return;
+      if (pickerReseeding)
+        orphanPicker({ owner, address: latestAddress.current });
+      else closePicker();
+    };
+  }, [view, owner]);
+  return { owner, target, adopted };
 }

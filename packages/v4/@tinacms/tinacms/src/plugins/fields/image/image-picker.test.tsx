@@ -18,8 +18,11 @@ import {
   TinaProvider,
   useFormStatus,
   useFormId,
+  useFormSeedKey,
 } from '../../../editor';
+import { MediaPickerHost } from '../../media-manager/media-picker-host';
 import { FormScopeContext } from '../../../editor/context';
+import type { FormScope } from '../../../editor/context';
 import type { FormViewStore } from '../../../editor/form-view-state';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
@@ -35,6 +38,7 @@ const DOCUMENT_PATH = 'content/posts/hello.mdx';
 
 const FILES: MediaItem[] = [
   { path: 'posts', kind: 'directory' },
+  { path: 'empty', kind: 'directory' },
   { path: 'photo.jpg', kind: 'file' },
   { path: 'sunset.jpg', kind: 'file' },
   { path: 'notes.pdf', kind: 'file' },
@@ -99,9 +103,16 @@ const schema: CollectionSchema = {
 };
 
 let view: FormViewStore | undefined;
+let scopeOf: FormScope | null = null;
+
+// The admin remounts the form fields when a reseed advances the seed key.
+function KeyedFields() {
+  return <LabelledFields key={useFormSeedKey()} />;
+}
 
 function Probes() {
-  view = use(FormScopeContext)?.view;
+  scopeOf = use(FormScopeContext);
+  view = scopeOf?.view;
   const status = useFormStatus(useFormId());
   return <span data-testid='status'>{status}</span>;
 }
@@ -136,7 +147,7 @@ const renderField = (
         path={DOCUMENT_PATH}
         document={document}
       >
-        <LabelledFields />
+        <KeyedFields />
         <Probes />
         {beside}
       </FormProvider>
@@ -625,5 +636,207 @@ describe('the picker for an image inside a list item', () => {
       { name: 'Ivan', avatar: null },
       { name: 'Brook', avatar: null },
     ]);
+  });
+});
+
+describe('round 2 behaviours', () => {
+  const open = async (name = 'Hero') =>
+    userEvent.click(
+      within(await group(name)).getByRole('button', {
+        name: /Choose from Media|Replace /,
+      })
+    );
+
+  it('closes on Escape after a folder was opened, and after the breadcrumb was used', async () => {
+    renderField();
+    await open();
+    await userEvent.click(await tile('Open folder posts'));
+    await tile('a.jpg');
+    await userEvent.keyboard('{Escape}');
+    expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull();
+  });
+
+  it('clears a search with Escape, and keeps the picker open with its picks', async () => {
+    renderField();
+    await open();
+    await userEvent.click(await tile('photo.jpg'));
+    const panel = await picker();
+    const search = within(panel).getByRole('searchbox', {
+      name: 'Search this folder',
+    });
+    await userEvent.type(search, 'sun');
+    await userEvent.keyboard('{Escape}');
+    expect(search).toHaveValue('');
+    expect(within(panel).getByText('1 picked')).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull();
+  });
+
+  it('keeps the error pane tucked while the picker is open, and opens it on close', async () => {
+    renderField();
+    await group('Hero');
+    await open();
+    await picker();
+    act(() => {
+      view?.getState().block(['hero']);
+    });
+    expect(view?.getState().errorSummary.paneOpen).toBe(false);
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(view?.getState().errorSummary.paneOpen).toBe(true);
+  });
+
+  it('keeps the picker open across a reseed of the same document, and the pick lands', async () => {
+    renderField({ hero: 'photo.jpg' });
+    await open();
+    const panel = await picker();
+    await userEvent.click(await tile('sunset.jpg'));
+    act(() => {
+      useFormStore
+        .getState()
+        .setFieldValue(
+          toFormId(DOCUMENT_PATH),
+          toFieldAddress('cover'),
+          'x.jpg'
+        );
+    });
+    act(() => {
+      scopeOf?.discardEdits();
+    });
+    expect(screen.getByRole('region', { name: 'Choose an image' })).toBe(panel);
+    expect(
+      within(await group('Hero')).getByText('Choosing in the picker')
+    ).toBeVisible();
+    await userEvent.click(
+      within(panel).getByRole('button', { name: 'Choose image' })
+    );
+    expect(valueOf('hero')).toBe('sunset.jpg');
+  });
+
+  it('draws no picker while the host is suspended', async () => {
+    renderField(undefined, [], schema, <MediaPickerHost primary suspended />);
+    await open();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull();
+  });
+
+  it('moves the Replace card to the old folder when the picture turns out missing', async () => {
+    renderField({ hero: 'posts/gone.jpg' });
+    const hero = await group('Hero');
+    await userEvent.click(
+      within(hero).getByRole('button', { name: 'Replace gone.jpg' })
+    );
+    const panel = await picker();
+    expect(within(panel).queryByText(/No longer in Media/)).toBeNull();
+    vi.useFakeTimers();
+    for (let attempt = 0; attempt < 4; attempt++) {
+      fireEvent.error(within(hero).getByAltText('gone.jpg'));
+      await act(() => vi.runOnlyPendingTimersAsync());
+    }
+    vi.useRealTimers();
+    expect(await within(panel).findByText(/No longer in Media/)).toBeVisible();
+  });
+
+  it('falls back to the Media root when the old folder lists as empty', async () => {
+    renderField({ hero: 'nofolder/gone.jpg' });
+    const hero = await group('Hero');
+    vi.useFakeTimers();
+    for (let attempt = 0; attempt < 4; attempt++) {
+      fireEvent.error(within(hero).getByAltText('gone.jpg'));
+      await act(() => vi.runOnlyPendingTimersAsync());
+    }
+    vi.useRealTimers();
+    await userEvent.click(
+      within(hero).getByRole('button', { name: 'Replace gone.jpg' })
+    );
+    expect(await tile('photo.jpg')).toBeVisible();
+    expect(screen.queryByText(/No images in nofolder yet/)).toBeNull();
+  });
+
+  it('shows the choosing look on Add images while its picker is open', async () => {
+    renderField({ images: [] });
+    const images = await group('Images');
+    await userEvent.click(
+      within(images).getByRole('button', { name: 'Add images' })
+    );
+    await picker('Choose images');
+    expect(within(images).getByText('Choosing in the picker')).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(within(images).queryByText('Choosing in the picker')).toBeNull();
+  });
+
+  it('shows Upload after "Drop images here, or" in an empty folder', async () => {
+    renderField();
+    await open();
+    await userEvent.click(await tile('Open folder empty'));
+    const panel = await picker();
+    expect(
+      await within(panel).findByText('Drop images here, or')
+    ).toBeVisible();
+    const library = within(panel).getByRole('region', {
+      name: 'Media library',
+    });
+    expect(
+      within(library).getByRole('button', { name: 'Upload' })
+    ).toBeEnabled();
+  });
+});
+
+describe('a gallery inside a list item', () => {
+  const nested: CollectionSchema = {
+    name: 'post',
+    format: 'mdx',
+    fields: [
+      t.array({
+        name: 'authors',
+        label: 'Authors',
+        fields: [
+          t.string({ name: 'name', label: 'Name' }),
+          t.array({
+            name: 'shots',
+            label: 'Shots',
+            of: t.image({ name: 'shot' }),
+          }),
+        ],
+      }),
+    ],
+  };
+
+  it('keeps reading its own images as already added after its item moved', async () => {
+    renderField(
+      {
+        authors: [
+          { name: 'Ivan', shots: [] },
+          { name: 'Josh', shots: ['photo.jpg'] },
+        ],
+      },
+      [],
+      nested
+    );
+    for (const head of await screen.findAllByRole('button', {
+      name: /^Item \d:/,
+    })) {
+      await userEvent.click(head);
+    }
+    const [, second] = await screen.findAllByRole('group', { name: 'Shots' });
+    await userEvent.click(
+      within(second as HTMLElement).getByRole('button', { name: 'Add images' })
+    );
+    const panel = await picker('Choose images');
+    expect(
+      await within(panel).findByRole('button', {
+        name: 'photo.jpg, Already added',
+      })
+    ).toBeVisible();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Actions for Item 2' })
+    );
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: /^Move up/ })
+    );
+    expect(
+      await within(panel).findByRole('button', {
+        name: 'photo.jpg, Already added',
+      })
+    ).toBeVisible();
   });
 });

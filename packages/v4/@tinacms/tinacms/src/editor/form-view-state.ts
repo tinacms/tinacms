@@ -102,6 +102,16 @@ export interface FormViewState {
   pickerTuckedPane: boolean;
   /** Ids of the mounted picker hosts. The first one draws, and the admin's primary host goes first. */
   pickerHosts: readonly string[];
+  /** True from a reseed until its fields remount, so the remount does not close an open picker. */
+  pickerReseeding: boolean;
+  endReseed: () => void;
+  /** The field a reseed unmounted while its picker stayed open. The remounted field adopts the picker. */
+  pickerOrphan: { owner: string; address: string } | null;
+  orphanPicker: (orphan: { owner: string; address: string }) => void;
+  /** Hands the open picker of the orphaned `from` owner to the remounted `to` owner. */
+  adoptPicker: (from: string, to: string) => void;
+  /** Changes when the picker serves another requester, so the panel resets its picks. */
+  pickerSerial: number;
   openPicker: (request: MediaPickerRequest) => void;
   closePicker: () => void;
   claimPickerHost: (id: string, primary: boolean) => () => void;
@@ -117,6 +127,7 @@ export const createFormViewStore = (): FormViewStore => {
     block: (addresses, hiddenParents = []) =>
       set((state) => ({
         blockedSaves: state.blockedSaves + 1,
+        pickerTuckedPane: state.picker !== null ? true : state.pickerTuckedPane,
         errorSummary: {
           ...IDLE_SUMMARY,
           blocked: addresses.map((address) => ({
@@ -124,7 +135,7 @@ export const createFormViewStore = (): FormViewStore => {
             address,
           })),
           hiddenParents: [...hiddenParents],
-          paneOpen: true,
+          paneOpen: state.picker === null,
         },
       })),
     fix: (remaining, labelOf, currentIndex) =>
@@ -190,13 +201,13 @@ export const createFormViewStore = (): FormViewStore => {
         };
       }),
     openPane: (focusRow) =>
-      set((state) =>
-        state.errorSummary.blocked.length === 0
-          ? state
-          : {
-              errorSummary: { ...state.errorSummary, paneOpen: true, focusRow },
-            }
-      ),
+      set((state) => {
+        if (state.errorSummary.blocked.length === 0) return state;
+        if (state.picker !== null) return { pickerTuckedPane: true };
+        return {
+          errorSummary: { ...state.errorSummary, paneOpen: true, focusRow },
+        };
+      }),
     tuckPane: () =>
       set((state) => ({
         errorSummary: {
@@ -246,7 +257,7 @@ export const createFormViewStore = (): FormViewStore => {
           },
         };
       }),
-    reset: () => set({ errorSummary: IDLE_SUMMARY }),
+    reset: () => set({ errorSummary: IDLE_SUMMARY, pickerReseeding: true }),
     touched: new Set(),
     saveAttempted: false,
     openLevels: [],
@@ -279,6 +290,26 @@ export const createFormViewStore = (): FormViewStore => {
     picker: null,
     pickerTuckedPane: false,
     pickerHosts: [],
+    pickerReseeding: false,
+    endReseed: () => set({ pickerReseeding: false }),
+    pickerOrphan: null,
+    orphanPicker: (orphan) => set({ pickerOrphan: orphan }),
+    pickerSerial: 0,
+    adoptPicker: (from, to) =>
+      set((state) => {
+        const { picker } = state;
+        if (picker === null) return { pickerOrphan: null };
+        const rest = picker.target.startsWith(`${from}/`)
+          ? picker.target.slice(from.length)
+          : picker.target === from
+            ? ''
+            : null;
+        if (rest === null) return { pickerOrphan: null };
+        return {
+          pickerOrphan: null,
+          picker: { ...picker, target: `${to}${rest}` },
+        };
+      }),
     openPicker: (request) =>
       set((state) => {
         const summary = state.errorSummary;
@@ -289,6 +320,10 @@ export const createFormViewStore = (): FormViewStore => {
           !readPinned();
         return {
           picker: request,
+          pickerSerial:
+            state.picker?.target === request.target
+              ? state.pickerSerial
+              : state.pickerSerial + 1,
           pickerTuckedPane:
             state.picker === null ? tucks : state.pickerTuckedPane,
           errorSummary: tucks
@@ -303,6 +338,7 @@ export const createFormViewStore = (): FormViewStore => {
         const reopens = state.pickerTuckedPane && summary.blocked.length > 0;
         return {
           picker: null,
+          pickerOrphan: null,
           pickerTuckedPane: false,
           errorSummary: reopens
             ? { ...summary, paneOpen: true, focusRow: false }

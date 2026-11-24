@@ -4,6 +4,7 @@ import { cn } from '@tinacms/ui/lib/utils';
 import { GripVerticalIcon, ImageUpIcon } from 'lucide-react';
 import {
   type KeyboardEvent,
+  type MouseEvent,
   type PointerEvent,
   type ReactNode,
   type Ref,
@@ -112,9 +113,22 @@ export function ImageTile({
     return () => document.removeEventListener('pointerdown', dismiss);
   }, [revealed]);
 
+  // The tap that reveals the actions must not also press the one under the finger.
+  const swallowClick = useRef(false);
   const reveal = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType === 'touch' || event.pointerType === 'pen') {
-      setRevealed(true);
+    if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return;
+    swallowClick.current = !revealed;
+    setRevealed(true);
+  };
+  const guardClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (!swallowClick.current) return;
+    swallowClick.current = false;
+    if (
+      event.target instanceof Element &&
+      event.target.closest('[data-tile-actions]')
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
     }
   };
 
@@ -135,6 +149,7 @@ export function ImageTile({
       <div
         ref={boxRef}
         onPointerDown={reveal}
+        onClickCapture={guardClick}
         className={cn(
           'group relative w-full overflow-hidden rounded-sm border bg-muted transition',
           tileShape[look],
@@ -185,8 +200,9 @@ export function ImageTile({
         ) : null}
         {inert ? null : (
           <div
+            data-tile-actions=''
             data-revealed={revealed ? '' : undefined}
-            className='absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity duration-(--dur) ease-(--ease) group-focus-within:opacity-100 group-hover:opacity-100 data-revealed:opacity-100 motion-reduce:transition-none'
+            className='pointer-events-none absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity duration-(--dur) ease-(--ease) group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 data-revealed:pointer-events-auto data-revealed:opacity-100 motion-reduce:transition-none'
           >
             {onReplace ? (
               <Button

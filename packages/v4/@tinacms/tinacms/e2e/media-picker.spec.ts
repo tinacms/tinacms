@@ -69,6 +69,11 @@ test.describe('desktop', () => {
     const maximised = await box(panel);
     expect(Math.round(maximised.x - region.x)).toBe(12);
     expect(Math.round(maximised.width)).toBe(Math.round(region.width - 24));
+    const upload = await box(picker.getByRole('button', { name: 'Upload' }));
+    const restoreButton = await box(
+      picker.getByRole('button', { name: 'Restore' })
+    );
+    expect(restoreButton.x - (upload.x + upload.width)).toBeLessThan(16);
     await picker.getByRole('button', { name: 'Restore' }).click();
     await page.waitForTimeout(300);
     expect(Math.round((await box(panel)).width)).toBe(400);
@@ -189,6 +194,19 @@ test.describe('desktop', () => {
 
 test.describe('tablet', () => {
   test.use({ viewport: { width: 1024, height: 800 } });
+
+  test('keeps a readable popover: at least 360px wide, or covering the page', async ({
+    page,
+  }) => {
+    await page.goto(HOME);
+    const picker = await openPicker(page);
+    const rect = await box(page.locator('[data-slot=media-picker-host]'));
+    expect(rect.width).toBeGreaterThanOrEqual(360);
+    await expect(
+      picker.getByRole('heading', { name: 'Choose an image' })
+    ).toBeVisible();
+    await expect(picker.getByText('0 picked')).toBeVisible();
+  });
 
   test('Maximise fills the space below the top bar, form included', async ({
     page,

@@ -18,10 +18,7 @@ import {
   useFieldValue,
   useMediaSlice,
 } from '../../../editor';
-import {
-  useMediaPicker,
-  useOwnedPickerTarget,
-} from '../../../editor/media-picker';
+import { useMediaPicker, useOwnedPicker } from '../../../editor/media-picker';
 import { UploadHost } from '../../../editor/uploads/upload-host';
 import {
   REPLACE_KEEPS_OLD_FILE,
@@ -47,10 +44,14 @@ export function ImageField() {
   const focusAfterRemove = useRef(false);
   const focusAfterUpload = useRef(false);
   const focusAfterChoose = useRef(false);
-  const target = useId();
   const picker = useMediaPicker();
   const parentLabel = useParentLabel(address);
-  const choosing = useOwnedPickerTarget(target) !== null;
+  const {
+    owner: target,
+    target: openTarget,
+    adopted,
+  } = useOwnedPicker(address);
+  const choosing = openTarget !== null;
   const [missing, setMissing] = useState(false);
   const [replacement, setReplacement] = useState<File | null>(null);
   const [stored, setStored] = useState(0);
@@ -133,6 +134,22 @@ export function ImageField() {
       opener: primaryRef.current,
       choose: (picked) => choose.current(picked),
     });
+
+  // A reseed remounts the field under an open picker, and a slow load can flip `missing`
+  // after the picker opened. Both send the request again with the newest state.
+  const resend = useRef(openPicker);
+  useLayoutEffect(() => {
+    resend.current = openPicker;
+  });
+  useEffect(() => {
+    if (adopted) resend.current();
+  }, [adopted]);
+  const wasMissing = useRef(missing);
+  useEffect(() => {
+    if (wasMissing.current === missing) return;
+    wasMissing.current = missing;
+    if (choosing) resend.current();
+  }, [missing, choosing]);
 
   const failure = frame.disabled || frame.readOnly ? null : upload.failure;
   const retry = failure?.retry;

@@ -22,6 +22,8 @@ import { MediaPickerPanel } from './media-picker';
 const PREVIEW_SLOT = '[data-preview-slot]';
 const POPOVER_WIDTH_PX = 400;
 const INSET_PX = 12;
+// Under this preview width the popover would squeeze the header, so it covers the page instead.
+const MIN_REGION_PX = 440;
 // The Top bar's and the Status bar's heights, which the admin's pickers keep clear.
 const TOP_BAR_PX = 56;
 const STATUS_BAR_PX = 28;
@@ -68,13 +70,14 @@ function ScopedHost({
   const open = useStore(view, (state) => state.picker !== null);
 
   useEffect(() => {
-    if (suspended) view.getState().closePicker();
-  }, [view, suspended]);
+    if (suspended && open) view.getState().closePicker();
+  }, [view, suspended, open]);
 
   return (
     <>
-      {primary ? null : <UploadHost />}
-      {first && open ? <OpenPicker view={view} primary={primary} /> : null}
+      {first && open && !suspended ? (
+        <OpenPicker view={view} primary={primary} />
+      ) : null}
     </>
   );
 }
@@ -207,9 +210,10 @@ function OpenPicker({
   });
 
   const phone = tier === 'phone';
-  const covering = phone || (tier === 'tablet' && maximised);
-
-  const region = usePreviewRegion(primary && !covering);
+  const tabletMaximised = tier === 'tablet' && maximised;
+  const region = usePreviewRegion(primary && !phone && !tabletMaximised);
+  const narrow = region !== null && region.width < MIN_REGION_PX;
+  const covering = phone || tabletMaximised || narrow;
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setEntered(true));
@@ -283,5 +287,10 @@ function OpenPicker({
     </div>
   );
 
-  return createPortal(panel, document.body);
+  return (
+    <>
+      {primary ? null : <UploadHost />}
+      {createPortal(panel, document.body)}
+    </>
+  );
 }

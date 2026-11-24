@@ -655,6 +655,7 @@ export function FormProvider({
   }, [formId, view]);
   useEffect(() => {
     view.getState().showLevels([]);
+    view.getState().endReseed();
   }, [fieldSeedKey, view]);
   const [failure, setFailure] = useState<{
     formId: FormId;
