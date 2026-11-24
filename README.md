@@ -57,8 +57,6 @@ https://tina.io/docs/r/FAQ/#5-what-is-tinas-tech-stack
 
 Our development priorities can be read on our [Public Roadmap](https://tina.io/roadmap/).
 
-**Graph: Issues Opened and Closed for TinaCMS**
-<!-- Made with [OSS Insight](https://ossinsight.io/) -->
 ## Contributing
 
 Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/CONTRIBUTING.md)
