@@ -320,6 +320,8 @@ export const createFormViewStore = (): FormViewStore => {
           !readPinned();
         return {
           picker: request,
+          pickerOrphan:
+            state.picker?.target === request.target ? state.pickerOrphan : null,
           pickerSerial:
             state.picker?.target === request.target
               ? state.pickerSerial

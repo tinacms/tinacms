@@ -372,6 +372,11 @@ export function MediaPickerPanel({
 
   const confirm = () => {
     if (picks.length === 0) return;
+    // Its requester unmounted in a reseed and nothing adopted the picker yet: write nothing.
+    if (scope.view.getState().pickerOrphan !== null) {
+      onClose(false);
+      return;
+    }
     const chosen = many ? picks : picks.slice(0, 1);
     request.choose(chosen);
     onClose(false);

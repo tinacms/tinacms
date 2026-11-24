@@ -866,3 +866,59 @@ describe('a reseed that removes the picker target', () => {
     );
   });
 });
+
+describe('a picker left open by a reseed', () => {
+  const nested: CollectionSchema = {
+    name: 'post',
+    format: 'mdx',
+    fields: [
+      t.image({ name: 'hero', label: 'Hero' }),
+      t.array({
+        name: 'authors',
+        label: 'Authors',
+        fields: [t.image({ name: 'avatar', label: 'Avatar' })],
+      }),
+    ],
+  };
+
+  const openAvatarOfNewItem = async () => {
+    renderField({ authors: [] }, [], nested);
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Add item' })
+    );
+    await userEvent.click(
+      within(await group('Avatar')).getByRole('button', {
+        name: 'Choose from Media',
+      })
+    );
+    await picker();
+  };
+
+  it('writes nothing when the editor confirms before anything adopts it', async () => {
+    await openAvatarOfNewItem();
+    await userEvent.click(await tile('photo.jpg'));
+    act(() => {
+      scopeOf?.discardEdits();
+    });
+    await userEvent.click(
+      within(await picker()).getByRole('button', { name: 'Choose image' })
+    );
+    expect(valueOf('authors')).toEqual([]);
+  });
+
+  it('is not closed by the wait timer once the editor opened another picker', async () => {
+    await openAvatarOfNewItem();
+    act(() => {
+      scopeOf?.discardEdits();
+    });
+    await userEvent.click(
+      within(await group('Hero')).getByRole('button', {
+        name: 'Choose from Media',
+      })
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1700));
+    expect(
+      screen.getByRole('region', { name: 'Choose an image' })
+    ).toBeVisible();
+  });
+});
