@@ -91,6 +91,23 @@ describe('uploadMedia', () => {
     });
   });
 
+  it('puts the file with the type the upload URL is signed for', async () => {
+    vi.useFakeTimers();
+    stubFetch(
+      json({
+        signedUrl: 'https://s3.test/signed',
+        requestId: 'r-1',
+        contentType: 'image/webp',
+      }),
+      json({ error: false })
+    );
+    const puts = stubPut();
+    const done = uploadMedia(client, undefined, png);
+    await vi.advanceTimersByTimeAsync(1000);
+    await done;
+    expect(puts[0].requestHeaders).toEqual({ 'content-type': 'image/webp' });
+  });
+
   it('reports a 412 for the upload URL as name-taken and sends no bytes', async () => {
     stubFetch(json({ message: 'File already exists' }, 412));
     const puts = stubPut();
