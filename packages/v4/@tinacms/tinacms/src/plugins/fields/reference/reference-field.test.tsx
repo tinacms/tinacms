@@ -209,11 +209,23 @@ describe('ReferenceField value updates', () => {
 
 const DELETED = 'content/pages/deleted.mdx';
 
+// The page's upload status is an empty live region of its own; only the field's warnings count here.
+const statusRegions = () =>
+  screen
+    .queryAllByRole('status')
+    .filter((region) => !region.hasAttribute('data-upload-status'));
+const fieldStatus = () =>
+  waitFor(() => {
+    const [region] = statusRegions();
+    expect(region).toBeDefined();
+    return region;
+  });
+
 describe('ReferenceField missing references', () => {
   it('keeps the stored path in the box and warns without blocking', async () => {
     renderField({ page: DELETED });
     expect(await screen.findByLabelText(/^Page\b/)).toHaveValue(DELETED);
-    expect(await screen.findByRole('status')).toHaveTextContent(
+    expect(await fieldStatus()).toHaveTextContent(
       'This document no longer exists.'
     );
     expect(screen.queryByRole('alert')).toBeNull();
@@ -229,7 +241,7 @@ describe('ReferenceField missing references', () => {
 
   it('lets a required field clear a missing reference, then shows the required error', async () => {
     renderField({ author: 'content/authors/gone.mdx' });
-    await screen.findByRole('status');
+    await fieldStatus();
     await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
     expect(valueOf('author')).toBeNull();
     const input = screen.getByLabelText(/^Author\b/);
@@ -249,7 +261,7 @@ describe('ReferenceField missing references', () => {
     expect(input).toHaveValue(DELETED);
     expect(input).toBeDisabled();
     expect(input).toHaveAttribute('placeholder', 'Loading documents…');
-    expect(screen.queryByRole('status')).toBeNull();
+    expect(statusRegions()).toHaveLength(0);
   });
 
   it('keeps the warning and the box while a background refetch runs', async () => {
@@ -271,11 +283,11 @@ describe('ReferenceField missing references', () => {
       queryClient
     );
     const input = await screen.findByLabelText(/^Page\b/);
-    await screen.findByRole('status');
+    await fieldStatus();
     refetching = true;
     void queryClient.refetchQueries({ queryKey: contentKeys.list('page') });
     await waitFor(() => expect(refetchStarted).toHaveBeenCalled());
-    expect(screen.getByRole('status')).toHaveTextContent(
+    expect(statusRegions()[0]).toHaveTextContent(
       'This document no longer exists.'
     );
     expect(input).toBeEnabled();
@@ -331,7 +343,7 @@ describe('ReferenceField missing references', () => {
     renderField({ page: 42 } as unknown as TinaDocument);
     const input = await screen.findByLabelText(/^Page\b/);
     expect(input).toHaveValue('');
-    expect(screen.queryByRole('status')).toBeNull();
+    expect(statusRegions()).toHaveLength(0);
     expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull();
   });
 });
@@ -352,7 +364,7 @@ describe('ReferenceField failed lists', () => {
     for (const alert of alerts) expect(alert).toHaveTextContent('Network down');
     expect(input).toBeDisabled();
     expect(input).toHaveAttribute('placeholder', 'Could not load documents');
-    expect(screen.queryByRole('status')).toBeNull();
+    expect(statusRegions()).toHaveLength(0);
   });
 
   it('disables the whole field when one of several lists fails', async () => {
@@ -461,7 +473,7 @@ describe('ReferenceField opening a document', () => {
 
   it('hides Open for a missing document', async () => {
     renderField({ page: DELETED }, contentPlugin(), InRouter);
-    await screen.findByRole('status');
+    await fieldStatus();
     expect(screen.queryByRole('button', { name: /^Open/ })).toBeNull();
   });
 
