@@ -23,15 +23,15 @@ const reexportExact = (types: string) => `${types}\nexport type { Exact };\n`;
 
 export const generateTypes = async (
   schema: GraphQLSchema,
-  queryPathGlob = process.cwd(),
-  fragDocPath = process.cwd(),
+  queryPointers: string[],
+  fragDocPointers: string[],
   apiURL: string
 ) => {
   let docs = [];
   let fragDocs = [];
 
-  docs = await loadGraphQLDocuments(queryPathGlob);
-  fragDocs = await loadGraphQLDocuments(fragDocPath);
+  docs = await loadGraphQLDocuments(queryPointers);
+  fragDocs = await loadGraphQLDocuments(fragDocPointers);
 
   // See https://www.graphql-code-generator.com/docs/getting-started/programmatic-usage for more details
   const res = await codegen({
@@ -72,10 +72,11 @@ export const generateTypes = async (
   return reexportExact(importRichTextType(res));
 };
 
-const loadGraphQLDocuments = async (globPath: string) => {
+/** Each pointer must end in a literal extension; the loader parses extensionless pointers as GraphQL and throws on a space in the path. */
+const loadGraphQLDocuments = async (pointers: string[]) => {
   let result = [];
   try {
-    result = await loadDocuments(globPath, {
+    result = await loadDocuments(pointers, {
       loaders: [new GraphQLFileLoader()],
     });
   } catch (e) {
