@@ -62,7 +62,7 @@ type BranchNote = {
 type BranchSwitcherProps = {
   /** The branch edits save to. Left out while it is not known yet, as when the list failed to load. */
   current?: string;
-  branches: BranchEntry[];
+  branches: readonly BranchEntry[];
   /** Disables the button, for example while a save runs. It has no tooltip: the Status bar gives the reason. */
   disabled?: boolean;
   /** Stops a switch and shows these words, such as "Save or discard your changes first". */
@@ -204,7 +204,7 @@ function BranchGroup({
 }: {
   heading?: string;
   description?: string;
-  branches: BranchEntry[];
+  branches: readonly BranchEntry[];
   current: string;
   blocked: boolean;
   onSwitch: (name: string) => void;

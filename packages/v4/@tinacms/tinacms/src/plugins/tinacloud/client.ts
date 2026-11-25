@@ -284,10 +284,13 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       token = await options.getToken();
     } catch (cause) {
       // A dropped or unreadable token refresh is one unknown status; a lost session is final.
-      const transient =
+      if (
         cause instanceof AuthError &&
-        (cause.code === 'network' || cause.code === 'invalid-response');
-      if (cause instanceof AuthError && !transient) throw cause;
+        cause.code !== 'network' &&
+        cause.code !== 'invalid-response'
+      ) {
+        throw cause;
+      }
       throw new TinaCloudError(
         `Could not read the TinaCloud token: ${causeMessage(cause)}`,
         {}
