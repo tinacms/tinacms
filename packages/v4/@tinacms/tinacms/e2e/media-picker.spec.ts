@@ -44,7 +44,7 @@ const sideways = (page: Page) =>
 test.describe('desktop', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test('is a 400px popover 12px inside the preview, and Maximise covers the preview only', async ({
+  test('is a 400px popover 12px under the preview toolbar, and Maximise covers the preview only', async ({
     page,
   }) => {
     await page.goto(HOME);
@@ -52,9 +52,12 @@ test.describe('desktop', () => {
     const picker = await openPicker(page);
     const panel = page.locator('[data-slot=media-picker-host]');
     const region = await box(previewRegion(page));
+    const toolbar = await box(
+      previewRegion(page).locator('[data-slot=preview-toolbar]')
+    );
     const rect = await box(panel);
     expect(Math.round(rect.width)).toBe(400);
-    expect(Math.round(rect.y - region.y)).toBe(12);
+    expect(Math.round(rect.y - (toolbar.y + toolbar.height))).toBe(12);
     expect(Math.round(region.x + region.width - (rect.x + rect.width))).toBe(
       12
     );
@@ -100,17 +103,20 @@ test.describe('desktop', () => {
     );
   });
 
-  test('closes when the preview expands and when Media opens', async ({
+  test('closes without writing when Expand preview is clicked', async ({
     page,
   }) => {
     await page.goto(HOME);
-    await openPicker(page);
-    // The popover covers the preview toolbar, so the keyboard reaches Expand.
-    await page.getByRole('button', { name: /Expand preview/i }).focus();
-    await page.keyboard.press('Enter');
+    const picker = await openPicker(page);
+    await picker.getByRole('button', { name: 'preview.svg' }).click();
+    await expect(picker.getByText('1 picked')).toBeVisible();
+    await page.getByRole('button', { name: /Expand preview/i }).click();
     await expect(
       page.getByRole('region', { name: 'Choose an image' })
     ).toHaveCount(0);
+    await expect(page.getByRole('contentinfo')).not.toContainText(
+      'Unsaved changes'
+    );
     expect(
       await page.evaluate(() => document.activeElement === document.body)
     ).toBe(false);

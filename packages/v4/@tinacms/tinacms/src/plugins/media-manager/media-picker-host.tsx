@@ -177,13 +177,10 @@ interface Region {
 }
 
 /**
- * The preview region's box in the window, kept current while the picker is open. With
- * `belowToolbar`, the box starts under the preview toolbar so its buttons stay reachable.
+ * The preview region's box in the window, under the preview toolbar so its buttons stay
+ * reachable, kept current while the picker is open.
  */
-function usePreviewRegion(
-  enabled: boolean,
-  belowToolbar: boolean
-): Region | null {
+function usePreviewRegion(enabled: boolean): Region | null {
   const [region, setRegion] = useState<Region | null>(null);
   useLayoutEffect(() => {
     const slot = enabled ? document.querySelector(PREVIEW_SLOT) : null;
@@ -191,7 +188,7 @@ function usePreviewRegion(
       setRegion(null);
       return;
     }
-    const toolbar = belowToolbar ? slot.querySelector(PREVIEW_TOOLBAR) : null;
+    const toolbar = slot.querySelector(PREVIEW_TOOLBAR);
     const measure = () => {
       const box = slot.getBoundingClientRect();
       const toolbarBottom = toolbar?.getBoundingClientRect().bottom ?? box.top;
@@ -217,7 +214,7 @@ function usePreviewRegion(
       observer.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [enabled, belowToolbar]);
+  }, [enabled]);
   return region;
 }
 
@@ -274,7 +271,7 @@ function OpenPicker({
 
   const phone = tier === 'phone';
   const tabletMaximised = tier === 'tablet' && maximised;
-  const region = usePreviewRegion(primary && !phone, tier === 'tablet');
+  const region = usePreviewRegion(primary && !phone);
   const narrow = region !== null && region.width < MIN_REGION_PX;
   const covering = phone || tabletMaximised || narrow;
 
