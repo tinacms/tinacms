@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>C4 Open Cloudflare's deploy page</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden}
+body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:#111827;background:#d1d5db;-webkit-font-smoothing:antialiased}
+ul,ol{list-style:none}
+.win{position:absolute;inset:0;display:flex;flex-direction:column;background:#fff}
+.tabs{height:46px;background:#dfe3e8;display:flex;align-items:flex-end;gap:2px;padding:0 12px}
+.tab{height:38px;min-width:260px;max-width:320px;padding:0 16px;display:flex;align-items:center;gap:10px;border-radius:10px 10px 0 0;font-size:15px;color:#374151;background:#cfd4da}
+.tab.on{background:#fff;color:#111827}
+.tab .fav{width:16px;height:16px;border-radius:4px;flex:none}
+.tab.new{outline:3px solid #2563eb;outline-offset:-3px}
+.bar{height:54px;display:flex;align-items:center;gap:16px;padding:0 18px;border-bottom:1px solid #e5e7eb;background:#fff}
+.dots{display:flex;gap:8px}.dots i{width:13px;height:13px;border-radius:50%;background:#d1d5db;display:block}
+.url{flex:1;height:36px;border-radius:18px;background:#f1f3f4;display:flex;align-items:center;padding:0 18px;font-size:17px;color:#374151;gap:10px}
+.url b{font-weight:500;color:#111827}
+.lock{width:12px;height:14px;border:2px solid #6b7280;border-radius:2px;position:relative;margin-top:4px}
+.lock:before{content:"";position:absolute;left:1px;top:-8px;width:6px;height:7px;border:2px solid #6b7280;border-bottom:0;border-radius:4px 4px 0 0}
+.view{flex:1;position:relative;overflow:hidden}
+/* click target */
+.target{position:relative;outline:4px solid #2563eb;outline-offset:6px;border-radius:8px;box-shadow:0 0 0 14px rgba(37,99,235,.18)}
+.cursor{position:absolute;right:-30px;bottom:-34px;z-index:5;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.cursor.tr{bottom:auto;top:-40px;right:-50px}
+.cursor.r{right:-56px;bottom:auto;top:20%}
+.cursor.rt{right:-60px;bottom:auto;top:-16px}
+/* TinaCloud dashboard */
+.tc{position:absolute;inset:0;background:#f3f4f6;overflow:hidden}
+.tbar{position:relative;z-index:2;height:64px;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;padding:0 32px}
+.logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#f06d44,#ec4815)}
+.main{max-width:1280px;margin:0 auto;padding:48px 32px}
+.hn{font-size:24px;line-height:28px;font-weight:700;color:#ec4815;margin-bottom:20px}
+.wiz{border:1px solid #e5e7eb;background:#fff;border-radius:8px;padding:20px 24px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.wiz .track{position:relative}
+.wiz .line{position:absolute;top:16px;height:2px;background:#e5e7eb;border-radius:2px}
+.wiz .fill{height:100%;background:#22c55e;border-radius:2px}
+.wiz ol{position:relative;display:grid}
+.wiz li{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.dot{width:32px;height:32px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600}
+.dot.completed{border-color:#22c55e;background:#22c55e;color:#fff}
+.dot.active{border-color:#3b82f6;background:#3b82f6;color:#fff;box-shadow:0 0 0 4px rgba(59,130,246,.2)}
+.dot.upcoming{border-color:#d1d5db;background:#fff;color:#6b7280}
+.wl{font-size:14px}.wl.completed{color:#4b5563}.wl.active{font-weight:600;color:#111827}.wl.upcoming{color:#6b7280}
+.my8{margin:32px 0}
+.h2{font-size:24px;font-weight:500;color:#111827}
+.sub{font-size:16px;color:#6b7280;margin-top:4px;max-width:65ch;line-height:24px}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;font-weight:500;border-radius:8px;font-size:14px;height:40px;padding:0 20px}
+.btn.lg{font-size:16px;height:48px;padding:0 24px}
+.btn.sec{color:#1f2937;background:#fff;border:1px solid #f3f4f6;box-shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)}
+.btn.pri{color:#fff;background:linear-gradient(to right,#f06d44,#bd3a11);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.btn.lpri{color:#fff;background:#ec4815;box-shadow:0 1px 3px rgba(0,0,0,.1);font-size:14px;height:48px;padding:0 20px}
+.btn.lpri.lg{font-size:16px;padding:0 24px}
+.btn.lsec{color:#1f2937;background:#fff;border:1px solid #d1d5db;height:48px;padding:0 20px;font-size:14px}
+.btn.wht{color:#1f2937;background:#fff;border:1px solid #6b7280;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.btn.ghost{color:#6b7280;background:transparent;border:1px solid transparent}
+.btn.off{opacity:.3}
+.callout{font-size:14px;padding:12px 16px;border-radius:6px;border:2px solid;background:#fff;color:#374151;font-weight:500;display:flex;align-items:center;gap:12px;margin:8px 0;line-height:20px}
+.callout.info{border-color:rgba(37,99,235,.2)}.callout.warn{border-color:rgba(180,83,9,.2)}
+.i-call{width:20px;height:20px;flex:none;opacity:.7}
+.a{color:#2563eb;font-weight:500}
+.grid{display:grid;grid-template-columns:18rem 1fr;gap:24px;padding:24px 0}
+.slist{display:flex;flex-direction:column;gap:8px}
+.sitem{display:flex;align-items:center;gap:12px;padding:8px;border-radius:8px;border:2px solid transparent;background:#fff}
+.sitem.cur{border-color:#ec4815;background:#fff7ed}
+.thumb{width:56px;height:56px;border-radius:6px;flex:none;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.sname{font-weight:500;color:#111827;font-size:16px;line-height:24px}
+.sbadges{font-size:14px;color:#6b7280;line-height:20px}
+.detail{background:#fff;border-radius:8px;box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);padding:24px;display:flex;flex-direction:column;gap:16px}
+.hero{height:288px;border-radius:8px;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);position:relative;overflow:hidden}
+.badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{font-size:14px;border-radius:6px;padding:4px 12px;background:#dbeafe;color:#1e40af;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.dname{font-size:24px;font-weight:500;color:#ec4815}
+.gh{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;color:#4b5563}
+.desc{font-size:16px;color:#6b7280;max-width:65ch;line-height:24px}
+.h4{font-size:16px;font-weight:500;color:#111827;margin-bottom:8px}
+.hosts{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.hosts img{display:block;height:36px;width:auto}
+.hosts .dis{opacity:.6}
+.manual{margin-top:12px;font-size:14px;color:#374151;text-decoration:underline}
+.authz{margin-top:12px;display:flex;align-items:center;gap:8px;font-size:14px;color:#6b7280}
+.authz .i-spin{width:16px;height:16px;color:#6b7280}
+.panel{background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);padding:28px 24px}
+.card{display:flex;flex-direction:column;gap:20px}
+.ct{font-size:24px;font-weight:700;color:#111827}
+.cs{font-size:16px;color:#4b5563;max-width:65ch;line-height:24px;margin-top:6px}
+.acct{display:flex;align-items:center;gap:12px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;padding:14px 16px;max-width:672px}
+.acct.ok{border-color:#bbf7d0;background:#f0fdf4}
+.acct .n{font-size:16px;font-weight:600;color:#111827;display:block}
+.acct .d{font-size:14px;color:#4b5563;display:block}
+.i-done{width:24px;height:24px;flex:none;color:#15803d}
+.i-spin{width:20px;height:20px;flex:none;color:#ec4815}
+.pend{width:24px;height:24px;flex:none;border-radius:50%;border:2px solid #d1d5db}
+.status{display:flex;align-items:center;gap:12px;border-radius:8px;border:1px solid #fed7aa;background:#fff7ed;padding:14px 16px}
+.status .t{flex:1;font-size:14px;color:#7c2d12}
+.steps{list-style:decimal;padding-left:20px;font-size:16px;line-height:24px;color:#374151;display:flex;flex-direction:column;gap:6px}
+.steps li{list-style:decimal}
+.link{font-size:14px;font-weight:500;color:#2563eb}
+.chk{display:flex;flex-direction:column;gap:4px;max-width:768px}
+.chk li{display:flex;align-items:center;gap:12px;padding:10px 4px;font-size:16px;color:#111827}
+.chk li.active{font-weight:600}
+.chk li.pending{color:#4b5563}
+.chk .lab{flex:1}
+.chk .trail{font-size:14px;font-weight:500}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px}
+.note{font-size:14px;color:#4b5563;line-height:20px}
+.err{font-size:14px;color:#dc2626}
+.log{border-radius:8px;background:#111827;padding:12px;font-size:12px;line-height:20px;color:#f3f4f6;white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.picker{display:flex;flex-direction:column;gap:16px}
+.ph2{font-size:20px;font-weight:500;line-height:24px;color:#111827}
+.wlist{border:1px solid #f3f4f6;border-radius:8px}
+.wlist li{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;background:#fff}
+.wlist li+li{border-top:1px solid #f3f4f6}
+.wn{font-size:14px;font-weight:500;color:#111827}.wc{font-size:12px;color:#6b7280}
+.status-h{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.status-h h2{font-size:24px;font-weight:700;color:#374151}
+.big-ok{width:32px;height:32px;color:#16a34a}
+.p{font-size:16px;color:#6b7280;line-height:24px}
+.p b{font-weight:500;color:#374151}
+.lnk{color:#2563eb}
+.live{display:flex;flex-direction:column;align-items:center;gap:20px;padding:24px 0;text-align:center}
+.live .i-done{width:56px;height:56px}
+.live h2{font-size:30px;font-weight:700;color:#111827}
+/* third-party simplified screens */
+.tp{position:absolute;inset:0;background:#fafafa;color:#111;overflow:hidden}
+.tp-head{height:64px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:14px;padding:0 40px;background:#fff;font-size:20px;font-weight:600}
+.mark{width:28px;height:28px;border-radius:6px;background:#111}
+.mark.cf{background:#f38020;border-radius:50%}
+.tp-body{max-width:1100px;margin:40px auto;zoom:1.4;display:flex;flex-direction:column;gap:28px}
+.box{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:28px 32px;display:flex;flex-direction:column;gap:18px}
+.box h3{font-size:22px;font-weight:600}
+.field{display:flex;flex-direction:column;gap:8px}
+.field label{font-size:15px;color:#4b5563;font-weight:500}
+.input{height:46px;border:1px solid #d1d5db;border-radius:8px;display:flex;align-items:center;padding:0 14px;font-size:17px;background:#fff;color:#111}
+.input.empty{color:#9ca3af}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.tbtn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 26px;border-radius:8px;font-size:17px;font-weight:600;background:#111;color:#fff;align-self:flex-start}
+.tbtn.cf{background:#f38020;color:#111}
+.tbtn.sec{background:#fff;color:#111;border:1px solid #d1d5db}
+.intg{display:flex;align-items:center;gap:16px;border:1px solid #e5e7eb;border-radius:10px;padding:16px 18px}
+.intg .nm{flex:1;font-size:18px;font-weight:600}
+.tlogo{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#f06d44,#ec4815)}
+/* annotation labels (video graphics, not UI) */
+.anno{position:absolute;z-index:6;background:#1e3a8a;color:#fff;font-size:26px;font-weight:600;padding:10px 20px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+/* popup window */
+.scrim{position:absolute;inset:0;background:rgba(17,24,39,.2);z-index:3}
+.popup{position:absolute;z-index:4;right:70px;top:60px;width:740px;height:520px;border-radius:12px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.4);display:flex;flex-direction:column;background:#fff}
+.popup .bar{height:50px}
+.popup .tp{position:relative;flex:1}
+/* title cards */
+.cardbg{position:absolute;inset:0;background:linear-gradient(135deg,#1f2937,#111827);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 160px;gap:28px}
+.cardbg h1{font-size:84px;line-height:1.08;font-weight:800;letter-spacing:-.02em;max-width:1400px}
+.cardbg p{font-size:36px;color:#e5e7eb;max-width:1300px;line-height:1.35}
+.cardbg .acc{width:120px;height:10px;border-radius:5px;background:#ec4815}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:12px}
+.col{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:36px 40px;display:flex;flex-direction:column;gap:14px}
+.col h2{font-size:40px;font-weight:700}
+.col li{font-size:28px;color:#e5e7eb;line-height:1.4;list-style:disc;margin-left:32px}
+.col .u{font-size:19px;color:#fdba74;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+</style>
+</head>
+<body>
+<div class="win"><div class="tabs"><div class="tab on" data-chrome><span class="fav" style="background:linear-gradient(135deg,#f06d44,#ec4815)"></span>TinaCloud | Projects</div></div><div class="bar" data-chrome><div class="dots"><i></i><i></i><i></i></div><div class="url"><span class="lock"></span><span><b>app.tina.io</b>/projects/starter</span></div></div><div class="view"><div class="tc"><div class="tbar"><span class="logo"></span></div><div class="main" style="zoom:1.2;margin-top:0px"><h2 class="hn" data-s>New Project</h2><div style="display:flex;flex-direction:column;gap:24px;margin-top:32px"><nav class="wiz"><div class="track"><div class="line" style="left:12.5%;right:12.5%"><div class="fill" style="width:33.3333%"></div></div><ol style="grid-template-columns:repeat(4,minmax(0,1fr))"><li><span class="dot completed"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M9.5 16.6 5.4 12.5l1.4-1.4 2.7 2.7 7.7-7.7 1.4 1.4z"/></svg></span><span class="wl completed" data-s>Connect</span></li><li><span class="dot active"><span data-num>2</span></span><span class="wl active" data-s>Deploy</span></li><li><span class="dot upcoming"><span data-num>3</span></span><span class="wl upcoming" data-s>Finish</span></li><li><span class="dot upcoming"><span data-num>4</span></span><span class="wl upcoming" data-s>Live</span></li></ol></div></nav><div class="panel"><div class="card"><div><h2 class="ct" data-s>Deploy on Cloudflare</h2><p class="cs" data-s>Cloudflare's deploy page opens in a new tab. Keep this tab open: it picks up your Worker by itself.</p></div><div style="display:flex;flex-direction:column;gap:14px;max-width:672px"><ol class="steps"><li><span data-s>Click <strong>Deploy</strong> on Cloudflare's page. Any Worker name is fine.</span></li><li><span data-s>Skip the secrets prompt. TinaCloud adds the keys for you.</span></li><li><span data-s>Come back here. We'll find your new Worker.</span></li></ol><div><span class="target " style="display:inline-block"><span class="btn lpri lg"><span data-s>Open Cloudflare deploy page</span></span><svg class="cursor br" data-chrome viewBox="0 0 24 24" width="44" height="44" aria-hidden="true"><path d="M4 2l15 11.5-6.6.9 3.9 7.4-3 1.5-3.9-7.5L4 20z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg></span></div></div><div class="status"><svg class="i-spin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="3"/><path d="M12 3a9 9 0 0 1 9 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg><span class="t"><span data-s>Watching your Cloudflare account for a new Worker…</span></span><span class="link" data-s>I've deployed it</span></div></div></div></div></div></div></div></div>
+</body>
+</html>
