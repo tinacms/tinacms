@@ -39,6 +39,24 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const REDIRECT_TIMEOUT_MS = 15_000;
+
+// Resolves on a bfcache restore (Back), or by timeout because a stopped navigation fires no event.
+function redirectAbandoned() {
+  return new Promise<void>((resolve) => {
+    const settle = () => {
+      clearTimeout(timer);
+      window.removeEventListener('pageshow', onPageShow);
+      resolve();
+    };
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) settle();
+    };
+    const timer = setTimeout(settle, REDIRECT_TIMEOUT_MS);
+    window.addEventListener('pageshow', onPageShow);
+  });
+}
+
 export interface TinaCloudMediaStoreClass {
   new (client: Client): MediaStore;
 }
@@ -187,16 +205,7 @@ const AuthWallInner = ({
         loginScreenProps || authProps
       );
       if (token === AUTH_REDIRECTING) {
-        // Stay busy until the page leaves; a bfcache restore (Back) resolves this.
-        await new Promise<void>((resolve) => {
-          const onPageShow = (e: PageTransitionEvent) => {
-            if (e.persisted) {
-              window.removeEventListener('pageshow', onPageShow);
-              resolve();
-            }
-          };
-          window.addEventListener('pageshow', onPageShow);
-        });
+        await redirectAbandoned();
         return;
       }
       if (typeof client?.onLogin === 'function') {
@@ -498,16 +507,13 @@ export const TinaCloudProvider = (
     code: urlParams.get('code'),
     state: urlParams.get('state'),
     error: urlParams.get('error'),
-  };
-  const authRedirect = useTinaAuthRedirect(
-    authRedirectParams,
-    isTinaCloudAuth,
-    async (token) => {
+    onLogin: async (token) => {
       if (typeof client.onLogin === 'function') {
         await client.onLogin({ token });
       }
-    }
-  );
+    },
+  };
+  const authRedirect = useTinaAuthRedirect(authRedirectParams, isTinaCloudAuth);
   const isAuthRedirect = authRedirect.status === 'pending';
   const authRedirectError =
     authRedirect.status === 'failed' ? authRedirect.message : undefined;

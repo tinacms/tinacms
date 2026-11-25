@@ -116,6 +116,31 @@ describe('TinaCloudProvider login modal', () => {
     expect(loginButton()!.disabled).toBe(true);
   });
 
+  it('makes Log in usable again when the redirect never leaves the page', async () => {
+    const { cms, events, onLogin } = makeCms(async () => AUTH_REDIRECTING);
+    renderProvider(cms);
+    await screen.findByRole('button', { name: 'Log in' });
+    vi.useFakeTimers();
+    try {
+      await act(async () => {
+        fireEvent.click(loginButton()!);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(14_000);
+      });
+      expect(loginButton()!.disabled).toBe(true);
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1_000);
+      });
+      expect(loginButton()!.disabled).toBe(false);
+      expect(onLogin).not.toHaveBeenCalled();
+      expect(events).toEqual([]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('runs onLogin and closes the modal when authenticate returns a token', async () => {
     const token = { access_token: 'a', id_token: 'i', refresh_token: 'r' };
     const { cms, events, onLogin } = makeCms(async () => token);

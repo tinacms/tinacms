@@ -7,7 +7,7 @@ export const PKCE_STORAGE_KEY = 'tinacms-pkce';
 
 const TINA_LOGIN_EVENT = 'tinaCloudLogin';
 
-export const AUTH_REDIRECTING = Symbol('tinacms-auth-redirecting');
+export const AUTH_REDIRECTING = Symbol.for('tinacms-auth-redirecting');
 
 export class AuthenticationCancelledError extends Error {
   constructor(message = 'Authentication cancelled') {

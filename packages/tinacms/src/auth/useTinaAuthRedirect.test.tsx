@@ -340,9 +340,8 @@ describe('useTinaAuthRedirect', () => {
 
       renderHook(() =>
         useTinaAuthRedirect(
-          { code: CODE, state: STATE, error: null },
-          true,
-          onLogin
+          { code: CODE, state: STATE, error: null, onLogin },
+          true
         )
       );
 
@@ -365,9 +364,8 @@ describe('useTinaAuthRedirect', () => {
 
       const { result } = renderHook(() =>
         useTinaAuthRedirect(
-          { code: CODE, state: STATE, error: null },
-          true,
-          onLogin
+          { code: CODE, state: STATE, error: null, onLogin },
+          true
         )
       );
 

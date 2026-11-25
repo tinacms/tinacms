@@ -6,6 +6,7 @@ export interface AuthRedirectParams {
   code: string | null;
   state: string | null;
   error: string | null;
+  onLogin?: (token: TokenObject) => Promise<void>;
 }
 
 export type AuthRedirectStatus =
@@ -47,10 +48,9 @@ const failureMessage = (err: unknown): string => {
 
 export const useTinaAuthRedirect = (
   params: AuthRedirectParams,
-  enabled = true,
-  onLogin?: (token: TokenObject) => Promise<void>
+  enabled = true
 ): AuthRedirectStatus => {
-  const { code, state, error } = params;
+  const { code, state, error, onLogin } = params;
   const [result, setResult] = useState<AuthRedirectStatus>(() =>
     enabled && (error || (code && state))
       ? { status: 'pending' }
