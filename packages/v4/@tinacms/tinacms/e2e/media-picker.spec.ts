@@ -33,6 +33,12 @@ const openPicker = async (page: Page) => {
   return picker;
 };
 
+// A real press at the control's centre, with no scroll first, so it lands on whatever is on top.
+const mouseClick = async (page: Page, locator: Locator) => {
+  const { x, y, width, height } = await box(locator);
+  await page.mouse.click(x + width / 2, y + height / 2);
+};
+
 const previewRegion = (page: Page) => page.locator('[data-preview-slot]');
 
 const sideways = (page: Page) =>
@@ -41,48 +47,98 @@ const sideways = (page: Page) =>
     return root ? root.scrollWidth - root.clientWidth : 0;
   });
 
+for (const width of [1440, 1280]) {
+  test.describe(`desktop at ${width}px`, () => {
+    test.use({ viewport: { width, height: 900 } });
+
+    test('is a 400px popover 12px under the preview toolbar, and Maximise covers the preview only', async ({
+      page,
+    }) => {
+      await page.goto(HOME);
+      const formBefore = await box(formColumn(page));
+      const picker = await openPicker(page);
+      const panel = page.locator('[data-slot=media-picker-host]');
+      const region = await box(previewRegion(page));
+      const toolbar = await box(
+        previewRegion(page).locator('[data-slot=preview-toolbar]')
+      );
+      const rect = await box(panel);
+      expect(Math.round(rect.width)).toBe(400);
+      expect(Math.round(rect.y - (toolbar.y + toolbar.height))).toBe(12);
+      expect(Math.round(region.x + region.width - (rect.x + rect.width))).toBe(
+        12
+      );
+      expect(
+        Math.round(region.y + region.height - (rect.y + rect.height))
+      ).toBe(12);
+      expect(Math.round((await box(formColumn(page))).width)).toBe(
+        Math.round(formBefore.width)
+      );
+      await expect(heroField(page)).toBeVisible();
+
+      await picker.getByRole('button', { name: 'Maximise' }).click();
+      await page.waitForTimeout(300);
+      const maximised = await box(panel);
+      expect(Math.round(maximised.x - region.x)).toBe(12);
+      expect(Math.round(maximised.width)).toBe(Math.round(region.width - 24));
+      const upload = await box(picker.getByRole('button', { name: 'Upload' }));
+      const restoreButton = await box(
+        picker.getByRole('button', { name: 'Restore' })
+      );
+      expect(restoreButton.x - (upload.x + upload.width)).toBeLessThan(16);
+      await picker.getByRole('button', { name: 'Restore' }).click();
+      await page.waitForTimeout(300);
+      expect(Math.round((await box(panel)).width)).toBe(400);
+    });
+
+    test('closes without writing when Expand preview is clicked', async ({
+      page,
+    }) => {
+      await page.goto(HOME);
+      const picker = await openPicker(page);
+      await picker.getByRole('button', { name: 'preview.svg' }).click();
+      await expect(picker.getByText('1 picked')).toBeVisible();
+      await mouseClick(
+        page,
+        page.getByRole('button', { name: /Expand preview/i })
+      );
+      await expect(
+        page.getByRole('region', { name: 'Choose an image' })
+      ).toHaveCount(0);
+      await expect(
+        page.getByRole('button', { name: 'Collapse preview' })
+      ).toBeVisible();
+      await expect(page.getByRole('contentinfo')).not.toContainText(
+        'Unsaved changes'
+      );
+      expect(
+        await page.evaluate(() => document.activeElement === document.body)
+      ).toBe(false);
+    });
+
+    test('keeps Preview actions and the device buttons in reach of a mouse', async ({
+      page,
+    }) => {
+      await page.goto(HOME);
+      const picker = await openPicker(page);
+      await mouseClick(page, page.getByRole('button', { name: /^Tablet/ }));
+      await expect(
+        page.getByRole('button', { name: /^Tablet/ })
+      ).toHaveAttribute('aria-pressed', 'true');
+      await mouseClick(
+        page,
+        page.getByRole('button', { name: 'Preview actions' })
+      );
+      await expect(
+        page.getByRole('menuitem', { name: 'Reload' })
+      ).toBeVisible();
+      await expect(picker).toBeVisible();
+    });
+  });
+}
+
 test.describe('desktop', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
-
-  test('is a 400px popover 12px under the preview toolbar, and Maximise covers the preview only', async ({
-    page,
-  }) => {
-    await page.goto(HOME);
-    const formBefore = await box(formColumn(page));
-    const picker = await openPicker(page);
-    const panel = page.locator('[data-slot=media-picker-host]');
-    const region = await box(previewRegion(page));
-    const toolbar = await box(
-      previewRegion(page).locator('[data-slot=preview-toolbar]')
-    );
-    const rect = await box(panel);
-    expect(Math.round(rect.width)).toBe(400);
-    expect(Math.round(rect.y - (toolbar.y + toolbar.height))).toBe(12);
-    expect(Math.round(region.x + region.width - (rect.x + rect.width))).toBe(
-      12
-    );
-    expect(Math.round(region.y + region.height - (rect.y + rect.height))).toBe(
-      12
-    );
-    expect(Math.round((await box(formColumn(page))).width)).toBe(
-      Math.round(formBefore.width)
-    );
-    await expect(heroField(page)).toBeVisible();
-
-    await picker.getByRole('button', { name: 'Maximise' }).click();
-    await page.waitForTimeout(300);
-    const maximised = await box(panel);
-    expect(Math.round(maximised.x - region.x)).toBe(12);
-    expect(Math.round(maximised.width)).toBe(Math.round(region.width - 24));
-    const upload = await box(picker.getByRole('button', { name: 'Upload' }));
-    const restoreButton = await box(
-      picker.getByRole('button', { name: 'Restore' })
-    );
-    expect(restoreButton.x - (upload.x + upload.width)).toBeLessThan(16);
-    await picker.getByRole('button', { name: 'Restore' }).click();
-    await page.waitForTimeout(300);
-    expect(Math.round((await box(panel)).width)).toBe(400);
-  });
 
   test('keeps its header and footer pinned while the library scrolls', async ({
     page,
@@ -101,25 +157,6 @@ test.describe('desktop', () => {
     expect(await box(picker.locator('[data-slot=picker-footer]'))).toEqual(
       footer
     );
-  });
-
-  test('closes without writing when Expand preview is clicked', async ({
-    page,
-  }) => {
-    await page.goto(HOME);
-    const picker = await openPicker(page);
-    await picker.getByRole('button', { name: 'preview.svg' }).click();
-    await expect(picker.getByText('1 picked')).toBeVisible();
-    await page.getByRole('button', { name: /Expand preview/i }).click();
-    await expect(
-      page.getByRole('region', { name: 'Choose an image' })
-    ).toHaveCount(0);
-    await expect(page.getByRole('contentinfo')).not.toContainText(
-      'Unsaved changes'
-    );
-    expect(
-      await page.evaluate(() => document.activeElement === document.body)
-    ).toBe(false);
   });
 
   test('closes without writing when Media opens from the rail', async ({
