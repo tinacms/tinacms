@@ -26,7 +26,7 @@ import { BranchSwitchedEvent } from '../lib/posthog/posthog';
 import { captureEvent } from '../lib/posthog/posthogProvider';
 import { CreateClientProps, createClient } from '../utils';
 import { ModalBuilder } from './AuthModal';
-import { AuthenticationCancelledError } from './authenticate';
+import { AUTH_REDIRECTING, AuthenticationCancelledError } from './authenticate';
 import loginLlama from './tina-login.png';
 import {
   type AuthRedirectParams,
@@ -186,6 +186,19 @@ const AuthWallInner = ({
       const token = await client.authProvider.authenticate(
         loginScreenProps || authProps
       );
+      if (token === AUTH_REDIRECTING) {
+        // Stay busy until the page leaves; a bfcache restore (Back) resolves this.
+        await new Promise<void>((resolve) => {
+          const onPageShow = (e: PageTransitionEvent) => {
+            if (e.persisted) {
+              window.removeEventListener('pageshow', onPageShow);
+              resolve();
+            }
+          };
+          window.addEventListener('pageshow', onPageShow);
+        });
+        return;
+      }
       if (typeof client?.onLogin === 'function') {
         await client?.onLogin({ token });
       }
@@ -486,7 +499,15 @@ export const TinaCloudProvider = (
     state: urlParams.get('state'),
     error: urlParams.get('error'),
   };
-  const authRedirect = useTinaAuthRedirect(authRedirectParams, isTinaCloudAuth);
+  const authRedirect = useTinaAuthRedirect(
+    authRedirectParams,
+    isTinaCloudAuth,
+    async (token) => {
+      if (typeof client.onLogin === 'function') {
+        await client.onLogin({ token });
+      }
+    }
+  );
   const isAuthRedirect = authRedirect.status === 'pending';
   const authRedirectError =
     authRedirect.status === 'failed' ? authRedirect.message : undefined;

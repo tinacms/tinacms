@@ -1,3 +1,4 @@
+import { TokenObject } from '@tinacms/schema-tools';
 import { useEffect, useState } from 'react';
 import { AUTH_TOKEN_KEY, PKCE_STORAGE_KEY } from './authenticate';
 
@@ -27,7 +28,17 @@ class TokenExchangeError extends Error {
   }
 }
 
+class OnLoginError extends Error {
+  constructor(cause: unknown) {
+    super(String(cause));
+    this.name = 'OnLoginError';
+  }
+}
+
 const failureMessage = (err: unknown): string => {
+  if (err instanceof OnLoginError) {
+    return err.message;
+  }
   if (err instanceof TokenExchangeError && err.status === 403) {
     return NO_PROJECT_ACCESS_MESSAGE;
   }
@@ -36,7 +47,8 @@ const failureMessage = (err: unknown): string => {
 
 export const useTinaAuthRedirect = (
   params: AuthRedirectParams,
-  enabled = true
+  enabled = true,
+  onLogin?: (token: TokenObject) => Promise<void>
 ): AuthRedirectStatus => {
   const { code, state, error } = params;
   const [result, setResult] = useState<AuthRedirectStatus>(() =>
@@ -114,17 +126,21 @@ export const useTinaAuthRedirect = (
         }
         return data;
       })
-      .then((data) => {
-        localStorage.setItem(
-          AUTH_TOKEN_KEY,
-          JSON.stringify({
-            access_token: data.access_token,
-            refresh_token: data.refresh_token,
-          })
-        );
+      .then(async (data) => {
+        const token = {
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+        };
+        localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify(token));
 
         localStorage.removeItem(PKCE_STORAGE_KEY);
         window.history.replaceState({}, '', window.location.pathname);
+        try {
+          await onLogin?.(token);
+        } catch (e) {
+          localStorage.removeItem(AUTH_TOKEN_KEY);
+          throw new OnLoginError(e);
+        }
         window.location.reload();
       })
       .catch((err) => {

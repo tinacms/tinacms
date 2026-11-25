@@ -7,6 +7,8 @@ export const PKCE_STORAGE_KEY = 'tinacms-pkce';
 
 const TINA_LOGIN_EVENT = 'tinaCloudLogin';
 
+export const AUTH_REDIRECTING = Symbol('tinacms-auth-redirecting');
+
 export class AuthenticationCancelledError extends Error {
   constructor(message = 'Authentication cancelled') {
     super(message);
@@ -107,7 +109,7 @@ export function authenticatePopup(
 export async function authenticatePKCE(
   clientId: string,
   identityApiUrl: string
-): Promise<void> {
+): Promise<typeof AUTH_REDIRECTING> {
   const codeVerifier = randomString(128);
   const codeChallenge = await generateCodeChallenge(codeVerifier);
   const state = randomString();
@@ -134,16 +136,17 @@ export async function authenticatePKCE(
   });
 
   window.location.href = `${identityApiUrl}/v2/auth/tinacms?${params.toString()}`;
+  return AUTH_REDIRECTING;
 }
 
 export async function authenticate(
   clientId: string,
   identityApiUrl: string,
   frontendUrl: string
-): Promise<TokenObject | void> {
+): Promise<TokenObject | typeof AUTH_REDIRECTING | void> {
   const workosEnabled = await getWorkosEnabled(identityApiUrl);
   if (workosEnabled) {
-    await authenticatePKCE(clientId, identityApiUrl);
+    return authenticatePKCE(clientId, identityApiUrl);
   } else {
     return authenticatePopup(clientId, frontendUrl);
   }

@@ -4,7 +4,11 @@ import {
   TokenObject,
 } from '@tinacms/schema-tools';
 import { isErrorNamed } from '@toolkit/core/errors';
-import { AUTH_TOKEN_KEY, authenticate } from '../auth/authenticate';
+import {
+  AUTH_REDIRECTING,
+  AUTH_TOKEN_KEY,
+  authenticate,
+} from '../auth/authenticate';
 import DefaultSessionProvider from '../auth/defaultSessionProvider';
 import { bearerToken } from './bearerToken';
 
@@ -162,6 +166,9 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
       this.identityApiUrl,
       this.frontendUrl
     );
+    if (result === AUTH_REDIRECTING) {
+      return result;
+    }
     if (result) {
       this.setToken(result);
       return result;
