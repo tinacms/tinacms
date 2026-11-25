@@ -132,6 +132,13 @@ export interface MediaPickerPanelProps {
  * The media picker: the Media pane's folder and image looks in a panel that
  * lists images and folders only and hands the picked paths back to the field.
  */
+function isNotFound(error: unknown): boolean {
+  if (error instanceof MediaError) {
+    return error.code === 'not-found';
+  }
+  return false;
+}
+
 export function MediaPickerPanel({
   request,
   maximised,
@@ -254,6 +261,7 @@ export function MediaPickerPanel({
     !listing.hasNextPage &&
     (!serverSearch || debouncedSearch === '') &&
     listing.data.pages.every((page) => page.items.length === 0);
+  const parentCheckWanted = inMissingFolder && folder !== '' && listedEmpty;
   // A provider may list a missing folder as empty, so an empty folder is gone only when its parent lacks it.
   const parentCheck = useQuery({
     queryKey: [...MEDIA_LIST_KEY, branch, 'parent-has', folder],
@@ -272,17 +280,17 @@ export function MediaPickerPanel({
       } while (cursor);
       return false;
     },
-    enabled: inMissingFolder && folder !== '' && listedEmpty,
+    enabled: parentCheckWanted,
+    staleTime: 0,
   });
-  const checkingParent = parentCheck.isLoading;
-  const notFound = (error: unknown) =>
-    error instanceof MediaError && error.code === 'not-found';
-  const missingFolderGone =
-    notFound(listError) ||
-    (listedEmpty &&
-      (parentCheck.isError
-        ? notFound(parentCheck.error)
-        : parentCheck.data === false));
+  // A cached answer from before the picker opened may be stale, so only a fetched one decides.
+  const checkingParent = parentCheckWanted && !parentCheck.isFetchedAfterMount;
+  const parentGone = (() => {
+    if (!parentCheckWanted || !parentCheck.isFetchedAfterMount) return false;
+    if (parentCheck.isError) return isNotFound(parentCheck.error);
+    return parentCheck.data === false;
+  })();
+  const missingFolderGone = isNotFound(listError) || parentGone;
   useEffect(() => {
     if (inMissingFolder && folder !== '' && missingFolderGone) setFolder('');
   }, [inMissingFolder, folder, missingFolderGone]);

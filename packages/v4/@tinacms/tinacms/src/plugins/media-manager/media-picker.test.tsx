@@ -1034,6 +1034,47 @@ describe('a missing image in a folder that is still there', () => {
     expect(screen.queryByRole('navigation')).toBeNull();
   });
 
+  it('trusts a fresh answer over a cached one when the folder was recreated', async () => {
+    emptyPosts();
+    files = files.filter((item) => item.path !== 'posts');
+    const user = await openMissing(createProvider());
+    expect(await tile('logo.png')).toBeVisible();
+    await user.keyboard('{Escape}');
+    files.push({ path: 'posts', kind: 'directory' });
+    await openPicker(user);
+    expect(await screen.findByText(emptyWords('posts'))).toBeVisible();
+    expect(screen.getByRole('navigation')).toBeVisible();
+  });
+
+  it('stops showing loading once the editor left and re-entered the folder', async () => {
+    emptyPosts();
+    let release: () => void = () => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let parentChecked = false;
+    const user = await openMissing(
+      createProvider({
+        list: vi.fn(async (folder: string): Promise<MediaPage> => {
+          if (folder === '' && !parentChecked) {
+            parentChecked = true;
+            await held;
+          }
+          return { items: childrenOf(folder) };
+        }),
+      })
+    );
+    await screen.findByRole('status', { name: loadingWords('posts') });
+    await user.click(
+      within(screen.getByRole('navigation')).getByRole('button', {
+        name: 'Media',
+      })
+    );
+    await user.click(await folderCard('posts'));
+    expect(await screen.findByText(emptyWords('posts'))).toBeVisible();
+    release();
+  });
+
   it('shows the empty root, with Upload, for a missing image that was at the root', async () => {
     const user = userEvent.setup();
     files = [];
