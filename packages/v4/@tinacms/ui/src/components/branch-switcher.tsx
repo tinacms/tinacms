@@ -528,19 +528,8 @@ function BranchSwitcher({
     wasOpen.current = open;
   }, [open]);
 
-  // An open switcher belongs to the tier it opened on. Crossing 768px closes it before the other
-  // frame mounts open, so no closed scrim is left over the page; its state is kept for the next open.
   const maximisedNow = useRef(maximised);
   maximisedNow.current = maximised;
-  const openedOnPhone = useRef(phone);
-  if (!open) openedOnPhone.current = phone;
-  const staleTier = open && openedOnPhone.current !== phone;
-  const shown = open && !staleTier;
-  useEffect(() => {
-    if (!staleTier) return;
-    setOpen(false);
-    if (focusHere()) triggerRef.current?.focus();
-  });
 
   useEffect(() => {
     if (!open && maximised) setMaximised(false);
@@ -981,7 +970,7 @@ function BranchSwitcher({
 
   if (phone) {
     return (
-      <Dialog open={shown} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger render={trigger}>{label}</DialogTrigger>
         <ScreenContent
           title='Branches'
@@ -999,7 +988,7 @@ function BranchSwitcher({
   return (
     <>
       <Popover
-        open={shown && !maximised}
+        open={open && !maximised}
         onOpenChange={(next, details) => {
           // Tab off the busy button must not drop the create's own auto-switch.
           if (!next && busy && details.reason === 'focus-out') return;
@@ -1038,7 +1027,7 @@ function BranchSwitcher({
           ))}
         </PopoverContent>
       </Popover>
-      {shown && maximised
+      {open && maximised
         ? createPortal(
             <MaximisedView
               onKeyDown={move}

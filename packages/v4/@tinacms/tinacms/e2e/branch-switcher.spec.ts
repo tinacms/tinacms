@@ -196,15 +196,18 @@ test.describe('branch switcher pop-up', () => {
     await expect(page.getByText('cms/x is ready')).toHaveCount(0);
   });
 
-  test('returns focus to the branch button when crossing 768px closes the pop-up', async ({
+  test('keeps the switcher open across 768px and returns focus to the branch button when it closes', async ({
     page,
   }) => {
     await page.setViewportSize(DESKTOP);
     await page.goto(URL);
     await page.getByRole('button', { name: /^Branch:/ }).click();
-    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeVisible();
+    const switcher = page.getByRole('dialog', { name: 'Branches' });
+    await expect(switcher).toBeVisible();
     await page.setViewportSize({ width: 390, height: 844 });
-    await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
+    await expect(page.locator('[data-slot=screen-content]')).toBeVisible();
+    await page.getByRole('button', { name: 'Close branches' }).click();
+    await expect(switcher).toBeHidden();
     await expect(page.getByRole('button', { name: /^Branch:/ })).toBeFocused();
   });
 
@@ -411,7 +414,7 @@ test.describe('branch switcher pop-up', () => {
     },
   ];
   for (const state of states) {
-    test(`leaves no scrim after ${state.name} is open while the window shrinks to a phone`, async ({
+    test(`keeps ${state.name} open on the phone screen when the window shrinks, and leaves no scrim once closed`, async ({
       page,
     }) => {
       await page.setViewportSize(DESKTOP);
@@ -429,6 +432,12 @@ test.describe('branch switcher pop-up', () => {
       if (state.maximise)
         await page.getByRole('button', { name: 'Maximise' }).click();
       await page.setViewportSize({ width: 390, height: 844 });
+      await expect(page.locator('[data-slot=screen-content]')).toBeVisible();
+      if (state.form)
+        await expect(
+          page.getByRole('searchbox', { name: 'New branch name' })
+        ).toHaveValue('cms/x');
+      await page.getByRole('button', { name: 'Close branches' }).click();
       await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
       const blocked = await page.evaluate(() => {
         const at = document.elementFromPoint(195, 400);
