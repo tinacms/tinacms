@@ -441,12 +441,13 @@ function BranchSwitcher({
   const from = startFrom === 'base' ? baseBranch : (current ?? baseBranch);
   const [dismissed, setDismissed] = useState(false);
   const attempted = useRef('');
-  const failed =
+  // A form-started failure stays in the form while it is open, also after the name is edited.
+  const formFailure =
     createState === 'failed' &&
     creating &&
     !dismissed &&
-    attempted.current !== '' &&
-    typed === attempted.current;
+    attempted.current !== '';
+  const failed = formFailure && typed === attempted.current;
   const frame = () =>
     document.querySelector('[data-slot="branch-maximised"]') ?? document;
   const focusField = (field: 'search' | 'name') => {
@@ -649,19 +650,20 @@ function BranchSwitcher({
       : []),
   ];
 
-  const noteNamesIt = note?.kind === 'failed' && note.name === typed;
+  const noteShown =
+    note !== undefined && !(formFailure && note.kind === 'failed');
+  const noteNamesIt =
+    noteShown && note.kind === 'failed' && note.name === typed;
   const refusedFailure = failed || noteNamesIt ? undefined : refused.get(typed);
+  const failureName = refusedFailure !== undefined ? typed : attempted.current;
   const failureP =
-    failed || refusedFailure !== undefined ? (
+    refusedFailure !== undefined || formFailure ? (
       <p
         role='alert'
         data-branch-failure=''
         className='m-0 text-sm text-destructive [overflow-wrap:anywhere]'
       >
-        {failureLine(
-          failed ? attempted.current : typed,
-          failed ? createFailure : refusedFailure
-        )}
+        {failureLine(failureName, refusedFailure ?? createFailure)}
       </p>
     ) : null;
 
@@ -717,7 +719,7 @@ function BranchSwitcher({
           Creating {creatingBranch}…
         </p>
       ) : null}
-      {note !== undefined && !(failed && note.kind === 'failed') ? (
+      {noteShown ? (
         <OutcomeNote
           note={note}
           onAction={() => {
