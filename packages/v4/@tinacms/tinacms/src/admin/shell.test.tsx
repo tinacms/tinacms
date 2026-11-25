@@ -2352,6 +2352,26 @@ describe('branch switcher rows and creating a branch', () => {
     await waitFor(() => expect(toasts()).toHaveLength(0), { timeout: 3000 });
   });
 
+  it('keeps a failure toast gone after its own Dismiss, also once the switcher opens and closes', async () => {
+    const { user } = await failWhileClosed();
+    const toast = screen
+      .getByText("Couldn't create cms/x")
+      .closest('[data-slot=toast]') as HTMLElement;
+    await user.click(within(toast).getByRole('button', { name: 'Dismiss' }));
+    await waitFor(() => expect(toasts()).toHaveLength(0));
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(within(dialog).queryByText(/Couldn't create cms\/x/)).toBeNull();
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: 'Branches' })).toBeNull()
+    );
+    expect(toasts()).toHaveLength(0);
+    expect(screen.queryByText("Couldn't create cms/x")).toBeNull();
+  });
+
   it('sends one toast when the switcher closes with the note, and none after Dismiss', async () => {
     const { user } = await failWhileClosed();
     await user.click(screen.getByRole('button', { name: /^Branch:/ }));

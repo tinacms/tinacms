@@ -83,10 +83,13 @@ function Toast({
         <Button
           variant='outline'
           size='sm'
+          className='h-auto min-h-8 max-w-full shrink py-1 text-left whitespace-normal touch:min-h-touch'
           aria-label={action['aria-label']}
           onClick={action.onClick}
         >
-          {action.label}
+          <span className='min-w-0 [overflow-wrap:anywhere]'>
+            {action.label}
+          </span>
         </Button>
       ) : null}
       {secondaryAction ? (
@@ -171,16 +174,32 @@ type ToastOptions = Omit<ToastProps, 'id'> & {
   /** Milliseconds, or `Infinity` to stay until the person acts. Errors and warnings stay by default. */
   duration?: number;
   id?: string | number;
+  /** Runs only when the person presses Dismiss, not when code or the timer closes the toast. */
+  onDismissPress?: () => void;
 };
 
 /**
  * Shows a Toast in the Toaster and returns its id. Errors and warnings stay until dismissed.
  * Pass the same `id` to replace a toast. `onDismiss` runs however the toast closes.
  */
-function toast({ duration, onDismiss, id, ...props }: ToastOptions) {
+function toast({
+  duration,
+  onDismiss,
+  onDismissPress,
+  id,
+  ...props
+}: ToastOptions) {
   const urgent = props.tone === 'error' || props.tone === 'warning';
   return sonner.custom(
-    (toastId) => <Toast {...props} onDismiss={() => sonner.dismiss(toastId)} />,
+    (toastId) => (
+      <Toast
+        {...props}
+        onDismiss={() => {
+          onDismissPress?.();
+          sonner.dismiss(toastId);
+        }}
+      />
+    ),
     {
       duration: duration ?? (urgent ? Number.POSITIVE_INFINITY : undefined),
       style: props.actionsInline ? INLINE_ACTIONS_WIDTH : undefined,

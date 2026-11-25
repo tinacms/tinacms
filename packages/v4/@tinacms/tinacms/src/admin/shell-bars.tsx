@@ -297,9 +297,12 @@ function BranchControl() {
     };
     let id: string | number = '';
     const idOf = () => id;
+    const onDismissPress = () =>
+      setHeld((now) => (now === outcome ? undefined : now));
     if (outcome.kind === 'failed') {
       id = toast({
         tone: 'error',
+        onDismissPress,
         title: `Couldn't create ${outcome.name}`,
         text: failureDetail(outcome.name, outcome.failure),
         action: !canRetry(outcome.failure)
@@ -317,12 +320,14 @@ function BranchControl() {
     } else if (outcome.kind === 'unready') {
       id = toast({
         tone: 'warning',
+        onDismissPress,
         title: `${outcome.name} isn't ready yet`,
         text: 'It was made. You can switch to it after reloading the page.',
       });
     } else {
       id = toast({
         tone: 'success',
+        onDismissPress,
         title: `${outcome.name} is ready`,
         action: {
           label: `Switch to ${outcome.name}`,

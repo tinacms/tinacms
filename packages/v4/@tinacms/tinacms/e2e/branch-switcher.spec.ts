@@ -1381,6 +1381,71 @@ test.describe('branch switcher pop-up', () => {
     expect(fits).toBe(true);
   });
 
+  const expectInside = async (
+    page: Page,
+    outer: ReturnType<Page['locator']>,
+    inner: ReturnType<Page['locator']>
+  ) => {
+    const [o, i] = await Promise.all([
+      outer.boundingBox(),
+      inner.boundingBox(),
+    ]);
+    const { width, scrollWidth } = await page.evaluate(() => ({
+      width: window.innerWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+    }));
+    expect(o).not.toBeNull();
+    expect(i).not.toBeNull();
+    if (!o || !i) return;
+    expect(i.x).toBeGreaterThanOrEqual(o.x - 1);
+    expect(i.x + i.width).toBeLessThanOrEqual(o.x + o.width + 1);
+    expect(i.x + i.width).toBeLessThanOrEqual(width);
+    expect(scrollWidth).toBeLessThanOrEqual(width);
+  };
+  const longName = `cms/${'a'.repeat(116)}`;
+
+  for (const width of [320, 1280]) {
+    test(`wraps the ready toast's Switch to action inside the toast at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/branches.html?docs=1&create=slow#/');
+      await openFrame(page, false);
+      await makeBranch(page, frameOf(page, false), longName);
+      await page.keyboard.press('Escape');
+      const toast = page
+        .locator('[data-slot=toast]')
+        .filter({ hasText: `${longName} is ready` });
+      await expect(toast).toBeVisible({ timeout: 10000 });
+      const action = toast.getByRole('button', {
+        name: `Switch to ${longName}`,
+      });
+      await expect(action).toBeVisible();
+      await expectInside(page, toast, action);
+    });
+
+    test(`wraps the ready note's Switch to action inside the note at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/branches.html?docs=1&create=slow#/');
+      await openFrame(page, false);
+      await makeBranch(page, frameOf(page, false), longName);
+      await frameOf(page, false)
+        .getByRole('button', { name: 'main', exact: true })
+        .click();
+      await expect(frameOf(page, false)).toBeHidden();
+      await openFrame(page, false);
+      const note = page.locator('[data-slot="branch-outcome-note"]');
+      await expect(note).toBeVisible({ timeout: 10000 });
+      const action = note.getByRole('button', {
+        name: `Switch to ${longName}`,
+      });
+      await expect(action).toBeVisible();
+      await expectInside(page, note, action);
+    });
+  }
+
   test('leaves the Toaster layer as it was: no lift above the switcher', async ({
     page,
   }) => {
