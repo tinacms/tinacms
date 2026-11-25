@@ -19,6 +19,7 @@ import {
   AfterSaveHookError,
   FormValidationError,
   type SaveStage,
+  isServerFieldRefusal,
   saveDocument,
 } from '../editor/save-pipeline';
 import {
@@ -91,7 +92,8 @@ const failureOf = (
     console.error('[tinacms] afterSave failed:', cause.cause);
     return { result: { status: 'saved-with-warning' }, stop: false };
   }
-  if (cause instanceof FormValidationError) {
+  if (cause instanceof FormValidationError || isServerFieldRefusal(cause)) {
+    if (isServerFieldRefusal(cause)) readFormBindings(formId)?.blockOnErrors();
     return {
       result: {
         status: 'failed',

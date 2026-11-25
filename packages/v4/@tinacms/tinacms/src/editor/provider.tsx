@@ -28,6 +28,7 @@ import {
   type TinaStoreState,
 } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
+import { customValidatorNamesOf } from '../core/validator/registry';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { createScreenRegistry } from '../core/screen/registry';
 import { createGlobalNav } from '../core/slot/global-nav';
@@ -48,6 +49,12 @@ import {
   useFormStore,
   valuesEqual,
 } from '../form/form-store';
+import { blockOnFormErrors } from './block-errors';
+import {
+  endServerErrorsIfChanged,
+  forgetServerErrors,
+  heldServerErrors,
+} from './server-errors';
 import { registerFormBindings } from './form-bindings';
 import { checkForm } from './save-pipeline';
 import { UploadFormContext } from './uploads/upload-context';
@@ -63,7 +70,11 @@ import {
   type StaleDraftActions,
   type WaitingCause,
 } from './context';
-import { flattenFieldErrors, nestFieldErrors } from './field-errors';
+import {
+  flattenFieldErrors,
+  nestFieldErrors,
+  toFieldErrorEntry,
+} from './field-errors';
 import { useFormViewStore } from './form-view-state';
 import { buildFormResolver } from './resolver';
 
@@ -126,6 +137,7 @@ export function TinaProvider({
         validators: createValidatorRegistry(resolved),
         hooks: createFormHookRegistry(resolved),
         serverHooks: serverHookNamesOf(composedPlugins),
+        customValidators: customValidatorNamesOf(composedPlugins),
         store: createTinaStore(resolved, {
           rpcUrl: config.rpcUrl ?? DEFAULT_RPC_URL,
         }),
@@ -266,6 +278,7 @@ const discardFormEdits = (
   const store = readFormStore();
   const scope = store.forms[formId];
   if (!isEdited(scope)) return;
+  forgetServerErrors(formId);
   const baseline = toDocument(scope.baseline);
   store.discardEdits(formId);
   resetForm(baseline);
@@ -363,8 +376,13 @@ const notifyWatchedFieldChange = (
   formId: FormId,
   path: string,
   collection: CollectionSchema,
-  trigger: (names: string[]) => Promise<boolean>
+  trigger: (names: string[]) => Promise<boolean>,
+  revalidate: () => void
 ) => {
+  // A refusal judged the whole document, so any change to the values ends
+  // every held server message. A list action has already moved the form's
+  // errors to new addresses, so the whole form is judged again by the client rules.
+  if (endServerErrorsIfChanged(formId, values).length > 0) revalidate();
   if (name === undefined) return;
   runOnChange(
     formHooks,
@@ -507,7 +525,11 @@ function useFormMethodSubscriptions(
         formId,
         path,
         collection,
-        methods.trigger
+        methods.trigger,
+        () => {
+          methods.clearErrors();
+          void methods.trigger();
+        }
       )
     );
     return () => unsubscribe();
@@ -562,7 +584,7 @@ export function FormProvider({
     [formId, userId, ingested, equal]
   );
   const seedValues = resolveSeedValues(keepsIncoming, kept.seed, ingested);
-  const resolver = buildFormResolver(collection, registry, validators);
+  const resolver = buildFormResolver(collection, registry, validators, formId);
   const methods = useForm<TinaDocument>({
     defaultValues: seedValues,
     errors: kept.errors,
@@ -640,10 +662,17 @@ export function FormProvider({
         validate: () => checkForm(formId, view, methods.trigger),
         getValues: methods.getValues,
         setValue: (address, value) => methods.setValue(address, value),
+        setServerErrors: (errors) => {
+          for (const [address, messages] of Object.entries(errors)) {
+            methods.setError(address, toFieldErrorEntry(messages));
+          }
+        },
+        blockOnErrors: () =>
+          blockOnFormErrors(formId, view, collection, methods.getValues),
         reseedFields,
         resetReveal: () => view.getState().resetReveal(),
       }),
-    [formId, methods, reseedFields, view]
+    [formId, methods, reseedFields, view, collection]
   );
   useEffect(() => {
     view.getState().resetReveal();
@@ -651,7 +680,11 @@ export function FormProvider({
     if (!store.revealOnOpen[formId]) return;
     view.getState().attemptSave();
     store.clearRevealOnOpen(formId);
-  }, [formId, view]);
+    // A refusal that Save All left on this form blocks Save here as it did on an open form.
+    if (Object.keys(heldServerErrors(formId, methods.getValues())).length > 0) {
+      blockOnFormErrors(formId, view, collection, methods.getValues);
+    }
+  }, [formId, view, methods, collection]);
   useEffect(() => {
     view.getState().showLevels([]);
   }, [fieldSeedKey, view]);

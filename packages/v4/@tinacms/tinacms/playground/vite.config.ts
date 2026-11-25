@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { type Plugin, defineConfig } from 'vite';
-import { loadTinaConfig } from '../src/codegen/load-config';
+import { openTinaConfig } from '../src/codegen/load-config';
 import { tinaLocalDataLayerVitePlugin } from '../src/plugins/content/local/server/local-data-layer.vite';
 import { playgroundAliases } from './aliases';
 
@@ -10,8 +10,16 @@ const tinaConfigPath = fileURLToPath(
   new URL('./tina/config.ts', import.meta.url)
 );
 
-const tina = await loadTinaConfig(tinaConfigPath, {
+// The loader stays open: the first save imports each plugin's lazy `server` segment
+// through it (ADR-007), and a closed loader fails that import. It closes with the dev server.
+const opened = await openTinaConfig(tinaConfigPath, {
   alias: playgroundAliases,
+});
+const tina = opened.config;
+
+const closeLoaderWithServer = (): Plugin => ({
+  name: 'tina-playground-close-loader',
+  buildEnd: () => opened.close(),
 });
 
 const restartOnTinaConfigChange = (): Plugin => ({
@@ -94,6 +102,7 @@ export default defineConfig({
       config: tina,
     }),
     restartOnTinaConfigChange(),
+    closeLoaderWithServer(),
   ],
   resolve: { alias: playgroundAliases },
   // `@tinacms/mdx` resolves through a workspace symlink, so Vite reads it as

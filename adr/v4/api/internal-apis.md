@@ -106,22 +106,23 @@ defineServerPlugin<TOps>(ops: TOps)
 
 Where `TOps` is a record of operations. The shape of `TOps` is what `import type` infers across the boundary to produce the typed `server.<plugin>.<op>(...)` proxy on the client. ([ADR-007](../007-full-stack-plugins-client-backend-segments.md))
 
-### Reserved `hooks` key
+### Reserved `hooks` and `validators` keys
 
 `hooks` on a server segment is reserved. It is not an op:
 
 ```ts
 defineServerPlugin({
   hooks?: Record<string, ServerHookFactory>   // server hook factories, keyed by hook name
+  validators?: Record<string, ValidatorFactory>   // validator factories, keyed by validator name
   // …ops
 })
 ```
 
-The runtime loads these factories once at compose time and runs them inside the `content` provider's `update` op. It never routes `hooks`: `<ns>/hooks` is a 404, and the `server` proxy has no `hooks` key. `defineHooksPlugin` fills the key from each hook's `server` loader. A server hook name follows the same collision and `overrides` rule as a client hook name. ([ADR-028](../028-server-save-hooks.md))
+The runtime loads these factories once at compose time and runs them inside the `content` provider's `update` op. It never routes `hooks`: `<ns>/hooks` is a 404, and the `server` proxy has no `hooks` key. `defineHooksPlugin` fills the key from each hook's `server` loader. A server hook name follows the same collision and `overrides` rule as a client hook name. `validators` follows the same rules. The runtime loads the factories once at compose time and runs them inside the `content` provider's `update` op, before the server hooks. `<ns>/validators` is a 404. ([ADR-028](../028-server-save-hooks.md))
 
 ### The `content` provider's `update` op
 
-Core wraps the `content` provider's server `update` op with the server hooks and gates it on `content:save`. The provider's own `update` takes only its input. It reads the request through `requestContext()` from `tinacms/server`:
+Core wraps the `content` provider's server `update` op with the validators and the server hooks, and gates it on `content:save`. The provider's own `update` takes only its input. It reads the request through `requestContext()` from `tinacms/server`:
 
 ```ts
 update(input: ContentSaveInput): Promise<DocumentEntry>
@@ -216,7 +217,7 @@ The handler internally:
 3. Wraps each operation in the auth + permission transport.
 4. Routes incoming requests by `<plugin-or-capability>/<op>` to the right handler.
 
-The handler config takes the config's `schema` too. It is optional until a plugin registers a server hook. After that, a handler without it fails to compose. ([ADR-028](../028-server-save-hooks.md))
+The handler config takes the config's `schema` too. It is optional until a plugin registers a server hook or a custom validator. After that, a handler without it fails to compose. ([ADR-028](../028-server-save-hooks.md))
 
 ## What plugin code may not do
 

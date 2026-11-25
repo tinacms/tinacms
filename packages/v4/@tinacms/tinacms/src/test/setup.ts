@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { configure } from '@testing-library/dom';
 import { toast } from '@tinacms/ui/components/toast';
-import { afterEach, beforeEach } from 'vitest';
+import { afterAll, afterEach, beforeEach } from 'vitest';
 import { resolveClientSegments } from '../core/plugin';
 import { IDLE_SAVE_ALL, useFormStore } from '../form/form-store';
 import { corePlugins } from '../plugins/fields';
@@ -58,4 +58,20 @@ afterEach(async () => {
     '../admin/document-form'
   );
   flushPendingToastDismissals();
+});
+
+// Sonner removes a closed toast 200 ms later, with a timer it never clears. A test
+// file that ends inside that window lets the timer fire after its environment is
+// gone, and vitest exits 1 on `window is not defined`.
+const TOAST_REMOVAL_MS = 250;
+
+let toastShown = false;
+new MutationObserver(() => {
+  if (document.querySelector('[data-sonner-toast]')) toastShown = true;
+}).observe(document.body, { childList: true, subtree: true });
+
+afterAll(async () => {
+  if (toastShown) {
+    await new Promise((resolve) => setTimeout(resolve, TOAST_REMOVAL_MS));
+  }
 });

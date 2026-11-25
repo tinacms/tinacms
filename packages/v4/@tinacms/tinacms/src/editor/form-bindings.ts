@@ -7,6 +7,10 @@ export interface FormBindings {
   validate: () => Promise<boolean>;
   getValues: () => TinaDocument;
   setValue: (address: FieldAddress, value: unknown) => void;
+  /** Shows the Backend's messages on their fields. A later validation of the address clears them. */
+  setServerErrors: (errors: Record<string, string[]>) => void;
+  /** Lists the failing fields in the Errors pane. False when none fail. */
+  blockOnErrors: () => boolean;
   reseedFields: () => void;
   resetReveal: () => void;
 }

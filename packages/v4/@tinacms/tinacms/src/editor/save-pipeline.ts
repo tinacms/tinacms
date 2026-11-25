@@ -6,7 +6,7 @@ import { runAfterSave, runBeforeSave } from '../core/form/hooks';
 import type { FormHooks } from '../core/form/hooks';
 import { digestDocument, ingestDocument } from '../core/form/ingest';
 import { ContentError } from '../core/content/contract';
-import type { CollectionSchema } from '../core/schema/types';
+import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import {
   type FieldErrors,
   type FormId,
@@ -15,9 +15,10 @@ import {
   toFormValues,
   useFormStore,
 } from '../form/form-store';
-import type { SaveHandler } from './context';
+import type { SaveHandler, SavedDocument } from './context';
 import type { FormViewStore } from './form-view-state';
 import { type FormBindings } from './form-bindings';
+import { forgetServerErrors, holdServerErrors } from './server-errors';
 import { validateDocument } from './resolver';
 
 // Save refused because the document has validation errors. The form stays
@@ -99,6 +100,7 @@ export async function checkForm(
   view: FormViewStore,
   trigger: () => Promise<boolean>
 ): Promise<boolean> {
+  forgetServerErrors(formId);
   view.getState().attemptSave();
   const valid = await trigger();
   const store = useFormStore.getState();
@@ -162,6 +164,48 @@ const validateWithoutForm = (target: SaveTarget): void => {
   throw new FormValidationError();
 };
 
+// A refusal with field errors that the form can show and list.
+export const isServerFieldRefusal = (cause: unknown): cause is ContentError => {
+  if (cause instanceof ContentError) {
+    return (
+      cause.code === 'validation' &&
+      cause.fieldErrors !== undefined &&
+      Object.keys(cause.fieldErrors).length > 0
+    );
+  }
+  return false;
+};
+
+// Shows the refusal like the form's own errors: on the open form, or in the store for
+// the form that opens later. The values stay as the editor typed them.
+const showServerFieldErrors = (
+  { formId }: SaveTarget,
+  mounted: FormBindings | undefined,
+  cause: unknown,
+  sent: TinaDocument
+): void => {
+  if (!isServerFieldRefusal(cause) || !cause.fieldErrors) return;
+  const flat: Record<string, string[]> = {};
+  for (const [address, messages] of Object.entries(cause.fieldErrors)) {
+    if (messages) flat[address] = messages;
+  }
+  const open = useFormStore.getState().forms[formId];
+  const shown = holdServerErrors(
+    formId,
+    flat,
+    sent,
+    mounted ? mounted.getValues() : toDocument(open?.values ?? {})
+  );
+  if (Object.keys(shown).length === 0) return;
+  if (mounted) {
+    mounted.setServerErrors(shown);
+    return;
+  }
+  const store = useFormStore.getState();
+  store.setFieldErrors(formId, mirrorErrors(shown));
+  store.setRevealOnOpen(formId);
+};
+
 /**
  * The one save flow: validate, digest, `beforeSave`, write, adopt the saved
  * values, `afterSave`. `bindings` is read at each step that needs the form,
@@ -176,6 +220,7 @@ export function saveDocument(
   const stage = (next: SaveStage) => onStage?.(next);
   return recordSavePhase(formId, async () => {
     stage('validate');
+    forgetServerErrors(formId);
     const mounted = bindings();
     if (mounted) {
       if (!(await mounted.validate())) throw new FormValidationError();
@@ -188,6 +233,7 @@ export function saveDocument(
       ? current.getValues()
       : toDocument(open?.values ?? {});
     const submitted = structuredClone(toFormValues(values));
+    const sent = structuredClone(values);
     const context = { documentPath: path, registry };
     const hookScope = { formId, path, collection };
     stage('beforeSave');
@@ -197,7 +243,13 @@ export function saveDocument(
       hookScope
     );
     stage('write');
-    const saved = await write?.(digested);
+    let saved: void | SavedDocument;
+    try {
+      saved = await write?.(digested);
+    } catch (cause) {
+      showServerFieldErrors(target, bindings(), cause, sent);
+      throw cause;
+    }
     const savedDocument = saved ? saved.document : digested;
     const written = adoptSavedValues(
       formId,

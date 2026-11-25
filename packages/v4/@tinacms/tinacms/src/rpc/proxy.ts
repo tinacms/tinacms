@@ -3,14 +3,19 @@
 // which the compiler erases, so no server code and no secret reaches the browser. This
 // file runs in the browser, and it must not import from ../server or from ./handler.
 
+import {
+  type ContentFieldErrors,
+  parseFieldErrors,
+} from '../core/content/contract';
+
 export const DEFAULT_RPC_URL = '/api/tina';
 
-// `hooks`, `resolveBranch` and `searchIndex` are reserved keys of a segment, which never route.
+// `hooks`, `validators`, `resolveBranch` and `searchIndex` are reserved keys of a segment, which never route.
 export type RpcProxy<TSegments> = {
   [Namespace in keyof TSegments]: {
     [Op in Exclude<
       keyof TSegments[Namespace],
-      'hooks' | 'resolveBranch' | 'searchIndex'
+      'hooks' | 'validators' | 'resolveBranch' | 'searchIndex'
     >]: TSegments[Namespace][Op] extends (
       ...args: infer TArgs
     ) => Promise<infer TResult>
@@ -23,7 +28,8 @@ export class RpcError extends Error {
   constructor(
     readonly status: number,
     readonly code: string,
-    message: string
+    message: string,
+    readonly fieldErrors?: ContentFieldErrors
   ) {
     super(message);
     this.name = 'RpcError';
@@ -135,11 +141,15 @@ const unwrapRpcResponse = async (
     });
   }
   const payload = await response.json().catch(() => null);
-  const error = (payload as { error?: { code?: string; message?: string } })
-    ?.error;
+  const error = (
+    payload as {
+      error?: { code?: string; message?: string; fieldErrors?: unknown };
+    }
+  )?.error;
   throw new RpcError(
     response.status,
     error?.code ?? 'rpc-failed',
-    error?.message ?? `RPC ${namespace}/${opName} failed (${response.status}).`
+    error?.message ?? `RPC ${namespace}/${opName} failed (${response.status}).`,
+    parseFieldErrors(error?.fieldErrors)
   );
 };
