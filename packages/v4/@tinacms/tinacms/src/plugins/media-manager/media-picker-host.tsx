@@ -48,6 +48,8 @@ interface MediaPickerHostProps {
   primary?: boolean;
   /** The admin sets it while the picker's place is taken, so an open picker closes. */
   suspended?: boolean;
+  /** Each change closes an open picker once. A picker opened afterwards stays open. */
+  closeSignal?: number;
   /**
    * The Media pane is open. Opening it closes an open picker; a picker asked for while it is
    * open closes the pane through `onClosePane` and shows.
@@ -64,6 +66,7 @@ interface MediaPickerHostProps {
 export function MediaPickerHost({
   primary = false,
   suspended = false,
+  closeSignal = 0,
   paneOpen = false,
   onClosePane,
 }: MediaPickerHostProps) {
@@ -74,6 +77,7 @@ export function MediaPickerHost({
       view={scope.view}
       primary={primary}
       suspended={suspended}
+      closeSignal={closeSignal}
       paneOpen={paneOpen}
       onClosePane={onClosePane}
     />
@@ -84,6 +88,7 @@ function ScopedHost({
   view,
   primary,
   suspended,
+  closeSignal,
   paneOpen,
   onClosePane,
 }: {
@@ -101,6 +106,10 @@ function ScopedHost({
   useEffect(() => {
     if (suspended && open) view.getState().closePicker();
   }, [view, suspended, open]);
+
+  useEffect(() => {
+    if (closeSignal > 0) view.getState().closePicker();
+  }, [view, closeSignal]);
 
   useEffect(() => {
     if (paneOpen && open) view.getState().closePicker();

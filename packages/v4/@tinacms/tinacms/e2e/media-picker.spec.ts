@@ -248,6 +248,30 @@ test.describe('tablet with a wide enough preview', () => {
     expect(covered.x).toBeGreaterThanOrEqual(rect.x);
   });
 
+  test('Maximise preview by keyboard closes the picker and focuses Restore preview', async ({
+    page,
+  }) => {
+    await page.goto(HOME);
+    const picker = await openPicker(page);
+    await page.getByRole('button', { name: 'Maximise preview' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(picker).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: 'Restore preview' })
+    ).toBeFocused();
+  });
+
+  test('Maximise form by keyboard closes the picker', async ({ page }) => {
+    await page.goto(HOME);
+    const picker = await openPicker(page);
+    await page.getByRole('button', { name: 'Maximise form' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(picker).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: 'Restore form' })
+    ).toBeVisible();
+  });
+
   test('narrowing the window swaps the maximised picker for the cover with no Restore, and widening restores the popover', async ({
     page,
   }) => {

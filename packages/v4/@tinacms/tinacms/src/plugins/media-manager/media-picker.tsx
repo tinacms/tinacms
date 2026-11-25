@@ -264,7 +264,7 @@ export function MediaPickerPanel({
   const parentCheckWanted = inMissingFolder && folder !== '' && listedEmpty;
   // A provider may list a missing folder as empty, so an empty folder is gone only when its parent lacks it.
   const parentCheck = useQuery({
-    queryKey: [...MEDIA_LIST_KEY, branch, 'parent-has', folder],
+    queryKey: [...MEDIA_LIST_KEY, branch, 'parent-has', folder, served],
     queryFn: async () => {
       let cursor: string | undefined;
       do {
@@ -282,11 +282,14 @@ export function MediaPickerPanel({
     },
     enabled: parentCheckWanted,
     staleTime: 0,
+    gcTime: 0,
+    retry: (count, error) => !isNotFound(error) && count < 1,
   });
-  // A cached answer from before the picker opened may be stale, so only a fetched one decides.
-  const checkingParent = parentCheckWanted && !parentCheck.isFetchedAfterMount;
+  // The key holds the serve and the entry drops when the picker closes, so an answer was fetched for this serve.
+  const parentAnswered = parentCheck.isSuccess || parentCheck.isError;
+  const checkingParent = parentCheckWanted && !parentAnswered;
   const parentGone = (() => {
-    if (!parentCheckWanted || !parentCheck.isFetchedAfterMount) return false;
+    if (!parentCheckWanted || !parentAnswered) return false;
     if (parentCheck.isError) return isNotFound(parentCheck.error);
     return parentCheck.data === false;
   })();

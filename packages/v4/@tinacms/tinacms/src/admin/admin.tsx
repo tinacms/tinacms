@@ -897,6 +897,7 @@ function AdminShell({
       : mainRoute;
   const [formFocusRequest, setFormFocusRequest] = useState(0);
   const [previewAsked, setPreviewAsked] = useState(false);
+  const [formMaximiseSerial, setFormMaximiseSerial] = useState(0);
   const toggleMaximise = useCallback(
     (from: DocumentView) => {
       // Entering from the preview keeps focus on the toolbar's button, as the form header is
@@ -918,7 +919,10 @@ function AdminShell({
       }
       setView(from);
       setTabletMaximised(true);
-      if (from === 'form') setFormFocusRequest((n) => n + 1);
+      if (from === 'form') {
+        setFormFocusRequest((n) => n + 1);
+        setFormMaximiseSerial((n) => n + 1);
+      }
     },
     [tabletMaximised, mainRoute, navigate]
   );
@@ -1249,7 +1253,13 @@ function AdminShell({
                     <DocumentErrorPane />
                     <MediaPickerHost
                       primary
-                      suspended={previewExpanded}
+                      suspended={
+                        previewExpanded ||
+                        (tier === 'tablet' &&
+                          tabletMaximised &&
+                          view === 'preview')
+                      }
+                      closeSignal={formMaximiseSerial}
                       paneOpen={isMediaRoute}
                       onClosePane={closeMedia}
                     />

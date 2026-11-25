@@ -1034,6 +1034,49 @@ describe('a missing image in a folder that is still there', () => {
     expect(screen.queryByRole('navigation')).toBeNull();
   });
 
+  it('does not retry a parent check that says not-found', async () => {
+    emptyPosts();
+    const rootLists = vi.fn();
+    await openMissing(
+      createProvider({
+        list: vi.fn(async (folder: string): Promise<MediaPage> => {
+          if (folder === '') {
+            rootLists();
+            if (rootLists.mock.calls.length === 1) {
+              throw new MediaError('not-found');
+            }
+          }
+          return { items: childrenOf(folder) };
+        }),
+      })
+    );
+    expect(await tile('logo.png')).toBeVisible();
+    expect(rootLists).toHaveBeenCalledTimes(2);
+  });
+
+  it('checks the parent again when a second missing image re-seeds the open picker', async () => {
+    emptyPosts();
+    const user = userEvent.setup();
+    renderPicker(createProvider(), {
+      asks: {
+        one: single({
+          target: 'one',
+          replacing: { path: 'posts/gone.jpg', missing: true },
+        }),
+        two: single({
+          target: 'two',
+          replacing: { path: 'posts/other.jpg', missing: true },
+        }),
+      },
+    });
+    await openPicker(user, 'one');
+    expect(await screen.findByText(emptyWords('posts'))).toBeVisible();
+    files = files.filter((item) => item.path !== 'posts');
+    await user.click(screen.getByRole('button', { name: 'Open two' }));
+    expect(await tile('logo.png')).toBeVisible();
+    expect(screen.queryByRole('navigation')).toBeNull();
+  });
+
   it('trusts a fresh answer over a cached one when the folder was recreated', async () => {
     emptyPosts();
     files = files.filter((item) => item.path !== 'posts');
