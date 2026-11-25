@@ -8,6 +8,9 @@ const FAILURE_WORDS: Record<SaveFailureReason, string> = {
 const savedWords = (saved: number, warnings: boolean | undefined) =>
   `Saved ${saved} ${saved === 1 ? 'document' : 'documents'}${warnings ? ' with warnings' : ''}`;
 
+const shortSavedWords = (saved: number, warnings: boolean | undefined) =>
+  warnings ? 'Saved, with warnings' : `Saved ${saved}`;
+
 /** The Status bar's words for a save summary. Local files say so when nothing has saved. */
 export function statusWords(summary: SaveSummary, local: boolean): string {
   switch (summary.state) {
@@ -34,5 +37,34 @@ export function statusWords(summary: SaveSummary, local: boolean): string {
         return `Save failed: ${summary.runFailed} of ${summary.runTried} documents`;
       }
       return summary.reason ? FAILURE_WORDS[summary.reason] : 'Save failed';
+  }
+}
+
+/** The phone's Status bar words: the same branches as `statusWords`, without the reason or the document name. */
+export function shortStatusWords(summary: SaveSummary, local: boolean): string {
+  switch (summary.state) {
+    case 'idle':
+      if (summary.runSaved) {
+        return shortSavedWords(summary.runSaved, summary.runWarnings);
+      }
+      if (summary.kept) return 'Kept in this browser';
+      return local ? 'No saves yet' : 'No changes';
+    case 'unsaved':
+      return 'Unsaved';
+    case 'saving':
+      if (summary.runIndex !== undefined) {
+        return `Saving ${summary.runIndex} of ${summary.runTotal}…`;
+      }
+      return 'Saving…';
+    case 'saved':
+      if (summary.runSaved) {
+        return shortSavedWords(summary.runSaved, summary.runWarnings);
+      }
+      return 'Saved';
+    case 'failed':
+      if (summary.runFailed !== undefined) {
+        return `${summary.runFailed} of ${summary.runTried} failed`;
+      }
+      return 'Save failed';
   }
 }

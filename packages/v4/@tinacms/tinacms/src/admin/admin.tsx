@@ -13,6 +13,7 @@ import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { Toaster } from '@tinacms/ui/components/sonner';
 import { cn } from '@tinacms/ui/lib/utils';
 import { useKeyboardOpen } from '@tinacms/ui/hooks/use-keyboard-open';
+import { useNoFieldZoom } from './use-no-field-zoom';
 import { toast } from '@tinacms/ui/components/toast';
 import {
   type CSSProperties,
@@ -21,6 +22,7 @@ import {
   use,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -60,10 +62,20 @@ import { copyPath } from './copy-path';
 import { useKeptEditsNotice } from './use-kept-edits-notice';
 import { useAdminRoute } from './use-admin-route';
 import type { PreviewConnectionOptions } from '../editor/preview-connection';
-import { useFormColumnWidth } from './use-form-column-width';
+import {
+  DESKTOP_FORM_COLUMN,
+  NAVIGATOR_COLUMN,
+  TABLET_FORM_COLUMN,
+  useColumnWidth,
+} from './use-form-column-width';
+import { type DocumentView, OneViewContext } from './one-view';
+import { Button } from '@tinacms/ui/components/button';
 import { NoPreview, PreviewSlot } from './preview-slot';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
+
+// About ten seconds of frames to wait for the document entry of a slow collection.
+const OVERLAY_FOCUS_FRAMES = 600;
 
 const SHELL_WIDTH = { '--sidebar-width': '15rem' } as CSSProperties;
 
@@ -166,23 +178,82 @@ function FormColumnSkeleton() {
   );
 }
 
-function FormColumnFrame({ children }: { children: ReactNode }) {
-  const { width, isResizing, handleProps } = useFormColumnWidth();
+function FormColumnFrame({
+  children,
+  hidden = false,
+}: {
+  children: ReactNode;
+  hidden?: boolean;
+}) {
+  const tier = useTier();
+  const oneView = use(OneViewContext).active;
+  const { width, isResizing, handleProps } = useColumnWidth(
+    tier === 'desktop' ? DESKTOP_FORM_COLUMN : TABLET_FORM_COLUMN
+  );
+  // One view and a hidden column keep the form mounted: the frame stays in the page, its
+  // box does not draw.
   return (
     <>
       <aside
         aria-label='Document form'
-        className='flex min-w-0 shrink-0 flex-col overflow-hidden border-r border-border'
-        style={{ width }}
+        data-form-column=''
+        className={cn(
+          'flex min-w-0 shrink-0 flex-col overflow-hidden border-r border-border',
+          hidden ? 'hidden' : oneView ? 'contents' : null
+        )}
+        style={oneView || hidden ? undefined : { width }}
       >
         {children}
       </aside>
 
       <div
-        className='-ml-1 z-10 w-2 shrink-0 cursor-col-resize touch-none select-none focus-visible:outline-none'
+        className={cn(
+          'relative -ml-1 z-10 w-2 shrink-0 cursor-col-resize touch-none select-none focus-visible:outline-none touch:after:absolute touch:after:inset-y-0 touch:after:-inset-x-4 touch:after:content-[""]',
+          (hidden || oneView) && 'hidden'
+        )}
         {...handleProps}
       />
 
+      {isResizing ? (
+        <div className='fixed inset-0 z-50 cursor-col-resize' />
+      ) : null}
+    </>
+  );
+}
+
+/** The Collections column beside the preview: fixed at desktop, dragged on a tablet, full width on a phone. */
+function NavigatorFrame({
+  children,
+  hidden = false,
+}: {
+  children: ReactNode;
+  hidden?: boolean;
+}) {
+  const tier = useTier();
+  const { width, isResizing, handleProps } = useColumnWidth({
+    ...NAVIGATOR_COLUMN,
+  });
+  return (
+    <>
+      <div
+        className={cn(
+          'flex min-w-0 shrink-0',
+          tier === 'desktop' ? 'w-110' : null,
+          tier === 'phone' ? 'flex-1' : null,
+          hidden && 'below-desktop:hidden'
+        )}
+        style={tier === 'tablet' ? { width } : undefined}
+      >
+        {children}
+      </div>
+      <div
+        {...handleProps}
+        aria-label='Resize the Collections column'
+        className={cn(
+          'relative -ml-1 z-10 w-2 shrink-0 cursor-col-resize touch-none select-none focus-visible:outline-none touch:after:absolute touch:after:inset-y-0 touch:after:-inset-x-4 touch:after:content-[""]',
+          tier !== 'tablet' && 'hidden'
+        )}
+      />
       {isResizing ? (
         <div className='fixed inset-0 z-50 cursor-col-resize' />
       ) : null}
@@ -286,6 +357,7 @@ function ScopedFormHead({
   openPath: string | undefined;
 }) {
   const levels = useLevelTrail(scope);
+  const oneView = use(OneViewContext);
   const trail =
     levels.heading === null
       ? base
@@ -300,8 +372,14 @@ function ScopedFormHead({
         ];
   return (
     <PanelHeader
+      data-form-part='head'
       trail={trail}
       heading={levels.heading ?? title}
+      maximised={oneView.active}
+      onMaximise={
+        oneView.canMaximise ? () => oneView.toggleMaximise('form') : undefined
+      }
+      maximiseLabels={['Maximise form', 'Restore form']}
       menuLabel='Form actions'
       menu={
         openPath === undefined ? undefined : (
@@ -334,7 +412,9 @@ function FormColumn({
   collections,
   step,
   navigate,
+  hidden = false,
 }: {
+  hidden?: boolean;
   openPath?: string;
   collection?: CollectionSchema;
   collections: CollectionSchema[];
@@ -352,8 +432,9 @@ function FormColumn({
     startTransition(() => setMountedSeedKey(seedKey));
   }, [seedKey, mountedSeedKey]);
 
+  const oneView = use(OneViewContext).active;
   return (
-    <FormColumnFrame>
+    <FormColumnFrame hidden={hidden}>
       {collection ? (
         <FormHead
           openPath={openPath}
@@ -365,7 +446,7 @@ function FormColumn({
       ) : (
         <PanelHeader heading='Document' />
       )}
-      <div className='flex min-h-0 flex-1 flex-col'>
+      <div className={oneView ? 'contents' : 'flex min-h-0 flex-1 flex-col'}>
         {openPath === undefined ? (
           <p className='p-4 text-sm text-muted-foreground'>
             Select a document to edit
@@ -403,6 +484,26 @@ function NothingToEditColumn({
   );
 }
 
+function NothingToEditBar({
+  onOpenCollections,
+}: {
+  onOpenCollections: () => void;
+}) {
+  return (
+    <div
+      data-slot='nothing-to-edit-bar'
+      className='flex h-14 flex-none items-center gap-2 border-t border-border bg-card px-3'
+    >
+      <span className='min-w-0 flex-1 truncate text-sm'>
+        Nothing to edit here
+      </span>
+      <Button variant='outline' size='sm' onClick={onOpenCollections}>
+        Open Collections
+      </Button>
+    </div>
+  );
+}
+
 export interface TinaAdminProps {
   config: ResolvedConfig;
   preview?: ReactNode;
@@ -410,19 +511,37 @@ export interface TinaAdminProps {
 }
 
 export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
+  const tier = useTier();
+  useNoFieldZoom();
+  // Portalled content (dialogs, menus, sheets) sits outside the wrapper, so <html> carries the
+  // breakpoint too and the `phone:` variants reach it.
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    const before = root.dataset.breakpoint;
+    root.dataset.breakpoint = tier;
+    return () => {
+      if (before === undefined) delete root.dataset.breakpoint;
+      else root.dataset.breakpoint = before;
+    };
+  }, [tier]);
   return (
-    <AdminErrorBoundary>
-      <TinaProvider config={config} queryClient={queryClient}>
-        <TooltipProvider>
-          <HashRouter>
-            <AuthGate>
-              <AdminShell preview={preview} projectName={config.projectName} />
-            </AuthGate>
-          </HashRouter>
-          <ShellToaster />
-        </TooltipProvider>
-      </TinaProvider>
-    </AdminErrorBoundary>
+    <div data-breakpoint={tier} className='contents'>
+      <AdminErrorBoundary>
+        <TinaProvider config={config} queryClient={queryClient}>
+          <TooltipProvider>
+            <HashRouter>
+              <AuthGate>
+                <AdminShell
+                  preview={preview}
+                  projectName={config.projectName}
+                />
+              </AuthGate>
+            </HashRouter>
+            <ShellToaster />
+          </TooltipProvider>
+        </TinaProvider>
+      </AdminErrorBoundary>
+    </div>
   );
 }
 
@@ -514,7 +633,9 @@ function MissingPanel({
   children: ReactNode;
 }) {
   return (
-    <SidebarInset className={hideBelowLg ? 'min-w-0 max-lg:hidden' : 'min-w-0'}>
+    <SidebarInset
+      className={hideBelowLg ? 'min-w-0 below-desktop:hidden' : 'min-w-0'}
+    >
       <PanelHeader heading={title} closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto'>
         <Placeholder>{children}</Placeholder>
@@ -537,6 +658,9 @@ function AdminShell({
   const globalNav = useGlobalNav();
   const { route, navigate } = useAdminRoute();
   const branch = useCurrentBranch();
+  const tier = useTier();
+  const phone = tier === 'phone';
+  const [view, setView] = useState<DocumentView>('form');
 
   // A reference step belongs to the document it opened. Any other navigation drops it.
   const [stepState, setStepState] = useState<{
@@ -552,6 +676,7 @@ function AdminShell({
       } else if (stepState?.target === target.path) {
         setStepState(null);
       }
+      setView('form');
       navigate({
         view: 'document',
         collection: target.collection,
@@ -572,7 +697,8 @@ function AdminShell({
   }, [route, isMediaRoute]);
   const mainRoute = isMediaRoute ? lastMain : route;
 
-  const [maximised, setMaximised] = useState(false);
+  const [desktopMaximised, setMaximised] = useState(false);
+  const maximised = desktopMaximised || tier !== 'desktop';
   const treeFolders = useTreeFolders();
   useEffect(() => {
     if (!isMediaRoute) setMaximised(false);
@@ -674,6 +800,11 @@ function AdminShell({
     (mainRoute.view === 'folder' && !showTable) ||
     (mainRoute.view === 'document' && collection === undefined);
   const showNavigator = !isMediaRoute && mainShowsNavigator;
+  const overlay =
+    mainRoute.view === 'document' &&
+    mainRoute.navigator === true &&
+    collection !== undefined;
+  const showOverlay = overlay && !isMediaRoute;
   const documentFailed = openPath !== undefined && openDocumentError !== null;
   const showsPreviewRoute =
     !activeScreen &&
@@ -685,7 +816,9 @@ function AdminShell({
     !documentFailed;
   // Beside the navigator the Home screen takes the pane. The frame stays mounted, hidden.
   const previewVisible =
-    showsPreviewRoute && !(mainShowsNavigator && homeScreen);
+    showsPreviewRoute &&
+    !(mainShowsNavigator && homeScreen) &&
+    !(showOverlay && phone);
   const showsPreview = previewVisible && !(isMediaRoute && maximised);
   const [previewMounted, setPreviewMounted] = useState(false);
   useEffect(() => {
@@ -699,9 +832,8 @@ function AdminShell({
   const setPreviewExpanded = useCallback((on: boolean, focus = true) => {
     setExpansion((current) => (current.on === on ? current : { on, focus }));
   }, []);
-  const tier = useTier();
   useEffect(() => {
-    if (!previewVisible || isMediaRoute || tier === 'phone') {
+    if (!previewVisible || isMediaRoute || tier !== 'desktop') {
       setPreviewExpanded(false, false);
     }
   }, [previewVisible, isMediaRoute, tier, setPreviewExpanded]);
@@ -723,6 +855,206 @@ function AdminShell({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [previewExpanded, setPreviewExpanded]);
 
+  // A tablet enters one view with Maximise; a phone is always in one view. Crossing from a
+  // phone to a tablet keeps one view. Desktop shows the split.
+  const [tabletMaximised, setTabletMaximised] = useState(false);
+  const previousTier = useRef(tier);
+  useEffect(() => {
+    const before = previousTier.current;
+    previousTier.current = tier;
+    if (tier === 'desktop') setTabletMaximised(false);
+    else if (tier === 'tablet' && before === 'phone' && !showOverlay) {
+      setTabletMaximised(true);
+    }
+  }, [tier]);
+  const documentOpen = mainRoute.view === 'document' && previewVisible;
+  // The Collections column beside the preview is the split, never one view.
+  const oneViewActive =
+    documentOpen &&
+    (phone || (tier === 'tablet' && tabletMaximised && !showOverlay));
+  useEffect(() => {
+    if (!previewVisible || isMediaRoute) setTabletMaximised(false);
+  }, [previewVisible, isMediaRoute]);
+  const overlayWasShown = useRef(false);
+  useEffect(() => {
+    if (showOverlay && !overlayWasShown.current && tier === 'tablet') {
+      setTabletMaximised(false);
+    }
+    overlayWasShown.current = showOverlay;
+  }, [showOverlay, tier]);
+  useEffect(() => {
+    setView('form');
+  }, [openPath]);
+
+  const documentRoute = (): AdminRoute =>
+    mainRoute.view === 'document'
+      ? {
+          view: 'document',
+          collection: mainRoute.collection,
+          path: mainRoute.path,
+        }
+      : mainRoute;
+  const [formFocusRequest, setFormFocusRequest] = useState(0);
+  const [previewAsked, setPreviewAsked] = useState(false);
+  const toggleMaximise = useCallback(
+    (from: DocumentView) => {
+      // Entering from the preview keeps focus on the toolbar's button, as the form header is
+      // hidden in the preview view. Restoring puts focus on the form header's button.
+      setPreviewAsked(from === 'preview' && !tabletMaximised);
+      if (tabletMaximised) {
+        setTabletMaximised(false);
+        setFormFocusRequest((n) => n + 1);
+        return;
+      }
+      if (from === 'preview' && mainRoute.view === 'document') {
+        if (mainRoute.navigator) {
+          navigate({
+            view: 'document',
+            collection: mainRoute.collection,
+            path: mainRoute.path,
+          });
+        }
+      }
+      setView(from);
+      setTabletMaximised(true);
+      if (from === 'form') setFormFocusRequest((n) => n + 1);
+    },
+    [tabletMaximised, mainRoute, navigate]
+  );
+  useEffect(() => {
+    if (formFocusRequest === 0) return;
+    document
+      .querySelector<HTMLElement>(
+        '[data-form-part=head] button[aria-label$=" form"]'
+      )
+      ?.focus();
+  }, [formFocusRequest]);
+  useEffect(() => {
+    if (!(tier === 'tablet' && tabletMaximised)) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      if (
+        event.target instanceof Element &&
+        event.target.closest(
+          '[role=menu],[role=dialog],[role=alertdialog],[data-slot=save-progress]'
+        )
+      ) {
+        return;
+      }
+      setTabletMaximised(false);
+      setFormFocusRequest((n) => n + 1);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [tier, tabletMaximised]);
+  const oneView = {
+    active: oneViewActive,
+    view,
+    setView,
+    canMaximise: tier === 'tablet' && documentOpen,
+    toggleMaximise,
+  };
+
+  // The Collections column over a document keeps its own moves local, so the form stays mounted.
+  const [navigatorRoute, setNavigatorRoute] = useState<AdminRoute | null>(null);
+  useEffect(() => {
+    if (!overlay) setNavigatorRoute(null);
+  }, [overlay]);
+  const overlayNavigate = useCallback(
+    (target: AdminRoute) => {
+      const local =
+        target.view === 'collection' ||
+        target.view === 'folder' ||
+        (target.view === 'collections' && !target.maximised);
+      if (local) setNavigatorRoute(target);
+      else navigate(target);
+    },
+    [navigate]
+  );
+  const closeOverlay = () => {
+    setView('form');
+    navigate(documentRoute());
+  };
+  // Focus goes to the navigator on open and back to the field that had it on close.
+  const formFocus = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const onFocusIn = (event: FocusEvent) => {
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.closest('[data-form-column]')
+      ) {
+        formFocus.current = event.target;
+      }
+    };
+    document.addEventListener('focusin', onFocusIn);
+    return () => document.removeEventListener('focusin', onFocusIn);
+  }, []);
+  const wasOverlay = useRef(false);
+  useEffect(() => {
+    if (showOverlay) {
+      wasOverlay.current = true;
+      // The side nav sheet hands focus back to its menu button as it leaves, and the
+      // document entry draws once its collection loads: the first control takes focus
+      // at once and the entry takes it when it draws, unless the user moved it first.
+      let frame = 0;
+      let waited = 0;
+      let placed: HTMLElement | undefined;
+      let userMoved = false;
+      // Any press or key after the overlay opens outside the leaving sheet means the user took focus.
+      const onInput = (event: Event) => {
+        if (
+          !(event.target instanceof Element) ||
+          !event.target.closest('[data-slot=sidebar]')
+        ) {
+          userMoved = true;
+        }
+      };
+      document.addEventListener('pointerdown', onInput, true);
+      document.addEventListener('keydown', onInput, true);
+      const place = () => {
+        waited += 1;
+        if (document.querySelector('[data-slot=sidebar][data-mobile=true]')) {
+          frame = requestAnimationFrame(place);
+          return;
+        }
+        if (userMoved || document.activeElement instanceof HTMLIFrameElement) {
+          return;
+        }
+        const pane = document.querySelector('[aria-label=Navigator]');
+        const current = pane?.querySelector<HTMLElement>('[aria-current=page]');
+        if (current) {
+          current.focus();
+          return;
+        }
+        if (!placed) {
+          placed = pane?.querySelector<HTMLElement>('button') ?? undefined;
+          placed?.focus();
+        }
+        if (waited <= OVERLAY_FOCUS_FRAMES) {
+          frame = requestAnimationFrame(place);
+        }
+      };
+      frame = requestAnimationFrame(place);
+      return () => {
+        cancelAnimationFrame(frame);
+        document.removeEventListener('pointerdown', onInput, true);
+        document.removeEventListener('keydown', onInput, true);
+      };
+    }
+    if (!wasOverlay.current || overlay) return;
+    wasOverlay.current = false;
+    const frame = requestAnimationFrame(() => {
+      const back = formFocus.current;
+      (back?.isConnected
+        ? back
+        : document.querySelector<HTMLElement>(
+            '[data-form-part=head] button, [data-form-part=fields] input'
+          )
+      )?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [showOverlay, overlay]);
+
   const connection: PreviewConnectionOptions = {
     open:
       collection && openPath
@@ -733,7 +1065,10 @@ function AdminShell({
     onPage: mainRoute.view === 'page',
     onOpen: openDocument,
     onNothingToEdit: () => navigate({ view: 'page' }),
-    onActivate: () => setPreviewExpanded(false, false),
+    onActivate: () => {
+      setPreviewExpanded(false, false);
+      setView('form');
+    },
   };
 
   const maximiseNavigator = () =>
@@ -747,165 +1082,205 @@ function AdminShell({
       ? navigate(folderRouteOf(collection, documentPath))
       : goToCollections();
 
+  const navigatorOwnsScreen = showNavigator && phone && !isStaleCollectionRoute;
+  const preview_phonePage = phone && mainRoute.view === 'page';
+  const expandedOnPreview =
+    tier === 'tablet' ? tabletMaximised : previewExpanded;
+
   return (
-    <SidebarProvider
-      style={SHELL_WIDTH}
-      className='h-svh min-h-0 flex-col overflow-hidden'
-    >
-      <ShellTopBar projectName={projectName} />
-      <UploadHost primary />
-
-      <div
-        className={cn(
-          'flex min-h-0 flex-1',
-          previewExpanded && '[&>:not([data-main-region])]:hidden'
-        )}
+    <OneViewContext value={oneView}>
+      <SidebarProvider
+        style={SHELL_WIDTH}
+        className='h-svh min-h-0 flex-col overflow-hidden'
       >
-        <Sidebar
-          aria-label='Content'
-          role='navigation'
-          collapsible='icon'
-          className={BETWEEN_BARS}
-        >
-          <AdminRail
-            route={route}
-            navigate={navigate}
-            sections={globalNav}
-            hasMediaScreen={hasMediaScreen}
-          />
-        </Sidebar>
-
-        {isMediaRoute ? (
-          mediaScreen ? (
-            <MediaPaneShellContext
-              value={{
-                maximised,
-                toggleMaximise: () => setMaximised((current) => !current),
-                close: closeMedia,
-              }}
-            >
-              <MediaPaneSlot screen={mediaScreen} segments={mediaSegments} />
-            </MediaPaneShellContext>
-          ) : (
-            <MediaPanel onClose={closeMedia} />
-          )
-        ) : null}
-
-        {showNavigator ? (
-          <CollectionsNavigator
-            collections={schema.collections}
-            selectedPath={selectedPath}
-            route={route}
-            navigate={navigate}
-            onClose={goHome}
-            onMaximise={maximiseNavigator}
-            treeFolders={treeFolders}
-            hideBelowLg={isStaleCollectionRoute}
-          />
-        ) : null}
+        <ShellTopBar projectName={projectName} />
+        <UploadHost primary />
 
         <div
-          data-main-region=''
-          className={
-            isMediaRoute
-              ? maximised
-                ? 'hidden'
-                : 'contents max-lg:hidden'
-              : 'contents'
-          }
+          className={cn(
+            'flex min-h-0 flex-1',
+            previewExpanded && '[&>:not([data-main-region])]:hidden'
+          )}
         >
-          {activeScreen ? (
-            <ScreenOutlet
-              name={activeScreen.screen}
-              screen={screens.find(
-                (candidate) => candidate.name === activeScreen.screen
-              )}
-              segments={activeScreen.segments}
-              onClose={goHome}
+          <Sidebar
+            aria-label='Content'
+            role='navigation'
+            collapsible='icon'
+            className={BETWEEN_BARS}
+          >
+            <AdminRail
+              route={route}
+              navigate={navigate}
+              sections={globalNav}
+              hasMediaScreen={hasMediaScreen}
             />
-          ) : homeSegments ? (
-            <HomeOutlet screen={homeScreen} segments={homeSegments} />
-          ) : isStaleCollectionRoute ? (
-            <MissingPanel title='Collection not found' onClose={goHome}>
-              No collection named “{activeCollectionName}”.
-            </MissingPanel>
-          ) : showIndex ? (
-            <SidebarInset className='min-w-0'>
-              <CollectionsIndex />
-            </SidebarInset>
-          ) : showTable ? (
-            <SidebarInset className='min-w-0'>
-              <CollectionTable
-                key={`${branch ?? ''}/${collection.name}/${tableFolder}`}
-                collection={collection.name}
-                folder={tableFolder}
-                onRestore={(folder) =>
-                  treeFolders.reveal(collection.name, folder)
-                }
+          </Sidebar>
+
+          {isMediaRoute ? (
+            mediaScreen ? (
+              <MediaPaneShellContext
+                value={{
+                  maximised,
+                  toggleMaximise: () => setMaximised((current) => !current),
+                  close: closeMedia,
+                }}
+              >
+                <MediaPaneSlot screen={mediaScreen} segments={mediaSegments} />
+              </MediaPaneShellContext>
+            ) : (
+              <NavigatorFrame>
+                <MediaPanel onClose={closeMedia} />
+              </NavigatorFrame>
+            )
+          ) : null}
+
+          {showNavigator ? (
+            <NavigatorFrame hidden={isStaleCollectionRoute}>
+              <CollectionsNavigator
+                collections={schema.collections}
+                selectedPath={selectedPath}
+                route={route}
+                navigate={navigate}
+                onClose={goHome}
+                onMaximise={phone ? undefined : maximiseNavigator}
+                treeFolders={treeFolders}
               />
-            </SidebarInset>
-          ) : isStaleDocumentRoute ? (
-            <MissingPanel title='Document not found' onClose={goHome}>
-              No document named “{openPath}”.
-            </MissingPanel>
-          ) : openPath !== undefined && openDocumentError !== null ? (
-            <MissingPanel title='Cannot open document' onClose={goHome}>
-              <span role='alert'>
-                Cannot read “{openPath}”. {openDocumentError.message}
-              </span>
-            </MissingPanel>
-          ) : mainShowsNavigator && homeScreen ? (
-            <HomeOutlet screen={homeScreen} segments={[]} />
+            </NavigatorFrame>
           ) : null}
 
-          {showsPreviewRoute || previewMounted ? (
-            <SidebarInset
-              className={cn(
-                previewVisible ? 'relative min-w-0 flex-row' : 'hidden',
-                previewExpanded && '[&>:not([data-preview-slot])]:hidden'
-              )}
-            >
-              {mainRoute.view === 'document' ? (
-                <DocumentScope
-                  collection={collection}
-                  path={openPath}
-                  onDiscardNew={() =>
-                    openPath ? goToFolderOf(openPath) : undefined
+          {showOverlay ? (
+            <NavigatorFrame>
+              <CollectionsNavigator
+                collections={schema.collections}
+                selectedPath={openPath}
+                route={navigatorRoute ?? documentRoute()}
+                navigate={overlayNavigate}
+                onClose={closeOverlay}
+                onMaximise={phone ? undefined : maximiseNavigator}
+                treeFolders={treeFolders}
+              />
+            </NavigatorFrame>
+          ) : null}
+
+          <div
+            data-main-region=''
+            className={
+              isMediaRoute
+                ? maximised
+                  ? 'hidden'
+                  : 'contents'
+                : navigatorOwnsScreen
+                  ? 'hidden'
+                  : 'contents'
+            }
+          >
+            {activeScreen ? (
+              <ScreenOutlet
+                name={activeScreen.screen}
+                screen={screens.find(
+                  (candidate) => candidate.name === activeScreen.screen
+                )}
+                segments={activeScreen.segments}
+                onClose={goHome}
+              />
+            ) : homeSegments ? (
+              <HomeOutlet screen={homeScreen} segments={homeSegments} />
+            ) : isStaleCollectionRoute ? (
+              <MissingPanel title='Collection not found' onClose={goHome}>
+                No collection named “{activeCollectionName}”.
+              </MissingPanel>
+            ) : showIndex ? (
+              <SidebarInset className='min-w-0'>
+                <CollectionsIndex />
+              </SidebarInset>
+            ) : showTable ? (
+              <SidebarInset className='min-w-0'>
+                <CollectionTable
+                  key={`${branch ?? ''}/${collection.name}/${tableFolder}`}
+                  collection={collection.name}
+                  folder={tableFolder}
+                  onRestore={(folder) =>
+                    treeFolders.reveal(collection.name, folder)
                   }
-                >
-                  <FormColumn
-                    openPath={openPath}
-                    collection={collection}
-                    collections={schema.collections}
-                    step={activeStep}
-                    navigate={navigate}
-                  />
-                  <DocumentErrorPane />
-                  {typeof preview === 'string' ? null : (
-                    <PreviewNodeSlot preview={preview} />
-                  )}
-                </DocumentScope>
-              ) : mainRoute.view === 'page' ? (
-                <NothingToEditColumn onOpenCollections={goToCollections} />
-              ) : null}
-              {typeof preview === 'string' ? (
-                <PreviewSlot
-                  src={preview}
-                  connection={connection}
-                  expanded={previewExpanded}
-                  moveFocus={expansion.focus}
-                  onExpandedChange={setPreviewExpanded}
                 />
-              ) : mainRoute.view === 'document' ? null : (
-                <PreviewNodeSlot preview={preview} />
-              )}
-            </SidebarInset>
-          ) : null}
-        </div>
-      </div>
+              </SidebarInset>
+            ) : isStaleDocumentRoute ? (
+              <MissingPanel title='Document not found' onClose={goHome}>
+                No document named “{openPath}”.
+              </MissingPanel>
+            ) : openPath !== undefined && openDocumentError !== null ? (
+              <MissingPanel title='Cannot open document' onClose={goHome}>
+                <span role='alert'>
+                  Cannot read “{openPath}”. {openDocumentError.message}
+                </span>
+              </MissingPanel>
+            ) : mainShowsNavigator && homeScreen ? (
+              <HomeOutlet screen={homeScreen} segments={[]} />
+            ) : null}
 
-      <ShellStatusBar />
-      <ShellSaveProgress />
-    </SidebarProvider>
+            {showsPreviewRoute || previewMounted ? (
+              <SidebarInset
+                data-one-view={oneViewActive ? view : undefined}
+                className={cn(
+                  previewVisible ? 'relative min-w-0 flex-row' : 'hidden',
+                  (oneViewActive || preview_phonePage) && 'flex-col',
+                  oneViewActive &&
+                    'data-[one-view=preview]:[&_[data-form-part]]:hidden data-[one-view=form]:[&>[data-preview-slot]]:hidden',
+                  previewExpanded && '[&>:not([data-preview-slot])]:hidden'
+                )}
+              >
+                {mainRoute.view === 'document' ? (
+                  <DocumentScope
+                    collection={collection}
+                    path={openPath}
+                    onDiscardNew={() =>
+                      openPath ? goToFolderOf(openPath) : undefined
+                    }
+                  >
+                    <FormColumn
+                      hidden={showOverlay}
+                      openPath={openPath}
+                      collection={collection}
+                      collections={schema.collections}
+                      step={activeStep}
+                      navigate={navigate}
+                    />
+                    <DocumentErrorPane />
+                    {typeof preview === 'string' ? null : (
+                      <PreviewNodeSlot preview={preview} />
+                    )}
+                  </DocumentScope>
+                ) : mainRoute.view === 'page' && !phone ? (
+                  <NothingToEditColumn onOpenCollections={goToCollections} />
+                ) : null}
+                {typeof preview === 'string' ? (
+                  <PreviewSlot
+                    src={preview}
+                    connection={connection}
+                    expanded={expandedOnPreview}
+                    moveFocus={
+                      tier === 'tablet' ? previewAsked : expansion.focus
+                    }
+                    onExpandedChange={
+                      tier === 'tablet'
+                        ? () => toggleMaximise('preview')
+                        : setPreviewExpanded
+                    }
+                  />
+                ) : mainRoute.view === 'document' ? null : (
+                  <PreviewNodeSlot preview={preview} />
+                )}
+                {preview_phonePage ? (
+                  <NothingToEditBar onOpenCollections={goToCollections} />
+                ) : null}
+              </SidebarInset>
+            ) : null}
+          </div>
+        </div>
+
+        <ShellStatusBar />
+        <ShellSaveProgress />
+      </SidebarProvider>
+    </OneViewContext>
   );
 }

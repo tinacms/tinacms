@@ -1,9 +1,34 @@
 import { expect, test } from '@playwright/test';
 
-test('at 390px the tree reaches the index, a table, Rename and back with no typed address', async ({
+test('at 390px the side nav reaches the full-screen tree and a document with no typed address', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/');
+  await page.getByRole('button', { name: 'Open side nav' }).click();
+  await page
+    .getByRole('navigation', { name: 'Content' })
+    .getByRole('button', { name: 'Collections' })
+    .click();
+  await expect(page).toHaveURL(/#\/collections$/);
+
+  const pane = page.getByRole('complementary', { name: 'Navigator' });
+  await expect(pane).toBeVisible();
+  await expect(pane.getByRole('button', { name: 'Maximise' })).toHaveCount(0);
+  const box = await pane.boundingBox();
+  expect(box?.width).toBe(390);
+
+  await pane.getByRole('button', { name: 'Posts' }).click();
+  await expect(page).toHaveURL(/#\/collections\/post$/);
+  await pane.getByRole('button', { name: 'hello-world.mdx' }).click();
+  await expect(page).toHaveURL(/#\/collections\/post\/.*hello-world/);
+  await expect(page.getByRole('textbox', { name: /^Title/ })).toBeVisible();
+});
+
+test('at 768px the tree reaches the index, a table, Rename and back with no typed address', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 768, height: 1024 });
   await page.goto('/#/collections');
   const pane = page.getByRole('complementary', { name: 'Navigator' });
   await pane.getByRole('button', { name: 'Maximise' }).click();

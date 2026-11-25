@@ -23,7 +23,7 @@ function Switch({
     <label
       data-slot='switch-label'
       className={cn(
-        'group/switch inline-flex min-h-8 cursor-pointer items-center gap-2 font-sans text-base leading-5 text-foreground select-none',
+        'group/switch inline-flex min-h-8 touch:min-h-touch cursor-pointer items-center gap-2 font-sans text-base leading-5 text-foreground select-none',
         disabled ? 'cursor-not-allowed opacity-45' : null,
         readOnly && 'cursor-default'
       )}
@@ -33,7 +33,7 @@ function Switch({
         disabled={disabled}
         readOnly={readOnly}
         className={cn(
-          'relative inline-flex h-4.5 w-8 shrink-0 items-center rounded-full border-0 bg-slate-300 px-0.5 transition-colors outline-none group-hover/switch:bg-input-hover',
+          'relative inline-flex h-4.5 w-8 shrink-0 items-center touch:after:absolute touch:after:top-1/2 touch:after:left-1/2 touch:after:right-auto touch:after:bottom-auto touch:after:h-touch touch:after:w-touch touch:after:-translate-1/2 rounded-full border-0 bg-slate-300 px-0.5 transition-colors outline-none group-hover/switch:bg-input-hover',
           'data-checked:bg-primary data-checked:group-hover/switch:bg-primary-hover',
           'focus:shadow-focus-ring',
           'data-disabled:group-hover/switch:bg-slate-300 data-disabled:data-checked:group-hover/switch:bg-primary',

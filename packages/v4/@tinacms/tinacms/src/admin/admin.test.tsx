@@ -481,12 +481,11 @@ describe('TinaAdmin', () => {
     renderAdmin('about:blank');
     const frame = await screen.findByTitle('Preview');
     const bar = screen.getByRole('group', { name: 'Preview toolbar' });
-    // The test window is 1024px wide, a tablet: the device sizes sit in the actions menu.
     await user.click(
-      within(bar).getByRole('button', { name: 'Preview actions' })
-    );
-    await user.click(
-      await screen.findByRole('menuitemcheckbox', { name: /^Tablet/ })
+      within(within(bar).getByRole('group', { name: 'Device size' })).getByRole(
+        'button',
+        { name: /^Tablet/ }
+      )
     );
     expect(screen.getByTitle('Preview')).toBe(frame);
     await user.click(
@@ -1856,7 +1855,7 @@ describe('TinaAdmin rail', () => {
 
   it('closes the phone rail sheet when a row is chosen', async () => {
     vi.stubGlobal('matchMedia', (query: string) => ({
-      matches: true,
+      matches: !/min-width/.test(query),
       media: query,
       addEventListener: () => {},
       removeEventListener: () => {},
@@ -1865,7 +1864,7 @@ describe('TinaAdmin rail', () => {
       const user = userEvent.setup();
       renderAdmin();
       await user.click(
-        await screen.findByRole('button', { name: 'Toggle Sidebar' })
+        await screen.findByRole('button', { name: 'Open side nav' })
       );
       const sheet = await waitFor(() => {
         const found = document.querySelector<HTMLElement>('[data-mobile=true]');
@@ -2128,5 +2127,98 @@ describe('Toast tooltips', () => {
     expect(tip()).toBeNull();
     await act(() => vi.advanceTimersByTimeAsync(1));
     expect(tip()).toHaveTextContent('Dismiss');
+  });
+});
+
+describe('TinaAdmin below desktop', () => {
+  const DOCUMENT = '#/collections/post/content%2Fposts%2Fhello.mdx';
+
+  const stubWidth = (width: number) =>
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: width >= Number(/min-width: (\d+)px/.exec(query)?.[1] ?? 0),
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('on a tablet, Maximise form shows one view with the View switch, and Escape restores the split', async () => {
+    stubWidth(900);
+    window.location.hash = DOCUMENT;
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    await user.click(
+      await screen.findByRole('button', { name: 'Maximise form' })
+    );
+    expect(screen.getByRole('group', { name: 'View' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Restore form' })).toHaveFocus();
+    await user.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(screen.queryByRole('group', { name: 'View' })).toBeNull()
+    );
+    expect(screen.getByRole('button', { name: 'Maximise form' })).toHaveFocus();
+  });
+
+  it('on a tablet, Maximise preview then Restore preview focuses Maximise form', async () => {
+    stubWidth(900);
+    window.location.hash = DOCUMENT;
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    await user.click(
+      await screen.findByRole('button', { name: 'Maximise preview' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Restore preview' }));
+    expect(screen.getByRole('button', { name: 'Maximise form' })).toHaveFocus();
+  });
+
+  it('on a phone, a document opens on Form and the View switch shows the preview', async () => {
+    stubWidth(390);
+    window.location.hash = DOCUMENT;
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    const view = await screen.findByRole('group', { name: 'View' });
+    expect(within(view).getByRole('button', { name: 'Form' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    await user.click(within(view).getByRole('button', { name: 'Preview' }));
+    expect(
+      within(view).getByRole('button', { name: 'Preview' })
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTitle('Preview')).toBeInTheDocument();
+  });
+
+  it('on a phone, the page route shows the foot bar that opens Collections', async () => {
+    stubWidth(390);
+    window.location.hash = '#/page';
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    expect(await screen.findByText('Nothing to edit here')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Open Collections' }));
+    expect(window.location.hash).toBe('#/collections');
+  });
+
+  it('on a tablet, ?nav shows the Collections column and Close returns to the document', async () => {
+    stubWidth(900);
+    window.location.hash = `${DOCUMENT}?nav`;
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    const navigator = await screen.findByRole('complementary', {
+      name: 'Navigator',
+    });
+    await user.click(within(navigator).getByRole('button', { name: 'Close' }));
+    expect(window.location.hash).toBe(DOCUMENT);
+  });
+
+  it('with ?nav, a collection group keeps the document route', async () => {
+    stubWidth(900);
+    window.location.hash = `${DOCUMENT}?nav`;
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    const navigator = await screen.findByRole('complementary', {
+      name: 'Navigator',
+    });
+    await user.click(within(navigator).getByRole('button', { name: 'Pages' }));
+    expect(window.location.hash).toBe(`${DOCUMENT}?nav`);
   });
 });

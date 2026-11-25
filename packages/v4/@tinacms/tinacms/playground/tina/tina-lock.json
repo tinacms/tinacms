@@ -597,6 +597,174 @@
             "type": "array"
           }
         ]
+      },
+      {
+        "name": "manyrequired",
+        "label": "Many required",
+        "path": "content/manyrequired",
+        "description": "Twelve required fields, for the error count.",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "note",
+            "label": "Note",
+            "type": "string"
+          },
+          {
+            "name": "f1",
+            "label": "Field 1",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "f2",
+            "label": "Field 2",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "f3",
+            "label": "Field 3",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "f4",
+            "label": "Field 4",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "f5",
+            "label": "Field 5",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "f6",
+            "label": "Field 6",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "f7",
+            "label": "Field 7",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "f8",
+            "label": "Field 8",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "f9",
+            "label": "Field 9",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "f10",
+            "label": "Field 10",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "f11",
+            "label": "Field 11",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "f12",
+            "label": "Field 12",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "lockable",
+        "label": "Lockable",
+        "path": "content/lockable",
+        "description": "One list that can be edited and one that is disabled.",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "open",
+            "label": "Open list",
+            "fields": [
+              {
+                "name": "text",
+                "label": "Text",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          },
+          {
+            "name": "locked",
+            "label": "Locked list",
+            "disabled": true,
+            "fields": [
+              {
+                "name": "text",
+                "label": "Text",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          }
+        ]
       }
     ],
     "version": {

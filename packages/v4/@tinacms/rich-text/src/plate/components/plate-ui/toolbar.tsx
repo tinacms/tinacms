@@ -129,7 +129,7 @@ const ToolbarButtonBase = React.forwardRef<
     aria-pressed={typeof pressed === 'boolean' ? pressed : undefined}
     data-state={open ? 'open' : undefined}
     className={cn(
-      'inline-flex h-8 min-w-8 shrink-0 items-center justify-center gap-1 rounded-sm px-1.5 font-sans text-sm font-medium text-foreground outline-none transition-colors pointer-coarse:h-10 pointer-coarse:min-w-10',
+      'inline-flex h-8 min-w-8 shrink-0 items-center justify-center gap-1 rounded-sm px-1.5 font-sans text-sm font-medium text-foreground outline-none transition-colors touch:h-touch touch:min-w-(--touch-height)',
       'focus-visible:shadow-focus-ring disabled:cursor-not-allowed disabled:opacity-45',
       'not-disabled:hover:bg-muted aria-pressed:bg-selected not-disabled:aria-pressed:hover:bg-selected data-[state=open]:bg-muted',
       '[&_svg:not([data-icon])]:size-4',
@@ -183,7 +183,7 @@ export const ToolbarButton = React.forwardRef<
             if (!props['aria-haspopup']) row.onRun();
           }}
           className={cn(
-            'h-9 w-full justify-start gap-2.5 px-2.5 text-base font-normal pointer-coarse:h-10',
+            'h-9 w-full justify-start gap-2.5 px-2.5 text-base font-normal touch:h-touch',
             className
           )}
         >

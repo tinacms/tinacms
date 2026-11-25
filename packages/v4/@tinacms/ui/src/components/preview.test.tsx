@@ -60,7 +60,7 @@ describe('PreviewToolbar tiers', () => {
     );
     expect(screen.queryByRole('group', { name: 'Device size' })).toBeNull();
     expect(
-      screen.getByRole('button', { name: 'Expand preview' })
+      screen.getByRole('button', { name: 'Maximise preview' })
     ).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole('button', { name: 'Preview actions' })

@@ -197,4 +197,9 @@
   --leading-tip: 1.4; /* Line height of the words in a tooltip, which may wrap to two lines */
   --leading-field-message: 1.125rem; /* Line height of the help and the messages under a field */
   --leading-code: 1.55; /* Line height of the code lines in a diff view */
+
+  /* @group Breakpoints and touch */
+  --breakpoint-tablet: 48rem; /* Tablet starts here, 768px. Read by useTier; not a Tailwind breakpoint */
+  --breakpoint-desktop: 80rem; /* Desktop starts here, 1280px. Read by useTier; not a Tailwind breakpoint */
+  --touch-height: 40px; /* Least height of a control on a touch screen */
 }
