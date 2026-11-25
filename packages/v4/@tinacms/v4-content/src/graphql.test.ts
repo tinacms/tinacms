@@ -34,7 +34,7 @@ const tagged: CollectionSchema = {
     {
       name: 'tags',
       type: 'array',
-      of: { name: 'tag', type: 'select' },
+      of: { name: 'tag', type: 'rating' },
     } as CollectionSchema['fields'][number],
   ],
 };
@@ -64,12 +64,56 @@ describe('lockToGraphQL', () => {
     expect(result.skipped).toEqual([
       {
         collection: 'tagged',
-        reason: 'The field type "select" has no GraphQL type in the v3 engine.',
+        reason: 'The field type "rating" has no GraphQL type in the v3 engine.',
       },
     ]);
     const sdl = print(result.graphQLSchema);
     expect(sdl).toContain('type Author implements');
     expect(sdl).not.toContain('type Tagged implements');
+  });
+
+  it('serves a select field as a v3 string with its options', async () => {
+    const picked: CollectionSchema = {
+      name: 'picked',
+      path: 'content/picked',
+      format: 'md',
+      fields: [
+        {
+          name: 'size',
+          type: 'select',
+          options: [{ value: 'sm', label: 'Small' }, { value: 'lg' }],
+        } as CollectionSchema['fields'][number],
+        {
+          name: 'sizes',
+          type: 'array',
+          of: { name: 'size', type: 'select', options: [{ value: 'sm' }] },
+        } as CollectionSchema['fields'][number],
+      ],
+    };
+    expect(toV3Collection(picked).fields).toEqual([
+      {
+        type: 'string',
+        name: 'size',
+        required: false,
+        options: [
+          { value: 'sm', label: 'Small' },
+          { value: 'lg', label: 'lg' },
+        ],
+      },
+      {
+        type: 'string',
+        name: 'sizes',
+        required: false,
+        options: [{ value: 'sm', label: 'sm' }],
+        list: true,
+      },
+    ]);
+    const result = await lockToGraphQL(lockWith([picked]));
+    expect(result.skipped).toEqual([]);
+    const sdl = print(result.graphQLSchema);
+    expect(sdl).toContain('type Picked implements');
+    expect(sdl).toMatch(/size: String/);
+    expect(sdl).toMatch(/sizes: \[String\]/);
   });
 
   it('finds an unserved type inside templates and object fields', async () => {

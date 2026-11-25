@@ -22,7 +22,19 @@ export interface V3Field {
   fields?: V3Field[];
   templates?: Array<Omit<TemplateSchema, 'fields'> & { fields: V3Field[] }>;
   collections?: string[];
+  options?: Array<{ value: string; label: string }>;
 }
+
+// A v4 `select` stores one of its option values, which is a v3 `string` with
+// `options`.
+const SELECT_FIELD_TYPE = 'select';
+type SelectOption = { value: string; label?: string };
+
+const selectOptionsOf = (field: FieldSchema) =>
+  ((field as { options?: SelectOption[] }).options ?? []).map((option) => ({
+    value: option.value,
+    label: option.label ?? option.value,
+  }));
 
 export interface V3Collection {
   name: string;
@@ -63,6 +75,15 @@ export const toV3Field = (field: FieldSchema): V3Field => {
       label: field.label,
       required,
       list: true,
+    };
+  }
+  if (field.type === SELECT_FIELD_TYPE) {
+    return {
+      type: 'string',
+      name: field.name,
+      label: field.label,
+      required,
+      options: selectOptionsOf(field),
     };
   }
   const fields = fieldsOf(field);
