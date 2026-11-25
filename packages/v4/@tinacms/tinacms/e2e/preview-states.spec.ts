@@ -269,8 +269,6 @@ const leaveStep: [string, (page: Page) => Promise<void>][] = [
       ).not.toContainText('Edited before the step');
     },
   ],
-  ['the rail’s Tools', async (page) => rail(page, 'Tools').click()],
-  ['the rail’s Settings', async (page) => rail(page, 'Settings').click()],
 ];
 
 for (const [name, leave] of leaveStep) {

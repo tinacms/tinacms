@@ -251,7 +251,7 @@ function ErrorRow({
             'col-start-1 row-start-1 inline-flex items-center justify-end gap-1 text-foreground opacity-0 transition-opacity',
             atRest && 'opacity-100',
             !selected &&
-              'group-hover/row:opacity-100 group-focus-visible/row:opacity-100 group-data-[look=hover]/row:opacity-100'
+              'touch:opacity-100 group-hover/row:opacity-100 group-focus-visible/row:opacity-100 group-data-[look=hover]/row:opacity-100'
           )}
         >
           Go to field
@@ -517,7 +517,7 @@ function ErrorPane({
                 ? 'Pinned. It docks beside the preview on a wider window.'
                 : 'Fix these to save.'}
             </p>
-            <span className='inline-flex flex-none items-center gap-1.5 text-xs leading-control text-muted-foreground'>
+            <span className='inline-flex flex-none items-center gap-1.5 text-xs leading-control text-muted-foreground touch:hidden'>
               <Kbd size='sm'>Esc</Kbd>
               <span className='sr-only'>Escape</span>
               to hide

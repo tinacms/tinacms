@@ -57,7 +57,7 @@ describe('TinaCloud media slice upload', () => {
     harness.answerProject();
     expect(await done).toBe('hero.png');
     expect(harness.uploadUrlRequest()).toBe(
-      `${TINACLOUD_ASSETS_URL}/v1/abc/upload_url/hero.png?branch=feat%2Fa`
+      `${TINACLOUD_ASSETS_URL}/v1/abc/upload_url/hero.png?contentType=image%2Fpng&branch=feat%2Fa`
     );
   });
 
@@ -68,7 +68,7 @@ describe('TinaCloud media slice upload', () => {
     harness.answerProject();
     expect(await done).toBe('hero.png');
     expect(harness.uploadUrlRequest()).toBe(
-      `${TINACLOUD_ASSETS_URL}/v1/abc/upload_url/hero.png?branch=main`
+      `${TINACLOUD_ASSETS_URL}/v1/abc/upload_url/hero.png?contentType=image%2Fpng&branch=main`
     );
   });
 
@@ -80,7 +80,7 @@ describe('TinaCloud media slice upload', () => {
     harness.answerProject();
     expect(await done).toBe('hero.png');
     expect(harness.uploadUrlRequest()).toBe(
-      `${TINACLOUD_ASSETS_URL}/v1/abc/upload_url/hero.png?branch=main`
+      `${TINACLOUD_ASSETS_URL}/v1/abc/upload_url/hero.png?contentType=image%2Fpng&branch=main`
     );
   });
 

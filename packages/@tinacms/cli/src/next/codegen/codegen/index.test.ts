@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { buildSchema } from 'graphql';
 import { generateTypes } from './index';
 
@@ -19,7 +22,7 @@ const schema = buildSchema(`
   }
 `);
 
-const NO_DOCUMENTS = '/__tina_no_documents__/*.gql';
+const NO_DOCUMENTS = ['/__tina_no_documents__/*.gql'];
 
 describe('generateTypes', () => {
   let types: string;
@@ -61,5 +64,32 @@ describe('generateTypes', () => {
 
   it('emits the schema types', () => {
     expect(types).toContain('export type Post = {');
+  });
+});
+
+describe('generateTypes with a space in the project path', () => {
+  it('loads queries from a folder whose path contains a space', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'a directory with '));
+    try {
+      fs.mkdirSync(path.join(dir, 'queries/nested'), { recursive: true });
+      fs.writeFileSync(
+        path.join(dir, 'queries/nested/post.graphql'),
+        'query SpacedPost { post(relativePath: "a.md") { title } }'
+      );
+      fs.writeFileSync(
+        path.join(dir, 'queries/other.gql'),
+        'query SpacedGql { post(relativePath: "b.md") { title } }'
+      );
+      const types = await generateTypes(
+        schema,
+        ['graphql', 'gql'].map((ext) => path.join(dir, `queries/**/*.${ext}`)),
+        NO_DOCUMENTS,
+        'http://localhost:4001/graphql'
+      );
+      expect(types).toContain('SpacedPostQuery');
+      expect(types).toContain('SpacedGqlQuery');
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

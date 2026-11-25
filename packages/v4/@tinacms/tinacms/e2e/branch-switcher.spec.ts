@@ -369,7 +369,7 @@ test.describe('branch switcher pop-up', () => {
       await page.goto(URL);
       const button = page.getByRole('button', { name: /^Branch:/ });
       await button.click();
-      await page.getByRole('button', { name: 'Maximise' }).click();
+      await page.getByRole('button', { name: 'Maximise', exact: true }).click();
       const view = page.locator('[data-slot="branch-maximised"]');
       await expect(view).toBeVisible();
       await expect(page.getByRole('dialog', { name: 'Branches' })).toBeHidden();
@@ -635,7 +635,7 @@ test.describe('branch switcher pop-up', () => {
       await page.setViewportSize(size);
       await page.goto('/branches.html?docs=1&many=30&create=fail#/');
       await page.getByRole('button', { name: /^Branch:/ }).click();
-      await page.getByRole('button', { name: 'Maximise' }).click();
+      await page.getByRole('button', { name: 'Maximise', exact: true }).click();
       const view = page.locator('[data-slot="branch-maximised"]');
       await view.getByRole('button', { name: 'New branch' }).click();
       await view
@@ -729,7 +729,7 @@ test.describe('branch switcher pop-up', () => {
     'feature/a-very-long-branch-name-that-keeps-going-past-the-row-width-0123456789';
   const frames = [
     {
-      name: '320px phone sheet',
+      name: '320px phone screen',
       size: { width: 320, height: 640 },
       maximise: false,
     },
@@ -904,7 +904,11 @@ test.describe('branch switcher pop-up', () => {
   const FRAMES = [
     { name: 'pop-up', size: DESKTOP, maximise: false },
     { name: 'maximised view', size: DESKTOP, maximise: true },
-    { name: 'phone sheet', size: { width: 390, height: 844 }, maximise: false },
+    {
+      name: 'phone screen',
+      size: { width: 390, height: 844 },
+      maximise: false,
+    },
   ];
   const toastCount = (page: Page) =>
     page.locator('[data-sonner-toast]').count();
@@ -1174,7 +1178,6 @@ test.describe('branch switcher pop-up', () => {
         .getByRole('searchbox', { name: 'New branch name' })
         .fill('cms/x');
       const form = view.getByRole('form', { name: 'New branch form' });
-      // The sheet is anchored to the bottom, so its buttons are measured on the page.
       const below = async (name: string) => {
         const button = view.getByRole('button', { name });
         await expect(button).toBeVisible();
@@ -1184,7 +1187,7 @@ test.describe('branch switcher pop-up', () => {
           form.boundingBox(),
         ]);
         if (!b || !f) return undefined;
-        return Math.round(frame.name === 'phone sheet' ? b.y : b.y - f.y);
+        return Math.round(b.y - f.y);
       };
       const before = await below('Create branch');
       await view.getByRole('button', { name: 'Create branch' }).click();
@@ -1322,7 +1325,7 @@ test.describe('branch switcher pop-up', () => {
         page.locator('[data-slot="error-summary-pane"]').first()
       ).toBeVisible();
       await page.getByRole('button', { name: /^Branch:/ }).click();
-      await page.getByRole('button', { name: 'Maximise' }).click();
+      await page.getByRole('button', { name: 'Maximise', exact: true }).click();
       const view = page.locator('[data-slot="branch-maximised"]');
       await expect(view).toBeVisible();
       const onTop = await page.evaluate(() => {
@@ -1386,7 +1389,7 @@ test.describe('branch switcher pop-up', () => {
     expect(['40', 'none']).toContain(layer);
   });
 
-  test('keeps a page toast from covering a modal opened over the phone sheet', async ({
+  test('keeps a page toast from covering a modal opened over the phone screen', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
@@ -1409,7 +1412,7 @@ test.describe('branch switcher pop-up', () => {
       .poll(() =>
         page.evaluate(() => {
           const field = document.querySelector<HTMLElement>(
-            '[data-slot=foot-sheet]:not([hidden]) input'
+            '[data-slot=screen-content] input'
           );
           if (!field) return 'no field';
           const r = field.getBoundingClientRect();

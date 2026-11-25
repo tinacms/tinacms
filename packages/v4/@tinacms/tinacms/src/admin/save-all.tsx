@@ -315,7 +315,7 @@ export function SaveAllControl() {
       disabled={disabled}
       aria-label={label}
       className={cn(
-        'max-sm:w-8 max-sm:px-0',
+        'phone:w-8 phone:px-0',
         message !== undefined && 'pointer-events-none'
       )}
       onClick={() => {
@@ -323,9 +323,9 @@ export function SaveAllControl() {
         void run().then(setAnnouncement);
       }}
     >
-      <span className='max-sm:hidden'>Save all</span>
+      <span className='phone:hidden'>Save all</span>
       {failed > 0 ? (
-        <span className='max-sm:hidden'>{failed} failed</span>
+        <span className='phone:hidden'>{failed} failed</span>
       ) : null}
     </Button>
   );

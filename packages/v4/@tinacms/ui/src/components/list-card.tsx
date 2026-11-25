@@ -70,7 +70,7 @@ const HEAD_HOVER =
   'hover:bg-muted *:data-grip:group-hover/head:text-foreground **:data-more:group-hover/head:text-foreground';
 
 const GRIP =
-  'flex h-8 w-6 flex-none cursor-grab touch-none items-center justify-center rounded-sm border-0 bg-transparent p-0 text-muted-foreground outline-none focus-visible:shadow-focus-ring disabled:cursor-not-allowed';
+  'flex h-8 touch:h-touch w-6 flex-none cursor-grab touch-none items-center justify-center rounded-sm border-0 bg-transparent p-0 text-muted-foreground outline-none focus-visible:shadow-focus-ring disabled:cursor-not-allowed';
 
 type ListCardCommonProps = Omit<
   ComponentProps<'div'>,
@@ -217,10 +217,10 @@ function ValueBody({
             stepper(event.key === 'ArrowUp' ? 'up' : 'down');
           }
         }}
-        className='h-8 min-w-0 flex-1 appearance-none border-0 bg-transparent px-1.5 font-sans text-base text-ellipsis text-foreground tabular-nums outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
+        className='h-8 touch:h-touch min-w-0 flex-1 appearance-none border-0 bg-transparent px-1.5 font-sans text-base text-ellipsis text-foreground tabular-nums outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
       />
       {stepper ? (
-        <span className='flex h-8 flex-none flex-col justify-center'>
+        <span className='flex h-8 touch:h-touch flex-none flex-col justify-center'>
           {STEPS.map(({ direction, name: stepName, glyph }) => (
             <button
               key={direction}
@@ -290,7 +290,7 @@ function GroupHead({
   const inPlace = opens === 'in-place';
   if (alwaysOpen) {
     return (
-      <div className='flex h-8 min-w-0 flex-1 items-center px-2 font-sans text-base text-foreground'>
+      <div className='flex h-8 touch:h-touch min-w-0 flex-1 items-center px-2 font-sans text-base text-foreground'>
         <span className='min-w-0 flex-1 truncate'>
           <HeadText
             name={name}
@@ -308,7 +308,7 @@ function GroupHead({
       aria-expanded={inPlace ? open : undefined}
       disabled={disabled}
       onClick={onToggle}
-      className='flex h-8 min-w-0 flex-1 cursor-pointer items-center gap-0.5 rounded-sm border-0 bg-transparent px-0.5 text-left font-sans text-base text-foreground outline-none focus-visible:shadow-focus-ring disabled:cursor-not-allowed'
+      className='flex h-8 touch:h-touch min-w-0 flex-1 cursor-pointer items-center gap-0.5 rounded-sm border-0 bg-transparent px-0.5 text-left font-sans text-base text-foreground outline-none focus-visible:shadow-focus-ring disabled:cursor-not-allowed'
     >
       {inPlace ? (
         <span
@@ -441,7 +441,7 @@ function ListCard(props: ListCardProps) {
           data-slot='list-card-head'
           data-pinned={pinned || undefined}
           className={cn(
-            'group/head flex min-h-(--item-header-height) min-w-0 items-center gap-0.5 pr-1 pl-0.5 transition-colors',
+            'group/head flex min-h-(--item-header-height) touch:[--item-header-height:var(--touch-height)] min-w-0 items-center gap-0.5 pr-1 pl-0.5 transition-colors',
             showFields ? 'rounded-t-sm' : 'rounded-sm',
             pinned && ['sticky z-10 bg-card', PIN_TOP[pinDepth ?? 0]],
             !readOnly && !disabled && !dragging && HEAD_HOVER
@@ -508,7 +508,7 @@ function ListCard(props: ListCardProps) {
                     size='sm'
                     icon='more'
                     data-more=''
-                    className='flex-none opacity-0 not-disabled:hover:bg-transparent disabled:opacity-0 group-focus-within/list-card:opacity-100 group-hover/list-card:opacity-100 data-popup-open:opacity-100 pointer-coarse:not-disabled:opacity-100'
+                    className='flex-none opacity-0 not-disabled:hover:bg-transparent disabled:opacity-0 group-focus-within/list-card:opacity-100 group-hover/list-card:opacity-100 data-popup-open:opacity-100 touch:not-disabled:opacity-100'
                   />
                 }
                 disabled={disabled}

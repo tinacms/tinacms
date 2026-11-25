@@ -5,8 +5,10 @@ import { cn } from '@tinacms/ui/lib/utils';
 type TopBarProps = Omit<ComponentProps<'header'>, 'children'> & {
   /** The one side nav toggle. */
   toggle?: ReactNode;
-  /** The TinaCMS logo, as an image with the alt text "TinaCMS". */
+  /** The TinaCMS word logo, as an image with the alt text "TinaCMS". Hidden on a phone. */
   logo?: ReactNode;
+  /** The TinaCMS mark, shown in place of the logo on a phone. */
+  mark?: ReactNode;
   /** Shown after the logo. Long names end in an ellipsis. */
   projectName?: string;
   /** The branch button, or the Local files badge in local mode. Leave it out when there are no branches. */
@@ -35,11 +37,12 @@ function Slash({ className }: { className?: string }) {
 /**
  * The 56px bar along the top of the admin: toggle, logo, project name and
  * branch at the start; Search and the account button at the end. Below 768px
- * the project name and branch truncate, so nothing overflows at 375px. Below 480px the project name and its slash are hidden so the branch name stays readable.
+ * the project name and branch truncate, so nothing overflows at 375px. On a phone the mark replaces the logo and the project name and slashes are hidden.
  */
 function TopBar({
   toggle,
   logo,
+  mark,
   projectName,
   branch,
   devControls,
@@ -61,13 +64,18 @@ function TopBar({
     >
       <div className='flex min-w-0 flex-1 items-center gap-2'>
         {toggle}
-        {logo}
+        {logo ? (
+          <div className='flex flex-none items-center phone:hidden'>{logo}</div>
+        ) : null}
+        {mark ? (
+          <div className='hidden flex-none items-center phone:flex'>{mark}</div>
+        ) : null}
         {projectName ? (
           <>
-            <Slash className='max-[479px]:hidden' />
+            <Slash className='phone:hidden' />
             <span
               data-slot='top-bar-project'
-              className='min-w-0 shrink-[4] truncate font-semibold max-[479px]:hidden'
+              className='min-w-0 shrink-[4] truncate font-semibold phone:hidden'
               title={projectName}
             >
               {projectName}
@@ -75,7 +83,7 @@ function TopBar({
           </>
         ) : null}
         {branch ? (
-          <div className='flex min-w-0 flex-initial items-center gap-2 before:flex-none before:text-muted-foreground before:[content:"/"_/_""] empty:hidden'>
+          <div className='flex min-w-0 flex-initial items-center gap-2 before:flex-none before:text-muted-foreground before:[content:"/"_/_""] phone:before:hidden empty:hidden'>
             {branch}
           </div>
         ) : null}

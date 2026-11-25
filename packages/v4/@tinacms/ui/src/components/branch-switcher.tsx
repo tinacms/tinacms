@@ -8,20 +8,14 @@ import {
 import { createPortal } from 'react-dom';
 
 import { Button } from '@tinacms/ui/components/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@tinacms/ui/components/dialog';
+import { Dialog, DialogTrigger } from '@tinacms/ui/components/dialog';
 import {
   Popover,
   PopoverContent,
   PopoverTitle,
   PopoverTrigger,
 } from '@tinacms/ui/components/popover';
+import { ScreenContent } from '@tinacms/ui/components/sheet';
 import { Badge } from '@tinacms/ui/components/badge';
 import { Icon } from '@tinacms/ui/components/icon';
 import { RadioGroup, RadioGroupItem } from '@tinacms/ui/components/radio-group';
@@ -119,7 +113,7 @@ function BranchButtonLabel({
         {current}
       </span>
       {isProtected ? (
-        <span className='text-xs text-muted-foreground-strong max-md:hidden'>
+        <span className='text-xs text-muted-foreground-strong phone:hidden'>
           protected
         </span>
       ) : null}
@@ -352,7 +346,7 @@ const POPUP_WIDTH =
  * The branch button and what it opens: a search box, the current branch first, then the
  * others, protected branches in one Protected group, and New branch. From 768px up it opens
  * as a pop-up under the button and can be maximised to fill the work area; on a phone it is
- * a foot sheet.
+ * a screen under the top bar.
  */
 function BranchSwitcher({
   current,
@@ -474,9 +468,8 @@ function BranchSwitcher({
   };
   const showActions = () => {
     const root = frame();
-    // The sheet shows the line above the buttons, so scrolling to it would push them down.
     (
-      (phone ? null : root.querySelector('[data-branch-failure]')) ??
+      root.querySelector('[data-branch-failure]') ??
       root.querySelector('[data-branch-actions]')
     )?.scrollIntoView?.({ block: 'nearest' });
   };
@@ -657,7 +650,6 @@ function BranchSwitcher({
       : []),
   ];
 
-  // On the bottom-anchored sheet the line goes above the buttons, so they stay under the finger.
   const noteNamesIt = note?.kind === 'failed' && note.name === typed;
   const refusedFailure = failed || noteNamesIt ? undefined : refused.get(typed);
   const failureP =
@@ -674,15 +666,15 @@ function BranchSwitcher({
       </p>
     ) : null;
 
-  /** The same content in every frame; `Title` is the frame's own heading element. */
-  const panel = (Title: (props: { children: ReactNode }) => ReactNode) => (
+  /** The same content in every frame; `Title` is the frame's own heading element. The phone screen draws its own header. */
+  const panel = (Title?: (props: { children: ReactNode }) => ReactNode) => (
     <>
-      <div className='flex flex-none items-start justify-between gap-2'>
-        <div className='flex min-w-0 flex-col gap-1'>
-          <Title>Branches</Title>
-        </div>
-        <div className='flex flex-none items-center gap-1'>
-          {phone ? null : (
+      {Title ? (
+        <div className='flex flex-none items-start justify-between gap-2'>
+          <div className='flex min-w-0 flex-col gap-1'>
+            <Title>Branches</Title>
+          </div>
+          <div className='flex flex-none items-center gap-1'>
             <Button
               variant='icon'
               size='sm'
@@ -691,8 +683,6 @@ function BranchSwitcher({
               aria-pressed={maximised}
               onClick={() => setMaximised(!maximised)}
             />
-          )}
-          {phone ? null : (
             <Button
               variant='icon'
               size='sm'
@@ -700,9 +690,9 @@ function BranchSwitcher({
               aria-label='Close branches'
               onClick={closeAndFocusButton}
             />
-          )}
+          </div>
         </div>
-      </div>
+      ) : null}
       {blocked ? (
         <p role='status' className='m-0 text-sm text-destructive'>
           {blockedMessage}
@@ -904,13 +894,12 @@ function BranchSwitcher({
                 </span>
               )}
             </div>
-            {phone ? failureP : null}
             <div
               data-branch-actions=''
-              className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'
+              className='flex justify-end gap-2 phone:items-stretch phone:*:min-w-0 phone:*:flex-1'
             >
               <Button
-                className='max-md:h-auto max-md:min-h-9'
+                className='phone:h-auto phone:min-h-9'
                 disabled={busy}
                 onClick={() => {
                   setCreating(false);
@@ -918,7 +907,7 @@ function BranchSwitcher({
                   focusField('search');
                 }}
               >
-                <span className='min-w-0 max-md:py-1.5 max-md:whitespace-normal'>
+                <span className='min-w-0 phone:py-1.5 phone:whitespace-normal'>
                   Back to branches
                 </span>
               </Button>
@@ -927,7 +916,7 @@ function BranchSwitcher({
                 type='submit'
                 busy={busy}
                 aria-busy={busy}
-                className='max-md:h-auto max-md:min-h-9'
+                className='phone:h-auto phone:min-h-9'
                 disabled={
                   !onCreate ||
                   from === undefined ||
@@ -946,7 +935,7 @@ function BranchSwitcher({
                     : 'Create branch'}
               </Button>
             </div>
-            {phone ? null : failureP}
+            {failureP}
           </form>
         ) : null}
       </div>
@@ -994,16 +983,15 @@ function BranchSwitcher({
     return (
       <Dialog open={shown} onOpenChange={setOpen}>
         <DialogTrigger render={trigger}>{label}</DialogTrigger>
-        <DialogContent size='md' showCloseButton={false} onKeyDown={move}>
-          {panel(({ children }) => (
-            <>
-              <DialogTitle>{children}</DialogTitle>
-              <DialogDescription className='sr-only'>
-                Edits save to the branch you choose.
-              </DialogDescription>
-            </>
-          ))}
-        </DialogContent>
+        <ScreenContent
+          title='Branches'
+          description='Edits save to the branch you choose.'
+          closeLabel='Close branches'
+          initialFocus={() => (creating ? nameRef.current : searchRef.current)}
+          onKeyDown={move}
+        >
+          {panel()}
+        </ScreenContent>
       </Dialog>
     );
   }
@@ -1068,7 +1056,7 @@ function BranchSwitcher({
   );
 }
 
-/** Tab at either end of the maximised view wraps inside it, as it does in the sheet. */
+/** Tab at either end of the maximised view wraps inside it, as it does in the phone screen. */
 const wrapTab = (event: KeyboardEvent<HTMLElement>) => {
   const items = [
     ...event.currentTarget.querySelectorAll<HTMLElement>(

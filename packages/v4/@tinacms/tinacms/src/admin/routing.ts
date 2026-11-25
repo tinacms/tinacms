@@ -1,13 +1,11 @@
 export type AdminRoute =
   | { view: 'home' }
   | { view: 'media' }
-  | { view: 'tools' }
-  | { view: 'settings' }
   | { view: 'page' }
   | { view: 'collections'; unsavedOnly?: boolean; maximised?: true }
   | { view: 'collection'; collection: string; maximised?: true }
   | { view: 'folder'; collection: string; folder: string }
-  | { view: 'document'; collection: string; path: string }
+  | { view: 'document'; collection: string; path: string; navigator?: true }
   | { view: 'screen'; screen: string; segments: string[] };
 
 export const COLLECTIONS_ROUTE: AdminRoute = { view: 'collections' };
@@ -17,6 +15,7 @@ const COLLECTIONS_PREFIX = 'collections';
 const SCREENS_PREFIX = 'screens';
 const UNSAVED_ONLY = '?unsaved';
 const MAXIMISED = '?max';
+const NAVIGATOR = '?nav';
 const FOLDER_SEGMENT = 'folder';
 
 export const formatAdminRoute = (route: AdminRoute): string => {
@@ -27,13 +26,7 @@ export const formatAdminRoute = (route: AdminRoute): string => {
     }
     return `#/${COLLECTIONS_PREFIX}${route.unsavedOnly ? UNSAVED_ONLY : ''}`;
   }
-  if (
-    route.view === 'media' ||
-    route.view === 'tools' ||
-    route.view === 'settings' ||
-    route.view === 'page'
-  )
-    return `#/${route.view}`;
+  if (route.view === 'media' || route.view === 'page') return `#/${route.view}`;
   if (route.view === 'screen') {
     const parts = [route.screen, ...route.segments].map(encodeURIComponent);
     return `#/${SCREENS_PREFIX}/${parts.join('/')}`;
@@ -48,7 +41,7 @@ export const formatAdminRoute = (route: AdminRoute): string => {
     const parts = route.folder.split('/').map(encodeURIComponent);
     return `#/${COLLECTIONS_PREFIX}/${collection}/${FOLDER_SEGMENT}/${parts.join('/')}`;
   }
-  return `#/${COLLECTIONS_PREFIX}/${collection}/${encodeURIComponent(route.path)}`;
+  return `#/${COLLECTIONS_PREFIX}/${collection}/${encodeURIComponent(route.path)}${route.navigator ? NAVIGATOR : ''}`;
 };
 
 const decodeSegment = (segment: string): string | null => {
@@ -66,13 +59,7 @@ export const parseAdminRoute = (hash: string): AdminRoute => {
   const decoded = raw.map(decodeSegment);
   if (decoded.some((segment) => segment === null)) return HOME_ROUTE;
   const [prefix, head, ...rest] = decoded as string[];
-  if (
-    !head &&
-    (prefix === 'media' ||
-      prefix === 'tools' ||
-      prefix === 'settings' ||
-      prefix === 'page')
-  )
+  if (!head && (prefix === 'media' || prefix === 'page'))
     return { view: prefix };
   if (prefix === COLLECTIONS_PREFIX && !head) {
     const flags = (query ?? '').split('&');
@@ -100,5 +87,7 @@ export const parseAdminRoute = (hash: string): AdminRoute => {
       return { view: 'collection', collection: head, maximised: true };
     return { view: 'folder', collection: head, folder: folderParts.join('/') };
   }
-  return { view: 'document', collection: head, path: docPath };
+  return (query ?? '').split('&').includes('nav')
+    ? { view: 'document', collection: head, path: docPath, navigator: true }
+    : { view: 'document', collection: head, path: docPath };
 };
