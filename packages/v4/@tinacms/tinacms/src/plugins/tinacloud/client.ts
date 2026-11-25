@@ -122,18 +122,6 @@ const causeMessage = (cause: unknown): string => {
   return String(cause);
 };
 
-/** A request that went out and got no answer may still have made the branch. */
-const createFailure = (cause: unknown, sent: boolean): unknown => {
-  if (!(cause instanceof TinaCloudError)) return cause;
-  if (cause.status === 409) {
-    return new BranchCreateError(cause.message, 'exists');
-  }
-  if (cause.status === undefined && sent) {
-    return new BranchCreateError(cause.message, 'timeout');
-  }
-  return new BranchCreateError(cause.serverMessage ?? cause.message, 'other');
-};
-
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -265,13 +253,13 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     );
   };
 
-  // A token read that fails for any reason but an ended session counts as one unknown status.
+  // A token read that fails for any reason but a lost session counts as one unknown status.
   const pollOnce = async (url: string, signal: AbortSignal) => {
     let token: string | undefined;
     try {
       token = await options.getToken();
     } catch (cause) {
-      if (cause instanceof AuthError) throw cause;
+      if (cause instanceof AuthError && cause.code !== 'network') throw cause;
       throw new TinaCloudError(
         `Could not read the TinaCloud token: ${causeMessage(cause)}`,
         {}
@@ -353,13 +341,15 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     const expired = new Promise<never>((_resolve, reject) => {
       deadline.signal.addEventListener(
         'abort',
-        () =>
+        () => {
+          const message = `TinaCloud did not answer the request to create branch ${name} in time.`;
+          // Only a request that went out can have made the branch.
           reject(
-            new TinaCloudError(
-              `TinaCloud did not answer the request to create branch ${name} in time.`,
-              {}
-            )
-          ),
+            sent
+              ? new BranchCreateError(message, 'timeout')
+              : new TinaCloudError(message, {})
+          );
+        },
         { once: true }
       );
     });
@@ -382,7 +372,10 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
         expired,
       ]);
     } catch (cause) {
-      throw createFailure(cause, sent);
+      if (cause instanceof TinaCloudError && cause.status === 409) {
+        throw new BranchCreateError(cause.message, 'exists');
+      }
+      throw cause;
     } finally {
       clearTimeout(timer);
     }

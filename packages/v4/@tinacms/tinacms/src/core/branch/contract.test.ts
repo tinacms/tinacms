@@ -1,6 +1,7 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import type { ContentProvider } from '../content/contract';
 import { createTinaStore } from '../../store/create-store';
+import { AuthError } from '../auth/contract';
 import { createBranchAction } from './create';
 import { BranchCreateError, branchSliceOf } from './contract';
 
@@ -97,15 +98,10 @@ describe('branchSliceOf', () => {
 
 describe('createBranchAction', () => {
   it.each([
-    [
-      new BranchCreateError('no answer', 'timeout'),
-      { reason: 'timeout', message: 'no answer' },
-    ],
-    [
-      new BranchCreateError('taken', 'exists'),
-      { reason: 'exists', message: 'taken' },
-    ],
-    [new Error('boom'), undefined],
+    [new BranchCreateError('no answer', 'timeout'), 'timeout'],
+    [new BranchCreateError('taken', 'exists'), 'exists'],
+    [new AuthError('expired'), 'auth'],
+    [new Error('boom'), 'other'],
   ])('records why a create failed: %s', async (cause, failure) => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const store = createTinaStore([]);
@@ -122,7 +118,7 @@ describe('createBranchAction', () => {
         outcome: 'failed',
       })
     );
-    expect(branchSliceOf(store.getState())?.createResult?.failure).toEqual(
+    expect(branchSliceOf(store.getState())?.createResult?.failure).toBe(
       failure
     );
     warn.mockRestore();

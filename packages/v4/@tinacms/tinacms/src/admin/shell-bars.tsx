@@ -62,10 +62,7 @@ const sameOutcome = (a: Outcome, b: Outcome): boolean =>
   a.kind === b.kind &&
   a.name === b.name &&
   (a.kind !== 'failed' ||
-    (b.kind === 'failed' &&
-      a.from === b.from &&
-      a.failure?.reason === b.failure?.reason &&
-      a.failure?.message === b.failure?.message));
+    (b.kind === 'failed' && a.from === b.from && a.failure === b.failure));
 
 /**
  * The branch button. Owns whether the switcher is open and what the last create ended in. While
@@ -305,7 +302,7 @@ function BranchControl() {
         title: `Couldn't create ${outcome.name}`,
         text: failureDetail(outcome.name, outcome.failure),
         action:
-          outcome.failure?.reason === 'exists'
+          outcome.failure === 'exists'
             ? undefined
             : {
                 label: 'Retry',

@@ -18,6 +18,7 @@ import type {
   BranchSlice,
   BranchSource,
 } from '../core/branch/contract';
+import { AuthError } from '../core/auth/contract';
 import { BranchCreateError, currentBranchOf } from '../core/branch/contract';
 import { ContentError, type DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
@@ -1813,9 +1814,7 @@ describe('branch switcher rows and creating a branch', () => {
     const { user, dialog } = await startCreate();
     await press(dialog, user);
     expect(
-      await within(dialog).findByText(
-        "Couldn't create cms/x. Check your connection, then retry."
-      )
+      await within(dialog).findByText("Couldn't create cms/x. Try again.")
     ).toBeVisible();
     expect(warn).toHaveBeenCalled();
     expect(screen.getByRole('button', { name: /^Branch: main/ })).toBeVisible();
@@ -2192,9 +2191,7 @@ describe('branch switcher rows and creating a branch', () => {
     await user.click(screen.getByRole('button', { name: /^Branch:/ }));
     const dialog = await screen.findByRole('dialog', { name: 'Branches' });
     expect(
-      await within(dialog).findByText(
-        "Couldn't create cms/x. Check your connection, then retry."
-      )
+      await within(dialog).findByText("Couldn't create cms/x. Try again.")
     ).toBeVisible();
     await waitFor(() => expect(toasts()).toHaveLength(0));
   });
@@ -2215,7 +2212,7 @@ describe('branch switcher rows and creating a branch', () => {
     );
     const { user, dialog } = await startCreate();
     await press(dialog, user);
-    await within(dialog).findByText(/Couldn't create cms\/x\. Check/);
+    await within(dialog).findByText(/Couldn't create cms\/x\. Try/);
     await user.click(
       within(dialog).getByRole('button', { name: 'Clear name' })
     );
@@ -2226,7 +2223,7 @@ describe('branch switcher rows and creating a branch', () => {
     await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
     const reopened = await screen.findByRole('dialog', { name: 'Branches' });
     expect(
-      await within(reopened).findByText(/Couldn't create cms\/x\. Check/)
+      await within(reopened).findByText(/Couldn't create cms\/x\. Try/)
     ).toBeVisible();
     await waitFor(() => expect(toasts()).toHaveLength(0));
   });
@@ -2246,9 +2243,7 @@ describe('branch switcher rows and creating a branch', () => {
     expect(await within(dialog).findByText('Creating cms/x…')).toBeVisible();
     act(() => rejects[1](new Error('offline')));
     expect(
-      await within(dialog).findByText(
-        "Couldn't create cms/x. Check your connection, then retry."
-      )
+      await within(dialog).findByText("Couldn't create cms/x. Try again.")
     ).toBeVisible();
     await waitFor(() => expect(toasts()).toHaveLength(0));
   });
@@ -2446,15 +2441,21 @@ describe('branch switcher rows and creating a branch', () => {
       false,
     ],
     [
-      'failed with a message from the server',
-      new BranchCreateError('Branch name is not allowed.', 'other'),
-      "Couldn't create cms/x. Branch name is not allowed.",
+      'failed with the server saying something long',
+      new BranchCreateError('<html>502 Bad Gateway</html>', 'other'),
+      "Couldn't create cms/x. Try again.",
+      true,
+    ],
+    [
+      'needed a new sign-in',
+      new AuthError('expired'),
+      "Couldn't create cms/x. Sign in again to create a branch.",
       true,
     ],
     [
       'failed for an unknown reason',
       new Error('offline'),
-      "Couldn't create cms/x. Check your connection, then retry.",
+      "Couldn't create cms/x. Try again.",
       true,
     ],
   ])(
@@ -2487,6 +2488,28 @@ describe('branch switcher rows and creating a branch', () => {
       ).toBe(retry);
     }
   );
+
+  it('disables Create branch for a name the server said is taken until the name changes', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    createBranch = vi.fn<NonNullable<BranchSource['create']>>(() =>
+      Promise.reject(new BranchCreateError('conflict', 'exists'))
+    );
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await within(dialog).findByText(/already exists/);
+    const create = within(dialog).getByRole('button', {
+      name: 'Create branch',
+    });
+    expect(create).toBeDisabled();
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      '2'
+    );
+    expect(
+      within(dialog).getByRole('button', { name: 'Create branch' })
+    ).toBeEnabled();
+    expect(createBranch).toHaveBeenCalledTimes(1);
+  });
 
   it('keeps validating the name after a create ended ready', async () => {
     createBranch = async ({ name }) => ({ name, ready: Promise.resolve() });
@@ -2571,7 +2594,7 @@ describe('branch switcher rows and creating a branch', () => {
     );
     const { user, dialog } = await startCreate();
     await press(dialog, user);
-    await within(dialog).findByText(/Couldn't create cms\/x\. Check/);
+    await within(dialog).findByText(/Couldn't create cms\/x\. Try/);
     await user.click(
       within(dialog).getByRole('button', { name: 'Close branches' })
     );
@@ -2778,7 +2801,7 @@ describe('branch switcher rows and creating a branch', () => {
       const { user } = first;
       await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
       const dialog = await screen.findByRole('dialog', { name: 'Branches' });
-      await within(dialog).findByText(/Couldn't create cms\/a\. Check/);
+      await within(dialog).findByText(/Couldn't create cms\/a\. Try/);
       const open = within(dialog).queryByRole('button', {
         name: 'New branch',
       });
@@ -2843,7 +2866,7 @@ describe('branch switcher rows and creating a branch', () => {
       it.each([
         ['ready', 'cms/a is ready'],
         ['unready', /cms\/a isn't ready yet/],
-        ['failed', /Couldn't create cms\/a\. Check/],
+        ['failed', /Couldn't create cms\/a\. Try/],
       ] as const)(
         'keeps the typed name, the form and the branch when it ends %s, and shows the note once the form closes',
         async (end, note) => {
@@ -2895,7 +2918,7 @@ describe('branch switcher rows and creating a branch', () => {
         within(dialog).getByRole('form', { name: 'New branch form' })
       ).toBeVisible();
       expect(
-        await within(dialog).findByText(/Couldn't create cms\/a\. Check/)
+        await within(dialog).findByText(/Couldn't create cms\/a\. Try/)
       ).toBeVisible();
     });
 

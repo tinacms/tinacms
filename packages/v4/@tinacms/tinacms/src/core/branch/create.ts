@@ -1,7 +1,9 @@
 import type { StoreApi } from 'zustand';
+import { AuthError } from '../auth/contract';
 import type { TinaStoreState } from '../plugin';
 import {
   BranchCreateError,
+  type BranchCreateFailure,
   type BranchSource,
   type BranchSlice,
   branchSliceOf,
@@ -9,6 +11,12 @@ import {
 } from './contract';
 
 type Creatable = BranchSource & Required<Pick<BranchSource, 'create'>>;
+
+const failureOf = (cause: unknown): BranchCreateFailure => {
+  if (cause instanceof BranchCreateError) return cause.reason;
+  if (cause instanceof AuthError) return 'auth';
+  return 'other';
+};
 
 let clock = 0;
 
@@ -61,7 +69,7 @@ export const createBranchAction =
     const finish = (
       made: string,
       outcome: 'ready' | 'unready' | 'failed',
-      failure?: BranchCreateError
+      failure?: BranchCreateFailure
     ) => {
       if (settled) return;
       settled = true;
@@ -79,9 +87,7 @@ export const createBranchAction =
           from,
           startedOn,
           outcome,
-          ...(failure
-            ? { failure: { reason: failure.reason, message: failure.message } }
-            : {}),
+          ...(failure ? { failure } : {}),
         },
       });
     };
@@ -107,7 +113,7 @@ export const createBranchAction =
         }
         if (typeof made !== 'string' || made.trim() === '') {
           console.warn(`[tinacms] could not create branch ${name}:`, result);
-          finish(name, 'failed');
+          finish(name, 'failed', 'other');
           return;
         }
         try {
@@ -149,8 +155,7 @@ export const createBranchAction =
       },
       (cause: unknown) => {
         console.warn(`[tinacms] could not create branch ${name}:`, cause);
-        if (cause instanceof BranchCreateError) finish(name, 'failed', cause);
-        else finish(name, 'failed');
+        finish(name, 'failed', failureOf(cause));
       }
     );
   };

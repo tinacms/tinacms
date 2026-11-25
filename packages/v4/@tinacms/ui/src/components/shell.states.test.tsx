@@ -3,6 +3,7 @@ import {
   cleanup,
   render,
   screen,
+  fireEvent,
   waitFor,
   within,
 } from '@testing-library/react';
@@ -181,6 +182,60 @@ describe('Branch switcher pending rows', () => {
       />
     );
     expect(screen.getByRole('button', { name: /^main/ })).toBeInTheDocument();
+  });
+});
+
+describe('Branch switcher while its form creates', () => {
+  it('hides only the branch being created, not other new rows', async () => {
+    const props = {
+      current: 'feature/news',
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(
+      <BranchSwitcher {...props} branches={[{ name: 'feature/news' }]} />
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    rerender(
+      <BranchSwitcher
+        {...props}
+        createState='creating'
+        creatingBranch='cms/a'
+        branches={[
+          { name: 'cms/a', ready: false },
+          { name: 'cms/other' },
+          { name: 'feature/news' },
+        ]}
+      />
+    );
+    expect(screen.queryByRole('button', { name: /cms\/a/ })).toBeNull();
+    expect(screen.getByRole('button', { name: /cms\/other/ })).toBeVisible();
+  });
+
+  it('does not close the maximised view on Escape while composing', async () => {
+    render(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        onSwitch={() => {}}
+        defaultOpen
+        defaultMaximised
+      />
+    );
+    const view = document.querySelector('[data-slot="branch-maximised"]');
+    expect(view).not.toBeNull();
+    fireEvent.keyDown(document.body, { key: 'Escape', isComposing: true });
+    expect(
+      document.querySelector('[data-slot="branch-maximised"]')
+    ).not.toBeNull();
+    fireEvent.keyDown(document.body, { key: 'Escape' });
+    await waitFor(() =>
+      expect(
+        document.querySelector('[data-slot="branch-maximised"]')
+      ).toBeNull()
+    );
   });
 });
 
@@ -869,8 +924,7 @@ describe('Branch switcher controls', () => {
       expect(
         scrolled.mock.contexts.some(
           (el) =>
-            el instanceof Element &&
-            el.contains(screen.getByRole('button', { name: 'Retry' }))
+            el instanceof Element && el.contains(screen.getByRole('alert'))
         )
       ).toBe(true)
     );

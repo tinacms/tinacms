@@ -21,7 +21,7 @@ export interface BranchSource {
   /**
    * Makes branch `name` from branch `from`. Resolves once the branch exists, with the name the
    * Data Layer gave it and, when it is not readable yet, a `ready` promise that settles when it is.
-   * Rejects when the branch was not made. Reject with `BranchCreateError` to say why.
+   * Rejects when the branch was not made.
    */
   create?(request: {
     name: string;
@@ -29,7 +29,10 @@ export interface BranchSource {
   }): Promise<{ name: string; ready?: Promise<void> }>;
 }
 
-/** Why a create failed: `timeout` (it may still exist), `exists` (the name is taken) or `other`. */
+/** Why a create failed. `auth` is a sign-in problem and `other` is everything else. */
+export type BranchCreateFailure = 'timeout' | 'exists' | 'auth' | 'other';
+
+/** The TinaCloud provider's way to say `timeout` (it may still exist) or `exists` (name taken). Not public. */
 export class BranchCreateError extends Error {
   constructor(
     message: string,
@@ -100,7 +103,7 @@ export interface BranchCreateResult {
   /** `current` when the create started; the auto-switch only fires if it is still current. */
   startedOn: string | undefined;
   outcome: 'ready' | 'unready' | 'failed';
-  failure?: { reason: BranchCreateError['reason']; message: string };
+  failure?: BranchCreateFailure;
 }
 
 type SaveToNewBranch = NonNullable<BranchSlice['saveToNewBranch']>;
@@ -124,14 +127,6 @@ const creatingOf = (value: unknown): BranchCreating | undefined => {
   return { name, from, startedOn: optionalString(startedOn), phase };
 };
 
-const failureOf = (
-  reason: unknown,
-  message: string
-): NonNullable<BranchCreateResult['failure']> => ({
-  reason: reason === 'timeout' || reason === 'exists' ? reason : 'other',
-  message,
-});
-
 const createResultOf = (value: unknown): BranchCreateResult | undefined => {
   if (!isRecord(value)) return undefined;
   const { name, from, startedOn, outcome, failure } = value;
@@ -144,8 +139,11 @@ const createResultOf = (value: unknown): BranchCreateResult | undefined => {
     from,
     startedOn: optionalString(startedOn),
     outcome,
-    ...(isRecord(failure) && typeof failure.message === 'string'
-      ? { failure: failureOf(failure.reason, failure.message) }
+    ...(failure === 'timeout' ||
+    failure === 'exists' ||
+    failure === 'auth' ||
+    failure === 'other'
+      ? { failure }
       : {}),
   };
 };

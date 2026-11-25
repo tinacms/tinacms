@@ -44,11 +44,8 @@ type BranchEntry = {
   unready?: boolean;
 };
 
-/** Why a create failed: it may still exist, the name is taken, or the provider's own message. */
-type CreateFailure = {
-  reason: 'timeout' | 'exists' | 'other';
-  message?: string;
-};
+/** Why a create failed: it may still exist, the name is taken, sign-in, or anything else. */
+type CreateFailure = 'timeout' | 'exists' | 'auth' | 'other';
 
 /** What a create ended in. `reason` says why the note's action was refused. */
 type BranchNote = {
@@ -238,20 +235,20 @@ function BranchGroup({
   );
 }
 
-/** What a failed create tells the user to do. */
+/** What a failed create tells the user to do. Never shows what a server sent back. */
 const failureDetail = (name: string, failure?: CreateFailure) => {
-  if (failure?.reason === 'exists') {
+  if (failure === 'exists') {
     return `A branch called ${name} already exists. Reload to see it.`;
   }
-  if (failure?.reason === 'other' && failure.message) return failure.message;
-  const retry = 'Check your connection, then retry.';
-  return failure?.reason === 'timeout'
-    ? `${retry} It may still have been made, so reload to check.`
-    : retry;
+  if (failure === 'auth') return 'Sign in again to create a branch.';
+  if (failure === 'timeout') {
+    return 'Check your connection, then retry. It may still have been made, so reload to check.';
+  }
+  return 'Try again.';
 };
 
 const failureLine = (name: string, failure?: CreateFailure) =>
-  failure?.reason === 'exists'
+  failure === 'exists'
     ? failureDetail(name, failure)
     : `Couldn't create ${name}. ${failureDetail(name, failure)}`;
 
@@ -268,7 +265,7 @@ function OutcomeNote({
   const failed = note.kind === 'failed';
   const action =
     note.kind === 'failed'
-      ? note.failure?.reason === 'exists'
+      ? note.failure === 'exists'
         ? undefined
         : 'Retry'
       : note.kind === 'ready'
@@ -286,7 +283,7 @@ function OutcomeNote({
           failed ? 'text-destructive' : 'text-foreground'
         )}
       >
-        <span className='min-w-0 flex-1 [overflow-wrap:anywhere]'>
+        <span className='min-w-0 flex-[1_1_12rem] [overflow-wrap:anywhere]'>
           {note.kind === 'failed'
             ? failureLine(note.name, note.failure)
             : note.kind === 'unready'
@@ -407,7 +404,11 @@ function BranchSwitcher({
   const hideMaking = createState === 'creating' && creating;
   const matching = branches.filter(
     (branch) =>
-      !(hideMaking && !known.current.has(branch.name)) &&
+      !(
+        hideMaking &&
+        branch.name === creatingBranch &&
+        !known.current.has(branch.name)
+      ) &&
       (branch.name.toLowerCase().includes(wanted) ||
         (branch.pullRequest !== undefined &&
           String(branch.pullRequest).includes(wanted)))
@@ -450,9 +451,11 @@ function BranchSwitcher({
     );
   };
   const showActions = () => {
-    frame()
-      .querySelector('[data-branch-actions]')
-      ?.scrollIntoView?.({ block: 'nearest' });
+    const root = frame();
+    (
+      root.querySelector('[data-branch-failure]') ??
+      root.querySelector('[data-branch-actions]')
+    )?.scrollIntoView?.({ block: 'nearest' });
   };
   useEffect(() => {
     if (failed) return afterPaint(showActions);
@@ -547,6 +550,19 @@ function BranchSwitcher({
     setOpen(false);
     triggerRef.current?.focus();
   };
+
+  // A tooltip on a focused control takes the first Escape, so the pop-up listens before it.
+  const closeNow = useRef(closeAndFocusButton);
+  closeNow.current = closeAndFocusButton;
+  const popUpOpen = shown && !maximised && !phone;
+  useEffect(() => {
+    if (!popUpOpen) return;
+    const close = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape' && !event.isComposing) closeNow.current();
+    };
+    document.addEventListener('keydown', close, true);
+    return () => document.removeEventListener('keydown', close, true);
+  }, [popUpOpen]);
 
   const move = (event: KeyboardEvent<HTMLElement>) => {
     const keys = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
@@ -834,21 +850,6 @@ function BranchSwitcher({
                 </span>
               )}
             </div>
-            {failed ? (
-              <p
-                role='alert'
-                className='m-0 text-sm text-destructive [overflow-wrap:anywhere]'
-              >
-                {failureLine(attempted.current, createFailure)}
-              </p>
-            ) : (
-              // Holds the failure line's height, so Create, Creating and Retry stay put.
-              <p
-                aria-hidden='true'
-                data-text={failureLine('branch')}
-                className='invisible m-0 text-sm before:content-[attr(data-text)] [overflow-wrap:anywhere]'
-              />
-            )}
             <div
               data-branch-actions=''
               className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'
@@ -877,16 +878,26 @@ function BranchSwitcher({
                   blocked ||
                   waiting ||
                   typed === '' ||
-                  nameError !== undefined
+                  nameError !== undefined ||
+                  (failed && createFailure === 'exists')
                 }
               >
                 {busy
                   ? 'Creating'
-                  : failed && createFailure?.reason !== 'exists'
+                  : failed && createFailure !== 'exists'
                     ? 'Retry'
                     : 'Create branch'}
               </Button>
             </div>
+            {failed ? (
+              <p
+                role='alert'
+                data-branch-failure=''
+                className='m-0 text-sm text-destructive [overflow-wrap:anywhere]'
+              >
+                {failureLine(attempted.current, createFailure)}
+              </p>
+            ) : null}
           </form>
         ) : null}
       </div>
@@ -1012,9 +1023,14 @@ function BranchSwitcher({
 const wrapTab = (event: KeyboardEvent<HTMLElement>) => {
   const items = [
     ...event.currentTarget.querySelectorAll<HTMLElement>(
-      'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled])'
+      'a[href], button, input, select, textarea, [tabindex]'
     ),
-  ];
+  ].filter(
+    (item) =>
+      item.tabIndex >= 0 &&
+      !item.matches(':disabled') &&
+      item.getClientRects().length > 0
+  );
   const end = event.shiftKey ? items[0] : items[items.length - 1];
   if (document.activeElement !== end) return;
   event.preventDefault();
@@ -1040,7 +1056,7 @@ function MaximisedView({
   escape.current = onEscape;
   useEffect(() => {
     const close = (event: globalThis.KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
+      if (event.key !== 'Escape' || event.isComposing) return;
       // A busy Button swallows keys, so Escape on it still closes the view.
       const onBusyButton =
         event.target instanceof Element &&

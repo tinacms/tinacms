@@ -208,6 +208,58 @@ test.describe('branch switcher pop-up', () => {
     await expect(page.getByRole('button', { name: /^Branch:/ })).toBeFocused();
   });
 
+  test('closes the pop-up with one Escape from the Maximise button, tooltip and all', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto(URL);
+    await page.getByRole('button', { name: /^Branch:/ }).click();
+    const popup = page.getByRole('dialog', { name: 'Branches' });
+    await expect(popup).toBeVisible();
+    await expect(
+      popup.getByRole('searchbox', { name: 'Search branches' })
+    ).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Shift+Tab');
+    await expect(popup.getByRole('button', { name: 'Maximise' })).toBeFocused();
+    await expect(
+      page.locator('[data-slot="tooltip-content"]', { hasText: 'Maximise' })
+    ).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(popup).toBeHidden();
+  });
+
+  test('keeps the ready note readable on a 375px phone with a long branch name', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 700 });
+    await page.goto('/branches.html?docs=1&create=failonce#/');
+    await openFrame(page, false);
+    const sheet = frameOf(page, false);
+    const long = 'cms/ready-later-with-a-long-name';
+    await makeBranch(page, sheet, long);
+    await page.keyboard.press('Escape');
+    await expect(page.getByText(`Couldn't create ${long}`)).toBeVisible();
+    await openFrame(page, false);
+    const reopened = frameOf(page, false);
+    const name = reopened.getByRole('searchbox', { name: 'New branch name' });
+    await name.fill('cms/b');
+    await reopened
+      .locator('[data-slot="branch-outcome-note"]')
+      .getByRole('button', { name: 'Retry' })
+      .click();
+    await expect(reopened.getByText('Creating', { exact: false })).toBeHidden({
+      timeout: 8000,
+    });
+    await name.fill('');
+    const text = reopened
+      .locator('[data-slot="branch-outcome-note"] span')
+      .first();
+    await expect(text).toHaveText(`${long} is ready`);
+    const box = await text.boundingBox();
+    expect(box?.height ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(40);
+  });
+
   test('wraps Tab inside the maximised view while Create branch is disabled', async ({
     page,
   }) => {
@@ -1158,9 +1210,7 @@ test.describe('branch switcher pop-up', () => {
       await openFrame(page, frame.maximise);
       const view = frameOf(page, frame.maximise);
       await makeBranch(page, view);
-      await expect(
-        view.getByText(/Couldn't create cms\/x\. Check/)
-      ).toBeVisible({
+      await expect(view.getByText(/Couldn't create cms\/x\. Try/)).toBeVisible({
         timeout: 5000,
       });
       await view.getByRole('searchbox', { name: 'New branch name' }).fill('');
@@ -1170,9 +1220,7 @@ test.describe('branch switcher pop-up', () => {
       ).toBeVisible();
       await openFrame(page, frame.maximise);
       await expect(
-        frameOf(page, frame.maximise).getByText(
-          /Couldn't create cms\/x\. Check/
-        )
+        frameOf(page, frame.maximise).getByText(/Couldn't create cms\/x\. Try/)
       ).toBeVisible();
       await expect.poll(() => toastCount(page)).toBe(0);
     });
@@ -1211,16 +1259,12 @@ test.describe('branch switcher pop-up', () => {
       await openFrame(page, frame.maximise);
       const view = frameOf(page, frame.maximise);
       await expect(
-        view.getByText(
-          "Couldn't create cms/x. Check your connection, then retry."
-        )
+        view.getByText("Couldn't create cms/x. Try again.")
       ).toBeVisible();
       await expect.poll(() => toastCount(page)).toBe(0);
       await view.getByRole('button', { name: 'Retry' }).click();
       await expect(
-        view.getByText(
-          "Couldn't create cms/x. Check your connection, then retry."
-        )
+        view.getByText("Couldn't create cms/x. Try again.")
       ).toBeVisible({ timeout: 5000 });
       expect(await toastCount(page)).toBe(0);
     });
