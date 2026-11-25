@@ -46,6 +46,7 @@ import {
   emptyWords,
   loadingWords,
   missingCardWords,
+  parentCheckFailedWords,
 } from './media-picker-words';
 
 const DOCUMENT_PATH = 'content/posts/hello.mdx';
@@ -1006,22 +1007,48 @@ describe('a missing image in a folder that is still there', () => {
     expect(screen.getByRole('navigation')).toBeVisible();
   });
 
-  it('keeps the folder open when the parent check fails another way', async () => {
+  it('keeps the folder open when the parent check fails another way, says so, and retries', async () => {
     emptyPosts();
-    const failing = (error: Error) => {
-      let first = true;
-      return createProvider({
+    let rootFails = true;
+    const user = await openMissing(
+      createProvider({
         list: vi.fn(async (folder: string): Promise<MediaPage> => {
-          if (folder === '' && first) {
-            first = false;
-            throw error;
-          }
+          if (folder === '' && rootFails) throw new Error('boom');
           return { items: childrenOf(folder) };
         }),
-      });
-    };
-    await openMissing(failing(new Error('boom')));
-    expect(await screen.findByText(emptyWords('posts'))).toBeVisible();
+      })
+    );
+    expect(
+      await screen.findByText(parentCheckFailedWords('posts'))
+    ).toBeVisible();
+    expect(screen.getByText(emptyWords('posts'))).toBeVisible();
+    rootFails = false;
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    await waitFor(() =>
+      expect(screen.queryByText(parentCheckFailedWords('posts'))).toBeNull()
+    );
+    expect(screen.getByText(emptyWords('posts'))).toBeVisible();
+    expect(screen.getByRole('navigation')).toBeVisible();
+  });
+
+  it('serves a new missing folder when the same field asks again', async () => {
+    files = [
+      { path: 'shots', kind: 'directory' },
+      { path: 'logo.png', kind: 'file' },
+    ];
+    const user = userEvent.setup();
+    renderPicker(createProvider(), {
+      asks: {
+        one: single({ replacing: { path: 'posts/gone.jpg', missing: true } }),
+        two: single({ replacing: { path: 'shots/gone.jpg', missing: true } }),
+      },
+    });
+    await openPicker(user, 'one');
+    expect(await tile('logo.png')).toBeVisible();
+    expect(screen.queryByRole('navigation')).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Open two' }));
+    expect(await screen.findByText(emptyWords('shots'))).toBeVisible();
+    expect(screen.getByRole('navigation')).toBeVisible();
   });
 
   it('leaves the folder when the parent check says not-found', async () => {

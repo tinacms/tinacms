@@ -66,6 +66,7 @@ import {
   SEARCH_PLACEHOLDER,
   confirmWords,
   emptyWords,
+  parentCheckFailedWords,
   forLine,
   missingCardWords,
   noHitsWords,
@@ -293,6 +294,8 @@ export function MediaPickerPanel({
     if (parentCheck.isError) return isNotFound(parentCheck.error);
     return parentCheck.data === false;
   })();
+  const parentCheckFailed =
+    parentCheckWanted && parentCheck.isError && !isNotFound(parentCheck.error);
   const missingFolderGone = isNotFound(listError) || parentGone;
   useEffect(() => {
     if (inMissingFolder && folder !== '' && missingFolderGone) setFolder('');
@@ -463,6 +466,20 @@ export function MediaPickerPanel({
     }
     return (
       <>
+        {parentCheckFailed ? (
+          <div className='flex items-center gap-2 p-2 text-sm text-muted-foreground'>
+            <p className='m-0'>{parentCheckFailedWords(folder)}</p>
+            <Button
+              type='button'
+              variant='ghost'
+              size='sm'
+              disabled={parentCheck.isFetching}
+              onClick={() => void parentCheck.refetch()}
+            >
+              {RETRY}
+            </Button>
+          </div>
+        ) : null}
         {items.length === 0 && !hasNextPage ? (
           hasQuery ? (
             <div className='flex flex-col items-start gap-2 p-2 text-sm'>

@@ -33,6 +33,9 @@ export const loadingWords = (folder: string): string =>
 export const emptyWords = (folder: string): string =>
   `No images in ${folderNameOf(folder)} yet.`;
 
+export const parentCheckFailedWords = (folder: string): string =>
+  `Couldn’t check that ${folderNameOf(folder)} is still in Media.`;
+
 export const noHitsWords = (folder: string, query: string): string =>
   `No images in ${folderNameOf(folder)} match “${query}”.`;
 
