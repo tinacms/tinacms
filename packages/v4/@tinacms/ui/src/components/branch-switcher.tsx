@@ -301,10 +301,10 @@ function OutcomeNote({
         {action ? (
           <Button
             size='sm'
-            className='h-auto min-h-8 min-w-0 max-w-full shrink py-1 text-left whitespace-normal [overflow-wrap:anywhere]'
+            className='h-auto min-h-8 min-w-0 max-w-full shrink py-1 text-left whitespace-normal'
             onClick={onAction}
           >
-            {action}
+            <span className='min-w-0 [overflow-wrap:anywhere]'>{action}</span>
           </Button>
         ) : null}
         <Button size='sm' variant='ghost' onClick={onDismiss}>

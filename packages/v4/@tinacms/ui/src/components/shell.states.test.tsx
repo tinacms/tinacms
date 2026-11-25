@@ -447,6 +447,11 @@ describe('Branch switcher create announcements', () => {
     expect(
       screen.getByRole('button', { name: /Switch to cms\/ready-later/ })
     ).toHaveClass('whitespace-normal', 'shrink');
+    const label = screen.getByText(
+      'Switch to cms/ready-later-with-a-long-name'
+    );
+    expect(label).not.toHaveClass('truncate');
+    expect(label).toHaveClass('[overflow-wrap:anywhere]');
   });
 });
 
