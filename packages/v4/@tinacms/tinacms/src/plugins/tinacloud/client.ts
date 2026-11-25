@@ -128,9 +128,8 @@ const createFailure = (cause: unknown, sent: boolean): unknown => {
   const { status } = cause;
   if (status === 409) return new BranchCreateError(cause.message, 'exists');
   if (status === 422) return new BranchCreateError(cause.message, 'refused');
-  if (status === 401 || status === 403) {
-    return new BranchCreateError(cause.message, 'auth');
-  }
+  if (status === 401) return new BranchCreateError(cause.message, 'auth');
+  if (status === 403) return new BranchCreateError(cause.message, 'forbidden');
   if (status === undefined && sent) {
     return new BranchCreateError(cause.message, 'timeout');
   }

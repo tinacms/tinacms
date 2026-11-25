@@ -2,7 +2,7 @@ import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import type { ContentProvider } from '../content/contract';
 import { createTinaStore } from '../../store/create-store';
 import { AuthError } from '../auth/contract';
-import { createBranchAction } from './create';
+import { CREATE_DEADLINE_MS, createBranchAction } from './create';
 import { BranchCreateError, branchSliceOf } from './contract';
 
 const sliceWith = (saveToNewBranch: unknown) =>
@@ -124,6 +124,41 @@ describe('createBranchAction', () => {
     expect(branchSliceOf(store.getState())?.createResult?.failure).toBe(
       failure
     );
+    warn.mockRestore();
+  });
+
+  it('ends a create the provider never answers as a timeout and accepts the next one', async () => {
+    vi.useFakeTimers();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createTinaStore([]);
+    store.setState({
+      branch: { list: ['main'], protected: [], switchTo: () => {} },
+    } as never);
+    const create = vi
+      .fn()
+      .mockImplementationOnce(() => new Promise(() => {}))
+      .mockResolvedValueOnce({ name: 'cms/two' });
+    const act = createBranchAction(store, {
+      list: async () => [],
+      defaultBranch: async () => 'main',
+      create,
+    });
+    act('cms/one', 'main');
+    expect(branchSliceOf(store.getState())?.creating?.name).toBe('cms/one');
+    await vi.advanceTimersByTimeAsync(CREATE_DEADLINE_MS + 1);
+    expect(branchSliceOf(store.getState())?.creating).toBeUndefined();
+    expect(branchSliceOf(store.getState())?.createResult).toMatchObject({
+      name: 'cms/one',
+      outcome: 'failed',
+      failure: 'timeout',
+    });
+    act('cms/two', 'main');
+    await vi.advanceTimersByTimeAsync(10);
+    expect(branchSliceOf(store.getState())?.createResult).toMatchObject({
+      name: 'cms/two',
+      outcome: 'ready',
+    });
+    vi.useRealTimers();
     warn.mockRestore();
   });
 

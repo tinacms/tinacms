@@ -2453,9 +2453,9 @@ describe('branch switcher rows and creating a branch', () => {
       false,
     ],
     [
-      'was refused by TinaCloud for lack of access',
-      new BranchCreateError('403', 'auth'),
-      "Couldn't create cms/x. Sign in again to create a branch.",
+      'was refused for lack of access',
+      new BranchCreateError('403', 'forbidden'),
+      "Couldn't create cms/x. You don't have permission to create branches.",
       false,
     ],
     [
@@ -2467,7 +2467,7 @@ describe('branch switcher rows and creating a branch', () => {
     [
       'was refused because of the branch name',
       new BranchCreateError('422', 'refused'),
-      "Couldn't create cms/x. TinaCloud refused this branch name.",
+      "Couldn't create cms/x. This branch name was refused.",
       false,
     ],
     [
@@ -2541,6 +2541,40 @@ describe('branch switcher rows and creating a branch', () => {
       within(dialog).getByRole('searchbox', { name: 'New branch name' })
     ).toHaveFocus();
   });
+
+  it.each([
+    ['exists', new BranchCreateError('conflict', 'exists')],
+    ['refused', new BranchCreateError('422', 'refused')],
+    ['sign-in', new AuthError('expired')],
+  ])(
+    'keeps Create branch off for the same name after a %s failure, even after closing and reopening',
+    async (_label, cause) => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      createBranch = vi.fn<NonNullable<BranchSource['create']>>(() =>
+        Promise.reject(cause)
+      );
+      const { user, dialog } = await startCreate();
+      await press(dialog, user);
+      await within(dialog).findByRole('alert');
+      expect(
+        within(dialog).getByRole('button', { name: 'Create branch' })
+      ).toBeDisabled();
+      await user.keyboard('{Escape}');
+      await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+      const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+      const name = await within(reopened).findByRole('searchbox', {
+        name: 'New branch name',
+      });
+      expect(name).toHaveValue('cms/x');
+      expect(
+        within(reopened).getByRole('button', { name: 'Create branch' })
+      ).toBeDisabled();
+      await user.type(name, '2');
+      expect(
+        within(reopened).getByRole('button', { name: 'Create branch' })
+      ).toBeEnabled();
+    }
+  );
 
   it('keeps validating the name after a create ended ready', async () => {
     createBranch = async ({ name }) => ({ name, ready: Promise.resolve() });

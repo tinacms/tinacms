@@ -20,6 +20,9 @@ const failureOf = (cause: unknown): BranchCreateFailure => {
   return 'other';
 };
 
+/** How long a provider's `create` may take before the create ends as a timeout. */
+export const CREATE_DEADLINE_MS = 90_000;
+
 let clock = 0;
 
 /** Orders list reads against creates: a later value happened later. */
@@ -68,6 +71,7 @@ export const createBranchAction =
       store.setState((state) => ({ branch: { ...state.branch, ...patch } }));
     const startedOn = currentBranchOf(store.getState());
     let settled = false;
+    let deadline: ReturnType<typeof setTimeout> | undefined;
     const finish = (
       made: string,
       outcome: 'ready' | 'unready' | 'failed',
@@ -75,6 +79,7 @@ export const createBranchAction =
     ) => {
       if (settled) return;
       settled = true;
+      clearTimeout(deadline);
       const madeNames = madeByStore.get(store);
       if (madeNames?.has(made)) madeNames.set(made, tickClock());
       const unready = branchSliceOf(store.getState())?.unready ?? [];
@@ -103,10 +108,17 @@ export const createBranchAction =
       },
       createResult: undefined,
     });
+    // A provider whose create never answers must not lock creating for the session.
+    deadline = setTimeout(
+      () => finish(name, 'failed', 'timeout'),
+      CREATE_DEADLINE_MS
+    );
     new Promise<Awaited<ReturnType<Creatable['create']>>>((resolve) =>
       resolve(source.create({ name, from }))
     ).then(
       (result) => {
+        if (settled) return;
+        clearTimeout(deadline);
         let made: unknown;
         try {
           made = result?.name;

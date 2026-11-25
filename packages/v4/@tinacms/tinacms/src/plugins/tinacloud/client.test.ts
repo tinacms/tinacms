@@ -484,7 +484,7 @@ describe('createBranch', () => {
     [409, 'exists'],
     [422, 'refused'],
     [401, 'auth'],
-    [403, 'auth'],
+    [403, 'forbidden'],
   ])(
     'says why a create answered %s was refused: %s',
     async (status, reason) => {

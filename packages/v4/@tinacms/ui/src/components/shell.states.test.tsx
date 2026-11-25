@@ -186,7 +186,7 @@ describe('Branch switcher pending rows', () => {
 });
 
 describe('Branch switcher failure notes', () => {
-  it('caps the failure note to two lines and keeps the full text in a title', () => {
+  it('wraps the failure note in full, with no clamp and no title', () => {
     const name = 'cms/a-very-long-branch-name-that-keeps-going-and-going';
     render(
       <BranchSwitcher
@@ -198,14 +198,16 @@ describe('Branch switcher failure notes', () => {
       />
     );
     const text = screen.getByText(new RegExp(`Couldn't create ${name}`));
-    expect(text).toHaveClass('line-clamp-2');
-    expect(text).toHaveAttribute('title', text.textContent ?? '');
+    expect(text).not.toHaveClass('line-clamp-2');
+    expect(text).not.toHaveAttribute('title');
+    expect(text).toHaveTextContent(/reload to check\.$/);
   });
 
   it.each([
     ['exists', false],
     ['refused', false],
     ['auth', false],
+    ['forbidden', false],
     ['network', true],
     ['timeout', true],
     ['other', true],

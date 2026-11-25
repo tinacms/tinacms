@@ -1,10 +1,9 @@
 import {
-  type CreateFailure,
   BranchSwitcher,
   LocalFilesBadge,
-  canRetry,
   failureDetail,
 } from '@tinacms/ui/components/branch-switcher';
+import { canRetry, type CreateFailure } from '@tinacms/ui/lib/create-failure';
 import { SaveProgress } from '@tinacms/ui/components/save-progress';
 import { SidebarTrigger } from '@tinacms/ui/components/sidebar';
 import { StatusBar } from '@tinacms/ui/components/status-bar';

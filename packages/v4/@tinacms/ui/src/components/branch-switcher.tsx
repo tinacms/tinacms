@@ -29,6 +29,7 @@ import { SearchBox } from '@tinacms/ui/components/search-box';
 import { BRANCH_NAME_HINT, branchNameError } from '@tinacms/ui/lib/branch-name';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { dialogTitleClasses } from '@tinacms/ui/lib/dialog-styles';
+import { canRetry, type CreateFailure } from '@tinacms/ui/lib/create-failure';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type BranchEntry = {
@@ -45,14 +46,6 @@ type BranchEntry = {
 };
 
 /** Why a create failed: it may still exist, the name is taken, sign-in, or anything else. */
-type CreateFailure =
-  | 'timeout'
-  | 'exists'
-  | 'refused'
-  | 'auth'
-  | 'network'
-  | 'other';
-
 /** What a create ended in. `reason` says why the note's action was refused. */
 type BranchNote = {
   kind: 'failed' | 'unready' | 'ready';
@@ -246,7 +239,10 @@ const failureDetail = (name: string, failure?: CreateFailure) => {
   if (failure === 'exists') {
     return `A branch called ${name} already exists. Reload to see it.`;
   }
-  if (failure === 'refused') return 'TinaCloud refused this branch name.';
+  if (failure === 'refused') return 'This branch name was refused.';
+  if (failure === 'forbidden') {
+    return "You don't have permission to create branches.";
+  }
   if (failure === 'auth') return 'Sign in again to create a branch.';
   if (failure === 'network')
     return "Can't reach the sign-in service. Try again.";
@@ -255,10 +251,6 @@ const failureDetail = (name: string, failure?: CreateFailure) => {
   }
   return 'Try again.';
 };
-
-/** Retry helps only when the same request could succeed: not for a taken or refused name, or no sign-in. */
-const canRetry = (failure?: CreateFailure) =>
-  failure !== 'exists' && failure !== 'refused' && failure !== 'auth';
 
 const failureLine = (name: string, failure?: CreateFailure) =>
   failure === 'exists'
@@ -296,13 +288,7 @@ function OutcomeNote({
           failed ? 'text-destructive' : 'text-foreground'
         )}
       >
-        <span
-          title={failed ? failureLine(note.name, note.failure) : undefined}
-          className={cn(
-            'min-w-0 flex-[1_1_12rem] [overflow-wrap:anywhere]',
-            failed && 'line-clamp-2'
-          )}
-        >
+        <span className='min-w-0 flex-[1_1_12rem] [overflow-wrap:anywhere]'>
           {note.kind === 'failed'
             ? failureLine(note.name, note.failure)
             : note.kind === 'unready'
@@ -480,9 +466,12 @@ function BranchSwitcher({
   useEffect(() => {
     if (failed) return afterPaint(showActions);
   }, [failed, maximised]);
+  // The name a failure said cannot work stays blocked after the failure itself is gone.
+  const [refusedName, setRefusedName] = useState<string>();
   // A failure that disables the focused Create button must not drop focus out of the view.
   useEffect(() => {
     if (!failed || canRetry(createFailure)) return;
+    setRefusedName(attempted.current);
     const active = document.activeElement;
     if (
       !active ||
@@ -505,6 +494,7 @@ function BranchSwitcher({
     setNewName('');
     setSubmitted(false);
     setStartFrom('current');
+    setRefusedName(undefined);
   }
   useEffect(() => {
     if (resetFromForm.current && open && focusHere()) {
@@ -913,8 +903,8 @@ function BranchSwitcher({
                   waiting ||
                   typed === '' ||
                   nameError !== undefined ||
-                  (failed &&
-                    (createFailure === 'exists' || createFailure === 'refused'))
+                  (failed && !canRetry(createFailure)) ||
+                  typed === refusedName
                 }
               >
                 {busy
@@ -1124,5 +1114,5 @@ function LocalFilesBadge() {
   );
 }
 
-export type { BranchEntry, BranchNote, BranchSwitcherProps, CreateFailure };
-export { BranchSwitcher, LocalFilesBadge, canRetry, failureDetail };
+export type { BranchEntry, BranchNote, BranchSwitcherProps };
+export { BranchSwitcher, LocalFilesBadge, failureDetail };
