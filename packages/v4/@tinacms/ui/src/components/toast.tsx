@@ -174,29 +174,36 @@ type ToastOptions = Omit<ToastProps, 'id'> & {
   /** Milliseconds, or `Infinity` to stay until the person acts. Errors and warnings stay by default. */
   duration?: number;
   id?: string | number;
-  /** Runs only when the person presses Dismiss, not when code or the timer closes the toast. */
-  onDismissPress?: () => void;
+  /**
+   * Runs once when the person or the timer ends the toast: its Dismiss button, a swipe or
+   * auto-close. Not when code calls `toast.dismiss`.
+   */
+  onEnd?: () => void;
 };
+
+// sonner reports a swipe and a `dismiss()` call the same way, so code dismissals are marked here.
+const shown = new Set<string | number>();
+const closedByCode = new Set<string | number>();
 
 /**
  * Shows a Toast in the Toaster and returns its id. Errors and warnings stay until dismissed.
  * Pass the same `id` to replace a toast. `onDismiss` runs however the toast closes.
  */
-function toast({
-  duration,
-  onDismiss,
-  onDismissPress,
-  id,
-  ...props
-}: ToastOptions) {
+function toast({ duration, onDismiss, onEnd, id, ...props }: ToastOptions) {
   const urgent = props.tone === 'error' || props.tone === 'warning';
-  return sonner.custom(
-    (toastId) => (
+  let ended = false;
+  const end = () => {
+    if (ended) return;
+    ended = true;
+    onEnd?.();
+  };
+  const toastId = sonner.custom(
+    (sonnerId) => (
       <Toast
         {...props}
         onDismiss={() => {
-          onDismissPress?.();
-          sonner.dismiss(toastId);
+          end();
+          dismiss(sonnerId);
         }}
       />
     ),
@@ -204,12 +211,30 @@ function toast({
       duration: duration ?? (urgent ? Number.POSITIVE_INFINITY : undefined),
       style: props.actionsInline ? INLINE_ACTIONS_WIDTH : undefined,
       id,
-      onDismiss,
-      onAutoClose: onDismiss,
+      onDismiss: (closed) => {
+        shown.delete(closed.id);
+        if (!closedByCode.delete(closed.id)) end();
+        onDismiss?.();
+      },
+      onAutoClose: (closed) => {
+        shown.delete(closed.id);
+        end();
+        onDismiss?.();
+      },
     }
   );
+  shown.add(toastId);
+  return toastId;
 }
-toast.dismiss = sonner.dismiss;
+
+/** Closes one toast, or every toast, from code: `onEnd` does not run. */
+function dismiss(id?: string | number) {
+  for (const closed of id === undefined ? shown : [id]) {
+    if (shown.has(closed)) closedByCode.add(closed);
+  }
+  return sonner.dismiss(id);
+}
+toast.dismiss = dismiss;
 
 export type { ToastAction, ToastOptions, ToastProps, ToastTone };
 export { Toast, toast, toastVariants };

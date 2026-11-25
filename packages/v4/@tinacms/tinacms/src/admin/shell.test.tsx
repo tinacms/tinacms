@@ -2352,6 +2352,64 @@ describe('branch switcher rows and creating a branch', () => {
     await waitFor(() => expect(toasts()).toHaveLength(0), { timeout: 3000 });
   });
 
+  it('keeps a failure toast gone after its own Dismiss when the failure first showed in the form', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let fail: () => void = () => {};
+    createBranch = vi.fn<NonNullable<BranchSource['create']>>(
+      () =>
+        new Promise((_resolve, reject) => {
+          fail = () => reject(new Error('offline'));
+        })
+    );
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    act(() => fail());
+    expect(
+      await within(dialog).findByText("Couldn't create cms/x. Try again.")
+    ).toBeVisible();
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    const sent = (await screen.findByText("Couldn't create cms/x")).closest(
+      '[data-slot=toast]'
+    ) as HTMLElement;
+    await user.click(within(sent).getByRole('button', { name: 'Dismiss' }));
+    await waitFor(() => expect(toasts()).toHaveLength(0));
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const again = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(within(again).queryByText(/Couldn't create cms\/x/)).toBeNull();
+    await user.click(
+      within(again).getByRole('button', { name: 'Close branches' })
+    );
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: 'Branches' })).toBeNull()
+    );
+    expect(toasts()).toHaveLength(0);
+  });
+
+  it('keeps a ready outcome gone after its toast closes by itself', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    let finish: () => void = () => {};
+    createBranch = vi.fn<NonNullable<BranchSource['create']>>(
+      ({ name }) =>
+        new Promise((resolve) => {
+          finish = () => resolve({ name });
+        })
+    );
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    act(() => finish());
+    expect(await screen.findByText('cms/x is ready')).toBeVisible();
+    await act(() => vi.advanceTimersByTimeAsync(10_000));
+    await waitFor(() => expect(toasts()).toHaveLength(0));
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const again = await screen.findByRole('dialog', { name: 'Branches' });
+    expect(within(again).queryByText('cms/x is ready')).toBeNull();
+  });
+
   it('keeps a failure toast gone after its own Dismiss, also once the switcher opens and closes', async () => {
     const { user } = await failWhileClosed();
     const toast = screen

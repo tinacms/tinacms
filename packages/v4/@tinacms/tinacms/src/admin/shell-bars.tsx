@@ -52,7 +52,6 @@ type Outcome =
       kind: 'failed';
       name: string;
       from: string;
-      viaForm?: boolean;
       failure?: CreateFailure;
     }
   | { kind: 'unready'; name: string }
@@ -78,6 +77,8 @@ function BranchControl() {
   const dirty = useAnyFormDirty();
   const [open, setOpen] = useState(false);
   const [held, setHeld] = useState<Outcome>();
+  // The held failure while it still shows in the New branch form, not as the note.
+  const [inline, setInline] = useState<Outcome>();
   const [reason, setReason] = useState<string>();
   const [formShown, setFormShown] = useState(false);
   const [formTyped, setFormTyped] = useState('');
@@ -197,14 +198,11 @@ function BranchControl() {
       setReason(undefined);
       if (outcome === 'failed') {
         setDeferred(undefined);
-        const inline = origin?.via === 'form' && isOpen && shown;
-        setHeld({
-          kind: 'failed',
-          name,
-          from,
-          viaForm: inline,
-          failure,
-        });
+        const failed: Outcome = { kind: 'failed', name, from, failure };
+        setHeld(failed);
+        setInline(
+          origin?.via === 'form' && isOpen && shown ? failed : undefined
+        );
         return;
       }
       const owned =
@@ -245,12 +243,12 @@ function BranchControl() {
     }
   }, [deferred, open, formShown, formTyped]);
 
-  const demoteInline = () =>
-    setHeld((note) =>
-      note?.kind === 'failed' && note.viaForm
-        ? { ...note, viaForm: false }
-        : note
-    );
+  const demoteInline = () => setInline(undefined);
+  // Every way a person or a timer ends an outcome: the note's or toast's Dismiss, a swipe, auto-close.
+  const endOutcome = (ended: Outcome) => {
+    setHeld((now) => (now === ended ? undefined : now));
+    setReason(undefined);
+  };
   useEffect(() => {
     if (!open) demoteInline();
   }, [open]);
@@ -297,12 +295,11 @@ function BranchControl() {
     };
     let id: string | number = '';
     const idOf = () => id;
-    const onDismissPress = () =>
-      setHeld((now) => (now === outcome ? undefined : now));
+    const onEnd = () => endOutcome(outcome);
     if (outcome.kind === 'failed') {
       id = toast({
         tone: 'error',
-        onDismissPress,
+        onEnd,
         title: `Couldn't create ${outcome.name}`,
         text: failureDetail(outcome.name, outcome.failure),
         action: !canRetry(outcome.failure)
@@ -320,14 +317,14 @@ function BranchControl() {
     } else if (outcome.kind === 'unready') {
       id = toast({
         tone: 'warning',
-        onDismissPress,
+        onEnd,
         title: `${outcome.name} isn't ready yet`,
         text: 'It was made. You can switch to it after reloading the page.',
       });
     } else {
       id = toast({
         tone: 'success',
-        onDismissPress,
+        onEnd,
         title: `${outcome.name} is ready`,
         action: {
           label: `Switch to ${outcome.name}`,
@@ -372,8 +369,7 @@ function BranchControl() {
       }
       onNoteAction={handle}
       onNoteDismiss={() => {
-        setHeld(undefined);
-        setReason(undefined);
+        if (held) endOutcome(held);
       }}
       createFailure={held?.kind === 'failed' ? held.failure : undefined}
       formResetKey={formReset}
@@ -385,7 +381,7 @@ function BranchControl() {
       createState={
         (branch.creating || result) && started.current?.via === 'form'
           ? 'creating'
-          : held?.kind === 'failed' && held.viaForm
+          : held?.kind === 'failed' && held === inline
             ? 'failed'
             : 'idle'
       }

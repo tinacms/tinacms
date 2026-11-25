@@ -4,6 +4,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
@@ -358,5 +359,72 @@ describe('Toast', () => {
     });
     await waitFor(() => expect(screen.queryByText('Changes saved')).toBeNull());
     expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
+  it('runs onEnd once when the person presses Dismiss, never when code dismisses it', async () => {
+    const user = userEvent.setup();
+    const pressed = vi.fn();
+    const closedByCode = vi.fn();
+    render(<Toaster />);
+    act(() => {
+      toast({ id: 'a', tone: 'error', title: 'Pressed', onEnd: pressed });
+      toast({ id: 'b', tone: 'error', title: 'By code', onEnd: closedByCode });
+    });
+    const card = (await screen.findByText('Pressed')).closest(
+      '[data-slot=toast]'
+    ) as HTMLElement;
+    await user.click(within(card).getByRole('button', { name: 'Dismiss' }));
+    act(() => {
+      toast.dismiss('b');
+    });
+    await waitFor(() => expect(screen.queryByText('By code')).toBeNull());
+    await waitFor(() => expect(screen.queryByText('Pressed')).toBeNull());
+    expect(pressed).toHaveBeenCalledOnce();
+    expect(closedByCode).not.toHaveBeenCalled();
+  });
+
+  it('runs onEnd when a toast closes by itself, but not when code closes every toast', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const timedOut = vi.fn();
+    const all = vi.fn();
+    render(<Toaster />);
+    act(() => {
+      toast({
+        tone: 'success',
+        title: 'Short',
+        duration: 1000,
+        onEnd: timedOut,
+      });
+    });
+    await screen.findByText('Short');
+    await act(() => vi.advanceTimersByTimeAsync(3000));
+    await waitFor(() => expect(screen.queryByText('Short')).toBeNull());
+    expect(timedOut).toHaveBeenCalledOnce();
+    act(() => {
+      toast({ tone: 'error', title: 'Kept', onEnd: all });
+    });
+    await screen.findByText('Kept');
+    act(() => {
+      toast.dismiss();
+    });
+    await waitFor(() => expect(screen.queryByText('Kept')).toBeNull());
+    expect(all).not.toHaveBeenCalled();
+  });
+
+  it('runs onEnd when the person swipes a toast away', async () => {
+    Element.prototype.setPointerCapture ??= () => {};
+    const swiped = vi.fn();
+    render(<Toaster />);
+    act(() => {
+      toast({ tone: 'error', title: 'Swiped', onEnd: swiped });
+    });
+    const item = (await screen.findByText('Swiped')).closest(
+      '[data-sonner-toast]'
+    ) as HTMLElement;
+    fireEvent.pointerDown(item, { clientX: 0, clientY: 0, button: 0 });
+    fireEvent.pointerMove(item, { clientX: 10, clientY: 0, button: 0 });
+    fireEvent.pointerMove(item, { clientX: 200, clientY: 0, button: 0 });
+    fireEvent.pointerUp(item, { clientX: 200, clientY: 0, button: 0 });
+    await waitFor(() => expect(swiped).toHaveBeenCalledOnce());
   });
 });

@@ -1481,6 +1481,39 @@ test.describe('branch switcher pop-up', () => {
     wrapsSwitchTo('on a touch phone', { width: 390, height: 844 });
   });
 
+  test('keeps a failure toast gone after the person swipes it away', async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto('/branches.html?docs=1&create=fail#/');
+    await openFrame(page, false);
+    await makeBranch(page, frameOf(page, false));
+    await expect(frameOf(page, false).getByRole('alert')).toBeVisible();
+    await page.keyboard.press('Escape');
+    const toast = page
+      .locator('[data-sonner-toast]')
+      .filter({ hasText: "Couldn't create cms/x" });
+    await expect(toast).toBeVisible();
+    const box = await toast.boundingBox();
+    if (!box) throw new Error('no toast box');
+    const y = box.y + 12;
+    await page.mouse.move(box.x + 20, y);
+    await page.mouse.down();
+    for (const dx of [10, 60, 140, 260]) {
+      await page.mouse.move(box.x + 20 + dx, y);
+    }
+    await page.mouse.up();
+    await expect(toast).toHaveCount(0);
+    await openFrame(page, false);
+    await expect(
+      frameOf(page, false).getByText(/Couldn't create cms\/x/)
+    ).toHaveCount(0);
+    await page.keyboard.press('Escape');
+    await expect(frameOf(page, false)).toBeHidden();
+    await nextFrames(page);
+    expect(await toastCount(page)).toBe(0);
+  });
+
   test('leaves the Toaster layer as it was: no lift above the switcher', async ({
     page,
   }) => {
