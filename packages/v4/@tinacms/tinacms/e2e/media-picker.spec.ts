@@ -248,6 +248,32 @@ test.describe('tablet with a wide enough preview', () => {
     expect(covered.x).toBeGreaterThanOrEqual(rect.x);
   });
 
+  test('sits 12px under the preview toolbar, leaving it clickable', async ({
+    page,
+  }) => {
+    await page.goto(HOME);
+    await openPicker(page);
+    const toolbar = await box(
+      previewRegion(page).locator('[data-slot=preview-toolbar]')
+    );
+    const rect = await box(page.locator('[data-slot=media-picker-host]'));
+    expect(Math.round(rect.y - (toolbar.y + toolbar.height))).toBe(12);
+    const region = await box(previewRegion(page));
+    expect(Math.round(region.y + region.height - (rect.y + rect.height))).toBe(
+      12
+    );
+  });
+
+  test('Maximise preview by mouse closes the picker', async ({ page }) => {
+    await page.goto(HOME);
+    const picker = await openPicker(page);
+    await page.getByRole('button', { name: 'Maximise preview' }).click();
+    await expect(picker).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: 'Restore preview' })
+    ).toBeVisible();
+  });
+
   test('Maximise preview by keyboard closes the picker and focuses Restore preview', async ({
     page,
   }) => {

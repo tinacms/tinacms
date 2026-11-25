@@ -26,6 +26,7 @@ type ActiveMark = Pick<
 >;
 
 const PREVIEW_SLOT = '[data-preview-slot]';
+const PREVIEW_TOOLBAR = '[data-slot=preview-toolbar]';
 
 /** The scroll region of the form column for `formId`. */
 const formRegionOf = (formId: string | undefined): HTMLElement | undefined =>
@@ -175,8 +176,14 @@ interface Region {
   height: number;
 }
 
-/** The preview region's box in the window, kept current while the picker is open. */
-function usePreviewRegion(enabled: boolean): Region | null {
+/**
+ * The preview region's box in the window, kept current while the picker is open. With
+ * `belowToolbar`, the box starts under the preview toolbar so its buttons stay reachable.
+ */
+function usePreviewRegion(
+  enabled: boolean,
+  belowToolbar: boolean
+): Region | null {
   const [region, setRegion] = useState<Region | null>(null);
   useLayoutEffect(() => {
     const slot = enabled ? document.querySelector(PREVIEW_SLOT) : null;
@@ -184,8 +191,13 @@ function usePreviewRegion(enabled: boolean): Region | null {
       setRegion(null);
       return;
     }
+    const toolbar = belowToolbar ? slot.querySelector(PREVIEW_TOOLBAR) : null;
     const measure = () => {
-      const { top, left, width, height } = slot.getBoundingClientRect();
+      const box = slot.getBoundingClientRect();
+      const toolbarBottom = toolbar?.getBoundingClientRect().bottom ?? box.top;
+      const top = Math.min(Math.max(box.top, toolbarBottom), box.bottom);
+      const { left, width } = box;
+      const height = box.bottom - top;
       setRegion((last) =>
         last &&
         last.top === top &&
@@ -199,12 +211,13 @@ function usePreviewRegion(enabled: boolean): Region | null {
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(slot);
+    if (toolbar) observer.observe(toolbar);
     window.addEventListener('resize', measure);
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [enabled]);
+  }, [enabled, belowToolbar]);
   return region;
 }
 
@@ -261,7 +274,7 @@ function OpenPicker({
 
   const phone = tier === 'phone';
   const tabletMaximised = tier === 'tablet' && maximised;
-  const region = usePreviewRegion(primary && !phone);
+  const region = usePreviewRegion(primary && !phone, tier === 'tablet');
   const narrow = region !== null && region.width < MIN_REGION_PX;
   const covering = phone || tabletMaximised || narrow;
 
