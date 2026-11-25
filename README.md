@@ -71,6 +71,7 @@ Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/
 - Ben Neoh ([@Ben0189](https://github.com/Ben0189))
 - Josh Berman ([@joshbermanssw](https://github.com/joshbermanssw))
 - Ivan Gaiduk ([@18-th](https://github.com/18-th))
+- Harley Jackson ([@harley-j](https://github.com/harley-j))
 - Adam Cogan ([@adamcogan](https://github.com/adamcogan)) [Key Stakeholder]
 
 ### Part time
