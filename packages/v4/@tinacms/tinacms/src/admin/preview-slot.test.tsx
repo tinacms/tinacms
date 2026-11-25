@@ -1,5 +1,11 @@
 import { QueryClient } from '@tanstack/react-query';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
@@ -97,20 +103,12 @@ describe('the preview slot', () => {
     expect(shown.src).toBe('http://localhost:3000/#team');
   });
 
-  it('marks the chosen device size in the actions menu', async () => {
+  it('marks the chosen device size', async () => {
     renderSlot();
-    const actions = () =>
-      screen.findByRole('button', { name: 'Preview actions' });
-    await userEvent.click(await actions());
-    const [, second] = await screen.findAllByRole('menuitemcheckbox');
-    const name = second?.textContent ?? '';
+    const group = await screen.findByRole('group', { name: 'Device size' });
+    const [, second] = within(group).getAllByRole('button');
     await userEvent.click(second as HTMLElement);
-    await userEvent.click(await actions());
-    const rows = await screen.findAllByRole('menuitemcheckbox');
-    expect(rows.find((row) => row.textContent === name)).toHaveAttribute(
-      'aria-checked',
-      'true'
-    );
+    expect(second).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('opens the page in a new tab from the actions menu', async () => {
