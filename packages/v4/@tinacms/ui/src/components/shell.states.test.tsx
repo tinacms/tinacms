@@ -326,6 +326,86 @@ describe('Branch switcher refused names by reason', () => {
   );
 });
 
+describe('Branch switcher names under a taken branch', () => {
+  it('blocks a name nested under a branch the server said exists', async () => {
+    const props = {
+      current: 'main',
+      branches: [{ name: 'main' }],
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    rerender(
+      <BranchSwitcher
+        {...props}
+        note={{ kind: 'failed', name: 'docs', failure: 'exists' }}
+      />
+    );
+    await userEvent.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'docs/intro'
+    );
+    expect(
+      screen.getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
+    expect(
+      screen
+        .getAllByRole('alert')
+        .some((alert) => /docs/.test(alert.textContent ?? ''))
+    ).toBe(true);
+  });
+});
+
+describe('Branch switcher create announcements', () => {
+  it('announces the running create and marks the button busy', async () => {
+    const props = {
+      current: 'main',
+      branches: [{ name: 'main' }],
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    await userEvent.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/x'
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Create branch' })
+    );
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    expect(
+      screen
+        .getAllByRole('status')
+        .some((node) => node.textContent === 'Creating cms/x…')
+    ).toBe(true);
+    expect(screen.getByRole('button', { name: 'Creating' })).toHaveAttribute(
+      'aria-busy',
+      'true'
+    );
+  });
+
+  it('lets a long Switch to action wrap inside the ready note', () => {
+    render(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        onSwitch={() => {}}
+        defaultOpen
+        note={{ kind: 'ready', name: 'cms/ready-later-with-a-long-name' }}
+      />
+    );
+    expect(
+      screen.getByRole('button', { name: /Switch to cms\/ready-later/ })
+    ).toHaveClass('whitespace-normal', 'shrink');
+  });
+});
+
 describe('Branch switcher while its form creates', () => {
   it('hides only the branch being created, not other new rows', async () => {
     const props = {
@@ -566,8 +646,8 @@ const phoneTier = () =>
 
 describe('Branch switcher, the full design', () => {
   const entries = [
-    { name: 'docs/v4-launch', pullRequest: 482, unsaved: 2 },
-    { name: 'docs/pricing-update', pullRequest: 479 },
+    { name: 'docs/v4-launch', pullRequest: '482', unsaved: 2 },
+    { name: 'docs/pricing-update', pullRequest: '479' },
     { name: 'docs/changelog-2-24', ready: false },
     { name: 'main', protected: true },
   ];

@@ -122,21 +122,22 @@ function BranchControl() {
     return true;
   };
 
-  // A refused action says why inside the switcher while it is open, else in a toast.
-  const refusalToasts = useRef(new Set<string>());
+  const refusalToasts = useRef(new Map<string, string>());
   const refuse = (message: string) => {
     if (latest.current.open) setReason(message);
     else refusalToast(message);
   };
+  // One id per kind of refusal, so a message that changes (a renamed create) replaces its toast.
   const refusalToast = (message: string) => {
-    const id = `refused:${message}`;
-    refusalToasts.current.add(id);
+    const id = message.startsWith('Wait for ')
+      ? 'refused:wait'
+      : `refused:${message}`;
+    refusalToasts.current.set(id, message);
     toast({ id, tone: 'warning', title: message });
   };
-  // A refusal goes once its cause is gone: `only` limits it to one kind of message.
   const clearRefusals = (only?: (message: string) => boolean) => {
-    for (const id of [...refusalToasts.current]) {
-      if (only && !only(id.slice('refused:'.length))) continue;
+    for (const [id, message] of [...refusalToasts.current]) {
+      if (only && !only(message)) continue;
       toast.dismiss(id);
       refusalToasts.current.delete(id);
     }
@@ -242,7 +243,6 @@ function BranchControl() {
     }
   }, [deferred, open, formShown, formTyped]);
 
-  // An inline form failure becomes the note once the switcher closes or the form goes.
   const demoteInline = () =>
     setHeld((note) =>
       note?.kind === 'failed' && note.viaForm
@@ -274,7 +274,6 @@ function BranchControl() {
     }
   };
 
-  // The toast stands in for the note while the switcher is closed.
   const sent = useRef<{ outcome: Outcome; id: string | number }>(undefined);
   useEffect(() => {
     if (open || !outcome) {

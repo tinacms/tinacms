@@ -40,7 +40,7 @@ export type BranchCreateFailure = CreateFailure;
 export class BranchCreateError extends Error {
   constructor(
     message: string,
-    readonly reason: 'timeout' | 'exists' | 'refused' | 'auth' | 'forbidden'
+    readonly reason: BranchCreateFailure
   ) {
     super(message);
     this.name = 'BranchCreateError';

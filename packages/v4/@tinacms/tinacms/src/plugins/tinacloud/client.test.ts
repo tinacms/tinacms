@@ -350,6 +350,47 @@ describe('createBranch', () => {
     await expect(broken.listBranches()).rejects.toBeInstanceOf(AuthError);
   });
 
+  it.each([408, 429])(
+    'counts a %s while polling as an unknown status',
+    async (status) => {
+      vi.useFakeTimers();
+      stubFetch(
+        json({}),
+        json({ message: 'slow down' }, status),
+        json({ status: 'complete' })
+      );
+      const made = await createTinaCloudClient({
+        clientId: 'abc',
+        getToken: async () => 'secret',
+        indexPollMs: 100,
+        indexTimeoutMs: 5000,
+      }).createBranch({ name: 'cms/x', from: 'main' });
+      const done = expect(made.ready).resolves.toBeUndefined();
+      await vi.advanceTimersByTimeAsync(1000);
+      await done;
+    }
+  );
+
+  it('counts an unreadable token refresh answer as an unknown status', async () => {
+    vi.useFakeTimers();
+    let calls = 0;
+    const flaky = createTinaCloudClient({
+      clientId: 'abc',
+      getToken: () => {
+        calls += 1;
+        if (calls === 2) throw new AuthError('invalid-response');
+        return 'secret';
+      },
+      indexPollMs: 100,
+      indexTimeoutMs: 5000,
+    });
+    stubFetch(json({}), json({ status: 'complete' }));
+    const made = await flaky.createBranch({ name: 'cms/x', from: 'main' });
+    const done = expect(made.ready).resolves.toBeUndefined();
+    await vi.advanceTimersByTimeAsync(1000);
+    await done;
+  });
+
   it('counts a dropped token refresh as an unknown status, not a lost session', async () => {
     vi.useFakeTimers();
     let calls = 0;
@@ -546,8 +587,9 @@ describe('createBranch', () => {
       getToken: () => new Promise<string>(() => {}),
       createTimeoutMs: 1000,
     }).createBranch({ name: 'cms/x', from: 'main' });
-    const assertion =
-      expect(pending).rejects.not.toBeInstanceOf(BranchCreateError);
+    const assertion = expect(pending).rejects.toMatchObject({
+      reason: 'network',
+    });
     await vi.advanceTimersByTimeAsync(1500);
     await assertion;
   });

@@ -15,7 +15,10 @@ type Creatable = BranchSource & Required<Pick<BranchSource, 'create'>>;
 const failureOf = (cause: unknown): BranchCreateFailure => {
   if (cause instanceof BranchCreateError) return cause.reason;
   if (cause instanceof AuthError) {
-    return cause.code === 'network' ? 'network' : 'auth';
+    if (cause.code === 'network') return 'network';
+    if (cause.code === 'no-access') return 'forbidden';
+    if (cause.code === 'invalid-response') return 'other';
+    return 'auth';
   }
   return 'other';
 };
@@ -111,7 +114,6 @@ export const createBranchAction =
       },
       createResult: undefined,
     });
-    // A provider whose create never answers must not lock creating for the session.
     deadline = setTimeout(
       () => finish(name, 'failed', 'timeout'),
       CREATE_DEADLINE_MS
@@ -125,7 +127,11 @@ export const createBranchAction =
         let made: unknown;
         try {
           made = result?.name;
-        } catch {
+        } catch (cause) {
+          console.warn(
+            `[tinacms] the result of creating ${name} has no readable name:`,
+            cause
+          );
           made = undefined;
         }
         if (typeof made !== 'string' || made.trim() === '') {
@@ -155,7 +161,6 @@ export const createBranchAction =
             finish(made, 'ready');
             return;
           }
-          // A `ready` that never settles must not lock creating either.
           deadline = setTimeout(
             () => finish(made, 'unready'),
             READY_DEADLINE_MS

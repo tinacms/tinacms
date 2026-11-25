@@ -47,7 +47,7 @@ export const branchSwitcherStates: {
       defaultOpen: true,
       branches: [
         { name: 'main', protected: true },
-        { name: 'feature/news', pullRequest: 482 },
+        { name: 'feature/news', pullRequest: '482' },
         { name: 'fix/typo' },
       ],
     },

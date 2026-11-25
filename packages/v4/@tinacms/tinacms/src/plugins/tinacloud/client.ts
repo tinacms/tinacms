@@ -28,7 +28,13 @@ const MAX_UNKNOWN_INDEX_STATUSES = 6;
 const isTransient = (cause: unknown): boolean => {
   if (!(cause instanceof TinaCloudError)) return false;
   const { status } = cause;
-  return status === undefined || status === 404 || status >= 500;
+  return (
+    status === undefined ||
+    status === 404 ||
+    status === 408 ||
+    status === 429 ||
+    status >= 500
+  );
 };
 
 const HEADS_PREFIX = 'refs/heads/';
@@ -130,10 +136,15 @@ const createFailure = (cause: unknown, sent: boolean): unknown => {
   if (status === 422) return new BranchCreateError(cause.message, 'refused');
   if (status === 401) return new BranchCreateError(cause.message, 'auth');
   if (status === 403) return new BranchCreateError(cause.message, 'forbidden');
-  if (status === undefined && sent) {
-    return new BranchCreateError(cause.message, 'timeout');
+  if (status === undefined) {
+    return new BranchCreateError(cause.message, sent ? 'timeout' : 'network');
   }
   return cause;
+};
+
+/** Stops an unhandled-rejection report for a promise something else already waits on. */
+const markHandled = (promise: Promise<unknown>): void => {
+  promise.catch(() => undefined);
 };
 
 const sleep = (ms: number) =>
@@ -267,13 +278,16 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     );
   };
 
-  // A token read that fails for any reason but a lost session counts as one unknown status.
   const pollOnce = async (url: string, signal: AbortSignal) => {
     let token: string | undefined;
     try {
       token = await options.getToken();
     } catch (cause) {
-      if (cause instanceof AuthError && cause.code !== 'network') throw cause;
+      // A dropped or unreadable token refresh is one unknown status; a lost session is final.
+      const transient =
+        cause instanceof AuthError &&
+        (cause.code === 'network' || cause.code === 'invalid-response');
+      if (cause instanceof AuthError && !transient) throw cause;
       throw new TinaCloudError(
         `Could not read the TinaCloud token: ${causeMessage(cause)}`,
         {}
@@ -300,7 +314,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
         once: true,
       });
     });
-    expired.catch(() => {});
+    markHandled(expired);
     try {
       while (true) {
         let body: unknown;
@@ -365,7 +379,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
         { once: true }
       );
     });
-    expired.catch(() => {});
+    markHandled(expired);
     let body: unknown;
     try {
       body = await Promise.race([
@@ -394,7 +408,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       ? ref.slice(HEADS_PREFIX.length)
       : name;
     const ready = waitForIndex(made);
-    ready.catch(() => {});
+    markHandled(ready);
     return { name: made, ready };
   };
 

@@ -36,7 +36,7 @@ type BranchEntry = {
   name: string;
   protected?: boolean;
   /** The open pull request's number, shown after the name and searchable. */
-  pullRequest?: number;
+  pullRequest?: string;
   /** Documents with unsaved edits on this branch. */
   unsaved?: number;
   /** `false` while the branch is still being made: its row is greyed and cannot be picked. */
@@ -45,7 +45,6 @@ type BranchEntry = {
   unready?: boolean;
 };
 
-/** Why a create failed: it may still exist, the name is taken, sign-in, or anything else. */
 /** What a create ended in. `reason` says why the note's action was refused. */
 type BranchNote = {
   kind: 'failed' | 'unready' | 'ready';
@@ -296,7 +295,11 @@ function OutcomeNote({
               : `${note.name} is ready`}
         </span>
         {action ? (
-          <Button size='sm' onClick={onAction}>
+          <Button
+            size='sm'
+            className='h-auto min-h-8 min-w-0 max-w-full shrink py-1 text-left whitespace-normal [overflow-wrap:anywhere]'
+            onClick={onAction}
+          >
             {action}
           </Button>
         ) : null}
@@ -416,13 +419,23 @@ function BranchSwitcher({
       ) &&
       (branch.name.toLowerCase().includes(wanted) ||
         (branch.pullRequest !== undefined &&
-          String(branch.pullRequest).includes(wanted)))
+          branch.pullRequest.includes(wanted)))
   );
   const busy = createState === 'creating';
   const waiting = creatingBranch !== undefined && !busy;
   const [submitted, setSubmitted] = useState(false);
   const typed = newName.trim();
-  const takenNames = branches.map((branch) => branch.name);
+  // The name a failure said cannot work stays blocked after the failure itself is gone.
+  const [refused, setRefused] = useState<ReadonlyMap<string, CreateFailure>>(
+    new Map()
+  );
+  // A name nested under, or holding, a branch the server says exists cannot be made either.
+  const takenNames = [
+    ...branches.map((branch) => branch.name),
+    ...[...refused]
+      .filter(([name, failure]) => failure === 'exists' && name !== typed)
+      .map(([name]) => name),
+  ];
   const nameError =
     busy || (waiting && typed === creatingBranch)
       ? undefined
@@ -466,11 +479,7 @@ function BranchSwitcher({
   useEffect(() => {
     if (failed) return afterPaint(showActions);
   }, [failed, maximised]);
-  // The name a failure said cannot work stays blocked after the failure itself is gone.
-  const [refused, setRefused] = useState<ReadonlyMap<string, CreateFailure>>(
-    new Map()
-  );
-  // A failure shows even while the switcher is closed, so the note is where the name is learned.
+
   useEffect(() => {
     // Only a failure about the name itself sticks: signing in again can fix the others.
     if (note?.kind !== 'failed') return;
@@ -481,12 +490,18 @@ function BranchSwitcher({
   }, [note?.kind, note?.name, note?.failure]);
   // A failure that disables the focused Create button must not drop focus out of the view.
   useEffect(() => {
-    if (!failed || canRetry(createFailure)) return;
+    if (
+      !failed ||
+      (createFailure !== 'exists' && createFailure !== 'refused')
+    ) {
+      return;
+    }
     const active = document.activeElement;
     if (
       !active ||
       active === document.body ||
-      active.matches(':disabled, [aria-disabled="true"], [data-disabled]')
+      active.matches(':disabled, [aria-disabled="true"], [data-disabled]') ||
+      active.closest('[data-branch-actions]') !== null
     ) {
       focusField('name');
     }
@@ -494,7 +509,6 @@ function BranchSwitcher({
   useEffect(() => setDismissed(false), [createState]);
 
   const wasOpen = useRef(open);
-  // A create that ended under the name in the form returns it to the list; a failure keeps it.
   const [seenReset, setSeenReset] = useState(formResetKey);
   const resetFromForm = useRef(false);
   if (seenReset !== formResetKey) {
@@ -504,7 +518,6 @@ function BranchSwitcher({
     setNewName('');
     setSubmitted(false);
     setStartFrom('current');
-    setRefused(new Map());
   }
   useEffect(() => {
     if (resetFromForm.current && open && focusHere()) {
@@ -646,7 +659,6 @@ function BranchSwitcher({
   ];
 
   // On the bottom-anchored sheet the line goes above the buttons, so they stay under the finger.
-  // Why Create is off for a name a failure already refused, also after closing and reopening.
   const noteNamesIt = note?.kind === 'failed' && note.name === typed;
   const refusedFailure = failed || noteNamesIt ? undefined : refused.get(typed);
   const failureP =
@@ -813,6 +825,9 @@ function BranchSwitcher({
             }}
           >
             <h3 className='m-0 text-base font-semibold'>New branch</h3>
+            <p role='status' className='sr-only'>
+              {busy ? `Creating ${attempted.current}…` : ''}
+            </p>
             <p className='m-0 text-sm text-muted-foreground'>
               It starts with no unsaved changes. Yours stay on the branch they
               were made on.
@@ -912,6 +927,7 @@ function BranchSwitcher({
                 variant='primary'
                 type='submit'
                 busy={busy}
+                aria-busy={busy}
                 className='max-md:h-auto max-md:min-h-9'
                 disabled={
                   !onCreate ||
@@ -920,7 +936,6 @@ function BranchSwitcher({
                   waiting ||
                   typed === '' ||
                   nameError !== undefined ||
-                  (failed && !canRetry(createFailure)) ||
                   refused.has(typed)
                 }
               >

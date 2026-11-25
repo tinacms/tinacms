@@ -2624,6 +2624,58 @@ describe('branch switcher rows and creating a branch', () => {
     ).toBeEnabled();
   });
 
+  it.each([
+    ['sign-in', new AuthError('expired')],
+    ['permission', new BranchCreateError('403', 'forbidden')],
+    ['sign-in service', new AuthError('network')],
+    ['timeout', new BranchCreateError('late', 'timeout')],
+  ])(
+    'leaves Create branch on for the same name after a %s failure',
+    async (_label, cause) => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      createBranch = vi.fn<NonNullable<BranchSource['create']>>(() =>
+        Promise.reject(cause)
+      );
+      const { user, dialog } = await startCreate();
+      await press(dialog, user);
+      await within(dialog).findByRole('alert');
+      expect(
+        within(dialog).getByRole('button', { name: /^(Create branch|Retry)$/ })
+      ).toBeEnabled();
+    }
+  );
+
+  it('keeps a taken name blocked after another create ended ready', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    createBranch = vi
+      .fn<NonNullable<BranchSource['create']>>()
+      .mockRejectedValueOnce(new BranchCreateError('conflict', 'exists'))
+      .mockImplementation(async ({ name }) => ({ name }));
+    window.location.hash = '#/screens/branch-action';
+    const { user, dialog } = await startCreate('cms/taken');
+    await press(dialog, user);
+    await within(dialog).findByText(/already exists/);
+    const name = within(dialog).getByRole('searchbox', {
+      name: 'New branch name',
+    });
+    await user.clear(name);
+    await user.type(name, 'cms/new');
+    await press(dialog, user);
+    await screen.findByRole('button', { name: 'Branch: cms/new' });
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      await within(reopened).findByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(reopened).getByRole('searchbox', { name: 'New branch name' }),
+      'cms/taken'
+    );
+    expect(
+      within(reopened).getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
+  });
+
   it('keeps validating the name after a create ended ready', async () => {
     createBranch = async ({ name }) => ({ name, ready: Promise.resolve() });
     const { user, dialog } = await startCreate('cms/z');
@@ -3213,6 +3265,25 @@ describe('branch switcher rows and creating a branch', () => {
       expect(
         within(reopened).queryByText('Save or discard your changes first')
       ).toBeNull();
+    });
+
+    it('keeps one wait warning when the running create is renamed between two presses', async () => {
+      const { user, calls } = await failedToast(false);
+      act(() => createDirect('cms/y', 'main'));
+      await user.click(screen.getByRole('button', { name: 'Retry' }));
+      expect(
+        await screen.findByText('Wait for cms/y to finish first')
+      ).toBeVisible();
+      act(() =>
+        calls[0]({ name: 'cms/y-1', ready: new Promise<void>(() => {}) })
+      );
+      await user.click(screen.getByRole('button', { name: 'Retry' }));
+      expect(
+        await screen.findByText('Wait for cms/y-1 to finish first')
+      ).toBeVisible();
+      await waitFor(() =>
+        expect(screen.queryAllByText(/^Wait for /)).toHaveLength(1)
+      );
     });
 
     it('drops the wait warning when the other create ends, and replaces a stale failure toast with the new outcome', async () => {
