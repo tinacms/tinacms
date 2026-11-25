@@ -52,7 +52,16 @@ export function RichTextField() {
     containerRef.current?.querySelector<HTMLElement>('[role="textbox"]');
 
   useFieldActivation(() => {
-    setTimeout(() => editable()?.focus(), 0);
+    setTimeout(() => {
+      const active = document.activeElement;
+      if (
+        containerRef.current?.contains(active) ||
+        active?.closest('[role="menu"], [role="dialog"]')
+      ) {
+        return;
+      }
+      editable()?.focus();
+    }, 0);
   });
 
   return (
@@ -64,6 +73,7 @@ export function RichTextField() {
         value={value ?? EMPTY_RICH_TEXT}
         onChange={setBody}
         field={field}
+        body={field.isBody}
         onActivateEmbed={activateEmbed}
       />
     </div>

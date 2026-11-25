@@ -2,6 +2,7 @@ import { ImageIcon } from 'lucide-react';
 import { use, useEffect } from 'react';
 import { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { returnToTree } from '../test/collection-tree';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
@@ -19,7 +20,6 @@ import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 import { connectionOf } from '../test/connection';
-import { returnToTree } from '../test/collection-tree';
 
 type Mode = 'branches' | 'local' | 'none';
 
@@ -218,7 +218,7 @@ const duplicateScreenPlugin = definePlugin({
     default: {
       screens: [{ name: 'prefs', label: 'Prefs', component: NotesScreen }],
       slots: {
-        globalNav: ['Settings', 'Notes', 'Notes'].map((label) => ({
+        globalNav: ['Prefs', 'Prefs', 'Notes', 'Notes'].map((label) => ({
           label,
           icon: ImageIcon,
           target: { kind: 'screen' as const, screen: 'prefs' },
@@ -468,13 +468,25 @@ describe('Top bar', () => {
     renderAdmin();
     await user.click(await screen.findByRole('button', { name: /Search/ }));
     const dialog = await screen.findByRole('dialog', { name: 'Search' });
-    await user.type(within(dialog).getByRole('searchbox'), 'sett');
+    await user.type(within(dialog).getByRole('searchbox'), 'coll');
     const list = within(dialog).getByRole('list', {
       name: 'Navigation results',
     });
     expect(within(list).getAllByRole('listitem')).toHaveLength(1);
-    await user.click(within(list).getByRole('button', { name: 'Settings' }));
-    await waitFor(() => expect(window.location.hash).toBe('#/settings'));
+    await user.click(within(list).getByRole('button', { name: 'Collections' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/collections'));
+  });
+
+  it('shows no Navigation heading when no entry matches the query', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: /Search/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Search' });
+    await user.type(within(dialog).getByRole('searchbox'), 'zzz');
+    expect(within(dialog).queryByText('Navigation')).toBeNull();
+    expect(
+      within(dialog).queryByRole('list', { name: 'Navigation results' })
+    ).toBeNull();
   });
 
   it('keeps every Search row when two entries share a label', async () => {
@@ -489,12 +501,12 @@ describe('Top bar', () => {
     });
     const all = within(list).getAllByRole('listitem').length;
     const box = within(dialog).getByRole('searchbox');
-    await user.type(box, 'Set');
+    await user.type(box, 'Pre');
     expect(
       within(list)
         .getAllByRole('listitem')
         .map((row) => row.textContent)
-    ).toEqual(['Settings', 'Settings']);
+    ).toEqual(['Prefs', 'Prefs']);
     await user.clear(box);
     await user.type(box, 'Not');
     expect(
@@ -558,9 +570,9 @@ describe('side nav entries', () => {
     ).toBeNull();
   });
 
-  it('puts Help & docs at the foot and opens it in a new tab', async () => {
+  it('puts Help and docs at the foot and opens it in a new tab', async () => {
     renderAdmin();
-    const help = await screen.findByRole('link', { name: /Help & docs/ });
+    const help = await screen.findByRole('link', { name: /Help and docs/ });
     expect(help).toHaveAttribute('target', '_blank');
     expect(help).toHaveAttribute('rel', expect.stringContaining('noopener'));
   });
@@ -868,7 +880,7 @@ describe('save state', () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     const { user, input } = await openHello();
     await user.clear(input);
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     await screen.findByRole('button', { name: 'Resolve 1 error' });
     expect(
       log.mock.calls.some(([first]) => String(first).includes('Save failed'))
@@ -879,7 +891,7 @@ describe('save state', () => {
   it('reads Save failed after a later network failure, once the blocked save is fixed', async () => {
     const { user, input } = await openHello();
     await user.clear(input);
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     await screen.findByRole('button', { name: 'Resolve 1 error' });
     await user.type(input, 'Hello!');
     updateError = new ContentError('network');
@@ -899,7 +911,7 @@ describe('save state', () => {
       .getState()
       .setSavePhase(toFormId('content/posts/other.mdx'), { phase: 'saved' });
     await user.clear(input);
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     await screen.findByRole('button', { name: 'Resolve 1 error' });
     expect(within(statusBar()).queryByText('Save failed')).toBeNull();
     expect(within(statusBar()).getByText('Unsaved changes')).toBeVisible();
@@ -911,7 +923,7 @@ describe('save state', () => {
   it('does not call a blocked save a failed save in the Status bar', async () => {
     const { user, input } = await openHello();
     await user.clear(input);
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
     expect(
       await screen.findByRole('button', { name: 'Resolve 1 error' })
     ).toBeVisible();
@@ -931,7 +943,7 @@ describe('toasts', () => {
     renderAdmin();
     const input = await screen.findByLabelText(/^Title\b/);
     await user.type(input, '!');
-    await user.click(screen.getByRole('button', { name: /^Save/ }));
+    await user.click(screen.getByRole('button', { name: /^Save$/ }));
 
     const toast = await waitFor(() => {
       const found = document.querySelector('[data-slot=toast]');
@@ -985,21 +997,28 @@ describe('read-error and screen views', () => {
 });
 
 describe('document form panel', () => {
-  it('has Back and a menu in its header, no Close and no second title, then tabs and a form bar', async () => {
+  it('has a title-led head with a Location trail and a Form actions menu, no tabs, then a form bar', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     renderAdmin();
     await screen.findByLabelText(/^Title\b/);
     const panel = screen.getByRole('complementary', { name: 'Document form' });
+    const trail = within(panel).getByRole('navigation', { name: 'Location' });
     expect(
-      within(panel).getByRole('button', { name: 'Return to navigator' })
+      within(trail)
+        .getAllByRole('button')
+        .map((step) => step.textContent)
+    ).toEqual(['Collections', 'Posts']);
+    expect(
+      within(panel).getByRole('heading', { level: 2, name: 'Hello' })
     ).toBeVisible();
     expect(
-      within(panel).getByRole('button', { name: 'Document menu' })
+      within(panel).getByRole('button', { name: 'Form actions' })
     ).toBeVisible();
     expect(within(panel).queryByRole('button', { name: 'Close' })).toBeNull();
-    expect(within(panel).queryByRole('heading')).toBeNull();
-    expect(within(panel).getByRole('tab', { name: 'Fields' })).toBeVisible();
-    expect(within(panel).queryByRole('tab', { name: 'History' })).toBeNull();
+    expect(
+      within(panel).queryByRole('button', { name: 'Return to navigator' })
+    ).toBeNull();
+    expect(within(panel).queryByRole('tab')).toBeNull();
     expect(
       within(panel).getByRole('button', { name: 'Document actions' })
     ).toBeVisible();
@@ -1021,15 +1040,17 @@ describe('document form panel', () => {
 });
 
 describe('panel headers', () => {
-  it('gives the form column Back to its collection, and the missing views a title and Close', async () => {
+  it('gives the form column a Location step back to its collection, and the missing views a title and Close', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     const user = userEvent.setup();
     const view = renderAdmin();
     await screen.findByLabelText(/^Title\b/);
     await user.click(
       within(
-        screen.getByRole('complementary', { name: 'Document form' })
-      ).getByRole('button', { name: 'Return to navigator' })
+        within(
+          screen.getByRole('complementary', { name: 'Document form' })
+        ).getByRole('navigation', { name: 'Location' })
+      ).getByRole('button', { name: 'Posts' })
     );
     await waitFor(() =>
       expect(window.location.hash).toBe('#/collections/post?max')

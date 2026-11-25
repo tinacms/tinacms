@@ -167,7 +167,11 @@ function NameForm({
   };
 
   return (
-    <form onSubmit={submit} className='flex flex-col gap-4' noValidate>
+    <form
+      onSubmit={submit}
+      className='flex flex-col gap-4 max-md:flex-1'
+      noValidate
+    >
       <div className='flex flex-col gap-1.5'>
         <Label htmlFor={inputId}>{label}</Label>
         <div className='flex items-center gap-2'>

@@ -28,6 +28,8 @@ export type StringFieldViewProps = Pick<
   mono?: boolean;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   ref?: (box: HTMLInputElement | HTMLTextAreaElement | null) => void;
 };
 
@@ -46,6 +48,7 @@ export function StringFieldView({
   mono = false,
   disabled = false,
   readOnly = false,
+  active = false,
   ref,
   ...frame
 }: StringFieldViewProps) {
@@ -59,6 +62,7 @@ export function StringFieldView({
     mono,
     required: frame.required,
     onBlur,
+    'data-active': active ? '' : undefined,
     'aria-invalid': errors.length > 0 || undefined,
     'aria-describedby': frame.help ? frame.helpId : undefined,
     onChange: (event: { target: { value: string } }) =>

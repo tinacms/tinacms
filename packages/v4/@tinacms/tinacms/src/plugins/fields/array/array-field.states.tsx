@@ -17,6 +17,7 @@ const base = {
 const author = (id: string, summary?: string): ArrayItemView => ({
   id,
   name: `Item ${id}`,
+  address: `items.${id}`,
   kind: 'group',
   summary,
   opens: 'in-place',
@@ -28,6 +29,7 @@ const closed = [author('1', 'Ivan'), author('2', 'Brook'), author('3')];
 const tag = (id: string, value: string): ArrayItemView => ({
   id,
   name: `Item ${id}`,
+  address: `items.${id}`,
   kind: 'value',
   value,
 });
@@ -40,6 +42,7 @@ const block = (
 ): ArrayItemView => ({
   id,
   name: `Item ${id}`,
+  address: `items.${id}`,
   kind: 'group',
   title,
   summary,

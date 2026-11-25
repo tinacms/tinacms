@@ -10,6 +10,7 @@
       "@tinacms/tinacms/react": ["../src/editor/index.ts"],
       "@tinacms/tinacms/admin": ["../src/admin/index.ts"],
       "@tinacms/tinacms/adapters/react": ["../src/adapters/react/index.ts"],
+      "@tinacms/tinacms/client": ["../src/client/index.ts"],
       "@tinacms/tinacms": ["../src/index.ts"],
       "@tinacms/graphql": ["../src/plugins/content/local/graphql/tinacms-graphql.d.ts"]
     }

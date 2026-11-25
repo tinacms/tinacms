@@ -3,6 +3,11 @@ import { cva } from 'class-variance-authority';
 import type * as React from 'react';
 
 import { Button } from '@tinacms/ui/components/button';
+import {
+  footSheetHeaderClasses,
+  useFootSheetPopup,
+} from '@tinacms/ui/components/foot-sheet';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { dialogTitleClasses } from '@tinacms/ui/lib/dialog-styles';
 import { cn } from '@tinacms/ui/lib/utils';
 
@@ -59,22 +64,35 @@ function SheetContent({
   children,
   side = 'right',
   showCloseButton = true,
+  initialFocus,
+  style,
   ...props
 }: SheetPrimitive.Popup.Props & {
   side?: SheetSide;
   showCloseButton?: boolean;
 }) {
+  const phone = useTier() === 'phone';
+  const footSheet = phone && side === 'bottom';
+  const { popup, scrim, chrome } = useFootSheetPopup({
+    on: footSheet,
+    Close: SheetPrimitive.Close,
+    slot: 'sheet-content',
+    look: sheetVariants({ side }),
+    // After `className`, so a caller's own width gives way to the screen's.
+    className: cn(
+      className,
+      phone && (side === 'left' || side === 'right') && 'w-full'
+    ),
+    initialFocus,
+    style,
+  });
   return (
     <SheetPortal>
-      <SheetOverlay />
-      <SheetPrimitive.Popup
-        data-slot='sheet-content'
-        data-side={side}
-        className={cn(sheetVariants({ side }), className)}
-        {...props}
-      >
+      <SheetOverlay {...scrim} />
+      <SheetPrimitive.Popup {...popup} data-side={side} {...props}>
         {children}
-        {showCloseButton ? (
+        {chrome}
+        {!footSheet && showCloseButton ? (
           <SheetPrimitive.Close
             data-slot='sheet-close'
             render={
@@ -99,6 +117,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
       data-slot='sheet-header'
       className={cn(
         'flex flex-none flex-col gap-0.5 border-b border-border-subtle py-4 pr-12 pl-5',
+        footSheetHeaderClasses,
         className
       )}
       {...props}

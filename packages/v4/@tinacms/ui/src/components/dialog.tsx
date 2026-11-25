@@ -11,9 +11,46 @@ import {
 import { cn } from '@tinacms/ui/lib/utils';
 
 import { Button } from '@tinacms/ui/components/button';
+import {
+  FootSheetRootProvider,
+  footSheetFooterClasses,
+  footSheetHeaderClasses,
+  useFootSheetPopup,
+} from '@tinacms/ui/components/foot-sheet';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 
-function Dialog({ ...props }: DialogPrimitive.Root.Props) {
-  return <DialogPrimitive.Root data-slot='dialog' {...props} />;
+function Dialog({
+  keepOnDismiss = false,
+  onOpenChange,
+  ...props
+}: DialogPrimitive.Root.Props & {
+  /**
+   * On a phone, a tap on the scrim or the handle does not close while this is true. ×, any
+   * `DialogClose`, Escape and the caller's own Cancel still do.
+   */
+  keepOnDismiss?: boolean;
+}) {
+  const phone = useTier() === 'phone';
+  return (
+    <FootSheetRootProvider value={{ keepOnDismiss: keepOnDismiss && phone }}>
+      <DialogPrimitive.Root
+        data-slot='dialog'
+        onOpenChange={(open, details) => {
+          if (
+            !open &&
+            keepOnDismiss &&
+            phone &&
+            details.reason === 'outside-press'
+          ) {
+            details.cancel();
+            return;
+          }
+          onOpenChange?.(open, details);
+        }}
+        {...props}
+      />
+    </FootSheetRootProvider>
+  );
 }
 
 function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
@@ -46,22 +83,37 @@ function DialogContent({
   children,
   size,
   showCloseButton = true,
+  keyboard = false,
+  initialFocus,
+  style,
   ...props
 }: DialogPrimitive.Popup.Props &
   VariantProps<typeof dialogVariants> & {
     showCloseButton?: boolean;
+    /** Lays the sheet out from the top on a phone, with its actions right under the body. */
+    keyboard?: boolean;
   }) {
+  const phone = useTier() === 'phone';
+  const { popup, scrim, chrome } = useFootSheetPopup({
+    on: phone,
+    Close: DialogPrimitive.Close,
+    slot: 'dialog-content',
+    look: cn(dialogVariants({ size }), 'group/dialog'),
+    className,
+    initialFocus,
+    style,
+  });
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay {...scrim} />
       <DialogPrimitive.Popup
-        data-slot='dialog-content'
-        data-close-button={showCloseButton ? '' : undefined}
-        className={cn(dialogVariants({ size }), 'group/dialog', className)}
+        {...popup}
+        data-close-button={showCloseButton || phone ? '' : undefined}
+        data-keyboard={keyboard ? '' : undefined}
         {...props}
       >
         {children}
-        {showCloseButton ? (
+        {showCloseButton && !phone ? (
           <DialogPrimitive.Close
             data-slot='dialog-close'
             render={
@@ -75,6 +127,7 @@ function DialogContent({
             }
           />
         ) : null}
+        {chrome}
       </DialogPrimitive.Popup>
     </DialogPortal>
   );
@@ -86,6 +139,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
       data-slot='dialog-header'
       className={cn(
         'flex flex-col gap-1 group-data-close-button/dialog:pr-8',
+        footSheetHeaderClasses,
         className
       )}
       {...props}
@@ -104,7 +158,12 @@ function DialogFooter({
   return (
     <div
       data-slot='dialog-footer'
-      className={cn(dialogFooterClasses, className)}
+      className={cn(
+        dialogFooterClasses,
+        footSheetFooterClasses,
+        'max-md:mt-auto max-md:group-data-keyboard/dialog:mt-0',
+        className
+      )}
       {...props}
     >
       {children}
