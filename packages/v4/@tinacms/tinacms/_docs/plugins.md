@@ -65,8 +65,10 @@ first plugin.
 A validator plugin registers named, parameterised rules that a collection
 attaches to individual fields. The manifest lists the names in `validators`,
 so `compileSchema` can check a collection without loading client code. The
-client segment holds one factory for each name. A name that the manifest lists
-without a factory, or a factory the manifest does not list, throws at boot.
+client segment and the server segment each hold one factory for each name. A
+name that the manifest lists without a factory, or a factory the manifest does
+not list, throws at boot. A plugin with no server segment stops the whole RPC
+handler from composing.
 
 ```ts
 // manifest
@@ -75,6 +77,7 @@ definePlugin({
   provides: ['validator'],
   validators: ['after'],
   client: () => import('./validators.client'),
+  server: () => import('./validators.server'),
 });
 
 // validators.client.ts
@@ -91,9 +94,22 @@ export default defineClientPlugin({
   },
 });
 
+// validators.server.ts: the same factories, from a module with no client import
+import { after } from './validator-factories';
+
+export default defineServerPlugin({ validators: { after } });
+
 // in a collection
 t.datetime({ name: 'endDate', validators: [{ name: 'after', args: ['startDate'] }] });
 ```
+
+Where a validator runs:
+
+- The built-in validators (`required`, `min`, `max`, `pattern`) run in the
+  form. They also run on the Backend when the collection saves through it.
+- A custom validator runs in the form and on the Backend. A collection with a
+  custom validator saves through the Backend, so it needs the site's server
+  route, and `mountHandler(config)` needs the schema.
 
 ### Names are global, so give them a prefix
 
@@ -301,8 +317,8 @@ The save needs the site's server route. Mount the RPC handler with the
 whole config, `mountHandler(config)`, so it gets the schema. The admin calls
 it at `/api/tina`. Set `rpcUrl` in `defineConfig` when the site mounts it
 somewhere else, and the handler pins its route to the same value. A site with no server runtime cannot save to the
-collection, and the save fails with "This collection has server hooks, so it
-needs the site's server route." Core never falls back to a direct write. On
+collection, and the save fails with "This collection runs checks on the site's
+server, so it needs the site's server route." Core never falls back to a direct write. On
 `vite dev`, `tinaLocalDataLayerVitePlugin` serves the route for the local
 Data Layer.
 

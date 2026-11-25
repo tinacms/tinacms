@@ -30,6 +30,8 @@ export interface TinaRuntime {
   validators: ValidatorRegistry;
   hooks: FormHookRegistry;
   serverHooks: ReadonlySet<string>;
+  // The validator names that the core validators plugin does not win (ADR-028 §3).
+  customValidators: ReadonlySet<string>;
   rpcUrl: string;
   store: StoreApi<TinaStoreState>;
   schema: TinaSchema;

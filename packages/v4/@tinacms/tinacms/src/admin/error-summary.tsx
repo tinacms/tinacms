@@ -17,7 +17,8 @@ import { useFormContext } from 'react-hook-form';
 import { useStore } from 'zustand';
 import { toFieldAddress } from '../core/field/address';
 import { FormScopeContext } from '../editor/context';
-import { failingLeaves, inDocumentOrder } from '../editor/field-errors';
+import { blockOnFormErrors } from '../editor/block-errors';
+import { inDocumentOrder } from '../editor/field-errors';
 import { fieldsAlong, REMOVED } from '../editor/form-view-state';
 import { readPinned, writePinned } from '../editor/pane-pin';
 import { useFormErrors, useFormStore } from '../form/form-store';
@@ -90,21 +91,8 @@ export function useErrorSummary() {
   const summary = useStore(scope.view, (state) => state.errorSummary);
   const blocked = summary.blocked.length > 0;
 
-  const block = (): boolean => {
-    const form = useFormStore.getState().forms[scope.formId];
-    const errors = form?.status === 'edited' ? form.errors : {};
-    const failing = Object.keys(errors);
-    const leaves = failingLeaves(failing).map((address) => ({ address }));
-    if (leaves.length === 0) return false;
-    const ordered = inDocumentOrder(leaves, scope.collection.fields, getValues);
-    scope.view.getState().block(
-      ordered.map((leaf) => leaf.address),
-      failing.filter(
-        (address) => !leaves.some((leaf) => leaf.address === address)
-      )
-    );
-    return true;
-  };
+  const block = (): boolean =>
+    blockOnFormErrors(scope.formId, scope.view, scope.collection, getValues);
 
   const resolve = () => {
     const view = scope.view.getState();

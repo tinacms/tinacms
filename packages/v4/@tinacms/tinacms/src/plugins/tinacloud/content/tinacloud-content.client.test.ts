@@ -380,4 +380,22 @@ describe('TinaCloud content slice', () => {
     expect(failure).toBeInstanceOf(ContentError);
     expect(failure).toMatchObject({ code: 'branch-not-found' });
   });
+
+  it('carries a VALIDATION error with its fields, so the form can show each message', async () => {
+    stubTinaCloud({
+      errors: [
+        {
+          message: 'Title is taken.',
+          extensions: { code: 'VALIDATION', field: 'title' },
+        },
+      ],
+    });
+    const failure = await content()
+      .update('post', 'a.mdx', {})
+      .catch((cause: unknown) => cause);
+    expect(failure).toMatchObject({
+      code: 'validation',
+      fieldErrors: { title: ['Title is taken.'] },
+    });
+  });
 });

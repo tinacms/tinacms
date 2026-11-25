@@ -1,7 +1,7 @@
 # ADR-018: Save Flow
 
 ## Status
-**Accepted**, amended by [ADR-028](./028-server-save-hooks.md): a save to a collection with a server hook goes through the Backend, which runs the hook before the write. Resolves the **save-path** question deferred by [ADR-015](./015-execution-boundary.md). Builds on [ADR-004](./004-git-editorial-workflow.md) (git inside the Data Layer), [ADR-007](./007-full-stack-plugins-client-backend-segments.md) (Capability RPC / Backend), [ADR-008](./008-authorization-permissions-roles.md) (enforcement), [ADR-010](./010-form-state-model.md) (reconstruct), [ADR-014](./014-document-lifecycle-hooks.md) (`beforeSave`/`afterSave`), and [ADR-017](./017-content-model.md) (Format adapters).
+**Accepted**, amended by [ADR-028](./028-server-save-hooks.md): a save to a collection with a server hook or a custom validator goes through the Backend, which runs the validators and the hooks before the write. Resolves the **save-path** question deferred by [ADR-015](./015-execution-boundary.md). Builds on [ADR-004](./004-git-editorial-workflow.md) (git inside the Data Layer), [ADR-007](./007-full-stack-plugins-client-backend-segments.md) (Capability RPC / Backend), [ADR-008](./008-authorization-permissions-roles.md) (enforcement), [ADR-010](./010-form-state-model.md) (reconstruct), [ADR-014](./014-document-lifecycle-hooks.md) (`beforeSave`/`afterSave`), and [ADR-017](./017-content-model.md) (Format adapters).
 
 ## Context
 ADR-015 flagged "the save path" as an open dependency: whether content writes route **Client → Backend → Data Layer** or **Client → Data Layer directly** — which decides where enforcement lives, and therefore what custom logic can run on managed TinaCloud. This ADR resolves it and pins what is **v4 core** versus what belongs to the **Data Layer**.
@@ -9,9 +9,10 @@ ADR-015 flagged "the save path" as an open dependency: whether content writes ro
 ## Decision
 
 ### 1. Content writes go Client → Data Layer directly (path A)
-The `content` capability's provider **is the Data Layer** — *not* a Backend plugin server segment. (Media/search/custom RPC go through Backend server segments; the **content write hits the Data Layer directly**, authenticated.) **Enforcement of the content write lives at the Data Layer write point:** (A save to a collection with a server hook is the exception. It goes through the Backend first, per [ADR-028](./028-server-save-hooks.md).)
-- **Declarative validation + permissions** → enforced **everywhere**, including TinaCloud (they're in `tina-lock.json`).
+The `content` capability's provider **is the Data Layer** — *not* a Backend plugin server segment. (Media/search/custom RPC go through Backend server segments; the **content write hits the Data Layer directly**, authenticated.) **Enforcement of the content write lives at the Data Layer write point:** (A save to a collection with a server hook or a custom validator is the exception. It goes through the Backend first, per [ADR-028](./028-server-save-hooks.md).)
+- **Permissions** → enforced **everywhere**, including TinaCloud (they're in `tina-lock.json`). **Declarative validation** is in `tina-lock.json` too, but TinaCloud does not run it yet. The Backend runs it for a collection that saves through the Backend ([ADR-028](./028-server-save-hooks.md) §9).
 - **Custom `beforeSave` enforcement** → a **server hook** on the collection ([ADR-028](./028-server-save-hooks.md)). Saves to that collection go through the Backend, which runs the hook before the write, on every Data Layer including TinaCloud. A client `beforeSave` is **client-UX only**.
+- **Custom validators** → run on the Backend before the server hooks ([ADR-028](./028-server-save-hooks.md) §9). Saves to a collection with a custom validator go through the Backend.
 - **A client `beforeSave` that calls the Backend:** still allowed. It may be async and call a Server segment via Capability RPC, but it stays **advisory/UX** (client-orchestrated, bypassable). Use a server hook to enforce.
 
 ### 2. The core save is small
@@ -31,7 +32,7 @@ Conflict detection is a **Data-Layer concern** (like granularity). Local emits n
 ## Consequences
 
 ### Positive
-- The core save-flow is tiny and storage-agnostic. Declarative enforcement lives in the Data Layer, and custom enforcement lives in server hooks on the Backend ([ADR-028](./028-server-save-hooks.md)).
+- The core save-flow is tiny and storage-agnostic. Custom enforcement lives on the Backend, in validators and server hooks ([ADR-028](./028-server-save-hooks.md)). Declarative enforcement can live in the Data Layer, which reads it from `tina-lock.json`.
 - Local dev is dead simple: write a file.
 - Custom enforcement works on TinaCloud through server hooks. The known gap is explicit: a request written by hand straight to TinaCloud skips them until TinaCloud requires a server secret for those writes ([ADR-028](./028-server-save-hooks.md) §8).
 - Conflict-readiness costs nothing now and can't be cheaply retrofitted later.

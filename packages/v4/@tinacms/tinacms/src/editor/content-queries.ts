@@ -19,7 +19,8 @@ import {
   isProviderRefusalCode,
 } from '../core/content/contract';
 import { invariant } from '../core/invariant';
-import type { TinaDocument } from '../core/schema/types';
+import { fieldsOf, scalarItemOf } from '../core/schema/children';
+import type { FieldSchema, TinaDocument } from '../core/schema/types';
 import { RpcError } from '../rpc/proxy';
 import { type SavedDocument, TinaRuntimeContext } from './context';
 import { isMissingRouteError } from './rpc-errors';
@@ -165,6 +166,23 @@ const STATUS_ERROR_CODES: Partial<Record<number, ContentErrorCode>> = {
   403: 'forbidden',
 };
 
+// Whether a field at any depth lists a custom validator. It reads the schema,
+// not the values, so an empty list still routes: every template, object field
+// and `of` item counts.
+const listsCustomValidator = (
+  fields: readonly FieldSchema[],
+  custom: ReadonlySet<string>
+): boolean =>
+  fields.some((node) => {
+    if (node.validators?.some(({ name }) => custom.has(name))) return true;
+    const children = [
+      ...(fieldsOf(node) ?? []),
+      ...(node.templates?.flatMap(({ fields: own }) => own) ?? []),
+      ...(scalarItemOf(node) ? [scalarItemOf(node) as FieldSchema] : []),
+    ];
+    return listsCustomValidator(children, custom);
+  });
+
 const toServerSaveError = (cause: unknown): ContentError => {
   if (cause instanceof TypeError) {
     return new ContentError('network', cause.message);
@@ -177,6 +195,9 @@ const toServerSaveError = (cause: unknown): ContentError => {
   }
   if (isContentRefusalCode(cause.code)) {
     return new ContentError(cause.code, cause.message);
+  }
+  if (cause.code === 'validation') {
+    return new ContentError('validation', cause.message, cause.fieldErrors);
   }
   if (isMissingRouteError(cause)) {
     return new ContentError('server-route-missing', cause.message);
@@ -200,10 +221,16 @@ export const useSaveDocument = (): DocumentSave => {
   const content = useContentSlice();
   const server = useRpcClient<ContentSaveSegments>({ url: runtime.rpcUrl });
   const queryClient = useQueryClient();
-  const hasServerHooks = (collection: string): boolean =>
-    runtime.schema.collections
-      .find(({ name }) => name === collection)
-      ?.hooks?.some(({ name }) => runtime.serverHooks.has(name)) ?? false;
+  const savesThroughServer = (collection: string): boolean => {
+    const schema = runtime.schema.collections.find(
+      ({ name }) => name === collection
+    );
+    if (!schema) return false;
+    return (
+      schema.hooks?.some(({ name }) => runtime.serverHooks.has(name)) ===
+        true || listsCustomValidator(schema.fields, runtime.customValidators)
+    );
+  };
   const saveThroughServer = async ({
     isNew,
     ...input
@@ -222,7 +249,7 @@ export const useSaveDocument = (): DocumentSave => {
   };
   const mutation = useMutation({
     mutationFn: (input: SaveDocumentInput): Promise<SavedEntry> => {
-      if (hasServerHooks(input.collection)) return saveThroughServer(input);
+      if (savesThroughServer(input.collection)) return saveThroughServer(input);
       if (input.isNew) {
         invariant(
           content.create,

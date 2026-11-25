@@ -250,10 +250,24 @@ beforeEach(() => {
   window.location.hash = `#/collections/note/${encodeURIComponent(PATH)}`;
   useFormStore.setState({ forms: {} });
   localStorage.clear();
+  // The `codeIsOk` validator is custom, so the `note` collection saves through the
+  // site's server route. This stands in for that route.
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (_url: string, init?: RequestInit) => {
+      const { path, value } = JSON.parse(String(init?.body));
+      saved.push(value);
+      return Response.json({
+        entry: { path, document: value },
+        hookWarnings: [],
+      });
+    })
+  );
 });
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllGlobals();
 });
 
 const titleInput = () => screen.findByLabelText(/^Title\b/);

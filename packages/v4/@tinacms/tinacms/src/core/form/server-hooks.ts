@@ -2,13 +2,19 @@ import { z } from 'zod';
 import type { Session } from '../auth/contract';
 import {
   type ContentSaveInput,
+  DocumentValidationError,
   type ContentSaveResult,
   type DocumentEntry,
   InvalidSaveInputError,
 } from '../content/contract';
 import { invariant } from '../invariant';
+import type { ServerValidatorRegistry } from '../validator/server-registry';
 import type { PluginManifest, ResolvedServerSegment } from '../plugin';
 import type { CollectionSchema, HookRef } from '../schema/types';
+import {
+  type StoredValidationConfig,
+  validateStoredDocument,
+} from './server-validation';
 import {
   type ServerFormHooks,
   type ServerHookFactory,
@@ -91,8 +97,11 @@ const documentEntrySchema = z.object({
 
 export interface ServerSaveConfig {
   hooks: ServerHookRegistry;
+  validators: ServerValidatorRegistry;
+  // The stored-value helpers of each field type, from the plugin manifests.
+  stored: StoredValidationConfig['stored'];
   // Undefined when the host passed no schema, which only holds while no
-  // server hook is installed.
+  // server hook and no custom validator is installed.
   collections: readonly CollectionSchema[] | undefined;
   write: (input: ContentSaveInput) => Promise<unknown>;
   resolveBranch?: (branch: string | undefined) => Promise<string | undefined>;
@@ -125,6 +134,8 @@ const parseSave = (
 export const createServerSave =
   ({
     hooks,
+    validators,
+    stored,
     collections,
     write,
     resolveBranch,
@@ -141,6 +152,15 @@ export const createServerSave =
     const branch = resolveBranch
       ? await resolveBranch(save.branch)
       : save.branch;
+    if (collection) {
+      const fieldErrors = validateStoredDocument(collection, save.value, {
+        validators,
+        stored,
+      });
+      if (Object.keys(fieldErrors).length > 0) {
+        throw new DocumentValidationError(fieldErrors);
+      }
+    }
     const scope: ServerHookScope | null = collection
       ? { path: documentPath, collection, session, branch }
       : null;
