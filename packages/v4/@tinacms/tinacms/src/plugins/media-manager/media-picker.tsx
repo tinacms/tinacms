@@ -128,10 +128,6 @@ export interface MediaPickerPanelProps {
   onClose: (restoreFocus: boolean) => void;
 }
 
-/**
- * The media picker: the Media pane's folder and image looks in a panel that
- * lists images and folders only and hands the picked paths back to the field.
- */
 function isNotFound(error: unknown): boolean {
   if (error instanceof MediaError) {
     return error.code === 'not-found';
@@ -139,6 +135,10 @@ function isNotFound(error: unknown): boolean {
   return false;
 }
 
+/**
+ * The media picker: the Media pane's folder and image looks in a panel that
+ * lists images and folders only and hands the picked paths back to the field.
+ */
 export function MediaPickerPanel({
   request,
   maximised,
