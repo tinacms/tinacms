@@ -284,6 +284,8 @@ interface Options {
   plugin?: ReturnType<typeof definePlugin>;
   extra?: ReactNode;
   document?: { title: string };
+  /** The app's own client retries once; most tests turn it off. */
+  retry?: number | false;
 }
 
 const renderPicker = (provider: MediaProvider, options: Options = {}) => {
@@ -323,7 +325,9 @@ const renderPicker = (provider: MediaProvider, options: Options = {}) => {
         schema: { collections: [collection] },
       })}
       queryClient={
-        new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        new QueryClient({
+          defaultOptions: { queries: { retry: options.retry ?? false } },
+        })
       }
     >
       <FormProvider
@@ -907,9 +911,13 @@ describe('focus after a confirm from a custom field', () => {
 });
 
 describe('a missing image in a folder that is still there', () => {
-  const openMissing = async (provider: MediaProvider) => {
+  const openMissing = async (
+    provider: MediaProvider,
+    retry?: number | false
+  ) => {
     const user = userEvent.setup();
     renderPicker(provider, {
+      retry,
       asks: {
         hero: single({ replacing: { path: 'posts/gone.jpg', missing: true } }),
       },
@@ -1048,7 +1056,8 @@ describe('a missing image in a folder that is still there', () => {
           }
           return { items: childrenOf(folder) };
         }),
-      })
+      }),
+      1
     );
     expect(await tile('logo.png')).toBeVisible();
     expect(rootLists).toHaveBeenCalledTimes(2);
