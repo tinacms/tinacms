@@ -492,8 +492,9 @@ function BranchSwitcher({
     if (
       !active ||
       active === document.body ||
-      active.matches(':disabled, [aria-disabled="true"], [data-disabled]') ||
-      active.closest('[data-branch-actions]') !== null
+      active.matches(
+        ':disabled, [aria-disabled="true"], [data-disabled], [type="submit"]'
+      )
     ) {
       focusField('name');
     }
@@ -624,16 +625,24 @@ function BranchSwitcher({
     else setOpen(false);
   };
 
+  const createBlocked =
+    waiting ||
+    blocked ||
+    typed === '' ||
+    nameError !== undefined ||
+    (failed && blocksName(createFailure)) ||
+    refused.has(typed);
   const submit = () => {
     setSubmitted(true);
-    if (typed === '' || branchNameError(typed, takenNames, true)) return;
-    if (!onCreate || from === undefined || blocked || busy || waiting) return;
+    if (busy || createBlocked || !onCreate || from === undefined) return;
     attempted.current = typed;
     onCreate(typed, from);
   };
 
   const startOptions: { value: 'current' | 'base'; label: string }[] = [
-    { value: 'current' as const, label: `${current ?? ''} (current)` },
+    ...(current === undefined
+      ? []
+      : [{ value: 'current' as const, label: `${current} (current)` }]),
     ...(baseBranch !== undefined && baseBranch !== current
       ? [{ value: 'base' as const, label: baseBranch }]
       : []),
@@ -906,16 +915,7 @@ function BranchSwitcher({
                 busy={busy}
                 aria-busy={busy}
                 className='phone:h-auto phone:min-h-9'
-                disabled={
-                  !onCreate ||
-                  from === undefined ||
-                  blocked ||
-                  waiting ||
-                  typed === '' ||
-                  nameError !== undefined ||
-                  (failed && blocksName(createFailure)) ||
-                  refused.has(typed)
-                }
+                disabled={!onCreate || from === undefined || createBlocked}
               >
                 {busy
                   ? 'Creating'

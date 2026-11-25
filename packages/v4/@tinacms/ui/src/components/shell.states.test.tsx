@@ -17,6 +17,7 @@ import {
   SaveProgress,
   SaveProgressCard,
 } from '@tinacms/ui/components/save-progress';
+import type { CreateFailure } from '@tinacms/ui/lib/create-failure';
 import { SaveToBranchDialog } from '@tinacms/ui/components/save-to-branch-dialog';
 import { saveToBranchDialogStates } from './save-to-branch-dialog.states';
 import { saveProgressStates } from './save-progress.states';
@@ -327,47 +328,121 @@ describe('Branch switcher refused names by reason', () => {
 });
 
 describe('Branch switcher form failures', () => {
+  const props = {
+    current: 'main',
+    branches: [{ name: 'main' }],
+    onSwitch: () => {},
+    baseBranch: 'main',
+    defaultOpen: true,
+  } as const;
+  const failOnForm = async (
+    failure: CreateFailure,
+    onCreate: (name: string) => void = () => {},
+    focusBack = false
+  ) => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <BranchSwitcher {...props} onCreate={onCreate} />
+    );
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    await user.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/a'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    rerender(
+      <BranchSwitcher {...props} onCreate={onCreate} createState='creating' />
+    );
+    if (focusBack) {
+      screen.getByRole('button', { name: 'Back to branches' }).focus();
+    }
+    rerender(
+      <BranchSwitcher
+        {...props}
+        onCreate={onCreate}
+        createState='failed'
+        createFailure={failure}
+      />
+    );
+    return { user, rerender };
+  };
+
   it.each([
-    ['exists', false],
-    ['refused', false],
-    ['auth', true],
-    ['forbidden', true],
-    ['network', true],
-    ['timeout', true],
-    ['other', true],
+    ['exists', 'Create branch', false],
+    ['refused', 'Create branch', false],
+    ['auth', 'Create branch', true],
+    ['forbidden', 'Create branch', true],
+    ['network', 'Retry', true],
+    ['timeout', 'Retry', true],
+    ['other', 'Retry', true],
   ] as const)(
-    'leaves Create on after a %s failure for the same name: %s',
-    async (failure, enabled) => {
-      const user = userEvent.setup();
-      const props = {
-        current: 'main',
-        branches: [{ name: 'main' }],
-        onSwitch: () => {},
-        onCreate: () => {},
-        baseBranch: 'main',
-        defaultOpen: true,
-      } as const;
-      const { rerender } = render(<BranchSwitcher {...props} />);
-      await user.click(screen.getByRole('button', { name: 'New branch' }));
-      await user.type(
-        screen.getByRole('searchbox', { name: 'New branch name' }),
-        'cms/a'
-      );
-      await user.click(screen.getByRole('button', { name: 'Create branch' }));
-      rerender(<BranchSwitcher {...props} createState='creating' />);
-      rerender(
-        <BranchSwitcher
-          {...props}
-          createState='failed'
-          createFailure={failure}
-        />
-      );
-      const create = screen.getByRole('button', {
-        name: /^(Create branch|Retry)$/,
-      });
+    'after a %s failure for the same name the button reads %s, enabled: %s',
+    async (failure, label, enabled) => {
+      await failOnForm(failure);
+      const create = screen.getByRole('button', { name: label });
       expect(create.hasAttribute('disabled')).toBe(!enabled);
     }
   );
+
+  it.each(['exists', 'refused'] as const)(
+    'keeps focus on Back to branches when a %s result arrives',
+    async (failure) => {
+      await failOnForm(failure, () => {}, true);
+      expect(
+        screen.getByRole('button', { name: 'Back to branches' })
+      ).toHaveFocus();
+    }
+  );
+
+  it.each(['exists', 'refused'] as const)(
+    'sends nothing when the form is submitted for a name a %s failure blocked',
+    async (failure) => {
+      const onCreate = vi.fn();
+      await failOnForm(failure, onCreate);
+      onCreate.mockClear();
+      fireEvent.submit(screen.getByRole('form', { name: 'New branch form' }));
+      expect(onCreate).not.toHaveBeenCalled();
+    }
+  );
+
+  it('keeps a name refused as exists blocked after the form resets', async () => {
+    const { user, rerender } = await failOnForm('exists');
+    rerender(
+      <BranchSwitcher
+        {...props}
+        onCreate={() => {}}
+        note={{ kind: 'failed', name: 'cms/a', failure: 'exists' }}
+      />
+    );
+    rerender(
+      <BranchSwitcher {...props} onCreate={() => {}} formResetKey={1} />
+    );
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    const name = screen.getByRole('searchbox', { name: 'New branch name' });
+    expect(name).toHaveValue('');
+    await user.type(name, 'cms/a');
+    expect(
+      screen.getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
+  });
+
+  it('never shows (current) without a branch name', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        branches={[{ name: 'main' }]}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        baseBranch='main'
+        defaultOpen
+      />
+    );
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    expect(screen.queryByText(/\(current\)/)).toBeNull();
+    expect(
+      screen.getByRole('form', { name: 'New branch form' })
+    ).toHaveTextContent('Start frommain');
+  });
 });
 
 describe('Branch switcher names under a taken branch', () => {
