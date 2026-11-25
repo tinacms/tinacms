@@ -4,10 +4,11 @@ import {
   type MediaUploadOptions,
 } from '../../../core/media/contract';
 import {
-  type UploadResponse,
   sendUpload,
+  type UploadResponse,
   uploadAbortError,
 } from '../../../core/media/upload-request';
+import { encodePath } from '../../../utils/encode-path';
 import { sanitizeFilename } from '../../media-manager/media-types';
 import {
   TINACLOUD_ASSETS_URL,
@@ -15,9 +16,8 @@ import {
   TinaCloudError,
   TinaCloudRequestFailedError,
 } from '../client';
-import { encodePath } from '../../../utils/encode-path';
+import { type MediaBranch, toMediaError } from './shared';
 import { uploadUrlResponseSchema } from './tinacloud-media-types';
-import { type MediaBranch, branchQuery, toMediaError } from './shared';
 
 const s3Error = ({ status, text }: UploadResponse): MediaError => {
   const code = /<Code>([^<]+)<\/Code>/.exec(text)?.[1];
@@ -32,13 +32,15 @@ const s3Error = ({ status, text }: UploadResponse): MediaError => {
 const putFile = async (
   signedUrl: string,
   file: File,
+  contentType: string,
   options: MediaUploadOptions
 ): Promise<void> => {
+  // The URL is signed for `contentType`, so the PUT must send exactly that.
   const response = await sendUpload(
     {
       url: signedUrl,
       method: 'PUT',
-      headers: { 'Content-Type': file.type || 'application/octet-stream' },
+      headers: { 'Content-Type': contentType },
       body: file,
     },
     options
@@ -48,15 +50,23 @@ const putFile = async (
   }
 };
 
+// Query for `upload_url`: the type the file is sent as, plus the branch.
+const uploadUrlQuery = (branch: MediaBranch, contentType: string): string => {
+  const params = new URLSearchParams({ contentType });
+  if (branch) params.set('branch', branch);
+  return `?${params}`;
+};
+
 // `upload_url` answers 412 when the path is an asset that exists.
 const requestUploadUrl = async (
   client: TinaCloudClient,
   branch: MediaBranch,
-  path: string
+  path: string,
+  contentType: string
 ): Promise<unknown> => {
   try {
     return await client.authedFetch(
-      `${TINACLOUD_ASSETS_URL}/v1/${client.clientId}/upload_url/${encodePath(path)}${branchQuery(branch)}`
+      `${TINACLOUD_ASSETS_URL}/v1/${client.clientId}/upload_url/${encodePath(path)}${uploadUrlQuery(branch, contentType)}`
     );
   } catch (cause) {
     if (cause instanceof TinaCloudError && cause.status === 412) {
@@ -94,7 +104,8 @@ const sendFile = async (
 ): Promise<string | undefined> => {
   try {
     if (options.signal?.aborted) throw uploadAbortError();
-    const body = await requestUploadUrl(client, branch, path);
+    const contentType = file.type || 'application/octet-stream';
+    const body = await requestUploadUrl(client, branch, path, contentType);
     const parsed = uploadUrlResponseSchema.safeParse(body);
     if (!parsed.success) {
       throw new MediaError(
@@ -102,7 +113,12 @@ const sendFile = async (
         'TinaCloud returned no upload URL.'
       );
     }
-    await putFile(parsed.data.signedUrl, file, options);
+    await putFile(
+      parsed.data.signedUrl,
+      file,
+      parsed.data.contentType ?? contentType,
+      options
+    );
     return parsed.data.requestId;
   } catch (cause) {
     throw answeredFailureOf(cause);
