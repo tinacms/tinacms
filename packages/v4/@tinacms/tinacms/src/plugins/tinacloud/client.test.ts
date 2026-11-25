@@ -228,6 +228,24 @@ describe('createBranch', () => {
     expect(made.name).toBe('cms/y');
   });
 
+  it('polls the requested name when the ref is exactly refs/heads/', async () => {
+    vi.useFakeTimers();
+    const fetchMock = stubFetch(
+      json({ data: { ref: 'refs/heads/' } }),
+      json({ status: 'complete' })
+    );
+    const made = await createTinaCloudClient({
+      clientId: 'abc',
+      getToken: async () => 'secret',
+      indexPollMs: 100,
+    }).createBranch({ name: 'cms/y', from: 'main' });
+    expect(made.name).toBe('cms/y');
+    const done = expect(made.ready).resolves.toBeUndefined();
+    await vi.advanceTimersByTimeAsync(500);
+    await done;
+    expect(String(fetchMock.mock.calls[1]?.[0])).toMatch(/\/status\/cms\/y$/);
+  });
+
   it('falls back to the requested name when the response has no ref', async () => {
     stubFetch(json({}));
     const made = await client().createBranch({ name: 'cms/y', from: 'main' });
@@ -537,11 +555,21 @@ describe('createBranch', () => {
   );
 
   it('lets other refusals through as they are', async () => {
-    stubFetch(json({ message: 'down' }, 502));
+    stubFetch(json({ message: 'bad request' }, 400));
     await expect(
       client().createBranch({ name: 'cms/x', from: 'main' })
-    ).rejects.toMatchObject({ status: 502 });
+    ).rejects.toMatchObject({ status: 400 });
   });
+
+  it.each([502, 503, 504])(
+    'says a create answered %s may still have made the branch',
+    async (status) => {
+      stubFetch(json({ message: 'gateway' }, status));
+      await expect(
+        client().createBranch({ name: 'cms/x', from: 'main' })
+      ).rejects.toMatchObject({ reason: 'timeout' });
+    }
+  );
 
   it('says it may still exist when the connection drops after the request went out', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('reset')));

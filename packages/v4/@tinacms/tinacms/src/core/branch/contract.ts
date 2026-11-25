@@ -1,7 +1,3 @@
-import {
-  CREATE_FAILURES,
-  type CreateFailure,
-} from '@tinacms/ui/lib/create-failure';
 import { isRecord } from '../../utils/is-record';
 import type { DocumentEntry } from '../content/contract';
 import type { SliceState, TinaStoreState } from '../plugin';
@@ -33,10 +29,23 @@ export interface BranchSource {
   }): Promise<{ name: string; ready?: Promise<void> }>;
 }
 
-/** Why a create failed: `refused` is a bad name, `auth` a sign-in problem, `forbidden` no access, `network` the sign-in service. */
-export type BranchCreateFailure = CreateFailure;
+/**
+ * Why a create failed: `timeout` may still have made it, `exists` and `refused` are about the name,
+ * `auth` is a signed-out session, `forbidden` no access, `network` no answer before sending.
+ */
+export const BRANCH_CREATE_FAILURES = [
+  'timeout',
+  'exists',
+  'refused',
+  'auth',
+  'forbidden',
+  'network',
+  'other',
+] as const;
 
-/** The TinaCloud provider's way to say `timeout` (it may still exist) or `exists` (name taken). Not public. */
+export type BranchCreateFailure = (typeof BRANCH_CREATE_FAILURES)[number];
+
+/** A provider's way to say why a create failed. Not public. */
 export class BranchCreateError extends Error {
   constructor(
     message: string,
@@ -132,7 +141,7 @@ const creatingOf = (value: unknown): BranchCreating | undefined => {
 };
 
 const isFailure = (value: unknown): value is BranchCreateFailure =>
-  CREATE_FAILURES.some((failure) => failure === value);
+  BRANCH_CREATE_FAILURES.some((failure) => failure === value);
 
 const createResultOf = (value: unknown): BranchCreateResult | undefined => {
   if (!isRecord(value)) return undefined;

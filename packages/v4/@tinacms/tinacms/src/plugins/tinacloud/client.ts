@@ -139,6 +139,9 @@ const createFailure = (cause: unknown, sent: boolean): unknown => {
   if (status === undefined) {
     return new BranchCreateError(cause.message, sent ? 'timeout' : 'network');
   }
+  if (sent && (status === 502 || status === 503 || status === 504)) {
+    return new BranchCreateError(cause.message, 'timeout');
+  }
   return cause;
 };
 
@@ -407,9 +410,10 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     }
     const parsed = createBranchResponseSchema.safeParse(body);
     const ref = parsed.success ? parsed.data.data?.ref : undefined;
-    const made = ref?.startsWith(HEADS_PREFIX)
-      ? ref.slice(HEADS_PREFIX.length)
-      : name;
+    const made =
+      ref?.startsWith(HEADS_PREFIX) && ref.length > HEADS_PREFIX.length
+        ? ref.slice(HEADS_PREFIX.length)
+        : name;
     const ready = waitForIndex(made);
     markHandled(ready);
     return { name: made, ready };
