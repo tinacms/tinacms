@@ -467,11 +467,18 @@ function BranchSwitcher({
     if (failed) return afterPaint(showActions);
   }, [failed, maximised]);
   // The name a failure said cannot work stays blocked after the failure itself is gone.
-  const [refusedName, setRefusedName] = useState<string>();
+  const [refusedNames, setRefusedNames] = useState<string[]>([]);
+  // A failure shows even while the switcher is closed, so the note is where the name is learned.
+  useEffect(() => {
+    if (note?.kind !== 'failed' || canRetry(note.failure)) return;
+    const refused = note.name;
+    setRefusedNames((names) =>
+      names.includes(refused) ? names : [...names, refused]
+    );
+  }, [note?.kind, note?.name, note?.failure]);
   // A failure that disables the focused Create button must not drop focus out of the view.
   useEffect(() => {
     if (!failed || canRetry(createFailure)) return;
-    setRefusedName(attempted.current);
     const active = document.activeElement;
     if (
       !active ||
@@ -494,7 +501,7 @@ function BranchSwitcher({
     setNewName('');
     setSubmitted(false);
     setStartFrom('current');
-    setRefusedName(undefined);
+    setRefusedNames([]);
   }
   useEffect(() => {
     if (resetFromForm.current && open && focusHere()) {
@@ -904,7 +911,7 @@ function BranchSwitcher({
                   typed === '' ||
                   nameError !== undefined ||
                   (failed && !canRetry(createFailure)) ||
-                  typed === refusedName
+                  refusedNames.includes(typed)
                 }
               >
                 {busy

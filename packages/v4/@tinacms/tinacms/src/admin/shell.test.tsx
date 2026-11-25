@@ -2576,6 +2576,35 @@ describe('branch switcher rows and creating a branch', () => {
     }
   );
 
+  it('keeps Create branch off for a name refused while the switcher was closed', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const rejects: ((cause: Error) => void)[] = [];
+    createBranch = vi.fn<NonNullable<BranchSource['create']>>(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejects.push(reject);
+        })
+    );
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    act(() => rejects[0](new BranchCreateError('conflict', 'exists')));
+    await screen.findByText("Couldn't create cms/x");
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+    const name = await within(reopened).findByRole('searchbox', {
+      name: 'New branch name',
+    });
+    expect(name).toHaveValue('cms/x');
+    expect(
+      within(reopened).getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
+    await user.type(name, '{Enter}');
+    expect(createBranch).toHaveBeenCalledTimes(1);
+  });
+
   it('keeps validating the name after a create ended ready', async () => {
     createBranch = async ({ name }) => ({ name, ready: Promise.resolve() });
     const { user, dialog } = await startCreate('cms/z');
