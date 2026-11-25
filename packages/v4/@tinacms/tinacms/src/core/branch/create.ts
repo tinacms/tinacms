@@ -14,7 +14,9 @@ type Creatable = BranchSource & Required<Pick<BranchSource, 'create'>>;
 
 const failureOf = (cause: unknown): BranchCreateFailure => {
   if (cause instanceof BranchCreateError) return cause.reason;
-  if (cause instanceof AuthError) return 'auth';
+  if (cause instanceof AuthError) {
+    return cause.code === 'network' ? 'network' : 'auth';
+  }
   return 'other';
 };
 

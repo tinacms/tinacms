@@ -2,6 +2,7 @@ import {
   type CreateFailure,
   BranchSwitcher,
   LocalFilesBadge,
+  canRetry,
   failureDetail,
 } from '@tinacms/ui/components/branch-switcher';
 import { SaveProgress } from '@tinacms/ui/components/save-progress';
@@ -301,18 +302,17 @@ function BranchControl() {
         tone: 'error',
         title: `Couldn't create ${outcome.name}`,
         text: failureDetail(outcome.name, outcome.failure),
-        action:
-          outcome.failure === 'exists'
-            ? undefined
-            : {
-                label: 'Retry',
-                onClick: act(idOf, () =>
-                  latest.current.startCreate(
-                    { name: outcome.name, from: outcome.from },
-                    'note'
-                  )
-                ),
-              },
+        action: !canRetry(outcome.failure)
+          ? undefined
+          : {
+              label: 'Retry',
+              onClick: act(idOf, () =>
+                latest.current.startCreate(
+                  { name: outcome.name, from: outcome.from },
+                  'note'
+                )
+              ),
+            },
       });
     } else if (outcome.kind === 'unready') {
       id = toast({

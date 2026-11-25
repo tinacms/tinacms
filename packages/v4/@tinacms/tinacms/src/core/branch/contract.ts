@@ -29,14 +29,29 @@ export interface BranchSource {
   }): Promise<{ name: string; ready?: Promise<void> }>;
 }
 
-/** Why a create failed. `auth` is a sign-in problem and `other` is everything else. */
-export type BranchCreateFailure = 'timeout' | 'exists' | 'auth' | 'other';
+/** Why a create failed: `refused` is a bad name, `auth` a sign-in problem, `network` the sign-in service. */
+export type BranchCreateFailure =
+  | 'timeout'
+  | 'exists'
+  | 'refused'
+  | 'auth'
+  | 'network'
+  | 'other';
+
+const FAILURES: readonly unknown[] = [
+  'timeout',
+  'exists',
+  'refused',
+  'auth',
+  'network',
+  'other',
+];
 
 /** The TinaCloud provider's way to say `timeout` (it may still exist) or `exists` (name taken). Not public. */
 export class BranchCreateError extends Error {
   constructor(
     message: string,
-    readonly reason: 'timeout' | 'exists' | 'other'
+    readonly reason: 'timeout' | 'exists' | 'refused' | 'auth'
   ) {
     super(message);
     this.name = 'BranchCreateError';
@@ -127,6 +142,9 @@ const creatingOf = (value: unknown): BranchCreating | undefined => {
   return { name, from, startedOn: optionalString(startedOn), phase };
 };
 
+const isFailure = (value: unknown): value is BranchCreateFailure =>
+  FAILURES.includes(value);
+
 const createResultOf = (value: unknown): BranchCreateResult | undefined => {
   if (!isRecord(value)) return undefined;
   const { name, from, startedOn, outcome, failure } = value;
@@ -139,12 +157,7 @@ const createResultOf = (value: unknown): BranchCreateResult | undefined => {
     from,
     startedOn: optionalString(startedOn),
     outcome,
-    ...(failure === 'timeout' ||
-    failure === 'exists' ||
-    failure === 'auth' ||
-    failure === 'other'
-      ? { failure }
-      : {}),
+    ...(isFailure(failure) ? { failure } : {}),
   };
 };
 

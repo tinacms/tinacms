@@ -101,6 +101,9 @@ describe('createBranchAction', () => {
     [new BranchCreateError('no answer', 'timeout'), 'timeout'],
     [new BranchCreateError('taken', 'exists'), 'exists'],
     [new AuthError('expired'), 'auth'],
+    [new AuthError('network'), 'network'],
+    [new BranchCreateError('422', 'refused'), 'refused'],
+    [new BranchCreateError('403', 'auth'), 'auth'],
     [new Error('boom'), 'other'],
   ])('records why a create failed: %s', async (cause, failure) => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});

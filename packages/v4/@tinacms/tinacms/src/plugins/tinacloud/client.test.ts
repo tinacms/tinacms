@@ -480,22 +480,33 @@ describe('createBranch', () => {
     await assertion;
   });
 
-  it('says the name is taken on a 409 and lets every other refusal through as it is', async () => {
-    stubFetch(json({ message: 'taken' }, 409));
+  it.each([
+    [409, 'exists'],
+    [422, 'refused'],
+    [401, 'auth'],
+    [403, 'auth'],
+  ])(
+    'says why a create answered %s was refused: %s',
+    async (status, reason) => {
+      stubFetch(json({ message: '<html>nope</html>' }, status));
+      await expect(
+        client().createBranch({ name: 'cms/x', from: 'main' })
+      ).rejects.toMatchObject({ reason });
+    }
+  );
+
+  it('lets other refusals through as they are', async () => {
+    stubFetch(json({ message: 'down' }, 502));
     await expect(
       client().createBranch({ name: 'cms/x', from: 'main' })
-    ).rejects.toBeInstanceOf(BranchCreateError);
-    stubFetch(json({ message: 'Branch name is not allowed.' }, 422));
-    await expect(
-      client().createBranch({ name: 'cms/x', from: 'main' })
-    ).rejects.toMatchObject({ status: 422 });
+    ).rejects.toMatchObject({ status: 502 });
   });
 
-  it('does not say it may still exist when the request failed before any answer', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('offline')));
+  it('says it may still exist when the connection drops after the request went out', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('reset')));
     await expect(
       client().createBranch({ name: 'cms/x', from: 'main' })
-    ).rejects.not.toBeInstanceOf(BranchCreateError);
+    ).rejects.toMatchObject({ reason: 'timeout' });
   });
 
   it('abandons a create request that never answers, aborts it and rejects', async () => {
@@ -545,7 +556,7 @@ describe('createBranch', () => {
     const fetchMock = stubFetch();
     await expect(
       client({}).createBranch({ name: 'cms/x', from: 'main' })
-    ).rejects.toBeInstanceOf(TinaCloudError);
+    ).rejects.toMatchObject({ reason: 'auth' });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

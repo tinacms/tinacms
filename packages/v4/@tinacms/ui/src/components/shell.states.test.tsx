@@ -185,6 +185,62 @@ describe('Branch switcher pending rows', () => {
   });
 });
 
+describe('Branch switcher failure notes', () => {
+  it('caps the failure note to two lines and keeps the full text in a title', () => {
+    const name = 'cms/a-very-long-branch-name-that-keeps-going-and-going';
+    render(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        onSwitch={() => {}}
+        defaultOpen
+        note={{ kind: 'failed', name, failure: 'timeout' }}
+      />
+    );
+    const text = screen.getByText(new RegExp(`Couldn't create ${name}`));
+    expect(text).toHaveClass('line-clamp-2');
+    expect(text).toHaveAttribute('title', text.textContent ?? '');
+  });
+
+  it.each([
+    ['exists', false],
+    ['refused', false],
+    ['auth', false],
+    ['network', true],
+    ['timeout', true],
+    ['other', true],
+  ] as const)('offers Retry on the note only for %s: %s', (failure, retry) => {
+    render(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        onSwitch={() => {}}
+        defaultOpen
+        note={{ kind: 'failed', name: 'cms/x', failure }}
+      />
+    );
+    expect(screen.queryByRole('button', { name: 'Retry' }) !== null).toBe(
+      retry
+    );
+  });
+
+  it('wraps a single Start from value', async () => {
+    render(
+      <BranchSwitcher
+        current='feature/longcurrentbranchnamewithnobreaks'
+        branches={[{ name: 'feature/longcurrentbranchnamewithnobreaks' }]}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        defaultOpen
+      />
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    expect(
+      screen.getByText(/feature\/longcurrentbranchnamewithnobreaks \(current\)/)
+    ).toHaveClass('[overflow-wrap:anywhere]');
+  });
+});
+
 describe('Branch switcher while its form creates', () => {
   it('hides only the branch being created, not other new rows', async () => {
     const props = {

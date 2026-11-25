@@ -2442,7 +2442,7 @@ describe('branch switcher rows and creating a branch', () => {
     ],
     [
       'failed with the server saying something long',
-      new BranchCreateError('<html>502 Bad Gateway</html>', 'other'),
+      new Error('<html>502 Bad Gateway</html>'),
       "Couldn't create cms/x. Try again.",
       true,
     ],
@@ -2450,7 +2450,25 @@ describe('branch switcher rows and creating a branch', () => {
       'needed a new sign-in',
       new AuthError('expired'),
       "Couldn't create cms/x. Sign in again to create a branch.",
+      false,
+    ],
+    [
+      'was refused by TinaCloud for lack of access',
+      new BranchCreateError('403', 'auth'),
+      "Couldn't create cms/x. Sign in again to create a branch.",
+      false,
+    ],
+    [
+      'could not reach the sign-in service',
+      new AuthError('network'),
+      "Couldn't create cms/x. Can't reach the sign-in service. Try again.",
       true,
+    ],
+    [
+      'was refused because of the branch name',
+      new BranchCreateError('422', 'refused'),
+      "Couldn't create cms/x. TinaCloud refused this branch name.",
+      false,
     ],
     [
       'failed for an unknown reason',
@@ -2509,6 +2527,19 @@ describe('branch switcher rows and creating a branch', () => {
       within(dialog).getByRole('button', { name: 'Create branch' })
     ).toBeEnabled();
     expect(createBranch).toHaveBeenCalledTimes(1);
+  });
+
+  it('moves focus to the name field when a failure disables the focused Create branch', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    createBranch = vi.fn<NonNullable<BranchSource['create']>>(() =>
+      Promise.reject(new BranchCreateError('conflict', 'exists'))
+    );
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await within(dialog).findByText(/already exists/);
+    expect(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' })
+    ).toHaveFocus();
   });
 
   it('keeps validating the name after a create ended ready', async () => {

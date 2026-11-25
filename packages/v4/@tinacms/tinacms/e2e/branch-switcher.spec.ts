@@ -208,25 +208,31 @@ test.describe('branch switcher pop-up', () => {
     await expect(page.getByRole('button', { name: /^Branch:/ })).toBeFocused();
   });
 
-  test('closes the pop-up with one Escape from the Maximise button, tooltip and all', async ({
+  test('closes the pop-up with one Escape, keeps the typed name and keeps the key from the page', async ({
     page,
   }) => {
     await page.setViewportSize(DESKTOP);
-    await page.goto(URL);
-    await page.getByRole('button', { name: /^Branch:/ }).click();
-    const popup = page.getByRole('dialog', { name: 'Branches' });
-    await expect(popup).toBeVisible();
-    await expect(
-      popup.getByRole('searchbox', { name: 'Search branches' })
-    ).toBeFocused();
-    await page.keyboard.press('Shift+Tab');
-    await page.keyboard.press('Shift+Tab');
-    await expect(popup.getByRole('button', { name: 'Maximise' })).toBeFocused();
-    await expect(
-      page.locator('[data-slot="tooltip-content"]', { hasText: 'Maximise' })
-    ).toBeVisible();
+    await page.goto('/branches.html?docs=1&create=ok#/');
+    await page.evaluate(() => {
+      const seen: string[] = [];
+      Object.assign(window, { seen });
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') seen.push('escape');
+      });
+    });
+    await openFrame(page, false);
+    const popup = frameOf(page, false);
+    await popup.getByRole('button', { name: 'New branch' }).click();
+    const name = popup.getByRole('searchbox', { name: 'New branch name' });
+    await name.fill('cms/z');
+    await expect(name).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(popup).toBeHidden();
+    expect(await page.evaluate(() => Reflect.get(window, 'seen'))).toEqual([]);
+    await openFrame(page, false);
+    await expect(
+      frameOf(page, false).getByRole('searchbox', { name: 'New branch name' })
+    ).toHaveValue('cms/z');
   });
 
   test('keeps the ready note readable on a 375px phone with a long branch name', async ({
@@ -1168,6 +1174,7 @@ test.describe('branch switcher pop-up', () => {
         .getByRole('searchbox', { name: 'New branch name' })
         .fill('cms/x');
       const form = view.getByRole('form', { name: 'New branch form' });
+      // The sheet is anchored to the bottom, so its buttons are measured on the page.
       const below = async (name: string) => {
         const button = view.getByRole('button', { name });
         await expect(button).toBeVisible();
@@ -1176,7 +1183,8 @@ test.describe('branch switcher pop-up', () => {
           button.boundingBox(),
           form.boundingBox(),
         ]);
-        return b && f ? Math.round(b.y - f.y) : undefined;
+        if (!b || !f) return undefined;
+        return Math.round(frame.name === 'phone sheet' ? b.y : b.y - f.y);
       };
       const before = await below('Create branch');
       await view.getByRole('button', { name: 'Create branch' }).click();

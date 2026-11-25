@@ -45,7 +45,13 @@ type BranchEntry = {
 };
 
 /** Why a create failed: it may still exist, the name is taken, sign-in, or anything else. */
-type CreateFailure = 'timeout' | 'exists' | 'auth' | 'other';
+type CreateFailure =
+  | 'timeout'
+  | 'exists'
+  | 'refused'
+  | 'auth'
+  | 'network'
+  | 'other';
 
 /** What a create ended in. `reason` says why the note's action was refused. */
 type BranchNote = {
@@ -240,12 +246,19 @@ const failureDetail = (name: string, failure?: CreateFailure) => {
   if (failure === 'exists') {
     return `A branch called ${name} already exists. Reload to see it.`;
   }
+  if (failure === 'refused') return 'TinaCloud refused this branch name.';
   if (failure === 'auth') return 'Sign in again to create a branch.';
+  if (failure === 'network')
+    return "Can't reach the sign-in service. Try again.";
   if (failure === 'timeout') {
     return 'Check your connection, then retry. It may still have been made, so reload to check.';
   }
   return 'Try again.';
 };
+
+/** Retry helps only when the same request could succeed: not for a taken or refused name, or no sign-in. */
+const canRetry = (failure?: CreateFailure) =>
+  failure !== 'exists' && failure !== 'refused' && failure !== 'auth';
 
 const failureLine = (name: string, failure?: CreateFailure) =>
   failure === 'exists'
@@ -265,9 +278,9 @@ function OutcomeNote({
   const failed = note.kind === 'failed';
   const action =
     note.kind === 'failed'
-      ? note.failure === 'exists'
-        ? undefined
-        : 'Retry'
+      ? canRetry(note.failure)
+        ? 'Retry'
+        : undefined
       : note.kind === 'ready'
         ? `Switch to ${note.name}`
         : undefined;
@@ -283,7 +296,13 @@ function OutcomeNote({
           failed ? 'text-destructive' : 'text-foreground'
         )}
       >
-        <span className='min-w-0 flex-[1_1_12rem] [overflow-wrap:anywhere]'>
+        <span
+          title={failed ? failureLine(note.name, note.failure) : undefined}
+          className={cn(
+            'min-w-0 flex-[1_1_12rem] [overflow-wrap:anywhere]',
+            failed && 'line-clamp-2'
+          )}
+        >
           {note.kind === 'failed'
             ? failureLine(note.name, note.failure)
             : note.kind === 'unready'
@@ -452,14 +471,27 @@ function BranchSwitcher({
   };
   const showActions = () => {
     const root = frame();
+    // The sheet shows the line above the buttons, so scrolling to it would push them down.
     (
-      root.querySelector('[data-branch-failure]') ??
+      (phone ? null : root.querySelector('[data-branch-failure]')) ??
       root.querySelector('[data-branch-actions]')
     )?.scrollIntoView?.({ block: 'nearest' });
   };
   useEffect(() => {
     if (failed) return afterPaint(showActions);
   }, [failed, maximised]);
+  // A failure that disables the focused Create button must not drop focus out of the view.
+  useEffect(() => {
+    if (!failed || canRetry(createFailure)) return;
+    const active = document.activeElement;
+    if (
+      !active ||
+      active === document.body ||
+      active.matches(':disabled, [aria-disabled="true"], [data-disabled]')
+    ) {
+      focusField('name');
+    }
+  }, [failed, createFailure]);
   useEffect(() => setDismissed(false), [createState]);
 
   const wasOpen = useRef(open);
@@ -551,19 +583,6 @@ function BranchSwitcher({
     triggerRef.current?.focus();
   };
 
-  // A tooltip on a focused control takes the first Escape, so the pop-up listens before it.
-  const closeNow = useRef(closeAndFocusButton);
-  closeNow.current = closeAndFocusButton;
-  const popUpOpen = shown && !maximised && !phone;
-  useEffect(() => {
-    if (!popUpOpen) return;
-    const close = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape' && !event.isComposing) closeNow.current();
-    };
-    document.addEventListener('keydown', close, true);
-    return () => document.removeEventListener('keydown', close, true);
-  }, [popUpOpen]);
-
   const move = (event: KeyboardEvent<HTMLElement>) => {
     const keys = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
     if (!keys.includes(event.key)) return;
@@ -625,6 +644,17 @@ function BranchSwitcher({
       ? [{ value: 'base' as const, label: baseBranch }]
       : []),
   ];
+
+  // On the bottom-anchored sheet the line goes above the buttons, so they stay under the finger.
+  const failureP = failed ? (
+    <p
+      role='alert'
+      data-branch-failure=''
+      className='m-0 text-sm text-destructive [overflow-wrap:anywhere]'
+    >
+      {failureLine(attempted.current, createFailure)}
+    </p>
+  ) : null;
 
   /** The same content in every frame; `Title` is the frame's own heading element. */
   const panel = (Title: (props: { children: ReactNode }) => ReactNode) => (
@@ -736,7 +766,7 @@ function BranchSwitcher({
           <>
             {matching.length === 0 && query.trim() !== '' ? (
               <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                <p className='m-0 min-w-0 flex-1'>
+                <p className='m-0 min-w-0 flex-1 [overflow-wrap:anywhere]'>
                   No branches match “{query.trim()}”.
                 </p>
                 <Button
@@ -818,7 +848,10 @@ function BranchSwitcher({
               </p>
             ) : null}
             {waiting ? (
-              <p role='status' className='m-0 text-sm text-muted-foreground'>
+              <p
+                role='status'
+                className='m-0 text-sm text-muted-foreground [overflow-wrap:anywhere]'
+              >
                 Wait for {creatingBranch} to finish first
               </p>
             ) : null}
@@ -844,12 +877,13 @@ function BranchSwitcher({
                   ))}
                 </RadioGroup>
               ) : (
-                <span className='font-mono text-sm tracking-code'>
+                <span className='font-mono text-sm tracking-code [overflow-wrap:anywhere]'>
                   {current ?? baseBranch}
                   {current === undefined ? '' : ' (current)'}
                 </span>
               )}
             </div>
+            {phone ? failureP : null}
             <div
               data-branch-actions=''
               className='flex justify-end gap-2 max-md:items-stretch max-md:*:min-w-0 max-md:*:flex-1'
@@ -879,25 +913,18 @@ function BranchSwitcher({
                   waiting ||
                   typed === '' ||
                   nameError !== undefined ||
-                  (failed && createFailure === 'exists')
+                  (failed &&
+                    (createFailure === 'exists' || createFailure === 'refused'))
                 }
               >
                 {busy
                   ? 'Creating'
-                  : failed && createFailure !== 'exists'
+                  : failed && canRetry(createFailure)
                     ? 'Retry'
                     : 'Create branch'}
               </Button>
             </div>
-            {failed ? (
-              <p
-                role='alert'
-                data-branch-failure=''
-                className='m-0 text-sm text-destructive [overflow-wrap:anywhere]'
-              >
-                {failureLine(attempted.current, createFailure)}
-              </p>
-            ) : null}
+            {phone ? null : failureP}
           </form>
         ) : null}
       </div>
@@ -1098,4 +1125,4 @@ function LocalFilesBadge() {
 }
 
 export type { BranchEntry, BranchNote, BranchSwitcherProps, CreateFailure };
-export { BranchSwitcher, LocalFilesBadge, failureDetail };
+export { BranchSwitcher, LocalFilesBadge, canRetry, failureDetail };
