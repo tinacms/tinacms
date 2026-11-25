@@ -1399,16 +1399,21 @@ test.describe('branch switcher pop-up', () => {
     if (!o || !i) return;
     expect(i.x).toBeGreaterThanOrEqual(o.x - 1);
     expect(i.x + i.width).toBeLessThanOrEqual(o.x + o.width + 1);
+    expect(i.y).toBeGreaterThanOrEqual(o.y - 1);
+    expect(i.y + i.height).toBeLessThanOrEqual(o.y + o.height + 1);
     expect(i.x + i.width).toBeLessThanOrEqual(width);
     expect(scrollWidth).toBeLessThanOrEqual(width);
   };
   const longName = `cms/${'a'.repeat(116)}`;
 
-  for (const width of [320, 1280]) {
-    test(`wraps the ready toast's Switch to action inside the toast at ${width}px`, async ({
+  const wrapsSwitchTo = (
+    where: string,
+    size: { width: number; height: number }
+  ) => {
+    test(`wraps the ready toast's Switch to action inside the toast ${where}`, async ({
       page,
     }) => {
-      await page.setViewportSize({ width, height: 800 });
+      await page.setViewportSize(size);
       await page.goto('/branches.html?docs=1&create=slow#/');
       await openFrame(page, false);
       await makeBranch(page, frameOf(page, false), longName);
@@ -1422,12 +1427,13 @@ test.describe('branch switcher pop-up', () => {
       });
       await expect(action).toBeVisible();
       await expectInside(page, toast, action);
+      await expectInside(page, action, action.locator('span').last());
     });
 
-    test(`wraps the ready note's Switch to action inside the note at ${width}px`, async ({
+    test(`wraps the ready note's Switch to action inside the note ${where}`, async ({
       page,
     }) => {
-      await page.setViewportSize({ width, height: 800 });
+      await page.setViewportSize(size);
       await page.goto('/branches.html?docs=1&create=slow#/');
       await openFrame(page, false);
       await makeBranch(page, frameOf(page, false), longName);
@@ -1443,8 +1449,16 @@ test.describe('branch switcher pop-up', () => {
       });
       await expect(action).toBeVisible();
       await expectInside(page, note, action);
+      await expectInside(page, action, action.locator('span').last());
     });
+  };
+  for (const width of [320, 1280]) {
+    wrapsSwitchTo(`at ${width}px`, { width, height: 800 });
   }
+  test.describe('with touch', () => {
+    test.use({ hasTouch: true });
+    wrapsSwitchTo('on a touch phone', { width: 390, height: 844 });
+  });
 
   test('leaves the Toaster layer as it was: no lift above the switcher', async ({
     page,

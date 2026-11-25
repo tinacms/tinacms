@@ -295,7 +295,7 @@ function OutcomeNote({
         {action ? (
           <Button
             size='sm'
-            className='h-auto min-h-8 min-w-0 max-w-full shrink py-1 text-left whitespace-normal'
+            className='h-auto min-h-8 min-w-0 max-w-full shrink py-1 text-left whitespace-normal touch:h-auto! touch:min-h-touch'
             onClick={onAction}
           >
             <span className='min-w-0 [overflow-wrap:anywhere]'>{action}</span>

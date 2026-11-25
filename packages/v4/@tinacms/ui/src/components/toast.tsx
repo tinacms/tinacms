@@ -83,7 +83,7 @@ function Toast({
         <Button
           variant='outline'
           size='sm'
-          className='h-auto min-h-8 max-w-full shrink py-1 text-left whitespace-normal touch:min-h-touch'
+          className='h-auto min-h-8 max-w-full shrink py-1 text-left whitespace-normal touch:h-auto! touch:min-h-touch'
           aria-label={action['aria-label']}
           onClick={action.onClick}
         >
