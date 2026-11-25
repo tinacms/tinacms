@@ -274,8 +274,7 @@ export function MediaPickerPanel({
     },
     enabled: inMissingFolder && folder !== '' && listedEmpty,
   });
-  const checkingParent =
-    inMissingFolder && listedEmpty && parentCheck.isPending;
+  const checkingParent = parentCheck.isLoading;
   const notFound = (error: unknown) =>
     error instanceof MediaError && error.code === 'not-found';
   const missingFolderGone =

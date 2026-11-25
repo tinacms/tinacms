@@ -1034,6 +1034,19 @@ describe('a missing image in a folder that is still there', () => {
     expect(screen.queryByRole('navigation')).toBeNull();
   });
 
+  it('shows the empty root, with Upload, for a missing image that was at the root', async () => {
+    const user = userEvent.setup();
+    files = [];
+    renderPicker(createProvider(), {
+      asks: {
+        hero: single({ replacing: { path: 'gone.jpg', missing: true } }),
+      },
+    });
+    await openPicker(user);
+    expect(await screen.findByText(emptyWords(''))).toBeVisible();
+    expect(screen.getByText(missingCardWords(''))).toBeVisible();
+  });
+
   it('shows loading, not the empty message, while the parent check runs', async () => {
     emptyPosts();
     let release: () => void = () => {};
