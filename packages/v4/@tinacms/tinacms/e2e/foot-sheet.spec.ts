@@ -20,7 +20,7 @@ const edit = async (page: Page, name: RegExp, text: string) => {
 const save = (page: Page) =>
   page
     .locator('[data-slot=form-bar]')
-    .getByRole('button', { name: /^(Save|Resolve)/ });
+    .getByRole('button', { name: /^(Save|Resolve|\d+\+? errors?$)/ });
 
 const openBranchDialog = async (page: Page) => {
   await page.goto(BRANCH_DIALOG);
@@ -333,36 +333,23 @@ test.describe('the Discard confirm', () => {
   });
 });
 
-test('the navigation sheet closes at 390px without navigating', async ({
+test('the side nav sheet closes at 390px without navigating', async ({
   page,
 }) => {
   await page.setViewportSize(SIZES[0]);
   await page.goto('/#/collections/post/content%2Fposts%2Fhello-world.mdx');
   const url = page.url();
-  await page.getByRole('button', { name: 'Toggle Sidebar' }).first().click();
+  await page.getByRole('button', { name: 'Open side nav' }).click();
   const side = page.locator('[data-slot=sidebar][data-mobile=true]');
   await expect(side).toBeVisible();
   await settle(page);
-  expect((await box(side)).width).toBe(390);
-  const close = side.getByRole('button', { name: 'Close', exact: true });
-  const x = await box(close);
-  const overlaps = await side.evaluate(
-    (el, { left, top, right, bottom }) =>
-      [...el.querySelectorAll('a, button')].some((control) => {
-        if (control.getAttribute('aria-label') === 'Close') return false;
-        const r = control.getBoundingClientRect();
-        return (
-          r.width > 0 &&
-          r.left < right &&
-          r.right > left &&
-          r.top < bottom &&
-          r.bottom > top
-        );
-      }),
-    { left: x.x, top: x.y, right: x.x + x.width, bottom: x.y + x.height }
-  );
-  expect(overlaps).toBe(false);
-  await close.click();
+  const rect = await box(side);
+  expect(rect.width).toBe(288);
+  expect(rect.y).toBe(56);
+  await page.getByRole('button', { name: 'Close side nav' }).click();
   await expect(side).toBeHidden();
+  await expect(
+    page.getByRole('button', { name: 'Open side nav' })
+  ).toBeFocused();
   expect(page.url()).toBe(url);
 });

@@ -1,7 +1,15 @@
 import { act, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { useTier } from '@tinacms/ui/hooks/use-tier';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import {
+  DESKTOP_MIN_WIDTH,
+  resetTierQueries,
+  TABLET_MIN_WIDTH,
+  useTier,
+} from '@tinacms/ui/hooks/use-tier';
 import { guardConsole } from '../test/console-guard';
 
 guardConsole();
@@ -53,5 +61,32 @@ describe('useTier', () => {
       for (const listener of listeners) listener();
     });
     expect(screen.getByText('tablet')).toBeVisible();
+  });
+});
+
+describe('useTier tokens', () => {
+  it('keeps the fallback widths equal to tokens.css', () => {
+    const css = readFileSync(
+      join(process.cwd(), 'src/styles/tokens.css'),
+      'utf8'
+    );
+    const rem = (name: string) =>
+      Number(new RegExp(`--${name}: ([\\d.]+)rem`).exec(css)?.[1]) * 16;
+    expect(rem('breakpoint-tablet')).toBe(TABLET_MIN_WIDTH);
+    expect(rem('breakpoint-desktop')).toBe(DESKTOP_MIN_WIDTH);
+  });
+
+  it('reads the steps from the document tokens', () => {
+    document.documentElement.style.setProperty('--breakpoint-desktop', '70rem');
+    resetTierQueries();
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: query === '(min-width: 70rem)' || query.includes('48rem'),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+    render(<Probe />);
+    expect(screen.getByText('desktop')).toBeVisible();
+    document.documentElement.style.removeProperty('--breakpoint-desktop');
+    resetTierQueries();
   });
 });

@@ -50,8 +50,10 @@ export class ConfigManager {
   generatedDatabaseClientDFilePath: string;
   generatedQueriesFilePath: string;
   generatedFragmentsFilePath: string;
-  generatedQueriesAndFragmentsGlob: string;
+  /** Watcher glob. Loader pointers must end in a literal extension, see `*Pointers`. */
   userQueriesAndFragmentsGlob: string;
+  userQueriesAndFragmentsPointers: string[];
+  generatedQueriesAndFragmentsPointers: string[];
   publicFolderPath: string;
   outputFolderPath: string;
   outputHTMLFilePath: string;
@@ -184,9 +186,12 @@ export class ConfigManager {
       this.tinaFolderPath,
       'queries/**/*.{graphql,gql}'
     );
-    this.generatedQueriesAndFragmentsGlob = path.join(
-      this.generatedFolderPath,
-      '*.{graphql,gql}'
+    // Loader pointers must end in a literal extension: the loader parses extensionless ones as GraphQL and throws on a space in the path.
+    this.userQueriesAndFragmentsPointers = ['graphql', 'gql'].map((ext) =>
+      path.join(this.tinaFolderPath, `queries/**/*.${ext}`)
+    );
+    this.generatedQueriesAndFragmentsPointers = ['graphql', 'gql'].map((ext) =>
+      path.join(this.generatedFolderPath, `*.${ext}`)
     );
     // TODO: make these match the behavior where this matches the config format
     this.generatedClientTSFilePath = path.join(

@@ -15,7 +15,7 @@ import {
 import { MediaPaneShellContext } from '../../admin/media-pane-shell';
 import { HOME_ROUTE } from '../../admin/routing';
 import { useAdminRoute } from '../../admin/use-admin-route';
-import { useNarrow } from '../../admin/use-narrow';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import type { AdminScreenProps } from '../../core/screen/contract';
 import { useCurrentBranch } from '../../editor/content-queries';
 import { useMediaSlice } from '../../editor/hooks';
@@ -174,7 +174,7 @@ export function MediaPane({ segments }: AdminScreenProps) {
   const uploadHold = useUploadHold();
   const branch = useCurrentBranch() ?? '';
   useMediaOpenMark();
-  const narrow = useNarrow();
+  const narrow = useTier() !== 'desktop';
   const root = useRef<HTMLElement>(null);
   const library = useRef<HTMLDivElement>(null);
   const paneWidth = useWidth(root);
@@ -812,7 +812,7 @@ function MediaPaneRoot({
       aria-label='Media'
       className={cn(
         'outline-none flex min-h-0 min-w-0 flex-col border-r border-border',
-        maximised ? 'flex-1' : 'w-110 max-lg:flex-1'
+        maximised ? 'flex-1' : 'w-110 below-desktop:flex-1'
       )}
     >
       {children}

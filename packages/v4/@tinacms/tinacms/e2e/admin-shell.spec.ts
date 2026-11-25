@@ -221,7 +221,7 @@ for (const width of [320, 375, 414]) {
   }
 }
 
-for (const width of [320, 375, 390, 414, 480, 520, 639, 640]) {
+for (const width of [320, 375, 390, 414, 480, 520, 640, 767, 768]) {
   test(`Save All and its result list stay on screen at ${width}px`, async ({
     page,
   }) => {
@@ -262,7 +262,7 @@ for (const width of [320, 375, 390, 414, 480, 520, 639, 640]) {
     const text = await bar
       .getByRole('button', { name: /^Save all/ })
       .innerText();
-    if (width < 640) expect(text.trim()).toBe('');
+    if (width < 768) expect(text.trim()).toBe('');
     else expect(text).toMatch(/Save all\s*1 failed/);
     expect((buttonBox?.x ?? 0) + (buttonBox?.width ?? 0)).toBeLessThanOrEqual(
       (barBox?.x ?? 0) + (barBox?.width ?? 0)

@@ -40,6 +40,8 @@ type PanelHeaderProps = Omit<ComponentProps<'div'>, 'children'> & {
   /** Shows a Maximise button before close ("Restore" while true). Without `onMaximise` there is none. */
   maximised?: boolean;
   onMaximise?: () => void;
+  /** Names the Maximise button when off and on. They default to "Maximise" and "Restore". */
+  maximiseLabels?: readonly [string, string];
 };
 
 /**
@@ -61,6 +63,7 @@ function PanelHeader({
   onClose,
   maximised = false,
   onMaximise,
+  maximiseLabels = ['Maximise', 'Restore'],
   className,
   ...props
 }: PanelHeaderProps) {
@@ -124,7 +127,7 @@ function PanelHeader({
           variant='icon'
           size='sm'
           icon={maximised ? 'restore' : 'maximise'}
-          aria-label={maximised ? 'Restore' : 'Maximise'}
+          aria-label={maximised ? maximiseLabels[1] : maximiseLabels[0]}
           aria-pressed={maximised}
           onClick={onMaximise}
         />

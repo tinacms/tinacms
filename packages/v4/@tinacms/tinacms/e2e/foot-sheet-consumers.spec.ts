@@ -47,6 +47,24 @@ const expectFootSheet = async (page: Page) => {
 
 const expectClosed = (page: Page) => expect(page.locator(SHEET)).toHaveCount(0);
 
+const SCREEN_CONTENT = '[data-slot=screen-content]';
+
+/** AC25, AC26: on a phone the branch switcher and Search fill the screen between the bars, with no handle. */
+const expectFullScreen = async (page: Page) => {
+  const screen = page.locator(SCREEN_CONTENT);
+  await expect(screen).toBeVisible();
+  const rect = await box(screen);
+  expect(Math.round(rect.y)).toBe(56);
+  expect(rect.width).toBe(SCREEN.width);
+  expect(rect.y + rect.height).toBeLessThan(SCREEN.height);
+  await expect(page.locator(SHEET)).toHaveCount(0);
+  await expect(screen.getByRole('button', { name: 'Close sheet' })).toHaveCount(
+    0
+  );
+  await expect(screen.getByRole('button', { name: 'Maximise' })).toHaveCount(0);
+  return screen;
+};
+
 const openRowMenu = async (page: Page, label: string, item: string) => {
   await page.getByRole('button', { name: `Actions for ${label}` }).click();
   await page.getByRole('menuitem', { name: item }).click();
@@ -60,18 +78,19 @@ test.describe('dialogs as foot sheets on a phone', () => {
   }) => {
     await page.goto(BRANCHES);
     await page.getByRole('button', { name: /^Branch: / }).click();
-    const sheet = await expectFootSheet(page);
-    await sheet.getByRole('button', { name: 'New branch' }).click();
+    const screen = await expectFullScreen(page);
+    await expect(screen.getByRole('searchbox')).toBeFocused();
+    await screen.getByRole('button', { name: 'New branch' }).click();
     await expect(
-      sheet.getByRole('form', { name: 'New branch form' })
+      screen.getByRole('form', { name: 'New branch form' })
     ).toBeVisible();
-    await expectFootSheet(page);
-    await sheet.getByRole('button', { name: 'Back to branches' }).click();
+    await expectFullScreen(page);
+    await screen.getByRole('button', { name: 'Back to branches' }).click();
     await expect(
-      sheet.getByRole('form', { name: 'New branch form' })
+      screen.getByRole('form', { name: 'New branch form' })
     ).toBeHidden();
-    await sheet.getByRole('button', { name: 'Close', exact: true }).click();
-    await expectClosed(page);
+    await screen.getByRole('button', { name: 'Close branches' }).click();
+    await expect(page.locator(SCREEN_CONTENT)).toHaveCount(0);
   });
 
   test('the collection table rename dialog', async ({ page }) => {
@@ -132,15 +151,17 @@ test.describe('dialogs as foot sheets on a phone', () => {
       .getByRole('button', { name: /Search/ })
       .first()
       .click();
-    const sheet = await expectFootSheet(page);
+    const screen = await expectFullScreen(page);
     await expect(
-      sheet.getByRole('searchbox', { name: 'Search' })
+      screen.getByRole('searchbox', { name: 'Search' })
     ).toBeFocused();
-    const title = await box(sheet.getByText('Search', { exact: true }).first());
-    const field = await box(sheet.getByRole('searchbox', { name: 'Search' }));
+    const title = await box(
+      screen.getByText('Search', { exact: true }).first()
+    );
+    const field = await box(screen.getByRole('searchbox', { name: 'Search' }));
     expect(title.y).toBeLessThan(field.y);
-    await sheet.getByRole('button', { name: 'Close', exact: true }).click();
-    await expectClosed(page);
+    await screen.getByRole('button', { name: 'Close search' }).click();
+    await expect(page.locator(SCREEN_CONTENT)).toHaveCount(0);
   });
 
   test('the image field confirm and its picker dialog', async ({ page }) => {

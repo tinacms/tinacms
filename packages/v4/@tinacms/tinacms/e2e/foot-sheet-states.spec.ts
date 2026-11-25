@@ -26,7 +26,7 @@ const edit = async (page: Page, name: RegExp, text: string) => {
 const save = (page: Page) =>
   page
     .locator('[data-slot=form-bar]')
-    .getByRole('button', { name: /^(Save|Resolve)/ });
+    .getByRole('button', { name: /^(Save|Resolve|\d+\+? errors?$)/ });
 
 const drag = async (page: Page, handle: Locator, dy: number) => {
   const { x, y, width, height } = await box(handle);
@@ -724,7 +724,8 @@ test.describe('the branch switcher on a phone', () => {
       .getByRole('button', { name: /feature\/news/ })
       .first()
       .click();
-    await expect(page.locator(SHEET)).toBeVisible();
+    await expect(page.locator('[data-slot=screen-content]')).toBeVisible();
+    await expect(page.locator(SHEET)).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Full screen' })).toHaveCount(
       0
     );

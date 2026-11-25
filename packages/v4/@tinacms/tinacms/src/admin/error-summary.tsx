@@ -21,7 +21,6 @@ import { failingLeaves, inDocumentOrder } from '../editor/field-errors';
 import { fieldsAlong, REMOVED } from '../editor/form-view-state';
 import { readPinned, writePinned } from '../editor/pane-pin';
 import { useFormErrors, useFormStore } from '../form/form-store';
-import { useNarrow } from './use-narrow';
 
 const HOVER_DWELL_MS = 300;
 const ERROR_PANE_ID = 'error-pane';
@@ -69,7 +68,7 @@ function useErrorRows(): Row[] {
 
 function useGoTo() {
   const scope = useScope();
-  const narrow = useNarrow();
+  const narrow = useTier() !== 'desktop';
   const phone = useTier() === 'phone';
   return (key: string) => {
     const address = scope.view.getState().goTo(key);
@@ -290,7 +289,7 @@ function ErrorPaneHost() {
         pinned={pinned}
         status={done === 'pane' ? 'success' : 'list'}
         autoFocusRow={focusRow}
-        className='z-40 data-[layout=docked]:order-1 max-lg:w-[min(22.5rem,calc(100vw-1.5rem))]'
+        className='z-40 data-[layout=docked]:order-1 below-desktop:w-[min(22.5rem,calc(100vw-1.5rem))]'
         returnFocusTo={resolveButton}
         onSelect={(row) => goTo(row.id)}
         onPin={(next) => {

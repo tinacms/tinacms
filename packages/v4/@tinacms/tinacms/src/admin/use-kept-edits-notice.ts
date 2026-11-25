@@ -49,7 +49,15 @@ export function useKeptEditsNotice(
         title: `Edits to “${title}” are kept in this browser`,
         text: branch ? `Still unsaved on ${branch}.` : undefined,
         dismissible: true,
-        action: { label: 'Open', onClick: () => navigate(target) },
+        action: {
+          label: 'Open',
+          onClick: () =>
+            navigate({
+              view: 'document',
+              collection: target.collection,
+              path: target.path,
+            }),
+        },
       });
     };
     const enteringStepFromLeft =

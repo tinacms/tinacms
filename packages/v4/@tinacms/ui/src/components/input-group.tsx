@@ -19,7 +19,10 @@ const inputGroupVariants = cva(
   ],
   {
     variants: {
-      size: { md: 'min-h-8', sm: 'min-h-7' },
+      size: {
+        md: 'min-h-8 touch:min-h-touch',
+        sm: 'min-h-7 touch:min-h-touch',
+      },
     },
     defaultVariants: { size: 'md' },
   }
@@ -87,10 +90,10 @@ const inputGroupButtonVariants = cva(
   {
     variants: {
       size: {
-        xs: "h-6 gap-1 px-1.5 [&>svg:not([class*='size-'])]:size-3.5",
-        sm: 'h-7 px-2',
-        'icon-xs': 'size-6 p-0',
-        'icon-sm': 'size-7 p-0',
+        xs: "h-6 touch:h-touch gap-1 px-1.5 [&>svg:not([class*='size-'])]:size-3.5",
+        sm: 'h-7 touch:h-touch px-2',
+        'icon-xs': 'size-6 touch:size-touch p-0',
+        'icon-sm': 'size-7 touch:size-touch p-0',
       },
     },
     defaultVariants: {
@@ -146,7 +149,7 @@ function InputGroupInput({
       data-slot='input-group-control'
       className={cn(
         CONTROL_RESET,
-        'h-7.5 group-data-[size=sm]/input-group:h-6.5 group-data-[size=sm]/input-group:text-sm',
+        'h-7.5 touch:h-9.5! group-data-[size=sm]/input-group:h-6.5 touch:group-data-[size=sm]/input-group:h-9.5! group-data-[size=sm]/input-group:text-sm',
         className
       )}
       {...props}

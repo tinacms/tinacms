@@ -23,7 +23,7 @@ function Kbd({ size = 'md', className, ...props }: KbdProps) {
   return (
     <kbd
       data-slot='kbd'
-      className={cn(kbdVariants({ size }), className)}
+      className={cn(kbdVariants({ size }), 'touch:hidden', className)}
       {...props}
     />
   );
@@ -101,6 +101,7 @@ function KbdShortcut({
       className={cn(
         'inline-flex flex-none items-center gap-1 font-sans text-xs leading-none whitespace-nowrap text-muted-foreground-strong',
         end && 'ml-auto',
+        !label && 'touch:hidden',
         className
       )}
       {...props}
@@ -110,7 +111,9 @@ function KbdShortcut({
           {i > 0 ? (
             <span className='text-2xs text-muted-foreground'>then</span>
           ) : null}
-          <Kbd size={size}>{keycap(press)}</Kbd>
+          <Kbd size={size} className={label ? 'touch:inline-flex' : undefined}>
+            {keycap(press)}
+          </Kbd>
         </Fragment>
       ))}
     </span>

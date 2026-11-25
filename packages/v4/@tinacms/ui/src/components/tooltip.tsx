@@ -2,6 +2,7 @@
 
 import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip';
 
+import { useTouch } from '@tinacms/ui/hooks/use-touch';
 import { cn } from '@tinacms/ui/lib/utils';
 
 function TooltipProvider({
@@ -17,8 +18,16 @@ function TooltipProvider({
   );
 }
 
+/** Stays closed on a touch screen, where a tap does what the button says and nothing covers the page. */
 function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
-  return <TooltipPrimitive.Root data-slot='tooltip' {...props} />;
+  const touch = useTouch();
+  return (
+    <TooltipPrimitive.Root
+      data-slot='tooltip'
+      {...props}
+      {...(touch ? { open: false } : {})}
+    />
+  );
 }
 
 function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
