@@ -2545,7 +2545,6 @@ describe('branch switcher rows and creating a branch', () => {
   it.each([
     ['exists', new BranchCreateError('conflict', 'exists')],
     ['refused', new BranchCreateError('422', 'refused')],
-    ['sign-in', new AuthError('expired')],
   ])(
     'keeps Create branch off for the same name after a %s failure, even after closing and reopening',
     async (_label, cause) => {
@@ -2606,6 +2605,23 @@ describe('branch switcher rows and creating a branch', () => {
     );
     await user.type(name, '{Enter}');
     expect(createBranch).toHaveBeenCalledTimes(1);
+  });
+
+  it('lets the same name be tried again after reopening once a sign-in failure is over', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    createBranch = vi.fn<NonNullable<BranchSource['create']>>(() =>
+      Promise.reject(new AuthError('expired'))
+    );
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await within(dialog).findByRole('alert');
+    await user.keyboard('{Escape}');
+    await user.click(await screen.findByRole('button', { name: /^Branch:/ }));
+    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+    await within(reopened).findByRole('searchbox', { name: 'New branch name' });
+    expect(
+      within(reopened).getByRole('button', { name: 'Create branch' })
+    ).toBeEnabled();
   });
 
   it('keeps validating the name after a create ended ready', async () => {

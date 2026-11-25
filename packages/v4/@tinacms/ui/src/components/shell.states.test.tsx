@@ -281,6 +281,51 @@ describe('Branch switcher refused names', () => {
   });
 });
 
+describe('Branch switcher refused names by reason', () => {
+  it.each([
+    ['exists', true],
+    ['refused', true],
+    ['auth', false],
+    ['forbidden', false],
+    ['network', false],
+    ['timeout', false],
+    ['other', false],
+  ] as const)(
+    'a %s failure blocks the name later: %s',
+    async (failure, blocks) => {
+      const props = {
+        current: 'main',
+        branches: [{ name: 'main' }],
+        onSwitch: () => {},
+        onCreate: () => {},
+        baseBranch: 'main',
+        defaultOpen: true,
+      } as const;
+      const { rerender } = render(<BranchSwitcher {...props} />);
+      await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+      rerender(
+        <BranchSwitcher
+          {...props}
+          note={{ kind: 'failed', name: 'cms/a', failure }}
+        />
+      );
+      rerender(<BranchSwitcher {...props} />);
+      await userEvent.type(
+        screen.getByRole('searchbox', { name: 'New branch name' }),
+        'cms/a'
+      );
+      expect(
+        screen
+          .getByRole('button', { name: 'Create branch' })
+          .hasAttribute('disabled') ||
+          screen
+            .getByRole('button', { name: 'Create branch' })
+            .getAttribute('aria-disabled') === 'true'
+      ).toBe(blocks);
+    }
+  );
+});
+
 describe('Branch switcher while its form creates', () => {
   it('hides only the branch being created, not other new rows', async () => {
     const props = {

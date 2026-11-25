@@ -472,7 +472,9 @@ function BranchSwitcher({
   );
   // A failure shows even while the switcher is closed, so the note is where the name is learned.
   useEffect(() => {
-    if (note?.kind !== 'failed' || canRetry(note.failure)) return;
+    // Only a failure about the name itself sticks: signing in again can fix the others.
+    if (note?.kind !== 'failed') return;
+    if (note.failure !== 'exists' && note.failure !== 'refused') return;
     const refusedName = note.name;
     const failure = note.failure;
     setRefused((names) => new Map(names).set(refusedName, failure));
