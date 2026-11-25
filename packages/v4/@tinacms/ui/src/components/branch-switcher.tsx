@@ -548,8 +548,9 @@ function BranchSwitcher({
         document.activeElement?.closest(
           'form[aria-label="New branch form"]'
         ) !== null;
+      // Focus leaves the form before it unmounts, or the dialog's focus trap takes it.
+      if (focusInForm && open) focusField('search');
       setCreating(false);
-      if (focusInForm && open) return afterPaint(() => focusField('search'));
     }
   }, [noteKey]);
 

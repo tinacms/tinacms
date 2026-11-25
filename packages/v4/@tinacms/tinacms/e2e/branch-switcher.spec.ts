@@ -1222,6 +1222,27 @@ test.describe('branch switcher pop-up', () => {
       await expect(page.getByText(/already exists/)).toHaveCount(0);
     });
 
+    test(`moves focus from the emptied form to the search box when the note's Retry ends unready in the ${frame.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(frame.size);
+      await page.goto('/branches.html?docs=1&create=failonce-unready#/');
+      await openFrame(page, frame.maximise);
+      await makeBranch(page, frameOf(page, frame.maximise));
+      await page.keyboard.press('Escape');
+      await expect(page.getByText("Couldn't create cms/x")).toBeVisible();
+      await openFrame(page, frame.maximise);
+      const view = frameOf(page, frame.maximise);
+      const name = view.getByRole('searchbox', { name: 'New branch name' });
+      await name.fill('');
+      await view.getByRole('button', { name: 'Retry' }).click();
+      await name.click();
+      await expect(view.getByText(/cms\/x isn't ready yet/)).toBeVisible();
+      await expect(
+        view.getByRole('searchbox', { name: 'Search branches' })
+      ).toBeFocused();
+    });
+
     test(`takes the failure toast back after the failed form is emptied and the ${frame.name} closed`, async ({
       page,
     }) => {
