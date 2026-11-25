@@ -268,6 +268,13 @@ describe('Branch switcher refused names', () => {
     expect(
       screen.getByRole('button', { name: 'Create branch' })
     ).toBeDisabled();
+    expect(
+      screen
+        .getAllByRole('alert')
+        .some((alert) =>
+          /A branch called cms\/a already exists/.test(alert.textContent ?? '')
+        )
+    ).toBe(true);
     await userEvent.clear(box);
     await userEvent.type(box, 'cms/c');
     expect(screen.getByRole('button', { name: 'Create branch' })).toBeEnabled();

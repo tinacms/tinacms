@@ -20,6 +20,9 @@ const failureOf = (cause: unknown): BranchCreateFailure => {
   return 'other';
 };
 
+/** How long a branch may stay not ready before the create ends unready. Longer than TinaCloud's index timeout. */
+export const READY_DEADLINE_MS = 20 * 60 * 1000;
+
 /** How long a provider's `create` may take before the create ends as a timeout. */
 export const CREATE_DEADLINE_MS = 90_000;
 
@@ -152,6 +155,11 @@ export const createBranchAction =
             finish(made, 'ready');
             return;
           }
+          // A `ready` that never settles must not lock creating either.
+          deadline = setTimeout(
+            () => finish(made, 'unready'),
+            READY_DEADLINE_MS
+          );
           ready.then(
             () => finish(made, 'ready'),
             (cause: unknown) => {

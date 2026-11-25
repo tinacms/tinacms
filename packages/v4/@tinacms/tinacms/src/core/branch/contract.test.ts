@@ -2,7 +2,11 @@ import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import type { ContentProvider } from '../content/contract';
 import { createTinaStore } from '../../store/create-store';
 import { AuthError } from '../auth/contract';
-import { CREATE_DEADLINE_MS, createBranchAction } from './create';
+import {
+  CREATE_DEADLINE_MS,
+  READY_DEADLINE_MS,
+  createBranchAction,
+} from './create';
 import { BranchCreateError, branchSliceOf } from './contract';
 
 const sliceWith = (saveToNewBranch: unknown) =>
@@ -124,6 +128,41 @@ describe('createBranchAction', () => {
     expect(branchSliceOf(store.getState())?.createResult?.failure).toBe(
       failure
     );
+    warn.mockRestore();
+  });
+
+  it('ends a branch whose ready never settles as unready and accepts the next create', async () => {
+    vi.useFakeTimers();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createTinaStore([]);
+    store.setState({
+      branch: { list: ['main'], protected: [], switchTo: () => {} },
+    } as never);
+    const create = vi
+      .fn()
+      .mockResolvedValueOnce({ name: 'cms/one', ready: new Promise(() => {}) })
+      .mockResolvedValueOnce({ name: 'cms/two' });
+    const act = createBranchAction(store, {
+      list: async () => [],
+      defaultBranch: async () => 'main',
+      create,
+    });
+    act('cms/one', 'main');
+    await vi.advanceTimersByTimeAsync(CREATE_DEADLINE_MS + 1);
+    expect(branchSliceOf(store.getState())?.creating?.phase).toBe('preparing');
+    await vi.advanceTimersByTimeAsync(READY_DEADLINE_MS);
+    expect(branchSliceOf(store.getState())?.creating).toBeUndefined();
+    expect(branchSliceOf(store.getState())?.createResult).toMatchObject({
+      name: 'cms/one',
+      outcome: 'unready',
+    });
+    act('cms/two', 'main');
+    await vi.advanceTimersByTimeAsync(10);
+    expect(branchSliceOf(store.getState())?.createResult).toMatchObject({
+      name: 'cms/two',
+      outcome: 'ready',
+    });
+    vi.useRealTimers();
     warn.mockRestore();
   });
 

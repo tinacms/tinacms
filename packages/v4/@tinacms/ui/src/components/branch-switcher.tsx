@@ -467,14 +467,15 @@ function BranchSwitcher({
     if (failed) return afterPaint(showActions);
   }, [failed, maximised]);
   // The name a failure said cannot work stays blocked after the failure itself is gone.
-  const [refusedNames, setRefusedNames] = useState<string[]>([]);
+  const [refused, setRefused] = useState<ReadonlyMap<string, CreateFailure>>(
+    new Map()
+  );
   // A failure shows even while the switcher is closed, so the note is where the name is learned.
   useEffect(() => {
     if (note?.kind !== 'failed' || canRetry(note.failure)) return;
-    const refused = note.name;
-    setRefusedNames((names) =>
-      names.includes(refused) ? names : [...names, refused]
-    );
+    const refusedName = note.name;
+    const failure = note.failure;
+    setRefused((names) => new Map(names).set(refusedName, failure));
   }, [note?.kind, note?.name, note?.failure]);
   // A failure that disables the focused Create button must not drop focus out of the view.
   useEffect(() => {
@@ -501,7 +502,7 @@ function BranchSwitcher({
     setNewName('');
     setSubmitted(false);
     setStartFrom('current');
-    setRefusedNames([]);
+    setRefused(new Map());
   }
   useEffect(() => {
     if (resetFromForm.current && open && focusHere()) {
@@ -643,15 +644,22 @@ function BranchSwitcher({
   ];
 
   // On the bottom-anchored sheet the line goes above the buttons, so they stay under the finger.
-  const failureP = failed ? (
-    <p
-      role='alert'
-      data-branch-failure=''
-      className='m-0 text-sm text-destructive [overflow-wrap:anywhere]'
-    >
-      {failureLine(attempted.current, createFailure)}
-    </p>
-  ) : null;
+  // Why Create is off for a name a failure already refused, also after closing and reopening.
+  const noteNamesIt = note?.kind === 'failed' && note.name === typed;
+  const refusedFailure = failed || noteNamesIt ? undefined : refused.get(typed);
+  const failureP =
+    failed || refusedFailure !== undefined ? (
+      <p
+        role='alert'
+        data-branch-failure=''
+        className='m-0 text-sm text-destructive [overflow-wrap:anywhere]'
+      >
+        {failureLine(
+          failed ? attempted.current : typed,
+          failed ? createFailure : refusedFailure
+        )}
+      </p>
+    ) : null;
 
   /** The same content in every frame; `Title` is the frame's own heading element. */
   const panel = (Title: (props: { children: ReactNode }) => ReactNode) => (
@@ -911,7 +919,7 @@ function BranchSwitcher({
                   typed === '' ||
                   nameError !== undefined ||
                   (failed && !canRetry(createFailure)) ||
-                  refusedNames.includes(typed)
+                  refused.has(typed)
                 }
               >
                 {busy

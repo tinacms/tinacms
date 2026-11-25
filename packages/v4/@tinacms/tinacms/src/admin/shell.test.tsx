@@ -2601,6 +2601,9 @@ describe('branch switcher rows and creating a branch', () => {
     expect(
       within(reopened).getByRole('button', { name: 'Create branch' })
     ).toBeDisabled();
+    expect(within(reopened).getAllByRole('alert').pop()).toHaveTextContent(
+      'A branch called cms/x already exists. Reload to see it.'
+    );
     await user.type(name, '{Enter}');
     expect(createBranch).toHaveBeenCalledTimes(1);
   });
