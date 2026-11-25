@@ -326,6 +326,50 @@ describe('Branch switcher refused names by reason', () => {
   );
 });
 
+describe('Branch switcher form failures', () => {
+  it.each([
+    ['exists', false],
+    ['refused', false],
+    ['auth', true],
+    ['forbidden', true],
+    ['network', true],
+    ['timeout', true],
+    ['other', true],
+  ] as const)(
+    'leaves Create on after a %s failure for the same name: %s',
+    async (failure, enabled) => {
+      const user = userEvent.setup();
+      const props = {
+        current: 'main',
+        branches: [{ name: 'main' }],
+        onSwitch: () => {},
+        onCreate: () => {},
+        baseBranch: 'main',
+        defaultOpen: true,
+      } as const;
+      const { rerender } = render(<BranchSwitcher {...props} />);
+      await user.click(screen.getByRole('button', { name: 'New branch' }));
+      await user.type(
+        screen.getByRole('searchbox', { name: 'New branch name' }),
+        'cms/a'
+      );
+      await user.click(screen.getByRole('button', { name: 'Create branch' }));
+      rerender(<BranchSwitcher {...props} createState='creating' />);
+      rerender(
+        <BranchSwitcher
+          {...props}
+          createState='failed'
+          createFailure={failure}
+        />
+      );
+      const create = screen.getByRole('button', {
+        name: /^(Create branch|Retry)$/,
+      });
+      expect(create.hasAttribute('disabled')).toBe(!enabled);
+    }
+  );
+});
+
 describe('Branch switcher names under a taken branch', () => {
   it('blocks a name nested under a branch the server said exists', async () => {
     const props = {

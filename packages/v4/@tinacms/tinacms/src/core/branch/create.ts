@@ -1,5 +1,5 @@
 import type { StoreApi } from 'zustand';
-import { AuthError } from '../auth/contract';
+import { AuthError, type AuthErrorCode } from '../auth/contract';
 import type { TinaStoreState } from '../plugin';
 import {
   BranchCreateError,
@@ -12,14 +12,19 @@ import {
 
 type Creatable = BranchSource & Required<Pick<BranchSource, 'create'>>;
 
+// Only a signed-out session reads "Sign in again": signing in cannot fix the others.
+const AUTH_FAILURES = {
+  unauthenticated: 'auth',
+  expired: 'auth',
+  'no-access': 'forbidden',
+  network: 'network',
+  'invalid-response': 'other',
+  'popup-blocked': 'other',
+} as const satisfies Record<AuthErrorCode, BranchCreateFailure>;
+
 const failureOf = (cause: unknown): BranchCreateFailure => {
   if (cause instanceof BranchCreateError) return cause.reason;
-  if (cause instanceof AuthError) {
-    if (cause.code === 'network') return 'network';
-    if (cause.code === 'no-access') return 'forbidden';
-    if (cause.code === 'invalid-response') return 'other';
-    return 'auth';
-  }
+  if (cause instanceof AuthError) return AUTH_FAILURES[cause.code];
   return 'other';
 };
 

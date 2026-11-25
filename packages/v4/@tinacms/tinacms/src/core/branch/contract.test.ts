@@ -109,6 +109,7 @@ describe('createBranchAction', () => {
     [new AuthError('network'), 'network'],
     [new AuthError('no-access'), 'forbidden'],
     [new AuthError('invalid-response'), 'other'],
+    [new AuthError('popup-blocked'), 'other'],
     [new BranchCreateError('422', 'refused'), 'refused'],
     [new BranchCreateError('403', 'auth'), 'auth'],
     [new Error('boom'), 'other'],

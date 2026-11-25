@@ -17,3 +17,7 @@ export const canRetry = (failure?: CreateFailure): boolean =>
   failure !== 'refused' &&
   failure !== 'auth' &&
   failure !== 'forbidden';
+
+/** The name itself cannot work, so the same name stays blocked; other failures leave Create on. */
+export const blocksName = (failure?: CreateFailure): boolean =>
+  failure === 'exists' || failure === 'refused';

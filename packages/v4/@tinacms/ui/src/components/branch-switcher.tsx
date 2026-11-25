@@ -29,7 +29,11 @@ import { SearchBox } from '@tinacms/ui/components/search-box';
 import { BRANCH_NAME_HINT, branchNameError } from '@tinacms/ui/lib/branch-name';
 import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { dialogTitleClasses } from '@tinacms/ui/lib/dialog-styles';
-import { canRetry, type CreateFailure } from '@tinacms/ui/lib/create-failure';
+import {
+  blocksName,
+  canRetry,
+  type CreateFailure,
+} from '@tinacms/ui/lib/create-failure';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type BranchEntry = {
@@ -483,19 +487,14 @@ function BranchSwitcher({
   useEffect(() => {
     // Only a failure about the name itself sticks: signing in again can fix the others.
     if (note?.kind !== 'failed') return;
-    if (note.failure !== 'exists' && note.failure !== 'refused') return;
+    if (!blocksName(note.failure)) return;
     const refusedName = note.name;
     const failure = note.failure;
     setRefused((names) => new Map(names).set(refusedName, failure));
   }, [note?.kind, note?.name, note?.failure]);
   // A failure that disables the focused Create button must not drop focus out of the view.
   useEffect(() => {
-    if (
-      !failed ||
-      (createFailure !== 'exists' && createFailure !== 'refused')
-    ) {
-      return;
-    }
+    if (!failed || !blocksName(createFailure)) return;
     const active = document.activeElement;
     if (
       !active ||
@@ -936,6 +935,7 @@ function BranchSwitcher({
                   waiting ||
                   typed === '' ||
                   nameError !== undefined ||
+                  (failed && blocksName(createFailure)) ||
                   refused.has(typed)
                 }
               >
