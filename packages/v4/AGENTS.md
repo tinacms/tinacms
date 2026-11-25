@@ -18,7 +18,7 @@ Instructions for agents working under `packages/v4/`.
 | `@tinacms/tinacms` | `@tinacms/tinacms` | The v4 runtime + CLI in one package. `private: true`, `4.0.0-alpha.x`. Subpath exports for `/react`, `/client`, `/server`, `/local-data-layer`, and framework adapters (`/adapters/next`, `/express`, `/astro`, `/hono`). |
 | `@tinacms/rich-text` | `@tinacms/rich-text` | Plate rich-text editor. A value contract separates the editor from the storage format — keep that boundary (see `src/boundary.test.ts`). |
 | `@tinacms/ui` | `@tinacms/ui` | Shared UI components, built on shadcn/ui and restyled to the TinaCMS design. |
-| `@tinacms/v4-content` | `@tinacms/v4-content` | The content contract that TinaCloud shares: lock type and parser, format adapters, lock-to-GraphQL bridge. Published, and `exports` point at `dist/`, so run `pnpm build` in it before you test `@tinacms/tinacms`. Golden fixtures in `fixtures/` pin the GraphQL output. |
+| `@tinacms/v4-content` | `@tinacms/v4-content` | The content contract that TinaCloud shares: lock type and parser, format adapters, lock-to-GraphQL bridge. `private: true` until publishing is approved. `exports` point at `dist/`, so run `pnpm build` in it before you test `@tinacms/tinacms`. Golden fixtures in `fixtures/` pin the GraphQL output. |
 
 ## Commands (run inside the package directory)
 
