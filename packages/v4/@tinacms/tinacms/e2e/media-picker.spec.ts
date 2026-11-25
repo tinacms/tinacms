@@ -5,6 +5,8 @@ import { formColumn } from './form-column';
 const HOME = `/?preview=${encodeURIComponent('/plain.html')}#/collections/page/${encodeURIComponent('content/pages/home.mdx')}`;
 
 const TOP_BAR = 56;
+// The preview is 364px narrower than the window, so under 440px at this width.
+const NARROW_TABLET = 800;
 const CHECKLIST =
   '/#/collections/checklist/content%2Fchecklists%2Ftwo-errors.mdx';
 
@@ -211,6 +213,7 @@ test.describe('tablet', () => {
   test('covers the page with no Maximise when the preview is under 440px', async ({
     page,
   }) => {
+    await page.setViewportSize({ width: NARROW_TABLET, height: 800 });
     await page.goto(HOME);
     const picker = await openPicker(page);
     await expect(picker.getByRole('button', { name: 'Maximise' })).toHaveCount(
@@ -221,7 +224,7 @@ test.describe('tablet', () => {
     );
     const rect = await box(page.locator('[data-slot=media-picker-host]'));
     expect(Math.round(rect.x)).toBe(0);
-    expect(Math.round(rect.width)).toBe(1024);
+    expect(Math.round(rect.width)).toBe(NARROW_TABLET);
     expect(Math.round(rect.y)).toBe(TOP_BAR);
   });
 });
@@ -245,13 +248,13 @@ test.describe('tablet with a wide enough preview', () => {
     expect(covered.x).toBeGreaterThanOrEqual(rect.x);
   });
 
-  test('narrowing to 1024px swaps the maximised picker for the cover with no Restore, and widening restores the popover', async ({
+  test('narrowing the window swaps the maximised picker for the cover with no Restore, and widening restores the popover', async ({
     page,
   }) => {
     await page.goto(HOME);
     const picker = await openPicker(page);
     await picker.getByRole('button', { name: 'Maximise' }).click();
-    await page.setViewportSize({ width: 1024, height: 800 });
+    await page.setViewportSize({ width: NARROW_TABLET, height: 800 });
     await expect(picker.getByRole('button', { name: 'Restore' })).toHaveCount(
       0
     );
