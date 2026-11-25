@@ -1,5 +1,13 @@
 # tina-graphql
 
+## 4.1.1
+
+### Patch Changes
+
+- [#8023](https://github.com/tinacms/tinacms/pull/8023) [`f4e222a`](https://github.com/tinacms/tinacms/commit/f4e222ad0ef301ac83342e5096d7f53e701a3472) Thanks [@officialasishkumar](https://github.com/officialasishkumar)! - Index an unquoted date or timestamp in a `string` field as its ISO string. YAML and TOML parse these values into a `Date`, which stopped indexing with "Unable to seed" and `resolvedValue.substring is not a function`.
+
+- [#7924](https://github.com/tinacms/tinacms/pull/7924) [`f5a5746`](https://github.com/tinacms/tinacms/commit/f5a5746094071ed46d6865fba9a92d05fc92b697) Thanks [@PranjalGoyal06](https://github.com/PranjalGoyal06)! - Build index key range in makeFilterSuffixes when EQ filters cover the leading fields of an index, avoiding full-scan iteration in hasReferences and prefix queries.
+
 ## 4.1.0
 
 ### Minor Changes
