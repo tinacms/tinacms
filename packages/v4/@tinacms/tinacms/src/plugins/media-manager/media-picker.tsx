@@ -2,7 +2,7 @@ import { Button } from '@tinacms/ui/components/button';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { SearchBox } from '@tinacms/ui/components/search-box';
 import { cn } from '@tinacms/ui/lib/utils';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useStore } from 'zustand';
 import { XIcon } from 'lucide-react';
 import {
@@ -166,8 +166,10 @@ export function MediaPickerPanel({
   const panel = useRef<HTMLElement>(null);
 
   const [servedMissing, setServedMissing] = useState(missingFolder);
+  const [fallbackLeft, setFallbackLeft] = useState(true);
   if (servedMissing !== missingFolder) {
     setServedMissing(missingFolder);
+    setFallbackLeft(true);
     if (missingFolder !== null) setFolder(missingFolder);
   }
   const scope = use(FormScopeContext);
@@ -178,7 +180,10 @@ export function MediaPickerPanel({
     setServed(pickerSerial);
     setPicks([]);
     setNotice(null);
-    if (missingFolder !== null) setFolder(missingFolder);
+    if (missingFolder !== null) {
+      setFolder(missingFolder);
+      setFallbackLeft(true);
+    }
   }
   const origin = useMemo<UploadOrigin>(
     () => ({ kind: 'picker', id: `${pickerId}:${served}` }),
@@ -238,24 +243,50 @@ export function MediaPickerPanel({
   const status = useMediaStatus();
 
   const listError = listing.isError ? listing.error : null;
-  // A provider that lists a missing folder as empty looks the same as one that says not-found.
-  let missingFolderGone = false;
-  if (listError instanceof MediaError) {
-    missingFolderGone = listError.code === 'not-found';
-  } else if (
+  // The fallback to the root happens once per served missing folder, and only from that folder.
+  useEffect(() => {
+    if (folder !== missingFolder) setFallbackLeft(false);
+  }, [folder, missingFolder]);
+  const inMissingFolder =
+    fallbackLeft && missingFolder !== null && folder === missingFolder;
+  const listedEmpty =
     listing.isSuccess &&
     !listing.hasNextPage &&
-    (!serverSearch || debouncedSearch === '')
-  ) {
-    missingFolderGone = listing.data.pages.every(
-      (page) => page.items.length === 0
-    );
-  }
+    (!serverSearch || debouncedSearch === '') &&
+    listing.data.pages.every((page) => page.items.length === 0);
+  // A provider may list a missing folder as empty, so an empty folder is gone only when its parent lacks it.
+  const parentCheck = useQuery({
+    queryKey: [...MEDIA_LIST_KEY, branch, 'parent-has', folder],
+    queryFn: async () => {
+      let cursor: string | undefined;
+      do {
+        const page = await media.list(parentOf(folder), { cursor });
+        if (
+          page.items.some(
+            (item) => item.kind === 'directory' && item.path === folder
+          )
+        ) {
+          return true;
+        }
+        cursor = page.cursor;
+      } while (cursor);
+      return false;
+    },
+    enabled: inMissingFolder && folder !== '' && listedEmpty,
+  });
+  const checkingParent =
+    inMissingFolder && listedEmpty && parentCheck.isPending;
+  const notFound = (error: unknown) =>
+    error instanceof MediaError && error.code === 'not-found';
+  const missingFolderGone =
+    notFound(listError) ||
+    (listedEmpty &&
+      (parentCheck.isError
+        ? notFound(parentCheck.error)
+        : parentCheck.data === false));
   useEffect(() => {
-    if (missingFolder !== null && folder === missingFolder && folder !== '') {
-      if (missingFolderGone) setFolder('');
-    }
-  }, [missingFolder, folder, missingFolderGone]);
+    if (inMissingFolder && folder !== '' && missingFolderGone) setFolder('');
+  }, [inMissingFolder, folder, missingFolderGone]);
 
   // The form store mirrors every live value of the form, so a removal while the picker
   // is open re-renders it. `getValues` would hide the change from the compiler's memo.
@@ -396,7 +427,9 @@ export function MediaPickerPanel({
     if (status.data?.kind === 'needs-setup') {
       return <SetupBanner status={status.data} />;
     }
-    if (listing.isPending) return <PickerLoading folder={folder} />;
+    if (listing.isPending || checkingParent) {
+      return <PickerLoading folder={folder} />;
+    }
     if (listError) {
       if (
         listError instanceof MediaError &&

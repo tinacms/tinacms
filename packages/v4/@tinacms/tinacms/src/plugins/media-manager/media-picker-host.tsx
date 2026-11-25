@@ -285,26 +285,28 @@ function OpenPicker({
     restore.current.panel = root;
   }, [root]);
 
-  // A close the form made (a save, Discard, Resume, an outside change, or the field going away)
-  // moves focus only when it is in the picker or on `body`, and keeps a mark the editor changed.
+  // A close that did not come from the editor's Escape or Close moves focus only when it is in
+  // the picker or on `body`. A confirm leaves the active mark alone; a close the form made also
+  // keeps a mark the editor changed.
   useEffect(
     () => () => {
       const { opener, focus, mark, panel } = restore.current;
-      if (focus === false) return;
       if (focus === true) {
         if (opener?.isConnected) opener.focus();
         return;
       }
-      view.getState().armFocusHandoff();
       const openerHere = opener?.isConnected === true;
-      const { active, setActive } = useFormStore.getState();
-      if (
-        !openerHere &&
-        mark &&
-        active?.formId === mark.formId &&
-        active.address === mark.address
-      ) {
-        setActive(mark.formId, null);
+      if (focus === undefined) {
+        view.getState().armFocusHandoff();
+        const { active, setActive } = useFormStore.getState();
+        if (
+          !openerHere &&
+          mark &&
+          active?.formId === mark.formId &&
+          active.address === mark.address
+        ) {
+          setActive(mark.formId, null);
+        }
       }
       const focused = document.activeElement;
       const free =

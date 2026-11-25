@@ -8,7 +8,7 @@ import {
   within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../config';
 import { branchSliceOf } from '../../core/branch/contract';
@@ -41,7 +41,12 @@ import { LabelledFields } from '../../test/labelled-fields';
 import stringFieldPlugin from '../fields/string/string-field.plugin';
 import { SESSION_EXPIRED } from './media-pane-words';
 import { MediaPickerHost } from './media-picker-host';
-import { LOAD_FAILED, missingCardWords } from './media-picker-words';
+import {
+  LOAD_FAILED,
+  emptyWords,
+  loadingWords,
+  missingCardWords,
+} from './media-picker-words';
 
 const DOCUMENT_PATH = 'content/posts/hello.mdx';
 const SAVING_FORM = toFormId(DOCUMENT_PATH);
@@ -823,6 +828,235 @@ describe('a missing image', () => {
   });
 });
 
+describe('focus after a confirm from a custom field', () => {
+  function CustomField({
+    focusInput = false,
+    swapOpener = false,
+  }: {
+    focusInput?: boolean;
+    swapOpener?: boolean;
+  }) {
+    const picker = useMediaPicker();
+    const [version, setVersion] = useState(0);
+    const input = useRef<HTMLInputElement>(null);
+    return (
+      <>
+        <button
+          key={swapOpener ? version : 0}
+          type='button'
+          onClick={(event) =>
+            picker.open({
+              mode: 'single',
+              forLabel: 'Custom',
+              target: 'custom',
+              opener: event.currentTarget,
+              choose: () => {
+                setVersion((current) => current + 1);
+                if (focusInput) input.current?.focus();
+              },
+            })
+          }
+        >
+          Open custom
+        </button>
+        <input ref={input} aria-label='Other input' />
+      </>
+    );
+  }
+
+  const confirm = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(
+      await screen.findByRole('button', { name: 'Open custom' })
+    );
+    await user.click(await tile('logo.png'));
+    await user.click(screen.getByRole('button', { name: 'Choose image' }));
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('region', { name: 'Choose an image' })
+      ).toBeNull()
+    );
+  };
+
+  it('returns focus to the opener when it is still in the page', async () => {
+    const user = userEvent.setup();
+    renderPicker(createProvider(), { extra: <CustomField /> });
+    await confirm(user);
+    expect(screen.getByRole('button', { name: 'Open custom' })).toHaveFocus();
+  });
+
+  it('leaves focus where the field put it', async () => {
+    const user = userEvent.setup();
+    renderPicker(createProvider(), { extra: <CustomField focusInput /> });
+    await confirm(user);
+    expect(screen.getByLabelText('Other input')).toHaveFocus();
+  });
+
+  it('goes to the form scroll region when the opener was replaced', async () => {
+    const user = userEvent.setup();
+    renderPicker(createProvider(), {
+      extra: (
+        <>
+          <div data-form-id={SAVING_FORM} tabIndex={-1} aria-label='Form' />
+          <CustomField swapOpener />
+        </>
+      ),
+    });
+    await confirm(user);
+    expect(screen.getByLabelText('Form')).toHaveFocus();
+  });
+});
+
+describe('a missing image in a folder that is still there', () => {
+  const openMissing = async (provider: MediaProvider) => {
+    const user = userEvent.setup();
+    renderPicker(provider, {
+      asks: {
+        hero: single({ replacing: { path: 'posts/gone.jpg', missing: true } }),
+      },
+    });
+    await openPicker(user);
+    return user;
+  };
+  const emptyPosts = () => {
+    files = files.filter((item) => item.path !== 'posts/hero.jpg');
+  };
+
+  it('stays in an empty folder that its parent lists, and uploads there', async () => {
+    emptyPosts();
+    const provider = createProvider();
+    const user = await openMissing(provider);
+    expect(await screen.findByText(emptyWords('posts'))).toBeVisible();
+    expect(screen.getByText(missingCardWords('posts'))).toBeVisible();
+    expect(screen.getByRole('navigation')).toBeVisible();
+    await user.upload(fileInput(), png('new.png'));
+    await waitFor(() =>
+      expect(provider.upload).toHaveBeenCalledWith(
+        expect.any(File),
+        'posts',
+        expect.anything()
+      )
+    );
+  });
+
+  it('falls back to the root when the empty folder is not in its parent', async () => {
+    emptyPosts();
+    files = files.filter((item) => item.path !== 'posts');
+    await openMissing(createProvider());
+    expect(await tile('logo.png')).toBeVisible();
+    expect(screen.queryByRole('navigation')).toBeNull();
+    expect(screen.getByText(missingCardWords('posts'))).toBeVisible();
+  });
+
+  it('finds the folder on a later page of its parent', async () => {
+    emptyPosts();
+    const provider = createProvider({
+      list: vi.fn(
+        async (
+          folder: string,
+          page: { cursor?: string } = {}
+        ): Promise<MediaPage> => {
+          if (folder === 'posts') return { items: [] };
+          if (!page.cursor) {
+            return { items: [{ path: 'a', kind: 'directory' }], cursor: 'p2' };
+          }
+          return { items: [{ path: 'posts', kind: 'directory' }] };
+        }
+      ),
+    });
+    await openMissing(provider);
+    expect(await screen.findByText(emptyWords('posts'))).toBeVisible();
+    expect(screen.getByRole('navigation')).toBeVisible();
+  });
+
+  it('falls back once when the folder cannot be listed, then opens it without bouncing', async () => {
+    const provider = createProvider({
+      list: vi.fn(async (folder: string): Promise<MediaPage> => {
+        if (folder === 'posts') throw new MediaError('not-found');
+        return { items: childrenOf(folder) };
+      }),
+    });
+    const user = await openMissing(provider);
+    expect(await tile('logo.png')).toBeVisible();
+    expect(screen.queryByRole('navigation')).toBeNull();
+    await user.click(await folderCard('posts'));
+    expect(await screen.findByText(LOAD_FAILED)).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
+    expect(screen.getByRole('navigation')).toBeVisible();
+  });
+
+  it('opens an empty folder again from the root without bouncing', async () => {
+    emptyPosts();
+    const user = await openMissing(createProvider());
+    expect(await screen.findByText(emptyWords('posts'))).toBeVisible();
+    await user.click(
+      within(screen.getByRole('navigation')).getByRole('button', {
+        name: 'Media',
+      })
+    );
+    await user.click(await folderCard('posts'));
+    expect(await screen.findByText(emptyWords('posts'))).toBeVisible();
+    expect(screen.getByRole('navigation')).toBeVisible();
+  });
+
+  it('keeps the folder open when the parent check fails another way', async () => {
+    emptyPosts();
+    const failing = (error: Error) => {
+      let first = true;
+      return createProvider({
+        list: vi.fn(async (folder: string): Promise<MediaPage> => {
+          if (folder === '' && first) {
+            first = false;
+            throw error;
+          }
+          return { items: childrenOf(folder) };
+        }),
+      });
+    };
+    await openMissing(failing(new Error('boom')));
+    expect(await screen.findByText(emptyWords('posts'))).toBeVisible();
+  });
+
+  it('leaves the folder when the parent check says not-found', async () => {
+    emptyPosts();
+    let first = true;
+    await openMissing(
+      createProvider({
+        list: vi.fn(async (folder: string): Promise<MediaPage> => {
+          if (folder === '' && first) {
+            first = false;
+            throw new MediaError('not-found');
+          }
+          return { items: childrenOf(folder) };
+        }),
+      })
+    );
+    expect(await tile('logo.png')).toBeVisible();
+    expect(screen.queryByRole('navigation')).toBeNull();
+  });
+
+  it('shows loading, not the empty message, while the parent check runs', async () => {
+    emptyPosts();
+    let release: () => void = () => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await openMissing(
+      createProvider({
+        list: vi.fn(async (folder: string): Promise<MediaPage> => {
+          if (folder === '') await held;
+          return { items: childrenOf(folder) };
+        }),
+      })
+    );
+    expect(
+      await screen.findByRole('status', { name: loadingWords('posts') })
+    ).toBeVisible();
+    expect(screen.queryByText(emptyWords('posts'))).toBeNull();
+    release();
+    expect(await screen.findByText(emptyWords('posts'))).toBeVisible();
+  });
+});
+
 describe('a missing image with a search', () => {
   it('stays in the old folder while a search finds nothing there', async () => {
     const user = userEvent.setup();
@@ -851,7 +1085,10 @@ describe('a missing image on a provider without search', () => {
     const provider = createProvider({
       list: vi.fn(async (folder: string): Promise<MediaPage> => {
         if (folder === 'posts') await postsListed;
-        return { items: folder === 'posts' ? [] : childrenOf(folder) };
+        if (folder === 'posts') return { items: [] };
+        return {
+          items: childrenOf(folder).filter((item) => item.path !== 'posts'),
+        };
       }),
     });
     renderPicker(provider, {
