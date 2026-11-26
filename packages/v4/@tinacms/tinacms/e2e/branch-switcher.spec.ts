@@ -1479,6 +1479,30 @@ test.describe('branch switcher pop-up', () => {
   test.describe('with touch', () => {
     test.use({ hasTouch: true });
     wrapsSwitchTo('on a touch phone', { width: 390, height: 844 });
+
+    test('keeps the New branch buttons still on a touch phone while a create starts and fails', async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto('/branches.html?docs=1&create=fail#/');
+      await openFrame(page, false);
+      const view = frameOf(page, false);
+      await view.getByRole('button', { name: 'New branch' }).click();
+      const top = async (name: string) =>
+        (await view.getByRole('button', { name }).boundingBox())?.y;
+      const before = await top('Create branch');
+      await view
+        .getByRole('searchbox', { name: 'New branch name' })
+        .fill('cms/t');
+      expect(await top('Create branch')).toBe(before);
+      await view.getByRole('button', { name: 'Create branch' }).click();
+      await expect(
+        view.getByRole('button', { name: 'Creating' })
+      ).toBeVisible();
+      expect(await top('Creating')).toBe(before);
+      await expect(view.getByRole('button', { name: 'Retry' })).toBeVisible();
+      expect(await top('Retry')).toBe(before);
+    });
   });
 
   test('keeps a failure toast gone after the person swipes it away', async ({

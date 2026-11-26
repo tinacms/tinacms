@@ -92,6 +92,7 @@ function SearchBox({
             ) : null}
             <InputGroupButton
               size='icon-xs'
+              className='touch:-my-px'
               aria-label={clearLabel}
               onClick={onClear}
             >
