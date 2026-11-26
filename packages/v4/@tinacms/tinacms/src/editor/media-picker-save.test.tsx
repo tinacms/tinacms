@@ -16,7 +16,14 @@ import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { connectionOf } from '../test/connection';
 import { LabelledFields } from '../test/labelled-fields';
-import { FormScopeContext, type FormScope } from './context';
+import {
+  FormScopeContext,
+  type FormScope,
+  type TinaRuntime,
+  TinaRuntimeContext,
+} from './context';
+import { readFormBindings } from './form-bindings';
+import { saveDocument } from './save-pipeline';
 import {
   FormProvider,
   TinaProvider,
@@ -57,12 +64,14 @@ const content: ContentProvider = {
 
 let save: () => Promise<void>;
 let scope: FormScope | null;
+let runtime: TinaRuntime | null = null;
 const writes: TinaDocument[] = [];
 let release: (() => void) | undefined;
 
 function Probes() {
   save = useFormSave();
   scope = use(FormScopeContext);
+  runtime = use(TinaRuntimeContext);
   const status = useFormStatus(useFormId());
   return <span data-testid='status'>{status}</span>;
 }
@@ -178,6 +187,42 @@ describe('saving with the media picker open, with no TinaAdmin', () => {
     let saved: Promise<unknown> = Promise.resolve();
     act(() => {
       saved = save().catch((cause: unknown) => cause);
+    });
+    expect(pickerOf()).toBeNull();
+    await act(async () => {
+      await saved;
+    });
+    expect(writes).toEqual([]);
+    expect(heroValue()).toBe('photo.jpg');
+  });
+
+  it('closes the picker for a Save All that validation blocks, and writes nothing', async () => {
+    const schema: CollectionSchema = {
+      ...collection,
+      fields: [
+        ...collection.fields,
+        t.string({ name: 'title', label: 'Title', validators: [required()] }),
+      ],
+    };
+    renderForm(schema);
+    await openAndPick();
+    const formId = toFormId(PATH);
+    const live = runtime;
+    if (!live) throw new Error('no runtime');
+    let saved: Promise<unknown> = Promise.resolve();
+    act(() => {
+      saved = saveDocument(
+        {
+          formId,
+          path: PATH,
+          collection: schema,
+          hooks: [],
+          registry: live.registry,
+          validators: live.validators,
+        },
+        () => readFormBindings(formId),
+        { write: heldWrite }
+      ).catch((cause: unknown) => cause);
     });
     expect(pickerOf()).toBeNull();
     await act(async () => {
