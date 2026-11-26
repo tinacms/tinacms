@@ -1319,6 +1319,31 @@ describe('Save to new branch', () => {
     ).toHaveFocus();
   });
 
+  it('keeps the branch button off on the new branch until its afterSave ends', async () => {
+    withAction();
+    let endAfterSave: () => void = () => {};
+    holdAfterSave = new Promise<void>((resolve) => {
+      endAfterSave = resolve;
+    });
+    const { user, dialog } = await openProtectedDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(switchCalls).toEqual(['docs/hello-edits']));
+    const branch = await screen.findByRole('button', {
+      name: /^Branch: docs\/hello-edits/,
+    });
+    expect(branch).toBeDisabled();
+    expect(
+      useFormStore.getState().saves[toFormId('content/posts/hello.mdx')]?.phase
+    ).toBe('saving');
+
+    await act(async () => endAfterSave());
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /^Branch: docs\/hello-edits/ })
+      ).toBeEnabled()
+    );
+  });
+
   it('saves to the new branch in one call with the beforeSave change, then switches to it', async () => {
     stampBeforeSave = true;
     let finish: () => void = () => {};

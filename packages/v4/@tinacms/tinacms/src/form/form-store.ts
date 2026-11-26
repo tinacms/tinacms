@@ -607,7 +607,12 @@ export const useFormStore = create<FormStore>()(
             return {
               branch,
               forms: {},
-              saves: {},
+              // A save that moves branch itself (Save to new branch) still runs its afterSave here.
+              saves: Object.fromEntries(
+                formEntries(state.saves).filter(
+                  ([, save]) => save.phase === 'saving'
+                )
+              ),
               waiting: {},
               held: {},
               unstored: {},
