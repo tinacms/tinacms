@@ -94,7 +94,7 @@ export default defineClientPlugin({
     select(item) { set({ selected: item }) },
   }),
 
-  components: { MediaPicker, MediaBrowser },
+  components: { MediaPicker },
 })
 ```
 

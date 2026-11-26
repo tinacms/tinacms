@@ -59,10 +59,10 @@ export default defineConfig({
 
 | Property | Type | Effect |
 |---|---|---|
-| `cover` | `'wide' \| 'tall'` | Shows the picture larger: `wide` is 16:9, `tall` is 4:3. The empty drop area keeps the same shape. Any other value fails schema validation. |
+| `cover` | `'wide' \| 'tall'` | Shows the picture in a fixed shape, at most 480px wide: `wide` is 16:9, `tall` is 4:3 and at most 360px tall. The empty drop area keeps the same shape. Any other value fails schema validation. |
 
 `cover` has no effect on the image of a list of images (`of: t.image(...)`).
-Gallery tiles are always square. Other field types reject `cover` in the type
+Gallery tiles are always 4:3. Other field types reject `cover` in the type
 checker.
 
 A list of images is a `t.array` whose `of` is an image field:
@@ -152,9 +152,12 @@ The view (`image-field.view.tsx`) takes props only. The container
 
 An empty field shows a dashed drop area with a "Choose from Media" button. A
 read-only empty field says "No image.". A filled field shows one tile
-(`image-tile.tsx`): the picture, capped in width, with Replace and Remove icon
-buttons on its top right corner at rest, and the file name small and muted
-under it. The buttons are named "Replace {file}" and "Remove {file}", and each
+(`image-tile.tsx`): the picture, 4:3 and across the width of the field, with
+Replace and Remove icon buttons on a white overlay at its top right corner,
+and the file name small and muted under it. The buttons show when the pointer
+is on the picture, when focus is inside it, or after a tap on it. While they
+are hidden, they stay in the Tab order and show on focus. A missing picture
+keeps both buttons. The empty drop area also spans the width of the field. The buttons are named "Replace {file}" and "Remove {file}", and each
 shows that name in a tooltip. Remove writes an absent value at once, with no
 confirm. Neither button deletes the media file.
 
@@ -166,11 +169,35 @@ design sign-off and the render test.
 
 ### Picking
 
-"Choose from Media" and "Replace" open a dialog with
-`<MediaBrowser mode='pick' accept='image' />`. When the author clicks
-"Insert", the field stores `item.path` and closes the dialog. A cancelled
-Replace keeps the old value. Refer to
-[Pick mode](./media-manager.md#pick-mode).
+"Choose from Media" and "Replace" open the media picker, a panel that slides
+over the preview. The field calls `useMediaPicker()` and sends an open
+request. Refer to [The media picker](./media-manager.md#the-media-picker).
+
+The header says "Choose an image", and "For {field label}" shows under it. A
+field inside another field adds the parent: "For Logos in Logo strip". The
+picker lists images and folders only. Its search covers the folder in view.
+
+- A plain field takes one pick. A new pick replaces the old one. The
+  footer button says "Choose image". The field stores the path and the picker
+  closes.
+- A gallery takes many picks. Each pick shows its number, in pick order. The
+  footer button says "Add image" or "Add {n} images", and the picks go to the
+  end of the list. An image that the gallery already holds shows "Already
+  added" and cannot be picked again. Replace on one tile picks one image for
+  that tile, and the other tiles show "Already added".
+- A cancelled pick keeps the old value. So does a pick of the image that the
+  field holds.
+- If the picture is missing, the picker opens in the old folder. A card at the
+  top says that the image is no longer in Media.
+
+While the picker is open for the field, the drop area (empty) or the picture
+(chosen) takes the active border, and "Choosing in the picker" shows under the
+file name. On a gallery, Replace gives this look to its tile. "Add images"
+has no such look.
+
+The picker closes, and the field gets no value, when the field or the tile
+unmounts, when the document closes, when the preview expands, when the Media
+pane opens, and when the branch changes.
 
 ### Uploading
 
@@ -178,7 +205,7 @@ An author drops a file on the field. The field sends the first file of the
 drop to the upload list of the admin, and the file goes to the media root.
 The upload list is the same list that the Media pane and the picker use, so
 the file also shows under the Upload button. Refer to
-[Upload](./media-manager.md). The picker dialog has its own upload button.
+[Upload](./media-manager.md). The picker has its own upload button.
 
 The field reads its upload state from the upload list by form and by field
 address (`useImageUpload` in `image-upload.ts`). It does not keep this state
@@ -229,11 +256,11 @@ When an author drags a file over a field that has an image, the tile says
 
 The field never deletes the old file from Media.
 
-Focus stays in the confirm while it is open. The confirm, the picker dialog
+Focus stays in the confirm while it is open. The confirm, the picker
 and the Save to new branch dialog are portals, and React sends their focus
 events through the row of the field. The first focus event activates the
 field. The field does not take focus on that activation while focus is in a
-dialog that the field is not in.
+dialog or the picker that the field is not in.
 
 ### When the field turns a drop away
 
@@ -288,10 +315,10 @@ until the author replaces or removes it.
 ### The gallery
 
 A list of images renders `ImageGallery` (`image-gallery.ui.tsx`, the image descriptor's `ListView`) in place of
-the generic scalar list: square tiles three across and an "Add images" tile at
+the generic scalar list: 4:3 tiles three across, in a grid at most 480px wide, and an "Add images" tile at
 the end. It has one wrapper and one picker. "Add images" appends only after a
-pick, and each pick adds one image. Remove splices the item out, so the saved
-list has no `null` holes. The same image can appear twice.
+pick, and a pick adds one or more images. Remove splices the item out, so the saved
+list has no `null` holes. The picker does not offer an image that the gallery holds, but a hand-edited file can list the same image twice.
 
 A tile reorders by dragging it (a 4px threshold; Escape or releasing outside
 the gallery cancels), or by arrow keys on its handle "Move Image N: {file}".
@@ -335,8 +362,8 @@ with a crop. Refer to [media.md](./media.md#rendering-media-on-the-site).
   it exports `imageFieldPlugin`.
 - The registration is in `plugins/fields/index.ts`. That file adds the plugin
   to `corePlugins`, and it supplies `t.image`.
-- The picker is `MediaBrowser` from `plugins/media-manager/`, and the dialog
-  is the shadcn `dialog` in `@tinacms/ui`.
+- The picker is the media picker of `plugins/media-manager/`. The field opens
+  it with `useMediaPicker()` from `@tinacms/tinacms/react`.
 - On the site, `resolveMediaUrl` turns the stored path into a URL. Refer to
   [`media.md`](./media.md).
 

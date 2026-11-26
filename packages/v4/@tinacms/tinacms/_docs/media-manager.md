@@ -71,8 +71,7 @@ steps out through the folders before it leaves Media.
   can't-load look with "Try again", and a not-set-up look with the provider's
   link.
 
-The pane has no Rename and no filters for kind or type. Pick mode keeps its
-filters.
+The pane has no Rename and no filters for kind or type.
 
 ## Upload
 
@@ -209,35 +208,73 @@ office documents and some 3D formats.
 `resolveUrl` gets a size for each image: 400x400 for the grid, 80x80 for the
 list. A provider without image transforms ignores the size.
 
-## Pick mode
+## The media picker
 
-`MediaBrowser` (`@tinacms/tinacms/react`) is the browser for a field that
-selects media. It has one mode, `pick`. The details panel has an "Insert"
-button, and no Rename or Delete.
-The browser keeps the open folder in its own state, not in the URL.
-The [`image` field](./image-field.md) uses `pick` mode in a dialog.
+The media picker is the panel that a field uses to choose media. It slides
+over the preview, and it looks like the Media pane. The admin draws it next to
+the error pane. A page with `FormProvider` and no admin gets a fixed panel at
+the right edge of the window, so a field always opens a picker.
+
+A field opens it with `useMediaPicker()` (`@tinacms/tinacms/react`). The
+[`image` field](./image-field.md) does this, and so can a custom field.
 
 ```tsx
-import { MediaBrowser } from '@tinacms/tinacms/react';
+import { useMediaPicker } from '@tinacms/tinacms/react';
 
-<MediaBrowser
-  mode='pick'
-  accept='image'
-  onSelect={(item) => setValue(item.path)}
-/>;
+const picker = useMediaPicker(); // { open(request), close() }
+
+picker.open({
+  mode: 'single',
+  forLabel: 'Hero image',
+  target: 'hero',
+  opener: buttonRef.current,
+  choose: ([path]) => setValue(path),
+});
 ```
 
-| Prop | Role |
+| `open` request | Role |
 |---|---|
-| `mode` | `'pick'`. |
-| `onSelect(item)` | Gets the file when the user clicks "Insert". |
-| `accept` | A category (`image`, `video`, `audio`, `document`), an extension, or a list of them. |
-| `folder`, `onFolderChange` | Optional. Give both to control the open folder. |
+| `mode` | `'single'` or `'multiple'`. |
+| `forLabel` | Names what the picker is for. The header shows "For {forLabel}". |
+| `parentLabel` | Optional. Names the parent of a nested field: "For {forLabel} in {parentLabel}". |
+| `target` | Names the requester. A second `open` with another target re-targets the open picker. The picker keeps its folder and size, and clears the picks. |
+| `replacing` | Optional. `{ path, missing }`, the media path that the field replaces. |
+| `opener` | The element that opened the picker. Focus returns to it on close. |
+| `taken` | Optional. `{ address, paths }`. The picker reads the live form value at `address` and passes it to `paths`, which returns the paths that the field holds. In `multiple` mode they show "Already added". |
+| `choose(paths)` | Gets the picked paths, in pick order, when the author confirms. |
 
-`accept` replaces `features.acceptedMimeTypes` and
-`features.acceptedExtensions` for the upload checks. If the provider
-sets `features.extensionFilter`, `accept` also limits the list. Then a locked
-chip such as "Images only" shows in place of the type filter.
+The picker shows images and folders only. When the provider sets
+`features.extensionFilter`, the provider filters. If not, the picker filters
+each page of results by extension. Search is always on. It covers the folder
+in view. When the provider sets `features.search`, the provider searches. If
+not, the picker filters the loaded items by file name.
+
+- **Header.** "Choose an image" or "Choose images", and "For {label}" under
+  it. Upload, Maximise and Close sit at the end. A phone has no Maximise.
+- **Breadcrumb.** It shows inside a folder, and not at the root.
+- **Picks.** In `single` mode, a pick replaces the pick before it. In
+  `multiple` mode, each pick shows its number, in pick order. Picks stay when
+  the author changes folder or search.
+- **Footer.** It shows the number of picks, Cancel, and one button: "Choose
+  image", "Add image" or "Add {n} images". The button is off with no picks.
+- **Missing image.** If `replacing.missing` is true, the picker opens in the
+  old folder. A card at the top says that the image is no longer in Media.
+- **Upload.** The Upload button and a drop go to the folder in view. They
+  refuse a file that is not an image. A file that lands while the picker is
+  open becomes a pick.
+- **Size.** On a desktop, the panel is 400px wide over the preview, and
+  Maximise covers the preview. On a tablet, Maximise fills the space below the
+  top bar. On a phone, the panel always fills that space.
+
+The picker has no grid or list toggle, no filter for kind or type, no New
+Folder and no details panel. The Media pane keeps them.
+
+The picker closes, and `choose` does not run, on Cancel, on Close, on Escape,
+when the requester unmounts, when the document closes, when the preview
+expands, when the Media pane opens, and when the branch changes.
+
+`useMediaPicker()` replaces the old picker component. The component export is removed from `@tinacms/tinacms/react`. v4 is in private alpha, so this is a
+breaking change with no deprecation.
 
 ## Not supported yet
 

@@ -22,6 +22,7 @@ import {
   use,
   useEffect,
   useEffectEvent,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -669,8 +670,25 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
   // again for that, so the effect keys on what the toast says, and the buttons
   // read the latest actions. While the confirm is open the buttons do nothing.
   const resume = useEffectEvent(() => {
-    if (!confirming) stale?.resume();
+    if (confirming) return;
+    // Sonner returns focus to its toast; the new form column must find focus on `body`.
+    leaveToaster();
+    stale?.resume();
   });
+  // The picker closes with the discard. The toast's Discard button goes away with the copies,
+  // so focus returns to the picker's opener, else to the form's scroll region.
+  const confirmDiscard = () => {
+    const picker = scope.view.getState().picker;
+    stale?.discard(shown.current);
+    if (!picker) return;
+    scope.view.getState().closePicker();
+    const region = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-form-id]')
+    ).find((node) => node.getAttribute('data-form-id') === scope.formId);
+    discardButton.current = picker.opener?.isConnected
+      ? picker.opener
+      : (region ?? null);
+  };
   const askToDiscard = useEffectEvent(() => {
     if (confirming) return;
     discardButton.current = document.activeElement as HTMLElement | null;
@@ -709,7 +727,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
     <DiscardConfirm
       open={confirming}
       onOpenChange={setConfirming}
-      onConfirm={() => stale?.discard(shown.current)}
+      onConfirm={confirmDiscard}
       returnFocusTo={discardButton}
       title={`Discard earlier unsaved edits to “${documentTitle(values, scope.path)}”?`}
       description='Discarded edits can’t be brought back. What you typed since stays.'
@@ -892,7 +910,8 @@ function FormScroller({
     <div
       ref={scroller}
       data-form-part='fields'
-      className='min-h-0 flex-1 overflow-y-auto'
+      tabIndex={-1}
+      className='min-h-0 flex-1 overflow-y-auto outline-none'
       {...formRootProps(formId)}
     >
       {children}
@@ -902,6 +921,16 @@ function FormScroller({
 
 export function DocumentForm() {
   const scope = use(FormScopeContext);
+  const view = scope?.view;
+  const formId = scope?.formId;
+  useLayoutEffect(() => {
+    if (!view?.getState().takeFocusHandoff()) return;
+    const focused = document.activeElement;
+    if (focused && focused !== document.body) return;
+    Array.from(document.querySelectorAll<HTMLElement>('[data-form-id]'))
+      .find((node) => node.getAttribute('data-form-id') === formId)
+      ?.focus();
+  }, [view, formId]);
   if (!scope) return null;
 
   return (

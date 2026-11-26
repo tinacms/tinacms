@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
+import { fakeKeyboard } from './fake-keyboard';
 
 const BRANCH_DIALOG =
   '/branches.html?docs=1&fail=branch-gone#/collections/post/content%2Fposts%2Fpost-01.mdx';
@@ -48,18 +49,6 @@ const drag = async (page: Page, handle: Locator, dy: number) => {
   await page.mouse.move(x + width / 2, y + height / 2 + dy, { steps: 4 });
   await page.mouse.up();
 };
-
-// A keyboard shrinks the visual viewport and leaves the layout viewport alone.
-const fakeKeyboard = (page: Page, shrink: number) =>
-  page.evaluate((by) => {
-    const visual = window.visualViewport;
-    if (!visual) throw new Error('no visual viewport');
-    Object.defineProperty(visual, 'height', {
-      configurable: true,
-      value: window.innerHeight - by,
-    });
-    visual.dispatchEvent(new Event('resize'));
-  }, shrink);
 
 test.describe('the branch dialog as a foot sheet', () => {
   for (const size of SIZES) {

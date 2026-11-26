@@ -10,7 +10,7 @@ Media is **not a separate system** — it is the singleton `media` capability, i
 ┌─ Browser ────────────────────────────────┐
 │  media plugin's Client segment:          │
 │    store.media slice (items, selected,…) │
-│    MediaPicker, MediaBrowser components  │
+│    MediaPicker, useMediaPicker() hook    │
 │         │                                │
 │         │  Capability RPC                │
 │         ▼                                │

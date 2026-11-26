@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
+import { fakeKeyboard } from './fake-keyboard';
 
 const SCREEN = { width: 390, height: 844 };
 const KEYBOARD = 336;
@@ -18,18 +19,6 @@ const box = async (locator: Locator) => {
   if (!found) throw new Error('no box');
   return found;
 };
-
-// A keyboard shrinks the visual viewport and leaves the layout viewport alone.
-const fakeKeyboard = (page: Page, shrink: number) =>
-  page.evaluate((by) => {
-    const visual = window.visualViewport;
-    if (!visual) throw new Error('no visual viewport');
-    Object.defineProperty(visual, 'height', {
-      configurable: true,
-      value: window.innerHeight - by,
-    });
-    visual.dispatchEvent(new Event('resize'));
-  }, shrink);
 
 const foot = async (sheet: Locator) => {
   const rect = await box(sheet);
@@ -179,13 +168,15 @@ test.describe('dialogs as foot sheets on a phone', () => {
     await page.goto(HOME);
     const field = page.getByRole('group', { name: 'Hero image' });
     await field.getByRole('button', { name: 'Choose from Media' }).click();
-    const picker = await expectFootSheet(page);
-    await expect(
-      picker.getByRole('heading', { name: 'Choose an image' })
-    ).toBeVisible();
+    const picker = page.getByRole('region', { name: 'Choose an image' });
+    await expect(picker).toBeVisible();
+    await settle(page);
+    const rect = await box(page.locator('[data-slot=media-picker-host]'));
+    expect(rect.width).toBe(SCREEN.width);
+    expect(rect.y).toBe(56);
     await picker.getByRole('button', { name: 'preview.svg' }).click();
-    await picker.getByRole('button', { name: 'Insert' }).click();
-    await expectClosed(page);
+    await picker.getByRole('button', { name: 'Choose image' }).click();
+    await expect(picker).toHaveCount(0);
 
     const dataTransfer = await page.evaluateHandle(() => {
       const transfer = new DataTransfer();
@@ -256,31 +247,6 @@ test.describe('media manager confirms as foot sheets on a phone', () => {
     ).toBeLessThanOrEqual(SCREEN.height - KEYBOARD);
     await sheet.getByRole('button', { name: 'Cancel' }).click();
     await expectClosed(page);
-  });
-
-  test('the New folder form in the image picker keeps its field above the keyboard', async ({
-    page,
-  }) => {
-    await page.goto(HOME);
-    await page
-      .getByRole('group', { name: 'Hero image' })
-      .getByRole('button', { name: 'Choose from Media' })
-      .click();
-    await expectFootSheet(page);
-    await page.getByRole('button', { name: 'New Folder' }).click();
-    const sheet = page.locator(SHEET).last();
-    await settle(page);
-    const field = sheet.getByRole('textbox', { name: 'Folder name' });
-    await field.focus();
-    await fakeKeyboard(page, KEYBOARD);
-    await expect.poll(() => foot(sheet)).toBe(SCREEN.height - KEYBOARD);
-    expect(
-      (await box(field)).y + (await box(field)).height
-    ).toBeLessThanOrEqual(SCREEN.height - KEYBOARD);
-    await sheet.getByRole('button', { name: 'Cancel' }).click();
-    await expect(
-      page.getByRole('textbox', { name: 'Folder name' })
-    ).toHaveCount(0);
   });
 });
 

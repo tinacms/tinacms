@@ -41,6 +41,7 @@ import { TinaProvider } from '../editor/provider';
 import { AuthGate } from './auth-gate';
 import { DocumentForm, useLevelTrail } from './document-form';
 import { DocumentErrorPane } from './error-summary';
+import { MediaPickerHost } from '../plugins/media-manager/media-picker-host';
 import { DocumentScope } from './document-scope';
 import { CollectionsNavigator, MediaPanel, useTreeFolders } from './navigator';
 import { CollectionTable } from './collection-table/collection-table';
@@ -157,7 +158,7 @@ function HomeOutlet({
 function PreviewNodeSlot({ preview }: { preview?: ReactNode }) {
   const hasForm = use(FormScopeContext) !== null;
   return (
-    <div data-preview-slot='' className='min-w-0 flex-1'>
+    <div data-preview-slot='' className='relative min-w-0 flex-1'>
       {hasForm ? (
         (preview ?? <NoPreview />)
       ) : (
@@ -896,6 +897,7 @@ function AdminShell({
       : mainRoute;
   const [formFocusRequest, setFormFocusRequest] = useState(0);
   const [previewAsked, setPreviewAsked] = useState(false);
+  const [formMaximiseSerial, setFormMaximiseSerial] = useState(0);
   const toggleMaximise = useCallback(
     (from: DocumentView) => {
       // Entering from the preview keeps focus on the toolbar's button, as the form header is
@@ -917,7 +919,10 @@ function AdminShell({
       }
       setView(from);
       setTabletMaximised(true);
-      if (from === 'form') setFormFocusRequest((n) => n + 1);
+      if (from === 'form') {
+        setFormFocusRequest((n) => n + 1);
+        setFormMaximiseSerial((n) => n + 1);
+      }
     },
     [tabletMaximised, mainRoute, navigate]
   );
@@ -1246,6 +1251,18 @@ function AdminShell({
                       navigate={navigate}
                     />
                     <DocumentErrorPane />
+                    <MediaPickerHost
+                      primary
+                      suspended={
+                        previewExpanded ||
+                        (tier === 'tablet' &&
+                          tabletMaximised &&
+                          view === 'preview')
+                      }
+                      closeSignal={formMaximiseSerial}
+                      paneOpen={isMediaRoute}
+                      onClosePane={closeMedia}
+                    />
                     {typeof preview === 'string' ? null : (
                       <PreviewNodeSlot preview={preview} />
                     )}

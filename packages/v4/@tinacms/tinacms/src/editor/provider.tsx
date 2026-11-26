@@ -49,6 +49,7 @@ import {
   useFormStore,
   valuesEqual,
 } from '../form/form-store';
+import { MediaPickerHost } from '../plugins/media-manager/media-picker-host';
 import { blockOnFormErrors } from './block-errors';
 import {
   endServerErrorsIfChanged,
@@ -440,12 +441,16 @@ function useSeededFormSync(
   seedValues: TinaDocument,
   keptSeed: TinaDocument | null,
   resetForm: (values: TinaDocument, options?: { keepErrors?: boolean }) => void,
-  dropFieldTargets: () => void,
+  dropUploadTargets: () => void,
   collectionName: string
 ) {
   const reseeds = useRef(0);
   const [seedKey, setSeedKey] = useState(() => `${formId}#${reseeds.current}`);
   const view = useFormViewStore(formId);
+  const dropFieldTargets = useCallback(() => {
+    dropUploadTargets();
+    view.getState().closePicker();
+  }, [dropUploadTargets, view]);
   const advanceSeedKey = useCallback(
     (seededFormId: FormId) => {
       reseeds.current += 1;
@@ -492,7 +497,7 @@ function useSeededFormSync(
     discardFormEdits(formId, resetForm, advanceSeedKey, dropFieldTargets);
   }, [formId, resetForm, advanceSeedKey, dropFieldTargets, view]);
 
-  return { seedKey, advanceSeedKey, discardEdits, view };
+  return { seedKey, advanceSeedKey, discardEdits, dropFieldTargets, view };
 }
 
 function useFormMethodSubscriptions(
@@ -595,22 +600,23 @@ export function FormProvider({
 
   const [uploadForm] = useState(() => ({}));
   const uploads = uploadListOf(runtime.store);
-  const dropFieldTargets = useCallback(
+  const dropUploadTargets = useCallback(
     () => uploads.dropFieldTargets(uploadForm),
     [uploads, uploadForm]
   );
 
-  const { seedKey, advanceSeedKey, discardEdits, view } = useSeededFormSync(
-    formId,
-    userId,
-    ingested,
-    equal,
-    seedValues,
-    kept.seed,
-    methods.reset,
-    dropFieldTargets,
-    collection.name
-  );
+  const { seedKey, advanceSeedKey, discardEdits, dropFieldTargets, view } =
+    useSeededFormSync(
+      formId,
+      userId,
+      ingested,
+      equal,
+      seedValues,
+      kept.seed,
+      methods.reset,
+      dropUploadTargets,
+      collection.name
+    );
 
   const waiting = useFormStore((state) => offeredCopies(state, formId));
   const staleDraftActions = useMemo(
@@ -749,6 +755,7 @@ export function FormProvider({
       <UploadFormContext value={uploadForm}>
         <RhfFormProvider {...methods}>
           <>{children}</>
+          <MediaPickerHost />
         </RhfFormProvider>
       </UploadFormContext>
     </FormScopeContext>

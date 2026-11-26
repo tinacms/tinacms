@@ -1,26 +1,36 @@
 import { Button } from '@tinacms/ui/components/button';
 import { Icon } from '@tinacms/ui/components/icon';
 import { cn } from '@tinacms/ui/lib/utils';
-import { GripVerticalIcon, ReplaceIcon } from 'lucide-react';
-import { type KeyboardEvent, type ReactNode, type Ref, useEffect } from 'react';
+import { GripVerticalIcon, ImageUpIcon } from 'lucide-react';
+import {
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent,
+  type ReactNode,
+  type Ref,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { mediaNameOf } from '../../media-manager/media-types';
 import type { ImageCoverLook } from './image-field.schema';
+import { CHOOSING_IN_PICKER } from './image-words';
 import { PREVIEW_SIZE, useImagePreview } from './image-preview';
 
-export type ImageTileLook = ImageCoverLook | 'default' | 'square';
+export type ImageTileLook = ImageCoverLook | 'default' | 'gallery';
 
 export const tileShape = {
-  default: 'aspect-3/2',
+  default: 'aspect-4/3',
   wide: 'aspect-video',
   tall: 'aspect-4/3',
-  square: 'aspect-square',
+  gallery: 'aspect-4/3',
 } as const satisfies Record<ImageTileLook, string>;
 
 export const tileCap = {
-  default: 'max-w-xs',
-  wide: 'max-w-2xl',
-  tall: 'max-w-xl',
-  square: undefined,
+  default: undefined,
+  wide: 'max-w-120',
+  tall: 'max-w-120',
+  gallery: undefined,
 } as const satisfies Record<ImageTileLook, string | undefined>;
 
 export type ResolveImageUrl = (
@@ -35,6 +45,8 @@ export interface ImageTileProps {
   look?: ImageTileLook;
   invalid?: boolean;
   inert?: boolean;
+  /** The media picker is open for this picture: draw the active border and say so under the name. */
+  choosing?: boolean;
   missing?: boolean;
   onMissingChange?: (missing: boolean) => void;
   previewKey?: number;
@@ -63,6 +75,7 @@ export function ImageTile({
   look = 'default',
   invalid,
   inert,
+  choosing,
   missing: forcedMissing,
   onMissingChange,
   previewKey,
@@ -82,6 +95,45 @@ export function ImageTile({
   const preview = useImagePreview(path, resolveUrl, previewKey);
   const missing = path === null || forcedMissing || preview.missing;
   const name = path === null ? fallbackName : mediaNameOf(path);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [revealed, setRevealed] = useState(false);
+  const showChoosing = choosing && !inert;
+
+  useEffect(() => {
+    if (!revealed) return;
+    const dismiss = (event: globalThis.PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        boxRef.current?.contains(event.target)
+      )
+        return;
+      setRevealed(false);
+    };
+    document.addEventListener('pointerdown', dismiss);
+    return () => document.removeEventListener('pointerdown', dismiss);
+  }, [revealed]);
+
+  // The tap that reveals the actions must not also press the one under the finger.
+  const swallowClick = useRef(false);
+  const reveal = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== 'touch' && event.pointerType !== 'pen') {
+      swallowClick.current = false;
+      return;
+    }
+    swallowClick.current = !revealed;
+    setRevealed(true);
+  };
+  const guardClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (!swallowClick.current) return;
+    swallowClick.current = false;
+    if (
+      event.target instanceof Element &&
+      event.target.closest('[data-tile-actions]')
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  };
 
   useEffect(() => {
     onMissingChange?.(path !== null && (forcedMissing || preview.missing));
@@ -98,12 +150,19 @@ export function ImageTile({
       )}
     >
       <div
+        ref={boxRef}
+        onPointerDown={reveal}
+        onPointerCancel={() => {
+          swallowClick.current = false;
+        }}
+        onClickCapture={guardClick}
         className={cn(
-          'relative w-full overflow-hidden rounded-sm border bg-muted transition',
+          'group relative w-full overflow-hidden rounded-sm border bg-muted transition',
           tileShape[look],
-          invalid && 'border-destructive',
+          showChoosing && 'border-field-active-border',
           dropTarget && 'border-primary bg-selected',
-          dropLabel !== undefined && !invalid && 'border-primary'
+          dropLabel !== undefined && 'border-primary',
+          invalid && 'border-destructive'
         )}
       >
         {path === null && veil !== undefined ? (
@@ -146,18 +205,19 @@ export function ImageTile({
           </div>
         ) : null}
         {inert ? null : (
-          <div className='absolute top-2 right-2 flex gap-1'>
+          <div
+            data-tile-actions=''
+            data-revealed={revealed ? '' : undefined}
+            className='pointer-events-none absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity duration-(--dur) ease-(--ease) group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 data-revealed:pointer-events-auto data-revealed:opacity-100 motion-reduce:transition-none'
+          >
             {onReplace ? (
               <Button
                 ref={replaceRef}
                 variant='icon'
                 size='sm'
-                icon={ReplaceIcon}
+                icon={ImageUpIcon}
                 disabled={busy}
-                className={cn(
-                  'bg-card shadow-xs',
-                  look === 'square' && 'size-6'
-                )}
+                className='bg-card shadow-xs'
                 onClick={onReplace}
               >
                 {`Replace ${name}`}
@@ -169,10 +229,7 @@ export function ImageTile({
                 size='sm'
                 destructive
                 disabled={busy}
-                className={cn(
-                  'bg-card shadow-xs',
-                  look === 'square' && 'size-6'
-                )}
+                className='bg-card shadow-xs'
                 onClick={onRemove}
               >
                 {`Remove ${name}`}
@@ -187,6 +244,11 @@ export function ImageTile({
       >
         {path === null ? placeholder : missing ? 'File not found' : name}
       </figcaption>
+      {showChoosing ? (
+        <p className='m-0 text-xs text-muted-foreground'>
+          {CHOOSING_IN_PICKER}
+        </p>
+      ) : null}
       {note ? (
         <p className='m-0 text-xs text-muted-foreground [overflow-wrap:anywhere]'>
           {note}

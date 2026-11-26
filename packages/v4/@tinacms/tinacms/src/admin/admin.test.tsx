@@ -20,6 +20,7 @@ import { useFieldValue, useFormId } from '../editor/hooks';
 import { toFieldAddress } from '../core/field/address';
 import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
+import imageFieldPlugin from '../plugins/fields/image/image-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
@@ -2169,6 +2170,96 @@ describe('TinaAdmin below desktop', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Restore preview' }));
     expect(screen.getByRole('button', { name: 'Maximise form' })).toHaveFocus();
+  });
+
+  describe('with the media picker open', () => {
+    const mediaStub = definePlugin({
+      name: 'test:media-stub',
+      provides: ['media'],
+      client: async () => ({
+        default: {
+          slice: () => ({
+            list: async () => ({ items: [] }),
+            upload: async (file: File) => file.name,
+            delete: async () => {},
+            resolveUrl: (path: string) => path,
+          }),
+        },
+      }),
+    });
+    const withImage = asResolvedConfig({
+      ...config,
+      plugins: [...config.plugins, imageFieldPlugin, mediaStub],
+      schema: {
+        collections: [
+          {
+            name: 'post',
+            label: 'Posts',
+            path: 'content/posts',
+            format: 'mdx',
+            fields: [
+              { name: 'title', label: 'Title', type: 'string' },
+              { name: 'banner', label: 'Banner', type: 'image' },
+            ],
+          },
+        ],
+      },
+    });
+    const openOnTablet = async () => {
+      stubWidth(900);
+      window.location.hash = DOCUMENT;
+      const user = userEvent.setup();
+      render(
+        <TinaAdmin
+          config={withImage}
+          queryClient={
+            new QueryClient({ defaultOptions: { queries: { retry: false } } })
+          }
+          preview='about:blank'
+        />
+      );
+      return user;
+    };
+    const openPicker = async (user: User) => {
+      await user.click(
+        await screen.findByRole('button', { name: /Choose from Media/ })
+      );
+      return screen.findByRole('region', { name: /^Choose / });
+    };
+
+    it('Maximise preview closes the picker and focuses Restore preview', async () => {
+      const user = await openOnTablet();
+      await openPicker(user);
+      await user.click(
+        screen.getByRole('button', { name: 'Maximise preview' })
+      );
+      await waitFor(() =>
+        expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+      );
+      expect(
+        screen.getByRole('button', { name: 'Restore preview' })
+      ).toHaveFocus();
+    });
+
+    it('Maximise form closes the picker', async () => {
+      const user = await openOnTablet();
+      await openPicker(user);
+      await user.click(screen.getByRole('button', { name: 'Maximise form' }));
+      await screen.findByRole('button', { name: 'Restore form' });
+      await waitFor(() =>
+        expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+      );
+    });
+
+    it('a picker opened while the form is maximised stays open', async () => {
+      const user = await openOnTablet();
+      await user.click(
+        await screen.findByRole('button', { name: 'Maximise form' })
+      );
+      await openPicker(user);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(screen.getByRole('region', { name: /^Choose / })).toBeVisible();
+    });
   });
 
   it('on a phone, a document opens on Form and the View switch shows the preview', async () => {
