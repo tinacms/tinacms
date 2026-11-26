@@ -159,6 +159,19 @@ test.describe('desktop', () => {
     );
   });
 
+  test('keeps the footer inside the popover on a short window', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 320 });
+    await page.goto(HOME);
+    const picker = await openPicker(page);
+    const host = await box(page.locator('[data-slot=media-picker-host]'));
+    const footer = await box(picker.locator('[data-slot=picker-footer]'));
+    expect(footer.y + footer.height).toBeLessThanOrEqual(
+      host.y + host.height + 1
+    );
+  });
+
   test('closes without writing when Media opens from the rail', async ({
     page,
   }) => {

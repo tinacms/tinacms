@@ -601,58 +601,63 @@ export function MediaPickerPanel({
         closeLabel={CLOSE_PICKER}
         onClose={() => onClose(true)}
       />
-      <p className='m-0 border-b border-border-subtle px-4 py-2 text-sm text-muted-foreground'>
-        {forLine(request.forLabel, request.parentLabel)}
-      </p>
-      {folder === '' ? null : (
-        <div className='border-b border-border-subtle px-4 py-2'>
-          <MediaBreadcrumb folder={folder} onOpen={openFolder} />
-        </div>
-      )}
-      <div className='border-b border-border-subtle px-4 py-2'>
-        <SearchBox
-          label={SEARCH_LABEL}
-          placeholder={SEARCH_PLACEHOLDER}
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          onClear={() => {
-            setSearch('');
-            setDebouncedSearch('');
-          }}
-          results={hasQuery ? resultWords(images.length) : undefined}
-        />
-      </div>
-      {notice ? (
-        <p
-          role='alert'
-          className='m-0 border-b bg-destructive/10 px-4 py-2 text-sm text-destructive'
-        >
-          {notice}
-        </p>
-      ) : null}
       <div
-        ref={library}
-        role='region'
-        aria-label='Media library'
-        tabIndex={-1}
-        data-dragging={dragging ? 'true' : undefined}
-        className={cn(
-          'min-h-0 min-w-0 flex-1 overflow-y-auto border-2 border-transparent p-4 outline-none transition',
-          dragging ? 'rounded-sm border-orange-500' : null
-        )}
-        onDragEnter={dragOver}
-        onDragOver={dragOver}
-        onDragLeave={dragLeave}
-        onDrop={drop}
+        data-slot='picker-body'
+        className='flex min-h-0 flex-1 flex-col overflow-y-auto'
       >
-        {missingFolder !== null && request.replacing ? (
-          <MissingFileCard
-            path={request.replacing.path}
-            folder={missingFolder}
-            words={missingCardWords(missingFolder)}
+        <p className='m-0 border-b border-border-subtle px-4 py-2 text-sm text-muted-foreground'>
+          {forLine(request.forLabel, request.parentLabel)}
+        </p>
+        {folder === '' ? null : (
+          <div className='border-b border-border-subtle px-4 py-2'>
+            <MediaBreadcrumb folder={folder} onOpen={openFolder} />
+          </div>
+        )}
+        <div className='border-b border-border-subtle px-4 py-2'>
+          <SearchBox
+            label={SEARCH_LABEL}
+            placeholder={SEARCH_PLACEHOLDER}
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            onClear={() => {
+              setSearch('');
+              setDebouncedSearch('');
+            }}
+            results={hasQuery ? resultWords(images.length) : undefined}
           />
+        </div>
+        {notice ? (
+          <p
+            role='alert'
+            className='m-0 border-b bg-destructive/10 px-4 py-2 text-sm text-destructive'
+          >
+            {notice}
+          </p>
         ) : null}
-        {body()}
+        <div
+          ref={library}
+          role='region'
+          aria-label='Media library'
+          tabIndex={-1}
+          data-dragging={dragging ? 'true' : undefined}
+          className={cn(
+            'min-h-32 min-w-0 flex-1 overflow-y-auto border-2 border-transparent p-4 outline-none transition',
+            dragging ? 'rounded-sm border-orange-500' : null
+          )}
+          onDragEnter={dragOver}
+          onDragOver={dragOver}
+          onDragLeave={dragLeave}
+          onDrop={drop}
+        >
+          {missingFolder !== null && request.replacing ? (
+            <MissingFileCard
+              path={request.replacing.path}
+              folder={missingFolder}
+              words={missingCardWords(missingFolder)}
+            />
+          ) : null}
+          {body()}
+        </div>
       </div>
       <div
         data-slot='picker-footer'
