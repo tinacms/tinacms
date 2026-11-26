@@ -383,7 +383,7 @@ describe('Toast', () => {
     expect(closedByCode).not.toHaveBeenCalled();
   });
 
-  it('runs onEnd when a toast closes by itself, but not when code closes every toast', async () => {
+  it('runs no onEnd when a toast closes by itself or code closes every toast', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const timedOut = vi.fn();
     const all = vi.fn();
@@ -399,7 +399,7 @@ describe('Toast', () => {
     await screen.findByText('Short');
     await act(() => vi.advanceTimersByTimeAsync(3000));
     await waitFor(() => expect(screen.queryByText('Short')).toBeNull());
-    expect(timedOut).toHaveBeenCalledOnce();
+    expect(timedOut).not.toHaveBeenCalled();
     act(() => {
       toast({ tone: 'error', title: 'Kept', onEnd: all });
     });

@@ -1245,7 +1245,7 @@ describe('Branch switcher controls', () => {
     ).toHaveLength(1);
   });
 
-  it('keeps the failure in the form once the name is edited, drops Retry, and scrolls the alert into view', async () => {
+  it('drops the failure line and Retry once the name is edited, with no note while the form is open, and scrolls the alert into view', async () => {
     const user = userEvent.setup();
     const scrolled = vi.fn();
     Element.prototype.scrollIntoView = scrolled;
@@ -1278,15 +1278,12 @@ describe('Branch switcher controls', () => {
         )
       ).toBe(true)
     );
-    const alert = screen.getByRole('alert');
     await user.type(box, 'b');
-    expect(screen.getByRole('alert')).toBe(alert);
-    expect(alert).toHaveTextContent("Couldn't create aaa");
-    expect(alert.closest('form')).toBe(box.closest('form'));
-    expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
+    expect(screen.queryByText(/Couldn't create/)).toBeNull();
     expect(screen.getByRole('button', { name: 'Create branch' })).toBeVisible();
     await user.type(box, '{Backspace}');
-    expect(screen.getByRole('alert')).toBe(alert);
+    expect(screen.getByRole('alert')).toHaveTextContent("Couldn't create aaa");
     expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
   });
 

@@ -441,7 +441,7 @@ function BranchSwitcher({
   const from = startFrom === 'base' ? baseBranch : (current ?? baseBranch);
   const [dismissed, setDismissed] = useState(false);
   const attempted = useRef('');
-  // A form-started failure stays in the form while it is open, also after the name is edited.
+  // A form-started failure belongs to the form while it is open; its line shows only for that name.
   const formFailure =
     createState === 'failed' &&
     creating &&
@@ -655,15 +655,17 @@ function BranchSwitcher({
   const noteNamesIt =
     noteShown && note.kind === 'failed' && note.name === typed;
   const refusedFailure = failed || noteNamesIt ? undefined : refused.get(typed);
-  const failureName = refusedFailure !== undefined ? typed : attempted.current;
   const failureP =
-    refusedFailure !== undefined || formFailure ? (
+    failed || refusedFailure !== undefined ? (
       <p
         role='alert'
         data-branch-failure=''
         className='m-0 text-sm text-destructive [overflow-wrap:anywhere]'
       >
-        {failureLine(failureName, refusedFailure ?? createFailure)}
+        {failureLine(
+          failed ? attempted.current : typed,
+          failed ? createFailure : refusedFailure
+        )}
       </p>
     ) : null;
 

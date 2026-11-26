@@ -2387,7 +2387,7 @@ describe('branch switcher rows and creating a branch', () => {
     expect(toasts()).toHaveLength(0);
   });
 
-  it('keeps a ready outcome gone after its toast closes by itself', async () => {
+  it('keeps a ready outcome as the note after its toast closes by itself', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     let finish: () => void = () => {};
     createBranch = vi.fn<NonNullable<BranchSource['create']>>(
@@ -2407,7 +2407,7 @@ describe('branch switcher rows and creating a branch', () => {
     await waitFor(() => expect(toasts()).toHaveLength(0));
     await user.click(screen.getByRole('button', { name: /^Branch:/ }));
     const again = await screen.findByRole('dialog', { name: 'Branches' });
-    expect(within(again).queryByText('cms/x is ready')).toBeNull();
+    expect(within(again).getByText('cms/x is ready')).toBeVisible();
   });
 
   it('keeps a failure toast gone after its own Dismiss, also once the switcher opens and closes', async () => {

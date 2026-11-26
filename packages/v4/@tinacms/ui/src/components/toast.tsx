@@ -175,8 +175,8 @@ type ToastOptions = Omit<ToastProps, 'id'> & {
   duration?: number;
   id?: string | number;
   /**
-   * Runs once when the person or the timer ends the toast: its Dismiss button, a swipe or
-   * auto-close. Not when code calls `toast.dismiss`.
+   * Runs once when the person ends the toast: its Dismiss button or a swipe. Not when it
+   * closes by itself or code calls `toast.dismiss`.
    */
   onEnd?: () => void;
 };
@@ -218,7 +218,6 @@ function toast({ duration, onDismiss, onEnd, id, ...props }: ToastOptions) {
       },
       onAutoClose: (closed) => {
         shown.delete(closed.id);
-        end();
         onDismiss?.();
       },
     }

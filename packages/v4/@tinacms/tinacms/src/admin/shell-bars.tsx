@@ -244,7 +244,7 @@ function BranchControl() {
   }, [deferred, open, formShown, formTyped]);
 
   const demoteInline = () => setInline(undefined);
-  // Every way a person or a timer ends an outcome: the note's or toast's Dismiss, a swipe, auto-close.
+  // Every way a person ends an outcome: the note's or toast's Dismiss, or a swipe. Auto-close does not (F4).
   const endOutcome = (ended: Outcome) => {
     setHeld((now) => (now === ended ? undefined : now));
     setReason(undefined);
