@@ -43,6 +43,24 @@ describe('authedFetch', () => {
     expect(headers.get('content-type')).toBe('application/json');
   });
 
+  it.each(['TimeoutError', 'AbortError'])(
+    'says the request did not finish when the reply body hits a %s',
+    async (name) => {
+      stubFetch(
+        Object.assign(json({ ok: 1 }), {
+          text: () => Promise.reject(new DOMException('slow', name)),
+        })
+      );
+      await expect(
+        client().authedFetch('https://x.test/a')
+      ).rejects.toMatchObject({
+        message: 'The TinaCloud request did not finish.',
+        status: undefined,
+        timedOut: true,
+      });
+    }
+  );
+
   it('sends X-API-KEY and no Authorization with credential api-key (AC27)', async () => {
     const fetchMock = stubFetch(json({ ok: 1 }));
     const apiKeyClient = createTinaCloudClient({

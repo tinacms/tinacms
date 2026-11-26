@@ -95,12 +95,18 @@ const bodyMessage = (body: unknown): string | undefined => {
 export class TinaCloudError extends Error {
   readonly status?: number;
   readonly body?: unknown;
+  /** TinaCloud answered, but its reply did not arrive before the request's signal ended it. */
+  readonly timedOut: boolean;
 
-  constructor(message: string, details: { status?: number; body?: unknown }) {
+  constructor(
+    message: string,
+    details: { status?: number; body?: unknown; timedOut?: boolean }
+  ) {
     super(message);
     this.name = 'TinaCloudError';
     this.status = details.status;
     this.body = details.body;
+    this.timedOut = details.timedOut ?? false;
   }
 
   /** The message TinaCloud sent in the response body, if any. */
@@ -190,9 +196,19 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       text = await response.text();
     } catch (cause) {
       // A refusal keeps its status even when its body is lost; only an OK reply cut short is a drop.
+      const status = response.ok ? undefined : response.status;
+      if (
+        cause instanceof Error &&
+        (cause.name === 'AbortError' || cause.name === 'TimeoutError')
+      ) {
+        throw new TinaCloudError('The TinaCloud request did not finish.', {
+          status,
+          timedOut: true,
+        });
+      }
       throw new TinaCloudError(
         `The TinaCloud reply was cut off: ${causeMessage(cause)}`,
-        response.ok ? {} : { status: response.status }
+        { status }
       );
     }
     const body = parseBody(text);
