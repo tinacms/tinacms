@@ -15,6 +15,7 @@ import { toast } from '@tinacms/ui/components/toast';
 import { use, useEffect, useMemo, useRef, useState } from 'react';
 import {
   readAnyFormDirty,
+  readSaveRunning,
   useAnyFormDirty,
   useSaveSummary,
 } from '../form/form-store';
@@ -58,6 +59,16 @@ type Outcome =
   | { kind: 'ready'; name: string };
 
 const DIRTY_REASON = 'Save or discard your changes first';
+const SAVING_REASON = 'Wait for the save to finish.';
+const waitsOnCreate = (message: string) =>
+  message.startsWith('Wait for ') && message !== SAVING_REASON;
+
+/** Why no branch action may run now: unsaved edits, or a save still running (its afterSave included). */
+const blockedReason = (): string | undefined => {
+  if (readAnyFormDirty()) return DIRTY_REASON;
+  if (readSaveRunning()) return SAVING_REASON;
+  return undefined;
+};
 
 const sameOutcome = (a: Outcome, b: Outcome): boolean =>
   a.kind === b.kind &&
@@ -88,6 +99,10 @@ function BranchControl() {
   const released = useRef<Outcome>(undefined);
   // The create the shell started, until its result arrives. A direct slice call leaves it empty.
   const started = useRef<{ via: 'form' | 'note'; name: string }>(undefined);
+  // A ready create whose auto-switch waits for the running save to end.
+  const switchAfterSave = useRef<{ outcome: Outcome; startedOn?: string }>(
+    undefined
+  );
   const entries = useBranchEntries(branch, open);
 
   const create = branch?.create;
@@ -109,8 +124,9 @@ function BranchControl() {
     via: 'form' | 'note' = 'form'
   ): boolean => {
     if (!create) return false;
-    if (readAnyFormDirty()) {
-      refuse(DIRTY_REASON);
+    const blocked = blockedReason();
+    if (blocked) {
+      refuse(blocked);
       return false;
     }
     const running = latest.current.branch?.creating;
@@ -132,9 +148,7 @@ function BranchControl() {
   };
   // One id per kind of refusal, so a message that changes (a renamed create) replaces its toast.
   const refusalToast = (message: string) => {
-    const id = message.startsWith('Wait for ')
-      ? 'refused:wait'
-      : `refused:${message}`;
+    const id = waitsOnCreate(message) ? 'refused:wait' : `refused:${message}`;
     refusalToasts.current.set(id, message);
     toast({ id, tone: 'warning', title: message });
   };
@@ -150,8 +164,9 @@ function BranchControl() {
   };
 
   const switchTo = (name: string): boolean => {
-    if (readAnyFormDirty()) {
-      refuse(DIRTY_REASON);
+    const blocked = blockedReason();
+    if (blocked) {
+      refuse(blocked);
       return false;
     }
     latest.current.branch?.switchTo(name);
@@ -164,11 +179,28 @@ function BranchControl() {
   useEffect(() => {
     if (!dirty) clearRefusals((message) => message === DIRTY_REASON);
   }, [dirty]);
+  useEffect(() => {
+    if (saving) return;
+    clearRefusals((message) => message === SAVING_REASON);
+    const waiting = switchAfterSave.current;
+    switchAfterSave.current = undefined;
+    const view = latest.current.branch;
+    if (
+      !waiting ||
+      waiting.outcome !== held ||
+      !view ||
+      view.name !== waiting.startedOn ||
+      blockedReason()
+    ) {
+      return;
+    }
+    setHeld(undefined);
+    view.switchTo(waiting.outcome.name);
+    setOpen(false);
+  }, [saving]);
   const running = branch?.creating?.name;
   useEffect(() => {
-    if (running === undefined) {
-      clearRefusals((message) => message.startsWith('Wait for '));
-    }
+    if (running === undefined) clearRefusals(waitsOnCreate);
   }, [running]);
 
   const currentName = branch?.name;
@@ -215,16 +247,20 @@ function BranchControl() {
       }
       setDeferred(undefined);
       const startedOn = began ?? view.defaultBranch;
-      if (
-        outcome === 'ready' &&
-        isOpen &&
-        view.name === startedOn &&
-        !readAnyFormDirty()
-      ) {
-        setHeld(undefined);
-        view.switchTo(name);
-        setOpen(false);
-        return;
+      if (outcome === 'ready' && isOpen && view.name === startedOn) {
+        const blocked = blockedReason();
+        if (!blocked) {
+          setHeld(undefined);
+          view.switchTo(name);
+          setOpen(false);
+          return;
+        }
+        if (blocked === SAVING_REASON) {
+          const ready: Outcome = { kind: 'ready', name };
+          switchAfterSave.current = { outcome: ready, startedOn };
+          setHeld(ready);
+          return;
+        }
       }
       setHeld({ kind: outcome, name });
     };
@@ -329,8 +365,9 @@ function BranchControl() {
         action: {
           label: `Switch to ${outcome.name}`,
           onClick: act(idOf, () => {
-            if (readAnyFormDirty()) {
-              refusalToast(DIRTY_REASON);
+            const blocked = blockedReason();
+            if (blocked) {
+              refusalToast(blocked);
               return false;
             }
             latest.current.branch?.switchTo(outcome.name);
@@ -353,8 +390,8 @@ function BranchControl() {
       onRetry={branch.retryList}
       branches={entries}
       disabled={saving}
-      blockedMessage={dirty ? 'Save or discard your changes first' : undefined}
-      onSwitch={branch.switchTo}
+      blockedMessage={dirty ? DIRTY_REASON : saving ? SAVING_REASON : undefined}
+      onSwitch={switchTo}
       open={open}
       onOpenChange={setOpen}
       onFormChange={(shown, typed) => {

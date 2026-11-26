@@ -1212,6 +1212,10 @@ export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
 /** Whether any form is dirty right now, for code that runs outside a render. */
 export const readAnyFormDirty = (): boolean => anyFormDirty(readFormStore());
 
+/** Whether a save is running right now (the summary reads `saving`), for code that runs outside a render. */
+export const readSaveRunning = (): boolean =>
+  summarizeSaves(readFormStore()).state === 'saving';
+
 export const useSaveAllState = (): SaveAllState =>
   useFormStore((state) => state.saveAll);
 

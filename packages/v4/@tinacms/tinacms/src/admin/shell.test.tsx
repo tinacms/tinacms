@@ -59,6 +59,7 @@ let failGet: boolean;
 let listError: boolean;
 let listCalls: number;
 let failAfterSave: boolean;
+let holdAfterSave: Promise<void> | undefined;
 let updateError: Error | undefined;
 let listOmits: string | undefined;
 let holdNextList: Promise<void> | undefined;
@@ -175,7 +176,8 @@ const auditPlugin = definePlugin({
             if (failBeforeSave) throw new Error('audit refused');
             return stampBeforeSave ? { ...document, audited: 'yes' } : document;
           },
-          afterSave: () => {
+          afterSave: async () => {
+            await holdAfterSave;
             if (failAfterSave) throw new Error('audit endpoint down');
           },
         }),
@@ -357,6 +359,7 @@ beforeEach(() => {
   listError = false;
   listCalls = 0;
   failAfterSave = false;
+  holdAfterSave = undefined;
   updateError = undefined;
   listOmits = undefined;
   holdNextList = undefined;
@@ -1953,6 +1956,82 @@ describe('branch switcher rows and creating a branch', () => {
     expect(row).toHaveAttribute('aria-disabled', 'true');
     await user.click(row);
     expect(screen.getByRole('button', { name: 'Branch: cms/y' })).toBeVisible();
+  });
+
+  it('refuses Switch to while an afterSave hook still runs, and switches once it ends', async () => {
+    useUnprotectedBranch();
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    let ready: () => void = () => {};
+    createBranch = async ({ name }) => ({
+      name,
+      ready: new Promise<void>((resolve) => {
+        ready = resolve;
+      }),
+    });
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    let endAfterSave: () => void = () => {};
+    holdAfterSave = new Promise<void>((resolve) => {
+      endAfterSave = resolve;
+    });
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(updates).toHaveLength(1));
+    expect(readAnyFormDirty()).toBe(false);
+    const formId = toFormId('content/posts/hello.mdx');
+
+    act(() => ready());
+    await user.click(
+      await screen.findByRole('button', { name: 'Switch to cms/x' })
+    );
+    expect(
+      screen.getByRole('button', { name: /^Branch: feature\/news/ })
+    ).toBeVisible();
+    expect(
+      await screen.findByText('Wait for the save to finish.')
+    ).toBeVisible();
+    expect(useFormStore.getState().forms[formId]).toBeDefined();
+    expect(useFormStore.getState().saves[formId]?.phase).toBe('saving');
+
+    act(() => endAfterSave());
+    await waitFor(() =>
+      expect(useFormStore.getState().saves[formId]?.phase).toBe('saved')
+    );
+    await waitFor(() =>
+      expect(screen.queryByText('Wait for the save to finish.')).toBeNull()
+    );
+    await user.click(screen.getByRole('button', { name: 'Switch to cms/x' }));
+    expect(screen.getByRole('button', { name: 'Branch: cms/x' })).toBeVisible();
+  });
+
+  it('holds the auto-switch to a ready branch until the running save ends', async () => {
+    let ready: () => void = () => {};
+    createBranch = async ({ name }) => ({
+      name,
+      ready: new Promise<void>((resolve) => {
+        ready = resolve;
+      }),
+    });
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    const formId = toFormId('content/posts/hello.mdx');
+    act(() =>
+      useFormStore.getState().setSavePhase(formId, { phase: 'saving' })
+    );
+    act(() => ready());
+    expect(await within(dialog).findByText(/cms\/x is ready/)).toBeVisible();
+    expect(screen.getByRole('button', { name: /^Branch: main/ })).toBeVisible();
+
+    act(() => useFormStore.getState().setSavePhase(formId, { phase: 'saved' }));
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Branch: cms/x' })
+      ).toBeVisible()
+    );
+    expect(screen.queryByRole('dialog', { name: 'Branches' })).toBeNull();
   });
 
   it('offers Switch in a toast when the pop-up was closed while the branch was made', async () => {
