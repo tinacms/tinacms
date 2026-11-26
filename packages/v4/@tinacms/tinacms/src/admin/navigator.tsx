@@ -3,7 +3,10 @@ import { Button } from '@tinacms/ui/components/button';
 import { NavRow } from '@tinacms/ui/components/nav-row';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { useEffect, useRef, useState } from 'react';
-import type { CollectionSchema } from '../core/schema/types';
+import {
+  type CollectionSchema,
+  isListedCollection,
+} from '../core/schema/types';
 import {
   useCollectionDocuments,
   useCollectionsDocumentPaths,
@@ -432,6 +435,10 @@ export function CollectionsNavigator({
     route.view === 'collections' && route.unsavedOnly === true;
   const unsavedIds = new Set<string>(useUnsavedFormIds());
   const hasUnsaved = unsavedIds.size > 0;
+  // The unsaved view keeps hidden collections, so their edits are not shown as gone.
+  const shown = unsavedOnly
+    ? collections
+    : collections.filter(isListedCollection);
   return (
     <aside aria-label='Navigator' className={PANE_CLASS}>
       <PanelHeader
@@ -451,7 +458,7 @@ export function CollectionsNavigator({
         }
       />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
-        {collections.length === 0 ? (
+        {shown.length === 0 ? (
           <EmptyState text='No collections yet.' />
         ) : unsavedOnly && !hasUnsaved ? (
           <EmptyState text='No unsaved documents.' />
@@ -472,7 +479,7 @@ export function CollectionsNavigator({
           </>
         ) : (
           <ul aria-label='Collections' className='m-0 list-none p-0'>
-            {collections.map((collection) => (
+            {shown.map((collection) => (
               <CollectionNode
                 key={collection.name}
                 collection={collection}

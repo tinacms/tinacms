@@ -7,6 +7,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import type { Tier } from '@tinacms/ui/hooks/use-tier';
 import { useTinaSchema } from '../../admin/hooks';
 import { useAdminRoute } from '../../admin/use-admin-route';
+import { isListedCollection } from '../../core/schema/types';
 import { useCollectionLists } from '../../editor/collection-lists';
 import { useCurrentBranch } from '../../editor/content-queries';
 import { useContentMode } from '../../editor/content-mode';
@@ -171,7 +172,7 @@ function Rows({
  * five rows and Show more.
  */
 export function RecentDocumentsPanel({ tier }: { tier: Tier }) {
-  const { collections } = useTinaSchema();
+  const collections = useTinaSchema().collections.filter(isListedCollection);
   const { lists, retryFailed } = useCollectionLists(
     collections.map(({ name }) => name)
   );

@@ -11,7 +11,7 @@ import {
   searchIndex,
 } from '../plugins/search/search.plugin';
 import type { SearchFields } from '../core/search/index-contract';
-import type { FieldSchema } from '../core/schema/types';
+import type { CollectionSchema, FieldSchema } from '../core/schema/types';
 import { tinaCloud } from '../plugins/tinacloud/tinacloud.plugin';
 import { LOCK_VERSION, checkLock, compileSchema } from './compile-schema';
 
@@ -553,6 +553,31 @@ describe('compileSchema collection actions', () => {
     expect(() =>
       compileSchema(configFor({ allowedActions: { delete: false } }))
     ).toThrow(/allowedActions\.delete, which v4 does not have/);
+  });
+
+  it('carries hidden into the lock, and adds no key when it is unset', () => {
+    expect(
+      compileSchema(configFor({ hidden: true })).schema.collections[0]
+    ).toMatchObject({ hidden: true });
+    expect(
+      compileSchema(configFor({ hidden: false })).schema.collections[0]
+    ).toMatchObject({ hidden: false });
+    expect(
+      compileSchema(configFor({})).schema.collections[0]
+    ).not.toHaveProperty('hidden');
+  });
+
+  it('refuses a hidden that is not true or false', () => {
+    const fromJs: Partial<CollectionSchema> = {
+      // @ts-expect-error hidden takes true or false
+      hidden: 'yes',
+    };
+    expect(() => compileSchema(configFor(fromJs))).toThrow(
+      'schema-collection-hidden-not-boolean: Collection "post" sets "hidden" to "yes". "hidden" takes true or false.'
+    );
+    expect(() => compileSchema(configFor({ hidden: 1 }))).toThrow(
+      /^schema-collection-hidden-not-boolean: Collection "post" sets "hidden" to 1\./
+    );
   });
 });
 

@@ -185,6 +185,17 @@ const assertAllowedActionNames = (collections: CollectionSchema[]): void => {
   }
 };
 
+const assertHiddenIsBoolean = (collections: CollectionSchema[]): void => {
+  for (const collection of collections) {
+    const hidden: unknown = collection.hidden;
+    invariant(
+      hidden === undefined || typeof hidden === 'boolean',
+      'schema-collection-hidden-not-boolean',
+      `Collection "${collection.name}" sets "hidden" to ${JSON.stringify(hidden)}. "hidden" takes true or false.`
+    );
+  }
+};
+
 const isArrayNode = (node: Record<string, unknown>): boolean =>
   node.type === ARRAY_FIELD_TYPE;
 
@@ -300,6 +311,7 @@ export const compileSchema = (config: ResolvedConfig): TinaLock => {
   assertSearchFields(config);
   assertNoDroppedOptions(config.schema.collections);
   assertAllowedActionNames(config.schema.collections);
+  assertHiddenIsBoolean(config.schema.collections);
   assertScalarItemsAreVisible(config.schema.collections);
   assertTemplatesArrayOptions(config.schema.collections);
   assertObjectDisplays(config.schema.collections);

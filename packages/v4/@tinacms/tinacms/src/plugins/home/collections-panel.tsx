@@ -8,6 +8,7 @@ import type { Tier } from '@tinacms/ui/hooks/use-tier';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTinaSchema } from '../../admin/hooks';
 import { useAdminRoute } from '../../admin/use-admin-route';
+import { isListedCollection } from '../../core/schema/types';
 import {
   type CollectionList,
   useCollectionLists,
@@ -20,7 +21,7 @@ const countOf = (list: CollectionList | undefined): string | undefined => {
 };
 
 export function CollectionsPanel({ tier }: { tier: Tier }) {
-  const { collections } = useTinaSchema();
+  const collections = useTinaSchema().collections.filter(isListedCollection);
   const { navigate } = useAdminRoute();
   const { lists, retryFailed } = useCollectionLists(
     collections.map(({ name }) => name)

@@ -238,6 +238,19 @@ export const lockableCollection = {
   ],
 } satisfies CollectionSchema;
 
+export const seoDefaultsCollection = {
+  name: 'seoDefaults',
+  label: 'SEO defaults',
+  path: 'content/seo',
+  description: 'Hidden from the Admin UI lists. It opens by URL.',
+  format: 'json',
+  hidden: true,
+  fields: [
+    t.string({ name: 'title', label: 'Default title' }),
+    t.string({ name: 'description', label: 'Default description' }),
+  ],
+} satisfies CollectionSchema;
+
 export default defineConfig({
   plugins: [
     localContentPlugin(),
@@ -254,6 +267,7 @@ export default defineConfig({
       checklistCollection,
       manyRequiredCollection,
       lockableCollection,
+      seoDefaultsCollection,
     ],
   },
 });

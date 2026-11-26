@@ -7,7 +7,10 @@ import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { Skeleton } from '@tinacms/ui/components/skeleton';
 import { useEffect, useRef } from 'react';
 import { useDocumentsPage } from '../../editor/collection-documents';
-import type { CollectionSchema } from '../../core/schema/types';
+import {
+  type CollectionSchema,
+  isListedCollection,
+} from '../../core/schema/types';
 import { plural } from '../collection-table/table-model';
 import { RowHint } from '../row-hint';
 import { useTinaSchema } from '../hooks';
@@ -65,7 +68,7 @@ function DocumentCount({
  * opening that collection's table.
  */
 export function CollectionsIndex() {
-  const { collections } = useTinaSchema();
+  const collections = useTinaSchema().collections.filter(isListedCollection);
   const { navigate } = useAdminRoute();
   const openCollection = (name: string) =>
     navigate({ view: 'collection', collection: name, maximised: true });
