@@ -1159,8 +1159,8 @@ test.describe('branch switcher pop-up', () => {
       // The button's distance below the form's top, so a scroll of the frame does not count.
       const gap = async () => {
         const [b, f] = await Promise.all([
-          busy.boundingBox(),
-          form.boundingBox(),
+          busy.boundingBox({ timeout: 200 }).catch(() => null),
+          form.boundingBox({ timeout: 200 }).catch(() => null),
         ]);
         return b && f ? Math.round(b.y - f.y) : undefined;
       };
