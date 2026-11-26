@@ -8,7 +8,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   AlertDialog,
@@ -292,7 +292,20 @@ describe('Tooltip, light', () => {
 });
 
 describe('Toast', () => {
-  afterEach(() => {
+  // sonner captures the pointer on press, which happy-dom does not implement.
+  const capture = Element.prototype.setPointerCapture;
+  beforeEach(() => {
+    Element.prototype.setPointerCapture = () => {};
+  });
+  // sonner unmounts a closed toast on a timer; let it run before the file's DOM goes away.
+  afterEach(async () => {
+    act(() => {
+      toast.dismiss();
+    });
+    await waitFor(() =>
+      expect(document.querySelectorAll('[data-sonner-toast]')).toHaveLength(0)
+    );
+    Element.prototype.setPointerCapture = capture;
     vi.useRealTimers();
   });
 
@@ -412,7 +425,6 @@ describe('Toast', () => {
   });
 
   it('runs onEnd for a swipe on a toast shown again under an id code just closed', async () => {
-    Element.prototype.setPointerCapture ??= () => {};
     const swiped = vi.fn();
     render(<Toaster />);
     act(() => {
@@ -434,7 +446,6 @@ describe('Toast', () => {
   });
 
   it('runs onEnd when the person swipes a toast away', async () => {
-    Element.prototype.setPointerCapture ??= () => {};
     const swiped = vi.fn();
     render(<Toaster />);
     act(() => {
