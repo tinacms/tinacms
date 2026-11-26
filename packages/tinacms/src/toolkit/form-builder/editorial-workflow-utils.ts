@@ -20,6 +20,33 @@ export interface MediaWorkflowConfirmBranchEvent {
   onSaveToProtectedBranch: () => void;
 }
 
+export interface EditorialWorkflowCompleteEvent {
+  type: 'editorial-workflow:complete';
+  branchName: string;
+  pullRequestUrl?: string;
+  isDraft: boolean;
+  collection: string;
+  /** The document's path relative to its collection, with its extension. */
+  relativePath: string;
+  crudType: string;
+}
+
+export const collectionListHash = (
+  collection: string,
+  relativePath: string
+): string => {
+  const folderPath = relativePath.includes('/')
+    ? relativePath.substring(0, relativePath.lastIndexOf('/'))
+    : '';
+  return `#/collections/${collection}${folderPath ? `/${folderPath}` : ''}`;
+};
+
+export const documentEditHash = (
+  collection: string,
+  relativePath: string
+): string =>
+  `#/collections/edit/${collection}/${relativePath.replace(/\.[^/.]+$/, '')}`;
+
 export const getEditorialWorkflowPrTitle = (branchName: string): string =>
   `${branchName.replace('tina/', '').replaceAll('-', ' ')} (PR from TinaCMS)`;
 

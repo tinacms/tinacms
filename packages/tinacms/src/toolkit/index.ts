@@ -74,3 +74,4 @@ export {
   sanitizeFilename,
 } from './components/media';
 export { MediaWorkflowOverlay } from './components/media/media-workflow-overlay';
+export { PullRequestCreatedOverlay } from './form-builder/pull-request-created-modal';
