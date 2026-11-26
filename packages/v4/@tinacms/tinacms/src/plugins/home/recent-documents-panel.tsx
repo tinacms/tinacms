@@ -185,7 +185,7 @@ export function RecentDocumentsPanel({ tier }: { tier: Tier }) {
   const panelId = useId();
   const isLoading = lists.some(({ status }) => status === 'loading');
   const hasFailed = lists.some(({ status }) => status === 'failed');
-  // A hidden collection keeps its unsaved rows and loses its dated ones.
+  // ADR-032 §3: a hidden collection keeps its unsaved rows and drops its saved ones.
   const rows =
     isLoading || hasFailed
       ? []

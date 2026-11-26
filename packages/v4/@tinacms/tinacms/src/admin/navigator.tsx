@@ -435,8 +435,7 @@ export function CollectionsNavigator({
     route.view === 'collections' && route.unsavedOnly === true;
   const unsavedIds = new Set<string>(useUnsavedFormIds());
   const hasUnsaved = unsavedIds.size > 0;
-  // The unsaved view keeps hidden collections so it can show their edits.
-  // The tree keeps the collection the route opens, so a hidden one stays reachable.
+  // ADR-032 §3: hidden collections stay in the unsaved view and while a route opens them.
   const shown = unsavedOnly
     ? collections
     : collections.filter(
