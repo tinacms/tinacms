@@ -223,6 +223,7 @@ function toast({ duration, onDismiss, onEnd, id, ...props }: ToastOptions) {
     }
   );
   shown.add(toastId);
+  closedByCode.delete(toastId);
   return toastId;
 }
 

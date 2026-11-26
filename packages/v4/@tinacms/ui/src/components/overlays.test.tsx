@@ -411,6 +411,28 @@ describe('Toast', () => {
     expect(all).not.toHaveBeenCalled();
   });
 
+  it('runs onEnd for a swipe on a toast shown again under an id code just closed', async () => {
+    Element.prototype.setPointerCapture ??= () => {};
+    const swiped = vi.fn();
+    render(<Toaster />);
+    act(() => {
+      toast({ id: 'again', tone: 'error', title: 'First' });
+    });
+    await screen.findByText('First');
+    act(() => {
+      toast.dismiss('again');
+      toast({ id: 'again', tone: 'error', title: 'Second', onEnd: swiped });
+    });
+    const item = (await screen.findByText('Second')).closest(
+      '[data-sonner-toast]'
+    ) as HTMLElement;
+    fireEvent.pointerDown(item, { clientX: 0, clientY: 0, button: 0 });
+    fireEvent.pointerMove(item, { clientX: 10, clientY: 0, button: 0 });
+    fireEvent.pointerMove(item, { clientX: 200, clientY: 0, button: 0 });
+    fireEvent.pointerUp(item, { clientX: 200, clientY: 0, button: 0 });
+    await waitFor(() => expect(swiped).toHaveBeenCalledOnce());
+  });
+
   it('runs onEnd when the person swipes a toast away', async () => {
     Element.prototype.setPointerCapture ??= () => {};
     const swiped = vi.fn();

@@ -176,16 +176,18 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       headers.set('Authorization', `Bearer ${token}`);
     }
     let response: Response;
+    let text: string;
     try {
       onSend?.();
       response = await fetch(url, { ...init, headers });
+      text = await response.text();
     } catch (cause) {
       throw new TinaCloudError(
         `The request to TinaCloud failed: ${causeMessage(cause)}`,
         {}
       );
     }
-    const body = parseBody(await response.text());
+    const body = parseBody(text);
     if (!response.ok) {
       throw new TinaCloudError(`TinaCloud responded with ${response.status}.`, {
         status: response.status,

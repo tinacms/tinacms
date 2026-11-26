@@ -409,6 +409,23 @@ describe('createBranch', () => {
     await done;
   });
 
+  it('counts a reply cut off mid-body while polling as an unknown status', async () => {
+    vi.useFakeTimers();
+    const cut = Object.assign(json({ status: 'inprogress' }), {
+      text: () => Promise.reject(new TypeError('connection reset')),
+    });
+    stubFetch(json({}), cut, json({ status: 'complete' }));
+    const made = await createTinaCloudClient({
+      clientId: 'abc',
+      getToken: async () => 'secret',
+      indexPollMs: 100,
+      indexTimeoutMs: 5000,
+    }).createBranch({ name: 'cms/x', from: 'main' });
+    const done = expect(made.ready).resolves.toBeUndefined();
+    await vi.advanceTimersByTimeAsync(1000);
+    await done;
+  });
+
   it('counts a dropped token refresh as an unknown status, not a lost session', async () => {
     vi.useFakeTimers();
     let calls = 0;
