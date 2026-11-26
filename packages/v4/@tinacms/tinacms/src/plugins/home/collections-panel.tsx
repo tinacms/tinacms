@@ -21,7 +21,8 @@ const countOf = (list: CollectionList | undefined): string | undefined => {
 };
 
 export function CollectionsPanel({ tier }: { tier: Tier }) {
-  const collections = useTinaSchema().collections.filter(isListedCollection);
+  const { collections: all } = useTinaSchema();
+  const collections = all.filter(isListedCollection);
   const { navigate } = useAdminRoute();
   const { lists, retryFailed } = useCollectionLists(
     collections.map(({ name }) => name)
@@ -81,7 +82,14 @@ export function CollectionsPanel({ tier }: { tier: Tier }) {
         />
       ) : null}
       {entries.length === 0 ? (
-        <EmptyState variant='plain' text='No collections yet.' />
+        <EmptyState
+          variant='plain'
+          text={
+            all.length === 0
+              ? 'No collections yet.'
+              : 'No collections are listed.'
+          }
+        />
       ) : tier === 'phone' ? (
         <ul
           aria-label='Collections'

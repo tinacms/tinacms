@@ -20,6 +20,7 @@ configure({ asyncUtilTimeout: 20_000 });
 
 const POST = 'content/posts/hello.mdx';
 const SEO = 'content/seos/defaults.mdx';
+const SEO_NESTED = 'content/seos/nested/inner.mdx';
 const hashOf = (collection: string, path: string) =>
   `#/collections/${collection}/${encodeURIComponent(path)}`;
 
@@ -37,7 +38,11 @@ const contentPlugin = definePlugin({
           connectionOf(
             Object.keys(files)
               .filter((path) => path.includes(`/${collection}s/`))
-              .map((path) => ({ path, updatedAt: '2026-11-20T00:00:00Z' }))
+              .map((path) => ({
+                path,
+                title: String(files[path]?.title ?? ''),
+                updatedAt: '2026-11-20T00:00:00Z',
+              }))
           ),
         get: async (
           _collection: string,
@@ -118,8 +123,7 @@ const homePanel = async (name: string | RegExp) =>
     })
   ).findByRole('region', { name });
 
-const titleInput = () =>
-  screen.findByLabelText(/^Title\b/, { selector: 'input' });
+const titleInput = () => screen.findByRole('textbox', { name: /^Title/ });
 
 const stubWidth = (width: number) =>
   vi.stubGlobal('matchMedia', (query: string) => ({
@@ -133,6 +137,7 @@ beforeEach(() => {
   files = {
     [POST]: { title: 'Hello', seo: SEO },
     [SEO]: { title: 'Defaults' },
+    [SEO_NESTED]: { title: 'Nested' },
   };
   writes = [];
   window.location.hash = '';
@@ -166,8 +171,8 @@ describe('a hidden collection in the lists', () => {
     await waitFor(() =>
       expect(within(rows).getAllByRole('button')).toHaveLength(1)
     );
-    expect(rows).toHaveTextContent('hello');
-    expect(rows).not.toHaveTextContent('defaults');
+    expect(rows).toHaveTextContent('Hello');
+    expect(rows).not.toHaveTextContent('Defaults');
 
     await goTo('#/collections');
     const tree = within(await findCollectionTree());
@@ -196,22 +201,24 @@ describe('a hidden collection in the lists', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows No collections yet. everywhere when every collection is hidden, and still opens one by URL', async () => {
+  it('says No collections are listed. everywhere when every collection is hidden, and still opens one by URL', async () => {
     window.location.hash = '#/';
     renderAdmin([seo()]);
     const collections = await homePanel('Collections 0');
-    expect(within(collections).getByText('No collections yet.')).toBeVisible();
+    expect(
+      within(collections).getByText('No collections are listed.')
+    ).toBeVisible();
 
     await goTo('#/collections');
     expect(
-      await within(await navigator()).findByText('No collections yet.')
+      await within(await navigator()).findByText('No collections are listed.')
     ).toBeVisible();
 
     await goTo('#/collections?max');
     expect(
       await within(
         await screen.findByRole('region', { name: 'Collections' })
-      ).findByText('No collections yet.')
+      ).findByText('No collections are listed.')
     ).toBeVisible();
 
     await goTo('#/collections/seo?max');
@@ -238,7 +245,7 @@ describe('a hidden collection by URL', () => {
     const table = await screen.findByRole('region', {
       name: 'SEO defaults documents',
     });
-    expect(await within(table).findByText('defaults.mdx')).toBeVisible();
+    expect(await within(table).findByText('Defaults')).toBeVisible();
     expect(screen.queryByText('Collection not found')).toBeNull();
 
     await goTo(hashOf('seo', SEO));
@@ -249,6 +256,74 @@ describe('a hidden collection by URL', () => {
     await waitFor(() => expect(writes).toEqual([SEO]));
     expect(files[SEO]).toMatchObject({ title: 'Defaults v2' });
     expect(screen.queryByText('Collection not found')).toBeNull();
+  });
+
+  it('shows the collection it opens in the tree on its plain route, at every width', async () => {
+    for (const width of [1440, 900, 390]) {
+      stubWidth(width);
+      window.location.hash = '#/collections/seo';
+      const view = renderAdmin();
+      const tree = within(await findCollectionTree());
+      expect(
+        tree.getByRole('button', { name: 'SEO defaults' })
+      ).toHaveAttribute('aria-expanded', 'true');
+      expect(
+        within(
+          await tree.findByRole('list', { name: 'SEO defaults documents' })
+        ).getByRole('button', { name: 'defaults.mdx' })
+      ).toBeVisible();
+      view.unmount();
+    }
+  });
+
+  it('keeps the collection in the tree after Restore on its table', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/collections/seo?max';
+    renderAdmin();
+    await screen.findByRole('region', { name: 'SEO defaults documents' });
+    await user.click(screen.getByRole('button', { name: 'Restore' }));
+    await waitFor(() => expect(window.location.hash).toBe('#/collections/seo'));
+    const tree = within(await findCollectionTree());
+    expect(tree.getByRole('button', { name: 'SEO defaults' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
+    expect(
+      within(
+        await tree.findByRole('list', { name: 'SEO defaults documents' })
+      ).getByRole('button', { name: 'defaults.mdx' })
+    ).toBeVisible();
+  });
+
+  it('opens a folder of the collection', async () => {
+    window.location.hash = '#/collections/seo/folder/nested';
+    renderAdmin();
+    const table = await screen.findByRole('region', {
+      name: 'SEO defaults documents',
+    });
+    expect(await within(table).findByText('Nested')).toBeVisible();
+  });
+
+  it('keeps an unsaved edit in Recent documents, with no saved rows of the collection', async () => {
+    const user = userEvent.setup();
+    window.location.hash = hashOf('seo', SEO);
+    renderAdmin();
+    const title = await titleInput();
+    await waitFor(() => expect(title).toHaveValue('Defaults'));
+    await user.type(title, ' v2');
+
+    await goTo('#/');
+    const recent = await homePanel('Recent documents');
+    const rows = await within(recent).findByRole('list', {
+      name: 'Recent documents',
+    });
+    await waitFor(() =>
+      expect(
+        within(rows)
+          .getAllByRole('button')
+          .map((row) => row.textContent)
+      ).toEqual(['DefaultsUnsaved', expect.stringMatching(/^Hello/)])
+    );
   });
 
   it('keeps an unsaved edit in Show unsaved only and in Save all, not under documents that are gone', async () => {
@@ -266,6 +341,15 @@ describe('a hidden collection by URL', () => {
     expect(
       within(unsaved).getByRole('button', { name: /defaults\.mdx/ })
     ).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Collections menu' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Show all documents' })
+    );
+    await within(await findCollectionTree()).findByRole('button', {
+      name: 'Posts',
+    });
+    await goTo('#/collections?unsaved');
+    await screen.findByRole('list', { name: 'SEO defaults unsaved documents' });
     expect(
       screen.queryByRole('list', { name: 'Edits for documents that are gone' })
     ).toBeNull();
@@ -280,17 +364,17 @@ describe('a reference to a hidden collection', () => {
     const user = userEvent.setup();
     window.location.hash = hashOf('post', POST);
     renderAdmin();
-    const field = await screen.findByLabelText(/^SEO\b/);
-    await waitFor(() => expect(field).toHaveValue(SEO));
+    const field = await screen.findByRole('combobox', { name: /^SEO/ });
+    await waitFor(() => expect(field).toHaveValue('Defaults'));
     expect(screen.queryByText('This document no longer exists.')).toBeNull();
 
     await user.click(screen.getByRole('button', { name: 'Clear' }));
     await user.click(field);
     await user.click(
       await screen.findByRole('option', {
-        name: /^content\/seos\/defaults\.mdx\s/,
+        name: /^Defaults\s/,
       })
     );
-    expect(field).toHaveValue(SEO);
+    expect(field).toHaveValue('Defaults');
   });
 });

@@ -172,7 +172,10 @@ function Rows({
  * five rows and Show more.
  */
 export function RecentDocumentsPanel({ tier }: { tier: Tier }) {
-  const collections = useTinaSchema().collections.filter(isListedCollection);
+  const { collections } = useTinaSchema();
+  const listed = new Set(
+    collections.filter(isListedCollection).map(({ name }) => name)
+  );
   const { lists, retryFailed } = useCollectionLists(
     collections.map(({ name }) => name)
   );
@@ -182,8 +185,17 @@ export function RecentDocumentsPanel({ tier }: { tier: Tier }) {
   const panelId = useId();
   const isLoading = lists.some(({ status }) => status === 'loading');
   const hasFailed = lists.some(({ status }) => status === 'failed');
-  const rows = isLoading || hasFailed ? [] : recentRowsOf(lists, unsavedIds);
-  const hasDocuments = lists.some(({ documents }) => documents.length > 0);
+  // A hidden collection keeps its unsaved rows and loses its dated ones.
+  const rows =
+    isLoading || hasFailed
+      ? []
+      : recentRowsOf(lists, unsavedIds).filter(
+          (row) => row.unsaved || listed.has(row.collection)
+        );
+  const hasDocuments = lists.some(
+    ({ collection, documents }) =>
+      listed.has(collection) && documents.length > 0
+  );
   const isUnavailable = rows.length === 0 && hasDocuments;
   const problem = hasFailed
     ? "Couldn't load recent documents."

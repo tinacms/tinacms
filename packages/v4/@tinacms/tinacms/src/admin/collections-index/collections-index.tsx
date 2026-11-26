@@ -68,7 +68,8 @@ function DocumentCount({
  * opening that collection's table.
  */
 export function CollectionsIndex() {
-  const collections = useTinaSchema().collections.filter(isListedCollection);
+  const { collections: all } = useTinaSchema();
+  const collections = all.filter(isListedCollection);
   const { navigate } = useAdminRoute();
   const openCollection = (name: string) =>
     navigate({ view: 'collection', collection: name, maximised: true });
@@ -122,7 +123,11 @@ export function CollectionsIndex() {
             caption='Collections'
             columns={[...COLUMNS]}
             rows={rows}
-            emptyText='No collections yet.'
+            emptyText={
+              all.length === 0
+                ? 'No collections yet.'
+                : 'No collections are listed.'
+            }
           />
         </div>
       </div>
