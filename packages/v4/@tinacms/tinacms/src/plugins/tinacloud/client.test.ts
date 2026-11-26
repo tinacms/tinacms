@@ -409,6 +409,41 @@ describe('createBranch', () => {
     await done;
   });
 
+  const cutOff = (status: number) =>
+    Object.assign(json({ message: 'nope' }, status), {
+      text: () => Promise.reject(new TypeError('connection reset')),
+    });
+
+  it.each([
+    [409, 'exists'],
+    [422, 'refused'],
+    [401, 'auth'],
+    [403, 'forbidden'],
+    [503, 'timeout'],
+  ])(
+    'keeps the reason of a create answered %s whose body is cut off: %s',
+    async (status, reason) => {
+      stubFetch(cutOff(status));
+      await expect(
+        client().createBranch({ name: 'cms/x', from: 'main' })
+      ).rejects.toMatchObject({ reason });
+    }
+  );
+
+  it('ends polling at once on a 401 whose body is cut off', async () => {
+    vi.useFakeTimers();
+    stubFetch(json({}), cutOff(401), json({ status: 'complete' }));
+    const made = await createTinaCloudClient({
+      clientId: 'abc',
+      getToken: async () => 'secret',
+      indexPollMs: 100,
+      indexTimeoutMs: 5000,
+    }).createBranch({ name: 'cms/x', from: 'main' });
+    const done = expect(made.ready).rejects.toMatchObject({ status: 401 });
+    await vi.advanceTimersByTimeAsync(1000);
+    await done;
+  });
+
   it('counts a reply cut off mid-body while polling as an unknown status', async () => {
     vi.useFakeTimers();
     const cut = Object.assign(json({ status: 'inprogress' }), {

@@ -176,15 +176,23 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
       headers.set('Authorization', `Bearer ${token}`);
     }
     let response: Response;
-    let text: string;
     try {
       onSend?.();
       response = await fetch(url, { ...init, headers });
-      text = await response.text();
     } catch (cause) {
       throw new TinaCloudError(
         `The request to TinaCloud failed: ${causeMessage(cause)}`,
         {}
+      );
+    }
+    let text: string;
+    try {
+      text = await response.text();
+    } catch (cause) {
+      // A refusal keeps its status even when its body is lost; only an OK reply cut short is a drop.
+      throw new TinaCloudError(
+        `The TinaCloud reply was cut off: ${causeMessage(cause)}`,
+        response.ok ? {} : { status: response.status }
       );
     }
     const body = parseBody(text);
