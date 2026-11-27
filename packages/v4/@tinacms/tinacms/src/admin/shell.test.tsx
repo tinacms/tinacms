@@ -795,6 +795,29 @@ describe('branches', () => {
     ).toHaveValue('Hello!');
   });
 
+  it('waits for a running save before falling back from a gone branch', async () => {
+    localStorage.setItem(
+      'tina-store',
+      JSON.stringify({ state: { branch: { current: 'deleted' } }, version: 0 })
+    );
+    useFormStore.getState().beginSave();
+    renderAdmin();
+    await waitFor(() => expect(listCalls).toBe(1));
+    await act(async () => {});
+    expect(screen.queryByText('Branch "deleted" no longer exists')).toBeNull();
+    expect(
+      screen.getByRole('button', { name: /^Branch: deleted/ })
+    ).toBeVisible();
+
+    act(() => useFormStore.getState().endSave());
+    expect(
+      await screen.findByText('Branch "deleted" no longer exists')
+    ).toBeVisible();
+    expect(
+      await screen.findByRole('button', { name: /^Branch: main/ })
+    ).toBeVisible();
+  });
+
   it('falls back to the default branch with a toast when the saved branch is gone', async () => {
     localStorage.setItem(
       'tina-store',
@@ -1332,9 +1355,6 @@ describe('Save to new branch', () => {
       name: /^Branch: docs\/hello-edits/,
     });
     expect(branch).toBeDisabled();
-    expect(
-      useFormStore.getState().saves[toFormId('content/posts/hello.mdx')]?.phase
-    ).toBe('saving');
 
     await act(async () => endAfterSave());
     await waitFor(() =>
@@ -1342,6 +1362,57 @@ describe('Save to new branch', () => {
         screen.getByRole('button', { name: /^Branch: docs\/hello-edits/ })
       ).toBeEnabled()
     );
+  });
+
+  it('keeps the branch button off while a second save on the new branch outlives the first', async () => {
+    withAction();
+    let endFirst: () => void = () => {};
+    holdAfterSave = new Promise<void>((resolve) => {
+      endFirst = resolve;
+    });
+    const { user, dialog } = await openProtectedDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(switchCalls).toEqual(['docs/hello-edits']));
+    let endSecond: () => void = () => {};
+    holdAfterSave = new Promise<void>((resolve) => {
+      endSecond = resolve;
+    });
+    await user.type(await screen.findByLabelText(/^Title\b/), '?');
+    await pressSave(user);
+    const branch = () =>
+      screen.getByRole('button', { name: /^Branch: docs\/hello-edits/ });
+
+    await act(async () => endFirst());
+    expect(branch()).toBeDisabled();
+    await act(async () => endSecond());
+    await waitFor(() => expect(branch()).toBeEnabled());
+  });
+
+  it('frees the branch button when a save on the new branch is refused as invalid during the first afterSave', async () => {
+    withAction();
+    let endFirst: () => void = () => {};
+    holdAfterSave = new Promise<void>((resolve) => {
+      endFirst = resolve;
+    });
+    const { user, dialog } = await openProtectedDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(switchCalls).toEqual(['docs/hello-edits']));
+    await user.clear(await screen.findByLabelText(/^Title\b/));
+    await act(async () => {
+      fireEvent.click(
+        within(
+          document.querySelector('[data-slot=form-bar]') as HTMLElement
+        ).getByRole('button', { name: /^Save/ })
+      );
+      endFirst();
+    });
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /^Branch: docs\/hello-edits/ })
+      ).toBeEnabled()
+    );
+    expect(within(statusBar()).queryByText('Saving…')).toBeNull();
   });
 
   it('saves to the new branch in one call with the beforeSave change, then switches to it', async () => {

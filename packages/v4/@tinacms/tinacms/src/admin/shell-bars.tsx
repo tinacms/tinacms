@@ -17,6 +17,7 @@ import {
   readAnyFormDirty,
   readSaveRunning,
   useAnyFormDirty,
+  useSaveRunning,
   useSaveSummary,
 } from '../form/form-store';
 import { TinaRuntimeContext } from '../editor/context';
@@ -84,7 +85,7 @@ const sameOutcome = (a: Outcome, b: Outcome): boolean =>
 function BranchControl() {
   const runtime = use(TinaRuntimeContext);
   const branch = useBranchView();
-  const saving = useSaveSummary().state === 'saving';
+  const saving = useSaveRunning();
   const dirty = useAnyFormDirty();
   const [open, setOpen] = useState(false);
   const [held, setHeld] = useState<Outcome>();

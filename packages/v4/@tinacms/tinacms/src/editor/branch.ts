@@ -13,8 +13,23 @@ import {
   madeBranchesOf,
   tickClock,
 } from '../core/branch/create';
+import { readSaveRunning, useFormStore } from '../form/form-store';
 import { TinaRuntimeContext } from './context';
 import { useOptionalContentSlice, useTinaStore } from './hooks';
+
+// Runs `run` once no save is running, so a save's afterSave never ends on another branch. Returns a cancel.
+const whenNoSaveRuns = (run: () => void): (() => void) => {
+  if (!readSaveRunning()) {
+    run();
+    return () => {};
+  }
+  const stop = useFormStore.subscribe(() => {
+    if (readSaveRunning()) return;
+    stop();
+    run();
+  });
+  return stop;
+};
 
 // A saved branch the provider no longer lists falls back to the default with a toast.
 export function useBranchSync(): void {
@@ -33,6 +48,7 @@ export function useBranchSync(): void {
     const source = content.branches;
     if (!source) return;
     let cancelled = false;
+    let stopWaiting = () => {};
     const { create } = source;
     fill({
       mode: 'branches',
@@ -90,20 +106,24 @@ export function useBranchSync(): void {
           ),
         });
         const current = currentBranchOf(store.getState());
-        if (current && current === fallback) {
-          branchSliceOf(store.getState())?.switchTo(undefined);
-        } else if (
-          current &&
+        const gone =
+          current !== undefined &&
+          current !== fallback &&
           !branches.some((branch) => branch.name === current) &&
-          !kept.includes(current)
-        ) {
+          !kept.includes(current);
+        if (!current || (current !== fallback && !gone)) return;
+        stopWaiting = whenNoSaveRuns(() => {
+          if (cancelled || currentBranchOf(store.getState()) !== current) {
+            return;
+          }
           branchSliceOf(store.getState())?.switchTo(undefined);
+          if (!gone) return;
           toast({
             tone: 'warning',
             title: `Branch "${current}" no longer exists`,
             text: fallback ? `Switched to ${fallback}.` : undefined,
           });
-        }
+        });
       },
       (cause: unknown) => {
         if (cancelled) return;
@@ -113,6 +133,7 @@ export function useBranchSync(): void {
     );
     return () => {
       cancelled = true;
+      stopWaiting();
     };
   }, [runtime, content, attempt]);
 }

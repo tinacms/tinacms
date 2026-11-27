@@ -124,6 +124,8 @@ export interface FormStore {
   forms: Partial<Record<FormId, OpenForm>>;
   /** The latest save of each form, with a counter so the newest wins. */
   saves: Partial<Record<FormId, SavePhase & { readonly at: number }>>;
+  /** Saves still running, afterSave included. A branch switch does not reset it, as a save can move branch itself. */
+  savesRunning: number;
   branch: string | undefined;
   /** Counts changes to stored drafts, so lists of them refresh. */
   draftsVersion: number;
@@ -166,6 +168,8 @@ export interface FormStore {
    */
   discardWaiting: (formId: FormId, discarded?: readonly StoredDraft[]) => void;
   setBranch: (branch: string | undefined) => void;
+  beginSave: () => void;
+  endSave: () => void;
   setSavePhase: (formId: FormId, phase: SavePhase) => void;
   clearSavePhase: (formId: FormId) => void;
   restoreSavePhase: (
@@ -390,6 +394,8 @@ const DEVTOOLS_STORE_NAME = 'TinaFormStore';
 const DEVTOOLS_ACTION = {
   setUserId: 'form/setUserId',
   setBranch: 'form/setBranch',
+  beginSave: 'form/beginSave',
+  endSave: 'form/endSave',
   discardStoredDraft: 'form/discardStoredDraft',
   discardWaiting: 'form/discardWaiting',
   storage: 'form/storage',
@@ -431,6 +437,7 @@ export const useFormStore = create<FormStore>()(
         userId: undefined,
         forms: {},
         saves: {},
+        savesRunning: 0,
         branch: undefined,
         draftsVersion: 0,
         waiting: {},
@@ -607,12 +614,7 @@ export const useFormStore = create<FormStore>()(
             return {
               branch,
               forms: {},
-              // A save that moves branch itself (Save to new branch) still runs its afterSave here.
-              saves: Object.fromEntries(
-                formEntries(state.saves).filter(
-                  ([, save]) => save.phase === 'saving'
-                )
-              ),
+              saves: {},
               waiting: {},
               held: {},
               unstored: {},
@@ -628,6 +630,18 @@ export const useFormStore = create<FormStore>()(
               saveAll: IDLE_SAVE_ALL,
             };
           }, DEVTOOLS_ACTION.setBranch),
+
+        beginSave: () =>
+          apply(
+            (state) => ({ savesRunning: state.savesRunning + 1 }),
+            DEVTOOLS_ACTION.beginSave
+          ),
+
+        endSave: () =>
+          apply(
+            (state) => ({ savesRunning: Math.max(0, state.savesRunning - 1) }),
+            DEVTOOLS_ACTION.endSave
+          ),
 
         setSavePhase: (formId, phase) =>
           apply((state) => {
@@ -1217,9 +1231,14 @@ export const useAnyFormDirty = (): boolean => useFormStore(anyFormDirty);
 /** Whether any form is dirty right now, for code that runs outside a render. */
 export const readAnyFormDirty = (): boolean => anyFormDirty(readFormStore());
 
-/** Whether a save is running right now (the summary reads `saving`), for code that runs outside a render. */
-export const readSaveRunning = (): boolean =>
-  summarizeSaves(readFormStore()).state === 'saving';
+const saveRunning = (state: FormStore): boolean =>
+  state.savesRunning > 0 || summarizeSaves(state).state === 'saving';
+
+/** Whether any save is still running, afterSave included, even across the branch switch a save makes itself. */
+export const useSaveRunning = (): boolean => useFormStore(saveRunning);
+
+/** `useSaveRunning` for code that runs outside a render. */
+export const readSaveRunning = (): boolean => saveRunning(readFormStore());
 
 export const useSaveAllState = (): SaveAllState =>
   useFormStore((state) => state.saveAll);
