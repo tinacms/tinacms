@@ -31,8 +31,8 @@ Item field plugins are therefore **always single-valued**; the array plugin owns
 Field **content values are JSON-native**, so the generic adapter stores them as-is and the field component interprets them client-side. The per-`format` **Format adapter** is the *only* serialization layer — it maps document JSON ↔ file (frontmatter/body split, rich-text↔markdown, MDX embeds). Built-in adapters run everywhere; a **custom file format is a custom adapter — self-hosted-only** (ADR-015).
 
 ### 6. Validation = two tiers
-- **Declarative rules** (`required`/`min`/`max`/`pattern`/`enum`) serialize into the lock → **enforceable everywhere, including TinaCloud**.
-- **Custom `validate` functions** (field-level *and* document-level, run via the `beforeSave` pipeline, ADR-014) → **client-UX everywhere**. Registered as a **server hook**, they are **server-enforced on the Backend** for every Data Layer, managed TinaCloud included ([ADR-028](./028-server-save-hooks.md)).
+- **Declarative rules** (`required`/`min`/`max`/`pattern`/`enum`) serialize into the lock → **enforceable everywhere, including TinaCloud**. TinaCloud does not enforce them yet. The Backend runs `required`, `min`, `max` and `pattern` for a collection that saves through it ([ADR-028](./028-server-save-hooks.md) §9).
+- **Custom `validate` functions** (field-level *and* document-level, run via the `beforeSave` pipeline, ADR-014) → **client-UX everywhere**. Registered as a **custom validator** or a **server hook**, they are **server-enforced on the Backend** for every Data Layer, managed TinaCloud included ([ADR-028](./028-server-save-hooks.md) §9).
 
 ## Consequences
 

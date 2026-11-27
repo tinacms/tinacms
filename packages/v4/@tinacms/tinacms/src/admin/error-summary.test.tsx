@@ -250,10 +250,24 @@ beforeEach(() => {
   window.location.hash = `#/collections/note/${encodeURIComponent(PATH)}`;
   useFormStore.setState({ forms: {} });
   localStorage.clear();
+  // The `codeIsOk` validator is custom, so the `note` collection saves through the
+  // site's server route. This stands in for that route.
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (_url: string, init?: RequestInit) => {
+      const { path, value } = JSON.parse(String(init?.body));
+      saved.push(value);
+      return Response.json({
+        entry: { path, document: value },
+        hookWarnings: [],
+      });
+    })
+  );
 });
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllGlobals();
 });
 
 const titleInput = () => screen.findByLabelText(/^Title\b/);
@@ -1150,9 +1164,8 @@ describe('a phone', () => {
     const user = await blockOnTwoFields();
     await errorsSheet();
     await user.click(screen.getByRole('button', { name: 'Close' }));
-    const resolve = await screen.findByRole('button', {
-      name: 'Resolve 2 errors',
-    });
+    // On a phone the form bar says "2 errors" for "Resolve 2 errors".
+    const resolve = await screen.findByRole('button', { name: '2 errors' });
     await waitFor(() => expect(resolve).toHaveFocus());
     await user.click(resolve);
     expect(await errorsSheet()).toBeVisible();

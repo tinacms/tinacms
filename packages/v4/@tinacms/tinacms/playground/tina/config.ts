@@ -10,6 +10,7 @@ import {
   type RichTextFieldSchema,
   t,
 } from '@tinacms/tinacms';
+import { navDemoPlugin } from './nav-demo';
 
 export const authorCollection = {
   name: 'author',
@@ -200,8 +201,63 @@ export const checklistCollection = {
   ],
 } satisfies CollectionSchema;
 
+export const manyRequiredCollection = {
+  name: 'manyrequired',
+  label: 'Many required',
+  path: 'content/manyrequired',
+  description: 'Twelve required fields, for the error count.',
+  format: 'mdx',
+  fields: [
+    t.string({ name: 'note', label: 'Note' }),
+    ...Array.from({ length: 12 }, (_, index) =>
+      t.string({
+        name: `f${index + 1}`,
+        label: `Field ${index + 1}`,
+        validators: [required()],
+      })
+    ),
+  ],
+} satisfies CollectionSchema;
+
+const lockItem = [t.string({ name: 'text', label: 'Text' })];
+
+export const lockableCollection = {
+  name: 'lockable',
+  label: 'Lockable',
+  path: 'content/lockable',
+  description: 'One list that can be edited and one that is disabled.',
+  format: 'mdx',
+  fields: [
+    t.array({ name: 'open', label: 'Open list', fields: lockItem }),
+    t.array({
+      name: 'locked',
+      label: 'Locked list',
+      disabled: true,
+      fields: lockItem,
+    }),
+  ],
+} satisfies CollectionSchema;
+
+export const seoDefaultsCollection = {
+  name: 'seoDefaults',
+  label: 'SEO defaults',
+  path: 'content/seo',
+  description: 'Hidden from the Admin UI lists. It opens by URL.',
+  format: 'json',
+  hidden: true,
+  fields: [
+    t.string({ name: 'title', label: 'Default title' }),
+    t.string({ name: 'description', label: 'Default description' }),
+  ],
+} satisfies CollectionSchema;
+
 export default defineConfig({
-  plugins: [localContentPlugin(), localMediaPlugin(), mediaManagerPlugin()],
+  plugins: [
+    localContentPlugin(),
+    localMediaPlugin(),
+    mediaManagerPlugin(),
+    navDemoPlugin,
+  ],
   schema: {
     collections: [
       postCollection,
@@ -209,6 +265,9 @@ export default defineConfig({
       authorCollection,
       globalCollection,
       checklistCollection,
+      manyRequiredCollection,
+      lockableCollection,
+      seoDefaultsCollection,
     ],
   },
 });

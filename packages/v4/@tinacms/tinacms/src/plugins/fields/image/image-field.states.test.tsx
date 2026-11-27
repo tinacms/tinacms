@@ -257,6 +257,152 @@ describe('image field states', () => {
   });
 });
 
+describe('image field look', () => {
+  it('shows a plain field 4:3 and a cover in its own shape', () => {
+    const { unmount } = render(
+      <ImageFieldView {...imageFieldState('filled')} />
+    );
+    const box = () => screen.getByAltText('about.png').parentElement;
+    expect(box()).toHaveClass('aspect-4/3');
+    expect(box()).not.toHaveClass('max-w-xs');
+    unmount();
+    render(<ImageFieldView {...imageFieldState('cover wide')} />);
+    expect(box()).toHaveClass('aspect-video');
+  });
+
+  it('holds the empty drop area to the shape of its picture', () => {
+    render(<ImageFieldView {...imageFieldState('empty')} />);
+    const area = screen.getByRole('button', { name: 'Choose from Media' })
+      .parentElement?.parentElement;
+    expect(area).toHaveClass('aspect-4/3');
+  });
+
+  it('keeps Replace and Remove in the Tab order while hidden', async () => {
+    render(<ImageFieldView {...imageFieldState('filled')} />);
+    await userEvent.tab();
+    expect(
+      screen.getByRole('button', { name: 'Replace about.png' })
+    ).toHaveFocus();
+    await userEvent.tab();
+    expect(
+      screen.getByRole('button', { name: 'Remove about.png' })
+    ).toHaveFocus();
+  });
+
+  it('reveals the actions after a tap and hides them when a tap lands elsewhere', () => {
+    render(<ImageFieldView {...imageFieldState('filled')} />);
+    const actions = screen.getByRole('button', {
+      name: 'Replace about.png',
+    }).parentElement;
+    expect(actions).not.toHaveAttribute('data-revealed');
+    fireEvent.pointerDown(screen.getByAltText('about.png'), {
+      pointerType: 'touch',
+    });
+    expect(actions).toHaveAttribute('data-revealed');
+    fireEvent.pointerDown(document.body, { pointerType: 'touch' });
+    expect(actions).not.toHaveAttribute('data-revealed');
+  });
+
+  it('does not run a hidden Remove on the tap that reveals it, but runs it on the next tap', () => {
+    const onRemove = vi.fn();
+    render(
+      <ImageFieldView {...imageFieldState('filled')} onRemove={onRemove} />
+    );
+    const remove = screen.getByRole('button', { name: 'Remove about.png' });
+    expect(remove.parentElement).toHaveClass('pointer-events-none');
+    fireEvent.pointerDown(remove, { pointerType: 'touch' });
+    fireEvent.click(remove);
+    expect(onRemove).not.toHaveBeenCalled();
+    fireEvent.pointerDown(remove, { pointerType: 'touch' });
+    fireEvent.click(remove);
+    expect(onRemove).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ['a cancelled touch', () => ({ type: 'cancel' as const })],
+    ['a later mouse press', () => ({ type: 'mouse' as const })],
+  ])(
+    'runs Remove on a click after %s left the first tap unspent',
+    (_name, next) => {
+      const onRemove = vi.fn();
+      render(
+        <ImageFieldView {...imageFieldState('filled')} onRemove={onRemove} />
+      );
+      const remove = screen.getByRole('button', { name: 'Remove about.png' });
+      fireEvent.pointerDown(remove, { pointerType: 'touch' });
+      const { type } = next();
+      if (type === 'cancel') fireEvent.pointerCancel(remove);
+      else fireEvent.pointerDown(remove, { pointerType: 'mouse' });
+      fireEvent.click(remove);
+      expect(onRemove).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it('does not reveal the actions for a mouse press', () => {
+    render(<ImageFieldView {...imageFieldState('filled')} />);
+    fireEvent.pointerDown(screen.getByAltText('about.png'), {
+      pointerType: 'mouse',
+    });
+    expect(
+      screen.getByRole('button', { name: 'Replace about.png' }).parentElement
+    ).not.toHaveAttribute('data-revealed');
+  });
+
+  it('shows the choosing look on a chosen picture', () => {
+    render(<ImageFieldView {...imageFieldState('choosing')} />);
+    expect(screen.getByText('Choosing in the picker')).toBeVisible();
+    expect(screen.getByAltText('about.png').parentElement).toHaveClass(
+      'border-field-active-border'
+    );
+  });
+
+  it('shows the choosing look on the empty drop area', () => {
+    render(<ImageFieldView {...imageFieldState('choosing and empty')} />);
+    const group = screen.getByRole('group');
+    expect(within(group).getByText('Choosing in the picker')).toBeVisible();
+    const area = within(group).getByRole('button', {
+      name: 'Choose from Media',
+    }).parentElement?.parentElement;
+    expect(area).toHaveClass('border-field-active-border');
+  });
+
+  it('keeps the invalid border over the choosing border', () => {
+    render(
+      <ImageFieldView
+        {...imageFieldState('choosing')}
+        errors={['Hero must be a media path']}
+      />
+    );
+    const box = screen.getByAltText('about.png').parentElement;
+    expect(box).toHaveClass('border-destructive');
+    expect(box).not.toHaveClass('border-field-active-border');
+  });
+
+  it.each([{ disabled: true }, { readOnly: true }])(
+    'never shows the choosing look when %o',
+    (inertProps) => {
+      render(
+        <ImageFieldView {...imageFieldState('choosing')} {...inertProps} />
+      );
+      expect(screen.queryByText('Choosing in the picker')).toBeNull();
+      expect(screen.getByAltText('about.png').parentElement).not.toHaveClass(
+        'border-field-active-border'
+      );
+    }
+  );
+
+  it('tells the host when the picture is missing', () => {
+    const onMissingChange = vi.fn();
+    render(
+      <ImageFieldView
+        {...imageFieldState('missing image')}
+        onMissingChange={onMissingChange}
+      />
+    );
+    expect(onMissingChange).toHaveBeenLastCalledWith(true);
+  });
+});
+
 describe('image gallery states', () => {
   it.each(galleries)('renders $name', ({ props }) => {
     render(<ImageGalleryView {...props} />);
@@ -279,6 +425,61 @@ describe('image gallery states', () => {
     if (!editable && props.items.length === 0) {
       expect(within(group).getByText('No images.')).toBeVisible();
     }
+  });
+
+  it('shows the choosing look on the one tile whose key is choosing', () => {
+    render(<ImageGalleryView {...imageGalleryState('gallery choosing')} />);
+    expect(screen.getAllByText('Choosing in the picker')).toHaveLength(1);
+    expect(screen.getByAltText('team.jpg').parentElement).toHaveClass(
+      'border-field-active-border'
+    );
+    expect(screen.getByAltText('about.png').parentElement).not.toHaveClass(
+      'border-field-active-border'
+    );
+  });
+
+  it('shows the choosing look on the Add tile, and on no picture', () => {
+    render(<ImageGalleryView {...imageGalleryState('gallery adding')} />);
+    expect(screen.getAllByText('Choosing in the picker')).toHaveLength(1);
+    expect(screen.getByAltText('team.jpg').parentElement).not.toHaveClass(
+      'border-field-active-border'
+    );
+    expect(screen.getByRole('button', { name: 'Add images' })).toHaveClass(
+      'border-field-active-border'
+    );
+  });
+
+  it('shows tiles 4:3', () => {
+    render(<ImageGalleryView {...imageGalleryState('gallery filled')} />);
+    expect(screen.getByAltText('about.png').parentElement).toHaveClass(
+      'aspect-4/3'
+    );
+  });
+
+  it('replaces by item key', async () => {
+    const onReplace = vi.fn();
+    render(
+      <ImageGalleryView
+        {...imageGalleryState('gallery filled')}
+        onReplace={onReplace}
+      />
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Replace team.jpg' })
+    );
+    expect(onReplace).toHaveBeenCalledWith('b', expect.any(HTMLElement));
+  });
+
+  it('tells the host which items are missing, by key', () => {
+    const onMissingChange = vi.fn();
+    render(
+      <ImageGalleryView
+        {...imageGalleryState('gallery missing image')}
+        onMissingChange={onMissingChange}
+      />
+    );
+    expect(onMissingChange).toHaveBeenCalledWith('b', true);
+    expect(onMissingChange).not.toHaveBeenCalledWith('a', true);
   });
 
   it('names each move handle with its place and file', () => {

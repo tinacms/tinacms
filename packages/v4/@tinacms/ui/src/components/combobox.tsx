@@ -184,7 +184,7 @@ function ComboboxItem({
   return (
     <ComboboxPrimitive.Item
       data-slot='combobox-item'
-      className={cn(selectOptionClassName, className)}
+      className={cn(selectOptionClassName, 'touch:min-h-touch', className)}
       {...props}
     >
       {children}
@@ -266,7 +266,7 @@ function ComboboxChips({
     <ComboboxPrimitive.Chips
       data-slot='combobox-chips'
       className={cn(
-        'flex min-h-8 flex-wrap items-center gap-1 rounded-sm border border-input bg-card px-2.5 py-1 font-sans text-base text-foreground transition-[border-color,box-shadow] hover:border-input-hover focus-within:border-ring focus-within:shadow-focus-field data-active:border-ring data-active:shadow-focus-field has-aria-invalid:border-destructive has-aria-invalid:data-active:border-destructive has-data-[slot=combobox-chip]:px-1',
+        'flex min-h-8 touch:min-h-touch flex-wrap items-center gap-1 rounded-sm border border-input bg-card px-2.5 py-1 font-sans text-base text-foreground transition-[border-color,box-shadow] hover:border-input-hover focus-within:border-ring focus-within:shadow-focus-field data-active:border-ring data-active:shadow-focus-field has-aria-invalid:border-destructive has-aria-invalid:data-active:border-destructive has-data-[slot=combobox-chip]:px-1',
         className
       )}
       {...props}

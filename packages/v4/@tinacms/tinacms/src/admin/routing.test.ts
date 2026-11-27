@@ -12,8 +12,6 @@ describe('admin routing', () => {
     { view: 'collections' },
     { view: 'home' },
     { view: 'media' },
-    { view: 'tools' },
-    { view: 'settings' },
     { view: 'page' },
     { view: 'collections', unsavedOnly: true },
     { view: 'collection', collection: 'post' },
@@ -24,12 +22,33 @@ describe('admin routing', () => {
     { view: 'folder', collection: 'post', folder: 'folder' },
     { view: 'folder', collection: 'post', folder: 'v1.2/folder/x y' },
     { view: 'document', collection: 'post', path: 'content/posts/hello.mdx' },
+    {
+      view: 'document',
+      collection: 'post',
+      path: 'content/posts/hello.mdx',
+      navigator: true,
+    },
     { view: 'screen', screen: 'media', segments: [] },
     { view: 'screen', screen: 'media', segments: ['photos', '2026'] },
   ];
 
   it.each(routes)('round-trips $view', (route) => {
     expect(parseAdminRoute(formatAdminRoute(route))).toEqual(route);
+  });
+
+  it('writes the overlay flag as ?nav and drops any other query', () => {
+    const route: AdminRoute = {
+      view: 'document',
+      collection: 'post',
+      path: 'a.mdx',
+      navigator: true,
+    };
+    expect(formatAdminRoute(route)).toBe('#/collections/post/a.mdx?nav');
+    expect(parseAdminRoute('#/collections/post/a.mdx?other')).toEqual({
+      view: 'document',
+      collection: 'post',
+      path: 'a.mdx',
+    });
   });
 
   it('carries a document path as one encoded segment', () => {

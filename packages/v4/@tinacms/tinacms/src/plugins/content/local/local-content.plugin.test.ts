@@ -159,6 +159,32 @@ describe('content slice', () => {
     });
   });
 
+  it('reads a validation refusal of a save into a ContentError with its field errors', async () => {
+    const harness = await createSliceHarness(null);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Response.json(
+          {
+            error: {
+              code: 'validation',
+              message: 'Some fields are not valid. Fix them and try again.',
+              fieldErrors: { title: ['title is required'] },
+            },
+          },
+          { status: 422 }
+        )
+      )
+    );
+    await expect(
+      harness.slice().update('post', 'content/posts/hello.mdx', {})
+    ).rejects.toMatchObject({
+      name: 'ContentError',
+      code: 'validation',
+      fieldErrors: { title: ['title is required'] },
+    });
+  });
+
   it.each(['name-taken', 'invalid-path', 'folder-not-owned', 'forbidden'])(
     'reads a %s refusal of a structural write into a ContentError with that code',
     async (code) => {

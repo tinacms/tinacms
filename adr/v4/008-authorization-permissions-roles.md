@@ -41,7 +41,7 @@ definePlugin({ name: 'editorial-workflow', requires: { permission: 'content:publ
 - **Client checks are UX; the server transport is the sole enforcement.** The client hides/disables plugin UI the user can't use; the server rejects the RPC. The server never trusts the client.
 - **RBAC data is operational, not content → it is not stored in git.** This preserves "git is the source of truth *for content*" without pretending assignment data belongs in commits.
 - **New permissions are granted to nobody by default** except `admin` (`['*']`). Installing a plugin never silently widens an existing role.
-- **One exception: the default `editor` role holds `content:save`** ([ADR-028](./028-server-save-hooks.md)). A save to a collection with a server hook goes through the Backend's `content/update` op, which requires `content:save`. Without it, an editor could not save those collections. A role that should not save, such as a viewer, still leaves it out (ADR-014 §4).
+- **One exception: the default `editor` role holds `content:save`** ([ADR-028](./028-server-save-hooks.md)). A save to a collection with a server hook or a custom validator goes through the Backend's `content/update` op, which requires `content:save`. Without it, an editor could not save those collections. A role that should not save, such as a viewer, still leaves it out (ADR-014 §4).
 
 ## Consequences
 

@@ -1,6 +1,7 @@
 import { siteAuthHeadersOf } from '../../../core/auth/slice';
 import {
   type ContentErrorCode,
+  type ContentFieldErrors,
   type ContentProvider,
   ContentError,
   type DocumentConnection,
@@ -11,6 +12,7 @@ import {
   type RenameResult,
   isContentRefusalCode,
   isProviderRefusalCode,
+  parseFieldErrors,
 } from '../../../core/content/contract';
 import { isRecord } from '../../../utils/is-record';
 import type { ClientSlice, TinaStoreState } from '../../../core/plugin';
@@ -18,7 +20,11 @@ import type { ContentRequest } from './server/content-request';
 
 const refusalIn = (
   text: string
-): { code: ContentErrorCode; message: string } | null => {
+): {
+  code: ContentErrorCode;
+  message: string;
+  fieldErrors?: ContentFieldErrors;
+} | null => {
   let body: unknown;
   try {
     body = JSON.parse(text);
@@ -30,7 +36,11 @@ const refusalIn = (
   if (!isContentRefusalCode(error.code) && !isProviderRefusalCode(error.code)) {
     return null;
   }
-  return { code: error.code, message: error.message };
+  return {
+    code: error.code,
+    message: error.message,
+    fieldErrors: parseFieldErrors(error.fieldErrors),
+  };
 };
 
 const postContentRequest = async <Result>(
@@ -49,7 +59,13 @@ const postContentRequest = async <Result>(
   if (!response.ok) {
     const text = await response.text();
     const refusal = refusalIn(text);
-    if (refusal) throw new ContentError(refusal.code, refusal.message);
+    if (refusal) {
+      throw new ContentError(
+        refusal.code,
+        refusal.message,
+        refusal.fieldErrors
+      );
+    }
     throw new Error(
       `Content request ${request.op} failed (${response.status}): ${text}`
     );

@@ -22,6 +22,7 @@ import {
   use,
   useEffect,
   useEffectEvent,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -46,6 +47,7 @@ import { formRootProps } from '../editor/outline-markup';
 import {
   AfterSaveHookError,
   FormValidationError,
+  isServerFieldRefusal,
   useDiscardEdits,
   useFieldRegistry,
   useFormCheck,
@@ -72,7 +74,9 @@ import { ContentError } from '../core/content/contract';
 import { ErrorSuccessBubble, useErrorSummary } from './error-summary';
 import { saveFailureWords } from './save-failure';
 import { leftoverText } from './leftover-text';
-import { useNarrow } from './use-narrow';
+import { Segmented } from '@tinacms/ui/components/segmented';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
+import { OneViewContext } from './one-view';
 
 const toastOwners = new Map<string, number>();
 const liveRetries = new Map<string, () => void>();
@@ -158,6 +162,9 @@ const isBranchGone = (save: { phase: string; reason?: string } | undefined) =>
 
 const DEFAULT_LABEL = 'Save';
 const NEW_BRANCH_LABEL = 'Save to new branch';
+const SHORT_BRANCH_LABEL = 'Save to branch';
+const shortResolveLabel = (count: number) =>
+  `${count > 99 ? '99+' : count} ${count === 1 ? 'error' : 'errors'}`;
 
 // Save, or Save to new branch on a protected branch. `run` is the one gate:
 // Save, the toast's action and Retry all come through it.
@@ -170,9 +177,10 @@ function SaveButton() {
   const saveWith = useFormSaveWith();
   const check = useFormCheck();
   const content = useOptionalContentSlice();
-  const narrow = useNarrow();
+  const narrow = useTier() !== 'desktop';
   const view = useBranchView();
   const summary = useErrorSummary();
+  const phone = useTier() === 'phone';
   const [pending, setPendingState] = useState(false);
   const saveAllRunning = useFormStore(
     (state) => state.saveAll.running !== null
@@ -321,6 +329,11 @@ function SaveButton() {
         branchName !== undefined && names?.includes(branchName) === true
     );
 
+  const isBlockingFailure = (cause: unknown): boolean => {
+    if (cause instanceof FormValidationError) return true;
+    return isServerFieldRefusal(cause);
+  };
+
   const saveHere = () => {
     setPending(true);
     if (isProtected && branchName !== undefined) {
@@ -341,7 +354,7 @@ function SaveButton() {
     save()
       .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
-        if (cause instanceof FormValidationError && summary.block()) {
+        if (isBlockingFailure(cause) && summary.block()) {
           toast.dismiss(failedToastId);
           return;
         }
@@ -377,7 +390,7 @@ function SaveButton() {
     sendToNewBranch(request)
       .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
-        if (cause instanceof FormValidationError && summary.block()) {
+        if (isBlockingFailure(cause) && summary.block()) {
           toast.dismiss(failedToastId);
           return;
         }
@@ -415,7 +428,7 @@ function SaveButton() {
           return;
         }
         useFormStore.getState().restoreSavePhase(formId, previous);
-        if (cause instanceof FormValidationError) {
+        if (isBlockingFailure(cause)) {
           setDialog(null);
           if (!summary.block()) showFailure(cause);
           return;
@@ -492,7 +505,7 @@ function SaveButton() {
         ref={saveButton}
         variant='primary'
         type='button'
-        className='min-w-41 shrink-0'
+        className='phone:min-w-0 phone:flex-1 phone:truncate min-w-41 shrink-0'
         disabled={saveAllRunning || !(blocked || dirty || pending)}
         busy={pending}
         data-resolve=''
@@ -502,9 +515,13 @@ function SaveButton() {
         onClick={blocked ? summary.resolve : run}
       >
         {blocked
-          ? tinaResolveLabel(summary.count)
+          ? phone
+            ? shortResolveLabel(summary.count)
+            : tinaResolveLabel(summary.count)
           : isProtected
-            ? NEW_BRANCH_LABEL
+            ? phone
+              ? SHORT_BRANCH_LABEL
+              : NEW_BRANCH_LABEL
             : DEFAULT_LABEL}
       </Button>
       <SaveToBranchDialog
@@ -533,7 +550,13 @@ function SaveButton() {
   );
 }
 
-// The Unsaved tag, the Document actions menu and Save, fixed at the foot of the form.
+const VIEW_OPTIONS = [
+  { value: 'form', label: 'Form' },
+  { value: 'preview', label: 'Preview' },
+] as const;
+
+// The Unsaved tag, the Document actions menu and Save, fixed at the foot of the form. In one view
+// the View switch comes first and, on a phone, replaces the Unsaved tag.
 function FormBar() {
   const formId = useFormId();
   const dirty = useIsFormDirty(formId);
@@ -545,15 +568,36 @@ function FormBar() {
   // Read when the confirm opens, so typing in the title does not change it.
   const [documentName, setDocumentName] = useState('');
   const menuButton = useRef<HTMLButtonElement>(null);
+  const oneView = use(OneViewContext);
+  const tier = useTier();
   return (
     <div
       data-slot='form-bar'
-      className='relative flex h-14 flex-none items-center gap-2 border-t border-border bg-card px-3'
+      className='relative order-last flex h-14 flex-none items-center gap-2 border-t border-border bg-card px-3'
     >
       <ErrorSuccessBubble />
-      <div className='min-w-0 flex-1'>
+      {oneView.active ? (
+        <Segmented
+          aria-label='View'
+          size='sm'
+          value={oneView.view}
+          onValueChange={(next) => {
+            if (document.activeElement instanceof HTMLElement) {
+              document.activeElement.blur();
+            }
+            oneView.setView(next);
+          }}
+          options={VIEW_OPTIONS}
+        />
+      ) : null}
+      <div
+        className={
+          oneView.active && tier === 'phone' ? 'hidden' : 'min-w-0 flex-1'
+        }
+      >
         <DocumentStatus />
       </div>
+
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
@@ -614,7 +658,7 @@ const documentTitle = (values: TinaDocument | undefined, path: string) => {
 function ResumeDraftToast({ scope }: { scope: FormScope }) {
   const stale = useStaleDraft();
   const values = useFormValues(scope.formId);
-  const narrow = useNarrow();
+  const narrow = useTier() !== 'desktop';
   const [confirming, setConfirming] = useState(false);
   const discardButton = useRef<HTMLElement | null>(null);
   // The copies on screen when the confirm opened. Only these go on Confirm.
@@ -626,8 +670,25 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
   // again for that, so the effect keys on what the toast says, and the buttons
   // read the latest actions. While the confirm is open the buttons do nothing.
   const resume = useEffectEvent(() => {
-    if (!confirming) stale?.resume();
+    if (confirming) return;
+    // Sonner returns focus to its toast; the new form column must find focus on `body`.
+    leaveToaster();
+    stale?.resume();
   });
+  // The picker closes with the discard. The toast's Discard button goes away with the copies,
+  // so focus returns to the picker's opener, else to the form's scroll region.
+  const confirmDiscard = () => {
+    const picker = scope.view.getState().picker;
+    stale?.discard(shown.current);
+    if (!picker) return;
+    scope.view.getState().closePicker();
+    const region = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-form-id]')
+    ).find((node) => node.getAttribute('data-form-id') === scope.formId);
+    discardButton.current = picker.opener?.isConnected
+      ? picker.opener
+      : (region ?? null);
+  };
   const askToDiscard = useEffectEvent(() => {
     if (confirming) return;
     discardButton.current = document.activeElement as HTMLElement | null;
@@ -666,7 +727,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
     <DiscardConfirm
       open={confirming}
       onOpenChange={setConfirming}
-      onConfirm={() => stale?.discard(shown.current)}
+      onConfirm={confirmDiscard}
       returnFocusTo={discardButton}
       title={`Discard earlier unsaved edits to “${documentTitle(values, scope.path)}”?`}
       description='Discarded edits can’t be brought back. What you typed since stays.'
@@ -812,8 +873,64 @@ function FormFields({ scope }: { scope: FormScope }) {
   );
 }
 
+/**
+ * The form's scroll area. It remembers its scroll position and puts it back when it shows again
+ * after it was hidden, so the result does not rely on the browser keeping the scroll of a
+ * `display: none` element.
+ */
+function FormScroller({
+  formId,
+  children,
+}: {
+  formId: FormId;
+  children: ReactNode;
+}) {
+  const scroller = useRef<HTMLDivElement>(null);
+  const remembered = useRef(0);
+  useEffect(() => {
+    const element = scroller.current;
+    if (!element) return;
+    let visible = element.clientHeight > 0;
+    const onScroll = () => {
+      if (element.clientHeight > 0) remembered.current = element.scrollTop;
+    };
+    const observer = new ResizeObserver(() => {
+      const shown = element.clientHeight > 0;
+      if (shown && !visible) element.scrollTop = remembered.current;
+      visible = shown;
+    });
+    element.addEventListener('scroll', onScroll);
+    observer.observe(element);
+    return () => {
+      element.removeEventListener('scroll', onScroll);
+      observer.disconnect();
+    };
+  }, []);
+  return (
+    <div
+      ref={scroller}
+      data-form-part='fields'
+      tabIndex={-1}
+      className='min-h-0 flex-1 overflow-y-auto outline-none'
+      {...formRootProps(formId)}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function DocumentForm() {
   const scope = use(FormScopeContext);
+  const view = scope?.view;
+  const formId = scope?.formId;
+  useLayoutEffect(() => {
+    if (!view?.getState().takeFocusHandoff()) return;
+    const focused = document.activeElement;
+    if (focused && focused !== document.body) return;
+    Array.from(document.querySelectorAll<HTMLElement>('[data-form-id]'))
+      .find((node) => node.getAttribute('data-form-id') === formId)
+      ?.focus();
+  }, [view, formId]);
   if (!scope) return null;
 
   return (
@@ -821,12 +938,9 @@ export function DocumentForm() {
       <ResumeDraftToast scope={scope} />
       <StorageWarning scope={scope} />
       <ActiveFieldLevels scope={scope} />
-      <div
-        className='min-h-0 flex-1 overflow-y-auto'
-        {...formRootProps(scope.formId)}
-      >
+      <FormScroller formId={scope.formId}>
         <FormFields scope={scope} />
-      </div>
+      </FormScroller>
       <FormBar />
     </>
   );

@@ -126,6 +126,14 @@ function PreviewToolbar({
     seen.observe(element);
     return () => seen.disconnect();
   }, []);
+  const expandName =
+    shown === 'tablet'
+      ? expanded
+        ? 'Restore preview'
+        : 'Maximise preview'
+      : expanded
+        ? 'Collapse preview'
+        : 'Expand preview';
   const tierLevel = shown === 'desktop' ? 0 : 1;
   const level = Math.max(tierLevel, overflowLevel(paneWidth, device === 'fit'));
 
@@ -191,7 +199,7 @@ function PreviewToolbar({
       hint={expanded ? 'Esc' : undefined}
       onClick={() => onExpandedChange?.(!expanded)}
     >
-      {expanded ? 'Collapse preview' : 'Expand preview'}
+      {expandName}
     </DropdownMenuItem>
   );
   const more = (rows: {
@@ -265,7 +273,7 @@ function PreviewToolbar({
       tooltipSide='bottom'
       onClick={() => onExpandedChange?.(!expanded)}
     >
-      {expanded ? 'Collapse preview' : 'Expand preview'}
+      {expandName}
     </Button>
   );
 

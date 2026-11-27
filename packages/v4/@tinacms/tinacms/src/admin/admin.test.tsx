@@ -20,6 +20,7 @@ import { useFieldValue, useFormId } from '../editor/hooks';
 import { toFieldAddress } from '../core/field/address';
 import { toFormId, useFormStore } from '../form/form-store';
 import { required } from '../plugins/fields';
+import imageFieldPlugin from '../plugins/fields/image/image-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import homePlugin from '../plugins/home/home.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
@@ -402,9 +403,9 @@ describe('TinaAdmin', () => {
   });
 
   it('does not mount the preview frame until a route shows it', async () => {
-    window.location.hash = '#/settings';
+    window.location.hash = '#/';
     renderAdmin('about:blank');
-    await screen.findByRole('button', { name: 'Settings' });
+    await screen.findByRole('heading', { name: 'Home' });
     expect(screen.queryByTitle('Preview')).toBeNull();
   });
 
@@ -446,10 +447,10 @@ describe('TinaAdmin', () => {
     await user.click(
       within(screen.getByRole('navigation', { name: 'Content' })).getByRole(
         'button',
-        { name: 'Settings' }
+        { name: 'Home' }
       )
     );
-    await screen.findByText('Pick an entry to open it.');
+    await screen.findByRole('heading', { name: 'Home' });
     expect(screen.getByTitle('Preview')).toBe(frame);
     expect(frame.closest('.hidden')).not.toBeNull();
   });
@@ -481,12 +482,11 @@ describe('TinaAdmin', () => {
     renderAdmin('about:blank');
     const frame = await screen.findByTitle('Preview');
     const bar = screen.getByRole('group', { name: 'Preview toolbar' });
-    // The test window is 1024px wide, a tablet: the device sizes sit in the actions menu.
     await user.click(
-      within(bar).getByRole('button', { name: 'Preview actions' })
-    );
-    await user.click(
-      await screen.findByRole('menuitemcheckbox', { name: /^Tablet/ })
+      within(within(bar).getByRole('group', { name: 'Device size' })).getByRole(
+        'button',
+        { name: /^Tablet/ }
+      )
     );
     expect(screen.getByTitle('Preview')).toBe(frame);
     await user.click(
@@ -879,6 +879,22 @@ describe('TinaAdmin global nav', () => {
     ).toEqual(shown);
   });
 
+  it('draws a divider above each group and each run of entries without a group', async () => {
+    renderAdmin();
+    const rail = await screen.findByRole('navigation', { name: 'Content' });
+    await screen.findByRole('list', { name: 'Help' });
+    const firstRows = ['Switch branch', 'Guides', 'Changelog'];
+    const marks = [
+      ...rail.querySelectorAll(
+        '[data-slot=sidebar-separator], [data-rail-row]'
+      ),
+    ].map((node) => node.getAttribute('aria-label') ?? 'divider');
+    expect(marks.filter((mark) => mark === 'divider')).toHaveLength(3);
+    for (const row of firstRows) {
+      expect(marks[marks.indexOf(row) - 1]).toBe('divider');
+    }
+  });
+
   it('lists the entries of a group under its heading in the rail', async () => {
     renderAdmin();
     const menu = await screen.findByRole('list', { name: 'Help' });
@@ -911,38 +927,6 @@ describe('TinaAdmin global nav', () => {
       await screen.findByRole('button', { name: 'Switch branch' })
     );
     expect(navAction).toHaveBeenCalledOnce();
-  });
-
-  it('shows an empty Tools pane when no plugin adds an entry', async () => {
-    const user = userEvent.setup();
-    render(
-      <TinaAdmin
-        config={asResolvedConfig({
-          ...config,
-          plugins: config.plugins.filter((plugin) => plugin !== screenPlugin),
-        })}
-        queryClient={
-          new QueryClient({ defaultOptions: { queries: { retry: false } } })
-        }
-      />
-    );
-    await user.click(await screen.findByRole('button', { name: 'Tools' }));
-    const pane = await screen.findByRole('complementary', {
-      name: 'Tools panel',
-    });
-    expect(within(pane).getByText('No tools installed.')).toBeVisible();
-  });
-
-  it('opens a Settings pane beside the rail', async () => {
-    const user = userEvent.setup();
-    renderAdmin();
-    await user.click(await screen.findByRole('button', { name: 'Settings' }));
-    const pane = await screen.findByRole('complementary', {
-      name: 'Settings panel',
-    });
-    expect(within(pane).getByText('No settings yet.')).toBeVisible();
-    await user.click(within(pane).getByRole('button', { name: 'Close' }));
-    await waitFor(() => expect(window.location.hash).toBe('#/'));
   });
 });
 
@@ -1728,7 +1712,7 @@ describe('TinaAdmin rail', () => {
     ).getAllByRole('button');
   };
 
-  it('lists Home, Collections, Media, Tools and Settings, and no collection or document', async () => {
+  it('lists Home, Collections and Media, and no collection or document', async () => {
     renderAdmin();
     const buttons = await railButtons();
     expect(buttons.map((button) => button.getAttribute('aria-label'))).toEqual([
@@ -1737,11 +1721,6 @@ describe('TinaAdmin rail', () => {
       'Media',
     ]);
     const rail = screen.getByRole('navigation', { name: 'Content' });
-    expect(
-      within(within(rail).getByRole('list', { name: 'Tools and settings' }))
-        .getAllByRole('button')
-        .map((button) => button.getAttribute('aria-label'))
-    ).toEqual(['Tools', 'Settings']);
     expect(within(rail).queryByText('Posts')).toBeNull();
   });
 
@@ -1797,22 +1776,6 @@ describe('TinaAdmin rail', () => {
     await waitFor(() => expect(window.location.hash).toBe('#/collections'));
   });
 
-  it.each([
-    ['tools', 'Tools'],
-    ['settings', 'Settings'],
-  ])(
-    'marks %s selected on a deep link and asks for an entry',
-    async (hash, name) => {
-      window.location.hash = `#/${hash}`;
-      renderAdmin();
-      expect(await screen.findByRole('button', { name })).toHaveAttribute(
-        'aria-current',
-        'page'
-      );
-      expect(screen.getByText('Pick an entry to open it.')).toBeVisible();
-    }
-  );
-
   it('opens the collections beside the rail, not inside it', async () => {
     const user = userEvent.setup();
     renderAdmin();
@@ -1861,7 +1824,7 @@ describe('TinaAdmin rail', () => {
     await user.keyboard('{ArrowDown}');
     expect(screen.getByRole('button', { name: 'Collections' })).toHaveFocus();
     await user.keyboard('{End}');
-    const help = screen.getByRole('link', { name: /Help & docs/ });
+    const help = screen.getByRole('link', { name: /Help and docs/ });
     expect(help).toHaveFocus();
     await user.keyboard('{ArrowUp}');
     expect(help).not.toHaveFocus();
@@ -1888,12 +1851,12 @@ describe('TinaAdmin rail', () => {
     await user.keyboard('{ArrowUp}{Home}');
     expect(home).toHaveFocus();
     await user.keyboard('{End}');
-    expect(screen.getByRole('link', { name: /Help & docs/ })).toHaveFocus();
+    expect(screen.getByRole('link', { name: /Help and docs/ })).toHaveFocus();
   });
 
   it('closes the phone rail sheet when a row is chosen', async () => {
     vi.stubGlobal('matchMedia', (query: string) => ({
-      matches: true,
+      matches: !/min-width/.test(query),
       media: query,
       addEventListener: () => {},
       removeEventListener: () => {},
@@ -1902,7 +1865,7 @@ describe('TinaAdmin rail', () => {
       const user = userEvent.setup();
       renderAdmin();
       await user.click(
-        await screen.findByRole('button', { name: 'Toggle Sidebar' })
+        await screen.findByRole('button', { name: 'Open side nav' })
       );
       const sheet = await waitFor(() => {
         const found = document.querySelector<HTMLElement>('[data-mobile=true]');
@@ -2165,5 +2128,188 @@ describe('Toast tooltips', () => {
     expect(tip()).toBeNull();
     await act(() => vi.advanceTimersByTimeAsync(1));
     expect(tip()).toHaveTextContent('Dismiss');
+  });
+});
+
+describe('TinaAdmin below desktop', () => {
+  const DOCUMENT = '#/collections/post/content%2Fposts%2Fhello.mdx';
+
+  const stubWidth = (width: number) =>
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: width >= Number(/min-width: (\d+)px/.exec(query)?.[1] ?? 0),
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('on a tablet, Maximise form shows one view with the View switch, and Escape restores the split', async () => {
+    stubWidth(900);
+    window.location.hash = DOCUMENT;
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    await user.click(
+      await screen.findByRole('button', { name: 'Maximise form' })
+    );
+    expect(screen.getByRole('group', { name: 'View' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Restore form' })).toHaveFocus();
+    await user.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(screen.queryByRole('group', { name: 'View' })).toBeNull()
+    );
+    expect(screen.getByRole('button', { name: 'Maximise form' })).toHaveFocus();
+  });
+
+  it('on a tablet, Maximise preview then Restore preview focuses Maximise form', async () => {
+    stubWidth(900);
+    window.location.hash = DOCUMENT;
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    await user.click(
+      await screen.findByRole('button', { name: 'Maximise preview' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Restore preview' }));
+    expect(screen.getByRole('button', { name: 'Maximise form' })).toHaveFocus();
+  });
+
+  describe('with the media picker open', () => {
+    const mediaStub = definePlugin({
+      name: 'test:media-stub',
+      provides: ['media'],
+      client: async () => ({
+        default: {
+          slice: () => ({
+            list: async () => ({ items: [] }),
+            upload: async (file: File) => file.name,
+            delete: async () => {},
+            resolveUrl: (path: string) => path,
+          }),
+        },
+      }),
+    });
+    const withImage = asResolvedConfig({
+      ...config,
+      plugins: [...config.plugins, imageFieldPlugin, mediaStub],
+      schema: {
+        collections: [
+          {
+            name: 'post',
+            label: 'Posts',
+            path: 'content/posts',
+            format: 'mdx',
+            fields: [
+              { name: 'title', label: 'Title', type: 'string' },
+              { name: 'banner', label: 'Banner', type: 'image' },
+            ],
+          },
+        ],
+      },
+    });
+    const openOnTablet = async () => {
+      stubWidth(900);
+      window.location.hash = DOCUMENT;
+      const user = userEvent.setup();
+      render(
+        <TinaAdmin
+          config={withImage}
+          queryClient={
+            new QueryClient({ defaultOptions: { queries: { retry: false } } })
+          }
+          preview='about:blank'
+        />
+      );
+      return user;
+    };
+    const openPicker = async (user: User) => {
+      await user.click(
+        await screen.findByRole('button', { name: /Choose from Media/ })
+      );
+      return screen.findByRole('region', { name: /^Choose / });
+    };
+
+    it('Maximise preview closes the picker and focuses Restore preview', async () => {
+      const user = await openOnTablet();
+      await openPicker(user);
+      await user.click(
+        screen.getByRole('button', { name: 'Maximise preview' })
+      );
+      await waitFor(() =>
+        expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+      );
+      expect(
+        screen.getByRole('button', { name: 'Restore preview' })
+      ).toHaveFocus();
+    });
+
+    it('Maximise form closes the picker', async () => {
+      const user = await openOnTablet();
+      await openPicker(user);
+      await user.click(screen.getByRole('button', { name: 'Maximise form' }));
+      await screen.findByRole('button', { name: 'Restore form' });
+      await waitFor(() =>
+        expect(screen.queryByRole('region', { name: /^Choose / })).toBeNull()
+      );
+    });
+
+    it('a picker opened while the form is maximised stays open', async () => {
+      const user = await openOnTablet();
+      await user.click(
+        await screen.findByRole('button', { name: 'Maximise form' })
+      );
+      await openPicker(user);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(screen.getByRole('region', { name: /^Choose / })).toBeVisible();
+    });
+  });
+
+  it('on a phone, a document opens on Form and the View switch shows the preview', async () => {
+    stubWidth(390);
+    window.location.hash = DOCUMENT;
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    const view = await screen.findByRole('group', { name: 'View' });
+    expect(within(view).getByRole('button', { name: 'Form' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    await user.click(within(view).getByRole('button', { name: 'Preview' }));
+    expect(
+      within(view).getByRole('button', { name: 'Preview' })
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTitle('Preview')).toBeInTheDocument();
+  });
+
+  it('on a phone, the page route shows the foot bar that opens Collections', async () => {
+    stubWidth(390);
+    window.location.hash = '#/page';
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    expect(await screen.findByText('Nothing to edit here')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Open Collections' }));
+    expect(window.location.hash).toBe('#/collections');
+  });
+
+  it('on a tablet, ?nav shows the Collections column and Close returns to the document', async () => {
+    stubWidth(900);
+    window.location.hash = `${DOCUMENT}?nav`;
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    const navigator = await screen.findByRole('complementary', {
+      name: 'Navigator',
+    });
+    await user.click(within(navigator).getByRole('button', { name: 'Close' }));
+    expect(window.location.hash).toBe(DOCUMENT);
+  });
+
+  it('with ?nav, a collection group keeps the document route', async () => {
+    stubWidth(900);
+    window.location.hash = `${DOCUMENT}?nav`;
+    const user = userEvent.setup();
+    renderAdmin('about:blank');
+    const navigator = await screen.findByRole('complementary', {
+      name: 'Navigator',
+    });
+    await user.click(within(navigator).getByRole('button', { name: 'Pages' }));
+    expect(window.location.hash).toBe(`${DOCUMENT}?nav`);
   });
 });

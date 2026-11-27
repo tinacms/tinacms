@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
+import { fakeKeyboard } from './fake-keyboard';
 
 const BRANCH_DIALOG =
   '/branches.html?docs=1&fail=branch-gone#/collections/post/content%2Fposts%2Fpost-01.mdx';
@@ -25,7 +26,7 @@ const edit = async (page: Page, name: RegExp, text: string) => {
 const save = (page: Page) =>
   page
     .locator('[data-slot=form-bar]')
-    .getByRole('button', { name: /^(Save|Resolve)/ });
+    .getByRole('button', { name: /^(Save|Resolve|\d+\+? errors?$)/ });
 
 const drag = async (page: Page, handle: Locator, dy: number) => {
   const { x, y, width, height } = await box(handle);
@@ -35,17 +36,6 @@ const drag = async (page: Page, handle: Locator, dy: number) => {
   await page.mouse.move(x + width / 2, y + height / 2 + dy, { steps: 4 });
   await page.mouse.up();
 };
-
-const fakeKeyboard = (page: Page, shrink: number) =>
-  page.evaluate((by) => {
-    const visual = window.visualViewport;
-    if (!visual) throw new Error('no visual viewport');
-    Object.defineProperty(visual, 'height', {
-      configurable: true,
-      value: window.innerHeight - by,
-    });
-    visual.dispatchEvent(new Event('resize'));
-  }, shrink);
 
 const noSideways = (page: Page) =>
   page.evaluate(
@@ -189,38 +179,6 @@ test.describe('a sheet taller than the screen at 375px', () => {
       const field = await box(page.locator(':focus'));
       expect(field.y).toBeGreaterThanOrEqual(header.y + header.height - 1);
     }
-  });
-
-  test('the image pickers keep handle room and the safe area under a caller’s p-0', async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    const cdp = await page.context().newCDPSession(page);
-    await cdp.send('Emulation.setSafeAreaInsetsOverride', {
-      insets: { top: 0, bottom: 34, left: 0, right: 0 },
-    });
-    await page.goto(CHECKLIST);
-    await page.getByRole('button', { name: 'Add images' }).click();
-    const sheet = page.locator(SHEET);
-    await expect(sheet).toBeVisible();
-    await settle(page);
-    const sheetBox = await box(sheet);
-    const handle = await box(
-      sheet.getByRole('button', { name: 'Close sheet' })
-    );
-    const firstChild = await box(sheet.locator('> :first-child'));
-    expect(handle.y + handle.height).toBeLessThanOrEqual(firstChild.y + 1);
-    expect(firstChild.y - sheetBox.y).toBeGreaterThanOrEqual(36);
-    const close = await box(
-      sheet.getByRole('button', { name: 'Close', exact: true })
-    );
-    expect(sheetBox.x + sheetBox.width - (close.x + close.width)).toBe(16);
-    expect(close.y + close.height - sheetBox.y).toBeLessThanOrEqual(36);
-    const inner = await sheet.evaluate((el) => {
-      const style = getComputedStyle(el);
-      return Number.parseFloat(style.borderBottomWidth);
-    });
-    expect(inner).toBe(34);
   });
 });
 
@@ -686,23 +644,20 @@ test.describe('popups on a phone', () => {
   });
 });
 
-test('the image gallery dialog opens as a foot sheet and closes with ×', async ({
+test('the image gallery picker fills the phone and closes with Close picker', async ({
   page,
 }) => {
   await page.setViewportSize(PHONE);
   await page.goto(CHECKLIST);
   await page.getByRole('button', { name: 'Add images' }).click();
-  const sheet = page.locator(SHEET);
-  await expect(sheet).toBeVisible();
+  const picker = page.getByRole('region', { name: 'Choose images' });
+  await expect(picker).toBeVisible();
   await settle(page);
-  const rect = await box(sheet);
-  expect(Math.abs(rect.y + rect.height - PHONE.height)).toBeLessThanOrEqual(1);
-  expect(rect.height).toBeGreaterThanOrEqual(PHONE.height / 2 - 1);
-  await expect(
-    sheet.getByRole('button', { name: 'Close sheet' })
-  ).toBeVisible();
-  await sheet.getByRole('button', { name: 'Close', exact: true }).click();
-  await expect(page.locator(SHEET)).toHaveCount(0);
+  const rect = await box(page.locator('[data-slot=media-picker-host]'));
+  expect(rect.width).toBe(PHONE.width);
+  expect(Math.round(rect.y)).toBe(56);
+  await picker.getByRole('button', { name: 'Close picker' }).click();
+  await expect(picker).toHaveCount(0);
 });
 
 test('a list card’s action menu at the right edge stays inside the screen', async ({
@@ -769,7 +724,8 @@ test.describe('the branch switcher on a phone', () => {
       .getByRole('button', { name: /feature\/news/ })
       .first()
       .click();
-    await expect(page.locator(SHEET)).toBeVisible();
+    await expect(page.locator('[data-slot=screen-content]')).toBeVisible();
+    await expect(page.locator(SHEET)).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Full screen' })).toHaveCount(
       0
     );

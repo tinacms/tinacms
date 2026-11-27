@@ -16,6 +16,7 @@ import { type PluginManifest, definePlugin } from '../../../../core/plugin';
 import type { CollectionSchema } from '../../../../core/schema/types';
 import { defineServerPlugin } from '../../../../server';
 import { t } from '../../../fields';
+import coreValidatorsPlugin from '../../../validators/core-validators.plugin';
 import { localContentPlugin } from '../local-content.plugin';
 import { tinaLocalDataLayerVitePlugin } from './local-data-layer.vite';
 
@@ -578,6 +579,135 @@ describe('create runs the server hooks', () => {
       (await post(routes, '/api/tina/content/create', body({}), 'creator'))
         .status
     ).toBe(200);
+  });
+});
+
+describe('saves run the collection validators', () => {
+  const required = { name: 'required' };
+  const checked: CollectionSchema = {
+    ...POSTS,
+    fields: [{ type: 'string', name: 'title', validators: [required] }],
+  };
+  const noEmptyHooks = [coreValidatorsPlugin];
+  const body = (
+    value: Record<string, unknown>,
+    path = 'content/posts/new.mdx'
+  ) => ({
+    collection: 'posts',
+    path,
+    value,
+  });
+
+  it('refuses an invalid create and update on content/create and content/update with 422 validation, writing nothing', async () => {
+    const routes = mount(noEmptyHooks, [checked]);
+    const created = await post(
+      routes,
+      '/api/tina/content/create',
+      body({ title: '' })
+    );
+    const updated = await post(
+      routes,
+      '/api/tina/content/update',
+      body({ title: '' }, 'content/posts/a.mdx')
+    );
+    for (const response of [created, updated]) {
+      expect(response.status).toBe(422);
+      expect(response.body.error).toEqual({
+        code: 'validation',
+        message: 'Some fields are not valid. Fix them and try again.',
+        fieldErrors: { title: ['title is required'] },
+      });
+    }
+    expect(onDisk('content/posts/new.mdx')).toBe(false);
+    expect(onDisk('content/posts/a.mdx')).toBe(true);
+  });
+
+  it('refuses an invalid save on the content endpoint, which a built-ins-only collection uses, and writes a valid one', async () => {
+    const routes = mount(noEmptyHooks, [checked]);
+    const refused = await content(routes, {
+      op: 'create',
+      ...body({ title: '' }),
+    });
+    expect([refused.status, refused.body.error.code]).toEqual([
+      422,
+      'validation',
+    ]);
+    expect(refused.body.error.fieldErrors).toEqual({
+      title: ['title is required'],
+    });
+    expect(onDisk('content/posts/new.mdx')).toBe(false);
+    const written = await content(routes, {
+      op: 'create',
+      ...body({ title: 'N' }),
+    });
+    expect(written.status).toBe(200);
+    expect(onDisk('content/posts/new.mdx')).toBe(true);
+  });
+});
+
+describe('a plugin given collections and no config', () => {
+  const mountWithCollection = (collection: CollectionSchema) => {
+    const plugin = tinaLocalDataLayerVitePlugin({
+      rootDir,
+      collections: [collection],
+    });
+    const mounted = new Map<string, Function>();
+    (plugin.configureServer as (server: unknown) => void)({
+      config: { logger: { info: () => {} } },
+      middlewares: {
+        use: (route: string | Function, handler?: Function) => {
+          if (typeof route === 'string' && handler) mounted.set(route, handler);
+        },
+      },
+    });
+    return mounted;
+  };
+  const create = (
+    mounted: Map<string, Function>,
+    value: Record<string, unknown>
+  ) =>
+    content(mounted, {
+      op: 'create',
+      collection: 'posts',
+      path: 'content/posts/new.mdx',
+      value,
+    });
+
+  it('still registers the core validators, so a required field is refused with 422', async () => {
+    const mounted = mountWithCollection({
+      ...POSTS,
+      fields: [
+        { type: 'string', name: 'title', validators: [{ name: 'required' }] },
+      ],
+    });
+    const refused = await create(mounted, { title: '' });
+    expect(refused.status).toBe(422);
+    expect(refused.body.error.fieldErrors).toEqual({
+      title: ['title is required'],
+    });
+  });
+
+  it('uses the core field plugins, so a required child of an absent object is refused', async () => {
+    const mounted = mountWithCollection({
+      ...POSTS,
+      fields: [
+        t.string({ name: 'title' }),
+        t.object({
+          name: 'seo',
+          fields: [
+            t.string({
+              name: 'description',
+              validators: [{ name: 'required' }],
+            }),
+          ],
+        }),
+      ],
+    });
+    const refused = await create(mounted, { title: 'N' });
+    expect(refused.status).toBe(422);
+    expect(refused.body.error.fieldErrors).toEqual({
+      'seo.description': ['description is required'],
+    });
   });
 });
 

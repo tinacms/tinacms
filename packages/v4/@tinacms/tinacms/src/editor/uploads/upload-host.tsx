@@ -15,7 +15,7 @@ interface UploadHostProps {
 /**
  * Draws the part of the upload list that belongs to no surface: the polite
  * status. It also refreshes the folder listing when a file lands. `TinaAdmin`
- * renders the primary one. A `MediaBrowser` or an image field renders one too,
+ * renders the primary one. The media picker host and an image field render one too,
  * for a page with no `TinaAdmin`. Only the first host of a runtime draws, so
  * the page has it exactly once.
  */

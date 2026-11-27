@@ -56,7 +56,7 @@ v4 supplies four more examples:
   the content capability, not from a fixed list.
 - The `image` field ([`image-field.md`](./image-field.md)) stores the media
   path of one image. It depends on the `media` capability, and it picks with
-  `MediaBrowser` in `pick` mode.
+  the media picker (`useMediaPicker()`).
 - The `rich-text` field ([`rich-text-field.md`](./rich-text-field.md)) uses the
   `block` layout. With `isBody`, it controls the markdown body of the file.
 
@@ -325,6 +325,11 @@ their messages. The spec is
    `FieldValidationContext`: `{ node, address, siblings, values, isEmpty,
    measure }`.
 
+A save through the Backend runs only layer 2, the field-level named validators.
+It runs them on stored values: a number field holds `5`, not `'5'`, and a
+rich-text field holds its Markdown source. A field plugin's `descriptor.validate`
+and `descriptor.schema` stay client only.
+
 Both layers return the same shape, `string | string[] | null`
 (`Validate<TValue, TContext>` in `core/field/contract.ts`). Only layer 2 sees
 `siblings`; a plugin-level rule is scoped to its own field.
@@ -359,6 +364,18 @@ Two descriptor hooks let a field type answer them:
 
 `min` and `max` pass an empty value, so a field with `required()` and `min(3)`
 reports one message, not two.
+
+The Backend has no descriptor, so a field type that stores a value in a
+different form declares `stored` on its manifest `field`:
+`stored?: { isEmpty?, measure? }`. Both are pure functions with no client
+import. The Backend falls back to the default helpers when a field omits them.
+
+- The boolean field is never empty.
+- The rich-text field is empty when its Markdown is blank. Its `measure`
+  returns `null`, so `min` and `max` do not run on it.
+- The object field is empty only when its value is `null` or `undefined`.
+  It also sets `childrenWhenAbsent`, so an absent object still has its
+  subfields checked, as the form does with an empty object.
 
 A plugin registers factories through the `validator` capability
 ([plugins.md](./plugins.md#validator-plugins)). `TinaProvider` builds the

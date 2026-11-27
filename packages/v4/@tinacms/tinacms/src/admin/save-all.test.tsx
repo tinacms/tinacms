@@ -1294,6 +1294,139 @@ describe('Revealed errors show only on the first open', () => {
   });
 });
 
+describe('Server field errors from Save All', () => {
+  it("shows a refused document's messages on its fields when it opens", async () => {
+    failWrite.set(
+      POST_B,
+      new ContentError('validation', undefined, {
+        [toFieldAddress('slug')]: ['Slug is taken'],
+      })
+    );
+    const user = userEvent.setup();
+    window.location.hash = hashOf('post', POST_B);
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-x');
+    await goTo('post', POST);
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-y');
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 1 of 2 documents')
+      ).toBeVisible()
+    );
+
+    await goTo('post', POST_B);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Slug is taken');
+  });
+
+  it("keeps a refused form's messages when the form was closed from Home before Save all", async () => {
+    failWrite.set(
+      POST_B,
+      new ContentError('validation', undefined, {
+        [toFieldAddress('slug')]: ['Slug is taken'],
+      })
+    );
+    const user = userEvent.setup();
+    window.location.hash = hashOf('post', POST_B);
+    renderAdmin();
+    await user.type(await screen.findByLabelText(/^Slug\b/), '-x');
+    act(() => {
+      window.location.hash = '#/';
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await waitFor(() => expect(screen.queryByLabelText(/^Slug\b/)).toBeNull());
+    await user.click(saveAll());
+    await waitFor(() =>
+      expect(
+        within(statusBar()).getByText('Save failed: 1 of 1 documents')
+      ).toBeVisible()
+    );
+
+    await goTo('post', POST_B);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Slug is taken');
+    // Save blocks here as it does on a form that stayed open.
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+  });
+});
+
+describe('Server list-item errors for a form closed during Save all', () => {
+  it.each([
+    ['collapsed', false],
+    ['open', true],
+  ])(
+    'shows the message of an item field when the item is %s',
+    async (_name, openItem) => {
+      failWrite.set(
+        PAGE,
+        new ContentError('validation', undefined, {
+          [toFieldAddress('links.1.url')]: ['URL is not reachable'],
+        })
+      );
+      const user = userEvent.setup();
+      window.location.hash = hashOf('page', PAGE);
+      renderAdmin();
+      await user.type(await titleInput(), '!');
+      act(() => {
+        window.location.hash = '#/';
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+      await waitFor(() =>
+        expect(screen.queryByLabelText(/^Title\b/)).toBeNull()
+      );
+      await user.click(saveAll());
+      await waitFor(() =>
+        expect(
+          within(statusBar()).getByText('Save failed: 1 of 1 documents')
+        ).toBeVisible()
+      );
+
+      await goTo('page', PAGE);
+      await titleInput();
+      if (openItem) {
+        await user.click(
+          await screen.findByRole('button', { name: /^Item 2:/ })
+        );
+      }
+      await waitFor(() =>
+        expect(
+          screen
+            .getAllByRole('alert')
+            .some((alert) =>
+              /URL is not reachable/.test(alert.textContent ?? '')
+            )
+        ).toBe(true)
+      );
+    }
+  );
+});
+
+describe('Server errors from Save All on the open form', () => {
+  it('lists a refused field inside a collapsed list item and turns Save into Resolve', async () => {
+    failWrite.set(
+      PAGE,
+      new ContentError('validation', undefined, {
+        [toFieldAddress('links.1.url')]: ['URL is not reachable'],
+      })
+    );
+    const user = userEvent.setup();
+    window.location.hash = hashOf('page', PAGE);
+    renderAdmin();
+    await user.type(await titleInput(), '!');
+    await user.click(saveAll());
+
+    expect(
+      await screen.findByRole('button', { name: 'Resolve 1 error' })
+    ).toBeVisible();
+    await waitFor(() =>
+      expect(
+        document.querySelector('[data-slot=error-summary-pane]')
+      ).toHaveTextContent('URL is not reachable')
+    );
+  });
+});
+
 describe('Status bar after a run', () => {
   it('shows a later single save, not the finished run', async () => {
     const user = userEvent.setup();

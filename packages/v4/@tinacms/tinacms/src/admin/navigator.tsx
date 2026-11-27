@@ -3,7 +3,10 @@ import { Button } from '@tinacms/ui/components/button';
 import { NavRow } from '@tinacms/ui/components/nav-row';
 import { PanelHeader } from '@tinacms/ui/components/panel-header';
 import { useEffect, useRef, useState } from 'react';
-import type { CollectionSchema } from '../core/schema/types';
+import {
+  type CollectionSchema,
+  isListedCollection,
+} from '../core/schema/types';
 import {
   useCollectionDocuments,
   useCollectionsDocumentPaths,
@@ -25,14 +28,12 @@ import {
   folderOfDocument,
   useNewDocumentDrafts,
 } from '../editor/collection-documents';
-import type { GlobalNavEntry } from '../core/slot/contract';
 import { DropdownMenuItem } from '@tinacms/ui/components/dropdown-menu';
 import { DiscardConfirm } from './discard-confirm';
-import { openNavTarget } from './rail';
 import type { AdminRoute } from './routing';
 
-const paneClass = (hideBelowLg: boolean) =>
-  `flex w-110 min-w-0 flex-col border-r border-border${hideBelowLg ? ' max-lg:hidden' : ''}`;
+// The frame around the pane (`NavigatorFrame` in admin.tsx) sets its width.
+const PANE_CLASS = 'flex min-w-0 flex-1 flex-col border-r border-border';
 
 const documentName = (path: string) => path.split('/').at(-1) ?? path;
 
@@ -413,7 +414,6 @@ export function CollectionsNavigator({
   onClose,
   onMaximise,
   treeFolders,
-  hideBelowLg = false,
 }: {
   collections: CollectionSchema[];
   treeFolders: TreeFolders;
@@ -422,8 +422,7 @@ export function CollectionsNavigator({
   route: AdminRoute;
   navigate: (route: AdminRoute) => void;
   onClose: () => void;
-  onMaximise: () => void;
-  hideBelowLg?: boolean;
+  onMaximise?: () => void;
 }) {
   const activeCollection =
     route.view === 'collection' ||
@@ -436,8 +435,15 @@ export function CollectionsNavigator({
     route.view === 'collections' && route.unsavedOnly === true;
   const unsavedIds = new Set<string>(useUnsavedFormIds());
   const hasUnsaved = unsavedIds.size > 0;
+  // ADR-032 §3: hidden collections stay in the unsaved view and while a route opens them.
+  const shown = unsavedOnly
+    ? collections
+    : collections.filter(
+        (collection) =>
+          isListedCollection(collection) || collection.name === activeCollection
+      );
   return (
-    <aside aria-label='Navigator' className={paneClass(hideBelowLg)}>
+    <aside aria-label='Navigator' className={PANE_CLASS}>
       <PanelHeader
         heading='Collections'
         closeLabel='Close'
@@ -457,6 +463,8 @@ export function CollectionsNavigator({
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
         {collections.length === 0 ? (
           <EmptyState text='No collections yet.' />
+        ) : shown.length === 0 ? (
+          <EmptyState text='No collections are listed.' />
         ) : unsavedOnly && !hasUnsaved ? (
           <EmptyState text='No unsaved documents.' />
         ) : unsavedOnly ? (
@@ -476,7 +484,7 @@ export function CollectionsNavigator({
           </>
         ) : (
           <ul aria-label='Collections' className='m-0 list-none p-0'>
-            {collections.map((collection) => (
+            {shown.map((collection) => (
               <CollectionNode
                 key={collection.name}
                 collection={collection}
@@ -495,45 +503,12 @@ export function CollectionsNavigator({
 }
 
 /** The Media pane when no media plugin is installed. */
-export function MediaPanel({
-  onClose,
-  hideBelowLg = false,
-}: {
-  onClose: () => void;
-  hideBelowLg?: boolean;
-}) {
+export function MediaPanel({ onClose }: { onClose: () => void }) {
   return (
-    <aside aria-label='Media' className={paneClass(hideBelowLg)}>
+    <aside aria-label='Media' className={PANE_CLASS}>
       <PanelHeader heading='Media' closeLabel='Close' onClose={onClose} />
       <div className='min-h-0 flex-1 overflow-y-auto p-2'>
         <EmptyState text='No media library is installed.' />
-      </div>
-    </aside>
-  );
-}
-
-/** The panel the Tools entry opens beside the rail. Plugin entries sit in the rail (ADR-027), so it has none yet. */
-export function ToolsPane({ onClose }: { onClose: () => void }) {
-  return (
-    <aside aria-label='Tools panel' className={paneClass(false)}>
-      <PanelHeader heading='Tools' closeLabel='Close' onClose={onClose} />
-      <div className='min-h-0 flex-1 overflow-y-auto p-2'>
-        <EmptyState text='No tools installed.' />
-      </div>
-    </aside>
-  );
-}
-
-/** The panel the Settings entry opens beside the rail. Plugins have no way to add to it yet. */
-export function SettingsPane({ onClose }: { onClose: () => void }) {
-  return (
-    <aside
-      aria-label='Settings panel'
-      className='flex w-110 min-w-0 flex-col border-r border-border'
-    >
-      <PanelHeader heading='Settings' closeLabel='Close' onClose={onClose} />
-      <div className='min-h-0 flex-1 overflow-y-auto p-2'>
-        <EmptyState text='No settings yet.' />
       </div>
     </aside>
   );

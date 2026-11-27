@@ -78,8 +78,8 @@ supplies the addition for it.
 
 | `features` field | Role |
 |---|---|
-| `search` | `list` uses `search`. |
-| `extensionFilter` | `list` uses `extensions`. |
+| `search` | `list` uses `search`. The media picker also uses it. Without it, the picker filters the loaded items of the open folder by file name. |
+| `extensionFilter` | `list` uses `extensions`. The media picker asks for image extensions. Without it, the picker filters each page of results to images. |
 | `acceptedMimeTypes` | The MIME types that `upload` accepts, such as `application/pdf`, or a wildcard such as `image/*`. |
 | `acceptedExtensions` | The extensions that `upload` accepts, lowercase and without the dot, such as `svg`. |
 | `maxSize` | The largest file that `upload` accepts, in bytes. Each media plugin sets its own limit. If it is not set, the Media Manager does not check the size before an upload. |

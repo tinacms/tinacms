@@ -13,4 +13,5 @@ export default definePlugin({
   provides: ['validator'],
   validators: [...CORE_VALIDATOR_NAMES],
   client: () => import('./core-validators.client'),
+  server: () => import('./core-validators.server'),
 });

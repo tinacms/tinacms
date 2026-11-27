@@ -219,7 +219,8 @@ const viewportBottom = () => {
 const clippedBottom = (link: HTMLElement) => {
   let bottom = viewportBottom();
   for (let up = link.parentElement; up; up = up.parentElement) {
-    if (CLIPS.test(getComputedStyle(up).overflowY)) {
+    const style = getComputedStyle(up);
+    if (style.display !== 'contents' && CLIPS.test(style.overflowY)) {
       bottom = Math.min(bottom, up.getBoundingClientRect().bottom);
     }
   }

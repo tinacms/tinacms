@@ -18,19 +18,19 @@ type SegmentedOption<T extends string> = {
 
 const segmentVariants = cva(
   [
-    'inline-flex h-9 min-w-20 cursor-pointer items-center justify-center gap-1.5 rounded-full border-0 bg-transparent px-3.5 font-sans text-base leading-control font-medium text-muted-foreground-strong outline-none transition-[background-color,color,box-shadow]',
+    'inline-flex h-9 touch:h-touch min-w-20 cursor-pointer items-center justify-center gap-1.5 rounded-full border-0 bg-transparent px-3.5 font-sans text-base leading-control font-medium text-muted-foreground-strong outline-none transition-[background-color,color,box-shadow]',
     'not-disabled:hover:text-foreground data-pressed:bg-card data-pressed:text-foreground data-pressed:shadow-segment',
     'focus:shadow-focus-ring data-pressed:focus:shadow-focus-ring',
     'disabled:cursor-not-allowed disabled:opacity-45',
   ],
   {
     variants: {
-      size: { md: '', sm: 'h-7 min-w-0 px-3 text-sm' },
+      size: { md: '', sm: 'h-7 touch:h-touch min-w-0 px-3 text-sm' },
       iconOnly: { true: 'min-w-0 px-0', false: '' },
     },
     compoundVariants: [
-      { size: 'md', iconOnly: true, className: 'w-9' },
-      { size: 'sm', iconOnly: true, className: 'w-7' },
+      { size: 'md', iconOnly: true, className: 'w-9 touch:w-touch' },
+      { size: 'sm', iconOnly: true, className: 'w-7 touch:w-touch' },
     ],
     defaultVariants: { size: 'md', iconOnly: false },
   }

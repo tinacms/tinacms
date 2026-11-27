@@ -8,13 +8,7 @@ import {
   AlertDialogTitle,
 } from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@tinacms/ui/components/dialog';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { hasValidator } from '../../../core/schema/types';
 import {
   useFieldActivation,
@@ -24,15 +18,16 @@ import {
   useFieldValue,
   useMediaSlice,
 } from '../../../editor';
+import { useMediaPicker, useOwnedPicker } from '../../../editor/media-picker';
 import { UploadHost } from '../../../editor/uploads/upload-host';
 import {
   REPLACE_KEEPS_OLD_FILE,
   replaceQuestion,
 } from '../../../editor/uploads/upload-words';
-import { MediaBrowser } from '../../media-manager/media-browser';
 import { mediaNameOf } from '../../media-manager/media-types';
 import type { ImageFieldSchema } from './image-field.schema';
 import { ImageFieldView } from './image-field.view';
+import { useParentLabel } from './image-picker';
 import { useImageUpload } from './image-upload';
 
 export function ImageField() {
@@ -48,15 +43,21 @@ export function ImageField() {
   const groupRef = useRef<HTMLDivElement>(null);
   const focusAfterRemove = useRef(false);
   const focusAfterUpload = useRef(false);
-  const [picking, setPicking] = useState(false);
+  const focusAfterChoose = useRef(false);
+  const picker = useMediaPicker();
+  const parentLabel = useParentLabel(address);
+  const { owner: target, target: openTarget } = useOwnedPicker();
+  const choosing = openTarget !== null;
+  const [missing, setMissing] = useState(false);
   const [replacement, setReplacement] = useState<File | null>(null);
   const [stored, setStored] = useState(0);
 
   const focusPrimary = () => primaryRef.current?.focus();
 
   // A dialog this field opens is a portal, and React sends its focus events through the
-  // field's row, which activates the field. Focus must stay in that dialog.
+  // field's row, which activates the field. Focus must stay in that dialog, and in the picker.
   useFieldActivation(() => {
+    if (document.activeElement?.closest('[data-slot="media-picker"]')) return;
     const dialog = document.activeElement?.closest(
       '[role="dialog"], [role="alertdialog"]'
     );
@@ -68,7 +69,11 @@ export function ImageField() {
       focusAfterRemove.current = false;
       primaryRef.current?.focus();
     }
-  }, [value]);
+    if (focusAfterChoose.current && path !== null) {
+      focusAfterChoose.current = false;
+      primaryRef.current?.focus();
+    }
+  }, [value, path]);
 
   // A file that lands under the path the field already holds must still show the new picture.
   useEffect(() => {
@@ -99,6 +104,45 @@ export function ImageField() {
     setValue(next);
   };
 
+  // The request outlives this render, so a list edit while it is open must not strand its address.
+  const choose = useRef((_picked: string[]) => {});
+  useLayoutEffect(() => {
+    choose.current = ([picked]) => {
+      if (picked === undefined) return;
+      focusAfterChoose.current = true;
+      if (picked === path) {
+        focusAfterChoose.current = false;
+        setStored((count) => count + 1);
+        primaryRef.current?.focus();
+        return;
+      }
+      store(picked);
+    };
+  });
+
+  const openPicker = () =>
+    picker.open({
+      mode: 'single',
+      forLabel: field.label ?? field.name,
+      parentLabel,
+      target,
+      replacing: path === null ? undefined : { path, missing },
+      opener: primaryRef.current,
+      choose: (picked) => choose.current(picked),
+    });
+
+  // A slow load can flip `missing` after the picker opened: send the request again.
+  const resend = useRef(openPicker);
+  useLayoutEffect(() => {
+    resend.current = openPicker;
+  });
+  const wasMissing = useRef(missing);
+  useEffect(() => {
+    if (wasMissing.current === missing) return;
+    wasMissing.current = missing;
+    if (choosing) resend.current();
+  }, [missing, choosing]);
+
   const failure = frame.disabled || frame.readOnly ? null : upload.failure;
   const retry = failure?.retry;
   const current = upload.current;
@@ -126,8 +170,10 @@ export function ImageField() {
         holdReason={upload.hold?.reason}
         holdQuiet={upload.hold?.quiet}
         previewKey={stored}
-        onChoose={() => setPicking(true)}
-        onReplace={() => setPicking(true)}
+        choosing={choosing}
+        onMissingChange={setMissing}
+        onChoose={openPicker}
+        onReplace={openPicker}
         onRetry={
           retry
             ? () => {
@@ -192,24 +238,6 @@ export function ImageField() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <Dialog open={picking} onOpenChange={setPicking}>
-        <DialogContent
-          finalFocus={primaryRef}
-          className='flex h-[80vh] flex-col gap-0 [--sheet-gap:0px] [--sheet-px:0px] p-0 max-w-5xl'
-        >
-          <DialogHeader className='border-b px-4 py-3'>
-            <DialogTitle>Choose an image</DialogTitle>
-          </DialogHeader>
-          <MediaBrowser
-            mode='pick'
-            accept='image'
-            onSelect={(item) => {
-              store(item.path);
-              setPicking(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

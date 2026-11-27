@@ -28,13 +28,15 @@ type StatusBarProps = Omit<ComponentProps<'footer'>, 'children'> &
   StatusBarWhere & {
     /** Draws the icon, or the unsaved dot, before the words. `failed` turns them red. */
     state?: StatusBarState;
-    /** The state in words. Screen readers hear each change. */
+    /** The state in words. Screen readers hear each change. On a phone, pass the short words: the branch drops first when the line is full. */
     children?: ReactNode;
   };
 
 /**
  * The 28px bar along the bottom of the admin: where edits save to, then the save
- * state. A failed save says so in words, so colour is not the only signal.
+ * state. The state comes first in the markup and a reversed, wrapping row puts it last on
+ * screen, so when the line is full the branch wraps out of the clipped bar and the state
+ * stays. A failed save says so in words, so colour is not the only signal.
  */
 function StatusBar({
   local,
@@ -52,24 +54,14 @@ function StatusBar({
       aria-label='Status bar'
       data-slot='status-bar'
       className={cn(
-        'box-border flex h-7 min-w-0 flex-none items-center gap-4 border-t border-border-subtle bg-card px-3 font-sans text-xs leading-none text-muted-foreground-strong',
+        'box-border flex h-7 min-w-0 flex-none flex-row-reverse flex-wrap items-center justify-end gap-x-4 overflow-hidden border-t border-border-subtle bg-card px-3 font-sans text-xs leading-none text-muted-foreground-strong',
         className
       )}
       {...props}
     >
-      {local || branch ? (
-        <span className='inline-flex flex-none items-center gap-1.5 font-mono tracking-code'>
-          <Icon glyph={local ? 'folder' : 'branch'} size={14} />
-          {local
-            ? 'Local files'
-            : protectedBranch
-              ? `${branch} (protected)`
-              : branch}
-        </span>
-      ) : null}
       <span
         data-slot='status-bar-state'
-        className='inline-flex min-w-0 items-center gap-1.5'
+        className='inline-flex h-full max-w-full min-w-0 items-center gap-1.5'
       >
         {glyph ? (
           <Icon
@@ -92,6 +84,16 @@ function StatusBar({
           {children}
         </span>
       </span>
+      {local || branch ? (
+        <span className='inline-flex h-full max-w-full flex-none items-center gap-1.5 font-mono tracking-code'>
+          <Icon glyph={local ? 'folder' : 'branch'} size={14} />
+          {local
+            ? 'Local files'
+            : protectedBranch
+              ? `${branch} (protected)`
+              : branch}
+        </span>
+      ) : null}
     </footer>
   );
 }

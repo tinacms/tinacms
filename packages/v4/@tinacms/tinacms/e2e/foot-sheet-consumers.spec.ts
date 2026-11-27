@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
+import { fakeKeyboard } from './fake-keyboard';
 
 const SCREEN = { width: 390, height: 844 };
 const KEYBOARD = 336;
@@ -18,18 +19,6 @@ const box = async (locator: Locator) => {
   if (!found) throw new Error('no box');
   return found;
 };
-
-// A keyboard shrinks the visual viewport and leaves the layout viewport alone.
-const fakeKeyboard = (page: Page, shrink: number) =>
-  page.evaluate((by) => {
-    const visual = window.visualViewport;
-    if (!visual) throw new Error('no visual viewport');
-    Object.defineProperty(visual, 'height', {
-      configurable: true,
-      value: window.innerHeight - by,
-    });
-    visual.dispatchEvent(new Event('resize'));
-  }, shrink);
 
 const foot = async (sheet: Locator) => {
   const rect = await box(sheet);
@@ -58,6 +47,24 @@ const expectFootSheet = async (page: Page) => {
 
 const expectClosed = (page: Page) => expect(page.locator(SHEET)).toHaveCount(0);
 
+const SCREEN_CONTENT = '[data-slot=screen-content]';
+
+/** AC25, AC26: on a phone the branch switcher and Search fill the screen between the bars, with no handle. */
+const expectFullScreen = async (page: Page) => {
+  const screen = page.locator(SCREEN_CONTENT);
+  await expect(screen).toBeVisible();
+  const rect = await box(screen);
+  expect(Math.round(rect.y)).toBe(56);
+  expect(rect.width).toBe(SCREEN.width);
+  expect(rect.y + rect.height).toBeLessThan(SCREEN.height);
+  await expect(page.locator(SHEET)).toHaveCount(0);
+  await expect(screen.getByRole('button', { name: 'Close sheet' })).toHaveCount(
+    0
+  );
+  await expect(screen.getByRole('button', { name: 'Maximise' })).toHaveCount(0);
+  return screen;
+};
+
 const openRowMenu = async (page: Page, label: string, item: string) => {
   await page.getByRole('button', { name: `Actions for ${label}` }).click();
   await page.getByRole('menuitem', { name: item }).click();
@@ -71,18 +78,19 @@ test.describe('dialogs as foot sheets on a phone', () => {
   }) => {
     await page.goto(BRANCHES);
     await page.getByRole('button', { name: /^Branch: / }).click();
-    const sheet = await expectFootSheet(page);
-    await sheet.getByRole('button', { name: 'New branch' }).click();
+    const screen = await expectFullScreen(page);
+    await expect(screen.getByRole('searchbox')).toBeFocused();
+    await screen.getByRole('button', { name: 'New branch' }).click();
     await expect(
-      sheet.getByRole('form', { name: 'New branch form' })
+      screen.getByRole('form', { name: 'New branch form' })
     ).toBeVisible();
-    await expectFootSheet(page);
-    await sheet.getByRole('button', { name: 'Back to branches' }).click();
+    await expectFullScreen(page);
+    await screen.getByRole('button', { name: 'Back to branches' }).click();
     await expect(
-      sheet.getByRole('form', { name: 'New branch form' })
+      screen.getByRole('form', { name: 'New branch form' })
     ).toBeHidden();
-    await sheet.getByRole('button', { name: 'Close', exact: true }).click();
-    await expectClosed(page);
+    await screen.getByRole('button', { name: 'Close branches' }).click();
+    await expect(page.locator(SCREEN_CONTENT)).toHaveCount(0);
   });
 
   test('the collection table rename dialog', async ({ page }) => {
@@ -143,28 +151,32 @@ test.describe('dialogs as foot sheets on a phone', () => {
       .getByRole('button', { name: /Search/ })
       .first()
       .click();
-    const sheet = await expectFootSheet(page);
+    const screen = await expectFullScreen(page);
     await expect(
-      sheet.getByRole('searchbox', { name: 'Search' })
+      screen.getByRole('searchbox', { name: 'Search' })
     ).toBeFocused();
-    const title = await box(sheet.getByText('Search', { exact: true }).first());
-    const field = await box(sheet.getByRole('searchbox', { name: 'Search' }));
+    const title = await box(
+      screen.getByText('Search', { exact: true }).first()
+    );
+    const field = await box(screen.getByRole('searchbox', { name: 'Search' }));
     expect(title.y).toBeLessThan(field.y);
-    await sheet.getByRole('button', { name: 'Close', exact: true }).click();
-    await expectClosed(page);
+    await screen.getByRole('button', { name: 'Close search' }).click();
+    await expect(page.locator(SCREEN_CONTENT)).toHaveCount(0);
   });
 
   test('the image field confirm and its picker dialog', async ({ page }) => {
     await page.goto(HOME);
     const field = page.getByRole('group', { name: 'Hero image' });
     await field.getByRole('button', { name: 'Choose from Media' }).click();
-    const picker = await expectFootSheet(page);
-    await expect(
-      picker.getByRole('heading', { name: 'Choose an image' })
-    ).toBeVisible();
+    const picker = page.getByRole('region', { name: 'Choose an image' });
+    await expect(picker).toBeVisible();
+    await settle(page);
+    const rect = await box(page.locator('[data-slot=media-picker-host]'));
+    expect(rect.width).toBe(SCREEN.width);
+    expect(rect.y).toBe(56);
     await picker.getByRole('button', { name: 'preview.svg' }).click();
-    await picker.getByRole('button', { name: 'Insert' }).click();
-    await expectClosed(page);
+    await picker.getByRole('button', { name: 'Choose image' }).click();
+    await expect(picker).toHaveCount(0);
 
     const dataTransfer = await page.evaluateHandle(() => {
       const transfer = new DataTransfer();
@@ -235,31 +247,6 @@ test.describe('media manager confirms as foot sheets on a phone', () => {
     ).toBeLessThanOrEqual(SCREEN.height - KEYBOARD);
     await sheet.getByRole('button', { name: 'Cancel' }).click();
     await expectClosed(page);
-  });
-
-  test('the New folder form in the image picker keeps its field above the keyboard', async ({
-    page,
-  }) => {
-    await page.goto(HOME);
-    await page
-      .getByRole('group', { name: 'Hero image' })
-      .getByRole('button', { name: 'Choose from Media' })
-      .click();
-    await expectFootSheet(page);
-    await page.getByRole('button', { name: 'New Folder' }).click();
-    const sheet = page.locator(SHEET).last();
-    await settle(page);
-    const field = sheet.getByRole('textbox', { name: 'Folder name' });
-    await field.focus();
-    await fakeKeyboard(page, KEYBOARD);
-    await expect.poll(() => foot(sheet)).toBe(SCREEN.height - KEYBOARD);
-    expect(
-      (await box(field)).y + (await box(field)).height
-    ).toBeLessThanOrEqual(SCREEN.height - KEYBOARD);
-    await sheet.getByRole('button', { name: 'Cancel' }).click();
-    await expect(
-      page.getByRole('textbox', { name: 'Folder name' })
-    ).toHaveCount(0);
   });
 });
 

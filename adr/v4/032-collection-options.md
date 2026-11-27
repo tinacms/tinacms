@@ -1,7 +1,7 @@
 # ADR-032: Collection Options Live at the Top Level, Not Under `ui`
 
 ## Status
-**Proposed** (2026-11-12). Decided by Ivan, Josh and Matt, except the property names in Decision 1, which are open (see Open questions). Completes the carve-out in [ADR-029](./029-field-ui-options.md), which left collection options to their own ADR. Builds on [ADR-015](./015-execution-boundary.md), [ADR-016](./016-schema-compiled-artifact.md) and [ADR-017](./017-content-model.md).
+**Proposed** (2026-11-12). Decided by Ivan, Josh and Matt, except the property names in Decision 1, which are open (see Open questions). Josh added Decision 3 (`hidden`) on 2026-11-26. Completes the carve-out in [ADR-029](./029-field-ui-options.md), which left collection options to their own ADR. Builds on [ADR-015](./015-execution-boundary.md), [ADR-016](./016-schema-compiled-artifact.md) and [ADR-017](./017-content-model.md).
 
 ## Context
 v3 configures a collection through a `ui` object (`UICollection`, `packages/@tinacms/schema-tools/src/types/index.ts:1265`). It holds `filename`, `allowedActions`, `global`, `router` and `beforeSubmit`. v4 collections have no `ui` object (`CollectionSchema`, `core/schema/types.ts:83`).
@@ -10,7 +10,7 @@ ADR-029 §1 removed the `ui` wrapper for fields. It left collection options out 
 
 [#8042](https://github.com/tinacms/tinacms/issues/8042) (browsing a collection's documents) adds Rename, Duplicate and Delete to the document list. v3's `allowedActions` has `create`, `delete`, `createFolder` and `createNestedFolder` (`types/index.ts:1311`). It has no switch for Duplicate. A developer who wants to stop editors deleting documents needs one place to say so.
 
-This ADR decides where the first two collection options live. It decides nothing about the rest.
+This ADR decides where the first three collection options live. It decides nothing about the rest.
 
 ## Decision
 
@@ -44,10 +44,26 @@ export const authorCollection = {
 ### 2. `description: string` is a top-level collection option
 A collection gets a `description`, as a field does (ADR-029 §2). It is plain text that says what the collection is for. This ADR does not decide where the Admin UI shows it.
 
+### 3. `hidden: boolean` is a top-level collection option
+Asked for in [#7460](https://github.com/tinacms/tinacms/issues/7460). A collection takes `hidden: true` at the top level. It defaults to `false`.
+
+The Admin UI leaves a hidden collection out of the Collections navigator, the Collections view and the home panels. The navigator keeps it while a route to it is open, and home Recent documents keeps its unsaved documents. Its documents still open by URL, save and resolve as references. Search still finds them.
+
+`hidden` is not access control. The server does not read it. The collection still compiles into `tina-lock.json`.
+
+```ts
+export const seoDefaults = {
+  name: 'seoDefaults',
+  path: 'content/seo',
+  format: 'json',
+  hidden: true,
+  fields: [t.string({ name: 'title' })],
+} satisfies CollectionSchema;
+```
+
 ## Deferred
 These options stay undecided. Each needs its own decision.
 
-- `hidden` ([#7460](https://github.com/tinacms/tinacms/issues/7460)).
 - A help link ([#7461](https://github.com/tinacms/tinacms/issues/7461)).
 - `filename` (`parse`, `slugify`, `readonly`, `showFirst`, `description`). It belongs with the work that creates documents.
 - `global`, `router` and `beforeSubmit`. ADR-014 and ADR-028 already cover save hooks.

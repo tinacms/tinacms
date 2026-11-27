@@ -287,6 +287,8 @@ export interface MediaUploadButtonProps {
   /** Why files cannot be chosen now, in words. The list still opens. */
   holdReason?: string | null;
   size?: 'sm' | 'md';
+  /** Sizes the button to its words, for a bar where a fixed width would leave a gap. */
+  compact?: boolean;
   /** The files the editor picked. Never empty. */
   onPick: (files: File[]) => void;
 }
@@ -299,8 +301,10 @@ export function MediaUploadButton({
   accept,
   holdReason = null,
   size = 'sm',
+  compact = false,
   onPick,
 }: MediaUploadButtonProps) {
+  const width = compact ? '0px' : BUTTON_MIN_WIDTH;
   const uploads = useUploadList();
   const view = useUploadView();
   const { rows, button: look } = view;
@@ -334,7 +338,7 @@ export function MediaUploadButton({
       <Button
         {...shared}
         icon={UploadRing}
-        style={ringStyle(look.percent, BUTTON_MIN_WIDTH)}
+        style={ringStyle(look.percent, width)}
         className='justify-start'
       >
         {look.words}
@@ -344,7 +348,7 @@ export function MediaUploadButton({
         {...shared}
         icon={DoneTick}
         disabled={held}
-        minWidth={BUTTON_MIN_WIDTH}
+        minWidth={width}
         className='justify-start'
       >
         {`${look.count} uploaded`}
@@ -355,7 +359,7 @@ export function MediaUploadButton({
         icon='upload'
         chip={look.count}
         chipSrLabel={`, ${look.count} couldn't upload`}
-        minWidth={BUTTON_MIN_WIDTH}
+        minWidth={width}
         className='justify-start'
       >
         Upload
@@ -365,7 +369,7 @@ export function MediaUploadButton({
         {...shared}
         icon='upload'
         disabled={held}
-        minWidth={BUTTON_MIN_WIDTH}
+        minWidth={width}
         className='justify-start'
       >
         Upload

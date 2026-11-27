@@ -59,8 +59,8 @@ function Marks({ invalid }: { invalid?: boolean }) {
 const stepVariants = cva(['block truncate', quietControl], {
   variants: {
     size: {
-      md: 'max-w-60 px-1.5 py-1 text-base',
-      sm: 'max-w-50 px-1 py-0.5 text-sm',
+      md: 'max-w-60 px-1.5 py-1 text-base touch:min-h-touch',
+      sm: 'max-w-50 px-1 py-0.5 text-sm touch:min-h-touch',
     },
     current: {
       true: 'cursor-default font-medium text-foreground hover:bg-transparent',
@@ -76,7 +76,9 @@ const foldVariants = cva(
     quietControl,
   ],
   {
-    variants: { size: { md: 'size-7', sm: 'size-6' } },
+    variants: {
+      size: { md: 'size-7 touch:size-touch', sm: 'size-6 touch:size-touch' },
+    },
     defaultVariants: { size: 'md' },
   }
 );

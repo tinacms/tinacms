@@ -189,9 +189,9 @@ interface RowMenuProps {
   items: ReactNode;
 }
 
-// Hidden until the row is hovered or holds focus; always shown where nothing hovers.
+// Hidden until the row is hovered or holds focus; always shown on touch.
 const MENU_CELL =
-  'relative z-10 flex justify-end opacity-0 focus-within:opacity-100 has-data-popup-open:opacity-100 [tr:focus-within_&]:opacity-100 [tr:hover_&]:opacity-100 [@media(hover:none)]:opacity-100';
+  'relative z-10 flex justify-end opacity-0 focus-within:opacity-100 has-data-popup-open:opacity-100 [tr:focus-within_&]:opacity-100 [tr:hover_&]:opacity-100 touch:opacity-100';
 
 function RowMenu({ rowKey, label, items }: RowMenuProps) {
   return (

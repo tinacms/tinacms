@@ -1,5 +1,7 @@
 import {
   CONTENT_REFUSALS,
+  type ContentFieldErrors,
+  isDocumentValidationError,
   type ProviderRefusalCode,
   isContentWriteError,
   isInvalidSaveInputError,
@@ -15,8 +17,13 @@ import { type SearchErrorCode, isSearchError } from '../core/search/contract';
 export const errorResponse = (
   status: number,
   code: string,
-  message: string
-): Response => Response.json({ error: { code, message } }, { status });
+  message: string,
+  fieldErrors?: ContentFieldErrors
+): Response =>
+  Response.json(
+    { error: fieldErrors ? { code, message, fieldErrors } : { code, message } },
+    { status }
+  );
 
 const PROVIDER_REFUSAL_STATUS: Record<ProviderRefusalCode, number> = {
   unauthorized: 401,
@@ -41,6 +48,9 @@ const SEARCH_ERROR_STATUS: Record<SearchErrorCode, number> = {
 // A failure with no known cause keeps its message out of the body and in the
 // server log under `label`.
 export const toErrorResponse = (cause: unknown, label: string): Response => {
+  if (isDocumentValidationError(cause)) {
+    return errorResponse(422, 'validation', cause.message, cause.fieldErrors);
+  }
   if (isHookRejectedError(cause)) {
     return errorResponse(422, CONTENT_REFUSALS.hookRejected, cause.message);
   }
