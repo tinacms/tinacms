@@ -26,7 +26,7 @@ import { BranchSwitchedEvent } from '../lib/posthog/posthog';
 import { captureEvent } from '../lib/posthog/posthogProvider';
 import { CreateClientProps, createClient } from '../utils';
 import { ModalBuilder } from './AuthModal';
-import { AuthenticationCancelledError } from './authenticate';
+import { AUTH_REDIRECTING, AuthenticationCancelledError } from './authenticate';
 import loginLlama from './tina-login.png';
 import {
   type AuthRedirectParams,
@@ -37,6 +37,24 @@ type ModalNames = null | 'authenticate' | 'error';
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+const REDIRECT_TIMEOUT_MS = 15_000;
+
+// Resolves on a bfcache restore (Back), or by timeout because a stopped navigation fires no event.
+function redirectAbandoned() {
+  return new Promise<void>((resolve) => {
+    const settle = () => {
+      clearTimeout(timer);
+      window.removeEventListener('pageshow', onPageShow);
+      resolve();
+    };
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) settle();
+    };
+    const timer = setTimeout(settle, REDIRECT_TIMEOUT_MS);
+    window.addEventListener('pageshow', onPageShow);
+  });
 }
 
 export interface TinaCloudMediaStoreClass {
@@ -186,6 +204,10 @@ const AuthWallInner = ({
       const token = await client.authProvider.authenticate(
         loginScreenProps || authProps
       );
+      if (token === AUTH_REDIRECTING) {
+        await redirectAbandoned();
+        return;
+      }
       if (typeof client?.onLogin === 'function') {
         await client?.onLogin({ token });
       }
@@ -485,6 +507,11 @@ export const TinaCloudProvider = (
     code: urlParams.get('code'),
     state: urlParams.get('state'),
     error: urlParams.get('error'),
+    onLogin: async (token) => {
+      if (typeof client.onLogin === 'function') {
+        await client.onLogin({ token });
+      }
+    },
   };
   const authRedirect = useTinaAuthRedirect(authRedirectParams, isTinaCloudAuth);
   const isAuthRedirect = authRedirect.status === 'pending';

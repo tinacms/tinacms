@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  AUTH_REDIRECTING,
   authenticate,
   AUTH_TOKEN_KEY,
   AuthenticationCancelledError,
@@ -181,7 +182,12 @@ describe('authenticate — WorkOS enabled (PKCE redirect)', () => {
   });
 
   it('redirects to /v2/auth/tinacms', async () => {
-    await authenticate(CLIENT_ID, IDENTITY_API_URL, FRONTEND_URL);
+    const result = await authenticate(
+      CLIENT_ID,
+      IDENTITY_API_URL,
+      FRONTEND_URL
+    );
+    expect(result).toBe(AUTH_REDIRECTING);
 
     const redirectUrl = new URL(window.location.href);
     expect(redirectUrl.origin + redirectUrl.pathname).toBe(

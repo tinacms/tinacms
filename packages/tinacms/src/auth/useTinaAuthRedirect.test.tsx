@@ -314,4 +314,69 @@ describe('useTinaAuthRedirect', () => {
     );
     expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
   });
+
+  describe('onLogin', () => {
+    const mockExchange = () => {
+      seedPkceStorage();
+      fetchSpy.mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({ access_token: 'access-token', refresh_token: 'r' }),
+      });
+    };
+
+    it('runs once with the real token, after the URL is cleaned and before the reload', async () => {
+      mockExchange();
+      const order: string[] = [];
+      replaceStateSpy.mockImplementation(() => {
+        order.push('clean url');
+      });
+      const onLogin = vi.fn(async () => {
+        order.push(`login:${localStorage.getItem(AUTH_TOKEN_KEY)}`);
+      });
+      (window.location.reload as any).mockImplementation(() => {
+        order.push('reload');
+      });
+
+      renderHook(() =>
+        useTinaAuthRedirect(
+          { code: CODE, state: STATE, error: null, onLogin },
+          true
+        )
+      );
+
+      await vi.waitFor(() => expect(window.location.reload).toHaveBeenCalled());
+      expect(onLogin).toHaveBeenCalledTimes(1);
+      expect(onLogin).toHaveBeenCalledWith({
+        access_token: 'access-token',
+        refresh_token: 'r',
+      });
+      expect(order).toEqual([
+        'clean url',
+        `login:${JSON.stringify({ access_token: 'access-token', refresh_token: 'r' })}`,
+        'reload',
+      ]);
+    });
+
+    it('shows the error, drops the token and does not reload when it throws', async () => {
+      mockExchange();
+      const onLogin = vi.fn().mockRejectedValue(new Error('hook failed'));
+
+      const { result } = renderHook(() =>
+        useTinaAuthRedirect(
+          { code: CODE, state: STATE, error: null, onLogin },
+          true
+        )
+      );
+
+      await vi.waitFor(() =>
+        expect(result.current).toEqual({
+          status: 'failed',
+          message: 'hook failed',
+        })
+      );
+      expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
+      expect(window.location.reload).not.toHaveBeenCalled();
+    });
+  });
 });
