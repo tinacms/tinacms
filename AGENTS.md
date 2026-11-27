@@ -4,6 +4,10 @@
 
 TinaCMS is an open-source headless CMS with visual editing. This monorepo contains the core packages, CLI, admin app, and framework example apps.
 
+## Contributing
+
+Before preparing a pull request, follow the contribution process in [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Security & Disclosure
 
 This repo has a public security policy at [`SECURITY.md`](SECURITY.md). Read it before touching code that could surface a vulnerability (auth, media routes, path handling, GraphQL resolvers, anything that accepts untrusted input).
