@@ -1,0 +1,10 @@
+{
+  "name": "Ada Lovelace",
+  "links": [
+    {
+      "label": "Site",
+      "href": "https://example.com/ada"
+    }
+  ],
+  "scores": [1, 2, 3]
+}

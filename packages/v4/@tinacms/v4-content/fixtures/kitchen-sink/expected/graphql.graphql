@@ -1,0 +1,322 @@
+"References another document, used as a foreign key"
+scalar Reference
+
+""
+scalar JSON
+
+"A rich-text document, renderable by TinaMarkdown"
+scalar RichText
+
+type SystemInfo {
+  filename: String!
+  title: String
+  basename: String!
+  hasReferences: Boolean
+  breadcrumbs(excludeExtension: Boolean): [String!]!
+  path: String!
+  relativePath: String!
+  extension: String!
+  template: String!
+  collection: Collection!
+}
+
+type Folder {
+  name: String!
+  path: String!
+}
+
+type PageInfo {
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
+  startCursor: String!
+  endCursor: String!
+}
+
+""
+interface Node {
+  id: ID!
+}
+
+""
+interface Document {
+  id: ID!
+  _sys: SystemInfo
+  _values: JSON!
+}
+
+"A relay-compliant pagination connection"
+interface Connection {
+  totalCount: Float!
+  pageInfo: PageInfo!
+}
+
+type Query {
+  getOptimizedQuery(queryString: String!): String
+  collection(collection: String): Collection!
+  collections: [Collection!]!
+  node(id: String): Node!
+  document(collection: String, relativePath: String): DocumentNode!
+  post(relativePath: String): Post!
+  postConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: PostFilter): PostConnection!
+  author(relativePath: String): Author!
+  authorConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: AuthorFilter): AuthorConnection!
+}
+
+input DocumentFilter {
+  post: PostFilter
+  author: AuthorFilter
+}
+
+type DocumentConnectionEdges {
+  cursor: String!
+  node: DocumentNode
+}
+
+type DocumentConnection implements Connection {
+  pageInfo: PageInfo!
+  totalCount: Float!
+  edges: [DocumentConnectionEdges]
+}
+
+type Collection {
+  name: String!
+  slug: String!
+  label: String
+  path: String!
+  format: String
+  matches: String
+  templates: [JSON]
+  fields: [JSON]
+  documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter, folder: String): DocumentConnection!
+}
+
+union DocumentNode = Post | Author | Folder
+
+union PostAuthor = Author
+
+type PostBlocksHero {
+  headline: String
+}
+
+type PostBlocksQuote {
+  text: String
+  cite: String
+}
+
+union PostBlocks = PostBlocksHero | PostBlocksQuote
+
+type PostSeo {
+  title: String
+  description: String
+}
+
+type Post implements Node & Document {
+  title: String!
+  published: Boolean
+  date: String
+  rating: Float
+  hero: String
+  author: PostAuthor
+  tags: [String]
+  blocks: [PostBlocks]
+  seo: PostSeo
+  body: RichText
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+input StringFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input BooleanFilter {
+  eq: Boolean
+  exists: Boolean
+}
+
+input DatetimeFilter {
+  after: String
+  before: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input NumberFilter {
+  lt: Float
+  lte: Float
+  gte: Float
+  gt: Float
+  eq: Float
+  exists: Boolean
+  in: [Float]
+}
+
+input ImageFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input PostAuthorFilter {
+  author: AuthorFilter
+}
+
+input PostBlocksHeroFilter {
+  headline: StringFilter
+}
+
+input PostBlocksQuoteFilter {
+  text: StringFilter
+  cite: StringFilter
+}
+
+input PostBlocksFilter {
+  hero: PostBlocksHeroFilter
+  quote: PostBlocksQuoteFilter
+}
+
+input PostSeoFilter {
+  title: StringFilter
+  description: StringFilter
+}
+
+input PostBodyCalloutFilter {
+  message: StringFilter
+}
+
+input PostBodyFilter {
+  Callout: PostBodyCalloutFilter
+}
+
+input PostFilter {
+  title: StringFilter
+  published: BooleanFilter
+  date: DatetimeFilter
+  rating: NumberFilter
+  hero: ImageFilter
+  author: PostAuthorFilter
+  tags: StringFilter
+  blocks: PostBlocksFilter
+  seo: PostSeoFilter
+  body: PostBodyFilter
+}
+
+type PostConnectionEdges {
+  cursor: String!
+  node: Post
+}
+
+type PostConnection implements Connection {
+  pageInfo: PageInfo!
+  totalCount: Float!
+  edges: [PostConnectionEdges]
+}
+
+type AuthorLinks {
+  label: String
+  href: String
+}
+
+type Author implements Node & Document {
+  name: String!
+  links: [AuthorLinks]
+  scores: [Float]
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+input AuthorLinksFilter {
+  label: StringFilter
+  href: StringFilter
+}
+
+input AuthorFilter {
+  name: StringFilter
+  links: AuthorLinksFilter
+  scores: NumberFilter
+}
+
+type AuthorConnectionEdges {
+  cursor: String!
+  node: Author
+}
+
+type AuthorConnection implements Connection {
+  pageInfo: PageInfo!
+  totalCount: Float!
+  edges: [AuthorConnectionEdges]
+}
+
+type Mutation {
+  addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
+  updateDocument(collection: String, relativePath: String!, params: DocumentUpdateMutation!): DocumentNode!
+  deleteDocument(collection: String, relativePath: String!): DocumentNode!
+  createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  createFolder(collection: String, relativePath: String!): DocumentNode!
+  updatePost(relativePath: String!, params: PostMutation!): Post!
+  createPost(relativePath: String!, params: PostMutation!): Post!
+  updateAuthor(relativePath: String!, params: AuthorMutation!): Author!
+  createAuthor(relativePath: String!, params: AuthorMutation!): Author!
+}
+
+input DocumentUpdateMutation {
+  post: PostMutation
+  author: AuthorMutation
+  relativePath: String
+}
+
+input DocumentMutation {
+  post: PostMutation
+  author: AuthorMutation
+}
+
+input PostBlocksHeroMutation {
+  headline: String
+}
+
+input PostBlocksQuoteMutation {
+  text: String
+  cite: String
+}
+
+input PostBlocksMutation {
+  hero: PostBlocksHeroMutation
+  quote: PostBlocksQuoteMutation
+}
+
+input PostSeoMutation {
+  title: String
+  description: String
+}
+
+input PostMutation {
+  title: String
+  published: Boolean
+  date: String
+  rating: Float
+  hero: String
+  author: String
+  tags: [String]
+  blocks: [PostBlocksMutation]
+  seo: PostSeoMutation
+  body: RichText
+}
+
+input AuthorLinksMutation {
+  label: String
+  href: String
+}
+
+input AuthorMutation {
+  name: String
+  links: [AuthorLinksMutation]
+  scores: [Float]
+}
+

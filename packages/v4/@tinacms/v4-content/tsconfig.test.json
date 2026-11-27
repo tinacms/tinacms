@@ -1,0 +1,12 @@
+{
+  // The main tsconfig excludes tests because it emits declarations. This config
+  // checks the tests and emits nothing. `pnpm types` runs both.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "rootDir": "."
+  },
+  "exclude": ["node_modules", "**/dist"],
+  "include": ["src", "*.ts"]
+}

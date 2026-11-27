@@ -1,5 +1,6 @@
 import matter from 'gray-matter';
-import type { FormatAdapter } from './format-adapters';
+import type { FormatAdapter } from '../format-adapters';
+import { isSameValue } from './same-value';
 
 const dropLayoutBlankLine = (body: string): string =>
   body.startsWith('\n') ? body.slice(1) : body;
@@ -38,9 +39,6 @@ const toLineFeeds = (text: string): string => text.replace(/\r\n/g, '\n');
 
 const toDocumentEol = (text: string, crlf: boolean): string =>
   crlf ? text.replace(/\n/g, CRLF) : text;
-
-const isSameValue = (next: unknown, previous: unknown): boolean =>
-  JSON.stringify(next) === JSON.stringify(previous);
 
 const mergeFrontmatter = (
   document: Record<string, unknown>,
@@ -85,9 +83,12 @@ export const markdownAdapter = (extension: string): FormatAdapter => ({
       hasFrontmatter,
       bodyField
     );
+    // parse drops the blank line after the front matter and bodyToWrite always
+    // adds one, so compare bodies as parse returns them.
+    const body = hasFrontmatter ? dropLayoutBlankLine(content) : content;
     if (
       previousRaw !== undefined &&
-      content === previous.content &&
+      body === dropLayoutBlankLine(previous.content) &&
       isSameValue(frontmatter, previous.data)
     ) {
       return previousRaw;

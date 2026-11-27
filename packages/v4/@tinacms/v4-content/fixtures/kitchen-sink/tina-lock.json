@@ -1,0 +1,193 @@
+{
+  "version": 5,
+  "schema": {
+    "collections": [
+      {
+        "name": "post",
+        "label": "Posts",
+        "path": "content/posts",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "published",
+            "label": "Published",
+            "type": "boolean"
+          },
+          {
+            "name": "date",
+            "label": "Date",
+            "type": "datetime"
+          },
+          {
+            "name": "rating",
+            "label": "Rating",
+            "type": "number"
+          },
+          {
+            "name": "hero",
+            "label": "Hero image",
+            "type": "image"
+          },
+          {
+            "type": "reference",
+            "name": "author",
+            "label": "Author",
+            "collections": [
+              "author"
+            ]
+          },
+          {
+            "name": "tags",
+            "label": "Tags",
+            "of": {
+              "name": "tag",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "name": "blocks",
+            "label": "Blocks",
+            "templates": [
+              {
+                "name": "hero",
+                "label": "Hero",
+                "fields": [
+                  {
+                    "name": "headline",
+                    "label": "Headline",
+                    "type": "string"
+                  }
+                ]
+              },
+              {
+                "name": "quote",
+                "label": "Quote",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "string"
+                  },
+                  {
+                    "name": "cite",
+                    "label": "Cite",
+                    "type": "string"
+                  }
+                ]
+              }
+            ],
+            "type": "array"
+          },
+          {
+            "name": "seo",
+            "label": "SEO",
+            "fields": [
+              {
+                "name": "title",
+                "label": "SEO title",
+                "type": "string"
+              },
+              {
+                "name": "description",
+                "label": "SEO description",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          },
+          {
+            "name": "body",
+            "label": "Body",
+            "isBody": true,
+            "templates": [
+              {
+                "name": "Callout",
+                "label": "Callout",
+                "fields": [
+                  {
+                    "name": "message",
+                    "label": "Message",
+                    "type": "string"
+                  }
+                ]
+              }
+            ],
+            "type": "rich-text"
+          }
+        ]
+      },
+      {
+        "name": "author",
+        "label": "Authors",
+        "path": "content/authors",
+        "format": "json",
+        "fields": [
+          {
+            "name": "name",
+            "label": "Name",
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
+            "type": "string"
+          },
+          {
+            "name": "links",
+            "label": "Links",
+            "fields": [
+              {
+                "name": "label",
+                "label": "Label",
+                "type": "string"
+              },
+              {
+                "name": "href",
+                "label": "Link",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          },
+          {
+            "name": "scores",
+            "label": "Scores",
+            "of": {
+              "name": "score",
+              "type": "number"
+            },
+            "type": "array"
+          }
+        ]
+      }
+    ],
+    "version": {
+      "fullVersion": "4.0.0-alpha.0",
+      "major": "4",
+      "minor": "0",
+      "patch": "0-alpha"
+    }
+  },
+  "primitives": {
+    "array": 1,
+    "boolean": 1,
+    "datetime": 1,
+    "image": 1,
+    "number": 1,
+    "object": 1,
+    "reference": 1,
+    "rich-text": 1,
+    "string": 1
+  }
+}

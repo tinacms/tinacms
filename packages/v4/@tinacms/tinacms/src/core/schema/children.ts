@@ -1,5 +1,12 @@
+import { fieldsOf, scalarItemOf } from '@tinacms/v4-content/schema';
 import { isRecord } from '../../utils/is-record';
 import type { FieldSchema, TemplateSchema, TinaDocument } from './types';
+
+export {
+  fieldsOf,
+  isFieldNode,
+  scalarItemOf,
+} from '@tinacms/v4-content/schema';
 
 // ADR-017 §3: an item of a `templates` position names its template here.
 export const TEMPLATE_KEY = '_template';
@@ -9,9 +16,6 @@ export const templateFor = <T extends TemplateSchema>(
   item: Record<string, unknown>
 ): T | undefined =>
   templates.find((template) => template.name === item[TEMPLATE_KEY]);
-
-export const fieldsOf = (node: FieldSchema): FieldSchema[] | undefined =>
-  'fields' in node && Array.isArray(node.fields) ? node.fields : undefined;
 
 // A value naming no known template has no fieldset.
 export const fieldsetOf = (
@@ -25,13 +29,6 @@ export const fieldsetOf = (
   }
   return undefined;
 };
-
-export const isFieldNode = (value: unknown): value is FieldSchema =>
-  isRecord(value) && typeof value.type === 'string';
-
-// `FieldSchema` does not declare `of`; only the array plugin owns that key.
-export const scalarItemOf = (node: FieldSchema): FieldSchema | undefined =>
-  'of' in node && isFieldNode(node.of) ? node.of : undefined;
 
 // A value nested under a node, read either as one value with `field` (an `of`
 // item) or as an object with `fields`. `index` is set for an item of a list.

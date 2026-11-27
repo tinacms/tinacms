@@ -1,0 +1,302 @@
+{
+  "post-single": {
+    "data": {
+      "post": {
+        "id": "content/posts/hello.mdx",
+        "title": "Hello World",
+        "published": true,
+        "date": "2024-03-01T00:00:00.000Z",
+        "rating": 4,
+        "hero": "/uploads/hello.png",
+        "tags": [
+          "intro",
+          "news"
+        ],
+        "blocks": [
+          {
+            "__typename": "PostBlocksHero",
+            "headline": "Welcome"
+          },
+          {
+            "__typename": "PostBlocksQuote",
+            "text": "Content is code.",
+            "cite": "Ada"
+          }
+        ],
+        "seo": {
+          "title": "Hello SEO",
+          "description": "The first post."
+        },
+        "author": {
+          "id": "content/authors/ada.json",
+          "name": "Ada Lovelace",
+          "scores": [
+            1,
+            2,
+            3
+          ],
+          "links": [
+            {
+              "label": "Site",
+              "href": "https://example.com/ada"
+            }
+          ]
+        },
+        "body": {
+          "type": "root",
+          "children": [
+            {
+              "type": "h1",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Hello"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Some "
+                },
+                {
+                  "type": "text",
+                  "text": "bold",
+                  "bold": true
+                },
+                {
+                  "type": "text",
+                  "text": " prose with a "
+                },
+                {
+                  "type": "a",
+                  "url": "https://tina.io",
+                  "title": null,
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "link"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "."
+                }
+              ]
+            },
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "Callout",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "props": {
+                "message": "Read the docs"
+              }
+            },
+            {
+              "type": "ul",
+              "children": [
+                {
+                  "type": "li",
+                  "children": [
+                    {
+                      "type": "lic",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "one"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "li",
+                  "children": [
+                    {
+                      "type": "lic",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "two"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "_sys": {
+          "filename": "hello",
+          "basename": "hello.mdx",
+          "relativePath": "hello.mdx",
+          "extension": ".mdx",
+          "collection": {
+            "name": "post"
+          }
+        }
+      }
+    }
+  },
+  "post-second": {
+    "data": {
+      "post": {
+        "title": "Second Post",
+        "published": false,
+        "tags": [
+          "news"
+        ],
+        "blocks": null,
+        "author": {
+          "name": "Grace Hopper"
+        },
+        "body": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Plain body."
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "post-connection": {
+    "data": {
+      "postConnection": {
+        "totalCount": 2,
+        "edges": [
+          {
+            "node": {
+              "id": "content/posts/hello.mdx",
+              "title": "Hello World",
+              "tags": [
+                "intro",
+                "news"
+              ]
+            }
+          },
+          {
+            "node": {
+              "id": "content/posts/second.mdx",
+              "title": "Second Post",
+              "tags": [
+                "news"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "post-connection-filter": {
+    "data": {
+      "postConnection": {
+        "totalCount": 1,
+        "edges": [
+          {
+            "node": {
+              "title": "Hello World"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "author-single": {
+    "data": {
+      "author": {
+        "id": "content/authors/ada.json",
+        "name": "Ada Lovelace",
+        "scores": [
+          1,
+          2,
+          3
+        ],
+        "links": [
+          {
+            "label": "Site",
+            "href": "https://example.com/ada"
+          }
+        ],
+        "_sys": {
+          "filename": "ada",
+          "extension": ".json"
+        }
+      }
+    }
+  },
+  "author-connection": {
+    "data": {
+      "authorConnection": {
+        "totalCount": 2,
+        "edges": [
+          {
+            "node": {
+              "name": "Ada Lovelace",
+              "scores": [
+                1,
+                2,
+                3
+              ]
+            }
+          },
+          {
+            "node": {
+              "name": "Grace Hopper",
+              "scores": []
+            }
+          }
+        ]
+      }
+    }
+  },
+  "collections": {
+    "data": {
+      "collections": [
+        {
+          "name": "post",
+          "path": "content/posts",
+          "format": "mdx"
+        },
+        {
+          "name": "author",
+          "path": "content/authors",
+          "format": "json"
+        }
+      ]
+    }
+  },
+  "unknown-document": {
+    "errors": [
+      {
+        "message": "Unable to find record content/posts/missing.mdx",
+        "locations": [
+          {
+            "line": 1,
+            "column": 33
+          }
+        ],
+        "path": [
+          "post"
+        ]
+      }
+    ],
+    "data": null
+  }
+}

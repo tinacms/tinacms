@@ -1,0 +1,38 @@
+[
+  {
+    "name": "post-single",
+    "query": "query($relativePath: String!) { post(relativePath: $relativePath) { id title published date rating hero tags blocks { __typename ... on PostBlocksHero { headline } ... on PostBlocksQuote { text cite } } seo { title description } author { ... on Author { id name scores links { label href } } } body _sys { filename basename relativePath extension collection { name } } } }",
+    "variables": { "relativePath": "hello.mdx" }
+  },
+  {
+    "name": "post-second",
+    "query": "query($relativePath: String!) { post(relativePath: $relativePath) { title published tags blocks { __typename } author { ... on Author { name } } body } }",
+    "variables": { "relativePath": "second.mdx" }
+  },
+  {
+    "name": "post-connection",
+    "query": "{ postConnection(sort: \"title\") { totalCount edges { node { id title tags } } } }"
+  },
+  {
+    "name": "post-connection-filter",
+    "query": "{ postConnection(filter: { published: { eq: true } }) { totalCount edges { node { title } } } }"
+  },
+  {
+    "name": "author-single",
+    "query": "query($relativePath: String!) { author(relativePath: $relativePath) { id name scores links { label href } _sys { filename extension } } }",
+    "variables": { "relativePath": "ada.json" }
+  },
+  {
+    "name": "author-connection",
+    "query": "{ authorConnection { totalCount edges { node { name scores } } } }"
+  },
+  {
+    "name": "collections",
+    "query": "{ collections { name path format } }"
+  },
+  {
+    "name": "unknown-document",
+    "query": "query($relativePath: String!) { post(relativePath: $relativePath) { title } }",
+    "variables": { "relativePath": "missing.mdx" }
+  }
+]

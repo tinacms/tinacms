@@ -1,3 +1,4 @@
+import { ARRAY_FIELD_TYPE } from '@tinacms/v4-content/schema';
 import { type ZodType, z } from 'zod';
 import { invariant } from '../../../core/invariant';
 import { isFieldNode, templateFor } from '../../../core/schema/children';
@@ -10,7 +11,7 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 
-export const ARRAY_FIELD_TYPE = 'array';
+export { ARRAY_FIELD_TYPE };
 
 const COMPOUND_TYPES: string[] = [ARRAY_FIELD_TYPE, OBJECT_FIELD_TYPE];
 
