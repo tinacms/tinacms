@@ -765,6 +765,26 @@
             "type": "array"
           }
         ]
+      },
+      {
+        "name": "seoDefaults",
+        "label": "SEO defaults",
+        "path": "content/seo",
+        "description": "Hidden from the Admin UI lists. It opens by URL.",
+        "format": "json",
+        "hidden": true,
+        "fields": [
+          {
+            "name": "title",
+            "label": "Default title",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "label": "Default description",
+            "type": "string"
+          }
+        ]
       }
     ],
     "version": {
