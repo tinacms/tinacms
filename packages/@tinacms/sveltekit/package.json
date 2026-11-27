@@ -84,8 +84,7 @@
       },
       "src/types.ts",
       "src/sanitize.ts",
-      "src/internal/forms-store.ts",
-      "src/internal/escape.ts"
+      "src/internal/forms-store.ts"
     ]
   },
   "scripts": {

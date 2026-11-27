@@ -28,6 +28,26 @@
     "./quick-edit-css": {
       "types": "./dist/quick-edit-css.d.ts",
       "default": "./dist/quick-edit-css.js"
+    },
+    "./edit-mode": {
+      "types": "./dist/edit-mode.d.ts",
+      "default": "./dist/edit-mode.js"
+    },
+    "./form-payload": {
+      "types": "./dist/form-payload.d.ts",
+      "default": "./dist/form-payload.js"
+    },
+    "./island": {
+      "types": "./dist/island.d.ts",
+      "default": "./dist/island.js"
+    },
+    "./sanitize": {
+      "types": "./dist/sanitize.d.ts",
+      "default": "./dist/sanitize.js"
+    },
+    "./dev-server": {
+      "types": "./dist/dev-server.d.ts",
+      "default": "./dist/dev-server.js"
     }
   },
   "license": "Apache-2.0",
@@ -37,7 +57,15 @@
       "src/tina-field.ts",
       "src/preview.ts",
       "src/metadata.ts",
-      "src/quick-edit-css.ts"
+      "src/quick-edit-css.ts",
+      "src/edit-mode.ts",
+      "src/form-payload.ts",
+      "src/island.ts",
+      "src/sanitize.ts",
+      {
+        "name": "src/dev-server.ts",
+        "target": "node"
+      }
     ]
   },
   "scripts": {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sanitizeCssColor, sanitizeHref, sanitizeImageSrc } from '../sanitize';
+import { sanitizeCssColor, sanitizeHref, sanitizeImageSrc } from './sanitize';
 
 describe('sanitizeHref', () => {
   it('blocks javascript: scheme', () => {

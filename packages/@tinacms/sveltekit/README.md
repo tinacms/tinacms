@@ -260,9 +260,11 @@ export const POST = experimental_createIslandHandler({
 
 - The registry key, `name`, and `wrapper` must match. Pass `basePath` if the
   app uses a SvelteKit base path.
-- The endpoint accepts only same-origin Tina preview POSTs, bounds and
-  validates the JSON envelope, renders only registered components, and sends
-  `Cache-Control: no-store`. Never choose components from request input.
+- The endpoint is `handleIslandRequest` from `@tinacms/bridge/island`; the
+  [bridge README](../bridge/README.md#islands) lists the requests it accepts.
+  Never choose components from request input.
+- `experimental_createIslandHandler` throws at startup if a registry key isn't
+  a URL path segment or a wrapper tag is a void element.
 
 ## Deployment modes
 
@@ -311,13 +313,16 @@ Layout:
 | `src/TinaBridge.svelte` | Iframe bootstrap and navigation refresh |
 | `src/TinaMarkdown.svelte` | Rich-text renderer |
 | `src/TinaIsland.svelte`, `src/experimental/` | Island marker and endpoint |
-| `src/internal/` | Per-request form store (on `event.locals`), escaping |
+| `src/internal/` | Per-request form store (on `event.locals`) |
 | `src/__tests__/` | `*.test.ts` (Node), `*.svelte.test.ts` (happy-dom, can use runes) |
 
 Design decisions:
 
 - Form state lives on `event.locals`, not `AsyncLocalStorage`, so the request
   path stays edge-compatible.
+- Server logic shared with other adapters (edit-mode detection, form payloads,
+  the island endpoint, sanitizers, serving the bridge) comes from
+  `@tinacms/bridge`; this package keeps only the SvelteKit wiring.
 - Use Svelte 5 runes for all components.
 - The bridge is served by Vite middleware in dev and emitted only into the
   client build. Putting it in `static/admin` makes Vite reject the import.
@@ -340,8 +345,7 @@ Verified:
 - Hybrid runtime (2026-10-19, Playwright): a prerendered post primes its island
   (200), its form appears in the admin, and unsaved edits update the preview.
   Dev: live title and rich text, click-to-focus, navigation, no console
-  warnings. Same-origin checks need the server to see the browser's protocol;
-  see the example README on `pnpm start` over plain HTTP.
+  warnings.
 - `pnpm test` passes (23 tests in Node and happy-dom, plus `svelte-check`),
   and so does the example's Playwright suite (53 tests). CI runs both.
 
@@ -351,11 +355,7 @@ Next:
    `svelte-check` passes. Still to do: a changeset and the real npm release.
 2. **Content invalidation:** check whether Vite needs a watcher for content
    and routes created in Tina during dev.
-3. **Shared server helpers:** move edit-mode detection, form payloads,
-   escaping, the island checks and the bridge dev server into
-   `@tinacms/bridge`, and switch this package and `@tinacms/astro` to them
-   (follow-up PR).
-4. **happy-dom:** this package pins `happy-dom ^21.0.4`: 15.10.2 (the catalog
+3. **happy-dom:** this package pins `happy-dom ^21.0.4`: 15.10.2 (the catalog
    version) doesn't show paragraphs added to existing content, and versions up
    to 21.0.3 are covered by security advisories. Go back to `catalog:` once
    the catalog is bumped.

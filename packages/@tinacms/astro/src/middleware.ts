@@ -1,11 +1,7 @@
+import { renderPageFormPayloads } from '@tinacms/bridge/form-payload';
 import type { MiddlewareHandler } from 'astro';
 import { adminOrigins } from './internal/admin-origin';
-import {
-  type CollectedForm,
-  formsStore,
-  renderFormPayloadDiv,
-  sortByPriority,
-} from './internal/forms-store';
+import { type CollectedForm, formsStore } from './internal/forms-store';
 import { requestStore } from './internal/request-context';
 import { EDIT_COOKIE_HEADER, isEditMode } from './is-edit-mode';
 
@@ -52,7 +48,7 @@ async function injectEditMode(
     return new Response(html, init);
   }
 
-  const injection = renderInjection(forms);
+  const injection = renderPageFormPayloads(forms) + bridgeScript();
   return new Response(
     html.slice(0, headEnd) + injection + html.slice(headEnd),
     init
@@ -65,15 +61,6 @@ function editModeInit(response: Response): ResponseInit {
   headers.delete('content-length');
   headers.append('Set-Cookie', EDIT_COOKIE_HEADER);
   return { status: response.status, statusText: response.statusText, headers };
-}
-
-function renderInjection(forms: CollectedForm[]): string {
-  // No explicit priority => sort is a no-op and the first form (page
-  // frontmatter runs before its layout's) wins as primary.
-  const formDivs = sortByPriority(forms)
-    .map((form, i) => renderFormPayloadDiv(form, i === 0))
-    .join('');
-  return formDivs + bridgeScript();
 }
 
 function bridgeScript(): string {
