@@ -178,7 +178,7 @@ catalog:
     highlight.js: ^11.11.1
     identity-obj-proxy: ^3.0.0
     is-hotkey: ^0.2.0
-    isomorphic-git: ^1.29.0
+    isomorphic-git: ^1.38.6
     jest: ^29.7.0
     jest-diff: ^29.7.0
     jest-matcher-utils: ^29.7.0
