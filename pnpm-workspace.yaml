@@ -60,6 +60,7 @@ catalog:
     "@graphql-tools/load": ^8.1.21
     "@headlessui/react": 2.2.10
     "@iarna/toml": ^2.2.5
+    "@modelcontextprotocol/sdk": ^1.32.2
     "@monaco-editor/loader": ^1.7.0
     "@octokit/rest": ^22.0.1
     "@playwright/test": ^1.61.1

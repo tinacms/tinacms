@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+import('../dist/index.js')
+  .then((mod) => mod.runCli(process.argv.slice(2)))
+  .catch((err) => {
+    console.error('tinacms-mcp:', err instanceof Error ? err.message : err);
+    process.exit(1);
+  });
