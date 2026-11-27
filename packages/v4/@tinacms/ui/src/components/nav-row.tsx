@@ -15,7 +15,7 @@ type NavRowKind = 'group' | 'folder' | 'doc' | 'more' | 'section';
 
 const navRowVariants = cva(
   [
-    'group/nav-row relative m-0 box-border flex min-h-8.5 w-full cursor-pointer items-center gap-2 py-1.5 pr-2.5 pl-1.5 text-left text-base leading-control',
+    'group/nav-row relative m-0 box-border flex min-h-8.5 touch:min-h-touch w-full cursor-pointer items-center gap-2 py-1.5 pr-2.5 pl-1.5 text-left text-base leading-control',
     quietControl,
     'disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent disabled:hover:text-slate-600',
   ],

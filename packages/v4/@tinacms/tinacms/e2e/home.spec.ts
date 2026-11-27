@@ -44,7 +44,7 @@ test('Home on a branch has two columns at 1280px and wider', async ({
   }
 });
 
-for (const width of [1279, 1024, 390]) {
+for (const width of [1039, 1024, 390]) {
   test(`Home on a branch is one column from Branch down at ${width}px`, async ({
     page,
   }) => {
@@ -214,7 +214,7 @@ test('Review N unsaved is full width under the local-files line on a phone, and 
   expect(reviewBox.width).toBe(recentBox.width);
   await expect(
     panel(page, 'Recent documents').getByRole('button', {
-      name: /^hello-world.*Unsaved/,
+      name: /^Hello World!.*Unsaved/,
     })
   ).toBeVisible();
   await expectNoSidewaysScroll(page);
@@ -319,7 +319,7 @@ test('Home reaches every tile, row and button by Tab, and Enter opens a collecti
   expect(stops[4]).toMatch(/^Pull request #128/);
   await posts.focus();
   await page.keyboard.press('Enter');
-  await expect(page).toHaveURL(/#\/collections\/post$/);
+  await expect(page).toHaveURL(/#\/collections\/post\?max$/);
 });
 
 const SIZES = [

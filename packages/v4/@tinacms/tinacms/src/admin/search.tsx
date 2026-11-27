@@ -3,9 +3,13 @@ import {
   DialogContent,
   DialogTitle,
 } from '@tinacms/ui/components/dialog';
+import { Badge } from '@tinacms/ui/components/badge';
 import { Button } from '@tinacms/ui/components/button';
 import { SearchBox } from '@tinacms/ui/components/search-box';
-import { useEffect, useMemo, useState } from 'react';
+import { ScreenContent } from '@tinacms/ui/components/sheet';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
+import { use, useEffect, useMemo, useState } from 'react';
+import { OneViewContext } from './one-view';
 import {
   ContentError,
   type ContentProvider,
@@ -18,6 +22,7 @@ import {
   isSearchProvider,
 } from '../core/search/contract';
 import { useOptionalContentSlice, useTinaStore } from '../editor/hooks';
+import { useUnsavedFormIds } from '../form/form-store';
 import { useAdminScreens, useGlobalNav } from './hooks';
 import {
   HOME_SCREEN,
@@ -135,8 +140,6 @@ function useNavigationResults(): NavigationResult[] {
               : { view: 'media' }
           ),
       },
-      { label: 'Tools', run: () => navigate({ view: 'tools' }) },
-      { label: 'Settings', run: () => navigate({ view: 'settings' }) },
     ];
     const plugins = globalNav
       .flatMap(({ entries }) => entries)
@@ -166,9 +169,13 @@ function SearchDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const phone = useTier() === 'phone';
+  const { navigate } = useAdminRoute();
+  const oneView = use(OneViewContext);
   const [query, setQuery] = useState('');
   const [outcome, setOutcome] = useState<ContentSearchOutcome>(NO_OUTCOME);
   const navigation = useNavigationResults();
+  const unsavedPaths = new Set<string>(useUnsavedFormIds());
   const matching = navigation.filter(({ label }) =>
     label.toLowerCase().includes(query.trim().toLowerCase())
   );
@@ -189,70 +196,99 @@ function SearchDialog({
       clearTimeout(timer);
     };
   }, [provider, content, query]);
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size='lg' showCloseButton>
-        <DialogTitle>Search</DialogTitle>
-        <SearchBox
-          label='Search'
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          onClear={() => setQuery('')}
-          autoFocus
-        />
-        <h3 className='text-sm font-semibold text-muted-foreground'>
-          Navigation
-        </h3>
-        <ul aria-label='Navigation results' className='m-0 list-none p-0'>
-          {matching.map(({ id, label, run }) => (
-            <li key={id}>
-              <button
-                type='button'
-                className='w-full cursor-pointer rounded-sm px-2 py-1.5 text-left text-base hover:bg-muted'
-                onClick={() => {
-                  onOpenChange(false);
-                  run();
-                }}
-              >
-                {label}
-              </button>
-            </li>
-          ))}
-        </ul>
-        {provider && content ? (
-          <>
-            <h3 className='text-sm font-semibold text-muted-foreground'>
-              Content search
-            </h3>
-            {outcome.message ? (
-              <p role='alert' className='text-sm text-destructive'>
-                {outcome.message}
-              </p>
-            ) : null}
-            <ul aria-label='Search results' className='m-0 list-none p-0'>
-              {outcome.results.map(({ ref, title, snippet }) => (
-                <li
-                  key={`${ref.collection}:${ref.path}`}
-                  className='py-1.5 text-base'
+  const body = (
+    <>
+      <SearchBox
+        label='Search'
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        onClear={() => setQuery('')}
+        autoFocus
+      />
+      {matching.length > 0 ? (
+        <>
+          <h3 className='text-sm font-semibold text-muted-foreground'>
+            Navigation
+          </h3>
+          <ul aria-label='Navigation results' className='m-0 list-none p-0'>
+            {matching.map(({ id, label, run }) => (
+              <li key={id}>
+                <button
+                  type='button'
+                  className='w-full cursor-pointer rounded-sm px-2 py-1.5 text-left text-base hover:bg-muted'
+                  onClick={() => {
+                    onOpenChange(false);
+                    run();
+                  }}
                 >
-                  <span className='block [overflow-wrap:anywhere] font-medium'>
-                    {title}
+                  {label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+      {provider && content ? (
+        <>
+          <h3 className='text-sm font-semibold text-muted-foreground'>
+            Content search
+          </h3>
+          {outcome.message ? (
+            <p role='alert' className='text-sm text-destructive'>
+              {outcome.message}
+            </p>
+          ) : null}
+          <ul aria-label='Search results' className='m-0 list-none p-0'>
+            {outcome.results.map(({ ref, title, snippet }) => (
+              <li key={`${ref.collection}:${ref.path}`} className='text-base'>
+                <button
+                  type='button'
+                  className='block w-full cursor-pointer rounded-sm px-2 py-1.5 text-left hover:bg-muted'
+                  onClick={() => {
+                    onOpenChange(false);
+                    oneView.setView('form');
+                    navigate({
+                      view: 'document',
+                      collection: ref.collection,
+                      path: ref.path,
+                    });
+                  }}
+                >
+                  <span className='flex items-center gap-2'>
+                    <span className='min-w-0 [overflow-wrap:anywhere] font-medium'>
+                      {title}
+                    </span>
+                    {unsavedPaths.has(ref.path) ? <Badge /> : null}
                   </span>
                   {snippet ? (
                     <span className='block [overflow-wrap:anywhere] text-sm text-muted-foreground'>
                       {snippet}
                     </span>
                   ) : null}
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <p className='text-sm text-muted-foreground'>
-            Full-text search needs a search provider.
-          </p>
-        )}
-      </DialogContent>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p className='text-sm text-muted-foreground'>
+          Full-text search needs a search provider.
+        </p>
+      )}
+    </>
+  );
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {phone ? (
+        <ScreenContent title='Search' closeLabel='Close search'>
+          {body}
+        </ScreenContent>
+      ) : (
+        <DialogContent size='lg' showCloseButton keyboard>
+          <DialogTitle>Search</DialogTitle>
+          {body}
+        </DialogContent>
+      )}
     </Dialog>
   );
 }
@@ -280,10 +316,10 @@ export function SearchControl() {
         icon='search'
         shortcut='⌘K'
         aria-keyshortcuts='Meta+K Control+K'
-        className='max-md:px-2 max-md:[&_[data-slot=kbd-shortcut]]:hidden'
+        className='phone:px-2 phone:[&_[data-slot=kbd-shortcut]]:hidden touch:[&_[data-slot=kbd-shortcut]]:hidden'
         onClick={() => setOpen(true)}
       >
-        <span className='max-md:sr-only'>Search</span>
+        <span className='phone:sr-only'>Search</span>
       </Button>
       <SearchDialog
         provider={provider}

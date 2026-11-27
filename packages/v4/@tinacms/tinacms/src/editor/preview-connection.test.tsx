@@ -1,12 +1,6 @@
-import {
-  act,
-  render,
-  renderHook,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type ReactNode, type RefObject, useRef } from 'react';
+import { Component, type ReactNode, type RefObject, useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import type { ContentProvider } from '../core/content/contract';
@@ -20,24 +14,28 @@ import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import {
   activateMessage,
+  documentsMessage,
   readyMessage,
   valuesMessage,
 } from '../preview/protocol';
 import { LabelledFields } from '../test/labelled-fields';
-import { FormScopeContext } from './context';
-import { createFormViewStore } from './form-view-state';
 import { FormProvider, TinaProvider } from './index';
-import { usePreviewConnection } from './preview-connection';
-
-const NO_COLLECTIONS = { collections: [] };
+import {
+  type PreviewConnectionOptions,
+  usePreviewConnection,
+} from './preview-connection';
+import { connectionOf } from '../test/connection';
 
 const collection: CollectionSchema = {
   name: 'post',
+  path: 'content/posts',
   format: 'mdx',
   fields: [t.string({ name: 'title', label: 'Title' })],
 };
 const path = 'content/posts/preview.mdx';
 const formId = toFormId(path);
+const NO_COLLECTIONS = { collections: [collection] };
+const openPost = { collection: 'post', path };
 
 const fakeIframe = () => {
   const contentWindow = { postMessage: vi.fn() };
@@ -51,10 +49,12 @@ const fakeIframe = () => {
 
 function Connection({
   iframeRef,
+  options = { open: openPost },
 }: {
   iframeRef: RefObject<HTMLIFrameElement | null>;
+  options?: PreviewConnectionOptions;
 }) {
-  usePreviewConnection(iframeRef);
+  usePreviewConnection(iframeRef, options);
   return null;
 }
 
@@ -73,7 +73,13 @@ const messageFromPreview = (
   });
 };
 
-const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
+const hear = (iframe: ReturnType<typeof fakeIframe>) =>
+  messageFromPreview(readyMessage(), iframe.ref.current?.contentWindow);
+
+const renderConnected = (
+  iframeRef: RefObject<HTMLIFrameElement | null>,
+  options?: PreviewConnectionOptions
+) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
@@ -87,7 +93,7 @@ const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
         document={{ title: 'Hello' }}
       >
         <LabelledFields />
-        <Connection iframeRef={iframeRef} />
+        <Connection iframeRef={iframeRef} options={options} />
       </FormProvider>
     </TinaProvider>
   );
@@ -96,6 +102,7 @@ const REFERENCED_PATH = 'content/pages/deleted.mdx';
 
 const referenceCollection: CollectionSchema = {
   name: 'post',
+  path: 'content/posts',
   format: 'mdx',
   fields: [
     t.string({ name: 'title', label: 'Title' }),
@@ -121,7 +128,7 @@ const renderWithReference = (
       default: {
         slice: () => ({
           get,
-          list: async () => [],
+          list: async () => connectionOf([]),
           update: async (_c: string, p: string, value: TinaDocument) => ({
             path: p,
             document: value,
@@ -160,22 +167,28 @@ describe('usePreviewConnection reference resolution', () => {
     const iframe = fakeIframe();
     renderWithReference(iframe.ref, get);
     const input = await screen.findByLabelText(/^Title\b/);
+    hear(iframe);
     await waitFor(() => expect(get).toHaveBeenCalledTimes(1));
     iframe.postMessage.mockClear();
 
     await userEvent.type(input, '!');
-    await waitFor(() => expect(iframe.postMessage).toHaveBeenCalled());
+    const valuesPosts = () =>
+      iframe.postMessage.mock.calls.filter(
+        ([message]) => message.type === 'tina:values'
+      );
+    await waitFor(() => expect(valuesPosts()).not.toHaveLength(0));
 
     // `content.get` answers null for a document that is gone. Reading the
     // cached document rather than the cache entry treats that null as a miss,
     // so every edit re-enters the fetch and posts a second time.
-    expect(iframe.postMessage).toHaveBeenCalledTimes(1);
+    expect(valuesPosts()).toHaveLength(1);
   });
 
   it('keeps the path when the document is gone', async () => {
     const iframe = fakeIframe();
     renderWithReference(iframe.ref, async () => null);
     await screen.findByLabelText(/^Title\b/);
+    hear(iframe);
 
     await waitFor(() =>
       expect(iframe.postMessage).toHaveBeenCalledWith(
@@ -192,6 +205,7 @@ describe('usePreviewConnection reference resolution', () => {
       document: { title: 'Deleted Page' },
     }));
     await screen.findByLabelText(/^Title\b/);
+    hear(iframe);
 
     await waitFor(() =>
       expect(iframe.postMessage).toHaveBeenCalledWith(
@@ -220,6 +234,7 @@ describe('usePreviewConnection', () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
     const input = await screen.findByLabelText(/^Title\b/);
+    hear(iframe);
     iframe.postMessage.mockClear();
 
     await userEvent.type(input, '!');
@@ -255,8 +270,79 @@ describe('usePreviewConnection', () => {
     expect(useFormStore.getState().active).toEqual({
       formId,
       address: 'title',
+      source: 'page',
     });
     expect(input).toHaveFocus();
+  });
+
+  it('calls onActivate once per accepted activate message, and not for a refused one', async () => {
+    const iframe = fakeIframe();
+    const onActivate = vi.fn();
+    renderConnected(iframe.ref, { open: openPost, onActivate });
+    await screen.findByLabelText(/^Title\b/);
+
+    messageFromPreview(
+      activateMessage('title'),
+      iframe.ref.current?.contentWindow,
+      'https://evil.example'
+    );
+    messageFromPreview(activateMessage('title'), { not: 'the iframe' });
+    expect(onActivate).not.toHaveBeenCalled();
+
+    messageFromPreview(
+      activateMessage('title'),
+      iframe.ref.current?.contentWindow
+    );
+    expect(onActivate).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onPageUrl once per ready or documents message, including from another origin, and not for a foreign window or a url on a different origin', async () => {
+    const iframe = fakeIframe();
+    const onPageUrl = vi.fn();
+    renderConnected(iframe.ref, { open: openPost, onPageUrl });
+    await screen.findByLabelText(/^Title\b/);
+    const win = iframe.ref.current?.contentWindow;
+    const site = 'https://site.example';
+
+    messageFromPreview(readyMessage(undefined, `${site}/a`), win, site);
+    expect(onPageUrl).toHaveBeenCalledTimes(1);
+    expect(onPageUrl).toHaveBeenLastCalledWith(`${site}/a`);
+
+    messageFromPreview(documentsMessage([], `${site}/b`), win, site);
+    expect(onPageUrl).toHaveBeenCalledTimes(2);
+    expect(onPageUrl).toHaveBeenLastCalledWith(`${site}/b`);
+
+    messageFromPreview(
+      readyMessage(undefined, `${site}/c`),
+      { not: 'the iframe' },
+      site
+    );
+    messageFromPreview(
+      readyMessage(undefined, 'https://other.example/c'),
+      win,
+      site
+    );
+    messageFromPreview(readyMessage(undefined, 'not a url'), win, site);
+    messageFromPreview(readyMessage(), win, site);
+    expect(onPageUrl).toHaveBeenCalledTimes(2);
+  });
+
+  it('opens nothing for a cross-origin ready message even though it reports its url', async () => {
+    const iframe = fakeIframe();
+    const onOpen = vi.fn();
+    const onPageUrl = vi.fn();
+    renderConnected(iframe.ref, { open: openPost, onOpen, onPageUrl });
+    await screen.findByLabelText(/^Title\b/);
+    iframe.postMessage.mockClear();
+
+    messageFromPreview(
+      readyMessage(undefined, 'https://site.example/a'),
+      iframe.ref.current?.contentWindow,
+      'https://site.example'
+    );
+    expect(onPageUrl).toHaveBeenCalledTimes(1);
+    expect(onOpen).not.toHaveBeenCalled();
+    expect(iframe.postMessage).not.toHaveBeenCalled();
   });
 
   it('ignores the wrong origin, the wrong source, and malformed data', async () => {
@@ -284,7 +370,7 @@ describe('usePreviewConnection', () => {
     function Bare() {
       const ref = useRef<HTMLIFrameElement | null>(null);
       ref.current = iframe.ref.current;
-      usePreviewConnection(ref);
+      usePreviewConnection(ref, { open: openPost });
       return <div>bare</div>;
     }
     render(
@@ -305,7 +391,10 @@ describe('usePreviewConnection', () => {
     });
     iframe.postMessage.mockClear();
     messageFromPreview(readyMessage(), iframe.ref.current?.contentWindow);
-    expect(iframe.postMessage).not.toHaveBeenCalled();
+    expect(iframe.postMessage).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'tina:values' }),
+      window.origin
+    );
 
     act(() => {
       useFormStore
@@ -318,7 +407,7 @@ describe('usePreviewConnection', () => {
     );
   });
 
-  it('streams an already-edited form on switch — no ready, no edit needed', async () => {
+  it('streams an already-edited form on switch — no edit needed', async () => {
     const otherPath = 'content/posts/other.mdx';
     const otherFormId = toFormId(otherPath);
     act(() => {
@@ -343,12 +432,16 @@ describe('usePreviewConnection', () => {
           document={{ title: 'Hello' }}
         >
           <LabelledFields />
-          <Connection iframeRef={iframe.ref} />
+          <Connection
+            iframeRef={iframe.ref}
+            options={{ open: { collection: 'post', path: documentPath } }}
+          />
         </FormProvider>
       </TinaProvider>
     );
     const { rerender } = render(tree(path));
     await screen.findByLabelText(/^Title\b/);
+    hear(iframe);
     iframe.postMessage.mockClear();
 
     rerender(tree(otherPath));
@@ -360,38 +453,41 @@ describe('usePreviewConnection', () => {
     );
   });
 
-  it("rejects '*' as targetOrigin at construction", () => {
+  it("rejects '*' as targetOrigin at construction", async () => {
     const iframe = fakeIframe();
-    const wrapper = ({ children }: { children: ReactNode }) => (
-      <FormScopeContext
-        value={{
-          formId,
-          path,
-          collection,
-          onSave: null,
-          seedKey: path,
-          fieldSeedKey: path,
-          reseedFields: () => {},
-          saveFailure: null,
-          setSaveFailure: () => {},
-          view: createFormViewStore(),
-          discardEdits: () => {},
-          hooks: [],
-          staleDraft: null,
-          removeListItem: () => {},
-          insertListItem: () => {},
-          moveListItem: () => {},
-        }}
+    const caught: unknown[] = [];
+    class Catch extends Component<
+      { children: ReactNode },
+      { failed: boolean }
+    > {
+      state = { failed: false };
+      static getDerivedStateFromError() {
+        return { failed: true };
+      }
+      componentDidCatch(error: unknown) {
+        caught.push(error);
+      }
+      render() {
+        return this.state.failed ? <p>failed</p> : this.props.children;
+      }
+    }
+    function Wildcard() {
+      usePreviewConnection(iframe.ref, { targetOrigin: '*' });
+      return null;
+    }
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(
+      <TinaProvider
+        config={asResolvedConfig({ plugins: [], schema: NO_COLLECTIONS })}
       >
-        {children}
-      </FormScopeContext>
+        <Catch>
+          <Wildcard />
+        </Catch>
+      </TinaProvider>
     );
-    expect(() =>
-      renderHook(
-        () => usePreviewConnection(iframe.ref, { targetOrigin: '*' }),
-        { wrapper }
-      )
-    ).toThrow('preview-target-origin-wildcard');
+    await screen.findByText('failed');
+    logged.mockRestore();
+    expect(String(caught[0])).toContain('preview-target-origin-wildcard');
   });
 
   it('goes silent after unmount', async () => {
@@ -409,4 +505,52 @@ describe('usePreviewConnection', () => {
     });
     expect(iframe.postMessage).not.toHaveBeenCalled();
   });
+});
+
+describe('usePreviewConnection with a read-only field', () => {
+  it.each([
+    ['readOnly', 'readonly'],
+    ['disabled', 'disabled'],
+  ] as const)(
+    'makes a %s field active on a click in the page and leaves it not editable',
+    async (flag, attribute) => {
+      const readOnly: CollectionSchema = {
+        ...collection,
+        fields: [t.string({ name: 'title', label: 'Title', [flag]: true })],
+      };
+      const iframe = fakeIframe();
+      render(
+        <TinaProvider
+          config={asResolvedConfig({
+            plugins: [stringFieldPlugin, coreValidatorsPlugin],
+            schema: { collections: [readOnly] },
+          })}
+        >
+          <FormProvider
+            collection={readOnly}
+            path={path}
+            document={{ title: 'Hello' }}
+          >
+            <LabelledFields />
+            <Connection iframeRef={iframe.ref} />
+          </FormProvider>
+        </TinaProvider>
+      );
+      const input = await screen.findByLabelText(/^Title\b/);
+      hear(iframe);
+
+      messageFromPreview(
+        activateMessage('title'),
+        iframe.ref.current?.contentWindow
+      );
+      expect(useFormStore.getState().active).toEqual({
+        formId,
+        address: 'title',
+        source: 'page',
+      });
+      await userEvent.type(input, '!', { skipClick: true });
+      expect(input).toHaveValue('Hello');
+      expect(input).toHaveAttribute(attribute);
+    }
+  );
 });

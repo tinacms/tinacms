@@ -18,7 +18,7 @@ const graphQLErrorSchema = z.object({
     .optional(),
 });
 
-export type TinaCloudGraphQLErrorEntry = z.infer<typeof graphQLErrorSchema>;
+type TinaCloudGraphQLErrorEntry = z.infer<typeof graphQLErrorSchema>;
 
 const responseSchema = z.object({
   data: z.unknown().optional(),
@@ -100,7 +100,12 @@ const listPageSchema = z.object({
   collection: z.object({
     documents: z.object({
       edges: z.array(
-        z.object({ node: z.object({ _sys: z.object({ path: z.string() }) }) })
+        z.object({
+          node: z.object({
+            _sys: z.object({ path: z.string(), relativePath: z.string() }),
+            _values: z.record(z.unknown()),
+          }),
+        })
       ),
       pageInfo: z.object({
         hasNextPage: z.boolean(),
@@ -113,7 +118,7 @@ const listPageSchema = z.object({
 const LIST_QUERY = `query($collection: String!, $first: Float!, $after: String) {
   collection(collection: $collection) {
     documents(first: $first, after: $after) {
-      edges { node { ... on Document { _sys { path } } } }
+      edges { node { ... on Document { _sys { path relativePath } _values } } }
       pageInfo { hasNextPage endCursor }
     }
   }

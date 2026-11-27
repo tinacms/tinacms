@@ -1,286 +1,479 @@
 'use client';
 
 import * as React from 'react';
+import { useKeyboardInset } from '../../hooks/use-keyboard-inset';
 
 import { PortalBody } from '@udecode/cn';
 import {
-  type UseVirtualFloatingOptions,
   flip,
-  limitShift,
+  hide,
   offset,
   shift,
+  useVirtualFloating,
 } from '@udecode/plate-floating';
-import { type TLinkElement, getLinkAttributes } from '@udecode/plate-link';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import {
-  FloatingLinkUrlInput,
-  type LinkFloatingToolbarState,
-  LinkPlugin,
-  submitFloatingLink,
-  useFloatingLinkEdit,
-  useFloatingLinkEditState,
-  useFloatingLinkInsert,
-  useFloatingLinkInsertState,
-} from '@udecode/plate-link/react';
+  type TLinkElement,
+  getLinkAttributes,
+  unwrapLink,
+  upsertLink,
+} from '@udecode/plate-link';
+import { LinkPlugin } from '@udecode/plate-link/react';
 import {
-  useEditorPlugin,
+  type PlateEditor,
+  useEditorReadOnly,
   useEditorRef,
-  useEditorSelection,
-  useFormInputProps,
+  useEditorSelector,
+  useFocused,
   usePluginOption,
 } from '@udecode/plate/react';
-import { cva } from 'class-variance-authority';
-import { CircleX, ExternalLink, Link, Text, Unlink } from 'lucide-react';
-import { buttonVariants } from './button';
-import { Separator } from './separator';
+import { Link, Text } from 'lucide-react';
 
-const popoverVariants = cva(
-  'z-[999999] w-auto rounded-sm border bg-popover p-1 text-popover-foreground shadow-md outline-hidden'
-);
+import { Button } from '@tinacms/ui/components/button';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '@tinacms/ui/components/input-group';
+import { Separator } from '@tinacms/ui/components/separator';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@tinacms/ui/components/sheet';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
+import { cn } from '@tinacms/ui/lib/utils';
+import { helpers } from '../../plugins/core/common';
 
-const inputVariants = cva(
-  'flex h-[28px] w-full rounded-sm border-none bg-transparent px-1.5 py-1 text-base placeholder:text-muted-foreground focus-visible:ring-transparent focus-visible:outline-none md:text-sm'
-);
+const INVALID_URL_MESSAGE =
+  'Invalid URL. Please prefix link with https:// or use a relative path like /about';
 
-export function LinkFloatingToolbar({
-  state,
+export type LinkDraft = { url: string; text: string };
+
+/** False when Plate's own URL check refuses an address the box accepted, such as ftp://. */
+export function applyLink(
+  editor: Parameters<typeof upsertLink>[0],
+  { url, text }: LinkDraft
+): boolean {
+  return upsertLink(editor, { url, text }) === true;
+}
+
+export function LinkBox({
+  initial,
+  onSubmit,
+  onCancel,
 }: {
-  state?: LinkFloatingToolbarState;
+  initial: LinkDraft;
+  onSubmit: (draft: LinkDraft) => boolean;
+  onCancel: () => void;
 }) {
-  const activeCommentId = usePluginOption({ key: 'comment' }, 'activeId');
-  const activeSuggestionId = usePluginOption({ key: 'suggestion' }, 'activeId');
-  const { api, editor } = useEditorPlugin(LinkPlugin);
+  const isUrl = usePluginOption(LinkPlugin, 'isUrl');
+  const [url, setUrl] = React.useState(initial.url);
+  const [text, setText] = React.useState(initial.text);
+  const [invalid, setInvalid] = React.useState(false);
+  const urlRef = React.useRef<HTMLInputElement>(null);
+  const errorId = React.useId();
 
-  const isUrlValidator = usePluginOption(LinkPlugin, 'isUrl');
+  React.useEffect(() => {
+    const input = urlRef.current;
+    if (!input) return;
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+  }, []);
 
-  const [currentUrl, setCurrentUrl] = React.useState('');
-  const [isValidUrl, setIsValidUrl] = React.useState(true);
+  const isValid = (value: string) =>
+    value.length > 0 && (isUrl ? isUrl(value) : true);
 
-  const handleUrlInput = React.useCallback(
-    (e: React.FormEvent<HTMLInputElement>) => {
-      const value = e.currentTarget.value;
-      setCurrentUrl(value);
-      if (value && isUrlValidator) {
-        const valid = isUrlValidator(value);
-        setIsValidUrl(valid);
-      } else {
-        setIsValidUrl(true);
-      }
-    },
-    [isUrlValidator]
-  );
+  const submit = () => {
+    const trimmed = url.trim();
+    if (!isValid(trimmed)) {
+      setInvalid(true);
+      return;
+    }
+    if (!onSubmit({ url: trimmed, text })) setInvalid(true);
+  };
 
-  const floatingOptions: UseVirtualFloatingOptions = React.useMemo(() => {
-    return {
-      middleware: [
-        offset(8),
-        flip({
-          fallbackPlacements: ['bottom-end', 'top-start', 'top-end'],
-          padding: 12,
-        }),
-        shift({ padding: 8, limiter: limitShift() }),
-      ],
-      placement:
-        activeSuggestionId || activeCommentId ? 'top-start' : 'bottom-start',
-    };
-  }, [activeCommentId, activeSuggestionId]);
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      submit();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      onCancel();
+    }
+  };
 
-  const insertState = useFloatingLinkInsertState({
-    ...state,
-    floatingOptions: {
-      ...floatingOptions,
-      ...state?.floatingOptions,
-    },
-  });
-  const {
-    hidden,
-    props: insertProps,
-    ref: insertRef,
-    textInputProps,
-  } = useFloatingLinkInsert(insertState);
-
-  const editState = useFloatingLinkEditState({
-    ...state,
-    floatingOptions: {
-      ...floatingOptions,
-      ...state?.floatingOptions,
-    },
-  });
-  const {
-    editButtonProps,
-    props: editProps,
-    ref: editRef,
-    unlinkButtonProps,
-  } = useFloatingLinkEdit(editState);
-  const inputProps = useFormInputProps({
-    preventDefaultOnEnterKeydown: true,
-  });
-
-  if (hidden) return null;
-
-  const input = (
-    <div
-      className='z-[999999] flex w-[330px] flex-col relative'
-      {...inputProps}
-    >
-      {!isValidUrl && currentUrl && (
-        <div className='absolute -top-16 left-0 right-0 z-[1000000] mb-2'>
-          <div
-            className='bg-red-50 border border-red-200 rounded-sm p-2 shadow-lg'
-            role='alert'
-            aria-live='polite'
-          >
-            <div className='flex items-center'>
-              <CircleX className='size-4 text-red-500 mr-2 flex-shrink-0' />
-              <span className='text-sm text-red-700 text-wrap'>
-                Invalid URL. Please prefix link with https:// or use a relative
-                path like /about
-              </span>
-            </div>
-            <div className='absolute -bottom-1 left-4 w-2 h-2 bg-red-50 border-r border-b border-red-200 transform rotate-45'></div>
-          </div>
-        </div>
-      )}
-
-      <div className='flex items-center'>
-        <div className='flex items-center pr-1 pl-2 text-muted-foreground'>
-          <Link className='size-4' />
-        </div>
-
-        <FloatingLinkUrlInput
-          className={inputVariants()}
+  return (
+    <div className='flex flex-col gap-2' onKeyDown={onKeyDown}>
+      <InputGroup>
+        <InputGroupAddon>
+          <Link />
+        </InputGroupAddon>
+        <InputGroupInput
+          ref={urlRef}
+          type='url'
+          inputMode='url'
+          aria-label='Link'
           placeholder='Paste link'
-          data-plate-focus
-          onInput={handleUrlInput}
+          value={url}
+          aria-invalid={invalid || undefined}
+          aria-describedby={invalid ? errorId : undefined}
+          onChange={(event) => {
+            const next = event.target.value;
+            setUrl(next);
+            setInvalid(next.length > 0 && !isValid(next.trim()));
+          }}
         />
-      </div>
-      <Separator className='my-1' />
-      <div className='flex items-center'>
-        <div className='flex items-center pr-1 pl-2 text-muted-foreground'>
-          <Text className='size-4' />
-        </div>
-        <input
-          className={inputVariants()}
+      </InputGroup>
+      {invalid ? (
+        <p id={errorId} role='alert' className='text-sm text-destructive'>
+          {INVALID_URL_MESSAGE}
+        </p>
+      ) : null}
+      <InputGroup>
+        <InputGroupAddon>
+          <Text />
+        </InputGroupAddon>
+        <InputGroupInput
+          type='text'
+          aria-label='Text to display'
           placeholder='Text to display'
-          data-plate-focus
-          {...textInputProps}
+          value={text}
+          onChange={(event) => setText(event.target.value)}
         />
-      </div>
-      <Separator className='my-1' />
-      <div className='flex items-center justify-end gap-2 px-2 py-1'>
-        <button
-          type='button'
-          className={buttonVariants({ size: 'sm', variant: 'ghost' })}
-          onClick={() => {
-            api.floatingLink.hide();
-          }}
-        >
+      </InputGroup>
+      <div className='flex items-center justify-end gap-2'>
+        <Button variant='ghost' size='sm' onClick={onCancel}>
           Cancel
-        </button>
-        <button
-          type='button'
-          className={buttonVariants({
-            size: 'sm',
-            variant: 'tinaPrimary',
-          })}
-          onClick={() => {
-            if (isValidUrl && currentUrl) {
-              submitFloatingLink(editor);
-            }
-          }}
-          disabled={!isValidUrl && !!currentUrl}
-        >
+        </Button>
+        <Button variant='primary' size='sm' onClick={submit}>
           OK
-        </button>
+        </Button>
       </div>
     </div>
   );
+}
 
-  const editContent = editState.isEditing ? (
-    input
-  ) : (
-    <div className='box-content flex items-center'>
-      <button
-        className={buttonVariants({ size: 'sm', variant: 'ghost' })}
-        type='button'
-        {...editButtonProps}
+export function LinkSheet({
+  open,
+  onOpenChange,
+  children,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+}) {
+  const inset = useKeyboardInset();
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side='bottom'
+        style={{ bottom: inset }}
+        showCloseButton={false}
+        initialFocus={false}
+        className='pb-[env(safe-area-inset-bottom)]'
       >
-        Edit link
-      </button>
-
-      <Separator orientation='vertical' />
-
-      <LinkOpenButton />
-
-      <Separator orientation='vertical' />
-
-      <button
-        className={buttonVariants({
-          size: 'icon',
-          variant: 'ghost',
-        })}
-        type='button'
-        {...unlinkButtonProps}
-      >
-        <Unlink width={18} />
-      </button>
-    </div>
+        <SheetHeader>
+          <SheetTitle>Link</SheetTitle>
+        </SheetHeader>
+        <div className='p-4'>{children}</div>
+      </SheetContent>
+    </Sheet>
   );
+}
+
+const scrollParentOf = (node: HTMLElement) => {
+  for (let up = node.parentElement; up; up = up.parentElement) {
+    if (/auto|scroll/.test(getComputedStyle(up).overflowY)) return up;
+  }
+  return null;
+};
+
+/** How far the stuck body toolbar reaches into the form's scroll area; a link under it is out of view. */
+const stuckToolbarOverlap = (editor: PlateEditor) => {
+  const shell = toolbarShellOf(editor, '[data-stuck]:not([data-lifted])');
+  if (!shell) return 0;
+  const top = scrollParentOf(shell)?.getBoundingClientRect().top ?? 0;
+  return Math.max(0, shell.getBoundingClientRect().bottom - top);
+};
+
+const isWebKit = () =>
+  typeof CSS !== 'undefined' &&
+  CSS.supports?.('-webkit-backdrop-filter', 'none');
+
+const CLIPS = /auto|scroll|hidden|clip|overlay/;
+
+/**
+ * Bottom of the visual viewport (never `innerHeight`, which a phone keyboard doesn't shrink).
+ * floating-ui offsets its viewport rect by `offsetTop` except on WebKit; this follows the same rule so the padding lines up with it.
+ */
+const viewportBottom = () => {
+  const viewport = window.visualViewport;
+  if (!viewport) return window.innerHeight;
+  return (isWebKit() ? 0 : viewport.offsetTop) + viewport.height;
+};
+
+/** The viewport bottom cut by each clipping ancestor of the link, which is what `hide` measures the link against. */
+const clippedBottom = (link: HTMLElement) => {
+  let bottom = viewportBottom();
+  for (let up = link.parentElement; up; up = up.parentElement) {
+    const style = getComputedStyle(up);
+    if (style.display !== 'contents' && CLIPS.test(style.overflowY)) {
+      bottom = Math.min(bottom, up.getBoundingClientRect().bottom);
+    }
+  }
+  return bottom;
+};
+
+const toolbarShellOf = (editor: PlateEditor, selector: string) =>
+  editor.api
+    .toDOMNode(editor)
+    ?.closest('[data-slot="field-wrapper"]')
+    ?.querySelector<HTMLElement>(`[data-slot="toolbar-shell"]${selector}`) ??
+  null;
+
+/**
+ * The room the lifted phone toolbar (and the keyboard under it) takes from the bottom of the open area.
+ * The bar itself is portaled to the body, so flip and shift measure it against the viewport alone; only `hide`, which tests the link, uses the link's clipped bottom.
+ */
+const liftedToolbarInset = (
+  editor: PlateEditor,
+  link: HTMLElement | null,
+  clipToLink: boolean
+) => {
+  const shell = toolbarShellOf(editor, '[data-lifted]');
+  if (!shell || !link) return 0;
+  const bottom = clipToLink ? clippedBottom(link) : viewportBottom();
+  return Math.max(0, bottom - shell.getBoundingClientRect().top);
+};
+
+function useLinkEntry() {
+  return useEditorSelector(
+    (editor) =>
+      editor.selection
+        ? (editor.api.above<TLinkElement>({
+            match: { type: editor.getType(LinkPlugin) },
+          }) ?? null)
+        : null,
+    [],
+    { equalityFn: (a, b) => a?.[0] === b?.[0] }
+  );
+}
+
+export function LinkFloatingToolbar() {
+  const editor = useEditorRef();
+  const readOnly = useEditorReadOnly();
+  const focused = useFocused();
+  const tier = useTier();
+  const entry = useLinkEntry();
+  const inCodeBlock = useEditorSelector(
+    (e) => helpers.isNodeActive(e, CodeBlockPlugin),
+    []
+  );
+  const [editingState, setEditing] = React.useState<{
+    element: TLinkElement;
+    draft: LinkDraft;
+    selection: typeof editor.selection;
+  } | null>(null);
+  const [barFocused, setBarFocused] = React.useState(false);
+
+  const element = entry?.[0];
+  const path = entry?.[1];
+  const editing = editingState?.element === element ? editingState : null;
+  const visible =
+    !readOnly &&
+    !inCodeBlock &&
+    element !== undefined &&
+    (focused || barFocused || editing !== null);
+
+  React.useEffect(() => {
+    if (!visible || editingState?.element !== element) setEditing(null);
+  }, [visible, element, editingState]);
+
+  const elementRef = React.useRef(element);
+  elementRef.current = element;
+  const linkNode = () =>
+    elementRef.current
+      ? (editor.api.toDOMNode(elementRef.current) ?? null)
+      : null;
+  const openAreaPadding = (clipToLink = false) => ({
+    top: stuckToolbarOverlap(editor),
+    bottom: liftedToolbarInset(editor, linkNode(), clipToLink),
+  });
+
+  const floating = useVirtualFloating({
+    open: visible,
+    getBoundingClientRect: () => {
+      const node = element ? editor.api.toDOMNode(element) : undefined;
+      return node?.getBoundingClientRect() ?? new DOMRect();
+    },
+    placement: 'bottom-start',
+    middleware: [
+      offset(8),
+      flip(() => ({
+        fallbackPlacements: ['top-start', 'bottom-end', 'top-end'],
+        padding: openAreaPadding(),
+      })),
+      shift(() => {
+        const { top, bottom } = openAreaPadding();
+        return {
+          padding: { top: 8 + top, right: 8, left: 8, bottom: 8 + bottom },
+        };
+      }),
+      hide(() => ({ padding: openAreaPadding(true) })),
+    ],
+  });
+  floating.virtualElementRef.current.contextElement = element
+    ? editor.api.toDOMNode(element)
+    : undefined;
+
+  const { update } = floating;
+  React.useEffect(() => {
+    if (visible) update?.();
+  }, [visible, update, element]);
+
+  React.useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!visible || !viewport || !update) return;
+    viewport.addEventListener('resize', update);
+    viewport.addEventListener('scroll', update);
+    return () => {
+      viewport.removeEventListener('resize', update);
+      viewport.removeEventListener('scroll', update);
+    };
+  }, [visible, update]);
+
+  React.useEffect(() => {
+    const shell = toolbarShellOf(editor, '');
+    if (!visible || !shell || !update) return;
+    const watch = new MutationObserver(() => update());
+    watch.observe(shell, {
+      attributes: true,
+      attributeFilter: ['data-lifted', 'data-stuck', 'style'],
+    });
+    return () => watch.disconnect();
+  }, [editor, visible, update]);
+
+  if (!visible || !element || !path) return null;
+
+  const href = getLinkAttributes(editor, element).href;
+
+  const closeEditing = () => {
+    setEditing(null);
+    editor.tf.focus();
+  };
+
+  const startEditing = () =>
+    setEditing({
+      element,
+      draft: { url: element.url, text: editor.api.string(path) },
+      selection: editor.selection,
+    });
+
+  const submit = (draft: LinkDraft) => {
+    if (editing?.selection) editor.tf.select(editing.selection);
+    if (!applyLink(editor, draft)) return false;
+    closeEditing();
+    return true;
+  };
+
+  const remove = () => {
+    unwrapLink(editor, { at: path });
+    editor.tf.focus();
+  };
+
+  const box = editing ? (
+    <LinkBox
+      initial={editing.draft}
+      onSubmit={submit}
+      onCancel={closeEditing}
+    />
+  ) : null;
+
+  if (editing && tier === 'phone') {
+    return (
+      <LinkSheet
+        open
+        onOpenChange={(open) => {
+          if (!open) closeEditing();
+        }}
+      >
+        {box}
+      </LinkSheet>
+    );
+  }
 
   return (
     <PortalBody>
       <div
-        ref={insertRef}
-        className={popoverVariants()}
-        {...insertProps}
-        style={{
-          ...(insertProps.style as React.CSSProperties),
-          zIndex: 999999,
+        ref={floating.refs.setFloating}
+        style={floating.style}
+        onFocus={() => setBarFocused(true)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setBarFocused(false);
+          }
         }}
+        onMouseDown={(event) => {
+          if (!(event.target instanceof HTMLInputElement)) {
+            event.preventDefault();
+          }
+        }}
+        className='z-50'
       >
-        {input}
-      </div>
-
-      <div
-        ref={editRef}
-        className={popoverVariants()}
-        {...editProps}
-        style={{ ...(editProps.style as React.CSSProperties), zIndex: 999999 }}
-      >
-        {editContent}
+        {box ? (
+          <div className='w-80 max-w-[calc(100vw-1rem)] rounded-md bg-popover p-2 shadow-popover inset-ring inset-ring-border'>
+            {box}
+          </div>
+        ) : (
+          <div
+            role='toolbar'
+            aria-label='Link'
+            className={cn(
+              'flex max-w-[calc(100vw-1rem)] items-center gap-1 rounded-md bg-popover p-1 font-sans shadow-popover inset-ring inset-ring-border'
+            )}
+          >
+            <span className='max-w-60 truncate px-2 text-sm text-muted-foreground'>
+              {element.url}
+            </span>
+            {href ? (
+              <Button
+                variant='icon'
+                size='sm'
+                icon='external'
+                href={href}
+                aria-label='Open link in a new tab'
+                {...{ target: '_blank', rel: 'noopener noreferrer' }}
+              />
+            ) : (
+              <Button
+                variant='icon'
+                size='sm'
+                icon='external'
+                disabled
+                aria-label='Open link in a new tab'
+              />
+            )}
+            <Button
+              variant='icon'
+              size='sm'
+              icon='edit'
+              aria-label='Edit link'
+              onClick={startEditing}
+            />
+            <Separator orientation='vertical' tone='strong' className='h-5' />
+            <Button
+              variant='icon'
+              size='sm'
+              destructive
+              aria-label='Remove link'
+              onClick={remove}
+            />
+          </div>
+        )}
       </div>
     </PortalBody>
-  );
-}
-
-function LinkOpenButton() {
-  const editor = useEditorRef();
-  const selection = useEditorSelection();
-
-  const attributes = React.useMemo(() => {
-    const entry = editor.api.node<TLinkElement>({
-      match: { type: editor.getType(LinkPlugin) },
-    });
-    if (!entry) {
-      return {};
-    }
-    const [element] = entry;
-    return getLinkAttributes(editor, element);
-  }, [editor, selection]);
-
-  return (
-    <a
-      {...attributes}
-      className={buttonVariants({
-        size: 'icon',
-        variant: 'ghost',
-      })}
-      onMouseOver={(e) => {
-        e.stopPropagation();
-      }}
-      aria-label='Open link in a new tab'
-      target='_blank'
-    >
-      <ExternalLink width={18} />
-    </a>
   );
 }

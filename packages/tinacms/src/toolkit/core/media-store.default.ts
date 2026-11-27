@@ -595,8 +595,11 @@ export class TinaMediaStore implements MediaStore {
       item.directory,
       sanitizeFilename(item.file.name)
     );
+    // The URL is signed for this type, so the PUT must send exactly that value.
+    const contentType = item.file.type || 'application/octet-stream';
+    const contentTypeQuery = `?contentType=${encodeURIComponent(contentType)}`;
     const res = await this.api.authProvider.fetchWithToken(
-      `${this.url}/upload_url/${path}${branchQuery}`,
+      `${this.url}/upload_url/${path}${contentTypeQuery}${branchQuery.replace('?', '&')}`,
       { method: 'GET' }
     );
 
@@ -606,7 +609,11 @@ export class TinaMediaStore implements MediaStore {
       throw new Error(message);
     }
 
-    const { signedUrl, requestId } = await res.json();
+    const {
+      signedUrl,
+      requestId,
+      contentType: signedContentType,
+    } = await res.json();
     if (!signedUrl) {
       throw new Error('Unexpected error generating upload url');
     }
@@ -615,7 +622,7 @@ export class TinaMediaStore implements MediaStore {
       method: 'PUT',
       body: item.file,
       headers: {
-        'Content-Type': item.file.type || 'application/octet-stream',
+        'Content-Type': signedContentType ?? contentType,
         'Content-Length': String(item.file.size),
       },
     });

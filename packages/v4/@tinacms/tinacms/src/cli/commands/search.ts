@@ -54,6 +54,10 @@ export const runSearchReindex = async (
         'search-no-index-provider',
         'The `search` plugin has no index provider, so there is nothing to reindex.'
       );
+      if (index.indexesItself) {
+        options.log('This search provider indexes itself; nothing to reindex.');
+        return;
+      }
       const { fields } = provider.search;
       const collections = Object.keys(fields).map((name) => {
         const collection = config.schema.collections.find(
@@ -84,9 +88,9 @@ export const runSearchReindex = async (
       try {
         for (const collection of collections) {
           let count = 0;
-          for (const { path: documentPath } of await reader.list(
-            collection.name
-          )) {
+          for (const {
+            node: { path: documentPath },
+          } of (await reader.list(collection.name)).edges) {
             let document: TinaDocument | undefined;
             try {
               document = (await reader.get(collection.name, documentPath))

@@ -13,6 +13,8 @@ import type { FieldSchema } from '../core/schema/types';
 import type { FormId } from '../form/form-store';
 import type { FieldLock } from './context';
 import { type ListChange, rekeyAddresses } from './field-errors';
+import type { MediaPickerRequest } from './media-picker';
+import { readPinned } from './pane-pin';
 
 export interface OpenLevel {
   address: FieldAddress;
@@ -97,6 +99,26 @@ export interface FormViewState {
   showLevels: (levels: readonly OpenLevel[]) => void;
   closeLevelsAbove: (keep: number) => void;
   clearReturn: () => void;
+  /** The one open request of the form's media picker, or null while it is closed. */
+  picker: MediaPickerRequest | null;
+  /** True while the open picker tucked the error summary pane, so closing it brings the pane back. */
+  pickerTuckedPane: boolean;
+  /** Ids of the mounted picker hosts. The first one draws, and the admin's primary host goes first. */
+  pickerHosts: readonly string[];
+  /**
+   * Armed when the form closes the picker (a save, Resume, Discard or an outside change may
+   * remount the form column). The next form column to mount takes focus if it fell to `body`.
+   * A new picker disarms it.
+   */
+  focusHandoff: boolean;
+  armFocusHandoff: () => void;
+  /** Reads and disarms the hand-off. */
+  takeFocusHandoff: () => boolean;
+  /** Changes when the picker serves another requester, so the panel resets its picks. */
+  pickerSerial: number;
+  openPicker: (request: MediaPickerRequest) => void;
+  closePicker: () => void;
+  claimPickerHost: (id: string, primary: boolean) => () => void;
 }
 
 export type FormViewStore = StoreApi<FormViewState>;
@@ -149,6 +171,7 @@ export const createFormViewStore = (): FormViewStore => {
     block: (addresses, hiddenParents = []) =>
       set((state) => ({
         blockedSaves: state.blockedSaves + 1,
+        pickerTuckedPane: state.picker !== null ? true : state.pickerTuckedPane,
         errorSummary: {
           ...IDLE_SUMMARY,
           blocked: addresses.map((address) => ({
@@ -156,7 +179,7 @@ export const createFormViewStore = (): FormViewStore => {
             address,
           })),
           hiddenParents: [...hiddenParents],
-          paneOpen: true,
+          paneOpen: state.picker === null,
         },
       })),
     fix: (remaining, labelOf, currentIndex) =>
@@ -227,13 +250,13 @@ export const createFormViewStore = (): FormViewStore => {
         };
       }),
     openPane: (focusRow) =>
-      set((state) =>
-        state.errorSummary.blocked.length === 0
-          ? state
-          : {
-              errorSummary: { ...state.errorSummary, paneOpen: true, focusRow },
-            }
-      ),
+      set((state) => {
+        if (state.errorSummary.blocked.length === 0) return state;
+        if (state.picker !== null) return { pickerTuckedPane: true };
+        return {
+          errorSummary: { ...state.errorSummary, paneOpen: true, focusRow },
+        };
+      }),
     tuckPane: () =>
       set((state) => ({
         errorSummary: {
@@ -375,6 +398,71 @@ export const createFormViewStore = (): FormViewStore => {
         returnedFrom: state.openLevels[keep]?.address ?? null,
       })),
     clearReturn: () => set({ returnedFrom: null }),
+    picker: null,
+    pickerTuckedPane: false,
+    pickerHosts: [],
+    focusHandoff: false,
+    armFocusHandoff: () => set({ focusHandoff: true }),
+    takeFocusHandoff: () => {
+      const armed = get().focusHandoff;
+      if (armed) set({ focusHandoff: false });
+      return armed;
+    },
+    pickerSerial: 0,
+    openPicker: (asked) => {
+      // A `choose` held past the picker's close, or past a re-target, writes nothing.
+      const request: MediaPickerRequest = {
+        ...asked,
+        choose: (paths) => {
+          if (get().picker === request) asked.choose(paths);
+        },
+      };
+      set((state) => {
+        const summary = state.errorSummary;
+        const tucks =
+          state.picker === null &&
+          summary.paneOpen &&
+          summary.blocked.length > 0 &&
+          !readPinned();
+        return {
+          picker: request,
+          focusHandoff: false,
+          pickerSerial:
+            state.picker?.target === request.target
+              ? state.pickerSerial
+              : state.pickerSerial + 1,
+          pickerTuckedPane:
+            state.picker === null ? tucks : state.pickerTuckedPane,
+          errorSummary: tucks
+            ? { ...summary, paneOpen: false, focusRow: false }
+            : summary,
+        };
+      });
+    },
+    closePicker: () =>
+      set((state) => {
+        if (state.picker === null) return state;
+        const summary = state.errorSummary;
+        const reopens = state.pickerTuckedPane && summary.blocked.length > 0;
+        return {
+          picker: null,
+          pickerTuckedPane: false,
+          errorSummary: reopens
+            ? { ...summary, paneOpen: true, focusRow: false }
+            : summary,
+        };
+      }),
+    claimPickerHost: (id, primary) => {
+      set((state) => ({
+        pickerHosts: primary
+          ? [id, ...state.pickerHosts]
+          : [...state.pickerHosts, id],
+      }));
+      return () =>
+        set((state) => ({
+          pickerHosts: state.pickerHosts.filter((host) => host !== id),
+        }));
+    },
   }));
 };
 
@@ -546,7 +634,8 @@ export const lockAbove = (
   };
 };
 
-// The levels that must be open for the field at `address` to be on screen.
+// The levels that must be open for the field at `address` to be on screen. A
+// list item that opens as a form level is its own level.
 export const levelsFor = (
   address: string,
   fields: readonly FieldSchema[],
@@ -554,5 +643,5 @@ export const levelsFor = (
   drillsIn: (step: OpenLevel) => boolean
 ): OpenLevel[] =>
   fieldsAlong(address, fields, valueAt).filter(
-    (step) => step.address !== address && drillsIn(step)
+    (step) => (step.address !== address || step.item === true) && drillsIn(step)
   );

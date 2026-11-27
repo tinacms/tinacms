@@ -1,7 +1,7 @@
 import { defineClientPlugin } from '../../../client';
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import type { TinaDocument } from '../../../core/schema/types';
-import { validateFieldTree } from '../../../core/validation';
+import { joinAddress, validateFieldTree } from '../../../core/validation';
 import {
   asObjectFieldSchema,
   isPlainObject,
@@ -55,7 +55,7 @@ export default defineClientPlugin({
             subfield,
             descriptor,
             object[subfield.name],
-            `${address}.${subfield.name}`,
+            joinAddress(address, subfield.name),
             registry,
             { ...scope, siblings: object }
           )

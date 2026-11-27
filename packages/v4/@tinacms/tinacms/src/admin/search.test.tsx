@@ -11,8 +11,10 @@ import { SearchError } from '../core/search/contract';
 import { defineSearchPlugin } from '../plugins/search/search.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import { TinaProvider } from '../editor/provider';
+import { toFormId, useFormStore } from '../form/form-store';
 import { TinaAdmin } from './admin';
 import { SearchControl } from './search';
+import { connectionOf } from '../test/connection';
 
 const hit = (path: string, snippet = ''): SearchHit => ({
   ref: { collection: 'post', path },
@@ -60,7 +62,7 @@ const contentPlugin = definePlugin({
   client: async () => ({
     default: {
       slice: () => ({
-        list: async () => [],
+        list: async () => connectionOf([]),
         get: async (_collection: string, path: string) => {
           const found = DOCUMENTS[path];
           if (found instanceof Error) throw found;
@@ -161,7 +163,22 @@ describe('the Search dialog content results', () => {
     expect(first).toHaveTextContent('Hello post');
     expect(first).toHaveTextContent('a snippet');
     expect(second).toHaveTextContent('content/posts/untitled.mdx');
-    expect(within(results).queryByRole('button')).toBeNull();
+    expect(within(results).getAllByRole('button')).toHaveLength(2);
+  });
+
+  it('opens the document of a hit that is picked, and closes Search', async () => {
+    const search = vi.fn(async () => [hit('content/posts/hello.mdx')]);
+    const user = userEvent.setup();
+    renderAdmin(searchProviderPlugin(search));
+    const dialog = await openSearch(user);
+    await user.type(within(dialog).getByRole('searchbox'), 'hello');
+    await user.click(
+      await within(dialog).findByRole('button', { name: /Hello post/ })
+    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(window.location.hash).toBe(
+      '#/collections/post/content%2Fposts%2Fhello.mdx'
+    );
   });
 
   it.each([
@@ -214,12 +231,37 @@ describe('the Search dialog content results', () => {
     );
   });
 
+  it('marks a hit whose document holds unsaved edits and no other', async () => {
+    useFormStore
+      .getState()
+      .storeNewDocumentDraft(toFormId('content/posts/hello.mdx'), {
+        title: 'Hello post',
+      });
+    const search = vi.fn(async () => [
+      hit('content/posts/hello.mdx'),
+      hit('content/posts/both.mdx'),
+    ]);
+    const user = userEvent.setup();
+    renderAdmin(searchProviderPlugin(search));
+    const dialog = await openSearch(user);
+    await user.type(within(dialog).getByRole('searchbox'), 'x');
+    const results = within(dialog).getByRole('list', {
+      name: 'Search results',
+    });
+    await waitFor(() =>
+      expect(within(results).getAllByRole('listitem')).toHaveLength(2)
+    );
+    const [edited, clean] = within(results).getAllByRole('listitem');
+    expect(within(edited).getByText('Unsaved')).toBeVisible();
+    expect(within(clean).queryByText('Unsaved')).toBeNull();
+  });
+
   it('renders the Search control and its dialog with no content plugin, and never searches', async () => {
     const search = vi.fn(async () => [hit('content/posts/hello.mdx')]);
     const user = userEvent.setup();
     renderWithoutContent(searchProviderPlugin(search));
     const dialog = await openSearch(user);
-    await user.type(within(dialog).getByRole('searchbox'), 'sett');
+    await user.type(within(dialog).getByRole('searchbox'), 'coll');
     expect(
       within(dialog).getByRole('list', { name: 'Navigation results' })
     ).toBeVisible();

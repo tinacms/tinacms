@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@tinacms/ui/components/dropdown-menu';
 import { tinaResolveLabel } from '@tinacms/ui/components/error-summary-pane';
+import type { BreadcrumbStep } from '@tinacms/ui/components/breadcrumb';
 import { FormLevel } from '@tinacms/ui/components/form-level';
 import { SaveToBranchDialog } from '@tinacms/ui/components/save-to-branch-dialog';
 import { toast } from '@tinacms/ui/components/toast';
@@ -21,10 +22,11 @@ import {
   use,
   useEffect,
   useEffectEvent,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { get, useFormContext } from 'react-hook-form';
 import { useStore } from 'zustand';
 import {
   FieldLockContext,
@@ -41,9 +43,11 @@ import {
   type OpenLevel,
 } from '../editor/form-view-state';
 import { useBranchView } from '../editor/branch';
+import { formRootProps } from '../editor/outline-markup';
 import {
   AfterSaveHookError,
   FormValidationError,
+  isServerFieldRefusal,
   useDiscardEdits,
   useFieldRegistry,
   useFormCheck,
@@ -58,6 +62,7 @@ import {
   useFormErrors,
   useFormStore,
   useFormValues,
+  useHasNewDocument,
   useIsFormDirty,
   type FormStore,
 } from '../form/form-store';
@@ -69,7 +74,9 @@ import { ContentError } from '../core/content/contract';
 import { ErrorSuccessBubble, useErrorSummary } from './error-summary';
 import { saveFailureWords } from './save-failure';
 import { leftoverText } from './leftover-text';
-import { useNarrow } from './use-narrow';
+import { Segmented } from '@tinacms/ui/components/segmented';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
+import { OneViewContext } from './one-view';
 
 const toastOwners = new Map<string, number>();
 const liveRetries = new Map<string, () => void>();
@@ -94,6 +101,12 @@ const dismissIfUnowned = (toastId: string) => {
     setTimeout(() => dismissNowIfUnowned(toastId), TOAST_REMOUNT_GRACE_MS)
   );
 };
+
+export function dismissSaveFailedToast(formId: FormId) {
+  const toastId = `save-failed:${formId}`;
+  goneToasts.delete(toastId);
+  toast.dismiss(toastId);
+}
 
 export function flushPendingToastDismissals() {
   for (const toastId of [...dismissTimers.keys()]) dismissNowIfUnowned(toastId);
@@ -149,6 +162,9 @@ const isBranchGone = (save: { phase: string; reason?: string } | undefined) =>
 
 const DEFAULT_LABEL = 'Save';
 const NEW_BRANCH_LABEL = 'Save to new branch';
+const SHORT_BRANCH_LABEL = 'Save to branch';
+const shortResolveLabel = (count: number) =>
+  `${count > 99 ? '99+' : count} ${count === 1 ? 'error' : 'errors'}`;
 
 // Save, or Save to new branch on a protected branch. `run` is the one gate:
 // Save, the toast's action and Retry all come through it.
@@ -161,10 +177,22 @@ function SaveButton() {
   const saveWith = useFormSaveWith();
   const check = useFormCheck();
   const content = useOptionalContentSlice();
-  const narrow = useNarrow();
+  const narrow = useTier() !== 'desktop';
   const view = useBranchView();
   const summary = useErrorSummary();
-  const [pending, setPending] = useState(false);
+  const phone = useTier() === 'phone';
+  const [pending, setPendingState] = useState(false);
+  const saveAllRunning = useFormStore(
+    (state) => state.saveAll.running !== null
+  );
+  const setPending = (next: boolean) => {
+    setPendingState(next);
+    useFormStore.getState().setSavePending(formId, next);
+  };
+  useEffect(
+    () => () => useFormStore.getState().setSavePending(formId, false),
+    [formId]
+  );
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [name, setName] = useState('');
   const [revealed, setRevealed] = useState(false);
@@ -301,6 +329,11 @@ function SaveButton() {
         branchName !== undefined && names?.includes(branchName) === true
     );
 
+  const isBlockingFailure = (cause: unknown): boolean => {
+    if (cause instanceof FormValidationError) return true;
+    return isServerFieldRefusal(cause);
+  };
+
   const saveHere = () => {
     setPending(true);
     if (isProtected && branchName !== undefined) {
@@ -321,7 +354,7 @@ function SaveButton() {
     save()
       .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
-        if (cause instanceof FormValidationError && summary.block()) {
+        if (isBlockingFailure(cause) && summary.block()) {
           toast.dismiss(failedToastId);
           return;
         }
@@ -357,7 +390,7 @@ function SaveButton() {
     sendToNewBranch(request)
       .then(() => toast.dismiss(failedToastId))
       .catch((cause) => {
-        if (cause instanceof FormValidationError && summary.block()) {
+        if (isBlockingFailure(cause) && summary.block()) {
           toast.dismiss(failedToastId);
           return;
         }
@@ -395,7 +428,7 @@ function SaveButton() {
           return;
         }
         useFormStore.getState().restoreSavePhase(formId, previous);
-        if (cause instanceof FormValidationError) {
+        if (isBlockingFailure(cause)) {
           setDialog(null);
           if (!summary.block()) showFailure(cause);
           return;
@@ -407,7 +440,7 @@ function SaveButton() {
   };
 
   const run = useEffectEvent(() => {
-    if (dialog || pending) return;
+    if (dialog || pending || useFormStore.getState().saveAll.running) return;
     if (remembered.current && view?.saveToNewBranch) {
       const { request, failure } = remembered.current;
       const startedOn = branchName;
@@ -472,8 +505,8 @@ function SaveButton() {
         ref={saveButton}
         variant='primary'
         type='button'
-        className='min-w-41 shrink-0'
-        disabled={!(blocked || dirty || pending)}
+        className='phone:min-w-0 phone:flex-1 phone:truncate min-w-41 shrink-0'
+        disabled={saveAllRunning || !(blocked || dirty || pending)}
         busy={pending}
         data-resolve=''
         icon={blocked ? 'error' : undefined}
@@ -482,9 +515,13 @@ function SaveButton() {
         onClick={blocked ? summary.resolve : run}
       >
         {blocked
-          ? tinaResolveLabel(summary.count)
+          ? phone
+            ? shortResolveLabel(summary.count)
+            : tinaResolveLabel(summary.count)
           : isProtected
-            ? NEW_BRANCH_LABEL
+            ? phone
+              ? SHORT_BRANCH_LABEL
+              : NEW_BRANCH_LABEL
             : DEFAULT_LABEL}
       </Button>
       <SaveToBranchDialog
@@ -513,26 +550,54 @@ function SaveButton() {
   );
 }
 
-// The Unsaved tag, the Document actions menu and Save, fixed at the foot of the form.
+const VIEW_OPTIONS = [
+  { value: 'form', label: 'Form' },
+  { value: 'preview', label: 'Preview' },
+] as const;
+
+// The Unsaved tag, the Document actions menu and Save, fixed at the foot of the form. In one view
+// the View switch comes first and, on a phone, replaces the Unsaved tag.
 function FormBar() {
   const formId = useFormId();
   const dirty = useIsFormDirty(formId);
   const discard = useDiscardEdits();
   const values = useFormValues(formId);
   const scope = use(FormScopeContext);
+  const isNewDocument = useHasNewDocument(formId);
   const [confirming, setConfirming] = useState(false);
   // Read when the confirm opens, so typing in the title does not change it.
   const [documentName, setDocumentName] = useState('');
   const menuButton = useRef<HTMLButtonElement>(null);
+  const oneView = use(OneViewContext);
+  const tier = useTier();
   return (
     <div
       data-slot='form-bar'
-      className='relative flex h-14 flex-none items-center gap-2 border-t border-border bg-card px-3'
+      className='relative order-last flex h-14 flex-none items-center gap-2 border-t border-border bg-card px-3'
     >
       <ErrorSuccessBubble />
-      <div className='min-w-0 flex-1'>
+      {oneView.active ? (
+        <Segmented
+          aria-label='View'
+          size='sm'
+          value={oneView.view}
+          onValueChange={(next) => {
+            if (document.activeElement instanceof HTMLElement) {
+              document.activeElement.blur();
+            }
+            oneView.setView(next);
+          }}
+          options={VIEW_OPTIONS}
+        />
+      ) : null}
+      <div
+        className={
+          oneView.active && tier === 'phone' ? 'hidden' : 'min-w-0 flex-1'
+        }
+      >
         <DocumentStatus />
       </div>
+
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
@@ -569,6 +634,7 @@ function FormBar() {
         onOpenChange={setConfirming}
         onConfirm={discard}
         returnFocusTo={menuButton}
+        isNewDocument={isNewDocument}
         title={`Discard unsaved edits to “${documentName}”?`}
       />
     </div>
@@ -587,11 +653,12 @@ const documentTitle = (values: TinaDocument | undefined, path: string) => {
 };
 
 // The prompt is a bottom-right toast, so the form stays editable behind it. One
-// toast per document: its id holds the path, and leaving the document removes it.
+// toast per document: its id holds the path, and leaving the document removes it
+// until reload or until a new copy joins the waiting list (ADR-026 §2).
 function ResumeDraftToast({ scope }: { scope: FormScope }) {
   const stale = useStaleDraft();
   const values = useFormValues(scope.formId);
-  const narrow = useNarrow();
+  const narrow = useTier() !== 'desktop';
   const [confirming, setConfirming] = useState(false);
   const discardButton = useRef<HTMLElement | null>(null);
   // The copies on screen when the confirm opened. Only these go on Confirm.
@@ -603,8 +670,25 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
   // again for that, so the effect keys on what the toast says, and the buttons
   // read the latest actions. While the confirm is open the buttons do nothing.
   const resume = useEffectEvent(() => {
-    if (!confirming) stale?.resume();
+    if (confirming) return;
+    // Sonner returns focus to its toast; the new form column must find focus on `body`.
+    leaveToaster();
+    stale?.resume();
   });
+  // The picker closes with the discard. The toast's Discard button goes away with the copies,
+  // so focus returns to the picker's opener, else to the form's scroll region.
+  const confirmDiscard = () => {
+    const picker = scope.view.getState().picker;
+    stale?.discard(shown.current);
+    if (!picker) return;
+    scope.view.getState().closePicker();
+    const region = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-form-id]')
+    ).find((node) => node.getAttribute('data-form-id') === scope.formId);
+    discardButton.current = picker.opener?.isConnected
+      ? picker.opener
+      : (region ?? null);
+  };
   const askToDiscard = useEffectEvent(() => {
     if (confirming) return;
     discardButton.current = document.activeElement as HTMLElement | null;
@@ -643,7 +727,7 @@ function ResumeDraftToast({ scope }: { scope: FormScope }) {
     <DiscardConfirm
       open={confirming}
       onOpenChange={setConfirming}
-      onConfirm={() => stale?.discard(shown.current)}
+      onConfirm={confirmDiscard}
       returnFocusTo={discardButton}
       title={`Discard earlier unsaved edits to “${documentTitle(values, scope.path)}”?`}
       description='Discarded edits can’t be brought back. What you typed since stays.'
@@ -698,7 +782,11 @@ function ActiveFieldLevels({ scope }: { scope: FormScope }) {
       levels.every(
         (level, index) => level.address === openLevels[index]?.address
       );
-    if (sameLevels || top === address || top?.startsWith(`${address}.`)) return;
+    if (sameLevels) return;
+    const opensItself = levels.at(-1)?.address === address;
+    if (!opensItself && (top === address || top?.startsWith(`${address}.`))) {
+      return;
+    }
     view.getState().showLevels(levels);
   });
   useEffect(() => {
@@ -707,50 +795,59 @@ function ActiveFieldLevels({ scope }: { scope: FormScope }) {
   return null;
 }
 
-// Reads the whole view and every error for the trail. `children` keeps its
-// element identity, so a re-render here does not reach the fields.
-function OpenLevelFrame({
-  scope,
-  current,
-  children,
-}: {
-  scope: FormScope;
-  current: OpenLevel;
-  children: ReactNode;
-}) {
-  const errors = useFormErrors(useFormId());
-  const { getValues } = useFormContext();
-  const view = useStore(scope.view);
-  const { collection, path } = scope;
-  const { closeLevelsAbove } = scope.view.getState();
+function OpenLevelFrame({ children }: { children: ReactNode }) {
+  return <FormLevel pinHeaders>{children}</FormLevel>;
+}
 
+/**
+ * The levels the form is drilled into, as trail steps for the head. `parents`
+ * are the levels above the open one, each returning to its level; `heading` is
+ * the open level; `closeAll` returns to the document.
+ */
+export function useLevelTrail(scope: FormScope): {
+  heading: string | null;
+  parents: BreadcrumbStep[];
+  documentInvalid: boolean;
+  closeAll: () => void;
+} {
+  const errors = useFormErrors(scope.formId);
+  const values = useFormStore((state) => state.forms[scope.formId]?.values);
+  const view = useStore(scope.view);
+  const { closeLevelsAbove } = scope.view.getState();
+  const current = view.openLevels.at(-1);
   const errorAddresses = Object.keys(errors);
-  const steps = [
-    {
-      label: path.split('/').at(-1) ?? path,
-      onClick: () => closeLevelsAbove(0),
-      invalid: holdsRevealedError(view, errorAddresses),
-    },
-    ...fieldsAlong(current.address, collection.fields, getValues).map(
-      (step) => {
-        const keep = view.openLevels.filter(
-          (level) =>
-            level.address === step.address ||
-            step.address.startsWith(`${level.address}.`)
-        ).length;
-        return {
-          label: step.label,
-          onClick: () => closeLevelsAbove(keep),
-          invalid: holdsRevealedError(view, errorAddresses, step.address),
-        };
-      }
-    ),
-  ];
-  return (
-    <FormLevel pinHeaders steps={steps} onUp={steps.at(-2)?.onClick}>
-      {children}
-    </FormLevel>
+  const documentInvalid = holdsRevealedError(view, errorAddresses);
+  if (!current) {
+    return {
+      heading: null,
+      parents: [],
+      documentInvalid,
+      closeAll: () => closeLevelsAbove(0),
+    };
+  }
+  const along = fieldsAlong(
+    current.address,
+    scope.collection.fields,
+    (address) => (values ? get(values, address) : undefined)
   );
+  const parents = along.slice(0, -1).map((step) => {
+    const keep = view.openLevels.filter(
+      (level) =>
+        level.address === step.address ||
+        step.address.startsWith(`${level.address}.`)
+    ).length;
+    return {
+      label: step.label,
+      onClick: () => closeLevelsAbove(keep),
+      invalid: holdsRevealedError(view, errorAddresses, step.address),
+    };
+  });
+  return {
+    heading: along.at(-1)?.label ?? current.address,
+    parents,
+    documentInvalid,
+    closeAll: () => closeLevelsAbove(0),
+  };
 }
 
 function FormFields({ scope }: { scope: FormScope }) {
@@ -766,7 +863,7 @@ function FormFields({ scope }: { scope: FormScope }) {
     );
   }
   return (
-    <OpenLevelFrame scope={scope} current={current}>
+    <OpenLevelFrame>
       <FieldLockContext
         value={lockAbove(current.address, scope.collection.fields, getValues)}
       >
@@ -776,8 +873,64 @@ function FormFields({ scope }: { scope: FormScope }) {
   );
 }
 
+/**
+ * The form's scroll area. It remembers its scroll position and puts it back when it shows again
+ * after it was hidden, so the result does not rely on the browser keeping the scroll of a
+ * `display: none` element.
+ */
+function FormScroller({
+  formId,
+  children,
+}: {
+  formId: FormId;
+  children: ReactNode;
+}) {
+  const scroller = useRef<HTMLDivElement>(null);
+  const remembered = useRef(0);
+  useEffect(() => {
+    const element = scroller.current;
+    if (!element) return;
+    let visible = element.clientHeight > 0;
+    const onScroll = () => {
+      if (element.clientHeight > 0) remembered.current = element.scrollTop;
+    };
+    const observer = new ResizeObserver(() => {
+      const shown = element.clientHeight > 0;
+      if (shown && !visible) element.scrollTop = remembered.current;
+      visible = shown;
+    });
+    element.addEventListener('scroll', onScroll);
+    observer.observe(element);
+    return () => {
+      element.removeEventListener('scroll', onScroll);
+      observer.disconnect();
+    };
+  }, []);
+  return (
+    <div
+      ref={scroller}
+      data-form-part='fields'
+      tabIndex={-1}
+      className='min-h-0 flex-1 overflow-y-auto outline-none'
+      {...formRootProps(formId)}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function DocumentForm() {
   const scope = use(FormScopeContext);
+  const view = scope?.view;
+  const formId = scope?.formId;
+  useLayoutEffect(() => {
+    if (!view?.getState().takeFocusHandoff()) return;
+    const focused = document.activeElement;
+    if (focused && focused !== document.body) return;
+    Array.from(document.querySelectorAll<HTMLElement>('[data-form-id]'))
+      .find((node) => node.getAttribute('data-form-id') === formId)
+      ?.focus();
+  }, [view, formId]);
   if (!scope) return null;
 
   return (
@@ -785,9 +938,9 @@ export function DocumentForm() {
       <ResumeDraftToast scope={scope} />
       <StorageWarning scope={scope} />
       <ActiveFieldLevels scope={scope} />
-      <div className='min-h-0 flex-1 overflow-y-auto'>
+      <FormScroller formId={scope.formId}>
         <FormFields scope={scope} />
-      </div>
+      </FormScroller>
       <FormBar />
     </>
   );

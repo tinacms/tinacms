@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { type FakeXhr, stubXhr } from '../../../test/fake-xhr';
-import { TINACLOUD_ASSETS_URL, createTinaCloudClient } from '../client';
 import { AuthError } from '../../../core/auth/contract';
 import { MediaError } from '../../../core/media/contract';
+import { type FakeXhr, stubXhr } from '../../../test/fake-xhr';
+import { createTinaCloudClient, TINACLOUD_ASSETS_URL } from '../client';
 import { uploadMedia } from './upload';
 
 const client = createTinaCloudClient({
@@ -59,7 +59,7 @@ describe('uploadMedia', () => {
 
     const [getCall, pollCall] = fetchMock.mock.calls;
     expect(getCall[0]).toBe(
-      `${TINACLOUD_ASSETS_URL}/v1/abc/upload_url/posts/hero.png?branch=feat%2Fx`
+      `${TINACLOUD_ASSETS_URL}/v1/abc/upload_url/posts/hero.png?contentType=image%2Fpng&branch=feat%2Fx`
     );
     expect(new Headers(getCall[1]?.headers).get('Authorization')).toBe(
       'Bearer secret'
@@ -84,11 +84,28 @@ describe('uploadMedia', () => {
     await vi.advanceTimersByTimeAsync(1000);
     expect(await done).toBe('my-hero.png');
     expect(fetchMock.mock.calls[0][0]).toBe(
-      `${TINACLOUD_ASSETS_URL}/v1/abc/upload_url/my-hero.png`
+      `${TINACLOUD_ASSETS_URL}/v1/abc/upload_url/my-hero.png?contentType=application%2Foctet-stream`
     );
     expect(puts[0].requestHeaders).toEqual({
       'content-type': 'application/octet-stream',
     });
+  });
+
+  it('puts the file with the type the upload URL is signed for', async () => {
+    vi.useFakeTimers();
+    stubFetch(
+      json({
+        signedUrl: 'https://s3.test/signed',
+        requestId: 'r-1',
+        contentType: 'image/webp',
+      }),
+      json({ error: false })
+    );
+    const puts = stubPut();
+    const done = uploadMedia(client, undefined, png);
+    await vi.advanceTimersByTimeAsync(1000);
+    await done;
+    expect(puts[0].requestHeaders).toEqual({ 'content-type': 'image/webp' });
   });
 
   it('reports a 412 for the upload URL as name-taken and sends no bytes', async () => {

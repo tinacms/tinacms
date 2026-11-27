@@ -1,5 +1,19 @@
 # tinacms
 
+## 3.15.3
+
+### Patch Changes
+
+- [#8024](https://github.com/tinacms/tinacms/pull/8024) [`0463576`](https://github.com/tinacms/tinacms/commit/04635762a184ae3ae5242828145d24f19c873a45) Thanks [@officialasishkumar](https://github.com/officialasishkumar)! - Show an error and return to a usable state when creating a branch fails in the branch switcher, instead of spinning forever and throwing an unhandled rejection.
+
+- [#8038](https://github.com/tinacms/tinacms/pull/8038) [`5e42004`](https://github.com/tinacms/tinacms/commit/5e4200469dded87c2fd561e31450df9008e9ac98) Thanks [@harley-j](https://github.com/harley-j)! - Automatically resolve generated editorial workflow branch name collisions with themed suffixes, and show the final branch name after saving.
+
+- [#8080](https://github.com/tinacms/tinacms/pull/8080) [`f214222`](https://github.com/tinacms/tinacms/commit/f2142226dad67327afb991af8ee8c9e3cccb1817) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Show an error and keep the Log in button usable when the TinaCloud sign-in fails after the redirect back to the site. Before, a failed token exchange left the button busy until the page was reloaded. When the signed-in account has no access to the project, the editor now asks you to log in with a different account.
+
+- [#8010](https://github.com/tinacms/tinacms/pull/8010) [`d58251f`](https://github.com/tinacms/tinacms/commit/d58251fe0e641ecc28c7a444a0f934c3a1de4344) Thanks [@sarahanntolsma-ff](https://github.com/sarahanntolsma-ff)! - Stop the visual editor's preview URL poll from outliving the component. Each mount started a 100ms interval that was never cleared, so navigating within the admin left every earlier interval running and reading the preview frame's location.
+
+- [#8081](https://github.com/tinacms/tinacms/pull/8081) [`015b7a1`](https://github.com/tinacms/tinacms/commit/015b7a14f5589aed868aac342851ee6975615891) Thanks [@harley-j](https://github.com/harley-j)! - Send the file's Content-Type when requesting a TinaCloud upload URL, and upload with the type TinaCloud returns.
+
 ## 3.15.2
 
 ### Patch Changes

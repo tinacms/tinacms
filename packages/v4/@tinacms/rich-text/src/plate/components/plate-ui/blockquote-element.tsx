@@ -13,7 +13,7 @@ export const BlockquoteElement = withRef<typeof PlateElement>(
         as='blockquote'
         className={cn(
           className,
-          'my-1 border-l-2 border-gray-200 pl-6 not-tina-prose text-gray-500'
+          'not-tina-prose mb-3 border-l-2 border-input pl-4 text-base leading-6 text-muted-foreground last:mb-0'
         )}
         {...props}
       >

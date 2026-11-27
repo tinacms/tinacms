@@ -1,8 +1,14 @@
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { cva } from 'class-variance-authority';
 import type * as React from 'react';
+import { useRef } from 'react';
 
 import { Button } from '@tinacms/ui/components/button';
+import {
+  footSheetHeaderClasses,
+  useFootSheetPopup,
+} from '@tinacms/ui/components/foot-sheet';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { dialogTitleClasses } from '@tinacms/ui/lib/dialog-styles';
 import { cn } from '@tinacms/ui/lib/utils';
 
@@ -59,22 +65,35 @@ function SheetContent({
   children,
   side = 'right',
   showCloseButton = true,
+  initialFocus,
+  style,
   ...props
 }: SheetPrimitive.Popup.Props & {
   side?: SheetSide;
   showCloseButton?: boolean;
 }) {
+  const phone = useTier() === 'phone';
+  const footSheet = phone && side === 'bottom';
+  const { popup, scrim, chrome } = useFootSheetPopup({
+    on: footSheet,
+    Close: SheetPrimitive.Close,
+    slot: 'sheet-content',
+    look: sheetVariants({ side }),
+    // After `className`, so a caller's own width gives way to the screen's.
+    className: cn(
+      className,
+      phone && (side === 'left' || side === 'right') && 'w-full'
+    ),
+    initialFocus,
+    style,
+  });
   return (
     <SheetPortal>
-      <SheetOverlay />
-      <SheetPrimitive.Popup
-        data-slot='sheet-content'
-        data-side={side}
-        className={cn(sheetVariants({ side }), className)}
-        {...props}
-      >
+      <SheetOverlay {...scrim} />
+      <SheetPrimitive.Popup {...popup} data-side={side} {...props}>
         {children}
-        {showCloseButton ? (
+        {chrome}
+        {!footSheet && showCloseButton ? (
           <SheetPrimitive.Close
             data-slot='sheet-close'
             render={
@@ -93,12 +112,76 @@ function SheetContent({
   );
 }
 
+/**
+ * A popup that fills the screen between the Top bar and the Status bar, as the branch
+ * switcher and Search do on a phone. It focuses the first input, else the first control. Its
+ * header holds the title and a Close button named `closeLabel`.
+ */
+function ScreenContent({
+  title,
+  description,
+  closeLabel,
+  className,
+  children,
+  initialFocus,
+  ...props
+}: SheetPrimitive.Popup.Props & {
+  title: string;
+  description?: string;
+  closeLabel: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  return (
+    <SheetPortal>
+      <SheetPrimitive.Popup
+        ref={ref}
+        data-slot='screen-content'
+        initialFocus={
+          initialFocus ??
+          (() => ref.current?.querySelector<HTMLElement>('input') ?? true)
+        }
+        className={(state) =>
+          cn(
+            'fixed inset-x-0 top-14 bottom-7 z-50 flex flex-col gap-4 overflow-y-auto bg-popover p-4 font-sans text-base leading-control text-foreground outline-none',
+            typeof className === 'function' ? className(state) : className
+          )
+        }
+        {...props}
+      >
+        <div className='flex flex-none items-start justify-between gap-2'>
+          <div className='flex min-w-0 flex-col gap-1'>
+            <SheetTitle>{title}</SheetTitle>
+            {description ? (
+              <SheetDescription className='sr-only'>
+                {description}
+              </SheetDescription>
+            ) : null}
+          </div>
+          <SheetPrimitive.Close
+            data-slot='screen-close'
+            render={
+              <Button
+                variant='icon'
+                size='sm'
+                icon='close'
+                aria-label={closeLabel}
+              />
+            }
+          />
+        </div>
+        {children}
+      </SheetPrimitive.Popup>
+    </SheetPortal>
+  );
+}
+
 function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot='sheet-header'
       className={cn(
         'flex flex-none flex-col gap-0.5 border-b border-border-subtle py-4 pr-12 pl-5',
+        footSheetHeaderClasses,
         className
       )}
       {...props}
@@ -156,6 +239,7 @@ function SheetDescription({
 }
 
 export {
+  ScreenContent,
   Sheet,
   SheetTrigger,
   SheetClose,

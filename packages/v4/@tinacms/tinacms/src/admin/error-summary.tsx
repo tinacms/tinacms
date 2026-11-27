@@ -12,34 +12,19 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { useFormContext } from 'react-hook-form';
 import { useStore } from 'zustand';
 import { toFieldAddress } from '../core/field/address';
 import { FormScopeContext } from '../editor/context';
-import { failingLeaves, inDocumentOrder } from '../editor/field-errors';
+import { blockOnFormErrors } from '../editor/block-errors';
+import { inDocumentOrder } from '../editor/field-errors';
 import { fieldsAlong, REMOVED } from '../editor/form-view-state';
+import { readPinned, writePinned } from '../editor/pane-pin';
 import { useFormErrors, useFormStore } from '../form/form-store';
-import { useNarrow } from './use-narrow';
 
-const PIN_KEY = 'tina.errorPane.pinned';
 const HOVER_DWELL_MS = 300;
 const ERROR_PANE_ID = 'error-pane';
-
-const readPinned = (): boolean => {
-  try {
-    return localStorage.getItem(PIN_KEY) === 'true';
-  } catch {
-    return false;
-  }
-};
-
-const writePinned = (pinned: boolean) => {
-  try {
-    localStorage.setItem(PIN_KEY, String(pinned));
-  } catch {
-    // Storage can be blocked; the pin then lasts for the session only.
-  }
-};
 
 const resolveButton = () =>
   document.querySelector<HTMLElement>('[data-resolve]');
@@ -84,10 +69,14 @@ function useErrorRows(): Row[] {
 
 function useGoTo() {
   const scope = useScope();
-  const narrow = useNarrow();
+  const narrow = useTier() !== 'desktop';
+  const phone = useTier() === 'phone';
   return (key: string) => {
     const address = scope.view.getState().goTo(key);
-    if (!address) return;
+    if (!address) {
+      if (phone) resolveButton()?.focus();
+      return;
+    }
     useFormStore.getState().setActive(scope.formId, toFieldAddress(address));
     // Below lg the pane covers the form, so it clears the way for the field.
     if (narrow) scope.view.getState().tuckPane();
@@ -102,21 +91,8 @@ export function useErrorSummary() {
   const summary = useStore(scope.view, (state) => state.errorSummary);
   const blocked = summary.blocked.length > 0;
 
-  const block = (): boolean => {
-    const form = useFormStore.getState().forms[scope.formId];
-    const errors = form?.status === 'edited' ? form.errors : {};
-    const failing = Object.keys(errors);
-    const leaves = failingLeaves(failing).map((address) => ({ address }));
-    if (leaves.length === 0) return false;
-    const ordered = inDocumentOrder(leaves, scope.collection.fields, getValues);
-    scope.view.getState().block(
-      ordered.map((leaf) => leaf.address),
-      failing.filter(
-        (address) => !leaves.some((leaf) => leaf.address === address)
-      )
-    );
-    return true;
-  };
+  const block = (): boolean =>
+    blockOnFormErrors(scope.formId, scope.view, scope.collection, getValues);
 
   const resolve = () => {
     const view = scope.view.getState();
@@ -250,6 +226,7 @@ function ErrorPaneHost() {
   const goTo = useGoTo();
   const summary = useStore(scope.view, (state) => state.errorSummary);
   const [pinned, setPinned] = useState(readPinned);
+  const phone = useTier() === 'phone';
   useFollowFixes(rows);
 
   const { blocked, paneOpen, current, done, focusRow, announcement } = summary;
@@ -265,7 +242,15 @@ function ErrorPaneHost() {
     if (hadFocus) resolveButton()?.focus();
   };
 
-  useTuckOutside(open && !pinned && listed, tuck);
+  useTuckOutside(open && !pinned && listed && !phone, tuck);
+
+  // Crossing 768px rebuilds the pane in the other layout, so an open one tucks.
+  const wasPhone = useRef(phone);
+  useEffect(() => {
+    if (wasPhone.current === phone) return;
+    wasPhone.current = phone;
+    tuck();
+  });
 
   // The rows vanish with "All fixed", so a focus that sat in one falls to the page.
   useLayoutEffect(() => {
@@ -292,7 +277,8 @@ function ErrorPaneHost() {
         pinned={pinned}
         status={done === 'pane' ? 'success' : 'list'}
         autoFocusRow={focusRow}
-        className='z-40 data-[layout=docked]:order-1 max-lg:w-[min(22.5rem,calc(100vw-1.5rem))]'
+        className='z-40 data-[layout=docked]:order-1 below-desktop:w-[min(22.5rem,calc(100vw-1.5rem))]'
+        returnFocusTo={resolveButton}
         onSelect={(row) => goTo(row.id)}
         onPin={(next) => {
           setPinned(next);
@@ -313,9 +299,11 @@ function ErrorPaneHost() {
             className='z-40'
             onOpen={() => scope.view.getState().openPane(true)}
           />
-          <EdgeHoverZone
-            onDwell={() => scope.view.getState().openPane(false)}
-          />
+          {phone ? null : (
+            <EdgeHoverZone
+              onDwell={() => scope.view.getState().openPane(false)}
+            />
+          )}
         </>
       ) : null}
     </>

@@ -6,10 +6,11 @@ import type * as React from 'react';
 
 import { Avatar } from '@tinacms/ui/components/avatar';
 import { type Glyph, Icon } from '@tinacms/ui/components/icon';
+import { usePopupEdgePadding } from '@tinacms/ui/components/foot-sheet';
 import { cn } from '@tinacms/ui/lib/utils';
 
 const menuRowClasses =
-  'relative box-border flex min-h-9 w-full cursor-default items-center gap-2.5 rounded-sm px-2.5 py-0 font-sans text-base leading-control text-foreground no-underline outline-none select-none focus-visible:shadow-focus-inset data-highlighted:bg-muted data-disabled:text-muted-foreground data-disabled:data-highlighted:bg-transparent';
+  'relative box-border flex min-h-9 touch:min-h-touch w-full cursor-default items-center gap-2.5 rounded-sm px-2.5 py-0 font-sans text-base leading-control text-foreground no-underline outline-none select-none focus-visible:shadow-focus-inset data-highlighted:bg-muted data-disabled:text-muted-foreground data-disabled:data-highlighted:bg-transparent';
 
 const destructiveRowClasses =
   'data-[variant=destructive]:not-data-disabled:text-destructive data-[variant=destructive]:not-data-disabled:data-highlighted:bg-status-failed-subtle';
@@ -57,13 +58,21 @@ function DropdownMenuContent({
   alignOffset = 0,
   side = 'bottom',
   sideOffset = 4,
+  collisionPadding,
+  collisionAvoidance,
   className,
   ...props
 }: MenuPrimitive.Popup.Props &
   Pick<
     MenuPrimitive.Positioner.Props,
-    'align' | 'alignOffset' | 'side' | 'sideOffset'
+    | 'align'
+    | 'alignOffset'
+    | 'side'
+    | 'sideOffset'
+    | 'collisionPadding'
+    | 'collisionAvoidance'
   >) {
+  const edge = usePopupEdgePadding();
   return (
     <MenuPrimitive.Portal>
       <MenuPrimitive.Positioner
@@ -72,6 +81,8 @@ function DropdownMenuContent({
         alignOffset={alignOffset}
         side={side}
         sideOffset={sideOffset}
+        collisionPadding={collisionPadding ?? edge}
+        collisionAvoidance={collisionAvoidance}
       >
         <MenuPrimitive.Popup
           data-slot='dropdown-menu-content'

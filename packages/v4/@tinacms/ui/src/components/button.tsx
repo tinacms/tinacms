@@ -22,10 +22,10 @@ const heightSizeOf = (size: ButtonSize): ButtonHeightSize =>
   size === 'compact' || size === 'sm' ? 'sm' : 'md';
 
 /** One height per size, shared by every variant so mixed buttons line up. */
-const buttonHeight = { md: 'h-9', sm: 'h-8' } as const satisfies Record<
-  ButtonHeightSize,
-  string
->;
+const buttonHeight = {
+  md: 'h-9',
+  sm: 'h-8',
+} as const satisfies Record<ButtonHeightSize, string>;
 
 /**
  * Hover and press styles are written `not-disabled:not-aria-disabled:` so a disabled or busy button never
@@ -47,8 +47,8 @@ const buttonVariants = cva(
         icon: 'gap-0 bg-transparent px-0 text-muted-foreground hover:bg-transparent not-disabled:not-aria-disabled:hover:bg-muted not-disabled:not-aria-disabled:hover:text-foreground',
       },
       size: {
-        md: `${buttonHeight.md} px-3.75 text-base`,
-        sm: `${buttonHeight.sm} px-2.75 text-sm`,
+        md: `${buttonHeight.md} touch:h-touch px-3.75 text-base`,
+        sm: `${buttonHeight.sm} touch:h-touch px-2.75 text-sm`,
       },
       selected: { true: '', false: '' },
       redIcon: { true: '', false: '' },
@@ -57,8 +57,8 @@ const buttonVariants = cva(
       busy: { true: 'cursor-progress', false: '' },
     },
     compoundVariants: [
-      { variant: 'icon', size: 'md', className: 'w-9 px-0' },
-      { variant: 'icon', size: 'sm', className: 'w-8 px-0' },
+      { variant: 'icon', size: 'md', className: 'w-9 px-0 touch:w-touch' },
+      { variant: 'icon', size: 'sm', className: 'w-8 px-0 touch:w-touch' },
       {
         variant: 'icon',
         redIcon: true,
@@ -77,8 +77,8 @@ const buttonVariants = cva(
         className:
           'bg-selected text-foreground hover:bg-selected not-disabled:not-aria-disabled:hover:bg-selected not-disabled:not-aria-disabled:hover:text-foreground',
       },
-      { shortcut: true, size: 'md', className: 'pr-1.25' },
-      { shortcut: true, size: 'sm', className: 'pr-1' },
+      { shortcut: true, size: 'md', className: 'pr-1.25 touch:pr-3.75' },
+      { shortcut: true, size: 'sm', className: 'pr-1 touch:pr-2.75' },
     ],
     defaultVariants: {
       variant: 'outline',

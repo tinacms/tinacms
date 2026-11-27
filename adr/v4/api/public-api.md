@@ -145,7 +145,7 @@ const current = useTinaStore((s) => s.branch.current)
 | `useFieldAddress()` | identity of *this* field |
 | `useFieldValue<T>(address)` | one leaf value (stable reference) |
 | `useFieldErrors(address)` | every error at an address, shown at once |
-| `useFieldFrame()` | props for `FieldWrapper`: label, ids, required, and the errors to show now (after the field is left, or after a save was tried). Reads the address from context |
+| `useFieldFrame()` | props for `FieldWrapper`: label, ids, required, and the errors to show now (after the field is left, or after a save was tried). Reads the address from context. It also returns `active`, which `FieldWrapper` renders as `data-active` |
 | `useFieldActivation(handler)` | opt-in callback when this field becomes active |
 | `useSiblingValue(address, name)` | sibling leaf |
 | `useChildKeys(address)` | ordered child keys at a composite address |
@@ -192,7 +192,7 @@ import config from '../../../../tina.config'
 export const { GET, POST } = mountHandler(config)
 ```
 
-The adapter mounts the runtime-composed server-segment handler (all server segments + RPC transport). It needs the config's `schema` once a plugin registers a server hook ([ADR-028](../028-server-save-hooks.md)). Express, Hono, Remix, etc. have equivalent adapters.
+The adapter mounts the runtime-composed server-segment handler (all server segments + RPC transport). It needs the config's `schema` once a plugin registers a server hook or a custom validator ([ADR-028](../028-server-save-hooks.md)). Express, Hono, Remix, etc. have equivalent adapters.
 
 ## Stability
 

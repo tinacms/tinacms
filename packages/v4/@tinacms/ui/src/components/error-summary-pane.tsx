@@ -1,3 +1,4 @@
+import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { cva } from 'class-variance-authority';
 import {
   type ComponentProps,
@@ -13,8 +14,10 @@ import {
 import { Badge } from '@tinacms/ui/components/badge';
 import { foldPath } from '@tinacms/ui/components/breadcrumb';
 import { Button } from '@tinacms/ui/components/button';
+import { useFootSheetPopup } from '@tinacms/ui/components/foot-sheet';
 import { Icon } from '@tinacms/ui/components/icon';
 import { Kbd } from '@tinacms/ui/components/kbd';
+import { useTier } from '@tinacms/ui/hooks/use-tier';
 import { cn } from '@tinacms/ui/lib/utils';
 
 type ErrorSummaryItem = {
@@ -154,10 +157,20 @@ type ErrorRowProps = {
   error: ErrorSummaryItem;
   selected: boolean;
   stillHover: boolean;
+  /** On a phone "Go to field" shows at rest, as a finger cannot hover. */
+  atRest?: boolean;
+  disabled?: boolean;
   onSelect?: (error: ErrorSummaryItem) => void;
 };
 
-function ErrorRow({ error, selected, stillHover, onSelect }: ErrorRowProps) {
+function ErrorRow({
+  error,
+  selected,
+  stillHover,
+  atRest = false,
+  disabled = false,
+  onSelect,
+}: ErrorRowProps) {
   const trail = error.trail ?? [];
   const where = trail.join(' › ');
   const steps = shortTrail(trail);
@@ -169,6 +182,9 @@ function ErrorRow({ error, selected, stillHover, onSelect }: ErrorRowProps) {
     <button
       type='button'
       data-error-row=''
+      onMouseDown={(event) => {
+        if (disabled) event.preventDefault();
+      }}
       data-look={stillHover ? 'hover' : undefined}
       aria-current={selected ? 'true' : undefined}
       aria-label={name}
@@ -224,7 +240,7 @@ function ErrorRow({ error, selected, stillHover, onSelect }: ErrorRowProps) {
         <span
           className={cn(
             'col-start-1 row-start-1 inline-flex items-center justify-end gap-1 text-muted-foreground',
-            !selected && 'opacity-0'
+            (!selected || atRest) && 'opacity-0'
           )}
         >
           <Icon glyph='eye' size={14} />
@@ -233,8 +249,9 @@ function ErrorRow({ error, selected, stillHover, onSelect }: ErrorRowProps) {
         <span
           className={cn(
             'col-start-1 row-start-1 inline-flex items-center justify-end gap-1 text-foreground opacity-0 transition-opacity',
+            atRest && 'opacity-100',
             !selected &&
-              'group-hover/row:opacity-100 group-focus-visible/row:opacity-100 group-data-[look=hover]/row:opacity-100'
+              'touch:opacity-100 group-hover/row:opacity-100 group-focus-visible/row:opacity-100 group-data-[look=hover]/row:opacity-100'
           )}
         >
           Go to field
@@ -247,9 +264,11 @@ function ErrorRow({ error, selected, stillHover, onSelect }: ErrorRowProps) {
 
 function LeavingRow({
   error,
+  atRest,
   onGone,
 }: {
   error: ErrorSummaryItem;
+  atRest?: boolean;
   onGone: (id: string) => void;
 }) {
   const ref = useRef<HTMLLIElement>(null);
@@ -276,9 +295,52 @@ function LeavingRow({
   }, [error.id, onGone]);
   return (
     <li ref={ref} aria-hidden='true' inert className='overflow-hidden'>
-      <ErrorRow error={error} selected={false} stillHover={false} />
+      <ErrorRow
+        error={error}
+        selected={false}
+        stillHover={false}
+        atRest={atRest}
+      />
     </li>
   );
+}
+
+/** The errors plus the fixed rows that stay a moment to collapse, at the place they had. */
+function useRowsWithLeaving(errors: ErrorSummaryItem[], success: boolean) {
+  const [leaving, setLeaving] = useState<
+    { error: ErrorSummaryItem; at: number }[]
+  >([]);
+  const previous = useRef(errors);
+  useLayoutEffect(() => {
+    const before = previous.current;
+    previous.current = errors;
+    if (success) return;
+    const now = new Set(errors.map((error) => error.id));
+    const gone = before.flatMap((error, at) =>
+      now.has(error.id) ? [] : [{ error, at }]
+    );
+    if (gone.length)
+      setLeaving((list) => [
+        ...list.filter((l) => !now.has(l.error.id)),
+        ...gone,
+      ]);
+  }, [errors, success]);
+  const removeLeaving = useCallback((gone: string) => {
+    setLeaving((list) => list.filter((l) => l.error.id !== gone));
+  }, []);
+
+  const rows: { error: ErrorSummaryItem; leaving: boolean }[] = errors.map(
+    (error) => ({ error, leaving: false })
+  );
+  for (const l of [...leaving].sort((a, b) => a.at - b.at)) {
+    if (!rows.some((row) => row.error.id === l.error.id)) {
+      rows.splice(Math.min(l.at, rows.length), 0, {
+        error: l.error,
+        leaving: true,
+      });
+    }
+  }
+  return { rows, removeLeaving };
 }
 
 type TinaErrorSummaryPaneProps = Omit<
@@ -296,6 +358,8 @@ type TinaErrorSummaryPaneProps = Omit<
   onPin?: (pinned: boolean) => void;
   onClose?: () => void;
   onSuccessEnd?: () => void;
+  /** On a phone: where focus goes when the sheet closes without a row tapped. */
+  returnFocusTo?: () => HTMLElement | null;
   /** Focuses the first row when the pane opens. */
   autoFocusRow?: boolean;
   /** For stories and screenshots: draws the hover look on that row. */
@@ -305,7 +369,7 @@ type TinaErrorSummaryPaneProps = Omit<
   announcement?: string;
 };
 
-function TinaErrorSummaryPane({
+function ErrorPane({
   errors,
   open = true,
   selectedId,
@@ -393,40 +457,7 @@ function TinaErrorSummaryPane({
       ?.focus({ preventScroll: true });
   }, [open, shown, autoFocusRow]);
 
-  // Fixed rows stay a moment to collapse, at the place they had.
-  const [leaving, setLeaving] = useState<
-    { error: ErrorSummaryItem; at: number }[]
-  >([]);
-  const previous = useRef(errors);
-  useLayoutEffect(() => {
-    const before = previous.current;
-    previous.current = errors;
-    if (success) return;
-    const now = new Set(errors.map((error) => error.id));
-    const gone = before.flatMap((error, at) =>
-      now.has(error.id) ? [] : [{ error, at }]
-    );
-    if (gone.length)
-      setLeaving((list) => [
-        ...list.filter((l) => !now.has(l.error.id)),
-        ...gone,
-      ]);
-  }, [errors, success]);
-  const removeLeaving = useCallback((gone: string) => {
-    setLeaving((list) => list.filter((l) => l.error.id !== gone));
-  }, []);
-
-  const rows: { error: ErrorSummaryItem; leaving: boolean }[] = errors.map(
-    (error) => ({ error, leaving: false })
-  );
-  for (const l of [...leaving].sort((a, b) => a.at - b.at)) {
-    if (!rows.some((row) => row.error.id === l.error.id)) {
-      rows.splice(Math.min(l.at, rows.length), 0, {
-        error: l.error,
-        leaving: true,
-      });
-    }
-  }
+  const { rows, removeLeaving } = useRowsWithLeaving(errors, success);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     onKeyDown?.(event);
@@ -486,7 +517,7 @@ function TinaErrorSummaryPane({
                 ? 'Pinned. It docks beside the preview on a wider window.'
                 : 'Fix these to save.'}
             </p>
-            <span className='inline-flex flex-none items-center gap-1.5 text-xs leading-control text-muted-foreground'>
+            <span className='inline-flex flex-none items-center gap-1.5 text-xs leading-control text-muted-foreground touch:hidden'>
               <Kbd size='sm'>Esc</Kbd>
               <span className='sr-only'>Escape</span>
               to hide
@@ -533,6 +564,165 @@ function TinaErrorSummaryPane({
       </span>
     </>
   );
+}
+
+type ErrorSheetProps = Omit<
+  TinaErrorSummaryPaneProps,
+  'wide' | 'pinned' | 'onPin'
+>;
+
+/**
+ * The error list on a phone: a half-height foot sheet over the form. A tap on a row closes the
+ * sheet first and moves focus to the field once the sheet has gone, so the sheet's own focus
+ * return cannot take it back.
+ */
+function ErrorSheet({
+  errors,
+  open = true,
+  selectedId,
+  status = 'list',
+  onSelect,
+  onClose,
+  onSuccessEnd,
+  returnFocusTo,
+  stillHoverId,
+  stillSuccess = false,
+  announcement,
+  id = 'error-pane',
+}: ErrorSheetProps) {
+  const success = status === 'success';
+  const count = success ? 0 : errors.length;
+  const {
+    popup,
+    scrim,
+    chrome,
+    ref: popupRef,
+  } = useFootSheetPopup({
+    on: true,
+    Close: DialogPrimitive.Close,
+    slot: 'foot-sheet',
+    look: '',
+    className: 'h-[50dvh] gap-0 overflow-hidden px-0 pb-0',
+    bodyScrolls: false,
+  });
+  const picked = useRef<ErrorSummaryItem | null>(null);
+  // Stays set until the sheet opens again: the focus return may run after the close completes.
+  const tapped = useRef(false);
+  useEffect(() => {
+    if (open) tapped.current = false;
+  }, [open]);
+  const { rows, removeLeaving } = useRowsWithLeaving(errors, success);
+
+  const pick = (error: ErrorSummaryItem) => {
+    if (!open || picked.current) return;
+    picked.current = error;
+    tapped.current = true;
+    onClose?.();
+  };
+
+  const sheet = (
+    <DialogPrimitive.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onClose?.();
+      }}
+      onOpenChangeComplete={(isOpen) => {
+        if (isOpen) return;
+        const error = picked.current;
+        picked.current = null;
+        if (error) onSelect?.(error);
+      }}
+    >
+      <DialogPrimitive.Portal keepMounted>
+        <DialogPrimitive.Backdrop
+          {...scrim}
+          className={cn(
+            'fixed inset-0 isolate z-50 bg-scrim transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0',
+            scrim.className
+          )}
+        />
+        <DialogPrimitive.Popup
+          {...popup}
+          id={id}
+          inert={!open}
+          data-layout='sheet'
+          data-status={status}
+          finalFocus={() => {
+            if (tapped.current) return false;
+            return returnFocusTo?.() ?? true;
+          }}
+        >
+          <header className='flex flex-none items-center gap-2 border-b border-border py-3.5 pr-14 pl-5'>
+            <DialogPrimitive.Title className='m-0 inline-flex items-center gap-2 font-heading text-md leading-title font-semibold text-foreground'>
+              Errors
+              <Badge kind='count' of='errors' count={count} />
+            </DialogPrimitive.Title>
+          </header>
+          {success ? (
+            <SuccessFace
+              still={stillSuccess}
+              onEnd={onSuccessEnd}
+              pane={popupRef}
+            />
+          ) : (
+            <>
+              <p className='m-0 flex-none px-5 pt-3 pb-1 text-sm leading-control text-muted-foreground'>
+                Fix these to save.
+              </p>
+              <ul
+                role='list'
+                className='m-0 flex min-h-0 flex-auto list-none flex-col gap-0.5 overflow-y-auto px-2 py-1.5'
+              >
+                {rows.map(({ error, leaving: isLeaving }) =>
+                  isLeaving ? (
+                    <LeavingRow
+                      key={error.id}
+                      error={error}
+                      atRest
+                      onGone={removeLeaving}
+                    />
+                  ) : (
+                    <li key={error.id}>
+                      <ErrorRow
+                        error={error}
+                        selected={error.id === selectedId}
+                        stillHover={error.id === stillHoverId}
+                        atRest
+                        disabled={!open}
+                        onSelect={pick}
+                      />
+                    </li>
+                  )
+                )}
+              </ul>
+            </>
+          )}
+          {chrome}
+        </DialogPrimitive.Popup>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
+  );
+  if (announcement === undefined) return sheet;
+  return (
+    <>
+      {sheet}
+      <span
+        role='status'
+        aria-live='polite'
+        aria-atomic='true'
+        className='sr-only'
+      >
+        {announcement}
+      </span>
+    </>
+  );
+}
+
+/** The error list: a foot sheet on a phone, else the floating, overlay or docked pane. */
+function TinaErrorSummaryPane(props: TinaErrorSummaryPaneProps) {
+  const phone = useTier() === 'phone';
+  const { returnFocusTo, ...pane } = props;
+  return phone ? <ErrorSheet {...props} /> : <ErrorPane {...pane} />;
 }
 
 function SuccessFace({

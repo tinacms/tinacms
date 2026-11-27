@@ -77,7 +77,7 @@ Why no value/onChange props? Because forms are **flat, normalized by address** (
 | `useFieldAddress()` | — | identity of *this* field |
 | `useFieldValue<T>(address)` | one leaf address | read+write a value |
 | `useFieldErrors(address)` | every error at an address, shown at once | custom error display |
-| `useFieldFrame()` | label, ids, required, and the errors to show now. Reads the address from context | spread into `FieldWrapper` |
+| `useFieldFrame()` | label, ids, required, and the errors to show now. Reads the address from context | spread into `FieldWrapper`; also returns `active`, which `FieldWrapper` renders as `data-active` |
 | `useFieldActivation(handler)` | active-field === my address | opt-in focus/popover/center |
 | `useSiblingValue(address, name)` | sibling leaf | conditional UI across fields (not validation: see [Validation](#validation)) |
 | `useChildKeys(address)` | structure index entry | composite child ordering |
@@ -229,7 +229,9 @@ descriptor hooks let a field type answer them, so one rule serves every type:
 `min` and `max` pass an empty value and let `required` report it, so a field
 with both rules reports one message, not two.
 
-**These rules run on the Client, not inside TinaCloud.** Before this change the
+On the Backend there is no descriptor. The validators read the stored value, and a field type whose stored value differs declares `isEmpty` and `measure` for it in `field.stored` on its manifest ([ADR-028](../028-server-save-hooks.md) §9).
+
+**These rules run on the Client, and on the Backend for a collection that saves through it (ADR-028 §9). They never run inside TinaCloud.** Before this change the
 first layer was declarative and serialisable, so TinaCloud could in principle
 enforce it. Nothing ever did: no server in v3 or v4 reads those rules, and the
 Data Layer writes content without them. Making them validators costs no
@@ -258,7 +260,7 @@ A plugin registers validators under names. Each validator is a factory: it takes
 its parameters and returns a `Validate`, the way `z.string().min(5)` takes `5`.
 A validator never hard-codes a sibling name; the collection passes it in. The
 manifest lists the names, so the build can check them without loading client
-code; the client segment holds the factories. `validator` is a **Keyed
+code. The client segment and the server segment each hold a factory for every name. A plugin can import one module from both. `validator` is a **Keyed
 capability** keyed by name: two plugins that register the same name are a
 Capability conflict (ADR-006). Names are global, so a third-party plugin gives
 its own a prefix (`acme.after`); a first-party name stays bare (`required`).
@@ -270,6 +272,7 @@ definePlugin({
   provides: ['validator'],
   validators: ['after', 'matches'],
   client: () => import('./validators.client'),
+  server: () => import('./validators.server'),
 })
 
 // validators.client.ts
@@ -288,6 +291,11 @@ export default defineClientPlugin({
   },
 })
 
+// validators.server.ts: the same factories, from a module with no client import
+import { after, matches } from './validator-factories'
+
+export default defineServerPlugin({ validators: { after, matches } })
+
 // validators.ts: the same plugin exports typed helpers for collection authors
 export const after = (other: string) => ({ name: 'after', args: [other] })
 export const matches = (pattern: string, message?: string) =>
@@ -303,7 +311,7 @@ t.string({ name: 'slug', validators: [matches('^[a-z0-9-]+$', 'Lowercase letters
 
 A validator entry is `{ name, args }`, plain JSON, so the field's `validators`
 serialise into `tina-lock.json`; the build fails on a name no installed plugin
-registers. The validator's code runs on the client (editor UX) and in
+registers. The validator's code runs on the client (editor UX), on the Backend for a collection that saves through it (ADR-028 §9), and in
 `tina doctor` (ADR-020), never inside TinaCloud (ADR-015). A rule that must hold
 on managed TinaCloud has to be expressible as a layer 1 declarative rule.
 

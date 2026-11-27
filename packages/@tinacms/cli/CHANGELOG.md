@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 4.0.6
+
+### Patch Changes
+
+- [#8098](https://github.com/tinacms/tinacms/pull/8098) [`a2a31ae`](https://github.com/tinacms/tinacms/commit/a2a31aed64186f620084b330064abd9d6f817199) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix `tinacms dev` and codegen failing when the project path contains a space
+
+- [#8008](https://github.com/tinacms/tinacms/pull/8008) [`6a63b4e`](https://github.com/tinacms/tinacms/commit/6a63b4e0c2256adca1a3fbc09e6d6c88bfc6c666) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump minimatch from 5.1.6 to 5.1.9
+
+- [#8022](https://github.com/tinacms/tinacms/pull/8022) [`995d1dc`](https://github.com/tinacms/tinacms/commit/995d1dc9b5917ea763aa865f62d0e53e8ed4e5c7) Thanks [@officialasishkumar](https://github.com/officialasishkumar)! - Wait for the datalayer server to be listening before `tinacms dev`, `build` and `audit` connect to it, and stop the command with an error naming the cause when the server can't start. Previously a listen failure other than a busy port was swallowed, leaving the command stuck on "Indexing local files".
+
+- Updated dependencies [[`0463576`](https://github.com/tinacms/tinacms/commit/04635762a184ae3ae5242828145d24f19c873a45), [`5e42004`](https://github.com/tinacms/tinacms/commit/5e4200469dded87c2fd561e31450df9008e9ac98), [`f4e222a`](https://github.com/tinacms/tinacms/commit/f4e222ad0ef301ac83342e5096d7f53e701a3472), [`f214222`](https://github.com/tinacms/tinacms/commit/f2142226dad67327afb991af8ee8c9e3cccb1817), [`f5a5746`](https://github.com/tinacms/tinacms/commit/f5a5746094071ed46d6865fba9a92d05fc92b697), [`d58251f`](https://github.com/tinacms/tinacms/commit/d58251fe0e641ecc28c7a444a0f934c3a1de4344), [`015b7a1`](https://github.com/tinacms/tinacms/commit/015b7a14f5589aed868aac342851ee6975615891)]:
+  - tinacms@3.15.3
+  - @tinacms/graphql@4.1.1
+
 ## 4.0.5
 
 ### Patch Changes

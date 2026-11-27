@@ -1,5 +1,9 @@
 import type { StoreApi } from 'zustand';
-import type { FieldDescriptor, ValidatorFactory } from './field/contract';
+import type {
+  FieldDescriptor,
+  FieldMeasure,
+  ValidatorFactory,
+} from './field/contract';
 import type { FormHookFactory, ServerHookFactory } from './form/hooks';
 import { invariant } from './invariant';
 import type { MediaManifest } from './media/contract';
@@ -49,6 +53,21 @@ export const isSingletonSliceCapability = (
 export interface FieldProvision {
   type: string;
   contractVersion: number;
+  /**
+   * How `required`, `min` and `max` read this field type's stored value on the
+   * Backend, where no field descriptor loads (ADR-028 §9). Pure functions with
+   * no client import. A type whose stored value reads the same as its editor
+   * value declares nothing.
+   */
+  stored?: {
+    isEmpty?: (value: unknown) => boolean;
+    measure?: (value: unknown) => FieldMeasure | null;
+    /**
+     * An absent value still has children to check, as the form's `{}` for an
+     * absent object does. Only a field that holds one object sets it.
+     */
+    childrenWhenAbsent?: boolean;
+  };
 }
 
 export type CapabilityOverride =
@@ -109,6 +128,7 @@ export interface ServerSegment {
   [op: string]:
     | ServerOp
     | Record<string, ServerHookFactory>
+    | Record<string, ValidatorFactory>
     | SearchIndexProvider;
   /**
    * One `ServerHookFactory` for each name the manifest declares in
@@ -116,13 +136,17 @@ export interface ServerSegment {
    */
   hooks?: Record<string, ServerHookFactory>;
   /**
+   * One `ValidatorFactory` for each name the manifest declares in
+   * `validators`. Reserved: it is never routed as an op (ADR-028 §9).
+   */
+  validators?: Record<string, ValidatorFactory>;
+  /**
    * On a `content` provider: the branch a save writes to, given the branch the
    * caller sent. Reserved: it is never routed as an op.
    */
   resolveBranch?: (branch: string | undefined) => Promise<string | undefined>;
   /**
-   * On a `search` provider built with `defineSearchPlugin`: the index writes
-   * core calls in-process. Reserved: it is never routed as an op.
+   * On a `search` provider: the index writes core calls in-process. Reserved: it is never routed as an op.
    */
   searchIndex?: SearchIndexProvider;
 }
@@ -186,7 +210,7 @@ export interface PluginManifestInput {
    * The validator names this plugin registers, as plain strings. They live on
    * the manifest so `compileSchema` can check a collection's `validators`
    * without loading client code; the factories themselves live on the client
-   * segment, under the same names.
+   * segment and on the server segment, under the same names.
    *
    * A name is the registry key, so it is global: two plugins registering
    * `after` conflict at boot. Give a third-party name a prefix
@@ -202,7 +226,7 @@ export interface PluginManifestInput {
   serverHooks?: string[];
   /** Set by a plugin that provides `media`. */
   media?: MediaManifest;
-  /** Set by `defineSearchPlugin`, so codegen checks the fields without loading plugin code. */
+  /** Set by a plugin that provides `search`, so codegen checks the fields without loading plugin code. */
   search?: SearchManifest;
   client?: () => Promise<{ default: ClientSegment }>;
   server?: () => Promise<{ default: ServerSegment }>;

@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { nodesOf } from '../../../../core/content/contract';
 import { createGraphQLPipeline } from '../graphql/graphql-pipeline';
 import { dispatchContentRequest } from './content-request';
 import { type LocalDataLayer, createLocalDataLayer } from './local-data-layer';
@@ -52,6 +53,9 @@ afterEach(() => fs.rm(rootDir, { recursive: true, force: true }));
 const modifiedTimeOf = async (relative: string): Promise<string> =>
   (await fs.stat(path.join(rootDir, relative))).mtime.toISOString();
 
+const listed = async (layer: LocalDataLayer, collection: string) =>
+  nodesOf(await layer.list(collection));
+
 const setModifiedTime = (relative: string, time: string): Promise<void> =>
   fs.utimes(path.join(rootDir, relative), new Date(time), new Date(time));
 
@@ -65,14 +69,16 @@ describe('list', () => {
       'content/posts/nested/deep.mdx',
       '2025-06-07T08:09:10.000Z'
     );
-    const entries = await dataLayer.list('post');
+    const entries = await listed(dataLayer, 'post');
     expect(entries).toEqual([
       {
         path: 'content/posts/hello.mdx',
+        title: 'Hello World',
         updatedAt: '2026-01-02T03:04:05.000Z',
       },
       {
         path: 'content/posts/nested/deep.mdx',
+        title: 'Deep',
         updatedAt: '2025-06-07T08:09:10.000Z',
       },
     ]);
@@ -88,9 +94,10 @@ describe('list', () => {
       path.join(rootDir, 'content/posts/nested/deep.mdx'),
       path.join(rootDir, 'content/posts/linked.mdx')
     );
-    const entries = await dataLayer.list('post');
+    const entries = await listed(dataLayer, 'post');
     expect(entries).toContainEqual({
       path: 'content/posts/linked.mdx',
+      title: 'Deep',
       updatedAt: '2025-06-07T08:09:10.000Z',
     });
   });
@@ -100,7 +107,7 @@ describe('list', () => {
       path.join(rootDir, 'content/posts/no-target.mdx'),
       path.join(rootDir, 'content/posts/dangling.mdx')
     );
-    const entries = await dataLayer.list('post');
+    const entries = await listed(dataLayer, 'post');
     const dangling = entries.find(
       (entry) => entry.path === 'content/posts/dangling.mdx'
     );
@@ -112,11 +119,15 @@ describe('list', () => {
   it('keeps the content of the documents out of the payload', async () => {
     const payload = JSON.stringify(await dataLayer.list('post'));
     expect(payload).not.toContain('Body prose');
-    expect(payload).not.toContain('Hello World');
   });
 
-  it('returns [] when the collection folder does not exist yet', async () => {
-    expect(await dataLayer.list('page')).toEqual([]);
+  it('lists a collection whose folder does not exist yet as empty', async () => {
+    const connection = await dataLayer.list('page');
+    expect(connection).toMatchObject({
+      edges: [],
+      totalCount: 0,
+      folders: [],
+    });
   });
 
   it('lists a file it cannot parse, which `get` then reports', async () => {
@@ -124,12 +135,19 @@ describe('list', () => {
       path.join(rootDir, 'content/posts/broken.mdx'),
       '---\ntitle: [unclosed\n---\n'
     );
-    const entries = await dataLayer.list('post');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const entries = await listed(dataLayer, 'post');
     expect(entries.map((entry) => entry.path)).toEqual([
       'content/posts/broken.mdx',
       'content/posts/hello.mdx',
       'content/posts/nested/deep.mdx',
     ]);
+    expect(entries[0]).not.toHaveProperty('title');
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('content/posts/broken.mdx'),
+      expect.anything()
+    );
+    warn.mockRestore();
     await expect(
       dataLayer.get('post', 'content/posts/broken.mdx')
     ).rejects.toThrow();
@@ -140,7 +158,7 @@ describe('list', () => {
       path.join(rootDir, 'content/posts/broken.mdx'),
       '---\ntitle: [unclosed\n---\n'
     );
-    const [broken] = await dataLayer.list('post');
+    const [broken] = await listed(dataLayer, 'post');
     await expect(
       dataLayer.update('post', broken.path, { title: 'Replacement' })
     ).rejects.toThrow(/could not be parsed/);
@@ -149,7 +167,7 @@ describe('list', () => {
   it('excludes a directory named *.mdx without a warning', async () => {
     await fs.mkdir(path.join(rootDir, 'content/posts/folder.mdx'));
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const entries = await dataLayer.list('post');
+    const entries = await listed(dataLayer, 'post');
     expect(entries.map((entry) => entry.path)).toEqual([
       'content/posts/hello.mdx',
       'content/posts/nested/deep.mdx',
@@ -170,7 +188,7 @@ describe('list with nested collections', () => {
     });
     await fs.mkdir(path.join(rootDir, 'content'), { recursive: true });
     await fs.writeFile(path.join(rootDir, 'content/about.mdx'), '---\n---\n');
-    expect(await nested.list('site')).toEqual([
+    expect(await listed(nested, 'site')).toEqual([
       {
         path: 'content/about.mdx',
         updatedAt: await modifiedTimeOf('content/about.mdx'),
@@ -291,7 +309,12 @@ describe('update', () => {
   });
 
   it('writes fresh when the file is missing (never lose the edit)', async () => {
-    await dataLayer.update('post', 'content/posts/new.mdx', { title: 'New' });
+    await dataLayer.update(
+      'post',
+      'content/posts/new.mdx',
+      { title: 'New' },
+      { mayCreate: true }
+    );
     const entry = await dataLayer.get('post', 'content/posts/new.mdx');
     expect(entry?.document).toEqual({ title: 'New', body: '' });
   });
@@ -341,7 +364,12 @@ describe('update', () => {
       'content/linked/a.mdx'
     );
     expect(canonical).toBe('content/linked/a.mdx');
-    const saved = await linked.update('linked', canonical, { title: 'A' });
+    const saved = await linked.update(
+      'linked',
+      canonical,
+      { title: 'A' },
+      { mayCreate: true }
+    );
     expect(saved.path).toBe('content/linked/a.mdx');
     expect(
       await fs.readFile(path.join(rootDir, 'shared/posts/a.mdx'), 'utf8')
@@ -392,7 +420,12 @@ describe('update', () => {
       nested.update('site', 'content/posts/claimed.mdx', { title: 'x' })
     ).rejects.toThrow(/belongs to collection "post"/);
     await expect(fs.access(file)).rejects.toThrow();
-    await nested.update('post', 'content/posts/claimed.mdx', { title: 'x' });
+    await nested.update(
+      'post',
+      'content/posts/claimed.mdx',
+      { title: 'x' },
+      { mayCreate: true }
+    );
     await expect(fs.access(file)).resolves.toBeUndefined();
   });
 
@@ -404,8 +437,18 @@ describe('update', () => {
         { name: 'settings', path: 'content', format: 'json', fields: [] },
       ],
     });
-    await shared.update('settings', 'content/x.json', { title: 'json' });
-    await shared.update('pages', 'content/x.mdx', { title: 'mdx' });
+    await shared.update(
+      'settings',
+      'content/x.json',
+      { title: 'json' },
+      { mayCreate: true }
+    );
+    await shared.update(
+      'pages',
+      'content/x.mdx',
+      { title: 'mdx' },
+      { mayCreate: true }
+    );
     expect((await shared.get('settings', 'content/x.json'))?.document).toEqual({
       title: 'json',
     });
@@ -428,9 +471,12 @@ describe('update', () => {
     await fs.rm(path.join(rootDir, 'content/posts/nested'), {
       recursive: true,
     });
-    await dataLayer.update('post', 'content/posts/nested/deep.mdx', {
-      title: 'Restored',
-    });
+    await dataLayer.update(
+      'post',
+      'content/posts/nested/deep.mdx',
+      { title: 'Restored' },
+      { mayCreate: true }
+    );
     const entry = await dataLayer.get('post', 'content/posts/nested/deep.mdx');
     expect(entry?.document).toEqual({ title: 'Restored', body: '' });
   });
@@ -505,7 +551,7 @@ describe('trust boundary', () => {
       path.join(rootDir, 'content/posts/zz-linked.mdx')
     );
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const entries = await dataLayer.list('post');
+    const entries = await listed(dataLayer, 'post');
     expect(entries.map((entry) => entry.path)).toEqual([
       'content/posts/hello.mdx',
       'content/posts/nested/deep.mdx',
@@ -548,6 +594,7 @@ describe('graphql pipeline', () => {
       .mockResolvedValueOnce({
         execute: async () => ({ data: {} }),
         reindexPaths: async () => {},
+        removePaths: async () => {},
         close: async () => {},
       });
     await expect(dataLayer.graphql('{}')).rejects.toThrow('boot failed');
@@ -561,6 +608,7 @@ describe('graphql pipeline', () => {
       reindexPaths: async () => {
         throw new Error('index broke');
       },
+      removePaths: async () => {},
       close: async () => {},
     });
     await dataLayer.graphql('{}');
@@ -596,7 +644,7 @@ describe('mixed-format collection', () => {
   });
 
   it('lists documents of every declared format', async () => {
-    const entries = await mixed.list('post');
+    const entries = await listed(mixed, 'post');
     expect(entries.map((entry) => entry.path)).toEqual([
       'content/posts/hello.mdx',
       'content/posts/nested/deep.mdx',
@@ -675,7 +723,7 @@ describe('dispatchContentRequest', () => {
       op: 'list',
       collection: 'post',
     });
-    expect(Array.isArray(listed)).toBe(true);
+    expect(listed).toMatchObject({ totalCount: 2 });
     const updated = await dispatchContentRequest(dataLayer, {
       op: 'update',
       collection: 'post',
@@ -726,6 +774,7 @@ describe('dispatchContentRequest', () => {
     vi.mocked(createGraphQLPipeline).mockResolvedValueOnce({
       execute: async () => ({ data: { post: { title: 'Hello World' } } }),
       reindexPaths: async () => {},
+      removePaths: async () => {},
       close: async () => {},
     });
     const result = await dispatchContentRequest(dataLayer, {
@@ -745,6 +794,7 @@ describe('dispatchContentRequest', () => {
     vi.mocked(createGraphQLPipeline).mockResolvedValueOnce({
       execute: async () => ({ data: { post: { title: 'Hello World' } } }),
       reindexPaths: async () => {},
+      removePaths: async () => {},
       close: async () => {},
     });
     const result = await dispatchContentRequest(dataLayer, {

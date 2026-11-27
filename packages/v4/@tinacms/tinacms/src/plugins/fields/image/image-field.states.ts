@@ -111,6 +111,8 @@ export const imageFieldStates = [
   { name: 'cover wide', props: { ...filled, look: 'wide' } },
   { name: 'cover tall empty', props: { ...base, look: 'tall' } },
   { name: 'cover tall', props: { ...filled, look: 'tall' } },
+  { name: 'choosing', props: { ...filled, choosing: true } },
+  { name: 'choosing and empty', props: { ...base, choosing: true } },
 ] satisfies { name: string; props: ImageFieldViewProps }[];
 
 export type ImageFieldStateName = (typeof imageFieldStates)[number]['name'];
@@ -207,6 +209,14 @@ export const imageGalleryStates = [
   {
     name: 'gallery read-only',
     props: { ...galleryBase, items: galleryItems, readOnly: true },
+  },
+  {
+    name: 'gallery choosing',
+    props: { ...galleryBase, items: galleryItems, choosingKey: 'b' },
+  },
+  {
+    name: 'gallery adding',
+    props: { ...galleryBase, items: galleryItems, choosingAdd: true },
   },
   {
     name: 'gallery read-only and empty',

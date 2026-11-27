@@ -7,6 +7,7 @@ import {
   useRef,
 } from 'react';
 
+import { Badge } from '@tinacms/ui/components/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +27,8 @@ type BreadcrumbStep = {
   current?: boolean;
   /** The open document's file, shown on hover. */
   file?: string;
+  /** This level holds an invalid field: a red dot after the step. */
+  invalid?: boolean;
 };
 
 type BreadcrumbSize = 'md' | 'sm';
@@ -47,11 +50,17 @@ function foldPath<T>(
   };
 }
 
+function Marks({ invalid }: { invalid?: boolean }) {
+  return invalid ? (
+    <Badge kind='dot' tone='error' srLabel=', has errors' />
+  ) : null;
+}
+
 const stepVariants = cva(['block truncate', quietControl], {
   variants: {
     size: {
-      md: 'max-w-60 px-1.5 py-1 text-base',
-      sm: 'max-w-50 px-1 py-0.5 text-sm',
+      md: 'max-w-60 px-1.5 py-1 text-base touch:min-h-touch',
+      sm: 'max-w-50 px-1 py-0.5 text-sm touch:min-h-touch',
     },
     current: {
       true: 'cursor-default font-medium text-foreground hover:bg-transparent',
@@ -67,7 +76,9 @@ const foldVariants = cva(
     quietControl,
   ],
   {
-    variants: { size: { md: 'size-7', sm: 'size-6' } },
+    variants: {
+      size: { md: 'size-7 touch:size-touch', sm: 'size-6 touch:size-touch' },
+    },
     defaultVariants: { size: 'md' },
   }
 );
@@ -126,6 +137,17 @@ function BreadcrumbFold({
   );
 }
 
+function StepLabel({ step }: { step: BreadcrumbStep }) {
+  return step.invalid ? (
+    <>
+      <span className='min-w-0 truncate'>{step.label}</span>
+      <Marks invalid />
+    </>
+  ) : (
+    step.label
+  );
+}
+
 function Step({
   step,
   current,
@@ -143,16 +165,25 @@ function Step({
         aria-current='page'
         tabIndex={-1}
         title={step.file}
-        className={stepVariants({ size, current: true })}
+        className={cn(
+          stepVariants({ size, current: true }),
+          step.invalid && 'inline-flex items-center gap-1.5'
+        )}
       >
-        {step.label}
+        <StepLabel step={step} />
       </span>
     );
   }
   if (!onClick && step.href) {
     return (
-      <a href={step.href} className={stepVariants({ size })}>
-        {step.label}
+      <a
+        href={step.href}
+        className={cn(
+          stepVariants({ size }),
+          step.invalid && 'inline-flex items-center gap-1.5'
+        )}
+      >
+        <StepLabel step={step} />
       </a>
     );
   }
@@ -161,16 +192,24 @@ function Step({
       <span
         className={cn(
           stepVariants({ size }),
-          'cursor-default hover:bg-transparent hover:text-slate-600'
+          'cursor-default hover:bg-transparent hover:text-slate-600',
+          step.invalid && 'inline-flex items-center gap-1.5'
         )}
       >
-        {step.label}
+        <StepLabel step={step} />
       </span>
     );
   }
   return (
-    <button type='button' onClick={onClick} className={stepVariants({ size })}>
-      {step.label}
+    <button
+      type='button'
+      onClick={onClick}
+      className={cn(
+        stepVariants({ size }),
+        step.invalid && 'inline-flex items-center gap-1.5'
+      )}
+    >
+      <StepLabel step={step} />
     </button>
   );
 }
@@ -255,6 +294,7 @@ function Breadcrumb({
                     label: item.label,
                     href: item.href,
                     onClick: press(item.onClick),
+                    marks: <Marks invalid={item.invalid} />,
                   }))}
                 />
               ) : (

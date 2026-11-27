@@ -63,7 +63,7 @@ defineClientPlugin({
     async load(path: string) { … },
     select(item) { set({ selected: item }) },
   }),
-  components: { MediaPicker, MediaBrowser },
+  components: { MediaPicker },
   // optional: which subset of `slice` to persist
   persist: (slice) => ({ selected: slice.selected }),
 })

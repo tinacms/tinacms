@@ -1,255 +1,237 @@
+import { useTouch } from '@tinacms/ui/hooks/use-touch';
 import { cn } from '@tinacms/ui/lib/utils';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import {
+  useEditorReadOnly,
+  useEditorRef,
+  useEditorState,
+  useHotkeys,
+} from '@udecode/plate/react';
 import {
   BulletedListPlugin,
   NumberedListPlugin,
 } from '@udecode/plate-list/react';
-import { TablePlugin } from '@udecode/plate-table/react';
-import { useEditorState } from '@udecode/plate/react';
 import React from 'react';
 import { useResize } from '../hooks/use-resize';
-import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
 import {
-  CONTAINER_MD_BREAKPOINT,
-  EMBED_ICON_WIDTH,
-  HEADING_ICON_ONLY,
-  HEADING_ICON_WITH_TEXT,
-  HEADING_LABEL,
-  HIGHLIGHT_ICON_WIDTH,
-  OVERFLOW_MENU_WIDTH,
-  STANDARD_ICON_WIDTH,
-  type ToolbarOverrideType,
-} from '../toolbar/toolbar-overrides';
+  type InLineTool,
+  hasAnyTool,
+  resolveToolbarLayout,
+} from '../toolbar/toolbar-layout';
 import { useToolbarContext } from '../toolbar/toolbar-provider';
-import { HeadingsMenu } from './headings-dropdown';
-import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button';
-import { HorizontalRuleToolbarButton } from './plate-ui/hr-toolbar-button';
-import { ImageToolbarButton } from './plate-ui/image-toolbar-button';
-import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
+import { InsertMenu } from './insert-menu';
+import { MoreFormattingMenu } from './more-formatting-menu';
+import { MoreToolsMenu } from './more-tools-menu';
+import { TextStyleMenu } from './text-style-menu';
 import { LinkToolbarButton } from './plate-ui/link-toolbar-button';
+import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
 import {
   BoldToolbarButton,
-  CodeToolbarButton,
-  HighlightToolbarButton,
   ItalicToolbarButton,
-  StrikethroughToolbarButton,
-  TextColorToolbarButton,
 } from './plate-ui/mark-toolbar-button';
-import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button';
-import OverflowMenu from './plate-ui/overflow-menu';
 import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button';
-import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button';
-import { TableDropdownMenu } from './plate-ui/table/table-dropdown-menu';
-import TemplatesToolbarButton from './plate-ui/templates-toolbar-button';
-import { ToolbarGroup } from './plate-ui/toolbar';
+import { Toolbar, ToolbarSeparator } from './plate-ui/toolbar';
+import { helpers } from '../plugins/core/common';
+import {
+  LinkShortcutContext,
+  useLinkShortcutRegistry,
+} from './plate-ui/link-shortcut';
+import { useToolBlocked } from './use-tool-blocked';
 
-type ToolbarItem = {
-  label: string;
-  width: (paragraphIconExists?: boolean) => number;
-  Component: React.ReactNode;
-};
+const WIDE_TOOLBAR = 448;
+const TOOL_WIDTH = 34;
+const TOOL_WIDTH_COARSE = 42;
+const TEXT_STYLE_WIDTH = 140;
+const TEXT_STYLE_ICON_WIDTH = 52;
+const MORE_FORMATTING_WIDTH = 52;
+const INSERT_WIDTH = 76;
+const SEPARATOR_WIDTH = 9;
 
-const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
-  heading: {
-    label: HEADING_LABEL,
-    width: (paragraphIconExists) =>
-      paragraphIconExists ? HEADING_ICON_WITH_TEXT : HEADING_ICON_ONLY, // Dynamically handle width based on paragraph icon
-    Component: (
-      <ToolbarGroup noSeparator>
-        <HeadingsMenu />
-      </ToolbarGroup>
-    ),
-  },
-  link: {
-    label: 'Link',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <LinkToolbarButton />,
-  },
-  image: {
-    label: 'Image',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <ImageToolbarButton />,
-  },
-  hr: {
-    label: 'Horizontal Rule',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <HorizontalRuleToolbarButton />,
-  },
-  quote: {
-    label: 'Quote',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <QuoteToolbarButton />,
-  },
-  ul: {
-    label: 'Unordered List',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <ListToolbarButton nodeType={BulletedListPlugin.key} />,
-  },
-  ol: {
-    label: 'Ordered List',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <ListToolbarButton nodeType={NumberedListPlugin.key} />,
-  },
-  bold: {
-    label: 'Bold',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <BoldToolbarButton />,
-  },
-  strikethrough: {
-    label: 'Strikethrough',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <StrikethroughToolbarButton />,
-  },
-  highlight: {
-    label: 'Highlight',
-    width: () => HIGHLIGHT_ICON_WIDTH,
-    Component: <HighlightToolbarButton />,
-  },
-  textColor: {
-    label: 'Text Color',
-    width: () => HIGHLIGHT_ICON_WIDTH,
-    Component: <TextColorToolbarButton />,
-  },
-  italic: {
-    label: 'Italic',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <ItalicToolbarButton />,
-  },
-  code: {
-    label: 'Code',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <CodeToolbarButton />,
-  },
-  codeBlock: {
-    label: 'Code Block',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <CodeBlockToolbarButton />,
-  },
-  mermaid: {
-    label: 'Mermaid',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <MermaidToolbarButton />,
-  },
-  table: {
-    label: 'Table',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <TableDropdownMenu />,
-  },
-  raw: {
-    label: 'Raw Markdown',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <RawMarkdownToolbarButton />,
-  },
-  embed: {
-    label: 'Templates',
-    width: () => EMBED_ICON_WIDTH,
-    Component: <TemplatesToolbarButton />,
-  },
-};
-
-export default function FixedToolbarButtons() {
-  const toolbarRef = React.useRef(null);
-  const [itemsShown, setItemsShown] = React.useState(11);
-  const { overrides, templates } = useToolbarContext();
-  const showEmbedButton = templates.length > 0;
-
-  let items: ToolbarItem[] =
-    overrides?.toolbar === undefined
-      ? Object.values(toolbarItems)
-      : overrides.toolbar
-          .map((item) => toolbarItems[item])
-          .filter((item) => item !== undefined);
-
-  if (!showEmbedButton) {
-    items = items.filter((item) => item.label !== toolbarItems.embed.label);
+const InLineButton = ({
+  tool,
+  disabled,
+  blocked,
+}: {
+  tool: InLineTool;
+  disabled: boolean;
+  blocked: boolean;
+}) => {
+  switch (tool) {
+    case 'bold':
+      return <BoldToolbarButton disabled={disabled} />;
+    case 'italic':
+      return <ItalicToolbarButton disabled={disabled} />;
+    case 'link':
+      return <LinkToolbarButton disabled={disabled} />;
+    case 'ul':
+      return (
+        <ListToolbarButton
+          nodeType={BulletedListPlugin.key}
+          disabled={disabled || blocked}
+        />
+      );
+    case 'ol':
+      return (
+        <ListToolbarButton
+          nodeType={NumberedListPlugin.key}
+          disabled={disabled || blocked}
+        />
+      );
+    case 'quote':
+      return <QuoteToolbarButton disabled={disabled || blocked} />;
   }
+};
 
-  items = items.filter((item) => item.label !== toolbarItems.raw.label);
+const ResetWhenUnfolded = ({
+  folded,
+  onReset,
+}: {
+  folded: boolean;
+  onReset: () => void;
+}) => {
+  React.useEffect(() => {
+    if (!folded) onReset();
+  }, [folded, onReset]);
+  return null;
+};
 
-  const editorState = useEditorState();
-  const userInTable = helpers.isNodeActive(editorState, TablePlugin);
+export default function FixedToolbarButtons({
+  disabled = false,
+}: {
+  disabled?: boolean;
+}) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [width, setWidth] = React.useState(Number.POSITIVE_INFINITY);
+  const { overrides, templates } = useToolbarContext();
+  const coarse = useTouch();
+  const { isBlocked, inCodeBlock } = useToolBlocked();
+  useEditorState();
+  const editor = useEditorRef();
+  const readOnly = useEditorReadOnly();
+  const linkShortcut = useLinkShortcutRegistry();
+  const [moreOpen, setMoreOpenState] = React.useState(false);
+  const [moreQuiet, setMoreQuiet] = React.useState(false);
+  const setMoreOpen = React.useCallback((open: boolean) => {
+    setMoreOpenState(open);
+    if (!open) setMoreQuiet(false);
+  }, []);
+  const resetLinkShortcut = React.useCallback(() => {
+    linkShortcut.pending.current = false;
+    if (moreQuiet) setMoreOpen(false);
+  }, [linkShortcut, moreQuiet, setMoreOpen]);
 
-  const userInCodeBlock = helpers.isNodeActive(editorState, CodeBlockPlugin);
+  const layout = React.useMemo(
+    () => resolveToolbarLayout(overrides?.toolbar, templates.length),
+    [overrides?.toolbar, templates.length]
+  );
 
-  useResize(toolbarRef, (entry) => {
-    const width = entry.target.getBoundingClientRect().width;
-    const headingButton = items.find((item) => item.label === HEADING_LABEL);
-    const headingWidth = headingButton
-      ? headingButton.width(width >= CONTAINER_MD_BREAKPOINT)
-      : 0;
+  useResize(ref, (entry) => setWidth(entry.contentRect.width));
 
-    const availableWidth = width - headingWidth;
-
-    const countItemsFitting = (budget: number) => {
-      let count = headingButton ? 1 : 0;
-      let used = 0;
-      for (const item of items) {
-        if (item.label === HEADING_LABEL) continue;
-        if (used + item.width() > budget) break;
-        used += item.width();
-        count += 1;
+  const hasLink = layout.inLine.includes('link');
+  useHotkeys(
+    'meta+k, ctrl+k',
+    (event) => {
+      const root = editor.api.toDOMNode(editor);
+      if (!root?.contains(document.activeElement)) return;
+      if (
+        readOnly ||
+        !hasLink ||
+        disabled ||
+        helpers.isNodeActive(editor, CodeBlockPlugin)
+      ) {
+        return;
       }
-      return count;
-    };
+      event.preventDefault();
+      if (linkShortcut.open.current) {
+        linkShortcut.open.current();
+        return;
+      }
+      linkShortcut.pending.current = true;
+      setMoreQuiet(true);
+      setMoreOpen(true);
+    },
+    { enableOnContentEditable: true },
+    [editor, hasLink, disabled, readOnly, linkShortcut, setMoreOpen]
+  );
 
-    const fitCount = countItemsFitting(availableWidth);
+  if (!hasAnyTool(layout)) return null;
 
-    setItemsShown(
-      fitCount >= items.length
-        ? items.length
-        : countItemsFitting(availableWidth - OVERFLOW_MENU_WIDTH)
-    );
-  });
+  const wide = width >= WIDE_TOOLBAR;
+  const toolWidth = coarse ? TOOL_WIDTH_COARSE : TOOL_WIDTH;
+  const off = disabled || inCodeBlock;
+  const hasMoreFormatting = layout.moreFormatting.length > 0;
 
-  const getOpacity = (item: ToolbarItem) => {
-    if (userInTable && unsupportedItemsInTable.has(item.label)) {
-      return 'opacity-25 pointer-events-none';
-    }
-    if (userInCodeBlock) {
-      return 'opacity-25 pointer-events-none';
-    }
-    return 'opacity-100';
-  };
+  const fixedBase =
+    (layout.textStyle ? (wide ? TEXT_STYLE_WIDTH : TEXT_STYLE_ICON_WIDTH) : 0) +
+    (hasMoreFormatting ? MORE_FORMATTING_WIDTH : 0) +
+    (layout.showInsert ? INSERT_WIDTH + SEPARATOR_WIDTH : 0) +
+    (layout.textStyle && layout.inLine.length > 0 ? SEPARATOR_WIDTH : 0);
+  const all = layout.inLine.length;
+  const roomWithoutDivider = Math.floor((width - fixedBase) / toolWidth);
+  const allFit = roomWithoutDivider >= all && !hasMoreFormatting;
+  const room = allFit
+    ? roomWithoutDivider
+    : Math.floor(
+        (width - fixedBase - (all > 0 ? SEPARATOR_WIDTH : 0)) / toolWidth
+      );
+  const shown = room >= all ? all : Math.max(0, room - 1);
+  const inLine = layout.inLine.slice(0, shown);
+  const folded = layout.inLine.slice(shown);
+
+  const render = (tool: InLineTool) => (
+    <InLineButton
+      key={tool}
+      tool={tool}
+      disabled={off}
+      blocked={isBlocked(tool)}
+    />
+  );
 
   return (
-    <div className='w-full overflow-hidden @container/toolbar' ref={toolbarRef}>
-      <div
-        className='flex'
-        style={{
-          transform: 'translateX(calc(-1px))',
-        }}
+    <LinkShortcutContext.Provider value={linkShortcut}>
+      <ResetWhenUnfolded
+        folded={folded.includes('link')}
+        onReset={resetLinkShortcut}
+      />
+      <Toolbar
+        ref={ref}
+        aria-label='Formatting'
+        className={cn('min-w-0 flex-1 flex-nowrap overflow-hidden px-1.5 py-1')}
       >
-        <>
-          {items.slice(0, itemsShown).map((item) => (
-            <div
-              className={cn(
-                'transition duration-500 ease-in-out',
-                getOpacity(item)
-              )}
-              key={item.label}
-            >
-              {item.Component}
-            </div>
-          ))}
-          {items.length > itemsShown ? (
-            <div className='w-fit'>
-              <OverflowMenu>
-                {items.slice(itemsShown).flatMap((c) => (
-                  <div
-                    className={cn(
-                      'transition duration-500 ease-in-out',
-                      getOpacity(c)
-                    )}
-                    key={c.label}
-                  >
-                    {c.Component}
-                  </div>
-                ))}
-              </OverflowMenu>
-            </div>
-          ) : null}
-        </>
-      </div>
-    </div>
+        {layout.textStyle ? (
+          <TextStyleMenu showLabel={wide} disabled={off} />
+        ) : null}
+        {layout.textStyle && layout.inLine.length > 0 ? (
+          <ToolbarSeparator />
+        ) : null}
+        {inLine.map(render)}
+        {inLine.length > 0 && (hasMoreFormatting || folded.length > 0) ? (
+          <ToolbarSeparator />
+        ) : null}
+        {hasMoreFormatting ? (
+          <MoreFormattingMenu tools={layout.moreFormatting} disabled={off} />
+        ) : null}
+        {folded.length > 0 ? (
+          <MoreToolsMenu
+            disabled={off}
+            open={moreOpen}
+            quiet={moreQuiet}
+            onOpenChange={setMoreOpen}
+          >
+            {folded.map(render)}
+          </MoreToolsMenu>
+        ) : null}
+        {layout.showInsert ? (
+          <>
+            <ToolbarSeparator />
+            <InsertMenu
+              inserts={layout.inserts}
+              templates={layout.templates}
+              disabled={off}
+            />
+          </>
+        ) : null}
+      </Toolbar>
+    </LinkShortcutContext.Provider>
   );
 }

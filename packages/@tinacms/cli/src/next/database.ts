@@ -16,7 +16,7 @@ import {
   TINA_FOLDER,
 } from './config-manager';
 
-export const createDBServer = (port: number): Server => {
+export const createDBServer = (port: number): Promise<Server> => {
   const levelHost = new ManyLevelHost(
     // @ts-ignore
     new MemoryLevel<string, Record<string, any>>({
@@ -29,16 +29,24 @@ export const createDBServer = (port: number): Server => {
       // Disconnected
     });
   });
-  dbServer.once('error', (err) => {
-    // @ts-ignore err.code undefined
-    if (err?.code === 'EADDRINUSE') {
-      throw new Error(
-        `Tina Dev server is already in use. Datalayer server is busy on port ${port}`
-      );
-    }
+  return new Promise((resolve, reject) => {
+    dbServer.once('error', (err: NodeJS.ErrnoException) => {
+      if (err.code === 'EADDRINUSE') {
+        reject(
+          new Error(
+            `Tina Dev server is already in use. Datalayer server is busy on port ${port}`
+          )
+        );
+      } else {
+        reject(
+          new Error(
+            `Unable to start the datalayer server on port ${port}: ${err.message}`
+          )
+        );
+      }
+    });
+    dbServer.listen(port, 'localhost', () => resolve(dbServer));
   });
-  dbServer.listen(port, 'localhost');
-  return dbServer;
 };
 
 export async function createAndInitializeDatabase(

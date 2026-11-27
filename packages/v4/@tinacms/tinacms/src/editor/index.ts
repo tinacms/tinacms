@@ -12,9 +12,10 @@ export {
   useIsFormDirty,
 } from '../form/form-store';
 export {
-  MediaBrowser,
-  type MediaBrowserProps,
-} from '../plugins/media-manager/media-browser';
+  type MediaPicker,
+  type MediaPickerRequest,
+  useMediaPicker,
+} from './media-picker';
 export type { SaveHandler, StaleDraftActions } from './context';
 export {
   Field,
@@ -66,6 +67,7 @@ export {
   useDiscardEdits,
   useDocumentPath,
   useFieldActivation,
+  useFieldActive,
   useFieldAddress,
   useFieldErrors,
   useFieldFrame,

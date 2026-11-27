@@ -11,7 +11,13 @@ import {
   createServerHookRegistry,
   createServerSave,
 } from '../core/form/server-hooks';
+import { storedHelpersOf } from '../core/form/server-validation';
 import { invariant } from '../core/invariant';
+import { customValidatorNamesOf } from '../core/validator/registry';
+import {
+  type ServerValidatorRegistry,
+  createServerValidatorRegistry,
+} from '../core/validator/server-registry';
 import { capabilityMountsFor, capabilityProvider } from '../core/mount';
 import {
   REGISTRY_CONFLICTS,
@@ -44,6 +50,10 @@ import {
   serverRuntimeStorage,
 } from '../server/runtime-storage';
 import { errorResponse, toErrorResponse } from './error-response';
+import {
+  SESSION_NAMESPACE,
+  SESSION_PERMISSIONS_OP,
+} from './session-permissions';
 
 export type RpcHandler = ((request: Request) => Promise<Response>) & {
   // Tear the composed plugins down. A host that replaces a handler instead of ending
@@ -57,8 +67,8 @@ export interface RpcHandlerConfig {
   // route is the last two segments of the path, so any prefix reaches an operation and
   // a proxy rule keyed on an exact path does not hold. Set it to pin the route.
   rpcUrl?: string;
-  // The collections, so a content save runs the server hooks each one lists.
-  // Required once a plugin registers a server hook.
+  // The collections, so a content save runs the validators and the server hooks
+  // each one lists. Required once a plugin registers a server hook or a custom validator.
   schema?: TinaSchema;
 }
 
@@ -142,10 +152,17 @@ export const createRpcHandler = ({
 
 const composeServerSegments = async (
   plugins: PluginManifest[]
-): Promise<Omit<ServerRuntime, 'destroy'> & { hooks: ServerHookRegistry }> => {
+): Promise<
+  Omit<ServerRuntime, 'destroy' | 'collections'> & {
+    hooks: ServerHookRegistry;
+    validators: ServerValidatorRegistry;
+    stored: ReturnType<typeof storedHelpersOf>;
+  }
+> => {
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
   const hooks = createServerHookRegistry(plugins, resolved);
+  const validators = createServerValidatorRegistry(plugins, resolved);
   const segmentsByNamespace = composeOverridableRegistry(
     resolved.flatMap((segment) =>
       capabilityMountsFor(segment.manifest).map((mount) => ({
@@ -159,6 +176,8 @@ const composeServerSegments = async (
   claimServerHookFactories(segmentsByNamespace);
   return {
     hooks,
+    validators,
+    stored: storedHelpersOf(plugins),
     searchIndex: claimSearchIndexProvider(
       segmentsByNamespace,
       capabilityProvider(plugins, 'search')
@@ -180,25 +199,32 @@ const composeServerRuntime = async (
   plugins: PluginManifest[],
   schema: TinaSchema | undefined
 ): Promise<ServerRuntime> => {
-  const { hooks, ...composed } = await composeServerSegments(plugins);
+  const { hooks, validators, stored, ...composed } =
+    await composeServerSegments(plugins);
   const { resolveBranch } = composed;
   invariant(
-    hooks.size === 0 || schema,
+    (hooks.size === 0 && customValidatorNamesOf(plugins).size === 0) || schema,
     'rpc-server-hooks-no-schema',
-    'A plugin registers a server hook, but the RPC handler has no `schema`. ' +
-      'Pass the config schema to mountHandler so a save runs the hooks its collection lists.'
+    'A plugin registers a server hook or a custom validator, but the RPC handler has no `schema`. ' +
+      'Pass the config schema to mountHandler so a save runs the validators and the hooks its collection lists.'
   );
   wrapContentSave(
     composed.segmentsByNamespace,
     capabilityProvider(plugins, 'content'),
-    { hooks, collections: schema?.collections, resolveBranch }
+    {
+      hooks,
+      validators,
+      stored,
+      collections: schema?.collections,
+      resolveBranch,
+    }
   );
   // The init runs last, so a failed composition leaves no initialized plugin behind
   // for the next attempt. The teardown travels on the runtime: a handler that is
   // replaced rather than ending with the process — a dev server re-evaluating its
   // route module — would otherwise run every onInit again with no matching onDestroy.
   const destroy = await initializePlugins(plugins);
-  return { ...composed, destroy };
+  return { ...composed, collections: schema?.collections ?? [], destroy };
 };
 
 // Runs no onInit, so a getSession must not depend on state that onInit sets.
@@ -206,7 +232,11 @@ const lazyRuntimeOf = (plugins: PluginManifest[]) => {
   let composing: Promise<ServerRuntime> | null = null;
   return (): Promise<ServerRuntime> => {
     composing ??= composeServerSegments(plugins).then(
-      (composed) => ({ ...composed, destroy: async () => {} }),
+      ({ hooks, validators, stored, ...composed }) => ({
+        ...composed,
+        collections: [],
+        destroy: async () => {},
+      }),
       (cause) => {
         composing = null;
         throw cause;
@@ -245,6 +275,20 @@ export const createRequestAuthorizer = (plugins: PluginManifest[]) => {
   };
 };
 
+// The `session/permissions` op for a route outside the handler: the local Data
+// Layer's own server answers it with the resolution its gate uses.
+export const createSessionPermissionsResponder = (
+  plugins: PluginManifest[]
+) => {
+  const runtimeOf = lazyRuntimeOf(plugins);
+  return async (request: Request): Promise<Response> => {
+    const runtime = await runtimeOf();
+    return serverRuntimeStorage.run(runtime, () =>
+      answerSessionPermissions(runtime, request)
+    );
+  };
+};
+
 // Runs code that a route outside the handler serves, such as the local Data
 // Layer's save, inside the contexts a dispatched op has, so `use()` and
 // `requestContext()` resolve there too.
@@ -265,12 +309,12 @@ export const createOpContextRunner = (plugins: PluginManifest[]) => {
   };
 };
 
-// The reserved `hooks` key holds server hook factories, not an op, so it never routes.
+// The reserved `hooks` and `validators` keys hold factories, not ops, so they never route.
 const claimServerHookFactories = (
   segmentsByNamespace: Map<string, ResolvedServerSegment>
 ): void => {
   for (const [namespace, segment] of segmentsByNamespace) {
-    const { hooks, ...routableOps } = segment.ops;
+    const { hooks, validators, ...routableOps } = segment.ops;
     segmentsByNamespace.set(namespace, { ...segment, ops: routableOps });
   }
 };
@@ -472,6 +516,9 @@ const authorizeAndInvokeOp = async (
   namespace: string,
   opName: string
 ): Promise<Response> => {
+  if (namespace === SESSION_NAMESPACE && opName === SESSION_PERMISSIONS_OP) {
+    return answerSessionPermissions(runtime, request);
+  }
   const mounted = runtime.segmentsByNamespace.get(namespace);
   const op = mounted ? routedOp(mounted, opName) : undefined;
   if (!mounted || !op) {
@@ -511,6 +558,19 @@ const authorizeAndInvokeOp = async (
     () => invokeOp(op, input)
   );
   return Response.json(result ?? null);
+};
+
+// Needs a session and no permission. Where no auth hooks exist, the server checks
+// nothing and accepts every request, so the answer is the wildcard; it grants
+// nothing, because only the server's own check enforces.
+const answerSessionPermissions = async (
+  runtime: ServerRuntime,
+  request: Request
+): Promise<Response> => {
+  if (!runtime.authHooks) return Response.json(['*']);
+  const session = await runtime.authHooks.getSession(request);
+  if (!session) return errorResponse(401, 'unauthenticated', 'No CMS session.');
+  return Response.json(await permissionsOf(runtime.authHooks, session));
 };
 
 export type Authorization = { session: Session } | { refusal: Response };
@@ -565,16 +625,35 @@ const routedOp = (
 const invokeOp = (op: ServerOp, input: unknown): Promise<unknown> =>
   (op as (input: unknown) => Promise<unknown>)(input);
 
+// A provider that resolves the roles owns the whole map (ADR-008 §3 and §4).
+const permissionsOfRole = async (
+  authHooks: AuthTransportHooks,
+  role: string
+): Promise<readonly string[]> =>
+  authHooks.rolePermissions
+    ? await authHooks.rolePermissions(role)
+    : (DEFAULT_ROLE_PERMISSIONS[role] ?? []);
+
+const permissionsOf = async (
+  authHooks: AuthTransportHooks,
+  session: Session
+): Promise<string[]> => {
+  const granted = new Set<string>();
+  for (const role of session.roles) {
+    for (const permission of await permissionsOfRole(authHooks, role)) {
+      granted.add(permission);
+    }
+  }
+  return [...granted];
+};
+
 const hasPermission = async (
   authHooks: AuthTransportHooks,
   session: Session,
   permission: string
 ): Promise<boolean> => {
   for (const role of session.roles) {
-    // A provider that resolves the roles owns the whole map (ADR-008 §3 and §4).
-    const permissions = authHooks.rolePermissions
-      ? await authHooks.rolePermissions(role)
-      : (DEFAULT_ROLE_PERMISSIONS[role] ?? []);
+    const permissions = await permissionsOfRole(authHooks, role);
     if (permissions.includes('*') || permissions.includes(permission)) {
       return true;
     }

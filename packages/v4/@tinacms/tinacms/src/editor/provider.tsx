@@ -35,6 +35,7 @@ import {
   type TinaStoreState,
 } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
+import { customValidatorNamesOf } from '../core/validator/registry';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { createScreenRegistry } from '../core/screen/registry';
 import { createGlobalNav } from '../core/slot/global-nav';
@@ -45,6 +46,7 @@ import {
   type FieldErrors,
   type FormId,
   isEdited,
+  offeredCopies,
   readFormStore,
   readOpeningScope,
   syncDrafts,
@@ -54,6 +56,15 @@ import {
   useFormStore,
   valuesEqual,
 } from '../form/form-store';
+import { MediaPickerHost } from '../plugins/media-manager/media-picker-host';
+import { blockOnFormErrors } from './block-errors';
+import {
+  endServerErrorsIfChanged,
+  forgetServerErrors,
+  heldServerErrors,
+} from './server-errors';
+import { registerFormBindings } from './form-bindings';
+import { checkForm } from './save-pipeline';
 import { UploadFormContext } from './uploads/upload-context';
 import { uploadListOf } from './uploads/upload-list';
 import { SELF_CONTAINED_VALIDATORS } from '../plugins/validators/core-validators.schema';
@@ -72,6 +83,7 @@ import {
   type ListChange,
   nestFieldErrors,
   rekeyAddresses,
+  toFieldErrorEntry,
 } from './field-errors';
 import { useFormViewStore } from './form-view-state';
 import { buildFormResolver } from './resolver';
@@ -207,6 +219,7 @@ export function TinaProvider({
         validators: createValidatorRegistry(resolved),
         hooks: createFormHookRegistry(resolved),
         serverHooks: serverHookNamesOf(composedPlugins),
+        customValidators: customValidatorNamesOf(composedPlugins),
         store: createTinaStore(resolved, {
           rpcUrl: config.rpcUrl ?? DEFAULT_RPC_URL,
         }),
@@ -313,7 +326,8 @@ const syncSeededForm = (
   keptSeed: TinaDocument | null,
   resetForm: (values: TinaDocument, options?: { keepErrors?: boolean }) => void,
   advanceSeedKey: (formId: FormId) => void,
-  dropFieldTargets: () => void
+  dropFieldTargets: () => void,
+  collectionName: string
 ) => {
   const incoming = toFormValues(ingested);
   const before = useFormStore.getState().forms[formId];
@@ -323,6 +337,7 @@ const syncSeededForm = (
     valuesEqual(incoming, before.baseline, equal);
   seededFormId.current = formId;
   useFormStore.getState().registerForm(formId, incoming, equal);
+  useFormStore.getState().registerCollection(formId, collectionName);
   const signature = seedSignatureOf(formId, userId, seedValues);
   if (seededSignature.current === null) {
     seededSignature.current = signature;
@@ -345,6 +360,7 @@ const discardFormEdits = (
   const store = readFormStore();
   const scope = store.forms[formId];
   if (!isEdited(scope)) return;
+  forgetServerErrors(formId);
   const baseline = toDocument(scope.baseline);
   store.discardEdits(formId);
   resetForm(baseline);
@@ -442,8 +458,13 @@ const notifyWatchedFieldChange = (
   formId: FormId,
   path: string,
   collection: CollectionSchema,
-  trigger: (names: string[]) => Promise<boolean>
+  trigger: (names: string[]) => Promise<boolean>,
+  revalidate: () => void
 ) => {
+  // A refusal judged the whole document, so any change to the values ends
+  // every held server message. A list action has already moved the form's
+  // errors to new addresses, so the whole form is judged again by the client rules.
+  if (endServerErrorsIfChanged(formId, values).length > 0) revalidate();
   if (name === undefined) return;
   runOnChange(
     formHooks,
@@ -501,11 +522,16 @@ function useSeededFormSync(
   seedValues: TinaDocument,
   keptSeed: TinaDocument | null,
   resetForm: (values: TinaDocument, options?: { keepErrors?: boolean }) => void,
-  dropFieldTargets: () => void
+  dropUploadTargets: () => void,
+  collectionName: string
 ) {
   const reseeds = useRef(0);
   const [seedKey, setSeedKey] = useState(() => `${formId}#${reseeds.current}`);
   const view = useFormViewStore(formId);
+  const dropFieldTargets = useCallback(() => {
+    dropUploadTargets();
+    view.getState().closePicker();
+  }, [dropUploadTargets, view]);
   const advanceSeedKey = useCallback(
     (seededFormId: FormId) => {
       reseeds.current += 1;
@@ -529,7 +555,8 @@ function useSeededFormSync(
       keptSeed,
       resetForm,
       advanceSeedKey,
-      dropFieldTargets
+      dropFieldTargets,
+      collectionName
     );
   }, [
     formId,
@@ -541,6 +568,7 @@ function useSeededFormSync(
     equal,
     advanceSeedKey,
     dropFieldTargets,
+    collectionName,
   ]);
 
   const discardEdits = useCallback(() => {
@@ -550,7 +578,7 @@ function useSeededFormSync(
     discardFormEdits(formId, resetForm, advanceSeedKey, dropFieldTargets);
   }, [formId, resetForm, advanceSeedKey, dropFieldTargets, view]);
 
-  return { seedKey, advanceSeedKey, discardEdits, view };
+  return { seedKey, advanceSeedKey, discardEdits, dropFieldTargets, view };
 }
 
 function useFormMethodSubscriptions(
@@ -583,7 +611,11 @@ function useFormMethodSubscriptions(
         formId,
         path,
         collection,
-        methods.trigger
+        methods.trigger,
+        () => {
+          methods.clearErrors();
+          void methods.trigger();
+        }
       )
     );
     return () => unsubscribe();
@@ -595,6 +627,8 @@ export interface FormProviderProps {
   path: string;
   document?: TinaDocument;
   onSave?: SaveHandler;
+  /** Set for a document that has no file yet: Discard drops its copy and calls this. */
+  onDiscardNew?: () => void;
   children: ReactNode;
 }
 
@@ -603,6 +637,7 @@ export function FormProvider({
   path,
   document,
   onSave,
+  onDiscardNew,
   children,
 }: FormProviderProps) {
   const runtime = use(TinaRuntimeContext);
@@ -635,7 +670,7 @@ export function FormProvider({
     [formId, userId, ingested, equal]
   );
   const seedValues = resolveSeedValues(keepsIncoming, kept.seed, ingested);
-  const resolver = buildFormResolver(collection, registry, validators);
+  const resolver = buildFormResolver(collection, registry, validators, formId);
   const methods = useForm<TinaDocument>({
     defaultValues: seedValues,
     errors: kept.errors,
@@ -646,25 +681,25 @@ export function FormProvider({
 
   const [uploadForm] = useState(() => ({}));
   const uploads = uploadListOf(runtime.store);
-  const dropFieldTargets = useCallback(
+  const dropUploadTargets = useCallback(
     () => uploads.dropFieldTargets(uploadForm),
     [uploads, uploadForm]
   );
 
-  const { seedKey, advanceSeedKey, discardEdits, view } = useSeededFormSync(
-    formId,
-    userId,
-    ingested,
-    equal,
-    seedValues,
-    kept.seed,
-    methods.reset,
-    dropFieldTargets
-  );
+  const { seedKey, advanceSeedKey, discardEdits, dropFieldTargets, view } =
+    useSeededFormSync(
+      formId,
+      userId,
+      ingested,
+      equal,
+      seedValues,
+      kept.seed,
+      methods.reset,
+      dropUploadTargets,
+      collection.name
+    );
 
-  const waiting = useFormStore((state) =>
-    state.hidden[formId] ? undefined : state.waiting[formId]
-  );
+  const waiting = useFormStore((state) => offeredCopies(state, formId));
   const staleDraftActions = useMemo(
     () =>
       buildStaleDraftActions(
@@ -708,6 +743,35 @@ export function FormProvider({
     []
   );
   const fieldSeedKey = `${seedKey}~${fieldReseeds}`;
+  useEffect(
+    () =>
+      registerFormBindings(formId, {
+        validate: () => checkForm(formId, view, methods.trigger),
+        getValues: methods.getValues,
+        setValue: (address, value) => methods.setValue(address, value),
+        setServerErrors: (errors) => {
+          for (const [address, messages] of Object.entries(errors)) {
+            methods.setError(address, toFieldErrorEntry(messages));
+          }
+        },
+        blockOnErrors: () =>
+          blockOnFormErrors(formId, view, collection, methods.getValues),
+        reseedFields,
+        resetReveal: () => view.getState().resetReveal(),
+      }),
+    [formId, methods, reseedFields, view, collection]
+  );
+  useEffect(() => {
+    view.getState().resetReveal();
+    const store = useFormStore.getState();
+    if (!store.revealOnOpen[formId]) return;
+    view.getState().attemptSave();
+    store.clearRevealOnOpen(formId);
+    // A refusal that Save All left on this form blocks Save here as it did on an open form.
+    if (Object.keys(heldServerErrors(formId, methods.getValues())).length > 0) {
+      blockOnFormErrors(formId, view, collection, methods.getValues);
+    }
+  }, [formId, view, methods, collection]);
   useEffect(() => {
     view.getState().showLevels([]);
   }, [fieldSeedKey, view]);
@@ -791,6 +855,17 @@ export function FormProvider({
     [commitList, methods, view]
   );
 
+  const discardNewDocument = useMemo(
+    () =>
+      onDiscardNew
+        ? () => {
+            readFormStore().discardStoredDraft(formId);
+            onDiscardNew();
+          }
+        : undefined,
+    [onDiscardNew, formId]
+  );
+
   const formScope = useMemo(
     () => ({
       formId,
@@ -803,7 +878,7 @@ export function FormProvider({
       saveFailure,
       setSaveFailure,
       view,
-      discardEdits,
+      discardEdits: discardNewDocument ?? discardEdits,
       hooks: formHooks,
       staleDraft: staleDraftActions,
       removeListItem,
@@ -822,6 +897,7 @@ export function FormProvider({
       setSaveFailure,
       view,
       discardEdits,
+      discardNewDocument,
       formHooks,
       staleDraftActions,
       removeListItem,
@@ -835,6 +911,7 @@ export function FormProvider({
       <UploadFormContext value={uploadForm}>
         <RhfFormProvider {...methods}>
           <>{children}</>
+          <MediaPickerHost />
         </RhfFormProvider>
       </UploadFormContext>
     </FormScopeContext>

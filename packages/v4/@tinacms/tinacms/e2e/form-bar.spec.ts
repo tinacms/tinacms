@@ -6,12 +6,15 @@ const rects = (page: Page) =>
   page.evaluate(() => {
     const box = (element: Element | null) => {
       const r = element?.getBoundingClientRect();
-      return r ? { x: r.x, y: r.y, width: r.width, height: r.height } : null;
+      return r?.width
+        ? { x: r.x, y: r.y, width: r.width, height: r.height }
+        : null;
     };
     const bar = document.querySelector('[data-slot=form-bar]');
     return {
       bar: box(bar),
       tag: box(bar?.querySelector('[role=status]') ?? null),
+      view: box(bar?.querySelector('[role=group][aria-label="View"]') ?? null),
       menu: box(bar?.querySelector('[aria-label="Document actions"]') ?? null),
       save: box(
         [...(bar?.querySelectorAll('button') ?? [])].find(
@@ -45,6 +48,16 @@ const dirty = async (page: Page) => {
   // Fonts load late and move the tag by a fraction of a pixel, which is not the
   // failure under test.
   await page.evaluate(() => document.fonts.ready);
+  // On a phone the View switch takes the tag's place and the status bar says Unsaved.
+  if ((page.viewportSize()?.width ?? 0) < 768) {
+    await expect(page.locator('[data-slot=status-bar]')).toContainText(
+      'Unsaved'
+    );
+    await expect(
+      page.locator('[data-slot=form-bar] [role=group][aria-label="View"]')
+    ).toBeVisible();
+    return;
+  }
   await expect(
     page.locator('[data-slot=form-bar] [role=status]')
   ).toBeVisible();
@@ -101,7 +114,9 @@ for (const { name, width, height } of [
       await failWrites(page, message);
       await dirty(page);
       const before = await settled(page);
-      await page.getByRole('button', { name: 'Save' }).click();
+      expect(before.view !== null).toBe(width < 768);
+      expect(before.tag !== null).toBe(width >= 768);
+      await page.getByRole('button', { name: 'Save', exact: true }).click();
       const toast = page.locator(
         '[data-sonner-toast][role=alert], [role=alert][data-slot=toast]'
       );
@@ -111,9 +126,13 @@ for (const { name, width, height } of [
       await expect(toast.first()).not.toContainText(/500|op-failed|xxxx/);
       expect(await rects(page)).toEqual(before);
       expect((await rects(page)).alerts).toBe(0);
-      await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled();
+      await expect(
+        page.getByRole('button', { name: 'Save', exact: true })
+      ).toBeEnabled();
       // The toast clears the bar, so Save stays reachable.
-      await page.getByRole('button', { name: 'Save' }).hover({ timeout: 4000 });
+      await page
+        .getByRole('button', { name: 'Save', exact: true })
+        .hover({ timeout: 4000 });
     });
   }
 }

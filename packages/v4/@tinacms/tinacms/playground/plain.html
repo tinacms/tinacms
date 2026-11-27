@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plain page</title>
+    <style>
+      body { margin: 0; padding: 16px; font-family: Georgia, serif; }
+      #inner-width { font-size: 32px; }
+    </style>
+  </head>
+  <body>
+    <h1 data-testid="plain-title">Plain page without Tina</h1>
+    <p>Layout width: <span id="inner-width" data-testid="inner-width"></span></p>
+    <p data-testid="query"></p>
+    <p><a href="/plain.html?second=1" data-testid="plain-link">Second plain page</a></p>
+    <p><a href="/plain.html#anchor" data-testid="plain-anchor">Anchor</a></p>
+    <script>
+      const width = document.getElementById('inner-width');
+      const query = document.querySelector('[data-testid=query]');
+      const show = () => {
+        width.textContent = String(window.innerWidth);
+        query.textContent = location.search;
+      };
+      show();
+      window.addEventListener('resize', show);
+    </script>
+  </body>
+</html>

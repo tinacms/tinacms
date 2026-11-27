@@ -78,8 +78,8 @@ supplies the addition for it.
 
 | `features` field | Role |
 |---|---|
-| `search` | `list` uses `search`. |
-| `extensionFilter` | `list` uses `extensions`. |
+| `search` | `list` uses `search`. The media picker also uses it. Without it, the picker filters the loaded items of the open folder by file name. |
+| `extensionFilter` | `list` uses `extensions`. The media picker asks for image extensions. Without it, the picker filters each page of results to images. |
 | `acceptedMimeTypes` | The MIME types that `upload` accepts, such as `application/pdf`, or a wildcard such as `image/*`. |
 | `acceptedExtensions` | The extensions that `upload` accepts, lowercase and without the dot, such as `svg`. |
 | `maxSize` | The largest file that `upload` accepts, in bytes. Each media plugin sets its own limit. If it is not set, the Media Manager does not check the size before an upload. |
@@ -182,9 +182,10 @@ through a symbolic link. It rejects a file name that holds a path separator.
 ## `tinaCloud()`
 
 `tinaCloud()` keeps media and content in TinaCloud. It provides `media`,
-`auth` and `content`, with one slice each in `slices.media`, `slices.auth` and
-`slices.content`. Refer to [auth-plugins.md](./auth-plugins.md#tinacloud) for
-the sign-in flow.
+`auth` and `content`, and optionally `search`, with one slice each in
+`slices.media`, `slices.auth`, `slices.content` and `slices.search`. Refer to
+[search-plugins.md](./search-plugins.md#tinacloud) for `search`. Refer to
+[auth-plugins.md](./auth-plugins.md#tinacloud) for the sign-in flow.
 
 `tinaCloud()` provides `content`, so it cannot sit next to
 `localContentPlugin()`. Swap all of it for the local plugins in local

@@ -1,23 +1,27 @@
 import { defineServerHook } from '../../../core/form/hooks';
 import type { ServerSegment } from '../../../core/plugin';
-import type { SearchIndexProvider } from '../../../core/search/index-contract';
-import { SEARCH_INDEX_HOOK } from '../../../core/search/index-contract';
+import {
+  SEARCH_INDEX_HOOK,
+  type SearchFields,
+  type SearchIndexProvider,
+} from '../../../core/search/index-contract';
 import { buildSearchRecord } from '../../../core/search/record';
 import { validateSearchRequest } from '../../../core/search/validate';
 import { publicOp } from '../../../server/op-meta';
 import { currentServerRuntime } from '../../../server/runtime-access';
-import type { SearchPluginConfig } from '../search.plugin';
 
 // Everything below the `server` loader must import no node module (ADR-028 §4).
 export const serverSegmentOf = (
-  config: SearchPluginConfig,
-  provider: SearchIndexProvider
+  config: { fields: SearchFields },
+  provider: SearchIndexProvider,
+  { saveHook }: { saveHook: boolean }
 ): ServerSegment => {
   const searchable = Object.keys(config.fields);
   const query = publicOp(async (input: unknown) => {
     const { query: text, options } = validateSearchRequest(input, searchable);
     return provider.query({ query: text, ...options });
   });
+  if (!saveHook) return { query, searchIndex: provider };
   const hook = defineServerHook(() => ({
     afterSave: async (document, scope) => {
       if (scope.branch === undefined) return;

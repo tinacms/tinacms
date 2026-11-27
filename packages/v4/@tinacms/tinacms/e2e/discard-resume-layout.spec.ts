@@ -219,7 +219,12 @@ test('AC21: the toast follows a resize, a column drag and a sidebar collapse', a
   await low('column dragged back');
   await page.setViewportSize({ width: 1100, height: 900 });
   await setColumnWidth(page, 540);
-  await high('1100 wide with a wide column');
+  await low('1100 wide: the tablet column stops at 480, short of the toast');
+  await page.setViewportSize({ width: 900, height: 900 });
+  await high('900 wide with the widest tablet column');
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await setColumnWidth(page, 540);
+  await high('1280 wide with a wide column beside the sidebar');
   await page.getByRole('button', { name: 'Toggle Sidebar' }).first().click();
   await low('sidebar collapsed');
 });

@@ -71,7 +71,7 @@ export class DevCommand extends BaseCommand {
     this.warnOnVersionSkew(configManager.rootPath);
 
     // Initialize the host TCP server
-    createDBServer(Number(this.datalayerPort));
+    await createDBServer(Number(this.datalayerPort));
 
     let database: Database = null;
     const dbLock = async (fn: () => Promise<void>) => {

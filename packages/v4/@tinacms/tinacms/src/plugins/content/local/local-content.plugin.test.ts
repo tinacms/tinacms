@@ -3,7 +3,7 @@ import { toUserId } from '../../../core/auth/contract';
 import type {
   ContentSlice,
   DocumentEntry,
-  DocumentSummary,
+  DocumentConnection,
 } from '../../../core/content/contract';
 import type { SliceSet, SliceState } from '../../../core/plugin';
 import { localContentPlugin } from './local-content.plugin';
@@ -13,7 +13,12 @@ const ENTRIES: DocumentEntry[] = [
   { path: 'content/posts/second.mdx', document: { title: 'Second' } },
 ];
 
-const SUMMARIES: DocumentSummary[] = ENTRIES.map(({ path }) => ({ path }));
+const SUMMARIES: DocumentConnection = {
+  edges: ENTRIES.map(({ path }) => ({ node: { path }, cursor: path })),
+  pageInfo: { hasNextPage: false, endCursor: null },
+  totalCount: ENTRIES.length,
+  folders: [],
+};
 
 const signedInAs = (token: string, sendsTokenToSite = true): SliceState => ({
   sendsTokenToSite,
@@ -77,6 +82,28 @@ describe('content slice', () => {
     expect(listed).toEqual(SUMMARIES);
   });
 
+  it('posts the list query with the list op', async () => {
+    const harness = await createSliceHarness(SUMMARIES);
+    await harness.slice().list('post', {
+      folder: 'a/b',
+      filter: 'x',
+      sort: { by: 'updatedAt', direction: 'desc' },
+      first: 50,
+    });
+    expect(harness.requests).toEqual([
+      {
+        op: 'list',
+        collection: 'post',
+        query: {
+          folder: 'a/b',
+          filter: 'x',
+          sort: { by: 'updatedAt', direction: 'desc' },
+          first: 50,
+        },
+      },
+    ]);
+  });
+
   it('posts a get op for one document', async () => {
     const harness = await createSliceHarness(ENTRIES[0]);
     const entry = await harness.slice().get('post', 'content/posts/hello.mdx');
@@ -132,6 +159,66 @@ describe('content slice', () => {
     });
   });
 
+  it('reads a validation refusal of a save into a ContentError with its field errors', async () => {
+    const harness = await createSliceHarness(null);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Response.json(
+          {
+            error: {
+              code: 'validation',
+              message: 'Some fields are not valid. Fix them and try again.',
+              fieldErrors: { title: ['title is required'] },
+            },
+          },
+          { status: 422 }
+        )
+      )
+    );
+    await expect(
+      harness.slice().update('post', 'content/posts/hello.mdx', {})
+    ).rejects.toMatchObject({
+      name: 'ContentError',
+      code: 'validation',
+      fieldErrors: { title: ['title is required'] },
+    });
+  });
+
+  it.each(['name-taken', 'invalid-path', 'folder-not-owned', 'forbidden'])(
+    'reads a %s refusal of a structural write into a ContentError with that code',
+    async (code) => {
+      const harness = await createSliceHarness(null);
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () =>
+          Response.json(
+            { error: { code, message: 'Refused.' } },
+            { status: 422 }
+          )
+        )
+      );
+      await expect(
+        harness
+          .slice()
+          .rename?.('post', 'content/posts/a.mdx', 'content/posts/b.mdx')
+      ).rejects.toMatchObject({
+        name: 'ContentError',
+        code,
+      });
+    }
+  );
+
+  it('posts a delete op and resolves with nothing', async () => {
+    const harness = await createSliceHarness(null);
+    await expect(
+      harness.slice().delete?.('post', 'content/posts/hello.mdx')
+    ).resolves.toBeUndefined();
+    expect(harness.requests).toEqual([
+      { op: 'delete', collection: 'post', path: 'content/posts/hello.mdx' },
+    ]);
+  });
+
   it('writes no store state, because it holds no cache', async () => {
     const harness = await createSliceHarness(ENTRIES);
     await harness.slice().list('post');
@@ -140,6 +227,13 @@ describe('content slice', () => {
       'list',
       'get',
       'update',
+      'create',
+      'rename',
+      'delete',
+      'referrers',
+      'createFolder',
+      'renameFolder',
+      'deleteFolder',
     ]);
   });
 });

@@ -4,7 +4,7 @@ import {
   type FieldWrapperProps,
 } from '@tinacms/ui/components/field-wrapper';
 import { cn } from '@tinacms/ui/lib/utils';
-import { type DragEvent, type Ref, useState } from 'react';
+import { type DragEvent, type Ref, useEffect, useRef, useState } from 'react';
 import {
   DROP_TO_REPLACE,
   RETRY,
@@ -18,6 +18,7 @@ import {
   tileCap,
   tileShape,
 } from './image-tile';
+import { CHOOSING_IN_PICKER } from './image-words';
 
 export interface ImageFieldViewProps
   extends Pick<
@@ -49,9 +50,15 @@ export interface ImageFieldViewProps
   /** Shows `holdReason` only while a file is dragged over the field or after a refused drop. */
   holdQuiet?: boolean;
   missing?: boolean;
+  /** Called with whether the picture is missing: the `missing` prop, or the picture failing to load. */
+  onMissingChange?: (missing: boolean) => void;
+  /** The media picker is open for this field: the picture or drop area takes the active border. */
+  choosing?: boolean;
   previewKey?: number;
   disabled?: boolean;
   readOnly?: boolean;
+  /** The page is pointing at this field: draw it like focus. */
+  active?: boolean;
   primaryRef?: Ref<HTMLButtonElement>;
   groupRef?: Ref<HTMLDivElement>;
 }
@@ -87,9 +94,12 @@ export function ImageFieldView({
   holdReason,
   holdQuiet,
   missing,
+  onMissingChange,
+  choosing,
   previewKey,
   disabled,
   readOnly,
+  active,
   primaryRef,
   groupRef,
 }: ImageFieldViewProps) {
@@ -142,10 +152,16 @@ export function ImageFieldView({
     holdReason && (!holdQuiet || dragging || refused !== null)
       ? holdReason
       : undefined;
-  const allWarnings =
-    path !== null && (missing || tileMissing)
-      ? [...warnings, MISSING_IMAGE_WARNING]
-      : warnings;
+  const isMissing = path !== null && (!!missing || tileMissing);
+  const showChoosing = choosing && editable;
+  const reportMissing = useRef(onMissingChange);
+  reportMissing.current = onMissingChange;
+  useEffect(() => {
+    reportMissing.current?.(isMissing);
+  }, [isMissing]);
+  const allWarnings = isMissing
+    ? [...warnings, MISSING_IMAGE_WARNING]
+    : warnings;
   const retry =
     editable && onRetry && !busy ? (
       <Button
@@ -184,7 +200,8 @@ export function ImageFieldView({
         tabIndex={-1}
         aria-labelledby={labelId}
         data-dragging={dragging ? 'true' : undefined}
-        className='flex min-w-0 flex-col items-start gap-2 outline-none'
+        data-active={active ? '' : undefined}
+        className='flex min-w-0 flex-col items-start gap-2 rounded-sm outline-none data-active:shadow-focus-ring'
         onDragEnter={dragOver}
         onDragOver={dragOver}
         onDragLeave={dragLeave}
@@ -201,6 +218,7 @@ export function ImageFieldView({
               resolveUrl={resolveUrl}
               look={shown}
               invalid={invalid}
+              choosing={showChoosing}
               inert={!editable}
               missing={missing}
               onMissingChange={setTileMissing}
@@ -225,9 +243,10 @@ export function ImageFieldView({
               'flex w-full flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-input p-4 text-center transition',
               tileShape[shown],
               tileCap[shown],
-              invalid && 'border-destructive',
+              showChoosing && 'border-solid border-field-active-border',
               dropLook && 'bg-selected',
-              dropLook && !invalid && 'border-primary'
+              dropLook && !invalid && 'border-primary',
+              invalid && 'border-destructive'
             )}
           >
             {refusalLine ??
@@ -236,6 +255,11 @@ export function ImageFieldView({
                   Drop an image here, or
                 </p>
               ) : null)}
+            {showChoosing ? (
+              <p className='m-0 text-xs text-muted-foreground'>
+                {CHOOSING_IN_PICKER}
+              </p>
+            ) : null}
             <div className='flex flex-wrap items-center justify-center gap-2'>
               <Button
                 ref={primaryRef}

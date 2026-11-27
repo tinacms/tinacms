@@ -8,10 +8,11 @@ import { SEARCH_INDEX_HOOK } from '../core/search/index-contract';
 import { isRecord } from '../utils/is-record';
 import { scalarItemOf } from '../core/schema/children';
 import type { FieldProvision, PluginManifest } from '../core/plugin';
-import type {
-  CollectionSchema,
-  FieldSchema,
-  TemplateSchema,
+import {
+  ALLOWED_ACTION_NAMES,
+  type CollectionSchema,
+  type FieldSchema,
+  type TemplateSchema,
 } from '../core/schema/types';
 import {
   overridesValidatorKey,
@@ -172,6 +173,29 @@ const assertNoDroppedOptions = (collections: CollectionSchema[]): void => {
   }
 };
 
+const assertAllowedActionNames = (collections: CollectionSchema[]): void => {
+  for (const collection of collections) {
+    for (const key of Object.keys(collection.allowedActions ?? {})) {
+      invariant(
+        ALLOWED_ACTION_NAMES.some((name) => name === key),
+        'schema-unknown-allowed-action',
+        `Collection "${collection.name}" sets allowedActions.${key}, which v4 does not have. Use ${ALLOWED_ACTION_NAMES.join(', ')}.`
+      );
+    }
+  }
+};
+
+const assertHiddenIsBoolean = (collections: CollectionSchema[]): void => {
+  for (const collection of collections) {
+    const hidden: unknown = collection.hidden;
+    invariant(
+      hidden === undefined || typeof hidden === 'boolean',
+      'schema-collection-hidden-not-boolean',
+      `Collection "${collection.name}" sets "hidden" to ${JSON.stringify(hidden)}. "hidden" takes true or false.`
+    );
+  }
+};
+
 const isArrayNode = (node: Record<string, unknown>): boolean =>
   node.type === ARRAY_FIELD_TYPE;
 
@@ -286,6 +310,8 @@ const assertSearchFields = (config: ResolvedConfig): void => {
 export const compileSchema = (config: ResolvedConfig): TinaLock => {
   assertSearchFields(config);
   assertNoDroppedOptions(config.schema.collections);
+  assertAllowedActionNames(config.schema.collections);
+  assertHiddenIsBoolean(config.schema.collections);
   assertScalarItemsAreVisible(config.schema.collections);
   assertTemplatesArrayOptions(config.schema.collections);
   assertObjectDisplays(config.schema.collections);

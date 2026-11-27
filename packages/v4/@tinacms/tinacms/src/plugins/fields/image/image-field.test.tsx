@@ -35,6 +35,7 @@ import { LabelledFields } from '../../../test/labelled-fields';
 import arrayFieldPlugin from '../array/array-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import imageFieldPlugin from './image-field.plugin';
+import { connectionOf } from '../../../test/connection';
 
 const DOCUMENT_PATH = 'content/posts/hello.mdx';
 const HERO = 'posts/hero.jpg';
@@ -58,7 +59,7 @@ const [heroNode, coverNode] = collection.fields;
 
 const contentPlugin = (): PluginManifest => {
   const provider: ContentProvider = {
-    list: vi.fn(async () => []),
+    list: vi.fn(async () => connectionOf([])),
     get: vi.fn(async () => null),
     update: vi.fn(async (_collection, path, value) => ({
       path,
@@ -151,12 +152,16 @@ const imageFile = (name = 'new.png') =>
 
 const pickFromLibrary = async (group: HTMLElement, button: string) => {
   await userEvent.click(within(group).getByRole('button', { name: button }));
-  const dialog = await screen.findByRole('dialog', { name: 'Choose an image' });
+  const picker = await screen.findByRole('region', {
+    name: /^Choose (an image|images)$/,
+  });
   await userEvent.click(
-    await within(dialog).findByRole('button', { name: 'photo.jpg' })
+    await within(picker).findByRole('button', { name: 'photo.jpg' })
   );
   await userEvent.click(
-    await within(dialog).findByRole('button', { name: 'Insert' })
+    await within(picker).findByRole('button', {
+      name: /^(Choose image|Add image)$/,
+    })
   );
 };
 
@@ -338,7 +343,7 @@ describe('ImageField removing', () => {
     await userEvent.click(
       within(group).getByRole('button', { name: 'Replace hero.jpg' })
     );
-    await screen.findByRole('dialog', { name: 'Choose an image' });
+    await screen.findByRole('region', { name: 'Choose an image' });
     await userEvent.keyboard('{Escape}');
     expect(valueOf('hero')).toBe(HERO);
     expect(
@@ -608,7 +613,7 @@ describe('ImageField gallery', () => {
     await userEvent.click(
       within(group).getByRole('button', { name: 'Add images' })
     );
-    await screen.findByRole('dialog', { name: 'Choose an image' });
+    await screen.findByRole('region', { name: 'Choose images' });
     await userEvent.keyboard('{Escape}');
     expect(valueOf('images')).toEqual(['a/one.jpg']);
     await pickFromLibrary(group, 'Add images');
@@ -647,13 +652,21 @@ describe('ImageField gallery', () => {
     ).toHaveFocus();
   });
 
-  it('allows the same image twice', async () => {
-    renderGallery(['a/one.jpg']);
+  it('does not offer an image the gallery already holds', async () => {
+    renderGallery(['a/one.jpg', 'photo.jpg']);
     const group = await gallery();
-    await pickFromLibrary(group, 'Add images');
-    await pickFromLibrary(group, 'Replace one.jpg');
-    expect(valueOf('images')).toEqual(['photo.jpg', 'photo.jpg']);
-    expect(within(group).getAllByRole('figure')).toHaveLength(2);
+    await userEvent.click(
+      within(group).getByRole('button', { name: 'Add images' })
+    );
+    const picker = await screen.findByRole('region', { name: 'Choose images' });
+    const held = await within(picker).findByRole('button', {
+      name: 'photo.jpg, Already added',
+    });
+    await userEvent.click(held);
+    expect(
+      within(picker).getByRole('button', { name: 'Add image' })
+    ).toBeDisabled();
+    expect(valueOf('images')).toEqual(['a/one.jpg', 'photo.jpg']);
   });
 
   it('moves a tile by arrow key, keeps focus on it and announces it', async () => {

@@ -13,6 +13,7 @@ import {
 import {
   type FormId,
   formStatus,
+  offeredCopies,
   syncDrafts,
   toFormId,
   useFormStore,
@@ -115,6 +116,52 @@ describe('form drafts', () => {
       { values: { title: 'Mine', summary: 'Same' }, baseline: FILE },
     ]);
     expect(readDraft(postA)).toBeUndefined();
+  });
+
+  it('keeps a left prompt down on reopen until a new copy joins the waiting list', () => {
+    reloadWithEdit();
+    open();
+    store.getState().lowerPrompt(postA);
+    open();
+    expect(store.getState().promptDown[postA]).toBe(true);
+    otherTabWrites(postA, 'Theirs');
+    open();
+    expect(waitingOf()).toHaveLength(2);
+    expect(store.getState().promptDown[postA]).toBeUndefined();
+  });
+
+  it('keeps a left prompt down when a waiting copy only leaves the list', () => {
+    reloadWithEdit('Older');
+    open();
+    typeTitle('Newer');
+    simulateReload();
+    open();
+    expect(waitingOf()).toHaveLength(2);
+    store.getState().lowerPrompt(postA);
+    open({ [title]: 'Older', [summary]: 'Same' });
+    expect(waitingOf()).toHaveLength(1);
+    expect(store.getState().promptDown[postA]).toBe(true);
+  });
+
+  it('lowers the prompt while the form holds every waiting copy, and keeps the copies', () => {
+    reloadWithEdit();
+    open();
+    typeTitle('Mine');
+    expect(offeredCopies(store.getState(), postA)).toBeUndefined();
+    expect(readWaitingDrafts(postA)).toHaveLength(1);
+    typeTitle('Mine2');
+    expect(offeredCopies(store.getState(), postA)).toHaveLength(1);
+  });
+
+  it('keeps the prompt up when only the newest waiting copy matches the form', () => {
+    reloadWithEdit('Older');
+    open();
+    typeTitle('Newer');
+    simulateReload();
+    open();
+    expect(waitingOf()).toHaveLength(2);
+    typeTitle('Newer');
+    expect(offeredCopies(store.getState(), postA)).toHaveLength(2);
   });
 
   it('row 3: a draft typed on an older file waits too', () => {

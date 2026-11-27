@@ -1,6 +1,11 @@
 import { fireEvent, render, renderHook, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useFormColumnWidth } from './use-form-column-width';
+import {
+  NAVIGATOR_COLUMN,
+  TABLET_FORM_COLUMN,
+  useColumnWidth,
+  useFormColumnWidth,
+} from './use-form-column-width';
 
 const STORAGE_KEY = 'tina-form-column-width';
 const DEFAULT_WIDTH = 352;
@@ -310,5 +315,31 @@ describe('useFormColumnWidth stored width survival', () => {
     renderHook(() => useFormColumnWidth());
     expect(writes).toContain('600');
     expect(writes).not.toContain(String(DEFAULT_WIDTH));
+  });
+});
+
+describe('useColumnWidth for a tablet column', () => {
+  const widthOf = (spec: Parameters<typeof useColumnWidth>[0]) =>
+    renderHook(() => useColumnWidth(spec)).result.current.width;
+
+  it.each([
+    [TABLET_FORM_COLUMN, '9999', 480],
+    [TABLET_FORM_COLUMN, 'abc', 360],
+    [TABLET_FORM_COLUMN, '10', 320],
+    [NAVIGATOR_COLUMN, '9999', 480],
+    [NAVIGATOR_COLUMN, 'abc', 440],
+  ])(
+    'clamps or falls back for a stored %j value of %s',
+    (spec, stored, expected) => {
+      localStorage.setItem(spec.storageKey, stored);
+      expect(widthOf(spec)).toBe(expected);
+    }
+  );
+
+  it('keeps a tablet width apart from the desktop width', () => {
+    localStorage.setItem(STORAGE_KEY, '500');
+    const { result } = renderHook(() => useColumnWidth(TABLET_FORM_COLUMN));
+    expect(result.current.width).toBe(360);
+    expect(localStorage.getItem(STORAGE_KEY)).toBe('500');
   });
 });

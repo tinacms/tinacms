@@ -14,13 +14,16 @@ import {
   type DocumentEntry,
   type DocumentSummary,
   type ContentErrorCode,
+  nodesOf,
   isContentRefusalCode,
   isProviderRefusalCode,
 } from '../core/content/contract';
 import { invariant } from '../core/invariant';
-import type { TinaDocument } from '../core/schema/types';
+import { fieldsOf, scalarItemOf } from '../core/schema/children';
+import type { FieldSchema, TinaDocument } from '../core/schema/types';
 import { RpcError } from '../rpc/proxy';
 import { type SavedDocument, TinaRuntimeContext } from './context';
+import { isMissingRouteError } from './rpc-errors';
 import { useContentSlice, useRpcClient, useTinaStore } from './hooks';
 
 // The branch is the last element, so `all()` still prefixes every key. A key
@@ -42,6 +45,10 @@ export const contentKeys = {
   ],
 };
 
+// Table pages sit under the collection's list key, after this part.
+export const PAGE_KEY_PART = 'page';
+export const LEVEL_KEY_PART = 'level';
+
 export const useCurrentBranch = (): string | undefined =>
   useTinaStore(currentBranchOf);
 
@@ -62,7 +69,9 @@ export const useCollectionDocuments = (
   const branch = useCurrentBranch();
   const query = useQuery({
     queryKey: contentKeys.list(collection ?? '', branch),
-    queryFn: collection ? () => content.list(collection) : skipToken,
+    queryFn: collection
+      ? async () => nodesOf(await content.list(collection))
+      : skipToken,
     staleTime: CONTENT_STALE_TIME,
   });
   return {
@@ -81,7 +90,7 @@ export const useCollectionsDocumentPaths = (
   const results = useQueries({
     queries: collections.map((collection) => ({
       queryKey: contentKeys.list(collection, branch),
-      queryFn: () => content.list(collection),
+      queryFn: async () => nodesOf(await content.list(collection)),
       staleTime: CONTENT_STALE_TIME,
     })),
   });
@@ -133,6 +142,8 @@ export interface SaveDocumentInput {
   collection: string;
   path: string;
   value: TinaDocument;
+  /** The document has no file yet, so Save creates it. */
+  isNew?: boolean;
 }
 
 export type SavedEntry = DocumentEntry & SavedDocument;
@@ -145,6 +156,7 @@ export interface DocumentSave {
 interface ContentSaveSegments {
   content: {
     update: (input: ContentSaveInput) => Promise<ContentSaveResult>;
+    create: (input: ContentSaveInput) => Promise<ContentSaveResult>;
   };
 }
 
@@ -153,6 +165,23 @@ const STATUS_ERROR_CODES: Partial<Record<number, ContentErrorCode>> = {
   401: 'unauthorized',
   403: 'forbidden',
 };
+
+// Whether a field at any depth lists a custom validator. It reads the schema,
+// not the values, so an empty list still routes: every template, object field
+// and `of` item counts.
+const listsCustomValidator = (
+  fields: readonly FieldSchema[],
+  custom: ReadonlySet<string>
+): boolean =>
+  fields.some((node) => {
+    if (node.validators?.some(({ name }) => custom.has(name))) return true;
+    const children = [
+      ...(fieldsOf(node) ?? []),
+      ...(node.templates?.flatMap(({ fields: own }) => own) ?? []),
+      ...(scalarItemOf(node) ? [scalarItemOf(node) as FieldSchema] : []),
+    ];
+    return listsCustomValidator(children, custom);
+  });
 
 const toServerSaveError = (cause: unknown): ContentError => {
   if (cause instanceof TypeError) {
@@ -167,11 +196,10 @@ const toServerSaveError = (cause: unknown): ContentError => {
   if (isContentRefusalCode(cause.code)) {
     return new ContentError(cause.code, cause.message);
   }
-  if (
-    cause.status === 404 ||
-    cause.status === 405 ||
-    cause.code === 'rpc-not-json'
-  ) {
+  if (cause.code === 'validation') {
+    return new ContentError('validation', cause.message, cause.fieldErrors);
+  }
+  if (isMissingRouteError(cause)) {
     return new ContentError('server-route-missing', cause.message);
   }
   if (isProviderRefusalCode(cause.code)) {
@@ -193,16 +221,24 @@ export const useSaveDocument = (): DocumentSave => {
   const content = useContentSlice();
   const server = useRpcClient<ContentSaveSegments>({ url: runtime.rpcUrl });
   const queryClient = useQueryClient();
-  const hasServerHooks = (collection: string): boolean =>
-    runtime.schema.collections
-      .find(({ name }) => name === collection)
-      ?.hooks?.some(({ name }) => runtime.serverHooks.has(name)) ?? false;
-  const saveThroughServer = async (
-    input: SaveDocumentInput
-  ): Promise<SavedEntry> => {
+  const savesThroughServer = (collection: string): boolean => {
+    const schema = runtime.schema.collections.find(
+      ({ name }) => name === collection
+    );
+    if (!schema) return false;
+    return (
+      schema.hooks?.some(({ name }) => runtime.serverHooks.has(name)) ===
+        true || listsCustomValidator(schema.fields, runtime.customValidators)
+    );
+  };
+  const saveThroughServer = async ({
+    isNew,
+    ...input
+  }: SaveDocumentInput): Promise<SavedEntry> => {
     const branch = currentBranchOf(runtime.store.getState());
+    const write = isNew ? server.content.create : server.content.update;
     try {
-      const { entry, hookWarnings } = await server.content.update({
+      const { entry, hookWarnings } = await write({
         ...input,
         ...(typeof branch === 'string' && branch ? { branch } : {}),
       });
@@ -212,10 +248,18 @@ export const useSaveDocument = (): DocumentSave => {
     }
   };
   const mutation = useMutation({
-    mutationFn: (input: SaveDocumentInput): Promise<SavedEntry> =>
-      hasServerHooks(input.collection)
-        ? saveThroughServer(input)
-        : content.update(input.collection, input.path, input.value),
+    mutationFn: (input: SaveDocumentInput): Promise<SavedEntry> => {
+      if (savesThroughServer(input.collection)) return saveThroughServer(input);
+      if (input.isNew) {
+        invariant(
+          content.create,
+          'content-create-missing',
+          'This content provider cannot create documents'
+        );
+        return content.create(input.collection, input.path, input.value);
+      }
+      return content.update(input.collection, input.path, input.value);
+    },
     onMutate: () => currentBranchOf(runtime.store.getState()),
     onSuccess: (
       { document, hookWarnings, ...summary },
@@ -230,6 +274,12 @@ export const useSaveDocument = (): DocumentSave => {
         contentKeys.document(collection, summary.path, branch),
         { ...summary, document }
       );
+      void queryClient.invalidateQueries({
+        queryKey: [...contentKeys.list(collection, branch), PAGE_KEY_PART],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [...contentKeys.list(collection, branch), LEVEL_KEY_PART],
+      });
     },
   });
   return { save: mutation.mutateAsync, isSaving: mutation.isPending };
