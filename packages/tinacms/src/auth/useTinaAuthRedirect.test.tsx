@@ -372,7 +372,7 @@ describe('useTinaAuthRedirect', () => {
       await vi.waitFor(() =>
         expect(result.current).toEqual({
           status: 'failed',
-          message: 'Error: hook failed',
+          message: 'hook failed',
         })
       );
       expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();

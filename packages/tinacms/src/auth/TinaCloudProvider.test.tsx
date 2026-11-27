@@ -8,7 +8,8 @@ import {
 import { TinaCMS } from '@tinacms/toolkit';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AUTH_REDIRECTING } from './authenticate';
+import { TinaCloudAuthProvider } from '../internalClient';
+import { AUTH_REDIRECTING, PKCE_STORAGE_KEY } from './authenticate';
 import { TinaCloudProvider } from './TinaCloudProvider';
 
 vi.mock('../lib/posthog/posthogProvider', () => ({ captureEvent: vi.fn() }));
@@ -67,6 +68,9 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+  localStorage.clear();
+  window.history.replaceState({}, '', '/');
 });
 
 describe('TinaCloudProvider login modal', () => {
@@ -171,5 +175,41 @@ describe('TinaCloudProvider login modal', () => {
     expect(await screen.findByText(/config fetch failed/)).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Retry' })).toBeTruthy();
     expect(onLogin).not.toHaveBeenCalled();
+  });
+
+  it('runs the client onLogin with the exchanged token after a redirect login', async () => {
+    const { cms, onLogin } = makeCms(async () => undefined);
+    const client = cms.api.tina;
+    client.authProvider = new TinaCloudAuthProvider({
+      clientId: 'client-id',
+      identityApiUrl: 'https://api.example.com',
+      frontendUrl: 'https://app.example.com',
+    });
+    localStorage.setItem(
+      PKCE_STORAGE_KEY,
+      JSON.stringify({
+        code_verifier: 'verifier',
+        state: 'the-state',
+        client_id: 'client-id',
+        identity_api_url: 'https://api.example.com',
+      })
+    );
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ access_token: 'a', refresh_token: 'r' }),
+      })
+    );
+    vi.spyOn(window.location, 'reload').mockImplementation(() => {});
+    window.history.pushState({}, '', '/?code=the-code&state=the-state');
+
+    renderProvider(cms);
+
+    await vi.waitFor(() =>
+      expect(onLogin).toHaveBeenCalledWith({
+        token: { access_token: 'a', refresh_token: 'r' },
+      })
+    );
   });
 });

@@ -31,7 +31,7 @@ class TokenExchangeError extends Error {
 
 class OnLoginError extends Error {
   constructor(cause: unknown) {
-    super(String(cause));
+    super(cause instanceof Error ? cause.message : String(cause));
     this.name = 'OnLoginError';
   }
 }
