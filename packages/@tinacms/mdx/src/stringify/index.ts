@@ -142,6 +142,12 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
     extensions: [
       directiveToMarkdown(patterns),
       mdxJsxToMarkdown(),
+      {
+        unsafe: [
+          { character: '{', inConstruct: ['phrasing'] },
+          { atBreak: true, character: '{' },
+        ],
+      },
       gfmToMarkdown(),
     ],
     listItemIndent: 'one',
