@@ -286,7 +286,9 @@ function BranchControl() {
     setReason(undefined);
   };
   useEffect(() => {
-    if (!open) demoteInline();
+    if (open) return;
+    demoteInline();
+    switchAfterSave.current = undefined;
   }, [open]);
 
   const outcome = useMemo<Outcome | undefined>(() => {

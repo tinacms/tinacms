@@ -2059,6 +2059,35 @@ describe('branch switcher rows and creating a branch', () => {
     expect(screen.queryByRole('dialog', { name: 'Branches' })).toBeNull();
   });
 
+  it('drops the held auto-switch when the pop-up closes, leaving Switch to in the toast', async () => {
+    let ready: () => void = () => {};
+    createBranch = async ({ name }) => ({
+      name,
+      ready: new Promise<void>((resolve) => {
+        ready = resolve;
+      }),
+    });
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    const formId = toFormId('content/posts/hello.mdx');
+    act(() =>
+      useFormStore.getState().setSavePhase(formId, { phase: 'saving' })
+    );
+    act(() => ready());
+    await within(dialog).findByText(/cms\/x is ready/);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    act(() => useFormStore.getState().setSavePhase(formId, { phase: 'saved' }));
+
+    const switchTo = await screen.findByRole('button', {
+      name: 'Switch to cms/x',
+    });
+    expect(screen.getByRole('button', { name: /^Branch: main/ })).toBeVisible();
+    await user.click(switchTo);
+    expect(screen.getByRole('button', { name: 'Branch: cms/x' })).toBeVisible();
+  });
+
   it('offers Switch in a toast when the pop-up was closed while the branch was made', async () => {
     let ready: () => void = () => {};
     createBranch = async ({ name }) => ({
