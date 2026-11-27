@@ -66,8 +66,8 @@ const waitsOnCreate = (message: string) =>
 
 /** Why no branch action may run now: unsaved edits, or a save still running (its afterSave included). */
 const blockedReason = (): string | undefined => {
-  if (readAnyFormDirty()) return DIRTY_REASON;
   if (readSaveRunning()) return SAVING_REASON;
+  if (readAnyFormDirty()) return DIRTY_REASON;
   return undefined;
 };
 
@@ -143,9 +143,12 @@ function BranchControl() {
   };
 
   const refusalToasts = useRef(new Map<string, string>());
+  // An open switcher already shows the dirty or saving reason as its blocked line.
   const refuse = (message: string) => {
-    if (latest.current.open) setReason(message);
-    else refusalToast(message);
+    if (!latest.current.open) refusalToast(message);
+    else if (message !== DIRTY_REASON && message !== SAVING_REASON) {
+      setReason(message);
+    }
   };
   // One id per kind of refusal, so a message that changes (a renamed create) replaces its toast.
   const refusalToast = (message: string) => {
@@ -393,7 +396,7 @@ function BranchControl() {
       onRetry={branch.retryList}
       branches={entries}
       disabled={saving}
-      blockedMessage={dirty ? DIRTY_REASON : saving ? SAVING_REASON : undefined}
+      blockedMessage={saving ? SAVING_REASON : dirty ? DIRTY_REASON : undefined}
       onSwitch={switchTo}
       open={open}
       onOpenChange={setOpen}

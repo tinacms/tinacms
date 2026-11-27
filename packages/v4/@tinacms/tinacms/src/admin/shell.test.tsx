@@ -2103,6 +2103,70 @@ describe('branch switcher rows and creating a branch', () => {
     expect(screen.getByRole('button', { name: 'Branch: cms/x' })).toBeVisible();
   });
 
+  it('says to wait for the save, not to save, when Switch to is pressed while the write runs', async () => {
+    useUnprotectedBranch();
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    let ready: () => void = () => {};
+    createBranch = async ({ name }) => ({
+      name,
+      ready: new Promise<void>((resolve) => {
+        ready = resolve;
+      }),
+    });
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    holdUpdates = true;
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(releaseUpdate).toBeDefined());
+    expect(readAnyFormDirty()).toBe(true);
+
+    act(() => ready());
+    await user.click(
+      await screen.findByRole('button', { name: 'Switch to cms/x' })
+    );
+    expect(
+      await screen.findByText('Wait for the save to finish.')
+    ).toBeVisible();
+    expect(screen.queryByText('Save or discard your changes first')).toBeNull();
+    act(() => releaseUpdate?.());
+  });
+
+  it("shows a blocked note's Switch to reason once", async () => {
+    useUnprotectedBranch();
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    let ready: () => void = () => {};
+    createBranch = async ({ name }) => ({
+      name,
+      ready: new Promise<void>((resolve) => {
+        ready = resolve;
+      }),
+    });
+    const { user, dialog } = await startCreate();
+    await press(dialog, user);
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    await user.type(await screen.findByLabelText(/^Title\b/), '!');
+    act(() => ready());
+    await screen.findByRole('button', { name: 'Switch to cms/x' });
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    const reopened = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      await within(reopened).findByRole('button', { name: 'Switch to cms/x' })
+    );
+
+    expect(
+      within(reopened).getAllByText('Save or discard your changes first')
+    ).toHaveLength(1);
+    expect(
+      screen.getByRole('button', { name: /^Branch: feature\/news/ })
+    ).toBeVisible();
+  });
+
   it('holds the auto-switch to a ready branch until the running save ends', async () => {
     let ready: () => void = () => {};
     createBranch = async ({ name }) => ({
@@ -2375,8 +2439,8 @@ describe('branch switcher rows and creating a branch', () => {
       '[data-slot="branch-outcome-note"]'
     ) as HTMLElement;
     expect(
-      await within(note).findByText('Save or discard your changes first')
-    ).toBeVisible();
+      within(dialog).getAllByText('Save or discard your changes first')
+    ).toHaveLength(1);
     expect(within(note).getByText('cms/x is ready')).toBeVisible();
     expect(screen.getByRole('button', { name: /^Branch: main/ })).toBeVisible();
   });
