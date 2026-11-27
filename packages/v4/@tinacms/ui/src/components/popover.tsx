@@ -62,4 +62,9 @@ function PopoverContent({
   );
 }
 
-export { Popover, PopoverContent, PopoverTrigger };
+/** Names the pop-up for screen readers. Style it with `className`. */
+function PopoverTitle({ ...props }: PopoverPrimitive.Title.Props) {
+  return <PopoverPrimitive.Title data-slot='popover-title' {...props} />;
+}
+
+export { Popover, PopoverContent, PopoverTitle, PopoverTrigger };

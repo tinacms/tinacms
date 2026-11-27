@@ -49,7 +49,12 @@ const searchErrorOf = (cause: unknown, publicToken: boolean): SearchError => {
   if (cause instanceof SearchError) return cause;
   if (cause instanceof TinaCloudError) {
     if (cause.status === undefined) {
-      return new SearchError('unavailable', 'TinaCloud could not be reached.');
+      return new SearchError(
+        'unavailable',
+        cause.timedOut
+          ? 'The TinaCloud request did not finish.'
+          : 'TinaCloud could not be reached.'
+      );
     }
     if (cause.status === 401 || cause.status === 403) {
       return new SearchError(
@@ -70,7 +75,6 @@ const searchErrorOf = (cause: unknown, publicToken: boolean): SearchError => {
       `TinaCloud answered ${cause.status}.`
     );
   }
-  // An abort that fires while the body is read escapes authedFetch unwrapped.
   return new SearchError(
     'unavailable',
     'The TinaCloud request did not finish.'

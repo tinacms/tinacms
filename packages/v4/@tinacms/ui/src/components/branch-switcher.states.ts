@@ -19,6 +19,10 @@ export const branchSwitcherStates: {
   props: BranchSwitcherProps;
   /** Words the open pop-up must show. */
   shows: string[];
+  /** Presses New branch first, to show the form. */
+  openForm?: boolean;
+  /** With `openForm`: types this name and presses Create branch before the state applies. */
+  submit?: string;
 }[] = [
   { name: 'closed', props: base, shows: [] },
   {
@@ -32,9 +36,80 @@ export const branchSwitcherStates: {
     shows: ['Protected', 'main'],
   },
   {
-    name: 'open full screen',
-    props: { ...base, defaultOpen: true, defaultFullScreen: true },
+    name: 'maximised',
+    props: { ...base, defaultOpen: true, defaultMaximised: true },
     shows: ['Protected', 'Branches'],
+  },
+  {
+    name: 'open with pull request numbers',
+    props: {
+      ...base,
+      defaultOpen: true,
+      branches: [
+        { name: 'main', protected: true },
+        { name: 'feature/news', pullRequest: '482' },
+        { name: 'fix/typo' },
+      ],
+    },
+    shows: ['#482'],
+  },
+  {
+    name: 'open with unsaved counts',
+    props: {
+      ...base,
+      defaultOpen: true,
+      branches: [
+        { name: 'feature/news', unsaved: 1 },
+        { name: 'fix/typo', unsaved: 2 },
+      ],
+    },
+    shows: [', 1 unsaved', ', 2 unsaved'],
+  },
+  {
+    name: 'open with a branch getting ready',
+    props: {
+      ...base,
+      defaultOpen: true,
+      branches: [{ name: 'feature/news' }, { name: 'cms/new', ready: false }],
+    },
+    shows: ['cms/new', 'Getting ready'],
+  },
+  {
+    name: 'open with a branch that did not get ready',
+    props: {
+      ...base,
+      defaultOpen: true,
+      branches: [
+        { name: 'feature/news' },
+        { name: 'cms/late', ready: false, unready: true },
+      ],
+    },
+    shows: ['cms/late', 'Reload to switch'],
+  },
+  {
+    name: 'creating a branch',
+    props: {
+      ...base,
+      defaultOpen: true,
+      baseBranch: 'main',
+      onCreate: () => {},
+      createState: 'creating',
+    },
+    shows: ['Start from', 'Creating'],
+    openForm: true,
+  },
+  {
+    name: 'create failed',
+    props: {
+      ...base,
+      defaultOpen: true,
+      baseBranch: 'main',
+      onCreate: () => {},
+      createState: 'failed',
+    },
+    shows: ['Start from', 'Retry'],
+    openForm: true,
+    submit: 'cms/new',
   },
   {
     name: 'open and blocked by unsaved edits',

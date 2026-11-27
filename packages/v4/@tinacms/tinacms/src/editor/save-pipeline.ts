@@ -70,12 +70,15 @@ async function recordSavePhase(
   formId: FormId,
   run: () => Promise<void>
 ): Promise<void> {
-  const { setSavePhase, restoreSavePhase, saves } = useFormStore.getState();
+  const { setSavePhase, restoreSavePhase, saves, beginSave, endSave } =
+    useFormStore.getState();
   const previous = saves[formId];
   setSavePhase(formId, { phase: 'saving' });
+  beginSave();
   try {
     await run();
   } catch (cause) {
+    endSave();
     if (cause instanceof FormValidationError) {
       restoreSavePhase(formId, previous);
       throw cause;
@@ -89,6 +92,7 @@ async function recordSavePhase(
     }
     throw cause;
   }
+  endSave();
   setSavePhase(formId, { phase: 'saved' });
 }
 

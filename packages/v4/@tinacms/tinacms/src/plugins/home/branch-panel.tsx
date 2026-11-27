@@ -7,6 +7,7 @@ import { useLoadingWords } from '@tinacms/ui/hooks/use-loading-words';
 import { cn } from '@tinacms/ui/lib/utils';
 import { useEffect, useRef, useState } from 'react';
 import { ReviewUnsavedButton } from '../../admin/review-unsaved';
+import { parsePullRequest } from '../../core/branch/pull-request';
 import { type BranchView, useBranchView } from '../../editor/branch';
 import { useContentMode } from '../../editor/content-mode';
 import { useUnsavedFormIds } from '../../form/form-store';
@@ -38,13 +39,14 @@ function BranchName({ branch }: { branch: BranchView }) {
 const pullRequestOf = (
   url: string | undefined
 ): { href: string; label: string } | null => {
-  if (!url || !URL.canParse(url)) return null;
-  const { protocol, pathname, href } = new URL(url);
-  if (protocol !== 'https:' && protocol !== 'http:') return null;
-  const last = pathname.split('/').filter(Boolean).at(-1) ?? '';
+  const pullRequest = parsePullRequest(url);
+  if (!pullRequest) return null;
   return {
-    href,
-    label: /^\d+$/.test(last) ? `Pull request #${last}` : 'Pull request',
+    href: pullRequest.href,
+    label:
+      pullRequest.number === undefined
+        ? 'Pull request'
+        : `Pull request #${pullRequest.number}`,
   };
 };
 

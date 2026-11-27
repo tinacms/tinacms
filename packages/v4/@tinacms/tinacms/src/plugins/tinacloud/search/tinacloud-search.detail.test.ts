@@ -47,4 +47,42 @@ describe('TinaCloud search error detail (AC12)', () => {
     expect((error as SearchError).detail).toContain('Sign in');
     expect((error as SearchError).detail).not.toContain('editor-jwt');
   });
+
+  const cutOff = async (cause: Error) => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Object.assign(new Response('{}', { status: 200 }), {
+          text: () => Promise.reject(cause),
+        })
+      )
+    );
+    const provider = createTinaCloudSearchProvider({ clientId: 'abc' }, {
+      fields: { post: {} },
+      branch: 'main',
+    } as never);
+    return provider.query({ query: 'x', limit: 1 }).then(
+      () => undefined,
+      (failure: unknown) => failure
+    );
+  };
+
+  it.each(['TimeoutError', 'AbortError'])(
+    'says the request did not finish when the reply body hits a %s',
+    async (name) => {
+      const error = await cutOff(new DOMException('slow', name));
+      expect(error).toBeInstanceOf(SearchError);
+      expect((error as SearchError).code).toBe('unavailable');
+      expect((error as SearchError).detail).toBe(
+        'The TinaCloud request did not finish.'
+      );
+    }
+  );
+
+  it('says TinaCloud could not be reached when the reply body drops for another reason', async () => {
+    const error = await cutOff(new TypeError('connection reset'));
+    expect((error as SearchError).detail).toBe(
+      'TinaCloud could not be reached.'
+    );
+  });
 });

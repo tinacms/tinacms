@@ -691,7 +691,7 @@ test.describe('the branch switcher on a phone', () => {
     size: { width: number; height: number }
   ) => {
     await page.setViewportSize(size);
-    await page.goto('/branches.html?docs=1#/');
+    await page.goto('/branches.html?docs=1&create=ok#/');
     await page
       .getByRole('button', { name: /feature\/news/ })
       .first()
@@ -715,24 +715,25 @@ test.describe('the branch switcher on a phone', () => {
     });
   }
 
-  test('shows no Full screen button, but keeps it from 768px up', async ({
+  test('shows no Maximise button, but keeps it from 768px up', async ({
     page,
   }) => {
     await page.setViewportSize(PHONE);
-    await page.goto('/branches.html?docs=1#/');
+    await page.goto('/branches.html?docs=1&create=ok#/');
     await page
       .getByRole('button', { name: /feature\/news/ })
       .first()
       .click();
     await expect(page.locator('[data-slot=screen-content]')).toBeVisible();
     await expect(page.locator(SHEET)).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Full screen' })).toHaveCount(
-      0
-    );
+    await expect(page.getByRole('button', { name: 'Maximise' })).toHaveCount(0);
     await page.setViewportSize({ width: 1280, height: 800 });
-    await expect(
-      page.getByRole('button', { name: 'Full screen' })
-    ).toBeVisible();
+    await expect(page.locator(SHEET)).toHaveCount(0);
+    await page
+      .getByRole('button', { name: /feature\/news/ })
+      .first()
+      .click();
+    await expect(page.getByRole('button', { name: 'Maximise' })).toBeVisible();
   });
 });
 
@@ -771,7 +772,7 @@ for (const width of [375, 320]) {
 
 test('Back to branches wraps at 320px', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
-  await page.goto('/branches.html?docs=1#/');
+  await page.goto('/branches.html?docs=1&create=ok#/');
   await page
     .getByRole('button', { name: /feature\/news/ })
     .first()

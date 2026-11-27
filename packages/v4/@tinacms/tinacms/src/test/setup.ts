@@ -36,6 +36,7 @@ beforeEach(() => {
     userId: undefined,
     forms: {},
     saves: {},
+    savesRunning: 0,
     waiting: {},
     held: {},
     unstored: {},

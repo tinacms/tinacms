@@ -19,7 +19,8 @@ const signedIn = params.get('account') === '1';
 // names, `pr=<url>` gives the branch a pull request, `slow=1` never answers
 // (`slowBranches=1`: only the branch list), and `fail=lists` or
 // `fail=branches` makes that read fail. `fail=branch-gone` deletes the branch
-// on the first save, so the save fails with `branch-not-found`.
+// on the first save, so the save fails with `branch-not-found`. `create=ok|fail|failonce|failonce-unready|slow|unready`
+// adds `branches.create`: it makes the branch, fails, fails the first time only (then never gets ready), takes 2s to get ready, or never gets ready.
 const documentCount = Number(params.get('docs') ?? 0);
 const withDates = params.get('dates') !== '0';
 const longNames = params.get('long') === '1';
@@ -27,6 +28,10 @@ const pullRequestUrl = params.get('pr') ?? undefined;
 const slow = params.get('slow') === '1';
 const slowBranches = slow || params.get('slowBranches') === '1';
 const failing = params.get('fail');
+const createMode = params.get('create');
+const extraBranches = Number(params.get('many') ?? 0);
+const madeBranches: string[] = [];
+let failedOnce = false;
 
 const AUTHORS = ['Priya Raman', 'Josh Berman', 'Ada Lovelace'];
 const HOUR = 3_600_000;
@@ -109,6 +114,10 @@ const content = definePlugin({
             if (failing === 'branches') throw new Error('offline');
             return [
               { name: 'main', protected: true },
+              ...Array.from({ length: extraBranches }, (_, at) => ({
+                name: `many/branch-${at + 1}`,
+              })),
+              ...madeBranches.map((name) => ({ name })),
               ...(branchGone
                 ? []
                 : [
@@ -121,6 +130,35 @@ const content = definePlugin({
             ];
           },
           defaultBranch: async () => branchName,
+          ...(createMode
+            ? {
+                create: async ({ name }: { name: string; from: string }) => {
+                  await new Promise((resolve) => setTimeout(resolve, 500));
+                  if (createMode === 'fail') throw new Error('offline');
+                  if (
+                    (createMode === 'failonce' ||
+                      createMode === 'failonce-unready') &&
+                    !failedOnce
+                  ) {
+                    failedOnce = true;
+                    throw new Error('offline');
+                  }
+                  madeBranches.push(name);
+                  return {
+                    name,
+                    ready:
+                      createMode === 'slow'
+                        ? new Promise<void>((resolve) =>
+                            setTimeout(resolve, 2000)
+                          )
+                        : createMode === 'unready' ||
+                            createMode === 'failonce-unready'
+                          ? Promise.reject(new Error('timed out'))
+                          : undefined,
+                  };
+                },
+              }
+            : {}),
         },
         list: async (collection: string) => {
           if (slow) return never;

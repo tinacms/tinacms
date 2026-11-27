@@ -955,7 +955,11 @@ describe('list changes while blocked', () => {
     const heard = () => [
       ...new Set(spoken.texts.filter((text) => text !== '')),
     ];
-    await waitFor(() => expect(heard()).toContain('1 error left.'));
+    const region = () =>
+      globalThis.document.querySelector('[data-slot=error-announcement]')
+        ?.textContent;
+    await waitFor(() => expect(region()).toBe('1 error left.'));
+    expect(heard()).toContain('1 error left.');
     expect(heard()).toEqual(['1 error left.']);
     spoken.stop();
   });

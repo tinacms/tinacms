@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { AuthError } from '../../core/auth/contract';
+import { BranchCreateError } from '../../core/branch/contract';
 import { isRecord } from '../../utils/is-record';
 
 export const TINACLOUD_ASSETS_URL = 'https://assets.tinajs.io';
@@ -14,6 +16,34 @@ export const TINACLOUD_APP_URL = 'https://app.tina.io';
 const POLL_INTERVAL_MS = 1000;
 
 const POLL_TIMEOUT_MS = 30_000;
+
+const INDEX_POLL_MS = 5000;
+
+const INDEX_TIMEOUT_MS = 15 * 60 * 1000;
+const CREATE_TIMEOUT_MS = 60 * 1000;
+
+const MAX_UNKNOWN_INDEX_STATUSES = 6;
+
+/** A poll that failed on the network, a 404 before indexing starts, or a 5xx: worth asking again. */
+const isTransient = (cause: unknown): boolean => {
+  if (!(cause instanceof TinaCloudError)) return false;
+  const { status } = cause;
+  return (
+    status === undefined ||
+    status === 404 ||
+    status === 408 ||
+    status === 429 ||
+    status >= 500
+  );
+};
+
+const HEADS_PREFIX = 'refs/heads/';
+
+const createBranchResponseSchema = z.object({
+  data: z.object({ ref: z.string().optional() }).optional(),
+});
+
+const indexStatusSchema = z.object({ status: z.string().optional() });
 
 const requestStatusSchema = z.object({
   error: z.boolean(),
@@ -47,6 +77,12 @@ export interface TinaCloudClientOptions extends TinaCloudOptions {
    * or `X-API-KEY` (an API token, as TinaCloud's Public Search token is).
    */
   credential?: 'bearer' | 'api-key';
+  /** How often a new branch's index status is read. */
+  indexPollMs?: number;
+  /** How long a new branch may take to index before `ready` rejects. */
+  indexTimeoutMs?: number;
+  /** How long the create request may take before it is abandoned. Default one minute. */
+  createTimeoutMs?: number;
 }
 
 const bodyMessage = (body: unknown): string | undefined => {
@@ -59,12 +95,18 @@ const bodyMessage = (body: unknown): string | undefined => {
 export class TinaCloudError extends Error {
   readonly status?: number;
   readonly body?: unknown;
+  /** TinaCloud answered, but its reply did not arrive before the request's signal ended it. */
+  readonly timedOut: boolean;
 
-  constructor(message: string, details: { status?: number; body?: unknown }) {
+  constructor(
+    message: string,
+    details: { status?: number; body?: unknown; timedOut?: boolean }
+  ) {
     super(message);
     this.name = 'TinaCloudError';
     this.status = details.status;
     this.body = details.body;
+    this.timedOut = details.timedOut ?? false;
   }
 
   /** The message TinaCloud sent in the response body, if any. */
@@ -92,6 +134,28 @@ const causeMessage = (cause: unknown): string => {
   return String(cause);
 };
 
+/** Says why a create failed. A request that went out and got no answer may still have made the branch. */
+const createFailure = (cause: unknown, sent: boolean): unknown => {
+  if (!(cause instanceof TinaCloudError)) return cause;
+  const { status } = cause;
+  if (status === 409) return new BranchCreateError(cause.message, 'exists');
+  if (status === 422) return new BranchCreateError(cause.message, 'refused');
+  if (status === 401) return new BranchCreateError(cause.message, 'auth');
+  if (status === 403) return new BranchCreateError(cause.message, 'forbidden');
+  if (status === undefined) {
+    return new BranchCreateError(cause.message, sent ? 'timeout' : 'network');
+  }
+  if (sent && (status === 502 || status === 503 || status === 504)) {
+    return new BranchCreateError(cause.message, 'timeout');
+  }
+  return cause;
+};
+
+/** Stops an unhandled-rejection report for a promise something else already waits on. */
+const markHandled = (promise: Promise<unknown>): void => {
+  promise.catch(() => undefined);
+};
+
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -99,11 +163,12 @@ export type TinaCloudClient = ReturnType<typeof createTinaCloudClient>;
 
 export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
   /** Resolves to the parsed JSON body, the raw text if it is not JSON, or null. */
-  const authedFetch = async (
+  const sendAuthed = async (
     url: string,
-    init: RequestInit = {}
+    init: RequestInit,
+    token: string | undefined,
+    onSend?: () => void
   ): Promise<unknown> => {
-    const token = await options.getToken();
     if (!token) {
       throw new TinaCloudError('No TinaCloud token is available.', {
         status: 401,
@@ -118,6 +183,7 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     }
     let response: Response;
     try {
+      onSend?.();
       response = await fetch(url, { ...init, headers });
     } catch (cause) {
       throw new TinaCloudError(
@@ -125,7 +191,27 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
         {}
       );
     }
-    const body = parseBody(await response.text());
+    let text: string;
+    try {
+      text = await response.text();
+    } catch (cause) {
+      // A refusal keeps its status even when its body is lost; only an OK reply cut short is a drop.
+      const status = response.ok ? undefined : response.status;
+      if (
+        cause instanceof Error &&
+        (cause.name === 'AbortError' || cause.name === 'TimeoutError')
+      ) {
+        throw new TinaCloudError('The TinaCloud request did not finish.', {
+          status,
+          timedOut: true,
+        });
+      }
+      throw new TinaCloudError(
+        `The TinaCloud reply was cut off: ${causeMessage(cause)}`,
+        { status }
+      );
+    }
+    const body = parseBody(text);
     if (!response.ok) {
       throw new TinaCloudError(`TinaCloud responded with ${response.status}.`, {
         status: response.status,
@@ -134,6 +220,13 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     }
     return body;
   };
+
+  const authedFetch = async (
+    url: string,
+    init: RequestInit = {},
+    onSend?: () => void
+  ): Promise<unknown> =>
+    sendAuthed(url, init, await options.getToken(), onSend);
 
   // TinaCloud commits media writes in the background and returns a request id
   // at once; waiting means a write only resolves once it has landed, and a
@@ -214,11 +307,150 @@ export const createTinaCloudClient = (options: TinaCloudClientOptions) => {
     );
   };
 
+  const pollOnce = async (url: string, signal: AbortSignal) => {
+    let token: string | undefined;
+    try {
+      token = await options.getToken();
+    } catch (cause) {
+      // A dropped or unreadable token refresh is one unknown status; a lost session is final.
+      if (
+        cause instanceof AuthError &&
+        cause.code !== 'network' &&
+        cause.code !== 'invalid-response'
+      ) {
+        throw cause;
+      }
+      throw new TinaCloudError(
+        `Could not read the TinaCloud token: ${causeMessage(cause)}`,
+        {}
+      );
+    }
+    return sendAuthed(url, { signal }, token);
+  };
+
+  const waitForIndex = async (name: string): Promise<void> => {
+    const url = `${TINACLOUD_CONTENT_URL}/db/${options.clientId}/status/${name}`;
+    const pollMs = options.indexPollMs ?? INDEX_POLL_MS;
+    const timeoutMs = options.indexTimeoutMs ?? INDEX_TIMEOUT_MS;
+    const startedAt = Date.now();
+    let unknowns = 0;
+    const deadline = new AbortController();
+    const timer = setTimeout(() => deadline.abort(), timeoutMs);
+    const timedOut = () =>
+      new TinaCloudError(
+        `TinaCloud did not finish indexing branch ${name} in time.`,
+        {}
+      );
+    const expired = new Promise<never>((_resolve, reject) => {
+      deadline.signal.addEventListener('abort', () => reject(timedOut()), {
+        once: true,
+      });
+    });
+    markHandled(expired);
+    try {
+      while (true) {
+        let body: unknown;
+        try {
+          body = await Promise.race([pollOnce(url, deadline.signal), expired]);
+        } catch (cause) {
+          if (deadline.signal.aborted) throw timedOut();
+          if (!isTransient(cause)) throw cause;
+          body = undefined;
+        }
+        const status = indexStatusSchema.safeParse(body);
+        const value = status.success ? status.data.status : undefined;
+        if (value === 'complete') return;
+        if (value === 'failed') {
+          throw new TinaCloudError(
+            `TinaCloud failed to index branch ${name}.`,
+            { body }
+          );
+        }
+        if (value === 'inprogress') {
+          unknowns = 0;
+        } else {
+          unknowns += 1;
+          if (unknowns >= MAX_UNKNOWN_INDEX_STATUSES) {
+            throw new TinaCloudError(
+              `TinaCloud could not report the index status of branch ${name}.`,
+              { body }
+            );
+          }
+        }
+        if (Date.now() - startedAt >= timeoutMs) throw timedOut();
+        await sleep(pollMs);
+      }
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+
+  const createBranch = async ({
+    name,
+    from,
+  }: {
+    name: string;
+    from: string;
+  }): Promise<{ name: string; ready: Promise<void> }> => {
+    const deadline = new AbortController();
+    const timer = setTimeout(
+      () => deadline.abort(),
+      options.createTimeoutMs ?? CREATE_TIMEOUT_MS
+    );
+    let sent = false;
+    const expired = new Promise<never>((_resolve, reject) => {
+      deadline.signal.addEventListener(
+        'abort',
+        () =>
+          reject(
+            new TinaCloudError(
+              `TinaCloud did not answer the request to create branch ${name} in time.`,
+              {}
+            )
+          ),
+        { once: true }
+      );
+    });
+    markHandled(expired);
+    let body: unknown;
+    try {
+      body = await Promise.race([
+        authedFetch(
+          `${TINACLOUD_CONTENT_URL}/github/${options.clientId}/create_branch`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ baseBranch: from, branchName: name }),
+            signal: deadline.signal,
+          },
+          () => {
+            sent = true;
+          }
+        ),
+        expired,
+      ]);
+    } catch (cause) {
+      throw createFailure(cause, sent);
+    } finally {
+      clearTimeout(timer);
+    }
+    const parsed = createBranchResponseSchema.safeParse(body);
+    const ref = parsed.success ? parsed.data.data?.ref : undefined;
+    const made =
+      ref?.startsWith(HEADS_PREFIX) && ref.length > HEADS_PREFIX.length
+        ? ref.slice(HEADS_PREFIX.length)
+        : name;
+    const ready = waitForIndex(made);
+    markHandled(ready);
+    return { name: made, ready };
+  };
+
   return {
     clientId: options.clientId,
     authedFetch,
     waitForRequest,
     getProject,
     listBranches,
+    createBranch,
   };
 };

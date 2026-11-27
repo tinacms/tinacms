@@ -18,6 +18,42 @@ export interface BranchSource {
   list(): Promise<BranchInfo[]>;
   /** The branch an editor sees when `branch.current` is unset. */
   defaultBranch(): Promise<string | undefined>;
+  /**
+   * Makes branch `name` from branch `from`. Resolves once the branch exists, with the name the
+   * Data Layer gave it and, when it is not readable yet, a `ready` promise that settles when it is.
+   * Rejects when the branch was not made.
+   */
+  create?(request: {
+    name: string;
+    from: string;
+  }): Promise<{ name: string; ready?: Promise<void> }>;
+}
+
+/**
+ * Why a create failed: `timeout` may still have made it, `exists` and `refused` are about the name,
+ * `auth` is a signed-out session, `forbidden` no access, `network` no answer before sending.
+ */
+export const BRANCH_CREATE_FAILURES = [
+  'timeout',
+  'exists',
+  'refused',
+  'auth',
+  'forbidden',
+  'network',
+  'other',
+] as const;
+
+export type BranchCreateFailure = (typeof BRANCH_CREATE_FAILURES)[number];
+
+/** A provider's way to say why a create failed. Not public. */
+export class BranchCreateError extends Error {
+  constructor(
+    message: string,
+    readonly reason: BranchCreateFailure
+  ) {
+    super(message);
+    this.name = 'BranchCreateError';
+  }
 }
 
 export type BranchMode = 'local' | 'branches';
@@ -35,9 +71,23 @@ export interface BranchSlice {
   protected: string[];
   /** Branch name to pull request URL, for the branches that have one. */
   pullRequests: Record<string, string>;
+  /**
+   * Branches this session made whose `ready` rejected. They stay unswitchable until the page
+   * reloads: the provider has no readiness check. Each name once. Never persisted.
+   */
+  unready: string[];
   /** Whether the branch list is being read, read, or failed to read. Absent until the first read starts. */
   listState?: BranchListState;
   switchTo: (name: string | undefined) => void;
+  /** The branch being made by this session, if any. At most one. Never persisted. */
+  creating?: BranchCreating;
+  /** The last finished create, for the shell to act on. The shell clears it once handled. */
+  createResult?: BranchCreateResult;
+  /**
+   * Makes branch `name` from `from` through the content provider and records `creating` and
+   * `createResult`. Absent until a provider offers `branches.create`.
+   */
+  create?: (name: string, from: string) => void;
   /**
    * Makes branch `name` from `from` (the default branch when undefined) and
    * writes `value` to it in one request. All or nothing: when it rejects, no
@@ -52,6 +102,23 @@ export interface BranchSlice {
   }) => Promise<DocumentEntry & { hookWarnings?: string[] }>;
 }
 
+export interface BranchCreating {
+  name: string;
+  from: string;
+  /** `current` when the create started; the auto-switch only fires if it is still current. */
+  startedOn: string | undefined;
+  phase: 'making' | 'preparing';
+}
+
+export interface BranchCreateResult {
+  name: string;
+  from: string;
+  /** `current` when the create started; the auto-switch only fires if it is still current. */
+  startedOn: string | undefined;
+  outcome: 'ready' | 'unready' | 'failed';
+  failure?: BranchCreateFailure;
+}
+
 type SaveToNewBranch = NonNullable<BranchSlice['saveToNewBranch']>;
 
 const isSaveToNewBranch = (value: unknown): value is SaveToNewBranch =>
@@ -64,6 +131,33 @@ const isNames = (value: unknown): value is string[] =>
 
 const optionalString = (value: unknown): string | undefined =>
   typeof value === 'string' && value ? value : undefined;
+
+const creatingOf = (value: unknown): BranchCreating | undefined => {
+  if (!isRecord(value)) return undefined;
+  const { name, from, startedOn, phase } = value;
+  if (typeof name !== 'string' || typeof from !== 'string') return undefined;
+  if (phase !== 'making' && phase !== 'preparing') return undefined;
+  return { name, from, startedOn: optionalString(startedOn), phase };
+};
+
+const isFailure = (value: unknown): value is BranchCreateFailure =>
+  BRANCH_CREATE_FAILURES.some((failure) => failure === value);
+
+const createResultOf = (value: unknown): BranchCreateResult | undefined => {
+  if (!isRecord(value)) return undefined;
+  const { name, from, startedOn, outcome, failure } = value;
+  if (typeof name !== 'string' || typeof from !== 'string') return undefined;
+  if (outcome !== 'ready' && outcome !== 'unready' && outcome !== 'failed') {
+    return undefined;
+  }
+  return {
+    name,
+    from,
+    startedOn: optionalString(startedOn),
+    outcome,
+    ...(isFailure(failure) ? { failure } : {}),
+  };
+};
 
 const pullRequestsOf = (value: unknown): Record<string, string> => {
   if (!isRecord(value)) return {};
@@ -85,6 +179,7 @@ export const branchSliceOf = (
     protected: protectedNames,
     mode,
     saveToNewBranch,
+    create,
   } = slice;
   if (typeof switchTo !== 'function') return undefined;
   if (!isNames(list) || !isNames(protectedNames)) return undefined;
@@ -95,6 +190,7 @@ export const branchSliceOf = (
     list,
     protected: protectedNames,
     pullRequests: pullRequestsOf(slice.pullRequests),
+    unready: isNames(slice.unready) ? slice.unready : [],
     listState:
       slice.listState === 'loading' ||
       slice.listState === 'ready' ||
@@ -102,6 +198,12 @@ export const branchSliceOf = (
         ? slice.listState
         : undefined,
     switchTo: (name) => switchTo(name),
+    creating: creatingOf(slice.creating),
+    createResult: createResultOf(slice.createResult),
+    create:
+      typeof create === 'function'
+        ? (name, from) => create(name, from)
+        : undefined,
     saveToNewBranch: isSaveToNewBranch(saveToNewBranch)
       ? (request) => saveToNewBranch(request)
       : undefined,

@@ -7,8 +7,29 @@ import {
   branchSliceOf,
   currentBranchOf,
 } from '../core/branch/contract';
+import {
+  createBranchAction,
+  forgetMadeBranches,
+  madeBranchesOf,
+  tickClock,
+} from '../core/branch/create';
+import { readSaveRunning, useFormStore } from '../form/form-store';
 import { TinaRuntimeContext } from './context';
 import { useOptionalContentSlice, useTinaStore } from './hooks';
+
+// Runs `run` once no save is running, so a save's afterSave never ends on another branch. Returns a cancel.
+const whenNoSaveRuns = (run: () => void): (() => void) => {
+  if (!readSaveRunning()) {
+    run();
+    return () => {};
+  }
+  const stop = useFormStore.subscribe(() => {
+    if (readSaveRunning()) return;
+    stop();
+    run();
+  });
+  return stop;
+};
 
 // A saved branch the provider no longer lists falls back to the default with a toast.
 export function useBranchSync(): void {
@@ -27,15 +48,54 @@ export function useBranchSync(): void {
     const source = content.branches;
     if (!source) return;
     let cancelled = false;
-    fill({ mode: 'branches', listState: 'loading' });
+    let stopWaiting = () => {};
+    const { create } = source;
+    fill({
+      mode: 'branches',
+      listState: 'loading',
+      create: create
+        ? createBranchAction(store, {
+            ...source,
+            create: (r) => create.call(source, r),
+          })
+        : undefined,
+    });
+    const startedAt = tickClock();
     Promise.all([source.list(), source.defaultBranch()]).then(
       ([branches, fallback]) => {
         if (cancelled) return;
+        const names = branches.map((branch) => branch.name);
+        const slice = branchSliceOf(store.getState());
+        const pending =
+          slice?.creating?.phase === 'preparing'
+            ? slice.creating.name
+            : undefined;
+        const made = madeBranchesOf(store);
+        const omitted = made.filter(
+          ({ name, settledAt }) =>
+            settledAt !== null &&
+            settledAt < startedAt &&
+            !names.includes(name) &&
+            !slice?.unready.includes(name)
+        );
+        forgetMadeBranches(
+          store,
+          omitted.map(({ name }) => name)
+        );
+        const kept = [
+          ...new Set([
+            ...(slice?.unready ?? []),
+            ...(pending ? [pending] : []),
+            ...made
+              .map(({ name }) => name)
+              .filter((name) => !omitted.some((gone) => gone.name === name)),
+          ]),
+        ];
         fill({
           mode: 'branches',
           listState: 'ready',
           fallback,
-          list: branches.map((branch) => branch.name),
+          list: [...names, ...kept.filter((name) => !names.includes(name))],
           protected: branches
             .filter((branch) => branch.protected)
             .map((branch) => branch.name),
@@ -46,19 +106,24 @@ export function useBranchSync(): void {
           ),
         });
         const current = currentBranchOf(store.getState());
-        if (current && current === fallback) {
+        const gone =
+          current !== undefined &&
+          current !== fallback &&
+          !branches.some((branch) => branch.name === current) &&
+          !kept.includes(current);
+        if (!current || (current !== fallback && !gone)) return;
+        stopWaiting = whenNoSaveRuns(() => {
+          if (cancelled || currentBranchOf(store.getState()) !== current) {
+            return;
+          }
           branchSliceOf(store.getState())?.switchTo(undefined);
-        } else if (
-          current &&
-          !branches.some((branch) => branch.name === current)
-        ) {
-          branchSliceOf(store.getState())?.switchTo(undefined);
+          if (!gone) return;
           toast({
             tone: 'warning',
             title: `Branch "${current}" no longer exists`,
             text: fallback ? `Switched to ${fallback}.` : undefined,
           });
-        }
+        });
       },
       (cause: unknown) => {
         if (cancelled) return;
@@ -68,6 +133,7 @@ export function useBranchSync(): void {
     );
     return () => {
       cancelled = true;
+      stopWaiting();
     };
   }, [runtime, content, attempt]);
 }
@@ -79,6 +145,8 @@ export interface BranchView {
   /** The pull request of the branch `name`, when it has one. */
   pullRequestUrl: string | undefined;
   branches: { name: string; protected: boolean }[];
+  /** Branches made this session that are not ready and cannot be switched to until a reload. */
+  unready: string[];
   /** The provider's default branch, once the list has been read. */
   defaultBranch: string | undefined;
   /** Whether the list is being read, read, or failed. */
@@ -87,6 +155,11 @@ export interface BranchView {
   retryList: () => void;
   switchTo: (name: string) => void;
   saveToNewBranch: BranchSlice['saveToNewBranch'];
+  /** Makes a branch through the provider. Absent when the provider cannot. */
+  create: BranchSlice['create'];
+  /** The branch being made by this session, if any. */
+  creating: BranchSlice['creating'];
+  createResult: BranchSlice['createResult'];
 }
 
 export function useBranchView(): BranchView | null {
@@ -107,6 +180,7 @@ export function useBranchView(): BranchView | null {
       name,
       protected: slice.protected.includes(name),
     })),
+    unready: slice.unready,
     listState: slice.listState,
     retryList: () =>
       runtime?.store.setState((state) => ({
@@ -117,5 +191,8 @@ export function useBranchView(): BranchView | null {
       })),
     switchTo: slice.switchTo,
     saveToNewBranch: slice.saveToNewBranch,
+    create: slice.create,
+    creating: slice.creating,
+    createResult: slice.createResult,
   };
 }

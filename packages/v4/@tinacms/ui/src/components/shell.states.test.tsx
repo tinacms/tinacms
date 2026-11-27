@@ -1,6 +1,14 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { useState } from 'react';
+import {
+  cleanup,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Button } from '@tinacms/ui/components/button';
 import { BranchSwitcher } from '@tinacms/ui/components/branch-switcher';
@@ -9,6 +17,7 @@ import {
   SaveProgress,
   SaveProgressCard,
 } from '@tinacms/ui/components/save-progress';
+import type { CreateFailure } from '@tinacms/ui/lib/create-failure';
 import { SaveToBranchDialog } from '@tinacms/ui/components/save-to-branch-dialog';
 import { saveToBranchDialogStates } from './save-to-branch-dialog.states';
 import { saveProgressStates } from './save-progress.states';
@@ -66,18 +75,511 @@ describe('Top bar states', () => {
 });
 
 describe('Branch switcher states', () => {
-  it.each(branchSwitcherStates)('renders $name', ({ props, shows }) => {
-    render(<BranchSwitcher {...props} />);
-    const button = screen.getByRole('button', {
-      name: new RegExp(`^Branch: ${props.current}`),
-      hidden: true,
-    });
-    expect(button.hasAttribute('disabled')).toBe(props.disabled === true);
-    for (const words of shows) {
-      expect(screen.getAllByText(words).length).toBeGreaterThan(0);
+  it.each(branchSwitcherStates)(
+    'renders $name',
+    async ({ props, shows, openForm, submit }) => {
+      const { createState, ...idle } = props;
+      const { rerender } = render(
+        <BranchSwitcher {...(openForm ? idle : props)} />
+      );
+      if (openForm) {
+        await userEvent.click(
+          screen.getByRole('button', { name: 'New branch' })
+        );
+        if (submit) {
+          await userEvent.type(
+            screen.getByRole('searchbox', { name: 'New branch name' }),
+            submit
+          );
+          await userEvent.click(
+            screen.getByRole('button', { name: 'Create branch' })
+          );
+        }
+        rerender(<BranchSwitcher {...props} />);
+      }
+      const button = screen.getByRole('button', {
+        name: new RegExp(`^Branch: ${props.current}`),
+        hidden: true,
+      });
+      expect(button.hasAttribute('disabled')).toBe(props.disabled === true);
+      for (const words of shows) {
+        expect(screen.getAllByText(words).length).toBeGreaterThan(0);
+      }
+      const framed = props.defaultOpen === true;
+      const maximised = props.defaultMaximised === true;
+      expect(screen.queryByRole('dialog') !== null).toBe(framed && !maximised);
+      expect(
+        document.querySelector('[data-slot="branch-maximised"]') !== null
+      ).toBe(framed && maximised);
     }
-    expect(screen.queryByRole('dialog') !== null).toBe(
-      props.defaultOpen === true
+  );
+});
+
+describe('Branch switcher list and form edges', () => {
+  it('says nothing about a search when the branch list is empty', async () => {
+    render(
+      <BranchSwitcher
+        current='main'
+        branches={[]}
+        defaultOpen
+        onSwitch={() => {}}
+      />
+    );
+    expect(screen.queryByText(/No branches match/)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Clear search' })).toBeNull();
+  });
+
+  it('shows no failure line for a failed state before any name was submitted', async () => {
+    const { rerender } = render(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        baseBranch='main'
+        onCreate={() => {}}
+        defaultOpen
+        onSwitch={() => {}}
+      />
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    rerender(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        baseBranch='main'
+        onCreate={() => {}}
+        defaultOpen
+        onSwitch={() => {}}
+        createState='failed'
+      />
+    );
+    expect(screen.queryByText(/Couldn't create/)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
+  });
+});
+
+describe('Branch switcher pending rows', () => {
+  it('keeps the rows of branches that already existed while the form creates', async () => {
+    const props = {
+      current: 'feature/news',
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const entries = [
+      { name: 'feature/news' },
+      { name: 'main', protected: true },
+    ];
+    const { rerender } = render(
+      <BranchSwitcher {...props} branches={entries} />
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    rerender(
+      <BranchSwitcher
+        {...props}
+        createState='creating'
+        creatingBranch='main'
+        branches={[{ name: 'main', protected: true, ready: false }, entries[0]]}
+      />
+    );
+    expect(screen.getByRole('button', { name: /^main/ })).toBeInTheDocument();
+  });
+});
+
+describe('Branch switcher failure notes', () => {
+  it('wraps the failure note in full, with no clamp and no title', () => {
+    const name = 'cms/a-very-long-branch-name-that-keeps-going-and-going';
+    render(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        onSwitch={() => {}}
+        defaultOpen
+        note={{ kind: 'failed', name, failure: 'timeout' }}
+      />
+    );
+    const text = screen.getByText(new RegExp(`Couldn't create ${name}`));
+    expect(text).not.toHaveClass('line-clamp-2');
+    expect(text).not.toHaveAttribute('title');
+    expect(text).toHaveTextContent(/reload to check\.$/);
+  });
+
+  it.each([
+    ['exists', false],
+    ['refused', false],
+    ['auth', false],
+    ['forbidden', false],
+    ['network', true],
+    ['timeout', true],
+    ['other', true],
+  ] as const)('offers Retry on the note only for %s: %s', (failure, retry) => {
+    render(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        onSwitch={() => {}}
+        defaultOpen
+        note={{ kind: 'failed', name: 'cms/x', failure }}
+      />
+    );
+    expect(screen.queryByRole('button', { name: 'Retry' }) !== null).toBe(
+      retry
+    );
+  });
+
+  it('wraps a single Start from value', async () => {
+    render(
+      <BranchSwitcher
+        current='feature/longcurrentbranchnamewithnobreaks'
+        branches={[{ name: 'feature/longcurrentbranchnamewithnobreaks' }]}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        defaultOpen
+      />
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    expect(
+      screen.getByText(/feature\/longcurrentbranchnamewithnobreaks \(current\)/)
+    ).toHaveClass('[overflow-wrap:anywhere]');
+  });
+});
+
+describe('Branch switcher refused names', () => {
+  it('keeps every refused name off, not only the latest', async () => {
+    const props = {
+      current: 'main',
+      branches: [{ name: 'main' }],
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    for (const name of ['cms/a', 'cms/b']) {
+      rerender(
+        <BranchSwitcher
+          {...props}
+          note={{ kind: 'failed', name, failure: 'exists' }}
+        />
+      );
+    }
+    const box = screen.getByRole('searchbox', { name: 'New branch name' });
+    await userEvent.type(box, 'cms/a');
+    expect(
+      screen.getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
+    expect(
+      screen
+        .getAllByRole('alert')
+        .some((alert) =>
+          /A branch called cms\/a already exists/.test(alert.textContent ?? '')
+        )
+    ).toBe(true);
+    await userEvent.clear(box);
+    await userEvent.type(box, 'cms/c');
+    expect(screen.getByRole('button', { name: 'Create branch' })).toBeEnabled();
+  });
+});
+
+describe('Branch switcher refused names by reason', () => {
+  it.each([
+    ['exists', true],
+    ['refused', true],
+    ['auth', false],
+    ['forbidden', false],
+    ['network', false],
+    ['timeout', false],
+    ['other', false],
+  ] as const)(
+    'a %s failure blocks the name later: %s',
+    async (failure, blocks) => {
+      const props = {
+        current: 'main',
+        branches: [{ name: 'main' }],
+        onSwitch: () => {},
+        onCreate: () => {},
+        baseBranch: 'main',
+        defaultOpen: true,
+      } as const;
+      const { rerender } = render(<BranchSwitcher {...props} />);
+      await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+      rerender(
+        <BranchSwitcher
+          {...props}
+          note={{ kind: 'failed', name: 'cms/a', failure }}
+        />
+      );
+      rerender(<BranchSwitcher {...props} />);
+      await userEvent.type(
+        screen.getByRole('searchbox', { name: 'New branch name' }),
+        'cms/a'
+      );
+      expect(
+        screen
+          .getByRole('button', { name: 'Create branch' })
+          .hasAttribute('disabled') ||
+          screen
+            .getByRole('button', { name: 'Create branch' })
+            .getAttribute('aria-disabled') === 'true'
+      ).toBe(blocks);
+    }
+  );
+});
+
+describe('Branch switcher form failures', () => {
+  const props = {
+    current: 'main',
+    branches: [{ name: 'main' }],
+    onSwitch: () => {},
+    baseBranch: 'main',
+    defaultOpen: true,
+  } as const;
+  const failOnForm = async (
+    failure: CreateFailure,
+    onCreate: (name: string) => void = () => {},
+    focusBack = false
+  ) => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <BranchSwitcher {...props} onCreate={onCreate} />
+    );
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    await user.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/a'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    rerender(
+      <BranchSwitcher {...props} onCreate={onCreate} createState='creating' />
+    );
+    if (focusBack) {
+      screen.getByRole('button', { name: 'Back to branches' }).focus();
+    }
+    rerender(
+      <BranchSwitcher
+        {...props}
+        onCreate={onCreate}
+        createState='failed'
+        createFailure={failure}
+      />
+    );
+    return { user, rerender };
+  };
+
+  it.each([
+    ['exists', 'Create branch', false],
+    ['refused', 'Create branch', false],
+    ['auth', 'Create branch', true],
+    ['forbidden', 'Create branch', true],
+    ['network', 'Retry', true],
+    ['timeout', 'Retry', true],
+    ['other', 'Retry', true],
+  ] as const)(
+    'after a %s failure for the same name the button reads %s, enabled: %s',
+    async (failure, label, enabled) => {
+      await failOnForm(failure);
+      const create = screen.getByRole('button', { name: label });
+      expect(create.hasAttribute('disabled')).toBe(!enabled);
+    }
+  );
+
+  it.each(['exists', 'refused'] as const)(
+    'keeps focus on Back to branches when a %s result arrives',
+    async (failure) => {
+      await failOnForm(failure, () => {}, true);
+      expect(
+        screen.getByRole('button', { name: 'Back to branches' })
+      ).toHaveFocus();
+    }
+  );
+
+  it.each(['exists', 'refused'] as const)(
+    'sends nothing when the form is submitted for a name a %s failure blocked',
+    async (failure) => {
+      const onCreate = vi.fn();
+      await failOnForm(failure, onCreate);
+      onCreate.mockClear();
+      fireEvent.submit(screen.getByRole('form', { name: 'New branch form' }));
+      expect(onCreate).not.toHaveBeenCalled();
+    }
+  );
+
+  it('keeps a name refused as exists blocked after the form resets', async () => {
+    const { user, rerender } = await failOnForm('exists');
+    rerender(
+      <BranchSwitcher
+        {...props}
+        onCreate={() => {}}
+        note={{ kind: 'failed', name: 'cms/a', failure: 'exists' }}
+      />
+    );
+    rerender(
+      <BranchSwitcher {...props} onCreate={() => {}} formResetKey={1} />
+    );
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    const name = screen.getByRole('searchbox', { name: 'New branch name' });
+    expect(name).toHaveValue('');
+    await user.type(name, 'cms/a');
+    expect(
+      screen.getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
+  });
+
+  it('never shows (current) without a branch name', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        branches={[{ name: 'main' }]}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        baseBranch='main'
+        defaultOpen
+      />
+    );
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    expect(screen.queryByText(/\(current\)/)).toBeNull();
+    expect(
+      screen.getByRole('form', { name: 'New branch form' })
+    ).toHaveTextContent('Start frommain');
+  });
+});
+
+describe('Branch switcher names under a taken branch', () => {
+  it('blocks a name nested under a branch the server said exists', async () => {
+    const props = {
+      current: 'main',
+      branches: [{ name: 'main' }],
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    rerender(
+      <BranchSwitcher
+        {...props}
+        note={{ kind: 'failed', name: 'docs', failure: 'exists' }}
+      />
+    );
+    await userEvent.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'docs/intro'
+    );
+    expect(
+      screen.getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
+    expect(
+      screen
+        .getAllByRole('alert')
+        .some((alert) => /docs/.test(alert.textContent ?? ''))
+    ).toBe(true);
+  });
+});
+
+describe('Branch switcher create announcements', () => {
+  it('announces the running create and marks the button busy', async () => {
+    const props = {
+      current: 'main',
+      branches: [{ name: 'main' }],
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    await userEvent.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/x'
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Create branch' })
+    );
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    expect(
+      screen
+        .getAllByRole('status')
+        .some((node) => node.textContent === 'Creating cms/x…')
+    ).toBe(true);
+    expect(screen.getByRole('button', { name: 'Creating' })).toHaveAttribute(
+      'aria-busy',
+      'true'
+    );
+  });
+
+  it('lets a long Switch to action wrap inside the ready note', () => {
+    render(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        onSwitch={() => {}}
+        defaultOpen
+        note={{ kind: 'ready', name: 'cms/ready-later-with-a-long-name' }}
+      />
+    );
+    expect(
+      screen.getByRole('button', { name: /Switch to cms\/ready-later/ })
+    ).toHaveClass('whitespace-normal', 'shrink');
+    const label = screen.getByText(
+      'Switch to cms/ready-later-with-a-long-name'
+    );
+    expect(label).not.toHaveClass('truncate');
+    expect(label).toHaveClass('[overflow-wrap:anywhere]');
+  });
+});
+
+describe('Branch switcher while its form creates', () => {
+  it('hides only the branch being created, not other new rows', async () => {
+    const props = {
+      current: 'feature/news',
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(
+      <BranchSwitcher {...props} branches={[{ name: 'feature/news' }]} />
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'New branch' }));
+    rerender(
+      <BranchSwitcher
+        {...props}
+        createState='creating'
+        creatingBranch='cms/a'
+        branches={[
+          { name: 'cms/a', ready: false },
+          { name: 'cms/other' },
+          { name: 'feature/news' },
+        ]}
+      />
+    );
+    expect(screen.queryByRole('button', { name: /cms\/a/ })).toBeNull();
+    expect(screen.getByRole('button', { name: /cms\/other/ })).toBeVisible();
+  });
+
+  it('does not close the maximised view on Escape while composing', async () => {
+    render(
+      <BranchSwitcher
+        current='main'
+        branches={[{ name: 'main' }]}
+        onSwitch={() => {}}
+        defaultOpen
+        defaultMaximised
+      />
+    );
+    const view = document.querySelector('[data-slot="branch-maximised"]');
+    expect(view).not.toBeNull();
+    fireEvent.keyDown(document.body, { key: 'Escape', isComposing: true });
+    expect(
+      document.querySelector('[data-slot="branch-maximised"]')
+    ).not.toBeNull();
+    fireEvent.keyDown(document.body, { key: 'Escape' });
+    await waitFor(() =>
+      expect(
+        document.querySelector('[data-slot="branch-maximised"]')
+      ).toBeNull()
     );
   });
 });
@@ -257,10 +759,19 @@ describe('Save progress card', () => {
   });
 });
 
+/** jsdom has no `matchMedia`; this makes `(min-width: ...)` false so `useTier` says phone. */
+const phoneTier = () =>
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  }));
+
 describe('Branch switcher, the full design', () => {
   const entries = [
-    { name: 'docs/v4-launch', pullRequest: 482, unsaved: 2 },
-    { name: 'docs/pricing-update', pullRequest: 479 },
+    { name: 'docs/v4-launch', pullRequest: '482', unsaved: 2 },
+    { name: 'docs/pricing-update', pullRequest: '479' },
     { name: 'docs/changelog-2-24', ready: false },
     { name: 'main', protected: true },
   ];
@@ -288,7 +799,8 @@ describe('Branch switcher, the full design', () => {
     const onSwitch = vi.fn();
     const { user, dialog } = await open({ onSwitch });
     const rows = within(dialog).getAllByRole('listitem');
-    expect(rows[0]).toHaveTextContent('docs/v4-launch#4822, 2 unsaved');
+    expect(rows[0]).toHaveTextContent('docs/changelog-2-24');
+    expect(rows[1]).toHaveTextContent('docs/v4-launch#4822, 2 unsaved');
     const ready = within(dialog).getByRole('button', {
       name: /docs\/changelog-2-24/,
     });
@@ -296,6 +808,75 @@ describe('Branch switcher, the full design', () => {
     await user.click(ready);
     expect(onSwitch).not.toHaveBeenCalled();
   });
+
+  describe.each([
+    ['pop-up', false, false],
+    ['maximised switcher', true, false],
+    ['phone sheet', false, true],
+  ])(
+    'unready and creating rows in the %s',
+    (_surface, defaultMaximised, phone) => {
+      afterEach(() => vi.unstubAllGlobals());
+
+      const rowsFor = (
+        branches: React.ComponentProps<typeof BranchSwitcher>['branches']
+      ) => {
+        if (phone) phoneTier();
+        render(
+          <BranchSwitcher
+            current='docs/v4-launch'
+            branches={branches}
+            onSwitch={() => {}}
+            defaultOpen
+            defaultMaximised={defaultMaximised}
+          />
+        );
+        expect(
+          screen.queryByRole('button', { name: /^(Maximise|Restore)$/ }) ===
+            null
+        ).toBe(phone);
+        return screen
+          .getAllByRole('button')
+          .filter((row) => row.hasAttribute('data-branch-row'));
+      };
+
+      it('shows an unready row disabled with no spinner and Reload to switch, and a creating row with the spinner and Getting ready', () => {
+        const rows = rowsFor([
+          { name: 'docs/v4-launch' },
+          { name: 'cms/unready', ready: false, unready: true },
+          { name: 'cms/making', ready: false },
+        ]);
+        const unready = rows.find((row) =>
+          row.textContent?.includes('cms/unready')
+        );
+        const making = rows.find((row) =>
+          row.textContent?.includes('cms/making')
+        );
+        expect(unready).toHaveAttribute('aria-disabled', 'true');
+        expect(unready).toHaveTextContent('Reload to switch');
+        expect(unready).not.toHaveTextContent('Getting ready');
+        expect(unready?.querySelector('[class*="animate-spin"]')).toBeNull();
+        expect(making).toHaveTextContent('Getting ready');
+        expect(making?.querySelector('[class*="animate-spin"]')).not.toBeNull();
+      });
+
+      it('lists a protected branch once while it is creating, and once when unready', () => {
+        const count = (name: string, extra: object) => {
+          const rows = rowsFor([
+            { name: 'docs/v4-launch' },
+            { name, protected: true, ready: false, ...extra },
+          ]);
+          const found = rows.filter((row) =>
+            row.textContent?.includes(name)
+          ).length;
+          cleanup();
+          return found;
+        };
+        expect(count('release', {})).toBe(1);
+        expect(count('release', { unready: true })).toBe(1);
+      });
+    }
+  );
 
   it('finds a branch by its pull request number', async () => {
     const { user, dialog } = await open();
@@ -352,7 +933,7 @@ describe('Branch switcher, the full design', () => {
     await user.click(
       within(dialog).getByRole('button', { name: 'Create branch' })
     );
-    expect(onCreate).toHaveBeenCalledWith('docs/astro-guide');
+    expect(onCreate).toHaveBeenCalledWith('docs/astro-guide', 'docs/v4-launch');
   });
 
   it.each([
@@ -391,11 +972,11 @@ describe('Branch switcher, the full design', () => {
     );
   });
 
-  it('shows the New branch form without a create operation, but cannot create', async () => {
-    const { dialog } = await openForm();
+  it('offers no New branch without a create operation', async () => {
+    const { dialog } = await open();
     expect(
-      within(dialog).getByRole('button', { name: 'Create branch' })
-    ).toBeDisabled();
+      within(dialog).queryByRole('button', { name: 'New branch' })
+    ).toBeNull();
   });
 
   it('shows loading in place, and a failed load with Retry', async () => {
@@ -410,9 +991,636 @@ describe('Branch switcher, the full design', () => {
     const onRetry = vi.fn();
     const { user, dialog } = await open({ status: 'failed', onRetry });
     expect(within(dialog).getByRole('alert')).toHaveTextContent(
-      "Couldn't load branches. You're still on docs/v4-launch and can keep editing."
+      "Couldn't load branches. Check your connection, then retry. You're still on docs/v4-launch and can keep editing."
     );
     await user.click(within(dialog).getByRole('button', { name: 'Retry' }));
     expect(onRetry).toHaveBeenCalledOnce();
+  });
+});
+
+describe('Branch switcher controls', () => {
+  const entries = [
+    { name: 'feature/news' },
+    { name: 'fix/typo' },
+    { name: 'main', protected: true },
+  ];
+
+  it('opens and closes only through open and onOpenChange when controlled, and stays open after onCreate', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    const onCreate = vi.fn();
+    const { rerender } = render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        onCreate={onCreate}
+        baseBranch='main'
+        open={false}
+        onOpenChange={onOpenChange}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    rerender(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        onCreate={onCreate}
+        baseBranch='main'
+        open
+        onOpenChange={onOpenChange}
+      />
+    );
+    const dialog = await screen.findByRole('dialog', { name: 'Branches' });
+    await user.click(
+      within(dialog).getByRole('button', { name: 'New branch' })
+    );
+    await user.type(
+      within(dialog).getByRole('searchbox', { name: 'New branch name' }),
+      'cms/x'
+    );
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Create branch' })
+    );
+    expect(onCreate).toHaveBeenCalledWith('cms/x', 'feature/news');
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
+    expect(screen.getByRole('dialog', { name: 'Branches' })).toBeVisible();
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Close branches' })
+    );
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it('moves between rows with the keys in the maximised view', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        defaultOpen
+        defaultMaximised
+      />
+    );
+    const search = screen.getByRole('searchbox', { name: 'Search branches' });
+    await waitFor(() => expect(search).toHaveFocus());
+    await user.keyboard('{ArrowDown}');
+    const rows = screen
+      .getAllByRole('button', { name: /feature|fix|main/ })
+      .filter((row) => row.hasAttribute('data-branch-row'));
+    expect(rows[0]).toHaveFocus();
+    await user.keyboard('{End}');
+    expect(rows.at(-1)).toHaveFocus();
+    await user.keyboard('{Home}');
+    expect(rows[0]).toHaveFocus();
+  });
+
+  it('shows No branches match with Clear search, which empties and focuses the box', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        defaultOpen
+      />
+    );
+    const search = screen.getByRole('searchbox', { name: 'Search branches' });
+    await user.type(search, 'zzz');
+    expect(screen.getByText('No branches match “zzz”.')).toBeVisible();
+    const empty = screen.getByText('No branches match “zzz”.').parentElement;
+    if (!empty) throw new Error('no empty state');
+    await user.click(
+      within(empty).getByRole('button', { name: 'Clear search' })
+    );
+    expect(search).toHaveValue('');
+    expect(search).toHaveFocus();
+  });
+
+  it('puts the Getting ready row first, and focuses the name field when New branch opens', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={[
+          { name: 'feature/news' },
+          { name: 'fix/typo' },
+          { name: 'cms/new', ready: false },
+          { name: 'main', protected: true },
+        ]}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        baseBranch='main'
+        defaultOpen
+      />
+    );
+    const rows = screen
+      .getAllByRole('button')
+      .filter((row) => row.hasAttribute('data-branch-row'));
+    expect(rows.map((row) => row.textContent)).toEqual([
+      'cms/newGetting ready',
+      'feature/news',
+      'fix/typo',
+      'main',
+    ]);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    expect(
+      screen.getByRole('searchbox', { name: 'New branch name' })
+    ).toHaveFocus();
+    expect(
+      screen.getByText('Use letters, numbers, dashes, dots and slashes.')
+    ).toBeVisible();
+  });
+
+  it('disables New branch while the list loads or failed, even without a create', () => {
+    const { rerender } = render(
+      <BranchSwitcher
+        current='main'
+        branches={entries}
+        onSwitch={() => {}}
+        status='loading'
+        onCreate={() => {}}
+        defaultOpen
+      />
+    );
+    expect(screen.getByRole('button', { name: 'New branch' })).toBeDisabled();
+    rerender(
+      <BranchSwitcher
+        current='main'
+        branches={entries}
+        onSwitch={() => {}}
+        status='failed'
+        onCreate={() => {}}
+        defaultOpen
+      />
+    );
+    expect(screen.getByRole('button', { name: 'New branch' })).toBeDisabled();
+  });
+
+  it('closes when focus leaves the pop-up for the page', async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <BranchSwitcher
+          current='feature/news'
+          branches={entries}
+          onSwitch={() => {}}
+          defaultOpen
+        />
+        <button type='button'>page</button>
+      </>
+    );
+    expect(
+      screen.getByRole('dialog', { name: 'Branches' })
+    ).toBeInTheDocument();
+    screen.getByRole('searchbox', { name: 'Search branches' }).focus();
+    screen.getByRole('button', { name: 'page' }).focus();
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+    expect(
+      await screen.findByRole('dialog', { name: 'Branches' })
+    ).toBeVisible();
+  });
+
+  it.each(['Close branches', 'Escape'])(
+    'opens again as the pop-up after the maximised view is closed with %s',
+    async (how) => {
+      const user = userEvent.setup();
+      render(
+        <BranchSwitcher
+          current='feature/news'
+          branches={entries}
+          onSwitch={() => {}}
+          defaultOpen
+          defaultMaximised
+        />
+      );
+      expect(
+        document.querySelector('[data-slot="branch-maximised"]')
+      ).not.toBeNull();
+      if (how === 'Escape') await user.keyboard('{Escape}');
+      else
+        await user.click(
+          screen.getByRole('button', { name: 'Close branches' })
+        );
+      await waitFor(() =>
+        expect(
+          document.querySelector('[data-slot="branch-maximised"]')
+        ).toBeNull()
+      );
+      await user.click(screen.getByRole('button', { name: /^Branch:/ }));
+      expect(
+        await screen.findByRole('dialog', { name: 'Branches' })
+      ).toBeVisible();
+    }
+  );
+
+  it('names the clear button of the name field apart from the search box', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        baseBranch='main'
+        defaultOpen
+      />
+    );
+    await user.type(
+      screen.getByRole('searchbox', { name: 'Search branches' }),
+      'x'
+    );
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    await user.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/a'
+    );
+    expect(screen.getByRole('button', { name: 'Clear name' })).toBeVisible();
+    expect(
+      screen.getAllByRole('button', { name: 'Clear search' })
+    ).toHaveLength(1);
+  });
+
+  it('drops the failure line and Retry once the name is edited, with no note while the form is open, and scrolls the alert into view', async () => {
+    const user = userEvent.setup();
+    const scrolled = vi.fn();
+    Element.prototype.scrollIntoView = scrolled;
+    const props = {
+      current: 'feature/news',
+      branches: entries,
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    const box = screen.getByRole('searchbox', { name: 'New branch name' });
+    await user.type(box, 'aaa');
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    scrolled.mockClear();
+    const failedProps = {
+      ...props,
+      createState: 'failed',
+      note: { kind: 'failed', name: 'aaa', failure: 'other' },
+    } as const;
+    rerender(<BranchSwitcher {...failedProps} />);
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
+    await waitFor(() =>
+      expect(
+        scrolled.mock.contexts.some(
+          (el) =>
+            el instanceof Element && el.contains(screen.getByRole('alert'))
+        )
+      ).toBe(true)
+    );
+    await user.type(box, 'b');
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
+    expect(screen.queryByText(/Couldn't create/)).toBeNull();
+    expect(screen.getByRole('button', { name: 'Create branch' })).toBeVisible();
+    await user.type(box, '{Backspace}');
+    expect(screen.getByRole('alert')).toHaveTextContent("Couldn't create aaa");
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
+  });
+
+  it('puts focus back in the search box after Back to branches and in the name field after Clear name', async () => {
+    const user = userEvent.setup();
+    const onFormChange = vi.fn();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        onCreate={() => {}}
+        baseBranch='main'
+        onFormChange={onFormChange}
+        defaultOpen
+      />
+    );
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    expect(onFormChange).toHaveBeenLastCalledWith(true, '');
+    const name = screen.getByRole('searchbox', { name: 'New branch name' });
+    await user.type(name, 'cms/a');
+    await user.click(screen.getByRole('button', { name: 'Clear name' }));
+    expect(name).toHaveFocus();
+    await user.click(screen.getByRole('button', { name: 'Back to branches' }));
+    expect(onFormChange).toHaveBeenLastCalledWith(false, '');
+    const search = screen.getByRole('searchbox', { name: 'Search branches' });
+    expect(search).toHaveFocus();
+    await user.type(search, 'x');
+    await user.click(screen.getByRole('button', { name: 'Clear search' }));
+    expect(search).toHaveFocus();
+  });
+
+  describe.each([
+    ['pop-up', false, false],
+    ['maximised switcher', true, false],
+    ['phone sheet', false, true],
+  ])('the New branch form in the %s', (_surface, defaultMaximised, phone) => {
+    afterEach(() => vi.unstubAllGlobals());
+
+    const renderForm = (
+      props: Partial<React.ComponentProps<typeof BranchSwitcher>> = {}
+    ) => {
+      const onCreate = vi.fn();
+      if (phone) phoneTier();
+      render(
+        <BranchSwitcher
+          current='feature/news'
+          branches={entries}
+          onSwitch={() => {}}
+          onCreate={onCreate}
+          baseBranch='main'
+          defaultOpen
+          defaultMaximised={defaultMaximised}
+          {...props}
+        />
+      );
+      expect(
+        screen.queryByRole('button', { name: /^(Maximise|Restore)$/ }) === null
+      ).toBe(phone);
+      return onCreate;
+    };
+
+    it('keeps Create branch off while the name is empty, and starts nothing on Enter', async () => {
+      const user = userEvent.setup();
+      const onCreate = renderForm();
+      await user.click(screen.getByRole('button', { name: 'New branch' }));
+      const create = screen.getByRole('button', { name: 'Create branch' });
+      const name = screen.getByRole('searchbox', { name: 'New branch name' });
+      expect(create).toBeDisabled();
+      await user.type(name, '{Enter}');
+      expect(onCreate).not.toHaveBeenCalled();
+      await user.type(name, 'cms/a');
+      expect(create).toBeEnabled();
+      await user.clear(name);
+      expect(create).toBeDisabled();
+      expect(screen.getByText('Enter a branch name.')).toBeVisible();
+    });
+
+    it('stays editable and not busy while a create the form did not start runs', async () => {
+      const user = userEvent.setup();
+      const onCreate = renderForm({ creatingBranch: 'cms/a' });
+      expect(screen.getByText('Creating cms/a…')).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'New branch' }));
+      const name = screen.getByRole('searchbox', { name: 'New branch name' });
+      await user.type(name, 'cms/b');
+      expect(name).not.toHaveAttribute('readonly');
+      expect(name).toHaveValue('cms/b');
+      expect(screen.getByText('Creating cms/a…')).toBeVisible();
+      expect(screen.getByText('Wait for cms/a to finish first')).toBeVisible();
+      const create = screen.getByRole('button', { name: 'Create branch' });
+      expect(create).toBeDisabled();
+      await user.type(name, '{Enter}');
+      expect(onCreate).not.toHaveBeenCalled();
+    });
+  });
+
+  it('keeps focus on the Create button while it creates, and puts it in the search box after the list Retry', async () => {
+    const user = userEvent.setup();
+    const props = {
+      current: 'feature/news',
+      branches: entries,
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    await user.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/a'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    expect(screen.getByRole('button', { name: 'Creating' })).toHaveFocus();
+    rerender(<BranchSwitcher {...props} createState='failed' />);
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
+
+    const onRetry = vi.fn();
+    rerender(
+      <BranchSwitcher
+        {...props}
+        createState='idle'
+        status='failed'
+        onRetry={onRetry}
+      />
+    );
+    await user.click(
+      screen.getAllByRole('button', { name: 'Retry' }).at(-1) as HTMLElement
+    );
+    expect(onRetry).toHaveBeenCalledOnce();
+    expect(
+      screen.getByRole('searchbox', { name: 'Search branches' })
+    ).toHaveFocus();
+  });
+
+  it('closes the maximised view on Escape while the form create is busy and its button has focus', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    const props = {
+      current: 'feature/news',
+      branches: entries,
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      open: true,
+      onOpenChange,
+      defaultMaximised: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    await user.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/a'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    const busy = screen.getByRole('button', { name: 'Creating' });
+    busy.focus();
+    await user.keyboard('{Escape}');
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('clears the New branch form when a create the form started finishes', async () => {
+    const user = userEvent.setup();
+    const props = {
+      current: 'feature/news',
+      branches: entries,
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    await user.type(
+      screen.getByRole('searchbox', { name: 'New branch name' }),
+      'cms/a'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    rerender(<BranchSwitcher {...props} createState='failed' />);
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    rerender(<BranchSwitcher {...props} formResetKey={1} />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    const name = screen.getByRole('searchbox', { name: 'New branch name' });
+    expect(name).toHaveValue('');
+    await user.type(name, 'main');
+    expect(screen.getByRole('alert')).toHaveTextContent(/already exists/);
+    expect(
+      screen.getByRole('button', { name: 'Create branch' })
+    ).toBeDisabled();
+  });
+
+  it('keeps the typed name when the form create ends without finishing, as when its failure is held elsewhere', async () => {
+    const user = userEvent.setup();
+    const props = {
+      current: 'feature/news',
+      branches: entries,
+      onSwitch: () => {},
+      onCreate: () => {},
+      baseBranch: 'main',
+      defaultOpen: true,
+    } as const;
+    const { rerender } = render(<BranchSwitcher {...props} />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    const name = screen.getByRole('searchbox', { name: 'New branch name' });
+    await user.type(name, 'cms/a');
+    await user.click(screen.getByRole('button', { name: 'Create branch' }));
+    rerender(<BranchSwitcher {...props} createState='creating' />);
+    rerender(<BranchSwitcher {...props} createState='idle' />);
+    expect(name).toHaveValue('cms/a');
+  });
+
+  it('puts focus back on the branch button after a branch is picked in the maximised view', async () => {
+    const user = userEvent.setup();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        defaultOpen
+        defaultMaximised
+      />
+    );
+    await user.click(screen.getByRole('button', { name: /^fix\/typo/ }));
+    expect(document.querySelector('[data-slot="branch-maximised"]')).toBeNull();
+    expect(screen.getByRole('button', { name: /^Branch:/ })).toHaveFocus();
+  });
+
+  it('closes the maximised view on Escape even when focus is on the page body', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        defaultOpen
+        defaultMaximised
+        onOpenChange={onOpenChange}
+      />
+    );
+    (document.activeElement as HTMLElement | null)?.blur();
+    expect(document.body).toHaveFocus();
+    await user.keyboard('{Escape}');
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it('moves focus to the search box after the note Retry only when the retry started', async () => {
+    const user = userEvent.setup();
+    const refused = vi.fn(() => false);
+    const { rerender } = render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        note={{ kind: 'failed', name: 'cms/x' }}
+        onNoteAction={refused}
+        defaultOpen
+      />
+    );
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(refused).toHaveBeenCalledOnce();
+    expect(
+      screen.getByRole('searchbox', { name: 'Search branches' })
+    ).not.toHaveFocus();
+    const started = vi.fn(() => true);
+    rerender(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        note={{ kind: 'failed', name: 'cms/x' }}
+        onNoteAction={started}
+        defaultOpen
+      />
+    );
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(
+      screen.getByRole('searchbox', { name: 'Search branches' })
+    ).toHaveFocus();
+  });
+
+  it('shows one note with its action and Dismiss, and Dismiss focuses the search box', async () => {
+    const user = userEvent.setup();
+    const onNoteDismiss = vi.fn();
+    render(
+      <BranchSwitcher
+        current='feature/news'
+        branches={entries}
+        onSwitch={() => {}}
+        note={{
+          kind: 'ready',
+          name: 'cms/x',
+          reason: 'Save or discard your changes first',
+        }}
+        onNoteDismiss={onNoteDismiss}
+        defaultOpen
+      />
+    );
+    expect(screen.getByText('cms/x is ready')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Switch to cms/x' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Save or discard your changes first')
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Dismiss' }));
+    expect(onNoteDismiss).toHaveBeenCalledOnce();
+    expect(
+      screen.getByRole('searchbox', { name: 'Search branches' })
+    ).toHaveFocus();
+  });
+
+  it('opens the New branch form while a ready note is held', async () => {
+    const user = userEvent.setup();
+    // Like the app's Top bar, the parent re-renders when the form opens and builds a new note object.
+    function Parent() {
+      const [, setShown] = useState(false);
+      return (
+        <BranchSwitcher
+          current='feature/news'
+          branches={entries}
+          onSwitch={() => {}}
+          onCreate={() => {}}
+          baseBranch='main'
+          onFormChange={setShown}
+          note={{ kind: 'ready', name: 'cms/x' }}
+          defaultOpen
+        />
+      );
+    }
+    render(<Parent />);
+    await user.click(screen.getByRole('button', { name: 'New branch' }));
+    expect(
+      screen.getByRole('searchbox', { name: 'New branch name' })
+    ).toBeInTheDocument();
   });
 });
