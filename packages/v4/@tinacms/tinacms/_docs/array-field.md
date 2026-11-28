@@ -244,8 +244,11 @@ sets the field to an empty list.
 ## The component
 
 `ArrayField` (`array-field.ui.tsx`) owns the data. `ArrayFieldView`
-(`array-field.view.tsx`) draws it. The view takes plain props, so every look
-is a story in `array-field.states.tsx` and a case in one render test.
+(`array-field.view.tsx`) draws it. Remove and move go through `useRemoveListItem`
+and `useMoveListItem`. Those rewrite the list at its nested address, such as
+`groups.0.members`, so the defaults and the item errors move with the items.
+The view takes plain props, so every look is a story in `array-field.states.tsx`
+and a case in one render test.
 
 The list uses react-hook-form's `useFieldArray({ control, name: address })`
 for add, insert, remove and reorder. It has stable item keys, so React does

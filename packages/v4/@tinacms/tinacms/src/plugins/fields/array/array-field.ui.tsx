@@ -1,9 +1,9 @@
 import {
+  type RefObject,
   useEffect,
   useEffectEvent,
   useRef,
   useState,
-  type RefObject,
 } from 'react';
 import {
   get,
@@ -22,55 +22,58 @@ import {
   templateTitle,
 } from '../../../core/schema/children';
 import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
-import { useCardOutline } from '../../../editor/hooks';
 import {
   itemOpensNextLevel,
   NestedFieldRow,
   ownFieldErrors,
-  useActiveField,
   useActivation,
+  useActiveField,
   useDocumentPath,
+  useExpansion,
   useFieldAddress,
   useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
+  useInsertListItem,
   useInvalidFieldCount,
   useInvalidFieldCounts,
   useListItems,
   useMediaSlice,
-  useExpansion,
+  useMoveListItem,
   useOpenLevel,
+  useRemoveListItem,
 } from '../../../editor';
+import { useCardOutline } from '../../../editor/hooks';
+import { centerInScroller } from '../../../utils/center-in-scroller';
 import { isMediaPath } from '../image/image-field.schema';
 import { atLimit, limitOf, stepValue } from '../number/number-field.step';
 import { firstText, summaryFieldsOf } from '../object/object-field.schema';
 import { StoredValue, UneditableValue } from '../uneditable-value';
 import {
   type ArrayTemplateSchema,
-  type ObjectArrayFieldSchema,
-  type ScalarArrayFieldSchema,
-  type TemplatesArrayFieldSchema,
   asArrayFieldSchema,
   isItem,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
+  type ObjectArrayFieldSchema,
   pickerOf,
+  type ScalarArrayFieldSchema,
+  type TemplatesArrayFieldSchema,
 } from './array-field.schema';
-import { centerInScroller } from '../../../utils/center-in-scroller';
-import { seedItem } from './seed-item';
-import {
-  BlockAddView,
-  type BlockOption,
-  InlineBlockPicker,
-} from './block-picker.view';
 import {
   ArrayDrillInView,
   ArrayFieldView,
   type ArrayItemView,
   FULL_REASON,
 } from './array-field.view';
+import {
+  BlockAddView,
+  type BlockOption,
+  InlineBlockPicker,
+} from './block-picker.view';
+import { seedItem } from './seed-item';
 
 export function ArrayField() {
   const address = useFieldAddress();
@@ -185,19 +188,28 @@ function ObjectItems({
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();
   const listItems = useListItems();
+  const removeListItem = useRemoveListItem();
+  const insertListItem = useInsertListItem();
+  const moveListItem = useMoveListItem();
   const activation = useActivation();
   const { setActive } = useActiveField();
   const cardOutline = useCardOutline(toFieldAddress(address));
   const { control, getValues } = useFormContext();
-  const {
-    fields: items,
-    append,
-    insert,
-    remove,
-    move,
-  } = useFieldArray({ control, name: address });
+  const { fields: items } = useFieldArray({ control, name: address });
   // Re-renders the headings on typing, so an `itemLabel` follows it.
   useWatch({ control, name: address });
+  // Reset gives every useFieldArray new ids, so keying rows by `item.id`
+  // remounts every row of every list and the pressed button loses focus.
+  // These keys stay with the rows that remain, and follow a move or remove.
+  // `keysHeld` skips one length check while a click has already shifted the
+  // keys and the field array has not rendered the new length yet.
+  const keys = useRef<string[]>([]);
+  const keysHeld = useRef(false);
+  if (keysHeld.current) {
+    if (keys.current.length === items.length) keysHeld.current = false;
+  } else if (keys.current.length !== items.length) {
+    keys.current = items.map(nextObjectKey);
+  }
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
   const [inserting, setInserting] = useState<InsertPicker | null>(null);
   const [adding, setAdding] = useState(false);
@@ -238,14 +250,15 @@ function ObjectItems({
       if (first) setActive(toFieldAddress(`${itemAddress}.${first.name}`));
       return true;
     }
-    const id = items[index]?.id;
+    const id = keys.current[index] ?? items[index]?.id;
     if (id) setOpen((held) => new Set(held).add(id));
     return false;
   }
   const openOnActivation = useEffectEvent((target: string) => {
     items.forEach((item, index) => {
       if (target.startsWith(`${address}.${index}.`)) {
-        setOpen((held) => new Set(held).add(item.id));
+        const id = keys.current[index] ?? item.id;
+        setOpen((held) => new Set(held).add(id));
       }
     });
   });
@@ -262,7 +275,7 @@ function ObjectItems({
         openAll
           ? items
               .filter((_, index) => !opensNextLevel(`${address}.${index}`))
-              .map((item) => item.id)
+              .map((item, index) => keys.current[index] ?? item.id)
           : []
       )
     )
@@ -273,7 +286,9 @@ function ObjectItems({
 
   // The insert picker follows its opener card by id, so a move or remove while it is open cannot shift it.
   const openerIndex = inserting
-    ? items.findIndex((item) => item.id === inserting.openerId)
+    ? keys.current.indexOf(inserting.openerId) >= 0
+      ? keys.current.indexOf(inserting.openerId)
+      : items.findIndex((item) => item.id === inserting.openerId)
     : -1;
   const pickAt =
     inserting && openerIndex >= 0
@@ -288,7 +303,10 @@ function ObjectItems({
     const openerId = refocusOpener.current;
     if (inserting || openerId === null) return;
     refocusOpener.current = null;
-    const index = items.findIndex((item) => item.id === openerId);
+    const index =
+      keys.current.indexOf(openerId) >= 0
+        ? keys.current.indexOf(openerId)
+        : items.findIndex((item) => item.id === openerId);
     const cards = Array.from(listRef.current?.children ?? []).filter((child) =>
       child.hasAttribute('data-array-item')
     );
@@ -308,7 +326,9 @@ function ObjectItems({
       '[data-grip], [data-slot="list-card-head"] button'
     );
     if (card && target) {
-      const returnedId = items[Math.min(returned, items.length - 1)]?.id;
+      const returnedIndex = Math.min(returned, items.length - 1);
+      const returnedId =
+        keys.current[returnedIndex] ?? items[returnedIndex]?.id;
       if (returnedId && activation?.address === `${address}.${returned}`) {
         setReturnedTo(returnedId);
       }
@@ -335,6 +355,10 @@ function ObjectItems({
     const list: unknown = getValues(address);
     return max !== undefined && Array.isArray(list) && list.length >= max;
   };
+  const trackAddedRow = () => {
+    keys.current = [...keys.current, nextObjectKey()];
+    keysHeld.current = true;
+  };
   const cancelInsert = () => {
     refocusOpener.current = inserting?.openerId ?? null;
     setInserting(null);
@@ -344,21 +368,34 @@ function ObjectItems({
       cancelInsert();
       return;
     }
+    keys.current.splice(index, 0, nextObjectKey());
+    keysHeld.current = true;
     refocusOpener.current = null;
     afterChange({ open: index, focus: index });
-    listItems.insert(address, index, () => insert(index, seedFor(template)));
+    listItems.insert(address, index, () =>
+      insertListItem(address, index, seedFor(template))
+    );
     setInserting(null);
   };
   const add = (template?: ArrayTemplateSchema) => {
     if (atMax()) return;
+    trackAddedRow();
     afterChange({ open: items.length, focus: items.length });
-    append(seedFor(template));
+    listItems.insert(address, items.length, () =>
+      insertListItem(address, items.length, seedFor(template))
+    );
     setAdding(false);
   };
   const moveTo = (from: number, to: number) => {
     if (to < 0 || to >= items.length) return;
+    if (keys.current.length === items.length) {
+      const next = [...keys.current];
+      const [key] = next.splice(from, 1);
+      next.splice(to, 0, key);
+      keys.current = next;
+    }
     afterChange({ focus: to });
-    listItems.move(address, from, to, () => move(from, to));
+    listItems.move(address, from, to, () => moveListItem(address, from, to));
   };
 
   useEffect(() => {
@@ -367,7 +404,11 @@ function ObjectItems({
       setReturnedTo(null);
       return;
     }
-    const index = items.findIndex((item) => item.id === returnedTo);
+    const keyIndex = keys.current.indexOf(returnedTo);
+    const index =
+      keyIndex >= 0
+        ? keyIndex
+        : items.findIndex((item) => item.id === returnedTo);
     if (
       activation?.address !== address &&
       activation?.address !== `${address}.${index}`
@@ -388,6 +429,7 @@ function ObjectItems({
     (returnedTo === id && activation?.address === address);
 
   const views: ArrayItemView[] = items.map((item, index) => {
+    const key = keys.current[index] ?? item.id;
     const itemAddress = `${address}.${index}`;
     const stored: unknown = getValues(itemAddress);
     // `watched` only triggers the render; it can lag a move, so read `stored`.
@@ -413,20 +455,19 @@ function ObjectItems({
     const opens =
       fields && opensNextLevel(itemAddress) ? 'next-level' : 'in-place';
     return {
-      id: item.id,
+      id: key,
       name: `Item ${index + 1}`,
       address: itemAddress,
       kind: 'group',
       title,
       summary,
       opens,
-      open: open.has(item.id),
+      open: open.has(key),
       errorCount: counts[index],
-      active: isActive(item.id, itemAddress),
+      active: isActive(key, itemAddress),
       onHoverChange: (hovering) =>
         cardOutline.hover(hovering ? toFieldAddress(itemAddress) : null),
-      onCardFocus: () =>
-        setReturnedTo((held) => (held === item.id ? held : null)),
+      onCardFocus: () => setReturnedTo((held) => (held === key ? held : null)),
       onToggle: () => {
         if (opens === 'next-level') {
           showItem(index);
@@ -434,7 +475,7 @@ function ObjectItems({
         }
         setOpen((held) => {
           const next = new Set(held);
-          if (!next.delete(item.id)) next.add(item.id);
+          if (!next.delete(key)) next.add(key);
           return next;
         });
       },
@@ -510,7 +551,7 @@ function ObjectItems({
       onMove={moveTo}
       onInsert={(index, where) => {
         if (isTemplatesArray(field)) {
-          const openerId = items[index]?.id;
+          const openerId = keys.current[index] ?? items[index]?.id;
           if (!openerId) return;
           setAdding(false);
           refocusOpener.current = null;
@@ -520,14 +561,26 @@ function ObjectItems({
       }}
       onDuplicate={(index) => {
         if (atMax()) return;
+        keys.current.splice(index + 1, 0, nextObjectKey());
+        keysHeld.current = true;
         afterChange({ open: index + 1, focus: index + 1 });
         listItems.insert(address, index + 1, () =>
-          insert(index + 1, structuredClone(getValues(`${address}.${index}`)))
+          insertListItem(
+            address,
+            index + 1,
+            structuredClone(getValues(`${address}.${index}`))
+          )
         );
       }}
       onRemove={(index) => {
+        if (keys.current.length === items.length) {
+          keys.current = keys.current.filter(
+            (_, position) => position !== index
+          );
+          keysHeld.current = true;
+        }
         afterChange({ focus: focusAfterRemove(index, items.length - 1) });
-        listItems.remove(address, index, () => remove(index));
+        listItems.remove(address, index, () => removeListItem(address, index));
       }}
     />
   );
@@ -799,3 +852,6 @@ const numberBox = (
 
 let scalarKeyCount = 0;
 const nextScalarKey = (): string => `scalar-item-${scalarKeyCount++}`;
+
+let objectKeyCount = 0;
+const nextObjectKey = (): string => `object-item-${objectKeyCount++}`;

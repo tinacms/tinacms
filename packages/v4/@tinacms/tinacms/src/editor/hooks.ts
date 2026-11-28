@@ -19,10 +19,10 @@ import type { AuthSlice } from '../core/auth/contract';
 import { authSliceOf, siteAuthTokenOf } from '../core/auth/slice';
 import { currentBranchOf } from '../core/branch/contract';
 import { ContentError, type ContentSlice } from '../core/content/contract';
-import type { MediaSlice } from '../core/media/contract';
 import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
 import { invariant } from '../core/invariant';
+import type { MediaSlice } from '../core/media/contract';
 import type { SliceState, TinaStoreState } from '../core/plugin';
 import {
   type CollectionSchema,
@@ -38,9 +38,9 @@ import {
   useFormStore,
 } from '../form/form-store';
 import {
+  createRpcClient,
   type RpcClientConfig,
   type RpcProxy,
-  createRpcClient,
 } from '../rpc/proxy';
 import {
   FieldActiveContext,
@@ -228,6 +228,32 @@ export function useSaveFailure(): [
 export function useDiscardEdits(): () => void {
   return useFormScope('discard-edits-outside-provider', 'useDiscardEdits')
     .discardEdits;
+}
+
+export function useRemoveListItem(): (
+  address: FieldAddress,
+  index: number
+) => void {
+  return useFormScope('remove-list-item-outside-provider', 'useRemoveListItem')
+    .removeListItem;
+}
+
+export function useInsertListItem(): (
+  address: FieldAddress,
+  index: number,
+  item: unknown
+) => void {
+  return useFormScope('insert-list-item-outside-provider', 'useInsertListItem')
+    .insertListItem;
+}
+
+export function useMoveListItem(): (
+  address: FieldAddress,
+  from: number,
+  to: number
+) => void {
+  return useFormScope('move-list-item-outside-provider', 'useMoveListItem')
+    .moveListItem;
 }
 
 // Set while a stored copy waits for the editor to Resume or Discard it.
