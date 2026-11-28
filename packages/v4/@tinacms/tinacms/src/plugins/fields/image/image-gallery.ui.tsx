@@ -129,6 +129,19 @@ export function ImageGallery() {
     }
   }, [choosingMissing]);
 
+  // Moving a parent list item changes `address` after `MediaPickerPanel` may have
+  // rendered with the old `latestAddress`; re-send the request so "Already added" reads the new path.
+  const previousAddress = useRef(address);
+  useEffect(() => {
+    if (previousAddress.current === address) return;
+    previousAddress.current = address;
+    if (choosingAdd) {
+      picker.open(addRequest(opener.current));
+    } else if (choosingKey !== undefined) {
+      picker.open(replaceRequest(choosingKey, opener.current));
+    }
+  }, [address]);
+
   return (
     <ImageGalleryView
       {...frame}

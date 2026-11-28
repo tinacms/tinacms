@@ -18,13 +18,13 @@ import {
   readyMessage,
   valuesMessage,
 } from '../preview/protocol';
+import { connectionOf } from '../test/connection';
 import { LabelledFields } from '../test/labelled-fields';
 import { FormProvider, TinaProvider } from './index';
 import {
   type PreviewConnectionOptions,
   usePreviewConnection,
 } from './preview-connection';
-import { connectionOf } from '../test/connection';
 
 const collection: CollectionSchema = {
   name: 'post',

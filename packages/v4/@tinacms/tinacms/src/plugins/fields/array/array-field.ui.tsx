@@ -1,9 +1,9 @@
 import {
+  type RefObject,
   useEffect,
   useEffectEvent,
   useRef,
   useState,
-  type RefObject,
 } from 'react';
 import {
   get,
@@ -22,58 +22,58 @@ import {
   templateTitle,
 } from '../../../core/schema/children';
 import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
-import { useCardOutline } from '../../../editor/hooks';
 import {
   itemOpensNextLevel,
   NestedFieldRow,
   ownFieldErrors,
-  useActiveField,
   useActivation,
+  useActiveField,
   useDocumentPath,
+  useExpansion,
   useFieldAddress,
   useFieldFrame,
   useFieldRegistry,
   useFieldSchema,
   useFieldValue,
+  useInsertListItem,
   useInvalidFieldCount,
   useInvalidFieldCounts,
-  useInsertListItem,
   useListItems,
   useMediaSlice,
-  useExpansion,
   useMoveListItem,
   useOpenLevel,
   useRemoveListItem,
 } from '../../../editor';
+import { useCardOutline } from '../../../editor/hooks';
+import { centerInScroller } from '../../../utils/center-in-scroller';
 import { isMediaPath } from '../image/image-field.schema';
 import { atLimit, limitOf, stepValue } from '../number/number-field.step';
 import { firstText, summaryFieldsOf } from '../object/object-field.schema';
 import { StoredValue, UneditableValue } from '../uneditable-value';
 import {
   type ArrayTemplateSchema,
-  type ObjectArrayFieldSchema,
-  type ScalarArrayFieldSchema,
-  type TemplatesArrayFieldSchema,
   asArrayFieldSchema,
   isItem,
   isScalarArray,
   isTemplatesArray,
   itemFieldsOf,
+  type ObjectArrayFieldSchema,
   pickerOf,
+  type ScalarArrayFieldSchema,
+  type TemplatesArrayFieldSchema,
 } from './array-field.schema';
-import { centerInScroller } from '../../../utils/center-in-scroller';
-import { seedItem } from './seed-item';
-import {
-  BlockAddView,
-  type BlockOption,
-  InlineBlockPicker,
-} from './block-picker.view';
 import {
   ArrayDrillInView,
   ArrayFieldView,
   type ArrayItemView,
   FULL_REASON,
 } from './array-field.view';
+import {
+  BlockAddView,
+  type BlockOption,
+  InlineBlockPicker,
+} from './block-picker.view';
+import { seedItem } from './seed-item';
 
 export function ArrayField() {
   const address = useFieldAddress();
@@ -326,7 +326,9 @@ function ObjectItems({
       '[data-grip], [data-slot="list-card-head"] button'
     );
     if (card && target) {
-      const returnedId = items[Math.min(returned, items.length - 1)]?.id;
+      const returnedIndex = Math.min(returned, items.length - 1);
+      const returnedId =
+        keys.current[returnedIndex] ?? items[returnedIndex]?.id;
       if (returnedId && activation?.address === `${address}.${returned}`) {
         setReturnedTo(returnedId);
       }
@@ -402,7 +404,11 @@ function ObjectItems({
       setReturnedTo(null);
       return;
     }
-    const index = items.findIndex((item) => item.id === returnedTo);
+    const keyIndex = keys.current.indexOf(returnedTo);
+    const index =
+      keyIndex >= 0
+        ? keyIndex
+        : items.findIndex((item) => item.id === returnedTo);
     if (
       activation?.address !== address &&
       activation?.address !== `${address}.${index}`
@@ -458,11 +464,10 @@ function ObjectItems({
       opens,
       open: open.has(key),
       errorCount: counts[index],
-      active: isActive(item.id, itemAddress),
+      active: isActive(key, itemAddress),
       onHoverChange: (hovering) =>
         cardOutline.hover(hovering ? toFieldAddress(itemAddress) : null),
-      onCardFocus: () =>
-        setReturnedTo((held) => (held === item.id ? held : null)),
+      onCardFocus: () => setReturnedTo((held) => (held === key ? held : null)),
       onToggle: () => {
         if (opens === 'next-level') {
           showItem(index);

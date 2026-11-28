@@ -35,12 +35,14 @@ import {
   type TinaStoreState,
 } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
-import { customValidatorNamesOf } from '../core/validator/registry';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { createScreenRegistry } from '../core/screen/registry';
 import { createGlobalNav } from '../core/slot/global-nav';
 import { addressesWithValidators } from '../core/validation';
-import { createValidatorRegistry } from '../core/validator/registry';
+import {
+  createValidatorRegistry,
+  customValidatorNamesOf,
+} from '../core/validator/registry';
 import type { DraftUserScope, StoredDraft } from '../form/drafts';
 import {
   type FieldErrors,
@@ -57,25 +59,16 @@ import {
   valuesEqual,
 } from '../form/form-store';
 import { MediaPickerHost } from '../plugins/media-manager/media-picker-host';
-import { blockOnFormErrors } from './block-errors';
-import {
-  endServerErrorsIfChanged,
-  forgetServerErrors,
-  heldServerErrors,
-} from './server-errors';
-import { registerFormBindings } from './form-bindings';
-import { checkForm } from './save-pipeline';
-import { UploadFormContext } from './uploads/upload-context';
-import { uploadListOf } from './uploads/upload-list';
 import { SELF_CONTAINED_VALIDATORS } from '../plugins/validators/core-validators.schema';
 import { DEFAULT_RPC_URL } from '../rpc/proxy';
 import { createTinaStore } from '../store/create-store';
+import { blockOnFormErrors } from './block-errors';
 import {
   FormScopeContext,
   type SaveHandler,
+  type StaleDraftActions,
   type TinaRuntime,
   TinaRuntimeContext,
-  type StaleDraftActions,
   type WaitingCause,
 } from './context';
 import {
@@ -85,8 +78,17 @@ import {
   rekeyAddresses,
   toFieldErrorEntry,
 } from './field-errors';
+import { registerFormBindings } from './form-bindings';
 import { useFormViewStore } from './form-view-state';
 import { buildFormResolver } from './resolver';
+import { checkForm } from './save-pipeline';
+import {
+  endServerErrorsIfChanged,
+  forgetServerErrors,
+  heldServerErrors,
+} from './server-errors';
+import { UploadFormContext } from './uploads/upload-context';
+import { uploadListOf } from './uploads/upload-list';
 
 export interface TinaProviderProps {
   config: ResolvedConfig;
